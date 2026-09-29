@@ -34,6 +34,7 @@
             "CPAN::Meta" : "0",
             "ExtUtils::MakeMaker" : "6.76",
             "ExtUtils::MakeMaker::CPANfile" : "0.11",
+            "File::Basename" : "0",
             "File::ShareDir::Install" : "0",
             "File::Spec::Functions" : "0",
             "Module::Load::Conditional" : "0",
@@ -76,7 +77,7 @@
    "provides" : {
       "Dist::Starter" : {
          "file" : "lib/Dist/Starter.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.3.0"
       }
    },
    "release_status" : "stable",
@@ -90,6 +91,6 @@
          "web" : "https://codeberg.org/XSven/Dist-Starter"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.3.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

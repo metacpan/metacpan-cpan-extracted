@@ -1,6 +1,18 @@
 Revision history for Chem-Structure-Parser
 
 
+0.035 2026-09-27 CDT
+
+ - The interface has a pocket: the first partner's atoms within 6 A of the
+   second, which is the receptor's binding site around a peptide or ligand
+   in the order the partners are worked out.  It comes with the pocket's
+   size, charge, Kyte-Doolittle hydropathy, residue-class fractions, surface
+   in the receptor alone and its hydrophobic share, mean relative surface
+   and buried fraction, and packing density.  The definitions are the
+   pocket block of the pepPriML static feature script, and on 1cka all
+   sixteen of its figures agree.  It is on by default; pocket => 0 turns it
+   off, and pocket_distance and packing_distance move its two cutoffs.
+
 0.034 2026-09-26 CDT
 
  - A free amino acid or nucleotide bound after a chain is told from a

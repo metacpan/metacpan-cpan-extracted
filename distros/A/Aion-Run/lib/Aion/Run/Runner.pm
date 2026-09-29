@@ -1,30 +1,29 @@
 package Aion::Run::Runner;
 use common::sense;
 
-use Aion::Fs qw/mkpath cat lay to_pkg/;
-use List::Util qw/pairgrep/;
-
-use config INI => 'etc/annotation/run.ann';
+use Aion::Annotation::Reader;
 
 use Aion;
 
 # Список команд
-has runs => (is => 'ro', isa => HashRef, default => sub {
+has runs => (is => 'ro?!', isa => HashRef, default => sub {
 	my($self) = @_;
 	my %run;
-	open my $f, '<:utf8', INI or die "Can't open ${\INI}: $!";
-	while (<$f>) {
-		chomp;
-		warn("Annotation error. Use #\@run <rubric>:<name> <remark>\n$_\n  at ${\INI} line $."), next unless /^([\w:]+)#(\w*),(\d+)=(\S+?):(\S+)[ \t]+(.+)/am;
-		$run{$5} = {
-			rubric => $4,
-			name   => $5,
-			remark => $6,
-			pkg    => $1,
-			sub    => $2,
+	my $reader = Aion::Annotation::Reader->new('run');
+	while (<$reader>) {
+		if($_->{annotation} !~ /^(\S+?):(\S+)[ \t]+(.+)/am) {
+			warn("Annotation error. Use #\@run <rubric>:<name> <remark>\n  $_->{annotation}\n  at $reader->{path} line $.");
+		 	next;
+		}
+
+		$run{$2} = {
+			rubric => $1,
+			name   => $2,
+			remark => $3,
+			pkg    => $_->{pkg},
+			sub    => $_->{name},
 		};
 	}
-	close $f;
 	\%run;
 });
 
@@ -61,17 +60,18 @@ File etc/annotation/run.ann:
 
 
 
-	use Aion::Format qw/trappout np/;
+	use Aion::Format qw/trappout/;
+	use Data::Printer colored => 1, caller_info => 0, show_memsize => 0;
 	use Aion::Run::Runner;
 	use Aion::Run::RunRun;
 	
-	trappout { Aion::Run::Runner->run("run", "1+2") } # -> np(3, caller_info => 0) . "\n"
+	trappout { Aion::Run::Runner->run("run", "1+2") } # -> do { my $t = 3; p $t, return_value => "dump", caller_info => 0, show_memsize => 0 } . "\n"
 
 =head1 DESCRIPTION
 
 C<Aion::Run::Runner> reads the file B<etc/annotation/run.ann> with a list of scripts, and any script from the list can be executed through its C<run> method.
 
-The path to the file with scripts can be changed using the C<INI> config.
+The path to the file with scripts can be changed using the C<AION_ANNOTATION_INI> config.
 
 Used in the C<act> command.
 
@@ -79,7 +79,7 @@ Used in the C<act> command.
 
 =head2 runs
 
-Hash with commands. Loaded by default from the C<INI> file.
+Hash with commands. Loaded from a file.
 
 =head1 SUBROUTINES
 

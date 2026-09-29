@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use Cwd qw(abs_path);
 use Digest::MD5 qw(md5_hex);
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 
 my $CREATED = '2026-08-11';
 
@@ -237,7 +237,17 @@ sub ramdisk_setup {
         elsif ( defined $rm_base && length $rm_base ) {
             my $rm_base_check = $rm_base;
             $rm_base_check .= '/' if $os eq 'windows' && $rm_base_check =~ /^[a-zA-Z]:$/;
-            if ( -d $rm_base_check ) {
+            if ( $os eq 'macos' ) {
+                # On macOS, /Volumes is root-owned and holds mount points.
+                # An APFS/HFS+ RAM-disk is only considered mounted if the volume
+                # directory already exists and is writable.
+                my $target_rdir = "$rm_base/amberdb_$dbname";
+                if ( -d $target_rdir && -w $target_rdir ) {
+                    $ramdisk_dir = $target_rdir;
+                    $is_mounted  = 1;
+                }
+            }
+            elsif ( -d $rm_base_check ) {
                 $ramdisk_dir = "$rm_base/amberdb_$dbname";
                 $is_mounted  = 1;
             }
@@ -282,13 +292,22 @@ sub ramdisk_setup {
         );
 
         my $old_umask = umask(0000);
-        for my $dir ( $ramdisk_dir, $tbl_rdir, $schema_rdir, $config_rdir, $lock_dir, $session_dir, $shmem_dir, "$ramdisk_dir/journal" ) {
-            $self->make_path($dir);
-            chmod 0777, $dir if -d $dir;
-        }
+        my $make_ok = eval {
+            for my $dir ( $ramdisk_dir, $tbl_rdir, $schema_rdir, $config_rdir, $lock_dir, $session_dir, $shmem_dir, "$ramdisk_dir/journal" ) {
+                $self->make_path($dir);
+                chmod 0777, $dir if -d $dir;
+            }
+            1;
+        };
         umask($old_umask);
+        if ( !$make_ok ) {
+            $is_mounted  = 0;
+            $ramdisk_dir = '';
+            $mount_desc  = "Local Storage (No RAM-disk active)";
+        }
     }
-    else {
+
+    if (!$is_mounted) {
         # Strict zero-fallback: when unmounted, all *_rdir paths are empty and removed.
         $tbl_dir     = $self->path('table_dir')   || "$dbase_dir/table";
         $schema_dir  = $self->path('schema_dir')  || "$dbase_dir/schema";

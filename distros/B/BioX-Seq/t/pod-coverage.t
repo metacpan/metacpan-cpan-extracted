@@ -4,6 +4,8 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 
+## no critic (ProhibitStringyEval)
+
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;
 eval "use Test::Pod::Coverage $min_tpc";

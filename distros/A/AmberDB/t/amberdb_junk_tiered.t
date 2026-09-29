@@ -120,7 +120,7 @@ subtest '2. CRUD partitioning into Base, A: and B: streams' => sub {
     is_deeply( \@b_src_beta,    [2], "'beta' indexed in junk B:4:beta" );
 
     # Check fields in .fld (block 1 is Roman)
-    my @roman_id = $adb->get_fieldlist( "Roman", $tpath, $adb->table_info('catalog_product'), 1 );
+    my @roman_id = $adb->field_to_list( "Roman", $tpath, $adb->table_info('catalog_product'), 1 );
     my ( undef, @base_fld_roman ) = $adb->index_get( "$tpath.fld", "1:$roman_id[0]", "ids", 0, 0, 'asc' );
     my ( undef, @a_fld_roman )    = $adb->index_get( "$tpath.fld", "A:1:$roman_id[0]", "ids", 0, 0, 'asc' );
     my ( undef, @b_fld_roman )    = $adb->index_get( "$tpath.fld", "B:1:$roman_id[0]", "ids", 0, 0, 'asc' );

@@ -5,6 +5,7 @@ on configure => sub {
   requires 'CPAN::Meta'                    => '0';
   requires 'ExtUtils::MakeMaker'           => '6.76';    # Offers the RECURSIVE_TEST_FILES, NO_PERLLOCAL features
   requires 'ExtUtils::MakeMaker::CPANfile' => '0.10';    # Needs at least ExtUtils::MakeMaker 6.52
+  requires 'File::Basename'                => '0';
   requires 'File::Spec::Functions'         => '0';
   requires 'Module::Load::Conditional'     => '0';
   requires 'Module::Loaded'                => '0';

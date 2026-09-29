@@ -19,9 +19,9 @@ use_ok('AmberDB::Tools')              or BAIL_OUT('Cannot load AmberDB::Tools');
 
 subtest 'Index Methods Existence' => sub {
     plan tests => 17;
-    can_ok( 'AmberDB::Base::Index', 'get_fieldlist' );
-    can_ok( 'AmberDB::Base::Index', 'set_fieldlist' );
     can_ok( 'AmberDB::Base::Index', 'field_to_list' );
+    can_ok( 'AmberDB::Base::Index', 'unique_check' );
+    can_ok( 'AmberDB::Base::Index', 'unique_add' );
     can_ok( 'AmberDB::Base::Index', 'rdbm_target' );
     can_ok( 'AmberDB::Base::Index', 'repeat_fields' );
     can_ok( 'AmberDB::Base::Facet', 'facet_rules' );
@@ -40,9 +40,9 @@ subtest 'Index Methods Existence' => sub {
 
 subtest 'AmberDB Inheritance of Index Methods' => sub {
     plan tests => 17;
-    can_ok( 'AmberDB', 'get_fieldlist' );
-    can_ok( 'AmberDB', 'set_fieldlist' );
     can_ok( 'AmberDB', 'field_to_list' );
+    can_ok( 'AmberDB', 'unique_check' );
+    can_ok( 'AmberDB', 'unique_add' );
     can_ok( 'AmberDB', 'rdbm_target' );
     can_ok( 'AmberDB', 'repeat_fields' );
     can_ok( 'AmberDB', 'facet_rules' );
@@ -146,16 +146,16 @@ subtest 'index_put / index_get binary safety' => sub {
     is( $count,   scalar @ids, 'count value matches' );
     is( $lastid,  5000,        'lastid value matches' );
 
-    # Test non-numeric ID filtering in array when type ne 'raw'
+    # Test non-positive and undef ID filtering in array when type ne 'raw'
     $adb->table_write($inx_path);
-    $adb->index_put( $inx_path, 'filtered_keys', [ 10, 'junk', 20, undef, -5, 30 ], 'ids' );
+    $adb->index_put( $inx_path, 'filtered_keys', [ 10, 0, 20, undef, -5, 30 ], 'ids' );
     my ( $cnt_f, @keys_f ) = $adb->index_get( $inx_path, 'filtered_keys' );
-    is( $cnt_f, 3, 'non-numeric and non-positive IDs filtered from array' );
+    is( $cnt_f, 3, 'non-positive and undefined IDs filtered from array' );
     is_deeply( \@keys_f, [ 30, 20, 10 ], 'clean IDs preserved (desc default)' );
 
-    # Test non-numeric scalar rejection when type is ids
-    my $ret_bad = $adb->index_put( $inx_path, 'bad_scalar', 'not_a_number', 'ids' );
-    ok( !$ret_bad, 'non-numeric scalar rejected when type is ids' );
+    # Test non-positive scalar rejection when type is ids
+    my $ret_bad = $adb->index_put( $inx_path, 'bad_scalar', 0, 'ids' );
+    ok( !$ret_bad, 'non-positive scalar rejected when type is ids' );
 
     # Test arbitrary string allowed when type is raw
     my $ret_raw = $adb->index_put( $inx_path, 'raw_field', 'arbitrary string with utf8: şçö', 'raw' );

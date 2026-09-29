@@ -14,7 +14,7 @@ use InternetData::Database;
 use InternetData::Error;
 use InternetData::Oauth;
 
-our $VERSION = '1.7.0';
+our $VERSION = '1.7.1';
 
 use constant DEFAULT_BASE_URL => 'https://internetdata.io';
 
@@ -44,7 +44,10 @@ sub new {
         api_key => $args{api_key},
         base_url => _base_url($args{base_url}),
         retries => $retries,
-        timeout => $timeout,
+        # Held as a number: Mojo tests the bound for truth before arming it, and a
+        # string such as '0.0' is true, so it would be a timer that fires at once
+        # rather than no bound.
+        timeout => 0 + $timeout,
         ua => $args{ua} || Mojo::UserAgent->new,
     }, $class;
 
@@ -151,7 +154,9 @@ sub _start_p {
     my ($self, $tx, $timeout) = @_;
     my $ua = $self->{ua};
     my $bound = $ua->request_timeout;
-    $ua->request_timeout(defined $timeout ? $timeout : $self->{timeout});
+    # A number, for the reason new gives: a per-call '0.0' is otherwise a timer
+    # that fires at once.
+    $ua->request_timeout(defined $timeout ? 0 + $timeout : $self->{timeout});
     my $promise = eval { $ua->start_p($tx) };
     my $failed = $@;
     $ua->request_timeout($bound);

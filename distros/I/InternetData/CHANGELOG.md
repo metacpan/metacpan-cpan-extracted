@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.7.1 - 2026-09-29
+
+### Fixes
+
+- Read a timeout written as a string zero as no bound ([`2d5da60`](https://github.com/internetdata/sdk-perl/commit/2d5da600b6fb2a1afc885e3efe35c64cbff6d5bf))
+
 ## 1.7.0 - 2026-09-27
 
 ### Features

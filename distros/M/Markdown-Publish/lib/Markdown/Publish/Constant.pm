@@ -18,7 +18,7 @@ use warnings;
 
 use Cwd qw(abs_path);
 
-$VERSION='1.003';
+$VERSION='1.004';
 
 %Constant=(
     MARKDOWN_PUBLISH_MODULE      => 'Markdown::Publish::MkDocs',

@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 require XSLoader;
 XSLoader::load('Destructure::Declare', $VERSION);

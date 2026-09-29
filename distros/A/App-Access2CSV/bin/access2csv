@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+
+# Thin wrapper: all of the logic, and the documentation used by --help,
+# lives in App::Access2CSV so that it can be tested without a subprocess
+
+use strict;
+use warnings;
+use autodie qw(:all);
+
+use App::Access2CSV;
+
+exit App::Access2CSV->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+access2csv - Export the tables of a Microsoft Access database to CSV files
+
+=head1 SYNOPSIS
+
+	access2csv [options] database.accdb
+	access2csv [options] -          # read the database from standard input
+
+Run C<access2csv --help> for the options, or C<access2csv --man> (or
+C<perldoc App::Access2CSV>) for the full manual.
+
+=head1 DESCRIPTION
+
+Writes one CSV file for each table of a Microsoft Access database
+(C<.mdb> or C<.accdb>), using the mdbtools programs.  Access's own
+system tables are skipped; file names are made safe; each file is
+written completely or not at all.
+
+Common options: B<--output-dir> I<DIR>, B<--table> I<NAME> (repeatable),
+B<--overwrite>, B<--dry-run>, B<--show-counts>,
+B<--encoding> I<utf8|utf8-bom|cp1252>, B<--log> I<FILE> / B<--no-log>,
+B<--version>.  See L<App::Access2CSV/OPTIONS> for all of them.
+
+=head1 EXIT STATUS
+
+	0  every selected table was exported (also --dry-run, --help, --version)
+	1  at least one table could not be exported
+	2  the command line was wrong
+	3  a fatal error stopped the run
+
+=head1 REQUIREMENTS
+
+The mdbtools programs (C<mdb-tables>, C<mdb-export>, and C<mdb-count> for
+B<--show-counts>) must be installed and in your C<PATH>, for example with
+C<sudo apt install mdbtools> or C<brew install mdbtools>.  See
+L<App::Access2CSV/REQUIREMENTS>.
+
+=head1 SEE ALSO
+
+L<App::Access2CSV>, L<https://github.com/mdbtools/mdbtools>
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

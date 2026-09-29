@@ -54,6 +54,7 @@ WriteMakefile(
             directory => [
                 'lib/AmberDB/Base',
                 'lib/AmberDB/Locale/Lang',
+                'lib/AmberDB/Tools',
             ],
             file => [
                 'lib/AmberDB/Base.pm',
@@ -66,6 +67,9 @@ WriteMakefile(
             package => [
                 'AmberDB::Base',
                 'AmberDB::Locale::Currency',
+                'AmberDB::Tools::Index',
+                'AmberDB::Tools::Maintain',
+                'AmberDB::Tools::Update',
             ],
         },
         resources   => {

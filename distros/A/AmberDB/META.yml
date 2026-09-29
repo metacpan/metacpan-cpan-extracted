@@ -23,6 +23,7 @@ no_index:
     - inc
     - lib/AmberDB/Base
     - lib/AmberDB/Locale/Lang
+    - lib/AmberDB/Tools
   file:
     - lib/AmberDB/Base.pm
     - lib/AmberDB/Locale/Currency.pm
@@ -32,6 +33,9 @@ no_index:
   package:
     - AmberDB::Base
     - AmberDB::Locale::Currency
+    - AmberDB::Tools::Index
+    - AmberDB::Tools::Maintain
+    - AmberDB::Tools::Update
 requires:
   Archive::Tar: '0'
   Carp: '0'
@@ -52,5 +56,5 @@ requires:
 resources:
   bugtracker: https://github.com/marufcetin/amberdb/issues
   repository: https://github.com/marufcetin/amberdb.git
-version: v5.26.0
+version: v5.26.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

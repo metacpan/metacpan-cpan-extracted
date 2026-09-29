@@ -27,7 +27,7 @@ $adb->table_attr( $tbl, {
 
 $adb->insert_id( $tbl, 1, 'Inception Christopher Nolan', 'Action', '2010' );
 $adb->insert_id( $tbl, 2, 'The Dark Knight', 'Action', '2008' );
-$adb->insert_id( $tbl, 3, 'Interstellar', 'Sci-Fi', '2014' );
+$adb->insert_id( $tbl, 3, 'Interstellar', 'SciFi', '2014' );
 $adb->insert_id( $tbl, 4, 'Memento', 'Thriller', '2000' );
 
 subtest '1. read_field tests' => sub {
@@ -38,7 +38,7 @@ subtest '1. read_field tests' => sub {
     is_deeply( [ sort { $a <=> $b } @single ], [ 1, 2 ], 'read_field single value' );
 
     # Multiple values via bin_crop OR
-    my @multi = $adb->read_field( $tbl, 2, [ 'Action', 'Sci-Fi' ] );
+    my @multi = $adb->read_field( $tbl, 2, [ 'Action', 'SciFi' ] );
     is_deeply( [ sort { $a <=> $b } @multi ], [ 1, 2, 3 ], 'read_field multi value via bin_crop' );
 
     # All keys

@@ -45,7 +45,7 @@ sub next_seq {
     local $/ = $self->{rec_sep};
 
     my $line = $self->{buffer} // <$fh>;
-    return undef if (! defined $line);
+    return if (! defined $line);
     chomp $line;
 
     my ($id, $desc) = ($line =~ /^\@(\S+)\s*(.+)?$/);

@@ -24,7 +24,7 @@ use parent qw(
 our $DB_HASH;
 our $hash_info;
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 my $CREATED = '2005-01-28';
 
 
@@ -41,7 +41,7 @@ sub new {
     }
 
     # Map public input keys to internal private keys
-    $self->{_cfg}     = delete $self->{cfg}     // $self->{_cfg}     // {};
+    $self->{_cfg}     = delete $self->{cfg}     // delete $self->{config} // $self->{_cfg}     // {};
     $self->{_path}    = delete $self->{path}    // $self->{_path}    // {};
     $self->{_connect} = delete $self->{connect} // $self->{_connect} // {};
 
@@ -187,22 +187,31 @@ sub insert_id {
     $tableid or return;
     $rid //= 0;
 
-    # Deflate if hashref is provided as single payload or as record payload
+    # Deflate ONLY if table has a schema AND hash matches schema
     if ( ref($rid) eq 'HASH' && !@record ) {
-        my $h   = $rid;
-        my $def = $self->deflate( $tableid, $h );
-        if ( ref($def) eq 'ARRAY' ) {
-            $rid    = $def->[0];
-            @record = ( scalar(@$def) > 1 ) ? @{$def}[ 1 .. $#$def ] : (0);
+        if ( $self->schema_matches_hash( $tableid, $rid ) ) {
+            my $h   = $rid;
+            my $def = $self->deflate( $tableid, $h );
+            if ( ref($def) eq 'ARRAY' ) {
+                $rid    = $def->[0];
+                @record = ( scalar(@$def) > 1 ) ? @{$def}[ 1 .. $#$def ] : (0);
+            }
+        }
+        else {
+            my $h = { %$rid };
+            $rid = delete $h->{id} // delete $h->{ID} // 0;
+            @record = ($h);
         }
     }
     elsif ( @record && ref($record[0]) eq 'HASH' ) {
-        my $h = $record[0];
-        $h->{id} //= $rid if $rid;
-        my $def = $self->deflate( $tableid, $h );
-        if ( ref($def) eq 'ARRAY' ) {
-            $rid //= $def->[0];
-            @record = ( scalar(@$def) > 1 ) ? @{$def}[ 1 .. $#$def ] : (0);
+        if ( $self->schema_matches_hash( $tableid, $record[0] ) ) {
+            my $h = $record[0];
+            $h->{id} //= $rid if $rid;
+            my $def = $self->deflate( $tableid, $h );
+            if ( ref($def) eq 'ARRAY' ) {
+                $rid //= $def->[0];
+                @record = ( scalar(@$def) > 1 ) ? @{$def}[ 1 .. $#$def ] : (0);
+            }
         }
     }
 
@@ -352,15 +361,27 @@ sub insert_list {
     $tableid        or return {};
     scalar @records or return {};
 
-    # Deflate if records contain hashrefs or if single arrayref of hashes or HoH
-    if ( @records == 1 && ref($records[0]) eq 'ARRAY' && @{$records[0]} && ref($records[0]->[0]) eq 'HASH' ) {
-        @records = $self->deflate( $tableid, @{ $records[0] } );
+    # Deflate ONLY if table has a schema and records match schema
+    my $should_deflate = 0;
+    if ( $self->has_schema($tableid) ) {
+        my $first_rec = ( @records == 1 && ref($records[0]) eq 'ARRAY' && @{$records[0]} && ref($records[0]->[0]) eq 'HASH' )
+          ? $records[0]->[0]
+          : ( ref($records[0]) eq 'HASH' ? $records[0] : ( ( @records > 1 && ref($records[1]) eq 'HASH' ) ? $records[1] : undef ) );
+        if ( $first_rec && $self->schema_matches_hash( $tableid, $first_rec ) ) {
+            $should_deflate = 1;
+        }
     }
-    elsif ( @records == 1 && ref($records[0]) eq 'HASH' ) {
-        @records = $self->deflate( $tableid, $records[0] );
-    }
-    elsif ( grep { ref($_) eq 'HASH' } @records ) {
-        @records = $self->deflate( $tableid, @records );
+
+    if ($should_deflate) {
+        if ( @records == 1 && ref($records[0]) eq 'ARRAY' && @{$records[0]} && ref($records[0]->[0]) eq 'HASH' ) {
+            @records = $self->deflate( $tableid, @{ $records[0] } );
+        }
+        elsif ( @records == 1 && ref($records[0]) eq 'HASH' ) {
+            @records = $self->deflate( $tableid, $records[0] );
+        }
+        elsif ( grep { ref($_) eq 'HASH' } @records ) {
+            @records = $self->deflate( $tableid, @records );
+        }
     }
 
     # Write authority cancelled.
@@ -373,16 +394,18 @@ sub insert_list {
     my $table_path = $self->table_path($tableid);
     my $file_path  = "$table_path.$self->{db_ext}";
 
-    # If explicit numeric IDs are passed, ensure ascending order
-    my $has_numeric_ids = 0;
-    for my $r (@records) {
-        if ( ref($r) eq 'ARRAY' && defined $r->[0] && $r->[0] =~ /^\d+$/ && $r->[0] > 0 ) {
-            $has_numeric_ids = 1;
-            last;
+    # If explicit numeric IDs are passed on standard tables, ensure ascending order
+    unless ($is_simple) {
+        my $has_numeric_ids = 0;
+        for my $r (@records) {
+            if ( ref($r) eq 'ARRAY' && defined $r->[0] && $r->[0] > 0 ) {
+                $has_numeric_ids = 1;
+                last;
+            }
         }
-    }
-    if ($has_numeric_ids) {
-        @records = sort { ( $a->[0] // 0 ) <=> ( $b->[0] // 0 ) } @records;
+        if ($has_numeric_ids) {
+            @records = sort { ( $a->[0] // 0 ) <=> ( $b->[0] // 0 ) } @records;
+        }
     }
 
     my $use_ramdisk = $table_info ? ( $table_info->{use_ramdisk} // $table_info->{use_cache} // 0 ) : 0;
@@ -559,21 +582,30 @@ sub update_id {
     $tableid or return;
 
     if ( ref($rid) eq 'HASH' && !@record ) {
-        my $h = { %$rid };
-        $rid = $h->{id} // $h->{ID};
-        @record = ($h);
+        if ( $self->schema_matches_hash( $tableid, $rid ) ) {
+            my $h = { %$rid };
+            $rid = $h->{id} // $h->{ID};
+            @record = ($h);
+        }
+        else {
+            my $h = { %$rid };
+            $rid = delete $h->{id} // delete $h->{ID};
+            @record = ($h);
+        }
     }
 
     $rid = $self->id_check( $tableid, $rid );
     $rid or return;
 
-    # Deflate if hashref is provided
+    # Deflate ONLY if table has a schema AND hash matches schema
     if ( @record && ref($record[0]) eq 'HASH' ) {
-        my $h = { %{ $record[0] } };
-        $h->{id} //= $rid;
-        my $def = $self->deflate( $tableid, $h );
-        if ( ref($def) eq 'ARRAY' ) {
-            @record = ( scalar(@$def) > 1 ) ? @{$def}[ 1 .. $#$def ] : ();
+        if ( $self->schema_matches_hash( $tableid, $record[0] ) ) {
+            my $h = { %{ $record[0] } };
+            $h->{id} //= $rid;
+            my $def = $self->deflate( $tableid, $h );
+            if ( ref($def) eq 'ARRAY' ) {
+                @record = ( scalar(@$def) > 1 ) ? @{$def}[ 1 .. $#$def ] : ();
+            }
         }
     }
 
@@ -729,15 +761,27 @@ sub update_list {
     $tableid        or return {};
     scalar @records or return {};
 
-    # Deflate if records contain hashrefs or if single arrayref of hashes or HoH
-    if ( @records == 1 && ref($records[0]) eq 'ARRAY' && @{$records[0]} && ref($records[0]->[0]) eq 'HASH' ) {
-        @records = $self->deflate( $tableid, @{ $records[0] } );
+    # Deflate ONLY if table has a schema and records match schema
+    my $should_deflate = 0;
+    if ( $self->has_schema($tableid) ) {
+        my $first_rec = ( @records == 1 && ref($records[0]) eq 'ARRAY' && @{$records[0]} && ref($records[0]->[0]) eq 'HASH' )
+          ? $records[0]->[0]
+          : ( ref($records[0]) eq 'HASH' ? $records[0] : ( ( @records > 1 && ref($records[1]) eq 'HASH' ) ? $records[1] : undef ) );
+        if ( $first_rec && $self->schema_matches_hash( $tableid, $first_rec ) ) {
+            $should_deflate = 1;
+        }
     }
-    elsif ( @records == 1 && ref($records[0]) eq 'HASH' ) {
-        @records = $self->deflate( $tableid, $records[0] );
-    }
-    elsif ( grep { ref($_) eq 'HASH' } @records ) {
-        @records = $self->deflate( $tableid, @records );
+
+    if ($should_deflate) {
+        if ( @records == 1 && ref($records[0]) eq 'ARRAY' && @{$records[0]} && ref($records[0]->[0]) eq 'HASH' ) {
+            @records = $self->deflate( $tableid, @{ $records[0] } );
+        }
+        elsif ( @records == 1 && ref($records[0]) eq 'HASH' ) {
+            @records = $self->deflate( $tableid, $records[0] );
+        }
+        elsif ( grep { ref($_) eq 'HASH' } @records ) {
+            @records = $self->deflate( $tableid, @records );
+        }
     }
 
     # Write authority cancelled.
@@ -1501,7 +1545,7 @@ sub delete_id {
         $record   = $rec_h ? $rec_h->{$rid} : undef;
     }
 
-    if ( !$record ) {
+    if ( !defined $record ) {
         $self->table_close($file_path) unless ( $is_async_write || $use_ramdisk == 3 );
         $self->table_close($ram_file) if ( $use_ramdisk == 3 && $ram_file );
         unless ($is_txn) { $self->flock_close( $tableid, $rid ); }
@@ -1881,9 +1925,9 @@ sub inflate {
     my $table_info = $self->table_info($tableid);
     my $blocks = ( $table_info && ref( $table_info->{blocks} ) eq 'ARRAY' ) ? $table_info->{blocks} : undef;
 
-    # Return data as a reference to preserve caller's return signature contract consistency!
+    # Return data as-is if no schema blocks defined
     if ( !$blocks || !@$blocks ) {
-        return ( ref($data) eq 'ARRAY' ) ? $data : [$data];
+        return $data;
     }
 
     # 3. Detect single vs batch records
@@ -1964,7 +2008,19 @@ sub inflate {
     # 5. Inner record transformation
     my $inflate_record = sub {
         my ($rec) = @_;
-        return unless defined $rec && ref($rec) eq 'ARRAY';
+        return unless defined $rec;
+
+        # If record is already a HASH reference (e.g. document store), return as-is
+        if ( ref($rec) eq 'HASH' ) {
+            return $rec;
+        }
+
+        return unless ref($rec) eq 'ARRAY';
+
+        # If record is a document payload [ $id, \%doc_hash ] and schema has > 2 blocks, return the document
+        if ( @$rec == 2 && ref($rec->[1]) eq 'HASH' && @field_keys > 2 ) {
+            return $rec->[1];
+        }
 
         my %hash;
         my $max_i = ( scalar(@field_keys) > scalar(@$rec) ) ? $#field_keys : $#$rec;
@@ -1981,7 +2037,7 @@ sub inflate {
 
             if ( exists $rdbm_lookup{$i} && defined $val && $val ne '' ) {
                 my $cfg = $rdbm_lookup{$i};
-                my @foreign_ids = $self->get_fieldlist($val);
+                my @foreign_ids = $self->field_to_list($val);
 
                 if (@foreign_ids) {
                     my %resolved;
@@ -2063,6 +2119,36 @@ sub deflate {
     my $table_info = $self->table_info($tableid);
     my $blocks = ( $table_info && ref( $table_info->{blocks} ) eq 'ARRAY' ) ? $table_info->{blocks} : undef;
 
+    # If no schema blocks defined, pass through without altering data
+    if ( !$self->has_schema($tableid) ) {
+        return wantarray ? @records : ( @records == 1 ? $records[0] : \@records );
+    }
+
+    # If incoming structure does NOT match schema, pass through without altering data
+    my $first_cand = ( ref( $records[0] ) eq 'ARRAY' && @{ $records[0] } && ref( $records[0]->[0] ) eq 'HASH' )
+      ? $records[0]->[0]
+      : ( ref( $records[0] ) eq 'HASH' ? $records[0] : undef );
+
+    if ( $first_cand && !$self->schema_matches_hash( $tableid, $first_cand ) ) {
+        my @vals = values %$first_cand;
+        my $is_hoh = ( @vals && !grep { ref($_) ne 'HASH' } @vals );
+        if ($is_hoh) {
+            my $sample = $vals[0];
+            if ( !$self->schema_matches_hash( $tableid, $sample ) ) {
+                return wantarray ? @records : ( @records == 1 ? $records[0] : \@records );
+            }
+        }
+        else {
+            return wantarray ? @records : ( @records == 1 ? $records[0] : \@records );
+        }
+    }
+
+    my %block_names;
+    for my $b (@$blocks) {
+        $block_names{ $b->{name} } = 1 if ref($b) eq 'HASH' && defined $b->{name};
+        $block_names{ $b->{id} }   = 1 if ref($b) eq 'HASH' && defined $b->{id};
+    }
+
     # Normalize incoming data container
     my @raw_inputs;
     my $single_input = 0;
@@ -2073,7 +2159,8 @@ sub deflate {
         elsif ( ref( $records[0] ) eq 'HASH' ) {
             # Check if this hash is a Hash of Hashes: { 101 => { ... }, 102 => { ... } }
             my @vals = values %{ $records[0] };
-            if ( @vals && !grep { ref($_) ne 'HASH' } @vals ) {
+            my $has_block_key = grep { $block_names{$_} } keys %{ $records[0] };
+            if ( !$has_block_key && @vals && !grep { ref($_) ne 'HASH' } @vals ) {
                 for my $rid ( sort { ( $a =~ /^\d+$/ && $b =~ /^\d+$/ ) ? $a <=> $b : $a cmp $b } keys %{ $records[0] } ) {
                     my $sub_h = { %{ $records[0]->{$rid} } };
                     $sub_h->{id} //= $rid;
@@ -2091,11 +2178,6 @@ sub deflate {
     }
     else {
         @raw_inputs = @records;
-    }
-
-    # If no schema blocks defined, pass through
-    if ( !$blocks || !@$blocks ) {
-        return wantarray ? @raw_inputs : ( $single_input ? $raw_inputs[0] : \@raw_inputs );
     }
 
     # Determine repeating block index (repeat_start) if defined in table_info or blocks
@@ -2844,7 +2926,7 @@ sub filter_ids_by_range {
                 my @filtered;
                 for my $item (@survivors) {
                     my $id = ref($item) eq 'ARRAY' ? $item->[0] : $item;
-                    my $target = pack( "Q>", $id );
+                    my $target = $self->bin_encode([$id]);
                     my $pos = index( $slice_raw, $target );
                     while ( $pos != -1 && ( $pos % 8 != 0 ) ) {
                         $pos = index( $slice_raw, $target, $pos + 1 );
@@ -3435,7 +3517,7 @@ sub read_field {
     return unless -e $field_path;
 
     if ($values) {
-        my @values = $self->get_fieldlist( $values, $table_path, $table_info, $field );
+        my @values = $self->field_to_list( $values, $table_path, $table_info, $field );
 
         if ( @values == 1 ) {
             my $val = $values[0];
@@ -3627,7 +3709,7 @@ sub field_fetch {
     my $file_path  = ( ( $use_ramdisk == 2 || $use_ramdisk == 4 ) && -e "$idx_path.$self->{db_ext}" ) ? "$idx_path.$self->{db_ext}" : "$table_path.$self->{db_ext}";
     return unless -e $file_path;
 
-    my @fld_fetch_ids = $self->get_fieldlist( $fetch, $idx_path, $table_info, $block );
+    my @fld_fetch_ids = $self->field_to_list( $fetch, $idx_path, $table_info, $block );
 
     my $field_path = ( -e "${idx_path}.fld" ) ? "${idx_path}.fld" : "${table_path}.fld";
 
@@ -3747,7 +3829,7 @@ sub field_fetch {
 
     # If index file does not exist (unindexed fallback)...
     else {
-        my @raw_fetch = $self->get_fieldlist($fetch);
+        my @raw_fetch = $self->field_to_list($fetch);
         my %fetch = map { $_ => 1 } ( @raw_fetch, @fld_fetch_ids );
 
         $self->table_read($file_path) or return;
@@ -3758,7 +3840,7 @@ sub field_fetch {
                 my @fields = ( $key, $self->db_decode($val) );
                 $block <= $#fields or return;
                 defined $fields[$block] or return;
-                my @fld_val = $self->get_fieldlist( $fields[$block] );
+                my @fld_val = $self->field_to_list( $fields[$block] );
                 foreach my $fld_one (@fld_val) {
                     if ( $fld_one && exists( $fetch{$fld_one} ) ) {
                         push( @records, [@fields] );
@@ -3888,7 +3970,7 @@ sub field_keyvals {
         if ( defined $keyid && $keyid ne '' ) {
             my @req_keys = ref($keyid) eq 'ARRAY' ? @$keyid : ($keyid);
             for my $k_item (@req_keys) {
-                my @req_ids = $self->get_fieldlist( $k_item, $idx_path, $table_info, $field );
+                my @req_ids = $self->field_to_list( $k_item, $idx_path, $table_info, $field );
                 next unless @req_ids;
 
                 # Single key fast path
@@ -4021,7 +4103,7 @@ sub field_count {
             @req_keys = ($fetch);
         }
         @req_keys = map { $self->trim_space( "$_", 1 ) } @req_keys;
-        @req_keys = grep { defined && $_ ne '' } @req_keys;
+        @req_keys = grep { defined $_ && $_ ne '' } @req_keys;
     }
     else {
         $is_batch = 1;
@@ -4038,7 +4120,7 @@ sub field_count {
                 $result{$k_item} = 0;
 
                 # Resolve ID via .unq / RDBM if textual
-                my ($req_id) = $self->get_fieldlist( $k_item, $idx_path, $table_info, $block );
+                my ($req_id) = $self->field_to_list( $k_item, $idx_path, $table_info, $block );
                 $req_id = $k_item unless defined $req_id && $req_id ne '';
 
                 my $key   = "$tier_pfx$block:$req_id";
@@ -4054,7 +4136,7 @@ sub field_count {
                     }
                     else {
                         my @ids = $raw =~ /[\x1e,;\s]/ ? split( /[\x1e,;\s]+/, $raw ) : ($raw);
-                        @ids = grep { defined && $_ ne '' } @ids;
+                        @ids = grep { defined $_ && $_ > 0 } @ids;
                         $cnt = scalar(@ids);
                     }
                 }
@@ -4074,7 +4156,7 @@ sub field_count {
                     my $len = bytes::length($v);
                     my $cnt = ( $len >= 8 && $len % 8 == 0 )
                         ? int( $len / 8 )
-                        : scalar( grep { defined && $_ ne '' } split( /[\x1e,;\s]+/, $v ) );
+                        : scalar( grep { defined $_ && $_ > 0 } split( /[\x1e,;\s]+/, $v ) );
                     $result{$val_part} = $cnt;
                 }
             );
@@ -4220,7 +4302,7 @@ sub field_filter {
 
             for my $blk ( keys %filter ) {
                 next if ref($filter{$blk}) eq 'HASH';
-                my @values = $self->get_fieldlist( $filter{$blk}, $idx_path, $table_info, $blk );
+                my @values = $self->field_to_list( $filter{$blk}, $idx_path, $table_info, $blk );
                 $blk_vals_map{$blk} = \@values;
                 push @all_req_keys, map { "$pfx$blk:$_" } @values;
             }
@@ -4294,7 +4376,7 @@ sub field_filter {
         my %allowed_map;
         foreach my $blk ( keys %filter ) {
             next if ref($filter{$blk}) eq 'HASH';
-            my @vals = $self->get_fieldlist( $filter{$blk} );
+            my @vals = $self->field_to_list( $filter{$blk} );
             $allowed_map{$blk} = { map { $_ => 1 } @vals };
         }
 
@@ -4313,7 +4395,7 @@ sub field_filter {
                             $all_match = 0;
                             last;
                         }
-                        my @fld_vals = $self->get_fieldlist( $rec->[$blk] );
+                        my @fld_vals = $self->field_to_list( $rec->[$blk] );
                         my $matched = 0;
                         foreach my $one (@fld_vals) {
                             if ( exists $allowed_map{$blk}{$one} ) {
@@ -4332,7 +4414,7 @@ sub field_filter {
                     my $any_match = 0;
                     foreach my $blk ( keys %allowed_map ) {
                         next if $blk > $#$rec || !defined $rec->[$blk];
-                        my @fld_vals = $self->get_fieldlist( $rec->[$blk] );
+                        my @fld_vals = $self->field_to_list( $rec->[$blk] );
                         foreach my $one (@fld_vals) {
                             if ( exists $allowed_map{$blk}{$one} ) {
                                 $any_match = 1;
@@ -4356,7 +4438,7 @@ sub field_filter {
                         my @fields = ( $uid, $self->db_decode($val) );
                         foreach my $blk ( keys %allowed_map ) {
                             return unless $blk <= $#fields && defined $fields[$blk];
-                            my @fld_vals = $self->get_fieldlist( $fields[$blk] );
+                            my @fld_vals = $self->field_to_list( $fields[$blk] );
                             my $matched = 0;
                             foreach my $one (@fld_vals) {
                                 if ( exists $allowed_map{$blk}{$one} ) {
@@ -4378,7 +4460,7 @@ sub field_filter {
                         my @fields = ( $uid, $self->db_decode($val) );
                         foreach my $blk ( keys %allowed_map ) {
                             next unless $blk <= $#fields && defined $fields[$blk];
-                            my @fld_vals = $self->get_fieldlist( $fields[$blk] );
+                            my @fld_vals = $self->field_to_list( $fields[$blk] );
                             foreach my $one (@fld_vals) {
                                 if ( exists $allowed_map{$blk}{$one} ) {
                                     push @records, $uid;
@@ -4609,7 +4691,7 @@ sub search_table {
                     my $fld_idx = $self->resolve_block_idx( $tableid, $fld );
                     my $blk_for_fld = defined $fld_idx ? $fld_idx : $fld;
                     if ( -e $unified_fld ) {
-                        my @mapped_vals = $self->get_fieldlist( $filter_map{$fld}, $idx_path, $table_info, $blk_for_fld );
+                        my @mapped_vals = $self->field_to_list( $filter_map{$fld}, $idx_path, $table_info, $blk_for_fld );
                         my @raw_fld_bufs;
                         if ( @mapped_vals == 1 ) {
                             my $k = "$pfx$blk_for_fld:$mapped_vals[0]";
@@ -4653,7 +4735,7 @@ sub search_table {
                         my @filtered;
                         for my $rec (@recs) {
                             next unless @$rec > $blk_for_fld;
-                            my @fld_vals = $self->get_fieldlist( $rec->[$blk_for_fld] );
+                            my @fld_vals = $self->field_to_list( $rec->[$blk_for_fld] );
                             if ( grep { exists $allowed{$_} } @fld_vals ) {
                                 push @filtered, $rec->[0];
                             }
@@ -4757,7 +4839,7 @@ sub search_table {
                         sub {
                             my ( $key, $value ) = @_;
                             my @dec_fields = $self->db_decode($value);
-                            my $search_text = join( " ", grep { defined && !ref($_) } @dec_fields );
+                            my $search_text = join( " ", grep { defined $_ && !ref($_) } @dec_fields );
                             my %string = $self->get_words( $search_text, "write", $tableid );
                             foreach my $str (@tmp) {
                                 if ( $string{$str} ) {
@@ -4775,7 +4857,7 @@ sub search_table {
                         sub {
                             my ( $key, $value ) = @_;
                             my @dec_fields = $self->db_decode($value);
-                            my $search_text = join( " ", grep { defined && !ref($_) } @dec_fields );
+                            my $search_text = join( " ", grep { defined $_ && !ref($_) } @dec_fields );
                             my %string = $self->get_words( $search_text, "write", $tableid );
                             foreach my $str (@tmp) {
                                 unless ( $string{$str} ) {
@@ -4800,7 +4882,7 @@ sub search_table {
                 for my $rec (@records) {
                     # $rec is [$key, fld1, fld2, ...]
                     next unless @$rec > $blk_for_fld;
-                    my @fld_vals = $self->get_fieldlist( $rec->[$blk_for_fld] );
+                    my @fld_vals = $self->field_to_list( $rec->[$blk_for_fld] );
                     if ( grep { exists $allowed{$_} } @fld_vals ) {
                         push @filtered, $rec;
                     }
@@ -4935,7 +5017,7 @@ sub table_count {
 
         my @record = $self->table_keys($tableid);
         $count = scalar @record;
-        my ($last) = sort { $b <=> $a } grep { /^\d+$/ } @record;
+        my ($last) = sort { $b <=> $a } grep { defined $_ && $_ > 0 } @record;
         $last //= 0;
         if ( $self->table_write("$table_path.inx") ) {
             $self->index_put( "$table_path.inx", "keys",   \@record, "ids" );
@@ -5084,7 +5166,7 @@ sub table_keys {
     # Index check (.inx)
     if ( -e $index_path ) {
         my ( $total, @keys_list ) = $self->index_get( $index_path, "keys", "ids", 0, 0, $dir );
-        @keys_list = grep { defined $_ && /^\d+$/ && $_ > 0 } @keys_list;
+        @keys_list = grep { defined $_ && $_ > 0 } @keys_list;
         if (@keys_list) {
             $self->set_cache( $tableid, $cache_key, \@keys_list );
             $self->set_cache( $tableid, 'keys', \@keys_list ) if $dir eq 'desc';
@@ -5101,7 +5183,7 @@ sub table_keys {
     $self->table_close($scan_path);
 
     my $id_sort_type = ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
-    @keys = grep { defined $_ && /^\d+$/ && $_ > 0 } @keys if $id_sort_type eq 'num';
+    @keys = grep { defined $_ && $_ > 0 } @keys if $id_sort_type eq 'num';
     if ( $dir eq 'asc' ) {
         @keys = sort { $id_sort_type eq 'num' ? ( $a <=> $b ) : ( $a cmp $b ) } @keys;
     }
@@ -5703,7 +5785,7 @@ sub recs_put {
         next unless defined $rid && $rid ne '';
 
         my $k   = $self->utf_encode("$rid");
-        my $val = @fields == 1 ? $fields[0] : $self->db_encode(@fields);
+        my $val = ( @fields == 1 && !ref( $fields[0] ) ) ? $fields[0] : $self->db_encode(@fields);
         next unless defined $val && $val ne '';
 
         if ( $is_txn && !$self->{_txn}->{logged}->{"$file_path\x1e$rid"}++ ) {
@@ -5923,7 +6005,7 @@ sub index_get {
             }
             else {
                 my @ids = $raw =~ /[\x1e,;\s]/ ? split( /[\x1e,;\s]+/, $raw ) : ($raw);
-                @ids = grep { defined && $_ ne '' } @ids;
+                @ids = grep { defined $_ && $_ > 0 } @ids;
                 $result{$k_orig} = \@ids;
             }
         }
@@ -5997,7 +6079,7 @@ sub index_get {
 
     # 3. Fallback for legacy text index payload (.fld, .src, .inx)
     my @ids = $raw =~ /[\x1e,;\s]/ ? split( /[\x1e,;\s]+/, $raw ) : ($raw);
-    @ids = grep { defined && $_ ne '' } @ids;
+    @ids = grep { defined $_ && $_ > 0 } @ids;
     return ( scalar @ids, @ids );
 }
 
@@ -6067,7 +6149,7 @@ sub index_put {
             if ( ref($v_item) eq 'ARRAY' ) {
                 my @ids = @$v_item;
                 if ( $type ne 'raw' ) {
-                    @ids = grep { defined && /^\d+$/ && $_ > 0 } @ids;
+                    @ids = grep { defined $_ && $_ > 0 } @ids;
                 }
                 next unless @ids;
                 $v_encoded = $self->bin_encode(\@ids);
@@ -6078,7 +6160,7 @@ sub index_put {
             else {
                 if ( $type ne 'raw' ) {
                     # Non-raw scalar must be a positive integer key/ID
-                    next unless defined $v_item && $v_item =~ /^\d+$/ && $v_item > 0;
+                    next unless defined $v_item && $v_item > 0;
                     $v_encoded = $self->bin_encode([ $v_item ]);
                 }
                 else {
@@ -6156,7 +6238,7 @@ sub index_put {
     if ( ref($val) eq 'ARRAY' ) {
         my @ids = @$val;
         if ( $type ne 'raw' ) {
-            @ids = grep { defined && /^\d+$/ && $_ > 0 } @ids;
+            @ids = grep { defined $_ && $_ > 0 } @ids;
         }
         return unless @ids;
         $v_encoded = $self->bin_encode(\@ids);
@@ -6166,7 +6248,7 @@ sub index_put {
     }
     else {
         if ( $type ne 'raw' && ( $type eq 'ids' || $key eq 'keys' || $key =~ /:keys$/ || $key eq 'active' ) ) {
-            return unless defined $val && $val =~ /^\d+$/ && $val > 0;
+            return unless defined $val && $val > 0;
             $v_encoded = $self->bin_encode([ $val ]);
         }
         else {

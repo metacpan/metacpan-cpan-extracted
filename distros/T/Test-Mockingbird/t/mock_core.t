@@ -209,4 +209,54 @@ subtest 'mock_core(): croak on non-identifier or unknown builtin' => sub {
 		$ERR_BUILTIN, 'unknown builtin name croaks';
 };
 
+subtest 'mock_core(): fixed-arity builtins can be mocked (time, index, substr)' => sub {
+	# CORE::time(@_) and CORE::index(@_) do not compile, so these used to
+	# croak at install time.  The delegator now passes arguments by position.
+	lives_ok { mock_core time => sub { 1_000_000 } } 'time can be mocked';
+	is eval('time()'), 1_000_000, 'mocked time seen by fresh code';
+	unmock 'CORE::GLOBAL::time';
+
+	my $real;
+	mock_core time => sub { my $call_core = shift; $real = $call_core->(); 7 };
+	is eval('time()'), 7, 'time mock return value';
+	like $real, qr/^\d+$/, '$call_core for time returns the real epoch';
+	unmock 'CORE::GLOBAL::time';
+
+	my @got;
+	mock_core index => sub { my $call_core = shift; push @got, $call_core->(@_); $got[-1] };
+	is eval q{index('hello', 'l')},    2, 'index, two arguments';
+	is eval q{index('hello', 'l', 3)}, 3, 'index, optional third argument';
+	unmock 'CORE::GLOBAL::index';
+
+	mock_core substr => sub { my $call_core = shift; uc $call_core->(@_) };
+	is eval q{substr('abcdef', 1, 2)}, 'BC', 'substr delegates positionally';
+	unmock 'CORE::GLOBAL::substr';
+};
+
+subtest "mock_core(): lone '_' prototype delegates \$_[0] (lc)" => sub {
+	mock_core lc => sub { my $call_core = shift; '<' . $call_core->(@_) . '>' };
+	is eval q{lc('ABC')}, '<abc>', 'lc delegates its single argument';
+	unmock 'CORE::GLOBAL::lc';
+};
+
+subtest 'mock_core(): builtin without a prototype gets @ (system)' => sub {
+	# prototype('CORE::system') is undef; the wrapper falls back to '@'.
+	my @args;
+	mock_core system => sub { shift; @args = @_; 0 };
+	is eval q{system('echo', 'hi')}, 0, 'system mocked';
+	is_deeply \@args, [ 'echo', 'hi' ], 'arguments passed through';
+	is prototype(\&CORE::GLOBAL::system), '@', "wrapper prototype is '\@'";
+	unmock 'CORE::GLOBAL::system';
+};
+
+subtest 'mock_core(): builtin with no possible delegator can still be mocked' => sub {
+	# tie's '\[$@%*]$@' prototype cannot be expressed through a delegator.
+	my $call_core;
+	lives_ok { mock_core tie => sub { $call_core = shift; 'tied' } } 'tie can be mocked';
+	is eval q{my %h; tie %h, 'Nothing'}, 'tied', 'mock without call-through works';
+	throws_ok { $call_core->() } qr/mock_core: cannot call through to CORE::tie/,
+		'calling through croaks with a clear message';
+	unmock 'CORE::GLOBAL::tie';
+};
+
 done_testing();

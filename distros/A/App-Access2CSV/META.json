@@ -1,0 +1,97 @@
+{
+   "abstract" : "Export the tables of a Microsoft Access database to CSV files",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Access2CSV",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Encode" : "0",
+            "Fcntl" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "File::Which" : "0",
+            "Getopt::Long" : "0",
+            "IPC::Run3" : "0",
+            "IPC::System::Simple" : "0",
+            "Log::Abstraction" : "0",
+            "Params::Get" : "0",
+            "Params::Validate::Strict" : "0.4",
+            "Pod::Usage" : "0",
+            "Readonly" : "0",
+            "Return::Set" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Private" : "0.05",
+            "Sub::Protected" : "0",
+            "autodie" : "0",
+            "parent" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "IO::Pty" : "0"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Cwd" : "0",
+            "Errno" : "0",
+            "Exporter" : "0",
+            "File::Copy" : "0",
+            "FindBin" : "0",
+            "POSIX" : "0",
+            "Storable" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0.13",
+            "Test::Most" : "0",
+            "Test::Returns" : "0",
+            "Test::Without::Module" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-access2csv@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-access2csv",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-access2csv"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/App-access2csv.git",
+         "web" : "https://github.com/nigelhorne/App-access2csv"
+      }
+   },
+   "version" : "v0.001.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

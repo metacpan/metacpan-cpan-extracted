@@ -433,6 +433,19 @@ ok(@over <= $chains_with_seqres / 20,
 			my $alone = structure_interface($info, partners => $x->{partners});
 			is_deeply($alone->{residues}, $x->{residues},
 				"$name: the interface computed alone has the same surfaces, to the bit");
+			# The pocket is the first side's atoms within 6 A of the second,
+			# and a contact is a heavy-atom pair closer than 5.5 A, so every
+			# first-side residue in a contact is in the pocket; its residues
+			# hold its atoms, and it is the same computed alone.
+			my $p = $x->{pocket};
+			my %in = map { ("$_->{chain}\0$_->{residue}" => 1) } @{ $p->{residues} };
+			my @missed = grep { !$in{"$_->{chain1}\0$_->{residue1}"} } @{ $x->{contacts} };
+			is(scalar @missed, 0, "$name: every contacting residue of the first side is in the pocket")
+				if @missed;
+			my $n = 0;
+			$n += $_->{n_atoms} for @{ $p->{residues} };
+			is($n, $p->{n_atoms}, "$name: the pocket residues hold its atoms") if $n != $p->{n_atoms};
+			is_deeply($alone->{pocket}, $p, "$name: the pocket computed alone is the same, to the bit");
 		}
 	}
 	# --- the disulfides the coordinates show, against the ones the file

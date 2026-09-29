@@ -26,6 +26,7 @@ t/eol.t
 t/extended_tests.t
 t/fixme.t
 t/function.t
+t/github_14.t
 t/gv.t
 t/inject.t
 t/inject_all.t

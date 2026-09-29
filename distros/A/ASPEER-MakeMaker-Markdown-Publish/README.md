@@ -3,14 +3,23 @@
 Add MakeMaker targets for publishing Perl distribution documentation through
 MkDocs, VitePress, Docusaurus, or Astro Starlight.
 
+## Installation
+
+Install the released distribution and its prerequisites from CPAN:
+
+```sh
+cpanm ASPEER::MakeMaker::Markdown::Publish
+```
+
 ## GitHub Attestations
 
 The release workflow generates [GitHub artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations)
 for distribution archives. Install the [GitHub CLI](https://cli.github.com/)
 with `gh attestation` support and authenticate with `gh auth login`.
 
-Download `ASPEER-MakeMaker-Markdown-Publish-VERSION.tar.gz` from a GitHub
-release, MetaCPAN, or a CPAN mirror, replace `VERSION`, and verify it with:
+To verify a CPAN release archive separately, download
+`ASPEER-MakeMaker-Markdown-Publish-VERSION.tar.gz` from MetaCPAN or a CPAN
+mirror, replace `VERSION`, and run:
 
 ```sh
 gh attestation verify ASPEER-MakeMaker-Markdown-Publish-VERSION.tar.gz --repo aspeer/pm-ASPEER-MakeMaker-Markdown-Publish
@@ -84,8 +93,28 @@ and push only that branch to `origin` without forcing it.
 Set `x_documentation.publish.config_extend` to customise generated engine
 configuration without replacing it; it cannot be combined with `config`.
 `publish_cloudflare` builds and deploys the same site to the Worker named in
-an authored Wrangler config supplied as `cloudflare => {config => 'wrangler.jsonc'}`
-in `x_documentation.publish`. It neither commits nor pushes Git.
+`wrangler.jsonc`, or `wrangler.json` as a fallback, in the project root. Set
+`cloudflare => {config => 'deploy/wrangler.docs.jsonc'}` in
+`x_documentation.publish` only when the config lives elsewhere. The target
+neither commits nor pushes Git.
+
+A minimal project-root `wrangler.jsonc` is:
+
+```jsonc
+{
+  "name": "example-documentation",
+  "compatibility_date": "2026-09-29"
+}
+```
+
+The target supplies the generated site using Wrangler's `--assets` option, so
+this file does not need an `assets.directory` setting. Choose a unique Worker
+name, authenticate Wrangler, regenerate the Makefile, and publish:
+
+```sh
+perl Makefile.PL
+make publish_cloudflare
+```
 
 See the [module documentation](lib/ASPEER/MakeMaker/Markdown/Publish.pm.md) and
 [examples](examples/README.md).

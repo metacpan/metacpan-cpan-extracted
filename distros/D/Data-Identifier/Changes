@@ -1,3 +1,10 @@
+v0.37  2026-09-29Z
+    - Fixed handling of $id->as($as) when $as is an Data::Identifier and $id isn't
+    - Reserved methods classes_of() and _classes_of_provider() in Data::Identifier::Interface::Known
+    - Moved announce() from Data::Identifier::Wellknown to Data::Identifier::Util
+    - Updated language list in Data::Identifier::Wellknown
+    - Added more tests
+
 v0.36  2026-09-04Z
     - Fixed generation with displayname on identifiers that already exist
     - Added support for character names as tagnames

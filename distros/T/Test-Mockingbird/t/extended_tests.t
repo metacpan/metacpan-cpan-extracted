@@ -1404,5 +1404,47 @@ subtest 'before() / after() / around() use the same LIFO stack as mock()' => sub
 #   Status: REACHABLE only from top-level script scope, not from within tests.
 # ===========================================================================
 
-done_testing();
+# ===========================================================================
+# Condition gaps in target parsing and mock_core's layer type
+# ===========================================================================
 
+subtest 'before/after/around: single target without :: is not shorthand' => sub {
+	# defined $arg1 && !defined $arg3 true, but the 'Pkg::method' regex
+	# fails, so the longhand branch runs with the hook in the method slot.
+	for my $case ([ before => \&before ], [ after => \&after ], [ around => \&around ]) {
+		my ($name, $fn) = @$case;
+		throws_ok { $fn->('NoColons', sub { }) }
+			qr/Package, method and hook are required for $name\(\)/,
+			"$name('NoColons', \$hook) croaks";
+	}
+	throws_ok { around(undef, 'm', sub { }) }
+		qr/Package, method and hook are required for around\(\)/,
+		'around with undef package croaks';
+};
+
+subtest 'inject: two-argument form without :: is not shorthand' => sub {
+	throws_ok { inject('NoColons', 'value') }
+		qr/Package and dependency are required for injection/,
+		"inject('NoColons', \$value) croaks";
+};
+
+subtest 'mock_scoped: argument forms that match no pattern croak' => sub {
+	# Three args whose second is a coderef: not (Pkg, method, code)
+	throws_ok { mock_scoped('Ext::Scope::a', sub { }, sub { }) }
+		qr/mock_scoped: unrecognised argument form/, 'three args, coderef second';
+	# Six args, second not a coderef: neither the pairs nor the package form
+	throws_ok { mock_scoped('Ext::Scope', 'a', sub { }, 'b', sub { }, 'c') }
+		qr/mock_scoped: unrecognised argument form/, 'even count >= 5 without pairs';
+};
+
+subtest 'mock_core: honours a $TYPE set by a wrapping helper' => sub {
+	{
+		local $Test::Mockingbird::TYPE = 'custom_core';
+		mock_core 'sleep' => sub { 0 };
+	}
+	is diagnose_mocks()->{'CORE::GLOBAL::sleep'}{layers}[0]{type}, 'custom_core',
+		'layer type taken from $TYPE';
+	restore_all();
+};
+
+done_testing();

@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Chem::Structure::Parser;
-our $VERSION = 0.034;
+our $VERSION = 0.035;
 require XSLoader;
 use warnings FATAL => 'all';
 # No `use autodie': it would ask every installer for a prerequisite in order to
@@ -470,6 +470,21 @@ my %PRODIGY = (
 );
 my $PRODIGY_R = 0.0019858775;
 
+# The pocket's residue classes and charges, as the pocket_block() of
+# ~/ui/pepPriML/py/features.pdb.20260806.py has them: its HYDROPHOBIC_RES,
+# POLAR_RES, AROMATIC_RES, POS_RES and NEG_RES, and its RESIDUE_CHARGE, which
+# gives histidine a tenth of a charge for the share of it protonated at pH 7.
+# A class set is not a partition -- tyrosine is aromatic and polar, histidine
+# polar and charged, and glycine none of them -- and a modified residue is its
+# parent's single-letter code, as the script's parent_resname() makes it.
+my %POCKET_HYDROPHOBIC = map { $_ => 1 } qw(A V I L M F W P);
+my %POCKET_POLAR       = map { $_ => 1 } qw(S T N Q C Y H);
+my %POCKET_CHARGED     = map { $_ => 1 } qw(R K H D E);
+my %POCKET_CHARGE      = (R => 1, K => 1, H => 0.1, D => -1, E => -1);
+# the relative surface alone below which a pocket residue is buried, the
+# script's pocket_frac_buried_residues
+my $POCKET_BURIED = 0.25;
+
 # The pK values of Bjellqvist et al. (1993) Electrophoresis 14:1023-31 and
 # (1994) 15:529-39, as Bio/SeqUtils/IsoelectricPoint.py of Biopython 1.87
 # writes them: the side chains, and the termini with the residue-specific
@@ -571,6 +586,13 @@ my %FEATURE_DEFAULT = (
 	# the first hydration shell of features.pdb.20260806.py's
 	# WATER_CONTACT_NM, which a bridging water reaches on both sides
 	water_distance       => 3.5, # angstrom
+	# features.pdb.20260806.py's pocket_block(): the receptor pocket is every
+	# receptor atom within POCKET_CUTOFF_NM, 0.6 nm, of any peptide atom, and
+	# its packing density counts the receptor heavy atoms within 0.8 nm of a
+	# peptide heavy atom
+	pocket               => 1,   # the first partner's pocket around the second
+	pocket_distance      => 6.0, # angstrom
+	packing_distance     => 8.0, # angstrom
 	# PRODIGY's analyse_nis() acc_threshold: a residue is on the surface when
 	# at least this fraction of its NACCESS reference area is exposed
 	nis_threshold        => 0.05,
@@ -597,6 +619,7 @@ my @HB_OPT   = qw(peptide_bond);
 my @IFACE_OPT = qw(
 	partners interface_distance salt_bridge_distance polar_distance
 	cation_pi_distance water_distance nis_threshold temperature probe points
+	pocket pocket_distance packing_distance
 );
 
 # The options that are a switch, in either table.  undef is a false value and
@@ -605,7 +628,7 @@ my @IFACE_OPT = qw(
 my %SWITCH = map { $_ => 1 } qw(
 	hydrogens waters hetatm atoms features meta anisou dssp
 	sasa pi_stacking disulfides base_pairs base_stacks interface shape
-	dihedrals contacts exposure hbonds secondary store
+	dihedrals contacts exposure hbonds secondary store pocket
 );
 
 # _no_undef(\%opt, $who, \%default) -- die at an option given as undef that
@@ -668,7 +691,7 @@ sub _feature_options {
 		unless $o{base_stack_omega} =~ /\A[0-9]*\.?[0-9]+\z/
 		    && $o{base_stack_omega} <= 180;
 	for my $k (qw(interface_distance salt_bridge_distance polar_distance
-	              cation_pi_distance water_distance)) {
+	              cation_pi_distance water_distance pocket_distance packing_distance)) {
 		die "$who: $k must be a positive number, not '$o{$k}'"
 			unless $o{$k} =~ /\A[0-9]*\.?[0-9]+\z/ && $o{$k} > 0;
 	}
@@ -1391,6 +1414,7 @@ sub _finish_interface {
 		(exists $raw->{min_distance} ? (min_distance => $raw->{min_distance}) : ()),
 		(exists $raw->{com_distance} ? (com_distance => $raw->{com_distance}) : ()),
 	);
+	$out{pocket} = _pocket($sides->{residues}[0], $raw) if $raw->{pocket_atoms};
 	# The non-interacting surface is PRODIGY's: every residue of either side
 	# whose surface in the complex is at least nis_threshold of its NACCESS
 	# reference, sorted by class.  It is over the whole complex, interface
@@ -1415,6 +1439,70 @@ sub _finish_interface {
 		};
 	}
 	return $f->{interface} = \%out;
+}
+
+# _pocket(\@first, $raw) -- the first partner's pocket around the second, from
+# what iface_compute() tallied per residue of the first list: its atoms in the
+# pocket, their surface in the first partner alone, and the residue's whole
+# relative surface alone.  The composition is over the pocket's amino acids
+# with one of the twenty letters, as %KD is, so a cap or a ligand named into
+# the first partner is in the atom and residue counts and the surface but is
+# not scored as an amino acid it is not.
+sub _pocket {
+	my ($first, $raw) = @_;
+	my ($n_atoms, @res, %chains, @aa, @rsa) = (0);
+	my $surf = exists $raw->{pocket_sasa};
+	my %sasa = (total => 0, hydrophobic => 0, polar => 0);
+	for my $e (0 .. $#$first) {
+		my $n = $raw->{pocket_atoms}[$e] or next;
+		my $r = $first->[$e];
+		my $one = ($r->{type} || '') eq 'amino_acid' && exists $KD{ $r->{one} // '' }
+		        ? $r->{one} : undef;
+		my %one = (chain => $r->{chain}, residue => $r->{key}, resname => $r->{resname},
+		           n_atoms => $n);
+		$n_atoms += $n;
+		$chains{ $r->{chain} } = 1;
+		push @aa, $one if defined $one;
+		if ($surf) {
+			my $a = $raw->{pocket_sasa}[$e];
+			$one{sasa_alone} = $a;
+			$sasa{total} += $a;
+			$sasa{ defined $one && $POCKET_HYDROPHOBIC{$one} ? 'hydrophobic' : 'polar' } += $a;
+			my $rel = $raw->{pocket_rsa}[$e];
+			if (defined $one && defined $rel) {
+				$one{rsa_alone} = $rel;
+				push @rsa, $rel;
+			}
+		}
+		push @res, \%one;
+	}
+	my %p = (n_atoms => $n_atoms, n_residues => scalar @res,
+	         n_chains => scalar keys %chains, residues => \@res);
+	$p{packing_density} = $raw->{pocket_packing} if exists $raw->{pocket_packing};
+	return \%p unless @res;
+	$p{sasa} = \%sasa if $surf;
+	if (@aa) {
+		my ($kd, $kd_max, $charge) = (0, undef, 0);
+		for (@aa) {
+			$kd += $KD{$_};
+			$kd_max = $KD{$_} if !defined $kd_max || $KD{$_} > $kd_max;
+			$charge += $POCKET_CHARGE{$_} || 0;
+		}
+		$p{charge}               = $charge;
+		$p{hydropathy}           = $kd / @aa;
+		$p{hydropathy_max}       = $kd_max;
+		$p{aromatic_fraction}    = (grep { $AROMATIC{$_} } @aa) / @aa;
+		$p{hydrophobic_fraction} = (grep { $POCKET_HYDROPHOBIC{$_} } @aa) / @aa;
+		$p{polar_fraction}       = (grep { $POCKET_POLAR{$_} } @aa) / @aa;
+		$p{charged_fraction}     = (grep { $POCKET_CHARGED{$_} } @aa) / @aa;
+	}
+	if (@rsa) {
+		my $sum = 0;
+		$sum += $_ for @rsa;
+		$p{rsa}             = $sum / @rsa;
+		$p{buried_fraction} = (grep { $_ < $POCKET_BURIED } @rsa) / @rsa;
+	}
+	return \%p;
 }
 
 # _bjellqvist_charge(\%count, $pos, $neg, $ph) -- the net charge of a sequence
@@ -4703,6 +4791,8 @@ C<secondary> is.
  scalar @{ $x->{bridging_waters} };  # 7
  $x->{com_distance};                 # 12.11  A between the centres of mass
  $x->{min_distance};                 # 2.74   A between the closest heavy atoms
+ $x->{pocket}{n_residues};           # 18     the domain's residues around the peptide
+ $x->{pocket}{sasa}{total};          # 1029.7 A^2 of them exposed without it
 
 (1cka: the N-terminal SH3 domain of c-Crk, chain A, holding the C3G peptide
 PPPALPPKK, chain B. It is C<t/data/iface.pdb>.)
@@ -4720,7 +4810,8 @@ is a lookup. Name an option and the interface alone is computed again with it
 in force; that costs the surface of the complex, which the default read gets
 mostly for free (see below). C<< interface =E<gt> 0 >> on C<structure_features()> turns it
 off, and C<< sasa =E<gt> 0 >> leaves the surface-based half out — C<sasa>, C<buried>, the
-residues' surfaces, C<nis> and C<prodigy> — and keeps the rest.
+residues' surfaces, C<nis>, C<prodigy> and the pocket's surfaces — and keeps the
+rest.
 
 =head3 Choosing the partners
 
@@ -4860,6 +4951,10 @@ come back only to be asked whether they bridge the two.
   <td><code>bfactor</code></td>
   <td><code>mean</code> and <code>interface</code>, each <code>[ first, second ]</code>: the mean B-factor of each side's heavy atoms, and of those within <code>interface_distance</code> of the other side</td>
 </tr>
+<tr>
+  <td><code>pocket</code></td>
+  <td>the first side's pocket around the second; see below</td>
+</tr>
 </tbody>
 </table>
 
@@ -4869,6 +4964,80 @@ come back only to be asked whether they bridge the two.
 
 C<pi_stacking> and C<disulfides> come from the whole-structure lists, so an
 interface computed on its own with options has neither.
+
+=head3 The pocket
+
+The pocket is the first partner's atoms, hydrogens included, within
+C<pocket_distance> of any atom of the second, and the residues they are in: the
+receptor's binding site around a peptide or a ligand, when the receptor is
+named first — which is the order the partners are worked out in. Name them the
+other way round for the peptide's side of it.
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>key</th>
+  <th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>n_atoms</code>, <code>n_residues</code>, <code>n_chains</code></td>
+  <td>how big the pocket is</td>
+</tr>
+<tr>
+  <td><code>residues</code></td>
+  <td>each pocket residue's <code>chain</code>, <code>residue</code>, <code>resname</code>, <code>n_atoms</code> in the pocket, <code>sasa_alone</code>, the surface of those atoms in the first partner alone, and <code>rsa_alone</code>, the relative surface of the whole residue's heavy atoms in the first partner alone</td>
+</tr>
+<tr>
+  <td><code>sasa</code></td>
+  <td><code>total</code>, <code>hydrophobic</code> and <code>polar</code>: the pocket atoms' surface in the first partner alone, angstrom^2, and its split between the atoms of the hydrophobic residues — A, V, I, L, M, F, W, P — and the rest</td>
+</tr>
+<tr>
+  <td><code>charge</code></td>
+  <td>+1 for each R and K, −1 for each D and E, and +0.1 for each H: the share of a histidine protonated at pH 7</td>
+</tr>
+<tr>
+  <td><code>hydropathy</code>, <code>hydropathy_max</code></td>
+  <td>the mean and the largest Kyte-Doolittle index of the pocket residues</td>
+</tr>
+<tr>
+  <td><code>aromatic_fraction</code>, <code>hydrophobic_fraction</code>, <code>polar_fraction</code>, <code>charged_fraction</code></td>
+  <td>the pocket residues that are F, W or Y; A, V, I, L, M, F, W or P; S, T, N, Q, C, Y or H; and R, K, H, D or E. The classes overlap, and glycine is in none of them</td>
+</tr>
+<tr>
+  <td><code>rsa</code>, <code>buried_fraction</code></td>
+  <td>the mean <code>rsa_alone</code>, and the share of the residues whose <code>rsa_alone</code> is under 0.25</td>
+</tr>
+<tr>
+  <td><code>packing_density</code></td>
+  <td>the first partner's heavy atoms within <code>packing_distance</code> of a heavy atom of the second, per heavy atom of the second: how tightly the pocket wraps what it holds</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+The composition is over the pocket's amino acids with one of the twenty
+single-letter codes, a modified residue counting as its parent, so a cap or a
+ligand in the first partner is in the counts and the surface but is not scored
+as an amino acid it is not. A pocket with none has no composition keys, one with
+no atom at all has only its counts and C<packing_density>, and C<< sasa =E<gt> 0 >> leaves
+out C<sasa>, C<rsa>, C<buried_fraction> and the residues' surfaces. C<rsa_alone> is
+over the heavy atoms because Tien's maxima, which it divides by as C<rsa> does,
+are surfaces with no hydrogens in them; a structure that has hydrogens would
+otherwise count theirs in the numerator alone.
+
+The definitions are the pocket block of the pepPriML feature script, below, and
+on 1cka all sixteen of its figures agree with this one's. C<< pocket =E<gt> 0 >> leaves
+the pocket out, and it costs little: over 60 PDBbind entries it adds 0.04 s to
+the 2.5 s their interfaces take.
 
 =head3 Against PRODIGY
 
@@ -4890,15 +5059,64 @@ of the complex, the interface included, not only the residues away from it.
 =head3 Against the pepPriML feature script
 
 The salt bridges, the polar pairs and their backbone split, the bridging
-waters, the atom-pair counts at any cutoff and the two distances are the
-definitions of C<features.pdb.20260806.py>, the static feature script of the
-pepPriML project, which computes them with mdtraj; on 1cka the two agree on
-every one. Two differences are deliberate. Its cation–π counts histidine as a
+waters, the atom-pair counts at any cutoff, the two distances and the pocket
+are the definitions of C<features.pdb.20260806.py>, the static feature script of
+the pepPriML project, which computes them with mdtraj; on 1cka the two agree on
+every one. Its pocket features are this module's under other names, and its
+surfaces are nm^2 where these are angstrom^2:
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>the script's</th>
+  <th>here, under <code>pocket</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>pocket_n_atoms</code>, <code>pocket_n_residues</code>, <code>pocket_n_chains</code></td>
+  <td><code>n_atoms</code>, <code>n_residues</code>, <code>n_chains</code></td>
+</tr>
+<tr>
+  <td><code>pocket_net_charge</code>, <code>pocket_gravy</code>, <code>pocket_kd_max</code></td>
+  <td><code>charge</code>, <code>hydropathy</code>, <code>hydropathy_max</code></td>
+</tr>
+<tr>
+  <td><code>pocket_frac_aromatic</code>, <code>_hydrophobic</code>, <code>_polar</code>, <code>_charged</code></td>
+  <td><code>aromatic_fraction</code>, <code>hydrophobic_fraction</code>, <code>polar_fraction</code>, <code>charged_fraction</code></td>
+</tr>
+<tr>
+  <td><code>pocket_sasa_nm2</code>, <code>pocket_hydrophobic_sasa_nm2</code>, <code>pocket_polar_sasa_nm2</code></td>
+  <td><code>sasa</code> <code>total</code>, <code>hydrophobic</code>, <code>polar</code>, divided by 100</td>
+</tr>
+<tr>
+  <td><code>pocket_mean_rel_sasa</code>, <code>pocket_frac_buried_residues</code></td>
+  <td><code>rsa</code>, <code>buried_fraction</code></td>
+</tr>
+<tr>
+  <td><code>pocket_packing_density</code></td>
+  <td><code>packing_density</code></td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+Two differences are deliberate. Its cation–π counts histidine as a
 cation and as a ring, and Gallivan, J P and Dougherty, D A (1999) I<PNAS>
 96(17):9459-64, whose 6 Å filter this is, count it as neither. And it leaves an
 ACE or NH2 cap out of the peptide, which a chain named as a partner here takes
 in. Over twenty peptide complexes of PDBbind the two agree on every count once
-those two are allowed for, and on the buried surface to 1 Å².
+those two are allowed for, and on the buried surface to 1 Å². Over forty, the
+pockets agree on every count and fraction in the 35 without a cap or a
+peptide-bonded non-standard residue in either partner, and on the surfaces to
+a sphere point or two of mdtraj's float32 kernel, 0.23 Å² at most.
 
 =head3 Options
 
@@ -4954,6 +5172,21 @@ those two are allowed for, and on the buried surface to 1 Å².
   <td><code>temperature</code></td>
   <td>25</td>
   <td>degrees Celsius, for turning the estimate into a Kd</td>
+</tr>
+<tr>
+  <td><code>pocket</code></td>
+  <td>1</td>
+  <td>compute the pocket</td>
+</tr>
+<tr>
+  <td><code>pocket_distance</code></td>
+  <td>6.0</td>
+  <td>the largest separation of a pocket atom from the second partner, angstrom — the script's <code>POCKET_CUTOFF_NM</code></td>
+</tr>
+<tr>
+  <td><code>packing_distance</code></td>
+  <td>8.0</td>
+  <td>the heavy-atom separation <code>packing_density</code> counts within, angstrom — the script's 0.8 nm</td>
 </tr>
 <tr>
   <td><code>probe</code>, <code>points</code></td>

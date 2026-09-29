@@ -71,7 +71,7 @@
          "web" : "https://github.com/aspeer/pm-Markdown-Publish"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_authority" : "cpan:ASPEER",
    "x_documentation" : {
       "publish" : {

@@ -18,7 +18,8 @@
          "t",
          "inc",
          "lib/AmberDB/Base",
-         "lib/AmberDB/Locale/Lang"
+         "lib/AmberDB/Locale/Lang",
+         "lib/AmberDB/Tools"
       ],
       "file" : [
          "lib/AmberDB/Base.pm",
@@ -30,7 +31,10 @@
       ],
       "package" : [
          "AmberDB::Base",
-         "AmberDB::Locale::Currency"
+         "AmberDB::Locale::Currency",
+         "AmberDB::Tools::Index",
+         "AmberDB::Tools::Maintain",
+         "AmberDB::Tools::Update"
       ]
    },
    "prereqs" : {
@@ -87,6 +91,6 @@
          "web" : "https://github.com/marufcetin/amberdb"
       }
    },
-   "version" : "v5.26.0",
+   "version" : "v5.26.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

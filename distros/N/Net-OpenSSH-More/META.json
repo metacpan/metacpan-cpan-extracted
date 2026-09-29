@@ -71,6 +71,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "File::Spec" : "0",
             "FindBin" : "0",
             "IO::Handle" : "0",
@@ -88,11 +89,11 @@
    "provides" : {
       "Net::OpenSSH::More" : {
          "file" : "lib/Net/OpenSSH/More.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Net::OpenSSH::More::Linux" : {
          "file" : "lib/Net/OpenSSH/More/Linux.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -107,7 +108,7 @@
          "web" : "https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_contributors" : [
       "Andy Baugh <andy@troglodyne.net>"
    ],

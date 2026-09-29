@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 
 my $CREATED = '2026-08-28';
 
@@ -72,7 +72,7 @@ sub facet_add {
             for my $rec (@active_records) {
                 my $rid = $rec->[0];
                 next unless defined $rec->[$blk] && $rec->[$blk] ne '';
-                my @ids = $self->set_fieldlist( $rec->[$blk], $table_path, $table_info, $blk );
+                my @ids = $self->field_to_list( $rec->[$blk], $table_path, $table_info, $blk );
                 if (@ids) {
                     $self->index_put( $fac_path, "$blk:$rid", join( "\t", @ids ), 'raw' );
                 }
@@ -157,7 +157,7 @@ sub facet_modify {
             for my $p (@became_active) {
                 my ( $rid, undef, $new_rec ) = @$p;
                 next unless defined $new_rec->[$blk] && $new_rec->[$blk] ne '';
-                my @ids = $self->set_fieldlist( $new_rec->[$blk], $table_path, $table_info, $blk );
+                my @ids = $self->field_to_list( $new_rec->[$blk], $table_path, $table_info, $blk );
                 if (@ids) {
                     $self->index_put( $fac_path, "$blk:$rid", join( "\t", @ids ), 'raw' );
                 }
@@ -185,7 +185,7 @@ sub facet_modify {
             for my $p (@changed_pairs) {
                 my ( $rid, undef, $new_rec ) = @$p;
                 if ( defined $new_rec->[$blk] && $new_rec->[$blk] ne '' ) {
-                    my @ids = $self->set_fieldlist( $new_rec->[$blk], $table_path, $table_info, $blk );
+                    my @ids = $self->field_to_list( $new_rec->[$blk], $table_path, $table_info, $blk );
                     if (@ids) {
                         $self->index_put( $fac_path, "$blk:$rid", join( "\t", @ids ), 'raw' );
                     }

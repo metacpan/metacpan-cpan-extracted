@@ -1,0 +1,3 @@
+#### RT-Extension-Slack
+#### You need to get a bearer token from your slack application.
+Set($SlackToken, 'Bearer YOURTOKENGOESHERE');

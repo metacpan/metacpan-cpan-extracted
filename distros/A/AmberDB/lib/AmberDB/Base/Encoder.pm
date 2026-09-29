@@ -5,9 +5,36 @@ use warnings;
 use Carp qw(croak cluck);
 use MIME::Base64 qw(encode_base64 decode_base64);
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 
 my $CREATED = '2026-09-06';
+
+# Cross-platform 64-bit integer packing:
+# Native Q> on 64-bit Perl; transparent high/low 32-bit (NN) fallback on 32-bit Perls (e.g. armv6l)
+our $HAS_QUAD = eval { my $p = pack( "Q>", 1 ); length($p) == 8 } ? 1 : 0;
+
+sub _pack_ids {
+    return pack( "(Q>)*", @_ ) if $HAS_QUAD;
+    return pack( "(NN)*", map { ( int( $_ / 4294967296 ), $_ % 4294967296 ) } @_ );
+}
+
+sub _unpack_ids {
+    my ($buf) = @_;
+    return () unless defined $buf && length($buf);
+    return unpack( "(Q>)*", $buf ) if $HAS_QUAD;
+    my @raw = unpack( "(NN)*", $buf );
+    my @ids;
+    for ( my $i = 0; $i < @raw; $i += 2 ) {
+        push @ids, ( $raw[$i] ? ( $raw[$i] * 4294967296 + $raw[$i + 1] ) : $raw[$i + 1] );
+    }
+    return @ids;
+}
+
+sub _pack_single_id {
+    my ($id) = @_;
+    return pack( "Q>", $id ) if $HAS_QUAD;
+    return pack( "NN", int( $id / 4294967296 ), $id % 4294967296 );
+}
 
 # =====================================================================
 # RECORD ENCODING / DECODING — ABR v5 (AmberDB Binary Record)
@@ -472,10 +499,10 @@ sub bin_encode {
     return '' unless ref($rids) eq 'ARRAY' && @$rids;
 
     # Fast numeric filter: positive numbers only (no regex overhead)
-    my @valid = grep { defined && $_ > 0 } @$rids;
+    my @valid = grep { defined $_ && $_ > 0 } @$rids;
     return '' unless @valid;
 
-    return pack( "(Q>)*", @valid );
+    return _pack_ids( @valid );
 }
 
 # $adb->bin_decode($binary_buffer, $offset, $limit, $dir)
@@ -502,11 +529,11 @@ sub bin_decode {
     if ( $dir eq 'desc' ) {
         my $real_start = $total - $offset - $limit;
         my $slice = substr( $buffer, $real_start * $rec_size, $limit * $rec_size );
-        return ( $total, reverse unpack( "(Q>)*", $slice ) );
+        return ( $total, reverse _unpack_ids( $slice ) );
     }
 
     my $slice = substr( $buffer, $offset * $rec_size, $limit * $rec_size );
-    return ( $total, unpack( "(Q>)*", $slice ) );
+    return ( $total, _unpack_ids( $slice ) );
 }
 
 # $idx = $adb->bin_search($buffer, $target)
@@ -523,7 +550,12 @@ sub bin_search {
 
     while ( $low <= $high ) {
         my $mid = int( ( $low + $high ) / 2 );
-        my $val = unpack( "Q>", substr( $buffer, $mid * 8, 8 ) );
+        my $val = $HAS_QUAD
+          ? unpack( "Q>", substr( $buffer, $mid * 8, 8 ) )
+          : do {
+              my ( $hi, $lo ) = unpack( "NN", substr( $buffer, $mid * 8, 8 ) );
+              $hi ? ( $hi * 4294967296 + $lo ) : $lo;
+          };
         return $mid if $val == $target;
         if ( $val < $target ) {
             $low = $mid + 1;
@@ -588,12 +620,12 @@ sub bin_crop {
         # $liste de ikili bir tampon ise
         if ( $option == 2 ) {
             # 2: $liste tamponunun sırası
-            my @l_ids = unpack( "(Q>)*", $liste );
+            my @l_ids = _unpack_ids( $liste );
             @result = grep { $self->bin_search( $buffer, $_ ) >= 0 } @l_ids;
         }
         elsif ( $option == 1 ) {
             # 1: $buffer tamponunun sırası (indeks pozisyonuna göre sırala: 0 hash)
-            my @l_ids = unpack( "(Q>)*", $liste );
+            my @l_ids = _unpack_ids( $liste );
             my @matches;
             for my $id (@l_ids) {
                 my $pos = $self->bin_search( $buffer, $id );
@@ -604,12 +636,12 @@ sub bin_crop {
         else {
             # 0: Sıralama önemsiz: küçük olanı büyükte ikili ara
             my ( $small, $large ) = length($buffer) <= length($liste) ? ( $buffer, $liste ) : ( $liste, $buffer );
-            my @s_ids = unpack( "(Q>)*", $small );
+            my @s_ids = _unpack_ids( $small );
             @result = grep { $self->bin_search( $large, $_ ) >= 0 } @s_ids;
         }
     }
 
-    return wantarray ? @result : ( @result ? pack( "(Q>)*", @result ) : '' );
+    return wantarray ? @result : ( @result ? _pack_ids( @result ) : '' );
 }
 
 # $adb->bin_union(\@buffers, $dir)
@@ -639,14 +671,14 @@ sub bin_union {
     my $combined = join( '', @bufs );
     return () unless length($combined) >= 8;
 
-    my @all_ids = unpack( "(Q>)*", $combined );
+    my @all_ids = _unpack_ids( $combined );
     @all_ids = ( defined $dir && lc($dir) eq 'desc' ) ? sort { $b <=> $a } @all_ids : sort { $a <=> $b } @all_ids;
 
     # O(N) linear deduplication of adjacent elements (no hash table!)
     my $prev = -1;
     my @uniq = grep { my $dup = ($_ == $prev); $prev = $_; !$dup } @all_ids;
 
-    return wantarray ? @uniq : ( @uniq ? pack( "(Q>)*", @uniq ) : '' );
+    return wantarray ? @uniq : ( @uniq ? _pack_ids( @uniq ) : '' );
 }
 
 # $updated_buf = $adb->bin_add($buffer, $rids)
@@ -663,10 +695,10 @@ sub bin_add {
     my @ids = ref($new_rids) eq 'ARRAY'
       ? @$new_rids
       : ( !ref($new_rids) && length($new_rids) >= 8 && length($new_rids) % 8 == 0
-          ? unpack( "(Q>)*", $new_rids )
+          ? _unpack_ids( $new_rids )
           : ($new_rids) );
 
-    @ids = grep { defined && $_ > 0 } @ids;
+    @ids = grep { defined $_ && $_ > 0 } @ids;
     return $buffer unless @ids;
 
     # Deduplicate input IDs without a hash
@@ -675,7 +707,7 @@ sub bin_add {
     @ids = grep { my $d = ($_ == $prev_in); $prev_in = $_; !$d } @sorted_in;
 
     if ( length($buffer) < 8 ) {
-        return pack( "(Q>)*", @ids );
+        return _pack_ids( @ids );
     }
 
     my @to_add;
@@ -684,7 +716,7 @@ sub bin_add {
     }
     return $buffer unless @to_add;
 
-    $buffer .= pack( "(Q>)*", @to_add );
+    $buffer .= _pack_ids( @to_add );
     return $self->bin_sort($buffer);
 }
 
@@ -701,10 +733,10 @@ sub bin_punch {
     my @del_list = ref($del_rids) eq 'ARRAY'
       ? @$del_rids
       : ( !ref($del_rids) && length($del_rids) >= 8 && length($del_rids) % 8 == 0
-          ? unpack( "(Q>)*", $del_rids )
+          ? _unpack_ids( $del_rids )
           : ($del_rids) );
 
-    @del_list = grep { defined && $_ > 0 } @del_list;
+    @del_list = grep { defined $_ && $_ > 0 } @del_list;
     return $buffer unless @del_list;
 
     for my $del_id (@del_list) {
@@ -718,7 +750,7 @@ sub bin_punch {
         }
 
         # Fallback for unsorted buffer: 8-byte boundary index search
-        my $target_bytes = pack( "Q>", $del_id );
+        my $target_bytes = _pack_single_id( $del_id );
         my $pos = index( $buffer, $target_bytes );
         while ( $pos >= 0 ) {
             if ( $pos % 8 == 0 ) {
@@ -744,7 +776,7 @@ sub bin_find {
     return 1 if $self->bin_search( $buffer, $rid ) >= 0;
 
     # Fallback for unsorted buffer: 8-byte boundary index search
-    my $target_bytes = pack( "Q>", $rid );
+    my $target_bytes = _pack_single_id( $rid );
     my $pos = index( $buffer, $target_bytes );
     while ( $pos >= 0 ) {
         return 1 if $pos % 8 == 0;

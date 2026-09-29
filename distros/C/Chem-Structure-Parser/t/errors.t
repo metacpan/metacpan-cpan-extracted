@@ -294,7 +294,7 @@ SKIP: {
 		'which is by its ligand key';
 
 	for my $k (qw(interface_distance salt_bridge_distance polar_distance
-	              cation_pi_distance water_distance)) {
+	              cation_pi_distance water_distance pocket_distance packing_distance)) {
 		throws_ok { structure_interface($info, $k => 0) }
 			qr/^structure_interface: $k must be a positive number, not '0'/,
 			"$k => 0 dies";
@@ -341,6 +341,9 @@ SKIP: {
 	throws_ok { Chem::Structure::Parser::_features($info,
 	                { %o, sides => [ $A, $B ], water_distance => -1 }, 'x') }
 		qr/^x: the interface distances must be positive numbers/, 'XS: a negative distance';
+	throws_ok { Chem::Structure::Parser::_features($info,
+	                { %o, sides => [ $A, $B ], pocket_distance => 0 }, 'x') }
+		qr/^x: the interface distances must be positive numbers/, 'XS: a pocket of no size';
 }
 
 done_testing();

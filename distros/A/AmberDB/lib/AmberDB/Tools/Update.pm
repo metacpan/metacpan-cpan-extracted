@@ -10,7 +10,7 @@ use File::Copy qw(move);
 use Cwd qw(abs_path getcwd);
 use version;
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 my $CREATED = '2018-10-08';
 
 sub new {

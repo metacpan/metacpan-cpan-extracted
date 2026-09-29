@@ -38,7 +38,7 @@ Readonly::Hash my %SAFE_LIST_OPS => map { $_ => 1 } ('IN', 'NOT IN');
 # A bare undef criterion value (col => undef) also generates IS NULL.
 Readonly::Hash my %SAFE_NOARG_OPS => map { $_ => 1 } ('IS NULL', 'IS NOT NULL');
 
-our $VERSION = '0.007.1';
+our $VERSION = '0.008.0';
 
 # Package-level cache for threads availability.  undef = not yet checked;
 # 1 = available; 0 = not available.  Checked lazily on the first parallel
@@ -56,13 +56,14 @@ Readonly::Hash my %MESSAGES => (
 	error_col_conflict	=> 'Column "%s" exists in multiple databases; use the owning database directly or rename the column',
 	error_remove_join_col	=> 'Cannot remove join_column "%s"; it is required for the join',
 	warn_unknown_column	=> 'Column "%s" is not present in any configured database; criterion ignored',
-	error_query_unsupported	=> 'query() chained builder is not supported on Database::Join; call selectall_arrayref / fetchrow_hashref directly',
+	error_query_unsupported	=> 'query() chained builder is not supported on Database::Join (Database::Abstraction::Query targets a single DA, not the merged view); use selectall_arrayref, selectall_array, fetchrow_hashref, count, or each_row instead',
 	error_execute_unsupported => 'execute() raw SQL is not supported on Database::Join',
 	error_unknown_message	=> 'Unknown message key "%s"',
 	error_invalid_prefix	=> 'collision_prefix[%d] must be a plain string, not a reference; passing a reference would leak a heap address into column names',
 	error_invalid_backend	=> 'backend must be "array", "sqlite", or "auto"; got "%s"',
 	error_sqlite_connect	=> 'Failed to open temporary SQLite database for join backend: %s',
 	warn_schema_type_mismatch => 'column "%s" has type "%s" in database[%d] but type "%s" in database[%d]; use collision_prefix to preserve both values without silent type coercion',
+	error_invalid_callback	=> 'each_row: first argument must be a code reference',
 );
 
 =head1 NAME
@@ -71,7 +72,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.007.1
+Version 0.008.0
 
 =head1 SYNOPSIS
 
@@ -1405,6 +1406,34 @@ sub selectall_array {
 	return wantarray ? @{$rows} : $rows->[0];
 }
 
+=head2 selectall_hashref
+
+Deprecated alias for L</selectall_arrayref>, present for compatibility with
+callers written against C<Database::Abstraction>'s deprecated API.  Use
+C<selectall_arrayref> in new code.
+
+=cut
+
+sub selectall_hashref {
+	my $self = shift;
+	carp 'Database::Join::selectall_hashref is deprecated; use selectall_arrayref';
+	return $self->selectall_arrayref(@_);
+}
+
+=head2 selectall_hash
+
+Deprecated alias for L</selectall_array>, present for compatibility with
+callers written against C<Database::Abstraction>'s deprecated API.  Use
+C<selectall_array> in new code.
+
+=cut
+
+sub selectall_hash {
+	my $self = shift;
+	carp 'Database::Join::selectall_hash is deprecated; use selectall_array';
+	return $self->selectall_array(@_);
+}
+
 =head2 fetchrow_hashref
 
 =head3 SYNOPSIS
@@ -1508,6 +1537,86 @@ sub count {
 	return $self->_sqlite_join($params, count_only => 1)
 		unless $self->{_backend} eq 'array';
 	return scalar @{ $self->_joined_query_array($params) };
+}
+
+=head2 each_row
+
+=head3 SYNOPSIS
+
+    my $count = $join->each_row(sub { my ($row) = @_; ... });
+    my $count = $join->each_row(sub { ... }, tier => 'gold');
+    my $count = $join->each_row(sub { ... }, sort_by => 'name', limit => 100);
+
+=head3 DESCRIPTION
+
+Calls C<\&callback> once for every row in the merged view that matches the
+given criteria, then returns the total count of rows visited.
+
+Accepts the same criteria, C<sort_by>, C<limit>, and C<offset> parameters as
+C<selectall_arrayref>.
+
+B<Note on memory usage>: C<Database::Join> always materialises the complete
+merged result set before invoking the callback, because merging rows from
+multiple independent sources requires that every source be queried and
+cross-referenced first.  True constant-memory streaming (as C<Database::Abstraction>
+provides on single-source SQL queries) is not possible at the join layer.
+For genuinely large result sets use the SQLite backend (C<backend =E<gt>
+'sqlite'>), which keeps peak RAM to approximately one times the source data
+size rather than three.
+
+Any exception thrown inside the callback propagates to the caller after the
+current row; subsequent rows are not visited.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    \&callback   Positional coderef (required).
+                 Called as $callback->($row_hashref) for each merged row.
+
+    Additional arguments follow the same calling conventions as
+    selectall_arrayref: no args, a single scalar join-column value,
+    or key-value criteria pairs (including sort_by, limit, offset).
+
+=head4 Output
+
+    Non-negative integer: the count of rows for which the callback was invoked.
+
+=head3 EXAMPLE
+
+    # Print every gold-tier customer's name, sorted by name
+    my $count = $join->each_row(
+        sub { my ($row) = @_; print "$row->{name}\n" },
+        tier    => 'gold',
+        sort_by => 'name',
+    );
+    print "$count gold-tier customers\n";
+
+    # Accumulate without holding the full result
+    my $total_score = 0;
+    $join->each_row(sub { $total_score += $_[0]->{score} // 0 });
+
+=head3 MESSAGES
+
+    error_invalid_callback (croak)
+        -- First argument is not a code reference.
+
+=cut
+
+sub each_row {
+	my ($self, $cb, @args) = @_;
+	croak $self->_err('error_invalid_callback')
+		unless ref($cb) eq 'CODE';
+	# Materialise the full merged result first; multi-source joins cannot
+	# stream rows one at a time because the merge key set is not known until
+	# all sources have been queried and cross-referenced.
+	my $rows  = $self->selectall_arrayref(@args);
+	my $count = 0;
+	for my $row (@{$rows}) {
+		$cb->($row);
+		$count++;
+	}
+	return $count;
 }
 
 =head2 dbi_source
@@ -2182,11 +2291,13 @@ sub remove_column {
 
 =head2 query
 
-Not supported.  C<Database::Join> does not implement the chained query
-builder.  Calling this method will always C<croak> with an explanatory message.
+Not supported.  C<Database::Join> does not implement the
+C<Database::Abstraction::Query> chained builder because the builder's
+C<.all()> / C<.first()> methods would be targeting a single component DA
+rather than the merged view.  Calling this method will always C<croak>.
 
-Use C<selectall_arrayref>, C<selectall_array>, C<fetchrow_hashref>, or
-C<count> instead.
+Use C<selectall_arrayref>, C<selectall_array>, C<fetchrow_hashref>,
+C<count>, or C<each_row> against the C<Database::Join> object instead.
 
 =cut
 
@@ -3049,7 +3160,16 @@ sub _build_sqlite_cache :Protected {
 		# criteria for this source will go into the SQL WHERE clause.
 		# eval wraps can() to suppress ISA warnings from stub packages in tests.
 		if (do { local $@; eval { $db->can('dbi_source') } }) {
-			my $src = eval { $db->dbi_source() };
+			# Probe dbi_source() in an isolated scope: local $@ prevents leaking
+			# eval failure into the caller's $@; local $SIG{__WARN__} suppresses
+			# spurious warnings from inherited dbi_source() probing non-SQLite DAs
+			# (e.g. Database::Abstraction 0.46 base-class dbi_source() calling
+			# _open() on a DA with no backing file).
+			my $src = do {
+				local $SIG{__WARN__} = sub {};
+				local $@;
+				eval { $db->dbi_source() }
+			};
 			if ($src && ref($src) eq 'HASH' && $src->{dbh} && $src->{table}
 				&& eval { $src->{dbh}{Driver}{Name} } eq 'SQLite') {
 				my ($db_file) = $src->{dbh}->selectrow_array(
@@ -3210,7 +3330,11 @@ sub _sqlite_join :Protected {
 			# dbi_source() path: COUNT(*) against the entire source table
 			# (no WHERE) gives a conservative upper bound on the spilled size.
 			if (do { local $@; eval { $db->can('dbi_source') } }) {
-				my $src = eval { $db->dbi_source() };
+				my $src = do {
+					local $SIG{__WARN__} = sub {};
+					local $@;
+					eval { $db->dbi_source() }
+				};
 				if ($src && ref($src) eq 'HASH' && $src->{dbh} && $src->{table}
 					&& eval { $src->{dbh}{Driver}{Name} } eq 'SQLite') {
 					my ($cnt) = $src->{dbh}->selectrow_array(

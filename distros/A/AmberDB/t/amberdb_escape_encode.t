@@ -140,4 +140,45 @@ subtest 'Comprehensive 7 edge-case roundtrip scenarios' => sub {
     }
 };
 
+# 6. Single HASH / ARRAY document-store records and deep nested structures
+subtest 'Table single HASH and deep nested structures roundtrip' => sub {
+    plan tests => 9;
+
+    my $table = 'doc_store';
+
+    # 1. Single HASH record without schema (e.g. data='{"name":"Ahmet"}')
+    my $user_doc = { name => 'Ahmet', role => 'admin', active => 1 };
+    my $uid = $adb->insert_id( $table, 0, $user_doc );
+    ok( defined $uid && $uid > 0, "Single HASH record inserted with ID $uid" );
+
+    my @read_user = $adb->read_id( $table, $uid );
+    is( $read_user[0], $uid, "read_id returned ID $uid" );
+    is( ref( $read_user[1] ), 'HASH', "Record payload is a HASH reference (not stringified 'HASH(0x...)')" );
+    is_deeply( $read_user[1], $user_doc, "Record payload matches exact original HASH" );
+
+    # 2. Mixed record with nested array, nested hash, and multi-level hierarchy
+    my $complex_rec = [
+        'Device Node',
+        {
+            sensors => [ { type => 'temp', val => 24.5 }, { type => 'humidity', val => 60 } ],
+            network => { ip => '192.168.1.50', ports => [ 80, 443 ] },
+        },
+        [ 'alpha', 'beta', [ 100, 200 ] ]
+    ];
+    my $cid = $adb->insert_id( $table, 0, @$complex_rec );
+    ok( defined $cid && $cid > 0, "Complex nested record inserted with ID $cid" );
+
+    my @read_complex = $adb->read_id( $table, $cid );
+    is( $read_complex[0], $cid, "Complex read returned ID $cid" );
+    is_deeply( [ @read_complex[ 1 .. $#read_complex ] ], $complex_rec, "Deeply nested array/hash hierarchy restored intact" );
+
+    # 3. Update single HASH record
+    my $updated_doc = { name => 'Mehmet', role => 'editor', active => 0 };
+    my $up_res = $adb->update_id( $table, $uid, $updated_doc );
+    ok( $up_res, "update_id on single HASH record succeeded" );
+    my @read_up = $adb->read_id( $table, $uid );
+    is_deeply( $read_up[1], $updated_doc, "Updated single HASH record restored intact" );
+};
+
 done_testing();
+

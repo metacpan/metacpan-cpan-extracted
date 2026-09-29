@@ -24,32 +24,32 @@ use_ok('AmberDB::Base::Index') or BAIL_OUT('Cannot load AmberDB::Base::Index');
 use_ok('AmberDB::Tools') or BAIL_OUT('Cannot load AmberDB::Tools');
 
 # ------------------------------------------------------------------
-# SUBTEST 1: get_fieldlist / set_fieldlist unit tests (trim_space & normalization)
+# SUBTEST 1: field_to_list / field_to_list unit tests (trim_space & normalization)
 # ------------------------------------------------------------------
-subtest 'get_fieldlist normalization and trim_space' => sub {
+subtest 'field_to_list normalization and trim_space' => sub {
     plan tests => 10;
 
     my $adb = AmberDB->new();
 
     # 1. Undef / empty
-    is_deeply( [ $adb->get_fieldlist(undef) ], [], 'undef returns empty list' );
-    is_deeply( [ $adb->get_fieldlist('') ],    [], 'empty string returns empty list' );
-    is_deeply( [ $adb->get_fieldlist('   ') ], [], 'whitespace-only returns empty list' );
+    is_deeply( [ $adb->field_to_list(undef) ], [], 'undef returns empty list' );
+    is_deeply( [ $adb->field_to_list('') ],    [], 'empty string returns empty list' );
+    is_deeply( [ $adb->field_to_list('   ') ], [], 'whitespace-only returns empty list' );
 
     # 2. Single value with whitespace
-    is_deeply( [ $adb->get_fieldlist('  Edebiyat  ') ], ['Edebiyat'], 'single string trimmed' );
+    is_deeply( [ $adb->field_to_list('  Edebiyat  ') ], ['Edebiyat'], 'single string trimmed' );
 
     # 3. Comma / semicolon delimited with multiple spaces & tabs
     my $str1 = " Edebiyat ,  Dünya   Klasikleri ; \t Rus Romanları \n ";
     is_deeply(
-        [ $adb->get_fieldlist($str1) ],
+        [ $adb->field_to_list($str1) ],
         [ 'Edebiyat', 'Dünya Klasikleri', 'Rus Romanları' ],
         'comma/semicolon delimited string trimmed and normalized'
     );
 
     # 4. Numeric comma list
     is_deeply(
-        [ $adb->get_fieldlist(' 49 , 112 ; 167 ') ],
+        [ $adb->field_to_list(' 49 , 112 ; 167 ') ],
         [ '49', '112', '167' ],
         'numeric comma/semicolon list parsed'
     );
@@ -57,7 +57,7 @@ subtest 'get_fieldlist normalization and trim_space' => sub {
     # 5. Array reference with trailing/leading spaces
     my $arr1 = [ ' Edebiyat ', '  Dünya  Klasikleri  ', '', '   ' ];
     is_deeply(
-        [ $adb->get_fieldlist($arr1) ],
+        [ $adb->field_to_list($arr1) ],
         [ 'Edebiyat', 'Dünya Klasikleri' ],
         'array ref elements trimmed and empty items removed'
     );
@@ -65,7 +65,7 @@ subtest 'get_fieldlist normalization and trim_space' => sub {
     # 6. Nested array reference
     my $arr2 = [ '49', [ ' 112 ', ' 167 ' ] ];
     is_deeply(
-        [ $adb->get_fieldlist($arr2) ],
+        [ $adb->field_to_list($arr2) ],
         [ '49', '112', '167' ],
         'nested array ref flattened and trimmed'
     );
@@ -141,10 +141,10 @@ SCHEMA
 };
 
 # ------------------------------------------------------------------
-# SUBTEST 3: non-rdbm string field (Case 2: .unq dictionary with lastid)
+# SUBTEST 3: non-rdbm string field (Direct string indexing in .fld without .unq)
 # ------------------------------------------------------------------
-subtest 'non-rdbm string match_block with .unq and lastid (Case 2)' => sub {
-    plan tests => 13;
+subtest 'non-rdbm string match_block with direct string keys (Case 2)' => sub {
+    plan tests => 9;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
     my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
@@ -180,32 +180,22 @@ SCHEMA
     my $id1 = $adb->insert_id( 'tags', 1, 'Edebiyat, Dünya Klasikleri, Rus Romanları', 'Makale 1' );
     my $id2 = $adb->insert_id( 'tags', 2, 'Dünya Klasikleri, Bilim Kurgu', 'Makale 2' );
 
-    my $unq_path = $adb->table_path('tags') . '.unq';
     my $fld_path = $adb->table_path('tags') . '.fld';
+    my $unq_path = $adb->table_path('tags') . '.unq';
 
-    ok( -e $unq_path, 'tags.unq dictionary file exists' );
     ok( -e $fld_path, 'tags.fld index file exists' );
+    ok( !-e $unq_path, 'tags.unq is NOT created for non-unique match blocks' );
 
-    # Check lastid and string mappings in .unq using 1:s: prefix
-    my ($lastid)  = $adb->index_get( $unq_path, '1:lastid', 'raw' );
-    my ($id_edeb) = $adb->index_get( $unq_path, '1:s:Edebiyat', 'raw' );
-    my ($id_dunya)= $adb->index_get( $unq_path, '1:s:Dünya Klasikleri', 'raw' );
-    my ($id_rus)  = $adb->index_get( $unq_path, '1:s:Rus Romanları', 'raw' );
-    my ($id_bilim)= $adb->index_get( $unq_path, '1:s:Bilim Kurgu', 'raw' );
+    # Check .fld index keys (direct strings with 1: prefix)
+    my ( undef, @fld_edeb )  = $adb->index_get( $fld_path, '1:Edebiyat' );
+    my ( undef, @fld_dunya ) = $adb->index_get( $fld_path, '1:Dünya Klasikleri' );
+    my ( undef, @fld_bilim ) = $adb->index_get( $fld_path, '1:Bilim Kurgu' );
 
-    is( $lastid, 4, 'lastid in .unq equals 4' );
-    is( $id_edeb, 1, 'Edebiyat assigned ID 1' );
-    is( $id_dunya, 2, 'Dünya Klasikleri assigned ID 2' );
-    is( $id_rus, 3, 'Rus Romanları assigned ID 3' );
-    is( $id_bilim, 4, 'Bilim Kurgu assigned ID 4' );
+    is_deeply( \@fld_edeb, [1], 'key 1:Edebiyat has record 1' );
+    is_deeply( [ sort @fld_dunya ], [1, 2], 'key 1:Dünya Klasikleri has records 1, 2' );
+    is_deeply( \@fld_bilim, [2], 'key 1:Bilim Kurgu has record 2' );
 
-    # Check .fld index keys (only numeric IDs 1, 2, 3, 4 with 1: prefix)
-    my ( undef, @fld_1 ) = $adb->index_get( $fld_path, '1:1' );
-    my ( undef, @fld_2 ) = $adb->index_get( $fld_path, '1:2' );
-    is_deeply( \@fld_1, [1], 'key 1 (Edebiyat) has record 1' );
-    is_deeply( [ sort @fld_2 ], [1, 2], 'key 2 (Dünya Klasikleri) has records 1, 2' );
-
-    # field_fetch queries by string name
+    # field_fetch queries by direct string name
     my @fetch_edeb = $adb->field_fetch( 'tags', 1, 'Edebiyat' );
     is( scalar(@fetch_edeb), 1, 'field_fetch("tags", 1, "Edebiyat") finds record 1' );
     is( $fetch_edeb[0]->[0], 1, 'record 1 returned' );
@@ -218,10 +208,10 @@ SCHEMA
 };
 
 # ------------------------------------------------------------------
-# SUBTEST 4: modify_id, delete_id and set_fields (rebuild)
+# SUBTEST 4: modify_id, delete_id and index rebuild
 # ------------------------------------------------------------------
 subtest 'modify_id, delete_id and index rebuild' => sub {
-    plan tests => 8;
+    plan tests => 7;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
     my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
@@ -256,17 +246,18 @@ SCHEMA
     $adb->insert_id( 'news', 1, 'Teknoloji, Yapay Zeka', 'Haber 1' );
     $adb->insert_id( 'news', 2, 'Yapay Zeka, Robotik',   'Haber 2' );
 
-    my $unq_path = $adb->table_path('news') . '.unq';
-    my ($lastid) = $adb->index_get( $unq_path, '1:lastid', 'raw' );
-    is( $lastid, 3, 'initial lastid is 3' );
+    my $fld_path = $adb->table_path('news') . '.fld';
+    my ( undef, @fld_tekno ) = $adb->index_get( $fld_path, '1:Teknoloji' );
+    is_deeply( \@fld_tekno, [1], 'Teknoloji initially has news 1' );
 
     # Modify news 1: replace 'Teknoloji' with new topic 'Uzay'
     $adb->modify_id( 'news', 1, 'Uzay, Yapay Zeka', 'Haber 1' );
 
-    my ($new_lastid) = $adb->index_get( $unq_path, '1:lastid', 'raw' );
-    my ($id_uzay)    = $adb->index_get( $unq_path, '1:s:Uzay', 'raw' );
-    is( $new_lastid, 4, 'lastid incremented to 4 after adding Uzay' );
-    is( $id_uzay, 4, 'Uzay assigned ID 4' );
+    # Direct .fld check: 'Teknoloji' removed from news 1, 'Uzay' added
+    my ( undef, @fld_tekno_after ) = $adb->index_get( $fld_path, '1:Teknoloji' );
+    my ( undef, @fld_uzay )        = $adb->index_get( $fld_path, '1:Uzay' );
+    is_deeply( \@fld_tekno_after, [], 'Teknoloji removed from .fld for news 1' );
+    is_deeply( \@fld_uzay, [1], 'Uzay added to .fld for news 1' );
 
     # Querying old topic 'Teknoloji' returns nothing for news 1
     my @fetch_tekno = $adb->field_fetch( 'news', 1, 'Teknoloji' );
@@ -288,14 +279,13 @@ SCHEMA
 
     my @fetch_uzay_rebuilt = $adb->field_fetch( 'news', 1, 'Uzay' );
     is( scalar(@fetch_uzay_rebuilt), 1, 'rebuilt index matches Uzay' );
-    is( $fetch_uzay_rebuilt[0]->[0], 1, 'rebuilt record matches news 1' );
 };
 
 # ------------------------------------------------------------------
 # SUBTEST 5: batch match_add lifecycle and embedded whitespace cleaning
 # ------------------------------------------------------------------
 subtest 'batch match_add handle lifecycle and whitespace cleaning' => sub {
-    plan tests => 6;
+    plan tests => 5;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
     my $conf_dir   = File::Spec->catdir( $temp_dir, 'config' );
@@ -327,8 +317,8 @@ SCHEMA
         }
     );
 
-    # Test newline/tab normalization in get_fieldlist
-    my @f_list = $adb->get_fieldlist("  Bilim\nKurgu  ,  Yapay\tZeka  ");
+    # Test newline/tab normalization in field_to_list
+    my @f_list = $adb->field_to_list("  Bilim\nKurgu  ,  Yapay\tZeka  ");
     is_deeply( \@f_list, [ 'Bilim Kurgu', 'Yapay Zeka' ], 'embedded newlines and tabs normalized to single spaces' );
 
     # Batch records insertion
@@ -344,26 +334,21 @@ SCHEMA
     # Run match_add for the whole batch
     $adb->match_add( $table_path, $table_info, \@batch );
 
-    my $unq_path = File::Spec->catfile( $temp_dir, 'batch_test.unq' );
     my $fld_path = File::Spec->catfile( $temp_dir, 'batch_test.fld' );
+    my $unq_path = File::Spec->catfile( $temp_dir, 'batch_test.unq' );
 
-    ok( -e $unq_path, 'batch_test.unq exists' );
     ok( -e $fld_path, 'batch_test.fld exists' );
+    ok( !-e $unq_path, 'batch_test.unq does not exist for non-unique tables' );
 
-    my ($lastid)   = $adb->index_get( $unq_path, '1:lastid', 'raw' );
-    my ($id_fizik) = $adb->index_get( $unq_path, '1:s:Fizik', 'raw' );
-    my ($id_kimya) = $adb->index_get( $unq_path, '1:s:Kimya', 'raw' );
-
-    is( $lastid, 5, 'lastid is 5 after batch match_add' );
-
-    # Verify .fld index for Fizik (ID 1) contains records 1 and 3 with 1: prefix
-    my ( undef, @recs_fizik ) = $adb->index_get( $fld_path, "1:$id_fizik" );
+    # Verify .fld index for Fizik contains records 1 and 3 with 1: prefix
+    my ( undef, @recs_fizik ) = $adb->index_get( $fld_path, "1:Fizik" );
     is_deeply( [ sort @recs_fizik ], [ 1, 3 ], 'Fizik index correctly maps to records 1 and 3 across batch' );
 
-    # Verify get_fieldlist read mode does not open-close erroneously
-    my @read_ids = $adb->get_fieldlist( 'Fizik, Geometri', 'read', $table_path, $table_info, 1 );
-    is_deeply( \@read_ids, [ $id_fizik, 5 ], 'read mode resolves batch strings to numeric IDs' );
+    # Verify field_to_list parses comma list directly
+    my @read_ids = $adb->field_to_list( 'Fizik, Geometri' );
+    is_deeply( \@read_ids, [ 'Fizik', 'Geometri' ], 'field_to_list parses strings directly' );
 };
+
 
 # ------------------------------------------------------------------
 # SUBTEST 6: valid => "unique" O(1) duplicate constraint enforcement
@@ -437,9 +422,9 @@ SCHEMA
 };
 
 # ------------------------------------------------------------------
-# SUBTEST 7: RDBM Foreign String auto-resolution via foreign .unq
+# SUBTEST 7: RDBM Foreign ID and text matching without .unq dictionary indirection
 # ------------------------------------------------------------------
-subtest 'RDBM Foreign String auto-resolution via foreign .unq' => sub {
+subtest 'RDBM Foreign ID and text matching without .unq dictionary indirection' => sub {
     plan tests => 8;
 
     my $temp_dir   = tempdir( CLEANUP => 1 );
@@ -493,34 +478,34 @@ SCHEMA
     my $b10 = $adb->insert_id( 'catalog_brand', 10, 'Can Yayınları' );
     is( $b10, 10, 'Brand 10 Can Yayınları created' );
 
-    # Insert book 1001 passing text 'Can Yayınları'
-    my $k1 = $adb->insert_id( 'catalog_book', 1001, 'Can Yayınları', 'Karamazov Kardeşler' );
-    is( $k1, 1001, 'Book 1001 inserted with string publisher' );
+    # Duplicate brand in catalog_brand should fail due to valid => "unique"
+    my $b_dup = $adb->insert_id( 'catalog_brand', 11, 'Can Yayınları' );
+    ok( !defined $b_dup, 'Duplicate brand insertion prevented by valid => "unique"' );
 
-    # Verify .fld index of catalog_book has resolved 'Can Yayınları' to ID 10
-    my $book_fld = $adb->table_path('catalog_book') . '.fld';
-    my ( undef, @books_10 ) = $adb->index_get( $book_fld, '1:10' );
-    is_deeply( \@books_10, [1001], 'Book 1001 correctly indexed under numeric Brand ID 10' );
+    # Insert book 1001 passing Brand ID 10
+    my $k1 = $adb->insert_id( 'catalog_book', 1001, 10, 'Karamazov Kardeşler' );
+    is( $k1, 1001, 'Book 1001 inserted with numeric publisher ID' );
 
-    # Insert book 1002 passing brand ID 10 directly
+    # Insert book 1002 passing Brand ID 10 directly
     my $k2 = $adb->insert_id( 'catalog_book', 1002, 10, 'Suç ve Ceza' );
     is( $k2, 1002, 'Book 1002 inserted with numeric publisher ID' );
 
+    # Verify .fld index of catalog_book has indexed both under '1:10'
+    my $book_fld = $adb->table_path('catalog_book') . '.fld';
     my ( undef, @books_10_all ) = $adb->index_get( $book_fld, '1:10' );
     is_deeply( [ sort @books_10_all ], [ 1001, 1002 ], 'Both books match Brand ID 10' );
 
-    # Insert book 1003 passing new brand 'İthaki Yayınları' (does NOT create foreign record, only unq)
+    # Insert book 1003 passing string publisher 'İthaki Yayınları'
     my $k3 = $adb->insert_id( 'catalog_book', 1003, 'İthaki Yayınları', 'Dune' );
-    is( $k3, 1003, 'Book 1003 inserted' );
+    is( $k3, 1003, 'Book 1003 inserted with string publisher' );
 
-    # Verify target table catalog_brand has NOT created a foreign record (remains 1 record)
-    my @all_brands = $adb->read_all('catalog_brand');
-    is( scalar @all_brands, 1, 'catalog_brand has NOT created foreign record; exactly 1 record remains in .inx index' );
+    # Verify .fld index maps direct string '1:İthaki Yayınları'
+    my ( undef, @books_ithaki ) = $adb->index_get( $book_fld, '1:İthaki Yayınları' );
+    is_deeply( \@books_ithaki, [1003], 'Book 1003 indexed under direct string key' );
 
-    # Verify catalog_book.unq has registered 'İthaki Yayınları' ("sadece unq üretsin")
-    my $book_unq = $adb->table_path('catalog_book') . '.unq';
-    my ($ithaki_unq_id) = $adb->index_get( $book_unq, '1:s:İthaki Yayınları', 'raw' );
-    ok( defined $ithaki_unq_id && $ithaki_unq_id ne '', 'catalog_book.unq generated unq ID for string publisher' );
+    # Querying by string matches book 1003 directly
+    my @fetch_ithaki = $adb->field_fetch( 'catalog_book', 1, 'İthaki Yayınları' );
+    is( scalar(@fetch_ithaki), 1, 'field_fetch matches book 1003 by string directly' );
 };
 
 done_testing();

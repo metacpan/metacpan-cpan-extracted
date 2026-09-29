@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.00';
 
 use Devel::CallParser;
 use Object::Proto;

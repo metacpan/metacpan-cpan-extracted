@@ -1,4 +1,4 @@
-$tkdb::VERSION = '2.4';
+$tkdb::VERSION = '2.5';
 
 use strict;
 use Data::Dumper;
@@ -590,7 +590,7 @@ sub setup_main_window {
   my $int = new Tcl::Tk;
   $self->{int} = $int;
 
-  $int->_packageRequire('treectrl');
+  $int->_packageRequire('Ttk');
 
   $self->{main_window} = $self->{int}->mainwindow();
   $self->{main_window}->geometry($ENV{'PTKDB_GEOMETRY'} || "800x600");
@@ -1134,7 +1134,7 @@ sub tree_split {
 
 #
 # callback executed when someone double clicks
-# an entry in the 'Subs' Tk::Notebook page.
+# an entry in the 'Subs' TtkNotebook page.
 #
 sub sub_list_cmd {
   my ($self, $path) = @_;
@@ -1292,9 +1292,11 @@ sub setup_search_panel {
 sub setup_frames {
   my ($self) = @_;
   my $mw = $self->{'main_window'};
+  my $int = $self->{int};
 
-  my $pw = $mw->Frame->pack(qw/-side bottom -fill both -expand 1/)->Panedwindow()->pack(qw/-side left -fill both -expand 1/);
-  my $frm = $pw->Frame->pack(qw/-side top -fill both -expand 1/); # frame for our code pane and search controls
+  my $pw = $mw->Frame->pack(-side=>'bottom', -fill=>'both', -expand=>1)
+      ->Panedwindow()->pack(-side=>'left', -fill=>'both', -expand=>1);
+  my $frm = $pw->Frame->pack(-side=>'bottom', -fill=>'both', -expand=>1); # frame for our code pane and search controls
 
   $self->setup_search_panel($frm);
 
@@ -1309,11 +1311,10 @@ sub setup_frames {
   $self->configure_text();
 
   #
-  # Notebook
+  # Notebook using ttk__notebook, which refers to ttk:notebook in tcl/tk
   #
 
-  my $nb = $self->{'notebook'} = $pw->BWNoteBook()
-        ->pack(qw/-side left -fill both -expand 1/);
+  my $nb = $self->{'notebook'} = $pw->TtkNotebook()->pack(-side => 'left', -fill => 'both', -expand => 1);
   $self->{w_nb} = $nb;
 
   $pw->add($frm, $nb);
@@ -1321,8 +1322,8 @@ sub setup_frames {
   #
   # a widget for the data entries
   #
-  $nb->_insertEnd("datapage", -text => "Exprs");
-  $self->{'data_page'} = $nb->getframe("datapage");
+  $self->{data_page} = $nb->TtkFrame();
+  $nb->add($self->{data_page}, -text => "Exprs");
 
   #
   # frame, entry and label for quick expressions
@@ -1330,8 +1331,8 @@ sub setup_frames {
   my $frame = $self->{'data_page'}->Frame()->pack(-side => 'top', -fill => 'x') ;
   my $label = $frame->Label(-text => "Quick Expr:")->pack(-side => 'left') ;
 
-  $self->{'quick_entry'} = $frame->Entry()->pack(-side => 'left', -fill => 'x', -expand => 1) ;
-  $self->{'quick_entry'}->bind('<Return>', sub { $self->QuickExpr() ; } ) ;
+  $self->{quick_entry} = $frame->Entry()->pack(-side => 'left', -fill => 'x', -expand => 1) ;
+  $self->{quick_entry}->bind('<Return>', sub { $self->QuickExpr() ; } ) ;
 
   #
   # Entry widget for expressions and breakpoints
@@ -1345,39 +1346,163 @@ sub setup_frames {
   #
   # tk widget for data expressions
   #
-  my $w_tree = $self->{'data_page'}->Scrolled('Treectrl',-showroot=>1,-showrootbutton=>1)
-		  ->pack(qw/-side top -fill both -expand 1/);
-  $self->{data_list0} = [$w_tree->Subwidget, $w_tree->columnCreate()];
-  $w_tree->elementCreate('foo','text');
-  $w_tree->elementCreate('bar','rect',-showfocus=>1);
-  $w_tree->styleCreate('st');
-  $w_tree->styleElements('st',['foo','bar']);
-  $w_tree->styleLayout('st','bar',-union=>'foo');
-  $w_tree->configure(-defaultstyle=>'st',-treecolumn=>$self->{data_list0}->[1]);
+  #my $w_tree = $self->{'data_page'}->Scrolled('Treectrl',-showroot=>1,-showrootbutton=>1)
+  my $w_tree = $self->{'data_page'}->Scrolled('TtkTreeview',
+    -show => 'tree headings',
+    -columns => ['name=data_list0']
+  )->pack(-side=>'top', -fill=>'both', -expand=>1);
+  $self->{data_list0} = $w_tree->Subwidget;
 
-  # subs page
-  #$self->setup_subs_page();
-  $nb->_insertEnd("subspage", -text => "Subs");
-  my $w1 = $nb->getframe("subspage")->Scrolled('Listbox', -selectmode=>'single');
-  $self->{'sub_list0'} = $w1->Subwidget;
-  $self->{int}->bind($self->{'sub_list0'}, "<Double-1>" => sub { $self->sub_list_cmd0(@_); });
-  $w1->pack(qw/-side left -fill both -expand 1/);
-  $self->fill_subs_page();
-  $self->{'subs_list_cnt'} = scalar keys %DB::sub;
+    # subs page
+    $self->{subspage} = $nb->TtkFrame();
+    $nb->add($self->{subspage}, -text => "Subs");
+    my $w1 = $self->{subspage}
+      #->Listbox(-selectmode=>'single');
+       ->Scrolled('Listbox', -selectmode=>'single');
+    $self->{'sub_list0'} = $w1->Subwidget;
+    $int->bind($self->{'sub_list0'}, "<Double-1>" => sub { $self->sub_list_cmd0(@_); });
+    $w1->pack(qw/-side left -fill both -expand 1/);
+    $self->fill_subs_page();
+    $self->{'subs_list_cnt'} = scalar keys %DB::sub;
 
-  # breakpts page
-  $self->{'notebook'}->_insertEnd("brkptspage", -text => "BrkPts") ;
-  my $sw = $self->{'notebook'}->getframe("brkptspage")->ScrolledWindow()->pack(qw(-side top -fill both -expand  1));
-  $self->{'breakpts_table'} = $sw->ScrollableFrame();
-  $sw->setwidget($self->{'breakpts_table'});
-  $self->{'breakpts_table_data'} = {}; # controls addressed by "fname:lineno"
+    # breakpts page
+    $self->{brkptspage} = $nb->TtkFrame();
+    $nb->add($self->{brkptspage}, -text => "BrkPts");
+    my $sw = $self->{brkptspage}->Scrolled('TtkTreeview',
+        -show => 'headings',
+        -columns => ['active', 'pos', 'condition']
+    )->pack(-side=>'top', -fill=>'both', -expand=>1);
+    my $tree = $sw->Subwidget('TtkTreeview');
+    $self->{breakpts_table} = $tree;
+    $tree->heading('active', -text => 'On');
+    $tree->heading('pos', -text => 'Breakpoint', -anchor => 'w');
+    $tree->heading('condition', -text => 'Condition', -anchor => 'w');
+    $tree->column('active', -width=>50, -anchor => 'w');
+    $tree->column('pos', -width=>150, -anchor => 'w');
+    $self->{'breakpts_table_data'} = {}; # controls addressed by "fname:lineno"
 
-  # eval page
-  $nb->_insertEnd("evalpage", -text => "Eval");
-  $self->{'w_eval_text'} = $nb->getframe("evalpage")->Scrolled('Text')->pack(qw/-side  top -fill both  -expand 1/);
+    my $edit_bkpt_sub = sub {
+	my $current_item = $tree->focus(); # Get the ID of the selected row
+	return unless $current_item;        # Exit if clicked on an empty space
 
-  # done
-  $nb->_raise("datapage");
+	# Extract current text values from TtkTreeview columns
+	# Expected order: 0 => active, 1 => pos, 2 => condition
+	my @values = $int->SplitList(scalar $tree->item($current_item, '-values'));
+	my $current_status    = $values[0]; # e.g., "[X]" or "[ ]"
+	my $breakpoint_name   = $values[1]; # e.g., "a.pl:7"
+	my $current_condition = $values[2] // ''; 
+
+	# --- Create modal dialog window (Toplevel) ---
+	my $dialog = $tree->Toplevel();
+	$dialog->title("Edit Breakpoint: $breakpoint_name");
+	
+	# Find the root window (main debugger window)
+	my $parent_toplevel = $int->icall('winfo', 'toplevel', $tree->path);
+
+	# Make the window modal (block the parent window)
+	$dialog->transient($parent_toplevel);
+	$dialog->grab();
+
+	# --- WINDOW AUTO-CENTERING ---
+	# Force update main window geometry to get accurate coordinates
+	$int->icall('update', 'idletasks'); 
+	
+	my $p_x = $int->icall('winfo', 'x',      $parent_toplevel);
+	my $p_y = $int->icall('winfo', 'y',      $parent_toplevel);
+	my $p_w = $int->icall('winfo', 'width',  $parent_toplevel);
+	my $p_h = $int->icall('winfo', 'height', $parent_toplevel);
+
+	# Desired dimensions for our dialog window
+	my $dlg_w = 320;
+	my $dlg_h = 135;
+
+	# Calculate center coordinates
+	my $x = $p_x + int(($p_w - $dlg_w) / 2);
+	my $y = $p_y + int(($p_h - $dlg_h) / 2);
+
+	# Fallback to prevent window from flying off-screen (e.g., if main window is minimized)
+	$x = 100 if $x < 0;
+	$y = 100 if $y < 0;
+
+	# Set size and position
+	$dialog->geometry("${dlg_w}x${dlg_h}+$x+$y");
+
+	# Local variables to store changes inside the dialog
+	my $is_active = ($current_status eq '[X]') ? 1 : 0;
+	my $new_condition = $current_condition;
+
+	# Container for the activity checkbox
+	my $f1 = $dialog->TtkFrame()->pack(-fill => 'x', -padx => 10, -pady => [10, 5]);
+	$f1->TtkCheckbutton(
+	    -text     => "Enabled",
+	    -variable => \$is_active
+	)->pack(-side => 'left');
+
+	# Container for the condition input field
+	my $f2 = $dialog->TtkFrame()->pack(-fill => 'x', -padx => 10, -pady => 5);
+	$f2->TtkLabel(-text => "Condition (Perl expression):")->pack(-side => 'top', -anchor => 'w', -pady => [0, 2]);
+	
+	my $entry = $f2->TtkEntry(-textvariable => \$new_condition);
+	$entry->pack(-side => 'top', -fill => 'x', -expand => 1);
+	$entry->focus(); # Shift focus to the text input field
+
+	# Closure (subroutine) to save the results
+	my $save_action = sub {
+	    my $next_status = $is_active ? '[X]' : '[ ]';
+
+	    # change tag for the breakpoint for it to be displayed as active/inactive
+	    my ($fname, $idx) = split /:/, $breakpoint_name;
+	    $self->change_breakpoint_tag($self->{text}, "$idx.0", $is_active) if $fname eq $self->{'current_file'} ;
+
+	    # Update visual representation directly in the TtkTreeview
+	    $tree->item($current_item, -values => [$next_status, $breakpoint_name, $new_condition]);
+
+	    # --- DEBUGGER CORE BACKEND SYNCHRONIZATION CODE ---
+            $self->{'breakpts_table_data'}->{$breakpoint_name}->{'tv-idx'} = $current_item;
+
+	    $dialog->destroy(); # Close the dialog window
+	};
+
+	# Container for OK / Cancel buttons
+	my $f3 = $dialog->TtkFrame()->pack(-fill => 'x', -padx => 10, -pady => [10, 10]);
+
+	# OK Button
+	my $ok_btn = $f3->TtkButton(
+	    -text    => "OK",
+	    -command => $save_action
+	)->pack(-side => 'right', -padx => 5);
+
+	# Cancel Button
+	$f3->TtkButton(
+	    -text    => "Cancel",
+	    -command => sub { $dialog->destroy(); }
+	)->pack(-side => 'right');
+
+	# TODO: add these 2 buttons:
+	# $xxx->Button(-text => "Delete", -command => sub { $self->removeBreakpoint($fname, $index) ; } )
+	# $xxx->Button(-text => "Goto", -command => sub { $self->set_file($fname, $index) ; } )
+
+	# --- Keyboard Shortcuts Handling ---
+	# Bind Enter key to the window and entry field to trigger save action
+	$dialog->bind('<Return>', $save_action); 
+	$entry->bind('<Return>', $save_action);
+
+	# Close window without saving on Escape key
+	$dialog->bind('<Escape>', sub { $dialog->destroy(); });
+    };
+
+    # Bind double left-click and "return" key events to the sub
+    $sw->bind('<Double-1>', $edit_bkpt_sub);
+    $sw->bind('<Key-Return>', $edit_bkpt_sub);
+
+
+    # eval page
+    $self->{evalpage} = $nb->TtkFrame();
+    $nb->add($self->{evalpage}, -text => "Eval");
+    $self->{w_eval_text} = $self->{evalpage}->Scrolled('Text')->pack(qw/-side  top -fill both  -expand 1/);
+
+    # done
+    $nb->_select(0);
 
 } # end of setup_frames
 
@@ -1496,20 +1621,13 @@ sub clear_entry_text {
   return $str;
 } # end of clear_entry_text
 
-sub brkPtCheckbutton {
-  my ($self, $fname, $idx, $brkPt) = @_ ;
-  $self->change_breakpoint_tag($self->{text}, "$idx.0", $brkPt->{value}) if $fname eq $self->{'current_file'} ;
-} # end of brkPtCheckbutton
-
 #
 # insert a breakpoint control into our breakpoint list.  
-# returns a handle to the control
 #
 #  Expression, if defined, is to be evaluated at the breakpoint
 # and execution stopped if it is non-zero/defined.
 #
-# If action is defined && True then it will be evalled
-# before continuing.  
+# If action is defined && True then it will be evalled before continuing.  
 #
 sub insertBreakpoint {
   my ($self, $fname, @brks) = @_ ;
@@ -1540,61 +1658,27 @@ sub add_brkpt_to_brkpt_page {
   # 
   # Add the breakpoint to the breakpoints page 
   # 
+  $self->{w_nb}->_select(2);
   my ($fname, $index) = @$brkPt{'fname', 'line'} ; 
   return if exists $self->{'breakpts_table_data'}->{"$fname:$index"} ; 
-  $self->{'brkPtCnt'} += 1 ; 
-
-  my $btnName = $fname ;
-  $btnName =~ s/.*\/([^\/]*)$/$1/;
-
-  # take the last leaf of the pathname
-
-  my $frm = $self->{'breakpts_table'}->getframe;
-  my $upperFrame = $frm->Frame()->pack(qw/-side top -fill x -expand 1/);
-
-  $upperFrame->Checkbutton(-text => "$btnName:$index",
-	  -variable => \$brkPt->{'value'}, # CAUTION value tracking
-	  -command => sub { $self->brkPtCheckbutton($fname, $index, $brkPt) })
-      ->pack(-side => 'left') ;
-
-  $upperFrame->Button(-text => "Delete", -command => sub { $self->removeBreakpoint($fname, $index) ; } )
-      ->pack(qw/-side left -fill x -expand 1/);
-
-  $upperFrame->Button(-text => "Goto", -command => sub { $self->set_file($fname, $index) ; } )
-      ->pack(qw/-side left -fill x -expand 1/);
-
-  my $lowerFrame = $frm->Frame()->pack(-side => 'top', '-fill' => 'x', '-expand' => 1);
-
-  $lowerFrame->Label(-text => "Cond:")->pack(-side => 'left');
-
-  $lowerFrame->Entry(-textvariable => \$brkPt->{'expr'})
-      ->pack(qw/-side left -fill x -expand 1/);
-
-  $self->{'breakpts_table_data'}->{"$fname:$index"}->{'frm1'} = $upperFrame;
-  $self->{'breakpts_table_data'}->{"$fname:$index"}->{'frm2'} = $lowerFrame;
-
-  #TODO $self->{'main_window'}->update;
-
-  #TODO my $width = $frm->cget('-width') ;#TODO < Must be widget method
-  #TODO if ( $width > $self->{'breakpts_table'}->width ) {
-  #TODO   $self->{'notebook'}->configure(-width => $width) ;
-  #TODO }
-
+  $self->{'brkPtCnt'} += 1;
+  my $fname0 = $fname =~ s/.*\/([^\/]*)$/$1/r;
+  my $line_tid = $self->{breakpts_table}->insert('', 'end', -values => [
+    $brkPt->{'value'} ? '[X]' : '[ ]',
+    "$fname0:$index",
+    $brkPt->{'expr'} || ''
+  ]);
+  $self->{'breakpts_table_data'}->{"$fname:$index"}->{'tv-idx'} = $line_tid;
 } # end of add_brkpt_to_brkpt_page
 
 sub remove_brkpt_from_brkpt_page {
   my($self, $fname, $idx) = @_ ;
 
-  my $table = $self->{'breakpts_table'} ;
+  # Delete corresponding line from the TtkTreeview widget
+  $self->{breakpts_table}->delete( $self->{'breakpts_table_data'}->{"$fname:$idx"}->{'tv-idx'} );
 
-  # Delete the breakpoint control in the breakpoints window
-
-  $self->{'breakpts_table_data'}->{"$fname:$idx"}->{frm1}->destroy;
-  $self->{'breakpts_table_data'}->{"$fname:$idx"}->{frm2}->destroy;
   delete $self->{'breakpts_table_data'}->{"$fname:$idx"};
-
   $self->{'brkPtCnt'} -= 1;
-
 } # end of remove_brkpt_from_brkpt_page
 
 
@@ -1680,10 +1764,8 @@ sub removeAllBreakpoints {
 #
 sub deleteAllExprs {
   my ($self) = @_ ;
-  my $c = $self->{data_list0}->[0]->_item('children','root'); # this returns Tcl::List or empty. TODO - do this better
-  my @c = ref $c ? @$c : split / /,$c;
-  #print STDERR "{{{@c;$#c;($c);w=$self->{data_list0}->[0]}}}";
-  $self->{data_list0}->[0]->_item(delete=>$_) for @c;
+  my @c = $self->{int}->SplitList(scalar $self->{data_list0}->children(''));
+  $self->{data_list0}->_delete($_) for @c;
 } # end of deleteAllExprs
 
 sub EnterExpr {
@@ -1708,17 +1790,16 @@ sub QuickExpr {
 
 sub deleteExpr {
   my ($self) = @_ ;
-  my ($tv, $tcol) = @{$self->{data_list0}}; 
-  my $ret = $tv->_selectionGet; # TODO
-  my @sList = ref $ret ? @$ret : split / /,$ret;
+  my $tv = $self->{data_list0}; 
+  my @sList = $self->{int}->SplitList(scalar $tv->_selection);
 
   for (@sList) {
-      if ($tv->itemParent($_) == 0) {
+      if ($tv->_parent($_) eq '') {
           # if we're deleteing a top level expression we have to take it out of the list of expressions
           my $e = delete $self->{el2expr}->{$_};
           $self->{'expr_list'} = [grep {$_->{expr} ne $e} @{$self->{'expr_list'}}];
       }
-      $tv->_item('delete', $_);
+      $tv->_delete($_);
   }
 } # end of deleteExpr
 
@@ -1738,8 +1819,8 @@ sub deleteExpr {
 sub insertExpr {
   my ($self, $reusedRefs, $theRef, $name, $depth, $el) = @_;
   my ($type, $result, @circRefs);
-  local $^W = 0; # spare us uncessary warnings about comparing strings with ==
-  my ($tv, $tcol) = @{$self->{data_list0}}; 
+  local $^W = 0; # spare us unnecessary warnings about comparing strings with ==
+  my $tv = $self->{data_list0}; 
 
   while( ref $theRef eq 'SCALAR' ) {
     $theRef = $$theRef ;
@@ -1762,9 +1843,8 @@ sub insertExpr {
   if( !$type || $type eq "" || $type eq "GLOB" || $type eq "CODE") {
     eval {
 	my $t = "$name = $label" . (defined $theRef?$theRef:"undef");
-	$el = $tv->itemCreate(-button=>'no',-parent=>$el);
-        $self->{el2expr}->{$el->[0]} = $name;
-	$tv->itemElementConfigure($el, $tcol, 'foo', -text=>"$t");
+	$el = $tv->insert($el, 'end', -text=>"$t");
+        $self->{el2expr}->{$el} = $name;
     };
     $self->DoAlert($@), return 0 if $@ ;
     return 1 ;
@@ -1773,9 +1853,8 @@ sub insertExpr {
   if( $type eq 'ARRAY' or "$theRef" =~ /ARRAY/ ) {
     my $idx = 0 ;
     eval {
-	$el = $tv->itemCreate(-button=>'yes',-parent=>$el);
-        $self->{el2expr}->{$el->[0]} = $name;
-	$tv->itemElementConfigure($el, $tcol, 'foo', -text=>"$name = $theRef");
+	$el = $tv->insert($el, 'end', -text=>"$name = $theRef");
+        $self->{el2expr}->{$el} = $name;
     } ;
     if( $@ ) {
       $self->DoAlert($@) ;
@@ -1786,8 +1865,7 @@ sub insertExpr {
 
       if( grep $_ == $r, @$reusedRefs ) { # check to make sure that we're not doing a single level self reference
         eval {
-	    $el = $tv->itemCreate(-button=>'yes',-parent=>$el);
-	    $tv->itemElementConfigure($el, $tcol, 'foo', -text=>"[$idx] = $r REUSED ADDR");
+	    $el = $tv->insert($el, -text=>"[$idx] = $r REUSED ADDR");
         } ;
         $self->DoAlert($@) if( $@ ) ;
         next ;
@@ -1805,9 +1883,8 @@ sub insertExpr {
 
   if ("$theRef" !~ /HASH\050\060x[\da-f]*\051/) {
     eval {
-	$el = $tv->itemCreate(-button=>'yes',-parent=>$el);
-        $self->{el2expr}->{$el->[0]} = $name;
-	$tv->itemElementConfigure($el, $tcol, 'foo', -text=>"$name = $theRef");
+	$el = $tv->insert($el, -text=>"$name = $theRef");
+        $self->{el2expr}->{$el} = $name;
     };
     if( $@ ) {
       $self->DoAlert($@) ;
@@ -1820,17 +1897,15 @@ sub insertExpr {
 #
   my $idx = 0 ;
   my @theKeys = sort keys %$theRef;
-  $el = $tv->itemCreate(-button=>'yes',-parent=>$el);
-  $self->{el2expr}->{$el->[0]} = $name;
-  $tv->itemElementConfigure($el, $tcol, 'foo', -text=>"$name = " . "$theRef");
+  $el = $tv->insert($el, -text=>"$name = " . "$theRef");
+  $self->{el2expr}->{$el} = $name;
   $result = 1 ;
 
   for my $r ( @$theRef{@theKeys} ) { # slice out the values with the sorted list
 
     if( grep $_ == $r, @$reusedRefs ) { # check to make sure that we're not doing a single level self reference
       eval {
-	$el = $tv->itemCreate(-parent=>$el);
-	$tv->itemElementConfigure($el, $tcol, 'foo', -text=>"$theKeys[$idx++] = $r REUSED ADDR");
+	$el = $tv->insert($el, -text=>"$theKeys[$idx++] = $r REUSED ADDR");
       } ;
       print "bad path $@\n" if( $@ ) ;
       next ;
@@ -2620,7 +2695,7 @@ sub updateExprs {
     my @result = &DB::dbeval($package, $expr->{'expr'}) ;
 
     my $r = (@result==1?$result[0]:\@result);
-    $DB::window->insertExpr([$r], $r, $expr->{'expr'}, $expr->{'depth'},'root');
+    $DB::window->insertExpr([$r], $r, $expr->{'expr'}, $expr->{'depth'},'');
   }
 } # end of updateExprs
 
@@ -3166,7 +3241,7 @@ sub DB {
 
            @result = &DB::dbeval($package, $DB::window->{expr}) ;
 	   my $rr = (@result == 1? $result[0] : \@result);
-           my $r = $DB::window->insertExpr([ $rr ], $rr, $DB::window->{expr}, -1,'root') ;
+           my $r = $DB::window->insertExpr([ $rr ], $rr, $DB::window->{expr}, -1,'') ;
 
            #
            # $r will be 1 if the expression was added succesfully, 0 if not,

@@ -84,14 +84,6 @@ Reorganize documentation
 
 =item *
 
-Add script (C<-s>) option
-
-=item *
-
-Provide option to customize the initial version
-
-=item *
-
 Validate license string allowing only values contained in the
 L<CPAN::Meta::Spec/license> list
 

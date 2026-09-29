@@ -799,10 +799,34 @@ is_deeply($cloudflare_or->{'command'}, [
 ], 'Wrangler deploy receives the authored configuration and built assets');
 is($cloudflare_or->{'build_count'}, 1, 'Cloudflare action builds exactly once');
 
+blurp('wrangler.jsonc', "{\"name\":\"default-docs\",\"compatibility_date\":\"2026-09-28\"}\n");
+blurp('wrangler.json', "{\"name\":\"fallback-docs\",\"compatibility_date\":\"2026-09-28\"}\n");
+my $default_cloudflare_or=TestCloudflare->new({site_dn => $site_dn});
+is($default_cloudflare_or->publish_cloudflare(), $site_dn,
+    'root Wrangler JSONC configuration publishes without metadata');
+is_deeply($default_cloudflare_or->{'command'}, [
+    'wrangler', 'deploy', '--config', abs_path('wrangler.jsonc'),
+    '--assets', $site_dn
+], 'root Wrangler JSONC configuration is preferred over JSON');
+
+unlink('wrangler.jsonc') || die "unable to remove disposable Wrangler JSONC: $!";
+my $json_cloudflare_or=TestCloudflare->new({site_dn => $site_dn});
+is($json_cloudflare_or->publish_cloudflare(), $site_dn,
+    'root Wrangler JSON configuration is the default fallback');
+is_deeply($json_cloudflare_or->{'command'}, [
+    'wrangler', 'deploy', '--config', abs_path('wrangler.json'),
+    '--assets', $site_dn
+], 'root Wrangler JSON configuration is passed to deployment');
+unlink('wrangler.json') || die "unable to remove disposable Wrangler JSON: $!";
+
 my $missing_or=TestCloudflare->new({site_dn => $site_dn});
 eval {$missing_or->publish_cloudflare()};
-like($@, qr/configuration must be a hash reference/, 'missing Cloudflare configuration rejected');
+like($@, qr/requires cloudflare\.config or wrangler\.jsonc\/wrangler\.json/,
+    'missing explicit and root Wrangler configuration rejected');
 ok(!$missing_or->{'build_count'}, 'missing configuration fails before building');
+$missing_or->{'cloudflare'}='invalid';
+eval {$missing_or->publish_cloudflare()};
+like($@, qr/configuration must be a hash reference/, 'invalid Cloudflare configuration rejected');
 $missing_or->{'cloudflare'}={config => 'config/missing.jsonc'};
 eval {$missing_or->publish_cloudflare()};
 like($@, qr/Wrangler configuration not found/, 'missing Wrangler file rejected');

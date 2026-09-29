@@ -398,4 +398,32 @@ subtest '9. Repeating records (repeat_start / type => repeat)' => sub {
     is_deeply( $direct_def->[5], [ 202, "Pen" ], "Deflated block 5 is second repeat item" );
 };
 
+# ============================================================
+# 10. SCHEMA GUARDS: No deflate/inflate if no schema or non-matching structure
+# ============================================================
+subtest '10. Schema guard: No deflate/inflate without schema or non-matching structure' => sub {
+    # 1. Schema-less table
+    ok( !$adb->has_schema('dummy_unstructured'), "Unstructured table has no schema" );
+    my $doc = { data => { name => "Ahmet", nested => [ 1, 2, 3 ] } };
+    
+    my $def_untouched = $adb->deflate( 'dummy_unstructured', $doc );
+    is_deeply( $def_untouched, $doc, "deflate returns doc untouched when no schema" );
+
+    my $inf_untouched = $adb->inflate( 'dummy_unstructured', $doc );
+    is_deeply( $inf_untouched, $doc, "inflate returns doc untouched when no schema" );
+
+    # Insert into schema-less table
+    my $uid = $adb->insert_id( 'dummy_unstructured', 0, $doc );
+    ok( $uid > 0, "Inserted record into schema-less table" );
+    my @read_back = $adb->read_id( 'dummy_unstructured', $uid );
+    is( $read_back[0], $uid, "Read-back record id matches" );
+    is_deeply( $read_back[1], $doc, "Read-back document preserved completely" );
+
+    # 2. Schema-based table with non-matching payload
+    my $mismatch_doc = { data => { name => "Ahmet" }, irrelevant => 123 };
+    ok( !$adb->schema_matches_hash( 'catalog_product', $mismatch_doc ), "Non-matching hash detected" );
+    my $def_mismatch = $adb->deflate( 'catalog_product', $mismatch_doc );
+    is_deeply( $def_mismatch, $mismatch_doc, "deflate leaves non-matching structure untouched" );
+};
+
 done_testing();

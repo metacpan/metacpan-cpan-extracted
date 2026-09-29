@@ -1,0 +1,28 @@
+---
+abstract: 'Send and sync RT ticket notifications to Slack'
+author:
+  - 'Josh Tackitt <tackittj@reed.edu>'
+  - 'Josh Tackitt <tackittj@reed.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.21'
+license: gpl2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-Slack
+no_index:
+  directory:
+    - etc
+    - inc
+requires:
+  perl: 5.10.1
+resources:
+  license: http://opensource.org/licenses/gpl-2.0.php
+version: '1.1'
+x_module_install_rtx_version: '0.45'
+x_requires_rt: 6.0.0

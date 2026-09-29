@@ -1,0 +1,22 @@
+Revision history for App-Access2CSV
+
+0.001.0	Mon Sep 28 02:13:38 PM EDT 2026
+        First release.
+        - access2csv: export every user table of an Access (.mdb/.accdb)
+          database to one CSV file each, using mdbtools
+        - Encodings: utf8, utf8-bom (for Excel) and cp1252; cp1252 refuses
+          characters it cannot hold, with the line number
+        - Safe file names: unsafe and invisible control characters
+          replaced, Windows device names avoided, collisions numbered
+          (ignoring case)
+        - Each table written to a temporary file and renamed into place: a
+          failure or interruption never leaves a half-written CSV, and an
+          old file is replaced only by a complete new one
+        - --table, --dry-run, --show-counts, --overwrite, --output-dir,
+          --log/--no-log, --no-progress, --verbose, --version
+        - "-" reads the database from standard input
+        - Ctrl-C/SIGTERM stop the run cleanly
+        - Security: no shell, "--" before names, relative PATH entries
+          ignored, terminal output escaped, log symbolic links refused,
+          taint mode (-T) supported
+        - Messages through a translatable catalog (English included)

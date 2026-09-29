@@ -1,5 +1,5 @@
 package Net::OpenSSH::More;
-$Net::OpenSSH::More::VERSION = '1.04';
+$Net::OpenSSH::More::VERSION = '1.05';
 #ABSTRACT: Net::OpenSSH submodule with many useful features
 
 use strict;
@@ -55,8 +55,8 @@ my $check_local_perms = sub {
     ## no critic(BitwiseOperator)
     $die_no_trace->(qq{"$path" must be a directory that exists}) unless !$is_dir ^ -d _;
     ## no critic(BitwiseOperator)
-    $die_no_trace->(qq{"$path" must be a file that exists})      unless $is_dir ^ -f _;
-    $die_no_trace->(qq{"$path" could not be read})               unless -r _;
+    $die_no_trace->(qq{"$path" must be a file that exists}) unless $is_dir ^ -f _;
+    $die_no_trace->(qq{"$path" could not be read})          unless -r _;
 
     ## no critic(BitwiseOperator)
     my $actual_mode = $stat[2] & 07777;
@@ -218,6 +218,19 @@ $init_ssh = sub {
 
     my $status = 0;
     my $self;
+
+    # What the last failed attempt said.  Each attempt fails for a reason, and
+    # the reason is what tells a key that is refused from a host that is not
+    # there yet, so it is said when it changes, and again when this gives up.
+    my $last_said = q{};
+    my $said      = sub {
+        my ( $why, $attempt ) = @_;
+        $why =~ s/\s+/ /g;
+        $why =~ s/\A | \z//g;
+        diag( { '_opts' => $opts }, "Attempt $attempt of $opts->{'retry_max'} to reach $opts->{'host'} failed: $why" ) if $why ne $last_said;
+        $last_said = $why;
+        return;
+    };
     foreach my $attempt ( 1 .. $opts->{'retry_max'} ) {
 
         # Have to wait here: the `next` statements further down short-circuit
@@ -228,6 +241,7 @@ $init_ssh = sub {
         my $up = $ping->($opts);
         if ( !$up ) {
             $die_no_trace->("$opts->{'host'} is down!") if $opts->{die_on_drop};
+            $last_said = "nothing answered on port " . ( $opts->{'port'} // 22 );
             diag( { '_opts' => $opts }, "Waiting for host to bring up sshd, attempt $attempt..." );
             next;
         }
@@ -271,21 +285,19 @@ $init_ssh = sub {
             $die_no_trace->("Bad credentials, will not retry SSH connection: $error.")     if ( $error =~ m{Permission denied} );
         }
 
-        next unless ref $self eq 'Net::OpenSSH::More' && !$ssh_error;
+        if ( ref $self ne 'Net::OpenSSH::More' || $ssh_error ) {
+            $said->( $error || 'the master connection would not start', $attempt );
+            next;
+        }
         bless $self, $class if ref $self ne $class;
 
-        # Diagnosed against $opts rather than the object: _opts is not stashed
-        # onto it until after this returns, and the host lives in _host there
-        # rather than host.
-        if ( defined $self->error && $self->error ne "0" && $attempt == 1 ) {
-            diag( { '_opts' => $opts }, "SSH Connection could not be established to $opts->{'host'} with the error:", $error, "Will retry $opts->{'retry_max'} times." );
-        }
         if ( $status = $self->check_master() ) {
             diag( { '_opts' => $opts }, "Successfully established connection to $opts->{'host'} on attempt #$attempt." ) if $attempt gt 1;
             last;
         }
+        $said->( 'the master connection did not answer a check', $attempt );
     }
-    $die_no_trace->("Failed to establish SSH connection after $opts->{'retry_max'} attempts. Stopping here.") if ( !$status );
+    $die_no_trace->("Failed to establish SSH connection after $opts->{'retry_max'} attempts.  The last attempt said: $last_said.  Stopping here.") if ( !$status );
 
     # An adopted master is somebody else's, and all we knew when we took it was
     # that a socket file existed at that path.  That says nothing about the
@@ -772,7 +784,7 @@ Net::OpenSSH::More - Net::OpenSSH submodule with many useful features
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

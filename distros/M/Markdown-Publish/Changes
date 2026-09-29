@@ -1,5 +1,12 @@
 Revision history for Markdown-Publish
 
+1.004  2026-09-29
+
+    - Discover wrangler.jsonc or wrangler.json in the project root when
+      Cloudflare publication configuration is not supplied explicitly.
+    - Allow make publish_cloudflare to deploy with no Cloudflare settings in
+      META_MERGE and document the minimal assets-only Wrangler configuration.
+
 1.003  2026-09-26
 
     - Publish public repository metadata through the GitHub mirror.

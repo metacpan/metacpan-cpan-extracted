@@ -6,10 +6,11 @@ Aion::Run::RunRun - выполняет Perl-код и распечатывает
 # SYNOPSIS
 
 ```perl
-use Aion::Format qw/trappout np/;
+use Aion::Format qw/trappout/;
+use Data::Printer colored => 1, caller_info => 0, show_memsize => 0;
 use Aion::Run::RunRun;
 
-trappout { Aion::Run::RunRun->new(code => "1+2")->run } # -> np(3, caller_info => 0) . "\n"
+trappout { Aion::Run::RunRun->new(code => "1+2")->run } # -> do { my $t = 3; p $t, return_value => "dump", caller_info => 0, show_memsize => 0 } . "\n"
 ```
 
 # DESCRIPTION

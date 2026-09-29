@@ -1,5 +1,5 @@
 package Dancer2;
-$Dancer2::VERSION = '2.2.1';
+$Dancer2::VERSION = '2.2.2';
 # ABSTRACT: Lightweight yet powerful web application framework
 
 use 5.12.0;
@@ -128,7 +128,7 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 2.2.1
+version 2.2.2
 
 =head1 DESCRIPTION
 
@@ -398,10 +398,10 @@ We are also on IRC: #dancer on irc.perl.org.
     Mikko Koivunalho
     Mohammad S Anwar
     mokko
-    Nick Patch
     Nick Tonkin
     Nigel Gregoire
     Nikita K
+    Nova Patch
     Nuno Carvalho
     Olaf Alders
     Olivier Mengué

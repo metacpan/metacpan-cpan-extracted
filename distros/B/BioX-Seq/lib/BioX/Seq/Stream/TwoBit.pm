@@ -69,7 +69,7 @@ sub next_seq {
     
     my ($self) = @_;
 
-    return undef if ($self->{curr_idx} >= $self->{seq_count});
+    return if ($self->{curr_idx} >= $self->{seq_count});
 
     my $seq = $self->_fetch_record( $self->{curr_idx} );
     ++$self->{curr_idx};

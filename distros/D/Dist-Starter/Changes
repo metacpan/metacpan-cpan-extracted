@@ -1,5 +1,11 @@
 Release history for Dist-Starter
 
+v0.3.0    2026-09-29T07:16:34Z
+          - Add test runner PATH setup logic
+          - Improve test runner t/lib setup logic
+          - Ignore all space when checking expected files in api test script
+          - Set --nooutdent-labels perltidy option
+
 v0.2.1    2026-09-15T08:25:24Z
           - Let the test runner provide t/lib if it exists
           - MY module should be criticized too

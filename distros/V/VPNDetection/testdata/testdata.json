@@ -137,8 +137,18 @@
     },
     {
       "ip": "fe00::",
+      "expect": true,
+      "why": "past fc00::/7 but inside e000::/3, outside global unicast"
+    },
+    {
+      "ip": "3fff:fff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address inside 3fff::/20; pins the /20 mask width"
+    },
+    {
+      "ip": "3fff:1000::",
       "expect": false,
-      "why": "first address past fc00::/7; a mask one bit too wide claims it"
+      "why": "first address past 3fff::/20; a mask one bit too wide claims it"
     },
     {
       "ip": "2001:db8:ffff:ffff:ffff:ffff:ffff:ffff",
@@ -177,8 +187,18 @@
     },
     {
       "ip": "100:0:0:1::",
+      "expect": true,
+      "why": "past 100::/64 but inside 100:0:0:1::/64 and ::/3"
+    },
+    {
+      "ip": "2001:1ff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address inside 2001::/23; pins the /23 mask width"
+    },
+    {
+      "ip": "2001:200::",
       "expect": false,
-      "why": "first address past 100::/64; a mask one bit too wide claims it"
+      "why": "first address past 2001::/23; a mask one bit too wide claims it"
     },
     {
       "ip": "10.255.255.255",
@@ -229,6 +249,50 @@
       "ip": "192.0.3.0",
       "expect": false,
       "why": "first address past 192.0.2.0/24; a mask one bit too wide claims it"
+    }
+  ],
+  "ipv4Mapped": [
+    {
+      "ip": "::ffff:8.8.8.8",
+      "carries": "8.8.8.8",
+      "expect": false,
+      "why": "a public IPv4 visitor, as a server listening on :: sees every one: judged, sent and cached as 8.8.8.8, never as a bogon in ::ffff:0:0/96"
+    },
+    {
+      "ip": "::ffff:10.0.0.1",
+      "carries": "10.0.0.1",
+      "expect": true,
+      "why": "RFC 1918, mapped: a bogon for the same reason 10.0.0.1 is"
+    },
+    {
+      "ip": "::ffff:127.0.0.1",
+      "carries": "127.0.0.1",
+      "expect": true,
+      "why": "loopback, mapped: a local client of a server listening on ::"
+    },
+    {
+      "ip": "::ffff:808:808",
+      "carries": "8.8.8.8",
+      "expect": false,
+      "why": "the same address with its IPv4 half in hex"
+    },
+    {
+      "ip": "0:0:0:0:0:ffff:808:808",
+      "carries": "8.8.8.8",
+      "expect": false,
+      "why": "the same address written in full"
+    },
+    {
+      "ip": "::FFFF:8.8.8.8",
+      "carries": "8.8.8.8",
+      "expect": false,
+      "why": "upper-case hex digits"
+    },
+    {
+      "ip": "::8.8.8.8",
+      "carries": "::8.8.8.8",
+      "expect": true,
+      "why": "IPv4-compatible, not mapped: stays IPv6 and inside ::/96"
     }
   ],
   "bogonResponse": {
@@ -6601,54 +6665,80 @@
       "172.16.0.0/12",
       "192.0.0.0/24",
       "192.0.2.0/24",
+      "192.88.99.2/32",
       "192.168.0.0/16",
       "198.18.0.0/15",
       "198.51.100.0/24",
       "203.0.113.0/24",
       "224.0.0.0/4",
-      "240.0.0.0/4",
-      "255.255.255.255/32"
+      "255.255.255.255/32",
+      "240.0.0.0/4"
     ],
     "v6": [
       "::/128",
       "::1/128",
       "::ffff:0:0/96",
       "::/96",
+      "64:ff9b::/96",
+      "64:ff9b:1::/48",
       "100::/64",
+      "100:0:0:1::/64",
+      "2001:2::/48",
       "2001:10::/28",
       "2001:db8::/32",
+      "3fff::/20",
+      "5f00::/16",
       "fc00::/7",
       "fe80::/10",
       "fec0::/10",
       "ff00::/8",
       "2002::/24",
       "2002:a00::/24",
+      "2002:6440::/26",
       "2002:7f00::/24",
       "2002:a9fe::/32",
       "2002:ac10::/28",
       "2002:c000::/40",
       "2002:c000:200::/40",
+      "2002:c058:6302::/48",
       "2002:c0a8::/32",
       "2002:c612::/31",
       "2002:c633:6400::/40",
       "2002:cb00:7100::/40",
       "2002:e000::/20",
-      "2002:f000::/20",
       "2002:ffff:ffff::/48",
+      "2002:f000::/20",
       "2001::/40",
       "2001:0:a00::/40",
+      "2001:0:6440::/42",
       "2001:0:7f00::/40",
       "2001:0:a9fe::/48",
       "2001:0:ac10::/44",
       "2001:0:c000::/56",
       "2001:0:c000:200::/56",
+      "2001:0:c058:6302::/64",
       "2001:0:c0a8::/48",
       "2001:0:c612::/47",
       "2001:0:c633:6400::/56",
       "2001:0:cb00:7100::/56",
       "2001:0:e000::/36",
+      "2001:0:ffff:ffff::/64",
       "2001:0:f000::/36",
-      "2001:0:ffff:ffff::/64"
+      "2001:1::/32",
+      "2001:2::/31",
+      "2001:4::/30",
+      "2001:8::/29",
+      "2001:20::/27",
+      "2001:40::/26",
+      "2001:80::/25",
+      "2001:100::/24",
+      "::/3",
+      "4000::/3",
+      "6000::/3",
+      "8000::/3",
+      "a000::/3",
+      "c000::/3",
+      "e000::/3"
     ]
   }
 }

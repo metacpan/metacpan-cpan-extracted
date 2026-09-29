@@ -1682,6 +1682,104 @@ subtest 'with_frozen_time(): croaks when timestamp is undef' => sub {
 };
 
 # ============================================================================
+#  Input validation and restore_all scoping
+# ============================================================================
+
+subtest 'mock(): croaks on a replacement that is not a coderef' => sub {
+	{ package Unit::NonCode; sub fn { 'real' } }
+
+	for my $case ([ hashref => {} ], [ arrayref => [] ], [ string => 'fn' ],
+			[ scalarref => \'x' ]) {
+		my ($name, $bad) = @$case;
+		throws_ok { mock 'Unit::NonCode::fn' => $bad }
+			qr/mock: replacement for 'Unit::NonCode::fn' must be a coderef/,
+			"$name replacement croaks";
+		is(Unit::NonCode->fn, 'real', "$name: method untouched");
+	}
+	is_deeply(diagnose_mocks(), {}, 'no layer was pushed');
+
+	# False values keep the original "required" message
+	throws_ok { mock 'Unit::NonCode::fn' => 0 } qr/\Q$ERR_MOCK\E/,
+		'0 replacement: required message';
+};
+
+subtest "'0' is a valid package or method name" => sub {
+	{ no strict 'refs'; *{'0::fn'} = sub { 'zero pkg' }; *{'Unit::Zero::0'} = sub { 'zero sub' }; }
+
+	lives_ok { mock '0', 'fn', sub { 'mocked' } } 'mock accepts package 0';
+	is(&{\&{'0::fn'}}(), 'mocked', 'mock on package 0 active');
+	lives_ok { unmock '0', 'fn' } 'unmock accepts package 0';
+	is(&{\&{'0::fn'}}(), 'zero pkg', 'package 0 restored');
+
+	lives_ok { mock 'Unit::Zero', '0', sub { 'mocked' } } 'mock accepts method 0';
+	is(Unit::Zero->can('0')->(), 'mocked', 'mock on method 0 active');
+	unmock 'Unit::Zero', '0';
+
+	lives_ok { spy '0', 'fn' }                      'spy accepts package 0';
+	lives_ok { before '0', 'fn', sub { } }          'before accepts package 0';
+	lives_ok { after 'Unit::Zero', '0', sub { } }   'after accepts method 0';
+	lives_ok { around 'Unit::Zero', '0', sub { } }  'around accepts method 0';
+	lives_ok { inject 'Unit::Zero', '0', 'dep' }    'inject accepts dependency 0';
+	restore_all();
+	is(Unit::Zero->can('0')->(), 'zero sub', 'method 0 restored');
+
+	throws_ok { mock '', 'fn', sub { } } qr/\Q$ERR_MOCK\E/, 'empty package still croaks';
+	throws_ok { spy 'Unit::Zero', '' }   qr/\Q$ERR_SPY\E/,  'empty method still croaks';
+};
+
+subtest 'restore_all($pkg): restores the package and its sub-packages only' => sub {
+	{
+		package Unit::Scope;          sub fn { 'scope' }
+		package Unit::Scope::Inner;   sub fn { 'inner' }
+		package Unit::ScopeSibling;   sub fn { 'sibling' }
+	}
+	mock 'Unit::Scope::fn'        => sub { 'm1' };
+	mock 'Unit::Scope::Inner::fn' => sub { 'm2' };
+	mock 'Unit::ScopeSibling::fn' => sub { 'm3' };
+
+	restore_all('Unit::Scope');
+	is(Unit::Scope->fn,        'scope',   'package itself restored');
+	is(Unit::Scope::Inner->fn, 'inner',   'sub-package restored');
+	is(Unit::ScopeSibling->fn, 'm3',      'package sharing a name prefix untouched');
+	restore_all();
+};
+
+subtest 'non-ASCII package and method names (use utf8)' => sub {
+	use utf8;
+	{
+		package Unit::Café;          sub prix { 'réel' }
+		package Unit::Café::Enfant;  our @ISA = ('Unit::Café');
+	}
+	mock 'Unit::Café::prix' => sub { 'moqué' };
+	is(Unit::Café->prix, 'moqué', 'mock on a UTF-8 package');
+	unmock 'Unit::Café::prix';
+	is(Unit::Café->prix, 'réel', 'unmock restores it');
+
+	my $spy = spy 'Unit::Café::Enfant::prix';
+	is(Unit::Café::Enfant->prix, 'réel', 'spy on an inherited UTF-8 method calls through');
+	is(scalar(() = $spy->()), 1, 'spy recorded the call');
+
+	inject 'Unit::Café', 'dépendance', 42;
+	is(Unit::Café::dépendance(), 42, 'inject with a UTF-8 dependency name');
+	like(diagnose_mocks_pretty(), qr/Unit::Café::dépendance:/, 'diagnostics show the UTF-8 name');
+
+	restore_all('Unit::Café');
+	is_deeply(diagnose_mocks(), {}, 'scoped restore_all clears the UTF-8 targets');
+	ok(!defined &Unit::Café::Enfant::prix, 'inherited method slot emptied again');
+};
+
+subtest 'spy(): recursive calls are recorded once per call, outermost first' => sub {
+	{
+		package Unit::Recurse;
+		sub fact { my ($class, $n) = @_; $n <= 1 ? 1 : $n * $class->fact($n - 1) }
+	}
+	my $spy = spy 'Unit::Recurse::fact';
+	is(Unit::Recurse->fact(4), 24, 'recursion works through the spy');
+	is_deeply([ map { $_->[2] } $spy->() ], [ 4, 3, 2, 1 ], 'every level recorded in order');
+	restore_all();
+};
+
+# ============================================================================
 #  Cleanup: ensure no mock state leaks between test files
 # ============================================================================
 

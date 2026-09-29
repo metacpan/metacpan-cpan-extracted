@@ -14,12 +14,13 @@ use VPNDetectionTest::Origin;
 # libraries quietly disagreeing about one address.
 my $corpus = VPNDetectionTest::corpus();
 
-my (%routes, @batch_sizes);
+my (%routes, @batch_sizes, @batch_sent);
 my $origin = VPNDetectionTest::Origin->new(sub {
     my ($c) = @_;
     my $path = $c->req->url->path->to_string;
     if ($path eq '/batch') {
         push @batch_sizes, scalar @{ $c->req->json->{ips} || [] };
+        push @batch_sent, @{ $c->req->json->{ips} || [] };
         return $c->render(json => batch_answer($c->req->json));
     }
     my $route = $routes{$path};
@@ -59,6 +60,7 @@ sub client {
 sub serve {
     %routes = ();
     @batch_sizes = ();
+    @batch_sent = ();
     for my $route (@_) {
         $routes{"/$route->{ip}"} = $route;
     }
@@ -244,6 +246,39 @@ subtest 'an error is never cached' => sub {
     eval { $client->lookup('1.1.1.1') };
 
     is($origin->count, 2, 'the second call asked again');
+};
+
+# A server listening on :: sees every IPv4 visitor as ::ffff:a.b.c.d. Read whole
+# that is inside ::ffff:0:0/96, so an SDK that did not unmap answered each one
+# locally as a bogon and never asked.
+subtest 'an IPv4-mapped address is the IPv4 address it carries' => sub {
+    for my $case (@{ $corpus->{ipv4Mapped} }) {
+        my ($ip, $carries) = @$case{qw(ip carries)};
+        serve({ ip => $carries, body => { ip => $carries, is_vpn => \1 } });
+        my $client = client();
+        is($client->is_bogon($ip), $case->{expect} ? 1 : 0, "$ip: is_bogon ($case->{why})");
+
+        my $result = eval { $client->lookup($ip) };
+        is($result && $result->ip, $carries, "$ip: the answer names $carries");
+        if ($case->{expect}) {
+            is($result && $result->is_bogon, 1, "$ip: answered locally");
+            is($origin->count, 0, "$ip: with no request");
+            next;
+        }
+        is_deeply([$origin->paths], ["/$carries"], "$ip: sent as $carries");
+        $client->lookup($carries);
+        is($origin->count, 1, "$ip: a lookup of $carries is then a cache hit");
+
+        # The mapped form alone: asked beside its plain form, a batch that sent
+        # the address as given would still have been answered for the plain one.
+        $origin->reset;
+        @batch_sent = ();
+        my $answers = client(retries => 0)->lookup_batch([$ip]);
+        my $answer = $answers->{$ip};
+        is_deeply([keys %$answers], [$ip], "$ip: a batch keys the answer as asked");
+        is($answer && $answer->can('ip') && $answer->ip, $carries, "$ip: and answers it as $carries");
+        is_deeply(\@batch_sent, [$carries], "$ip: the batch sent $carries alone");
+    }
 };
 
 done_testing();

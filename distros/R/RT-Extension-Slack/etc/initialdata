@@ -1,0 +1,16 @@
+@ScripConditions = (
+    { Name        => 'SlackCondition',
+      Description => 'Slack Plugin: Evaluate custom conditions to trigger Slack interactions',
+      ExecModule  => 'SlackCondition',
+      ApplicableTransTypes  => 'Any',
+    },
+);
+
+@ScripActions = (
+    { Name        => 'Slack',
+      Description => 'RTbot for Slack: Customizable and synced RT ticket notifications in Slack',
+      ExecModule  => 'Slack',
+    },
+);
+
+1;

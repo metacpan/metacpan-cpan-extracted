@@ -1,0 +1,85 @@
+NAME
+    RT-Extension-Slack - Send and sync RT ticket notifications to Slack
+
+RT VERSION
+    Works with RT 6.
+
+DESCRIPTION
+    This RT extension allows for creating Slack messages linked to RT
+    tickets. -Custom formatting based on status -Provides Take/Steal links
+    -Slack messages are updated when Status, Owner, or Subject are modified.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    make initdb
+        Only run this the first time you install this module.
+
+        If you run this twice, you may end up with duplicate data in your
+        database.
+
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
+                Add this line:
+
+                    Plugin('RT::Extension::Slack');
+
+                See below for additional configuration details.
+
+    Clear your mason cache
+            rm -rf /opt/rt6/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+    Create a Slack App
+        Create a new Slack App from a manifest (see
+        /opt/rt6/local/plugins/RT-Extension-Slack/etc/Slack_Manifest.json)
+        Install it to your workspace and copy the Bot User OAuth Token
+        (starts with xoxb-).
+
+        Invite the app to every Slack channel you intend to map below. Posts
+        to a channel the bot hasn't joined will fail silently.
+
+    Set your Bearer Token
+        Copy:
+        /opt/rt6/local/plugins/RT-Extension-Slack/etc/Slack_Token.pm.example
+        to: /opt/rt6/etc/RT_SiteConfig.d/Slack_Token.pm and set your token:
+        Set($SlackToken, 'xoxb-your-real-token');
+
+    Configure URLs and Queue-to-Channel Mapping
+            Copy:
+                F</opt/rt6/local/plugins/RT-Extension-Slack/etc/Slack_Config.pm.example>
+            to:
+                F</opt/rt6/etc/RT_SiteConfig.d/Slack_Config.pm>
+
+            Edit $slackURL and $rtURL.
+            Edit %SlackQueueConfig to map RT Queue Names (case-sensitive) to 
+            Slack Channel IDs. Get a channel ID by right-clicking the channel 
+            in Slack > Channel details > View channel details > and it will be at the bottom.
+
+    Restart your webserver and clear your mason cache
+    Create the Scrip & Apply to Queues
+            Create a new Scrip
+                Applies to: Tickets
+                Condition: SlackCondition
+                Action: Slack
+                Template: Blank
+
+            The condition, action, and a slack_timestamp customfield were created
+            via initialdata when you ran:
+                make initdb
+            during installation. Only queues with both the Scrip applied AND an 
+            entry in %SlackQueueConfig will post to Slack.
+
+AUTHOR
+        Josh Tackitt <tackittj@reed.edu>
+
+LICENSE AND COPYRIGHT
+    This extension is Copyright (C) 2026 Reed College.
+
+    This is free software, licensed under: The GNU General Public License,
+    Version 2, June 1991
+

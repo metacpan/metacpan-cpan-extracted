@@ -1,5 +1,19 @@
 Revision history for Func-Util
 
+0.04    2026-05-17
+        - Fix build on Solaris/illumos: drop GNU-only
+          `-Wl,--allow-shlib-undefined` from
+          t/xs/funcutil_export_test/Makefile.PL's LDFLAGS branch.
+          Sun ld rejects the flag as "unrecognized option" AND
+          already permits unresolved symbols at link time by
+          default, so removing solaris/sunos from the branch is
+          exactly the fix. 0.03 was failing the build on every
+          Solaris CPAN-tester perl (5.30.0, 5.30.1, 5.30.3, 5.32.1)
+          with `ld: fatal: unrecognized option
+          '--allow-shlib-undefined'`. The main FuncUtil.so was
+          unaffected (it never asked for the flag); only the
+          in-tree test helper triggered it.
+
 0.03    2026-04-27
         - Attempt to Fix Windows/Cygwin build failure in t/xs/funcutil_export_test, Explicit import added.
 

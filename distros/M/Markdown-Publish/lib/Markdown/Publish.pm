@@ -37,7 +37,7 @@ use Markdown::Publish::Constant;
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='1.003';
+$VERSION='1.004';
 
 
 #  Supported publication actions
@@ -895,14 +895,28 @@ sub publish_cloudflare {
 
 
     #  The site generator owns the build; Wrangler deploys only the resulting
-    #  static assets using an explicitly selected Worker configuration.
+    #  static assets using an explicit or conventional root configuration.
     #
     my ($self)=@_;
-    my $cloudflare_hr=$self->{'cloudflare'};
+    my $cloudflare_hr=exists($self->{'cloudflare'}) ? $self->{'cloudflare'} : {};
     die "cloudflare publication configuration must be a hash reference\n"
         unless ref($cloudflare_hr) eq 'HASH';
-    my $config_fn=$cloudflare_hr->{'config'} ||
-        die "cloudflare publication requires a Wrangler configuration file\n";
+    my $config_fn;
+    if (exists($cloudflare_hr->{'config'})) {
+        $config_fn=$cloudflare_hr->{'config'};
+        die "cloudflare publication requires a Wrangler configuration file\n"
+            unless defined($config_fn) && length($config_fn);
+    }
+    else {
+        foreach my $candidate_fn (qw(wrangler.jsonc wrangler.json)) {
+            if (-f $candidate_fn) {
+                $config_fn=$candidate_fn;
+                last;
+            }
+        }
+        die "cloudflare publication requires cloudflare.config or wrangler.jsonc/wrangler.json in the project root\n"
+            unless defined($config_fn);
+    }
     die "Wrangler configuration not found: $config_fn\n" unless -f $config_fn;
     $config_fn=abs_path($config_fn);
     my $wrangler=$cloudflare_hr->{'wrangler'} || 'wrangler';
@@ -983,7 +997,6 @@ flat, rather than nested beneath engine names:
     config  => 'doc/docusaurus/docusaurus.config.js',
     output  => 'site',
     branch  => 'gh-pages',
-    cloudflare => {config => 'wrangler.jsonc'},
 }
 ```
 
@@ -1016,21 +1029,18 @@ For a static documentation Worker, a minimal authored `wrangler.jsonc` is:
 ```jsonc
 {
     "name": "example-docs",
-    "compatibility_date": "2026-09-22",
-    "assets": {
-        "directory": "./site",
-        "not_found_handling": "404-page"
-    },
-    "observability": {
-        "enabled": true,
-        "traces": {"enabled": true}
-    }
+    "compatibility_date": "2026-09-29"
 }
 ```
 
 Use the current compatibility date for a new Worker and choose the intended
-Worker name. The deploy action replaces `assets.directory` with the selected
-engine's actual build output; the authored file remains unchanged.
+Worker name. Save the file as `wrangler.jsonc` in the project root, then run
+`make publish_cloudflare`. The deploy action supplies the selected engine's
+actual build output through Wrangler's `--assets` option, so the minimal file
+does not need `assets.directory`. The publisher falls back to `wrangler.json`.
+Set `cloudflare.config` only when the configuration lives elsewhere.
+`cloudflare.wrangler` may select another executable and
+`cloudflare.environment` may select an authored Wrangler environment.
 
 # METHODS
 
@@ -1087,13 +1097,15 @@ It does not force the update or push any other branch.
 ## publish_cloudflare
 
 Builds through the selected engine, then deploys that output as Workers Static
-Assets using Wrangler. Set `cloudflare.config` to an existing, dedicated
-Wrangler configuration file for the intended Worker. `cloudflare.wrangler`
-selects the executable (`wrangler` by default); `cloudflare.environment`
-optionally selects an authored Wrangler environment. The site directory is
-passed with `--assets`, overriding the config file's asset directory. Missing
-configuration or build output is fatal before deployment. Authentication
-comes from Wrangler's existing login or environment, not publication metadata.
+Assets using Wrangler. With no `cloudflare.config`, it uses `wrangler.jsonc`
+in the project root or falls back to `wrangler.json`. Set `cloudflare.config`
+to select an existing, dedicated Wrangler configuration elsewhere.
+`cloudflare.wrangler` selects the executable (`wrangler` by default);
+`cloudflare.environment` optionally selects an authored Wrangler environment.
+The site directory is passed with `--assets`, overriding the config file's
+asset directory. Missing configuration or build output is fatal before
+deployment. Authentication comes from Wrangler's existing login or environment,
+not publication metadata.
 
 The Wrangler config owns the Worker name, compatibility date, routing, and
 other deployment settings. Use a static-assets-only config without a `main`
@@ -1189,7 +1201,6 @@ flat, rather than nested beneath engine names:
      config  => 'doc/docusaurus/docusaurus.config.js',
      output  => 'site',
      branch  => 'gh-pages',
-     cloudflare => {config => 'wrangler.jsonc'},
  }
 The C<config> path and other engine-specific options are described by the
 selected engine module. C<load_config($filename)> accepts a JSON object
@@ -1220,19 +1231,16 @@ For a static documentation Worker, a minimal authored C<wrangler.jsonc> is:
 
  {
      "name": "example-docs",
-     "compatibility_date": "2026-09-22",
-     "assets": {
-         "directory": "./site",
-         "not_found_handling": "404-page"
-     },
-     "observability": {
-         "enabled": true,
-         "traces": {"enabled": true}
-     }
+     "compatibility_date": "2026-09-29"
  }
 Use the current compatibility date for a new Worker and choose the intended
-Worker name. The deploy action replaces C<assets.directory> with the selected
-engine's actual build output; the authored file remains unchanged.
+Worker name. Save the file as C<wrangler.jsonc> in the project root, then run
+C<make publish_cloudflare>. The deploy action supplies the selected engine's
+actual build output through Wrangler's C<--assets> option, so the minimal file
+does not need C<assets.directory>. The publisher falls back to C<wrangler.json>.
+Set C<cloudflare.config> only when the configuration lives elsewhere.
+C<cloudflare.wrangler> may select another executable and
+C<cloudflare.environment> may select an authored Wrangler environment.
 
 
 =head1 METHODS
@@ -1299,13 +1307,15 @@ It does not force the update or push any other branch.
 =head2 publish_cloudflare
 
 Builds through the selected engine, then deploys that output as Workers Static
-Assets using Wrangler. Set C<cloudflare.config> to an existing, dedicated
-Wrangler configuration file for the intended Worker. C<cloudflare.wrangler>
-selects the executable (C<wrangler> by default); C<cloudflare.environment>
-optionally selects an authored Wrangler environment. The site directory is
-passed with C<--assets>, overriding the config file's asset directory. Missing
-configuration or build output is fatal before deployment. Authentication
-comes from Wrangler's existing login or environment, not publication metadata.
+Assets using Wrangler. With no C<cloudflare.config>, it uses C<wrangler.jsonc>
+in the project root or falls back to C<wrangler.json>. Set C<cloudflare.config>
+to select an existing, dedicated Wrangler configuration elsewhere.
+C<cloudflare.wrangler> selects the executable (C<wrangler> by default);
+C<cloudflare.environment> optionally selects an authored Wrangler environment.
+The site directory is passed with C<--assets>, overriding the config file's
+asset directory. Missing configuration or build output is fatal before
+deployment. Authentication comes from Wrangler's existing login or environment,
+not publication metadata.
 
 The Wrangler config owns the Worker name, compatibility date, routing, and
 other deployment settings. Use a static-assets-only config without a C<main>

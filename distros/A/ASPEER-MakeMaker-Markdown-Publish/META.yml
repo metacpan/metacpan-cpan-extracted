@@ -31,7 +31,7 @@ requires:
   File::Spec: '0'
   JSON::PP: '0'
   MIME::Base64: '0'
-  Markdown::Publish: '1.001'
+  Markdown::Publish: '1.004'
   perl: '5.010'
   strict: '0'
   vars: '0'
@@ -41,6 +41,6 @@ resources:
   homepage: https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Publish
   license: http://dev.perl.org/licenses/
   repository: https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Publish.git
-version: '1.003'
+version: '1.004'
 x_authority: cpan:ASPEER
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

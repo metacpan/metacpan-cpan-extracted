@@ -7,6 +7,9 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
+binmode Test::More->builder->$_, ":utf8" for qw(output failure_output todo_output);
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
 use File::Temp qw(tempdir);
 
 use lib 'lib';
@@ -34,7 +37,7 @@ subtest '1. Word Normalization & get_words In-Memory Caching' => sub {
     # get_words per-word caching
     my %words = $adb->get_words('Bilgisayar ve Kulaklık', 'read');
     ok( exists $adb->{_cache}{gw}{'Bilgisayar'}, 'get_words caches per-word Bilgisayar in $adb->{_cache}{gw}' );
-    ok( exists $adb->{_cache}{gw}{'Kulaklık'}, 'get_words caches per-word Kulaklık in $adb->{_cache}{gw}' );
+    ok( exists $adb->{_cache}{gw}{'Kulaklık'}, 'get_words caches per-word Kulaklik in $adb->{_cache}{gw}' );
 
     # minchar caching as empty string
     $adb->get_words('A B Cuma', 'read');

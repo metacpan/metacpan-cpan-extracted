@@ -2,6 +2,14 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.4.1 - 2026-09-29
+
+### Fixes
+
+- Judge an IPv4-mapped address as the IPv4 address it carries ([`6b3f88e`](https://github.com/vpndetection-io/sdk-perl/commit/6b3f88eb7a184d153c4be494415eb08c162ff770))
+- Treat a timeout written as a string zero as no bound, as 0 is ([`553b657`](https://github.com/vpndetection-io/sdk-perl/commit/553b657218edc979a8bad180b06aaf6d70b9bb5d))
+- Recognize 26 more reserved ranges as bogons, as the API does ([`9f13904`](https://github.com/vpndetection-io/sdk-perl/commit/9f139040f8274b08af84931fd96338ecdcaa644f))
+
 ## 3.4.0 - 2026-09-27
 
 ### Features

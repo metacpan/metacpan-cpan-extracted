@@ -6,10 +6,11 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # # SYNOPSIS
 # 
 subtest 'SYNOPSIS' => sub { 
-use Aion::Format qw/trappout np/;
+use Aion::Format qw/trappout/;
+use Data::Printer colored => 1, caller_info => 0, show_memsize => 0;
 use Aion::Run::RunRun;
 
-local ($::_g0 = do {trappout { Aion::Run::RunRun->new(code => "1+2")->run }}, $::_e0 = do {np(3, caller_info => 0) . "\n"}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'trappout { Aion::Run::RunRun->new(code => "1+2")->run } # -> np(3, caller_info => 0) . "\n"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {trappout { Aion::Run::RunRun->new(code => "1+2")->run }}, $::_e0 = do {do { my $t = 3; p $t, return_value => "dump", caller_info => 0, show_memsize => 0 } . "\n"}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'trappout { Aion::Run::RunRun->new(code => "1+2")->run } # -> do { my $t = 3; p $t, return_value => "dump", caller_info => 0, show_memsize => 0 } . "\n"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPTION

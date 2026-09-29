@@ -364,18 +364,11 @@ Cloudflare publication requires a dedicated Wrangler configuration. Keep the Wor
 ``` json
 {
   "name": "example-client-docs",
-  "compatibility_date": "2026-09-25",
-  "assets": {
-    "directory": "./site",
-    "not_found_handling": "404-page"
-  },
-  "observability": {
-    "enabled": true
-  }
+  "compatibility_date": "2026-09-29"
 }
 ```
 
-Point the publication configuration at that file. The executable defaults to `wrangler`; an authored Wrangler environment is optional.
+Save this as `wrangler.jsonc` in the project root and `make publish_cloudflare` discovers it without additional publication metadata. The deploy action supplies the built site through Wrangler's `--assets` option, so the minimal file does not need `assets.directory`. The publisher falls back to `wrangler.json`. Set `cloudflare.config` only when the file lives elsewhere. The executable defaults to `wrangler`; an authored Wrangler environment is optional.
 
 ``` json
 {
@@ -383,7 +376,7 @@ Point the publication configuration at that file. The executable defaults to `wr
     "module": "mkdocs",
     "name": "Example::Client",
     "cloudflare": {
-      "config": "wrangler.docs.jsonc",
+      "config": "deploy/wrangler.docs.jsonc",
       "wrangler": "wrangler",
       "environment": "production"
     }

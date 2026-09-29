@@ -43,18 +43,17 @@ my $builder = $deployer->new(
     configure_requires => {
         'Module::Build' => 0,
     },
-    build_requires => {
-        'Compress::BGZF'  => 0,
-        'IPC::Cmd'        => 0,
-        'Test::Exception' => 0,
-        'Test::More'      => 0,
-    },
     requires => {
+        'Compress::BGZF' => 0,
         'IPC::Cmd'       => 0,
         'Scalar::Util'   => 0,
         'POSIX'          => 0,
         'Cwd'            => 0,
         'File::Basename' => 0,
+    },
+    test_requires => {
+        'Test::Exception' => 0,
+        'Test::More'      => 0,
     },
     meta_merge => {
         resources => {

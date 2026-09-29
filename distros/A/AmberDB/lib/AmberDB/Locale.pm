@@ -6,7 +6,7 @@ use utf8;
 use Encode qw(decode encode);
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 my $CREATED  = '2017-07-22';
 
 my %LOCALE_CACHE;
@@ -788,7 +788,7 @@ sub num2text {
         $str_main =~ s/\s+$//;
     }
 
-    my $result = join ' ', grep { defined && length } ( $str_main, $str_sub );
+    my $result = join ' ', grep { defined $_ && length($_) } ( $str_main, $str_sub );
     $result = $numbers->{zero} unless length($result);
 
     if ( $is_negative && $result ne $numbers->{zero} ) {

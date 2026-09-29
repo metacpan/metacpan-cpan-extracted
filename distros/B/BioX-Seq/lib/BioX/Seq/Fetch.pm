@@ -197,7 +197,7 @@ sub fetch_seq {
     
     my ($self, $id, $start_bp, $end_bp) = @_;
 
-    return undef if (! defined $self->{idx}->{$id});
+    return if (! defined $self->{idx}->{$id});
     my ($len, $off, $bpl, $eol) = @{ $self->{idx}->{$id} };
 
     my $fh = $self->{fh};

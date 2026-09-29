@@ -3,14 +3,25 @@
 Build, preview, and publish Markdown documentation from Perl distribution
 trees with MkDocs, VitePress, Docusaurus, or Astro Starlight.
 
+## Installation
+
+Install the released distribution and its prerequisites from CPAN:
+
+```sh
+cpanm Markdown::Publish
+```
+
+Install the external site generator required for the backend you use.
+
 ## GitHub Attestations
 
 The release workflow generates [GitHub artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations)
 for distribution archives. Install the [GitHub CLI](https://cli.github.com/)
 with `gh attestation` support and authenticate with `gh auth login`.
 
-Download `Markdown-Publish-VERSION.tar.gz` from a GitHub release, MetaCPAN,
-or a CPAN mirror, replace `VERSION`, and verify it with:
+To verify a CPAN release archive separately, download
+`Markdown-Publish-VERSION.tar.gz` from MetaCPAN or a CPAN mirror, replace
+`VERSION`, and run:
 
 ```sh
 gh attestation verify Markdown-Publish-VERSION.tar.gz --repo aspeer/pm-Markdown-Publish
@@ -21,10 +32,7 @@ attestation from this repository. The workflow publishes the same archive to
 GitHub Releases and CPAN. Older releases and GitHub's automatically generated
 source-code archives are not covered.
 
-## Install and run
-
-Install this distribution with `cpanm .`, then install the external site
-generator required for the backend you use.
+## Run
 
 ```sh
 markdown-publish build

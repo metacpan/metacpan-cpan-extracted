@@ -6716,6 +6716,11 @@ Where each definition comes from, which is also what it is checked against:
   bridging_waters a water with a heavy atom within 3.5 A of a heavy atom of
                   each partner: that script's WATER_CONTACT_NM and
                   n_bridging_waters.
+  pocket          the first partner's atoms, hydrogens included, within 6.0 A
+                  of any atom of the second, and the first partner's heavy
+                  atoms within 8.0 A of a heavy atom of the second per heavy
+                  atom of the second: that script's pocket_block(), with its
+                  POCKET_CUTOFF_NM and the 0.8 nm of pocket_packing_density.
 
 The surfaces are the kernel's, run on the two partners alone.  Most of that run
 is already done: an atom's surface depends only on which atoms are its
@@ -6733,6 +6738,9 @@ typedef struct {
 	NV polar;     //N/O/S pairs
 	NV cation_pi; //cation to ring centroid
 	NV water;     //a bridging water to each partner
+	NV pocket;    //an atom of the first partner to any atom of the second
+	NV packing;   //a heavy atom of the first to a heavy atom of the second
+	bool want_pocket;
 } iface_opt;
 
 //what an atom of either partner is, for the search across the interface
@@ -6794,6 +6802,30 @@ static UV grid_within(pTHX_ const cell_grid *CSP_RESTRICT g,
 		}
 	}
 	return n;
+}
+
+/*Whether any point of a grid is within cut of (px, py, pz): grid_within()
+stopped at the first, for a question that only wants to know there is one.*/
+static bool grid_any(const cell_grid *CSP_RESTRICT g,
+                     const NV *CSP_RESTRICT x, const NV *CSP_RESTRICT y,
+                     const NV *CSP_RESTRICT z, NV px, NV py, NV pz, NV cut)
+{
+	UV ci, cj, ck, bx, by, bz;
+	if (g->start == NULL) return FALSE;
+	ci = grid_axis(px - g->x0, g->cell, g->nx);
+	cj = grid_axis(py - g->y0, g->cell, g->ny);
+	ck = grid_axis(pz - g->z0, g->cell, g->nz);
+	for (bx = ci ? ci - 1 : 0; bx <= (ci + 1 < g->nx ? ci + 1 : g->nx - 1); bx++)
+	for (by = cj ? cj - 1 : 0; by <= (cj + 1 < g->ny ? cj + 1 : g->ny - 1); by++)
+	for (bz = ck ? ck - 1 : 0; bz <= (ck + 1 < g->nz ? ck + 1 : g->nz - 1); bz++) {
+		UV cell = (bx * g->ny + by) * g->nz + bz, p;
+		for (p = g->start[cell]; p < g->start[cell + 1]; p++) {
+			UV j = g->idx[p];
+			NV dx = x[j] - px, dy = y[j] - py, dz = z[j] - pz;
+			if (dx * dx + dy * dy + dz * dz < cut * cut) return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 //an atom's name and element, as the classification below wants them
@@ -6918,6 +6950,10 @@ typedef struct {
 	NV *pts;
 	sasa_bins bins;
 	cell_grid g_all, g1, g2;
+	cell_grid g_pk, g_pack;   //the second partner's atoms, and its heavy atoms
+	UV *pk_n;                 //per residue of s: its atoms in the pocket
+	NV *pk_a;                 //... and their surface in the first partner alone
+	NV *pk_h;                 //the residue's heavy atoms' surface in it alone
 	bool have_bins;
 } iface_work;
 
@@ -6933,6 +6969,8 @@ static void iface_work_free(pTHX_ iface_work *CSP_RESTRICT w)
 	Safefree(w->ct); Safefree(w->sb); Safefree(w->rings); Safefree(w->pts);
 	if (w->have_bins) sasa_bins_free(aTHX_ &w->bins);
 	grid_free(aTHX_ &w->g_all); grid_free(aTHX_ &w->g1); grid_free(aTHX_ &w->g2);
+	grid_free(aTHX_ &w->g_pk); grid_free(aTHX_ &w->g_pack);
+	Safefree(w->pk_n); Safefree(w->pk_a); Safefree(w->pk_h);
 	Zero(w, 1, iface_work);
 }
 
@@ -6962,7 +7000,7 @@ static HV *iface_compute(pTHX_ structset *CSP_RESTRICT s, AV *sides[2], UV npts,
 	AV *res_sasa[2], *res_alone[2], *contacts, *polar, *salt, *cpi, *bridge;
 	NV *res_c = NULL, *res_a = NULL;
 	UV n_sub = 0, n1 = 0, n_h1 = 0, n_h2 = 0, i, k, r, buf_cap = 0;
-	UV ct_cap = 0, sb_cap = 0, n_atom_contacts = 0;
+	UV ct_cap = 0, sb_cap = 0, n_atom_contacts = 0, n_pack = 0;
 	NV reach = io->contact, min_d = 0.0;
 	NV sasa_c = 0.0, alone[2] = { 0.0, 0.0 }, bur_ap = 0.0, bur_po = 0.0;
 	NV bsum[2] = { 0.0, 0.0 }, bisum[2] = { 0.0, 0.0 }, bmean[2], bimean[2];
@@ -7238,6 +7276,37 @@ static HV *iface_compute(pTHX_ structset *CSP_RESTRICT s, AV *sides[2], UV npts,
 		}
 	}
 
+	/*The pocket: which of the first partner's atoms, hydrogens and all, come
+	within io->pocket of any atom of the second, tallied per residue with their
+	surface in the first partner alone; and how many of its heavy atoms come
+	within io->packing of a heavy atom of the second.  The second partner's
+	atoms are the tail of the sub arrays, one range.*/
+	if (io->want_pocket) {
+		Newxz(w.pk_n, s->n_res ? s->n_res : 1, UV);
+		Newxz(w.pk_a, s->n_res ? s->n_res : 1, NV);
+		Newxz(w.pk_h, s->n_res ? s->n_res : 1, NV);
+		grid_build(aTHX_ &w.g_pk, w.sx + n1, w.sy + n1, w.sz + n1, n_sub - n1, io->pocket);
+		for (r = 0; r < s->n_res; r++) {
+			UV f, l;
+			if (w.side_res[r] != 1) continue;
+			f = w.sub_first[r];
+			l = f + (s->res_last[r] - s->res_first[r]);
+			for (k = f; k < l; k++) {
+				if (w.cls[w.map[k]] & IA_HEAVY) w.pk_h[r] += w.aarea[k];
+				if (!grid_any(&w.g_pk, w.sx + n1, w.sy + n1, w.sz + n1,
+				              w.sx[k], w.sy[k], w.sz[k], io->pocket)) continue;
+				w.pk_n[r]++;
+				w.pk_a[r] += w.aarea[k];
+			}
+		}
+		grid_free(aTHX_ &w.g_pk);
+		grid_build(aTHX_ &w.g_pack, w.h2x, w.h2y, w.h2z, n_h2, io->packing);
+		for (k = 0; k < n_h1; k++)
+			if (grid_any(&w.g_pack, w.h2x, w.h2y, w.h2z,
+			             w.h1x[k], w.h1y[k], w.h1z[k], io->packing)) n_pack++;
+		grid_free(aTHX_ &w.g_pack);
+	}
+
 	//centres of mass, and the B-factors of each partner and of its interface
 	Zero(com, 1, NV[2][3]);
 	for (k = 0; k < n_sub; k++) {
@@ -7278,6 +7347,36 @@ static HV *iface_compute(pTHX_ structset *CSP_RESTRICT s, AV *sides[2], UV npts,
 	//built last, so that nothing between here and the return can croak with it
 	//half-filled and unreferenced
 	out = newHV();
+	/*The pocket, parallel to the first list as the surfaces are: each
+	residue's atoms in it, their surface alone, and the residue's relative
+	surface alone, over max_asa[] as rsa is, where it has one.  The relative
+	surface is of the heavy atoms only, as the script's residue_sasa() sums
+	it: Tien's maxima are surfaces of tripeptides with no hydrogens, and a
+	structure that has them would otherwise add their surface to the
+	numerator alone.*/
+	if (io->want_pocket) {
+		SSize_t e, ne = av_len(sides[0]) + 1;
+		AV *pn = newAV(), *pa = NULL, *pr = NULL;
+		(void)hv_stores(out, "pocket_atoms", newRV_noinc((SV *)pn));
+		if (want_surface) {
+			pa = newAV();
+			pr = newAV();
+			(void)hv_stores(out, "pocket_sasa", newRV_noinc((SV *)pa));
+			(void)hv_stores(out, "pocket_rsa", newRV_noinc((SV *)pr));
+		}
+		for (e = 0; e < ne; e++) {
+			SV **p = av_fetch(sides[0], e, 0);
+			NV maxa = 0.0;
+			r = res_addr_find(w.tab, s->n_res, PTR2UV(SvRV(*p)), s->n_res);
+			av_push(pn, newSVuv(w.pk_n[r]));
+			if (!want_surface) continue;
+			av_push(pa, newSVnv(w.pk_a[r]));
+			if (s->res_type[r] == RT_AA && s->res_one[r] >= 'A' && s->res_one[r] <= 'Z')
+				maxa = max_asa[s->res_one[r] - 'A'];
+			av_push(pr, maxa > 0.0 ? newSVnv(w.pk_h[r] / maxa) : newSV(0));
+		}
+		if (n_h2) (void)hv_stores(out, "pocket_packing", newSVnv((NV)n_pack / (NV)n_h2));
+	}
 	{
 		AV *na = newAV(), *al = newAV(), *rs = newAV(), *ra = newAV();
 		av_push(na, newSVuv(n_at[0])); av_push(na, newSVuv(n_at[1]));
@@ -7555,8 +7654,12 @@ static HV *features_do(pTHX_ HV *CSP_RESTRICT info, HV *CSP_RESTRICT o,
 			io.polar     = opt_nv(aTHX_ o, "polar_distance", 3.5);
 			io.cation_pi = opt_nv(aTHX_ o, "cation_pi_distance", 6.0);
 			io.water     = opt_nv(aTHX_ o, "water_distance", 3.5);
+			io.pocket    = opt_nv(aTHX_ o, "pocket_distance", 6.0);
+			io.packing   = opt_nv(aTHX_ o, "packing_distance", 8.0);
+			io.want_pocket = opt_bool(aTHX_ o, "pocket", TRUE);
 			if (io.contact <= 0.0 || io.salt <= 0.0 || io.polar <= 0.0
-			    || io.cation_pi <= 0.0 || io.water <= 0.0)
+			    || io.cation_pi <= 0.0 || io.water <= 0.0 || io.pocket <= 0.0
+			    || io.packing <= 0.0)
 				croak("%s: the interface distances must be positive numbers", who);
 			/*sasa => 0 is a request for no surface, and the interface's is
 			one; interface_sasa is the Perl's own key, set by

@@ -1,5 +1,12 @@
 Revision history for ASPEER-MakeMaker-Markdown-Publish
 
+1.004  2026-09-29
+
+    - Document metadata-free Cloudflare publication through a project-root
+      wrangler.jsonc or wrangler.json file.
+    - Require Markdown::Publish 1.004 and verify that publish_cloudflare
+      delegates correctly when publication metadata is omitted.
+
 1.003  2026-09-26
 
     - Publish public repository metadata through the GitHub mirror.

@@ -27,7 +27,10 @@
 #         features.pdb.20260806.py iface.pdb --pep-chain B --no-openmm
 #
 #     with mdtraj 1.11.1.  Its distances are float32 nanometres; see the
-#     tolerance where they are compared.
+#     tolerance where they are compared.  The sixteen pocket_* features of its
+#     pocket_block() come from the same run, as the "features" of
+#     iface.pdb.features.json, and the pocket's residues from its
+#     ctx.pocket_res after pocket_block(ctx).
 #   Biopython 1.87 -- Bio.SeqUtils.IsoelectricPoint's charge_at_pH(7.0) and
 #     pi(), for each chain's net charge and isoelectric point.  Frozen from
 #     IsoelectricPoint(seq) over the sequences written beside each answer.
@@ -37,7 +40,15 @@
 # a ring, where Gallivan and Dougherty (1999) count it as neither; and it leaves
 # an ACE or NH2 cap out of the peptide, where a chain named as a partner here
 # takes in whatever is peptide-bonded into it.  Over twenty peptide complexes
-# of PDBbind the two agree on every count once those are allowed for.
+# of PDBbind the two agree on every count once those are allowed for.  The
+# pocket was run over a spread of forty PDBbind peptide complexes, 2026-09-27,
+# with the script given the chain this module chose as the peptide and
+# --receptor-mode all.  35 agree on every count and fraction; the other five
+# -- 1bbz, 1nlo, 3fe7, 3ov1 and 3zha -- have an ACE or NH2 cap, or a
+# non-standard residue peptide-bonded into a chain, that is in a partner here
+# and not there.  The surfaces differ in fourteen by at most 0.23 A^2, one or
+# two sphere points, which is mdtraj's float32 kernel as t/data/features.py
+# discusses it.
 require 5.010;
 use strict;
 use warnings FATAL => 'all';
@@ -179,6 +190,127 @@ ok(!(grep { $_->{distance} >= 4.0 } @{ $x->{salt_bridges} }), 'every salt bridge
 ok(!(grep { $_->{distance} >= 3.5 } @{ $x->{polar_contacts} }), 'every polar pair is under 3.5 A');
 
 #--------
+# the pocket, against the script's pocket_block()
+#--------
+{
+	# features.pdb.20260806.py's pocket_* for iface.pdb; the surfaces are its
+	# nm^2, and a hundred of them are this module's A^2
+	my %want = (
+		n_atoms => 130, n_residues => 18, n_chains => 1, charge => -6,
+		hydropathy => -1.0166666666666666, hydropathy_max => 4.2,
+		aromatic_fraction => 0.2222222222222222, hydrophobic_fraction => 0.4444444444444444,
+		polar_fraction => 0.16666666666666666, charged_fraction => 0.3333333333333333,
+		buried_fraction => 0.4444444444444444, packing_density => 2.6615384615384614,
+	);
+	my %want_sasa = (total => 10.296524143137503, hydrophobic => 3.2722341048065573,
+	                 polar => 7.024290038330946);
+	my @want_res = qw(141 142 143 145 146 147 149 150 151 166 167 168 169 181 183 184 185 186);
+	for my $fmt (qw(pdb cif)) {
+		my $p = $info{$fmt}{features}{interface}{pocket};
+		ok($p, "$fmt: the interface has a pocket by default");
+		is_deeply([ map { $_->{residue} } @{ $p->{residues} } ], \@want_res,
+			"$fmt: the pocket is the script's eighteen residues of the domain");
+		# The counts are integers and the fractions one integer over another,
+		# the same NV.  The hydropathy is a sum of eighteen table values, which
+		# can be added in another order: it was 2.2e-16 from the script's on a
+		# double perl, and 1e-12 is headroom for a wider NV rounding it
+		# differently.
+		for my $k (sort keys %want) {
+			cmp_ok(abs($p->{$k} - $want{$k}), '<=', 1e-12 * (1 + abs $want{$k}),
+				"$fmt: pocket $k is the script's");
+		}
+		# The script's surfaces are mdtraj's float32 kernel, and the three
+		# here were 2.3e-8 of themselves from it on 1cka (1.7e-5 A^2 in 327):
+		# float32 addition over 130 atoms.  A sphere point that flipped would be
+		# 0.13 A^2, 1.3e-4 of the total, so 1e-6 tells the two apart with forty
+		# times the observed difference to spare.
+		for my $k (sort keys %want_sasa) {
+			cmp_ok(abs($p->{sasa}{$k} / (100 * $want_sasa{$k}) - 1), '<', 1e-6,
+				"$fmt: the pocket's $k surface alone is the script's");
+		}
+		# a mean of eighteen float32 quotients: 8.8e-9 from the script's
+		cmp_ok(abs($p->{rsa} - 0.3083244125001126), '<', 1e-6,
+			"$fmt: and so is its mean relative surface alone");
+	}
+	my $p = $x->{pocket};
+	my $n = 0;
+	$n += $_->{n_atoms} for @{ $p->{residues} };
+	is($n, $p->{n_atoms}, 'the pocket residues account for every pocket atom');
+	my $a = 0;
+	$a += $_->{sasa_alone} for @{ $p->{residues} };
+	cmp_ok(abs($a - $p->{sasa}{total}), '<', 1e-8, 'and for its surface');
+	cmp_ok(abs($p->{sasa}{hydrophobic} + $p->{sasa}{polar} - $p->{sasa}{total}), '<', 1e-8,
+		'which is its hydrophobic residues\' and the rest');
+	ok(!(grep { !defined $_->{rsa_alone} } @{ $p->{residues} }),
+		'every pocket residue of 1cka has a relative surface');
+
+	# What the pocket is, from the coordinates: the first partner's atoms within
+	# pocket_distance of any atom of the second, hydrogens and all -- iface.pdb
+	# has them, and the script counts them -- and the heavy atoms of the first
+	# within packing_distance of a heavy atom of the second, per heavy atom of
+	# the second.  Brute force over the two chains, at the defaults and at
+	# cutoffs either side of them.
+	my $atoms = sub {
+		my ($c) = @_;
+		my $ch = $info{pdb}{chains}{$c};
+		# the chain's amino acids: its waters are in neither partner
+		return [ map {
+			my $r = $_;
+			map { [ $r->{key}, $_->{element}, $_->{x}, $_->{y}, $_->{z} ] }
+				map { $r->{atoms}{$_} } @{ $r->{atom_order} }
+		} grep { $_->{type} eq 'amino_acid' } map { $ch->{residues}{$_} } @{ $ch->{residue_order} } ];
+	};
+	my ($A, $B) = map { $atoms->($_) } qw(A B);
+	my $close = sub {
+		my ($u, $list, $cut) = @_;
+		for my $v (@$list) {
+			my ($dx, $dy, $dz) = map { $u->[$_] - $v->[$_] } 2 .. 4;
+			return 1 if $dx * $dx + $dy * $dy + $dz * $dz < $cut * $cut;
+		}
+		return 0;
+	};
+	my @heavy_b = grep { $_->[1] ne 'H' } @$B;
+	for my $cut ([ 6.0, 8.0 ], [ 4.0, 5.0 ], [ 9.0, 12.0 ]) {
+		my ($pk, $pack) = @$cut;
+		my @in = grep { $close->($_, $B, $pk) } @$A;
+		my %res = map { ($_->[0] => 1) } @in;
+		my $n_pack = grep { $_->[1] ne 'H' && $close->($_, \@heavy_b, $pack) } @$A;
+		my $y = $pk == 6.0 ? $p
+		      : structure_interface($info{pdb}, pocket_distance => $pk,
+		                            packing_distance => $pack)->{pocket};
+		is($y->{n_atoms}, scalar @in, "pocket_distance => $pk: every atom of A within $pk A of B");
+		is($y->{n_residues}, scalar keys %res, "pocket_distance => $pk: and their residues");
+		cmp_ok(abs($y->{packing_density} - $n_pack / @heavy_b), '<', 1e-12,
+			"packing_distance => $pack: A's heavy atoms within $pack A of B's, per heavy atom of B");
+	}
+
+	# The first partner's pocket around the second: the other way round it is
+	# the peptide's atoms around the domain
+	my $y = structure_interface($info{pdb}, partners => [ 'B', 'A' ])->{pocket};
+	is($y->{n_atoms}, scalar(grep { $close->($_, $A, 6.0) } @$B),
+		'partners => [B, A] is the peptide\'s atoms around the domain');
+	is($y->{n_chains}, 1, 'on one chain');
+	is_deeply(structure_interface($info{pdb}, partners => [ ['A'], ['B'] ])->{pocket}, $p,
+		'the interface computed alone has the same pocket, exactly');
+
+	my $none = structure_interface($info{pdb}, pocket_distance => 0.5)->{pocket};
+	is_deeply($none, { n_atoms => 0, n_residues => 0, n_chains => 0, residues => [],
+	                   packing_density => $p->{packing_density} },
+		'a pocket with nothing in it has its counts and nothing to average');
+	ok(!exists structure_features($info{pdb}, pocket => 0)->{interface}{pocket},
+		'pocket => 0 leaves it out');
+	ok(!exists structure_interface($info{pdb}, pocket => 0)->{pocket},
+		'and so does structure_interface()');
+
+	my $m = structure_info("$data/mini.pdb");
+	my $l = structure_interface($m, partners => [ ['A'], ['NAG_A_201'] ])->{pocket};
+	ok($l->{n_atoms} > 0, 'a ligand has a pocket of the chain around it');
+	my $r = structure_interface($m, partners => [ ['NAG_A_201'], ['A'] ])->{pocket};
+	ok($r->{n_residues} == 1 && !exists $r->{hydropathy} && !exists $r->{rsa},
+		'and a ligand as the first partner is a pocket with no amino acid to score');
+}
+
+#--------
 # the surfaces
 #--------
 {
@@ -277,6 +409,11 @@ ok(!exists structure_features($info{pdb}, interface => 0)->{interface},
 		'sasa => 0: the interface residues are the ones in contact');
 	ok(!(grep { exists $_->{buried} } map { @$_ } @{ $y->{residues} }),
 		'and carry no surface');
+	my %p = %{ $x->{pocket} };
+	delete @p{qw(sasa rsa buried_fraction)};
+	$p{residues} = [ map { my %r = %$_; delete @r{qw(sasa_alone rsa_alone)}; \%r }
+	                 @{ $p{residues} } ];
+	is_deeply($y->{pocket}, \%p, 'sasa => 0: the pocket, less its surfaces');
 	throws_ok { structure_interface($info{pdb}, sasa => 0) } qr/unknown option 'sasa'/,
 		'structure_interface() always computes its surface, so sasa is not its option';
 }

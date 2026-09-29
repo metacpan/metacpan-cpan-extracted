@@ -1,4 +1,4 @@
-package BioX::Seq 0.008010;
+package BioX::Seq 0.008012;
 
 use 5.016;
 use strict;
@@ -150,7 +150,7 @@ sub range {
     my ($self, $start, $end) = @_;
     if ($start < 1 || $end > length($self->{seq})) {
         warn "Range outside of sequence length\n";
-        return undef;
+        return;
     }
     my $seq = substr $self->{seq}, $start-1, $end-$start+1;
     my $qual = defined $self->{qual}
@@ -173,7 +173,7 @@ sub as_fasta {
     my $l = $line_length // 60;
     if (! defined $self->{id}) {
         warn "Can't write FASTA with undefined ID\n";
-        return undef;
+        return;
     }
     my $string = '>' . $self->{id};
     $string .= ' ' . $self->{desc} if (defined $self->{desc});
@@ -192,7 +192,7 @@ sub as_fastq {
     my ($self, $qual) = @_;
     if (! defined $self->{id}) {
         warn "Can't write FASTQ with undefined ID\n";
-        return undef;
+        return;
     }
     my $string = '@' . $self->{id};
     $string .= ' ' . $self->{desc} if (defined $self->{desc});
@@ -238,7 +238,7 @@ sub rev_com {
     $seq =~ tr/Xx/Nn/;
      if (! _is_nucleic($seq) ) {
         warn "Bad input sequence\n";
-        return undef;
+        return;
     }
     $seq = reverse $seq;
     $seq =~ tr
@@ -280,7 +280,7 @@ sub translate {
     $seq =~ tr/X/N/;
     if (! _is_nucleic($seq) ) {
         warn "Input doesn't look like DNA\n";
-        return undef;
+        return;
     }
 
     $seq = join('', map {$genetic_code{$_} // 'X'}

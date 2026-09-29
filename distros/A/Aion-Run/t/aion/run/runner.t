@@ -12,18 +12,19 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 #@< EOF
 # 
 subtest 'SYNOPSIS' => sub { 
-use Aion::Format qw/trappout np/;
+use Aion::Format qw/trappout/;
+use Data::Printer colored => 1, caller_info => 0, show_memsize => 0;
 use Aion::Run::Runner;
 use Aion::Run::RunRun;
 
-local ($::_g0 = do {trappout { Aion::Run::Runner->run("run", "1+2") }}, $::_e0 = do {np(3, caller_info => 0) . "\n"}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'trappout { Aion::Run::Runner->run("run", "1+2") } # -> np(3, caller_info => 0) . "\n"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {trappout { Aion::Run::Runner->run("run", "1+2") }}, $::_e0 = do {do { my $t = 3; p $t, return_value => "dump", caller_info => 0, show_memsize => 0 } . "\n"}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'trappout { Aion::Run::Runner->run("run", "1+2") } # -> do { my $t = 3; p $t, return_value => "dump", caller_info => 0, show_memsize => 0 } . "\n"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPTION
 # 
 # `Aion::Run::Runner` считывает файл **etc/annotation/run.ann** со списком скриптов, а выполнить любой скрипт из списка можно через его метод `run`.
 # 
-# Путь к файлу cо скриптами можно поменять с помощью конфига `INI`.
+# Путь к файлу cо скриптами можно поменять с помощью конфига `AION_ANNOTATION_INI`.
 # 
 # Используется в команде `act`.
 # 
@@ -31,7 +32,7 @@ local ($::_g0 = do {trappout { Aion::Run::Runner->run("run", "1+2") }}, $::_e0 =
 # 
 # ## runs
 # 
-# Хеш с командами. Подгружается по дефолту из файла `INI`.
+# Хеш с командами. Подгружается из файла.
 # 
 # # SUBROUTINES
 # 

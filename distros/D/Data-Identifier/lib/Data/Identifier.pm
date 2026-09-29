@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.36;
+our $VERSION = v0.37;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
@@ -714,7 +714,7 @@ sub as {
 
     $as = $opts{rawtype} if $as eq 'raw' && defined($opts{rawtype});
 
-    if (ref($as) && eval {$as->isa(__PACKAGE__)}) {
+    if (ref($as) && eval {$as->isa(__PACKAGE__)} && $self->isa(__PACKAGE__)) {
         my $type_uuid = $as->uuid;
         my $next_type;
 
@@ -1189,7 +1189,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.36
+version v0.37
 
 =head1 SYNOPSIS
 

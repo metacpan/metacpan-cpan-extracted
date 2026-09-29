@@ -4,7 +4,7 @@
       "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.28",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "gpl_3"
    ],
@@ -51,18 +51,19 @@
       "runtime" : {
          "requires" : {
             "Aion" : "1.2",
+            "Aion::Annotation" : "v0.2.0",
             "Aion::Carp" : "1.6",
-            "Aion::Format" : "v0.1.0",
             "Aion::Fs" : "v0.2.2",
+            "Data::Printer" : "0",
             "List::Util" : "0",
             "common::sense" : "0",
-            "config" : "0",
             "open" : "0",
             "perl" : "v5.22.0"
          }
       },
       "test" : {
          "requires" : {
+            "Aion::Format" : "v0.1.0",
             "Carp" : "0",
             "Cwd" : "0",
             "Data::Dumper" : "0",
@@ -82,7 +83,7 @@
    "provides" : {
       "Aion::Run" : {
          "file" : "lib/Aion/Run.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       },
       "Aion::Run::RunRun" : {
          "file" : "lib/Aion/Run/RunRun.pm"
@@ -106,7 +107,7 @@
          "web" : "https://github.com/darviarush/perl-aion-run"
       }
    },
-   "version" : "0.0.3",
+   "version" : "0.0.4",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

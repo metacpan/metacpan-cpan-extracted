@@ -229,7 +229,7 @@ $adb->insert_id("catalog_product", @product_data);
 # =========================================================================
 # STEP 3: How Multi-Value Lookups (field_fetch) Work
 # =========================================================================
-# AmberDB's 'set_fieldlist' feature automatically unpacks comma-delimited strings
+# AmberDB's 'field_to_list' feature automatically unpacks comma-delimited strings
 # ("5,12" and "7,9") and indexes each discrete ID into its respective .fld index.
 # Both of the following independent queries will immediately find the product via fast direct index lookup:
 my @cat12_items   = $adb->field_fetch("catalog_product", 1, "12"); # All products in Category 12
@@ -1415,7 +1415,7 @@ AmberDB breaks free from fixed column width constraints by allowing a variable n
 During every `insert_id`, `modify_id`, `insert_list`, or `modify_list` call, the engine automatically processes all repeating blocks starting from `repeat_start` (15):
 1. It extracts the identifier of each repeating block (the first element `$_->[0]` if it's an ARRAY reference, or the scalar value itself).
 2. It joins these IDs into a comma-separated string (`"101,102,103"`) and assigns it automatically to block `repeat_ids` (12) - developers do not need to populate this field manually.
-3. Because Block 12 is declared in `match_block`, the engine automatically indexes each product key into `order_active.fld` (under key `"12:$id"`) via `set_fieldlist`.
+3. Because Block 12 is declared in `match_block`, the engine automatically indexes each product key into `order_active.fld` (under key `"12:$id"`) via `field_to_list`.
 
 > [!NOTE]
 > **Repeating Blocks in Schemaless Simple Mode:**  
@@ -2303,7 +2303,7 @@ This entire document is written to the `.db` file as a **single key-value pair**
 In SQL, answering *"Which orders contain Product 101?"* requires scanning the `order_items` index/table, joining with `orders`, and executing multiple disk/cache seeks across separate tables.
 
 **In AmberDB:**
-The order record contains the array of product items in Block 3. When `match_block => [3]` is defined in the schema, the engine automatically extracts each product ID using `set_fieldlist` and indexes it into `orders.fld` under the key `"3:$id"`.
+The order record contains the array of product items in Block 3. When `match_block => [3]` is defined in the schema, the engine automatically extracts each product ID using `field_to_list` and indexes it into `orders.fld` under the key `"3:$id"`.
 
 ```perl
 # Fetch all order records containing Product 101:

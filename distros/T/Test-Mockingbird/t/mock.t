@@ -6,9 +6,6 @@ use Test::Most tests => 7;
 use Test::Mockingbird;
 
 # MyClass has no methods of its own at this point.
-# Use defined(&...) rather than ->can() -- after any mock/unmock cycle
-# the GV is auto-vivified and ->can() may return the undef-stub.  See
-# LIMITATIONS in Test::Mockingbird for the full explanation.
 ok !defined(&MyClass::greet), 'greet not defined before mock';
 
 # Install a mock for a method that did not previously exist

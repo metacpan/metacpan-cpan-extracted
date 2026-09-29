@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.36;
+our $VERSION = v0.37;
 
 use constant {
     WK_UUID         => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -233,32 +233,8 @@ sub classes_of {
 
 
 sub announce {
-    my ($pkg, $type, $regs, @opts) = @_;
-
-    croak 'Stray options passed' if scalar @opts;
-
-    $type = Data::Identifier->new(from => $type); # Force to Data::Identifier
-    $type->register;                              # Ensure it is registered
-
-    if (ref($regs) eq 'HASH') {
-        $type = $type->uuid;                      # Convert to UUID for cache usage
-        foreach my $key (keys %{$regs}) {
-            my $identifier = Data::Identifier->new(from => $regs->{$key});
-            $identifier->{id_cache} //= {};
-            $identifier->{id_cache}->{$type} //= $key;
-            $identifier->register;
-        }
-    } elsif (ref($regs) eq 'ARRAY') {
-        foreach my $key (@{$regs}) {
-            if (ref $key) {
-                Data::Identifier->new(from => $key)->register;
-            } else {
-                Data::Identifier->new($type => $key)->register;
-            }
-        }
-    } else {
-        croak 'Unsupported data type';
-    }
+    require Data::Identifier::Util;
+    goto &Data::Identifier::Util::announce;
 }
 
 # ---- Private helpers ----
@@ -281,7 +257,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.36
+version v0.37
 
 =head1 SYNOPSIS
 
@@ -334,24 +310,13 @@ This is an B<experimental> method. It may be changed, renamed, or removed withou
 
     Data::Identifier::Wellknown->announce($type => $data);
 
-(experimental since v0.26)
+(experimental since v0.26, moved in v0.37 to L<Data::Identifier::Util>, will be removed in v0.40)
 
-This method can be used to announce additional well known identifiers.
-It is mostly used by other modules to register identifiers for a given type related to those modules
-and alias them to UUIDs.
-This is mostly useful if those identifiers are mapped to UUIDs via a register (in contrast to a generator).
+This method was moved to L<Data::Identifier::Util/announce> in v0.37.
+The new method has the same interface as this method had.
 
-The type is passed as C<$type> which is parsed as per C<from> of L<Data::Identifier/new>.
-It must resolve to an identifier with a defined UUID.
-This module might make restrictions on the type identifiers can be registered for.
-
-If C<$data> is a hashref the keys are understood as the identifiers of the type given via C<$type>
-and the values are the corresponding identifiers (parsed as per C<from> of L<Data::Identifier/new>) to map to.
-
-If C<$data> is an arrayref the values are understood as the identifiers.
-L<Data::Identifier> objects are created as needed and registered.
-
-C<$type> and all identifiers updated by this method will be registered as per L<Data::Identifier/register>.
+This module has a proxy method to aid migration.
+The proxy method will be removed in v0.40.
 
 =head1 AUTHOR
 
@@ -1310,6 +1275,7 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   am      Amharic         sid=332
 .   ar      Arabic          sid=243
 .   bn      Bengali         sid=245
+.   da      Danish
 .   de      German          sid=71
 .   en      English         sid=70
 .   eo      Esperanto
@@ -1320,9 +1286,11 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   ha      Hausa           sid=321
 .   he      Hebrew          sid=348
 .   hi      Hindi           sid=242
+.   hu      Hungarian
 .   ia      Interlingua     sid=350
 .   id      Indonesian      sid=248
 .   ie      Interlingue     sid=349
+.   is      Icelandic       sid=343
 .   it      Italian         sid=330
 .   ja      Japanese        sid=250
 .   jv      Javanese        sid=329
@@ -1330,8 +1298,10 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   ko      Korean          sid=327
 .   mi      Maori           sid=254
 .   mr      Marathi         sid=251
+.   nds     Low German
 .   nl      Dutch           sid=72
 .   no      Norwegian       sid=345
+.   pl      Polish
 .   pt      Portuguese      sid=246
 .   ru      Russian         sid=247
 .   sv      Swedish         sid=346
@@ -1340,6 +1310,7 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   te      Telugu          sid=320
 .   th      Thai            sid=328
 .   tl      Tagalog         sid=324
+.   tok     Toki Pona
 .   tr      Turkish         sid=322
 .   ur      Urdu            sid=249
 .   vi      Vietnamese      sid=252
@@ -1352,8 +1323,9 @@ $extra_classes languoid
 $displayname_is_tagname true
 $type uuid
 
-.   8ca63437-1b1e-4a85-8512-02ba5c15a412    Lapine      sid=340
-.   1d668738-8aef-4cb4-a4ed-9368e872a93f    famibeib    sid=341
+.   8ca63437-1b1e-4a85-8512-02ba5c15a412    Lapine              sid=340
+.   1d668738-8aef-4cb4-a4ed-9368e872a93f    famibeib            sid=341
+.   86563b0f-d8fd-4e95-9a64-96e2d6809623    scientific name
 
 
 $class mediatype

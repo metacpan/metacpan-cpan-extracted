@@ -18,7 +18,7 @@ use Carp;
 use Data::Identifier;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.36;
+our $VERSION = v0.37;
 
 use constant {
     BOOL_TRUE  => Data::Identifier->new(uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5')->register,
@@ -612,6 +612,36 @@ sub render_unit_request {
 }
 
 
+sub announce {
+    my ($pkg, $type, $regs, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $type = Data::Identifier->new(from => $type); # Force to Data::Identifier
+    $type->register;                              # Ensure it is registered
+
+    if (ref($regs) eq 'HASH') {
+        $type = $type->uuid;                      # Convert to UUID for cache usage
+        foreach my $key (keys %{$regs}) {
+            my $identifier = Data::Identifier->new(from => $regs->{$key});
+            $identifier->{id_cache} //= {};
+            $identifier->{id_cache}->{$type} //= $key;
+            $identifier->register;
+        }
+    } elsif (ref($regs) eq 'ARRAY') {
+        foreach my $key (@{$regs}) {
+            if (ref $key) {
+                Data::Identifier->new(from => $key)->register;
+            } else {
+                Data::Identifier->new($type => $key)->register;
+            }
+        }
+    } else {
+        croak 'Unsupported data type';
+    }
+}
+
+
 #@returns Data::Identifier
 sub register_namespace {
     my ($self, $identifier, %opts) = _register_base(@_);
@@ -798,7 +828,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.36
+version v0.37
 
 =head1 SYNOPSIS
 
@@ -970,6 +1000,32 @@ This might might support more values if L<Data::Identifier::Wellknown> is loaded
 and/or if a L<Data::TagMap> is given via L<Data::Identifier::Interface::Subobjects/so_attach>.
 
 See also L</parse_sirtx>.
+
+=head2 announce
+
+    Data::Identifier::Util->announce($type => $data);
+
+(experimental since v0.37)
+
+This method can be used to announce additional well known identifiers.
+It is mostly used by other modules to register identifiers for a given type related to those modules
+and alias them to UUIDs.
+This is mostly useful if those identifiers are mapped to UUIDs via a register (in contrast to a generator).
+
+The type is passed as C<$type> which is parsed as per C<from> of L<Data::Identifier/new>.
+It must resolve to an identifier with a defined UUID.
+This module might make restrictions on the type identifiers can be registered for.
+
+If C<$data> is a hashref the keys are understood as the identifiers of the type given via C<$type>
+and the values are the corresponding identifiers (parsed as per C<from> of L<Data::Identifier/new>) to map to.
+
+If C<$data> is an arrayref the values are understood as the identifiers.
+L<Data::Identifier> objects are created as needed and registered.
+
+C<$type> and all identifiers updated by this method will be registered as per L<Data::Identifier/register>.
+
+B<Note:>
+This method was part of L<Data::Identifier::Wellknown> until it became part of this package in v0.37.
 
 =head2 register_namespace
 

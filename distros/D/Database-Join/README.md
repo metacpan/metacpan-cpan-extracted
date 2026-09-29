@@ -4,7 +4,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 ## Version
 
-Version 0.007.1
+Version 0.008.0
 
 ## Synopsis
 
@@ -1319,6 +1319,78 @@ printf "%d total, %d gold-tier, %d high-scorers\n",
 #### Messages
 
 Same messages as `selectall_arrayref`.
+
+### Each\_Row
+
+#### Synopsis
+
+```perl
+my $count = $join->each_row(sub { my ($row) = @_; ... });
+my $count = $join->each_row(sub { ... }, tier => 'gold');
+my $count = $join->each_row(sub { ... }, sort_by => 'name', limit => 100);
+```
+
+#### Description
+
+Calls `\&callback` once for every row in the merged view that matches the
+given criteria, then returns the total count of rows visited.
+
+Accepts the same criteria, `sort_by`, `limit`, and `offset` parameters as
+`selectall_arrayref`.
+
+**Note on memory usage**: `Database::Join` always materialises the complete
+merged result set before invoking the callback, because merging rows from
+multiple independent sources requires that every source be queried and
+cross-referenced first.  True constant-memory streaming (as `Database::Abstraction`
+provides on single-source SQL queries) is not possible at the join layer.
+For genuinely large result sets use the SQLite backend (`backend =>
+'sqlite'`), which keeps peak RAM to approximately one times the source data
+size rather than three.
+
+Any exception thrown inside the callback propagates to the caller after the
+current row; subsequent rows are not visited.
+
+#### Api Specification
+
+##### Input
+
+```
+\&callback   Positional coderef (required).
+             Called as $callback->($row_hashref) for each merged row.
+
+Additional arguments follow the same calling conventions as
+selectall_arrayref: no args, a single scalar join-column value,
+or key-value criteria pairs (including sort_by, limit, offset).
+```
+
+##### Output
+
+```
+Non-negative integer: the count of rows for which the callback was invoked.
+```
+
+#### Example
+
+```perl
+# Print every gold-tier customer's name, sorted by name
+my $count = $join->each_row(
+    sub { my ($row) = @_; print "$row->{name}\n" },
+    tier    => 'gold',
+    sort_by => 'name',
+);
+print "$count gold-tier customers\n";
+
+# Accumulate without holding the full result
+my $total_score = 0;
+$join->each_row(sub { $total_score += $_[0]->{score} // 0 });
+```
+
+#### Messages
+
+```
+error_invalid_callback (croak)
+    -- First argument is not a code reference.
+```
 
 ### Dbi\_Source
 

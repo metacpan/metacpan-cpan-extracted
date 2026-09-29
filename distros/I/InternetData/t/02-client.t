@@ -259,6 +259,27 @@ subtest 'a client-wide timeout is refused where it cannot work' => sub {
         [], 'while timeout => 0 still builds a client that answers');
 };
 
+subtest 'a zero written as a string is no bound too' => sub {
+    my $origin = InternetDataTest::Origin->new(sub {
+        my $c = shift;
+        return $c->render(json => { databases => [] }) if $c->req->url->path->to_string eq '/api/v2/database/list';
+        $c->render(json => { issuer => 'x', authorization_endpoint => 'x', token_endpoint => 'x' });
+    });
+    # Each is 0 as a number and true as a string, and Mojo tests the bound for
+    # truth before arming it: handed over as given, each was a timer that fired
+    # at once and failed every call.
+    for my $zero ('0.0', '00', '0e0', '0 but true') {
+        my $client = InternetData->new(base_url => $origin->url, retries => 0, timeout => $zero);
+        my $got = eval { $client->database->list };
+        is_deeply($got, [], "the client's timeout => '$zero' bounds nothing") or diag $@;
+        my $keyless = InternetData->new(base_url => $origin->url, retries => 0);
+        $got = eval { $keyless->database->list(timeout => $zero) };
+        is_deeply($got, [], "and neither does list's") or diag $@;
+        $got = eval { $keyless->oauth->metadata(timeout => $zero) };
+        is($got && $got->{issuer}, 'x', "nor oauth->metadata's") or diag $@;
+    }
+};
+
 subtest 'an unpublished format is refused before the network' => sub {
     my $origin = InternetDataTest::Origin->new(sub {
         my ($c, $o) = @_;

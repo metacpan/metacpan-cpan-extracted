@@ -8,7 +8,7 @@ use Socket qw(AF_INET AF_INET6 inet_pton);
 use VPNDetection::Bogons;
 use VPNDetection::Result;
 
-our $VERSION = '3.4.0';
+our $VERSION = '3.4.1';
 
 # Whether an address is private, loopback, link-local, documentation, multicast
 # or otherwise not routable on the public internet, including the IPv6
@@ -20,6 +20,7 @@ sub is_bogon {
     my ($ip) = @_;
     return 0 unless defined $ip && length $ip;
 
+    $ip = unmapped($ip);
     my $v6 = index($ip, ':') >= 0;
     my $addr = _pton($v6 ? AF_INET6 : AF_INET, $ip);
     return 0 unless defined $addr;
@@ -28,6 +29,19 @@ sub is_bogon {
         return 1 if ($addr & $range->[1]) eq $range->[0];
     }
     return 0;
+}
+
+# The IPv4 address an IPv4-mapped IPv6 address (::ffff:a.b.c.d, in any spelling)
+# carries, dotted, and any other string as given. A server listening on :: sees
+# every IPv4 visitor in that form, which read whole is inside ::ffff:0:0/96, so
+# judging it whole would answer every such visitor locally as a bogon. ::a.b.c.d
+# is IPv4-compatible rather than mapped, and stays IPv6.
+sub unmapped {
+    my ($ip) = @_;
+    return $ip unless defined $ip && index($ip, ':') >= 0;
+    my $addr = _pton(AF_INET6, $ip);
+    return $ip unless defined $addr && substr($addr, 0, 12) eq ("\0" x 10) . "\xff\xff";
+    return join '.', unpack 'C4', substr($addr, 12);
 }
 
 # The answer a bogon gets, in the full shape the API serves at its widest plan:
@@ -61,8 +75,8 @@ sub _v6 {
 #
 # That behavior is why no file in this distribution says `use v5.28` or later:
 # those enable the `bitwise` feature, under which `&` becomes numeric-only, both
-# operands numify to 0, and EVERY address would match EVERY range. The 46 case
-# isBogon corpus is what catches it.
+# operands numify to 0, and EVERY address would match EVERY range. The isBogon
+# corpus is what catches it.
 sub _range {
     my ($family, $cidr, $width) = @_;
     my ($net, $bits) = split m{/}, $cidr, 2;

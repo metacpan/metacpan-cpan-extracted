@@ -15,17 +15,19 @@ our @EXPORT_OK = qw(
 	async_spy
 );
 
+=encoding utf-8
+
 =head1 NAME
 
 Test::Mockingbird::Async - Future-based async mocking for Test::Mockingbird
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -100,16 +102,21 @@ Mock a method so that it always returns a pre-resolved C<Future>.
 The method is replaced with a stub that returns C<Future->done(@values)>.
 Restore with C<restore_all()> or C<unmock()>.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
-=head4 Input (Params::Validate::Strict schema)
+=head4 Input
 
-- C<target>: required, scalar string; shorthand C<'Pkg::method'> form
-- C<@values>: zero or more values passed to C<Future->done>
+    target -- Str, 'Pkg::method'
+    values -- List[Any], zero or more; passed to Future->done
 
-=head4 Output (Returns::Set schema)
+=head4 Output
 
-- C<return>: undef
+    returns: undef
+
+=head3 MESSAGES
+
+  "mock_future_return requires a target" -- target undef
+  "Test::Mockingbird::Async requires the Future module." -- Future missing
 
 =cut
 
@@ -137,17 +144,22 @@ The method is replaced with a stub that returns
 C<Future->fail($message, @details)>. The caller receives a rejected Future;
 no exception is thrown at the call site.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
-=head4 Input (Params::Validate::Strict schema)
+=head4 Input
 
-- C<target>: required, scalar string
-- C<$message>: required, scalar string; the failure message
-- C<@details>: optional; additional failure metadata passed to C<Future->fail>
+    target  -- Str, 'Pkg::method'
+    message -- Str, the failure message
+    details -- List[Any], optional; further arguments to Future->fail
 
-=head4 Output (Returns::Set schema)
+=head4 Output
 
-- C<return>: undef
+    returns: undef
+
+=head3 MESSAGES
+
+  "mock_future_fail requires a target and a failure message" -- either undef
+  "Test::Mockingbird::Async requires the Future module." -- Future missing
 
 =cut
 
@@ -183,16 +195,23 @@ allowing a mix of resolved and failed Futures in the sequence):
         42,
         Future->fail('oops');
 
-=head3 API specification
+=head3 API SPECIFICATION
 
-=head4 Input (Params::Validate::Strict schema)
+=head4 Input
 
-- C<target>: required, scalar string
-- C<@items>: required; one or more plain values or C<Future> objects
+    target -- Str, 'Pkg::method'
+    items  -- List[Any|Future], one or more; plain values are wrapped in
+              Future->done, Future objects are returned as they are
 
-=head4 Output (Returns::Set schema)
+=head4 Output
 
-- C<return>: undef
+    returns: undef
+
+=head3 MESSAGES
+
+  "mock_future_sequence requires a target and at least one item" -- target
+      undef or no items
+  "Test::Mockingbird::Async requires the Future module." -- Future missing
 
 =cut
 
@@ -230,16 +249,21 @@ first call the previous implementation is automatically restored.
 This is useful for simulating transient failures, one-time responses, or
 state transitions in async code.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
-=head4 Input (Params::Validate::Strict schema)
+=head4 Input
 
-- C<target>: required, scalar string
-- C<@values>: zero or more values passed to C<Future->done>
+    target -- Str, 'Pkg::method'
+    values -- List[Any], zero or more; passed to Future->done
 
-=head4 Output (Returns::Set schema)
+=head4 Output
 
-- C<return>: undef
+    returns: undef
+
+=head3 MESSAGES
+
+  "mock_future_once requires a target" -- target undef
+  "Test::Mockingbird::Async requires the Future module." -- Future missing
 
 =cut
 
@@ -293,15 +317,21 @@ C<async_spy> assumes the spied method returns a C<Future>. If the method
 returns a plain value the C<future> field in each call record will hold that
 value rather than a C<Future>, and calling C<< ->get >> on it will fail.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
-=head4 Input (Params::Validate::Strict schema)
+=head4 Input
 
-- C<target>: required; C<'Pkg::method'> shorthand or C<('Pkg', 'method')> longhand
+    target -- Str, 'Pkg::method' or ('Pkg', 'method')
 
-=head4 Output (Returns::Set schema)
+=head4 Output
 
-- C<return>: coderef; when called, returns the list of call records
+    returns: CodeRef; yields the list of call records, each
+             { args => [ 'Pkg::method', @args ], future => $returned }
+
+=head3 MESSAGES
+
+  "Package and method are required for async_spy" -- target missing or incomplete
+  "Test::Mockingbird::Async requires the Future module." -- Future missing
 
 =cut
 
@@ -311,19 +341,15 @@ sub async_spy {
 	my ($package, $method) = Test::Mockingbird::_parse_target(@_);
 
 	croak 'Package and method are required for async_spy'
-		unless $package && $method;
+		unless Test::Mockingbird::_is_name($package)
+			&& Test::Mockingbird::_is_name($method);
 
 	my $full_method = "${package}::${method}";
 
-	# Capture current implementation so the wrapper can delegate to it.
-	# mock() will also capture it independently for stack bookkeeping;
-	# both captures see the same coderef at this point.
-	my $orig;
-	{
-		## no critic (ProhibitNoStrict)
-		no strict 'refs';
-		$orig = \&{$full_method};
-	}
+	# Resolve what the wrapper delegates to (the parent's implementation
+	# for an inherited method).  mock() separately saves the CODE slot for
+	# stack bookkeeping.
+	my $orig = Test::Mockingbird::_call_through($package, $method);
 
 	my @calls;
 
@@ -350,6 +376,59 @@ sub _require_future {
 		or croak "Test::Mockingbird::Async requires the Future module.\n"
 			. "Install it with: cpanm Future\n";
 }
+
+=head1 FORMAL SPECIFICATION
+
+Each function requires C<Future> (C<_require_future>) and installs one layer
+through C<Test::Mockingbird::mock()> with C<type> set to its own name; see
+L<Test::Mockingbird/FORMAL SPECIFICATION> for C<mock>, C<unmock> and
+C<resolve>.
+
+=head2 mock_future_return
+
+    mock_future_return ≙
+      ∀ target : Str; values : Seq(Any) •
+        pre  defined(target)
+        post mock(target, sub { Future->done(values) })
+
+=head2 mock_future_fail
+
+    mock_future_fail ≙
+      ∀ target : Str; msg : Str; details : Seq(Any) •
+        pre  defined(target) ∧ defined(msg)
+        post mock(target, sub { Future->fail(msg, details) })
+
+=head2 mock_future_sequence
+
+    mock_future_sequence ≙
+      ∀ target : Str; items : Seq(Any) •
+        pre  defined(target) ∧ |items| ≥ 1
+        post let queue = items •
+          mock(target, sub {
+            let item = (|queue| = 1) ? head(queue) : shift(queue) •
+            item isa Future ? item : Future->done(item)
+          })
+
+=head2 mock_future_once
+
+    mock_future_once ≙
+      ∀ target : Str; values : Seq(Any) •
+        pre  defined(target)
+        post mock(target, sub {
+               let f = Future->done(values) • unmock(target); f
+             })
+
+=head2 async_spy
+
+    async_spy ≙
+      ∀ pkg, meth : Str •
+        pre  name(pkg) ∧ name(meth)
+        let t = pkg::meth; orig = resolve(pkg, meth) •
+        post mock(t, wrapper)
+             ∧ wrapper(@args) ≙ let f = orig(@args) •
+                                calls' = calls ⌢ ⟨{ args => [t, @args], future => f }⟩
+                                ∧ call_log' = call_log ⌢ ⟨t⟩; f
+             ∧ returns sub { calls }
 
 =head1 SUPPORT
 

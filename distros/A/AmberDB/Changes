@@ -1,5 +1,64 @@
 Revision history for AmberDB
 
+5.26.2  2026-09-28
+        - [STANDALONE EXECUTABLE BUILDER & CI RELEASE AUTOMATION]
+          * Resolved Strawberry Perl PAR::Packer ('pp') compilation failure on Windows by decoupling attached module search switch into separated '-I lib' arguments.
+          * Configured GitHub Actions build-exe workflow to automatically compile and smoke-test amberdb.exe on pushes to main and master branches.
+          * Enforced dynamic release tag formatting ('v<VERSION>_exe', e.g. 'v5.26.2_exe') to prevent refspec collisions with Git branch 'main' and keep binary releases isolated from source tags.
+          * Updated bin/build_exe.bat with fixed compiler flags and registered script in MANIFEST.
+
+        - [CLI ENGINE VERSION INTROSPECTION]
+          * Added '--version', '-v', and 'version' commands to bin/amberdb_cli.pl.
+          * Emits standard release banner 'AmberDB v<VERSION> (CLI)' or structured JSON schema when combined with 'format=json'.
+
+        - [DOCUMENT-STORE SINGLE HASH / REFERENCE ENCODING FIX]
+          * Fixed AmberDB::recs_put to ensure single reference record payloads (HASH/ARRAY, e.g. 'data={...}') are passed through db_encode rather than stringified to 'HASH(0x...)'.
+          * Verified complete recursive serialization and round-trip fidelity for deeply nested hashes and arrays inside array records (tested in t/amberdb_escape_encode.t).
+
+        - [CLI DEFAULT TABLE OUTPUT RENDERING & POSITIONAL ARGUMENTS]
+          * Configured clean, formatted ASCII box tables ('+----+----+') as default CLI output for single records ('read <table_name> <id>') and multi-record lists ('read all', 'search', 'fetch'), replacing legacy Data::Dumper fallback.
+          * Enhanced CLI positional argument parsing for multi-block records, enabling seamless scalar, JSON array, and JSON hash parameters directly via command line (e.g. 'amberdb insert items 0 "Mouse" \'["wireless","bt"]\' \'{"brand":"Razer"}\'').
+          * Fixed TSV output formatting ('format=tsv' / 'tsv') to join record fields strictly with tabs on a single line ('<id>\t<field_1>\t<field_2>...') instead of splitting fields across separate newlines.
+          * Preserved full backwards compatibility with explicit format switches: 'format=dumper' / 'dumper', 'format=json' / 'json', 'format=pretty' / 'pretty', and 'format=tsv' / 'tsv'.
+          * Added bilingual command-line usage screen support: 'amberdb usage' / 'amberdb help' renders in English, while 'amberdb usage.tr' / 'amberdb help.tr' (or 'usage tr') renders in Turkish.
+          * Added subtest 13 in t/amberdb_cli.t to verify default table output, TSV tab separation, column headers, and explicit dumper formatting.
+
+5.26.1  2026-09-28
+        - [32-BIT PERL / CPAN TESTERS QUAD PACKING COMPATIBILITY]
+          * Implemented transparent cross-platform 64-bit integer packing in AmberDB::Base::Encoder (_pack_ids, _unpack_ids, _pack_single_id).
+          * Utilizes native 64-bit pack("(Q>)*") / unpack("(Q>)*") on 64-bit Perls with zero performance overhead.
+          * Automatically falls back to dual 32-bit unsigned network integer pack("(NN)*") / unpack("(NN)*") on 32-bit Perls without quad support (use64bitint=undef, e.g. Raspberry Pi armv6l).
+          * Guaranteed 100% byte-exact binary compatibility on physical .inx, .fld, .src index files across 32-bit and 64-bit architectures.
+          * Completely resolved CPAN Testers "Invalid type 'Q' in pack" exceptions across 36 test suites.
+
+        - [CLI THREE-MODE ARCHITECTURE & ZERO-FALLBACK ENFORCEMENT]
+          * Re-architected amberdb CLI (bin/amberdb_cli.pl) into three distinct, predictable operational modes:
+            1. 'amberdb setup': Provisions global workspace (~/.amberdb) with session/ and config/ directories. Fully eliminated dummy default/ database.
+            2. 'amberdb connect <name>[@<path>]': Named session management with canonical absolute path resolution; rejects raw directory names without database alias.
+            3. Direct CRUD ('amberdb CRUD'): Strictly targets local ./dbstore in current working directory without fallback to ~/.amberdb/default.
+          * Read operations (tables, read, search, count, info) return empty/null cleanly without creating directory skeletons.
+          * Write operations (insert) automatically provision ./dbstore and core.conf on-the-fly.
+          * Updated user guides and documentation in README.md, wiki/TR-Guide-CLI.md, and wiki/Guide-CLI.md.
+
+        - [SCHEMA USE_SIMPLE SANITIZATION & STRING KEY PRESERVATION]
+          * Updated AmberDB::Base::Schema to strip unused 'blocks' definition for use_simple => 1 tables.
+          * Wrapped explicit ID sorting in AmberDB::insert_list with unless ($is_simple) guard, eliminating numeric comparison warnings on string keys without regex overhead.
+
+        - [CROSS-PLATFORM CI & MACOS MOUNT FIX]
+          * Fixed macOS /Volumes permission error in AmberDB::Base::Ramdisk by verifying write permissions before activating RAM-disk mount points.
+          * Added eval guard to ramdisk_setup with graceful fallback to local storage.
+
+        - [WINDOWS CRLF & TRANSACTION JOURNAL HARDENING]
+          * Enforced binmode on journal handles in AmberDB::Base::Transact to prevent Windows CRLF mangling of record separators and Base64 payloads.
+          * Added journal content diagnostic dumps and exact field assertions in t/amberdb_transact.t.
+
+        - [WINDOWS CI & FLOCK / CLI AT-SYNTAX COMPATIBILITY]
+          * Replaced colon separator with '@' for custom directory connect syntax ('amberdb connect <dbname>@<path>'), completely eliminating ambiguity with Windows drive letters (C:\path).
+          * Enforced strict directory path and legacy colon syntax rejection in bin/amberdb_cli.pl.
+          * Added automatic background workspace provisioning in bin/amberdb_cli.pl: automatically runs global setup on first invocation if ~/.amberdb does not exist.
+          * Fixed t/amberdb_transact.t journal reader to read directly via active transaction handle ($adb->{_txn}->{fh}), eliminating Windows mandatory flock(LOCK_EX) read collisions that resulted in uninitialized $journal_content on native Windows (Strawberry Perl).
+          * Added comprehensive cross-platform connect '@' syntax, auto-setup, and Windows drive path rejection tests in t/amberdb_cli.t.
+
 5.26.0  2026-09-23
         - [FAST INDEXED FIELD COUNTING (field_count)]
           * Implemented field_count($table, $block, $val) for fast O(1) indexed counting across inverted match (.fld) indexes without reading or deserializing full records.
@@ -74,7 +133,7 @@ Revision history for AmberDB
           * Added comprehensive unit test suite in t/amberdb_field_normalize.t.
 
         - [INDEX INTEGRITY & STRICT NUMERIC ID REINDEXING]
-          * Enforced strict positive integer filtering (/^\d+$/ && $_ > 0) across all binary index buffers (keys, A:keys, B:keys, $blk:keys, bin_encode, bin_decode, bin_add, bin_punch), completely preventing non-numeric or non-positive IDs from entering .inx files.
+          * Enforced strict positive integer filtering (defined $_ && $_ > 0) across all binary index buffers (keys, A:keys, B:keys, $blk:keys, bin_encode, bin_decode, bin_add, bin_punch), completely preventing non-numeric or non-positive IDs from entering .inx files.
           * Updated set_index in AmberDB::Tools::Index to close and unlink all existing index files (.inx, .src, .fld, .fac, .slg, .unq) on both physical disk and RAM-disk before rebuilding, ensuring clean and deterministic recreation.
           * Added RAM-disk synchronization to set_index: freshly rebuilt index files are atomically mirrored to RAM-disk upon completion with safe filehandle management.
           * Fixed UTF-8 double-encoding in $blk:vals across sort_add, sort_modify, and sort_del in AmberDB::Base::Index to prevent exponential byte bloat on multibyte character updates.

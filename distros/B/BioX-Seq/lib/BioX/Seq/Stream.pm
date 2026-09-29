@@ -7,6 +7,7 @@ use warnings;
 use IPC::Cmd qw/can_run/;
 use Scalar::Util qw/blessed openhandle/;
 use BioX::Seq;
+use Module::Load;
 use POSIX qw/ceil/;
 use Cwd qw/abs_path/;
 use File::Basename qw/fileparse/;
@@ -151,7 +152,7 @@ sub _guess_format {
     for my $module ( glob "$search_path/*.pm" ) {
         my ($name,$path,$suff) = fileparse($module, qr/\.pm/i);
         my $classname = blessed($self) . "::$name";
-        eval "require $classname";
+        load $classname;
         if ($classname->_check_type($self)) {
             push @matched, $classname;
         }
@@ -161,7 +162,7 @@ sub _guess_format {
     # uncoverable branch true
     die "Multiple filetypes matched\n" if (scalar(@matched) > 1);
 
-    eval "require $matched[0]";
+    load $matched[0];
     bless $self => $matched[0];
 
 }

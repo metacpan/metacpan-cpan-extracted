@@ -1,0 +1,47 @@
+###  Set your RT and Slack URLs
+my $slackURL = 'https://YOUR-SLACK.slack.com/api/';
+my $rtURL = 'https://YOUR-RT-URL/Ticket/Display.html';
+
+### Map your Slack Channels to RT Queues.  You can have multiple queues mapped to the same channel.
+### The Queue name must match exactly.
+### Get the Slack Channel ID by right-clicking your slack channel > Channel Details > show Channel Details > Channel ID is at the bottom
+
+Set(%SlackQueueConfig, 
+    "rt-test"        => { channel => "SLACKCHANNELID" }, 
+    "help desk"      => { channel => "SLACKCHANNELID" },
+        
+
+    ######## Special Queue Mapping Examples ##########
+    #### ...maybe delete these if you're not gonna do special stuff.  
+    ## Example 1: Tickets in a specific queue with a specific requestor email are routed to a different channel than declared above.     
+    "sillyqueue" => {
+        # This 'custom_logic' sub will be called to determine the channel
+        custom_logic => sub {
+            my ($requestor_email) = @_;
+            if ($requestor_email eq "email\@domain.com") {
+                return { channel => "ALT-SLACKCHANNELID" };
+            } else {
+                return { channel => "SLACKCHANNELID" };
+            }
+        }
+    },
+
+    ## Example 2: Tickets in a specific queue get mapped to a channel, but we are going to extract and display additional information 
+    ## In this example we look for a Custom Field called "Change Scheduled".
+    "sillyqueue2" => {
+        channel => "SLACKCHANNELID",
+        custom_text => sub {
+            my ($ticket_obj) = @_;
+            my $changeScheduledValue = $ticket_obj->FirstCustomFieldValue('Change Scheduled');
+            if (defined $changeScheduledValue && $changeScheduledValue ne '') {
+                return "| Scheduled: $changeScheduledValue |";
+            }
+            # Return undef so it's skipped by join()
+            return undef; 
+        }
+    },
+    ## end special mapping examples ##
+
+);
+
+1;

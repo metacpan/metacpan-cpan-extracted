@@ -63,7 +63,7 @@ subtest '3. bin_crop with Option 2 (Preserves List / Relevance Order)' => sub {
     my @res = $adb->bin_crop( $buf, $list, 2 );
     is_deeply( \@res, [ 50, 10, 30 ], 'Option 2 preserves list order for array ref' );
 
-    my $buf_list = pack( "(Q>)*", 50, 10, 30 );
+    my $buf_list = $adb->bin_encode([ 50, 10, 30 ]);
     my @res_b = $adb->bin_crop( $buf, $buf_list, 2 );
     is_deeply( \@res_b, [ 50, 10, 30 ], 'Option 2 preserves list order for buffer input' );
 };
@@ -136,7 +136,7 @@ subtest '6. bin_add, bin_punch, bin_find, bin_sort, bin_count' => sub {
     is_deeply( \@punch_ids, [ 10, 20, 40, 50 ], 'bin_punch removes 30 cleanly' );
 
     # bin_sort
-    my $unsorted = pack( "(Q>)*", 50, 10, 40, 20 );
+    my $unsorted = $adb->bin_encode([ 50, 10, 40, 20 ]);
     my $sorted = $adb->bin_sort($unsorted);
     my ( undef, @sorted_ids ) = $adb->bin_decode( $sorted, 0, 0, 'asc' );
     is_deeply( \@sorted_ids, [ 10, 20, 40, 50 ], 'bin_sort sorts 8-byte chunks in ascending order' );

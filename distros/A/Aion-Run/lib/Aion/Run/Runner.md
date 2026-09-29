@@ -12,18 +12,19 @@ Aion::Run::RunsRun#list,5=run:runs „List of scripts”
 ```
 
 ```perl
-use Aion::Format qw/trappout np/;
+use Aion::Format qw/trappout/;
+use Data::Printer colored => 1, caller_info => 0, show_memsize => 0;
 use Aion::Run::Runner;
 use Aion::Run::RunRun;
 
-trappout { Aion::Run::Runner->run("run", "1+2") } # -> np(3, caller_info => 0) . "\n"
+trappout { Aion::Run::Runner->run("run", "1+2") } # -> do { my $t = 3; p $t, return_value => "dump", caller_info => 0, show_memsize => 0 } . "\n"
 ```
 
 # DESCRIPTION
 
 `Aion::Run::Runner` считывает файл **etc/annotation/run.ann** со списком скриптов, а выполнить любой скрипт из списка можно через его метод `run`.
 
-Путь к файлу cо скриптами можно поменять с помощью конфига `INI`.
+Путь к файлу cо скриптами можно поменять с помощью конфига `AION_ANNOTATION_INI`.
 
 Используется в команде `act`.
 
@@ -31,7 +32,7 @@ trappout { Aion::Run::Runner->run("run", "1+2") } # -> np(3, caller_info => 0) .
 
 ## runs
 
-Хеш с командами. Подгружается по дефолту из файла `INI`.
+Хеш с командами. Подгружается из файла.
 
 # SUBROUTINES
 

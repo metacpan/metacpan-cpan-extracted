@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 1;
 
@@ -14,7 +14,7 @@ Enum::Declare::Common - A curated collection of commonly-needed enums
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =head1 SYNOPSIS
 

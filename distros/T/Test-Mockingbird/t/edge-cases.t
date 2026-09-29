@@ -354,6 +354,12 @@ subtest 'spy(): preserves prototype -- no mismatch warning, _ prototype binds $_
 	is scalar @calls, 1, 'spy captured the call';
 	is $calls[0][0], 'Proto::Edge::Spy::fn', 'method name recorded';
 
+	# Kills mutant COND_INV_740_2 ('if (defined $orig_proto)' inverted in
+	# spy()): the glob assignment runs under "no warnings 'prototype'", so
+	# only the active wrapper's own prototype reveals whether it was stamped.
+	is prototype(\&Proto::Edge::Spy::fn), '',
+		'active spy wrapper carries the original () prototype';
+
 	# set_prototype is now applied -- no prototype-mismatch warning
 	is scalar(grep { /Prototype mismatch/ } @warnings), 0,
 		'spy() emits no prototype-mismatch warning after fix';
@@ -362,6 +368,19 @@ subtest 'spy(): preserves prototype -- no mismatch warning, _ prototype binds $_
 
 	is prototype(\&Proto::Edge::Spy::fn), '',
 		'original () prototype restored after spy removed';
+};
+
+subtest 'spy(): unprototyped original gives an unprototyped wrapper' => sub {
+	{
+		package Proto::Edge::SpyNoProto;
+		sub fn { 'orig' }
+	}
+
+	spy 'Proto::Edge::SpyNoProto::fn';
+	ok !defined prototype(\&Proto::Edge::SpyNoProto::fn),
+		'active spy wrapper has no prototype';
+	is(Proto::Edge::SpyNoProto->fn, 'orig', 'spy calls through');
+	restore_all();
 };
 
 subtest 'mock(): ($$) prototype preserved through full mock/unmock cycle' => sub {

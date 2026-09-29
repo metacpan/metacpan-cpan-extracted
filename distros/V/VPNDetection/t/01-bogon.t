@@ -10,8 +10,8 @@ use VPNDetectionTest;
 my $cases = VPNDetectionTest::corpus()->{isBogon};
 plan tests => 2 * @$cases + 4;
 
-# 46 cases: 26 membership, plus 20 boundary pairs that pin the prefix WIDTH, so a
-# mask one bit too wide or too narrow fails here rather than in production.
+# Membership cases, plus boundary pairs that pin the prefix WIDTH, so a mask one
+# bit too wide or too narrow fails here rather than in production.
 my $client = VPNDetection->new;
 for my $case (@$cases) {
     my $want = $case->{expect} ? 1 : 0;
@@ -23,4 +23,4 @@ is(is_bogon('10.0.0.0/8'), 0, 'a CIDR is not an address');
 is(is_bogon('notanip'), 0, 'junk is not a bogon');
 is(is_bogon(''), 0, 'the empty string is not a bogon');
 is(VPNDetection::is_bogon('::ffff:10.0.0.1'), 1,
-    'a 4-in-6 address is matched against the v6 table, as every other SDK does');
+    'a mapped address is judged as the IPv4 address it carries');

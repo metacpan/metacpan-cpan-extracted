@@ -21,7 +21,7 @@ use Getopt::Long qw(GetOptions);
 use Markdown::Publish;
 use Markdown::Publish::Constant;
 
-$VERSION='1.003';
+$VERSION='1.004';
 
 
 sub main {

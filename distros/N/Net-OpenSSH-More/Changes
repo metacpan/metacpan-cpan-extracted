@@ -1,5 +1,8 @@
 Revision history for Net-OpenSSH-More
 
+1.05 2026-09-28 TEODESIAN
+    - Note the reason an SSH connection failed
+
 1.04 2026-09-18 TEODESIAN
     - Fix test failure due to inability to open a port
 

@@ -35,7 +35,7 @@
             "Carp" : "0",
             "DBD::SQLite" : "1.70",
             "DBI" : "0",
-            "Database::Abstraction" : "0.45",
+            "Database::Abstraction" : "0.46",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "JSON::MaybeXS" : "0",
@@ -79,6 +79,6 @@
          "web" : "https://github.com/nigelhorne/Database-Join"
       }
    },
-   "version" : "v0.007.1",
+   "version" : "v0.008.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

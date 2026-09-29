@@ -59,33 +59,33 @@ subtest '1. match_block Schema & Index Key File (.fld) Generation' => sub {
     my $fld_path   = "${table_path}.fld";
     my $unq_path   = "${table_path}.unq";
 
-    # Verify unified .fld and .unq index files exist on disk for defined match blocks
+    # Verify unified .fld index file exists on disk for defined match blocks (no .unq needed)
     ok( -e $fld_path, "Unified index file ${tbl}.fld created" );
-    ok( -e $unq_path, "Unified dictionary file ${tbl}.unq created for match blocks" );
+    ok( !-e $unq_path, "No unnecessary dictionary file ${tbl}.unq created for match blocks" );
     ok( !-e "${table_path}_4.unq", "No legacy per-block _4.unq created" );
 
     # Verify .fld posting lists directly using composite keys
-    my ($k_cat10) = $adb->get_fieldlist( '10', $table_path, $table_info, 4 );
+    my ($k_cat10) = $adb->field_to_list( '10', $table_path, $table_info, 4 );
     my ( undef, @ids_cat10 ) = $adb->index_get( $fld_path, "4:$k_cat10" );
     is_deeply( [ sort { $a <=> $b } @ids_cat10 ], [ 1, 2, 5, 6 ],
         "Category '10' (key 4:$k_cat10) in unified .fld maps to IDs 1, 2, 5, 6" );
 
-    my ($k_cat20) = $adb->get_fieldlist( '20', $table_path, $table_info, 4 );
+    my ($k_cat20) = $adb->field_to_list( '20', $table_path, $table_info, 4 );
     my ( undef, @ids_cat20 ) = $adb->index_get( $fld_path, "4:$k_cat20" );
     is_deeply( [ sort { $a <=> $b } @ids_cat20 ], [ 1, 3, 4 ],
         "Category '20' (key 4:$k_cat20) in unified .fld maps to IDs 1, 3, 4" );
 
-    my ($k_brand12) = $adb->get_fieldlist( '12', $table_path, $table_info, 6 );
+    my ($k_brand12) = $adb->field_to_list( '12', $table_path, $table_info, 6 );
     my ( undef, @ids_brand12 ) = $adb->index_get( $fld_path, "6:$k_brand12" );
     is_deeply( [ sort { $a <=> $b } @ids_brand12 ], [ 1, 2, 4 ],
         "Brand '12' (key 6:$k_brand12) in unified .fld maps to IDs 1, 2, 4" );
 
-    my ($k_brand14) = $adb->get_fieldlist( '14', $table_path, $table_info, 6 );
+    my ($k_brand14) = $adb->field_to_list( '14', $table_path, $table_info, 6 );
     my ( undef, @ids_brand14 ) = $adb->index_get( $fld_path, "6:$k_brand14" );
     is_deeply( [ sort { $a <=> $b } @ids_brand14 ], [ 3, 6 ],
         "Brand '14' (key 6:$k_brand14) in unified .fld maps to IDs 3, 6" );
 
-    my ($k_brand16) = $adb->get_fieldlist( '16', $table_path, $table_info, 6 );
+    my ($k_brand16) = $adb->field_to_list( '16', $table_path, $table_info, 6 );
     my ( undef, @ids_brand16 ) = $adb->index_get( $fld_path, "6:$k_brand16" );
     is_deeply( [ sort { $a <=> $b } @ids_brand16 ], [ 5 ],
         "Brand '16' (key 6:$k_brand16) in unified .fld maps to ID 5" );

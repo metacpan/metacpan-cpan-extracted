@@ -6,7 +6,7 @@ use warnings;
 
 use Infix::Custom ();
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 require XSLoader;
 XSLoader::load('Syntax::Infix::OptionalChain', $VERSION);
@@ -34,7 +34,7 @@ Syntax::Infix::OptionalChain - a safe-navigation C<< ?-> >> operator for objects
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =head1 SYNOPSIS
 

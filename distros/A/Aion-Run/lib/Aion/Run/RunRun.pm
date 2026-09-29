@@ -1,7 +1,7 @@
 package Aion::Run::RunRun;
 use common::sense;
 
-use Aion::Format qw/p/;
+use Data::Printer colored => 1, caller_info => 0, show_memsize => 0;
 
 use Aion;
 
@@ -18,7 +18,7 @@ sub run {
 	my $x = eval $self->code;
 	die if $@;
 
-	p $x, output => 'stdout', caller_info => 0;
+	p $x, output => 'stdout';
 }
 
 1;
@@ -33,10 +33,11 @@ Aion::Run::RunRun - executes Perl code and prints the result to STDOUT
 
 =head1 SYNOPSIS
 
-	use Aion::Format qw/trappout np/;
+	use Aion::Format qw/trappout/;
+	use Data::Printer colored => 1, caller_info => 0, show_memsize => 0;
 	use Aion::Run::RunRun;
 	
-	trappout { Aion::Run::RunRun->new(code => "1+2")->run } # -> np(3, caller_info => 0) . "\n"
+	trappout { Aion::Run::RunRun->new(code => "1+2")->run } # -> do { my $t = 3; p $t, return_value => "dump", caller_info => 0, show_memsize => 0 } . "\n"
 
 =head1 DESCRIPTION
 

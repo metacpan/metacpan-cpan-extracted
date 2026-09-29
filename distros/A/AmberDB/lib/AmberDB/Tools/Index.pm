@@ -6,7 +6,7 @@ use strict;
 use Carp qw(croak cluck);
 use File::Spec;
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 my $CREATED = '2018-10-08';
 
 sub new {
@@ -188,7 +188,7 @@ sub set_readall {
     }
     scalar @records or return;
     my @all_records = ref( $records[0] ) eq 'ARRAY' ? ( map { $_->[0] } @records ) : @records;
-    @all_records = grep { defined $_ && /^\d+$/ && $_ > 0 } @all_records;
+    @all_records = grep { defined $_ && $_ > 0 } @all_records;
 
     my ( @active_records, @junk_records );
     my $has_junk = $table_info->{use_junk} ? 1 : 0;
@@ -199,7 +199,7 @@ sub set_readall {
             my $rdbm_recs = $adb->prefetch_junk_rdbm( $table_info, \@records );
             for my $rec (@records) {
                 my $rid = $rec->[0];
-                next unless defined $rid && $rid =~ /^\d+$/ && $rid > 0;
+                next unless defined $rid && $rid > 0;
                 if ( $adb->junk_rules($table_info, $rec, $rdbm_recs) ) {
                     push @junk_records, $rid;
                 }
@@ -211,12 +211,12 @@ sub set_readall {
         else {
             for my $rec (@records) {
                 my $rid = $rec->[0];
-                push @active_records, $rid if defined $rid && $rid =~ /^\d+$/ && $rid > 0;
+                push @active_records, $rid if defined $rid && $rid > 0;
             }
         }
     }
     else {
-        my @clean_rids = grep { defined $_ && /^\d+$/ && $_ > 0 } @records;
+        my @clean_rids = grep { defined $_ && $_ > 0 } @records;
         if ($has_junk) {
             for my $rid (@clean_rids) {
                 my @rec = $adb->table_readid($file_path, $rid);
@@ -235,9 +235,9 @@ sub set_readall {
 
     # Deduplicate in original order
     my %seen_act;
-    @active_records = grep { defined $_ && /^\d+$/ && $_ > 0 && !$seen_act{$_}++ } @active_records;
+    @active_records = grep { defined $_ && $_ > 0 && !$seen_act{$_}++ } @active_records;
     my %seen_junk;
-    @junk_records   = grep { defined $_ && /^\d+$/ && $_ > 0 && !$seen_junk{$_}++ } @junk_records;
+    @junk_records   = grep { defined $_ && $_ > 0 && !$seen_junk{$_}++ } @junk_records;
 
 
     my $cur_max = 0;
@@ -347,7 +347,7 @@ sub set_search {
     foreach my $line (@records) {
         my @fields = @$line;
         my $rid = $fields[0];
-        next unless defined $rid && $rid =~ /^\d+$/;
+        next unless defined $rid && $rid > 0;
         my $is_junk = $has_junk ? $adb->junk_rules( $table_info, \@fields, $junk_rdbm ) : 0;
         foreach my $blk ( @{ $table_info->{search_block} } ) {
             my $b_idx = ref($blk) eq "ARRAY" ? $blk->[0] : $blk;
@@ -498,7 +498,7 @@ sub set_fields {
         }
         my @fields_arr = @$record;
         my $rid = $fields_arr[0];
-        next unless defined $rid && $rid =~ /^\d+$/;
+        next unless defined $rid && $rid > 0;
         my $is_junk = $has_junk ? $adb->junk_rules( $table_info, \@fields_arr, $rdbm_recs ) : 0;
 
         foreach my $line (@match_blks) {
@@ -514,7 +514,7 @@ sub set_fields {
                 @num_ids = grep { /^\d+$/ } split /[,;]/, $clean;
             }
             else {
-                @num_ids = $adb->set_fieldlist( $val, $table_path, $table_info, $line );
+                @num_ids = $adb->field_to_list( $val, $table_path, $table_info, $line );
             }
 
             my %seen_nid;
@@ -616,6 +616,24 @@ sub set_filters {
         @records = $adb->read_all($tableid, 0, 0, no_index => 1, dir => 'asc');
     }
     scalar @records or return;
+
+    # Columnar facet architecture with dictionary (.unq) support
+    if ( exists $table_info->{facet_block} && ref($table_info->{facet_block}) eq 'ARRAY' && @{ $table_info->{facet_block} } ) {
+        $self->{say} .= "    - Columnar facet index (.fac, .unq) olusturuluyor: \n";
+        unlink $fac_path if -e $fac_path;
+        unlink "$table_path.unq" if -e "$table_path.unq";
+
+        my $batch_size = 5000;
+        for ( my $i = 0; $i < @records; $i += $batch_size ) {
+            my $end = $i + $batch_size - 1;
+            $end = $#records if $end > $#records;
+            my @batch = @records[ $i .. $end ];
+            $adb->facet_add( $table_path, $table_info, \@batch );
+        }
+        $self->{say} .= "          * $fac_path \n";
+        $self->{say} .= "          * $table_path.unq \n" if -e "$table_path.unq";
+        return 1;
+    }
 
     unlink($tmp_path);
 
@@ -788,7 +806,7 @@ sub set_sort {
         my %uniq_vals;
         my ( %act_uniq, %junk_uniq );
         foreach my $rec (@records) {
-            next unless ref($rec) eq 'ARRAY' && defined $rec->[0] && $rec->[0] =~ /^\d+$/ && $rec->[0] > 0;
+            next unless ref($rec) eq 'ARRAY' && defined $rec->[0] && $rec->[0] > 0;
             my $rid  = $rec->[0];
             my $val  = $rec->[$blk];
             my $norm = $adb->normalize_sort_key( $val, $type, $len );
@@ -812,7 +830,7 @@ sub set_sort {
         }
 
         # Sort all keys in-memory with deterministic tie-breaker (strictly numeric IDs)
-        my @sorted_ids = grep { defined $_ && /^\d+$/ && $_ > 0 } sort {
+        my @sorted_ids = grep { defined $_ && $_ > 0 } sort {
             ( ( $map{$a} // '' ) cmp ( $map{$b} // '' ) )
               || ( $a <=> $b )
         } keys %map;
@@ -840,14 +858,14 @@ sub set_sort {
         $raw_batch{"$blk:vals"} = $sort_vals->(\%uniq_vals) if %uniq_vals;
 
         if ($has_junk) {
-            my @sorted_act = grep { defined $_ && /^\d+$/ && $_ > 0 } sort {
+            my @sorted_act = grep { defined $_ && $_ > 0 } sort {
                 ( ( $act_map{$a} // '' ) cmp ( $act_map{$b} // '' ) )
                   || ( $a <=> $b )
             } keys %act_map;
             $keys_batch{"A:$blk:keys"} = \@sorted_act;
             $raw_batch{"A:$blk:vals"} = $sort_vals->(\%act_uniq) if %act_uniq;
 
-            my @sorted_junk = grep { defined $_ && /^\d+$/ && $_ > 0 } sort {
+            my @sorted_junk = grep { defined $_ && $_ > 0 } sort {
                 ( ( $junk_map{$a} // '' ) cmp ( $junk_map{$b} // '' ) )
                   || ( $a <=> $b )
             } keys %junk_map;

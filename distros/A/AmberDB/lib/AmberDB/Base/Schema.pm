@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use File::Spec;
 use parent 'AmberDB::Base';
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 
 my $CREATED = '2026-09-06';
 
@@ -494,6 +494,41 @@ sub normalize_blocks {
     }
 
     # ------------------------------------------------------------------------
+    # Pipeline Step 4b: Precompute _has_schema and _block_keys for high-performance lookup
+    # ------------------------------------------------------------------------
+    if ( exists $schema->{blocks} && ref( $schema->{blocks} ) eq 'ARRAY' && @{ $schema->{blocks} } ) {
+        $schema->{_has_schema} = 1;
+        my %b_keys;
+        for my $idx ( 0 .. $#{ $schema->{blocks} } ) {
+            my $b = $schema->{blocks}->[$idx];
+            $b_keys{$idx} = 1;
+            if ( ref($b) eq 'HASH' ) {
+                my $name = $b->{name};
+                my $id   = $b->{id};
+                $b_keys{ lc($name) } = 1 if defined $name;
+                $b_keys{ lc($id) }   = 1 if defined $id;
+
+                # Plural and singular aliases for repeating blocks
+                if ( defined $name ) {
+                    $b_keys{ lc("${name}s") } = 1;
+                    $b_keys{ lc($1) } = 1 if $name =~ /^(.+)s$/i;
+                }
+                if ( defined $id && ( !defined $name || $id ne $name ) ) {
+                    $b_keys{ lc("${id}s") } = 1;
+                    $b_keys{ lc($1) } = 1 if $id =~ /^(.+)s$/i;
+                }
+            }
+        }
+        $b_keys{repeat}  = 1 if $schema->{repeat_start};
+        $b_keys{repeats} = 1 if $schema->{repeat_start};
+        $schema->{_block_keys} = \%b_keys;
+    }
+    else {
+        $schema->{_has_schema} = 0;
+        $schema->{_block_keys} = {};
+    }
+
+    # ------------------------------------------------------------------------
     # Pipeline Step 5: (Future Schema Rules / Extensions)
     # Alanları ve sınırları belirlenmiş yeni şema kuralları buraya eklenebilir.
     # ------------------------------------------------------------------------
@@ -614,6 +649,54 @@ sub table_info {
     }
 
     return {};
+}
+
+# Checks if a table has defined schema blocks (.table file with blocks).
+# Pure O(1) in-memory cache lookup.
+# ------------------------------------------------
+sub has_schema {
+    my ( $self, $tableid ) = @_;
+    return 0 unless defined $tableid && length $tableid;
+
+    $self->table_info($tableid);
+    my $tbl_cache = $self->{_table}->{$tableid};
+
+    return ( $tbl_cache && $tbl_cache->{_has_schema} ) ? 1 : 0;
+}
+
+# Checks if a given hash structure matches the schema defined in table_info.
+# Returns 1 if table has a schema AND hash contains valid schema block keys.
+# Returns 0 immediately if table has no schema OR if ANY key does not belong to schema.
+# Short-circuits on the very first unmatched key with zero allocation.
+# ------------------------------------------------
+sub schema_matches_hash {
+    my ( $self, $tableid, $hash ) = @_;
+
+    return 0 unless defined $tableid && length $tableid;
+    return 0 unless ref($hash) eq 'HASH' && %$hash;
+
+    my $tbl_cache = $self->{_table}->{$tableid};
+    if ( !$tbl_cache || !exists $tbl_cache->{_has_schema} ) {
+        $self->table_info($tableid);
+        $tbl_cache = $self->{_table}->{$tableid};
+    }
+
+    # Fast short-circuit: table without schema cannot match
+    return 0 unless $tbl_cache && $tbl_cache->{_has_schema};
+
+    my $known_keys = $tbl_cache->{_block_keys};
+    return 0 unless $known_keys && %$known_keys;
+
+    # Immediate rejection loop: If ANY key does NOT belong to the schema, exit immediately!
+    my $has_field = 0;
+    for my $k ( keys %$hash ) {
+        my $lc_k = lc($k);
+        next if $lc_k eq 'id' || $lc_k eq '0';
+        return 0 unless $known_keys->{$lc_k};
+        $has_field = 1;
+    }
+
+    return $has_field || exists $hash->{id} || exists $hash->{ID} || exists $hash->{0} ? 1 : 0;
 }
 
 # my $table_path = $adb->table_path($table);
@@ -896,7 +979,7 @@ sub table_infset {
         $table_str .= "\tblocks => [\n";
         my %seen;
         foreach my $blok ( @{ $tbl->{blocks} } ) {
-            next unless $blok->{id} && $blok->{name};
+            next unless ( defined $blok->{id} && length $blok->{id} ) && ( defined $blok->{name} && length $blok->{name} );
             next if $seen{ $blok->{id} }++;
             $table_str .= "\t\t{ id => \"$blok->{id}\",";
             $table_str .= " name => \"$blok->{name}\",";

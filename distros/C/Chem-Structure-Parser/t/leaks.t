@@ -270,6 +270,9 @@ no_leaks_ok { structure_features(structure_info("$data/empty.pdb")) }
 		'nor computing it on its own';
 	no_leaks_ok { structure_interface($info, interface_distance => 4.0, temperature => 37) }
 		'nor with the cutoffs changed';
+	no_leaks_ok { structure_interface($info, pocket_distance => 0.5) }
+		'nor with a pocket that has nothing in it';
+	no_leaks_ok { structure_interface($info, pocket => 0) } 'nor with no pocket';
 	no_leaks_ok { eval { structure_interface($info, partners => [ ['A'], ['Q'] ]) } }
 		'nor a partner that is not there';
 	no_leaks_ok { eval { structure_interface($info, partners => [ ['A'], ['A'] ]) } }

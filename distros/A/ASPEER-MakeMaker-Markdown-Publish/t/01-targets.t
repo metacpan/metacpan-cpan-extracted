@@ -212,5 +212,25 @@ blurp('Makefile.PL', $invalid);
 isnt(system($^X, '-MASPEER::MakeMaker::Markdown::Publish', 'Makefile.PL'), 0,
     'invalid x_documentation metadata rejected');
 
+
+#  Publication targets work when MakeMaker metadata supplies no settings
+#
+blurp('Makefile.PL', <<'MAKEFILE_PL');
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+WriteMakefile(
+    NAME         => 'Sample',
+    VERSION_FROM => 'lib/Sample.pm',
+);
+MAKEFILE_PL
+is(system($^X, '-MASPEER::MakeMaker::Markdown::Publish', 'Makefile.PL'), 0,
+    'Makefile.PL accepts omitted publication metadata');
+is(system($make, 'publish_cloudflare'), 0,
+    'Cloudflare target delegates without publication metadata');
+@target=map {decode_json($_)} grep {length($_)} split(/\n/, slurp('target.log'));
+is_deeply($target[-1]{'config'}, {name => 'Sample'},
+    'Cloudflare target passes only the default distribution name');
+
 chdir($cwd) || die "unable to restore cwd $cwd: $!";
 done_testing();

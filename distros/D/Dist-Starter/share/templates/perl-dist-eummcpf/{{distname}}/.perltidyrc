@@ -4,6 +4,7 @@
 # such as parentheses, contain the quantities within.
 --paren-tightness 0
 --square-bracket-tightness 0
+--blank-lines-before-subs 0
 --brace-tightness 0
 --variable-maximum-line-length
 --maximum-line-length 120
@@ -15,4 +16,4 @@
 # No semicolon after return values
 --noadd-semicolons
 --noblanks-before-comments
---blank-lines-before-subs 0
+--nooutdent-labels

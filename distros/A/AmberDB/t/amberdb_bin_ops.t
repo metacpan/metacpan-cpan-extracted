@@ -12,7 +12,7 @@ subtest "1. bin_count" => sub {
     is( $adb->bin_count(""), 0, "empty buffer count is 0" );
     is( $adb->bin_count("1234567"), 0, "buffer < 8 bytes count is 0" );
 
-    my $buf = pack("(Q>)*", 1, 2, 3, 4, 5);
+    my $buf = $adb->bin_encode([1, 2, 3, 4, 5]);
     is( $adb->bin_count($buf), 5, "5 packed IDs count is 5" );
 };
 
@@ -42,7 +42,7 @@ subtest "2. bin_add" => sub {
 };
 
 subtest "3. bin_punch" => sub {
-    my $buf = pack("(Q>)*", 10, 20, 30, 40, 50);
+    my $buf = $adb->bin_encode([10, 20, 30, 40, 50]);
 
     # Delete single middle ID (bsearch path)
     $buf = $adb->bin_punch($buf, 30);
@@ -65,28 +65,28 @@ subtest "3. bin_punch" => sub {
     is( $buf, '', "Buffer is empty string" );
 
     # Test unsorted buffer deletion (fallback path)
-    my $unsorted = pack("(Q>)*", 50, 10, 40, 20, 30);
+    my $unsorted = $adb->bin_encode([50, 10, 40, 20, 30]);
     $unsorted = $adb->bin_punch($unsorted, [10, 30]);
-    @ids = unpack("(Q>)*", $unsorted);
-    is_deeply( \@ids, [50, 40, 20], "Unsorted buffer correctly punched to [50, 40, 20]" );
+    ( undef, @ids ) = $adb->bin_decode($unsorted, 0, 0, 'desc');
+    is_deeply( [ sort { $b <=> $a } @ids ], [50, 40, 20], "Unsorted buffer correctly punched to [50, 40, 20]" );
 };
 
 subtest "4. bin_find" => sub {
-    my $sorted = pack("(Q>)*", 5, 10, 15, 20, 25);
+    my $sorted = $adb->bin_encode([5, 10, 15, 20, 25]);
     ok( $adb->bin_find($sorted, 5), "Found 5 (head)" );
     ok( $adb->bin_find($sorted, 15), "Found 15 (mid)" );
     ok( $adb->bin_find($sorted, 25), "Found 25 (tail)" );
     ok( !$adb->bin_find($sorted, 12), "Not found 12" );
     ok( !$adb->bin_find($sorted, 99), "Not found 99" );
 
-    my $unsorted = pack("(Q>)*", 25, 5, 20, 10, 15);
+    my $unsorted = $adb->bin_encode([25, 5, 20, 10, 15]);
     ok( $adb->bin_find($unsorted, 5), "Found 5 in unsorted" );
     ok( $adb->bin_find($unsorted, 25), "Found 25 in unsorted" );
     ok( !$adb->bin_find($unsorted, 100), "Not found 100 in unsorted" );
 };
 
 subtest "5. bin_sort" => sub {
-    my $buf = pack("(Q>)*", 500, 2, 1000000, 45, 1);
+    my $buf = $adb->bin_encode([500, 2, 1000000, 45, 1]);
     my $sorted = $adb->bin_sort($buf);
     my ( undef, @ids ) = $adb->bin_decode($sorted, 0, 0, 'asc');
     is_deeply( \@ids, [1, 2, 45, 500, 1000000], "Binary sort correctly sorted 64-bit Big-Endian integers" );

@@ -112,7 +112,7 @@ sub next_seq {
         $obj->{_input_format} = 'fasta';
         return $obj;
     }
-    return undef;
+    return;
 
 }
 

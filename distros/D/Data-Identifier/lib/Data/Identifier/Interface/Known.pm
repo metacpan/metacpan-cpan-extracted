@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use Data::Identifier;
 
-our $VERSION = v0.36;
+our $VERSION = v0.37;
 
 my @_subobjects = qw(db extractor store fii);
 
@@ -76,6 +76,8 @@ sub _known_provider {
     croak 'Unsupported class';
 }
 
+
+
 1;
 
 __END__
@@ -90,7 +92,7 @@ Data::Identifier::Interface::Known - format independent identifier object
 
 =head1 VERSION
 
-version v0.36
+version v0.37
 
 =head1 SYNOPSIS
 
@@ -241,6 +243,22 @@ A non-identifier value is defined as any value that cannot be passed
 to L<Data::Identifier/new> via C<from>.
 
 =back
+
+=head2 classes_of
+
+    ... = Some::Package->classes_of(...);
+
+(experimental since v0.37)
+
+This method is reserved for future use.
+
+=head2 _classes_of_provider
+
+    ... = Some::Package->_classes_of_provider(...);
+
+(experimental since v0.37)
+
+This method is reserved for future use.
 
 =head1 AUTHOR
 

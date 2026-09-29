@@ -34,7 +34,7 @@ subtest '1. Journal encode & decode' => sub {
     is( $dec1->{payload}, "Sample data|123", 'Payload restored from Base64' );
 
     # Test 2: Index with fixed byte offset (pos = 8000000)
-    my $packed_id = pack( "Q>", 1000001 );
+    my $packed_id = $adb->bin_encode([1000001]);
     my $line2 = $adb->journal_encode( 'index', 'catalog_product', '/db/product.inx', 'keys', 'append', 8000000, $packed_id, 1741512305 );
     my $dec2 = $adb->journal_decode($line2);
     is( $dec2->{pos}, 8000000, 'Fixed pos 8000000 decoded as number' );

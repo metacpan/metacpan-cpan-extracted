@@ -9,7 +9,7 @@ use Fcntl qw(:DEFAULT :flock);
 use Digest::SHA qw(sha256_hex);
 use parent qw(AmberDB::Locale AmberDB::Array);
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 my $CREATED = '2014-12-20';
 
 # ------------------------------------------------
@@ -310,7 +310,7 @@ sub set_datadir {
 
 
 
-    unless ( $self->config('test') || $^C ) {
+    unless ( $self->config('test') || $self->config('no_mkdir') || $^C ) {
         if ( defined $dbase_dir && $dbase_dir ne "." && $dbase_dir ne "" ) {
             for my $dir (
                 $self->{_path}->{dbase_dir},
@@ -329,7 +329,7 @@ sub set_datadir {
         }
     }
 
-    $self->ramdisk_setup() unless $^C;
+    $self->ramdisk_setup() unless $^C || $self->config('no_mkdir');
     return 1;
 }
 

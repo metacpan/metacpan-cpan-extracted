@@ -2,6 +2,7 @@ bin/amberdb
 bin/amberdb.bat
 bin/amberdb_cli.pl
 bin/amberdb_daemon.pl
+bin/build_exe.bat
 bin/commands.md
 bin/push_wiki.pl
 bin/setup_windows.bat

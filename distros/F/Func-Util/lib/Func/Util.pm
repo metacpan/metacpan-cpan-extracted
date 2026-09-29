@@ -2,7 +2,7 @@ package Func::Util;
 
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '1.00';
 
 use DynaLoader;
 our @ISA = ('DynaLoader');

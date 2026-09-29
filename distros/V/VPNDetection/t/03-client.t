@@ -191,6 +191,35 @@ subtest 'a client-wide timeout is refused where it cannot work' => sub {
     is($unbounded && $unbounded->lookup('9.9.9.9')->ip, '9.9.9.9', 'and that client answers');
 };
 
+subtest 'a timeout written as a string zero is no bound, as 0 is' => sub {
+    # Mojo arms a bound only when it is true, and each of these strings is true:
+    # handed over as written, each was a timer that fired at once, and every call
+    # failed as a network error.
+    my $origin = VPNDetectionTest::Origin->new(sub {
+        my ($c) = @_;
+        my $path = $c->req->url->path->to_string;
+        return $c->render(json => { databases => [] }) if $path eq '/api/v1/database/list';
+        return $c->render(json => { issuer => 'i', authorization_endpoint => 'a', token_endpoint => 't' })
+            if $path eq '/.well-known/oauth-authorization-server';
+        $c->render(json => { ip => '9.9.9.9', is_vpn => \0 });
+    });
+    for my $zero ('0.0', '00', '0e0', '0 but true') {
+        my $client = VPNDetection->new(
+            base_url => $origin->url, api_key => 'k', cache_size => 0, retries => 0, timeout => $zero,
+        );
+        is_deeply(eval { $client->database->list }, [], "a client built with '$zero' answers list");
+        is(eval { $client->lookup('9.9.9.9') } && $client->lookup('9.9.9.9')->ip, '9.9.9.9',
+            "and lookup");
+
+        my $keyless = VPNDetection->new(base_url => $origin->url, cache_size => 0, retries => 0);
+        is_deeply(eval { $keyless->database->list(timeout => $zero) }, [], "list(timeout => '$zero') answers");
+        is(eval { $keyless->oauth->metadata(timeout => $zero)->{issuer} }, 'i',
+            "oauth->metadata(timeout => '$zero') answers");
+        is(eval { $keyless->lookup('9.9.9.9', timeout => $zero)->ip }, '9.9.9.9',
+            "lookup(timeout => '$zero') answers");
+    }
+};
+
 subtest 'retries are configurable per call' => sub {
     my $origin = VPNDetectionTest::Origin->new(sub {
         shift->render(json => { error => 'lookup failed' }, status => 500);

@@ -37,11 +37,14 @@ sub norm_path {
 
 # ---------------------------------------------------------------------------
 subtest '1. Help screen & default table overview' => sub {
-    plan tests => 3;
+    plan tests => 4;
 
-    my $out_help = `"$perl_bin" -Ilib "$cli_path" help`;
+    my $out_help = `"$perl_bin" -Ilib "$cli_path" usage`;
     like($out_help, qr/AmberDB CLI/, "Help screen shows CLI title");
-    like($out_help, qr/Kullanım:/, "Help screen shows usage section");
+    like($out_help, qr/Usage:/, "Usage screen shows English usage section");
+
+    my $out_tr = `"$perl_bin" -Ilib "$cli_path" usage.tr`;
+    like($out_tr, qr/Kullanım:/, "usage.tr shows Turkish usage section");
 
     my $out_list = `"$perl_bin" -Ilib "$cli_path" path-dbase_dir="$test_dbdir" format=json`;
     my $data = eval { decode_json($out_list) };
@@ -327,7 +330,7 @@ subtest '10. Execution elapsed time parameter (time, time=1, --time)' => sub {
 
 # ---------------------------------------------------------------------------
 subtest '11. Positional connect database name and rejection of dbstore/paths' => sub {
-    plan tests => 6;
+    plan tests => 13;
 
     # 1. Positional connect with database name
     my $c_data = -f "$test_dbdir/config/connect.pl" ? do "$test_dbdir/config/connect.pl" : {};
@@ -350,6 +353,97 @@ subtest '11. Positional connect database name and rejection of dbstore/paths' =>
     # 3. Rejection of directory path as database argument
     my $out_path = `"$perl_bin" -Ilib "$cli_path" connect "$test_dbdir" 2>&1`;
     like($out_path, qr/\[AMBERDB_ERROR\].*not a valid database name/i, "Connect with directory path rejected");
+
+    # 4. Explicit Windows drive path rejection
+    my $out_win_path = `"$perl_bin" -Ilib "$cli_path" connect "C:\\fake\\dbstore" 2>&1`;
+    like($out_win_path, qr/\[AMBERDB_ERROR\].*not a valid database name/i, "Connect with Windows drive path rejected");
+
+    my $out_win_fwd = `"$perl_bin" -Ilib "$cli_path" connect "C:/fake/dbstore" 2>&1`;
+    like($out_win_fwd, qr/\[AMBERDB_ERROR\].*not a valid database name/i, "Connect with Windows forward-slash drive path rejected");
+
+    # 5. Connect with <dbname>@<path> syntax
+    my $out_at = `"$perl_bin" -Ilib "$cli_path" connect "$expected_db\@$test_dbdir" format=json`;
+    my $conn_at = eval { decode_json($out_at) };
+    is($conn_at->{status}, 'connected', "Connect with <dbname>\@<path> succeeded");
+    my $tok_at = $conn_at->{token};
+    ok(defined $tok_at && $tok_at =~ /^\d{4}$/, "Connect \@ token generated: $tok_at");
+    is($conn_at->{database}, $expected_db, "Connect \@ database matches '$expected_db'");
+
+    my $disc_at = `"$perl_bin" -Ilib "$cli_path" token=$tok_at disconnect format=json`;
+    my $dd_at = eval { decode_json($disc_at) };
+    is($dd_at->{status}, 'disconnected', "Connect \@ disconnected cleanly");
+
+    # 6. Rejection of legacy colon format (no backward compatibility)
+    my $out_colon = `"$perl_bin" -Ilib "$cli_path" connect "$expected_db:$test_dbdir" 2>&1`;
+    like($out_colon, qr/\[AMBERDB_ERROR\].*not a valid database name/i, "Connect with legacy colon syntax rejected");
+};
+
+# ---------------------------------------------------------------------------
+subtest '12. Auto-provisioning ~/.amberdb workspace on first run' => sub {
+    plan tests => 2;
+
+    my $fresh_home = tempdir(CLEANUP => 1);
+    $fresh_home =~ s{\\}{/}g;
+    ok( !-d "$fresh_home/.amberdb", "Before run: fresh ~/.amberdb does not exist" );
+
+    my $prev_up = $ENV{USERPROFILE};
+    my $prev_h  = $ENV{HOME};
+    $ENV{USERPROFILE} = $fresh_home;
+    $ENV{HOME}        = $fresh_home;
+
+    my $out = `"$perl_bin" -Ilib "$cli_path" help`;
+
+    ok( -d "$fresh_home/.amberdb/session" && -d "$fresh_home/.amberdb/config", "After run: ~/.amberdb and subdirs auto-created in background" );
+
+    if ( defined $prev_up ) { $ENV{USERPROFILE} = $prev_up; } else { delete $ENV{USERPROFILE}; }
+    if ( defined $prev_h )  { $ENV{HOME} = $prev_h; }        else { delete $ENV{HOME}; }
+};
+
+# ---------------------------------------------------------------------------
+subtest '13. Default table view rendering vs explicit format' => sub {
+    plan tests => 11;
+
+    my $out_conn = `"$perl_bin" -Ilib "$cli_path" connect path-dbase_dir="$test_dbdir" format=json`;
+    my $token = decode_json($out_conn)->{token};
+
+    # Insert a document-store record
+    `"$perl_bin" -Ilib "$cli_path" $token insert tbl_table_view 1 data='{"name":"Ahmet","role":"admin"}'`;
+
+    # Read without format: should render box table with 0, 1 index headers by default
+    my $out_tbl = `"$perl_bin" -Ilib "$cli_path" $token read tbl_table_view 1`;
+    like( $out_tbl, qr/\+----+/, "Default output has box table border" );
+    like( $out_tbl, qr/\|\s*0\s*\|\s*1\s*\|/, "Default output contains index headers 0 and 1" );
+    like( $out_tbl, qr/Ahmet/, "Default output contains data payload" );
+
+    # Read with explicit dumper format: should render Data::Dumper
+    my $out_dump = `"$perl_bin" -Ilib "$cli_path" $token read tbl_table_view 1 dumper`;
+    like( $out_dump, qr/\$VAR1\s*=/, "Explicit dumper format produces Data::Dumper output" );
+
+    # Read with explicit tsv format: should render tab-separated fields on a single line
+    my $out_tsv = `"$perl_bin" -Ilib "$cli_path" $token read tbl_table_view 1 tsv`;
+    chomp $out_tsv;
+    like( $out_tsv, qr/^1\t\{.*"?name"?\s*:\s*"?Ahmet"?.*\}$/, "Explicit tsv format produces tab-separated line without newline splitting" );
+
+    # Insert second record with nested data hash and auto-id 0: data='{"data":{"name":"Maruf","age":"50"}}'
+    `"$perl_bin" -Ilib "$cli_path" $token insert tbl_table_view 0 data='{"data":{"name":"Maruf","age":"50"}}'`;
+
+    # Read all with default table view
+    my $out_all = `"$perl_bin" -Ilib "$cli_path" $token read tbl_table_view all`;
+    like( $out_all, qr/\[Found 2 record\(s\)\]/, "read all outputs record count header" );
+    like( $out_all, qr/Maruf/, "nested hash payload preserved in table view" );
+
+    # Delete record 2
+    my $del_out = `"$perl_bin" -Ilib "$cli_path" $token delete tbl_table_view 2 json`;
+    my $del_json = eval { decode_json($del_out) };
+    is( $del_json->{status}, 'ok', "delete single record returns status ok" );
+    is( $del_json->{result}, 1, "delete single record returns result 1" );
+
+    # Read all after delete
+    my $out_after = `"$perl_bin" -Ilib "$cli_path" $token read tbl_table_view all`;
+    like( $out_after, qr/\[Found 1 record\(s\)\]/, "read all reflects deleted record" );
+    unlike( $out_after, qr/Maruf/, "deleted record no longer present" );
+
+    `"$perl_bin" -Ilib "$cli_path" $token disconnect`;
 };
 
 done_testing();

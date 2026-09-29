@@ -370,6 +370,7 @@ my @files = (
     't/scope_problems/views/500.tt',
     't/scope_problems/with_return_dies.t',
     't/serializer.t',
+    't/serializer_helpers.t',
     't/serializer_json.t',
     't/serializer_mutable.t',
     't/serializer_mutable_custom.t',

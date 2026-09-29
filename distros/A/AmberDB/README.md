@@ -86,7 +86,20 @@ AmberDB classifies physical file extensions into three operational tiers:
 
 ## Installation
 
-### Via CPAN (Recommended)
+### Standalone Windows Executable (`amberdb.exe`)
+
+For Windows users who do not have Perl installed, a self-contained portable executable is available:
+
+1. Download the latest **`amberdb-win64.zip`** from [GitHub Releases](https://github.com/marufcetin/amberdb/releases).
+2. Extract to a directory of your choice (e.g. `C:\amberdb`).
+3. Add `C:\amberdb` to your `PATH` via PowerShell:
+   ```powershell
+   [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\amberdb", "User")
+   ```
+   *(Or via Windows GUI: Environment Variables → Edit User `Path` → New → `C:\amberdb`)*
+4. Run `amberdb` from any terminal prompt!
+
+### Via CPAN (Recommended for Perl Environments)
 
 AmberDB can be installed directly from CPAN across Linux, macOS, and Windows (Strawberry Perl / MSYS2 / MSYS64):
 
@@ -285,33 +298,49 @@ $adb->delete_list("catalog_product", 101, 102, 103);
 
 ---
 
-## CLI Utilities
+## CLI Utilities & Standalone Tools
 
-AmberDB ships with two consolidated, production-ready command-line tools in `bin/`:
+### Standalone Windows CLI (`amberdb.exe`)
+For Windows environments without Perl, download the self-contained `amberdb-win64.zip` from [GitHub Releases](https://github.com/marufcetin/amberdb/releases). It runs natively with **zero dependencies** (no Perl installation required):
 
-### 1. `bin/amberdb_setup.pl` (Setup, Infrastructure & Maintenance)
-Unified administrative entry point for setup, RAM-disk management, table upgrades, backups, and re-indexing:
+```powershell
+# Extract to C:\amberdb and add to User PATH (one-line PowerShell command):
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\amberdb", "User")
+```
+
+After restarting your terminal, use `amberdb` from any folder:
+```cmd
+amberdb setup
+amberdb tables
+amberdb read catalog_product 10
+amberdb search catalog_product "laptop"
+amberdb dump backup/catalog.amberdb
+```
+
+---
+
+### 1. Unified Management CLI (`amberdb` / `amberdb.exe`)
+The consolidated administrative CLI for infrastructure provisioning, database setup, RAM-disk orchestration, backups, and maintenance:
 ```bash
-# Display comprehensive usage and available actions
-perl bin/amberdb_setup.pl
-
-# Full infrastructure installation & permission setup
-sudo perl bin/amberdb_setup.pl --action=install --user=eticaretim --size=256M --cron
+# Infrastructure setup (creates physical directories and baseline config)
+amberdb setup
+amberdb setup /path/to/dbstore
 
 # RAM-disk management (Linux tmpfs, macOS APFS, Windows ImDisk)
-perl bin/amberdb_setup.pl --action=ramdisk --start --size=512M
-perl bin/amberdb_setup.pl --action=ramdisk --status
-perl bin/amberdb_setup.pl --action=ramdisk --stop
+amberdb setup ramdisk start 512M
+amberdb setup ramdisk status
+amberdb setup ramdisk stop
 
 # Native backup (.amberdb dump and restore)
-perl bin/amberdb_setup.pl --action=backup --dump --file=backup/catalog.amberdb
-perl bin/amberdb_setup.pl --action=backup --restore --file=backup/catalog.amberdb --force
+amberdb dump catalog file=backup/catalog.amberdb
+amberdb restore file=backup/catalog.amberdb
 
-# Table migration (upgrade legacy tables to current ABR v1 binary format)
-perl bin/amberdb_setup.pl --action=update --all
+# Storage layout & engine migrations
+amberdb update storage --all
+amberdb update version --check
 
 # Re-index secondary binary indexes (.inx, .fld, .src, .slg)
-perl bin/amberdb_setup.pl --action=reindex
+amberdb reindex catalog
 ```
 
 ### 2. `bin/amberdb_daemon.pl` (Service Supervisor & Sync Daemon)
@@ -360,14 +389,16 @@ Supported Languages: **Global Base (`gb`)**, **English (`en`)**, **Turkish (`tr`
 
 ## Documentation
 
-Full comprehensive guides are available in the [`docs/`](docs/) directory:
+Full comprehensive guides are available in the [`docs/`](docs/) and [`wiki/`](wiki/) directories:
 
 - **English Documentation**:
+  - [Command-Line Interface (CLI) User Guide](wiki/Guide-CLI.md)
   - [AmberDB Database System & Architecture Guide](docs/EN.AmberDB_User-Guide.md)
   - [AmberDB::Locale User Guide](docs/EN.AmberDB-Locale_User-Guide.md)
   - [AmberDB vs SQL Comparison Guide](docs/EN.AmberDB-vs-SQL_User-Guide.md)
   - [AmberDB vs SQLite Benchmark Report (600K Movies)](docs/EN.AmberDB-vs-SQLite_Benchmark.md)
 - **Türkçe Dokümantasyon**:
+  - [Komut Satırı Arayüzü (CLI) Kullanım Rehberi](wiki/TR-Guide-CLI.md)
   - [AmberDB Veritabanı Sistemi & Mimari Rehberi](docs/TR.AmberDB_Veritabani_Sistemi.md)
   - [AmberDB::Locale Kullanım Rehberi](docs/TR.AmberDB-Locale_Kullanim_Rehberi.md)
   - [AmberDB vs SQL Karşılaştırmalı Kullanım Rehberi](docs/TR.AmberDB-vs-SQL_Kullanim_Rehberi.md)

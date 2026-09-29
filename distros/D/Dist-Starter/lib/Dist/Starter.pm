@@ -7,7 +7,7 @@ use feature qw( say );
 #<<<
 package Dist::Starter;
 BEGIN {
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.3.0';
 }
 #>>>
 

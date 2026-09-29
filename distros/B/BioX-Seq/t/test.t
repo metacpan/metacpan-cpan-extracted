@@ -45,6 +45,7 @@ my @tmp_files = (
     $test_fai_expl,
     "$test_duplicates.fai",
     "$test2_fa.fai",
+    "$test_gz_gt.fai",
 );
 
 

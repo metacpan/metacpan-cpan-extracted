@@ -32,7 +32,7 @@ use JSON::PP qw(encode_json);
 #  Inheritance and version information
 #
 @ISA=qw(Markdown::Publish);
-$VERSION='1.003';
+$VERSION='1.004';
 
 
 #  Done

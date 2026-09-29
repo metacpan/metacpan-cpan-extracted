@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.4.0';
+our $VERSION = '3.4.1';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -60,7 +60,9 @@ sub new {
         base_url => _base_url($args{base_url}),
         concurrency => $concurrency,
         retries => $retries,
-        timeout => $timeout,
+        # Numified: Mojo arms a bound only when it is true, and '0.0', '00', '0e0'
+        # and '0 but true' are true strings, each a timer that fires at once.
+        timeout => 0 + $timeout,
         cache => $cache_size > 0 ? VPNDetection::Cache->new(
             max => $cache_size,
             ttl => defined $args{cache_ttl} ? $args{cache_ttl} : 3600,
@@ -101,6 +103,8 @@ sub lookup_p {
     my ($self, $ip, %options) = @_;
     Carp::croak('lookup: expected an IP address') if !defined $ip || !length $ip;
     $self->_check_options('lookup', \%options, 'retries', 'timeout');
+    # Judged, cached and sent as the IPv4 address it carries, if it is mapped.
+    $ip = VPNDetection::Bogon::unmapped($ip);
 
     return Mojo::Promise->resolve(VPNDetection::Bogon::bogon_result($ip))
         if VPNDetection::Bogon::is_bogon($ip);
@@ -218,8 +222,11 @@ sub lookup_batch_p {
     # `limit` chunks in flight. Keyed by address rather than positional, so
     # duplicates in the input collapse to a single entry and the caller never has
     # to line two lists up.
+    # An IPv4-mapped address is sent as the address it carries, once however
+    # many of its spellings were asked, and answered under each one asked.
+    my @asked = grep { defined && length } @$ips;
     my %seen;
-    my @unique = grep { defined && length && !$seen{$_}++ } @$ips;
+    my @unique = grep { !$seen{$_}++ } map { VPNDetection::Bogon::unmapped($_) } @asked;
     my %answers;
     my @pending;
     my %joined;
@@ -253,8 +260,7 @@ sub lookup_batch_p {
         boarded => \%boarded,
     };
     $self->_dispatch($batch);
-    return $batch->{promise} unless %joined;
-    return Mojo::Promise->all(
+    my $done = %joined ? Mojo::Promise->all(
         $batch->{promise},
         map {
             my $ip = $_;
@@ -263,7 +269,10 @@ sub lookup_batch_p {
                 sub { $answers{$ip} = VPNDetection::Error->wrap(shift) },
             );
         } sort keys %joined,
-    )->then(sub { \%answers });
+    ) : $batch->{promise};
+    return $done->then(sub {
+        return { map { ($_ => $answers{ VPNDetection::Bogon::unmapped($_) }) } @asked };
+    });
 }
 
 # The licensed dataset downloads. Built per call rather than held, so the client
@@ -487,7 +496,7 @@ sub _start_p {
     my ($self, $tx, $timeout) = @_;
     my $ua = $self->{ua};
     my $bound = $ua->request_timeout;
-    $ua->request_timeout(defined $timeout ? $timeout : $self->{timeout});
+    $ua->request_timeout(defined $timeout ? 0 + $timeout : $self->{timeout});
     my $promise = eval { $ua->start_p($tx) };
     my $failed = $@;
     $ua->request_timeout($bound);

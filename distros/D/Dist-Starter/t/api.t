@@ -60,8 +60,8 @@ SKIP: {
   skip "'diff' is not installed!", 1 unless defined which( 'diff' );
 
   my $stdout;
-  program_runs [ 'diff', '-rq', $got_project, catdir( qw( t data expected basic Foo-Bar-Baz ) ) ], { stdout => \$stdout },
-    'Deep comparison of expanded template'
+  program_runs [ 'diff', '-rqw', $got_project, catdir( qw( t data expected basic Foo-Bar-Baz ) ) ],
+    { stdout => \$stdout }, 'Deep comparison of expanded template'
     or diag $stdout
 }
 
@@ -85,7 +85,7 @@ SKIP: {
   skip "'diff' is not installed!", 1 unless defined which( 'diff' );
 
   my $stdout;
-  program_runs [ 'diff', '-rq', $got_project, catdir( qw( t data expected share Baz-Bar-Foo ) ) ], { stdout => \$stdout },
-    'Deep comparison of expanded template'
+  program_runs [ 'diff', '-rqw', $got_project, catdir( qw( t data expected share Baz-Bar-Foo ) ) ],
+    { stdout => \$stdout }, 'Deep comparison of expanded template'
     or diag $stdout
 }

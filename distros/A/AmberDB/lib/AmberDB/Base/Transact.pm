@@ -7,7 +7,7 @@ use Fcntl qw(:flock);
 use IO::Handle;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
-our $VERSION = '5.26.0';
+our $VERSION = '5.26.2';
 
 my $CREATED = '2026-08-11';
 
@@ -115,6 +115,7 @@ sub transact_start {
         $self->transact_error( $txn_file, "Cannot open journal: $txn_file ($!)" );
         return;
     };
+    binmode $fh;
 
     # Lock journal file non-blocking to establish active process ownership
     unless ( flock( $fh, LOCK_EX | LOCK_NB ) ) {
@@ -280,6 +281,7 @@ sub _txn_log {
 
     return unless $self->{_txn} && $self->{_txn}->{active};
     my $fh = $self->{_txn}->{fh} or return;
+    binmode $fh;
 
     $type      //= 'recs';
     $tableid   //= '';
@@ -329,6 +331,7 @@ sub _txn_apply_rollback {
             cluck "[DB_TXN] Cannot read journal for rollback: $txn_source ($!)\n";
             return;
         };
+        binmode $fh;
         @lines = <$fh>;
         close $fh;
     }

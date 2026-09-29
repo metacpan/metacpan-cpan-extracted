@@ -31,34 +31,20 @@ $adb->table_attr( 'catalog_product', {
 } );
 
 # ---------------------------------------------------------------------------
-subtest '1. .unq dictionary prefix architecture (s: and n:)' => sub {
-    plan tests => 6;
+subtest '1. Direct string normalization without artificial .unq dictionary' => sub {
+    plan tests => 3;
 
     my $table_path = $adb->table_path('catalog_product');
     my $tinfo = $adb->table_info('catalog_product');
 
-    # Convert strings to IDs (write mode via set_fieldlist)
-    my @ids = $adb->set_fieldlist( 'Elektronik', $table_path, $tinfo, 1 );
-    is( scalar @ids, 1, "Generated 1 numeric ID for 'Elektronik'" );
-    my $elek_id = $ids[0];
-    ok( $elek_id =~ /^\d+$/, "ID is numeric" );
+    my @ids = $adb->field_to_list( '  Elektronik  ', $table_path, $tinfo, 1 );
+    is_deeply( \@ids, ['Elektronik'], "field_to_list returns trimmed string directly" );
 
-    # Check forward key 1:s:Elektronik
+    my @read_ids = $adb->field_to_list( 'Elektronik, Telefon', $table_path, $tinfo, 1 );
+    is_deeply( \@read_ids, ['Elektronik', 'Telefon'], "field_to_list parses comma list directly" );
+
     my $unq_file = "${table_path}.unq";
-    my ($stored_id) = $adb->index_get( $unq_file, "1:s:Elektronik", 'raw' );
-    is( $stored_id, $elek_id, "1:s:Elektronik maps to numeric ID $elek_id" );
-
-    # Check reverse key 1:n:$elek_id
-    my ($stored_name) = $adb->index_get( $unq_file, "1:n:$elek_id", 'raw' );
-    is( $stored_name, 'Elektronik', "1:n:$elek_id maps back to 'Elektronik'" );
-
-    # Test reading mode (read mode via get_fieldlist)
-    my @read_ids = $adb->get_fieldlist( 'Elektronik', $table_path, $tinfo, 1 );
-    is_deeply( \@read_ids, [$elek_id], "get_fieldlist read mode resolves 'Elektronik' to $elek_id" );
-
-    # Idempotent write: same string gets same ID
-    my @ids2 = $adb->set_fieldlist( 'Elektronik', $table_path, $tinfo, 1 );
-    is( $ids2[0], $elek_id, "Idempotent: same string reuses existing ID" );
+    ok( !-e $unq_file, "No unnecessary .unq dictionary created for standard fields" );
 };
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 package Dancer2::Core::Factory;
 # ABSTRACT: Instantiate components by type and name
-$Dancer2::Core::Factory::VERSION = '2.2.1';
+$Dancer2::Core::Factory::VERSION = '2.2.2';
 use Moo;
 use Dancer2::Core;
 use Module::Runtime 'use_module';
@@ -34,7 +34,7 @@ Dancer2::Core::Factory - Instantiate components by type and name
 
 =head1 VERSION
 
-version 2.2.1
+version 2.2.2
 
 =head1 AUTHOR
 

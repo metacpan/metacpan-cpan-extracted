@@ -32,7 +32,7 @@ use ASPEER::MakeMaker::Markdown::Publish::MM ();
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='1.003';
+$VERSION='1.004';
 $VERSION_GIT_SHA=do {local(@ARGV, $/, $_); @ARGV=($_=__FILE__.'.sha'); <> if -f $_};
 chomp($VERSION_GIT_SHA) if defined($VERSION_GIT_SHA);
 
@@ -173,12 +173,32 @@ without replacing it. It is passed unchanged to `Markdown::Publish` and
 cannot be combined with `config`. MkDocs accepts supplemental YAML; the Node
 publishers accept the extension functions documented by their engine modules.
 
-For Workers Static Assets, set `cloudflare => {config => 'wrangler.jsonc'}`
-inside `publish`. This path selects a dedicated Worker configuration with its
-name and compatibility date. Optionally set `wrangler` to the executable path
-or `environment` to an authored Wrangler environment in the same `cloudflare`
+For Workers Static Assets, place `wrangler.jsonc` or `wrangler.json` in the
+project root. `publish_cloudflare` discovers those names in that order, so no
+Cloudflare publication metadata is needed for the usual layout. Set
+`cloudflare => {config => 'deploy/wrangler.docs.jsonc'}` inside `publish` to
+select a file elsewhere. Optionally set `wrangler` to the executable path or
+`environment` to an authored Wrangler environment in the same `cloudflare`
 hash. Wrangler uses its own login or environment for authentication; do not
 put credentials in metadata. Deployment does not change Git.
+
+A minimal project-root `wrangler.jsonc` is:
+
+```jsonc
+{
+    "name": "example-documentation",
+    "compatibility_date": "2026-09-29"
+}
+```
+
+The target supplies the generated site using Wrangler's `--assets` option, so
+the file does not need an `assets.directory` setting. Choose a unique Worker
+name, authenticate Wrangler, regenerate the Makefile, and run:
+
+```sh
+perl Makefile.PL
+make publish_cloudflare
+```
 
 # ERRORS
 
@@ -317,13 +337,29 @@ without replacing it. It is passed unchanged to C<Markdown::Publish> and
 cannot be combined with C<config>. MkDocs accepts supplemental YAML; the Node
 publishers accept the extension functions documented by their engine modules.
 
-For Workers Static Assets, set C<<< cloudflare => {config => 'wrangler.jsonc'} >>>
-inside C<publish>. This path selects a dedicated Worker configuration with its
-name and compatibility date. Optionally set C<wrangler> to the executable path
-or C<environment> to an authored Wrangler environment in the same C<cloudflare>
+For Workers Static Assets, place C<wrangler.jsonc> or C<wrangler.json> in the
+project root. C<publish_cloudflare> discovers those names in that order, so no
+Cloudflare publication metadata is needed for the usual layout. Set
+C<<< cloudflare => {config => 'deploy/wrangler.docs.jsonc'} >>> inside C<publish> to
+select a file elsewhere. Optionally set C<wrangler> to the executable path or
+C<environment> to an authored Wrangler environment in the same C<cloudflare>
 hash. Wrangler uses its own login or environment for authentication; do not
 put credentials in metadata. Deployment does not change Git.
 
+A minimal project-root C<wrangler.jsonc> is:
+
+
+ {
+     "name": "example-documentation",
+     "compatibility_date": "2026-09-29"
+ }
+The target supplies the generated site using Wrangler's C<--assets> option, so
+the file does not need an C<assets.directory> setting. Choose a unique Worker
+name, authenticate Wrangler, regenerate the Makefile, and run:
+
+
+ perl Makefile.PL
+ make publish_cloudflare
 
 =head1 ERRORS
 
