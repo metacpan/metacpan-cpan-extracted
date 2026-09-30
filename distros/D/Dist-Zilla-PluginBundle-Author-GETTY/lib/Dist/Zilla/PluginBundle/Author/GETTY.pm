@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.325';
+our $VERSION = '0.326';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -90,6 +90,22 @@ has tag_format => (
   isa     => 'Str',
   lazy    => 1,
   default => sub { $_[0]->payload->{tag_format} || '%v' },
+);
+
+# Git::NextVersion version_regexp matching the tags tag_format produces: the
+# literal parts quoted, the single %v as the capture. Git::NextVersion's own
+# default ^v(.+)$ misses bare %v tags, so a dist without $VERSION in its
+# source would restart at first_version (0.001). Undef (keep that default) when
+# tag_format has any other %-code or not exactly one %v.
+has _version_regexp => (
+  is      => 'ro',
+  isa     => 'Maybe[Str]',
+  lazy    => 1,
+  default => sub {
+    my @literals = split /%v/, $_[0]->tag_format, -1;
+    return undef unless @literals == 2 && !grep { /%/ } @literals;
+    return '^'.quotemeta($literals[0]).'(\d[\d._]*)'.quotemeta($literals[1]).'$';
+  },
 );
 
 has deprecated => (
@@ -453,6 +469,11 @@ sub configure {
     scalar @{$self->gather_exclude_match} > 0 ? ( exclude_match => $self->gather_exclude_match ) : (),
   }]);
 
+  # Snapshot the agent context (.claude/.codex/CLAUDE.md/...) into the build
+  # under misc/agent-context/ for build provenance (not installed). Reads from
+  # disk, so it also captures skilletor-installed (git-ignored) skills.
+  $self->add_plugins('GatherAgentContext');
+
   my @removes = ('GatherDir','PruneCruft');
   if ($self->no_cpan || $self->no_makemaker) {
     push @removes, 'UploadToCPAN' if $self->no_cpan;
@@ -667,6 +688,9 @@ sub configure {
     $self->add_bundle('@Git::VersionManager' => {
       'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
       'Git::Tag.tag_format' => $self->tag_format,
+      # RewriteVersion::Transitional hands this on to its Git::NextVersion.
+      defined $self->_version_regexp
+        ? ( 'RewriteVersion::Transitional.version_regexp' => $self->_version_regexp ) : (),
       # The configured default bumps :InstallModules and :PerlExecFiles, but
       # @Git::VersionManager's post-release commit only allows ^lib/.*\.pm$ to be
       # dirty. Without this, bumped Perl executables under bin/ are left behind
@@ -726,7 +750,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.325
+version 0.326
 
 =head1 SYNOPSIS
 
@@ -908,6 +932,12 @@ yielding a tag like C<v0.317.0>.
 
 Note that C<%v> is still whatever C<$VERSION> is (Perl's own decimal versioning); this
 option only changes the tag's formatting, not the version scheme itself.
+
+The matching C<version_regexp> for L<Dist::Zilla::Plugin::Git::NextVersion>, which
+finds the last release tag for a dist without C<$VERSION> in its source, is derived
+from this format automatically (C<%v> gives C<^(\d[\d._]*)$>, C<v%v.0> gives
+C<^v(\d[\d._]*)\.0$>); a format with any other C<%> code keeps that plugin's own
+default C<^v(.+)$>.
 
 =head2 weaver_config
 

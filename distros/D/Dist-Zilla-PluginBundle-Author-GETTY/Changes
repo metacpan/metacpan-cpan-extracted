@@ -1,3 +1,17 @@
+0.326     2026-09-29 17:20:32Z
+
+  - Every distribution built with [@Author::GETTY] now snapshots its agent
+    context (.claude/.codex, CLAUDE.md, AGENTS.md, skilletor.lock.json, ...)
+    into the build under misc/agent-context/ (present in the tarball, not
+    installed), via Dist::Zilla::Plugin::GatherAgentContext. This records which
+    skills, agents and rules a release was built with, including
+    skilletor-installed (git-ignored) ones. New prereq:
+    Dist::Zilla::Plugin::GatherAgentContext.
+
+  - Git::NextVersion version_regexp is now derived from tag_format, so a dist
+    without $VERSION in its source finds its last release tag instead of
+    restarting at first_version.
+
 0.325     2026-09-22 06:46:49Z
 
   - Version rewriting defaults to ":InstallModules" and ":PerlExecFiles", so

@@ -6,7 +6,7 @@ use utf8;
 use Encode qw(decode encode);
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 my $CREATED  = '2017-07-22';
 
 my %LOCALE_CACHE;
@@ -223,8 +223,9 @@ sub _compile_patterns {
     # Safe-text character class (alphabet_chars extends a-zA-Z)
     my $extra = $loc->{alphabet_chars} || '';
     my $safe_extra = quotemeta($extra);
-    $self->{_safe_re}   = qr/[^a-zA-Z${safe_extra}0-9&.,_\-;:()\s]/;
-    $self->{_letter_re} = qr/[a-zA-Z${safe_extra}]/;
+    $self->{_letter_chars} = "a-zA-Z${safe_extra}";
+    $self->{_safe_re}      = qr/[^a-zA-Z${safe_extra}0-9&.,_\-;:()\s]/;
+    $self->{_letter_re}    = qr/[a-zA-Z${safe_extra}]/;
 
     my @splitters = @{ $loc->{word_splitters} || [ "'", "\x{2019}", "\x{2018}", "\x{2032}", "\x{02BC}", "-" ] };
     my $split_chars = join '', map { quotemeta($_) } @splitters;
@@ -347,50 +348,64 @@ sub search_regex {
 # phonetic assimilation, clitic/apostrophe stripping, and final-devoicing rules.
 # $mode_write = 1 | "write" -> "Türkiye'de" => "turkiye turkiyede"
 # $mode_write = 0 | "read"  -> "Türkiye'de" => "turkiye"
-# my $norm = $lang->normalize_word($word, $mode_write);
+# $no_ascii   = 1 | "no_ascii" -> Harf tablosunu korur (ASCII/fonetik dönüştürmez)
+# Sadece string girilirse varsayılan olarak okuma modunda (is_write = 0, no_ascii = 0) çalışır.
+# my $norm = $lang->normalize_word($word, $mode_write, $no_ascii);
 # -------------------------------------------------------
 sub normalize_word {
-    my ( $self, $word, $mode_write ) = @_;
+    my ( $self, $word, $mode_write, $no_ascii ) = @_;
     return '' unless defined $word && length($word);
 
+    my $is_write = ( $mode_write && $mode_write ne 'read' && $mode_write ne '0' ) ? 1 : 0;
+    $no_ascii = ( $no_ascii && $no_ascii ne 'ascii' && $no_ascii ne '0' ) ? 1 : 0;
+
     # Fast in-memory cache check
-    if ( defined $self->{_cache}{nw}{$word} ) {
-        return $self->{_cache}{nw}{$word};
+    my $cache_key = ( !$is_write && !$no_ascii ) ? $word : "$word:$is_write:$no_ascii";
+    if ( defined $self->{_cache}{nw}{$cache_key} ) {
+        return $self->{_cache}{nw}{$cache_key};
     }
 
     $word = $self->utf_decode($word);
 
-    my $is_write = ( $mode_write && ( $mode_write eq 'write' || $mode_write eq '1' ) ) ? 1 : 0;
-    my $L = $self->{_letter_re}   || qr/[a-zA-Z]/;
-    my $S = $self->{_splitter_re} || qr/['’‘′ʼ\-]/;
+    my $lc = $self->{_letter_chars} || 'a-zA-Z';
+    my $S  = $self->{_splitter_re}  || qr/['’‘′ʼ\-]/;
 
     if ($is_write) {
         # Yazma modunda: Kök ($1) ve Birleşik ($1$2) türetilir, ek ($2) tek başına alınmaz
-        $word =~ s/($L+)$S+($L+)/$1 $1$2/g;
+        $word =~ s/([$lc]+)$S+([$lc]+)/$1 $1$2/g;
     }
     else {
         # Okuma/Arama modunda: Kök ($1) yeterlidir (tek harfli ön eklerde birleşik $1$2 alınır: örn. T-Shirt -> tshirt)
-        $word =~ s/($L+)$S+($L+)/(length($1) > 1 ? $1 : "$1$2")/ge;
+        $word =~ s/([$lc]+)$S+([$lc]+)/(length($1) > 1 ? $1 : "$1$2")/ge;
     }
 
     my @parts;
     foreach my $w ( split /\s+/, $word ) {
         next unless length $w;
         $w = $self->lc($w);
-        $w = $self->to_ascii($w);
 
-        if ( my $rules = $self->{_phonetic_rules} ) {
-            foreach my $rule (@$rules) {
-                my ( $re, $sub ) = @$rule;
-                $w =~ s/$re/$sub/g;
+        if (!$no_ascii) {
+            $w = $self->to_ascii($w);
+
+            if ( my $rules = $self->{_phonetic_rules} ) {
+                foreach my $rule (@$rules) {
+                    my ( $re, $sub ) = @$rule;
+                    $w =~ s/$re/$sub/g;
+                }
             }
+            $w =~ s/^[^a-z0-9]+|[^a-z0-9]+$//g;
+            push @parts, $w if length $w;
         }
-        $w =~ s/^[^a-z0-9]+|[^a-z0-9]+$//g;
-        push @parts, $w if length $w;
+        else {
+            # no_ascii mode: alphabet_chars dışındakileri temizle
+            $w =~ s/[^0-9${lc}]+/ /g;
+            $w =~ s/^\s+|\s+$//g;
+            push @parts, grep { length } split /\s+/, $w if length $w;
+        }
     }
 
     my $res = join( " ", @parts );
-    $self->{_cache}{nw}{$word} = $res;
+    $self->{_cache}{nw}{$cache_key} = $res;
     return $res;
 }
 
@@ -1484,7 +1499,7 @@ Performs a case-insensitive, locale-aware regex match of C<$pattern> inside C<$s
 
   my $found = $tr->search_regex("İstanbul Boğazı", "istanbul"); # 1
 
-=head3 normalize_word($word, [$mode_write])
+=head3 normalize_word($word [, $mode_write, $no_ascii])
 
 Normalizes a single search token according to locale phonetic assimilation, clitic/apostrophe stripping, and final-devoicing rules.
 
@@ -1492,12 +1507,15 @@ Normalizes a single search token according to locale phonetic assimilation, clit
 
 =item * B<Write Mode (C<$mode_write = 1>):> Generates both the root token and joined compound token to index clitic variants (e.g. C<"Türkiye'de"> -E<gt> C<"turkiye turkiyede">).
 
-=item * B<Read Mode (C<$mode_write = 0> or omitted):> Strips clitics and suffixes to resolve the base root (e.g. C<"Türkiye'de"> -E<gt> C<"turkiye">; single-letter prefixes like C<"T-Shirt"> resolve to C<"tshirt">).
+=item * B<Read Mode (C<$mode_write = 0> or omitted):> Strips clitics and suffixes to resolve the base root (e.g. C<"Türkiye'de"> -E<gt> C<"turkiye">; single-letter prefixes like C<"T-Shirt"> resolve to C<"tshirt">). Sadece metin girildiğinde varsayılan olarak okuma modunda (C<is_write = 0, no_ascii = 0>) çalışır.
+
+=item * B<No ASCII Mode (C<$no_ascii = 1>):> Harf tablosunu korur, fonetik/ASCII dönüşümü yapmaz (örn. C<normalize_word("Türkiye'de", 1, 1)> -E<gt> C<"türkiye türkiyede">).
 
 =back
 
-  my $write_tokens = $tr->normalize_word("Türkiye'de", 1); # "turkiye turkiyede"
-  my $query_token  = $tr->normalize_word("Türkiye'de", 0); # "turkiye"
+  my $write_tokens = $tr->normalize_word("Türkiye'de", 1);    # "turkiye turkiyede"
+  my $query_token  = $tr->normalize_word("Türkiye'de");       # "turkiye" (okuma modu varsayılan)
+  my $no_ascii_tok = $tr->normalize_word("Türkiye'de", 1, 1); # "türkiye türkiyede"
 
 =head2 Number & Currency Processing
 

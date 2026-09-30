@@ -166,6 +166,97 @@ SKIP: {
 		'a negative freeze column count dies too';
 }
 
+# The worksheet name is checked as openpyxl 3.1.5 checks one (the title setter
+# in openpyxl/workbook/child.py): empty, or holding any of \ * ? : / [ ], is an
+# error; longer than 31 characters is a warning, "Some applications may not be
+# able to read the file".  Each is checked before the file is opened.
+{
+	my $f = xlsx_path();
+	open my $keep, '>', $f or die "cannot write $f: $!";
+	print {$keep} "precious\n";
+	close $keep;
+	throws_ok { write_table([{ a => 1 }], $f, 'xlsx.sheet' => '') }
+		qr/^write_table: 'xlsx\.sheet' must have at least one character/, 'an empty sheet name dies';
+	foreach my $c ('\\', '*', '?', ':', '/', '[', ']') {
+		throws_ok { write_table([{ a => 1 }], $f, 'xlsx.sheet' => "a${c}b") }
+			qr/^write_table: 'xlsx\.sheet' may not contain '\Q$c\E'/, "a sheet name holding '$c' dies";
+	}
+	open $keep, '<', $f or die "cannot read $f: $!";
+	is( scalar <$keep>, "precious\n", 'a refused sheet name leaves an existing file intact' );
+	close $keep;
+	my @w;
+	{
+		local $SIG{__WARN__} = sub { push @w, @_ };
+		write_table([{ a => 1 }], xlsx_path(), 'xlsx.sheet' => 'x' x 31, quiet => 1);
+	}
+	is( scalar @w, 0, 'a 31-character sheet name is fine' );
+	{
+		local $SIG{__WARN__} = sub { push @w, @_ };
+		write_table([{ a => 1 }], xlsx_path(), 'xlsx.sheet' => 'x' x 32, quiet => 1);
+		write_table([{ a => 1 }], xlsx_path(), 'xlsx.sheet' => "\x{394}" x 31, quiet => 1);
+	}
+	is( scalar @w, 1, 'a 32-character name warns; 31 wide characters do not' );
+	like( $w[0], qr/^write_table: 'xlsx\.sheet' is more than 31 characters/, 'the warning says why' );
+}
+
+# The worksheet is streamed, a chunk at a time, and its local header patched
+# once the size is known; a file that cannot seek, such as a pipe, gets the
+# worksheet gathered in memory instead.  Both have to make the same bytes, and
+# a table spanning many chunks has to read back whole.
+{
+	my @rows = map { my $i = $_; +{ id => $i, name => "row $i & <more>", v => $i / 7 } } 1 .. 6000;
+	my $f = xlsx_path();
+	write_table(\@rows, $f, quiet => 1);
+	cmp_ok( -s $f, '>', 4 * 65536, 'the table spans several of the chunks it is streamed in' );
+	my $back = read_table($f, 'output.type' => 'aoh');
+	is( scalar @$back, 6000, 'a streamed workbook reads back every row' );
+	is( $back->[5999]{name}, 'row 6000 & <more>', 'a streamed workbook reads back the last row whole' );
+	SKIP: {
+		skip 'needs /dev/stdout and a list-form pipe open', 1 if $^O eq 'MSWin32' || !-e '/dev/stdout';
+		# One child writes the table to a file and then down its stdout, a pipe,
+		# so that the provenance line -- which names the script -- is the same in
+		# both.  The file's name comes in @ARGV, not in the script's text.
+		my $script = "$dir/pipe.pl";
+		open my $sfh, '>', $script or die "cannot write $script: $!";
+		print {$sfh} 'use Stats::LikeR; my @rows = map { my $i = $_; +{ id => $i, name => "row $i & <more>", v => $i / 7 } } 1 .. 6000;',
+			" write_table(\\\@rows, \$ARGV[0], xlsx => 1, quiet => 1);",
+			" write_table(\\\@rows, '/dev/stdout', xlsx => 1, quiet => 1);\n";
+		close $sfh or die "cannot write $script: $!";
+		my $to_file = "$dir/piped_twin.xlsx";
+		my @inc = map { "-I$_" } grep { !ref $_ } @INC;
+		open my $ph, '-|', $^X, @inc, $script, $to_file or die "cannot run a child perl: $!";
+		binmode $ph;
+		my $piped = do { local $/; <$ph> };
+		close $ph;
+		open my $ffh, '<', $to_file or die "cannot read $to_file: $!";
+		binmode $ffh;
+		my $filed = do { local $/; <$ffh> };
+		close $ffh;
+		ok( length($piped) > 4 * 65536 && $piped eq $filed,
+			'a workbook written down a pipe is byte for byte the one written to a file' );
+	}
+}
+
+# A NUL cannot appear in XML 1.0 at all, so a cell holding one loses it in the
+# worksheet (it used to lose everything after it, at a strlen()); and a sheet
+# name given as Latin-1 bytes is written as UTF-8, where its bytes used to go
+# into workbook.xml as they were.
+SKIP: {
+	skip 'IO::Uncompress::Unzip (core) not available', 2 unless $have_unzip;
+	my $f = xlsx_path();
+	write_table([{ a => "x\0y" }], $f, quiet => 1, 'xlsx.sheet' => "R\xe9sum\xe9");
+	like( member($f, 'xl/worksheets/sheet1.xml'), qr{<t xml:space="preserve">xy</t>}, 'a NUL is dropped from an .xlsx cell' );
+	like( member($f, 'xl/workbook.xml'), qr{name="R\xc3\xa9sum\xc3\xa9"}, 'a Latin-1 sheet name is written as UTF-8' );
+}
+
+# An empty table writes a workbook too: its header row alone, or no cells.
+{
+	my $f = xlsx_path();
+	write_table([], $f, 'col.names' => [qw(a b)], quiet => 1);
+	ok( -s $f, 'an empty table writes its workbook' );
+	is_deeply( read_table($f, 'output.type' => 'aoh'), [], 'an empty table reads back as no rows' );
+}
+
 # tex and xlsx are mutually exclusive
 throws_ok { write_table([{ a => 1 }], "$dir/x.out", xlsx => 1, tex => 1) }
 	qr/mutually exclusive/,

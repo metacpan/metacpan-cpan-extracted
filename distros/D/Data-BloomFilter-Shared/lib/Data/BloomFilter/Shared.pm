@@ -1,7 +1,7 @@
 package Data::BloomFilter::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::BloomFilter::Shared', $VERSION);
 
@@ -214,6 +214,13 @@ the union of what all of them have added.
     unless (fork) { $bf->add_many([ map { "ev-$_" } 1 .. 1000 ]); exit }
     wait;
     print $bf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
+
+C<new> and C<new_memfd> create a new segment sparse: pages are allocated as
+they are first written, and once the filesystem is full, a write to a page not
+yet allocated dies with SIGBUS. Set C<DATA_BLOOMFILTER_SHARED_SPARSE=0> to
+reserve the whole segment at creation, so a full filesystem makes them croak
+instead; on tmpfs and memfd that commits the segment's memory at once, and a
+memory cgroup too small for it gets an OOM kill rather than a croak.
 
 =head1 FROZEN (READ-ONLY) MODE
 

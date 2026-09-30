@@ -1,4 +1,4 @@
-# Claude Code — commit: skills/, agents/, rules/, hooks/, settings.json
+# Claude Code — commit: skills/, agents/, rules/, hooks/, settings.json, skilletor config
 # Ignore: local overrides, credentials, session data
 
 # Tracked: shared config & extensibility
@@ -14,6 +14,8 @@
 !.claude/rules/**
 !.claude/hooks/
 !.claude/hooks/**
+!.claude/skilletor.json
+!.claude/.gitignore
 
 # Local overrides (machine-specific)
 .claude/*.local.*

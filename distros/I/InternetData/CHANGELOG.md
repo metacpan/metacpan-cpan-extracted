@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.8.0 - 2026-09-30
+
+### Features
+
+- Add the authorization code sign-in, with PKCE ([`0002d02`](https://github.com/internetdata/sdk-perl/commit/0002d028de057ab29d4bfed35022d6dd8578a376))
+
 ## 1.7.1 - 2026-09-29
 
 ### Fixes

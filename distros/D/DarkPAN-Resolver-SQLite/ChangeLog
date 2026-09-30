@@ -1,0 +1,70 @@
+Tue Sep 29 07:36:49 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.2]:
+	* .gitignore: updated by CPAN::Maker::Bootstrapper
+	* .includes/local.mk: likewise
+	* .includes/perl.mk: likewise
+	* Makefile: likewise
+	* README.md: generated
+	* lib/DarkPAN/Resolver/SQLite.pm.in
+	- pod updates
+	* t/02-fetch-packages-index.t: remove diag
+	* project.mk: new
+
+Tue Sep 15 04:37:47 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* VERSION: bump
+	* README.md: generated
+	* release-notes.md: new
+	* release-notes/release-notes-1.0.1.md: new
+	* .includes/bootstrap.mk: added by CPAN::Maker::Bootstrapper
+	* .includes/update.mk: updated by CPAN::Maker::Bootstrapper
+	* Makefile: likewise
+	* requires: +DBD::SQLite
+	* cpanfile: likewise
+	* lib/DarkPAN/Resolver/SQLite.pm.in
+	- added POD
+	(_connect): RaiseError => 1
+	(DESTROY): GLOBAL_PHASE guard
+	(_fetch_packages_version)
+	- fix success check
+	- fix sprintf - missing arg
+	- guard gunzip failure
+	- use default tempdir
+	- binmode when writing
+	* t/00-darkpan-resolver-sqlite.t: fix use_ok()
+	* test-requires: +DBI
+	* t/01-resolve.t: new
+	* t/02-fetch-packages-index.t: new
+	* xt/integration/01-indexer-resolver.t: new
+
+Fri Sep 11 12:29:06  Rob Lauer  rclauer@gmail.com
+
+	[1.0.0]:
+
+	* .gitignore: new
+	* .includes/bash-completion.mk: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/local.mk: new
+	* .includes/modulino.mk: new
+	* .includes/perl.mk: new
+	* .includes/release-notes.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* buildspec.yml.tmpl: new
+	* buildspec.yml: new
+	* config.mk: new
+	* cpanfile: new
+	* lib/DarkPAN/Resolver/SQLite.pm.in: new
+	* recommends: new
+	* requires: new
+	* suggests: new
+	* t/00-darkpan-resolver-sqlite.t: new
+	* test-requires: new

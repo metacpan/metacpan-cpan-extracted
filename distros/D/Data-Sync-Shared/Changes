@@ -1,27 +1,26 @@
 Revision history for Data-Sync-Shared
 
+0.10      2026-09-26
+          - A create that fails at mmap no longer leaves a full-size file
+            behind.
+          - Checking a file left by an interrupted create no longer allocates
+            its pages on tmpfs.
+          - Error messages no longer lose their reason to a long path.
+
 0.09      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix an RWLock writer stall on ARM64 after readers release.
 
 0.08      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
+          - A file left by an interrupted create is recovered, not refused.
+          - Hardening against tied and overloaded arguments.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.07      2026-07-22
-          - Fix guards releasing a lock from the wrong process: a forked child
-            inheriting an RWLock, Condvar or Semaphore guard released the
-            PARENT lock at exit, breaking mutual exclusion. Each guard now
-            records the acquiring PID and releases only from it.
-          - On-disk format change (v2 -> v3): an existing 0.06 file is
-            refused; recreate it.
-          - Give the Guard packages a $VERSION so PAUSE indexes them.
-          - Reject acquire_n above the maximum instead of blocking forever.
+          - A guard inherited by a forked child no longer releases the
+            parent's RWLock, Condvar or Semaphore at exit.
+          - On-disk format change (v2 -> v3): recreate 0.06 files.
+          - acquire_n above the maximum croaks instead of blocking forever.
 
 0.06  2026-07-03
     - Security and robustness hardening; backing files now created mode
@@ -50,10 +49,8 @@ Revision history for Data-Sync-Shared
 
 
 0.01  2026-04-11
-    - Initial release
-    - Five primitives: Semaphore, Barrier, RWLock, Condvar, Once
-    - Futex-based blocking, mmap shared memory, PID stale recovery
-    - File-backed, anonymous, and memfd modes
-    - eventfd integration for event loops
-    - Guard objects for scope-based auto-release
-    - Timeouts on all blocking operations
+    - Initial release: futex-based Semaphore, Barrier, RWLock, Condvar and
+      Once in shared memory.
+    - File-backed, anonymous and memfd modes; PID-based stale recovery;
+      eventfd integration.
+    - Scope guards, and timeouts on all blocking operations.

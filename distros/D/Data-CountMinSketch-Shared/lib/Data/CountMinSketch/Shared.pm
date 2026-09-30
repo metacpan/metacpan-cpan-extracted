@@ -1,7 +1,7 @@
 package Data::CountMinSketch::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::CountMinSketch::Shared', $VERSION);
 
@@ -237,6 +237,13 @@ reflect the combined stream all of them have added.
     unless (fork) { $cms->add("ev-500") for 1 .. 10; exit }
     wait;
     print $cms->estimate("ev-500"), "\n";   # >= 10 -- the child's adds
+
+C<new> and C<new_memfd> create a new segment sparse: pages are allocated as
+they are first written, and once the filesystem is full, a write to a page not
+yet allocated dies with SIGBUS. Set C<DATA_COUNTMINSKETCH_SHARED_SPARSE=0> to
+reserve the whole segment at creation, so a full filesystem makes them croak
+instead; on tmpfs and memfd that commits the segment's memory at once, and a
+memory cgroup too small for it gets an OOM kill rather than a croak.
 
 =head1 FROZEN (READ-ONLY) MODE
 

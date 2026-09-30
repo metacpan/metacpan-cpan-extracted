@@ -688,9 +688,9 @@ use strict;
 				olson_description => "Central - NU (central)",
 				timezone_name => "America/Rankin_Inlet",
 			},
-			"Central - ON (west), Manitoba" => {
+			"EST - Manitoba, ON (northwest)" => {
 				location_coords => "+4953-09709",
-				olson_description => "Central - ON (west), Manitoba",
+				olson_description => "EST - Manitoba, ON (northwest)",
 				timezone_name => "America/Winnipeg",
 			},
 			"EST - ON (Atikokan), NU (Coral H)" => {

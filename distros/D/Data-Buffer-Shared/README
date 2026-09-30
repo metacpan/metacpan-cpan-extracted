@@ -234,17 +234,18 @@ CONCURRENCY AND CRASH SAFETY
     matters. A variant, element-size or version mismatch is reported as an
     error.
 
-    Disk space. The backing file is created sparse: "new" sizes it, but blocks
-    are allocated only as you write, so a large buffer costs almost nothing on
-    disk until it is used. The cost of that is a late failure, and how it
-    reaches you depends on the filesystem. Where blocks are allocated at fault
-    time -- tmpfs, so "/dev/shm" and many "/tmp" mounts -- a write to a page
-    that cannot be backed raises "SIGBUS" and kills the process, because an
-    "mmap" store has no way to report "ENOSPC". Where allocation is delayed to
-    writeback (ext4, xfs), the store lands in page cache and the failure
-    appears later: the write is lost, and "sync" is what reports it, croaking
-    with the underlying error. Keep the filesystem sized for the buffer you
-    asked for, and call "sync" when you need to know your writes reached disk.
+    Disk space. "new" and "new_memfd" create a new segment sparse: blocks are
+    allocated only as you write, so a large buffer costs almost nothing until
+    it is used. The cost of that is a late failure: a write to a page the
+    filesystem cannot back raises "SIGBUS" and kills the process (an "mmap"
+    store has no way to report "ENOSPC"), and an error the filesystem hits
+    later, while writing the page back, loses the write, which "sync" reports
+    by croaking with the underlying error. Call "sync" when you need to know
+    your writes reached disk. Set "DATA_BUFFER_SHARED_SPARSE=0" to reserve the
+    whole segment at creation, so a full filesystem makes the constructor
+    croak instead; on tmpfs and memfd that commits the segment's memory at
+    once, and a memory cgroup too small for it gets an OOM kill rather than a
+    croak.
 
 SEE ALSO
     Data::HashMap::Shared - concurrent hash table

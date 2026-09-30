@@ -7,7 +7,12 @@ use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::RealBin/lib";
 
 use File::Find;
-use Test::More tests => 2;
+use Test::More;
+
+plan skip_all => 'Author test.  Set AUTHOR_TESTING=1 to run.'
+  unless $ENV{AUTHOR_TESTING};
+
+plan tests => 2;
 
 =head1 PURPOSE
 

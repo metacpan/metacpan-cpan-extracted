@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.0 (2026-09-29)
+
+- SQL masking now also catches strings with a backslash-escaped quote (`'o\'brien'`, `E'o\'brien'`), prefixed strings (`E''`, `X''`, `N''`, `B''`, `U&''`, prefix included), hex, binary and exponent numbers (`0x1F`, `0b101`, `3e10`, `1.5E-3`, `.5`), and, on MySQL and MariaDB, `"double-quoted"` strings. `ForgeOps::Tracker::SqlStatement::mask($sql, system => $db_system)` takes the database's name, and a database span's statement is masked with its `db_system`.
+
 ## 0.11.0 (2026-09-25)
 
 - A database span can now carry the SQL it ran: `ForgeOps::Tracker::span('Load orders', sub { ... }, kind => 'database', statement => $sql, db_system => 'postgresql')`, plus `record_database_span($name, $sql, $started_at, $duration_ms, db_system => ...)` for a query you timed yourself. The statement is masked (every string and number becomes `?`) and cut to 4000 characters before it's stored, then sent in the span's data as `db.statement`, with `db_system` lowercased as `db.system`. Bind values are never read. Both options are ignored on spans of any other kind, and a `db.statement` put in a database span's `data` directly is masked too.

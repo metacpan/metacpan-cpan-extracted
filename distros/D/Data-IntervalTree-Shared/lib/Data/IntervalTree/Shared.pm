@@ -1,7 +1,7 @@
 package Data::IntervalTree::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::IntervalTree::Shared', $VERSION);
 
@@ -84,6 +84,14 @@ reopening a B<sealed> (frozen) file read-write is refused -- use
 C<new_readonly> instead (see L</"FROZEN (READ-ONLY) MODE">). An optional file
 B<mode> may be passed as the last argument to C<new> (e.g. C<0660>)
 for cross-user sharing; it defaults to C<0600> (owner-only).
+
+C<new> and C<new_memfd> create a new segment sparse: pages are allocated as
+they are first written, and once the filesystem is full, an C<add> or query
+that touches a page not yet allocated dies with C<SIGBUS>. Set
+C<DATA_INTERVALTREE_SHARED_SPARSE=0> to reserve the whole segment at creation,
+so a full filesystem makes them croak instead; on tmpfs and memfd that commits
+the segment's memory at once, and a memory cgroup too small for it gets an OOM
+kill rather than a croak.
 
 =head2 Adding intervals
 

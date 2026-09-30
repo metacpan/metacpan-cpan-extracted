@@ -1,7 +1,7 @@
 package Data::Fenwick2D::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::Fenwick2D::Shared', $VERSION);
 
@@ -138,6 +138,13 @@ new_from_fd($fd) >>. The descriptor you pass is duplicated
 (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
 disturb the handle. Every process's updates land in the one shared grid, and
 queries take only the read lock so many readers proceed concurrently.
+
+C<new> and C<new_memfd> create a new segment sparse: pages are allocated as
+they are first written, and once the filesystem is full, a write to a page not
+yet allocated dies with SIGBUS. Set C<DATA_FENWICK2D_SHARED_SPARSE=0> to
+reserve the whole segment at creation, so a full filesystem makes them croak
+instead; on tmpfs and memfd that commits the segment's memory at once, and a
+memory cgroup too small for it gets an OOM kill rather than a croak.
 
 =head1 FROZEN (READ-ONLY) MODE
 

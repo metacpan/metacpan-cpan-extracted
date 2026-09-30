@@ -1,0 +1,39 @@
+---
+abstract: DarkPAN::Resolver::SQLite
+author:
+  - 'Rob Lauer <rclauer@gmail.com>'
+build_requires:
+  DBI: '1.647'
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DarkPAN-Resolver-SQLite
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  DarkPAN::Resolver::SQLite:
+    file: lib/DarkPAN/Resolver/SQLite.pm
+    version: v1.0.2
+requires:
+  App::cpm::DistNotation: '0'
+  App::cpm::version: '0'
+  DBD::SQLite: '0'
+  DBI: '1.647'
+  HTTP::Tiny: '0.088'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/rlauer6/DarkPAN-Resolver-SQLite/issues
+  homepage: https://github.com/rlauer6/DarkPAN-Resolver-SQLite
+  repository: https://github.com/rlauer6/DarkPAN-Resolver-SQLite
+version: v1.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -15,6 +15,7 @@
 #ifndef F2D_H
 #define F2D_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,7 +45,7 @@
 
 #define F2D_MAGIC        0x42443246U  /* Fenwick2D */
 #define F2D_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
-#define F2D_ERR_BUFLEN   256
+#define F2D_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef F2D_READER_SLOTS
 #define F2D_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -608,14 +609,36 @@ static int f2d_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int f2d_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int f2d_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* Opt-in (DATA_FENWICK2D_SHARED_SPARSE=0): reserving commits memory this module otherwise fills lazily. */
+static int f2d_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_FENWICK2D_SHARED_SPARSE");
+    if (!sp || strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static F2dHandle *f2d_create(const char *path, uint64_t rows, uint64_t cols, mode_t mode, char *errbuf) {
@@ -649,9 +672,18 @@ static F2dHandle *f2d_create(const char *path, uint64_t rows, uint64_t cols, mod
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             F2D_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && f2d_reserve(fd, total) < 0) {
+            F2D_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { F2D_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            F2D_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!f2d_validate_header((F2dHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -661,9 +693,13 @@ static F2dHandle *f2d_create(const char *path, uint64_t rows, uint64_t cols, mod
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((F2dHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && f2d_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && f2d_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         F2D_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (f2d_reserve(fd, total) < 0) {
+                        F2D_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     f2d_init_header(base, rows, cols, total);
@@ -699,6 +735,10 @@ static F2dHandle *f2d_create_memfd(const char *name, uint64_t rows, uint64_t col
     if (ftruncate(fd, (off_t)total) < 0) {
         F2D_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (f2d_reserve(fd, total) < 0) {
+        F2D_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { F2D_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -711,6 +751,11 @@ static F2dHandle *f2d_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { F2D_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(F2dHeader)) { F2D_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(F2dHeader, magic)) != (ssize_t)sizeof magic || magic != F2D_MAGIC) {
+        F2D_ERR("invalid Fenwick2D tree table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { F2D_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -738,6 +783,11 @@ static F2dHandle *f2d_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { F2D_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(F2dHeader)) { F2D_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(F2dHeader, magic)) != (ssize_t)sizeof magic || magic != F2D_MAGIC) {
+        F2D_ERR("%s: invalid Fenwick2D tree file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */

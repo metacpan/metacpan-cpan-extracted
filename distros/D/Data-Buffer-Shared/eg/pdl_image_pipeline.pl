@@ -58,11 +58,10 @@ my $proc_pid = fork();
 if ($proc_pid == 0) {
     my $processed = 0;
     while ($processed < $nframes) {
-        my $n = $ctl->wait_notify;
-        unless (defined $n) { sleep 0.001; next }
-
+        # Wakeups coalesce and both stages drain the one eventfd: the counters say what is ready.
+        $ctl->wait_notify;
         my $ready = $ctl->get(0);
-        next if $ready <= $processed;
+        if ($ready <= $processed) { sleep 0.001; next }
 
         # read raw frame
         my $raw = $raw_buf->get_raw(0, $npx);
@@ -90,9 +89,9 @@ if ($proc_pid == 0) {
         }
         $proc_buf->set_raw(0, pack("C*", @px));
 
-        $ctl->incr(1);
+        $ctl->set(1, $ready);
         $ctl->notify;
-        $processed++;
+        $processed = $ready;
     }
     _exit(0);
 }
@@ -103,11 +102,9 @@ my $rendered = 0;
 my $t0 = time();
 
 while ($rendered < $nframes) {
-    my $n = $ctl->wait_notify;
-    unless (defined $n) { sleep 0.001; next }
-
+    $ctl->wait_notify;
     my $ready = $ctl->get(1);
-    next if $ready <= $rendered;
+    if ($ready <= $rendered) { sleep 0.001; next }
 
     # --- With OpenGL::Modern ---
     # glTexSubImage2D_s(GL_TEXTURE_2D, 0, 0, 0, $w, $h,

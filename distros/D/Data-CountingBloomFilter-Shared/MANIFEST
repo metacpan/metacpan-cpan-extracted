@@ -18,6 +18,7 @@ xt/asan.t
 xt/crash_recovery.t
 xt/destroy_during_call.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fork_cbf.t
 xt/kwalitee.t
 xt/pod.t

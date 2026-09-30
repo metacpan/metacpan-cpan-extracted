@@ -1294,6 +1294,25 @@ XSレイヤーが読み込まれている場合は、高速パスであるXSC<_c
 
     my @sorted = sort { $a <=> $b } @datetimes;
 
+=head2 compare_epoch( $epoch )
+
+    if( $token_expires->compare_epoch( time() ) < 0 )
+    {
+        # トークンの有効期限切れ
+    }
+
+インスタンスメソッドです。現在のオブジェクトをユニックスエポック値と比較します。L</from_epoch>で一時オブジェクトを作り、そのオブジェクトに対してL</compare>を呼び出すのと同等です。
+
+このインスタンスがC<$epoch>より早ければC<-1>、同じ瞬間を表していればC<0>、遅ければC<1>を返します。
+
+C<time()>の戻り値、データベースのカラム、外部APIのフィールドなど、すでにユニックスエポックになっている値とL<DateTime::Lite>を比べるときの常套手段です。そのたびに自分で別のL<DateTime::Lite>オブジェクトを構築する必要はありません。
+
+C<$epoch>は、L<Scalar::Util/looks_like_number>が認識する数値でなければなりません。整数でも小数でも構いません。小数はL</from_epoch>と同じ規則で、最も近いマイクロ秒に丸められます。引数が未定義、または数値でない場合はL<エラーオブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。
+
+一時オブジェクトはC<UTC>タイムゾーンで作られます。これはL</from_epoch>と同じ取り決めです。現在のインスタンスがfloatingタイムゾーンにある場合、瞬間を順序付ける前にL</compare>が通常どおり変換を行います。
+
+オーバーロードされたC<< <=> >>演算子は変わりません。C<< $dt < time() >>と書くと、生のエポックは互換オブジェクトではないため、依然として例外になります。代わりにこのメソッドか、L</is_past> / L</is_future>を使ってください。
+
 =head2 compare_ignore_floating( $dt1, $dt2 )
 
 L</compare>と同様ですが、floatingタイムゾーンの日時を、もう一方のオペランドと同じUTCオフセットを持つものとして扱います。タイムゾーンに関係なくローカルの壁時計時刻を比較したい場合に便利です。
@@ -1301,6 +1320,32 @@ L</compare>と同様ですが、floatingタイムゾーンの日時を、もう�
 =head2 is_between( $lower, $upper )
 
 C<$self>が2つの境界の厳密な間にある場合に真を返します。
+
+=head2 is_future
+
+    if( $expiry->is_future )
+    {
+        # まだ有効
+    }
+
+C<$self>が、L</now>が返す現在時刻より厳密に後であれば真を返します。C<< $self->compare( DateTime::Lite->now ) > 0 >>と同等です。
+
+現在時刻と等しい瞬間は、過去でも未来でもありません。判定はL</is_between>と同じく厳密です。
+
+L</now>は呼び出すたびに評価されます。したがって比較に使うのは、C<$self>が構築された時点の時計ではなく、呼び出し時点の時計です。C<$self>がfloatingである場合を含め、タイムゾーンの違いはL</compare>が処理します。
+
+=head2 is_past
+
+    if( $token->{expires}->is_past )
+    {
+        # 期限切れとして拒否
+    }
+
+C<$self>が、L</now>が返す現在時刻より厳密に前であれば真を返します。C<< $self->compare( DateTime::Lite->now ) < 0 >>と同等です。
+
+現在時刻と等しい瞬間は、過去でも未来でもありません。呼び出し時点の時計、およびタイムゾーンの扱いはL</is_future>と同じです。
+
+=head1 エラー対応
 
 =head2 error
 

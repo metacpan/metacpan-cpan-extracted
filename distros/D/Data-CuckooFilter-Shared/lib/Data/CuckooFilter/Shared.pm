@@ -1,7 +1,7 @@
 package Data::CuckooFilter::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::CuckooFilter::Shared', $VERSION);
 
@@ -242,6 +242,13 @@ the combined effect of what all of them have done.
     unless (fork) { $cf->add_many([ map { "ev-$_" } 1 .. 1000 ]); exit }
     wait;
     print $cf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
+
+C<new> and C<new_memfd> create a new segment sparse: pages are allocated as
+they are first written, and once the filesystem is full, a write to a page not
+yet allocated dies with SIGBUS. Set C<DATA_CUCKOOFILTER_SHARED_SPARSE=0> to
+reserve the whole segment at creation, so a full filesystem makes them croak
+instead; on tmpfs and memfd that commits the segment's memory at once, and a
+memory cgroup too small for it gets an OOM kill rather than a croak.
 
 =head1 FROZEN (READ-ONLY) MODE
 

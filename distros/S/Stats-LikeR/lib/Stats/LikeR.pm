@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3211';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3212';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -5908,7 +5908,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3211
+version 0.3212
 
 =head1 Synopsis
 
@@ -15963,21 +15963,27 @@ Before R 4.6.0 — and in earlier releases of this module — ties ruled out an 
 
 The exact table is refused rather than attempted if it would need more than 16 million cells, with a message suggesting C<< exact =E<gt> 0 >>. This is only reachable by forcing C<< exact =E<gt> 1 >> on samples far larger than the automatic threshold.
 
+The exact confidence interval on tied data is found as R finds it, by trying the shift between each pair of neighbouring pairwise differences, up to C<m * n> of them, each with its own conditional distribution. That distribution depends only on the ranks, so it is rebuilt only when a shift changes them. Two samples of 49 five-point scores, which take the exact path by default, get their interval in about 0.03 seconds; R 4.6.1 takes 10.
+
 =head3 Notes and edge cases
 
-Missing data is handled by listwise removal of non-numeric, undefined and C<NaN> cells before ranking; in the paired case a pair is dropped if either member is missing or if the difference is not a number. An empty C<x> (or a C<y> that is present but empty) after this filtering is fatal. All-zero differences are not: C<wilcox_test([0, 0, 0, 0, 0])> returns C<V = 0>, C<p = 1>, which is what the permutation distribution over an empty set of sign flips says.
+Missing data is handled by listwise removal of non-numeric, undefined and C<NaN> cells before ranking; in the paired case a pair is dropped if either member is missing or if the difference is not a number. An empty C<x> (or a C<y> that is present but empty) after this filtering is fatal. All-zero differences are not: C<wilcox_test([0, 0, 0, 0, 0])> returns C<V = 0>, C<p = 1>, which is what the permutation distribution over an empty set of sign flips says. A tied array is read like any other, one C<FETCH> per element.
+
+C<Inf> and C<-Inf> are values, not missing data, and a rank test has no trouble with them. In a confidence interval, a difference of two infinities of the same sign (C<Inf - Inf>) is C<NaN>, and it is left out of the differences (or Walsh averages) the estimate and the interval are read from, just as R's C<sort()> leaves it out.
 
 Ties are detected during ranking and trigger the tie-corrected variance in the normal approximation. When C<exact> is left on auto, the size thresholds (C<< E<lt> 50 >> per group, or C<< E<lt> 50 >> observations) are the only thing gating the exact vs. approximate decision.
 
 =head3 Differences from R
 
-Two, both deliberate:
+Three, all deliberate:
 
 =over
 
 =item * B<< C<correct> is a boolean here. >> R 4.6.0 turned its C<correct> into an integer C<0:3>, in which numeric C<0> still applies the continuity correction and only C<FALSE> removes it. Keeping that would mean C<< correct =E<gt> 0 >> no longer meaning "off", which is what it means for every other flag in this module. So C<correct> stays a boolean and the Edgeworth terms live under C<edgeworth>: R's C<correct = k> for C<k> in C<1, 2, 3> is C<< correct =E<gt> 1, edgeworth =E<gt> k >> here, and R's C<correct = 0> is C<< correct =E<gt> 1 >>.
 
 =item * B<A zero variance is reported, not propagated.> With C<< exact =E<gt> 0 >> and every observation tied there is nothing to divide by; R divides anyway and returns C<NaN> for the p-value, and its two-sample confidence interval then dies inside C<uniroot> with I<missing value where TRUE/FALSE needed>. This warns instead, and returns C<p = 1> and a C<NaN> interval at level C<0> — which is what R's own one-sample code does. The default path no longer reaches any of this, since the exact test handles all-tied data.
+
+=item * B<Infinite observations get an answer or a reason, never an error.> The asymptotic interval has no finite bracket to search when an observation is infinite. R's two-sample code dies in C<uniroot> with I<invalid 'xmin' value>, and its one-sample code returns a C<NaN> interval at level C<0>. Both give that C<NaN> interval here, with a warning. The exact one-sample interval on data holding both C<Inf> and C<-Inf> stops R with I<missing value where TRUE/FALSE needed>; here it is computed, ranking the C<NaN> those make last, as R's C<rank()> does.
 
 =back
 
@@ -15994,11 +16000,13 @@ C<write_table> accepts every data-frame shape: a flat hash (one row), a hash of 
  write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
  write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
 
+A data row longer than the header is not cut short: the header is widened with empty cells over the extra columns, the shape pandas gives C<DataFrame([[1, 2], [4, 5, 6]])>, and C<write_table> warns, naming the first long row.
+
 You can also precisely filter and reorder which columns are written by passing an array reference to C<col.names>:
 
  write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
 
-undefined variables are printed as C<NA> by default, but can be set as you wish using C<undef.val>
+undefined values are written as empty fields by default, but can be set as you wish using C<undef.val>
 
  write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
 
@@ -16006,6 +16014,18 @@ A hash of hashes keeps its outer keys as a leading column by default, since that
 
  my %taxa = (9606 => { species => 'Homo sapiens' }, 10090 => { species => 'Mus musculus' });
  write_table(\%taxa, 'taxa.tsv', 'row.names' => 'taxid');   # taxid  species
+
+Leaving that column unnamed writes an empty first header cell, and every reader then has to invent a name for it (C<read_table> calls it C<row_name>, pandas C<Unnamed: 0>). C<write_table> therefore warns and suggests C<row.names>. It also warns when any data column has an empty name, whatever the shape. The empty label cell that C<< row.names =E<gt> 1 >> writes for the other shapes is R's own layout, and nothing can name it, so that one is not warned about.
+
+For a hash of arrays or an array of hashes, C<< row.names =E<gt> 'col' >> takes the labels from column C<col> and heads the label column C<col>, as pandas heads an index with its name:
+
+ write_table(\%hoa, 'out.csv', 'row.names' => 'gene');   # gene,score / TP53,0.9 / ...
+
+A hash of arrays has as many rows as the longest of the arrays it writes; an array that C<col.names> leaves out does not add rows.
+
+An empty C<{}> or C<[]> is a table with no rows, and is written as one: the header C<col.names> and C<row.names> give, if any, and otherwise a single empty record. C<< write_table([], 'out.csv', 'col.names' =E<gt> ['A'], 'row.names' =E<gt> 1) >> writes C<,A>, as pandas writes C<DataFrame({"A": []}).to_csv()>.
+
+Every cell of delimited output is written whole, including one holding a NUL byte, and a cell of a tied hash or array (such as C<Tie::IxHash>) is read through its C<FETCH>. A number is formatted the way perl formats it, but in a copy, so writing a table does not add a string buffer to every numeric scalar in it.
 
 C<write_table> determines comma and tab-separated delimiters from the filename, but will override if C<sep> or C<delim> are explicitly set.
 Args can also be accepted:
@@ -16034,8 +16054,7 @@ makes the same bytes.
 
 =item * B<A write that fails partway leaves a truncated file>, which
 L<C<read_table>|/"read_table"> refuses, never one that looks whole. A
-compressed write also croaks if the disk fills or the file cannot be
-finished.
+compressed write also croaks if the file cannot be finished.
 
 =item * B<Only delimited text is compressed.> A name such as C<table.tex.gz> or
 C<book.xlsx.bz2>, or C<tex>/C<xlsx> with a compressed name, is an error.
@@ -16052,7 +16071,7 @@ Every successful write prints one line to standard output naming the file, with 
 
  wrote output.tsv
 
-This is C<say 'wrote ' . colored(['black on_cyan'], $file)>, but the SGR codes (C<\e[30;46m> … C<\e[0m>) are written out inline, so the module takes no dependency on C<Term::ANSIColor>. Every format announces itself the same way — delimited, LaTeX and C<.xlsx> alike — so you always learn where a table went, in the same shape whatever you asked for. Nothing is printed when nothing is written: an empty data frame returns before a file is opened, and a write that cannot open its file croaks instead.
+This is C<say 'wrote ' . colored(['black on_cyan'], $file)>, but the SGR codes (C<\e[30;46m> … C<\e[0m>) are written out inline, so the module takes no dependency on C<Term::ANSIColor>. Every format announces itself the same way — delimited, LaTeX and C<.xlsx> alike — so you always learn where a table went, in the same shape whatever you asked for. Nothing is printed when nothing is written: a write that cannot open its file, or that loses data on the way to it, croaks instead. That includes a full disk, which a buffered write only discovers at the close; every format checks for it, as R's C<write.table> does. The message gives the system's reason, so a full disk reads C<write_table: could not finish writing 'out.csv': No space left on device>, and a quota or an I/O error says so instead; C<$!> is left set to it. A file that cannot be opened gives its reason the same way (C<Permission denied>, C<No such file or directory>). An empty data frame is written, and so announced.
 
 The colour is unconditional; it is not suppressed when standard output is a pipe or a file. Pass C<< quiet =E<gt> 1 >> to suppress the line altogether, which is what a script writing to a pipe or a data file usually wants:
 
@@ -16067,7 +16086,7 @@ C<write_table> can write the output file as a LaTeX C<tabular> instead of a deli
  write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
  write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
 
-The file begins with a C<< %written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance comment (the working directory and script name). The header row is bold and the table is ruled with C<\hline>. As with every other format, C<row.names> is B<off> unless you ask for it, except for a HoH: pass C<< row.names =E<gt> 1 >> to prepend a label column of 1-based indices. A HoH writes its outer keys as that column by default, and C<< row.names =E<gt> 0 >> drops them. Cell text is LaTeX-escaped: C<#>, C<_>, C<%>, and C<&> are backslash-escaped, C<< E<gt> >> becomes C<\textgreater{}>, and a cell consisting solely of C<\includesvg{...svg}> is passed through untouched. The C<tex.*> options tune the output:
+The file begins with a C<< %written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance comment (the working directory and script name). The header row is bold and the table is ruled with C<\hline>. As with every other format, C<row.names> is B<off> unless you ask for it, except for a HoH: pass C<< row.names =E<gt> 1 >> to prepend a label column of 1-based indices. A HoH writes its outer keys as that column by default, and C<< row.names =E<gt> 0 >> drops them. Cell text is LaTeX-escaped: C<#>, C<_>, C<%>, and C<&> are backslash-escaped, C<< E<gt> >> becomes C<\textgreater{}>, and a cell consisting solely of C<\includesvg{...svg}> is passed through untouched. A table with no columns at all is an error, since LaTeX rejects one, and it is refused before the file is opened. The C<tex.*> options tune the output:
 
  write_table(\@rows, 'table.tex',
      'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
@@ -16135,14 +16154,25 @@ writer, so it works for every shape above:
 
 A numeric-looking cell is written as a number; every other non-empty cell as an
 inline string (C<undef>/empty cells are omitted). The result reads straight back
-with L<C<read_table>|/"read_table">.
+with L<C<read_table>|/"read_table">. XML cannot hold a NUL or most other control
+characters, so those are dropped from a cell's text.
+
+The worksheet is streamed to the file as the rows are formatted, so writing a
+workbook takes little memory beyond the data itself: a 200000 x 20 array of
+hashes needs 30 MB for a 308 MB workbook, where it used to need 1.1 GB. Like
+delimited output, a write that croaks partway (a nested reference in a late row,
+say) leaves a truncated file behind. A file that cannot seek, such as a pipe,
+still works; its worksheet is gathered in memory first. A workbook larger than
+4 GB, the most a ZIP archive holds without ZIP64, is refused.
 
 Mirroring C<Excel::Writer::XLSX>'s
 C<< $workbook-E<gt>set_properties(comments =E<gt> comments()) >>, the same
 C<< written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance line the LaTeX writer emits is stored in
 the workbook's document B<comments> property (C<dc:description> in
 C<docProps/core.xml>); a C<xlsx.comment> string (or array ref of strings) is
-appended after it. C<xlsx.sheet> sets the worksheet name (default C<Sheet1>):
+appended after it. C<xlsx.sheet> sets the worksheet name (default C<Sheet1>). As
+in openpyxl, a name that is empty or holds any of C<\ * ? : / [ ]> is an error, and
+one longer than 31 characters draws a warning, since Excel cannot read it:
 
  write_table(\@rows, 'report.xlsx',
      'xlsx.sheet'   => 'Results',
@@ -16415,6 +16445,10 @@ C<t/model_pvalue_tails.t> and C<t/oneway_test.R.scipy.t>.
 =head1 COPYRIGHT AND LICENSE
 
 This software is free.  It is licensed under the same terms as Perl itself
+
+=head1 Thanks
+
+A lot of this work used Claude AI, which was paid for by the University of Idaho's IMCI
 
 =head1 AUTHOR
 

@@ -1,0 +1,14 @@
+^\.gitignore$
+^\.git/
+^\.github/
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^QUIC\.c$
+\.(?:o|obj|bs|so|dll|dylib)$
+^Net-QUIC-.*\.tar\.gz$
+^cover_db/
+^handoff\.md$
+^Net-QUIC-[^/]+/

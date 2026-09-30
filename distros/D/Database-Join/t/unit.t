@@ -20,7 +20,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 129;
+	plan tests => 140;
 	use_ok('Database::Join');
 }
 
@@ -70,6 +70,21 @@ my %LEDGER = (
 	'count:non_neg_int'          => 1,
 	'count:zero_when_empty'      => 1,
 	'count:with_criteria'        => 1,
+
+	# each_row return states and error messages
+	'er:returns_count'           => 1,  # return value equals number of rows visited
+	'er:zero_on_empty'           => 1,  # returns 0 when no rows match
+	'er:callback_receives_row'   => 1,  # callback receives merged hashref
+	'er:criteria_forwarded'      => 1,  # criteria narrow the visited set
+	'er:sort_by_forwarded'       => 1,  # sort_by ordering is honoured
+	'er:limit_forwarded'         => 1,  # limit caps the row count
+	'er:error_invalid_callback'  => 1,  # non-CODE first arg fires croak
+
+	# selectall_hashref / selectall_hash deprecated alias states
+	'sha:hashref_same_result'    => 1,  # selectall_hashref returns same rows as selectall_arrayref
+	'sha:hash_same_result'       => 1,  # selectall_hash returns same rows as selectall_array
+	'sha:hashref_warns'          => 1,  # selectall_hashref emits a deprecation carp
+	'sha:hash_warns'             => 1,  # selectall_hash emits a deprecation carp
 
 	# columns return states
 	'cols:returns_arrayref'      => 1,
@@ -666,6 +681,127 @@ subtest 'count: with criteria counts only matching rows' => sub {
 	my $j = _two_db_join();
 	is($j->count($COL_C => 'gold'), 1, 'count() with criteria returns the filtered count');
 	delete $LEDGER{'count:with_criteria'};
+};
+
+# ===========================================================================
+# SECTION 5b -- each_row
+# ===========================================================================
+
+subtest 'each_row: return value equals the number of rows visited' => sub {
+	plan tests => 2;
+	my $j     = _two_db_join();
+	my @seen;
+	my $count = $j->each_row(sub { push @seen, $_[0] });
+	is($count, 2, 'each_row returns 2 for a 2-row join');
+	is(scalar @seen, 2, 'callback was invoked exactly twice');
+	delete $LEDGER{'er:returns_count'};
+};
+
+subtest 'each_row: returns 0 when no rows match the criteria' => sub {
+	plan tests => 1;
+	my $j   = _two_db_join();
+	my $cnt = $j->each_row(sub {}, $JC => 'NOMATCH');
+	is($cnt, 0, 'each_row returns 0 when criteria match nothing');
+	delete $LEDGER{'er:zero_on_empty'};
+};
+
+subtest 'each_row: callback receives a merged hashref for each row' => sub {
+	plan tests => 3;
+	my $j    = _two_db_join();
+	my @rows;
+	$j->each_row(sub { push @rows, $_[0] });
+	# Verify the first row contains columns from both component databases.
+	my ($alice) = grep { $_->{$COL_A} eq 'Alice' } @rows;
+	ok(defined $alice,                  'row for Alice present');
+	ok(defined $alice->{$COL_A},        "merged row has $COL_A");
+	ok(defined $alice->{$COL_B},        "merged row has $COL_B from secondary DB");
+	delete $LEDGER{'er:callback_receives_row'};
+};
+
+subtest 'each_row: criteria narrow the visited set' => sub {
+	plan tests => 2;
+	my $j    = _two_db_join();
+	my @rows;
+	my $cnt  = $j->each_row(sub { push @rows, $_[0] }, $COL_C => 'gold');
+	is($cnt, 1, 'each_row visits only 1 gold-tier row');
+	is($rows[0]{$COL_A}, 'Alice', 'the visited row is the gold-tier customer');
+	delete $LEDGER{'er:criteria_forwarded'};
+};
+
+subtest 'each_row: sort_by ordering is honoured' => sub {
+	plan tests => 2;
+	my $j    = _three_row_join();
+	my @seen;
+	$j->each_row(sub { push @seen, $_[0]{$COL_A} }, sort_by => [$COL_A, 'DESC']);
+	is($seen[0], 'Carol', 'first visited row is Carol (C > B > A DESC)');
+	is($seen[2], 'Alice', 'last visited row is Alice');
+	delete $LEDGER{'er:sort_by_forwarded'};
+};
+
+subtest 'each_row: limit caps the number of rows visited' => sub {
+	plan tests => 2;
+	my $j   = _three_row_join();
+	my @seen;
+	my $cnt = $j->each_row(sub { push @seen, $_[0] }, limit => 2);
+	is($cnt, 2, 'each_row with limit => 2 visits exactly 2 rows');
+	is(scalar @seen, 2, 'callback was invoked exactly twice');
+	delete $LEDGER{'er:limit_forwarded'};
+};
+
+subtest 'each_row: non-CODE first argument fires error_invalid_callback croak' => sub {
+	plan tests => 2;
+	my $j = _two_db_join();
+	throws_ok { $j->each_row('not_a_coderef') }
+		qr/each_row.*code reference/i,
+		'each_row croaks when first arg is a string';
+	throws_ok { $j->each_row(undef) }
+		qr/each_row.*code reference/i,
+		'each_row croaks when first arg is undef';
+	delete $LEDGER{'er:error_invalid_callback'};
+};
+
+# ===========================================================================
+# SECTION 3b -- selectall_hashref / selectall_hash deprecated aliases
+# ===========================================================================
+
+subtest 'selectall_hashref: returns the same rows as selectall_arrayref' => sub {
+	plan tests => 2;
+	my $j = _two_db_join();
+	my $via_alias    = do { local $SIG{__WARN__} = sub {}; $j->selectall_hashref() };
+	my $via_canon    = $j->selectall_arrayref();
+	is_deeply($via_alias, $via_canon,
+		'selectall_hashref returns identical result to selectall_arrayref');
+	is(ref($via_alias), 'ARRAY', 'selectall_hashref returns an arrayref');
+	delete $LEDGER{'sha:hashref_same_result'};
+};
+
+subtest 'selectall_hash: returns the same rows as selectall_array in list context' => sub {
+	plan tests => 2;
+	my $j = _two_db_join();
+	my @via_alias = do { local $SIG{__WARN__} = sub {}; $j->selectall_hash() };
+	my @via_canon = $j->selectall_array();
+	is_deeply(\@via_alias, \@via_canon,
+		'selectall_hash (list context) returns identical rows to selectall_array');
+	is(scalar @via_alias, 2, 'selectall_hash returns 2 rows');
+	delete $LEDGER{'sha:hash_same_result'};
+};
+
+subtest 'selectall_hashref: emits a deprecation carp on every call' => sub {
+	plan tests => 1;
+	my $j = _two_db_join();
+	warning_like { $j->selectall_hashref() }
+		qr/selectall_hashref.*deprecated/i,
+		'selectall_hashref emits a deprecation carp warning';
+	delete $LEDGER{'sha:hashref_warns'};
+};
+
+subtest 'selectall_hash: emits a deprecation carp on every call' => sub {
+	plan tests => 1;
+	my $j = _two_db_join();
+	warning_like { $j->selectall_hash() }
+		qr/selectall_hash.*deprecated/i,
+		'selectall_hash emits a deprecation carp warning';
+	delete $LEDGER{'sha:hash_warns'};
 };
 
 # ===========================================================================

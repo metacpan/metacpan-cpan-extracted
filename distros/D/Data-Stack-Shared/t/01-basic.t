@@ -59,7 +59,7 @@ if ($pid == 0) {
     _exit($v == 42 ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'child popped parent value';
+is $?, 0, 'child popped parent value';
 
 # futex wakeup: child pushes, parent pops
 $pid = fork // die;
@@ -154,7 +154,7 @@ if ($pid == 0) {
     _exit($child->pop == 99 ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'memfd fd inherited across fork';
+is $?, 0, 'memfd fd inherited across fork';
 
 # --- eventfd ---
 

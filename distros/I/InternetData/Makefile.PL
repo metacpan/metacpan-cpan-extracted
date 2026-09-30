@@ -18,6 +18,9 @@ WriteMakefile(
         'Mojolicious' => '9.47',
         # Mojolicious makes TLS optional; the API is HTTPS only, so we do not.
         'IO::Socket::SSL' => '2.009',
+        # The PKCE verifier's random bytes, which core perl has no secure source
+        # for. IO::Socket::SSL 2.009 already requires this version.
+        'Net::SSLeay' => '1.46',
     },
     # Safe to declare rather than fold into PREREQ_PM: TEST_REQUIRES needs
     # ExtUtils::MakeMaker 6.64, and perl 5.022000 already shipped 7.04_01.

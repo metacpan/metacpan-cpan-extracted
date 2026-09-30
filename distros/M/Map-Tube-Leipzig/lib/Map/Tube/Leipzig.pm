@@ -1,15 +1,17 @@
 package Map::Tube::Leipzig;
 
-$Map::Tube::Leipzig::VERSION   = '0.03';
-$Map::Tube::Leipzig::AUTHORITY = 'cpan:MANWAR';
+use version;
+
+our $VERSION   = qv('v0.1.0');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
-Map::Tube::Leipzig - Interface to the Leipzig Rail Map.
+Map::Tube::Leipzig - Interface to the Leipzig/Halle S-Bahn and Tram Map.
 
 =head1 VERSION
 
-Version 0.03
+Version v0.1.0
 
 =cut
 
@@ -28,25 +30,18 @@ with 'Map::Tube';
 =head1 DESCRIPTION
 
 This was created and published while participating in the B<Perl Toolchain Summit 2025> in Leipzip, Germany.
+It was later expanded for more coverage.
 
 It currently provides functionality to find the shortest  route between  the  two
-given  nodes. It covers the following rail lines only for now:
-
-=over 2
-
-=item * L<S3|Map::Tube::Leipzig::Line::S3>
-
-=item * L<S7|Map::Tube::Leipzig::Line::S7>
-
-=back
+given  nodes.
 
 =head1 MAP DATA
 
-The map data collected from L<this website|https://ontheworldmap.com/germany/city/leipzig/leipzig-rail-map.html>.
+The map data collected from local websites showing rail maps and schedules.
 
 =head1 CONSTRUCTOR
 
-The constructor DO NOT expects parameters.This setup the default node definitions.
+The constructor DOES NOT expect parameters. This sets up the default node (stations and lines) definitions.
 
     use strict;
     use warnings;
@@ -55,6 +50,8 @@ The constructor DO NOT expects parameters.This setup the default node definition
     my $rail = Map::Tube::Leipzig->new;
 
 =head1 METHODS
+
+See L<Map::Tube> for the full documentation of the methods provided.
 
 =head2 get_shortest_route($from, $to)
 
@@ -93,6 +90,14 @@ base64 encoded string of the entire map.
 
 Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
+=head1 CONTRIBUTORS
+
+=over 2
+
+=item * Gisbert W. Selke, C<< <gws at cpan.org> >>
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/manwar/Map-Tube-Leipzig>
@@ -117,14 +122,6 @@ You can also look for information at:
 
 L<https://github.com/manwar/Map-Tube-Leipzig/issues>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Map-Tube-Leipzig>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Map-Tube-Leipzig>
-
 =item * Search MetaCPAN
 
 L<https://metacpan.org/dist/Map-Tube-Leipzig>
@@ -133,7 +130,7 @@ L<https://metacpan.org/dist/Map-Tube-Leipzig>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2025 Mohammad Sajid Anwar.
+Copyright (C) 2026 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

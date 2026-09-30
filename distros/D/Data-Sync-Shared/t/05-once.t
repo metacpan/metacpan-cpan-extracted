@@ -78,7 +78,9 @@ is $s->{state}, 'init', 'stats state is init after reset';
     }
 
     waitpid($pid, 0);
-    my $child_was_init = $? >> 8;
+    my $st = $?;
+    is $st & 127, 0, 'the child was not killed by a signal';
+    my $child_was_init = $st >> 8;
     my $parent_was_init = $got ? 1 : 0;
 
     # Exactly one should have been initializer

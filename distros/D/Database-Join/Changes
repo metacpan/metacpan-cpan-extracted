@@ -1,5 +1,20 @@
 Revision history for Database::Join
 
+0.008.1	Tue Sep 29 07:14:50 AM EDT 2026
+	[ Enhancements ]
+	- set_logger() now accepts the named-pair form set_logger(logger => $obj),
+	  matching the Database::Abstraction API.  Non-blessed values (log-level
+	  strings, filenames, coderefs) are wrapped in Log::Abstraction->new(...)
+	  automatically, exactly as Database::Abstraction does.  Callers using the
+	  named-pair form against a Database::Join object previously had the string
+	  "logger" silently stored as the logger object.
+	- join => criteria now croak immediately with a diagnostic message
+	  (error_join_criterion) instead of being silently dropped with a
+	  warn_unknown_column carp.  Database::Abstraction accepts join => for
+	  SQL JOINs within a single table; on a merged view the criterion cannot be
+	  routed, so an early croak is clearer than silent discard.
+	- Log::Abstraction 0.33 added as a runtime dependency (Makefile.PL, cpanfile).
+
 0.008.0	Mon Sep 28 09:41:08 PM EDT 2026
 	[ Enhancements ]
 	- each_row(\&callback, ...): new streaming-style select method that calls

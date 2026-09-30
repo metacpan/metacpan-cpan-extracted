@@ -1,0 +1,71 @@
+{
+   "abstract" : "DarkPAN::Resolver::SQLite",
+   "author" : [
+      "Rob Lauer <rclauer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DarkPAN-Resolver-SQLite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::cpm::DistNotation" : "0",
+            "App::cpm::version" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "1.647",
+            "HTTP::Tiny" : "0.088",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBI" : "1.647"
+         }
+      }
+   },
+   "provides" : {
+      "DarkPAN::Resolver::SQLite" : {
+         "file" : "lib/DarkPAN/Resolver/SQLite.pm",
+         "version" : "v1.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "https://github.com/rlauer6/DarkPAN-Resolver-SQLite/issues"
+      },
+      "homepage" : "https://github.com/rlauer6/DarkPAN-Resolver-SQLite",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/rlauer6/DarkPAN-Resolver-SQLite"
+      }
+   },
+   "version" : "v1.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

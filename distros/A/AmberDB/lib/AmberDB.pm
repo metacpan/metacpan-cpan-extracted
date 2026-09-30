@@ -24,7 +24,7 @@ use parent qw(
 our $DB_HASH;
 our $hash_info;
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 my $CREATED = '2005-01-28';
 
 
@@ -136,7 +136,7 @@ sub new {
             date_short date_str time year year_dir
             _lang _locale _collator _uc_re _lc_re _sort_re _accent_re
             _ascii_re _search_re _search_map _phonetic_rules _safe_re
-            _letter_re _splitter_re _html_entities
+            _letter_re _splitter_re _html_entities _letter_chars
         )
     );
     lock_keys( %$self, @allowed );
@@ -323,6 +323,7 @@ sub insert_id {
     $self->sort_add( $idx_path, $table_info, \@batch );
     $self->unique_add( $idx_path, $table_info, \@batch );
     $self->slug_add( $idx_path, $table_info, $tableid, \@batch );
+    $self->suggest_add( $idx_path, $table_info, $tableid, \@batch );
 
     # 2. Tiered stream (A: Aktif, B: Pasif/Junk)
     if ( $table_info->{use_junk} ) {
@@ -556,6 +557,7 @@ sub insert_list {
     }
 
     $self->slug_add( $idx_path, $table_info, $tableid, \@batch );
+    $self->suggest_add( $idx_path, $table_info, $tableid, \@batch );
 
     unless ($is_async_write) {
         if ( $table_info->{log_owner} ) {
@@ -741,6 +743,7 @@ sub update_id {
     $self->unique_modify( $idx_path, $table_info, \@pairs );
 
     $self->slug_modify( $idx_path, $table_info, $tableid, \@pairs );
+    $self->suggest_add( $idx_path, $table_info, $tableid, [ \@new_rec ] );
 
     # Authorization
     $self->auth_write( $tableid, $table_path, "edit", $rid ) unless ( $is_async_write || $use_ramdisk == 3 );
@@ -4971,6 +4974,116 @@ sub search_string {
     return $statu;
 }
 
+# Autocomplete / Instant Search Suggestion method (.ajw, .ajn)
+# my @suggestions = $adb->suggest_table($tableid, $query, [\%options]);
+# Options:
+#   limit => 10 (default 10)
+# ------------------------------------------------
+sub suggest_table {
+    my ( $self, $tableid, $query, @args ) = @_;
+    return () unless defined $tableid && defined $query;
+
+    my %opts;
+    if ( @args == 1 && ref( $args[0] ) eq 'HASH' ) {
+        %opts = %{ $args[0] };
+    }
+    elsif ( @args && @args % 2 == 0 ) {
+        %opts = @args;
+    }
+    my $limit = $opts{limit} // 10;
+
+    my $table_info = $self->table_info($tableid);
+    return () unless $table_info;
+    return () unless $table_info->{suggest_block};
+
+    my $use_ramdisk = $table_info ? $self->_normalize_ramdisk_tier( $table_info->{use_ramdisk} // $table_info->{use_cache} // 0 ) : 0;
+    if ( $use_ramdisk && $self->ramdisk_is_mounted() ) {
+        $self->ramdisk_ensure($tableid);
+    }
+
+    my $table_path   = $self->table_path($tableid);
+    my $ramdisk_path = ( $use_ramdisk && $self->ramdisk_is_mounted() ) ? $self->ramdisk_path($tableid) : undef;
+    my $idx_path     = ( $use_ramdisk && $ramdisk_path ) ? $ramdisk_path : $table_path;
+
+    my $ajw_path = "${idx_path}.ajw";
+    my $ajn_path = "${idx_path}.ajn";
+    $ajw_path = "${table_path}.ajw" unless -e $ajw_path;
+    $ajn_path = "${table_path}.ajn" unless -e $ajn_path;
+
+    return () unless -e $ajw_path;
+
+    my $raw_query = $query;
+    $raw_query =~ s/^\s+//;
+    return () unless length $raw_query;
+
+    my $has_trailing_space = ( $raw_query =~ /\s+$/ ) ? 1 : 0;
+
+    my $clean_q = $self->to_ascii( $self->lc($raw_query) );
+    $clean_q =~ s/^[^\w\s]+//;
+    my @tokens = split /\s+/, $clean_q;
+    return () unless @tokens;
+
+    # 1. Single word without trailing space: prefix lookup on .ajw
+    if ( @tokens == 1 && !$has_trailing_space ) {
+        my $prefix = $tokens[0];
+        return () if length($prefix) < 2;
+
+        my $raw = $self->index_get( $ajw_path, $prefix, 'raw' );
+        return () unless defined $raw && length($raw);
+        my $items = $self->db_decode($raw);
+        return () unless ref($items) eq 'ARRAY' && @$items;
+
+        my @results;
+        for my $it (@$items) {
+            push @results, ( ref($it) eq 'ARRAY' ? $it->[0] : $it );
+            last if @results >= $limit;
+        }
+        return @results;
+    }
+
+    # 2. Multi-word or trailing space: transition lookup on .ajn
+    return () unless -e $ajn_path;
+
+    my ( $prev_norm, $filter_prefix, $user_lead );
+
+    if ($has_trailing_space) {
+        $prev_norm     = $tokens[-1];
+        $filter_prefix = '';
+        $user_lead     = $raw_query;
+        $user_lead    .= " " unless $user_lead =~ /\s$/;
+    }
+    else {
+        $prev_norm     = $tokens[-2];
+        $filter_prefix = $tokens[-1];
+        if ( $raw_query =~ /^(.*\s+)\S+$/ ) {
+            $user_lead = $1;
+        }
+        else {
+            $user_lead = join( " ", @tokens[ 0 .. $#tokens - 1 ] ) . " ";
+        }
+    }
+
+    my $raw = $self->index_get( $ajn_path, $prev_norm, 'raw' );
+    return () unless defined $raw && length($raw);
+    my $items = $self->db_decode($raw);
+    return () unless ref($items) eq 'ARRAY' && @$items;
+
+    my @results;
+    for my $it (@$items) {
+        next unless ref($it) eq 'ARRAY';
+        my ( $disp_word, $cnt, $norm_word ) = @$it;
+        $norm_word //= $self->to_ascii( $self->lc($disp_word) );
+
+        if ( length $filter_prefix ) {
+            next unless index( $norm_word, $filter_prefix ) == 0;
+        }
+        push @results, $user_lead . $disp_word;
+        last if @results >= $limit;
+    }
+
+    return @results;
+}
+
 # Calculates record count.
 # my $count = $adb->table_count($tableid);
 # ------------------------------------------------
@@ -5806,14 +5919,14 @@ sub recs_put {
         my $table_info  = eval { $self->table_info($tableid) };
         my $use_ramdisk = $table_info ? $self->_normalize_ramdisk_tier( $table_info->{use_ramdisk} // $table_info->{use_cache} // 0 ) : 0;
         my ($ext)     = $file_path =~ m{\.([^.]+)$};
-        my $is_idx    = ( $ext && $ext =~ /^(?:inx|src|fld|fac|unq|slg)$/ ) ? 1 : 0;
+        my $is_idx    = ( $ext && $ext =~ /^(?:inx|src|fld|fac|unq|slg|ajw|ajn)$/ ) ? 1 : 0;
         my $should_mirror = ( $use_ramdisk == 2 || ( $use_ramdisk == 4 && $is_txn ) )
                          || ( $use_ramdisk == 1 && $is_idx );
         if ($should_mirror) {
             my $ram_dir   = $self->ramdisk_dir();
             my $is_in_ram = ( $ram_dir && index( $file_path, $ram_dir ) == 0 ) ? 1 : 0;
             my $mirror_file;
-            if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg)$/ ) {
+            if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg|ajw|ajn)$/ ) {
                 if ($is_in_ram) {
                     my $tbl_path = $self->table_path($tableid);
                     $mirror_file = "$tbl_path.$ext" if $tbl_path;
@@ -5881,14 +5994,14 @@ sub recs_del {
         my $table_info  = eval { $self->table_info($tableid) };
         my $use_ramdisk = $table_info ? $self->_normalize_ramdisk_tier( $table_info->{use_ramdisk} // $table_info->{use_cache} // 0 ) : 0;
         my ($ext)     = $file_path =~ m{\.([^.]+)$};
-        my $is_idx    = ( $ext && $ext =~ /^(?:inx|src|fld|fac|unq|slg)$/ ) ? 1 : 0;
+        my $is_idx    = ( $ext && $ext =~ /^(?:inx|src|fld|fac|unq|slg|ajw|ajn)$/ ) ? 1 : 0;
         my $should_mirror = ( $use_ramdisk == 2 || ( $use_ramdisk == 4 && $is_txn ) )
                          || ( $use_ramdisk == 1 && $is_idx );
         if ($should_mirror) {
             my $ram_dir   = $self->ramdisk_dir();
             my $is_in_ram = ( $ram_dir && index( $file_path, $ram_dir ) == 0 ) ? 1 : 0;
             my $mirror_file;
-            if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg)$/ ) {
+            if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg|ajw|ajn)$/ ) {
                 if ($is_in_ram) {
                     my $tbl_path = $self->table_path($tableid);
                     $mirror_file = "$tbl_path.$ext" if $tbl_path;
@@ -6065,6 +6178,8 @@ sub index_get {
             || $k eq 'lastid'
             || $table_path =~ /\.slg$/
             || $table_path =~ /\.unq$/
+            || $table_path =~ /\.ajw$/
+            || $table_path =~ /\.ajn$/
             || ( $table_path =~ /\.fac$/ && $k ne 'active' ) )
         {
             return ($raw);
@@ -6188,7 +6303,7 @@ sub index_put {
                 my $is_in_ram = ( $ram_dir && index( $table_path, $ram_dir ) == 0 ) ? 1 : 0;
                 my ($ext)     = $table_path =~ m{\.([^.]+)$};
                 my $mirror_path;
-                if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg)$/ ) {
+                if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg|ajw|ajn)$/ ) {
                     if ($is_in_ram) {
                         my $tbl_path = $self->table_path($tableid);
                         $mirror_path = "$tbl_path.$ext" if $tbl_path;
@@ -6271,7 +6386,7 @@ sub index_put {
             my $is_in_ram = ( $ram_dir && index( $table_path, $ram_dir ) == 0 ) ? 1 : 0;
             my ($ext)     = $table_path =~ m{\.([^.]+)$};
             my $mirror_path;
-            if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg)$/ ) {
+            if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg|ajw|ajn)$/ ) {
                 if ($is_in_ram) {
                     my $tbl_path = $self->table_path($tableid);
                     $mirror_path = "$tbl_path.$ext" if $tbl_path;
@@ -6353,7 +6468,7 @@ sub index_del {
                 my $is_in_ram = ( $ram_dir && index( $table_path, $ram_dir ) == 0 ) ? 1 : 0;
                 my ($ext)     = $table_path =~ m{\.([^.]+)$};
                 my $mirror_path;
-                if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg)$/ ) {
+                if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg|ajw|ajn)$/ ) {
                     if ($is_in_ram) {
                         my $tbl_path = $self->table_path($tableid);
                         $mirror_path = "$tbl_path.$ext" if $tbl_path;
@@ -6408,7 +6523,7 @@ sub index_del {
             my $is_in_ram = ( $ram_dir && index( $table_path, $ram_dir ) == 0 ) ? 1 : 0;
             my ($ext)     = $table_path =~ m{\.([^.]+)$};
             my $mirror_path;
-            if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg)$/ ) {
+            if ( $ext && $ext =~ /^(?:\Q$self->{db_ext}\E|inx|src|fld|fac|unq|slg|ajw|ajn)$/ ) {
                 if ($is_in_ram) {
                     my $tbl_path = $self->table_path($tableid);
                     $mirror_path = "$tbl_path.$ext" if $tbl_path;

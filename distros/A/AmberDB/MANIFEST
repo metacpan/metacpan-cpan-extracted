@@ -120,6 +120,7 @@ t/amberdb_simple_mode.t
 t/amberdb_slug_bulk.t
 t/amberdb_slug_facet_bulk.t
 t/amberdb_sort.t
+t/amberdb_suggest.t
 t/amberdb_standard_api_args.t
 t/amberdb_table_use_simple.t
 t/amberdb_tools.t

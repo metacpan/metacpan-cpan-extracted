@@ -10,6 +10,7 @@ use autodie qw(:all);
 use Carp qw(croak carp);
 use File::Spec;
 use List::Util qw(max);
+use Log::Abstraction;
 use Readonly;
 use Scalar::Util qw(blessed);
 use Object::Configure;
@@ -38,7 +39,7 @@ Readonly::Hash my %SAFE_LIST_OPS => map { $_ => 1 } ('IN', 'NOT IN');
 # A bare undef criterion value (col => undef) also generates IS NULL.
 Readonly::Hash my %SAFE_NOARG_OPS => map { $_ => 1 } ('IS NULL', 'IS NOT NULL');
 
-our $VERSION = '0.008.0';
+our $VERSION = '0.008.1';
 
 # Package-level cache for threads availability.  undef = not yet checked;
 # 1 = available; 0 = not available.  Checked lazily on the first parallel
@@ -56,6 +57,7 @@ Readonly::Hash my %MESSAGES => (
 	error_col_conflict	=> 'Column "%s" exists in multiple databases; use the owning database directly or rename the column',
 	error_remove_join_col	=> 'Cannot remove join_column "%s"; it is required for the join',
 	warn_unknown_column	=> 'Column "%s" is not present in any configured database; criterion ignored',
+	error_join_criterion	=> 'join => criteria are not supported on Database::Join (SQL JOINs target a single DA; use multiple DAs in the databases => [] constructor instead)',
 	error_query_unsupported	=> 'query() chained builder is not supported on Database::Join (Database::Abstraction::Query targets a single DA, not the merged view); use selectall_arrayref, selectall_array, fetchrow_hashref, count, or each_row instead',
 	error_execute_unsupported => 'execute() raw SQL is not supported on Database::Join',
 	error_unknown_message	=> 'Unknown message key "%s"',
@@ -72,7 +74,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.008.0
+Version 0.008.1
 
 =head1 SYNOPSIS
 
@@ -486,6 +488,18 @@ query and kept alive until the object is destroyed; it is not re-created on
 every query call.  If the directory is not writable, or the filesystem is full,
 the call will C<croak> with C<error_sqlite_connect>.  Check permissions and
 free space if you see that error.
+
+=item C<join =E<gt>> criteria are not supported
+
+C<Database::Abstraction> accepts a C<join =E<gt> { table =E<gt> ..., on =E<gt> ... }>
+key in its criteria hashrefs to express an SQL JOIN within a single table.
+C<Database::Join> cannot route this to a component DA meaningfully: the merged
+view has no concept of a single underlying table.  Passing C<join =E<gt>> to any
+query method will C<croak> with C<error_join_criterion>.
+
+B<Fix:> Model the joined table as a separate C<Database::Abstraction> object and
+add it to the C<databases =E<gt> []> list.  Use C<join_column> or C<join_map> to
+specify the shared key.
 
 =back
 
@@ -1320,6 +1334,9 @@ A single plain scalar argument is interpreted as the C<join_column> value
     warn_unknown_column (carp)
         -- A criterion key names a column not present in any component database;
            the criterion is silently dropped and all rows are returned.
+    error_join_criterion (croak)
+        -- A criterion hashref contains a join => key (DA SQL-JOIN syntax).
+           Use a separate DA object for the joined table instead.
     sort_by column unknown (carp)
         -- The column given in sort_by is not in the merged view; the result
            is returned in the default join_column ascending order instead.
@@ -1913,18 +1930,24 @@ sub updated {
 =head3 SYNOPSIS
 
     $join->set_logger($log);
+    $join->set_logger(logger => $log);   # named-pair form also accepted
 
 =head3 DESCRIPTION
 
 Attaches a new logger object to the join and propagates it to every component
 database.  The logger is used for diagnostic output by all component databases.
 
+Non-blessed values (a log-level string such as C<"debug">, a filename, or a
+code reference) are wrapped in C<Log::Abstraction->new(...)> automatically,
+matching the behaviour of C<Database::Abstraction::set_logger>.
+
 =head3 API SPECIFICATION
 
 =head4 Input
 
-    $log    Positional: a logger object (required).
-            Must support whatever interface Database::Abstraction expects.
+    logger  Positional or named: a logger object, log-level string, filename,
+            or code reference (required).  Non-blessed values are wrapped in
+            Log::Abstraction automatically.
 
 =head4 Output
 
@@ -1941,17 +1964,27 @@ database.  The logger is used for diagnostic output by all component databases.
     $join->set_logger($log);
     # $log is now used by $join and by $db1 and $db2
 
+    # Named-pair form (mirrors Database::Abstraction API):
+    $join->set_logger(logger => $log);
+
 =head3 MESSAGES
 
-    (croak) Usage: set_logger($logger)
+    (croak) Usage: set_logger(logger => $logger)
         -- Called with an undefined argument.  Pass a valid logger object.
 
 =cut
 
 sub set_logger {
-	my ($self, $logger) = @_;
+	my $self = shift;
+	my $p    = Params::Get::get_params('logger', @_);
+	my $logger = $p->{'logger'};
 
-	croak 'Usage: set_logger($logger)' unless defined $logger;
+	croak 'Usage: set_logger(logger => $logger)' unless defined $logger;
+
+	# Wrap non-blessed values (log-level strings, filenames, coderefs) exactly
+	# as Database::Abstraction does, so callers get identical behaviour from DJ.
+	$logger = Log::Abstraction->new($logger)
+		unless Scalar::Util::blessed($logger);
 
 	$self->{_logger} = $logger;
 	$_->set_logger($logger) for @{ $self->{_dbs} };
@@ -2647,6 +2680,11 @@ sub _partition_criteria :Protected {
 				my $local = $self->{_join_map}{$i} // $join_col;
 				$per_db[$i]{$local} = ref($val) eq 'HASH' ? { %{$val} } : $val;
 			}
+		} elsif ($col eq 'join') {
+			# DA accepts a 'join =>' criteria key for SQL JOINs within one table.
+			# DJ cannot route such a criterion to a component DA meaningfully, so
+			# croak early with a diagnostic rather than silently dropping it.
+			croak $self->_err('error_join_criterion');
 		} elsif (defined(my $idx = $self->{_col_db}{$col})) {
 			# Translate the published column name back to the database's own name
 			# when the column was renamed for a collision (e.g. "pfx.col" -> "col").
@@ -3763,6 +3801,16 @@ B<When:> A criterion is passed for a column that does not exist in any
 component database (or has been removed with C<remove_column>).
 
 B<Fix:> Check the column name spelling.  The criterion is ignored.
+
+=item C<error_join_criterion>
+
+B<When:> A criterion hashref contains a C<join =E<gt>> key (the
+C<Database::Abstraction> SQL-JOIN syntax).
+
+B<Fix:> C<join =E<gt>> targets a single table inside one DA; it cannot be
+routed through a merged view.  Express multi-table relationships by adding
+the joined table as a separate C<Database::Abstraction> object in the
+C<databases =E<gt> []> constructor list instead.
 
 =item C<error_query_unsupported>
 

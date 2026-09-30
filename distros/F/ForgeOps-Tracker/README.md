@@ -327,7 +327,9 @@ builder {
 
 The statement is masked before it's stored: every string and number becomes `?`, so this span
 carries `SELECT id FROM orders WHERE customer_id = ? AND status = ?`, and ForgeOps masks it again on
-arrival. It's cut to 4000 characters, and bind values (`$customer_id`) are never read. It goes out
+arrival. That includes escaped and prefixed strings (`E'o\'brien'`, `X'DEADBEEF'`), hex, binary and
+exponent numbers (`0x1F`, `0b101`, `1.5E-3`), and, with `db_system => 'mysql'` or `'mariadb'` (where
+`"double quotes"` hold a string, not a name), double-quoted strings. It's cut to 4000 characters, and bind values (`$customer_id`) are never read. It goes out
 in the span's data as `db.statement`, with the database name (`postgresql`, `mysql`, `sqlite`,
 `mssql`, `oracle`, or any other; optional) lowercased as `db.system`. Both options are ignored on
 spans of any other kind. For a query you timed yourself, use

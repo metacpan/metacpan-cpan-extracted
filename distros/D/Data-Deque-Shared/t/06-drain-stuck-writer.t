@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use open IO => ":raw";
 use Test::More;
 use File::Temp qw(tempfile);
 use Time::HiRes qw(time);
@@ -169,7 +170,7 @@ sub poke_cursor_tail {
     cmp_ok $dt, '>=', 1.5, "C: pop_front waited ~2s before recovery (got ${dt}s)";
 
     waitpid $pid, 0;
-    is $? >> 8, 0, 'C: waiting pusher was woken immediately upon slot recovery';
+    is $?, 0, 'C: waiting pusher was woken immediately upon slot recovery';
 
     my $st = $dq->stats;
     cmp_ok $st->{recoveries}, '>=', 1, 'C: stat_recoveries incremented on pop recovery';

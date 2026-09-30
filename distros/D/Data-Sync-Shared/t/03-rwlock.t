@@ -85,7 +85,7 @@ $rw->rdunlock;
         _exit($got);
     }
     waitpid($pid, 0);
-    is $? >> 8, 1, 'child acquired concurrent rdlock';
+    is $?, 256, 'child acquired concurrent rdlock';
     $mp->rdunlock;
 }
 
@@ -102,7 +102,7 @@ $rw->rdunlock;
         _exit($got);
     }
     waitpid($pid, 0);
-    is $? >> 8, 0, 'child could not wrlock while parent holds';
+    is $?, 0, 'child could not wrlock while parent holds';
     $mp->wrunlock;
 }
 

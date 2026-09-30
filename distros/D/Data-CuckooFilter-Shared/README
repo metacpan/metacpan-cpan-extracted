@@ -225,6 +225,14 @@ SHARING ACROSS PROCESSES
         wait;
         print $cf->contains("ev-500") ? "seen\n" : "no\n";   # seen -- the child's add
 
+    "new" and "new_memfd" create a new segment sparse: pages are allocated as
+    they are first written, and once the filesystem is full, a write to a page
+    not yet allocated dies with SIGBUS. Set
+    "DATA_CUCKOOFILTER_SHARED_SPARSE=0" to reserve the whole segment at
+    creation, so a full filesystem makes them croak instead; on tmpfs and
+    memfd that commits the segment's memory at once, and a memory cgroup too
+    small for it gets an OOM kill rather than a croak.
+
 FROZEN (READ-ONLY) MODE
     A file-backed filter can be frozen and then shipped to other machines,
     where consumers open it read-only and query it with no locking at all.

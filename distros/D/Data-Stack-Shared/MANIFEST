@@ -33,6 +33,7 @@ xt/concurrent_open.t
 xt/dead_peer_recovery.t
 xt/destroy_during_call.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/file_format_v1.t

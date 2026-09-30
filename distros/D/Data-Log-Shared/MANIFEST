@@ -34,6 +34,7 @@ xt/cross_module_fd.t
 xt/daemon_detach.t
 xt/destroy_during_call.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/file_truncation.t

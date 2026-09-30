@@ -96,7 +96,7 @@ if ($pid == 0) {
     _exit($dq->pop_front == 42 ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'cross-process';
+is $?, 0, 'cross-process';
 
 # futex wakeup: child pushes, parent pops
 $pid = fork // die;

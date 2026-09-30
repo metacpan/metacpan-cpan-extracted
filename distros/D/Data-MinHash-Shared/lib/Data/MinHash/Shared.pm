@@ -1,7 +1,7 @@
 package Data::MinHash::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::MinHash::Shared', $VERSION);
 
@@ -112,6 +112,12 @@ out-of-range value croaks. An optional file B<mode> may be passed as the last ar
 to C<new> (e.g. C<0660>) for cross-user sharing; it defaults to C<0600>
 (owner-only). C<new_readonly> opens a B<frozen> file read-only for lock-free
 querying (see L</"FROZEN (READ-ONLY) MODE">).
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of dying with C<SIGBUS> while the
+segment is initialized; set C<DATA_MINHASH_SHARED_SPARSE=1> to skip the
+reservation. On tmpfs and memfd the segment is memory, and a memory cgroup too
+small for it gets an OOM kill rather than a croak.
 
 =head2 Building and comparing
 

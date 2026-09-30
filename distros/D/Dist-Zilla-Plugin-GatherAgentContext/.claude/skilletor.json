@@ -1,0 +1,14 @@
+{
+  "sources": {
+    "getty": { "git": "https://github.com/Getty/skills" }
+  },
+  "install": {
+    "skills": [
+      "getty-perl-core@getty",
+      "getty-perl-moose@getty",
+      "getty-git-commit-style@getty",
+      "getty-git-usage@getty"
+    ]
+  },
+  "targets": ["claude"]
+}

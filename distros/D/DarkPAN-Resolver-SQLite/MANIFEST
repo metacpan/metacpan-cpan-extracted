@@ -1,0 +1,11 @@
+ChangeLog
+lib/DarkPAN/Resolver/SQLite.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+share/README.md
+t/00-darkpan-resolver-sqlite.t
+t/01-resolve.t
+t/02-fetch-packages-index.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

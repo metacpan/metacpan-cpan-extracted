@@ -1,7 +1,7 @@
 package Data::Fenwick::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::Fenwick::Shared', $VERSION);
 
@@ -199,6 +199,13 @@ and queries the same tree>.
     unless (fork) { $fen->update($_, 1) for 1 .. 500; exit }
     wait;
     print $fen->total, "\n";   # 500 -- the child's updates
+
+C<new> and C<new_memfd> create a new segment sparse: pages are allocated as
+they are first written, and once the filesystem is full, a write to a page not
+yet allocated dies with SIGBUS. Set C<DATA_FENWICK_SHARED_SPARSE=0> to reserve
+the whole segment at creation, so a full filesystem makes them croak instead;
+on tmpfs and memfd that commits the segment's memory at once, and a memory
+cgroup too small for it gets an OOM kill rather than a croak.
 
 =head1 FROZEN (READ-ONLY) MODE
 

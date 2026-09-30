@@ -5,16 +5,22 @@ use warnings;
 
 use B ();
 use Carp ();
+use Digest::SHA ();
+use Encode ();
+use MIME::Base64 ();
 use Mojo::Promise;
 use Mojo::Util ();
+use Net::SSLeay ();
 use Scalar::Util ();
 
 use InternetData::Error;
 use InternetData::OauthError;
 
-our $VERSION = '1.7.1';
+our $VERSION = '1.8.0';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
+# The only PKCE method the server accepts.
+use constant PKCE_METHOD => 'S256';
 
 # Each member a response may carry, by wire name: its type, whether it is
 # required, and the name it is surfaced under when that differs.
@@ -136,6 +142,63 @@ sub revoke_p {
     $self->{client}->_check_options('oauth->revoke', \%options, 'timeout');
     my %form = (token => $token, client_id => $client_id);
     return $self->_send_p('/oauth/revoke', \%form, $self->{client}{retries}, \%options)->then(sub { return });
+}
+
+# The URL to open in the person's browser for the authorization code flow. Makes
+# no request, so there is no promise form. Every value is percent-encoded over
+# UTF-8 with only A-Z a-z 0-9 - . _ ~ left literal, so a space is %20, never +.
+sub authorization_url {
+    my ($self, $client_id, $redirect_uri, $code_challenge, %options) = @_;
+    my @required = (client_id => $client_id, redirect_uri => $redirect_uri, code_challenge => $code_challenge);
+    _assert_argument('authorization_url', @required);
+    $self->{client}->_check_options('oauth->authorization_url', \%options, 'scope', 'state', 'resource');
+    my @params = (response_type => 'code', @required, code_challenge_method => PKCE_METHOD);
+    for my $name (qw(scope state resource)) {
+        next unless defined $options{$name} && length $options{$name};
+        _assert_argument('authorization_url', $name => $options{$name});
+        push @params, $name => $options{$name};
+    }
+    my @query;
+    while (my ($name, $value) = splice @params, 0, 2) {
+        push @query, "$name=" . _percent_encode('authorization_url', $name, $value);
+    }
+    return $self->{client}->_url('/oauth/authorize')->to_string . '?' . join('&', @query);
+}
+
+# Trades the code a sign-in's redirect brought back for tokens. Never retried: the
+# server spends the code on first read, before it checks the verifier.
+sub exchange_authorization_code {
+    my $self = shift;
+    $self->_assert_blocking_ok('exchange_authorization_code');
+    return $self->{client}->_wait($self->exchange_authorization_code_p(@_));
+}
+
+sub exchange_authorization_code_p {
+    my ($self, $client_id, $code, $code_verifier, $redirect_uri, %options) = @_;
+    _assert_argument('exchange_authorization_code',
+        client_id => $client_id, code => $code, code_verifier => $code_verifier, redirect_uri => $redirect_uri);
+    $self->{client}->_check_options('oauth->exchange_authorization_code', \%options, 'timeout');
+    return $self->_exchange_p({
+        grant_type => 'authorization_code', code => $code, redirect_uri => $redirect_uri,
+        client_id => $client_id, code_verifier => $code_verifier,
+    }, \%options);
+}
+
+# A fresh PKCE pair for one sign-in, from OpenSSL's secure random source: core
+# perl has none, and Net::SSLeay comes with IO::Socket::SSL.
+sub create_pkce {
+    my ($self) = @_;
+    my $bytes;
+    Net::SSLeay::RAND_bytes($bytes, 32) == 1 && length $bytes == 32
+        or Carp::croak('InternetData::oauth->create_pkce: the secure random source failed');
+    my $verifier = MIME::Base64::encode_base64url($bytes);
+    return { verifier => $verifier, challenge => _challenge($verifier), method => PKCE_METHOD };
+}
+
+sub pkce_challenge {
+    my ($self, $verifier) = @_;
+    _assert_argument('pkce_challenge', verifier => $verifier);
+    return _challenge($verifier);
 }
 
 sub poll_device_token {
@@ -284,6 +347,21 @@ sub _is_string {
     return ($flags & B::SVp_POK) && !($flags & (B::SVp_IOK | B::SVp_NOK)) ? 1 : 0;
 }
 
+sub _challenge {
+    my ($verifier) = @_;
+    return MIME::Base64::encode_base64url(Digest::SHA::sha256(Encode::encode('UTF-8', $verifier)));
+}
+
+# A value with no UTF-8 at all, such as a lone surrogate, is refused rather than
+# sent in perl's own lax encoding.
+sub _percent_encode {
+    my ($method, $name, $value) = @_;
+    my $bytes = eval { Encode::encode('UTF-8', $value, Encode::FB_CROAK | Encode::LEAVE_SRC) };
+    Carp::croak("InternetData::oauth->$method: $name has no UTF-8 form") unless defined $bytes;
+    $bytes =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord $1)/ge;
+    return $bytes;
+}
+
 sub _assert_argument {
     my ($method, %arguments) = @_;
     for my $name (sort keys %arguments) {
@@ -304,7 +382,7 @@ __END__
 
 =head1 NAME
 
-InternetData::Oauth - sign a person in with the OAuth device flow
+InternetData::Oauth - sign a person in with OAuth
 
 =head1 SYNOPSIS
 
@@ -320,13 +398,17 @@ InternetData::Oauth - sign a person in with the OAuth device flow
 =head1 DESCRIPTION
 
 A program running on the person's own machine lets them sign in with a browser
-and pick one of their API keys, instead of asking them to paste it. Reached
+and pick one of their API keys, instead of asking them to paste it: the device
+flow. An app that can take a browser redirect signs them in there instead: the
+authorization code flow, with a PKCE pair made for that one sign-in. Reached
 through L<InternetData/oauth>.
 
-Every method takes a client ID, issued on request from support@internetdata.io.
-None of these requests carries the client's API key, and none needs one. Every
-method takes a per-call C<timeout> in seconds, bounding each request it sends,
-and has a C<_p> twin returning a L<Mojo::Promise>.
+Every method takes a client ID, issued on request from support@internetdata.io;
+for the authorization code flow it can also be the https URL of a client
+metadata document the app serves. None of these requests carries the client's
+API key, and none needs one. Every method that sends a request takes a per-call
+C<timeout> in seconds, bounding each request it sends, and has a C<_p> twin
+returning a L<Mojo::Promise>.
 
 Answers are hash references keyed by the wire names. A member the server did not
 send has no key at all, and an empty C<scope> is present.
@@ -392,5 +474,33 @@ bounds each request, never the poll.
 There is no cancellation handle: the blocking form returns only at one of those
 outcomes. The waits are event-loop timers, so C<poll_device_token_p> shares a
 running L<Mojo::IOLoop> with everything else on it.
+
+=head2 authorization_url($client_id, $redirect_uri, $code_challenge, %options)
+
+The URL to open in the person's browser for the authorization code flow, from a
+PKCE C<challenge>. Makes no request. C<scope>, C<state> and C<resource> are added
+when given and left out when empty; the redirect brings C<state> back as it was
+sent, beside a C<code> for C<exchange_authorization_code>, or with an C<error>.
+Every value is percent-encoded over UTF-8, leaving only C<A-Z a-z 0-9 - . _ ~>
+literal. An empty required value, or one with no UTF-8 form, croaks.
+
+=head2 exchange_authorization_code($client_id, $code, $code_verifier, $redirect_uri, %options)
+
+Trades the C<code> the redirect brought back for tokens, answering as the two
+exchanges above do. C<$code_verifier> is the PKCE C<verifier> whose challenge went
+into the authorization URL, and C<$redirect_uri> that URL's, exactly. Never
+retried: the server spends the code on first read, before it checks the verifier.
+
+=head2 create_pkce
+
+A fresh PKCE pair for one sign-in, as a hash reference: C<verifier>, 32 bytes
+from OpenSSL's secure random source as 43 characters of unpadded base64url;
+C<challenge>, its SHA-256 as unpadded base64url; and C<method>, C<S256>, the only
+one the server accepts. The challenge goes into the authorization URL, the
+verifier only to the exchange.
+
+=head2 pkce_challenge($verifier)
+
+The C<S256> challenge for a verifier of your own.
 
 =cut

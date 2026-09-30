@@ -40,6 +40,47 @@ subtest 'mask replaces strings and numbers, leaving identifiers and placeholders
     is(mask('DO $b$ BEGIN PERFORM 1; END $b$'), 'DO ?');
 };
 
+# The server's canonical masking cases ([statement, db.system, expected]), copied in whole so every
+# SDK's port is checked against exactly the same set.
+my @CORPUS = (
+    ['SELECT * FROM orders WHERE email = \'a@b.co\' AND id = 42 LIMIT 10', undef, 'SELECT * FROM orders WHERE email = ? AND id = ? LIMIT ?'],
+    ['EXEC sp_note @text = \'it\'\'s broken\'', undef, 'EXEC sp_note @text = ?'],
+    ['SELECT 1 WHERE name = \'unterminated', undef, 'SELECT ? WHERE name = ?'],
+    ['DO $body$ BEGIN PERFORM 1; END $body$', undef, 'DO ?'],
+    ['SELECT "user id" FROM orders2 WHERE id = $1 AND v = sp_v2(?)', undef, 'SELECT "user id" FROM orders2 WHERE id = $1 AND v = sp_v2(?)'],
+    ['SELECT price * 1.5 FROM t', undef, 'SELECT price * ? FROM t'],
+    ['SELECT * FROM users WHERE name = E\'o\\\'brien\' AND id = 1', undef, 'SELECT * FROM users WHERE name = ? AND id = ?'],
+    ['SELECT * FROM users WHERE name = \'o\\\'brien\' AND id = 1', undef, 'SELECT * FROM users WHERE name = ? AND id = ?'],
+    ['SELECT * FROM t WHERE b = X\'DEADBEEF\' AND s = N\'uni\' AND u = U&\'d\\0061t\' AND e = e\'x\'', undef, 'SELECT * FROM t WHERE b = ? AND s = ? AND u = ? AND e = ?'],
+    ['SELECT * FROM t WHERE a LIKE\'%secret%\'', undef, 'SELECT * FROM t WHERE a LIKE?'],
+    ['SELECT * FROM t WHERE f = 0x1F AND b = 0b101 AND n = 3e10 AND m = 1.5E-3 AND k = .5', undef, 'SELECT * FROM t WHERE f = ? AND b = ? AND n = ? AND m = ? AND k = ?'],
+    ['SELECT e, t.col, 1e5e FROM t', undef, 'SELECT e, t.col, 1e5e FROM t'],
+    ['SELECT "user id" FROM t WHERE token = "abc123secret"', 'mysql', 'SELECT ? FROM t WHERE token = ?'],
+    ['SELECT "user id" FROM t WHERE token = "abc123secret"', 'MariaDB', 'SELECT ? FROM t WHERE token = ?'],
+    ['SELECT "user id" FROM t WHERE token = "abc123secret"', 'postgresql', 'SELECT "user id" FROM t WHERE token = "abc123secret"'],
+    ['SELECT "user id" FROM t WHERE token = "abc123secret"', undef, 'SELECT "user id" FROM t WHERE token = "abc123secret"'],
+    ['SELECT * FROM t WHERE a = \'x\' AND b = 9', undef, 'SELECT * FROM t WHERE a = ? AND b = ?'],
+    ['SELECT * FROM t WHERE a = ? AND b = ?', undef, 'SELECT * FROM t WHERE a = ? AND b = ?'],
+    ['SELECT * FROM t WHERE path = \'C:\\\\dir\\\\\' AND n = 5', undef, 'SELECT * FROM t WHERE path = ? AND n = ?'],
+    ['INSERT INTO t (a, b) VALUES (-5, +3.25e+2)', undef, 'INSERT INTO t (a, b) VALUES (-?, +?)'],
+    ['SELECT * FROM t WHERE a = \'secret\\', undef, 'SELECT * FROM t WHERE a = ?'],
+    ['SELECT * FROM t WHERE a = "secret\\', 'mysql', 'SELECT * FROM t WHERE a = ?'],
+);
+
+subtest 'mask matches the server on every canonical case' => sub {
+    for my $case (@CORPUS) {
+        my ($statement, $system, $expected) = @$case;
+        my $label = $statement . (defined $system ? " on $system" : '');
+        is(mask($statement, system => $system), $expected, $label);
+        is(mask($expected, system => $system), $expected, "$label, masked again");
+    }
+};
+
+subtest 'mask covers a string longer than Perl repeats a complex group' => sub {
+    is(mask(q{SELECT '} . ('ab\\x' x 40000) . q{' AND n = 5}), 'SELECT ? AND n = ?');
+    is(mask('SELECT "' . ('xy' x 80000) . '" FROM t', system => 'mysql'), 'SELECT ? FROM t');
+};
+
 subtest 'mask is idempotent, truncates, and returns undef for blank input' => sub {
     my $once = mask(q{SELECT * FROM t WHERE a = 'x' AND b = 9});
     is(mask($once), $once);

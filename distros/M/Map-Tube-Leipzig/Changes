@@ -1,5 +1,12 @@
 Revision history for Map::Tube::Leipzig
 
+v0.1.0  Wed Sep 30 01:35:00 2026
+        - Prepared by Gisbert W. Selke.
+        - Substantially expanded coverage, also adding Halle area.
+        - Changed to semantic versioning.
+        - Removed doc-only modules S3.pm and S7.pm.
+        - Updated documentation.
+
 0.03  Sat May 03 09:45:00 2025
       - Fixed encoding error in the pod.
 

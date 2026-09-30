@@ -51,7 +51,7 @@ for my $c (0 .. $CONSUMERS - 1) {
 
 for my $pid (@kids) {
     waitpid $pid, 0;
-    ok $? >> 8 == 0, "worker $pid exit 0 (got $?)";
+    ok $? == 0, "worker $pid exit 0 (got $?)";
 }
 
 my %seen;

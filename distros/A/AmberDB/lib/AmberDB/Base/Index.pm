@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 
 my $CREATED = '2021-05-24';
 
@@ -1907,6 +1907,332 @@ sub sort_by_block_records {
     $type //= ( $blk == 0 ) ? ( ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num' ) : 'auto';
 
     return $self->array_sort( $type, $dir, $blk, @$recs_ref );
+}
+
+# ------------------------------------------------
+# Autocomplete / Suggest Index Lifecycle Methods (.ajw, .ajn)
+# ------------------------------------------------
+
+sub _extract_suggest_sentences {
+    my ( $self, $table_info, $rec, $rdbm_recs, $rdbm_blocks ) = @_;
+
+    return () unless ref($table_info) eq 'HASH' && ref($rec) eq 'ARRAY';
+    my $suggest_blocks = $table_info->{suggest_block};
+    return () unless ref($suggest_blocks) eq 'ARRAY' && @$suggest_blocks;
+
+    my %join_left_blocks;
+    if ( ref( $table_info->{suggest_join} ) eq 'ARRAY' ) {
+        for my $rule ( @{ $table_info->{suggest_join} } ) {
+            if ( ref($rule) eq 'ARRAY' && @$rule ) {
+                $join_left_blocks{ $rule->[0] } = 1;
+            }
+        }
+    }
+
+    my %block_vals;
+    for my $blk ( @$suggest_blocks ) {
+        my $real_blk = ref($blk) eq 'ARRAY' ? $blk->[0] : $blk;
+        my $val = $rec->[$real_blk];
+        next unless defined $val && $val ne '';
+
+        my $rdbm = $rdbm_blocks ? $rdbm_blocks->{$real_blk} : undef;
+        if ( $rdbm ) {
+            my $target_table = $rdbm->{table};
+            my $disp         = $rdbm->{display} // 1;
+            my @parts;
+            for my $sid ( split /[,;]/, $val ) {
+                $sid =~ s/^\s+|\s+$//g;
+                next unless length $sid;
+                if ( my $target_rec = $rdbm_recs->{$target_table}->{$sid} ) {
+                    my $name = $target_rec->[$disp];
+                    if ( defined $name && length $name ) {
+                        $name =~ s/^\s+|\s+$//g;
+                        push @parts, $name if length $name;
+                    }
+                }
+            }
+            $block_vals{$real_blk} = \@parts if @parts;
+        }
+        else {
+            $val =~ s/^\s+|\s+$//g;
+            if ( length $val ) {
+                if ( $val =~ /^\d+(\s*[,;]\s*\d+)+$/ || ( $join_left_blocks{$real_blk} && $val =~ /[,;]/ ) ) {
+                    my @parts = grep { length } split /\s*[,;]\s*/, $val;
+                    $block_vals{$real_blk} = \@parts if @parts;
+                }
+                else {
+                    $block_vals{$real_blk} = [ $val ];
+                }
+            }
+        }
+    }
+
+    my @sentences;
+    # 1. Standalone sentences
+    for my $blk ( @$suggest_blocks ) {
+        my $real_blk = ref($blk) eq 'ARRAY' ? $blk->[0] : $blk;
+        if ( my $parts = $block_vals{$real_blk} ) {
+            push @sentences, @$parts;
+            if ( @$parts > 1 ) {
+                push @sentences, join( ' ', @$parts );
+            }
+        }
+    }
+
+    # 2. Joined sentences based on suggest_join
+    if ( ref( $table_info->{suggest_join} ) eq 'ARRAY' ) {
+        for my $rule ( @{ $table_info->{suggest_join} } ) {
+            next unless ref($rule) eq 'ARRAY' && @$rule >= 2;
+            my ( $b1, $b2 ) = ( $rule->[0], $rule->[1] );
+            my $p1 = $block_vals{$b1};
+            my $p2 = $block_vals{$b2};
+            next unless $p1 && @$p1 && $p2 && @$p2;
+
+            for my $s1 (@$p1) {
+                for my $s2 (@$p2) {
+                    push @sentences, "$s1 $s2";
+                }
+            }
+            if ( @$p1 > 1 ) {
+                my $all_p1 = join( ' ', @$p1 );
+                for my $s2 (@$p2) {
+                    push @sentences, "$all_p1 $s2";
+                }
+            }
+        }
+    }
+
+    my %seen;
+    @sentences = grep { defined $_ && length($_) >= 2 && !$seen{$_}++ } @sentences;
+    return @sentences;
+}
+
+sub _extract_words_and_transitions {
+    my ( $self, @sentences ) = @_;
+
+    my ( %word_freq, %transitions );
+
+    for my $sent (@sentences) {
+        # 1. Strip punctuation (commas, dots, colons, brackets, quotes, etc.)
+        $sent =~ s/[.,:;()\[\]{}"“”?!\\\/&_+*~^%#@=<>|]/ /g;
+        # 2. Clean isolated/dangling hyphens and quotes (e.g. " - ", " ' ")
+        $sent =~ s/(?:^|\s)[-\'\x{2019}\x{2018}\x{2032}\x{02BC}]+(?=\s|$)/ /g;
+
+        my @raw_words = split /\s+/, $sent;
+        my @word_tokens;
+
+        for my $rw (@raw_words) {
+            $rw =~ s/^[^\w\x80-\xff]+|[^\w\x80-\xff]+$//g;
+            next unless length($rw) >= 2;
+
+            # Yazma modu (is_write = 1), no_ascii = 1 (preserve alphabet_chars)
+            my $norm_str = $self->normalize_word( $rw, 1, 1 );
+            my @toks = grep { length($_) >= 2 } split /\s+/, $norm_str;
+            next unless @toks;
+
+            for my $tok (@toks) {
+                $word_freq{$tok}{disp} //= $tok;
+                $word_freq{$tok}{cnt}++;
+            }
+            push @word_tokens, \@toks;
+        }
+
+        for ( my $i = 0; $i < $#word_tokens; $i++ ) {
+            for my $n1 ( @{ $word_tokens[$i] } ) {
+                my $a1 = $self->to_ascii($n1);
+                for my $n2 ( @{ $word_tokens[$i + 1] } ) {
+                    my $a2 = $self->to_ascii($n2);
+                    $transitions{$n1}{$n2}{disp} //= $n2;
+                    $transitions{$n1}{$n2}{cnt}++;
+                    if ( defined $a1 && $a1 ne $n1 ) {
+                        $transitions{$a1}{$n2}{disp} //= $n2;
+                        $transitions{$a1}{$n2}{cnt}++;
+                    }
+                }
+            }
+        }
+    }
+
+    return ( \%word_freq, \%transitions );
+}
+
+sub suggest_add {
+    my ( $self, $table_path, $table_info, $tableid, $records, $tier ) = @_;
+
+    return unless exists $table_info->{suggest_block};
+    return unless ref($records) eq 'ARRAY' && @$records;
+
+    # 1. Identify RDBM blocks and prepare pre-fetch
+    my %rdbm_blocks;
+    for my $blk ( @{ $table_info->{suggest_block} } ) {
+        my ( $real_blk, $src_table, $src_display ) =
+            ref($blk) eq 'ARRAY' ? ( $blk->[0], $blk->[1], $blk->[2] )
+                                 : ( $blk,       undef,     undef      );
+
+        if ( !$src_table ) {
+            ( $src_table, $src_display ) = $self->rdbm_target( $table_info, $real_blk );
+        }
+        if ( $src_table ) {
+            $src_display //= 1;
+            $rdbm_blocks{$real_blk} = { table => $src_table, display => $src_display };
+        }
+    }
+
+    # 2. Collect unique foreign IDs across records
+    my ( %foreign_ids, %rdbm_recs );
+    if ( %rdbm_blocks ) {
+        for my $rec (@$records) {
+            for my $real_blk ( keys %rdbm_blocks ) {
+                my $val = $rec->[$real_blk];
+                next unless defined $val && $val ne '';
+                my $target_table = $rdbm_blocks{$real_blk}->{table};
+                for my $id ( split /[,;]/, $val ) {
+                    $id =~ s/^\s+|\s+$//g;
+                    $foreign_ids{$target_table}->{$id} = 1 if $id =~ /^\d+$/;
+                }
+            }
+        }
+        for my $target_table ( keys %foreign_ids ) {
+            my @ids = keys %{ $foreign_ids{$target_table} };
+            next unless @ids;
+            my @target_records = $self->read_list( $target_table, \@ids );
+            $rdbm_recs{$target_table} = { map { $_->[0] => $_ } @target_records };
+        }
+    }
+
+    # 3. Extract sentences across all records in batch
+    my @all_sentences;
+    for my $rec (@$records) {
+        push @all_sentences, $self->_extract_suggest_sentences( $table_info, $rec, \%rdbm_recs, \%rdbm_blocks );
+    }
+    return unless @all_sentences;
+
+    my ( $word_freq, $transitions ) = $self->_extract_words_and_transitions( @all_sentences );
+    return unless %$word_freq;
+
+    my $ajw_path = "${table_path}.ajw";
+    my $ajn_path = "${table_path}.ajn";
+
+    # Open .ajw and .ajn for writing
+    my $ajw_opened = 0;
+    if ( !$self->{_db}->{$ajw_path} ) {
+        $self->table_write($ajw_path) or do {
+            $self->transact_error( $ajw_path, "cannot open .ajw" );
+            return;
+        };
+        $ajw_opened = 1;
+    }
+    my $ajn_opened = 0;
+    if ( !$self->{_db}->{$ajn_path} ) {
+        $self->table_write($ajn_path) or do {
+            $self->table_close($ajw_path) if $ajw_opened;
+            $self->transact_error( $ajn_path, "cannot open .ajn" );
+            return;
+        };
+        $ajn_opened = 1;
+    }
+
+    # 4. Update .ajw (Word prefix index, max 10 per prefix)
+    my %prefixes_to_update;
+    for my $norm ( keys %$word_freq ) {
+        my $disp = $word_freq->{$norm}{disp};
+        my $cnt  = $word_freq->{$norm}{cnt};
+        my $max_len = length($norm) < 12 ? length($norm) : 12;
+        for ( my $len = 2; $len <= $max_len; $len++ ) {
+            my $pfx = substr($norm, 0, $len);
+            $prefixes_to_update{$pfx}{$norm} = [ $disp, $cnt ];
+        }
+        my $ascii_norm = $self->to_ascii($norm);
+        if ( defined $ascii_norm && $ascii_norm ne $norm ) {
+            my $a_len = length($ascii_norm) < 12 ? length($ascii_norm) : 12;
+            for ( my $len = 2; $len <= $a_len; $len++ ) {
+                my $a_pfx = substr($ascii_norm, 0, $len);
+                $prefixes_to_update{$a_pfx}{$norm} = [ $disp, $cnt ];
+            }
+        }
+    }
+
+    my @pfx_keys = keys %prefixes_to_update;
+    my $existing_ajw = @pfx_keys ? $self->recs_get( $ajw_path, @pfx_keys ) : {};
+    my @ajw_to_put;
+
+    for my $pfx (@pfx_keys) {
+        my %merged;
+        if ( my $raw = $existing_ajw->{$pfx} ) {
+            my $old_items = $self->db_decode($raw);
+            if ( ref($old_items) eq 'ARRAY' ) {
+                for my $it (@$old_items) {
+                    next unless ref($it) eq 'ARRAY';
+                    my $n = $self->to_ascii( $self->lc($it->[0]) );
+                    $merged{$n} = [ $it->[0], $it->[1] ];
+                }
+            }
+        }
+        for my $n ( keys %{ $prefixes_to_update{$pfx} } ) {
+            my $new_it = $prefixes_to_update{$pfx}{$n};
+            if ( exists $merged{$n} ) {
+                $merged{$n}->[1] += $new_it->[1];
+            }
+            else {
+                $merged{$n} = [ $new_it->[0], $new_it->[1] ];
+            }
+        }
+        my @sorted = sort {
+            $merged{$b}->[1] <=> $merged{$a}->[1]
+            || $a cmp $b
+        } keys %merged;
+        @sorted = @sorted[0 .. 9] if @sorted > 10;
+        my @payload = map { $merged{$_} } @sorted;
+        push @ajw_to_put, [ $pfx, $self->db_encode(\@payload) ];
+    }
+    $self->recs_put( [ $ajw_path, $tableid ], @ajw_to_put ) if @ajw_to_put;
+
+    # 5. Update .ajn (Next word transitions, unlimited / up to 300)
+    my @norm1_keys = keys %$transitions;
+    my $existing_ajn = @norm1_keys ? $self->recs_get( $ajn_path, @norm1_keys ) : {};
+    my @ajn_to_put;
+
+    for my $norm1 (@norm1_keys) {
+        my %merged;
+        if ( my $raw = $existing_ajn->{$norm1} ) {
+            my $old_items = $self->db_decode($raw);
+            if ( ref($old_items) eq 'ARRAY' ) {
+                for my $it (@$old_items) {
+                    next unless ref($it) eq 'ARRAY';
+                    my $n2 = $it->[2] // $self->to_ascii( $self->lc($it->[0]) );
+                    $merged{$n2} = { disp => $it->[0], cnt => $it->[1] };
+                }
+            }
+        }
+        my $new_t = $transitions->{$norm1};
+        for my $n2 ( keys %$new_t ) {
+            if ( exists $merged{$n2} ) {
+                $merged{$n2}{cnt} += $new_t->{$n2}{cnt};
+            }
+            else {
+                $merged{$n2} = { disp => $new_t->{$n2}{disp}, cnt => $new_t->{$n2}{cnt} };
+            }
+        }
+        my @sorted = sort {
+            $merged{$b}{cnt} <=> $merged{$a}{cnt}
+            || $a cmp $b
+        } keys %merged;
+        @sorted = @sorted[0 .. 299] if @sorted > 300;
+        my @payload = map {
+            [ $merged{$_}{disp}, $merged{$_}{cnt}, $_ ]
+        } @sorted;
+        push @ajn_to_put, [ $norm1, $self->db_encode(\@payload) ];
+    }
+    $self->recs_put( [ $ajn_path, $tableid ], @ajn_to_put ) if @ajn_to_put;
+
+    if ($ajw_opened) {
+        $self->table_close($ajw_path);
+    }
+    if ($ajn_opened) {
+        $self->table_close($ajn_path);
+    }
+
+    return 1;
 }
 
 1;

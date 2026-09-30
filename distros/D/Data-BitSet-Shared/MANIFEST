@@ -3,7 +3,6 @@ bitset.h
 Changes
 eg/basic.pl
 eg/bloom_filter.pl
-eg/ev_eventfd.pl
 eg/membership.pl
 eg/memfd_fork.pl
 eg/rate_limiter.pl
@@ -33,6 +32,7 @@ xt/concurrent_open.t
 xt/cross_module_fd.t
 xt/destroy_during_call.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/fuzz_header.t

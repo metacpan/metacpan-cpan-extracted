@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
 
-our $VERSION = '2.2.4';
+our $VERSION = '2.2.5';
 
 use Google::RestApi::Setup;
 

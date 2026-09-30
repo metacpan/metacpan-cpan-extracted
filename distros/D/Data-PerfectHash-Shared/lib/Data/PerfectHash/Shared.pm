@@ -1,11 +1,15 @@
 package Data::PerfectHash::Shared;
 use strict; use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use XSLoader;
 XSLoader::load('Data::PerfectHash::Shared', $VERSION);
 
+# ithreads: a cloned handle would unmap the parent's on thread exit.
+sub CLONE_SKIP { 1 }
+
 package Data::PerfectHash::Shared::Builder;   # blessed builder handle
-our $VERSION = '0.02';
+our $VERSION = '0.03';
+sub CLONE_SKIP { 1 }
 
 1;
 __END__

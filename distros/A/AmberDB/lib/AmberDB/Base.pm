@@ -9,7 +9,7 @@ use Fcntl qw(:DEFAULT :flock);
 use Digest::SHA qw(sha256_hex);
 use parent qw(AmberDB::Locale AmberDB::Array);
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 my $CREATED = '2014-12-20';
 
 # ------------------------------------------------

@@ -2,7 +2,7 @@ package Google::RestApi::SheetsApi4::Range::All;
 
 # TODO: this class has not been fully tested. use at your own risk.
 
-our $VERSION = '2.2.4';
+our $VERSION = '2.2.5';
 
 use Google::RestApi::Setup;
 

@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 
 my $CREATED  = '2026-09-03';
 

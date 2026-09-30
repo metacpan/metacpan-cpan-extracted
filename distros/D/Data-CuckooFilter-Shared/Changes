@@ -1,26 +1,25 @@
 Revision history for Data-CuckooFilter-Shared
 
+0.06      2026-09-26
+          - remove after an add killed mid-way no longer wraps the count and
+            bricks the file.
+          - DATA_CUCKOOFILTER_SHARED_SPARSE=0 reserves segments up front, so a
+            full filesystem fails the constructor, not a later write.
+          - A failed create no longer leaves a full-size file behind.
+
 0.05      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
 
 0.04      2026-08-11
-          - Frozen read-only mode: freeze() seals a file-backed structure;
-            new_readonly() maps it O_RDONLY and queries it lock-free.
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
+          - freeze()/new_readonly(): sealed read-only mode, lock-free.
+          - A file left by an interrupted create is recovered, not refused.
+          - unlink() reports a failed removal; a missing file is no error.
+          - Hardening against tied and overloaded arguments.
 
 0.03      2026-07-23
-          - On-disk format change (v1 -> v2): an existing 0.02 file is
-            refused; recreate it.
-          - Resolve argument magic before capturing the path string.
-          - Re-read the class name at the point of use in the constructors, so
-            a later argument's magic cannot dangle the INPUT-captured PV.
+          - On-disk format change (v1 -> v2): recreate 0.02 files.
+          - Resolve argument magic before capturing the path or class name.
           - Document that a crash mid-eviction can drop a fingerprint.
 
 0.02      2026-07-09

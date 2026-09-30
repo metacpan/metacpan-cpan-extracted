@@ -5,13 +5,11 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   HTTP::Status: '0'
-  Perl::Critic::TooMuchCode: '0'
   Sub::Override: '0'
   Test::Class: '0'
   Test::Class::Load: '0'
   Test::Deep: '0'
   Test::Most: '0'
-  Test::Perl::Critic: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -25,6 +23,7 @@ no_index:
   directory:
     - t
     - inc
+    - tutorial
 requires:
   Cache::Memory::Simple: '0'
   Carp: '0'
@@ -61,5 +60,5 @@ requires:
   constant: '0'
 resources:
   repository: https://github.com/mvsjes2/p5-google-restapi.git
-version: v2.2.4
+version: v2.2.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

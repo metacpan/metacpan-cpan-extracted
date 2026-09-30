@@ -1,5 +1,8 @@
 Revision history for Data::PerfectHash::Shared
 
+0.03  2026-09-26
+    - Creating a thread no longer frees the handles the parent holds.
+
 0.02  2026-08-12
     - Regenerate README from the POD: it still described the image as portable
       across differing word sizes, whereas load() requires the same byte order.

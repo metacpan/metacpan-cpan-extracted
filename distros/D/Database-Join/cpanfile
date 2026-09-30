@@ -10,6 +10,7 @@ requires 'File::Spec';
 requires 'File::Temp';
 requires 'JSON::MaybeXS';
 requires 'List::Util', '1.33';
+requires 'Log::Abstraction', '0.33';
 requires 'Object::Configure';
 requires 'Params::Get', '0.13';
 requires 'Params::Validate::Strict', '0.39';

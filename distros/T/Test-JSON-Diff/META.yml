@@ -1,0 +1,32 @@
+---
+abstract: 'Check two large JSON strings for structural equality'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000121'
+  perl: v5.42.0
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Which: '0'
+  perl: v5.42.0
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-JSON-Diff
+requires:
+  File::Which: '0'
+  Path::Tiny: '0.130'
+  Test2::API: '1.302015'
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/uperl/Test-JSON-Diff/issues
+  homepage: https://metacpan.org/pod/Test::JSON::Diff
+  repository: git://github.com/uperl/Test-JSON-Diff.git
+version: '0.02'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

@@ -6,7 +6,7 @@ package Google::RestApi::Types;
 use strict;
 use warnings;
 
-our $VERSION = '2.2.4';
+our $VERSION = '2.2.5';
 
 use Types::Standard qw( Undef Str StrMatch Int ArrayRef HashRef Tuple HasMethods );
 

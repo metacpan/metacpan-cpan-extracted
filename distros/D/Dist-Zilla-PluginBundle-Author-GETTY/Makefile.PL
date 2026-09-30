@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Authority" => "1.006",
     "Dist::Zilla::Plugin::Deprecated" => "0.007",
     "Dist::Zilla::Plugin::Docker::API" => "0.104",
+    "Dist::Zilla::Plugin::GatherAgentContext" => "0.001",
     "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => "0.014",
     "Dist::Zilla::Plugin::GitHub::CreateRelease" => "0.0012",
     "Dist::Zilla::Plugin::GithubMeta" => "0.58",
@@ -49,7 +50,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "1.302219"
   },
-  "VERSION" => "0.325",
+  "VERSION" => "0.326",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +66,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Authority" => "1.006",
   "Dist::Zilla::Plugin::Deprecated" => "0.007",
   "Dist::Zilla::Plugin::Docker::API" => "0.104",
+  "Dist::Zilla::Plugin::GatherAgentContext" => "0.001",
   "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => "0.014",
   "Dist::Zilla::Plugin::GitHub::CreateRelease" => "0.0012",
   "Dist::Zilla::Plugin::GithubMeta" => "0.58",

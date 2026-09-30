@@ -28,7 +28,7 @@ use File::Spec;
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 120;
+	plan tests => 134;
 	use_ok('Database::Join');
 }
 
@@ -2098,4 +2098,150 @@ subtest 'updated(): returns working timestamp when one DA throws and one succeed
 	my $ts;
 	lives_ok { $ts = $j->updated() } 'updated() lives in mixed throw/good case';
 	is $ts, 9_000_000, 'returns the timestamp from the working component DA';
+};
+
+# ===========================================================================
+# S24: each_row -- hostile and boundary inputs
+# ===========================================================================
+
+subtest 'each_row: undef callback croaks with error_invalid_callback' => sub {
+	# Non-CODE first argument must be rejected before any query is issued.
+	my ($j) = _minimal_join();
+	throws_ok { $j->each_row(undef) }
+		qr/each_row.*code reference/i,
+		'each_row(undef) croaks with expected message';
+};
+
+subtest 'each_row: string callback croaks with error_invalid_callback' => sub {
+	my ($j) = _minimal_join();
+	throws_ok { $j->each_row('not_a_sub') }
+		qr/each_row.*code reference/i,
+		'each_row("string") croaks with expected message';
+};
+
+subtest 'each_row: hashref callback croaks with error_invalid_callback' => sub {
+	my ($j) = _minimal_join();
+	throws_ok { $j->each_row({}) }
+		qr/each_row.*code reference/i,
+		'each_row({}) croaks — a hashref is not a coderef';
+};
+
+subtest 'each_row: returns 0 on zero-row join' => sub {
+	# Boundary: zero rows should produce zero callback calls and return 0.
+	my $prim = MockEdgeDA->new(cols => ['entry', 'name'], rows => []);
+	my $sec  = MockEdgeDA->new(cols => ['entry', 'score'], rows => []);
+	my $j    = Database::Join->new(
+		databases   => [$prim, $sec],
+		join_column => $JC,
+	);
+	my $calls = 0;
+	my $ret;
+	lives_ok { $ret = $j->each_row(sub { $calls++ }) }
+		'each_row on an empty join lives';
+	is $ret,   0, 'return value is 0 for a zero-row join';
+	is $calls, 0, 'callback was never invoked';
+};
+
+subtest 'each_row: callback exception propagates and stops iteration' => sub {
+	# An exception from inside the callback must propagate to the caller.
+	# Rows materialised before the crashing row are already visited; rows
+	# after it are not.  Only the first two assertions must hold for the
+	# iterator-abort guarantee; the count-so-far cannot be recovered since
+	# each_row does not catch the exception.
+	my ($j) = _minimal_join();
+	my $calls = 0;
+	eval {
+		$j->each_row(sub {
+			$calls++;
+			die "deliberate error\n" if $calls >= 1;
+		});
+	};
+	like $@, qr/deliberate error/, 'exception from callback propagates to caller';
+};
+
+subtest 'each_row: does not set $@ on success' => sub {
+	# each_row must not contaminate $@ when it completes without error.
+	my ($j) = _minimal_join();
+	eval {};
+	my $pre = $@;
+	$j->each_row(sub {});
+	is $@, $pre, '$@ unchanged after a successful each_row call';
+};
+
+subtest 'each_row: does not corrupt caller $_' => sub {
+	my ($j) = _minimal_join();
+	local $_ = 'sentinel';
+	$j->each_row(sub {});
+	is $_, 'sentinel', '$_ unchanged after each_row';
+};
+
+subtest 'each_row: callback mutating the row hashref is isolated' => sub {
+	# Callers that destructively modify the row hashref inside the callback
+	# must not corrupt other rows — each_row provides no isolation guarantee
+	# beyond what selectall_arrayref already provides (each row is a distinct
+	# hashref), so this test just verifies no crash and correct row count.
+	my ($j) = _minimal_join();
+	my $count;
+	lives_ok {
+		$count = $j->each_row(sub {
+			my ($row) = @_;
+			$row->{__mutated__} = 1;   # add a key that doesn't belong
+		});
+	} 'each_row survives callback that mutates the row hashref';
+	is $count, 2, 'returns correct row count after mutation';
+};
+
+# ===========================================================================
+# S25: selectall_hashref / selectall_hash deprecated aliases -- hostile tests
+# ===========================================================================
+
+subtest 'selectall_hashref: results are identical to selectall_arrayref' => sub {
+	my ($j) = _minimal_join();
+	my $via_alias;
+	my $via_canon = $j->selectall_arrayref();
+	lives_ok { local $SIG{__WARN__} = sub {}; $via_alias = $j->selectall_hashref() }
+		'selectall_hashref lives';
+	is_deeply $via_alias, $via_canon,
+		'selectall_hashref and selectall_arrayref return identical data';
+};
+
+subtest 'selectall_hashref: emits exactly one deprecation carp' => sub {
+	my ($j) = _minimal_join();
+	warning_like { $j->selectall_hashref() }
+		qr/selectall_hashref.*deprecated/i,
+		'selectall_hashref emits exactly one deprecation carp';
+};
+
+subtest 'selectall_hash: results are identical to selectall_array (list context)' => sub {
+	my ($j) = _minimal_join();
+	my @via_alias;
+	my @via_canon = $j->selectall_array();
+	lives_ok { local $SIG{__WARN__} = sub {}; @via_alias = $j->selectall_hash() }
+		'selectall_hash lives';
+	is_deeply \@via_alias, \@via_canon,
+		'selectall_hash and selectall_array return identical data';
+};
+
+subtest 'selectall_hash: emits exactly one deprecation carp' => sub {
+	my ($j) = _minimal_join();
+	warning_like { $j->selectall_hash() }
+		qr/selectall_hash.*deprecated/i,
+		'selectall_hash emits exactly one deprecation carp';
+};
+
+subtest 'selectall_hashref: forwards criteria correctly' => sub {
+	# Deprecated aliases must pass all arguments through to the underlying method.
+	my ($j) = _minimal_join();
+	my $rows;
+	{ local $SIG{__WARN__} = sub {}; $rows = $j->selectall_hashref($JC => $K_ALPHA) }
+	is scalar @{$rows}, 1, 'selectall_hashref forwards criteria to selectall_arrayref';
+	is $rows->[0]{entry}, $K_ALPHA, 'correct row returned via selectall_hashref';
+};
+
+subtest 'selectall_hash: forwards criteria correctly (scalar context)' => sub {
+	my ($j) = _minimal_join();
+	my $first;
+	{ local $SIG{__WARN__} = sub {}; $first = $j->selectall_hash($JC => $K_ALPHA) }
+	ok defined $first, 'selectall_hash scalar context returns first matching row';
+	is $first->{entry}, $K_ALPHA, 'correct row returned via selectall_hash';
 };

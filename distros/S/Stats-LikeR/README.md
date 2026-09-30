@@ -7161,18 +7161,23 @@ Before R 4.6.0 — and in earlier releases of this module — ties ruled out an 
 
 The exact table is refused rather than attempted if it would need more than 16 million cells, with a message suggesting `exact => 0`. This is only reachable by forcing `exact => 1` on samples far larger than the automatic threshold.
 
+The exact confidence interval on tied data is found as R finds it, by trying the shift between each pair of neighbouring pairwise differences, up to `m * n` of them, each with its own conditional distribution. That distribution depends only on the ranks, so it is rebuilt only when a shift changes them. Two samples of 49 five-point scores, which take the exact path by default, get their interval in about 0.03 seconds; R 4.6.1 takes 10.
+
 ### Notes and edge cases
 
-Missing data is handled by listwise removal of non-numeric, undefined and `NaN` cells before ranking; in the paired case a pair is dropped if either member is missing or if the difference is not a number. An empty `x` (or a `y` that is present but empty) after this filtering is fatal. All-zero differences are not: `wilcox_test([0, 0, 0, 0, 0])` returns `V = 0`, `p = 1`, which is what the permutation distribution over an empty set of sign flips says.
+Missing data is handled by listwise removal of non-numeric, undefined and `NaN` cells before ranking; in the paired case a pair is dropped if either member is missing or if the difference is not a number. An empty `x` (or a `y` that is present but empty) after this filtering is fatal. All-zero differences are not: `wilcox_test([0, 0, 0, 0, 0])` returns `V = 0`, `p = 1`, which is what the permutation distribution over an empty set of sign flips says. A tied array is read like any other, one `FETCH` per element.
+
+`Inf` and `-Inf` are values, not missing data, and a rank test has no trouble with them. In a confidence interval, a difference of two infinities of the same sign (`Inf - Inf`) is `NaN`, and it is left out of the differences (or Walsh averages) the estimate and the interval are read from, just as R's `sort()` leaves it out.
 
 Ties are detected during ranking and trigger the tie-corrected variance in the normal approximation. When `exact` is left on auto, the size thresholds (`< 50` per group, or `< 50` observations) are the only thing gating the exact vs. approximate decision.
 
 ### Differences from R
 
-Two, both deliberate:
+Three, all deliberate:
 
 - **`correct` is a boolean here.** R 4.6.0 turned its `correct` into an integer `0:3`, in which numeric `0` still applies the continuity correction and only `FALSE` removes it. Keeping that would mean `correct => 0` no longer meaning "off", which is what it means for every other flag in this module. So `correct` stays a boolean and the Edgeworth terms live under `edgeworth`: R's `correct = k` for `k` in `1, 2, 3` is `correct => 1, edgeworth => k` here, and R's `correct = 0` is `correct => 1`.
 - **A zero variance is reported, not propagated.** With `exact => 0` and every observation tied there is nothing to divide by; R divides anyway and returns `NaN` for the p-value, and its two-sample confidence interval then dies inside `uniroot` with *missing value where TRUE/FALSE needed*. This warns instead, and returns `p = 1` and a `NaN` interval at level `0` — which is what R's own one-sample code does. The default path no longer reaches any of this, since the exact test handles all-tied data.
+- **Infinite observations get an answer or a reason, never an error.** The asymptotic interval has no finite bracket to search when an observation is infinite. R's two-sample code dies in `uniroot` with *invalid 'xmin' value*, and its one-sample code returns a `NaN` interval at level `0`. Both give that `NaN` interval here, with a warning. The exact one-sample interval on data holding both `Inf` and `-Inf` stops R with *missing value where TRUE/FALSE needed*; here it is computed, ranking the `NaN` those make last, as R's `rank()` does.
 
 Everything else is checked against R's and SciPy's own test suites in `t/wilcox_test.R.scipy.t`.
 
@@ -7184,16 +7189,30 @@ mimics R's `write.table`, with data as first argument to subroutine, and output 
 
     write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
     write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
+A data row longer than the header is not cut short: the header is widened with empty cells over the extra columns, the shape pandas gives `DataFrame([[1, 2], [4, 5, 6]])`, and `write_table` warns, naming the first long row.
+
 You can also precisely filter and reorder which columns are written by passing an array reference to `col.names`:
 
     write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
-undefined variables are printed as `NA` by default, but can be set as you wish using `undef.val`
+undefined values are written as empty fields by default, but can be set as you wish using `undef.val`
 
     write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
 A hash of hashes keeps its outer keys as a leading column by default, since that is the only place they exist. Name that column with `row.names`, or drop it with `row.names => 0`:
 
     my %taxa = (9606 => { species => 'Homo sapiens' }, 10090 => { species => 'Mus musculus' });
     write_table(\%taxa, 'taxa.tsv', 'row.names' => 'taxid');   # taxid  species
+Leaving that column unnamed writes an empty first header cell, and every reader then has to invent a name for it (`read_table` calls it `row_name`, pandas `Unnamed: 0`). `write_table` therefore warns and suggests `row.names`. It also warns when any data column has an empty name, whatever the shape. The empty label cell that `row.names => 1` writes for the other shapes is R's own layout, and nothing can name it, so that one is not warned about.
+
+For a hash of arrays or an array of hashes, `row.names => 'col'` takes the labels from column `col` and heads the label column `col`, as pandas heads an index with its name:
+
+    write_table(\%hoa, 'out.csv', 'row.names' => 'gene');   # gene,score / TP53,0.9 / ...
+
+A hash of arrays has as many rows as the longest of the arrays it writes; an array that `col.names` leaves out does not add rows.
+
+An empty `{}` or `[]` is a table with no rows, and is written as one: the header `col.names` and `row.names` give, if any, and otherwise a single empty record. `write_table([], 'out.csv', 'col.names' => ['A'], 'row.names' => 1)` writes `,A`, as pandas writes `DataFrame({"A": []}).to_csv()`.
+
+Every cell of delimited output is written whole, including one holding a NUL byte, and a cell of a tied hash or array (such as `Tie::IxHash`) is read through its `FETCH`. A number is formatted the way perl formats it, but in a copy, so writing a table does not add a string buffer to every numeric scalar in it.
+
 `write_table` determines comma and tab-separated delimiters from the filename, but will override if `sep` or `delim` are explicitly set.
 Args can also be accepted:
 
@@ -7216,8 +7235,7 @@ A file name ending in `.gz` is written gzip-compressed, and one ending in
     makes the same bytes.
   - **A write that fails partway leaves a truncated file**, which
     [`read_table`](#read_table) refuses, never one that looks whole. A
-    compressed write also croaks if the disk fills or the file cannot be
-    finished.
+    compressed write also croaks if the file cannot be finished.
   - **Only delimited text is compressed.** A name such as `table.tex.gz` or
     `book.xlsx.bz2`, or `tex`/`xlsx` with a compressed name, is an error.
   - Both use core modules only. A `.bgz` name is an error: it promises
@@ -7230,7 +7248,7 @@ Every successful write prints one line to standard output naming the file, with 
 
     wrote output.tsv
 
-This is `say 'wrote ' . colored(['black on_cyan'], $file)`, but the SGR codes (`\e[30;46m` … `\e[0m`) are written out inline, so the module takes no dependency on `Term::ANSIColor`. Every format announces itself the same way — delimited, LaTeX and `.xlsx` alike — so you always learn where a table went, in the same shape whatever you asked for. Nothing is printed when nothing is written: an empty data frame returns before a file is opened, and a write that cannot open its file croaks instead.
+This is `say 'wrote ' . colored(['black on_cyan'], $file)`, but the SGR codes (`\e[30;46m` … `\e[0m`) are written out inline, so the module takes no dependency on `Term::ANSIColor`. Every format announces itself the same way — delimited, LaTeX and `.xlsx` alike — so you always learn where a table went, in the same shape whatever you asked for. Nothing is printed when nothing is written: a write that cannot open its file, or that loses data on the way to it, croaks instead. That includes a full disk, which a buffered write only discovers at the close; every format checks for it, as R's `write.table` does. The message gives the system's reason, so a full disk reads `write_table: could not finish writing 'out.csv': No space left on device`, and a quota or an I/O error says so instead; `$!` is left set to it. A file that cannot be opened gives its reason the same way (`Permission denied`, `No such file or directory`). An empty data frame is written, and so announced.
 
 The colour is unconditional; it is not suppressed when standard output is a pipe or a file. Pass `quiet => 1` to suppress the line altogether, which is what a script writing to a pipe or a data file usually wants:
 
@@ -7242,7 +7260,7 @@ The colour is unconditional; it is not suppressed when standard output is a pipe
 
     write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
     write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
-The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. As with every other format, `row.names` is **off** unless you ask for it, except for a HoH: pass `row.names => 1` to prepend a label column of 1-based indices. A HoH writes its outer keys as that column by default, and `row.names => 0` drops them. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. The `tex.*` options tune the output:
+The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. As with every other format, `row.names` is **off** unless you ask for it, except for a HoH: pass `row.names => 1` to prepend a label column of 1-based indices. A HoH writes its outer keys as that column by default, and `row.names => 0` drops them. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. A table with no columns at all is an error, since LaTeX rejects one, and it is refused before the file is opened. The `tex.*` options tune the output:
 
     write_table(\@rows, 'table.tex',
         'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
@@ -7303,14 +7321,25 @@ writer, so it works for every shape above:
 
 A numeric-looking cell is written as a number; every other non-empty cell as an
 inline string (`undef`/empty cells are omitted). The result reads straight back
-with [`read_table`](#read_table).
+with [`read_table`](#read_table). XML cannot hold a NUL or most other control
+characters, so those are dropped from a cell's text.
+
+The worksheet is streamed to the file as the rows are formatted, so writing a
+workbook takes little memory beyond the data itself: a 200000 x 20 array of
+hashes needs 30 MB for a 308 MB workbook, where it used to need 1.1 GB. Like
+delimited output, a write that croaks partway (a nested reference in a late row,
+say) leaves a truncated file behind. A file that cannot seek, such as a pipe,
+still works; its worksheet is gathered in memory first. A workbook larger than
+4 GB, the most a ZIP archive holds without ZIP64, is refused.
 
 Mirroring `Excel::Writer::XLSX`'s
 `$workbook->set_properties(comments => comments())`, the same
 `written by <cwd>/<script>` provenance line the LaTeX writer emits is stored in
 the workbook's document **comments** property (`dc:description` in
 `docProps/core.xml`); a `xlsx.comment` string (or array ref of strings) is
-appended after it. `xlsx.sheet` sets the worksheet name (default `Sheet1`):
+appended after it. `xlsx.sheet` sets the worksheet name (default `Sheet1`). As
+in openpyxl, a name that is empty or holds any of `\ * ? : / [ ]` is an error, and
+one longer than 31 characters draws a warning, since Excel cannot read it:
 
     write_table(\@rows, 'report.xlsx',
         'xlsx.sheet'   => 'Results',
@@ -7434,3 +7463,7 @@ Verified against R 4.6.1 (`oneway.test`, `anova(aov())`, `anova(lm())`,
 # COPYRIGHT AND LICENSE
 
 This software is free.  It is licensed under the same terms as Perl itself
+
+# Thanks
+
+A lot of this work used Claude AI, which was paid for by the University of Idaho's IMCI

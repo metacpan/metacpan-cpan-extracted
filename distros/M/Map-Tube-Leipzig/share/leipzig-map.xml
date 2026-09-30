@@ -1,78 +1,615 @@
-<tube name="Leipzig Rail">
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Leipzig/Halle S-Bahn and Tram">
   <lines>
-      <line id="S3" name="S3" color="red"    />
-      <line id="S7" name="S7" color="purple" />
+    <!-- Tram Halle -->
+    <line id="LEI_H1" name="H1" color="#FDB812"/>
+    <line id="LEI_H10" name="H10" color="#4A8343"/>
+    <line id="LEI_H12" name="H12" color="#8BC63F"/>
+    <line id="LEI_H16" name="H16" color="#AE2741"/>
+    <line id="LEI_H2" name="H2" color="#F58221"/>
+    <line id="LEI_H3" name="H3" color="#0095DA"/>
+    <line id="LEI_H4" name="H4" color="#9A1114"/>
+    <line id="LEI_H5" name="H5" color="#0B4EA2"/>
+    <line id="LEI_H7" name="H7" color="#EF5AA1"/>
+    <line id="LEI_H8" name="H8" color="#824807"/>
+    <line id="LEI_H9" name="H9" color="#A7AF39"/>
+    <line id="LEI_H94" name="H94" color="#6F1105"/>
+    <line id="LEI_H95" name="H95" color="#051541"/>
+    <!-- Tram Leipzig -->
+    <line id="LEI_L1" name="L1" color="#65B32E"/>
+    <line id="LEI_L10" name="L10" color="#E30613"/>
+    <line id="LEI_L11" name="L11" color="#E30633"/>
+    <line id="LEI_L12" name="L12" color="#213ACF"/>
+    <line id="LEI_L14" name="L14" color="#E30653"/>
+    <line id="LEI_L15" name="L15" color="#213AEF"/>
+    <line id="LEI_L16" name="L16" color="#E30653"/>
+    <line id="LEI_L2" name="L2" color="#FFCC00"/>
+    <line id="LEI_L3" name="L3" color="#65B34E"/>
+    <line id="LEI_L39" name="L39" color="#E30673"/>
+    <line id="LEI_L4" name="L4" color="#213A8F"/>
+    <line id="LEI_L7" name="L7" color="#213AAF"/>
+    <line id="LEI_L8" name="L8" color="#FFCC40"/>
+    <line id="LEI_L9" name="L9" color="#FFCC20"/>
+    <!-- S-Bahn -->
+    <line id="LEI_S1" name="S1" color="#F6Df00"/>
+    <line id="LEI_S11" name="S11" color="#31A098"/>
+    <line id="LEI_S2" name="S2" color="#00A1E5"/>
+    <line id="LEI_S3" name="S3" color="#E30613"/>
+    <line id="LEI_S30" name="S30" color="#E30613"/>
+    <line id="LEI_S4" name="S4" color="#009641"/>
+    <line id="LEI_S5" name="S5" color="#EF7D00"/>
+    <line id="LEI_S5X" name="S5X" color="#FECF53"/>
+    <line id="LEI_S6" name="S6" color="#5D1339"/>
+    <line id="LEI_S7" name="S7" color="#00569D"/>
+    <line id="LEI_S8" name="S8" color="#5C2483"/>
+    <line id="LEI_S9" name="S9" color="#C0046B"/>
   </lines>
-
   <stations>
-    <station id="TROTHA"
-             name="Trotha"
-             line="S3,S7"
-             link="WOHNSTADT-NORD,S7-13" />
-
-    <station id="WOHNSTADT-NORD"
-             name="Wohnstadt Nord"
-             line="S3,S7"
-             link="TROTHA,ZOO" />
-
-    <station id="ZOO"
-             name="Zoo"
-             line="S3,S7"
-             link="WOHNSTADT-NORD,DESSAUER-BRUCKE" />
-
-    <station id="DESSAUER-BRUCKE"
-             name="Dessauer Brücke"
-             line="S3,S7"
-             link="ZOO,STEINTORBRUCKE" />
-
-    <station id="STEINTORBRUCKE"
-             name="Steintorbrücke"
-             line="S3,S7"
-             link="DESSAUER-BRUCKE,HALLE-HBF" />
-
-    <station id="HALLE-HBF"
-             name="Halle Hbf"
-             line="S3,S7"
-             link="STEINTORBRUCKE,S3-07,S7-06" />
-
-    <!-- Line S3 -->
-    <station id="S3-07" name="Halle Messe"               line="S3" link="HALLE-HBF,S3-08" />
-    <station id="S3-08" name="Dieskau"                   line="S3" link="S3-07,S3-09"     />
-    <station id="S3-09" name="Gröbers"                   line="S3" link="S3-08,S3-10"     />
-    <station id="S3-10" name="Großkugel"                 line="S3" link="S3-09,S3-11"     />
-    <station id="S3-11" name="Schkeuditz"                line="S3" link="S3-10,S3-12"     />
-    <station id="S3-12" name="Lützschena"                line="S3" link="S3-11,S3-13"     />
-    <station id="S3-13" name="Wahren"                    line="S3" link="S3-12,S3-14"     />
-    <station id="S3-14" name="Slevogt-str"               line="S3" link="S3-13,S3-15"     />
-    <station id="S3-15" name="Olbritch-str"              line="S3" link="S3-14,S3-16"     />
-    <station id="S3-16" name="Gohlis"                    line="S3" link="S3-15,S3-17"     />
-    <station id="S3-17" name="Leipzig Hbf"               line="S3" link="S3-16,S3-18"     />
-    <station id="S3-18" name="Markt"                     line="S3" link="S3-17,S3-19"     />
-    <station id="S3-19" name="Wilhelm-Leuschner-PI."     line="S3" link="S3-18,S3-20"     />
-    <station id="S3-20" name="Bayerischer Bf"            line="S3" link="S3-19,S3-21"     />
-    <station id="S3-21" name="MDR"                       line="S3" link="S3-20,S3-22"     />
-    <station id="S3-22" name="Connetwitz"                line="S3" link="S3-21,S3-23"     />
-    <station id="S3-23" name="Markkleeberg"              line="S3" link="S3-22,S3-24"     />
-    <station id="S3-24" name="Markkleeberg-Großstädtein" line="S3" link="S3-23,S3-25"     />
-    <station id="S3-25" name="Großdeuben"                line="S3" link="S3-24,S3-26"     />
-    <station id="S3-26" name="Böhlen Werke"              line="S3" link="S3-25,S3-27"     />
-    <station id="S3-27" name="NeuKieritzsch"             line="S3" link="S3-26,S3-28"     />
-    <station id="S3-28" name="Lobstädt"                  line="S3" link="S3-27,S3-29"     />
-    <station id="S3-29" name="Borna"                     line="S3" link="S3-28,S3-30"     />
-    <station id="S3-30" name="Petergrube"                line="S3" link="S3-29,S3-31"     />
-    <station id="S3-31" name="Neukirchen-Wyrha"          line="S3" link="S3-30,S3-32"     />
-    <station id="S3-32" name="Frohburg"                  line="S3" link="S3-31,S3-33"     />
-    <station id="S3-33" name="Geithan"                   line="S3" link="S3-32"           />
-
-    <!-- Line S7 -->
-    <station id="S7-01" name="Neitleben"                 line="S7" link="S7-02"           />
-    <station id="S7-02" name="Neustadt"                  line="S7" link="S7-01,S7-03"     />
-    <station id="S7-03" name="Zscherbener Str."          line="S7" link="S7-02,S7-04"     />
-    <station id="S7-04" name="Süd-stadt"                 line="S7" link="S7-03,S7-05"     />
-    <station id="S7-05" name="Suber-höhe"                line="S7" link="S7-04,S7-06"     />
-    <station id="S7-06" name="Rosen-garten"              line="S7" link="S7-05,HALLE-HBF" />
-    <station id="S7-13" name="Beidersee"                 line="S7" link="TROTHA,S7-14"    />
-    <station id="S7-14" name="Gimritz"                   line="S7" link="S7-13,S7-15"     />
-    <station id="S7-15" name="Wettin"                    line="S7" link="S7-14"           />
+    <!-- H1 -->
+    <station id="lei_h101" name="Gertraudenfriedhof" line="LEI_H1:1" link="lei_s504"/>
+    <station id="lei_s504" name="Dessauer Brücke" line="LEI_H1:2,LEI_S5:4,LEI_S5X:4" link="lei_h101,lei_h103,lei_s503,lei_s505"/>
+    <station id="lei_h103" name="Äußere Hordorfer Straße" line="LEI_H1:3" link="lei_h104,lei_s504"/>
+    <station id="lei_h104" name="Am Wasserturm" line="LEI_H1:4" link="lei_h103,lei_h105"/>
+    <station id="lei_h105" name="Am Steintor" line="LEI_H1:5,LEI_H10:18,LEI_H12:10,LEI_H16:5,LEI_H2:12,LEI_H5:14,LEI_H95:10" link="lei_h1019,lei_h104,lei_h106,lei_h1209,lei_h213"/>
+    <station id="lei_h106" name="Joliot-Curie-Platz" line="LEI_H1:6,LEI_H10:17,LEI_H16:6,LEI_H2:11,LEI_H5:13,LEI_H95:11" link="lei_h105,lei_h107"/>
+    <station id="lei_h107" name="Marktplatz" line="LEI_H1:7,LEI_H10:16,LEI_H16:7,LEI_H2:10,LEI_H3:11,LEI_H5:12,LEI_H7:12,LEI_H8:13,LEI_H94:12,LEI_H95:12" link="lei_h106,lei_h108,lei_h209,lei_h310"/>
+    <station id="lei_h108" name="Franckeplatz" line="LEI_H1:8,LEI_H16:8,LEI_H3:12,LEI_H4:11,LEI_H7:13,LEI_H8:14,LEI_H9:15,LEI_H95:13" link="lei_h107,lei_h109,lei_h410,lei_h412"/>
+    <station id="lei_h109" name="Steinweg" line="LEI_H1:9,LEI_H16:9,LEI_H3:13,LEI_H8:15,LEI_H95:14" link="lei_h108,lei_h110"/>
+    <station id="lei_h110" name="Rannischer Platz" line="LEI_H1:10,LEI_H16:10,LEI_H3:14,LEI_H8:16,LEI_H95:15" link="lei_h109,lei_h111,lei_h315"/>
+    <station id="lei_h111" name="Kurt-Tucholsky-Straße" line="LEI_H1:11" link="lei_h110,lei_h112"/>
+    <station id="lei_h112" name="Ludwigstraße" line="LEI_H1:12" link="lei_h111,lei_h113"/>
+    <station id="lei_h113" name="Böllberg" line="LEI_H1:13" link="lei_h112,lei_h114"/>
+    <station id="lei_h114" name="Passendorfer Weg" line="LEI_H1:14" link="lei_h113,lei_h115"/>
+    <station id="lei_h115" name="Diesterwegstraße" line="LEI_H1:15" link="lei_h114,lei_h116"/>
+    <station id="lei_h116" name="Wiener Straße" line="LEI_H1:16" link="lei_h115,lei_h117"/>
+    <station id="lei_h117" name="Wörmlitz" line="LEI_H1:17" link="lei_h116,lei_s304"/>
+    <station id="lei_s304" name="Südstadt" line="LEI_H1:18,LEI_S3:4,LEI_S7:4" link="lei_h117,lei_h119,lei_s303,lei_s305,lei_s705"/>
+    <station id="lei_h119" name="Südstadt, Veszpremer Straße" line="LEI_H1:19,LEI_H2:27" link="lei_h226,lei_s304"/>
+    <!-- H10 -->
+    <station id="lei_h901" name="Soltauer Straße" line="LEI_H10:1,LEI_H9:1" link="lei_h902"/>
+    <station id="lei_h902" name="Mindener Straße" line="LEI_H10:2,LEI_H9:2" link="lei_h901,lei_h903"/>
+    <station id="lei_h903" name="Braunschweiger Bogen" line="LEI_H10:3,LEI_H9:3" link="lei_h902,lei_h905"/>
+    <station id="lei_h904" name="Göttinger Bogen" line="LEI_H10:4,LEI_H9:4" link="lei_h905"/>
+    <station id="lei_h905" name="An der Eselsmühle" line="LEI_H10:5,LEI_H9:5" link="lei_h903,lei_h904,lei_h906"/>
+    <station id="lei_h906" name="Mark-Twain-Straße" line="LEI_H10:6,LEI_H9:6" link="lei_h201,lei_h905"/>
+    <station id="lei_h201" name="Schwimmhalle" line="LEI_H10:7,LEI_H2:1,LEI_H9:7" link="lei_h906,lei_s302"/>
+    <station id="lei_s302" name="Halle Neustadt" line="LEI_H10:8,LEI_H2:2,LEI_H9:8,LEI_S3:2" link="lei_h201,lei_h203,lei_s301,lei_s303"/>
+    <station id="lei_h203" name="Zentrum Neustadt" line="LEI_H10:9,LEI_H2:3,LEI_H9:9" link="lei_h204,lei_s302"/>
+    <station id="lei_h204" name="An der Feuerwache" line="LEI_H10:10,LEI_H2:4,LEI_H9:10" link="lei_h203,lei_h205"/>
+    <station id="lei_h205" name="Hyazinthenstraße" line="LEI_H10:11,LEI_H2:5,LEI_H9:11" link="lei_h204,lei_h206"/>
+    <station id="lei_h206" name="Rennbahnkreuz" line="LEI_H10:12,LEI_H2:6,LEI_H4:8,LEI_H5:8,LEI_H9:12,LEI_H94:8" link="lei_h205,lei_h207,lei_h407"/>
+    <station id="lei_h207" name="Saline" line="LEI_H10:13,LEI_H2:7,LEI_H4:9,LEI_H5:9,LEI_H9:13,LEI_H94:9" link="lei_h206,lei_h208,lei_h410"/>
+    <station id="lei_h208" name="Ankerstraße" line="LEI_H10:14,LEI_H2:8,LEI_H5:10,LEI_H94:10" link="lei_h207,lei_h209"/>
+    <station id="lei_h209" name="Hallmarkt" line="LEI_H10:15,LEI_H2:9,LEI_H5:11,LEI_H94:11" link="lei_h107,lei_h208"/>
+    <station id="lei_h1019" name="Friesenstraße" line="LEI_H10:19" link="lei_h105,lei_s505"/>
+    <station id="lei_s505" name="Steintorbrücke" line="LEI_H10:20,LEI_S5:5,LEI_S5X:5" link="lei_h1019,lei_h1021,lei_s307,lei_s504"/>
+    <station id="lei_h1021" name="Berliner Brücke" line="LEI_H10:21" link="lei_h1022,lei_s505"/>
+    <station id="lei_h1022" name="Betriebshof Freiimfelder Straße" line="LEI_H10:22" link="lei_h1021,lei_h717"/>
+    <station id="lei_h717" name="Freiimfelder Straße" line="LEI_H10:23,LEI_H7:17" link="lei_h1022,lei_h718,lei_s307"/>
+    <station id="lei_s307" name="Halle Hbf" line="LEI_H10:24,LEI_H12:13,LEI_H2:15,LEI_H4:14,LEI_H5:17,LEI_H7:16,LEI_H9:18,LEI_S11:1,LEI_S3:7,LEI_S5:6,LEI_S5X:6,LEI_S7:1,LEI_S8:13,LEI_S9:1" link="lei_h214,lei_h216,lei_h717,lei_s1102,lei_s306,lei_s308,lei_s505,lei_s507,lei_s812,lei_s902"/>
+    <!-- H12 -->
+    <station id="lei_s501" name="Trotha" line="LEI_H12:1,LEI_H3:1,LEI_H8:1,LEI_H95:1,LEI_S5:1,LEI_S5X:1" link="lei_h302,lei_s502"/>
+    <station id="lei_h302" name="Pfarrstraße" line="LEI_H12:2,LEI_H3:2,LEI_H8:2,LEI_H95:2" link="lei_h303,lei_s501"/>
+    <station id="lei_h303" name="Seebener Straße" line="LEI_H12:3,LEI_H3:3,LEI_H8:3,LEI_H95:3" link="lei_h302,lei_h804,lei_s503"/>
+    <station id="lei_s503" name="Zoo" line="LEI_H12:4,LEI_H3:4,LEI_H95:4,LEI_L12:10,LEI_S5:3,LEI_S5X:3" link="lei_h303,lei_h305,lei_l1209,lei_l1211,lei_s502,lei_s504"/>
+    <station id="lei_h305" name="Kurallee" line="LEI_H12:5,LEI_H3:5,LEI_H95:5" link="lei_h306,lei_s503"/>
+    <station id="lei_h306" name="Hegelstraße" line="LEI_H12:6,LEI_H3:6,LEI_H95:6" link="lei_h305,lei_h307"/>
+    <station id="lei_h307" name="Reileck" line="LEI_H12:7,LEI_H16:2,LEI_H3:7,LEI_H7:8,LEI_H95:7" link="lei_h1208,lei_h1601,lei_h306,lei_h308,lei_h707"/>
+    <station id="lei_h1208" name="Willy-Lohmann-Straße" line="LEI_H12:8,LEI_H16:3,LEI_H95:8" link="lei_h1209,lei_h307"/>
+    <station id="lei_h1209" name="Lessingstraße" line="LEI_H12:9,LEI_H16:4,LEI_H95:9" link="lei_h105,lei_h1208"/>
+    <station id="lei_h213" name="Magdeburger Straße" line="LEI_H12:11,LEI_H2:13,LEI_H5:15" link="lei_h105,lei_h214"/>
+    <station id="lei_h214" name="Riebeckplatz" line="LEI_H12:12,LEI_H2:14,LEI_H4:13,LEI_H5:16,LEI_H7:15,LEI_H9:17" link="lei_h213,lei_h412,lei_s307"/>
+    <!-- H16 -->
+    <station id="lei_h1601" name="Adolfstraße" line="LEI_H16:1" link="lei_h307"/>
+    <station id="lei_h315" name="Melanchthonstraße" line="LEI_H16:11,LEI_H3:15,LEI_H8:17,LEI_H95:16" link="lei_h110,lei_h316"/>
+    <station id="lei_h316" name="Kantstraße" line="LEI_H16:12,LEI_H3:16,LEI_H8:18,LEI_H95:17" link="lei_h315,lei_h317"/>
+    <station id="lei_h317" name="Robert-Koch-Straße" line="LEI_H16:13,LEI_H3:17,LEI_H8:19,LEI_H95:18" link="lei_h223,lei_h316"/>
+    <station id="lei_h223" name="Vogelweide" line="LEI_H16:14,LEI_H2:23,LEI_H3:18,LEI_H8:20,LEI_H95:19" link="lei_h222,lei_h224,lei_h317,lei_h821"/>
+    <station id="lei_h224" name="Paul-Suhr-Straße" line="LEI_H16:15,LEI_H2:24,LEI_H3:19" link="lei_h223,lei_h225"/>
+    <station id="lei_h225" name="Moskauer Straße" line="LEI_H16:16,LEI_H2:25,LEI_H3:20" link="lei_h224,lei_h226"/>
+    <station id="lei_h226" name="Südstadt, Paul-Suhr-Straße" line="LEI_H16:17,LEI_H2:26,LEI_H3:21" link="lei_h119,lei_h225,lei_h228"/>
+    <station id="lei_h228" name="Freyburger Straße" line="LEI_H16:18,LEI_H2:28,LEI_H3:22" link="lei_h226,lei_s305"/>
+    <station id="lei_s305" name="Silberhöhe" line="LEI_H16:19,LEI_H2:29,LEI_H3:23,LEI_S3:5,LEI_S7:3" link="lei_h228,lei_h230,lei_s304,lei_s306"/>
+    <station id="lei_h230" name="Gustav-Staude-Straße" line="LEI_H16:20,LEI_H2:30,LEI_H3:24" link="lei_h231,lei_s305"/>
+    <station id="lei_h231" name="Anhalter Platz" line="LEI_H16:21,LEI_H2:31,LEI_H3:25" link="lei_h230,lei_h232"/>
+    <station id="lei_h232" name="Brühlstraße" line="LEI_H16:22,LEI_H2:32,LEI_H3:26" link="lei_h231,lei_h233"/>
+    <station id="lei_h233" name="Beesen" line="LEI_H16:23,LEI_H2:33,LEI_H3:27" link="lei_h232"/>
+    <!-- H2 -->
+    <station id="lei_h216" name="Pfännerhöhe" line="LEI_H2:16,LEI_H5:18" link="lei_h217,lei_s307"/>
+    <station id="lei_h217" name="Heinrich-Schütz-Straße" line="LEI_H2:17,LEI_H5:19" link="lei_h216,lei_h218"/>
+    <station id="lei_h218" name="Lutherstraße" line="LEI_H2:18,LEI_H5:20" link="lei_h217,lei_l332"/>
+    <station id="lei_l332" name="Huttenstraße" line="LEI_H2:19,LEI_H5:21,LEI_L3:32" link="lei_h218,lei_h220,lei_l331,lei_l333"/>
+    <station id="lei_h220" name="BG Klinikum Bergmannstrost" line="LEI_H2:20,LEI_H5:22" link="lei_h221,lei_l332"/>
+    <station id="lei_h221" name="Damaschkestraße" line="LEI_H2:21,LEI_H5:23,LEI_H95:21" link="lei_h220,lei_h222,lei_h524"/>
+    <station id="lei_h222" name="Am Grünen Feld" line="LEI_H2:22,LEI_H95:20" link="lei_h221,lei_h223"/>
+    <!-- H3 -->
+    <station id="lei_h308" name="Hermannstraße" line="LEI_H3:8,LEI_H7:9,LEI_H8:10" link="lei_h307,lei_h309,lei_h809"/>
+    <station id="lei_h309" name="Moritzburgring" line="LEI_H3:9,LEI_H7:10,LEI_H8:11" link="lei_h308,lei_h310"/>
+    <station id="lei_h310" name="Neues Theater" line="LEI_H3:10,LEI_H7:11,LEI_H8:12" link="lei_h107,lei_h309"/>
+    <!-- H4 -->
+    <station id="lei_h401" name="Kröllwitz" line="LEI_H4:1,LEI_H5:1,LEI_H7:1,LEI_H94:1" link="lei_h402,lei_h702"/>
+    <station id="lei_h402" name="Spechtweg" line="LEI_H4:2,LEI_H5:2,LEI_H94:2" link="lei_h401,lei_h403"/>
+    <station id="lei_h403" name="Heide-Universitätsklinikum" line="LEI_H4:3,LEI_H5:3,LEI_H94:3" link="lei_h402,lei_h404"/>
+    <station id="lei_h404" name="Straßburger Weg" line="LEI_H4:4,LEI_H5:4,LEI_H94:4" link="lei_h403,lei_h405"/>
+    <station id="lei_h405" name="Weinberg Campus" line="LEI_H4:5,LEI_H5:5,LEI_H94:5" link="lei_h404,lei_h406"/>
+    <station id="lei_h406" name="Blücherstraße/Peißnitzinsel" line="LEI_H4:6,LEI_H5:6,LEI_H94:6" link="lei_h405,lei_h407"/>
+    <station id="lei_h407" name="Gimritzer Damm" line="LEI_H4:7,LEI_H5:7,LEI_H94:7" link="lei_h206,lei_h406"/>
+    <station id="lei_h410" name="Glauchaer Platz / SWH" line="LEI_H4:10,LEI_H9:14" link="lei_h108,lei_h207"/>
+    <station id="lei_h412" name="Am Leipziger Turm" line="LEI_H4:12,LEI_H7:14,LEI_H9:16" link="lei_h108,lei_h214"/>
+    <!-- H5 -->
+    <station id="lei_h524" name="Theodor-Neubauer-Straße" line="LEI_H5:24,LEI_H95:22" link="lei_h221,lei_s306"/>
+    <station id="lei_s306" name="Rosengarten" line="LEI_H5:25,LEI_H95:23,LEI_S3:6,LEI_S7:2" link="lei_h524,lei_h526,lei_s305,lei_s307"/>
+    <station id="lei_h526" name="Betriebshof Rosengarten" line="LEI_H5:26,LEI_H95:24" link="lei_h527,lei_s306"/>
+    <station id="lei_h527" name="Am Sommerbad" line="LEI_H5:27,LEI_H95:25" link="lei_h526,lei_h528"/>
+    <station id="lei_h528" name="Kurt-Wüsteneck-Straße" line="LEI_H5:28,LEI_H95:26" link="lei_h527,lei_h529"/>
+    <station id="lei_h529" name="Florian-Geyer-Straße" line="LEI_H5:29,LEI_H95:27" link="lei_h528,lei_s1102"/>
+    <station id="lei_s1102" name="Ammendorf" line="LEI_H5:30,LEI_H95:28,LEI_S11:2" link="lei_h529,lei_h531,lei_s1103,lei_s307"/>
+    <station id="lei_h531" name="Kollenbeyer Weg" line="LEI_H5:31" link="lei_h532,lei_s1102"/>
+    <station id="lei_h532" name="Korbethaer Straße" line="LEI_H5:32" link="lei_h531,lei_h533"/>
+    <station id="lei_h533" name="Dörstewitzer Straße" line="LEI_H5:33" link="lei_h532,lei_h534"/>
+    <station id="lei_h534" name="Bunawerke" line="LEI_H5:34" link="lei_h533,lei_h535"/>
+    <station id="lei_h535" name="Am Schloss" line="LEI_H5:35" link="lei_h534,lei_h536"/>
+    <station id="lei_h536" name="Ludwig-Uhland-Straße" line="LEI_H5:36" link="lei_h535,lei_h537"/>
+    <station id="lei_h537" name="Hohendorfer Marke" line="LEI_H5:37" link="lei_h536,lei_h538"/>
+    <station id="lei_h538" name="Stadtstadion" line="LEI_H5:38" link="lei_h537,lei_h539"/>
+    <station id="lei_h539" name="Am Stadtpark" line="LEI_H5:39" link="lei_h538,lei_h540"/>
+    <station id="lei_h540" name="Slawenweg" line="LEI_H5:40" link="lei_h539,lei_h541"/>
+    <station id="lei_h541" name="Carl-von-Basedow-Klinikum" line="LEI_H5:41" link="lei_h540,lei_h542"/>
+    <station id="lei_h542" name="Lindenstraße" line="LEI_H5:42" link="lei_h541,lei_h543"/>
+    <station id="lei_h543" name="Merseburg, Zentrum" line="LEI_H5:43" link="lei_h542,lei_h544"/>
+    <station id="lei_h544" name="Herweghstraße" line="LEI_H5:44" link="lei_h543,lei_h545"/>
+    <station id="lei_h545" name="Haeckelstraße" line="LEI_H5:45" link="lei_h544,lei_h546"/>
+    <station id="lei_h546" name="Leunaweg" line="LEI_H5:46" link="lei_h545,lei_h547,lei_h560"/>
+    <station id="lei_h547" name="Leunatorstraße" line="LEI_H5:47" link="lei_h546,lei_h548"/>
+    <station id="lei_h548" name="Industrietor" line="LEI_H5:48" link="lei_h547,lei_h549"/>
+    <station id="lei_h549" name="Am Haupttor" line="LEI_H5:49" link="lei_h548,lei_h550"/>
+    <station id="lei_h550" name="Pfalzplatz" line="LEI_H5:50" link="lei_h549,lei_h551"/>
+    <station id="lei_h551" name="Sachsenplatz" line="LEI_H5:51" link="lei_h550,lei_h552"/>
+    <station id="lei_h552" name="Krähenberg" line="LEI_H5:52" link="lei_h551,lei_h553"/>
+    <station id="lei_h553" name="Daspig" line="LEI_H5:53" link="lei_h552,lei_h554"/>
+    <station id="lei_h554" name="Leuna-Kröllwitz" line="LEI_H5:54" link="lei_h553,lei_h555"/>
+    <station id="lei_h555" name="Kirchfährendorf" line="LEI_H5:55" link="lei_h554,lei_h556"/>
+    <station id="lei_h556" name="Kurpark" line="LEI_H5:56" link="lei_h555,lei_h557"/>
+    <station id="lei_h557" name="Platz der Freiheit" line="LEI_H5:57" link="lei_h556,lei_h558"/>
+    <station id="lei_h558" name="Bad Dürrenberg, Bahnhof" line="LEI_H5:58" link="lei_h557,lei_h559"/>
+    <station id="lei_h559" name="Bad Dürrenberg, Markt" line="LEI_H5:59" link="lei_h558"/>
+    <station id="lei_h560" name="Kötzschener Weg" line="LEI_H5:60" link="lei_h546,lei_h561"/>
+    <station id="lei_h561" name="Naumburger Straße" line="LEI_H5:61" link="lei_h560,lei_h562"/>
+    <station id="lei_h562" name="Merseburg-Süd" line="LEI_H5:62" link="lei_h561"/>
+    <!-- H7 -->
+    <station id="lei_h702" name="Schwuchtstraße" line="LEI_H7:2" link="lei_h401,lei_h703"/>
+    <station id="lei_h703" name="Louise-Otto-Peters-Straße" line="LEI_H7:3" link="lei_h702,lei_h704"/>
+    <station id="lei_h704" name="Talstraße" line="LEI_H7:4" link="lei_h703,lei_h705"/>
+    <station id="lei_h705" name="Burg Giebichenstein" line="LEI_H7:5,LEI_H8:6" link="lei_h704,lei_h706,lei_h805,lei_h807"/>
+    <station id="lei_h706" name="Triftstraße" line="LEI_H7:6" link="lei_h705,lei_h707"/>
+    <station id="lei_h707" name="Landesmuseum für Vorgeschichte" line="LEI_H7:7" link="lei_h307,lei_h706"/>
+    <station id="lei_h718" name="Grenzstraße" line="LEI_H7:18" link="lei_h717,lei_h719"/>
+    <station id="lei_h719" name="Fiete-Schulze-Straße" line="LEI_H7:19" link="lei_h718,lei_h720"/>
+    <station id="lei_h720" name="Alfred-Schneider-Straße" line="LEI_H7:20" link="lei_h719,lei_h721"/>
+    <station id="lei_h721" name="Bitterfelder Straße" line="LEI_H7:21" link="lei_h720,lei_h722"/>
+    <station id="lei_h722" name="Käthe-Kollwitz-Straße" line="LEI_H7:22" link="lei_h721,lei_h723"/>
+    <station id="lei_h723" name="Büschdorf" line="LEI_H7:23" link="lei_h722"/>
+    <!-- H8 -->
+    <station id="lei_h804" name="Am Klausberg" line="LEI_H8:4" link="lei_h303,lei_h805"/>
+    <station id="lei_h805" name="Emil-Eichhorn-Straße" line="LEI_H8:5" link="lei_h705,lei_h804"/>
+    <station id="lei_h807" name="Volkspark" line="LEI_H8:7" link="lei_h705,lei_h808"/>
+    <station id="lei_h808" name="Diakoniewerk Halle" line="LEI_H8:8" link="lei_h807,lei_h809"/>
+    <station id="lei_h809" name="Mühlweg" line="LEI_H8:9" link="lei_h308,lei_h808"/>
+    <station id="lei_h821" name="Am Breiten Pfuhl" line="LEI_H8:21" link="lei_h223,lei_h822"/>
+    <station id="lei_h822" name="Elsa-Brändström-Straße" line="LEI_H8:22" link="lei_h821"/>
+    <!-- H9 -->
+    <!-- H94 -->
+    <!-- H95 -->
+    <!-- L1 -->
+    <station id="lei_l101" name="Mockau, Post" line="LEI_L1:1,LEI_L9:4" link="lei_l102,lei_l903"/>
+    <station id="lei_l102" name="Döringstraße" line="LEI_L1:2,LEI_L9:5" link="lei_l101,lei_l103"/>
+    <station id="lei_l103" name="Friedrichshafner Straße" line="LEI_L1:3,LEI_L9:6" link="lei_l102,lei_l104"/>
+    <station id="lei_l104" name="Mockauer/Volbedingstraße" line="LEI_L1:4,LEI_L9:7" link="lei_l103,lei_l105,lei_l908"/>
+    <station id="lei_l105" name="Schönefeld, Volbedingstraße" line="LEI_L1:5" link="lei_l104,lei_l106"/>
+    <station id="lei_l106" name="Rathaus Schönefeld" line="LEI_L1:6" link="lei_l105,lei_l107"/>
+    <station id="lei_l107" name="Ossietzky-/Gorkistraße" line="LEI_L1:7" link="lei_l106,lei_l108"/>
+    <station id="lei_l108" name="Löbauer Straße" line="LEI_L1:8" link="lei_l107,lei_l109"/>
+    <station id="lei_l109" name="Stöckelstraße" line="LEI_L1:9" link="lei_l108,lei_l110"/>
+    <station id="lei_l110" name="Stannebeinplatz" line="LEI_L1:10" link="lei_l109,lei_l111"/>
+    <station id="lei_l111" name="H.-Liebmann-/Eisenbahnstraße" line="LEI_L1:11,LEI_L3:14,LEI_L8:22" link="lei_l110,lei_l112,lei_l313"/>
+    <station id="lei_l112" name="Einertstraße" line="LEI_L1:12,LEI_L3:15,LEI_L8:21" link="lei_l111,lei_l113"/>
+    <station id="lei_l113" name="Friedrich-List-Platz" line="LEI_L1:13,LEI_L3:16,LEI_L8:20" link="lei_l112,lei_l114"/>
+    <station id="lei_l114" name="Hofmeisterstraße" line="LEI_L1:14,LEI_L3:17,LEI_L8:19" link="lei_l113,lei_l818,lei_s111"/>
+    <station id="lei_s111" name="Leipzig Hbf" line="LEI_L1:15,LEI_L10:13,LEI_L11:23,LEI_L12:13,LEI_L14:18,LEI_L15:21,LEI_L16:15,LEI_L3:18,LEI_L4:14,LEI_L7:22,LEI_S1:11,LEI_S2:16,LEI_S3:19,LEI_S30:7,LEI_S4:15,LEI_S5:9,LEI_S5X:9,LEI_S6:1" link="lei_l114,lei_l116,lei_l1417,lei_l415,lei_l910,lei_s109,lei_s110,lei_s112,lei_s213,lei_s215" other_link="leipzighbf:lei_l818,leipzighbf:lei_l911"/>
+    <station id="lei_l116" name="Goerdelerring" line="LEI_L1:16,LEI_L12:12,LEI_L15:20,LEI_L3:19,LEI_L4:13,LEI_L7:23,LEI_L9:12" link="lei_l117,lei_l1211,lei_l320,lei_l911,lei_l913,lei_s111"/>
+    <station id="lei_l117" name="Gottschedstraße" line="LEI_L1:17" link="lei_l116,lei_l118"/>
+    <station id="lei_l118" name="Westplatz" line="LEI_L1:18,LEI_L14:22,LEI_L2:10,LEI_L39:18,LEI_L8:14" link="lei_l117,lei_l119,lei_l1424,lei_l209,lei_l321"/>
+    <station id="lei_l119" name="Marschnerstraße" line="LEI_L1:19,LEI_L14:23,LEI_L2:11" link="lei_l118,lei_l120,lei_l1424"/>
+    <station id="lei_l120" name="Klingerwegstraße" line="LEI_L1:20,LEI_L2:12" link="lei_l119,lei_l121"/>
+    <station id="lei_l121" name="Holbeinstraße" line="LEI_L1:21,LEI_L2:13" link="lei_l120,lei_l122"/>
+    <station id="lei_l122" name="Stieglitzstraße" line="LEI_L1:22,LEI_L2:14" link="lei_l121,lei_l123"/>
+    <station id="lei_l123" name="Rödelstraße" line="LEI_L1:23,LEI_L2:15" link="lei_l122,lei_l124"/>
+    <station id="lei_l124" name="Adler" line="LEI_L1:24,LEI_L2:16,LEI_L3:27" link="lei_l123,lei_l125,lei_l326,lei_l328"/>
+    <station id="lei_l125" name="Antonien-/Gießerstraße" line="LEI_L1:25,LEI_L2:17" link="lei_l124,lei_l126"/>
+    <station id="lei_l126" name="Diezmannstraße" line="LEI_L1:26,LEI_L2:18" link="lei_l125,lei_l127"/>
+    <station id="lei_l127" name="Kurt-Kresse-Straße" line="LEI_L1:27,LEI_L2:19" link="lei_l126,lei_l128"/>
+    <station id="lei_l128" name="Herrmann-Meyer-Straße" line="LEI_L1:28,LEI_L2:20" link="lei_l127,lei_l129"/>
+    <station id="lei_l129" name="Schönauer/Ratzelstraße" line="LEI_L1:29,LEI_L2:21" link="lei_l128,lei_l130"/>
+    <station id="lei_l130" name="Stuttgarter Allee" line="LEI_L1:30,LEI_L2:22" link="lei_l129,lei_l131"/>
+    <station id="lei_l131" name="Ratzelbogen" line="LEI_L1:31,LEI_L2:23" link="lei_l130,lei_l132,lei_l224"/>
+    <station id="lei_l132" name="Krakauer Straße" line="LEI_L1:32" link="lei_l131,lei_l133"/>
+    <station id="lei_l133" name="Zschampertaue" line="LEI_L1:33" link="lei_l132,lei_l134"/>
+    <station id="lei_l134" name="Lausen" line="LEI_L1:34" link="lei_l133"/>
+    <!-- L10 -->
+    <station id="lei_l1001" name="Pater-Aurelius-Platz" line="LEI_L10:1" link="lei_s315"/>
+    <station id="lei_s315" name="Wahren" line="LEI_L10:2,LEI_L11:12,LEI_S3:15,LEI_S30:3" link="lei_l1001,lei_l1003,lei_l1111,lei_s314,lei_s316"/>
+    <station id="lei_l1003" name="Am Viadukt" line="LEI_L10:3,LEI_L11:13" link="lei_l1004,lei_s315"/>
+    <station id="lei_l1004" name="Annaberger Straße" line="LEI_L10:4,LEI_L11:14" link="lei_l1003,lei_l1005"/>
+    <station id="lei_l1005" name="Möckernscher Markt" line="LEI_L10:5,LEI_L11:15" link="lei_l1004,lei_l1006"/>
+    <station id="lei_l1006" name="Dantestraße" line="LEI_L10:6,LEI_L11:16" link="lei_l1005,lei_s108"/>
+    <station id="lei_s108" name="Möckern" line="LEI_L10:7,LEI_L11:17,LEI_S1:8,LEI_S6:3" link="lei_l1006,lei_l1008,lei_s107,lei_s109"/>
+    <station id="lei_l1008" name="Wiederitzscher Straße" line="LEI_L10:8,LEI_L11:18" link="lei_l406,lei_s108"/>
+    <station id="lei_l406" name="G.-Schumann-/Lindenthaler Straße" line="LEI_L10:9,LEI_L11:19,LEI_L4:6" link="lei_l1008,lei_l1010,lei_l407,lei_s109"/>
+    <station id="lei_l1010" name="G.-Schumann-/Lützowstraße" line="LEI_L10:10,LEI_L11:20,LEI_L12:6" link="lei_l1011,lei_l1207,lei_l406,lei_s110"/>
+    <station id="lei_l1011" name="Chausseehaus" line="LEI_L10:11,LEI_L11:21,LEI_L16:13" link="lei_l1010,lei_l1612,lei_l910"/>
+    <station id="lei_l910" name="Wilhelm-Liebknecht-Platz" line="LEI_L10:12,LEI_L11:22,LEI_L16:14,LEI_L9:10" link="lei_l1011,lei_l909,lei_l911,lei_s111"/>
+    <station id="lei_l415" name="Augustusplatz" line="LEI_L10:14,LEI_L11:24,LEI_L12:14,LEI_L14:19,LEI_L15:22,LEI_L16:16,LEI_L4:15,LEI_L7:21,LEI_L8:17" link="lei_l207,lei_l208,lei_l416,lei_l818,lei_s111"/>
+    <station id="lei_l208" name="Wilhelm-Leuschner-Platz" line="LEI_L10:15,LEI_L11:25,LEI_L14:20,LEI_L2:8,LEI_L39:16,LEI_L8:16,LEI_L9:15" link="lei_l1016,lei_l207,lei_l209,lei_l415"/>
+    <station id="lei_l1016" name="Münzgasse, LVZ" line="LEI_L10:16,LEI_L11:26" link="lei_l1017,lei_l208"/>
+    <station id="lei_l1017" name="Hohe Straße" line="LEI_L10:17,LEI_L11:27" link="lei_l1016,lei_l1018"/>
+    <station id="lei_l1018" name="Südplatz" line="LEI_L10:18,LEI_L11:28" link="lei_l1017,lei_l1019"/>
+    <station id="lei_l1019" name="K.-Liebknecht-/K.-Eisner-Straße" line="LEI_L10:19,LEI_L11:29" link="lei_l1018,lei_l923"/>
+    <station id="lei_l923" name="Richard-Lehmann-Straße, HTWK" line="LEI_L10:20,LEI_L11:30,LEI_L39:8,LEI_L9:23" link="lei_l1019,lei_l922,lei_l924"/>
+    <station id="lei_l924" name="Connewitzer Kreuz" line="LEI_L10:21,LEI_L11:31,LEI_L39:7,LEI_L9:24" link="lei_l1022,lei_l923,lei_l925"/>
+    <station id="lei_l1022" name="Wiedebachplatz" line="LEI_L10:22,LEI_L39:6" link="lei_l1023,lei_l924"/>
+    <station id="lei_l1023" name="Meusdorfer Straße" line="LEI_L10:23,LEI_L39:5" link="lei_l1022,lei_l1024"/>
+    <station id="lei_l1024" name="Triftweg" line="LEI_L10:24,LEI_L16:24,LEI_L39:4" link="lei_l1023,lei_l1025,lei_l1623"/>
+    <station id="lei_l1025" name="An der Märchenwiese" line="LEI_L10:25,LEI_L16:25,LEI_L39:3" link="lei_l1024,lei_l1026"/>
+    <station id="lei_l1026" name="Moritz Hof" line="LEI_L10:26,LEI_L16:26,LEI_L39:2" link="lei_l1025,lei_l1027"/>
+    <station id="lei_l1027" name="Lößnig" line="LEI_L10:27,LEI_L16:27,LEI_L39:1" link="lei_l1026"/>
+    <!-- L11 -->
+    <station id="lei_l1101" name="Schkeuditz, Rathausplatz" line="LEI_L11:1" link="lei_l1102"/>
+    <station id="lei_l1102" name="Altscherbitz" line="LEI_L11:2" link="lei_l1101,lei_l1103"/>
+    <station id="lei_l1103" name="Schkeuditz, Paetzstraße" line="LEI_L11:3" link="lei_l1102,lei_l1104"/>
+    <station id="lei_l1104" name="Schkeuditz, Gartenstadt" line="LEI_L11:4" link="lei_l1103,lei_l1105"/>
+    <station id="lei_l1105" name="Modelwitz" line="LEI_L11:5" link="lei_l1104,lei_l1106"/>
+    <station id="lei_l1106" name="Hänichen, Bismarckturm" line="LEI_L11:6" link="lei_l1105,lei_l1107"/>
+    <station id="lei_l1107" name="Freirodaer Weg" line="LEI_L11:7" link="lei_l1106,lei_s314"/>
+    <station id="lei_s314" name="Lützschena" line="LEI_L11:8,LEI_S3:14,LEI_S30:2" link="lei_l1107,lei_l1109,lei_s313,lei_s315"/>
+    <station id="lei_l1109" name="Stahmelner Allee" line="LEI_L11:9" link="lei_l1110,lei_s314"/>
+    <station id="lei_l1110" name="Stahmeln" line="LEI_L11:10" link="lei_l1109,lei_l1111"/>
+    <station id="lei_l1111" name="Pittlerstraße" line="LEI_L11:11" link="lei_l1110,lei_s315"/>
+    <station id="lei_l925" name="Stockartstraße" line="LEI_L11:32,LEI_L9:25" link="lei_l924,lei_l926"/>
+    <station id="lei_l926" name="Hildebrandstraße" line="LEI_L11:33,LEI_L9:26" link="lei_l925,lei_s221"/>
+    <station id="lei_s221" name="Connewitz" line="LEI_L11:34,LEI_L9:27,LEI_S2:21,LEI_S3:24,LEI_S5:14,LEI_S5X:14" link="lei_l1135,lei_l926,lei_s115,lei_s325"/>
+    <station id="lei_l1135" name="Raschwitzer Straße" line="LEI_L11:35" link="lei_l1136,lei_s221"/>
+    <station id="lei_l1136" name="Friederikenstraße" line="LEI_L11:36" link="lei_l1135,lei_l1137"/>
+    <station id="lei_l1137" name="Leinestraße" line="LEI_L11:37" link="lei_l1136,lei_l1138"/>
+    <station id="lei_l1138" name="Dölitz, Straßenbahnhof" line="LEI_L11:38" link="lei_l1137,lei_l1139"/>
+    <station id="lei_l1139" name="Markkleeberg, Virchowstraße" line="LEI_L11:39" link="lei_l1138,lei_l1140"/>
+    <station id="lei_l1140" name="Markkleeberg-Ost" line="LEI_L11:40" link="lei_l1139"/>
+    <!-- L12 -->
+    <station id="lei_l1201" name="Gohlis-Nord" line="LEI_L12:1" link="lei_l1202"/>
+    <station id="lei_l1202" name="Baaderstraße" line="LEI_L12:2" link="lei_l1201,lei_l1203"/>
+    <station id="lei_l1203" name="Gottschallstraße" line="LEI_L12:3" link="lei_l1202,lei_l1204"/>
+    <station id="lei_l1204" name="Virchow-/Coppistraße" line="LEI_L12:4" link="lei_l1203,lei_s110"/>
+    <station id="lei_s110" name="Gohlis" line="LEI_L12:5,LEI_S1:10,LEI_S3:18,LEI_S30:6" link="lei_l1010,lei_l1204,lei_s109,lei_s111,lei_s317"/>
+    <station id="lei_l1207" name="Fritz-Seger-Straße" line="LEI_L12:7" link="lei_l1010,lei_l1208"/>
+    <station id="lei_l1208" name="Springerstraße" line="LEI_L12:8" link="lei_l1207,lei_l1209"/>
+    <station id="lei_l1209" name="Nordplatz" line="LEI_L12:9" link="lei_l1208,lei_s503"/>
+    <station id="lei_l1211" name="Lortzingstraße" line="LEI_L12:11" link="lei_l116,lei_s503"/>
+    <station id="lei_l416" name="Johannisplatz" line="LEI_L12:15,LEI_L15:23,LEI_L4:16,LEI_L7:20" link="lei_l1216,lei_l415,lei_l417"/>
+    <station id="lei_l1216" name="Gutenbergplatz" line="LEI_L12:16,LEI_L15:24" link="lei_l1217,lei_l416"/>
+    <station id="lei_l1217" name="Ostplatz" line="LEI_L12:17,LEI_L15:25" link="lei_l1216,lei_l1218"/>
+    <station id="lei_l1218" name="Witzgallstraße" line="LEI_L12:18,LEI_L15:26" link="lei_l1217,lei_l422"/>
+    <station id="lei_l422" name="Technisches Rathaus" line="LEI_L12:19,LEI_L15:27,LEI_L4:22" link="lei_l1218,lei_l202,lei_l421,lei_s117"/>
+    <!-- L14 -->
+    <station id="lei_l1401" name="Messegelände" line="LEI_L14:1,LEI_L16:1" link="lei_l1402"/>
+    <station id="lei_l1402" name="Messe" line="LEI_L14:2,LEI_L16:2" link="lei_l1401,lei_l1403"/>
+    <station id="lei_l1403" name="Georg-Herwegh-Straße" line="LEI_L14:3,LEI_L16:3" link="lei_l1402,lei_l1404"/>
+    <station id="lei_l1404" name="Wiederitzsch-Mitte" line="LEI_L14:4,LEI_L16:4" link="lei_l1403,lei_l1405"/>
+    <station id="lei_l1405" name="Dachauer Straße" line="LEI_L14:5,LEI_L16:5" link="lei_l1404,lei_l1407"/>
+    <station id="lei_l1406" name="Klinikum St. Georg (Schleife)" line="LEI_L14:6" link="lei_l1407"/>
+    <station id="lei_l1407" name="Klinikum St. Georg" line="LEI_L14:7,LEI_L16:6" link="lei_l1405,lei_l1406,lei_l1408"/>
+    <station id="lei_l1408" name="Hornbach Baumarkt" line="LEI_L14:8,LEI_L16:7" link="lei_l1407,lei_l1409"/>
+    <station id="lei_l1409" name="Delitzscher/Essener Straße" line="LEI_L14:9,LEI_L16:8" link="lei_l1408,lei_l1410"/>
+    <station id="lei_l1410" name="Mosenthinstraße" line="LEI_L14:10,LEI_L16:9" link="lei_l1409,lei_l1411"/>
+    <station id="lei_l1411" name="Eutritzscher Markt" line="LEI_L14:11,LEI_L16:10" link="lei_l1410,lei_l1412"/>
+    <station id="lei_l1412" name="Eutritzscher Zentrum" line="LEI_L14:12,LEI_L16:11" link="lei_l1411,lei_l1413,lei_l1612"/>
+    <station id="lei_l1413" name="Theresienstraße" line="LEI_L14:13" link="lei_l1412,lei_l1414"/>
+    <station id="lei_l1414" name="Dessauer Straße" line="LEI_L14:14" link="lei_l1413,lei_l909"/>
+    <station id="lei_l909" name="Apelstraße, Historischer Straßenbahnhof" line="LEI_L14:15,LEI_L9:9" link="lei_l1414,lei_l908,lei_l910"/>
+    <station id="lei_l1416" name="Wittenberger Straße" line="LEI_L14:16" link="lei_l1417,lei_l909"/>
+    <station id="lei_l1417" name="W.-Liebknecht-Platz" line="LEI_L14:17" link="lei_l1416,lei_s111"/>
+    <station id="lei_l209" name="Neues Rathaus" line="LEI_L14:21,LEI_L2:9,LEI_L39:17,LEI_L8:15,LEI_L9:14" link="lei_l118,lei_l208,lei_l913"/>
+    <station id="lei_l1424" name="Nonnenstraße" line="LEI_L14:24,LEI_L39:19" link="lei_l118,lei_l119,lei_l1425"/>
+    <station id="lei_l1425" name="Alte Straße" line="LEI_L14:25,LEI_L39:20" link="lei_l1424,lei_l324"/>
+    <station id="lei_l324" name="Felsenkeller" line="LEI_L14:26,LEI_L3:24,LEI_L39:21" link="lei_l1425,lei_l1427,lei_l323,lei_l325"/>
+    <station id="lei_l1427" name="K.-Heine-/Merseburger Straße" line="LEI_L14:27" link="lei_l1428,lei_l324"/>
+    <station id="lei_l1428" name="K.-Heine-/Gießerstraße" line="LEI_L14:28" link="lei_l1427,lei_s105"/>
+    <station id="lei_s105" name="Plagwitz" line="LEI_L14:29,LEI_S1:5" link="lei_l1428,lei_s104,lei_s106"/>
+    <!-- L15 -->
+    <station id="lei_s606" name="Miltitz" line="LEI_L15:1,LEI_S6:6" link="lei_l1502,lei_s605,lei_s607"/>
+    <station id="lei_l1502" name="Saturnstraße" line="LEI_L15:2" link="lei_l1503,lei_s606"/>
+    <station id="lei_l1503" name="Jupiterstraße" line="LEI_L15:3" link="lei_l1502,lei_l1504"/>
+    <station id="lei_l1504" name="Plovdiver Straße" line="LEI_L15:4" link="lei_l1503,lei_l1505"/>
+    <station id="lei_l1505" name="Kiewer Straße" line="LEI_L15:5" link="lei_l1504,lei_l1506"/>
+    <station id="lei_l1506" name="Am Kirschberg" line="LEI_L15:6" link="lei_l1505,lei_l802"/>
+    <station id="lei_l802" name="Schönauer Ring" line="LEI_L15:7,LEI_L8:2" link="lei_l1506,lei_l801,lei_l803"/>
+    <station id="lei_l803" name="Parkallee" line="LEI_L15:8,LEI_L8:3" link="lei_l802,lei_s104"/>
+    <station id="lei_s104" name="Grünauer Allee" line="LEI_L15:9,LEI_L8:4,LEI_S1:4" link="lei_l1510,lei_l803,lei_l805,lei_s103,lei_s105"/>
+    <station id="lei_l1510" name="Saarländer Straße" line="LEI_L15:10" link="lei_l806,lei_s104"/>
+    <station id="lei_l806" name="Credéstraße" line="LEI_L15:11,LEI_L8:6" link="lei_l1510,lei_l805,lei_l807"/>
+    <station id="lei_l807" name="Lindenau, Bushof" line="LEI_L15:12,LEI_L8:7" link="lei_l806,lei_l808"/>
+    <station id="lei_l808" name="Henriettenstraße" line="LEI_L15:13,LEI_L8:8" link="lei_l807,lei_l809"/>
+    <station id="lei_l809" name="Lützner/Merseburger Straße" line="LEI_L15:14,LEI_L8:9" link="lei_l728,lei_l808"/>
+    <station id="lei_l728" name="Lindenauer Markt" line="LEI_L15:15,LEI_L7:28,LEI_L8:10" link="lei_l323,lei_l729,lei_l809"/>
+    <station id="lei_l323" name="Angerbrücke, Straßenbahnhof" line="LEI_L15:16,LEI_L3:23,LEI_L39:22,LEI_L7:27,LEI_L8:11" link="lei_l322,lei_l324,lei_l728"/>
+    <station id="lei_l322" name="Sportforum Süd" line="LEI_L15:17,LEI_L3:22,LEI_L7:26,LEI_L8:12" link="lei_l321,lei_l323"/>
+    <station id="lei_l321" name="Waldplatz" line="LEI_L15:18,LEI_L3:21,LEI_L4:11,LEI_L7:25,LEI_L8:13" link="lei_l118,lei_l320,lei_l322,lei_l410"/>
+    <station id="lei_l320" name="Leibnizstraße" line="LEI_L15:19,LEI_L3:20,LEI_L4:12,LEI_L7:24" link="lei_l116,lei_l321"/>
+    <station id="lei_l202" name="Altes Messegelände" line="LEI_L15:28,LEI_L2:2" link="lei_l201,lei_l203,lei_l422"/>
+    <station id="lei_l201" name="Naunhofer Straße" line="LEI_L15:29,LEI_L2:1" link="lei_l202,lei_s116"/>
+    <station id="lei_s116" name="Völkerschlachtdenkmal" line="LEI_L15:30,LEI_S1:16,LEI_S4:20" link="lei_l1531,lei_l201,lei_s115,lei_s117"/>
+    <station id="lei_l1531" name="Südfriedhof" line="LEI_L15:31" link="lei_l1532,lei_s116"/>
+    <station id="lei_l1532" name="Prager/Russenstraße" line="LEI_L15:32" link="lei_l1531,lei_l1533"/>
+    <station id="lei_l1533" name="Probstheida" line="LEI_L15:33" link="lei_l1532,lei_l1534"/>
+    <station id="lei_l1534" name="Franzosenallee" line="LEI_L15:34" link="lei_l1533,lei_l1535"/>
+    <station id="lei_l1535" name="Roseggerstraße" line="LEI_L15:35" link="lei_l1534,lei_l1536"/>
+    <station id="lei_l1536" name="Meusdorf" line="LEI_L15:36" link="lei_l1535"/>
+    <!-- L16 -->
+    <station id="lei_l1612" name="Wilhelminenstraße" line="LEI_L16:12" link="lei_l1011,lei_l1412"/>
+    <station id="lei_l207" name="Roßplatz" line="LEI_L16:17,LEI_L2:7,LEI_L39:15,LEI_L9:16" link="lei_l206,lei_l208,lei_l415"/>
+    <station id="lei_l206" name="Härtelstraße" line="LEI_L16:18,LEI_L2:6,LEI_L39:14,LEI_L9:17" link="lei_l205,lei_l207"/>
+    <station id="lei_l205" name="Bayerischer Bahnhof" line="LEI_L16:19,LEI_L2:5,LEI_L39:13,LEI_L9:18" link="lei_l204,lei_l206,lei_l919"/>
+    <station id="lei_l204" name="Johannisallee" line="LEI_L16:20,LEI_L2:4" link="lei_l203,lei_l205"/>
+    <station id="lei_l203" name="Deutsche Nationalbibliothek" line="LEI_L16:21,LEI_L2:3" link="lei_l1622,lei_l202,lei_l204"/>
+    <station id="lei_l1622" name="An den Tierkliniken" line="LEI_L16:22" link="lei_l1623,lei_l203"/>
+    <station id="lei_l1623" name="R.-Lehmann-/Zwickauer Straße" line="LEI_L16:23" link="lei_l1024,lei_l1622"/>
+    <!-- L2 -->
+    <station id="lei_l224" name="Grünau-Süd" line="LEI_L2:24" link="lei_l131"/>
+    <!-- L3 -->
+    <station id="lei_l301" name="Taucha, An der Bürgerruhe" line="LEI_L3:1" link="lei_l302"/>
+    <station id="lei_l302" name="Taucha, Freiligrathstraße" line="LEI_L3:2" link="lei_l301,lei_l303"/>
+    <station id="lei_l303" name="Taucha, Theodor-Körner-Straße" line="LEI_L3:3" link="lei_l302,lei_l304"/>
+    <station id="lei_l304" name="Taucha, O.-Schmidt-Straße" line="LEI_L3:4" link="lei_l303,lei_l305"/>
+    <station id="lei_l305" name="Portitzer Allee" line="LEI_L3:5" link="lei_l304,lei_l306,lei_l344" other_link="portheit:lei_s412"/>
+    <station id="lei_l306" name="Heiterblick, Teslastraße" line="LEI_L3:6" link="lei_l305,lei_l307"/>
+    <station id="lei_l307" name="Arcus Park" line="LEI_L3:7" link="lei_l306,lei_l308"/>
+    <station id="lei_l308" name="Hohentichelnstraße" line="LEI_L3:8" link="lei_l307,lei_l309"/>
+    <station id="lei_l309" name="Bautzner Straße" line="LEI_L3:9" link="lei_l308,lei_l310"/>
+    <station id="lei_l310" name="Schwantesstraße" line="LEI_L3:10" link="lei_l309,lei_l311"/>
+    <station id="lei_l311" name="Permoser-/Torgauer Straße" line="LEI_L3:11" link="lei_l310,lei_l312"/>
+    <station id="lei_l312" name="Volksgarten" line="LEI_L3:12" link="lei_l311,lei_l313"/>
+    <station id="lei_l313" name="Torgauer Platz" line="LEI_L3:13,LEI_L7:15,LEI_L8:23" link="lei_l111,lei_l312,lei_l714,lei_l716"/>
+    <station id="lei_l325" name="Elster Passage" line="LEI_L3:25" link="lei_l324,lei_l326"/>
+    <station id="lei_l326" name="Markranstädter Straße" line="LEI_L3:26" link="lei_l124,lei_l325"/>
+    <station id="lei_l328" name="Schwartzestraße" line="LEI_L3:28" link="lei_l124,lei_l329"/>
+    <station id="lei_l329" name="Kleinzschocher, Kötzschauer Straße" line="LEI_L3:29" link="lei_l328,lei_l330"/>
+    <station id="lei_l330" name="Arthur-Nagel-Straße" line="LEI_L3:30" link="lei_l329,lei_l331"/>
+    <station id="lei_l331" name="Kunzestraße" line="LEI_L3:31" link="lei_l330,lei_l332"/>
+    <station id="lei_l333" name="Großzschocher, G.-Ellrodt-Straße" line="LEI_L3:33" link="lei_l332,lei_l334"/>
+    <station id="lei_l334" name="Wasserwerk Windorf" line="LEI_L3:34" link="lei_l333,lei_l335"/>
+    <station id="lei_l335" name="Seumestraße" line="LEI_L3:35" link="lei_l334,lei_l336"/>
+    <station id="lei_l336" name="Albersdorfer Straße" line="LEI_L3:36" link="lei_l335,lei_l337"/>
+    <station id="lei_l337" name="Fortunabadstraße" line="LEI_L3:37" link="lei_l336,lei_l338"/>
+    <station id="lei_l338" name="Knautkleeberg" line="LEI_L3:38" link="lei_l337"/>
+    <station id="lei_l339" name="Sommerfeld" line="LEI_L3:39,LEI_L7:1" link="lei_l340"/>
+    <station id="lei_l340" name="Paunsdorf Center" line="LEI_L3:40,LEI_L7:2" link="lei_l339,lei_l341"/>
+    <station id="lei_l341" name="Paunsdorfer Allee/Permoserstraße" line="LEI_L3:41,LEI_L7:3" link="lei_l340,lei_l342"/>
+    <station id="lei_l342" name="Hermelinstraße" line="LEI_L3:42,LEI_L7:4" link="lei_l341,lei_l343"/>
+    <station id="lei_l343" name="Paunsdorf-Nord" line="LEI_L3:43,LEI_L7:5,LEI_L8:33" link="lei_l342,lei_l344,lei_l706"/>
+    <station id="lei_l344" name="Heisenbergstraße" line="LEI_L3:44" link="lei_l305,lei_l343"/>
+    <!-- L39 -->
+    <station id="lei_l922" name="A.-Hoffmann-/R.-Lehmann-Straße" line="LEI_L39:9,LEI_L9:22" link="lei_l921,lei_l923"/>
+    <station id="lei_l921" name="Steinplatz" line="LEI_L39:10,LEI_L9:21" link="lei_l920,lei_l922"/>
+    <station id="lei_l920" name="K.-Eisner-/A.-Hoffmann-Straße" line="LEI_L39:11,LEI_L9:20" link="lei_l919,lei_l921"/>
+    <station id="lei_l919" name="Körnerstraße" line="LEI_L39:12,LEI_L9:19" link="lei_l205,lei_l920"/>
+    <!-- L4 -->
+    <station id="lei_l401" name="Gohlis, Landsberger Straße" line="LEI_L4:1" link="lei_l402"/>
+    <station id="lei_l402" name="Beyerleinstraße" line="LEI_L4:2" link="lei_l401,lei_l403"/>
+    <station id="lei_l403" name="Landsberger/M.-Liebermann-Straße" line="LEI_L4:3" link="lei_l402,lei_l404"/>
+    <station id="lei_l404" name="Viertelsweg" line="LEI_L4:4" link="lei_l403,lei_s109"/>
+    <station id="lei_s109" name="Coppiplatz" line="LEI_L4:5,LEI_S1:9,LEI_S6:2" link="lei_l404,lei_l406,lei_s108,lei_s110,lei_s111"/>
+    <station id="lei_l407" name="Menckestraße" line="LEI_L4:7" link="lei_l406,lei_l408"/>
+    <station id="lei_l408" name="Stallbaumstraße" line="LEI_L4:8" link="lei_l407,lei_l409"/>
+    <station id="lei_l409" name="Am Mückenschlösschen" line="LEI_L4:9" link="lei_l408,lei_l410"/>
+    <station id="lei_l410" name="Feuerbachstraße" line="LEI_L4:10" link="lei_l321,lei_l409"/>
+    <station id="lei_l417" name="Gerichtsweg" line="LEI_L4:17,LEI_L7:19" link="lei_l416,lei_l418,lei_l718"/>
+    <station id="lei_l418" name="Reudnitz, Köhlerstraße" line="LEI_L4:18" link="lei_l417,lei_l419"/>
+    <station id="lei_l419" name="Breite Straße" line="LEI_L4:19" link="lei_l418,lei_l420"/>
+    <station id="lei_l420" name="Riebeck-/Oststraße" line="LEI_L4:20" link="lei_l419,lei_l421"/>
+    <station id="lei_l421" name="Riebeck-/Stötteritzer Straße" line="LEI_L4:21" link="lei_l420,lei_l422"/>
+    <station id="lei_s117" name="Stötteritz" line="LEI_L4:23,LEI_S1:17,LEI_S4:21" link="lei_l422,lei_l424,lei_s116,lei_s422"/>
+    <station id="lei_l424" name="Breslauer Straße" line="LEI_L4:24" link="lei_l425,lei_s117"/>
+    <station id="lei_l425" name="Weißestraße" line="LEI_L4:25" link="lei_l424,lei_l426"/>
+    <station id="lei_l426" name="Rathaus Stötteritz" line="LEI_L4:26" link="lei_l425,lei_l427"/>
+    <station id="lei_l427" name="Kolmstraße" line="LEI_L4:27" link="lei_l426,lei_l428"/>
+    <station id="lei_l428" name="Stötteritz, Holzhäuser Straße" line="LEI_L4:28" link="lei_l427"/>
+    <!-- L7 -->
+    <station id="lei_l706" name="Ahornstraße" line="LEI_L7:6,LEI_L8:32" link="lei_l343,lei_l707"/>
+    <station id="lei_l707" name="Am Vorwerk" line="LEI_L7:7,LEI_L8:31" link="lei_l706,lei_l708"/>
+    <station id="lei_l708" name="Paunsdorf, Straßenbahnhof" line="LEI_L7:8,LEI_L8:30" link="lei_l707,lei_l709"/>
+    <station id="lei_l709" name="Barbarastraße" line="LEI_L7:9,LEI_L8:29" link="lei_l708,lei_l710"/>
+    <station id="lei_l710" name="Theodor-Heuss-Straße" line="LEI_L7:10,LEI_L8:28" link="lei_l709,lei_l711"/>
+    <station id="lei_l711" name="Ostheimstraße" line="LEI_L7:11,LEI_L8:27" link="lei_l710,lei_l712"/>
+    <station id="lei_l712" name="Sellerhausen, Emmausstraße" line="LEI_L7:12,LEI_L8:26" link="lei_l711,lei_l713"/>
+    <station id="lei_l713" name="Annenstraße" line="LEI_L7:13,LEI_L8:25" link="lei_l712,lei_l714"/>
+    <station id="lei_l714" name="Geißlerstraße, Bülowviertel" line="LEI_L7:14,LEI_L8:24" link="lei_l313,lei_l713"/>
+    <station id="lei_l716" name="Edlichstraße" line="LEI_L7:16" link="lei_l313,lei_l717"/>
+    <station id="lei_l717" name="Wiebelstraße" line="LEI_L7:17" link="lei_l716,lei_l718"/>
+    <station id="lei_l718" name="Reudnitz, Koehlerstraße" line="LEI_L7:18" link="lei_l417,lei_l717"/>
+    <station id="lei_l729" name="G.-Schwarz-/Merseburger Straße" line="LEI_L7:29" link="lei_l728,lei_l730"/>
+    <station id="lei_l730" name="Wielandstraße" line="LEI_L7:30" link="lei_l729,lei_l731"/>
+    <station id="lei_l731" name="Diakonissenhaus" line="LEI_L7:31" link="lei_l730,lei_l732"/>
+    <station id="lei_l732" name="Am langen Felde" line="LEI_L7:32" link="lei_l731,lei_l733"/>
+    <station id="lei_l733" name="Rathaus Leutzsch" line="LEI_L7:33" link="lei_l732,lei_l734"/>
+    <station id="lei_l734" name="Pfingstweide" line="LEI_L7:34" link="lei_l733,lei_l735"/>
+    <station id="lei_l735" name="Philipp-Reis-Straße" line="LEI_L7:35" link="lei_l734,lei_s107"/>
+    <station id="lei_s107" name="Leutzsch" line="LEI_L7:36,LEI_S1:7,LEI_S6:4" link="lei_l735,lei_l737,lei_s106,lei_s108,lei_s605"/>
+    <station id="lei_l737" name="Barnecker Straße" line="LEI_L7:37" link="lei_l738,lei_s107"/>
+    <station id="lei_l738" name="Südstraße" line="LEI_L7:38" link="lei_l737,lei_l739"/>
+    <station id="lei_l739" name="Ludwig-Jahn-Straße" line="LEI_L7:39" link="lei_l738,lei_l740"/>
+    <station id="lei_l740" name="Forstweg" line="LEI_L7:40" link="lei_l739,lei_l741"/>
+    <station id="lei_l741" name="Böhlitz-Ehrenberg, Burghausener Straße" line="LEI_L7:41" link="lei_l740"/>
+    <!-- L8 -->
+    <station id="lei_l801" name="Grünau-Nord" line="LEI_L8:1" link="lei_l802"/>
+    <station id="lei_l805" name="Saarlandstraße" line="LEI_L8:5" link="lei_l806,lei_s104"/>
+    <station id="lei_l818" name="Leipzig Hbf, Wintergartenstraße" line="LEI_L8:18" link="lei_l114,lei_l415" other_link="leipzighbf:lei_s111"/>
+    <!-- L9 -->
+    <station id="lei_l901" name="Thekla" line="LEI_L9:1" link="lei_l902"/>
+    <station id="lei_l902" name="Mockau, Kirche" line="LEI_L9:2" link="lei_l901,lei_l903"/>
+    <station id="lei_l903" name="Samuel-Lampel-Straße" line="LEI_L9:3" link="lei_l101,lei_l902"/>
+    <station id="lei_l908" name="Hamburger Straße" line="LEI_L9:8" link="lei_l104,lei_l909"/>
+    <station id="lei_l911" name="Leipzig Hbf, Westseite" line="LEI_L9:11" link="lei_l116,lei_l910" other_link="leipzighbf:lei_s111"/>
+    <station id="lei_l913" name="Thomaskirche" line="LEI_L9:13" link="lei_l116,lei_l209"/>
+    <!-- S1 -->
+    <station id="lei_s101" name="Miltitzer Allee" line="LEI_S1:1" link="lei_s102"/>
+    <station id="lei_s102" name="Karlsruher Straße" line="LEI_S1:2" link="lei_s101,lei_s103"/>
+    <station id="lei_s103" name="Allee-Center" line="LEI_S1:3" link="lei_s102,lei_s104"/>
+    <station id="lei_s106" name="Lindenau" line="LEI_S1:6" link="lei_s105,lei_s107"/>
+    <station id="lei_s112" name="Markt" line="LEI_S1:12,LEI_S2:17,LEI_S3:20,LEI_S4:16,LEI_S5:10,LEI_S5X:10" link="lei_s111,lei_s113"/>
+    <station id="lei_s113" name="Wilhelm-Leuschner-Pl." line="LEI_S1:13,LEI_S2:18,LEI_S3:21,LEI_S4:17,LEI_S5:11,LEI_S5X:11" link="lei_s112,lei_s114"/>
+    <station id="lei_s114" name="Bayerischer Bf" line="LEI_S1:14,LEI_S2:19,LEI_S3:22,LEI_S4:18,LEI_S5:12,LEI_S5X:12" link="lei_s113,lei_s115"/>
+    <station id="lei_s115" name="MDR" line="LEI_S1:15,LEI_S2:20,LEI_S3:23,LEI_S4:19,LEI_S5:13,LEI_S5X:13" link="lei_s114,lei_s116,lei_s221"/>
+    <!-- S11 -->
+    <station id="lei_s1103" name="Schkopau" line="LEI_S11:3" link="lei_s1102,lei_s1104"/>
+    <station id="lei_s1104" name="Merseburg Hbf" line="LEI_S11:4" link="lei_s1103,lei_s1105"/>
+    <station id="lei_s1105" name="Merseburg Bergmannsring" line="LEI_S11:5" link="lei_s1104,lei_s1106"/>
+    <station id="lei_s1106" name="Beuna" line="LEI_S11:6" link="lei_s1105,lei_s1107"/>
+    <station id="lei_s1107" name="Frankleben" line="LEI_S11:7" link="lei_s1106,lei_s1108"/>
+    <station id="lei_s1108" name="Braunsbedra Pfännerhall" line="LEI_S11:8" link="lei_s1107,lei_s1109"/>
+    <station id="lei_s1109" name="Braunsbedra" line="LEI_S11:9" link="lei_s1108,lei_s1110"/>
+    <station id="lei_s1110" name="Krumpa" line="LEI_S11:10" link="lei_s1109,lei_s1111"/>
+    <station id="lei_s1111" name="Mücheln Stadt" line="LEI_S11:11" link="lei_s1110,lei_s1112"/>
+    <station id="lei_s1112" name="Mücheln" line="LEI_S11:12" link="lei_s1111,lei_s1113"/>
+    <station id="lei_s1113" name="Langeneichstädt" line="LEI_S11:13" link="lei_s1112,lei_s1114"/>
+    <station id="lei_s1114" name="Nemsdorf-Göhrendorf" line="LEI_S11:14" link="lei_s1113,lei_s1115"/>
+    <station id="lei_s1115" name="Querfurt" line="LEI_S11:15" link="lei_s1114"/>
+    <!-- S2 -->
+    <station id="lei_s201" name="Dessau Hbf" line="LEI_S2:1,LEI_S8:1" link="lei_s202"/>
+    <station id="lei_s202" name="Dessau Süd" line="LEI_S2:2,LEI_S8:2" link="lei_s201,lei_s203"/>
+    <station id="lei_s203" name="Marke" line="LEI_S2:3,LEI_S8:3" link="lei_s202,lei_s204"/>
+    <station id="lei_s204" name="Raguhn" line="LEI_S2:4,LEI_S8:4" link="lei_s203,lei_s205"/>
+    <station id="lei_s205" name="Jeßnitz" line="LEI_S2:5,LEI_S8:5" link="lei_s204,lei_s206"/>
+    <station id="lei_s206" name="Wolfen" line="LEI_S2:6,LEI_S8:6" link="lei_s205,lei_s207"/>
+    <station id="lei_s207" name="Greppin" line="LEI_S2:7,LEI_S8:7" link="lei_s206,lei_s208"/>
+    <station id="lei_s208" name="Bitterfeld" line="LEI_S2:8,LEI_S8:8" link="lei_s207,lei_s209,lei_s231,lei_s809"/>
+    <station id="lei_s209" name="Petersroda" line="LEI_S2:9" link="lei_s208,lei_s210"/>
+    <station id="lei_s210" name="Delitzsch unt Bf" line="LEI_S2:10" link="lei_s209,lei_s211"/>
+    <station id="lei_s211" name="Zschortau" line="LEI_S2:11" link="lei_s210,lei_s212"/>
+    <station id="lei_s212" name="Rackwitz" line="LEI_S2:12" link="lei_s211,lei_s213"/>
+    <station id="lei_s213" name="Leipzig Messe" line="LEI_S2:13,LEI_S5:8,LEI_S5X:8" link="lei_s111,lei_s212,lei_s214,lei_s507"/>
+    <station id="lei_s214" name="Essener Straße" line="LEI_S2:14" link="lei_s213,lei_s215"/>
+    <station id="lei_s215" name="Leipzig Nord" line="LEI_S2:15,LEI_S4:14" link="lei_s111,lei_s214,lei_s413"/>
+    <station id="lei_s222" name="Zahna" line="LEI_S2:22" link="lei_s223"/>
+    <station id="lei_s223" name="Bülzig" line="LEI_S2:23" link="lei_s222,lei_s224"/>
+    <station id="lei_s224" name="Zörnigall" line="LEI_S2:24" link="lei_s223,lei_s225"/>
+    <station id="lei_s225" name="Lutherstadt Wittenberg Hbf" line="LEI_S2:25,LEI_S8:14" link="lei_s224,lei_s226"/>
+    <station id="lei_s226" name="Pratau" line="LEI_S2:26,LEI_S8:15" link="lei_s225,lei_s227"/>
+    <station id="lei_s227" name="Bergwitz" line="LEI_S2:27,LEI_S8:16" link="lei_s226,lei_s228"/>
+    <station id="lei_s228" name="Radis" line="LEI_S2:28,LEI_S8:17" link="lei_s227,lei_s229"/>
+    <station id="lei_s229" name="Gräfenhainichen" line="LEI_S2:29,LEI_S8:18" link="lei_s228,lei_s230"/>
+    <station id="lei_s230" name="Burgkemnitz" line="LEI_S2:30,LEI_S8:19" link="lei_s229,lei_s231"/>
+    <station id="lei_s231" name="Muldenstein" line="LEI_S2:31,LEI_S8:20" link="lei_s208,lei_s230"/>
+    <!-- S3 -->
+    <station id="lei_s301" name="Nietleben" line="LEI_S3:1" link="lei_s302"/>
+    <station id="lei_s303" name="Zscherbener Straße" line="LEI_S3:3" link="lei_s302,lei_s304"/>
+    <station id="lei_s308" name="Halle Messe" line="LEI_S3:8" link="lei_s307,lei_s309"/>
+    <station id="lei_s309" name="Dieskau" line="LEI_S3:9" link="lei_s308,lei_s310"/>
+    <station id="lei_s310" name="Gröbers" line="LEI_S3:10" link="lei_s309,lei_s311"/>
+    <station id="lei_s311" name="Großkugel" line="LEI_S3:11" link="lei_s310,lei_s312"/>
+    <station id="lei_s312" name="Schkeuditz West" line="LEI_S3:12" link="lei_s311,lei_s313"/>
+    <station id="lei_s313" name="Schkeuditz" line="LEI_S3:13,LEI_S30:1" link="lei_s312,lei_s314"/>
+    <station id="lei_s316" name="Slevogtstraße" line="LEI_S3:16,LEI_S30:4" link="lei_s315,lei_s317"/>
+    <station id="lei_s317" name="Olbrichtstraße" line="LEI_S3:17,LEI_S30:5" link="lei_s110,lei_s316"/>
+    <station id="lei_s325" name="Markkleeberg" line="LEI_S3:25,LEI_S5:15,LEI_S5X:15" link="lei_s221,lei_s326,lei_s329"/>
+    <station id="lei_s326" name="Markkleeberg-Großstädteln" line="LEI_S3:26" link="lei_s325,lei_s327"/>
+    <station id="lei_s327" name="Markkleeberg-Gaschwitz" line="LEI_S3:27" link="lei_s326,lei_s328"/>
+    <station id="lei_s328" name="Großdeuben" line="LEI_S3:28" link="lei_s327,lei_s329"/>
+    <station id="lei_s329" name="Böhlen" line="LEI_S3:29,LEI_S5:16,LEI_S5X:16" link="lei_s325,lei_s328,lei_s330,lei_s522"/>
+    <station id="lei_s330" name="Böhlen Werke" line="LEI_S3:30,LEI_S5:17" link="lei_s329,lei_s331"/>
+    <station id="lei_s331" name="Neukieritzsch" line="LEI_S3:31,LEI_S5:18" link="lei_s330,lei_s332,lei_s519"/>
+    <station id="lei_s332" name="Lobstädt" line="LEI_S3:32" link="lei_s331,lei_s333"/>
+    <station id="lei_s333" name="Borna" line="LEI_S3:33" link="lei_s332,lei_s334"/>
+    <station id="lei_s334" name="Petergrube" line="LEI_S3:34" link="lei_s333,lei_s335"/>
+    <station id="lei_s335" name="Neukirchen-Wyhra" line="LEI_S3:35" link="lei_s334,lei_s336"/>
+    <station id="lei_s336" name="Frohburg" line="LEI_S3:36" link="lei_s335,lei_s337"/>
+    <station id="lei_s337" name="Geithain" line="LEI_S3:37" link="lei_s336"/>
+    <!-- S30 -->
+    <!-- S4 -->
+    <station id="lei_s401" name="Falkenberg" line="LEI_S4:1" link="lei_s402"/>
+    <station id="lei_s402" name="Rehfeld" line="LEI_S4:2" link="lei_s401,lei_s403"/>
+    <station id="lei_s403" name="Beilrode" line="LEI_S4:3" link="lei_s402,lei_s404"/>
+    <station id="lei_s404" name="Torgau" line="LEI_S4:4" link="lei_s403,lei_s405"/>
+    <station id="lei_s405" name="Mockrehna" line="LEI_S4:5" link="lei_s404,lei_s406"/>
+    <station id="lei_s406" name="Doberschütz" line="LEI_S4:6" link="lei_s405,lei_s407"/>
+    <station id="lei_s407" name="Eilenburg Ost" line="LEI_S4:7" link="lei_s406,lei_s408"/>
+    <station id="lei_s408" name="Eilenburg" line="LEI_S4:8,LEI_S9:11" link="lei_s407,lei_s409,lei_s910"/>
+    <station id="lei_s409" name="Jesewitz" line="LEI_S4:9" link="lei_s408,lei_s410"/>
+    <station id="lei_s410" name="Pönitz" line="LEI_S4:10" link="lei_s409,lei_s411"/>
+    <station id="lei_s411" name="Taucha" line="LEI_S4:11" link="lei_s410,lei_s412"/>
+    <station id="lei_s412" name="Heiterblick" line="LEI_S4:12" link="lei_s411,lei_s413" other_link="portheit:lei_l305"/>
+    <station id="lei_s413" name="Mockauer Straße" line="LEI_S4:13" link="lei_s215,lei_s412"/>
+    <station id="lei_s422" name="Anger-Crottendorf" line="LEI_S4:22" link="lei_s117,lei_s423"/>
+    <station id="lei_s423" name="Engelsdorf" line="LEI_S4:23" link="lei_s422,lei_s424"/>
+    <station id="lei_s424" name="Borsdorf" line="LEI_S4:24" link="lei_s423,lei_s425"/>
+    <station id="lei_s425" name="Gerichshain" line="LEI_S4:25" link="lei_s424,lei_s426"/>
+    <station id="lei_s426" name="Machern" line="LEI_S4:26" link="lei_s425,lei_s427"/>
+    <station id="lei_s427" name="Altenbach" line="LEI_S4:27" link="lei_s426,lei_s428"/>
+    <station id="lei_s428" name="Bennewitz" line="LEI_S4:28" link="lei_s427,lei_s429"/>
+    <station id="lei_s429" name="Wurzen" line="LEI_S4:29" link="lei_s428,lei_s430"/>
+    <station id="lei_s430" name="Kühren" line="LEI_S4:30" link="lei_s429,lei_s431"/>
+    <station id="lei_s431" name="Dahlen" line="LEI_S4:31" link="lei_s430,lei_s432"/>
+    <station id="lei_s432" name="Oschatz" line="LEI_S4:32" link="lei_s431"/>
+    <!-- S5 -->
+    <station id="lei_s502" name="Wohnstadt Nord" line="LEI_S5:2,LEI_S5X:2" link="lei_s501,lei_s503"/>
+    <station id="lei_s507" name="Leipzig/Halle Flughafen" line="LEI_S5:7,LEI_S5X:7" link="lei_s213,lei_s307"/>
+    <station id="lei_s519" name="Deutzen" line="LEI_S5:19" link="lei_s331,lei_s520"/>
+    <station id="lei_s520" name="Regis-Breitingen" line="LEI_S5:20" link="lei_s519,lei_s521"/>
+    <station id="lei_s521" name="Treben-Lehma" line="LEI_S5:21" link="lei_s520,lei_s522"/>
+    <station id="lei_s522" name="Altenburg" line="LEI_S5:22,LEI_S5X:17" link="lei_s329,lei_s521,lei_s523,lei_s524"/>
+    <station id="lei_s523" name="Lehndorf" line="LEI_S5:23" link="lei_s522,lei_s524"/>
+    <station id="lei_s524" name="Gößnitz" line="LEI_S5:24,LEI_S5X:18" link="lei_s522,lei_s523,lei_s525,lei_s526"/>
+    <station id="lei_s525" name="Ponitz" line="LEI_S5:25" link="lei_s524,lei_s526"/>
+    <station id="lei_s526" name="Crimmitschau" line="LEI_S5:26,LEI_S5X:19" link="lei_s524,lei_s525,lei_s527,lei_s529"/>
+    <station id="lei_s527" name="Schweinsburg-Culten" line="LEI_S5:27" link="lei_s526,lei_s528"/>
+    <station id="lei_s528" name="Werdau Nord" line="LEI_S5:28" link="lei_s527,lei_s529"/>
+    <station id="lei_s529" name="Werdau" line="LEI_S5:29,LEI_S5X:20" link="lei_s526,lei_s528,lei_s530,lei_s532"/>
+    <station id="lei_s530" name="Steinpleis" line="LEI_S5:30" link="lei_s529,lei_s531"/>
+    <station id="lei_s531" name="Lichtentanne" line="LEI_S5:31" link="lei_s530,lei_s532"/>
+    <station id="lei_s532" name="Zwickau Hbf" line="LEI_S5:32,LEI_S5X:21" link="lei_s529,lei_s531"/>
+    <!-- S5X -->
+    <!-- S6 -->
+    <station id="lei_s605" name="Rückmarsdorf" line="LEI_S6:5" link="lei_s107,lei_s606"/>
+    <station id="lei_s607" name="Markranstädt" line="LEI_S6:7" link="lei_s606,lei_s608"/>
+    <station id="lei_s608" name="Großlehna" line="LEI_S6:8" link="lei_s607,lei_s609"/>
+    <station id="lei_s609" name="Kötzschau" line="LEI_S6:9" link="lei_s608,lei_s610"/>
+    <station id="lei_s610" name="Bad Dürrenberg" line="LEI_S6:10" link="lei_s609,lei_s611"/>
+    <station id="lei_s611" name="Großkorbetha" line="LEI_S6:11" link="lei_s610,lei_s612"/>
+    <station id="lei_s612" name="Weißenfels" line="LEI_S6:12" link="lei_s611,lei_s613"/>
+    <station id="lei_s613" name="Leißling" line="LEI_S6:13" link="lei_s612,lei_s614"/>
+    <station id="lei_s614" name="Naumburg (Saale) Hbf" line="LEI_S6:14" link="lei_s613"/>
+    <!-- S7 -->
+    <station id="lei_s705" name="Angersdorf" line="LEI_S7:5" link="lei_s304,lei_s706"/>
+    <station id="lei_s706" name="Zscherben" line="LEI_S7:6" link="lei_s705,lei_s707"/>
+    <station id="lei_s707" name="Teutschenthal Ost" line="LEI_S7:7" link="lei_s706,lei_s708"/>
+    <station id="lei_s708" name="Teutschenthal" line="LEI_S7:8" link="lei_s707,lei_s709"/>
+    <station id="lei_s709" name="Wansleben am See" line="LEI_S7:9" link="lei_s708,lei_s710"/>
+    <station id="lei_s710" name="Amsdorf" line="LEI_S7:10" link="lei_s709,lei_s711"/>
+    <station id="lei_s711" name="Röblingen am See" line="LEI_S7:11" link="lei_s710,lei_s712"/>
+    <station id="lei_s712" name="Erdeborn" line="LEI_S7:12" link="lei_s711,lei_s713"/>
+    <station id="lei_s713" name="Lutherstadt Eisleben" line="LEI_S7:13" link="lei_s712"/>
+    <!-- S8 -->
+    <station id="lei_s809" name="Roitzsch" line="LEI_S8:9" link="lei_s208,lei_s810"/>
+    <station id="lei_s810" name="Brehna" line="LEI_S8:10" link="lei_s809,lei_s811"/>
+    <station id="lei_s811" name="Landsberg" line="LEI_S8:11" link="lei_s810,lei_s812"/>
+    <station id="lei_s812" name="Hohenthurm" line="LEI_S8:12" link="lei_s307,lei_s811"/>
+    <!-- S9 -->
+    <station id="lei_s902" name="Peißen" line="LEI_S9:2" link="lei_s307,lei_s903"/>
+    <station id="lei_s903" name="Reußen" line="LEI_S9:3" link="lei_s902,lei_s904"/>
+    <station id="lei_s904" name="Landsberg Süd" line="LEI_S9:4" link="lei_s903,lei_s905"/>
+    <station id="lei_s905" name="Klitschmar" line="LEI_S9:5" link="lei_s904,lei_s906"/>
+    <station id="lei_s906" name="Kyhna" line="LEI_S9:6" link="lei_s905,lei_s907"/>
+    <station id="lei_s907" name="Delitzsch ob Bf" line="LEI_S9:7" link="lei_s906,lei_s908"/>
+    <station id="lei_s908" name="Hohenroda" line="LEI_S9:8" link="lei_s907,lei_s909"/>
+    <station id="lei_s909" name="Krensitz" line="LEI_S9:9" link="lei_s908,lei_s910"/>
+    <station id="lei_s910" name="Kämmereiforst" line="LEI_S9:10" link="lei_s408,lei_s909"/>
   </stations>
 </tube>

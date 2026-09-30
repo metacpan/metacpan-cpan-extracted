@@ -1,5 +1,8 @@
 Revision history for Perl module Apache2::API
 
+v0.5.6 2026-09-30T14:45:11+0900
+    - Corrected the method remote_ip() in Apache2::API::Request
+
 v0.5.5 2026-08-05T23:04:36+0900
     - Added support for retry_after property of a JSON response, which will set the HTTP header Retry-After.
 

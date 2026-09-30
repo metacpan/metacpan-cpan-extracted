@@ -113,7 +113,7 @@ use Data::Sync::Shared;
         _exit($got);
     }
     waitpid($pid, 0);
-    is $? >> 8, 0, 'child rdlock_timed fails when writer holds';
+    is $?, 0, 'child rdlock_timed fails when writer holds';
     $rw->wrunlock;
 
     # wrlock with timeout in method call
@@ -125,7 +125,7 @@ use Data::Sync::Shared;
         _exit($got);
     }
     waitpid($pid, 0);
-    is $? >> 8, 0, 'child wrlock_timed fails when reader holds';
+    is $?, 0, 'child wrlock_timed fails when reader holds';
     $rw->rdunlock;
 }
 
@@ -257,7 +257,7 @@ use Data::Sync::Shared;
         _exit($@ =~ /timeout/ ? 0 : 1);
     }
     waitpid($pid, 0);
-    is $? >> 8, 0, 'wrlock_guard with timeout croaks on failure';
+    is $?, 0, 'wrlock_guard with timeout croaks on failure';
     $rw->rdunlock;
 }
 
@@ -272,7 +272,7 @@ use Data::Sync::Shared;
         _exit($@ =~ /timeout/ ? 0 : 1);
     }
     waitpid($pid, 0);
-    is $? >> 8, 0, 'rdlock_guard with timeout croaks on failure';
+    is $?, 0, 'rdlock_guard with timeout croaks on failure';
     $rw->wrunlock;
 }
 

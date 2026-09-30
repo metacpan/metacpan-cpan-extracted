@@ -172,6 +172,8 @@ ISID
 jeroen
 junos
 Kentrox
+MICROSENS
+Microsens
 Kosmach
 kramarov
 Kraus
@@ -258,6 +260,12 @@ propvirtual
 proxim
 PSE
 pvid
+qnap
+QNAP
+qts
+QTS
+quts
+QuTS
 PVST
 qbridge
 qos
@@ -324,6 +332,7 @@ tftpserver
 TiMOS
 tmnxModel
 todo
+Tuecks
 tuttle
 Ubiquiti
 ucsc

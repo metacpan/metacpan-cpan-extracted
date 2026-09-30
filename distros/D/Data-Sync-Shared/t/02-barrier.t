@@ -38,7 +38,7 @@ is $bar->arrived, 0, 'arrived starts at 0';
 
     for my $pid (@pids) {
         waitpid($pid, 0);
-        is $? >> 8, 0, "child $pid passed barrier";
+        is $?, 0, "child $pid passed barrier";
     }
 
     is $b->generation, 1, 'generation incremented to 1';
@@ -57,7 +57,7 @@ is $bar->arrived, 0, 'arrived starts at 0';
         }
         $b->wait(5.0);
         waitpid($pid, 0);
-        is $? >> 8, 0, "round $round passed";
+        is $?, 0, "round $round passed";
         is $b->generation, $round, "generation is $round";
     }
 }
@@ -92,7 +92,7 @@ is $bar->arrived, 0, 'arrived starts at 0';
     }
     my $r = $b->wait(5.0);
     waitpid($pid, 0);
-    is $? >> 8, 0, 'barrier usable after reset';
+    is $?, 0, 'barrier usable after reset';
 }
 
 # wait(0) is non-blocking

@@ -241,14 +241,17 @@ for my $ext (qw(gz bz2)) {
 # every write with ENOSPC; it is reached through a link named .gz.
 SKIP: {
 	skip 'no /dev/full here', 4 unless -c '/dev/full' && -w _;
+	require Errno;
 	for my $ext (qw(gz bz2)) {
 		my $f = path("full.$ext");
 		skip 'symlink() is not available', 4
 			unless eval { symlink('/dev/full', $f) };
+		# The reason is the system's, formatted by $! as the XS formats it.
+		my $enospc = do { local $! = Errno::ENOSPC(); "$!" };
 		eval { write_table([ { a => 1 } ], $f, quiet => 1) };
-		is $@, "write_table: could not write '$f'\n", ".$ext: a full disk croaks";
+		is $@, "write_table: could not finish writing '$f': $enospc\n", ".$ext: a full disk croaks, and says why";
 		eval { write_table([ map { { a => $_ } } 1 .. 50000 ], $f, quiet => 1) };
-		is $@, "write_table: could not write '$f'\n",
+		is $@, "write_table: could not finish writing '$f': $enospc\n",
 			".$ext: and so it does when a WRITE fails partway";
 	}
 }

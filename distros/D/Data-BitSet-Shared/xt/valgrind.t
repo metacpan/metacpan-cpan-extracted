@@ -19,7 +19,7 @@ plan tests => scalar @tests;
 
 for my $t (sort @tests) {
     my $name = $t; $name =~ s{.*/}{};
-    my $out = `valgrind --leak-check=full --error-exitcode=42 --errors-for-leak-kinds=definite $PERL -Mblib $t 2>&1`;
+    my $out = `PERL_DESTRUCT_LEVEL=2 valgrind --leak-check=full --error-exitcode=42 --errors-for-leak-kinds=definite $PERL -Mblib $t 2>&1`;
     my $exit = $? >> 8;
     my $ok = ($exit != 42);
     ok $ok, "valgrind: $name" or do {

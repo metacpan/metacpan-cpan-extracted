@@ -1,0 +1,116 @@
+NAME
+
+    Test::JSON::Diff - Check two large JSON strings for structural equality
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+     use Test2::V0;
+     use Test::JSON::Diff qw( json_eq_or_diff );
+    
+     json_eq_or_diff '{"a":1,"b":[1,2]}', '{ "b" : [1,2], "a" : 1 }';
+     json_eq_or_diff $actual_json, $expected_json, 'response body';
+     json_eq_or_diff $actual_json, $expected_json, { max_lines => 100 };
+     json_eq_or_diff $actual_json, $expected_json, 'response body', { context => 5 };
+    
+     done_testing;
+
+DESCRIPTION
+
+    This module provides a Test2 compatible test for comparing two JSON
+    documents for structural equality. It is intended for large documents,
+    so the JSON is never decoded into Perl. Instead each document is
+    canonicalized with jq and, only if they differ, the canonical forms are
+    compared with diff. The failure diagnostic is a unified diff of the
+    pretty-printed JSON.
+
+    Two documents are considered the same if they differ only in:
+
+    object key order
+
+      {"a":"b","c":"d"} is the same as {"c":"d","a":"b"}.
+
+    whitespace outside of strings
+
+      {"a":"b"} is the same as { "a" : "b" }.
+
+    Any other difference is a failure, including:
+
+    array order
+
+      [1,2] is not the same as [2,1].
+
+    types
+
+      [1] is not the same as ["1"], and [true] is not the same as [1].
+
+    number literals
+
+      [1] is not the same as [1.0]. Number literals are compared as
+      written, which also means that large integers are compared exactly.
+
+FUNCTIONS
+
+ json_eq_or_diff
+
+     json_eq_or_diff $actual_json, $expected_json;
+     json_eq_or_diff $actual_json, $expected_json, $test_name;
+     json_eq_or_diff $actual_json, $expected_json, \%options;
+     json_eq_or_diff $actual_json, $expected_json, $test_name, \%options;
+
+    Passes if $actual_json and $expected_json are structurally the same
+    JSON. Both must be strings of raw, undecoded, UTF-8 encoded JSON
+    containing exactly one JSON value. If either is not valid JSON, the
+    test fails and the diagnostic contains the error reported by jq.
+
+    If the documents differ, the diagnostic is a unified diff of the
+    pretty-printed, key sorted JSON, with the expected document as the
+    original (-) and the actual document as the new (+).
+
+    $test_name defaults to json is the same.
+
+    Options:
+
+    context
+
+      The number of lines of context around each change in the diff.
+      Defaults to 3.
+
+    max_lines
+
+      The maximum number of lines of diff output to include in the
+      diagnostic. If the diff is longer, the remaining lines are replaced
+      with .... Defaults to 50.
+
+    This function will die if an unrecognized option is passed, or if
+    either jq or diff cannot be found in the PATH.
+
+CAVEATS
+
+    Strings containing wide characters are not currently supported; the
+    JSON must be passed as UTF-8 encoded bytes.
+
+    This module requires jq 1.7 or later, since older versions do not
+    preserve number literals. This is checked when the distribution is
+    installed, but not at runtime.
+
+SEE ALSO
+
+    Test::Differences
+
+    https://jqlang.org
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2026 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

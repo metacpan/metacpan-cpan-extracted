@@ -16,6 +16,7 @@
 #ifndef HLL_H
 #define HLL_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +49,7 @@
 
 #define HLL_MAGIC        0x474C4C48U  /* "HLLG" (little-endian) */
 #define HLL_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
-#define HLL_ERR_BUFLEN   256
+#define HLL_ERR_BUFLEN   (PATH_MAX + 256)
 #define HLL_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 
 /* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
@@ -610,13 +611,18 @@ static int hll_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int hll_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int hll_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
 }
 
@@ -654,7 +660,11 @@ static HllHandle *hll_create(const char *path, uint32_t precision, mode_t mode, 
         }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { HLL_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            HLL_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!hll_validate_header((HllHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -664,7 +674,7 @@ static HllHandle *hll_create(const char *path, uint32_t precision, mode_t mode, 
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((HllHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && hll_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && hll_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         HLL_ERR("%s: fchmod: %s", path, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
@@ -715,6 +725,11 @@ static HllHandle *hll_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { HLL_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(HllHeader)) { HLL_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(HllHeader, magic)) != (ssize_t)sizeof magic || magic != HLL_MAGIC) {
+        HLL_ERR("invalid HyperLogLog table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { HLL_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -769,6 +784,11 @@ static HllHandle *hll_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { HLL_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(HllHeader)) { HLL_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(HllHeader, magic)) != (ssize_t)sizeof magic || magic != HLL_MAGIC) {
+        HLL_ERR("%s: invalid HyperLogLog file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */

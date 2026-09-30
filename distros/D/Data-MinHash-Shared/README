@@ -93,6 +93,12 @@ METHODS
     0600 (owner-only). "new_readonly" opens a frozen file read-only for
     lock-free querying (see "FROZEN (READ-ONLY) MODE").
 
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of dying with "SIGBUS" while the
+    segment is initialized; set "DATA_MINHASH_SHARED_SPARSE=1" to skip the
+    reservation. On tmpfs and memfd the segment is memory, and a memory cgroup
+    too small for it gets an OOM kill rather than a croak.
+
   Building and comparing
         my $changed = $mh->add($element);       # 1 if a register was lowered, else 0
         my $n       = $mh->add_many(\@elements); # how many adds lowered a register

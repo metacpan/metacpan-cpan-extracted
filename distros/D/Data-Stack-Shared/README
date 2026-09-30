@@ -68,6 +68,12 @@ DESCRIPTION
     "Data::Stack::Shared::Int" - int64_t values
     "Data::Stack::Shared::Str" - fixed-length strings
 
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of the initialization dying with
+    SIGBUS; set "DATA_STACK_SHARED_SPARSE=1" to skip the reservation. On tmpfs
+    and memfd the segment is memory, and a memory cgroup too small for it gets
+    an OOM kill rather than a croak.
+
 METHODS
   Push / Pop
         my $ok  = $stk->push($val);               # non-blocking

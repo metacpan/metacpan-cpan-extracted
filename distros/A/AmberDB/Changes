@@ -1,5 +1,34 @@
 Revision history for AmberDB
 
+5.26.3  2026-09-29
+        - [AUTOCOMPLETE & INSTANT SEARCH / AJAX QUERY SUGGESTION ENGINE (.ajw, .ajn)]
+          * Implemented high-performance dual-index query suggestion and autocomplete engine designed for Ajax instant-search bars and typeahead UI widgets.
+          * Introduced '.ajw' (Word Prefix Index): maps 2 to 12-character token prefixes to top candidate words with occurrence frequency scores (top 10 matches per prefix), supporting both native Unicode (Turkish/international alphabet) and ASCII-folded variants (e.g. searching 'sek' or 'şek' matches 'şeker').
+          * Introduced '.ajn' (Next Word Transition Index): stores n-gram word transition frequency tables (up to 300 transitions per token), powering chained multi-word query completions (e.g. 'orhan ' -> 'pamuk', 'kemal', 'hançerlioğlu'; 'orhan p' -> 'orhan pamuk'; 'orhan pamuk m' -> 'orhan pamuk masumiyet').
+          * Added 'AmberDB::suggest_table($tableid, $query, [%opts])' method (default limit 10) to execute single-word prefix lookups (.ajw) or active next-word transitions (.ajn) seamlessly based on query structure.
+          * Added automatic real-time suggestion index updates in CRUD operations ('insert_id', 'insert_list', 'update_id') via 'AmberDB::Base::Index::suggest_add'.
+          * Built-in multi-value and relational foreign key (RDBM) awareness: automatically traverses comma/semicolon-separated values (e.g. multi-author fields) and resolves foreign IDs ('rdbm_target') into display titles when building suggestions.
+
+        - [SCHEMA CONFIGURATION: SUGGEST_BLOCK & SUGGEST_JOIN]
+          * Extended 'AmberDB::Base::Schema' to declare autocomplete sources with 'suggest_block => [...]' (field block IDs to index for suggestions).
+          * Added 'suggest_join => [ [blk1, blk2], ... ]' schema directive to enable automatic cross-block compound sentence generation (e.g. combining Author and Title blocks into "Author Title" autocomplete phrases).
+          * Updated 'table_infset' to serialize 'suggest_block' and 'suggest_join' into 'core.conf' table definitions.
+          * Updated 'normalize_blocks' to sanitize suggest configurations for simple/use_simple tables.
+
+        - [TOOLS & REINDEXING INFRASTRUCTURE]
+          * Added 'set_suggest($tableid, @records)' and 'reindex_suggest($tableid)' to 'AmberDB::Tools::Index' for complete standalone suggestion index rebuilding.
+          * Added convenient method alias '*reindex = \&set_index' in 'AmberDB::Tools::Index'.
+          * Updated 'set_index' and 'AmberDB::Tools::Update::update_table' to include '.ajw' and '.ajn' in index cleanups and rebuilds.
+
+        - [LOCALE & WORD NORMALIZATION EXTENSIONS]
+          * Extended 'AmberDB::Locale::normalize_word($word [, $mode_write, $no_ascii])' with a '$no_ascii' flag to preserve locale native characters ('alphabet_chars', e.g. 'ç, ğ, ı, ö, ş, ü') while stripping non-word punctuation without phonetic flattening.
+          * Added composite caching key ('$word:$is_write:$no_ascii') in 'normalize_word' to eliminate cross-mode cache pollution and maximize lookup speed.
+          * Compiled regex pattern '_letter_chars' ('a-zA-Z${safe_extra}') for consistent token extraction across locale-aware indexing operations.
+
+        - [TEST SUITE & MANIFEST]
+          * Created comprehensive test suite 't/amberdb_suggest.t' covering automatic index generation, single-word prefix lookups, next-word transitions, multi-value fields, reindexing, and RAM-disk Tier 1 operations.
+          * Registered 't/amberdb_suggest.t' in 'MANIFEST'.
+
 5.26.2  2026-09-28
         - [STANDALONE EXECUTABLE BUILDER & CI RELEASE AUTOMATION]
           * Resolved Strawberry Perl PAR::Packer ('pp') compilation failure on Windows by decoupling attached module search switch into separated '-I lib' arguments.

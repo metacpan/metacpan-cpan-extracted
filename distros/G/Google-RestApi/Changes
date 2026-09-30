@@ -1,5 +1,19 @@
 Revision history for Perl extension Google::RestApi.
 
+2.2.5 2026-09-29
+        - Gate the author-only tests (t/perlcritic.t, t/pod.t,
+          t/pod-coverage.t, t/99_changes.t) behind AUTHOR_TESTING. They
+          shipped in the dist and ran on every smoke tester, where their
+          verdict depended on which modules happened to be installed
+          rather than on this code: 2.2.4 drew 16 FAIL reports from a
+          smoker that had picked up a newly released third-party
+          Perl::Critic policy. Test::Perl::Critic and
+          Perl::Critic::TooMuchCode are no longer test prerequisites.
+        - Don't index the tutorial/ helper modules on CPAN.
+          tutorial/lib/Tutorial/{Setup,Utils}.pm ship as documentation,
+          but with no no_index entry they were indexed as a claim on the
+          generic top-level Tutorial:: namespace.
+
 2.2.4 2026-09-21
         - Migrate the OAuth token creator from Google's blocked
           out-of-band (urn:ietf:wg:oauth:2.0:oob) redirect to the loopback

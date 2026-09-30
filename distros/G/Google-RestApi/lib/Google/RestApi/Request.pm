@@ -1,6 +1,6 @@
 package Google::RestApi::Request;
 
-our $VERSION = '2.2.4';
+our $VERSION = '2.2.5';
 
 use Google::RestApi::Setup;
 

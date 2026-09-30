@@ -1,0 +1,10 @@
+Revision history for Test-JSON-Diff
+
+0.02      2026-09-29 15:41:00 -0600
+  - fix _diff to no longer be affected by a caller's ambient $/ (input
+    record separator); a caller that left $/ set to undef (or any other
+    non-default value) could previously cause a false failure report for
+    two JSON documents that are actually the same
+
+0.01      2026-09-29 13:05:04 -0600
+  - initial version

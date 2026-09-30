@@ -17,6 +17,7 @@
 #ifndef RING_H
 #define RING_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -32,10 +33,11 @@
 #include <sys/eventfd.h>
 #include <time.h>
 #include <limits.h>
+#include <signal.h>
 
 #define RING_MAGIC       0x524E4732U  /* "RNG2" -- v2 layout: per-slot publication seq */
 #define RING_VERSION     2
-#define RING_ERR_BUFLEN  256
+#define RING_ERR_BUFLEN  (PATH_MAX + 256)
 
 #define RING_VAR_INT  0
 #define RING_VAR_F64  1
@@ -424,14 +426,36 @@ static int ring_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int ring_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int ring_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int ring_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_RINGBUFFER_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static RingHandle *ring_create(const char *path, uint64_t capacity,
@@ -472,9 +496,18 @@ static RingHandle *ring_create(const char *path, uint64_t capacity,
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             RING_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && ring_reserve(fd, total) < 0) {
+            RING_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { RING_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            RING_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!ring_validate_header((RingHeader *)base, (uint64_t)st.st_size, variant_id)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -484,9 +517,13 @@ static RingHandle *ring_create(const char *path, uint64_t capacity,
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((RingHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && ring_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && ring_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         RING_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (ring_reserve(fd, total) < 0) {
+                        RING_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     ring_init_header(base, total, elem_size, variant_id, capacity);
@@ -522,6 +559,10 @@ static RingHandle *ring_create_memfd(const char *name, uint64_t capacity,
     int fd = memfd_create(name ? name : "ring", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { RING_ERR("memfd_create: %s", strerror(errno)); return NULL; }
     if (ftruncate(fd, (off_t)total) < 0) { RING_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL; }
+    if (ring_reserve(fd, total) < 0) {
+        RING_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { RING_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -534,6 +575,11 @@ static RingHandle *ring_open_fd(int fd, uint32_t variant_id, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { RING_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(RingHeader)) { RING_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(RingHeader, magic)) != (ssize_t)sizeof magic || magic != RING_MAGIC) {
+        RING_ERR("invalid ring"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { RING_ERR("mmap: %s", strerror(errno)); return NULL; }

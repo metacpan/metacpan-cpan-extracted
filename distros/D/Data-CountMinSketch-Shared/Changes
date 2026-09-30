@@ -1,30 +1,27 @@
 Revision history for Data-CountMinSketch-Shared
 
+0.06      2026-09-26
+          - DATA_COUNTMINSKETCH_SHARED_SPARSE=0 reserves segments up front, so
+            a full filesystem fails the constructor, not a later write.
+          - A failed create no longer leaves a full-size file behind.
+          - Checking a half-created file no longer allocates it on tmpfs.
+          - Long paths no longer cut the reason from error messages.
+
 0.05      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
 
 0.04      2026-08-11
-          - Frozen read-only mode: freeze() seals a file-backed structure;
-            new_readonly() maps it O_RDONLY and queries it lock-free.
-          - Clamp the derived depth for a subnormal delta; it could collapse to
-            a single hash row.
-          - stats(): report delta as exp(-min(depth, width)).
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
+          - freeze()/new_readonly(): sealed read-only mode, lock-free.
+          - A subnormal delta no longer collapses depth to one row; stats()
+            reports delta as exp(-min(depth, width)).
+          - A file left by an interrupted create is recovered, not refused.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.03      2026-07-22
-          - On-disk format change (v1 -> v2): an existing 0.02 file is
-            refused; recreate it.
-          - Fix a use-after-free in merge(): sv_isobject on the peer argument
-            runs get-magic, so a tied argument can destroy this object before
-            its handle is used again. Such a call now croaks.
-          - Resolve argument magic before capturing the path string.
+          - On-disk format change (v1 -> v2): recreate 0.02 files.
+          - Fix a use-after-free in merge() when a tied peer destroys the
+            object; it now croaks.
           - Document that counters wrap at 2^64.
 
 0.02      2026-07-03

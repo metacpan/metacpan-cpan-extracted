@@ -22,6 +22,7 @@ t/05_edge.t
 t/06_cross_bless.t
 t/07_atomic_rebuild.t
 t/08_builder_errors.t
+t/09_threads.t
 xt/asan.t
 xt/concurrent_readers.t
 xt/destroy_during_call.t

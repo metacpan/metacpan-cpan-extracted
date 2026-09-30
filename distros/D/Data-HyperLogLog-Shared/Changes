@@ -1,24 +1,25 @@
 Revision history for Data-HyperLogLog-Shared
 
+0.06      2026-09-26
+          - A create that fails at mmap no longer leaves a full-size file
+            behind.
+          - Checking a file left by an interrupted create no longer allocates
+            its pages on tmpfs.
+          - Error messages no longer lose their reason to a long path.
+
 0.05      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
 
 0.04      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Frozen read-only mode: freeze() seals a file-backed structure;
-            new_readonly() maps it O_RDONLY and queries it lock-free.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
+          - A file left by an interrupted create is recovered, not refused.
+          - freeze()/new_readonly(): sealed read-only mode, lock-free.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.03      2026-07-22
-          - On-disk format change (v1 -> v2): an existing 0.02 file is
-            refused; recreate it.
-          - Fix a use-after-free in merge(): sv_isobject on the peer argument
-            runs get-magic, so a tied argument can destroy this object before
-            its handle is used again. Such a call now croaks.
+          - On-disk format change (v1 -> v2): recreate 0.02 files.
+          - Fix a use-after-free in merge() when a tied peer destroys the
+            object; it now croaks.
           - Resolve argument magic before capturing the path string.
 
 0.02      2026-07-03

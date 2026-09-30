@@ -3,6 +3,7 @@ use warnings;
 
 use lib 't/lib';
 
+use Mojo::URL ();
 use Mojo::Util ();
 use Scalar::Util ();
 use Test::More;
@@ -11,8 +12,8 @@ use InternetData;
 use InternetDataTest;
 use InternetDataTest::Origin;
 
-# The OAuth accessor against the shared corpus's oauth section. Nothing here
-# reads oauth.deferred: those operations are not in this release.
+# The OAuth accessor against the shared corpus's oauth section, the
+# authorization code flow's vectors under oauth.deferred included.
 my $corpus = InternetDataTest::corpus()->{oauth};
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
@@ -113,6 +114,9 @@ sub call {
     return $oauth->exchange_refresh_token($args->{clientId}, $args->{refreshToken}, %options)
         if $operation eq 'exchangeRefreshToken';
     return $oauth->revoke($args->{clientId}, $args->{token}, %options) if $operation eq 'revoke';
+    return $oauth->exchange_authorization_code(
+        $args->{clientId}, $args->{code}, $args->{codeVerifier}, $args->{redirectUri}, %options,
+    ) if $operation eq 'exchangeAuthorizationCode';
     die "the corpus names an operation this suite does not know: $operation";
 }
 
@@ -166,8 +170,14 @@ subtest 'no OAuth request carries the API key' => sub {
     $oauth->exchange_refresh_token('internetdata-cli', 'mo_rt_x');
     $oauth->revoke('internetdata-cli', 'mo_rt_x');
     $oauth->poll_device_token('internetdata-cli', $device);
+    $oauth->exchange_authorization_code('internetdata-cli', 'mo_ac_x', 'verifier', 'http://127.0.0.1:8765/cb');
 
-    is(scalar @requests, 6, 'every operation was sent');
+    my $url = Mojo::URL->new($oauth->authorization_url('internetdata-cli', 'http://127.0.0.1:8765/cb', 'c',
+        scope => 'apikeys.use', state => 's', resource => 'https://x.test/'));
+    ok(!exists $url->query->to_hash->{$_}, "the authorization URL carries no $_") for @{ $rule->{forbiddenQuery} };
+    is(index("$url", $rule->{apiKey}), -1, 'the authorization URL carries the key nowhere');
+
+    is(scalar @requests, 7, 'every operation was sent');
     for my $req (@requests) {
         my $label = "$req->{method} $req->{path}";
         ok(!exists $req->{headers}{$_}, "$label carried no $_") for @{ $rule->{forbiddenHeaders} };
@@ -188,7 +198,7 @@ subtest 'each operation requests its endpoint with exactly its form fields' => s
         "$corpus->{endpoints}{metadata}{method} $corpus->{endpoints}{metadata}{path}",
         'metadata, on a base URL with a trailing slash');
 
-    for my $case (@{ $corpus->{forms}{cases} }) {
+    for my $case (@{ $corpus->{forms}{cases} }, @{ $corpus->{deferred}{forms} }) {
         serve({ status => 200, body => \%EVERY_REQUIRED_MEMBER });
         call(client()->oauth, $case->{operation}, $case->{args}, timeout => 5);
 
@@ -285,7 +295,7 @@ subtest 'a failed answer is an OAuth refusal only when it is one' => sub {
 };
 
 subtest 'only what consumes nothing is retried, and never an OAuth refusal' => sub {
-    for my $case (@{ $corpus->{retries}{cases} }) {
+    for my $case (@{ $corpus->{retries}{cases} }, @{ $corpus->{deferred}{retries} }) {
         serve(@{ $case->{responses} });
         my $outcome = settle(sub { call(client()->oauth, $case->{operation}, $case->{args}) });
 
@@ -297,6 +307,47 @@ subtest 'only what consumes nothing is retried, and never an OAuth refusal' => s
         }
         is_outcome($outcome, { %{ $case->{expect} }, type => $case->{expect}{outcome} }, $case->{name});
     }
+};
+
+subtest 'a PKCE pair matches the RFC vector and is never reused' => sub {
+    my $vector = $corpus->{deferred}{pkce};
+    my $oauth = client()->oauth;
+    is($oauth->pkce_challenge($vector->{verifier}), $vector->{challenge}, 'the RFC 7636 challenge');
+
+    my ($first, $second) = ($oauth->create_pkce, $oauth->create_pkce);
+    for my $pkce ($first, $second) {
+        like($pkce->{verifier}, qr/$vector->{generatedVerifierPattern}/, 'a 43-character base64url verifier');
+        is($pkce->{challenge}, $oauth->pkce_challenge($pkce->{verifier}), 'its own challenge');
+        is($pkce->{method}, $vector->{method}, 'S256');
+        is_deeply([sort keys %$pkce], [qw(challenge method verifier)], 'the three members');
+    }
+    isnt($first->{verifier}, $second->{verifier}, 'a fresh verifier each time');
+};
+
+subtest 'the authorization URL is built exactly, with no request' => sub {
+    serve({ status => 200, body => \%EVERY_REQUIRED_MEMBER });
+    for my $case (@{ $corpus->{deferred}{authorizationUrl} }) {
+        my %given = map { exists $case->{$_} ? ($_ => $case->{$_}) : () } qw(scope state resource);
+        my $url = InternetData->new(base_url => $case->{baseUrl})->oauth->authorization_url(
+            $case->{clientId}, $case->{redirectUri}, $case->{codeChallenge}, %given);
+        is($url, $case->{expect}, $case->{name});
+    }
+    client()->oauth->authorization_url('internetdata-cli', 'http://127.0.0.1:8765/cb', 'c');
+    is(scalar @requests, 0, 'building the URL sent nothing');
+};
+
+subtest 'an empty option is left out, and an empty or unencodable value refused' => sub {
+    my $oauth = InternetData->new(base_url => 'https://internetdata.io')->oauth;
+    is($oauth->authorization_url('c', 'https://app.example/cb', 'x', scope => '', state => '', resource => ''),
+        $oauth->authorization_url('c', 'https://app.example/cb', 'x'), 'empty options are left out');
+    for my $args (['', 'r', 'x'], ['c', '', 'x'], ['c', 'r', ''], [undef, 'r', 'x']) {
+        eval { $oauth->authorization_url(@$args) };
+        like($@, qr/authorization_url: expected \w+ as a string/, 'an empty required value croaks');
+    }
+    eval { $oauth->authorization_url('c', 'r', 'x', state => "\x{D800}") };
+    like($@, qr/authorization_url: state has no UTF-8 form/, 'a lone surrogate croaks');
+    eval { $oauth->authorization_url('c', 'r', 'x', timeout => 5) };
+    like($@, qr/unknown option\(s\): timeout/, 'a URL takes no timeout');
 };
 
 # Waits are asserted exactly, through the seam that replaces the wait AND the

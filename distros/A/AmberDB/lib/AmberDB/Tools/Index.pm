@@ -6,7 +6,7 @@ use strict;
 use Carp qw(croak cluck);
 use File::Spec;
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 my $CREATED = '2018-10-08';
 
 sub new {
@@ -39,6 +39,7 @@ sub new {
 }
 
 # my $ok = $tools->set_index($tableid, @records);
+# my $ok = $tools->reindex($tableid, @records);
 # ------------------------------------------------
 sub set_index {
 
@@ -54,7 +55,7 @@ sub set_index {
     return unless ( -e "$table_path.$adb->{db_ext}" );
 
     # 1. Clean up previous index files on physical storage and RAM-disk before rebuilding
-    my @idx_exts = qw( inx src fld fac slg unq );
+    my @idx_exts = qw( inx src fld fac slg unq ajw ajn );
     for my $ext (@idx_exts) {
         my $p_file = "$table_path.$ext";
         if ( -e $p_file ) {
@@ -138,6 +139,12 @@ sub set_index {
         $adb->unique_add( $table_path, $table_info, \@records );
     }
 
+    # 10. Create suggest index (.ajw, .ajn)
+    if ( exists( $table_info->{suggest_block} ) ) {
+        $self->{say} .= "    - Rebuilding suggest index (.ajw, .ajn)...\n";
+        my $ok = $self->set_suggest( $tableid, @records );
+    }
+
     # 10. If RAM-disk is active, sync freshly built index files to RAM-disk
     if ( $adb->ramdisk_is_mounted() ) {
         my $rm_path = $adb->ramdisk_path($tableid);
@@ -159,7 +166,7 @@ sub set_index {
 
     return 1;
 }
-
+*reindex = \&set_index;
 
 # Rebuilds Read All index.
 # my $ok = $tools->set_readall($tableid);
@@ -1025,5 +1032,152 @@ sub check_search {
     return \%diff;
 }
 
+# $ok = $self->set_suggest( $tableid, @records );
+# Rebuilds .ajw and .ajn suggest index files from records
+# ------------------------------------------------
+sub set_suggest {
+    my ( $self, $tableid, @records ) = @_;
+
+    my $adb = $self->{_adb};
+    my $table_info = $adb->table_info($tableid);
+    return unless $table_info && exists $table_info->{suggest_block};
+
+    my $table_path = $adb->table_path($tableid);
+    my $ajw_path   = "${table_path}.ajw";
+    my $ajn_path   = "${table_path}.ajn";
+    my $tmp_ajw    = "$ajw_path.tmp";
+    my $tmp_ajn    = "$ajn_path.tmp";
+
+    unlink $tmp_ajw, $tmp_ajn;
+
+    # 1. Identify RDBM blocks and prepare pre-fetch
+    my %rdbm_blocks;
+    for my $blk ( @{ $table_info->{suggest_block} } ) {
+        my ( $real_blk, $src_table, $src_display ) =
+            ref($blk) eq 'ARRAY' ? ( $blk->[0], $blk->[1], $blk->[2] )
+                                 : ( $blk,       undef,     undef      );
+
+        if ( !$src_table ) {
+            ( $src_table, $src_display ) = $adb->rdbm_target( $table_info, $real_blk );
+        }
+        if ( $src_table ) {
+            $src_display //= 1;
+            $rdbm_blocks{$real_blk} = { table => $src_table, display => $src_display };
+        }
+    }
+
+    # 2. Collect unique foreign IDs across records
+    my ( %foreign_ids, %rdbm_recs );
+    if ( %rdbm_blocks ) {
+        for my $rec (@records) {
+            for my $real_blk ( keys %rdbm_blocks ) {
+                my $val = $rec->[$real_blk];
+                next unless defined $val && $val ne '';
+                my $target_table = $rdbm_blocks{$real_blk}->{table};
+                for my $id ( split /[,;]/, $val ) {
+                    $id =~ s/^\s+|\s+$//g;
+                    $foreign_ids{$target_table}->{$id} = 1 if $id =~ /^\d+$/;
+                }
+            }
+        }
+        for my $target_table ( keys %foreign_ids ) {
+            my @ids = keys %{ $foreign_ids{$target_table} };
+            next unless @ids;
+            my @target_records = $adb->read_list( $target_table, \@ids );
+            $rdbm_recs{$target_table} = { map { $_->[0] => $_ } @target_records };
+        }
+    }
+
+    # 3. Extract sentences across all records
+    my @all_sentences;
+    for my $rec (@records) {
+        push @all_sentences, $adb->_extract_suggest_sentences( $table_info, $rec, \%rdbm_recs, \%rdbm_blocks );
+    }
+    return unless @all_sentences;
+
+    my ( $word_freq, $transitions ) = $adb->_extract_words_and_transitions( @all_sentences );
+
+    # 4. Build .ajw (Word prefix index)
+    my %ajw_buckets;
+    for my $norm ( keys %$word_freq ) {
+        my $disp = $word_freq->{$norm}{disp};
+        my $cnt  = $word_freq->{$norm}{cnt};
+        my $max_len = length($norm) < 12 ? length($norm) : 12;
+        for ( my $len = 2; $len <= $max_len; $len++ ) {
+            my $pfx = substr($norm, 0, $len);
+            $ajw_buckets{$pfx}{$norm} = [ $disp, $cnt ];
+        }
+        my $ascii_norm = $adb->to_ascii($norm);
+        if ( defined $ascii_norm && $ascii_norm ne $norm ) {
+            my $a_len = length($ascii_norm) < 12 ? length($ascii_norm) : 12;
+            for ( my $len = 2; $len <= $a_len; $len++ ) {
+                my $a_pfx = substr($ascii_norm, 0, $len);
+                $ajw_buckets{$a_pfx}{$norm} = [ $disp, $cnt ];
+            }
+        }
+    }
+
+    my @ajw_records;
+    for my $pfx ( keys %ajw_buckets ) {
+        my $bucket = $ajw_buckets{$pfx};
+        my @sorted = sort {
+            $bucket->{$b}->[1] <=> $bucket->{$a}->[1]
+            || $a cmp $b
+        } keys %$bucket;
+        @sorted = @sorted[0 .. 9] if @sorted > 10;
+        my @payload = map { $bucket->{$_} } @sorted;
+        push @ajw_records, [ $pfx, $adb->db_encode(\@payload) ];
+    }
+
+    if (@ajw_records) {
+        $adb->table_write($tmp_ajw) or return 0;
+        $adb->recs_put( $tmp_ajw, @ajw_records );
+        $adb->table_close($tmp_ajw);
+        $adb->table_close($ajw_path);
+        unlink $ajw_path;
+        rename( $tmp_ajw, $ajw_path ) or do {
+            require File::Copy;
+            File::Copy::move( $tmp_ajw, $ajw_path );
+        };
+        $self->{say} .= "          * $ajw_path \n";
+    }
+
+    # 5. Build .ajn (Next word transitions)
+    my @ajn_records;
+    for my $norm1 ( keys %$transitions ) {
+        my $targets = $transitions->{$norm1};
+        my @sorted = sort {
+            $targets->{$b}->{cnt} <=> $targets->{$a}->{cnt}
+            || $a cmp $b
+        } keys %$targets;
+        @sorted = @sorted[0 .. 299] if @sorted > 300;
+        my @payload = map {
+            [ $targets->{$_}->{disp}, $targets->{$_}->{cnt}, $_ ]
+        } @sorted;
+        push @ajn_records, [ $norm1, $adb->db_encode(\@payload) ];
+    }
+
+    if (@ajn_records) {
+        $adb->table_write($tmp_ajn) or return 0;
+        $adb->recs_put( $tmp_ajn, @ajn_records );
+        $adb->table_close($tmp_ajn);
+        $adb->table_close($ajn_path);
+        unlink $ajn_path;
+        rename( $tmp_ajn, $ajn_path ) or do {
+            require File::Copy;
+            File::Copy::move( $tmp_ajn, $ajn_path );
+        };
+        $self->{say} .= "          * $ajn_path \n";
+    }
+
+    return 1;
+}
+
+sub reindex_suggest {
+    my ( $self, $tableid ) = @_;
+    my $adb = $self->{_adb};
+    my @records = $adb->read_all($tableid);
+    return $self->set_suggest( $tableid, @records );
+}
 
 1;

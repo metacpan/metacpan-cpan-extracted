@@ -27,6 +27,9 @@
 #         'alternative'" check;
 #       - tests/reg-tests-1d.R, the six degenerate one-sample calls at line
 #         332 and the +/-Inf identities at line 3525;
+#       - src/library/stats/tests/ks-test.R, the Wilcoxon block: exact
+#         intervals on 0:m and c(1e-9, 1:m), whose output ks-test.Rout.save
+#         pins to print precision, here at R's full precision;
 #       - src/library/stats/man/wilcox.test.Rd and the pinned output of its
 #         examples in tests/Examples/stats-Ex.Rout.save, including the
 #         airquality Ozone case (whose W is a half-integer, so it exercises
@@ -36,7 +39,9 @@
 #         reads "All magic numbers are from R wilcox.test": cases_basic,
 #         cases_continuity, cases_9184, cases_2118, test_tie_correct,
 #         test_exact_U_equals_mean, test_gh_11355b (+/-Inf) and
-#         test_mannwhitneyu_{one,two}_sided;
+#         test_mannwhitneyu_{one,two}_sided.  test_gh_11355b's data are also
+#         run through R's default exact test with conf.int, which SciPy does
+#         not have, so those expected values are R 4.6.1's;
 #       - scipy/stats/tests/test_morestats.py::TestWilcoxon:
 #         test_accuracy_wilcoxon, test_wilcoxon_tie, test_onesided,
 #         test_exact_pval, test_exact_p_1, test_all_zeros_exact and
@@ -93,10 +98,10 @@ my $TOL_STAT = 1e-12;
 my $TOL_CI     = 1e-8;
 my $TOL_CI_ABS = 1e-9;
 
-# The exact-with-ties confidence interval rebuilds a permutation distribution
-# at every candidate shift; at m = n = 30 that is about 1.5 seconds here and
-# 0.8 in R.  Nothing else in this file takes more than a few milliseconds.
-my $EXTENDED = $ENV{EXTENDED_TESTING} || $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING};
+# The exact-with-ties confidence interval tries up to m * n shifts, and up to
+# 0.3212 rebuilt the permutation distribution at every one: at m = n = 30 that
+# was about 1.5 seconds here and 0.8 in R.  It now rebuilds only when the
+# scores change, and the whole file runs in 0.2 seconds, so nothing is gated.
 
 # Relative compare with an absolute fallback at exactly 0, plus explicit
 # handling of the non-finite bounds an unbounded one-sided interval carries.
@@ -996,6 +1001,52 @@ foreach my $c ( [[1,2,3], [1.5,2.5], 'greater',   3,   0.6135850036578],
 	}
 }
 
+# The same five data sets through R's default test, which is exact given the
+# ties, with conf.int = TRUE.  SciPy has no interval, so the expected values are
+# R 4.6.1's for SciPy's data, at options(digits = 17):
+#   wilcox.test(x, y, conf.int = TRUE, alternative = alt)
+# With an infinity in both samples the interval's scan tries shifts that meet
+# one as Inf - Inf.  R's rank() puts that NaN last (na.last = TRUE); up to
+# 0.3212 this module left it wherever the sort did, and gave [-5, 3] for data
+# set 2 where R gives [-5, Inf].  Seven of these fifteen differed.
+{
+	my $inf = 9 ** 9 ** 9;
+	my @data = (
+		[[1,2,3,4],       [3,6,7,8,$inf,3,2,1,4,4,5]],
+		[[1,2,3,4],       [3,6,7,8,$inf,$inf,2,1,4,4,5]],
+		[[1,2,$inf,4],    [3,6,7,8,$inf,3,2,1,4,4,5]],
+		[[1,2,$inf,4],    [3,6,7,8,$inf,$inf,2,1,4,4,5]],
+		[[1,$inf,$inf,4], [3,6,7,8,$inf,$inf,2,1,4,4,5]] );
+	# [ data set, alternative, W, p, lower, upper, achieved level, estimate ]
+	foreach my $c (
+	[0, 'two.sided', 10, 0.14798534798534799, -6, 0, 0.95750915750915755, -2],
+	[0, 'less', 10, 0.073992673992673993, '-Inf', 0, 0.97509157509157507, -2],
+	[0, 'greater', 10, 0.95457875457875463, -5, 'Inf', 0.95897435897435901, -2],
+	[1, 'two.sided', 8.5, 0.098168498168498167, -7, 0, 0.97069597069597069, -3],
+	[1, 'less', 8.5, 0.049084249084249083, '-Inf', 0, 0.95091575091575087, -3],
+	[1, 'greater', 8.5, 0.97289377289377288, -6, 'Inf', 0.9538461538461539, -3],
+	[2, 'two.sided', 17.5, 0.59780219780219779, -5, 'Inf', 0.97728937728937737, -1],
+	[2, 'less', 17.5, 0.29890109890109889, '-Inf', 'Inf', 1, -1],
+	[2, 'greater', 17.5, 0.72747252747252744, -4, 'Inf', 0.95750915750915755, -1],
+	[3, 'two.sided', 16, 0.4879120879120879, -7, 'Inf', 0.98901098901098905, -2],
+	[3, 'less', 16, 0.24395604395604395, '-Inf', 'Inf', 1, -2],
+	[3, 'greater', 16, 0.79706959706959712, -6, 'Inf', 0.95091575091575098, -2],
+	[4, 'two.sided', 24.5, 0.7941391941391942, -6, 'Inf', 0.9758241758241758, 1.5],
+	[4, 'less', 24.5, 0.65274725274725276, '-Inf', 'Inf', 1, 1.5],
+	[4, 'greater', 24.5, 0.3970695970695971, -5, 'Inf', 0.96410256410256412, 1.5],
+	) {
+		my ($i, $alt, $w, $p, $lo, $hi, $level, $est) = @$c;
+		my $r = wilcox_test(@{ $data[$i] }, conf_int => 1, alternative => $alt);
+		my $tag = "SciPy gh-11355b data set $i, exact, $alt";
+		close_to($r->{statistic},      $w,     $TOL_STAT, "$tag: statistic");
+		close_to($r->{'p.value'},      $p,     $TOL_P,    "$tag: p");
+		close_to($r->{'conf.int'}[0],  $lo,    $TOL_CI,   "$tag: lower");
+		close_to($r->{'conf.int'}[1],  $hi,    $TOL_CI,   "$tag: upper");
+		close_to($r->{'conf.level'},   $level, $TOL_P,    "$tag: achieved level");
+		close_to($r->{estimate},       $est,   $TOL_CI,   "$tag: estimate");
+	}
+}
+
 # test_mannwhitneyu_{one,two}_sided and their no-continuity twins: n = 30
 # against n = 20, so the asymptotic tail is a long way out.
 {
@@ -1159,6 +1210,88 @@ foreach my $x ( [-1,-2,3], [-1,2,-3,-4,5], [-1,-2,3,-4,-5,-6,7,8] ) {
 #
 # 4. R's own regression tests
 #
+
+# src/library/stats/tests/ks-test.R, the "Wilkoxon (Mann Whitney)" block: every
+# alternative on 0:m and on c(1e-9, 1:m) for m = 0..4, one-sample and then the
+# first set against the second, all with exact = TRUE and conf.int = TRUE --
+# upstream's comment is "Even with conf.int = TRUE, do not want errors".  Its
+# saved output (ks-test.Rout.save) pins these to print precision; the values
+# here are R 4.6.1's at options(digits = 17).  They are exact intervals on tied
+# data and zeroes, so they run the scans behind the conditional exact interval,
+# which 0.3212 rewrote to keep the permutation table between trial shifts.
+# 1e-9 is not dyadic, but nothing here ties with it at any NV width: the only
+# values within a factor of two of it are its own shifts.
+{
+	my %set = (s0 => [ map { [0 .. $_] } 0 .. 4 ], 's.' => [ map { [1e-9, 1 .. $_] } 0 .. 4 ]);
+	my $check = sub {
+		my ($r, $tag, $w, $p, $lo, $hi, $level, $est) = @_;
+		close_to($r->{statistic},     $w,     $TOL_STAT, "$tag: statistic");
+		close_to($r->{'p.value'},     $p,     $TOL_P,    "$tag: p");
+		close_to($r->{'conf.int'}[0], $lo,    $TOL_CI,   "$tag: lower",    $TOL_CI_ABS);
+		close_to($r->{'conf.int'}[1], $hi,    $TOL_CI,   "$tag: upper",    $TOL_CI_ABS);
+		close_to($r->{'conf.level'},  $level, $TOL_P,    "$tag: achieved level");
+		close_to($r->{estimate},      $est,   $TOL_CI,   "$tag: estimate", $TOL_CI_ABS);
+	};
+	# [ set, m + 1, alternative, V, p, lower, upper, achieved level, estimate ]
+	foreach my $c (
+	['s0', 1, 'two.sided', 0, 1, 0, 'Inf', 1, 0],
+	['s0', 2, 'two.sided', 2, 1, 0, 'Inf', 1, 0.5],
+	['s0', 3, 'two.sided', 5, 0.5, 0, 'Inf', 1, 1],
+	['s0', 4, 'two.sided', 9, 0.25, 0, 'Inf', 1, 1.5],
+	['s0', 5, 'two.sided', 14, 0.125, 0, 'Inf', 1, 2],
+	['s0', 1, 'less', 0, 1, '-Inf', 'Inf', 1, 0],
+	['s0', 2, 'less', 2, 1, '-Inf', 'Inf', 1, 0.5],
+	['s0', 3, 'less', 5, 1, '-Inf', 'Inf', 1, 1],
+	['s0', 4, 'less', 9, 1, '-Inf', 'Inf', 1, 1.5],
+	['s0', 5, 'less', 14, 1, '-Inf', 4, 1, 2],
+	['s0', 1, 'greater', 0, 1, 0, 'Inf', 1, 0],
+	['s0', 2, 'greater', 2, 0.5, 0, 'Inf', 1, 0.5],
+	['s0', 3, 'greater', 5, 0.25, 0, 'Inf', 1, 1],
+	['s0', 4, 'greater', 9, 0.125, 0, 'Inf', 1, 1.5],
+	['s0', 5, 'greater', 14, 0.0625, 0.5, 'Inf', 0.96875, 2],
+	['s.', 1, 'two.sided', 1, 1, '-Inf', 'Inf', 1, 1.0000000000000001e-09],
+	['s.', 2, 'two.sided', 3, 0.5, '-Inf', 'Inf', 1, 0.50000000050000004],
+	['s.', 3, 'two.sided', 6, 0.25000000000000006, '-Inf', 'Inf', 1, 1.00000000025],
+	['s.', 4, 'two.sided', 10, 0.125, '-Inf', 'Inf', 1, 1.50000000025],
+	['s.', 5, 'two.sided', 15, 0.0625, '-Inf', 'Inf', 1, 2],
+	['s.', 1, 'less', 1, 1, '-Inf', 'Inf', 1, 1.0000000000000001e-09],
+	['s.', 2, 'less', 3, 1, '-Inf', 'Inf', 1, 0.50000000050000004],
+	['s.', 3, 'less', 6, 1, '-Inf', 'Inf', 1, 1.00000000025],
+	['s.', 4, 'less', 10, 1, '-Inf', 'Inf', 1, 1.50000000025],
+	['s.', 5, 'less', 15, 1, '-Inf', 4, 0.96875, 2],
+	['s.', 1, 'greater', 1, 0.5, '-Inf', 'Inf', 1, 1.0000000000000001e-09],
+	['s.', 2, 'greater', 3, 0.25, '-Inf', 'Inf', 1, 0.50000000050000004],
+	['s.', 3, 'greater', 6, 0.12500000000000003, '-Inf', 'Inf', 1, 1.00000000025],
+	['s.', 4, 'greater', 10, 0.0625, '-Inf', 'Inf', 1, 1.50000000025],
+	['s.', 5, 'greater', 15, 0.03125, 1.0000000000000001e-09, 'Inf', 0.96875, 2],
+	) {
+		my ($s, $k, $alt, @want) = @$c;
+		my $r = wilcox_test($set{$s}[$k - 1], exact => 1, conf_int => 1, alternative => $alt);
+		$check->($r, "R ks-test.R one-sample $s\[[$k]] $alt", @want);
+	}
+	# [ m + 1, alternative, W, p, lower, upper, achieved level, estimate ]
+	foreach my $c (
+	[1, 'two.sided', 0, 1, '-Inf', 'Inf', 1, -1.0000000000000001e-09],
+	[2, 'two.sided', 1.5, 1, '-Inf', 'Inf', 1, -5.0000000000000003e-10],
+	[3, 'two.sided', 4, 1, '-Inf', 'Inf', 1, 0],
+	[4, 'two.sided', 7.5, 0.97142857142857142, -3, 2.9999999989999999, 1, 0],
+	[5, 'two.sided', 12, 0.96825396825396814, -3, 2.9999999989999999, 0.96428571428571419, 0],
+	[1, 'less', 0, 0.5, '-Inf', 'Inf', 1, -1.0000000000000001e-09],
+	[2, 'less', 1.5, 0.5, '-Inf', 'Inf', 1, -5.0000000000000003e-10],
+	[3, 'less', 4, 0.5, '-Inf', 1.9999999989999999, 1, 0],
+	[4, 'less', 7.5, 0.48571428571428571, '-Inf', 2, 0.97142857142857142, 0],
+	[5, 'less', 12, 0.48412698412698407, '-Inf', 2, 0.95238095238095233, 0],
+	[1, 'greater', 0, 1, '-Inf', 'Inf', 1, -1.0000000000000001e-09],
+	[2, 'greater', 1.5, 0.83333333333333337, '-Inf', 'Inf', 1, -5.0000000000000003e-10],
+	[3, 'greater', 4, 0.69999999999999996, -2, 'Inf', 1, 0],
+	[4, 'greater', 7.5, 0.62857142857142856, -2, 'Inf', 0.97142857142857142, 0],
+	[5, 'greater', 12, 0.58730158730158732, -2, 'Inf', 0.97222222222222221, 0],
+	) {
+		my ($k, $alt, @want) = @$c;
+		my $r = wilcox_test($set{s0}[$k - 1], $set{'s.'}[$k - 1], exact => 1, conf_int => 1, alternative => $alt);
+		$check->($r, "R ks-test.R s0[[$k]] vs s.[[$k]] $alt", @want);
+	}
+}
 
 # tests/reg-tests-1a.R, PR#1150: "Wilcoxon rank sum and signed rank tests did
 # not return the Hodges-Lehmann estimators of the associated confidence
@@ -1643,6 +1776,43 @@ foreach my $n (20, 30, 40, 49, 60, 120) {
 	is($r->{'conf.level'}, 0, 'all-tied two-sample interval: achieved level is 0');
 	close_to($r->{estimate}, 0, 1e-15,
 		'all-tied two-sample interval: estimate is the midrange');
+}
+
+# An infinite observation makes the asymptotic interval's bracket infinite.
+# R's two-sample code stops in uniroot() with "invalid 'xmin' value"; its
+# one-sample code's W() meets Inf - Inf, which is NA to R, and it hands back a
+# NaN interval at level 0.  We give that answer in both places, and say why.
+# The data are SciPy's gh-11355b sets, whose asymptotic p-values are checked in
+# section 2.
+{
+	my $inf = 9 ** 9 ** 9;
+	my @w;
+	local $SIG{__WARN__} = sub { push @w, $_[0] };
+	my $r = wilcox_test([1,2,3,4], [3,6,7,8,$inf,3,2,1,4,4,5], conf_int => 1, exact => 0);
+	ok(scalar(grep { /infinite observations/ } @w), 'infinite two-sample asymptotic interval: warns, where R stops');
+	ok($r->{'conf.int'}[0] != $r->{'conf.int'}[0], 'infinite two-sample asymptotic interval: lower limit is NaN');
+	ok($r->{'conf.int'}[1] != $r->{'conf.int'}[1], 'infinite two-sample asymptotic interval: upper limit is NaN');
+	is($r->{'conf.level'}, 0, 'infinite two-sample asymptotic interval: achieved level is 0');
+	close_to($r->{'p.value'}, 0.1297704873477, 1e-11, 'infinite two-sample asymptotic interval: the p-value is unaffected');
+	$r = wilcox_test([1,2,3,4], [3,6,7,8,$inf,3,2,1,4,4,5], conf_int => 1, exact => 0, alternative => 'less');
+	close_to($r->{'conf.int'}[0], '-Inf', 0, 'infinite asymptotic interval, less: lower limit stays -Inf');
+	ok($r->{'conf.int'}[1] != $r->{'conf.int'}[1], 'infinite asymptotic interval, less: upper limit is NaN');
+}
+
+# The exact one-sample interval on data holding both infinities: R's own
+# tests/reg-tests-1d.R pairs c(-Inf, 1:5, Inf) with a second sample, and on its
+# own R's scan meets -Inf + Inf and stops with "missing value where TRUE/FALSE
+# needed".  We rank that NaN last, as R's rank() does, and answer; the estimate
+# is R's own median of the Walsh averages that are not NaN, which is 3.
+{
+	my $inf = 9 ** 9 ** 9;
+	my $r = wilcox_test([-$inf, 1 .. 5, $inf], conf_int => 1);
+	close_to($r->{statistic},     21.5,      $TOL_STAT, 'one-sample +/-Inf exact interval: V (R agrees)');
+	close_to($r->{'p.value'},     0.234375,  $TOL_P,    'one-sample +/-Inf exact interval: p (R agrees)');
+	close_to($r->{estimate},      3,         $TOL_CI,   'one-sample +/-Inf exact interval: estimate is R\'s NaN-free median');
+	close_to($r->{'conf.int'}[0], '-Inf',    0,         'one-sample +/-Inf exact interval: lower, where R stops');
+	close_to($r->{'conf.int'}[1], 5,         $TOL_CI,   'one-sample +/-Inf exact interval: upper, where R stops');
+	close_to($r->{'conf.level'},  0.9921875, $TOL_P,    'one-sample +/-Inf exact interval: achieved level');
 }
 
 # R's exact p-values on tied data are computed from a density it normalises

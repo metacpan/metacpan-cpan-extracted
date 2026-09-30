@@ -10,4 +10,6 @@
 ^pod2htm
 ^_build/
 ^.git/
+\B\.gitignore\b
 ^maps/
+extras/*

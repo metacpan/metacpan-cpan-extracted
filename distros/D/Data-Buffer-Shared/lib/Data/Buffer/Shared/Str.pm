@@ -2,7 +2,7 @@ package Data::Buffer::Shared::Str;
 use strict;
 use warnings;
 use Data::Buffer::Shared;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::Buffer::Shared::Str/buf_str_get"} = 1;

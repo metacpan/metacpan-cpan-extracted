@@ -1,38 +1,26 @@
 Revision history for Data-Buffer-Shared
 
+0.09      2026-09-26
+          - DATA_BUFFER_SHARED_SPARSE=0 reserves segments up front, so a full
+            filesystem fails the constructor, not a later write.
+          - Checking a half-created file no longer allocates it on tmpfs.
+          - Long paths no longer cut the reason from error messages.
+
 0.08      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
 
 0.07      2026-08-11
-          - Fix a reader-lock leak and an unbalanced unlock_rd that underflowed
-            a reader slot; either could block every writer indefinitely.
-          - Refuse a non-empty file too small to hold a header, including one
-            this process created.
-          - Recover a file left behind by an interrupted create.
-          - Create leaves the backing file sparse.
-          - Str set()/fill(): clamp the value length to the element size.
-          - Str get(): size the scratch buffer as size_t.
-          - slice(): validate count against capacity before allocating.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
-          - Makefile.PL: Shared.c depends on xs/*.xs and buf_*.h; declare the
-            repository and bugtracker in META.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
+          - Fix a reader-lock leak and an unbalanced unlock_rd that could
+            block every writer.
+          - Refuse a truncated file; recover an interrupted create's file.
+          - Str set/fill clamp lengths; tied/overloaded argument hardening.
+          - unlink() reports a failed removal.
 
 0.06      2026-07-22
-          - On-disk format change (v2 -> v3): an existing 0.05 file is
-            refused; recreate it.
-          - Release a lock still held when its handle is destroyed.
-          - Keep the parent's locks when a forked child's handle is destroyed:
-            the close path now releases only locks the exiting process took
-            itself (pid + fork-generation check, same guard as the reader-slot
-            release).
-          - End the seqlock write section when destroying a handle that holds
-            lock_wr; wrunlock alone left seq odd forever and hung every bulk
-            reader (slice/get_raw/Str get).
+          - On-disk format change (v2 -> v3): recreate 0.05 files.
+          - Destroying a handle releases only its own locks, never a forked
+            parent's, and no longer hangs bulk readers.
           - Reject Str lengths above 2^32.
 
 0.05  2026-07-03
@@ -58,18 +46,8 @@ Revision history for Data-Buffer-Shared
 
 
 0.01  2026-04-05
-    - Initial release
-    - 11 type variants: I8/U8/I16/U16/I32/U32/I64/U64/F32/F64/Str
-    - File-backed, anonymous, and memfd constructors
-    - Lock-free atomic get/set for numeric types
-    - Atomic counters: incr/decr/add/cas/cmpxchg
-    - Atomic bitwise: and/or/xor
-    - Seqlock-guarded bulk: slice/set_slice/get_raw/set_raw/fill/clear
-    - Batch atomic add_slice
-    - Zero-copy as_scalar (mmap-aliased scalar ref)
-    - Raw pointer access: ptr/ptr_at
-    - Explicit locking: lock_wr/unlock_wr/lock_rd/unlock_rd
-    - fd passing: new_memfd/new_from_fd/fd
-    - eventfd notifications: create_eventfd/attach_eventfd/notify/wait_notify
-    - Futex-based rwlock with stale-lock recovery
-    - Keyword API via XS::Parse::Keyword
+    - Initial release: 11 typed variants on file, anonymous or memfd memory.
+    - Lock-free atomics, seqlock-guarded bulk ops, zero-copy as_scalar/ptr.
+    - Explicit locks, fd passing, eventfd notify; futex rwlock with stale-lock
+      recovery.
+    - Keyword API via XS::Parse::Keyword.

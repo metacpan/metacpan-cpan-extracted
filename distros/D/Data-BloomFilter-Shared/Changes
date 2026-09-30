@@ -1,19 +1,21 @@
 Revision history for Data-BloomFilter-Shared
 
+0.07      2026-09-26
+          - DATA_BLOOMFILTER_SHARED_SPARSE=0 reserves segments up front, so a
+            full filesystem fails the constructor, not a later write.
+          - A failed create no longer leaves a full-size file behind.
+          - Checking a half-created file no longer allocates it on tmpfs.
+          - Long paths no longer cut the reason from error messages.
+
 0.06      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
 
 0.05      2026-08-11
-          - Frozen read-only mode: freeze() seals a file-backed structure;
-            new_readonly() maps it O_RDONLY and queries it lock-free.
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
+          - freeze()/new_readonly(): sealed read-only mode, lock-free.
+          - A file left by an interrupted create is recovered, not refused.
+          - unlink() reports a failed removal; a missing file is no error.
+          - Hardening against tied and overloaded arguments.
 
 0.04      2026-07-21
           - On-disk format change (v1 -> v2): an existing 0.03 file is

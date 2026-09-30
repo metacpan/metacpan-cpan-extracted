@@ -2,7 +2,7 @@ package Data::Buffer::Shared::I32;
 use strict;
 use warnings;
 use Data::Buffer::Shared;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub import {
     $^H{"Data::Buffer::Shared::I32/buf_i32_get"} = 1;

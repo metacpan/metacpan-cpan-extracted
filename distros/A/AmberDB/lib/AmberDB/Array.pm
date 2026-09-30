@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 my $CREATED = '2018-02-23';
 
 # TODO

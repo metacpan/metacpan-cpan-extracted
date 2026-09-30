@@ -1,7 +1,7 @@
 package Data::Buffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Data::Buffer::Shared', $VERSION);
@@ -286,17 +286,18 @@ the capacity you pass is ignored and the existing capacity is used, so check
 C<< $buf->capacity >> if it matters. A variant, element-size or version
 mismatch is reported as an error.
 
-B<Disk space.> The backing file is created B<sparse>: C<new> sizes it, but
-blocks are allocated only as you write, so a large buffer costs almost
-nothing on disk until it is used. The cost of that is a late failure, and how
-it reaches you depends on the filesystem. Where blocks are allocated at fault
-time -- tmpfs, so C</dev/shm> and many C</tmp> mounts -- a write to a page that
-cannot be backed raises C<SIGBUS> and kills the process, because an C<mmap>
-store has no way to report C<ENOSPC>. Where allocation is delayed to writeback
-(ext4, xfs), the store lands in page cache and the failure appears later: the
-write is lost, and C<sync> is what reports it, croaking with the underlying
-error. Keep the filesystem sized for the buffer you asked for, and call
-C<sync> when you need to know your writes reached disk.
+B<Disk space.> C<new> and C<new_memfd> create a new segment B<sparse>: blocks
+are allocated only as you write, so a large buffer costs almost nothing until
+it is used. The cost of that is a late failure: a write to a page the
+filesystem cannot back raises C<SIGBUS> and kills the process (an C<mmap> store
+has no way to report C<ENOSPC>), and an error the filesystem hits later, while
+writing the page back, loses the write, which C<sync> reports by croaking with
+the underlying error. Call C<sync> when you need to know your writes reached
+disk. Set
+C<DATA_BUFFER_SHARED_SPARSE=0> to reserve the whole segment at creation, so a
+full filesystem makes the constructor croak instead; on tmpfs and memfd that
+commits the segment's memory at once, and a memory cgroup too small for it
+gets an OOM kill rather than a croak.
 
 =head1 SEE ALSO
 

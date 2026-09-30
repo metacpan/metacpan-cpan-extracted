@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use open IO => ":raw";
 use Test::More;
 use File::Temp qw(tempdir);
 use Data::Stack::Shared;

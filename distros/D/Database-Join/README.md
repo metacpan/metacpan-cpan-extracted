@@ -4,7 +4,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 ## Version
 
-Version 0.008.0
+Version 0.008.1
 
 ## Synopsis
 
@@ -428,6 +428,18 @@ preserve both values under distinct names instead.
     every query call.  If the directory is not writable, or the filesystem is full,
     the call will `croak` with `error_sqlite_connect`.  Check permissions and
     free space if you see that error.
+
+- `join =>` criteria are not supported
+
+    `Database::Abstraction` accepts a `join => { table => ..., on => ... }`
+    key in its criteria hashrefs to express an SQL JOIN within a single table.
+    `Database::Join` cannot route this to a component DA meaningfully: the merged
+    view has no concept of a single underlying table.  Passing `join =>` to any
+    query method will `croak` with `error_join_criterion`.
+
+    **Fix:** Model the joined table as a separate `Database::Abstraction` object and
+    add it to the `databases => []` list.  Use `join_column` or `join_map` to
+    specify the shared key.
 
 ## Methods
 
@@ -1149,10 +1161,13 @@ for my $row (@{$vip}) {
 
 #### Messages
 
-```
+```perl
 warn_unknown_column (carp)
     -- A criterion key names a column not present in any component database;
        the criterion is silently dropped and all rows are returned.
+error_join_criterion (croak)
+    -- A criterion hashref contains a join => key (DA SQL-JOIN syntax).
+       Use a separate DA object for the joined table instead.
 sort_by column unknown (carp)
     -- The column given in sort_by is not in the merged view; the result
        is returned in the default join_column ascending order instead.
@@ -1224,6 +1239,18 @@ print $first_vip->{name}, "\n" if defined $first_vip;
 #### Messages
 
 Same messages as `selectall_arrayref`.
+
+### Selectall\_Hashref
+
+Deprecated alias for ["selectall\_arrayref"](#selectall_arrayref), present for compatibility with
+callers written against `Database::Abstraction`'s deprecated API.  Use
+`selectall_arrayref` in new code.
+
+### Selectall\_Hash
+
+Deprecated alias for ["selectall\_array"](#selectall_array), present for compatibility with
+callers written against `Database::Abstraction`'s deprecated API.  Use
+`selectall_array` in new code.
 
 ### Fetchrow\_Hashref
 
@@ -1613,8 +1640,9 @@ empty list).
 
 #### Synopsis
 
-```
+```perl
 $join->set_logger($log);
+$join->set_logger(logger => $log);   # named-pair form also accepted
 ```
 
 #### Description
@@ -1622,13 +1650,18 @@ $join->set_logger($log);
 Attaches a new logger object to the join and propagates it to every component
 database.  The logger is used for diagnostic output by all component databases.
 
+Non-blessed values (a log-level string such as `"debug"`, a filename, or a
+code reference) are wrapped in `Log::Abstraction-`new(...)> automatically,
+matching the behaviour of `Database::Abstraction::set_logger`.
+
 #### Api Specification
 
 ##### Input
 
 ```
-$log    Positional: a logger object (required).
-        Must support whatever interface Database::Abstraction expects.
+logger  Positional or named: a logger object, log-level string, filename,
+        or code reference (required).  Non-blessed values are wrapped in
+        Log::Abstraction automatically.
 ```
 
 ##### Output
@@ -1648,12 +1681,15 @@ use Log::Any qw($log);
 my $join = Database::Join->new(databases => [$db1, $db2], join_column => 'entry');
 $join->set_logger($log);
 # $log is now used by $join and by $db1 and $db2
+
+# Named-pair form (mirrors Database::Abstraction API):
+$join->set_logger(logger => $log);
 ```
 
 #### Messages
 
-```
-(croak) Usage: set_logger($logger)
+```perl
+(croak) Usage: set_logger(logger => $logger)
     -- Called with an undefined argument.  Pass a valid logger object.
 ```
 
@@ -1868,11 +1904,13 @@ error_remove_join_col -- attempt to remove the join_column itself
 
 ### Query
 
-Not supported.  `Database::Join` does not implement the chained query
-builder.  Calling this method will always `croak` with an explanatory message.
+Not supported.  `Database::Join` does not implement the
+`Database::Abstraction::Query` chained builder because the builder's
+`.all()` / `.first()` methods would be targeting a single component DA
+rather than the merged view.  Calling this method will always `croak`.
 
-Use `selectall_arrayref`, `selectall_array`, `fetchrow_hashref`, or
-`count` instead.
+Use `selectall_arrayref`, `selectall_array`, `fetchrow_hashref`,
+`count`, or `each_row` against the `Database::Join` object instead.
 
 ### Execute
 
@@ -2050,6 +2088,16 @@ can be localised by supplying an `i18n` object to `new`.
     component database (or has been removed with `remove_column`).
 
     **Fix:** Check the column name spelling.  The criterion is ignored.
+
+- `error_join_criterion`
+
+    **When:** A criterion hashref contains a `join =>` key (the
+    `Database::Abstraction` SQL-JOIN syntax).
+
+    **Fix:** `join =>` targets a single table inside one DA; it cannot be
+    routed through a merged view.  Express multi-table relationships by adding
+    the joined table as a separate `Database::Abstraction` object in the
+    `databases => []` constructor list instead.
 
 - `error_query_unsupported`
 

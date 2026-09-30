@@ -178,7 +178,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 # VERSION
 
-    v0.6.1
+    v0.10.0
 
 # DESCRIPTION
 
@@ -271,7 +271,14 @@ Accepted parameters are:
 - `nanosecond`
 - `time_zone`
 
-    The time zone for the datetime. Accepts a zone name, such as `Asia/Tokyo`), a fixed-offset string, such as `+09:00`, a [DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone) object, `UTC`, `floating`, or `local`.
+    The time zone for the datetime. Accepts:
+
+    - A zone name string, such as `Asia/Tokyo`, a fixed-offset string such as `+09:00`, `UTC`, `floating`, or `local`.
+    - A [DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone) object.
+    - A hash reference whose keys are passed directly to ["new" in DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone#new). This allows passing options that are not available on the string form, such as `extended => 1` (to resolve timezone abbreviations such as `JST` or `CET`), or `latitude`/`longitude` for coordinate-based resolution:
+
+            time_zone => { name => 'JST', extended => 1 }
+            time_zone => { latitude => 35.658558, longitude => 139.745504 }
 
     If omitted, and the `locale` argument carries a BCP47 `-u-tz-` extension, such as `he-IL-u-ca-hebrew-tz-jeruslm`, the corresponding IANA canonical timezone is resolved automatically. If neither is provided, the default floating timezone is used (or `$ENV{PERL_DATETIME_DEFAULT_TZ}` if set).
 
@@ -316,7 +323,7 @@ If you provide the `time_zone` argument, it will be applied _after_ the object i
 
 For example:
 
-    my $dt = DateTime->from_epoch(
+    my $dt = DateTime::Lite->from_epoch(
         epoch     => 0,
         time_zone => 'Asia/Tokyo'
     );
@@ -441,12 +448,6 @@ Returns the hour (0-23).
     my $min = $dt->minute;
 
 Returns the minute (0-59).
-
-## second
-
-    my $s = $dt->second;
-
-Returns the second (0-59, or 60 on a leap second).
 
 ## second
 
@@ -721,7 +722,298 @@ Returns `86400`, the number of seconds in one day (excluding leap seconds).
 
 ## strftime( @patterns )
 
-POSIX-style formatting. Supports all standard `%x` specifiers plus `%{method_name}` and `%NNN` for nanoseconds.
+POSIX-style formatting. Returns the datetime as a string formatted according to the given pattern(s). Supports all standard `%x` specifiers, plus `%{method_name}` for any `DateTime::Lite` method call, and `%NNN` for sub-second precision.
+
+All examples below use the following reference datetime, which falls on a Wednesday in British Summer Time (UTC+1):
+
+    my $dt = DateTime::Lite->new(
+        year       => 2026,
+        month      => 7,
+        day        => 15,
+        hour       => 14,
+        minute     => 30,
+        second     => 45,
+        nanosecond => 123456789,
+        time_zone  => 'Europe/London',
+        locale     => 'en-GB',
+    );
+    # Wednesday 15 July 2026, 14:30:45.123456789 BST (UTC+01:00)
+    # Reproduce with: $dt->strftime('%A %d %B %Y, %T.%N %Z (UTC%:z)');
+
+The following `%x` tokens are supported:
+
+- `%a`
+
+    The abbreviated weekday name.
+
+        $dt->strftime('%a')  # "Wed"
+
+- `%A`
+
+    The full weekday name.
+
+        $dt->strftime('%A')  # "Wednesday"
+
+- `%b`
+
+    The abbreviated month name.
+
+        $dt->strftime('%b')  # "Jul"
+
+- `%B`
+
+    The full month name.
+
+        $dt->strftime('%B')  # "July"
+
+- `%c`
+
+    The default datetime format for the object's locale (`%a %b %e %H:%M:%S %Y`).
+
+        $dt->strftime('%c')  # "Wed Jul 15 14:30:45 2026"
+
+- `%C`
+
+    The century number (year/100) as a 2-digit integer.
+
+        $dt->strftime('%C')  # "20"
+
+- `%d`
+
+    The day of the month as a decimal number (range 01 to 31).
+
+        $dt->strftime('%d')  # "15"
+
+- `%D`
+
+    Equivalent to `%m/%d/%y`.
+
+        $dt->strftime('%D')  # "07/15/26"
+
+- `%e`
+
+    Like `%d` but a leading zero is replaced by a space.
+
+        $dt->strftime('%e')  # "15"
+
+- `%E`
+
+    The abbreviated weekday name (alias for `%a`).
+
+        $dt->strftime('%E')  # "Wed"
+
+- `%F`
+
+    Equivalent to `%Y-%m-%d` (the ISO 8601 date format).
+
+        $dt->strftime('%F')  # "2026-07-15"
+
+- `%G`
+
+    The ISO 8601 year with century as a decimal number.
+
+        $dt->strftime('%G')  # "2026"
+
+- `%g`
+
+    Like `%G`, but without century (2-digit year).
+
+        $dt->strftime('%g')  # "26"
+
+- `%h`
+
+    Equivalent to `%b` (abbreviated month name).
+
+        $dt->strftime('%h')  # "Jul"
+
+- `%H`
+
+    The hour as a decimal number using a 24-hour clock (range 00 to 23).
+
+        $dt->strftime('%H')  # "14"
+
+- `%I`
+
+    The hour as a decimal number using a 12-hour clock (range 01 to 12).
+
+        $dt->strftime('%I')  # "02"
+
+- `%j`
+
+    The day of the year as a decimal number (range 001 to 366).
+
+        $dt->strftime('%j')  # "196"
+
+- `%k`
+
+    The hour (24-hour clock) as a decimal number (range 0 to 23); single digits preceded by a blank.
+
+        $dt->strftime('%k')  # "14"
+
+- `%l`
+
+    The hour (12-hour clock) as a decimal number (range 1 to 12); single digits preceded by a blank.
+
+        $dt->strftime('%l')  # " 2"
+
+- `%m`
+
+    The month as a decimal number (range 01 to 12).
+
+        $dt->strftime('%m')  # "07"
+
+- `%M`
+
+    The minute as a decimal number (range 00 to 59).
+
+        $dt->strftime('%M')  # "30"
+
+- `%n`
+
+    A newline character.
+
+        $dt->strftime('date%ntime')  # "date\ntime"
+
+- `%N`
+
+    The fractional seconds digits. Default is 9 digits (nanoseconds).
+
+        %3N   milliseconds (3 digits)
+        %6N   microseconds (6 digits)
+        %9N   nanoseconds  (9 digits)
+
+- `%O`
+
+    The IANA timezone name, such as `Asia/Tokyo` or `Europe/London`.
+
+        $dt->strftime('%O')  # "Europe/London"
+
+- `%p`
+
+    Either `AM` or `PM` according to the given time value.
+
+        $dt->strftime('%p')  # "PM"
+
+- `%P`
+
+    Like `%p` but in lowercase: `am` or `pm`.
+
+        $dt->strftime('%P')  # "pm"
+
+- `%r`
+
+    The time in a.m. or p.m. notation (`%I:%M:%S %p`).
+
+        $dt->strftime('%r')  # "02:30:45 PM"
+
+- `%R`
+
+    The time in 24-hour notation (`%H:%M`).
+
+        $dt->strftime('%R')  # "14:30"
+
+- `%s`
+
+    The number of seconds since the epoch.
+
+        $dt->strftime('%s')  # "1784122245"
+
+- `%S`
+
+    The second as a decimal number (range 00 to 61).
+
+        $dt->strftime('%S')  # "45"
+
+- `%t`
+
+    A tab character.
+
+        $dt->strftime('date%ttime')  # "date\ttime"
+
+- `%T`
+
+    The time in 24-hour notation (`%H:%M:%S`).
+
+        $dt->strftime('%T')  # "14:30:45"
+
+- `%u`
+
+    The day of the week as a decimal, range 1 to 7, Monday being 1.
+
+        $dt->strftime('%u')  # "3"  (Wednesday)
+
+- `%U`
+
+    The week number of the current year, starting with the first Sunday as the first day of week 01.
+
+        $dt->strftime('%U')  # "28"
+
+- `%V`
+
+    The ISO 8601:1988 week number of the current year.
+
+        $dt->strftime('%V')  # "29"
+
+- `%w`
+
+    The day of the week as a decimal, range 0 to 6, Sunday being 0.
+
+        $dt->strftime('%w')  # "3"  (Wednesday)
+
+- `%W`
+
+    The week number of the current year, starting with the first Monday as the first day of week 01.
+
+        $dt->strftime('%W')  # "28"
+
+- `%x`
+
+    The default date format for the object's locale.
+
+        $dt->strftime('%x')  # "07/15/26"
+
+- `%X`
+
+    The default time format for the object's locale.
+
+        $dt->strftime('%X')  # "14:30:45"
+
+- `%y`
+
+    The year as a decimal number without a century (range 00 to 99).
+
+        $dt->strftime('%y')  # "26"
+
+- `%Y`
+
+    The year as a decimal number including the century.
+
+        $dt->strftime('%Y')  # "2026"
+
+- `%z`
+
+    The time zone as hour offset from UTC (such as `+0900`).
+
+        $dt->strftime('%z')  # "+0100"  (BST = UTC+1)
+
+- `%Z`
+
+    The short name for the time zone (such as `JST` or `EST`).
+
+        $dt->strftime('%Z')  # "BST"
+
+- `%%`
+
+    A literal `%` character.
+
+        $dt->strftime('100%%')  # "100%"
+
+- `%{method}`
+
+    Any method name may be specified using the format `%{method}` where _method_ is a valid `DateTime::Lite` object method.
+
+        $dt->strftime('%{quarter}')      # "3"
+        $dt->strftime('%{day_of_year}')  # "196"
 
 ## format\_cldr( @patterns )
 
@@ -749,7 +1041,7 @@ Returns the date portion as `YYYY-MM-DD` (default separator `"-"`).
     my $time = $dt->hms;          # "12:34:56"
     my $time = $dt->hms( '.' );   # "12.34.56"
 
-Returns the time portion as `HH:MM:SS` (default separator `":"`>).
+Returns the time portion as `HH:MM:SS` (default separator `":"`).
 
 ## dmy( \[$sep\] )
 
@@ -850,7 +1142,7 @@ Sets the month (1-12). Returns `$self`.
 
 ## set\_day
 
-    $dt->set_month(31);
+    $dt->set_day(31);
 
 Sets the day of the month. Returns `$self`.
 
@@ -870,7 +1162,7 @@ Sets the minute (0-59). Returns `$self`.
 
     $dt->set_second(30);
 
-Sets the second (0-59). Returns `$self`.
+Sets the second (0-59 normally, up to 61 for leap-second compatibility). Returns `$self`.
 
 ## set\_nanosecond
 
@@ -893,8 +1185,11 @@ Sets the formatter object used by ["stringify"](#stringify). Must respond to `fo
 ## set\_time\_zone
 
     $dt->set_time_zone( 'Asia/Tokyo' );
+    $dt->set_time_zone( $tz_object );  # A DateTime::Lite::TimeZone object
+    $dt->set_time_zone( { name => 'JST', extended => 1 } );
+    $dt->set_time_zone( { latitude => 35.658558, longitude => 139.745504 } );
 
-Changes the time zone of the datetime in-place. Accepts a time zone name string, such as `America/New_York`, or a [DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone) object. Returns `$self`.
+Changes the time zone of the datetime in-place. Accepts a time zone name string such as `America/New_York`, a [DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone) object, or a hash reference whose keys are passed directly to ["new" in DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone#new) (allowing options such as `extended => 1` or coordinate-based resolution). Returns `$self`.
 
 ## end\_of
 
@@ -915,7 +1210,7 @@ Supported units are: `second`, `minute`, `hour`, `day`, `week`, `local_week`, `m
 
 The result is the last nanosecond before the start of the next unit, so the timezone and variable-length units such as months and years are handled correctly without hardcoding boundary values.
 
-Returns the modified object on success, or sets an [error object](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3AException) and returns `undef` in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (`DateTime::Lite::Null`) to avoid the typical `Can't call method '%s' on an undefined value`
+Returns the modified object on success, or sets an [error object](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3AException) and returns `undef` in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (`DateTime::Lite::Null`) to avoid the typical `Can't call method '%s' on an undefined value`.
 
 See also ["start\_of"](#start_of) and ["truncate"](#truncate).
 
@@ -938,7 +1233,7 @@ Supported units are: `second`, `minute`, `hour`, `day`, `week`, `local_week`, `m
 
 For most units this delegates to ["truncate"](#truncate). `decade` and `century` are handled independently: `start_of('decade')` for 2026 returns 2020-01-01, and `start_of('century')` returns 2001-01-01.
 
-Returns the modified object on success, or sets an [error object](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3AException) and returns `undef` in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (`DateTime::Lite::Null`) to avoid the typical `Can't call method '%s' on an undefined value`
+Returns the modified object on success, or sets an [error object](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3AException) and returns `undef` in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (`DateTime::Lite::Null`) to avoid the typical `Can't call method '%s' on an undefined value`.
 
 See also ["end\_of"](#end_of) and ["truncate"](#truncate).
 
@@ -962,13 +1257,58 @@ Can also be used via the overloaded `<=>` and `cmp` operators:
 
     my @sorted = sort { $a <=> $b } @datetimes;
 
+## compare\_epoch( $epoch )
+
+    if( $token_expires->compare_epoch( time() ) < 0 )
+    {
+        # token has expired
+    }
+
+This is an instance method. It compares the current object to a Unix timestamp. The comparison is equivalent to building a temporary object with ["from\_epoch"](#from_epoch) and calling ["compare"](#compare) on that temporary object.
+
+The method returns `-1` if this instance is earlier than `$epoch`, `0` if both values represent the same instant, and `1` if this instance is later.
+
+This is the usual way to compare a [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object with a value that already is a Unix timestamp: the return value of `time()`, a database column, or a field from an external API. You do not have to construct another [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object yourself each time.
+
+`$epoch` must be a number as recognised by ["looks\_like\_number" in Scalar::Util](https://metacpan.org/pod/Scalar%3A%3AUtil#looks_like_number). An integer or a fractional value is accepted; a fractional value is handled as in ["from\_epoch"](#from_epoch) and is rounded to the nearest microsecond. If the argument is undefined or not numeric, the method sets an [error object](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3AException) and returns `undef` in scalar context, or an empty list in list context.
+
+The temporary object is created in the `UTC` time zone, which is the same convention as ["from\_epoch"](#from_epoch). If the current instance is in a floating time zone, ["compare"](#compare) applies its usual conversion before the instants are ordered.
+
+The overloaded `<=>` operator is not changed. Writing `$dt < time()` still dies, because a raw epoch is not a compatible object. Call this method, or ["is\_past"](#is_past) / ["is\_future"](#is_future), instead.
+
 ## compare\_ignore\_floating( $dt1, $dt2 )
 
-Like ["compare"](#compare), but treats floating-timezone datetimes as if they share the same UTC offset as the other operand. Useful when comparing local wall-clock times regardless of timezone.
+This is like ["compare"](#compare), but treats floating-timezone datetimes as if they shared the same UTC offset as the other operand. This is useful when comparing local wall-clock times regardless of timezone.
 
 ## is\_between( $lower, $upper )
 
 Returns true if `$self` is strictly between the two boundaries.
+
+## is\_future
+
+    if( $expiry->is_future )
+    {
+        # still valid
+    }
+
+Returns true if `$self` is strictly later than the current time, as returned by ["now"](#now). This is equivalent to `$self->compare( DateTime::Lite->now ) > 0`.
+
+An instant that is equal to the current time is neither past nor future. The test is strict, in the same sense as ["is\_between"](#is_between).
+
+["now"](#now) is evaluated on every call. The comparison therefore uses the clock at the moment of the call, not the clock at the moment `$self` was constructed. Differences in time zone, including the case where `$self` is floating, are handled by ["compare"](#compare).
+
+## is\_past
+
+    if( $token->{expires}->is_past )
+    {
+        # rejected as expired
+    }
+
+Returns true if `$self` is strictly earlier than the current time, as returned by ["now"](#now). This is equivalent to `$self->compare( DateTime::Lite->now ) < 0`.
+
+An instant that is equal to the current time is neither past nor future. The call-time clock and the time-zone behaviour are the same as for ["is\_future"](#is_future).
+
+# ERROR HANDLING
 
 ## error
 
@@ -1493,6 +1833,6 @@ Jacques Deguest <`jack@deguest.jp`>
 
 Copyright(c) 2026 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

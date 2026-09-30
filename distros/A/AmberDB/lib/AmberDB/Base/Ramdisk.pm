@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use Cwd qw(abs_path);
 use Digest::MD5 qw(md5_hex);
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 
 my $CREATED = '2026-08-11';
 
@@ -534,7 +534,7 @@ sub ramdisk_ensure {
 
     # For use_ramdisk >= 1: ensure all secondary & lookup index files are present
     unless ($needs_preload) {
-        for my $ext ( qw( inx fld src fac unq slg ) ) {
+        for my $ext ( qw( inx fld src fac unq slg ajw ajn ) ) {
             my $src_file = "$table_path.$ext";
             my $ram_file = "$ramdisk_path.$ext";
             if ( -e $src_file && !-e $ram_file ) {
@@ -628,7 +628,7 @@ sub ramdisk_delete {
         my $ramdisk_path = $self->ramdisk_path($tableid) or return;
         my $db_ext       = $self->{db_ext} // 'db';
 
-        foreach my $ext ( $db_ext, qw( inx fld src fac unq slg ) ) {
+        foreach my $ext ( $db_ext, qw( inx fld src fac unq slg ajw ajn ) ) {
             my $file = "$ramdisk_path.$ext";
             if ( -e $file ) {
                 $self->table_close($file);
@@ -693,7 +693,7 @@ sub ramdisk_preload {
 
     # 2. Preload index & lookup files (.inx, .fld, .src, .fac, .unq, .slg) for use_ramdisk >= 1 and != 3
     if ( $use_ramdisk >= 1 && $use_ramdisk != 3 ) {
-        foreach my $ext ( qw( inx fld src fac unq slg ) ) {
+        foreach my $ext ( qw( inx fld src fac unq slg ajw ajn ) ) {
             my $src_file = "$table_path.$ext";
             my $dst_file = "$ramdisk_path.$ext";
             $_copy_atomic->( $src_file, $dst_file );

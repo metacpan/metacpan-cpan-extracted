@@ -1,7 +1,7 @@
 package Data::RingBuffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::RingBuffer::Shared', $VERSION);
 
@@ -93,6 +93,12 @@ B<Linux-only>. Requires 64-bit Perl.
 The descriptor you pass to C<new_from_fd> is duplicated
 (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
 disturb the buffer.
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of the initialization dying with
+SIGBUS; set C<DATA_RINGBUFFER_SHARED_SPARSE=1> to skip the reservation. On
+tmpfs and memfd the segment is memory, and a memory cgroup too small for it
+gets an OOM kill rather than a croak.
 
 =head2 Write
 

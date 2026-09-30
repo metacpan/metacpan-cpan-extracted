@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use File::Spec;
 use parent 'AmberDB::Base';
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 
 my $CREATED = '2026-09-06';
 
@@ -436,6 +436,7 @@ sub normalize_blocks {
         delete @{$schema}{
             qw(
               blocks match_block search_block view_block facet_block filter_block
+              suggest_block suggest_join
               slug_block sort_block sort_fields use_facet facet_rules use_junk junk_rules
               record_index repeat_start repeat_ids field_rules keep_deleted
             )
@@ -455,6 +456,7 @@ sub normalize_blocks {
         delete @{$schema}{
             qw(
               blocks match_block search_block view_block facet_block filter_block
+              suggest_block suggest_join
               slug_block sort_block sort_fields use_facet facet_rules use_junk junk_rules
               record_index repeat_start repeat_ids field_rules
               use_ramdisk ramdisk_ttl use_cache cache_ttl
@@ -919,7 +921,7 @@ sub table_infset {
     # Array keys
     my @array_keys = qw(
       search_block match_block view_block facet_block
-      filter_block slug_block reverse
+      filter_block slug_block reverse suggest_block
     );
     foreach my $key (@array_keys) {
         next unless ref( $tbl->{$key} ) eq "ARRAY";
@@ -972,6 +974,16 @@ sub table_infset {
             $jr_val = "[ " . join( ", ", map { $_ =~ /^\d+$/ ? $_ : "\"$_\"" } @$jr ) . " ]";
         }
         $table_str .= "\tjunk_rules => $jr_val,\n";
+    }
+
+    # Serialize suggest_join
+    if ( ref( $tbl->{suggest_join} ) eq 'ARRAY' && @{ $tbl->{suggest_join} } ) {
+        my $sj = $tbl->{suggest_join};
+        my @rules_str = map {
+            ref($_) eq 'ARRAY' ? "[" . join( ", ", @$_ ) . "]" : "[$_]"
+        } @$sj;
+        my $sj_val = "[ " . join( ", ", @rules_str ) . " ]";
+        $table_str .= "\tsuggest_join => $sj_val,\n";
     }
 
     # Serialize blocks in correct format

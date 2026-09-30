@@ -1,0 +1,96 @@
+{
+   "abstract" : "QUIC transport for Perl",
+   "author" : [
+      "Joshua S. Day <haxmeister@hotmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-QUIC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::ngtcp2" : "0.03",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::ngtcp2" : "0.03",
+            "Carp" : "0",
+            "Hash::Util::FieldHash" : "0",
+            "Scalar::Util" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "IO::Select" : "0",
+            "IO::Socket::INET" : "0",
+            "Socket" : "0",
+            "Test2::V0" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::QUIC" : {
+         "file" : "lib/Net/QUIC.pm",
+         "version" : "0.01"
+      },
+      "Net::QUIC::Connection" : {
+         "file" : "lib/Net/QUIC/Connection.pm",
+         "version" : "0.01"
+      },
+      "Net::QUIC::Datagram" : {
+         "file" : "lib/Net/QUIC/Datagram.pm",
+         "version" : "0.01"
+      },
+      "Net::QUIC::Driver" : {
+         "file" : "lib/Net/QUIC/Driver.pm",
+         "version" : "0.01"
+      },
+      "Net::QUIC::Endpoint" : {
+         "file" : "lib/Net/QUIC/Endpoint.pm",
+         "version" : "0.01"
+      },
+      "Net::QUIC::Stream" : {
+         "file" : "lib/Net/QUIC/Stream.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haxmeister/perl-Net-QUIC/issues"
+      },
+      "homepage" : "https://github.com/haxmeister/perl-Net-QUIC",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haxmeister/perl-Net-QUIC.git",
+         "web" : "https://github.com/haxmeister/perl-Net-QUIC"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

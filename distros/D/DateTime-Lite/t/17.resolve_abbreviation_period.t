@@ -218,7 +218,7 @@ subtest 'period with raw epoch integer value' => sub
             diag( "Failed to resolve the timezone abbreviation 'EST' with period >$epoch_2010" );
             skip( 'resolution failed', 4 );
         }
-        is( scalar( @$results ),       3,      'Three EST zones used after 2010 epoch' );
+        is( scalar( @$results ),       4,      'Four EST zones used after 2010 epoch' );
         my $names = zone_names( $results );
         ok( ( grep{ $_ eq 'America/Port-au-Prince' } @$names ), 'America/Port-au-Prince present' );
         ok( ( grep{ $_ eq 'America/Cancun'         } @$names ), 'America/Cancun present' );

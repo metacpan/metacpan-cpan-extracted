@@ -1,13 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Apache2 API Framework - ~/lib//mnt/src/perl/Apache2-API/lib/Apache2/API/Request.pm
-## Version v0.4.2
+## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
+## Version v0.4.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2026/06/17
+## Modified 2026/09/30
 ## All rights reserved
-## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -55,7 +54,7 @@ BEGIN
     use Scalar::Util;
     use URI;
     use URI::Escape;
-    our $VERSION = 'v0.4.2';
+    our $VERSION = 'v0.4.3';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -1134,52 +1133,97 @@ sub remote_host { return( shift->_try( 'connection', 'get_remote_host', @_ ) ); 
 sub remote_ip
 {
     my $self = shift( @_ );
-    # my $vers = $self->server_version;
-    my $serv = $self->request;
-    # http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
-    # We have to prepend the version with 'v', because it will faill when there is a dotted decimal with 3 numbers, 
-    # e.g. 2.4.16 > 2.2 will return false !!
-    # but v2.4.16 > v2.2 returns true :(
-    # Already contacted the author about this edge case (2019-09-22)
-#     if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
-#     {
-#         my $ip;
-#         # try-catch
-#         local $@;
-#         eval
-#         {
-#             $ip = $serv->useragent_ip;
-#         };
-#         if( $@ )
-#         {
-#             warn( "Unable to get the remote ip with the method useragent_ip: $@\n" );
-#         }
-#         $ip = $self->env( 'REMOTE_ADDR' ) if( !CORE::length( $ip ) );
-#         return( $ip ) if( CORE::length( $ip ) );
-#         return;
-#     }
-#     else
-#     {
-#         return( $self->connection->remote_addr->ip_get );
-#     }
-    my $c = $self->connection;
-    my $coderef = $c->can( 'client_ip' ) // $c->can( 'remote_ip' );
-    # try-catch
-    local $@;
-    my $rv = eval
+    my $r    = $self->request;
+    my $c    = $self->connection;
+
+    # Setter mode.
+    #
+    # Apache 2.4 exposes useragent_ip(), which represents the effective client
+    # address associated with the request and is the value updated by modules
+    # such as mod_remoteip.
+    #
+    # Apache 2.2 does not provide useragent_ip(). In that case, fall back to the
+    # connection-level remote_ip() accessor. client_ip() is kept as a final
+    # compatibility fallback for implementations exposing it without
+    # useragent_ip().
+    if( @_ )
     {
-        $coderef->( $c, shift( @_ ) ) if( @_ );
-        my $ip = $coderef->( $c );
-        $ip = $self->env( 'REMOTE_ADDR' ) if( !CORE::length( $ip ) );
-        return( $ip ) if( CORE::length( $ip ) );
-        return( '' );
+        my $ip = shift( @_ );
+        local $@;
+        eval
+        {
+            if( $r->can( 'useragent_ip' ) )
+            {
+                $r->useragent_ip( $ip );
+            }
+            elsif( $c && $c->can( 'remote_ip' ) )
+            {
+                $c->remote_ip( $ip );
+            }
+            elsif( $c && $c->can( 'client_ip' ) )
+            {
+                $c->client_ip( $ip );
+            }
+
+            # Keep the CGI-style environment consistent for code that reads
+            # REMOTE_ADDR instead of using the Apache request API directly.
+            $r->subprocess_env( REMOTE_ADDR => $ip );
+        };
+        if( $@ )
+        {
+            warn( "Unable to set remote ip: $@\n" );
+            return;
+        }
+        return( $ip );
+    }
+
+    # Getter mode.
+    #
+    # Prefer useragent_ip() when available. On Apache 2.4 this is the logical
+    # client address for the request and therefore the correct value when
+    # mod_remoteip has rewritten the client address behind a reverse proxy.
+    #
+    # If it is unavailable, use the connection-level accessor exposed by the
+    # running Apache/mod_perl version:
+    #
+    #   Apache 2.4 -> client_ip()
+    #   Apache 2.2 -> remote_ip()
+    #
+    # REMOTE_ADDR is only a last-resort fallback because subprocess_env may not
+    # yet be populated in every request phase.
+    local $@;
+    my $ip = eval
+    {
+        my $v;
+        if( $r->can( 'useragent_ip' ) )
+        {
+            $v = $r->useragent_ip;
+            return( $v ) if( defined( $v ) && CORE::length( $v ) );
+        }
+
+        if( $c )
+        {
+            if( $c->can( 'client_ip' ) )
+            {
+                $v = $c->client_ip;
+            }
+            elsif( $c->can( 'remote_ip' ) )
+            {
+                $v = $c->remote_ip;
+            }
+            return( $v ) if( defined( $v ) && CORE::length( $v ) );
+        }
+        $v = $self->env( 'REMOTE_ADDR' );
+        return( $v ) if( defined( $v ) && CORE::length( $v ) );
+        return('');
     };
+
     if( $@ )
     {
-        warn( "Unable to get the remote addr with the method ", ( $c->can( 'client_ip' ) ? 'client_ip' : 'remote_ip' ), ": $@\n" );
+        warn( "Unable to get the remote ip: $@\n" );
         return;
     }
-    return( $rv );
+    return( $ip );
 }
 
 sub remote_port { return( shift->env( 'REMOTE_PORT', @_ ) ); }
@@ -1429,9 +1473,13 @@ sub uri
     my $self = shift( @_ );
     my $r = $self->request;
     # my $host = $r->get_server_name;
-    my $host = $r->hostname;
-    my $port = $r->get_server_port;
-    my $proto = ( $port == 443 ) ? 'https' : 'http';
+    my $host   = $r->hostname;
+    my $port   = $r->get_server_port;
+    my $https = $r->subprocess_env('HTTPS') // '';
+    my $forwarded_proto = $r->headers_in->{'X-Forwarded-Proto'} // '';
+    my $is_ssl = ( lc( $https ) eq 'on' || lc( $forwarded_proto ) eq 'https' ) ? 1 : 0;
+    # my $proto = ( $port == 443 ) ? 'https' : 'http';
+    my $proto = $is_ssl ? 'https' : 'http';
     my $path = $r->unparsed_uri;
     # The port is superfluous, and even annoying
     # return( URI->new( "${proto}://${host}:${port}${path}" ) );
@@ -1841,7 +1889,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.4.2
+    v0.4.3
 
 =head1 DESCRIPTION
 
@@ -3421,12 +3469,49 @@ Default value is C<Apache2::Const::REMOTE_NAME>
 
 =head2 remote_ip
 
-    my $remote_ip      = $req->connection->remote_ip();
-    my $prev_remote_ip = $req->connection->remote_ip( $new_remote_ip );
+    my $ip = $req->remote_ip;
+    $req->remote_ip( $new_ip );
 
-Sets or gets the ip address of the client, ie remote host making the request, by calling L<Apache2::Connection/client_ip> or L<Apache2::Connection/remote_ip>
+Gets or sets the remote client IP address.
 
-It returns a string representing an ip address,
+When called with an argument, the value is written to every available slot: L<Apache2::RequestRec/useragent_ip> when that method exists (Apache 2.4+), then L<Apache2::Connection/client_ip> or the older L<Apache2::Connection/remote_ip>, and finally the C<REMOTE_ADDR> subprocess environment variable. The same value is returned.
+
+When called without an argument, the IP is resolved in this order:
+
+=over 4
+
+=item 1.
+
+C<< $r->useragent_ip >> if the method exists.
+
+This is the Apache 2.4+ field that L<mod_remoteip|https://httpd.apache.org/docs/current/mod/mod_remoteip.html> updates from C<RemoteIPHeader> (typically C<X-Forwarded-For>) after a trusted proxy hop. Behind a reverse proxy this is the address you usually want, not the TCP peer.
+
+=item 2.
+
+C<< $c->client_ip >> (Apache 2.4 connection API), or C<< $c->remote_ip >> on Apache 2.2 where C<client_ip> does not exist.
+
+This is the address of the immediate TCP peer. On a backend reached via loopback or an internal proxy it is often C<127.0.0.1> or the proxy address, even when C<mod_remoteip> has already set C<useragent_ip> to the original client.
+
+=item 3.
+
+The C<REMOTE_ADDR> value from L</env>, which is the CGI-style copy Apache fills in later in the request lifecycle.
+
+This is only a fallback. It may still be empty or still hold the proxy address if C<remote_ip> is called from an early hook (for example C<PerlTransHandler> or C<PerlHeaderParserHandler>) before C<mod_remoteip> or the environment table has run.
+
+=back
+
+It returns a string, or the empty string if nothing could be determined. If an Apache API call throws, a warning is issued and C<undef> is returned.
+
+C<useragent_ip> and C<client_ip> are detected with C<can>, not by parsing L</server_version>, so the same code path works on Apache 2.2 and 2.4.
+
+This method does not read C<X-Forwarded-For> or C<X-Real-IP> itself. Trusting those headers belongs to C<mod_remoteip> (or C<mod_rpaf> / C<mod_extract_forwarded> on 2.2). Typical backend configuration:
+
+    RemoteIPHeader X-Forwarded-For
+    RemoteIPInternalProxy 127.0.0.1 ::1
+
+C<mod_remoteip> runs at C<post_read_request>. Call C<remote_ip> at that phase or later (for example from a C<PerlResponseHandler>) if you need the rewritten client address.
+
+See L<Apache2::RequestRec/useragent_ip>, L<Apache2::Connection/client_ip>, L<Apache2::Connection/remote_ip> and L<mod_remoteip|https://httpd.apache.org/docs/current/mod/mod_remoteip.html>.
 
 =head2 remote_port
 

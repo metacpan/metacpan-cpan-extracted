@@ -1,0 +1,158 @@
+Revision history for Net-QUIC
+
+0.01  2026-09-29
+    - First stable CPAN release.
+    - Add a real localhost UDP Driver loopback test using kernel UDP sockets.
+    - Treat peer stream-limit exhaustion as normal flow control: open_bidi_stream
+      and open_uni_stream now return undef instead of throwing when the current
+      peer limit is exhausted.
+    - Add Connection->on_stream_available for bidi/uni stream-credit recovery.
+    - Replenish peer MAX_STREAMS credit when peer-opened streams close.
+    - Add Connection->close_info with structured application, transport, TLS,
+      certificate, handshake, idle, and drop outcomes.
+    - Keep local programming/configuration/internal failures as Perl exceptions.
+    - Send the proper QUIC CONNECTION_CLOSE for locally detected protocol and
+      TLS failures when the connection state permits it.
+    - Add Stream->local_reset_code alongside remote_reset_code.
+    - Make transport policy explicit with the optional transport hash.
+    - Default to a 10 second handshake timeout, 30 second idle timeout, 1 MiB
+      connection receive window, 256 KiB stream receive window, and 100 initial
+      bidi/uni peer streams.
+    - Advertise active migration as disabled until migration support is
+      implemented and tested.
+    - Add destructive lifecycle coverage for Driver, Endpoint, Connection, and
+      Stream destruction order, Driver backpressure during close, staggered
+      multi-connection retirement, CID cleanup, timer cleanup, and native stream
+      cleanup.
+    - Rewrite README and top-level POD around the simpler public model:
+      Driver -> Connection -> Stream, with Endpoint documented as the low-level
+      escape hatch.
+    - Add examples for Linux::Event, AnyEvent, IO::Async, Mojo::IOLoop, and EV.
+    - Add a second IO::Async example using Future::AsyncAwait for sequential
+      application flow without changing the callback-based Driver integration.
+    - Add a core IO::Select QUIC echo server for running the client examples.
+    - Compile and run the event-loop examples in CI on the current Perl job.
+    - Require concrete local IPv4/IPv6 addresses at the QUIC path boundary;
+      reject wildcard bind addresses 0.0.0.0 and ::.
+    - Document packet-info/source-address requirements for wildcard-bound UDP
+      adapters and keep those OS-specific socket operations outside Net::QUIC.
+    - Make the simple IO::Select echo server reject wildcard binds rather than
+      demonstrating an incorrect QUIC path.
+    - Add missing_features.md to track the remaining canonical QUIC features
+      and standardized extensions not yet exposed by Net::QUIC.
+
+0.001_002  2026-09-27
+    - Require Alien::ngtcp2 0.03 and use its fixed Picotls QUIC TLS path.
+    - Remove the OpenSSL, GnuTLS, BoringSSL, and wolfSSL backend branches.
+    - Install Alien::ngtcp2 0.03 from CPAN in the full CI matrix.
+    - Add a private server Connection path and an in-memory client/server
+      QUIC/TLS handshake proof for development testing.
+    - Add the first real client QUIC endpoint.
+    - Separate the event-loop Endpoint object from the application-facing
+      Connection object before server support is added.
+    - Add the event-loop integration boundary: receive_datagram,
+      next_datagram, timeout_after, and handle_timeout.
+    - Add Net::QUIC::Datagram for outbound UDP payload and path data.
+    - Generate a real QUIC Initial packet in the native test suite.
+    - Keep UDP sockets and timers outside Net::QUIC.
+    - Use Perl's allocator for endpoint-owned native memory so threaded
+      Windows Perl does not cross C runtime heaps.
+    - Recognize MinGW's WIN32 define for the Windows monotonic clock path.
+    - Add Net::QUIC::Stream with local bidirectional and unidirectional stream
+      opening, incoming stream discovery, send, receive, FIN, and reset.
+    - Replace the one-stream proof storage with independent per-stream receive
+      and transmit queues.
+    - Keep transmitted stream bytes immutable until ngtcp2 acknowledges them
+      or closes the stream.
+    - Return QUIC receive flow-control credit when application data is
+      consumed.
+    - Schedule pending streams round-robin when producing UDP datagrams.
+    - Make the in-memory handshake and stream tests honor positive QUIC pacing
+      timers instead of depending on CPU timing.
+    - Test concurrent streams, unidirectional streams, FIN, and reset across
+      the full portability matrix.
+    - Add the first multi-connection server Endpoint.
+    - Route server packets by QUIC destination connection ID and track
+      connection IDs issued and retired by ngtcp2.
+    - Add next_connection for pulling newly created server Connections.
+    - Aggregate all server Connection timers behind the same Endpoint timer.
+    - Schedule outbound server datagrams fairly across managed Connections.
+    - Test two simultaneous clients, handshakes, short-header routing, and
+      streams through one server Endpoint.
+    - Add a stateless server front door before Connection allocation.
+    - Send Version Negotiation for unsupported QUIC versions.
+    - Add optional Retry/address validation with validate_address.
+    - Generate authenticated Retry tokens bound to the peer socket address.
+    - Carry verified original destination and Retry connection IDs into the
+      server transport parameters.
+    - Reject Retry-token replay from a different peer address without creating
+      Connection state.
+    - Test a complete Retry handshake and stream exchange.
+    - Verify client server certificates by default through Picotls and OpenSSL.
+    - Verify DNS names and IP addresses against the required server_name.
+    - Use OpenSSL default trust locations and allow ca_file to add a private
+      PEM trust anchor.
+    - Reject untrusted certificates and trusted certificates with the wrong
+      host name.
+    - Keep certificate verification mandatory; no skip-verification switch is
+      exposed.
+    - Add Connection close and closed lifecycle methods.
+    - Keep closing and draining Connections alive for the QUIC 3-PTO wait.
+    - Retire idle-closed and dropped Connections without leaving Endpoint state.
+    - Remove retired server Connections from the managed connection list,
+      pending accept queue, and every CID route.
+    - Ignore replayed packets for retired connection IDs instead of recreating
+      a Connection.
+    - Reuse the existing transmit buffer for CONNECTION_CLOSE so retirement
+      does not add another large per-Connection packet buffer.
+    - Test close, draining, timer retirement, CID cleanup, and retired-CID
+      replay across the portability matrix.
+    - Load server certificate and private-key state once per server Endpoint.
+    - Share one Picotls server credential context across accepted Connections.
+    - Keep each Connection's Picotls session independent while retaining the
+      shared context for the Connection lifetime.
+    - Stop reopening and reparsing certificate/key files for every new client.
+    - Fail invalid server credential paths when Endpoint->server is constructed.
+    - Test two handshakes after the original credential files have been deleted.
+    - Test that a server Connection safely retains the shared TLS object after
+      the caller's original reference is released.
+    - Add Stateless Reset handling for sufficiently large unknown short-header
+      packets without allocating new Connection state.
+    - Derive server reset tokens from the Endpoint-private secret and each
+      server-issued connection ID, including the initial server connection ID.
+    - Drop unknown long-header packets and undersized short-header packets
+      instead of resetting them.
+    - Keep Stateless Reset responses smaller than their triggering packets.
+    - Test unknown connection IDs, complete server connection-state loss, and
+      normally retired connection IDs, including client recognition of the
+      advertised reset token.
+    - Reclaim closed native stream state once no Perl Stream object or pending
+      incoming-stream queue entry needs it.
+    - Keep closed stream status and buffered receive data available for the
+      lifetime of the public Stream object.
+    - Test ownership transfer from the pending incoming-stream queue to a
+      returned Stream object and verify native stream counts return to zero.
+    - Split large Stream send buffers into fixed-size native transmit chunks.
+    - Release fully acknowledged leading chunks without waiting for the entire
+      original send call to be acknowledged.
+    - Keep chunk creation atomic so allocation failure cannot queue a partial
+      application send.
+    - Test partial ACK-driven memory release while later chunks are still
+      buffered, along with exact byte ordering and FIN behavior.
+    - Add Net::QUIC::Driver as the recommended event-loop adapter boundary.
+    - Reduce ordinary adapters to start, receive, timeout, and writable events
+      plus send and set_timeout callbacks.
+    - Keep Endpoint's four primitive integration methods as the low-level API.
+    - Move Endpoint output draining, backpressure pause/resume, and timeout
+      replacement rules into Driver so adapters do not reproduce them.
+    - Notify Driver automatically after application operations that can change
+      QUIC output state, including Stream send/finish/reset/data consumption and
+      Connection close.
+
+0.001_001  2026-09-27
+    - Begin the Net::QUIC implementation.
+    - Require Alien::ngtcp2 0.02.
+    - Link XS against libngtcp2 and the TLS helper selected by Alien::ngtcp2.
+    - Add native ngtcp2 version and crypto backend diagnostics.
+    - Add a small native crypto self-test.
+    - Keep the library event-loop neutral.

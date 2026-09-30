@@ -87,6 +87,16 @@ subtest 'a db.statement put in data by hand is masked, and the caller hash is un
     unlike($json, qr/tok-77xq/);
 };
 
+subtest 'a MySQL or MariaDB span masks double-quoted strings, any other keeps them as names' => sub {
+    my ($trace, $json) = traced(sub {
+        ForgeOps::Tracker::span('Find token', sub { 1 }, kind => 'database', statement => 'SELECT id FROM t WHERE token = "tok-5ecret"', db_system => 'MariaDB');
+        ForgeOps::Tracker::span('Find user', sub { 1 }, kind => 'database', statement => 'SELECT "user id" FROM t', db_system => 'postgresql');
+    });
+    is(span_named($trace, 'Find token')->{data}{'db.statement'}, 'SELECT id FROM t WHERE token = ?');
+    is(span_named($trace, 'Find user')->{data}{'db.statement'}, 'SELECT "user id" FROM t');
+    unlike($json, qr/tok-5ecret/);
+};
+
 subtest 'statement and db_system are ignored on a span that is not a database span' => sub {
     my ($trace, $json) = traced(sub {
         ForgeOps::Tracker::span('Charge', sub { 1 }, statement => "SELECT 'secret-value'", db_system => 'mysql');

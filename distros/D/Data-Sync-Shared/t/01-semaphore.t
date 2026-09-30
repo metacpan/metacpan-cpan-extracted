@@ -92,7 +92,7 @@ is $msem2->value, 4, 'memfd cross-handle visibility';
         _exit($got);
     }
     waitpid($pid, 0);
-    is $? >> 8, 0, 'child could not acquire held semaphore';
+    is $?, 0, 'child could not acquire held semaphore';
 
     $mp->release;
 
@@ -103,7 +103,7 @@ is $msem2->value, 4, 'memfd cross-handle visibility';
         _exit($got);
     }
     waitpid($pid, 0);
-    is $? >> 8, 1, 'child acquired released semaphore';
+    is $?, 256, 'child acquired released semaphore';
 }
 
 # drain

@@ -1,16 +1,15 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite.pm
-## Version v0.9.0
+## Version v0.10.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/09/12
+## Modified 2026/09/30
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 package DateTime::Lite;
 BEGIN
 {
@@ -39,7 +38,7 @@ BEGIN
         'eq'     => '_string_equals_overload',
         'ne'     => '_string_not_equals_overload',
     );
-    our $VERSION = 'v0.9.0';
+    our $VERSION = 'v0.10.0';
 
     @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
     @LeapYearMonthLengths = @MonthLengths;
@@ -522,6 +521,20 @@ if( $IsPurePerl )
 
 # NOTE: Comparison
 sub compare { return( shift->_compare( @_, 0 ) ); }
+
+# NOTE: To compare an object to an integer representing a timestamp.
+sub compare_epoch
+{
+    my $self  = shift( @_ );
+    my $epoch = shift( @_ );
+    unless( defined( $epoch ) && Scalar::Util::looks_like_number( $epoch ) )
+    {
+        return( $self->error( "compare_epoch() expects a Unix epoch number." ) );
+    }
+    my $other = DateTime::Lite->from_epoch( epoch => $epoch ) ||
+        return( $self->pass_error );
+    return( $self->compare( $other ) );
+}
 
 sub compare_ignore_floating
 {
@@ -1129,7 +1142,14 @@ sub is_dst
     return( $self->{tz}->is_dst_for_datetime( $self ) );
 }
 
-sub is_finite   {1}
+sub is_finite {1}
+
+sub is_future
+{
+    my $self = shift( @_ );
+    return( $self->compare( DateTime::Lite->now ) > 0 );
+}
+
 sub is_infinite {0}
 
 # NOTE: sub is_last_day_of_month is autoloaded
@@ -1150,6 +1170,12 @@ sub is_leap_year
         die( 'Usage: $dt->is_dst' );
     }
     return( $self->_is_leap_year( $self->year ) );
+}
+
+sub is_past
+{
+    my $self = shift( @_ );
+    return( $self->compare( DateTime::Lite->now ) < 0 );
 }
 
 sub iso8601 { $_[0]->datetime( 'T' ) }
@@ -3546,7 +3572,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 =head1 VERSION
 
-    v0.9.0
+    v0.10.0
 
 =head1 DESCRIPTION
 
@@ -4659,13 +4685,58 @@ Can also be used via the overloaded C<< <=> >> and C<cmp> operators:
 
     my @sorted = sort { $a <=> $b } @datetimes;
 
+=head2 compare_epoch( $epoch )
+
+    if( $token_expires->compare_epoch( time() ) < 0 )
+    {
+        # token has expired
+    }
+
+This is an instance method. It compares the current object to a Unix timestamp. The comparison is equivalent to building a temporary object with L</from_epoch> and calling L</compare> on that temporary object.
+
+The method returns C<-1> if this instance is earlier than C<$epoch>, C<0> if both values represent the same instant, and C<1> if this instance is later.
+
+This is the usual way to compare a L<DateTime::Lite> object with a value that already is a Unix timestamp: the return value of C<time()>, a database column, or a field from an external API. You do not have to construct another L<DateTime::Lite> object yourself each time.
+
+C<$epoch> must be a number as recognised by L<Scalar::Util/looks_like_number>. An integer or a fractional value is accepted; a fractional value is handled as in L</from_epoch> and is rounded to the nearest microsecond. If the argument is undefined or not numeric, the method sets an L<error object|DateTime::Lite::Exception> and returns C<undef> in scalar context, or an empty list in list context.
+
+The temporary object is created in the C<UTC> time zone, which is the same convention as L</from_epoch>. If the current instance is in a floating time zone, L</compare> applies its usual conversion before the instants are ordered.
+
+The overloaded C<< <=> >> operator is not changed. Writing C<< $dt < time() >> still dies, because a raw epoch is not a compatible object. Call this method, or L</is_past> / L</is_future>, instead.
+
 =head2 compare_ignore_floating( $dt1, $dt2 )
 
-Like L</compare>, but treats floating-timezone datetimes as if they share the same UTC offset as the other operand. Useful when comparing local wall-clock times regardless of timezone.
+This is like L</compare>, but treats floating-timezone datetimes as if they shared the same UTC offset as the other operand. This is useful when comparing local wall-clock times regardless of timezone.
 
 =head2 is_between( $lower, $upper )
 
 Returns true if C<$self> is strictly between the two boundaries.
+
+=head2 is_future
+
+    if( $expiry->is_future )
+    {
+        # still valid
+    }
+
+Returns true if C<$self> is strictly later than the current time, as returned by L</now>. This is equivalent to C<< $self->compare( DateTime::Lite->now ) > 0 >>.
+
+An instant that is equal to the current time is neither past nor future. The test is strict, in the same sense as L</is_between>.
+
+L</now> is evaluated on every call. The comparison therefore uses the clock at the moment of the call, not the clock at the moment C<$self> was constructed. Differences in time zone, including the case where C<$self> is floating, are handled by L</compare>.
+
+=head2 is_past
+
+    if( $token->{expires}->is_past )
+    {
+        # rejected as expired
+    }
+
+Returns true if C<$self> is strictly earlier than the current time, as returned by L</now>. This is equivalent to C<< $self->compare( DateTime::Lite->now ) < 0 >>.
+
+An instant that is equal to the current time is neither past nor future. The call-time clock and the time-zone behaviour are the same as for L</is_future>.
+
+=head1 ERROR HANDLING
 
 =head2 error
 

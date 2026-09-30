@@ -42,6 +42,12 @@ DESCRIPTION
 
     Linux-only. Requires 64-bit Perl.
 
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of dying with "SIGBUS" while the
+    segment is initialized; set "DATA_LOG_SHARED_SPARSE=1" to skip the
+    reservation. On tmpfs and memfd the segment is memory, and a memory cgroup
+    too small for it gets an OOM kill rather than a croak.
+
 METHODS
   Append
         my $off = $log->append($data);  # returns offset, or undef if full

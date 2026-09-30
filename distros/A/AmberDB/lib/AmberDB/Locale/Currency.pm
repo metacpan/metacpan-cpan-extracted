@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 my $CREATED  = '2026-08-06';
 
 # Master ISO 4217 Currency Dictionary

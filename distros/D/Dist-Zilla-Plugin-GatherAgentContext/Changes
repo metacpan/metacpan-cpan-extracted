@@ -1,0 +1,5 @@
+Release history for Dist-Zilla-Plugin-GatherAgentContext
+
+0.001     2026-09-29 20:02:51Z
+    - Initial release: snapshot agent context (.claude/.codex/CLAUDE.md/...)
+      into the build under misc/agent-context/ for build provenance.

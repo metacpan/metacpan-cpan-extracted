@@ -1,16 +1,15 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.5.5
+## Version v0.5.6
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2026/08/05
+## Modified 2026/09/30
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 package Apache2::API;
 BEGIN
 {
@@ -41,7 +40,7 @@ BEGIN
     use Scalar::Util ();
     our @EXPORT = qw( apr1_md5 );
     $DEBUG   = 0;
-    $VERSION = 'v0.5.5';
+    $VERSION = 'v0.5.6';
 };
 
 use strict;
@@ -700,8 +699,8 @@ sub reply
             }
             else
             {
-                my $fallback = $locale
-                    ? $resp->get_http_message( $code, $locale )
+                my $fallback = ( defined( $locale ) && "$locale" )
+                    ? $resp->get_http_message( $code, "$locale" )
                     : $resp->get_http_message( $code );
                 $ref->{detail} = $fallback // 'An error occurred';
             }
@@ -964,6 +963,7 @@ sub reply
     elsif( exists( $ref->{message} ) )
     {
         $msg = $ref->{message};
+        $set_payload_locale->( $ref, $msg );
         # We format the message like in bailout, ie { error => { message => '', code => '' } }
         if( $is_error )
         {
@@ -985,7 +985,6 @@ sub reply
             $ref->{code}  //= $code;
             $ref->{code}    = int( $ref->{code} ) if( $ref->{code} =~ /^\d+$/ );
         }
-        $set_payload_locale->( $ref, $msg );
     }
     # Or we just have a code to go on with
     elsif( $is_error )
@@ -1966,7 +1965,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.5.5
+    v0.5.6
 
 =head1 DESCRIPTION
 

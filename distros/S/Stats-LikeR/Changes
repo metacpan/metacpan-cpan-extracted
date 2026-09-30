@@ -1,5 +1,210 @@
 Revision history for Stats-LikeR
 
+0.3212 2026-09-28 CDT
+
+ [write_table(): a warning for a header cell with no name]
+
+ - A hash of hashes writes its outer keys as a leading column by default,
+   and unless row.names names that column its header cell is empty, so the
+   file gives the column no name and every reader invents one: read_table
+   calls it row_name, pandas "Unnamed: 0". write_table now warns when it
+   writes that, and says that row.names => 'name' names the column and
+   row.names => 0 drops it. This holds for LaTeX and .xlsx output too.
+
+ - It also warns, for every shape, when a data column's header is empty:
+   an empty or undef cell in an array of arrays' header row, or '' in
+   col.names. The warning counts such columns and gives the first one's
+   position in the file.
+
+ - The empty label cell that row.names => 1 writes for the other shapes is
+   not warned about. It is R's own layout, asked for explicitly, and
+   row.names cannot name it for those shapes, so the warning could not be
+   silenced. The file written is unchanged in every case, and quiet => 1
+   does not suppress the warnings, which are about the data and not the
+   confirmation line.
+
+ - The warnings are given after the file is written and closed and every
+   buffer is released, so a __WARN__ handler that dies loses no output and
+   leaks nothing. t/write_table.t covers each shape, each row.names mode,
+   LaTeX and .xlsx, the dying handler, and leaks.
+
+ [wilcox_test(): exact intervals on tied data, up to 330 times faster]
+
+ - The exact interval on tied data is found as R finds it: at every shift
+   between two neighbouring pairwise differences, up to m*n of them, the
+   permutation distribution given the ranks is built and a tail read from
+   it. It was rebuilt from scratch at every shift. It depends only on the
+   sorted scores, which most shifts leave alone, so it is now kept and
+   rebuilt only when they change; and the loop that builds it skips the
+   cells that must be zero and the rows that can no longer reach the last
+   one. Two samples of 49 five-point scores, which take the exact path by
+   default, went from 8.6s to 0.026s (R 4.6.1 takes 10.2s), and 49 against
+   49 with a single tie from 10.3s to 1.15s.
+
+ - The table is now built for the smaller sample, whose rank sum is the
+   total less the other's: 45 against 5 went from 0.067s to under 1ms.
+
+ - Against the previous build, 2400 random tied intervals and 900 exact
+   p-values came out the same to the last bit.
+
+ [wilcox_test(): the exact tables without ties]
+
+ - Both are symmetric, and are now built and held as their low half only,
+   which halves their memory and their time. The rank-sum table loops over
+   the smaller sample: m = 5 against n = 3000 with exact => 1 went from
+   28ms to under 1ms.
+
+ - The rank-sum recurrence is now bounded by the degree of the polynomial
+   built so far, so it no longer forms counts as differences of numbers
+   near C(m+n, n). Against exact rational arithmetic, two-sample p-values
+   from large exact tables were off by a median of 15 ulp (the worst by
+   100780) and are now off by a median of 1 (the worst by 7).
+
+ - The signed-rank table for ties or zeroes is symmetric as well, since
+   flipping every sign turns V into sum(z) - V, and is folded the same
+   way. The comment that said otherwise was wrong.
+
+ [wilcox_test(): asymptotic intervals]
+
+ - The root search re-ranked both samples from scratch at every step.
+   Subtracting a shift and digits.rank's signif() both keep a sorted
+   sample sorted, so x and y are now sorted once and each step merges
+   them, which gives the same ranks in the same order: the interval on two
+   samples of 20000 went from 52ms to 9ms.
+
+ [wilcox_test(): infinite observations]
+
+ - A difference of two infinities of the same sign (Inf - Inf) is NaN, and
+   R's sort() drops it from the differences an exact interval and the
+   Hodges-Lehmann estimate are read from. They were kept here, where no
+   sort can place a NaN, and the estimate could come out Inf where R's is
+   a number.
+
+ - The scan behind an exact interval tries shifts that meet an infinite
+   observation as Inf - Inf, and R's rank() ranks the NaN last. It was
+   ranked wherever the sort left it: on SciPy's gh-11355 data wilcox_test
+   gave [-5, 3] where R gives [-5, Inf], and 7 of 15 intervals differed.
+   All 15 now match R, and t/wilcox_test.R.scipy.t pins them.
+
+ - An infinite observation leaves the asymptotic interval no finite
+   bracket. R's two-sample code dies in uniroot() with "invalid 'xmin'
+   value", and its one-sample code returns a NaN interval at level 0. Both
+   now return that NaN interval, with a warning, where the root search
+   used to run on whatever the ranks of x - Inf came to.
+
+ [wilcox_test(): tied arrays, and smaller fixes]
+
+ - An element of a tied array has no value until its FETCH runs, which is
+   get magic, and SvOK() was tested first, so a tied x croaked that it was
+   empty. Each element is now fetched once.
+
+ - Three croaks did not name the function; they now begin "wilcox_test:".
+
+ - The exact signed-rank test with zeroes took its scale from every rank,
+   the zeroes' included, where R takes it from the non-zero ones, so two
+   tied zeroes doubled the table for nothing.
+
+ - The exact intervals without ties sorted all m*n differences (or Walsh
+   averages) for three or four order statistics, which are now placed by
+   selection.
+
+ - t/wilcox_test.R.scipy.t adds R's own tied exact-interval cases from
+   src/library/stats/tests/ks-test.R, at full precision, and
+   t/wilcox_test.t tied arrays and leak checks for every interval path.
+
+ [write_table(): write errors, empty tables, ragged rows and tied data]
+
+ - A write that fails now croaks and announces nothing. Output is
+   buffered, so a full disk shows only at the close, which was never
+   checked for a plain file, a LaTeX file or a workbook: a table written
+   to /dev/full returned normally and said it had been written. R's own
+   tests/reg-tests-1d.R (PR#17243) expects write.table() to complain
+   there, and pandas raises.
+
+ - The message gives the system's reason, as R's and pandas' do:
+   "write_table: could not finish writing 'out.csv': No space left on
+   device", and $! is left set to it. The same close meets an exceeded
+   quota, an I/O error or a file server that has gone away, and only the
+   system knows which it was. A compressed file's message, which was
+   "could not write '...'" with no reason, is now the same, and a file
+   that cannot be opened gives its reason too ("Permission denied", "No
+   such file or directory").
+
+ - Empty data, {} or [], writes a file: the header col.names and row.names
+   give, or a single empty record, as pandas writes ",A\n" for
+   DataFrame({"A": []}).to_csv(). It used to return without writing or
+   saying anything, which t/write_table.t and t/write_table.announce.t
+   pinned; they now pin the new behaviour.
+
+ - An array of arrays' row longer than its header lost its extra cells
+   without a word. The header is now widened with empty cells, as pandas
+   pads DataFrame([[1, 2], [4, 5, 6]]), and the long rows are warned
+   about.
+
+ - For a hash of arrays or an array of hashes, row.names => 'col' left the
+   label column's header cell empty, so the name was lost and read_table
+   read the column back as row_name. It is now headed 'col', as pandas
+   heads a named index.
+
+ - A hash of arrays took its row count from every array in the hash, so a
+   col.names leaving out a longer one wrote rows of separators after the
+   data ran out. It is now the longest of the arrays written.
+
+ - A hash of arrays with a col.names naming no column croaked only after
+   opening, and so emptying, the output file. It now croaks first.
+
+ - A tied hash or array (Tie::IxHash, say), as a row, a column or the
+   table itself, was written as empty cells, because SvOK() was tested
+   before its FETCH ran.
+
+ - A cell holding a NUL was cut short at it. Delimited output now writes
+   it whole, raw and unquoted, as csv.writer and pandas' to_csv() do;
+   .xlsx drops the NUL, which XML cannot hold.
+
+ - The .xlsx sheet name is now checked as openpyxl checks one -- empty, or
+   holding any of \ * ? : / [ ], is an error, and longer than 31
+   characters a warning -- and is written as UTF-8 when it arrives as
+   Latin-1 bytes. A LaTeX table with no columns, which LaTeX rejects, is
+   refused before the file is opened.
+
+ - README.md said undef cells are written as NA by default. They are
+   written empty, as t/write_table.t has always tested; the documentation
+   now says so.
+
+ [write_table(): memory and time]
+
+ - .xlsx output is streamed: each row's XML goes to the file as it is
+   made, and the worksheet's local header is patched once its size is
+   known. The table used to be copied into SVs, then into one string of
+   XML, then that into a second string holding the whole archive. A 200000
+   x 20 array of hashes took 1125 MB over the data's own peak for its 308
+   MB workbook and now takes 30 MB, and 2.31s became 1.52s. A pipe, which
+   cannot seek, has its worksheet gathered in memory first. The bytes
+   written are the same as before in every case, and a write that croaks
+   partway now leaves a truncated workbook, as it always did a delimited
+   file.
+
+ - A number was formatted with SvPV(), which caches the text in the SV it
+   is given: a hash of arrays holding a million numbers weighed 32 MB
+   before a call and 96 MB after, and stayed that way. It is now formatted
+   in a scratch copy.
+
+ - Finding the columns of an array or hash of hashes made a mortal copy of
+   every key of every row, all freed only when write_table returned: 202
+   MB for a 200000 x 20 array of hashes. They are now freed a row at a
+   time, leaving 30 MB, the hash iterators that perl's own keys() leaves
+   behind as well.
+
+ - A hash of arrays looked each column's array up once per cell, and now
+   does once per column: 0.209s became 0.155s on 200000 x 20. Each field
+   is scanned once for what makes it need quotes, where it was scanned
+   five times, and a quoted field is written in runs rather than a byte at
+   a time.
+
+ - Every buffer and handle is now on the save stack, so a croak from
+   anywhere -- a tied FETCH included, which none of the dozen hand-written
+   cleanups before each croak saw -- closes the file and leaks nothing.
+
 0.3211 2026-09-27 CDT
 
  [min(), max(), sum() and the other reductions: magical arguments]

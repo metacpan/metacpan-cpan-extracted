@@ -98,9 +98,10 @@ sub _build {
 }
 
 # mask_database_data($data): a copy of a database span's data with "db.statement" masked by
-# ForgeOps::Tracker::SqlStatement, so the SQL as written never reaches the payload however the
-# hash was built. A statement that isn't a plain string, or is blank, is dropped. The caller's hash
-# is never modified.
+# ForgeOps::Tracker::SqlStatement (with its "db.system", so a MySQL or MariaDB query's "double
+# quoted" strings are masked too), so the SQL as written never reaches the payload however the hash
+# was built. A statement that isn't a plain string, or is blank, is dropped. The caller's hash is
+# never modified.
 sub mask_database_data {
     my ($data) = @_;
     return {} unless ref $data eq 'HASH';
@@ -108,7 +109,8 @@ sub mask_database_data {
 
     my %masked = %$data;
     my $statement = delete $masked{'db.statement'};
-    $statement = ForgeOps::Tracker::SqlStatement::mask($statement) if defined $statement && !ref $statement;
+    $statement = ForgeOps::Tracker::SqlStatement::mask($statement, system => $masked{'db.system'})
+        if defined $statement && !ref $statement;
     $masked{'db.statement'} = $statement if defined $statement && !ref $statement;
     return \%masked;
 }

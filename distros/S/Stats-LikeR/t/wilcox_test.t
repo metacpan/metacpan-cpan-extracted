@@ -166,6 +166,62 @@ foreach my $k (qw(statistic statistic.name p.value method alternative
 	ok( exists $shape->{$k}, "wilcox_test: output has '$k'" );
 }
 
+# wilcox_test: tied arrays.  An element of a tied array has no value until its
+# FETCH runs, which is get magic; the element loops used to test SvOK() first,
+# so every element read as undef and a tied x croaked that it was empty.  Each
+# element is FETCHed exactly once, and every path gives what the plain arrays
+# give.
+{
+	package CountingArray;
+	require Tie::Array;
+	our @ISA = ('Tie::StdArray');
+	our $fetches = 0;
+	sub FETCH { $fetches++; my $self = shift; return $self->SUPER::FETCH(@_) }
+}
+{
+	tie my @tx, 'CountingArray'; @tx = @x;
+	tie my @ty, 'CountingArray'; @ty = @y;
+	foreach my $c (
+		[ 'two-sample',            [],                         2 * @x ],
+		[ 'two-sample, interval',  [ conf_int => 1 ],          undef ],
+		[ 'paired',                [ paired => 1 ],            2 * @x ],
+		[ 'asymptotic, interval',  [ exact => 0, conf_int => 1 ], undef ] ) {
+		my ($what, $opts, $want_fetches) = @$c;
+		local $CountingArray::fetches = 0;
+		my $t = wilcox_test(\@tx, \@ty, @$opts);
+		my $got_fetches = $CountingArray::fetches;
+		is_deeply( $t, wilcox_test(\@x, \@y, @$opts), "wilcox_test: tied arrays, $what: same result as plain ones" );
+		is( $got_fetches, $want_fetches, "wilcox_test: tied arrays, $what: one FETCH per element" )
+			if defined $want_fetches;
+	}
+	is_deeply( wilcox_test(\@tx, conf_int => 1), wilcox_test(\@x, conf_int => 1),
+		'wilcox_test: tied array, one-sample interval: same result as a plain one' );
+}
+
+# The messages that did not say which function they came from now do.
+throws_ok { wilcox_test([undef, 'a']) } qr/^wilcox_test: not enough \(non-missing\) 'x' observations/,
+	'wilcox_test: an all-missing x names the function';
+throws_ok { wilcox_test([1, 2], [undef]) } qr/^wilcox_test: not enough 'y' observations/,
+	'wilcox_test: an all-missing y names the function';
+throws_ok { wilcox_test([1, 2, 3], [1, 2], paired => 1) } qr/^wilcox_test: 'x' and 'y' must have the same length/,
+	'wilcox_test: a paired length mismatch names the function';
+
+# A difference of two like-signed infinities is NaN, which R's sort() drops
+# from the differences an exact interval is read from.  When every difference
+# is one, there is nothing left to read; R itself stops earlier, in the
+# p-value.  The interval is NaN, at level 0, with a warning.
+{
+	my $inf = 9 ** 9 ** 9;
+	my @w;
+	local $SIG{__WARN__} = sub { push @w, $_[0] };
+	my $r = wilcox_test([$inf, $inf], [$inf], conf_int => 1);
+	ok( scalar(grep { /every difference is Inf - Inf/ } @w), 'wilcox_test: all-NaN differences warn' );
+	ok( $r->{'conf.int'}[0] != $r->{'conf.int'}[0] && $r->{'conf.int'}[1] != $r->{'conf.int'}[1],
+		'wilcox_test: all-NaN differences give a NaN interval' );
+	is( $r->{'conf.level'}, 0, 'wilcox_test: all-NaN differences give level 0' );
+	ok( $r->{estimate} != $r->{estimate}, 'wilcox_test: all-NaN differences give a NaN estimate' );
+}
+
 # wilcox_test: memory
 no_leaks_ok {
 	eval { wilcox_test(\@x, \@y) }
@@ -176,5 +232,25 @@ no_leaks_ok {
 no_leaks_ok {
 	eval { wilcox_test(\@x, \@y, paired => 1, alternative => 'greater') }
 } 'wilcox_test(): no memory leaks (paired exact)' unless $INC{'Devel/Cover.pm'};
+
+# The interval paths allocate scratch on the save stack, and the exact scans
+# keep one permutation table between trial shifts that is freed by hand.
+my @tied_x = (1, 2, 2, 3, 3, 3, 4, 5);
+my @tied_y = (2, 3, 3, 4, 4, 5, 6, 6, 7);
+no_leaks_ok {
+	eval { wilcox_test(\@tied_x, \@tied_y, conf_int => 1) }
+} 'wilcox_test(): no memory leaks (two-sample exact interval with ties)' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok {
+	eval { wilcox_test(\@tied_x, conf_int => 1, mu => 3) }
+} 'wilcox_test(): no memory leaks (one-sample exact interval with ties and zeroes)' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok {
+	eval { wilcox_test(\@x, \@y, conf_int => 1) }
+} 'wilcox_test(): no memory leaks (two-sample exact interval)' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok {
+	eval { wilcox_test(\@x, \@y, exact => 0, conf_int => 1, digits_rank => 2) }
+} 'wilcox_test(): no memory leaks (two-sample asymptotic interval)' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok {
+	eval { wilcox_test(\@x, exact => 0, conf_int => 1) }
+} 'wilcox_test(): no memory leaks (one-sample asymptotic interval)' unless $INC{'Devel/Cover.pm'};
 
 done_testing();

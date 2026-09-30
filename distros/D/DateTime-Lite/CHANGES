@@ -1,5 +1,20 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.10.0 2026-09-30T11:15:40+0900
+    [Maintenance]
+    - SQLite database updated with the newly released IANA data version 2026e.
+    - No API change.
+
+v0.9.1 2026-09-12T15:09:12+0900
+    [New Feature]
+    - Added the method compare_epoch() in DateTime::Lite to compare an object with a
+      Unix timestamp, without the need for the caller to construct a temporary
+      DateTime::Lite object.
+    - Added as well the methods is_future() and is_past() in DateTime::Lite as concise
+      shortcuts to compare an object against the current time. These complement the
+      existing is_between() method.
+    - English and Japanese POD documentation updated for those three new methods.
+
 v0.9.0 2026-09-12T09:20:13+0900
     [Maintenance]
     - SQLite database updated with the newly released IANA data version 2026d.
@@ -73,8 +88,8 @@ v0.7.0 2026-05-17T21:29:35+0900
 v0.6.7 2026-05-05T21:08:09+0900
     [Bug Fixes]
     - Added checking for unknown arguments passed to constructors that were silently
-      ignored, and causing typos such as C<year> instead of C<years> in
-      C<DateTime::Lite::Duration->new> to produce incorrect results without
+      ignored, and causing typos such as 'year' instead of 'years' in
+      DateTime::Lite::Duration->new to produce incorrect results without
       any indication of error. All constructors now return an error when an
       unrecognised argument is supplied.
       This includes new(), from_epoch(), from_object(), from_day_of_year(),

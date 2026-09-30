@@ -20,6 +20,7 @@
 #ifndef BUF_DEFS_H
 #define BUF_DEFS_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -41,7 +42,7 @@
 
 #define BUF_MAGIC       0x42554631U  /* "BUF1" */
 #define BUF_VERSION     3            /* v3: added occupancy bitmap region (layout change) */
-#define BUF_ERR_BUFLEN  256
+#define BUF_ERR_BUFLEN  (PATH_MAX + 256)
 #define BUF_READER_SLOTS 1024         /* per-process reader-counter mirror */
 
 /* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
@@ -552,14 +553,36 @@ static int buf_secure_open(const char *path, mode_t file_mode, int *created, cha
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int buf_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int buf_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* Opt-in (DATA_BUFFER_SHARED_SPARSE=0): reserving commits memory this module otherwise fills lazily. */
+static int buf_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_BUFFER_SHARED_SPARSE");
+    if (!sp || strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static BufHandle *buf_create_map(const char *path, uint64_t capacity,
@@ -627,6 +650,7 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
         may_resize = (pread(fd, &probe, sizeof probe, 0) == (ssize_t)sizeof probe
                       && probe == 0);
     }
+    int reserved = 0;
     if (may_resize && (uint64_t)st.st_size < total_size) {
         if (ftruncate(fd, (off_t)total_size) < 0) {
             snprintf(errbuf, BUF_ERR_BUFLEN, "ftruncate(%s): %s", path, strerror(errno));
@@ -634,6 +658,14 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
             close(fd);
             return NULL;
         }
+        if (buf_reserve(fd, total_size) < 0) {
+            snprintf(errbuf, BUF_ERR_BUFLEN, "%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total_size, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN);
+            close(fd);
+            return NULL;
+        }
+        reserved = 1;
     }
 
     /* Re-stat after possible truncate */
@@ -682,7 +714,7 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
         /* Re-initialize a pre-existing file ONLY when it is provably all-zero (a
          * fresh ftruncate, which is all an abandoned mid-init creator leaves), so
          * a same-owner file that merely starts with a zero word is never clobbered. */
-        if (!created && !buf_region_is_zero(base, (size_t)st.st_size)) {
+        if (!created && !buf_file_is_zero(fd, (uint64_t)st.st_size)) {
             snprintf(errbuf, BUF_ERR_BUFLEN, "%s: uninitialized file is not empty; refusing to initialize", path);
             goto fail;
         }
@@ -691,6 +723,10 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
          * we then turn around and refuse. */
         if (!created && fchmod(fd, file_mode) < 0) {
             snprintf(errbuf, BUF_ERR_BUFLEN, "%s: fchmod: %s", path, strerror(errno));
+            goto fail;
+        }
+        if (!reserved && buf_reserve(fd, (uint64_t)st.st_size) < 0) {
+            snprintf(errbuf, BUF_ERR_BUFLEN, "%s: cannot reserve %llu bytes: %s", path, (unsigned long long)st.st_size, strerror(errno));
             goto fail;
         }
         /* Zero reader_slots + occ bitmap, before any header field is written, so a
@@ -863,6 +899,11 @@ static BufHandle *buf_create_memfd(const char *name, uint64_t capacity,
         close(fd);
         return NULL;
     }
+    if (buf_reserve(fd, total_size) < 0) {
+        snprintf(errbuf, BUF_ERR_BUFLEN, "memfd: cannot reserve %llu bytes: %s", (unsigned long long)total_size, strerror(errno));
+        close(fd);
+        return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
 
     void *base = mmap(NULL, (size_t)total_size, PROT_READ | PROT_WRITE,
@@ -921,6 +962,12 @@ static BufHandle *buf_open_fd(int fd, uint32_t elem_size, uint32_t variant_id,
     }
     if ((uint64_t)st.st_size < sizeof(BufHeader)) {
         snprintf(errbuf, BUF_ERR_BUFLEN, "fd=%d: file too small for header", fd);
+        return NULL;
+    }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic = 0;
+    if (pread(fd, &magic, sizeof magic, offsetof(BufHeader, magic)) != (ssize_t)sizeof magic || magic != BUF_MAGIC) {
+        snprintf(errbuf, BUF_ERR_BUFLEN, "fd=%d: bad magic (0x%08x)", fd, magic);
         return NULL;
     }
 

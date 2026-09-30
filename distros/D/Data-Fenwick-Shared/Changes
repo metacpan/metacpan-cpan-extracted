@@ -1,30 +1,28 @@
 Revision history for Data-Fenwick-Shared
 
+0.05      2026-09-26
+          - DATA_FENWICK_SHARED_SPARSE=0 reserves segments up front, so a full
+            filesystem fails the constructor, not a later write.
+          - A failed create no longer leaves a full-size file behind.
+          - Checking a half-created file no longer allocates it on tmpfs.
+          - Long paths no longer cut the reason from error messages.
+
 0.04      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
 
 0.03      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Frozen read-only mode: freeze() seals a file-backed structure;
-            new_readonly() maps it O_RDONLY and queries it lock-free.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
+          - A file left by an interrupted create is recovered, not refused.
+          - freeze()/new_readonly(): sealed read-only mode, lock-free.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.02      2026-07-22
-          - Fix a use-after-free in merge(): sv_isobject on the peer argument
-            runs get-magic, so a tied argument can destroy this object before
-            its handle is used again. Such a call now croaks.
-          - Add range-update mode (new_range / range_add; O(log n) range queries).
-          - Resolve argument magic before capturing the path string.
-          - Correct the POD: 0.02 cannot open a 0.01 file.
+          - Add range-update mode (new_range / range_add).
+          - Fix a use-after-free in merge() when a tied peer destroys the
+            object; it now croaks.
+          - 0.02 cannot open a 0.01 file.
 
 0.01      2026-07-10
-          - Initial release. Shared-memory Fenwick tree (binary indexed tree):
-            O(log n) point update and prefix-sum query over n signed int64
-            positions, plus range/point/total, set, and a find (binary-lifting
-            rank / weighted-sample lookup). Backed by a file, anonymous mapping,
-            or memfd; write-preferring rwlock with dead-process recovery;
-            element-wise merge. Linux, 64-bit Perl.
+          - Initial release: shared-memory Fenwick tree over signed int64 with
+            O(log n) update, prefix sum, range, set and find; file, anonymous
+            or memfd; rwlock with dead-process recovery; merge.

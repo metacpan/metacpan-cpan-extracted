@@ -38,6 +38,7 @@ xt/cross_module_fd.t
 xt/destroy_during_call.t
 xt/displaced_writer.t
 xt/eg_runs.t
+xt/enospc.t
 xt/epoch_boundary.t
 xt/fd_leak.t
 xt/fd_validation.t

@@ -20,7 +20,25 @@ use constant MAX_LENGTH      => 4000;
 use constant MAX_NAMES       => 10;
 use constant MAX_NAME_LENGTH => 200;
 
-my $LITERAL = qr/'(?:[^']|'')*(?:'|\z)|(\$[A-Za-z_]*\$).*?(?:\1|\z)|(?<![\w\$.])\d+(?:\.\d+)?(?!\w)/s;
+# db.system values where "double quotes" are a string, not a name.
+my %DOUBLE_QUOTED_STRING_SYSTEMS = map { $_ => 1 } qw(mysql mariadb);
+
+# /a keeps \w and \d to ASCII, as they are in the Ruby original, even on a string Perl holds as
+# characters. The prefix only counts as one when it isn't the end of a word, but the quote always
+# does: LIKE'%x%', with no space, is still a string. A backslash can be the statement's last
+# character ('secret\ cut off mid-escape), and the string is still masked to the end. A string's
+# body is the Ruby original's (?:[^'\\]|\\(?:.|\z)|'')* unrolled into runs, which matches exactly
+# the same text: Perl stops repeating a group like that one after a fixed count (65534 on Perl 5.34,
+# fewer on older ones) and warns, so the original form would leave a string longer than that
+# unmasked, where this only runs out at that many escapes in one string.
+my $STRING               = qr/(?:(?<![\w\$])(?:[EeXxNnBb]|[Uu]&))?'[^'\\]*(?:(?:\\(?:.|\z)|'')[^'\\]*)*(?:'|\z)/sa;
+my $DOUBLE_QUOTED_STRING = qr/"[^"\\]*(?:(?:\\(?:.|\z)|"")[^"\\]*)*(?:"|\z)/s;
+my $DOLLAR_QUOTED        = qr/(?<tag>\$[A-Za-z_]*\$).*?(?:\k<tag>|\z)/s;
+# [0-9A-Fa-f] where the Ruby original has \h: in Perl, \h is horizontal whitespace.
+my $NUMBER = qr/(?<![\w\$.])(?:0[xX][0-9A-Fa-f]+|0[bB][01]+|(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)(?!\w)/a;
+
+my $LITERAL                    = qr/$STRING|$DOLLAR_QUOTED|$NUMBER/;
+my $LITERAL_WITH_DOUBLE_QUOTES = qr/$STRING|$DOUBLE_QUOTED_STRING|$DOLLAR_QUOTED|$NUMBER/;
 
 my $PART = q{(?:[\w$#@]+|"[^"]+"|\[[^\]]+\]|`[^`]+`)};
 my $NAME = qr/$PART(?:\.$PART)*/;
@@ -63,11 +81,15 @@ sub find_in {
     return undef;
 }
 
+# mask($statement, system => $db_system): pass the query's db.system when it's known. On mysql and
+# mariadb "double quotes" are a string too, so they're masked there and left alone everywhere else.
 sub mask {
-    my ($statement) = @_;
+    my ($statement, %options) = @_;
     return undef unless defined $statement && $statement =~ /\S/;
 
-    (my $masked = $statement) =~ s/$LITERAL/MASK/ge;
+    my $system = defined $options{system} && !ref $options{system} ? lc $options{system} : '';
+    my $pattern = $DOUBLE_QUOTED_STRING_SYSTEMS{$system} ? $LITERAL_WITH_DOUBLE_QUOTES : $LITERAL;
+    (my $masked = $statement) =~ s/$pattern/MASK/ge;
     return length($masked) > MAX_LENGTH ? substr($masked, 0, MAX_LENGTH) . '...' : $masked;
 }
 

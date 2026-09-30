@@ -10,7 +10,7 @@ use File::Copy qw(move);
 use Cwd qw(abs_path getcwd);
 use version;
 
-our $VERSION = '5.26.2';
+our $VERSION = '5.26.3';
 my $CREATED = '2018-10-08';
 
 sub new {
@@ -272,10 +272,10 @@ sub update_table {
         $adb->table_close($file_path);
 
         # Eski turetilen indeks dosyalarini temizle
-    for my $iext (qw(inx src fld fac slg)) {
-        my $idx_f = "$table_path.$iext";
-        unlink $idx_f if -e $idx_f;
-    }
+        for my $iext (qw(inx src fld fac slg ajw ajn)) {
+            my $idx_f = "$table_path.$iext";
+            unlink $idx_f if -e $idx_f;
+        }
     $adb->clear_cache($tableid);
     }
     else {

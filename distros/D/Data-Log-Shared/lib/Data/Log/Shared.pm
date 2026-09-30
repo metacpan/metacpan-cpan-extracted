@@ -1,7 +1,7 @@
 package Data::Log::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 require XSLoader;
 XSLoader::load('Data::Log::Shared', $VERSION);
 
@@ -73,6 +73,12 @@ L<Data::PubSub::Shared> (ring overwrites), the log retains all entries
 until truncation. Useful for audit trails, event sourcing, debug logging.
 
 B<Linux-only>. Requires 64-bit Perl.
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of dying with C<SIGBUS> while the
+segment is initialized; set C<DATA_LOG_SHARED_SPARSE=1> to skip the
+reservation. On tmpfs and memfd the segment is memory, and a memory cgroup too
+small for it gets an OOM kill rather than a croak.
 
 =head1 METHODS
 

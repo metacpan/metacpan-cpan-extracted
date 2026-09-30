@@ -61,7 +61,7 @@ if ($pid == 0) {
     _exit($r->latest == 42 ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'cross-process read';
+is $?, 0, 'cross-process read';
 
 # child writes, parent reads
 $pid = fork // die;

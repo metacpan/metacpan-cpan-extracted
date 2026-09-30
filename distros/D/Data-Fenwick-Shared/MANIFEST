@@ -14,6 +14,7 @@ t/04-recover.t
 xt/asan.t
 xt/crash_recovery.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fork_fen.t
 xt/kwalitee.t
 xt/pod.t

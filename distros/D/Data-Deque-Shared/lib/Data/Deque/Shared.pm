@@ -1,7 +1,7 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
 
@@ -115,6 +115,12 @@ backing file is created (default C<0600>); see L</SECURITY>.
 C<new_memfd> creates an anonymous C<memfd> sealed mapping named C<$name>;
 retrieve its descriptor with C<memfd> and re-attach in another process
 (after passing the fd across, e.g. via C<SCM_RIGHTS>) with C<new_from_fd>.
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of dying with SIGBUS while they zero
+it; C<DATA_DEQUE_SHARED_SPARSE=1> skips the reservation. On tmpfs and memfd
+the segment is memory, and a memory cgroup too small for it gets an OOM kill
+rather than a croak.
 
 All constructors croak on failure. The descriptor you pass is duplicated
 (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not

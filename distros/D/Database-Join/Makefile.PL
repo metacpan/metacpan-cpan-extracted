@@ -28,6 +28,7 @@ WriteMakefile(
 		'File::Temp'               => 0,
 		'JSON::MaybeXS'            => 0,
 		'List::Util'               => '1.33',
+		'Log::Abstraction'         => '0.33',
 		'Object::Configure'        => 0,
 		'Params::Get'              => '0.13',
 		'Params::Validate::Strict' => '0.39',

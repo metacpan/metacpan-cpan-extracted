@@ -107,17 +107,28 @@ for my $fmt (sort keys %by_format) {
 	is($out, announcement($file), 'xlsx => 1 announces the name it was given');
 }
 
-# nothing written, nothing announced
-{
-	# An empty frame returns before a file is ever opened.
-	my $file = "$dir/never.csv";
-	my $out  = child_stdout("write_table([], '$file');");
-	is($out, '', 'an empty frame announces nothing');
-	ok(!-e $file, 'an empty frame writes no file');
+# A write that fails announces nothing: a full disk shows only when the buffer
+# goes out at the close, which is now checked before the line is printed.  The
+# check is guarded as R's own tests/reg-tests-1d.R (PR#17243) guards its test.
+SKIP: {
+	skip 'no writable /dev/full here', 2 unless -e '/dev/full' && -w '/dev/full';
+	my $out = child_stdout("eval { write_table([{ a => 1 }], '/dev/full', sep => ',') }; print STDERR \$\@;");
+	is($out, '', 'a write to a full disk announces nothing');
+	$out = child_stdout("eval { write_table([{ a => 1 }], '/dev/full', xlsx => 1) }; print STDERR \$\@;");
+	is($out, '', 'an .xlsx write to a full disk announces nothing');
+}
 
-	my $ehash = "$dir/never2.csv";
+# An empty frame is a table with no rows: it writes its file, and so announces
+# it.  Up to 0.3212 it returned before a file was opened, and said nothing.
+{
+	my $file = "$dir/empty.csv";
+	my $out  = child_stdout("write_table([], '$file');");
+	is($out, announcement($file), 'an empty frame announces the file it wrote');
+	ok(-e $file, 'an empty frame writes its file');
+
+	my $ehash = "$dir/empty2.csv";
 	my $out2  = child_stdout("write_table({}, '$ehash');");
-	is($out2, '', 'an empty hash announces nothing');
+	is($out2, announcement($ehash), 'an empty hash announces the file it wrote');
 }
 
 {

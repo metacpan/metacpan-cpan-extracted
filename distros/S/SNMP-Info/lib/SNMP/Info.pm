@@ -26,7 +26,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.977001';
+$VERSION = '3.978000';
 
 =head1 NAME
 
@@ -34,7 +34,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.977001
+SNMP::Info - Version 3.978000
 
 =head1 AUTHOR
 
@@ -294,6 +294,13 @@ See documentation in L<SNMP::Info::CDP> for details.
 SNMP Interface to Cisco Aggregated Links
 
 See documentation in L<SNMP::Info::CiscoAgg> for details.
+
+=item SNMP::Info::CiscoAuthFramework
+
+F<CISCO-AUTH-FRAMEWORK-MIB>. Cisco Authentication Framework session
+information, including dynamically assigned authentication VLANs.
+
+See documentation in L<SNMP::Info::CiscoAuthFramework> for details.
 
 =item SNMP::Info::CiscoBGP
 
@@ -677,6 +684,12 @@ Class for Kentrox DataSMART DSU/CSU.
 
 See documentation in L<SNMP::Info::Layer2::Kentrox> for details.
 
+=item SNMP::Info::Layer2::Microsens
+
+Subclass for MICROSENS managed switches, including G6 and G6+.
+
+See documentation in L<SNMP::Info::Layer2::Microsens> for details.
+
 =item SNMP::Info::Layer2::N2270
 
 Subclass for Nortel 2270 wireless switches.
@@ -946,6 +959,12 @@ Subclass for F5 devices.
 
 See documentation in L<SNMP::Info::Layer3::F5> for details.
 
+=item SNMP::Info::Layer3::F5OS
+
+Subclass for F5OS devices.
+
+See documentation in L<SNMP::Info::Layer3::F5OS> for details.
+
 =item SNMP::Info::Layer3::Force10
 
 Subclass for Force10 devices.
@@ -1002,6 +1021,12 @@ See documentation in L<SNMP::Info::Layer3::IBMGbTor> for details.
 Subclass for Juniper devices.
 
 See documentation in L<SNMP::Info::Layer3::Juniper> for details.
+
+=item SNMP::Info::Layer3::Lancom
+
+Subclass for LANCOM devices running LCOS.
+
+See documentation in L<SNMP::Info::Layer3::Lancom> for details.
 
 =item SNMP::Info::Layer3::Lantronix
 
@@ -1117,6 +1142,12 @@ See documentation in L<SNMP::Info::Layer3::Scalance> for details.
 Subclass for generic SonicWALL devices.
 
 See documentation in L<SNMP::Info::Layer3::SonicWALL> for details.
+
+=item SNMP::Info::Layer3::Sophos
+
+Subclass for Sophos SFOS firewalls.
+
+See documentation in L<SNMP::Info::Layer3::Sophos> for details.
 
 =item SNMP::Info::Layer3::Steelfusion
 
@@ -1239,6 +1270,19 @@ See documentation in L<SNMP::Info::Layer7::Neoteris> for details.
 Subclass for Citrix Netscaler appliances.
 
 See documentation in L<SNMP::Info::Layer7::Netscaler> for details.
+
+=item SNMP::Info::Layer7::QNAP
+
+Subclass for QNAP NAS devices running QTS or QuTS hero.  The operating-system
+family is reported as C<qts> or C<quts hero>.
+
+See documentation in L<SNMP::Info::Layer7::QNAP> for details.
+
+=item SNMP::Info::Layer7::Kemp
+
+Subclass for Kemp LoadMaster appliances.
+
+See documentation in L<SNMP::Info::Layer7::Kemp> for details.
 
 =item SNMP::Info::Layer7::Stormshield
 
@@ -1830,6 +1874,8 @@ sub device_type {
         2011  => 'SNMP::Info::Layer3::Huawei',
         2021  => 'SNMP::Info::Layer3::NetSNMP',
         2272  => 'SNMP::Info::Layer3::Passport',
+        2356  => 'SNMP::Info::Layer3::Lancom',
+        2604  => 'SNMP::Info::Layer3::Sophos',
         2620  => 'SNMP::Info::Layer3::CheckPoint',
         2636  => 'SNMP::Info::Layer3::Juniper',
         2925  => 'SNMP::Info::Layer1::Cyclades',
@@ -1852,6 +1898,8 @@ sub device_type {
         10002 => 'SNMP::Info::Layer2::Ubiquiti',
         10418 => 'SNMP::Info::Layer1::Cyclades',
         11256 => 'SNMP::Info::Layer7::Stormshield',
+        12196 => 'SNMP::Info::Layer7::Kemp',
+        12276 => 'SNMP::Info::Layer3::F5OS',
         12325 => 'SNMP::Info::Layer3::Pf',
         12356 => 'SNMP::Info::Layer3::Fortinet',
         13191 => 'SNMP::Info::Layer3::OneAccess',
@@ -1899,6 +1947,7 @@ sub device_type {
         2011  => 'SNMP::Info::Layer3::Huawei',
         2272  => 'SNMP::Info::Layer3::Passport',
         2925  => 'SNMP::Info::Layer1::Cyclades',
+        3181  => 'SNMP::Info::Layer2::Microsens',
         3224  => 'SNMP::Info::Layer3::Netscreen',
         3375  => 'SNMP::Info::Layer3::F5',
         4526  => 'SNMP::Info::Layer2::Netgear',
@@ -1935,10 +1984,13 @@ sub device_type {
         5951  => 'SNMP::Info::Layer7::Netscaler',
         9694  => 'SNMP::Info::Layer7::Arbor',
         11256 => 'SNMP::Info::Layer7::Stormshield',
+        12196 => 'SNMP::Info::Layer7::Kemp',
         12532 => 'SNMP::Info::Layer7::Neoteris',
         14525 => 'SNMP::Info::Layer2::Trapeze',
         21796 => 'SNMP::Info::Layer7::HWGroup',
+        24681 => 'SNMP::Info::Layer7::QNAP',
         26866 => 'SNMP::Info::Layer7::Gigamon',
+        55062 => 'SNMP::Info::Layer7::QNAP',
     );
 
     # Get just the enterprise number for generic mapping

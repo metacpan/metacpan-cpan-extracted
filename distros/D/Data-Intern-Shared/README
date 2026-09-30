@@ -66,6 +66,14 @@ METHODS
     closing it does not disturb the handle. "new_readonly" opens a frozen file
     read-only for lock-free querying (see "FROZEN (READ-ONLY) MODE").
 
+    "new" and "new_memfd" create a new segment sparse: pages are allocated as
+    they are first written, and once the filesystem is full, an "intern" that
+    writes a page not yet allocated dies with "SIGBUS". Set
+    "DATA_INTERN_SHARED_SPARSE=0" to reserve the whole segment at creation, so
+    a full filesystem makes them croak instead; on tmpfs and memfd that
+    commits the segment's memory at once, and a memory cgroup too small for it
+    gets an OOM kill rather than a croak.
+
   Interning
         my $id = $in->intern($str);   # id (>=0); undef if the id space or arena is full
         $in->id_of($str);             # id, or undef if $str was never interned

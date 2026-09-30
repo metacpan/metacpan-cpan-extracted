@@ -59,6 +59,12 @@ METHODS
     ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
     disturb the buffer.
 
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of the initialization dying with
+    SIGBUS; set "DATA_RINGBUFFER_SHARED_SPARSE=1" to skip the reservation. On
+    tmpfs and memfd the segment is memory, and a memory cgroup too small for
+    it gets an OOM kill rather than a croak.
+
   Write
         my $seq = $ring->write($value);  # returns sequence number
 

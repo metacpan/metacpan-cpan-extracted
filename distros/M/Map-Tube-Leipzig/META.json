@@ -1,5 +1,5 @@
 {
-   "abstract" : "Interface to the Leipzig Rail Map.",
+   "abstract" : "Interface to the Leipzig/Halle S-Bahn and Tram Map.",
    "author" : [
       "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
    ],
@@ -63,6 +63,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Leipzig"
       }
    },
-   "version" : "0.03",
+   "version" : "v0.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

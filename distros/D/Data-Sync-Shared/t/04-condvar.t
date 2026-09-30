@@ -34,7 +34,7 @@ $cv->unlock;
         _exit($got);
     }
     waitpid($pid, 0);
-    is $? >> 8, 0, 'try_lock fails when another process holds';
+    is $?, 0, 'try_lock fails when another process holds';
     $c->unlock;
 }
 
@@ -78,7 +78,7 @@ $cv->unlock;
     $c->unlock;
 
     waitpid($pid, 0);
-    is $? >> 8, 0, 'child was signaled';
+    is $?, 0, 'child was signaled';
 }
 
 # Broadcast wakes all waiters
@@ -106,7 +106,7 @@ $cv->unlock;
 
     for my $pid (@pids) {
         waitpid($pid, 0);
-        is $? >> 8, 0, "child $pid woke from broadcast";
+        is $?, 0, "child $pid woke from broadcast";
     }
 }
 

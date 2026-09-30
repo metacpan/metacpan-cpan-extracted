@@ -74,7 +74,7 @@ if ($pid == 0) {
     _exit($d eq "from parent" ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'child read parent entry';
+is $?, 0, 'child read parent entry';
 
 # concurrent append
 $log->reset;

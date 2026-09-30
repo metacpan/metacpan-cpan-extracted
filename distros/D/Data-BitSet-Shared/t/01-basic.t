@@ -98,7 +98,7 @@ if ($pid == 0) {
     _exit($bs->test(42) == 1 ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'cross-process read';
+is $?, 0, 'cross-process read';
 
 # concurrent set from child
 $pid = fork // die;
