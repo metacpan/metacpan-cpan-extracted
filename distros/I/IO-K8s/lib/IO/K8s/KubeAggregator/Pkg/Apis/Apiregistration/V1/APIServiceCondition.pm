@@ -1,6 +1,6 @@
 package IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceCondition;
 # ABSTRACT: APIServiceCondition describes the state of an APIService at a particular point
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
@@ -32,7 +32,7 @@ IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceCondition - A
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 lastTransitionTime
 

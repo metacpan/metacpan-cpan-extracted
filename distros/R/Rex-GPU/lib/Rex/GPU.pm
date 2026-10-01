@@ -1,9 +1,11 @@
 # ABSTRACT: GPU detection and driver management for Rex
 
 package Rex::GPU;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use v5.14.4;
 use warnings;
+
+use Scalar::Util qw( blessed );
 
 use Rex::GPU::Detect;
 use Rex::GPU::NVIDIA;
@@ -21,11 +23,14 @@ use vars qw(@EXPORT);
 
 
 sub gpu_detect {
-  return Rex::GPU::Detect::detect();
+  my ( $class, %opts ) = _invocant(@_) ? @_ : ( __PACKAGE__, @_ );
+  my $detect = $class->detect_class($opts{detect});
+  return $class->_step($detect, 'Rex::GPU::Detect', 'detect');
 }
 
 
 sub _check_connection {
+  my ( $class ) = @_;
   my $conn = Rex::get_current_connection() or return;
   return if Rex::is_local();
 
@@ -42,21 +47,28 @@ sub _check_connection {
 }
 
 sub gpu_setup {
-  my (%opts) = @_;
+  my ( $class, %opts ) = _invocant(@_) ? @_ : ( __PACKAGE__, @_ );
 
-  _check_connection();
+  $class->_step($class, __PACKAGE__, '_check_connection');
+
+  # A class of the user's (nvidia => / detect =>, set gpu_nvidia_class /
+  # gpu_detect_class, karr #71) that cannot be loaded dies here, before
+  # anything touches the host.
+  my $nvidia = $class->nvidia_class($opts{nvidia});
+  $class->detect_class($opts{detect});
 
   # A containerd_config typo dies here (karr #66), not after the driver
   # install and a reboot.
   my $runtime = $opts{containerd_config} // 'rke2';
-  Rex::GPU::NVIDIA::_check_containerd_runtime($runtime, 'none');
+  $nvidia->_check_containerd_runtime($runtime, 'none');
 
   # A custom setup (setup => / set gpu_nvidia_setup, karr #34) that cannot be
   # loaded dies here, before detection installs pciutils -- on every host, not
   # only on one with a GPU.
-  Rex::GPU::NVIDIA->custom_setup($opts{setup});
+  $nvidia->custom_setup($opts{setup});
 
-  my $gpus = gpu_detect();
+  my $gpus = $class->_step($class, __PACKAGE__, 'gpu_detect',
+    ( defined $opts{detect} ? ( detect => $opts{detect} ) : () ));
 
   if ($gpus->{nvidia} && @{$gpus->{nvidia}}) {
     my @compute = grep { $_->{compute} } @{$gpus->{nvidia}};
@@ -68,22 +80,22 @@ sub gpu_setup {
       my $nvswitch = $gpus->{nvswitch} // [];
       Rex::Logger::info("NVSwitch host (".scalar(@$nvswitch)." NVSwitch): NVIDIA Fabric "
         ."Manager is installed with the driver") if @$nvswitch;
-      Rex::GPU::NVIDIA::install_driver(
+      $class->_step($nvidia, 'Rex::GPU::NVIDIA', 'install_driver',
         reboot => ($opts{reboot} ? 1 : 0),
         gpus   => \@compute,
         ( map { defined $opts{$_} ? ( $_ => $opts{$_} ) : () } qw( setup requirement ) ),
         ( @$nvswitch ? ( nvswitches => $nvswitch ) : () ),
       );
-      Rex::GPU::NVIDIA::install_container_toolkit();
-      Rex::GPU::NVIDIA::generate_cdi_specs();
+      $class->_step($nvidia, 'Rex::GPU::NVIDIA', 'install_container_toolkit');
+      $class->_step($nvidia, 'Rex::GPU::NVIDIA', 'generate_cdi_specs');
 
       if ($runtime ne 'none') {
-        Rex::GPU::NVIDIA::configure_containerd($runtime);
+        $class->_step($nvidia, 'Rex::GPU::NVIDIA', 'configure_containerd', $runtime);
       }
 
       # The full check, toolkit included, once the toolkit is there (karr
       # #42); install_driver checks only the driver.
-      Rex::GPU::NVIDIA::verify_nvidia();
+      $class->_step($nvidia, 'Rex::GPU::NVIDIA', 'verify_nvidia');
     }
   }
 
@@ -92,6 +104,40 @@ sub gpu_setup {
   }
 
   return $gpus;
+}
+
+
+sub nvidia_class {
+  my ( $class, $nvidia ) = @_;
+  return Rex::GPU::NVIDIA->configured_class($nvidia);
+}
+
+
+sub detect_class {
+  my ( $class, $detect ) = @_;
+  return Rex::GPU::Detect->configured_class($detect);
+}
+
+# One step of the pipeline. With the built-in class ($target eq $base) it is
+# called through its function name, with exactly the arguments it always got:
+# Rex::Rancher's tests, kubernetes-ocp's and t/ replace those globs
+# (*Rex::GPU::NVIDIA::install_driver, *Rex::GPU::gpu_detect, ...) and record
+# @_. A class of the user's gets a method call instead.
+sub _step {
+  my ( $class, $target, $base, $name, @args ) = @_;
+  return $target eq $base ? $base->can($name)->(@args) : $target->$name(@args);
+}
+
+# Called as a method (Rex::GPU->gpu_setup, My::GPU->gpu_setup): the invocant,
+# a class name or object that isa Rex::GPU. Called as a function
+# (gpu_setup(...) from a Rexfile, Rex::GPU::gpu_setup(...)): undef -- a first
+# argument such as 'containerd_config' is no package of ours, and nothing is
+# loaded to find out.
+sub _invocant {
+  my ( $first ) = @_;
+  return unless defined $first && ( !ref $first || blessed $first );
+  return $first if eval { $first->isa(__PACKAGE__) };
+  return;
 }
 
 1;
@@ -108,7 +154,7 @@ Rex::GPU - GPU detection and driver management for Rex
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -216,6 +262,11 @@ a deliberate security tradeoff:
 
 =head1 FUNCTIONS
 
+Each function also works as a class method, C<Rex::GPU-E<gt>gpu_setup(...)>
+or C<My::GPU-E<gt>gpu_setup(...)> for a subclass of your own (experimental),
+with the same arguments; called as a function it runs as C<Rex::GPU>. See
+L</CLASSES OF YOUR OWN>.
+
 =head2 gpu_detect
 
 Detect GPU hardware on the remote host by scanning PCI devices. Installs
@@ -242,7 +293,7 @@ NVSwitch chips under C<nvswitch>:
   #   ],
   #   amd => [
   #     {
-  #       name      => "Radeon RX 7900 XTX",
+  #       name      => "Navi 31 [Radeon RX 7900 XTX]",
   #       vendor    => "amd",
   #       pci_class => "0300",
   #       compute   => 0,        # always 0 (AMD not yet supported)
@@ -259,6 +310,15 @@ apart from a physical or passed-through card by its PCI subsystem ID, read
 with another read-only C<lspci> only on hosts with an NVIDIA GPU: C<vgpu =E<gt> 1>
 and C<vgpu_type> (see L<Rex::GPU::Detect/NVIDIA vGPU guests>). See
 L<Rex::GPU::Detect> for details on the classification logic.
+
+  my $gpus = gpu_detect(detect => 'My::GPU::Detect');
+
+B<Experimental.> The one option, C<detect>, names the L<Rex::GPU::Detect>
+subclass that detects instead (see L</detect_class>); without it
+C<set gpu_detect_class> or C<Rex::GPU::Detect> does. The built-in
+L<Rex::GPU::Detect::Sysfs> is one: it reads C</sys/bus/pci/devices>
+instead of C<lspci>, installs nothing, and returns the same shape without
+product names (C<compute> is C<undef> where only a name could decide).
 
 =head2 gpu_setup
 
@@ -412,16 +472,90 @@ GPU's hard limit. If no driver meets both, C<gpu_setup> dies before the
 driver install changes the host. Passed to
 L<Rex::GPU::NVIDIA/install_driver>.
 
+=item C<nvidia>
+
+B<Experimental.> A subclass of L<Rex::GPU::NVIDIA> (a class name) that
+runs every NVIDIA step -- L<Rex::GPU::NVIDIA/install_driver>, the container
+toolkit, CDI, containerd, verification -- as class methods, so it can
+override any of them or any helper they call. Without it, C<set
+gpu_nvidia_class =E<gt> 'My::GPU::NVIDIA'> in the Rexfile does the same for
+every call, a plain function call such as C<install_driver(...)> included;
+this option wins over it. See L</nvidia_class>.
+
+=item C<detect>
+
+B<Experimental.> A subclass of L<Rex::GPU::Detect> (a class name) that
+detects the GPUs instead, passed to L</gpu_detect>; without it C<set
+gpu_detect_class>. See L</detect_class>. C<detect =E<gt>
+'Rex::GPU::Detect::Sysfs'> detects from sysfs, without C<lspci> and
+without installing C<pciutils>; a GPU it leaves at C<compute =E<gt> undef>
+(no generation row, no name to judge) gets no driver here.
+
 =back
 
-Neither option changes anything for a caller that does not pass it; in
-particular L<Rex::Rancher>'s C<gpu =E<gt> 1> passes neither, and picks up a
-custom setup through C<set gpu_nvidia_setup>.
+A class of C<setup>, C<nvidia> or C<detect> that cannot be loaded or does
+not extend its base class makes C<gpu_setup> die before anything is done on
+the host, even on a host without a GPU.
+
+None of these options changes anything for a caller that does not pass
+it; in particular L<Rex::Rancher>'s C<gpu =E<gt> 1> passes none, and picks
+up a custom setup through C<set gpu_nvidia_setup> and custom classes
+through C<set gpu_nvidia_class> / C<set gpu_detect_class>.
 
 Returns the result of L<Rex::GPU::Detect/detect> — a hashref with C<nvidia>,
 C<amd> and C<nvswitch> array keys.
 
 Dies if the connection backend is neither LibSSH nor SFTP-capable.
+
+=head2 nvidia_class
+
+  my $class = Rex::GPU->nvidia_class($nvidia_option);
+
+B<Experimental.> The L<Rex::GPU::NVIDIA> class L</gpu_setup> installs with:
+C<$nvidia_option> (its C<nvidia> option) if defined, else C<set
+gpu_nvidia_class>, else C<Rex::GPU::NVIDIA>. See
+L<Rex::GPU::NVIDIA/configured_class>; croaks before anything touches the
+host for a class that cannot be loaded or is not a L<Rex::GPU::NVIDIA>.
+
+=head2 detect_class
+
+  my $class = Rex::GPU->detect_class($detect_option);
+
+B<Experimental.> The L<Rex::GPU::Detect> class L</gpu_detect> (and so
+L</gpu_setup>) detects with: C<$detect_option> (their C<detect> option) if
+defined, else C<set gpu_detect_class>, else C<Rex::GPU::Detect>. See
+L<Rex::GPU::Detect/configured_class>.
+
+=head1 CLASSES OF YOUR OWN
+
+B<Experimental>, like L<Rex::GPU::NVIDIA::Setup>. C<Rex::GPU>,
+L<Rex::GPU::Detect> and L<Rex::GPU::NVIDIA> are plain packages whose
+functions are also class methods: every step and every private helper is
+called through the class it runs as, so a subclass overrides one without
+copying the rest.
+
+  # lib/My/GPU/NVIDIA.pm, next to the Rexfile
+  package My::GPU::NVIDIA;
+  use parent 'Rex::GPU::NVIDIA';
+  sub generate_cdi_specs {
+    my ( $class, @args ) = @_;
+    $class->next::method(@args);     # or SUPER::, never the function name
+    # ... your extra step
+  }
+  1;
+
+  # Rexfile
+  set gpu_nvidia_class => 'My::GPU::NVIDIA';   # or gpu_setup(nvidia => ...)
+
+A function call (C<install_driver(...)>, C<Rex::GPU::NVIDIA::verify_nvidia()>,
+C<configure_containerd('rke2')>) is passed on unchanged, as a method, to
+the configured class (L<Rex::GPU::NVIDIA/configured_class>,
+L<Rex::GPU::Detect/configured_class>). An override must therefore call the
+built-in step as a method (C<next::method>, C<SUPER::>), not by its
+function name, which with C<set gpu_nvidia_class> comes back to it. L</gpu_setup> calls each step
+through its function name while the built-in class is in use, so code that
+replaces C<Rex::GPU::NVIDIA::install_driver> and friends sees the same
+arguments as before.
 
 =head1 SEE ALSO
 

@@ -18,6 +18,9 @@ use Test::More;
 
 use Rex::Rancher;
 use Rex::Rancher::Cilium;
+use Rex::Rancher::Distribution;
+
+sub rke2_default { Rex::Rancher::Distribution->new_for('rke2')->default_disable }
 
 my @warnings;
 {
@@ -26,7 +29,7 @@ my @warnings;
 }
 
 my $CHART   = 'rke2-gateway-api-crd';
-my @DEFAULT = @{ Rex::Rancher::Server::_paths('rke2')->{disable} };
+my @DEFAULT = @{ rke2_default() };
 my %gw      = ( gateway_api => 1, gateway_api_version => 'v1.2.0' );
 
 sub disable_for { my %o = Rex::Rancher::_gateway_api_disable(@_); $o{disable} }
@@ -52,8 +55,7 @@ subtest 'install_server disable list' => sub {
   is( disable_for( %gw, disable => [] ), undef, 'empty list: as given' );
   is( scalar @warnings, 1, '... with a warning' );
 
-  is_deeply( [ @{ Rex::Rancher::Server::_paths('rke2')->{disable} } ], \@DEFAULT,
-    'the Server default list is not mutated' );
+  is_deeply( rke2_default(), \@DEFAULT, 'the rke2 default list is not mutated' );
 };
 
 subtest 'rancher_deploy_server hands it to install_server' => sub {
@@ -84,7 +86,8 @@ subtest 'rancher_deploy_server hands it to install_server' => sub {
     } grep { $_->{labels}{name} eq $name } @{ $self->{secrets} };
     return bless { items => \@items }, 'FakeList';
   }
-  sub get { $_[0]{gets}++; die "404 not found\n" }
+  # What Kubernetes::REST croaks with on a 404 response.
+  sub get { $_[0]{gets}++; die "Kubernetes API error (get $_[1]): 404 {\"reason\":\"NotFound\"}\n" }
   package FakeList;
   sub items { $_[0]{items} }
   package FakeSecret;
@@ -100,12 +103,12 @@ sub secret {
     labels => { owner => 'helm', name => $name, status => $status, version => 1 } };
 }
 
-my %o = ( gateway_api_version => 'v1.2.0', gateway_api_channel => 'experimental' );
+my @o = ( 'v1.2.0', 'experimental' );
 my $ensure = Rex::Rancher::Cilium->can('_ensure_gateway_api_crds');
 
 subtest 'RKE2 release owns the CRDs: die before anything' => sub {
   my $api = FakeAPI->new( secrets => [ secret( $CHART, 'deployed' ) ] );
-  ok( !eval { $ensure->( $api, \%o ); 1 }, 'dies' );
+  ok( !eval { $ensure->( $api, @o ); 1 }, 'dies' );
   like( $@, qr/\Q$CHART\E \(deployed/, 'names the release and its state' );
   like( $@, qr/disable and restart rke2-server/, 'names the way out' );
   is( $api->{gets}, 0, 'before probing or applying any CRD' );
@@ -117,7 +120,7 @@ subtest 'no RKE2 release: the apply path runs' => sub {
   my @fetched;
   no warnings 'redefine';
   local *HTTP::Tiny::get = sub { push @fetched, $_[1]; die "stop before the network\n" };
-  eval { $ensure->( $api, \%o ) };
+  eval { $ensure->( $api, @o ) };
   is( $@, "stop before the network\n", 'past the guard' );
   is( $api->{gets}, 1, 'CRD probe ran' );
   like( $fetched[0], qr{/v1\.2\.0/experimental-install\.yaml$}, 'bundle fetch reached' );

@@ -1,6 +1,6 @@
 package IO::K8s::CRD;
 # ABSTRACT: Turn CustomResourceDefinition manifests into IO::K8s classes
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use v5.10;
 use strict;
 use warnings;
@@ -9,8 +9,25 @@ use Scalar::Util qw( blessed );
 use Module::Runtime qw( require_module );
 use JSON::MaybeXS ();
 use re ();
+use IO::K8s ();
 use IO::K8s::AutoGen ();
 use IO::K8s::Resource ();
+
+# Carp treats the distribution modules this one works with on a public path
+# as part of it, so an error names the line that called into them:
+#   * IO::K8s (k165): a croak from load or generate reached through
+#     IO::K8s->add_crd names the line that called add_crd, not add_crd's
+#     own line in lib/IO/K8s.pm, and the "Cannot open" IO::K8s->_slurp_utf8
+#     raises for load names load's caller, not this file;
+#   * IO::K8s::AutoGen (k170): a croak from class generation under generate
+#     -- directly or through add_crd, the first failure and the remembered
+#     one AutoGen rethrows for a later request (k149) -- names the caller,
+#     not the generate line here;
+#   * IO::K8s::Role::APIObject (k170): a croak from crd_for_class reached
+#     through $class->to_crd names the line that called to_crd, not the
+#     to_crd line in lib/IO/K8s/Role/APIObject.pm.
+# A caller in any other package still sees its own line.
+our @CARP_NOT = ('IO::K8s', 'IO::K8s::AutoGen', 'IO::K8s::Role::APIObject');
 
 # The typed class crd_for_class() and new() build and return (D9). Kept as
 # a constant rather than spelled out at each call site -- the brief's own
@@ -37,16 +54,14 @@ sub load {
         @docs = ($input);
     }
     elsif (!ref $input) {
-        my $text = $input;
-        if ($input !~ /\n/ && -f $input) {
-            open my $fh, '<:encoding(UTF-8)', $input
-                or croak "IO::K8s::CRD->load: cannot open $input: $!";
-            $text = do { local $/; <$fh> };
-            close $fh;
-        }
+        # A file or YAML text by load_yaml's rule (k162): a file is read as
+        # UTF-8, a directory is refused, and a one-line argument that is no
+        # file and only parses to plain scalars -- a mistyped path -- dies
+        # instead of giving [] and an add_crd that registers nothing.
         require YAML::PP;
-        my $yp = YAML::PP->new(boolean => 'JSON::PP');
-        @docs = grep { ref $_ eq 'HASH' } $yp->load_string($text);
+        my ($refused, @found) = IO::K8s->_yaml_documents($input, YAML::PP->new(boolean => 'JSON::PP'));
+        croak "IO::K8s::CRD->load: '".$input."' ".$refused if defined $refused;
+        @docs = grep { ref $_ eq 'HASH' } @found;
     }
     else {
         croak 'IO::K8s::CRD->load: unsupported input ' . ref($input);
@@ -98,6 +113,9 @@ sub served_versions {
             # mutating the caller's manifest hashref -- ref() first, so a
             # missing/undef 'schema' is read without creating it.
             schema      => (ref $v->{schema} eq 'HASH' ? $v->{schema}{openAPIV3Schema} : undef) // { type => 'object' },
+            # As given, only when the version has any (k158): generate
+            # hands it to the class, which checks it.
+            (defined $v->{subresources} ? (subresources => $v->{subresources}) : ()),
         };
     }
     croak "IO::K8s::CRD: no served version in the CRD for $crd->{spec}{names}{kind}" unless @out;
@@ -131,6 +149,7 @@ sub generate {
             kind            => $kind,
             resource_plural => $spec->{names}{plural},
             is_namespaced   => $namespaced,
+            (exists $v->{subresources} ? (subresources => $v->{subresources}) : ()),
             %opts,
         );
         # Track every served version as the fallback so the LAST one wins
@@ -190,11 +209,15 @@ sub new {
     my $id0 = $ids[0];
     my @versions = map {
         my $i = $_;
+        my $subresources = $classes->[$i]->can('subresources') && $classes->[$i]->subresources;
         {
             name    => $ids[$i]{version},
             served  => JSON::MaybeXS::true,
             storage => ($i == $storage_index) ? JSON::MaybeXS::true : JSON::MaybeXS::false,
             schema  => { openAPIV3Schema => _schema_for_class($classes->[$i]) },
+            # Per version, the way the apiserver takes them: each class's
+            # own declaration (k158), no key for a class without one.
+            ($subresources ? (subresources => $subresources) : ()),
         };
     } 0 .. $#ids;
 
@@ -312,14 +335,12 @@ sub _property_schema {
 # emit here that would read back as Quantity. A Quantity field therefore
 # round-trips through add_crd as a plain Str -- documented in the task-2
 # report, not worked around here. is_hash_of_quantity shares the same gap
-# for the same reason (AutoGen's additionalProperties dispatch collapses
-# every typed map -- int/num/bool/quantity/time/int-or-string alike -- to
-# the opaque { Str => 1 } shape rather than a typed additionalProperties
-# schema, so none of is_hash_of_{int,num,bool,quantity,time,int_or_string}
-# has a schema shape that reads back as itself; only the standalone scalar
-# is_time is lossless via `format: date-time`, which AutoGen's own dispatch
-# explicitly reads back into Time). is_array_of_quantity has the identical
-# gap to the scalar is_quantity, one level down.
+# for the same reason: its additionalProperties is a plain `type: string`,
+# which AutoGen reads back as the string map HashRef[Str]. The other typed
+# maps -- int/num/bool/time/int-or-string -- read back as themselves since
+# k191, when AutoGen's additionalProperties dispatch stopped collapsing
+# every one of them to the old opaque { Str => 1 }. is_array_of_quantity
+# has the identical gap to the scalar is_quantity, one level down.
 sub _type_schema {
     my ($entry, $seen) = @_;
 
@@ -360,11 +381,11 @@ sub _type_schema {
 
     return { type => 'object', additionalProperties => _schema_for_class($entry->{class}, $seen) }
         if $entry->{is_hash_of_objects};
-    # is_hash_of_str is the opaque { Str => 1 } marker itself (see
-    # Resource.pm: "the genuinely opaque string map that labels,
-    # annotations and fieldsV1 need") -- never a typed additionalProperties
-    # schema, unlike every other is_hash_of_* flag below.
-    return _opaque_object() if $entry->{is_hash_of_str};
+    # The string map (k191) -- HashRef[Str] and { Str => 1 } alike, a
+    # map[string]string upstream -- and the free map, Opaque / HashRef,
+    # which is what { Str => 1 } used to stand for here.
+    return { type => 'object', additionalProperties => { type => 'string' } } if $entry->{is_hash_of_str};
+    return _opaque_object() if $entry->{is_hash_opaque};
     return { type => 'object', additionalProperties => { type => 'integer' } } if $entry->{is_hash_of_int};
     return { type => 'object', additionalProperties => { type => 'number' } }  if $entry->{is_hash_of_num};
     return { type => 'object', additionalProperties => { type => 'boolean' } } if $entry->{is_hash_of_bool};
@@ -664,7 +685,7 @@ IO::K8s::CRD - Turn CustomResourceDefinition manifests into IO::K8s classes
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -709,6 +730,18 @@ file, or an arrayref of any of those. Dies on a document that is not a
 C<CustomResourceDefinition> or lacks C<spec.group>, C<spec.names.kind> or
 C<spec.versions>.
 
+A string is read by the same rule as L<IO::K8s/load_yaml>: without
+a newline and naming an existing file, it is read from that file, as UTF-8;
+anything else is YAML or JSON text in decoded characters. A one-line string
+that is no existing file and parses to plain scalars only -- typically a
+mistyped path -- dies instead of returning an empty list, and so does a
+directory; the same happens through L<IO::K8s/add_crd>:
+
+    IO::K8s::CRD->load: 'crds/knobs.yaml' is neither an existing file nor YAML text
+
+Empty or whitespace-only text still returns an empty arrayref (and
+C<add_crd> registers nothing), and a one-line JSON document is still text.
+
 =head2 served_versions
 
     my $versions = IO::K8s::CRD->served_versions($crd);
@@ -716,7 +749,8 @@ C<spec.versions>.
 The served versions of one loaded CRD, in manifest order, each as
 C<< { name, api_version, storage, schema } >> where C<schema> is the
 version's C<openAPIV3Schema> (an empty C<type: object> when the manifest has
-none). Dies when no version is served.
+none), plus C<subresources> as the manifest gives it when the version has
+any. Dies when no version is served.
 
 =head2 generate
 
@@ -733,7 +767,17 @@ generated nested one. The storage version is the one the manifest marks; when
 none is marked (an invalid manifest, but a common one in hand-written
 fixtures) the last served version is used. Each class carries the CRD's
 C<kind>, C<names.plural> and scope, and every object with C<properties>
-below it is a nested class (see L<IO::K8s::AutoGen>).
+below it is a nested class (see L<IO::K8s::AutoGen>). A version's
+C<subresources> become the class's C<subresources> method (see
+L<IO::K8s::APIObject>), so C<to_crd> writes them back; a malformed
+C<subresources> section croaks the way the C<use IO::K8s::APIObject>
+parameter does, naming the generated class and the key.
+
+An error from generating a class -- a C<$ref> no definition answers, say,
+and the remembered failure L<IO::K8s::AutoGen> rethrows when the same class
+is asked for again -- names the line that called C<generate>, or
+L<IO::K8s/add_crd> when that is the way in, not a line inside the
+distribution.
 
 Classes are generated under C<$namespace\::_CRD>, never C<$namespace>
 itself. L<IO::K8s::AutoGen> caches by class name, and the class name is
@@ -777,17 +821,24 @@ The schema is generated from the registry, but it is not a lossless
 DSL-to-schema-to-DSL round-trip through C<add_crd>. C<Quantity> and
 C<[Quantity]> export only C<type: string> (or string array items), so the
 Quantity constraint cannot be reconstructed. During the reverse
-L<IO::K8s::AutoGen> inference, typed maps whose values are C<Int>, C<Num>,
-C<Bool>, C<Quantity>, C<Time> or C<IntOrStr> re-import as the opaque
-C<< { Str => 1 } >> form. Scalar arrays C<[Num]>, C<[Quantity]>, C<[Time]>
-and C<[IntOrStr]> re-import as C<[Str]>; C<[Str]>, C<[Int]> and C<[Bool]>
-retain their scalar element type.
+L<IO::K8s::AutoGen> inference, a string map -- C<< { Str => 1 } >> or
+C<HashRef[Str]> -- re-imports as the strict C<HashRef[Str]>, and so does a
+C<< { Quantity => 1 } >> map, whose values export as plain strings; typed
+maps of C<Int>, C<Num>, C<Bool>, C<Time> or C<IntOrStr> keep their value
+type, and C<Opaque> stays C<Opaque>. Scalar arrays C<[Str]>, C<[Int]>, C<[Num]>,
+C<[Bool]>, C<[IntOrStr]> and C<[Time]> retain their scalar element type;
+only C<[Quantity]> re-imports as C<[Str]>, since it exports only a plain
+C<type: string> items schema, indistinguishable from C<[Str]>.
 
 The single-version shorthand for L</new>: C<< IO::K8s::CRD::crd_for_class($class) >>
 is exactly C<< IO::K8s::CRD->new(classes => [$class], storage => $version) >>
 where C<$version> is C<$class>'s own version (split out of C<api_version> the
 same way). See L</new> for the object this returns -- a real, fully typed
 C<CustomResourceDefinition>, not a bare hashref.
+
+Reached through C<< $class->to_crd >>, an error -- a C<pattern> that
+cannot be written as ECMA262, say -- names the line that called C<to_crd>,
+not the C<to_crd> line in L<IO::K8s::Role::APIObject>.
 
 =head2 new
 
@@ -812,10 +863,11 @@ two whose C<api_version> both end C<.../v1>) would otherwise produce two
 identically-named C<spec.versions[]> entries -- a shape the apiserver
 rejects -- so that croaks too, naming the repeated version. Each class
 becomes one C<spec.versions[]> entry (schema from L</_schema_for_class>,
-applied per class): every entry is C<served => true>, and exactly the one
-whose C<name> matches C<storage> gets C<storage => true> (the rest
-C<storage => false>). C<storage> is required and must name one of the given
-classes' own versions, or the call croaks.
+applied per class, and C<subresources> from the class's own declaration
+when it has one): every entry is C<< served => true >>, and exactly
+the one whose C<name> matches C<storage> gets C<< storage => true >> (the
+rest C<< storage => false >>). C<storage> is required and must name one of
+the given classes' own versions, or the call croaks.
 
 Versions land in C<spec.versions> in the order C<classes> was given, not
 re-sorted by a Kubernetes-style version precedence -- the caller already
@@ -847,8 +899,8 @@ CURRENT path (the second, internal C<$seen> argument -- never pass it from
 outside): a class that references itself, directly or through a reused
 core class, becomes an opaque
 C<< { type => 'object', 'x-kubernetes-preserve-unknown-fields' => true } >>
-stub at the repeat instead of recursing forever, the same stub the opaque
-C<< { Str => 1 } >> map gets. This is deliberately PATH-scoped, not global:
+stub at the repeat instead of recursing forever, the same stub the free
+C<Opaque> map gets. This is deliberately PATH-scoped, not global:
 a class that legitimately appears more than once as unrelated siblings
 (C<LabelSelector>, reused all over a real CRD schema per D5) must not be
 flattened to that stub on its second, unrelated appearance.

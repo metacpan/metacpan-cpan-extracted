@@ -1,3 +1,18 @@
+Wed Sep 30 12:37:46 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.12]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.12.md: new
+	* VERSION: bump
+	* .includes/publish.mk: added by CPAN::Maker::Bootstrapper
+	* .includes/update.mk: updated by CPAN::Maker::Bootstrapper
+	* Makefile: likewise
+	* requires: remove dependencies that are included in those already listed
+	* cpanfile: likewise
+	* suggests: deleted
+	* test-requires: deleted
+	* .prompts/release-notes.prompt: new
+
 Sat Sep 26 05:09:37 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.11]:

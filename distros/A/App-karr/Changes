@@ -1,3 +1,80 @@
+0.602     2026-09-30 05:24:57Z
+
+    - `backlog` is now held back. `karr pick` and `karr-foundation` never take
+      a card from it, whatever the filters, and a board with only backlog
+      cards left counts as drained (skipped while unchanged, `on_drained`
+      runs, `board_actionable=no`). `karr pick --status` naming `backlog`, and
+      `pick --move backlog`, are refused as usage errors (exit 2) pointing at
+      `karr move ID todo`. A card in backlog holds no claim: an explicit
+      `--claim` onto it is refused by `create` (the default status included),
+      `edit` and `move` (exit 1), and a move into backlog -- `move` or
+      `edit --status` -- releases the claim the card carried. `todo` is the
+      pool that is picked from; `move ID in-progress --claim NAME` still takes
+      a backlog card up directly. The bundled skills and foundation's agent
+      prompts say that promoting out of backlog is the maintainer's call. A
+      board without a `backlog` column is unaffected.
+
+    - With `KARR_CLAIM` exported, `karr edit` and `karr move` no longer claim
+      every card they touch; the env name is written only when the card ends
+      up in a `require_claim` status (the rule `create` already follows). A
+      note, a tag or a backlog -> todo promotion leaves the card free to pick.
+      `edit --release` no longer claims the card back. An explicit `--claim`
+      still stamps on any status but `backlog` (see above).
+
+    - `karr-foundation` treats a card as finished when it is in the board's
+      own final status (or archived), not only `done`/`archived`. A board
+      whose last column has another name (e.g. `shipped`) is now seen as
+      drained: an unchanged board is skipped instead of starting an agent
+      every tick, the drain reports its progress, `on_drained` runs, and
+      chain prechecks read `board_actionable=no`.
+
+    - The bundled agent skill `kanban-issues-karr-cli` is split in two:
+      `kanban-issues-karr-coordination` (reading a board, picking, creating and
+      routing cards, config, sync) and `kanban-issues-karr-ticket` (working the
+      one card an agent was handed). `karr skill install`, `check` and `update`
+      and `karr init --claude-skill` handle both as one set; every result line
+      and `--json` entry now names its skill. A leftover
+      `kanban-issues-karr-cli/` directory is removed by `install`, `update` and
+      `init --claude-skill` (reported as `removed`), and `check` reports it as
+      `stale` and exits 1, so `karr skill update` alone migrates an old
+      install. `karr skill show` prints both `SKILL.md` files, or only the one
+      named (`karr skill show kanban-issues-karr-ticket`); its `--json` output
+      is now an array of `{skill, content}` objects instead of one `{content}`.
+
+    - Local task ids accept the house `kNNN` spelling: `karr show k30` names the
+      same card as `karr show 30`, and a leading `k`/`K` works anywhere a bare
+      number does -- move, edit, delete, archive, unlock, handoff, needs, show,
+      mixed batches (`k30,31,K32`), `log --task`, the
+      `--depends-on`/`--add-depends-on`/`--remove-depends-on` flags and the id
+      side of a cross-board `BOARD#ID` reference. Any other token is left
+      untouched and still fails as before; `log --task` answers a value that
+      is not an id -- a negative number, or `0` in any spelling (`0`, `k0`,
+      `00`), since task ids start at 1 -- with a usage error (exit 2) naming
+      the value.
+
+    - Release-asset names are tidied. The arm64 binary and tarball are now named
+      `...-linux-aarch64` (was `-linux-arm64`) to match the `x86_64` naming, and
+      the per-file `.sha256` sidecars are replaced by a single
+      `karr-<version>-checksums.txt` (verify with `sha256sum -c --ignore-missing
+      karr-<version>-checksums.txt`, which checks only the assets you
+      downloaded -- a plain `-c` fails on the ones you did not) covering every
+      asset. The raw binary and the `.tar.gz` are both still shipped per arch.
+
+    - The prebuilt Linux binaries now carry the bundled skills: `karr skill
+      install|show|check|update` and `karr init --claude-skill` failed in them
+      with "Could not find .../SKILL.md. Is App::karr properly installed?",
+      because the build never packed share/. The release build now fails a
+      binary that cannot install every bundled skill.
+
+    - `karr-foundation --dry-run` in ticket mode no longer logs a STALL for the
+      agent run it did not start.
+
+    - `karr init --claude-skill` looks up the bundled skills before it writes
+      anything, so an installation that cannot find them fails without
+      leaving a board, `.gitignore` entries or an empty `.claude/skills/`
+      directory behind, and the same command works once the installation is
+      fixed.
+
 0.601     2026-09-19 23:43:42Z
 
     - A card left blocked in a terminal status (`done`/`archived`) no longer

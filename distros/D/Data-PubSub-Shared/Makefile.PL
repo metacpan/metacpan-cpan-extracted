@@ -2,11 +2,11 @@ use ExtUtils::MakeMaker;
 use Config;
 
 unless ($^O eq 'linux') {
-    print "NA: Data::PubSub::Shared requires Linux\n";
+    print "OS unsupported: Data::PubSub::Shared requires Linux\n";
     exit 0;
 }
 if ($Config{ivsize} < 8) {
-    print "NA: Data::PubSub::Shared requires 64-bit integers (ivsize >= 8)\n";
+    print "OS unsupported: Data::PubSub::Shared requires 64-bit integers (ivsize >= 8)\n";
     exit 0;
 }
 

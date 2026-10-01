@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertManagerLocalObjectReference;
 # ABSTRACT: CredentialsRef is a reference to a Secret containing the CyberArk Certificate Manager Self-Hosted API credentials.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name => Str, { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::CertManager::V1::CertManagerLocalObjectReference - CredentialsRef is a 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

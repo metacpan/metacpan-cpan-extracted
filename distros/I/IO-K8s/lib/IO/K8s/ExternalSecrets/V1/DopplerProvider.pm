@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::DopplerProvider;
 # ABSTRACT: Doppler configures this store to sync secrets using the Doppler provider
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s auth            => '+IO::K8s::ExternalSecrets::V1::DopplerAuth', { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::DopplerProvider - Doppler configures this store to
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 auth
 

@@ -22,11 +22,12 @@ use Test::More;
 
 use YAML::PP;
 use Rex::Rancher::Server;
+use Rex::Rancher::Distribution;
 
-sub cfg { Rex::Rancher::Server::_build_server_config(@_) }
+sub dist { Rex::Rancher::Distribution->new_for(@_) }
+
+sub cfg { my ( $d, @rest ) = @_; Rex::Rancher::Server::_build_server_config( dist($d), @rest ) }
 #  ($distribution, $token, $server, $tls_san, $node_labels, $cilium, $node_name, $disable)
-
-sub paths { Rex::Rancher::Server::_paths(@_) }
 
 my %DEFAULT = (
   rke2 => ['rke2-ingress-nginx', 'rke2-traefik', 'rke2-traefik-crd'],
@@ -87,24 +88,24 @@ subtest 'k3s: disable does not touch the cilium keys' => sub {
 };
 
 subtest 'rke2 installer command' => sub {
-  my $p = paths('rke2');
-  is(Rex::Rancher::Server::_rke2_server_install_cmd($p, undef),
+  my $p = dist('rke2');
+  is($p->script_install_cmd(undef, undef),
     'curl -sfL https://get.rke2.io | sh -', 'unpinned: unchanged command');
-  is(Rex::Rancher::Server::_rke2_server_install_cmd($p, 'v1.30.4+rke2r1'),
+  is($p->script_install_cmd(undef, 'v1.30.4+rke2r1'),
     'curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION=v1.30.4+rke2r1 sh -',
     'pinned: INSTALL_RKE2_VERSION');
 };
 
 subtest 'k3s installer command' => sub {
-  my $p = paths('k3s');
-  is(Rex::Rancher::Server::_k3s_server_install_cmd($p, undef, undef),
+  my $p = dist('k3s');
+  is($p->script_install_cmd(undef, undef),
     'curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true sh -s - server --write-kubeconfig-mode=644',
     'unpinned, first server');
-  is(Rex::Rancher::Server::_k3s_server_install_cmd($p, undef, 'v1.30.4+k3s1'),
+  is($p->script_install_cmd(undef, 'v1.30.4+k3s1'),
     'curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.30.4+k3s1 INSTALL_K3S_SKIP_START=true sh -s - server'
       . ' --write-kubeconfig-mode=644',
     'pinned: INSTALL_K3S_VERSION');
-  my $ha = Rex::Rancher::Server::_k3s_server_install_cmd($p, 'https://cp1:6443', 'v1.30.4+k3s1');
+  my $ha = $p->script_install_cmd('https://cp1:6443', 'v1.30.4+k3s1');
   like($ha, qr/\| K3S_URL=https:\/\/cp1:6443 INSTALL_K3S_VERSION=v1\.30\.4\+k3s1 INSTALL_K3S_SKIP_START=true sh -s - server/,
     'HA join: URL and version');
   unlike($ha, qr/--disable/, 'disable lives in config.yaml, not on the command line');

@@ -4,7 +4,7 @@
       "Masayoshi Sekimura, <sekimura@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Text::Markdown::Discount" : {
          "file" : "lib/Text/Markdown/Discount.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/Songmu/text-markdown-discount"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_contributors" : [
       "Alessandro Ghedini <al3xbio@gmail.com>",
       "Anirvan Chatterjee <anirvan@users.noreply.github.com>",
@@ -93,6 +93,6 @@
       "tokuhirom <tokuhirom@gmail.com>",
       "utagawa kiki <utagawakiki@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

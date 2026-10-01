@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.70';
+our $VERSION = '2.71';
 
 our @ALL =
 qw(
@@ -1864,7 +1864,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2026d' }
+sub OlsonVersion { '2026e' }
 
 
 1;
@@ -2040,8 +2040,8 @@ so that applications can easily present a list of timezones.
   Antarctica/Rothera
   Antarctica/Troll
   Antarctica/Vostok
-  Antarctica/Palmer
   Antarctica/Macquarie
+  Antarctica/Palmer
 
 =head3 Asia
 
@@ -2194,8 +2194,6 @@ so that applications can easily present a list of timezones.
 
 =head3 Pacific
 
-  Pacific/Easter
-  Pacific/Galapagos
   Pacific/Apia
   Pacific/Auckland
   Pacific/Bougainville
@@ -2223,6 +2221,8 @@ so that applications can easily present a list of timezones.
   Pacific/Tahiti
   Pacific/Tarawa
   Pacific/Tongatapu
+  Pacific/Easter
+  Pacific/Galapagos
   Pacific/Honolulu
 
 =head2 Zones by Country
@@ -2440,7 +2440,7 @@ so that applications can easily present a list of timezones.
   America/Toronto - Eastern - ON & QC (most areas)
   America/Iqaluit - Eastern - NU (most areas)
   America/Atikokan - EST - ON (Atikokan), NU (Coral H)
-  America/Winnipeg - Central - ON (west), Manitoba
+  America/Winnipeg - EST - Manitoba, ON (northwest)
   America/Resolute - Central - NU (Resolute)
   America/Rankin_Inlet - Central - NU (central)
   America/Regina - CST - SK (most areas)

@@ -1,21 +1,21 @@
 Revision history for Data::Graph::Shared
 
+0.08      2026-09-26
+          - A writer killed mid add_node, add_edge or remove_node no longer
+            leaves a half-published node or freed edges linked.
+          - Segments are reserved, so a full filesystem fails the constructor;
+            DATA_GRAPH_SHARED_SPARSE=1 skips the reservation.
+          - A failed create no longer leaves a full-size file behind.
+
 0.07      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
 
 0.06      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Frozen read-only mode: freeze() seals a file-backed structure;
-            new_readonly() maps it O_RDONLY and queries it lock-free.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
-          - Document which methods return false for an id whose node is gone and
-            which croak; add_edge naming a removed node adds nothing and reports
-            it only through its return value.
+          - A file left by an interrupted create is recovered, not refused.
+          - freeze()/new_readonly(): sealed read-only mode, lock-free.
+          - Hardening against tied and overloaded arguments.
+          - unlink() reports a failed removal; a missing file is no error.
+          - Document which methods croak or return false for a removed node.
 
 0.05      2026-07-22
           - Fix a use-after-free in add_edge(): an overloaded or tied weight

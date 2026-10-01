@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionVersion;
 # ABSTRACT: CustomResourceDefinitionVersion describes a version for CRD.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s additionalPrinterColumns => ['Apiextensions::V1::CustomResourceColumnDefinition'];
@@ -44,7 +44,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDef
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 additionalPrinterColumns
 

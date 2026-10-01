@@ -157,4 +157,63 @@ subtest 'messages below threshold are not stored' => sub {
 	is(scalar(@msgs), 0, 'debug and info dropped at warn threshold');
 };
 
+# ---------------------------------------------------------------------------
+# 8. file/line reported to the backend is the caller's, not Log::Any's
+# ---------------------------------------------------------------------------
+
+subtest 'file and line point at the code calling Log::Any' => sub {
+	plan tests => 4;
+
+	my @calls;
+	my $la = Log::Abstraction->new(logger => sub { push @calls, $_[0] }, level => 'debug');
+	Log::Any::Adapter->set('Abstraction', instance => $la);
+
+	my $log = Log::Any->get_logger(category => 'TestCaller');
+	$log->info('where am I'); my $info_line = __LINE__;
+	$log->warning('and now'); my $warn_line = __LINE__;
+
+	is($calls[0]{file}, __FILE__,  'info: file is this test');
+	is($calls[0]{line}, $info_line, 'info: line is the $log->info call');
+	is($calls[1]{file}, __FILE__,  'warning: file is this test');
+	is($calls[1]{line}, $warn_line, 'warning: line is the $log->warning call');
+};
+
+# ---------------------------------------------------------------------------
+# 9. A non-Log::Abstraction 'instance' is an error, not a silent fallback
+# ---------------------------------------------------------------------------
+
+subtest 'instance must be a Log::Abstraction object' => sub {
+	plan tests => 1;
+
+	throws_ok(
+		sub {
+			Log::Any::Adapter->set('Abstraction', instance => { not => 'a logger' });
+			Log::Any->get_logger(category => 'TestBadInstance')->info('x');
+		},
+		qr/instance must be a Log::Abstraction object/,
+		'hashref instance croaks',
+	);
+};
+
+# ---------------------------------------------------------------------------
+# 10. carp_on_warn/croak_on_error are forwarded; logging never dies
+# ---------------------------------------------------------------------------
+
+subtest 'croak_on_error is forwarded but turned into a carp' => sub {
+	plan tests => 3;
+
+	my @msgs;
+	my @carps;
+	local $SIG{__WARN__} = sub { push @carps, $_[0] };
+
+	Log::Any::Adapter->set('Abstraction',
+		logger => \@msgs, level => 'debug', croak_on_error => 1, carp_on_warn => 1,
+	);
+	my $log = Log::Any->get_logger(category => 'TestNoDie');
+
+	lives_ok(sub { $log->error('bad thing') }, 'error() through Log::Any does not die');
+	like(join('', @carps), qr/bad thing/, 'the croak was turned into a carp');
+	is($msgs[0]{message}, 'bad thing', 'message still logged');
+};
+
 done_testing();

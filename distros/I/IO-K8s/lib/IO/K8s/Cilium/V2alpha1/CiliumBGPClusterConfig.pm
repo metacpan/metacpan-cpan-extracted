@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPClusterConfig;
 # ABSTRACT: CiliumBGPClusterConfig is the Schema for the CiliumBGPClusterConfig API
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
-    resource_plural => 'ciliumbgpclusterconfigs';
+    resource_plural => 'ciliumbgpclusterconfigs',
+    subresources    => { status => {} };
 
 k8s spec   => '+IO::K8s::Cilium::V2alpha1::CiliumBGPClusterConfigSpec', { required => 'schema' };
 k8s status => '+IO::K8s::Cilium::V2alpha1::CiliumBGPClusterConfigStatus';
@@ -24,7 +25,7 @@ IO::K8s::Cilium::V2alpha1::CiliumBGPClusterConfig - CiliumBGPClusterConfig is th
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

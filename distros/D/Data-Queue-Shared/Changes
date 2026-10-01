@@ -1,21 +1,23 @@
 Revision history for Data-Queue-Shared
 
+0.10      2026-09-26
+          - A killed push, pop or clear no longer corrupts a Str queue.
+          - Int, Int32 and Int16 queues reserve their segment, so a full
+            filesystem fails the constructor; DATA_QUEUE_SHARED_SPARSE=1 skips
+            it. Str queues reserve only with DATA_QUEUE_SHARED_SPARSE=0.
+          - A failed create no longer leaves a full-size file behind.
+
 0.09      2026-09-15
-          - Fix size and is_full misreading while another process pops.
-          - Fix pop_wait_multi(0) taking an element.
-          - push_wait_multi's timeout now bounds the whole call.
-          - Str push_multi wakes consumers before croaking on a too-big value.
-          - Refuse non-regular files and more corrupt headers.
-          - Recover a lock left ownerless by a corrupt file instead of hanging.
+          - Fix size/is_full during a concurrent pop, and pop_wait_multi(0).
+          - push_wait_multi's timeout bounds the whole call.
+          - Str push_multi wakes consumers before croaking on too big a value.
+          - Refuse non-regular files and more corrupt headers; an ownerless
+            lock no longer hangs.
 
 0.08      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
+          - A file left by an interrupted create is recovered, not refused.
+          - Hardening against tied and overloaded arguments.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.07      2026-07-21
           - Fetch get-magic on optional arguments before testing them.
@@ -37,12 +39,9 @@ Revision history for Data-Queue-Shared
 
 
 0.03  2026-04-26
-    - create: init under flock; mutex recovery wakes 1
-    - queue str clear wakes all producers/consumers
-    - eventfd consume returns accumulated count
-    - harden DESTROY; factor MAKE OBJ macro
-    - hoist SV construction out of pop multi/drain mutex
-    - stat recoveries uint64 t; aarch64 CI matrix
+    - Init under flock; mutex recovery wakes one waiter; Str clear wakes all.
+    - eventfd consume returns the accumulated count; hardened DESTROY.
+    - The recoveries stat is 64-bit.
 
 
 0.02  2026-04-12
@@ -50,12 +49,7 @@ Revision history for Data-Queue-Shared
 
 
 0.01  2026-04-05
-    - Initial release
-    - Int queue: lock-free Vyukov bounded MPMC
-    - Str queue: futex-mutex with circular arena, deque ops (push_front, pop_back)
-    - Backing: file-backed mmap, anonymous (MAP_ANONYMOUS), memfd
-    - Blocking push/pop with timeout via futex
-    - Batch ops under single mutex (push_multi, pop_multi, drain)
-    - eventfd integration (opt-in notify)
-    - PID-based stale lock recovery
-    - peek, sync, stats with waiter counts
+    - Initial release: lock-free Vyukov MPMC Int queue; Str queue with a
+      circular arena and deque ops.
+    - File, anonymous or memfd; futex waits with timeout; batch ops; eventfd;
+      stale-lock recovery.

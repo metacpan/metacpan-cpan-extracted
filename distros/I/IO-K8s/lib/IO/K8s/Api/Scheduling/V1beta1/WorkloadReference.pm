@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1beta1::WorkloadReference;
 # ABSTRACT: WorkloadReference references the Workload object together with the template that was used to create a particular PodGroup.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s templateName => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Scheduling::V1beta1::WorkloadReference - WorkloadReference referen
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 templateName
 

@@ -1,127 +1,111 @@
-# CPAN::Maker::Bootstrapper 2.3.3 Release Notes
+# Release Notes — CPAN::Maker::Bootstrapper 2.3.5
 
-**Released:** Fri Sep 25 2026
+## Summary
 
-## Overview
+This release adds DarkPAN dependency manifest generation, a new
+dependency deduplication filter, and direct CPAN publishing via
+PAUSE. The dependency list is cleaned up by removing redundant
+sub-module entries, and the build system gains an auto-generated
+`MANIFEST` and improved separation of managed make files.
 
-This is a maintenance release focused on build system housekeeping:
-template files have been relocated to a dedicated `share/`
-subdirectory, dependency scanning has been made more efficient by
-separating test and runtime dependency workflows, and `.gitignore`
-management has been cleaned up and aligned.
+---
+
+## New Features
+
+### DarkPAN Dependency Manifests
+
+A new `create-darkpan-requires` command (`cmb create-darkpan-requires`)
+examines the `requires` file and generates two manifest files for
+dependencies hosted on a private CPAN-compatible repository:
+
+- `cpanfile.darkpan` — dependencies in cpanfile syntax
+- `cpanm.darkpan` — one module requirement per line for `cpanm`
+
+Enable generation via the Makefile by setting:
+
+    DARKPAN_REQUIRES = yes
+    DARKPAN_URL = https://cpan.example.com/repository
+
+When enabled, `DARKPAN_URL` is required. The generated files are
+included in the distribution as installation aids and are
+automatically added to `extra-files.skip` (they are generated
+artifacts, not source-controlled files).
+
+### Dependency Deduplication Filter (`deps-filter`)
+
+A new `deps-filter` command removes modules from a dependency list
+that are already provided by another listed distribution. It
+consults the public CPAN package index and any repositories in
+`build-mirrors`, caching indexes locally. This command is now
+invoked automatically by the Makefile when processing `requires`,
+`recommends`, `suggests`, and `test-requires`.
+
+### PAUSE Publishing (`publish-to-cpan` / `make publish`)
+
+A new `publish-to-cpan` command uploads a distribution tarball to
+PAUSE:
+
+    cmb publish-to-cpan distribution.tar.gz [username [password]]
+
+Credentials may also be supplied via `PAUSE_USER` and
+`PAUSE_PASSWORD`. A new `make publish` target builds the
+distribution, runs the full test suite, and uploads on success:
+
+    make publish PAUSE_USER=username PAUSE_PASSWORD=password
+
+### `TARBALL_ORDER_ONLY_PREREQS`
+
+A new Makefile variable allows `project.mk` to declare order-only
+prerequisites for the distribution tarball — steps that must run
+before the tarball is built but that do not themselves make the
+tarball out of date:
+
+    TARBALL_ORDER_ONLY_PREREQS += prepare-assets
 
 ---
 
 ## Changes
 
-### Template Files Relocated to `share/`
+### Dependency Cleanup
 
-The following template files have been moved from the project root
-into the `share/` subdirectory. References in `buildspec.yml` and the
-project `.gitignore` have been updated accordingly.
+Several redundant sub-module entries have been removed from
+`requires` and `cpanfile`. Modules that are re-exported by a
+top-level distribution they already depend on no longer appear as
+separate entries:
 
-| Old Location | New Location |
-|---|---|
-| `buildspec.yml.tmpl` | `share/buildspec.yml.tmpl` |
-| `class-module.pm.tmpl` | `share/class-module.pm.tmpl` |
-| `cli-module.pm.tmpl` | `share/cli-module.pm.tmpl` |
-| `modulino.tmpl` | `share/modulino.tmpl` |
-| `test.t.tmpl` | `share/test.t.tmpl` |
+- Removed: `CLI::Simple::Constants`, `CLI::Simple::Utils`,
+  `CPAN::Maker::Role::ModuleUtils`, `CPAN::Maker::Role::Provides`,
+  `Role::Tiny::With`
+- Added: `HTTP::Tiny`, `IO::Socket::SSL`, `Net::SSLeay`
 
-> **Note:** `share/modulino.tmpl` has had its executable bit removed (`chmod -x`).
+### Makefile: Separated `test-requires` Filtering
 
----
+The `test-requires.raw` recipe now only normalises the scan output.
+A new dedicated `test-requires` recipe handles the full filter,
+deduplication, and `provides` exclusion pipeline. The
+`test-requires.skip` file has been removed as it is no longer needed.
 
-### Build System Improvements (`Makefile`)
+### `MANIFEST` Now Auto-Generated
 
-#### New Target: `cpanfile.runtime`
+`MANIFEST` is now a build target generated from the list of managed
+files and is added to `DEPS` in `project.mk`. The file is kept
+sorted.
 
-A new `cpanfile.runtime` target has been added that generates a
-cpanfile containing only runtime (`requires`) dependencies — excluding
-test dependencies. This is now the file that the `local` target
-depends on, meaning that installing local dependencies for hermetic
-syntax checking no longer pulls in test-only modules.
+### `update.mk` Refactored
 
-```makefile
-cpanfile.runtime: requires
-    $(CPAN_MAKER) create-cpanfile --dependency-type requires $< -o $@
-```
-
-#### New Target: `test-requires.scan`
-
-Test dependency scanning has been split into two distinct steps to
-avoid unnecessary rescans:
-
-- **`test-requires.scan`** — scans test files (`t/`) and writes a raw
-  sorted module list. This step depends only on the test files
-  themselves.
-- **`test-requires.raw`** — filters `test-requires.scan` against the
-  `provides` file to remove internal modules. This step now depends on
-  `test-requires.scan` and `provides` separately.
-
-Previously these two operations were combined into a single
-`test-requires.raw` recipe. The separation means a change to
-`provides` no longer forces a full rescan of the test files.
-
-#### `test-requires` Target Reworked
-
-The `test-requires` phony target now depends directly on
-`test-requires.raw` rather than `$(TESTS)`, reflecting the new
-two-stage pipeline.
-
-#### Generated Files Tracking
-
-The following files are now explicitly listed in `GENERATED_FILES`
-(and thus included in `CLEANFILES`):
-
-- `provides`
-- `cpanfile`
-- `test-requires.scan`
-
-All `cpanfile.*` variant files are also now cleaned up on `make clean`.
+Managed make files are now tracked in a separate `MANAGED_MK_FILES`
+variable, distinct from non-make managed files (`MANAGED_FILES`).
+`publish.mk` is included in the managed set.
 
 ---
 
-### `.gitignore` / `gitignore` Cleanup
+## Build System Changes
 
-Both `.gitignore` and the distributed `gitignore` template have been
-aligned and reorganised. Key additions and changes:
-
-- Entries are now grouped and sorted consistently using recursive glob patterns (`**/`)
-- Added: `**/*.bak`, `**/*.log`, `**/*.pod`, `**/*.tdy`, `**/*.tmp`
-- Added: `test-requires.scan`, `cpanfile.*`, `buildspec.yml.tmpl`, `test.t.tmpl`, `local/**`
-- Removed redundant or inconsistently scoped patterns
-- CMB-specific artifacts (`bin/bootstrapper`, `bin/cmb`,
-  `bin/cpan-maker-bootstrapper`, `cmb_md5sums.txt`) are now clearly
-  identified with a `# cmb specific` comment in `.gitignore`
+The build system has been updated in this release. Notable changes
+include the addition of `.includes/publish.mk` (new managed include),
+auto-generation of `MANIFEST` as a build target, and the introduction
+of `MANAGED_MK_FILES` / `MANAGED_FILES` separation in `update.mk`.
+The `CLEANFILES` list now also covers `*.darkpan` artifacts.
 
 ---
 
-### Local Dependency Installation (`local.mk`)
-
-The `local` target now depends on `cpanfile.runtime` instead of the
-full `cpanfile` (which includes test requirements). The `cpm install`
-invocation has been updated to pass the cpanfile explicitly via
-`--cpanfile $<`:
-
-```makefile
-cpm install -L local --cpanfile $< ...
-```
-
-This ensures that only runtime dependencies are installed into the
-local hermetic library used for syntax checking.
-
----
-
-## Upgrade Notes
-
-- If you are using `make update` to manage your build system files, run it after upgrading to pick up the updated `Makefile`, `.includes/local.mk`, and `gitignore` template.
-- The template files previously installed at the project root (`class-module.pm.tmpl`, `cli-module.pm.tmpl`, etc.) are now distributed under `share/`. Projects scaffolded with earlier versions are unaffected — the bootstrapper resolves these via `File::ShareDir` at install time.
-- `cpanfile.*` files (including `cpanfile.runtime`, `cpanfile.requires`, etc.) are now listed in `CLEANFILES` and will be removed by `make clean`. Regenerate them with `make cpanfile` or `make local` as needed.
-
----
-
-## Links
-
-- [GitHub Repository](http://github.com/rlauer6/CPAN-Maker-Bootstrapper)
-- [Issue Tracker](http://github.com/rlauer6/CPAN-Maker-Bootstrapper/issues)

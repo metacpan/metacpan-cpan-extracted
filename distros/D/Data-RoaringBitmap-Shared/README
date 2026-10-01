@@ -96,6 +96,14 @@ METHODS
     disturb the handle. "new_readonly" opens a frozen file read-only for
     lock-free querying (see "FROZEN (READ-ONLY) MODE").
 
+    "new" and "new_memfd" create a new segment sparse: pages are allocated as
+    they are first written, and once the filesystem is full, an add that
+    writes a page not yet allocated dies with SIGBUS while it holds the lock.
+    Set "DATA_ROARINGBITMAP_SHARED_SPARSE=0" to reserve the whole segment at
+    creation, so a full filesystem makes them croak instead; on tmpfs and
+    memfd that commits the segment's memory at once, and a memory cgroup too
+    small for it gets an OOM kill rather than a croak.
+
   Adding and removing
         my $new   = $a->add($x);          # 1 if newly added, 0 if already present
         my $new   = $a->set($x);          # alias for add
@@ -196,7 +204,9 @@ STATS
 
     *   "containers_used" -- the 1-based high-water of container slots
         allocated since creation or the last "clear" (slot 0 is the reserved
-        NULL sentinel, so an empty pool reports 1).
+        NULL sentinel, so an empty pool reports 1). A container rewrite copies
+        into a spare slot, so this can count one slot more than the sentinel
+        plus one per bucket.
 
     *   "containers_capacity" -- the fixed container-pool capacity.
 
@@ -286,10 +296,24 @@ SECURITY
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership; if a holder dies, the next contender detects the
-    dead owner and recovers. Because every mutation performs its container
-    allocations under the lock after a capacity pre-check, a crash leaves the
-    bitmap consistent up to the last completed operation. Limitation: PID
-    reuse is not detected (very unlikely in practice).
+    dead owner and recovers. Limitation: PID reuse is not detected (very
+    unlikely in practice).
+
+    A writer killed part-way through a call leaves every container it rewrites
+    either as it was or as the call left it. A container the call rewrites (an
+    insert into or removal from an array container, the promotion of a full
+    array to a bitmap, and the array results of "union" and "intersect") is
+    built in a spare slot and switched in through a small record in the
+    header, which the process that takes over the lock replays. That process
+    also recounts the bitmap containers, rebuilds the list of free slots, so
+    no slot is lost, and recomputes the total cardinality. Bitmap containers
+    are changed in place: adding or removing a value, or a "union" or
+    "intersect" of two bitmaps, leaves each 64-bit word old or new, and a
+    "union" of a bitmap with an array container sets bits one at a time, so a
+    kill leaves part of the array's values added. When no slot is spare, the
+    rewrite happens in place, and a kill during it can tear that container. A
+    call that touches several buckets ("add_many", "union", "intersect",
+    "clear") is not atomic as a whole: a kill leaves it partly applied.
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.

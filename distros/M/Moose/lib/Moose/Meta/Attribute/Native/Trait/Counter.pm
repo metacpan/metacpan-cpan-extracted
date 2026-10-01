@@ -1,5 +1,5 @@
 package Moose::Meta::Attribute::Native::Trait::Counter;
-our $VERSION = '2.4000';
+our $VERSION = '2.4001';
 
 use Moose::Role;
 with 'Moose::Meta::Attribute::Native::Trait';
@@ -25,7 +25,7 @@ Moose::Meta::Attribute::Native::Trait::Counter - Helper trait for Int attributes
 
 =head1 VERSION
 
-version 2.4000
+version 2.4001
 
 =head1 SYNOPSIS
 

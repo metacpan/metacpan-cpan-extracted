@@ -23,6 +23,8 @@ no warnings 'redefine';
 local *Rex::Rancher::_check_connection       = sub { push @ran, 'check_connection' };
 local *Rex::Rancher::prepare_node            = sub { push @ran, 'prepare_node' };
 local *Rex::Rancher::_gpu_setup_if_requested = sub { push @ran, 'gpu_setup' };
+# Rex::GPU is not needed here: its check has t/gpu-module-version.t.
+local *Rex::Rancher::_check_gpu_module       = sub { };
 local *Rex::Rancher::install_agent           = sub { push @ran, 'install_agent'; %agent_opts = @_ };
 use warnings 'redefine';
 

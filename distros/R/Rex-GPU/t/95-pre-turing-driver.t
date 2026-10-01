@@ -38,6 +38,9 @@ use Test::More;
 use Rex::GPU::Detect;
 use Rex::GPU::NVIDIA;
 use Rex::GPU::NVIDIA::Requirement;
+use Rex::GPU::NVIDIA::Setup;
+use Rex::GPU::NVIDIA::Setup::Apt;
+use Rex::GPU::NVIDIA::Setup::Rpm;
 
 # The source a Setup class's plan picks for $gpu, facts injected, no host.
 {
@@ -98,7 +101,7 @@ subtest 'legacy_driver_requirement — Turing and later / unknown => undef' => s
 };
 
 subtest 'real lspci line => device id => requirement' => sub {
-  my $g = Rex::GPU::Detect::_parse_nvidia_line(
+  my $g = Rex::GPU::Detect->_parse_nvidia_line(
     '3b:00.0 3D controller [0302]: NVIDIA Corporation GV100GL [Tesla V100 PCIe 32GB] [10de:1db6] (rev a1)'
   );
   is($g->{compute}, 1, 'V100 is compute (class 0302)');
@@ -106,7 +109,7 @@ subtest 'real lspci line => device id => requirement' => sub {
 };
 
 subtest '_reject_unsupported_legacy_gpu' => sub {
-  my $rej = \&Rex::GPU::NVIDIA::_reject_unsupported_legacy_gpu;
+  my $rej = sub { Rex::GPU::NVIDIA::Setup->_reject_unsupported_gpu(@_) };
   ok(!eval { $rej->($k80); 1 }, 'Tesla K80 dies');
   like($@, qr/Kepler or older.*470.*No driver package was installed and no package source was added/s, 'message names generation, branch, no change');
   ok(!eval { $rej->($c2050); 1 }, 'Fermi Tesla C2050 dies');
@@ -177,7 +180,7 @@ subtest 'SUSE: proprietary G06 for pre-Turing, default otherwise' => sub {
 };
 
 subtest '_apt_candidate_present' => sub {
-  my $c = \&Rex::GPU::NVIDIA::_apt_candidate_present;
+  my $c = sub { Rex::GPU::NVIDIA::Setup::Apt->_apt_candidate_present(@_) };
   is($c->("nvidia-driver-580-server:\n  Installed: (none)\n  Candidate: 580.178.04-0ubuntu0.24.04.1\n"), 1,
     'real candidate => 1');
   is($c->("nvidia-driver-580-server:\n  Installed: (none)\n  Candidate: (none)\n"), 0,
@@ -187,7 +190,7 @@ subtest '_apt_candidate_present' => sub {
 };
 
 subtest '_rpm_version_in_branch' => sub {
-  my $v = \&Rex::GPU::NVIDIA::_rpm_version_in_branch;
+  my $v = sub { Rex::GPU::NVIDIA::Setup::Rpm->_rpm_version_in_branch(@_) };
   is($v->('580.178.04', 580), 1, '580.178.04 in 580');
   is($v->('595.91.07',  580), 0, '595 not in 580');
   is($v->('5800.1',     580), 0, '5800.1 not in 580');

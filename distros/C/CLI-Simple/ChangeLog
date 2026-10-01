@@ -1,3 +1,22 @@
+Wed Sep 30 09:36:10 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.2.4]:
+	* .includes/publish.mk: added by CPAN::Maker::Bootstrapper
+	* .includes/update.mk: updated by CPAN::Maker::Bootstrapper
+	* Makefile: likewise
+	* .prompts/release-notes.prompt: new
+	* README.md: generated
+	* VERSION: bump
+	* lib/CLI/Simple.pm.in
+	- POD updates
+	(_get_help_sections): prefer USAGE when both USAGE & SYNOPSIS present
+	* lib/CLI/Simple/Constants.pm.in
+	(@VALID_OPTIONS): + help_sections
+	(@DEFAULT_HELP_SECTIONS): +USAGE
+	* recommends: generated
+	* t/04-cli-simple-help.t
+	- fix precedence tests
+
 Thu Sep 24 16:11:55 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.2.3]:
@@ -5,8 +24,8 @@ Thu Sep 24 16:11:55 2026  Rob Lauer  <rclauer@gmail.com>
 	* release-notes/release-notes-2.2.3.md: new
 	* README.md: generated
 	* VERSION: bump
-	* .includes/bootstrap.mk: added by CPAN::Maker::Bootsrapper
-	* .includes/perl.mk: updated by CPAN::Maker::Bootsrapper
+	* .includes/bootstrap.mk: added by CPAN::Maker::Bootstrapper
+	* .includes/perl.mk: updated by CPAN::Maker::Bootstrapper
 	* .includes/update.mk: likewise
 	* Makefile: likewise
 	* builder: likewise

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::WebhookSecret;
 # ABSTRACT: WebhookSecret defines a secret that will be passed to the webhook request.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name      => Str, { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::WebhookSecret - WebhookSecret defines a secret tha
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

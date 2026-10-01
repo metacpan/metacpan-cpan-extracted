@@ -1,8 +1,11 @@
 # Generated from Makefile.PL using makefilepl2cpanfile
 
-requires 'perl', '5.014';
+requires 'perl', '5.026';
 
+requires 'Carp';
+requires 'Fcntl';   # S_ISREG
 requires 'File::HomeDir';
+requires 'Getopt::Long';   # bin/makefilepl2cpanfile
 requires 'IPC::System::Simple';
 requires 'Params::Get', '0.17';
 requires 'Path::Tiny', '0.034';   # errors as Path::Tiny::Error objects
@@ -23,6 +26,7 @@ on 'test' => sub {
 	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird', '0.13';   # around, mock_scoped, spy, unmock, restore
 	requires 'Test::Most';
+	requires 'Test::Permissions';   # can_revoke_*, why_not
 	requires 'Test::Returns', '0.04';
 	requires 'Test::Without::Module';
 };

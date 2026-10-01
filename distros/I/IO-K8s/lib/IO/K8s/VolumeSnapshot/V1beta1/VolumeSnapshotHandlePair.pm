@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1beta1::VolumeSnapshotHandlePair;
 # ABSTRACT: VolumeSnapshotHandlePair defines a source volume and snapshot handle pair
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s snapshotHandle => Str, { required => 'schema' };
@@ -23,7 +23,7 @@ IO::K8s::VolumeSnapshot::V1beta1::VolumeSnapshotHandlePair - VolumeSnapshotHandl
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 snapshotHandle
 

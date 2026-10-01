@@ -1,7 +1,7 @@
 # ABSTRACT: Initialize a new karr board
 
 package App::karr::Cmd::Init;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -16,7 +16,7 @@ use App::karr::Role::Output;
 use App::karr::Role::SkillFile;
 
 # SkillFile: _skill_files and _write_skill_files, shared with `karr skill`,
-# which installs the same directory --claude-skill installs (tickets #145,
+# which installs the same directories --claude-skill installs (tickets #145,
 # #146, #285).
 with 'App::karr::Role::BoardDiscovery', 'App::karr::Role::SkillFile';
 with 'App::karr::Role::CliArgs';
@@ -42,7 +42,7 @@ option new_board => (
 
 option claude_skill => (
   is => 'ro',
-  doc => 'Install Claude Code skill for karr',
+  doc => 'Install the Claude Code skills for karr',
 );
 
 sub execute {
@@ -58,6 +58,21 @@ sub execute {
   # repository already has a board is a question the remote answers too, not
   # the local refs alone (#182).
   $self->_refuse_if_remote_has_board unless $self->new_board;
+
+  # Every file --claude-skill is going to install, looked up before anything
+  # is written, the way `karr skill install` looks up the whole set before its
+  # first write. The lookup can fail -- an install whose share dir is missing,
+  # as the single binary's was until k308 -- and init used to find that out
+  # only after writing the board refs and the .gitignore entries and creating
+  # the first skill's directory: exit 1, an initialized board, an empty
+  # .claude/skills/NAME (or one skill written and the next one empty), and a
+  # retry that only said "Board already exists" (k316). Asked here, a failed
+  # lookup leaves the repository exactly as it found it. Since #146 the lookup
+  # is App::karr::Role::SkillFile's and since #285 a skill is a directory,
+  # SKILL.md plus references/*.md, which _skill_files hands out whole.
+  my %shipped = $self->claude_skill
+    ? map { ( $_ => { $self->_skill_files($_) } ) } $self->_skill_names
+    : ();
 
   # Asked before the first ref write below, which would make any repository
   # look like it already held something. This is what tells a board born here
@@ -142,7 +157,7 @@ sub execute {
   }
 
   if ($self->claude_skill) {
-    $self->_install_claude_skill($root);
+    $self->_install_claude_skill( $root, \%shipped );
   }
 
   # --json reports the board name and the .gitignore entries this run added,
@@ -215,41 +230,54 @@ sub _refuse_if_remote_has_board {
   );
 }
 
+# $shipped is what execute looked up before its first write: skill name =>
+# { relative path => content }, the shape `karr skill install` builds too.
 sub _install_claude_skill {
-  my ($self, $root) = @_;
-  my $skill_dir = $root->child('.claude/skills/kanban-issues-karr-cli');
-  # An unwritable .claude is the project's layout, not a karr bug: Path::Tiny
-  # would otherwise report this file and line at the user (#77). Kept here
-  # rather than left to the mkpath inside _write_skill_files, which would report
-  # the same failure as "Could not write .../SKILL.md": at that point nothing has
-  # been written and nothing could be, because the directory is what karr could
-  # not create. Saying so is this command's own contract (t/120).
-  eval { $skill_dir->mkpath; 1 }
-    or user_error( "Could not create $skill_dir: ", clean_error($@) );
+  my ($self, $root, $shipped) = @_;
+  my $base = $root->child('.claude/skills');
+  my @installed;
 
-  # Also App::karr::Role::SkillFile's, since ticket #146: finding the bundled
-  # skill was a second copy of `karr skill`'s _skill_content, identical to it
-  # except for the one $INC key that told the development fallback which
-  # command's source tree to look next to. Since #285 the skill is a directory
-  # (SKILL.md plus references/*.md) and _skill_files is the whole of it.
-  my %skill_files = $self->_skill_files;
-  # Through App::karr::Role::SkillFile, not spew_utf8: this is the same
-  # directory `karr skill install --agent claude-code` writes, and in a
-  # checkout wired up by manage-skills its SKILL.md is one link of a hardlink
-  # chain. spew_utf8 renames a temp file over the target, which breaks this
-  # project out of that chain and leaves every other one on the old inode with
-  # the old text -- the bug fixed in `karr skill` as ticket #142 and left
-  # standing here until #145. The role is also where the read-only fallback
-  # and its warning live, so there is one description of how a skill gets
-  # written rather than two that drift.
-  $self->_write_skill_files( $skill_dir, \%skill_files );
-  my $skill_file = $skill_dir->child('SKILL.md');
-  # The path it wrote, not the fixed relative string it used to print: this
-  # installs into the root of the repository being initialized, which --dir can
-  # put in a different tree than the one the caller stands in, and
-  # ".claude/skills/..." is true of every tree at once. `karr skill install`
-  # printed the same non-answer and was fixed with it (#226, point 3).
-  print "Installed Claude Code skill to $skill_file\n" unless $self->json;
+  # Every skill of the set, as App::karr::Role::SkillFile lists them -- the
+  # same list `karr skill install` walks, so the two cannot install different
+  # sets.
+  for my $name ($self->_skill_names) {
+    my $skill_dir = $base->child($name);
+    # An unwritable .claude is the project's layout, not a karr bug: Path::Tiny
+    # would otherwise report this file and line at the user (#77). Kept here
+    # rather than left to the mkpath inside _write_skill_files, which would
+    # report the same failure as "Could not write .../SKILL.md": at that point
+    # nothing has been written and nothing could be, because the directory is
+    # what karr could not create. Saying so is this command's own contract
+    # (t/120).
+    eval { $skill_dir->mkpath; 1 }
+      or user_error( "Could not create $skill_dir: ", clean_error($@) );
+
+    # Through App::karr::Role::SkillFile, not spew_utf8: this is the same
+    # directory `karr skill install --agent claude-code` writes, and in a
+    # checkout wired up by manage-skills its SKILL.md is one link of a hardlink
+    # chain. spew_utf8 renames a temp file over the target, which breaks this
+    # project out of that chain and leaves every other one on the old inode
+    # with the old text -- the bug fixed in `karr skill` as ticket #142 and
+    # left standing here until #145. The role is also where the read-only
+    # fallback and its warning live, so there is one description of how a
+    # skill gets written rather than two that drift.
+    $self->_write_skill_files( $skill_dir, $shipped->{$name} );
+    push @installed, $skill_dir->child('SKILL.md');
+  }
+
+  # The retired single skill the set replaces goes, as `karr skill install`
+  # removes it -- after the new ones are written, so a failed write leaves the
+  # old skill rather than none.
+  my @removed = $self->_remove_retired_skills($base);
+
+  return if $self->json;
+  # The paths it wrote, not a fixed relative string: this installs into the
+  # root of the repository being initialized, which --dir can put in a
+  # different tree than the one the caller stands in, and ".claude/skills/..."
+  # is true of every tree at once. `karr skill install` printed the same
+  # non-answer and was fixed with it (#226, point 3).
+  print "Installed Claude Code skill to $_\n" for @installed;
+  print "Removed retired Claude Code skill $_\n" for @removed;
 }
 
 1;
@@ -266,7 +294,7 @@ App::karr::Cmd::Init - Initialize a new karr board
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -279,7 +307,7 @@ version 0.601
 
 Creates a new board inside C<refs/karr/*> in the current Git repository. The
 command writes the initial config and metadata refs and can optionally install
-the bundled Claude Code skill into the repository.
+the bundled Claude Code skills into the repository.
 
 Before it writes anything it asks the remote whether this repository already
 has a board there, because C<git clone> does not fetch C<refs/karr/*> and a
@@ -313,12 +341,22 @@ it is for (#95).
 
 =item * C<--claude-skill>
 
-Copies the bundled skill to F<.claude/skills/kanban-issues-karr-cli/> --
-F<SKILL.md> plus F<references/*.md>, the same directory
-L<App::karr::Cmd::Skill> installs for the C<claude-code> agent, and written
-the same way: each file B<in place>, keeping the inode of a F<SKILL.md> that
-is already there, so one that is a link of a hardlink chain shared across
-projects stays part of that chain.
+Copies the bundled skills to
+F<.claude/skills/kanban-issues-karr-coordination/> and
+F<.claude/skills/kanban-issues-karr-ticket/> -- each one's F<SKILL.md> plus
+its F<references/*.md>, the same directories L<App::karr::Cmd::Skill>
+installs for the C<claude-code> agent, and written the same way: each file
+B<in place>, keeping the inode of a F<SKILL.md> that is already there, so one
+that is a link of a hardlink chain shared across projects stays part of that
+chain. Files already there are overwritten, as with
+C<karr skill install --force>. A F<.claude/skills/kanban-issues-karr-cli/>
+left by an earlier release -- the single skill the two replace -- is removed,
+as C<karr skill install> removes it, and the plain output says so.
+
+The bundled skills are looked up before C<init> writes anything, so an
+installation that cannot find them fails without leaving a board, a
+F<.gitignore> entry or a half-written F<.claude/skills/> behind, and the same
+command can simply be run again once the installation is fixed.
 
 =item * C<--json>
 

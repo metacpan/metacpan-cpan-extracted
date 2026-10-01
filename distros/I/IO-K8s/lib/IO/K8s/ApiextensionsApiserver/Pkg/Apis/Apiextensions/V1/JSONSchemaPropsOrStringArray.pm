@@ -1,10 +1,17 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrStringArray;
 # ABSTRACT: JSONSchemaPropsOrStringArray represents a JSONSchemaProps or a string array.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use v5.10;
 use Moo;
 use Types::Standard qw( Str );
 use JSON::MaybeXS ();
+
+# Carp treats IO::K8s as part of this class (k175), as IO::K8s::List does
+# (k170): a schema arm is inflated through IO::K8s, and a shape croak raised
+# there -- a plain scalar where a schema belongs -- names the line that called
+# FROM_STRUCT, or IO::K8s itself on the way in, not the inflation call below.
+# A caller in any other package still sees its own line.
+our @CARP_NOT = ('IO::K8s');
 
 my $PROPS = 'IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaProps';
 
@@ -54,6 +61,15 @@ sub TO_JSON {
     return defined $schema ? $schema->TO_JSON : undef;
 }
 
+# The node a spec path walks into (IO::K8s::Role::SpecBuilder, k172): the
+# arm in use -- the property array, named so an element written into it is
+# checked against that attribute, or the schema.
+sub _spec_path_node {
+    my ($self) = @_;
+    my $property = $self->property;
+    return defined $property ? ($property, 'property') : ($self->schema);
+}
+
 with 'IO::K8s::Role::Resource';
 
 1;
@@ -70,7 +86,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOr
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 
@@ -86,6 +102,11 @@ Exactly one arm is populated, and which one it was survives a round trip.
     my $dep = $props->dependencies->{creditCard};
     if ($dep->is_schema) { ... $dep->schema   ... }
     else                 { ... $dep->property ... }
+
+An error inflating the schema arm -- a value of the wrong shape where a
+schema, or a field inside one, belongs -- names the line that called
+L</FROM_STRUCT>, or the entry point of IO::K8s that got there, not a line
+of this class.
 
 =head2 schema
 
@@ -109,6 +130,10 @@ True when the schema arm is in use, false when the string array arm is.
 
 Inflation hook called by L<IO::K8s/struct_to_object>. An ArrayRef fills
 C<property>, anything else fills C<schema>.
+
+The same hook builds the value a field of this type is given through C<new>,
+its setter or a C<spec_*> write of L<IO::K8s::Role::SpecBuilder>, whatever
+its shape; see L<IO::K8s::Resource/k8s>.
 
 =head2 TO_JSON
 

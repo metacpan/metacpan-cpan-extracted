@@ -1,15 +1,27 @@
 #-*- mode: makefile; -*-
 
-MANAGED_FILES = \
+MANAGED_MK_FILES = \
+    bash-completion.mk \
+    bootstrap.mk \
     git.mk \
     help.mk \
-    version.mk \
-    bootstrap.mk \
-    bash-completion.mk \
+    local.mk \
     modulino.mk \
     perl.mk \
-    local.mk \
-    release-notes.mk
+    publish.mk \
+    release-notes.mk \
+    update.mk \
+    upgrade.mk \
+    version.mk
+
+MANAGED_FILES = \
+   Makefile.txt \
+   gitignore
+
+INCLUDES_FILES = $(addprefix, "$(INCLUDES_DIR)/"., $(MANAGED_MK_FILES))
+
+MANIFEST: $(INCLUDES_FILE) $(MANAGED_FILES)
+	$(NO_ECHO)printf "%s\n" $(MANAGED_MK_FILES) $(MANAGED_FILES) | sort > $@
 
 BOOTSTRAPPER_DIST_DIR := $(shell perl -MFile::ShareDir=dist_dir \
     -e 'print dist_dir(q{CPAN-Maker-Bootstrapper})' 2>/dev/null || true)
@@ -21,7 +33,7 @@ INCLUDES_DIR = .includes
 .PHONY: post-update
 post-update: 
 	$(NO_ECHO)mkdir -p $(INCLUDES_DIR); \
-	for f in $(MANAGED_FILES); do \
+	for f in $(MANAGED_MK_FILES); do \
 	  src="$(BOOTSTRAPPER_DIST_DIR)/$$f"; \
 	  test -e "$$src" || continue; \
 	  cp "$$src" "$(INCLUDES_DIR)/$$f"; \

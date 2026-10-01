@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 155;
+use Test::More;
 
 BEGIN { use_ok(Imager=>qw(:all :handy)) }
 
@@ -72,7 +72,9 @@ test_colorf_glin($im_rgb, 0, 1,
   # fail gsamp
   is(Imager::i_gsamp_bits($im_rgb, 18, 22, 1, 16, \@samples, 0, [ 0, 3 ]), undef,
      "i_gsamp_bits fail bad channel");
-  is(Imager->_error_as_msg(), 'No channel 3 in this image', 'check message');
+  is(Imager->_error_as_msg(),
+     'getsamples: channel 3 out of range for 3 channel image',
+     'check message');
 
   is(Imager::i_gsamp_bits($im_rgb, 18, 22, 1, 17, \@samples, 0, [ 0, 2 ]), 8, 
      "i_gsamp_bits succeed high bits");
@@ -356,7 +358,29 @@ my $psamp_outside_error = "Image position outside of image";
   print "# end psampf tests\n";
 }
 
+SKIP:
+{
+  $ENV{IMAGER_RISKY_TESTS}
+    or skip "Skipping risky tests", 1;
+  $Config{ptrsize} == 8
+    or skip "Need 64-bit for this test", 1;
+  {
+    my $imx = Imager->new(xsize => 0x8000_0000, ysize => 0xFFFF_FFFF, bits => 16);
+    ok(!$imx, "Fail to create with overflow");
+    like(Imager->errstr, qr/integer overflow calculating image allocation/,
+         "check overflow message");
+  }
+  {
+    my $imx = Imager->new(xsize => 0x1000_0000, ysize => 0x800_0000, bits => 16);
+    ok(!$imx, "Fail to create with out of memory");
+    like(Imager->errstr, qr/Out of memory allocating image surface/,
+         "check out of memory message");
+  }
+}
+
 Imager->close_log;
+
+done_testing();
 
 unless ($ENV{IMAGER_KEEP_FILES}) {
   unlink "testout/t021sixteen.log";

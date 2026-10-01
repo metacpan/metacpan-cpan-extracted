@@ -5,6 +5,9 @@
 !/.claude/
 .claude/*
 !.claude/settings.json
+# skilletor: commit the config and its managed .gitignore (synced items stay ignored)
+!.claude/skilletor.json
+!.claude/.gitignore
 !.claude/agents/
 !.claude/agents/**
 !.claude/skills/

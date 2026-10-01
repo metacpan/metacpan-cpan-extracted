@@ -457,8 +457,8 @@ subtest 'full depth round-trip: CiliumNetworkPolicy / CiliumClusterwideNetworkPo
     isa_ok($cnp->spec->ingress->[0]->authentication, 'IO::K8s::Cilium::V2::Authentication');
     isa_ok($cnp->spec->ingress->[0]->toPorts->[0], 'IO::K8s::Cilium::V2::PortRule');
     isa_ok($cnp->spec->ingress->[0]->toPorts->[0]->ports->[0],
-        'IO::K8s::Api::Networking::V1::NetworkPolicyPort',
-        'PortRule.ports reused core NetworkPolicyPort (reuse_core)');
+        'IO::K8s::Cilium::V2::PortProtocol',
+        'PortRule.ports uses dedicated Str-port PortProtocol, not IntOrStr NetworkPolicyPort (k187)');
     isa_ok($cnp->spec->ingress->[0]->toPorts->[0]->rules, 'IO::K8s::Cilium::V2::L7Rules');
     isa_ok($cnp->spec->ingress->[0]->toPorts->[0]->rules->http->[0], 'IO::K8s::Cilium::V2::PortRuleHTTP');
     isa_ok($cnp->spec->egress->[0], 'IO::K8s::Cilium::V2::EgressRule');
@@ -968,11 +968,14 @@ subtest 'AccessLogs.json field (k108, fixed in 1.108)' => sub {
     # in the whole registry with a real upstream field literally named
     # `json` (Envoy access-log format spec, map[string]string). Before
     # 1.108 this collided with IO::K8s::Role::Resource's own internal JSON
-    # encoder attribute (also named `json`): Resource.pm's _k8s() skips
-    # creating a second attribute when the class already can($attr_name),
-    # so the field's attribute slot WAS the encoder, and to_json()/to_yaml()
-    # died on every AccessLogs instance, populated or not. Fixed by
-    # renaming the role's internal encoder attribute to `_json_encoder`,
+    # encoder attribute (also named `json`): Resource.pm's _k8s() silently
+    # skipped calling has() when the class already can($attr_name), so the
+    # field's attribute slot WAS the encoder, and to_json()/to_yaml() died
+    # on every AccessLogs instance, populated or not. That silent skip is
+    # gone as of k144 -- an unyielding collision like this now croaks at
+    # declaration time instead of silently reusing the existing slot -- but
+    # the fix that keeps AccessLogs.json working is still the rename below.
+    # Fixed by renaming the role's internal encoder attribute to `_json_encoder`,
     # freeing `json` for this real upstream field. See karr #108.
     my $al = IO::K8s::Cilium::V2alpha1::AccessLogs->new(
         format  => 'JSON',

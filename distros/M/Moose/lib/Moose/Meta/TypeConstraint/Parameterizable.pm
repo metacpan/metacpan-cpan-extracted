@@ -1,5 +1,5 @@
 package Moose::Meta::TypeConstraint::Parameterizable;
-our $VERSION = '2.4000';
+our $VERSION = '2.4001';
 
 use strict;
 use warnings;
@@ -116,7 +116,7 @@ Moose::Meta::TypeConstraint::Parameterizable - Type constraints which can take a
 
 =head1 VERSION
 
-version 2.4000
+version 2.4001
 
 =head1 DESCRIPTION
 

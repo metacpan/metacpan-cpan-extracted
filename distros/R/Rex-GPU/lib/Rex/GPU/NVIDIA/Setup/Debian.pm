@@ -1,7 +1,7 @@
 # ABSTRACT: NVIDIA driver setup for Debian (experimental)
 
 package Rex::GPU::NVIDIA::Setup::Debian;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 use Rex::Logger ();
 use namespace::autoclean;
@@ -372,7 +372,7 @@ Rex::GPU::NVIDIA::Setup::Debian - NVIDIA driver setup for Debian (experimental)
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -406,7 +406,7 @@ carries, at least 590. Unavailable on any other release or architecture.
 
 =back
 
-So a Blackwell GPU (open module, 570 or newer: no Debian-packaged driver
+So a Blackwell or GH200 GPU (open module only: no Debian-packaged driver
 fits) gets the CUDA repository on Debian 12/13 and dies before the host is
 changed anywhere else; every other GPU gets C<non-free>.
 

@@ -21,6 +21,8 @@ dzil-local/
 !/.claude/
 .claude/*
 !.claude/settings.json
+!.claude/skilletor.json
+!.claude/.gitignore
 !.claude/agents/
 !.claude/agents/**
 !.claude/skills/

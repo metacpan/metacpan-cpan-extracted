@@ -24,9 +24,11 @@ DESCRIPTION
     recovery. Futex blocking when empty.
 
     Crash safety: if a process dies while holding the heap mutex (mid-push or
-    mid-pop), the mutex is recovered via PID detection, but the heap data may
-    be in an inconsistent state (partially sifted). Callers should "clear" and
-    rebuild if crash recovery is triggered in a critical application.
+    mid-pop), the next process to take the mutex recovers it via PID detection
+    and finishes the interrupted sift from a record kept in the header, so the
+    heap stays ordered and holds every element exactly once. A push or pop the
+    dead process had not yet published is dropped; one it had published is
+    completed.
 
     Linux-only. Requires 64-bit Perl.
 
@@ -65,6 +67,12 @@ CONSTRUCTORS
     validated on attach. Croaks on error. The descriptor you pass is
     duplicated ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it
     does not disturb the handle.
+
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of dying with "SIGBUS" while the
+    segment is initialized; set "DATA_HEAP_SHARED_SPARSE=1" to skip the
+    reservation. On tmpfs and memfd the segment is memory, and a memory cgroup
+    too small for it gets an OOM kill rather than a croak.
 
 METHODS
   push

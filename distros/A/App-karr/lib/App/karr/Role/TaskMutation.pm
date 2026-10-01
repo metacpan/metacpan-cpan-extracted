@@ -1,7 +1,7 @@
 # ABSTRACT: The one guarded path for changing an existing task
 
 package App::karr::Role::TaskMutation;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo::Role;
 # No Time::Piece here on purpose: this role never asks for the time itself --
 # the lifecycle stamps are set by App::karr::Task::update_timestamps, which
@@ -262,6 +262,12 @@ sub apply_status_change {
     my $config = App::karr::Config->from_merged( $self->store->effective_config );
     $config->validate_status($new_status);
 
+    # A claim handed to a card on its way into backlog is refused (ticket
+    # k306). Ahead of the same-status shortcut below, because `move ID backlog
+    # --claim X` on a card already in backlog is a claim-only move, and that
+    # is exactly the claim the held-back column does not hold.
+    $self->check_held_back_claim( $task, $new_status, $claimant );
+
     my $old_status = $task->status;
 
     # A status change to the status the card already has changes nothing, so
@@ -332,9 +338,16 @@ sub apply_status_change {
     # claimed_at goes with claimed_by: on its own it is the age of a lease
     # nobody holds, and it is the timestamp `karr pick` and check_claim measure
     # expiry against.
-    if ( $config->is_terminal_status($old_status)
-        && !$config->is_terminal_status($new_status)
-        && !( defined $claimant && length $claimant ) )
+    #
+    # Parking releases it too (ticket k306): a card moved into backlog is
+    # held back, and backlog holds no claim, so whoever was working it lets go
+    # on the way in. The same two fields, cleared at the same point, so the
+    # activity log records it the way it records a reopen -- as the move. A
+    # claimant cannot reach this half: check_held_back_claim above refused it.
+    if ( !( defined $claimant && length $claimant )
+        && ( $config->is_held_back_status($new_status)
+          || ( $config->is_terminal_status($old_status)
+            && !$config->is_terminal_status($new_status) ) ) )
     {
         $task->clear_claimed_by;
         $task->clear_claimed_at;
@@ -378,6 +391,18 @@ sub apply_status_change {
 }
 
 
+sub check_held_back_claim {
+    my ( $self, $task, $status, $claimant ) = @_;
+    return 1 unless defined $claimant && length $claimant;
+    return 1 unless $self->store->is_held_back_status($status);
+    my $to = App::karr::Config->from_merged( $self->store->effective_config )
+        ->promotion_status;
+    App::karr::Error::user_error(
+        App::karr::Error::held_back_claim_message( $status,
+            'move', $task->id, $to // 'STATUS', '--claim', $claimant ) );
+}
+
+
 sub claim_hint_tokens {
     my ( $self, $task, $status ) = @_;
     return ( 'edit', $task->id, '--status', $status, '--claim', 'NAME' );
@@ -398,7 +423,7 @@ App::karr::Role::TaskMutation - The one guarded path for changing an existing ta
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 DESCRIPTION
 
@@ -514,7 +539,8 @@ meanwhile is reported as not found. Returns the deleted task.
 =head2 apply_status_change
 
 The only place a task's status is assigned. Rejects a status the board does not
-configure, releases the claim on a reopen, applies C<require_claim> and the
+configure, refuses a claim into C<backlog>, releases the claim on a reopen or a
+move into C<backlog>, applies C<require_claim> and the
 lifecycle stamps, records any unsatisfied dependencies
 (L<App::karr::Role::DependencyCheck/check_dependencies> -- recorded here,
 emitted by the caller once the write has landed), and returns the status the
@@ -550,6 +576,29 @@ The release happens B<before> the C<require_claim> check, so a claim on its way
 off the card cannot satisfy it: reopening straight into a column the board says
 needs an owner asks for C<--claim> rather than handing that column to whoever
 had finished the work (the shape of ticket #150).
+
+Moving a card into C<backlog> releases its claim the same way, whatever column
+it comes from (ticket k306): backlog is held back
+(L<App::karr::Config/is_held_back_status>) and holds no claim. A C<$claimant>
+passed for such a move is refused by L</check_held_back_claim>, before the
+same-status shortcut, so C<move ID backlog --claim NAME> is refused on a card
+already in backlog as well.
+
+=head2 check_held_back_claim
+
+    $self->check_held_back_claim( $task, $ends_in, $claim );
+
+Refuses a claim on a card that is, or ends up, in the board's held-back status
+-- C<backlog> (L<App::karr::Config/is_held_back_status>). Returns true when
+there is no claim to write or the status holds claims; otherwise dies with
+L<App::karr::Error/held_back_claim_message>, exit 1, whose last line is the
+C<karr move ID todo --claim NAME> that promotes the card and claims it in one
+step. L</apply_status_change> asks it for the destination; C<karr edit> asks it
+for the status the card is left in when there is no C<--status>.
+
+Only a claim being written is refused. A card that already carries one in
+backlog -- written before ticket k306 -- is not touched, so a note, a tag or a
+C<show> on it works as before.
 
 =head2 claim_hint_tokens
 

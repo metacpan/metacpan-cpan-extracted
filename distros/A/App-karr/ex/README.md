@@ -64,14 +64,14 @@ perl -Ilib bin/karr-foundation --config ex/config.yml             # the run
 What you see on a fresh sandbox:
 
 ```
-TICKET task#5
-START agent=demo command=.../fake-agent.sh
 fake-agent: working on #5
-Moved task 5: backlog -> review
+Moved task 5: todo -> review
 Handed off task 5 -> review (claim released)
-START command=.../drain-agent.sh
+fake-agent: #5 -> review, handed off
 drain-agent: working on #1
-Moved task 1: backlog -> done
+Moved task 1: todo -> done
+Updated task 1: Update the installation quickstart
+drain-agent: #1 -> done
 drain-agent: nothing to pick
 ```
 
@@ -94,11 +94,56 @@ perl -Ilib bin/karr --dir ex/webapp move 5 done
 
 ## Scenarios worth trying
 
-**A stalled agent and auto-block.** Point `docs-site`'s `.karr` at
-`lazy-agent.sh` (which prints "I cannot make progress" and exits 0). A run
-classifies as *stall* — the agent was given the board but nothing moved. After
-`max_attempts` (2 in the sample), the card it keeps failing on is
-auto-blocked. Reset the board with `--reset` afterwards.
+**A stalled agent and auto-block.** Reset the sandbox first
+(`./ex/setup.sh --reset && ./ex/setup.sh`), then point `webapp`'s `.karr` at
+`lazy-agent.sh` (which prints "I cannot make progress" and exits 0, without
+ever calling `karr`) by adding a `command:` line, which overrides the
+configured agent:
+
+```yaml
+# ex/webapp/.karr
+mode: ticket
+agent: demo
+prompt: "You are a demo agent. Work the assigned card, move it to review and hand it off under your own claim."
+max_attempts: 2
+command: /absolute/path/to/ex/bin/lazy-agent.sh
+```
+
+Not `docs-site`: it runs in `mode: drain`, and a drain only auto-blocks a card
+its *own* agent is on record as having touched — an activity-log entry under
+the claim it wrote. `lazy-agent.sh` never calls `karr`, so it never creates
+that record; pointed at `docs-site` it stalls forever and nothing is ever
+blocked. Ticket mode carries no such requirement: foundation assigned the
+card itself, so the assignment already is the evidence, and an agent that
+leaves it untouched still stalls it.
+
+Run the fleet twice — `max_attempts` is 2 in the sample:
+
+```console
+$ perl -Ilib bin/karr-foundation --config ex/config.yml
+lazy-agent: I cannot make progress on #5
+drain-agent: working on #1
+Moved task 1: todo -> done
+Updated task 1: Update the installation quickstart
+drain-agent: #1 -> done
+drain-agent: nothing to pick
+
+$ perl -Ilib bin/karr-foundation --config ex/config.yml
+lazy-agent: I cannot make progress on #5
+drain-agent: nothing to pick
+```
+
+(`docs-site`'s own card drains alongside it under its unmodified `.karr` —
+that's `drain-agent`'s output above, not part of this scenario.) The second
+run is card #5's second stall, so it is auto-blocked:
+
+```console
+$ perl -Ilib bin/karr --dir ex/webapp show 5
+...
+Blocked:  auto-block: no progress after 2 attempts (foundation)
+```
+
+Reset the board with `--reset` afterwards.
 
 **A failing agent and cooldown.** Point a `.karr` at `failing-agent.sh` (exits
 1 with an "API error"). The run is a *common-error* and the repository goes
@@ -435,9 +480,12 @@ What happens:
    repository, `init` leaves `.gitignore` alone and says so.
 
 Options: `--statuses` replaces the default status list with your own
-(comma-separated), `--claude-skill` places the shipped skill file at
-`.claude/skills/karr/SKILL.md` — written in place, so the inode of an already
-existing `SKILL.md` is preserved and a shared hardlink chain isn't broken.
+(comma-separated), `--claude-skill` places the two shipped skills at
+`.claude/skills/kanban-issues-karr-coordination/` and
+`.claude/skills/kanban-issues-karr-ticket/` — each file written in place, so
+the inode of an already existing `SKILL.md` is preserved and a shared hardlink
+chain isn't broken — and removes a leftover `kanban-issues-karr-cli/` from an
+earlier release.
 
 ### The `.gitignore` trap
 
@@ -539,10 +587,10 @@ brings it along), `--tags` shows an indented tag line per card.
 
 `archive ID` is the soft delete: the card goes to status `archived`, the ref
 stays, history and metadata are preserved, it disappears from the normal
-`list` output. A card with a live claim is **not** archived, no matter who holds
-it — archiving is a status change like any other, and `archive` deliberately has
-no `--claim`. Only release it first (`karr edit ID --release`) or wait out the
-`claim_timeout`.
+`list` output. A card with a live claim is **not** archived unless `--claim`
+names its holder — archiving is a status change like any other, and it does not
+read `KARR_CLAIM`. Otherwise release it first (`karr edit ID --release`) or wait
+out the `claim_timeout`.
 
 `delete ID --yes` removes the ref permanently. That's the difference to
 `archive`, and that's why it needs the confirmation.
@@ -557,40 +605,43 @@ A claim is not a lock in the technical sense — it expires (`claim_timeout`,
 default one hour), because an agent that dies mid-work must not take a card out
 of circulation forever. It's the agreement, not the enforcement.
 
-`karr agentname` supplies the name for it:
+`karr agent-name` supplies the name for it, and `KARR_CLAIM` carries it:
 
 ```bash
-NAME=$(karr agentname)
-karr pick --claim "$NAME" --status todo --move in-progress
-karr handoff 1 --claim "$NAME" --note "Implementation complete" --timestamp
+export KARR_CLAIM=$(karr agent-name)
+karr pick --status todo --move in-progress
+karr handoff 1 --note "Implementation complete" --timestamp
 ```
 
-Two words, lowercase, with a hyphen. And here lurks the most common mistake in
-the whole tool, which is why it made it into the command's POD: **every call
-rolls a new name.** Nothing is remembered — not per board, not per process, not
-per agent. So this is wrong:
+The name is the checkout's own directory name — `karr` for the `karr`
+checkout, `graphify-fix` for a worktree of that name — so it means something in
+`karr show`, and it comes out the same every time you ask in the same checkout.
+Exported once per session, it stands in for an omitted `--claim`: `pick` and
+`handoff` claim under it, `move` and `edit` recognize a card you already hold by
+it, and `list --claimed-by` selects on it. `create`, `move` and `edit` write it
+onto a card only when the card ends up in a `require_claim` column, so a card
+you file, promote to `todo` or annotate stays free for whoever picks next. An
+explicit `--claim NAME` still wins for a one-off.
 
-```bash
-karr pick --claim "$(karr agentname)" --move in-progress    # FALSCH
-karr handoff 7 --claim "$(karr agentname)"                  # FALSCH
-```
+Claims are checked by name comparison: `move`, `edit` and `handoff` compare the
+name with the one on the card, `list --claimed-by` and `log --agent` select on
+it. Claiming under one name and handing off under another is rejected — one
+name per session is the whole rule.
 
-That claims under one name and hands off under another. Claims are checked by
-name comparison: `move`, `edit` and `handoff` compare the passed name with the
-one on the card, `list --claimed-by` and `log --agent` select on it. Catch the
-name once in a variable and reuse the same variable everywhere — that's the
-whole rule.
+The name is deliberately **not** stored anywhere, neither on the board nor in a
+file in the checkout. Any anchor that survives a `karr` process — the board,
+the Git identity, the hostname — is shared just the same by every other agent on
+the same board, and a name derived from it would give two simultaneous agents
+the same claim. That's strictly worse than a mismatch: a mismatch is rejected, a
+collision is indistinguishable from the rightful owner. The checkout is the
+boundary that works — give each agent its own worktree and their names differ
+by themselves. Several agents in the **same** directory take `karr agent-name
+--unique` (`karr-8fa`), captured once into `KARR_CLAIM` like the plain name;
+`karr-foundation` does exactly that for every run it starts.
 
-The second half of it is just as deliberate: the name is **not** made stable per
-agent. Any anchor that survives a `karr` process — the board, the Git identity,
-the hostname — is shared just the same by every other agent on the same board.
-A name derived from it would give two simultaneous agents the same claim. And
-that's strictly worse than the mistake it would avoid: a mismatch is rejected,
-a collision is indistinguishable from the rightful owner and isn't rejected.
-
-If you've lost the name after all, you can read it back instead of minting a
-new one: `karr pick` prints `(claimed by NAME)`, `karr show ID` shows `Claimed:`,
-and the rejection on a mismatch names the current holder.
+If you've lost the name after all, you can read it back: `karr pick` prints
+`(claimed by NAME)`, `karr show ID` shows `Claimed:`, and the rejection on a
+mismatch names the current holder.
 
 ### `pick` vs. `list` — what the difference is
 
@@ -602,7 +653,8 @@ in-progress`). The selection part:
 
 - **Allowed statuses.** Without `--status` the terminal statuses fall away — the
   last configured status and `archived`, on a default board that's `done` and
-  `archived`.
+  `archived`. `backlog` falls away always: it is held back until someone
+  promotes a card to `todo`, and `pick --status backlog` is refused outright.
 - **Claim expiry.** Already claimed cards are invisible, unless their claim has
   expired after `claim_timeout`. A `claimed_by` that is an empty string isn't a
   claim — that's how `kanban-md` spells "not claimed".
@@ -791,8 +843,11 @@ how you look at a step, a run log or a question.
 
 ### Skills
 
-The distribution ships a `karr` skill, installable locally in the repository or
-globally in the home directory:
+The distribution ships two agent skills, installable locally in the repository
+or globally in the home directory: `kanban-issues-karr-coordination` (reading a
+board, picking, creating and routing cards, config, sync) and
+`kanban-issues-karr-ticket` (working the one card an agent was handed). Every
+`karr skill` action handles both as one set:
 
 ```bash
 karr skill install
@@ -800,9 +855,13 @@ karr skill install --agent claude-code
 karr skill install --agent codex --global --force
 karr skill check --global
 karr skill update
+karr skill show [NAME]      # both SKILL.md files, or the one named
 ```
 
-Targets are `claude-code`, `codex` and `cursor`.
+Targets are `claude-code`, `codex` and `cursor`. Earlier releases shipped a
+single `kanban-issues-karr-cli` skill instead; `install` and `update` remove a
+leftover one, and `check` reports it as `stale` and exits 1, so `karr skill
+update` alone migrates an old install.
 
 ### Characters inside, octets only at the edge
 
@@ -991,7 +1050,8 @@ the repository — never a silent fallback to "well then drain".
 **Ticket mode deserves its own explanation**, because it's the mode the chain
 builds on. Before starting the agent, foundation selects the card that the run
 is about — with `karr pick`'s own eligibility and ranking check (not terminal,
-not blocked, not held by a live claim; class, then priority, then identifier).
+not held back in `backlog`, not blocked, not held by a live claim; class, then
+priority, then identifier).
 These rules live in *one* role that both `karr pick` and foundation's picker
 compose. Until that was the case, they stood written out twice, and only the
 fact that they were copied from each other kept them in agreement — while a
@@ -1007,9 +1067,11 @@ value — a prompt that contained `$KARR_TASK` would give the agent those ten
 characters.
 
 And: **foundation names the card, it doesn't claim it.** The claim is the
-agent's work session, minted with `karr agentname` and reused across its own
-`move` and `handoff` calls. A claim invented by foundation couldn't be handed to
-the agent without a protocol of its own. The board's `.karr.lock` and the rule
+agent's work session: foundation exports `KARR_CLAIM` for the run (the
+checkout's `karr agent-name --unique`, minted once per run), and the agent's
+own `move` and `handoff` calls default to it. The environment is the whole
+protocol — a claim foundation stamped itself would need one of its own to reach
+the agent. The board's `.karr.lock` and the rule
 "one agent per repository" keep everyone else away for the duration of the run
 anyway. An agent that dies mid-run leaves at most its own claim — resolved by
 `claim_timeout` or `karr unlock` — and costs one attempt on foundation's
@@ -1058,8 +1120,9 @@ against which the next tick compares:
 
 The command is a **shell template**, not a string that `karr` rewrites. Exported
 into the child's environment: `PROMPT` (the instruction), `KARR_REPO` (where it
-is), `KARR_ROLE` (`agent` or `hook`) and `KARR_TASK` (the identifier in ticket
-mode, otherwise empty).
+is), `KARR_ROLE` (`agent` or `hook`), `KARR_TASK` (the identifier in ticket
+mode, otherwise empty) and `KARR_CLAIM` (the claim name the child's `karr`
+calls default to).
 
 ### How a run is judged
 
@@ -1394,8 +1457,9 @@ hub (`ask`, `answer`, `chain`) fail hard.
 
 ### `on_drained` — the hook that `karr` deliberately doesn't understand
 
-When a board has been drained — no workable card left, everything done, archived
-or blocked — foundation may run exactly one command in it:
+When a board has been drained — no workable card left, everything in the
+board's own final status (or archived), held back in `backlog`, or blocked —
+foundation may run exactly one command in it:
 
 ```yaml
 # /srv/gate/.karr
@@ -1443,11 +1507,13 @@ but with its own budget (`on_drained_max_runtime`), because how long an agent
 may take says nothing about how long a release gate may take.
 
 **"Drained" is a fact about the board, not a name for a result**: there is no
-workable card left on it. That's deliberately the same question that `--force`
-and `on_idle: always-run` are answers to, and the only one that keeps the same
-meaning across all modes. A drain that ends in a `common-error` doesn't count: a
-rate-limited agent leaves behind a board that looks exactly like one it worked
-through, and foundation doesn't believe that run itself.
+workable card left on it. A backlog card waits for a person to promote it, not
+for an agent, so a board with only backlog left is drained too. That's
+deliberately the same question that `--force` and `on_idle: always-run` are
+answers to, and the only one that keeps the same meaning across all modes. A
+drain that ends in a `common-error` doesn't count: a rate-limited agent leaves
+behind a board that looks exactly like one it worked through, and foundation
+doesn't believe that run itself.
 
 **An empty board isn't the same as finished work.** The hook may fail and create
 tickets; then the board is no longer empty, the next tick works them, the board
@@ -1490,9 +1556,12 @@ refs/karr-foundation/questions/<id>/ask     die Frage (YAML)
 refs/karr-foundation/questions/<id>/answer  die Antwort (YAML)
 ```
 
-**A chain is written from Perl today.** There's no CLI command for it, and that
-isn't convenience but the consequence of schema, cycle check and
-compare-and-swap — which is why `karr set-refs` flatly refuses this namespace:
+**A chain is written with `karr-foundation plan`**: one YAML (or JSON)
+document on stdin or `--input PATH`, validated whole before it replaces the
+chain in the hub (`--dry-run` checks without writing). Schema, cycle check and
+compare-and-swap are why `karr set-refs` flatly refuses this namespace. The
+Perl API underneath is the same path — it is what `ex/scripts/write-chain.pl`
+uses, and it reads like this:
 
 ```perl
 use App::karr::Git;
@@ -1563,10 +1632,11 @@ mode stays a unit that can be tested on its own.
 
 | Fact | Values |
 |---|---|
-| `board_actionable` | `yes` / `no` — is there still a card an agent could take |
+| `board_actionable` | `yes` / `no` — is there any card not in a terminal status, not in `backlog`, not blocked |
 | `ticket_status` | the status of the step's own card |
 | `ticket_blocked` | `yes` / `no` |
 | `ticket_claimed` | the claim name on it, or the empty string |
+| `ticket_links` | `settled` / `open` / `missing` — the far cards of the card's cross-board `needs:` links |
 | `question_state` | `answered` / `open` / `overdue` — only for a `kind: question` step |
 
 The division of labor behind it is deliberate: the `ChainStore` **knows the
@@ -2070,6 +2140,16 @@ explicit: the reference is a tag with a board **name** and card ID, and
 
 This section isn't a weakness of the article. It's the reason you can believe
 the rest.
+
+> **Since this was written**, three of the gaps below have been closed: the
+> coordination agent (`role: coordinator` on an agent definition, called at the
+> end of a tick for the deviations it met, writing the assignment, chains and
+> questions — so `escalate_to_ai` reaches it where one is marked), writing a
+> chain from the CLI (`karr-foundation plan`), and cross-board links in a chain
+> (the `ticket_links` precheck fact). The table and the subsections after it,
+> and the remarks in sections 5 and 7 that the judgement layer is missing,
+> describe the state before that; the "What is built, and what is not" table in
+> the distribution's `README.md` is the current one.
 
 | Piece | Status |
 |---|---|

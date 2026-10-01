@@ -149,9 +149,12 @@ Re-new image reference
 i_img *
 im_img_empty_ch(pIMCTX, i_img *im,i_img_dim x,i_img_dim y,int ch) {
   size_t bytes;
+  i_img *const orig_im = im;
+  size_t line_bytes;
 
   im_log((aIMCTX, 1,"i_img_empty_ch(*im %p, x %" i_DF ", y %" i_DF ", ch %d)\n",
 	  im, i_DFc(x), i_DFc(y), ch));
+  i_clear_error();
 
   if (x < 1 || y < 1) {
     im_push_error(aIMCTX, 0, "Image sizes must be positive");
@@ -161,10 +164,17 @@ im_img_empty_ch(pIMCTX, i_img *im,i_img_dim x,i_img_dim y,int ch) {
     im_push_errorf(aIMCTX, 0, "channels must be between 1 and %d", MAXCHANNELS);
     return NULL;
   }
-  /* check this multiplication doesn't overflow */
-  bytes = x*y*ch;
-  if (bytes / y / ch != (size_t)x) {
-    im_push_errorf(aIMCTX, 0, "integer overflow calculating image allocation");
+
+  if (im_mult_overflow3(&bytes, x, y, ch)) {
+    im_push_error(aIMCTX, 0, "integer overflow calculating image allocation");
+    return NULL;
+  }
+
+  /* basic assumption: we can always allocate a buffer representing a
+     line from the image, otherwise we're going to have trouble
+     working with the image */
+  if (im_mult_overflow2(&line_bytes, x, sizeof(i_fcolor))) {
+    im_push_error(aIMCTX, 0, "integer overflow calculating scanline allocation");
     return NULL;
   }
 
@@ -172,15 +182,24 @@ im_img_empty_ch(pIMCTX, i_img *im,i_img_dim x,i_img_dim y,int ch) {
     im = im_img_alloc(aIMCTX);
 
   memcpy(im, &IIM_base_8bit_direct, sizeof(i_img));
+
+  if ( (im->idata = i_malloc_fail(bytes)) == NULL) {
+    if (!orig_im)
+      /* can't i_img_destroy() until we've done i_img_init() */
+      i_free(im);
+    im_log((aIMCTX, 1, "i_img_empty_ch(): out of memory\n"));
+    i_push_error(0, "Out of memory allocating image surface");
+    return NULL;
+  }
+
+  memset(im->idata, 0, bytes);
+
   i_tags_new(&im->tags);
   im->xsize    = x;
   im->ysize    = y;
   im->channels = ch;
   im->ch_mask  = ~0U;
-  im->bytes=bytes;
-  if ( (im->idata=mymalloc(im->bytes)) == NULL) 
-    im_fatal(aIMCTX, 2,"malloc() error\n"); 
-  memset(im->idata,0,(size_t)im->bytes);
+  im->bytes    = bytes;
   
   im->ext_data = NULL;
 
@@ -529,12 +548,7 @@ i_gsampf_d(i_img *im, i_img_dim l, i_img_dim r, i_img_dim y, i_fsample_t *samps,
   int ch;
   i_img_dim count, i, w;
   unsigned char *data;
-  for (ch = 0; ch < chan_count; ++ch) {
-    if (chans[ch] < 0 || chans[ch] >= im->channels) {
-      dIMCTXim(im);
-      im_push_errorf(aIMCTX, 0, "No channel %d in this image", chans[ch]);
-    }
-  }
+
   if (y >=0 && y < im->ysize && l < im->xsize && l >= 0) {
     if (r > im->xsize)
       r = im->xsize;

@@ -1,107 +1,65 @@
-# OrePAN2-S3 Release Notes
+# OrePAN2-S3 2.1.2 Release Notes
 
-## Version 2.1.1
+## Summary
 
-**Released:** Mon Sep 14 2026  
-**Author:** Rob Lauer <rclauer@gmail.com>
+This release focuses on build system improvements and dependency
+cleanup. The core module functionality is unchanged; all changes are
+to the project infrastructure managed by `CPAN::Maker::Bootstrapper`.
 
----
+## Dependency Cleanup
 
-### New Features
+Redundant sub-module dependencies have been removed from `requires`
+and `cpanfile`. The following packages were already pulled in
+transitively by top-level dependencies and no longer need to be
+listed explicitly:
 
-#### `download-version-index` Command
-A new CLI command has been added to download the packages version
-index to the current working directory. This index is typically a
-SQLite database used with the `DarkPAN::Resolver::SQLite`
-resolver. The command requires a `packages_version_index` entry to be
-defined in your configuration file.
+- `CLI::Simple::Constants` and `CLI::Simple::Utils` (included by
+  `CLI::Simple`)
+- `DarkPAN::Utils::Docs` (included by `DarkPAN::Utils`)
+- `Role::Tiny::With` (included by `Role::Tiny`)
 
-```
-orepan2-s3 download-version-index
-```
+## Build System Changes
 
-#### `has_packages_version_index` Method
-A new internal method (`has_packages_version_index`) has been added to
-check whether a `packages_version_index` is defined in the active
-configuration profile.
+Significant updates to the build infrastructure were made via
+`CPAN::Maker::Bootstrapper`. Notable improvements include:
 
-#### Packages Version Index Integration for `delete`
-When deleting a distribution, if a `packages_version_index` is
-configured, the corresponding records are now automatically removed
-from that index via the new `_delete_from_packages_version_index`
-helper method.
+- **Dependency installation** (`local.mk`): The `local` target now
+  tracks installation state via a `local/.installed` sentinel file,
+  installs runtime and test dependencies separately, and correctly
+  handles the case where no CPAN installer is configured.
+- **Syntax and lint checking** (`perl.mk`): Check steps now emit
+  clearer progress messages (`Checking SYNTAX...`, `Checking POD...`,
+  `Checking TIDINESS...`, `Checking PERLCRITIC...`).
+- **Dependency scanning**: The `PERL5LIB` is now set correctly during
+  scanning so locally installed modules are visible. The
+  `test-requires` pipeline has been split into discrete steps
+  (`test-requires.scan` → `test-requires.raw` → `test-requires`)
+  with improved filtering logic.
+- **DarkPAN support**: New `DARKPAN_REQUIRES` / `DARKPAN_URL`
+  variables and associated targets for projects that pull dependencies
+  from a private DarkPAN mirror.
+- **Extra-files validation**: The `extra-files` target now verifies
+  that all listed files are tracked in git before packaging.
+- **Test discovery**: `find-files` now picks up `.pm` and `.pl`
+  helper files under `t/` in addition to `.t` files.
+- A new `publish.mk` include has been added.
+- `extra-files.mk` is now included unconditionally (previously used
+  `-include`).
+- Various generated files (`provides`, `test-requires.scan`,
+  `cpanfile.*`) are now properly listed in `CLEANFILES`.
 
-#### CloudFront Invalidation for Packages Version Index
-The `_invalidate_index` method now includes the configured
-`packages_version_index` path in CloudFront invalidation requests when
-one is defined.
+## Notes on ChangeLog Inconsistencies
 
-#### `--force` Short Option
-The `--force` option now accepts `-f` as a shorthand alias.
-
----
-
-### Changes
-
-#### Renamed Constant: `$PACKAGE_INDEX` → `$PACKAGES_DETAILS_INDEX`
-The internal constant previously named `$PACKAGE_INDEX` has been
-renamed to `$PACKAGES_DETAILS_INDEX` for clarity and consistency
-throughout `OrePAN2::S3`. All references across the codebase have been
-updated accordingly.
-
-#### Improved Error Handling in `fetch_config`
-- `die` calls replaced with `croak` for more idiomatic Perl error
-  propagation.
-- Config profile loading now logs at `debug` level instead of `info`
-  to reduce noise in standard operation.
-
-#### Quieter Logging in `fetch_template`
-Template loading messages have been downgraded from `info` to `debug`
-level logging.
-
-#### `cmd_delete` — Improved Match Reporting
-When multiple objects match a delete pattern, the full list of
-matching keys is no longer printed to stdout. Instead, a concise
-warning is logged showing only the count of matches, e.g.:
-
-```
-Multiple objects match "Foo-Bar" (3) - use --delete-all to remove all objects
-```
+- The `recommends` and `test-requires` files are listed as modified
+  in the ChangeLog but are not present in the diff. The nature of
+  those changes is not visible in this release.
+- `.prompts/release-notes.prompt` is listed in the ChangeLog but
+  does not appear in the diff and is not in the changed-files
+  listing — its content and purpose are unclear.
+- `Makefile` is attributed to `CPAN::Maker::Bootstrapper` in the
+  ChangeLog, but the Makefile in this repo is the project's own
+  (not the bootstrapper's `Makefile.txt`). The ChangeLog entry may
+  be imprecise.
 
 ---
 
-### Dependency Updates
-
-| Dependency | Previous Version | New Version |
-|---|---|---|
-| `OrePAN2::Lite` | 1.0.1 | 2.0.0 |
-| `DarkPAN::Indexer` | *(not required)* | 1.0.2 *(new)* |
-
----
-
-### Build System Updates
-
-- `bootstrap.mk` added to managed includes via `CPAN::Maker::Bootstrapper`.
-- `update.mk` and `Makefile` updated by `CPAN::Maker::Bootstrapper`.
-- `PACKAGE_VERSION` and `MODULE_NAME` are now exported from the `Makefile`.
-- `PERL5LIB` is now prepended with `$(pwd)/local/lib/perl5` when invoking `cpan-maker`.
-- `test-requires` scanning now filters out internally provided
-  packages using a generated `provides` file, preventing false
-  positive test dependencies.
-- `extra-files` and `extra-files.mk` generation refactored to use `cmb
-  extra-files`; `extra-files.mk` is skipped during bootstrap builds
-  (`BOOTSTRAP_BUILD`).
-- `$(MODULE_PATH).in` generation: `gen-vars-file` is now called before
-  the template resolution step.
-- `builder`: fixed a bug where `CPAN::Maker::Bootstrapper` was
-  overwriting rather than appending to `build-requires`.
-
----
-
-### Documentation Updates
-
-- POD for the `delete` command updated to note that records are
-  removed from a packages version index if one is configured.
-- `download-version-index` command documented in the command reference.
-- `dump-template` command entry repositioned in the command listing
-  for better logical grouping.

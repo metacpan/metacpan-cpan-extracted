@@ -1,11 +1,12 @@
 # Generated from Makefile.PL using makefilepl2cpanfile
 
-requires 'perl', '5.008';
+requires 'perl', '5.014';
 
 requires 'Carp';
 requires 'Config::Abstraction', '0.40';
-requires 'Data::Dumper';
 requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
+requires 'File::Basename';
+requires 'IPC::System::Simple';
 requires 'JSON::PP';
 requires 'Log::Log4perl';
 requires 'POSIX';
@@ -14,18 +15,19 @@ requires 'Readonly';
 requires 'Readonly::Values::Syslog', '0.04';
 requires 'Return::Set', '0.04';
 requires 'Scalar::Util';
+requires 'Socket';
 requires 'Sub::Private', '0.05';
 requires 'Sys::Syslog', '0.28';
-recommends 'Log::Any';
+requires 'autodie';
+recommends 'Email::Sender::Simple';
+recommends 'Email::Sender::Transport::SMTP';
+recommends 'Email::Simple';   # sendmail backend
+recommends 'Log::Any';   # Log::Any::Adapter::Abstraction
 
 on 'test' => sub {
-	requires 'File::Glob';   # scripts/generate_index
-	requires 'File::Slurp';
+	requires 'Data::Dumper';
 	requires 'File::Spec';
 	requires 'File::Temp';
-	requires 'File::stat';
-	requires 'IPC::System::Simple';
-	requires 'JSON::MaybeXS';
 	requires 'POSIX';
 	requires 'Test::DescribeMe';
 	requires 'Test::Mockingbird', '0.10';
@@ -38,6 +40,15 @@ on 'test' => sub {
 on 'develop' => sub {
 	requires 'Devel::Cover';
 	requires 'Perl::Critic';
-	requires 'Test::Pod';
-	requires 'Test::Pod::Coverage';
+	requires 'Pod::Coverage', '0.18';
+	requires 'Test::Carp';
+	requires 'Test::CheckManifest', '0.9';
+	requires 'Test::Compile';
+	requires 'Test::EOF';
+	requires 'Test::EOL';
+	requires 'Test::Pod', '1.22';
+	requires 'Test::Pod::Coverage', '1.08';
+	requires 'Test::Pod::Spelling::CommonMistakes';
+	requires 'Test::Spelling::Comment', '0.002';
+	requires 'Test::Synopsis';
 };

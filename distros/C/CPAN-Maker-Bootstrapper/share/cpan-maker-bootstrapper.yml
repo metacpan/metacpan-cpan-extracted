@@ -1,24 +1,27 @@
 ---
 commands:
-  annotate:           CPAN::Maker::Bootstrapper::Role::LLM::Annotator
-  code-finding:       CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
-  code-review:        CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
-  create-config:      CPAN::Maker::Bootstrapper::Role::CreateConfig
-  create-deps:        CPAN::Maker::Bootstrapper::Role::CreateDeps
-  critique:           CPAN::Maker::Bootstrapper::Role::Critic
-  default:            cmd_install
-  filter:             CPAN::Maker::Bootstrapper::Role::Filter 
-  install:            CPAN::Maker::Bootstrapper::Role::Installer
-  import-scaffold:    CPAN::Maker::Bootstrapper::Role::ScaffoldImporter
-  models:             CPAN::Maker::Bootstrapper::Role::LLM::Models
-  pod-finding:        CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
-  pod-review:         CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
-  provides:           CPAN::Maker::Bootstrapper::Role::Provides
-  release-notes:      CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes
-  update-annotations: CPAN::Maker::Bootstrapper::Role::LLM::Annotator
-  extra-files:        CPAN::Maker::Bootstrapper::Role::ExtraFiles
-  resolve-vars:       CPAN::Maker::Bootstrapper::Role::ResolveVars
-  version:            CPAN::Maker::Bootstrapper::Role::Version
+  annotate:                 CPAN::Maker::Bootstrapper::Role::LLM::Annotator
+  code-finding:             CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  code-review:              CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  create-config:            CPAN::Maker::Bootstrapper::Role::CreateConfig
+  create-deps:              CPAN::Maker::Bootstrapper::Role::CreateDeps
+  create-darkpan-requires:  CPAN::Maker::Bootstrapper::Role::DarkPANRequires
+  critique:                 CPAN::Maker::Bootstrapper::Role::Critic
+  default:                  cmd_install
+  deps-filter:              CPAN::Maker::Bootstrapper::Role::DepsFilter
+  filter:                   CPAN::Maker::Bootstrapper::Role::Filter 
+  install:                  CPAN::Maker::Bootstrapper::Role::Installer
+  import-scaffold:          CPAN::Maker::Bootstrapper::Role::ScaffoldImporter
+  models:                   CPAN::Maker::Bootstrapper::Role::LLM::Models
+  pod-finding:              CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  pod-review:               CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  provides:                 CPAN::Maker::Bootstrapper::Role::Provides
+  publish-to-cpan:          CPAN::Maker::Bootstrapper::Role::PAUSEUpload
+  release-notes:            CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes
+  update-annotations:       CPAN::Maker::Bootstrapper::Role::LLM::Annotator
+  extra-files:              CPAN::Maker::Bootstrapper::Role::ExtraFiles
+  resolve-vars:             CPAN::Maker::Bootstrapper::Role::ResolveVars
+  version:                  CPAN::Maker::Bootstrapper::Role::Version
 options:
 - auto-annotate|A
 - annotate|a=s@
@@ -49,6 +52,7 @@ options:
 - stub|s=s
 - username|u=s
 - vars-file=s
+abbreviations: 1
 alias:
   options:
     dryrun: dry-run

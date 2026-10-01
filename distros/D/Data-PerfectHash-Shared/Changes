@@ -1,5 +1,10 @@
 Revision history for Data::PerfectHash::Shared
 
+0.04  2026-10-01
+    - Perls without 64-bit integers are refused at build time: int keys are
+      64-bit.
+    - Windows is refused at build time: it lacks mmap.
+
 0.03  2026-09-26
     - Creating a thread no longer frees the handles the parent holds.
 

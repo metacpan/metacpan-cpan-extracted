@@ -42,7 +42,8 @@ sub _cli_board {
     system( 'git', '-C', $repo, 'config', 'user.name',  'Test User' ) == 0        or die 'git config';
     is( _run_karr( $repo, 'init', '--name', 'Guard Board' )->{exit}, 0,
         'setup: karr init exits 0' );
-    is( _run_karr( $repo, 'create', 'Held task' )->{exit}, 0,
+    # In todo: the tests claim this card, and backlog holds no claim (ticket k306).
+    is( _run_karr( $repo, 'create', 'Held task', '--status', 'todo' )->{exit}, 0,
         'setup: task 1 created' );
     return $repo;
 }

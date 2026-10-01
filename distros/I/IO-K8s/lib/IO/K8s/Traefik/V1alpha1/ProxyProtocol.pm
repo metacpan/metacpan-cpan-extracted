@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ProxyProtocol;
 # ABSTRACT: ProxyProtocol holds the PROXY Protocol configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s version => Int, { minimum => 1, maximum => 2 };
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::ProxyProtocol - ProxyProtocol holds the PROXY Protoc
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 version
 

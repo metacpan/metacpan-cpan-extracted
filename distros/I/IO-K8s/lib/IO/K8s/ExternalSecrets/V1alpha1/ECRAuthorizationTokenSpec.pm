@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ECRAuthorizationTokenSpec;
 # ABSTRACT: ECRAuthorizationTokenSpec defines the desired state to generate an AWS ECR authorization token.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s auth   => '+IO::K8s::ExternalSecrets::V1::AWSAuth';
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ECRAuthorizationTokenSpec - ECRAuthorization
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 auth
 

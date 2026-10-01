@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storagemigration::V1::StorageVersionMigration;
 # ABSTRACT: StorageVersionMigration represents a migration of stored data to the latest storage version.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject;
 
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Storagemigration::V1::StorageVersionMigration - StorageVersionMigr
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 

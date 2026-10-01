@@ -1,10 +1,7 @@
 #!/usr/bin/env perl
 # Example: the Ubuntu driver package chosen by `ubuntu-drivers list --gpgpu`
-# instead of Rex::GPU's apt-cache search, through a custom setup class.
-#
-# Layout:
-#   eg/ubuntu-drivers/Rexfile
-#   eg/ubuntu-drivers/lib/My/GPU/UbuntuDrivers.pm   <- the class; Rex puts lib/ on @INC
+# instead of Rex::GPU's apt-cache search, through the built-in, opt-in setup
+# class Rex::GPU::NVIDIA::Setup::UbuntuDrivers (experimental Setup API).
 #
 # Usage (Ubuntu hosts only):
 #   rex -f eg/ubuntu-drivers/Rexfile -H <host> setup
@@ -27,7 +24,7 @@ set private_key => $key;
 set public_key  => "$key.pub";
 set auth        => 'key';
 
-set gpu_nvidia_setup => 'My::GPU::UbuntuDrivers';
+set gpu_nvidia_setup => 'Rex::GPU::NVIDIA::Setup::UbuntuDrivers';
 
 desc 'GPU setup, driver package named by ubuntu-drivers';
 task 'setup', sub {

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::ScrapeConfigSpec;
 # ABSTRACT: spec defines the specification of ScrapeConfigSpec.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s authorization                  => '+IO::K8s::PrometheusOperator::V1alpha1::SafeAuthorization';
@@ -45,8 +45,8 @@ k8s nomadSDConfigs                 => ['+IO::K8s::PrometheusOperator::V1alpha1::
 k8s oauth2                         => '+IO::K8s::PrometheusOperator::V1alpha1::OAuth2';
 k8s openstackSDConfigs             => ['+IO::K8s::PrometheusOperator::V1alpha1::OpenStackSDConfig'];
 k8s ovhcloudSDConfigs              => ['+IO::K8s::PrometheusOperator::V1alpha1::OVHCloudSDConfig'];
-k8s params                         => { Str => 1 };
-k8s proxyConnectHeader             => { Str => 1 };
+k8s params                         => Opaque;
+k8s proxyConnectHeader             => Opaque;
 k8s proxyFromEnvironment           => Bool;
 k8s proxyUrl                       => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s puppetDBSDConfigs              => ['+IO::K8s::PrometheusOperator::V1alpha1::PuppetDBSDConfig'];
@@ -140,7 +140,7 @@ IO::K8s::PrometheusOperator::V1alpha1::ScrapeConfigSpec - spec defines the speci
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 authorization
 

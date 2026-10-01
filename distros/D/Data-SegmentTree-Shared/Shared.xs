@@ -134,8 +134,7 @@ add(self, i, delta)
   CODE:
     POS(pos, i);
     st_rwlock_wrlock(h);
-    __atomic_store_n(&h->hdr->add_used, 1, __ATOMIC_RELAXED);   /* a point add breaks gcd/product too; atomic: monoids_valid reads it unlocked */
-    st_range_add_rec(st_nodes(h), 1, 0, h->size - 1, (uint64_t)pos, (uint64_t)pos, (int64_t)delta);
+    st_range_add_locked(h, (uint64_t)pos, (uint64_t)pos, (int64_t)delta);
     v = st_get_locked(h, (uint64_t)pos);   /* new value, under the same lock */
     __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     st_rwlock_wrunlock(h);

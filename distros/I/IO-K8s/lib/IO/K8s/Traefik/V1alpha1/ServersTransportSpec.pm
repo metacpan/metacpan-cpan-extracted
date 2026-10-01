@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ServersTransportSpec;
 # ABSTRACT: ServersTransportSpec defines the desired state of a ServersTransport.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s certificatesSecrets => [Str];
@@ -44,7 +44,7 @@ IO::K8s::Traefik::V1alpha1::ServersTransportSpec - ServersTransportSpec defines 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 certificatesSecrets
 

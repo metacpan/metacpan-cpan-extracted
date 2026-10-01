@@ -1,6 +1,6 @@
 package IO::K8s::Role::Routable;
 # ABSTRACT: Role for building HTTP/gRPC routing rules
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use Carp qw( croak );
 use Scalar::Util qw( looks_like_number );
 # Imports above `use Moo::Role` on purpose: Role::Tiny treats subs already in
@@ -212,7 +212,7 @@ IO::K8s::Role::Routable - Role for building HTTP/gRPC routing rules
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -298,11 +298,11 @@ C<hostnames> list.
 
 =item * C<'traefik'> -- Traefik IngressRoute. Adds a new C<routes> entry
 whose C<match> string combines each hostname with C<Host(`...`)>, e.g.
-C<< match =E<gt> 'Host(`example.com`), Host(`api.example.com`)' >>.
+C<< match => 'Host(`example.com`), Host(`api.example.com`)' >>.
 
 =item * C<'ingress'> -- core Kubernetes Ingress. Appends an
 L<IO::K8s::Api::Networking::V1::IngressRule> per hostname with
-C<host =E<gt> $hostname>.
+C<< host => $hostname >>.
 
 =back
 
@@ -385,7 +385,7 @@ Returns C<$self> for chaining.
 
 Adds a header-based match to the most recently added routing rule.
 Gateway API appends to the last match's C<headers> array as
-C<< { name =E<gt> $header, value =E<gt> $value } >>; Traefik extends the
+C<< { name => $header, value => $value } >>; Traefik extends the
 route's C<match> string with C<< && Header(`<name>`, `<value>`) >>.
 Core Ingress does not support header matching natively and the call is a
 no-op in that mode. Returns C<$self> for chaining.

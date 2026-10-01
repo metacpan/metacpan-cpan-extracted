@@ -1,14 +1,14 @@
 package IO::K8s::AgentSandbox::V1beta1::SandboxTemplateSpec;
 # ABSTRACT: SandboxTemplateSpec
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s envVarsInjectionPolicy     => Str, { enum => [qw(Allowed Overrides Disallowed)], default => 'Disallowed' };
 k8s networkPolicy              => '+IO::K8s::AgentSandbox::V1beta1::NetworkPolicySpec';
 k8s networkPolicyManagement    => Str, { enum => [qw(Managed Unmanaged)], default => 'Managed' };
-k8s podTemplate                => '+IO::K8s::AgentSandbox::V1beta1::PodTemplate', { required => 'schema' };
+k8s podTemplate                => 'Core::V1::PodTemplateSpec', { required => 'schema' };
 k8s service                    => Bool;
-k8s volumeClaimTemplates       => ['+IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate'];
+k8s volumeClaimTemplates       => ['Core::V1::PersistentVolumeClaimTemplate'];
 k8s volumeClaimTemplatesPolicy => Str, { enum => [qw(Disallowed Allowed Overrides)], default => 'Disallowed' };
 
 
@@ -32,7 +32,7 @@ IO::K8s::AgentSandbox::V1beta1::SandboxTemplateSpec - SandboxTemplateSpec
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 envVarsInjectionPolicy
 

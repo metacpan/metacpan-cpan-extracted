@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::AllDisruptionMode;
 # ABSTRACT: AllDisruptionMode specifies that children can only be disrupted together.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 1;
@@ -17,7 +17,7 @@ IO::K8s::Api::Scheduling::V1alpha3::AllDisruptionMode - AllDisruptionMode specif
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SUPPORT
 

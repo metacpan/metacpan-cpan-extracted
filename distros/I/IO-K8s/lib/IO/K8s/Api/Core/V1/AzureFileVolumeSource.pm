@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::AzureFileVolumeSource;
 # ABSTRACT: AzureFile represents an Azure File Service mount on the host and bind mount to the pod.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s readOnly => Bool;
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::AzureFileVolumeSource - AzureFile represents an Azure Fi
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 readOnly
 

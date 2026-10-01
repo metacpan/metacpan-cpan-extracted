@@ -1,6 +1,6 @@
 package IO::K8s::Types::Net;
 # ABSTRACT: Type::Tiny constraints for IP addresses and CIDR notation
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use v5.10;
 use Type::Library -base, -declare => qw( IPv4 IPv6 IPAddress CIDR NetIP );
 use Type::Utils -all;
@@ -71,7 +71,7 @@ IO::K8s::Types::Net - Type::Tiny constraints for IP addresses and CIDR notation
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -157,7 +157,7 @@ C<< '$_' is not a valid IPv6 address >>.
 
 A L<Type::Tiny> constraint accepting either IPv4 or IPv6 single addresses
 (no CIDR suffix). Validated via L<Net::IP> -- a value is good iff
-C<Net::IP-E<gt>new($_)> constructs successfully. The diagnostic message is
+C<< Net::IP->new($_) >> constructs successfully. The diagnostic message is
 C<< '$_' is not a valid IP address >>.
 
 This is the type the L<IO::K8s::Role::CertManaged/add_ip_san> sanity-check
@@ -184,7 +184,7 @@ C<< '$_' is not valid CIDR notation >>.
     NetIP->check(Net::IP->new('10.0.0.1')); # 1
 
 A L<Type::Tiny> constraint accepting only L<Net::IP> instances. Comes with
-a coercion: any plain string is run through C<Net::IP-E<gt>new($_)>, so
+a coercion: any plain string is run through C<< Net::IP->new($_) >>, so
 attributes declared C<NetIP> can be constructed from a string. The
 coercion does no validation -- L<Net::IP::Error> will tell you whether
 the result is usable.

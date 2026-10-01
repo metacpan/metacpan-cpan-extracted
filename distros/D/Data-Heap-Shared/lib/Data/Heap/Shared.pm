@@ -1,7 +1,7 @@
 package Data::Heap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 require XSLoader;
 XSLoader::load('Data::Heap::Shared', $VERSION);
 
@@ -39,10 +39,11 @@ Mutex-protected push/pop with sift-up/sift-down. PID-based stale
 mutex recovery. Futex blocking when empty.
 
 B<Crash safety>: if a process dies while holding the heap mutex
-(mid-push or mid-pop), the mutex is recovered via PID detection,
-but the heap data may be in an inconsistent state (partially
-sifted). Callers should C<clear> and rebuild if crash recovery
-is triggered in a critical application.
+(mid-push or mid-pop), the next process to take the mutex recovers
+it via PID detection and finishes the interrupted sift from a record
+kept in the header, so the heap stays ordered and holds every element
+exactly once. A push or pop the dead process had not yet published
+is dropped; one it had published is completed.
 
 B<Linux-only>. Requires 64-bit Perl.
 
@@ -87,6 +88,12 @@ backing store (typically obtained from L</memfd> in another process).
 The header is validated on attach. Croaks on error. The descriptor you
 pass is duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to close and
 closing it does not disturb the handle.
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so
+a full filesystem makes them croak instead of dying with C<SIGBUS> while
+the segment is initialized; set C<DATA_HEAP_SHARED_SPARSE=1> to skip the
+reservation. On tmpfs and memfd the segment is memory, and a memory cgroup too
+small for it gets an OOM kill rather than a croak.
 
 =head1 METHODS
 

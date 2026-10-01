@@ -206,7 +206,9 @@ subtest 'an edit that names a field still stamps and still logs' => sub {
 
     # --release and --unblock carry no value, so they have to count as fields
     # in their own right -- `edit ID --release` is how a stale claim is broken
-    # and must not become a usage error (ticket #150, t/154).
+    # and must not become a usage error (ticket #150, t/154). Out of backlog
+    # first: a card there holds no claim (ticket k306).
+    is( _run_karr( $repo, 'move', '1', 'todo' )->{exit}, 0, 'setup: card 1 in todo' );
     my $claim = _run_karr( $repo, 'edit', '1', '--claim', 'agent-fox' );
     is( $claim->{exit}, 0, 'edit --claim goes through' ) or diag $claim->{stderr};
     my $release = _run_karr( $repo, 'edit', '1', '--release' );
@@ -247,6 +249,9 @@ subtest 'the reopen release of #224 is neither skipped nor silently taken' => su
 
 subtest 'move --claim onto the same status is a change and is written' => sub {
     my $repo = _setup_repo();
+    # In todo: backlog holds no claim (ticket k306), so there a claim-only
+    # move is refused -- t/306-backlog-held-back.t pins that side.
+    is( _run_karr( $repo, 'move', '1', 'todo' )->{exit}, 0, 'setup: card 1 in todo' );
 
     my $before = _updated_of( $repo, 1 );
     _past_the_second();
@@ -256,12 +261,12 @@ subtest 'move --claim onto the same status is a change and is written' => sub {
     # so an agent taking over a card whose claim ran out -- without moving it to
     # another column first -- must not be told nothing happened while nothing
     # did.
-    my $rv = _run_karr( $repo, 'move', '1', 'backlog', '--claim', 'agent-fox' );
+    my $rv = _run_karr( $repo, 'move', '1', 'todo', '--claim', 'agent-fox' );
     is( $rv->{exit}, 0, 'move --claim onto the same status goes through' )
         or diag $rv->{stderr};
     is( _field_of( $repo, 1, 'Claimed' ), 'agent-fox', 'the claim landed' );
     isnt( _updated_of( $repo, 1 ), $before, 'the write happened' );
-    is_deeply( [ _log_actions($repo) ], [ 'create', 'move' ],
+    is_deeply( [ _log_actions($repo) ], [ 'create', 'move', 'move' ],
         'and it is in the activity log, because something did change' );
 };
 

@@ -1,5 +1,48 @@
 Revision history for Rex-GPU
 
+0.003     2026-10-01 04:00:20Z
+  - None of the changes below has run on GPU hardware yet; they are
+    checked against the commands they send to the host.
+
+  [Driver]
+  - Grace Hopper GH200 (10de:2342, 10de:2348) gets the open kernel module
+    only, as Blackwell: Ubuntu -server-open, Debian 12/13 NVIDIA's CUDA
+    repository, RHEL cuda-open-dkms, openSUSE its open driver.
+  - Ubuntu: only the running kernel's linux-headers-$(uname -r) are
+    installed, no longer linux-headers-generic, which brought headers for
+    another kernel on HWE and vendor kernels (DGX Spark). A kernel
+    installed later needs its own headers for DKMS.
+  - Ubuntu: new opt-in setup Rex::GPU::NVIDIA::Setup::UbuntuDrivers
+    (experimental): `ubuntu-drivers list --gpgpu` names the driver
+    package, installed by apt-get and verified with dpkg; nothing named
+    dies before any driver install. The default stays apt-cache search.
+
+  [Detection]
+  - An AMD GPU's name is read from lspci as for NVIDIA, e.g.
+    "Navi 31 [Radeon RX 7900 XTX]", instead of "Unknown AMD GPU" for
+    every card. Detect-only as before: AMD stays compute => 0.
+  - New opt-in Rex::GPU::Detect::Sysfs (experimental): detection from
+    /sys/bus/pci/devices, without lspci and without installing pciutils;
+    same result shape including vgpu and nvswitch. No product names, so a
+    GPU the generation table does not cover is compute => undef, not 0.
+    Dies where sysfs cannot be read. Chosen with detect => or set
+    gpu_detect_class; lspci stays the default.
+
+  [API]
+  - Every function of Rex::GPU, Rex::GPU::Detect and Rex::GPU::NVIDIA
+    also works as a class method, and a subclass of Rex::GPU::NVIDIA or
+    Rex::GPU::Detect can replace any step (experimental): chosen with
+    gpu_setup(nvidia => ..., detect => ...) or set gpu_nvidia_class /
+    set gpu_detect_class; one that cannot be loaded dies before the host
+    is touched. Function calls, their arguments and the defaults are
+    unchanged.
+
+  [Container toolkit]
+  - install_container_toolkit(binaries_suffice => 1) counts the toolkit as
+    present when nvidia-container-runtime and nvidia-ctk are on the PATH and
+    nvidia-ctk runs, without asking the package manager (vendor images
+    such as DGX Spark); gpu_setup and the default are unchanged
+
 0.002     2026-09-24 21:34:32Z
   - None of the changes below has run on GPU hardware yet; they are
     checked against the commands they send to the host.

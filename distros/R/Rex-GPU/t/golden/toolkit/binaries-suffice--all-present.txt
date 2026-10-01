@@ -1,0 +1,6 @@
+# golden: toolkit/binaries-suffice--all-present
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: command -v nvidia-container-runtime 2>/dev/null
+run: command -v nvidia-ctk 2>/dev/null
+run: nvidia-ctk --version 2>&1

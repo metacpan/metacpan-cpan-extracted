@@ -1,7 +1,7 @@
 # ABSTRACT: Role providing board discovery, sync lifecycle, and task access
 
 package App::karr::Role::BoardAccess;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo::Role;
 use App::karr::Role::CliArgs;
 use App::karr::ActivityLog;
@@ -73,9 +73,15 @@ sub allocate_next_id {
 }
 
 
+sub normalize_task_id {
+    my ($self, $id) = @_;
+    return defined $id && $id =~ /\A[kK]([0-9]+)\z/ ? $1 : $id;
+}
+
+
 sub parse_ids {
     my ($self, $id_str) = @_;
-    return split /,/, $id_str;
+    return map { $self->normalize_task_id($_) } split /,/, $id_str;
 }
 
 
@@ -143,7 +149,7 @@ App::karr::Role::BoardAccess - Role providing board discovery, sync lifecycle, a
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 DESCRIPTION
 
@@ -230,18 +236,36 @@ free task id, delegating to L<App::karr::BoardStore/allocate_next_id>. The
 allocation is a compare-and-swap on the board's counter ref, so two agents
 running C<karr create> at the same time are always handed different ids.
 
+=head2 normalize_task_id
+
+    my $id = $self->normalize_task_id('k30');    # 30
+    my $id = $self->normalize_task_id('30');      # 30
+    my $id = $self->normalize_task_id('kanban');  # kanban (unchanged)
+
+Accepts the house C<kNNN> spelling of a local task id wherever a bare number
+is expected: a leading C<k> or C<K> immediately in front of a run of digits,
+with nothing else around it, is stripped so C<k30> resolves the same card as
+C<30>. Every other token -- a bare number, a lone C<k>, C<k1a>, C<kanban> --
+is returned unchanged and fails downstream exactly as it did before, through
+the same "not found" or "invalid id" path. Pure string handling: it never
+touches the store, so the numeric ref names built from the result are
+unaffected.
+
 =head2 parse_ids
 
-    my @ids = $self->parse_ids('1,2,3');   # (1, 2, 3)
-    my @ids = $self->parse_ids('7');       # (7)
+    my @ids = $self->parse_ids('1,2,3');    # (1, 2, 3)
+    my @ids = $self->parse_ids('7');        # (7)
+    my @ids = $self->parse_ids('k30,31,K32'); # (30, 31, 32)
 
 In a command class that composes this role, splits the comma-separated id
 argument every batch-capable command (C<move>, C<edit>, C<delete>,
 C<archive>, C<unlock>) takes on its single positional and returns the ids in
-order, unvalidated and as plain strings. There is no range syntax (C<1-3>)
-and no whitespace handling; an empty string returns an empty list. Whether
-each id actually names a task is left to the per-id callback each command
-runs via L<App::karr::Role::TaskMutation/run_batch>.
+order, unvalidated and as plain strings. Each token first passes through
+L</normalize_task_id>, so the house C<kNNN> spelling is accepted wherever a
+bare number is and a batch may mix the two (C<k30,31,K32>). There is no range
+syntax (C<1-3>) and no whitespace handling; an empty string returns an empty
+list. Whether each id actually names a task is left to the per-id callback
+each command runs via L<App::karr::Role::TaskMutation/run_batch>.
 
 =head2 activity_log
 

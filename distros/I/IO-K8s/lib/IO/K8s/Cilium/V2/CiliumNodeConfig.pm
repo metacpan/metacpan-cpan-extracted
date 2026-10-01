@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumNodeConfig;
 # ABSTRACT: CiliumNodeConfig is a list of configuration key-value pairs.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumnodeconfigs';
@@ -23,7 +23,7 @@ IO::K8s::Cilium::V2::CiliumNodeConfig - CiliumNodeConfig is a list of configurat
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

@@ -58,10 +58,10 @@ my $schema = {
                     type => 'object',
                     properties => { value => { type => 'string' } },
                 },
-                template => {                         # {metadata,spec}: several, NOT wire-identical (differing
-                    type => 'object',                 # target class per candidate) -- stays nested
+                template => {                         # {metadata,spec} with a BARE (opaque) spec: no
+                    type => 'object',                 # candidate's structured spec can hold it, so k156's
                     properties => { metadata => { type => 'object' }, spec => { type => 'object' } },
-                },
+                },                                    # recursive filter drops them all -- stays nested
             },
         },
     },
@@ -79,7 +79,7 @@ subtest 'exact core shapes are referenced' => sub {
     like($spec->{partial}{class}, qr/::Spec::Partial$/, 'a single-key shape stays a nested class');
     like($spec->{counter}{class}, qr/::Spec::Counter$/, 'a single-key shape stays a nested class even though Counter is type-compatible');
     like($spec->{template}{class}, qr/::Spec::Template$/,
-        'several candidates that are NOT wire-identical (PodTemplateSpec vs. JobTemplateSpec vs. ResourceClaimTemplateSpec, ...) stay a nested class');
+        'a {metadata,spec} whose spec is opaque matches no candidate deeply (k156 recursive filter drops them ahead of the tie-break), so it stays a nested class');
 };
 
 subtest 'inflate resolves the requirement inside a reused LabelSelector' => sub {
@@ -109,10 +109,11 @@ subtest 'metadata is part of an embedded type\'s shape, not a top-level Kind\'s'
     # PodTemplateSpec ({metadata,spec}) is an embedded type (no api_version/
     # kind of its own), so its `metadata` is a real, schema-visible field
     # and stays in its indexed shape. It is one of SEVERAL classes sharing
-    # this exact key set, not the sole match -- see the 'template' field
-    # above for why that keeps a {metadata,spec} schema from being reused
-    # automatically: they are not wire-identical (each has its own `spec`
-    # target class).
+    # this exact key set: a {metadata,spec} schema is reused only when the
+    # k156 recursive filter narrows those candidates to the one whose `spec`
+    # the schema actually fits (see t/149_k156_reuse_core_recursive_filter.t);
+    # an opaque spec like the 'template' field above narrows to none and stays
+    # nested.
     my @c = IO::K8s::AutoGen::core_class_for_shape([qw(metadata spec)]);
     is_deeply(
         \@c,

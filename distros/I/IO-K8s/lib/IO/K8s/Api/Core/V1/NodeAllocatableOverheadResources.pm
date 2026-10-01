@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeAllocatableOverheadResources;
 # ABSTRACT: NodeAllocatableOverheadResources describes auxiliary overhead resource allocations.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::NodeAllocatableOverheadResources - NodeAllocatableOverhe
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

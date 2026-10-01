@@ -1,5 +1,12 @@
 Revision history for Data-SegmentTree-Shared
 
+0.06      2026-09-26
+          - A writer killed mid-update is repaired: each position reads as
+            before or after it, and ranges agree with points.
+          - Segments are reserved, so a full filesystem fails the constructor;
+            DATA_SEGMENTTREE_SHARED_SPARSE=1 skips the reservation.
+          - A failed create no longer leaves a full-size file behind.
+
 0.05      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.

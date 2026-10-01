@@ -1,6 +1,249 @@
 Revision history for Rex-Rancher
 
-0.002     2026-09-24 20:39:38Z
+0.003     2026-10-01 04:03:18Z
+  - install_cilium with a kubeconfig no longer prints "Use of uninitialized
+    value" on a cluster without a Cilium Helm release (every fresh
+    rancher_deploy_server did, on STDERR; harmless otherwise).
+  - Cilium defaults to 1.20.0 with CLI v0.19.7 (was 1.17.0 / v0.16.23),
+    the pair kubernetes-ocp runs; Cilium 1.17 is not tested on Kubernetes
+    1.33+. 1.20 needs Linux 5.10+ (RHEL 8.10: 4.18) and, with gateway_api,
+    gateway_api_version v1.6.1+ (older dies before the host is touched).
+    Cilium moves one minor at a time: with kubeconfig, a version more than
+    one minor from the running Cilium dies before the host is touched, and
+    without version a running older minor keeps its version with a warning
+    (a re-run no longer takes 1.17 to 1.20, or pulls a newer one back).
+  - install_cilium and upgrade_cilium with kubeconfig keep what a running
+    Cilium uses: IPAM mode and pool from ConfigMap kube-system/cilium-config
+    whenever it exists, whatever the Helm release state (an rke2 upgrade or
+    a reinstall after a failed install no longer switches a cluster-pool
+    cluster to kubernetes IPAM), k8sServiceHost on k3s from the cilium
+    DaemonSet (k8s_service_host is then optional), operator.replicas from
+    the cilium-operator Deployment. A different mode or pool asked for in
+    helm_values dies before the host is touched; an API error other than a
+    404 while reading them dies instead of falling back to the defaults.
+    upgrade_cilium requires kubeconfig and dies without it before the host
+    is touched: the running IPAM mode and pool cannot be checked otherwise.
+  - upgrade_cilium requires a deployed revision of Helm release cilium and
+    dies before installing the Cilium CLI, applying the Gateway API CRDs
+    or writing the values file otherwise, pointing to install_cilium; a
+    ConfigMap kube-system/cilium-config or a cilium DaemonSet without a
+    deployed release is not enough, since cilium upgrade cannot install
+    one. A release stuck in pending-upgrade or pending-rollback (or
+    pending-install over a deployed revision) also dies before the host,
+    with the same message install_cilium uses, naming the Secret to
+    delete. A failed upgrade over a deployed revision is upgraded again.
+    On k3s without k8s_service_host this is now the message instead of the
+    k8s_service_host one.
+  - install_cilium with a kubeconfig no longer removes Helm release cilium
+    when it is stuck in pending-install over a deployed revision (cilium
+    uninstall, then every revision Secret including the deployed one, took
+    the pod network down with it); it dies instead, with the message
+    upgrade_cilium gives, naming the Secret to delete. pending-upgrade and
+    pending-rollback now also die there before the Cilium CLI is installed,
+    the Gateway API CRDs are applied or the values file is written, not
+    only after. A pending install with no deployed revision is still
+    removed and installed fresh.
+  - New wait and wait_duration (seconds, default 600) options for
+    install_cilium/upgrade_cilium: wait until the cilium DaemonSet and
+    cilium-operator are ready, or die naming their state; an API error
+    other than a 404 (no access, no connection) dies at once.
+  - New ensure_gateway_api_crds(kubeconfig, version, channel): apply only
+    the Gateway API CRDs and restart cilium-operator when they changed.
+  - install_cilium counts only a 404 as missing everywhere it reads or
+    deletes through the API: a 403 or another error on the Gateway API
+    probe CRD, a CRD waited on to be Established, the cilium-operator to
+    restart, the DaemonSet checked after install or a stale release Secret
+    being purged dies naming it, instead of applying the CRDs anyway,
+    waiting out 30s, skipping the operator restart silently or reading
+    "not found" in an error body as already gone.
+  - New cluster_cidr option (one IPv4 CIDR) for install_server and
+    rancher_deploy_server: written as cluster-cidr on rke2 and k3s, and
+    handed to install_cilium (new option, passed through by
+    rancher_deploy_server) as Cilium's pool unless helm_values sets one.
+    The pool counts in cluster-pool mode (k3s, or rke2 with ipam_mode
+    cluster-pool); rke2's default kubernetes mode ignores it and pods follow
+    the node podCIDRs cut from cluster-cidr. It is the pool of a fresh
+    install: a running cluster-pool Cilium keeps its own, with a warning.
+    Without it nothing changes: k3s keeps 10.42.0.0/16, rke2 writes none.
+  - New ipam_mode option (kubernetes or cluster-pool) for install_cilium,
+    upgrade_cilium and rancher_deploy_server: Cilium's IPAM mode on a fresh
+    install, in place of the distribution's default (rke2 kubernetes, k3s
+    cluster-pool). A Cilium already running in another mode keeps it, with
+    a warning naming both; ipam.mode in helm_values still dies there. Any
+    other value, or one helm_values contradicts, dies before the host is
+    touched.
+  - install_agent's error for an agent that never gets active names the
+    server it joins through ("It joins the cluster via ... -- check that
+    this node can reach that address") above the journal tail.
+  - prepare_node leaves an already NTP-synchronized clock alone instead of
+    installing chrony; a failed chrony install falls back to
+    systemd-timesyncd where the host has it (Debian/Ubuntu, not the RHEL
+    family) and, when that is not active either, goes on with a warning
+    that no time synchronization is active.
+  - prepare_node with hostname but no domain writes 127.0.1.1 hostname to
+    /etc/hosts, unless a line already names the host.
+  - prepare_node on Debian/Ubuntu enables the locale in /etc/locale.gen
+    (charset as locale.gen spells it: de_DE.utf8 enables de_DE.UTF-8 UTF-8)
+    and runs locale-gen before setting it. A locale that is not shaped like
+    en_US.UTF-8 dies before the host is touched.
+  - prepare_node (and rancher_deploy_server/_agent) dies before the host is
+    touched on a timezone that is not a zoneinfo-shaped name (Europe/Berlin,
+    UTC, Etc/GMT+5); timedatectl and the /etc/localtime symlink get it
+    single-quoted.
+  - Recommend Rex::GPU 0.002 for gpu => 1. "GPU hardware support" now
+    describes it: Fabric Manager on HGX A100/H100/H200, Fabric Manager plus
+    nvlsm and ib_umad on HGX B200/B300 (not only a warning), and the dies
+    for a host without a Fabric Manager or nvlsm source.
+  - rancher_deploy_server and rancher_deploy_agent die on a distribution
+    other than rke2 or k3s before touching the host; before, a typo got
+    through node preparation and Rex::GPU's driver install. install_agent's
+    error for it names the valid values, as install_server's does.
+  - A re-run heals an rke2 or k3s node set up with Rex::GPU 0.001:
+    install_server and install_agent remove a containerd config.toml.tmpl that
+    holds only imports and version = 2 before they (re)start the service, with
+    a warning; any other template stays, with a log line, and a removal that
+    fails dies before the start. While config.toml is still that template's
+    output (no SystemdCgroup, sandbox image or registry mirrors), the running
+    service is then restarted once, with a warning, so it renders its own
+    containerd config -- also when another template has replaced it since.
+  - A re-run restarts a running rke2 server or agent, logging why, when its
+    config.yaml(.d), registries.yaml, /etc/default file or containerd
+    drop-ins changed since it started, or a newer rke2 is installed that
+    the version skew rules below allow; before, it was only started and ran
+    the old setup until its next restart. Unchanged: it is left running.
+    k3s is still restarted on every run.
+  - install_server and install_agent follow Kubernetes' version skew policy
+    on a running rke2 or k3s: a version more than one minor ahead of it, or
+    older, dies before anything is installed. Without version that is the
+    stable channel's, resolved on the host. The next minor is restarted
+    onto only with version pinned; unpinned it is installed, but the
+    running service is left on its old version with a warning. Before, an
+    unpinned re-run restarted k3s onto whatever the channel installed. A
+    service that is not running is held to the same rules against the
+    installed rke2/k3s binary; there an unpinned next minor only warns, as
+    the service starts on it. No binary: a fresh install, not checked.
+  - New kubeconfig option for install_agent (kubeconfig_file for
+    rancher_deploy_agent): an agent of a newer minor than the control plane
+    dies before it is installed. New control_plane_version(kubeconfig) in
+    Rex::Rancher::K8s.
+  - deploy_nvidia_device_plugin's warning when no nvidia.com/gpu capacity
+    appears within two minutes names the API error of the last attempt (a
+    403, no connection) instead of only "check device plugin".
+  - Internal: what RKE2 and K3s differ in (paths, units, installer, release
+    artifacts, Cilium's Helm defaults) and the host steps server and agent
+    share moved into the new Rex::Rancher::Distribution with ::RKE2 and
+    ::K3s, loaded by new_for; the option checks and the checksum parsing
+    into Rex::Rancher::Options and Rex::Rancher::Checksum (new dependencies
+    Moo, Module::Runtime and namespace::autoclean). The commands run on the
+    host and their order are unchanged; so are the error messages, apart
+    from install_agent's for an agent that never gets active (above). New,
+    not exported: Rex::Rancher::Cilium::validate_cilium_opts checks
+    install_cilium's options without touching anything.
+  - install_server and rancher_deploy_server die before writing or
+    installing anything when a server already set up on the host (its
+    service active, or server/token there) would get another
+    cluster-cidr than the one it runs with, rke2 and k3s alike. The
+    running value is read from config.yaml and its config.yaml.d
+    drop-ins, or without one the built-in 10.42.0.0/16; the die names
+    both values. A re-run that leaves cluster_cidr out against a server
+    set up with another one dies the same way. Requires YAML::PP 0.027.
+  - New fetch_kubeconfig and patch_kubeconfig_server in
+    Rex::Rancher::Server: fetch the kubeconfig from the node, point it at
+    an address reachable from here (IPv6 in brackets, CA kept), apply your
+    own policy through filter, save it 0600.
+  - rancher_deploy_server saves kubeconfig_file with mode 0600, also over
+    an existing file; an IPv6 kubeconfig_server or tls_san address is now
+    bracketed (the URL was invalid before), and a https://[::1] server URL
+    is patched too.
+  - install_server and install_agent, RKE2 and K3s alike, die before
+    anything is written or installed on a host that carries Cilium datapath
+    state from an earlier cluster (/sys/fs/bpf/cilium, the
+    /run/cilium/cgroupv2 mount or the cilium_host device) but no RKE2/K3s:
+    until a reboot, its socket load balancer makes every image pull of the
+    new install hang. The message names what was found and asks for a
+    reboot. A host with RKE2 or K3s on it is not checked.
+  - New Rex::Rancher::Uninstall. uninstall_node runs the RKE2/K3s uninstall
+    scripts that are on the host, removes the Cilium CLI, /opt/cni and
+    /run/k3s with --one-file-system (a mount left under them is skipped,
+    not recursed into), clears Cilium's datapath (tc attachments, bpffs
+    pins, cilium_* devices, CILIUM_* iptables chains in every backend, the
+    cgroup2 mount, /run/cilium, Cilium's ip rules), and dies when RKE2/K3s
+    is still installed or Cilium state survived (then: reboot). Missing
+    tc (on Rocky/RHEL it needs the iproute-tc package) or no iptables
+    backend with both -save and -restore warns instead of silently
+    skipping that step; a reboot clears it too, and the exit status stays
+    unchanged. Destructive, and only run when called. uninstall_cmd and
+    uninstall_failure give the same line and message to callers with their
+    own channel; uninstall_failure leaves warnings out of the reason. New
+    uninstall_warnings($stdout, $stderr) picks the warnings out for a caller
+    reading its own channel. check_cilium_residue is the install guard.
+  - update_registries now removes a containerd config.toml.tmpl that holds
+    only imports and version = 2, as Rex::GPU 0.001 wrote it, before it
+    restarts rke2 or k3s: that restart would render it again instead of the
+    distribution's own containerd config, and the new registry mirrors would
+    never take effect. Any other template is kept. A removal that fails dies
+    before the restart (registries.yaml is written by then).
+  - New hold_running option for install_server, install_agent,
+    rancher_deploy_server and rancher_deploy_agent: the version the service
+    runs (stopped: the installed binary; neither: version, or the stable
+    channel) is this run's version, for the skew check, the installer and
+    the restart decision, read before anything is written. A version given
+    as well loses to it, with a warning naming both; an agent is still
+    checked against the control plane. Held, the service is restarted only
+    for a changed configuration, and K3s, otherwise restarted on every run,
+    also when the install script wrote its unit or env file with other
+    content. New Rex::Rancher::Distribution methods held_version,
+    installer_unit_files and installer_unit_digest.
+  - rancher_deploy_server and rancher_deploy_agent with gpu => 1 (and
+    gpu_setup not switched off) now require Rex::GPU 0.002 or later: with
+    an older, missing or unloadable Rex::GPU they die before the host is
+    touched, naming the installed version and pointing to gpu_setup => 0.
+    Rex::GPU 0.001 wrote a bare containerd config.toml.tmpl on every run.
+    Before, a missing Rex::GPU was noticed only after node preparation,
+    and 0.001 was accepted. With gpu_setup => 0 Rex::GPU is still not
+    needed.
+  - rancher_deploy_server and rancher_deploy_agent now check the host right
+    after the connection check and before prepare_node and the GPU setup:
+    Cilium datapath residue, the version skew (with hold_running against
+    the held version; for an agent with kubeconfig_file also against the
+    control plane) and, on a server, the established cluster-cidr. A
+    refused host is left as it was instead of half prepared. install_server
+    and install_agent run the same checks again, as before, on the host as
+    node preparation left it. The checks are the new, not exported
+    functions Rex::Rancher::Server::preflight_server and
+    Rex::Rancher::Agent::preflight_agent, for callers that prepare the node
+    themselves. install_method => 'artifact' without version now also dies
+    before prepare_node runs, for the same reason.
+  - install_server no longer warns that k3s "has not been run live through
+    Rex::Rancher": kubernetes-ocp has run k3s v1.36.4+k3s1 on Debian 13
+    through it (a fresh control plane with a joined worker, Cilium with
+    k8s_service_host, re-runs with hold_running, and the uninstall). RKE2
+    and K3s are now equally live-verified distributions; GPU nodes and
+    other operating systems are still K3s-unverified.
+  - uninstall_node and uninstall_cmd now remove the /etc/default/rke2-server
+    or -agent file ensure_nvidia_runtime_path wrote for the NVIDIA runtime
+    PATH lookup, which no vendor uninstaller touches (a GPU host left it
+    behind on every kubernetes-ocp destroy): only once rke2 is gone, and
+    only when the file holds nothing but that PATH line; a file an admin
+    added anything to stays untouched. K3s has no such file. New
+    Rex::Rancher::Distribution->env_files.
+  - POD: uninstall_node and uninstall_cmd now note that rke2-uninstall.sh
+    removes /etc/rancher/node, so rejoining the same cluster under the same
+    node name needs the Node, or secret kube-system/NODE.node-password.rke2,
+    deleted first (the cluster otherwise refuses the new password with
+    "Node password rejected"); the K3s uninstall scripts keep the file, so a
+    K3s node rejoins with the password it had.
+  - prepare_node (and rancher_deploy_server/_agent) no longer replaces a
+    static hostname whose first label already is the requested hostname,
+    case-insensitively (otho-lab.ai.citilan.de for otho-lab), and sets
+    nothing when it already is that name outright; the node then keeps
+    registering under the FQDN a provider or installer set unless node_name
+    is given.
+  - Requires IO::K8s and Kubernetes::REST 1.109: string-map fields (labels,
+    annotations, ConfigMap data) are sent as JSON strings, as the API
+    server requires.
+
+0.002    2026-09-24 20:39:38Z
   - Cilium is the only CNI and replaces kube-proxy unless cilium => 0: rke2
     gets cni: none and disable-kube-proxy; k3s now gets flannel-backend:
     none, disable-network-policy, disable-kube-proxy and cluster-cidr

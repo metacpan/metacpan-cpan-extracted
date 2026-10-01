@@ -140,7 +140,7 @@ sub ours {
 				for my $cf (@conf) {
 					next unless defined $cf->{x};
 					push @rows, sprintf '%s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%s',
-						$cid, $r->{number}, $r->{icode}, $an,
+						$cid, (defined $r->{number} ? $r->{number} : ''), $r->{icode}, $an,
 						$cf->{altloc}, $cf->{x}, $cf->{y}, $cf->{z}, $r->{resname};
 				}
 			}
@@ -199,7 +199,8 @@ sub compare {
 		my $c = $info->{chains}{$cid};
 		for my $rk (@{ $c->{residue_order} }) {
 			my $r     = $c->{residues}{$rk};
-			my $names = $named{"$cid|$r->{number}|$r->{icode}"} or next;
+			my $num   = defined $r->{number} ? $r->{number} : '';
+			my $names = $named{"$cid|$num|$r->{icode}"} or next;
 			push @wrong_name, "$cid $rk $r->{resname} vs " . join('/', sort keys %$names)
 				unless $names->{ $r->{resname} };
 		}

@@ -1,5 +1,8 @@
 Revision history for Business-NAB
 
+0.10
+        - Protect against even more rounding errors (for real this time)
+
 0.09
         - Protect against even more rounding errors.
 

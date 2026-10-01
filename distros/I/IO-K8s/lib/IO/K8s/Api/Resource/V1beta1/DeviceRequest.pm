@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::DeviceRequest;
 # ABSTRACT: DeviceRequest is a request for devices required for a claim. This is typically a request for a single resource like a device, but can also ask for several identical devices.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s adminAccess => Bool;
@@ -47,7 +47,7 @@ IO::K8s::Api::Resource::V1beta1::DeviceRequest - DeviceRequest is a request for 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 adminAccess
 

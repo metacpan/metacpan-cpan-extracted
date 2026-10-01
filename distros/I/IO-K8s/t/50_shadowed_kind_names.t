@@ -140,7 +140,7 @@ our $VERSION = '0.01';
 use IO::K8s::APIObject
     api_version     => 'shadow.example.com/v1',
     resource_plural => 'widgets';
-k8s spec => { Str => 1 };
+k8s spec => Opaque;
 1;
 CRD
 

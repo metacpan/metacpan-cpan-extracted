@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaProps;
 # ABSTRACT: JSONSchemaProps is a JSON-Schema following Specification Draft 4 (http://json-schema.org/).
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s '$ref' => Str;
@@ -114,7 +114,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaProps -
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 default
 

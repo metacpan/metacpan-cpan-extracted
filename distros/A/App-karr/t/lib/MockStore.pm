@@ -58,6 +58,11 @@ sub is_terminal_status {
   return App::karr::Config->from_merged( $self->{ec} )->is_terminal_status($name);
 }
 
+sub is_held_back_status {
+  my ($self, $name) = @_;
+  return App::karr::Config->from_merged( $self->{ec} )->is_held_back_status($name);
+}
+
 # Commands reach for ->store->git via SyncLifecycle; a no-op git double keeps
 # sync_before/sync_after from blowing up in tests that don't care about Git.
 sub git { $_[0]{git} //= MockGit->new }

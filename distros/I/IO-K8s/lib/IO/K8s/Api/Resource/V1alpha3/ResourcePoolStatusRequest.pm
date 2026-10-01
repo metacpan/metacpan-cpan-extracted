@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequest;
 # ABSTRACT: ResourcePoolStatusRequest triggers a one-time calculation of resource pool status based on the provided filters. Once status is set, the request is considered complete and will not be reprocessed. Users should delete and recreate requests to get updated information.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequest - ResourcePoolStatus
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 

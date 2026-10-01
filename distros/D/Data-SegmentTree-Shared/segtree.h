@@ -15,6 +15,7 @@
 #ifndef ST_H
 #define ST_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,7 +45,7 @@
 
 #define ST_MAGIC        0x54474553  /* SegmentTree */
 #define ST_VERSION      3            /* 3: added the occupancy bitmap region (layout change) */
-#define ST_ERR_BUFLEN   256
+#define ST_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef ST_READER_SLOTS
 #define ST_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -93,7 +94,12 @@ struct StHeader {
     uint32_t drain_seq;               /* 64  futex bumped by a reader releasing under a draining writer (wakes it) */
     uint32_t slotless_rdepth;   /* readers holding with no reader-slot (documented residual) */
     uint64_t stat_ops;                /* 72 */
-    uint8_t  _pad[176];               /* 80..255 */
+    /* A push-down of an add in flight, replayed by recovery (carved from the pad,
+     * so older files read 0: none). */
+    uint64_t pd_node;                 /* 80  the node pushing, 0 for none */
+    int64_t  pd_delta;                /* 88  its add */
+    int64_t  pd_tag[2];               /* 96  its children's add tags once pushed */
+    uint8_t  _pad[144];               /* 112..255 */
 };
 typedef struct StHeader StHeader;
 
@@ -202,23 +208,6 @@ static inline int st_pid_alive(uint32_t pid) {
     return !st_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
- * CAS to OUR pid to hold the lock while fixing shared state, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
- * process can detect and re-recover if we crash mid-recovery. */
-static inline void st_recover_stale_lock(StHandle *h, uint32_t observed_wlock) {
-    StHeader *hdr = h->hdr;
-    uint32_t mypid = ST_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
-            mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-        return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-}
-
 static const struct timespec st_lock_timeout = { ST_LOCK_TIMEOUT_SEC, 0 };
 
 /* Process-global fork-generation counter.  Incremented in the pthread_atfork
@@ -297,6 +286,85 @@ static inline void st_claim_reader_slot(StHandle *h) {
     /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
      * slotless path (lock still works; recovery of THIS reader's death is the
      * documented slotless limitation). */
+}
+
+/* Wait until no live reader holds the lock; the caller owns wlock, so no NEW
+ * reader can join (they see wlock!=0 and yield).  The SEQ_CST wlock CAS + the
+ * SEQ_CST rdepth loads below are the writer side of the Dekker handshake. */
+static inline void st_rwlock_drain(StHandle *h) {
+    StHeader *hdr = h->hdr;
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(ST_OCC_WORDS + live readers)
+         * instead of O(ST_READER_SLOTS). */
+        for (uint32_t w = 0; w < ST_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!st_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &st_lock_timeout, NULL, 0);
+    }
+}
+
+/* 1 if this process holds a read lock on the segment (through any handle).  Such a
+ * lock predates the current wlock holder, whose drain could then never have
+ * finished: it died before mutating anything. */
+static int st_self_reading(StHandle *h) {
+    if (h->slotless_held) return 1;
+    uint32_t me = (uint32_t)getpid();
+    for (uint32_t i = 0; i < ST_READER_SLOTS; i++)
+        if (__atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE) == me &&
+            __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_ACQUIRE) != 0)
+            return 1;
+    return 0;
+}
+
+static void st_repair_locked(StHandle *h);
+
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
+ * CAS to OUR pid to hold the lock while repairing shared state, then release.
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void st_recover_stale_lock(StHandle *h, uint32_t observed_wlock) {
+    StHeader *hdr = h->hdr;
+    uint32_t mypid = ST_RWLOCK_WR((uint32_t)getpid());
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
+            mypid, 0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+        return;
+    if (!st_self_reading(h)) {
+        st_rwlock_drain(h);
+        st_repair_locked(h);
+    }
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
@@ -447,48 +515,8 @@ static inline void st_rwlock_wrlock(StHandle *h) {
         st_unpark(h);
         spin = 0;
     }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
-    for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
-        int busy = 0;
-        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
-         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
-         * this scan, so no held slot is skipped).  O(ST_OCC_WORDS + live readers)
-         * instead of O(ST_READER_SLOTS). */
-        for (uint32_t w = 0; w < ST_OCC_WORDS; w++) {
-            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
-            while (word) {
-                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
-                word &= word - 1;                          /* consume this bit (local copy) */
-                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
-                if (rd == 0) continue;                      /* occupied but not read-locking now */
-                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
-                if (!st_pid_alive(pid)) {
-                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
-                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
-                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
-                    uint32_t ep = pid;
-                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
-                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
-                    continue;
-                }
-                busy = 1;                                   /* live reader still holding */
-            }
-        }
-        /* A live slotless reader keeps us waiting; a crashed slotless reader that
-         * cannot be attributed to a pid is the documented slotless limitation. */
-        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
-            busy = 1;
-        if (!busy)
-            return;                                    /* exclusive: wlock held + every rdepth 0 */
-        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
-         * (which reclaims any newly-dead slotted reader). */
-        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &st_lock_timeout, NULL, 0);
-    }
+    /* Phase 2: drain the readers that were already holding when we won the CAS. */
+    st_rwlock_drain(h);
 }
 
 static inline void st_rwlock_wrunlock(StHandle *h) {
@@ -647,14 +675,36 @@ static int st_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int st_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int st_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int st_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_SEGMENTTREE_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static StHandle *st_create(const char *path, uint64_t n, mode_t mode, char *errbuf) {
@@ -689,9 +739,18 @@ static StHandle *st_create(const char *path, uint64_t n, mode_t mode, char *errb
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             ST_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && st_reserve(fd, total) < 0) {
+            ST_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { ST_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            ST_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!st_validate_header((StHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -701,9 +760,13 @@ static StHandle *st_create(const char *path, uint64_t n, mode_t mode, char *errb
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((StHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && st_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && st_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         ST_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (st_reserve(fd, total) < 0) {
+                        ST_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     st_init_header(base, n, size, total);
@@ -736,6 +799,10 @@ static StHandle *st_create_memfd(const char *name, uint64_t n, char *errbuf) {
     if (ftruncate(fd, (off_t)total) < 0) {
         ST_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (st_reserve(fd, total) < 0) {
+        ST_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { ST_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -759,6 +826,11 @@ static StHandle *st_open_fd(int fd, char *errbuf) {
         (seals & (F_SEAL_SHRINK | F_SEAL_GROW)) != (F_SEAL_SHRINK | F_SEAL_GROW)) {
         ST_ERR("fd is not sealed against resize (need F_SEAL_SHRINK|F_SEAL_GROW)");
         return NULL;
+    }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(StHeader, magic)) != (ssize_t)sizeof magic || magic != ST_MAGIC) {
+        ST_ERR("invalid segment-tree table"); return NULL;
     }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
@@ -863,14 +935,23 @@ static inline void st_apply_assign(StNode *nd, int64_t c, uint64_t cnt) {
     nd->min    = c;
     nd->max    = c;
     nd->gcd    = st_gcd2(c, 0);                 /* |c| */
-    nd->lazy   = 0;
     nd->assign = c;
+    /* The flag supersedes the pending add: set it before dropping that add. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     nd->flags  = (nd->flags & ~ST_F_PROD_OVF) | ST_F_HAS_ASSIGN;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    nd->lazy   = 0;
     { int64_t p; if (st_ipow_ovf(c, cnt, &p)) nd->flags |= ST_F_PROD_OVF; else nd->prod = p; }
 }
 
-/* push node v's pending lazy (assign or add) down to both children */
-static inline void st_pushdown(StNode *nodes, uint64_t v, uint64_t lcnt, uint64_t rcnt) {
+/* The field st_apply_add changes for good; recovery re-derives the rest from it. */
+static inline int64_t *st_add_tag(StNode *nd, int leaf) {
+    return leaf ? &nd->sum : (nd->flags & ST_F_HAS_ASSIGN) ? &nd->assign : &nd->lazy;
+}
+
+/* push node v's pending lazy (assign or add) down to both children.  An
+ * assign lands the same however often it is replayed; an add is journaled. */
+static inline void st_pushdown(StHeader *hdr, StNode *nodes, uint64_t v, uint64_t lcnt, uint64_t rcnt) {
     StNode *nd = &nodes[v];
     if (nd->flags & ST_F_HAS_ASSIGN) {
         st_apply_assign(&nodes[2*v],     nd->assign, lcnt);
@@ -878,9 +959,19 @@ static inline void st_pushdown(StNode *nodes, uint64_t v, uint64_t lcnt, uint64_
         nd->flags &= ~ST_F_HAS_ASSIGN;
         nd->assign = 0;
     } else if (nd->lazy) {
-        st_apply_add(&nodes[2*v],     nd->lazy, lcnt);
-        st_apply_add(&nodes[2*v + 1], nd->lazy, rcnt);
+        int64_t d = nd->lazy;
+        hdr->pd_delta  = d;
+        hdr->pd_tag[0] = *st_add_tag(&nodes[2*v],     lcnt == 1) + d;
+        hdr->pd_tag[1] = *st_add_tag(&nodes[2*v + 1], rcnt == 1) + d;
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        hdr->pd_node = v;
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        st_apply_add(&nodes[2*v],     d, lcnt);
+        st_apply_add(&nodes[2*v + 1], d, rcnt);
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
         nd->lazy = 0;
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        hdr->pd_node = 0;
     }
 }
 
@@ -895,26 +986,26 @@ static inline void st_pull(StNode *nodes, uint64_t v) {
 }
 
 /* range-add delta to [l,r] within node v covering [lo,hi] (caller holds wrlock) */
-static void st_range_add_rec(StNode *nodes, uint64_t v, uint64_t lo, uint64_t hi,
+static void st_range_add_rec(StHeader *hdr, StNode *nodes, uint64_t v, uint64_t lo, uint64_t hi,
                              uint64_t l, uint64_t r, int64_t delta) {
     if (r < lo || hi < l) return;                              /* disjoint */
     if (l <= lo && hi <= r) { st_apply_add(&nodes[v], delta, hi - lo + 1); return; }
     uint64_t mid = lo + (hi - lo) / 2;
-    st_pushdown(nodes, v, mid - lo + 1, hi - mid);
-    st_range_add_rec(nodes, 2*v,     lo,      mid, l, r, delta);
-    st_range_add_rec(nodes, 2*v + 1, mid + 1, hi,  l, r, delta);
+    st_pushdown(hdr, nodes, v, mid - lo + 1, hi - mid);
+    st_range_add_rec(hdr, nodes, 2*v,     lo,      mid, l, r, delta);
+    st_range_add_rec(hdr, nodes, 2*v + 1, mid + 1, hi,  l, r, delta);
     st_pull(nodes, v);
 }
 
 /* range-assign value c to [l,r] within node v covering [lo,hi] (caller holds wrlock) */
-static void st_range_assign_rec(StNode *nodes, uint64_t v, uint64_t lo, uint64_t hi,
+static void st_range_assign_rec(StHeader *hdr, StNode *nodes, uint64_t v, uint64_t lo, uint64_t hi,
                                 uint64_t l, uint64_t r, int64_t c) {
     if (r < lo || hi < l) return;                              /* disjoint */
     if (l <= lo && hi <= r) { st_apply_assign(&nodes[v], c, hi - lo + 1); return; }
     uint64_t mid = lo + (hi - lo) / 2;
-    st_pushdown(nodes, v, mid - lo + 1, hi - mid);
-    st_range_assign_rec(nodes, 2*v,     lo,      mid, l, r, c);
-    st_range_assign_rec(nodes, 2*v + 1, mid + 1, hi,  l, r, c);
+    st_pushdown(hdr, nodes, v, mid - lo + 1, hi - mid);
+    st_range_assign_rec(hdr, nodes, 2*v,     lo,      mid, l, r, c);
+    st_range_assign_rec(hdr, nodes, 2*v + 1, mid + 1, hi,  l, r, c);
     st_pull(nodes, v);
 }
 
@@ -1010,13 +1101,15 @@ static inline int st_clamp_range(StHandle *h, uint64_t *l, uint64_t *r) {
 static void st_range_add_locked(StHandle *h, uint64_t l, uint64_t r, int64_t delta) {
     if (!st_clamp_range(h, &l, &r)) return;
     __atomic_store_n(&h->hdr->add_used, 1, __ATOMIC_RELAXED);   /* atomic: monoids_valid reads add_used unlocked (RELAXED) -- plain store would be a C11 data race */
-    st_range_add_rec(st_nodes(h), 1, 0, h->size - 1, l, r, delta);
+    /* The gate before the tree: a writer killed mid-add must not leave gcd/product trusted. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    st_range_add_rec(h->hdr, st_nodes(h), 1, 0, h->size - 1, l, r, delta);
 }
 
 /* assign value c to every position in [l,r] (caller holds the write lock) */
 static void st_range_assign_locked(StHandle *h, uint64_t l, uint64_t r, int64_t c) {
     if (!st_clamp_range(h, &l, &r)) return;
-    st_range_assign_rec(st_nodes(h), 1, 0, h->size - 1, l, r, c);
+    st_range_assign_rec(h->hdr, st_nodes(h), 1, 0, h->size - 1, l, r, c);
 }
 
 /* sum/min/max over [l,r] into *sum/*mn/*mx (caller holds a lock) */
@@ -1061,7 +1154,7 @@ static int64_t st_get_locked(StHandle *h, uint64_t i) {
  * the gcd/product monoids stay valid across point updates. */
 static void st_set_locked(StHandle *h, uint64_t i, int64_t val) {
     if (h->n == 0 || i >= h->n) return;
-    st_range_assign_rec(st_nodes(h), 1, 0, h->size - 1, i, i, val);
+    st_range_assign_rec(h->hdr, st_nodes(h), 1, 0, h->size - 1, i, i, val);
 }
 
 /* reset every position to 0 (caller holds the write lock) */
@@ -1070,8 +1163,51 @@ static inline void st_clear_locked(StHandle *h) {
     uint64_t node_count = 2 * h->size;
     uint64_t nmax = st_nodes_max(h);    /* Layer B: clamp to the mapping */
     if (node_count > nmax) node_count = nmax;
-    memset(nodes, 0, (size_t)(node_count * sizeof(StNode)));   /* every aggregate + lazy = 0 */
+    if (node_count < 2) return;
+    /* A 0 assigned at the root reads as the cleared tree while the nodes under it are zeroed. */
+    st_apply_assign(&nodes[1], 0, h->size);
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    memset(nodes + 2, 0, (size_t)((node_count - 2) * sizeof(StNode)));
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    memset(nodes, 0, 2 * sizeof(StNode));   /* every aggregate + lazy = 0 */
     __atomic_store_n(&h->hdr->add_used, 0, __ATOMIC_RELAXED);   /* atomic: monoids_valid reads add_used unlocked -- a cleared tree is gcd/product-capable again */
+}
+
+/* Each node's lazy tags are authoritative after a writer killed mid range op,
+ * once a journaled push-down still holding its add has landed: recompute every
+ * aggregate bottom-up from its children and its own tag (a leaf's value is its
+ * sum), so the op reads as partly applied.  Idempotent. */
+static void st_repair_locked(StHandle *h) {
+    StHeader *hdr = h->hdr;
+    StNode *nodes = st_nodes(h);
+    uint64_t size = h->size;
+    if (size == 0 || 2 * size > st_nodes_max(h)) return;
+    uint64_t pv = hdr->pd_node;
+    if (pv && pv < size && !(nodes[pv].flags & ST_F_HAS_ASSIGN) &&
+        nodes[pv].lazy && nodes[pv].lazy == hdr->pd_delta) {
+        int leaf = 2 * pv >= size;
+        *st_add_tag(&nodes[2*pv],     leaf) = hdr->pd_tag[0];
+        *st_add_tag(&nodes[2*pv + 1], leaf) = hdr->pd_tag[1];
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        nodes[pv].lazy = 0;
+    }
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->pd_node = 0;
+    for (uint64_t v = size; v < 2 * size; v++) {
+        StNode *nd = &nodes[v];
+        nd->min = nd->max = nd->prod = nd->sum;
+        nd->gcd = st_gcd2(nd->sum, 0);
+        nd->flags &= ~ST_F_PROD_OVF;
+    }
+    for (uint64_t v = size - 1; v >= 1; v--) {
+        StNode *nd = &nodes[v];
+        uint64_t cnt = size >> (63 - __builtin_clzll(v));
+        if (nd->flags & ST_F_HAS_ASSIGN) { st_apply_assign(nd, nd->assign, cnt); continue; }
+        st_pull(nodes, v);
+        nd->sum += nd->lazy * (int64_t)cnt;
+        nd->min += nd->lazy;
+        nd->max += nd->lazy;
+    }
 }
 
 #endif /* ST_H */

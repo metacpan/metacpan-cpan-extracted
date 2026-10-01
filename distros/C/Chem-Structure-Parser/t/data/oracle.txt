@@ -4263,6 +4263,26 @@ A|3||O||10.500|10.000|6.500|TRP
 #resolution
 #spacegroup
 
+== numbering.cif
+W|10000||O||3.500|1.000|2.000|HOH
+W|10001||O||7.000|1.000|2.000|HOH
+W|9999||O||0.000|1.000|2.000|HOH
+Y|0||O||10.500|1.000|2.000|HOH
+Y|||O||14.000|1.000|2.000|HOH
+#models 1
+#resolution
+#spacegroup
+
+== numbering.pdb
+W|10000||O||3.500|1.000|2.000|HOH
+W|10001||O||7.000|1.000|2.000|HOH
+W|9999||O||0.000|1.000|2.000|HOH
+Y|0||O||10.500|1.000|2.000|HOH
+Y|||O||14.000|1.000|2.000|HOH
+#models 1
+#resolution
+#spacegroup
+
 == pdb1gdr.ent refused
 # gemmi: Wrong format for charge: 90
 

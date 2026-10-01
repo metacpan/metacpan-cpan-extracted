@@ -1,0 +1,32 @@
+# The manifests of Example::Comb::Mailer::Stub, in the IO::K8s Perl DSL.
+# A file is static: it is written for a Comb named mailer. Namespace and the
+# Comb labels come from deploy.
+Deployment {
+  name => 'mailer',
+  spec => {
+    replicas => 1,
+    selector => { matchLabels => { app => 'mailer' } },
+    template => {
+      metadata => { labels => { app => 'mailer' } },
+      spec     => { containers => [ {
+        name  => 'mailpit',
+        image => 'axllent/mailpit',
+        ports => [
+          { name => 'smtp', containerPort => 1025 },
+          { name => 'web',  containerPort => 8025 }
+        ]
+      } ] }
+    }
+  }
+};
+
+Service {
+  name => 'mailer',
+  spec => {
+    selector => { app => 'mailer' },
+    ports    => [
+      { name => 'smtp', port => 25,   targetPort => 1025 },
+      { name => 'web',  port => 8025, targetPort => 8025 }
+    ]
+  }
+};

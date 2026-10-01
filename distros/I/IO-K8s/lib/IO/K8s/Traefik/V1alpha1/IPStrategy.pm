@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::IPStrategy;
 # ABSTRACT: IPStrategy holds the IP strategy configuration used by Traefik to determine the client IP.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s depth       => Int, { minimum => 0 };
@@ -24,7 +24,7 @@ IO::K8s::Traefik::V1alpha1::IPStrategy - IPStrategy holds the IP strategy config
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 depth
 

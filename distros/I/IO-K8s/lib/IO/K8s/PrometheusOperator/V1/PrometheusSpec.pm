@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::PrometheusSpec;
 # ABSTRACT: spec defines the specification of the desired behavior of the Prometheus cluster.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use utf8;
 use IO::K8s::Resource;
 
@@ -272,7 +272,7 @@ IO::K8s::PrometheusOperator::V1::PrometheusSpec - spec defines the specification
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 additionalAlertManagerConfigs
 

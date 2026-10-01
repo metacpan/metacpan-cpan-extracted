@@ -1,5 +1,5 @@
 package Business::NAB::Role::AttributeContainer;
-$Business::NAB::Role::AttributeContainer::VERSION = '0.09';
+$Business::NAB::Role::AttributeContainer::VERSION = '0.10';
 # undocument role
 
 use strict;

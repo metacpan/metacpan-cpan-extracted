@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPNodeSpec;
 # ABSTRACT: Spec is the specification of the desired behavior of the CiliumBGPNodeConfig.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s bgpInstances => ['+IO::K8s::Cilium::V2::CiliumBGPNodeInstance'], { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::CiliumBGPNodeSpec - Spec is the specification of the desire
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 bgpInstances
 

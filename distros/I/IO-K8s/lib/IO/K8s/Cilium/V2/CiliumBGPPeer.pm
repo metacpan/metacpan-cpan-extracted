@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPPeer;
 # ABSTRACT: CiliumBGPPeer
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s autoDiscovery => '+IO::K8s::Cilium::V2::BGPAutoDiscovery';
@@ -28,7 +28,7 @@ IO::K8s::Cilium::V2::CiliumBGPPeer - CiliumBGPPeer
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 autoDiscovery
 

@@ -62,6 +62,12 @@ METHODS
     the last argument to "new" (e.g. 0660) for cross-user sharing; it defaults
     to 0600 (owner-only).
 
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of the initialization dying with
+    SIGBUS; set "DATA_TIMINGWHEEL_SHARED_SPARSE=1" to skip the reservation. On
+    tmpfs and memfd the segment is memory, and a memory cgroup too small for
+    it gets an OOM kill rather than a croak.
+
   Scheduling
         my $id = $tw->add($delay, $payload);   # returns a timer id
         my $id = $tw->schedule($delay, $payload); # alias for add
@@ -122,10 +128,18 @@ SECURITY
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
-    PID-encoded ownership and dead-owner recovery. Scheduling, cancelling, and
-    each tick of an advance are short bounded list operations, so a crash
-    leaves the wheel consistent up to the last completed operation.
-    Limitation: PID reuse is not detected (very unlikely in practice).
+    PID-encoded ownership and dead-owner recovery. The process that recovers
+    the lock rebuilds every bucket from the pending timers, and the free list
+    and "count" from the rest, so an interrupted "add" or "cancel" has either
+    taken effect or not; this takes time proportional to "num_slots" plus
+    "capacity". An interrupted "advance" loses the timers it had already
+    fired, whose payloads died with it, and the timers in its current tick's
+    bucket that it had not reached yet fire one rotation ("num_slots" ticks)
+    late. "clear" rewrites every bucket and timer, so it marks itself in
+    progress in the header first; if its writer dies part-way, the process
+    that recovers the lock runs the "clear" again from the start, and the
+    wheel is empty afterwards. Limitation: PID reuse is not detected (very
+    unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.

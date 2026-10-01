@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::AkeylessAuthSecretRef;
 # ABSTRACT: Reference to a Secret that contains the details to authenticate with Akeyless.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s accessID        => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::AkeylessAuthSecretRef - Reference to a Secret that
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 accessID
 

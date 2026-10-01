@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 12;
+use Test::More;
 use Text::Markdown::Discount;
 
 {
@@ -48,3 +48,5 @@ use Text::Markdown::Discount;
     like $html, qr!<em>イーエム</em>!;
     ok !utf8::is_utf8($html);
 }
+
+done_testing;

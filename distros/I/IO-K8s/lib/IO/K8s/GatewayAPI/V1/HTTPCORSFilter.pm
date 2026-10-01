@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::HTTPCORSFilter;
 # ABSTRACT: CORS defines a schema for a filter that responds to the cross-origin request based on HTTP response header.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s allowCredentials => Bool;
@@ -30,7 +30,7 @@ IO::K8s::GatewayAPI::V1::HTTPCORSFilter - CORS defines a schema for a filter tha
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allowCredentials
 

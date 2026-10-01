@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/Test/Metrics/Any.pm

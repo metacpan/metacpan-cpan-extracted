@@ -1,12 +1,12 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPPeeringPolicy;
 # ABSTRACT: Cilium BGP peering policy
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliumbgppeeringpolicies';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => Opaque;
+k8s status => Opaque;
 
 1;
 
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2alpha1::CiliumBGPPeeringPolicy - Cilium BGP peering policy
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 

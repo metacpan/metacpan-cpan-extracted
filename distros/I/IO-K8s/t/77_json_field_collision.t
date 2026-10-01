@@ -1,15 +1,18 @@
 #!/usr/bin/env perl
 # k108: a k8s-declared field literally named `json` used to collide with
 # IO::K8s::Role::Resource's own internal JSON-encoder attribute (also named
-# `json`). Resource.pm's _k8s() skips calling Moo's has() when the class
-# already can($attr_name) -- true here, since the role's `has json` wins the
-# slot -- so the field's declared type/default were never backed by a real
-# attribute; the encoder object sat in that slot instead, and to_json/to_yaml
-# died trying to serialize it. Fixed by renaming the role's private encoder
-# attribute to `_json_encoder`, freeing `json` for a real k8s field on any
-# class that declares one. This is the generic regression test, independent
-# of the Cilium AccessLogs class that surfaced the bug (see t/07_cilium.t
-# for that direct repro).
+# `json`). Resource.pm's _k8s() silently skipped calling Moo's has() when
+# the class already can($attr_name) -- true here, since the role's `has
+# json` wins the slot -- so the field's declared type/default were never
+# backed by a real attribute; the encoder object sat in that slot instead,
+# and to_json/to_yaml died trying to serialize it. Fixed by renaming the
+# role's private encoder attribute to `_json_encoder`, freeing `json` for a
+# real k8s field on any class that declares one. That silent skip itself is
+# gone as of k144 -- a field colliding with an existing attribute it cannot
+# yield to now croaks at declaration time instead of silently reusing the
+# slot -- but the rename is still what makes `json` collision-free here.
+# This is the generic regression test, independent of the Cilium AccessLogs
+# class that surfaced the bug (see t/07_cilium.t for that direct repro).
 use strict;
 use warnings;
 use Test::More;

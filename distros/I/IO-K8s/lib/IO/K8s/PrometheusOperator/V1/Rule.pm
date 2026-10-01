@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::Rule;
 # ABSTRACT: Rule describes an alerting or recording rule See Prometheus documentation: [alerting](https://www.prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) or [recording](https://www.prometheus.io/docs/prometheus/latest/configuration/recording_rules/#recording-rules) rule
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s alert           => Str;
@@ -32,7 +32,7 @@ IO::K8s::PrometheusOperator::V1::Rule - Rule describes an alerting or recording 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 alert
 

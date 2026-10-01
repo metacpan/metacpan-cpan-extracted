@@ -1,15 +1,16 @@
 # ABSTRACT: Turn the dependency ids a command was given into validated numbers
 
 package App::karr::Role::DependencyArgs;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo::Role;
 
 # What this role calls on its consumer (ticket #128's rule): usage_error from
-# App::karr::Role::ExitCodes, find_task from App::karr::Role::BoardAccess. Both
-# halves of the dependency pair need find_task -- deliberately the same lookup,
-# see assert_dependencies_exist below -- and nothing else is shared, which is
-# why the pair is two roles (ticket #137).
-requires qw( find_task usage_error );
+# App::karr::Role::ExitCodes, find_task and normalize_task_id from
+# App::karr::Role::BoardAccess. Both halves of the dependency pair need
+# find_task -- deliberately the same lookup, see assert_dependencies_exist
+# below -- and nothing else is shared, which is why the pair is two roles
+# (ticket #137).
+requires qw( find_task normalize_task_id usage_error );
 
 
 # Ticket #124, gated on the CLI route existing; the move-time warning in
@@ -25,9 +26,15 @@ sub parse_dependency_ids {
     my ( $self, $flag, $value ) = @_;
     my ( @ids, %seen );
     for my $raw ( split /,/, $value ) {
+        # The house kNNN spelling is accepted here too (k30 == 30): normalized
+        # to a bare number before validation so `--depends-on k30` names the
+        # same card `karr show k30` does. A token that is not k+digits comes
+        # back unchanged and still fails the numeric check below -- the error
+        # names the value as the caller typed it.
+        my $id = $self->normalize_task_id($raw);
         $self->usage_error(
-            qq{invalid $flag id "$raw" (ids are comma-separated numbers)} )
-            unless $raw =~ /\A[0-9]+\z/;
+            qq{invalid $flag id "$raw" (ids are comma-separated numbers or kNNN)} )
+            unless $id =~ /\A[0-9]+\z/;
         # Numified on purpose: YAML::XS and JSON::MaybeXS both encode by the
         # scalar's own type, so a string "2" would round-trip as '2' / "2" --
         # which go-yaml refuses to unmarshal into kanban-md's IntSlice. Same
@@ -35,7 +42,7 @@ sub parse_dependency_ids {
         # for every flag, so `--depends-on 2,2` cannot store [2,2]: a repeated
         # id carries no meaning in any of the three flags, and edit's
         # append-unique only guards against ids the card already carries.
-        push @ids, $raw + 0 unless $seen{ $raw + 0 }++;
+        push @ids, $id + 0 unless $seen{ $id + 0 }++;
     }
     $self->usage_error("$flag requires at least one id") unless @ids;
     return \@ids;
@@ -67,7 +74,7 @@ App::karr::Role::DependencyArgs - Turn the dependency ids a command was given in
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 DESCRIPTION
 
@@ -105,7 +112,9 @@ L<App::karr::Cmd::Create>, L<App::karr::Cmd::Edit>
     my $ids = $self->parse_dependency_ids( '--depends-on', $self->depends_on );
 
 Splits a comma-separated dependency option value into an arrayref of numeric
-ids, in order, duplicates collapsed. A value that is not a plain number is a
+ids, in order, duplicates collapsed. Each id accepts the house C<kNNN>
+spelling (C<k30> == C<30>), stripped to a bare number before validation. A
+value that is not a plain number is a
 usage error naming the flag and the value, raised before any task is touched
 -- it condemns the invocation, never one id of a batch. The ids are returned
 as numbers so they round-trip numerically through the frontmatter and

@@ -1,6 +1,6 @@
 package IO::K8s::CertManager;
 # ABSTRACT: cert-manager CRD resource map provider for IO::K8s
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use Moo;
 with 'IO::K8s::Role::ResourceMap';
 
@@ -49,7 +49,7 @@ IO::K8s::CertManager - cert-manager CRD resource map provider for IO::K8s
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 

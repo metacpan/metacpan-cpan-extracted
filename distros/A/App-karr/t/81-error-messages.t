@@ -15,7 +15,8 @@ use App::karr::Error qw( user_error clean_error );
 # ends in a newline, and because exceptions from underneath karr (Path::Tiny,
 # libgit2, captured git stderr) carry the same suffix plus extra lines.
 #
-# Probed pre-fix, `karr skill install` into an unwritable directory:
+# Probed pre-fix, `karr skill install` into an unwritable directory (back when
+# the one skill it installed was kanban-issues-karr-cli):
 #
 #   mkpath failed for .claude/skills/kanban-issues-karr-cli: Permission denied at
 #   /.../lib/App/karr/Cmd/Skill.pm line 134.

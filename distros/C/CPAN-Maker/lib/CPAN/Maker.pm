@@ -38,9 +38,9 @@ with 'CPAN::Maker::Role::ModuleUtils';
 with 'CPAN::Maker::Role::FileUtils';
 with 'CPAN::Maker::Role::Provides';
 
-our $VERSION   = '2.0.11';
-our $GIT_SHA   = '8e1b94ea298dc1294440689c84dde1e63f6e4e28';
-our $GIT_DIRTY = '8e1b94ea298dc1294440689c84dde1e63f6e4e28';
+our $VERSION   = '2.0.12';
+our $GIT_SHA   = '61a54cafa632f61811b2f1fd2d968664e3ae14bf';
+our $GIT_DIRTY = '61a54cafa632f61811b2f1fd2d968664e3ae14bf';
 
 __PACKAGE__->use_log4perl( level => 'info', color => $FALSE );
 
@@ -2172,7 +2172,7 @@ format.
 
 =head1 VERSION
 
-This documentation refers to version 2.0.11
+This documentation refers to version 2.0.12
 
 =head1 AUTHOR
 

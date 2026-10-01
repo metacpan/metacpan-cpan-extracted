@@ -1,20 +1,22 @@
 Revision history for Data-DDSketch-Shared
 
+0.04      2026-09-26
+          - The process recovering a dead writer's lock recounts count from
+            the buckets; sum, min and max may become estimates.
+          - DATA_DDSKETCH_SHARED_SPARSE=0 reserves segments up front, so a
+            full filesystem fails the constructor, not a later write.
+          - A failed create no longer leaves a full-size file behind.
+
 0.03      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
 
 0.02      2026-08-11
-          - Frozen read-only mode: freeze() seals a file-backed structure;
-            new_readonly() maps it O_RDONLY and queries it lock-free.
+          - freeze()/new_readonly(): sealed read-only mode, lock-free.
           - Create leaves the backing file sparse.
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
+          - A file left by an interrupted create is recovered, not refused.
+          - unlink() reports a failed removal; a missing file is no error.
+          - Hardening against tied and overloaded arguments.
 
 0.01      2026-07-22
           - Initial release.

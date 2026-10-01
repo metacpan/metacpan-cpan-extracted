@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumCIDRGroupSpec;
 # ABSTRACT: CiliumCIDRGroupSpec
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s externalCIDRs => [Str], { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::CiliumCIDRGroupSpec - CiliumCIDRGroupSpec
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 externalCIDRs
 

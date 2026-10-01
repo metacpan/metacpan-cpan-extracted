@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GithubAuth;
 # ABSTRACT: Auth configures how ESO authenticates with a Github instance.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s privateKey => '+IO::K8s::ExternalSecrets::V1alpha1::GithubSecretRef', { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GithubAuth - Auth configures how ESO authent
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 privateKey
 

@@ -1,6 +1,6 @@
 package IO::K8s::Role::Resource;
 # ABSTRACT: Role providing Kubernetes resource instance behavior
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use v5.10;
 use Moo ();
 use mro ();
@@ -11,6 +11,7 @@ use Scalar::Util qw(blessed);
 # the package as not-methods, so their names stay off every consumer. A `use`
 # below that line composes its exports onto all shipped classes (k118).
 use Moo::Role;
+our @CARP_NOT = ('IO::K8s');  # FROM_HASH/from_json errors name their caller (k175)
 
 has _json_encoder => (
     is      => 'ro',
@@ -66,20 +67,39 @@ sub _collect_known_init_args {
     for my $attr (keys %$info) {
         $known{ $info->{$attr}{json_key} // $attr } = 1;
     }
-    for my $ancestor (@{ mro::get_linear_isa($class) }) {
-        my $maker = Moo->_constructor_maker_for($ancestor) or next;
-        my $specs = $maker->all_attribute_specs;
-        for my $name (keys %$specs) {
-            my $spec = $specs->{$name};
-            my $init = exists $spec->{init_arg} ? $spec->{init_arg} : $name;
-            $known{$init} = 1 if defined $init;
-        }
+    my $specs = _effective_attribute_specs($class);
+    for my $name (keys %$specs) {
+        my $spec = $specs->{$name};
+        my $init = exists $spec->{init_arg} ? $spec->{init_arg} : $name;
+        $known{$init} = 1 if defined $init;
     }
     if ($class->can('_is_resource')) {
         $known{apiVersion} = 1;
         $known{kind}       = 1;
     }
     return \%known;
+}
+
+# The Moo attribute specs that are in effect for $class: attribute name ->
+# spec, nearest first over mro::get_linear_isa, so a subclass's own `has`
+# for a name hides every ancestor's spec of that name. Read from each
+# ancestor's constructor maker for the reasons given above
+# _known_init_args. Private, uncached and free of side effects on the
+# registry: _collect_known_init_args uses it for the constructor keys,
+# IO::K8s::Resource's declaration preflight (k144) to tell a real Moo
+# attribute from a same-named method -- the registry alone never proves an
+# attribute exists.
+sub _effective_attribute_specs {
+    my ($class) = @_;
+    my %specs;
+    for my $ancestor (@{ mro::get_linear_isa($class) }) {
+        my $maker = Moo->_constructor_maker_for($ancestor) or next;
+        my $own = $maker->all_attribute_specs;
+        for my $name (keys %$own) {
+            $specs{$name} = $own->{$name} unless exists $specs{$name};
+        }
+    }
+    return \%specs;
 }
 
 # One level of copying for a plain container -- the same depth TO_JSON and
@@ -238,7 +258,16 @@ sub TO_JSON {
 
     for my $attr (@$attrs) {
         my $value = $self->$attr;
-        next unless defined $value;
+        unless (defined $value) {
+            # A nullable field present with undef is an explicit JSON null
+            # (k158); has_<accessor> tells it from an absent one. Every
+            # other undefined field is omitted, as it always was.
+            my $opts = $info->{$attr} && $info->{$attr}{options};
+            next unless $opts && $opts->{nullable};
+            my ($has) = IO::K8s::Resource::_nullable_methods($attr);
+            $data{ $info->{$attr}{json_key} // $attr } = undef if $self->$has;
+            next;
+        }
 
         my $attr_info = $info->{$attr} // {};
         # Use json_key for output when attr name differs from JSON field name
@@ -256,6 +285,21 @@ sub TO_JSON {
             $data{$key} = $value + 0;
         } elsif ($attr_info->{is_int_or_string}) {
             $data{$key} = ($value =~ /\A-?\d+\z/) ? int($value) : $value;
+        } elsif ($attr_info->{is_str}) {
+            # A JSON string on the wire whatever Perl scalar it holds (k145):
+            # JSON::MaybeXS encodes a numeric scalar as a JSON number, so
+            # EnvVar value => 8080 used to go out as 8080 where Kubernetes
+            # expects "8080". Interpolating builds a fresh string, so the
+            # object's own value is left as it was. A ref cannot pass the
+            # Str constraint; the guard only keeps one that got into the
+            # slot some other way on the old pass-through.
+            $data{$key} = ref $value ? $value : "$value";
+        } elsif ($attr_info->{is_quantity} || $attr_info->{is_time}) {
+            # A JSON string, the form Kubernetes writes both in (k180): a
+            # numeric Perl value -- sizeLimit => 1 -- used to go out as a
+            # JSON number, while the same value in a [Quantity] array went
+            # out as "1" (k167). The API server accepts either.
+            $data{$key} = ref $value ? $value : "$value";
         } elsif ($attr_info->{is_object} && blessed($value) && $value->can('TO_JSON')) {
             $data{$key} = $value->TO_JSON;
         } elsif ($attr_info->{is_array_of_objects}) {
@@ -275,8 +319,73 @@ sub TO_JSON {
                 my $v = $value->{$_};
                 $_ => (($v =~ /\A-?\d+\z/) ? int($v) : $v)
             } keys %$value };
+        } elsif ($attr_info->{is_hash_of_quantity} || $attr_info->{is_hash_of_time}) {
+            # Each value a JSON string, as for the scalar field (k180) --
+            # limits => { cpu => 1 } goes out as {"cpu":"1"} -- in a new
+            # hash (k54). A value the constructor never saw (written through
+            # the accessor's hashref) may be undef or a ref; it goes out as
+            # it is, the way the array branches below leave such elements.
+            $data{$key} = { map {
+                my $v = $value->{$_};
+                $_ => (defined($v) && !ref($v) ? "$v" : $v)
+            } keys %$value };
+        } elsif ($attr_info->{is_hash_of_str}) {
+            # The string map (k191): every scalar value a JSON string, the
+            # rule a [Str] element follows (k145) -- labels => { v => 5 }
+            # used to go out as {"v":5} and the API server answered 400 --
+            # in a new hash (k54), the object keeping what it was given.
+            # undef and a reference go out as they are. A reference can only
+            # sit in the lenient { Str => 1 } form (HashRef[Str] refuses one
+            # at construction, but a write through the accessor's hashref
+            # can still put one there), and there it is the opaque-map use
+            # that form served until k191, so it is reported, once per class
+            # and field (_warn_lenient_ref).
+            my %out;
+            for my $k (keys %$value) {
+                my $v = $value->{$k};
+                if (ref $v) {
+                    _warn_lenient_ref(ref($self) || $self, $key, $k)
+                        if $attr_info->{is_hash_of_str_lenient};
+                    $out{$k} = $v;
+                } else {
+                    $out{$k} = defined $v ? "$v" : $v;
+                }
+            }
+            $data{$key} = \%out;
         } elsif ($attr_info->{is_array_of_int}) {
             $data{$key} = [ map { int($_) } @$value ];
+        } elsif ($attr_info->{is_array_of_num}) {
+            # Each element a JSON number, as for is_num above (k68), so a
+            # numeric string passed to ->new does not go out quoted. Until
+            # AutoGen typed `items: {type: number}` as [Num] (k155) no class
+            # carried this form and the generic ARRAY copy below served it.
+            # An undef or ref element is left alone, as in is_array_of_str.
+            $data{$key} = [ map { defined($_) && !ref($_) ? $_ + 0 : $_ } @$value ];
+        } elsif ($attr_info->{is_array_of_str}) {
+            # Each element a JSON string, as for is_str above (k145), in a
+            # new outer array -- the same one-level copy the generic ARRAY
+            # branch below makes (k54). An element the constructor never
+            # saw (spec_push, or a push onto the accessor's arrayref) may be
+            # undef or a ref; it goes out exactly as before.
+            $data{$key} = [ map { defined($_) && !ref($_) ? "$_" : $_ } @$value ];
+        } elsif ($attr_info->{is_array_of_int_or_string}) {
+            # The scalar is_int_or_string rule per element (k167): an
+            # all-digit element goes out as a JSON number, anything else as
+            # it is -- so 8080 stays 8080 and '25%' stays '25%'. Until
+            # AutoGen typed int-or-string items as [IntOrStr] no generated
+            # class carried this form, and the generic ARRAY copy below
+            # served the hand-written ones without the rule. undef and ref
+            # elements are left alone, as in is_array_of_str.
+            $data{$key} = [ map {
+                defined($_) && !ref($_) && /\A-?\d+\z/ ? int($_) : $_
+            } @$value ];
+        } elsif ($attr_info->{is_array_of_quantity} || $attr_info->{is_array_of_time}) {
+            # A Quantity and a Time are JSON strings on the wire (k167) --
+            # the form Kubernetes writes both in -- so a numeric Perl
+            # element such as 1 for a Quantity goes out as "1", the same
+            # per-element stringification is_array_of_str applies (k145),
+            # in a new outer array (k54).
+            $data{$key} = [ map { defined($_) && !ref($_) ? "$_" : $_ } @$value ];
         } elsif ($attr_info->{is_array_of_bool}) {
             # An undef ELEMENT dies rather than becoming a silent false
             # (k51). ArrayRef[Bool] accepts undef because
@@ -326,6 +435,26 @@ sub TO_JSON {
     return \%data;
 }
 
+# The deprecation warning of the lenient string map (k191): a { Str => 1 }
+# field holding a reference is an opaque map declared the pre-k191 way. Once
+# per class and field for the life of the process, in the 'deprecated'
+# category of the code that serialized it, so `no warnings 'deprecated'`
+# there silences it and $SIG{__WARN__} sees it. Counted only when actually
+# emitted: a serialization with the category switched off does not use up
+# the one warning a later one should get.
+my %_lenient_ref_warned;
+
+sub _warn_lenient_ref {
+    my ($class, $field, $map_key) = @_;
+    return if $_lenient_ref_warned{$class}{$field};
+    return unless warnings::enabled('deprecated');
+    $_lenient_ref_warned{$class}{$field} = 1;
+    warnings::warn('deprecated', "IO::K8s: field '$field' of $class is declared "
+        . "{ Str => 1 }, a map of strings, but holds a reference (at key "
+        . "'$map_key'); it is passed through unchanged. If the field is not a "
+        . 'map of strings, declare it as Opaque or HashRef[...]');
+}
+
 
 sub to_json {
     my $self = shift;
@@ -336,7 +465,11 @@ sub to_json {
 sub TO_YAML {
     my $self = shift;
     require YAML::PP;
-    my $yp = YAML::PP->new(schema => [qw/JSON/], boolean => 'JSON::PP');
+    # Dumping with all three schemas quotes the union of what each would
+    # resolve to a non-string; kubectl reads YAML 1.1 (go-yaml v2), so the
+    # JSON schema alone left True, yes, on, ~, 012 bare (k188). Typed
+    # values emit the same under all three: they share JSON's representers.
+    my $yp = YAML::PP->new(schema => [qw/JSON Core YAML1_1/], boolean => 'JSON::PP');
     return $yp->dump_string($self->TO_JSON);
 }
 
@@ -453,6 +586,7 @@ sub _describe_local_type {
     return 'array<object>'  if $info->{is_array_of_objects};
     return 'hash<string>'   if $info->{is_hash_of_str};
     return 'hash<object>'   if $info->{is_hash_of_objects};
+    return 'object'         if $info->{is_hash_opaque};
     return 'object'         if $info->{is_object};
     return 'unknown';
 }
@@ -502,7 +636,7 @@ IO::K8s::Role::Resource - Role providing Kubernetes resource instance behavior
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 UNKNOWN FIELDS
 
@@ -519,10 +653,10 @@ attribute walk never sees as a field of its own.
 
 An instance created through L<IO::K8s> with C<< strict => 1 >> turns this
 into a fatal error instead: any key that would otherwise land in the bag
-dies as C<Unknown field 'E<lt>nameE<gt>' for E<lt>classE<gt>>, again at every
+dies as C<< Unknown field '<name>' for <class> >>, again at every
 nesting level, for the duration of that call.
 
-Since k99, L<IO::K8s::List> -- the generic envelope a list Kind (C<PodList>,
+Since 1.108, L<IO::K8s::List> -- the generic envelope a list Kind (C<PodList>,
 a bare C<kind: List>, ...) inflates to -- composes this role too, so its
 own top-level keys besides C<items>/C<metadata>/C<item_class> are preserved
 and checked exactly like any other resource's, under C<strict> or
@@ -541,9 +675,35 @@ encoding -- the canonical wire format Kubernetes accepts. Walks the
 attribute registry of the class and emits each declared field with the
 right JSON type: integers unquoted, booleans as C<true>/C<false>, nested
 objects recursively via their own C<TO_JSON>, hashes and arrays of objects
-in their canonical shape. For classes that compose
+in their canonical shape. A C<Str> field and each element of a C<[Str]>
+array are always emitted as a JSON string, even when the Perl value itself
+is numeric: C<< EnvVar->new(value => 8080) >> serializes C<value> as
+C<"8080">, not a bare C<8080>. The other way round, a C<Num> field and
+each element of a C<[Num]> array are always emitted as a JSON number, so a
+numeric string such as C<'0.25'> goes out unquoted. Each element of an
+C<[IntOrStr]> array follows the rule of an C<IntOrStr> field: an all-digit
+value goes out as a JSON number, anything else (C<'25%'>, C<'http'>) as the
+string it is. A C<Quantity> or C<Time> value always goes out as a JSON
+string, the form Kubernetes writes both in -- a scalar field, each value of
+a C<< { Quantity => 1 } >> or C<< { Time => 1 } >> map and each element of a
+C<[Quantity]> or C<[Time]> array alike: C<< limits => { cpu => 1 } >> is
+emitted as C<{"cpu":"1"}>. The object keeps the value it was
+given. Each value of a string map -- C<< { Str => 1 } >> or
+C<HashRef[Str]>: labels, annotations, ConfigMap C<data>, ... -- goes out as
+a JSON string too, so C<< labels => { v => 5 } >> is C<{"v":"5"}>. A
+reference value in a C<< { Str => 1 } >> map is copied through unchanged
+and warns once per class and field, in the C<deprecated> category: declare
+such a field C<Opaque> or C<HashRef[...]>. The free map, C<Opaque> or a
+bare C<HashRef> (C<fieldsV1>, a C<RawExtension>, ...), is exempt from all
+of this -- its values are copied through unchanged, keeping whatever JSON
+type they already had. For classes that compose
 L<IO::K8s::Role::APIObject>, the C<apiVersion>, C<kind> and C<metadata>
 fields are prepended.
+
+A field that holds C<undef> is omitted -- unless it is declared
+C<nullable> and present, which C<< has_<accessor> >> tells: that one is
+written as an explicit JSON C<null> (see
+L<IO::K8s::Resource/Field options>).
 
 This is the entry point L</to_json> builds on, and the inverse of
 L</FROM_HASH>.
@@ -561,10 +721,12 @@ configured internally. Symmetric to L</from_json> on the consumer side.
     my $yaml_string = $pod->TO_YAML;
 
 Returns a YAML string for the object, built via L<YAML::PP> on top of
-L</TO_JSON>. Uses the JSON schema with JSON booleans (so C<true>/C<false>
-survive the round-trip the way they would to the API server). Symmetric
-to L</TO_JSON> -- the YAML is just another wire format over the same
-canonical struct.
+L</TO_JSON>. Real booleans and numbers go out bare. A string is quoted
+whenever a JSON, YAML 1.2 core or YAML 1.1 reader would take its bare form
+for a boolean, null or number (C<True>, C<yes>, C<on>, C<~>, C<012>,
+C<0x1F>, C<+1>, ...), so kubectl and the API server read it back as a
+string. Symmetric to L</TO_JSON> -- the YAML is just another wire format
+over the same canonical struct.
 
 =head2 to_yaml
 
@@ -582,8 +744,19 @@ point.
 Builds an object of this class from a plain hashref of JSON field names,
 inflating nested objects, arrays of objects and hashes of objects through the
 attribute registry -- the same inflation L<IO::K8s/inflate> performs, so a
-struct from L</TO_JSON> round-trips back (k59). Before 1.108 this was a
+struct from L</TO_JSON> round-trips back. Before 1.108 this was a
 bare C<< $class->new(%$hash) >> and any nested field had to be pre-built.
+
+A defined value at an object-bearing position that is not a hashref (or
+already an object of the right class) -- an arrayref, a plain string, a
+code or scalar reference -- fails closed the same way inflation does
+everywhere else: it croaks naming the target class, the shape it
+actually received, and, for a nested field, the field itself, rather than
+silently building an empty object. So does a blessed value whose class has
+no C<TO_JSON> returning a hashref, such as a JSON boolean, and an
+array or hash field holding the wrong container. See
+L<IO::K8s/new_object> for the exact messages. C<undef> and an omitted field
+are unaffected and remain allowed.
 
 =head2 from_json
 
@@ -592,8 +765,8 @@ bare C<< $class->new(%$hash) >> and any nested field had to be pre-built.
 Builds an object of this class from a JSON document, symmetric to
 L</to_json>. The argument is a B<UTF-8 encoded byte string> -- exactly what
 C<to_json> produces; a decoded character string is not accepted and fails
-loudly in the JSON decoder rather than silently round-tripping to mojibake
-(k53). Decode-tolerance was rejected on purpose: it would leave
+loudly in the JSON decoder rather than silently round-tripping to mojibake.
+Decode-tolerance was rejected on purpose: it would leave
 C<from_json> more permissive than C<< $k8s->json_to_object >>, which has
 always been byte-oriented.
 

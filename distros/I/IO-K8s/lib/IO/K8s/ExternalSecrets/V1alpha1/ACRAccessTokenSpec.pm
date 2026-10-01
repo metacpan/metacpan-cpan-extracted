@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ACRAccessTokenSpec;
 # ABSTRACT: ACRAccessTokenSpec defines how to generate the access token e.g. how to authenticate and which registry to use.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s auth            => '+IO::K8s::ExternalSecrets::V1alpha1::ACRAuth', { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ACRAccessTokenSpec - ACRAccessTokenSpec defi
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 auth
 

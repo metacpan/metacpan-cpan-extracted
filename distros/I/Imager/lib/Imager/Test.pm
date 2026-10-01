@@ -8,7 +8,7 @@ require Exporter;
 use Carp qw(croak carp);
 use Config;
 
-our $VERSION = "1.007";
+our $VERSION = "1.008";
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = 
@@ -42,6 +42,7 @@ our @EXPORT_OK =
      can_test_threads
      std_font_tests
      std_font_test_count
+     std_image_tests
      );
 
 sub diff_text_with_nul {
@@ -892,6 +893,138 @@ sub std_font_tests {
   }
 }
 
+sub std_image_tests {
+  my ($opts) = @_;
+
+  my $bits = $opts->{bits}
+    or croak "Missing bits parameter";
+
+  my $models = $opts->{models} || [ qw(gray graya rgb rgba) ];
+
+  my @ten_zeros = (0) x 10;
+
+  my @test_colors =
+    (
+     [ 255, 128, 0,  255 ],
+     [ 192, 128, 64, 128 ],
+    );
+
+  for my $model (@$models) {
+    print "# model $model\n";
+    my $im = Imager->new(xsize => 10, ysize => 10, model => $model, bits => $bits);
+    my $alpha_ch = $im->alphachannel;
+    my $col_channels = $im->colorchannels;
+    my $channel_count = $col_channels;
+    ++$channel_count if $alpha_ch;
+    my @colors;
+    my @samples;
+    my @samples_alpha;
+    my @alphas;
+    for my $color (@test_colors) {
+      my @ch = @{$color}[0 .. $col_channels-1 ];
+      push @samples, @ch;
+      push @samples_alpha, @ch;
+      if ($alpha_ch) {
+	my $alpha = $color->[3];
+	push @ch, $alpha;
+	push @alphas, $alpha;
+	push @samples_alpha, $alpha;
+      }
+      push @colors, \@ch;
+    }
+    my @channels = ( 0 .. $channel_count-1 );
+    ok($im->setpixel(x => 0, y => 0, color => { channels => $colors[0] }),
+       "set a normal spread of values at (0,0)")
+      or diag "$model: set first pixel to (" . join(", ", @{$colors[0]}) . "): ".$im->errstr;
+    ok($im->setpixel(x => 1, y => 0, color => { channels => $colors[1] }),
+       "set a normal spread of values at (1,0)");
+
+    for my $type (qw(8bit float 16bit)) {
+      {
+        # getsamples, direct return
+        # one too many channels
+        ok(!$im->getsamples(type => $type, y => 0,
+                            channels => [ $channel_count ]),
+           "fetch invalid channel type $type");
+        like($im->errstr, qr/getsamples: channel $channel_count out of range for $channel_count channel image/,
+             "check message channel $channel_count type $type");
+
+        ok(!$im->getsamples(type => $type, y => 0, channels => [ -1 ]),
+           "fetch no channels type $type");
+        like($im->errstr, qr/getsamples: channel -1 out of range for $channel_count channel image/,
+             "check message for negative channel type $type");
+
+        ok(!$im->getsamples(type => $type, y => -1),
+           "fetch from row -1 type $type");
+        like($im->errstr, qr/getsamples: y outside of image/,
+             "check message for y -1 type $type");
+
+        ok(!$im->getsamples(type => $type, y => 10),
+           "fetch from row 10 type $type");
+        like($im->errstr, qr/getsamples: y outside of image/,
+             "check message for y 10 type $type");
+
+        ok(!$im->getsamples(type => $type, x => -1, y => 0),
+           "fetch from x = -1 type $type");
+        like($im->errstr, qr/getsamples: left outside of image/,
+             "check message for x -1 type $type");
+
+        ok(!$im->getsamples(type => $type, x => 11, width => 2, y => 0),
+           "fetch from x = 11");
+        like($im->errstr, qr/getsamples: left outside of image/,
+             "check message for x 11 type $type");
+
+        ok(!$im->getsamples(type => $type, x => 5, width => 0, y => 0),
+           "fetch from x = 5, width 0");
+        like($im->errstr, qr/getsamples: left not left of right/,
+             "check message for x = 5, width 0 type $type");
+      }
+
+      {
+        # getsamples, target return
+        # one too many channels
+        my @t;
+        ok(!$im->getsamples(type => $type, target => \@t, y => 0,
+                            channels => [ $channel_count ]),
+           "fetch invalid channel type $type");
+        like($im->errstr, qr/getsamples: channel $channel_count out of range for $channel_count channel image/,
+             "check message channel $channel_count type $type");
+
+        ok(!$im->getsamples(type => $type, target => \@t, y => 0,
+                            channels => [ -1 ]),
+           "fetch no channels type $type");
+        like($im->errstr, qr/getsamples: channel -1 out of range for $channel_count channel image/,
+             "check message for negative channel type $type");
+
+        ok(!$im->getsamples(type => $type, target => \@t, y => -1),
+           "fetch from row -1 type $type");
+        like($im->errstr, qr/getsamples: y outside of image/,
+             "check message for y -1 type $type");
+
+        ok(!$im->getsamples(type => $type, target => \@t, y => 10),
+           "fetch from row 10 type $type");
+        like($im->errstr, qr/getsamples: y outside of image/,
+             "check message for y 10 type $type");
+
+        ok(!$im->getsamples(type => $type, target => \@t, x => -1, y => 0),
+           "fetch from x = -1 type $type");
+        like($im->errstr, qr/getsamples: left outside of image/,
+             "check message for x -1 type $type");
+
+        ok(!$im->getsamples(type => $type, target => \@t, x => 11, width => 2, y => 0),
+           "fetch from x = 11 type $type");
+        like($im->errstr, qr/getsamples: left outside of image/,
+             "check message for x 11 type $type");
+
+        ok(!$im->getsamples(type => $type, target => \@t, x => 5, width => 0, y => 0),
+           "fetch from x = 5, width 0 type $type");
+        like($im->errstr, qr/getsamples: left not left of right/,
+             "check message for x = 5, width 0 type $type");
+      }
+    }
+  }
+}
+
 package Imager::Test::OverUtf8;
 use overload '""' => sub { "A".chr(0x2010)."A" };
 
@@ -1018,6 +1151,11 @@ Functions that perform one or more tests, typically used to test
 various parts of Imager's implementation.
 
 =over
+
+=item std_image_tests(\%options)
+
+Performs various basic tests.  Assumes you're doing modern C<no_plan>
+testing.
 
 =item image_bounds_checks($im)
 

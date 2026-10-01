@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::KeeperSecurityProvider;
 # ABSTRACT: KeeperSecurity configures this store to sync secrets using the KeeperSecurity provider
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s authRef            => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::KeeperSecurityProvider - KeeperSecurity configures
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 authRef
 

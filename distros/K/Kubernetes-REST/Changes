@@ -1,5 +1,127 @@
 Revision history for Kubernetes-REST
 
+1.109     2026-10-01 03:32:13Z
+
+ - Require IO::K8s 1.109: string-map fields (labels, annotations, ConfigMap
+   data, ...) now serialize numeric values as JSON strings, which the API
+   server requires.
+
+ - ensure and ensure_only resolve a hashref manifest through its
+   apiVersion: an autoscaling/v1 HorizontalPodAutoscaler is no longer sent
+   as autoscaling/v2. An apiVersion no known class serves croaks, naming
+   the Kind and apiVersion, instead of falling back to the Kind's default
+   version.
+ - ensure special-cases only the built-in core v1 PersistentVolumeClaim and
+   batch/v1 Job, matched by apiVersion and Kind; a custom resource reusing
+   either Kind name is updated like any other object. An object that
+   appears between ensure's GET and POST (409 AlreadyExists) is handled
+   like one that existed, so a Job is kept or recreated instead of PUT
+   onto its immutable Pod template.
+ - ensure tells a missing object (404), AlreadyExists and Conflict (409)
+   apart by the response status, and ensure_crd ends its wait for
+   Established with the API error on any failed poll but a 404. An error
+   whose text merely contains "404" or "409" no longer makes ensure
+   create, re-fetch or retry, nor ensure_crd poll on to its timeout.
+ - ensure_only no longer deletes the objects it has just applied when a
+   kinds entry is qualified ('autoscaling/v1/HorizontalPodAutoscaler') or
+   resolves to IO::K8s::Unstructured. Listed items match on their own API
+   group, Kind, namespace and name, so a labelled resource of the same
+   Kind in another group (Istio vs Gateway API Gateway) is deleted too.
+ - ensure_only warns when it cannot list a kinds entry in a namespace or
+   delete a stale object, naming Kind, namespace, name and reason, instead
+   of skipping silently; a 404 stays silent and the return value is
+   unchanged.
+ - delete takes propagationPolicy => 'Background', 'Foreground' or
+   'Orphan', sent as a query parameter, and croaks on any other argument
+   instead of ignoring it, so a misspelt option no longer silently orphans
+   a Job's Pods. ensure_only prunes with Background unless given another
+   propagationPolicy; ensure deletes the failed Job it recreates with
+   Background. The v0 Delete* methods pass propagationPolicy on and still
+   ignore their other parameters.
+ - ensure_only, log, list, get, watch, patch, patch_status, ensure_crd,
+   port_forward, exec and attach croak on an argument they do not take,
+   naming it and the ones they do, before anything is applied or sent: a
+   misspelt propagation_policy, namespace, tail_lines, label_selector or
+   containr no longer silently changes what the call does. get takes
+   subresource, e.g. 'status'. name on list and watch croaks - select one
+   object with fieldSelector => 'metadata.name=NAME'. With an object, patch
+   and patch_status take only patch and type; ensure croaks on anything
+   after its object. The v0 List*, Read*, Watch* and Patch* methods pass
+   on only what the new methods take and ignore their other parameters.
+ - A qualified name ('example.org/v1/Widget', or a Kind plus apiVersion)
+   resolved to IO::K8s::Unstructured addresses exactly its own group and
+   version in list, get, delete, patch and ensure_only. One the cluster
+   does not serve stays unresolved - build_path croaks naming the
+   apiVersion - instead of going to another group or version serving the
+   Kind.
+ - list, get, patch, patch_status, delete, watch, log, port_forward, exec,
+   attach and compare_schema croak "unknown resource 'NAME'" for a name
+   nothing resolves - an unknown bare Kind, or a qualified name whose
+   group/version the cluster does not serve - naming a failed discovery
+   with its reason, instead of "argument is not a module name" or an @INC
+   dump. ensure and ensure_only do the same for a manifest without
+   apiVersion whose Kind nothing resolves. No request is sent, as before.
+ - Objects of a single-segment class registered as '+Gizmo' inflate as that
+   class - in ensure, CRUD, watch and inflate_object/inflate_list/
+   process_watch_chunk - instead of dying on IO/K8s/Gizmo.pm, dropping list
+   items or becoming the class the Kind Gizmo is mapped to.
+ - prepare_request percent-encodes query keys and values where the API
+   server would otherwise split or change them - &, +, #, %, ;, a space, a
+   control character, non-ASCII (sent as UTF-8) - so such a fieldSelector
+   arrives intact. Everything else, '=', ',', '!', '/', '(', ')' and ':'
+   included, is sent as written; typical label and field selectors render
+   byte for byte as before.
+ - schema_for finds the definition of a class whose name does not map onto
+   one - apiextensions, apiregistration, a '+My::Class' or `with` provider
+   CRD class, IO::K8s::Unstructured - by its x-kubernetes-group-version-kind
+   instead of answering undef, so compare_schema works for the typed ones
+   too; a name resolving to no class answers undef without warnings.
+   compare_schema on IO::K8s::Unstructured, which has no local schema,
+   croaks saying so before fetching /openapi/v2.
+ - An HTTP error status dies with a Kubernetes::REST::APIError instead of a
+   plain string - from every call, check_response, absorb_discovery and the
+   /openapi/v2 fetch behind schema_for and compare_schema - carrying code,
+   reason, message and details of the Status body, the decoded body,
+   context and response, plus is_not_found and is_conflict. It stringifies
+   to the old message, caller line included, so printing or matching $@ is
+   unaffected; code that tests ref($@) sees an object now. Two messages
+   change: "Could not fetch OpenAPI spec: 503" becomes "Kubernetes API
+   error (fetch OpenAPI spec): 503 <body>", and "discovery GET /api
+   failed: 401" becomes "Kubernetes API error (discovery GET /api): 401
+   <body>", also inside the built-in resource map fallback warning and the
+   croaks of fetch_resource_map and build_path.
+ - New prepare_discovery_requests and absorb_discovery let an async client
+   read discovery (GET /api, GET /apis) through its own event loop and hand
+   the responses over; with aggregated discovery, name resolution and the
+   resource map then send no request of their own. Legacy discovery
+   answers false and is read synchronously on first use, as before.
+ - Legacy discovery (clusters before Kubernetes 1.27) warns when a
+   group/version answers with an HTTP error, naming its apiVersion and the
+   error, instead of silently leaving its Kinds out of the resource map; a
+   404 stays silent and the other groups are still read.
+ - The client keeps its own copy of a resource_map passed to it, and
+   invalidate_discovery - with it ensure_crd - keeps that map instead of
+   rebuilding it, so its '+My::Class' entries, the Kind ensure_crd has just
+   installed included, still resolve afterwards. `with` providers are
+   merged into that copy, no longer into the caller's hash or, after a
+   failed cluster fetch, into IO::K8s's process-wide built-in map. A change
+   to the passed hash after construction is not seen; change
+   $api->resource_map instead.
+ - The v0 status methods use the /status subresource: Read*Status
+   (ReadNamespacedPodStatus, ReadNodeStatus, ...) read it and their
+   deprecation warning names get(..., subresource => 'status'), and
+   Replace*Status and Patch*Status write through update_status and
+   patch_status. They wrote the main endpoint, where the API server drops
+   the status stanza and still answers 2xx, so the status was lost.
+ - The v0 layer resolves a Kind whose own name ends in Status, such as
+   ComponentStatus, as one whole Kind: ListComponentStatus and
+   ReadComponentStatus reach the componentstatuses endpoint instead of
+   dying while loading a non-existent Component class.
+ - The built-in resource map fallback warning, and an error from a call
+   through the v0 compatibility layer (an APIError or a croak raised in
+   list/get/update/... behind it), name the caller's line instead of one
+   inside Kubernetes/REST.pm or V0Group.pm.
+
 1.108     2026-09-22 02:22:33Z
 
  - New ensure_crd(@classes): create-or-update CustomResourceDefinitions from

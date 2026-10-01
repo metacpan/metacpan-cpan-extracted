@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 ## Version
 
-0.34
+0.35
 
 ## Synopsis
 
@@ -26,6 +26,14 @@ The `Log::Abstraction` class provides a flexible logging layer on top of
 different types of loggers, including code references, arrays, file paths,
 and objects.  It also supports logging to syslog if configured.
 
+### Unicode
+
+Messages may be character strings containing any Unicode text.  The file,
+fd and scalar-path backends write character strings as UTF-8 (unless an
+`fd` handle already has a `:utf8` or `:encoding` layer, in which case the
+handle does the encoding), and `format => 'json'` output is UTF-8 too.
+journald fields are sent as UTF-8.  Byte strings are written unchanged.
+
 ## Methods
 
 ### New
@@ -40,7 +48,9 @@ my $clone = $logger->new(level => 'debug');
 ```
 
 Creates a new `Log::Abstraction` instance, or clones an existing one when
-called on an object.
+called on an object.  It may also be called as a plain function,
+`Log::Abstraction::new(%args)`, which behaves like
+`Log::Abstraction->new(%args)`.
 
 #### Arguments
 
@@ -82,6 +92,10 @@ called on an object.
     %env_FOO%     value of $ENV{FOO}, or empty string if unset
     ```
 
+    Tokens are only expanded in the format string itself, never in the text
+    of the message.  Each line break in a message is followed by a tab, so a
+    continuation line can't be mistaken for a new log entry.
+
     The special value `"json"` (not a format string but a magic keyword) switches
     all file and fd backends to emit one compact JSON object per log line:
 
@@ -91,7 +105,7 @@ called on an object.
 
     This format is compatible with log aggregators such as journald, Loki,
     Elasticsearch, and Splunk.  `class` is included when the logger is a subclass
-    of `Log::Abstraction`.
+    of `Log::Abstraction`.  Keys are emitted in sorted order.
 
     **Security note:** because `format` may contain `%env_*%` tokens, avoid
     granting untrusted sources write access to config files that set this key.
@@ -99,8 +113,17 @@ called on an object.
 - `level`
 
     Minimum level at which to emit log entries.  Defaults to `"warning"`.
-    Valid values (case-insensitive): `trace`, `debug`, `info`, `notice`,
-    `warn`/`warning`, `error`.
+    Valid values (case-insensitive): `trace`, `debug`, `info`/`informational`,
+    `notice`, `warn`/`warning`, `error`/`err`, `crit`/`critical`/`fatal`,
+    `alert`, `emerg`/`emergency`/`panic`.  `trace` and `debug` are the same
+    threshold (see ["LIMITATIONS"](#limitations)).
+
+- `max_messages`
+
+    The most entries to keep in the in-memory history returned by
+    ["messages"](#messages); when it is full, the oldest entry is discarded.  Must be a
+    non-negative integer.  Unlimited by default, which in a long-running process
+    means the history grows without bound.
 
 - `logger`
 
@@ -116,17 +139,33 @@ called on an object.
 
     The `sendmail` sub-hash supports:
     `host`, `port`, `to`, `from`, `subject`, `level`, `min_interval`.
-    At most one email is sent per `min_interval` seconds per instance.
+    `to` is required.  `level` may be a level name or a syslog number (0-7);
+    without it, every message is emailed.
+    At most one email is sent per `min_interval` seconds per instance.  If
+    delivery fails, `Carp::carp` is called and the other backends still receive
+    the message.
+
+    The `syslog` sub-hash supports:
+
+    - `facility` -- the syslog facility (default: `local0`)
+    - `level` -- only messages at this level or more severe are sent; a level name or a syslog number (0-7)
+    - `host` (or its alias `server`), and any other ["setlogsock" in Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog#setlogsock) option -- passed to `setlogsock()`
 
     The `journald` sub-hash sends each message as a single datagram to the
     systemd journal using the journald native protocol.  Supported keys:
 
     - `socket` -- path to the journald socket (default: `/run/systemd/journal/socket`)
     - `identifier` -- value for the `SYSLOG_IDENTIFIER` field (default: basename of `$0`)
-    - any other key -- included verbatim as an uppercase journald field name
+    - any other key -- included verbatim as an uppercase journald field name.
+    The upper-cased name must contain only `A-Z`, `0-9` and `_`, and must not
+    start with `_`; `new()` croaks otherwise.
 
     The `PRIORITY` field is set automatically from the log level (0=emerg...7=debug).
-    Delivery failures are silent (`Carp::carp` only); the application is never crashed by a journald error.
+    A message too large for one datagram (about 200KB) is truncated and
+    `[truncated]` appended.
+    Delivery failures are silent apart from a single `Carp::carp` (repeated only
+    after a later send has succeeded); the application is never crashed by a
+    journald error.
 
 - `script_name`
 
@@ -143,8 +182,9 @@ A blessed `Log::Abstraction` object.
 
 #### Side Effects
 
-Loads `File::Basename` if `syslog` is configured and `script_name` is
-not supplied.  Loads `Log::Log4perl` if no logger backend is specified.
+Loads `File::Basename` if `syslog` is configured (either at the top level
+or in a `logger` hash) and `script_name` is not supplied.  Loads
+`Log::Log4perl` if no logger backend is specified.
 
 #### Example
 
@@ -168,8 +208,9 @@ my $clone = $logger->new(level => 'info');
     croak_on_error => { type => 'boolean', optional => 1 },
     ctx            => { optional => 1 },
     format         => { type => 'string',  optional => 1 },
-    level          => { type => 'string',  regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
+    level          => { type => 'string',  regex => qr/^(trace|debug|info(?:rmational)?|notice|warn(?:ing)?|err(?:or)?|crit(?:ical)?|fatal|alert|emerg(?:ency)?|panic)$/i, optional => 1 },
     logger         => { optional => 1 },
+    max_messages   => { type => 'integer', min => 0, optional => 1 },
     script_name    => { type => 'string',  optional => 1 },
     verbose        => { type => 'boolean', optional => 1 },
 }
@@ -198,6 +239,51 @@ Error                                     Meaning / Action
 "<class>: invalid syslog level '<l>'"     level value is not a recognised syslog
                                           level name.  Use trace/debug/info/notice/
                                           warn/warning/error.
+"<class>: max_messages must be a          max_messages is negative or not a number.
+  non-negative integer, not '<v>'"
+"<class>: invalid sendmail level '<l>'"   The sendmail sub-hash 'level' is neither
+                                          a level name nor 0-7.  (A bad syslog
+                                          sub-hash 'level' gives "invalid syslog
+                                          level", as above.)
+"<class>: the sendmail backend needs      The sendmail sub-hash has no 'to' key.
+  a 'to' address"
+"<class>: invalid journald field name     An extra journald key, upper-cased, is not
+  '<k>'"                                  [A-Z0-9_] or starts with '_'.
+```
+
+The following are not raised by `new()` but later, by the logging methods
+(`trace`, `debug`, `info`, `notice`, `warn`, `error`, `fatal`), when
+a message that passes the level threshold reaches the backend concerned.
+Croaks are configuration errors; delivery failures only carp, because a
+logging failure must never crash the application.
+
+```
+Croak                                     Meaning / Action
+----------------------------------------  -----------------------------------------
+"<class>: Invalid file name: <path>"      A file path (logger string, 'file' key or
+                                          logger hash 'file') contains one of
+                                          < > | * ? ; ! ` $ " or a control
+                                          character, or contains '..'.
+"<class>: Invalid SMTP host: <host>"      The sendmail 'host' contains characters
+                                          other than A-Z a-z 0-9 . -
+"<class>: Invalid SMTP port: <port>"      The sendmail 'port' is not an integer in
+                                          1-65535.
+"<class>: Don't know how to deal with     A logger hash has none of the keys file,
+  the <level> message"                    array, fd, syslog, journald or sendmail.
+"<class>: <object class> doesn't know     An object logger has no method for this
+  how to deal with the <level> message"   level.  (notice falls back to info.)
+"<class>: configuration error, no         logger is a reference of an unsupported
+  handler written for the <level>         type, e.g. a SCALAR or GLOB reference.
+  message"
+
+Carp                                      Meaning / Action
+----------------------------------------  -----------------------------------------
+"Failed to send email: <error>"           SMTP delivery failed.  The other backends
+                                          still receive the message.
+"<class>: syslog failed: <error>"         Sys::Syslog::syslog() died.
+"<class>: journald send failed: <error>"  The journald socket could not be reached.
+                                          Given once, then not again until a send
+                                          succeeds.
 ```
 
 #### Pseudocode
@@ -218,10 +304,12 @@ FUNCTION new(class_or_obj, args...)
   IF called on a blessed instance (clone form):
     shallow-clone self merged with override args
     validate and store new level integer if level given in args
-    deep-copy message history list
+    copy message history list
+    count the clone as a user of an open syslog connection
     RETURN clone
 
-  IF syslog requested and script_name not supplied:
+  IF syslog requested (top level or in a logger hash) and script_name
+  not supplied:
     auto-detect script name via File::Basename
     CROAK if still undefined
 
@@ -237,6 +325,14 @@ FUNCTION new(class_or_obj, args...)
     lc() the level string
     CROAK if not in syslog_values lookup
     default to $DEFAULT_LEVEL if not supplied
+
+  CROAK if max_messages is given and is not a non-negative integer
+
+  IF logger is a hash:
+    CROAK if the syslog or sendmail sub-hash 'level' is not a level
+      name or 0-7
+    CROAK if a sendmail sub-hash has no 'to' address
+    CROAK if an extra journald key is not a valid journald field name
 
   RETURN bless { messages => [], merged args, level => numeric } as class
 
@@ -287,7 +383,7 @@ $logger->level('info')->info('Now at info level');
 
 ```perl
 {
-    level => { type => 'string', regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
+    level => { type => 'string', regex => qr/^(trace|debug|info(?:rmational)?|notice|warn(?:ing)?|err(?:or)?|crit(?:ical)?|fatal|alert|emerg(?:ency)?|panic)$/i, optional => 1 },
 }
 ```
 
@@ -416,9 +512,10 @@ $logger->trace(@messages);
 $logger->trace(\@messages);
 ```
 
-Logs a message at `trace` level (the most verbose level, below `debug`).
-The message is dropped silently when the configured level threshold is above
-`trace`.
+Logs a message at `trace` level.  syslog has no priority below debug, so
+`trace` shares `debug`'s threshold: trace messages are emitted whenever
+debug messages are, and are sent to syslog and journald as debug.  The
+message is dropped silently when the configured level is above `debug`.
 
 #### Arguments
 
@@ -457,6 +554,11 @@ $logger->trace('start')->debug('details')->info('summary');
 ```perl
 { type => 'object', class => 'Log::Abstraction' }
 ```
+
+#### Messages
+
+Croaks if the configured backend is misconfigured, and carps if delivery
+fails; see the second table under ["new"](#new)'s MESSAGES.
 
 ### Debug
 
@@ -501,6 +603,11 @@ $logger->debug('Query took ', $elapsed, 'ms');
 { type => 'object', class => 'Log::Abstraction' }
 ```
 
+#### Messages
+
+Croaks if the configured backend is misconfigured, and carps if delivery
+fails; see the second table under ["new"](#new)'s MESSAGES.
+
 ### Info
 
 ```
@@ -543,6 +650,11 @@ $logger->info('Server started on port ', $port);
 ```perl
 { type => 'object', class => 'Log::Abstraction' }
 ```
+
+#### Messages
+
+Croaks if the configured backend is misconfigured, and carps if delivery
+fails; see the second table under ["new"](#new)'s MESSAGES.
 
 ### Notice
 
@@ -588,6 +700,11 @@ $logger->notice('Configuration reloaded');
 { type => 'object', class => 'Log::Abstraction' }
 ```
 
+#### Messages
+
+Croaks if the configured backend is misconfigured, and carps if delivery
+fails; see the second table under ["new"](#new)'s MESSAGES.
+
 ### Warn
 
 ```perl
@@ -599,8 +716,13 @@ $logger->warn(warning => \@parts);
 ```
 
 Logs a warning message.  Also dispatches to syslog and/or email backends
-when those are configured.  Falls back to `Carp::carp` when no logger
-backend is set.
+when those are configured.  Falls back to `Carp::carp` when no backend
+(`logger`, `array`, `file` or `fd`) is set.  The `Carp::carp` (whether
+from `carp_on_warn` or the fallback) only happens when the message passes
+the level threshold.
+
+Called as a class method (`Log::Abstraction->warn(...)`, or on a
+subclass), it calls `Carp::carp` directly.
 
 A `warn()` call with an empty or all-undef argument list is a silent no-op.
 
@@ -648,8 +770,15 @@ $logger->warn({ warning => ['Part A', 'Part B'] });
 #### Messages
 
 ```
-(no croak/carp messages from this method itself; see _high_priority)
+(the warning text itself)                 Carped if carp_on_warn is set, or if no
+                                          backend (logger, array, file or fd) is
+                                          configured, provided the warning passes
+                                          the level threshold.  Also carped when
+                                          called as a class method.
 ```
+
+Backend misconfiguration and delivery failures are reported as described
+in the second table under ["new"](#new)'s MESSAGES.
 
 ### Error
 
@@ -660,7 +789,8 @@ $logger->error(warning => $text);
 
 Logs an error-level message.  Behaves identically to `warn()` but at the
 `error` level, which triggers `Carp::croak` if `croak_on_error` is set
-or no logger backend is active.
+or no backend (`logger`, `array`, `file` or `fd`) is set.  Called as a
+class method, it calls `Carp::croak` directly.
 
 #### Arguments
 
@@ -700,9 +830,16 @@ $logger->error('Fatal: database unavailable');
 ```
 Croak                                     Meaning / Action
 ----------------------------------------  ------------------------------------------
-(the error message text itself)           croak_on_error is set, or no backend is
-                                          active.  The call stack is unwound.
+(the error message text itself)           croak_on_error is set, or no backend
+                                          (logger, array, file or fd) is
+                                          configured, or error() was called as a
+                                          class method.  The call stack is unwound.
+(the error message text itself), as a     carp_on_warn is set and croak_on_error
+  carp                                    is not.
 ```
+
+Backend misconfiguration and delivery failures are reported as described
+in the second table under ["new"](#new)'s MESSAGES.
 
 ### Fatal
 
@@ -863,6 +1000,24 @@ callback as described above.
     instances is not supported and produces undefined behaviour on the second
     instance.
 
+- **trace is the same threshold as debug**
+
+    syslog has no priority below debug, so `trace` and `debug` share one
+    threshold: a logger at `debug` level also emits `trace` messages, and
+    `trace` can't be filtered separately.
+
+- **Unbounded message history by default**
+
+    Every logged message is kept in the history returned by ["messages"](#messages).  In a
+    long-running process (a daemon, or under mod\_perl) set `max_messages` to
+    stop it growing without bound.
+
+- **syslog connection is shared**
+
+    `openlog()` and `closelog()` act on the whole process, so every instance
+    logging to syslog shares one connection, opened with the `script_name` of
+    the first.  It is closed when the last such instance is destroyed.
+
 - **No structured log fields**
 
     All backends except the CODE-ref backend reduce the message to a flat string.
@@ -953,7 +1108,9 @@ You can also look for information at:
 ├─────────────────────────────────────────────────────────────
 │ result!.level = syslog_values(args?.level ∨ 'warning')
 │ result!.messages = ⟨⟩
-│ result!.logger = args?.logger
+│ args?.logger ≠ ∅ ⟹ result!.logger = args?.logger
+│ args?.logger = ∅ ∧ args?.file = ∅ ∧ args?.array = ∅
+│   ⟹ result!.logger = Log4perl
 └─────────────────────────────────────────────────────────────
 
 Clone operation (called on an existing object):
@@ -963,7 +1120,7 @@ Clone operation (called on an existing object):
 │ overrides? : Args
 ├─────────────────────────────────────────────────────────────
 │ result!.level    = syslog_values(overrides?.level ∨ level)
-│ result!.messages = messages   {deep copy}
+│ result!.messages = messages   {new sequence; entries shared}
 │ result!.logger   = overrides?.logger ∨ logger
 └─────────────────────────────────────────────────────────────
 ```
@@ -1017,7 +1174,6 @@ Clone operation (called on an existing object):
 │ ΔLogState
 │ msg? : seq STRING
 ├─────────────────────────────────────────────────────────────
-│ msg? ≠ ⟨⟩
 │ syslog_values('trace') ≤ level
 │ messages' = messages ⌢ ⟨{level ↦ 'trace', message ↦ ⊕(msg?)}⟩
 └─────────────────────────────────────────────────────────────
@@ -1030,7 +1186,6 @@ Clone operation (called on an existing object):
 │ ΔLogState
 │ msg? : seq STRING
 ├─────────────────────────────────────────────────────────────
-│ msg? ≠ ⟨⟩
 │ syslog_values('debug') ≤ level
 │ messages' = messages ⌢ ⟨{level ↦ 'debug', message ↦ ⊕(msg?)}⟩
 └─────────────────────────────────────────────────────────────
@@ -1043,7 +1198,6 @@ Clone operation (called on an existing object):
 │ ΔLogState
 │ msg? : seq STRING
 ├─────────────────────────────────────────────────────────────
-│ msg? ≠ ⟨⟩
 │ syslog_values('info') ≤ level
 │ messages' = messages ⌢ ⟨{level ↦ 'info', message ↦ ⊕(msg?)}⟩
 └─────────────────────────────────────────────────────────────
@@ -1056,7 +1210,6 @@ Clone operation (called on an existing object):
 │ ΔLogState
 │ msg? : seq STRING
 ├─────────────────────────────────────────────────────────────
-│ msg? ≠ ⟨⟩
 │ syslog_values('notice') ≤ level
 │ messages' = messages ⌢ ⟨{level ↦ 'notice', message ↦ ⊕(msg?)}⟩
 └─────────────────────────────────────────────────────────────
@@ -1072,7 +1225,13 @@ Clone operation (called on an existing object):
 │ msg? ≠ ∅ ∧ join(msg?) ≠ ''
 │ syslog_values('warn') ≤ level
 │ messages' = messages ⌢ ⟨{level ↦ 'warn', message ↦ join(msg?)}⟩
+│ (carp_on_warn ∨ no_backend) ⟹ carp(join(msg?))
 └─────────────────────────────────────────────────────────────
+
+no_backend ≡ logger = ∅ ∧ array = ∅ ∧ file = ∅ ∧ fd = ∅
+
+Called as a class method (no LogState): carp(join(msg?)), and
+messages is not touched.
 ```
 
 ### Error
@@ -1085,8 +1244,10 @@ Clone operation (called on an existing object):
 │ msg? ≠ ∅ ∧ join(msg?) ≠ ''
 │ syslog_values('error') ≤ level
 │ messages' = messages ⌢ ⟨{level ↦ 'error', message ↦ join(msg?)}⟩
-│ croak_on_error = 1 ⟹ execution_continues = false
+│ (croak_on_error ∨ no_backend) ⟹ execution_continues = false
 └─────────────────────────────────────────────────────────────
+
+Called as a class method (no LogState): croak(join(msg?)).
 ```
 
 ### Fatal

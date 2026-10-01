@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2::CiliumLoadBalancerIPPool;
 # ABSTRACT: CiliumLoadBalancerIPPool is a Kubernetes third-party resource which is used to defined pools of IPs which the operator can use to allocate and advertise IPs for Services of type LoadBalancer.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
-    resource_plural => 'ciliumloadbalancerippools';
+    resource_plural => 'ciliumloadbalancerippools',
+    subresources    => { status => {} };
 
 k8s spec   => '+IO::K8s::Cilium::V2::CiliumLoadBalancerIPPoolSpec', { required => 'schema' };
 k8s status => '+IO::K8s::Cilium::V2::CiliumLoadBalancerIPPoolStatus';
@@ -24,7 +25,7 @@ IO::K8s::Cilium::V2::CiliumLoadBalancerIPPool - CiliumLoadBalancerIPPool is a Ku
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

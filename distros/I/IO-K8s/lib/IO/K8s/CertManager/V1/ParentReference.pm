@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ParentReference;
 # ABSTRACT: ParentReference identifies an API object (usually a Gateway) that can be considered a parent of this resource (usually a route).
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s group       => Str, { pattern => qr/^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/, default => 'gateway.networking.k8s.io' };
@@ -30,7 +30,7 @@ IO::K8s::CertManager::V1::ParentReference - ParentReference identifies an API ob
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 group
 

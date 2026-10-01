@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::EndpointHealth;
 # ABSTRACT: Health is the overall endpoint & subcomponent health.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s bpf           => Str;
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::EndpointHealth - Health is the overall endpoint & subcompon
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 bpf
 

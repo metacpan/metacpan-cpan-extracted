@@ -1,14 +1,14 @@
 package IO::K8s::AgentSandbox::V1alpha1::Sandbox;
 # ABSTRACT: Isolated runtime environment for AI agents
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'agents.x-k8s.io/v1alpha1',
     resource_plural => 'sandboxes';
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec => {
-    podTemplate           => { Str => 1 },
-    volumeClaimTemplates  => { Str => 1 },
+    podTemplate           => Opaque,
+    volumeClaimTemplates  => ['Core::V1::PersistentVolumeClaimTemplate'],
     shutdownTime          => Time,
     shutdownPolicy        => Str,
     replicas              => Int,
@@ -17,7 +17,7 @@ k8s spec => {
 k8s status => {
     serviceFQDN => Str,
     service     => Str,
-    conditions  => { Str => 1 },
+    conditions  => ['Meta::V1::Condition'],
     replicas    => Int,
     selector    => Str,
     podIPs      => [Str],
@@ -37,7 +37,7 @@ IO::K8s::AgentSandbox::V1alpha1::Sandbox - Isolated runtime environment for AI a
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 

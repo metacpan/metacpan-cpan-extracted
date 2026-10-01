@@ -18,6 +18,7 @@
 #ifndef HW_H
 #define HW_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +48,7 @@
 
 #define HW_MAGIC        0x4C575448  /* HierTimingWheel */
 #define HW_VERSION      2            /* 2: added the occupancy bitmap region (layout change) */
-#define HW_ERR_BUFLEN   256
+#define HW_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef HW_READER_SLOTS
 #define HW_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -63,6 +64,7 @@
 #define HW_MIN_CAP      1
 #define HW_MAX_CAP      0x1000000U    /* 2^24 concurrent timers (index fits uint32, < HW_NIL) */
 #define HW_NIL          0xFFFFFFFFU   /* empty list link / free-list terminator */
+#define HW_OP_CLEAR     1u            /* hdr->op: a clear is in progress */
 
 #define HW_ERR(fmt, ...) do { if (errbuf) snprintf(errbuf, HW_ERR_BUFLEN, fmt, ##__VA_ARGS__); } while (0)
 
@@ -102,7 +104,8 @@ struct HwHeader {
     uint32_t drain_seq;               /* 80  futex bumped by a reader releasing under a draining writer (wakes it) */
     uint32_t slotless_rdepth;         /* readers holding with no reader-slot (documented residual) */
     uint64_t stat_ops;                /* 88 */
-    uint8_t  _pad[160];               /* 96..255 */
+    uint32_t op;                      /* 96  HW_OP_* in progress, 0 = none (carved from the pad) */
+    uint8_t  _pad[156];               /* 100..255 */
 };
 typedef struct HwHeader HwHeader;
 
@@ -211,23 +214,6 @@ static inline int hw_pid_alive(uint32_t pid) {
     return !hw_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
- * CAS to OUR pid to hold the lock while fixing shared state, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
- * process can detect and re-recover if we crash mid-recovery. */
-static inline void hw_recover_stale_lock(HwHandle *h, uint32_t observed_wlock) {
-    HwHeader *hdr = h->hdr;
-    uint32_t mypid = HW_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
-            mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-        return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-}
-
 static const struct timespec hw_lock_timeout = { HW_LOCK_TIMEOUT_SEC, 0 };
 
 /* Process-global fork-generation counter.  Incremented in the pthread_atfork
@@ -305,6 +291,85 @@ static inline void hw_claim_reader_slot(HwHandle *h) {
     /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
      * slotless path (lock still works; recovery of THIS reader's death is the
      * documented slotless limitation). */
+}
+
+/* Wait until no live reader holds the lock; the caller owns wlock, so no NEW
+ * reader can join (they see wlock!=0 and yield).  The SEQ_CST wlock CAS + the
+ * SEQ_CST rdepth loads below are the writer side of the Dekker handshake. */
+static inline void hw_rwlock_drain(HwHandle *h) {
+    HwHeader *hdr = h->hdr;
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(HW_OCC_WORDS + live readers)
+         * instead of O(HW_READER_SLOTS). */
+        for (uint32_t w = 0; w < HW_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!hw_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &hw_lock_timeout, NULL, 0);
+    }
+}
+
+/* 1 if this process holds a read lock on the segment (through any handle).  Such a
+ * lock predates the current wlock holder, whose drain could then never have
+ * finished: it died before mutating anything. */
+static int hw_self_reading(HwHandle *h) {
+    if (h->slotless_held) return 1;
+    uint32_t me = (uint32_t)getpid();
+    for (uint32_t i = 0; i < HW_READER_SLOTS; i++)
+        if (__atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE) == me &&
+            __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_ACQUIRE) != 0)
+            return 1;
+    return 0;
+}
+
+static void hw_repair_locked(HwHandle *h);
+
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
+ * CAS to OUR pid to hold the lock while repairing shared state, then release.
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void hw_recover_stale_lock(HwHandle *h, uint32_t observed_wlock) {
+    HwHeader *hdr = h->hdr;
+    uint32_t mypid = HW_RWLOCK_WR((uint32_t)getpid());
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
+            mypid, 0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+        return;
+    if (!hw_self_reading(h)) {
+        hw_rwlock_drain(h);
+        hw_repair_locked(h);
+    }
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
@@ -455,48 +520,8 @@ static inline void hw_rwlock_wrlock(HwHandle *h) {
         hw_unpark(h);
         spin = 0;
     }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
-    for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
-        int busy = 0;
-        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
-         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
-         * this scan, so no held slot is skipped).  O(HW_OCC_WORDS + live readers)
-         * instead of O(HW_READER_SLOTS). */
-        for (uint32_t w = 0; w < HW_OCC_WORDS; w++) {
-            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
-            while (word) {
-                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
-                word &= word - 1;                          /* consume this bit (local copy) */
-                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
-                if (rd == 0) continue;                      /* occupied but not read-locking now */
-                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
-                if (!hw_pid_alive(pid)) {
-                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
-                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
-                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
-                    uint32_t ep = pid;
-                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
-                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
-                    continue;
-                }
-                busy = 1;                                   /* live reader still holding */
-            }
-        }
-        /* A live slotless reader keeps us waiting; a crashed slotless reader that
-         * cannot be attributed to a pid is the documented slotless limitation. */
-        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
-            busy = 1;
-        if (!busy)
-            return;                                    /* exclusive: wlock held + every rdepth 0 */
-        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
-         * (which reclaims any newly-dead slotted reader). */
-        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &hw_lock_timeout, NULL, 0);
-    }
+    /* Phase 2: drain the readers that were already holding when we won the CAS. */
+    hw_rwlock_drain(h);
 }
 
 static inline void hw_rwlock_wrunlock(HwHandle *h) {
@@ -675,14 +700,36 @@ static int hw_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int hw_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int hw_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int hw_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_HIERTIMINGWHEEL_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static HwHandle *hw_create(const char *path, uint64_t num_slots, uint64_t num_levels, uint64_t capacity, mode_t mode, char *errbuf) {
@@ -716,9 +763,18 @@ static HwHandle *hw_create(const char *path, uint64_t num_slots, uint64_t num_le
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             HW_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && hw_reserve(fd, total) < 0) {
+            HW_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { HW_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            HW_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!hw_validate_header((HwHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -728,9 +784,13 @@ static HwHandle *hw_create(const char *path, uint64_t num_slots, uint64_t num_le
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((HwHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && hw_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && hw_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         HW_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (hw_reserve(fd, total) < 0) {
+                        HW_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     hw_init_header(base, (uint32_t)num_slots, (uint32_t)num_levels, (uint32_t)capacity, total);
@@ -762,6 +822,10 @@ static HwHandle *hw_create_memfd(const char *name, uint64_t num_slots, uint64_t 
     if (ftruncate(fd, (off_t)total) < 0) {
         HW_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (hw_reserve(fd, total) < 0) {
+        HW_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { HW_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -774,6 +838,11 @@ static HwHandle *hw_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { HW_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(HwHeader)) { HW_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(HwHeader, magic)) != (ssize_t)sizeof magic || magic != HW_MAGIC) {
+        HW_ERR("invalid hierarchical timing-wheel table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { HW_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -843,6 +912,7 @@ static void hw_free(HwHandle *h, uint32_t t) {
     tm->prev   = HW_NIL;
     tm->bucket = HW_NIL;
     tm->next   = h->hdr->free_head;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->free_head = t;
 }
 
@@ -853,8 +923,8 @@ static void hw_link(HwHandle *h, uint32_t t, uint64_t b) {
     tm->prev   = HW_NIL;
     uint32_t head = hw_slots(h)[b];
     tm->next = head;
-    if (HW_TIMER_OK(h, head)) hw_timer(h, head)->prev = t;
     hw_slots(h)[b] = t;
+    if (HW_TIMER_OK(h, head)) hw_timer(h, head)->prev = t;
 }
 
 /* choose the flat bucket for a timer whose absolute expiry is E, given the
@@ -884,6 +954,8 @@ static int64_t hw_add_locked(HwHandle *h, uint64_t delay, uint64_t payload) {
     tm->payload = payload;
     tm->expiry  = E;
     uint32_t gen = (tm->state >> 1) + 1;                   /* bump generation for this reuse */
+    /* Recovery re-bins every active timer by its expiry. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     tm->state   = (gen << 1) | 1u;                         /* low bit = active, upper bits = generation */
     hw_link(h, t, hw_bucket_for(h, E, now));
     h->hdr->count++;
@@ -908,10 +980,10 @@ static int hw_cancel_locked(HwHandle *h, uint64_t id) {
 /* re-bin every timer in level-k's now-current bucket into a finer level (called
  * when `now` has just reached a multiple of tick[k]).  If level k also wrapped,
  * cascade level k+1 first (top-down) so higher levels feed into this one. */
-static void hw_cascade(HwHandle *h, uint32_t k) {
+static void hw_cascade(HwHandle *h, uint32_t k, uint64_t now) {
     uint32_t S = h->num_slots;
-    uint64_t slot = (h->hdr->now / h->tick[k]) % S;
-    if (slot == 0 && k + 1 < h->num_levels) hw_cascade(h, k + 1);   /* level k wrapped too */
+    uint64_t slot = (now / h->tick[k]) % S;
+    if (slot == 0 && k + 1 < h->num_levels) hw_cascade(h, k + 1, now);   /* level k wrapped too */
     uint64_t b = (uint64_t)k * S + slot;
     uint32_t t = hw_slots(h)[b];
     hw_slots(h)[b] = HW_NIL;                               /* detach the whole list */
@@ -920,7 +992,7 @@ static void hw_cascade(HwHandle *h, uint32_t k) {
         HwTimer *tm = hw_timer(h, t);
         uint32_t nx = tm->next;
         if (tm->state & 1u)                                /* re-insert into a lower level (or level-0 current slot) */
-            hw_link(h, t, hw_bucket_for(h, tm->expiry, h->hdr->now));
+            hw_link(h, t, hw_bucket_for(h, tm->expiry, now));
         t = nx;
     }
 }
@@ -932,10 +1004,9 @@ static uint64_t hw_advance_locked(HwHandle *h, uint64_t ticks, uint64_t *out, ui
     uint32_t S = h->num_slots;
     if (S == 0 || h->num_levels == 0) return 0;
     for (uint64_t j = 0; j < ticks; j++) {
-        h->hdr->now++;
-        uint64_t now = h->hdr->now;
+        uint64_t now = h->hdr->now + 1;
         if (now % S == 0 && h->num_levels > 1)             /* level 0 wrapped -> cascade higher levels down */
-            hw_cascade(h, 1);
+            hw_cascade(h, 1, now);
         uint64_t b = now % S;                              /* level-0 current slot (tick[0]==1) */
         uint32_t t = hw_slots(h)[b];
         uint64_t guard = 0;
@@ -949,16 +1020,25 @@ static uint64_t hw_advance_locked(HwHandle *h, uint64_t ticks, uint64_t *out, ui
             if (fired < out_cap) out[fired++] = tm->payload;   /* cap BOTH the write and the count */
             t = nx;
         }
+        /* The tick is done only once it has fired; a writer killed before this has it rerun. */
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        h->hdr->now = now;
     }
     return fired;
 }
 
 /* reset to an empty wheel: rethread the free list, clear the buckets, reset time.
  * (caller holds the write lock) */
-static inline void hw_clear_locked(HwHandle *h) {
-    uint64_t nb = hw_num_bucket(h), cap = h->capacity;
+static inline uint64_t hw_buckets_max(HwHandle *h) {
+    uint64_t nb = hw_num_bucket(h);
     uint64_t smax = (h->slots_off < h->mmap_size) ? (h->mmap_size - h->slots_off) / sizeof(uint32_t) : 0;
-    if (nb > smax) nb = smax;                              /* Layer B */
+    return nb > smax ? smax : nb;                          /* Layer B */
+}
+
+static inline void hw_clear_locked(HwHandle *h) {
+    h->hdr->op = HW_OP_CLEAR;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    uint64_t nb = hw_buckets_max(h), cap = h->capacity;
     uint64_t tmax = hw_timers_max(h);
     if (cap > tmax) cap = tmax;
     uint32_t *slots = hw_slots(h);
@@ -973,6 +1053,37 @@ static inline void hw_clear_locked(HwHandle *h) {
     h->hdr->now = 0;
     h->hdr->count = 0;
     h->hdr->free_head = cap ? 0 : HW_NIL;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->hdr->op = 0;
+}
+
+/* A clear killed part-way left its op word set: run it again from scratch.
+ * Otherwise an add, cancel, cascade or tick may have left links half made or a
+ * bucket detached: re-bin every active timer by its expiry, put every other one
+ * on the free list, and recount.  Idempotent. */
+static void hw_repair_locked(HwHandle *h) {
+    HwHeader *hdr = h->hdr;
+    if (hdr->op == HW_OP_CLEAR) { hw_clear_locked(h); return; }
+    uint64_t nb = hw_buckets_max(h), cap = h->capacity, count = 0, now = hdr->now;
+    uint64_t tmax = hw_timers_max(h);
+    if (cap > tmax) cap = tmax;
+    if (nb < hw_num_bucket(h)) return;
+    uint32_t *slots = hw_slots(h), free_head = HW_NIL;
+    for (uint64_t b = 0; b < nb; b++) slots[b] = HW_NIL;
+    for (uint64_t i = cap; i-- > 0; ) {
+        HwTimer *tm = hw_timer(h, i);
+        if (tm->state & 1u) {
+            hw_link(h, (uint32_t)i, hw_bucket_for(h, tm->expiry > now ? tm->expiry : now + 1, now));
+            count++;
+        } else {
+            tm->prev   = HW_NIL;
+            tm->bucket = HW_NIL;
+            tm->next   = free_head;
+            free_head  = (uint32_t)i;
+        }
+    }
+    hdr->free_head = free_head;
+    hdr->count = count;
 }
 
 #endif /* HW_H */

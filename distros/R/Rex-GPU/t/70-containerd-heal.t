@@ -48,7 +48,7 @@ use Test::More;
 
 use Rex::GPU::NVIDIA;
 
-sub clobber { Rex::GPU::NVIDIA::_is_rke2_clobber_tmpl(@_) }
+sub clobber { Rex::GPU::NVIDIA->_is_rke2_clobber_tmpl(@_) }
 
 # The EXACT content rex-gpu 0.002 wrote to config.toml.tmpl.
 my $bare_clobber = qq{imports = ["/etc/containerd/conf.d/*.toml"]\nversion = 2\n};
@@ -71,7 +71,7 @@ subtest 'the exact 0.002 clobber => remove (1)' => sub {
 };
 
 subtest 'the #9 base-extending tmpl => keep (0) -- the critical guard' => sub {
-  my $safe = Rex::GPU::NVIDIA::_nvidia_containerd_tmpl_v2();
+  my $safe = Rex::GPU::NVIDIA->_nvidia_containerd_tmpl_v2();
   is(clobber($safe), 0,
     'the exact base-extending config.toml.tmpl the module emits today => 0');
   # It is the `{{ template "base" . }}` directive that makes it safe.
@@ -84,7 +84,7 @@ subtest 'the #9 base-extending tmpl => keep (0) -- the critical guard' => sub {
 };
 
 subtest 'the v3 drop-in the module emits today => keep (0)' => sub {
-  is(clobber(Rex::GPU::NVIDIA::_nvidia_containerd_dropin_v3()), 0,
+  is(clobber(Rex::GPU::NVIDIA->_nvidia_containerd_dropin_v3()), 0,
     'v3 drop-in (version=3 + plugins) is not the clobber => 0');
 };
 

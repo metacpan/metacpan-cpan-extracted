@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ResponseForwarding;
 # ABSTRACT: ResponseForwarding defines how Traefik forwards the response from the upstream Kubernetes Service to the client.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s flushInterval => Str;
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::ResponseForwarding - ResponseForwarding defines how 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 flushInterval
 

@@ -29,8 +29,10 @@ extern "C" {
  Version 5 changed the return types of i_get_file_background() and
  i_get_file_backgroundf() from void to int.
 
+ Version 6 removed the IMAGER_DEBUG_MALLOC entry points.
+
 */
-#define IMAGER_API_VERSION 5
+#define IMAGER_API_VERSION 6
 
 /*
  IMAGER_API_LEVEL is the level of the structure.  New function pointers
@@ -38,7 +40,7 @@ extern "C" {
  will result in an increment of IMAGER_API_LEVEL.
 */
 
-#define IMAGER_API_LEVEL 10
+#define IMAGER_API_LEVEL 11
 
 typedef struct {
   int version;
@@ -48,9 +50,6 @@ typedef struct {
   void * (*f_mymalloc)(size_t size);
   void (*f_myfree)(void *block);
   void * (*f_myrealloc)(void *block, size_t newsize);
-  void* (*f_mymalloc_file_line)(size_t size, char* file, int line);
-  void  (*f_myfree_file_line)(void *p, char*file, int line);
-  void* (*f_myrealloc_file_line)(void *p, size_t newsize, char* file,int line);
 
   i_img *(*f_i_img_8_new)(i_img_dim xsize, i_img_dim ysize, int channels); /* SKIP */
   i_img *(*f_i_img_16_new)(i_img_dim xsize, i_img_dim ysize, int channels);  /* SKIP */
@@ -278,6 +277,10 @@ typedef struct {
   int (*f_im_decode_exif)(i_img *im, const unsigned char *data, size_t length);
 
   /* IMAGER_API_LEVEL 11 functions will be added here */
+  void *(*f_im_malloc)(im_context_t, size_t);
+  void *(*f_im_realloc)(im_context_t, void *, size_t);
+  void (*f_im_free)(im_context_t, void *);
+  void *(*f_im_malloc_fail)(im_context_t, size_t);
 } im_ext_funcs;
 
 #define PERL_FUNCTION_TABLE_NAME "Imager::__ext_func_table"

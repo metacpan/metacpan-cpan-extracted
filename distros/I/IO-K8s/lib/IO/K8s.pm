@@ -12,7 +12,7 @@ use IO::K8s::Resource ();
 use IO::K8s::Unstructured ();
 use namespace::clean;
 
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
@@ -883,8 +883,12 @@ sub struct_to_object {
 # caller's class. It also forced expand_class()'s loadable-class probe to
 # stay broad enough to catch already-resolved names, which is what kept the
 # shadow window open.
+#
+# $where is optional and only ever read for an error message: _inflate_struct
+# passes the parent class and field a nested value sits under, so a refused
+# value can be found in the caller's manifest.
 sub _struct_to_object_expanded {
-    my ($self, $class, $params) = @_;
+    my ($self, $class, $params, $where) = @_;
 
     # Already an object of the right class — pass through as-is
     return $params if Scalar::Util::blessed($params) && $params->isa($class);
@@ -896,19 +900,151 @@ sub _struct_to_object_expanded {
     # a hashref of attributes, so the generic path below would lose the data.
     return $class->FROM_STRUCT($params, $self) if $class->can('FROM_STRUCT');
 
+    # Every other class is built from a hash (a JSON object) and nothing
+    # else. A defined value of any other shape -- an array, a plain string,
+    # a CODE or SCALAR ref -- used to reach _inflate_struct's `return {}`
+    # fallback and come out as an empty object, so metadata => [] built a
+    # Pod with `metadata: {}` while Pod->new(metadata => []) failed its type
+    # check (k146). Refused here, after FROM_STRUCT, because the union
+    # classes above legitimately take arrays and booleans. Left alone on
+    # purpose: undef (no value, handled like an absent field). Independent
+    # of strict, which is about undeclared keys, not shape.
+    #
+    # A blessed value of another class is read through its TO_JSON and has
+    # to come out as a hash like anything else. Without a TO_JSON it is
+    # refused: a JSON boolean at `metadata` -- what "metadata": true
+    # decodes to -- used to fall through to the same `return {}` and build
+    # an empty ObjectMeta (k153). An IO::K8s object of a FOREIGN class stays
+    # accepted on purpose and is converted: AutoGen/CRD classes and core
+    # classes of the same shape get mixed in practice -- a core
+    # LabelSelector handed to a generated selector field -- and its
+    # undeclared fields are kept per D1 (dies under strict), exactly as if
+    # the caller had passed its TO_JSON hash.
+    if (Scalar::Util::blessed($params)) {
+        $self->_refuse_object_shape($class, $self->_describe_shape($params), $where)
+            unless $params->can('TO_JSON');
+        my $data = $params->TO_JSON;
+        $self->_refuse_object_shape($class, $self->_describe_shape($params)
+            .' whose TO_JSON returned '.$self->_describe_shape($data), $where)
+            unless ref $data eq 'HASH';
+        $params = $data;
+    }
+    $self->_refuse_object_shape($class, $self->_describe_shape($params), $where)
+        if defined $params && ref $params ne 'HASH';
+
     my $inflated = $self->_inflate_struct($class, $params);
-    return $class->new(%$inflated);
+    return $self->_construct($class, $inflated);
+}
+
+# Builds an object of $class from its inflated arguments: the one place
+# IO::K8s calls a constructor (k164).
+#
+# An error the constructor raises about those arguments blames the line
+# that called it, which is the one below: Moo croaks "Missing required
+# arguments" from the frame of the class being built, and a Type::Tiny
+# exception takes the first frame outside Type::Tiny. Neither gets past
+# IO::K8s by @CARP_NOT -- the classes being built are not ours to mark,
+# and Type::Tiny does not read @CARP_NOT at all -- so _blame_caller moves
+# such an error to the place a croak from here is reported.
+sub _construct {
+    my ($self, $class, $args) = @_;
+    my $object;
+    return $object if eval { $object = $class->new(%$args); 1 };
+    my $error = $@;
+    die $self->_blame_caller($error);
+}
+
+# $error moved to the place a croak from IO::K8s at this point is reported,
+# when it blames a line of this file (k164) -- inside _construct, only the
+# constructor's own complaint does. Carp decides the place, by the
+# @CARP_NOT declarations of the distribution: the line that called into
+# IO::K8s, the manifest line of a Kind call in a .pk8s (k163), the caller
+# of add_crd or to_crd. A Type::Tiny exception stays the same object with
+# its context moved; a string gets the new location in the form Carp
+# writes it.
+#
+# Everything else is returned as it is: an error blaming another place (a
+# class's own BUILD, a bug elsewhere keeps pointing at itself), a Carp
+# answer that is itself a line of the distribution (a path whose modules do
+# not trust each other yet -- moving the blame there would only trade one
+# internal line for another), and a full backtrace under $Carp::Verbose.
+sub _blame_caller {
+    my ($self, $error) = @_;
+    my $at_construct = qr/ at \Q${\ __FILE__}\E line \d+(?: thread \d+)?\.\n\z/;
+    if (Scalar::Util::blessed($error)) {
+        return $error unless $error->isa('Error::TypeTiny');
+        my $context = $error->context;
+        return $error unless ref $context eq 'HASH'
+            && defined $context->{file} && $context->{file} eq __FILE__;
+        my @at = $self->_caller_location or return $error;
+        @$context{qw( package file line )} = @at;
+        return $error;
+    }
+    return $error if ref $error || !defined $error || $error !~ $at_construct;
+    my (undef, $file, $line) = $self->_caller_location or return $error;
+    $error =~ s/$at_construct/ at $file line $line.\n/;
+    return $error;
+}
+
+# Package, file and line of the place Carp reports a croak from IO::K8s at
+# this point (k164), or nothing when that is a line of the distribution or
+# Carp answers with a full backtrace instead of one line. Carp names the
+# file and line; the package is that of the frame calling from there.
+sub _caller_location {
+    my ($self) = @_;
+    my ($file, $line) = Carp::shortmess('') =~ /\A at (.+) line (\d+)(?: thread \d+)?\.\n\z/
+        or return;
+    return if $self->_is_own_file($file);
+    for (my $level = 1; my @frame = caller $level; $level++) {
+        return ($frame[0], $file, $line) if $frame[1] eq $file && $frame[2] == $line;
+    }
+    return;
+}
+
+# True for a file of this distribution: this one, or a module below the
+# IO/K8s/ directory next to it.
+sub _is_own_file {
+    my ($self, $file) = @_;
+    state $dir = do { (my $d = __FILE__) =~ s/\.pm\z/\//; $d };
+    return $file eq __FILE__ || index($file, $dir) == 0;
+}
+
+# How a refused value is named in an inflation error (k146, k153, k154).
+sub _describe_shape {
+    my ($self, $value) = @_;
+    return !defined $value               ? 'undef'
+         : Scalar::Util::blessed($value) ? 'an object of class '.ref($value)
+         : ref $value                    ? 'a reference of type '.ref($value)
+         :                                 'a plain scalar';
+}
+
+# The one wording for a value that cannot become an object of $class
+# (k146, k153). $where names the parent class and field of a nested value.
+# $class is undef for a whole document handed to inflate, whose class the
+# missing hash would have named through its kind (k161).
+sub _refuse_object_shape {
+    my ($self, $class, $got, $where) = @_;
+    croak 'Cannot inflate'.(defined $class ? ' '.$class : '')
+        .': expected a hash (a JSON object), got '.$got
+        .(defined $where ? ' while inflating '.$where : '');
 }
 
 sub inflate {
     my ($self, $data) = @_;
     local $IO::K8s::Resource::STRICT = $self->strict;
 
-    # Accept both JSON string and hashref
-    my $struct = ref($data) eq 'HASH' ? $data : $self->json->decode($data);
+    # A hashref is the document, a plain string is JSON text for one. What
+    # the text decodes to has to be a hash as well (k161): inflate('[]')
+    # used to die with Perl's own "Not a HASH reference", and an arrayref,
+    # undef or an object handed over directly came back as a JSON parse
+    # error about a "malformed JSON string" -- none naming what was wrong.
+    my $struct = defined $data && !ref $data ? $self->json->decode($data) : $data;
+    $self->_refuse_object_shape(undef, $self->_describe_shape($struct))
+        unless ref $struct eq 'HASH';
 
+    # croak, not die (k175): the error names the line that called inflate.
     my $kind = $struct->{kind}
-        or die "Cannot inflate: missing 'kind' field in data";
+        or croak "Cannot inflate: missing 'kind' field in data";
 
     # A List-shaped Kind ('List' itself, or any '...List') routes to the
     # generic IO::K8s::List container rather than expand_class(): the
@@ -934,7 +1070,7 @@ sub inflate {
     }
     $self->load_class($class);
     my $inflated = $self->_inflate_struct($class, $struct);
-    return $class->new(%$inflated);
+    return $self->_construct($class, $inflated);
 }
 
 sub new_object {
@@ -1047,14 +1183,11 @@ sub _die_resolution_error {
 sub _inflate_struct {
     my ($self, $class, $params) = @_;
 
-    # Blessed objects should be caught by struct_to_object before reaching
-    # here.  If one does slip through (defensive), extract its data rather
-    # than silently returning {} which would create an empty object.
-    if (Scalar::Util::blessed($params)) {
-        return $params->TO_JSON if $params->can('TO_JSON');
-        return {};
-    }
-
+    # Both callers hand over a plain hash or undef: inflate() only ever has
+    # a decoded JSON object here, and _struct_to_object_expanded has already
+    # turned a blessed value into its TO_JSON hash or refused it (k153) and
+    # refused every other shape (k146). undef means "no value" and builds
+    # an object with nothing set.
     return {} unless ref $params eq 'HASH';
 
     # Opaque fields that should be passed through as-is (complex JSON structures)
@@ -1074,7 +1207,16 @@ sub _inflate_struct {
 
     for my $attr (keys %$params) {
         my $value = $params->{$attr};
-        next unless defined $value;
+        unless (defined $value) {
+            # A JSON null is "no value" and dropped -- except for a field
+            # declared nullable, where it is a value of its own that TO_JSON
+            # writes back (k158): the attribute is built with undef, so it
+            # exists and has_<accessor> is true.
+            my $opts = $attr_info->{ $json_to_perl{$attr} // $attr };
+            $opts = $opts->{options} if $opts;
+            $args{$attr} = undef if $opts && $opts->{nullable};
+            next;
+        }
 
         # Pass through opaque fields without type coercion -- but not as the
         # caller's own reference (k54), see the else branch below.
@@ -1087,20 +1229,48 @@ sub _inflate_struct {
         my $perl_name = $json_to_perl{$attr} // $attr;
         my $info = $attr_info->{$perl_name} // {};
 
+        # An array field takes an array and a hash field a hash, whatever
+        # its elements are (k154). The object branches below used to
+        # dereference without looking, so containers => 'x' died with
+        # Perl's own "Can't use string as an ARRAY ref", naming neither the
+        # class nor the field; a scalar container reached the constructor
+        # and got a Type::Tiny message without the class. Only the
+        # container is checked -- the field's own isa already demanded it
+        # (ArrayRef[...], HashRef[...], the bare HashRef of Opaque and of
+        # the lenient { Str => 1 }), so nothing is refused that used to
+        # pass, and the contents of an opaque map stay as unconstrained as
+        # before.
+        if (my $shape = $self->_container_shape($info)) {
+            $self->_refuse_container_shape($class, $attr, $shape, $info->{class}, $value)
+                unless ref $value eq $shape;
+        }
+
         # The registry's {class} is always a final class name: the k8s DSL
         # runs every declared type through IO::K8s::Resource::_expand_class
         # before storing it, and generated inline structs are named in full.
         # So these go straight to the pre-expanded path — sending them back
         # through expand_class() would re-interpret a name that is already
         # resolved (k35).
+        #
+        # The third argument names where a nested value sits, for the shape
+        # error _struct_to_object_expanded raises (k146) -- worded like the
+        # Bool message below and the element/key suffixes of the object
+        # coercers in IO::K8s::Resource.
         if ($info->{is_array_of_objects}) {
             my $inner_class = $info->{class};
-            $args{$attr} = [ map { $self->_struct_to_object_expanded($inner_class, $_) } @$value ];
+            $args{$attr} = [ map {
+                $self->_struct_to_object_expanded($inner_class, $value->[$_],
+                    $class.' field '.$attr.' at element '.$_)
+            } 0 .. $#$value ];
         } elsif ($info->{is_hash_of_objects}) {
             my $inner_class = $info->{class};
-            $args{$attr} = { map { $_ => $self->_struct_to_object_expanded($inner_class, $value->{$_}) } keys %$value };
+            $args{$attr} = { map {
+                $_ => $self->_struct_to_object_expanded($inner_class, $value->{$_},
+                    $class.' field '.$attr." at key '".$_."'")
+            } keys %$value };
         } elsif ($info->{is_object}) {
-            $args{$attr} = $self->_struct_to_object_expanded($info->{class}, $value);
+            $args{$attr} = $self->_struct_to_object_expanded($info->{class}, $value,
+                $class.' field '.$attr);
         } elsif ($info->{is_bool}) {
             # Same normalization the Bool coercer in IO::K8s::Resource applies.
             # It has to be the same one: this runs before $class->new(%args),
@@ -1140,6 +1310,33 @@ sub _shallow_copy {
     return $value;
 }
 
+# The container a registry entry's field holds -- 'ARRAY', 'HASH', or
+# nothing for a scalar or single-object field (k154). Read off the flag
+# prefix, the way IO::K8s::AutoGen::_element_compatible does, so a
+# container form the DSL gains later is covered without a list to keep in
+# step with IO::K8s::Resource. The free map (Opaque / HashRef, k191) is the
+# one hash form without an is_hash_of_ prefix.
+sub _container_shape {
+    my ($self, $info) = @_;
+    for my $flag (keys %$info) {
+        next unless $info->{$flag};
+        return 'ARRAY' if index($flag, 'is_array_of_') == 0;
+        return 'HASH'  if index($flag, 'is_hash_of_') == 0 || $flag eq 'is_hash_opaque';
+    }
+    return;
+}
+
+# The same form for an array or hash field holding the wrong container
+# (k154): the class being inflated, the field, the expected container and,
+# for an array or hash of objects, the element class.
+sub _refuse_container_shape {
+    my ($self, $class, $attr, $shape, $of, $value) = @_;
+    croak 'Cannot inflate '.$class.' field '.$attr.': expected '
+        .($shape eq 'ARRAY' ? 'an array (a JSON array)' : 'a hash (a JSON object)')
+        .(defined $of ? ' of '.$of : '')
+        .', got '.$self->_describe_shape($value);
+}
+
 sub object_to_struct {
     my ($self, $object) = @_;
     return $object->TO_JSON;
@@ -1151,14 +1348,22 @@ sub object_to_json {
 }
 
 sub load {
-    my ($self, $file) = @_;
+    my ($self, $file, %opts) = @_;
+
+    # vars (k160) is the one option; anything else is a typo that would
+    # otherwise leave every var() in the manifest on its default.
+    my $vars = delete $opts{vars};
+    croak 'load: unknown option '.join(', ', map { "'".$_."'" } sort keys %opts)
+        if %opts;
+    croak 'load: vars must be a hash reference'
+        if defined $vars && ref $vars ne 'HASH';
 
     require IO::K8s::Manifest;
 
     # Set k8s instance for DSL functions
     local $IO::K8s::Manifest::_k8s_instance = $self;
 
-    return IO::K8s::Manifest->_load_file($file, $self);
+    return IO::K8s::Manifest->_load_file($file, $self, $vars);
 }
 
 sub load_yaml {
@@ -1166,19 +1371,10 @@ sub load_yaml {
 
     require YAML::PP;
 
-    my $content;
-    if ($file_or_string !~ /\n/ && -f $file_or_string) {
-        # It's a file path
-        open my $fh, '<', $file_or_string or die "Cannot open $file_or_string: $!";
-        $content = do { local $/; <$fh> };
-        close $fh;
-    } else {
-        # It's YAML content
-        $content = $file_or_string;
-    }
-
-    # Parse multi-document YAML (Load returns all docs in list context)
-    my @docs = YAML::PP::Load($content);
+    # A file or YAML text, multi-document, by the rule IO::K8s::CRD->load
+    # shares (k159, k162). YAML::PP->new is what YAML::PP::Load used here.
+    my ($refused, @docs) = $self->_yaml_documents($file_or_string, YAML::PP->new);
+    croak "load_yaml: '".$file_or_string."' ".$refused if defined $refused;
 
     my $collect_errors = $opts{collect_errors};
     my @objects;
@@ -1209,6 +1405,45 @@ sub load_yaml {
     return \@objects;
 }
 
+# The YAML documents in a load_yaml or IO::K8s::CRD->load argument: one
+# argument, two readings (k159, k162). Without a newline it may name a
+# file: an existing one is read as UTF-8, a directory is refused.
+# Everything else is YAML text, expected as decoded characters and parsed
+# as given, never re-encoded. A one-line argument that is no file and
+# parses to plain scalars only, not a single mapping or sequence, is a path
+# with a typo -- 'manifests/app.yaml' is valid YAML for that very string --
+# and used to come back as [] without a word. Empty or whitespace-only
+# text, a bare '---' or a comment parse to nothing defined and still give
+# no documents.
+#
+# $yaml is the caller's YAML::PP, so each keeps its own boolean setting.
+# Returns undef and the documents, or a refusal to follow the quoted
+# argument in the caller's croak. The callers croak themselves, with their
+# own name: a croak from in here would be reported at IO::K8s::CRD's line,
+# not at its caller's.
+sub _yaml_documents {
+    my ($self, $file_or_string, $yaml) = @_;
+    my $one_line = $file_or_string !~ /\n/;
+    return 'is a directory, not a file or YAML text' if $one_line && -d $file_or_string;
+    my $is_file = $one_line && -f $file_or_string;
+    my @docs = $yaml->load_string($is_file ? $self->_slurp_utf8($file_or_string) : $file_or_string);
+    return 'is neither an existing file nor YAML text'
+        if $one_line && !$is_file && !grep({ ref } @docs) && grep({ defined } @docs);
+    return (undef, @docs);
+}
+
+# A whole file as text, read as UTF-8 -- the encoding Kubernetes manifests
+# are written in, and YAML::PP and a string eval both want characters, not
+# bytes (k159, k160). IO::K8s::CRD->load reads a file through it as well,
+# by way of _yaml_documents (k162).
+sub _slurp_utf8 {
+    my ($self, $file) = @_;
+    open my $fh, '<:encoding(UTF-8)', $file or croak 'Cannot open '.$file.': '.$!;
+    my $content = do { local $/; <$fh> };
+    close $fh;
+    return $content;
+}
+
 1;
 
 __END__
@@ -1223,7 +1458,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -1366,7 +1601,9 @@ The C<k8s> DSL supports these type specifications:
   k8s ready    => 'Bool';                  # boolean attribute
   k8s spec     => 'Core::V1::PodSpec';     # nested IO::K8s object
   k8s ports    => ['Core::V1::ServicePort']; # array of objects
-  k8s labels   => { Str => 1 };            # hash of strings
+  k8s labels   => { Str => 1 };            # map of strings
+  k8s data     => HashRef[Str];            # map of strings (strict)
+  k8s raw      => Opaque;                  # free map, values untyped
   k8s items    => ['+Full::Class::Name'];  # array with full class (+ prefix)
 
 =head2 IO::K8s::APIObject (top-level resources)
@@ -1414,8 +1651,8 @@ like Pod, Deployment, and Service.
       resource_plural => 'staticwebsites';
   with 'IO::K8s::Role::Namespaced';
 
-  k8s spec   => { Str => 1 };
-  k8s status => { Str => 1 };
+  k8s spec   => Opaque;
+  k8s status => Opaque;
   1;
 
 That's it - 6 lines of actual code. This class now supports:
@@ -1455,7 +1692,20 @@ and the caller is left to pluralize the kind name itself
 (C<StaticWebSite> -E<gt> C<staticwebsites>) -- that heuristic does not work
 for all names, which is exactly why declaring it is recommended.
 
+=item C<subresources> (optional)
+
+Declares which subresources (C<status>, C<scale>) the CRD version serves;
+L<IO::K8s::Role::APIObject/to_crd> writes the declaration into
+C<spec.versions[].subresources>. Becomes a fixed identity class method like
+C<api_version>. See L<IO::K8s::APIObject> for the accepted shape and its
+validation.
+
 =back
+
+An unknown import parameter, an odd number of import arguments, or an
+C<api_version>/C<resource_plural> given as C<undef> or an empty string all
+croak at the C<use> line, before anything is set up; see
+L<IO::K8s::APIObject> for the exact messages.
 
 =head2 Namespaced vs cluster-scoped
 
@@ -1527,13 +1777,14 @@ per served version and goes further than the OpenAPI-spec path above: every
 inline C<type: object> schema below the top level, which is how a CRD
 schema is written everywhere below its Kind, becomes its own nested class
 named after its place in the parent (C<< <Kind>::<Prop> >>, with an
-C<Item> / C<Value> suffix for array items and map values) instead of an
-opaque hash of strings, so field options and the unknown-field bag apply at
+C<Item> / C<Value> suffix for array items and map values) instead of a
+free C<Opaque> map, so field options and the unknown-field bag apply at
 every level. Hash-style access on such a field still works -- a Moo object
 is a blessed hash keyed by attribute name -- so code that reads
 C<< $obj->{spec}{mode} >> does not need to change either way. Only a
-property-less object and an C<additionalProperties>-only map (nothing
-underneath to attach options to) stay opaque. L<IO::K8s::CRD::Emitter>
+property-less object (or one with C<x-kubernetes-preserve-unknown-fields>)
+stays C<Opaque>, and an C<additionalProperties>-only map becomes a
+C<HashRef[X]> (nothing underneath to attach options to). L<IO::K8s::CRD::Emitter>
 renders the same classes as checked-in source.
 
 =head2 Explicit generation with IO::K8s::AutoGen
@@ -1596,7 +1847,7 @@ Optional. Boolean, default C<0>. Governs what happens when a constructor key
 matches no declared attribute, at any nesting level. With the default C<0> the
 field is kept and re-emitted by C<TO_JSON> (see
 L<IO::K8s::Role::Resource/UNKNOWN FIELDS>); with C<1> it dies instead, with
-C<Unknown field 'E<lt>nameE<gt>' for E<lt>classE<gt>>.
+C<< Unknown field '<name>' for <class> >>.
 
     my $k8s = IO::K8s->new(strict => 1);
     $k8s->new_object('Pod', { spec => { bogusField => 1 } });
@@ -1607,7 +1858,7 @@ L</struct_to_object>; L</load> and L</load_yaml> inherit it because both
 build on C<inflate>/C<new_object>. It applies for the duration of that one
 call, including every nested object it constructs along the way.
 
-Since k99, L<IO::K8s::List>, the envelope a list Kind inflates to, also
+Since 1.108, L<IO::K8s::List>, the envelope a list Kind inflates to, also
 composes L<IO::K8s::Role::Resource>: its own top-level keys are preserved
 and checked under C<strict> exactly like any other resource's, alongside
 the objects inside C<items>, each through its own class.
@@ -1644,6 +1895,12 @@ C<apiVersion>/C<kind>/C<metadata> is precisely what it exists to preserve.
 Optional. The OpenAPI v2 specification from a Kubernetes cluster. When provided,
 enables auto-generation of classes for types not found in the built-in classes.
 
+An error from generating such a class -- a C<$ref> no definition answers,
+say, and the remembered failure L<IO::K8s::AutoGen> rethrows when the same
+class is asked for again -- names the line that called L</expand_class>,
+L</new_object>, L</inflate> or whichever entry point asked for the class,
+not a line inside IO::K8s.
+
 =head2 class_namespaces
 
 Optional. ArrayRef of namespace prefixes to search for classes before checking
@@ -1658,8 +1915,8 @@ own copy, so modifications via C<add()> do not affect other instances.
 
 =head2 json
 
-A L<JSON::MaybeXS> encoder/decoder configured with C<utf8 =E<gt> 1> and
-C<canonical =E<gt> 1>. Used by L</object_to_json>, L</json_to_object> and
+A L<JSON::MaybeXS> encoder/decoder configured with C<< utf8 => 1 >> and
+C<< canonical => 1 >>. Used by L</object_to_json>, L</json_to_object> and
 L</inflate> for their default encoding/decoding. Override at construction
 when the caller needs a different encoder (for example, to disable
 C<canonical> for tighter output, or to swap in a different backend):
@@ -1688,6 +1945,7 @@ Returns C<$self> for chaining.
 =head2 load
 
     my $resources = $k8s->load('myapp.pk8s');
+    my $resources = $k8s->load('myapp.pk8s', vars => { name => 'web', replicas => 3 });
 
 Load a C<.pk8s> manifest file and return an ArrayRef of IO::K8s objects.
 
@@ -1728,6 +1986,54 @@ resources:
 Inside C<{}> blocks, C<name>, C<namespace>, C<labels>, and C<annotations>
 are automatically moved to C<metadata>.
 
+Values can be handed to a manifest with the C<vars> option. Inside the file,
+C<var($name)> returns the value passed under that name and
+C<var($name, $default)> falls back to C<$default> when none was passed; a
+name with neither dies, naming the file and the name. A value passed as
+C<undef> counts as passed. References pass through as they are. C<var> is
+lower case, so it never collides with a Kind function:
+
+    # myapp.pk8s
+    Deployment {
+        name      => var('name'),
+        namespace => var('namespace', 'default'),
+        spec      => {
+            replicas => var('replicas', 1),
+            ...
+        },
+    };
+
+    my $resources = $k8s->load('myapp.pk8s', vars => { name => 'web', replicas => 3 });
+
+C<vars> must be a hash reference, and it is the only option -- any other
+key dies rather than leaving every C<var> on its default. Without C<vars>,
+C<var($name, $default)> still works and C<var($name)> dies.
+
+The file is read as UTF-8, so a non-ASCII string literal in it gives the
+same characters as the same value in a YAML file read by L</load_yaml>; a
+manifest that says C<use utf8;> itself keeps working. The file is evaluated
+in a package of its own that is removed again once C<load> returns, also
+when loading fails, so reloading manifests in a long-running process does
+not grow it. Subs and closures the manifest hands out in its data keep
+working after that.
+
+Errors name the manifest's file and its own line numbers: a C<die>,
+a warning, a syntax error, a C<var> without value and an error raised for
+a Kind call -- a field of the wrong shape, a missing required field or a
+value of the wrong type -- all report
+C<at myapp.pk8s line 12>, and a fatal one comes prefixed with
+C<Error loading myapp.pk8s:>. A file name with a double quote, a line break
+or characters outside printable ASCII cannot be written into Perl's
+C<#line> directive; for such a file the line numbers are still right, the
+location reads C<(eval N)> instead of the name, and the prefix still names
+the file. A manifest that cannot be opened croaks C<Cannot open myapp.pk8s:
+...> at the line that called C<load>.
+
+The manifest is compiled under C<use strict> and C<use warnings> and sees
+C<var> and one function per Kind, but none of the loader's own variables:
+an undeclared C<$file> or C<$m> in it is a compile error, not a quiet
+reach into the loader, and C<@_> is empty at its top level.
+
 With CRDs (requires openapi_spec):
 
     my $k8s = IO::K8s->new(openapi_spec => $spec);
@@ -1740,6 +2046,19 @@ With CRDs (requires openapi_spec):
 
 Load a YAML manifest file (or YAML string) and return an ArrayRef of IO::K8s
 objects. Supports multi-document YAML (separated by C<--->).
+
+An argument without a newline that names an existing file is read from
+that file, as UTF-8. Anything else is taken as YAML text, which is expected
+as decoded characters (not UTF-8 bytes) and is parsed as given. A one-line
+argument that is no existing file and parses as YAML to plain scalars only
+-- typically a mistyped path -- dies instead of returning an empty list, and
+so does a directory:
+
+    load_yaml: 'manifests/app.yaml' is neither an existing file nor YAML text
+
+Empty or whitespace-only text still returns an empty ArrayRef, and a
+one-line YAML mapping such as C<{kind: Namespace, metadata: {name: x}}> is
+still YAML text.
 
 This method validates declared fields against the Kubernetes types. A declared
 field with the wrong type throws an error. By default, an undeclared field is
@@ -1801,7 +2120,7 @@ L</inflate>: it is treated as the exact GVK the caller wants, and the
 short name resolves against it instead of whichever version the class
 defaults to. When a positional C<api_version> is also given and the two
 disagree -- including one being defined and the other undef -- this
-croaks rather than picking one (k62):
+croaks rather than picking one:
 
     new_object: conflicting apiVersion for kind 'NetworkPolicy' --
     params hash says 'cilium.io/v2', positional argument says 'networking.k8s.io/v1'
@@ -1822,6 +2141,89 @@ class doesn't exist either, the failure is Perl's own module-loading error
 This same fail-closed behaviour applies uniformly across C<new_object>,
 C<inflate>, C<json_to_object> and C<struct_to_object>.
 
+Independently of GVK resolution, a defined value at an object-bearing
+position -- a nested field such as C<spec> or C<metadata> anywhere inside
+the params, or (via L</struct_to_object> and L</json_to_object>) the
+top-level value itself -- must be a hashref, or an already-inflated object
+of the right class; anything else (an arrayref, a plain string, a code or
+scalar reference) dies naming the target class, the shape actually
+received, and, for a nested field, the field itself:
+
+    Cannot inflate IO::K8s::Api::Core::V1::Pod: expected a hash (a JSON object), got a reference of type ARRAY
+    Cannot inflate IO::K8s::Api::Core::V1::PodSpec: expected a hash (a JSON object), got a plain scalar while inflating IO::K8s::Api::Core::V1::Pod field spec
+
+A blessed value of another class is read through its C<TO_JSON>, which
+has to return a hashref; a blessed value without C<TO_JSON> -- such as the
+JSON boolean C<"metadata": true> decodes to -- or with a C<TO_JSON> that
+returns anything else dies the same way, naming the value's class:
+
+    Cannot inflate IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta: expected a hash (a JSON object), got an object of class JSON::PP::Boolean while inflating IO::K8s::Api::Core::V1::Pod field metadata
+
+An IO::K8s object of a I<different> class at an object position is
+therefore converted, not refused: a core
+L<IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::LabelSelector> handed to a
+CRD field typed with a generated selector class of the same shape keeps
+working. Fields the target class does not declare are kept (and die under
+C<strict>) exactly as if its C<TO_JSON> hash had been passed.
+
+An array field -- of objects, such as C<containers>, or of scalars, such
+as C<args> -- takes an arrayref, and a hash field -- of objects, or a map
+such as C<labels> or C<limits> -- takes a hashref. Any other defined value
+dies naming the class being inflated, the field, the expected container
+and, for objects, the element class:
+
+    Cannot inflate IO::K8s::Api::Core::V1::PodSpec field containers: expected an array (a JSON array) of IO::K8s::Api::Core::V1::Container, got a plain scalar
+
+Only the container is checked; the contents of a free-form map such as
+C<labels> or C<annotations> stay as unconstrained as before.
+
+A list payload (C<kind: PodList> and the like, inflated into
+L<IO::K8s::List>) follows the same rules: the list itself has to be a hash,
+C<items> an array -- named as C<IO::K8s::List field items> -- and each item
+a hash, named by its index:
+
+    Cannot inflate IO::K8s::Api::Core::V1::Pod: expected a hash (a JSON object), got a plain scalar while inflating IO::K8s::List field items at element 1
+
+All of this applies uniformly across C<new_object>, C<inflate>,
+C<json_to_object>, C<struct_to_object>, L<IO::K8s::Role::Resource/FROM_HASH>
+and the nested coercion of a class's constructor, on every class, and
+independently of C<strict> -- C<strict> only governs a constructor key no
+attribute claims, not the shape of a value that is present. C<undef> and
+an omitted field are unaffected and remain allowed.
+
+A JSON C<null> (C<undef>) for a field counts as the field being omitted --
+except for a field declared C<nullable> (see
+L<IO::K8s::Resource/Field options>), where it is kept: the attribute exists
+with C<undef>, its C<< has_<accessor> >> is true, and C<TO_JSON> writes
+the C<null> back. That too holds on every entry point listed above
+and at any depth.
+
+An error the constructor of a class raises while it is built -- Moo's
+C<Missing required arguments>, or a L<Type::Tiny> exception for a value of
+the wrong type -- names the line that called C<new_object>, C<inflate>,
+C<struct_to_object>, C<json_to_object> or L</load_yaml>, and in a C<.pk8s>
+manifest the line of the Kind call (see L</load>), not a line inside
+IO::K8s. That holds at any depth, for every Kind that resolves to a
+class -- shipped, generated or your own:
+
+    Missing required arguments: selector, template at deploy.pl line 12.
+
+The message is otherwise the constructor's own, and a Type::Tiny exception
+stays the same L<Error::TypeTiny::Assertion> object, its C<context>
+(package, file and line) moved to that caller. An error a class raises from
+its own code, such as a C<BUILD> that dies, keeps its own location, and a
+direct C<< $class->new(...) >> is not an entry point of IO::K8s and reports
+as it always has.
+
+The same goes for the routes that inflate through IO::K8s on your behalf:
+L<IO::K8s::Role::Resource/FROM_HASH> and C<from_json>, which the
+C<< unknown_kinds => 'unstructured' >> fallback of C<new_object> and
+C<inflate> goes through as well; a hash that C<spec_set> or C<spec_merge>
+of L<IO::K8s::Role::SpecBuilder> writes into a typed field; and a schema
+arm the C<JSONSchemaPropsOr*> union classes inflate. A shape error, a
+missing required field or a value of the wrong type met on those routes
+names the line that called them.
+
 =head2 inflate
 
     my $obj = $k8s->inflate($json_string);
@@ -1836,18 +2238,50 @@ If C<kind>/C<apiVersion> amount to a GVK request that cannot be resolved, this
 dies with the same fail-closed error as L</new_object> -- see there for the
 exact message and the bare-Kind exemption.
 
+Independently of that, a defined non-hash value at an object-bearing
+position anywhere in the data also fails closed -- see L</new_object> for
+the exact message.
+
+The data itself has to be a hash: a hashref, or JSON text that decodes to
+an object. JSON text for anything else -- C<[]>, a string, C<null> -- and
+any other Perl value -- an arrayref, C<undef>, an already-inflated object --
+dies naming what it received:
+
+    Cannot inflate: expected a hash (a JSON object), got a reference of type ARRAY
+
+A hash without a C<kind> croaks, naming the line that called C<inflate>:
+
+    Cannot inflate: missing 'kind' field in data at deploy.pl line 12.
+
 =head2 json_to_object
 
     my $obj = $k8s->json_to_object($json_with_kind);
     my $obj = $k8s->json_to_object('Pod', $json_string);
 
 Convert JSON to an IO::K8s object. With one argument, auto-detects the class
-from C<kind>. With two arguments, uses the specified class.
+from C<kind> exactly as L</inflate> does, and like there the JSON has to
+decode to an object. With two arguments, uses the specified class.
+
+The specified class name goes through L</expand_class> exactly as it would
+for L</new_object>: a bare one-word name is always read as a Kubernetes
+Kind and looked up in the resource map, never as a package name --
+C<Gizmo> resolves as the resource map's C<Gizmo> entry, not as a literal
+package called C<Gizmo>. A class name that has already been resolved --
+for example, the return value of a previous L</expand_class> call -- is not
+exempt from this and must be prefixed with C<+> to be used verbatim instead
+of being looked up again:
+
+    my $class = $k8s->expand_class('Gizmo');    # already a full class name
+    $k8s->json_to_object('+'.$class, $json);     # '+' skips re-resolution
 
 When the class argument is a GVK request (domain-qualified, or paired with an
 C<api_version>) that cannot be resolved, this dies with the same fail-closed
 error as L</new_object> -- see there for the exact message and the bare-Kind
 exemption.
+
+Independently of that, a defined non-hash value at an object-bearing
+position anywhere in the data also fails closed -- see L</new_object> for
+the exact message.
 
 =head2 struct_to_object
 
@@ -1857,10 +2291,26 @@ exemption.
 Convert a Perl hashref to an IO::K8s object. With one argument, auto-detects
 the class from C<kind>. With two arguments, uses the specified class.
 
+The specified class name goes through L</expand_class> exactly as it would
+for L</new_object>: a bare one-word name is always read as a Kubernetes
+Kind and looked up in the resource map, never as a package name --
+C<Gizmo> resolves as the resource map's C<Gizmo> entry, not as a literal
+package called C<Gizmo>. A class name that has already been resolved --
+for example, the return value of a previous L</expand_class> call -- is not
+exempt from this and must be prefixed with C<+> to be used verbatim instead
+of being looked up again:
+
+    my $class = $k8s->expand_class('Gizmo');      # already a full class name
+    $k8s->struct_to_object('+'.$class, $hashref);  # '+' skips re-resolution
+
 When the class argument is a GVK request (domain-qualified, or paired with an
 C<api_version>) that cannot be resolved, this dies with the same fail-closed
 error as L</new_object> -- see there for the exact message and the bare-Kind
 exemption.
+
+Independently of that, a defined non-hash value at an object-bearing
+position anywhere in the data also fails closed -- see L</new_object> for
+the exact message.
 
 If the target class provides a C<FROM_STRUCT> class method, it is called as
 C<< $class->FROM_STRUCT($struct, $k8s) >> and its return value is used as-is,
@@ -1903,7 +2353,7 @@ qualified C<api_version/Kind> form is checked first against the resource
 map, then a short-name key whose mapped class itself reports the
 requested C<api_version>, then the C<openapi_spec> for an auto-generated
 class. Anything else fails closed rather than substituting a different
-version (k17).
+version.
 
 A bare unqualified name is B<not> a GVK request: it falls through to
 C<IO::K8s::>E<lt>KindE<gt> and then to auto-generation, and a name that

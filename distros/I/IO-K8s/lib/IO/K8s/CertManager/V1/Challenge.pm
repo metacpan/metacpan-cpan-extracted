@@ -1,9 +1,10 @@
 package IO::K8s::CertManager::V1::Challenge;
 # ABSTRACT: Challenge is a type to represent a Challenge request with an ACME server
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'acme.cert-manager.io/v1',
-    resource_plural => 'challenges';
+    resource_plural => 'challenges',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => '+IO::K8s::CertManager::V1::ChallengeSpec', { required => 'schema' };
@@ -25,7 +26,7 @@ IO::K8s::CertManager::V1::Challenge - Challenge is a type to represent a Challen
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

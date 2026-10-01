@@ -125,4 +125,37 @@ subtest 'min_interval=0 does not throttle' => sub {
 	Test::Mockingbird::unmock('Email::Sender::Transport::SMTP', 'send_email');
 };
 
+# ---------------------------------------------------------------------------
+# A delivery failure must not stop later backends receiving the message
+# ---------------------------------------------------------------------------
+
+subtest 'failed email still dispatches to the other backends' => sub {
+	my @messages;
+	my $buffer = '';
+	open(my $fd, '>', \$buffer) or die $!;
+
+	my $guard = Test::Mockingbird::mock_scoped('Email::Sender::Transport::SMTP', 'send_email', sub {
+		die "SMTP unavailable\n";
+	});
+
+	my @carps;
+	local $SIG{__WARN__} = sub { push @carps, $_[0] };
+
+	my $log = Log::Abstraction->new(
+		logger => {
+			sendmail => { to => 'alerts@example.com' },
+			fd => $fd,
+		},
+		array => \@messages,
+		level => 'info',
+	);
+	$log->info('after failure');
+	close $fd;
+
+	like(join('', @carps), qr/Failed to send email/, 'delivery failure is carped');
+	like($buffer, qr/after failure/, 'fd backend still received the message');
+	is($log->messages()->[0]{message}, 'after failure', 'message recorded in history');
+	ok(!defined($log->{_last_email_sent}), 'throttle not started by a failed send');
+};
+
 done_testing();

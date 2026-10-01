@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::YandexAuth;
 # ABSTRACT: Auth defines the information necessary to authenticate against Yandex.Cloud
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s authorizedKeySecretRef => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::YandexAuth - Auth defines the information necessar
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 authorizedKeySecretRef
 

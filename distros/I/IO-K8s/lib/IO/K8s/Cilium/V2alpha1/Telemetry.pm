@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::Telemetry;
 # ABSTRACT: Telemetry specifies observability options for Gateways using this GatewayClass configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s accessLogs => ['+IO::K8s::Cilium::V2alpha1::AccessLogs'];
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2alpha1::Telemetry - Telemetry specifies observability options
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 accessLogs
 

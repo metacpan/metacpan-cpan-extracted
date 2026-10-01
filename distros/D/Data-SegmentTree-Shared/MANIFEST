@@ -16,9 +16,12 @@ xt/clamp_oob.t
 xt/crash_recovery.t
 xt/destroy_during_call.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fork_st.t
+xt/kill_repair.t
 xt/kwalitee.t
 xt/pod.t
+xt/pushdown_crash_gdb.t
 xt/tsan.t
 xt/valgrind.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -464,6 +464,14 @@ By residue number with the insertion code appended, so `100`, `100A` and
 ligands are in `residues` alongside the polymer, which is why chain A above
 has 206 residues to its 191-long SEQRES.
 
+A number too big for its columns is read the way cctbx, phenix and gemmi write
+it, in [hybrid-36](https://cci.lbl.gov/hybrid_36/): a residue numbered `A000`
+in a PDB file is residue `10000`, and an atom serial of `A0000` is `100000`,
+so a chain past 9,999 residues reads the same from a PDB file as from its
+mmCIF. A residue whose number field is blank, or is not a number in either
+spelling, has an `undef` number and the empty key `''`; it is still a residue
+of its own and not part of the one before it.
+
 The name is not part of a residue's identity. One position is sometimes
 modelled in two chemical states at once, written as complementary altloc
 groups — 3zeu has ten methionines that are MSE in altlocs A and B and MET in
@@ -2226,3 +2234,7 @@ David E. Condon <dec986@gmail.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+# Thanks
+
+Most of this was done with the help of Claude models, which was paid for by the University of Idaho's IMCI.

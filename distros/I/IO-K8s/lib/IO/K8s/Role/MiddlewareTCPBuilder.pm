@@ -1,6 +1,6 @@
 package IO::K8s::Role::MiddlewareTCPBuilder;
 # ABSTRACT: Role for building Traefik TCP middleware configuration
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use Moo::Role;
 
 # The fluent setters below build the spec through IO::K8s::Role::SpecBuilder
@@ -48,7 +48,7 @@ IO::K8s::Role::MiddlewareTCPBuilder - Role for building Traefik TCP middleware c
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ role composes on custom CRD classes too.
 Configures the Traefik inFlightConn middleware, which caps how many
 simultaneous TCP connections the middleware lets through -- once C<$amount>
 connections are open the next one is closed rather than queued. Writes the
-C<< spec.inFlightConn = { amount =E<gt> $amount } >> block, replacing any
+C<< spec.inFlightConn = { amount => $amount } >> block, replacing any
 prior one. Passing no amount writes an empty C<< {} >> rather than a
 populated block. Returns C<$self> for chaining.
 
@@ -110,7 +110,7 @@ populated block. Returns C<$self> for chaining.
 Configures the Traefik ipAllowList middleware to accept connections only
 from the given client IPs, each written either as a plain address or in
 CIDR notation. The ranges are written as a single
-C<< { sourceRange =E<gt> [...] } >> block, replacing any prior ipAllowList
+C<< { sourceRange => [...] } >> block, replacing any prior ipAllowList
 block. Pass an empty list to emit an empty C<ipAllowList.sourceRange>
 array. Returns C<$self> for chaining.
 

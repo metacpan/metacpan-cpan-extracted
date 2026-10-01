@@ -1,9 +1,10 @@
 package IO::K8s::GatewayAPI::V1::BackendTLSPolicy;
 # ABSTRACT: BackendTLSPolicy provides a way to configure how a Gateway connects to a Backend via TLS.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
-    resource_plural => 'backendtlspolicies';
+    resource_plural => 'backendtlspolicies',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => '+IO::K8s::GatewayAPI::V1::BackendTLSPolicySpec', { required => 'schema' };
@@ -25,7 +26,7 @@ IO::K8s::GatewayAPI::V1::BackendTLSPolicy - BackendTLSPolicy provides a way to c
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

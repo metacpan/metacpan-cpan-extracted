@@ -1,0 +1,156 @@
+.\"
+.Dd December 20, 2007
+.Dt MARKDOWN 3
+.Os Mastodon
+.Sh NAME
+.Nm markdown
+.Nd process Markdown documents
+.Sh LIBRARY
+Markdown 
+.Pq libmarkdown , -lmarkdown
+.Sh SYNOPSIS
+.Fd #include <mkdio.h>
+.Ft MMIOT
+.Fn *mkd_in "FILE *input" "mkd_flag_t *flags"
+.Ft MMIOT
+.Fn *mkd_string "char *string" "int size" "mkd_flag_t *flags"
+.Ft int
+.Fn markdown "MMIOT *doc" "FILE *output" "mkd_flag_t *flags"
+.Sh DESCRIPTION
+These functions
+convert
+.Em Markdown
+documents and strings into HTML.
+.Fn markdown
+processes an entire document, while
+.Fn mkd_text
+processes a single string.
+.Pp
+To process a file, you pass a FILE* to
+.Fn mkd_in ,
+and if it returns a nonzero value you pass that in to 
+.Fn markdown ,
+which then writes the converted document to the specified
+.Em FILE* .
+If your input has already been written into a string (generated
+input or a file opened 
+with 
+.Xr mmap 2 )
+you can feed that string to 
+.Fn mkd_string
+and pass its return value to
+.Fn markdown.
+.Pp
+.Fn Markdown
+holds the flag values in an opaque flag blob that you need to
+initialize and populate before using:
+.Bl -tag -width MKD_NOSTRIKETHROUGH -compact
+.It Ft "mkd_flag_t*" Fn mkd_flag_t
+creates a mkd_flag_t structure and returns a pointer to it.
+.It Fn mkd_free_flags "mkd_flag_t *"
+deletes a mkd_flag_t structure when you are finished with it.
+.It Ft mkd_flag_t* Fn mkd_copy_flags "mkd_flag_t*"
+Makes a copy of a flag blob and returns a pointer to it.
+.It Fn mkd_flag_isset "mkd_flag_t *" "int"
+tells you if a specific flag is set
+.It Fn mkd_set_flag_num "mkd_flag_t *" "int"
+Sets a specified flag
+.It Fn mkd_clr_flag_num "mkd_flag_t *" "int"
+Clears a specified flag
+.El
+.Pp
+The following flags are currently accepted:
+.Bl -tag -width MKD_NOSTRIKETHROUGH -compact
+.It Ar MKD_NOLINKS
+don't do link processing, block <a> tags
+.It Ar MKD_NOIMAGE
+don't do image processing, block <img>
+.It Ar MKD_NOPANTS
+don't run smartypants()
+.It Ar MKD_NOHTML
+don't allow raw html through AT ALL
+.It Ar MKD_NORMAL_LISTITEM
+disable github-style checkbox lists
+.It Ar MKD_TAGTEXT
+process text inside an html tag
+.It Ar MKD_NO_EXT
+don't allow pseudo-protocols
+.It Ar MKD_EXPLICITLIST
+don't combine numbered/bulletted lists
+.It Ar MKD_CDATA
+generate code for xml ![CDATA[...]]
+.It Ar MKD_NOSUPERSCRIPT
+no A^B
+.It Ar MKD_STRICT
+conform to Markdown standard as implemented in Markdown.pl
+.It Ar MKD_NOTABLES
+disallow tables
+.It Ar MKD_NOSTRIKETHROUGH
+forbid ~~strikethrough~~
+.It Ar MKD_1_COMPAT
+compatibility with MarkdownTest_1.0
+.It Ar MKD_TOC
+do table-of-contents processing
+.It Ar MKD_AUTOLINK
+make http://foo.com link even without <>s
+.It Ar MKD_NOHEADER
+don't process header blocks
+.It Ar MKD_TABSTOP
+expand tabs to 4 spaces
+.It Ar MKD_SAFELINK
+paranoid check for link protocol
+.It Ar MKD_NODIVQUOTE
+forbid >%class% blocks
+.It Ar MKD_NOALPHALIST
+forbid alphabetic lists
+.It Ar MKD_EXTRA_FOOTNOTE
+enable markdown extra-style footnotes
+.It Ar MKD_NOSTYLE
+don't extract <style> blocks
+.It Ar MKD_DLDISCOUNT
+enable discount-style definition lists
+.It Ar MKD_DLEXTRA
+enable extra-style definition lists
+.It Ar MKD_FENCEDCODE
+enabled fenced code blocks
+.It Ar MKD_IDANCHOR
+use id= anchors for TOC links
+.It Ar MKD_GITHUBTAGS
+allow dash and underscore in element names
+.It Ar MKD_URLENCODEDANCHOR
+urlencode non-identifier chars instead of replacing with dots
+.It Ar MKD_LATEX
+handle embedded LaTeX escapes
+.It Ar MKD_ALT_AS_TITLE
+use alt text as the title if no title is listed
+.It Ar MKD_EXTENDED_ATTR
+allow extended attribute suffixes
+.El
+.Sh RETURN VALUES
+.Fn markdown
+returns 0 on success, 1 on failure.
+The
+.Fn mkd_in
+and
+.Fn mkd_string
+functions return a MMIOT* on success, null on failure.
+.Sh SEE ALSO
+.Xr markdown 1 ,
+.Xr mkd-callbacks 3 ,
+.Xr mkd-functions 3 ,
+.Xr mkd-line 3 ,
+.Xr markdown 7 ,
+.Xr mkd-extensions 7 ,
+.Xr mmap 2 .
+.Pp
+http://daringfireball.net/projects/markdown/syntax
+.Sh BUGS
+Error handling is minimal at best.
+.Pp
+The
+.Ar MMIOT
+created by
+.Fn mkd_string
+is deleted by the
+.Nm
+function.

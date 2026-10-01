@@ -1,5 +1,5 @@
 package Kubernetes::REST::LWPIO;
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 # ABSTRACT: HTTP client using LWP::UserAgent
 use Moo;
 use LWP::UserAgent;
@@ -132,7 +132,7 @@ Kubernetes::REST::LWPIO - HTTP client using LWP::UserAgent
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 

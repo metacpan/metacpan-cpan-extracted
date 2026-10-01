@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01Ingress;
 # ABSTRACT: The ingress based HTTP01 challenge solver will solve challenges by creating or modifying Ingress resources in order to route requests for '/.well-known/acme-challenge/XYZ' to 'challenge solver' pods that are provisioned by cert-manager for each Challenge to be completed.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s class            => Str;
@@ -30,7 +30,7 @@ IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01Ingress - The ingress based H
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 class
 

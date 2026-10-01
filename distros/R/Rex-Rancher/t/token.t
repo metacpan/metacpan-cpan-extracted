@@ -15,12 +15,16 @@ use Test::More;
 #    reaches the node through config.yaml only, for server and agent, rke2 and
 #    k3s alike.
 #
-# `run` is replaced in Rex::Rancher::Server so no remote host is involved.
+# `run` is replaced in Rex::Rancher::Server and Rex::Commands::Run so no
+# remote host is involved.
 # This proves the decision logic and the command strings, not a deploy.
 # -----------------------------------------------------------------------------
 
 use Rex::Rancher::Server;
 use Rex::Rancher::Agent;
+use Rex::Rancher::Distribution;
+
+my $D = 'Rex::Rancher::Distribution';
 
 my $TOKEN = 'K10deadbeef::server:s3cr3t-token-value-0123456789';
 
@@ -28,7 +32,7 @@ my $TOKEN = 'K10deadbeef::server:s3cr3t-token-value-0123456789';
 my ( %files, @cmds );
 {
   no warnings 'redefine';
-  *Rex::Rancher::Server::run = sub {
+  my $run = sub {
     my ( $cmd ) = @_;
     push @cmds, $cmd;
     if ( $cmd =~ m{^cat (\S+)} ) {
@@ -40,12 +44,14 @@ my ( %files, @cmds );
     $? = 0;
     return '';
   };
+  *Rex::Rancher::Server::run = $run;
+  *Rex::Commands::Run::run   = $run;
 }
 
 sub resolve {
   my ( $dist, $given ) = @_;
   @cmds = ();
-  Rex::Rancher::Server::_resolve_token( Rex::Rancher::Server::_paths($dist), $given );
+  Rex::Rancher::Server::_resolve_token( $D->new_for($dist), $given );
 }
 
 for my $dist (qw( rke2 k3s )) {
@@ -78,31 +84,31 @@ for my $dist (qw( rke2 k3s )) {
 
 subtest 'server config carries the token' => sub {
   for my $dist (qw( rke2 k3s )) {
-    my $c = Rex::Rancher::Server::_build_server_config( $dist, $TOKEN, undef, undef, undef, 1 );
+    my $c = Rex::Rancher::Server::_build_server_config( $D->new_for($dist), $TOKEN, undef, undef, undef, 1 );
     is( $c->{token}, $TOKEN, "$dist config.yaml has token" );
   }
 };
 
 subtest 'k3s server install command has no token' => sub {
-  my $paths = Rex::Rancher::Server::_paths('k3s');
-  my $cmd = Rex::Rancher::Server::_k3s_server_install_cmd( $paths, undef );
+  my $k3s = $D->new_for('k3s');
+  my $cmd = $k3s->script_install_cmd( undef, undef );
   unlike( $cmd, qr/K3S_TOKEN/, 'no K3S_TOKEN (first server)' );
   like( $cmd, qr/sh -s - server/, 'explicit server command' );
   unlike( $cmd, qr/K3S_URL/, 'no K3S_URL without server' );
 
-  $cmd = Rex::Rancher::Server::_k3s_server_install_cmd( $paths, 'https://cp1:6443' );
+  $cmd = $k3s->script_install_cmd( 'https://cp1:6443', undef );
   unlike( $cmd, qr/K3S_TOKEN/, 'no K3S_TOKEN (HA join)' );
   like( $cmd, qr/K3S_URL=https:\/\/cp1:6443 INSTALL_K3S_SKIP_START=true sh -s - server/, 'K3S_URL kept for HA join' );
 };
 
 subtest 'agent install commands have no token' => sub {
-  my $k3s = Rex::Rancher::Agent::_installer_cmd( 'k3s', 'v1.30.0+k3s1', 'https://cp1:6443' );
+  my $k3s = $D->new_for( 'k3s', role => 'agent' )->script_install_cmd( 'https://cp1:6443', 'v1.30.0+k3s1' );
   unlike( $k3s, qr/K3S_TOKEN/, 'k3s agent: no K3S_TOKEN' );
   like( $k3s, qr/K3S_URL=https:\/\/cp1:6443/, 'k3s agent: K3S_URL set' );
   like( $k3s, qr/INSTALL_K3S_VERSION=v1\.30\.0\+k3s1/, 'k3s agent: version pin' );
   like( $k3s, qr/sh -s - agent$/, 'k3s agent: explicit agent command' );
 
-  my $rke2 = Rex::Rancher::Agent::_installer_cmd( 'rke2', undef, 'https://cp1:9345' );
+  my $rke2 = $D->new_for( 'rke2', role => 'agent' )->script_install_cmd( 'https://cp1:9345', undef );
   unlike( $rke2, qr/token/i, 'rke2 agent: no token' );
   like( $rke2, qr/INSTALL_RKE2_TYPE=agent/, 'rke2 agent: agent type' );
 };

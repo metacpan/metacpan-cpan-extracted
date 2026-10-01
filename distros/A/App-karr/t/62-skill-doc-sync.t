@@ -1,8 +1,10 @@
-# t/62-skill-doc-sync.t - share/kanban-issues-karr-cli/ and the repo's own
-# .claude/skills/kanban-issues-karr-cli/ are the same skill in two places
-# (shipped to users vs. what this repo's agents are briefed with). Since
-# ticket #285 the skill is a directory -- SKILL.md plus references/*.md -- so
-# the two trees must hold the same set of *.md files, and each pair's bodies
+# t/62-skill-doc-sync.t - every bundled skill lives in two places: under
+# share/<skill>/ (shipped to users) and under the repo's own
+# .claude/skills/<skill>/ (what this repo's agents are briefed with). Two
+# skills ship, kanban-issues-karr-coordination and kanban-issues-karr-ticket;
+# they replace kanban-issues-karr-cli. Since ticket #285 a skill is a
+# directory -- SKILL.md plus references/*.md -- so for each skill the two
+# trees must hold the same set of *.md files, and each pair's bodies
 # (everything after the leading YAML frontmatter) must stay byte-identical;
 # only the frontmatter (e.g. `name:`) is allowed to differ. A file present on
 # one side only is a drift as much as a differing body is.
@@ -12,15 +14,23 @@ use Test::More;
 use FindBin;
 use Path::Tiny qw( path );
 
-my $repo_root      = path($FindBin::Bin)->parent;
-my $share_dir      = $repo_root->child(qw( share kanban-issues-karr-cli ));
-my $repo_skill_dir = $repo_root->child(qw( .claude skills kanban-issues-karr-cli ));
+use App::karr::Role::SkillFile;
+use App::karr::Cmd::Skill;
+
+my $repo_root = path($FindBin::Bin)->parent;
+
+# The list the commands install, not a copy of it: a skill added to the role
+# without its two directories fails here instead of shipping half-done.
+my @skills = App::karr::Cmd::Skill->_skill_names;
 
 # .claude/ is not shipped in a dzil build, so under `dzil test` (or any
 # checkout missing one of these directories) this is a repo-hygiene check that
 # doesn't apply - skip rather than fail.
-plan skip_all => "$share_dir and/or $repo_skill_dir not found - skipping doc-sync check outside a full source checkout"
-  unless $share_dir->is_dir && $repo_skill_dir->is_dir;
+my @missing = grep { !$_->is_dir }
+              map  { ( $repo_root->child( 'share', $_ ), $repo_root->child( '.claude', 'skills', $_ ) ) }
+              @skills;
+plan skip_all => "@missing not found - skipping doc-sync check outside a full source checkout"
+  if @missing;
 
 # Strip a leading YAML frontmatter block delimited by the first two '---'
 # lines. The frontmatter (name/description) legitimately differs between
@@ -51,50 +61,69 @@ sub md_files_under {
   return sort @rel;
 }
 
-my @share_files = md_files_under($share_dir);
-my @repo_files  = md_files_under($repo_skill_dir);
+for my $skill (@skills) {
+  subtest $skill => sub {
+    my $share_dir      = $repo_root->child( 'share', $skill );
+    my $repo_skill_dir = $repo_root->child( '.claude', 'skills', $skill );
 
-cmp_ok scalar(@share_files), '>=', 2,
-  "share/kanban-issues-karr-cli/ holds SKILL.md and at least one reference (found @{[ scalar @share_files ]})";
-ok( ( grep { $_ eq 'SKILL.md' } @share_files ), 'share/kanban-issues-karr-cli/SKILL.md exists' );
-ok( ( grep { $_ eq 'SKILL.md' } @repo_files ),  '.claude/skills/kanban-issues-karr-cli/SKILL.md exists' );
+    my @share_files = md_files_under($share_dir);
+    my @repo_files  = md_files_under($repo_skill_dir);
 
-is_deeply \@repo_files, \@share_files,
-  'both directories hold the same set of *.md files'
-  or do {
-    my %share = map { $_ => 1 } @share_files;
-    my %repo  = map { $_ => 1 } @repo_files;
-    diag("only under share/:   $_") for grep { !$repo{$_} }  @share_files;
-    diag("only under .claude/: $_") for grep { !$share{$_} } @repo_files;
-  };
+    ok( ( grep { $_ eq 'SKILL.md' } @share_files ), "share/$skill/SKILL.md exists" );
+    ok( ( grep { $_ eq 'SKILL.md' } @repo_files ),  ".claude/skills/$skill/SKILL.md exists" );
 
-for my $rel (@share_files) {
-  my $share_file = $share_dir->child($rel);
-  my $repo_file  = $repo_skill_dir->child($rel);
-  next unless $repo_file->exists;   # already reported above
+    is_deeply \@repo_files, \@share_files,
+      'both directories hold the same set of *.md files'
+      or do {
+        my %share = map { $_ => 1 } @share_files;
+        my %repo  = map { $_ => 1 } @repo_files;
+        diag("only under share/:   $_") for grep { !$repo{$_} }  @share_files;
+        diag("only under .claude/: $_") for grep { !$share{$_} } @repo_files;
+      };
 
-  my $share_body = strip_frontmatter($share_file->slurp_utf8);
-  my $repo_body  = strip_frontmatter($repo_file->slurp_utf8);
+    for my $rel (@share_files) {
+      my $share_file = $share_dir->child($rel);
+      my $repo_file  = $repo_skill_dir->child($rel);
+      next unless $repo_file->exists;   # already reported above
 
-  if ($share_body eq $repo_body) {
-    pass("$rel: bodies match after stripping frontmatter");
-  }
-  else {
-    my @share_lines = split /\n/, $share_body, -1;
-    my @repo_lines  = split /\n/, $repo_body, -1;
-    my $max = @share_lines > @repo_lines ? scalar(@share_lines) : scalar(@repo_lines);
-    for my $i (0 .. $max - 1) {
-      my $a = $i < @share_lines ? $share_lines[$i] : '<no line - file ends here>';
-      my $b = $i < @repo_lines  ? $repo_lines[$i]  : '<no line - file ends here>';
-      if ($a ne $b) {
-        diag("first differing body line is line " . ($i + 1) . " (counted after the frontmatter):");
-        diag("  share/kanban-issues-karr-cli/$rel:           $a");
-        diag("  .claude/skills/kanban-issues-karr-cli/$rel:  $b");
-        last;
+      my $share_body = strip_frontmatter($share_file->slurp_utf8);
+      my $repo_body  = strip_frontmatter($repo_file->slurp_utf8);
+
+      if ($share_body eq $repo_body) {
+        pass("$rel: bodies match after stripping frontmatter");
+      }
+      else {
+        my @share_lines = split /\n/, $share_body, -1;
+        my @repo_lines  = split /\n/, $repo_body, -1;
+        my $max = @share_lines > @repo_lines ? scalar(@share_lines) : scalar(@repo_lines);
+        for my $i (0 .. $max - 1) {
+          my $a = $i < @share_lines ? $share_lines[$i] : '<no line - file ends here>';
+          my $b = $i < @repo_lines  ? $repo_lines[$i]  : '<no line - file ends here>';
+          if ($a ne $b) {
+            diag("first differing body line is line " . ($i + 1) . " (counted after the frontmatter):");
+            diag("  share/$skill/$rel:           $a");
+            diag("  .claude/skills/$skill/$rel:  $b");
+            last;
+          }
+        }
+        fail("$rel: share/ and .claude/ copies have drifted apart - re-sync the two files (bodies after frontmatter must be byte-identical)");
       }
     }
-    fail("$rel: share/ and .claude/ copies have drifted apart - re-sync the two files (bodies after frontmatter must be byte-identical)");
-  }
+  };
+}
+
+# The coordination skill is the one with references behind its SKILL.md; if
+# the walk ever came back with SKILL.md alone, the comparison above would pass
+# on far less than ships.
+my @coordination = md_files_under( $repo_root->child( 'share', 'kanban-issues-karr-coordination' ) );
+cmp_ok scalar(@coordination), '>=', 2, 'share/kanban-issues-karr-coordination/ holds SKILL.md and at least one reference';
+
+# The retired skill is gone from both places: a leftover under share/ would
+# not ship (nothing lists it) but would be edited, and one under .claude/
+# would brief this repo's agents with the old text next to the new pair.
+for my $retired ( App::karr::Cmd::Skill->_retired_skill_names ) {
+  ok( !$repo_root->child( 'share', $retired )->exists, "share/$retired/ is gone" );
+  ok( !$repo_root->child( '.claude', 'skills', $retired )->exists, ".claude/skills/$retired/ is gone" );
 }
 
 done_testing;

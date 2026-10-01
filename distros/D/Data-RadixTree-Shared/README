@@ -100,6 +100,14 @@ METHODS
     disturb the handle. "new_readonly" opens a frozen file read-only for
     lock-free querying (see "FROZEN (READ-ONLY) MODE").
 
+    "new" and "new_memfd" create a new segment sparse: pages are allocated as
+    they are first written, and once the filesystem is full, a write to a page
+    not yet allocated dies with SIGBUS. Set "DATA_RADIXTREE_SHARED_SPARSE=0"
+    to reserve the whole segment at creation, so a full filesystem makes them
+    croak instead; on tmpfs and memfd that commits the segment's memory at
+    once, and a memory cgroup too small for it gets an OOM kill rather than a
+    croak.
+
     $mode (default 0600, owner-only) is the permission mode for a newly
     created backing file; pass e.g. 0660 to opt into cross-user sharing. The
     exact mode is applied (via "fchmod" after the "O_EXCL" create, so the

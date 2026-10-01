@@ -18,10 +18,14 @@ WriteMakefile(
 		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	PREREQ_PM => {
+		'autodie' => 0,
 		'Carp'	 => 0,
 		'Config::Abstraction' => 0.40,
-		'Data::Dumper' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+		'File::Basename' => 0,
+		# Params::Get (via Config::Abstraction) uses autodie qw(:all) but
+		# doesn't declare IPC::System::Simple, which that needs
+		'IPC::System::Simple' => 0,
 		'JSON::PP' => 0,
 		'Log::Log4perl' => 0,
 		'Params::Get' => 0.15,
@@ -31,17 +35,14 @@ WriteMakefile(
 		'Return::Set' => 0.04,
 		'Sys::Syslog' => 0.28,
 		'Scalar::Util'=> 0,
+		'Socket' => 0,
 		'Sub::Private' => 0.05,
 	},
 	TEST_REQUIRES => {
-		'File::Glob' => 0,	# scripts/generate_index
-		'File::Slurp' => 0,
+		'Data::Dumper' => 0,
 		'File::Spec' => 0,
-		'File::stat' => 0,
 		'File::Temp' => 0,
-		'JSON::MaybeXS' => 0,
 		'POSIX' => 0,
-		'IPC::System::Simple' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Mockingbird' => 0.10,
 		'Test::Most' => 0,
@@ -54,15 +55,39 @@ WriteMakefile(
 		FILES => 'Log-Abstraction-*'
 	}, META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
-		resources => {
+		prereqs => {
+			develop => {
+				requires => {
+					'Devel::Cover' => 0,
+					'Perl::Critic' => 0,
+					'Pod::Coverage' => 0.18,
+					'Test::Carp' => 0,
+					'Test::CheckManifest' => 0.9,
+					'Test::Compile' => 0,
+					'Test::EOF' => 0,
+					'Test::EOL' => 0,
+					'Test::Pod' => 1.22,
+					'Test::Pod::Coverage' => 1.08,
+					'Test::Pod::Spelling::CommonMistakes' => 0,
+					'Test::Spelling::Comment' => 0.002,
+					'Test::Synopsis' => 0,
+				},
+			},
+			runtime => {
+				recommends => {
+					'Log::Any' => 0,	# Log::Any::Adapter::Abstraction
+					'Email::Simple' => 0,	# sendmail backend
+					'Email::Sender::Simple' => 0,
+					'Email::Sender::Transport::SMTP' => 0,
+				},
+			},
+		}, resources => {
 			homepage => 'https://metacpan.org/pod/Log::Abstraction',
 			repository => {
 				repository => 'https://github.com/nigelhorne/Log-Abstraction',
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Log-Abstraction.git',
 				web => 'https://github.com/nigelhorne/Log-Abstraction'
-			}, recommends => {
-				'Log::Any' => 0,
 			}, bugtracker => {
 				mailto => 'bug-Log-Abstraction@rt.cpan.org',
 				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction',
@@ -72,5 +97,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.008'
+	MIN_PERL_VERSION	=> '5.014'	# Readonly::Values::Syslog needs v5.14
 );

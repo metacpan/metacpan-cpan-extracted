@@ -165,3 +165,6 @@ Revision history for Perl extension WebService::MusicBrainz.
 
 1.0.10 Monday Jan 19 2026
 	- Move Mojo::UserAgent::Role::Retry to a recommended/optional module
+
+1.0.11 Wednesday Sept 20 2026
+	- Merge pull requests and fix test

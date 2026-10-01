@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::AWSJWTAuth;
 # ABSTRACT: AWSJWTAuth stores reference to Authenticate against AWS using service account tokens.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s serviceAccountRef => '+IO::K8s::ExternalSecrets::V1::ServiceAccountSelector';
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::AWSJWTAuth - AWSJWTAuth stores reference to Authen
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 serviceAccountRef
 

@@ -16,9 +16,10 @@ use App::karr::Cmd::Skill;
 # The bundled SKILL.md is real Markdown prose and legitimately contains
 # non-ASCII (em dashes, ellipses, umlauts). _skill_content hands it back
 # decoded (slurp_utf8), so exactly one encode must happen between there and the
-# terminal. Since #285 the skill ships as a directory
-# (kanban-issues-karr-cli/SKILL.md plus references/), and `karr skill show`
-# still prints its SKILL.md alone; the share dirs below hold that layout.
+# terminal. Since #285 a skill ships as a directory (SKILL.md plus
+# references/), and `karr skill show NAME` prints that skill's SKILL.md alone;
+# the share dirs below hold that layout for kanban-issues-karr-ticket, and the
+# in-process runs name it, so they print the planted text and nothing else.
 #
 # Ticket #33 put that encode inside the command, because the rest of the CLI
 # handed raw octets to print and a UTF-8 layer on STDOUT would have
@@ -36,10 +37,12 @@ my $SKILL_TEXT = "# karr \x{2014} skill\n\nBl\x{00f6}cke \x{2026} \x{00fc}ml\x{0
 my $ROOT = abs_path('.');
 my $BIN  = "$ROOT/bin/karr";
 
-# A share dir whose kanban-issues-karr-cli/SKILL.md holds $SKILL_TEXT.
+my $SKILL = 'kanban-issues-karr-ticket';
+
+# A share dir whose kanban-issues-karr-ticket/SKILL.md holds $SKILL_TEXT.
 sub share_dir_with_skill {
     my $dir  = path( tempdir( CLEANUP => 1 ) );
-    my $file = $dir->child('kanban-issues-karr-cli/SKILL.md');
+    my $file = $dir->child("$SKILL/SKILL.md");
     $file->parent->mkpath;
     $file->spew_utf8($SKILL_TEXT);
     return "$dir";
@@ -61,7 +64,7 @@ sub run_skill_show {
     open my $capture, '>:encoding(UTF-8)', \my $out
         or die "cannot open in-memory handle: $!";
     my $prev = select $capture;
-    my $ok   = eval { App::karr::Cmd::Skill->new->execute( ['show'], [] ); 1 };
+    my $ok   = eval { App::karr::Cmd::Skill->new->execute( [ 'show', $SKILL ], [] ); 1 };
     my $err  = $@;
     select $prev;
     close $capture;
@@ -103,15 +106,15 @@ subtest '_skill_content stays decoded so check/update comparisons keep working' 
     no warnings 'redefine';
     local *File::ShareDir::dist_dir = sub { return $dir };
 
-    my $content = App::karr::Cmd::Skill->new->_skill_content;
+    my $content = App::karr::Cmd::Skill->new->_skill_content($SKILL);
 
     is( $content, $SKILL_TEXT, '_skill_content returns decoded characters' );
     is( length($content), length($SKILL_TEXT), 'character length matches (not byte-inflated)' );
 };
 
 subtest 'karr skill show through the real CLI emits the bundled file verbatim' => sub {
-    my $bundled = path($ROOT)->child('share/kanban-issues-karr-cli/SKILL.md');
-    plan skip_all => "no share/kanban-issues-karr-cli/SKILL.md in this checkout" unless $bundled->exists;
+    my $bundled = path($ROOT)->child("share/$SKILL/SKILL.md");
+    plan skip_all => "no share/$SKILL/SKILL.md in this checkout" unless $bundled->exists;
 
     my $raw = do {
         open my $fh, '<:raw', "$bundled" or die "open $bundled: $!";
@@ -131,13 +134,13 @@ subtest 'karr skill show through the real CLI emits the bundled file verbatim' =
     # auto/share/dist/<dist> against @INC in order, so a -I in front of the rest
     # pins it deterministically.
     my $share_lib = path( tempdir( CLEANUP => 1 ) );
-    my $share_dir = $share_lib->child(qw( auto share dist App-karr kanban-issues-karr-cli ));
+    my $share_dir = $share_lib->child( qw( auto share dist App-karr ), $SKILL );
     $share_dir->mkpath;
     $bundled->copy( $share_dir->child('SKILL.md') );
 
     my $err_fh = gensym;
     my $pid = open3( my $in, my $out_fh, $err_fh,
-        $^X, "-I$share_lib", "-I$ROOT/lib", $BIN, 'skill', 'show' );
+        $^X, "-I$share_lib", "-I$ROOT/lib", $BIN, 'skill', 'show', $SKILL );
     close $in;
     binmode $out_fh;
     my $stdout = do { local $/; <$out_fh> };

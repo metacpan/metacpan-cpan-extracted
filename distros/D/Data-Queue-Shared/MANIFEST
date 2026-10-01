@@ -58,6 +58,7 @@ xt/drain_concurrent.t
 xt/eg_runs.t
 xt/eintr.t
 xt/eintr_sigalrm.t
+xt/enospc.t
 xt/ev_integration.t
 xt/fd_leak.t
 xt/fd_validation.t

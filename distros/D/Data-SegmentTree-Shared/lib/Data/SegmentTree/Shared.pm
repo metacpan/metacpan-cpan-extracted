@@ -1,7 +1,7 @@
 package Data::SegmentTree::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::SegmentTree::Shared', $VERSION);
 
@@ -102,6 +102,12 @@ not resize it -- but they are still range-checked, so an out-of-range value
 croaks. An optional file B<mode> may be passed as the last argument to C<new>
 (e.g. C<0660>) for cross-user sharing; it defaults to C<0600> (owner-only).
 
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of the initialization dying with
+SIGBUS; set C<DATA_SEGMENTTREE_SHARED_SPARSE=1> to skip the reservation. On
+tmpfs and memfd the segment is memory, and a memory cgroup too small for it
+gets an OOM kill rather than a croak.
+
 =head2 Updates
 
     $st->set($i, $value);              # position $i := $value
@@ -183,15 +189,21 @@ seals and is accepted on the caller's trust.
 =head1 CRASH SAFETY
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
-ownership and dead-owner recovery. Dead-owner recovery restores lock
-B<availability> only. Each mutation is a multi-store O(log n) tree walk with no
-commit protocol, so a writer killed mid-update leaves that update partially
-applied: the tree can be left internally inconsistent (a later C<query> may
-disagree with the individual C<get> values), and recovery neither detects nor
-repairs the torn update. Treat a crash during a mutation as leaving the tree in
-an undefined state, and rebuild from a trusted source if you need consistency
-across crashes. B<Limitation>: PID reuse is not detected (very unlikely in
-practice).
+ownership and dead-owner recovery. Each mutation is a multi-store O(log n) tree
+walk with no commit protocol, so a writer killed mid-update leaves that update
+partially applied. The process that recovers the lock repairs the tree around
+it: each node's pending range-add and range-assign tags are taken as
+authoritative, and every aggregate is recomputed bottom-up from its children
+and its own tags (a leaf's value is its stored sum). Afterwards every C<query>
+agrees with the individual C<get> values, and the interrupted C<range_add>,
+C<range_assign>, C<add> or C<set> shows as applied to some of its positions
+and not others, each holding its value from either before or after it; an
+interrupted C<clear> reads as done or not done. The repair takes time
+proportional to C<n>. A writer running a version of this
+module before 0.06, killed while pushing a pending C<range_add> down the tree,
+can leave that add applied twice to positions an earlier, completed
+C<range_add> covered. B<Limitation>: PID reuse is not detected (very
+unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table holds

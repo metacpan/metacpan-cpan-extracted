@@ -1,16 +1,10 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 3;
+use Test::More;
 use Text::Markdown::Discount qw/markdown/;
 
 my $html = '<article>abc</article>';
-{
-    is trim(markdown($html)), '<p><article>abc</article></p>';
-}
-
-Text::Markdown::Discount::with_html5_tags();
-
 {
     my $md = Text::Markdown::Discount->new();
     is trim(markdown($html)), '<article>abc</article>';
@@ -19,6 +13,8 @@ Text::Markdown::Discount::with_html5_tags();
 {
     is trim(Text::Markdown::Discount::markdown($html)), '<article>abc</article>';
 }
+
+done_testing;
 
 sub trim {
     my $text = shift;

@@ -4,7 +4,7 @@ use strict;
 use Mojo::Base -base;
 use WebService::MusicBrainz::Request;
 
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 
 has 'request';
 has valid_resources =>
@@ -21,7 +21,7 @@ has relationships => sub {
 # inc subqueries
 our %subquery_map = (
     _modifiers    => [qw(discids media isrcs artist-credits various-artists)],
-    _misc         => [qw(aliases annotation tags ratings user-tags user-ratings)],
+    _misc         => [qw(aliases annotation tags ratings user-tags user-ratings genres user-genres)],
     artist        => [qw(recordings releases release-groups works)],
     discid        => [qw(artists artist-credits collections labels recordings release-groups)],
     label         => [qw(releases)],

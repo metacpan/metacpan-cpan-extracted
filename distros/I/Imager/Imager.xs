@@ -423,7 +423,7 @@ io_writer(void *p, void const *data, size_t size) {
   SAVETMPS;
   EXTEND(SP, 1);
   PUSHMARK(SP);
-  PUSHs(sv_2mortal(newSVpv((char *)data, size)));
+  PUSHs(sv_2mortal(newSVpvn((char *)data, size)));
   PUTBACK;
 
   count = perl_call_sv(cbd->writecb, G_SCALAR);
@@ -670,7 +670,7 @@ ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
 
   quant->mc_colors = mymalloc(quant->mc_size * sizeof(i_color));
 
-  sv = hv_fetch(hv, "transp", 6, 0);
+  sv = hv_fetchs(hv, "transp", 0);
   if (sv && *sv && (str = SvPV(*sv, len))) {
     quant->transp = 
       lookup_name(transp_names, sizeof(transp_names)/sizeof(*transp_names), 
@@ -679,12 +679,12 @@ ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
        return 0;
     if (quant->transp != tr_none) {
       quant->tr_threshold = 127;
-      sv = hv_fetch(hv, "tr_threshold", 12, 0);
+      sv = hv_fetchs(hv, "tr_threshold", 0);
       if (sv && *sv)
 	quant->tr_threshold = SvIV(*sv);
     }
     if (quant->transp == tr_errdiff) {
-      sv = hv_fetch(hv, "tr_errdiff", 10, 0);
+      sv = hv_fetchs(hv, "tr_errdiff", 0);
       if (sv && *sv && (str = SvPV(*sv, len))) {
 	quant->tr_errdiff = lookup_name(errdiff_names, sizeof(errdiff_names)/sizeof(*errdiff_names), str, ed_floyd, push_errors, "tr_errdiff", &failed);
 	if (failed)
@@ -693,7 +693,7 @@ ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
     }
     if (quant->transp == tr_ordered) {
       quant->tr_orddith = od_tiny;
-      sv = hv_fetch(hv, "tr_orddith", 10, 0);
+      sv = hv_fetchs(hv, "tr_orddith", 0);
       if (sv && *sv && (str = SvPV(*sv, len))) {
 	quant->tr_orddith = lookup_name(orddith_names, sizeof(orddith_names)/sizeof(*orddith_names), str, od_random, push_errors, "tr_orddith", &failed);
 	if (failed)
@@ -701,7 +701,7 @@ ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
       }
 
       if (quant->tr_orddith == od_custom) {
-	sv = hv_fetch(hv, "tr_map", 6, 0);
+	sv = hv_fetchs(hv, "tr_map", 0);
 	if (sv && *sv && SvTYPE(SvRV(*sv)) == SVt_PVAV) {
 	  AV *av = (AV*)SvRV(*sv);
           unsigned index;
@@ -721,14 +721,14 @@ ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
     }
   }
   quant->make_colors = mc_median_cut;
-  sv = hv_fetch(hv, "make_colors", 11, 0);
+  sv = hv_fetchs(hv, "make_colors", 0);
   if (sv && *sv && (str = SvPV(*sv, len))) {
     quant->make_colors = 
       lookup_name(make_color_names, sizeof(make_color_names)/sizeof(*make_color_names), str, mc_median_cut, push_errors, "make_colors", &failed);
     if (failed)
       return 0;
   }
-  sv = hv_fetch(hv, "colors", 6, 0);
+  sv = hv_fetchs(hv, "colors", 0);
   if (sv && *sv && SvROK(*sv) && SvTYPE(SvRV(*sv)) == SVt_PVAV) {
     /* needs to be an array of Imager::Color
        note that the caller allocates the mc_color array and sets mc_size
@@ -749,7 +749,7 @@ ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
       }
     }
   }
-  sv = hv_fetch(hv, "max_colors", 10, 0);
+  sv = hv_fetchs(hv, "max_colors", 0);
   if (sv && *sv) {
     IV iv = SvIV(*sv);
     if (iv <= 0) {
@@ -761,13 +761,13 @@ ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
   }
 
   quant->translate = pt_closest;
-  sv = hv_fetch(hv, "translate", 9, 0);
+  sv = hv_fetchs(hv, "translate", 0);
   if (sv && *sv && (str = SvPV(*sv, len))) {
     quant->translate = lookup_name(translate_names, sizeof(translate_names)/sizeof(*translate_names), str, pt_closest, push_errors, "translate", &failed);
     if (failed)
       return 0;
   }
-  sv = hv_fetch(hv, "errdiff", 7, 0);
+  sv = hv_fetchs(hv, "errdiff", 0);
   if (sv && *sv && (str = SvPV(*sv, len))) {
     quant->errdiff = lookup_name(errdiff_names, sizeof(errdiff_names)/sizeof(*errdiff_names), str, ed_floyd, push_errors, "errdiff", &failed);
     if (failed)
@@ -775,19 +775,19 @@ ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
   }
   if (quant->translate == pt_errdiff && quant->errdiff == ed_custom) {
     /* get the error diffusion map */
-    sv = hv_fetch(hv, "errdiff_width", 13, 0);
+    sv = hv_fetchs(hv, "errdiff_width", 0);
     if (sv && *sv)
       quant->ed_width = SvIV(*sv);
-    sv = hv_fetch(hv, "errdiff_height", 14, 0);
+    sv = hv_fetchs(hv, "errdiff_height", 0);
     if (sv && *sv)
       quant->ed_height = SvIV(*sv);
-    sv = hv_fetch(hv, "errdiff_orig", 12, 0);
+    sv = hv_fetchs(hv, "errdiff_orig", 0);
     if (sv && *sv)
       quant->ed_orig = SvIV(*sv);
     if (quant->ed_width > 0 && quant->ed_height > 0) {
       int sum = 0;
       quant->ed_map = mymalloc(sizeof(int) * quant->ed_width * quant->ed_height);
-      sv = hv_fetch(hv, "errdiff_map", 11, 0);
+      sv = hv_fetchs(hv, "errdiff_map", 0);
       if (sv && *sv && SvROK(*sv) && SvTYPE(SvRV(*sv)) == SVt_PVAV) {
 	AV *av = (AV*)SvRV(*sv);
         size_t avi;
@@ -820,7 +820,7 @@ ip_handle_quant_opts_low(pTHX_ i_quantize *quant, HV *hv, int push_errors)
       }
     }
   }
-  sv = hv_fetch(hv, "perturb", 7, 0);
+  sv = hv_fetchs(hv, "perturb", 0);
   if (sv && *sv)
     quant->perturb = SvIV(*sv);
 
@@ -856,7 +856,7 @@ ip_copy_colors_back(pTHX_ HV *hv, i_quantize *quant) {
   int i;
   SV *work;
 
-  sv = hv_fetch(hv, "colors", 6, 0);
+  sv = hv_fetchs(hv, "colors", 0);
   if (!sv || !*sv || !SvROK(*sv) || SvTYPE(SvRV(*sv)) != SVt_PVAV) {
     /* nothing to do */
     return;
@@ -1286,6 +1286,103 @@ S_get_trim_color_list(pTHX_ SV *sv, i_trim_color_list *t) {
   return TRUE;
 }
 
+static void
+my_out_of_memory(pIMCTX, void *userdata, const char *func, size_t size) {
+  dTHX;
+  dSP;
+  SV *callme = get_sv("Imager::_out_of_memory", 0);
+
+  (void)my_im_ctx;
+  (void)userdata;
+
+  if (!SvOK(callme))
+    Perl_croak(aTHX_ "out of memory %s size %zu", func, size);
+
+  PUSHSTACK;
+  PUSHMARK(SP);
+  EXTEND(SP, 2);
+  PUSHs(sv_2mortal(newSVpv(func, 0)));
+  PUSHs(sv_2mortal(newSVuv(size)));
+  PUTBACK;
+  (void)call_sv(callme, G_VOID);
+  /* we shouldn't get here */
+  Perl_croak(aTHX_ "out of memory handler returned");
+}
+
+/* test the numeric parameters of i_[pg]sampf?(?:_bits)?
+  for validity.
+  Pushes errors.
+  Returns the size of the buffer in *buf_size.
+
+  Returns non-zero if valid.
+*/
+
+static int
+is_valid_sample_params(
+  i_img *im, i_img_dim l, i_img_dim *pr, i_img_dim y,
+  i_channel_list *channels, size_t sample_size, size_t *buf_size) {
+  if (l < 0 || l > im->xsize) {
+    i_push_error(0, "getsamples: left outside of image");
+    return 0;
+  }
+  if (*pr > im->xsize)
+    *pr = im->xsize;
+  if (l >= *pr) {
+    i_push_errorf(0, "left not left of right");
+    return 0;
+  }
+  if (y < 0 || y >= im->ysize) {
+    i_push_error(0, "y outside of image");
+    return 0;
+  }
+  if (channels->count < 1) {
+    /* caught in the type handler */
+    i_push_error(0, "must be at least one channel");
+    return 0;
+  }
+  if (channels->channels) {
+    int i;
+    for (i = 0; i < channels->count; ++i) {
+      int ch = channels->channels[i];
+      if (ch < 0 || ch >= im->channels) {
+        i_push_errorf(0, "channel %d out of range for %d channel image",
+          ch, im->channels);
+        return 0;
+      }
+    }
+  }
+  else {
+    /* the type handler doesn't do this (yet) */
+    if (channels->count > im->channels) {
+      i_push_errorf(0, "channel count %d out of range for %d channel image",
+        channels->count, im->channels);
+      return 0;
+    }
+  }
+
+  if (im_mult_overflow3(buf_size, *pr - l, channels->count, sample_size)) {
+    i_push_error(0, "integer overflow calculating buffer size");
+    return 0;
+  }
+
+  return 1;
+}
+
+static void
+save_error_sv(pTHX_ SV *err_sv) {
+  i_errmsg *errors = i_errors();
+  int i = 0;
+  SvPVCLEAR(err_sv);
+
+  while (errors[i].msg) {
+    if (i)
+      sv_catpvs(err_sv, ": ");
+    sv_catpv(err_sv, errors[i].msg);
+    ++i;
+  }
+  SvSETMAGIC(err_sv);
+}
+
 typedef i_trim_color_list Imager__TrimColorList;
 #define trim_color_list_count(t) ((t).count)
 
@@ -1537,7 +1634,7 @@ io_slurp(ig)
 	     CODE:
  	      data    = NULL;
               tlength = io_slurp(ig, &data);
-              RETVAL = newSVpv((char *)data,tlength);
+              RETVAL = newSVpvn((char *)data, tlength);
               myfree(data);
 	     OUTPUT:
 	      RETVAL
@@ -1569,6 +1666,11 @@ i_int_check_image_file_limits(width, height, channels, sample_size)
 	int channels
 	size_t sample_size
   PROTOTYPE: DISABLE
+
+void
+i_set_out_of_memory(bool use_perl)
+     PPCODE:
+     i_set_out_of_memory(use_perl ? my_out_of_memory : NULL, NULL);
 
 void
 i_trim_rect(Imager::ImgRaw im, double transp_threshold, Imager::TrimColorList cls)
@@ -1639,7 +1741,7 @@ io_slurp(class, ig)
     CODE:
 	data    = NULL;
 	tlength = io_slurp(ig, &data);
-	RETVAL = newSVpv((char *)data,tlength);
+	RETVAL = newSVpvn((char *)data, tlength);
 	myfree(data);
     OUTPUT:
 	RETVAL
@@ -1999,7 +2101,7 @@ i_img_getdata(im)
              PPCODE:
 	       EXTEND(SP, 1);
                PUSHs(im->idata ? 
-	             sv_2mortal(newSVpv((char *)im->idata, im->bytes)) 
+	             sv_2mortal(newSVpvn((char *)im->idata, im->bytes))
 		     : &PL_sv_undef);
 
 IV
@@ -2777,7 +2879,7 @@ i_tt_has_chars(handle, text_sv, utf8)
             }
 	  }
         }
-        else {
+        else if (count) {
           EXTEND(SP, 1);
           PUSHs(sv_2mortal(newSVpv(work, count)));
         }
@@ -3323,7 +3425,7 @@ i_errors()
 	i = 0;
 	while (errors[i].msg) {
 	  av = newAV();
-	  sv = newSVpv(errors[i].msg, strlen(errors[i].msg));
+	  sv = newSVpv(errors[i].msg, 0);
 	  if (!av_store(av, 0, sv)) {
 	    SvREFCNT_dec(sv);
 	  }
@@ -3391,9 +3493,6 @@ i_nearest_color(im, ...)
         RETVAL = i_nearest_color(im, num, xo, yo, ival, dmeasure);
       OUTPUT:
         RETVAL
-
-void
-malloc_state()
 
 void
 DSO_open(filename)
@@ -3555,9 +3654,9 @@ i_gpal(im, l, r, y)
               PUSHs(sv_2mortal(newSViv(work[i])));
             }
           }
-          else {
+          else if (count) {
             EXTEND(SP, 1);
-            PUSHs(sv_2mortal(newSVpv((char *)work, count * sizeof(i_palidx))));
+            PUSHs(sv_2mortal(newSVpvn((char *)work, count * sizeof(i_palidx))));
           }
           myfree(work);
         }
@@ -3718,64 +3817,80 @@ i_img_virtual(im)
         Imager::ImgRaw  im
 
 void
-i_gsamp(im, l, r, y, channels)
-        Imager::ImgRaw im
-        i_img_dim l
-        i_img_dim r
-        i_img_dim y
-        i_channel_list channels
+i_gsamp(Imager::ImgRaw im, i_img_dim l, i_img_dim r, i_img_dim y, \
+        i_channel_list channels, SV *err_sv = NULL)
       PREINIT:
         i_sample_t *data;
         i_img_dim count, i;
+        size_t buf_size;
+        SV *result_sv;
       PPCODE:
-        if (l < r) {
-          data = mymalloc(sizeof(i_sample_t) * (r-l) * channels.count);
+        i_clear_error();
+        if (is_valid_sample_params(im, l, &r, y, &channels,
+            sizeof(i_sample_t), &buf_size)) {
+          result_sv = newSV(buf_size);
+          data = (i_sample_t *)SvPVX(result_sv);
           count = i_gsamp(im, l, r, y, data, channels.channels, channels.count);
           if (GIMME_V == G_ARRAY) {
             EXTEND(SP, count);
             for (i = 0; i < count; ++i)
               PUSHs(sv_2mortal(newSViv(data[i])));
           }
-          else {
+          else if (count) {
             EXTEND(SP, 1);
-            PUSHs(sv_2mortal(newSVpv((char *)data, count * sizeof(i_sample_t))));
+            SvCUR_set(result_sv, count * sizeof(i_sample_t));
+            *SvEND(result_sv) = '\0';
+            SvPOK_only(result_sv);
+            PUSHs(result_sv);
           }
-	  myfree(data);
+          else {
+            i_push_error(0, "getsamples");
+            if (err_sv)
+              save_error_sv(aTHX_ err_sv);
+          }
         }
         else {
-          if (GIMME_V != G_ARRAY) {
-	    XSRETURN_UNDEF;
+          i_push_error(0, "getsamples");
+          if (err_sv)
+            save_error_sv(aTHX_ err_sv);
+          if (GIMME_V == G_SCALAR) {
+            EXTEND(SP, 1);
+            PUSHs(&PL_sv_undef);
           }
         }
 
 undef_neg_int
-i_gsamp_bits(im, l, r, y, bits, target, offset, channels)
-        Imager::ImgRaw im
-        i_img_dim l
-        i_img_dim r
-        i_img_dim y
-	int bits
-	AV *target
-	STRLEN offset
-        i_channel_list channels
+i_gsamp_bits(Imager::ImgRaw im, i_img_dim l, i_img_dim r, i_img_dim y, \
+	int bits, AV *target, STRLEN offset, i_channel_list channels, \
+        SV *err_sv = NULL)
       PREINIT:
         unsigned *data;
         i_img_dim count, i;
+        size_t buf_size;
       CODE:
 	i_clear_error();
-        if (items < 8)
-          croak("No channel numbers supplied to g_samp()");
-        if (l < r) {
-          data = mymalloc(sizeof(unsigned) * (r-l) * channels.count);
+        if (is_valid_sample_params(im, l, &r, y, &channels,
+            sizeof(unsigned), &buf_size)) {
+          data = mymalloc(buf_size);
           count = i_gsamp_bits(im, l, r, y, data, channels.channels, channels.count, bits);
-	  for (i = 0; i < count; ++i) {
-	    av_store(target, i+offset, newSVuv(data[i]));
-	  }
+          if (count >= 0) {
+	    for (i = 0; i < count; ++i) {
+	      av_store(target, i+offset, newSVuv(data[i]));
+	    }
+          }
+          else {
+            i_push_error(0, "getsamples");
+            if (err_sv)
+              save_error_sv(aTHX_ err_sv);
+          }
 	  myfree(data);
 	  RETVAL = count;
         }
         else {
-	  RETVAL = 0;
+          i_push_error(0, "getsamples");
+          if (err_sv)
+            save_error_sv(aTHX_ err_sv);
+	  RETVAL = -1;
         }
       OUTPUT:
 	RETVAL
@@ -3976,33 +4091,40 @@ i_ppixf(im, x, y, cl)
         Imager::Color::Float cl
 
 void
-i_gsampf(im, l, r, y, channels)
-        Imager::ImgRaw im
-        i_img_dim l
-        i_img_dim r
-        i_img_dim y
-	i_channel_list channels
+i_gsampf(Imager::ImgRaw im, i_img_dim l, i_img_dim r, i_img_dim y, \
+        i_channel_list channels, SV *err_sv = NULL)
       PREINIT:
         i_fsample_t *data;
         i_img_dim count, i;
+        size_t buf_size;
+        SV *result_sv;
       PPCODE:
-        if (l < r) {
-          data = mymalloc(sizeof(i_fsample_t) * (r-l) * channels.count);
+        i_clear_error();
+        if (is_valid_sample_params(im, l, &r, y, &channels,
+            sizeof(i_fsample_t), &buf_size)) {
+          result_sv = newSV(buf_size);
+          data = (i_fsample_t *)SvPVX(result_sv);
           count = i_gsampf(im, l, r, y, data, channels.channels, channels.count);
           if (GIMME_V == G_ARRAY) {
             EXTEND(SP, count);
             for (i = 0; i < count; ++i)
               PUSHs(sv_2mortal(newSVnv(data[i])));
           }
-          else {
+          else if (count) {
             EXTEND(SP, 1);
-            PUSHs(sv_2mortal(newSVpv((void *)data, count * sizeof(i_fsample_t))));
+            SvCUR_set(result_sv, count * sizeof(i_fsample_t));
+            *SvEND(result_sv) = '\0';
+            SvPOK_only(result_sv);
+            PUSHs(result_sv);
           }
-          myfree(data);
         }
         else {
-          if (GIMME_V != G_ARRAY) {
-	    XSRETURN_UNDEF;
+          i_push_error(0, "getsamples");
+          if (err_sv)
+            save_error_sv(aTHX_ err_sv);
+          if (GIMME_V == G_SCALAR) {
+            EXTEND(SP, 1);
+            PUSHs(&PL_sv_undef);
           }
         }
 
@@ -4089,7 +4211,7 @@ i_glin(im, l, r, y)
           }
           else if (count) {
 	    EXTEND(SP, 1);
-	    PUSHs(sv_2mortal(newSVpv((void *)vals, count * sizeof(i_color))));
+	    PUSHs(sv_2mortal(newSVpvn((void *)vals, count * sizeof(i_color))));
           }
           myfree(vals);
         }
@@ -4121,7 +4243,7 @@ i_glinf(im, l, r, y)
           }
           else if (count) {
             EXTEND(SP, 1);
-            PUSHs(sv_2mortal(newSVpv((void *)vals, count * sizeof(i_fcolor))));
+            PUSHs(sv_2mortal(newSVpvn((void *)vals, count * sizeof(i_fcolor))));
           }
           myfree(vals);
         }

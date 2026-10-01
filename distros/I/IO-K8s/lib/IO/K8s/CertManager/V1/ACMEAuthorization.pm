@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEAuthorization;
 # ABSTRACT: ACMEAuthorization contains data returned from the ACME server on an authorization that must be completed in order validate a DNS name on an ACME Order resource.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s challenges   => ['+IO::K8s::CertManager::V1::ACMEChallenge'];
@@ -28,7 +28,7 @@ IO::K8s::CertManager::V1::ACMEAuthorization - ACMEAuthorization contains data re
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 challenges
 

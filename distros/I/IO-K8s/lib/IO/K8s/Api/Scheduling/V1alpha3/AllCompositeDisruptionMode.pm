@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::AllCompositeDisruptionMode;
 # ABSTRACT: AllCompositeDisruptionMode means that children of a CompositePodGroup can only be disrupted or preempted together.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 1;
@@ -17,7 +17,7 @@ IO::K8s::Api::Scheduling::V1alpha3::AllCompositeDisruptionMode - AllCompositeDis
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SUPPORT
 

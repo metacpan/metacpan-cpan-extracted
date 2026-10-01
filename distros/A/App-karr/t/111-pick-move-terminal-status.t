@@ -35,7 +35,10 @@ use App::karr::BoardStore;
 use App::karr::Task;
 use App::karr::Cmd::Pick;
 
-my @CUSTOM = qw( backlog doing shipped archived );
+# The card starts in the first column, and pick never takes a card out of
+# backlog (ticket k306) -- so the first column here is `ready`, the kanban-md
+# board this is about minus the one column pick leaves alone.
+my @CUSTOM = qw( ready doing shipped archived );
 
 sub board {
   my (@statuses) = @_;
@@ -112,7 +115,7 @@ subtest 'pick --move to a working column does not stamp completed' => sub {
 };
 
 subtest 'the default board is unchanged' => sub {
-  my $store = board(qw( backlog todo done archived ));
+  my $store = board(qw( todo in-progress review done archived ));
   my ( $err ) = run_execute(
     App::karr::Cmd::Pick->new(
       store => $store, claim => 'agent-x', move => 'done' ) );

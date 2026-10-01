@@ -60,15 +60,19 @@ make_repo() {  # make_repo NAME
 make_repo webapp
 if [ -d "$EX/webapp" ] && ! karr --dir "$EX/webapp" show 1 >/dev/null 2>&1; then
   W() { karr --dir "$EX/webapp" "$@"; }
-  W create --title "Fix login bug" --priority high --body "Session cookie is dropped on the second request. Reproduce on staging with two tabs." >/dev/null
+  # Every sample card starts in todo, the pool pick and karr-foundation hand
+  # work out of: backlog is held back and never picked, so a sandbox seeded
+  # there would give the demo agents nothing to do. Whatever holds a card here
+  # is its own mechanism -- a claim, a dependency, a block, a cross-board need.
+  W create --title "Fix login bug" --priority high --status todo --body "Session cookie is dropped on the second request. Reproduce on staging with two tabs." >/dev/null
   W move 1 in-progress --claim agent-fox
-  W create --title "Rate limit the API" --priority medium --depends_on 1 >/dev/null
-  W create --title "Publish release notes" --priority low >/dev/null
+  W create --title "Rate limit the API" --priority medium --status todo --depends_on 1 >/dev/null
+  W create --title "Publish release notes" --priority low --status todo >/dev/null
   W move 3 review --claim agent-fox
-  W create --title "Upgrade TLS on staging" --priority critical >/dev/null
+  W create --title "Upgrade TLS on staging" --priority critical --status todo >/dev/null
   W edit 4 --block "waiting for the certificate from ops" >/dev/null
-  W create --title "Write integration tests for checkout" --priority high >/dev/null
-  W create --title "Deploy the 0.6 release" --priority low --needs docs-site#1 >/dev/null
+  W create --title "Write integration tests for checkout" --priority high --status todo >/dev/null
+  W create --title "Deploy the 0.6 release" --priority low --status todo --needs docs-site#1 >/dev/null
   echo "ex/webapp: sample cards created"
 fi
 
@@ -76,8 +80,8 @@ fi
 make_repo docs-site
 if [ -d "$EX/docs-site" ] && ! karr --dir "$EX/docs-site" show 1 >/dev/null 2>&1; then
   D() { karr --dir "$EX/docs-site" "$@"; }
-  D create --title "Update the installation quickstart" --priority medium >/dev/null
-  D create --title "Rewrite the deployment section" --priority low >/dev/null
+  D create --title "Update the installation quickstart" --priority medium --status todo >/dev/null
+  D create --title "Rewrite the deployment section" --priority low --status todo >/dev/null
   D move 2 in-progress --claim agent-fox
   echo "ex/docs-site: sample cards created"
 fi

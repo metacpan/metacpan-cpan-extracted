@@ -110,6 +110,12 @@ METHODS
     "new_readonly" opens a frozen file read-only for lock-free querying (see
     "FROZEN (READ-ONLY) MODE").
 
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of the initialization dying with
+    SIGBUS; set "DATA_SPATIALHASH_SHARED_SPARSE=1" to skip the reservation. On
+    tmpfs and memfd the segment is memory, and a memory cgroup too small for
+    it gets an OOM kill rather than a croak.
+
   Mutators
         my $h = $s->insert(x, y, value);        # 2D insert -- returns handle or undef
         my $h = $s->insert(x, y, z, value);     # 3D insert
@@ -434,6 +440,15 @@ CRASH SAFETY
     acquire the lock checks whether the owner PID is still alive and, if not,
     recovers the lock. Reader slots are similarly reclaimed when a dead
     reader's slot is detected.
+
+    The recovering process also repairs what the dead writer left half done:
+    it rebuilds every bucket chain, the free list and "count" from the
+    live-entry bitmap and each live entry's stored position. An interrupted
+    "insert" or "remove" then reads as either done or not done. An interrupted
+    "clear", "insert_many" or "move_many" can be partly applied, and a "move"
+    killed while it was writing the new position can leave that entry at a
+    per-axis mix of its old and new coordinates, indexed where it now is. The
+    repair takes time proportional to "max_entries".
 
     Limitation: PID reuse is not detected. If a new process acquires the same
     PID as a dead lock holder before recovery runs, the stale lock may not be

@@ -1,0 +1,89 @@
+{
+  "skills/getty-git-commit-style": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-commit-style/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-commit-style/SKILL.md": "sha256:959bed63af658dcec1abc3010a2a262d347851a8aae87d833736d065c0f9f863"
+    }
+  },
+  "skills/getty-git-usage": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-usage/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-usage/SKILL.md": "sha256:9a4cdf50cc3991e16b2af8882175e8e9a4e27b40fd93605898348ed2db506630"
+    }
+  },
+  "skills/getty-perl-core": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-core/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-core/SKILL.md": "sha256:eec7e726b0deab2a50dd5b99c2f16c68b332ba8ac6296642679f3bfd3bc46816"
+    }
+  },
+  "skills/getty-perl-moo": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-moo/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-moo/SKILL.md": "sha256:40935882df586ed9db50466c1c289913beaec39c74fced3d25e99a585100e03c"
+    }
+  },
+  "skills/getty-perl-pod": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-pod/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-pod/SKILL.md": "sha256:105c0a002592f877eadc60246c71ab739a0bf4fbf52771b8fb7ea1ff8bbdec7c"
+    }
+  },
+  "skills/getty-perl-release-author-getty": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-release-author-getty/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-release-author-getty/SKILL.md": "sha256:8142dbdc668449c99f514dec23a8740f9570a7884e61ad7541ea37a20ba5d902"
+    }
+  },
+  "skills/kanban-issues-karr-coordination": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-coordination/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-coordination/SKILL.md": "sha256:60296bb91931ad9e2b90eb5b187716b810feb55c4f99c670fb0505bc5753d0c9",
+      "skills/kanban-issues-karr-coordination/references/cards.md": "sha256:ed1ed17fdffa756e8ee8ff5d72a3a22c3e414abdaadc9b0fc0ba08e176d95340",
+      "skills/kanban-issues-karr-coordination/references/claims.md": "sha256:81459998fe329f30bc6c10fcf750955fa2b6134e13093e59df5970c335e3aadb",
+      "skills/kanban-issues-karr-coordination/references/config.md": "sha256:1220e5d2069af5b760fc76572dbedeccda00f0ee51c3c770040a454671c15430",
+      "skills/kanban-issues-karr-coordination/references/cross-board.md": "sha256:7ece9e04470ebcd738dbd20b4ea372cbb730de10af27ab33ce0eb068be453a8d",
+      "skills/kanban-issues-karr-coordination/references/queries.md": "sha256:0c4c38c7aa36f050a61f4abdc79a2531b58b0148e57ca9e56581a31a5e9d63c8",
+      "skills/kanban-issues-karr-coordination/references/setup.md": "sha256:d90667962ec6301eb994d5a463f9441979711c031e67073dac3f98d584983a61",
+      "skills/kanban-issues-karr-coordination/references/storage.md": "sha256:4e50a5927f3a1582e4f08a8bbfad1d10a78cae386636f0007c498a85d9a823bf"
+    }
+  },
+  "skills/kanban-issues-karr-ticket": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-ticket/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-ticket/SKILL.md": "sha256:a8885a983ac394c3e604e8a06fc483f5f953888a863373671df1bf460d1e9f93"
+    }
+  },
+  "skills/kubernetes-concepts": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/kubernetes-concepts/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kubernetes-concepts/SKILL.md": "sha256:a66c0d7bad0ca05441a17812e6f0977b8e1e0763e6f14c626dfe51850a7d81dd"
+    }
+  },
+  "skills/perl-release-dist-ini": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/perl-release-dist-ini/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/perl-release-dist-ini/SKILL.md": "sha256:968219fbff70237c642d39e5ece9cc619680a46c4493fee64138e9a9400a97bb"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::AzureAddress;
 # ABSTRACT: AzureAddress is an IP address assigned to an AzureInterface
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s ip     => Str;
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::AzureAddress - AzureAddress is an IP address assigned to an
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 ip
 

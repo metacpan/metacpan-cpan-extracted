@@ -79,6 +79,7 @@
 
 # This project's own dev-only files
 ^\.claude/
+^\.perlcriticrc$
 ^inc/\.author/
 ^CLAUDE\.md$
 ^RT-Extension-AwayMode-.*\.tar\.gz$

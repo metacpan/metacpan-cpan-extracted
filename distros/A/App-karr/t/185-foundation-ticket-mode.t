@@ -105,6 +105,21 @@ sub runs_of {
   return grep { defined } split /\n/, $log->slurp_utf8;
 }
 
+# What a --verbose run printed. A dry run writes no .karr.log -- the terminal is
+# the only place its log lines go -- so that is where a test has to read them.
+sub capture_stdout {
+  my ( $code ) = @_;
+  my $file = Path::Tiny->tempfile;
+  open my $save, '>&', \*STDOUT or die "dup stdout: $!";
+  open STDOUT, '>', "$file"      or die "redirect stdout: $!";
+  my $err;
+  eval { $code->(); 1 } or $err = $@;
+  open STDOUT, '>&', $save or die "restore stdout: $!";
+  close $save;
+  die $err if defined $err;
+  return $file->slurp_utf8;
+}
+
 # ---------------------------------------------------------------------------
 # Unit: run mode, and the one key it has to share with the old one
 # ---------------------------------------------------------------------------
@@ -350,6 +365,74 @@ subtest 'a card still carrying somebody else\'s name is not auto-blocked' => sub
     'but the claim holder keeps their card';
   ok !exists( ( $f->_state_get( $repo, 'attempts' ) // {} )->{1} ),
     'and no attempt is charged against it';
+};
+
+# ---------------------------------------------------------------------------
+# Integration: a dry run judges no run it did not start (#314)
+# ---------------------------------------------------------------------------
+
+# A dry run names the card and prints the START it would make, then starts
+# nothing -- and the unmoved card used to be judged anyway, so --dry-run
+# --verbose printed "STALL task#N -- no report from the agent" for an agent
+# that never ran. The card is one nobody would move (KARR_FAKE_MODE=idle), so
+# the only way to get no STALL line here is not to judge the skipped run at
+# all; max_attempts 1 means a judged run would reach the auto-block on the
+# first stall.
+subtest 'a dry run reports no stall for the run it skipped' => sub {
+  my $repo = make_git_repo();
+  seed_board( $repo, { status => 'todo' } );
+  my $agent = write_fake_agent( $repo );
+
+  my $f = App::karr::Foundation->new(
+    _config_data => {}, dry_run => 1, verbose => 1 );
+  local $ENV{KARR_FAKE_MODE} = 'idle';
+  my $res;
+  my $shown = capture_stdout( sub {
+    $res = $f->_drain_repo( $repo,
+      { command => $agent, max_runtime => 60, mode => 'ticket', max_attempts => 1 } );
+  } );
+
+  like $shown, qr/TICKET task#1/,
+    'the dry run still names the card it would assign';
+  like $shown, qr/START command=/, 'and the start it would make';
+  like $shown, qr/DRY-RUN \(skipped\)/, 'and says it skipped it';
+  unlike $shown, qr/STALL/,
+    'but reports no stall for a run that never happened';
+  is $res->{ticket}, 1, 'the result still says which card the run was about';
+  isnt $res->{outcome}, 'stall', 'and does not call the skipped run a stall';
+
+  ok !path( $repo )->child('runs.log')->exists, 'the agent was never started';
+  ok !path( $repo )->child('.karr.log')->exists,   'no .karr.log was written';
+  ok !path( $repo )->child('.karr.state')->exists, 'no .karr.state was written';
+  ok !task_by_id( $repo, 1 )->has_blocked, 'and the card is not blocked';
+};
+
+# The same pass in drain mode, which never printed a STALL line -- a drain
+# judges engagement, and a run that never started engages nothing. It is here
+# because the guard for the ticket-mode line sits in the loop both modes share:
+# a dry drain must still stop after the one START it would make, not spin to
+# max_iterations on a board a skipped run cannot drain.
+subtest 'a dry drain shows one would-be run and judges none' => sub {
+  my $repo = make_git_repo();
+  seed_board( $repo, { status => 'todo' }, { status => 'todo' } );
+  my $agent = write_fake_agent( $repo );
+
+  my $f = App::karr::Foundation->new(
+    _config_data => {}, dry_run => 1, verbose => 1 );
+  local $ENV{KARR_FAKE_MODE} = 'idle';
+  my $res;
+  my $shown = capture_stdout( sub {
+    $res = $f->_drain_repo( $repo,
+      { command => $agent, max_runtime => 60, mode => 'drain', max_attempts => 1 } );
+  } );
+
+  my @starts = $shown =~ /START command=/g;
+  is scalar @starts, 1, 'one would-be START, not a loop of them';
+  unlike $shown, qr/STALL|AUTOBLOCK/, 'and nothing judged';
+  is $res->{outcome}, 'idle', 'a skipped run made no progress';
+  ok !path( $repo )->child('runs.log')->exists,    'the agent was never started';
+  ok !path( $repo )->child('.karr.log')->exists,   'no .karr.log was written';
+  ok !path( $repo )->child('.karr.state')->exists, 'no .karr.state was written';
 };
 
 done_testing;

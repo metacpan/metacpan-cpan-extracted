@@ -70,7 +70,7 @@ provides:
     version: '12.010003'
   DBI:
     file: DBI.pm
-    version: '1.654'
+    version: '1.655'
   DBI::Const::GetInfo::ANSI:
     file: lib/DBI/Const/GetInfo/ANSI.pm
     version: '2.008697'
@@ -159,4 +159,4 @@ resources:
   bugtracker: https://github.com/perl5-dbi/dbi/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/dbi
-version: '1.654'
+version: '1.655'

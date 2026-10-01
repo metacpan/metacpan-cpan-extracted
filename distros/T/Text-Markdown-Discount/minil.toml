@@ -5,4 +5,4 @@ module_maker = "ModuleBuild"
 build_class = "builder::MyBuilder"
 
 [FileGatherer]
-exclude_match = ["^discount-.*/tests"]
+exclude_match = ["^discount-.*/tests/(?!exercisers/make\\.include$)"]

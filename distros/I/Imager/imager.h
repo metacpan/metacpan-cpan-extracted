@@ -307,10 +307,6 @@ i_new_fill_fount(double xa, double ya, double xb, double yb,
                  int combine, int super_sample, double ssample_param, 
                  int count, i_fountain_seg *segs);
 
-/* Debug only functions */
-
-void malloc_state( void );
-
 #include "imerror.h"
 
 /* image tag processing */
@@ -358,24 +354,17 @@ im_int_check_image_file_limits(im_context_t ctx, i_img_dim width, i_img_dim heig
 void* mymalloc(size_t size);
 void  myfree(void *p);
 void* myrealloc(void *p, size_t newsize);
-void* mymalloc_file_line (size_t size, char* file, int line);
-void  myfree_file_line   (void *p, char*file, int line);
-void* myrealloc_file_line(void *p, size_t newsize, char* file,int line);
-
-#ifdef IMAGER_DEBUG_MALLOC
-
-#define mymalloc(x) (mymalloc_file_line((x), __FILE__, __LINE__))
-#define myrealloc(x,y) (myrealloc_file_line((x),(y), __FILE__, __LINE__))
-#define myfree(x) (myfree_file_line((x), __FILE__, __LINE__))
-
-void  malloc_state       (void);
-void  bndcheck_all       (void);
-
-#else
-
-void  malloc_state(void);
-
-#endif /* IMAGER_MALLOC_DEBUG */
+void *im_malloc(im_context_t ctx, size_t size);
+void  im_free(im_context_t ctx, void *p);
+void* im_realloc(im_context_t ctx, void *p, size_t newsize);
+void *im_malloc_fail(im_context_t ctx, size_t size);
+void
+im_def_out_of_memory(pIMCTX, void *userdata, const char *func, size_t size);
+void
+im_out_of_memory(pIMCTX, const char *func, size_t size);
+void
+im_set_out_of_memory(pIMCTX, i_out_of_memory_handler handler,
+                     void *userdata);
 
 #include "imrender.h"
 
@@ -421,5 +410,6 @@ extern void i_mutex_unlock(i_mutex_t m);
 #define i_color_black0 ((i_color){.rgba = { 0, 0, 0, 0 }})
 
 #include "imio.h"
+#include "iminline.h"
 
 #endif

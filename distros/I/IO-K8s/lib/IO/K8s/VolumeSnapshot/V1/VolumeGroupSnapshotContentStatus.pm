@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeGroupSnapshotContentStatus;
 # ABSTRACT: VolumeGroupSnapshotContentStatus defines the observed group snapshot content state
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s creationTime => Time;
@@ -32,7 +32,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeGroupSnapshotContentStatus - VolumeGroupSnaps
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 creationTime
 

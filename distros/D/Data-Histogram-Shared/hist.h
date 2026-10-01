@@ -17,6 +17,7 @@
 #ifndef HIST_H
 #define HIST_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +47,7 @@
 
 #define HIST_MAGIC        0x54534948U  /* "HIST" (little-endian) */
 #define HIST_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
-#define HIST_ERR_BUFLEN   256
+#define HIST_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef HIST_READER_SLOTS
 #define HIST_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -720,14 +721,36 @@ static int hist_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int hist_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int hist_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* Opt-in (DATA_HISTOGRAM_SHARED_SPARSE=0): reserving commits memory this module otherwise fills lazily. */
+static int hist_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_HISTOGRAM_SHARED_SPARSE");
+    if (!sp || strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static HistHandle *hist_create(const char *path, int64_t lowest, int64_t highest,
@@ -763,9 +786,18 @@ static HistHandle *hist_create(const char *path, int64_t lowest, int64_t highest
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             HIST_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && hist_reserve(fd, total) < 0) {
+            HIST_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { HIST_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            HIST_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!hist_validate_header((HistHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -775,9 +807,13 @@ static HistHandle *hist_create(const char *path, int64_t lowest, int64_t highest
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((HistHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && hist_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && hist_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         HIST_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (hist_reserve(fd, total) < 0) {
+                        HIST_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     hist_init_header(base, &g, total);
@@ -815,6 +851,10 @@ static HistHandle *hist_create_memfd(const char *name, int64_t lowest, int64_t h
     if (ftruncate(fd, (off_t)total) < 0) {
         HIST_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (hist_reserve(fd, total) < 0) {
+        HIST_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { HIST_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -827,6 +867,11 @@ static HistHandle *hist_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { HIST_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(HistHeader)) { HIST_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(HistHeader, magic)) != (ssize_t)sizeof magic || magic != HIST_MAGIC) {
+        HIST_ERR("invalid histogram table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { HIST_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -881,6 +926,11 @@ static HistHandle *hist_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { HIST_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(HistHeader)) { HIST_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(HistHeader, magic)) != (ssize_t)sizeof magic || magic != HIST_MAGIC) {
+        HIST_ERR("%s: invalid histogram file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
@@ -992,11 +1042,13 @@ static void hist_record_locked(HistHandle *h, int64_t value, int64_t count) {
     if (idx < 0 || idx >= hist_counts_capacity(h)) return;  /* Layer B: reject OOB idx (untrusted geometry) */
     int64_t *counts = hist_counts(h);
     counts[idx] += count;
-    h->hdr->total_count += count;
     if (count != 0) {   /* record(value, 0) records nothing -> no phantom min/max */
         if (value < h->hdr->min_value) h->hdr->min_value = value;
         if (value > h->hdr->max_value) h->hdr->max_value = value;
     }
+    /* min() and the percentile walk trust the total, so it goes last. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->hdr->total_count += count;
 }
 
 /* Highest equivalent value at or below which `p` percent of recorded values
@@ -1048,10 +1100,12 @@ static void hist_merge_counts(int64_t *dst, const int64_t *src, int64_t counts_l
 /* reset all counts to 0; reset total/min/max (caller holds the write lock) */
 static inline void hist_reset_locked(HistHandle *h) {
     int64_t len = hist_counts_len_safe(h);     /* Layer B: never zero past our mapping */
-    memset(hist_counts(h), 0, (size_t)((uint64_t)len * sizeof(int64_t)));
     h->hdr->total_count = 0;
     h->hdr->min_value   = INT64_MAX;
     h->hdr->max_value   = 0;
+    /* Empty the total first: a kill mid-memset leaves leftover counts, never a total they cannot reach. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    memset(hist_counts(h), 0, (size_t)((uint64_t)len * sizeof(int64_t)));
 }
 
 #endif /* HIST_H */

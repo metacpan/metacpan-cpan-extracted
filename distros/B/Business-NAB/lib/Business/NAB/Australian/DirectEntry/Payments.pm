@@ -1,5 +1,5 @@
 package Business::NAB::Australian::DirectEntry::Payments;
-$Business::NAB::Australian::DirectEntry::Payments::VERSION = '0.09';
+$Business::NAB::Australian::DirectEntry::Payments::VERSION = '0.10';
 =head1 NAME
 
 Business::NAB::Australian::DirectEntry::Payments
@@ -156,15 +156,17 @@ sub to_file (
     my $debit_total = sum0 map { $_->amount }
         grep { $_->is_debit } $self->detail_record->@*;
 
-    my $net_total = abs( $credit_total - $debit_total );
-    my $rounded_total = sprintf '%.8f', $net_total;
+    # sprintf to prevent floating point issues - we are dealing with
+    # minor units so there should *never* be a difference of < 1, if
+    # there is then it's floating point so just ignore that
+    my $net_total = sprintf( "%.0f",abs( $credit_total - $debit_total ) );
 
     # net total should be zero as it is the net of credit - debit records
     # and there should always be a record that nets off the other record
     # type totals (to describe where funds go to/from). however if this is
     # a returns file then this check does not apply
     if (
-        $rounded_total != 0
+        $net_total != 0
         && $self->blessed !~ /::Returns$/
     ) {
         croak(

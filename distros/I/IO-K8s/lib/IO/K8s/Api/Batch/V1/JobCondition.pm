@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::JobCondition;
 # ABSTRACT: JobCondition describes current state of a job.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s lastProbeTime => Time;
@@ -35,7 +35,7 @@ IO::K8s::Api::Batch::V1::JobCondition - JobCondition describes current state of 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 lastProbeTime
 

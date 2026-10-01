@@ -5,6 +5,7 @@ use Test::Exception;
 use File::Temp ();
 
 use IO::Async::Loop;
+use IO::K8s;
 use Net::Async::Kubernetes;
 use Kubernetes::REST::Server;
 use Kubernetes::REST::AuthToken;
@@ -209,24 +210,32 @@ subtest 'expand_class delegates to _rest' => sub {
 # Custom resource_map in expand_class
 # ============================================================================
 
+# The class the custom entry below points at. expand_class only returns a
+# class that loads and is a resource, so the entry has to name a real one.
+BEGIN {
+    package My::Custom::Thing;
+    use IO::K8s::APIObject
+        api_version     => 'example.com/v1',
+        resource_plural => 'things';
+}
+
 subtest 'expand_class with custom resource_map' => sub {
-    # Need to load the CRD class first
-    eval {
-        require IO::K8s;
-        my $default_map = IO::K8s->default_resource_map;
-        my $kube = Net::Async::Kubernetes->new(
-            server      => { endpoint => 'https://test.local' },
-            credentials => { token => 'test' },
-            resource_map => {
-                %$default_map,
-                MyCustomThing => '+My::Custom::Thing',
-            },
-            resource_map_from_cluster => 0,
-        );
-        my $class = $kube->expand_class('MyCustomThing');
-        is($class, 'My::Custom::Thing', 'custom resource_map entry resolved');
-    };
-    skip "IO::K8s default_resource_map not available", 1 if $@;
+    # Nothing here is optional - IO::K8s is a hard dependency, and the class
+    # above is built with it - so a croak is a failure of this subtest, not a
+    # reason to skip it.
+    my $kube = Net::Async::Kubernetes->new(
+        server      => { endpoint => 'https://test.local' },
+        credentials => { token => 'test' },
+        resource_map => {
+            %{ IO::K8s->default_resource_map },
+            MyCustomThing => '+My::Custom::Thing',
+        },
+        resource_map_from_cluster => 0,
+    );
+    my $class;
+    lives_ok { $class = $kube->expand_class('MyCustomThing') }
+        'expand_class resolves the custom entry without croaking';
+    is($class, 'My::Custom::Thing', 'custom resource_map entry resolved');
 };
 
 done_testing;

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::Endpoint;
 # ABSTRACT: Endpoint defines an endpoint serving Prometheus metrics to be scraped by Prometheus.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s authorization            => '+IO::K8s::PrometheusOperator::V1::SafeAuthorization';
@@ -16,10 +16,10 @@ k8s interval                 => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)
 k8s metricRelabelings        => ['+IO::K8s::PrometheusOperator::V1::RelabelConfig'];
 k8s noProxy                  => Str;
 k8s oauth2                   => '+IO::K8s::PrometheusOperator::V1::OAuth2';
-k8s params                   => { Str => 1 };
+k8s params                   => Opaque;
 k8s path                     => Str;
 k8s port                     => Str;
-k8s proxyConnectHeader       => { Str => 1 };
+k8s proxyConnectHeader       => Opaque;
 k8s proxyFromEnvironment     => Bool;
 k8s proxyUrl                 => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s relabelings              => ['+IO::K8s::PrometheusOperator::V1::RelabelConfig'];
@@ -68,7 +68,7 @@ IO::K8s::PrometheusOperator::V1::Endpoint - Endpoint defines an endpoint serving
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 authorization
 

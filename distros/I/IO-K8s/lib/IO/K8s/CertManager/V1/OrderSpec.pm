@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::OrderSpec;
 # ABSTRACT: OrderSpec
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use utf8;
 use IO::K8s::Resource;
 
@@ -36,7 +36,7 @@ IO::K8s::CertManager::V1::OrderSpec - OrderSpec
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 commonName
 

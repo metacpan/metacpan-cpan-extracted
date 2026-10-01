@@ -178,7 +178,11 @@ subtest 'subclass registry override wins; other inherited attrs stay visible' =>
         only_base => 'z',
     );
     like($base->to_json, qr/"active":true/, 'base serializes active as a JSON boolean');
-    like($sub->to_json, qr/"active":1(?:,|\})/, 'sub serializes active via its own Str override');
+    # k145: Str-typed fields now stringify a numeric Perl scalar at TO_JSON
+    # time, so the nearer Str declaration on the sub serializes "1", a JSON
+    # string, rather than the bare JSON number 1 -- still distinct from the
+    # base class's JSON boolean, which is the thing this test is about.
+    like($sub->to_json, qr/"active":"1"(?:,|\})/, 'sub serializes active via its own Str override');
     like($sub->to_json, qr/"only_base":"z"/, 'inherited only_base still serializes on sub');
 };
 

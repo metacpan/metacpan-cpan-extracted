@@ -44,9 +44,13 @@ use App::karr::Foundation::Picker;
 #     is real: --claimed-by matches an expired claim, --unclaimed matches the
 #     same card, so the two are not each other's negation;
 #
-#   * and the one that the refactor exists for: what `list --unclaimed` shows
-#     as free is what `karr pick` will actually hand out, drained card by card
-#     on the same board.
+#   * and the one that the refactor exists for: what `list --unclaimed
+#     --not-blocked` shows outside backlog is what `karr pick` will actually
+#     hand out, drained card by card on the same board.
+#
+# The two share the claim half of the rule and only that half. Where they part
+# -- a blocked card, and since k306 a card held back in backlog -- is pinned
+# too, so the difference stays a decision (ticket k309) and not a drift.
 
 sub _init_repo {
   my $repo = tempdir( CLEANUP => 1 );
@@ -357,9 +361,11 @@ subtest 'the board timeout is read once per run, not once per card' => sub {
 
 subtest 'what --unclaimed shows free is what pick hands out' => sub {
   # The whole point of reusing pickable's test. `list --unclaimed --not-blocked`
-  # is the claim rule plus pick's other two exclusions -- blocked, and the
-  # board's terminal statuses, which list hides by default -- so the set has to
-  # be exactly what pick will give up, one card at a time, until it has none.
+  # is the claim rule plus two of pick's other exclusions -- blocked, and the
+  # board's terminal statuses, which list hides by default -- so on a board
+  # with nothing in backlog the set has to be exactly what pick will give up,
+  # one card at a time, until it has none. Backlog, pick's third exclusion, is
+  # the next subtest.
   my $repo = _mixed_board();
   mk( $repo, id => 7, title => 'archived',  status => 'archived' );
   mk( $repo, id => 8, title => 'also free' );
@@ -383,6 +389,33 @@ subtest 'what --unclaimed shows free is what pick hands out' => sub {
   is_deeply list_ids( $repo, unclaimed => 1, not_blocked => 1 ), [],
     'after the drain nothing is free, because pick claimed it all';
   is pick_id( $repo, claim => 'agent-last' ), undef, 'and pick agrees';
+};
+
+subtest 'a backlog card is unclaimed and still not pickable (k309)' => sub {
+  # Decided in ticket k309: --unclaimed keeps kanban-md's IsUnclaimed meaning,
+  # "no live claim holds this card", and does not grow into "pick would take
+  # it". Since k306 a backlog card is held back -- pick never hands it out and
+  # it cannot gain a claim -- so it is always unclaimed and never pickable,
+  # the same parting a blocked card already had. The pickable set is `list
+  # --unclaimed --not-blocked` minus backlog. Narrowing --unclaimed or widening
+  # pick both fail here, which is what keeps the difference deliberate.
+  my $repo = _board();
+  mk( $repo, id => 1, title => 'held back', status => 'backlog' );
+  mk( $repo, id => 2, title => 'released',  status => 'todo' );
+
+  is_deeply list_ids( $repo, unclaimed => 1 ), [ 1, 2 ],
+    '--unclaimed lists the backlog card: nobody holds it';
+  is_deeply list_ids( $repo, unclaimed => 1, not_blocked => 1 ), [ 1, 2 ],
+    '...and --not-blocked does not take it out either';
+
+  is pick_id( $repo, claim => 'agent-a' ), 2, 'pick hands out the todo card';
+  is pick_id( $repo, claim => 'agent-b' ), undef,
+    '...and nothing after it: the backlog card is not pickable';
+
+  is_deeply list_ids( $repo, unclaimed => 1, not_blocked => 1 ), [1],
+    'while the list still calls the backlog card unclaimed';
+  ok !App::karr::Git->new( dir => $repo )->load_task_ref(1)->has_claimed_by,
+    'because it still carries no claim';
 };
 
 #### the contradicting pair
@@ -437,7 +470,8 @@ subtest 'the CLI wires --unclaimed and its exit code (ADR 0002)' => sub {
 
   is $run->( 'init', '--name', 'Unclaimed Board' )->{exit}, 0, 'setup: karr init exits 0';
   is $run->( 'create', '--title', 'free' )->{exit},    0, 'setup: task 1';
-  is $run->( 'create', '--title', 'held' )->{exit},    0, 'setup: task 2';
+  # In todo: a backlog card holds no claim (ticket k306).
+  is $run->( 'create', '--title', 'held', '--status', 'todo' )->{exit}, 0, 'setup: task 2';
   is $run->( 'create', '--title', 'blocked' )->{exit}, 0, 'setup: task 3';
   is $run->( 'edit', '2', '--claim', 'agent-fox' )->{exit}, 0, 'setup: task 2 claimed';
   is $run->( 'edit', '3', '--block', 'waiting' )->{exit},   0, 'setup: task 3 blocked';

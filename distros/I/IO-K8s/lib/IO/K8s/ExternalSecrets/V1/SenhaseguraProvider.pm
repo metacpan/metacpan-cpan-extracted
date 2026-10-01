@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::SenhaseguraProvider;
 # ABSTRACT: Senhasegura configures this store to sync secrets using senhasegura provider
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s auth                 => '+IO::K8s::ExternalSecrets::V1::SenhaseguraAuth', { required => 'schema' };
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::SenhaseguraProvider - Senhasegura configures this 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 auth
 

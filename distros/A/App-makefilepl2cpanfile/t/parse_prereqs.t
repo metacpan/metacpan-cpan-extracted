@@ -255,4 +255,30 @@ my $dep9 = App::makefilepl2cpanfile::parse_prereqs(
 is_deeply $dep9->{runtime}{requires}, { 'Good' => { version => 0, comment => 'note' } },
 	'an invalid last entry does not take the comment with it';
 
+# -----------------------------------------------------------------------
+# Nesting depth: a hash nested inside a dependency block, at any depth,
+# does not hide the block's entries (0.06 briefly skipped such blocks
+# from two or four levels) and adds no entries of its own
+# -----------------------------------------------------------------------
+
+{
+	# $depth hashes nested one inside the next: x => { x => { ... x => 1 } }
+	my $nested = sub { my $s = 'x => 1'; $s = "x => { $s }" for 1 .. $_[0]; $s };
+	my @forms = (
+		[ 'PREREQ_PM',             sub { "PREREQ_PM => { 'A' => 1, $_[0] }," },         'runtime', 'requires' ],
+		[ 'TEST_REQUIRES',         sub { "TEST_REQUIRES => { 'A' => 1, $_[0] }," },     'test',    'requires' ],
+		[ 'legacy recommends',     sub { "recommends => { 'A' => 1, $_[0] }," },        'runtime', 'recommends' ],
+		[ 'legacy build_requires', sub { "build_requires => { 'A' => 1, $_[0] }," },    'build',   'requires' ],
+		[ 'prereqs relationship',  sub { "prereqs => { test => { suggests => { 'A' => 1, $_[0] } } }," }, 'test', 'suggests' ],
+	);
+	for my $form (@forms) {
+		my ($name, $make, $phase, $rel) = @{$form};
+		for my $depth (1, 2, 4, 5, 20) {
+			my $d = App::makefilepl2cpanfile::parse_prereqs($make->($nested->($depth)));
+			is_deeply $d, { $phase => { $rel => { 'A' => { version => '1', comment => undef } } } },
+				"$name with a hash nested $depth deep: entry found, nothing else";
+		}
+	}
+}
+
 done_testing;

@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01IngressPodTemplate;
 # ABSTRACT: Optional pod template used to configure the ACME challenge solver pods used for HTTP01 challenges.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s metadata => '+IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01IngressPodObjectMeta';
@@ -22,7 +22,7 @@ IO::K8s::CertManager::V1::ACMEChallengeSolverHTTP01IngressPodTemplate - Optional
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 metadata
 

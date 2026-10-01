@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::BackendObjectReference;
 # ABSTRACT: BackendRef references a resource where mirrored requests are sent.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s group     => Str, { pattern => qr/^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/, default => '' };
@@ -28,7 +28,7 @@ IO::K8s::GatewayAPI::V1::BackendObjectReference - BackendRef references a resour
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 group
 

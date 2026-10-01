@@ -1,26 +1,23 @@
 Revision history for Data::Pool::Shared
 
+0.10      2026-09-26
+          - recover_stale frees slots of processes killed mid alloc or free.
+          - New file format: recreate files from 0.09 or earlier.
+          - Segments are reserved, so a full filesystem fails the constructor;
+            DATA_POOL_SHARED_SPARSE=1 skips the reservation.
+          - A failed create no longer leaves a full-size file behind.
+
 0.09      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
+          - A file left by an interrupted create is recovered, not refused.
+          - Hardening against tied and overloaded arguments.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.08      2026-07-22
-          - Fix a use-after-free in set() for the Raw and Str pools: the value
-            argument is a bare SV, so its overload or tie magic runs Perl that
-            can destroy the pool, after which the already-captured handle was
-            still used. Such a call now croaks.
-          - Reject a crafted header whose full layout overflows 64 bits. The
-            attach-time check counted only the header, while the create paths
-            counted header + bitmap + owners + data, so a wrapped total_size
-            could place the slot pointers outside the mapping.
-          - Give Data::Pool::Shared::Guard a $VERSION so PAUSE indexes it.
-          - Reject alloc_n counts above 2^32.
-          - A guard no longer frees the parent slot from a forked child.
+          - Fix a use-after-free in Raw/Str set() when the value's magic
+            destroys the pool; it now croaks.
+          - Reject crafted headers whose layout overflows 64 bits.
+          - A guard no longer frees the parent's slot from a forked child.
+          - alloc_n rejects counts above 2^32; Guard has a $VERSION.
 
 0.07  2026-07-03
     - Security and robustness hardening; backing files now created mode
@@ -56,14 +53,8 @@ Revision history for Data::Pool::Shared
     - Add capacity*elem_size overflow check
 
 0.01  2026-04-11
-    - Initial release
-    - Fixed-size shared-memory object pool with CAS bitmap allocation
-    - Variants: Raw, I64, F64, I32, Str
-    - Futex-based blocking when pool is exhausted
-    - PID-based stale slot recovery (recover_stale)
-    - Batch operations: alloc_n, free_n
-    - Zero-copy read: slot_sv
-    - Guard objects for auto-free on scope exit
-    - File-backed, anonymous, and memfd backing modes
-    - eventfd integration for event-loop wakeup
-    - Atomic ops: cas, cmpxchg, xchg, add, incr, decr (I64/I32)
+    - Initial release: fixed-size object pool (Raw, I64, F64, I32, Str) with
+      CAS bitmap allocation.
+    - Futex-blocking alloc, recover_stale, alloc_n/free_n, zero-copy slot_sv,
+      guards.
+    - File, anonymous or memfd backing; eventfd wakeup; atomic ops on I64/I32.

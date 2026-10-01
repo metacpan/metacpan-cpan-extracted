@@ -47,7 +47,7 @@ use IO::K8s;
     use IO::K8s::APIObject
         api_version     => 'vendor.example.com/v1',
         resource_plural => 'doodads';
-    k8s spec => { Str => 1 };
+    k8s spec => Opaque;
 }
 
 # The same CRD named in full. Its Kind is the last segment, not the whole
@@ -58,7 +58,7 @@ use IO::K8s;
     use IO::K8s::APIObject
         api_version     => 'vendor.example.com/v1',
         resource_plural => 'doodads';
-    k8s spec => { Str => 1 };
+    k8s spec => Opaque;
 }
 
 # ----------------------------------------------------------------------------

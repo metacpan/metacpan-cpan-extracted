@@ -1,14 +1,26 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Builder::Tester;
 
 use Test::Metrics::Any;
 
 use Metrics::Any '$metrics';
+
+# Detect the line number reporting behaviour of this version of perl, to
+# defend against failures introduced by Perl #24396
+my $CALLER_SEES_BLOCK_END;
+BEGIN {
+   sub probe_caller {
+      my $line = (caller)[2];
+      $CALLER_SEES_BLOCK_END = 1 if $line != shift;
+   }
+   probe_caller __LINE__,
+      sub { };
+}
 
 $metrics->make_counter( metric =>
    name => "the_metric_name",
@@ -28,7 +40,7 @@ $metrics->make_counter( metric =>
 # Missing
 {
    test_out( "not ok 1 - metric missing" );
-   test_fail( +4 );
+   test_fail( $CALLER_SEES_BLOCK_END ? +4 : +2 );
    test_err( "# Expected a metric called 'a_different_metric' but didn't find one" );
    is_metrics_from(
       sub { $metrics->inc_counter( metric => ); },
@@ -41,7 +53,7 @@ $metrics->make_counter( metric =>
 # Wrong value
 {
    test_out( "not ok 1 - metric differing" );
-   test_fail( +4 );
+   test_fail( $CALLER_SEES_BLOCK_END ? +4 : +2 );
    test_err( "# Expected metric 'the_metric_name' to be 2 but got 4" );
    is_metrics_from(
       sub { $metrics->inc_counter_by( metric => 4 ); },

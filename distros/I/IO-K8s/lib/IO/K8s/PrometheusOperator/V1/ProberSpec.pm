@@ -1,11 +1,11 @@
 package IO::K8s::PrometheusOperator::V1::ProberSpec;
 # ABSTRACT: prober defines the specification for the prober to use for probing targets.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s noProxy              => Str;
 k8s path                 => Str, { default => '/probe' };
-k8s proxyConnectHeader   => { Str => 1 };
+k8s proxyConnectHeader   => Opaque;
 k8s proxyFromEnvironment => Bool;
 k8s proxyUrl             => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s scheme               => Str, { enum => [qw(http https HTTP HTTPS)] };
@@ -32,7 +32,7 @@ IO::K8s::PrometheusOperator::V1::ProberSpec - prober defines the specification f
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 noProxy
 

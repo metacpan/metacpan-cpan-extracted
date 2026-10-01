@@ -61,6 +61,6 @@ for my $f (qw(magic version elem_size variant_id)) {
 # Sanity: actually decode magic + version matches runtime values
 my ($magic, $version) = unpack('V V', substr($hdr, 0, 8));
 is $magic,   0x504F4C31, "magic == POL1";
-is $version, 1,          "version == 1";
+is $version, 2,          "version == 2";
 
 done_testing;

@@ -115,8 +115,9 @@ subtest 'entries carry the acting agent and the resulting status' => sub {
 
 subtest 'pick logs its mutation exactly once' => sub {
     # Task 1 is claimed by the handoff above and task 2 is gone, so give pick
-    # something unclaimed to find.
-    _run_execute( App::karr::Cmd::Create->new( store => $store ), 'Gamma' );
+    # something unclaimed to find -- in todo, since pick never takes a card
+    # out of backlog (ticket k306).
+    _run_execute( App::karr::Cmd::Create->new( store => $store, status => 'todo' ), 'Gamma' );
 
     my $cmd = App::karr::Cmd::Pick->new(
         store => $store,

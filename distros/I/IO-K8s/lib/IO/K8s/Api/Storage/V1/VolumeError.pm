@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::VolumeError;
 # ABSTRACT: VolumeError captures an error encountered during a volume operation.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s errorCode => Int;
@@ -26,7 +26,7 @@ IO::K8s::Api::Storage::V1::VolumeError - VolumeError captures an error encounter
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 errorCode
 

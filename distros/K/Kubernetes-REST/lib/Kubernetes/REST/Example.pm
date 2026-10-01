@@ -1,6 +1,6 @@
 package Kubernetes::REST::Example;
 # ABSTRACT: Working examples for Kubernetes::REST with Minikube, K3s, and other clusters
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 1;
 
 __END__
@@ -15,7 +15,7 @@ Kubernetes::REST::Example - Working examples for Kubernetes::REST with Minikube,
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 
@@ -26,10 +26,6 @@ L<IO::K8s> typed objects.
 Every code snippet is ready to copy-paste into a script once you have a
 running cluster and the Perl dependencies installed. A comprehensive
 runnable demo script is included in C<eg/demo.pl>.
-
-=head1 NAME
-
-Kubernetes::REST::Example - Working examples for Kubernetes::REST with Minikube, K3s, and other clusters
 
 =head1 CLUSTER SETUP
 

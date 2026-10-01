@@ -1,14 +1,14 @@
 package IO::K8s::AgentSandbox::V1alpha1::SandboxTemplate;
 # ABSTRACT: Reusable sandbox configuration template
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'extensions.agents.x-k8s.io/v1alpha1',
     resource_plural => 'sandboxtemplates';
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec => {
-    podTemplate                => { Str => 1 },
-    networkPolicy               => { Str => 1 },
+    podTemplate                => Opaque,
+    networkPolicy               => Opaque,
     networkPolicyManagement     => Str,
     envVarsInjectionPolicy      => Str,
     service                     => Bool,
@@ -29,7 +29,7 @@ IO::K8s::AgentSandbox::V1alpha1::SandboxTemplate - Reusable sandbox configuratio
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 

@@ -1,9 +1,9 @@
 package IO::K8s::Api::Core::V1::PodStatus;
 # ABSTRACT: PodStatus represents information about the status of a pod. Status may trail the actual state of a system, especially if the node that hosts the pod cannot contact the control plane.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
-k8s allocatedResources => { Str => 1 };
+k8s allocatedResources => HashRef[Quantity];
 
 
 k8s conditions => ['Core::V1::PodCondition'];
@@ -83,7 +83,7 @@ IO::K8s::Api::Core::V1::PodStatus - PodStatus represents information about the s
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allocatedResources
 

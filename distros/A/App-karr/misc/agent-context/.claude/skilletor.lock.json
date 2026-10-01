@@ -1,0 +1,42 @@
+{
+  "skills/getty-git-commit-style": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-commit-style/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-commit-style/SKILL.md": "sha256:959bed63af658dcec1abc3010a2a262d347851a8aae87d833736d065c0f9f863"
+    }
+  },
+  "skills/getty-git-usage": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-usage/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-usage/SKILL.md": "sha256:9a4cdf50cc3991e16b2af8882175e8e9a4e27b40fd93605898348ed2db506630"
+    }
+  },
+  "skills/getty-perl-core": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-core/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-core/SKILL.md": "sha256:eec7e726b0deab2a50dd5b99c2f16c68b332ba8ac6296642679f3bfd3bc46816"
+    }
+  },
+  "skills/getty-perl-moo": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-moo/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-moo/SKILL.md": "sha256:40935882df586ed9db50466c1c289913beaec39c74fced3d25e99a585100e03c"
+    }
+  },
+  "skills/perl-release-dist-ini": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/perl-release-dist-ini/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/perl-release-dist-ini/SKILL.md": "sha256:968219fbff70237c642d39e5ece9cc619680a46c4493fee64138e9a9400a97bb"
+    }
+  }
+}

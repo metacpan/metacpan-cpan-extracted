@@ -4,7 +4,7 @@ App::makefilepl2cpanfile - Convert Makefile.PL to a cpanfile automatically
 
 ## Version
 
-This document describes App::makefilepl2cpanfile version 0.05.
+This document describes App::makefilepl2cpanfile version 0.06.
 
 ## Synopsis
 
@@ -82,6 +82,10 @@ searched for the parts that list dependencies.  This makes the tool safe
 to use on code you do not trust, but it also means that it cannot see
 dependencies that are computed while the program runs (see
 ["COMMON PITFALLS"](#common-pitfalls)).
+
+Reading takes time in proportion to the size of the input, however it is
+written, so a hostile `Makefile.PL` or `cpanfile` (for example one with
+thousands of unclosed braces) cannot make the tool hang.
 
 ### What It Reads
 
@@ -702,9 +706,10 @@ to be a regular file.
 
 - The `Makefile.PL` is read with patterns, not run, so dependencies
 that are computed by code cannot be found (see ["COMMON PITFALLS"](#common-pitfalls)).
-- Dependency lists nested more than four braces deep inside a
-single entry are not fully read.  Normal `Makefile.PL` files never
-come close to this.
+- Braces are matched without regard to quotes or comments, so an
+unmatched `{` or `}` inside a string or a `#` comment within a
+dependency list can hide some or all of that list's entries.  Dependency
+lists may otherwise nest to any depth.
 - Only one `on 'develop'` section of an existing `cpanfile` is
 used: the first one.
 

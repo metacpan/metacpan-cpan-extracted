@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1beta1::Lifecycle;
 # ABSTRACT: Lifecycle
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s shutdownPolicy          => Str, { enum => [qw(Delete DeleteForeground Retain)], default => 'Retain' };
@@ -24,7 +24,7 @@ IO::K8s::AgentSandbox::V1beta1::Lifecycle - Lifecycle
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 shutdownPolicy
 

@@ -1,0 +1,24 @@
+Revision history for Test-Permissions
+
+0.001.0	Wed Sep 30 10:32:18 AM EDT 2026
+	First version, taken from App-makefilepl2cpanfile's private
+	  t/lib/Test/Permissions.pm and extended:
+	Seven kinds of access: read, write, create, search, exec, delete and
+	  sticky.  create is what the private helper called can_revoke_write;
+	  can_revoke_write now checks a file's own write bit
+	Probe the directory the caller names (default File::Spec->tmpdir),
+	  and cache per kind, canonical directory, effective uid and groups;
+	  set_cache_scope('device') shares answers across a device
+	Every probe checks a baseline, checks that chmod really changed the
+	  mode, and counts only EACCES or EPERM as denied
+	why_not() gives the reason for a 0 answer; skip_unless_can_revoke()
+	  skips a SKIP block with it, natively under Test2::V0
+	acl_denies() finds an ACL (or similar) that denies access the mode
+	  bits allow
+	with_revoked() takes access away for the length of a block and always
+	  restores the mode
+	permissions_report() describes the environment, for diag()
+	Works under taint mode (perl -T)
+	Probes never die or warn, restore modes and leave nothing behind
+	Messages can be translated with set_messages()
+	Needs perl 5.26, because Params::Validate::Strict does

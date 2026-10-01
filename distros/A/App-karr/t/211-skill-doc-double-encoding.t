@@ -6,7 +6,8 @@ use Path::Tiny qw( path );
 use Encode qw( decode FB_CROAK );
 
 # Ticket #211: the shipped skill doc (then share/claude-skill.md, since #285
-# share/kanban-issues-karr-cli/SKILL.md plus references/*.md) -- what
+# share/kanban-issues-karr-cli/SKILL.md plus references/*.md, now
+# share/kanban-issues-karr-coordination/ and share/kanban-issues-karr-ticket/) -- what
 # `karr skill install` hands to users -- carried two double-encoded UTF-8
 # sequences: an em dash
 # (\xc3\xa2\xc2\x80\xc2\x94 instead of \xe2\x80\x94) and an arrow
@@ -21,13 +22,13 @@ use Encode qw( decode FB_CROAK );
 # class of bug tends to leave behind.
 #
 # Scope: App::karr::Role::SkillFile::_skill_files (lib/App/karr/Role/SkillFile.pm)
-# walks share/kanban-issues-karr-cli/ for every *.md `karr skill`/`karr init`
+# walks each share/<skill>/ for every *.md `karr skill`/`karr init`
 # ship, and this test walks all of share/ -- recursively, which is what
 # reaches the references/ subdirectory -- instead of naming any file, so a
 # reference doc dropped in later is covered without anyone having to remember
 # to update this test.
 #
-# .claude/skills/kanban-issues-karr-cli/ (the copy this repo's own agents are
+# .claude/skills/<skill>/ (the copies this repo's own agents are
 # briefed with) is not scanned here: t/62-skill-doc-sync.t already requires
 # each file's body to be byte-identical to its twin under share/, so a
 # mojibake regression in either copy becomes a body mismatch that test

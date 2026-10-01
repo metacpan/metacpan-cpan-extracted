@@ -1,0 +1,21 @@
+{
+  "sources": {
+    "getty": {
+      "git": "https://github.com/Getty/skills.git",
+      "ref": "main"
+    }
+  },
+  "install": {
+    "skills": [
+      "getty-git-commit-style@getty",
+      "getty-git-usage@getty",
+      "getty-perl-core@getty",
+      "getty-perl-moo@getty",
+      "perl-release-dist-ini@getty"
+    ]
+  },
+  "targets": [
+    "claude"
+  ],
+  "gitignore": true
+}

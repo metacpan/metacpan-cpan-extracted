@@ -31,8 +31,8 @@ scalar_types:
   io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime: Time
   io.k8s.apimachinery.pkg.util.intstr.IntOrString: IntOrStr
 
-# Upstream types this dist deliberately models as an unconstrained
-# hash-of-string ({ Str => 1 } in the k8s() DSL) rather than a class, because
+# Upstream types this dist deliberately models as the free map (Opaque in the
+# k8s() DSL; { Str => 1 } before k191) rather than a class, because
 # they serialize as an arbitrary JSON blob. See AutoGen.pm %OPAQUE_TYPES.
 opaque_types:
   - io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1

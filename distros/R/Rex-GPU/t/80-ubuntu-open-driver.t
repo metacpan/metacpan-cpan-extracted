@@ -31,6 +31,14 @@ use Test::More;
 # gates first)" is deliberately REPLACED: the device ID decides, not the arch.
 # The non-regression claim is kept: a non-Blackwell GPU stays on -server.
 #
+# karr #72: Grace Hopper GH200 (2342, 2348) is open too now -- a maintainer
+# decision, not something NVIDIA's own driver README says (kernel_open.html
+# still lists Hopper as proprietary-supported up to 615.71.09, with no Grace
+# exception). This REPLACES the k16 assertion below that GH200 (2342) => 0;
+# GH200's own narrow row in Rex::GPU::NVIDIA::Requirement's generations table
+# now returns kernel_module 'open', ahead of the Turing-to-Hopper block it
+# sits inside.
+#
 # NOT covered here (needs a real Ubuntu Blackwell host — none was available
 # for k15 or k16; see the t/10-detect.t header for the wider "what prove
 # cannot see"):
@@ -84,7 +92,6 @@ subtest 'open_kernel_module_required — Blackwell device-ID ranges (karr #16)' 
   is($okm->('2684'), 0, 'GeForce RTX 4090 (Ada, 2684) => 0');
   is($okm->('26b9'), 0, 'L40S (Ada, 26b9) => 0');
   is($okm->('2330'), 0, 'H100 SXM (Hopper, 2330) => 0');
-  is($okm->('2342'), 0, 'GH200 (Hopper, 2342) => 0');
   is($okm->('20b0'), 0, 'A100 (Ampere, 20b0) => 0');
   is($okm->('1eb0'), 0, 'Quadro RTX 5000 (Turing, 1eb0) => 0');
   # Unknown / future IDs outside the ranges: no guess
@@ -97,6 +104,18 @@ subtest 'open_kernel_module_required — Blackwell device-ID ranges (karr #16)' 
   is($okm->('2b85x'), 0, 'trailing garbage => 0');
   is($okm->('zzzz'),  0, 'non-hex => 0');
   is($okm->(''),      0, 'empty string => 0');
+};
+
+subtest 'open_kernel_module_required — GH200 (karr #72, REPLACES "2342 => 0" above)' => sub {
+  my $okm = \&Rex::GPU::Detect::open_kernel_module_required;
+  # Maintainer decision (karr #72): GH200's own narrow row in
+  # Rex::GPU::NVIDIA::Requirement's generations table gives it the open
+  # kernel module even though it sits inside the Turing-to-Hopper block and
+  # NVIDIA's own driver README still lists Hopper as proprietary-supported.
+  is($okm->('2342'), 1, 'GH200 120GB/480GB (2342) => open');
+  is($okm->('2348'), 1, 'GH200 144G HBM3e (2348) => open');
+  is($okm->('2341'), 0, 'neighbour 2341 (just below 2342) => 0, still Turing/Ampere/Ada/Hopper');
+  is($okm->('2343'), 0, 'neighbour 2343 (just above 2342) => 0, still Turing/Ampere/Ada/Hopper');
 };
 
 #### Which Ubuntu source the plan picks
@@ -139,32 +158,45 @@ subtest 'GB10 (aarch64 Spark) => still open' => sub {
 };
 
 subtest 'Blackwell on x86_64, via the real lspci parser => open (karr #16)' => sub {
-  my $rtx5090 = Rex::GPU::Detect::_parse_nvidia_line(
+  my $rtx5090 = Rex::GPU::Detect->_parse_nvidia_line(
     '01:00.0 VGA compatible controller [0300]: NVIDIA Corporation GB202 [GeForce RTX 5090] [10de:2b85] (rev a1)'
   );
   is($rtx5090->{compute},   1,      'RTX 5090 is compute (RTX name match)');
   is($rtx5090->{device_id}, '2b85', 'device id parsed');
   is(needs_open($rtx5090),  1,      'RTX 5090 => open');
 
-  my $b200 = Rex::GPU::Detect::_parse_nvidia_line(
+  my $b200 = Rex::GPU::Detect->_parse_nvidia_line(
     '18:00.0 3D controller [0302]: NVIDIA Corporation GB100 [B200] [10de:2901] (rev a1)'
   );
   is($b200->{compute},  1, 'B200 is compute (class 0302)');
   is(needs_open($b200), 1, 'B200 => open');
 
-  my $pro6000 = Rex::GPU::Detect::_parse_nvidia_line(
+  my $pro6000 = Rex::GPU::Detect->_parse_nvidia_line(
     '41:00.0 3D controller [0302]: NVIDIA Corporation GB202GL [RTX PRO 6000 Blackwell Server Edition] [10de:2bb5] (rev a1)'
   );
   is(needs_open($pro6000), 1, 'RTX PRO 6000 Blackwell Server Edition => open');
 };
 
+# End-to-end (karr #72): T::Ubuntu's plan chooses among Setup::Ubuntu's real
+# sources() -- ubuntu-server (proprietary) is rejected on kernel_module alone
+# before ubuntu-server-open is tried, so this is the same selection a live
+# plan makes, not just the open_kernel_module_required lookup above.
+subtest 'GH200 on Ubuntu, via the real lspci parser => -server-open, not -server (karr #72)' => sub {
+  my $gh200 = Rex::GPU::Detect->_parse_nvidia_line(
+    '01:00.0 3D controller [0302]: NVIDIA Corporation GH100 [GH200 120GB / 480GB] [10de:2342] (rev a1)'
+  );
+  is($gh200->{compute},   1,      'GH200 is compute (class 0302)');
+  is($gh200->{device_id}, '2342', 'device id parsed');
+  is(needs_open($gh200),  1,      'GH200 => plan picks ubuntu-server-open');
+};
+
 subtest 'non-Blackwell GPUs stay on -server (the non-regression point)' => sub {
   is(needs_open($rtx4000), 0, 'RTX 4000 SFF Ada (27b0) => not open');
-  my $h100 = Rex::GPU::Detect::_parse_nvidia_line(
+  my $h100 = Rex::GPU::Detect->_parse_nvidia_line(
     '17:00.0 3D controller [0302]: NVIDIA Corporation GH100 [H100 SXM5 80GB] [10de:2330] (rev a1)'
   );
   is(needs_open($h100), 0, 'H100 (Hopper, 2330) => not open');
-  my $rtx4090 = Rex::GPU::Detect::_parse_nvidia_line(
+  my $rtx4090 = Rex::GPU::Detect->_parse_nvidia_line(
     '01:00.0 VGA compatible controller [0300]: NVIDIA Corporation AD102 [GeForce RTX 4090] [10de:2684] (rev a1)'
   );
   is(needs_open($rtx4090), 0, 'RTX 4090 (Ada, 2684) => not open');

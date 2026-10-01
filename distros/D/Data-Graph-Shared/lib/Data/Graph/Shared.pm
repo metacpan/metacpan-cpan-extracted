@@ -1,7 +1,7 @@
 package Data::Graph::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 require XSLoader;
 XSLoader::load('Data::Graph::Shared', $VERSION);
 
@@ -82,6 +82,12 @@ sets the backing-file permissions. C<new_readonly> opens a B<frozen> file
 read-only for lock-free queries (see L</"FROZEN (READ-ONLY) MODE">). The
 descriptor you pass is duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to
 close and closing it does not disturb the handle.
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of dying with SIGBUS while they zero
+it; C<DATA_GRAPH_SHARED_SPARSE=1> skips the reservation. On tmpfs and memfd
+the segment is memory, and a memory cgroup too small for it gets an OOM kill
+rather than a croak.
 
 =head2 Operations
 

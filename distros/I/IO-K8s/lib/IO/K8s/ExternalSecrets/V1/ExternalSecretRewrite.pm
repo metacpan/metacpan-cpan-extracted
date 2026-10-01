@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ExternalSecretRewrite;
 # ABSTRACT: ExternalSecretRewrite defines how to rewrite secret data values before they are written to the Secret.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s merge     => '+IO::K8s::ExternalSecrets::V1::ExternalSecretRewriteMerge';
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::ExternalSecretRewrite - ExternalSecretRewrite defi
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 merge
 

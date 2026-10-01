@@ -6,7 +6,7 @@ use File::Temp qw(tempfile);
 use Data::Pool::Shared;
 
 my $POOL_MAGIC   = 0x504F4C31;   # POL1
-my $POOL_VERSION = 1;
+my $POOL_VERSION = 2;
 my $POOL_VAR_I64 = 1;
 
 # PoolHeader layout: magic(u32) version(u32) elem_size(u32) variant_id(u32)

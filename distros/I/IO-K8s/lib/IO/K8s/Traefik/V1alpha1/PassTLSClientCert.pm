@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::PassTLSClientCert;
 # ABSTRACT: PassTLSClientCert holds the pass TLS client cert middleware configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s info => '+IO::K8s::Traefik::V1alpha1::TLSClientCertificateInfo';
@@ -22,7 +22,7 @@ IO::K8s::Traefik::V1alpha1::PassTLSClientCert - PassTLSClientCert holds the pass
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 info
 

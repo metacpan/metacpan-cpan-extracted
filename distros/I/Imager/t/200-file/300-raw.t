@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 56;
+use Test::More;
 use Imager qw(:all);
 use Imager::Test qw/is_color3 is_color4 test_image test_image_mono is_image/;
 
@@ -275,6 +275,79 @@ SKIP:
   is_color4($im->getpixel(x => 2, y => 1), 0x12, 0x23, 0x34, 0x00,
 	    "check last channel zeroed");
 }
+{
+  for my $datach (-1, 0, 17) {
+    my $im = Imager->new;
+    my $data = "\x00" x (4 * 4 * 3);
+    ok(!$im->read(data => \$data, type => "raw",
+                  raw_interleave => 0,
+                  xsize => 4,
+                  ysize => 4,
+                  raw_datachannels => $datach),
+       "read with datachannels $datach");
+    is($im->errstr, "raw_datachannels must be between 1 and 16",
+       "check message for datachannels $datach");
+  }
+}
+{
+  # black to compare against
+  # not a great check
+  my $cmpimg = Imager->new(xsize => 4, ysize => 4, channels => 3);
+  for my $datach (1, 4, 16) {
+    my $im = Imager->new;
+    my $data = "\x00" x (4 * 4 * $datach);
+    ok($im->read(data => \$data, type => "raw",
+                 raw_interleave => 0,
+                 xsize => 4,
+                 ysize => 4,
+                 raw_datachannels => $datach),
+       "read with datachannels $datach");
+    is_image($im, $cmpimg, "$datach: got an image");
+  }
+}
+
+{
+  # test file limits obeyed
+  my $data = "\x00" x (150 * 150 * 3);
+  ok(Imager->set_file_limits(reset=>1, width=>149), "set width limit 149");
+  my $im = Imager->new;
+  ok(!$im->read(data=>$data, type => "raw", xsize => 150, ysize => 150,
+               raw_interleave => 1),
+     "should fail read due to size limits");
+  print "# ",$im->errstr,"\n";
+  like($im->errstr, qr/image width/, "check message");
+
+  ok(Imager->set_file_limits(reset=>1, height=>149), "set height limit 149");
+  ok(!$im->read(data=>$data, type => "raw", xsize => 150, ysize => 150,
+               raw_interleave => 1),
+     "should fail read due to size limits");
+  print "# ",$im->errstr,"\n";
+  like($im->errstr, qr/image height/, "check message");
+
+  ok(Imager->set_file_limits(reset=>1, width=>150), "set width limit 150");
+  ok($im->read(data=>$data, type => "raw", xsize => 150, ysize => 150,
+               raw_interleave => 1),
+     "should succeed - just inside width limit");
+  ok(Imager->set_file_limits(reset=>1, height=>150), "set height limit 150");
+  ok($im->read(data=>$data, type => "raw", xsize => 150, ysize => 150,
+               raw_interleave => 1),
+     "should succeed - just inside height limit");
+
+  # 150 x 150 x 3 channel image uses 67500 bytes
+  ok(Imager->set_file_limits(reset=>1, bytes=>67499),
+     "set bytes limit 67499");
+  ok(!$im->read(data=>$data, type => "raw", xsize => 150, ysize => 150,
+               raw_interleave => 1),
+     "should fail - too many bytes");
+  print "# ",$im->errstr,"\n";
+  like($im->errstr, qr/storage size/, "check error message");
+  ok(Imager->set_file_limits(reset=>1, bytes=>67500),
+     "set bytes limit 67500");
+  ok($im->read(data=>$data, type => "raw", xsize => 150, ysize => 150,
+               raw_interleave => 1),
+     "should succeed - just inside bytes limit");
+  Imager->set_file_limits(reset=>1);
+}
 
 {
   my @ims = ( basic => test_image(), mono => test_image_mono() );
@@ -320,6 +393,8 @@ unless ($ENV{IMAGER_KEEP_FILES}) {
   unlink(qw(testout/t103_base.raw testout/t103_3to4.raw
 	    testout/t103_line_int.raw testout/t103_img_int.raw))
 }
+
+done_testing();
 
 sub read_test {
   my ($in, $xsize, $ysize, $data, $store, $intrl, $base) = @_;

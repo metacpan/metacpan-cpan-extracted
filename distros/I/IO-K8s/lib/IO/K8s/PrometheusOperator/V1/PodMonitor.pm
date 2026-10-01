@@ -1,9 +1,10 @@
 package IO::K8s::PrometheusOperator::V1::PodMonitor;
 # ABSTRACT: The `PodMonitor` custom resource definition (CRD) defines how `Prometheus` and `PrometheusAgent` can scrape metrics from a group of pods.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'monitoring.coreos.com/v1',
-    resource_plural => 'podmonitors';
+    resource_plural => 'podmonitors',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => '+IO::K8s::PrometheusOperator::V1::PodMonitorSpec', { required => 'schema' };
@@ -25,7 +26,7 @@ IO::K8s::PrometheusOperator::V1::PodMonitor - The `PodMonitor` custom resource d
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

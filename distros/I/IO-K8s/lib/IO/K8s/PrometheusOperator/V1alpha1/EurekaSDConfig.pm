@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::EurekaSDConfig;
 # ABSTRACT: Eureka SD configurations allow retrieving scrape targets using the Eureka REST API.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s authorization        => '+IO::K8s::PrometheusOperator::V1alpha1::SafeAuthorization';
@@ -9,7 +9,7 @@ k8s enableHTTP2          => Bool;
 k8s followRedirects      => Bool;
 k8s noProxy              => Str;
 k8s oauth2               => '+IO::K8s::PrometheusOperator::V1alpha1::OAuth2';
-k8s proxyConnectHeader   => { Str => 1 };
+k8s proxyConnectHeader   => Opaque;
 k8s proxyFromEnvironment => Bool;
 k8s proxyUrl             => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s refreshInterval      => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$/ };
@@ -42,7 +42,7 @@ IO::K8s::PrometheusOperator::V1alpha1::EurekaSDConfig - Eureka SD configurations
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 authorization
 

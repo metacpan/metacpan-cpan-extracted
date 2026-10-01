@@ -69,7 +69,7 @@ sub nsort { sort { $a <=> $b } @_ }
 
     my $st = $a->stats;
     is $st->{buckets_used}, 1, 'exactly one bucket used';
-    is $st->{containers_used}, 2, 'one container slot used (plus reserved slot 0)';
+    is $st->{containers_used}, 3, 'one container slot plus the spare a rewrite copies into (plus reserved slot 0)';
     is $st->{cardinality}, 5000, 'stats cardinality matches';
 
     is $a->min, 0, 'min 0 in the dense bucket';

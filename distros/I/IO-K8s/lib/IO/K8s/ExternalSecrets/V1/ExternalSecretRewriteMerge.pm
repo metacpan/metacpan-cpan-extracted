@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ExternalSecretRewriteMerge;
 # ABSTRACT: Used to merge key/values in one single Secret The resulting key will contain all values from the specified secrets
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s conflictPolicy => Str, { enum => [qw(Ignore Error)], default => 'Error' };
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::ExternalSecretRewriteMerge - Used to merge key/val
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 conflictPolicy
 

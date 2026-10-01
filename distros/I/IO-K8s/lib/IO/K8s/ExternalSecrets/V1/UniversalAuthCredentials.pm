@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::UniversalAuthCredentials;
 # ABSTRACT: UniversalAuthCredentials represents the client credentials for universal authentication.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s clientId     => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::UniversalAuthCredentials - UniversalAuthCredential
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 clientId
 

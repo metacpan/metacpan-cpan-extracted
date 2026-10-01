@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::GitlabSecretRef;
 # ABSTRACT: GitlabSecretRef contains the secret reference for GitLab authentication credentials.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s accessToken => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::GitlabSecretRef - GitlabSecretRef contains the sec
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 accessToken
 

@@ -32,8 +32,9 @@ use Test::More;
 # -----------------------------------------------------------------------------
 
 use Rex::GPU::NVIDIA;
+use Rex::GPU::NVIDIA::Setup::Debian;
 
-sub rewrite { [ Rex::GPU::NVIDIA::_deb822_enable_nonfree($_[0]) ] }
+sub rewrite { [ Rex::GPU::NVIDIA::Setup::Debian->_deb822_enable_nonfree($_[0]) ] }
 
 my $KEY = 'Signed-By: /usr/share/keyrings/debian-archive-keyring.pgp';
 

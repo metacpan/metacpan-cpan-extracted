@@ -1,18 +1,19 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2026 -- leonerd@leonerd.org.uk
 
-package Test::Metrics::Any;
+package Test::Metrics::Any 0.02;
 
-use strict;
+use v5.20;
 use warnings;
 use base qw( Test::Builder::Module );
 
+use feature qw( signatures );
+no warnings qw( experimental::signatures );
+
 use Metrics::Any::Adapter 'Test';
 use Metrics::Any::Adapter::Test; # Eager load
-
-our $VERSION = '0.01';
 
 our @EXPORT = qw(
    is_metrics
@@ -24,6 +25,8 @@ our @EXPORT = qw(
 C<Test::Metrics::Any> - assert that code produces metrics via L<Metrics::Any>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Test::More;
    use Test::Metrics::Any;
@@ -57,7 +60,7 @@ C<Test>.
 
 =head2 is_metrics
 
-   is_metrics( \%metrics, $name )
+   is_metrics( \%metrics, $name );
 
 Asserts that the current value of every metric named in the given hash
 reference is set to the value provided. Values can either be given as exact
@@ -80,9 +83,8 @@ set up to expect them.
 
 =cut
 
-sub is_metrics
+sub is_metrics ( $expect, $testname )
 {
-   my ( $expect, $testname ) = @_;
    my $tb = __PACKAGE__->builder;
 
    my %got = map { ( split m/\s*=\s*/, $_ )[0,1] } split m/\n/, Metrics::Any::Adapter::Test->metrics;
@@ -118,7 +120,7 @@ sub is_metrics
 
 =head2 is_metrics_from
 
-   is_metrics_from( $code, \%metrics, $name )
+   is_metrics_from( $code, \%metrics, $name );
 
 Asserts the value of metrics reported by running the given piece of code.
 
@@ -127,16 +129,20 @@ any metrics are checked in the same manner as L</is_metrics>.
 
 =cut
 
-sub is_metrics_from(&@)
+# mixing prototype and signature is awkward before 5.28
 {
-   my ( $code, $expect, $testname ) = @_;
+   no feature 'signatures';
 
-   Metrics::Any::Adapter::Test->clear;
+   sub is_metrics_from(&@)
+   {
+      my ( $code, $expect, $testname ) = @_;
+      Metrics::Any::Adapter::Test->clear;
 
-   $code->();
+      $code->();
 
-   local $Test::Builder::Level = $Test::Builder::Level + 1;
-   return is_metrics( $expect, $testname );
+      local $Test::Builder::Level = $Test::Builder::Level + 1;
+      return is_metrics( $expect, $testname );
+   }
 }
 
 =head1 PREDICATES
@@ -151,11 +157,13 @@ These predicates are not exported but must be invoked fully-qualified.
 
 =cut
 
-sub predicate { return bless [ @_ ], "Test::Metrics::Any::_predicate" }
+sub predicate ( $message, $checker )
 {
-   package Test::Metrics::Any::_predicate;
-   sub check   { my $self = shift; $self->[1]->( shift ) }
-   sub message { my $self = shift; $self->[0] }
+   return bless [ $message, $checker ], "Test::Metrics::Any::_predicate";
+}
+package Test::Metrics::Any::_predicate {
+   sub check   ( $self, $value ) { $self->[1]->( $value ) }
+   sub message ( $self )         { $self->[0] }
 }
 
 =head2 positive
@@ -166,7 +174,10 @@ Asserts that the number is greater than zero. It must not be zero.
 
 =cut
 
-sub positive { predicate positive => sub { shift > 0 } }
+sub positive ()
+{
+   predicate positive => sub ( $value ) { $value > 0 };
+}
 
 =head2 at_least
 
@@ -176,7 +187,10 @@ Asserts that the number at least that given - it can be equal or greater.
 
 =cut
 
-sub at_least { my ($n) = @_; predicate "at least $n" => sub { shift >= $n } }
+sub at_least ( $n )
+{
+   predicate "at least $n" => sub ( $value ) { $value >= $n };
+}
 
 =head2 greater_than
 
@@ -186,7 +200,10 @@ Asserts that the number is greater than that given - it must not be equal.
 
 =cut
 
-sub greater_than { my ($n) = @_; predicate "greater than $n" => sub { shift > $n } }
+sub greater_than ( $n )
+{
+   predicate "greater than $n" => sub ( $value ) { $value > $n }
+}
 
 =head1 AUTHOR
 

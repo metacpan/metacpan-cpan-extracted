@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::EgressRule;
 # ABSTRACT: EgressRule contains all rule types which can be applied at egress, i.e.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s authentication => '+IO::K8s::Cilium::V2::Authentication';
@@ -42,7 +42,7 @@ IO::K8s::Cilium::V2::EgressRule - EgressRule contains all rule types which can b
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 authentication
 

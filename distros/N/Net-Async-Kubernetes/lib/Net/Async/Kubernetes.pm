@@ -1,11 +1,11 @@
 package Net::Async::Kubernetes;
 # ABSTRACT: Async Kubernetes client for IO::Async
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
 
-use Carp qw(croak);
+use Carp qw(carp croak);
 use Scalar::Util qw(blessed);
 use IO::Socket::SSL;
 use File::Temp ();
@@ -54,6 +54,9 @@ sub configure {
     if (exists $params{resource_map_from_cluster}) {
         $self->{resource_map_from_cluster} = delete $params{resource_map_from_cluster};
     }
+    if (exists $params{with}) {
+        $self->{with} = delete $params{with};
+    }
 
     # Resolve server/credentials via Kubeconfig (handles kubeconfig files
     # and in-cluster service account auto-detection)
@@ -63,8 +66,10 @@ sub configure {
             ($self->{kubeconfig} ? (kubeconfig_path => $self->{kubeconfig}) : ()),
             ($self->{context}    ? (context_name    => $self->{context})    : ()),
         );
-        if ($self->{kubeconfig}) {
-            # Explicit kubeconfig — must resolve or croak
+        if ($self->{kubeconfig} || $self->{context}) {
+            # Explicit kubeconfig or context — must resolve or croak with the
+            # reason; swallowed, it would only resurface as "server or
+            # kubeconfig required" on first use.
             my $api = $kc->api;
             $self->{server}      = $api->server;
             $self->{credentials} = $api->credentials;
@@ -92,6 +97,9 @@ sub resource_map             { $_[0]->{resource_map} }
 sub resource_map_from_cluster { $_[0]->{resource_map_from_cluster} // 0 }
 
 
+sub with                     { $_[0]->{with} // [] }
+
+
 sub server {
     my ($self) = @_;
     $self->{server} // croak "server or kubeconfig required";
@@ -111,6 +119,7 @@ sub rest {
         credentials => $self->credentials,
         resource_map_from_cluster => $self->resource_map_from_cluster,
         ($self->resource_map ? (resource_map => $self->resource_map) : ()),
+        with        => $self->with,
     );
 }
 
@@ -188,7 +197,7 @@ sub _materialize_ssl_pem {
 # IO::K8s::expand_class fails closed: an unknown, malformed or mismatched
 # apiVersion yields undef instead of a bare-name guess. Passing that undef on to
 # build_path dies with "argument is not a module name", naming neither the
-# resource nor the reason, so every call site guards the result with this.
+# resource nor the reason, so _resolve_class reports it with this.
 sub _unknown_resource_error {
     my ($self, $short_class) = @_;
     return sprintf(
@@ -198,11 +207,207 @@ sub _unknown_resource_error {
     );
 }
 
+# The message for a reference where a resource name - a plain string - is
+# required, and nothing for a string. A reference reaches a name position two
+# ways: as the class-name argument (a manifest hashref handed to patch(),
+# caught by _resolve_class below), or as the object-name argument of get() and
+# delete() (a manifest hashref or an IO::K8s object, karr k70). Left unchecked
+# either one stringifies into the request path (.../pods/HASH(0x...)) and only
+# the server's 404 shows the error. One wording for both positions, so a
+# reference is refused the same way wherever it lands.
+sub _resource_name_error {
+    my ($self, $name) = @_;
+    return unless ref $name;
+    return 'resource name must be a string, got '
+        . (blessed($name) ? 'an object of class ' . ref($name)
+                          : 'a ' . ref($name) . ' reference');
+}
+
+# Resolve a resource name to its IO::K8s class. Returns the class, or
+# (undef, $message) when no usable class comes out of the name, which every
+# caller reports per its contract - a failed Future or a croak. Kubernetes::REST's
+# expand_class fails closed for a qualified name (undef) but open for a bare
+# Kind: it fabricates 'IO::K8s::<Kind>' whether or not that class exists. Both
+# are an unknown resource; whatever else can go wrong with the class it did
+# resolve to is _usable_class's to report. A reference is no name at all -
+# say a manifest hashref handed to patch() - and is refused as such
+# (_resource_name_error): expand_class would stringify it into a class name
+# ('IO::K8s::HASH(0x...)') and the load error would name that instead.
+sub _resolve_class {
+    my ($self, $name, @args) = @_;
+    if (my $error = $self->_resource_name_error($name)) {
+        return (undef, $error);
+    }
+    my $class = $self->_rest->expand_class($name, @args)
+        // return (undef, $self->_unknown_resource_error($name));
+    return $self->_usable_class($name, $class);
+}
+
+# What build_path would otherwise die on, synchronously and without naming the
+# resource: the class must load, and it must answer api_version as a class
+# method - build_path's own precondition for a path. That precondition, not a
+# role, is what tells a resource class from IO::K8s's helpers (List, Resource,
+# Types, Unstructured) that a bare name can land on: List has an api_version,
+# but as an instance accessor that dies when called on the class. Returns the
+# class, or (undef, $message) with the real cause - the load error, or "not a
+# resource class". A fabricated bare-Kind name that does not load is an
+# unknown resource, not a load error. IO::K8s::Unstructured is the one
+# resource without a class-level api_version - its Kind is instance data -
+# so, reached any other way than its own bare name 'Unstructured' (above all
+# through Kubernetes::REST's discovery fallback for a Kind), it is passed on
+# to build_path, which gets the Kind from _unstructured_hint.
+sub _usable_class {
+    my ($self, $name, $class) = @_;
+    my $rest = $self->_rest;
+    my $fabricated = defined $name && !ref $name && $class eq 'IO::K8s::' . $name;
+
+    unless ($class->can('new') || eval { $rest->k8s->load_class($class); 1 }) {
+        my $load_error = $@;
+        return (undef, $self->_unknown_resource_error($name)) if $fabricated;
+        chomp $load_error;
+        return (undef, sprintf(
+            "resource '%s' resolves to class %s, which cannot be loaded: %s",
+            $name, $class, $load_error,
+        ));
+    }
+
+    if ($class eq 'IO::K8s::Unstructured' && !$fabricated) {
+        # A qualified name counts only in its own group/version (see
+        # _request_path). Asking for its path confirms it exactly, from the
+        # cached catalog, without a request.
+        return $class unless defined $name && !ref $name && $name =~ m{/};
+        my ($path) = $self->_request_path($class, $name);
+        return defined $path ? $class : (undef, $self->_unknown_resource_error($name));
+    }
+    return $class if $class->can('api_version') && defined eval { $class->api_version };
+    return (undef, sprintf(
+        "resource '%s' resolves to %s, which is not a Kubernetes resource class"
+            . " (it has no api_version to build a request path from)",
+        $name, $class,
+    ));
+}
+
+# The class of an object handed to one of the object forms (create, update,
+# update_status, patch, patch_status, delete, ensure), which build their path
+# from it. It is checked like a resolved name (_usable_class): an IO::K8s::List,
+# a nested type such as a PodSpec, or no IO::K8s object at all has no request
+# path, and build_path - or the metadata lookup before it - would die on it
+# synchronously. Returns the class, or (undef, $message) naming $label, which
+# each caller reports per its contract - a failed Future or a croak.
+sub _object_class {
+    my ($self, $label, $object) = @_;
+    return (undef, "$label requires an IO::K8s object") unless blessed($object);
+    my ($class, $error) = $self->_usable_class(ref($object), ref($object));
+    return defined $class ? $class : (undef, "$label: $error");
+}
+
+# The extra build_path arguments for a class that resolved to
+# IO::K8s::Unstructured - empty for every other class, whose path comes from
+# the class alone. Unstructured has no class-level api_version: its Kind and
+# apiVersion are instance data, so build_path takes them from the caller and
+# looks plural and scope up in Kubernetes::REST's discovery catalog. $ident is
+# what the class came from. An object gives its own kind and apiVersion. A
+# name is split the way Kubernetes::REST's expand_class splits it: a qualified
+# 'example.org/v1/Widget' keeps its group and version, instead of landing in
+# whichever group serving a Widget discovery lists first, and an explicit
+# class name ('+...', 'IO::K8s::...', any '...::...') carries no Kind. Mirrors
+# the private helper of the same name in Kubernetes::REST, which is not part
+# of its public seam.
+sub _unstructured_hint {
+    my ($self, $class, $ident) = @_;
+    return () unless defined $class && $class eq 'IO::K8s::Unstructured';
+    my ($kind, $api_version);
+    if (blessed($ident)) {
+        ($kind, $api_version) = ($ident->kind, $ident->apiVersion);
+    } elsif (defined $ident && !ref $ident && $ident !~ m{\A(?:\+|IO::K8s::)}) {
+        if ($ident =~ m{/}) {
+            ($api_version, $kind) = $ident =~ m{\A(.*)/([^/]+)\z};
+        } elsif ($ident !~ /::/) {
+            $kind = $ident;
+        }
+    }
+    return (
+        (defined $kind        ? (kind        => $kind)        : ()),
+        (defined $api_version ? (api_version => $api_version) : ()),
+    );
+}
+
+# The request path for $class: Kubernetes::REST's build_path with %args and
+# the Unstructured hint for $ident, the name or object the class came from.
+# Returns the path, or (undef, $message) when build_path gives up - on
+# IO::K8s::Unstructured without discovery, or without a Kind (the explicit
+# class name, an object without kind) - which every caller reports per its
+# contract, a failed Future or a croak, as it does a resolution error.
+# build_path croaks for that, and synchronously: from a Future-returning
+# method it escaped as a die. The message drops the location the croak ends
+# in, which points here; a croaking caller adds its caller's own.
+#
+# An apiVersion in the hint - from a qualified name or the object - names
+# the one group/version the request may go to; a path outside it is refused
+# with Kubernetes::REST's own message (its k43), so list, delete and
+# ensure_only's prune never reach another group serving a Kind of that name.
+sub _request_path {
+    my ($self, $class, $ident, %args) = @_;
+    my %hint = $self->_unstructured_hint($class, $ident);
+    my $path = eval { $self->_rest->build_path($class, %args, %hint) };
+    unless (defined $path) {
+        my $error = $@ ? "$@" : "cannot build a request path for $class";
+        $error =~ s/\s+\z//;
+        $error =~ s/ at \S+ line \d+\.\z//;
+        return (undef, $error);
+    }
+    my $api_version = $hint{api_version};
+    if (defined $api_version && length $api_version) {
+        my $prefix = $api_version =~ m{/} ? "/apis/$api_version/" : "/api/$api_version/";
+        return (undef, "no discovery entry for Kind '" . ($hint{kind} // '') . "'"
+            . " in apiVersion '$api_version' - cannot build a path for IO::K8s::Unstructured")
+            unless index($path, $prefix) == 0;
+    }
+    return $path;
+}
+
+# The name to hand Kubernetes::REST's inflate_object, inflate_list and
+# process_watch_chunk for $class. A single-segment class of the caller's own
+# ('+Gizmo' in the resource_map, which expand_class returns as 'Gizmo') must
+# not read to them as the Kind Gizmo - IO::K8s::Gizmo, or whatever class the
+# map gives that Kind. A loaded IO::K8s resource class therefore goes over as
+# '+Class', which is taken exactly; anything else is left as it is. Mirrors
+# the private helper of the same name in Kubernetes::REST, which is not part
+# of its public seam.
+sub _exact_class {
+    my ($self, $class) = @_;
+    return '+' . $class
+        if defined $class && !ref $class && length $class && $class !~ /\A\+/
+            && $class->can('does') && $class->does('IO::K8s::Role::Resource');
+    return $class;
+}
+
 sub expand_class {
     my ($self, @args) = @_;
-    my $class = $self->_rest->expand_class(@args);
-    croak $self->_unknown_resource_error($args[0]) unless defined $class;
+    my ($class, $error) = $self->_resolve_class(@args);
+    croak $error unless defined $class;
     return $class;
+}
+
+
+sub discover {
+    my ($self) = @_;
+
+    my $rest = $self->_rest;
+    return Future->done unless $self->resource_map_from_cluster;
+
+    my %requests = $rest->prepare_discovery_requests;
+    my @roots = sort keys %requests;
+    return Future->needs_all(
+        map { $self->_checked_request($requests{$_}, "discovery GET $_") } @roots
+    )->then(sub {
+        my %responses;
+        @responses{@roots} = @_;
+        # False for legacy discovery: nothing is kept, and Kubernetes::REST
+        # reads it through its own io on first use, as without discover.
+        $rest->absorb_discovery(%responses);
+        return Future->done;
+    });
 }
 
 
@@ -216,21 +421,50 @@ sub _add_to_loop {
 # ============================================================================
 
 sub list {
-    my ($self, $short_class, %args) = @_;
+    my ($self, $short_class, @args) = @_;
 
     my $rest = $self->_rest;
-    my $class = $rest->expand_class($short_class)
-        // return Future->fail($self->_unknown_resource_error($short_class));
-    my $path = $rest->build_path($class, %args);
-    my $req = $rest->prepare_request('GET', $path);
-
-    return $self->_do_request($req)->then(sub {
-        my ($response) = @_;
-        $rest->check_response($response, "list $short_class");
-        return Future->done($rest->inflate_list($class, $response));
+    return $self->_list_request($short_class, @args)->then(sub {
+        my ($class, $response) = @_;
+        return $self->_checked_response($response, "list $short_class")->then(sub {
+            return Future->done($rest->inflate_list($self->_exact_class($class), $response));
+        });
     });
 }
 
+
+# list() up to the response, unchecked: resolves with the class and the raw
+# Kubernetes::REST::HTTPResponse, or fails before any request when the name
+# resolves to no usable class. ensure_only() needs the status itself - a 404
+# there means the Kind is not served, not a failure - and must not read it
+# back out of the text check_response croaks with.
+sub _list_request {
+    my ($self, $short_class, @args) = @_;
+
+    return Future->fail("Invalid arguments to list()") if @args % 2;
+    my %args = @args;
+    my $unknown = $self->_unknown_argument_error('list', \%args,
+        qw( namespace labelSelector fieldSelector ));
+    return Future->fail($unknown) if defined $unknown;
+
+    my $rest = $self->_rest;
+    my ($class, $error) = $self->_resolve_class($short_class);
+    return Future->fail($error) unless defined $class;
+
+    # Selectors are query parameters; build_path only knows path segments and
+    # would drop them silently, turning a filtered list into a full one.
+    my %params;
+    for my $selector (qw(labelSelector fieldSelector)) {
+        my $value = delete $args{$selector};
+        $params{$selector} = $value if defined $value;
+    }
+
+    (my $path, $error) = $self->_request_path($class, $short_class, %args);
+    return Future->fail($error) unless defined $path;
+    return $self->_request_unchecked('GET', $path,
+        %params ? (parameters => \%params) : (),
+    )->then(sub { Future->done($class, @_) });
+}
 
 sub get {
     my ($self, $short_class, @rest_args) = @_;
@@ -241,24 +475,33 @@ sub get {
         $args{name} = $rest_args[0];
     } elsif (@rest_args >= 2 && $rest_args[0] !~ /^(name|namespace)$/) {
         $args{name} = shift @rest_args;
+        return Future->fail("Invalid arguments to get()") if @rest_args % 2;
         %args = (%args, @rest_args);
     } elsif (@rest_args % 2 == 0) {
         %args = @rest_args;
     } else {
         return Future->fail("Invalid arguments to get()");
     }
+    my $unknown = $self->_unknown_argument_error('get', \%args, qw( name namespace ));
+    return Future->fail($unknown) if defined $unknown;
 
-    my $class = $rest->expand_class($short_class)
-        // return Future->fail($self->_unknown_resource_error($short_class));
+    # A reference in the name position (a manifest hashref, an IO::K8s object)
+    # would otherwise be stringified straight into the path (k70).
+    if (my $name_error = $self->_resource_name_error($args{name})) {
+        return Future->fail($name_error);
+    }
+
+    my ($class, $error) = $self->_resolve_class($short_class);
+    return Future->fail($error) unless defined $class;
     return Future->fail("name required for get") unless $args{name};
 
-    my $path = $rest->build_path($class, %args);
+    (my $path, $error) = $self->_request_path($class, $short_class, %args);
+    return Future->fail($error) unless defined $path;
     my $req = $rest->prepare_request('GET', $path);
 
-    return $self->_do_request($req)->then(sub {
+    return $self->_checked_request($req, "get $short_class")->then(sub {
         my ($response) = @_;
-        $rest->check_response($response, "get $short_class");
-        return Future->done($rest->inflate_object($class, $response));
+        return Future->done($rest->inflate_object($self->_exact_class($class), $response));
     });
 }
 
@@ -267,18 +510,19 @@ sub create {
     my ($self, $object) = @_;
 
     my $rest = $self->_rest;
-    my $class = ref($object);
+    my ($class, $error) = $self->_object_class('create', $object);
+    return Future->fail($error) unless defined $class;
     my $namespace = $object->can('metadata') && $object->metadata
         ? $object->metadata->namespace
         : undef;
 
-    my $path = $rest->build_path($class, namespace => $namespace);
+    (my $path, $error) = $self->_request_path($class, $object, namespace => $namespace);
+    return Future->fail($error) unless defined $path;
     my $req = $rest->prepare_request('POST', $path, body => $object->TO_JSON);
 
-    return $self->_do_request($req)->then(sub {
+    return $self->_checked_request($req, "create " . ref($object))->then(sub {
         my ($response) = @_;
-        $rest->check_response($response, "create " . ref($object));
-        return Future->done($rest->inflate_object($class, $response));
+        return Future->done($rest->inflate_object($self->_exact_class($class), $response));
     });
 }
 
@@ -287,54 +531,85 @@ sub update {
     my ($self, $object) = @_;
 
     my $rest = $self->_rest;
-    my $class = ref($object);
+    my ($class, $error) = $self->_object_class('update', $object);
+    croak $error unless defined $class;
     my $metadata = $object->metadata or croak "object must have metadata";
     my $name = $metadata->name or croak "object must have metadata.name";
     my $namespace = $metadata->namespace;
 
-    my $path = $rest->build_path($class, name => $name, namespace => $namespace);
+    (my $path, $error) = $self->_request_path($class, $object,
+        name => $name, namespace => $namespace);
+    croak $error unless defined $path;
     my $req = $rest->prepare_request('PUT', $path, body => $object->TO_JSON);
 
-    return $self->_do_request($req)->then(sub {
+    return $self->_checked_request($req, "update " . ref($object))->then(sub {
         my ($response) = @_;
-        $rest->check_response($response, "update " . ref($object));
-        return Future->done($rest->inflate_object($class, $response));
+        return Future->done($rest->inflate_object($self->_exact_class($class), $response));
     });
 }
 
 
-sub patch {
-    my ($self, $class_or_object, @rest_args) = @_;
+sub update_status {
+    my ($self, $object) = @_;
+
+    my $rest = $self->_rest;
+    my ($class, $error) = $self->_object_class('update_status', $object);
+    croak $error unless defined $class;
+    my $metadata = $object->metadata or croak "object must have metadata";
+    my $name = $metadata->name or croak "object must have metadata.name";
+    my $namespace = $metadata->namespace;
+
+    (my $path, $error) = $self->_request_path($class, $object,
+        name        => $name,
+        namespace   => $namespace,
+        subresource => 'status',
+    );
+    croak $error unless defined $path;
+    my $req = $rest->prepare_request('PUT', $path, body => $object->TO_JSON);
+
+    return $self->_checked_request($req, "update_status $class")->then(sub {
+        my ($response) = @_;
+        return Future->done($rest->inflate_object($self->_exact_class($class), $response));
+    });
+}
+
+
+# Argument handling shared by patch() and patch_status(): the object form and
+# both class+name forms, the required patch document and the patch type.
+# Returns (undef, $class, $name, $namespace, $patch, $content_type), or just
+# the failure message, which the caller turns into a failed Future. $label
+# names the calling method in those messages; $default_type is the patch type
+# used when the caller passes none.
+sub _patch_args {
+    my ($self, $label, $default_type, $class_or_object, @rest_args) = @_;
 
     my $rest = $self->_rest;
     my ($class, $name, $namespace, $patch, $patch_type);
 
     if (ref($class_or_object) && blessed($class_or_object)) {
         my $object = $class_or_object;
-        $class = ref($object);
-        my $metadata = $object->metadata or return Future->fail("object must have metadata");
-        $name = $metadata->name or return Future->fail("object must have metadata.name");
+        ($class, my $error) = $self->_object_class($label, $object);
+        return $error unless defined $class;
+        my $metadata = $object->metadata or return "object must have metadata";
+        $name = $metadata->name or return "object must have metadata.name";
         $namespace = $metadata->namespace;
+        return "Invalid arguments to $label()" if @rest_args % 2;
         my %args = @rest_args;
-        $patch = $args{patch} // return Future->fail("patch requires 'patch' parameter");
-        $patch_type = $args{type} // 'strategic';
+        my $unknown = $self->_unknown_argument_error($label, \%args, qw( patch type ));
+        return $unknown if defined $unknown;
+        $patch = $args{patch} // return "$label requires 'patch' parameter";
+        $patch_type = $args{type} // $default_type;
     } else {
-        my %args;
-        if (@rest_args >= 1 && !ref($rest_args[0]) && $rest_args[0] !~ /^(name|namespace|patch|type)$/) {
-            $args{name} = shift @rest_args;
-            %args = (%args, @rest_args);
-        } elsif (@rest_args % 2 == 0) {
-            %args = @rest_args;
-        } else {
-            return Future->fail("Invalid arguments to patch()");
-        }
+        my ($arg_error, %args) = $self->_named_args($label, \@rest_args,
+            qw( name namespace patch type ));
+        return $arg_error if defined $arg_error;
 
-        $class = $rest->expand_class($class_or_object)
-            // return Future->fail($self->_unknown_resource_error($class_or_object));
-        $name = $args{name} or return Future->fail("name required for patch");
+        ($class, my $error) = $self->_resolve_class($class_or_object);
+        return $error unless defined $class;
+        $name = $args{name} or return "name required for $label";
         $namespace = $args{namespace};
-        $patch = $args{patch} // return Future->fail("patch requires 'patch' parameter");
-        $patch_type = $args{type} // 'strategic';
+        $patch = $args{patch} // return "$label requires 'patch' parameter";
+        $patch_type = $args{type} // $default_type;
     }
 
     my %patch_types = (
@@ -343,38 +618,155 @@ sub patch {
         json      => 'application/json-patch+json',
     );
     my $content_type = $patch_types{$patch_type}
-        // return Future->fail("Unknown patch type '$patch_type'");
+        // return "Unknown patch type '$patch_type'";
 
-    my $path = $rest->build_path($class, name => $name, namespace => $namespace);
+    return (undef, $class, $name, $namespace, $patch, $content_type);
+}
+
+sub patch {
+    my ($self, $class_or_object, @rest_args) = @_;
+
+    my $rest = $self->_rest;
+    my ($error, $class, $name, $namespace, $patch, $content_type)
+        = $self->_patch_args('patch', 'strategic', $class_or_object, @rest_args);
+    return Future->fail($error) if defined $error;
+
+    (my $path, $error) = $self->_request_path($class, $class_or_object,
+        name => $name, namespace => $namespace);
+    return Future->fail($error) unless defined $path;
     my $req = $rest->prepare_request('PATCH', $path,
         body => $patch, content_type => $content_type);
 
-    return $self->_do_request($req)->then(sub {
+    return $self->_checked_request($req, "patch $class")->then(sub {
         my ($response) = @_;
-        $rest->check_response($response, "patch $class");
-        return Future->done($rest->inflate_object($class, $response));
+        return Future->done($rest->inflate_object($self->_exact_class($class), $response));
+    });
+}
+
+
+sub patch_status {
+    my ($self, $class_or_object, @rest_args) = @_;
+
+    my $rest = $self->_rest;
+    my ($error, $class, $name, $namespace, $patch, $content_type)
+        = $self->_patch_args('patch_status', 'merge', $class_or_object, @rest_args);
+    return Future->fail($error) if defined $error;
+
+    (my $path, $error) = $self->_request_path($class, $class_or_object,
+        name        => $name,
+        namespace   => $namespace,
+        subresource => 'status',
+    );
+    return Future->fail($error) unless defined $path;
+    my $req = $rest->prepare_request('PATCH', $path,
+        body => $patch, content_type => $content_type);
+
+    return $self->_checked_request($req, "patch_status $class")->then(sub {
+        my ($response) = @_;
+        return Future->done($rest->inflate_object($self->_exact_class($class), $response));
     });
 }
 
 
 sub delete {
-    my ($self, $class_or_object, @rest_args) = @_;
+    my ($self, @args) = @_;
 
     my $rest = $self->_rest;
-    my ($class, $name, $namespace);
+    return $self->_delete_request(@args)->then(sub {
+        my ($class, $response) = @_;
+        return $self->_checked_response($response, "delete $class")->then(sub {
+            return Future->done(1);
+        });
+    });
+}
+
+
+# The message for the first key of %$args (in sort order) that is not in
+# @allowed, or nothing when there is none - Kubernetes::REST's wording, naming
+# $label and what is allowed. Each caller reports it per its contract, a
+# failed Future or a croak, before any request: an option a method does not
+# take would otherwise be dropped silently (a misspelt labelSelector lists
+# everything, namespace for namespaces makes ensure_only prune at cluster
+# scope only).
+sub _unknown_argument_error {
+    my ($self, $label, $args, @allowed) = @_;
+    my %allowed = map { $_ => 1 } @allowed;
+    my ($unknown) = sort grep { !$allowed{$_} } keys %$args;
+    return unless defined $unknown;
+    return "Unknown argument '$unknown' to $label() (allowed: " . join(', ', @allowed) . ')';
+}
+
+# Argument handling shared by log(), port_forward(), exec(), attach(),
+# cp_to_pod(), cp_from_pod() and the class form of patch() and patch_status()
+# (in _patch_args): the name positional - METHOD('Pod', 'web',
+# %options) - or keyed - METHOD('Pod', name => 'web', %options). A first
+# argument that is one of @allowed starts the keyed form, so the keys read as
+# the start of the keyed form and the keys _unknown_argument_error accepts are
+# one list. Returns (undef, %args), or just the failure message, which the
+# caller turns into a failed Future; $label names the calling method.
+sub _named_args {
+    my ($self, $label, $rest_args, @allowed) = @_;
+    my @rest_args = @$rest_args;
+    my $keys = join '|', map { quotemeta } @allowed;
+    my %args;
+    if (@rest_args >= 1
+        && !ref($rest_args[0])
+        && $rest_args[0] !~ /^(?:$keys)$/
+    ) {
+        $args{name} = shift @rest_args;
+        return "Invalid arguments to $label()" if @rest_args % 2;
+        %args = (%args, @rest_args);
+    } elsif (@rest_args % 2 == 0) {
+        %args = @rest_args;
+    } else {
+        return "Invalid arguments to $label()";
+    }
+    my $unknown = $self->_unknown_argument_error($label, \%args, @allowed);
+    return $unknown if defined $unknown;
+    return (undef, %args);
+}
+
+# The propagationPolicy values the API server accepts in a DELETE's
+# DeleteOptions.
+my @PROPAGATION_POLICIES = qw( Background Foreground Orphan );
+
+# Nothing when $policy is absent or one of @PROPAGATION_POLICIES, else the
+# message for it, naming $label - in Kubernetes::REST's wording.
+sub _propagation_policy_error {
+    my ($self, $label, $policy) = @_;
+    return if !defined $policy || grep { $policy eq $_ } @PROPAGATION_POLICIES;
+    return "Unknown propagationPolicy '$policy' for $label() (use: "
+        . join(', ', @PROPAGATION_POLICIES) . ')';
+}
+
+# delete() up to the response, unchecked: resolves with the class and the raw
+# Kubernetes::REST::HTTPResponse, or fails before any request on bad
+# arguments - for the same reason as _list_request: ensure_only() treats a
+# 404 (already gone) differently from a failure. An option delete() does not
+# know is a bad argument too: a mistyped propagationPolicy dropped on the
+# floor would leave a Job's Pods orphaned.
+sub _delete_request {
+    my ($self, $class_or_object, @rest_args) = @_;
+
+    my ($class, $name, $namespace, %options, @known);
 
     if (ref($class_or_object)) {
         my $object = $class_or_object;
-        $class = ref($object);
+        ($class, my $error) = $self->_object_class('delete', $object);
+        return Future->fail($error) unless defined $class;
         my $metadata = $object->metadata or return Future->fail("object must have metadata");
         $name = $metadata->name or return Future->fail("object must have metadata.name");
         $namespace = $metadata->namespace;
+        return Future->fail("Invalid arguments to delete()") if @rest_args % 2;
+        %options = @rest_args;
+        @known = qw( propagationPolicy );
     } else {
         my %args;
         if (@rest_args == 1) {
             $args{name} = $rest_args[0];
-        } elsif (@rest_args >= 2 && $rest_args[0] !~ /^(name|namespace)$/) {
+        } elsif (@rest_args >= 2 && $rest_args[0] !~ /^(name|namespace|propagationPolicy)$/) {
             $args{name} = shift @rest_args;
+            return Future->fail("Invalid arguments to delete()") if @rest_args % 2;
             %args = (%args, @rest_args);
         } elsif (@rest_args % 2 == 0) {
             %args = @rest_args;
@@ -382,19 +774,364 @@ sub delete {
             return Future->fail("Invalid arguments to delete()");
         }
 
-        $class = $rest->expand_class($class_or_object)
-            // return Future->fail($self->_unknown_resource_error($class_or_object));
-        $name = $args{name} or return Future->fail("name required for delete");
-        $namespace = $args{namespace};
+        ($class, my $error) = $self->_resolve_class($class_or_object);
+        return Future->fail($error) unless defined $class;
+        $name = delete $args{name} or return Future->fail("name required for delete");
+        $namespace = delete $args{namespace};
+        %options = %args;
+        @known = qw( name namespace propagationPolicy );
     }
 
-    my $path = $rest->build_path($class, name => $name, namespace => $namespace);
-    my $req = $rest->prepare_request('DELETE', $path);
+    my $policy = delete $options{propagationPolicy};
+    my $unknown = $self->_unknown_argument_error('delete', \%options, @known);
+    return Future->fail($unknown) if defined $unknown;
+    my $policy_error = $self->_propagation_policy_error('delete', $policy);
+    return Future->fail($policy_error) if defined $policy_error;
 
+    # A reference in the name position of the class form (delete('Pod',
+    # {name => 'web'})) would otherwise be stringified straight into the path
+    # (k70); the object form's name comes from metadata and is always a string.
+    if (my $name_error = $self->_resource_name_error($name)) {
+        return Future->fail($name_error);
+    }
+
+    my ($path, $error) = $self->_request_path($class, $class_or_object,
+        name => $name, namespace => $namespace);
+    return Future->fail($error) unless defined $path;
+    return $self->_request_unchecked('DELETE', $path,
+        defined $policy ? (parameters => { propagationPolicy => $policy }) : (),
+    )->then(sub { Future->done($class, @_) });
+}
+
+# One request through the Kubernetes::REST seam, resolving with the unchecked
+# Kubernetes::REST::HTTPResponse -- for ensure() and ensure_only(), which
+# branch on the status code (404 absent, 409 conflict), directly or through
+# _list_request and _delete_request. check_response would fold that code into
+# an error string it could only be read back out of with a regex.
+sub _request_unchecked {
+    my ($self, $method, $path, %opts) = @_;
+    return $self->_do_request($self->_rest->prepare_request($method, $path, %opts));
+}
+
+# The Future for a response: done with it when Kubernetes::REST's
+# check_response accepts it, failed the way Future's convention has it when
+# it does not (status >= 400) - ->fail($error, 'http', $response). $error is
+# exactly what check_response throws: the message string, or the error object
+# of a Kubernetes::REST that has one; $response lets a caller branch on
+# ->status (404 already gone, 409 conflict) instead of parsing the text.
+# $context names the operation in the message, as for check_response.
+sub _checked_response {
+    my ($self, $response, $context) = @_;
+    return Future->done($response)
+        if eval { $self->_rest->check_response($response, $context); 1 };
+    return Future->fail($@, http => $response);
+}
+
+# _do_request, then _checked_response: resolves with the response, or fails
+# as above.
+sub _checked_request {
+    my ($self, $req, $context) = @_;
     return $self->_do_request($req)->then(sub {
         my ($response) = @_;
-        $rest->check_response($response, "delete $class");
-        return Future->done(1);
+        return $self->_checked_response($response, $context);
+    });
+}
+
+# Shared hashref handling for ensure() and ensure_only(): turns a manifest into
+# a typed object. A manifest's apiVersion is authoritative - with one, the
+# class is resolved as that exact group/version/Kind, and an apiVersion no
+# class serves croaks instead of falling back to the version the bare Kind
+# happens to map to (HorizontalPodAutoscaler alone means autoscaling/v2, a
+# different endpoint and schema than an autoscaling/v1 manifest). Without an
+# apiVersion the bare Kind resolves as it always did. Either way the class
+# must be usable (_usable_class): one that does not load croaks with its load
+# error. The class is resolved here, so it goes to struct_to_object with a
+# '+', which IO::K8s takes as that exact class: struct_to_object resolves a
+# plain name again, and a single-segment class of the caller's own ('+Gizmo'
+# in the resource_map, which expand_class returns as 'Gizmo') reads to it as
+# the Kind Gizmo - IO::K8s::Gizmo, or whatever class the map gives that Kind.
+# $label only appears in croak messages.
+sub _manifest_to_object {
+    my ($self, $label, $manifest) = @_;
+    my $kind = $manifest->{kind} or croak "$label: hashref must have 'kind'";
+    my $api_version = $manifest->{apiVersion};
+    my $rest = $self->_rest;
+
+    return $rest->k8s->struct_to_object('+' . $self->expand_class($kind), $manifest)
+        unless defined $api_version && length $api_version;
+
+    my $resolved = $rest->expand_class($kind, $api_version)
+        // croak "$label: no IO::K8s class for apiVersion '$api_version', kind '$kind'"
+            . " (add it to resource_map if it is a CRD)";
+    my ($class, $error) = $self->_usable_class("$api_version/$kind", $resolved);
+    croak "$label: $error" unless defined $class;
+    return $rest->k8s->struct_to_object('+' . $class, $manifest);
+}
+
+# The apiVersion and Kind an object is an instance of, for ensure() and
+# ensure_only() to tell resources apart by. A typed object answers from its
+# class (api_version(), kind()); IO::K8s::Unstructured from its instance data,
+# since its class name says nothing about what it holds. The last segment of a
+# class name is not enough on its own: a CRD is free to reuse a built-in Kind
+# name in its own group. Mirrors the private helper of the same name in
+# Kubernetes::REST, which is not part of its public seam.
+sub _api_version_and_kind {
+    my ($self, $object) = @_;
+    my $api_version = ref($object) eq 'IO::K8s::Unstructured' ? $object->apiVersion
+                    : $object->can('api_version')           ? $object->api_version
+                    : undef;
+    my $kind = $object->can('kind') ? $object->kind : undef;
+    ($kind = ref $object) =~ s/.*::// unless defined $kind;
+    return ($api_version // '', $kind);
+}
+
+sub ensure {
+    my ($self, $object) = @_;
+
+    my $rest = $self->_rest;
+    $object = $self->_manifest_to_object('ensure', $object) if ref($object) eq 'HASH';
+    croak "ensure requires an IO::K8s object or hashref" unless blessed($object);
+
+    my ($class, $error) = $self->_object_class('ensure', $object);
+    croak $error unless defined $class;
+    my ($api_version, $kind) = $self->_api_version_and_kind($object);
+    # The special cases below are the built-in core v1 PersistentVolumeClaim
+    # and batch/v1 Job only. The apiVersion is compared exactly, not just its
+    # group: the Job branch reads batch/v1's status fields and deletes what it
+    # takes for a failed Job, so an apiVersion it was not written for falls
+    # through to the plain update, where a mismatch fails loudly instead.
+    my $is_pvc = $api_version eq 'v1'       && $kind eq 'PersistentVolumeClaim';
+    my $is_job = $api_version eq 'batch/v1' && $kind eq 'Job';
+    my $metadata = $object->metadata or croak "object must have metadata";
+    my $name = $metadata->name or croak "object must have metadata.name";
+    my $namespace = $metadata->namespace;
+    (my $path, $error) = $self->_request_path($class, $object,
+        name => $name, namespace => $namespace);
+    croak $error unless defined $path;
+    (my $collection, $error) = $self->_request_path($class, $object, namespace => $namespace);
+    croak $error unless defined $collection;
+
+    # GET the object as the server has it now; $context names the step.
+    my $fetch = sub {
+        my ($context) = @_;
+        return $self->_checked_request($rest->prepare_request('GET', $path), "$context $kind/$name")
+            ->then(sub {
+                my ($response) = @_;
+                return Future->done($rest->inflate_object($self->_exact_class($class), $response));
+            });
+    };
+
+    # PUT at the server's resourceVersion. A 409 means the object changed
+    # between GET and PUT: fetch it once more and retry once, no further.
+    my $replace = sub {
+        my ($existing) = @_;
+        $metadata->resourceVersion($existing->metadata->resourceVersion);
+        return $self->_request_unchecked('PUT', $path, body => $object->TO_JSON)->then(sub {
+            my ($response) = @_;
+            if ($response->status == 409) {
+                return $fetch->('ensure refetch')->then(sub {
+                    my ($current) = @_;
+                    $metadata->resourceVersion($current->metadata->resourceVersion);
+                    return $self->update($object);
+                });
+            }
+            return $self->_checked_response($response, "update $class")->then(sub {
+                return Future->done($rest->inflate_object($self->_exact_class($class), $response));
+            });
+        });
+    };
+
+    # The object as the server has it, however ensure found out it exists.
+    my $apply_to_existing = sub {
+        my ($existing) = @_;
+
+        # An existing claim is never rewritten.
+        return Future->done($existing) if $is_pvc;
+
+        # A Job's pod template is immutable: a running or succeeded Job stays,
+        # any other is replaced - deleted with its Pods (Background), which
+        # the API server's default for a Job would orphan. A failing delete
+        # does not stop the create. The status is read from TO_JSON, not
+        # status(): an IO::K8s::Unstructured Job has no status accessor.
+        if ($is_job) {
+            my $status = $existing->TO_JSON->{status} || {};
+            return Future->done($existing)
+                if $status->{succeeded} || $status->{active};
+            return Future->call(sub { $self->delete($existing, propagationPolicy => 'Background') })
+                ->else(sub { Future->done })
+                ->then(sub { $self->create($object) });
+        }
+
+        return $replace->($existing);
+    };
+
+    # POST. A 409 means it was created by someone else after our GET: from
+    # there on it is an existing object like any other, special cases
+    # included - a Job must not get a PUT onto its immutable Pod template.
+    my $create = sub {
+        return $self->_request_unchecked('POST', $collection, body => $object->TO_JSON)->then(sub {
+            my ($response) = @_;
+            return $fetch->('ensure post-409 get')->then($apply_to_existing)
+                if $response->status == 409;
+            return $self->_checked_response($response, "create $class")->then(sub {
+                return Future->done($rest->inflate_object($self->_exact_class($class), $response));
+            });
+        });
+    };
+
+    return $self->_request_unchecked('GET', $path)->then(sub {
+        my ($response) = @_;
+        return $create->() if $response->status == 404;
+        return $self->_checked_response($response, "ensure get $kind/$name")->then(sub {
+            return $apply_to_existing->($rest->inflate_object($self->_exact_class($class), $response));
+        });
+    });
+}
+
+
+sub ensure_all {
+    my ($self, @objects) = @_;
+
+    # Strictly one after another: object N+1 is only started once object N
+    # is done, so a later object may rely on an earlier one (a Namespace and
+    # what lives in it). Any error, a croak from ensure() included, fails
+    # the chain and nothing after it is started.
+    my @results;
+    my $f = Future->done;
+    for my $object (@objects) {
+        $f = $f->then(sub {
+            return $self->ensure($object);
+        })->then(sub {
+            push @results, @_;
+            return Future->done;
+        });
+    }
+
+    return $f->then(sub { Future->done(@results) });
+}
+
+
+sub ensure_only {
+    my ($self, @args) = @_;
+
+    # Before anything is applied: an odd list drops a value (no objects
+    # prunes everything carrying the label), namespace for namespaces would
+    # prune at cluster scope only.
+    croak "Invalid arguments to ensure_only()" if @args % 2;
+    my %args = @args;
+    my $unknown = $self->_unknown_argument_error('ensure_only', \%args,
+        qw( label objects kinds namespaces propagationPolicy ));
+    croak $unknown if defined $unknown;
+
+    my $rest       = $self->_rest;
+    my $label      = $args{label} or croak "ensure_only requires 'label'";
+    # Background unless told otherwise: the API server's own default leaves
+    # the Pods of a pruned Job behind.
+    my $policy     = $args{propagationPolicy} // 'Background';
+    my $policy_error = $self->_propagation_policy_error('ensure_only', $policy);
+    croak $policy_error if defined $policy_error;
+    my @objects    = @{ $args{objects} || [] };
+    my @kinds      = @{ $args{kinds} || [] };
+    my @namespaces = @{ $args{namespaces} || [undef] };
+
+    # Every hashref is resolved before the first request, so one that cannot
+    # be (no kind, an apiVersion no class serves) stops the whole call.
+    for my $object (@objects) {
+        $object = $self->_manifest_to_object('ensure_only', $object)
+            if ref($object) eq 'HASH';
+    }
+
+    # (group, Kind, namespace, name), taken from the object on both sides -
+    # never from the kinds entry, which may be qualified ('autoscaling/v1/...')
+    # and would then match nothing, deleting the objects just applied. Group
+    # and Kind come from _api_version_and_kind: class-derived for a typed
+    # object, instance data for IO::K8s::Unstructured. The group keeps the same
+    # Kind name in two groups apart (Istio's and the Gateway API's Gateway);
+    # the core group is ''. No version in the key: the same resource listed
+    # through another version's class is still the same resource.
+    my $key_of = sub {
+        my ($object) = @_;
+        my ($api_version, $kind) = $self->_api_version_and_kind($object);
+        my ($group) = $api_version =~ m{\A(.*)/[^/]*\z};
+        my $metadata = $object->metadata;
+        return join("\0", $group // '', $kind, $metadata->namespace // '', $metadata->name);
+    };
+
+    # A failed list or delete leaves stale objects behind, so it is reported
+    # rather than swallowed - but only a real failure: a 404 on the list means
+    # the cluster does not serve the Kind, a 404 on the delete that the object
+    # is already gone. The status comes from the unchecked response, never
+    # from the text of an error. A caught croak already ends in its own
+    # location, which carp adds again, so the reason drops it.
+    my $where = sub {
+        my ($namespace) = @_;
+        return defined $namespace ? "in namespace '$namespace'" : 'at cluster scope';
+    };
+    my $reason_of = sub {
+        my ($error) = @_;
+        $error = defined $error ? "$error" : 'unknown error';
+        $error =~ s/\s+\z//;
+        $error =~ s/ at \S+ line \d+\.\z//;
+        return $error;
+    };
+    my $prune = sub {
+        my ($item) = @_;
+        return Future->call(sub {
+            $self->_delete_request($item, propagationPolicy => $policy);
+        })->then(sub {
+            my ($class, $response) = @_;
+            return Future->done if $response->status == 404;
+            return $self->_checked_response($response, "delete $class");
+        })->else(sub {
+            my ($error) = @_;
+            my (undef, $kind) = $self->_api_version_and_kind($item);
+            carp "ensure_only: cannot delete $kind '" . $item->metadata->name . "' "
+                . $where->($item->metadata->namespace) . ': ' . $reason_of->($error);
+            return Future->done;
+        });
+    };
+
+    return $self->ensure_all(@objects)->then(sub {
+        my @applied = @_;
+        my %expected = map { $key_of->($_) => 1 } @objects;
+
+        # One Kind x namespace after another, each delete after the one
+        # before, and on past every failure.
+        my $f = Future->done;
+        for my $kind (@kinds) {
+            for my $namespace (@namespaces) {
+                $f = $f->then(sub {
+                    return Future->call(sub {
+                        $self->_list_request($kind,
+                            labelSelector => $label,
+                            (defined $namespace ? (namespace => $namespace) : ()),
+                        );
+                    })->then(sub {
+                        my ($class, $response) = @_;
+                        return Future->done if $response->status == 404;
+                        return $self->_checked_response($response, "list $kind")->then(sub {
+                            return Future->done($rest->inflate_list($self->_exact_class($class), $response));
+                        });
+                    })->else(sub {
+                        my ($error) = @_;
+                        carp "ensure_only: cannot list $kind " . $where->($namespace)
+                            . ', nothing pruned there: ' . $reason_of->($error);
+                        return Future->done;
+                    })->then(sub {
+                        my ($list) = @_;
+                        my $deletes = Future->done;
+                        return $deletes unless $list;
+                        for my $item (@{ $list->items }) {
+                            next if $expected{ $key_of->($item) };
+                            $deletes = $deletes->then(sub { $prune->($item) });
+                        }
+                        return $deletes;
+                    });
+                });
+            }
+        }
+
+        return $f->then(sub { Future->done(@applied) });
     });
 }
 
@@ -403,21 +1140,12 @@ sub log {
     my ($self, $short_class, @rest_args) = @_;
 
     my $rest = $self->_rest;
-    my %args;
 
     # Support: log('Pod', 'name', ...) and log('Pod', name => 'name', ...)
-    if (@rest_args >= 1
-        && !ref($rest_args[0])
-        && $rest_args[0] !~ /^(name|namespace|container|follow|tailLines|sinceSeconds|sinceTime|timestamps|previous|limitBytes|on_line)$/
-    ) {
-        $args{name} = shift @rest_args;
-        return Future->fail("Invalid arguments to log()") if @rest_args % 2;
-        %args = (%args, @rest_args);
-    } elsif (@rest_args % 2 == 0) {
-        %args = @rest_args;
-    } else {
-        return Future->fail("Invalid arguments to log()");
-    }
+    my ($arg_error, %args) = $self->_named_args('log', \@rest_args, qw( name namespace
+        container follow tailLines sinceSeconds sinceTime timestamps previous limitBytes
+        on_line ));
+    return Future->fail($arg_error) if defined $arg_error;
 
     return Future->fail("name required for log") unless $args{name};
 
@@ -431,9 +1159,11 @@ sub log {
     my $previous      = delete $args{previous};
     my $limit_bytes   = delete $args{limitBytes};
 
-    my $class = $rest->expand_class($short_class)
-        // return Future->fail($self->_unknown_resource_error($short_class));
-    my $path = $rest->build_path($class, %args) . '/log';
+    my ($class, $error) = $self->_resolve_class($short_class);
+    return Future->fail($error) unless defined $class;
+    (my $path, $error) = $self->_request_path($class, $short_class, %args);
+    return Future->fail($error) unless defined $path;
+    $path .= '/log';
 
     my %params;
     $params{container}    = $container     if defined $container;
@@ -456,7 +1186,8 @@ sub log {
             }
         })->then(sub {
             my ($response) = @_;
-            $rest->check_response($response, "log $short_class");
+            return $self->_checked_response($response, "log $short_class");
+        })->then(sub {
             if (length $buffer) {
                 $on_line->(Kubernetes::REST::LogEvent->new(line => $buffer));
             }
@@ -467,9 +1198,8 @@ sub log {
     my $req = $rest->prepare_request('GET', $path,
         %params ? (parameters => \%params) : (),
     );
-    return $self->_do_request($req)->then(sub {
+    return $self->_checked_request($req, "log $short_class")->then(sub {
         my ($response) = @_;
-        $rest->check_response($response, "log $short_class");
         return Future->done($response->content);
     });
 }
@@ -479,21 +1209,11 @@ sub port_forward {
     my ($self, $short_class, @rest_args) = @_;
 
     my $rest = $self->_rest;
-    my %args;
 
     # Support: port_forward('Pod', 'name', ...) and port_forward('Pod', name => 'name', ...)
-    if (@rest_args >= 1
-        && !ref($rest_args[0])
-        && $rest_args[0] !~ /^(name|namespace|ports|subprotocol|on_open|on_frame|on_close|on_error)$/
-    ) {
-        $args{name} = shift @rest_args;
-        return Future->fail("Invalid arguments to port_forward()") if @rest_args % 2;
-        %args = (%args, @rest_args);
-    } elsif (@rest_args % 2 == 0) {
-        %args = @rest_args;
-    } else {
-        return Future->fail("Invalid arguments to port_forward()");
-    }
+    my ($arg_error, %args) = $self->_named_args('port_forward', \@rest_args,
+        qw( name namespace ports subprotocol on_open on_frame on_close on_error ));
+    return Future->fail($arg_error) if defined $arg_error;
 
     return Future->fail("name required for port_forward") unless $args{name};
 
@@ -512,9 +1232,11 @@ sub port_forward {
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
-    my $class = $rest->expand_class($short_class)
-        // return Future->fail($self->_unknown_resource_error($short_class));
-    my $path = $rest->build_path($class, %args) . '/portforward';
+    my ($class, $error) = $self->_resolve_class($short_class);
+    return Future->fail($error) unless defined $class;
+    (my $path, $error) = $self->_request_path($class, $short_class, %args);
+    return Future->fail($error) unless defined $path;
+    $path .= '/portforward';
 
     # Keep compatibility with Kubernetes::REST >= 1.100 by expanding repeated
     # ports query params here instead of relying on arrayref parameter support.
@@ -544,21 +1266,11 @@ sub exec {
     my ($self, $short_class, @rest_args) = @_;
 
     my $rest = $self->_rest;
-    my %args;
 
     # Support: exec('Pod', 'name', ...) and exec('Pod', name => 'name', ...)
-    if (@rest_args >= 1
-        && !ref($rest_args[0])
-        && $rest_args[0] !~ /^(name|namespace|command|container|stdin|stdout|stderr|tty|subprotocol|on_open|on_frame|on_close|on_error)$/
-    ) {
-        $args{name} = shift @rest_args;
-        return Future->fail("Invalid arguments to exec()") if @rest_args % 2;
-        %args = (%args, @rest_args);
-    } elsif (@rest_args % 2 == 0) {
-        %args = @rest_args;
-    } else {
-        return Future->fail("Invalid arguments to exec()");
-    }
+    my ($arg_error, %args) = $self->_named_args('exec', \@rest_args, qw( name namespace command
+        container stdin stdout stderr tty subprotocol on_open on_frame on_close on_error ));
+    return Future->fail($arg_error) if defined $arg_error;
 
     return Future->fail("name required for exec") unless $args{name};
 
@@ -583,9 +1295,11 @@ sub exec {
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
-    my $class = $rest->expand_class($short_class)
-        // return Future->fail($self->_unknown_resource_error($short_class));
-    my $path = $rest->build_path($class, %args) . '/exec';
+    my ($class, $error) = $self->_resolve_class($short_class);
+    return Future->fail($error) unless defined $class;
+    (my $path, $error) = $self->_request_path($class, $short_class, %args);
+    return Future->fail($error) unless defined $path;
+    $path .= '/exec';
 
     my %params = (
         command => $command,
@@ -620,21 +1334,11 @@ sub attach {
     my ($self, $short_class, @rest_args) = @_;
 
     my $rest = $self->_rest;
-    my %args;
 
     # Support: attach('Pod', 'name', ...) and attach('Pod', name => 'name', ...)
-    if (@rest_args >= 1
-        && !ref($rest_args[0])
-        && $rest_args[0] !~ /^(name|namespace|container|stdin|stdout|stderr|tty|subprotocol|on_open|on_frame|on_close|on_error)$/
-    ) {
-        $args{name} = shift @rest_args;
-        return Future->fail("Invalid arguments to attach()") if @rest_args % 2;
-        %args = (%args, @rest_args);
-    } elsif (@rest_args % 2 == 0) {
-        %args = @rest_args;
-    } else {
-        return Future->fail("Invalid arguments to attach()");
-    }
+    my ($arg_error, %args) = $self->_named_args('attach', \@rest_args, qw( name namespace
+        container stdin stdout stderr tty subprotocol on_open on_frame on_close on_error ));
+    return Future->fail($arg_error) if defined $arg_error;
 
     return Future->fail("name required for attach") unless $args{name};
 
@@ -650,9 +1354,11 @@ sub attach {
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
-    my $class = $rest->expand_class($short_class)
-        // return Future->fail($self->_unknown_resource_error($short_class));
-    my $path = $rest->build_path($class, %args) . '/attach';
+    my ($class, $error) = $self->_resolve_class($short_class);
+    return Future->fail($error) unless defined $class;
+    (my $path, $error) = $self->_request_path($class, $short_class, %args);
+    return Future->fail($error) unless defined $path;
+    $path .= '/attach';
 
     my %params = (
         stdin   => $stdin  ? 'true' : 'false',
@@ -689,19 +1395,9 @@ sub cp_to_pod {
     return Future->fail("cp_to_pod requires Net::Async::Kubernetes to be added to an IO::Async::Loop")
         unless $loop;
 
-    my %args;
-    if (@rest_args >= 1
-        && !ref($rest_args[0])
-        && $rest_args[0] !~ /^(name|namespace|container|local|remote|chunk_size)$/
-    ) {
-        $args{name} = shift @rest_args;
-        return Future->fail("Invalid arguments to cp_to_pod()") if @rest_args % 2;
-        %args = (%args, @rest_args);
-    } elsif (@rest_args % 2 == 0) {
-        %args = @rest_args;
-    } else {
-        return Future->fail("Invalid arguments to cp_to_pod()");
-    }
+    my ($arg_error, %args) = $self->_named_args('cp_to_pod', \@rest_args,
+        qw( name namespace container local remote chunk_size ));
+    return Future->fail($arg_error) if defined $arg_error;
 
     return Future->fail("name required for cp_to_pod") unless $args{name};
 
@@ -774,19 +1470,9 @@ sub cp_from_pod {
     return Future->fail("cp_from_pod requires Net::Async::Kubernetes to be added to an IO::Async::Loop")
         unless $loop;
 
-    my %args;
-    if (@rest_args >= 1
-        && !ref($rest_args[0])
-        && $rest_args[0] !~ /^(name|namespace|container|local|remote)$/
-    ) {
-        $args{name} = shift @rest_args;
-        return Future->fail("Invalid arguments to cp_from_pod()") if @rest_args % 2;
-        %args = (%args, @rest_args);
-    } elsif (@rest_args % 2 == 0) {
-        %args = @rest_args;
-    } else {
-        return Future->fail("Invalid arguments to cp_from_pod()");
-    }
+    my ($arg_error, %args) = $self->_named_args('cp_from_pod', \@rest_args,
+        qw( name namespace container local remote ));
+    return Future->fail($arg_error) if defined $arg_error;
 
     return Future->fail("name required for cp_from_pod") unless $args{name};
 
@@ -866,12 +1552,13 @@ sub _send_stdin_chunks {
 # ============================================================================
 
 sub watcher {
-    my ($self, $resource, %args) = @_;
+    my ($self, $resource, @args) = @_;
 
+    croak "Invalid arguments to watcher()" if @args % 2;
     my $watcher = Net::Async::Kubernetes::Watcher->new(
         kube     => $self,
         resource => $resource,
-        %args,
+        @args,
     );
 
     $self->add_child($watcher);
@@ -880,11 +1567,12 @@ sub watcher {
 
 
 sub controller {
-    my ($self, %args) = @_;
+    my ($self, @args) = @_;
 
+    croak "Invalid arguments to controller()" if @args % 2;
     my $controller = Net::Async::Kubernetes::Controller->new(
         kube => $self,
-        %args,
+        @args,
     );
 
     $self->add_child($controller);
@@ -922,10 +1610,15 @@ sub _do_request {
     });
 }
 
+# Resolves with the response status and, for an error response (>= 400), its
+# body as content. An error body is the Status explaining the rejection, not
+# stream data: it never reaches $on_chunk, where it would pass for a watch
+# event or a log line, and is kept for the caller's check_response instead.
 sub _do_streaming_request {
     my ($self, $req, $on_chunk) = @_;
 
     my $uri = URI->new($req->url);
+    my $error_body = '';
 
     return $self->_http->do_request(
         method  => $req->method,
@@ -933,11 +1626,19 @@ sub _do_streaming_request {
         headers => $req->headers,
         on_header => sub {
             my ($response) = @_;
+            my $is_error = $response->code >= 400;
             return sub {
+                # Called once more without arguments at the end of the body;
+                # what it returns is what the request Future resolves with.
+                return $response unless @_;
                 my ($chunk) = @_;
-                if (defined $chunk) {
+                return unless defined $chunk;
+                if ($is_error) {
+                    $error_body .= $chunk;
+                } else {
                     $on_chunk->($chunk);
                 }
+                return;
             };
         },
         $self->_ssl_options,
@@ -945,7 +1646,7 @@ sub _do_streaming_request {
         my ($response) = @_;
         return Future->done(Kubernetes::REST::HTTPResponse->new(
             status  => $response->code,
-            content => '',
+            content => $error_body,
         ));
     });
 }
@@ -1119,7 +1820,7 @@ Net::Async::Kubernetes - Async Kubernetes client for IO::Async
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -1257,10 +1958,13 @@ running inside a Kubernetes pod)
 
 Internal L<IO::Async::Notifier> configuration method. Handles initialization
 of C<kubeconfig>, C<context>, C<server>, C<credentials>, C<resource_map>,
-and C<resource_map_from_cluster> parameters.
+C<resource_map_from_cluster> and C<with> parameters.
 
 If C<kubeconfig> is provided without explicit C<server> or C<credentials>,
-they are loaded automatically via L<Kubernetes::REST::Kubeconfig>.
+they are loaded automatically via L<Kubernetes::REST::Kubeconfig>. So are
+they for a C<context> without C<kubeconfig>, from the default kubeconfig.
+Either way a kubeconfig or context that cannot be resolved croaks with the
+reason (a missing file, C<Context not found: ...>).
 
 When running inside a Kubernetes pod (no C<kubeconfig> or C<server> set),
 the service account token at
@@ -1275,6 +1979,10 @@ extracted automatically (via L<Kubernetes::REST::Kubeconfig>).
 =head2 context
 
 Kubernetes context to use from the kubeconfig. Defaults to current-context.
+Without L</kubeconfig> it is looked up in the default kubeconfig
+(C<KUBECONFIG>, else F<~/.kube/config>); when it is not found there, or
+there is no kubeconfig at all and no in-cluster service account either, the
+constructor croaks with the reason.
 
 =head2 resource_map
 
@@ -1282,8 +1990,57 @@ Optional. Custom resource map for short class names.
 
 =head2 resource_map_from_cluster
 
-Optional boolean. Load resource map from cluster OpenAPI spec.
-Defaults to false.
+Optional boolean, defaults to false. When true, L<Kubernetes::REST> reads the
+cluster's discovery documents (C<GET /api>, C<GET /apis>) and, unless a
+L</resource_map> is given, builds the resource map from them. Left to itself
+it fetches them once, on first use, through its own synchronous HTTP backend,
+not through this client's transport, so that first use blocks the loop.
+Await L</discover> once at start-up to have them read through this client's
+transport instead:
+
+    my $kube = Net::Async::Kubernetes->new(
+        kubeconfig                => "$ENV{HOME}/.kube/config",
+        resource_map_from_cluster => 1,
+    );
+    $loop->add($kube);
+    $kube->discover->get;
+
+It also makes custom resources usable without a class of their own: a Kind
+that no IO::K8s class or C<resource_map> entry serves, but which discovery
+lists, resolves to L<IO::K8s::Unstructured>. Requests for it take the
+resource's plural and scope from discovery, and a qualified
+C<'group/version/Kind'> name stays in that group and version. An
+L<IO::K8s::Unstructured> object handed to L</create>, L</update>,
+L</ensure> or another object form is addressed the same way, by its own
+C<kind> and C<apiVersion> -- without this option there is no discovery to
+find its path in.
+
+That group and version are the only ones such a request goes to. When the
+cluster does not serve them, a qualified name is an unknown resource and an
+object or manifest with that C<apiVersion> is refused, even if another group
+or another version serves a Kind of the same name -- nothing is listed,
+changed or deleted there instead.
+
+A request for L<IO::K8s::Unstructured> that has no path -- without this
+option, for the explicit class name C<IO::K8s::Unstructured> (a class name
+carries no Kind), or for an object without C<kind> -- is refused before it
+is sent, like any other bad argument: the L<Future> fails with the reason,
+and L</update>, L</update_status>, L</ensure> and a watcher starting up
+croak with it instead, as they do for their other argument errors.
+
+=head2 with
+
+Optional arrayref of L<IO::K8s> resource-map providers (CRD bundles),
+passed on to L<Kubernetes::REST/with>, so their Kinds resolve to typed
+classes -- in names, lists, watches and L</new_object>:
+
+    my $kube = Net::Async::Kubernetes->new(
+        kubeconfig => "$ENV{HOME}/.kube/config",
+        with       => ['IO::K8s::GatewayAPI'],
+    );
+    my $gateways = $kube->list('Gateway', namespace => 'default')->get;
+
+Defaults to C<[]>. See L<IO::K8s/with> for the accepted provider forms.
 
 =head2 server
 
@@ -1338,9 +2095,61 @@ carries -- the two forms can and do point at different classes:
 This qualified form is accepted anywhere a resource name is, including
 C<list>, C<get>, and C<watcher>.
 
-Croaks when the name cannot be resolved to an IO::K8s class. This is the
-synchronous counterpart of the C<Future>-returning methods below, which report
-the same condition as a failed L<Future>.
+The result is a plain class name, without a C<+>. Handed back to a method
+that resolves names again -- L</new_object>, L<IO::K8s/struct_to_object> --
+a single-segment class of your own (C<'+Gizmo'> in the L</resource_map>,
+returned as C<'Gizmo'>) reads as the Kind C<Gizmo> there. Prefix it with
+C<+> when you do that yourself. The client's own methods already do, for the
+manifests L</ensure> resolves and for every answer they inflate, a watch
+event included -- whichever L<Kubernetes::REST> version is installed.
+
+Croaks when the name cannot be resolved to an IO::K8s class -- a qualified
+name no class serves, and equally a bare Kind no class ships for (C<'Bogus'>),
+which L<Kubernetes::REST/expand_class> would hand back as a fabricated
+C<IO::K8s::Bogus>. It also croaks when the name resolves to a class that
+cannot serve as a resource, with the real cause rather than "unknown
+resource": a class that does not load or compile (say, a typo in a
+C<'+Class'> entry of L</resource_map>) croaks with its load error, and a
+class without an C<api_version> of its own -- an IO::K8s helper such as
+C<IO::K8s::List> that a bare C<'List'> lands on -- croaks as not being a
+Kubernetes resource class. This is the synchronous counterpart of the
+C<Future>-returning methods below, which report the same conditions as a
+failed L<Future> with the same message.
+
+=head2 discover
+
+    $kube->discover->get;    # once, at start-up
+
+Reads the cluster's discovery documents (C<GET /api>, C<GET /apis>) through
+this client's own asynchronous transport and hands them to
+L<Kubernetes::REST>, which then resolves names -- a Kind only the cluster
+serves included (see L</resource_map_from_cluster>) -- and builds its
+resource map from them without a request of its own. Returns a L<Future>
+that resolves, with no value, once that is done.
+
+With L</resource_map_from_cluster> on, await it once at start-up, before the
+first request: otherwise L<Kubernetes::REST> reads discovery itself on first
+use, through its synchronous HTTP backend, and that first use blocks the
+loop. No other method calls C<discover> for you. Calling it again reads
+discovery anew and replaces what was read before -- after installing a
+CustomResourceDefinition, for example.
+
+=over 4
+
+=item * Without L</resource_map_from_cluster> there is no discovery to read:
+the L<Future> is done at once and nothing is sent.
+
+=item * A cluster older than Kubernetes 1.27 answers with legacy discovery,
+which takes a further request per API group and version.
+L<Kubernetes::REST> keeps nothing of it; the L<Future> is done all the same,
+and discovery is read synchronously on first use, as without C<discover>.
+
+=item * An error status (C<401>, C<403>, C<5xx>) fails the L<Future> as
+described in L</ERRORS>, C<< ->fail($error, 'http', $response) >>. A request
+that gets no response fails it the way the transport reports it, and a
+document that cannot be read (not JSON) with the reason.
+
+=back
 
 =head2 list
 
@@ -1348,9 +2157,18 @@ the same condition as a failed L<Future>.
     my $list = $future->get;
     my @pods = @{ $list->items };
 
+    my $future = $kube->list('Pod', labelSelector => 'app=web');
+
 List resources of the given type. Returns a L<Future> that resolves to an
 L<IO::K8s::List>. Its C<items> accessor holds the ArrayRef of inflated
 IO::K8s objects.
+
+C<labelSelector> and C<fieldSelector> are sent as query parameters, so
+filtering happens server-side rather than on the list that comes back.
+Any other option -- a misspelt C<labelselector> would otherwise list every
+object -- fails the L<Future> before a request is sent, naming the options
+C<list> takes. So does an odd list of options, as C<Invalid arguments to
+list()>: its last key would otherwise go out without a value.
 
 Arguments:
 
@@ -1360,7 +2178,8 @@ Arguments:
 qualified C<'group/version/Kind'> name to pin a specific API version -- see
 L</expand_class>
 
-=item C<%args> - Optional parameters (C<namespace>, etc.)
+=item C<%args> - Optional parameters: C<namespace>, C<labelSelector>,
+C<fieldSelector>
 
 =back
 
@@ -1370,7 +2189,11 @@ L</expand_class>
     my $pod = $future->get;
 
 Get a single resource by name. Returns a L<Future> that resolves to an
-inflated IO::K8s object.
+inflated IO::K8s object. An option other than C<name> and C<namespace> fails
+the L<Future> before a request is sent, and so does an odd list of options,
+as C<Invalid arguments to get()>. A reference in place of the name -- a
+manifest hashref, an IO::K8s object -- fails it as C<resource name must be a
+string, got a HASH reference>, before it is stringified into the request path.
 
 Arguments:
 
@@ -1381,7 +2204,7 @@ C<'group/version/Kind'> name -- see L</expand_class>
 
 =item C<$name> - Resource name (required)
 
-=item C<%args> - Optional parameters (C<namespace>, etc.)
+=item C<%args> - Optional parameters: C<namespace>
 
 =back
 
@@ -1392,6 +2215,10 @@ C<'group/version/Kind'> name -- see L</expand_class>
 
 Create a resource from an IO::K8s object. Returns a L<Future> that resolves
 to the created object with server-populated fields (C<resourceVersion>, etc.).
+
+An object that is no Kubernetes resource -- an L<IO::K8s::List>, a nested
+type such as a C<PodSpec> -- or anything that is not an IO::K8s object fails
+the L<Future> before a request is sent.
 
 Arguments:
 
@@ -1410,11 +2237,40 @@ Update an existing resource. The object must have C<metadata.name> (and
 C<metadata.namespace> if namespaced). Returns a L<Future> that resolves to
 the updated object.
 
+A missing C<metadata> or C<metadata.name> croaks synchronously, and so does
+an object that is no Kubernetes resource -- an L<IO::K8s::List>, a nested
+type such as a C<PodSpec> -- or anything that is not an IO::K8s object.
+
 Arguments:
 
 =over 4
 
 =item C<$object> - Modified IO::K8s object with updated fields
+
+=back
+
+=head2 update_status
+
+    my $future = $kube->update_status($node);
+    my $updated = $future->get;
+
+Replace a resource's B<status> through the C</status> subresource. The whole
+object is sent, as with L</update>, but the server only stores the C<status>
+it carries and leaves C<spec> and C<metadata> untouched. Returns a L<Future>
+that resolves to the updated object.
+
+Needs a current C<resourceVersion> and fails with a 409 conflict if the
+object changed on the server in the meantime. A missing C<metadata> or
+C<metadata.name>, or an object that is no Kubernetes resource, croaks
+synchronously, as with L</update>. Prefer
+L</patch_status> when you are setting individual status fields.
+
+Arguments:
+
+=over 4
+
+=item C<$object> - IO::K8s object with C<metadata.name> (and C<namespace> if
+namespaced) and the desired C<status>
 
 =back
 
@@ -1433,7 +2289,13 @@ Arguments:
     );
 
 Patch an existing resource. Returns a L<Future> that resolves to the patched
-object.
+object. Bad arguments -- among them an object that is no Kubernetes
+resource, such as an L<IO::K8s::List> or a nested C<PodSpec>, a plain
+reference such as a manifest hashref in place of the resource name, an odd
+list of options after the object or the name (C<Invalid arguments to
+patch()>), and an option not listed below (in the object form C<name> and
+C<namespace> come from the object and are refused as options too) -- fail
+the L<Future> before a request is sent.
 
 Arguments:
 
@@ -1451,6 +2313,55 @@ Arguments:
 
 =back
 
+=head2 patch_status
+
+    # By class and name
+    my $future = $kube->patch_status('OCPNode', 'cp-1',
+        namespace => 'ocp',
+        patch     => { status => { phase => 'Ready' } },
+    );
+
+    # Or by object
+    my $future = $kube->patch_status($node,
+        patch => { status => { phase => 'Ready' } },
+    );
+
+Partially update a resource's B<status> through the C</status> subresource.
+Once a CustomResourceDefinition declares C<subresources: { status: {} }>, the
+API server drops the C<status> stanza from every write to the main endpoint
+and still answers 2xx -- so a C<status> written via L</patch> or L</update>
+is silently discarded. This method writes to C</status> instead.
+
+Takes the same call forms and arguments as L</patch> (object, or class plus
+name in either the shorthand or fully-keyed form), and refuses any other
+option, and an odd list of options, the same way. The patch document is
+sent unchanged and carries its own C<status> key.
+
+The default patch type is C<merge>, not C<strategic> as in L</patch>: custom
+resources reject strategic merge patch with a 415, and C<merge> works for
+built-in kinds too. Pass C<type =E<gt> 'strategic'> explicitly to patch the
+status of a built-in resource when you need array merge semantics.
+
+Returns a L<Future> that resolves to the patched object; bad arguments, an
+unknown patch C<type>, or a server error fail the Future, as with L</patch>.
+
+Arguments:
+
+=over 4
+
+=item C<$class_or_object> - Resource class name or IO::K8s object
+
+=item C<name> - Resource name (required unless passing object)
+
+=item C<namespace> - Namespace (if namespaced)
+
+=item C<patch> - HashRef with a C<status> key (or ArrayRef of operations when
+C<type> is C<json>)
+
+=item C<type> - Patch type: C<'merge'> (default), C<'strategic'>, or C<'json'>
+
+=back
+
 =head2 delete
 
     # By class and name
@@ -1461,7 +2372,29 @@ Arguments:
     my $future = $kube->delete($pod_object);
     $future->get;
 
+    # A Job together with its Pods
+    $kube->delete('Job', 'nightly', namespace => 'default',
+        propagationPolicy => 'Background')->get;
+    $kube->delete($job, propagationPolicy => 'Foreground')->get;
+
 Delete a resource. Returns a L<Future> that resolves to C<1> on success.
+In the object form, an object without C<metadata.name>, one that is no
+Kubernetes resource (an L<IO::K8s::List>, a nested C<PodSpec>), or a
+reference that is not an IO::K8s object fails the L<Future>. In the class
+form, a reference in place of the name -- C<delete('Pod', $manifest)> --
+fails it as C<resource name must be a string, got a HASH reference>, before
+it is stringified into the request path.
+
+C<propagationPolicy> is sent as a query parameter and decides what happens
+to the objects the deleted one owns: C<Background> deletes them after it,
+C<Foreground> before it, C<Orphan> leaves them. Without it the API server
+applies the resource's own default -- for a C<Job> that orphans its Pods.
+Any other value, and any option C<delete> does not know (a misspelt
+C<propagationPolicy> would otherwise be dropped silently), fails the
+L<Future> before a request is sent, worded as L<Kubernetes::REST> words it:
+C<Unknown propagationPolicy 'x' for delete() (use: Background, Foreground,
+Orphan)>, or C<Unknown argument 'x' to delete() (allowed: ...)> naming the
+first unknown option.
 
 Arguments:
 
@@ -1471,7 +2404,174 @@ Arguments:
 
 =item C<$name> - Resource name (required unless passing object)
 
-=item C<%args> - Optional parameters (C<namespace>, etc.)
+=item C<namespace> - Namespace (if namespaced; not in the object form, which
+takes it from the object)
+
+=item C<propagationPolicy> - C<'Background'>, C<'Foreground'> or C<'Orphan'>;
+optional
+
+=back
+
+=head2 ensure
+
+    my $future = $kube->ensure($pod);
+    my $obj = $future->get;
+
+    # or from a plain hashref (treated as a Kubernetes manifest):
+    my $future = $kube->ensure({
+        apiVersion => 'v1',
+        kind       => 'Secret',
+        metadata   => { name => 'foo', namespace => 'default' },
+        stringData => { password => 'hunter2' },
+    });
+
+Idempotent create-or-update. GETs the object by kind/name/namespace: if it is
+missing, creates it; if it exists, updates it at the server's
+C<resourceVersion>, which this method writes back into the object passed in.
+Returns a L<Future> that resolves to the resulting IO::K8s object.
+
+Accepts a typed IO::K8s object or a plain hashref; a hashref must carry a
+C<kind> field and uses manifest-style camelCase keys (C<stringData>, not
+C<string_data>).
+
+A hashref's C<apiVersion>, when present, selects the class: an
+C<autoscaling/v1> HorizontalPodAutoscaler stays C<autoscaling/v1> and goes to
+that endpoint, although the bare Kind resolves to C<autoscaling/v2>. A hashref
+without C<apiVersion> (or with an empty one) resolves by its Kind alone, as
+L</expand_class> does.
+
+Handles the create/update race: a 409 on update (something else changed the
+object between GET and PUT) refetches once and retries the update; a 409 on
+create (something else created it between GET and POST) refetches it and
+handles it like an object that existed from the start -- updated, with the
+same one retry, or, for the two special cases below, returned unchanged or
+deleted and recreated.
+
+Two kinds get special handling because their spec is immutable after
+creation: an existing core C<v1> C<PersistentVolumeClaim> is left unchanged,
+and an existing C<batch/v1> C<Job> is left unchanged while it is active or has
+succeeded, and deleted and recreated otherwise -- deleted with
+C<propagationPolicy> C<Background>, so its Pods go with it instead of being
+orphaned. Both are recognised by
+apiVersion and Kind together -- the object's C<api_version> and C<kind> --
+never by the class name. A custom resource that reuses one of these Kind
+names in its own group is ensured like any other object, and so is a C<Job>
+under any apiVersion other than C<batch/v1>.
+
+Errors that are known before any request is made -- a hashref without
+C<kind>, a value that is neither an object nor a hashref, an object that is
+no Kubernetes resource (an L<IO::K8s::List>, a nested type such as a
+C<PodSpec>), an object missing C<metadata>/C<metadata.name>, an unknown
+C<kind>, a C<kind> whose class does
+not load or is no resource class (see L</expand_class>), or an C<apiVersion>
+that resolves to no known class (the message names both the Kind and the
+C<apiVersion>) -- croak synchronously, as with L</update>. Anything that
+goes wrong during the request flow itself fails the Future instead.
+
+Arguments:
+
+=over 4
+
+=item C<$object> - IO::K8s object or hashref manifest (must have C<kind> if a
+hashref)
+
+=back
+
+=head2 ensure_all
+
+    my $future = $kube->ensure_all(@objects);
+    my @results = $future->get;
+
+Batch form of L</ensure>. Applies each object in order, one at a time --
+object N+1 is only started once object N has resolved, so a later object may
+depend on an earlier one (a Namespace before what lives in it). Returns a
+L<Future> that resolves to the list of results in input order.
+
+If any object fails -- including a croak from L</ensure>, which becomes a
+failure here -- the Future fails and no later object is started.
+C<ensure_all> itself never croaks synchronously.
+
+Arguments:
+
+=over 4
+
+=item C<@objects> - IO::K8s objects or hashref manifests, as accepted by
+L</ensure>
+
+=back
+
+=head2 ensure_only
+
+    my $future = $kube->ensure_only(
+        label      => 'app.kubernetes.io/component=queen',
+        objects    => \@objects,
+        kinds      => [qw(Role RoleBinding ClusterRoleBinding)],
+        namespaces => ['default', 'kube-system', undef],
+    );
+    my @applied = $future->get;
+
+Like L</ensure_all>, but also deletes anything matching the label selector in
+the given kinds and namespaces that is not present in C<objects>. Use this
+for resources where stale objects must not survive (e.g. RBAC). Croaks
+synchronously if C<label> is missing, if C<propagationPolicy> is none of
+the values L</delete> accepts, on any option not listed below -- a
+C<namespace> meant as C<namespaces> would otherwise prune at cluster scope
+only -- and on an odd list of options (C<Invalid arguments to
+ensure_only()>), whose last key would otherwise be taken as given without a
+value: a stray C<objects> would prune everything carrying the label.
+
+Hashrefs in C<objects> are resolved as in L</ensure>, all of them before the
+first request: one without C<kind> or with an C<apiVersion> no class serves
+croaks, and nothing is applied or deleted.
+
+Applies C<objects> via L</ensure_all>, then for each kind in C<kinds> and
+each namespace in C<namespaces>, lists resources of that kind carrying the
+label and deletes any that do not match one of the just-applied objects by
+API group, Kind, namespace and name. Group and Kind are each object's own --
+the group from its C<api_version>, the Kind from its C<kind> -- so a
+qualified C<'group/version/Kind'> entry in C<kinds> still recognises the
+objects it lists rather than deleting them. The same Kind name in another
+group is another resource: with Istio's C<networking.istio.io> Gateway in
+C<objects>, a labelled Gateway API C<gateway.networking.k8s.io> Gateway of
+the same name and namespace is deleted. The version is not compared: an
+object applied as C<autoscaling/v1> is kept when the listing goes through
+C<autoscaling/v2>. A C<namespaces> entry of C<undef> scans cluster-scoped
+resources; if C<namespaces> is omitted, only cluster-scoped resources are
+scanned.
+
+Stale objects are deleted with C<propagationPolicy> C<Background> unless
+C<propagationPolicy> says otherwise, so a pruned Job or Deployment takes its
+Pods with it; the API server's own default would leave a Job's Pods behind.
+
+Pruning goes on past a failure, and says so. When a C<kinds> entry cannot be
+listed in one namespace -- the API server rejects the request, the request
+fails without a response, or the entry resolves to no usable class -- that
+combination is skipped with a warning (C<carp>) naming the entry, the
+namespace (or cluster scope) and the reason; anything stale there survives
+this run. A 404 is silent: the cluster does not serve that Kind, so there is
+nothing to prune. A delete that fails warns with the Kind, name, namespace
+and reason, and the next object is tried; a 404 there means the object is
+already gone and is silent too. A C<$SIG{__WARN__}> handler that dies while
+the prune runs fails the returned L<Future> with the warning instead.
+
+Returns a L<Future> that resolves to the list of applied objects (from
+L</ensure_all>), whether or not the pruning was complete.
+
+Arguments:
+
+=over 4
+
+=item C<label> - Label selector matching stale objects to delete (required)
+
+=item C<objects> - ArrayRef of objects/hashrefs to apply, as for L</ensure_all>
+
+=item C<kinds> - ArrayRef of resource kinds to scan for stale objects
+
+=item C<namespaces> - ArrayRef of namespaces to scan, C<undef> for
+cluster-scoped; defaults to cluster-scoped only
+
+=item C<propagationPolicy> - How stale objects are deleted: C<'Background'>
+(default), C<'Foreground'> or C<'Orphan'>, as for L</delete>
 
 =back
 
@@ -1501,6 +2601,12 @@ With C<on_line>, opens a streaming request and invokes the callback once per
 line with L<Kubernetes::REST::LogEvent> objects. The returned L<Future>
 resolves when the stream ends.
 
+Besides C<name>, C<namespace> and C<on_line> it takes the options
+C<container>, C<follow>, C<tailLines>, C<sinceSeconds>, C<sinceTime>,
+C<timestamps>, C<previous> and C<limitBytes>, sent as query parameters. Any
+other -- C<tail_lines> would otherwise fetch the whole log -- fails the
+L<Future> before a request is sent.
+
 =head2 port_forward
 
     my $f = $kube->port_forward('Pod', 'my-pod',
@@ -1524,6 +2630,13 @@ C<on_open> receives the created session object.
 C<on_frame> receives C<($channel, $payload)> where the first byte of each
 binary websocket frame is decoded as Kubernetes channel id.
 
+It takes C<name>, C<namespace>, C<ports> (one port or an arrayref of them,
+required), C<subprotocol> (default C<v4.channel.k8s.io>) and the callbacks
+C<on_open>, C<on_frame>, C<on_close> and C<on_error>. Any other option -- a
+misspelt C<onFrame> would otherwise be dropped, a C<subresource> would even
+land in the request path -- fails the L<Future> before a request is sent,
+naming the options C<port_forward> takes.
+
 =head2 exec
 
     my $f = $kube->exec('Pod', 'my-pod',
@@ -1546,6 +2659,14 @@ C<on_open> receives the created session object.
 
 C<on_frame> receives C<($channel, $payload)> where the first byte of each
 binary websocket frame is decoded as Kubernetes channel id.
+
+Besides C<name>, C<namespace>, C<command> (a string or an arrayref,
+required), C<subprotocol> and the callbacks it takes C<container>,
+C<stdin>, C<stdout>, C<stderr> and C<tty>, sent as query parameters
+(C<stdout> and C<stderr> default to true, the others to false). Any other
+option -- a misspelt C<container> would otherwise run the command in the
+pod's default container -- fails the L<Future> before a request is sent,
+naming the options C<exec> takes.
 
 =head2 attach
 
@@ -1574,6 +2695,11 @@ C<on_open> receives the created session object.
 C<on_frame> receives C<($channel, $payload)> where the first byte of each
 binary websocket frame is decoded as Kubernetes channel id.
 
+It takes C<name>, C<namespace>, C<container>, C<stdin>, C<stdout>,
+C<stderr>, C<tty>, C<subprotocol> and the callbacks, as L</exec> does, but
+no C<command>. Any other option, C<command> among them, fails the L<Future>
+before a request is sent, naming the options C<attach> takes.
+
 =head2 cp_to_pod
 
     my $f = $kube->cp_to_pod('Pod', 'my-pod',
@@ -1594,6 +2720,11 @@ for very large files.
 
 Returns a L<Future> resolving to a hashref containing C<local>, C<remote>,
 C<bytes>, C<stderr>, and C<status>.
+
+It takes C<name>, C<namespace>, C<container>, C<local>, C<remote> and
+C<chunk_size> (bytes per stdin write, default 65536). Any other option fails
+the L<Future> before a request is sent, naming the options C<cp_to_pod>
+takes.
 
 =head2 cp_from_pod
 
@@ -1616,6 +2747,11 @@ for very large files.
 Returns a L<Future> resolving to a hashref containing C<local>, C<remote>,
 C<bytes>, C<stderr>, and C<status>.
 
+It takes C<name>, C<namespace>, C<container>, C<remote> and C<local>. Any
+other option -- C<chunk_size> belongs to L</cp_to_pod> only -- fails the
+L<Future> before a request is sent, naming the options C<cp_from_pod>
+takes.
+
 =head2 watcher
 
     my $watcher = $kube->watcher('Pod',
@@ -1630,7 +2766,9 @@ Create and register a L<Net::Async::Kubernetes::Watcher> for the specified
 resource type. The watcher is added as a child notifier and will start
 automatically when the parent is added to a loop.
 
-Returns the watcher object.
+Returns the watcher object. An odd list of parameters croaks, as
+C<Invalid arguments to watcher()>, before the watcher is created -- as an
+unknown parameter does.
 
 Arguments:
 
@@ -1657,7 +2795,48 @@ Create and register a L<Net::Async::Kubernetes::Controller> runtime bound to
 this client. The controller is added as a child notifier and can register
 resource watches, queue reconcile work, and patch object status.
 
-Returns the controller object.
+Returns the controller object. An odd list of parameters croaks, as
+C<Invalid arguments to controller()>, before the controller is created.
+
+=head1 ERRORS
+
+The C<Future>-returning methods report every failure through the returned
+L<Future>:
+
+=over 4
+
+=item * Bad arguments -- an unknown resource, an object that is no
+Kubernetes resource, a missing name, an unknown option -- fail it with a
+message before any request is sent. L</expand_class>, L</update>,
+L</update_status>, L</ensure> and a watcher that starts croak instead, as
+each of them documents.
+
+=item * A response the API server refuses (status 400 and up) fails it
+following L<Future>'s convention for failure details:
+C<< ->fail($error, 'http', $response) >>. C<$error> is exactly what
+L<Kubernetes::REST/check_response> throws, a L<Kubernetes::REST::APIError>
+object, which stringifies to the message
+(C<Kubernetes API error (get Pod): 404 ...>).
+C<$response> is the L<Kubernetes::REST::HTTPResponse>, whose C<status>
+tells a C<404> from a C<409> without parsing the message:
+
+    $kube->delete('Pod', 'web', namespace => 'default')->catch(http => sub {
+        my ($error, $category, $response) = @_;
+        return Future->done if $response->status == 404;   # already gone
+        return Future->fail(@_);
+    })->get;
+
+L</ensure> and L</ensure_all> pass the failure of the request that failed
+on in the same form.
+
+=item * A request that gets no response at all (connection refused, a TLS
+error) fails it the way the HTTP transport reports it.
+
+=back
+
+A L<Net::Async::Kubernetes::Watcher> reports failures to its C<on_error>
+callback instead, with the HTTP status in the C<code> of the C<Status> it
+passes.
 
 =head1 SEE ALSO
 

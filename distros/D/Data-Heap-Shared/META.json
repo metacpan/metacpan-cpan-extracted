@@ -53,6 +53,6 @@
          "web" : "https://github.com/vividsnow/perl5-data-heap-shared"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

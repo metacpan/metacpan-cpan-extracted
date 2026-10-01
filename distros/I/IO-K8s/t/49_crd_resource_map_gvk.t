@@ -53,7 +53,7 @@ use IO::K8s;
     use IO::K8s::APIObject
         api_version     => 'homelab.example.com/v1',
         resource_plural => 'staticwebsites';
-    k8s spec => { Str => 1 };
+    k8s spec => Opaque;
     1;
 }
 
@@ -62,7 +62,7 @@ use IO::K8s;
     use IO::K8s::APIObject
         api_version     => 'homelab.example.com/v1',
         resource_plural => 'testcrds';
-    k8s spec => { Str => 1 };
+    k8s spec => Opaque;
     1;
 }
 

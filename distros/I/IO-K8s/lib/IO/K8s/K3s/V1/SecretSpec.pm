@@ -1,6 +1,6 @@
 package IO::K8s::K3s::V1::SecretSpec;
 # ABSTRACT: SecretSpec describes a key in a secret to load chart values from.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s ignoreUpdates => Bool;
@@ -24,7 +24,7 @@ IO::K8s::K3s::V1::SecretSpec - SecretSpec describes a key in a secret to load ch
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 ignoreUpdates
 

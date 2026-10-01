@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::WebHTTPHeaders;
 # ABSTRACT: headers defines a list of headers that can be added to HTTP responses.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s contentSecurityPolicy   => Str;
@@ -28,7 +28,7 @@ IO::K8s::PrometheusOperator::V1::WebHTTPHeaders - headers defines a list of head
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 contentSecurityPolicy
 

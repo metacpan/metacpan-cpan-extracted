@@ -93,6 +93,22 @@ DESCRIPTION
     slots owned by dead processes and frees them. Call periodically or on
     startup for crash recovery.
 
+    A slot is claimed by writing the allocator's PID into its owner word, and
+    only then marked in the allocation bitmap; a free clears the bitmap bit
+    first and the owner word last. A process killed at any point inside
+    "alloc" or "free" therefore leaves the slot either free or carrying its
+    PID, and "recover_stale" frees it once that process is dead. A slot freed
+    by a process other than its allocator, if that process is killed in the
+    middle of the free, stays taken until the allocator is dead too. A process
+    killed inside "alloc", "free" or "recover_stale" can leave "used" one too
+    high for each such kill, and one inside "free_n" or "alloc_n" by up to the
+    number of slots it handles ("available" never goes below 0); a blocked
+    "alloc" rescans at least once a second, so it still finds a free slot.
+
+    The backing-file format is version 2. A file written by a release that
+    used format 1 is refused with "pool file format version 1 is not
+    supported"; recreate it.
+
 CONSTRUCTORS
         # Raw pool
         my $p = Data::Pool::Shared->new($path, $capacity, $elem_size);
@@ -117,6 +133,12 @@ CONSTRUCTORS
     The descriptor you pass to "new_from_fd" is duplicated
     ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing it does not
     disturb the pool.
+
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of dying with "SIGBUS" while the
+    segment is initialized; set "DATA_POOL_SHARED_SPARSE=1" to skip the
+    reservation. On tmpfs and memfd the segment is memory, and a memory cgroup
+    too small for it gets an OOM kill rather than a croak.
 
 METHODS
   Allocation

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::GlobalSMTPConfig;
 # ABSTRACT: smtp defines global SMTP parameters.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s authIdentity     => Str;
@@ -38,7 +38,7 @@ IO::K8s::PrometheusOperator::V1::GlobalSMTPConfig - smtp defines global SMTP par
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 authIdentity
 

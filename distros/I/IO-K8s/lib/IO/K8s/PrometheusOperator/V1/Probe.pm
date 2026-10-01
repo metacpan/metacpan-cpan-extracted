@@ -1,9 +1,10 @@
 package IO::K8s::PrometheusOperator::V1::Probe;
 # ABSTRACT: The `Probe` custom resource definition (CRD) defines how to scrape metrics from prober exporters such as the [blackbox exporter](https://github.com/prometheus/blackbox_exporter).
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'monitoring.coreos.com/v1',
-    resource_plural => 'probes';
+    resource_plural => 'probes',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => '+IO::K8s::PrometheusOperator::V1::ProbeSpec', { required => 'schema' };
@@ -25,7 +26,7 @@ IO::K8s::PrometheusOperator::V1::Probe - The `Probe` custom resource definition 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

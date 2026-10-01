@@ -1,6 +1,6 @@
 package IO::K8s::Role::MiddlewareBuilder;
 # ABSTRACT: Role for building Traefik middleware configuration
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use Moo::Role;
 
 # The fluent setters below build the spec through IO::K8s::Role::SpecBuilder
@@ -75,7 +75,7 @@ IO::K8s::Role::MiddlewareBuilder - Role for building Traefik middleware configur
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ chaining.
 
 Configures the Traefik stripPrefix middleware to remove each prefix in
 C<@prefixes> from incoming request paths. The prefixes are written as a
-single C<< { prefixes =E<gt> [...] } >> block, replacing any prior
+single C<< { prefixes => [...] } >> block, replacing any prior
 stripPrefix block. Pass an empty list to emit an empty
 C<stripPrefix.prefixes> array. Returns C<$self> for chaining.
 
@@ -166,7 +166,7 @@ C<stripPrefix.prefixes> array. Returns C<$self> for chaining.
 
 Configures the Traefik redirectScheme middleware to issue a permanent 301
 redirect from the current listener to C<https>. The wire block is
-C<< { scheme =E<gt> 'https', permanent =E<gt> 1 } >>. Returns C<$self> for
+C<< { scheme => 'https', permanent => 1 } >>. Returns C<$self> for
 chaining.
 
 =head2 add_request_header

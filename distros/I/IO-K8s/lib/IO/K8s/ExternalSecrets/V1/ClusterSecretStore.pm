@@ -1,9 +1,10 @@
 package IO::K8s::ExternalSecrets::V1::ClusterSecretStore;
 # ABSTRACT: ClusterSecretStore represents a secure external location for storing secrets, which can be referenced as part of `storeRef` fields.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'external-secrets.io/v1',
-    resource_plural => 'clustersecretstores';
+    resource_plural => 'clustersecretstores',
+    subresources    => { status => {} };
 
 k8s spec   => '+IO::K8s::ExternalSecrets::V1::SecretStoreSpec';
 k8s status => '+IO::K8s::ExternalSecrets::V1::SecretStoreStatus';
@@ -24,7 +25,7 @@ IO::K8s::ExternalSecrets::V1::ClusterSecretStore - ClusterSecretStore represents
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

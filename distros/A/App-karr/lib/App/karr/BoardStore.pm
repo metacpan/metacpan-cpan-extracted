@@ -1,7 +1,7 @@
 # ABSTRACT: Ref-backed board storage for karr
 
 package App::karr::BoardStore;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use Path::Tiny qw( path );
 use YAML::XS qw( DumpFile LoadFile );
@@ -68,6 +68,13 @@ sub is_terminal_status {
     # kanban-md board names its final column whatever it likes (ticket #67).
     return App::karr::Config->from_merged( $self->effective_config )
         ->is_terminal_status($status_name);
+}
+
+
+sub is_held_back_status {
+    my ($self, $status_name) = @_;
+    return App::karr::Config->from_merged( $self->effective_config )
+        ->is_held_back_status($status_name);
 }
 
 
@@ -572,7 +579,7 @@ App::karr::BoardStore - Ref-backed board storage for karr
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -685,6 +692,13 @@ status, or C<archived>.
     unless ($store->is_terminal_status($task->status)) {
         # task is still active
     }
+
+=head2 is_held_back_status
+
+Returns true if the status is this board's held-back one -- C<backlog>, where
+the board has that column (L<App::karr::Config/is_held_back_status>).
+
+    next if $store->is_held_back_status($task->status);   # nobody takes it
 
 =head2 foundation_enabled
 

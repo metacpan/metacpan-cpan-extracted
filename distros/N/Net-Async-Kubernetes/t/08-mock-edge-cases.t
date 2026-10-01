@@ -392,11 +392,14 @@ subtest 'watcher retries on stream failure' => sub {
 
     my @added;
     my $event_count = 0;
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, $_[0] };
     my $watcher;
     $watcher = $kube->watcher('Pod',
-        namespace => 'retry',
-        on_added  => sub { push @added, $_[0]->metadata->name },
-        on_event  => sub {
+        namespace        => 'retry',
+        reconnect_jitter => 0,
+        on_added         => sub { push @added, $_[0]->metadata->name },
+        on_event         => sub {
             $event_count++;
             if ($event_count >= 2) {
                 $watcher->stop;
@@ -410,6 +413,8 @@ subtest 'watcher retries on stream failure' => sub {
     $loop->run;
 
     ok($event_count >= 2, "retry happened, saw $event_count events");
+    like($warnings[0] // '', qr/^watch Pod failed, retrying in 1s: Connection reset/,
+        'the failure is warned about, without on_error');
 };
 
 # ============================================================================

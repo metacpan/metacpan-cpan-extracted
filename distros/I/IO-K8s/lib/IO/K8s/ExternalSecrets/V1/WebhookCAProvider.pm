@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::WebhookCAProvider;
 # ABSTRACT: The provider for the CA bundle to use to validate webhook server certificate.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s key       => Str, { pattern => qr/^[-._a-zA-Z0-9]+$/ };
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::WebhookCAProvider - The provider for the CA bundle
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 key
 

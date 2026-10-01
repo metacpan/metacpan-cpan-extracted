@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeSwapStatus;
 # ABSTRACT: NodeSwapStatus represents swap memory information.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s capacity => Int;
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::NodeSwapStatus - NodeSwapStatus represents swap memory i
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 capacity
 

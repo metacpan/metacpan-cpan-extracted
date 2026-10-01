@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::StoreSourceRef;
 # ABSTRACT: SourceRef allows you to override the source from which the value will be pulled.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s generatorRef => 'Autoscaling::V1::CrossVersionObjectReference';
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::StoreSourceRef - SourceRef allows you to override 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 generatorRef
 

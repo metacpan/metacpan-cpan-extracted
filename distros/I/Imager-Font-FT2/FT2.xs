@@ -252,7 +252,7 @@ i_ft2_has_chars(handle, text_sv, utf8)
         }
         else {
           EXTEND(SP, 1);
-          PUSHs(sv_2mortal(newSVpv(work, count)));
+          PUSHs(sv_2mortal(newSVpvn(work, count)));
         }
         myfree(work);
 
@@ -340,7 +340,7 @@ i_ft2_get_multiple_masters(handle)
             AV *av = newAV();
             SV *sv;
             av_extend(av, 3);
-            sv = newSVpv(mm.axis[i].name, strlen(mm.axis[i].name));
+            sv = newSVpv(mm.axis[i].name, 0);
             SvREFCNT_inc(sv);
             av_store(av, 0, sv);
             sv = newSViv(mm.axis[i].minimum);

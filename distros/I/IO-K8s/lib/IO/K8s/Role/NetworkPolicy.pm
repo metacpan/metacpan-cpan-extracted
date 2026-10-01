@@ -1,6 +1,6 @@
 package IO::K8s::Role::NetworkPolicy;
 # ABSTRACT: Role for building network policies (core K8s and Cilium)
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Types::Net qw( cidr_contains );
 use Carp qw(croak);
 # Imports above `use Moo::Role` on purpose: Role::Tiny treats subs already in
@@ -409,7 +409,7 @@ IO::K8s::Role::NetworkPolicy - Role for building network policies (core K8s and 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -465,7 +465,7 @@ consuming class's C<_netpol_format>. Returns C<$self> for chaining.
 
 Adds an ingress rule allowing traffic from pods matching the given labels.
 C<$labels> is a hashref (the C<matchLabels> payload); C<ports> is an
-optional arrayref of C<< { port =E<gt> $n, protocol =E<gt> 'TCP' } >>
+optional arrayref of C<< { port => $n, protocol => 'TCP' } >>
 entries. Core K8s writes C<spec.ingress[].from[].podSelector>; Cilium
 writes C<spec.ingress[].fromEndpoints[].matchLabels>. Returns C<$self> for
 chaining.
@@ -476,8 +476,8 @@ chaining.
 
 Adds an ingress rule allowing traffic from the given CIDR ranges. Each CIDR
 is validated as having a C</> and being parseable by L<Net::IP>; croaks
-otherwise. C<ports> is an optional arrayref of C<< { port =E<gt> $n,
-protocol =E<gt> 'TCP' } >> entries. Core K8s writes
+otherwise. C<ports> is an optional arrayref of C<< { port => $n,
+protocol => 'TCP' } >> entries. Core K8s writes
 C<spec.ingress[].from[].ipBlock.cidr>; Cilium writes
 C<spec.ingress[].fromCIDR>. Returns C<$self> for chaining.
 
@@ -487,7 +487,7 @@ C<spec.ingress[].fromCIDR>. Returns C<$self> for chaining.
 
 Adds an ingress rule allowing traffic from any pod in the named namespace.
 Internally selects on the well-known
-C<kubernetes.io/metadata.name =E<gt> $namespace> label (or its Cilium
+C<< kubernetes.io/metadata.name => $namespace >> label (or its Cilium
 equivalent C<k8s:io.kubernetes.pod.namespace>). C<ports> is optional.
 Returns C<$self> for chaining.
 
@@ -538,7 +538,7 @@ C<kube-system> B<and> carry the label, not either:
 Cilium writes the same two facts as one C<toEndpoints> match in its own
 label vocabulary (C<k8s:io.kubernetes.pod.namespace>, C<k8s:k8s-app>).
 
-B<Changed in 1.108> (k117): the core branch used to emit the ports without
+B<Changed in 1.108>: the core branch used to emit the ports without
 any C<to> peer, which allows port 53 to B<every> destination -- a policy
 looser than this documentation described, and one that silently opened
 egress on port 53 to anything a pod could reach. Manifests regenerated

@@ -7,7 +7,7 @@
 
 use ExtUtils::testlib;
 
-use Test::More qw(no_plan);
+use Test::More;
 BEGIN { use_ok('Text::Markdown::Discount') };
 
 #########################
@@ -36,3 +36,5 @@ foreach my $testfile (grep { /\.text$/ } readdir(DIR)) {
         diag diff \$expected, \$actual;
     }
 }
+
+done_testing;

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ServiceUDP;
 # ABSTRACT: ServiceUDP defines an upstream UDP service to proxy traffic to.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name       => Str, { required => 'schema' };
@@ -30,7 +30,7 @@ IO::K8s::Traefik::V1alpha1::ServiceUDP - ServiceUDP defines an upstream UDP serv
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

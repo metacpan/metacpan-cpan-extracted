@@ -10,6 +10,9 @@ use IPC::Open3 qw( open3 );
 use Symbol qw( gensym );
 use JSON::MaybeXS qw( decode_json );
 use Path::Tiny qw( path );
+use App::karr::Git;
+use App::karr::BoardStore;
+use App::karr::Foundation::Picker;
 
 # t/216-ex-sandbox.t (ticket #216) -- coverage for the ex/ fleet sandbox that
 # ex/setup.sh builds (ticket #212). #213 was already taken (the missing chain
@@ -205,6 +208,9 @@ sub _build_sandbox {
 # What setup.sh itself claims it builds (comments in the script and the
 # maintainer's own manual --reset run agree): 6 webapp cards (2 claimed under
 # agent-fox, 1 blocked) and 2 docs-site cards (1 claimed under agent-fox).
+# Every card is seeded in todo, none in backlog: backlog is held back since
+# k306 -- never picked, never actionable -- so a sandbox seeded there hands
+# the demo agents nothing (k313). See also 'a fresh sandbox has work ...'.
 my %EXPECT_WEBAPP = (
   1 => {
     title => 'Fix login bug', status => 'in-progress', priority => 'high',
@@ -212,7 +218,7 @@ my %EXPECT_WEBAPP = (
     depends_on => [], tags => [],
   },
   2 => {
-    title => 'Rate limit the API', status => 'backlog', priority => 'medium',
+    title => 'Rate limit the API', status => 'todo', priority => 'medium',
     claimed_by => undef, blocked => 0, block_reason => undef,
     depends_on => [1], tags => [],
   },
@@ -222,18 +228,18 @@ my %EXPECT_WEBAPP = (
     depends_on => [], tags => [],
   },
   4 => {
-    title => 'Upgrade TLS on staging', status => 'backlog', priority => 'critical',
+    title => 'Upgrade TLS on staging', status => 'todo', priority => 'critical',
     claimed_by => undef, blocked => 1,
     block_reason => 'waiting for the certificate from ops',
     depends_on => [], tags => [],
   },
   5 => {
-    title => 'Write integration tests for checkout', status => 'backlog', priority => 'high',
+    title => 'Write integration tests for checkout', status => 'todo', priority => 'high',
     claimed_by => undef, blocked => 0, block_reason => undef,
     depends_on => [], tags => [],
   },
   6 => {
-    title => 'Deploy the 0.6 release', status => 'backlog', priority => 'low',
+    title => 'Deploy the 0.6 release', status => 'todo', priority => 'low',
     claimed_by => undef, blocked => 0, block_reason => undef,
     depends_on => [], tags => ['needs:docs-site#1'],
   },
@@ -241,7 +247,7 @@ my %EXPECT_WEBAPP = (
 
 my %EXPECT_DOCS = (
   1 => {
-    title => 'Update the installation quickstart', status => 'backlog', priority => 'medium',
+    title => 'Update the installation quickstart', status => 'todo', priority => 'medium',
     claimed_by => undef, blocked => 0, block_reason => undef,
     depends_on => [], tags => [],
   },
@@ -437,6 +443,29 @@ subtest 'karr-foundation --status sees both boards and the demo agent' => sub {
   like( $status->{stdout}, qr/2 tasks/,      'docs-site shows 2 tasks' );
   like( $status->{stdout}, qr/blocked:\s*#4/, 'webapp #4 is reported blocked' );
   like( $status->{stdout}, qr/demo\s+ok/,    'the demo agent is reported ok' );
+};
+
+# The walkthrough in ex/README.md opens with a run in which webapp's ticket-mode
+# agent is handed #5 and docs-site's drain agent picks #1. Both are read here
+# without driving an agent: the Picker is karr pick's own rules
+# (App::karr::Role::PickRules) asked read-only, and --dry-run shows foundation's
+# ticket choice while writing no state and starting nothing. A sandbox seeded
+# in backlog (held back since k306) answers undef and 'TICKET none
+# assignable', which is how the walkthrough silently stopped happening (k313).
+subtest 'a fresh sandbox has work for pick and karr-foundation to hand out' => sub {
+  my %first_pick = ( webapp => 5, 'docs-site' => 1 );
+  for my $repo ( sort keys %first_pick ) {
+    my $store = App::karr::BoardStore->new(
+      git => App::karr::Git->new( dir => "$sandbox/ex/$repo" ),
+    );
+    is( App::karr::Foundation::Picker->new( store => $store )->next_ticket,
+      $first_pick{$repo}, "pick's rules hand out #$first_pick{$repo} first on ex/$repo" );
+  }
+
+  my $dry = _foundation( $sandbox, '--config', "$sandbox/ex/config.yml", '--dry-run', '--verbose' );
+  is( $dry->{exit}, 0, 'karr-foundation --dry-run --verbose exits 0' ) or diag $dry->{stderr};
+  like( $dry->{stdout}, qr/TICKET task#5$/m, 'webapp ticket mode names #5' );
+  unlike( $dry->{stdout}, qr/TICKET none assignable/, '...and never finds nothing to assign' );
 };
 
 # ---------------------------------------------------------------- idempotency

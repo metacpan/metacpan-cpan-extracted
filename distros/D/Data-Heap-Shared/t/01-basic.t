@@ -69,7 +69,7 @@ if ($pid == 0) {
     _exit($cp == 7 && $cv == 700 ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'cross-process pop';
+is $?, 0, 'cross-process pop';
 
 # futex wakeup
 $pid = fork // die;

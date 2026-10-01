@@ -1,9 +1,10 @@
 package IO::K8s::GatewayAPI::V1::TLSRoute;
 # ABSTRACT: The TLSRoute resource is similar to TCPRoute, but can be configured to match against TLS-specific metadata.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
-    resource_plural => 'tlsroutes';
+    resource_plural => 'tlsroutes',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::Routable';
 sub _route_format { 'gateway' }
 
@@ -26,7 +27,7 @@ IO::K8s::GatewayAPI::V1::TLSRoute - The TLSRoute resource is similar to TCPRoute
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

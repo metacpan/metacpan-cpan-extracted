@@ -13,9 +13,9 @@ with 'CPAN::Maker::Role::ModuleUtils';
 
 CLI::Simple->import(qw(:roles));
 
-our $VERSION   = '2.3.3';
-our $GIT_SHA   = '48baa8672f343c6af2f5144821905a26ac2ef92d';
-our $GIT_DIRTY = '2.0.0-23-g48baa8672f343c6af2f5144821905a26ac2ef92d';
+our $VERSION   = '2.3.5';
+our $GIT_SHA   = '4a59b617de075c35aefe39115d9abc4b54bd0224';
+our $GIT_DIRTY = '2.0.0-25-g4a59b617de075c35aefe39115d9abc4b54bd0224';
 
 with 'CPAN::Maker::Bootstrapper::Role::Init';
 with 'CPAN::Maker::Bootstrapper::Role::LLM::Utils';
@@ -682,13 +682,14 @@ all C<.mk> files installed and maintained by the bootstrapper. These
 files are write-protected and should never be edited directly. Updated
 by C<make update>.
 
- .includes/perl.mk         - pattern rules, syntax checking, tidy, critic
- .includes/git.mk          - make git target
- .includes/help.mk         - make help target
- .includes/version.mk      - make release/minor/major targets
+ .includes/perl.mk          - pattern rules, syntax checking, tidy, critic
+ .includes/git.mk           - make git target
+ .includes/help.mk          - make help target
+ .includes/publish.mk       - publish to CPAN
  .includes/release-notes.mk - make release-notes target
- .includes/update.mk       - make update target
- .includes/upgrade.mk      - make upgrade/check-upgrade targets
+ .includes/update.mk        - make update target
+ .includes/upgrade.mk       - make upgrade/check-upgrade targets
+ .includes/version.mk       - make release/minor/major targets
 
 =item * F<project.mk> - your extension point for custom make rules,
 inter-module dependencies, and project-specific variables. Never
@@ -747,6 +748,12 @@ The target depends on the modulino, so it will build F<bin/E<lt>aliasE<gt>>
 first if needed. Completion is only available for modulinos that
 subclass C<CLI::Simple>.
 
+=item C<make help>
+
+Lists the available build targets and commonly used build variables.
+Project-specific targets in F<project.mk> are included when their
+target definition contains a C<##> description.
+
 =item C<make requires> / C<make test-requires>
 
 Scans source files with C<scandeps-static.pl> and writes the dependency
@@ -769,10 +776,60 @@ C<recommends> (soft, non-eval conditional dependencies), and C<suggests>
 sections of the generated F<Makefile.PL>. Each is regenerated when a
 source file changes; see L</Dependencies Management>.
 
+=item C<DARKPAN_REQUIRES>
+
+Set C<DARKPAN_REQUIRES> to a true value (C<1>, C<yes>, C<on>, or
+C<si>) to generate dependency manifests for modules available from a
+configured DarkPAN.
+
+This is useful when a distribution published to CPAN has one or more runtime
+dependencies that are intentionally hosted on a separate CPAN-compatible
+repository. CPAN metadata can still declare those dependencies normally, but
+standard installers need additional information to locate distributions that
+should be obtained from the DarkPAN.
+
+The generated DarkPAN manifests provide that information without duplicating
+the dependency declarations maintained in F<requires>. They are included in
+the distribution as installation aids for the person or process installing
+the module. They are not automatically consulted by Perl installers during a
+normal installation; the installer must explicitly use the appropriate
+manifest or configure the DarkPAN repository.
+
+When enabled, C<DARKPAN_URL> must specify the base URL of the
+CPAN-compatible repository:
+
+  DARKPAN_REQUIRES = yes
+  DARKPAN_URL = https://cpan.example.com/repository
+
+C<make> examines F<requires> and generates:
+
+  cpanfile.darkpan
+  cpanm.darkpan
+
+F<cpanfile.darkpan> contains the non-CPAN dependencies in cpanfile
+syntax. F<cpanm.darkpan> contains the same dependencies in a form
+suitable for passing to L<cpanm|App::cpanminus>.
+
+The configured DarkPAN must publish:
+
+  modules/02packages.details.txt.gz
+
+under C<DARKPAN_URL>.
+
 =item C<make package>
 
 Runs the quality and dependency gates together (C<lint> plus a
-dependency scan) Ã¢ÂÂ a convenience for pre-release verification.
+dependency scan) - a convenience for pre-release verification.
+
+=item C<TARBALL_ORDER_ONLY_PREREQS>
+
+Additional order-only prerequisites for the distribution tarball.
+
+Set this in F<project.mk> when project-specific generated artifacts or
+other preparation steps must complete before the tarball is built but
+should not themselves determine whether the tarball is out of date.
+
+ TARBALL_ORDER_ONLY_PREREQS += prepare-assets
 
 =item C<make release> / C<make minor> / C<make major>
 
@@ -793,6 +850,32 @@ C<clean-local> target with a double-colon.
 
   clean-local::
          rm -rf workdir
+
+=item C<make test>
+
+Runs the project's distribution unit tests under F<t/>:
+
+ prove -I lib -v t/
+
+Projects may also have tests that exercise development infrastructure,
+external services, generated artifacts, or other behavior that should
+not be included in the CPAN distribution. These tests should remain
+outside F<t/> and can be run by defining C<test-local::> in
+F<project.mk>:
+
+ test-local::
+     prove -I lib -v xt/
+
+or:
+
+ test-local::
+     ./bin/test-integration
+
+C<make test> runs both the distribution tests under F<t/> and any
+project-specific C<test-local::> recipes.
+
+The double-colon form allows F<project.mk> to extend the managed
+C<test-local> target without replacing it.
 
 =item C<make tidy>
 
@@ -903,11 +986,29 @@ Then set C<CPAN_MAKER_CONFIG> to point to it:
 
  export CPAN_MAKER_CONFIG=$HOME/.cpan-makerrc
 
+=item deps-filter
+
+ cmb deps-filter requires
+
+Filters a dependency list so that modules already provided by another
+listed distribution are removed.
+
+The command consults the public CPAN package index and any repositories
+listed in F<build-mirrors>. Repository indexes are cached under the
+user's cache directory and conditionally refreshed on subsequent runs.
+
+This command is normally invoked automatically by the generated
+Makefile for C<requires>, C<recommends>, C<suggests>, and
+C<test-requires>.
+
 =item extra-files
 
- cmb extra-files path file ...
+ cmb extra-files path file1 file2 ...
 
-Add files to be installed with the distribution. Use '.' for path if the file is to be installed in the root of the distribution tarball but not in the share directory. Use 'share' if the file is to be installed int the distribution share directory.
+Add files to be installed with the distribution. Use '.' for path if
+the file is to be installed in the root of the distribution tarball
+but not in the share directory. Use 'share' if the file is to be
+installed into the distribution share directory.
 
 I<NOTE: file should be the relative path within the project that points to the file.>
 
@@ -915,6 +1016,16 @@ Example:
 
  cmb extra-files . README.md
  cmb extra-files share share/config.json 
+
+Entries may be removed by editing F<buildspec.yml> directly, which is
+usually the clearest approach.
+
+The C<cmb extra-files> command also supports removing an entry by
+prefixing the filename with C<->:
+
+ cmb extra-files . -README.md
+
+This is primarily useful from scripts or other automated workflows.
 
 =item create-deps
 
@@ -929,6 +1040,50 @@ packages only, so C<make> rebuilds a dependent module when a module it
 depends on changes. With no arguments every project module is scanned;
 name one or more modules to restrict the output.
 
+=item create-darkpan-requires
+
+  cmb create-darkpan-requires
+
+Examines F<requires> and identifies dependencies available from the configured
+DarkPAN. If a dependency is available from both CPAN and the DarkPAN, the
+DarkPAN is preferred.
+
+The generated files are intended as installation aids and are included with
+the distribution. They do not alter normal Perl dependency resolution by
+themselves and are not automatically consulted during installation. Instead,
+they are intended to be consumed explicitly by your installation tool, such
+as C<cpm> or C<cpanm>.
+
+For distributions that include these files, the C<cpan-distfile> utility
+provided with L<DarkPAN::Resolver::SQLite> can be used to retrieve them
+directly from a CPAN distribution without manually downloading and unpacking
+the tarball.
+
+  cpan-distfile Some::Module cpanm.darkpan > cpanm.darkpan
+
+See L<DarkPAN::Resolver::SQLite> for examples of using these manifests with
+C<cpm> and C<cpanm>.
+
+The command generates two representations of those dependencies:
+
+  cpanfile.darkpan
+  cpanm.darkpan
+
+F<cpanfile.darkpan> uses cpanfile syntax:
+
+  requires 'Amazon::API::CloudWatchLogs', '1.43.90';
+
+F<cpanm.darkpan> contains one cpanm module requirement per line:
+
+  Amazon::API::CloudWatchLogs~1.43.90
+
+The version constraints are taken from F<requires>; the DarkPAN index
+is used only to determine whether a module is available from a DarkPAN
+repository.
+
+This command is normally invoked automatically by C<make> when
+C<DARKPAN_REQUIRES> is enabled.
+
 =item critique
 
  cmb critique file ...
@@ -940,6 +1095,17 @@ with the C<PERLCRITIC_THEME>, C<PERLCRITIC_SEVERITY>, and
 C<PERLCRITICRC> environment variables. Requires L<Perl::Critic> to be
 installed.
 
+=item publish-to-cpan
+
+ cmb publish-to-cpan distribution.tar.gz [username [password]]
+
+Uploads a distribution tarball to PAUSE.
+
+The username and password may be supplied as arguments or through
+C<PAUSE_USER> and C<PAUSE_PASSWORD>. Normally this command is invoked
+through C<make publish>, which rebuilds and tests the distribution
+before uploading it.
+
 =item resolve-vars
 
  cmb resolve-vars [--vars-file FILE] [--no-strict] source-file
@@ -948,7 +1114,7 @@ Filters C<source-file> to STDOUT, substituting C<@TOKEN@> placeholders
 with values drawn from the environment (or from a C<--vars-file>). This
 is the mechanism the generated F<Makefile> uses to turn F<.pm.in> and
 F<.pl.in> sources into their built C<.pm>/C<.pl> counterparts -- for
-example filling C<2.3.3> from the F<VERSION> file or
+example filling C<2.3.5> from the F<VERSION> file or
 C<@BUILD_DATE@> at build time.
 
 A placeholder is only I<required> to resolve if it appears in live code.
@@ -1811,8 +1977,17 @@ Any target specific to your project - generating assets, running
 linters, deploying, sending notifications:
 
  .PHONY: deploy
- deploy: all
+ deploy: all ## deploy the distribution
      scp $(TARBALL) user@myserver:/opt/cpan
+
+Add C<##> followed by a description to a target definition to include
+the target in the output from C<make help>. Because F<project.mk> is
+included in C<MAKEFILE_LIST>, project-specific targets are discovered
+automatically:
+
+ make help
+
+There is no separate help table to maintain.
 
 =item Inter-module dependencies
 
@@ -1844,7 +2019,16 @@ appending to C<CLEANFILES>:
 =item Extending the C<clean-recipe>
 
   clean-local::
-         rm -rf workd
+         rm -rf workdir
+
+=item Extending the test recipe
+
+Projects may have development or integration tests that should not be
+included in the CPAN distribution. Add them to C<make test> by
+extending C<test-local> with a double-colon rule:
+
+ test-local::
+     prove -I lib -v xt/
 
 =back
 
@@ -1854,8 +2038,10 @@ appending to C<CLEANFILES>:
 
 =item * Modifications to existing targets like C<all>, C<clean>, C<requires>
 
-=item * Changes to C<DEPS>, C<CLEANFILES>, or other core variables - these
-are owned by the managed Makefile
+=item * Replacing managed variables such as C<DEPS> or C<CLEANFILES>.
+
+Use documented extension points such as C<CLEANFILES +=> where
+provided rather than redefining the managed value.
 
 =item * Anything that duplicates logic already in the managed Makefile
 
@@ -1902,6 +2088,16 @@ The following targets manage the lifecycle of the build system itself:
 
 Checks MetaCPAN to see if a newer version of
 C<CPAN::Maker::Bootstrapper> is available.
+
+=item C<make publish>
+
+Builds the distribution tarball, unpacks it into a temporary directory,
+runs its normal C<Makefile.PL>, build, and test sequence, and uploads
+the tarball to PAUSE if all checks succeed.
+
+Set the PAUSE credentials with:
+
+ make publish PAUSE_USER=username PAUSE_PASSWORD=password
 
 =item C<make upgrade>
 
@@ -2368,6 +2564,31 @@ Files listed under C<share:> are installed into the distribution's
 share directory and can be accessed at runtime via
 L<File::ShareDir>.
 
+The build verifies that files listed in C<extra-files> are tracked by
+git. This helps catch files that have been added to the distribution
+but accidentally omitted from the project repository.
+
+Some extra files are generated build artifacts and therefore B<should
+not be committed> to the repository. Add those files to
+F<extra-files.skip>, one file per line:
+
+ generated/service-data.dat
+ share/generated-index.json
+
+Blank lines and lines beginning with C<#> are ignored.
+
+F<extra-files.skip> only disables the git tracking check for those
+files. The files remain part of the distribution and continue to be
+included as dependencies when determining whether the distribution
+tarball must be rebuilt.
+
+C<CPAN::Maker::Bootstrapper> uses this mechanism for generated DarkPAN
+dependency manifests. When C<DARKPAN_REQUIRES> is enabled,
+F<cpanfile.darkpan> and F<cpanm.darkpan> are added to
+F<buildspec.yml> as extra files and to F<extra-files.skip> because
+they are generated during the build rather than maintained in source
+control. See L</DARKPAN_REQUIRES>.
+
 =head2 I want to pin a version or add a module the scanner missed
 
 Edit F<requires> directly. Prefix the module name with C<+> to make
@@ -2629,21 +2850,28 @@ C<make requires> and C<make test-requires> to analyze your source files
 
 =head1 DEPENDENCIES
 
-  CLI::Simple::Constants
-  CLI::Simple::Utils
-  CPAN::Maker::ConfigReader
-  Cwd
-  English
+  CLI::Simple
+  CPAN::Maker
+  Class::Accessor::Fast
+  Config::Tiny
   Email::Valid
-  File::Basename
-  File::Copy
-  File::Find
-  File::Path
+  File::Copy::Recursive
+  File::HomeDir
   File::ShareDir
-  File::Temp
-  JSON::PP
-  List::Util
-  Module::Metadata;
+  HTTP::Tiny
+  IO::Interactive
+  IO::Scalar
+  IO::Socket::SSL
+  JSON
+  Log::Log4perl
+  Module::Metadata
+  Module::ScanDeps::Static
+  Net::SSLeay
+  Pod::Extract
+  Readonly
+  Role::Tiny
+  Text::ASCIITable
+  YAML::Tiny
 
 =head2 Required for AI Commands
 
@@ -2658,7 +2886,7 @@ C<make requires> and C<make test-requires> to analyze your source files
 
 =head1 VERSION
 
-This documentation refers to version 2.3.3
+This documentation refers to version 2.3.5
 
 =head1 AUTHOR
 

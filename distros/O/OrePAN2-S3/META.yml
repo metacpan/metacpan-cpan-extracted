@@ -22,7 +22,7 @@ no_index:
 provides:
   OrePAN2::S3:
     file: lib/OrePAN2/S3.pm
-    version: v2.1.1
+    version: v2.1.2
   OrePAN2::S3::Indexer:
     file: lib/OrePAN2/S3/Indexer.pm
     version: '0'
@@ -31,7 +31,7 @@ provides:
     version: '0'
   OrePAN2::S3::Role::Inject:
     file: lib/OrePAN2/S3/Role/Inject.pm
-    version: v2.1.1
+    version: v2.1.2
   OrePAN2::S3::Role::Upload:
     file: lib/OrePAN2/S3/Role/Upload.pm
     version: '0'
@@ -42,12 +42,9 @@ requires:
   Amazon::Credentials: v1.3.0
   Amazon::S3::Lite: v1.2.3
   CLI::Simple: v2.2.2
-  CLI::Simple::Constants: v2.2.2
-  CLI::Simple::Utils: v2.2.2
   CPAN::Meta: '2.150010'
   DarkPAN::Indexer: v1.0.2
   DarkPAN::Utils: v1.1.0
-  DarkPAN::Utils::Docs: v1.1.0
   Data::UUID: '1.227'
   File::ShareDir: '1.118'
   JSON: '4.10'
@@ -56,7 +53,6 @@ requires:
   OrePAN2::Lite: v2.0.0
   Readonly: '2.05'
   Role::Tiny: '2.002004'
-  Role::Tiny::With: '2.002004'
   Template: '3.102'
   Text::Markdown::Discount: '0.18'
   perl: '5.010'
@@ -64,5 +60,5 @@ resources:
   bugtracker: http://github.com/rlauer6/OrePAN2-S3/issues
   homepage: http://github.com/rlauer6/OrePAN2-S3.git
   repository: git://github.com/rlauer6/OrePAN2-S3.git
-version: v2.1.1
+version: v2.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

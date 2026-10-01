@@ -1,4 +1,4 @@
-use strict; use warnings; use Test::More;
+use strict; use warnings; use open IO => ":raw"; use Test::More;
 use Data::SpatialHash::Shared;
 use Fcntl qw(SEEK_SET);
 

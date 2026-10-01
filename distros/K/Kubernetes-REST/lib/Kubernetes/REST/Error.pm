@@ -1,5 +1,5 @@
 package Kubernetes::REST::Error;
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 # ABSTRACT: Compatibility helper for deprecated v0 error handling
   use Moo;
   use Types::Standard qw/Str/;
@@ -42,11 +42,11 @@ Kubernetes::REST::Error - Compatibility helper for deprecated v0 error handling
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 
-These error classes belong to the deprecated v0 API - the v1 API croaks instead of throwing structured exceptions. They stay around so code that still catches them keeps working.
+These error classes belong to the deprecated v0 API - the v1 API never throws them: an HTTP error status dies with a L<Kubernetes::REST::APIError>, anything else croaks with a string. They stay around so code that still catches them keeps working.
 
 See L<Kubernetes::REST/"UPGRADING FROM 0.02"> for migration guide.
 

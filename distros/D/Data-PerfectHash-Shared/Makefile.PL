@@ -1,6 +1,8 @@
 use ExtUtils::MakeMaker;
 use Devel::PPPort;
 use Config;
+if ($^O eq 'MSWin32') { print "OS unsupported: requires POSIX mmap\n"; exit 0 }
+if ($Config{ivsize} < 8) { print "OS unsupported: requires 64-bit\n"; exit 0 }
 Devel::PPPort::WriteFile();
 WriteMakefile(
   NAME => 'Data::PerfectHash::Shared', VERSION_FROM => 'lib/Data/PerfectHash/Shared.pm',

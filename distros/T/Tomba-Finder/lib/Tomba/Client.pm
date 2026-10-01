@@ -7,10 +7,9 @@ use LWP::UserAgent;
 use URI;
 use JSON qw(encode_json decode_json);
 use URI::Escape qw(uri_escape);
+use Carp qw(croak);
 
-our @ISA = qw();
-
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 # Tomba base url
 use constant DEFAULT_BASE_URL => 'https://api.tomba.io/v1';
@@ -136,13 +135,13 @@ sub new {
     $self->{baseUrl} = $baseUrl || DEFAULT_BASE_URL;
 
     if (length($apiKey) < 39) {
-        die "Invalid Tomba api key";
+        croak "Invalid Tomba api key";
     } else {
         $self->{apiKey} = $apiKey;
     }
 
     if (length($apiSecret) < 39) {
-        die "Invalid Tomba api secret";
+        croak "Invalid Tomba api secret";
     } else {
         $self->{apiSecret} = $apiSecret;
     }
@@ -188,15 +187,56 @@ sub call {
     }
 
     my $response = $self->{ua}->get($url);
+    my $content = $response->decoded_content;
     if ($response->is_success) {
-        $self->{body} = decode_json($response->decoded_content);
+        $self->{body} = decode_json($content);
     } else {
-        $self->{body} = decode_json($response->decoded_content);
+        $self->{body} = eval { decode_json($content) } || { status => $response->code, message => $content };
     }
 
     my $rate_limit = _parse_rate_limit_headers($response);
 
     return { data => $self->{body}, rate_limit => $rate_limit };
+}
+
+=head2 call_raw
+
+  my $result = $client->call_raw($path, $params);
+
+Makes a GET request to the Tomba API and returns the raw response body
+as a string without JSON decoding. Useful for endpoints that return
+non-JSON content such as CSV downloads.
+
+  Arg 1: Str $path - the path portion of the URL to request
+  Arg 2: HashRef $params - a hashref of query parameters to include in the URL
+  Returns: HashRef with raw response string in 'data' and rate_limit info
+
+=cut
+
+sub call_raw {
+    my ($self, $path, $params) = @_;
+
+    $self->{ua} = LWP::UserAgent->new;
+    $self->{ua}->default_headers(HTTP::Headers->new(
+        'X-Tomba-Key'    => $self->{apiKey},
+        'X-Tomba-Secret' => $self->{apiSecret},
+        'Accept'         => 'application/json',
+        'Content-Type'   => 'application/json',
+    ));
+    $self->{ua}->agent("Tomba-Finder/Perl/$VERSION");
+    $self->{ua}->timeout(120);
+
+    my $url = $self->{baseUrl} . $path;
+
+    if ($params && ref($params) eq 'HASH' && %$params) {
+        $url .= '?' . join('&', map { uri_escape($_) . '=' . uri_escape($params->{$_}) } keys %$params);
+    }
+
+    my $response = $self->{ua}->get($url);
+
+    my $rate_limit = _parse_rate_limit_headers($response);
+
+    return { data => $response->decoded_content, rate_limit => $rate_limit };
 }
 
 =head2 post

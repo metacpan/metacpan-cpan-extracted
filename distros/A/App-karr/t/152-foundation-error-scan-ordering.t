@@ -43,8 +43,10 @@ sub seed_board {
     git => App::karr::Git->new( dir => "$repo" ) );
   for my $title ( @titles ) {
     my $id = $store->allocate_next_id;
+    # todo, not backlog: a backlog card is held back and not actionable
+    # (ticket k306), so the drain would stop after its first run.
     $store->save_task( App::karr::Task->new(
-      id => $id, title => $title, status => 'backlog' ) );
+      id => $id, title => $title, status => 'todo' ) );
   }
 }
 

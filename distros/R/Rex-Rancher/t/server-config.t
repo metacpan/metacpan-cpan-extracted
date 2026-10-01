@@ -15,14 +15,18 @@ use Test::More;
 #
 # _build_server_config is pure (no file/YAML I/O), so it is unit-testable
 # offline; the actual write stays in _write_config. Nothing here says the
-# resulting cluster comes up -- k3s has not been run live through Rex::Rancher.
+# resulting cluster comes up -- only a live deploy does.
 # -----------------------------------------------------------------------------
 
 use JSON::MaybeXS ();
 use Rex::Rancher::Server;
 use Rex::Rancher::Cilium;
+use Rex::Rancher::Distribution;
 
-sub cfg { Rex::Rancher::Server::_build_server_config(@_) }
+sub cfg {
+  my ( $dist, @rest ) = @_;
+  Rex::Rancher::Server::_build_server_config( Rex::Rancher::Distribution->new_for($dist), @rest );
+}
 #          ($distribution, $token, $server, $tls_san, $node_labels, $cilium)
 
 subtest 'rke2 + cilium: kube-proxy replacement config present' => sub {
@@ -45,7 +49,8 @@ subtest 'k3s + cilium: Flannel, network policy and kube-proxy off' => sub {
     'disable-kube-proxy is a real true boolean — Cilium replaces it');
   is($c->{'cluster-cidr'}, '10.42.0.0/16', 'cluster-cidr spelled out');
   is($c->{'cluster-cidr'},
-    Rex::Rancher::Cilium::_paths_for('k3s')->{cluster_cidr},
+    Rex::Rancher::Cilium::_resolve_opts(distribution => 'k3s', k8s_service_host => 'cp')
+      ->{values}{ipam}{operator}{clusterPoolIPv4PodCIDRList}[0],
     'cluster-cidr is the range Cilium\'s pool gets');
   ok(!exists $c->{cni},     'no rke2 cni key on k3s');
   is_deeply($c->{disable}, ['traefik', 'servicelb'],
@@ -84,6 +89,45 @@ subtest 'server / tls_san / node_labels passthrough' => sub {
   is($c->{server}, 'https://api:6443', 'server set');
   is_deeply($c->{'tls-san'},    ['lb.example.com'], 'tls-san array');
   is_deeply($c->{'node-label'}, ['role=cp'],        'node-label array');
+};
+
+subtest 'cluster_cidr (k41): written on rke2 and k3s alike' => sub {
+  #        ($distribution, $token, $server, $tls_san, $node_labels, $cilium, $node_name, $disable, $cluster_cidr)
+  my @rest = (undef, undef, undef, undef, undef);
+  for my $cilium (1, 0) {
+    is(cfg('rke2', 'tok', @rest[0 .. 2], $cilium, undef, undef, '10.244.0.0/16')->{'cluster-cidr'},
+      '10.244.0.0/16', "rke2, cilium $cilium: given cluster-cidr written");
+    is(cfg('k3s', 'tok', @rest[0 .. 2], $cilium, undef, undef, '10.244.0.0/16')->{'cluster-cidr'},
+      '10.244.0.0/16', "k3s, cilium $cilium: given cluster-cidr written");
+  }
+  ok(!exists cfg('rke2', 'tok', undef, undef, undef, 1)->{'cluster-cidr'},
+    'rke2 default: nothing written, as before');
+  is(cfg('k3s', 'tok', 'https://cp1:6443', undef, undef, 1, undef, undef, '10.244.0.0/16')->{'cluster-cidr'},
+    '10.244.0.0/16', 'joining k3s server carries the same value');
+
+  my $check = sub { Rex::Rancher::Distribution->check_cluster_cidr(@_) };
+  is($check->(undef), undef, 'undef: default');
+  is($check->('10.42.0.0/16'), '10.42.0.0/16', 'IPv4 CIDR accepted');
+  for my $bad ('10.42.0.0', '10.42.0.0/33', '300.1.0.0/16', '10.42.0.0/16,fd00::/56', 'fd00::/56', '') {
+    ok(!eval { $check->($bad); 1 }, "'$bad' refused");
+    like($@, qr/cluster_cidr must be one IPv4 CIDR/, "'$bad': says what is expected");
+  }
+
+  # install_server refuses before anything reaches the host (the token
+  # lookup is the first remote read).
+  my @ran;
+  no warnings 'redefine';
+  local *Rex::Rancher::Server::run  = sub { push @ran, $_[0]; '' };
+  local *Rex::Rancher::Server::file = sub { push @ran, "file $_[0]" };
+  local *Rex::Commands::Run::run    = sub { push @ran, $_[0]; '' };
+  local *Rex::Commands::File::file  = sub { push @ran, "file $_[0]" };
+  use warnings 'redefine';
+  for my $dist (qw( rke2 k3s )) {
+    @ran = ();
+    ok(!eval { Rex::Rancher::Server::install_server(distribution => $dist, cluster_cidr => '10.42.0.0'); 1 },
+      "$dist install_server: invalid cluster_cidr dies");
+    is_deeply(\@ran, [], "$dist install_server: before the host is touched");
+  }
 };
 
 done_testing;

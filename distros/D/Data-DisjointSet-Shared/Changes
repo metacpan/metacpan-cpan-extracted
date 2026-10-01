@@ -1,5 +1,12 @@
 Revision history for Data-DisjointSet-Shared
 
+0.06      2026-09-26
+          - Recovery re-derives set sizes and num_sets after a writer killed
+            mid-union, and reruns an interrupted reset.
+          - Segments are reserved, so a full filesystem fails the constructor;
+            DATA_DISJOINTSET_SHARED_SPARSE=1 skips the reservation.
+          - A failed create no longer leaves a full-size file behind.
+
 0.05      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
@@ -12,14 +19,10 @@ Revision history for Data-DisjointSet-Shared
             error.
 
 0.03      2026-07-22
-          - Fix a use-after-free in union_many(): a tied array, or overloaded
-            or tied elements, run Perl that can destroy the set, after which
-            the already-captured handle was still used. Such a call now
-            croaks.
-          - On-disk format change (v1 -> v2): an existing 0.02 file is
-            refused; recreate it.
+          - Fix a use-after-free in union_many() when tied or overloaded
+            arguments destroy the set; it now croaks.
+          - On-disk format change (v1 -> v2): recreate 0.02 files.
           - Validate the element count from one snapshot at attach.
-          - Resolve argument magic before capturing the path string.
 
 0.02      2026-07-03
           - Security and robustness hardening; backing files now created mode

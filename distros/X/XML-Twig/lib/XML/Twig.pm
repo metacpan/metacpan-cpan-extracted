@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+
 # This is created in the caller's space
 # I realize (now!) that it's not clean, but it's been there for 10+ years...
 BEGIN
@@ -23,6 +24,8 @@ package XML::Twig;
 require 5.010;
 
 use utf8;
+use Scalar::Util qw(weaken looks_like_number);
+use List::Util qw(first);
 
 use vars qw($VERSION @ISA %valid_option);
 
@@ -33,9 +36,6 @@ use File::Basename;
 use Config; # to get perl's path name in case we need to know if perlio is available
 
 *isa= *UNIVERSAL::isa;
-
-# flag, set to true if the weaken sub is available
-use vars qw( $weakrefs);
 
 # flag set to true if the version of expat seems to be 1.95.2, which has annoying bugs
 # wrt doctype handling. This is global for performance reasons.
@@ -141,9 +141,10 @@ my $DEFAULT_HTML_TYPE= "-//W3C//DTD HTML 4.0 Transitional//EN";
 
 my $SEP= qr/\s*(?:$|\|)/;
 
+my $DEBUG_HANDLER;
 BEGIN
 {
-$VERSION = '3.54';
+$VERSION = '3.55';
 
 use XML::Parser;
 my $needVersion = '2.23';
@@ -155,18 +156,6 @@ croak "need at least XML::Parser version $needVersion" unless $parser_version >=
 eval "use Encode qw( :all)"; ## no critic ProhibitStringyEval
 $FB_XMLCREF  = 0x0400; # Encode::FB_XMLCREF;
 $FB_HTMLCREF = 0x0200; # Encode::FB_HTMLCREF;
-
-# test whether we can use weak references
-# set local empty signal handler to trap error messages
-{ local $SIG{__DIE__};
-  ## no critic (ProhibitStringyEval)
-  if( eval( 'require Scalar::Util') && defined( \&Scalar::Util::weaken))
-    { import Scalar::Util( 'weaken'); $weakrefs= 1; }
-  elsif( eval( 'require WeakRef'))
-    { import WeakRef; $weakrefs= 1;                 }
-  else
-    { $weakrefs= 0;                                 }
-}
 
 # used to store the gi's
 # should be set for each twig really, at least when there are several
@@ -732,7 +721,7 @@ sub new
     $self->{twig_autoflush}= 1; # auto flush by default
 
     $self->{twig}= $self;
-    if( $weakrefs) { weaken( $self->{twig}); }
+    weaken( $self->{twig});
 
     return $self;
   }
@@ -1581,7 +1570,7 @@ sub _set_regexp_handler
       { return 0; }
   }
 
-my $DEBUG_HANDLER= 0; # 0 or 1 (output the handler checking code) or 2 (super verbose)
+$DEBUG_HANDLER= 0; # 0 or 1 (output the handler checking code) or 2 (super verbose)
 my $handler_string;   # store the handler itself
 sub _set_debug_handler    { $DEBUG_HANDLER= shift; }
 sub _warn_debug_handler   { if( $DEBUG_HANDLER < 3) { warn @_; } else { $handler_string .= join( '', @_); } }
@@ -1753,66 +1742,91 @@ sub _tag_cond
 #        the score
 sub _parse_predicate_in_handler
   { my( $flag, $score)= @_[1..2];
-    $_[0]=~ s{(   ($REG_STRING)                            # quoted string
-                 |($REG_REGEXP)                            # regexp
-                 |\@($REG_TAG_NAME)(\s* $REG_MATCH \s* $REG_REGEXP) # @att and regexp
-                 |\@($REG_TAG_NAME)(?=\s*(?:[><=!]))       # @att followed by a comparison operator
-                 |\@($REG_TAG_NAME)                        # @att (not followed by a comparison operator)
-                 |=~|!~                                    # matching operators
-                 |([><]=?|=|!=)(?=\s*[\d+-])               # test before a number
-                 |([><]=?|=|!=)                            # test, other cases
-                 |($REG_FUNCTION)                          # no arg functions
+    $_[0]=~ s{(?<token>
+                  (?<tstr>$REG_STRING)                                 # quoted string
+                 |(?<tregexp>$REG_REGEXP)                              # regexp
+                 |(?<tatt_re>\@(?<att>$REG_TAG_NAME) \s* (?<op>$REG_MATCH) \s* (?<re>$REG_REGEXP)) # @att and regexp
+                 |(?<tatt_num>\@(?<att>$REG_TAG_NAME) \s* (?<op>$REG_COMP) \s* (?<nb>$REG_NUMBER)) # @att then comparison operator then number
+                 |(?<tatt_op>\@(?<att>$REG_TAG_NAME)(?=\s*(?:[><=!]))) # @att followed by a comparison operator
+                 |(?<tbare_att>\@(?<att>$REG_TAG_NAME))                # @att (not followed by a comparison operator)
+                 |=~|!~                                                # matching operators
+                 |(?<tbare_num_test>[><]=?|=|!=)(?=\s*[\d+-])          # test before a number
+                 |(?<tbare_test>[><]=?|=|!=)                           # test, other cases
                  # this bit is a mess, but it is the only solution with this half-baked parser
-                 |(string\(\s*$REG_NAME?\s*\)\s*$REG_MATCH\s*$REG_REGEXP) # string( child)=~ /regexp/ or string()=~ /regexp/
-                 |(string\(\s*$REG_NAME\s*\)\s*$REG_COMP\s*$REG_STRING)   # string( child) = "value" (or other test)
-                 |(string\(\s*$REG_NAME\s*\)\s*$REG_COMP\s*$REG_NUMBER)   # string( child) = nb (or other test)
-                 |(\band\b|\bor\b)
-                # |($REG_NAME(?=\s*(and|or|$)))            # nested tag name (needs to be after all other unquoted strings)
-                 |($REG_TAG_IN_PREDICATE)                  # nested tag name (needs to be after all other unquoted strings)
+                 |(?<tstr_re>string\(\s*(?<tag>$REG_NAME?)\s*\)\s*(?<op>$REG_MATCH)\s*(?<re>$REG_REGEXP))     # string( child) =~ /regexp/ or string()=~ /regexp/
+                 |(?<tstr_str>string\(\s*(?<tag>$REG_NAME?)\s*\)\s*(?<op>$REG_COMP)\s*(?<string>$REG_STRING)) # string( child) = "value" (or other test)
+                 |(?<tstr_num>string\(\s*(?<tag>$REG_NAME?)\s*\)\s*(?<op>$REG_COMP)\s*(?<nb>$REG_NUMBER))     # string( child) = nb (or other test)
+                 |(?<tfunc>$REG_FUNCTION)                              # no arg functions
+                 |(?<tand_or>\band\b|\bor\b)
+                 |(?<tntag>$REG_TAG_IN_PREDICATE)                      # nested tag name (needs to be after all other unquoted strings)
 
               )}
-             { my( $token, $str, $regexp, $att_re_name, $att_re_regexp, $att, $bare_att, $num_test, $alpha_test, $func, $str_regexp, $str_test_alpha, $str_test_num, $and_or, $tag)
-               = ( $1,     $2,   $3,      $4,           $5,             $6,   $7,        $8,        $9,          $10,   $11,         $12,              $13,          $14,     $15);
-
+              {
                $score->{predicates}++;
+               my %m = %+; # save the matches, so further regexps don't overwrite it 
 
                # store tests on text (they are not always allowed)
-               if( $func || $str_regexp || $str_test_num || $str_test_alpha ) { $flag->{test_on_text}= 1;   }
+               if( $m{tfunc} || $m{tstr_re} || $m{tstr_num} || $m{tstr_str} ) { $flag->{test_on_text}= 1;   }
 
-               if(    defined $str)   { _safe_string( $token) }
-               elsif( defined $regexp){ _safe_regexp( $token) }
-               elsif( $tag)           { qq{(\$elt->{'$ST_ELT'} && \$elt->{'$ST_ELT'}->has_child( '$tag'))} }
-               elsif( $att)           { $att=~ m{^#} ? qq{ (\$elt->{'$ST_ELT'} && \$elt->{'$ST_ELT'}->{att}->{'$att'})}
-                                                     : qq{\$elt->{'$att'}}
-                                      }
-               elsif( $att_re_name)   { $att_re_name=~ m{^#} ? qq{ (\$elt->{'$ST_ELT'} && \$elt->{'$ST_ELT'}->{att}->{'$att_re_name'}$att_re_regexp)}
-                                                     : qq{\$elt->{'$att_re_name'}$att_re_regexp}
-                                      }
-                                        # for some reason Devel::Cover flags the following lines as not tested. They are though.
-               elsif( $bare_att)      { $bare_att=~ m{^#} ? qq{(\$elt->{'$ST_ELT'} && defined(\$elt->{'$ST_ELT'}->{att}->{'$bare_att'}))}
-                                                          : qq{defined( \$elt->{'$bare_att'})}
-                                      }
-               elsif( $num_test && ($num_test eq '=') ) { "==" } # others tests are unchanged
-               elsif( $alpha_test)    { $PERL_ALPHA_TEST{$alpha_test} }
-               elsif( $func && $func=~ m{^string})
-                                      { "\$elt->{'$ST_ELT'}->text"; }
-               elsif( $str_regexp     && $str_regexp     =~ m{string\(\s*($REG_TAG_NAME)?\s*\)\s*($REG_MATCH)\s*($REG_REGEXP)})
-                                      { my( $rtag, $rmatch, $rregexp)= ($1, $2, _safe_regexp( $3));
-                                        if( $1) { "defined( _first_n {  \$_->text $rmatch $rregexp } 1, \$elt->{'$ST_ELT'}->_children( '$rtag'))" }
-                                        else    { "\$elt->text $rmatch $rregexp" }
-                                      }
-               elsif( $str_test_alpha && $str_test_alpha =~ m{string\(\s*($REG_TAG_NAME)\s*\)\s*($REG_COMP)\s*($REG_STRING)})
-                                      { my( $tag, $op, $str)= ($1, $2, _safe_string($3));
-                                        $str=~ s{(?<=.)'(?=.)}{\\'}g; # escape a quote within the string
-                                        $str=~ s{^"}{'};
-                                        $str=~ s{"$}{'};
-                                        "defined( _first_n { \$_->text $PERL_ALPHA_TEST{$op} $str } 1, \$elt->{'$ST_ELT'}->children( '$tag'))"; }
-               elsif( $str_test_num   && $str_test_num   =~ m{string\(\s*($REG_TAG_NAME)\s*\)\s*($REG_COMP)\s*($REG_NUMBER)})
-                                      { my $test= ($2 eq '=') ? '==' : $2;
-                                        "defined( _first_n { \$_->text $test $3 } 1, \$elt->{'$ST_ELT'}->children( '$1'))";
-                                      }
-               elsif( $and_or)        { $score->{tests}++; $and_or eq 'and' ? '&&' : '||' ; }
-               else                   { $token; }
+               my $token = $m{token};
+               if(    defined $m{tstr} )   { _safe_string( $token) }
+               elsif( defined $m{tregexp} ){ _safe_regexp( $token) }
+               elsif( $m{tntag} )          { qq{(\$elt->{'$ST_ELT'} && \$elt->{'$ST_ELT'}->has_child( '$m{tntag}'))} }
+               elsif( $m{tatt_op} )        { _att_is_private($m{att})
+                                                ? qq{ (\$elt->{'$ST_ELT'} && \$elt->{'$ST_ELT'}->{att}->{'$m{att}'})}
+                                                : qq{\$elt->{'$m{att}'}}
+                                           }
+               elsif( $m{tatt_re} )        { _att_is_private($m{att})
+                                                ? qq{ (\$elt->{'$ST_ELT'} && \$elt->{'$ST_ELT'}->{att}->{'$m{att}'} $m{op} $m{re})}
+                                                : qq{\$elt->{'$m{att}'} $m{op} $m{re}}
+                                           }
+              elsif( $m{tatt_num} )        { my $op = $m{op} eq '=' ? '==' : $m{op};
+                                             # the context stack stores private atts, set in an other handler
+                                             my $context_stack = qq{\$elt\->{'$ST_ELT'}};
+                                             # look for private atts in the context stack, other atts in the plain parse result
+                                             my $att_location = _att_is_private($m{att}) ? qq{$context_stack\->{att}} : qq{\$elt};
+                                             my $att= ${att_location} . qq{->{'$m{att}'}};
+                                             my @tests;
+                                             # for private atts, check existence of the context stack so we don't autovivify it
+                                             push @tests, $context_stack if _att_is_private($m{att});
+                                             # the base test
+                                             push @tests, qq{$att $op $m{nb}};
+                                             join ' && ', @tests;
+                                           }
+                                           # for some reason Devel::Cover flags the following lines as not tested. They are though.
+               elsif( $m{tbare_att} )      { _att_is_private($m{att})
+                                                ? qq{(\$elt->{'$ST_ELT'} && defined(\$elt->{'$ST_ELT'}->{att}->{'$m{att}'}))}
+                                                : qq{defined( \$elt->{'$m{att}'})}
+                                           }
+               elsif( $m{tbare_num_test }&& ($m{tbare_num_test} eq '=') )
+                                          { "==" } # others tests are unchanged
+               elsif( $m{tbare_test} )    { $PERL_ALPHA_TEST{$m{tbare_test}} }
+               elsif( $m{tfunc}&& $m{tfunc}=~ m{^string} )
+                                          { "\$elt->{'$ST_ELT'}->text"; }
+               elsif( $m{tstr_re} )       { my $tag = $m{tag} // '';
+                                            my $op = $m{op};
+                                            my( $regexp)=  _safe_regexp( $m{re});
+                                            if( $m{tag} ) { "defined( first {  \$_->text $m{op} $regexp } \$elt->{'$ST_ELT'}->_children( '$m{tag}'))" }
+                                            else          { "\$elt->{'$ST_ELT'}->text $m{op} $regexp" }
+                                          }
+               elsif( $m{tstr_str} )      { my $tag = $m{tag};
+                                            my $op= $PERL_ALPHA_TEST{$m{op}};
+                                            my $str= substr( $m{string}, 1, -1 ); # remove quotes
+                                            $str= _safe_string($str);
+                                            $str=~ s{(?<=.)'(?=.)}{\\'}g; # escape a quote within the string
+                                            $str= qq{'$str'};
+                                            if ( $tag ) { "defined( first { \$_->text $op $str } \$elt->{'$ST_ELT'}->children( '$tag'))"; }
+                                            else { "\$elt->{'$ST_ELT'}->text $op $str"; }
+                                          }
+               elsif( $m{tstr_num } )     { $m{tag }//= '';
+                                            my $op = $m{op} eq '=' ? '==' : $m{op};
+                                            if ( $m{tag} )
+                                              { "defined( first { (\$_->text $op $m{nb}) } \$elt->{'$ST_ELT'}->children( '$m{tag}'))"; }
+                                            else
+                                              { "\$elt->{'$ST_ELT'}->text $op $m{nb}" }
+                                           }
+               elsif( $m{tand_or} )        { $score->{tests}++; $m{tand_or} eq 'and' ? '&&' : '||' ; }
+               else                        { $token; }
              }gexs;
   }
 
@@ -1827,6 +1841,12 @@ sub _safe_regexp
     if( $regexp=~ m{\(\s*\?\s*\{}) { s{(\([()])}{\\$1}g; } # if '(?{' (code in a regexp) then escape all '(' and ')'
     return $regexp;
   }
+
+# no regexp in there so we can still use %+ in the following code
+sub _att_is_private {
+    my ($att) = @_;
+    return substr( $att, 0, 1 ) eq '#';
+}
 
 sub setCharHandler
   { my( $t, $handler)= @_;
@@ -1946,7 +1966,7 @@ sub _twig_init
     $t->{twig_parsing}=1;
 
     $t->{twig_parser}= $p;
-    if( $weakrefs) { weaken( $t->{twig_parser}); }
+    weaken( $t->{twig_parser});
 
     # in case they had been created by a previous parse
     delete $t->{twig_dtd};
@@ -2066,7 +2086,7 @@ sub _twig_start
     # now we can store the tag and atts
     my $context= { $ST_TAG => $gi, $ST_ELT => $elt, @att};
     $context->{$ST_NS}= $ns_decl if $ns_decl;
-    if( $weakrefs) { weaken( $context->{$ST_ELT}); }
+    weaken( $context->{$ST_ELT});
     push @{$t->{_twig_context_stack}}, $context;
 
     $parent->del_twig_current if( $parent);
@@ -2110,7 +2130,7 @@ sub _twig_start
     my $id= $elt->id;
     if( defined $id)
       { $t->{twig_id_list}->{$id}= $elt;
-        if( $weakrefs) { weaken( $t->{twig_id_list}->{$id}); }
+        weaken( $t->{twig_id_list}->{$id});
       }
 
     # call user handler if need be
@@ -2266,7 +2286,7 @@ sub set_root
     $t->{twig_root}= $elt;
     if( $elt)
       { $elt->{twig}= $t;
-        if( $weakrefs) { weaken(  $elt->{twig}); }
+        weaken(  $elt->{twig});
       }
     return $t;
   }
@@ -4658,9 +4678,6 @@ sub getRootNode        { return $_[0]; }
 sub getParentNode      { return undef; }
 sub getChildNodes      { my @children= ($_[0]->root); return wantarray ? @children : \@children; }
 
-sub _weakrefs     { return $weakrefs;       }
-sub _set_weakrefs { $weakrefs=shift() || 0; XML::Twig::Elt::set_destroy()if ! $weakrefs; } # for testing purposes
-
 sub _dump
   { my $t= shift;
     my $dump='';
@@ -4998,6 +5015,9 @@ package XML::Twig::Elt;
 ######################################################################
 
 use Carp;
+use Scalar::Util qw(weaken looks_like_number);
+use List::Util qw(first);
+
 *isa= *UNIVERSAL::isa;
 
 my $CDATA_START    = "<![CDATA[";
@@ -5077,15 +5097,6 @@ BEGIN
     *getFirstChild      = *_first_child;
     *getLastChild      = *_last_child;
 
-    # try using weak references
-    # test whether we can use weak references
-    { local $SIG{__DIE__};
-    ## no critic (ProhibitStringyEval)
-      if( eval 'require Scalar::Util' && defined( &Scalar::Util::weaken) )
-        { import Scalar::Util qw(weaken); }
-      elsif( eval 'require WeakRef')
-        { import WeakRef; }
-    }
 }
 
 # can be called as XML::Twig::Elt->new( [[$gi, $atts, [@content]])
@@ -5844,37 +5855,54 @@ sub reset_cond_cache { %cond_cache=(); }
 
       $cond=~ s{^\s*\[\s*}{};
       $cond=~ s{\s*\]\s*$}{};
-      $cond=~ s{(   ($REG_STRING|$REG_REGEXP)                # strings or regexps
-                   |\@($REG_TAG_NAME)(?=\s*(?:[><=!]|!~|=~)) # @att (followed by a comparison operator)
-                   |\@($REG_TAG_NAME)                        # @att (not followed by a comparison operator)
-                   |=~|!~                                    # matching operators
-                   |([><]=?|=|!=)(?=\s*[\d+-])               # test before a number
-                   |([><]=?|=|!=)                            # test, other cases
-                   |($REG_FUNCTION)                          # no arg functions
+      $cond=~ s{(?<token>
+                   (?<tstr>$REG_STRING|$REG_REGEXP)                      # strings or regexps
+                   |\@(?<tatt>$REG_TAG_NAME)(?=\s*(?:[><=!]|!~|=~))      # @att (followed by a comparison operator)
+                   |\@(?<tbare_att>$REG_TAG_NAME)                        # @att (not followed by a comparison operator)
+                   |=~|!~                                                # matching operators
+                   |(?<tbare_num_test>[><]=?|=|!=)(?=\s*[\d+-])          # test before a number
+                   |(?<tbare_test>[><]=?|=|!=)                           # test, other cases
                    # this bit is a mess, but it is the only solution with this half-baked parser
-                   |((?:string|text)\(\s*$REG_TAG_NAME\s*\)\s*$REG_MATCH\s*$REG_REGEXP) # string( child) =~ /regexp/
-                   |((?:string|text)\(\s*$REG_TAG_NAME\s*\)\s*!?=\s*$REG_VALUE)         # string( child) = "value" (or !=)
-                   |((?:string|text)\(\s*$REG_TAG_NAME\s*\)\s*[<>]=?\s*$REG_VALUE)      # string( child) > "value"
-                   |(and|or)
+                   |(?<tstr_re>(?:string|text)\(\s*(?<tag>$REG_TAG_NAME?)\s*\)\s*(?<op>$REG_MATCH)\s*(?<re>$REG_REGEXP))     # string(child) =~ /regexp/
+                   |(?<tstr_num>(?:string|text)\(\s*(?<tag>$REG_NAME?)\s*\)\s*(?<op>$REG_COMP)\s*(?<nb>$REG_NUMBER))         # string(child) = nb (or other test)
+                   |(?<tstr_str>(?:string|text)\(\s*(?<tag>$REG_TAG_NAME?)\s*\)\s*(?<op>!?=)\s*(?<string>$REG_STRING))       # string(child) = "value" (or !=)
+                   |(?<tstring_test>(?:string|text)\(\s*(?<tag>$REG_TAG_NAME)\s*\)\s*(?<op>[<>]=?)\s*(?<string>$REG_STRING)) # string(child) > "value"
+                   |(?<tfunc>$REG_FUNCTION)                              # no arg functions
+                   |(?<tand_or>and|or)
                 )}
-               { my( $token, $string, $att, $bare_att, $num_test, $alpha_test, $func, $string_regexp, $string_eq, $string_test, $and_or)
-                 = ( $1,     $2,      $3,   $4,        $5,        $6,          $7,    $8,             $9,         $10,          $11);
-
-                 if( defined $string)   { $token }
-                 elsif( $att)           { "( \$_[0]->{att} && exists( \$_[0]->{att}->{'$att'}) && \$_[0]->{att}->{'$att'})"; }
-                 elsif( $bare_att)      { "(\$_[0]->{att} && defined( \$_[0]->{att}->{'$bare_att'}))"; }
-                 elsif( $num_test && ($num_test eq '=') ) { "==" } # others tests are unchanged
-                 elsif( $alpha_test)    { $PERL_ALPHA_TEST{$alpha_test} }
-                 elsif( $func && $func=~ m{^(?:string|text)})
+               { 
+                 my %m = %+; # save the named captures so further regexp do not overwrite them
+                 if( defined $m{tstr} )     { $m{token} }
+                 elsif( $m{tatteq0} )       { "( \$_[0]->{att} && exists( \$_[0]->{att}->{'$m{tatteq0}'}) \$_[0]->{att}->{'$m{tatteq0}'})"; }
+                 elsif( $m{tatt} )          { "( \$_[0]->{att} && exists( \$_[0]->{att}->{'$m{tatt}'}) && \$_[0]->{att}->{'$m{tatt}'})"; }
+                 elsif( $m{tbare_att} )     { "(\$_[0]->{att} && defined( \$_[0]->{att}->{'$m{tbare_att}'}))"; }
+                 elsif( $m{tbare_num_test} && ($m{tbare_num_test} eq '=') ) { "==" } # others tests are unchanged
+                 elsif( $m{tbare_test} )   { $PERL_ALPHA_TEST{$m{tbare_test}} }
+                 elsif( $m{tfunc} && $m{tfunc}=~ m{^(?:string|text)})
                                         { "\$_[0]->text"; }
-                 elsif( $string_regexp && $string_regexp =~ m{(?:string|text)\(\s*($REG_TAG_NAME)\s*\)\s*($REG_MATCH)\s*($REG_REGEXP)})
-                                        { "(XML::Twig::_first_n { (\$_->gi eq '$1') && (\$_->text $2 $3) } 1, \$_[0]->_children)"; }
-                 elsif( $string_eq     && $string_eq     =~ m{(?:string|text)\(\s*($REG_TAG_NAME)\s*\)\s*(!?=)\s*($REG_VALUE)})
-                                        {"(XML::Twig::_first_n { (\$_->gi eq '$1') && (\$_->text $PERL_ALPHA_TEST{$2} $3) } 1, \$_[0]->_children)"; }
-                 elsif( $string_test   && $string_test   =~ m{(?:string|text)\(\s*($REG_TAG_NAME)\s*\)\s*([<>]=?)\s*($REG_VALUE)})
-                                        { "(XML::Twig::_first_n { (\$_->gi eq '$1') && (\$_->text $2 $3) } 1, \$_[0]->_children)"; }
-                 elsif( $and_or)        { $and_or eq 'and' ? '&&' : '||' ; }
-                 else                   { $token; }
+                 elsif( $m{tstr_num})   { my $op = $m{op} eq '=' ? '==' : $m{op};
+                                          if($m{tag})
+                                            { "(first { (\$_->gi eq '$m{tag}') && (\$_->text $op $m{nb}) } \$_[0]->_children)"; }
+                                          else
+                                            { "(\$_[0]->text $op $m{nb})";
+                                            }
+                                        }
+                 elsif( $m{tstr_re} )   { if($m{tag})
+                                            { "(first { (\$_->gi eq '$m{tag}') && (\$_->text $m{op} $m{re}) } \$_[0]->_children)"; }
+                                          else
+                                            { "(\$_[0]->text $m{op} $m{re} )";}
+                                        }
+                 elsif( $m{tstr_str}  ){ my $op = $PERL_ALPHA_TEST{$m{op}};
+                                         if($m{tag})
+                                            { "(first { (\$_->gi eq '$m{tag}') && (\$_->text $op $m{string}) } \$_[0]->_children)"; }
+                                          else
+                                            { "(\$_[0]->text $op $m{string} )"; }
+                                        }
+
+                 elsif( $m{tstring_test} )
+                                        { "(first { (\$_->gi eq '$m{tag}') && (\$_->text $m{op} $m{string}) } \$m{_}[0]->_children)"; }
+                 elsif( $m{tand_or})     { $m{tand_or }eq 'and' ? '&&' : '||' ; }
+                 else                   { $m{token}; }
                }gexs;
       #warn "[$initial_cond] => [$cond]\n";
       return "($cond)";
@@ -5897,7 +5925,7 @@ sub reset_cond_cache { %cond_cache=(); }
 
 sub set_parent
   { $_[0]->{parent}= $_[1];
-    if( $XML::Twig::weakrefs) { weaken( $_[0]->{parent}); }
+    weaken( $_[0]->{parent});
   }
 
 sub parent
@@ -5962,7 +5990,7 @@ sub set_field
 sub set_last_child
   { $_[0]->{'last_child'}= $_[1];
     delete $_[0]->{empty};
-    if( $XML::Twig::weakrefs) { weaken( $_[0]->{'last_child'}); }
+    weaken( $_[0]->{'last_child'});
   }
 
 sub last_child
@@ -5977,7 +6005,7 @@ sub last_child
 
 sub set_prev_sibling
   { $_[0]->{'prev_sibling'}= $_[1];
-    if( $XML::Twig::weakrefs) { weaken( $_[0]->{'prev_sibling'}); }
+    weaken( $_[0]->{'prev_sibling'});
   }
 
 sub prev_sibling
@@ -6145,7 +6173,7 @@ sub _set_id
   { my( $elt, $id)= @_;
     my $t= $elt->twig || $elt;
     $t->{twig_id_list}->{$id}= $elt;
-    if( $XML::Twig::weakrefs) { weaken(  $t->{twig_id_list}->{$id}); }
+    weaken(  $t->{twig_id_list}->{$id});
     return $elt;
   }
 
@@ -6973,13 +7001,8 @@ sub next_siblings
                                 { $test .= "\$_->text eq $1"; }
                               elsif( $pred =~ s{^string\(\s*\)\s*!=\s*($REG_STRING)\s*}{}o)  # string()!="string" pred
                                 { $test .= "\$_->text ne $1"; }
-                              if( $pred =~ s{^string\(\s*\)\s*=\s*($REG_NUMBER)\s*}{}o)  # string()=<number> pred
-                                { $test .= "\$_->text eq $1"; }
-                              elsif( $pred =~ s{^string\(\s*\)\s*!=\s*($REG_NUMBER)\s*}{}o)  # string()!=<number> pred
-                                { $test .= "\$_->text ne $1"; }
-                              elsif( $pred =~ s{^string\(\s*\)\s*(>|<|>=|<=)\s*($REG_NUMBER)\s*}{}o)  # string()!=<number> pred
-                                { $test .= "\$_->text $1 $2"; }
-
+                              elsif( $pred =~ s{^string\(\s*\)\s*(>|<|>=|<=|!=|=)\s*($REG_NUMBER)\s*}{}o)  # string() <comp> <number> pred
+                                { $test .= _gen_nb_comparison( '$_->text', $1, $2); }
                              elsif( $pred =~ s{^string\(\s*\)\s*($REG_MATCH)\s*($REG_REGEXP)\s*}{}o)  # string()=~/regex/ pred
                                 { my( $match, $regexp)= ($1, $2);
                                   $test .= "\$_->text $match $regexp";
@@ -7026,6 +7049,12 @@ sub next_siblings
         { _croak_and_doublecheck_xpath( $original_exp, "error in xpath expression $original_exp ($@);") }
       return( $s);
     }
+}
+
+sub _gen_nb_comparison {
+    my ($xml, $op, $nb) = @_;
+    if ($op eq '=') { $op = '=='; }
+    return "$xml $op $nb";
 }
 
 sub _croak_and_doublecheck_xpath
@@ -7094,7 +7123,7 @@ sub cut
     # save the old links, that'll make it easier for some loops
     foreach my $link ( qw(parent prev_sibling next_sibling) )
       { $elt->{former}->{$link}= $elt->{$link};
-         if( $XML::Twig::weakrefs) { weaken( $elt->{former}->{$link}); }
+         weaken( $elt->{former}->{$link});
       }
 
     # if we cut the current element then its parent becomes the current elt
@@ -7293,7 +7322,7 @@ BEGIN
           { $t->{twig_id_list}||={};
             foreach my $id (keys %$ids)
               { $t->{twig_id_list}->{$id}= $ids->{$id};
-                if( $XML::Twig::weakrefs) { weaken( $t->{twig_id_list}->{$id}); }
+                weaken( $t->{twig_id_list}->{$id});
               }
           }
         return $elt;
@@ -7969,7 +7998,7 @@ sub copy
     # save links to the original location, which can be convenient and is used for namespace resolution
     foreach my $link ( qw(parent prev_sibling next_sibling) )
       { $copy->{former}->{$link}= $elt->{$link};
-        if( $XML::Twig::weakrefs) { weaken( $copy->{former}->{$link}); }
+        weaken( $copy->{former}->{$link});
       }
 
     $copy->set_empty( $elt->is_empty);
@@ -7980,29 +8009,8 @@ sub copy
 sub delete
   { my $elt= shift;
     $elt->cut;
-    $elt->DESTROY unless $XML::Twig::weakrefs;
     return undef;
   }
-
-sub __destroy
-  { my $elt= shift;
-    return if( $XML::Twig::weakrefs);
-    my $t= shift || $elt->twig; # optional argument, passed in recursive calls
-
-    foreach( @{[$elt->_children]}) { $_->DESTROY( $t); }
-
-    # the id reference needs to be destroyed
-    # lots of tests to avoid warnings during the cleanup phase
-    $elt->del_id( $t) if( $ID && $t && defined( $elt->{att}) && exists( $elt->{att}->{$ID}));
-    if( $elt->{former}) { foreach (keys %{$elt->{former}}) { delete $elt->{former}->{$_}; } delete $elt->{former}; }
-    foreach (qw( keys %$elt)) { delete $elt->{$_}; }
-    undef $elt;
-  }
-
-BEGIN
-{ sub set_destroy { if( $XML::Twig::weakrefs) { undef *DESTROY } else { *DESTROY= *__destroy; } }
-  set_destroy();
-}
 
 # ignores the element
 sub ignore
@@ -8644,7 +8652,7 @@ sub safe_print_to_file
     }
 
   sub xml_text_only
-    { return join '', map { $_->xml_text if( $_->is_text || $_->is_ent) } $_[0]->_children; }
+    { return join '', map { $_->is_text || $_->is_ent ? $_->xml_text : '' } $_[0]->_children; }
 
   # same as print but except... it does not print but rather returns the string
   # if the second parameter is set then only the content is returned, not the
@@ -8898,7 +8906,7 @@ sub safe_print_to_file
     }
 
   sub text_only
-    { return join '', map { $_->text if( $_->is_text || $_->is_ent) } $_[0]->_children; }
+    { return join '', map { $_->is_text || $_->is_ent ? $_->text : '' } $_[0]->_children; }
 
   sub trimmed_text
     { my $elt= shift;
@@ -9265,6 +9273,13 @@ sub wrap_in
           { $t->{twig_current}= $new_elt;
             $elt->del_twig_current;
             $new_elt->set_twig_current;
+            if ( $t->{twig_in_cdata} || $t->{twig_in_pcdata} ) {
+                $t->{twig_in_cdata} = 0;
+                $t->{twig_in_pcdata} = 0;
+                $t->{twig_current}=$elt->parent;
+                $new_elt->del_twig_current;
+                $elt->parent->set_twig_current;
+            }
           }
 
         if( my $parent= $elt->_parent)
@@ -14051,10 +14066,6 @@ This is due to a bug in the way weak references are handled in Perl itself.
 
 The fix is either to upgrade to Perl 5.16 or later (C<perlbrew> is a great
 tool to manage several installations of perl on the same machine).
-
-An other, NOT RECOMMENDED, way of fixing the problem, is to switch off weak
-references by writing C<XML::Twig::_set_weakrefs( 0);> at the top of the code.
-This is totally unsupported, and may lead to other problems though.
 
 =item entity handling
 

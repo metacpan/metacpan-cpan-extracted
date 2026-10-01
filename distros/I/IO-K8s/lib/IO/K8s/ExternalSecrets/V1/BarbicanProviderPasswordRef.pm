@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::BarbicanProviderPasswordRef;
 # ABSTRACT: BarbicanProviderPasswordRef defines a reference to a secret containing password for the Barbican provider.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s secretRef => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::BarbicanProviderPasswordRef - BarbicanProviderPass
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 secretRef
 

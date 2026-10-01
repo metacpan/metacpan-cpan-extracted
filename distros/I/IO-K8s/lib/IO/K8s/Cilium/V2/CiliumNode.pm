@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2::CiliumNode;
 # ABSTRACT: CiliumNode represents a node managed by Cilium.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
-    resource_plural => 'ciliumnodes';
+    resource_plural => 'ciliumnodes',
+    subresources    => { status => {} };
 
 k8s spec   => '+IO::K8s::Cilium::V2::NodeSpec', { required => 'schema' };
 k8s status => '+IO::K8s::Cilium::V2::NodeStatus';
@@ -24,7 +25,7 @@ IO::K8s::Cilium::V2::CiliumNode - CiliumNode represents a node managed by Cilium
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

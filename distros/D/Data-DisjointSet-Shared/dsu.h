@@ -20,6 +20,7 @@
 #ifndef DSU_H
 #define DSU_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +49,7 @@
 
 #define DSU_MAGIC        0x55534444U  /* "DDSU" (little-endian) */
 #define DSU_VERSION      2            /* 2: added the occupancy bitmap region (layout change) */
-#define DSU_ERR_BUFLEN   256
+#define DSU_ERR_BUFLEN   (PATH_MAX + 256)
 #define DSU_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 
 /* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
@@ -57,6 +58,7 @@
 #define DSU_OCC_WORDS   (((DSU_READER_SLOTS) + 63) / 64)   /* 16 for 1024 slots */
 #define DSU_OCC_BYTES   ((uint64_t)DSU_OCC_WORDS * 8)      /* 128 bytes */
 #define DSU_MAX_N        (1u << 31)   /* 2.1B elements: keeps n*8 well within size_t and size[] sums within uint32 */
+#define DSU_OP_RESET     1u           /* hdr->op: a reset is in progress */
 
 #define DSU_ERR(fmt, ...) do { if (errbuf) snprintf(errbuf, DSU_ERR_BUFLEN, fmt, ##__VA_ARGS__); } while (0)
 
@@ -102,7 +104,8 @@ struct DsuHeader {
     uint32_t drain_seq;               /* 72  futex bumped by a reader releasing under a draining writer (wakes it) */
     uint32_t slotless_rdepth;         /* 76  readers holding with no reader-slot (documented residual) */
     uint64_t stat_ops;                /* 80 */
-    uint8_t  _pad[168];               /* 88..255 */
+    uint32_t op;                      /* 88  DSU_OP_* in progress, 0 = none (was padding) */
+    uint8_t  _pad[164];               /* 92..255 */
 };
 typedef struct DsuHeader DsuHeader;
 
@@ -194,23 +197,6 @@ static inline int dsu_pid_alive(uint32_t pid) {
     return !dsu_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
- * CAS to OUR pid to hold the lock while fixing shared state, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
- * process can detect and re-recover if we crash mid-recovery. */
-static inline void dsu_recover_stale_lock(DsuHandle *h, uint32_t observed_wlock) {
-    DsuHeader *hdr = h->hdr;
-    uint32_t mypid = DSU_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
-            mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-        return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-}
-
 static const struct timespec dsu_lock_timeout = { DSU_LOCK_TIMEOUT_SEC, 0 };
 
 /* Process-global fork-generation counter.  Incremented in the pthread_atfork
@@ -288,6 +274,85 @@ static inline void dsu_claim_reader_slot(DsuHandle *h) {
     /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
      * slotless path (lock still works; recovery of THIS reader's death is the
      * documented slotless limitation). */
+}
+
+/* Wait until no live reader holds the lock; the caller owns wlock, so no NEW
+ * reader can join (they see wlock!=0 and yield).  The SEQ_CST wlock CAS + the
+ * SEQ_CST rdepth loads below are the writer side of the Dekker handshake. */
+static inline void dsu_rwlock_drain(DsuHandle *h) {
+    DsuHeader *hdr = h->hdr;
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(DSU_OCC_WORDS + live readers)
+         * instead of O(DSU_READER_SLOTS). */
+        for (uint32_t w = 0; w < DSU_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!dsu_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &dsu_lock_timeout, NULL, 0);
+    }
+}
+
+/* 1 if this process holds a read lock on the segment (through any handle).  Such a
+ * lock predates the current wlock holder, whose drain could then never have
+ * finished: it died before mutating anything. */
+static int dsu_self_reading(DsuHandle *h) {
+    if (h->slotless_held) return 1;
+    uint32_t me = (uint32_t)getpid();
+    for (uint32_t i = 0; i < DSU_READER_SLOTS; i++)
+        if (__atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE) == me &&
+            __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_ACQUIRE) != 0)
+            return 1;
+    return 0;
+}
+
+static void dsu_repair_locked(DsuHandle *h);
+
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
+ * CAS to OUR pid to hold the lock while repairing shared state, then release.
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void dsu_recover_stale_lock(DsuHandle *h, uint32_t observed_wlock) {
+    DsuHeader *hdr = h->hdr;
+    uint32_t mypid = DSU_RWLOCK_WR((uint32_t)getpid());
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
+            mypid, 0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+        return;
+    if (!dsu_self_reading(h)) {
+        dsu_rwlock_drain(h);
+        dsu_repair_locked(h);
+    }
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
@@ -438,48 +503,8 @@ static inline void dsu_rwlock_wrlock(DsuHandle *h) {
         dsu_unpark(h);
         spin = 0;
     }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
-    for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
-        int busy = 0;
-        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
-         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
-         * this scan, so no held slot is skipped).  O(DSU_OCC_WORDS + live readers)
-         * instead of O(DSU_READER_SLOTS). */
-        for (uint32_t w = 0; w < DSU_OCC_WORDS; w++) {
-            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
-            while (word) {
-                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
-                word &= word - 1;                          /* consume this bit (local copy) */
-                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
-                if (rd == 0) continue;                      /* occupied but not read-locking now */
-                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
-                if (!dsu_pid_alive(pid)) {
-                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
-                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
-                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
-                    uint32_t ep = pid;
-                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
-                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
-                    continue;
-                }
-                busy = 1;                                   /* live reader still holding */
-            }
-        }
-        /* A live slotless reader keeps us waiting; a crashed slotless reader that
-         * cannot be attributed to a pid is the documented slotless limitation. */
-        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
-            busy = 1;
-        if (!busy)
-            return;                                    /* exclusive: wlock held + every rdepth 0 */
-        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
-         * (which reclaims any newly-dead slotted reader). */
-        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &dsu_lock_timeout, NULL, 0);
-    }
+    /* Phase 2: drain the readers that were already holding when we won the CAS. */
+    dsu_rwlock_drain(h);
 }
 
 static inline void dsu_rwlock_wrunlock(DsuHandle *h) {
@@ -587,8 +612,25 @@ static inline void dsu_reset_locked(DsuHandle *h) {
     uint32_t *p = dsu_parent(h);
     uint32_t *sz = dsu_size(h);
     uint32_t n = h->n;                    /* cached at attach; hdr->n is peer-writable */
+    h->hdr->op = DSU_OP_RESET;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     for (uint32_t i = 0; i < n; i++) { p[i] = i; sz[i] = 1; }
     h->hdr->num_sets = n;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->hdr->op = 0;
+}
+
+/* A reset killed part-way left its op word set: run it again from scratch.
+ * Otherwise the parent links are authoritative (a union links with one store):
+ * re-derive every root's size and the set count from them.  Idempotent. */
+static void dsu_repair_locked(DsuHandle *h) {
+    if (h->hdr->op == DSU_OP_RESET) { dsu_reset_locked(h); return; }
+    uint32_t *p = dsu_parent(h), *sz = dsu_size(h), n = h->n, sets = 0;
+    for (uint32_t i = 0; i < n; i++) if (p[i] >= n) p[i] = i;   /* corrupt link */
+    for (uint32_t i = 0; i < n; i++) dsu_find(h, i);            /* halving breaks any cycle */
+    for (uint32_t i = 0; i < n; i++) if (p[i] == i) { sz[i] = 0; sets++; }
+    for (uint32_t i = 0; i < n; i++) sz[dsu_find(h, i)]++;
+    h->hdr->num_sets = sets;
 }
 
 /* ================================================================
@@ -705,14 +747,36 @@ static int dsu_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int dsu_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int dsu_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int dsu_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_DISJOINTSET_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static DsuHandle *dsu_create(const char *path, uint64_t n_in, mode_t mode, char *errbuf) {
@@ -747,9 +811,18 @@ static DsuHandle *dsu_create(const char *path, uint64_t n_in, mode_t mode, char 
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             DSU_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && dsu_reserve(fd, total) < 0) {
+            DSU_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { DSU_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            DSU_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!dsu_validate_header((DsuHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -759,9 +832,13 @@ static DsuHandle *dsu_create(const char *path, uint64_t n_in, mode_t mode, char 
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((DsuHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && dsu_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && dsu_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         DSU_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (dsu_reserve(fd, total) < 0) {
+                        DSU_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     dsu_init_header(base, n, total);
@@ -794,6 +871,10 @@ static DsuHandle *dsu_create_memfd(const char *name, uint64_t n_in, char *errbuf
     if (ftruncate(fd, (off_t)total) < 0) {
         DSU_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (dsu_reserve(fd, total) < 0) {
+        DSU_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { DSU_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -806,6 +887,11 @@ static DsuHandle *dsu_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { DSU_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(DsuHeader)) { DSU_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(DsuHeader, magic)) != (ssize_t)sizeof magic || magic != DSU_MAGIC) {
+        DSU_ERR("invalid disjoint-set table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { DSU_ERR("mmap: %s", strerror(errno)); return NULL; }

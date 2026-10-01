@@ -1,4 +1,4 @@
-use Test::More tests => 2;
+use Test::More;
 use Text::Markdown::Discount;
 
 # https://rt.cpan.org/Ticket/Display.html?id=73657
@@ -18,3 +18,4 @@ use Text::Markdown::Discount;
     is($@, '');
 }
 
+done_testing;

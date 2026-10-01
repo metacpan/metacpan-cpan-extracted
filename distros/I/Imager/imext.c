@@ -37,10 +37,6 @@ im_ext_funcs imager_function_table =
     myfree,
     myrealloc,
 
-    mymalloc_file_line,
-    myfree_file_line,
-    myrealloc_file_line,
-
     mathom_i_img_8_new,
     mathom_i_img_16_new,
     mathom_i_img_double_new,
@@ -218,9 +214,13 @@ im_ext_funcs imager_function_table =
     i_img_color_channels,
 
     /* level 10 */
-    im_decode_exif
+    im_decode_exif,
 
     /* level 11 */
+    im_malloc,
+    im_realloc,
+    im_free,
+    im_malloc_fail
   };
 
 /* in general these functions aren't called by Imager internally, but

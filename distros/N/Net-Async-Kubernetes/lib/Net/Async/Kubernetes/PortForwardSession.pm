@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::PortForwardSession;
 # ABSTRACT: Duplex websocket session for pod port-forward, exec and attach
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -88,7 +88,7 @@ Net::Async::Kubernetes::PortForwardSession - Duplex websocket session for pod po
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

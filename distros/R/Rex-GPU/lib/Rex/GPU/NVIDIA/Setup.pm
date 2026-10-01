@@ -1,7 +1,7 @@
 # ABSTRACT: Base class of the per-distro NVIDIA driver setups (experimental)
 
 package Rex::GPU::NVIDIA::Setup;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 use Carp qw( croak );
 use Rex::Commands::File ();
@@ -146,7 +146,7 @@ my %REQUIREMENT_KEY = map { $_ => 1 } qw( kernel_module min_branch max_branch na
 # (BUILDARGS) and on an object (adopt).
 sub _coerce_requirement {
   my ( $self, $req ) = @_;
-  my $base = 'Rex::GPU::NVIDIA::Requirement';
+  my $base = $self->requirement_class;
   return $req if blessed($req) && $req->isa($base);
   croak __PACKAGE__.': a requirement is a hashref or a '.$base.' object, not '
     .( defined $req ? "'".$req."'" : 'undef' )
@@ -813,7 +813,7 @@ Rex::GPU::NVIDIA::Setup - Base class of the per-distro NVIDIA driver setups (exp
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -842,7 +842,8 @@ L</requirement> against the ordered L</sources>, the first that fits wins
 (L</select_source>). The per-distro
 classes are L<Rex::GPU::NVIDIA::Setup::Debian> and
 L<Rex::GPU::NVIDIA::Setup::Ubuntu> on the apt packaging layer
-L<Rex::GPU::NVIDIA::Setup::Apt>, and L<Rex::GPU::NVIDIA::Setup::RHEL> and
+L<Rex::GPU::NVIDIA::Setup::Apt> (plus the opt-in
+L<Rex::GPU::NVIDIA::Setup::UbuntuDrivers>, a subclass of the Ubuntu one), and L<Rex::GPU::NVIDIA::Setup::RHEL> and
 L<Rex::GPU::NVIDIA::Setup::SUSE> on the rpm packaging layer
 L<Rex::GPU::NVIDIA::Setup::Rpm>.
 
@@ -867,8 +868,8 @@ another way (e.g. sysfs, without C<lspci>) passes just these:
 =item * C<device_id> -- the PCI device ID as four hex digits, without
 C<0x> and without a trailing newline (C<2b85>; sysfs C<device> reads
 C<0x2b85>). It is what the driver is chosen by
-(L<Rex::GPU::NVIDIA::Requirement>): Kepler is refused, Blackwell gets the
-open kernel module, Maxwell/Pascal/Volta the 580 branch. Any other defined
+(L<Rex::GPU::NVIDIA::Requirement>): Kepler is refused, Blackwell and GH200
+get the open kernel module, Maxwell/Pascal/Volta the 580 branch. Any other defined
 value croaks in C<new> (and in L</adopt>), before anything touches the
 host -- it would otherwise silently count as an unknown GPU and lose those
 guards. Leaving it out (or C<undef>, as detection does for an C<lspci> line
@@ -1229,8 +1230,9 @@ package and records its branch. Returns a new hashref with C<packages>,
 C<verify> and, if known, the exact C<branch> -- or with C<unavailable> set
 to the reason when the repository has nothing to install. May read the
 host, must not change it. Override it to pick the package some other way (a
-site index, C<ubuntu-drivers list>); L</resolve_plan> checks whatever it
-returns against the requirement.
+site index; L<Rex::GPU::NVIDIA::Setup::UbuntuDrivers> asks C<ubuntu-drivers
+list --gpgpu>); L</resolve_plan> checks whatever it returns against the
+requirement.
 
 =head2 fabric_manager_package
 
@@ -1559,24 +1561,28 @@ can return. L</plan> and everything it calls must only read the host.
 
 Override L</resolve_source>: it runs after C<apt-get update>, may read the
 host but not change it, and whatever it returns is checked against the
-requirement again. C<eg/ubuntu-drivers/> in the distribution asks
-C<ubuntu-drivers list --gpgpu> (read-only) for the Ubuntu package instead
-of C<apt-cache search>; the package it names is installed and verified by
-the inherited steps, not by C<ubuntu-drivers install>:
+requirement again. The built-in L<Rex::GPU::NVIDIA::Setup::UbuntuDrivers>
+is such a class: it asks C<ubuntu-drivers list --gpgpu> (read-only) for the
+Ubuntu package instead of C<apt-cache search>; the package it names is
+installed and verified by the inherited steps, not by C<ubuntu-drivers
+install>. The outline of another such class, which installs the package an
+operator names in a file on the host instead of the newest one the repository
+offers:
 
-  package My::GPU::UbuntuDrivers;
+  package My::GPU::PinnedPackage;
   use Moo;
   extends 'Rex::GPU::NVIDIA::Setup::Ubuntu';
 
   sub resolve_source {
     my ( $self, $source ) = @_;
-    return $self->SUPER::resolve_source($source) unless defined $source->{search};
-    my $list = $self->run_cmd('ubuntu-drivers list --gpgpu 2>/dev/null', auto_die => 0);
-    # ... pick the newest nvidia-driver-NNN-server(-open) line of the
-    # source's kernel module flavour, then:
+    my $pin = $self->run_cmd('cat /etc/nvidia-driver-pin 2>/dev/null', auto_die => 0) // '';
+    my ( $pkg, $branch ) = $pin =~ /^(nvidia-driver-(\d+)-server(?:-open)?)\s*$/
+      or return $self->SUPER::resolve_source($source);
+    # ... return { %$source, unavailable => 'why' } unless the pinned
+    # package's flavour (-open or not) is the source's kernel_module, then:
     my %resolved = ( %$source, packages => [ $pkg ], verify => [ $pkg ], branch => $branch );
     delete $resolved{branch_at_least};
-    return \%resolved;   # or { %$source, unavailable => 'why' }
+    return \%resolved;
   }
 
 =head2 Choosing it

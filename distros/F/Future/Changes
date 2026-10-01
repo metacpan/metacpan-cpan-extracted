@@ -1,5 +1,12 @@
 Revision history for Future
 
+0.53    2026-09-30
+        [CHANGES]
+         * Add documentation to point at the `Future::XS` distribution
+         * Defend unit tests against changes to perl's reporting of line
+           numbers in code involving multi-line anonymous subroutines
+           (Perl #24396)
+
 0.52    2025-07-11
         [CHANGES]
          * Expose `Test::Future::Deferred->flush` as a method for test scripts

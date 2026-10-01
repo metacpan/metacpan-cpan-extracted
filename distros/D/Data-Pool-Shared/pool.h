@@ -16,6 +16,7 @@
 #ifndef POOL_H
 #define POOL_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -38,8 +39,11 @@
  * ================================================================ */
 
 #define POOL_MAGIC        0x504F4C31U  /* "POL1" */
-#define POOL_VERSION      1
-#define POOL_ERR_BUFLEN   256
+#define POOL_VERSION      2   /* 2: slots are claimed through the owner word, not the bitmap */
+
+/* Set in an owner word while recover_stale frees the slot of a dead owner. */
+#define POOL_OWNER_RECOVERING 0x80000000U
+#define POOL_ERR_BUFLEN   (PATH_MAX + 256)
 
 #define POOL_VAR_RAW  0
 #define POOL_VAR_I64  1
@@ -125,7 +129,7 @@ static inline int pool_pid_is_zombie(uint32_t pid) {
     return rp[1] == ' ' && rp[2] == 'Z';
 }
 static inline int pool_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (pid == 0) return 0; /* no owner recorded, treat as dead */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
     return !pool_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
@@ -183,24 +187,29 @@ static inline int64_t pool_try_alloc(PoolHandle *h) {
         uint32_t widx = (start + i) % nwords;
         uint64_t word = __atomic_load_n(&h->bitmap[widx], __ATOMIC_RELAXED);
 
+        /* The owner word is the claim (0 -> pid); the bitmap bit follows it, so a
+         * claimer killed in between leaves a dead owner that recover_stale frees.
+         * `used` counts the claim before the bit: a kill can leave it high, never low. */
         while (word != ~(uint64_t)0) {
             int bit = __builtin_ctzll(~word);
             uint64_t slot = (uint64_t)widx * 64 + bit;
             if (slot >= cap) break;
 
-            uint64_t new_word = word | ((uint64_t)1 << bit);
-            if (__atomic_compare_exchange_n(&h->bitmap[widx], &word, new_word,
-                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-                __atomic_store_n(&h->owners[slot], mypid, __ATOMIC_RELAXED);
-                memset(pool_slot_ptr(h, slot), 0, h->elem_size);
+            uint32_t unowned = 0;
+            if (__atomic_compare_exchange_n(&h->owners[slot], &unowned, mypid,
+                    0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
                 __atomic_add_fetch(&h->hdr->used, 1, __ATOMIC_RELEASE);
+                memset(pool_slot_ptr(h, slot), 0, h->elem_size);
+                uint64_t new_word = __atomic_or_fetch(&h->bitmap[widx],
+                        (uint64_t)1 << bit, __ATOMIC_RELEASE);
                 __atomic_add_fetch(&h->hdr->stat_allocs, 1, __ATOMIC_RELAXED);
                 /* Advance hint past full word to reduce next scan */
                 h->scan_hint = (new_word == ~(uint64_t)0 && nwords > 1)
                     ? (widx + 1) % nwords : widx;
                 return (int64_t)slot;
             }
-            /* CAS failed -- word now holds current value, retry */
+            /* Owned but not yet (or no longer) in the bitmap: skip it this scan. */
+            word |= (uint64_t)1 << bit;
         }
     }
     return -1;
@@ -246,14 +255,16 @@ static inline int64_t pool_alloc(PoolHandle *h, double timeout) {
 
         cur_used = __atomic_load_n(&hdr->used, __ATOMIC_ACQUIRE);
         if ((uint64_t)cur_used >= hdr->capacity) {
-            struct timespec *pts = NULL;
+            /* Rescan at least every second: a recover_stale killed mid-slot can leave
+             * `used` one high, so a full-looking pool may hold a free slot. */
+            struct timespec recheck = { 1, 0 }, *pts = &recheck;
             if (has_deadline) {
                 if (!pool_remaining_time(&deadline, &remaining)) {
                     __atomic_sub_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
                     __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
                     return -1;
                 }
-                pts = &remaining;
+                if (remaining.tv_sec < 1) pts = &remaining;
             }
             syscall(SYS_futex, &hdr->used, FUTEX_WAIT, cur_used, pts, NULL, 0);
         }
@@ -276,39 +287,36 @@ static inline int64_t pool_alloc(PoolHandle *h, double timeout) {
  * Free
  * ================================================================ */
 
+/* Clear an allocated slot's bitmap bit, then give up its owner word; a freer
+ * killed in between leaves an owner that recover_stale reclaims once it is
+ * dead.  An owner mid-recovery is left to recover_stale.  Returns 1 if this
+ * call cleared the bit, 0 if the slot was not allocated. */
+static inline int pool_release_slot(PoolHandle *h, uint64_t slot) {
+    uint32_t widx = (uint32_t)(slot / 64);
+    uint64_t mask = (uint64_t)1 << (slot % 64);
+    uint32_t owner = __atomic_load_n(&h->owners[slot], __ATOMIC_ACQUIRE);
+    uint64_t prev = __atomic_fetch_and(&h->bitmap[widx], ~mask, __ATOMIC_RELEASE);
+    if (!(prev & mask)) return 0;
+    if (!(owner & POOL_OWNER_RECOVERING))
+        __atomic_compare_exchange_n(&h->owners[slot], &owner, 0,
+                0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+    return 1;
+}
+
 static inline int pool_free_slot(PoolHandle *h, uint64_t slot) {
     PoolHeader *hdr = h->hdr;
     if (slot >= h->capacity) return 0;
-
-    uint32_t widx = (uint32_t)(slot / 64);
-    int bit = (int)(slot % 64);
-    uint64_t mask = (uint64_t)1 << bit;
-
-    for (;;) {
-        uint64_t word = __atomic_load_n(&h->bitmap[widx], __ATOMIC_RELAXED);
-        if (!(word & mask)) return 0;
-
-        uint64_t new_word = word & ~mask;
-        /* Zero owner BEFORE releasing the bit: once the bit is clear a peer's
-         * try_alloc may set owners[slot]=its pid, and doing owner=0 after the
-         * release CAS would race and clobber that pid to 0 (recover_stale then
-         * skips the slot -> a later crash leaks it).  recover_stale is
-         * owner-first for the same reason. */
-        __atomic_store_n(&h->owners[slot], 0, __ATOMIC_RELAXED);
-        if (__atomic_compare_exchange_n(&h->bitmap[widx], &word, new_word,
-                1, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-            __atomic_sub_fetch(&hdr->used, 1, __ATOMIC_RELEASE);
-            __atomic_add_fetch(&hdr->stat_frees, 1, __ATOMIC_RELAXED);
-            /* StoreLoad barrier: publish used-- before reading waiters, so we
-             * observe a waiter that registered just before our free (else the
-             * wake is lost and it sleeps until timeout). Pairs with the fence
-             * in the alloc-wait path. */
-            __atomic_thread_fence(__ATOMIC_SEQ_CST);
-            if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
-                syscall(SYS_futex, &hdr->used, FUTEX_WAKE, 1, NULL, NULL, 0);
-            return 1;
-        }
-    }
+    if (!pool_release_slot(h, slot)) return 0;
+    __atomic_sub_fetch(&hdr->used, 1, __ATOMIC_RELEASE);
+    __atomic_add_fetch(&hdr->stat_frees, 1, __ATOMIC_RELAXED);
+    /* StoreLoad barrier: publish used-- before reading waiters, so we
+     * observe a waiter that registered just before our free (else the
+     * wake is lost and it sleeps until timeout). Pairs with the fence
+     * in the alloc-wait path. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->used, FUTEX_WAKE, 1, NULL, NULL, 0);
+    return 1;
 }
 
 /* ================================================================
@@ -322,22 +330,7 @@ static inline uint32_t pool_free_n(PoolHandle *h, uint64_t *slots, uint32_t coun
     for (uint32_t i = 0; i < count; i++) {
         uint64_t slot = slots[i];
         if (slot >= h->capacity) continue;
-
-        uint32_t widx = (uint32_t)(slot / 64);
-        int bit = (int)(slot % 64);
-        uint64_t mask = (uint64_t)1 << bit;
-
-        for (;;) {
-            uint64_t word = __atomic_load_n(&h->bitmap[widx], __ATOMIC_RELAXED);
-            if (!(word & mask)) break;
-            uint64_t new_word = word & ~mask;
-            __atomic_store_n(&h->owners[slot], 0, __ATOMIC_RELAXED);  /* owner-first (see pool_free_slot) */
-            if (__atomic_compare_exchange_n(&h->bitmap[widx], &word, new_word,
-                    1, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-                freed++;
-                break;
-            }
-        }
+        if (pool_release_slot(h, slot)) freed++;
     }
 
     if (freed > 0) {
@@ -410,78 +403,49 @@ static inline int pool_alloc_n(PoolHandle *h, uint64_t *out, uint32_t count,
     }
 }
 
+/* capacity - used, never wrapping: `used` can run one high (see pool_alloc) */
+static inline uint64_t pool_available(PoolHandle *h) {
+    uint64_t used = __atomic_load_n(&h->hdr->used, __ATOMIC_RELAXED);
+    return used >= h->hdr->capacity ? 0 : h->hdr->capacity - used;
+}
+
 /* ================================================================
- * Stale recovery -- CAS owner to narrow race window
+ * Stale recovery
  * ================================================================ */
 
+/* Free every slot whose owner is dead, whatever its bitmap bit says: a dead
+ * claimer may have died before setting the bit, a dead freer after clearing
+ * it.  A live owner with a clear bit is a claim in progress and is skipped.
+ * The owner word is taken over (dead pid -> our pid|RECOVERING) before the bit
+ * is cleared, so no claimer can reuse the slot until we give it up. */
 static inline uint32_t pool_recover_stale(PoolHandle *h) {
     uint32_t recovered = 0;
     uint64_t cap = h->capacity;
+    uint32_t me = (uint32_t)getpid() | POOL_OWNER_RECOVERING;
 
     for (uint64_t slot = 0; slot < cap; slot++) {
-        if (!pool_is_allocated(h, slot)) continue;
         uint32_t owner = __atomic_load_n(&h->owners[slot], __ATOMIC_ACQUIRE);
-        if (owner == 0 || pool_pid_alive(owner)) continue;
-
-        /* CAS owner from dead PID to 0 -- if it fails, slot was
-         * re-allocated or already recovered by another process */
-        if (!__atomic_compare_exchange_n(&h->owners[slot], &owner, 0,
+        if (owner == 0 || pool_pid_alive(owner & ~POOL_OWNER_RECOVERING)) continue;
+        if (!__atomic_compare_exchange_n(&h->owners[slot], &owner, me,
                 0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
             continue;
-
-        /* We now own the right to free this slot's bitmap bit.
-         *
-         * Race window: between our owner-CAS and the bitmap-CAS below,
-         * the bitmap word can transition via concurrent allocators (or,
-         * with API misuse, a free+alloc cycle on the same bit). The bit
-         * may be reset by an allocator before our CAS reaches it, or our
-         * CAS may clear a bit a fresh allocator has just claimed.
-         *
-         * Mitigation: pre-CAS owner check (narrows window) + post-CAS
-         * recovery accounting (always decrement used, since our CAS
-         * succeeded against an "expected = bit set" state -- that bit is
-         * gone from popcount). If post-CAS observes an owner already
-         * stored, an allocator's CAS landed inside our window; we restore
-         * the bit so their slot stays claimed. Their own used++ pairs
-         * with our used-- to keep the counter in sync with popcount. */
         uint32_t widx = (uint32_t)(slot / 64);
-        int bit = (int)(slot % 64);
-        uint64_t mask = (uint64_t)1 << bit;
-
-        for (;;) {
-            uint64_t word = __atomic_load_n(&h->bitmap[widx], __ATOMIC_RELAXED);
-            if (!(word & mask)) break;
-
-            /* Pre-CAS: if a new allocator already populated owner, abort */
-            if (__atomic_load_n(&h->owners[slot], __ATOMIC_ACQUIRE) != 0)
-                break;
-
-            uint64_t new_word = word & ~mask;
-            if (__atomic_compare_exchange_n(&h->bitmap[widx], &word, new_word,
-                    1, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-                /* Post-CAS: if owner is now non-zero, a live allocator's
-                 * CAS landed inside our window. Restore the bit so their
-                 * claim stays valid; their used++ already happened. */
-                if (__atomic_load_n(&h->owners[slot], __ATOMIC_ACQUIRE) != 0)
-                    __atomic_or_fetch(&h->bitmap[widx], mask, __ATOMIC_RELEASE);
-                /* Account for the stale slot's bit we just cleared. Use a
-                 * saturating decrement: if a prior allocator was killed
-                 * between owner-store and used++, used may already reflect
-                 * fewer "real" allocations than popcount suggests, and a
-                 * plain sub would underflow on subsequent recoveries. */
-                uint32_t cur = __atomic_load_n(&h->hdr->used, __ATOMIC_RELAXED);
-                while (cur > 0 && !__atomic_compare_exchange_n(&h->hdr->used,
-                            &cur, cur - 1, 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED))
-                    ; /* CAS failed: cur reloaded with current value; retry */
-                __atomic_add_fetch(&h->hdr->stat_frees, 1, __ATOMIC_RELAXED);
-                /* StoreLoad barrier: see pool_free_slot. */
-                __atomic_thread_fence(__ATOMIC_SEQ_CST);
-                if (__atomic_load_n(&h->hdr->waiters, __ATOMIC_RELAXED) > 0)
-                    syscall(SYS_futex, &h->hdr->used, FUTEX_WAKE, 1, NULL, NULL, 0);
-                recovered++;
-                break;
-            }
+        uint64_t mask = (uint64_t)1 << (slot % 64);
+        uint64_t prev = __atomic_fetch_and(&h->bitmap[widx], ~mask, __ATOMIC_ACQ_REL);
+        if (prev & mask) {
+            /* Saturating: a corrupted count must not wrap. */
+            uint32_t cur = __atomic_load_n(&h->hdr->used, __ATOMIC_RELAXED);
+            while (cur > 0 && !__atomic_compare_exchange_n(&h->hdr->used,
+                        &cur, cur - 1, 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED))
+                ;
+            __atomic_add_fetch(&h->hdr->stat_frees, 1, __ATOMIC_RELAXED);
         }
+        __atomic_store_n(&h->owners[slot], 0, __ATOMIC_RELEASE);
+        /* StoreLoad barrier: see pool_free_slot. */
+        __atomic_thread_fence(__ATOMIC_SEQ_CST);
+        if (__atomic_load_n(&h->hdr->waiters, __ATOMIC_RELAXED) > 0)
+            syscall(SYS_futex, &h->hdr->used, FUTEX_WAKE, 1, NULL, NULL, 0);
+        recovered++;
     }
 
     if (recovered > 0)
@@ -628,14 +592,36 @@ static int pool_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int pool_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int pool_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int pool_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_POOL_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static PoolHandle *pool_create(const char *path, uint64_t capacity,
@@ -701,12 +687,18 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
                 POOL_ERR("ftruncate(%s): %s", path, strerror(errno));
                 flock(fd, LOCK_UN); close(fd); return NULL;
             }
+            if (pool_reserve(fd, total) < 0) {
+                POOL_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+                if (ftruncate(fd, 0) < 0) { /* best effort */ }
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
         }
 
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) {
             POOL_ERR("mmap(%s): %s", path, strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
@@ -719,9 +711,13 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((PoolHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && pool_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && pool_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         POOL_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (pool_reserve(fd, total) < 0) {
+                        POOL_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     pool_init_header(base, total, elem_size, variant_id, capacity,
@@ -732,6 +728,9 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
                 if (((PoolHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
                     && st.st_uid == geteuid())
                     POOL_ERR("%s: incomplete pool file left by an interrupted create; remove it and retry", path);
+                else if (((PoolHeader *)base)->magic == POOL_MAGIC && ((PoolHeader *)base)->version != POOL_VERSION)
+                    POOL_ERR("%s: pool file format version %u is not supported by this build (format %u); recreate it with this version",
+                             path, ((PoolHeader *)base)->version, POOL_VERSION);
                 else
                     POOL_ERR("%s: invalid or incompatible pool file", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
@@ -790,6 +789,10 @@ static PoolHandle *pool_create_memfd(const char *name, uint64_t capacity,
         POOL_ERR("ftruncate(memfd): %s", strerror(errno));
         close(fd); return NULL;
     }
+    if (pool_reserve(fd, total) < 0) {
+        POOL_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
 
     /* Seal against shrink/grow to block ftruncate-based SIGBUS attacks via
      * SCM_RIGHTS-shared fds. Peers can still write; only size is immutable. */
@@ -821,6 +824,13 @@ static PoolHandle *pool_open_fd(int fd, uint32_t variant_id, char *errbuf) {
         return NULL;
     }
 
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(PoolHeader, magic)) != (ssize_t)sizeof magic || magic != POOL_MAGIC) {
+        POOL_ERR("fd %d: invalid or incompatible pool", fd);
+        return NULL;
+    }
+
     size_t map_size = (size_t)st.st_size;
     void *base = mmap(NULL, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) {
@@ -829,7 +839,11 @@ static PoolHandle *pool_open_fd(int fd, uint32_t variant_id, char *errbuf) {
     }
 
     if (!pool_validate_header((PoolHeader *)base, (uint64_t)st.st_size, variant_id)) {
-        POOL_ERR("fd %d: invalid or incompatible pool", fd);
+        if (((PoolHeader *)base)->magic == POOL_MAGIC && ((PoolHeader *)base)->version != POOL_VERSION)
+            POOL_ERR("fd %d: pool file format version %u is not supported by this build (format %u)",
+                     fd, ((PoolHeader *)base)->version, POOL_VERSION);
+        else
+            POOL_ERR("fd %d: invalid or incompatible pool", fd);
         munmap(base, map_size);
         return NULL;
     }

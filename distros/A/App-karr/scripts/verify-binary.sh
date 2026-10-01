@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Smoke-test a built karr binary against both pp runtime traps.
+# Smoke-test a built karr binary against the pp runtime traps.
 # Usage: verify-binary.sh <karr-binary>
+# Trap 3 compares against the share/ of the checkout this script lives in, so
+# run the copy from the checkout the binary was built from.
 set -euo pipefail
 BIN=$(realpath "${1:?usage: verify-binary.sh <karr-binary>}")
 export PAR_GLOBAL_TEMP="$(mktemp -d)"
@@ -33,4 +35,31 @@ work=$(mktemp -d)
   "$BIN" destroy --yes
 )
 echo "trap2 (libgit2 board flow): OK"
+
+# Trap 3: karr's own share/, which the binary has only if build-binary.sh packed
+# it. Nothing above reads it -- `skill --help` loads the class, not the files --
+# so a binary without it passes traps 1 and 2 and dies the first time someone
+# runs `karr skill` or `karr init --claude-skill` (k308). Every skill under the
+# checkout's share/ has to come back from `skill show` byte for byte, and
+# `skill install` has to write each of its files, references included, unchanged.
+root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+skills=()
+for f in "$root"/share/*/SKILL.md; do
+  if [ -f "$f" ]; then skills+=("$(basename "$(dirname "$f")")"); fi
+done
+[ "${#skills[@]}" -gt 0 ] || { echo "FAIL: no skills under $root/share" >&2; exit 1; }
+hint="is share/ bundled (build-binary.sh -a share)?"
+proj=$(mktemp -d)
+( cd "$proj" && "$BIN" skill install --agent claude-code >/dev/null ) \
+  || { echo "FAIL: skill install -- $hint" >&2; exit 1; }
+for s in "${skills[@]}"; do
+  "$BIN" skill show "$s" | cmp -s - "$root/share/$s/SKILL.md" \
+    || { echo "FAIL: skill show $s -- $hint" >&2; exit 1; }
+  while IFS= read -r f; do
+    f=${f#./}
+    cmp -s "$root/share/$s/$f" "$proj/.claude/skills/$s/$f" \
+      || { echo "FAIL: skill install wrote no matching $s/$f -- $hint" >&2; exit 1; }
+  done < <(cd "$root/share/$s" && find . -type f -name '*.md')
+done
+echo "trap3 (bundled skills: ${skills[*]}): OK"
 echo "verify: OK"

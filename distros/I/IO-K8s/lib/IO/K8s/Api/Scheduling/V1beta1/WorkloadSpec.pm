@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1beta1::WorkloadSpec;
 # ABSTRACT: WorkloadSpec defines the desired state of a Workload.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s compositePodGroupTemplates => ['Scheduling::V1beta1::CompositePodGroupTemplate'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Scheduling::V1beta1::WorkloadSpec - WorkloadSpec defines the desir
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 compositePodGroupTemplates
 

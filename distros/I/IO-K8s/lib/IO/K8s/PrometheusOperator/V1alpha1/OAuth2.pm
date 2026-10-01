@@ -1,13 +1,13 @@
 package IO::K8s::PrometheusOperator::V1alpha1::OAuth2;
 # ABSTRACT: oauth2 defines the optional OAuth 2.0 configuration to authenticate against the target HTTP endpoint.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s clientId             => '+IO::K8s::PrometheusOperator::V1alpha1::SecretOrConfigMap', { required => 'schema' };
 k8s clientSecret         => 'Core::V1::ConfigMapKeySelector', { required => 'schema' };
 k8s endpointParams       => { Str => 1 };
 k8s noProxy              => Str;
-k8s proxyConnectHeader   => { Str => 1 };
+k8s proxyConnectHeader   => Opaque;
 k8s proxyFromEnvironment => Bool;
 k8s proxyUrl             => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s scopes               => [Str];
@@ -38,7 +38,7 @@ IO::K8s::PrometheusOperator::V1alpha1::OAuth2 - oauth2 defines the optional OAut
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 clientId
 

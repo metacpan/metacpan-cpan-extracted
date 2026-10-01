@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::BeyondtrustWorkloadCredentialsDynamicSecretSpec;
 # ABSTRACT: BeyondtrustWorkloadCredentialsDynamicSecretSpec defines the desired spec for BeyondtrustWorkloadCredentials dynamic generator.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s controller    => Str;
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::BeyondtrustWorkloadCredentialsDynamicSecretS
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 controller
 

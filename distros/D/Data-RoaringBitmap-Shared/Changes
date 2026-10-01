@@ -1,24 +1,25 @@
 Revision history for Data-RoaringBitmap-Shared
 
+0.06      2026-09-26
+          - A writer killed mid-call no longer tears a container or leaks
+            slots; stats' containers_used may count one spare slot.
+          - DATA_ROARINGBITMAP_SHARED_SPARSE=0 reserves segments up front, so
+            a full filesystem fails the constructor, not a later write.
+          - A failed create no longer leaves a full-size file behind.
+
 0.05      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
 
 0.04      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Frozen read-only mode: freeze() seals a file-backed structure;
-            new_readonly() maps it O_RDONLY and queries it lock-free.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
+          - A file left by an interrupted create is recovered, not refused.
+          - freeze()/new_readonly(): sealed read-only mode, lock-free.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.03      2026-07-22
-          - Fix a use-after-free in union() and intersect(): sv_isobject on the
-            peer argument runs get-magic, so a tied argument can destroy this
-            object before its handle is used again. Such a call now croaks.
-          - On-disk format change (v1 -> v2): an existing 0.02 file is
-            refused; recreate it.
+          - Fix a use-after-free in union() and intersect() when a tied peer
+            destroys the object; it now croaks.
+          - On-disk format change (v1 -> v2): recreate 0.02 files.
           - Security and robustness hardening.
 
 0.02      2026-07-03

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::BasicDevice;
 # ABSTRACT: BasicDevice defines one device instance.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s allNodes => Bool;
@@ -56,7 +56,7 @@ IO::K8s::Api::Resource::V1beta1::BasicDevice - BasicDevice defines one device in
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allNodes
 

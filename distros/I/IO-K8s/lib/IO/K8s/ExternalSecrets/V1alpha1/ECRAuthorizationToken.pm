@@ -1,9 +1,10 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ECRAuthorizationToken;
 # ABSTRACT: ECRAuthorizationToken uses the GetAuthorizationToken API to retrieve an authorization token.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
-    resource_plural => 'ecrauthorizationtokens';
+    resource_plural => 'ecrauthorizationtokens',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec => '+IO::K8s::ExternalSecrets::V1alpha1::ECRAuthorizationTokenSpec';
@@ -23,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ECRAuthorizationToken - ECRAuthorizationToke
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

@@ -1,7 +1,7 @@
 package Data::RadixTree::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::RadixTree::Shared', $VERSION);
 
@@ -122,6 +122,13 @@ another process. The descriptor you pass is duplicated (C<F_DUPFD_CLOEXEC>),
 so it stays yours to close and closing it does not disturb the handle.
 C<new_readonly> opens a B<frozen> file read-only for lock-free querying (see
 L</"FROZEN (READ-ONLY) MODE">).
+
+C<new> and C<new_memfd> create a new segment sparse: pages are allocated as
+they are first written, and once the filesystem is full, a write to a page not
+yet allocated dies with SIGBUS. Set C<DATA_RADIXTREE_SHARED_SPARSE=0> to
+reserve the whole segment at creation, so a full filesystem makes them croak
+instead; on tmpfs and memfd that commits the segment's memory at once, and a
+memory cgroup too small for it gets an OOM kill rather than a croak.
 
 C<$mode> (default C<0600>, owner-only) is the permission mode for a B<newly
 created> backing file; pass e.g. C<0660> to opt into cross-user sharing. The

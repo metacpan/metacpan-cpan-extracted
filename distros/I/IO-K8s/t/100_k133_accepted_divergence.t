@@ -95,7 +95,7 @@ use IO::K8s::APIObject
     api_version     => 'test.example.com/v1',
     resource_plural => '$plural';
 
-k8s spec => { Str => 1 };
+k8s spec => Opaque;
 
 1;
 PM

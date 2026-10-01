@@ -7,7 +7,7 @@ use warnings;
 
 use Kubernetes::REST::CLI::Watch;
 
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 
 my $watcher = Kubernetes::REST::CLI::Watch->new_with_options;
 $watcher->run(shift @ARGV);
@@ -24,7 +24,7 @@ kube_watch - Watch Kubernetes resources for changes
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 

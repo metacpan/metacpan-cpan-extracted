@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::LocalObjectReference;
 # ABSTRACT: ExtensionRef is an optional, implementation-specific extension to the "filter" behavior.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s group => Str, { required => 'schema', pattern => qr/^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/ };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1beta1::LocalObjectReference - ExtensionRef is an optional
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 group
 

@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::HTTPPathModifier;
 # ABSTRACT: Path defines a path rewrite.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s replaceFullPath    => Str;
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1::HTTPPathModifier - Path defines a path rewrite.
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 replaceFullPath
 

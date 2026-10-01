@@ -6,21 +6,26 @@ use Test::More;
 # Offline tests: config.yaml (join token) and registries.yaml (registry
 # passwords) are written 0600 root:root, for server and agent, rke2 and k3s.
 #
-# `run` and `file` are replaced in Rex::Rancher::Server (the shared
-# _write_secret_file lives there; Agent calls it) so no remote host is
-# involved. This proves the command sequence -- tmp pre-created 0600 before
+# `run` and `file` are replaced in Rex::Commands::Run / ::File (the shared
+# write_secret_file lives in Rex::Rancher::Distribution, which calls them;
+# Server and Agent import them) so no remote host is involved. This proves the command sequence -- tmp pre-created 0600 before
 # `file`, chown/chmod after it -- not what a real remote filesystem does.
 # -----------------------------------------------------------------------------
 
 use Rex::Rancher::Server;
 use Rex::Rancher::Agent;
+use Rex::Rancher::Distribution;
 
 my @log;
 {
   no warnings 'redefine';
-  *Rex::Rancher::Server::run  = sub { push @log, 'run '.$_[0]; $? = 0; return '' };
-  *Rex::Rancher::Server::file = sub { my ( $p, %o ) = @_; push @log, 'file '.$p; return };
-  *Rex::Rancher::Agent::run   = sub { push @log, 'run '.$_[0]; $? = 0; return '' };
+  my $run  = sub { push @log, 'run '.$_[0]; $? = 0; return '' };
+  my $file = sub { my ( $p, %o ) = @_; push @log, 'file '.$p; return };
+  *Rex::Commands::Run::run    = $run;
+  *Rex::Rancher::Server::run  = $run;
+  *Rex::Rancher::Agent::run   = $run;
+  *Rex::Commands::File::file  = $file;
+  *Rex::Rancher::Server::file = $file;
 }
 
 sub secret_ok {
@@ -43,19 +48,19 @@ my $REG = { configs => { 'r:5000' => { auth => { username => 'u', password => 'p
 for my $dist (qw( rke2 k3s )) {
   subtest "$dist server" => sub {
     @log = ();
-    my $paths = Rex::Rancher::Server::_paths($dist);
-    Rex::Rancher::Server::_write_config( $paths, $dist, 'tok', undef, undef, undef, 1 );
-    Rex::Rancher::Server::_generate_registries_yaml( $paths->{config_dir}, $REG );
+    my $d = Rex::Rancher::Distribution->new_for($dist);
+    Rex::Rancher::Server::_write_config( $d, 'tok', undef, undef, undef, 1 );
+    $d->write_registries($REG);
     secret_ok( "/etc/rancher/$dist/config.yaml",     'config.yaml' );
     secret_ok( "/etc/rancher/$dist/registries.yaml", 'registries.yaml' );
   };
 
   subtest "$dist agent" => sub {
     @log = ();
-    my $paths = Rex::Rancher::Agent::_paths($dist);
-    my %opts  = ( server => 'https://cp1:9345', token => 'tok', registries => $REG );
-    Rex::Rancher::Agent::_write_config( $paths, $dist, %opts );
-    Rex::Rancher::Agent::_write_registries( $paths, %opts );
+    my $d    = Rex::Rancher::Distribution->new_for( $dist, role => 'agent' );
+    my %opts = ( server => 'https://cp1:9345', token => 'tok', registries => $REG );
+    Rex::Rancher::Agent::_write_config( $d, %opts );
+    Rex::Rancher::Agent::_write_registries( $d, %opts );
     secret_ok( "/etc/rancher/$dist/config.yaml",     'config.yaml' );
     secret_ok( "/etc/rancher/$dist/registries.yaml", 'registries.yaml' );
   };

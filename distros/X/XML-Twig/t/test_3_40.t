@@ -8,16 +8,16 @@ use tools;
 
 $|=1;
 my $DEBUG=0;
- 
+
 use XML::Twig;
 
-my $TMAX=96;
+my $TMAX=88;
 print "1..$TMAX\n";
 
 
 { my $d="<d><title section='1'>title</title><para>p 1</para> <para>p 2</para></d>";
-  is( lf_in_t( XML::Twig->parse( pretty_print => 'indented', discard_spaces => 1, $d)), 1, 'space prevents indentation'); 
-  is( lf_in_t( XML::Twig->parse( pretty_print => 'indented', discard_all_spaces => 1, $d)), 5, 'discard_all_spaces restores indentation'); 
+  is( lf_in_t( XML::Twig->parse( pretty_print => 'indented', discard_spaces => 1, $d)), 1, 'space prevents indentation');
+  is( lf_in_t( XML::Twig->parse( pretty_print => 'indented', discard_all_spaces => 1, $d)), 5, 'discard_all_spaces restores indentation');
 }
 
 sub lf_in_t
@@ -46,13 +46,13 @@ sub lf_in_t
       my( $trigger, $test_cat, $expected_ids)= @$test;
       my $handlers= $test_cat =~ m{H} ?  { $trigger => sub { $ids.=$_->id; 1; } } : {};
       my $t= XML::Twig->new( twig_handlers => $handlers )->parse( $d);
-      is( $ids, $expected_ids, "(H) trigger with alt: '$trigger'"); 
+      is( $ids, $expected_ids, "(H) trigger with alt: '$trigger'");
 
       my $uniq_ids= join '', sort $expected_ids=~m{(t\d(?:-\d)?)}g;
 
       if( $test_cat =~ m{X})
         { (my $xpath= "//$trigger")=~ s{\|t}{|//t}g;
-          is( join( '', map { $_->id } $t->findnodes( $xpath)), $uniq_ids, " (X) path with |: '$trigger'"); 
+          is( join( '', map { $_->id } $t->findnodes( $xpath)), $uniq_ids, " (X) path with |: '$trigger'");
         }
 
       if( $test_cat =~ m{N})
@@ -76,33 +76,33 @@ sub lf_in_t
   is( $got, 'i1i3', 'bare attribute in handler condition');
 }
 
-if( $] > 5.008)
+if( $] > 5.008 && XML::Twig::_use('LWP') )
 { my $doc= q{<!DOCTYPE doc [ <!ELEMENT doc (#PCDATA)><!ENTITY ext SYSTEM "not_there.txt">]><doc>&ext;</doc>};
   ok( XML::Twig->parse( expand_external_ents => -1, $doc), 'failsafe expand_external_ents');
 }
 else
-{ skip( 1, 'not tested under perl < 5.8'); }
-  
+{ skip( 1, 'not tested under perl < 5.8 or without LWP installed'); }
+
 { my $t=XML::Twig->parse( q{<doc><e><e1>e11</e1><e2>e21</e2></e><e><e1>e12</e1></e></doc>});
   is( join( ':',  $t->findvalues( [$t->root->children], "./e1")), 'e11:e12', 'findvalues on array');
 }
 
-{ my $t=XML::Twig->parse( "<doc/>"); 
+{ my $t=XML::Twig->parse( "<doc/>");
   $t->set_encoding( "UTF-8");
   is( $t->sprint, qq{<?xml version="1.0" encoding="UTF-8"?>\n<doc/>}, 'set_encoding without XML declaration');
 }
 
-{ my $t=XML::Twig->parse( "<doc/>"); 
+{ my $t=XML::Twig->parse( "<doc/>");
   $t->set_standalone( 1);
   is( $t->sprint, qq{<?xml version="1.0" standalone="yes"?>\n<doc/>}, 'set_standalone (yes) without XML declaration');
 }
 
-{ my $t=XML::Twig->parse( "<doc/>"); 
+{ my $t=XML::Twig->parse( "<doc/>");
   $t->set_standalone( 0);
   is( $t->sprint, qq{<?xml version="1.0" standalone="no"?>\n<doc/>}, 'set_standalone (no) without XML declaration');
 }
 
-{ my $t=XML::Twig->parse( "<doc/>"); 
+{ my $t=XML::Twig->parse( "<doc/>");
   nok( $t->xml_version, 'xml_version with no XML declaration');
   $t->set_xml_version( 1.1);
   is( $t->sprint, qq{<?xml version="1.1"?>\n<doc/>}, 'set_xml_version without XML declaration');
@@ -125,58 +125,6 @@ else
   is( $t->sprint, '<nroot><root/></nroot>', 'wrapping the root');
 }
 
-{
-my $t=XML::Twig->new;
-XML::Twig::_set_weakrefs(0);
-my $doc='<doc>\n  <e att="a">text</e><e>text <![CDATA[cdata text]]> more text <e>foo</e>\n more</e></doc>';
-$t->parse( $doc);
-
-$doc=~ s{\n  }{}; # just the first one
-is( $t->sprint, $doc, 'parse with no weakrefs');
-
-$t->root->insert_new_elt( first_child => x => 'text');
-$doc=~ s{<doc>}{<doc><x>text</x>};
-is( $t->sprint, $doc, 'insert first child with no weakrefs');
-
-$t->root->insert_new_elt( last_child => x => 'text');
-$doc=~ s{</doc>}{<x>text</x></doc>};
-is( $t->sprint, $doc, 'insert last child with no weakrefs');
-
-$t->root->wrap_in( 'dd');
-$doc=~ s{<doc>}{<dd><doc>}; $doc=~s{</doc>}{</doc></dd>};
-is( $t->sprint, $doc, 'wrap with no weakrefs');
-
-$t->root->unwrap;
-$doc=~s{</?dd>}{}g;
-is( $t->sprint, $doc, 'unwrap with no weakrefs');
-
-my $new_e= XML::Twig::Elt->new( ee => { c => 1 }, 'ee text');
-$new_e->replace( $t->root->first_child( 'e'));
-$doc=~ s{<e.*?</e>}{<ee c="1">ee text</ee>};
-is( $t->sprint, $doc, 'replace with no weakrefs');
-
-XML::Twig::_set_weakrefs(1);
-
-}
-
-{ 
-my $t= XML::Twig->new( no_expand => 1);
-XML::Twig::_set_weakrefs(0);
-my $doc='<!DOCTYPE d [<!ENTITY foo SYSTEM "foo.xml"><!ENTITY bar SYSTEM "bar.xml">]><d a="foo"> bar &bar; bar<e/><f>&bar;</f><f>&foo; <e/>&bar; bar &foo;</f><e/>&bar; na &foo;<e/></d>';
-$t->parse( $doc);
-(my $got= $t->sprint)=~ s{\n}{}g;
-is( $got, $doc, 'external entities without weakrefs');
-
-XML::Twig::_set_weakrefs(1);
-}
-
-{ 
-  XML::Twig::_set_weakrefs(0);
-  { my $t= XML::Twig->new; undef $t; } 
-  ok( 1, "DESTROY doesn't crash when weakrefs is off");
-  XML::Twig::_set_weakrefs(1);
-}
-
 { my $doc= '<d><e a="a" get1="1" id="e1">foo</e><e a="b" id="e2"><e1 id="e11"/>bar</e><e a="b" id="e3"><e2 id="e21"/>bar</e></d>';
   my( $got1, $got2);
   XML::Twig->new( twig_handlers => { e1 => sub { $_->parent->set_att( get1 => 1); },
@@ -194,7 +142,7 @@ XML::Twig::_set_weakrefs(1);
 
 { my $t=XML::Twig->parse( '<foo><e/>foo<!-- comment --></foo>');
   my $root= $t->root;
-  ok( $root->closed, 'closed on completely parsed tree'); 
+  ok( $root->closed, 'closed on completely parsed tree');
   ok( $root->_extra_data_before_end_tag, '_extra_data_before_end_tag (success)');
   nok( $root->first_child->_extra_data_before_end_tag, '_extra_data_before_end_tag (no data)');
 }
@@ -357,5 +305,5 @@ for my $stem ( 1, 100)
 }
 
 { my $s= "foo";
-  is( XML::Twig::_to_utf8( 'iso-8859-1', $s), $s, 'trivial test of _to_utf8'); 
+  is( XML::Twig::_to_utf8( 'iso-8859-1', $s), $s, 'trivial test of _to_utf8');
 }

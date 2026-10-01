@@ -1,0 +1,31 @@
+# The three Comb custom resources the examples drive. Apply them into the
+# namespace the example manages:
+#
+#   kubectl apply -n comb-demo -f examples/combs.yaml
+#
+# None says where it borrows from or whether it is stubbed: the examples
+# decide that for db and mailer. A spec.upstream here would still count for
+# the Combs they leave alone.
+apiVersion: comb.internal/v1
+kind: Comb
+metadata:
+  name: nats
+spec:
+  class: Example::Comb::NATS
+---
+apiVersion: comb.internal/v1
+kind: Comb
+metadata:
+  name: db
+spec:
+  class: Example::Comb::DB
+---
+apiVersion: comb.internal/v1
+kind: Comb
+metadata:
+  name: mailer
+spec:
+  class: Example::Comb::Mailer
+  dependsOn: [ nats, db ]
+  config:
+    relay_host: "[smtp.example.com]:587"

@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::LocalObjectReference;
 # ABSTRACT: LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name => Str, { default => '' };
@@ -20,7 +20,7 @@ IO::K8s::CertManager::V1::LocalObjectReference - LocalObjectReference contains e
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

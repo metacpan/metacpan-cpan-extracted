@@ -1,7 +1,7 @@
 # ABSTRACT: Modify an existing task
 
 package App::karr::Cmd::Edit;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -332,17 +332,17 @@ sub execute {
     my $task = $self->update_task_guarded($id, sub {
       my ($task) = @_;
 
-      # The effective claim: --claim when given, else KARR_CLAIM (ADR 0005).
-      # --claim/--release mutual exclusion above stays on the explicit flag, so
-      # an env-default claim never turns a plain --release into a usage error.
-      my $claim = $self->resolved_claim;
-
       # --release is the one edit that may act on somebody else's claim: it
       # exists precisely to break a claim a crashed agent left behind, and it
       # is karr's only way out of one before the timeout. Everything else has
       # to own the claim, or find it expired. Same carve-out as kanban-md's
       # validateEditClaim (cmd/edit.go).
-      $self->check_claim($task, $claim) unless $self->release;
+      #
+      # The owner asked about is who the caller is: --claim, else KARR_CLAIM
+      # (ADR 0005). That is an identity, not a stamp, so a note on a card the
+      # caller holds is let through in any column. What gets written is
+      # decided separately below.
+      $self->check_claim($task, $self->resolved_claim) unless $self->release;
 
       # Clear the claim BEFORE the status change so the require_claim guard
       # in apply_status_change sees the post-release state: --release sets up
@@ -355,6 +355,28 @@ sub execute {
         $task->clear_claimed_by;
         $task->clear_claimed_at;
       }
+
+      # The claim this edit writes (ticket #303, the #286 rule create
+      # follows): an explicit --claim on any status, KARR_CLAIM only when the
+      # card ends up in a require_claim column -- the --status it is given,
+      # else the one it already has. Without the narrowing, every edit stamped
+      # the caller's env name. `edit ID -a note` on a backlog card took it out
+      # of every other agent's `pick` and `list --unclaimed`, and a plain
+      # `--release` put back the claim it had just cleared.
+      #
+      # --release never claims. An explicit --claim with it was refused above,
+      # so what this drops is only the env default. Passed to
+      # apply_status_change as well, so `--release --status in-progress` meets
+      # the #150 refusal instead of being satisfied by the env name.
+      my $ends_in = ( defined $self->status && length $self->status )
+        ? $self->status : $task->status;
+      my $claim = $self->release ? undef : $self->resolved_claim_for($ends_in);
+
+      # A card that is, or ends up, in backlog cannot gain a claim (ticket
+      # k306). apply_status_change asks the same for --status; this is the
+      # half it never sees -- `edit ID --claim X` on a card already there.
+      # Before any field is touched, so the refusal writes nothing.
+      $self->check_held_back_claim( $task, $ends_in, $claim );
 
       # length, not truth: a literal "0" is a meaningful title, status,
       # priority, assignee, due, class, estimate, body, append, tag or block
@@ -458,7 +480,7 @@ App::karr::Cmd::Edit - Modify an existing task
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -526,6 +548,17 @@ of those two pairs contradicts itself, so C<--claim> with C<--release> and
 C<--block> with C<--unblock> are rejected as usage errors (exit 2) before any
 task is read.
 
+C<KARR_CLAIM> (ADR 0005) stands in for C<--claim> only when the card ends up
+in a column the board's C<require_claim> list covers. That column is the
+C<--status> given, or the card's current status when C<--status> is omitted.
+A note, a tag or a C<--status todo> on a card in a column that needs no claim
+therefore leaves the card unclaimed. C<--release> never claims, whatever
+C<KARR_CLAIM> holds. An explicit C<--claim> stamps the claim on any status
+(ticket #303) but C<backlog>: a card that is, or ends up, in backlog holds no
+claim, so C<--claim> there is refused (exit 1) and names C<karr move ID todo
+--claim NAME> as the way out. C<--status backlog> releases the claim the card
+carried, the way C<karr move ID backlog> does.
+
 =item * Tag management
 
 C<--add-tag> and C<--remove-tag> accept comma-separated lists.
@@ -535,11 +568,13 @@ C<--add-tag> and C<--remove-tag> accept comma-separated lists.
 C<--add-depends-on> and C<--remove-depends-on> accept comma-separated task
 ids and follow the tag rule: add appends without duplicating, remove is a
 no-op for ids the card does not carry. Ids being added must exist on this
-board and must not name the task itself; an unknown or non-numeric id rejects
-the whole invocation as a usage error before anything is written, while a
-self-reference fails only the id it is wrong for and lets the rest of the
-batch proceed. Removing an id the board no longer has stays legal -- it is
-how a dependency on a deleted task is cleaned up.
+board and must not name the task itself; each is a number or the house
+C<kNNN> spelling (C<k2> is C<2>). An id that names no task here, or is
+neither a number nor C<kNNN>, rejects the whole invocation as a usage error
+before anything is written, while a self-reference fails only the id it is
+wrong for and lets the rest of the batch proceed. Removing an id the board no
+longer has stays legal -- it is how a dependency on a deleted task is cleaned
+up.
 
 =item * Cross-board dependency management
 

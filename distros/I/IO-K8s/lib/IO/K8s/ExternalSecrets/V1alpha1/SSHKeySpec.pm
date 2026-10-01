@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::SSHKeySpec;
 # ABSTRACT: SSHKeySpec controls the behavior of the ssh key generator.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s comment => Str;
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::SSHKeySpec - SSHKeySpec controls the behavio
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 comment
 

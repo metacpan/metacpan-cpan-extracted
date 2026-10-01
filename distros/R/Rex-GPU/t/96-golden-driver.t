@@ -57,7 +57,7 @@ sub driver_on {
 }
 
 subtest 'fixtures come from the real lspci parser' => sub {
-  for my $name (qw( ada blackwell volta b200 b300 pascal maxwell )) {
+  for my $name (qw( ada blackwell volta b200 b300 pascal maxwell gh200 )) {
     my $gpu = gpu_fixture($name);
     is($gpu->{compute}, 1, "$name is compute");
     like($gpu->{device_id}, qr/^[0-9a-f]{4}$/, "$name has a device id");
@@ -344,6 +344,24 @@ golden_is(
   is_deeply([ mutating_lines(@{ $rec->{lines} }) ], [],
     'debian-11 + RTX 5090: only read-only probes before the die');
   golden_is($rec, 'driver/debian-11--blackwell');
+}
+
+# Grace Hopper GH200 on Debian (karr #72): open kernel module only, by
+# maintainer decision -- Debian's own nvidia-driver is proprietary
+# (debian-nonfree), so GH200 is rejected there just like Blackwell and falls
+# through to NVIDIA's CUDA repo. That source (branch_at_least 590) carries no
+# per-device packaging, so the transcript it emits is byte-for-byte the one
+# Blackwell gets on the same host -- pinned here by equality instead of a
+# duplicate golden file.
+{
+  my $blackwell_rec = driver_on(host_profile('debian-12'), gpu_fixture('blackwell'));
+  my $gh200_rec     = driver_on(host_profile('debian-12'), gpu_fixture('gh200'));
+  is($gh200_rec->{error}, $blackwell_rec->{error},
+    'debian-12 + GH200: dies/lives like Blackwell (both take the CUDA-repo path)');
+  is_deeply($gh200_rec->{lines}, $blackwell_rec->{lines},
+    'debian-12 + GH200: identical CUDA-repo transcript to Blackwell');
+  ok((grep { /nvidia-kernel-open-dkms/ } @{ $gh200_rec->{lines} }),
+    q{debian-12 + GH200: installs the open-module package, not debian-nonfree's nvidia-driver});
 }
 
 #### Several GPUs on one host (karr #33)

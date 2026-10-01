@@ -18,6 +18,7 @@
 #ifndef TK_H
 #define TK_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,7 +51,7 @@
 
 #define TK_MAGIC        0x4B504F54  /* TopK */
 #define TK_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
-#define TK_ERR_BUFLEN   256
+#define TK_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef TK_READER_SLOTS
 #define TK_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -108,11 +109,17 @@ struct TkHeader {
     uint64_t stat_ops;                /* 88 */
     uint64_t bucket_off;              /* 96  offset of the hash bucket array */
     uint32_t mode;                    /* 104 TK_MODE_PLAIN | TK_MODE_DECAYED */
-    uint32_t _pad2;                   /* 108 */
+    uint32_t jsift;                   /* 108 TK_J_UP/DOWN | hole while a heap sift is in flight, else 0 */
     double   alpha;                   /* 112 decay rate ln(2)/half_life (decayed mode; 0 if plain) */
     double   now;                     /* 120 current time: max timestamp seen, or per-add tick */
     double   landmark;                /* 128 forward-decay landmark L (decayed mode) */
-    uint8_t  _pad[120];               /* 136..255 */
+    uint32_t jslot;                   /* 136 slot the in-flight sift will place at its hole */
+    /* A rescale in flight, resumed by recovery (carved from the pad, so older files read 0). */
+    uint32_t rs_on;                   /* 140 */
+    double   rs_inv;                  /* 144 its factor */
+    uint64_t rs_next;                 /* 152 slots below it are rescaled; | TK_RS_PEND: it is being written */
+    uint64_t rs_count, rs_error;      /* 160 while TK_RS_PEND: slot rs_next's new count and error */
+    uint8_t  _pad[80];                /* 176..255 */
 };
 typedef struct TkHeader TkHeader;
 
@@ -224,23 +231,6 @@ static inline int tk_pid_alive(uint32_t pid) {
     return !tk_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
- * CAS to OUR pid to hold the lock while fixing shared state, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
- * process can detect and re-recover if we crash mid-recovery. */
-static inline void tk_recover_stale_lock(TkHandle *h, uint32_t observed_wlock) {
-    TkHeader *hdr = h->hdr;
-    uint32_t mypid = TK_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
-            mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-        return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-}
-
 static const struct timespec tk_lock_timeout = { TK_LOCK_TIMEOUT_SEC, 0 };
 
 /* Process-global fork-generation counter.  Incremented in the pthread_atfork
@@ -318,6 +308,85 @@ static inline void tk_claim_reader_slot(TkHandle *h) {
     /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
      * slotless path (lock still works; recovery of THIS reader's death is the
      * documented slotless limitation). */
+}
+
+/* Wait until no live reader holds the lock; the caller owns wlock, so no NEW
+ * reader can join (they see wlock!=0 and yield).  The SEQ_CST wlock CAS + the
+ * SEQ_CST rdepth loads below are the writer side of the Dekker handshake. */
+static inline void tk_rwlock_drain(TkHandle *h) {
+    TkHeader *hdr = h->hdr;
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(TK_OCC_WORDS + live readers)
+         * instead of O(TK_READER_SLOTS). */
+        for (uint32_t w = 0; w < TK_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!tk_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &tk_lock_timeout, NULL, 0);
+    }
+}
+
+/* 1 if this process holds a read lock on the segment (through any handle).  Such a
+ * lock predates the current wlock holder, whose drain could then never have
+ * finished: it died before mutating anything. */
+static int tk_self_reading(TkHandle *h) {
+    if (h->slotless_held) return 1;
+    uint32_t me = (uint32_t)getpid();
+    for (uint32_t i = 0; i < TK_READER_SLOTS; i++)
+        if (__atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE) == me &&
+            __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_ACQUIRE) != 0)
+            return 1;
+    return 0;
+}
+
+static void tk_repair_locked(TkHandle *h);
+
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
+ * CAS to OUR pid to hold the lock while repairing shared state, then release.
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void tk_recover_stale_lock(TkHandle *h, uint32_t observed_wlock) {
+    TkHeader *hdr = h->hdr;
+    uint32_t mypid = TK_RWLOCK_WR((uint32_t)getpid());
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
+            mypid, 0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+        return;
+    if (!tk_self_reading(h)) {
+        tk_rwlock_drain(h);
+        tk_repair_locked(h);
+    }
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
@@ -468,48 +537,8 @@ static inline void tk_rwlock_wrlock(TkHandle *h) {
         tk_unpark(h);
         spin = 0;
     }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
-    for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
-        int busy = 0;
-        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
-         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
-         * this scan, so no held slot is skipped).  O(TK_OCC_WORDS + live readers)
-         * instead of O(TK_READER_SLOTS). */
-        for (uint32_t w = 0; w < TK_OCC_WORDS; w++) {
-            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
-            while (word) {
-                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
-                word &= word - 1;                          /* consume this bit (local copy) */
-                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
-                if (rd == 0) continue;                      /* occupied but not read-locking now */
-                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
-                if (!tk_pid_alive(pid)) {
-                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
-                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
-                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
-                    uint32_t ep = pid;
-                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
-                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
-                    continue;
-                }
-                busy = 1;                                   /* live reader still holding */
-            }
-        }
-        /* A live slotless reader keeps us waiting; a crashed slotless reader that
-         * cannot be attributed to a pid is the documented slotless limitation. */
-        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
-            busy = 1;
-        if (!busy)
-            return;                                    /* exclusive: wlock held + every rdepth 0 */
-        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
-         * (which reclaims any newly-dead slotted reader). */
-        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &tk_lock_timeout, NULL, 0);
-    }
+    /* Phase 2: drain the readers that were already holding when we won the CAS. */
+    tk_rwlock_drain(h);
 }
 
 static inline void tk_rwlock_wrunlock(TkHandle *h) {
@@ -710,14 +739,36 @@ static int tk_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int tk_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int tk_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int tk_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_TOPK_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static TkHandle *tk_create(const char *path, uint64_t capacity, uint64_t key_size, uint32_t tkmode, double alpha, mode_t mode, char *errbuf) {
@@ -751,9 +802,18 @@ static TkHandle *tk_create(const char *path, uint64_t capacity, uint64_t key_siz
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             TK_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && tk_reserve(fd, total) < 0) {
+            TK_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { TK_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            TK_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!tk_validate_header((TkHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -763,9 +823,13 @@ static TkHandle *tk_create(const char *path, uint64_t capacity, uint64_t key_siz
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((TkHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && tk_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && tk_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         TK_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (tk_reserve(fd, total) < 0) {
+                        TK_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     tk_init_header(base, (uint32_t)capacity, (uint32_t)key_size, tkmode, alpha, total);
@@ -797,6 +861,10 @@ static TkHandle *tk_create_memfd(const char *name, uint64_t capacity, uint64_t k
     if (ftruncate(fd, (off_t)total) < 0) {
         TK_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (tk_reserve(fd, total) < 0) {
+        TK_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { TK_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -809,6 +877,11 @@ static TkHandle *tk_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { TK_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(TkHeader)) { TK_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(TkHeader, magic)) != (ssize_t)sizeof magic || magic != TK_MAGIC) {
+        TK_ERR("invalid top-k table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { TK_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -871,9 +944,12 @@ static inline double tk_g(TkHandle *h) {
     return exp(h->alpha * (h->hdr->now - h->hdr->landmark));
 }
 /* mode-aware count comparisons for the min-heap */
+static inline int tk_count_lt(TkHandle *h, uint64_t a, uint64_t b) {
+    if (h->mode == TK_MODE_DECAYED) return tk_w_get(a) < tk_w_get(b);
+    return a < b;
+}
 static inline int tk_slot_lt(TkHandle *h, const TkSlot *a, const TkSlot *b) {
-    if (h->mode == TK_MODE_DECAYED) return tk_w_get(a->count) < tk_w_get(b->count);
-    return a->count < b->count;
+    return tk_count_lt(h, a->count, b->count);
 }
 static inline int tk_slot_le(TkHandle *h, const TkSlot *a, const TkSlot *b) {
     if (h->mode == TK_MODE_DECAYED) return tk_w_get(a->count) <= tk_w_get(b->count);
@@ -882,47 +958,98 @@ static inline int tk_slot_le(TkHandle *h, const TkSlot *a, const TkSlot *b) {
 
 /* ---- min-heap over slot counts (heap[] holds slot indices) ---- */
 
-static inline void tk_heap_swap(TkHandle *h, uint32_t *heap, uint64_t a, uint64_t b) {
-    uint32_t sa = heap[a], sb = heap[b];
-    heap[a] = sb; heap[b] = sa;
-    if (TK_SLOT_OK(h, sa)) tk_slot(h, sa)->heap_pos = (uint32_t)b;
-    if (TK_SLOT_OK(h, sb)) tk_slot(h, sb)->heap_pos = (uint32_t)a;
+/* Journaled hole sifts: slot s, saved in hdr->jslot, belongs at the hole heap[pos], which may hold
+ * a stale duplicate; each step copies one entry into the hole and records the new hole in jsift.
+ * A writer killed mid-sift leaves jsift set, and lock recovery finishes the sift. */
+#define TK_J_UP   0x40000000U
+#define TK_J_DOWN 0x80000000U
+#define TK_J_HOLE 0x3FFFFFFFU
+
+static inline void tk_heap_put(TkHandle *h, uint32_t *heap, uint64_t i, uint32_t s) {
+    heap[i] = s;
+    if (TK_SLOT_OK(h, s)) tk_slot(h, s)->heap_pos = (uint32_t)i;
 }
 
-static void tk_sift_up(TkHandle *h, uint32_t *heap, uint64_t pos) {
-    while (pos > 0) {
-        uint64_t parent = (pos - 1) / 2;
-        uint32_t sp = heap[parent], sc = heap[pos];
-        if (!TK_SLOT_OK(h, sp) || !TK_SLOT_OK(h, sc)) break;      /* Layer B */
-        if (tk_slot_le(h, tk_slot(h, sp), tk_slot(h, sc))) break;
-        tk_heap_swap(h, heap, parent, pos);
-        pos = parent;
-    }
+static inline void tk_journal_begin(TkHandle *h, uint32_t s, uint32_t dir, uint64_t pos) {
+    h->hdr->jslot = s;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->hdr->jsift = dir | (uint32_t)pos;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
 }
 
-static void tk_sift_down(TkHandle *h, uint32_t *heap, uint64_t size, uint64_t pos) {
-    for (;;) {
-        uint64_t l = 2 * pos + 1, r = 2 * pos + 2, smallest = pos;
-        if (l < size) {
-            uint32_t sl = heap[l], ss = heap[smallest];
-            if (TK_SLOT_OK(h, sl) && TK_SLOT_OK(h, ss) &&
-                tk_slot_lt(h, tk_slot(h, sl), tk_slot(h, ss))) smallest = l;
+static inline void tk_journal_step(TkHandle *h, uint32_t *heap, uint64_t pos, uint64_t next, uint32_t dir) {
+    tk_heap_put(h, heap, pos, heap[next]);
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->hdr->jsift = dir | (uint32_t)next;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+}
+
+static inline void tk_journal_end(TkHandle *h, uint32_t *heap, uint64_t pos, uint32_t s) {
+    tk_heap_put(h, heap, pos, s);
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->hdr->jsift = 0;
+}
+
+/* Whether a slot at heap[pos] whose count becomes c must sink: only then is a journal needed. */
+static inline int tk_must_sink(TkHandle *h, uint32_t *heap, uint64_t size, uint64_t pos, uint64_t c) {
+    for (uint64_t i = 2 * pos + 1; i <= 2 * pos + 2 && i < size; i++)
+        if (TK_SLOT_OK(h, heap[i]) && tk_count_lt(h, tk_slot(h, heap[i])->count, c)) return 1;
+    return 0;
+}
+
+static void tk_sift_up(TkHandle *h, uint32_t *heap, uint64_t pos, uint32_t s) {
+    if (TK_SLOT_OK(h, s)) {                                   /* Layer B */
+        TkSlot *e = tk_slot(h, s);
+        while (pos > 0) {
+            uint64_t parent = (pos - 1) / 2;
+            uint32_t sp = heap[parent];
+            if (!TK_SLOT_OK(h, sp) || tk_slot_le(h, tk_slot(h, sp), e)) break;
+            tk_journal_step(h, heap, pos, parent, TK_J_UP);
+            pos = parent;
         }
-        if (r < size) {
-            uint32_t sr = heap[r], ss = heap[smallest];
-            if (TK_SLOT_OK(h, sr) && TK_SLOT_OK(h, ss) &&
-                tk_slot_lt(h, tk_slot(h, sr), tk_slot(h, ss))) smallest = r;
-        }
-        if (smallest == pos) break;
-        tk_heap_swap(h, heap, pos, smallest);
-        pos = smallest;
     }
+    tk_journal_end(h, heap, pos, s);
+}
+
+static void tk_sift_down(TkHandle *h, uint32_t *heap, uint64_t size, uint64_t pos, uint32_t s) {
+    if (TK_SLOT_OK(h, s)) {                                   /* Layer B */
+        TkSlot *e = tk_slot(h, s);
+        for (;;) {
+            uint64_t c = 2 * pos + 1;
+            if (c >= size) break;
+            uint32_t sc = heap[c];
+            if (c + 1 < size) {
+                uint32_t sr = heap[c + 1];
+                if (TK_SLOT_OK(h, sr) &&
+                    (!TK_SLOT_OK(h, sc) || tk_slot_lt(h, tk_slot(h, sr), tk_slot(h, sc)))) { c++; sc = sr; }
+            }
+            if (!TK_SLOT_OK(h, sc) || !tk_slot_lt(h, tk_slot(h, sc), e)) break;
+            tk_journal_step(h, heap, pos, c, TK_J_DOWN);
+            pos = c;
+        }
+    }
+    tk_journal_end(h, heap, pos, s);
 }
 
 /* current heap size, clamped to the capacity (Layer B: hdr->used is peer-writable) */
 static inline uint64_t tk_heap_size(TkHandle *h) {
     uint64_t used = h->hdr->used;
     return (used > h->capacity) ? h->capacity : used;
+}
+
+/* A warm-up insert killed before publishing its slot never happened; any other sift is finished. */
+static void tk_journal_replay(TkHandle *h) {
+    TkHeader *hdr = h->hdr;
+    uint32_t j = hdr->jsift;
+    if (!j) return;
+    uint32_t s = hdr->jslot;
+    uint64_t pos = j & TK_J_HOLE, size = tk_heap_size(h);
+    if (pos < size && TK_SLOT_OK(h, s)) {
+        uint32_t *heap = tk_heap(h);
+        if ((j & ~TK_J_HOLE) == TK_J_UP)   { tk_sift_up(h, heap, pos, s); return; }
+        if ((j & ~TK_J_HOLE) == TK_J_DOWN) { tk_sift_down(h, heap, size, pos, s); return; }
+    }
+    hdr->jsift = 0;
 }
 
 /* ---- intrusive hash index (chaining via slot->hnext) ---- */
@@ -946,6 +1073,7 @@ static void tk_hash_insert(TkHandle *h, uint32_t s, uint64_t hv) {
     uint32_t *buckets = tk_buckets(h);
     uint64_t b = hv & h->hash_mask;
     tk_slot(h, s)->hnext = buckets[b];
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     buckets[b] = s;
 }
 
@@ -972,21 +1100,53 @@ static inline uint32_t tk_store_key(TkHandle *h, uint32_t s, const void *key, si
     return klen;
 }
 
+#define TK_RS_PEND (1ULL << 63)
+
+/* Rescale the slots from hdr->rs_next on by hdr->rs_inv, then advance the landmark.
+ * Each slot's new values go to the header first, so a rescale killed part-way is
+ * resumed without scaling any slot twice. */
+static void tk_rescale_run(TkHandle *h) {
+    TkHeader *hdr = h->hdr;
+    uint64_t used = tk_heap_size(h);
+    uint64_t smax = tk_slots_max(h);
+    if (used > smax) used = smax;                     /* Layer B */
+    uint64_t i = hdr->rs_next;
+    if (i & TK_RS_PEND) {
+        i &= ~TK_RS_PEND;
+        if (i < used) { tk_slot(h, i)->count = hdr->rs_count; tk_slot(h, i)->error = hdr->rs_error; }
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        hdr->rs_next = ++i;
+    }
+    double inv = hdr->rs_inv;
+    for (; i < used; i++) {
+        TkSlot *sl = tk_slot(h, i);
+        hdr->rs_count = tk_w_bits(tk_w_get(sl->count) * inv);
+        hdr->rs_error = tk_w_bits(tk_w_get(sl->error) * inv);
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        hdr->rs_next = i | TK_RS_PEND;
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        sl->count = hdr->rs_count;
+        sl->error = hdr->rs_error;
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        hdr->rs_next = i + 1;
+    }
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->landmark = hdr->now;                         /* g(now) == 1 again */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->rs_on = 0;
+}
+
 /* Rescale all weights by 1/g and advance the landmark to now, keeping the
  * forward-decay weights bounded (decayed mode; caller holds the write lock). */
 static void tk_rescale(TkHandle *h) {
     double g = tk_g(h);
     if (!(g > 1.0)) { h->hdr->landmark = h->hdr->now; return; }   /* g <= 1 or NaN: nothing to rescale */
-    double inv = isfinite(g) ? 1.0 / g : 0.0;   /* g == +Inf: a huge time gap fully decayed all old weight -> 0 */
-    uint64_t used = tk_heap_size(h);
-    uint64_t smax = tk_slots_max(h);
-    if (used > smax) used = smax;                     /* Layer B */
-    for (uint64_t i = 0; i < used; i++) {
-        TkSlot *sl = tk_slot(h, i);
-        sl->count = tk_w_bits(tk_w_get(sl->count) * inv);
-        sl->error = tk_w_bits(tk_w_get(sl->error) * inv);
-    }
-    h->hdr->landmark = h->hdr->now;                   /* g(now) == 1 again */
+    h->hdr->rs_inv  = isfinite(g) ? 1.0 / g : 0.0;   /* g == +Inf: a huge time gap fully decayed all old weight -> 0 */
+    h->hdr->rs_next = 0;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->hdr->rs_on = 1;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    tk_rescale_run(h);
 }
 
 /* Observe one item; returns the item's estimated count after this observation.
@@ -1011,11 +1171,14 @@ static uint64_t tk_observe_locked(TkHandle *h, const void *item, size_t len, int
     uint32_t *heap = tk_heap(h);
     if (s != TK_NIL) {                                     /* already monitored: bump */
         TkSlot *sl = tk_slot(h, s);
-        if (h->mode == TK_MODE_DECAYED) sl->count = tk_w_bits(tk_w_get(sl->count) + g);
-        else                            sl->count++;
+        uint64_t nc = (h->mode == TK_MODE_DECAYED) ? tk_w_bits(tk_w_get(sl->count) + g) : sl->count + 1;
         uint64_t size = tk_heap_size(h);
         uint64_t pos = sl->heap_pos;
-        if (pos < size) tk_sift_down(h, heap, size, pos); /* count rose -> sink it */
+        int sink = pos < size && tk_must_sink(h, heap, size, pos, nc);
+        uint32_t at = sink ? heap[pos] : TK_NIL;
+        if (sink) tk_journal_begin(h, at, TK_J_DOWN, pos);
+        sl->count = nc;
+        if (sink) tk_sift_down(h, heap, size, pos, at);   /* count rose -> sink it */
         return sl->count;
     }
 
@@ -1029,9 +1192,16 @@ static uint64_t tk_observe_locked(TkHandle *h, const void *item, size_t len, int
         sl->hnext = TK_NIL;
         sl->heap_pos = ns;
         heap[ns] = ns;
-        tk_hash_insert(h, ns, hv);
+        uint32_t sp = ns ? heap[(ns - 1) / 2] : TK_NIL;
+        int rise = TK_SLOT_OK(h, sp) && tk_slot_lt(h, sl, tk_slot(h, sp));
+        if (rise) tk_journal_begin(h, ns, TK_J_UP, ns);
+        /* Claim the slot before indexing it: a writer killed in between leaves an unindexed slot
+         * that eviction reclaims, not one the next key reuses while it is still chained. */
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
         h->hdr->used++;
-        tk_sift_up(h, heap, ns);
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        tk_hash_insert(h, ns, hv);
+        if (rise) tk_sift_up(h, heap, ns, ns);
         return sl->count;
     }
 
@@ -1042,18 +1212,18 @@ static uint64_t tk_observe_locked(TkHandle *h, const void *item, size_t len, int
     uint32_t old_kl = sl->key_len; if (old_kl > h->key_size) old_kl = h->key_size;
     uint64_t old_hv = tk_hash(tk_slot_key(sl), old_kl);
     tk_hash_remove(h, victim, old_hv);                    /* drop the evicted key */
+    uint64_t min_count = sl->count, nc;                   /* victim's count: the heap minimum */
+    /* The bound before the key: a kill between them leaves count - error <= 0, not a claim. */
+    sl->error = min_count;                                /* over-estimate bound */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     tk_store_key(h, victim, item, len);
-    if (h->mode == TK_MODE_DECAYED) {
-        double min_w = tk_w_get(sl->count);               /* victim's weight (heap minimum) */
-        sl->error = tk_w_bits(min_w);                     /* over-estimate bound */
-        sl->count = tk_w_bits(min_w + g);
-    } else {
-        uint64_t min_count = sl->count;
-        sl->error = min_count;
-        sl->count = min_count + 1;
-    }
+    if (h->mode == TK_MODE_DECAYED) nc = tk_w_bits(tk_w_get(min_count) + g);
+    else                            nc = min_count + 1;
+    int sink = tk_must_sink(h, heap, h->capacity, 0, nc);
+    if (sink) tk_journal_begin(h, victim, TK_J_DOWN, 0);
+    sl->count = nc;
     tk_hash_insert(h, victim, hv);
-    tk_sift_down(h, heap, h->capacity, 0);                /* root's count rose -> sink it */
+    if (sink) tk_sift_down(h, heap, h->capacity, 0, victim);   /* root's count rose -> sink it */
     return sl->count;
 }
 
@@ -1069,12 +1239,60 @@ static uint64_t tk_estimate_locked(TkHandle *h, const void *item, size_t len, ui
     return sl->count;
 }
 
+#define TK_J_CLEAR (TK_J_UP | TK_J_DOWN)                 /* jsift: a clear in flight */
+
 /* reset to an empty table (caller holds the write lock) */
 static inline void tk_clear_locked(TkHandle *h) {
+    uint64_t nb = h->hash_mask + 1;
+    h->hdr->jsift = TK_J_CLEAR;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    memset(tk_buckets(h), 0xFF, (size_t)(nb * sizeof(uint32_t)));   /* all buckets -> TK_NIL */
+    /* Unindex before emptying: a writer killed in between leaves slots no key reaches, not
+     * chains into slots the next keys refill. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->used = 0;
     h->hdr->seen = 0;
-    uint64_t nb = h->hash_mask + 1;
-    memset(tk_buckets(h), 0xFF, (size_t)(nb * sizeof(uint32_t)));   /* all buckets -> TK_NIL */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->hdr->jsift = 0;
+}
+
+/* Rebuild the hash index from the slots in use: an add killed between claiming or
+ * rewriting a slot and chaining it leaves a slot no key reaches. */
+static void tk_reindex(TkHandle *h) {
+    uint64_t used = tk_heap_size(h), smax = tk_slots_max(h);
+    if (used > smax) used = smax;                     /* Layer B */
+    memset(tk_buckets(h), 0xFF, (size_t)((h->hash_mask + 1) * sizeof(uint32_t)));
+    for (uint64_t s = 0; s < used; s++) {
+        TkSlot *sl = tk_slot(h, s);
+        uint32_t kl = sl->key_len; if (kl > h->key_size) kl = h->key_size;
+        uint64_t hv = tk_hash(tk_slot_key(sl), kl);
+        /* A key torn by a killed eviction can repeat another.  The torn counter has
+         * error == count, a real one counts above its error: index the real one,
+         * else the larger count, else the one below the heap root, where the torn
+         * one was evicted (decayed weights all 0 tie with it). */
+        uint32_t t = tk_hash_find(h, tk_slot_key(sl), kl, hv);
+        if (t != TK_NIL) {
+            TkSlot *ts = tk_slot(h, t);
+            int s_torn = !tk_count_lt(h, sl->error, sl->count);
+            int t_torn = !tk_count_lt(h, ts->error, ts->count);
+            int keep_t = s_torn != t_torn ? s_torn
+                       : tk_count_lt(h, sl->count, ts->count) ? 1
+                       : tk_count_lt(h, ts->count, sl->count) ? 0
+                       : ts->heap_pos >= sl->heap_pos;
+            if (keep_t) continue;
+            tk_hash_remove(h, t, hv);
+        }
+        tk_hash_insert(h, (uint32_t)s, hv);
+    }
+}
+
+/* Finish what a dead writer left part-way -- a clear, a rescale or a sift, each from
+ * its header record -- then re-derive the hash index.  Idempotent. */
+static void tk_repair_locked(TkHandle *h) {
+    if (h->hdr->jsift == TK_J_CLEAR) { tk_clear_locked(h); return; }
+    if (h->hdr->rs_on) tk_rescale_run(h);
+    tk_journal_replay(h);
+    tk_reindex(h);
 }
 
 #endif /* TK_H */

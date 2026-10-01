@@ -1,6 +1,6 @@
 package IO::K8s::Api::Lifecycle::V1alpha1::EvictionPodReference;
 # ABSTRACT: EvictionPodReference contains enough information to locate the referenced pod inside the same namespace.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Lifecycle::V1alpha1::EvictionPodReference - EvictionPodReference c
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

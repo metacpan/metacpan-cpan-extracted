@@ -1,6 +1,6 @@
 package IO::K8s::Cilium;
 # ABSTRACT: Cilium CRD resource map provider for IO::K8s
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use Moo;
 with 'IO::K8s::Role::ResourceMap';
 
@@ -102,7 +102,7 @@ IO::K8s::Cilium - Cilium CRD resource map provider for IO::K8s
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ schema to model further).
 
 C<cilium.io/v2alpha1> is modeled to full depth the same way -- 12 Kinds
 (the five v2alpha1-only Kinds plus the seven BGP/CIDR/LoadBalancerIPPool
-back-compat tracks, which share the very C<kinds.E<lt>KindE<gt>> overlay
+back-compat tracks, which share the very C<< kinds.<Kind> >> overlay
 entry the C<cilium.io/v2> render of the same Kind uses -- the version
 directory alone disambiguates, so a Go type is never accidentally shared
 I<across> C<v2>/C<v2alpha1>), under C<IO::K8s::Cilium::V2alpha1::*>.
@@ -256,7 +256,7 @@ reinitialization.
 
 Reachable only via their domain-qualified C<resource_map> key (never a bare short
 name), for clusters that have not yet upgraded past the Cilium release where each was
-superseded or removed (k78, k83):
+superseded or removed:
 
 =over 4
 

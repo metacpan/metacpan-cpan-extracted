@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::Most;
+use Data::Dumper;
 use Test::Returns;
 
 BEGIN { use_ok('Log::Abstraction') }

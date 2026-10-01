@@ -112,6 +112,19 @@ DESCRIPTION
     "MAP_SHARED|MAP_ANONYMOUS". Anonymous queues are shared with child
     processes via fork() but cannot be opened by unrelated processes.
 
+    "new" and "new_memfd" reserve the whole segment of an Int, Int32 or Int16
+    queue when they create one, so a full filesystem makes them croak instead
+    of dying with SIGBUS while they initialize it; set
+    "DATA_QUEUE_SHARED_SPARSE=1" to skip the reservation. On tmpfs and memfd
+    the segment is memory, and a memory cgroup too small for it gets an OOM
+    kill rather than a croak. A Str queue is created sparse instead: its pages
+    are allocated as they are first written, and once the filesystem is full,
+    a push that writes a page not yet allocated dies with SIGBUS. Set
+    "DATA_QUEUE_SHARED_SPARSE=0" to reserve a Str queue's whole segment at
+    creation too, so a full filesystem makes the constructor croak instead; on
+    tmpfs and memfd that commits the segment's memory at once, and a memory
+    cgroup too small for it gets an OOM kill rather than a croak.
+
   memfd Constructor
         my $q = Data::Queue::Shared::Int->new_memfd($name, $capacity);
         my $q = Data::Queue::Shared::Str->new_memfd($name, $capacity);

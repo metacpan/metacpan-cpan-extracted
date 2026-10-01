@@ -1,7 +1,7 @@
 package Data::TopK::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::TopK::Shared', $VERSION);
 
@@ -112,6 +112,12 @@ or memfd the stored geometry wins and the caller's arguments do not resize it
 optional file B<mode> may be passed as the last argument to C<new> (e.g.
 C<0660>) for cross-user sharing; it defaults to C<0600> (owner-only).
 
+The constructors reserve the whole segment when they create one, so a full
+filesystem makes them croak instead of the initialization dying with SIGBUS;
+set C<DATA_TOPK_SHARED_SPARSE=1> to skip the reservation. On tmpfs and memfd
+the segment is memory, and a memory cgroup too small for it gets an OOM kill
+rather than a croak.
+
 =head2 Feeding and querying
 
     my $count = $tk->add($key);           # observe one key; returns its new estimated count
@@ -188,8 +194,14 @@ the mapping.
 =head1 CRASH SAFETY
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
-ownership and dead-owner recovery. Each C<add> is a short bounded update, so a
-crash leaves the summary consistent up to the last completed operation.
+ownership and dead-owner recovery. The process that recovers the lock finishes
+a heap reordering, a decayed-mode rescale or a C<clear> the dead writer left
+part-way, each from a record kept in the header, and rebuilds the key index
+from the counters, so every monitored key is found again. A kill
+while an C<add> is copying a new key into an evicted counter can leave that
+counter holding a mix of the old and new key's bytes; if the mix spells a key
+that is already monitored, C<top> lists that key a second time, with the lowest
+count, until the torn counter is evicted.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a

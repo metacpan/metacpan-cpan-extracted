@@ -17,6 +17,7 @@
 #ifndef NDARRAY_H
 #define NDARRAY_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +47,7 @@
 
 #define NDA_MAGIC        0x4144444EU  /* "NDDA" (little-endian) */
 #define NDA_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
-#define NDA_ERR_BUFLEN   256
+#define NDA_ERR_BUFLEN   (PATH_MAX + 256)
 #define NDA_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 
 /* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
@@ -227,6 +228,33 @@ static inline int nda_pid_alive(uint32_t pid) {
     return !nda_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
+/* 1 if ndim/shape/strides describe a row-major array of exactly `size` elements. */
+static inline int nda_shape_ok(const NdaHeader *hdr, uint64_t size) {
+    uint32_t nd = hdr->ndim;
+    if (nd < 1 || nd > NDA_MAX_DIMS) return 0;
+    uint64_t n = 1;
+    for (uint32_t d = 0; d < nd; d++) {
+        if (hdr->shape[d] < 1 || hdr->shape[d] > UINT64_MAX / n) return 0;
+        n *= hdr->shape[d];
+    }
+    if (n != size) return 0;
+    uint64_t st = 1;
+    for (int d = (int)nd - 1; d >= 0; d--) {
+        if (hdr->strides[d] != st) return 0;
+        st *= hdr->shape[d];
+    }
+    return 1;
+}
+
+/* A reshape killed part-way leaves ndim/shape/strides mixed; the element count
+ * never changes, so fall back to its 1-D view. */
+static inline void nda_repair_shape_locked(NdaHandle *h) {
+    if (nda_shape_ok(h->hdr, h->size)) return;
+    h->hdr->ndim = 1;
+    h->hdr->shape[0] = h->size;
+    h->hdr->strides[0] = 1;
+}
+
 /* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
  * CAS to OUR pid to hold the lock while fixing shared state, then release.
  * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
@@ -237,8 +265,8 @@ static inline void nda_recover_stale_lock(NdaHandle *h, uint32_t observed_wlock)
     if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
+    /* A torn shape implies the dead writer had drained every reader. */
+    nda_repair_shape_locked(h);
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -753,26 +781,13 @@ static inline NdaHandle *nda_setup(void *base, size_t map_size,
 /* Validate a mapped header (shared by reopen and open_fd).  Stored
  * dtype/shape/strides/size win on reopen; require self-consistency and the
  * file size to match. */
-static inline int nda_validate_header(const NdaHeader *hdr, uint64_t file_size) {
+static inline int nda_validate_fixed(const NdaHeader *hdr, uint64_t file_size) {
     if (hdr->magic != NDA_MAGIC) return 0;
     if (hdr->version != NDA_VERSION) return 0;
     if (hdr->dtype >= NDA_NTYPES) return 0;
-    if (hdr->ndim < 1 || hdr->ndim > NDA_MAX_DIMS) return 0;
     if (hdr->itemsize != nda_itemsize_tab[hdr->dtype]) return 0;
-    uint64_t size = 1;
-    for (uint32_t d = 0; d < hdr->ndim; d++) {
-        if (hdr->shape[d] < 1) return 0;
-        if (hdr->shape[d] > UINT64_MAX / size) return 0;
-        size *= hdr->shape[d];
-    }
-    if (hdr->size != size) return 0;
-    if (size > NDA_MAX_BYTES / hdr->itemsize) return 0;
-    /* row-major stride check */
-    uint64_t st = 1;
-    for (int d = (int)hdr->ndim - 1; d >= 0; d--) {
-        if (hdr->strides[d] != st) return 0;
-        st *= hdr->shape[d];
-    }
+    uint64_t size = hdr->size;
+    if (size < 1 || size > NDA_MAX_BYTES / hdr->itemsize) return 0;
     uint64_t data_bytes = size * hdr->itemsize;
     NdaLayout L = nda_layout();
     if (hdr->reader_slots_off != L.reader_slots) return 0;
@@ -780,6 +795,22 @@ static inline int nda_validate_header(const NdaHeader *hdr, uint64_t file_size) 
     if (hdr->total_size != L.data + data_bytes) return 0;
     if (hdr->total_size != file_size) return 0;
     return 1;
+}
+
+static inline int nda_validate_header(const NdaHeader *hdr, uint64_t file_size) {
+    return nda_validate_fixed(hdr, file_size) && nda_shape_ok(hdr, hdr->size);
+}
+
+/* Read-write attach: a shape torn by a killed reshape is repaired under the
+ * write lock (which also recovers the dead writer) instead of refusing the file. */
+static NdaHandle *nda_setup_rw(void *base, size_t map_size, const char *path, int backing_fd) {
+    NdaHandle *h = nda_setup(base, map_size, path, backing_fd);
+    if (h && !nda_shape_ok(h->hdr, h->size)) {
+        nda_rwlock_wrlock(h);
+        nda_repair_shape_locked(h);
+        nda_rwlock_wrunlock(h);
+    }
+    return h;
 }
 
 /* Securely obtain a fd: create exclusively (O_CREAT|O_EXCL|O_NOFOLLOW at mode,
@@ -799,14 +830,36 @@ static int nda_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int nda_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int nda_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int nda_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_NDARRAY_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static NdaHandle *nda_create(const char *path, int dtype,
@@ -843,11 +896,20 @@ static NdaHandle *nda_create(const char *path, int dtype,
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             NDA_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && nda_reserve(fd, total) < 0) {
+            NDA_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)stt.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { NDA_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            NDA_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
-            if (!nda_validate_header((NdaHeader *)base, (uint64_t)stt.st_size)) {
+            if (!nda_validate_fixed((NdaHeader *)base, (uint64_t)stt.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
                  * between the ftruncate and the header init leaves a
                  * full-size, all-zero (magic==0) file that would brick every
@@ -855,9 +917,13 @@ static NdaHandle *nda_create(const char *path, int dtype,
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((NdaHeader *)base)->magic == 0 && (uint64_t)stt.st_size == total
-                    && stt.st_uid == geteuid() && nda_region_is_zero(base, map_size)) {
+                    && stt.st_uid == geteuid() && nda_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         NDA_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (nda_reserve(fd, total) < 0) {
+                        NDA_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     nda_init_header(base, dtype, shape, ndim, size, strides, total);
@@ -876,7 +942,7 @@ static NdaHandle *nda_create(const char *path, int dtype,
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            return nda_setup(base, map_size, path, -1);
+            return nda_setup_rw(base, map_size, path, -1);
         }
     }
     nda_init_header(base, dtype, shape, ndim, size, strides, total);
@@ -896,6 +962,10 @@ static NdaHandle *nda_create_memfd(const char *name, int dtype,
     if (ftruncate(fd, (off_t)total) < 0) {
         NDA_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (nda_reserve(fd, total) < 0) {
+        NDA_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { NDA_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -908,10 +978,15 @@ static NdaHandle *nda_open_fd(int fd, char *errbuf) {
     struct stat stt;
     if (fstat(fd, &stt) < 0) { NDA_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)stt.st_size < sizeof(struct NdaHeader)) { NDA_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(NdaHeader, magic)) != (ssize_t)sizeof magic || magic != NDA_MAGIC) {
+        NDA_ERR("invalid ndarray"); return NULL;
+    }
     size_t ms = (size_t)stt.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { NDA_ERR("mmap: %s", strerror(errno)); return NULL; }
-    if (!nda_validate_header((NdaHeader *)base, (uint64_t)stt.st_size)) {
+    if (!nda_validate_fixed((NdaHeader *)base, (uint64_t)stt.st_size)) {
         NDA_ERR("invalid ndarray"); munmap(base, ms); return NULL;
     }
     if (((NdaHeader *)base)->sealed) {
@@ -920,7 +995,7 @@ static NdaHandle *nda_open_fd(int fd, char *errbuf) {
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { NDA_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
-    return nda_setup(base, ms, NULL, myfd);
+    return nda_setup_rw(base, ms, NULL, myfd);
 }
 
 static void nda_destroy(NdaHandle *h) {
@@ -962,6 +1037,11 @@ static NdaHandle *nda_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { NDA_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(struct NdaHeader)) { NDA_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(NdaHeader, magic)) != (ssize_t)sizeof magic || magic != NDA_MAGIC) {
+        NDA_ERR("%s: invalid ndarray file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */

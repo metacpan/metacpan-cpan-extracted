@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ReplacePath;
 # ABSTRACT: ReplacePath holds the replace path middleware configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s path => Str;
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::ReplacePath - ReplacePath holds the replace path mid
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 path
 

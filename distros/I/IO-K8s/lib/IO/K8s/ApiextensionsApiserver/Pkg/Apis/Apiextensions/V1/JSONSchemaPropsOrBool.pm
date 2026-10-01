@@ -1,11 +1,18 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrBool;
 # ABSTRACT: JSONSchemaPropsOrBool represents JSONSchemaProps or a boolean value. Defaults to true for the boolean property.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use v5.10;
 use Moo;
 use Types::Standard qw( Bool );
 use Scalar::Util ();
 use JSON::MaybeXS ();
+
+# Carp treats IO::K8s as part of this class (k175), as IO::K8s::List does
+# (k170): a schema arm is inflated through IO::K8s, and a shape croak raised
+# there -- a plain scalar where a schema belongs -- names the line that called
+# FROM_STRUCT, or IO::K8s itself on the way in, not the inflation call below.
+# A caller in any other package still sees its own line.
+our @CARP_NOT = ('IO::K8s');
 
 my $PROPS = 'IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaProps';
 
@@ -57,6 +64,14 @@ sub TO_JSON {
     return $self->allows ? JSON::MaybeXS::true() : JSON::MaybeXS::false();
 }
 
+# The node a spec path walks into (IO::K8s::Role::SpecBuilder, k172): the
+# schema, or the boolean -- a scalar, which a path cannot descend through.
+sub _spec_path_node {
+    my ($self) = @_;
+    my $schema = $self->schema;
+    return defined $schema ? ($schema) : ($self->allows);
+}
+
 with 'IO::K8s::Role::Resource';
 
 1;
@@ -73,7 +88,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOr
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 
@@ -90,6 +105,11 @@ C<false> stays C<false> and never collapses into an empty schema object.
     my $ap = $props->additionalProperties;
     if ($ap->is_schema) { ... $ap->schema ... }
     else                { ... $ap->allows ... }
+
+An error inflating the schema arm -- a value of the wrong shape where a
+schema, or a field inside one, belongs -- names the line that called
+L</FROM_STRUCT>, or the entry point of IO::K8s that got there, not a line
+of this class.
 
 =head2 schema
 
@@ -114,6 +134,10 @@ Inflation hook called by L<IO::K8s/struct_to_object>. A HashRef (or an already
 built C<JSONSchemaProps>) fills C<schema>; anything else is read as a boolean
 into C<allows>. JSON booleans, C<\1> / C<\0> scalar refs and the plain scalars
 YAML::PP produces are all accepted.
+
+The same hook builds the value a field of this type is given through C<new>,
+its setter or a C<spec_*> write of L<IO::K8s::Role::SpecBuilder>, whatever
+its shape; see L<IO::K8s::Resource/k8s>.
 
 =head2 TO_JSON
 

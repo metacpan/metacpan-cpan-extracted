@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Middleware;
 # ABSTRACT: Middleware is the CRD implementation of a Traefik Middleware.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'middlewares';
@@ -23,7 +23,7 @@ IO::K8s::Traefik::V1alpha1::Middleware - Middleware is the CRD implementation of
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

@@ -1,6 +1,6 @@
 package IO::K8s::CRD::Emitter;
 # ABSTRACT: Render generated IO::K8s classes as house-style Perl source
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use v5.10;
 use Moo;
 use Carp qw( croak );
@@ -10,17 +10,18 @@ use Carp qw( croak );
 use Data::Dumper ();
 use Digest::SHA qw( sha1_hex );
 use re ();
-use Types::Standard qw( Str HashRef );
+use Types::Standard qw( Bool Str HashRef );
 use IO::K8s::AutoGen ();
 use IO::K8s::Resource ();
 use IO::K8s::Role::Resource ();
 
 
 
-has base    => (is => 'ro', isa => Str, required => 1);
-has names   => (is => 'ro', isa => HashRef, default => sub { {} });
-has overlay => (is => 'ro', isa => HashRef, default => sub { {} });
-has version => (is => 'ro', isa => Str, default => sub { $VERSION });
+has base         => (is => 'ro', isa => Str, required => 1);
+has names        => (is => 'ro', isa => HashRef, default => sub { {} });
+has overlay      => (is => 'ro', isa => HashRef, default => sub { {} });
+has version      => (is => 'ro', isa => Str, default => sub { $VERSION });
+has subresources => (is => 'ro', isa => Bool, default => 1);
 
 # The reverse of IO::K8s::Resource's class-prefix map (full namespace ->
 # short prefix), longest full namespace first so a more specific prefix
@@ -256,7 +257,13 @@ sub _type_source {
     return ('[Time]')     if $info->{is_array_of_time};
     return ('[ {} ]')     if $info->{is_array_of_hash};
     return ('[ [] ]')     if $info->{is_array_of_array};
-    return ('{ Str => 1 }')      if $info->{is_hash_of_str};
+    # The string map in the spelling that reads back as itself (k191): the
+    # lenient legacy form only where the registry says lenient, a strict
+    # one -- AutoGen's additionalProperties {type: string} -- as
+    # HashRef[Str]. The free map is Opaque.
+    return ('{ Str => 1 }')      if $info->{is_hash_of_str} && $info->{is_hash_of_str_lenient};
+    return ('HashRef[Str]')      if $info->{is_hash_of_str};
+    return ('Opaque')            if $info->{is_hash_opaque};
     return ('{ Int => 1 }')      if $info->{is_hash_of_int};
     return ('{ Num => 1 }')      if $info->{is_hash_of_num};
     return ('{ Bool => 1 }')     if $info->{is_hash_of_bool};
@@ -593,6 +600,29 @@ sub _pod_safe {
     return $text;
 }
 
+# The value of the subresources import parameter (k158), as source in the
+# column of the `use IO::K8s::APIObject` parameter it follows. status alone
+# fits on the line; scale, with its three paths, gets one line per key,
+# keys sorted and => aligned like the k8s lines, no trailing commas.
+sub _subresources_source {
+    my ($subresources) = @_;
+    return '{}' unless %$subresources;
+    return '{ status => {} }' unless $subresources->{scale};
+    my $scale = $subresources->{scale};
+    my ($kw) = sort { $b <=> $a } map { length } keys %$scale;
+    my %value = (
+        scale => "{\n"
+            . join(",\n", map { sprintf('            %-*s => %s', $kw, $_, _scalar_literal($scale->{$_})) }
+                sort keys %$scale)
+            . "\n        }"
+    );
+    $value{status} = '{}' if exists $subresources->{status};
+    my ($sw) = sort { $b <=> $a } map { length } keys %value;
+    return "{\n"
+        . join(",\n", map { sprintf('        %-*s => %s', $sw, $_, $value{$_}) } sort keys %value)
+        . "\n    }";
+}
+
 sub _render_class {
     my ($self, $class) = @_;
     my $info  = $class->_k8s_attr_info;
@@ -644,13 +674,18 @@ sub _render_class {
     my $use;
     if ($is_top) {
         my $plural = $class->resource_plural;
-        my @use_lines = (defined $plural && length $plural)
-            ? (
-                'use IO::K8s::APIObject',
-                "    api_version     => '" . $class->api_version . "',",
-                "    resource_plural => '$plural';",
-              )
-            : ("use IO::K8s::APIObject api_version => '" . $class->api_version . "';");
+        my @params = ([ api_version => "'" . $class->api_version . "'" ]);
+        push @params, [ resource_plural => "'$plural'" ] if defined $plural && length $plural;
+        push @params, [ subresources => _subresources_source($class->subresources) ]
+            if $self->subresources && $class->can('subresources');
+        my @use_lines;
+        if (@params == 1) {
+            @use_lines = ("use IO::K8s::APIObject $params[0][0] => $params[0][1];");
+        } else {
+            my ($width) = sort { $b <=> $a } map { length $_->[0] } @params;
+            @use_lines = ('use IO::K8s::APIObject',
+                join(",\n", map { sprintf('    %-*s => %s', $width, @$_) } @params) . ';');
+        }
 
         # overlay: with/extra, for the root Kind only. 'with' defaults to
         # Namespaced when the class composes it and to no roles otherwise
@@ -703,7 +738,7 @@ IO::K8s::CRD::Emitter - Render generated IO::K8s classes as house-style Perl sou
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -756,7 +791,7 @@ names (D6) come in. Checked before L</overlay>'s own C<names> map.
 
 =head2 overlay
 
-The per-Kind slice of a provider's C<maint/crd-render/E<lt>ProviderE<gt>.yaml>
+The per-Kind slice of a provider's C<< maint/crd-render/<Provider>.yaml >>
 (the render-side counterpart of L</names>): a hashref with C<with> (arrayref
 of role class names composed on one C<with> line), C<extra> (arrayref of
 verbatim source lines rendered right after the C<with> line) and C<names>
@@ -768,7 +803,7 @@ root class composes that role and C<[]> otherwise, when not given. This
 attribute holds one Kind's overlay, not the whole provider file -- slicing
 C<< $provider_overlay->{kinds}{$kind} >> out of the YAML is the caller's job.
 
-An C<names> value carrying C<::> (k120) is an B<absolute> target -- a
+An C<names> value carrying C<::> is an B<absolute> target -- a
 fully-qualified package this render references but does not itself write a
 file for: a cross-version type another version directory of the same
 provider already ships (C<IO::K8s::ExternalSecrets::V1::AWSAuth> named under a
@@ -784,6 +819,15 @@ overlay renames it.
 
 The C<$VERSION> line to write. Defaults to this distribution's.
 
+=head2 subresources
+
+Whether the root Kind's C<subresources> -- what the generated class took
+from its CRD version, see L<IO::K8s::APIObject> -- are rendered as the
+C<subresources> import parameter. Defaults to true, so a rendered
+class declares them and its C<to_crd> writes them back.
+C<maint/crd-drift-check.pl --check> renders with this false while the
+shipped provider classes declare no subresources yet.
+
 =head2 package_for
 
     my $package = $emitter->package_for($generated_class);
@@ -794,7 +838,7 @@ L</overlay>'s C<names> when listed there by logical path, otherwise
 L</base> plus the class's path segments below its Kind joined together
 (the Kind itself for the root).
 
-An overlay C<names> value that carries C<::> (k120) is used verbatim as an
+An overlay C<names> value that carries C<::> is used verbatim as an
 absolute package (a leading C<+> is stripped) rather than joined below
 L</base> -- the cross-version / core external targets described under
 L</overlay>. Such a class satisfies C<_is_external_ref>: L</render> neither

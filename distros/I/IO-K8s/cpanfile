@@ -5,6 +5,7 @@ requires 'JSON::MaybeXS';
 requires 'Module::Runtime';
 requires 'YAML::PP';
 requires 'Scalar::Util';
+requires 'Sub::Util', '1.40';
 requires 'Import::Into';
 requires 'Package::Stash';
 requires 'namespace::clean';

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::MiddlewareSpec;
 # ABSTRACT: MiddlewareSpec defines the desired state of a Middleware.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s addPrefix         => '+IO::K8s::Traefik::V1alpha1::AddPrefix';
@@ -20,7 +20,7 @@ k8s inFlightReq       => '+IO::K8s::Traefik::V1alpha1::InFlightReq';
 k8s ipAllowList       => '+IO::K8s::Traefik::V1alpha1::IPAllowList';
 k8s ipWhiteList       => '+IO::K8s::Traefik::V1alpha1::IPWhiteList';
 k8s passTLSClientCert => '+IO::K8s::Traefik::V1alpha1::PassTLSClientCert';
-k8s plugin            => { Str => 1 };
+k8s plugin            => Opaque;
 k8s rateLimit         => '+IO::K8s::Traefik::V1alpha1::RateLimit';
 k8s redirectRegex     => '+IO::K8s::Traefik::V1alpha1::RedirectRegex';
 k8s redirectScheme    => '+IO::K8s::Traefik::V1alpha1::RedirectScheme';
@@ -70,7 +70,7 @@ IO::K8s::Traefik::V1alpha1::MiddlewareSpec - MiddlewareSpec defines the desired 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 addPrefix
 

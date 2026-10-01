@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::GRPCServerTLSConfig;
 # ABSTRACT: grpcServerTlsConfig defines the TLS parameters for the gRPC server providing the StoreAPI.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s ca                 => '+IO::K8s::PrometheusOperator::V1::SecretOrConfigMap';
@@ -42,7 +42,7 @@ IO::K8s::PrometheusOperator::V1::GRPCServerTLSConfig - grpcServerTlsConfig defin
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 ca
 

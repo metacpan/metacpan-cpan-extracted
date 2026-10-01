@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::DefaultGateway;
 # ABSTRACT: defaultGateway is the configuration for auto-discovery of the default gateway.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s addressFamily => Str, { required => 'schema', enum => [qw(ipv4 ipv6)] };
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::DefaultGateway - defaultGateway is the configuration for au
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 addressFamily
 

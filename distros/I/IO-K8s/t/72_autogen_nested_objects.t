@@ -71,8 +71,15 @@ subtest 'nested classes exist with path-derived names' => sub {
     is($sinfo->{routes}{class}, "$class\::Spec::RoutesItem", 'array items -> <Parent>::<Prop>Item');
     ok($sinfo->{weights}{is_hash_of_objects}, 'map of objects');
     is($sinfo->{weights}{class}, "$class\::Spec::WeightsValue", 'map values -> <Parent>::<Prop>Value');
-    ok($sinfo->{labels}{is_hash_of_str}, 'additionalProperties: string stays an opaque map (k55)');
-    ok($sinfo->{blob}{is_hash_of_str}, 'property-less object stays opaque');
+    # k191 replaces half of the first claim: an additionalProperties-only
+    # string map still gets no nested class, but it is no longer the
+    # opaque map -- it is the strict string map HashRef[Str]
+    # (is_hash_of_str, no lenient marker). The property-less object is
+    # still opaque, under the opaque map's own flag (is_hash_opaque).
+    ok($sinfo->{labels}{is_hash_of_str}, 'additionalProperties: string is a map, not a nested class (k55)');
+    ok(!$sinfo->{labels}{is_hash_of_str_lenient} && !$sinfo->{labels}{is_hash_opaque},
+        '... the strict string map HashRef[Str] (k191)');
+    ok($sinfo->{blob}{is_hash_opaque}, 'property-less object stays opaque');
     is($sinfo->{x_extra}{class}, "$class\::Spec::X_extra", 'sanitized key names the nested class');
     is($sinfo->{name}{required}, 1, 'required list applies inside the nested class');
     is($sinfo->{limit}{class}->_k8s_attr_info->{average}{options}{minimum}, 0, 'options apply below the top level');

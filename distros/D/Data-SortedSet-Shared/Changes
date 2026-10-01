@@ -1,35 +1,27 @@
 Revision history for Data-SortedSet-Shared
 
+0.07      2026-09-26
+          - A writer killed mid add, incr, remove or pop is repaired: the set
+            is as before or after that write.
+          - Segments are reserved, so a full filesystem fails the constructor;
+            DATA_SORTEDSET_SHARED_SPARSE=1 skips the reservation.
+          - A failed create no longer leaves a full-size file behind.
+
 0.06      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.
 
 0.05      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Frozen read-only mode: freeze() seals a file-backed structure;
-            new_readonly() maps it O_RDONLY and queries it lock-free.
-          - Documentation and test-harness corrections.
-          - Refuse a header whose root names a real node while the tree
-            claims to be empty.  The node is still on the free list, so the
-            next insert descended from it and read uninitialised links.
+          - A file left by an interrupted create is recovered, not refused.
+          - freeze()/new_readonly(): sealed read-only mode, lock-free.
+          - Refuse a header whose root names a free node while the tree is
+            empty.
 
 0.04      2026-07-23
-          - Refuse an insert when the node pool cannot satisfy the worst-case
-            split, instead of writing through an out-of-range node index if
-            the free list is exhausted or corrupt.
-          - Validate B+tree node indices on the write paths too (insert,
-            delete, merge, underflow), so a corrupt peer-written index stops
-            the operation instead of a wild read/write under the lock.
-          - Bound the member-index probe and delete scan by the table size, so
-            a corrupt all-occupied index fails cleanly instead of spinning.
-          - add_many: pin the rows array and each row's SVs across argument
-            magic, so a hostile overload cannot dangle the resolve loop.
-          - On-disk format change (v1 -> v2): an existing 0.03 file is
-            refused; recreate it.
-          - Bump Data::SortedSet::Shared::Strings to the dist version so
-            PAUSE reindexes it.
-          - Resolve argument magic before capturing the path string.
+          - An insert is refused when the node pool cannot cover a worst-case
+            split, instead of writing out of bounds; writes validate indices.
+          - A corrupt member index fails instead of spinning.
+          - On-disk format change (v1 -> v2): recreate 0.03 files.
           - Document that a writer crash can corrupt the set.
 
 0.03      2026-07-03
@@ -37,14 +29,11 @@ Revision history for Data-SortedSet-Shared
             0600 (pass a file-mode argument to new() for cross-user sharing).
 
 0.02      2026-06-24
-          - Bundle string-keyed sets: Data::SortedSet::Shared::Strings (string
-            members, interned to ids via Data::Intern::Shared) now ships in this
-            distribution, with a native constructor Data::SortedSet::Shared->new_strings.
-          - New prerequisite: Data::Intern::Shared (for the string-keyed variant).
-          - DESTROY now nulls the handle SV before freeing (use-after-destroy
-            croaks cleanly; double DESTROY is a no-op).
-          - stats: compute index_load directly; range_by_score reuses the
-            lower-bound rank (one tree descent instead of two).
+          - Bundle Data::SortedSet::Shared::Strings (string members) with a
+            new_strings() constructor; new prerequisite Data::Intern::Shared.
+          - DESTROY nulls the handle first: use after destroy croaks, double
+            DESTROY is a no-op.
+          - stats computes index_load directly; range_by_score descends once.
 
 0.01      2026-06-22
           - Initial release.

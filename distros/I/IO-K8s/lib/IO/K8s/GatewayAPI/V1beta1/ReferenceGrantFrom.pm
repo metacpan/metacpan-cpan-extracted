@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::ReferenceGrantFrom;
 # ABSTRACT: ReferenceGrantFrom describes trusted namespaces and kinds.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s group     => Str, { required => 'schema', pattern => qr/^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/ };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1beta1::ReferenceGrantFrom - ReferenceGrantFrom describes 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 group
 

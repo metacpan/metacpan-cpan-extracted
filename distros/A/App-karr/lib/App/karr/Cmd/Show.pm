@@ -1,7 +1,7 @@
 # ABSTRACT: Show full details of a task
 
 package App::karr::Cmd::Show;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -254,7 +254,7 @@ App::karr::Cmd::Show - Show full details of a task
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -273,8 +273,10 @@ Shows the full details of a task, including optional metadata such as tags, due
 date, estimate, claim state, and the Markdown body. This is the most complete
 human-readable view of an individual card.
 
-C<ID> takes the comma-separated batch form the other task commands share
-(C<ID[,ID,...]>), printing the cards one after another: C<--json> as an array
+C<ID> is a number or the house C<kNNN> spelling -- C<karr show k12> is
+C<karr show 12> -- and takes the comma-separated batch form the other task
+commands share (C<ID[,ID,...]>, spellings mixed as in C<k12,13>), printing the
+cards one after another: C<--json> as an array
 (the shape C<karr list --json> uses), plain text separated by a blank line, and
 C<--compact> as one line per card. An id that names no card is reported on
 STDERR while the ids around it are still shown, and the command exits C<1> --

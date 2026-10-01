@@ -1,6 +1,6 @@
 package IO::K8s::K3s::V1::HelmChartConfig;
 # ABSTRACT: HelmChartConfig represents additional configuration for the installation of Helm chart release.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'helm.cattle.io/v1',
     resource_plural => 'helmchartconfigs';
@@ -23,7 +23,7 @@ IO::K8s::K3s::V1::HelmChartConfig - HelmChartConfig represents additional config
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

@@ -25,7 +25,8 @@ use App::karr::ActivityLog;
 #       demands one. Before the ticket this succeeded silently.
 #
 # The default status (backlog) is deliberately not consulted, and a board
-# whose statuses carry no require_claim behaves exactly as before.
+# whose statuses carry no require_claim behaves exactly as before. The claimed
+# creates below go to todo: backlog holds no claim at all (ticket k306).
 
 sub _run_karr {
     my ( $cwd, @argv ) = @_;
@@ -76,7 +77,9 @@ sub _lines {
 subtest 'create --claim stamps claimed_by and claimed_at' => sub {
     my $repo = _board_repo();
 
-    my $rv = _run_karr( $repo, 'create', 'Claimed at birth', '--claim', 'swift-fox' );
+    # --status todo: the default backlog holds no claim (ticket k306).
+    my $rv = _run_karr( $repo, 'create', 'Claimed at birth', '--status', 'todo',
+        '--claim', 'swift-fox' );
     is( $rv->{exit}, 0, 'create --claim succeeds' ) or diag $rv->{stderr};
 
     my $task = _task($repo);
@@ -88,7 +91,7 @@ subtest 'create --claim stamps claimed_by and claimed_at' => sub {
 subtest 'the activity-log entry for a claimed create carries the claim name' => sub {
     my $repo = _board_repo();
 
-    _run_karr( $repo, 'create', 'Claimed', '--claim', 'swift-fox' );
+    _run_karr( $repo, 'create', 'Claimed', '--status', 'todo', '--claim', 'swift-fox' );
     my @agents = _log_agents($repo);
 
     is( scalar @agents, 1, 'one log entry for the one create' );

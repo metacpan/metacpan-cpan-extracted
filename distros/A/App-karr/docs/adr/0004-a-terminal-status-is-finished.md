@@ -42,3 +42,9 @@ away -- must be read against this decision before it is built. It was split off
 from #250 on the premise that "given up" is a state worth reporting; under this
 ADR karr has no such state to report, and the ticket needs a new premise or
 closing.
+
+> Later: karr-foundation compared a card's status to the literal strings
+> `done`/`archived` for its own drain detection and the `board_actionable`
+> fact, rather than asking the board. k305 changed both to read
+> `BoardStore->is_terminal_status` instead -- the same board-derived terminal
+> rule this ADR describes now governs foundation too.

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceSubRequest;
 # ABSTRACT: DeviceSubRequest describes a request for device provided in the claim.spec.devices.requests[].firstAvailable array. DeviceSubRequest is similar to ExactDeviceRequest, but doesn't expose the AdminAccess field as that one is only supported when requesting a specific device.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s allocationMode => Str;
@@ -41,7 +41,7 @@ IO::K8s::Api::Resource::V1::DeviceSubRequest - DeviceSubRequest describes a requ
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allocationMode
 
@@ -91,7 +91,7 @@ Administrators may use this to restrict which devices may get requested by only 
 
 =head2 name
 
-Name can be used to reference this subrequest in the list of constraints or the list of configurations for the claim. References must use the format C<<main request>/<subrequest>>. Must be a DNS label.
+Name can be used to reference this subrequest in the list of constraints or the list of configurations for the claim. References must use the format C<< <main request>/<subrequest> >>. Must be a DNS label.
 
 =head2 selectors
 

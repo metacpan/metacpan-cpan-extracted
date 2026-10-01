@@ -1,12 +1,13 @@
 # ABSTRACT: Kubernetes API operations for Rex::Rancher (device plugin, readiness)
 
 package Rex::Rancher::K8s;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use v5.14.4;
 use warnings;
 
 use Kubernetes::REST::Kubeconfig;
 use Rex::Logger;
+use Rex::Rancher::Distribution;
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -14,6 +15,7 @@ use base qw(Rex::Exporter);
 use vars qw(@EXPORT);
 
 @EXPORT = qw(
+  control_plane_version
   deploy_nvidia_device_plugin
   wait_for_api
   untaint_node
@@ -105,6 +107,31 @@ sub untaint_node {
   }
 }
 
+
+sub control_plane_version {
+  my (%opts) = @_;
+  my $kubeconfig = $opts{kubeconfig} or die "kubeconfig required\n";
+  my $D = 'Rex::Rancher::Distribution';
+
+  my $api = _api($kubeconfig);
+  my @versions;
+  for my $node (@{ $api->list('Node')->items }) {
+    my $labels = $node->metadata->labels // {};
+    next unless exists $labels->{'node-role.kubernetes.io/control-plane'}
+      || exists $labels->{'node-role.kubernetes.io/master'};
+    my $info = $node->status && $node->status->nodeInfo;
+    my $version = $info && $info->kubeletVersion;
+    my @parts = $D->parse_release($version);
+    push @versions, $version if @parts;
+  }
+  my ($lowest) = sort { $D->compare_versions($a, $b) } @versions;
+  return $lowest if defined $lowest;
+
+  my $version = $api->cluster_version;
+  my @parts = $D->parse_release($version);
+  return @parts ? $version : ();
+}
+
 # ============================================================
 #  Internal helpers
 # ============================================================
@@ -175,6 +202,9 @@ sub _nvidia_device_plugin_daemonset_spec {
 sub _wait_for_gpu_resource {
   my ($api) = @_;
 
+  # The error of the last attempt, if it failed: a 403 or a dead API reads
+  # the same as a plugin that has not reported yet until the warning names it.
+  my $last_error;
   for my $i (1..24) {
     my $found = eval {
       my $nodes = $api->list('Node');
@@ -189,12 +219,14 @@ sub _wait_for_gpu_resource {
       }
       0;
     };
+    $last_error = $@ ? ( $@ =~ s/\s+\z//r ) : undef;
     return 1 if $found;  # exit the sub once GPU capacity is confirmed
     Rex::Logger::info("  No GPU capacity yet ($i/24), waiting...");
     sleep 5;
   }
 
-  Rex::Logger::info("  nvidia.com/gpu resource did not appear — check device plugin", "warn");
+  Rex::Logger::info("  nvidia.com/gpu resource did not appear — check device plugin"
+    . ( defined $last_error ? " (last API error: $last_error)" : '' ), "warn");
   return 0;
 }
 
@@ -212,7 +244,7 @@ Rex::Rancher::K8s - Kubernetes API operations for Rex::Rancher (device plugin, r
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -233,7 +265,7 @@ version 0.002
 =head1 DESCRIPTION
 
 L<Rex::Rancher::K8s> provides Kubernetes API operations for L<Rex::Rancher>
-using L<Kubernetes::REST> and L<IO::K8s>. All three public functions run
+using L<Kubernetes::REST> and L<IO::K8s>. All four public functions run
 entirely on the B<local machine> against the cluster's HTTP API — no
 C<kubectl> binary is required anywhere, and no SSH connection to the cluster
 nodes is needed for these operations.
@@ -247,6 +279,9 @@ The module is used internally by L<Rex::Rancher/rancher_deploy_server> to:
 =item 2. Deploy the NVIDIA device plugin when C<gpu =E<gt> 1>
 
 =back
+
+L<Rex::Rancher::Agent/install_agent> uses L</control_plane_version> to keep
+an agent from a newer minor version than the control plane.
 
 It can also be used standalone for post-deploy operations such as removing
 control-plane taints on single-node clusters.
@@ -320,6 +355,8 @@ concurrency requirement).
 
 After applying, polls up to 24 times (2-minute timeout) for
 C<nvidia.com/gpu> capacity to appear in any node's C<status.capacity>.
+When it does not, a warning says so (no die), naming the API error of the
+last attempt if that one failed (a 403, no connection).
 
 Required options:
 
@@ -372,6 +409,28 @@ Local path to the cluster kubeconfig.
 =back
 
   untaint_node(kubeconfig => "$ENV{HOME}/.kube/single-node.yaml");
+
+=head2 control_plane_version(%opts)
+
+The Kubernetes version of the cluster's control plane, as the agent side of
+the version skew policy needs it: the lowest C<kubeletVersion> among the
+nodes labelled C<node-role.kubernetes.io/control-plane> (or C<master>) —
+during a rolling server upgrade that is the server not yet upgraded — or,
+without such nodes, the API server's C</version>. RKE2 and K3s report their
+own release there (C<v1.30.4+rke2r1>). Nothing when neither gives a
+version. Runs locally via L<Kubernetes::REST>; an API error dies.
+
+Required options:
+
+=over
+
+=item C<kubeconfig>
+
+Local path to the cluster kubeconfig.
+
+=back
+
+  my $version = control_plane_version(kubeconfig => "$ENV{HOME}/.kube/mycluster.yaml");
 
 =head1 SEE ALSO
 

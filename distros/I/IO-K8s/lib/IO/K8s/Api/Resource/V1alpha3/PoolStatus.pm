@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::PoolStatus;
 # ABSTRACT: PoolStatus contains status information for a single resource pool.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s allocatedDevices => Int;
@@ -53,7 +53,7 @@ IO::K8s::Api::Resource::V1alpha3::PoolStatus - PoolStatus contains status inform
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allocatedDevices
 

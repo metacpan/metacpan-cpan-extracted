@@ -8,6 +8,8 @@ lib/CPAN/Maker/Bootstrapper/Constants.pm
 lib/CPAN/Maker/Bootstrapper/Role/CreateConfig.pm
 lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm
 lib/CPAN/Maker/Bootstrapper/Role/Critic.pm
+lib/CPAN/Maker/Bootstrapper/Role/DarkPANRequires.pm
+lib/CPAN/Maker/Bootstrapper/Role/DepsFilter.pm
 lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm
 lib/CPAN/Maker/Bootstrapper/Role/Filter.pm
 lib/CPAN/Maker/Bootstrapper/Role/Init.pm
@@ -17,6 +19,7 @@ lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm
+lib/CPAN/Maker/Bootstrapper/Role/PAUSEUpload.pm
 lib/CPAN/Maker/Bootstrapper/Role/Provides.pm
 lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm
 lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm
@@ -48,6 +51,7 @@ share/modulino.mk
 share/modulino.tmpl
 share/perl.mk
 share/pod-review.prompt
+share/publish.mk
 share/README.md
 share/release-notes.mk
 share/test.t.tmpl

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package Future 0.52;
+package Future 0.53;
 
 use v5.14;
 use warnings;
@@ -203,6 +203,21 @@ Since version 0.43 this module provides the L<Future::AsyncAwait::Awaitable>
 API. Subclass authors should note that several of the API methods are provided
 by special optimised internal methods, which may require overriding in your
 subclass if your internals are different from that of this module.
+
+=head2 OPTIONAL XS MODULE
+
+This module itself is implemented in pure Perl. Optionally, the CPAN module
+L<Future::XS> can be installed, which provides an implementation written in
+XS that may run faster and consume slightly less memory, which may be
+significant in high-performance cases. Simply installing the module is
+sufficient to use it; C<Future> will detect and load it automatically.
+
+This automatic loading can be disabled by setting the C<PERL_FUTURE_NO_XS>
+environment variable to some true value. This may be helpful if a bug or other
+undesirable behaviour is suspected, or simply to compare performance across
+otherwise-similar programs.
+
+   $ PERL_FUTURE_NO_XS=1 perl ...
 
 =cut
 

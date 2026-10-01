@@ -819,31 +819,29 @@ subtest 'coderef logger — ctx key absent when not configured' => sub {
 # 19. Compound boolean paths in _high_priority fallback
 # ============================================================
 
-subtest 'carp_on_warn=0, no array, no logger → carp fires (no backend)' => sub {
+subtest 'carp_on_warn=0, file-only logger → no carp (file is a backend)' => sub {
 	plan tests => 1;
 
-	# When there is no logger AND no array, carp fires even without carp_on_warn
+	# A top-level file counts as a backend, so warn() doesn't fall back to carp
 	my $carped = 0;
 	my $g = mock_scoped 'Carp::carp' => sub { $carped++ };
 
-	# File-only logger: after _log writes to file, _high_priority checks
-	# !defined($self->{logger}) && !defined($self->{array}) — both true
 	my $path = tmp_file();
 	my $logger = Log::Abstraction->new(file => $path, level => 'debug');
-	$logger->warn('no backend warn');
-	is($carped, 1, 'carp fires when no logger and no array backend');
+	$logger->warn('file backend warn');
+	is($carped, 0, 'no carp when a top-level file backend is configured');
 };
 
-subtest 'croak fires when no logger and no array for error()' => sub {
-	plan tests => 1;
+subtest 'error() with a file-only logger does not croak' => sub {
+	plan tests => 2;
 
 	my $path = tmp_file();
 	my $logger = Log::Abstraction->new(file => $path, level => 'debug');
-	throws_ok(
-		sub { $logger->error('no backend error') },
-		qr/no backend error/,
-		'croak fires for error() when no logger and no array backend'
+	lives_ok(
+		sub { $logger->error('file backend error') },
+		'error() does not croak when a top-level file backend is configured'
 	);
+	like(slurp($path), qr/file backend error/, 'error written to the file');
 };
 
 subtest 'croak_on_error=1 with logger set still croaks' => sub {

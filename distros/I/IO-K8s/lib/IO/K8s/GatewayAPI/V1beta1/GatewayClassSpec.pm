@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::GatewayClassSpec;
 # ABSTRACT: Spec defines the desired state of GatewayClass.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s controllerName => Str, { required => 'schema', pattern => '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\\/[A-Za-z0-9\\/\\-._~%!$&\'()*+,;=:]+$' };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1beta1::GatewayClassSpec - Spec defines the desired state 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 controllerName
 

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Compress;
 # ABSTRACT: Compress holds the compress middleware configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s defaultEncoding      => Str;
@@ -28,7 +28,7 @@ IO::K8s::Traefik::V1alpha1::Compress - Compress holds the compress middleware co
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 defaultEncoding
 

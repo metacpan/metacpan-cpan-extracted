@@ -66,11 +66,11 @@ WriteMakefile(
       'provides'=>{
                       'CLI::Simple'=>{
                                          'file'=>'lib/CLI/Simple.pm',
-                                         'version'=>'2.2.3'
+                                         'version'=>'2.2.4'
                                        },
                       'CLI::Simple::Constants'=>{
                                                     'file'=>'lib/CLI/Simple/Constants.pm',
-                                                    'version'=>'2.2.3'
+                                                    'version'=>'2.2.4'
                                                   },
                       'CLI::Simple::DumpSpec'=>{
                                                    'file'=>'lib/CLI/Simple/DumpSpec.pm',
@@ -98,7 +98,7 @@ WriteMakefile(
                                               },
                       'CLI::Simple::Utils'=>{
                                                 'file'=>'lib/CLI/Simple/Utils.pm',
-                                                'version'=>'2.2.3'
+                                                'version'=>'2.2.4'
                                               }
                     },
       'resources'=>{

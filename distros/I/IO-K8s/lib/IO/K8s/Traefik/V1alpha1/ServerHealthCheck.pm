@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ServerHealthCheck;
 # ABSTRACT: Healthcheck defines health checks for ExternalName services.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s followRedirects   => Bool;
@@ -42,7 +42,7 @@ IO::K8s::Traefik::V1alpha1::ServerHealthCheck - Healthcheck defines health check
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 followRedirects
 

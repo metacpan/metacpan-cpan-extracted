@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ClientTLS;
 # ABSTRACT: TLS defines TLS-specific configurations, including the CA, certificate, and key, which can be provided as a file path or file content.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s caSecret           => Str;
@@ -24,7 +24,7 @@ IO::K8s::Traefik::V1alpha1::ClientTLS - TLS defines TLS-specific configurations,
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 caSecret
 

@@ -1,5 +1,5 @@
 package Business::NAB::BPAY::Payments::HeaderRecord;
-$Business::NAB::BPAY::Payments::HeaderRecord::VERSION = '0.09';
+$Business::NAB::BPAY::Payments::HeaderRecord::VERSION = '0.10';
 =head1 NAME
 
 Business::NAB::BPAY::Payments::HeaderRecord

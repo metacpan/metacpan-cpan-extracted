@@ -1,0 +1,27 @@
+# The stub of the test Mailer: a Mailpit instead of a mail server.
+Deployment {
+  name => 'mailer',
+  spec => {
+    selector => { matchLabels => { app => 'mailer' } },
+    template => {
+      metadata => { labels => { app => 'mailer' } },
+      spec     => { containers => [ { name => 'mailpit', image => 'axllent/mailpit' } ] }
+    }
+  }
+};
+
+Service {
+  name => 'mailer',
+  spec => {
+    selector => { app => 'mailer' },
+    ports    => [ { name => 'smtp', port => 25, targetPort => 1025 } ]
+  }
+};
+
+Service {
+  name => 'mailer-web',
+  spec => {
+    selector => { app => 'mailer' },
+    ports    => [ { name => 'http', port => 8025 } ]
+  }
+};

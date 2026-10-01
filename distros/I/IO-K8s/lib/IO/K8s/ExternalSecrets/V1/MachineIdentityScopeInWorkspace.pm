@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::MachineIdentityScopeInWorkspace;
 # ABSTRACT: SecretsScope defines the scope of the secrets within the workspace
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s environmentSlug        => Str, { required => 'schema' };
@@ -30,7 +30,7 @@ IO::K8s::ExternalSecrets::V1::MachineIdentityScopeInWorkspace - SecretsScope def
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 environmentSlug
 

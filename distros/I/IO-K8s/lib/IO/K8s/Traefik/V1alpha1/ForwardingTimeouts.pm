@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ForwardingTimeouts;
 # ABSTRACT: ForwardingTimeouts defines the timeouts for requests forwarded to the backend servers.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s dialTimeout           => IntOrStr, { pattern => "^([0-9]+(ns|us|\x{b5}s|ms|s|m|h)?)+\$" };
@@ -28,7 +28,7 @@ IO::K8s::Traefik::V1alpha1::ForwardingTimeouts - ForwardingTimeouts defines the 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 dialTimeout
 

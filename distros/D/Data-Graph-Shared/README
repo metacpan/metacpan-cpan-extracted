@@ -48,6 +48,12 @@ METHODS
     pass is duplicated ("F_DUPFD_CLOEXEC"), so it stays yours to close and
     closing it does not disturb the handle.
 
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of dying with SIGBUS while they
+    zero it; "DATA_GRAPH_SHARED_SPARSE=1" skips the reservation. On tmpfs and
+    memfd the segment is memory, and a memory cgroup too small for it gets an
+    OOM kill rather than a croak.
+
   Operations
         my $id = $g->add_node($data);            # returns node index or undef
         $g->add_edge($src, $dst);                # weight defaults to 1

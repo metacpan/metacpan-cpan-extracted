@@ -1,5 +1,83 @@
 Imager release history.  Older releases can be found in Changes.old
 
+Imager 1.037 - 30 September 2026
+============
+
+The Imager C API major version has changed, any modules that depend on
+the Imager C API will need to be rebuilt.
+
+ - RAW:
+   - validate raw_datachannels and limit to a maximum of 16
+   - check raw line buffer calculation for overflow
+     https://github.com/tonycoz/imager/security/advisories/GHSA-g549-r73g-x7x6
+     CVE-2026-102504
+
+ - getsamples() with type "float" on a paletted image fetching more than one
+   channel would allocate too small a block.  Code calling this on an
+   untrusted image could have an attacker controlled buffer overflow.
+   https://github.com/tonycoz/imager/security/advisories/GHSA-4rx6-cgv3-fmxp
+   CVE-2026-102505
+
+ - RAW:
+   - implement file size limit checks for raw images too.
+     (see the set_file_limits() method)
+
+ - image creation no longer aborts the process if allocation of the
+   image surface fails, and fails image creation instead.
+
+ - failed allocation of other memory blocks (typically much smaller)
+   now uses abort() to exit the process instead of exit().  This is
+   easier to catch in a debugger or core dump and you can handle
+   SIGABRT to capture this, but...
+
+ - you can now set a handler for otherwise fatal memory allocation
+   failures using set_out_of_memory_handler().  This handler should
+   croak or otherwise clean up.
+
+ - removed IMAGER_DEBUG_MALLOC, tools like valgrind, ASAN and DrMemory
+   provide much better diagnostics.
+
+ - getsamples() with type "float" on a direct 8-bit per sample image
+   and default channels would dereference a NULL pointer, crashing
+   perl.
+   https://github.com/tonycoz/imager/issues/575
+
+ - validate earlier in the backend functions used by getsamples(), and
+   add error reporting on validation errors.
+
+ - getsamples() for 8 bit or float samples now fetches directly to an
+   SV, rather than using an intermediate memory block, saving a copy.
+
+ - i_tt_has_chars(), i_gpal(), i_gsamp(), i_gsampf() - avoid calling
+   newSVpv() with a zero length
+   https://github.com/tonycoz/imager/pull/576
+
+ - i_tt_face_name() - ensure the returned string length matches the
+   buffer
+   https://github.com/tonycoz/imager/pull/577
+
+Note: i_tt_has_chars() and i_tt_face_name() are part of Freetype 1.x
+support, which is disabled unless explicitly enabled.
+
+Perl API usage clean up:
+
+ - Core Imager, JPEG, FT2:
+   - use newSVpvn(p, len) instead of newSVpv(p, len) since newSVpv() will
+     try to wastefully or dangerously strlen(p) if len happens to be zero.
+     related to https://github.com/tonycoz/imager/pull/576
+
+ - Core Imager, FT2:
+   - use newSVpv(p, 0) instead of newSVpv(p, strlen(p)) for the
+     convenience of this otherwise annoying API.
+     related to https://github.com/tonycoz/imager/pull/576
+
+ - replace uses of hv_fetch(hv, "literal", length_of_literal, 0)
+   with hv_fetchs()
+
+ - add CI to check for misuse of newSVpv(), hv_fetch() with literal
+
+(partly applying perl-check checks)
+
 Imager 1.036 - 18 September 2026
 ============
 

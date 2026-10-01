@@ -30,18 +30,14 @@ WriteMakefile(
 ,
   PREREQ_PM        => {
       'CLI::Simple' => '2.1.2',
-      'CLI::Simple::Constants' => '2.1.2',
-      'CLI::Simple::Utils' => '2.1.2',
       'File::Process' => '1.0.0',
       'File::ShareDir' => '1.118',
       'File::ShareDir::Install' => '0',
       'JSON' => '4.10',
       'Log::Log4perl' => '0',
-      'Log::Log4perl::Level' => '0',
       'Module::CPANfile' => '0',
       'Readonly' => '2.05',
       'Role::Tiny' => '2.002004',
-      'Role::Tiny::With' => '2.002004',
       'YAML::Tiny' => '0'
     },
   BUILD_REQUIRES   => {
@@ -67,19 +63,19 @@ WriteMakefile(
       'provides'=>{
                       'CPAN::Maker'=>{
                                          'file'=>'lib/CPAN/Maker.pm',
-                                         'version'=>'2.0.11'
+                                         'version'=>'2.0.12'
                                        },
                       'CPAN::Maker::Constants'=>{
                                                     'file'=>'lib/CPAN/Maker/Constants.pm',
-                                                    'version'=>'2.0.11'
+                                                    'version'=>'2.0.12'
                                                   },
                       'CPAN::Maker::Role::FileUtils'=>{
                                                           'file'=>'lib/CPAN/Maker/Role/FileUtils.pm',
-                                                          'version'=>'2.0.11'
+                                                          'version'=>'2.0.12'
                                                         },
                       'CPAN::Maker::Role::ModuleUtils'=>{
                                                             'file'=>'lib/CPAN/Maker/Role/ModuleUtils.pm',
-                                                            'version'=>'2.0.11'
+                                                            'version'=>'2.0.12'
                                                           },
                       'CPAN::Maker::Role::Provides'=>{
                                                          'file'=>'lib/CPAN/Maker/Role/Provides.pm',
@@ -87,7 +83,7 @@ WriteMakefile(
                                                        },
                       'CPAN::Maker::Utils'=>{
                                                 'file'=>'lib/CPAN/Maker/Utils.pm',
-                                                'version'=>'2.0.11'
+                                                'version'=>'2.0.12'
                                               }
                     },
       'resources'=>{

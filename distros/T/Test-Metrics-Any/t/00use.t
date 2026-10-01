@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Test::Metrics::Any" );
+require Test::Metrics::Any;
 
+pass( 'Modules loaded' );
 done_testing;

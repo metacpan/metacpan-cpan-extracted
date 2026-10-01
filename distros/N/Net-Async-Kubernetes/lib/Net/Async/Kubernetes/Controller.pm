@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::Controller;
 # ABSTRACT: Minimal controller runtime for Net::Async::Kubernetes
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -117,11 +117,12 @@ sub stop {
 }
 
 sub watch_resource {
-    my ($self, $resource, %args) = @_;
+    my ($self, $resource, @args) = @_;
 
+    croak "Invalid arguments to watch_resource()" if @args % 2;
     my $spec = {
         resource => $resource,
-        %args,
+        @args,
     };
 
     push @{ $self->{watch_specs} }, $spec;
@@ -332,78 +333,60 @@ sub list_objects {
     return $self->kube->list(@args);
 }
 
+# The controller keeps its own signature - a status => {...} argument instead
+# of a patch document, merge as the default type - and builds the patch from
+# it; resolving the target, the request and the response are the client's
+# patch_status. Its own options are checked here, with the client's k63
+# helper: the client only sees patch and type, so any other key (typ,
+# statuss, namespace in the object form) would be dropped silently. Every
+# other argument check (metadata, name, patch type, unknown resource) happens
+# there and comes back as a failed Future too.
 sub patch_status {
     my ($self, $class_or_object, @rest_args) = @_;
 
-    my $rest = $self->kube->_rest;
-    my ($class, $name, $namespace, $status, $patch_type);
-
+    my (%args, @target, @allowed);
     if (ref($class_or_object) && blessed($class_or_object)) {
-        my $object = $class_or_object;
-        $class = ref($object);
-        my $metadata = $object->metadata or return Future->fail("object must have metadata");
-        $name = $metadata->name or return Future->fail("object must have metadata.name");
-        $namespace = $metadata->namespace;
-        my %args = @rest_args;
-        $status = $args{status} // $object->status // return Future->fail("status required for patch_status");
-        $patch_type = $args{type} // 'merge';
+        return Future->fail("Invalid arguments to patch_status()") if @rest_args % 2;
+        %args = @rest_args;
+        @allowed = qw( status type );
+        # A class without a status attribute has nothing to fall back on; the
+        # missing status is then reported below like any other.
+        $args{status} //= $class_or_object->status if $class_or_object->can('status');
+        @target = ($class_or_object);
     } else {
-        my %args;
         if (@rest_args >= 1 && !ref($rest_args[0]) && $rest_args[0] !~ /^(name|namespace|status|type)$/) {
             $args{name} = shift @rest_args;
+            return Future->fail("Invalid arguments to patch_status()") if @rest_args % 2;
             %args = (%args, @rest_args);
         } elsif (@rest_args % 2 == 0) {
             %args = @rest_args;
         } else {
             return Future->fail("Invalid arguments to patch_status()");
         }
-
-        $class = $rest->expand_class($class_or_object)
-            // return Future->fail(
-                $self->kube->_unknown_resource_error($class_or_object));
-        $name = $args{name} or return Future->fail("name required for patch_status");
-        $namespace = $args{namespace};
-        $status = $args{status} // return Future->fail("status required for patch_status");
-        $patch_type = $args{type} // 'merge';
+        @allowed = qw( name namespace status type );
+        @target = ($class_or_object, name => $args{name}, namespace => $args{namespace});
     }
+    my $unknown = $self->kube->_unknown_argument_error('patch_status', \%args, @allowed);
+    return Future->fail($unknown) if defined $unknown;
+    return Future->fail("status required for patch_status") unless defined $args{status};
 
-    my %patch_types = (
-        strategic => 'application/strategic-merge-patch+json',
-        merge     => 'application/merge-patch+json',
-        json      => 'application/json-patch+json',
+    return $self->kube->patch_status(@target,
+        patch => { status => $args{status} },
+        type  => $args{type} // 'merge',
     );
-    my $content_type = $patch_types{$patch_type}
-        // return Future->fail("Unknown patch type '$patch_type'");
-
-    my $path = $rest->build_path($class, name => $name, namespace => $namespace) . '/status';
-    my $req = $rest->prepare_request('PATCH', $path,
-        body => { status => $status },
-        content_type => $content_type,
-    );
-
-    return $self->kube->_do_request($req)->then(sub {
-        my ($response) = @_;
-        $rest->check_response($response, "patch status $class");
-        return Future->done($rest->inflate_object($class, $response));
-    });
 }
 
 sub update_status {
     my ($self, $object) = @_;
-    my $rest = $self->kube->_rest;
-    my $class = ref($object);
+
+    # The client's update_status croaks on these; the controller's helpers
+    # report every error as a failed Future.
+    my ($class, $error) = $self->kube->_object_class('update_status', $object);
+    return Future->fail($error) unless defined $class;
     my $metadata = $object->metadata or return Future->fail("object must have metadata");
-    my $name = $metadata->name or return Future->fail("object must have metadata.name");
-    my $namespace = $metadata->namespace;
+    $metadata->name or return Future->fail("object must have metadata.name");
 
-    my $path = $rest->build_path($class, name => $name, namespace => $namespace) . '/status';
-    my $req = $rest->prepare_request('PUT', $path, body => $object->TO_JSON);
-
-    return $self->kube->_do_request($req)->then(sub {
-        my ($response) = @_;
-        $rest->check_response($response, "update status $class");
-        return Future->done($rest->inflate_object($class, $response));
-    });
+    return $self->kube->update_status($object);
 }
 
 1;
@@ -420,7 +403,7 @@ Net::Async::Kubernetes::Controller - Minimal controller runtime for Net::Async::
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -437,7 +420,7 @@ version 0.008
         on_reconcile => sub {
             my ($ctx) = @_;
 
-            return $ctx->{controller}->patch_status('Pod', $ctx->{object},
+            return $ctx->{controller}->patch_status($ctx->{object},
                 status => { phase => 'Running' },
             );
         },
@@ -510,12 +493,22 @@ past that keeps neither object alive.
 
 =item C<on_watch_error>
 
-Optional callback for C<ERROR> events from a registered watch, for example a
-C<403> arriving mid-stream. Receives C<($error, $ctx)>, where C<$error> is the
-raw error hashref the watcher reports and C<$ctx> carries C<controller>,
-C<kube>, and C<resource>. Error events are not reconcile objects, so they never
-enter the workqueue. An C<on_error> passed to C<watch_resource> takes
-precedence for that watch.
+Optional callback for errors of a registered watch: C<ERROR> events, for
+example a C<403> arriving mid-stream, and failed watch attempts -- a
+transport error, the API server rejecting the request, or a stream that
+closes at once without an event or right after an C<ERROR> event -- which the
+watcher retries with backoff. Receives C<($error, $ctx)>, where C<$error> is
+the C<Status> hashref the watcher reports (see
+L<Net::Async::Kubernetes::Watcher/on_error>; a failed attempt has C<reason>
+C<WatchFailed>) and C<$ctx> carries C<controller>, C<kube>, and C<resource>.
+Errors are not reconcile objects, so they never enter the workqueue. An
+C<on_error> passed to C<watch_resource> takes precedence for that watch.
+Without either, the watcher C<warn>s about failed attempts.
+
+The watcher's reconnect settings (C<reconnect_delay>, C<max_reconnect_delay>,
+C<reconnect_jitter>, C<max_retries>, C<min_watch_duration>) are passed to
+C<watch_resource> with the other watcher arguments. A watch that gave up on C<max_retries> stays stopped; C<stop> and
+C<start> on the controller build it anew.
 
 =item C<retry_delay>
 
@@ -571,10 +564,12 @@ was retrying picks up at its next attempt number rather than at attempt 1.
     );
 
 Registers a watched resource and returns the watcher instance once started.
-Repeated events for the same reconcile key are coalesced into a single queued
-entry. A key's entry is dropped once it reconciles cleanly, so the queue does
-not grow with the number of objects seen; a key that is still queued, dirty or
-retrying keeps its entry, and with it its C<attempt> count.
+An odd list of parameters croaks, as C<Invalid arguments to
+watch_resource()>, before anything is registered. Repeated events for the
+same reconcile key are coalesced into a single queued entry. A key's entry is
+dropped once it reconciles cleanly, so the queue does not grow with the
+number of objects seen; a key that is still queued, dirty or retrying keeps
+its entry, and with it its C<attempt> count.
 
 =head2 get_object
 
@@ -593,16 +588,37 @@ L<Future>, resolving to an L<IO::K8s::List>.
         status    => { phase => 'Running' },
     )->get;
 
+    $controller->patch_status($object,
+        status => { phase => 'Running' },
+    )->get;
+
 Patch the C</status> subresource for an object. Accepts either a class/name
-pair or an object instance plus a C<status> payload. Returns a L<Future> that
-resolves to the patched object.
+pair (the name positional or as C<name =E<gt> ...>) or an object instance,
+plus a C<status> payload; in the object form, C<status> defaults to the
+object's own C<status> when its class has one. The helper sends
+C<{ status =E<gt> $status }> through L<Net::Async::Kubernetes/patch_status>,
+with the patch type from C<type> (C<merge> by default, C<strategic> or
+C<json>). Returns a L<Future> that resolves to the patched object.
+
+Bad arguments, a missing C<status> (including an object whose class has no
+C<status> to fall back on), an unknown resource or patch type, and server
+errors fail the returned L<Future> instead of dying. So does any option other
+than C<name>, C<namespace>, C<status> and C<type> -- in the object form only
+C<status> and C<type>, the object gives name and namespace -- before a
+request is sent: C<Unknown argument 'typ' to patch_status() (allowed: name,
+namespace, status, type)>. Such an option would otherwise be dropped when the
+patch is built. An odd list of options after the object or the name fails it
+as C<Invalid arguments to patch_status()> too, before a request is sent.
 
 =head2 update_status
 
     $controller->update_status($object)->get;
 
-Update the C</status> subresource for a full object instance. Returns a
-L<Future> that resolves to the updated object.
+Update the C</status> subresource for a full object instance, through
+L<Net::Async::Kubernetes/update_status>. Returns a L<Future> that resolves to
+the updated object. An object without C<metadata> or C<metadata.name>, or one
+that is no Kubernetes resource (an L<IO::K8s::List>, a nested C<PodSpec>),
+fails the L<Future> rather than croaking as the client method does.
 
 =head1 SEE ALSO
 

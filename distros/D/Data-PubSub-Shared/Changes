@@ -1,31 +1,26 @@
 Revision history for Data-PubSub-Shared
 
+0.11      2026-09-26
+          - A clear killed part-way no longer makes later int publishes
+            vanish.
+          - DATA_PUBSUB_SHARED_SPARSE=0 reserves segments up front, so a full
+            filesystem fails the constructor, not a later write.
+          - A failed create no longer leaves a full-size file behind.
+
 0.10      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
 
 0.09      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
+          - A file left by an interrupted create is recovered, not refused.
+          - Hardening against tied and overloaded arguments.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.08      2026-07-23
-          - Int/Int32/Int16 publish now commits (value, sequence) atomically
-            and drops an already-superseded store, so a publisher preempted a
-            full lap can no longer revert a slot and stall a subscriber. Uses a
-            lock-free slot-wide CAS where available, else the header mutex; the
-            on-disk format is unchanged.
-          - poll_cb: re-extract the subscriber after each callback, so one that
-            destroys or replaces it croaks instead of using a freed pointer.
-          - REEXTRACT guards re-check SvROK first (a replaced invocant croaks).
-          - poll: compute the sequence displacement wraparound-safe, avoiding
-            signed-overflow UB (previously masked by Perl's -fwrapv).
-          - xt/stress.t: use a progress-based stall check, not a 30s deadline.
-          - Reject headers whose data offset and arena size overflow.
-          - Fetch get-magic on optional arguments before testing them.
+          - Integer publishes commit value and sequence atomically, so a
+            publisher preempted a full lap no longer stalls a subscriber.
+          - poll_cb croaks instead of using a subscriber its callback
+            destroyed.
+          - Wraparound-safe sequence math in poll; overflow-checked headers.
 
 0.07  2026-07-03
     - Security and robustness hardening; backing files now created mode

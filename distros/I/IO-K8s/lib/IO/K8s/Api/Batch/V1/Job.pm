@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::Job;
 # ABSTRACT: Job represents the configuration of a single job.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Batch::V1::Job - Job represents the configuration of a single job.
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 

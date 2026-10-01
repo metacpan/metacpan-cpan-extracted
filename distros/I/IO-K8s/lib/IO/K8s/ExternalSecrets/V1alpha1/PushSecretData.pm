@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::PushSecretData;
 # ABSTRACT: PushSecretData defines data to be pushed to the provider and associated metadata.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s conversionStrategy => Str, { enum => [qw(None ReverseUnicode)], default => 'None' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::PushSecretData - PushSecretData defines data
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 conversionStrategy
 

@@ -1,12 +1,12 @@
 package IO::K8s::Cilium::V2::CiliumExternalWorkload;
 # ABSTRACT: Cilium external workload identity
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumexternalworkloads';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => Opaque;
+k8s status => Opaque;
 
 1;
 
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::CiliumExternalWorkload - Cilium external workload identity
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 

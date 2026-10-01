@@ -1,9 +1,10 @@
 package IO::K8s::ExternalSecrets::V1alpha1::CloudsmithAccessToken;
 # ABSTRACT: CloudsmithAccessToken generates Cloudsmith access token using OIDC authentication
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
-    resource_plural => 'cloudsmithaccesstokens';
+    resource_plural => 'cloudsmithaccesstokens',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec => '+IO::K8s::ExternalSecrets::V1alpha1::CloudsmithAccessTokenSpec';
@@ -23,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::CloudsmithAccessToken - CloudsmithAccessToke
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

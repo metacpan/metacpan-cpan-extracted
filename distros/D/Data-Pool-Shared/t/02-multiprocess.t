@@ -24,7 +24,7 @@ if ($pid == 0) {
     _exit($val == 42 ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'child read parent-written value';
+is $?, 0, 'child read parent-written value';
 $pool->free($idx);
 
 # Concurrent allocation — N children each alloc a slot and write their PID
@@ -122,7 +122,7 @@ if ($pid == 0) {
     _exit($anon->get($ai) == 77 ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'anonymous pool shared across fork';
+is $?, 0, 'anonymous pool shared across fork';
 $anon->free($ai);
 
 # --- Atomic operations across processes ---

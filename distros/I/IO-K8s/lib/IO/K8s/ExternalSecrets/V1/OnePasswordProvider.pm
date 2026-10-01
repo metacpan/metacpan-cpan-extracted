@@ -1,11 +1,11 @@
 package IO::K8s::ExternalSecrets::V1::OnePasswordProvider;
 # ABSTRACT: OnePassword configures this store to sync secrets using the 1Password Cloud provider
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s auth        => '+IO::K8s::ExternalSecrets::V1::OnePasswordAuth', { required => 'schema' };
 k8s connectHost => Str, { required => 'schema' };
-k8s vaults      => { Str => 1 }, { required => 'schema' };
+k8s vaults      => HashRef[Int], { required => 'schema' };
 
 
 
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::OnePasswordProvider - OnePassword configures this 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 auth
 

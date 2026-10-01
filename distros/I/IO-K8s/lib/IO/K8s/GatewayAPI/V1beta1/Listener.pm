@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::Listener;
 # ABSTRACT: Listener embodies the concept of a logical endpoint where a Gateway accepts network connections.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s allowedRoutes => '+IO::K8s::GatewayAPI::V1beta1::AllowedRoutes', { default => {'namespaces' => {'from' => 'Same'}} };
@@ -30,7 +30,7 @@ IO::K8s::GatewayAPI::V1beta1::Listener - Listener embodies the concept of a logi
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allowedRoutes
 

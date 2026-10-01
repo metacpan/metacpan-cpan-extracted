@@ -115,6 +115,14 @@ API
     "new_from_fd" ("F_DUPFD_CLOEXEC"), so it stays yours to close and closing
     it does not disturb the channel.
 
+    "new" and "new_memfd" create a new segment sparse: pages are allocated as
+    they are first written, and once the filesystem is full, a publish that
+    writes a page not yet allocated dies with "SIGBUS". Set
+    "DATA_PUBSUB_SHARED_SPARSE=0" to reserve the whole segment at creation, so
+    a full filesystem makes them croak instead; on tmpfs and memfd that
+    commits the segment's memory at once, and a memory cgroup too small for it
+    gets an OOM kill rather than a croak.
+
   Publishing
         $ps->publish($value);                # numeric: always succeeds
         my $n = $ps->publish_multi(@values); # batch (max 8192 values)

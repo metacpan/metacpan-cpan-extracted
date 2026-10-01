@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificateStatus;
 # ABSTRACT: Status of the Certificate.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s acme                     => '+IO::K8s::CertManager::V1::CertificateACMEStatus';
@@ -36,7 +36,7 @@ IO::K8s::CertManager::V1::CertificateStatus - Status of the Certificate.
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 acme
 

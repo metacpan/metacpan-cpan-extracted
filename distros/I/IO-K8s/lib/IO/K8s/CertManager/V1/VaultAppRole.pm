@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::VaultAppRole;
 # ABSTRACT: AppRole authenticates with Vault using the App Role auth mechanism, with the role and secret stored in a Kubernetes Secret resource.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s path      => Str, { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::CertManager::V1::VaultAppRole - AppRole authenticates with Vault using 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 path
 

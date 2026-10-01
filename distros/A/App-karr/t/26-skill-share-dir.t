@@ -13,7 +13,7 @@ use App::karr::Cmd::Skill;
 # Where `karr` gets the bundled skill from, for both commands that need it.
 #
 # There are two places to look and they are tried in order: File::ShareDir,
-# which is where share/kanban-issues-karr-cli/ lands once the dist is
+# which is where share/<skill>/ lands once the dist is
 # installed, and -- when it is not, i.e. a checkout being run with -Ilib --
 # share/ in that checkout. Both are exercised below, because the second one is
 # the half that can fail invisibly: `karr skill show` would print a stale or
@@ -34,6 +34,11 @@ use App::karr::Cmd::Skill;
 # -- and the lookup finds that directory: _skill_content is still SKILL.md
 # (what `karr skill show` prints) and _skill_files is every *.md under it,
 # walked rather than listed, as (relative path => content) pairs.
+#
+# Since the split of kanban-issues-karr-cli into kanban-issues-karr-coordination
+# and kanban-issues-karr-ticket, every lookup is per skill: both take the skill
+# name, and the list of names lives on the role (_skill_names). The in-process
+# lookups below use one of the two names; the CLI runs at the end cover both.
 
 my $ROOT = abs_path('.');
 my $BIN  = "$ROOT/bin/karr";
@@ -43,9 +48,10 @@ my $BIN  = "$ROOT/bin/karr";
 # instead of quietly testing a lookup nothing uses.
 my $ANCHOR = 'App/karr/Role/SkillFile.pm';
 
-# The directory the skill ships in, under share/ and under an installed share
-# dir alike.
-my $SKILL_DIR = 'kanban-issues-karr-cli';
+# The directory a skill ships in, under share/ and under an installed share
+# dir alike -- one of the two bundled skills, the one the lookups below ask for.
+my $SKILL_DIR = 'kanban-issues-karr-ticket';
+my @SKILLS    = qw( kanban-issues-karr-coordination kanban-issues-karr-ticket );
 
 # Non-ASCII on purpose: the skill is Markdown prose full of em dashes, and both
 # lookups must hand back characters (slurp_utf8), not octets -- t/65 pins what
@@ -108,6 +114,13 @@ subtest 'both commands look the skill up through one implementation' => sub {
     is( App::karr::Cmd::Init->can('_skill_files'),
         App::karr::Cmd::Skill->can('_skill_files'),
         'the same for the whole-directory lookup (#285)' );
+    is( App::karr::Cmd::Init->can('_skill_names'),
+        App::karr::Cmd::Skill->can('_skill_names'),
+        'and the one list of skill names is the same code for both' );
+    is_deeply( [ App::karr::Cmd::Skill->_skill_names ], \@SKILLS,
+        'which names the coordination and the ticket skill, in that order' );
+    is_deeply( [ App::karr::Cmd::Skill->_retired_skill_names ], ['kanban-issues-karr-cli'],
+        'and kanban-issues-karr-cli is the retired name' );
 
     ok( !App::karr::Cmd::Init->can('_find_skill_source'),
         'the second copy is gone rather than left behind as an alias' );
@@ -123,9 +136,9 @@ subtest 'installed dist: the content comes from File::ShareDir' => sub {
     no warnings 'redefine';
     local *File::ShareDir::dist_dir = sub { return "$dir" };
 
-    is( App::karr::Cmd::Init->new->_skill_content, $SHARED_SKILL,
+    is( App::karr::Cmd::Init->new->_skill_content($SKILL_DIR), $SHARED_SKILL,
         'init reads skill content from the share dir' );
-    is( App::karr::Cmd::Skill->new->_skill_content, $SHARED_SKILL,
+    is( App::karr::Cmd::Skill->new->_skill_content($SKILL_DIR), $SHARED_SKILL,
         'skill command reads skill content from the share dir' );
 };
 
@@ -142,9 +155,9 @@ subtest 'not installed: the content comes from the checkout the code was loaded 
     # Equality here is also what pins the decode: $DEV_SKILL has an em dash in
     # it, so a fallback that slurped raw would come back three octets longer
     # and fail rather than quietly hand octets on to print.
-    is( App::karr::Cmd::Init->new->_skill_content, $DEV_SKILL,
+    is( App::karr::Cmd::Init->new->_skill_content($SKILL_DIR), $DEV_SKILL,
         "init falls back to share/$SKILL_DIR/SKILL.md in that tree" );
-    is( App::karr::Cmd::Skill->new->_skill_content, $DEV_SKILL,
+    is( App::karr::Cmd::Skill->new->_skill_content($SKILL_DIR), $DEV_SKILL,
         'and so does the skill command' );
 };
 
@@ -159,30 +172,34 @@ subtest 'the same fallback when the share dir is there but the skill is not' => 
     local *File::ShareDir::dist_dir = sub { return "$empty" };
     local $INC{$ANCHOR} = $checkout->child( 'lib', $ANCHOR )->stringify;
 
-    is( App::karr::Cmd::Init->new->_skill_content, $DEV_SKILL,
+    is( App::karr::Cmd::Init->new->_skill_content($SKILL_DIR), $DEV_SKILL,
         'init falls through to the checkout' );
-    is( App::karr::Cmd::Skill->new->_skill_content, $DEV_SKILL,
+    is( App::karr::Cmd::Skill->new->_skill_content($SKILL_DIR), $DEV_SKILL,
         'and so does the skill command' );
 };
 
-subtest 'an installed App::karr from before #285 does not shadow the checkout' => sub {
+subtest 'an installed App::karr from before #285 or the split does not shadow the checkout' => sub {
     # The situation on any machine that has an older release installed: its
     # share dir answers and holds the one-file skill of that release,
-    # claude-skill.md, and nothing under kanban-issues-karr-cli/. That is not
+    # claude-skill.md, and nothing under the skill directories. That is not
     # the skill being looked for, so it must fall through -- or a checkout
-    # would silently run against the installed release's skill.
+    # would silently run against the installed release's skill. The same for
+    # a release from before the split, whose share dir holds only
+    # kanban-issues-karr-cli/: a directory by the retired name answers for
+    # nothing.
     my $old      = share_dir_holding(undef);
     my $checkout = checkout_holding($DEV_SKILL);
     $old->child('claude-skill.md')->spew_utf8("# the pre-#285 single file\n");
+    fill_skill_dir( $old->child('kanban-issues-karr-cli'), "# the pre-split skill\n" );
 
     require File::ShareDir;
     no warnings 'redefine';
     local *File::ShareDir::dist_dir = sub { return "$old" };
     local $INC{$ANCHOR} = $checkout->child( 'lib', $ANCHOR )->stringify;
 
-    is( App::karr::Cmd::Init->new->_skill_content, $DEV_SKILL,
+    is( App::karr::Cmd::Init->new->_skill_content($SKILL_DIR), $DEV_SKILL,
         'init falls through to the checkout' );
-    is( App::karr::Cmd::Skill->new->_skill_content, $DEV_SKILL,
+    is( App::karr::Cmd::Skill->new->_skill_content($SKILL_DIR), $DEV_SKILL,
         'and so does the skill command' );
 };
 
@@ -195,13 +212,13 @@ subtest 'neither: it says so instead of returning nothing' => sub {
     local $INC{$ANCHOR} = $bare->child( 'lib', $ANCHOR )->stringify;
 
     for my $class (qw( App::karr::Cmd::Init App::karr::Cmd::Skill )) {
-        my $content = eval { $class->new->_skill_content };
+        my $content = eval { $class->new->_skill_content($SKILL_DIR) };
         is( $content, undef, "$class returns nothing usable" );
         like( $@, qr{Could not find \Q$SKILL_DIR\E/SKILL\.md},
             "$class names the file it could not find" );
         unlike( $@, qr/ at \S+ line \d+/, "$class adds no source location" );
 
-        my @files = eval { $class->new->_skill_files };
+        my @files = eval { $class->new->_skill_files($SKILL_DIR) };
         is( scalar(@files), 0, "$class: _skill_files has nothing either" );
         like( $@, qr{Could not find \Q$SKILL_DIR\E/SKILL\.md},
             "$class: and says the same" );
@@ -221,7 +238,7 @@ subtest '_skill_files is every *.md under the directory, as characters, in order
     local $INC{$ANCHOR} = $checkout->child( 'lib', $ANCHOR )->stringify;
 
     for my $class (qw( App::karr::Cmd::Init App::karr::Cmd::Skill )) {
-        my @pairs = $class->new->_skill_files;
+        my @pairs = $class->new->_skill_files($SKILL_DIR);
         is_deeply(
             \@pairs,
             [ 'SKILL.md' => $DEV_SKILL,
@@ -239,7 +256,8 @@ subtest '_skill_files is every *.md under the directory, as characters, in order
 # commands are run as `karr` really runs, against a File::ShareDir that cannot
 # answer -- the situation of anyone working from a checkout without the dist
 # installed -- and have to come back with this checkout's share directory.
-my $SHARE = path($ROOT)->child( 'share', $SKILL_DIR );
+my %SHARE = map { ( $_ => path($ROOT)->child( 'share', $_ ) ) } @SKILLS;
+my $HAVE_SHARE = !grep { !$_->is_dir } values %SHARE;
 
 # A File::ShareDir that fails the way an uninstalled dist makes it fail, ahead
 # of the real one in the child's @INC. Cheaper and far more reliable than
@@ -278,19 +296,20 @@ sub run_karr {
     return { stdout => $out, stderr => $err, exit => $exit };
 }
 
-# Every shipped file of this checkout, relative to the skill directory.
+# Every shipped file of one skill in this checkout, relative to its directory.
 sub shipped_in_checkout {
+    my ($share) = @_;
     my @rel;
-    $SHARE->visit(
-        sub { my ($p) = @_; push @rel, $p->relative($SHARE)->stringify if $p->is_file && $p =~ /\.md\z/ },
+    $share->visit(
+        sub { my ($p) = @_; push @rel, $p->relative($share)->stringify if $p->is_file && $p =~ /\.md\z/ },
         { recurse => 1 },
     );
     return sort @rel;
 }
 
 subtest 'karr skill show through the real CLI, with nothing installed' => sub {
-    plan skip_all => "$SHARE not found - not a source checkout"
-        unless $SHARE->is_dir;
+    plan skip_all => "share/ skill directories not found - not a source checkout"
+        unless $HAVE_SHARE;
 
     # Run from somewhere else entirely: the fallback has to find the tree the
     # code was loaded from, not the directory the user happens to stand in.
@@ -298,13 +317,21 @@ subtest 'karr skill show through the real CLI, with nothing installed' => sub {
     my $r = run_karr( $elsewhere, stub_sharedir_lib(), 'skill', 'show' );
 
     is( $r->{exit}, 0, 'it exits 0' ) or diag "stderr: $r->{stderr}";
-    is( $r->{stdout}, $SHARE->child('SKILL.md')->slurp_raw,
-        "and prints this checkout's share/$SKILL_DIR/SKILL.md, byte for byte" );
+    is( $r->{stdout},
+        join( "\n", map { $SHARE{$_}->child('SKILL.md')->slurp_raw } @SKILLS ),
+        "and prints this checkout's share/*/SKILL.md, both, in order, byte for byte" );
+
+    for my $skill (@SKILLS) {
+        my $one = run_karr( $elsewhere, stub_sharedir_lib(), 'skill', 'show', $skill );
+        is( $one->{exit}, 0, "show $skill exits 0" ) or diag "stderr: $one->{stderr}";
+        is( $one->{stdout}, $SHARE{$skill}->child('SKILL.md')->slurp_raw,
+            "and prints share/$skill/SKILL.md alone, byte for byte" );
+    }
 };
 
 subtest 'karr init --claude-skill through the real CLI, with nothing installed' => sub {
-    plan skip_all => "$SHARE not found - not a source checkout"
-        unless $SHARE->is_dir;
+    plan skip_all => "share/ skill directories not found - not a source checkout"
+        unless $HAVE_SHARE;
 
     my $repo = tempdir( CLEANUP => 1 );
     system( 'git', 'init', '-q', $repo ) == 0
@@ -317,17 +344,20 @@ subtest 'karr init --claude-skill through the real CLI, with nothing installed' 
     is( $r->{exit}, 0, 'it exits 0' ) or diag "stderr: $r->{stderr}";
     like( $r->{stdout}, qr/Installed Claude Code skill/, 'and reports the install' );
 
-    my $installed = path($repo)->child( '.claude/skills', $SKILL_DIR );
-    ok( $installed->child('SKILL.md')->exists, 'the skill is there' ) or return;
+    my $refs = 0;
+    for my $skill (@SKILLS) {
+        my $installed = path($repo)->child( '.claude/skills', $skill );
+        ok( $installed->child('SKILL.md')->exists, "$skill is there" ) or next;
 
-    my @shipped = shipped_in_checkout();
-    ok( ( grep { m{^references/} } @shipped ) >= 1,
-        'this checkout ships at least one references/*.md to compare against' );
-    for my $rel (@shipped) {
-        ok( $installed->child($rel)->exists, "$rel was installed" ) or next;
-        is( $installed->child($rel)->slurp_raw, $SHARE->child($rel)->slurp_raw,
-            "and it is this checkout's share/$SKILL_DIR/$rel, byte for byte" );
+        my @shipped = shipped_in_checkout( $SHARE{$skill} );
+        $refs += grep { m{^references/} } @shipped;
+        for my $rel (@shipped) {
+            ok( $installed->child($rel)->exists, "$skill/$rel was installed" ) or next;
+            is( $installed->child($rel)->slurp_raw, $SHARE{$skill}->child($rel)->slurp_raw,
+                "and it is this checkout's share/$skill/$rel, byte for byte" );
+        }
     }
+    ok( $refs >= 1, 'this checkout ships at least one references/*.md to compare against' );
 };
 
 done_testing;

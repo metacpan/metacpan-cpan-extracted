@@ -1,5 +1,258 @@
 Revision history for Net-Async-Kubernetes
 
+0.009     2026-10-01 03:40:55Z
+ - Require IO::K8s 1.109: string-map fields (labels, annotations, ConfigMap
+   data, ...) now serialize numeric values as JSON strings, which the API
+   server requires.
+ - Require `IO::Async::SSL`. `Net::Async::HTTP` and
+   `Net::Async::WebSocket::Client` load it for every https request and wss
+   session but only recommend it, so a consumer that installed just this
+   distribution died with "Can't locate IO/Async/SSL.pm" on its first
+   request to a cluster. The minimum, 0.12, is the version `Net::Async::HTTP`
+   itself insists on.
+ - Require `Kubernetes::REST` 1.109. Failed Futures carry its
+   `Kubernetes::REST::APIError`, and `delete`'s `propagationPolicy` and
+   `discover` need what 1.109 added.
+ - Fix `list()` dropping `labelSelector` and `fieldSelector`. Both went to
+   `build_path`, which ignores them, so a filtered list resolved to every
+   object of the Kind. They are now sent as query parameters, as in
+   `Kubernetes::REST`; a list without selectors sends the same request as
+   before.
+ - Add `patch_status()` and `update_status()`, the Future counterparts of
+   `Kubernetes::REST`'s methods for the /status subresource. Once a resource
+   has that subresource, the API server discards status on every write to
+   the main endpoint and still answers 2xx. `patch_status` takes the same
+   call forms as `patch()` but defaults to a merge patch, since custom
+   resources reject a strategic one; `update_status` PUTs the whole object,
+   like `update()`.
+ - Add `ensure()`, `ensure_all()` and `ensure_only()`, the idempotent
+   create-or-update of `Kubernetes::REST` as Future chains. `ensure` creates
+   what is missing and updates what exists at its current resourceVersion,
+   retrying a conflict once; an existing core v1 PersistentVolumeClaim and a
+   running or succeeded batch/v1 Job are left alone, a failed one is
+   replaced, and a custom resource reusing either Kind name is updated like
+   any other object. An object that appears between the GET and the POST
+   (409 AlreadyExists) is handled the same way, so a Job is never PUT onto
+   its immutable Pod template. `ensure_all` applies its objects strictly one
+   after another. `ensure_only` then deletes every object with the given
+   label that it was not handed, matching by Kind, so a kinds entry written
+   as group/version/Kind does not delete the objects just applied. A kinds
+   entry it cannot list in a namespace, or a stale object it cannot delete,
+   is skipped with a warning naming the Kind, namespace, name and reason; a
+   404 on either stays silent, and the Future still resolves to the applied
+   objects. A hashref's `apiVersion` selects the class, so an
+   `autoscaling/v1` HorizontalPodAutoscaler is applied as v1 rather than as
+   the v2 the bare Kind maps to; an `apiVersion` no class serves croaks
+   before any request, naming the Kind and the version. A hashref resolved
+   to a single-segment class of your own (`'+Gizmo'` in the resource_map)
+   is built as that class, not as whatever the Kind name `Gizmo` maps to.
+   `ensure_only` matches by each object's own API group and `kind`, so
+   neither objects that share a class name but not a Kind nor the same Kind
+   in two groups (Istio's and the Gateway API's Gateway) shield each other
+   from the prune.
+ - Fix a bare unknown Kind (`$kube->get('Bogus', ...)`) dying synchronously
+   with "Can't locate IO/K8s/Bogus.pm". `Kubernetes::REST` resolves such a
+   name to a fabricated `IO::K8s::Bogus` rather than undef, so it slipped
+   past the unknown-resource guard. `list`, `get`, `delete`, `patch`,
+   `patch_status`, `log`, `port_forward`, `exec`, `attach` and the cp
+   helpers now fail their Future with the same "unknown resource" message
+   as a qualified name; `expand_class`, `watcher` and `ensure` croak with
+   it. A name that resolves to a class which does not load or compile (a
+   typo in a `+Class` resource_map entry), or to an IO::K8s helper that is
+   no resource class (a bare `List`, `Resource`, `Types` or
+   `Unstructured`), no longer dies in `build_path` either: the same methods
+   report the load error or "not a Kubernetes resource class" instead of
+   "unknown resource". `expand_class` therefore now loads the class it
+   returns.
+ - `Net::Async::Kubernetes::Controller`'s `patch_status` and `update_status`
+   now go through the client's methods of the same name instead of building
+   their own requests. Signature, the merge default and failed Futures for
+   bad input are unchanged; server-error messages now name the operation as
+   `patch_status`/`update_status`. A bare unknown Kind, and the object form
+   without `status` for a class that has no `status` attribute, now fail the
+   Future instead of dying. The SYNOPSIS showed a call form that never
+   worked and is fixed.
+ - Fix `Net::Async::Kubernetes::Watcher` retrying a failed watch request
+   silently, every second, forever. A request that fails (IO::Async::SSL
+   missing, a TLS or connection error, an unreachable API server) or that
+   the API server rejects (401, 403, 5xx) is now reported to `on_error` as
+   a Status hashref with `reason` `WatchFailed`, the HTTP status in `code`
+   (0 when no response arrived), the cause in `message` (a rejection as
+   `HTTP 403 Forbidden: <message of the answer>`) and the next delay in
+   `details.retryAfterSeconds`; without an `on_error` it is warned
+   about. So is a watch stream that ends badly, which used to reconnect at
+   once, in a tight loop against the API server: one that closes within
+   the new `min_watch_duration` (1s, client-go's threshold for the same
+   case) without delivering an event, or right after an ERROR event other
+   than 410 Gone (`code` is then that event's). Reconnects back off
+   exponentially from `reconnect_delay` (1s) to `max_reconnect_delay`
+   (30s) and start over once an event arrives or a watch cycle runs its
+   course; an ERROR event does not count. Each delay is shortened at
+   random by up to the new `reconnect_jitter` (default 0.2, 0 for exact
+   delays), so watchers that fail together do not reconnect together;
+   `retryAfterSeconds` is the delay actually waited. The new `max_retries`
+   (default: unlimited) stops the watcher after that many consecutive
+   failed retries and says so. `stop()` also cancels a pending reconnect,
+   and `start()` during one no longer opens a second watch. A controller's
+   `on_watch_error` receives these reports as well. ERROR events are still
+   dispatched as before, and 410 Gone still reconnects at once without a
+   resourceVersion.
+ - Fix the streaming transport behind `log()` with `on_line` and behind the
+   watcher failing its Future at the end of every stream ("Can't call
+   method "code""): a streamed log failed after its last line, and a watch
+   cycle ending at its server-side timeout was taken for a connection
+   error and reconnected a second late. An error response is no longer
+   streamed either: its body reached `on_line` as a log line (and the
+   watcher as a bogus event) and now ends up in the failure message.
+ - Fix the object forms dying synchronously on an object that is no
+   resource. `create`, `update`, `update_status`, `patch`, `patch_status`,
+   `delete` and `ensure` handed the object's class straight to
+   `build_path`, so an `IO::K8s::List`, a nested type such as a `PodSpec`,
+   or a value that is no IO::K8s object at all died there, or in the
+   metadata lookup before it, with an unrelated message. Each now reports
+   "not a Kubernetes resource class" (or "requires an IO::K8s object") the
+   way it reports its other bad arguments, before any request is sent: a
+   failed Future from `create`, `delete`, `patch` and `patch_status`, a
+   croak from `update`, `update_status` and `ensure`. The controller's
+   `update_status` fails its Future for such an object instead of dying.
+ - Fix every request for a custom resource that resolves to
+   `IO::K8s::Unstructured` dying synchronously with "IO::K8s::Unstructured
+   needs a Kind to build a path". With `resource_map_from_cluster`, a Kind
+   the cluster's discovery lists but no class serves resolves to
+   `IO::K8s::Unstructured`; its Kind and apiVersion now reach `build_path`
+   wherever the client builds a path - `list`, `get`, `create`, `update`,
+   `update_status`, `patch`, `patch_status`, `delete`, `ensure`,
+   `ensure_only`, `log`, `port_forward`, `exec`, `attach` and the watcher -
+   taken from the name (a qualified `group/version/Kind` stays in its own
+   group and version) or from the `IO::K8s::Unstructured` object. `ensure`
+   and `ensure_only` apply their Job, PersistentVolumeClaim and prune rules
+   to such objects by their `kind` and `apiVersion`.
+ - Fix answers inflating as the wrong class when a resource resolves to a
+   single-segment class of your own (`'+Gizmo'` in the resource_map). With
+   `Kubernetes::REST` 1.108, `list`, `get`, `create`, `update`,
+   `update_status`, `patch`, `patch_status`, `ensure`, `ensure_only` and the
+   watcher handed the resolved name `Gizmo` back to it, which read it as the
+   Kind `Gizmo`: the answer died, list items were dropped, or everything
+   inflated as whatever class the resource map gives that Kind - and
+   `ensure_only` took its own objects for strangers and deleted them in that
+   other group. The client now hands over the resolved class exactly,
+   whichever Kubernetes::REST version is installed.
+ - Fix requests for `IO::K8s::Unstructured` that have no path dying
+   synchronously in Future-returning methods: without
+   `resource_map_from_cluster`, for the explicit class name
+   `IO::K8s::Unstructured`, and for an Unstructured object without `kind`,
+   `build_path` croaked straight out of the call. `list`, `get`, `create`,
+   `patch`, `patch_status`, `delete`, `log`, `port_forward`, `exec`,
+   `attach` and the cp helpers now fail their Future with the reason;
+   `update`, `update_status`, `ensure` and the watcher croak with it, as
+   with their other bad arguments, now from the caller's line.
+ - Fix a qualified `group/version/Kind` name, or an `IO::K8s::Unstructured`
+   object or manifest whose `apiVersion` the cluster does not serve,
+   reaching another group that serves a Kind of the same name. With
+   `resource_map_from_cluster` and `Kubernetes::REST` 1.108,
+   `example.org/v1/Widget` resolved through discovery to whichever group
+   served a `Widget`, and `list`, `get`, `patch`, `delete`, `log`, the
+   duplex methods, `ensure`, `ensure_only`'s prune and the watcher went
+   there. The name is now an unknown resource and the object or manifest is
+   refused before any request, as with Kubernetes::REST 1.109: a failed
+   Future, a croak from `expand_class`, `update`, `update_status`, `ensure`
+   and the watcher, a warning from `ensure_only`.
+ - Fix a reference in place of a resource name - typically a manifest
+   hashref handed to `patch` or `patch_status` - failing with "resource
+   'HASH(0x...)' resolves to class IO::K8s::HASH(0x...), which cannot be
+   loaded". Every method that takes a resource name now refuses it as
+   "resource name must be a string, got a HASH reference", the way it
+   reports its other bad arguments.
+ - Add `propagationPolicy` to `delete()`, in every call form
+   (`delete($object, propagationPolicy => 'Background')`, `delete('Job',
+   'nightly', namespace => 'ns', propagationPolicy => 'Foreground')`,
+   `delete('Job', name => 'nightly', ...)`), sent as a query parameter:
+   `Background` and `Foreground` delete what the object owns, `Orphan` keeps
+   it; without it the API server's default applies, which for a Job orphans
+   its Pods. Any other value, and any option `delete` does not know, fails
+   the Future before a request is sent, so a misspelt option no longer goes
+   unnoticed; the messages are worded as in `Kubernetes::REST`
+   (`Unknown propagationPolicy 'x' for delete() (use: Background,
+   Foreground, Orphan)`, `Unknown argument 'x' to delete() (allowed: ...)`).
+   The object form, which ignored every extra argument, now takes only
+   `propagationPolicy`. `ensure_only` prunes with `Background` unless its
+   new `propagationPolicy` option says otherwise (an unknown value croaks,
+   worded the same way), and `ensure` deletes a failed Job with
+   `Background` before recreating it.
+ - Fail Futures for a refusal of the API server (status 400 and up) the way
+   Future's convention has it: `->fail($error, 'http', $response)`. `$error`
+   is exactly what `Kubernetes::REST`'s `check_response` throws, a
+   `Kubernetes::REST::APIError` that stringifies to the message as before,
+   and `$response` is the `Kubernetes::REST::HTTPResponse`, so a 404 or a
+   409 can be told apart by `$response->status` instead of by parsing the
+   message, e.g. with `->catch(http => sub { ... })`. This holds for every
+   request method, a streamed `log()`, `ensure` and `ensure_all`; the
+   watcher still reports to `on_error`.
+ - Fix the constructor swallowing why a `context` given without `kubeconfig`
+   could not be used: a context missing from the default kubeconfig, or no
+   kubeconfig at all outside a cluster, was ignored and surfaced as "server
+   or kubeconfig required" on the first request. The constructor now croaks
+   with the reason (`Context not found: ...`), as it does for an explicit
+   `kubeconfig`; without a context, a failed auto-detection stays silent as
+   before.
+ - Add the `with` constructor option: IO::K8s resource-map providers (CRD
+   bundles such as `IO::K8s::GatewayAPI`), passed on to `Kubernetes::REST`,
+   so their Kinds resolve to typed classes in names, lists, watches and
+   `new_object`.
+ - Add `discover()`, which reads the cluster's discovery documents
+   (`GET /api`, `GET /apis`) through the client's own asynchronous
+   transport and hands them to `Kubernetes::REST`, so names and the
+   resource map resolve without a request of its own. With
+   `resource_map_from_cluster`, `Kubernetes::REST` otherwise reads them on
+   first use through its synchronous HTTP backend, blocking the loop; await
+   `discover` once at start-up to avoid that. An error status fails the
+   Future with category `http` and the response; legacy discovery
+   (Kubernetes before 1.27) is left to the synchronous read on first use;
+   without `resource_map_from_cluster` nothing is sent.
+ - Refuse an option `list`, `get`, `log`, `patch`, `patch_status`,
+   `port_forward`, `exec`, `attach`, `cp_to_pod`, `cp_from_pod`,
+   `ensure_only` or `Net::Async::Kubernetes::Controller`'s `patch_status`
+   does not take, instead of dropping it silently: a misspelt
+   `labelselector` listed every object, `tail_lines` fetched the whole log,
+   `namespace` for `namespaces` made `ensure_only` prune at cluster scope
+   only, a misspelt `container` ran an exec in the pod's default container,
+   a stray `subresource` landed in the exec, attach or port-forward path,
+   and the controller sent a merge patch for `typ => 'json'`. The message
+   names the first such option and those the method takes, as
+   `Kubernetes::REST` words it (`Unknown argument 'tail_lines' to log()
+   (allowed: ...)`); `ensure_only` croaks, the others fail their Future,
+   before any request. `list` takes only `namespace`, `labelSelector` and
+   `fieldSelector`, the object forms of `patch` and `patch_status` only
+   `patch` and `type`, and that of the controller's `patch_status` only
+   `status` and `type`.
+ - Refuse an odd list of options in `get`, `list`, `patch`, `patch_status`,
+   `ensure_only`, `watcher`, `controller` and
+   `Net::Async::Kubernetes::Controller`'s `patch_status` and
+   `watch_resource`, as `delete` and the keyed class forms already did.
+   Perl only warned "Odd number of elements in hash assignment" and the
+   call went on with the stray key's value undef: `get('Pod', 'web',
+   namespace => 'default', 'namespace')` fetched the Pod at cluster scope,
+   a trailing `'type'` patched with the default type, a lone `'status'`
+   after an object made the controller patch the object's own status,
+   `list('Pod', 'namespace')` listed every namespace, a trailing
+   `'objects'` left `ensure_only` pruning everything carrying its label,
+   and a trailing `'namespace'` made a watch cover the whole cluster. The
+   message is `Invalid arguments to METHOD()`, before any request;
+   `ensure_only`, `watcher`, `controller` and `watch_resource` croak, the
+   others fail their Future. A lone argument after the Kind is still the
+   name in `get`, even one spelled like an option.
+ - Refuse a reference in the name position of `get()` and `delete()`.
+   `get('Pod', $obj)` and `delete('Pod', {name => 'web'})` took the reference
+   as the resource name and stringified it straight into the request path
+   (`GET /api/v1/pods/IO::K8s::...=HASH(0x...)`), so the mistake surfaced only
+   as the server's 404. Both now fail the Future before any request with
+   `resource name must be a string, got a HASH reference` (a blessed object:
+   `got an object of class ...`), the same wording already used for a
+   reference in the class-name position (`patch($manifest, ...)`); the other
+   name-taking methods (`log`, `patch`, the duplex methods) already rejected
+   such input before a request. A string name, the object forms, and every
+   other call are unchanged.
+
 0.008     2026-09-22 04:13:56Z
  - Add public `rest` and `new_object($kind, %fields)` on the client: the
    underlying `Kubernetes::REST` instance and a typed `IO::K8s` object for

@@ -4,6 +4,8 @@ use Test::More;
 
 use YAML::PP;
 use Rex::Rancher::Agent;
+use Rex::Rancher::Server;
+use Rex::Rancher::Distribution;
 
 # The agent config.yaml builder: same keys on rke2 and k3s, node-label shaped
 # like the server's. Pure, no file I/O; nothing here says the node joins.
@@ -25,7 +27,8 @@ is_deeply(cfg(%join, node_labels => 'role=gpu')->{'node-label'}, ['role=gpu'],
 is_deeply(cfg(%join)->{'node-label'}, undef, 'no node_labels: no node-label key');
 
 # Same key as the server writes.
-my $server = Rex::Rancher::Server::_build_server_config('rke2', 't', undef, undef, ['role=gpu'], 1);
+my $server = Rex::Rancher::Server::_build_server_config(
+  Rex::Rancher::Distribution->new_for('rke2'), 't', undef, undef, ['role=gpu'], 1);
 is_deeply(cfg(%join, node_labels => ['role=gpu'])->{'node-label'}, $server->{'node-label'},
   'node-label matches the server config');
 

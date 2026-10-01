@@ -13,22 +13,22 @@
 # directory exists at this tag -- see lib/IO/K8s/AgentSandbox.pm and
 # maint/crd-drift-exceptions.yaml's ignore_unrendered for that track).
 #
-# `PodTemplate`/`PersistentVolumeClaimTemplate` are agent-sandbox's own
-# structs embedded via the shared, inlined `SandboxBlueprint` (both Sandbox
-# and SandboxTemplate's spec embed it), so one name covers both Kinds --
-# same for `PodMetadata` and `EmbeddedObjectMetadata`. `PodTemplate.Spec` is
-# a literal `corev1.PodSpec` field, but the CRD schema is one field short of
-# what Core::V1::PodSpec ships (`evictionResponders`, added upstream after
-# agent-sandbox's vendored client-go snapshot), so reuse_core correctly
-# declines and it renders as a nested class -- named `PodSpec` after its
-# real Go type all the same, and its own single-key sub-structs
-# (`os`/`readinessGates`/`schedulingGates`/`schedulingGroup`/
-# `imagePullSecrets` items) are named after THEIR real corev1 Go types too
-# (`PodOS`, `PodReadinessGate`, `PodSchedulingGate`, `PodSchedulingGroup`,
-# `LocalObjectReference`) even though a single-key shape is never
-# auto-reused (see lib/IO/K8s/AutoGen.pm) -- same precedent as
-# GatewayAPI/CertManager naming their own single-key `LocalObjectReference`
-# occurrences after the real type instead of the emitter's joined default.
+# `podTemplate` and `volumeClaimTemplates` were once rendered as agent-sandbox's
+# own nested structs (embedded via the shared, inlined `SandboxBlueprint` that
+# both Sandbox and SandboxTemplate's spec embed), but since k156 -- the
+# recursive reuse filter now runs AHEAD of the D5 tie-break, see
+# lib/IO/K8s/AutoGen.pm -- their {metadata,spec} shapes resolve to core:
+# `podTemplate` reuses Core::V1::PodTemplateSpec (whose spec is the superset
+# Core::V1::PodSpec; the CRD is one field short of it, `evictionResponders`,
+# which the reused class simply leaves unset) and each `volumeClaimTemplates`
+# item reuses Core::V1::PersistentVolumeClaimTemplate. The emitter no longer
+# renders PodTemplate/PodSpec, that spec's single-key sub-structs
+# (PodOS/PodReadinessGate/PodSchedulingGate/PodSchedulingGroup/
+# LocalObjectReference), PersistentVolumeClaimTemplate or EmbeddedObjectMetadata
+# for these paths, so no `names` entries remain for them; the once-shipped
+# classes are kept (maint/crd-drift-exceptions.yaml ignore_unrendered) rather
+# than removed. `PodMetadata` is still rendered -- SandboxClaim's
+# `additionalPodMetadata` embeds it standalone (named below).
 #
 # `SandboxClaim`'s own `Lifecycle` (sandboxclaim_types.go) is a distinct Go
 # struct from `Sandbox`'s `Lifecycle` (sandbox_types.go, inlined flat into
@@ -46,17 +46,7 @@ base: IO::K8s::AgentSandbox
 kinds:
   Sandbox:
     extra: []
-    names:
-      Spec::PodTemplate: PodTemplate
-      Spec::PodTemplate::Metadata: PodMetadata
-      Spec::PodTemplate::Spec: PodSpec
-      Spec::PodTemplate::Spec::ImagePullSecretsItem: LocalObjectReference
-      Spec::PodTemplate::Spec::Os: PodOS
-      Spec::PodTemplate::Spec::ReadinessGatesItem: PodReadinessGate
-      Spec::PodTemplate::Spec::SchedulingGatesItem: PodSchedulingGate
-      Spec::PodTemplate::Spec::SchedulingGroup: PodSchedulingGroup
-      Spec::VolumeClaimTemplatesItem: PersistentVolumeClaimTemplate
-      Spec::VolumeClaimTemplatesItem::Metadata: EmbeddedObjectMetadata
+    names: {}
     with:
     - IO::K8s::Role::Namespaced
   SandboxClaim:
@@ -65,8 +55,6 @@ kinds:
       Spec::AdditionalPodMetadata: PodMetadata
       Spec::EnvItem: EnvVar
       Spec::Lifecycle: Lifecycle
-      Spec::VolumeClaimTemplatesItem: PersistentVolumeClaimTemplate
-      Spec::VolumeClaimTemplatesItem::Metadata: EmbeddedObjectMetadata
       Spec::WarmPoolRef: SandboxWarmPoolRef
     with:
     - IO::K8s::Role::Namespaced
@@ -74,16 +62,6 @@ kinds:
     extra: []
     names:
       Spec::NetworkPolicy: NetworkPolicySpec
-      Spec::PodTemplate: PodTemplate
-      Spec::PodTemplate::Metadata: PodMetadata
-      Spec::PodTemplate::Spec: PodSpec
-      Spec::PodTemplate::Spec::ImagePullSecretsItem: LocalObjectReference
-      Spec::PodTemplate::Spec::Os: PodOS
-      Spec::PodTemplate::Spec::ReadinessGatesItem: PodReadinessGate
-      Spec::PodTemplate::Spec::SchedulingGatesItem: PodSchedulingGate
-      Spec::PodTemplate::Spec::SchedulingGroup: PodSchedulingGroup
-      Spec::VolumeClaimTemplatesItem: PersistentVolumeClaimTemplate
-      Spec::VolumeClaimTemplatesItem::Metadata: EmbeddedObjectMetadata
     with:
     - IO::K8s::Role::Namespaced
   SandboxWarmPool:

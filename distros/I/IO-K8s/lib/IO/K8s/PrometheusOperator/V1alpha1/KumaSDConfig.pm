@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::KumaSDConfig;
 # ABSTRACT: KumaSDConfig allow retrieving scrape targets from Kuma's control plane.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s authorization        => '+IO::K8s::PrometheusOperator::V1alpha1::SafeAuthorization';
@@ -11,7 +11,7 @@ k8s fetchTimeout         => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([
 k8s followRedirects      => Bool;
 k8s noProxy              => Str;
 k8s oauth2               => '+IO::K8s::PrometheusOperator::V1alpha1::OAuth2';
-k8s proxyConnectHeader   => { Str => 1 };
+k8s proxyConnectHeader   => Opaque;
 k8s proxyFromEnvironment => Bool;
 k8s proxyUrl             => Str, { pattern => qr/^(http|https|socks5):\/\/.+$/ };
 k8s refreshInterval      => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$/ };
@@ -46,7 +46,7 @@ IO::K8s::PrometheusOperator::V1alpha1::KumaSDConfig - KumaSDConfig allow retriev
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 authorization
 

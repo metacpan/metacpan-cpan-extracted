@@ -248,7 +248,10 @@ subtest 'the activity log falls through to the git identity' => sub {
 };
 
 subtest 'foundation does not treat an empty claim as an engaged card' => sub {
-  my ( undef, $repo ) = board_with( card( claimed_by => q{""} ) );
+  # In todo, not the backlog card() writes: backlog is held back and never
+  # actionable (ticket k306), and this is about the empty claim, not the column.
+  ( my $content = card( claimed_by => q{""} ) ) =~ s/^status: backlog$/status: todo/m;
+  my ( undef, $repo ) = board_with($content);
   my $foundation = App::karr::Foundation->new;
   my %states     = $foundation->_task_states($repo);
 

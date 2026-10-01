@@ -26,8 +26,10 @@ use Data::Deque::Shared;
 #   40:  uint64_t ctl_off
 #   48:  uint8_t  _pad0[16]
 #   64:  uint64_t cursor       ((head<<32)|tail)
+#   72:  uint32_t waiters_push
 my $CTL_OFF_AT    = 40;
 my $CURSOR_OFF_AT = 64;
+my $WAITERS_PUSH_AT = 72;
 
 # Slot ctl word: (generation << 2) | state
 # states: EMPTY=0 WRITING=1 FILLED=2 READING=3
@@ -70,6 +72,15 @@ sub poke_cursor_tail {
     sysseek $fh, $CURSOR_OFF_AT, 0 or die "seek cursor write: $!";
     syswrite $fh, pack('Q<', $new_cursor), 8;
     close $fh;
+}
+
+sub waiters_push {
+    my ($path) = @_;
+    open my $fh, '<:raw', $path or die "open $path: $!";
+    sysseek $fh, $WAITERS_PUSH_AT, 0 or die "seek waiters: $!";
+    my $buf;
+    sysread $fh, $buf, 4;
+    return unpack 'L<', $buf;
 }
 
 # --- Scenario B: stuck WRITING (publish window) ---------------------
@@ -162,11 +173,12 @@ sub poke_cursor_tail {
         POSIX::_exit(($ok && $dt < 5.0) ? 0 : 1);
     }
 
-    select(undef, undef, undef, 0.1);  # let child enter push_back_wait
+    # A pop that starts before the child parks frees room for its push.
+    my $until = time + 10;
+    select(undef, undef, undef, 0.01) until waiters_push($path) || time > $until;
     my $t0 = time;
     my $val = $dq->pop_front;
     my $dt = time - $t0;
-    is $val, undef, 'C: pop_front returned undef (abandoned write discarded)';
     cmp_ok $dt, '>=', 1.5, "C: pop_front waited ~2s before recovery (got ${dt}s)";
 
     waitpid $pid, 0;
@@ -174,7 +186,10 @@ sub poke_cursor_tail {
 
     my $st = $dq->stats;
     cmp_ok $st->{recoveries}, '>=', 1, 'C: stat_recoveries incremented on pop recovery';
-    is $dq->pop_front, 456, 'C: pushed item readable from deque';
+    # The woken pusher can still land before the recovering pop re-reads the
+    # cursor, so 456 may come from either pop; the abandoned 123 never does.
+    my @got = grep { defined } $val, $dq->pop_front;
+    is_deeply \@got, [456], 'C: abandoned write discarded, pushed item popped once';
 
     unlink $path;
 }

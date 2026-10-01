@@ -156,7 +156,8 @@ subtest 'KARR_CLAIM defaults create and edit' => sub {
 
 subtest 'pick no longer requires --claim when KARR_CLAIM is set' => sub {
     my $repo = _named_repo('board');
-    _run_karr( $repo, 'create', 'Pick me' );
+    # --status todo: pick never takes a backlog card (ticket k306).
+    _run_karr( $repo, 'create', 'Pick me', '--status', 'todo' );
     {
         local $ENV{KARR_CLAIM} = 'env-agent';
         my $rv = _run_karr( $repo, 'pick', '--move', 'in-progress' );

@@ -40,7 +40,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Fcntl" : "0",
             "File::HomeDir" : "0",
+            "Getopt::Long" : "0",
             "IPC::System::Simple" : "0",
             "Params::Get" : "0.17",
             "Path::Tiny" : "0.034",
@@ -48,7 +51,7 @@
             "Text::Diff" : "0",
             "YAML::Tiny" : "0",
             "autodie" : "0",
-            "perl" : "5.014"
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -60,6 +63,7 @@
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0.13",
             "Test::Most" : "0",
+            "Test::Permissions" : "0",
             "Test::Returns" : "0.04",
             "Test::Without::Module" : "0"
          }
@@ -78,6 +82,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-makefilepl2cpanfile"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

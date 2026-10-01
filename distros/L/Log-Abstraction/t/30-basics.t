@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::Most;
+use Data::Dumper;
 use File::Temp qw/tempfile/;
 use Sys::Syslog qw(:standard :macros);
 
@@ -97,8 +98,8 @@ like($log_lines[1], qr/File info message/, 'Logged correct info message to file 
 my @code_log;
 $logger = Log::Abstraction->new(logger => sub { push @code_log, @_ }, level => 'debug');
 
-$logger->debug('Code debug message');
-$logger->info('Code info message');
+$logger->debug('Code debug message'); my $debug_line = __LINE__;
+$logger->info('Code info message'); my $info_line = __LINE__;
 
 diag(Data::Dumper->new([\@code_log])->Dump()) if($ENV{'TEST_VERBOSE'});
 
@@ -117,13 +118,13 @@ is_deeply(
 		{
 			class => 'Log::Abstraction',
 			file => 't/30-basics.t',
-			line => 100,	# Adjust line number if needed
+			line => $debug_line,
 			level => 'debug',
 			message => ['Code debug message']
 		}, {
 			class => 'Log::Abstraction',
 			file => 't/30-basics.t',
-			line => 101,	# Adjust line number if needed
+			line => $info_line,
 			level => 'info',
 			message => ['Code info message']
 		}

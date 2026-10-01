@@ -17,6 +17,7 @@
 #ifndef DD_H
 #define DD_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +47,7 @@
 
 #define DD_MAGIC        0x4B534444  /* DDSketch */
 #define DD_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
-#define DD_ERR_BUFLEN   256
+#define DD_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef DD_READER_SLOTS
 #define DD_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -199,23 +200,6 @@ static inline int dd_pid_alive(uint32_t pid) {
     return !dd_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
- * CAS to OUR pid to hold the lock while fixing shared state, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
- * process can detect and re-recover if we crash mid-recovery. */
-static inline void dd_recover_stale_lock(DdHandle *h, uint32_t observed_wlock) {
-    DdHeader *hdr = h->hdr;
-    uint32_t mypid = DD_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
-            mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-        return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-}
-
 static const struct timespec dd_lock_timeout = { DD_LOCK_TIMEOUT_SEC, 0 };
 
 /* Process-global fork-generation counter.  Incremented in the pthread_atfork
@@ -293,6 +277,85 @@ static inline void dd_claim_reader_slot(DdHandle *h) {
     /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
      * slotless path (lock still works; recovery of THIS reader's death is the
      * documented slotless limitation). */
+}
+
+/* Wait until no live reader holds the lock; the caller owns wlock, so no NEW
+ * reader can join (they see wlock!=0 and yield).  The SEQ_CST wlock CAS + the
+ * SEQ_CST rdepth loads below are the writer side of the Dekker handshake. */
+static inline void dd_rwlock_drain(DdHandle *h) {
+    DdHeader *hdr = h->hdr;
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(DD_OCC_WORDS + live readers)
+         * instead of O(DD_READER_SLOTS). */
+        for (uint32_t w = 0; w < DD_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!dd_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &dd_lock_timeout, NULL, 0);
+    }
+}
+
+/* 1 if this process holds a read lock on the segment (through any handle).  Such a
+ * lock predates the current wlock holder, whose drain could then never have
+ * finished: it died before mutating anything. */
+static int dd_self_reading(DdHandle *h) {
+    if (h->slotless_held) return 1;
+    uint32_t me = (uint32_t)getpid();
+    for (uint32_t i = 0; i < DD_READER_SLOTS; i++)
+        if (__atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE) == me &&
+            __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_ACQUIRE) != 0)
+            return 1;
+    return 0;
+}
+
+static void dd_repair_locked(DdHandle *h);
+
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
+ * CAS to OUR pid to hold the lock while repairing shared state, then release.
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void dd_recover_stale_lock(DdHandle *h, uint32_t observed_wlock) {
+    DdHeader *hdr = h->hdr;
+    uint32_t mypid = DD_RWLOCK_WR((uint32_t)getpid());
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
+            mypid, 0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+        return;
+    if (!dd_self_reading(h)) {
+        dd_rwlock_drain(h);
+        dd_repair_locked(h);
+    }
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
@@ -443,48 +506,8 @@ static inline void dd_rwlock_wrlock(DdHandle *h) {
         dd_unpark(h);
         spin = 0;
     }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
-    for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
-        int busy = 0;
-        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
-         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
-         * this scan, so no held slot is skipped).  O(DD_OCC_WORDS + live readers)
-         * instead of O(DD_READER_SLOTS). */
-        for (uint32_t w = 0; w < DD_OCC_WORDS; w++) {
-            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
-            while (word) {
-                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
-                word &= word - 1;                          /* consume this bit (local copy) */
-                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
-                if (rd == 0) continue;                      /* occupied but not read-locking now */
-                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
-                if (!dd_pid_alive(pid)) {
-                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
-                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
-                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
-                    uint32_t ep = pid;
-                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
-                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
-                    continue;
-                }
-                busy = 1;                                   /* live reader still holding */
-            }
-        }
-        /* A live slotless reader keeps us waiting; a crashed slotless reader that
-         * cannot be attributed to a pid is the documented slotless limitation. */
-        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
-            busy = 1;
-        if (!busy)
-            return;                                    /* exclusive: wlock held + every rdepth 0 */
-        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
-         * (which reclaims any newly-dead slotted reader). */
-        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &dd_lock_timeout, NULL, 0);
-    }
+    /* Phase 2: drain the readers that were already holding when we won the CAS. */
+    dd_rwlock_drain(h);
 }
 
 static inline void dd_rwlock_wrunlock(DdHandle *h) {
@@ -657,14 +680,36 @@ static int dd_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int dd_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int dd_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* Opt-in (DATA_DDSKETCH_SHARED_SPARSE=0): reserving commits memory this module otherwise fills lazily. */
+static int dd_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_DDSKETCH_SHARED_SPARSE");
+    if (!sp || strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static DdHandle *dd_create(const char *path, double alpha, uint64_t num_buckets, mode_t mode, char *errbuf) {
@@ -698,9 +743,18 @@ static DdHandle *dd_create(const char *path, double alpha, uint64_t num_buckets,
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             DD_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && dd_reserve(fd, total) < 0) {
+            DD_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { DD_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            DD_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!dd_validate_header((DdHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -710,9 +764,13 @@ static DdHandle *dd_create(const char *path, double alpha, uint64_t num_buckets,
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((DdHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && dd_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && dd_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         DD_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (dd_reserve(fd, total) < 0) {
+                        DD_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     dd_init_header(base, (uint32_t)num_buckets, alpha, total);
@@ -748,6 +806,10 @@ static DdHandle *dd_create_memfd(const char *name, double alpha, uint64_t num_bu
     if (ftruncate(fd, (off_t)total) < 0) {
         DD_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (dd_reserve(fd, total) < 0) {
+        DD_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { DD_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -760,6 +822,11 @@ static DdHandle *dd_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { DD_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(DdHeader)) { DD_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(DdHeader, magic)) != (ssize_t)sizeof magic || magic != DD_MAGIC) {
+        DD_ERR("invalid DDSketch table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { DD_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -814,6 +881,11 @@ static DdHandle *dd_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { DD_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(DdHeader)) { DD_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(DdHeader, magic)) != (ssize_t)sizeof magic || magic != DD_MAGIC) {
+        DD_ERR("%s: invalid DDSketch file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
@@ -874,17 +946,21 @@ static inline uint64_t dd_slot_of_key(DdHandle *h, int64_t key) {
 /* insert one finite value (caller holds the write lock; caller has rejected NaN/Inf) */
 static void dd_insert_locked(DdHandle *h, double v, uint64_t count) {
     DdHeader *hdr = h->hdr;
+    if (v == 0.0) {
+        hdr->zero_count += count;
+    } else if (h->num_buckets != 0) {                        /* Layer B: unusable mapping */
+        double mag = v > 0 ? v : -v;
+        int64_t key = (int64_t)ceil(log(mag) * h->inv_ln_gamma);
+        uint64_t slot = dd_slot_of_key(h, key);
+        uint64_t *store = (v > 0) ? dd_pos(h) : dd_neg(h);
+        store[slot] += count;
+    }
+    /* Quantiles walk the buckets up to total_count: a writer killed before it must add nothing. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     hdr->total_count += count;
     hdr->sum += v * (double)count;
     if (v < hdr->min_value) hdr->min_value = v;
     if (v > hdr->max_value) hdr->max_value = v;
-    if (v == 0.0) { hdr->zero_count += count; return; }
-    if (h->num_buckets == 0) return;                         /* Layer B: unusable mapping */
-    double mag = v > 0 ? v : -v;
-    int64_t key = (int64_t)ceil(log(mag) * h->inv_ln_gamma);
-    uint64_t slot = dd_slot_of_key(h, key);
-    uint64_t *store = (v > 0) ? dd_pos(h) : dd_neg(h);
-    store[slot] += count;
 }
 
 /* value at 0-based rank `rank` (typically q*(count-1)), walking buckets from
@@ -928,8 +1004,9 @@ static void dd_merge_locked(DdHandle *dst, const uint64_t *src_neg, const uint64
     if (nb > src_nb) nb = src_nb;                            /* Layer B: clamp to both buffers */
     uint64_t *neg = dd_neg(dst), *pos = dd_pos(dst);
     for (uint64_t i = 0; i < nb; i++) { neg[i] += src_neg[i]; pos[i] += src_pos[i]; }
-    dst->hdr->total_count += src_total;
     dst->hdr->zero_count  += src_zero;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    dst->hdr->total_count += src_total;
     dst->hdr->sum         += src_sum;
     if (src_min < dst->hdr->min_value) dst->hdr->min_value = src_min;
     if (src_max > dst->hdr->max_value) dst->hdr->max_value = src_max;
@@ -948,6 +1025,37 @@ static inline void dd_clear_locked(DdHandle *h) {
     hdr->sum         = 0.0;
     hdr->min_value   = INFINITY;
     hdr->max_value   = -INFINITY;
+}
+
+/* The buckets and zero_count are authoritative after a writer killed mid add,
+ * merge or clear: recount total_count from them.  When it disagrees, sum/min/max
+ * are re-estimated from the bucket representatives (total last, so a crash here
+ * is re-detected).  Idempotent. */
+static void dd_repair_locked(DdHandle *h) {
+    DdHeader *hdr = h->hdr;
+    uint64_t nb = h->num_buckets;
+    uint64_t nfit = dd_store_max(h, h->neg_off), pfit = dd_store_max(h, h->pos_off);
+    if (nb > nfit) nb = nfit;
+    if (nb > pfit) nb = pfit;
+    const uint64_t *neg = dd_neg(h), *pos = dd_pos(h);
+    uint64_t n = hdr->zero_count;
+    for (uint64_t i = 0; i < nb; i++) n += neg[i] + pos[i];
+    if (n == hdr->total_count && (n == 0 || hdr->min_value <= hdr->max_value)) {
+        if (n == 0) { hdr->sum = 0.0; hdr->min_value = INFINITY; hdr->max_value = -INFINITY; }
+        return;
+    }
+    double sum = 0.0, lo = INFINITY, hi = -INFINITY;
+    if (hdr->zero_count) lo = hi = 0.0;
+    for (uint64_t i = 0; i < nb; i++) {
+        double v = dd_value_of_key(h, (int64_t)i - (int64_t)h->bias);
+        if (neg[i]) { sum -= v * (double)neg[i]; if (-v < lo) lo = -v; if (-v > hi) hi = -v; }
+        if (pos[i]) { sum += v * (double)pos[i]; if (v < lo) lo = v; if (v > hi) hi = v; }
+    }
+    hdr->sum = sum;
+    hdr->min_value = lo;
+    hdr->max_value = hi;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->total_count = n;
 }
 
 #endif /* DD_H */

@@ -1,7 +1,7 @@
 # ABSTRACT: Normalize MooX::Options option-parse errors to exit code 2 (ADR 0002)
 
 package App::karr::Role::ExitCodes;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo::Role;
 # Both loaded without importing, and every call below is qualified: a Moo::Role
 # composes every sub in its package into its consumers, imported ones included
@@ -451,7 +451,7 @@ App::karr::Role::ExitCodes - Normalize MooX::Options option-parse errors to exit
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 DESCRIPTION
 

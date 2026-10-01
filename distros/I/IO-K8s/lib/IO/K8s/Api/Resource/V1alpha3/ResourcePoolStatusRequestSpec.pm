@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequestSpec;
 # ABSTRACT: ResourcePoolStatusRequestSpec defines the filters for the pool status request.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s defaultPartitionTypeAttribute => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequestSpec - ResourcePoolSt
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 defaultPartitionTypeAttribute
 

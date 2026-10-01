@@ -1,12 +1,12 @@
 package IO::K8s::Api::Resource::V1beta2::AllocatedDeviceStatus;
 # ABSTRACT: AllocatedDeviceStatus contains the status of an allocated device, if the driver chooses to report it. This may include driver-specific information.  The combination of Driver, Pool, Device, and ShareID must match the corresponding key in Status.Allocation.Devices.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
 
 
-k8s data => { Str => 1 };
+k8s data => Opaque;
 
 
 k8s device => Str, 'required';
@@ -38,7 +38,7 @@ IO::K8s::Api::Resource::V1beta2::AllocatedDeviceStatus - AllocatedDeviceStatus c
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 conditions
 

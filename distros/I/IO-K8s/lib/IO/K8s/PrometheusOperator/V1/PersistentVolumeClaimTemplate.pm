@@ -1,9 +1,9 @@
 package IO::K8s::PrometheusOperator::V1::PersistentVolumeClaimTemplate;
 # ABSTRACT: Will be used to create a stand-alone PVC to provision the volume.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
-k8s metadata => { Str => 1 };
+k8s metadata => Opaque;
 k8s spec     => 'Core::V1::PersistentVolumeClaimSpec', { required => 'schema' };
 
 
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::PersistentVolumeClaimTemplate - Will be used to
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 metadata
 

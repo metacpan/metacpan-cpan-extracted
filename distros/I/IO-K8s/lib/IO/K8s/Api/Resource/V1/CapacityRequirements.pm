@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::CapacityRequirements;
 # ABSTRACT: CapacityRequirements defines the capacity requirements for a specific device request.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s requests => { Quantity => 1 };
@@ -20,11 +20,11 @@ IO::K8s::Api::Resource::V1::CapacityRequirements - CapacityRequirements defines 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 requests
 
-Requests represent individual device resource requests for distinct resources, all of which must be provided by the device. This value is used as an additional filtering condition against the available capacity on the device. This is semantically equivalent to a CEL selector with C<device.capacity[<domain>].<name>.compareTo(quantity(<request>)) E<gt>= 0>.
+Requests represent individual device resource requests for distinct resources, all of which must be provided by the device. This value is used as an additional filtering condition against the available capacity on the device. This is semantically equivalent to a CEL selector with C<< device.capacity[<domain>].<name>.compareTo(quantity(<request>)) >= 0 >>.
 
 When a requestPolicy is defined, the requested amount is adjusted upward to the nearest valid value based on the policy. If the requested amount cannot be adjusted to a valid value because it exceeds what the requestPolicy allows, the device is considered ineligible for allocation.
 

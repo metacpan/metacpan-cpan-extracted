@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::EncodedCharacters;
 # ABSTRACT: EncodedCharacters configures which encoded characters are allowed in the request path.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s allowEncodedBackSlash     => Bool;
@@ -32,7 +32,7 @@ IO::K8s::Traefik::V1alpha1::EncodedCharacters - EncodedCharacters configures whi
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allowEncodedBackSlash
 

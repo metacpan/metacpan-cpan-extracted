@@ -331,7 +331,7 @@ subtest 'the built-in-map fallback names the load failure once, not twice (k29)'
 
     is scalar @warnings, 1, 'exactly one warning for the whole fallback';
     like $warnings[0],
-        qr/^Falling back to the built-in resource map: Could not load resource map from cluster: discovery GET \/api failed: 404/,
+        qr/^Falling back to the built-in resource map: Could not load resource map from cluster: Kubernetes API error \(discovery GET \/api\): 404 /,
         'the outer wrapper names its own failure, with the inner one riding along once';
     my $repeats = () = $warnings[0] =~ /Could not load resource map from cluster/g;
     is $repeats, 1, 'and the phrase is not doubled';

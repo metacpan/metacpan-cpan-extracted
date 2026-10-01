@@ -532,8 +532,8 @@ subtest 'SandboxTemplate volumeClaimTemplates as typed PersistentVolumeClaimTemp
     );
 
     is(ref $tmpl->spec->volumeClaimTemplates, 'ARRAY', 'volumeClaimTemplates is an array');
-    isa_ok($tmpl->spec->volumeClaimTemplates->[0], 'IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate');
-    isa_ok($tmpl->spec->volumeClaimTemplates->[0]->metadata, 'IO::K8s::AgentSandbox::V1beta1::EmbeddedObjectMetadata');
+    isa_ok($tmpl->spec->volumeClaimTemplates->[0], 'IO::K8s::Api::Core::V1::PersistentVolumeClaimTemplate');
+    isa_ok($tmpl->spec->volumeClaimTemplates->[0]->metadata, 'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta');
     is($tmpl->spec->volumeClaimTemplates->[0]->metadata->name, 'data', 'volumeClaimTemplates[0].metadata.name');
     isa_ok($tmpl->spec->volumeClaimTemplates->[0]->spec, 'IO::K8s::Api::Core::V1::PersistentVolumeClaimSpec');
     is_deeply($tmpl->spec->volumeClaimTemplates->[0]->spec->accessModes, ['ReadWriteOnce'],
@@ -577,17 +577,17 @@ subtest 'full depth round-trip: Sandbox' => sub {
     );
 
     isa_ok($sandbox->spec, 'IO::K8s::AgentSandbox::V1beta1::SandboxSpec');
-    isa_ok($sandbox->spec->podTemplate, 'IO::K8s::AgentSandbox::V1beta1::PodTemplate');
-    isa_ok($sandbox->spec->podTemplate->metadata, 'IO::K8s::AgentSandbox::V1beta1::PodMetadata');
-    isa_ok($sandbox->spec->podTemplate->spec, 'IO::K8s::AgentSandbox::V1beta1::PodSpec');
+    isa_ok($sandbox->spec->podTemplate, 'IO::K8s::Api::Core::V1::PodTemplateSpec');
+    isa_ok($sandbox->spec->podTemplate->metadata, 'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta');
+    isa_ok($sandbox->spec->podTemplate->spec, 'IO::K8s::Api::Core::V1::PodSpec');
     isa_ok($sandbox->spec->podTemplate->spec->containers->[0], 'IO::K8s::Api::Core::V1::Container');
-    isa_ok($sandbox->spec->podTemplate->spec->imagePullSecrets->[0], 'IO::K8s::AgentSandbox::V1beta1::LocalObjectReference');
-    isa_ok($sandbox->spec->podTemplate->spec->os, 'IO::K8s::AgentSandbox::V1beta1::PodOS');
-    isa_ok($sandbox->spec->podTemplate->spec->schedulingGroup, 'IO::K8s::AgentSandbox::V1beta1::PodSchedulingGroup');
-    isa_ok($sandbox->spec->podTemplate->spec->readinessGates->[0], 'IO::K8s::AgentSandbox::V1beta1::PodReadinessGate');
-    isa_ok($sandbox->spec->podTemplate->spec->schedulingGates->[0], 'IO::K8s::AgentSandbox::V1beta1::PodSchedulingGate');
-    isa_ok($sandbox->spec->volumeClaimTemplates->[0], 'IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate');
-    isa_ok($sandbox->spec->volumeClaimTemplates->[0]->metadata, 'IO::K8s::AgentSandbox::V1beta1::EmbeddedObjectMetadata');
+    isa_ok($sandbox->spec->podTemplate->spec->imagePullSecrets->[0], 'IO::K8s::Api::Core::V1::LocalObjectReference');
+    isa_ok($sandbox->spec->podTemplate->spec->os, 'IO::K8s::Api::Core::V1::PodOS');
+    isa_ok($sandbox->spec->podTemplate->spec->schedulingGroup, 'IO::K8s::Api::Core::V1::PodSchedulingGroup');
+    isa_ok($sandbox->spec->podTemplate->spec->readinessGates->[0], 'IO::K8s::Api::Core::V1::PodReadinessGate');
+    isa_ok($sandbox->spec->podTemplate->spec->schedulingGates->[0], 'IO::K8s::Api::Core::V1::PodSchedulingGate');
+    isa_ok($sandbox->spec->volumeClaimTemplates->[0], 'IO::K8s::Api::Core::V1::PersistentVolumeClaimTemplate');
+    isa_ok($sandbox->spec->volumeClaimTemplates->[0]->metadata, 'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta');
     isa_ok($sandbox->spec->volumeClaimTemplates->[0]->spec, 'IO::K8s::Api::Core::V1::PersistentVolumeClaimSpec');
 
     is($sandbox->spec->podTemplate->spec->containers->[0]->image, 'agent:latest', 'podTemplate.spec.containers[0].image');
@@ -642,7 +642,7 @@ subtest 'full depth round-trip: SandboxClaim' => sub {
     isa_ok($claim->spec->lifecycle, 'IO::K8s::AgentSandbox::V1beta1::Lifecycle');
     isa_ok($claim->spec->additionalPodMetadata, 'IO::K8s::AgentSandbox::V1beta1::PodMetadata');
     isa_ok($claim->spec->env->[0], 'IO::K8s::AgentSandbox::V1beta1::EnvVar');
-    isa_ok($claim->spec->volumeClaimTemplates->[0], 'IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate');
+    isa_ok($claim->spec->volumeClaimTemplates->[0], 'IO::K8s::Api::Core::V1::PersistentVolumeClaimTemplate');
     isa_ok($claim->status, 'IO::K8s::AgentSandbox::V1beta1::SandboxClaimStatus');
     isa_ok($claim->status->conditions->[0], 'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Condition');
     isa_ok($claim->status->sandbox, 'IO::K8s::AgentSandbox::V1beta1::SandboxClaimStatusSandbox');
@@ -683,7 +683,7 @@ subtest 'full depth round-trip: SandboxTemplate' => sub {
     isa_ok($tmpl->spec->networkPolicy, 'IO::K8s::AgentSandbox::V1beta1::NetworkPolicySpec');
     isa_ok($tmpl->spec->networkPolicy->ingress->[0], 'IO::K8s::Api::Networking::V1::NetworkPolicyIngressRule');
     isa_ok($tmpl->spec->networkPolicy->egress->[0], 'IO::K8s::Api::Networking::V1::NetworkPolicyEgressRule');
-    isa_ok($tmpl->spec->podTemplate, 'IO::K8s::AgentSandbox::V1beta1::PodTemplate');
+    isa_ok($tmpl->spec->podTemplate, 'IO::K8s::Api::Core::V1::PodTemplateSpec');
 
     is($tmpl->spec->networkPolicy->ingress->[0]->from->[0]->podSelector->matchLabels->{role}, 'router',
         'networkPolicy.ingress[0].from[0].podSelector.matchLabels.role');

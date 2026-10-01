@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2::CiliumEndpoint;
 # ABSTRACT: CiliumEndpoint is the status of a Cilium policy rule.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
-    resource_plural => 'ciliumendpoints';
+    resource_plural => 'ciliumendpoints',
+    subresources    => {};
 with 'IO::K8s::Role::Namespaced';
 
 k8s status => '+IO::K8s::Cilium::V2::EndpointStatus';
@@ -23,7 +24,7 @@ IO::K8s::Cilium::V2::CiliumEndpoint - CiliumEndpoint is the status of a Cilium p
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 status
 

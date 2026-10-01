@@ -19,7 +19,6 @@ t/extended_tests.t
 t/function.t
 t/integration.t
 t/kwalitee.t
-t/lib/Test/Permissions.pm
 t/locales.t
 t/logic.t
 t/parse_prereqs.t

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::LogConfig;
 # ABSTRACT: Log specifies custom policy-specific Hubble logging configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s value => Str, { pattern => qr/^\PC*$/ };
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::LogConfig - Log specifies custom policy-specific Hubble log
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 value
 

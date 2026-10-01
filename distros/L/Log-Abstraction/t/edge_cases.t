@@ -459,6 +459,27 @@ subtest 'format — %env_NONEXISTENT% expands to empty string without warning' =
 	is($content, "[]\n", 'missing env var expands to empty string, brackets remain');
 };
 
+subtest 'format — tokens inside the message are not expanded' => sub {
+	plan tests => 1;
+
+	# Bug fixed: %message% was substituted before %env_*% and %timestamp%,
+	# so a message containing "%env_FOO%" leaked $ENV{FOO} into the log
+	local $ENV{LA_SECRET_XYZ} = 'leaked';
+
+	my $path = tmp_file();
+	my @sink;
+	my $logger = Log::Abstraction->new(
+		file   => $path,
+		array  => \@sink,
+		level  => 'debug',
+		format => '[%env_LA_SECRET_XYZ%] %message%',
+	);
+	$logger->debug('%env_LA_SECRET_XYZ% %timestamp% %level%');
+
+	is(slurp($path), "[leaked] %env_LA_SECRET_XYZ% %timestamp% %level%\n",
+		'format tokens are expanded but tokens in the message are left literal');
+};
+
 # ============================================================
 # 6. level() — boundary values
 # ============================================================

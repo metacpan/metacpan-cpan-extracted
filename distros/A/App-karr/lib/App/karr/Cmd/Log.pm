@@ -1,7 +1,7 @@
 # ABSTRACT: Show activity log
 
 package App::karr::Cmd::Log;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -24,9 +24,12 @@ option agent => (
     doc => 'Filter by agent name',
 );
 
+# A string, not `format => 'i'`: Getopt::Long refuses `k5` before karr sees it,
+# and the house kNNN spelling has to work here as it does for every other local
+# id (ticket k310). Normalized and validated in execute.
 option task => (
     is => 'ro',
-    format => 'i',
+    format => 's',
     doc => 'Filter by task ID',
 );
 
@@ -90,6 +93,26 @@ sub execute {
         unless grep { $_ eq $self->action } @valid;
     }
 
+    # --task is a local task id, so it takes the house kNNN spelling through
+    # the same normalize_task_id every other id argument goes through (k5 ==
+    # 5). Anything that is still not a number afterwards -- abc, a lone k, k5x
+    # -- stays a usage error naming the value as typed, which is what the old
+    # `format => 'i'` answered it with (ticket k310).
+    my $task_id;
+    if ( defined $self->task ) {
+      $task_id = $self->normalize_task_id( $self->task );
+      $self->usage_error(
+        sprintf 'invalid --task id "%s" (ids are numbers or kNNN)', $self->task )
+        unless $task_id =~ /\A[0-9]+\z/;
+      # Task ids start at 1, so 0 in any spelling -- 0, k0, 00 -- names no
+      # task. The filter below used to test the id for truth, which read 0 as
+      # "no filter" and printed the whole log, while "00" (a true string)
+      # filtered for task 0 and printed none (ticket k312).
+      $self->usage_error(
+        sprintf 'invalid --task id "%s" (ids start at 1)', $self->task )
+        if $task_id == 0;
+    }
+
     # This is where the empty answers are told apart, and all three are
     # settled before a single ref is read. "No log entries." is what a board
     # with no activity says; a repository with no board says something else
@@ -128,8 +151,8 @@ sub execute {
     if ($self->agent) {
         @entries = grep { ($_->{agent} // '') eq $self->agent } @entries;
     }
-    if ($self->task) {
-        @entries = grep { ($_->{task_id} // 0) == $self->task } @entries;
+    if (defined $task_id) {
+        @entries = grep { ($_->{task_id} // 0) == $task_id } @entries;
     }
     if ( defined $self->since && length $self->since ) {
         # String comparison against the RFC3339 timestamp: an entry from the
@@ -200,7 +223,7 @@ App::karr::Cmd::Log - Show activity log
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -233,7 +256,11 @@ Only show entries recorded for a specific agent.
 
 =item * C<--task>
 
-Only show entries associated with a specific task id.
+Only show entries associated with a specific task id. The id takes the house
+C<kNNN> spelling as well (C<--task k12> is C<--task 12>), the same strip
+L<App::karr::Role::BoardAccess/normalize_task_id> makes for every local id.
+Task ids start at 1, so C<0> in any spelling (C<0>, C<k0>, C<00>) is a usage
+error, as is any value that is not a number or C<kNNN>.
 
 =item * C<--last>
 

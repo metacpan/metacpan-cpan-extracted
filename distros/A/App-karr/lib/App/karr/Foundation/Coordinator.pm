@@ -1,7 +1,7 @@
 # ABSTRACT: karr-foundation's judgement layer -- the coordination agent, called only on deviation
 
 package App::karr::Foundation::Coordinator;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use POSIX qw( strftime );
 use Path::Tiny;
@@ -363,6 +363,8 @@ WHAT YOU MUST NOT DO
     is the assignment's job and the assignment is local.
   - Lift a block on a card. A cross-board link is a fact and 'blocked' is a
     decision: 'karr needs --resolve' or a person makes it.
+  - Plan a card that sits in backlog, or move one out of it. Backlog is held
+    back on purpose; promoting a card to todo is the maintainer's call.
   - Plan two agents into one repository at the same time. One agent per
     repository is the fleet's one hard rule; concurrency is across
     repositories.
@@ -511,7 +513,7 @@ App::karr::Foundation::Coordinator - karr-foundation's judgement layer -- the co
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Kubernetes::REST::CLI::Minikube;
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 # ABSTRACT: Bring up a minikube test cluster and run a command against it
 use Moo;
 use MooX::Options;
@@ -500,7 +500,7 @@ Kubernetes::REST::CLI::Minikube - Bring up a minikube test cluster and run a com
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 

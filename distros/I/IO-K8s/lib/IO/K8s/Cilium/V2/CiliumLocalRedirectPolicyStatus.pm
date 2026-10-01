@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumLocalRedirectPolicyStatus;
 # ABSTRACT: Status is the most recent status of the local redirect policy.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s ok => Bool;
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::CiliumLocalRedirectPolicyStatus - Status is the most recent
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 ok
 

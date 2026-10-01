@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::EndpointIdentity;
 # ABSTRACT: Identity is the security identity associated with the endpoint
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s id     => Int;
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::EndpointIdentity - Identity is the security identity associ
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 id
 

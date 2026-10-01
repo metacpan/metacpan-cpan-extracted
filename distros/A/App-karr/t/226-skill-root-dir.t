@@ -12,7 +12,9 @@ use JSON::MaybeXS qw( decode_json );
 # Ticket #226: `karr --dir PATH skill install` accepted --dir, threw it away,
 # and installed into the current directory instead -- reporting success with a
 # relative path that names no tree at all. Measured before the fix, from skA
-# with --dir pointing at skB:
+# with --dir pointing at skB (back when one skill, kanban-issues-karr-cli,
+# shipped; the checks below look for the ticket skill of the pair that
+# replaced it):
 #
 #   karr --dir .../skB skill install --agent claude-code
 #   -> claude-code  installed to .claude/skills/kanban-issues-karr-cli/SKILL.md
@@ -71,7 +73,7 @@ my $there = git_repo( $tmp->child('skB') );
 
 sub skill_file {
     my ($tree) = @_;
-    return $tree->child('.claude/skills/kanban-issues-karr-cli/SKILL.md');
+    return $tree->child('.claude/skills/kanban-issues-karr-ticket/SKILL.md');
 }
 
 subtest 'the root placement is refused instead of writing into the wrong tree' => sub {
@@ -132,7 +134,7 @@ subtest 'the success message names the tree the file landed in' => sub {
     like $r->{stdout}, qr/\Qinstalled to $file\E/,
         'the message names the absolute path it wrote'
         or diag "stdout: $r->{stdout}";
-    unlike $r->{stdout}, qr/^\S+\s+installed to \.claude/m,
+    unlike $r->{stdout}, qr/^\S+\s+\S+\s+installed to \.claude/m,
         'not a relative path that fits every tree';
 
     # The same path is what --json hands the agents that parse it.
@@ -140,7 +142,8 @@ subtest 'the success message names the tree the file landed in' => sub {
     is $j->{exit}, 0, '--json exits 0' or diag "stderr: $j->{stderr}";
     my $data = eval { decode_json( $j->{stdout} ) };
     ok $data, 'and prints JSON' or diag "stdout: $j->{stdout}";
-    is $data->[0]{path}, "$file", 'whose path field is absolute too';
+    my ($entry) = grep { $_->{skill} eq 'kanban-issues-karr-ticket' } @{ $data || [] };
+    is $entry->{path}, "$file", 'whose path field is absolute too';
 };
 
 subtest 'project-local means the current directory, repository or not' => sub {

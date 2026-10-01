@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/tomba-io/perl/issues
   homepage: https://tomba.io
   repository: https://github.com/tomba-io/perl.git
-version: v1.1.0
+version: v1.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

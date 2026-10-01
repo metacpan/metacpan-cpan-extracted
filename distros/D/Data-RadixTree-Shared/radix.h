@@ -23,6 +23,7 @@
 #ifndef RADIX_H
 #define RADIX_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,7 +52,7 @@
 
 #define RDX_MAGIC        0x58444152U  /* "RADX" (little-endian) */
 #define RDX_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
-#define RDX_ERR_BUFLEN   256
+#define RDX_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef RDX_READER_SLOTS
 #define RDX_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -565,6 +566,7 @@ static inline void rdx_free_node(RdxHandle *h, uint32_t idx) {
     RdxNode *nodes = rdx_nodes(h);
     memset(&nodes[idx], 0, sizeof(RdxNode));
     nodes[idx].label_off = hdr->free_head;        /* next-free link (0 terminates) */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     hdr->free_head = idx;
 }
 
@@ -680,8 +682,10 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
     for (;;) {
         if (kpos == klen) {                       /* key ends here -> mark this node */
             int isnew = !nodes[cur].has_value;
-            nodes[cur].has_value = 1;
             nodes[cur].value = value;
+            /* The value before the flag that publishes it. */
+            __atomic_signal_fence(__ATOMIC_SEQ_CST);
+            nodes[cur].has_value = 1;
             if (isnew) hdr->keys++;
             return isnew;
         }
@@ -778,6 +782,8 @@ static inline int rdx_insert_locked(RdxHandle *h, const uint8_t *key, uint32_t k
         }
         /* Single-word commit: everything above is unreachable until this store. */
         __atomic_store_n(&nodes[cur].children[b], mid, __ATOMIC_RELEASE);
+        /* A release store does not keep the recycle's memset below it. */
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
         rdx_free_node(h, ch);                              /* displaced: recycle post-commit */
         hdr->keys++;
         return 1;
@@ -864,6 +870,7 @@ static inline int rdx_delete_locked(RdxHandle *h, const uint8_t *key, uint32_t k
     RdxNode *nodes = rdx_nodes(h);
     if (!nodes[n].has_value) return 0;
     nodes[n].has_value = 0;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     nodes[n].value = 0;
     h->hdr->keys--;
     return 1;
@@ -874,6 +881,11 @@ static inline int rdx_delete_locked(RdxHandle *h, const uint8_t *key, uint32_t k
 static inline void rdx_clear_locked(RdxHandle *h) {
     RdxHeader *hdr = h->hdr;
     RdxNode *nodes = rdx_nodes(h);
+    if (hdr->root && hdr->root < h->node_cap)        /* root is peer-writable; keep the memset in-pool */
+        memset(&nodes[hdr->root], 0, sizeof(RdxNode));   /* zero children + has_value + label */
+    /* Unlink before reclaiming: a writer killed in between must not leave the root linking
+     * nodes the counters already hand out again. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     hdr->node_used = 2;
     hdr->arena_used = 0;
     hdr->keys = 0;
@@ -882,8 +894,6 @@ static inline void rdx_clear_locked(RdxHandle *h) {
      * from the stale list and once from the bump path -- silently losing the
      * keys stored under whichever insert lost the race. */
     hdr->free_head = 0;
-    if (hdr->root && hdr->root < h->node_cap)        /* root is peer-writable; keep the memset in-pool */
-        memset(&nodes[hdr->root], 0, sizeof(RdxNode));   /* zero children + has_value + label */
 }
 
 /* ================================================================
@@ -1013,14 +1023,36 @@ static int rdx_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int rdx_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int rdx_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* Opt-in (DATA_RADIXTREE_SHARED_SPARSE=0): reserving commits memory this module otherwise fills lazily. */
+static int rdx_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_RADIXTREE_SHARED_SPARSE");
+    if (!sp || strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static RdxHandle *rdx_create(const char *path, uint64_t node_cap_in, uint64_t arena_cap_in, mode_t mode, char *errbuf) {
@@ -1056,9 +1088,18 @@ static RdxHandle *rdx_create(const char *path, uint64_t node_cap_in, uint64_t ar
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             RDX_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && rdx_reserve(fd, total) < 0) {
+            RDX_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { RDX_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            RDX_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!rdx_validate_header((RdxHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -1068,9 +1109,13 @@ static RdxHandle *rdx_create(const char *path, uint64_t node_cap_in, uint64_t ar
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((RdxHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && rdx_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && rdx_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         RDX_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (rdx_reserve(fd, total) < 0) {
+                        RDX_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     rdx_init_header(base, node_cap, arena_cap, total);
@@ -1108,6 +1153,10 @@ static RdxHandle *rdx_create_memfd(const char *name, uint64_t node_cap_in, uint6
     if (ftruncate(fd, (off_t)total) < 0) {
         RDX_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (rdx_reserve(fd, total) < 0) {
+        RDX_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { RDX_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -1120,6 +1169,11 @@ static RdxHandle *rdx_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { RDX_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(RdxHeader)) { RDX_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(RdxHeader, magic)) != (ssize_t)sizeof magic || magic != RDX_MAGIC) {
+        RDX_ERR("invalid radix-tree table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { RDX_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -1174,6 +1228,11 @@ static RdxHandle *rdx_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { RDX_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(RdxHeader)) { RDX_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(RdxHeader, magic)) != (ssize_t)sizeof magic || magic != RDX_MAGIC) {
+        RDX_ERR("%s: invalid radix-tree file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */

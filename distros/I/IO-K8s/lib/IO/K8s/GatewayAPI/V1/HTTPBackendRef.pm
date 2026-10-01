@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::HTTPBackendRef;
 # ABSTRACT: HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s filters   => ['+IO::K8s::GatewayAPI::V1::HTTPRouteFilter'];
@@ -32,7 +32,7 @@ IO::K8s::GatewayAPI::V1::HTTPBackendRef - HTTPBackendRef defines how a HTTPRoute
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 filters
 

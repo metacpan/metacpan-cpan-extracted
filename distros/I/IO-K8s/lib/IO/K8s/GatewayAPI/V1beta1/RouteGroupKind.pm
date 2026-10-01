@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::RouteGroupKind;
 # ABSTRACT: RouteGroupKind indicates the group and kind of a Route resource.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s group => Str, { pattern => qr/^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/, default => 'gateway.networking.k8s.io' };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1beta1::RouteGroupKind - RouteGroupKind indicates the grou
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 group
 

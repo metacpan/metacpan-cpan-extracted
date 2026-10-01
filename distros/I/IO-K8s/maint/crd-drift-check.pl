@@ -590,7 +590,8 @@ sub require_provider_tree {
 }
 
 # The shipped `spec` field set for a class, or undef when spec is modeled
-# opaquely (a { Str => 1 } hash, a free-form object, or simply absent).
+# opaquely (an Opaque map -- { Str => 1 } before k191 --, a free-form
+# object, or simply absent).
 # Two shapes expose upstream-comparable field names, both read off the
 # nested class's own registry entry using each attribute's wire json_key:
 #
@@ -705,7 +706,8 @@ sub cosmetic_differ_excepted {
 # accepts a GENUINE structural difference between the render and lib -- the
 # k55/k120 typed-empty-vs-opaque-hash UUIDSpec case, where lib names the empty
 # struct '+IO::K8s::ExternalSecrets::V1alpha1::UUIDSpec' and the emitter types
-# it opaquely as { Str => 1 } -- so it cannot go through the cosmetic guard,
+# it opaquely as Opaque ({ Str => 1 } before k191) -- so it cannot go
+# through the cosmetic guard,
 # which by design refuses anything whose k8s declarations drift. The scope
 # limit here is exactness, not a signature: only the EXACT provider+path pairs
 # listed are reclassified, so an unlisted file's structural drift is never
@@ -989,6 +991,9 @@ sub render_gvk {
         (my $suffix = $key) =~ s/^\Q$u->{kind}\E:://;
         $class_names{"$root\::$suffix"} = $names->{$key};
     }
+    # subresources: the shipped provider classes now declare their upstream
+    # subresources as the k158 import parameter, so the emitter default
+    # (subresources => 1) renders them and --check stays byte-identical.
     my $emitter = IO::K8s::CRD::Emitter->new(
         base    => "IO::K8s::$provider\::" . ucfirst($u->{version}),
         names   => \%class_names,
@@ -1162,6 +1167,11 @@ sub _structural_signature {
         $stmt =~ s/\s+([)\]}])/$1/g;      # ... nor just inside a closing one
         $stmt =~ s/\A\s+//;
         $stmt =~ s/\s+\z//;
+        # k191: HashRef[X] and { X => 1 } are the same typed map, and the
+        # string map is one structure whether strict (HashRef[Str], what the
+        # emitter renders) or lenient ({ Str => 1 }, what lib carries): the
+        # lenient flag is a serialisation nuance, not structural drift.
+        $stmt =~ s/\bHashRef\[(\w+)\]/{$1 => 1}/g;
     }
     return join("\n", @stmts);
 }

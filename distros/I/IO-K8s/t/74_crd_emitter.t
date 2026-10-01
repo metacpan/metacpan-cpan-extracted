@@ -19,10 +19,23 @@ my $classes = IO::K8s::CRD->generate($crd, 'IO::K8s::_AUTOGEN_emit');
 my $root = $classes->{'opts.example.com/v1'};
 
 my $emitter = IO::K8s::CRD::Emitter->new(
-    base  => 'TestEmit::V1',
-    names => { "$root\::Spec::Limit" => 'RateLimit' },
+    base    => 'TestEmit::V1',
+    names   => { "$root\::Spec::Limit" => 'RateLimit' },
+    version => '1.108',
 );
 my $files = $emitter->render($root);
+
+subtest 'default version follows the Emitter module version' => sub {
+    my $default = IO::K8s::CRD::Emitter->new(base => 'TestEmitDefault::V1');
+    is($default->version, $IO::K8s::CRD::Emitter::VERSION,
+        'default version is the current Emitter module version');
+
+    my $default_files = $default->render($root);
+    my ($rendered_version) = $default_files->{'TestEmitDefault/V1/Knob.pm'}
+        =~ /^our \$VERSION = '([^']+)';$/m;
+    is($rendered_version, $IO::K8s::CRD::Emitter::VERSION,
+        'rendered source writes the default Emitter module version');
+};
 
 subtest 'one file per class, named from the base and the name map' => sub {
     is_deeply([ sort keys %$files ], [
@@ -40,7 +53,9 @@ subtest 'the root file is a house-style APIObject class' => sub {
     my $src = $files->{'TestEmit/V1/Knob.pm'};
     like($src, qr/^package TestEmit::V1::Knob;\n# ABSTRACT: /m, 'package + ABSTRACT');
     like($src, qr/^our \$VERSION = '1\.108';$/m, 'version line');
-    like($src, qr/^use IO::K8s::APIObject\n    api_version     => 'opts\.example\.com\/v1',\n    resource_plural => 'knobs';$/m, 'APIObject import');
+    # The knob's v1 serves the status subresource, which the generated class
+    # carries and the emitter renders as the import parameter (k158).
+    like($src, qr/^use IO::K8s::APIObject\n    api_version     => 'opts\.example\.com\/v1',\n    resource_plural => 'knobs',\n    subresources    => \{ status => \{\} \};$/m, 'APIObject import, subresources included');
     like($src, qr/^with 'IO::K8s::Role::Namespaced';$/m, 'Namespaced');
     like($src, qr/^k8s spec\s+=> '\+TestEmit::V1::KnobSpec', \{ required => 'schema' \};$/m, 'required object field, renamed, recorded not enforced');
     like($src, qr/^k8s status\s+=> '\+TestEmit::V1::KnobStatus';$/m, 'status');
@@ -57,7 +72,9 @@ subtest 'field lines render every type form and the options' => sub {
     like($src, qr/^k8s limit\s+=> '\+TestEmit::V1::RateLimit';$/m, 'nested object via the name map');
     like($src, qr/^k8s routes\s+=> \['\+TestEmit::V1::KnobSpecRoutesItem'\];$/m, 'array of objects');
     like($src, qr/^k8s size\s+=> IntOrStr;$/m, 'int-or-string');
-    like($src, qr/^k8s extra\s+=> \{ Str => 1 \}, \{ preserve_unknown => 1 \};$/m, 'opaque map with a schema-only option');
+    # k191: the opaque map renders as Opaque; { Str => 1 } is the string map
+    # since then. Same claim, the opaque map's spelling changed.
+    like($src, qr/^k8s extra\s+=> Opaque, \{ preserve_unknown => 1 \};$/m, 'opaque map with a schema-only option');
     like($src, qr/^=attr mode\n\nOperating mode\.\n/m, 'description becomes the =attr text');
     like($src, qr/^=attr replicas\n\nNo description in the upstream schema\.\n/m, 'fallback text');
     unlike($src, qr/description =>/, 'description is not repeated as an option');
@@ -218,7 +235,10 @@ subtest 'non-ASCII patterns, enum values and descriptions render UTF-8-safely' =
     my ($u_crd) = @{ IO::K8s::CRD->load("$FindBin::Bin/data/crd-utf8.yaml") };
     my $u_classes = IO::K8s::CRD->generate($u_crd, 'IO::K8s::_AUTOGEN_utf8emit');
     my $u_root = $u_classes->{'utf8.example.com/v1'};
-    my $u_emitter = IO::K8s::CRD::Emitter->new(base => 'TestUtf8::V1');
+    my $u_emitter = IO::K8s::CRD::Emitter->new(
+        base    => 'TestUtf8::V1',
+        version => '1.108',
+    );
     my $u_files = $u_emitter->render($u_root);
 
     is_deeply([ sort keys %$u_files ], [
@@ -340,10 +360,13 @@ subtest 'a path-derived name past 200 chars still renders, with its own fallback
 # int_or_string (added for k96 task-2, read by IO::K8s::CRD's to_crd
 # _type_schema), but this emitter's own _type_source -- the reverse,
 # registry -> DSL-source direction -- still had no branch for any of the
-# four and croaked. Unreachable today via any bundled provider or AutoGen
-# schema path (AutoGen's array-item dispatch never produces one of these
-# four flags from a schema; see the comment above IO::K8s::CRD::_type_schema),
-# so reproduce with a hand-declared class exercising the DSL forms
+# four and croaked. Unreachable today via CRD::Emitter's own schema path
+# for three of the four: AutoGen's array-item dispatch now produces
+# is_array_of_num, is_array_of_int_or_string and is_array_of_time straight
+# from a schema (k155, k167, k181); is_array_of_quantity still is not,
+# since Quantity only round-trips through a $ref a structural CRD schema
+# cannot carry (k178; see the comment above IO::K8s::CRD::_type_schema).
+# Reproduce with a hand-declared class exercising all four DSL forms
 # directly, the same way t/63_k66_array_of_hash.t does for [ {} ] / [ [] ].
 {
     package Test::Karr112::Thing;

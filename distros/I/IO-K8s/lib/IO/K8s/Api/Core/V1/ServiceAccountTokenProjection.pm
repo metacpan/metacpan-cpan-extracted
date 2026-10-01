@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ServiceAccountTokenProjection;
 # ABSTRACT: ServiceAccountTokenProjection represents a projected service account token volume. This projection can be used to insert a service account token into the pods runtime filesystem for use against APIs (Kubernetes API Server or otherwise).
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s audience => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::ServiceAccountTokenProjection - ServiceAccountTokenProje
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 audience
 

@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::RouteNamespaces;
 # ABSTRACT: Namespaces indicates namespaces from which Routes may be attached to this Listener.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s from     => Str, { enum => [qw(All Selector Same)], default => 'Same' };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::RouteNamespaces - Namespaces indicates namespaces from 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 from
 

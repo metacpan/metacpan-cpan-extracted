@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::PolicyStatus;
 # ABSTRACT: Status defines the current state of BackendTLSPolicy.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s ancestors => ['+IO::K8s::GatewayAPI::V1::PolicyAncestorStatus'], { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::GatewayAPI::V1::PolicyStatus - Status defines the current state of Back
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 ancestors
 

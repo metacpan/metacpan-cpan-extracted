@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ChunkEncodingSpec;
 # ABSTRACT: chunkEncoding configures per-chunk-type encoding overrides.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s floats => Str, { enum => [qw(Xor Xor2)] };
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::ChunkEncodingSpec - chunkEncoding configures pe
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 floats
 

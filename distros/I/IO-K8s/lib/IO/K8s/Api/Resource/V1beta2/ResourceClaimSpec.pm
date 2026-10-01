@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::ResourceClaimSpec;
 # ABSTRACT: ResourceClaimSpec defines what is being requested in a ResourceClaim and how to configure it.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s devices => 'Resource::V1beta2::DeviceClaim';
@@ -20,7 +20,7 @@ IO::K8s::Api::Resource::V1beta2::ResourceClaimSpec - ResourceClaimSpec defines w
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 devices
 

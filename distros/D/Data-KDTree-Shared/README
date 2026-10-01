@@ -63,6 +63,14 @@ METHODS
     file is refused; use "new_readonly" instead (see "FROZEN (READ-ONLY)
     MODE").
 
+    "new" and "new_memfd" create a new segment sparse: pages are allocated as
+    they are first written, and once the filesystem is full, an "add" or query
+    that touches a page not yet allocated dies with "SIGBUS". Set
+    "DATA_KDTREE_SHARED_SPARSE=0" to reserve the whole segment at creation, so
+    a full filesystem makes them croak instead; on tmpfs and memfd that
+    commits the segment's memory at once, and a memory cgroup too small for it
+    gets an OOM kill rather than a croak.
+
   Adding points
         my $i = $kd->add(\@coords);          # id defaults to the insertion index
         my $i = $kd->add(\@coords, $id);     # attach an explicit 64-bit id

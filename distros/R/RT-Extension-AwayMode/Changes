@@ -1,5 +1,14 @@
 Revision history for RT-Extension-AwayMode
 
+0.05  2026-09-30
+      - Lower the minimum Perl version from 5.36 to 5.20. The modules
+        declared "use v5.36;" only to get non-experimental subroutine
+        signatures, and Makefile.PL turned that into a hard build-time
+        requirement, so the extension refused to install on older Perls
+        for no real reason. They now ask for v5.20 plus the signatures
+        feature explicitly.
+      - CI: also test against Perl 5.20 and 5.32.
+
 0.04  2026-08-11
       - Add Catalan (ca) and Spanish (es) translations.
       - UPGRADING: the one-time SetApplicableTransTypes tweak for existing

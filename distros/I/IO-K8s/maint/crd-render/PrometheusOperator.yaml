@@ -90,7 +90,6 @@ kinds:
       Spec::Storage: StorageSpec
       Spec::Storage::EmptyDir: EmptyDirVolumeSource
       Spec::Storage::Ephemeral: EphemeralVolumeSource
-      Spec::Storage::Ephemeral::VolumeClaimTemplate: PersistentVolumeClaimTemplate
       Spec::Storage::VolumeClaimTemplate: EmbeddedPersistentVolumeClaim
       Spec::Storage::VolumeClaimTemplate::Metadata: EmbeddedObjectMetadata
       Spec::Storage::VolumeClaimTemplate::Status: PersistentVolumeClaimStatus
@@ -241,7 +240,6 @@ kinds:
       Spec::Storage: StorageSpec
       Spec::Storage::EmptyDir: EmptyDirVolumeSource
       Spec::Storage::Ephemeral: EphemeralVolumeSource
-      Spec::Storage::Ephemeral::VolumeClaimTemplate: PersistentVolumeClaimTemplate
       Spec::Storage::VolumeClaimTemplate: EmbeddedPersistentVolumeClaim
       Spec::Storage::VolumeClaimTemplate::Metadata: EmbeddedObjectMetadata
       Spec::Storage::VolumeClaimTemplate::Status: PersistentVolumeClaimStatus

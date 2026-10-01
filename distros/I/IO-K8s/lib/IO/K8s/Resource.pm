@@ -1,7 +1,9 @@
 package IO::K8s::Resource;
 # ABSTRACT: Base class for all Kubernetes resources
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use v5.10;
+use strict;
+use warnings;
 use Moo ();
 use Moo::Role ();
 use Import::Into;
@@ -9,8 +11,10 @@ use Package::Stash;
 use Types::Standard qw( ArrayRef Bool HashRef InstanceOf Int Maybe Num Str );
 use IO::K8s::Types qw( IntOrStr Quantity Time );
 use IO::K8s::Role::Resource ();
+use namespace::clean ();
 use Scalar::Util qw( blessed reftype looks_like_number );
 use Carp qw( croak );
+use Sub::Util qw( subname );
 
 # Registry: class -> attr -> { type, class, is_array, is_hash, is_bool, is_int }
 # Use 'our' to make it a proper package variable accessible via symbol table
@@ -100,12 +104,19 @@ sub _scalar_base_for {
     return $STR_ISA_MAP{$kind} // Str;
 }
 
-# Value types for the hash-of-scalar-type DSL form { TypeName => 1 } (k63).
-# 'Str' is deliberately NOT here: it keeps its historical bare-HashRef meaning,
-# the genuinely opaque string map that labels, annotations and fieldsV1 need.
-# Everything here constrains each VALUE against the scalar type, so a map
-# upstream declares as map[X]Quantity finally rejects cpu => 'banana' at
-# construction instead of at the API server.
+# Value types for the hash-of-scalar-type DSL form { TypeName => 1 } (k63),
+# and for HashRef[TypeName], which means the same (k191). Everything here
+# constrains each VALUE against the scalar type, so a map upstream declares
+# as map[X]Quantity finally rejects cpu => 'banana' at construction instead
+# of at the API server.
+#
+# 'Str' is NOT here: since k191 it is the string map (is_hash_of_str, every
+# scalar value a JSON string on the wire), and its two spellings validate
+# differently. HashRef[Str] is strict, a reference value is refused.
+# { Str => 1 } keeps the bare HashRef it always had and is marked
+# is_hash_of_str_lenient: it was the opaque map until k191, so a reference
+# value still passes and TO_JSON warns about it once per class and field.
+# The free map is Opaque (or a bare HashRef), flag is_hash_opaque.
 my %HASH_VALUE_TYPES = (
     Int      => { isa => Int,      flag => 'is_hash_of_int' },
     Num      => { isa => Num,      flag => 'is_hash_of_num' },
@@ -122,6 +133,7 @@ my %HASH_VALUE_TYPES = (
 # recorded in the registry for to_crd; enum, minimum, maximum and pattern
 # are also enforced at construction, the way { Quantity => 1 } validates
 # its values -- a bad value fails here instead of at the API server.
+# nullable also keeps an explicit JSON null on the way in and out (k158).
 # default is deliberately NOT applied client-side: defaulting is the API
 # server's job, and a client default would change the wire output.
 my %FIELD_OPTIONS = map { $_ => 1 } qw(
@@ -208,6 +220,22 @@ sub import {
     my $class = shift;
     my $caller = caller;
     $class->_setup_class($caller);
+    $class->_import_map_types($caller);
+}
+
+# HashRef and Opaque for map declarations (k191): `k8s data => HashRef[Str]`,
+# `k8s raw => Opaque`. Only here, where a class is compiled from source --
+# _setup_class also serves inline structs and IO::K8s::AutoGen, which build
+# their fields at runtime and never name a type in code. Both names are
+# swept from the package again once the scope that said `use` has finished
+# compiling (namespace::clean, the explicit-list form): the declarations
+# compiled against them keep working, but neither becomes a method of every
+# shipped class, which is what k118 took HashRef off (t/27_no_import_leak.t).
+sub _import_map_types {
+    my ($class, $target) = @_;
+    Types::Standard->import::into($target, qw( HashRef ));
+    IO::K8s::Types->import::into($target, qw( Opaque ));
+    namespace::clean->import(-cleanee => $target, qw( HashRef Opaque ));
 }
 
 sub _setup_class {
@@ -330,11 +358,10 @@ sub _normalize_bool {
 # Named rather than written inline in that branch for the same reason
 # _normalize_bool above is: a second caller needs exactly this, and the two
 # must not drift. That caller is IO::K8s::Role::APIObject, whose `metadata`
-# is a plain `has` -- the role composes before any k8s declaration runs, so
-# _k8s's "don't overwrite a role's attribute" guard means it registers
-# metadata but never creates it, and a coercer installed here would never
-# reach it (k115). The role therefore declares metadata with this coercion
-# from the start.
+# is a plain `has` -- the role composes before any k8s declaration runs, and
+# metadata is then only registered through _k8s_adopt, which never calls
+# has(), so a coercer installed here would never reach it (k115). The role
+# therefore declares metadata with this coercion from the start.
 #
 # $class_name is captured; IO::K8s::Role::Resource::_default_k8s() is
 # touched at COERCION time only, never while the attribute is installed --
@@ -342,11 +369,88 @@ sub _normalize_bool {
 # _default_k8s requires IO::K8s, which loads this file.
 sub _object_coercer {
     my ($class_name) = @_;
+    my $builds = _object_builds($class_name);
     return sub {
-        return $_[0] unless ref $_[0] eq 'HASH';
+        return $_[0] unless $builds->($_[0]);
         return IO::K8s::Role::Resource::_default_k8s()
             ->_struct_to_object_expanded($class_name, $_[0]);
     };
+}
+
+# Whether a value handed to an object-bearing field of $class_name is built
+# into that class by the object coercers, as a predicate the three of them
+# share -- the single field above and, element by element, the array and
+# hash forms in _declare_field.
+#
+# A plain hashref always is. A class with FROM_STRUCT -- the apiextensions
+# union classes, which serialize as the bare value they hold -- takes every
+# defined value (k179): inflation hands it anything, so values => [1, 2]
+# or enum => ['a'] inflated fine while ->new, the setter and spec_set died
+# on the InstanceOf check for the very same values. An object already of
+# the class is left alone, and undef stays "no value". Every other class
+# keeps the k146 rule: anything but a hashref goes on to `isa`, which
+# refuses it.
+#
+# FROM_STRUCT is only known once the class is loaded, and the coercer is
+# installed long before (see _object_coercer). It is asked the first time
+# a value is not a hashref, and the answer is kept; a class that does not
+# load is asked again next time and meanwhile counts as an ordinary class,
+# so such a value still meets the type check it met before.
+sub _object_builds {
+    my ($class_name) = @_;
+    my $from_struct;
+    return sub {
+        my ($value) = @_;
+        return 0 unless defined $value;
+        return 1 if ref $value eq 'HASH';
+        $from_struct //= _takes_any_value($class_name);
+        return 0 unless $from_struct;
+        return blessed($value) && $value->isa($class_name) ? 0 : 1;
+    };
+}
+
+# True when $class_name inflates through FROM_STRUCT (k179), false when it
+# does not, nothing when it cannot be loaded.
+sub _takes_any_value {
+    my ($class_name) = @_;
+    return unless eval {
+        IO::K8s::Role::Resource::_default_k8s()->load_class($class_name);
+        1;
+    };
+    return $class_name->can('FROM_STRUCT') ? 1 : 0;
+}
+
+# A map whose values have a type (k191): HashRef[X], and the { X => 1 } form
+# that means the same for every X but Str. Sets the registry flag in $info
+# and returns the field's type. X is a Type::Tiny value type: a scalar kind
+# by its name -- Str (the strict string map), Int, Num, Bool, IntOrStr,
+# Quantity, Time -- or InstanceOf[Class], the map of objects. The value
+# constraint is X itself, so HashRef[Time] checks what { Time => 1 } checks
+# and a lenient Str-based Time (IO::K8s::AutoGen's) stays lenient.
+sub _typed_map {
+    my ($info, $value_type, $opts, $where) = @_;
+    my $kind = $value_type->name;
+    if ($kind eq 'Str') {
+        $info->{is_hash_of_str} = 1;
+        return HashRef[ _constrain($value_type, 'Str', $opts, $where) ];
+    }
+    if (my $vt = $HASH_VALUE_TYPES{$kind}) {
+        $info->{ $vt->{flag} } = 1;
+        return HashRef[ _constrain($value_type, $kind, $opts, $where) ];
+    }
+    return _object_map($info, $value_type->class, $opts, $where)
+        if $value_type->isa('Type::Tiny::Class');
+    croak "k8s: cannot interpret the value type of $where: HashRef["
+        . $value_type->display_name . '] (a scalar type, or InstanceOf[Class])';
+}
+
+# The map of objects: { Class => 1 } and HashRef[InstanceOf[Class]].
+sub _object_map {
+    my ($info, $full_class, $opts, $where) = @_;
+    $info->{is_hash_of_objects} = 1;
+    $info->{class} = $full_class;
+    _reject_value_options($opts, $where);
+    return HashRef[InstanceOf[$full_class]];
 }
 
 sub _generate_inline_struct {
@@ -357,12 +461,142 @@ sub _generate_inline_struct {
     }
 }
 
+# The nearest registry entry for a Perl attribute name: $class's own, else
+# the first one found walking @ISA depth-first, left to right -- the order
+# IO::K8s::Role::Resource::_merged_attr_info resolves in, so this answers
+# for the same view TO_JSON and FROM_HASH read. Returns the declaring class
+# and its entry, or nothing. Uncached: it runs while classes are still
+# being declared, and populating the role's merged-view cache from here
+# would be a side effect of a declaration that may yet be rejected.
+sub _nearest_registration {
+    my ($class, $attr_name) = @_;
+    my $own = $_attr_registry{$class};
+    return ($class, $own->{$attr_name}) if $own && $own->{$attr_name};
+    no strict 'refs';
+    for my $parent (@{"${class}::ISA"}) {
+        my @found = _nearest_registration($parent, $attr_name);
+        return @found if @found;
+    }
+    return;
+}
+
+# The role that $class's method $attr_name comes from, when that role lists
+# the name in its %YIELDS_TO_K8S_FIELD -- a role helper meant to give way to
+# a declared wire field of the same name (IO::K8s::Role::APIObject's
+# conditions, for ComponentStatus). Found through the method's own name
+# rather than a list of classes, and checked against the role itself: the
+# code must be the role's sub, and $class must do the role. Anything else --
+# a method the class wrote, one a role does not declare as yielding, a
+# modifier-wrapped helper -- returns nothing and stays a collision.
+sub _yielding_role_helper {
+    my ($class, $attr_name) = @_;
+    my $code = $class->can($attr_name) or return;
+    my ($role, $sub) = subname($code) =~ /\A(.+)::([^:]+)\z/ or return;
+    return unless $sub eq $attr_name && Moo::Role->is_role($role);
+    no strict 'refs';
+    return unless ${"${role}::YIELDS_TO_K8S_FIELD"}{$attr_name};
+    return unless defined &{"${role}::${attr_name}"}
+        && \&{"${role}::${attr_name}"} == $code;
+    return unless $class->can('does') && $class->does($role);
+    return $role;
+}
+
+# The `k8s` DSL entry point. A thin wrapper so that every argument a caller
+# of `k8s` can pass has a meaning; the adopt switch below is not one of them.
 sub _k8s {
     my ($class, $caller, $name, $type_spec, $marker) = @_;
+    return $class->_declare_field($caller, $name, $type_spec, $marker, 0);
+}
+
+# Register a wire field for a Moo attribute the class already has, without
+# calling has() -- the one field this exists for is metadata, which
+# IO::K8s::Role::APIObject declares itself (with the ObjectMeta coercion)
+# and which IO::K8s::APIObject::import and IO::K8s::AutoGen then register
+# for the registry readers. Private on purpose: the public `k8s` never
+# adopts, so a field can no longer end up registered over an attribute
+# nobody declared for it (k144). Refused unless an attribute of that name
+# is in effect and its init_arg is the field's JSON key.
+sub _k8s_adopt {
+    my ($class, $caller, $name, $type_spec, $marker) = @_;
+    return $class->_declare_field($caller, $name, $type_spec, $marker, 1);
+}
+
+sub _declare_field {
+    my ($class, $caller, $name, $type_spec, $marker, $adopt) = @_;
 
     my $json_key  = $name;
     my $attr_name = _sanitize_attr_name($name);
     my $where     = "field '$name' of $caller";
+
+    # Declaration preflight (k144). Every conflict is refused here, before
+    # anything below builds an inline-struct class, calls has() or writes
+    # the registry, the attribute list or the merged-view cache -- a
+    # rejected declaration leaves the class exactly as it was.
+    #
+    # Two JSON keys, one accessor: _sanitize_attr_name is not injective
+    # (x-value and x_value both become x_value), so a second key reaching
+    # an attribute name another key already holds -- in this class or,
+    # nearest wins, in an ancestor -- would silently retarget that field.
+    my ($declarer, $registered) = _nearest_registration($caller, $attr_name);
+    if ($registered) {
+        my $other_key = $registered->{json_key} // $attr_name;
+        croak "k8s: $where collides with field '$other_key' of $declarer: "
+            . "both map to the Perl attribute '$attr_name'"
+            if $other_key ne $json_key;
+    }
+    # The same JSON key declared a second time in this very class (k151).
+    # Moo keeps the first attribute, so a second declaration is only ever
+    # compared with the first one, below, once its type is interpreted --
+    # identical is a no-op, anything else is refused.
+    my $redeclared = $registered && $declarer eq $caller;
+    # A method that is not a Moo attribute -- an IO::K8s::Role::APIObject
+    # helper such as get_condition, a Moo keyword -- used to make the old
+    # `return if $caller->can($attr_name)` register the field and skip
+    # has(), leaving the wire field served by that method. What counts is
+    # the effective Moo spec; a registry entry proves nothing. The one way
+    # past this is a role helper its role declares as yielding to a wire
+    # field of the same name (see _yielding_role_helper): the field is then
+    # installed over it.
+    my ($spec, $local, $yielding);
+    if ($caller->can($attr_name)) {
+        $spec = IO::K8s::Role::Resource::_effective_attribute_specs($caller)->{$attr_name};
+        $yielding = _yielding_role_helper($caller, $attr_name) unless $spec;
+        croak "k8s: $where collides with the method '$attr_name' of $caller, "
+            . 'which is not an attribute'
+            unless $spec || $yielding;
+        no strict 'refs';
+        $local = defined &{"${caller}::${attr_name}"};
+    }
+    # Moo refuses has() for an accessor this very package already defines,
+    # so a fresh declaration can replace an inherited attribute (nearest
+    # wins, below) but never one of the class's own. That leaves three
+    # cases where has() is not called at all:
+    #   * adopt -- the explicit path above; the attribute must exist and
+    #     take the JSON key as its constructor argument;
+    #   * a field this class already declared (or adopted), declared again
+    #     with the same JSON key -- compared with the first declaration
+    #     further down, and a no-op when identical (k151). It used to
+    #     overwrite the registry entry while Moo kept the first spec, so
+    #     the two described different fields;
+    #   * anything else the class defines itself (a role's attribute, a
+    #     plain has) -- refused, since the field would be registered over
+    #     an attribute that does not follow its declaration.
+    my $install = 1;
+    if ($adopt) {
+        my $init = $spec && exists $spec->{init_arg} ? $spec->{init_arg} : $attr_name;
+        croak "k8s: cannot adopt $where: $caller has no attribute '$attr_name' "
+            . "taking '$json_key' as its constructor argument"
+            unless $spec && defined $init && $init eq $json_key;
+        $install = 0;
+    } elsif ($yielding) {
+        # Installed below; a helper composed into this very package is
+        # removed right before has(), which refuses to overwrite it.
+    } elsif ($local) {
+        croak "k8s: $where would take over the attribute '$attr_name' that "
+            . "$caller defines outside the k8s DSL"
+            unless $redeclared;
+        $install = 0;
+    }
 
     # Inline-struct form: name => [ Type, { options } ]. Exactly two elements
     # with a hashref second is unambiguous -- every array type spec ([Str],
@@ -393,6 +627,23 @@ sub _k8s {
         croak "k8s: field option '$key' for $where must not be undef"
             unless defined $opts{$key};
     }
+    # A nullable field keeps an explicit JSON null (k158) and brings two
+    # methods of its own: has_<accessor>, true while the key exists (null
+    # included), and clear_<accessor>, which makes the field absent again.
+    # Both names are part of the declaration preflight: taken by anything
+    # but this very field's own predicate and clearer -- declared before in
+    # this class, or inherited from the field an ancestor declares -- they
+    # are refused like a colliding field name, before anything is built.
+    my @nullable_methods = $opts{nullable} ? _nullable_methods($attr_name) : ();
+    if (@nullable_methods) {
+        my $own = IO::K8s::Role::Resource::_effective_attribute_specs($caller)->{$attr_name} // {};
+        my %own = map { defined $_ ? ($_ => 1) : () } @{$own}{qw( predicate clearer )};
+        for my $method (@nullable_methods) {
+            croak "k8s: $where needs the method '$method' as a nullable field, "
+                . "but $caller already has a method of that name"
+                if $caller->can($method) && !$own{$method};
+        }
+    }
     # required => 1 (or the legacy 'required' marker / '!' suffix) both
     # enforces the field at construction and records required => 1 in the
     # registry. required => 'schema' does the second half only: AutoGen
@@ -413,21 +664,29 @@ sub _k8s {
         $required = $required_recorded = 1;
     }
 
-    # Ensure the registry entry exists
-    $_attr_registry{$caller} = {} unless exists $_attr_registry{$caller};
-
     # Every branch below sets $inner, the type of a present value; the
     # Maybe wrapping for an optional field happens once at the end.
     my %info;
     my $inner;
 
-    # Handle Type::Tiny objects directly (Str, Int, Bool, IntOrStr, Quantity, Time)
+    # Handle Type::Tiny objects directly (Str, Int, Bool, IntOrStr, Quantity,
+    # Time) -- and, since k191, the map types: Opaque or a bare HashRef is
+    # the free map, HashRef[X] a map whose values are X.
     if (_is_type_tiny($type_spec)) {
         my $kind  = $type_spec->name;
         my $flags = $TYPE_FLAGS{$kind};
         if ($flags) {
             %info  = %$flags;
             $inner = _constrain($type_spec, $kind, \%opts, $where);
+        } elsif ($kind eq 'Opaque' || $kind eq 'HashRef') {
+            # Values untyped and copied through as they are; there is no
+            # scalar to put a value option on.
+            $info{is_hash_opaque} = 1;
+            _reject_value_options(\%opts, $where);
+            $inner = HashRef;
+        } elsif ($type_spec->is_parameterized
+            && $type_spec->parameterized_from->name eq 'HashRef') {
+            $inner = _typed_map(\%info, $type_spec->type_parameter, \%opts, $where);
         }
     } elsif (!ref $type_spec) {
         if (my $flags = $TYPE_FLAGS{$type_spec}) {
@@ -466,11 +725,15 @@ sub _k8s {
         # attribute, which is exactly what to_crd's _schema_for_class does
         # (found via IO::K8s::Api::Resource::V1::ResourceSlice, whose
         # DeviceCapacity.validValues is [Quantity]; k96 task-2 review).
-        # Purely additive: TO_JSON/_inflate_struct have no branch keyed on
-        # any of these four new flags either, so they fall through to the
-        # same generic ArrayRef copy an unflagged entry already used --
-        # serialization and inflation are unchanged, only the registry gets
-        # more precise.
+        # Purely additive when introduced (k96 task-2): TO_JSON and
+        # _inflate_struct had no branch keyed on any of these four flags, so
+        # they fell through to the same generic ArrayRef copy an unflagged
+        # entry already used. _inflate_struct still does today -- inflation
+        # is unchanged. TO_JSON no longer does: it now reads is_array_of_num
+        # for JSON-number elements (k155), is_array_of_quantity and
+        # is_array_of_time to stringify elements (k180), and
+        # is_array_of_int_or_string for the per-element int-or-string rule
+        # (k167, k181).
         } elsif (_is_type_tiny($elem)) {
             my $kind = $elem->name;
             if ($kind eq 'Str') {
@@ -508,27 +771,31 @@ sub _k8s {
             # Hash-of-X pattern: { TypeName => 1 }
             my $vkind = $keys[0];
             if ($vkind eq 'Str') {
+                # The string map, lenient (k191): TO_JSON puts every scalar
+                # value out as a JSON string, but the check stays the bare
+                # HashRef it was while { Str => 1 } meant the opaque map, so
+                # a declaration still relying on that keeps loading and
+                # serializing -- its reference values pass through, with a
+                # one-time warning. HashRef[Str] is the strict spelling.
                 $info{is_hash_of_str} = 1;
-                # Use plain HashRef without inner constraint - K8s has nested hashes
-                # in fields like fieldsV1, annotations, labels which can have any structure
+                $info{is_hash_of_str_lenient} = 1;
                 _reject_value_options(\%opts, $where);
                 $inner = HashRef;
             } elsif (my $vt = $HASH_VALUE_TYPES{$vkind}) {
                 # { Quantity => 1 } and friends: a typed value map. Each value
                 # is validated against the scalar type (k63).
-                $info{$vt->{flag}} = 1;
-                $inner = HashRef[ _constrain($vt->{isa}, $vkind, \%opts, $where) ];
+                $inner = _typed_map(\%info, $vt->{isa}, \%opts, $where);
             } else {
-                my $full_class = _expand_class($vkind);
-                $info{is_hash_of_objects} = 1;
-                $info{class} = $full_class;
-                _reject_value_options(\%opts, $where);
-                $inner = HashRef[InstanceOf[$full_class]];
+                $inner = _object_map(\%info, _expand_class($vkind), \%opts, $where);
             }
         } else {
             # Inline struct: { field => TypeSpec, ... }
             my $inner_class = $caller . '::_' . ucfirst($attr_name);
-            _generate_inline_struct($inner_class, $type_spec);
+            if ($redeclared) {
+                _redeclare_inline_struct($caller, $where, $registered, $inner_class, $type_spec);
+            } else {
+                _generate_inline_struct($inner_class, $type_spec);
+            }
             $info{is_object} = 1;
             $info{is_inline_struct} = 1;
             $info{class} = $inner_class;
@@ -553,7 +820,9 @@ sub _k8s {
             . $inner->get_message($opts{default});
     }
 
-    my $isa = $required ? $inner : Maybe[$inner];
+    # A nullable field takes undef even when required: required means the
+    # key must exist, and null is a value it may exist with (k158).
+    my $isa = $required && !@nullable_methods ? $inner : Maybe[$inner];
 
     $info{required} = 1 if $required_recorded;
     if (%opts) {
@@ -570,17 +839,21 @@ sub _k8s {
     # Store json_key when it differs from the Perl attribute name
     $info{json_key} = $json_key if $attr_name ne $json_key;
 
-    # Register - use hash slice to copy values, not reference
-    $_attr_registry{$caller}{$attr_name} = { %info };
-    no strict 'refs';
-    push @{"${caller}::_k8s_attributes"}, $attr_name;
+    # Declared in this very class before (k151): nothing is installed or
+    # registered a second time. The registry entry covers type, nested
+    # class, options, recorded required-ness and JSON key; the Moo spec
+    # adds whether required is enforced (1 and 'schema' record the same).
+    # An identical declaration changes nothing, not even the attribute list.
+    if ($redeclared) {
+        _croak_redeclared($where, $caller)
+            unless _same_value(\%info, $registered)
+            && $required == ($spec && $spec->{required} ? 1 : 0);
+        return;
+    }
 
-    # The merged @ISA views in IO::K8s::Role::Resource are cached; a new
-    # registration must not leave a stale merged view behind.
-    IO::K8s::Role::Resource::_invalidate_k8s_attr_cache($caller);
-
-    # Only create the attribute if it doesn't already exist (e.g., from a role)
-    return if $caller->can($attr_name);
+    # Adopted (a redeclaration has returned above): see the preflight above
+    # for why there is nothing to install.
+    return _register_field($caller, $attr_name, \%info) unless $install;
 
     # Call Moo's has — use init_arg to map JSON key to Perl-safe attribute name
     my $has = $caller->can('has');
@@ -634,13 +907,15 @@ sub _k8s {
     # now matches the one every other object-bearing field produces.
     #
     # Two things the three object branches here share:
-    #   * `ref $_[0] eq 'HASH'` is false for a blessed hashref, so one test
-    #     covers both "already an object, pass it through" and "not a hash,
-    #     pass it through". That short-circuit is also what keeps
-    #     IO::K8s::_inflate_struct from doing the work twice: it hands
-    #     $class->new fully built objects and every one of them lands here.
-    #   * anything that is neither goes on unchanged and lets `isa` write
-    #     the message -- a coercer never invents a type error of its own.
+    #   * one predicate, _object_builds, decides what is built: a plain
+    #     hashref -- `ref eq 'HASH'` is false for a blessed one -- or, for a
+    #     union class with FROM_STRUCT, any defined value that is not
+    #     already of the class (k179). An object of the class is passed
+    #     through, which is also what keeps IO::K8s::_inflate_struct from
+    #     doing the work twice: it hands $class->new fully built objects and
+    #     every one of them lands here.
+    #   * anything else goes on unchanged and lets `isa` write the message
+    #     -- a coercer never invents a type error of its own.
     elsif ($info{is_object}) {
         @coerce = (coerce => _object_coercer($info{class}));
     }
@@ -648,23 +923,27 @@ sub _k8s {
     # gets its index appended the same way the [Bool] coercer above does,
     # so the culprit can be found. Scanned first and returned untouched
     # when no element needs building -- the inflate path arrives here with
-    # an array of ready objects and should pay one `ref` per element, not
+    # an array of ready objects and should pay one check per element, not
     # a fresh arrayref.
+    #
+    # An element is built by the rule _object_builds states for the single
+    # field: a hashref, or any defined value for a union class (k179).
     elsif ($info{is_array_of_objects}) {
         my $oc = $info{class};
+        my $builds = _object_builds($oc);
         @coerce = (coerce => sub {
             return $_[0] unless ref $_[0] eq 'ARRAY';
             my $in = $_[0];
             my $needed = 0;
             for my $elem (@$in) {
-                next unless ref $elem eq 'HASH';
+                next unless $builds->($elem);
                 $needed = 1;
                 last;
             }
             return $in unless $needed;
             my @out;
             for my $i (0 .. $#$in) {
-                if (ref $in->[$i] eq 'HASH') {
+                if ($builds->($in->[$i])) {
                     push @out, eval {
                         IO::K8s::Role::Resource::_default_k8s()
                             ->_struct_to_object_expanded($oc, $in->[$i])
@@ -681,24 +960,26 @@ sub _k8s {
         });
     }
     # Hash of named nested classes: value-wise, with the key named on a
-    # failure. Same scan-first shortcut as the array form; `sort keys` in
-    # the building pass so several bad values still name a deterministic
-    # one, matching the unknown-field walk in IO::K8s::Role::Resource.
+    # failure. Same scan-first shortcut and element rule as the array form;
+    # `sort keys` in the building pass so several bad values still name a
+    # deterministic one, matching the unknown-field walk in
+    # IO::K8s::Role::Resource.
     elsif ($info{is_hash_of_objects}) {
         my $oc = $info{class};
+        my $builds = _object_builds($oc);
         @coerce = (coerce => sub {
             return $_[0] unless ref $_[0] eq 'HASH';
             my $in = $_[0];
             my $needed = 0;
             for my $key (keys %$in) {
-                next unless ref $in->{$key} eq 'HASH';
+                next unless $builds->($in->{$key});
                 $needed = 1;
                 last;
             }
             return $in unless $needed;
             my %out;
             for my $key (sort keys %$in) {
-                if (ref $in->{$key} eq 'HASH') {
+                if ($builds->($in->{$key})) {
                     $out{$key} = eval {
                         IO::K8s::Role::Resource::_default_k8s()
                             ->_struct_to_object_expanded($oc, $in->{$key})
@@ -714,10 +995,125 @@ sub _k8s {
             return \%out;
         });
     }
+    # Map of Bool (k191): a JSON boolean value -- what a decoded document
+    # carries -- becomes the 0/1 the value check accepts, through the same
+    # normalization the Bool field uses. Only reference values are touched:
+    # a plain scalar goes to `isa` as it is, so 'maybe' is still refused
+    # rather than read as true. A map whose values are all plain scalars is
+    # returned untouched.
+    elsif ($info{is_hash_of_bool}) {
+        @coerce = (coerce => sub {
+            return $_[0] unless ref $_[0] eq 'HASH';
+            my $in = $_[0];
+            return $in unless grep { ref } values %$in;
+            my %out;
+            for my $key (keys %$in) {
+                my $v = $in->{$key};
+                my $n = ref $v ? eval { _normalize_bool($v) } : undef;
+                $out{$key} = defined $n ? $n : $v;
+            }
+            return \%out;
+        });
+    }
+    # A yielding role helper composed into this package goes first, so the
+    # accessor can take its name -- after every check above, so a rejected
+    # declaration never gets this far.
+    Package::Stash->new($caller)->remove_symbol('&'.$attr_name)
+        if $yielding && $local;
+
+    # A complete spec, never has('+name'). For a field redeclared under the
+    # same JSON key in a subclass this is what makes nearest-wins real
+    # (k144): the subclass's spec replaces the inherited one outright, so
+    # the parent's coercion, required flag and init_arg go with it --
+    # has('+name') would merge them back in, and refuses coerce => undef.
+    # The parent class is left untouched.
     $has->($attr_name, is => 'rw', isa => $isa, @coerce,
         ($required ? (required => 1) : ()),
         ($attr_name ne $json_key ? (init_arg => $json_key) : ()),
+        (@nullable_methods
+            ? (predicate => $nullable_methods[0], clearer => $nullable_methods[1])
+            : ()),
     );
+    return _register_field($caller, $attr_name, \%info);
+}
+
+# The predicate and clearer a nullable field gets (k158), in that order:
+# has_<accessor> and clear_<accessor>, named after the Perl attribute, the
+# same name the accessor itself has. IO::K8s::Role::Resource's TO_JSON and
+# IO::K8s::Role::SpecBuilder's spec_delete call them through this too, so
+# the names are spelled in one place.
+sub _nullable_methods {
+    my ($attr_name) = @_;
+    return ('has_'.$attr_name, 'clear_'.$attr_name);
+}
+
+# An inline struct declared again in the class that declared it (k151). Its
+# inner class exists already, and building it a second time would add a new
+# field to it, keep a dropped one and set the class up twice -- so it is
+# compared instead: the same field names, and every field again an
+# identical declaration in the inner class, which the same rule makes a
+# no-op or refuses. Refused before any field is looked at when the first
+# declaration was not this inline struct or the names differ, so a refusal
+# leaves the inner class as it was.
+sub _redeclare_inline_struct {
+    my ($caller, $where, $registered, $inner_class, $fields) = @_;
+    my $had = $_attr_registry{$inner_class} // {};
+    my @had = sort map { $had->{$_}{json_key} // $_ } keys %$had;
+    _croak_redeclared($where, $caller)
+        unless $registered->{is_inline_struct}
+        && $registered->{class} eq $inner_class
+        && join("\0", @had) eq join("\0", sort keys %$fields);
+    __PACKAGE__->_k8s($inner_class, $_, $fields->{$_}) for sort keys %$fields;
+    return;
+}
+
+sub _croak_redeclared {
+    my ($where, $caller) = @_;
+    croak "k8s: $where is already declared in $caller with a different type, "
+        . 'options or required-ness; declare each field once per class';
+}
+
+# Deep equality of two registry entries (k151): arrays and hashes element
+# by element, everything else by what it stringifies to within the same
+# ref type -- a plain scalar as itself, a Regexp as its pattern with its
+# flags, a JSON boolean default as 0 or 1.
+sub _same_value {
+    my ($x, $y) = @_;
+    return !defined $y unless defined $x;
+    return 0 unless defined $y && ref $x eq ref $y;
+    my $type = reftype($x) // '';
+    if ($type eq 'ARRAY') {
+        return 0 unless @$x == @$y;
+        for my $i (0 .. $#$x) {
+            return 0 unless _same_value($x->[$i], $y->[$i]);
+        }
+        return 1;
+    }
+    if ($type eq 'HASH') {
+        return 0 unless keys %$x == keys %$y;
+        for my $key (keys %$x) {
+            return 0 unless exists $y->{$key} && _same_value($x->{$key}, $y->{$key});
+        }
+        return 1;
+    }
+    return "$x" eq "$y" ? 1 : 0;
+}
+
+# Record a declared field, only once its attribute is in place (k144): a
+# has() that dies must not leave a registry entry behind that no attribute
+# backs, nor a name in the attribute list or a merged view already rebuilt
+# around it.
+sub _register_field {
+    my ($caller, $attr_name, $info) = @_;
+    # Copy the values, not the reference
+    $_attr_registry{$caller}{$attr_name} = { %$info };
+    no strict 'refs';
+    push @{"${caller}::_k8s_attributes"}, $attr_name;
+
+    # The merged @ISA views in IO::K8s::Role::Resource are cached; a new
+    # registration must not leave a stale merged view behind.
+    IO::K8s::Role::Resource::_invalidate_k8s_attr_cache($caller);
+    return;
 }
 
 1;
@@ -734,7 +1130,7 @@ IO::K8s::Resource - Base class for all Kubernetes resources
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -767,8 +1163,11 @@ IO::K8s::Resource - Base class for Kubernetes resources
     k8s suspend => 'Bool';
     k8s spec => 'Core::V1::PodSpec';           # Short class name
     k8s containers => ['Core::V1::Container']; # Array of objects
-    k8s labels => { Str => 1 };                # Opaque hash of strings
+    k8s labels => { Str => 1 };                # String map (lenient legacy spelling)
+    k8s data => HashRef[Str];                  # String map, strict
+    k8s raw => Opaque;                         # Free map, values untyped (also bare HashRef)
     k8s limits => { Quantity => 1 };           # Typed value map (also Int/Num/Bool/Time/IntOrStr)
+    k8s ports => HashRef[Int];                 # The same, as HashRef[X]
     k8s rows => [ {} ];                         # Array of opaque hashes
     k8s matrix => [ [] ];                       # Array of opaque arrays
     k8s spec => {                              # Inline struct
@@ -777,18 +1176,32 @@ IO::K8s::Resource - Base class for Kubernetes resources
         template => { Str => 1 },
     };
 
-The C<< { Str => 1 } >> form is a deliberately B<opaque> hash: any value is
-accepted, for genuinely free-form maps such as labels, annotations and
-C<fieldsV1>. C<< { Quantity => 1 } >> (and C<Int>, C<Num>, C<Bool>, C<Time>,
+C<< { Str => 1 } >> and C<HashRef[Str]> declare a B<string map> -- labels,
+annotations, ConfigMap C<data>, a C<map[string]string> upstream: C<TO_JSON>
+puts every scalar value out as a JSON string, so C<< labels => { v => 5 } >>
+goes out as C<{"v":"5"}>. C<HashRef[Str]> refuses a reference value at
+construction. C<< { Str => 1 } >> keeps accepting any value, since it was
+the opaque map before 1.109: a reference value passes through unchanged and
+warns once per class and field (category C<deprecated>). C<Opaque>, or a
+bare C<HashRef>, is the B<free map> for genuinely free-form values such as
+C<fieldsV1> or a C<RawExtension>: any value, copied through as it is.
+C<Opaque> takes no parameters -- C<Opaque[...]> dies at declaration.
+Declare a free field as C<Opaque>: C<< { Str => 1 } >> was the opaque map up
+to 1.108, but is a string map now, so C<to_crd> emits C<additionalProperties:
+string> for it instead of C<x-kubernetes-preserve-unknown-fields>, and a
+reference value warns.
+C<< { Quantity => 1 } >> (and C<Int>, C<Num>, C<Bool>, C<Time>,
 C<IntOrStr>) instead validates every value against that scalar type, so a
 map upstream declares as C<map[X]Quantity> rejects a bad value at
-construction rather than at the API server.
+construction rather than at the API server; C<HashRef[Quantity]> and the
+other C<HashRef[X]>, including C<HashRef[InstanceOf['Some::Class']]> for a
+map of objects, are the same declarations spelled the other way.
 
 Inline structs auto-generate an inner class (e.g. C<MyClass::_Spec>) with
 the declared fields. Hashrefs are auto-coerced to the inner class on
 construction, through the very same coercion a named nested class gets --
 so a plain container inside the hashref is copied one level rather than
-stored by reference (k116). Before that, C<< ->new >> was the one route
+stored by reference. Before 1.108, C<< ->new >> was the one route
 into an inline-struct field that aliased the caller's structure while
 C<inflate>, C<struct_to_object> and C<FROM_HASH> already copied it; the
 four now agree.
@@ -807,6 +1220,21 @@ so boolean spellings and the unknown-field policy behave identically on both
 routes. A value that is already an object is passed through untouched, and
 anything that is neither a hashref nor an object is left to the type
 constraint to reject.
+
+The one exception is a class that inflates through C<FROM_STRUCT> -- the
+apiextensions union classes C<V1::JSON> and C<JSONSchemaPropsOr*>, which
+serialize as the bare value they hold. Such a field takes every defined
+value, not only a hashref, exactly as inflation does:
+
+    IO::K8s::K3s::V1::HelmChartSpec->new(values => [ 1, 2 ]);   # values: [1,2]
+    $schema->enum([ 'small', 'large' ]);                         # enum: ["small","large"]
+
+The value goes to the class's C<FROM_STRUCT> through the same call
+inflation makes, in the constructor, the setter and every C<spec_*> write,
+element by element for an array or map of such objects. An object already
+of the class is passed through, C<undef> is still no value, and a value
+the union itself refuses (a plain scalar for the schema arm of C<items>)
+fails with the same inflation error L<IO::K8s/inflate> gives for it.
 
 Short class names are auto-expanded:
 
@@ -834,22 +1262,22 @@ original keys.
     };
 
 A field declaration takes an optional third argument: a hashref of options,
-directly after the type spec (C<k8s name => Type, { ... }>), or as the
+directly after the type spec (C<< k8s name => Type, { ... } >>), or as the
 second element of a two-element arrayref in place of the type spec
-(C<name => [ Type, { ... } ]>) for a field inside an inline struct, which
+(C<< name => [ Type, { ... } ] >>) for a field inside an inline struct, which
 has no third-argument slot of its own. The legacy C<'required'> string
-marker and the C<Type!> suffix (C<k8s x => 'Str!'>) still work and are
-equivalent to C<{ required => 1 }>.
+marker and the C<Type!> suffix (C<< k8s x => 'Str!' >>) still work and are
+equivalent to C<< { required => 1 } >>.
 
 The nine recognised option keys are C<required>, C<default>, C<enum>,
 C<minimum>, C<maximum>, C<pattern>, C<description>, C<nullable> and
 C<preserve_unknown>. All nine are recorded in the attribute registry for
 the CRD schema a C<to_crd> emitter builds from it.
 
-C<required> itself takes two meaningful values. C<required => 1> (like the
+C<required> itself takes two meaningful values. C<< required => 1 >> (like the
 legacy marker and the C<!> suffix) both makes the field a Moo-required
-constructor argument and records C<required => 1> in the registry.
-C<required => 'schema'> records the same registry fact without the Moo
+constructor argument and records C<< required => 1 >> in the registry.
+C<< required => 'schema' >> records the same registry fact without the Moo
 enforcement, leaving the field optional at construction -- this is what
 L<IO::K8s::AutoGen> uses for an OpenAPI C<required> list, since a document
 a real cluster returns can still omit such a field (a server-side default,
@@ -863,9 +1291,10 @@ Type::Tiny constraints at construction, the same way C<< { Quantity => 1 }
 API server. They apply to a scalar field, to each element of an array of
 scalars (C<< k8s tags => [Str], { enum => [...] } >>), and to each value of
 a typed value map (C<< k8s weights => { Int => 1 }, { maximum => 100 } >>).
-Declaring one of them on an object, inline-struct or opaque-container field
-(C<{ Str => 1 }>, C<[ {} ]>, C<[ [] ]>, a nested class) is a class-load
-error, since there is no scalar value to check. A failing value dies with
+Declaring one of them on an object, inline-struct or container field
+(C<Opaque>, a bare C<HashRef>, C<< { Str => 1 } >>, C<[ {} ]>, C<[ [] ]>, a nested class) is a
+class-load error, since there is no scalar value to check. C<HashRef[Str]>
+takes them, per value. A failing value dies with
 one of:
 
     Value "x" is not one of: a, b
@@ -877,30 +1306,112 @@ On an optional field the message is prefixed with Type::Tiny's own generic
 "did not pass type constraint" line; the rule text above follows in the
 explanation.
 
-C<default>, C<description>, C<nullable> and C<preserve_unknown> are
-schema-only: they are recorded for C<to_crd> and never change anything at
-construction or serialization. In particular, C<default> is B<not> applied
-client-side -- defaulting is the API server's job, and a client-side
-default would change the wire output, so a field with no value given still
-serializes as absent. C<nullable> likewise does not make C<TO_JSON> emit
-C<null>: an unset field is still omitted from the JSON either way.
+C<default>, C<description> and C<preserve_unknown> are schema-only: they
+are recorded for C<to_crd> and never change anything at construction or
+serialization. In particular, C<default> is B<not> applied client-side --
+defaulting is the API server's job, and a client-side default would change
+the wire output, so a field with no value given still serializes as
+absent.
+
+C<nullable> is recorded for C<to_crd> as well, and since 1.109 it also
+makes an explicit JSON C<null> a value of its own:
+
+    k8s upstream => { Str => 1 }, { nullable => 1 };
+
+    my $spec = My::Spec->new(upstream => undef);
+    $spec->has_upstream;      # true: the key exists
+    $spec->to_json;           # {"upstream":null}
+    $spec->clear_upstream;    # absent again
+    $spec->to_json;           # {}
+
+The field accepts C<undef> at construction and in its setter -- its type
+is C<Maybe>-wrapped even when it is C<required> -- and every inflation
+route (L<IO::K8s/inflate>, L<IO::K8s/new_object>,
+L<IO::K8s/struct_to_object>, L<IO::K8s/json_to_object>,
+L<IO::K8s::Role::Resource/FROM_HASH>, C<from_json> and the nested coercion
+of a constructor, at any depth) keeps a C<null> for it where every other
+field drops it. C<TO_JSON> writes a nullable field that is present with
+C<undef> as C<null>; an absent one stays omitted. Only a nullable field
+gets the two methods that tell those apart: C<< has_<accessor> >>, true
+while the key exists, C<null> included, and C<< clear_<accessor> >>,
+which makes the field absent again. C<< required => 1 >> together with
+C<nullable> means the key has to exist, and C<null> satisfies it. For every
+field without C<nullable>, C<undef> and C<null> still mean "absent".
 
 Class load fails, naming the class and field, on: an unrecognised option
-key (C<k8s: unknown field option '<key>' for field '<name>' of <class>
-(known: ...)>); any option given an explicit C<undef> value, since that is
-a declaration error rather than "no option" (C<k8s: field option '<key>'
-for ... must not be undef>); a third argument that is neither
+key (C<< k8s: unknown field option '<key>' for field '<name>' of <class>
+(known: ...) >>); any option given an explicit C<undef> value, since that is
+a declaration error rather than "no option" (C<< k8s: field option '<key>'
+for ... must not be undef >>); a third argument that is neither
 C<'required'> nor a hashref; an empty or duplicate C<enum>, or C<enum> on a
 C<Bool> field; C<minimum>/C<maximum> on a non-numeric field, a non-numeric
 bound, or a C<minimum> exceeding C<maximum>; a C<pattern> on a non-string
 field or one that does not compile as a Perl regex; and a C<default> that
-fails the field's own type (C<k8s: 'default' for ... fails the field's own
-type: <message>>), checked once at class-load time rather than discovered
+fails the field's own type (C<< k8s: 'default' for ... fails the field's own
+type: <message> >>), checked once at class-load time rather than discovered
 later when C<to_crd> emits it. An object-bearing field -- a referenced
 class, an inline struct, or an array or map of objects -- is exempt from
 that last check: no plain hash or array default can ever satisfy an
 C<InstanceOf> constraint, so there is nothing useful to check, and the
 default is recorded as given.
+
+Class load also fails, before any field option above is even considered,
+on a declaration that collides with something already in place:
+
+=over 4
+
+=item * Two different JSON keys that sanitize to the same Perl attribute
+name (C<x-value> and C<x_value> both become C<x_value>), in this class or,
+nearest wins, in an ancestor: C<< k8s: field '<name>' of <class> collides
+with field '<other key>' of <declaring class>: both map to the Perl
+attribute '<attr>' >>.
+
+=item * A field name that is already a method on the class but not a Moo
+attribute -- a role helper such as L<IO::K8s::Role::APIObject/is_ready> --
+unless the role that provides it has declared the helper as yielding to a
+wire field of the same name, which today only C<conditions> is:
+C<< k8s: field '<name>' of <class> collides with the method '<attr>' of
+<class>, which is not an attribute >>.
+
+=item * A field that would take over an attribute the class defines
+itself outside the C<k8s> DSL (a plain C<has>): C<< k8s: field '<name>' of
+<class> would take over the attribute '<attr>' that <class> defines
+outside the k8s DSL >>.
+
+=item * A C<nullable> field whose predicate or clearer name
+(C<< has_<accessor> >>, C<< clear_<accessor> >>) the class already
+answers to -- a method, or the accessor of another field -- other than as
+this very field's own, declared before or inherited: C<< k8s: field
+'<name>' of <class> needs the method '<method>' as a nullable field, but
+<class> already has a method of that name >>. The other way round, a field
+whose accessor would take a nullable field's predicate or clearer name is
+refused by the method check above.
+
+=item * A field the same class has already declared under the same JSON
+key, declared again with a different type, nested class, option,
+C<required> (including C<1> against C<'schema'>) or inline-struct field
+set: C<< k8s: field '<name>' of <class> is already declared in
+<class> with a different type, options or required-ness; declare each
+field once per class >>. Moo keeps the first attribute of a class, so a
+second, different declaration could never take effect; it used to
+overwrite the C<_k8s_attr_info> entry anyway, leaving serialization and
+construction to follow two different declarations of one field. An
+inline struct is compared field by field, and a changed field inside it is
+reported against the generated inner class (C<< <class>::_<Name> >>).
+
+=back
+
+A rejected declaration leaves the class exactly as it was -- nothing is
+installed, registered in C<_k8s_attr_info>, or added to the attribute
+list. A subclass that redeclares an inherited C<k8s> field under the same
+JSON key replaces it outright, in the subclass only: nearest wins, so the
+new declaration's type, coercion, C<required> and C<init_arg> take over
+there, while the ancestor's own declaration is left completely untouched.
+Within the very same class, an identical second declaration of a field
+is tolerated and changes nothing -- not the registry, not the attribute
+list; that includes declaring C<metadata> as C<Meta::V1::ObjectMeta> in a
+class whose C<use IO::K8s::APIObject> already adopted it. Declare each
+field once per class.
 
 The registry (C<_k8s_attr_info>) keeps C<required> as a plain C<1> (absent
 when not required, matching the pre-D3 shape) and every other given option,

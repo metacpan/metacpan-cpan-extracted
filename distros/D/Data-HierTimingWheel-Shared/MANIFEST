@@ -13,8 +13,10 @@ t/02-recover.t
 xt/asan.t
 xt/crash_recovery.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fork_hw.t
 xt/kwalitee.t
+xt/ops_crash_gdb.t
 xt/pod.t
 xt/tsan.t
 xt/valgrind.t

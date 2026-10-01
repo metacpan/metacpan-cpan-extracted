@@ -18,7 +18,7 @@ name: WebService-MusicBrainz
 provides:
   WebService::MusicBrainz:
     file: lib/WebService/MusicBrainz.pm
-    version: v1.0.10
+    version: v1.0.11
   WebService::MusicBrainz::Request:
     file: lib/WebService/MusicBrainz/Request.pm
     version: '1.1'
@@ -30,5 +30,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/bfaist/webservice-musicbrainz.git
-version: v1.0.10
+version: v1.0.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -29,8 +29,9 @@ use Test::More;
 # -----------------------------------------------------------------------------
 
 use Rex::GPU::NVIDIA;
+use Rex::GPU::NVIDIA::Setup;
 
-sub present { Rex::GPU::NVIDIA::_nvidia_driver_present(@_) }
+sub present { Rex::GPU::NVIDIA::Setup->_driver_present(@_) }
 
 subtest 'working driver => present (skip install)' => sub {
   # The exact `nvidia-smi -L` line from otho-lab (Ubuntu 24.04, 610.57.04).

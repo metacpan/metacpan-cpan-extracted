@@ -38,18 +38,14 @@
          },
          "requires" : {
             "CLI::Simple" : "v2.1.2",
-            "CLI::Simple::Constants" : "v2.1.2",
-            "CLI::Simple::Utils" : "v2.1.2",
             "File::Process" : "v1.0.0",
             "File::ShareDir" : "1.118",
             "File::ShareDir::Install" : "0",
             "JSON" : "4.10",
             "Log::Log4perl" : "0",
-            "Log::Log4perl::Level" : "0",
             "Module::CPANfile" : "0",
             "Readonly" : "2.05",
             "Role::Tiny" : "2.002004",
-            "Role::Tiny::With" : "2.002004",
             "YAML::Tiny" : "0",
             "perl" : "5.010"
          }
@@ -61,19 +57,19 @@
    "provides" : {
       "CPAN::Maker" : {
          "file" : "lib/CPAN/Maker.pm",
-         "version" : "v2.0.11"
+         "version" : "v2.0.12"
       },
       "CPAN::Maker::Constants" : {
          "file" : "lib/CPAN/Maker/Constants.pm",
-         "version" : "v2.0.11"
+         "version" : "v2.0.12"
       },
       "CPAN::Maker::Role::FileUtils" : {
          "file" : "lib/CPAN/Maker/Role/FileUtils.pm",
-         "version" : "v2.0.11"
+         "version" : "v2.0.12"
       },
       "CPAN::Maker::Role::ModuleUtils" : {
          "file" : "lib/CPAN/Maker/Role/ModuleUtils.pm",
-         "version" : "v2.0.11"
+         "version" : "v2.0.12"
       },
       "CPAN::Maker::Role::Provides" : {
          "file" : "lib/CPAN/Maker/Role/Provides.pm",
@@ -81,7 +77,7 @@
       },
       "CPAN::Maker::Utils" : {
          "file" : "lib/CPAN/Maker/Utils.pm",
-         "version" : "v2.0.11"
+         "version" : "v2.0.12"
       }
    },
    "release_status" : "stable",
@@ -96,6 +92,6 @@
          "web" : "https://github.com/rlauer6/CPAN-Maker"
       }
    },
-   "version" : "v2.0.11",
+   "version" : "v2.0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

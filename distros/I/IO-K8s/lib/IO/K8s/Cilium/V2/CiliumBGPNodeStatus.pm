@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPNodeStatus;
 # ABSTRACT: Status is the most recently observed status of the CiliumBGPNodeConfig.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s bgpInstances => ['+IO::K8s::Cilium::V2::CiliumBGPNodeInstanceStatus'];
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::CiliumBGPNodeStatus - Status is the most recently observed 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 bgpInstances
 

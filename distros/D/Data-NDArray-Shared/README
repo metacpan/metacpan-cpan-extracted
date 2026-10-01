@@ -129,6 +129,12 @@ METHODS
     does not disturb the handle. "new_readonly" opens a frozen file read-only
     for lock-free access (see "FROZEN (READ-ONLY) MODE").
 
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of dying with "SIGBUS" while the
+    array is zero-filled; set "DATA_NDARRAY_SHARED_SPARSE=1" to skip the
+    reservation. On tmpfs and memfd the segment is memory, and a memory cgroup
+    too small for it gets an OOM kill rather than a croak.
+
   Element access
         my $v = $a->get(@idx);            # element at the full multi-index
         $a->set(@idx, $val);              # write the element at the multi-index
@@ -414,9 +420,13 @@ SECURITY
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership; if a holder dies, the next contender detects the
-    dead owner and recovers. Because each mutation updates the data buffer
-    (and, for "reshape", a few header words) while holding the lock, a crash
-    leaves the array consistent up to the last completed operation.
+    dead owner and recovers. A whole-array operation killed part-way leaves
+    some elements updated and the rest not. A "reshape" killed part-way can
+    leave "ndim", "shape" and "strides" mixed; the process that recovers the
+    lock, or the next one to open the file, detects that (the shape's product
+    no longer equals "size", or the strides are not row-major) and resets the
+    array to its 1-D view: "ndim" 1, "shape" "(size)". The data itself is
+    never touched, and a mixed shape that is still self-consistent is kept.
     Limitation: PID reuse is not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery

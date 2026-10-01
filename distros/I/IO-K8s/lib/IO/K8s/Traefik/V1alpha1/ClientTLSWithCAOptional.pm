@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ClientTLSWithCAOptional;
 # ABSTRACT: TLS defines the configuration used to secure the connection to the authentication server.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s caOptional         => Bool;
@@ -26,7 +26,7 @@ IO::K8s::Traefik::V1alpha1::ClientTLSWithCAOptional - TLS defines the configurat
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 caOptional
 

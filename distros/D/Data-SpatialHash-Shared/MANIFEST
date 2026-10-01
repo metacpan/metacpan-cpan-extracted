@@ -55,11 +55,13 @@ xt/crash_recovery.t
 xt/dead_reader_recovery.t
 xt/destroy_during_call.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/fork_live.t
 xt/fork_locked.t
 xt/invalid_args.t
+xt/kill_repair.t
 xt/kwalitee.t
 xt/manifest_vs_git.t
 xt/memfd_seal.t

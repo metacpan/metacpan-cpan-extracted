@@ -1,0 +1,4 @@
+# golden: detect/sysfs--rtx3090
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: cd /sys/bus/pci/devices && test -r . || exit 3; for d in *; do test -e "$d" || continue; l=$d; for f in class vendor device subsystem_vendor subsystem_device; do v=; read -r v 2>/dev/null <"$d/$f"; l="$l ${v:--}"; done; printf '%s\n' "$l"; done

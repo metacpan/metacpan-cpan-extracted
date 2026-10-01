@@ -1,4 +1,15 @@
 Revision history for Test-Metrics-Any
 
+0.02    2026-09-30
+        [CHANGES]
+         * General style refresh
+            + Minimum perl version 5.20
+            + Use subroutine signatures (mostly)
+            + Minor Pod style updates
+            + Swap unit tests from `Test::More` to `Test2::V0`
+         * Defend unit tests against changes to perl's reporting of line
+           numbers in code involving multi-line anonymous subroutines
+           (Perl #24396)
+
 0.01    2020-05-05
         First version, released on an unsuspecting world.

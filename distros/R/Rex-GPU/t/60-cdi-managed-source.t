@@ -39,7 +39,7 @@ use Test::More;
 
 use Rex::GPU::NVIDIA;
 
-sub managed { Rex::GPU::NVIDIA::_cdi_managed_source_present(@_) }
+sub managed { Rex::GPU::NVIDIA->_cdi_managed_source_present(@_) }
 
 subtest 'refresh unit installed (is-enabled) => managed, skip /etc/cdi' => sub {
   is(managed(enabled_state => 'enabled'),         1, 'enabled => managed');

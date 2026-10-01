@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::HTTPRouteTimeouts;
 # ABSTRACT: Timeouts defines the timeouts that can be configured for an HTTP request.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s backendRequest => Str, { pattern => qr/^([0-9]{1,5}(h|m|s|ms)){1,4}$/ };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1beta1::HTTPRouteTimeouts - Timeouts defines the timeouts 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 backendRequest
 

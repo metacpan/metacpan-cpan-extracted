@@ -13,19 +13,17 @@ use YAML::Tiny ();
 use File::HomeDir ();
 use Fcntl ();
 
-=encoding utf-8
-
 =head1 NAME
 
 App::makefilepl2cpanfile - Convert Makefile.PL to a cpanfile automatically
 
 =head1 VERSION
 
-This document describes App::makefilepl2cpanfile version 0.05.
+This document describes App::makefilepl2cpanfile version 0.06.
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # -----------------------------------------------------------------------
 # Constants
@@ -159,6 +157,18 @@ Readonly::Scalar my $SIMPLE_KEY_RE => qr/
 	(?: BUILD_REQUIRES | CONFIGURE_REQUIRES | PREREQ_PM | TEST_REQUIRES )
 /x;
 
+# Openers of dependency blocks: each captures its key in $1 and ends with
+# the '{', whose block _blocks() then takes from the matching-brace table.
+Readonly::Scalar my $SIMPLE_OPEN_RE  => qr/ \b ($SIMPLE_KEY_RE) \s*+ => \s*+ \{ /x;
+Readonly::Scalar my $PREREQS_OPEN_RE => qr/ \b (prereqs) \s*+ => \s*+ \{ /x;
+# A child of a prereqs or phase block: a phase or relationship name.
+Readonly::Scalar my $CHILD_OPEN_RE   => qr/ \b (\w++) \s*+ => \s*+ \{ /x;
+# The META spec 1.x top-level keys of %LEGACY_KEY, optionally quoted.
+Readonly::Scalar my $LEGACY_OPEN_RE  => qr/
+	\b ( requires | build_requires | configure_requires | recommends | suggests | conflicts )
+	['"]? \s*+ => \s*+ \{
+/x;
+
 # The text of a comment without its outer whitespace: runs of whitespace
 # each followed by non-whitespace, taken possessively, so trailing
 # whitespace is left out without being rescanned.  (The usual
@@ -190,7 +200,7 @@ Readonly::Scalar my $DEVELOP_ENTRY_RE => qr/
 # Unicode bidirectional controls used by "Trojan Source" (CVE-2021-42574)
 # to make text display differently from how it is read.
 Readonly::Scalar my $UNSAFE_COMMENT_CHARS_RE =>
-	qr/[\x00-\x08\x0A-\x1F\x7F-\x9F\x{061C}\x{200E}\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}]/;
+	qr/[\x00-\x08\x0A-\x1F\x7F-\x9F\x{061C}\x{200E}\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}]/x;
 
 =head1 SYNOPSIS
 
@@ -256,6 +266,10 @@ searched for the parts that list dependencies.  This makes the tool safe
 to use on code you do not trust, but it also means that it cannot see
 dependencies that are computed while the program runs (see
 L</COMMON PITFALLS>).
+
+Reading takes time in proportion to the size of the input, however it is
+written, so a hostile F<Makefile.PL> or F<cpanfile> (for example one with
+thousands of unclosed braces) cannot make the tool hang.
 
 =head2 What it reads
 
@@ -645,7 +659,7 @@ sub generate {
 
 	# File tests and the reads below (including the config file) change
 	# errno; restore the caller's $! on every exit path.
-	local $!;
+	local $! = 0;
 
 	my $existing = $args->{existing} // '';
 	my $with_dev = $args->{with_develop} // 1;
@@ -664,16 +678,16 @@ sub generate {
 	# after the first.  Conclusion: only the first opener needs trying.
 	# The closing '};' must start a line, so a '};' inside an inline
 	# comment does not end the block early.
-	if ($existing =~ /$DEVELOP_OPEN_RE/g) {
+	if ($existing =~ /$DEVELOP_OPEN_RE/gx) {
 		my $open_end = pos $existing;
-		if ($existing =~ /^[ \t]*\};/mg) {
+		if ($existing =~ /^[ \t]*\};/mgx) {
 			my $dev_block = substr $existing, $open_end, $-[0] - $open_end;
 
 			# A commented-out line is not an entry.  '#' cannot occur in a
 			# valid module name or version, so stripping to end of line is safe.
-			$dev_block =~ s/\#[^\n]*+//g;
+			$dev_block =~ s/\#[^\n]*+//gx;
 
-			while ($dev_block =~ /$DEVELOP_ENTRY_RE/g) {
+			while ($dev_block =~ /$DEVELOP_ENTRY_RE/gx) {
 				# Save immediately: the validation regexes below would reset
 				# the capture variables.
 				my ($rel, $mod, $ver) = ($1, $2 // $3, $4 // $5);
@@ -779,14 +793,13 @@ sub read_makefile {
 	my $makefile = "@{[ $_[0] // 'Makefile.PL' ]}";
 
 	# File tests and reads change errno; restore the caller's $! and $@.
-	local $!;
-	local $@;
+	local $! = 0;
+	local $@ = q{};
 
 	Carp::croak "Cannot read '" . _printable($makefile) . q{'} unless -f $makefile && -r _;
 
 	my $content;
-	eval { $content = Path::Tiny::path($makefile)->slurp_utf8 };
-	if ($@) {
+	if (!eval { $content = Path::Tiny::path($makefile)->slurp_utf8; 1 }) {
 		# Only degrade gracefully for encoding errors; re-throw true I/O
 		# failures so callers can distinguish a corrupt file from an
 		# unreadable one.  Path::Tiny reports I/O failures as
@@ -794,9 +807,9 @@ sub read_makefile {
 		# matching keywords against that would misread an I/O error in,
 		# say, ~/src/utf8-tools/ as a decoding problem.  So objects are
 		# always rethrown, and only plain decoder messages are matched.
-		die $@ if ref $@ || $@ !~ /decode|ill-formed|utf/i;
+		die $@ if ref $@ || $@ !~ /decode|ill-formed|utf/ix;  ## no critic (RequireCarping) re-thrown unchanged, as documented; croak would append a location
 		Carp::carp "Warning: '" . _printable($makefile) . "' contains invalid UTF-8; reading as raw bytes: "
-			. _printable($@ =~ s/\n\z//r);
+			. _printable($@ =~ s/\n\z//rx);
 		$content = Path::Tiny::path($makefile)->slurp_raw;
 	}
 	return $content;
@@ -946,29 +959,23 @@ sub parse_prereqs {
 	# silently ignored."  Undef and references are not valid Str inputs; return
 	# {} immediately to avoid "uninitialized value" and "reference used as
 	# string" warnings from the pattern-match operators below.
-	return {} unless defined $content && !ref $content;
+	return {} if !defined $content || ref $content;
 
 	my %deps;
 	my $comments = _comment_spans($content);
+
+	# Every block is found through the matching-brace table, so a block may
+	# nest to any depth and each scan below is linear: no pattern has to
+	# match balanced braces, which is what made unclosed openers quadratic.
+	my $pairs = _brace_pairs($content);
 
 	# ---- Simple dependency keys (PREREQ_PM, BUILD_REQUIRES, etc.) ----
 	# These always map to the 'requires' relationship in their phase.  All
 	# four are found in one pass: each key has its own phase, so the order
 	# in which blocks are met cannot change which entry wins.
-	#
-	# The regex allows up to four levels of brace nesting so that unusual
-	# Makefile.PL constructs (e.g. version objects) don't terminate the
-	# block match prematurely.
-	while ($content =~ /
-		\b ($SIMPLE_KEY_RE) \s*=>\s* \{
-			( (?: [^{}]++
-			    | \{ (?: [^{}]++ | \{ (?: [^{}]++ | \{ [^}]*+ \} )* \} )* \}
-			  )*
-			)
-		\}
-	/gsx) {
-		my ($key, $block) = ($1, $2);
-		next if _in_comment($comments, $-[0]);
+	for my $found (@{ _blocks($content, 0, $pairs, $SIMPLE_OPEN_RE) }) {
+		my ($key, $at, undef, $block) = @{$found};
+		next if _in_comment($comments, $at);
 		_extract_pairs($block, \%deps, $PHASE_MAP{$key}, 'requires');
 	}
 
@@ -976,46 +983,22 @@ sub parse_prereqs {
 	# These can appear at the top level of WriteMakefile() or nested inside
 	# META_MERGE; both are covered by searching the full content for 'prereqs'.
 	# The [start, end) offset of each block is recorded so that the legacy
-	# 'recommends'/'suggests' scan below can skip relationship blocks nested inside it.
+	# scan below can skip relationship blocks nested inside it.
 	my @prereqs_spans;
-	while ($content =~ /
-		\b prereqs \s*=>\s* \{
-			( (?: [^{}]++
-			    | \{ (?: [^{}]++
-			         | \{ (?: [^{}]++ | \{ (?: [^{}]++ | \{ [^}]*+ \} )* \} )* \}
-			      )* \}
-			  )*
-			)
-		\}
-	/gsx) {
-		my $prereqs_block = $1;
-		my @span = ($-[0], $+[0]);
-		# Offset of the block's text in $content: nested matches below are
-		# made on substrings, so their positions must be shifted by this
-		# before they can be looked up in the comment map.
-		my $prereqs_base = $-[1];
-		next if _in_comment($comments, $span[0]);
-		push @prereqs_spans, \@span;
+	for my $prereqs (@{ _blocks($content, 0, $pairs, $PREREQS_OPEN_RE) }) {
+		my (undef, $at, $prereqs_base, $prereqs_block, $end) = @{$prereqs};
+		next if _in_comment($comments, $at);
+		push @prereqs_spans, [ $at, $end ];
 
 		# Each direct child is a phase name mapping to a relationship hash.
-		while ($prereqs_block =~ /
-			\b (\w+) \s*=>\s* \{
-				( (?: [^{}]++ | \{ (?: [^{}]++ | \{ [^}]*+ \} )* \} )* )
-			\}
-		/gsx) {
-			my ($phase_name, $phase_block) = ($1, $2);
-			my ($phase_at, $phase_base) = ($prereqs_base + $-[0], $prereqs_base + $-[2]);
+		for my $phase (@{ _blocks($prereqs_block, $prereqs_base, $pairs, $CHILD_OPEN_RE) }) {
+			my ($phase_name, $phase_at, $phase_base, $phase_block) = @{$phase};
 			next unless $VALID_PHASE{$phase_name};
 			next if _in_comment($comments, $phase_at);
 
 			# Each child of the phase block is a relationship name.
-			while ($phase_block =~ /
-				\b (\w+) \s*=>\s* \{
-					( (?: [^{}]++ | \{ [^}]*+ \} )* )
-				\}
-			/gsx) {
-				my ($rel, $rel_block) = ($1, $2);
-				my $rel_at = $phase_base + $-[0];
+			for my $relationship (@{ _blocks($phase_block, $phase_base, $pairs, $CHILD_OPEN_RE) }) {
+				my ($rel, $rel_at, undef, $rel_block) = @{$relationship};
 				next unless $VALID_REL{$rel};
 				next if _in_comment($comments, $rel_at);
 
@@ -1024,28 +1007,80 @@ sub parse_prereqs {
 		}
 	}
 
-	# ---- Legacy top-level 'recommends' / 'suggests' ----
-	# e.g. META_MERGE => { recommends => { 'Mod' => 0 } }.  META spec 1.x
-	# defines a top-level 'recommends' as runtime recommendations; a
-	# top-level 'suggests' is treated the same way (runtime suggestions).
-	# Occurrences inside a 'prereqs' block are phase-scoped and have
-	# already been handled above, so skip them.
-	while ($content =~ /
-		\b (requires|build_requires|configure_requires|recommends|suggests|conflicts) ['"]? \s*=>\s* \{
-			( (?: [^{}]++ | \{ [^}]*+ \} )* )
-		\}
-	/gsx) {
-		my ($key, $block, $start) = ($1, $2, $-[0]);
-		# The spans come from successive /g matches, so they are sorted and
-		# do not overlap: the same binary search as for comments applies,
-		# O(log P) per block instead of a linear scan (which made many
-		# legacy blocks times many prereqs blocks quadratic).
-		next if _in_comment(\@prereqs_spans, $start);
-		next if _in_comment($comments, $start);
+	# ---- Legacy top-level keys (META spec 1.x) ----
+	# e.g. META_MERGE => { recommends => { 'Mod' => 0 } }, mapped through
+	# %LEGACY_KEY.  Occurrences inside a 'prereqs' block are phase-scoped and
+	# have already been handled above, so skip them.
+	for my $found (@{ _blocks($content, 0, $pairs, $LEGACY_OPEN_RE) }) {
+		my ($key, $at, undef, $block) = @{$found};
+		# The spans come from a scan that resumes after each block, so they
+		# are sorted and do not overlap: the same binary search as for
+		# comments applies, O(log P) per block instead of a linear scan
+		# (which made many legacy blocks times many prereqs blocks quadratic).
+		next if _in_comment(\@prereqs_spans, $at);
+		next if _in_comment($comments, $at);
 		_extract_pairs($block, \%deps, @{ $LEGACY_KEY{$key} });
 	}
 
 	return \%deps;
+}
+
+# -----------------------------------------------------------------------
+
+# _brace_pairs
+#
+# Purpose:  Pair every '{' in the content with its matching '}', in one
+#           left-to-right pass with a stack.
+# Entry:    $_[0] - the content (a defined string).
+# Exit:     Returns a hashref { offset of '{' => offset of its '}' }.  A '{'
+#           that is never closed has no entry; a '}' with no '{' before it
+#           is ignored.
+# Effects:  None.
+#
+# Braces are counted wherever they appear, including inside quoted strings
+# and comments, as the balanced-brace patterns this replaced did.
+sub _brace_pairs {
+	my $content = $_[0];
+	my (%close_of, @open);
+	while ($content =~ /[{}]/gx) {
+		if (substr($content, $-[0], 1) eq '{') {
+			push @open, $-[0];
+		} elsif (@open) {
+			$close_of{ pop @open } = $-[0];
+		}
+	}
+	return \%close_of;
+}
+
+# -----------------------------------------------------------------------
+
+# _blocks
+#
+# Purpose:  Find each "KEY => {" whose '{' is closed, with the text of its
+#           block.
+# Entry:    $_[0] - text to scan: a substring of the content.
+#           $_[1] - offset of that substring in the content.
+#           $_[2] - _brace_pairs() of the whole content.
+#           $_[3] - opener pattern: captures the key in $1, ends with '{'.
+# Exit:     Returns an arrayref of [ key, offset of the key, offset of the
+#           block's text, the block's text, offset just past its '}' ].
+#           Offsets are in the whole content.
+# Effects:  None.
+#
+# Like a /g match of a balanced-brace pattern, the scan resumes after each
+# block, so a key inside a block that was found is not reported
+# separately.  An unclosed '{' is passed over and the scan continues
+# inside it.
+sub _blocks {
+	my ($text, $base, $pairs, $opener_re) = @_;
+	my @blocks;
+	while ($text =~ /$opener_re/gx) {
+		my ($key, $at, $opening) = ($1, $base + $-[0], $base + $+[0] - 1);
+		my $closing = $pairs->{$opening} // next;
+		push @blocks, [ $key, $at, $opening + 1, substr($text, $opening + 1 - $base, $closing - $opening - 1), $closing + 1 ];
+		pos($text) = $closing + 1 - $base;
+	}
+	return \@blocks;
 }
 
 # -----------------------------------------------------------------------
@@ -1072,7 +1107,7 @@ sub parse_prereqs {
 sub _extract_pairs {
 	my ($block, $deps, $phase, $rel) = @_;
 
-	for my $line (split /\n/, $block) {
+	for my $line (split /\n/x, $block) {
 		# Capture any trailing inline comment before stripping it.
 		# (.*\S) is O(N): greedy .* scans to end, then gives back trailing
 		# spaces one by one until \S anchors on the last non-space char.
@@ -1085,10 +1120,10 @@ sub _extract_pairs {
 			# characters (which can expose new outer whitespace).  Both use
 			# $TRIMMED_RE, which is linear; see its definition.
 			my $after = substr $line, index($line, '#') + 1;
-			($comment) = $after =~ /\A$TRIMMED_RE/;
+			($comment) = $after =~ /\A$TRIMMED_RE/x;
 			if (defined $comment) {
-				$comment =~ s/$UNSAFE_COMMENT_CHARS_RE//g;
-				($comment) = $comment =~ /\A$TRIMMED_RE/;
+				$comment =~ s/$UNSAFE_COMMENT_CHARS_RE//gx;
+				($comment) = $comment =~ /\A$TRIMMED_RE/x;
 			}
 			$line = substr $line, 0, index($line, '#');
 		}
@@ -1097,7 +1132,7 @@ sub _extract_pairs {
 		my @pairs;
 		# Opening and closing quotes must match: with ['"]...['"] the key
 		# "A'B" was read as 'B" and recorded as a different module, B.
-		while ($line =~ /$PAIR_RE/g) {
+		while ($line =~ /$PAIR_RE/gx) {
 			push @pairs, [ $1 // $2, $3 // $4 // $5 ];
 		}
 
@@ -1134,7 +1169,7 @@ sub _extract_pairs {
 sub _parse_min_perl {
 	my $content = $_[0];
 	return undef if !defined $content || ref $content;	## no critic (ProhibitExplicitReturnUndef)
-	return undef unless $content =~ /\bMIN_PERL_VERSION\b\s*=>\s*$VALUE_TOKEN_RE/;	## no critic (ProhibitExplicitReturnUndef)
+	return undef unless $content =~ /\bMIN_PERL_VERSION\b\s*=>\s*$VALUE_TOKEN_RE/x;	## no critic (ProhibitExplicitReturnUndef)
 	my $ver = $1 // $2 // $3;
 	return _valid_version($ver) ? $ver : undef;
 }
@@ -1151,7 +1186,7 @@ sub _comment_spans {
 	my $content = $_[0];
 	my @spans;
 	my $offset = 0;
-	for my $line (split /\n/, $content, -1) {
+	for my $line (split /\n/x, $content, -1) {
 		# Most lines have no '#' at all; only the rest need the quote-aware
 		# scan, which finds the first '#' outside quoted strings (so that
 		# e.g. 'C#' is not mistaken for a comment) without building a copy.
@@ -1217,7 +1252,7 @@ sub _valid_requirement {
 #           characters replaced by \x{..} escapes; everything else as is.
 sub _printable {
 	my $text = "$_[0]";
-	$text =~ s/($UNSAFE_COMMENT_CHARS_RE)/sprintf '\\x{%X}', ord $1/ge;
+	$text =~ s/($UNSAFE_COMMENT_CHARS_RE)/sprintf '\\x{%X}', ord $1/gex;
 	return $text;
 }
 
@@ -1232,7 +1267,7 @@ sub _printable {
 sub _load_develop_config {
 	# Path::Tiny and YAML::Tiny use eval internally, which resets $@; keep the
 	# caller's value intact so an enclosing eval/$@ check is not disturbed.
-	local $@;
+	local $@ = q{};
 
 	# Guard: no usable home directory (containers, chroots, CI).  length()
 	# of undef is undef, so one test rejects both undef and ''.
@@ -1263,7 +1298,7 @@ sub _load_develop_config {
 	my $yaml = eval { YAML::Tiny->read("$cfg_path") };
 	unless ($yaml) {
 		my $err = $@ || YAML::Tiny->errstr() // q{};
-		$err =~ s/ at \S++ line \d++\.?\n?\z//;
+		$err =~ s/[ ]at[ ]\S++[ ]line[ ]\d++\.?\n?\z//x;
 		Carp::croak "Failed to parse $cfg_shown: " . _printable($err);
 	}
 
@@ -1330,7 +1365,7 @@ sub _emit {
 		# empty, yields no entries.  Conclusion: it yields no section.
 		next if $body eq q{};
 		push @sections, $phase eq 'runtime'
-			? $body =~ s/\n\z//r		# the blank-line separator is added by join
+			? $body =~ s/\n\z//rx		# the blank-line separator is added by join
 			: "on '$phase' => sub {\n$body};";
 	}
 
@@ -1401,7 +1436,7 @@ sub _has_version {
 	# Conclusion: two tests decide it.
 	return 0 unless defined $ver;
 	return $ver =~ /\A \s* >= \s* v? [0._]* \s* \z/x ? 0 : 1 if $ver =~ /[<>=!]/x;
-	return $ver =~ /[1-9]/ ? 1 : 0;
+	return $ver =~ /[1-9]/x ? 1 : 0;
 }
 
 
@@ -1428,10 +1463,10 @@ sub _has_version {
 #       English only.
 #
 # Technical debt
-# TODO: Replace the brace-counting regexes with PPI: parses Perl without
-#       running it, handles any nesting depth, quoting and heredocs, and
-#       could flag conditional dependencies instead of making them
-#       unconditional.
+# TODO: Replace the brace matching with PPI: parses Perl without running
+#       it, understands quoting, comments and heredocs (so a brace inside
+#       a string would no longer count), and could flag conditional
+#       dependencies instead of making them unconditional.
 # TODO: Move bin/makefilepl2cpanfile's logic into a module
 #       (e.g. App::makefilepl2cpanfile::CLI->run(\@ARGV) returning an exit
 #       code) for in-process tests, real coverage, and fewer subprocess
@@ -1449,9 +1484,8 @@ sub _has_version {
 #       and close the small race between the symlink check and the write.
 # TODO: Consider a size limit for Makefile.PL and the existing cpanfile, so
 #       a huge hostile file cannot exhaust memory.
-# TODO: CI matrix: a Perl 5.14 job (the declared minimum), Windows and
-#       macOS runners, and Devel::Cover for the command-line tool's
-#       subprocesses (via PERL5OPT).
+# TODO: CI: Devel::Cover for the command-line tool's subprocesses (via
+#       PERL5OPT).
 
 1;
 
@@ -1560,9 +1594,10 @@ to be a regular file.
 =item * The F<Makefile.PL> is read with patterns, not run, so dependencies
 that are computed by code cannot be found (see L</COMMON PITFALLS>).
 
-=item * Dependency lists nested more than four braces deep inside a
-single entry are not fully read.  Normal F<Makefile.PL> files never
-come close to this.
+=item * Braces are matched without regard to quotes or comments, so an
+unmatched C<{> or C<}> inside a string or a C<#> comment within a
+dependency list can hide some or all of that list's entries.  Dependency
+lists may otherwise nest to any depth.
 
 =item * Only one C<on 'develop'> section of an existing F<cpanfile> is
 used: the first one.
@@ -1595,6 +1630,8 @@ L<https://github.com/nigelhorne/App-makefilepl2cpanfile/issues>.
 =head1 AUTHOR
 
 Nigel Horne E<lt>njh@nigelhorne.comE<gt>
+
+=encoding utf-8
 
 =head1 FORMAL SPECIFICATION
 

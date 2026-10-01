@@ -51,3 +51,7 @@ ex/webapp/
 ex/docs-site/
 ex/fleet-hub/
 ex/config.yml
+
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore

@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::TLSRouteRule;
 # ABSTRACT: TLSRouteRule is the configuration for a given rule.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s backendRefs => ['+IO::K8s::GatewayAPI::V1::BackendRef'], { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::TLSRouteRule - TLSRouteRule is the configuration for a 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 backendRefs
 

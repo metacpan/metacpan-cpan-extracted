@@ -1,10 +1,11 @@
 package IO::K8s::Role::APIObject;
 # ABSTRACT: Role for top-level Kubernetes API objects
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use Types::Standard qw( InstanceOf Maybe );
 use IO::K8s::Resource ();
 use Scalar::Util qw(blessed);
 use Carp qw( croak );
+use mro ();
 # Imports above `use Moo::Role` on purpose: Role::Tiny treats subs already in
 # the package as not-methods, so their names stay off every consumer. A `use`
 # below that line composes its exports onto all shipped classes (k118).
@@ -32,12 +33,11 @@ with 'IO::K8s::Role::SpecBuilder';
 my $OBJECT_META = 'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta';
 
 # metadata is the one object-bearing field of a top-level Kind that the k8s
-# DSL does not create: this role composes first, so by the time
-# IO::K8s::APIObject::import runs `k8s metadata => 'Meta::V1::ObjectMeta'`
-# the attribute already exists and _k8s's "don't overwrite a role's
-# attribute" guard registers it without installing anything. That guard is
-# right and stays; what it means is that the coercion has to be declared
-# here instead. _object_coercer is _k8s's own, so `metadata` coerces exactly
+# DSL does not create: this role composes first, and IO::K8s::APIObject::import
+# (like IO::K8s::AutoGen) then only registers it through
+# IO::K8s::Resource::_k8s_adopt, which installs nothing (k144). What that
+# means is that the coercion has to be declared here instead.
+# _object_coercer is _k8s's own, so `metadata` coerces exactly
 # like every other is_object field -- Pod->new(metadata => { name => 'x' })
 # builds an ObjectMeta through the same call FROM_HASH makes (k115).
 #
@@ -558,11 +558,10 @@ sub to_crd {
     return IO::K8s::CRD::crd_for_class(ref($self) || $self);
 }
 
+# One YAML emitter for every object: IO::K8s::Role::Resource's TO_YAML (k188).
 sub to_yaml {
     my ($self) = @_;
-    require YAML::PP;
-    my $yp = YAML::PP->new(schema => [qw/JSON/], boolean => 'JSON::PP');
-    return $yp->dump_string($self->TO_JSON);
+    return $self->TO_YAML;
 }
 
 
@@ -679,8 +678,23 @@ sub remove_annotation {
 # Status condition convenience methods
 # ============================================================
 
+# The helpers of this role that give way to a declared k8s wire field of
+# the same name: a class that declares such a field gets it installed over
+# the composed helper instead of being refused by IO::K8s::Resource's
+# declaration preflight (k144), which reads this table from whichever role
+# a colliding method comes from. Exactly conditions, because upstream's
+# core/v1 ComponentStatus carries its conditions at the top level rather
+# than under status. Every other helper here stays a collision.
+our %YIELDS_TO_K8S_FIELD = ( conditions => 1 );
+
 sub _extract_conditions {
     my ($self) = @_;
+    # A class that declares its own top-level conditions field (merged
+    # registry, so inherited counts too) keeps its conditions there.
+    if ($self->can('_k8s_attr_info') && $self->_k8s_attr_info->{conditions}) {
+        my $conds = $self->_conditions_field_value;
+        return ref $conds eq 'ARRAY' ? $conds : [];
+    }
     return [] unless $self->can('status') && defined $self->status;
     my $status = $self->status;
 
@@ -699,6 +713,26 @@ sub _extract_conditions {
     return [];
 }
 
+# The value of that top-level conditions field, through its accessor --
+# but never through $self->conditions blindly: where the field won, that is
+# the accessor, yet a subclass that composes this role again gets the
+# helper back in its own stash, and calling the helper from here would
+# recurse. So the first conditions sub along the MRO that is not this
+# role's helper is the accessor. Any arguments go to it unchanged, so the
+# helper can forward a setter call (see conditions below).
+sub _conditions_field_value {
+    my ($self, @args) = @_;
+    my $helper = \&conditions;
+    no strict 'refs';
+    for my $class (@{ mro::get_linear_isa(ref $self) }) {
+        next unless defined &{"${class}::conditions"};
+        my $code = \&{"${class}::conditions"};
+        next if $code == $helper;
+        return $self->$code(@args);
+    }
+    return;
+}
+
 sub _condition_field {
     my ($cond, $field) = @_;
     if (blessed($cond) && $cond->can($field)) {
@@ -712,7 +746,15 @@ sub _condition_field {
 
 
 sub conditions {
-    my ($self) = @_;
+    my ($self, @args) = @_;
+    # Where a declared conditions field won, this helper is normally gone
+    # from the class's stash. But Role::Tiny composes against the target's
+    # own stash only, so a subclass that composes this role again gets the
+    # helper back, shadowing the inherited accessor -- and a setter call
+    # landing here would silently do nothing. So with such a field the
+    # helper is transparent: it hands every argument to the accessor.
+    return $self->_conditions_field_value(@args)
+        if $self->can('_k8s_attr_info') && $self->_k8s_attr_info->{conditions};
     return $self->_extract_conditions;
 }
 
@@ -866,7 +908,7 @@ IO::K8s::Role::APIObject - Role for top-level Kubernetes API objects
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 metadata
 
@@ -894,7 +936,7 @@ derived from the first ancestor in a known namespace.
     $deployment->api_version;  # "apps/v1"
 
 Derived identity, not a writable field: passing an argument croaks
-rather than silently rebinding (k67). CRD classes installed via
+rather than silently rebinding. CRD classes installed via
 L<IO::K8s::APIObject/api_version> install a fixed-value method with the
 same contract -- see there for the precise error message.
 
@@ -908,7 +950,7 @@ registered as C<+Widget>.
     $deployment->kind;  # "Deployment"
 
 Derived identity, not a writable field: passing an argument croaks
-rather than silently rebinding (k67). Auto-generated CRD classes
+rather than silently rebinding. Auto-generated CRD classes
 install a fixed-value method with the same contract -- see
 L<IO::K8s::AutoGen> for the precise error message.
 
@@ -957,7 +999,7 @@ CRD classes declare their own, which always wins over the built-in table:
         resource_plural => 'staticwebsites';
 
 Derived identity, not a writable field: passing an argument croaks
-rather than silently rebinding (k70). CRD classes installed via
+rather than silently rebinding. CRD classes installed via
 L<IO::K8s::APIObject/resource_plural> install a fixed-value method with
 the same contract -- see there for the precise error message.
 
@@ -970,7 +1012,8 @@ The C<CustomResourceDefinition> this class's own attribute registry
 describes (D9), emitted through L<IO::K8s::CRD/crd_for_class>. It is a
 schema export, not a lossless reverse round-trip through C<add_crd>: see
 L<IO::K8s::CRD/crd_for_class> for the C<Quantity> export and typed-map /
-scalar-array inference limits.
+scalar-array inference limits. A class that declares C<subresources>
+(L<IO::K8s::APIObject>) gets them in its C<spec.versions[]> entry.
 
 =head2 to_yaml
 
@@ -1048,7 +1091,12 @@ Remove an annotation by key. Returns C<$self> for chaining.
 
     my $conds = $obj->conditions;  # => ArrayRef
 
-Returns all status conditions as an arrayref.
+Returns all status conditions as an arrayref, read from
+C<< $obj->status->conditions >>. A class that declares its own top-level
+C<conditions> field via the C<k8s> DSL -- rather than nesting it under
+C<status> -- replaces this helper with that field's own accessor instead:
+L<IO::K8s::Api::Core::V1::ComponentStatus> is the one shipped Kind
+that does, since upstream carries its conditions at the top level.
 
 =head2 get_condition
 

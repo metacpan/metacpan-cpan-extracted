@@ -1,7 +1,7 @@
 # ABSTRACT: NVIDIA GPU driver and container toolkit management
 
 package Rex::GPU::NVIDIA;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use v5.14.4;
 use warnings;
 
@@ -22,6 +22,7 @@ use Rex::GPU::NVIDIA::Setup::Debian;
 use Rex::GPU::NVIDIA::Setup::RHEL;
 use Rex::GPU::NVIDIA::Setup::SUSE;
 use Rex::GPU::NVIDIA::Setup::Ubuntu;
+use Rex::GPU::NVIDIA::Setup::UbuntuDrivers;
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -38,7 +39,8 @@ use vars qw(@EXPORT);
 
 
 sub install_driver {
-  my (%opts) = @_;
+  my $class = _invocant(@_) // return __PACKAGE__->configured_class->install_driver(@_);
+  my ( undef, %opts ) = @_;
 
   die "install_driver: pass gpu or gpus, not both\n"
     if defined $opts{gpu} && defined $opts{gpus};
@@ -55,12 +57,12 @@ sub install_driver {
   # blacklist are its steps. Which class: setup =>, set gpu_nvidia_setup, or
   # the OS (karr #34) -- resolved before anything touches the host.
   my @extra = defined $opts{requirement} ? ( extra_requirement => $opts{requirement} ) : ();
-  my $setup = Rex::GPU::NVIDIA->setup_for(gpus => $gpus, setup => $opts{setup}, @extra, @nvswitches);
+  my $setup = $class->setup_for(gpus => $gpus, setup => $opts{setup}, @extra, @nvswitches);
   unless ($setup) {
     # No class for this OS. Same order as before the move: a working driver
     # still short-circuits and a Kepler or a GPU conflict still gets its own
     # message (both via the base class, read-only), then the OS is refused.
-    my $probe = Rex::GPU::NVIDIA::Setup->new(gpus => $gpus, @extra);
+    my $probe = $class->setup_base_class->new(gpus => $gpus, @extra);
     return if $probe->already_installed;
     $probe->plan;
     die "Unsupported OS for NVIDIA driver installation: ".$probe->os."\n";
@@ -76,15 +78,15 @@ sub install_driver {
       my $fabric = $setup->nvlink_fabric_needed ? $setup->retrofit_nvlink_fabric : 0;
       run "systemctl start ".$setup->fabric_manager_service, auto_die => 0
         if $fm || $fabric;
-      my $active = _check_fabric_manager($setup);
+      my $active = $class->_check_fabric_manager($setup);
       $setup->check_nvlink_fabric($active) if $setup->nvlink_fabric_needed;
     }
-    _note_nvlink_platforms($setup);
+    $class->_note_nvlink_platforms($setup);
     return;
   }
 
   if ($opts{reboot}) {
-    _reboot_and_wait();
+    $class->_reboot_and_wait;
   }
   else {
     run "modprobe nvidia", auto_die => 0;
@@ -93,14 +95,14 @@ sub install_driver {
     run "systemctl start ".$setup->fabric_manager_service, auto_die => 0
       if $setup->fabric_manager_needed;
   }
-  my $fm_active = $setup->fabric_manager_needed ? _check_fabric_manager($setup) : 0;
+  my $fm_active = $setup->fabric_manager_needed ? $class->_check_fabric_manager($setup) : 0;
 
   # Driver only (karr #42): the toolkit comes after this step in gpu_setup,
   # so verify_nvidia's nvidia-ctk check could only warn here.
-  verify_nvidia_driver();
+  $class->verify_nvidia_driver(setup => $setup);
   # HGX B200/B300 (karr #56): Fabric State of every GPU; warns, never dies
   $setup->check_nvlink_fabric($fm_active) if $setup->nvlink_fabric_needed;
-  _note_nvlink_platforms($setup);
+  $class->_note_nvlink_platforms($setup);
 
   Rex::Logger::info("NVIDIA driver installation complete");
 }
@@ -120,7 +122,7 @@ sub setup_class_for_os {
   }
   return 'Rex::GPU::NVIDIA::Setup::RHEL' if is_redhat();
   return 'Rex::GPU::NVIDIA::Setup::SUSE' if is_suse();
-  return 'Rex::GPU::NVIDIA::Setup::RHEL' if _rhel_family_name(operating_system());
+  return 'Rex::GPU::NVIDIA::Setup::RHEL' if $class->_rhel_family_name(operating_system());
   return;
 }
 
@@ -135,7 +137,7 @@ sub setup_class_for_os {
 # listed, as exact names: an OS we cannot name is still refused, and nothing
 # is read from the host to decide (the class is chosen before any probe).
 sub _rhel_family_name {
-  my ($os) = @_;
+  my ( $class, $os ) = @_;
   return ($os // '') =~ /^(?:Rocky|RockyLinux|AlmaLinux|CentOSStream)$/ ? 1 : 0;
 }
 
@@ -162,7 +164,7 @@ sub custom_setup {
     $origin = 'set gpu_nvidia_setup';
     return unless $class->_setup_given($setup);
   }
-  my $base = 'Rex::GPU::NVIDIA::Setup';
+  my $base = $class->setup_base_class;
   # The setting is shared by every host of the Rexfile; an object caches one
   # host's facts (os, kernel, GPUs), so only a class name is taken there.
   croak 'set gpu_nvidia_setup takes a class name, not '.$setup.': the setting '
@@ -175,14 +177,47 @@ sub custom_setup {
       unless blessed($setup) && $setup->isa($base);
     return $setup;
   }
-  croak "NVIDIA driver setup from $origin: '$setup' is not a Perl package name. "
+  return $class->load_user_class($setup, base => $base, what => 'NVIDIA driver setup',
+    origin => $origin, hint => 'extends it, or one of the ::Setup::* classes');
+}
+
+
+sub setup_base_class { 'Rex::GPU::NVIDIA::Setup' }
+
+sub toolkit_setup_class {
+  my ( $class, $family ) = @_;
+  return $family eq 'debian' ? 'Rex::GPU::NVIDIA::Setup::Apt'
+    : $family eq 'suse' ? 'Rex::GPU::NVIDIA::Setup::SUSE'
+    : undef;
+}
+
+
+sub configured_class {
+  my ( $class, $nvidia ) = @_;
+  my $origin = 'nvidia =>';
+  unless (defined $nvidia && $nvidia ne '') {
+    $nvidia = Rex::Config->get('gpu_nvidia_class');
+    $origin = 'set gpu_nvidia_class';
+    return __PACKAGE__ unless defined $nvidia && $nvidia ne '';
+  }
+  croak 'NVIDIA class from '.$origin.' must be a class name, not '.$nvidia
+    .'. Nothing was changed on the host'
+    if ref $nvidia;
+  return $class->load_user_class($nvidia,
+    base => __PACKAGE__, what => 'NVIDIA class', origin => $origin);
+}
+
+sub load_user_class {
+  my ( $class, $package, %arg ) = @_;
+  my ( $base, $what, $origin ) = @arg{qw( base what origin )};
+  croak "$what from $origin: '$package' is not a Perl package name. "
     .'Nothing was changed on the host'
-    unless is_module_name($setup);
-  $class->_load_setup_class($setup, $origin) unless $class->_package_defined($setup);
-  croak 'NVIDIA driver setup from '.$origin.': '.$setup.' is not a subclass of '.$base
-    .' (extends it, or one of the ::Setup::* classes). Nothing was changed on the host'
-    unless $setup->isa($base);
-  return $setup;
+    unless is_module_name($package);
+  $class->_load_class($package, $what, $origin) unless $class->_package_defined($package);
+  croak $what.' from '.$origin.': '.$package.' is not a subclass of '.$base
+    .' ('.( $arg{hint} // 'extends it' ).'). Nothing was changed on the host'
+    unless $package->isa($base);
+  return $package;
 }
 
 sub _setup_given {
@@ -201,62 +236,72 @@ sub _package_defined {
   return ( grep { !/::\z/ && defined &{ $package.'::'.$_ } } keys %{ $package.'::' } ) ? 1 : 0;
 }
 
-sub _load_setup_class {
-  my ( $class, $package, $origin ) = @_;
+sub _load_class {
+  my ( $class, $package, $what, $origin ) = @_;
   return if eval { use_module($package); 1 };
   my $error = $@;
   my $file  = module_notional_filename($package);
-  croak 'NVIDIA driver setup from '.$origin.': '.$package.' not found -- no '.$file
+  croak $what.' from '.$origin.': '.$package.' not found -- no '.$file
     .' in @INC. Put it at lib/'.$file.' next to your Rexfile (Rex adds that lib/ to '
     .'@INC) or define the package in the Rexfile. Nothing was changed on the host'
     if $error =~ /^Can't locate \Q$file\E in \@INC/;
   $error =~ s/\s+\z//;
-  croak 'NVIDIA driver setup from '.$origin.': loading '.$package.' failed: '.$error
+  croak $what.' from '.$origin.': loading '.$package.' failed: '.$error
     .' -- Nothing was changed on the host';
 }
 
-# The helpers below moved into the Setup classes (karr #31, #32). The old
-# private names stay as thin wrappers: t/ calls them.
-
-sub _nvidia_driver_present {
-  Rex::GPU::NVIDIA::Setup->_driver_present(@_);
-}
-
-sub _reject_unsupported_legacy_gpu {
-  Rex::GPU::NVIDIA::Setup->_reject_unsupported_gpu(@_);
-}
-
-sub _apt_candidate_present {
-  Rex::GPU::NVIDIA::Setup::Apt->_apt_candidate_present(@_);
-}
-
-sub _rpm_version_in_branch {
-  Rex::GPU::NVIDIA::Setup::Rpm->_rpm_version_in_branch(@_);
+# Called as a method (Rex::GPU::NVIDIA->install_driver, My::GPU::NVIDIA->...):
+# the invocant, a class name or object that isa Rex::GPU::NVIDIA. Called as a
+# function (install_driver(...) from a Rexfile, Rex::GPU::NVIDIA::install_driver
+# from Rex::Rancher, configure_containerd('rke2')): undef -- a first argument
+# such as 'reboot' or 'rke2' is no package of ours, and nothing is loaded to
+# find out. The public functions then pass the call on, unchanged, to
+# configured_class as a method.
+sub _invocant {
+  my ( $first ) = @_;
+  return unless defined $first && ( !ref $first || blessed $first );
+  return $first if eval { $first->isa(__PACKAGE__) };
+  return;
 }
 
 
 sub install_container_toolkit {
+  my $class = _invocant(@_) // return __PACKAGE__->configured_class->install_container_toolkit(@_);
+  my ( undef, @args ) = @_;
+
+  # karr #74: the one option, checked before the host is asked anything. A
+  # misspelt binaries_suffice would otherwise fall through to the repository
+  # setup it exists to avoid.
+  die "install_container_toolkit: options are key => value pairs\n" if @args % 2;
+  my %opts = @args;
+  my @unknown = grep { $_ ne 'binaries_suffice' } sort keys %opts;
+  die 'install_container_toolkit: unknown option '.join(', ', @unknown)." (valid: binaries_suffice)\n"
+    if @unknown;
+
+  # No package manager is asked, so no OS family is needed either.
+  return if $opts{binaries_suffice} && $class->_toolkit_binaries_present;
+
   my $os = operating_system();
 
   my $family = is_debian() ? 'debian'
     : is_redhat() ? 'redhat'
     : is_suse() ? 'suse'
-    : _rhel_family_name($os) ? 'redhat'
+    : $class->_rhel_family_name($os) ? 'redhat'
     : undef;
   die "Unsupported OS for NVIDIA Container Toolkit: $os\n" unless $family;
 
-  return if _toolkit_present($family);
+  return if $class->_toolkit_present($family);
 
   Rex::Logger::info("Installing NVIDIA Container Toolkit");
 
   if ($family eq 'debian') {
-    _install_toolkit_debian();
+    $class->_install_toolkit_debian;
   }
   elsif ($family eq 'redhat') {
-    _install_toolkit_redhat();
+    $class->_install_toolkit_redhat;
   }
   else {
-    _install_toolkit_suse();
+    $class->_install_toolkit_suse;
   }
 
   Rex::Logger::info("NVIDIA Container Toolkit installed");
@@ -268,29 +313,30 @@ sub install_container_toolkit {
 our @CONTAINERD_RUNTIMES = qw( rke2 k3s containerd );
 
 sub _check_containerd_runtime {
-  my ($runtime, @also) = @_;
+  my ( $class, $runtime, @also ) = @_;
   my @valid = (@CONTAINERD_RUNTIMES, @also);
   return if grep { $_ eq $runtime } @valid;
   die "Unknown containerd runtime: $runtime (valid: " . join(', ', @valid) . ")\n";
 }
 
 sub configure_containerd {
-  my ($runtime) = @_;
+  my $class = _invocant(@_) // return __PACKAGE__->configured_class->configure_containerd(@_);
+  my ( undef, $runtime ) = @_;
   $runtime //= 'rke2';
 
   # The name first (karr #66): without the runtime binary a typo would
   # otherwise return quietly below.
-  _check_containerd_runtime($runtime);
+  $class->_check_containerd_runtime($runtime);
 
   return unless can_run("nvidia-container-runtime");
 
   Rex::Logger::info("Configuring containerd for NVIDIA GPU (runtime: $runtime)");
 
   if ($runtime eq 'rke2' || $runtime eq 'k3s') {
-    _configure_containerd_rke2($runtime);
+    $class->_configure_containerd_rke2($runtime);
   }
   else {
-    _configure_containerd_standalone();
+    $class->_configure_containerd_standalone;
   }
 
   Rex::Logger::info("Containerd configured with NVIDIA runtime");
@@ -298,8 +344,9 @@ sub configure_containerd {
 
 
 sub verify_nvidia {
+  my $class = _invocant(@_) // return __PACKAGE__->configured_class->verify_nvidia(@_);
   Rex::Logger::info("Verifying NVIDIA installation...");
-  my $ok = _verify_module_and_smi();
+  my $ok = $class->_verify_module_and_smi;
 
   if (can_run("nvidia-ctk")) {
     Rex::Logger::info("  [ok] nvidia-container-toolkit installed");
@@ -318,10 +365,13 @@ sub verify_nvidia {
 
 
 sub verify_nvidia_driver {
+  my $class = _invocant(@_) // return __PACKAGE__->configured_class->verify_nvidia_driver(@_);
+  my ( undef, %opts ) = @_;
+  my $setup = $opts{setup} // $class->setup_base_class;
   Rex::Logger::info("Verifying NVIDIA driver...");
-  my $ok = _verify_module_and_smi();
+  my $ok = $class->_verify_module_and_smi;
 
-  run(Rex::GPU::NVIDIA::Setup->libcuda_command, auto_die => 0);
+  run($setup->libcuda_command, auto_die => 0);
   if ($? == 0) {
     Rex::Logger::info("  [ok] libcuda.so.1 in the linker cache");
   }
@@ -341,6 +391,7 @@ sub verify_nvidia_driver {
 # The kernel module and nvidia-smi checks both verify_* share; warns per
 # failure, returns 1/0.
 sub _verify_module_and_smi {
+  my ( $class ) = @_;
   my $ok = 1;
 
   my $lsmod = run "lsmod | grep '^nvidia '", auto_die => 0;
@@ -368,7 +419,7 @@ sub _verify_module_and_smi {
 # NVSwitch host (karr #23) or HGX B200/B300 (karr #56): is Fabric Manager
 # running? Warns, never dies, like verify_nvidia. Returns 1/0.
 sub _check_fabric_manager {
-  my ($setup) = @_;
+  my ( $class, $setup ) = @_;
   my $unit  = $setup->fabric_manager_service;
   my $label = $setup->fabric_label;
   run "systemctl is-active --quiet $unit", auto_die => 0;
@@ -389,7 +440,7 @@ sub _check_fabric_manager {
 # no host command. HGX B200/B300 are set up since karr #56 (Setup
 # install_nvlink_fabric / check_nvlink_fabric), so only NVL72 is left here.
 sub _note_nvlink_platforms {
-  my ($setup) = @_;
+  my ( $class, $setup ) = @_;
   for my $platform ($setup->nvlink_platforms) {
     if ($platform eq 'nvl72') {
       Rex::Logger::info("GB200/GB300 NVL72 compute tray: multi-node NVLink needs nvidia-imex "
@@ -397,44 +448,6 @@ sub _note_nvlink_platforms {
     }
   }
   return;
-}
-
-# ============================================================
-#  Debian / Ubuntu — Rex::GPU::NVIDIA::Setup::Debian / ::Ubuntu
-# ============================================================
-
-# Thin wrappers over the pure helpers that moved into the Setup classes
-# (karr #31); t/ calls them by these names.
-
-sub _sources_list_enable_nonfree {
-  Rex::GPU::NVIDIA::Setup::Debian->_sources_list_enable_nonfree(@_);
-}
-
-sub _deb822_enable_nonfree {
-  Rex::GPU::NVIDIA::Setup::Debian->_deb822_enable_nonfree(@_);
-}
-
-# ============================================================
-#  RHEL / openSUSE — Rex::GPU::NVIDIA::Setup::RHEL / ::SUSE
-# ============================================================
-
-# Thin wrappers over the pure helpers that moved into the Setup classes
-# (karr #32); t/ calls them by these names.
-
-# `uname -m` -> NVIDIA's CUDA repo arch token ("sbsa" for aarch64/arm64,
-# else "x86_64"). NOT the libnvidia-container toolkit repo's token, which is
-# "aarch64" for the same machine: do not reuse it for the toolkit path.
-sub _cuda_repo_arch {
-  Rex::GPU::NVIDIA::Setup->_cuda_repo_arch(@_);
-}
-
-sub _os_major_version {
-  # Rex::Commands::Gather::operating_system_version() strips dots, so "10.1"
-  # becomes "101": the raw operating_system_release() string is read instead.
-  # An explicit $release may be passed so callers stay pure and unit-testable.
-  my ($release) = @_;
-  $release //= Rex::Commands::Gather::operating_system_release();
-  return Rex::GPU::NVIDIA::Setup->_major_version($release);
 }
 
 # ============================================================
@@ -450,7 +463,7 @@ sub _os_major_version {
 # Operator's /usr/local/nvidia/toolkit) must still get the package. dpkg
 # 'hi' (held, installed) counts as installed.
 sub _toolkit_present {
-  my ($family) = @_;
+  my ( $class, $family ) = @_;
   return 0 unless can_run("nvidia-ctk");
   my $version = run "nvidia-ctk --version 2>&1", auto_die => 0;
   return 0 if $? != 0;
@@ -468,7 +481,40 @@ sub _toolkit_present {
   return 1;
 }
 
+# karr #74, binaries_suffice: the binaries a CRI execs, whoever put them
+# there -- a vendor image (DGX Spark) ships them outside the package manager,
+# and RKE2/K3s find nvidia-container-runtime on PATH themselves. The package
+# manager is not asked. `command -v` through run, as Detect's _has_lspci (karr
+# #46), not can_run: can_run runs the same `command -v` but then stats the
+# path through the file interface (SFTP on SSH/OpenSSH); run answers under
+# the PATH the later `run "nvidia-ctk ..."` calls get. nvidia-ctk must run,
+# as in _toolkit_present (karr #42): a broken one is no toolkit. Anything
+# less returns 0, and install_container_toolkit goes on as without the
+# option.
+sub _toolkit_binaries_present {
+  my ( $class ) = @_;
+  my %path;
+  for my $bin (qw( nvidia-container-runtime nvidia-ctk )) {
+    my $out = run "command -v $bin 2>/dev/null", auto_die => 0;
+    my $found = $? == 0;
+    ( $path{$bin} ) = split /\n/, ( $out // '' );
+    next if $found && defined $path{$bin} && length $path{$bin};
+    Rex::Logger::info("binaries_suffice: $bin not found on the PATH — checking for the nvidia-container-toolkit package as without the option");
+    return 0;
+  }
+  my $version = run "nvidia-ctk --version 2>&1", auto_die => 0;
+  if ($? != 0) {
+    Rex::Logger::info("binaries_suffice: $path{'nvidia-ctk'} does not run (nvidia-ctk --version failed) — checking for the nvidia-container-toolkit package as without the option", "warn");
+    return 0;
+  }
+  ($version) = split /\n/, ($version // '');
+  $version //= 'nvidia-ctk';
+  Rex::Logger::info("NVIDIA Container Toolkit already present (binaries_suffice: $path{'nvidia-container-runtime'}, $path{'nvidia-ctk'}, $version) — skipping repository setup and install; the package manager was not asked");
+  return 1;
+}
+
 sub _install_toolkit_debian {
+  my ( $class ) = @_;
   my $keyring = '/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg';
 
   # The driver path's apt layer (karr #37): the apt timers stopped before the
@@ -478,13 +524,13 @@ sub _install_toolkit_debian {
   # timeout and stopping the timers does not release a lock cloud-init holds,
   # so curl/gnupg go through apt-get too. --no-upgrade keeps pkg's
   # ensure => present meaning: an installed curl or gnupg is not upgraded.
-  my $apt = Rex::GPU::NVIDIA::Setup::Apt->new;
+  my $apt = $class->toolkit_setup_class('debian')->new;
   $apt->prepare_host({ packages => [ 'curl', 'gnupg', 'nvidia-container-toolkit' ] });
   $apt->run_cmd('DEBIAN_FRONTEND=noninteractive '.$apt->apt_get.' install -y --no-upgrade curl gnupg',
     auto_die => 0);
   $apt->verify_packages({ verify => [ 'curl', 'gnupg' ] });
 
-  _install_toolkit_keyring($keyring);
+  $class->_install_toolkit_keyring($keyring);
 
   file "/etc/apt/sources.list.d/nvidia-container-toolkit.list",
     content => 'deb [signed-by='.$keyring.'] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /' . "\n";
@@ -501,7 +547,7 @@ sub _install_toolkit_debian {
 # _apt sandbox user; any failure dies instead of carrying on to an apt-get
 # update that cannot verify the repository.
 sub _install_toolkit_keyring {
-  my ($keyring) = @_;
+  my ( $class, $keyring ) = @_;
   my $asc = "$keyring.asc.tmp";
   my $tmp = "$keyring.tmp";
 
@@ -527,7 +573,7 @@ sub _install_toolkit_keyring {
 # the [nvidia-container-toolkit] section. Every failure dies, leaving an
 # existing .repo as it was.
 sub _install_toolkit_repo_file {
-  my ($repo) = @_;
+  my ( $class, $repo ) = @_;
   my $url = 'https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo';
   my $tmp = "$repo.tmp";
 
@@ -545,7 +591,8 @@ sub _install_toolkit_repo_file {
 }
 
 sub _install_toolkit_redhat {
-  _install_toolkit_repo_file('/etc/yum.repos.d/nvidia-container-toolkit.repo');
+  my ( $class ) = @_;
+  $class->_install_toolkit_repo_file('/etc/yum.repos.d/nvidia-container-toolkit.repo');
   run "dnf clean expire-cache", auto_die => 0;
   run "dnf install -y nvidia-container-toolkit", auto_die => 0;
   my $check = run "rpm -q nvidia-container-toolkit 2>&1", auto_die => 0;
@@ -553,6 +600,8 @@ sub _install_toolkit_redhat {
 }
 
 sub _install_toolkit_suse {
+  my ( $class ) = @_;
+  my $suse = $class->toolkit_setup_class('suse');
   # The .repo file URL is yum/dnf format — zypper needs the baseurl directly.
   # Remove any stale entry (possibly added with the wrong URL) before re-adding.
   my $arch = run "uname -m", auto_die => 0;
@@ -562,12 +611,12 @@ sub _install_toolkit_suse {
   run "rpm --import https://nvidia.github.io/libnvidia-container/gpgkey 2>/dev/null",
     auto_die => 0;
   # karr #52: rr + addrepo + refresh, dying on a failed addrepo or refresh.
-  Rex::GPU::NVIDIA::Setup::SUSE->add_repo('nvidia-container-toolkit',
+  $suse->add_repo('nvidia-container-toolkit',
     "https://nvidia.github.io/libnvidia-container/stable/rpm/$arch");
 
   # zypper's exit code is not the evidence (karr #27): rpm -q is, as on RHEL.
   # karr #53: waits for the zypp lock, as add_repo does.
-  my $zypper = Rex::GPU::NVIDIA::Setup::SUSE->zypper;
+  my $zypper = $suse->zypper;
   run "$zypper install -y nvidia-container-toolkit", auto_die => 0;
   my $check = run "rpm -q nvidia-container-toolkit 2>&1", auto_die => 0;
   die "nvidia-container-toolkit not installed\n" if $? != 0;
@@ -578,7 +627,7 @@ sub _install_toolkit_suse {
 # ============================================================
 
 sub _rke2_base_dir {
-  my ($runtime) = @_;
+  my ( $class, $runtime ) = @_;
   $runtime //= 'rke2';
   my $dist = ($runtime eq 'k3s') ? 'k3s' : 'rke2';
   return "/var/lib/rancher/$dist/agent/etc/containerd";
@@ -599,7 +648,7 @@ sub _rke2_base_dir {
 # Ordering is load-bearing: a distro that auto-detected nvidia-container-runtime
 # on PATH wires the runtime itself, so 'present' must win before any write path.
 sub _containerd_nvidia_action {
-  my (%s) = @_;
+  my ( $class, %s ) = @_;
   my $config = $s{config} // '';
 
   # Already wired (RKE2/K3s auto-detect, or a prior additive drop-in) — no-op.
@@ -627,6 +676,7 @@ sub _containerd_nvidia_action {
 # v3 CRI plugin path (io.containerd.cri.v1.runtime), matching what the distro
 # auto-wires. SystemdCgroup=true keeps the cgroup driver aligned with kubelet.
 sub _nvidia_containerd_dropin_v3 {
+  my ( $class ) = @_;
   return <<'TOML';
 version = 3
 
@@ -644,6 +694,7 @@ TOML
 # config first, then we ADD the nvidia runtime under the v2 CRI plugin path.
 # NEVER a bare full-config tmpl (that replaced the base and was karr #9).
 sub _nvidia_containerd_tmpl_v2 {
+  my ( $class ) = @_;
   return <<'TOML';
 {{ template "base" . }}
 
@@ -657,7 +708,7 @@ TOML
 }
 
 sub _path_exists {
-  my ($flag, $path) = @_;
+  my ( $class, $flag, $path ) = @_;
   run "test $flag $path", auto_die => 0;
   return $? == 0 ? 1 : 0;
 }
@@ -668,10 +719,10 @@ sub _path_exists {
 # config.toml they generate, so this ADDS the nvidia runtime without touching
 # the base.
 sub _write_nvidia_v3_dropin {
-  my ($base) = @_;
+  my ( $class, $base ) = @_;
   file "$base/config-v3.toml.d", ensure => 'directory';
   file "$base/config-v3.toml.d/99-nvidia.toml",
-    content => _nvidia_containerd_dropin_v3();
+    content => $class->_nvidia_containerd_dropin_v3;
   Rex::Logger::info(
     "  wrote additive nvidia drop-in: $base/config-v3.toml.d/99-nvidia.toml");
 }
@@ -698,9 +749,10 @@ sub _write_nvidia_v3_dropin {
 # that is not the bare clobber) => 0. When in doubt, 0.
 #
 # Pure (regex/string only, no run/file) so it is unit-testable offline, like
-# _containerd_nvidia_action / _nvidia_driver_present / _cdi_managed_source_present.
+# _containerd_nvidia_action / _cdi_managed_source_present /
+# Rex::GPU::NVIDIA::Setup->_driver_present.
 sub _is_rke2_clobber_tmpl {
-  my ($content) = @_;
+  my ( $class, $content ) = @_;
   return 0 unless defined $content && length $content;
 
   # The base-extending tmpl (#9) and any base-rendering template carry the
@@ -720,10 +772,10 @@ sub _is_rke2_clobber_tmpl {
 }
 
 sub _configure_containerd_rke2 {
-  my ($runtime) = @_;
+  my ( $class, $runtime ) = @_;
   $runtime //= 'rke2';
 
-  my $base        = _rke2_base_dir($runtime);
+  my $base        = $class->_rke2_base_dir($runtime);
   my $config_file = "$base/config.toml";
   my $tmpl_file   = "$base/config.toml.tmpl";
 
@@ -737,7 +789,7 @@ sub _configure_containerd_rke2 {
   # config on the next restart. _is_rke2_clobber_tmpl matches ONLY the bare
   # clobber, never the #9 base-extending tmpl or a user's own custom tmpl.
   my $tmpl = run "cat $tmpl_file 2>/dev/null", auto_die => 0;
-  if (_is_rke2_clobber_tmpl($tmpl)) {
+  if ($class->_is_rke2_clobber_tmpl($tmpl)) {
     Rex::Logger::info(
       "  removing legacy rex-gpu full-config clobber $tmpl_file so $runtime "
       . "regenerates its native containerd config (karr #13)", "warn");
@@ -757,7 +809,7 @@ sub _configure_containerd_rke2 {
     # real-world clobber target is modern RKE2/K3s (containerd 2.x / config v3),
     # whose native config imports config-v3.toml.d/*.toml; a base-extending
     # config.toml.tmpl would just recreate the file we just removed.
-    _write_nvidia_v3_dropin($base);
+    $class->_write_nvidia_v3_dropin($base);
     return;
   }
 
@@ -766,10 +818,10 @@ sub _configure_containerd_rke2 {
   # after finding nvidia-container-runtime on PATH.
   my $config = run "cat $config_file 2>/dev/null", auto_die => 0;
 
-  my $action = _containerd_nvidia_action(
+  my $action = $class->_containerd_nvidia_action(
     config      => $config,
-    has_v3_tmpl => _path_exists("-f", "$base/config-v3.toml.tmpl"),
-    has_v3_dir  => _path_exists("-d", "$base/config-v3.toml.d"),
+    has_v3_tmpl => $class->_path_exists("-f", "$base/config-v3.toml.tmpl"),
+    has_v3_dir  => $class->_path_exists("-d", "$base/config-v3.toml.d"),
   );
 
   if ($action eq 'present') {
@@ -784,17 +836,18 @@ sub _configure_containerd_rke2 {
       . "assuming modern (config v3) $runtime", "warn")
       unless defined $config && length $config;
 
-    _write_nvidia_v3_dropin($base);
+    $class->_write_nvidia_v3_dropin($base);
   }
   else {
     file $base, ensure => 'directory';
-    file "$base/config.toml.tmpl", content => _nvidia_containerd_tmpl_v2();
+    file "$base/config.toml.tmpl", content => $class->_nvidia_containerd_tmpl_v2;
     Rex::Logger::info(
       "  wrote base-extending config.toml.tmpl (legacy v2): $base/config.toml.tmpl");
   }
 }
 
 sub _configure_containerd_standalone {
+  my ( $class ) = @_;
   run "nvidia-ctk runtime configure --runtime=containerd 2>&1", auto_die => 0;
   run "systemctl restart containerd 2>/dev/null", auto_die => 0;
 }
@@ -805,6 +858,7 @@ sub _configure_containerd_standalone {
 
 
 sub generate_cdi_specs {
+  my $class = _invocant(@_) // return __PACKAGE__->configured_class->generate_cdi_specs(@_);
   Rex::Logger::info("Generating NVIDIA CDI specs...");
 
   # Hand off to a managed CDI source if one owns the runtime scan dir. Modern
@@ -820,10 +874,10 @@ sub generate_cdi_specs {
   my $active = run "systemctl is-active nvidia-cdi-refresh.path 2>/dev/null", auto_die => 0;
   chomp $active if defined $active;
 
-  if (_cdi_managed_source_present(
+  if ($class->_cdi_managed_source_present(
       enabled_state => $enabled,
       active_state  => $active,
-      run_cdi       => _path_exists("-f", "/run/cdi/nvidia.yaml"),
+      run_cdi       => $class->_path_exists("-f", "/run/cdi/nvidia.yaml"),
   )) {
     Rex::Logger::info(
       "  nvidia-cdi-refresh manages CDI in /run/cdi — not writing a static "
@@ -869,9 +923,9 @@ sub generate_cdi_specs {
 # (opted out, or no such unit) do NOT count as managed.
 #
 # Pure (regex/string/boolean only, no run/systemctl/test) so it is unit-testable
-# offline, like _nvidia_driver_present / _containerd_nvidia_action.
+# offline, like _containerd_nvidia_action / Rex::GPU::NVIDIA::Setup->_driver_present.
 sub _cdi_managed_source_present {
-  my (%s) = @_;
+  my ( $class, %s ) = @_;
   my $enabled = $s{enabled_state} // '';
   my $active  = $s{active_state}  // '';
   return 1 if $enabled =~ /^(?:enabled|enabled-runtime|static|indirect|alias)\b/;
@@ -885,6 +939,7 @@ sub _cdi_managed_source_present {
 # ============================================================
 
 sub _reboot_and_wait {
+  my ( $class ) = @_;
   Rex::Logger::info("Rebooting host to activate NVIDIA driver (replacing nouveau)...");
 
   # Schedule reboot 2 s from now so the run() call can return cleanly
@@ -930,7 +985,7 @@ Rex::GPU::NVIDIA - NVIDIA GPU driver and container toolkit management
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -956,6 +1011,16 @@ version 0.002
 L<Rex::GPU::NVIDIA> manages the full NVIDIA software stack needed to run
 GPU-accelerated workloads in Kubernetes: driver installation, the Container
 Toolkit, CDI spec generation, and containerd runtime configuration.
+
+Every function is also a class method (B<experimental>):
+C<Rex::GPU::NVIDIA-E<gt>install_driver(%opts)> or
+C<My::GPU::NVIDIA-E<gt>install_driver(%opts)> for a subclass, with the same
+arguments. A function call -- C<install_driver(%opts)>,
+C<Rex::GPU::NVIDIA::install_driver(%opts)>, C<configure_containerd('rke2')>
+-- runs as the class L</configured_class> names: C<set gpu_nvidia_class>, or
+C<Rex::GPU::NVIDIA>. Inside, every step and helper is called through that
+class, so a subclass overrides any one of them; see
+L<Rex::GPU/CLASSES OF YOUR OWN>.
 
 Each step is OS-aware and handles Debian/Ubuntu, RHEL/Rocky/CentOS, and
 openSUSE Leap without further configuration.
@@ -989,7 +1054,9 @@ The install is done by L<Rex::GPU::NVIDIA::Setup::Debian>,
 L<Rex::GPU::NVIDIA::Setup::Ubuntu>, L<Rex::GPU::NVIDIA::Setup::RHEL> and
 L<Rex::GPU::NVIDIA::Setup::SUSE> (experimental classes, see
 L<Rex::GPU::NVIDIA::Setup>); the steps and commands are the ones described
-here. A subclass of your own replaces them through the C<setup> option of
+here. On Ubuntu, C<setup =E<gt> 'Rex::GPU::NVIDIA::Setup::UbuntuDrivers'>
+lets C<ubuntu-drivers list --gpgpu> name the driver package instead of
+C<apt-cache search>. A subclass of your own replaces them through the C<setup> option of
 L</install_driver> or C<set gpu_nvidia_setup> -- see
 L<Rex::GPU::NVIDIA::Setup/WRITING YOUR OWN SETUP>.
 
@@ -1001,13 +1068,19 @@ below.
 
 =over
 
-=item * B<Turing, Ampere, Ada, Hopper> and unknown IDs: the default per-distro
-selection.
+=item * B<Turing, Ampere, Ada, Hopper> (GH200 excepted) and unknown IDs: the
+default per-distro selection.
 
 =item * B<Blackwell> (B200/GB200/B300, GeForce RTX 50xx, RTX PRO Blackwell,
 GB10), on any CPU architecture: it has no proprietary kernel module. Ubuntu
 selects the C<-server-open> variant. Debian 12/13 installs the open-module set
 from NVIDIA's CUDA repository instead of C<non-free>.
+
+=item * B<Grace Hopper GH200> (C<10de:2342>, C<10de:2348>): the same open
+kernel module selection as Blackwell. NVIDIA's driver README still lists
+Hopper as supported by the proprietary module; the open-only rule follows
+NVIDIA's statement that Grace Hopper platforms need the open modules (see
+L<Rex::GPU::NVIDIA::Requirement/generations>).
 
 =item * B<Maxwell, Pascal, Volta> (e.g. V100, P100, GeForce GT 1030, GTX
 980): only the proprietary
@@ -1144,6 +1217,9 @@ read, so a caller that finds the GPUs itself -- without C<lspci> -- passes
 just the first two; a GPU without C<vgpu> is not a vGPU:
 
   install_driver(gpu => { device_id => '2b85', name => 'NVIDIA GeForce RTX 5090' });
+
+L<Rex::GPU::Detect::Sysfs> finds them without C<lspci> in the full shape,
+vGPU keys and C<nvswitch> included.
 
 B<NVIDIA vGPU guest> (karr #24; C<vgpu =E<gt> 1>, see
 L<Rex::GPU::Detect/NVIDIA vGPU guests>): such a device needs NVIDIA's
@@ -1326,7 +1402,10 @@ needs C<nvidia-imex> and its configuration, which Rex::GPU does not set up.
 =back
 
 Omit C<gpus> and C<gpu> (or pass C<undef>) to keep the GPU-agnostic
-package selection.
+package selection. An empty C<gpus =E<gt> []> is the same: a driver is
+still installed, not skipped. A caller that filters its GPU list (e.g.
+drops C<compute> 0) and is left with none must not call C<install_driver>
+at all, as L<Rex::GPU/gpu_setup> does.
 
 Each distro's L<Rex::GPU::NVIDIA::Setup> class has an ordered list of
 driver sources; the first that fits the requirement is installed, and if
@@ -1335,13 +1414,14 @@ source and why it was rejected. What the requirement picks:
 
 =over
 
-=item * B<No constraint> (Turing, Ampere, Ada, Hopper and every GPU the
-table does not know; no GPU): the first source -- Ubuntu the newest
+=item * B<No constraint> (Turing, Ampere, Ada, Hopper except GH200, and
+every GPU the table does not know; no GPU): the first source -- Ubuntu the newest
 C<-server>, Debian C<non-free> C<nvidia-driver>, RHEL C<open-dkms>,
 openSUSE open C<G06>/C<G07>.
 
-=item * B<Blackwell> (open kernel module only, branch 570 or newer; GB10 and
-Blackwell Ultra 580 or newer): Ubuntu the newest C<-server-open>. On Debian
+=item * B<Blackwell> and B<Grace Hopper GH200> (open kernel module only;
+Blackwell branch 570 or newer, GB10 and Blackwell Ultra 580 or newer, GH200
+C<2342> 535 or newer and C<2348> 565 or newer): Ubuntu the newest C<-server-open>. On Debian
 no Debian-packaged driver fits (bookworm ships 535, trixie 550), so the
 driver comes from NVIDIA's CUDA apt repository instead of C<non-free>: the
 C<cuda-keyring> package for C<debian12> or C<debian13> (C<x86_64> for amd64,
@@ -1398,6 +1478,9 @@ L<Rex::GPU::NVIDIA::Setup::RHEL> on the RHEL family,
 L<Rex::GPU::NVIDIA::Setup::SUSE> on openSUSE, and C<undef> elsewhere
 (L</install_driver> then dies). Asked only when neither the C<setup> option
 nor C<set gpu_nvidia_setup> chose a class (see L</setup_for>).
+L<Rex::GPU::NVIDIA::Setup::UbuntuDrivers> (the package named by
+C<ubuntu-drivers list --gpgpu>) is never chosen here; it is opt-in through
+those two.
 
 The RHEL family is what L<Rex::Commands::Gather/is_redhat> accepts, plus the
 names Rex reports for Rocky Linux, AlmaLinux and CentOS Stream when
@@ -1448,7 +1531,52 @@ directory. Croaks, before anything touches the host, if the name is not a
 package name, the module cannot be found or does not compile, or the class
 or object is not a L<Rex::GPU::NVIDIA::Setup>.
 
+=head2 setup_base_class
+
+B<Experimental.> The base class every setup has to extend and the one
+L</install_driver> probes a host with that no setup class fits:
+L<Rex::GPU::NVIDIA::Setup>.
+
+=head2 toolkit_setup_class
+
+  my $apt = Rex::GPU::NVIDIA->toolkit_setup_class('debian');
+
+B<Experimental.> The setup class whose package layer
+L</install_container_toolkit> uses: C<debian> L<Rex::GPU::NVIDIA::Setup::Apt>
+(lock timeout, apt timers, install and C<dpkg -l> check), C<suse>
+L<Rex::GPU::NVIDIA::Setup::SUSE> (C<zypper>, C<add_repo>). C<undef> for
+C<redhat>, which runs C<dnf> directly.
+
+=head2 configured_class
+
+  my $class = Rex::GPU::NVIDIA->configured_class($nvidia_option);
+
+B<Experimental.> The class a function call of L</install_driver>,
+L</install_container_toolkit>, L</generate_cdi_specs>,
+L</configure_containerd>, L</verify_nvidia> or L</verify_nvidia_driver> is
+passed on to as a method: C<$nvidia_option> (L<Rex::GPU/gpu_setup>'s
+C<nvidia> option) if defined, else C<set gpu_nvidia_class =E<gt>
+'My::GPU::NVIDIA'> in the Rexfile, else C<Rex::GPU::NVIDIA>. A class name
+only, loaded like a setup class (L</custom_setup>); croaks, before anything
+touches the host, if it is not a package name, cannot be loaded or is not a
+subclass of C<Rex::GPU::NVIDIA>.
+
+=head2 load_user_class
+
+  my $package = Rex::GPU::NVIDIA->load_user_class($package,
+    base => 'Rex::GPU::NVIDIA', what => 'NVIDIA class', origin => 'nvidia =>');
+
+B<Experimental.> The loader behind L</custom_setup>, L</configured_class>
+and L<Rex::GPU::Detect/configured_class>: loads C<$package> with
+L<Module::Runtime/use_module> unless it is already defined, and returns it.
+Croaks, naming C<what> and C<origin>, if it is not a package name, cannot be
+found or does not compile, or does not C<isa> C<base> (C<hint> says what to
+extend, default C<extends it>). Nothing on the host is touched.
+
 =head2 install_container_toolkit
+
+  install_container_toolkit();
+  install_container_toolkit(binaries_suffice => 1);
 
 Install the NVIDIA Container Toolkit (C<nvidia-container-toolkit> package)
 from the official NVIDIA package repository at
@@ -1466,7 +1594,8 @@ nvidia-container-toolkit>, C<zypper update nvidia-container-toolkit>). An
 C<nvidia-ctk> that the package manager does not know about (e.g. unpacked by
 the GPU Operator) does not count: the package is installed, because
 L</configure_containerd> relies on the packaged
-C</usr/bin/nvidia-container-runtime>.
+C</usr/bin/nvidia-container-runtime> -- unless C<binaries_suffice> (below)
+is passed.
 
 Otherwise the repository GPG key is imported and the package repository is
 registered before installing. On Debian/Ubuntu the apt timers
@@ -1494,7 +1623,43 @@ The package is installed with C<apt-get>/C<dnf>/C<zypper> directly, never
 through L<Rex::Commands::Pkg/pkg>, and the result is checked with C<dpkg -l>
 (C<ii>) or C<rpm -q> on every distro, openSUSE included.
 
-Dies if the OS is not supported or if installation fails.
+Dies if the OS is not supported or if installation fails, and, before
+anything is asked of the host, on an option other than C<binaries_suffice>
+or an odd-length option list.
+
+Options:
+
+=over 4
+
+=item C<binaries_suffice>
+
+A true value counts the toolkit as present when C<nvidia-container-runtime>
+and C<nvidia-ctk> are both found by C<command -v> on the C<PATH> Rex runs
+commands with and C<nvidia-ctk --version> runs; the package manager is not
+asked. C<install_container_toolkit> then logs both paths and the version
+and returns without touching the repository, the key or the package, on
+any OS -- the check runs before the OS family is decided, so an OS without
+an install path returns instead of dying when both binaries are there.
+
+It is for hosts whose binaries come from somewhere other than the package
+manager, such as vendor images like NVIDIA DGX Spark, where adding NVIDIA's
+package repository would change where the host's packages come from, and
+for callers that leave the containerd wiring to RKE2/K3s, which find
+C<nvidia-container-runtime> on the C<PATH> themselves.
+
+If either binary is missing or C<nvidia-ctk --version> fails, it logs why
+and goes on exactly as without the option (the package check above, then
+the install). A copy that is not on that C<PATH>, such as the GPU
+Operator's C</usr/local/nvidia/toolkit>, does not count.
+
+Not for use with L</configure_containerd>: its C<rke2>/C<k3s> configuration
+registers C</usr/bin/nvidia-container-runtime>. With the runtime elsewhere
+on the C<PATH> it either changes nothing (already wired) or registers a
+binary that does not exist, and every pod of runtime class C<nvidia> fails
+to start. L<Rex::GPU/gpu_setup> runs L</configure_containerd> and so never
+passes this option.
+
+=back
 
 =head2 configure_containerd
 
@@ -1609,7 +1774,15 @@ means the next run installs again
 
 Does not look for the container toolkit. Returns C<1> if all checks pass,
 C<0> otherwise; logs a warning per failure and never dies. Not exported:
-call it as C<Rex::GPU::NVIDIA::verify_nvidia_driver()>.
+call it as C<Rex::GPU::NVIDIA::verify_nvidia_driver()> or
+C<Rex::GPU::NVIDIA-E<gt>verify_nvidia_driver>.
+
+  Rex::GPU::NVIDIA->verify_nvidia_driver(setup => $setup);
+
+C<setup> (optional): the L<Rex::GPU::NVIDIA::Setup> class or object whose
+L<libcuda_command|Rex::GPU::NVIDIA::Setup/libcuda_command> is run;
+L</install_driver> passes the setup it installed with. Default:
+L</setup_base_class>.
 
 =head2 generate_cdi_specs
 

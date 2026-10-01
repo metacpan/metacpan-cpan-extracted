@@ -1,9 +1,10 @@
 package IO::K8s::CertManager::V1::Order;
 # ABSTRACT: Order is a type to represent an Order with an ACME server
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'acme.cert-manager.io/v1',
-    resource_plural => 'orders';
+    resource_plural => 'orders',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => '+IO::K8s::CertManager::V1::OrderSpec', { required => 'schema' };
@@ -25,7 +26,7 @@ IO::K8s::CertManager::V1::Order - Order is a type to represent an Order with an 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

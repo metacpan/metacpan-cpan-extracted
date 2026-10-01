@@ -14,6 +14,7 @@
 #ifndef SORTEDSET_H
 #define SORTEDSET_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,7 +44,7 @@
 #define SS_MAGIC        0x53534554U  /* "SSET" */
 #define SS_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
 #define SS_NONE         UINT32_MAX
-#define SS_ERR_BUFLEN   256
+#define SS_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef SS_READER_SLOTS
 #define SS_READER_SLOTS 1024  /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -56,6 +57,13 @@
 
 #define SS_ORDER 16              /* B+tree fanout: max children / max leaf entries */
 #define SS_MIN   (SS_ORDER / 2)  /* min children/entries except the root */
+
+/* SsHeader.wphase: which structure a write is changing.  While the tree
+ * changes, the index still holds the set as before the write; while the index
+ * changes, the tree holds it as after. */
+#define SS_WP_NONE  0
+#define SS_WP_TREE  1
+#define SS_WP_INDEX 2
 
 #define SS_ERR(fmt, ...) do { if (errbuf) snprintf(errbuf, SS_ERR_BUFLEN, fmt, ##__VA_ARGS__); } while (0)
 
@@ -73,7 +81,7 @@
 typedef struct {
     uint16_t num;                    /* leaf: #entries; internal: #children */
     uint8_t  is_leaf;
-    uint8_t  _pad;
+    uint8_t  mark;                   /* stale-lock rebuild scratch; 0 outside it */
     uint32_t parent;                 /* SS_NONE for root; free-list link when free */
     uint32_t next, prev;             /* leaf sibling links (SS_NONE at the ends) */
     double   scores[SS_ORDER + 1];   /* leaf entries / internal separators (num-1 used) */
@@ -125,7 +133,8 @@ struct SsHeader {
     uint64_t stat_ops;                /* 88 */
     uint32_t slotless_rdepth;         /* 96: readers holding with no reader-slot (documented residual) */
     uint8_t  sealed;                  /* 100  0 = mutable, 1 = frozen (read-only; lock-free reads) */
-    uint8_t  _pad[155];               /* 101..255 */
+    uint8_t  wphase;                  /* 101  SS_WP_*; carved from the pad, so older files read 0 */
+    uint8_t  _pad[154];               /* 102..255 */
 };
 typedef struct SsHeader SsHeader;
 
@@ -243,23 +252,6 @@ static inline int ss_pid_alive(uint32_t pid) {
     return !ss_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
- * CAS to OUR pid to hold the lock while fixing shared state, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
- * process can detect and re-recover if we crash mid-recovery. */
-static inline void ss_recover_stale_lock(SsHandle *h, uint32_t observed_wlock) {
-    SsHeader *hdr = h->hdr;
-    uint32_t mypid = SS_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
-            mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-        return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-}
-
 static const struct timespec ss_lock_timeout = { SS_LOCK_TIMEOUT_SEC, 0 };
 
 /* Process-global fork-generation counter.  Incremented in the pthread_atfork
@@ -337,6 +329,85 @@ static inline void ss_claim_reader_slot(SsHandle *h) {
     /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
      * slotless path (lock still works; recovery of THIS reader's death is the
      * documented slotless limitation). */
+}
+
+/* Wait until no live reader holds the lock; the caller owns wlock, so no NEW
+ * reader can join (they see wlock!=0 and yield).  The SEQ_CST wlock CAS + the
+ * SEQ_CST rdepth loads below are the writer side of the Dekker handshake. */
+static inline void ss_rwlock_drain(SsHandle *h) {
+    SsHeader *hdr = h->hdr;
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(SS_OCC_WORDS + live readers)
+         * instead of O(SS_READER_SLOTS). */
+        for (uint32_t w = 0; w < SS_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!ss_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &ss_lock_timeout, NULL, 0);
+    }
+}
+
+/* 1 if this process holds a read lock on the segment (through any handle).  Such a
+ * lock predates the current wlock holder, whose drain could then never have
+ * finished: it died before mutating anything. */
+static int ss_self_reading(SsHandle *h) {
+    if (h->slotless_held) return 1;
+    uint32_t me = (uint32_t)getpid();
+    for (uint32_t i = 0; i < SS_READER_SLOTS; i++)
+        if (__atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE) == me &&
+            __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_ACQUIRE) != 0)
+            return 1;
+    return 0;
+}
+
+static void ss_rebuild_locked(SsHandle *h);
+
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
+ * CAS to OUR pid to hold the lock while repairing shared state, then release.
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void ss_recover_stale_lock(SsHandle *h, uint32_t observed_wlock) {
+    SsHeader *hdr = h->hdr;
+    uint32_t mypid = SS_RWLOCK_WR((uint32_t)getpid());
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
+            mypid, 0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+        return;
+    if (!ss_self_reading(h)) {
+        ss_rwlock_drain(h);
+        ss_rebuild_locked(h);
+    }
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
@@ -487,48 +558,8 @@ static inline void ss_rwlock_wrlock(SsHandle *h) {
         ss_unpark(h);
         spin = 0;
     }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
-    for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
-        int busy = 0;
-        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
-         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
-         * this scan, so no held slot is skipped).  O(SS_OCC_WORDS + live readers)
-         * instead of O(SS_READER_SLOTS). */
-        for (uint32_t w = 0; w < SS_OCC_WORDS; w++) {
-            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
-            while (word) {
-                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
-                word &= word - 1;                          /* consume this bit (local copy) */
-                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
-                if (rd == 0) continue;                      /* occupied but not read-locking now */
-                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
-                if (!ss_pid_alive(pid)) {
-                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
-                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
-                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
-                    uint32_t ep = pid;
-                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
-                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
-                    continue;
-                }
-                busy = 1;                                   /* live reader still holding */
-            }
-        }
-        /* A live slotless reader keeps us waiting; a crashed slotless reader that
-         * cannot be attributed to a pid is the documented slotless limitation. */
-        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
-            busy = 1;
-        if (!busy)
-            return;                                    /* exclusive: wlock held + every rdepth 0 */
-        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
-         * (which reclaims any newly-dead slotted reader). */
-        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &ss_lock_timeout, NULL, 0);
-    }
+    /* Phase 2: drain the readers that were already holding when we won the CAS. */
+    ss_rwlock_drain(h);
 }
 
 static inline void ss_rwlock_wrunlock(SsHandle *h) {
@@ -690,14 +721,36 @@ static int ss_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int ss_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int ss_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int ss_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_SORTEDSET_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static SsHandle *ss_create(const char *path, uint32_t max_entries, mode_t mode, char *errbuf) {
@@ -732,9 +785,18 @@ static SsHandle *ss_create(const char *path, uint32_t max_entries, mode_t mode, 
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             SS_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && ss_reserve(fd, total) < 0) {
+            SS_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { SS_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            SS_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!ss_validate_header((SsHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -744,9 +806,13 @@ static SsHandle *ss_create(const char *path, uint32_t max_entries, mode_t mode, 
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((SsHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && ss_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && ss_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         SS_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (ss_reserve(fd, total) < 0) {
+                        SS_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     ss_init_header(base, max_entries, index_slots, node_capacity, total);
@@ -783,6 +849,10 @@ static SsHandle *ss_create_memfd(const char *name, uint32_t max_entries, char *e
     if (ftruncate(fd, (off_t)total) < 0) {
         SS_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (ss_reserve(fd, total) < 0) {
+        SS_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { SS_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -795,6 +865,11 @@ static SsHandle *ss_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { SS_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(SsHeader)) { SS_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(SsHeader, magic)) != (ssize_t)sizeof magic || magic != SS_MAGIC) {
+        SS_ERR("invalid sorted-set"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { SS_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -850,6 +925,11 @@ static SsHandle *ss_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { SS_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(SsHeader)) { SS_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(SsHeader, magic)) != (ssize_t)sizeof magic || magic != SS_MAGIC) {
+        SS_ERR("%s: invalid sorted-set file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
@@ -907,8 +987,7 @@ static int64_t ss_eventfd_consume(SsHandle *h) {
  * Sorted set: node pool, member index, B+tree (callers hold the lock)
  * ================================================================ */
 
-/* reset to the empty set (caller holds the write lock) */
-static inline void ss_clear_locked(SsHandle *h) {
+static inline void ss_clear_tree(SsHandle *h) {
     SsHeader *hdr = h->hdr;
     hdr->count     = 0;
     hdr->root      = SS_NONE;
@@ -918,6 +997,11 @@ static inline void ss_clear_locked(SsHandle *h) {
     for (uint32_t i = 0; i < h->node_capacity; i++)
         h->nodes[i].parent = (i + 1 < h->node_capacity) ? (i + 1) : SS_NONE;
     hdr->node_free_head = 0;
+}
+
+/* reset to the empty set (caller holds the write lock) */
+static inline void ss_clear_locked(SsHandle *h) {
+    ss_clear_tree(h);
     memset(h->index, 0, (size_t)h->index_slots * sizeof(SsIdxSlot));
 }
 
@@ -951,6 +1035,7 @@ static inline int ss_add_has_headroom(const SsHandle *h) {
 
 static inline void ss_node_free(SsHandle *h, uint32_t idx) {
     h->nodes[idx].parent = h->hdr->node_free_head;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->node_free_head = idx;
 }
 
@@ -995,6 +1080,7 @@ static inline int ss_idx_set(SsHandle *h, int64_t member, double score) {
     if (i == SS_NONE) return 0;
     h->index[i].member = member;
     h->index[i].score  = score;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->index[i].state  = 1;
     return 1;
 }
@@ -1254,6 +1340,31 @@ static void ss_tree_del(SsHandle *h, double score, int64_t member) {
     hdr->count--;
 }
 
+static inline void ss_wphase(SsHandle *h, uint8_t p) {
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_store_n(&h->hdr->wphase, p, __ATOMIC_RELAXED);
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+}
+
+/* Give member the score, moving it from old when had.  0 on a corrupt full index. */
+static int ss_put_locked(SsHandle *h, int64_t member, int had, double old, double score) {
+    ss_wphase(h, SS_WP_TREE);
+    if (had) ss_tree_del(h, old, member);
+    ss_tree_add(h, score, member);
+    ss_wphase(h, SS_WP_INDEX);
+    int ok = ss_idx_set(h, member, score);
+    ss_wphase(h, SS_WP_NONE);
+    return ok;
+}
+
+static void ss_drop_locked(SsHandle *h, int64_t member, double old) {
+    ss_wphase(h, SS_WP_TREE);
+    ss_tree_del(h, old, member);
+    ss_wphase(h, SS_WP_INDEX);
+    ss_idx_del(h, member);
+    ss_wphase(h, SS_WP_NONE);
+}
+
 /* add: 1 (new), 0 (existing -- score updated if changed), -1 (full) */
 static int ss_add_locked(SsHandle *h, int64_t member, double score) {
     double old;
@@ -1262,14 +1373,13 @@ static int ss_add_locked(SsHandle *h, int64_t member, double score) {
             /* re-insert: check headroom BEFORE the delete, so a refusal leaves
                the set untouched rather than dropping the member */
             if (!ss_add_has_headroom(h)) return -1;
-            ss_tree_del(h, old, member); ss_tree_add(h, score, member); ss_idx_set(h, member, score);
+            ss_put_locked(h, member, 1, old, score);
         }
         return 0;
     }
     if (h->hdr->count >= h->hdr->max_entries) return -1;
     if (!ss_add_has_headroom(h)) return -1;
-    ss_tree_add(h, score, member);
-    if (!ss_idx_set(h, member, score)) return -1;   /* corrupt full index: fail the add */
+    if (!ss_put_locked(h, member, 0, 0, score)) return -1;   /* corrupt full index: fail the add */
     return 1;
 }
 
@@ -1277,8 +1387,7 @@ static int ss_add_locked(SsHandle *h, int64_t member, double score) {
 static int ss_remove_locked(SsHandle *h, int64_t member) {
     double old;
     if (!ss_idx_get(h, member, &old)) return 0;
-    ss_tree_del(h, old, member);
-    ss_idx_del(h, member);
+    ss_drop_locked(h, member, old);
     return 1;
 }
 
@@ -1291,7 +1400,7 @@ static int ss_incr_locked(SsHandle *h, int64_t member, double delta, double *out
         if (ns != ns) return -2;
         if (ns != old) {
             if (!ss_add_has_headroom(h)) return -1;
-            ss_tree_del(h, old, member); ss_tree_add(h, ns, member); ss_idx_set(h, member, ns);
+            ss_put_locked(h, member, 1, old, ns);
         }
         return 0;
     }
@@ -1299,8 +1408,7 @@ static int ss_incr_locked(SsHandle *h, int64_t member, double delta, double *out
     *out = delta;
     if (delta != delta) return -2;
     if (!ss_add_has_headroom(h)) return -1;
-    ss_tree_add(h, delta, member);
-    if (!ss_idx_set(h, member, delta)) return -1;   /* corrupt full index: fail the incr */
+    if (!ss_put_locked(h, member, 0, 0, delta)) return -1;   /* corrupt full index: fail the incr */
     return 1;
 }
 
@@ -1312,8 +1420,7 @@ static int ss_pop_locked(SsHandle *h, int max, int64_t *m, double *s) {
     SsNode *nd = &h->nodes[li];
     int pos = max ? nd->num - 1 : 0;
     *m = nd->members[pos]; *s = nd->scores[pos];
-    ss_tree_del(h, *s, *m);
-    ss_idx_del(h, *m);
+    ss_drop_locked(h, *m, *s);
     return 1;
 }
 
@@ -1365,6 +1472,94 @@ static int ss_validate_tree(SsHandle *h) {
     uint32_t icount = 0;
     for (uint32_t i = 0; i < h->index_slots; i++) if (h->index[i].state) icount++;   /* cached geometry */
     return icount == hdr->count;
+}
+
+/* ---- stale-lock repair ---- */
+typedef struct { uint32_t prev_leaf, leaf_depth; } SsRebuild;
+
+static uint32_t ss_rebuild_rec(SsHandle *h, SsRebuild *rb, uint32_t nidx, uint32_t parent, uint32_t depth) {
+    SsNode *nd = &h->nodes[nidx];
+    nd->parent = parent;
+    if (nd->num > SS_ORDER) nd->num = SS_ORDER;   /* killed mid-split: keep later inserts in bounds */
+    if (depth >= 64) { nd->is_leaf = 1; nd->num = 0; }   /* only a corrupt file nests this deep */
+    int k = 0;
+    if (nd->is_leaf) {
+        for (int i = 0; i < nd->num; i++) {
+            int f;
+            ss_idx_find(h, nd->members[i], &f);
+            if (f || !ss_idx_set(h, nd->members[i], nd->scores[i])) continue;   /* a torn shift's duplicate */
+            nd->scores[k] = nd->scores[i]; nd->members[k] = nd->members[i]; k++;
+        }
+        nd->num = (uint16_t)k;
+        if (k) {
+            if (rb->leaf_depth == UINT32_MAX) rb->leaf_depth = depth;
+            nd->prev = rb->prev_leaf;
+            nd->next = SS_NONE;
+            if (rb->prev_leaf == SS_NONE) h->hdr->leftmost = nidx;
+            else h->nodes[rb->prev_leaf].next = nidx;
+            rb->prev_leaf = nidx;
+        }
+        return (uint32_t)k;
+    }
+    uint32_t total = 0;
+    for (int i = 0; i < nd->num; i++) {
+        uint32_t c = nd->children[i];
+        if (!ss_node_ok(h, c) || h->nodes[c].mark) continue;   /* a corrupt or duplicate child link */
+        h->nodes[c].mark = 1;
+        uint32_t t = ss_rebuild_rec(h, rb, c, nidx, depth + 1);
+        if (!t) { h->nodes[c].mark = 0; continue; }
+        if (k > 0 && k != i) { nd->scores[k-1] = nd->scores[i-1]; nd->members[k-1] = nd->members[i-1]; }
+        nd->children[k] = c;
+        nd->counts[k++] = t;
+        total += t;
+    }
+    nd->num = (uint16_t)k;
+    return total;
+}
+
+/* From what the root reaches, re-derive the subtree counts, parent and leaf
+ * links, leftmost/rightmost, height, count, the free list and the member index.
+ * A node left mid-shift or mid-split is only bounded (duplicates and empty
+ * nodes dropped), not repaired.  Idempotent. */
+static void ss_rebuild_from_tree(SsHandle *h) {
+    SsHeader *hdr = h->hdr;
+    uint32_t cap = h->node_capacity, root = hdr->root;
+    SsRebuild rb = { SS_NONE, UINT32_MAX };
+    if (root == SS_NONE || !ss_node_ok(h, root)) { ss_clear_locked(h); return; }
+    for (uint32_t i = 0; i < cap; i++) h->nodes[i].mark = 0;
+    memset(h->index, 0, (size_t)h->index_slots * sizeof(SsIdxSlot));
+    h->nodes[root].mark = 1;
+    hdr->leftmost = SS_NONE;
+    uint32_t n = ss_rebuild_rec(h, &rb, root, SS_NONE, 0);
+    if (n == 0) { ss_clear_locked(h); return; }
+    hdr->rightmost = rb.prev_leaf;
+    hdr->height = rb.leaf_depth + 1;
+    hdr->count = n;
+    uint32_t head = SS_NONE;
+    for (uint32_t i = cap; i-- > 0; )
+        if (h->nodes[i].mark) h->nodes[i].mark = 0;
+        else { h->nodes[i].parent = head; head = i; }
+    hdr->node_free_head = head;
+}
+
+/* Repair what a dead writer left half done.  Mid-tree, the index still holds
+ * the set from before the write: replant the tree from it, undoing the write.
+ * Otherwise the tree is whole and the index is rebuilt from it; the tree check
+ * also bounds a file whose writer predates wphase. */
+static void ss_rebuild_locked(SsHandle *h) {
+    SsHeader *hdr = h->hdr;
+    if (hdr->wphase == SS_WP_TREE) {
+        ss_clear_tree(h);
+        for (uint32_t i = 0; i < h->index_slots; i++) {
+            SsIdxSlot *s = &h->index[i];
+            if (!s->state) continue;
+            if (hdr->count >= hdr->max_entries || !ss_add_has_headroom(h)) break;   /* corrupt index */
+            ss_tree_add(h, s->score, s->member);
+        }
+        ss_wphase(h, SS_WP_INDEX);
+    }
+    ss_rebuild_from_tree(h);
+    ss_wphase(h, SS_WP_NONE);
 }
 
 /* ---- order-statistics queries (read paths; caller holds the read lock) ---- */

@@ -1,7 +1,7 @@
 # ABSTRACT: Change a task's status
 
 package App::karr::Cmd::Move;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -141,8 +141,11 @@ sub execute {
     my $task = $self->update_task_guarded($id, sub {
       my ($task) = @_;
 
-      my $claim = $self->resolved_claim;
-      $self->check_claim($task, $claim);
+      # Who the caller is: --claim, else KARR_CLAIM (ADR 0005). That is an
+      # identity for the ownership check, so a card the caller already holds
+      # moves whatever the destination. Whether that name is then *written*
+      # is decided below, once the destination is known.
+      $self->check_claim($task, $self->resolved_claim);
 
       my $task_new_status = $new_status;
 
@@ -173,6 +176,14 @@ sub execute {
       die 'New status required (valid: ' . join( ', ', @statuses ) . "):\n"
         . command_hint( 'move', $id, 'STATUS' ) . "\n"
         unless $task_new_status;
+
+      # The claim this move writes: an explicit --claim on any destination,
+      # KARR_CLAIM only into a require_claim column (ticket #304, the #286
+      # rule create follows). Promoting a card from backlog to todo puts it
+      # in the pool for someone else to pick up. With the env name stamped on
+      # every move, the promoter held every card it promoted for
+      # claim_timeout, and `pick` and `list --unclaimed` did not see it.
+      my $claim = $self->resolved_claim_for($task_new_status);
 
       # A move to the status the card already has, with no claim to hand over,
       # changes nothing -- so it writes nothing: the write is what stamps
@@ -282,7 +293,7 @@ App::karr::Cmd::Move - Change a task's status
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -299,6 +310,12 @@ enforces C<require_claim> when the destination status requires an owner.
 Moving a finished task back into a working column releases the claim the card
 still carried, unless C<--claim> names the agent taking it up
 (L<App::karr::Role::TaskMutation/apply_status_change>).
+
+Moving a task into C<backlog> releases its claim from any column: backlog is
+held back and holds no claim (L<App::karr::Config/is_held_back_status>).
+Moving a card out of backlog is its promotion -- C<backlog> to C<todo> puts it
+in the pool C<karr pick> takes from, and C<< karr move ID in-progress --claim
+NAME >> takes it up directly.
 
 Moving a task to the status it already has changes nothing and therefore writes
 nothing: the card keeps its C<updated> stamp, no activity-log entry is
@@ -328,6 +345,13 @@ cobra's all-1 convention cannot.
 
 Claim the task while moving it. This is commonly used for
 C<in-progress> or C<review> states.
+
+C<KARR_CLAIM> (ADR 0005) stands in for the flag only when the destination is
+in the board's C<require_claim> list. A card moved into a column that needs no
+claim, for example backlog to C<todo>, gets nothing from the environment and
+stays free for someone else to pick up. An explicit C<--claim> stamps the
+claim on any destination (ticket #304) but C<backlog>, where it is refused
+(exit 1) with the C<karr move ID todo --claim NAME> that would have worked.
 
 =back
 

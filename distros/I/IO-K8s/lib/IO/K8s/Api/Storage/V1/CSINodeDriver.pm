@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::CSINodeDriver;
 # ABSTRACT: CSINodeDriver holds information about the specification of one CSI driver installed on a node
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s allocatable => 'Storage::V1::VolumeNodeResources';
@@ -29,7 +29,7 @@ IO::K8s::Api::Storage::V1::CSINodeDriver - CSINodeDriver holds information about
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allocatable
 

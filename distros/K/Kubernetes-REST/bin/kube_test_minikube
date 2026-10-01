@@ -7,7 +7,7 @@ use warnings;
 
 use Kubernetes::REST::CLI::Minikube;
 
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 
 my ($options, $command) = Kubernetes::REST::CLI::Minikube->split_argv(@ARGV);
 @ARGV = @$options;
@@ -26,7 +26,7 @@ kube_test_minikube - Run a command against a throwaway minikube cluster
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 

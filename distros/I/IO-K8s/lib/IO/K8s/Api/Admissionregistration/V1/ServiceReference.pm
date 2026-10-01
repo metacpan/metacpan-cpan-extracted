@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::ServiceReference;
 # ABSTRACT: ServiceReference holds a reference to Service.legacy.k8s.io
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -29,7 +29,7 @@ IO::K8s::Api::Admissionregistration::V1::ServiceReference - ServiceReference hol
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

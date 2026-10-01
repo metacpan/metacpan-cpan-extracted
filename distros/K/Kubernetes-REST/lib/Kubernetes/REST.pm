@@ -1,5 +1,5 @@
 package Kubernetes::REST;
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 # ABSTRACT: A Perl REST Client for the Kubernetes API
 use Moo;
 use Carp qw(croak carp);
@@ -18,6 +18,7 @@ use IO::K8s::Unstructured ();
 use Time::HiRes ();
 use Kubernetes::REST::WatchEvent;
 use Kubernetes::REST::LogEvent;
+use Kubernetes::REST::APIError;
 use namespace::clean;
 
 has server => (
@@ -93,7 +94,7 @@ has k8s => (
             # openapi_spec is an eager hashref on IO::K8s: handing it over here
             # only once it has actually been fetched keeps constructing/using
             # the inner instance from forcing the /openapi/v2 download (D12).
-            # Until then it is absent; _openapi_spec's builder rebuilds this
+            # Until then it is absent; _fetch_openapi_spec rebuilds this
             # instance once the spec exists.
             ($self->_has_openapi_spec ? (openapi_spec => $self->_openapi_spec) : ()),
         );
@@ -137,8 +138,16 @@ has resource_map => (
     lazy => 1,
     predicate => '_has_resource_map',
     clearer => '_clear_resource_map',
+    # Always a hash of our own: the inner IO::K8s merges the `with` providers
+    # into this hashref in place (IO::K8s::add). A map passed to the
+    # constructor is the caller's, and the fallback of a failed cluster fetch
+    # is IO::K8s's process-wide built-in map - neither may grow by the
+    # provider Kinds (karr k57). Moo coerces the default's value too.
+    coerce => sub { ref $_[0] eq 'HASH' ? { %{ $_[0] } } : $_[0] },
     default => sub {
         my $self = shift;
+        # Built here, not passed in: absorb_discovery may rebuild it.
+        $self->_resource_map_built(1);
         # A private copy, never IO::K8s's shared global map: the inner IO::K8s
         # is handed this hashref and merges any `with` providers into it with
         # add(), which mutates it in place. Returning the global ref would leak
@@ -148,6 +157,11 @@ has resource_map => (
     },
 );
 
+
+# Whether the resource map in place was built by the default above rather
+# than passed to the constructor. absorb_discovery rebuilds a built map from
+# the catalog it takes; a map the caller passed is theirs and stays (karr k51).
+has _resource_map_built => (is => 'rw', init_arg => undef);
 
 # Deliberately NOT delegated to the k8s attribute like the other IO::K8s
 # methods: building that instance forces the lazy resource_map, which on the
@@ -199,15 +213,9 @@ sub expand_class {
     # 'IO::K8s::<Kind>' whether or not such a class exists, and the fail-closed
     # error only surfaces later when require_module() cannot load it. For an
     # exact-GVK or domain-qualified request it fails *closed*, returning undef.
-    # Both -- and nothing else -- mean unresolved.
+    # Both -- and nothing else -- mean unresolved (_is_unresolved).
     my ($kind, $api_version) = $self->_kind_from_expand_args(@args);
-    my $unresolved =
-        !defined $class
-        || (defined $kind
-            && $class eq "IO::K8s::$kind"
-            && !($class->can('new') || eval { require_module($class); 1 }));
-
-    return $class unless $unresolved && defined $kind;
+    return $class unless defined $kind && $self->_is_unresolved($class, $kind);
 
     # Rung 4 (D16): the Kind resolved to nothing that ships. If the cluster
     # confirms this GVK through aggregated discovery, resolve to
@@ -220,9 +228,12 @@ sub expand_class {
     # catalog was already fetched building the cluster map, so this consults a
     # cache and never adds a round-trip. A Kind discovery does not serve stays
     # fail-closed (rung 5): the fabricated name (or undef) is returned so the
-    # load error still names the Kind. A discovery *failure* (cluster
-    # unreachable, expired token) is deliberately treated the same as "not
-    # served" here -- rung 5, fail-closed -- with the reason kept in
+    # load error still names the Kind. A qualified name, or a Kind plus
+    # apiVersion, is confirmed only in exactly its group/version: another
+    # group or version serving the Kind leaves it at rung 5 too (karr k43).
+    # A discovery *failure* (cluster unreachable, expired token) is
+    # deliberately treated the same as "not served" here -- rung 5,
+    # fail-closed -- with the reason kept in
     # _discovery_error; on the CRUD path the carp from
     # _load_resource_map_from_cluster has already named it while building the
     # cluster map.
@@ -230,6 +241,73 @@ sub expand_class {
         if $self->_discovery_path_meta($kind, $api_version);
 
     return $class;
+}
+
+# Whether $class, what expand_class() made of a name whose Kind is $kind (from
+# _kind_from_expand_args), is the signal that nothing resolved it: undef, or
+# the 'IO::K8s::<Kind>' IO::K8s fabricates for a bare Kind when that class does
+# not load (see expand_class). Every real resolution is resolved, including a
+# '+'-class that is not loaded yet.
+sub _is_unresolved {
+    my ($self, $class, $kind) = @_;
+    return 1 unless defined $class;
+    return defined $kind
+        && $class eq "IO::K8s::$kind"
+        && !($class->can('new') || eval { require_module($class); 1 });
+}
+
+# expand_class() for the methods that take a resource name and build a request
+# path from its class (list, get, patch, patch_status, delete, watch, log,
+# port_forward, exec, attach) or load it (compare_schema). A name nothing
+# resolves croaks here, naming it the way Net::Async::Kubernetes does, before
+# any request (karr k46) - instead of in _build_path, where require_module saw
+# only expand_class's answer: undef for a qualified name ("argument is not a
+# module name"), or a bare Kind's fabricated class ("Can't locate
+# IO/K8s/<Kind>.pm", naming a module that does not exist). A discovery
+# failure is named with it: an unreachable cluster could not confirm the name,
+# which is not the same as a cluster that does not serve it (karr k28). Only
+# for a name with a Kind - expand_class consulted discovery for exactly that
+# one, so the recorded failure is this call's. expand_class itself keeps
+# returning undef or the fabricated name: that is its public contract, and
+# _manifest_to_object reads the undef.
+sub _expand_class_or_croak {
+    my ($self, $name) = @_;
+    my $class = $self->expand_class($name);
+    my ($kind) = $self->_kind_from_expand_args($name);
+    return $class unless $self->_is_unresolved($class, $kind);
+    my $discovery_error = defined $kind ? $self->_discovery_error : undef;
+    $discovery_error = $self->_error_reason($discovery_error) if defined $discovery_error;
+    croak "unknown resource '" . ($name // '(undef)') . "': no IO::K8s class"
+        . " for this apiVersion/kind (add it to resource_map if it is a CRD)"
+        . (defined $discovery_error
+            ? "; discovery failed, so the cluster could not confirm it: $discovery_error"
+            : '');
+}
+
+# A caught error - a croak's string, or an APIError - as the reason another
+# message embeds: its text without the location it ends with. That location
+# names a line in here, or whatever frame a lazy builder left; the message it
+# goes into names the caller's line itself (karr k59). Once a file handle has
+# been read, Carp's location ends ', <$fh> line N.' (or 'chunk N').
+sub _error_reason {
+    my ($self, $error) = @_;
+    my $reason = "$error";
+    $reason =~ s/(?: at \S+ line \d+(?:, <[^>]*> (?:line|chunk) \d+)?\.)?\s*\z//;
+    return $reason;
+}
+
+# carp, for a warning raised while a lazy attribute is built - the discovery
+# catalog, the resource map built from it. Carp skips the frames of Moo's
+# generated accessors (Moo marks them internal), but not the frame where this
+# package calls into one, so a plain carp named the line in here that first
+# asked for the attribute (karr k63, k64). Trusting the generated accessors
+# for this one warning lets it name the caller's line, as a warning from a
+# plain method does. Not package-wide: that would move every other croak.
+sub _carp_past_builders {
+    my ($self, $message) = @_;
+    local our @CARP_NOT = ('Method::Generate::Accessor::_Generated');
+    carp $message;
+    return;
 }
 
 # Extract the Kubernetes Kind (and any explicitly supplied apiVersion) from an
@@ -269,9 +347,10 @@ sub _kind_from_expand_args {
 # confirmed) -- but the reason is kept in _discovery_error so _build_path can
 # name it instead of claiming a missing entry.
 #
-# $want_api_version, when given (an Unstructured object's own apiVersion),
-# pins the group/version; otherwise the group's discovery-preferred version
-# wins, matching _resource_map_from_catalog and D17.
+# $want_api_version, when given (a qualified name's group/version, or an
+# Unstructured object's own apiVersion), pins the group/version, and nothing
+# else will do; without it the group's discovery-preferred version wins,
+# matching _resource_map_from_catalog and D17.
 sub _discovery_path_meta {
     my ($self, $kind, $want_api_version) = @_;
     return unless $self->resource_map_from_cluster;
@@ -292,16 +371,23 @@ sub _discovery_path_meta {
         };
     };
 
-    # An explicit apiVersion pins the exact group/version first.
+    # An explicit apiVersion pins the exact group/version, and only that one.
+    # It names one GVK, and a cluster that does not serve that GVK has not
+    # confirmed it (D16) - not even when another group, or another version of
+    # the same group, serves a Kind of that name. Falling back there would
+    # address that other resource: list, delete and ensure_only's prune would
+    # land in it (karr k43). The same rule as IO::K8s's exact-GVK resolution,
+    # where an explicit version never falls back to the bare Kind's.
     if (defined $want_api_version && length $want_api_version) {
         my ($g, $v) = $want_api_version =~ m{/}
             ? split(m{/}, $want_api_version, 2)
             : ('', $want_api_version);
         my $res = $catalog->{groups}{$g}{versions}{$v}{kinds}{$kind};
-        return $meta_for->($g, $v, $res) if $res;
+        return unless $res;
+        return $meta_for->($g, $v, $res);
     }
 
-    # Otherwise the preferred version of whichever group serves the Kind.
+    # A bare Kind: the preferred version of whichever group serves it (D17).
     for my $group (sort keys %{$catalog->{groups}}) {
         my $gdata = $catalog->{groups}{$group};
         my @order = @{$gdata->{version_order} // []};
@@ -318,9 +404,11 @@ sub _discovery_path_meta {
 
 # The extra _build_path arguments an IO::K8s::Unstructured resolution needs,
 # derived from whatever identifier expand_class was given: an IO::K8s object
-# (its kind/apiVersion accessors) or a name string (the Kind is its last
-# '/'-delimited segment). Empty for every typed class, so typed path building
-# is completely unchanged.
+# (its kind/apiVersion accessors) or a name string. A string is split the way
+# expand_class split it to confirm the GVK, so a qualified
+# 'example.org/v1/Widget' keeps its group/version and does not land in
+# whichever other group serving a Widget discovery lists first. Empty for
+# every typed class, so typed path building is completely unchanged.
 sub _unstructured_hint {
     my ($self, $class, $ident) = @_;
     return () unless defined $class && $class eq 'IO::K8s::Unstructured';
@@ -330,7 +418,11 @@ sub _unstructured_hint {
             (defined $ident->apiVersion ? (api_version => $ident->apiVersion) : ()),
         );
     }
-    return (kind => (split m{/}, $ident)[-1]);
+    my ($kind, $api_version) = $self->_kind_from_expand_args($ident);
+    return (
+        (defined $kind        ? (kind        => $kind)        : ()),
+        (defined $api_version ? (api_version => $api_version) : ()),
+    );
 }
 
 # Kubernetes groups whose IO::K8s classes do NOT live under IO::K8s::Api::.
@@ -384,7 +476,8 @@ sub fetch_resource_map {
     # for schema_for/compare_schema only. The failure keeps this method's
     # documented wording; the underlying error rides along.
     my $catalog = eval { $self->_discovery };
-    croak "Could not load resource map from cluster: $@" unless $catalog;
+    croak 'Could not load resource map from cluster: ' . $self->_error_reason($@)
+        unless $catalog;
 
     return $self->_resource_map_from_catalog($catalog);
 }
@@ -472,16 +565,19 @@ sub _io_k8s_class_ships {
 #           <Kind> => { resource => <plural>, scope => 'Namespaced'|'Cluster' },
 #       } } },
 #   } } }
-# Built lazily on first use and invalidated by invalidate_discovery.
+# Built lazily on first use - or handed over by absorb_discovery - and
+# invalidated by invalidate_discovery.
 has _discovery => (
     is => 'lazy',
     predicate => '_has_discovery',
     clearer => '_clear_discovery',
+    writer => '_set_discovery',   # absorb_discovery
     builder => sub { $_[0]->_fetch_discovery },
 );
 
-# The reason ($@ text) the last discovery fetch attempted from
-# _discovery_path_meta failed, kept so the croak in _build_path can name it: a
+# The reason the last discovery fetch attempted from _discovery_path_meta
+# failed - its $@, for an HTTP error status an APIError (karr k59), rendered
+# with _error_reason - kept so the croak in _build_path can name it: a
 # failed fetch and a healthy catalog without the Kind both come back from
 # _discovery_path_meta as undef (fail-closed, D16), and only this tells them
 # apart. Cleared by the next successful fetch and by invalidate_discovery.
@@ -499,21 +595,19 @@ has _discovery_error => (
 my $DISCOVERY_ACCEPT =
     'application/json;g=apidiscovery.k8s.io;v=v2;as=APIGroupDiscoveryList';
 
+# The two discovery documents, in the order they are read.
+my @DISCOVERY_ROOTS = ('/api', '/apis');
+
 sub _fetch_discovery {
     my ($self) = @_;
 
     my $catalog = { groups => {} };
 
-    for my $root ('/api', '/apis') {
-        my $response = $self->_request('GET', $root, undef,
-            headers => { Accept => $DISCOVERY_ACCEPT });
-        croak "discovery GET $root failed: " . $response->status
-            if $response->status >= 400;
+    for my $root (@DISCOVERY_ROOTS) {
+        my ($body, $aggregated) = $self->_discovery_document($root,
+            $self->io->call($self->_discovery_request($root)));
 
-        my $body = $self->_json->decode($response->content);
-        my $kind = ref $body eq 'HASH' ? ($body->{kind} // '') : '';
-
-        if ($kind eq 'APIGroupDiscoveryList') {
+        if ($aggregated) {
             $self->_absorb_discovery_list($catalog, $body);
         } elsif ($root eq '/api') {
             $self->_fetch_discovery_legacy_core($catalog, $body);
@@ -523,6 +617,27 @@ sub _fetch_discovery {
     }
 
     return $catalog;
+}
+
+# The request for one discovery root: what _fetch_discovery sends, and what
+# prepare_discovery_requests hands an async client to send.
+sub _discovery_request {
+    my ($self, $root) = @_;
+    return $self->_prepare_request('GET', $root,
+        headers => { Accept => $DISCOVERY_ACCEPT });
+}
+
+# One discovery root's response, checked and decoded - for the synchronous
+# fetch and absorb_discovery alike. An HTTP error dies as an APIError like
+# any other checked response, carrying the body that says why (karr k59);
+# the second value says whether the document is aggregated discovery
+# (APIGroupDiscoveryList) rather than the legacy one.
+sub _discovery_document {
+    my ($self, $root, $response) = @_;
+    $self->_check_response($response, "discovery GET $root");
+    my $body = $self->_json->decode($response->content);
+    my $kind = ref $body eq 'HASH' ? ($body->{kind} // '') : '';
+    return ($body, $kind eq 'APIGroupDiscoveryList');
 }
 
 # APIGroupDiscoveryList (aggregated discovery v2). Each item is one group; the
@@ -558,8 +673,9 @@ sub _fetch_discovery_legacy_core {
 
     my @versions = @{$body->{versions} // []};
     for my $version (@versions) {
-        my $response = $self->_request('GET', "/api/$version");
-        next if $response->status >= 400;
+        my $path = "/api/$version";
+        my $response = $self->_request('GET', $path);
+        next unless $self->_legacy_resource_list_ok($response, $version, $path);
         my $list = $self->_json->decode($response->content);
         $self->_absorb_api_resource_list($catalog, '', $version, $list);
     }
@@ -578,8 +694,9 @@ sub _fetch_discovery_legacy_groups {
         for my $v (@{$group->{versions} // []}) {
             my $version = $v->{version};
             next unless defined $version && length $version;
-            my $response = $self->_request('GET', "/apis/$gname/$version");
-            next if $response->status >= 400;
+            my $path = "/apis/$gname/$version";
+            my $response = $self->_request('GET', $path);
+            next unless $self->_legacy_resource_list_ok($response, "$gname/$version", $path);
             my $list = $self->_json->decode($response->content);
             $self->_absorb_api_resource_list($catalog, $gname, $version, $list);
         }
@@ -587,6 +704,23 @@ sub _fetch_discovery_legacy_groups {
         $catalog->{groups}{$gname}{preferred} = $pref
             if defined $pref && exists $catalog->{groups}{$gname};
     }
+}
+
+# Whether the legacy APIResourceList response for one group/version
+# ($api_version, fetched from $path) can be read into the catalog. An error
+# status leaves that group/version's Kinds out of the catalog, and so out of
+# the resource map: any other status than 404 warns, naming it and the reason
+# the APIError gives, and the other groups are read on (karr k63). A 404 is
+# silent - the group/version went away between the group list and this
+# request.
+sub _legacy_resource_list_ok {
+    my ($self, $response, $api_version, $path) = @_;
+    return 1 if $response->status < 400;
+    return 0 if $response->status == 404;
+    eval { $self->_check_response($response, "discovery GET $path") };
+    $self->_carp_past_builders("discovery: cannot read apiVersion '$api_version',"
+        . ' its Kinds are missing from the resource map: ' . $self->_error_reason($@));
+    return 0;
 }
 
 # APIResourceList (legacy per-group discovery). Subresource entries carry a
@@ -630,34 +764,84 @@ sub invalidate_discovery {
 
     $self->_clear_discovery;
     $self->_clear_discovery_error;
-    $self->_clear_resource_map if $self->_has_resource_map;
-    # The inner IO::K8s captured the old map at build time; drop it too so it is
-    # rebuilt from the refreshed map on next use.
-    $self->_clear_k8s if $self->_has_k8s;
+    # Only a map built from the catalog goes, and with it the inner IO::K8s
+    # that captured it at build time, so both are rebuilt on next use. A map
+    # passed to the constructor is the caller's: rebuilding it would drop
+    # their '+My::Class' entries (karr k52), as absorb_discovery knows too.
+    if ($self->_has_resource_map && $self->_resource_map_built) {
+        $self->_clear_resource_map;
+        $self->_clear_k8s if $self->_has_k8s;
+    }
     return 1;
 }
 
-# Fetch full OpenAPI spec from cluster (cached). Kept lazy on purpose: the
-# only /openapi/v2 download in the client, paid for by schema_for/compare_schema
-# and (once resolution needs it) AutoGen, never by construction.
-has _openapi_spec => (
-    is => 'lazy',
-    predicate => '_has_openapi_spec',
-    builder => sub {
-        my $self = shift;
-        my $response = $self->_request('GET', '/openapi/v2');
-        croak "Could not fetch OpenAPI spec: " . $response->status if $response->status >= 400;
-        my $spec = $self->_json->decode($response->content);
-        # D12: the inner IO::K8s was built without a spec (so building it never
-        # forced this fetch). Now that the spec exists, drop the cached instance
-        # so its next build passes it through as openapi_spec for AutoGen -- the
-        # same rebuild-on-next-use pattern invalidate_discovery uses. The clear
-        # only marks it for rebuild; nothing here re-reads k8s, so the rebuild
-        # happens after Moo has stored this spec, not during the builder.
+sub prepare_discovery_requests {
+    my ($self) = @_;
+
+
+    return map { ($_ => $self->_discovery_request($_)) } @DISCOVERY_ROOTS;
+}
+
+sub absorb_discovery {
+    my ($self, %responses) = @_;
+
+
+    $self->_croak_unknown_args('absorb_discovery', \%responses, @DISCOVERY_ROOTS);
+    my @lists;
+    for my $root (@DISCOVERY_ROOTS) {
+        my $response = $responses{$root}
+            or croak "absorb_discovery requires the response for $root";
+        my ($body, $aggregated) = $self->_discovery_document($root, $response);
+        push @lists, $aggregated ? $body : undef;
+    }
+    # Legacy discovery needs a request per group/version on top, which only
+    # the synchronous path makes: nothing is cached, and the caller falls
+    # back to that path.
+    return if grep { !defined } @lists;
+
+    my $catalog = { groups => {} };
+    $self->_absorb_discovery_list($catalog, $_) for @lists;
+
+    # What an earlier catalog built goes, so this one counts: a resource map
+    # built from it, and the inner IO::K8s holding that map. A map passed to
+    # the constructor stays - a caller's '+My::Class' entries must survive.
+    if ($self->_has_resource_map && $self->_resource_map_built) {
+        $self->_clear_resource_map;
         $self->_clear_k8s if $self->_has_k8s;
-        return $spec;
-    },
+    }
+    $self->_clear_discovery_error;
+    $self->_set_discovery($catalog);
+    return 1;
+}
+
+# The full OpenAPI spec from the cluster, once _fetch_openapi_spec has fetched
+# it (cached). The only /openapi/v2 download in the client, paid for by
+# schema_for/compare_schema and (once resolution needs it) AutoGen, never by
+# construction.
+has _openapi_spec => (
+    is => 'ro',
+    predicate => '_has_openapi_spec',
+    writer => '_set_openapi_spec',
 );
+
+# Fetch /openapi/v2 and keep it. Not a lazy builder: an error status dies as
+# an APIError like any other checked response, naming the caller's line (karr
+# k55) - and a Moo-generated accessor between the caller and the check breaks
+# Carp's trust chain, so from a builder it named a line in here. A failed
+# fetch keeps nothing, and the next use fetches again.
+sub _fetch_openapi_spec {
+    my ($self) = @_;
+    my $response = $self->_request('GET', '/openapi/v2');
+    $self->_check_response($response, 'fetch OpenAPI spec');
+    my $spec = $self->_json->decode($response->content);
+    $self->_set_openapi_spec($spec);
+    # D12: the inner IO::K8s was built without a spec (so building it never
+    # forced this fetch). Now that the spec exists, drop the cached instance
+    # so its next build passes it through as openapi_spec for AutoGen -- the
+    # same rebuild-on-next-use pattern invalidate_discovery uses.
+    $self->_clear_k8s if $self->_has_k8s;
+    return $spec;
+}
 
 # Get schema definition for a specific type
 # $kind can be: 'Pod', 'IO::K8s::Api::Core::V1::Pod', or OpenAPI name like 'io.k8s.api.core.v1.Pod'
@@ -665,7 +849,7 @@ sub schema_for {
     my ($self, $kind) = @_;
 
 
-    my $spec = $self->_openapi_spec;
+    my $spec = $self->_has_openapi_spec ? $self->_openapi_spec : $self->_fetch_openapi_spec;
     my $defs = $spec->{definitions} // {};
 
     # If it's already an OpenAPI definition name
@@ -673,8 +857,12 @@ sub schema_for {
         return $defs->{$kind};
     }
 
-    # Convert class name to OpenAPI definition name
+    # Convert class name to OpenAPI definition name. A name nothing resolves
+    # (expand_class answers undef for a qualified one) has no definition to
+    # look up: the same undef a missing definition gets, without turning undef
+    # into a definition name first (karr k47).
     my $class = $self->expand_class($kind);
+    return unless defined $class;
     # IO::K8s::Api::Core::V1::Pod -> io.k8s.api.core.v1.Pod
     my $def_name = $class;
     $def_name =~ s/^IO::K8s:://;
@@ -684,8 +872,55 @@ sub schema_for {
     my @parts = split /\./, $def_name;
     $parts[$_] = lc($parts[$_]) for 0 .. $#parts - 1;
     $def_name = join '.', @parts;
+    return $defs->{$def_name} if exists $defs->{$def_name};
 
-    return $defs->{$def_name};
+    # That holds for the IO::K8s::Api:: classes only. Upstream names
+    # apiextensions and apiregistration after their staging repositories
+    # (io.k8s.apiextensions-apiserver..., io.k8s.kube-aggregator...), a CRD's
+    # definition after its group (com.example.v1.Widget), and Unstructured or
+    # a '+My::Class' map onto nothing. Every Kind's definition carries
+    # x-kubernetes-group-version-kind, so the class's GVK finds it; no match
+    # stays undef (karr k54).
+    my ($api_version, $gvk_kind) = $self->_schema_gvk($class, $kind);
+    return unless defined $api_version;
+    my ($group, $version) = $api_version =~ m{/}
+        ? split(m{/}, $api_version, 2)
+        : ('', $api_version);
+    for my $name (sort keys %$defs) {
+        my $gvks = ref $defs->{$name} eq 'HASH'
+            ? $defs->{$name}{'x-kubernetes-group-version-kind'} : undef;
+        next unless ref $gvks eq 'ARRAY';
+        for my $gvk (grep { ref $_ eq 'HASH' } @$gvks) {
+            return $defs->{$name}
+                if ($gvk->{group} // '') eq $group
+                && ($gvk->{version} // '') eq $version
+                && ($gvk->{kind} // '') eq $gvk_kind;
+        }
+    }
+    return;
+}
+
+# The apiVersion and Kind schema_for looks a definition up by, for $class as
+# expand_class resolved $name: the class's own api_version() and kind(), or -
+# for IO::K8s::Unstructured, whose class has neither - the Kind of the name
+# and the apiVersion discovery confirmed for it, exactly as expand_class and
+# _build_path read it (_discovery_path_meta). Empty when there is none.
+sub _schema_gvk {
+    my ($self, $class, $name) = @_;
+    if ($class eq 'IO::K8s::Unstructured') {
+        my ($kind, $api_version) = $self->_kind_from_expand_args($name);
+        return unless defined $kind;
+        my $meta = $self->_discovery_path_meta($kind, $api_version) or return;
+        return ($meta->{api_version}, $kind);
+    }
+    return unless eval { require_module($class); 1 } && $class->can('api_version');
+    # Asked as class methods, and only an answer without error counts - a
+    # class of your own may have them as instance attributes.
+    my $api_version = eval { $class->api_version };
+    return unless defined $api_version && length $api_version;
+    my $kind = $class->can('kind') ? eval { $class->kind } : undef;
+    ($kind = $class) =~ s/.*::// unless defined $kind && length $kind;
+    return ($api_version, $kind);
 }
 
 # Compare local class against cluster schema
@@ -694,7 +929,15 @@ sub compare_schema {
     my ($self, $kind) = @_;
 
 
-    my $class = $self->expand_class($kind);
+    my $class = $self->_expand_class_or_croak($kind);
+    # Unstructured declares only the envelope; held against a definition it
+    # would report every other field as missing locally, which says nothing
+    # about skew (karr k60). Before the /openapi/v2 download, which it would
+    # waste.
+    croak "compare_schema: '$kind' resolves to IO::K8s::Unstructured, which has"
+        . " no local schema to compare (add a typed class for it to resource_map"
+        . " or with)"
+        if $class eq 'IO::K8s::Unstructured';
     require_module($class);
 
     my $schema = $self->schema_for($kind);
@@ -703,12 +946,16 @@ sub compare_schema {
     return $class->compare_to_schema($schema);
 }
 
-# Internal wrapper with fallback for lazy loading
+# Internal wrapper with fallback for lazy loading. It runs in the
+# resource_map builder, most often reached through the k8s one: the warning
+# goes through _carp_past_builders to name the caller's line, not the line of
+# the k8s builder that asked for the map (karr k64).
 sub _load_resource_map_from_cluster {
     my ($self) = @_;
     my $map = eval { $self->fetch_resource_map };
     if ($@) {
-        carp "Falling back to the built-in resource map: $@";
+        $self->_carp_past_builders('Falling back to the built-in resource map: '
+            . $self->_error_reason($@));
         return IO::K8s->default_resource_map;
     }
     return $map;
@@ -779,13 +1026,19 @@ sub _build_path {
                 # A failed fetch and a catalog without the Kind both come back
                 # undef (fail-closed, see _discovery_path_meta); only the
                 # recorded reason tells them apart, and a catalog that was
-                # never read must not be reported as one lacking an entry.
+                # never read must not be reported as one lacking an entry. A
+                # pinned apiVersion is named: the Kind may well be served in
+                # another group or version, just not in this one (karr k43).
                 my $reason = $self->_discovery_error;
+                $reason = $self->_error_reason($reason) if defined $reason;
+                my $gvk = "Kind '$kind_hint'"
+                    . (defined $av_hint && length $av_hint
+                        ? " in apiVersion '$av_hint'" : '');
                 croak defined $reason
-                    ? "discovery failed, so Kind '$kind_hint' is unconfirmed"
+                    ? "discovery failed, so $gvk is unconfirmed"
                         . " - cannot build a path for IO::K8s::Unstructured:"
                         . " $reason"
-                    : "no discovery entry for Kind '$kind_hint' - cannot"
+                    : "no discovery entry for $gvk - cannot"
                         . " build a path for IO::K8s::Unstructured";
             }
             ($api_version, $resource, $is_namespaced) =
@@ -868,16 +1121,17 @@ sub _prepare_request {
     my $parameters = $opts{parameters};
     my $extra_headers = $opts{headers} // {};
 
-    # Append query parameters to URL
+    # Append query parameters to URL, keys and values through _query_escape
     if ($parameters && %$parameters) {
         my @pairs;
         for my $key (sort keys %$parameters) {
             my $val = $parameters->{$key};
             next unless defined $val;
+            my $k = $self->_query_escape($key);
             if (ref($val) eq 'ARRAY') {
-                push @pairs, map { "$key=$_" } grep { defined } @$val;
+                push @pairs, map { "$k=" . $self->_query_escape($_) } grep { defined } @$val;
             } else {
-                push @pairs, "$key=$val";
+                push @pairs, "$k=" . $self->_query_escape($val);
             }
         }
         if (@pairs) {
@@ -908,6 +1162,27 @@ sub _prepare_request {
     );
 }
 
+# Percent-encode a query key or value - but only what would otherwise change
+# what the API server reads (karr k35). The server splits a query with Go's
+# net/url ParseQuery: into pairs at '&', dropping a pair that holds a ';'
+# whole, then key from value at the FIRST '=', reading '+' as a space and
+# '%XX' as a byte, and dropping a pair with a malformed '%'. A '#' ends the
+# URL before it is sent (URI and HTTP::Tiny take the rest for a fragment), and
+# a space, a control character or a non-ASCII byte has no place in a request
+# target. Those are encoded - characters as their UTF-8 bytes, the contract
+# the JSON body follows too. Everything else stays as it is, above all '=',
+# ',', '!', '/', '(', ')' and ':': the server reads them the same either way
+# (a value's '=' is past the first one), a selector stays readable in the URL,
+# and whoever compares the rendered query - this distribution's mock harness,
+# Net::Async::Kubernetes's - sees the string it always did. Keys go the same
+# way; they are the API's parameter names, none of which holds an '='.
+sub _query_escape {
+    my ($self, $string) = @_;
+    my $bytes = Encode::encode('UTF-8', "$string");
+    $bytes =~ s/([\x00-\x20\x7F-\xFF%&+#;])/sprintf('%%%02X', ord $1)/ge;
+    return $bytes;
+}
+
 sub _check_response {
     my ($self, $response, $context) = @_;
     if ($response->status >= 400) {
@@ -915,25 +1190,51 @@ sub _check_response {
         # decode it (leniently - a truncated or non-UTF-8 body must not turn a
         # useful API error into an encoding croak).
         my $body = Encode::decode('UTF-8', $response->content // '', Encode::FB_DEFAULT);
-        croak "Kubernetes API error ($context): "
-            . $response->status . " " . $body;
+        # An object, so a caller can branch on the status instead of parsing
+        # the text; it stringifies to the message this croaked with before,
+        # at the same caller line (karr k50).
+        Kubernetes::REST::APIError->throw(
+            code     => 0 + $response->status,
+            body     => $body,
+            context  => $context,
+            response => $response,
+        );
     }
     return $response;
 }
 
+# The name to hand IO::K8s's json_to_object()/struct_to_object() for $class.
+# Both resolve a name again, and a single-segment class of your own - '+Gizmo'
+# in the resource_map, which expand_class returns as 'Gizmo' - reads to them
+# as a Kind: IO::K8s::Gizmo, or whatever class the map gives the Kind Gizmo
+# (karr k42). A name that already is a loaded IO::K8s class, which is what
+# expand_class resolved and _build_path loaded, therefore goes over as
+# '+Class', which IO::K8s takes exactly. Any other name - a short or qualified
+# one a seam caller passed - is left for IO::K8s to resolve. The role check
+# keeps an unrelated package that merely shares a Kind's name from being
+# taken for the class.
+sub _exact_class {
+    my ($self, $class) = @_;
+    return "+$class"
+        if defined $class && !ref $class && length $class && $class !~ /\A\+/
+            && $class->can('does') && $class->does('IO::K8s::Role::Resource');
+    return $class;
+}
+
 sub _inflate_object {
     my ($self, $class, $response) = @_;
-    return $self->k8s->json_to_object($class, $response->content);
+    return $self->k8s->json_to_object($self->_exact_class($class), $response->content);
 }
 
 sub _inflate_list {
     my ($self, $class, $response) = @_;
     my $struct = $self->_json->decode($response->content);
     my $items = $struct->{items} // [];
+    my $exact_class = $self->_exact_class($class);
     my (@objects, @dropped);
     for my $i (0 .. $#$items) {
         my $item = $items->[$i];
-        my $obj = eval { $self->k8s->struct_to_object($class, $item) };
+        my $obj = eval { $self->k8s->struct_to_object($exact_class, $item) };
         if (defined $obj) {
             push @objects, $obj;
             next;
@@ -964,6 +1265,7 @@ sub _process_watch_chunk {
     my ($self, $class, $buffer_ref, $chunk) = @_;
     $$buffer_ref .= $chunk;
 
+    my $exact_class = $self->_exact_class($class);
     my @events;
     while ($$buffer_ref =~ s/^([^\n]*)\n//) {
         my $line = $1;
@@ -986,7 +1288,7 @@ sub _process_watch_chunk {
         if ($type eq 'ERROR') {
             $object = $raw_object;
         } else {
-            $object = eval { $self->k8s->struct_to_object($class, $raw_object) }
+            $object = eval { $self->k8s->struct_to_object($exact_class, $raw_object) }
                 // $raw_object;
         }
 
@@ -1090,11 +1392,28 @@ sub list {
     my ($self, $short_class, %args) = @_;
 
 
+    # A misspelt option is not ignored (karr k58): label_selector listed
+    # unfiltered, namespce across the cluster. name and subresource are out
+    # too: they made the request a GET of one object, read as an empty list.
+    $self->_croak_unknown_args('list', \%args, qw(namespace labelSelector fieldSelector));
+    my ($class, $response) = $self->_list_request($short_class, %args);
+    $self->_check_response($response, "list $short_class");
+
+    return $self->_inflate_list($class, $response);
+}
+
+# list() up to the response, unchecked: returns the resolved class and the raw
+# response. ensure_only() needs the status itself - a 404 there means the Kind
+# is not served, not a failure - and must not read it back out of the text
+# _check_response croaks with.
+sub _list_request {
+    my ($self, $short_class, %args) = @_;
+
     # Extract query parameters before building path
     my $label_selector = delete $args{labelSelector};
     my $field_selector = delete $args{fieldSelector};
 
-    my $class = $self->expand_class($short_class);
+    my $class = $self->_expand_class_or_croak($short_class);
     my $path = $self->_build_path($class, %args,
         $self->_unstructured_hint($class, $short_class));
 
@@ -1105,9 +1424,7 @@ sub list {
     my $response = %params
         ? $self->_request('GET', $path, undef, parameters => \%params)
         : $self->_request('GET', $path);
-    $self->_check_response($response, "list $short_class");
-
-    return $self->_inflate_list($class, $response);
+    return ($class, $response);
 }
 
 sub get {
@@ -1115,11 +1432,12 @@ sub get {
 
 
     # Support: get('Kind', 'name'), get('Kind', 'name', namespace => 'ns'),
-    #          get('Kind', name => 'name'), get('Kind', name => 'name', namespace => 'ns')
+    #          get('Kind', name => 'name'), get('Kind', name => 'name', namespace => 'ns'),
+    #          each with subresource => ... as well
     my %args;
     if (@rest == 1) {
         $args{name} = $rest[0];
-    } elsif (@rest >= 2 && $rest[0] !~ /^(name|namespace)$/) {
+    } elsif (@rest >= 2 && $rest[0] !~ /^(name|namespace|subresource)$/) {
         # First arg is name, rest are key=value pairs
         $args{name} = shift @rest;
         %args = (%args, @rest);
@@ -1128,8 +1446,11 @@ sub get {
     } else {
         croak "Invalid arguments to get()";
     }
+    # A misspelt option is not ignored (karr k58). subresource is build_path's
+    # and works: status answers with the object.
+    $self->_croak_unknown_args('get', \%args, qw(name namespace subresource));
 
-    my $class = $self->expand_class($short_class);
+    my $class = $self->_expand_class_or_croak($short_class);
     croak "name required for get" unless $args{name};
 
     my $path = $self->_build_path($class, %args,
@@ -1144,6 +1465,19 @@ sub create {
     my ($self, $object) = @_;
 
 
+    my ($class, $response) = $self->_create_request($object);
+    $self->_check_response($response, "create $class");
+
+    return $self->_inflate_object($class, $response);
+}
+
+# create() up to the response, unchecked, for the same reason as
+# _list_request: ensure() takes a 409 as its cue that the object appeared
+# since its GET, and must read that off the status, not out of the text
+# _check_response croaks with (karr k44).
+sub _create_request {
+    my ($self, $object) = @_;
+
     my $class = ref($object);
     my $namespace = $object->can('metadata') && $object->metadata
         ? $object->metadata->namespace
@@ -1151,15 +1485,23 @@ sub create {
 
     my $path = $self->_build_path($class, namespace => $namespace,
         $self->_unstructured_hint($class, $object));
-    my $response = $self->_request('POST', $path, $object->TO_JSON);
-    $self->_check_response($response, "create " . ref($object));
-
-    return $self->_inflate_object($class, $response);
+    return ($class, $self->_request('POST', $path, $object->TO_JSON));
 }
 
 sub update {
     my ($self, $object) = @_;
 
+
+    my ($class, $response) = $self->_update_request($object);
+    $self->_check_response($response, "update $class");
+
+    return $self->_inflate_object($class, $response);
+}
+
+# update() up to the response, unchecked, like _create_request: ensure()
+# re-fetches and retries on a 409 Conflict and must tell it apart by status.
+sub _update_request {
+    my ($self, $object) = @_;
 
     my $class = ref($object);
     my $metadata = $object->metadata or croak "object must have metadata";
@@ -1168,10 +1510,7 @@ sub update {
 
     my $path = $self->_build_path($class, name => $name, namespace => $namespace,
         $self->_unstructured_hint($class, $object));
-    my $response = $self->_request('PUT', $path, $object->TO_JSON);
-    $self->_check_response($response, "update " . ref($object));
-
-    return $self->_inflate_object($class, $response);
+    return ($class, $self->_request('PUT', $path, $object->TO_JSON));
 }
 
 my %PATCH_TYPES = (
@@ -1185,6 +1524,11 @@ my %PATCH_TYPES = (
 # (patch('Pod', 'name', ...)) and the fully keyed (patch('Pod', name => ...))
 # call form. $label only appears in croak messages, $default_type is the patch
 # strategy used when the caller does not pass one.
+#
+# Any argument it does not read croaks before anything is sent (karr k61): a
+# misspelt namespce patched the object of that name at cluster scope, a
+# patch_type => 'merge' went out as a strategic merge patch. An object names
+# itself, so with one only the patch and its type are taken.
 sub _unpack_patch_args {
     my ($self, $label, $default_type, $class_or_object, @rest) = @_;
 
@@ -1193,11 +1537,12 @@ sub _unpack_patch_args {
     if (ref($class_or_object) && blessed($class_or_object)) {
         # Object passed: patch($object, patch => {...})
         my $object = $class_or_object;
+        my %args = @rest;
+        $self->_croak_unknown_args($label, \%args, qw(patch type));
         $class = ref($object);
         my $metadata = $object->metadata or croak "object must have metadata";
         $name = $metadata->name or croak "object must have metadata.name";
         $namespace = $metadata->namespace;
-        my %args = @rest;
         $patch = $args{patch} // croak "$label requires 'patch' parameter";
         $patch_type = $args{type} // $default_type;
     } else {
@@ -1211,8 +1556,9 @@ sub _unpack_patch_args {
         } else {
             croak "Invalid arguments to $label()";
         }
+        $self->_croak_unknown_args($label, \%args, qw(name namespace patch type));
 
-        $class = $self->expand_class($class_or_object);
+        $class = $self->_expand_class_or_croak($class_or_object);
         $name = $args{name} or croak "name required for $label";
         $namespace = $args{namespace};
         $patch = $args{patch} // croak "$label requires 'patch' parameter";
@@ -1286,22 +1632,43 @@ sub delete {
     my ($self, $class_or_object, @rest) = @_;
 
 
-    my ($class, $name, $namespace);
+    my ($class, $response) = $self->_delete_request($class_or_object, @rest);
+    $self->_check_response($response, "delete $class");
+
+    return 1;
+}
+
+# delete() up to the response, unchecked: returns the resolved class and the
+# raw response, for the same reason as _list_request - ensure_only() treats a
+# 404 (already gone) differently from a failure.
+#
+# propagationPolicy goes out as the query parameter the API server reads
+# DeleteOptions from. Any other argument croaks before anything is sent: a
+# misspelt propagationPolicy that was silently dropped would leave a Job's
+# Pods orphaned (karr k49).
+sub _delete_request {
+    my ($self, $class_or_object, @rest) = @_;
+
+    my ($class, $name, $namespace, %args);
 
     if (ref($class_or_object)) {
-        # Object passed
+        # Object passed: delete($object), delete($object, propagationPolicy => ...)
         my $object = $class_or_object;
+        croak "Invalid arguments to delete()" if @rest % 2;
+        %args = @rest;
+        $self->_croak_unknown_args('delete', \%args, 'propagationPolicy');
+        $self->_propagation_policy_or_croak('delete', $args{propagationPolicy});
         $class = ref($object);
         my $metadata = $object->metadata or croak "object must have metadata";
         $name = $metadata->name or croak "object must have metadata.name";
         $namespace = $metadata->namespace;
     } else {
         # Support: delete('Kind', 'name'), delete('Kind', 'name', namespace => 'ns'),
-        #          delete('Kind', name => 'name'), delete('Kind', name => 'name', namespace => 'ns')
-        my %args;
+        #          delete('Kind', name => 'name'), delete('Kind', name => 'name', namespace => 'ns'),
+        #          each with propagationPolicy => ... as well
         if (@rest == 1) {
             $args{name} = $rest[0];
-        } elsif (@rest >= 2 && $rest[0] !~ /^(name|namespace)$/) {
+        } elsif (@rest >= 2 && $rest[0] !~ /^(name|namespace|propagationPolicy)$/) {
             # First arg is name, rest are key=value pairs
             $args{name} = shift @rest;
             %args = (%args, @rest);
@@ -1310,33 +1677,111 @@ sub delete {
         } else {
             croak "Invalid arguments to delete()";
         }
+        $self->_croak_unknown_args('delete', \%args,
+            qw(name namespace propagationPolicy));
+        $self->_propagation_policy_or_croak('delete', $args{propagationPolicy});
 
-        $class = $self->expand_class($class_or_object);
+        $class = $self->_expand_class_or_croak($class_or_object);
         $name = $args{name} or croak "name required for delete";
         $namespace = $args{namespace};
     }
 
     my $path = $self->_build_path($class, name => $name, namespace => $namespace,
         $self->_unstructured_hint($class, $class_or_object));
-    my $response = $self->_request('DELETE', $path);
-    $self->_check_response($response, "delete $class");
+    my $policy = $args{propagationPolicy};
+    return ($class, defined $policy
+        ? $self->_request('DELETE', $path, undef,
+            parameters => { propagationPolicy => $policy })
+        : $self->_request('DELETE', $path));
+}
 
-    return 1;
+# The propagationPolicy values DeleteOptions takes.
+my @PROPAGATION_POLICIES = qw(Background Foreground Orphan);
+
+# Croak unless $policy is undef (none given) or one of @PROPAGATION_POLICIES.
+# $label only appears in the message.
+sub _propagation_policy_or_croak {
+    my ($self, $label, $policy) = @_;
+    return $policy if !defined $policy || grep { $_ eq $policy } @PROPAGATION_POLICIES;
+    croak "Unknown propagationPolicy '$policy' for $label() (use: "
+        . join(', ', @PROPAGATION_POLICIES) . ")";
+}
+
+# Croak on the first key of %$args that is not in @allowed, naming it and
+# what is allowed, instead of ignoring it. $label only appears in the message.
+sub _croak_unknown_args {
+    my ($self, $label, $args, @allowed) = @_;
+    my %allowed = map { $_ => 1 } @allowed;
+    my ($unknown) = sort grep { !$allowed{$_} } keys %$args;
+    return unless defined $unknown;
+    croak "Unknown argument '$unknown' to $label() (allowed: "
+        . join(', ', @allowed) . ")";
+}
+
+# Shared hashref handling for ensure() and ensure_only(): turns a manifest into
+# a typed object. A manifest's apiVersion is authoritative - with one, the
+# class is resolved as that exact group/version/Kind, and an apiVersion no
+# class serves croaks instead of falling back to the version the bare Kind
+# happens to map to (HorizontalPodAutoscaler alone means autoscaling/v2, a
+# different endpoint and schema than an autoscaling/v1 manifest). Without an
+# apiVersion the bare Kind resolves as it always did, and a Kind nothing
+# resolves croaks naming it, as for every method taking a resource name -
+# not with the module loader's "Can't locate IO/K8s/<Kind>.pm" (karr k48).
+# Either way the class is resolved here, so it goes to struct_to_object with
+# its '+': IO::K8s takes it as that exact class instead of resolving the name
+# again (see _exact_class; the class need not be loaded yet, so this does not
+# ask it). $label only appears in croak messages.
+sub _manifest_to_object {
+    my ($self, $label, $manifest) = @_;
+    my $kind = $manifest->{kind} or croak "$label: hashref must have 'kind'";
+    my $api_version = $manifest->{apiVersion};
+
+    return $self->k8s->struct_to_object('+' . $self->_expand_class_or_croak($kind), $manifest)
+        unless defined $api_version && length $api_version;
+
+    my $class = $self->expand_class($kind, $api_version)
+        // croak "$label: no IO::K8s class for apiVersion '$api_version', kind '$kind'"
+            . " (add it to resource_map if it is a CRD)";
+    return $self->k8s->struct_to_object("+$class", $manifest);
+}
+
+# The apiVersion and Kind an object is an instance of, for ensure() and
+# ensure_only() to tell resources apart by. A typed object answers from its
+# class (api_version(), kind()); IO::K8s::Unstructured from its instance data,
+# since its class name says nothing about what it holds. The last segment of a
+# class name is not enough on its own: a CRD is free to reuse a built-in Kind
+# name in its own group.
+sub _api_version_and_kind {
+    my ($self, $object) = @_;
+    my $api_version = ref($object) eq 'IO::K8s::Unstructured' ? $object->apiVersion
+                    : $object->can('api_version')           ? $object->api_version
+                    : undef;
+    my $kind = $object->can('kind') ? $object->kind : undef;
+    ($kind = ref $object) =~ s/.*::// unless defined $kind;
+    return ($api_version // '', $kind);
 }
 
 sub ensure {
-    my ($self, $object) = @_;
+    my ($self, $object, @extra) = @_;
 
 
-    if (ref($object) eq 'HASH') {
-        my $kind = $object->{kind} or croak "ensure: hashref must have 'kind'";
-        my $class = $self->expand_class($kind);
-        $object = $self->k8s->struct_to_object($class, $object);
-    }
+    # Nothing after the object is read (karr k58): namespace => ... would not
+    # move it, a second object would not be applied.
+    croak 'Invalid arguments to ensure(): it takes one object or hashref'
+        . ' (ensure_all takes several)'
+        if @extra;
+    $object = $self->_manifest_to_object('ensure', $object) if ref($object) eq 'HASH';
 
     my $class = ref($object);
     croak "ensure requires an IO::K8s object or hashref" unless blessed($object);
-    (my $kind = $class) =~ s/.*:://;
+    my ($api_version, $kind) = $self->_api_version_and_kind($object);
+    # The special cases below are the built-in core v1 PersistentVolumeClaim
+    # and batch/v1 Job only. The apiVersion is compared exactly, not just its
+    # group: the Job branch reads batch/v1's status fields and deletes what it
+    # takes for a failed Job, so an apiVersion it was not written for falls
+    # through to the plain update, where a mismatch fails loudly instead.
+    my $is_pvc = $api_version eq 'v1'       && $kind eq 'PersistentVolumeClaim';
+    my $is_job = $api_version eq 'batch/v1' && $kind eq 'Job';
     my $metadata = $object->metadata or croak "object must have metadata";
     my $name = $metadata->name or croak "object must have metadata.name";
     my $namespace = $metadata->namespace;
@@ -1345,50 +1790,55 @@ sub ensure {
     my $path = $self->_build_path($class, name => $name, namespace => $namespace,
         @unstructured_hint);
 
-    my $existing = eval {
-        my $response = $self->_request('GET', $path);
-        return undef if $response->status == 404;
+    # Every branch below is taken on the status of the response, never on the
+    # text of an error: a 500 or 422 whose message merely contains "404" or
+    # "409" is a failure, not a missing object or a conflict (karr k44).
+    my $existing;
+    my $response = $self->_request('GET', $path);
+    unless ($response->status == 404) {
         $self->_check_response($response, "ensure get $kind/$name");
-        $self->_inflate_object($class, $response);
-    };
-    my $get_err = $@;
-    die $get_err if $get_err && $get_err !~ /\b404\b/;
-
-    if ($existing) {
-        return $existing if $kind eq 'PersistentVolumeClaim';
-        if ($kind eq 'Job') {
-            my $status = $existing->status;
-            my $succeeded = $status && $status->succeeded;
-            my $active    = $status && $status->active;
-            return $existing if $succeeded || $active;
-            eval { $self->delete($existing) };
-            return $self->create($object);
-        }
-        $object->metadata->resourceVersion($existing->metadata->resourceVersion);
-        my $updated = eval { $self->update($object) };
-        return $updated if $updated;
-        if ($@ =~ /\b409\b/) {
-            $existing = $self->_request('GET', $path);
-            $self->_check_response($existing, "ensure refetch $kind/$name");
-            $existing = $self->_inflate_object($class, $existing);
-            $object->metadata->resourceVersion($existing->metadata->resourceVersion);
-            return $self->update($object);
-        }
-        die $@;
+        $existing = $self->_inflate_object($class, $response);
     }
 
-    my $created = eval { $self->create($object) };
-    return $created if $created;
-
-    if ($@ =~ /\b409\b/) {
-        my $response = $self->_request('GET', $path);
+    unless ($existing) {
+        (undef, $response) = $self->_create_request($object);
+        unless ($response->status == 409) {
+            $self->_check_response($response, "create $class");
+            return $self->_inflate_object($class, $response);
+        }
+        # 409 AlreadyExists: it appeared between the GET and the POST. From
+        # here on it is an existing object like any other, special cases
+        # included - a Job must not get a PUT onto its immutable Pod template.
+        $response = $self->_request('GET', $path);
         $self->_check_response($response, "ensure post-409 get $kind/$name");
         $existing = $self->_inflate_object($class, $response);
-        return $existing if $kind eq 'PersistentVolumeClaim';
-        $object->metadata->resourceVersion($existing->metadata->resourceVersion);
-        return $self->update($object);
     }
-    die $@;
+
+    return $existing if $is_pvc;
+    if ($is_job) {
+        # Read from TO_JSON, not status(): an IO::K8s::Unstructured Job has
+        # no status accessor, its status rides in the unknown-fields bag.
+        my $status = $existing->TO_JSON->{status} || {};
+        return $existing if $status->{succeeded} || $status->{active};
+        # Background, or the failed Job's Pods would be orphaned - the API
+        # default for a Job (karr k49) - and the old Job is gone at once, so
+        # the create does not run into it.
+        eval { $self->delete($existing, propagationPolicy => 'Background') };
+        return $self->create($object);
+    }
+    $object->metadata->resourceVersion($existing->metadata->resourceVersion);
+    (undef, $response) = $self->_update_request($object);
+    unless ($response->status == 409) {
+        $self->_check_response($response, "update $class");
+        return $self->_inflate_object($class, $response);
+    }
+    # 409 Conflict: the resourceVersion moved on server-side. Re-fetch it and
+    # retry once; a second conflict croaks.
+    $response = $self->_request('GET', $path);
+    $self->_check_response($response, "ensure refetch $kind/$name");
+    $existing = $self->_inflate_object($class, $response);
+    $object->metadata->resourceVersion($existing->metadata->resourceVersion);
+    return $self->update($object);
 }
 
 sub ensure_all {
@@ -1402,38 +1852,88 @@ sub ensure_only {
     my ($self, %args) = @_;
 
 
+    # A misspelt option is not ignored, before anything is applied: a
+    # propagation_policy typo would prune with Background, a namespace typo
+    # scan cluster scope only (karr k53).
+    $self->_croak_unknown_args('ensure_only', \%args,
+        qw(label objects kinds namespaces propagationPolicy));
     my $label      = $args{label} or croak "ensure_only requires 'label'";
     my @objects    = @{$args{objects} || []};
     my @kinds      = @{$args{kinds} || []};
     my @namespaces = @{$args{namespaces} || [undef]};
+    # Background by default, as kubectl delete does: a pruned Job would
+    # otherwise orphan its Pods (karr k49). Checked before anything is applied.
+    my $propagation = $self->_propagation_policy_or_croak('ensure_only',
+        $args{propagationPolicy} // 'Background');
 
     for my $obj (@objects) {
-        next unless ref($obj) eq 'HASH';
-        my $kind = $obj->{kind} or croak "ensure_only: hashref must have 'kind'";
-        my $class = $self->expand_class($kind);
-        $obj = $self->k8s->struct_to_object($class, $obj);
+        $obj = $self->_manifest_to_object('ensure_only', $obj) if ref($obj) eq 'HASH';
     }
 
     my @results = $self->ensure_all(@objects);
 
-    my %expected;
-    for my $obj (@objects) {
-        (my $kind = ref $obj) =~ s/.*:://;
-        my $key = join("\0", $kind, $obj->metadata->namespace // '');
-        $expected{$key}{$obj->metadata->name} = 1;
-    }
+    # (group, Kind, namespace, name), taken from the object on both sides -
+    # never from the kinds entry, which may be qualified ('autoscaling/v1/...')
+    # and would then match nothing, deleting the objects just applied. Group
+    # and Kind come from _api_version_and_kind: class-derived for a typed
+    # object, instance data for IO::K8s::Unstructured. The group keeps the same
+    # Kind name in two groups apart (Istio's and the Gateway API's Gateway);
+    # the core group is ''. No version in the key: the same resource listed
+    # through another version's class is still the same resource.
+    my $key_of = sub {
+        my ($obj) = @_;
+        my ($api_version, $kind) = $self->_api_version_and_kind($obj);
+        my ($group) = $api_version =~ m{\A(.*)/[^/]*\z};
+        my $metadata = $obj->metadata;
+        return join("\0", $group // '', $kind, $metadata->namespace // '', $metadata->name);
+    };
+    my %expected = map { $key_of->($_) => 1 } @objects;
+
+    # A failed list or delete leaves stale objects behind, so it is reported
+    # rather than swallowed - but only a real failure: a 404 on the list means
+    # the cluster does not serve the Kind, a 404 on the delete that the object
+    # is already gone. The status comes from the response, never from the text
+    # of an error. The caught croak already names the caller's line, which
+    # carp adds again, so the reason drops it.
+    my $where = sub {
+        my ($ns) = @_;
+        return defined $ns ? "in namespace '$ns'" : 'at cluster scope';
+    };
+    my $reason_of = sub {
+        my ($error) = @_;
+        $error =~ s/\s+\z//;
+        $error =~ s/ at \S+ line \d+\.\z//;
+        return $error;
+    };
 
     for my $kind (@kinds) {
         for my $ns (@namespaces) {
             my %list_args = (labelSelector => $label);
             $list_args{namespace} = $ns if defined $ns;
-            my $list = eval { $self->list($kind, %list_args) };
-            next unless $list;
+            my $list = eval {
+                my ($class, $response) = $self->_list_request($kind, %list_args);
+                return if $response->status == 404;
+                $self->_check_response($response, "list $kind");
+                $self->_inflate_list($class, $response);
+            };
+            unless ($list) {
+                carp "ensure_only: cannot list $kind " . $where->($ns)
+                    . ', nothing pruned there: ' . $reason_of->($@)
+                    if $@;
+                next;
+            }
             for my $item (@{$list->items}) {
-                my $item_ns = $item->metadata->namespace // '';
-                my $key = join("\0", $kind, $item_ns);
-                next if $expected{$key} && $expected{$key}{$item->metadata->name};
-                eval { $self->delete($item) };
+                next if $expected{ $key_of->($item) };
+                next if eval {
+                    my ($class, $response) = $self->_delete_request($item,
+                        propagationPolicy => $propagation);
+                    $response->status == 404
+                        || $self->_check_response($response, "delete $class");
+                };
+                my (undef, $item_kind) = $self->_api_version_and_kind($item);
+                carp "ensure_only: cannot delete $item_kind '" . $item->metadata->name
+                    . "' " . $where->($item->metadata->namespace)
+                    . ': ' . $reason_of->($@);
             }
         }
     }
@@ -1452,6 +1952,9 @@ sub ensure_crd {
     } else {
         @classes = @_;
     }
+    # A misspelt option is not ignored, before any class is asked for its CRD
+    # (karr k61): tiemout => 5 waited the default 30 seconds.
+    $self->_croak_unknown_args('ensure_crd', \%opts, qw(timeout poll_interval storage));
     croak "ensure_crd requires at least one CRD class" unless @classes;
 
     my $storage = $opts{storage};
@@ -1500,7 +2003,10 @@ sub ensure_crd {
 
 # Poll GET on a CustomResourceDefinition by name until its Established condition
 # is True, or croak on timeout. A 404 during polling means "not registered yet"
-# and is treated as not-established, not an error.
+# and is treated as not-established, not an error. That is read off the status
+# of the response, never out of the text of an error: any other failure - a
+# 500 whose message merely contains "404" too - ends the wait with that error
+# instead of being polled away into a timeout (karr k45).
 sub _wait_crd_established {
     my ($self, $crd, %opts) = @_;
 
@@ -1512,16 +2018,12 @@ sub _wait_crd_established {
     my $deadline = Time::HiRes::time() + $timeout;
 
     while (1) {
-        my $current = eval {
-            my $response = $self->_request('GET', $path);
-            return undef if $response->status == 404;
+        my $response = $self->_request('GET', $path);
+        unless ($response->status == 404) {
             $self->_check_response($response, "ensure_crd wait $name");
-            $self->_inflate_object($class, $response);
-        };
-        my $err = $@;
-        die $err if $err && $err !~ /\b404\b/;
-
-        return $current if $current && $self->_crd_established($current);
+            my $current = $self->_inflate_object($class, $response);
+            return $current if $current && $self->_crd_established($current);
+        }
         last if Time::HiRes::time() >= $deadline;
         Time::HiRes::sleep($interval);
     }
@@ -1548,6 +2050,11 @@ sub watch {
     my ($self, $short_class, %args) = @_;
 
 
+    # A misspelt option is not ignored (karr k58): timeoutSeconds ran for the
+    # default 300. name is out too: it made the request a GET of one object,
+    # which the server answers with the object, not a watch.
+    $self->_croak_unknown_args('watch', \%args, qw(on_event timeout
+        resourceVersion labelSelector fieldSelector namespace));
     my $on_event = delete $args{on_event}
         or croak "watch requires 'on_event' callback";
     my $timeout          = delete $args{timeout} // 300;
@@ -1555,7 +2062,7 @@ sub watch {
     my $label_selector   = delete $args{labelSelector};
     my $field_selector   = delete $args{fieldSelector};
 
-    my $class = $self->expand_class($short_class);
+    my $class = $self->_expand_class_or_croak($short_class);
     my $path = $self->_build_path($class, %args,
         $self->_unstructured_hint($class, $short_class));
 
@@ -1606,6 +2113,11 @@ sub log {
     } else {
         croak "Invalid arguments to log()";
     }
+    # A misspelt option is not ignored (karr k53): tail_lines => 10 would
+    # fetch the whole log.
+    $self->_croak_unknown_args('log', \%args, qw(name namespace container
+        follow tailLines sinceSeconds sinceTime timestamps previous limitBytes
+        on_line));
 
     croak "name required for log" unless $args{name};
 
@@ -1619,7 +2131,7 @@ sub log {
     my $previous     = delete $args{previous};
     my $limit_bytes  = delete $args{limitBytes};
 
-    my $class = $self->expand_class($short_class);
+    my $class = $self->_expand_class_or_croak($short_class);
     my $path = $self->_build_path($class, %args, subresource => 'log',
         $self->_unstructured_hint($class, $short_class));
 
@@ -1678,6 +2190,10 @@ sub port_forward {
     } else {
         croak "Invalid arguments to port_forward()";
     }
+    # A misspelt option is not ignored (karr k61): whatever was not read went
+    # on to build_path, which dropped it - on_message never saw a frame.
+    $self->_croak_unknown_args('port_forward', \%args, qw(name namespace ports
+        subprotocol on_open on_frame on_close on_error));
 
     croak "name required for port_forward" unless $args{name};
 
@@ -1696,7 +2212,7 @@ sub port_forward {
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
-    my $class = $self->expand_class($short_class);
+    my $class = $self->_expand_class_or_croak($short_class);
     my $path = $self->_build_path($class, %args, subresource => 'portforward',
         $self->_unstructured_hint($class, $short_class));
 
@@ -1736,6 +2252,11 @@ sub exec {
     } else {
         croak "Invalid arguments to exec()";
     }
+    # A misspelt option is not ignored (karr k61): containr => 'app' ran the
+    # command in the default container.
+    $self->_croak_unknown_args('exec', \%args, qw(name namespace command
+        container stdin stdout stderr tty subprotocol on_open on_frame on_close
+        on_error));
 
     croak "name required for exec" unless $args{name};
 
@@ -1760,7 +2281,7 @@ sub exec {
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
-    my $class = $self->expand_class($short_class);
+    my $class = $self->_expand_class_or_croak($short_class);
     my $path = $self->_build_path($class, %args, subresource => 'exec',
         $self->_unstructured_hint($class, $short_class));
 
@@ -1809,6 +2330,10 @@ sub attach {
     } else {
         croak "Invalid arguments to attach()";
     }
+    # A misspelt option is not ignored (karr k61): stdn => 1 attached without
+    # stdin.
+    $self->_croak_unknown_args('attach', \%args, qw(name namespace container
+        stdin stdout stderr tty subprotocol on_open on_frame on_close on_error));
 
     croak "name required for attach" unless $args{name};
 
@@ -1824,7 +2349,7 @@ sub attach {
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
-    my $class = $self->expand_class($short_class);
+    my $class = $self->_expand_class_or_croak($short_class);
     my $path = $self->_build_path($class, %args, subresource => 'attach',
         $self->_unstructured_hint($class, $short_class));
 
@@ -1873,7 +2398,7 @@ Kubernetes::REST - A Perl REST Client for the Kubernetes API
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -2066,6 +2591,10 @@ Read-only. The Kubernetes cluster version string (e.g., C<v1.31.0>). Fetched aut
 
 Hashref mapping short resource names to L<IO::K8s> class paths. By default loads dynamically from the cluster (if C<resource_map_from_cluster> is true) or uses L<IO::K8s> built-in map.
 
+When the cluster's discovery cannot be read, the built-in map is used
+instead, with a warning that names the reason - at the line of the call that
+first needed the map, whether that read C<resource_map> or resolved a name.
+
 Override for custom resources:
 
     resource_map => {
@@ -2074,6 +2603,13 @@ Override for custom resources:
     }
 
 The C<+> prefix tells L<IO::K8s> that this is a custom class (not in the IO::K8s:: namespace).
+
+The client keeps a copy of the hashref it is given: the Kinds of the L</with>
+providers are merged into that copy, never into your hash, and a change you
+make to your hash after construction is not seen. Change
+C<< $api->resource_map >> itself instead:
+
+    $api->resource_map->{StaticWebSite} = '+My::StaticWebSite';
 
 =head2 expand_class
 
@@ -2085,12 +2621,42 @@ Resolve a short resource name (C<'Pod'>), a domain-qualified name
 fully-qualified class name to its L<IO::K8s> class - the same contract as
 L<IO::K8s/expand_class>, against this client's L</resource_map>.
 
+With L</resource_map_from_cluster> on (the default), a Kind no shipped class,
+L</with> provider or AutoGen class resolves becomes L<IO::K8s::Unstructured>
+when the cluster's discovery serves it. A bare Kind is looked up in whichever
+group serves it, at that group's preferred version. A qualified name
+(C<'example.org/v1/Widget'>, or C<('Widget', 'example.org/v1')>) counts only
+in exactly that group and version: when the cluster does not serve those, it
+stays unresolved (C<undef>), even if another group or another version serves
+a Kind of the same name - nothing is ever sent there instead.
+
+The methods that take a resource name - L</list>, L</get>, L</patch>,
+L</patch_status>, L</delete>, L</watch>, L</log>, L</port_forward>,
+L</exec>, L</attach> and L</compare_schema> - croak on a name that stays
+unresolved, before sending anything, and name it:
+
+    unknown resource 'other.org/v1/Widget': no IO::K8s class for this
+    apiVersion/kind (add it to resource_map if it is a CRD)
+
+A bare Kind nothing resolves (C<expand_class> answers with the class name
+C<IO::K8s::E<lt>KindE<gt>>, which does not exist) is reported the same way.
+When the cluster's discovery could not be read, the message goes on to say so
+and why - the cluster could not confirm the name, which is not the same as not
+serving it.
+
 Pure name resolution does not cost a cluster roundtrip: as long as the
 resource map has not been fetched yet (and none was passed to the
 constructor), a name the built-in L<IO::K8s> map resolves to a loadable
 class is answered from that map directly. Only a name the built-in map
 cannot answer falls through to the cluster-backed map, fetching it on first
 use exactly as before.
+
+The result is a plain class name, without a C<+>. Handed back to a method
+that resolves names again - L<IO::K8s/struct_to_object>,
+L<IO::K8s/json_to_object> - a single-segment class of your own (C<'+Gizmo'>
+in the resource map, returned as C<'Gizmo'>) reads as the Kind C<Gizmo>
+there. Prefix it with C<+> when you do that yourself; this client's own
+inflation already does.
 
 =head2 fetch_resource_map
 
@@ -2102,10 +2668,25 @@ Build the resource map from the cluster's aggregated discovery documents
 
 Called automatically if C<resource_map_from_cluster> is enabled.
 
-Discovery is fetched and cached once per instance (see L</invalidate_discovery>);
+Discovery is fetched and cached once per instance (see L</invalidate_discovery>;
+an async client can supply it instead, see L</absorb_discovery>);
 calling this again rebuilds the map from the cached catalog rather than
 re-querying the cluster. It does B<not> download C</openapi/v2> - that spec is
 fetched lazily only when L</schema_for> or L</compare_schema> need it.
+
+When discovery cannot be read, it croaks C<Could not load resource map from
+cluster:> followed by the reason - for an HTTP error status the message of
+the L<Kubernetes::REST::APIError>,
+C<Kubernetes API error (discovery GET /api): 401 ...>.
+
+A cluster older than Kubernetes 1.27 answers with legacy discovery, which
+takes one more request per group and version. When one of those answers with
+an HTTP error status, that group/version's Kinds are missing from the map,
+and a warning names its apiVersion and the error - C<discovery: cannot read
+apiVersion 'metrics.k8s.io/v1beta1', its Kinds are missing from the resource
+map: Kubernetes API error (discovery GET /apis/metrics.k8s.io/v1beta1): 503
+...>; the other groups are read on. A 404 there is silent: the group/version
+went away after the list of groups was read.
 
 B<Version selection (D17).> When a group serves a Kind in more than one
 version, the bare short name (C<Pod>, C<ServiceCIDR>) resolves to the version
@@ -2128,13 +2709,96 @@ Discard the cached discovery catalog and the resource map built from it, so the
 next resolution re-queries the cluster. Use it after a CustomResourceDefinition
 is installed or changed, to make the new Kind visible to this client instance.
 
+A resource map passed to the constructor is not built from the catalog and
+stays as it is, entries such as C<'+My::Class'> included.
+
+=head2 prepare_discovery_requests
+
+    my %requests = $api->prepare_discovery_requests;
+    # ('/api' => $request, '/apis' => $request)
+
+Build the two discovery requests - C<GET /api> and C<GET /apis>, with the
+C<Accept> header that asks for aggregated discovery (C<APIGroupDiscoveryList>,
+C<apidiscovery.k8s.io/v2>) - without sending them. Returns them as path/request
+pairs, C</api> first, each a L<Kubernetes::REST::HTTPRequest> as
+L</prepare_request> builds it: exactly what the client sends when it reads
+discovery through its own L</io>.
+
+This and L</absorb_discovery> are for async wrappers such as
+L<Net::Async::Kubernetes>. With L</resource_map_from_cluster> on, the first
+name resolution otherwise reads discovery through the synchronous L</io>,
+blocking the wrapper's event loop.
+
+=head2 absorb_discovery
+
+    my $absorbed = $api->absorb_discovery(
+        '/api'  => $api_response,
+        '/apis' => $apis_response,
+    );
+
+Take the responses to the requests from L</prepare_discovery_requests> - any
+objects with C<status> and C<content> (the undecoded body), such as
+L<Kubernetes::REST::HTTPResponse>.
+
+When both are aggregated discovery documents they become this client's
+discovery catalog, replacing any it had cached, as if the client had read them
+itself, and the method returns true. From then on L</expand_class>,
+L</fetch_resource_map>, L</build_path> and the lazily built L</resource_map>
+answer from that catalog without sending a request. A resource map built from
+an earlier catalog is rebuilt from this one; a map passed to the constructor
+stays as it is.
+
+When either is a legacy discovery document - a cluster older than Kubernetes
+1.27 ignores the C<Accept> header - it returns false and caches nothing:
+reading legacy discovery takes a request per group and version, which only the
+synchronous path makes. The client then reads discovery itself when it first
+needs it, as it always did.
+
+An HTTP error status dies with a L<Kubernetes::REST::APIError>, as the
+client's own discovery read does, its C<context> naming the document:
+C<Kubernetes API error (discovery GET /apis): 503 ...>. A missing response,
+or any key other than C</api> and C</apis>, croaks.
+
+An async client hands the requests to its own transport and the responses
+back - here C<< $send->($request) >> stands for whatever runs a
+L<Kubernetes::REST::HTTPRequest> through the event loop and returns a
+L<Future> of the response:
+
+    my %requests = $rest->prepare_discovery_requests;
+    my @roots    = sort keys %requests;
+    my $ready = Future->needs_all(map { $send->($requests{$_}) } @roots)
+        ->then(sub {
+            my %responses;
+            @responses{@roots} = @_;
+            # false: legacy discovery, read synchronously on first use
+            $rest->absorb_discovery(%responses);
+            return Future->done;
+        });
+
 =head2 schema_for
 
     my $schema = $api->schema_for('Pod');
 
 Get the OpenAPI schema definition for a resource type from the cluster. Accepts short names (C<Pod>), full class names (C<IO::K8s::Api::Core::V1::Pod>), or OpenAPI definition names (C<io.k8s.api.core.v1.Pod>).
 
-Returns a hashref with the OpenAPI v2 schema definition.
+A name resolves as in L</expand_class>, and the definition is looked up by
+the name its class maps onto (C<IO::K8s::Api::Core::V1::Pod> becomes
+C<io.k8s.api.core.v1.Pod>), which holds for the C<IO::K8s::Api::> classes.
+Where no definition has that name - apiextensions and apiregistration, whose
+definitions upstream names after their staging repositories, a CRD class of
+your own or from a L</with> provider, L<IO::K8s::Unstructured> - it is the
+definition whose C<x-kubernetes-group-version-kind> names the class's API
+group, version and Kind: its C<api_version> and C<kind>, or for
+L<IO::K8s::Unstructured> the Kind and the group/version the cluster's
+discovery confirmed for it.
+
+Returns a hashref with the OpenAPI v2 schema definition, or C<undef> when
+there is none - also for a name that resolves to no class at all.
+
+The spec is fetched from C</openapi/v2> on first use and kept. An HTTP error
+status there dies with a L<Kubernetes::REST::APIError> whose C<context> is
+C<fetch OpenAPI spec>, as does L</compare_schema>; nothing is kept, and the
+next call fetches again.
 
 =head2 compare_schema
 
@@ -2143,6 +2807,12 @@ Returns a hashref with the OpenAPI v2 schema definition.
 Compare the local L<IO::K8s> class definition against the cluster's OpenAPI schema. Useful for detecting version skew between your L<IO::K8s> installation and the cluster.
 
 Returns the comparison result from C<< $class->compare_to_schema >>, the method L<IO::K8s::Role::Resource> provides on every resource class.
+
+A name that resolves to L<IO::K8s::Unstructured> (see L</expand_class>)
+croaks, before the spec is fetched: that class declares only C<apiVersion>,
+C<kind> and C<metadata> and keeps every other field untyped, so it has no
+local schema to compare. L</schema_for> still answers the cluster's
+definition for such a name.
 
 =head2 build_path
 
@@ -2173,7 +2843,7 @@ C<build_path> also accepts C<kind>, C<api_version>, C<resource> and C<namespaced
     );
     # => /apis/example.com/v1/namespaces/default/mycrds/my-instance
 
-Passing C<api_version>, C<resource> and C<namespaced> together, as above, resolves the path directly with no discovery lookup - the case for a caller (such as an async wrapper) that already knows the resource's metadata. Otherwise C<kind> is required (C<build_path> croaks without it), and resource/namespaced/apiVersion are looked up in the client's cached discovery catalog instead, preferring the cluster's preferred version unless C<api_version> pins a specific group/version; C<build_path> croaks if discovery has no entry for the Kind, and equally if the catalog could not be fetched at all (cluster unreachable, expired token) - in that case the message names that failure rather than claiming a missing entry, and the fallback stays fail-closed either way.
+Passing C<api_version>, C<resource> and C<namespaced> together, as above, resolves the path directly with no discovery lookup - the case for a caller (such as an async wrapper) that already knows the resource's metadata. Otherwise C<kind> is required (C<build_path> croaks without it), and resource/namespaced/apiVersion are looked up in the client's cached discovery catalog instead, preferring the cluster's preferred version unless C<api_version> pins a specific group/version - then only that group/version counts, never another group or version that serves a Kind of the same name; C<build_path> croaks if discovery has no entry for the Kind (in the pinned group/version, which the message then names), and equally if the catalog could not be fetched at all (cluster unreachable, expired token) - in that case the message names that failure rather than claiming a missing entry, and the fallback stays fail-closed either way.
 
 This is a public API for async wrappers like L<Net::Async::Kubernetes> that need to construct request paths independently.
 
@@ -2191,19 +2861,41 @@ Query parameter values may be scalars or arrayrefs (arrayrefs are emitted as
 repeated C<key=value> pairs). Extra request headers can be provided via
 C<headers =E<gt> \%headers>.
 
+Keys and values are percent-encoded where they would otherwise split or
+change the query on its way to the API server: C<%>, C<&>, C<+>, C<#>, C<;>,
+space, control characters, and non-ASCII characters (as their UTF-8 bytes).
+Everything else is sent as written, so a selector such as
+C<app.kubernetes.io/name=web,tier!=db> appears in the URL exactly as it was
+passed. Pass characters, not bytes - a value that already holds UTF-8 bytes
+is encoded twice. A query string that is already part of C<$path> is left
+untouched.
+
 This is a public API for async wrappers that execute HTTP requests through their own event loop.
 
 =head2 check_response
 
     $api->check_response($response, "get Pod");
 
-Validate an HTTP response. Croaks with a descriptive error if the status code is >= 400. Returns the response on success.
+Validate an HTTP response. Returns the response on success. On a status code
+>= 400 it dies with a L<Kubernetes::REST::APIError>, which carries the status
+(C<code>, C<is_not_found>, C<is_conflict>), the C<reason>, C<message> and
+C<details> of a Kubernetes C<Status> body, the decoded C<body>, the
+C<context> and the C<response>. It stringifies to the message this method
+croaked with as a plain string before, C<Kubernetes API error (get Pod): 404
+...>, naming the line that called C<check_response>. See L</ERROR HANDLING>.
 
 =head2 inflate_object
 
     my $pod = $api->inflate_object($class, $response);
 
 Decode the JSON response body and inflate it into a typed L<IO::K8s> object.
+
+C<$class> is normally what L</expand_class> resolved and L</build_path>
+loaded. A loaded L<IO::K8s> class is inflated as exactly that class - also a
+single-segment class of your own, registered as C<'+Gizmo'>, which
+L<IO::K8s> would otherwise read as the Kind C<Gizmo>. Any other name, short
+or qualified, is resolved first. L</inflate_list> and
+L</process_watch_chunk> treat C<$class> the same way.
 
 =head2 inflate_list
 
@@ -2245,6 +2937,11 @@ Accepts short class names (C<Pod>) or full class paths. For namespaced resources
 
 Supports C<labelSelector> and C<fieldSelector> query parameters for server-side filtering.
 
+Any other argument croaks before a request is sent, naming it: a misspelt
+option is not ignored. That includes C<name>: the list endpoint selects one
+object with C<< fieldSelector => 'metadata.name=NAME' >>, and L</get>
+fetches it.
+
 =head2 get
 
     my $pod = $api->get('Pod', name => 'my-pod', namespace => 'default');
@@ -2252,6 +2949,17 @@ Supports C<labelSelector> and C<fieldSelector> query parameters for server-side 
     my $pod = $api->get('Pod', 'my-pod', namespace => 'default');
 
 Get a single resource by name. Returns a typed L<IO::K8s> object.
+
+    my $pod = $api->get('Pod', 'my-pod', namespace => 'default',
+        subresource => 'status');
+    # GET /api/v1/namespaces/default/pods/my-pod/status
+
+Takes C<name>, C<namespace> for namespaced resources, and C<subresource>,
+which reads the named subresource of the object instead of the object. The
+response is inflated as the resource's own class, which fits a subresource
+that answers with the object itself, as C<status> does. Any other argument
+croaks before a request is sent, naming it: a misspelt option is not
+ignored.
 
 =head2 create
 
@@ -2318,6 +3026,10 @@ JSON Patch (RFC 6902): an array of operations, as in the third example above.
 
 Returns the full updated object from the server.
 
+Any other argument croaks before a request is sent, naming it: a misspelt
+option is not ignored. With an object, which names the resource itself, only
+C<patch> and C<type> are taken - C<name> and C<namespace> croak too.
+
 =head2 patch_status
 
     my $node = $api->patch_status('OCPNode', 'cp-1',
@@ -2339,7 +3051,8 @@ C<create>, C<update>, C<patch> and server-side apply alike - and still answers
 C</status>, which is what this method addresses.
 
 Takes the same arguments as L</patch> (object or class plus name, both call
-forms, the same C<type> values) and returns the full object from the server.
+forms, the same C<type> values), croaks on any other as L</patch> does, and
+returns the full object from the server.
 The patch document is passed through unchanged, so it carries its own
 C<status> key.
 
@@ -2370,7 +3083,42 @@ individual status fields.
     # or shorthand:
     $api->delete('Pod', 'my-pod', namespace => 'default');
 
+    # a Job, and the Pods it created with it:
+    $api->delete($job, propagationPolicy => 'Background');
+    $api->delete('Job', 'nightly', namespace => 'default',
+        propagationPolicy => 'Foreground');
+
 Delete a resource. Returns true on success.
+
+The optional C<propagationPolicy> decides what happens to the objects the
+deleted one owns, and is sent as the C<propagationPolicy> query parameter
+(a C<DeleteOptions> field):
+
+=over 4
+
+=item C<Background>
+
+The object is deleted at once; the garbage collector deletes its dependents
+afterwards.
+
+=item C<Foreground>
+
+The object stays, with a C<deletionTimestamp>, until its dependents are
+deleted.
+
+=item C<Orphan>
+
+The dependents are kept and lose their owner reference.
+
+=back
+
+Without it the server applies the resource's default - for a C<batch/v1>
+C<Job> that is C<Orphan>, which leaves its Pods behind. Any other value
+croaks, listing the three.
+
+Any argument other than C<name>, C<namespace> and C<propagationPolicy> -
+with an object, other than C<propagationPolicy> - croaks before anything is
+sent, naming it: a misspelt option is not ignored.
 
 =head2 ensure
 
@@ -2392,6 +3140,16 @@ carry a C<kind> field and is inflated to a typed object via
 L<IO::K8s/struct_to_object>. Hashref keys follow the Kubernetes API convention
 (camelCase, e.g. C<stringData>, not C<string_data>).
 
+A hashref's C<apiVersion>, when present, selects the class: an
+C<autoscaling/v1> HorizontalPodAutoscaler stays C<autoscaling/v1> and goes to
+that endpoint, although the bare Kind resolves to C<autoscaling/v2>. An
+C<apiVersion> that resolves to no known class croaks, naming the Kind and the
+C<apiVersion>, instead of falling back to the Kind's default version. A
+hashref without C<apiVersion> resolves by its Kind alone, as L</expand_class>
+does; a Kind that resolves to nothing croaks naming it
+(C<unknown resource 'Kind'>, as described under L</expand_class>) before any
+request is sent.
+
 Handles common race conditions:
 
 =over 4
@@ -2399,24 +3157,39 @@ Handles common race conditions:
 =item * 404 on initial get is treated as "does not exist" and falls through to create.
 
 =item * 409 AlreadyExists on create (resource appeared between get and create) is
-retried as an update.
+re-fetched and handled like a resource that existed from the start: updated,
+or - for the special cases below - returned unchanged or recreated.
 
 =item * 409 Conflict on update (resourceVersion changed server-side, e.g. a
 controller wrote status) is retried by re-fetching and re-applying.
 
 =back
 
+Each case is recognised by the response status. Any other error status
+croaks with the API error, whatever its message happens to say.
+
 Special-cases for kinds with server-side mutation constraints:
 
 =over 4
 
-=item * C<PersistentVolumeClaim> - spec is immutable after creation, so an existing
-PVC is returned unchanged.
+=item * C<PersistentVolumeClaim> (core C<v1>) - spec is immutable after
+creation, so an existing PVC is returned unchanged.
 
-=item * C<Job> - spec is immutable; an existing Job that is active or has
-succeeded is returned unchanged. A failed Job is deleted and recreated.
+=item * C<Job> (C<batch/v1>) - spec is immutable; an existing Job that is
+active or has succeeded is returned unchanged. A failed Job is deleted with
+C<propagationPolicy> C<Background>, so its Pods go with it, and recreated.
 
 =back
+
+Both are recognised by apiVersion and Kind together: a typed object's
+C<api_version> and C<kind>, or an L<IO::K8s::Unstructured> object's
+C<apiVersion> and C<kind> fields - never by the class name. A custom resource
+that reuses one of these Kind names in its own group is ensured like any other
+object, and so is a C<Job> under any apiVersion other than C<batch/v1>.
+
+It takes exactly one object or hashref. Anything after it croaks before a
+request is sent - an option is not ignored, and a second object is not
+applied silently or dropped; L</ensure_all> takes several.
 
 =head2 ensure_all
 
@@ -2441,7 +3214,40 @@ Use this for resources where stale objects must not survive (e.g. RBAC).
 Pass C<undef> inside C<namespaces> to scan cluster-scoped resources. If
 C<namespaces> is omitted, only cluster-scoped resources are scanned.
 
-Returns the list of applied objects (from L</ensure_all>).
+C<objects> takes typed objects or hashrefs, resolved as in L</ensure>. A
+C<kinds> entry may be a bare Kind or a qualified C<group/version/Kind> (see
+L</expand_class>). A listed resource counts as present when its API group,
+Kind, namespace and name match an object in C<objects> - group and Kind come
+from a typed object's C<api_version> and C<kind>, or from an
+L<IO::K8s::Unstructured> object's C<apiVersion> and C<kind> fields. The
+same Kind name in another group is another resource: with Istio's
+C<networking.istio.io> Gateway in C<objects>, a labelled Gateway API
+C<gateway.networking.k8s.io> Gateway of the same name is deleted. The version
+is not compared, so an object applied as C<autoscaling/v1> is kept when the
+listing goes through C<autoscaling/v2>.
+
+Pruning goes on past a failure, and says so. When a C<kinds> entry cannot be
+listed in one namespace - an HTTP error, or an entry that resolves to no
+class - that combination is skipped with a warning naming the entry, the
+namespace (or cluster scope) and the reason; anything stale there survives
+this run. A 404 is silent: the cluster does not serve that Kind, so there is
+nothing to prune. A delete that fails warns with the Kind, name, namespace and
+reason, and the next object is tried; a 404 there means the object is already
+gone and is silent too. Promote the warnings to a fatal error with
+C<< local $SIG{__WARN__} = sub { die @_ } >> if a partial prune is
+unacceptable to you.
+
+Pruned objects are deleted with C<propagationPolicy> C<Background> (see
+L</delete>), as C<kubectl delete> does, so a pruned Job takes its Pods with
+it. Pass C<< propagationPolicy => 'Foreground' >> or C<'Orphan'> to change
+that; any other value croaks before anything is applied.
+
+Returns the list of applied objects (from L</ensure_all>), whether or not the
+pruning was complete.
+
+Any argument other than C<label>, C<objects>, C<kinds>, C<namespaces> and
+C<propagationPolicy> croaks before anything is applied, naming it: a
+misspelt option is not ignored.
 
 =head2 ensure_crd
 
@@ -2472,6 +3278,8 @@ subject to a timeout. Only then is the discovery cache invalidated, so the
 next C<create>/C<list> of a custom resource does not race the apiserver
 registering the Kind (the reason plain C<ensure> of the CRD is not enough:
 the following call almost always creates a CR, which 404s until Established).
+A 404 while polling counts as not registered yet and is polled again; any
+other error status ends the wait at once and croaks with that API error.
 
 Returns the list of established CustomResourceDefinition objects (the objects
 read back from the final poll, carrying their C<Established> status).
@@ -2508,6 +3316,9 @@ group with no storage version croaks, naming the CRD and the candidate
 versions.
 
 =back
+
+Any other option croaks before anything is applied, naming it: a misspelt
+option is not ignored.
 
 =head2 watch
 
@@ -2555,6 +3366,10 @@ For namespaced resources, the namespace to watch.
 
 =back
 
+Any other argument croaks before a request is sent, naming it: a misspelt
+option is not ignored. That includes C<name>: to watch one object, pass
+C<< fieldSelector => 'metadata.name=NAME' >>.
+
 Returns the last C<resourceVersion> seen. Croaks on 410 Gone once the given
 C<resourceVersion> has expired - re-list to get a fresh one and resume from
 there:
@@ -2574,6 +3389,12 @@ there:
             $rv = undef;  # start fresh
         }
     }
+
+That croak is a plain string, not a L<Kubernetes::REST::APIError>: the watch
+request itself was answered with C<200>, and the C<410> arrived inside the
+stream as an C<ERROR> event, which C<on_event> has already been given. It
+calls for a re-list, not error handling. An HTTP error status on the watch
+request itself dies with an L<Kubernetes::REST::APIError> as usual.
 
 =head2 log
 
@@ -2609,7 +3430,9 @@ Also accepts, for namespaced resources, C<namespace>; and as further optional
 arguments: C<container> (name, for multi-container pods), C<sinceSeconds> /
 C<sinceTime> (show only recent output), C<timestamps> (prepend a timestamp to
 each line), C<previous> (logs from the container's previous run, after a
-restart), and C<limitBytes> (byte cap on the response).
+restart), and C<limitBytes> (byte cap on the response). Any other argument
+croaks before the request is sent, naming it: a misspelt option is not
+ignored.
 
 =head2 port_forward
 
@@ -2627,7 +3450,8 @@ C<[8080, 8443]>).
 Optional: C<namespace> (for namespaced resources), C<subprotocol> (WebSocket
 subprotocol, default C<v4.channel.k8s.io>), and the duplex transport callbacks
 C<on_open>, C<on_frame>, C<on_close>, C<on_error>, passed through to the IO
-backend.
+backend. Any other argument croaks before a request is sent, naming it: a
+misspelt option is not ignored.
 
 This method requires an IO backend that implements C<call_duplex>. The default
 L<Kubernetes::REST::LWPIO> and L<Kubernetes::REST::HTTPTinyIO> backends do not
@@ -2657,7 +3481,9 @@ Optional: C<namespace>, C<container> (for multi-container pods), the stream
 toggles C<stdin>/C<stdout>/C<stderr>/C<tty> shown above (defaults: stdin and
 tty off, stdout and stderr on), C<subprotocol> (WebSocket subprotocol, default
 C<v4.channel.k8s.io>), and the duplex transport callbacks C<on_open>,
-C<on_frame>, C<on_close>, C<on_error>, passed through to the IO backend.
+C<on_frame>, C<on_close>, C<on_error>, passed through to the IO backend. Any
+other argument croaks before a request is sent, naming it: a misspelt option
+is not ignored.
 
 This method requires an IO backend that implements C<call_duplex>. The default
 L<Kubernetes::REST::LWPIO> and L<Kubernetes::REST::HTTPTinyIO> backends do not
@@ -2686,7 +3512,9 @@ Optional: C<namespace>, C<container> (for multi-container pods), the stream
 toggles C<stdin>/C<stdout>/C<stderr>/C<tty> shown above (defaults: stdin and
 tty off, stdout and stderr on), C<subprotocol> (WebSocket subprotocol, default
 C<v4.channel.k8s.io>), and the duplex transport callbacks C<on_open>,
-C<on_frame>, C<on_close>, C<on_error>, passed through to the IO backend.
+C<on_frame>, C<on_close>, C<on_error>, passed through to the IO backend. Any
+other argument croaks before a request is sent, naming it: a misspelt option
+is not ignored.
 
 This method requires an IO backend that implements C<call_duplex>. The default
 L<Kubernetes::REST::LWPIO> and L<Kubernetes::REST::HTTPTinyIO> backends do not
@@ -2695,9 +3523,39 @@ currently provide duplex transport.
 Returns whatever the IO backend returns for C<call_duplex> (typically a
 session/handle object managed by that backend).
 
-=head1 NAME
+=head1 ERROR HANDLING
 
-Kubernetes::REST - A Perl REST Client for the Kubernetes API
+When the API server answers with an HTTP error status (400 and up), the call
+dies with a L<Kubernetes::REST::APIError>. It stringifies to the familiar
+message - C<Kubernetes API error (get Pod): 404 {...} at app.pl line 12.> -
+so printing C<$@> or matching it against a regex works as it always did, and
+it carries the status for code that has to tell cases apart:
+
+    my $ok = eval { $api->delete('Pod', 'web', namespace => 'default'); 1 };
+    unless ($ok) {
+        my $err = $@;
+        die $err unless ref $err && $err->isa('Kubernetes::REST::APIError')
+            && $err->is_not_found;    # already gone is fine
+    }
+
+Besides C<code>, C<is_not_found> and C<is_conflict> it has the C<reason>,
+C<message> and C<details> of the Kubernetes C<Status> body, the decoded
+C<body>, the C<context> and the C<response>.
+
+That includes the C</openapi/v2> fetch behind C<schema_for> and
+C<compare_schema>, and the discovery documents (C<GET /api>, C<GET /apis>,
+context C<discovery GET /api>), which L</absorb_discovery> dies with
+directly. Where the client reads discovery for itself, a failure shows
+inside another message instead - the warning that the resource map falls
+back to the built-in one, the croak of L</fetch_resource_map>, the croak for
+a name discovery could not confirm, the warning for a legacy group/version
+it could not read (see L</fetch_resource_map>) - which embeds the error's
+text.
+
+Everything else croaks with a plain string: invalid arguments, a resource
+name nothing resolves, and an expired watch - its C<410> arrives as an
+C<ERROR> event in a stream the server answered with C<200>, not as an HTTP
+status (see L</watch>).
 
 =head1 UPGRADING FROM 0.02
 
@@ -2755,7 +3613,8 @@ public methods provide this:
 
 =item * C<prepare_request($method, $path, %opts)> - Build HTTP request with auth
 
-=item * C<check_response($response, $context)> - Validate HTTP status
+=item * C<check_response($response, $context)> - Validate HTTP status (dies
+with a L<Kubernetes::REST::APIError> on 400 and up)
 
 =item * C<inflate_object($class, $response)> - JSON to typed object
 
@@ -2766,6 +3625,10 @@ L</inflate_list>)
 =item * C<process_watch_chunk($class, \$buf, $chunk)> - Parse NDJSON watch stream
 
 =item * C<process_log_chunk(\$buf, $chunk)> - Parse plain-text log stream
+
+=item * C<prepare_discovery_requests> and C<absorb_discovery(%responses)> -
+Read the cluster's discovery through your own event loop, so that resolving
+names needs no request of the client's own (see L</absorb_discovery>)
 
 =back
 
@@ -2903,6 +3766,8 @@ backends must honour that; see L<Kubernetes::REST::Role::IO/Encoding contract>.
 =item * L<Kubernetes::REST::WatchEvent> - Watch event object
 
 =item * L<Kubernetes::REST::LogEvent> - Log event object
+
+=item * L<Kubernetes::REST::APIError> - Error thrown for an HTTP error status
 
 =item * L<Kubernetes::REST::HTTPRequest> - HTTP request object
 

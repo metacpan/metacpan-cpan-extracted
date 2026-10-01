@@ -36,9 +36,9 @@ with 'OrePAN2::S3::Role::UploadArtifacts';
 
 use parent qw(CLI::Simple);
 
-our $VERSION   = '2.1.1';
-our $GIT_SHA   = '7f6970e14718af2b93d4ee2b2e6487c1c879944d';
-our $GIT_DIRTY = '7f6970e14718af2b93d4ee2b2e6487c1c879944d';
+our $VERSION   = '2.1.2';
+our $GIT_SHA   = 'b44f2719bda3edd84aee992ea81b9a86c52cc492';
+our $GIT_DIRTY = 'b44f2719bda3edd84aee992ea81b9a86c52cc492';
 
 our %DOC_INDEX;
 
@@ -1598,7 +1598,7 @@ Example:
 
 =head1 VERSION
 
-This documentation refers to version 2.1.1.
+This documentation refers to version 2.1.2.
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ConjurAPIKey;
 # ABSTRACT: Authenticates with Conjur using an API key.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s account   => Str, { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::ConjurAPIKey - Authenticates with Conjur using an 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 account
 

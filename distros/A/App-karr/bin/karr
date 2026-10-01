@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use App::karr::SyncGuard;
 use App::karr::Dispatch qw( dispatch );
 
@@ -54,7 +54,7 @@ karr - Kanban Assignment & Responsibility Registry
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -117,8 +117,9 @@ L<App::karr::Cmd::Restore>, and L<App::karr::Cmd::Destroy>.
 
 =item * L<App::karr::Cmd::Init>
 
-Creates the initial board in C<refs/karr/*> and can install the bundled
-project skill for Claude Code.
+Creates the initial board in C<refs/karr/*> and can install the two bundled
+skills (C<kanban-issues-karr-coordination> and C<kanban-issues-karr-ticket>)
+for Claude Code in the project.
 
 =item * L<App::karr::Cmd::Config>
 
@@ -141,8 +142,9 @@ Generates a compact board summary for embedding into files such as F<AGENTS.md>.
 
 =item * L<App::karr::Cmd::Skill>
 
-Installs, checks, updates, or prints the bundled skill file for Claude Code,
-Codex, and Cursor.
+Installs, checks, updates, or prints the bundled skills
+(C<kanban-issues-karr-coordination> and C<kanban-issues-karr-ticket>) for
+Claude Code, Codex, and Cursor.
 
 =back
 
@@ -335,14 +337,14 @@ C<KARR_UID> and C<KARR_GID> at build time.
 
 =head1 EXAMPLES
 
-Initialize a new board and install the project-local Claude Code skill:
+Initialize a new board and install the project-local Claude Code skills:
 
     karr init --name "HandyIntelligence Prototype" --claude-skill
 
-Claim and start the next task for a generated agent:
+Claim and start the next task under this checkout's claim name:
 
-    NAME=$(karr agentname)
-    karr pick --claim "$NAME" --move in-progress
+    export KARR_CLAIM=$(karr agent-name)
+    karr pick --move in-progress
 
 Export the board before trying a destructive restore:
 

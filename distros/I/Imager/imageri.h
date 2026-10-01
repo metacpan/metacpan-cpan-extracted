@@ -157,11 +157,12 @@ typedef struct im_context_tag {
   /* registered file type magic */
   im_file_magic *file_magic;
 
+  i_out_of_memory_handler out_of_memory;
+  void *out_of_memory_userdata;
+
   ptrdiff_t refcount;
 } im_context_struct;
 
 #define DEF_BYTES_LIMIT 0x40000000
-
-#define im_size_t_max (~(size_t)0)
 
 #endif

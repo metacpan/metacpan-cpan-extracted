@@ -41,15 +41,34 @@ which wins over nothing. There is no silent fallback: with neither set, a
 `require_claim` column still refuses (see below). A human or agent that wants a
 one-off different claim just names it on the line.
 
-`create` takes the default more narrowly (k286): `KARR_CLAIM` is used only
-when `--status` names a `require_claim` column -- the card is being started
-right there, and that is also the one case the guard below consults the
-environment. A card filed into the backlog or `todo` carries no claim from
-the environment: a Claim is a lease held *while working* the card
-(CONTEXT.md), and a card filed for others is not being worked. Under the
-plain rule every bug an agent filed was invisible to every other agent's
-`pick` and `list --unclaimed` for `claim_timeout`. An explicit `--claim`
-still stamps on any status.
+`create`, `move` and `edit` use the default more narrowly (k286 for
+`create`, k304 for `move`, k303 for `edit`). `KARR_CLAIM` is written onto the
+card only when the card ends up in a `require_claim` column:
+
+- `create`: the `--status` column.
+- `move`: the destination.
+- `edit`: the `--status` column, or the card's current column when
+  `--status` is omitted.
+
+A card in such a column is being worked, and this is also the one case in
+which the guard below consults the environment. A card filed into the
+backlog, promoted from backlog to `todo`, or given a note or a tag in either
+of those columns gets no claim from the environment. A Claim is a lease held
+*while working* the card (CONTEXT.md), and a card left for others is not
+being worked. Under the plain rule, every card an agent filed, promoted or
+annotated was hidden from every other agent's `pick` and `list --unclaimed`
+until `claim_timeout` ran out.
+
+`edit --release` never claims, and `--release` with an explicit `--claim` is
+a usage error (exit 2, ADR 0002). An explicit `--claim` still stamps on any
+status (since k306 except `backlog`, which holds no claim). That is how an
+expired claim is taken over in place: `move ID <same status> --claim NAME`.
+
+The environment still identifies the caller, even where it is not written:
+`check_claim` compares it with the card, so a card the caller already holds
+can be moved or edited in any column. `pick` and `handoff` always claim and
+take `KARR_CLAIM` as before. The shared resolution is
+`App::karr::Role::ClaimDefault::resolved_claim_for`.
 
 ## The value: `agent-name` is the checkout, not a random word
 
@@ -162,3 +181,8 @@ board, may write claims at once -- so the per-run suffix keeps them distinct
 where the bare checkout name would collide, and `claim_timeout`, not name reuse,
 recovers a crashed run's cards. Nothing is written to `refs/karr/*` or to the
 working tree (ticket #281).
+
+> Later: `share/claude-skill.md` became the skill directory
+> `share/kanban-issues-karr-cli/` (k285), and that was split into
+> `share/kanban-issues-karr-coordination/` and `share/kanban-issues-karr-ticket/`
+> (k302). Both carry the claim guidance this section describes.

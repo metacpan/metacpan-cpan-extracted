@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::ServiceInfo;
 # ABSTRACT: ServiceMatcher specifies Kubernetes service and port that matches traffic to be redirected.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s namespace   => Str, { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::ServiceInfo - ServiceMatcher specifies Kubernetes service a
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 namespace
 

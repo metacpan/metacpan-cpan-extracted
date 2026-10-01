@@ -22,7 +22,8 @@ Test::Mockingbird::mock('Sys::Syslog', 'syslog', sub {
 	my ($priority, $format, @args) = @_;
 
 	$called++;
-	cmp_ok($format, 'eq', 'Info message', 'Message body looks correct');
+	cmp_ok($format, 'eq', '%s', "message is passed through '%s'");
+	cmp_ok($args[0], 'eq', 'Info message', 'Message body looks correct');
 
 	return 1;
 });

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ClientAuth;
 # ABSTRACT: ClientAuth defines the server's policy for TLS Client Authentication.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s clientAuthType => Str, { enum => [qw(NoClientCert RequestClientCert RequireAnyClientCert VerifyClientCertIfGiven RequireAndVerifyClientCert)] };
@@ -22,7 +22,7 @@ IO::K8s::Traefik::V1alpha1::ClientAuth - ClientAuth defines the server's policy 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 clientAuthType
 

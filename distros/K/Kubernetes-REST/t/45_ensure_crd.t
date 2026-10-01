@@ -217,4 +217,104 @@ subtest 'ensure_crd requires at least one class' => sub {
     like($@, qr/requires at least one CRD class/, 'empty call croaks');
 };
 
+# ---------------------------------------------------------------------------
+# karr k45: the wait for Established goes by the status of each poll, never by
+# the text of an error. A 404 means "not registered yet" and is polled again;
+# any other failure ends the wait at once with that error - a 500 whose
+# message merely contains "404" too, instead of being polled away until the
+# timeout and reported as a CRD that did not establish.
+#
+# The mock answers a path the same way every time; the wait needs a sequence.
+# This subclass answers from a per-request script first - 'METHOD /path' =>
+# [ [ status, body ], ... ], consumed in order - and hands everything else to
+# the mock, as in t/17.
+# ---------------------------------------------------------------------------
+{
+    package Test::EnsureCRD::ScriptedIO;
+    use Moo;
+    extends 'Test::Kubernetes::Mock::IO';
+
+    has script => (is => 'ro', default => sub { {} });
+
+    around call => sub {
+        my ($orig, $self, $req) = @_;
+        (my $path = $req->url) =~ s{\Ahttps?://[^/]+}{};
+        my $steps = $self->script->{ $req->method . ' ' . $path };
+        return $self->$orig($req) unless $steps && @$steps;
+        my ($status, $body) = @{ shift @$steps };
+        push @{ $self->requests },
+            { method => $req->method, path => $path, content => $req->content };
+        return Test::Kubernetes::Mock::Response->new(
+            status  => $status,
+            content => $json->encode($body),
+        );
+    };
+}
+
+sub scripted_api {
+    my (%script) = @_;
+    return Kubernetes::REST->new(
+        server      => { endpoint => 'http://mock.local' },
+        credentials => { token => 'MockToken' },
+        resource_map_from_cluster => 0,
+        io          => Test::EnsureCRD::ScriptedIO->new(script => \%script),
+    );
+}
+
+sub failure {
+    my ($code, $reason, $message) = @_;
+    return [ $code, { kind => 'Status', apiVersion => 'v1', status => 'Failure',
+                      code => $code, reason => $reason,
+                      (defined $message ? (message => $message) : ()) } ];
+}
+
+sub polls {
+    my ($api, $path) = @_;
+    return scalar grep { $_->{method} eq 'GET' && $_->{path} eq $path }
+        @{ $api->io->requests };
+}
+
+subtest 'k45: a 500 saying 404 ends the wait with the 500, not a timeout' => sub {
+    my $name = 'staticwebsites.homelab.example.com';
+    my %crd  = (name => $name, group => 'homelab.example.com',
+                plural => 'staticwebsites', kind => 'StaticWebSite', versions => ['v1']);
+    # ensure's GET finds nothing, the POST creates it, the first poll fails.
+    # Once the script runs out the mock answers 404, which is polled again.
+    my $api = scripted_api(
+        "GET $CRD_PATH/$name" => [ failure(404, 'NotFound'),
+                                   failure(500, 'InternalError', 'etcd timed out after 404 ms') ],
+        "POST $CRD_PATH"      => [ [ 201, crd_manifest(%crd) ] ],
+    );
+
+    eval {
+        $api->ensure_crd(['My::CRD::V1::StaticWebSite'], timeout => 1, poll_interval => 0.05);
+    };
+    my $err = $@;
+    like($err, qr/ensure_crd wait \Q$name\E\): 500 /, 'croaks with the 500');
+    like($err, qr/etcd timed out after 404 ms/, 'the server message is carried');
+    unlike($err, qr/did not reach the Established condition/, 'it is not reported as a timeout');
+    is(polls($api, "$CRD_PATH/$name"), 2, 'ensure GET plus exactly one poll - no polling on');
+};
+
+subtest 'k45: a real 404 is polled again until Established' => sub {
+    my $name = 'staticwebsites.homelab.example.com';
+    my %crd  = (name => $name, group => 'homelab.example.com',
+                plural => 'staticwebsites', kind => 'StaticWebSite', versions => ['v1']);
+    my $api = scripted_api(
+        "GET $CRD_PATH/$name" => [ failure(404, 'NotFound'),     # ensure's GET
+                                   failure(404, 'NotFound'),     # poll 1
+                                   failure(404, 'NotFound'),     # poll 2
+                                   [ 200, crd_manifest(%crd, established => 1) ] ],
+        "POST $CRD_PATH"      => [ [ 201, crd_manifest(%crd) ] ],
+    );
+
+    my @out = eval {
+        $api->ensure_crd(['My::CRD::V1::StaticWebSite'], timeout => 5, poll_interval => 0.01);
+    };
+    is($@, '', 'ensure_crd does not die');
+    is(scalar @out, 1, 'one established CRD returned');
+    ok(@out && $api->_crd_established($out[0]), 'it carries Established=True');
+    is(polls($api, "$CRD_PATH/$name"), 4, 'ensure GET plus three polls');
+};
+
 done_testing;

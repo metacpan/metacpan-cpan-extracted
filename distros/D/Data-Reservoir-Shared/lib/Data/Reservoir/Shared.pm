@@ -1,7 +1,7 @@
 package Data::Reservoir::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::Reservoir::Shared', $VERSION);
 
@@ -99,6 +99,13 @@ are still range-checked, so an out-of-range value croaks. An optional file
 B<mode> may be passed as the last argument to C<new> (e.g. C<0660>) for
 cross-user sharing; it defaults to C<0600> (owner-only).
 
+The constructors create a new segment sparse: pages are allocated as they are
+first written, and once the filesystem is full, a write to a page not yet
+allocated dies with SIGBUS. Set C<DATA_RESERVOIR_SHARED_SPARSE=0> to reserve
+the whole segment at creation, so a full filesystem makes them croak instead;
+on tmpfs and memfd that commits the segment's memory at once, and a memory
+cgroup too small for it gets an OOM kill rather than a croak.
+
 =head2 Sampling
 
     my $kept  = $rsv->add($item);            # uniform: 1 if now stored, 0 if discarded
@@ -164,8 +171,11 @@ the mapping.
 =head1 CRASH SAFETY
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
-ownership and dead-owner recovery. Each C<add> is a short bounded update, so a
-crash leaves the reservoir consistent up to the last completed operation.
+ownership and dead-owner recovery. The process that recovers the lock finishes
+a heap reordering the dead writer left part-way, from a record kept in the
+header, so the sample stays ordered and holds each item once. A kill while an
+C<add> is copying an item over a replaced one can leave that slot holding the
+new item's length over the old item's bytes.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a

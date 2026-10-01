@@ -327,7 +327,9 @@ subtest 'nothing new blocks: the link is the fact, blocked is the decision' => s
     my $other = init_board( $work, 'other' );
 
     seed_task( $other, id => 7, title => 'The prerequisite', status => 'todo' );
-    run_karr( $home, 'create', 'Waiting', '--needs', 'other#7' );
+    # In todo: a backlog card is held back from pick and foundation alike
+    # (ticket k306), and this is about the link, not the column.
+    run_karr( $home, 'create', 'Waiting', '--needs', 'other#7', '--status', 'todo' );
 
     # Foundation must not become stricter than the board it coordinates (#185).
     my $picker = App::karr::Foundation::Picker->new( store => store_for($home) );

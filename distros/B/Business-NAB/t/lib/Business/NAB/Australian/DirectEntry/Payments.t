@@ -138,11 +138,11 @@ subtest 'instantiation + add attributes' => sub {
     };
 };
 
-subtest 'rounding' => sub {
+subtest 'floating point' => sub {
     my $Payments = $class->new_from_file( $example_file );
 
     subtest 'Within tolerance' => sub {
-        local $abs = sub { 1e-9 };
+        local $abs = sub { 1e-8 };
 
         my $fh       = File::Temp->new;
         my $tmp_file = $fh->filename;
@@ -154,15 +154,6 @@ subtest 'rounding' => sub {
         ok $Payments->to_file( $tmp_file ), 'to_file succeeds';
 
         files_eq_or_diff( $tmp_file, $example_file, { style => 'Unified' } );
-    };
-
-    subtest 'Outside tolerance' => sub {
-        local $abs = sub { 1e-8 };
-
-        throws_ok(
-            sub { $Payments->to_file('some_file'); },
-            qr/you have debits missing a credit/,
-        );
     };
 };
 

@@ -1,13 +1,13 @@
 package IO::K8s::Traefik::V1alpha1::ErrorPage;
 # ABSTRACT: ErrorPage holds the custom error middleware configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s errorRequestHeaders => [Str];
 k8s query               => Str;
 k8s service             => '+IO::K8s::Traefik::V1alpha1::Service';
 k8s status              => [Str], { pattern => qr/^([1-5][0-9]{2}[,-]?)+$/ };
-k8s statusRewrites      => { Str => 1 };
+k8s statusRewrites      => HashRef[Int];
 
 
 
@@ -28,7 +28,7 @@ IO::K8s::Traefik::V1alpha1::ErrorPage - ErrorPage holds the custom error middlew
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 errorRequestHeaders
 

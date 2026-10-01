@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::TLSClientCertificateInfo;
 # ABSTRACT: Info selects the specific client certificate details you want to add to the X-Forwarded-Tls-Client-Cert-Info header.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s issuer       => '+IO::K8s::Traefik::V1alpha1::TLSClientCertificateIssuerDNInfo';
@@ -30,7 +30,7 @@ IO::K8s::Traefik::V1alpha1::TLSClientCertificateInfo - Info selects the specific
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 issuer
 

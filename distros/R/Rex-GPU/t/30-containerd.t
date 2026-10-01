@@ -28,7 +28,7 @@ use Test::More;
 
 use Rex::GPU::NVIDIA;
 
-sub action { Rex::GPU::NVIDIA::_containerd_nvidia_action(@_) }
+sub action { Rex::GPU::NVIDIA->_containerd_nvidia_action(@_) }
 
 # The real generated config.toml from otho-lab (RKE2 v1.36.3+rke2r1, config v3):
 # version 3, config-v3.toml.d import, and RKE2's own auto-wired nvidia runtime.
@@ -99,16 +99,16 @@ subtest 'no config, no markers => modern v3 default' => sub {
 };
 
 subtest '_rke2_base_dir' => sub {
-  is(Rex::GPU::NVIDIA::_rke2_base_dir('rke2'),
+  is(Rex::GPU::NVIDIA->_rke2_base_dir('rke2'),
     '/var/lib/rancher/rke2/agent/etc/containerd', 'rke2 base dir');
-  is(Rex::GPU::NVIDIA::_rke2_base_dir('k3s'),
+  is(Rex::GPU::NVIDIA->_rke2_base_dir('k3s'),
     '/var/lib/rancher/k3s/agent/etc/containerd', 'k3s base dir');
-  is(Rex::GPU::NVIDIA::_rke2_base_dir(),
+  is(Rex::GPU::NVIDIA->_rke2_base_dir(),
     '/var/lib/rancher/rke2/agent/etc/containerd', 'defaults to rke2');
 };
 
 subtest 'v3 drop-in content is additive and uses the v3 CRI plugin path' => sub {
-  my $c = Rex::GPU::NVIDIA::_nvidia_containerd_dropin_v3();
+  my $c = Rex::GPU::NVIDIA->_nvidia_containerd_dropin_v3();
   like($c, qr/io\.containerd\.cri\.v1\.runtime/,
     'uses the modern io.containerd.cri.v1.runtime plugin path');
   unlike($c, qr/io\.containerd\.grpc\.v1\.cri/,
@@ -124,7 +124,7 @@ subtest 'v3 drop-in content is additive and uses the v3 CRI plugin path' => sub 
 };
 
 subtest 'v2 tmpl EXTENDS the base — never replaces it' => sub {
-  my $c = Rex::GPU::NVIDIA::_nvidia_containerd_tmpl_v2();
+  my $c = Rex::GPU::NVIDIA->_nvidia_containerd_tmpl_v2();
   like($c, qr/\{\{\s*template "base" \.\s*\}\}/,
     'begins by rendering the distribution base template (no clobber)');
   like($c, qr/io\.containerd\.grpc\.v1\.cri/,

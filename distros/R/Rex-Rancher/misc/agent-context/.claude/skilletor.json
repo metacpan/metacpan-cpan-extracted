@@ -1,0 +1,36 @@
+{
+  "sources": {
+    "getty": {
+      "git": "https://github.com/Getty/skills.git",
+      "ref": "main"
+    },
+    "io-k8s-p5": {
+      "git": "https://github.com/pplu/io-k8s-p5.git",
+      "ref": "master"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr.git",
+      "ref": "main"
+    }
+  },
+  "install": {
+    "skills": [
+      "getty-git-commit-style@getty",
+      "getty-git-usage@getty",
+      "getty-perl-core@getty",
+      "getty-perl-release-author-getty@karr",
+      "kanban-issues-karr-coordination@karr",
+      "kanban-issues-karr-ticket@karr",
+      "kubernetes-cilium-concepts@getty",
+      "kubernetes-gpu@getty",
+      "kubernetes-rke2@getty",
+      "perl-io-k8s-kubernetes-classes@io-k8s-p5",
+      "perl-release-dist-ini@getty",
+      "rex@getty"
+    ]
+  },
+  "targets": [
+    "claude"
+  ],
+  "gitignore": true
+}

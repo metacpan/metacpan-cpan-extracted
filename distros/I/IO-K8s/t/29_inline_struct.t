@@ -170,7 +170,7 @@ subtest 'nested inline structs' => sub {
     k8s name => Str;
     k8s spec => {
         replicas => Int,
-        labels   => { Str => 1 },   # opaque map -- used to stay shared
+        labels   => Opaque,         # opaque map -- used to stay shared (k191: was { Str => 1 })
         tags     => [Str],          # scalar list -- used to stay shared
     };
 }

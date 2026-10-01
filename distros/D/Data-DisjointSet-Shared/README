@@ -192,6 +192,12 @@ SHARING ACROSS PROCESSES
         wait;
         print $d->num_sets, "\n";   # reflects the child's unions
 
+    "new" and "new_memfd" reserve the whole segment when they create one, so a
+    full filesystem makes them croak instead of dying with SIGBUS while they
+    initialize it; "DATA_DISJOINTSET_SHARED_SPARSE=1" skips the reservation.
+    On tmpfs and memfd the segment is memory, and a memory cgroup too small
+    for it gets an OOM kill rather than a croak.
+
 SECURITY
     Backing files are created with mode 0600 (owner-only) by default, so only
     the creating user can open and attach them. To share a backing file across
@@ -207,10 +213,14 @@ SECURITY
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
     PID-encoded ownership; if a holder dies, the next contender detects the
-    dead owner and recovers. Because "union" updates a couple of words while
-    holding the lock, a crash leaves the partition consistent up to the last
-    completed "union". Limitation: PID reuse is not detected (very unlikely in
-    practice).
+    dead owner and recovers. It also re-derives every set's size and
+    "num_sets" from the parent links, so an interrupted "union" has either
+    merged its two sets or not, and "set_size" and "num_sets" agree with the
+    partition; this takes time proportional to "capacity". "reset" rewrites
+    every element, so it marks itself in progress in the header first; if its
+    writer dies part-way, the process that recovers the lock runs the "reset"
+    again from the start, and every element is a singleton afterwards.
+    Limitation: PID reuse is not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.

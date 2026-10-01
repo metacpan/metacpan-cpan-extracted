@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::StatefulSet;
 # ABSTRACT: StatefulSet represents a set of pods with consistent identities.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Apps::V1::StatefulSet - StatefulSet represents a set of pods with 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 

@@ -31,6 +31,17 @@ done
 # installed -- e.g. a fresh CI container that only installed the deps. Without
 # it the glob finds nothing and the packed binary dies at startup on the first
 # missing App::karr::* module.
+#
+# -a share: karr's own share/ (the skills `karr skill` and `karr init
+# --claude-skill` install) goes where an installed dist's share lands,
+# auto/share/dist/App-karr below an @INC dir -- $PAR_TEMP/inc/lib at runtime,
+# the same place Alien-Libgit2's goes -- so File::ShareDir::dist_dir finds it.
+# pp packs no share tree on its own, and SkillFile's other lookup, share/ next
+# to the lib/ it was loaded from, has no checkout to find inside the binary.
+# Missing it, the binary builds and passes every --help, then every `karr
+# skill` action dies with "Could not find .../SKILL.md" (k308). pp only warns
+# about an -a path that is not there and still exits 0, so it is
+# verify-binary.sh's trap 3 that fails a binary without it.
 PAR_VERBATIM=1 pp -o "$OUT" \
   -I lib \
   -M 'App::karr::**' -M 'App::karr::Cmd::**' \
@@ -44,6 +55,7 @@ PAR_VERBATIM=1 pp -o "$OUT" \
   -M Alien::Libgit2 \
   -M FFI::Platypus -M 'FFI::Platypus::**' -M FFI::CheckLib \
   -a "$DISTDIR;lib/auto/share/dist/Alien-Libgit2" \
+  -a "share;lib/auto/share/dist/App-karr" \
   bin/karr
 
 chmod +x "$OUT"

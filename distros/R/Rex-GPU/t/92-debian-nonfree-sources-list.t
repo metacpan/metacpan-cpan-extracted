@@ -42,9 +42,10 @@ use FindBin qw( $Bin );
 use lib "$Bin/../eg/custom-setup/lib";   # My::GPU::DebianMirror
 
 use Rex::GPU::NVIDIA;
+use Rex::GPU::NVIDIA::Setup::Debian;
 use My::GPU::DebianMirror;
 
-sub rewrite { [ Rex::GPU::NVIDIA::_sources_list_enable_nonfree($_[0]) ] }
+sub rewrite { [ Rex::GPU::NVIDIA::Setup::Debian->_sources_list_enable_nonfree($_[0]) ] }
 
 my $ALL = 'contrib non-free non-free-firmware';
 

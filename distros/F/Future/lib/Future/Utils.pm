@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Future::Utils 0.52;
+package Future::Utils 0.53;
 
 use v5.14;
 use warnings;

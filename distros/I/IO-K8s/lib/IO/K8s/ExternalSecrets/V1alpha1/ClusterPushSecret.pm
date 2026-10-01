@@ -1,9 +1,10 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ClusterPushSecret;
 # ABSTRACT: ClusterPushSecret is the Schema for the ClusterPushSecrets API that enables cluster-wide management of pushing Kubernetes secrets to external providers.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'external-secrets.io/v1alpha1',
-    resource_plural => 'clusterpushsecrets';
+    resource_plural => 'clusterpushsecrets',
+    subresources    => { status => {} };
 
 k8s spec   => '+IO::K8s::ExternalSecrets::V1alpha1::ClusterPushSecretSpec';
 k8s status => '+IO::K8s::ExternalSecrets::V1alpha1::ClusterPushSecretStatus';
@@ -24,7 +25,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ClusterPushSecret - ClusterPushSecret is the
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

@@ -1,5 +1,86 @@
 Revision history for Log-Abstraction
 
+0.35	Wed Sep 30 09:44:46 PM EDT 2026
+	[ Enhancements ]
+	- New max_messages option caps the in-memory message history.
+
+	[ Security ]
+	- Format tokens inside a log message are no longer expanded.  Tokens
+	  were substituted one at a time with %message% first, so a message
+	  containing "%env_FOO%" leaked $ENV{FOO} into file/fd logs.  All
+	  tokens are now expanded in a single pass.
+	- Line breaks in a message are followed by a tab in text formats, so a
+	  message can no longer forge extra log entries.
+	- syslog messages are passed through a '%s' format, so '%m' and other
+	  '%' sequences in a message are logged literally.
+
+	[ Bug Fixes ]
+	- A failed sendmail delivery no longer stops the message reaching the
+	  syslog, journald, fd and top-level file/fd backends.
+	- level() setter is now case-insensitive, as documented.
+	- The syslog sub-hash 'level' may now be a name as well as a number;
+	  a name used to warn "isn't numeric" and drop every message.  The
+	  sendmail 'level' may likewise be a number, and is case-insensitive.
+	- Invalid syslog/sendmail levels, a sendmail hash without 'to', and
+	  invalid journald field names now croak in new() rather than
+	  silently dropping messages at log time.
+	- script_name is now auto-detected for logger => { syslog => {...} },
+	  not only for a top-level syslog key.
+	- warn()/error() called as a class method on a subclass no longer die
+	  with "Can't use string as a HASH ref".
+	- carp_on_warn (and the no-backend carp) no longer fires for a warning
+	  below the level threshold.
+	- A top-level file or fd now counts as a backend, so error() no longer
+	  croaks (and warn() no longer carps) on a file-only logger.
+	- syslog and sendmail now join message parts without a separator, like
+	  every other backend.
+	- Unicode messages are written as UTF-8 by the file/fd backends without
+	  "Wide character" warnings; an fd with an encoding layer is not
+	  double-encoded.  JSON output keys are now sorted.
+	- journald: values are sent as UTF-8 with correct binary-framing
+	  lengths; a message too big for one datagram is truncated; a missing
+	  journald socket carps once rather than on every message.
+	- Destroying one instance no longer closes the process-wide syslog
+	  connection while other instances still use it.
+	- Log::Any adapter: file/line now point at the code calling Log::Any;
+	  a non-Log::Abstraction 'instance' croaks instead of being silently
+	  replaced; carp_on_warn, croak_on_error, config_file and max_messages
+	  are forwarded; a croak while logging is turned into a carp.
+
+	[ Documentation ]
+	- Documented that trace shares debug's threshold, the syslog sub-hash
+	  keys, Unicode handling, and the full list of accepted level names.
+	- Formal specification brought in line with the code.
+
+	[ Housekeeping ]
+	- Removed the unused JSON::MaybeXS test dependency.
+	- journald binary framing no longer uses pack('Q<'), which dies on
+	  perls built without 64-bit integers.
+	- Minimum Perl version is now 5.014 (the code needs 5.010, and
+	  Readonly::Values::Syslog needs 5.014).
+	- Log::Any and the Email::* modules used by the sendmail backend are
+	  now proper runtime 'recommends' in META; Log::Any was previously
+	  hidden as an unrecognised resource.
+	- Documented the Log::Any adapter's generated logging and is_*
+	  methods, and fixed its SYNOPSIS.
+	- autodie is now loaded with :default rather than :all, since the
+	  module never calls system() or exec(); autodie is now declared.
+	  IPC::System::Simple is declared as a runtime requirement because
+	  Params::Get, loaded via Config::Abstraction, needs it but doesn't
+	  declare it.
+	- Data::Dumper is now a test dependency only; the tests that use it now
+	  load it themselves.  Removed the unused File::Slurp, File::Glob
+	  and File::stat test dependencies.  Declared the
+	  core modules Socket and File::Basename, and the author-test modules
+	  as develop prerequisites.
+	- Documented the messages raised while logging (invalid file name,
+	  SMTP host/port, unusable logger, delivery failures), and the
+	  Log::Abstraction::new() function-call form.
+	- t/10-compile.t no longer fails when Log::Any is not installed.
+	  Log::Any is only a recommended dependency, so the compile check of
+	  Log::Any::Adapter::Abstraction is now skipped when
+	  Log::Any::Adapter::Base cannot be loaded.
+
 0.34	Sat Sep 26 08:47:01 PM EDT 2026
 	[ Bug Fixes ]
 	- Bump minimum versions

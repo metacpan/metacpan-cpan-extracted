@@ -100,19 +100,19 @@ my $ADA_VMM = join("\n",
   "ProgIf:\t00");
 
 subtest '_parse_lspci_vmm' => sub {
-  my $r = Rex::GPU::Detect::_parse_lspci_vmm($A10_VMM."\n\n".$ADA_VMM."\n");
+  my $r = Rex::GPU::Detect->_parse_lspci_vmm($A10_VMM."\n\n".$ADA_VMM."\n");
   is_deeply($r, {
     '0002:00:00.0' => { device_id => '2236', subsystem_vendor_id => '10de', subsystem_id => '14b9' },
     '01:00.0'      => { device_id => '27b0', subsystem_vendor_id => '10de', subsystem_id => '16fa' }
   }, 'two records by slot');
-  is_deeply(Rex::GPU::Detect::_parse_lspci_vmm("Slot:\t05:00.0\nDevice:\tDevice [1db4]"),
+  is_deeply(Rex::GPU::Detect->_parse_lspci_vmm("Slot:\t05:00.0\nDevice:\tDevice [1db4]"),
     { '05:00.0' => { device_id => '1db4', subsystem_vendor_id => undef, subsystem_id => undef } },
     'no subsystem lines => undef');
-  is_deeply(Rex::GPU::Detect::_parse_lspci_vmm(undef), {}, 'no output => {}');
-  is_deeply(Rex::GPU::Detect::_parse_lspci_vmm($ADA_NN), {}, 'lspci -nn text => {}');
-  is(Rex::GPU::Detect::_pci_slot($ADA_NN), '01:00.0', '-nn slot 0000:01:00.0 => 01:00.0');
-  is(Rex::GPU::Detect::_pci_slot($A10_NN), '0002:00:00.0', 'non-zero domain kept');
-  is(Rex::GPU::Detect::_pci_slot($AMD_NN), '0a:00.0', 'no domain');
+  is_deeply(Rex::GPU::Detect->_parse_lspci_vmm(undef), {}, 'no output => {}');
+  is_deeply(Rex::GPU::Detect->_parse_lspci_vmm($ADA_NN), {}, 'lspci -nn text => {}');
+  is(Rex::GPU::Detect->_pci_slot($ADA_NN), '01:00.0', '-nn slot 0000:01:00.0 => 01:00.0');
+  is(Rex::GPU::Detect->_pci_slot($A10_NN), '0002:00:00.0', 'non-zero domain kept');
+  is(Rex::GPU::Detect->_pci_slot($AMD_NN), '0a:00.0', 'no domain');
 };
 
 #### detect()
@@ -200,7 +200,7 @@ subtest 'unparseable slots are ignored' => sub {
     is($r->{nvidia}[0]{vgpu}, 0, "-vmm Slot: '$slot' => vgpu 0");
     is($r->{nvidia}[0]{subsystem_id}, undef, '... subsystem_id undef');
   }
-  is_deeply(Rex::GPU::Detect::_parse_lspci_vmm("Slot:\tgarbage\nDevice:\tGA102GL [A10] [2236]\n"
+  is_deeply(Rex::GPU::Detect->_parse_lspci_vmm("Slot:\tgarbage\nDevice:\tGA102GL [A10] [2236]\n"
     ."SVendor:\tNVIDIA Corporation [10de]\nSDevice:\tDevice [14b9]"), {}, '_parse_lspci_vmm drops the record');
 };
 

@@ -75,7 +75,7 @@ if ($pid == 0) {
     _exit($g->node_data($a) == 111 ? 0 : 1);
 }
 waitpid($pid, 0);
-is $? >> 8, 0, 'cross-process read';
+is $?, 0, 'cross-process read';
 
 # file persistence
 my $path = tmpnam() . '.shm';

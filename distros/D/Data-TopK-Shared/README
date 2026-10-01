@@ -97,6 +97,12 @@ METHODS
     the last argument to "new" (e.g. 0660) for cross-user sharing; it defaults
     to 0600 (owner-only).
 
+    The constructors reserve the whole segment when they create one, so a full
+    filesystem makes them croak instead of the initialization dying with
+    SIGBUS; set "DATA_TOPK_SHARED_SPARSE=1" to skip the reservation. On tmpfs
+    and memfd the segment is memory, and a memory cgroup too small for it gets
+    an OOM kill rather than a croak.
+
   Feeding and querying
         my $count = $tk->add($key);           # observe one key; returns its new estimated count
         my $count = $tk->add($key, $t);       # decayed mode: observe at time $t (optional)
@@ -170,10 +176,15 @@ SECURITY
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
-    PID-encoded ownership and dead-owner recovery. Each "add" is a short
-    bounded update, so a crash leaves the summary consistent up to the last
-    completed operation. Limitation: PID reuse is not detected (very unlikely
-    in practice).
+    PID-encoded ownership and dead-owner recovery. The process that recovers
+    the lock finishes a heap reordering, a decayed-mode rescale or a "clear"
+    the dead writer left part-way, each from a record kept in the header, and
+    rebuilds the key index from the counters, so every monitored key is found
+    again. A kill while an "add" is copying a new key into an evicted counter
+    can leave that counter holding a mix of the old and new key's bytes; if
+    the mix spells a key that is already monitored, "top" lists that key a
+    second time, with the lowest count, until the torn counter is evicted.
+    Limitation: PID reuse is not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.

@@ -620,4 +620,53 @@ PDB
 		'at the distance mdtraj measures with PHE first');
 }
 
+# --- residue and serial numbers past the decimal columns -------------------
+#
+# A four-column residue number and a five-column serial are written in
+# hybrid-36 once they run out: Grosse-Kunstleve's encoding, which cctbx, phenix
+# and gemmi write, defined at https://cci.lbl.gov/hybrid_36/ with the reference
+# hy36decode() in hybrid_36_c.c.  t/data/numbering.pdb crosses the first
+# boundary of both fields, and gemmi 0.7.5 reads it as below.  Before this was
+# decoded, A000 and A001 were not numbers, both came back as the empty key, and
+# the three waters were one residue whose oxygen had three 'alternate
+# conformers'.
+{
+	my $i = structure_info("$data/numbering.pdb", features => 0);
+	my $w = $i->{chains}{W};
+	is_deeply($w->{residue_order}, [qw(9999 10000 10001)],
+		'hybrid-36 residue numbers are the numbers gemmi reads: A000 is 10000');
+	is_deeply([ map { $w->{residues}{$_}{atoms}{O}{serial} } @{ $w->{residue_order} } ],
+		[ 99998, 99999, 100000 ], 'and a hybrid-36 serial too: A0000 is 100000');
+	ok(!grep({ $w->{residues}{$_}{atoms}{O}{altlocs} } @{ $w->{residue_order} }),
+		'three waters are three atoms, and not one atom with three conformers');
+
+	# a water numbered 0 beside one with no number: gemmi has two residues,
+	# numbered 0 and None
+	my $y = $i->{chains}{Y};
+	is_deeply($y->{residue_order}, [ '0', '' ],
+		'a residue with no number is not the residue numbered 0 before it');
+	ok(!defined $y->{residues}{''}{number}, 'and its number is undef');
+}
+# The lower-case half, against the reference rather than against gemmi, which
+# decodes base 36 without regard to case and so reads 'a000' as 10000, the same
+# number as 'A000'.  The values are the reference's: the first lower-case number
+# of width four is 10000 + 26 * 36**3, and 'zzzz' and 'zzzzz' are the largest
+# numbers the two widths hold, 2436111 and 87440031.  A field that mixes the two
+# cases is not hybrid-36 and is no number at all.
+{
+	my $rec = sub {
+		my ($ser, $num) = @_;
+		return sprintf("HETATM%5s  O   HOH W%4s       1.000   1.000   1.000  1.00 20.00           O\n",
+		               $ser, $num);
+	};
+	my $i = structure_info_string($rec->('a0000', 'a000') . $rec->('zzzzz', 'zzzz')
+	                              . $rec->('9', 'A00a'), features => 0);
+	my $w = $i->{chains}{W};
+	is_deeply($w->{residue_order}, [ '1223056', '2436111', '' ],
+		'lower-case hybrid-36 follows the upper-case range, to zzzz = 2436111');
+	is($w->{residues}{1223056}{atoms}{O}{serial}, 43770016, 'a0000 is 100000 + 26 * 36**4');
+	is($w->{residues}{2436111}{atoms}{O}{serial}, 87440031, 'and zzzzz is 87440031');
+	ok(!defined $w->{residues}{''}{number}, 'a field that mixes the cases is not a number');
+}
+
 done_testing();

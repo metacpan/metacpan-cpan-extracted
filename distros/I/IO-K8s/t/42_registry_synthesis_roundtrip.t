@@ -355,7 +355,7 @@ sub synth_value {
     return [ '8080', 'http' ]                         if $info->{is_array_of_int_or_string};
     return [ '100m', '1Gi' ]                          if $info->{is_array_of_quantity};
     return [ '2024-01-01T00:00:00Z' ]                 if $info->{is_array_of_time};
-    return { 'sample-key' => 'sample-value' } if $info->{is_hash_of_str};
+    return { 'sample-key' => 'sample-value' } if $info->{is_hash_of_str} || $info->{is_hash_opaque};
     # Typed value maps -- the { TypeName => 1 } DSL form (k63). Each value
     # must satisfy the scalar constraint the map carries.
     return { 'sample-key' => '100m' }                 if $info->{is_hash_of_quantity};
@@ -470,6 +470,13 @@ for my $class (@classes) {
                     ok((@encoded && !grep { !/^-?\d+\z/ } @encoded),
                         "$class ($mode) .$key elements serialize as unquoted numbers")
                         or diag("encoded: @encoded");
+                }
+                elsif ($info->{is_hash_of_str}) {
+                    # map[string]string: every value must hit the wire as a JSON string
+                    my %encoded = map { $_ => $json_iso->encode($out1->{$key}{$_}) } keys %{ $out1->{$key} };
+                    ok((%encoded && !grep { !/^"/ } values %encoded),
+                        "$class ($mode) .$key values serialize as JSON strings")
+                        or diag("encoded: " . join(', ', map { "$_=$encoded{$_}" } sort keys %encoded));
                 }
             }
 

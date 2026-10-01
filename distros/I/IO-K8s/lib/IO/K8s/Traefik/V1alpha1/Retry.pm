@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Retry;
 # ABSTRACT: Retry holds the retry middleware configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s attempts                   => Int, { minimum => 0 };
@@ -32,7 +32,7 @@ IO::K8s::Traefik::V1alpha1::Retry - Retry holds the retry middleware configurati
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 attempts
 

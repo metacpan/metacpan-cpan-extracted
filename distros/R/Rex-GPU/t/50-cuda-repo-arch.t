@@ -22,8 +22,9 @@ use Test::More;
 # -----------------------------------------------------------------------------
 
 use Rex::GPU::NVIDIA;
+use Rex::GPU::NVIDIA::Setup;
 
-sub arch { Rex::GPU::NVIDIA::_cuda_repo_arch(@_) }
+sub arch { Rex::GPU::NVIDIA::Setup->_cuda_repo_arch(@_) }
 
 subtest 'aarch64 => sbsa' => sub {
   is(arch('aarch64'), 'sbsa', 'uname -m aarch64 => sbsa (CUDA repo token)');

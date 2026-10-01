@@ -19,9 +19,9 @@ sub new { bless {}, shift }
 
 package main;
 
+my $dir = File::Temp->newdir;   # the parent's: the child's _exit skips cleanup
 my $pid = fork // die "fork: $!";
 if ($pid == 0) {
-    my $dir = File::Temp->newdir;
     my $q = Data::Queue::Shared::Str->new("$dir/q", 64, 65536);
     my $died = !eval { $q->push_multi("a", Bomb->new, "c"); 1 };
     die "push_multi(bomb) did not die\n" unless $died && $@ =~ /boom/;

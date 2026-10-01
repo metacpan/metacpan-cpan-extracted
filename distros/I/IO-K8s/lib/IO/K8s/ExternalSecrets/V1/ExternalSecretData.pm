@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ExternalSecretData;
 # ABSTRACT: ExternalSecretData defines the connection between the Kubernetes Secret key (spec.data.<key>) and the Provider data.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s remoteRef => '+IO::K8s::ExternalSecrets::V1::ExternalSecretDataRemoteRef', { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::ExternalSecretData - ExternalSecretData defines th
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 remoteRef
 

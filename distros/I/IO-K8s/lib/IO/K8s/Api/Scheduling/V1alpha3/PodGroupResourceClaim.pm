@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::PodGroupResourceClaim;
 # ABSTRACT: PodGroupResourceClaim references exactly one ResourceClaim, either directly or by naming a ResourceClaimTemplate which is then turned into a ResourceClaim for the PodGroup. It adds a name to it that uniquely identifies the ResourceClaim inside the PodGroup. Pods that need access to the ResourceClaim define a matching reference in its own Spec.ResourceClaims. The Pod's claim must match all fields of the PodGroup's claim exactly.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Scheduling::V1alpha3::PodGroupResourceClaim - PodGroupResourceClai
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

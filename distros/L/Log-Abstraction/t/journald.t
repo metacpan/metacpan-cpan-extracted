@@ -11,19 +11,25 @@ use Test::Most;
 use Socket qw(AF_UNIX SOCK_DGRAM sockaddr_un);
 use File::Temp qw(tempdir);
 
-use Log::Abstraction;
-
 # Unix-domain datagram sockets are not available on all platforms (notably
 # Windows without the AF_UNIX feature enabled).  Skip the whole file rather
-# than failing with a hard socket error inside a subtest.
+# than failing with a hard socket error inside a subtest.  This must come
+# before any test is run, or skip_all gives a "Bad plan" failure, and the
+# reason must not end "at FILE line N." or GitHub's Perl problem matcher
+# reports the skip as an error.
 {
 	my $ok = eval {
-		socket(my $probe, AF_UNIX, SOCK_DGRAM, 0) or die $!;
+		socket(my $probe, AF_UNIX, SOCK_DGRAM, 0) or die "$!\n";
 		close $probe;
 		1;
 	};
-	plan skip_all => "Unix domain sockets not available: $@" unless $ok;
+	if(!$ok) {
+		chomp(my $reason = $@);
+		plan skip_all => "Unix domain sockets not available: $reason";
+	}
 }
+
+use_ok('Log::Abstraction');
 
 my $tmpdir   = tempdir(CLEANUP => 1);
 my $SOCKPATH = "$tmpdir/journal.socket";
@@ -62,7 +68,9 @@ sub parse_journald {
 		} elsif($data =~ s/\A([A-Z0-9_]+)\n//) {
 			my $key = $1;
 			# Binary-framed: 8-byte uint64-LE length, then value bytes, then \n
-			my $len = unpack('Q<', substr($data, 0, 8, ''));
+			# (read as two 32-bit words so this works without 64-bit integers)
+			my ($low, $high) = unpack('VV', substr($data, 0, 8, ''));
+			my $len = $low + $high * 2**32;
 			my $val = substr($data, 0, $len, '');
 			$data    =~ s/\A\n//;
 			$fields{$key} = $val;

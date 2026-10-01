@@ -39,6 +39,8 @@ t/data/mini.cif
 t/data/mini.pdb
 t/data/nmr.cif
 t/data/nmr.pdb
+t/data/numbering.cif
+t/data/numbering.pdb
 t/data/oracle.pl
 t/data/oracle.py
 t/data/oracle.txt

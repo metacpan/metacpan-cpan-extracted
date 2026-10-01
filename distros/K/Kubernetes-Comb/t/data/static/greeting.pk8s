@@ -1,0 +1,6 @@
+use utf8;
+
+ConfigMap {
+  name => 'greeting-pk8s',
+  data => { text => 'Grüße aus Köln' }
+};

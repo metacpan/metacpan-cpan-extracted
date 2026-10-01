@@ -1,7 +1,7 @@
 package Data::SpatialHash::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::SpatialHash::Shared', $VERSION);
 
@@ -128,6 +128,12 @@ The descriptor you pass is duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours
 to close and closing it does not disturb the handle. C<new_readonly> opens a
 B<frozen> file read-only for lock-free querying (see L</"FROZEN (READ-ONLY)
 MODE">).
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of the initialization dying with
+SIGBUS; set C<DATA_SPATIALHASH_SHARED_SPARSE=1> to skip the reservation. On
+tmpfs and memfd the segment is memory, and a memory cgroup too small for it
+gets an OOM kill rather than a croak.
 
 =head2 Mutators
 
@@ -477,6 +483,15 @@ If the writer process dies while holding the lock, the next writer that
 cannot acquire the lock checks whether the owner PID is still alive and,
 if not, recovers the lock.  Reader slots are similarly reclaimed when
 a dead reader's slot is detected.
+
+The recovering process also repairs what the dead writer left half done: it
+rebuilds every bucket chain, the free list and C<count> from the live-entry
+bitmap and each live entry's stored position. An interrupted C<insert> or
+C<remove> then reads as either done or not done. An interrupted C<clear>,
+C<insert_many> or C<move_many> can be partly applied, and a C<move> killed
+while it was writing the new position can leave that entry at a per-axis mix
+of its old and new coordinates, indexed where it now is. The repair takes time
+proportional to C<max_entries>.
 
 B<Limitation>: PID reuse is not detected.  If a new process acquires
 the same PID as a dead lock holder before recovery runs, the stale lock

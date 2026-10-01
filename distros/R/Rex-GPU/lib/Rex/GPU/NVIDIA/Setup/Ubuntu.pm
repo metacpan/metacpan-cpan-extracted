@@ -1,18 +1,12 @@
 # ABSTRACT: NVIDIA driver setup for Ubuntu (experimental)
 
 package Rex::GPU::NVIDIA::Setup::Ubuntu;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 use Rex::Logger ();
 use namespace::autoclean;
 
 extends 'Rex::GPU::NVIDIA::Setup::Apt';
-
-
-sub kernel_packages {
-  my ( $self ) = @_;
-  return ( $self->SUPER::kernel_packages, 'linux-headers-generic' );
-}
 
 
 # 580 is published for jammy and noble (Launchpad, source
@@ -192,7 +186,7 @@ Rex::GPU::NVIDIA::Setup::Ubuntu - NVIDIA driver setup for Ubuntu (experimental)
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -203,9 +197,20 @@ Ubuntu's C<nvidia-fabricmanager-NNN>, and C<nvlsm> from NVIDIA's CUDA
 repository, pinned so that nothing else comes from it
 (L</prepare_nvlink_fabric_source>).
 
-=head2 kernel_packages
+The kernel headers are the apt layer's
+(L<Rex::GPU::NVIDIA::Setup::Apt/kernel_packages>): C<linux-headers-$kernel>
+of the B<running> kernel only, never the C<linux-headers-generic>
+metapackage. That package follows the GA C<-generic> kernel, so on an HWE
+kernel or a vendor kernel (such as C<6.17.0-1029-nvidia> on a DGX Spark) it
+brings headers for a different kernel than the one DKMS builds for. The
+consequence: a kernel installed later does not get its headers from
+Rex::GPU; unless the host's kernel metapackage pulls them, DKMS cannot
+build the NVIDIA module for it, and after the reboot into that kernel no
+NVIDIA module loads. Install that kernel's C<linux-headers-*> with it, or run
+L<Rex::GPU::NVIDIA/install_driver> again after the upgrade.
 
-The apt layer's running-kernel headers, plus C<linux-headers-generic>.
+To let C<ubuntu-drivers list --gpgpu> name the driver package instead of
+C<apt-cache search>, use L<Rex::GPU::NVIDIA::Setup::UbuntuDrivers>.
 
 =head2 sources
 
@@ -236,8 +241,8 @@ its exact branch, is looked up only after C<apt-get update>
 cannot use, dies before any driver package is installed. There is no
 hard-coded fallback package, and no other source is tried then.
 
-So a GPU without constraints (Turing to Hopper, no GPU) gets
-C<ubuntu-server>, Blackwell C<ubuntu-server-open>, Maxwell/Pascal/Volta
+So a GPU without constraints (Turing to Hopper except GH200, no GPU) gets
+C<ubuntu-server>, Blackwell and GH200 C<ubuntu-server-open>, Maxwell/Pascal/Volta
 C<ubuntu-server-580>.
 
 Each names C<nvidia-fabricmanager-NNN> as its Fabric Manager (for a host
@@ -325,7 +330,8 @@ another way overrides this method; the requirement check after it stays.
 
 =head1 SEE ALSO
 
-L<Rex::GPU::NVIDIA::Setup>, L<Rex::GPU::NVIDIA/install_driver>
+L<Rex::GPU::NVIDIA::Setup>, L<Rex::GPU::NVIDIA::Setup::UbuntuDrivers>,
+L<Rex::GPU::NVIDIA/install_driver>
 
 =head1 SUPPORT
 

@@ -43,8 +43,10 @@ my %REQUIRED = (
 
     # The set-time half: turns --depends-on & friends into validated ids.
     # usage_error to refuse the invocation, find_task to check each id exists --
-    # deliberately the same lookup the reporting half resolves ids with.
-    'App::karr::Role::DependencyArgs' => [qw( find_task usage_error )],
+    # deliberately the same lookup the reporting half resolves ids with --
+    # and normalize_task_id to accept the house kNNN spelling before the
+    # numeric check (ticket k301).
+    'App::karr::Role::DependencyArgs' => [qw( find_task normalize_task_id usage_error )],
 );
 
 # A fresh package each time: Moo caches what it has applied to a class, and a

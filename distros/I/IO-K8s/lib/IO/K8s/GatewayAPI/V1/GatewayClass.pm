@@ -1,9 +1,10 @@
 package IO::K8s::GatewayAPI::V1::GatewayClass;
 # ABSTRACT: GatewayClass describes a class of Gateways available to the user for creating Gateway resources.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
-    resource_plural => 'gatewayclasses';
+    resource_plural => 'gatewayclasses',
+    subresources    => { status => {} };
 
 k8s spec   => '+IO::K8s::GatewayAPI::V1::GatewayClassSpec', { required => 'schema' };
 k8s status => '+IO::K8s::GatewayAPI::V1::GatewayClassStatus', { default => {'conditions' => [{'lastTransitionTime' => '1970-01-01T00:00:00Z','message' => 'Waiting for controller','reason' => 'Pending','status' => 'Unknown','type' => 'Accepted'}]} };
@@ -24,7 +25,7 @@ IO::K8s::GatewayAPI::V1::GatewayClass - GatewayClass describes a class of Gatewa
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

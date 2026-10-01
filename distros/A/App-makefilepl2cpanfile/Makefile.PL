@@ -34,10 +34,14 @@ WriteMakefile(
 		'Test::Most' => 0,
 		'File::Temp' => 0,
 		'Test::Mockingbird' => '0.13',	# around, mock_scoped, spy, unmock, restore
+		'Test::Permissions' => 0,	# can_revoke_*, why_not
 		'Test::Returns' => 0.04,
 		'Test::Without::Module' => 0,
 	}, PREREQ_PM => {
 		'autodie' => 0,
+		'Carp' => 0,
+		'Fcntl' => 0,	# S_ISREG
+		'Getopt::Long' => 0,	# bin/makefilepl2cpanfile
 		'File::HomeDir' => 0,
 		'Path::Tiny' => '0.034',	# errors as Path::Tiny::Error objects
 		'Params::Get' => 0.17,
@@ -75,5 +79,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.014'	# s///r and the /a regex modifier
+	MIN_PERL_VERSION	=> '5.026'	# test dependencies (Params::Validate::Strict, via Test::Permissions); the code itself needs 5.14 (s///r, /a)
 );

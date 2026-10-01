@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumEndpointSlice;
 # ABSTRACT: CiliumEndpointSlice contains a group of CoreCiliumendpoints.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliumendpointslices';
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2alpha1::CiliumEndpointSlice - CiliumEndpointSlice contains a 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 endpoints
 

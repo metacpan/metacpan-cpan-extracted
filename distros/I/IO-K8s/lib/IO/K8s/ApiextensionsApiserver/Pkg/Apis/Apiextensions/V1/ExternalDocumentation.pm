@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::ExternalDocumentation;
 # ABSTRACT: ExternalDocumentation allows referencing an external resource for extended documentation.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s description => Str;
@@ -21,7 +21,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::ExternalDocumenta
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SUPPORT
 

@@ -1,14 +1,14 @@
 package IO::K8s::AgentSandbox::V1beta1::SandboxSpec;
 # ABSTRACT: SandboxSpec
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s operatingMode        => Str, { enum => [qw(Running Suspended)], default => 'Running' };
-k8s podTemplate          => '+IO::K8s::AgentSandbox::V1beta1::PodTemplate', { required => 'schema' };
+k8s podTemplate          => 'Core::V1::PodTemplateSpec', { required => 'schema' };
 k8s service              => Bool;
 k8s shutdownPolicy       => Str, { enum => [qw(Delete Retain)], default => 'Retain' };
 k8s shutdownTime         => Time;
-k8s volumeClaimTemplates => ['+IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate'];
+k8s volumeClaimTemplates => ['Core::V1::PersistentVolumeClaimTemplate'];
 
 
 
@@ -30,7 +30,7 @@ IO::K8s::AgentSandbox::V1beta1::SandboxSpec - SandboxSpec
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 operatingMode
 

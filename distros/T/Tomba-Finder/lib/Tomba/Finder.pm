@@ -197,6 +197,8 @@ sub LinkedinFinder {
 # Delegated methods from service modules
 #-------------------------------------------------------------------------------
 
+## no critic (Subroutines::RequireArgUnpacking)
+
 # Account (from Tomba::Account)
 sub Account           { return Tomba::Account::Account(@_) }
 
@@ -287,6 +289,8 @@ sub ArchiveBulk       { return Tomba::Bulk::ArchiveBulk(@_) }
 sub RenameBulk        { return Tomba::Bulk::RenameBulk(@_) }
 sub BulkProgress      { return Tomba::Bulk::BulkProgress(@_) }
 sub BulkDownload      { return Tomba::Bulk::BulkDownload(@_) }
+
+## use critic
 
 1;
 __END__

@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Net::IP" => 0,
     "Package::Stash" => 0,
     "Scalar::Util" => 0,
+    "Sub::Util" => "1.40",
     "Type::Tiny" => "2.000000",
     "Types::Standard" => 0,
     "YAML::PP" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.108",
+  "VERSION" => "1.109",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "Package::Stash" => 0,
   "Path::Tiny" => 0,
   "Scalar::Util" => 0,
+  "Sub::Util" => "1.40",
   "Test::Deep" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

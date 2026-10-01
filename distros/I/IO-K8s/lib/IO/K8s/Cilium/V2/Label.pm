@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::Label;
 # ABSTRACT: Label is Cilium's representation of a label.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s key    => Str, { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::Label - Label is Cilium's representation of a label.
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 key
 

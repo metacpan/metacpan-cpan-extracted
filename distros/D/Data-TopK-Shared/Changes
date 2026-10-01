@@ -1,5 +1,12 @@
 Revision history for Data-TopK-Shared
 
+0.06      2026-09-26
+          - A writer killed mid add, clear or decayed rescale is repaired by
+            the next lock holder; every key is found again.
+          - Segments are reserved, so a full filesystem fails the constructor;
+            DATA_TOPK_SHARED_SPARSE=1 skips the reservation.
+          - A failed create no longer leaves a full-size file behind.
+
 0.05      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
           - Fix a writer stall on ARM64 after readers release.

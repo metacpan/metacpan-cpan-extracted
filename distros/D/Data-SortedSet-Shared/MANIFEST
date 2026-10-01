@@ -30,9 +30,11 @@ xt/crash_recovery.t
 xt/dead_reader_recovery.t
 xt/destroy_during_call.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fd_leak.t
 xt/fork_live.t
 xt/invalid_args.t
+xt/kill_repair.t
 xt/kwalitee.t
 xt/memfd_xproc.t
 xt/mpmc_fuzz.t
@@ -41,6 +43,7 @@ xt/pool_exhaustion.t
 xt/reader_starvation_guard.t
 xt/slotless_reader_recovery.t
 xt/strings_fork.t
+xt/tree_crash_gdb.t
 xt/tsan.t
 xt/valgrind.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

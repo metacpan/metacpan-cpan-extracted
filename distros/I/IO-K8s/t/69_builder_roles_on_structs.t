@@ -28,8 +28,10 @@ sub meta { IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta->new(name => $
 {
     package TestBR::Solver;
     use IO::K8s::Resource;
-    k8s http01 => { Str => 1 };
-    k8s dns01  => { Str => 1 };
+    # k191: solver configs are opaque maps, spelled Opaque since { Str => 1 }
+    # became the string map.
+    k8s http01 => Opaque;
+    k8s dns01  => Opaque;
 }
 
 {
@@ -38,7 +40,7 @@ sub meta { IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta->new(name => $
     with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::CertManaged';
     k8s spec => {
         acme       => { email => Str, server => Str, privateKeySecretRef => { name => Str }, solvers => ['+TestBR::Solver'] },
-        selfSigned => { Str => 1 },
+        selfSigned => Opaque,   # k191: was { Str => 1 }, the then-opaque map
         ca         => { secretName => Str },
     };
 }

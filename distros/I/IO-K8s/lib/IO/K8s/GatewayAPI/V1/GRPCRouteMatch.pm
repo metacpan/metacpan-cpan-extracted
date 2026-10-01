@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::GRPCRouteMatch;
 # ABSTRACT: GRPCRouteMatch defines the predicate used to match requests to a given action.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s headers => ['+IO::K8s::GatewayAPI::V1::GRPCHeaderMatch'];
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::GRPCRouteMatch - GRPCRouteMatch defines the predicate u
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 headers
 

@@ -17,7 +17,7 @@ makefilepl2cpanfile - Convert a Makefile.PL to a cpanfile
 =head1 VERSION
 
 This document describes makefilepl2cpanfile as shipped with
-App::makefilepl2cpanfile version 0.05.
+App::makefilepl2cpanfile version 0.06.
 
 =head1 SYNOPSIS
 

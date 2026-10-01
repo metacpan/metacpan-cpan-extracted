@@ -1,6 +1,31 @@
 Revision history for Chem-Structure-Parser
 
 
+0.036 2026-09-30 CDT
+
+ - A residue or serial number too big for its PDB columns is read as the
+   hybrid-36 number cctbx, phenix and gemmi write it as: residue A000 is
+   10000 and serial A0000 is 100000, as gemmi reads them.  They used to be
+   no number at all, so every such residue in a chain was filed under the
+   same empty key -- three waters numbered A000, A001 and A002 came back as
+   one residue whose oxygen had three alternate conformers -- and a chain
+   past 9,999 residues read differently from its mmCIF.
+ - A residue with no number is no longer folded into a residue numbered 0
+   just before it, in either format.  Both were read as residue 0, so the
+   second's atoms became conformers of the first's.
+ - A bad option to the feature calculations is refused before anything is
+   computed, rather than after the surface had already been written into
+   the structure.
+ - Reading is somewhat cheaper.  The atom hashes are built with their keys
+   hashed once per file and at the size they end at, and an mmCIF header's
+   tables with their column names made once per table rather than once per
+   cell: under callgrind, 5% fewer instructions to read 4fqr and 9% fewer
+   to read the mmCIF of 2iw3.  The feature walk reads each residue's
+   backbone and rings once where it read them three and four times, and
+   the interface reuses the surface's neighbour grid, for 4% fewer over
+   structure_features() on 1a4k.  A file is read into a buffer of its own
+   size rather than one doubled up to it.
+
 0.035 2026-09-27 CDT
 
  - The interface has a pocket: the first partner's atoms within 6 A of the

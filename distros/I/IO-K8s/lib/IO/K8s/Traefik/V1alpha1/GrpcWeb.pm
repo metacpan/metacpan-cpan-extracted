@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::GrpcWeb;
 # ABSTRACT: GrpcWeb holds the gRPC web middleware configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s allowOrigins => [Str];
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::GrpcWeb - GrpcWeb holds the gRPC web middleware conf
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allowOrigins
 

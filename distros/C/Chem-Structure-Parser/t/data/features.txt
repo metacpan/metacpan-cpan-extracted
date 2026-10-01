@@ -9015,6 +9015,12 @@ X 1 _
 X 2 _
 #rings 0
 
+== numbering.cif refused
+# mdtraj: invalid literal for int() with base 10: '?'
+
+== numbering.pdb refused
+# mdtraj: invalid literal for int() with base 10: 'A000'
+
 == pdb1gdr.ent refused
 # mdtraj: 'NoneType' object has no attribute 'norm'
 

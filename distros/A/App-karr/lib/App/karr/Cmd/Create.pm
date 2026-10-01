@@ -1,7 +1,7 @@
 # ABSTRACT: Create a new task
 
 package App::karr::Cmd::Create;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -14,7 +14,7 @@ use App::karr::Role::ClaimDefault;
 use App::karr::Task;
 use App::karr::Config;
 use App::karr::CrossBoard;
-use App::karr::Error qw( user_error require_claim_message );
+use App::karr::Error qw( user_error require_claim_message held_back_claim_message );
 use Time::Piece;
 
 # The set-time half only (ticket #137). A card that does not exist yet cannot be
@@ -162,18 +162,28 @@ sub execute {
   # a column that demands a claim is one the card is being started in, and
   # that is the only create where the remembered claim means what a Claim is.
   # Held in a local so the guard here and the stamp below cannot disagree --
-  # the env claim satisfies the guard exactly when it is then written.
+  # the env claim satisfies the guard exactly when it is then written. The
+  # rule itself is App::karr::Role::ClaimDefault/resolved_claim_for, shared
+  # with move and edit since tickets #303/#304.
   my $starts_work = defined $self->status
       && $self->store->status_requires_claim($self->status);
-  if ( $starts_work
-      && !( defined $self->resolved_claim && length $self->resolved_claim ) )
-  {
+  my $claim = $self->resolved_claim_for( $self->status );
+  if ( $starts_work && !( defined $claim && length $claim ) ) {
     # A local, not "$self->status" inside the string: that would interpolate
     # the object and leave the literal text "->status" behind it.
     my $status = $self->status;
     user_error( require_claim_message(
         $status, 'create', $title, '--status', $status, '--claim', 'NAME' ) );
   }
+
+  # The mirror image (ticket k306): a card filed into backlog -- the default
+  # status included -- is held back and holds no claim, so an explicit --claim
+  # there is refused before an id is allocated. KARR_CLAIM never gets this far:
+  # resolved_claim_for leaves it off a column that needs no claim.
+  my $status = $self->status // $defaults->{status} // 'backlog';
+  user_error( held_back_claim_message( $status,
+      'create', $title, '--status', $config->promotion_status // 'STATUS', '--claim', $claim ) )
+    if defined $claim && length $claim && $config->is_held_back_status($status);
 
   # Set-time dependency validation (ticket #124), under the same #54 rule.
   # A self-reference is not expressible here: the new id does not exist until
@@ -202,7 +212,7 @@ sub execute {
   my %task_args = (
     id       => $self->allocate_next_id,
     title    => $title,
-    status   => $self->status   // $defaults->{status}   // 'backlog',
+    status   => $status,
     priority => $self->priority // $defaults->{priority}  // 'medium',
     class    => $self->class    // $defaults->{class}     // 'standard',
   );
@@ -234,8 +244,8 @@ sub execute {
   # claim, which the skill has every agent export first thing, stays off it.
   # Before #286 resolved_claim was taken unconditionally, and a bug filed by
   # one agent was invisible to every other agent's `pick` and `list
-  # --unclaimed` until claim_timeout ran out.
-  my $claim = $starts_work ? $self->resolved_claim : $self->claim;
+  # --unclaimed` until claim_timeout ran out. $claim is resolved above the
+  # guard, so the two read the same value.
   if ( defined $claim && length $claim ) {
     $task_args{claimed_by} = $claim;
     $task_args{claimed_at} = gmtime->datetime . 'Z';
@@ -270,7 +280,7 @@ App::karr::Cmd::Create - Create a new task
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -308,10 +318,11 @@ Populate optional frontmatter fields at creation time.
 =item * C<--depends-on>
 
 Comma-separated ids of tasks this one depends on, same shape as C<--tags>.
-Every id must name a task on this board; an unknown or non-numeric id rejects
-the create as a usage error before an id is allocated, so nothing is burned
-(ticket #54). Taking the new card up while a dependency is unfinished warns --
-see L<App::karr::Cmd::Move>.
+Every id must name a task on this board, as a number or in the house C<kNNN>
+spelling (C<k2> is C<2>); an id that names no task here, or is neither a
+number nor C<kNNN>, rejects the create as a usage error before an id is
+allocated, so nothing is burned (ticket #54). Taking the new card up while a
+dependency is unfinished warns -- see L<App::karr::Cmd::Move>.
 
 =item * C<--needs>, C<--escalated-from>
 
@@ -343,7 +354,9 @@ and a card filed into the backlog for whoever picks it next is not being
 worked. Before ticket #286 the filer's remembered claim landed on every card,
 which hid a freshly filed bug from every other agent's C<karr pick> and
 C<< karr list --unclaimed >> until C<claim_timeout> ran out. An explicit
-C<--claim> stamps the claim on any status.
+C<--claim> stamps the claim on any status but C<backlog> -- the default one --
+which holds no claim: there it is refused (exit 1) before an id is allocated,
+and the last line of the error is the same create with C<--status todo>.
 
 =item * C<--json>
 

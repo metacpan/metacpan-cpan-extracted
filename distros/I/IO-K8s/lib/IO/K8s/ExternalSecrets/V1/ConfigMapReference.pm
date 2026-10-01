@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ConfigMapReference;
 # ABSTRACT: credConfig holds the configmap reference containing the GCP external account credential configuration in JSON format and the key name containing the json data.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s key       => Str, { required => 'schema', pattern => qr/^[-._a-zA-Z0-9]+$/ };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::ConfigMapReference - credConfig holds the configma
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 key
 

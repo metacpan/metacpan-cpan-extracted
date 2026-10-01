@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::FakeProvider;
 # ABSTRACT: Fake configures a store with static key/value pairs
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s data             => ['+IO::K8s::ExternalSecrets::V1::FakeProviderData'], { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::FakeProvider - Fake configures a store with static
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 data
 

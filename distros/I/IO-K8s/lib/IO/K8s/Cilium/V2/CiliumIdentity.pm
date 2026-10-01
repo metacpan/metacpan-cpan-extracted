@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2::CiliumIdentity;
 # ABSTRACT: CiliumIdentity is a CRD that represents an identity managed by Cilium.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
-    resource_plural => 'ciliumidentities';
+    resource_plural => 'ciliumidentities',
+    subresources    => { status => {} };
 
 k8s 'security-labels' => { Str => 1 }, { required => 'schema' };
 
@@ -22,7 +23,7 @@ IO::K8s::Cilium::V2::CiliumIdentity - CiliumIdentity is a CRD that represents an
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 security-labels
 

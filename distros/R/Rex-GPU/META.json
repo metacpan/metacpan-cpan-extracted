@@ -50,51 +50,59 @@
    "provides" : {
       "Rex::GPU" : {
          "file" : "lib/Rex/GPU.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Rex::GPU::Detect" : {
          "file" : "lib/Rex/GPU/Detect.pm",
-         "version" : "0.002"
+         "version" : "0.003"
+      },
+      "Rex::GPU::Detect::Sysfs" : {
+         "file" : "lib/Rex/GPU/Detect/Sysfs.pm",
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA" : {
          "file" : "lib/Rex/GPU/NVIDIA.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA::Requirement" : {
          "file" : "lib/Rex/GPU/NVIDIA/Requirement.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA::Setup" : {
          "file" : "lib/Rex/GPU/NVIDIA/Setup.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA::Setup::Apt" : {
          "file" : "lib/Rex/GPU/NVIDIA/Setup/Apt.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA::Setup::Debian" : {
          "file" : "lib/Rex/GPU/NVIDIA/Setup/Debian.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA::Setup::RHEL" : {
          "file" : "lib/Rex/GPU/NVIDIA/Setup/RHEL.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA::Setup::Rpm" : {
          "file" : "lib/Rex/GPU/NVIDIA/Setup/Rpm.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA::Setup::SUSE" : {
          "file" : "lib/Rex/GPU/NVIDIA/Setup/SUSE.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA::Setup::Ubuntu" : {
          "file" : "lib/Rex/GPU/NVIDIA/Setup/Ubuntu.pm",
-         "version" : "0.002"
+         "version" : "0.003"
+      },
+      "Rex::GPU::NVIDIA::Setup::UbuntuDrivers" : {
+         "file" : "lib/Rex/GPU/NVIDIA/Setup/UbuntuDrivers.pm",
+         "version" : "0.003"
       },
       "Rex::GPU::NVIDIA::VGPU" : {
          "file" : "lib/Rex/GPU/NVIDIA/VGPU.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -109,7 +117,7 @@
          "web" : "https://github.com/Getty/rex-gpu"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -135,6 +143,11 @@
             },
             "name" : "@Author::GETTY/Git::GatherDir",
             "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherAgentContext",
+            "name" : "@Author::GETTY/GatherAgentContext",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -466,7 +479,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.002",
+                  "tag" : "0.003",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

@@ -30,12 +30,36 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "Perl::Critic" : "0",
+            "Pod::Coverage" : "0.18",
+            "Test::Carp" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Compile" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling::Comment" : "0.002",
+            "Test::Synopsis" : "0"
+         }
+      },
       "runtime" : {
+         "recommends" : {
+            "Email::Sender::Simple" : "0",
+            "Email::Sender::Transport::SMTP" : "0",
+            "Email::Simple" : "0",
+            "Log::Any" : "0"
+         },
          "requires" : {
             "Carp" : "0",
             "Config::Abstraction" : "0.4",
-            "Data::Dumper" : "0",
             "ExtUtils::MakeMaker" : "6.64",
+            "File::Basename" : "0",
+            "IPC::System::Simple" : "0",
             "JSON::PP" : "0",
             "Log::Log4perl" : "0",
             "POSIX" : "0",
@@ -44,20 +68,18 @@
             "Readonly::Values::Syslog" : "0.04",
             "Return::Set" : "0.04",
             "Scalar::Util" : "0",
+            "Socket" : "0",
             "Sub::Private" : "0.05",
             "Sys::Syslog" : "0.28",
-            "perl" : "5.008"
+            "autodie" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "File::Glob" : "0",
-            "File::Slurp" : "0",
+            "Data::Dumper" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "File::stat" : "0",
-            "IPC::System::Simple" : "0",
-            "JSON::MaybeXS" : "0",
             "POSIX" : "0",
             "Test::DescribeMe" : "0",
             "Test::Mockingbird" : "0.1",
@@ -70,9 +92,6 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "X_recommends" : {
-         "Log::Any" : 0
-      },
       "bugtracker" : {
          "mailto" : "bug-Log-Abstraction@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction",
@@ -86,6 +105,6 @@
          "x_repository" : "https://github.com/nigelhorne/Log-Abstraction"
       }
    },
-   "version" : 0.34,
+   "version" : 0.35,
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

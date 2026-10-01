@@ -9,7 +9,8 @@ state lives in `refs/karr/*`; the `tasks/` directory is a materialized view.
 An active, expiring lease an agent holds on a **Task** while working it —
 recorded as `claimed_by` (+ `claimed_at`). It is *not* authorship: it expires
 (see Pick claim-timeout) and is released when the Task reaches a terminal
-status — on a `done`/`archived` Task the claim guards nothing, and `edit`,
+status — on a Task in the board's final status (`done` on a default board) or
+`archived` the claim guards nothing, and `edit`,
 `move`, `delete`, `archive` and `handoff` all go through whoever the field
 names. `karr board` shows no claimant on such a Task and leaves it out of its
 claimed count, because the board shows live work-in-progress, not history;
@@ -18,8 +19,25 @@ ends where the work resumes: a Task leaving a terminal status for a working one
 has `claimed_by`/`claimed_at` cleared, unless the reopening command names a
 claimant itself (`move ID todo --claim NAME`, `handoff`), in which case that
 agent holds it. `done` → `archived` keeps the name — archiving does not resume
-anything.
+anything. A Task in **Backlog** holds no Claim: moving one there releases it.
 _Avoid_: owner, lock (the advisory ref lock is a separate mechanism).
+
+**Backlog**:
+The held-back column. A **Task** filed into `backlog` — `create`'s default
+status — is sorted there and taken by nobody: `karr pick` and **Foundation**
+never hand it out (`pick --status backlog` is refused), a board with nothing but
+backlog left counts as drained, and it cannot hold a **Claim** — `--claim` onto
+it is refused, and a move into it releases the one the Task carried. Three
+stages, three meanings: *backlog* is filed and held back, *todo* is released for
+work — the pool `pick` and foundation take from — and a **Claim** says the Task
+is being worked now. Moving a Task out of backlog is its *promotion*, and it is the
+maintainer's call by default, not a coordinating agent's: an agent that
+promotes on its own lifts the very hold backlog exists for. The status is
+recognised by its name, not by a config flag — kanban-md drops a status key it
+does not know, so a flag would not survive a round trip through it — and a
+board without a `backlog` column holds nothing back.
+_Avoid_: "releasing" a Task for promoting it (release is what happens to a
+**Claim**); "parked" for a backlog Task (a parked board is a **Disabled board**).
 
 **Assignee**:
 The intended doer of a **Task** (`assignee`), set by a human/planner. Distinct
@@ -35,7 +53,9 @@ the foundation agent's per-run stdout capture).
 
 **Task lifecycle**:
 A **Task** carries timestamps for each milestone it passes: `claimed_at`,
-`started`, `completed`. `done` and `archived` are the terminal statuses.
+`started`, `completed`. The board's final status — its last configured status
+other than `archived`, `done` on a default board — and `archived` are the
+terminal statuses (ADR 0004).
 Terminal means *closed*, not *succeeded* — karr has a notion of progress and
 none of outcome. A card given up in the backlog and archived is
 frontmatter-identical to one archived after `done`: `update_timestamps` stamps
@@ -56,6 +76,14 @@ same reading deserves more caution across boards than within one. Giving a card
 up is therefore something to say on the far board yourself.
 _Avoid_: "settled"/"resolved" read as "succeeded" — both say only that the far
 card is closed.
+
+**Task id**:
+A **Task**'s number, allocated from the board's counter
+(`refs/karr/meta/next-id`). In prose — commit subjects, card bodies, notes — it
+is written `k12`, because a forge resolves `#12` against its own issue tracker.
+Commands accept `k12` (or `K12`) for `12`, the id side of a cross-board
+`BOARD#k12` included; the stored `id` and the ref name stay the bare number.
+_Avoid_: `#12` for a karr card.
 
 **Identity**:
 Who is acting, as `<role>/<git-email>`. The git email comes from git config;
@@ -103,15 +131,19 @@ _Avoid_: renaming the sentinels to "karr" (breaks cross-tool round-trips).
 
 **Claim name**:
 The name a card is held under, passed per `pick`/`move`/`handoff`/`edit`/`create`
-via `--claim` (defaulting to **KARR_CLAIM** when the flag is omitted), stored in
+via `--claim` (defaulting to **KARR_CLAIM** when the flag is omitted — for
+`create`/`move`/`edit` only when the card ends up in a `require_claim` column), stored in
 `claimed_by` and in the **Activity log** entry's `agent` field. `karr agent-name`
 derives it from the checkout's own directory name. Distinct from **Identity**: a
 single Identity may run under many Claim names over time.
 
 **KARR_CLAIM**:
 The **Claim name** carried per process — the default `--claim` reads when the flag
-is omitted (ADR 0005). Set once per session (`export KARR_CLAIM=$(karr
-agent-name)`); an explicit `--claim` overrides it. Per process and never stored,
+is omitted (ADR 0005). `create`, `move` and `edit` read it only when the card
+ends up in a `require_claim` column, so filing a card, promoting it to `todo` or
+adding a note leaves it unclaimed; `edit --release` never claims. Set once per
+session (`export KARR_CLAIM=$(karr agent-name)`); an explicit `--claim`
+overrides it. Per process and never stored,
 so concurrent agents never share one — the counterpart for the claim name of what
 `KARR_ROLE` is for the **Role**. Not the log **Identity**: `show --me` stays the
 Identity, not `KARR_CLAIM`.

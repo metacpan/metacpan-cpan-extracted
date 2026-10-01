@@ -11,6 +11,7 @@ use POSIX qw(INT_MIN INT_MAX);
 use if $] >= 5.014, "warnings::register" => qw(tagcodes channelmask);
 
 our $ERRSTR;
+our $_out_of_memory;
 
 our @EXPORT_OK = qw(
 		init
@@ -78,8 +79,6 @@ our @EXPORT_OK = qw(
 		i_postlevels
 		i_mosaic
 		i_watermark
-
-		malloc_state
 
 		list_formats
 
@@ -150,7 +149,7 @@ BEGIN {
   if ($ex_version < 5.57) {
     our @ISA = qw(Exporter);
   }
-  $VERSION = '1.036';
+  $VERSION = '1.037';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -536,7 +535,6 @@ END {
   if ($DEBUG) {
     print "shutdown code\n";
     #	for(keys %instances) { $instances{$_}->DESTROY(); }
-    malloc_state(); # how do decide if this should be used? -- store something from the import
     print "Imager exiting\n";
   }
 }
@@ -907,7 +905,8 @@ sub crop {
     $self->_set_error("attempting to crop outside of the image");
     return;
   }
-  my $dst = $self->_sametype(xsize=>$r-$l, ysize=>$b-$t);
+  my $dst = $self->_sametype(xsize=>$r-$l, ysize=>$b-$t)
+    or return;
 
   i_copyto($dst->{IMG},$self->{IMG},$l,$t,$r,$b,0,0);
   return $dst;
@@ -3726,14 +3725,14 @@ sub getsamples {
     my $offset = $opts{offset};
     if ($opts{type} eq '8bit') {
       my @samples = i_gsamp($self->{IMG}, $opts{x}, $opts{x}+$opts{width},
-			    $opts{y}, $opts{channels})
+			    $opts{y}, $opts{channels}, $self->{ERRSTR})
 	or return;
       @{$target}[$offset .. $offset + @samples - 1] = @samples;
       return scalar(@samples);
     }
     elsif ($opts{type} eq 'float') {
       my @samples = i_gsampf($self->{IMG}, $opts{x}, $opts{x}+$opts{width},
-			     $opts{y}, $opts{channels});
+			     $opts{y}, $opts{channels}, $self->{ERRSTR});
       @{$target}[$offset .. $offset + @samples - 1] = @samples;
       return scalar(@samples);
     }
@@ -3743,7 +3742,7 @@ sub getsamples {
       my @data;
       my $count = i_gsamp_bits($self->{IMG}, $opts{x}, $opts{x}+$opts{width}, 
 			       $opts{y}, $bits, $target, 
-			       $offset, $opts{channels});
+			       $offset, $opts{channels}, $self->{ERRSTR});
       unless (defined $count) {
 	$self->_set_error(Imager->_error_as_msg);
 	return;
@@ -3759,18 +3758,19 @@ sub getsamples {
   else {
     if ($opts{type} eq '8bit') {
       return i_gsamp($self->{IMG}, $opts{x}, $opts{x}+$opts{width},
-		     $opts{y}, $opts{channels});
+		     $opts{y}, $opts{channels}, $self->{ERRSTR});
     }
     elsif ($opts{type} eq 'float') {
       return i_gsampf($self->{IMG}, $opts{x}, $opts{x}+$opts{width},
-		      $opts{y}, $opts{channels});
+		      $opts{y}, $opts{channels}, $self->{ERRSTR});
     }
     elsif ($opts{type} =~ /^(\d+)bit$/) {
       my $bits = $1;
 
       my @data;
       i_gsamp_bits($self->{IMG}, $opts{x}, $opts{x}+$opts{width}, 
-		   $opts{y}, $bits, \@data, 0, $opts{channels})
+		   $opts{y}, $bits, \@data, 0, $opts{channels},
+                   $self->{ERRSTR})
 	or return;
       return @data;
     }
@@ -4377,6 +4377,17 @@ sub check_file_limits {
   return $result;
 }
 
+sub set_out_of_memory_handler {
+  my $class = shift;
+
+  if (@_) {
+    my $handler = shift;
+    $_out_of_memory = $handler;
+    i_set_out_of_memory(defined $handler);
+  }
+  $_out_of_memory;
+}
+
 # Shortcuts that can be exported
 
 sub newcolor { Imager::Color->new(@_); }
@@ -4930,6 +4941,38 @@ If it was a class method then call errstr() as a class method:
 Note that in some cases object methods are implemented in terms of
 class methods so a failing object method may set both.
 
+=item set_out_of_memory_handler()
+
+=item set_out_of_memory_handler($coderef)
+
+By default if Imager runs out of memory allocating what should be
+trivial amounts of memory it will print "Out of memory" and abort
+execution.
+
+You can provide a code reference to call instead, which is called with
+the name of the allocation function that failed (often "mymalloc") and
+the size of the memory block that failed allocation:
+
+  Imager->set_out_of_memory_handler(sub { die "out of memory @_" });
+
+You can reset to the default handler by calling this with C<undef>:
+
+  Imager->set_out_of_memory_handler(undef);
+
+Your handler should throw an exception, exit, or exec.  If your
+handler returns Imager will throw an exception.
+
+When your handler is called Imager may have succeeded other
+allocations that won't have been released, this is not considered a
+bug.
+
+if your handler is called you should clean up and restart your process
+if it is long lived.
+
+You can fetch the current handler by calling with no parameter:
+
+  my $current = set_out_of_memory_handler();
+
 =back
 
 The C<Imager-E<gt>new> method is described in detail in
@@ -5153,6 +5196,8 @@ in a paletted image
 set_file_limits() - L<Imager::Files/set_file_limits()>
 
 setmask() - L<Imager::ImageTypes/setmask()>
+
+set_out_of_memory_handler() - L</set_out_of_memory_handler()>
 
 setpixel() - L<Imager::Draw/setpixel()>
 

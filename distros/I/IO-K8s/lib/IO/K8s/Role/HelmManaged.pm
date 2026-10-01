@@ -1,6 +1,6 @@
 package IO::K8s::Role::HelmManaged;
 # ABSTRACT: Role for K3s Helm chart management
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use Moo::Role;
 
 # The fluent setters below build the spec through IO::K8s::Role::SpecBuilder
@@ -57,7 +57,7 @@ IO::K8s::Role::HelmManaged - Role for K3s Helm chart management
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -85,8 +85,8 @@ C<spec_*> methods, so the methods work whether the underlying C<spec>
 attribute is a plain hash or a typed object.
 
 Use this role on a custom CRD class with
-C<api_version =E<gt> 'helm.cattle.io/v1'> or
-C<api_version =E<gt> 'k3s.cattle.io/v1'>, or compose it on the bundled
+C<< api_version => 'helm.cattle.io/v1' >> or
+C<< api_version => 'k3s.cattle.io/v1' >>, or compose it on the bundled
 L<IO::K8s::K3s::V1::HelmChart> / L<IO::K8s::K3s::V1::HelmChartConfig>
 classes to add the helpers at runtime.
 

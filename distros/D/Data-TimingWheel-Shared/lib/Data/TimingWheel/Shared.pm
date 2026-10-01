@@ -1,7 +1,7 @@
 package Data::TimingWheel::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::TimingWheel::Shared', $VERSION);
 
@@ -81,6 +81,12 @@ out-of-range value croaks. An optional file B<mode> may be passed as the last
 argument to C<new> (e.g. C<0660>) for cross-user sharing; it defaults to
 C<0600> (owner-only).
 
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of the initialization dying with
+SIGBUS; set C<DATA_TIMINGWHEEL_SHARED_SPARSE=1> to skip the reservation. On
+tmpfs and memfd the segment is memory, and a memory cgroup too small for it
+gets an OOM kill rather than a croak.
+
 =head2 Scheduling
 
     my $id = $tw->add($delay, $payload);   # returns a timer id
@@ -145,10 +151,17 @@ the mapping.
 =head1 CRASH SAFETY
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
-ownership and dead-owner recovery. Scheduling, cancelling, and each tick of an
-advance are short bounded list operations, so a crash leaves the wheel consistent
-up to the last completed operation. B<Limitation>: PID reuse is not detected
-(very unlikely in practice).
+ownership and dead-owner recovery. The process that recovers the lock rebuilds
+every bucket from the pending timers, and the free list and C<count> from the
+rest, so an interrupted C<add> or C<cancel> has either taken effect or not; this
+takes time proportional to C<num_slots> plus C<capacity>. An interrupted
+C<advance> loses the timers it had already fired, whose payloads died with it,
+and the timers in its current tick's bucket that it had not reached yet fire
+one rotation (C<num_slots> ticks) late. C<clear> rewrites every bucket and timer, so
+it marks itself in progress in the header first; if its writer dies part-way,
+the process that recovers the lock runs the C<clear> again from the start, and
+the wheel is empty afterwards. B<Limitation>: PID reuse is not detected (very
+unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table holds

@@ -19,6 +19,7 @@
 #ifndef PUBSUB_H
 #define PUBSUB_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -46,7 +47,7 @@
 #define PUBSUB_MODE_STR          1
 #define PUBSUB_MODE_INT32        2
 #define PUBSUB_MODE_INT16        3
-#define PUBSUB_ERR_BUFLEN        256
+#define PUBSUB_ERR_BUFLEN        (PATH_MAX + 256)
 #define PUBSUB_SPIN_LIMIT        32
 #define PUBSUB_LOCK_TIMEOUT_SEC  2
 #define PUBSUB_DEFAULT_MSG_SIZE  256
@@ -452,14 +453,36 @@ static int pubsub_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int pubsub_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int pubsub_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* Opt-in (DATA_PUBSUB_SHARED_SPARSE=0): reserving commits memory this module otherwise fills lazily. */
+static int pubsub_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_PUBSUB_SHARED_SPARSE");
+    if (!sp || strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
@@ -525,12 +548,18 @@ static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
                 PUBSUB_ERR("ftruncate(%s): %s", path, strerror(errno));
                 flock(fd, LOCK_UN); close(fd); return NULL;
             }
+            if (pubsub_reserve(fd, total_size) < 0) {
+                PUBSUB_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total_size, strerror(errno));
+                if (ftruncate(fd, 0) < 0) { /* best effort */ }
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
         }
 
         map_size = is_new ? (size_t)total_size : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) {
             PUBSUB_ERR("mmap(%s): %s", path, strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
@@ -543,9 +572,13 @@ static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((PubSubHeader *)base)->magic == 0 && (uint64_t)st.st_size == total_size
-                    && st.st_uid == geteuid() && pubsub_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && pubsub_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, fmode) < 0) {
                         PUBSUB_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (pubsub_reserve(fd, total_size) < 0) {
+                        PUBSUB_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total_size, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     pubsub_init_header(base, mode, cap, total_size, slots_off, data_off,
@@ -603,6 +636,10 @@ static PubSubHandle *pubsub_create_memfd(const char *name, uint32_t capacity,
         PUBSUB_ERR("ftruncate(memfd): %s", strerror(errno));
         close(fd); return NULL;
     }
+    if (pubsub_reserve(fd, total_size) < 0) {
+        PUBSUB_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total_size, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
 
     void *base = mmap(NULL, (size_t)total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
@@ -631,6 +668,13 @@ static PubSubHandle *pubsub_open_fd(int fd, uint32_t mode, char *errbuf) {
 
     if ((uint64_t)st.st_size < sizeof(PubSubHeader)) {
         PUBSUB_ERR("fd %d: too small (%lld)", fd, (long long)st.st_size);
+        return NULL;
+    }
+
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(PubSubHeader, magic)) != (ssize_t)sizeof magic || magic != PUBSUB_MAGIC) {
+        PUBSUB_ERR("fd %d: invalid or incompatible pubsub", fd);
         return NULL;
     }
 
@@ -1003,7 +1047,7 @@ static inline int pubsub_str_publish_locked(PubSubHandle *h, const char *str,
     slot->packed_len = len | (utf8 ? PUBSUB_STR_UTF8_FLAG : 0);
 
     __atomic_store_n(&slot->sequence, pos + 1, __ATOMIC_RELEASE);
-    __atomic_store_n(&hdr->write_pos, pos + 1, __ATOMIC_RELAXED);
+    __atomic_store_n(&hdr->write_pos, pos + 1, __ATOMIC_RELEASE);
     __atomic_add_fetch(&hdr->stat_publish_ok, 1, __ATOMIC_RELAXED);
 
     return 1;
@@ -1140,11 +1184,6 @@ static void pubsub_clear(PubSubHandle *h) {
     if (h->mode == PUBSUB_MODE_STR)
         pubsub_mutex_lock(hdr);
 
-    __atomic_store_n(&hdr->write_pos, 0, __ATOMIC_RELAXED);
-    __atomic_store_n(&hdr->stat_publish_ok, 0, __ATOMIC_RELAXED);
-    if (h->mode == PUBSUB_MODE_STR)
-        __atomic_store_n(&hdr->arena_wpos, 0, __ATOMIC_RELAXED);
-
     /* Zero all slot sequences */
     uint32_t cap = h->capacity;
     if (h->mode == PUBSUB_MODE_INT) {
@@ -1164,6 +1203,14 @@ static void pubsub_clear(PubSubHandle *h) {
         for (uint32_t i = 0; i < cap; i++)
             __atomic_store_n(&s[i].sequence, 0, __ATOMIC_RELAXED);
     }
+
+    /* Rewind only once no slot holds a later lap: stale sequences past a rewound
+     * write_pos make every new int publish into them a silent drop. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_store_n(&hdr->write_pos, 0, __ATOMIC_RELAXED);
+    __atomic_store_n(&hdr->stat_publish_ok, 0, __ATOMIC_RELAXED);
+    if (h->mode == PUBSUB_MODE_STR)
+        __atomic_store_n(&hdr->arena_wpos, 0, __ATOMIC_RELAXED);
 
     if (h->mode == PUBSUB_MODE_STR)
         pubsub_mutex_unlock(hdr);

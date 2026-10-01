@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::TCPInFlightConn;
 # ABSTRACT: InFlightConn defines the InFlightConn middleware configuration.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s amount => Int, { minimum => 0 };
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::TCPInFlightConn - InFlightConn defines the InFlightC
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 amount
 

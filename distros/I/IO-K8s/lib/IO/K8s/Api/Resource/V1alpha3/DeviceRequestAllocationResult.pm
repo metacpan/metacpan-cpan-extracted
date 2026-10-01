@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::DeviceRequestAllocationResult;
 # ABSTRACT: DeviceRequestAllocationResult contains the allocation result for one request.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s device => Str, 'required';
@@ -29,7 +29,7 @@ IO::K8s::Api::Resource::V1alpha3::DeviceRequestAllocationResult - DeviceRequestA
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 device
 
@@ -43,7 +43,7 @@ Must be a DNS subdomain and should end with a DNS domain owned by the vendor of 
 
 =head2 pool
 
-This name together with the driver name and the device name field identify which device was allocated (C<E<lt>driver nameE<gt>/E<lt>pool nameE<gt>/E<lt>device nameE<gt>>).
+This name together with the driver name and the device name field identify which device was allocated (C<< <driver name>/<pool name>/<device name> >>).
 
 Must not be longer than 253 characters and may contain one or more DNS sub-domains separated by slashes.
 

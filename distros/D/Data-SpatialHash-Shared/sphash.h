@@ -14,6 +14,7 @@
 #ifndef SPHASH_H
 #define SPHASH_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -47,7 +48,7 @@
 #define SPH_MAGIC        0x53504831U  /* "SPH1" */
 #define SPH_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
 #define SPH_NONE         UINT32_MAX
-#define SPH_ERR_BUFLEN   256
+#define SPH_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef SPH_READER_SLOTS
 #define SPH_READER_SLOTS 1024  /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -278,23 +279,6 @@ static inline int sph_pid_alive(uint32_t pid) {
     return !sph_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
- * CAS to OUR pid to hold the lock while fixing shared state, then release.
- * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
- * process can detect and re-recover if we crash mid-recovery. */
-static inline void sph_recover_stale_lock(SpatialHandle *h, uint32_t observed_wlock) {
-    SphHeader *hdr = h->hdr;
-    uint32_t mypid = SPH_RWLOCK_WR((uint32_t)getpid());
-    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
-            mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
-        return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
-    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
-    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-}
-
 static const struct timespec sph_lock_timeout = { SPH_LOCK_TIMEOUT_SEC, 0 };
 
 /* Process-global fork-generation counter.  Incremented in the pthread_atfork
@@ -372,6 +356,100 @@ static inline void sph_claim_reader_slot(SpatialHandle *h) {
     /* Table full -- leave my_slot_idx = UINT32_MAX so this handle takes the
      * slotless path (lock still works; recovery of THIS reader's death is the
      * documented slotless limitation). */
+}
+
+/* Wait until no live reader holds the lock; the caller owns wlock, so no NEW
+ * reader can join (they see wlock!=0 and yield).  The SEQ_CST wlock CAS + the
+ * SEQ_CST rdepth loads below are the writer side of the Dekker handshake. */
+static inline void sph_rwlock_drain(SpatialHandle *h) {
+    SphHeader *hdr = h->hdr;
+    for (;;) {
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
+        int busy = 0;
+        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
+         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
+         * this scan, so no held slot is skipped).  O(SPH_OCC_WORDS + live readers)
+         * instead of O(SPH_READER_SLOTS). */
+        for (uint32_t w = 0; w < SPH_OCC_WORDS; w++) {
+            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
+            while (word) {
+                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
+                word &= word - 1;                          /* consume this bit (local copy) */
+                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
+                if (rd == 0) continue;                      /* occupied but not read-locking now */
+                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
+                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
+                if (!sph_pid_alive(pid)) {
+                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
+                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
+                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
+                    uint32_t ep = pid;
+                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                    continue;
+                }
+                busy = 1;                                   /* live reader still holding */
+            }
+        }
+        /* A live slotless reader keeps us waiting; a crashed slotless reader that
+         * cannot be attributed to a pid is the documented slotless limitation. */
+        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
+            busy = 1;
+        if (!busy)
+            return;                                    /* exclusive: wlock held + every rdepth 0 */
+        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
+         * (which reclaims any newly-dead slotted reader). */
+        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &sph_lock_timeout, NULL, 0);
+    }
+}
+
+/* 1 if this process holds a read lock on the segment (through any handle).  Such a
+ * lock predates the current wlock holder, whose drain could then never have
+ * finished: it died before mutating anything. */
+static int sph_self_reading(SpatialHandle *h) {
+    if (h->slotless_held) return 1;
+    uint32_t me = (uint32_t)getpid();
+    for (uint32_t i = 0; i < SPH_READER_SLOTS; i++)
+        if (__atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE) == me &&
+            __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_ACQUIRE) != 0)
+            return 1;
+    return 0;
+}
+
+static inline void sph_bucket_link(SpatialHandle *h, uint32_t idx);
+static inline int sph_is_live(const SpatialHandle *h, uint32_t idx);
+
+/* A writer killed mid-mutation leaves the chains, free list or count torn, but
+ * the live bitmap and each live entry's stored position are authoritative:
+ * rebuild the rest from them.  Idempotent, so a crash here is re-recovered. */
+static void sph_rebuild_locked(SpatialHandle *h) {
+    uint32_t me = h->max_entries, nb = h->num_buckets, n = 0, head = SPH_NONE;
+    for (uint32_t b = 0; b < nb; b++) h->buckets[b] = SPH_NONE;
+    for (uint32_t i = me; i-- > 0; ) {
+        if (sph_is_live(h, i)) { sph_bucket_link(h, i); n++; }
+        else { h->entries[i].next = head; head = i; }
+    }
+    h->hdr->free_head = head;
+    h->hdr->count = n;
+}
+
+/* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
+ * CAS to OUR pid to hold the lock while repairing shared state, then release.
+ * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
+ * process can detect and re-recover if we crash mid-recovery. */
+static inline void sph_recover_stale_lock(SpatialHandle *h, uint32_t observed_wlock) {
+    SphHeader *hdr = h->hdr;
+    uint32_t mypid = SPH_RWLOCK_WR((uint32_t)getpid());
+    if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
+            mypid, 0, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+        return;
+    if (!sph_self_reading(h)) {
+        sph_rwlock_drain(h);
+        sph_rebuild_locked(h);
+    }
+    __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
+    if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
+        syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* Inspect the writer word after a futex-wait timeout.  If a dead writer holds
@@ -522,48 +600,8 @@ static inline void sph_rwlock_wrlock(SpatialHandle *h) {
         sph_unpark(h);
         spin = 0;
     }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
-    for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
-        int busy = 0;
-        /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
-         * reader's bit -- set in claim, before its rdepth++ -- is ordered before
-         * this scan, so no held slot is skipped).  O(SPH_OCC_WORDS + live readers)
-         * instead of O(SPH_READER_SLOTS). */
-        for (uint32_t w = 0; w < SPH_OCC_WORDS; w++) {
-            uint64_t word = __atomic_load_n(&h->occ[w], __ATOMIC_SEQ_CST);
-            while (word) {
-                uint32_t i = (w << 6) + (uint32_t)__builtin_ctzll(word);
-                word &= word - 1;                          /* consume this bit (local copy) */
-                uint32_t rd = __atomic_load_n(&h->reader_slots[i].rdepth, __ATOMIC_SEQ_CST);
-                if (rd == 0) continue;                      /* occupied but not read-locking now */
-                uint32_t pid = __atomic_load_n(&h->reader_slots[i].pid, __ATOMIC_ACQUIRE);
-                if (pid == 0) continue;                     /* stale rdepth on a freed slot */
-                if (!sph_pid_alive(pid)) {
-                    /* Dead reader: drop its pid so the slot no longer counts.  Leave
-                     * the occ bit set (harmless -- a later scan hits pid==0 and skips,
-                     * a re-claim re-sets it) to avoid racing a concurrent claimant. */
-                    uint32_t ep = pid;
-                    __atomic_compare_exchange_n(&h->reader_slots[i].pid, &ep, 0,
-                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
-                    continue;
-                }
-                busy = 1;                                   /* live reader still holding */
-            }
-        }
-        /* A live slotless reader keeps us waiting; a crashed slotless reader that
-         * cannot be attributed to a pid is the documented slotless limitation. */
-        if (__atomic_load_n(&hdr->slotless_rdepth, __ATOMIC_SEQ_CST) != 0)
-            busy = 1;
-        if (!busy)
-            return;                                    /* exclusive: wlock held + every rdepth 0 */
-        /* Wait for a reader to release (drain_seq bump) or time out to re-scan
-         * (which reclaims any newly-dead slotted reader). */
-        syscall(SYS_futex, &hdr->drain_seq, FUTEX_WAIT, v, &sph_lock_timeout, NULL, 0);
-    }
+    /* Phase 2: drain the readers that were already holding when we won the CAS. */
+    sph_rwlock_drain(h);
 }
 
 static inline void sph_rwlock_wrunlock(SpatialHandle *h) {
@@ -909,14 +947,36 @@ static int sph_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int sph_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int sph_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int sph_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_SPATIALHASH_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static SpatialHandle *sph_create(const char *path, uint32_t max_entries,
@@ -952,9 +1012,18 @@ static SpatialHandle *sph_create(const char *path, uint32_t max_entries,
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             SPH_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && sph_reserve(fd, total) < 0) {
+            SPH_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { SPH_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            SPH_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!sph_validate_header((SphHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -964,9 +1033,13 @@ static SpatialHandle *sph_create(const char *path, uint32_t max_entries,
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((SphHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && sph_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && sph_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         SPH_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (sph_reserve(fd, total) < 0) {
+                        SPH_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     sph_init_header(base, max_entries, num_buckets, cell_size, world, sphere_radius, total);
@@ -1004,6 +1077,10 @@ static SpatialHandle *sph_create_memfd(const char *name, uint32_t max_entries,
     if (ftruncate(fd, (off_t)total) < 0) {
         SPH_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (sph_reserve(fd, total) < 0) {
+        SPH_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { SPH_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -1016,6 +1093,11 @@ static SpatialHandle *sph_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { SPH_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(SphHeader)) { SPH_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(SphHeader, magic)) != (ssize_t)sizeof magic || magic != SPH_MAGIC) {
+        SPH_ERR("invalid spatial hash"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { SPH_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -1071,6 +1153,11 @@ static SpatialHandle *sph_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { SPH_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(SphHeader)) { SPH_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(SphHeader, magic)) != (ssize_t)sizeof magic || magic != SPH_MAGIC) {
+        SPH_ERR("%s: invalid spatial hash file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
@@ -1147,7 +1234,6 @@ static inline uint32_t sph_alloc_slot(SpatialHandle *h) {
      * head instead of allocating. */
     if (idx >= h->max_entries) return SPH_NONE;
     h->hdr->free_head = h->entries[idx].next;       /* pop free-list */
-    h->bitmap[idx / 64] |= (uint64_t)1 << (idx % 64);
     h->entries[idx].next = SPH_NONE;
     h->entries[idx].prev = SPH_NONE;
     return idx;
@@ -1156,6 +1242,7 @@ static inline uint32_t sph_alloc_slot(SpatialHandle *h) {
 static inline void sph_free_slot(SpatialHandle *h, uint32_t idx) {
     h->bitmap[idx / 64] &= ~((uint64_t)1 << (idx % 64));
     h->entries[idx].next = h->hdr->free_head;        /* push free-list */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->free_head = idx;
 }
 
@@ -1174,6 +1261,7 @@ static inline void sph_bucket_link(SpatialHandle *h, uint32_t idx) {
     h->entries[idx].prev = SPH_NONE;
     h->entries[idx].next = head;
     if (head != SPH_NONE) h->entries[head].prev = idx;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->buckets[b] = idx;
 }
 
@@ -1187,7 +1275,7 @@ static inline void sph_bucket_unlink(SpatialHandle *h, uint32_t idx) {
     uint32_t me = h->max_entries;
     if (p != SPH_NONE && p >= me) p = SPH_NONE;
     if (n != SPH_NONE && n >= me) n = SPH_NONE;
-    if (p != SPH_NONE) h->entries[p].next = n; else h->buckets[b] = n;
+    if (p != SPH_NONE) h->entries[p].next = n; else if (h->buckets[b] == idx) h->buckets[b] = n;
     if (n != SPH_NONE) h->entries[n].prev = p;
 }
 
@@ -1203,6 +1291,9 @@ static inline uint32_t sph_insert_locked(SpatialHandle *h, double x, double y, d
     h->entries[idx].value = value;
     h->entries[idx].radius = radius;
     sph_bucket_link(h, idx);
+    /* The live bit publishes the entry to the bitmap scans: data and link first. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->bitmap[idx / 64] |= (uint64_t)1 << (idx % 64);
     h->hdr->count++;
     return idx;
 }

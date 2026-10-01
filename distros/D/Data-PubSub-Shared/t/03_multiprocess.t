@@ -31,7 +31,7 @@ use Data::PubSub::Shared;
     select(undef, undef, undef, 0.5);  # let child subscribe
     $ps->publish($_) for 1..5;
     waitpid($pid, 0);
-    is $? >> 8, 0, 'child received all 5 int messages';
+    is $?, 0, 'child received all 5 int messages';
     unlink $path;
 }
 
@@ -59,7 +59,7 @@ use Data::PubSub::Shared;
     $ps->publish("bar");
     $ps->publish("baz");
     waitpid($pid, 0);
-    is $? >> 8, 0, 'child received all str messages';
+    is $?, 0, 'child received all str messages';
     unlink $path;
 }
 

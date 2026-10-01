@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::VaultIssuer;
 # ABSTRACT: Vault configures this issuer to sign certificates using a HashiCorp Vault PKI backend.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s auth                => '+IO::K8s::CertManager::V1::VaultAuth', { required => 'schema' };
@@ -36,7 +36,7 @@ IO::K8s::CertManager::V1::VaultIssuer - Vault configures this issuer to sign cer
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 auth
 

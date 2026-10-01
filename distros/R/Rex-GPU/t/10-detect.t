@@ -48,28 +48,28 @@ sub detect_with {
 subtest '_is_nvidia_compute classification' => sub {
   # PCI class 0302 (3D controller) is compute whatever the name is, unless the
   # device ID is Kepler or older (karr #55, see below).
-  is(Rex::GPU::Detect::_is_nvidia_compute('0302', 'anything at all'), 1,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0302', 'anything at all'), 1,
     'class 0302, no ID => compute regardless of name');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0302', 'Device', '3aa0'), 1,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0302', 'Device', '3aa0'), 1,
     'class 0302, ID without a generation row => compute by class');
 
   # Named compute families.
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GA102 [GeForce RTX 3090]'), 1, 'RTX => compute');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'TITAN V'),                  1, 'TITAN => compute');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Quadro P2000'),            1, 'Quadro => compute');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Tesla V100'),             1, 'Tesla => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GA102 [GeForce RTX 3090]'), 1, 'RTX => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'TITAN V'),                  1, 'TITAN => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Quadro P2000'),            1, 'Quadro => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Tesla V100'),             1, 'Tesla => compute');
 
   # Datacenter short-codes via the /[AHLVP]\d{1,3}[GSi]?/ rule (note: the rule
   # is case-SENSITIVE — uppercase as real lspci emits).
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'A100'), 1, 'A100 => compute ([AHLVP]\d rule)');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'H100'), 1, 'H100 => compute ([AHLVP]\d rule)');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'L40'),  1, 'L40 => compute ([AHLVP]\d rule)');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'V100'), 1, 'V100 => compute ([AHLVP]\d rule)');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'P100'), 1, 'P100 => compute ([AHLVP]\d rule)');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'A100'), 1, 'A100 => compute ([AHLVP]\d rule)');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'H100'), 1, 'H100 => compute ([AHLVP]\d rule)');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'L40'),  1, 'L40 => compute ([AHLVP]\d rule)');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'V100'), 1, 'V100 => compute ([AHLVP]\d rule)');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'P100'), 1, 'P100 => compute ([AHLVP]\d rule)');
 
   # GTX 10xx / 16xx are compute.
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GeForce GTX 1080'), 1, 'GTX 1080 => compute');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GeForce GTX 1660'), 1, 'GTX 1660 => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GeForce GTX 1080'), 1, 'GTX 1080 => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GeForce GTX 1660'), 1, 'GTX 1660 => compute');
 
   # karr #54 REPLACES the claim "MX / GT / GTS / NVS / GTX 2xx-9xx are not
   # compute" (maintainer decision: every GPU usable for AI counts, as long as
@@ -79,26 +79,26 @@ subtest '_is_nvidia_compute classification' => sub {
   # that reveals nothing (or only an old generation) falls to the unknown
   # default 0 -- as before for GT 710 / GTS 450 / NVS 310, now with the
   # unknown-model warning.
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GP108M [GeForce MX150]'), 1, 'GeForce MX150 => compute (Pascal)');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GP108 [GeForce GT 1030]'), 1, 'GT 1030 => compute (Pascal)');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GeForce GTX 960'), 1, 'GTX 960 => compute (Maxwell)');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GM107 [GeForce GTX 750 Ti]'), 1, 'GTX 750 Ti => compute (Maxwell)');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GP108M [GeForce MX150]'), 1, 'GeForce MX150 => compute (Pascal)');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GP108 [GeForce GT 1030]'), 1, 'GT 1030 => compute (Pascal)');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GeForce GTX 960'), 1, 'GTX 960 => compute (Maxwell)');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GM107 [GeForce GTX 750 Ti]'), 1, 'GTX 750 Ti => compute (Maxwell)');
   {
     no warnings 'redefine';
     local *Rex::Logger::info = sub { };
-    is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'NV17 [GeForce4 MX 440]'), 0, 'GeForce4 MX 440 (2002) => not compute');
-    is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GT 710'),          0, 'GT 710, no ID => unknown default 0');
-    is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GeForce GTS 450'), 0, 'GTS 450, no ID => unknown default 0');
-    is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'NVS 310'),         0, 'NVS 310, no ID => unknown default 0');
-    is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GK110 [GeForce GTX 780]'), 0, 'GTX 780, no ID => unknown default 0');
-    is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GK110 [GeForce GTX TITAN]'), 0, 'Kepler GTX TITAN, no ID => not the TITAN rule');
-    is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GK210GL [Tesla K80]'), 0, 'Tesla K80 at 0300, no ID => not the Tesla rule');
-    is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GF110GL [Tesla M2090]'), 0, 'Fermi Tesla M2090, no ID => not the Tesla rule');
+    is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'NV17 [GeForce4 MX 440]'), 0, 'GeForce4 MX 440 (2002) => not compute');
+    is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GT 710'),          0, 'GT 710, no ID => unknown default 0');
+    is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GeForce GTS 450'), 0, 'GTS 450, no ID => unknown default 0');
+    is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'NVS 310'),         0, 'NVS 310, no ID => unknown default 0');
+    is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GK110 [GeForce GTX 780]'), 0, 'GTX 780, no ID => unknown default 0');
+    is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GK110 [GeForce GTX TITAN]'), 0, 'Kepler GTX TITAN, no ID => not the TITAN rule');
+    is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GK210GL [Tesla K80]'), 0, 'Tesla K80 at 0300, no ID => not the Tesla rule');
+    is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GF110GL [Tesla M2090]'), 0, 'Fermi Tesla M2090, no ID => not the Tesla rule');
   }
 
   # Unknown model at class 0300 => 0 is the safe, load-bearing default:
   # an unrecognised chip must NOT trigger a datacenter driver install.
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'FooBar 9000 Unknown Model'), 0,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'FooBar 9000 Unknown Model'), 0,
     'unknown model at class 0300 => 0 (safe default, no install)');
 
   # Known-compute PCI device ID (3rd arg). GB10 (10de:2e12, DGX Spark, aarch64)
@@ -106,22 +106,22 @@ subtest '_is_nvidia_compute classification' => sub {
   # pci.ids — lspci prints only "Device". Its device ID is in the Blackwell
   # range of the Requirement table, which makes it compute (karr #45) where
   # the name-token rules cannot. Verified live on cortex.
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Device', '2e12'), 1,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '2e12'), 1,
     'GB10 device id 2e12 at class 0300 with name "Device" => compute');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Device', '2E12'), 1,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '2E12'), 1,
     'device-id match is case-insensitive');
   # An ID no generation row covers must NOT flip the unknown default (still 0).
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Device', 'ffff'), 0,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', 'ffff'), 0,
     'device id outside every generation row => unknown default 0 preserved');
   # 2-arg calls (no device id) keep the exact prior behaviour.
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Device'), 0,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device'), 0,
     'no device id => unknown default 0 (back-compatible signature)');
 };
 
 #### _parse_nvidia_line
 
 subtest '_parse_nvidia_line — datacenter (class 0302)' => sub {
-  my $gpu = Rex::GPU::Detect::_parse_nvidia_line(
+  my $gpu = Rex::GPU::Detect->_parse_nvidia_line(
     '01:00.0 3D controller [0302]: NVIDIA Corporation AD104GL [RTX 4000 SFF Ada Generation] [10de:27b0] (rev a1)'
   );
   is($gpu->{vendor},    'nvidia', 'vendor nvidia');
@@ -137,7 +137,7 @@ subtest '_parse_nvidia_line — datacenter (class 0302)' => sub {
 };
 
 subtest '_parse_nvidia_line — consumer (class 0300)' => sub {
-  my $gpu = Rex::GPU::Detect::_parse_nvidia_line(
+  my $gpu = Rex::GPU::Detect->_parse_nvidia_line(
     '65:00.0 VGA compatible controller [0300]: NVIDIA Corporation GA102 [GeForce RTX 3090] [10de:2204] (rev a1)'
   );
   is($gpu->{vendor},    'nvidia',                   'vendor nvidia');
@@ -150,7 +150,7 @@ subtest '_parse_nvidia_line — GB10 aarch64 (name unresolved by pci.ids)' => su
   # EXACT class-03 line captured live from cortex (NVIDIA DGX Spark, GB10,
   # aarch64). pci.ids lacks 10de:2e12, so lspci renders the name as "Device";
   # the device ID drives the compute classification.
-  my $gpu = Rex::GPU::Detect::_parse_nvidia_line(
+  my $gpu = Rex::GPU::Detect->_parse_nvidia_line(
     '000f:01:00.0 VGA compatible controller [0300]: NVIDIA Corporation Device [10de:2e12] (rev a1)'
   );
   is($gpu->{vendor},    'nvidia', 'vendor nvidia');
@@ -162,22 +162,64 @@ subtest '_parse_nvidia_line — GB10 aarch64 (name unresolved by pci.ids)' => su
 #### _parse_amd_line
 
 subtest '_parse_amd_line — standard lspci format' => sub {
-  my $gpu = Rex::GPU::Detect::_parse_amd_line(
+  my $gpu = Rex::GPU::Detect->_parse_amd_line(
     '0a:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 31 [Radeon RX 7900 XTX] [1002:744c] (rev c8)'
   );
   is($gpu->{vendor},    'amd',  'vendor amd');
   is($gpu->{pci_class}, '0300', 'pci_class 0300');
   is($gpu->{compute},   0,      'compute 0 (AMD never compute by decision)');
-  # XXX characterization BUG: the name regex
-  #   /:\s+(?:Advanced Micro Devices|AMD\/ATI)\s+.*?\s+(.+?)\s*\[1002:/
-  # never matches the real lspci format, because "Advanced Micro Devices" is
-  # followed by ", Inc." (comma, not whitespace), so the required \s+ after the
-  # vendor literal fails; the "AMD/ATI" alternative is inside brackets and has
-  # no ":\s+" immediately before it. Result: name falls back to the default
-  # 'Unknown AMD GPU' for a perfectly ordinary AMD card. Detect-only today, so
-  # it changes no install decision — but it is a real parse bug. Reported.
-  is($gpu->{name}, 'Unknown AMD GPU',
-    'name => "Unknown AMD GPU" (regex fails on standard format — XXX, see report)');
+  # karr #5: same form as _parse_nvidia_line -- vendor prefix stripped,
+  # codename + bracketed marketing name kept verbatim, up to the [1002:xxxx]
+  # id. Was 'Unknown AMD GPU' on every real card before this fix (the old
+  # regex never matched "Advanced Micro Devices, Inc.", comma before the
+  # required \s+). The POD SYNOPSIS in Detect.pm/GPU.pm documents this exact
+  # form.
+  is($gpu->{name}, 'Navi 31 [Radeon RX 7900 XTX]',
+    'name = codename + bracketed marketing string (matches POD SYNOPSIS)');
+  unlike($gpu->{name}, qr/\[1002:/, 'the [1002:xxxx] id does not leak into the name');
+  unlike($gpu->{name}, qr/\(rev/,   'the (rev ..) suffix does not leak into the name');
+};
+
+subtest '_parse_amd_line — "Advanced Micro Devices [AMD] nee ATI" spelling' => sub {
+  # 2010-era pci.ids vendor string for 1002 -- one of the two other spellings
+  # karr #5's regex accepts. Same card/id as the standard-format test above,
+  # only the vendor prefix text differs, to isolate the vendor-spelling
+  # alternation (the "Navi 31" name is not period-accurate for this vendor
+  # string's era; that mismatch is irrelevant to what this regex checks).
+  my $gpu = Rex::GPU::Detect->_parse_amd_line(
+    '0a:00.0 VGA compatible controller [0300]: Advanced Micro Devices [AMD] nee ATI Navi 31 [Radeon RX 7900 XTX] [1002:744c] (rev c8)'
+  );
+  is($gpu->{name}, 'Navi 31 [Radeon RX 7900 XTX]', 'name parsed with the "nee ATI" vendor spelling');
+};
+
+subtest '_parse_amd_line — "ATI Technologies Inc" spelling' => sub {
+  # Pre-2010 pci.ids vendor string for 1002 -- the third spelling karr #5's
+  # regex accepts (trailing period optional). Same card/id as above, only the
+  # vendor prefix differs.
+  my $gpu = Rex::GPU::Detect->_parse_amd_line(
+    '0a:00.0 VGA compatible controller [0300]: ATI Technologies Inc Navi 31 [Radeon RX 7900 XTX] [1002:744c] (rev c8)'
+  );
+  is($gpu->{name}, 'Navi 31 [Radeon RX 7900 XTX]', 'name parsed with the "ATI Technologies Inc" vendor spelling');
+};
+
+subtest '_parse_amd_line — unresolved name (pci.ids lacks the device id)' => sub {
+  # Same shape as the NVIDIA GB10 "Device" case above: when pci.ids has no
+  # entry for the device id, lspci renders the name as the literal "Device".
+  my $gpu = Rex::GPU::Detect->_parse_amd_line(
+    '0a:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Device [1002:7550] (rev c1)'
+  );
+  is($gpu->{name}, 'Device', 'name = "Device" (pci.ids cannot resolve 1002:7550)');
+};
+
+subtest '_parse_amd_line — unrecognised vendor text => fallback' => sub {
+  # A vendor string that is none of the three accepted 1002 spellings (e.g. a
+  # board-partner name lspci prints instead of the reference vendor, or a
+  # future pci.ids wording) -- falls back to the default, same as every card
+  # did before this fix.
+  my $gpu = Rex::GPU::Detect->_parse_amd_line(
+    '0a:00.0 VGA compatible controller [0300]: XFX Pine Group Navi 31 [Radeon RX 7900 XTX] [1002:744c] (rev c8)'
+  );
+  is($gpu->{name}, 'Unknown AMD GPU', 'unrecognised vendor text => "Unknown AMD GPU" fallback');
 };
 
 #### detect() end-to-end with run()/is_installed() mocked
@@ -252,7 +294,7 @@ subtest 'unresolved name at class 0300 — every Blackwell ID => compute' => sub
   );
   for my $id (sort keys %ids) {
     my ($gpu, $log) = logged(sub {
-      Rex::GPU::Detect::_parse_nvidia_line(
+      Rex::GPU::Detect->_parse_nvidia_line(
         '01:00.0 VGA compatible controller [0300]: NVIDIA Corporation Device [10de:'.$id.'] (rev a1)'
       );
     });
@@ -261,20 +303,20 @@ subtest 'unresolved name at class 0300 — every Blackwell ID => compute' => sub
     is($gpu->{compute},   1,        $id.' ('.$ids{$id}.') => compute via the Blackwell device-id range');
     ok(!(grep { ($_->[1] // '') eq 'warn' } @$log), $id.' no unknown-model warning');
   }
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Device', '2B85'), 1,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '2B85'), 1,
     'upper-case device id matches too');
 
   # Range edges: the Blackwell block is 2900-2FFF; 28ff just below is the end
   # of the Turing..Hopper row (compute since karr #54), 3000 just above and
   # the neighbours of the Blackwell Ultra IDs are in no row at all.
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Device', '2900'), 1, '2900 (block start) => compute');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Device', '2fff'), 1, '2fff (block end) => compute');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Device', '28ff'), 1, '28ff (Turing..Hopper row end) => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '2900'), 1, '2900 (block start) => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '2fff'), 1, '2fff (block end) => compute');
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', '28ff'), 1, '28ff (Turing..Hopper row end) => compute');
   {
     no warnings 'redefine';
     local *Rex::Logger::info = sub { };
     for my $id (qw( 3000 3181 3183 31c1 31c4 )) {
-      is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'Device', $id), 0,
+      is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'Device', $id), 0,
         $id.' (in no generation row) with no name => unknown default 0');
     }
   }
@@ -294,7 +336,7 @@ subtest 'unresolved name, ID in no generation row => still not compute' => sub {
   # default, and warns.
   for my $id (qw( 3000 3183 3fff ffff )) {
     my ($gpu, $log) = logged(sub {
-      Rex::GPU::Detect::_parse_nvidia_line(
+      Rex::GPU::Detect->_parse_nvidia_line(
         '01:00.0 VGA compatible controller [0300]: NVIDIA Corporation Device [10de:'.$id.'] (rev a1)'
       );
     });
@@ -327,7 +369,7 @@ subtest 'k54: Maxwell and later are compute, whatever the name' => sub {
     my ($id, $name, $gen) = @$c;
     for my $shown ($name, 'Device') {
       my ($gpu, $log) = logged(sub {
-        Rex::GPU::Detect::_parse_nvidia_line(
+        Rex::GPU::Detect->_parse_nvidia_line(
           '01:00.0 VGA compatible controller [0300]: NVIDIA Corporation '.$shown.' [10de:'.$id.'] (rev a1)'
         );
       });
@@ -352,7 +394,7 @@ subtest 'k54: Kepler or older => not compute, with a warning' => sub {
     my ($id, $name) = @$c;
     for my $shown ($name, 'Device') {
       my ($gpu, $log) = logged(sub {
-        Rex::GPU::Detect::_parse_nvidia_line(
+        Rex::GPU::Detect->_parse_nvidia_line(
           '01:00.0 VGA compatible controller [0300]: NVIDIA Corporation '.$shown.' [10de:'.$id.'] (rev a1)'
         );
       });
@@ -367,7 +409,7 @@ subtest 'k54: Kepler or older => not compute, with a warning' => sub {
 
 subtest 'k54: unknown ID and unknown name => 0 with the unknown warning' => sub {
   my ($gpu, $log) = logged(sub {
-    Rex::GPU::Detect::_parse_nvidia_line(
+    Rex::GPU::Detect->_parse_nvidia_line(
       '01:00.0 VGA compatible controller [0300]: NVIDIA Corporation Frobnicator 9000 [10de:3aa0] (rev a1)'
     );
   });
@@ -421,7 +463,7 @@ subtest 'k55: class-0302 Kepler Tesla => not compute, with the Kepler warning' =
     my ($id, $name) = @$c;
     for my $shown ($name, 'Device') {
       my ($gpu, $log) = logged(sub {
-        Rex::GPU::Detect::_parse_nvidia_line(
+        Rex::GPU::Detect->_parse_nvidia_line(
           '04:00.0 3D controller [0302]: NVIDIA Corporation '.$shown.' [10de:'.$id.'] (rev a1)'
         );
       });
@@ -471,15 +513,15 @@ subtest 'k55: mixed host -- a K80 does not stop a newer GPU' => sub {
 subtest 'resolved names: RTX laptop parts are compute by name' => sub {
   # The name rule \bRTX\b stays: a laptop RTX of any generation whose name
   # pci.ids resolves is compute — wanted (karr #45), not just tolerated.
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GB202M [GeForce RTX 5090 Laptop GPU]', '2c18'), 1,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GB202M [GeForce RTX 5090 Laptop GPU]', '2c18'), 1,
     'resolved "RTX 5090 Laptop GPU" => compute (range and name agree)');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'AD103M / AD104M [GeForce RTX 4090 Laptop GPU]', '2717'), 1,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'AD103M / AD104M [GeForce RTX 4090 Laptop GPU]', '2717'), 1,
     'Ada "RTX 4090 Laptop GPU" => compute (Turing..Hopper row since karr #54, RTX name rule before)');
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GB202 [GeForce RTX 5090]', '2b85'), 1,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GB202 [GeForce RTX 5090]', '2b85'), 1,
     'resolved RTX 5090 => compute');
   no warnings 'redefine';
   local *Rex::Logger::info = sub { };
-  is(Rex::GPU::Detect::_is_nvidia_compute('0300', 'GT 710', '128b'), 0,
+  is(Rex::GPU::Detect->_is_nvidia_compute('0300', 'GT 710', '128b'), 0,
     'GT 710 with its Kepler id => still 0 (by generation since karr #54)');
 };
 
@@ -491,6 +533,7 @@ subtest 'detect — AMD only' => sub {
   is(scalar @{$r->{amd}},    1,     'one amd gpu');
   is($r->{amd}[0]{vendor},  'amd',  'element vendor amd');
   is($r->{amd}[0]{compute}, 0,      'element compute 0');
+  is($r->{amd}[0]{name}, 'Navi 31 [Radeon RX 7900 XTX]', 'element name (karr #5)');
 };
 
 subtest 'detect — virtual-only output => empty (unchanged)' => sub {
@@ -566,6 +609,7 @@ subtest 'detect — mixed NVIDIA + AMD' => sub {
   );
   is(scalar @{$r->{nvidia}}, 1, 'one nvidia gpu');
   is(scalar @{$r->{amd}},    1, 'one amd gpu');
+  is($r->{amd}[0]{name}, 'Navi 31 [Radeon RX 7900 XTX]', 'amd element name (karr #5)');
 };
 
 subtest 'detect — empty run output' => sub {

@@ -30,6 +30,13 @@ use JSON::MaybeXS qw( decode_json );
 #            leaves files the target has that are not shipped alone.
 #   init --claude-skill writes the same set.
 #
+# Since kanban-issues-karr-cli was split into kanban-issues-karr-coordination
+# (SKILL.md plus references/) and kanban-issues-karr-ticket (SKILL.md only),
+# the directory contract holds per skill. It is pinned here on the
+# coordination skill, the one with references; the ticket skill is planted
+# too, so every child reads a set this file controls, and is checked where the
+# whole pair matters. t/302 owns the removal of the retired directory.
+#
 # Everything runs in File::Temp directories against a share dir of this
 # file's own making (a -I ahead of @INC so File::ShareDir resolves to it,
 # the t/65 trick), never against the developer's tree or the real share/.
@@ -41,20 +48,27 @@ my $BIN  = "$ROOT/bin/karr";
 # file, not only SKILL.md. Spelled with \x{} so this file needs no source
 # encoding.
 my %SHIPPED = (
-    'SKILL.md'              => "---\nname: kanban-issues-karr-cli\n---\n# karr \x{2014} entry point\n",
+    'SKILL.md'              => "---\nname: kanban-issues-karr-coordination\n---\n# karr \x{2014} entry point\n",
     'references/cards.md'   => "# cards \x{2014} Bl\x{00f6}cke\n",
     'references/queries.md' => "# queries \x{2026}\n",
 );
+my %TICKET = (
+    'SKILL.md' => "---\nname: kanban-issues-karr-ticket\n---\n# karr \x{2014} one card\n",
+);
 
-# A lib dir whose auto/share/dist/App-karr/ holds the shipped set above, to go
-# in front of @INC in every child below.
+# A lib dir whose auto/share/dist/App-karr/ holds the shipped sets above, to
+# go in front of @INC in every child below.
 my $SHARE_LIB = path( tempdir( CLEANUP => 1 ) );
 {
-    my $share = $SHARE_LIB->child(qw( auto share dist App-karr kanban-issues-karr-cli ));
-    for my $rel ( sort keys %SHIPPED ) {
-        my $file = $share->child($rel);
-        $file->parent->mkpath;
-        $file->spew_utf8( $SHIPPED{$rel} );
+    my %sets = ( 'kanban-issues-karr-coordination' => \%SHIPPED,
+                 'kanban-issues-karr-ticket'       => \%TICKET );
+    for my $name ( sort keys %sets ) {
+        my $share = $SHARE_LIB->child( qw( auto share dist App-karr ), $name );
+        for my $rel ( sort keys %{ $sets{$name} } ) {
+            my $file = $share->child($rel);
+            $file->parent->mkpath;
+            $file->spew_utf8( $sets{$name}{$rel} );
+        }
     }
 }
 
@@ -76,15 +90,17 @@ sub run_karr {
 
 sub ino { my @st = stat "$_[0]" or return; return $st[1] }
 
-sub target_dir { path( $_[0] )->child('.claude/skills/kanban-issues-karr-cli') }
+sub target_dir { path( $_[0] )->child('.claude/skills/kanban-issues-karr-coordination') }
+sub ticket_dir { path( $_[0] )->child('.claude/skills/kanban-issues-karr-ticket') }
 
 # Every shipped file is present under $dir with the shipped content.
 sub is_installed_set {
-    my ( $dir, $label ) = @_;
-    for my $rel ( sort keys %SHIPPED ) {
+    my ( $dir, $label, $set ) = @_;
+    $set //= \%SHIPPED;
+    for my $rel ( sort keys %$set ) {
         my $file = $dir->child($rel);
         ok( $file->exists, "$label: $rel is there" ) or next;
-        is( $file->slurp_utf8, $SHIPPED{$rel}, "$label: $rel has the shipped content" );
+        is( $file->slurp_utf8, $set->{$rel}, "$label: $rel has the shipped content" );
     }
 }
 
@@ -102,11 +118,16 @@ subtest 'install writes SKILL.md and every reference' => sub {
 
     my $data = eval { decode_json( $r->{stdout} ) };
     ok( $data, 'and prints JSON' ) or diag "stdout: $r->{stdout}";
+    is( $data->[0]{skill}, 'kanban-issues-karr-coordination', 'the first entry is the coordination skill' );
     is( $data->[0]{status}, 'installed', 'status is installed' );
     is( $data->[0]{path}, target_dir($dir)->child('SKILL.md')->stringify,
         'path is still the absolute SKILL.md, as before #285' );
+    is( $data->[1]{skill}, 'kanban-issues-karr-ticket', 'the second the ticket skill' );
+    is( $data->[1]{status}, 'installed', 'installed as well' );
+    is( scalar @{ $data || [] }, 2, 'and nothing else is reported' );
 
     is_installed_set( target_dir($dir), 'install' );
+    is_installed_set( ticket_dir($dir), 'install (ticket)', \%TICKET );
 
     my $c = run_karr( $dir, 'skill', 'check', '--agent', 'claude-code' );
     is( $c->{exit}, 0, 'check exits 0 right after install' ) or diag "stderr: $c->{stderr}";
@@ -247,7 +268,11 @@ subtest 'init --claude-skill writes the references too' => sub {
     my $skill = target_dir($repo)->child('SKILL.md');
     like( $r->{stdout}, qr/\QInstalled Claude Code skill to $skill\E/,
         'and still names the SKILL.md it wrote' );
+    my $ticket = ticket_dir($repo)->child('SKILL.md');
+    like( $r->{stdout}, qr/\QInstalled Claude Code skill to $ticket\E/,
+        'and the ticket skill it wrote beside it' );
     is_installed_set( target_dir($repo), 'init --claude-skill' );
+    is_installed_set( ticket_dir($repo), 'init --claude-skill (ticket)', \%TICKET );
 
     my $c = run_karr( $repo, 'skill', 'check', '--agent', 'claude-code' );
     is( $c->{exit}, 0, 'karr skill check agrees the install is current' ) or diag "stderr: $c->{stderr}";

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::TopologySpreadConstraint;
 # ABSTRACT: TopologySpreadConstraint
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s additionalLabelSelectors => Str, { enum => [qw(OnResource OnShard)] };
@@ -36,7 +36,7 @@ IO::K8s::PrometheusOperator::V1::TopologySpreadConstraint - TopologySpreadConstr
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 additionalLabelSelectors
 

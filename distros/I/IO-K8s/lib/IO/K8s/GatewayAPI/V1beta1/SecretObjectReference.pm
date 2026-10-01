@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::SecretObjectReference;
 # ABSTRACT: ClientCertificateRef references an object that contains a client certificate and its associated private key.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s group     => Str, { pattern => qr/^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/, default => '' };
@@ -26,7 +26,7 @@ IO::K8s::GatewayAPI::V1beta1::SecretObjectReference - ClientCertificateRef refer
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 group
 

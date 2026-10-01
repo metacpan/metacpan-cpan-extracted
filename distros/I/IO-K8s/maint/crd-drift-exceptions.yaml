@@ -169,9 +169,51 @@ ignore_unrendered:
   - provider: AgentSandbox
     path: IO/K8s/AgentSandbox/V1alpha1/SandboxWarmPool.pm
     reason: "k88: v1alpha1 removed upstream at agent-sandbox v1.0.0 (no api/v1alpha1 manifest left to render from); class kept for clusters still on v0.5.x"
+  # k156: the recursive _field_compatible filter now runs AHEAD of the D5 reuse
+  # tie-break (see IO::K8s::AutoGen::_core_class_for), so these once-ambiguous
+  # {metadata,spec} shapes now reuse a core class: Sandbox's and SandboxTemplate's
+  # podTemplate reuse Core::V1::PodTemplateSpec, and all three Kinds'
+  # volumeClaimTemplates reuse Core::V1::PersistentVolumeClaimTemplate. The
+  # emitter therefore no longer renders the per-provider nested subtree those
+  # fields used to own (PodTemplate/PodSpec and its single-key sub-structs,
+  # PersistentVolumeClaimTemplate + EmbeddedObjectMetadata, LocalObjectReference).
+  # The classes are KEPT shipped, not deleted -- a removal is a breaking
+  # public-API change that would need IO::K8s::Deprecated redirect stubs, a
+  # coordination call left as a follow-up; kept, they stay directly usable and
+  # cost nothing but this suppression.
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1beta1/EmbeddedObjectMetadata.pm
+    reason: "k156: was the metadata of the now-reused PodTemplate/PersistentVolumeClaimTemplate; unreferenced after the reuse. Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1beta1/LocalObjectReference.pm
+    reason: "k156: was PodSpec.imagePullSecrets item; unreferenced after podTemplate reuses Core::V1::PodTemplateSpec. Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1beta1/PersistentVolumeClaimTemplate.pm
+    reason: "k156: volumeClaimTemplates now reuse Core::V1::PersistentVolumeClaimTemplate; this per-provider copy is unreferenced. Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1beta1/PodOS.pm
+    reason: "k156: was PodSpec.os; unreferenced after podTemplate reuses Core::V1::PodTemplateSpec. Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1beta1/PodReadinessGate.pm
+    reason: "k156: was PodSpec.readinessGates item; unreferenced after podTemplate reuses Core::V1::PodTemplateSpec. Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1beta1/PodSchedulingGate.pm
+    reason: "k156: was PodSpec.schedulingGates item; unreferenced after podTemplate reuses Core::V1::PodTemplateSpec. Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1beta1/PodSchedulingGroup.pm
+    reason: "k156: was PodSpec.schedulingGroup; unreferenced after podTemplate reuses Core::V1::PodTemplateSpec. Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1beta1/PodSpec.pm
+    reason: "k156: was PodTemplate.spec; unreferenced after podTemplate reuses Core::V1::PodTemplateSpec (whose spec is the superset Core::V1::PodSpec). Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1beta1/PodTemplate.pm
+    reason: "k156: podTemplate now reuses Core::V1::PodTemplateSpec; this per-provider copy is unreferenced. Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
+  - provider: PrometheusOperator
+    path: IO/K8s/PrometheusOperator/V1/PersistentVolumeClaimTemplate.pm
+    reason: "k156: storage.ephemeral.volumeClaimTemplate (Prometheus + PrometheusAgent, via the shared EphemeralVolumeSource) now reuses Core::V1::PersistentVolumeClaimTemplate; this per-provider copy is unreferenced. Kept shipped rather than removed (removal would need IO::K8s::Deprecated stubs -- deferred)"
   - provider: ExternalSecrets
     path: IO/K8s/ExternalSecrets/V1alpha1/UUIDSpec.pm
-    reason: "k120/k133: upstream models uuids .spec as a property-less {type: object}; AutoGen keeps a property-less object opaque (k55) so the render types UUID.spec as { Str => 1 } and emits no UUIDSpec, while lib ships a named empty struct. A typed-empty vs opaque-hash wrapper choice, not a field difference; k133 chose Weg 1 -- keep the named empty struct as a superset and accept the two residual reference-site divergences via accept_structural_divergence below."
+    reason: "k120/k133: upstream models uuids .spec as a property-less {type: object}; AutoGen keeps a property-less object opaque (k55) so the render types UUID.spec as Opaque ({ Str => 1 } before k191) and emits no UUIDSpec, while lib ships a named empty struct. A typed-empty vs opaque-hash wrapper choice, not a field difference; k133 chose Weg 1 -- keep the named empty struct as a superset and accept the two residual reference-site divergences via accept_structural_divergence below."
   # CertManager (k135/k139) / PrometheusOperator (k137): the provider-owned
   # condition classes. lib gives each provider its own Issuer/Certificate/
   # CertificateRequest/monitoringv1.Condition class, required exactly as its own
@@ -253,7 +295,7 @@ ignore_unrendered:
 # ExternalSecrets (k132): 8 generators.external-secrets.io/v1alpha1 (+ one v1)
 # classes differing only in ABSTRACT/POD. NOT listed here, deliberately:
 # V1alpha1/UUID.pm and V1alpha1/ClusterGeneratorGenerator.pm, whose `spec`/
-# `uuidSpec` the emitter types as { Str => 1 } while lib ships the named empty
+# `uuidSpec` the emitter types as Opaque ({ Str => 1 } before k191) while lib ships the named empty
 # struct UUIDSpec (see ignore_unrendered's UUIDSpec.pm entry). Those are
 # genuine k8s-declaration differences, not cosmetic; the guard would refuse
 # them anyway. k133 settled the k120 follow-up (Weg 1): they are kept as a
@@ -418,7 +460,8 @@ ignore_cosmetic_differs:
 # UUIDSpec choice. generators.external-secrets.io/v1alpha1 models uuids .spec
 # (and ClusterGenerator's uuid generator, uuidSpec) as a property-less
 # {type: object}; AutoGen keeps a property-less object opaque (k55), so the
-# emitter types both reference sites as { Str => 1 } and emits no UUIDSpec,
+# emitter types both reference sites as Opaque ({ Str => 1 } before k191)
+# and emits no UUIDSpec,
 # while lib deliberately keeps the named empty struct UUIDSpec as a superset.
 # k133 chose Weg 1 -- keep lib as-is and accept these two residual
 # reference-site divergences here, rather than drop the class (Deprecated) or
@@ -426,10 +469,10 @@ ignore_cosmetic_differs:
 accept_structural_divergence:
   - provider: ExternalSecrets
     path: IO/K8s/ExternalSecrets/V1alpha1/UUID.pm
-    reason: "k133 Weg 1 / k55 / k120: typed-empty UUIDSpec deliberately kept as a superset -- lib types spec as +IO::K8s::ExternalSecrets::V1alpha1::UUIDSpec, the emitter renders the opaque { Str => 1 }"
+    reason: "k133 Weg 1 / k55 / k120: typed-empty UUIDSpec deliberately kept as a superset -- lib types spec as +IO::K8s::ExternalSecrets::V1alpha1::UUIDSpec, the emitter renders the opaque map (Opaque; { Str => 1 } before k191)"
   - provider: ExternalSecrets
     path: IO/K8s/ExternalSecrets/V1alpha1/ClusterGeneratorGenerator.pm
-    reason: "k133 Weg 1 / k55 / k120: typed-empty UUIDSpec deliberately kept as a superset -- lib types uuidSpec as +IO::K8s::ExternalSecrets::V1alpha1::UUIDSpec, the emitter renders the opaque { Str => 1 }"
+    reason: "k133 Weg 1 / k55 / k120: typed-empty UUIDSpec deliberately kept as a superset -- lib types uuidSpec as +IO::K8s::ExternalSecrets::V1alpha1::UUIDSpec, the emitter renders the opaque map (Opaque; { Str => 1 } before k191)"
   # CertManager (k135/k139) / PrometheusOperator (k137): the provider-owned
   # condition classes and the status classes that reference them. k136 stopped
   # reuse_core (D5) rendering Meta::V1::Condition here (it over-requires vs

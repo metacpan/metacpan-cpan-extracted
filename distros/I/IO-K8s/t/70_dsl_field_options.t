@@ -71,7 +71,7 @@ subtest 'registry carries required and the other options' => sub {
     is($info->{legacy}{required}, 1, "legacy 'required' marker still records required");
     ok(!exists $info->{legacy}{options}, 'and adds no options');
     is($info->{bang}{required}, 1, "'Str!' suffix still records required");
-    is($info->{note}{options}{nullable}, 1, 'nullable is schema-only but recorded');
+    is($info->{note}{options}{nullable}, 1, 'nullable recorded');
     is($info->{labels}{options}{preserve_unknown}, 1, 'preserve_unknown recorded');
     is($info->{soft}{required}, 1, "required => 'schema' still records required => 1 (Critical 1)");
     ok(!exists $info->{soft}{options}, 'and adds no options');
@@ -120,12 +120,15 @@ subtest 'pattern' => sub {
     throws_ok { widget(spec => { mode => 'fast', hosts => [ 'A' ] }) } qr/does not match the pattern/, 'string pattern enforced per element';
 };
 
-subtest 'schema-only options change nothing at runtime' => sub {
+subtest 'schema-only options change nothing at runtime, nullable keeps an explicit null' => sub {
     my $w = widget();
     ok(!defined $w->policy, 'default is not applied client-side');
     ok(!exists $w->TO_JSON->{policy}, 'and nothing is emitted for it');
+    # k158: nullable is no longer schema-only -- an explicit undef is a
+    # JSON null on the wire, an absent field stays absent (t/128).
     my $n = widget(note => undef);
-    ok(!exists $n->TO_JSON->{note}, 'nullable: undef is still omitted on the wire');
+    ok(exists $n->TO_JSON->{note} && !defined $n->TO_JSON->{note}, 'nullable: an explicit undef is written as null');
+    ok(!exists widget()->TO_JSON->{note}, 'nullable: an absent field is still omitted');
     is_deeply(widget(labels => { a => 'b' })->TO_JSON->{labels}, { a => 'b' }, 'preserve_unknown: opaque map unchanged');
 };
 

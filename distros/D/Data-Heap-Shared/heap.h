@@ -10,6 +10,7 @@
 #ifndef HEAP_H
 #define HEAP_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -29,7 +30,7 @@
 
 #define HEAP_MAGIC       0x48455031U  /* "HEP1" */
 #define HEAP_VERSION     1
-#define HEAP_ERR_BUFLEN  256
+#define HEAP_ERR_BUFLEN  (PATH_MAX + 256)
 #define HEAP_SPIN_LIMIT  32
 
 #define HEAP_MUTEX_BIT   0x80000000U
@@ -55,7 +56,9 @@ typedef struct {
     uint64_t capacity;
     uint64_t total_size;
     uint64_t data_off;
-    uint8_t  _pad0[32];
+    HeapEntry jentry;          /* 32: element the in-flight sift will place at jhole */
+    uint32_t jsize;            /* 48: size that sift's push/pop publishes */
+    uint8_t  _pad0[12];
 
     uint32_t size;             /* 64: current element count (futex word for pop) */
     uint32_t mutex;            /* 68: 0=free, HEAP_MUTEX_BIT|pid=locked */
@@ -66,7 +69,8 @@ typedef struct {
     uint64_t stat_waits;       /* 96 */
     uint64_t stat_timeouts;    /* 104 */
     uint64_t stat_recoveries;  /* 112 */
-    uint8_t  _pad1[8];         /* 120-127 */
+    uint32_t jop;              /* 120: HEAP_J_UP/DOWN while a sift is in flight, else 0 */
+    uint32_t jhole;            /* 124 */
 } HeapHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -82,6 +86,74 @@ typedef struct {
     int         notify_fd;
     int         backing_fd;
 } HeapHandle;
+
+/* ================================================================
+ * Journaled hole sifts (must hold mutex)
+ *
+ * The moving element waits in hdr->jentry while each step copies one entry
+ * into the hole, whose slot then holds a stale duplicate until the next step.
+ * A holder killed mid-sift leaves jop set, and the next holder finishes it.
+ * ================================================================ */
+
+#define HEAP_J_UP   1U
+#define HEAP_J_DOWN 2U
+
+static inline void heap_journal_begin(HeapHeader *hdr, HeapEntry e, uint32_t op, uint32_t n, uint32_t hole) {
+    hdr->jentry = e;
+    hdr->jsize = n;
+    hdr->jhole = hole;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->jop = op;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+}
+
+static inline void heap_journal_step(HeapHeader *hdr, HeapEntry *data, uint32_t hole, uint32_t next) {
+    data[hole] = data[next];
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->jhole = next;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+}
+
+static inline void heap_journal_end(HeapHeader *hdr, HeapEntry *data, uint32_t hole, HeapEntry e) {
+    data[hole] = e;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->jop = 0;
+}
+
+static inline void heap_sift_up(HeapHeader *hdr, HeapEntry *data, uint32_t hole, HeapEntry e) {
+    while (hole > 0) {
+        uint32_t parent = (hole - 1) / 2;
+        if (data[parent].priority <= e.priority) break;
+        heap_journal_step(hdr, data, hole, parent);
+        hole = parent;
+    }
+    heap_journal_end(hdr, data, hole, e);
+}
+
+static inline void heap_sift_down(HeapHeader *hdr, HeapEntry *data, uint32_t size, uint32_t hole, HeapEntry e) {
+    for (;;) {
+        uint64_t c = (uint64_t)hole * 2 + 1;   /* uint64: 2*hole overflows uint32 near 2^31 */
+        if (c >= size) break;
+        if (c + 1 < size && data[c + 1].priority < data[c].priority) c++;
+        if (!(data[c].priority < e.priority)) break;
+        heap_journal_step(hdr, data, hole, (uint32_t)c);
+        hole = (uint32_t)c;
+    }
+    heap_journal_end(hdr, data, hole, e);
+}
+
+/* A push/pop killed before publishing its size never happened; one killed after is finished. */
+static inline void heap_journal_replay(HeapHeader *hdr, HeapEntry *data, uint64_t capacity) {
+    uint32_t op = hdr->jop;
+    if (!op) return;
+    uint32_t n = hdr->jsize, hole = hdr->jhole;
+    HeapEntry e = hdr->jentry;
+    if (n == hdr->size && n <= capacity && hole < n) {
+        if (op == HEAP_J_UP)   { heap_sift_up(hdr, data, hole, e); return; }
+        if (op == HEAP_J_DOWN) { heap_sift_down(hdr, data, n, hole, e); return; }
+    }
+    hdr->jop = 0;
+}
 
 /* ================================================================
  * Mutex (PID-based, stale-recoverable)
@@ -114,7 +186,8 @@ static inline int heap_pid_alive(uint32_t pid) {
     return !heap_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
-static inline void heap_mutex_lock(HeapHeader *hdr) {
+static inline void heap_mutex_lock(HeapHandle *h) {
+    HeapHeader *hdr = h->hdr;
     uint32_t mypid = HEAP_MUTEX_BIT | ((uint32_t)getpid() & HEAP_MUTEX_PID);
     for (int spin = 0; ; spin++) {
         uint32_t expected = 0;
@@ -137,12 +210,12 @@ static inline void heap_mutex_lock(HeapHeader *hdr) {
             if (rc == -1 && errno == ETIMEDOUT && cur >= HEAP_MUTEX_BIT) {
                 uint32_t pid = cur & HEAP_MUTEX_PID;
                 if (!heap_pid_alive(pid)) {
-                    if (__atomic_compare_exchange_n(&hdr->mutex, &cur, 0,
+                    if (__atomic_compare_exchange_n(&hdr->mutex, &cur, mypid,
                             0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
+                        __atomic_sub_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
                         __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
-                        /* Wake one waiter so recovery latency is not bounded by the 2s timeout. */
-                        if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
-                            syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
+                        heap_journal_replay(hdr, h->data, h->capacity);
+                        return;
                     }
                 }
             }
@@ -156,38 +229,6 @@ static inline void heap_mutex_unlock(HeapHeader *hdr) {
     __atomic_store_n(&hdr->mutex, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
-}
-
-/* ================================================================
- * Heap operations (must hold mutex)
- * ================================================================ */
-
-static inline void heap_swap(HeapEntry *a, HeapEntry *b) {
-    HeapEntry t = *a; *a = *b; *b = t;
-}
-
-static inline void heap_sift_up(HeapEntry *data, uint32_t idx) {
-    while (idx > 0) {
-        uint32_t parent = (idx - 1) / 2;
-        if (data[parent].priority <= data[idx].priority) break;
-        heap_swap(&data[parent], &data[idx]);
-        idx = parent;
-    }
-}
-
-static inline void heap_sift_down(HeapEntry *data, uint32_t size, uint32_t idx) {
-    while (1) {
-        uint32_t smallest = idx;
-        uint64_t left = (uint64_t)idx * 2 + 1;   /* uint64: 2*idx overflows uint32 near 2^31 */
-        uint64_t right = (uint64_t)idx * 2 + 2;
-        if (left < size && data[left].priority < data[smallest].priority)
-            smallest = (uint32_t)left;
-        if (right < size && data[right].priority < data[smallest].priority)
-            smallest = (uint32_t)right;
-        if (smallest == idx) break;
-        heap_swap(&data[idx], &data[smallest]);
-        idx = smallest;
-    }
 }
 
 /* ================================================================
@@ -213,17 +254,24 @@ static inline int heap_remaining(const struct timespec *dl, struct timespec *rem
 
 static inline int heap_push(HeapHandle *h, int64_t priority, int64_t value) {
     HeapHeader *hdr = h->hdr;
-    heap_mutex_lock(hdr);
+    heap_mutex_lock(h);
     uint32_t cur = hdr->size;
     if (cur >= h->capacity) {
         heap_mutex_unlock(hdr);
         return 0;
     }
-    uint32_t idx = cur;
-    hdr->size = cur + 1;
-    h->data[idx].priority = priority;
-    h->data[idx].value = value;
-    heap_sift_up(h->data, idx);
+    HeapEntry e = { priority, value };
+    if (cur > 0 && h->data[(cur - 1) / 2].priority > priority) {
+        heap_journal_begin(hdr, e, HEAP_J_UP, cur + 1, cur);
+        hdr->size = cur + 1;
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        heap_sift_up(hdr, h->data, cur, e);
+    } else {
+        h->data[cur] = e;
+        /* The size publishes the entry: a pusher killed before it must leave nothing to pop. */
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        hdr->size = cur + 1;
+    }
     __atomic_add_fetch(&hdr->stat_pushes, 1, __ATOMIC_RELAXED);
     heap_mutex_unlock(hdr);
     /* Wake pop-waiters.  Full barrier so our size store (under the lock) is
@@ -239,7 +287,7 @@ static inline int heap_push(HeapHandle *h, int64_t priority, int64_t value) {
 
 static inline int heap_pop(HeapHandle *h, int64_t *out_priority, int64_t *out_value) {
     HeapHeader *hdr = h->hdr;
-    heap_mutex_lock(hdr);
+    heap_mutex_lock(h);
     uint32_t cur = hdr->size;
     if (cur == 0) {
         heap_mutex_unlock(hdr);
@@ -258,10 +306,14 @@ static inline int heap_pop(HeapHandle *h, int64_t *out_priority, int64_t *out_va
     *out_priority = h->data[0].priority;
     *out_value = h->data[0].value;
     cur--;
-    hdr->size = cur;
     if (cur > 0) {
-        h->data[0] = h->data[cur];
-        heap_sift_down(h->data, cur, 0);
+        HeapEntry e = h->data[cur];
+        heap_journal_begin(hdr, e, HEAP_J_DOWN, cur, 0);
+        hdr->size = cur;
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        heap_sift_down(hdr, h->data, cur, 0, e);
+    } else {
+        hdr->size = 0;
     }
     __atomic_add_fetch(&hdr->stat_pops, 1, __ATOMIC_RELAXED);
     heap_mutex_unlock(hdr);
@@ -309,7 +361,7 @@ static inline int heap_pop_wait(HeapHandle *h, int64_t *out_p, int64_t *out_v, d
 
 static inline int heap_peek(HeapHandle *h, int64_t *out_p, int64_t *out_v) {
     HeapHeader *hdr = h->hdr;
-    heap_mutex_lock(hdr);
+    heap_mutex_lock(h);
     if (hdr->size == 0) { heap_mutex_unlock(hdr); return 0; }
     *out_p = h->data[0].priority;
     *out_v = h->data[0].value;
@@ -391,14 +443,36 @@ static int heap_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int heap_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int heap_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back. */
+static int heap_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_HEAP_SHARED_SPARSE");
+    if (sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static HeapHandle *heap_create(const char *path, uint64_t capacity, mode_t mode, char *errbuf) {
@@ -437,9 +511,18 @@ static HeapHandle *heap_create(const char *path, uint64_t capacity, mode_t mode,
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             HEAP_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && heap_reserve(fd, total) < 0) {
+            HEAP_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { HEAP_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            HEAP_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!heap_validate_header((HeapHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -449,9 +532,13 @@ static HeapHandle *heap_create(const char *path, uint64_t capacity, mode_t mode,
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((HeapHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && heap_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && heap_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         HEAP_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (heap_reserve(fd, total) < 0) {
+                        HEAP_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     heap_init_header(base, total, capacity);
@@ -485,6 +572,10 @@ static HeapHandle *heap_create_memfd(const char *name, uint64_t capacity, char *
     int fd = memfd_create(name ? name : "heap", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { HEAP_ERR("memfd_create: %s", strerror(errno)); return NULL; }
     if (ftruncate(fd, (off_t)total) < 0) { HEAP_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL; }
+    if (heap_reserve(fd, total) < 0) {
+        HEAP_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { HEAP_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -497,6 +588,11 @@ static HeapHandle *heap_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { HEAP_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(HeapHeader)) { HEAP_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(HeapHeader, magic)) != (ssize_t)sizeof magic || magic != HEAP_MAGIC) {
+        HEAP_ERR("invalid heap"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { HEAP_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -519,7 +615,7 @@ static void heap_destroy(HeapHandle *h) {
 
 /* Concurrency-safe: holds mutex (heap is already mutex-based) */
 static void heap_clear(HeapHandle *h) {
-    heap_mutex_lock(h->hdr);
+    heap_mutex_lock(h);
     h->hdr->size = 0;
     heap_mutex_unlock(h->hdr);
     if (__atomic_load_n(&h->hdr->waiters_pop, __ATOMIC_RELAXED) > 0)

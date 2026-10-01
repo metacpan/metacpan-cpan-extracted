@@ -18,7 +18,7 @@ use File::Find;
 use Role::Tiny;
 use List::Util qw(max);
 
-our $VERSION = '2.3.3';
+our $VERSION = '2.3.5';
 
 ########################################################################
 sub cmd_install {

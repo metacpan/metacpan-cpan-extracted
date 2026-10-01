@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ConjurCert;
 # ABSTRACT: Cert enables certificate-based authentication using a client certificate and key.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s account       => Str, { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::ConjurCert - Cert enables certificate-based authen
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 account
 

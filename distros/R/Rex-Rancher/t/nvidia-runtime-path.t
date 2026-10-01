@@ -19,6 +19,9 @@ use Test::More;
 
 use Rex::Rancher::Server;
 use Rex::Rancher::Agent;
+use Rex::Rancher::Distribution;
+
+my $D = 'Rex::Rancher::Distribution';
 
 my $LINE = 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';
 
@@ -33,6 +36,8 @@ my $run = sub {
     $? = 1 << 8;
     return '';
   }
+  # Only what %files holds exists (server/token too: no server set up, k67).
+  if ( $cmd =~ m{^test -[ed] '?([^' ]+)'?\z} ) { $? = exists $files{$1} ? 0 : 1 << 8; return '' }
   if ( $cmd =~ m{^systemctl is-active --quiet} ) { $? = ( $service_running ? 0 : 3 ) << 8; return '' }
   if ( $cmd =~ m{^systemctl is-active} ) { $? = 0; return "active\n" }
   if ( $cmd =~ m{^command -v rke2} ) { $? = 0; return "/usr/local/bin/rke2\n" }
@@ -48,17 +53,23 @@ my $file = sub {
 };
 {
   no warnings 'redefine';
+  # Server's and Agent's own steps, and the shared ones in
+  # Rex::Rancher::Distribution, which calls Rex::Commands::* directly.
+  my $can_run = sub { $runtime ? '/usr/bin/nvidia-container-runtime' : undef };
+  *Rex::Commands::Run::run       = $run;
   *Rex::Rancher::Server::run     = $run;
   *Rex::Rancher::Agent::run      = $run;
+  *Rex::Commands::File::file     = $file;
   *Rex::Rancher::Server::file    = $file;
-  *Rex::Rancher::Server::can_run = sub { $runtime ? '/usr/bin/nvidia-container-runtime' : undef };
+  *Rex::Commands::Run::can_run   = $can_run;
+  *Rex::Rancher::Server::can_run = $can_run;
 }
 
 sub reset_remote { %files = @_; @log = (); $runtime = 1; $service_running = 0 }
 
-my $env = \&Rex::Rancher::Server::_env_with_runtime_path;
+my $env = sub { $D->env_with_runtime_path(@_) };
 
-subtest '_env_with_runtime_path' => sub {
+subtest 'env_with_runtime_path' => sub {
   is( $env->(undef), "$LINE\n", 'no file: only the PATH line' );
   is( $env->(''),    "$LINE\n", 'empty file: only the PATH line' );
   is( $env->("RKE2_FOO=1\n# comment\n"), "RKE2_FOO=1\n# comment\n$LINE\n",
@@ -71,39 +82,39 @@ subtest '_env_with_runtime_path' => sub {
   is( $env->( $env->("$LINE\nX=1\n") ), undef, '... then stable' );
 };
 
-my %paths = map { $_ => Rex::Rancher::Server::_paths($_) } qw( rke2 k3s );
+my %dist = map { $_ => $D->new_for($_) } qw( rke2 k3s );
 my $writes = sub { grep { /^file / } @log };
 
 subtest 'rke2 server: written, other lines kept' => sub {
   reset_remote( '/etc/default/rke2-server' => "HTTP_PROXY=http://p:3128\n" );
-  Rex::Rancher::Server::_nvidia_runtime_path( $paths{rke2} );
+  $dist{rke2}->ensure_nvidia_runtime_path;
   is( $files{'/etc/default/rke2-server'}, "HTTP_PROXY=http://p:3128\n$LINE\n", 'content' );
   ok( !grep( { /restart/ } @log ), 'nothing restarted' );
 };
 
 subtest 'rke2 server: already right, not rewritten' => sub {
   reset_remote( '/etc/default/rke2-server' => "$LINE\n" );
-  Rex::Rancher::Server::_nvidia_runtime_path( $paths{rke2} );
+  $dist{rke2}->ensure_nvidia_runtime_path;
   is( scalar $writes->(), 0, 'no write' );
 };
 
 subtest 'no nvidia-container-runtime on the host: nothing written' => sub {
   reset_remote();
   $runtime = 0;
-  Rex::Rancher::Server::_nvidia_runtime_path( $paths{rke2} );
+  $dist{rke2}->ensure_nvidia_runtime_path;
   is( scalar @log, 0, 'no command, no write' );
 };
 
 subtest 'k3s: nothing written' => sub {
   reset_remote();
-  Rex::Rancher::Server::_nvidia_runtime_path( $paths{k3s} );
+  $dist{k3s}->ensure_nvidia_runtime_path;
   is( scalar @log, 0, 'no command, no write' );
 };
 
 subtest 'running service: file written, no restart' => sub {
   reset_remote();
   $service_running = 1;
-  Rex::Rancher::Server::_nvidia_runtime_path( $paths{rke2} );
+  $dist{rke2}->ensure_nvidia_runtime_path;
   is( $files{'/etc/default/rke2-server'}, "$LINE\n", 'written' );
   ok( !grep( { /systemctl (re)?start|restart/ } @log ), 'no (re)start' );
 };

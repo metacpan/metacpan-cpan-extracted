@@ -37,12 +37,14 @@ use App::karr::Cmd::List;
 use App::karr::Cmd::Context;
 
 # The exact card in the ticket: `blocked: false` (which Task normalises away
-# already, per #58) plus the two empty strings that survive it.
+# already, per #58) plus the two empty strings that survive it. In todo, as
+# are the pick fixtures below: backlog is held back and never picked (ticket
+# k306), and these are about the claim and blocked fields, not the column.
 my $KANBAN_CARD = <<'CARD';
 ---
 id: 1
 title: kanban-written
-status: backlog
+status: todo
 priority: high
 blocked: false
 block_reason: ""
@@ -127,7 +129,7 @@ subtest 'a real claim is still a claim' => sub {
 ---
 id: 1
 title: taken
-status: backlog
+status: todo
 priority: high
 claimed_by: alice
 claimed_at: 2999-01-01T00:00:00Z
@@ -152,7 +154,7 @@ subtest 'an expired claim is still reaped' => sub {
 ---
 id: 1
 title: abandoned
-status: backlog
+status: todo
 priority: high
 claimed_by: alice
 claimed_at: $stale
@@ -173,7 +175,7 @@ subtest 'a blocked card is still skipped' => sub {
 ---
 id: 1
 title: stuck
-status: backlog
+status: todo
 priority: high
 blocked: true
 block_reason: waiting on upstream

@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeSnapshotSpec;
 # ABSTRACT: spec defines the desired characteristics of a snapshot requested by a user.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s source                  => '+IO::K8s::VolumeSnapshot::V1::VolumeSnapshotSource', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeSnapshotSpec - spec defines the desired chara
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 source
 

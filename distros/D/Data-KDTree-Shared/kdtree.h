@@ -16,6 +16,7 @@
 #ifndef KD_H
 #define KD_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,7 +46,7 @@
 
 #define KD_MAGIC        0x5254444B  /* KDTree */
 #define KD_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
-#define KD_ERR_BUFLEN   256
+#define KD_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef KD_READER_SLOTS
 #define KD_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -648,14 +649,36 @@ static int kd_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int kd_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int kd_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* Opt-in (DATA_KDTREE_SHARED_SPARSE=0): reserving commits memory this module otherwise fills lazily. */
+static int kd_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_KDTREE_SHARED_SPARSE");
+    if (!sp || strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static KdHandle *kd_create(const char *path, uint64_t dims, uint64_t capacity, mode_t mode, char *errbuf) {
@@ -689,9 +712,18 @@ static KdHandle *kd_create(const char *path, uint64_t dims, uint64_t capacity, m
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             KD_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && kd_reserve(fd, total) < 0) {
+            KD_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { KD_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            KD_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!kd_validate_header((KdHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -701,9 +733,13 @@ static KdHandle *kd_create(const char *path, uint64_t dims, uint64_t capacity, m
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((KdHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && kd_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && kd_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         KD_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (kd_reserve(fd, total) < 0) {
+                        KD_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     kd_init_header(base, (uint32_t)dims, (uint32_t)capacity, total);
@@ -739,6 +775,10 @@ static KdHandle *kd_create_memfd(const char *name, uint64_t dims, uint64_t capac
     if (ftruncate(fd, (off_t)total) < 0) {
         KD_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (kd_reserve(fd, total) < 0) {
+        KD_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { KD_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -751,6 +791,11 @@ static KdHandle *kd_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { KD_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(KdHeader)) { KD_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(KdHeader, magic)) != (ssize_t)sizeof magic || magic != KD_MAGIC) {
+        KD_ERR("invalid k-d tree table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { KD_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -778,6 +823,11 @@ static KdHandle *kd_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { KD_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(KdHeader)) { KD_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(KdHeader, magic)) != (ssize_t)sizeof magic || magic != KD_MAGIC) {
+        KD_ERR("%s: invalid k-d tree file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */
@@ -837,6 +887,7 @@ static void kd_build_locked(KdHandle *h);
 static int kd_freeze(KdHandle *h) {
     kd_rwlock_wrlock(h);
     if (h->hdr->dirty) kd_build_locked(h);
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->sealed = 1;
     kd_rwlock_wrunlock(h);
     if (h->path || h->backing_fd >= 0) return kd_msync(h);
@@ -871,8 +922,10 @@ static int64_t kd_add_locked(KdHandle *h, const double *coords, uint64_t payload
     *kd_payload(h, slot) = payload;
     *kd_left(h, slot)    = KD_NIL;
     *kd_right(h, slot)   = KD_NIL;
-    h->hdr->count = slot + 1;
+    /* Dirty before the count: a kill between costs a rebuild, never a counted point outside the tree. */
     h->hdr->dirty = 1;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    h->hdr->count = slot + 1;
     return (int64_t)slot;
 }
 
@@ -904,10 +957,11 @@ static uint32_t kd_build_rec(KdHandle *h, uint32_t *idx, int64_t lo, int64_t hi,
 static void kd_build_locked(KdHandle *h) {
     uint64_t n = h->hdr->count;
     if (n > h->capacity) n = h->capacity;                 /* Layer B */
-    if (n == 0) { h->hdr->root = KD_NIL; h->hdr->dirty = 0; return; }
+    if (n == 0) { h->hdr->root = KD_NIL; __atomic_signal_fence(__ATOMIC_SEQ_CST); h->hdr->dirty = 0; return; }
     uint32_t *idx = kd_idx(h);                             /* scratch region inside the mapping */
     for (uint64_t i = 0; i < n; i++) idx[i] = (uint32_t)i;
     h->hdr->root = kd_build_rec(h, idx, 0, (int64_t)n - 1, 0);
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->dirty = 0;
 }
 
@@ -998,8 +1052,12 @@ static uint64_t kd_radius_locked(KdHandle *h, const double *q, double r,
 
 /* reset to an empty tree (caller holds the write lock) */
 static inline void kd_clear_locked(KdHandle *h) {
+    /* Dirty first: a kill at any point then reads as not cleared (rebuilt) or cleared. */
+    h->hdr->dirty = 1;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->count = 0;
     h->hdr->root  = KD_NIL;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     h->hdr->dirty = 0;
 }
 

@@ -1,7 +1,7 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
 

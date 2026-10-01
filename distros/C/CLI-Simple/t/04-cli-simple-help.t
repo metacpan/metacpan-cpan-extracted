@@ -45,7 +45,7 @@ sub capture_usage {
 }
 
 ########################################################################
-subtest 'USAGE is legacy fallback' => sub {
+subtest 'USAGE is used for default help' => sub {
 ########################################################################
   local @ARGV;
 
@@ -56,7 +56,7 @@ subtest 'USAGE is legacy fallback' => sub {
 
   my $output = capture_usage( $cli, 'CLISimpleHelpUsage.pm' );
 
-  like( $output, qr/LEGACY USAGE TEXT/sm, 'USAGE content displayed when SYNOPSIS is absent', );
+  like( $output, qr/LEGACY USAGE TEXT/sm, 'USAGE content displayed', );
 
   return;
 };
@@ -77,9 +77,8 @@ subtest 'SYNOPSIS is used for default help' => sub {
 
   return;
 };
-
 ########################################################################
-subtest 'SYNOPSIS takes precedence over USAGE' => sub {
+subtest 'USAGE takes precedence over SYNOPSIS' => sub {
 ########################################################################
   local @ARGV;
 
@@ -90,9 +89,9 @@ subtest 'SYNOPSIS takes precedence over USAGE' => sub {
 
   my $output = capture_usage( $cli, 'CLISimpleHelpBoth.pm' );
 
-  like( $output, qr/SYNOPSIS TEXT/sm, 'SYNOPSIS content displayed', );
+  like( $output, qr/LEGACY USAGE TEXT/sm, 'USAGE content displayed', );
 
-  unlike( $output, qr/LEGACY USAGE TEXT/sm, 'USAGE content suppressed', );
+  unlike( $output, qr/SYNOPSIS TEXT/sm, 'SYNOPSIS content suppressed', );
 
   return;
 };

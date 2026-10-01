@@ -238,15 +238,17 @@ subtest 'the board decides which move releases the claim' => sub {
     # A board imported from kanban-md may end anywhere. Here `shipped` is the
     # final column and `done` is an ordinary working one -- so the release
     # happens at `shipped` and nowhere else.
-    my @custom = qw( backlog done shipped archived );
+    my @custom = qw( backlog todo done shipped archived );
     my $board  = _consumer_for(@custom);
 
     my $shipped = _claimed_card('shipped');
     $board->apply_status_change( $shipped, 'done', undef );
     ok( !$shipped->has_claimed_by, 'custom board: shipped -> done releases the claim' );
 
+    # Into todo, not backlog: a move into backlog releases the claim from any
+    # column (ticket k306), which would say nothing about `done` here.
     my $working = _claimed_card('done');
-    $board->apply_status_change( $working, 'backlog', undef );
+    $board->apply_status_change( $working, 'todo', undef );
     is( $working->claimed_by, 'alpha-one',
         'custom board: `done` is no longer the magic word' );
 };

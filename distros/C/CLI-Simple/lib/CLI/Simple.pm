@@ -23,7 +23,7 @@ use IO::Interactive;
 use List::Util qw(zip none pairs any);
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.2.3';
+our $VERSION = '2.2.4';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -513,9 +513,9 @@ sub _get_help_sections {
       if $sections->[$idx] ne $DEFAULT_HELP_SECTIONS[$idx];
   }
 
-  return [ _pod_has_section( $input, 'SYNOPSIS' )
-    ? 'SYNOPSIS'
-    : 'USAGE',
+  return [ _pod_has_section( $input, 'USAGE' )
+    ? 'USAGE'
+    : 'SYNOPSIS',
     'DESCRIPTION/Commands', 'DESCRIPTION/Options', 'OPTIONS', ];
 }
 
@@ -1038,7 +1038,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.2.3.
+This documentation refers to version 2.2.4.
 
 =head1 FEATURES
 
@@ -1670,28 +1670,38 @@ calling C<new()>.
 
 =head2 C<help_sections>
 
-By default C<CLI::Simple> passes a standard set of POD section names to
-L<Pod::Usage> when rendering help output:
+By default C<CLI::Simple> renders the following POD sections when they
+are present:
 
-  SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE
+  SYNOPSIS
+  DESCRIPTION/Commands
+  DESCRIPTION/Options
+  OPTIONS
 
-You can override this by passing an array of sections names during construction.
+C<SYNOPSIS> is the preferred source for usage information. For
+backward compatibility, if the POD does not contain a C<SYNOPSIS>
+section, C<USAGE> is used instead.
 
- my $cli = CLI::Simple->new( help_sections => [qw(SYNOPSIS COMMANDS OPTIONS)], ...);
+C<SYNOPSIS> and C<USAGE> are not both displayed by default.
 
-You must do this during construction or add C<help_sections> to your
-C<extra_options> and set the defaults for C<help_sections>:
+You can override the default selection by passing an array reference of
+section names during construction:
 
   my $cli = CLI::Simple->new(
-    commands        => $commands,
-    extra_options   => [ qw(help_sections) ],
-    default_options => { help_sections => [qw(SYNOPIS COMMANDS OPTIONS)] },
-    option_specs    => \@option_specs
+    help_sections => [qw(SYNOPSIS COMMANDS OPTIONS)],
+    ...
   );
 
+When C<help_sections> is supplied explicitly, C<CLI::Simple> honors the
+list exactly as provided. For example, an application may request both
+C<SYNOPSIS> and C<USAGE>:
+
+  help_sections => [qw(SYNOPSIS USAGE)]
+
 Section names follow L<Pod::Usage> conventions. Subsections are
-specified with a C</> separator, e.g. C<DESCRIPTION/Commands> renders
-only the C<Commands> subsection under C<=head1 DESCRIPTION>.
+specified with a C</> separator; for example,
+C<DESCRIPTION/Commands> renders only the C<Commands> subsection under
+C<DESCRIPTION>.
 
 =head1 INTERNAL COMMANDS
 
@@ -2334,23 +2344,32 @@ methods, just like options set via the command line.
 
 =head1 ADDING USAGE TO YOUR SCRIPTS
 
-To provide built-in usage/help output, include a C<=head1 USAGE>
+To provide built-in usage/help output, include a C<=head1 SYNOPSIS>
 section in your script's POD:
 
-  =head1 USAGE
-
-    usage: myscript [options] command args
-
-    Options
-    -------
-    --help, -h      Display help
-    ...
+  =head1 SYNOPSIS
+  
+  ```
+  usage: myscript [options] command args
+  
+  Options
+  -------
+  --help, -h      Display help
+  ...
+  ```
 
 If the user supplies the command C<help>, or the C<--help> option,
-C<CLI::Simple> will display this section automatically:
+C<CLI::Simple> displays the configured help sections using
+L<Pod::Usage>.
 
-  perl myscript.pm --help
-  perl myscript.pm help
+For backward compatibility, C<USAGE> is also supported. If a C<USAGE>
+section is present, it is used as the usage section.
+
+If no C<USAGE> section is present, C<SYNOPSIS> is used instead.
+
+When both C<SYNOPSIS> and C<USAGE> are present, C<USAGE> is used by
+default. Applications that explicitly configure C<help_sections> may
+select the desired section.
 
 =head2 Custom help() Method
 
@@ -2358,14 +2377,12 @@ If you need full control over the help output, you can define a custom
 C<help> method and assign it as a command:
 
   commands => {
-    help => \&help,
+    help => &help,
     ...
-  }
+  };
 
-This is useful if your module follows the modulino pattern and you
-want to present usage information that differs from the embedded
-POD. Without a custom handler, C<CLI::Simple> defaults to displaying the
-C<USAGE> POD section.
+This is useful if your module follows the modulino pattern and you want
+to present help information that differs from the embedded POD.
 
 =head1 ADDING ADDITIONAL SETTERS
 

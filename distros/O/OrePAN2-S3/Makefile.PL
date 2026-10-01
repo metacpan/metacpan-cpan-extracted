@@ -30,12 +30,9 @@ WriteMakefile(
       'Amazon::Credentials' => '1.3.0',
       'Amazon::S3::Lite' => '1.2.3',
       'CLI::Simple' => '2.2.2',
-      'CLI::Simple::Constants' => '2.2.2',
-      'CLI::Simple::Utils' => '2.2.2',
       'CPAN::Meta' => '2.150010',
       'DarkPAN::Indexer' => '1.0.2',
       'DarkPAN::Utils' => '1.1.0',
-      'DarkPAN::Utils::Docs' => '1.1.0',
       'Data::UUID' => '1.227',
       'File::ShareDir' => '1.118',
       'JSON' => '4.10',
@@ -44,7 +41,6 @@ WriteMakefile(
       'OrePAN2::Lite' => '2.0.0',
       'Readonly' => '2.05',
       'Role::Tiny' => '2.002004',
-      'Role::Tiny::With' => '2.002004',
       'Template' => '3.102',
       'Text::Markdown::Discount' => '0.18'
     },
@@ -74,7 +70,7 @@ WriteMakefile(
       'provides'=>{
                       'OrePAN2::S3'=>{
                                          'file'=>'lib/OrePAN2/S3.pm',
-                                         'version'=>'2.1.1'
+                                         'version'=>'2.1.2'
                                        },
                       'OrePAN2::S3::Indexer'=>{
                                                   'file'=>'lib/OrePAN2/S3/Indexer.pm',
@@ -86,7 +82,7 @@ WriteMakefile(
                                                      },
                       'OrePAN2::S3::Role::Inject'=>{
                                                        'file'=>'lib/OrePAN2/S3/Role/Inject.pm',
-                                                       'version'=>'2.1.1'
+                                                       'version'=>'2.1.2'
                                                      },
                       'OrePAN2::S3::Role::Upload'=>{
                                                        'file'=>'lib/OrePAN2/S3/Role/Upload.pm',

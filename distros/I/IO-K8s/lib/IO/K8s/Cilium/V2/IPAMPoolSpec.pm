@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::IPAMPoolSpec;
 # ABSTRACT: Pools contains the list of assigned IPAM pools for this node.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s allocated => ['+IO::K8s::Cilium::V2::IPAMPoolAllocation'];
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::IPAMPoolSpec - Pools contains the list of assigned IPAM poo
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 allocated
 

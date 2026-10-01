@@ -1,7 +1,7 @@
 # ABSTRACT: Show and break task pick locks
 
 package App::karr::Cmd::Unlock;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -124,7 +124,7 @@ App::karr::Cmd::Unlock - Show and break task pick locks
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 

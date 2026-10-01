@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::KeyToPath;
 # ABSTRACT: Maps a string key to a path within a volume.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s key => Str, 'required';
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::KeyToPath - Maps a string key to a path within a volume.
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 key
 

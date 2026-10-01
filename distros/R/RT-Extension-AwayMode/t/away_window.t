@@ -1,4 +1,5 @@
-use v5.36;
+use v5.20;
+use warnings;
 use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/../lib";

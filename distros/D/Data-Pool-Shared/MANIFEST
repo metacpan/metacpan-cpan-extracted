@@ -39,6 +39,7 @@ xt/atomic_alignment.t
 xt/bitflip_corruption.t
 xt/cgroup_memory.t
 xt/chaos_monkey.t
+xt/claim_kill_gdb.t
 xt/cloexec.t
 xt/cloexec_exec.t
 xt/crash_recovery.t
@@ -47,6 +48,7 @@ xt/destroy_during_call.t
 xt/double_init_race.t
 xt/eg_runs.t
 xt/endurance_leak.t
+xt/enospc.t
 xt/false_sharing.t
 xt/fd_leak.t
 xt/fd_validation.t

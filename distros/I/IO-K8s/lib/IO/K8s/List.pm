@@ -1,13 +1,23 @@
 package IO::K8s::List;
 # ABSTRACT: Generic list container for Kubernetes API responses
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use v5.10;
 use Moo;
 with 'IO::K8s::Role::Resource';
+use Carp ();
 use Module::Runtime ();
 use Types::Standard qw( Str );
 use JSON::MaybeXS ();
 use Scalar::Util ();
+
+# Carp treats IO::K8s as part of this module (k170), the way IO::K8s::CRD
+# does (k165): FROM_STRUCT's own croak reached through IO::K8s->inflate
+# names the line that called inflate, not the FROM_STRUCT call in
+# lib/IO/K8s.pm, and a croak of the IO::K8s shape helpers FROM_STRUCT calls
+# -- and a constructor error for an item, which IO::K8s moves to Carp's
+# answer (k164) -- names the caller of inflate, FROM_STRUCT or from_json,
+# not this file. A caller in any other package still sees its own line.
+our @CARP_NOT = ('IO::K8s');
 
 
 has items => (
@@ -125,6 +135,15 @@ sub FROM_STRUCT {
 
     $k8s //= do { require IO::K8s; IO::K8s->new };
 
+    # The envelope, `items` and each item are refused in the message form
+    # every other inflation uses (k146, k154), through IO::K8s's own
+    # helpers so the wording cannot drift (k161). They used to reach a bare
+    # Perl dereference: "Not a HASH reference" for a struct that is no hash,
+    # "Can't use string as an ARRAY ref" for items => 'x'. undef stays "no
+    # value" -- an empty list, like a missing `items`.
+    $k8s->_refuse_object_shape($class, $k8s->_describe_shape($struct))
+        if defined $struct && ref $struct ne 'HASH';
+
     my $kind        = $struct->{kind};
     my $api_version = $struct->{apiVersion};
 
@@ -133,6 +152,17 @@ sub FROM_STRUCT {
     # hand-built list. Same '+' handling as everywhere else (k49).
     my $resolved_item_class;
     if (defined(my $override = $struct->{item_class})) {
+        # A class name and nothing else (k166). A reference used to reach
+        # Module::Runtime ("argument is not a module name") with items, or
+        # the attribute's Maybe[Str] check without; '' or a bare '+' died
+        # "`' is not a module name" with items and was kept silently without.
+        # Carp qualified, not imported: no croak method on a resource class
+        # (k118, t/27_no_import_leak.t).
+        Carp::croak($class.'->FROM_STRUCT: item_class must be a class name, got '
+            .(ref $override    ? $k8s->_describe_shape($override)
+            : $override eq '' ? 'an empty string'
+            :                   "a bare '+'"))
+            if ref $override || $override eq '' || $override eq '+';
         $override =~ s/\A\+//;
         $resolved_item_class = $override;
     }
@@ -150,18 +180,26 @@ sub FROM_STRUCT {
         # pre-expanded path so it is not re-interpreted by expand_class()
         # (k35), same reasoning IO::K8s::_inflate_struct applies to
         # every nested object it inflates.
-        $metadata = $k8s->_struct_to_object_expanded($LIST_META, $meta_struct);
+        $metadata = $k8s->_struct_to_object_expanded($LIST_META, $meta_struct,
+            $class.' field metadata');
     }
 
+    my $items = $struct->{items} // [];
+    $k8s->_refuse_container_shape($class, 'items', 'ARRAY', $resolved_item_class, $items)
+        unless ref $items eq 'ARRAY';
+
     my @items;
-    for my $item_struct (@{ $struct->{items} // [] }) {
+    for my $i (0 .. $#$items) {
         die "Cannot inflate item in List payload: kind '"
             . (defined $kind ? $kind : '<undef>')
             . "' has no derivable item type and no 'item_class' override was given\n"
             unless defined $resolved_item_class;
         # Already resolved above (via expand_class() or the override) --
-        # the pre-expanded path, for the same k35 reason as metadata.
-        push @items, $k8s->_struct_to_object_expanded($resolved_item_class, $item_struct);
+        # the pre-expanded path, for the same k35 reason as metadata. The
+        # third argument names the element for a shape error, worded like
+        # IO::K8s::_inflate_struct names an element of an object array.
+        push @items, $k8s->_struct_to_object_expanded($resolved_item_class, $items->[$i],
+            $class.' field items at element '.$i);
     }
 
     # Any top-level key besides the ones this envelope itself understands
@@ -248,7 +286,7 @@ IO::K8s::List - Generic list container for Kubernetes API responses
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -290,7 +328,7 @@ Accepted only as a fully-qualified class name, exactly like every other
 class-name-taking parameter in this distribution: a leading C<+> is
 stripped before use ("this is already a full class name"), and a short or
 partially-qualified name is not guessed at -- L</kind> and L</api_version>
-simply have nothing to derive from it (k49).
+simply have nothing to derive from it.
 
 =head2 api_version
 
@@ -302,7 +340,7 @@ Returns the Kubernetes kind (e.g., "PodList"), derived from items or item_class.
 For an C<item_class> the Kind is its last C<::> segment, or the whole name for
 a single-segment class such as a CRD registered as C<+Widget> -- but only when
 L</api_version> can also resolve for the same item_class; otherwise C<undef>,
-never a Kind with no apiVersion to go with it (k49).
+never a Kind with no apiVersion to go with it.
 
 =head2 FROM_STRUCT
 
@@ -322,10 +360,38 @@ derive one" meaning it already has for an empty list built directly via
 C<new>. It is the only way to inflate a bare C<kind: List> payload, whose
 Kind minus its C<List> suffix is empty and so derives nothing on its own.
 
-Fails closed (k39/k46): an item Kind that cannot be resolved to a
+C<item_class> must be a class name. A reference -- plain or blessed,
+a JSON boolean included -- or an empty class name, C<''> or a bare C<+>,
+dies naming this class, the argument and what it received, whether the list
+has items or not:
+
+    IO::K8s::List->FROM_STRUCT: item_class must be a class name, got a reference of type HASH
+    IO::K8s::List->FROM_STRUCT: item_class must be a class name, got an empty string
+
+An C<undef> C<item_class> is no override: the item type is derived as if the
+key were absent.
+
+Fails closed: an item Kind that cannot be resolved to a
 class dies with the same "Cannot resolve Kubernetes GVK" error every other
 entry point in this distribution uses, naming the ITEM's kind/apiVersion,
 never a silently empty or half-inflated list.
+
+The wrong shape fails closed in the message form of L<IO::K8s/new_object>:
+a C<$struct> that is not a hash dies naming this class, C<items>
+that is not an array dies naming the field, the item class and what it
+received, and an item or C<metadata> that is not a hash dies naming the
+field -- and for an item its index -- it sits at:
+
+    Cannot inflate IO::K8s::List field items: expected an array (a JSON array) of IO::K8s::Api::Core::V1::Pod, got a plain scalar
+    Cannot inflate IO::K8s::Api::Core::V1::Pod: expected a hash (a JSON object), got a plain scalar while inflating IO::K8s::List field items at element 1
+
+A C<$struct> of C<undef>, and C<items> missing or C<undef>, still give an
+empty list.
+
+The C<item_class> and shape errors above, and an error an item's
+constructor raises (a missing required field, a value of the wrong type),
+name the line that called L<IO::K8s/inflate>, C<FROM_STRUCT> or
+L</from_json>, not a line inside the distribution.
 
 =head2 TO_JSON
 
@@ -343,8 +409,8 @@ through its JSON encoder.
     my $json_bytes = $list->to_json;
 
 Serializes the List to a canonical JSON document as a B<UTF-8 encoded byte
-string> -- the same convention every L<IO::K8s::Role::Resource> class uses
-(k53), and the input L</from_json> reads back (k64).
+string> -- the same convention every L<IO::K8s::Role::Resource> class uses,
+and the input L</from_json> reads back.
 
 =head2 from_json
 
@@ -359,7 +425,7 @@ second argument when the item types must resolve through that instance's
 providers or C<class_namespaces>; without one a shared default instance is
 used, as FROM_STRUCT does.
 
-List composes L<IO::K8s::Role::Resource> (since k99) so its top-level
+List composes L<IO::K8s::Role::Resource> (since 1.108) so its top-level
 envelope gets the same C<_unknown_fields> bag and C<strict> handling as
 every other resource, but it is a container, not an API object with its
 own GVK, so C<to_json>/C<from_json>/C<TO_JSON>/C<FROM_STRUCT> stay

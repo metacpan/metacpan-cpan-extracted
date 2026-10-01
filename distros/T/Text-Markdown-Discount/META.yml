@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,14 +26,14 @@ no_index:
 provides:
   Text::Markdown::Discount:
     file: lib/Text/Markdown/Discount.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/Songmu/text-markdown-discount/issues
   homepage: https://github.com/Songmu/text-markdown-discount
   repository: https://github.com/Songmu/text-markdown-discount.git
-version: '0.18'
+version: '0.19'
 x_contributors:
   - 'Alessandro Ghedini <al3xbio@gmail.com>'
   - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
@@ -55,5 +55,5 @@ x_contributors:
   - 'hitode909 <hitode909@gmail.com>'
   - 'tokuhirom <tokuhirom@gmail.com>'
   - 'utagawa kiki <utagawakiki@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 0

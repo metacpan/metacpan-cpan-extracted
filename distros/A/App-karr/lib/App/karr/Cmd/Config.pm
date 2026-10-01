@@ -1,7 +1,7 @@
 # ABSTRACT: View or modify board configuration
 
 package App::karr::Cmd::Config;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -307,7 +307,7 @@ App::karr::Cmd::Config - View or modify board configuration
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 

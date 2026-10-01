@@ -1,7 +1,7 @@
 package Data::PubSub::Shared::Int16;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use Data::PubSub::Shared ();
 1;
 

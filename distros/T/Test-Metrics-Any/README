@@ -32,7 +32,7 @@ FUNCTIONS
 
  is_metrics
 
-       is_metrics( \%metrics, $name )
+       is_metrics( \%metrics, $name );
 
     Asserts that the current value of every metric named in the given hash
     reference is set to the value provided. Values can either be given as
@@ -56,7 +56,7 @@ FUNCTIONS
 
  is_metrics_from
 
-       is_metrics_from( $code, \%metrics, $name )
+       is_metrics_from( $code, \%metrics, $name );
 
     Asserts the value of metrics reported by running the given piece of
     code.

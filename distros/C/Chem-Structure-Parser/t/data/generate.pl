@@ -4495,6 +4495,41 @@ for my $r (map { $iface_res[$_] }
 push @iface, 'END';
 
 
+# --- numbering.pdb -- residue and serial numbers past the decimal columns -----
+#
+# A residue number has four columns and a serial five, and a structure with more
+# than 9,999 residues in a chain or 99,999 atoms has to write the next one
+# somehow.  cctbx, phenix and gemmi write it in hybrid-36 (Grosse-Kunstleve,
+# https://cci.lbl.gov/hybrid_36/): decimal to the end of the field's range, then
+# base-36 digits that begin with an upper-case letter, then with a lower-case
+# one.  Chain W runs across the first boundary -- 9999 then A000, which is
+# 10000 -- with the serials crossing 99999 into A0000 at the same time.  gemmi
+# 0.7.5 reads them as 10000, 10001 and 100000; t/data/oracle.txt is its answer.
+#
+# The lower-case half is not here, because gemmi reads it wrongly: it decodes
+# base 36 without regard to case, so 'a000' comes back 10000, the same number
+# as 'A000', where the encoding's reference makes it 1223056.  t/foreign.t
+# holds that half to the reference instead.
+#
+# Chain Y is the other way a number can fail to be one: a water numbered 0 and
+# a water with no number at all, which are two residues and not one.
+my @numbering;
+{
+	my @w = ([ 'W', '9999', '99998' ], [ 'W', 'A000', '99999' ], [ 'W', 'A001', 'A0000' ],
+	         [ 'Y', '0', '6' ], [ 'Y', '', '7' ]);
+	my $k = 0;
+	for my $r (@w) {
+		my ($chain, $resseq, $ser) = @$r;
+		push @numbering, cols(1, 6, 'HETATM', 7, 5, $ser, 'R', 13, 4, ' O', 18, 3, 'HOH',
+		                      22, 1, $chain, 23, 4, $resseq, 'R',
+		                      31, 8, sprintf('%.3f', 3.5 * $k), 'R', 39, 8, '1.000', 'R',
+		                      47, 8, '2.000', 'R', 55, 6, '1.00', 'R', 61, 6, '20.00', 'R',
+		                      77, 2, 'O', 'R');
+		$k++;
+	}
+	push @numbering, 'END';
+}
+
 # --- the mmCIF twins ------------------------------------------------------
 #
 # The same structures, written the other way.  The coordinates are converted
@@ -4540,12 +4575,12 @@ sub atom_site_loop {
 		next unless $l =~ /\A(ATOM  |HETATM)/;
 		my %a = (
 			group   => ($1 eq 'ATOM  ' ? 'ATOM' : 'HETATM'),
-			serial  => _t(substr($l, 6, 5)),
+			serial  => _hy36(_t(substr($l, 6, 5)), 5),
 			name    => _t(substr($l, 12, 4)),
 			altloc  => _t(substr($l, 16, 1)),
 			resname => _t(substr($l, 17, 3)),
 			chain   => _t(substr($l, 21, 1)),
-			resseq  => _t(substr($l, 22, 4)),
+			resseq  => _hy36(_t(substr($l, 22, 4)), 4),
 			icode   => _t(substr($l, 26, 1)),
 			x       => _t(substr($l, 30, 8)),
 			y       => _t(substr($l, 38, 8)),
@@ -4598,6 +4633,22 @@ sub atom_site_loop {
 		push @out, join ' ', map { ($_ eq '.' || $_ eq '?') ? $_ : cifq($_) } @{$r}[@keep];
 	}
 	return @out;
+}
+
+# _hy36($field, $width) -- a PDB number field as the integer it stands for,
+# decoding hybrid-36 (see numbering.pdb above) and leaving decimal and blank
+# alone.  An mmCIF number has no width to run out of, so the twin writes 10000
+# where the PDB record had to write A000.  The arithmetic is hy36decode() of
+# https://cci.lbl.gov/hybrid_36/ hybrid_36_c.c.
+sub _hy36 {
+	my ($f, $w) = @_;
+	return $f unless $f =~ /\A(?:[A-Z][0-9A-Z]*|[a-z][0-9a-z]*)\z/ && length $f == $w;
+	my $v = 0;
+	for my $c (split //, uc $f) {
+		$v = $v * 36 + ($c =~ /\d/ ? $c : ord($c) - ord('A') + 10);
+	}
+	return $f =~ /\A[A-Z]/ ? $v - 10 * 36 ** ($w - 1) + 10 ** $w
+	                       : $v + 16 * 36 ** ($w - 1) + 10 ** $w;
 }
 
 sub _t { my $s = shift; return '' unless defined $s; $s =~ s/\A\s+//; $s =~ s/\s+\z//; return $s }
@@ -4776,6 +4827,7 @@ my @sscif    = ('data_9SSB', '#', atom_site_loop(\@ss), '#');
 my @foldcif  = ('data_9FLD', '#', atom_site_loop(\@fold), '#');
 my @sheetcif = ('data_9SHT', '#', atom_site_loop(\@sheet), '#');
 my @ifacecif = ('data_9IFC', '#', atom_site_loop(\@iface), '#');
+my @numberingcif = ('data_9NUM', '#', atom_site_loop(\@numbering), '#');
 
 # quirks.cif -- everything about the way the format is written down that a
 # reader has to get right, in one file: comments in every position, both kinds
@@ -4848,6 +4900,7 @@ for my $f ([ 'mini.pdb', \@mini ], [ 'nmr.pdb', \@nmr ], [ 'bare.pdb', \@bare ],
            [ 'fold.pdb', \@fold ], [ 'fold.cif', \@foldcif ],
            [ 'sheet.pdb', \@sheet ], [ 'sheet.cif', \@sheetcif ],
            [ 'iface.pdb', \@iface ], [ 'iface.cif', \@ifacecif ],
+           [ 'numbering.pdb', \@numbering ], [ 'numbering.cif', \@numberingcif ],
            [ 'ensemble.pdb', \@ensemble ], [ 'ensemble.cif', \@enscif ],
            [ 'quirks.cif', \@quirks ]) {
 	open my $fh, '>', $f->[0];

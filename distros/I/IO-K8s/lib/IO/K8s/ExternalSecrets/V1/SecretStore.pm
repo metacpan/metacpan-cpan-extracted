@@ -1,9 +1,10 @@
 package IO::K8s::ExternalSecrets::V1::SecretStore;
 # ABSTRACT: SecretStore represents a secure external location for storing secrets, which can be referenced as part of `storeRef` fields.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'external-secrets.io/v1',
-    resource_plural => 'secretstores';
+    resource_plural => 'secretstores',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => '+IO::K8s::ExternalSecrets::V1::SecretStoreSpec';
@@ -25,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::SecretStore - SecretStore represents a secure exte
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

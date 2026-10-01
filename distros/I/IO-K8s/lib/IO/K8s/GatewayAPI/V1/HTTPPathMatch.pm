@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::HTTPPathMatch;
 # ABSTRACT: Path specifies a HTTP request path matcher.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s type  => Str, { enum => [qw(Exact PathPrefix RegularExpression)], default => 'PathPrefix' };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::HTTPPathMatch - Path specifies a HTTP request path matc
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 type
 

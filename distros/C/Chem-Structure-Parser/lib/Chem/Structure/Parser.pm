@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Chem::Structure::Parser;
-our $VERSION = 0.035;
+our $VERSION = 0.036;
 require XSLoader;
 use warnings FATAL => 'all';
 # No `use autodie': it would ask every installer for a prerequisite in order to
@@ -1231,8 +1231,13 @@ sub _partners {
 	# caps, and a drug that only shares the chain's letter is not.  Bonded is
 	# gemmi's test, as _bonded() applies it, asked of each such residue and the
 	# residues either side of it in the chain until nothing more joins.
+	#
+	# Worked out once per chain and kept: the split below asks it of the same
+	# chain several times over, each time walking the chain and testing bonds.
+	my %polymer_of;
 	my $polymer = sub {
 		my ($cid) = @_;
+		return $polymer_of{$cid} if $polymer_of{$cid};
 		my $c = $chains->{$cid};
 		my @res = map { $c->{residues}{$_} } @{ $c->{residue_order} };
 		my @in = map { $poly_type{ $_->{type} || '' } ? 1 : 0 } @res;
@@ -1246,7 +1251,7 @@ sub _partners {
 				$in[$k] = $grew = 1;
 			}
 		}
-		return [ map { $res[$_] } grep { $in[$_] } 0 .. $#res ];
+		return $polymer_of{$cid} = [ map { $res[$_] } grep { $in[$_] } 0 .. $#res ];
 	};
 	my (@names, @res);
 	if (defined $spec) {
@@ -3865,6 +3870,14 @@ By residue number with the insertion code appended, so C<100>, C<100A> and
 C<100B> are three separate keys and nothing is silently overwritten. Waters and
 ligands are in C<residues> alongside the polymer, which is why chain A above
 has 206 residues to its 191-long SEQRES.
+
+A number too big for its columns is read the way cctbx, phenix and gemmi write
+it, in L<hybrid-36|https://cci.lbl.gov/hybrid_36/>: a residue numbered C<A000>
+in a PDB file is residue C<10000>, and an atom serial of C<A0000> is C<100000>,
+so a chain past 9,999 residues reads the same from a PDB file as from its
+mmCIF. A residue whose number field is blank, or is not a number in either
+spelling, has an C<undef> number and the empty key C<''>; it is still a residue
+of its own and not part of the one before it.
 
 The name is not part of a residue's identity. One position is sometimes
 modelled in two chemical states at once, written as complementary altloc
@@ -6593,3 +6606,7 @@ David E. Condon L<mailto:dec986@gmail.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 Thanks
+
+Most of this was done with the help of Claude models, which was paid for by the University of Idaho's IMCI.

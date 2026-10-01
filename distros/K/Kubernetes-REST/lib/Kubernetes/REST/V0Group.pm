@@ -1,12 +1,23 @@
 package Kubernetes::REST::V0Group;
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 # ABSTRACT: Base class for backwards-compatible v0 API group wrappers
 use Moo;
 use Carp qw(croak carp);
+use IO::K8s ();
 
 has api => (is => 'ro', required => 1);
 has group => (is => 'ro', required => 1);
 has version => (is => 'ro', default => sub { 'v1' });
+
+# Kinds whose own name ends in Status - ComponentStatus is the only built-in
+# one. _parse_method's non-greedy resource capture would otherwise read
+# ListComponentStatus as the Kind Component plus a Status subresource suffix
+# and die loading a non-existent IO::K8s::Api::Core::V1::Component. Built once
+# from what the installed IO::K8s ships (bare Kind names, not the versioned
+# aliases), so a future Status-named Kind is handled too (karr k66).
+my %STATUS_KIND = map { $_ => 1 }
+    grep { /Status\z/ && !m{/} }
+    keys %{ IO::K8s->default_resource_map };
 
 # ============================================================================
 # BACKWARDS COMPATIBILITY LAYER (v0 API → v1 API)
@@ -35,6 +46,13 @@ has version => (is => 'ro', default => sub { 'v1' });
 
 our $AUTOLOAD;
 
+# AUTOLOAD dispatches to list/get/update/... in Kubernetes::REST, so an
+# APIError thrown there - or a plain croak - has this layer's frames between
+# it and the caller. Trust Kubernetes::REST so Carp's bidirectional check
+# walks past both packages and blames the code that made the v0 call, not
+# V0Group.pm; the object model's own errors are unaffected (karr k67).
+our @CARP_NOT = ('Kubernetes::REST');
+
 sub AUTOLOAD {
     my ($self, @args) = @_;
     my $method = $AUTOLOAD;
@@ -43,7 +61,7 @@ sub AUTOLOAD {
     return if $method eq 'DESTROY';
 
     # Parse method name: ListNamespacedPod, ReadNamespacedPod, CreateNamespacedPod, etc.
-    my ($action, $namespaced, $resource) = _parse_method($method);
+    my ($action, $namespaced, $resource, $status) = _parse_method($method);
 
     unless ($action && $resource) {
         croak "Unknown method: $method";
@@ -55,21 +73,36 @@ sub AUTOLOAD {
     # Convert args to hash if needed
     my %params = @args == 1 && ref($args[0]) eq 'HASH' ? %{$args[0]} : @args;
 
+    # Read*Status reads the status subresource, not the object itself (karr
+    # k62); get takes it since k58. Set here, the warning names it too.
+    $params{subresource} = 'status' if $status && $action eq 'read';
+
     # Show deprecation warning
-    $self->_warn_deprecated($method, $action, $class, \%params);
+    $self->_warn_deprecated($method, $action, $class, \%params, $status);
 
     # Call new API
-    return $self->_dispatch($action, $class, \%params);
+    return $self->_dispatch($action, $class, \%params, $status);
 }
 
 sub _parse_method {
     my ($method) = @_;
 
-    # Patterns: List/Read/Create/Replace/Patch/Delete/Watch + Namespaced? + Resource + ForAllNamespaces?
+    # Patterns: List/Read/Create/Replace/Patch/Delete/Watch + Namespaced? + Resource + ForAllNamespaces|Status?
+    # The fourth value says whether the name ends in Status.
     if ($method =~ /^(List|Read|Create|Replace|Patch|Delete|Watch)(Namespaced)?(\w+?)(ForAllNamespaces|Status)?$/) {
         my ($action, $namespaced, $resource, $suffix) = ($1, $2, $3, $4);
+
+        # A Kind that itself ends in Status (ComponentStatus) is one whole
+        # resource, not a shorter Kind plus a Status subresource: the
+        # non-greedy capture split it, so put the suffix back (karr k66).
+        if ($suffix && $suffix eq 'Status' && $STATUS_KIND{$resource . $suffix}) {
+            $resource .= $suffix;
+            $suffix = undef;
+        }
+
         $namespaced = 0 if $suffix && $suffix eq 'ForAllNamespaces';
-        return (lc($action), $namespaced ? 1 : 0, $resource);
+        return (lc($action), $namespaced ? 1 : 0, $resource,
+            ($suffix && $suffix eq 'Status') ? 1 : 0);
     }
 
     return (undef, undef, undef);
@@ -98,7 +131,7 @@ sub _build_class {
 }
 
 sub _warn_deprecated {
-    my ($self, $method, $action, $class, $params) = @_;
+    my ($self, $method, $action, $class, $params, $status) = @_;
 
     return if $ENV{HIDE_KUBERNETES_REST_V0_API_WARNING};
 
@@ -110,17 +143,20 @@ sub _warn_deprecated {
         $new_call = "\$api->list('$class'$ns)";
     } elsif ($action eq 'read') {
         my $ns = $params->{namespace} ? ", namespace => '$params->{namespace}'" : '';
-        $new_call = "\$api->get('$class', name => '$params->{name}'$ns)";
+        my $sub = $params->{subresource} ? ", subresource => '$params->{subresource}'" : '';
+        $new_call = "\$api->get('$class', name => '$params->{name}'$ns$sub)";
     } elsif ($action eq 'create') {
         $new_call = "\$api->create(\$object)";
     } elsif ($action eq 'replace') {
-        $new_call = "\$api->update(\$object)";
+        $new_call = $status ? "\$api->update_status(\$object)"
+                            : "\$api->update(\$object)";
     } elsif ($action eq 'delete') {
         my $ns = $params->{namespace} ? ", namespace => '$params->{namespace}'" : '';
         $new_call = "\$api->delete('$class', name => '$params->{name}'$ns)";
     } elsif ($action eq 'patch') {
         my $ns = $params->{namespace} ? ", namespace => '$params->{namespace}'" : '';
-        $new_call = "\$api->patch('$class', name => '$params->{name}'$ns, patch => \\%patch)";
+        my $name = $status ? 'patch_status' : 'patch';
+        $new_call = "\$api->$name('$class', name => '$params->{name}'$ns, patch => \\%patch)";
     } elsif ($action eq 'watch') {
         my $ns = $params->{namespace} ? ", namespace => '$params->{namespace}'" : '';
         $new_call = "\$api->watch('$class'$ns, on_event => sub { ... })";
@@ -132,26 +168,53 @@ sub _warn_deprecated {
 }
 
 sub _dispatch {
-    my ($self, $action, $class, $params) = @_;
+    my ($self, $action, $class, $params, $status) = @_;
     my $api = $self->api;
 
     if ($action eq 'list') {
-        return $api->list($class, %$params);
+        # list, get and watch croak on arguments they do not take, as delete
+        # does (below). The v0 parameters they have no use for (limit,
+        # pretty, watch, timeoutSeconds, ...) were ignored all along; they
+        # stay ignored rather than break v0 callers. A List* name goes with
+        # them: it made the request a GET of one object, read as an empty
+        # list (karr k58).
+        my %args = map { exists $params->{$_} ? ($_ => $params->{$_}) : () }
+            qw(namespace labelSelector fieldSelector);
+        return $api->list($class, %args);
     } elsif ($action eq 'read') {
-        return $api->get($class, %$params);
+        my %args = map { exists $params->{$_} ? ($_ => $params->{$_}) : () }
+            qw(name namespace subresource);
+        return $api->get($class, %args);
     } elsif ($action eq 'create') {
         # For create, we need the body object
         my $body = $params->{body} // croak "create requires 'body' parameter";
         return $api->create($body);
     } elsif ($action eq 'replace') {
         my $body = $params->{body} // croak "replace requires 'body' parameter";
-        return $api->update($body);
+        # Replace*Status replaces through the /status subresource: a plain
+        # update writes the main endpoint, where the server drops the status
+        # and still answers 2xx, losing it silently (karr k65).
+        return $status ? $api->update_status($body) : $api->update($body);
     } elsif ($action eq 'delete') {
-        return $api->delete($class, %$params);
+        # delete croaks on arguments it does not take. The v0 parameters it
+        # has no use for (body, gracePeriodSeconds, dryRun, ...) were ignored
+        # all along; they stay ignored rather than break v0 callers.
+        my %args = map { exists $params->{$_} ? ($_ => $params->{$_}) : () }
+            qw(name namespace propagationPolicy);
+        return $api->delete($class, %args);
     } elsif ($action eq 'patch') {
-        return $api->patch($class, %$params);
+        # patch croaks on arguments it does not take (karr k61); the v0
+        # parameters it has no use for (pretty, dryRun, fieldManager, ...)
+        # stay ignored, as with delete above.
+        my %args = map { exists $params->{$_} ? ($_ => $params->{$_}) : () }
+            qw(name namespace patch type);
+        # Patch*Status patches through /status, for the same reason as
+        # Replace*Status above (karr k65).
+        return $status ? $api->patch_status($class, %args) : $api->patch($class, %args);
     } elsif ($action eq 'watch') {
-        return $api->watch($class, %$params);
+        my %args = map { exists $params->{$_} ? ($_ => $params->{$_}) : () }
+            qw(on_event timeout resourceVersion labelSelector fieldSelector namespace);
+        return $api->watch($class, %args);
     } else {
         croak "Unknown action: $action";
     }
@@ -181,7 +244,7 @@ Kubernetes::REST::V0Group - Base class for backwards-compatible v0 API group wra
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -205,10 +268,6 @@ C<$ENV{HIDE_KUBERNETES_REST_V0_API_WARNING}>.
 
 See L<Kubernetes::REST/"UPGRADING FROM 0.02"> for migration guide.
 
-=head1 NAME
-
-Kubernetes::REST::V0Group - Base class for backwards-compatible v0 API group wrappers
-
 =head1 METHODS
 
 This module uses C<AUTOLOAD> to intercept method calls like C<ListNamespacedPod>
@@ -218,19 +277,38 @@ and translates them to the new API. The following actions are supported:
 
 =item * List -> list()
 
-=item * Read -> get()
+=item * Read -> get(); a name ending in C<Status> (C<ReadNamespacedPodStatus>)
+reads the status subresource, C<< get(..., subresource => 'status') >>
 
 =item * Create -> create()
 
-=item * Replace -> update()
+=item * Replace -> update(); a name ending in C<Status>
+(C<ReplaceNamespacedPodStatus>) replaces through the status subresource,
+C<update_status()>
 
 =item * Delete -> delete()
 
-=item * Patch -> patch()
+=item * Patch -> patch(); a name ending in C<Status>
+(C<PatchNamespacedPodStatus>) patches through the status subresource,
+C<patch_status()>
 
 =item * Watch -> watch()
 
 =back
+
+List, Read, Watch, Delete and Patch pass on only the parameters the new
+method takes - C<namespace>, C<labelSelector> and C<fieldSelector>; C<name>,
+C<namespace> and C<subresource>; C<on_event>, C<timeout>,
+C<resourceVersion>, C<labelSelector>, C<fieldSelector> and C<namespace>;
+C<name>, C<namespace> and C<propagationPolicy>; C<name>, C<namespace>,
+C<patch> and C<type> - and ignore the others, which the new methods croak
+on.
+
+The trailing C<Status> is only a subresource suffix when the Kind before it is
+a real Kind. A Kind whose own name ends in C<Status> - C<ComponentStatus> is
+the only built-in one - is kept whole: C<ListComponentStatus> and
+C<ReadComponentStatus> resolve the C<ComponentStatus> Kind itself, not a
+C<Status> subresource of a C<Component>.
 
 =head1 SEE ALSO
 

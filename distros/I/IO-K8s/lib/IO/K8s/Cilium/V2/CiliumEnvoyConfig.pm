@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2::CiliumEnvoyConfig;
 # ABSTRACT: CiliumEnvoyConfig
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
-    resource_plural => 'ciliumenvoyconfigs';
+    resource_plural => 'ciliumenvoyconfigs',
+    subresources    => {};
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec => '+IO::K8s::Cilium::V2::CiliumEnvoyConfigSpec';
@@ -23,7 +24,7 @@ IO::K8s::Cilium::V2::CiliumEnvoyConfig - CiliumEnvoyConfig
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

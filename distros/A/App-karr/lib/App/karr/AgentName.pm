@@ -1,7 +1,7 @@
 # ABSTRACT: Derive a claim-safe agent name from a checkout directory
 
 package App::karr::AgentName;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use strict;
 use warnings;
 use Path::Tiny ();
@@ -61,7 +61,7 @@ App::karr::AgentName - Derive a claim-safe agent name from a checkout directory
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 

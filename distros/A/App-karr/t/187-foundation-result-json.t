@@ -48,8 +48,10 @@ sub seed_board {
     git => App::karr::Git->new( dir => "$repo" ) );
   for my $spec ( @specs ) {
     my $id = $store->allocate_next_id;
+    # todo, not backlog: the board has to hold open work, and backlog is held
+    # back and not actionable (ticket k306).
     $store->save_task( App::karr::Task->new(
-      id => $id, status => 'backlog', title => "task $id",
+      id => $id, status => 'todo', title => "task $id",
       ref $spec ? %$spec : ( title => $spec ) ) );
   }
 }

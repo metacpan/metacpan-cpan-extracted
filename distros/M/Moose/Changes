@@ -1,6 +1,13 @@
 Also see Moose::Manual::Delta for more details of, and workarounds
 for, noteworthy changes.
 
+2.4001   2026-10-01
+
+  [TESTS]
+
+  - adapted a test to changes in perl 5.45.4 regarding the line number
+    reported for particular errors (Richard Leach, #188)
+
 2.4000   2025-07-04
 
   [DOCUMENTATION]

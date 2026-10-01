@@ -17,135 +17,138 @@ name: Kubernetes-REST
 provides:
   Kubernetes::REST:
     file: lib/Kubernetes/REST.pm
-    version: '1.108'
+    version: '1.109'
+  Kubernetes::REST::APIError:
+    file: lib/Kubernetes/REST/APIError.pm
+    version: '1.109'
   Kubernetes::REST::Admissionregistration:
     file: lib/Kubernetes/REST/Admissionregistration.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Apiextensions:
     file: lib/Kubernetes/REST/Apiextensions.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Apiregistration:
     file: lib/Kubernetes/REST/Apiregistration.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Apps:
     file: lib/Kubernetes/REST/Apps.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::AuthToken:
     file: lib/Kubernetes/REST/AuthToken.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::AuthTokenFile:
     file: lib/Kubernetes/REST/AuthTokenFile.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Authentication:
     file: lib/Kubernetes/REST/Authentication.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Authorization:
     file: lib/Kubernetes/REST/Authorization.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Autoscaling:
     file: lib/Kubernetes/REST/Autoscaling.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Batch:
     file: lib/Kubernetes/REST/Batch.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::CLI:
     file: lib/Kubernetes/REST/CLI.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::CLI::Cmd::Create:
     file: lib/Kubernetes/REST/CLI/Cmd/Create.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::CLI::Cmd::Delete:
     file: lib/Kubernetes/REST/CLI/Cmd/Delete.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::CLI::Cmd::Get:
     file: lib/Kubernetes/REST/CLI/Cmd/Get.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::CLI::Cmd::Raw:
     file: lib/Kubernetes/REST/CLI/Cmd/Raw.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::CLI::Crd2Class:
     file: lib/Kubernetes/REST/CLI/Crd2Class.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::CLI::Minikube:
     file: lib/Kubernetes/REST/CLI/Minikube.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::CLI::Role::Connection:
     file: lib/Kubernetes/REST/CLI/Role/Connection.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::CLI::Watch:
     file: lib/Kubernetes/REST/CLI/Watch.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Certificates:
     file: lib/Kubernetes/REST/Certificates.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Coordination:
     file: lib/Kubernetes/REST/Coordination.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Core:
     file: lib/Kubernetes/REST/Core.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Error:
     file: lib/Kubernetes/REST/Error.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Events:
     file: lib/Kubernetes/REST/Events.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Example:
     file: lib/Kubernetes/REST/Example.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::HTTPRequest:
     file: lib/Kubernetes/REST/HTTPRequest.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::HTTPResponse:
     file: lib/Kubernetes/REST/HTTPResponse.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::HTTPTinyIO:
     file: lib/Kubernetes/REST/HTTPTinyIO.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Kubeconfig:
     file: lib/Kubernetes/REST/Kubeconfig.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::LWPIO:
     file: lib/Kubernetes/REST/LWPIO.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::LogEvent:
     file: lib/Kubernetes/REST/LogEvent.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Networking:
     file: lib/Kubernetes/REST/Networking.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Policy:
     file: lib/Kubernetes/REST/Policy.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::RbacAuthorization:
     file: lib/Kubernetes/REST/RbacAuthorization.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::RemoteError:
     file: lib/Kubernetes/REST/RemoteError.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Role::IO:
     file: lib/Kubernetes/REST/Role/IO.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Scheduling:
     file: lib/Kubernetes/REST/Scheduling.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Server:
     file: lib/Kubernetes/REST/Server.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::Storage:
     file: lib/Kubernetes/REST/Storage.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::V0Group:
     file: lib/Kubernetes/REST/V0Group.pm
-    version: '1.108'
+    version: '1.109'
   Kubernetes::REST::WatchEvent:
     file: lib/Kubernetes/REST/WatchEvent.pm
-    version: '1.108'
+    version: '1.109'
 recommends:
   HTTP::Tiny: '0'
   LWP::ConsoleLogger: '0'
 requires:
-  IO::K8s: '1.108'
+  IO::K8s: '1.109'
   IO::Socket::SSL: '0'
   JSON::MaybeXS: '0'
   LWP::UserAgent: '0'
@@ -164,7 +167,7 @@ resources:
   bugtracker: https://github.com/pplu/kubernetes-rest/issues
   homepage: https://github.com/pplu/kubernetes-rest
   repository: https://github.com/pplu/kubernetes-rest.git
-version: '1.108'
+version: '1.109'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -185,6 +188,10 @@ x_Dist_Zilla:
           include_untracked: 0
       name: '@Author::GETTY/Git::GatherDir'
       version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::GatherAgentContext
+      name: '@Author::GETTY/GatherAgentContext'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
@@ -398,8 +405,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -444,7 +451,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.108'
+          tag: '1.109'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -459,8 +466,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}

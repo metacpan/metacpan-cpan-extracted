@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEChallengeSolverDNS01;
 # ABSTRACT: Configures cert-manager to attempt to complete authorizations by performing the DNS01 challenge flow.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s acmeDNS       => '+IO::K8s::CertManager::V1::ACMEIssuerDNS01ProviderAcmeDNS';
@@ -38,7 +38,7 @@ IO::K8s::CertManager::V1::ACMEChallengeSolverDNS01 - Configures cert-manager to 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 acmeDNS
 

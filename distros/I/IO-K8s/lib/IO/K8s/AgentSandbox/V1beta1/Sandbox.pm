@@ -1,9 +1,10 @@
 package IO::K8s::AgentSandbox::V1beta1::Sandbox;
 # ABSTRACT: Sandbox
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'agents.x-k8s.io/v1beta1',
-    resource_plural => 'sandboxes';
+    resource_plural => 'sandboxes',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => '+IO::K8s::AgentSandbox::V1beta1::SandboxSpec', { required => 'schema' };
@@ -25,7 +26,7 @@ IO::K8s::AgentSandbox::V1beta1::Sandbox - Sandbox
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeGroupSnapshotContentSource;
 # ABSTRACT: VolumeGroupSnapshotContentSource represents the CSI source of a group snapshot
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s groupSnapshotHandles => '+IO::K8s::VolumeSnapshot::V1::GroupSnapshotHandles';
@@ -23,7 +23,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeGroupSnapshotContentSource - VolumeGroupSnaps
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 groupSnapshotHandles
 

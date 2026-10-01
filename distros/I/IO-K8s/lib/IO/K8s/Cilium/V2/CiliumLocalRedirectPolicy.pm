@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2::CiliumLocalRedirectPolicy;
 # ABSTRACT: CiliumLocalRedirectPolicy is a Kubernetes Custom Resource that contains a specification to redirect traffic locally within a node.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
-    resource_plural => 'ciliumlocalredirectpolicies';
+    resource_plural => 'ciliumlocalredirectpolicies',
+    subresources    => {};
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => '+IO::K8s::Cilium::V2::CiliumLocalRedirectPolicySpec';
@@ -25,7 +26,7 @@ IO::K8s::Cilium::V2::CiliumLocalRedirectPolicy - CiliumLocalRedirectPolicy is a 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

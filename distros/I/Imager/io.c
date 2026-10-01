@@ -1,3 +1,4 @@
+#define IMAGER_NO_CONTEXT
 #include "imager.h"
 #include "imageri.h"
 #include <stdlib.h>
@@ -5,288 +6,156 @@
 #include <unistd.h>
 #endif
 
+/*
+=item mymalloc(size)
+=category Memory Management
 
-/* FIXME: make allocation dynamic */
+Allocate a block of C<size> bytes of memory.
 
+exit()s on failure.
 
-#ifdef IMAGER_DEBUG_MALLOC
+Always uses im_get_context() to fetch the current Imager context.
 
-#define MAXMAL 102400
-#define MAXDESC 65
-
-#define UNDRRNVAL 10
-#define OVERRNVAL 10
-
-#define PADBYTE 0xaa
-
-
-static int malloc_need_init = 1;
-
-typedef struct {
-  void* ptr;
-  size_t size;
-  const char *file;
-  int line;
-} malloc_entry;
-
-malloc_entry malloc_pointers[MAXMAL];
-
-
-
-
-/* Utility functions */
-
-
-static
-void
-malloc_init(void) {
-  int i;
-  for(i=0; i<MAXMAL; i++) malloc_pointers[i].ptr = NULL;
-  malloc_need_init = 0;
-  atexit(malloc_state);
-}
-
-
-static
-int 
-find_ptr(void *p) {
-  int i;
-  for(i=0;i<MAXMAL;i++)
-    if (malloc_pointers[i].ptr == p)
-      return i;
-  return -1;
-}
-
-
-/* Takes a pointer to real start of array,
- * sets the entries in the table, returns
- * the offset corrected pointer */
-
-static
-void *
-set_entry(int i, char *buf, size_t size, char *file, int line) {
-  memset( buf, PADBYTE, UNDRRNVAL );
-  memset( &buf[UNDRRNVAL+size], PADBYTE, OVERRNVAL );
-  buf += UNDRRNVAL;
-  malloc_pointers[i].ptr  = buf;
-  malloc_pointers[i].size = size;
-  malloc_pointers[i].file = file;
-  malloc_pointers[i].line = line;
-  return buf;
-}
-
-void
-malloc_state(void) {
-  int i;
-  size_t total = 0;
-
-  i_clear_error();
-  mm_log((0,"malloc_state()\n"));
-  bndcheck_all();
-  for(i=0; i<MAXMAL; i++) if (malloc_pointers[i].ptr != NULL) {
-      mm_log((0,"%d: %lu (%p) : %s (%d)\n", i, (unsigned long)malloc_pointers[i].size, malloc_pointers[i].ptr, malloc_pointers[i].file, malloc_pointers[i].line));
-    total += malloc_pointers[i].size;
-  }
-  if (total == 0) mm_log((0,"No memory currently used!\n"))
-    else mm_log((0,"total: %lu\n", (unsigned long)total));
-}
-
-
-
-void*
-mymalloc_file_line(size_t size, char* file, int line) {
-  char *buf;
-  int i;
-  if (malloc_need_init) malloc_init();
-  
-  /* bndcheck_all(); Uncomment for LOTS OF THRASHING */
-  
-  if ( (i = find_ptr(NULL)) < 0 ) {
-    mm_log((0,"more than %d segments allocated at %s (%d)\n", MAXMAL, file, line));
-    exit(3);
-  }
-
-  if ( (buf = malloc(size+UNDRRNVAL+OVERRNVAL)) == NULL ) {
-    mm_log((1,"Unable to allocate %ld for %s (%i)\n", (long)size, file, line));
-    exit(3);
-  }
-  
-  buf = set_entry(i, buf, size, file, line);
-  mm_log((1,"mymalloc_file_line: slot <%d> %ld bytes allocated at %p for %s (%d)\n", i, (long)size, buf, file, line));
-  return buf;
-}
+=cut
+*/
 
 void *
-(mymalloc)(size_t size) {
-  return mymalloc_file_line(size, "unknown", 0);
-}
-
-void*
-myrealloc_file_line(void *ptr, size_t newsize, char* file, int line) {
-  char *buf;
-  int i;
-
-  if (malloc_need_init) malloc_init();
-  /* bndcheck_all(); ACTIVATE FOR LOTS OF THRASHING */
-  
-  if (!ptr) {
-    mm_log((1, "realloc called with ptr = NULL, sending request to malloc\n"));
-    return mymalloc_file_line(newsize, file, line);
-  }
-  
-  if (!newsize) {
-    mm_log((1, "newsize = 0, sending request to free\n"));
-    myfree_file_line(ptr, file, line);
-    return NULL;
-  }
-
-  if ( (i = find_ptr(ptr)) == -1) {
-    mm_log((0, "Unable to find %p in realloc for %s (%i)\n", ptr, file, line));
-    exit(3);
-  }
-  
-  if ( (buf = realloc(((char *)ptr)-UNDRRNVAL, UNDRRNVAL+OVERRNVAL+newsize)) == NULL ) {
-    mm_log((1,"Unable to reallocate %ld bytes at %p for %s (%i)\n", (long)
-	    newsize, ptr, file, line));
-    exit(3); 
-  }
-  
-  buf = set_entry(i, buf, newsize, file, line);
-  mm_log((1,"realloc_file_line: slot <%d> %ld bytes allocated at %p for %s (%d)\n", i, (long)newsize, buf, file, line));
-  return buf;
-}
-
-void *
-(myrealloc)(void *ptr, size_t newsize) {
-  return myrealloc_file_line(ptr, newsize, "unknown", 0);
-}
-
-static
-void
-bndcheck(int idx) {
-  int i;
-  size_t s = malloc_pointers[idx].size;
-  unsigned char *pp = malloc_pointers[idx].ptr;
-  if (!pp) {
-    mm_log((1, "bndcheck: No pointer in slot %d\n", idx));
-    return;
-  }
-  
-  for(i=0;i<UNDRRNVAL;i++) {
-    if (pp[-(1+i)] != PADBYTE)
-      mm_log((1,"bndcheck: UNDERRUN OF %d bytes detected: slot = %d, point = %p, size = %ld\n", i+1, idx, pp, (long)s ));
-  }
-  
-  for(i=0;i<OVERRNVAL;i++) {
-    if (pp[s+i] != PADBYTE)
-      mm_log((1,"bndcheck: OVERRUN OF %d bytes detected: slot = %d, point = %p, size = %ld\n", i+1, idx, pp, (long)s ));
-  }
-}
-
-void
-bndcheck_all() {
-  int idx;
-  mm_log((1, "bndcheck_all()\n"));
-  for(idx=0; idx<MAXMAL; idx++)
-    if (malloc_pointers[idx].ptr)
-      bndcheck(idx);
-}
-
-void
-myfree_file_line(void *p, char *file, int line) {
-  char  *pp = p;
-  int match = 0;
-  int i;
-
-  if (p == NULL)
-    return;
-  
-  for(i=0; i<MAXMAL; i++) if (malloc_pointers[i].ptr == p) {
-      mm_log((1,"myfree_file_line: pointer %i (%s (%d)) freed at %s (%i)\n", i, malloc_pointers[i].file, malloc_pointers[i].line, file, line));
-    bndcheck(i);
-    malloc_pointers[i].ptr = NULL;
-    match++;
-  }
-
-  mm_log((1, "myfree_file_line: freeing address %p (real %p)\n", pp, pp-UNDRRNVAL));
-  
-  if (match != 1) {
-    mm_log((1, "myfree_file_line: INCONSISTENT REFCOUNT %d at %s (%i)\n", match, file, line));
-    fprintf(stderr, "myfree_file_line: INCONSISTENT REFCOUNT %d at %s (%i)\n", match, file, line);
-		exit(255);
-  }
-  
-  
-  free(pp-UNDRRNVAL);
-}
-
-void
-(myfree)(void *block) {
-  myfree_file_line(block, "unknown", 0);
-}
-
-#else 
-
-void
-malloc_state() {
-}
-
-void*
 mymalloc(size_t size) {
+  dIMCTX;
+  return i_malloc(size);
+}
+
+/*
+=item im_malloc(aIMCTX, size)
+=category Memory Management
+X<i_malloc>
+
+Allocate a block of C<size> bytes of memory.
+
+exit()s on failure.
+
+Callable as C<i_malloc(size)>, and will use the local IMCTX under
+IMAGER_NO_CONTEXT.
+
+=cut
+*/
+
+void*
+im_malloc(pIMCTX, size_t size) {
   void *buf;
 
   if ( (buf = malloc(size)) == NULL ) {
-    mm_log((1, "mymalloc: unable to malloc %ld\n", (long)size));
-    fprintf(stderr,"Unable to malloc %ld.\n", (long)size); exit(3);
+    im_out_of_memory(aIMCTX, "mymalloc", size);
   }
-  mm_log((1, "mymalloc(size %ld) -> %p\n", (long)size, buf));
+  im_log((aIMCTX, 1, "mymalloc(size %ld) -> %p\n", (long)size, buf));
   return buf;
 }
 
-void *
-mymalloc_file_line(size_t size, char *file, int line) {
-  (void)file;
-  (void)line;
-  return mymalloc(size);
-}
+/*
+=item myfree(p)
+=category Memory Management
+
+Release the memory block C<p> points at.
+
+This is not suitable for memory allocated by perl itself.
+
+Always uses im_get_context() to fetch the current Imager context.
+
+=cut
+*/
 
 void
 myfree(void *p) {
-  mm_log((1, "myfree(p %p)\n", p));
+  dIMCTX;
+  i_free(p);
+}
+
+/*
+=item im_free(aIMCTX, p)
+=category Memory Management
+
+Release the memory block C<p> points at.
+
+This is not suitable for memory allocated by perl itself.
+
+Callable as i_free(p), and will use the local IMCTX under
+IMAGER_NO_CONTEXT.
+
+=cut
+*/
+
+void
+im_free(pIMCTX, void *p) {
+  im_log((aIMCTX, 1, "myfree(p %p)\n", p));
   free(p);
 }
 
-void
-myfree_file_line(void *p, char *file, int line) {
-  (void)file;
-  (void)line;
-  myfree(p);
-}
+/*
+=item myrealloc(p, size)
+=category Memory Management
+
+Resize the block C<p> to C<size> bytes of memory.
+
+exit()s on failure.
+
+Always uses im_get_context() to fetch the current Imager context.
+
+=cut
+*/
 
 void *
 myrealloc(void *block, size_t size) {
+  dIMCTX;
+  return i_realloc(block, size);
+}
+
+/*
+=item im_realloc(aIMCTX, p, size)
+=category Memory Management
+
+Resize the block C<p> to C<size> bytes of memory.
+
+exit()s on failure.
+
+Callable as C<i_realloc(p, size)>, and will use the local IMCTX under
+IMAGER_NO_CONTEXT.
+
+=cut
+*/
+
+void *
+im_realloc(pIMCTX, void *block, size_t size) {
   void *result;
 
-  mm_log((1, "myrealloc(block %p, size %ld)\n", block, (long)size));
+  im_log((aIMCTX, 1, "myrealloc(block %p, size %ld)\n", block, (long)size));
   if ((result = realloc(block, size)) == NULL) {
-    mm_log((1, "myrealloc: out of memory\n"));
-    fprintf(stderr, "Out of memory.\n");
-    exit(3);
+    im_out_of_memory(aIMCTX, "myrealloc", size);
   }
   return result;
 }
 
+/*
+=item im_malloc_fail(aIMCTX, size)
+=category Memory Management
+
+Allocate C<size> bytes of memory, returning NULL on failure.
+
+=cut
+*/
+
 void *
-myrealloc_file_line(void *block, size_t newsize, char *file, int line) {
-  (void)file;
-  (void)line;
-  return myrealloc(block, newsize);
+im_malloc_fail(pIMCTX, size_t size) {
+  void *buf;
+
+  if ( (buf = malloc(size)) == NULL ) {
+    im_log((aIMCTX, 1, "im_malloc_fail: unable to allocate %zu\n",
+            size));
+    return NULL;
+  }
+  im_log((aIMCTX, 1, "im_malloc_fail(size %zu) -> %p\n",
+          size, buf));
+  return buf;
 }
-
-#endif /* IMAGER_MALLOC_DEBUG */
-
-
-
 
 /* memory pool implementation */
 

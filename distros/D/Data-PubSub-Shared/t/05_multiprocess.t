@@ -101,7 +101,7 @@ use Data::PubSub::Shared;
     }
 
     waitpid($pid, 0);
-    is $? >> 8, 0, 'concurrent str publisher+subscriber: child got all 50';
+    is $?, 0, 'concurrent str publisher+subscriber: child got all 50';
     unlink $path;
 }
 

@@ -71,7 +71,8 @@ sub coords {
 #--------------------------------------------------------------------
 for my $pair ([ 'mini', 'one of everything' ],
               [ 'nmr',  'a three model ensemble' ],
-              [ 'bare', 'coordinates and nothing else' ]) {
+              [ 'bare', 'coordinates and nothing else' ],
+              [ 'numbering', 'residue and serial numbers past the decimal columns' ]) {
 	my ($stem, $what) = @$pair;
 	my $p = structure_info("$data/$stem.pdb");
 	my $c = structure_info("$data/$stem.cif");

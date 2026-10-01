@@ -1,7 +1,7 @@
 # ABSTRACT: List tasks with filtering and sorting
 
 package App::karr::Cmd::List;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -12,12 +12,13 @@ use App::karr::Role::Output;
 use App::karr::Role::CompactOutput;
 use App::karr::Board;
 # For --unclaimed, and for nothing else: claim_held is the claim test
-# App::karr::Role::PickRules/pickable applies, so the free cards this command
-# lists are the free cards `karr pick` hands out (ticket #252). The role is
-# composed rather than the predicate rewritten here, which is the whole point
-# of the option. The rest of what it brings -- check_claim and its reporting
-# half -- belongs to the mutating commands; `list` writes nothing and never
-# calls it.
+# App::karr::Role::PickRules/pickable applies, so this command and `karr pick`
+# cannot disagree about who holds a card (ticket #252). Only the claim test:
+# pick also refuses blocked and backlog cards, and --unclaimed lists them
+# (ticket k309). The role is composed rather than the predicate rewritten
+# here, which is the whole point of the option. The rest of what it brings --
+# check_claim and its reporting half -- belongs to the mutating commands;
+# `list` writes nothing and never calls it.
 use App::karr::Role::ClaimTimeout;
 use App::karr::Role::ClaimDefault;
 use App::karr::Task;
@@ -401,15 +402,16 @@ sub _filter {
   }
   # The claim test itself is App::karr::Role::ClaimTimeout/claim_held -- the
   # one App::karr::Role::PickRules/pickable applies -- so this list and `karr
-  # pick` cannot come to disagree about which cards are free (#59, #198, #252).
+  # pick` cannot come to disagree about who holds a card (#59, #198, #252).
   # One window for the whole run, read once here rather than per card: a
   # board-wide filter that re-read claim_timeout for every card could in
   # principle straddle a config change mid-list, and would certainly do the
   # parse N times.
   #
   # Claim only, as kanban-md's IsUnclaimed is: pickable goes on to exclude
-  # blocked and terminal cards, and neither is a statement about who holds the
-  # card. --blocked --unclaimed is a real triage query here, not an empty one.
+  # backlog, blocked and terminal cards, and none of them is a statement about
+  # who holds the card (k309). --blocked --unclaimed is a real triage query
+  # here, not an empty one.
   # The window was read once in execute and is passed in, so the filter and
   # the table's claim display cannot judge the same run against two timeouts.
   if ($self->unclaimed) {
@@ -562,7 +564,7 @@ App::karr::Cmd::List - List tasks with filtering and sorting
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -662,13 +664,15 @@ C<pick> answers it by B<taking> the card.
 
 The test is not a second reading of the field: this filter calls
 L<App::karr::Role::ClaimTimeout/claim_held>, the same method
-L<App::karr::Role::PickRules/pickable> calls, so a card C<list --unclaimed>
-shows is a card C<karr pick> can hand out. It asks about the claim and nothing
-else, matching kanban-md's C<IsUnclaimed>: blocked cards and cards with unmet
-dependencies are unpickable but not claimed, so they are still listed, and
-C<--blocked --unclaimed> is a real query rather than an empty one. On a board
-with C<claim_timeout: 0s> no claim ever expires, so there C<--unclaimed> means
-C<claimed_by> empty and nothing more.
+L<App::karr::Role::PickRules/pickable> calls, so C<list --unclaimed> and
+C<karr pick> cannot disagree about who holds a card. It asks about the claim
+and nothing else, matching kanban-md's C<IsUnclaimed>, so it is not "what pick
+would take": blocked cards and cards held back in C<backlog> are unpickable
+but not claimed, and they are still listed. C<--blocked --unclaimed> is
+therefore a real query rather than an empty one, and what C<karr pick> would
+take is C<--unclaimed --not-blocked> minus the C<backlog> column (ticket k309).
+On a board with C<claim_timeout: 0s> no claim ever expires, so there
+C<--unclaimed> means C<claimed_by> empty and nothing more.
 
 C<--unclaimed> is not the negation of C<--claimed-by>, which is where #237's
 reading of the pair went wrong. C<--claimed-by NAME> is an exact string match

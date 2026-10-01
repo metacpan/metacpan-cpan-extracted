@@ -114,7 +114,7 @@ im_img_double_new(pIMCTX, i_img_dim x, i_img_dim y, int ch) {
 
   im_log((aIMCTX, 1,"i_img_double_new(x %" i_DF ", y %" i_DF ", ch %d)\n",
 	  i_DFc(x), i_DFc(y), ch));
-
+  i_clear_error();
   if (x < 1 || y < 1) {
     im_push_error(aIMCTX, 0, "Image sizes must be positive");
     return NULL;
@@ -123,22 +123,32 @@ im_img_double_new(pIMCTX, i_img_dim x, i_img_dim y, int ch) {
     im_push_errorf(aIMCTX, 0, "channels must be between 1 and %d", MAXCHANNELS);
     return NULL;
   }
-  bytes = x * y * ch * sizeof(double);
-  if (bytes / y / ch / sizeof(double) != (size_t)x) {
+
+  if (im_mult_overflow4(&bytes, x, y, ch, sizeof(double))) {
     im_push_errorf(aIMCTX, 0, "integer overflow calculating image allocation");
     return NULL;
   }
   
   im = im_img_alloc(aIMCTX);
   *im = IIM_base_double_direct;
+  
+  im->idata = i_malloc_fail(bytes);
+  if (im->idata == NULL) {
+    /* can't i_img_destroy() until we've done i_img_init() */
+    i_free(im);
+
+    im_log((aIMCTX, 1, "i_img_double_new(): out of memory\n"));
+    i_push_error(0, "Out of memory allocating image surface");
+    return NULL;
+  }
+  memset(im->idata, 0, bytes);
+
   i_tags_new(&im->tags);
   im->xsize = x;
   im->ysize = y;
   im->channels = ch;
   im->bytes = bytes;
   im->ext_data = NULL;
-  im->idata = mymalloc(im->bytes);
-  memset(im->idata, 0, im->bytes);
   im_img_init(aIMCTX, im);
   
   return im;

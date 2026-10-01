@@ -10,19 +10,24 @@ use Test::More;
 #   'artifact' needs a version and dies without one, before touching the host.
 # - uname -m -> GOARCH mapping; artifact names/URLs per distribution and arch.
 # - checksum lookup/compare as pure functions; a mismatch dies.
-# - _fetch_artifacts downloads on the host (curl, no upload) and dies on a
+# - fetch_artifacts downloads on the host (curl, no upload) and dies on a
 #   failed download or a mismatching checksum.
-# - _verify_installed_version: pinned version vs `<bin> --version`.
-# - _wait_for_service: polls is-active; failed/timeout die with the journal.
+# - verify_installed_version: pinned version vs `<bin> --version`.
+# - wait_for_service: polls is-active; failed/timeout die with the journal.
+# (Methods of Rex::Rancher::Distribution, which Server and Agent share.)
 #
-# `run` and `sleep` never reach a host: `run` is replaced in both packages.
-# This proves decision logic and command strings, not a deploy.
+# `run` and `sleep` never reach a host: `run` is replaced in
+# Rex::Commands::Run, which Server and Agent import and Rex::Rancher::Distribution
+# calls. This proves decision logic and command strings, not a deploy.
 # -----------------------------------------------------------------------------
 
 use Rex::Rancher::Server;
 use Rex::Rancher::Agent;
+use Rex::Rancher::Distribution;
 
-my $S = 'Rex::Rancher::Server';
+my $D = 'Rex::Rancher::Distribution';
+sub dist { $D->new_for(@_) }
+sub agent { $D->new_for( $_[0], role => 'agent' ) }
 
 # Scripted fake remote: @script holds [ qr/cmd/, $output, $exit ] handlers,
 # first match wins; unmatched commands succeed silently. All commands recorded.
@@ -42,6 +47,7 @@ my $fake = sub {
 };
 {
   no warnings 'redefine';
+  *Rex::Commands::Run::run   = $fake;
   *Rex::Rancher::Server::run = $fake;
   *Rex::Rancher::Agent::run  = $fake;
 }
@@ -56,13 +62,13 @@ sub dies_like (&$$) {
 
 # ---- install_method --------------------------------------------------------
 
-subtest '_install_method' => sub {
-  is( $S->can('_install_method')->(undef, undef), 'script', 'default is script' );
-  is( $S->can('_install_method')->('script', undef), 'script', 'script without version' );
-  is( $S->can('_install_method')->('artifact', 'v1.30.4+rke2r1'), 'artifact', 'artifact with version' );
-  dies_like { $S->can('_install_method')->('artifact', undef) }
+subtest 'resolve_install_method' => sub {
+  is( $D->resolve_install_method(undef, undef), 'script', 'default is script' );
+  is( $D->resolve_install_method('script', undef), 'script', 'script without version' );
+  is( $D->resolve_install_method('artifact', 'v1.30.4+rke2r1'), 'artifact', 'artifact with version' );
+  dies_like { $D->resolve_install_method('artifact', undef) }
     qr/install_method 'artifact' requires a version/, 'artifact without version dies';
-  dies_like { $S->can('_install_method')->('rpm', 'v1') }
+  dies_like { $D->resolve_install_method('rpm', 'v1') }
     qr/Unknown install_method: rpm/, 'unknown method dies';
 };
 
@@ -83,18 +89,18 @@ subtest 'artifact without version dies before touching the host' => sub {
 };
 
 subtest 'script method: installer lines unchanged' => sub {
-  is( Rex::Rancher::Server::_rke2_server_install_cmd( Rex::Rancher::Server::_paths('rke2'), undef ),
+  is( dist('rke2')->script_install_cmd( undef, undef ),
     'curl -sfL https://get.rke2.io | sh -', 'rke2 server' );
-  is( Rex::Rancher::Agent::_installer_cmd( 'rke2', undef, 'https://cp1:9345' ),
+  is( agent('rke2')->script_install_cmd( 'https://cp1:9345', undef ),
     'curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE=agent sh -', 'rke2 agent' );
-  is( Rex::Rancher::Agent::_installer_cmd( 'k3s', undef, 'https://cp1:6443' ),
+  is( agent('k3s')->script_install_cmd( 'https://cp1:6443', undef ),
     'curl -sfL https://get.k3s.io | K3S_URL=https://cp1:6443 INSTALL_K3S_SKIP_START=true sh -s - agent',
     'k3s agent: the script does not start it (bounded start follows)' );
-  my $kp = Rex::Rancher::Server::_paths('k3s');
-  is( Rex::Rancher::Server::_k3s_server_install_cmd( $kp, undef, undef ),
+  my $kp = dist('k3s');
+  is( $kp->script_install_cmd( undef, undef ),
     'curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true sh -s - server --write-kubeconfig-mode=644',
     'k3s server: the script does not start it (bounded start follows)' );
-  is( Rex::Rancher::Server::_k3s_server_install_cmd( $kp, 'https://cp1:6443', 'v1.30.4+k3s1' ),
+  is( $kp->script_install_cmd( 'https://cp1:6443', 'v1.30.4+k3s1' ),
     'curl -sfL https://get.k3s.io | K3S_URL=https://cp1:6443 INSTALL_K3S_VERSION=v1.30.4+k3s1'
       . ' INSTALL_K3S_SKIP_START=true sh -s - server --write-kubeconfig-mode=644',
     'k3s server HA join: same' );
@@ -102,8 +108,8 @@ subtest 'script method: installer lines unchanged' => sub {
 
 # ---- arch ------------------------------------------------------------------
 
-subtest '_goarch' => sub {
-  my $g = $S->can('_goarch');
+subtest 'goarch' => sub {
+  my $g = sub { $D->goarch(@_) };
   is( $g->("x86_64\n"), 'amd64', 'x86_64 (with newline)' );
   is( $g->('amd64'),    'amd64', 'amd64' );
   is( $g->("aarch64\n"), 'arm64', 'aarch64' );
@@ -115,8 +121,8 @@ subtest '_goarch' => sub {
 
 # ---- artifact spec ---------------------------------------------------------
 
-subtest '_artifact_spec' => sub {
-  my $spec = $S->can('_artifact_spec');
+subtest 'artifact_spec' => sub {
+  my $spec = sub { my ( $dist, @a ) = @_; dist($dist)->artifact_spec(@a) };
   my %want = (
     'rke2 amd64' => [ 'rke2.linux-amd64.tar.gz', 'https://github.com/rancher/rke2/releases/download/v1.30.4%2Brke2r1', '/tmp/rke2-artifacts', 'https://get.rke2.io', 'v1.30.4+rke2r1' ],
     'rke2 arm64' => [ 'rke2.linux-arm64.tar.gz', 'https://github.com/rancher/rke2/releases/download/v1.30.4%2Brke2r1', '/tmp/rke2-artifacts', 'https://get.rke2.io', 'v1.30.4+rke2r1' ],
@@ -147,8 +153,8 @@ my $H2 = 'b' x 64;
 my $H3 = 'c' x 64;
 my $H4 = 'd' x 64;
 
-subtest '_expected_sha256' => sub {
-  my $e = $S->can('_expected_sha256');
+subtest 'expected_sha256' => sub {
+  my $e = sub { $D->expected_sha256(@_) };
   my $k3s_sums = "$H1  k3s-airgap-images-arm64.tar.gz\n$H2  k3s-arm64\n$H3  k3s\n";
   is( $e->( $k3s_sums, 'k3s' ),       $H3, 'k3s: exact name, not the airgap line' );
   is( $e->( $k3s_sums, 'k3s-arm64' ), $H2, 'k3s-arm64' );
@@ -160,17 +166,17 @@ subtest '_expected_sha256' => sub {
   is( $e->( undef, 'k3s' ), undef, 'no text: undef' );
 };
 
-subtest '_sha256_of / _verify_sha256' => sub {
-  is( $S->can('_sha256_of')->("$H1  /tmp/k3s-artifacts/k3s\n"), $H1, 'sha256sum output parsed' );
-  is( $S->can('_sha256_of')->("sha256sum: x: No such file\n"), undef, 'error output: undef' );
-  my $v = $S->can('_verify_sha256');
+subtest 'sha256_of / verify_sha256' => sub {
+  is( $D->sha256_of("$H1  /tmp/k3s-artifacts/k3s\n"), $H1, 'sha256sum output parsed' );
+  is( $D->sha256_of("sha256sum: x: No such file\n"), undef, 'error output: undef' );
+  my $v = sub { $D->verify_sha256(@_) };
   ok( $v->( $H1, $H1, 'k3s' ), 'match' );
   dies_like { $v->( $H1, $H2, 'k3s' ) } qr/Checksum mismatch for k3s: expected $H1, got $H2/, 'mismatch dies with both';
   dies_like { $v->( undef, $H2, 'k3s' ) } qr/No checksum for k3s/, 'missing expected dies';
   dies_like { $v->( $H1, undef, 'k3s' ) } qr/Could not compute sha256/, 'missing actual dies';
 };
 
-# ---- _fetch_artifacts against the fake remote ------------------------------
+# ---- fetch_artifacts against the fake remote ------------------------------
 
 sub fetch_script {
   my ( %o ) = @_;
@@ -182,10 +188,10 @@ sub fetch_script {
   );
 }
 
-subtest '_fetch_artifacts: k3s arm64 happy path' => sub {
+subtest 'fetch_artifacts: k3s arm64 happy path' => sub {
   reset_remote( fetch_script( sums => "$H1  k3s-airgap-images-arm64.tar\n$H2  k3s-arm64\n",
     actual => "$H2  /tmp/k3s-artifacts/k3s-arm64\n" ) );
-  my $s = Rex::Rancher::Server::_fetch_artifacts( 'k3s', 'v1.30.4+k3s1' );
+  my $s = dist('k3s')->fetch_artifacts( 'v1.30.4+k3s1' );
   is( $s->{asset}, 'k3s-arm64', 'arch from uname -m on the host' );
   is( $cmds[1], "rm -rf '/tmp/k3s-artifacts' && mkdir -p '/tmp/k3s-artifacts'", 'dir emptied first' );
   my @curl = grep { /^curl / } @cmds;
@@ -196,30 +202,30 @@ subtest '_fetch_artifacts: k3s arm64 happy path' => sub {
     'artifact with progress bar' );
 };
 
-subtest '_fetch_artifacts: checksum mismatch dies' => sub {
+subtest 'fetch_artifacts: checksum mismatch dies' => sub {
   reset_remote( fetch_script( uname => "x86_64\n", sums => "$H1  rke2.linux-amd64.tar.gz\n",
     actual => "$H2  /tmp/rke2-artifacts/rke2.linux-amd64.tar.gz\n" ) );
-  dies_like { Rex::Rancher::Server::_fetch_artifacts( 'rke2', 'v1.30.4+rke2r1' ) }
+  dies_like { dist('rke2')->fetch_artifacts( 'v1.30.4+rke2r1' ) }
     qr/Checksum mismatch for rke2\.linux-amd64\.tar\.gz: expected $H1, got $H2/, 'loud mismatch';
 };
 
-subtest '_fetch_artifacts: asset missing from sums dies' => sub {
+subtest 'fetch_artifacts: asset missing from sums dies' => sub {
   reset_remote( fetch_script( sums => "$H1  something-else\n", actual => "$H2  x\n" ) );
-  dies_like { Rex::Rancher::Server::_fetch_artifacts( 'rke2', 'v1.30.4+rke2r1' ) }
+  dies_like { dist('rke2')->fetch_artifacts( 'v1.30.4+rke2r1' ) }
     qr/No checksum for rke2\.linux-arm64\.tar\.gz/, 'no silent pass';
 };
 
-subtest '_fetch_artifacts: failed download dies with URL and arch hint' => sub {
+subtest 'fetch_artifacts: failed download dies with URL and arch hint' => sub {
   reset_remote( fetch_script( fail => 'rke2.linux-arm64.tar.gz' ) );
-  dies_like { Rex::Rancher::Server::_fetch_artifacts( 'rke2', 'v9.9.9+rke2r1' ) }
+  dies_like { dist('rke2')->fetch_artifacts( 'v9.9.9+rke2r1' ) }
     qr{Download failed: https://github\.com/rancher/rke2/releases/download/v9\.9\.9%2Brke2r1/rke2\.linux-arm64\.tar\.gz\n.*no build for 'arm64'}s,
     'dies naming URL and arch';
   ok( !grep( /^sha256sum /, @cmds ), 'no checksum step after a failed download' );
 };
 
-subtest '_fetch_artifacts: unsupported arch dies before downloading' => sub {
+subtest 'fetch_artifacts: unsupported arch dies before downloading' => sub {
   reset_remote( fetch_script( uname => "armv7l\n" ) );
-  dies_like { Rex::Rancher::Server::_fetch_artifacts( 'k3s', 'v1.30.4+k3s1' ) }
+  dies_like { dist('k3s')->fetch_artifacts( 'v1.30.4+k3s1' ) }
     qr/Unsupported node architecture 'armv7l'/, 'dies';
   ok( !grep( /^curl /, @cmds ), 'nothing downloaded' );
 };
@@ -227,30 +233,30 @@ subtest '_fetch_artifacts: unsupported arch dies before downloading' => sub {
 # ---- artifact install commands ---------------------------------------------
 
 subtest 'artifact install commands' => sub {
-  my $rs = Rex::Rancher::Server::_artifact_spec( 'rke2', 'arm64', 'v1.30.4+rke2r1' );
-  is( Rex::Rancher::Server::_rke2_artifact_install_cmd( $rs, 'v1.30.4+rke2r1' ),
+  my $rs = dist('rke2')->artifact_spec( 'arm64', 'v1.30.4+rke2r1' );
+  is_deeply( [ dist('rke2')->artifact_install_cmds( $rs, undef, 'v1.30.4+rke2r1' ) ], [
     'INSTALL_RKE2_ARTIFACT_PATH=/tmp/rke2-artifacts INSTALL_RKE2_VERSION=v1.30.4+rke2r1 sh /tmp/rke2-artifacts/install.sh',
-    'rke2 server' );
-  is( Rex::Rancher::Server::_rke2_artifact_install_cmd( $rs, 'v1.30.4+rke2r1', 'agent' ),
+    ], 'rke2 server' );
+  is_deeply( [ agent('rke2')->artifact_install_cmds( $rs, 'https://cp1:9345', 'v1.30.4+rke2r1' ) ], [
     'INSTALL_RKE2_ARTIFACT_PATH=/tmp/rke2-artifacts INSTALL_RKE2_TYPE=agent INSTALL_RKE2_VERSION=v1.30.4+rke2r1 sh /tmp/rke2-artifacts/install.sh',
-    'rke2 agent' );
+    ], 'rke2 agent' );
 
-  my $ks = Rex::Rancher::Server::_artifact_spec( 'k3s', 'arm64', 'v1.30.4+k3s1' );
-  is( Rex::Rancher::Server::_k3s_binary_place_cmd($ks),
-    "install -m 0755 -o root -g root '/tmp/k3s-artifacts/k3s-arm64' /usr/local/bin/.k3s.rex-new"
-      . ' && mv -f /usr/local/bin/.k3s.rex-new /usr/local/bin/k3s',
-    'k3s binary placed atomically as /usr/local/bin/k3s' );
-  is( Rex::Rancher::Server::_k3s_artifact_install_cmd( $ks, undef, 'v1.30.4+k3s1', 'server' ),
+  my $ks = dist('k3s')->artifact_spec( 'arm64', 'v1.30.4+k3s1' );
+  my $place = "install -m 0755 -o root -g root '/tmp/k3s-artifacts/k3s-arm64' /usr/local/bin/.k3s.rex-new"
+    . ' && mv -f /usr/local/bin/.k3s.rex-new /usr/local/bin/k3s';
+  is_deeply( [ dist('k3s')->artifact_install_cmds( $ks, undef, 'v1.30.4+k3s1' ) ], [
+    $place,
     'INSTALL_K3S_SKIP_DOWNLOAD=binary INSTALL_K3S_BIN_DIR=/usr/local/bin INSTALL_K3S_VERSION=v1.30.4+k3s1'
       . ' INSTALL_K3S_SKIP_START=true sh /tmp/k3s-artifacts/install.sh server --write-kubeconfig-mode=644',
-    'k3s server: the script does not start it' );
-  is( Rex::Rancher::Server::_k3s_artifact_install_cmd( $ks, 'https://cp1:6443', 'v1.30.4+k3s1', 'agent' ),
+    ], 'k3s server: binary placed atomically as /usr/local/bin/k3s, then the script, which does not start it' );
+  is_deeply( [ agent('k3s')->artifact_install_cmds( $ks, 'https://cp1:6443', 'v1.30.4+k3s1' ) ], [
+    $place,
     'K3S_URL=https://cp1:6443 INSTALL_K3S_SKIP_DOWNLOAD=binary INSTALL_K3S_BIN_DIR=/usr/local/bin'
       . ' INSTALL_K3S_VERSION=v1.30.4+k3s1 INSTALL_K3S_SKIP_START=true sh /tmp/k3s-artifacts/install.sh agent',
-    'k3s agent: the script does not start it' );
+    ], 'k3s agent: same placement, the script does not start it' );
   for my $c (
-    Rex::Rancher::Server::_rke2_artifact_install_cmd( $rs, 'v1', 'agent' ),
-    Rex::Rancher::Server::_k3s_artifact_install_cmd( $ks, 'https://cp1:6443', 'v1', 'agent' ),
+    agent('rke2')->artifact_install_cmds( $rs, 'https://cp1:9345', 'v1' ),
+    agent('k3s')->artifact_install_cmds( $ks, 'https://cp1:6443', 'v1' ),
   ) {
     unlike( $c, qr/TOKEN/, 'no token on an artifact installer line' );
     unlike( $c, qr/curl/,  'artifact installer line downloads nothing' );
@@ -259,22 +265,31 @@ subtest 'artifact install commands' => sub {
 
 # ---- installed version -----------------------------------------------------
 
-subtest '_parse_version_output / _same_version' => sub {
-  my $p = $S->can('_parse_version_output');
+subtest 'parse_version_output / same_version' => sub {
+  my $p = sub { $D->parse_version_output(@_) };
   is( $p->("rke2 version v1.30.4+rke2r1 (abc123)\ngo version go1.22.5 X:boringcrypto\n"),
     'v1.30.4+rke2r1', 'rke2' );
   is( $p->("k3s version v1.30.4+k3s1 (98262b5d)\ngo version go1.22.5\n"), 'v1.30.4+k3s1', 'k3s' );
+  # k68: the first word is the name it was called by; through /proc/PID/exe
+  # that is "exe". Measured on the v1.36.4 release binaries.
+  is( $p->("exe version v1.36.4+rke2r1 (7479a59cdd2c8ce0b8871699a24daa4b7c28cc64)\n"
+    . "go version go1.26.7-X:boringcrypto\n"), 'v1.36.4+rke2r1', 'rke2 through /proc/PID/exe' );
+  is( $p->("exe version v1.36.4+k3s1 (4dedb15b)\ngo version go1.26.7\n"), 'v1.36.4+k3s1',
+    'k3s through /proc/PID/exe' );
+  is( $p->("go version go1.26.7\n"), undef, 'the go line alone: undef' );
   is( $p->("bash: rke2: command not found\n"), undef, 'not installed: undef' );
-  my $s = $S->can('_same_version');
+  is( $p->("sh: 1: /proc/123/exe: not found\n"), undef, 'no such process: undef' );
+  is( $p->("sh: 1: /proc/123/exe: Permission denied\n"), undef, 'permission denied: undef' );
+  my $s = sub { $D->same_version(@_) };
   ok( $s->( 'v1.30.4+rke2r1', 'v1.30.4+rke2r1' ), 'equal' );
   ok( $s->( '1.30.4+rke2r1', 'v1.30.4+rke2r1' ), 'leading v optional' );
   ok( !$s->( 'v1.30.4+rke2r1', 'v1.29.9+rke2r1' ), 'different' );
   ok( !$s->( 'v1.30.4+rke2r1', 'v1.30.4+rke2r2' ), 'release suffix counts' );
 };
 
-subtest '_verify_installed_version' => sub {
+subtest 'verify_installed_version' => sub {
   reset_remote();
-  ok( Rex::Rancher::Server::_verify_installed_version( 'rke2', undef ), 'unpinned: passes' );
+  ok( dist('rke2')->verify_installed_version(undef), 'unpinned: passes' );
   is( scalar @cmds, 0, 'unpinned: binary not even asked' );
 
   for my $dist (qw( rke2 k3s )) {
@@ -282,15 +297,15 @@ subtest '_verify_installed_version' => sub {
     my $old  = $dist eq 'k3s' ? 'v1.29.9+k3s1' : 'v1.29.9+rke2r1';
 
     reset_remote( [ qr/^$dist --version/, "$dist version $want (abc)\n" ] );
-    ok( Rex::Rancher::Server::_verify_installed_version( $dist, $want ), "$dist: match" );
+    ok( dist($dist)->verify_installed_version($want), "$dist: match" );
     is( $cmds[0], "$dist --version 2>&1", "$dist: asks the binary" );
 
     reset_remote( [ qr/^$dist --version/, "$dist version $old (abc)\n" ] );
-    dies_like { Rex::Rancher::Server::_verify_installed_version( $dist, $want ) }
+    dies_like { dist($dist)->verify_installed_version($want) }
       qr/Installed $dist version is \Q$old\E, expected \Q$want\E/, "$dist: stale binary dies";
 
     reset_remote( [ qr/^$dist --version/, "sh: $dist: not found\n", 127 ] );
-    dies_like { Rex::Rancher::Server::_verify_installed_version( $dist, $want ) }
+    dies_like { dist($dist)->verify_installed_version($want) }
       qr/Could not determine installed $dist version.*not found/s, "$dist: missing binary dies";
   }
 };
@@ -299,41 +314,54 @@ subtest '_verify_installed_version' => sub {
 
 my $JOURNAL = "Sep 24 rke2[123]: level=fatal msg=\"bootstrap data already found\"\n";
 
-subtest '_wait_for_service: active' => sub {
+subtest 'wait_for_service: active' => sub {
   my @states = ( "activating\n", "activating\n", "active\n" );
   reset_remote( [ qr/^systemctl is-active rke2-server$/, sub { shift @states }, 3 ] );
-  ok( Rex::Rancher::Server::_wait_for_service( 'rke2-server', attempts => 5, interval => 0 ),
+  ok( dist('rke2')->wait_for_service( attempts => 5, interval => 0 ),
     'returns once active' );
   is( scalar( grep { /is-active/ } @cmds ), 3, 'polled until active' );
   ok( !grep( /journalctl/, @cmds ), 'no journal on success' );
 };
 
-subtest '_wait_for_service: failed dies with journal' => sub {
+subtest 'wait_for_service: failed dies with journal' => sub {
   reset_remote(
     [ qr/^systemctl is-active/, "failed\n", 3 ],
     [ qr/^journalctl -u k3s-agent\.service -n 50 --no-pager/, $JOURNAL ],
   );
-  dies_like { Rex::Rancher::Server::_wait_for_service( 'k3s-agent.service', attempts => 5, interval => 0 ) }
+  dies_like { agent('k3s')->wait_for_service( attempts => 5, interval => 0 ) }
     qr/k3s-agent\.service is failed\n--- journalctl -u k3s-agent\.service -n 50 ---\n.*bootstrap data already found/s,
     'die text carries state and journal';
   is( scalar( grep { /is-active/ } @cmds ), 1, 'failed stops polling at once' );
 };
 
-subtest '_wait_for_service: timeout dies with last state and journal' => sub {
+subtest 'wait_for_service: timeout dies with last state and journal' => sub {
   reset_remote(
     [ qr/^systemctl is-active/, "activating\n", 3 ],
     [ qr/^journalctl/, $JOURNAL ],
   );
-  dies_like { Rex::Rancher::Server::_wait_for_service( 'rke2-server', attempts => 3, interval => 0 ) }
+  dies_like { dist('rke2')->wait_for_service( attempts => 3, interval => 0 ) }
     qr/rke2-server did not become active within 0s \(last state: activating\)\n.*bootstrap data/s,
     'timeout die text';
   is( scalar( grep { /is-active/ } @cmds ), 3, 'polled every attempt' );
 };
 
-subtest '_wait_for_service: empty journal still reported' => sub {
+subtest 'wait_for_service: empty journal still reported' => sub {
   reset_remote( [ qr/^systemctl is-active/, "failed\n", 3 ], [ qr/^journalctl/, '' ] );
-  dies_like { Rex::Rancher::Server::_wait_for_service( 'rke2-agent.service', attempts => 1, interval => 0 ) }
+  dies_like { agent('rke2')->wait_for_service( attempts => 1, interval => 0 ) }
     qr/\(no journal output\)/, 'placeholder instead of silence';
+};
+
+subtest 'wait_for_service: hint under the reason (k44)' => sub {
+  my $hint = 'It joins the cluster via https://cp1:9345 -- check that this node can reach that address';
+  reset_remote( [ qr/^systemctl is-active/, "failed\n", 3 ], [ qr/^journalctl/, $JOURNAL ] );
+  dies_like { agent('rke2')->wait_for_service( attempts => 2, interval => 0,
+    hint => $hint ) }
+    qr/rke2-agent\.service is failed\n\Q$hint\E\n--- journalctl -u rke2-agent\.service -n 50 ---\n.*bootstrap/s,
+    'failed: reason, hint, journal';
+  reset_remote( [ qr/^systemctl is-active/, "activating\n", 3 ], [ qr/^journalctl/, $JOURNAL ] );
+  dies_like { agent('k3s')->wait_for_service( attempts => 2, interval => 0,
+    hint => $hint ) }
+    qr/\(last state: activating\)\n\Q$hint\E\n--- journalctl/s, 'timeout: reason, hint, journal';
 };
 
 done_testing;

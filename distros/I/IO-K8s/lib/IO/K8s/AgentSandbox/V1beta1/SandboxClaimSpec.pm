@@ -1,12 +1,12 @@
 package IO::K8s::AgentSandbox::V1beta1::SandboxClaimSpec;
 # ABSTRACT: SandboxClaimSpec
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s additionalPodMetadata => '+IO::K8s::AgentSandbox::V1beta1::PodMetadata';
 k8s env                   => ['+IO::K8s::AgentSandbox::V1beta1::EnvVar'];
 k8s lifecycle             => '+IO::K8s::AgentSandbox::V1beta1::Lifecycle';
-k8s volumeClaimTemplates  => ['+IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate'];
+k8s volumeClaimTemplates  => ['Core::V1::PersistentVolumeClaimTemplate'];
 k8s warmPoolRef           => '+IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolRef', { required => 'schema' };
 
 
@@ -28,7 +28,7 @@ IO::K8s::AgentSandbox::V1beta1::SandboxClaimSpec - SandboxClaimSpec
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 additionalPodMetadata
 

@@ -1,5 +1,5 @@
 package Kubernetes::REST::CLI::Watch;
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 # ABSTRACT: CLI for watching Kubernetes resources
 use Moo;
 # protect_argv => 0 so parsed options are removed from @ARGV, leaving the
@@ -238,7 +238,7 @@ Kubernetes::REST::CLI::Watch - CLI for watching Kubernetes resources
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 

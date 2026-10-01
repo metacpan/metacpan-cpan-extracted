@@ -35,6 +35,7 @@ xt/crash_recovery.t
 xt/destroy_during_call.t
 xt/cross_module_fd.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/fuzz_header.t
@@ -46,6 +47,7 @@ xt/map_shared_proof.t
 xt/memfd_seal.t
 xt/mmap_leak.t
 xt/persistence_roundtrip.t
+xt/sift_kill.t
 xt/signal_during_wait.t
 xt/stats_under_load.t
 xt/stress.t

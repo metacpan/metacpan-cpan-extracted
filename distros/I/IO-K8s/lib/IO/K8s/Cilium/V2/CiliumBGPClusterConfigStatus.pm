@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPClusterConfigStatus;
 # ABSTRACT: Status is a running status of the cluster configuration
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::CiliumBGPClusterConfigStatus - Status is a running status o
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 conditions
 

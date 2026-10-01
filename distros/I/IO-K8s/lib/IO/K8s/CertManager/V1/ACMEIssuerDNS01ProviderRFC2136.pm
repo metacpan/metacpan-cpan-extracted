@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEIssuerDNS01ProviderRFC2136;
 # ABSTRACT: Use RFC2136 ("Dynamic Updates in the Domain Name System") (https://datatracker.ietf.org/doc/rfc2136/) to manage DNS01 challenge records.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s nameserver          => Str, { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::CertManager::V1::ACMEIssuerDNS01ProviderRFC2136 - Use RFC2136 ("Dynamic
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 nameserver
 

@@ -1,5 +1,244 @@
 Revision history for IO-K8s
 
+1.109     2026-10-01 02:33:28Z
+
+  - Behaviour change: { Str => 1 } is now a map of strings. Every scalar
+    value goes out as a JSON string in TO_JSON, to_json and to_yaml, so a
+    label, annotation, ConfigMap data value or any other map[string]string
+    value built from a numeric Perl value (labels => { v => $n + 0 }) no
+    longer reaches the API server as a JSON number and gets a 400 back. A
+    reference value in a { Str => 1 } map is still passed through, but
+    warns once per class and field in the 'deprecated' category: declare a
+    free-form map as Opaque (or a bare HashRef), which copies its values
+    through unchanged. to_crd exports a string map as additionalProperties:
+    {type: string} and an Opaque map as x-kubernetes-preserve-unknown-fields.
+    Opaque takes no parameters.
+
+  - New map forms HashRef[Str] (strict: a reference value is refused at
+    construction), HashRef[Int], HashRef[Num], HashRef[Bool],
+    HashRef[IntOrStr], HashRef[Quantity], HashRef[Time] and
+    HashRef[InstanceOf[Class]], equivalent to the { X => 1 } sugar, which
+    stays. { Bool => 1 } and HashRef[Bool] now accept the JSON booleans a
+    cluster sends back. AutoGen types an additionalProperties map as
+    HashRef[X] and a schemaless or preserve-unknown object as Opaque.
+
+  - 77 shipped fields whose upstream schema is not a map of strings are now
+    declared by what they hold: RawExtension, FieldsV1 and
+    map[string][]string fields (ControllerRevision data, WatchEvent object,
+    ManagedFieldsEntry fieldsV1, OpaqueDeviceConfiguration parameters,
+    UserInfo extra, PrometheusOperator proxyConnectHeader and params, ...)
+    are Opaque; resource lists (PodSpec overhead, allocatedResources,
+    consumedCapacity, ...) are HashRef[Quantity] and reject a value that is
+    not a quantity at construction; PodDisruptionBudgetStatus disruptedPods
+    is HashRef[Time]; ExternalSecrets OnePasswordProvider vaults and Traefik
+    ErrorPage statusRewrites are HashRef[Int]; Resource V1
+    DeviceCounterConsumption counters is a map of Counter objects.
+    AgentSandbox v1alpha1 volumeClaimTemplates, conditions and env are
+    arrays, as upstream declares them, instead of maps that refused every
+    real value.
+
+  - to_yaml, TO_YAML and save now quote every string that a JSON, YAML 1.2
+    core or YAML 1.1 reader would take for a boolean, null or number (True,
+    False, yes, No, on, ~, Null, 012, 0x1F, +1, 1_000, .inf, ...). Before,
+    only strings JSON would misread were quoted, so kubectl and the API
+    server, which resolve YAML 1.1, read such label, annotation and env
+    values and condition statuses as booleans, nulls or numbers, and a
+    generated CRD's enum [True, False, Unknown] arrived as
+    [true, false, "Unknown"]. Real booleans and numbers are still emitted
+    bare, and the output is unchanged for every other value. Every object's
+    to_yaml now goes through the one TO_YAML emitter.
+
+  - AgentSandbox and PrometheusOperator now reuse the shipped core classes
+    for their embedded pod and volume-claim templates: Sandbox and
+    SandboxTemplate podTemplate is Core::V1::PodTemplateSpec, and every
+    volumeClaimTemplates entry (plus Prometheus/PrometheusAgent's ephemeral
+    volumeClaimTemplate) is Core::V1::PersistentVolumeClaimTemplate. The
+    reuse heuristic now filters candidates by recursive shape compatibility
+    before its tie-break, which resolves these previously-ambiguous
+    {metadata,spec} shapes to the single matching core class.
+
+  - A colliding k8s declaration now fails at class load instead of silently
+    corrupting the class: two JSON keys that sanitize to one Perl accessor
+    (x-value and x_value, also across inheritance), a field -- or an AutoGen
+    CRD/OpenAPI property -- named like a role method that is not an
+    attribute (label, save, spec_get, ...), or a field its own class already
+    declared with a different type, options or required-ness (an identical
+    repeat is a no-op). A subclass redeclaring an inherited field under the
+    same JSON key now really replaces its type, coercion, required flag and
+    init_arg, not only its registry entry.
+
+  - ComponentStatus keeps its top-level conditions: they were dropped on
+    inflate and new and serialized as an empty list. The condition helpers
+    (get_condition, is_condition_true, is_ready, condition_message) read a
+    top-level conditions field wherever a class declares one.
+
+  - Serialize numeric Perl values in Str fields and [Str] elements as JSON
+    strings: EnvVar value => 8080 now emits "8080" instead of a bare number
+    the API server rejects. Opaque { Str => 1 } maps are unchanged. AutoGen
+    types an array of type: number as [Num], whose elements always go out
+    as JSON numbers, and arrays of int-or-string and date-time items as
+    [IntOrStr] and [Time] instead of [Str], so to_crd and the emitter keep
+    them. [IntOrStr] elements serialize like an IntOrStr field.
+
+  - new_object, inflate, struct_to_object, json_to_object and FROM_HASH
+    refuse a non-hash value (array, string, code or scalar reference) at an
+    object position instead of silently building an empty object, with or
+    without strict. The error names the target class and the field.
+
+  - SpecBuilder element writes (spec_push, indexed spec_set, map keys and
+    spec_merge) go through the field's own coercion and type check, like a
+    whole-field assignment: 'false' pushed into a [Bool] stays false, and a
+    bad element croaks at the write instead of later in to_json. A failed
+    multi-value spec_push changes nothing.
+
+  - AutoGen fails closed after a failed generation: every class the failed
+    run began stays failed, and later requests die with the original error
+    behind an explanatory prefix instead of returning a half-built class,
+    even after clear_cache. This includes add_crd; load a repaired schema
+    into a fresh IO::K8s instance.
+
+  - AutoGen's reuse_core no longer types a nested schema as a shipped core
+    class whose array, map or nested field holds a different element type
+    (an array of objects as LabelSelectorRequirement's [Str] values), which
+    made valid data fail to inflate, nor an int-or-string field as a Str or
+    [Str] one, which wrote 8080 back as "8080". Element types, map values
+    and nested fields are now compared recursively; reuse decisions for the
+    bundled providers are unchanged.
+
+  - AutoGen's reuse_core no longer types a plain type: string field as a
+    shipped core class whose matching field is an IntOrStr, Quantity or Time
+    -- the mirror of the int-or-string fix above. {host, port: string} no
+    longer reuses TCPSocketAction, whose IntOrStr port sent "8080" out as
+    8080, and {medium, mode, sizeLimit: string} no longer reuses
+    EmptyDirVolumeSource, whose strict Quantity rejected sizeLimit "big"; such
+    a field is typed Str and keeps its string value. A format: date-time
+    string still reuses a Time field and a $ref to resource.Quantity a
+    Quantity field.
+
+  - Cilium's CiliumNetworkPolicy and CiliumClusterwideNetworkPolicy
+    toPorts.ports is now a dedicated PortProtocol class whose port is a
+    string, not the reused Networking::V1::NetworkPolicyPort whose IntOrStr
+    port sent a Cilium port "80" out as the number 80 that the Cilium CRD
+    rejects.
+
+  - Declare Sub::Util as a direct runtime prerequisite.
+
+  - A blessed value at an object position has to come out of its TO_JSON
+    as a hash: the JSON boolean that "metadata": true decodes to used to
+    build an empty ObjectMeta and now dies naming its class. An IO::K8s
+    object of another class is still converted through its TO_JSON.
+
+  - An array or hash field given the wrong container (containers => 'x',
+    labels => []), a List whose items is no array or holds a non-hash
+    item or whose item_class is a reference or empty, and an inflate
+    document that is no hash (inflate('[]')) die naming the class, the
+    field or element and the expected and received shape instead of with
+    a bare Perl dereference, Module::Runtime, type-constraint or JSON
+    parse error.
+
+  - load_yaml reads a file as UTF-8 instead of handing its bytes to
+    YAML::PP, which mangled or died on non-ASCII text. A one-line argument
+    that is neither an existing file nor YAML text, typically a mistyped
+    path, now dies instead of returning an empty list, in load_yaml as in
+    IO::K8s::CRD->load and add_crd; so does a directory.
+
+  - load no longer leaves a loader package behind on every call (about
+    850 KB each, unbounded in a process that reloads manifests), and reads
+    .pk8s files as UTF-8, so a non-ASCII literal gives the same characters
+    as in YAML. An unknown option to load now dies.
+
+  - load($file, vars => { ... }) hands values to a .pk8s manifest, which
+    reads them with var($name) or var($name, $default).
+
+  - Document that json_to_object and struct_to_object resolve their class
+    name again through expand_class, so a bare one-word name is read as a
+    Kind; an already resolved class goes in as '+Class'.
+
+  - AutoGen types a $ref to the apiextensions JSON, JSONSchemaPropsOrArray,
+    JSONSchemaPropsOrBool and JSONSchemaPropsOrStringArray definitions as
+    the shipped classes, so a value such as default: "foo", an array or a
+    boolean round-trips instead of failing to inflate. The v1beta1 names
+    are carried unchanged by the v1 JSON class.
+
+  - Errors in a .pk8s manifest (die, warnings, syntax errors, var() and
+    the inflation errors of a Kind call) name its file and line instead of
+    "(eval 273) line 1848", and the manifest no longer sees the loader's
+    own variables ($file, $m, ...), which now fail under use strict.
+
+  - Errors name the calling line instead of one inside the distribution:
+    a missing required field or a wrongly typed value met while new_object,
+    inflate, struct_to_object, json_to_object, load_yaml or a .pk8s Kind
+    call builds an object (a Type::Tiny exception stays an object), and
+    errors from add_crd, IO::K8s::CRD->generate (AutoGen's included) and to_crd,
+    FROM_HASH and from_json (the unknown_kinds => 'unstructured' fallback
+    included), spec_set and spec_merge, the JSONSchemaPropsOr* classes,
+    classes AutoGen builds from an openapi_spec, load of a missing .pk8s
+    file, inflate of a document without kind, and List errors through
+    inflate or IO::K8s::List->FROM_STRUCT; so does a CRD file that exists
+    but cannot be read, through add_crd and IO::K8s::CRD->load alike.
+
+  - An apiextensions JSON value (a CRD schema's default, example or enum
+    entry, a K3s HelmChart's values) is copied one level on the way in and
+    out: inflating copies a hash or array instead of keeping the caller's
+    own, and TO_JSON returns a copy, so editing the source structure or the
+    serialized output no longer changes the object -- the rule every other
+    array or hash field already follows.
+
+  - A field declared nullable => 1 keeps an explicit JSON null: new, its
+    setter and every inflate path (inflate, new_object, struct_to_object,
+    json_to_object, FROM_HASH, nested coercion) keep it, TO_JSON writes it
+    back as null, and an absent field stays absent. Such a field gets
+    has_<accessor> and clear_<accessor>, and spec_delete removes it.
+    Setting a nullable field to undef therefore sends null; the
+    ExternalSecrets refreshTime now round-trips a server's null.
+
+  - use IO::K8s::APIObject takes a subresources parameter (status, scale)
+    that to_crd and IO::K8s::CRD->new write into spec.versions[]; it is
+    checked at use time. add_crd carries a CRD version's subresources into
+    the generated class and IO::K8s::CRD::Emitter renders the parameter,
+    so a CRD read in and written out again keeps them. Any other import
+    parameter -- a typo such as subresource or resource_plurals -- dies at
+    the use line, naming the class and the known ones, instead of being
+    ignored; so does an odd number of import arguments, and an api_version
+    or resource_plural that is empty, undef or a reference.
+
+  - SpecBuilder paths walk through apiextensions union fields into the
+    value they hold: spec_set('values.replicaCount', 3) on a K3s HelmChart
+    now serializes values: {"replicaCount":3} instead of values: null, and
+    spec_get, spec_hash, spec_array, spec_push and spec_delete reach the
+    value as well; the same for a schema's items, additionalProperties,
+    additionalItems, dependencies, default and example.
+
+  - Fix POD where a > inside a C<> code cut it short and garbled the text:
+    IO::K8s, IO::K8s::Resource's field options, IO::K8s::CRD->new,
+    IO::K8s::AutoGen, IO::K8s::CRD::Emitter, IO::K8s::Cilium,
+    IO::K8s::Types::Net, the IO::K8s::Role::* builder roles and several
+    Resource API classes.
+
+  - A field typed as an apiextensions union class takes on new, its setter
+    and spec_set/spec_push every value inflate takes, not only a hash:
+    HelmChartSpec->new(values => [1, 2]) and JSONSchemaProps->new(enum =>
+    ['a']) used to die on the type check. Other object fields still refuse
+    a non-hash value.
+
+  - AutoGen types a $ref to Quantity, IntOrString, Time or MicroTime in an
+    array's items or a map's additionalProperties as that scalar, as it
+    already did for a property: [Quantity], { Quantity => 1 } and so on.
+    It used to generate an empty class that real values failed to inflate
+    into, or refuse a spec that did not ship the definition.
+
+  - Quantity and Time values always serialize as JSON strings, the form
+    Kubernetes writes them in, in scalar fields, maps and arrays alike:
+    limits => { cpu => 1 } now emits "1" instead of a bare 1. The API
+    server accepts both, but the output for numeric Perl values changes.
+
+  - Bundled provider CRD Kind classes (Cilium, GatewayAPI, AgentSandbox,
+    CertManager, PrometheusOperator, VolumeSnapshot, ExternalSecrets) now
+    declare their upstream subresources, so to_crd writes
+    spec.versions[].subresources -- status, plus scale where upstream defines
+    it (AgentSandbox SandboxWarmPool, PrometheusOperator Alertmanager and
+    Prometheus).
+
 1.108     2026-09-22 00:53:53Z
 
   - Track Kubernetes v1.37.0: 11 new Kinds, 103 supporting types and 48 added

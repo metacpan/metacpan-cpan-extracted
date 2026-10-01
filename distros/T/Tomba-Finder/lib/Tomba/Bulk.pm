@@ -57,6 +57,24 @@ sub ListBulks {
     return $self->call("/bulk/$type", $params);
 }
 
+=head2 CreateBulk
+
+  my $data = $tomba->CreateBulk("finder", { emails => ["a@example.com"] });
+
+Create a new bulk operation of the given type.
+Type can be: search, finder, verifier, enrich, author, linkedin, company,
+phone-finder, phone-validator, similar.
+
+See L<https://docs.tomba.io/api/bulks>
+
+=cut
+
+sub CreateBulk {
+    my ($self, $type, $body) = @_;
+    _validate_type($type);
+    return $self->post("/bulk/$type", $body);
+}
+
 =head2 GetBulk
 
   my $data = $tomba->GetBulk("finder", $bulk_id);
@@ -166,7 +184,7 @@ See L<https://docs.tomba.io/api/bulks>
 sub BulkDownload {
     my ($self, $type, $id) = @_;
     _validate_type($type);
-    return $self->call("/bulk/$type/$id/download");
+    return $self->call_raw("/bulk/$type/$id/download");
 }
 
 1;

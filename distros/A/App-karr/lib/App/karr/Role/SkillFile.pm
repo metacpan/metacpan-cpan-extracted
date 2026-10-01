@@ -1,7 +1,7 @@
-# ABSTRACT: The one way karr finds and writes the bundled skill directory
+# ABSTRACT: The one way karr finds and writes the bundled skill directories
 
 package App::karr::Role::SkillFile;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo::Role;
 # All loaded without importing, for the reason spelled out in
 # App::karr::Role::Output: a Moo::Role composes every sub in its package into
@@ -12,8 +12,8 @@ use App::karr::Error ();
 use Path::Tiny ();
 use File::ShareDir ();
 
-# Nothing is required of the consumer. _skill_content and _skill_files take no
-# arguments, _write_skill and _write_skill_files are handed both the target and
+# Nothing is required of the consumer. _skill_content and _skill_files take
+# only a skill name, _write_skill and _write_skill_files are handed both the target and
 # the content, and none of them reaches for anything on $self -- which is the
 # point of the role: `karr skill` is board-less while `karr init` composes
 # App::karr::Role::BoardDiscovery, and the only way one helper can serve both
@@ -29,17 +29,28 @@ my @NAME_PARTS   = split /::/, __PACKAGE__;
 my $OWN_INC_KEY  = join( '/', @NAME_PARTS ) . '.pm';
 my $DIST_ROOT_UP = @NAME_PARTS + 1;
 
-# The directory the skill ships in, under share/. It happens to be the name of
-# the skill directory a target gets as well (.claude/skills/kanban-issues-karr-cli),
-# but that one is the commands' business: they name their targets themselves.
-my $SHARE_SKILL_DIR = 'kanban-issues-karr-cli';
+# The skills that ship, in the order every command handles and reports them.
+# Each is a directory under share/ and, by the same name, the directory a
+# target gets (.claude/skills/kanban-issues-karr-ticket, ...). This is the one
+# list of them: `karr skill` and `karr init` both iterate it, so adding or
+# splitting a skill is a change here and under share/, nowhere else.
+sub _skill_names { qw( kanban-issues-karr-coordination kanban-issues-karr-ticket ) }
 
-# The bundled skill directory. Two places to look, in order: File::ShareDir,
+# Names earlier releases installed and this one no longer ships. A target
+# directory by one of these names is a leftover: install and update remove it,
+# check reports it stale. kanban-issues-karr-cli is the single skill the pair
+# above was split out of; left in place it would brief an agent twice, once
+# with the old text.
+sub _retired_skill_names { qw( kanban-issues-karr-cli ) }
+
+# One bundled skill directory. Two places to look, in order: File::ShareDir,
 # which is where share/ lands when the dist is installed, and -- when it is
 # not, i.e. a checkout being run with -Ilib -- share/ in that checkout. A
-# share dir that answers but holds no kanban-issues-karr-cli/SKILL.md (an
-# App::karr from before #285, which shipped one claude-skill.md, is exactly
-# that) falls through to the checkout rather than counting as found.
+# share dir that answers but holds no NAME/SKILL.md (an App::karr from before
+# #285, which shipped one claude-skill.md, or one from before the split, which
+# shipped only kanban-issues-karr-cli/, is exactly that) falls through to the
+# checkout rather than counting as found. Looked up per skill, so every name
+# answers from wherever it is actually found.
 #
 # The second half has to know where that checkout is, and the only thing that
 # knows is a file of the dist Perl has already loaded. Cmd::Skill and Cmd::Init
@@ -55,12 +66,12 @@ my $SHARE_SKILL_DIR = 'kanban-issues-karr-cli';
 # it sits at the same depth below lib/ as the two command classes, so the climb
 # is the one both copies made.
 sub _skill_source_dir {
-  my ($self) = @_;
+  my ($self, $name) = @_;
 
   # Installed dist: File::ShareDir knows where share/ went.
   my $installed = eval {
     my $dir = Path::Tiny::path( File::ShareDir::dist_dir('App-karr') )
-                        ->child($SHARE_SKILL_DIR);
+                        ->child($name);
     $dir->child('SKILL.md')->exists ? $dir : undef;
   };
   return $installed if $installed;
@@ -69,23 +80,23 @@ sub _skill_source_dir {
   my $own_path = $INC{$OWN_INC_KEY};
   if ($own_path) {
     my $share = Path::Tiny::path($own_path)->parent($DIST_ROOT_UP)
-                                           ->child( 'share', $SHARE_SKILL_DIR );
+                                           ->child( 'share', $name );
     return $share if $share->child('SKILL.md')->exists;
   }
 
-  die "Could not find $SHARE_SKILL_DIR/SKILL.md. Is App::karr properly installed?\n";
+  die "Could not find $name/SKILL.md. Is App::karr properly installed?\n";
 }
 
-# The bundled SKILL.md, as characters (slurp_utf8 is Path::Tiny's own
+# One bundled skill's SKILL.md, as characters (slurp_utf8 is Path::Tiny's own
 # character-level read, which is what the file edge is allowed to use; decoding
 # on top of it would be the double decode App::karr::Encoding forbids). This is
 # what `karr skill show` prints: the entry point, not the references behind it.
 sub _skill_content {
-  my ($self) = @_;
-  return $self->_skill_source_dir->child('SKILL.md')->slurp_utf8;
+  my ($self, $name) = @_;
+  return $self->_skill_source_dir($name)->child('SKILL.md')->slurp_utf8;
 }
 
-# Every file the skill ships, as (relative path => characters) pairs in sorted
+# Every file one skill ships, as (relative path => characters) pairs in sorted
 # path order: SKILL.md, then references/*.md. Walked from the directory rather
 # than listed, so a reference file added under share/ ships without anyone
 # touching this role; only *.md counts, so an editor backup next to them never
@@ -93,8 +104,8 @@ sub _skill_content {
 # rejoin to a target directory, so the layout under share/ IS the layout a
 # target gets. Read with slurp_utf8 for the reason given on _skill_content.
 sub _skill_files {
-  my ($self) = @_;
-  my $dir = $self->_skill_source_dir;
+  my ($self, $name) = @_;
+  my $dir = $self->_skill_source_dir($name);
   my @found;
   $dir->visit(
     sub { my ($p) = @_; push @found, $p if $p->is_file && $p->basename =~ /\.md\z/ },
@@ -102,6 +113,41 @@ sub _skill_files {
   );
   return map  { ( $_ => $dir->child($_)->slurp_utf8 ) }
          sort map { $_->relative($dir)->stringify } @found;
+}
+
+# The retired skill directories present under $base -- the directory that
+# holds the skill directories (.claude/skills, ~/.codex/skills, ...) -- as
+# Path::Tiny objects. This is what check reports as stale. A dangling symlink
+# by that name counts too: it is a leftover all the same.
+sub _retired_skill_dirs {
+  my ($self, $base) = @_;
+  return grep { -e "$_" || -l "$_" }
+         map  { $base->child($_) } $self->_retired_skill_names;
+}
+
+# Removes every retired skill directory under $base and returns the ones it
+# removed, for the caller to report. File::Path unlinks a symlink rather than
+# following it, and a file that is one link of a hardlink chain loses only
+# this project's link, so another project still sharing the old skill keeps
+# its copy. A failure is the target's layout, not a karr bug: one clean line
+# naming the directory, like the write (#77). remove_tree reports some
+# failures only as warnings, so what counts is whether the path is gone.
+sub _remove_retired_skills {
+  my ($self, $base) = @_;
+  my @removed;
+  for my $dir ( $self->_retired_skill_dirs($base) ) {
+    my $error;
+    eval {
+      local $SIG{__WARN__} = sub { $error //= $_[0] };
+      $dir->remove_tree( { safe => 0 } );
+      1;
+    } or $error = $@;
+    App::karr::Error::user_error( "Could not remove $dir: ",
+                                  App::karr::Error::clean_error( $error // 'still there' ) )
+      if -e "$dir" || -l "$dir";
+    push @removed, $dir;
+  }
+  return @removed;
 }
 
 # Written in place, on purpose. Path::Tiny's spew_utf8 writes a temp file and
@@ -178,29 +224,37 @@ __END__
 
 =head1 NAME
 
-App::karr::Role::SkillFile - The one way karr finds and writes the bundled skill directory
+App::karr::Role::SkillFile - The one way karr finds and writes the bundled skill directories
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 DESCRIPTION
 
-Three commands need the bundled skill: C<karr skill install> and
-C<karr skill update> write it, C<karr skill show> prints its F<SKILL.md>, and
-C<karr init --claude-skill> writes the same
-F<.claude/skills/kanban-issues-karr-cli/> that
-C<karr skill install --agent claude-code> does. This role is the single place
-that knows both I<where that skill comes from> and I<how> it has to be written,
-so neither rule can be fixed in one command and left wrong in the other, which
-is exactly what happened between tickets #142 and #145.
+Three commands need the bundled skills: C<karr skill install> and
+C<karr skill update> write them, C<karr skill show> prints their F<SKILL.md>,
+and C<karr init --claude-skill> writes the same directories under
+F<.claude/skills/> that C<karr skill install --agent claude-code> does. This
+role is the single place that knows I<which> skills ship, I<where> they come
+from and I<how> they have to be written, so none of those rules can be fixed
+in one command and left wrong in the other, which is exactly what happened
+between tickets #142 and #145.
 
-The skill is a directory, not one file: F<SKILL.md>, the short part an agent
-loads on every trigger, plus F<references/*.md>, the parts it reads on demand
-once F<SKILL.md> has pointed it there (#285). It ships as
-F<share/kanban-issues-karr-cli/>, and every C<*.md> under that directory is
-what gets installed -- nothing is listed by name, so a new reference file ships
-without a code change.
+Two skills ship, in this order: C<kanban-issues-karr-coordination> (reading a
+board, picking, creating and routing cards, configuring and syncing karr) and
+C<kanban-issues-karr-ticket> (working the one card an agent was handed). They
+replace C<kanban-issues-karr-cli>, the single skill earlier releases shipped.
+That name is I<retired>, and this role is also what finds and removes a
+leftover directory of it in a target, so an agent is not briefed by the old
+skill and the new pair at once.
+
+Each skill is a directory, not one file: F<SKILL.md>, the short part an agent
+loads on every trigger, plus -- where it has them -- F<references/*.md>, the
+parts it reads on demand once F<SKILL.md> has pointed it there (#285). A skill
+ships as F<share/NAME/>, and every C<*.md> under that directory is what gets
+installed -- nothing is listed by name, so a new reference file ships without
+a code change.
 
 The lookup: that directory via L<File::ShareDir> when the dist is installed,
 and out of the source tree this file was loaded from when it is not.

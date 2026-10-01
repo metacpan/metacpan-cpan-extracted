@@ -46,7 +46,8 @@ unshift @INC, sub {
   my ( undef, $file ) = @_;
   return unless $file eq 'Rex/GPU.pm';
   push @gpu_loads, $file;
-  my $src = 'package Rex::GPU; sub import {} '
+  # 0.002: the minimum rancher_deploy_* accept (t/gpu-module-version.t).
+  my $src = 'package Rex::GPU; our $VERSION = \'0.002\'; sub import {} '
     .'sub gpu_setup { push @main::gpu_setup_calls, {@_} } 1;';
   open my $fh, '<', \$src or die;
   return $fh;

@@ -4,12 +4,13 @@
 
 use strict;
 use Test::More;
+use Config;
 
 BEGIN { use_ok(Imager => qw(:handy :all)) }
 use warnings;
 use POSIX qw(INT_MIN INT_MAX UINT_MAX);
 
-use Imager::Test qw(image_bounds_checks is_color3 is_color4 is_fcolor4 color_cmp mask_tests is_fcolor3);
+use Imager::Test qw(image_bounds_checks is_color3 is_color4 is_fcolor4 color_cmp mask_tests is_fcolor3 std_image_tests);
 
 -d "testout" or mkdir "testout";
 
@@ -185,6 +186,8 @@ is($impal2->colorchannels, 3, "check colorchannels");
   is($impal2->findcolor(color=>$blue), 1, "findcolors found blue");
   ok($impal2->setcolors(start=>0, colors=>[ $blue, $red ]),
      "we can setcolors");
+  is_deeply([ $impal2->getsamples(y => 0, type => "float") ],
+            [ (0, 0, 1) x 200 ], "get float samples from paletted");
 
   # make an rgb version
   my $imrgb2 = $impal2->to_rgb8()
@@ -278,6 +281,25 @@ ok(!Imager->new(xsize=>1, ysize=>1, channels=>5),
    "fail to create a five channel image");
 cmp_ok(Imager->errstr, '=~', qr/channels must be between 1 and 4/,
        "out of range channel message check");
+SKIP:
+{
+  $ENV{IMAGER_RISKY_TESTS}
+    or skip "Skipping risky tests", 1;
+  $Config{ptrsize} == 8
+    or skip "Need 64-bit for this test", 1;
+  {
+    my $imx = Imager->new(xsize => 0x8000_0000, ysize => 0xFFFF_FFFF);
+    ok(!$imx, "Fail to create with overflow");
+    like(Imager->errstr, qr/integer overflow calculating image allocation/,
+         "check overflow message");
+  }
+  {
+    my $imx = Imager->new(xsize => 0x1000_0000, ysize => 0x1000_0000);
+    ok(!$imx, "Fail to create with out of memory");
+    like(Imager->errstr, qr/Out of memory allocating image surface/,
+         "check out of memory message");
+  }
+}
 
 {
   # https://rt.cpan.org/Ticket/Display.html?id=8213
@@ -762,7 +784,12 @@ my $psamp_outside_error = "Image position outside of image";
 	      $im->getsamples('y'=>4, 'x'=>3, width=>4,
 			      type=>'float', channels=>[3,2,1,0]) ],
 	    [ map { ($_->rgba)[3,2,1,0] } @fcolors ],
-	    "get channels 3..0 as scalar, float samples");
+	    "get channels 3..0 as packed, float samples");
+  is_deeply([ unpack "d*", 
+	      $im->getsamples('y'=>4, 'x'=>3, width=>4,
+			      type=>'float') ],
+	    [ map { $_->rgba } @fcolors ],
+	    "get default channels 0..3 as packed, float samples");
   
   print "# end OO level scanline function tests\n";
 }
@@ -1227,6 +1254,8 @@ SKIP:
     is($im->colorchannels, $color_channels, "check colorchannels");
   }
 }
+
+std_image_tests({ bits => 8 });
 
 done_testing();
 

@@ -1,6 +1,10 @@
-use v5.36;
-
 package RT::Condition::OwnerAway;
+
+use v5.20;
+use warnings;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
 use base qw(RT::Condition);
 
 use RT::Extension::AwayMode;

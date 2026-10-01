@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2::CiliumBGPNodeConfig;
 # ABSTRACT: CiliumBGPNodeConfig is node local configuration for BGP agent.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
-    resource_plural => 'ciliumbgpnodeconfigs';
+    resource_plural => 'ciliumbgpnodeconfigs',
+    subresources    => { status => {} };
 
 k8s spec   => '+IO::K8s::Cilium::V2::CiliumBGPNodeSpec', { required => 'schema' };
 k8s status => '+IO::K8s::Cilium::V2::CiliumBGPNodeStatus';
@@ -24,7 +25,7 @@ IO::K8s::Cilium::V2::CiliumBGPNodeConfig - CiliumBGPNodeConfig is node local con
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

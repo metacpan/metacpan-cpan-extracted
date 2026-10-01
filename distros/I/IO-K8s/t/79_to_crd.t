@@ -55,6 +55,7 @@ use IO::K8s::CertManager::V1::Order;
     k8s scores    => { Int => 1 };
     k8s extras    => { '+Test79::Item' => 1 };
     k8s labels    => { Str => 1 };
+    k8s free      => Opaque;
     k8s mode      => Str, { enum => [qw(fast safe)], pattern => qr/\A[a-z]+\z/ };
     k8s note      => Str, { nullable => 1 };
     k8s blob      => Str, { preserve_unknown => 1 };
@@ -140,7 +141,12 @@ subtest '_schema_for_class mirrors every AutoGen branch in reverse' => sub {
             items      => { type => 'array', items => $ITEM_SCHEMA },
             scores     => { type => 'object', additionalProperties => { type => 'integer' } },
             extras     => { type => 'object', additionalProperties => $ITEM_SCHEMA },
-            labels     => { type => 'object', 'x-kubernetes-preserve-unknown-fields' => 1 },
+            # k191 replaces this claim: { Str => 1 } is the string map now
+            # (map[string]string upstream), no longer the opaque map, so it
+            # exports additionalProperties string. The opaque map is Opaque
+            # (free, below), and that is what keeps preserve-unknown.
+            labels     => { type => 'object', additionalProperties => { type => 'string' } },
+            free       => { type => 'object', 'x-kubernetes-preserve-unknown-fields' => 1 },
             # k110: a qr// is TRANSLATED to ECMA262 on emit, not passed
             # through as its Perl source -- \A/\z become ^/$, which is what
             # openAPIV3Schema.pattern is specified in. Before k110 this

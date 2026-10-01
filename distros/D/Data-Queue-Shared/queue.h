@@ -12,6 +12,7 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -39,7 +40,7 @@
 #define QUEUE_MODE_STR    1
 #define QUEUE_MODE_INT32  2
 #define QUEUE_MODE_INT16  3
-#define QUEUE_ERR_BUFLEN  256
+#define QUEUE_ERR_BUFLEN  (PATH_MAX + 256)
 #define QUEUE_SPIN_LIMIT  32
 #define QUEUE_LOCK_TIMEOUT_SEC 2
 
@@ -373,14 +374,37 @@ static int queue_secure_open(const char *path, mode_t file_mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int queue_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int queue_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* A sparse segment would SIGBUS at the first write the filesystem cannot back.  opt_in (Str) reserves
+   only on DATA_QUEUE_SHARED_SPARSE=0: it would commit memory the arena otherwise fills lazily. */
+static int queue_reserve(int fd, uint64_t size, int opt_in) {
+    const char *sp = getenv("DATA_QUEUE_SHARED_SPARSE");
+    if (opt_in ? !sp || strcmp(sp, "0") : sp && *sp && strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static QueueHandle *queue_create(const char *path, uint32_t capacity,
@@ -462,12 +486,18 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
                 QUEUE_ERR("ftruncate(%s): %s", path, strerror(errno));
                 flock(fd, LOCK_UN); close(fd); return NULL;
             }
+            if (queue_reserve(fd, total_size, mode == QUEUE_MODE_STR) < 0) {
+                QUEUE_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total_size, strerror(errno));
+                if (ftruncate(fd, 0) < 0) { /* best effort */ }
+                flock(fd, LOCK_UN); close(fd); return NULL;
+            }
         }
 
         map_size = is_new ? (size_t)total_size : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) {
             QUEUE_ERR("mmap(%s): %s", path, strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
@@ -499,9 +529,13 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (hdr->magic == 0 && (uint64_t)st.st_size == total_size
-                    && st.st_uid == geteuid() && queue_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && queue_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, file_mode) < 0) {
                         QUEUE_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (queue_reserve(fd, total_size, mode == QUEUE_MODE_STR) < 0) {
+                        QUEUE_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total_size, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
@@ -583,6 +617,10 @@ static QueueHandle *queue_create_memfd(const char *name, uint32_t capacity,
         QUEUE_ERR("ftruncate(memfd): %s", strerror(errno));
         close(fd); return NULL;
     }
+    if (queue_reserve(fd, total_size, mode == QUEUE_MODE_STR) < 0) {
+        QUEUE_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total_size, strerror(errno));
+        close(fd); return NULL;
+    }
 
     /* Seal size against ftruncate-based SIGBUS attacks via SCM_RIGHTS peers. */
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
@@ -629,6 +667,13 @@ static QueueHandle *queue_open_fd(int fd, uint32_t mode, char *errbuf) {
 
     if ((uint64_t)st.st_size < sizeof(QueueHeader)) {
         QUEUE_ERR("fd %d: too small (%lld)", fd, (long long)st.st_size);
+        return NULL;
+    }
+
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(QueueHeader, magic)) != (ssize_t)sizeof magic || magic != QUEUE_MAGIC) {
+        QUEUE_ERR("fd %d: invalid or incompatible queue", fd);
         return NULL;
     }
 
@@ -944,6 +989,9 @@ static inline int queue_str_push_locked(QueueHandle *h, const char *str,
 
     hdr->arena_wpos = pos + alloc;
     hdr->arena_used += (uint32_t)skip;
+    /* The tail is the commit point, and plain stores reorder: a pusher killed before it must
+     * leave nothing published, not a message whose arena the next push writes over. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     hdr->tail++;
     __atomic_add_fetch(&hdr->stat_push_ok, 1, __ATOMIC_RELAXED);
     return 1;
@@ -987,16 +1035,22 @@ static inline int queue_str_pop_locked(QueueHandle *h, const char **out_str,
     *out_str = h->copy_buf;
     *out_len = len;
 
-    if (hdr->tail == hdr->head + 1) {
+    int last = hdr->tail == hdr->head + 1;
+    uint32_t skip = slot->arena_skip;
+    /* Consume before crediting the bytes back: a crash between the two then
+     * leaves a self-healing over-count, not a message the next push overwrites. */
+    hdr->head++;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+
+    if (last) {
         hdr->arena_used = 0;
         hdr->arena_wpos = 0;
-    } else if (hdr->arena_used <= slot->arena_skip) {
+    } else if (hdr->arena_used <= skip) {
         hdr->arena_used = 0;
     } else {
-        hdr->arena_used -= slot->arena_skip;
+        hdr->arena_used -= skip;
     }
 
-    hdr->head++;
     __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_RELAXED);
     return 1;
 }
@@ -1101,8 +1155,9 @@ static inline uint64_t queue_str_size(QueueHandle *h) {
 static void queue_str_clear(QueueHandle *h) {
     QueueHeader *hdr = h->hdr;
     queue_mutex_lock(hdr);
-    hdr->head = 0;
-    hdr->tail = 0;
+    /* One store empties it: zeroing head and tail apart would leave tail-head garbage. */
+    hdr->head = hdr->tail;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     hdr->arena_wpos = 0;
     hdr->arena_used = 0;
     queue_mutex_unlock(hdr);
@@ -1212,13 +1267,15 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
 
     memcpy(h->arena + pos, str, len);
 
-    hdr->head--;
-    uint32_t idx = (uint32_t)(hdr->head & h->cap_mask);
+    uint32_t idx = (uint32_t)((hdr->head - 1) & h->cap_mask);
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
     slot->arena_off  = pos;
     slot->packed_len = len | (utf8 ? QUEUE_STR_UTF8_FLAG : 0);
     slot->arena_skip = skip;
     slot->prev_wpos  = hdr->arena_wpos;   /* retained for layout stability */
+    /* The slot before the head that publishes it. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->head--;
 
     __atomic_add_fetch(&hdr->stat_push_ok, 1, __ATOMIC_RELAXED);
     queue_mutex_unlock(hdr);
@@ -1277,6 +1334,8 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
     }
 
     hdr->tail--;
+    /* Unpublish before crediting the bytes back, as in pop. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     uint32_t idx = (uint32_t)(hdr->tail & h->cap_mask);
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
 

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::SecretServerProvider;
 # ABSTRACT: SecretServer configures this store to sync secrets using SecretServer provider https://docs.delinea.com/online-help/secret-server/start.htm
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s caBundle                => Str;
@@ -36,7 +36,7 @@ IO::K8s::ExternalSecrets::V1::SecretServerProvider - SecretServer configures thi
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 caBundle
 

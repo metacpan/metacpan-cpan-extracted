@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::EncryptionSpec;
 # ABSTRACT: EncryptionSpec defines the encryption relevant configuration of a node.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s key => Int;
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2alpha1::EncryptionSpec - EncryptionSpec defines the encryptio
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 key
 

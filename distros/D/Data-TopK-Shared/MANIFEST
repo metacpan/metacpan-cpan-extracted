@@ -15,9 +15,13 @@ xt/asan.t
 xt/crash_recovery.t
 xt/destroy_during_call.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fork_tk.t
 xt/kwalitee.t
 xt/pod.t
+xt/reindex_kill.t
+xt/rescale_kill.t
+xt/sift_kill.t
 xt/tsan.t
 xt/valgrind.t
 xxhash.h

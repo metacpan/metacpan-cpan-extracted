@@ -95,8 +95,9 @@ METHODS
     99th percentile), guaranteed within relative error "alpha" of the true
     value; it returns "undef" for an empty sketch and croaks if $q is outside
     "[0, 1]". "min", "max", and "count" are exact (tracked separately from the
-    buckets); "sum" and "mean" are double-precision running values subject to
-    floating-point rounding.
+    buckets; a writer crash can turn "min" and "max" into estimates, see
+    "CRASH SAFETY"); "sum" and "mean" are double-precision running values
+    subject to floating-point rounding.
 
   Merging and introspection
         $dd->merge($other);              # fold another sketch's values in (same alpha + num_buckets)
@@ -138,6 +139,14 @@ SHARING ACROSS PROCESSES
     disturb the handle. Every process's "add" feeds the one shared sketch, so
     a fleet of workers can each measure part of a workload into a single
     distribution.
+
+    "new" and "new_memfd" create a new segment sparse: pages are allocated as
+    they are first written, and once the filesystem is full, a write to a page
+    not yet allocated dies with SIGBUS. Set "DATA_DDSKETCH_SHARED_SPARSE=0" to
+    reserve the whole segment at creation, so a full filesystem makes them
+    croak instead; on tmpfs and memfd that commits the segment's memory at
+    once, and a memory cgroup too small for it gets an OOM kill rather than a
+    croak.
 
 FROZEN (READ-ONLY) MODE
     A file-backed sketch can be frozen and then shipped to other machines,
@@ -194,13 +203,21 @@ SECURITY
 
 CRASH SAFETY
     Mutation is guarded by a futex-based write-preferring rwlock with
-    PID-encoded ownership and dead-owner recovery. Each "add" is a short
-    bounded update, but recovery restores locking only -- it performs no state
-    repair. "add" commits the scalar aggregates (count, sum, min, max) before
-    the bucket counter, so a crash in that window leaves "count" ahead of the
-    buckets and quantile(1.0) can return "undef" on a non-empty sketch until
-    the next "add" completes. Limitation: PID reuse is not detected (very
-    unlikely in practice).
+    PID-encoded ownership and dead-owner recovery. The process that recovers
+    the lock also repairs what the dead writer left half done: the buckets and
+    "zero_count" are authoritative, and "count" is recounted from them. So an
+    interrupted "add" reads as done once its bucket was bumped, and an
+    interrupted "clear", "add_many" or "merge" as partly applied. When the
+    recount changes "count", the exact values of "sum", "min" and "max" are
+    lost: recovery sets "min" and "max" to the representative values of the
+    lowest and highest non-empty buckets and "sum" to the bucket-weighted sum
+    of the representatives. Outside the collapsed end buckets each
+    representative is within "alpha" of the values it stands for, so "sum" can
+    be off by "alpha" times the sum of the absolute values, which is large
+    next to a sum of mixed-sign values. An "add" killed after its count but
+    before its sum, min and max updates leaves those three missing that one
+    value, or estimated as above if the sketch was empty. Limitation: PID
+    reuse is not detected (very unlikely in practice).
 
     Reader-slot exhaustion (slotless readers): dead-process recovery
     attributes a crashed lock holder's contribution through its reader-slot.

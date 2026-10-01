@@ -16,7 +16,7 @@ use Role::Tiny;
 use Readonly;
 Readonly::Scalar our $PACKAGE_INDEX => '02packages.details.txt.gz';
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.1.2';
 
 ########################################################################
 sub cmd_inject {

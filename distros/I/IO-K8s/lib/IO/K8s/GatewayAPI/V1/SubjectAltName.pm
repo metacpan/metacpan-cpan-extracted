@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::SubjectAltName;
 # ABSTRACT: SubjectAltName represents Subject Alternative Name.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s hostname => Str, { pattern => qr/^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/ };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1::SubjectAltName - SubjectAltName represents Subject Alte
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 hostname
 

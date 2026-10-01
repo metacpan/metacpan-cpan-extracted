@@ -102,17 +102,24 @@ subtest 'KARR_CLAIM set, --status in-progress: the env claim is written' => sub 
         'claimed_at is the same UTC instant shape `karr move --claim` writes' );
 };
 
-subtest 'an explicit --claim stamps the default-status card as before' => sub {
+subtest 'an explicit --claim stamps a column that needs none; backlog refuses it' => sub {
     my $repo = _board_repo();
     local $ENV{KARR_CLAIM} = 'filer';
 
-    my $rv = _run_karr( $repo, 'create', 'Held on purpose', '--claim', 'other' );
-    is( $rv->{exit}, 0, 'create --claim succeeds' ) or diag $rv->{stderr};
+    my $rv = _run_karr( $repo, 'create', 'Held on purpose', '--status', 'todo',
+        '--claim', 'other' );
+    is( $rv->{exit}, 0, 'create --status todo --claim succeeds' ) or diag $rv->{stderr};
 
     my $task = _task($repo);
-    is( $task->status,     'backlog', 'default status' );
-    is( $task->claimed_by, 'other',   'the explicit flag wins on any status' );
+    is( $task->status,     'todo',  'in todo, a column with no require_claim' );
+    is( $task->claimed_by, 'other', 'the explicit flag is stamped there, over the env' );
     ok( $task->has_claimed_at, 'and claimed_at is stamped with it' );
+
+    # The default status is backlog, which holds no claim at all (ticket
+    # k306): there the explicit flag is refused instead of stamped.
+    $rv = _run_karr( $repo, 'create', 'Parked', '--claim', 'other' );
+    is( $rv->{exit}, 1, 'on the default status the explicit claim is refused' );
+    like( $rv->{stderr}, qr/\AStatus 'backlog' holds no claim/, 'with the held-back message' );
 };
 
 subtest 'KARR_CLAIM unset, no --claim: --status in-progress is still refused (k270)' => sub {

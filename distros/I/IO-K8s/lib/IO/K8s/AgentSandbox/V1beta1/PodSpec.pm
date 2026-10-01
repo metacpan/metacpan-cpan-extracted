@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1beta1::PodSpec;
 # ABSTRACT: PodSpec
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s activeDeadlineSeconds         => Int;
@@ -23,7 +23,7 @@ k8s initContainers                => ['Core::V1::Container'];
 k8s nodeName                      => Str;
 k8s nodeSelector                  => { Str => 1 };
 k8s os                            => '+IO::K8s::AgentSandbox::V1beta1::PodOS';
-k8s overhead                      => { Str => 1 };
+k8s overhead                      => HashRef[Quantity];
 k8s preemptionPolicy              => Str;
 k8s priority                      => Int;
 k8s priorityClassName             => Str;
@@ -102,7 +102,7 @@ IO::K8s::AgentSandbox::V1beta1::PodSpec - PodSpec
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 activeDeadlineSeconds
 

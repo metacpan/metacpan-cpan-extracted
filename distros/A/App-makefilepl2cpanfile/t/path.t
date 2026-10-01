@@ -25,8 +25,7 @@ use warnings;
 use Test::Most;
 use Test::Mockingbird;
 use Test::Returns;
-use lib 't/lib';
-use Test::Permissions qw(can_revoke_read can_revoke_search);
+use Test::Permissions qw(can_revoke_read can_revoke_search why_not with_revoked);
 use File::Temp qw(tempdir);
 use Path::Tiny;
 use POSIX qw(EIO);
@@ -114,6 +113,15 @@ my %PATHS = (
 	'I.2'  => 'pos before a span -> move left',
 	'I.3'  => 'pos at or after a span end -> move right',
 	'I.4'  => 'pos inside a span -> 1',
+
+	# _brace_pairs() / _blocks()
+	'B.1'  => 'no braces -> loop runs 0 times, {}',
+	'B.2'  => "'{' -> pushed; '}' -> pops and pairs it",
+	'B.3'  => "'}' with nothing open -> ignored",
+	'B.4'  => "'{' never closed -> left unpaired",
+	'K.1'  => 'no opener -> loop runs 0 times, []',
+	'K.2'  => 'opener closed -> block recorded, scan resumes after it',
+	'K.3'  => 'opener never closed -> next, scan continues inside it',
 
 	# _valid_version()
 	'V.1'  => 'undef -> 0',
@@ -221,12 +229,13 @@ subtest 'generate() paths' => sub {
 	took('G.1');
 
 	SKIP: {
-		skip 'chmod cannot make a file unreadable here (root or Windows)', 1 unless can_revoke_read();
 		my $locked = make_mf(q{});
-		chmod 0, $locked;
-		throws_ok { App::makefilepl2cpanfile::generate(makefile => $locked) }
-			qr/\ACannot read '\Q$locked\E' at /, 'G.17: -f true, -r false -> croak';
-		chmod 0600, $locked;
+		my $dir    = path($locked)->parent;
+		skip why_not('read', $dir), 1 unless can_revoke_read($dir);
+		with_revoked(read => $locked, sub {
+			throws_ok { App::makefilepl2cpanfile::generate(makefile => $locked) }
+				qr/\ACannot read '\Q$locked\E' at /, 'G.17: -f true, -r false -> croak';
+		});
 	}
 	took('G.17');
 
@@ -411,6 +420,31 @@ subtest '_comment_spans() and _in_comment() paths' => sub {
 	took(map { "I.$_" } 1 .. 4);
 };
 
+subtest '_brace_pairs() and _blocks() paths' => sub {
+	my $b = \&App::makefilepl2cpanfile::_brace_pairs;
+	is_deeply $b->('no braces'), {}, 'B.1';
+	is_deeply $b->('{ { } }'), { 0 => 6, 2 => 4 }, 'B.2: inner pair closes first';
+	is_deeply $b->('} {}'), { 2 => 3 }, 'B.3';
+	is_deeply $b->('{ {}'), { 2 => 3 }, 'B.4';
+	took(map { "B.$_" } 1 .. 4);
+
+	my $k  = \&App::makefilepl2cpanfile::_blocks;
+	my $re = qr/ \b (\w++) \s*+ => \s*+ \{ /x;
+	my $scan = sub { my $t = $_[0]; return $k->($t, 0, $b->($t), $re) };
+	is_deeply $scan->('nothing here'), [], 'K.1';
+	is_deeply $scan->('a => { b => { 1 } }, c => { 2 }'),
+		[ [ 'a', 0, 6, ' b => { 1 } ', 19 ], [ 'c', 21, 27, ' 2 ', 31 ] ],
+		'K.2: b inside a is not reported; c after it is';
+	is_deeply $scan->('a => { b => { 1 }'), [ [ 'b', 7, 13, ' 1 ', 17 ] ],
+		'K.3: unclosed a is passed over; b inside it is found';
+	took(map { "K.$_" } 1 .. 3);
+
+	# Offsets are in the whole content when scanning a substring.
+	my $content = 'xx a => { 1 }';
+	is_deeply $k->(substr($content, 3), 3, $b->($content), $re), [ [ 'a', 3, 9, ' 1 ', 13 ] ],
+		'K.2: offsets are relative to the whole content';
+};
+
 subtest '_valid_version() paths' => sub {
 	my $v = \&App::makefilepl2cpanfile::_valid_version;
 	is $v->(undef), 0, 'V.1';
@@ -445,11 +479,11 @@ subtest '_load_develop_config() paths' => sub {
 		took('L.4');
 	}
 	SKIP: {
-		skip 'chmod cannot make a directory unsearchable here (root or Windows)', 1 unless can_revoke_search();
-		my ($g, $cfg) = use_home({ develop => {} });
-		chmod 0, $cfg->parent->stringify;
-		throws_ok { $load->() } qr/\AFailed to parse \Q$cfg\E: \S/, 'L.5: other stat error';
-		chmod 0755, $cfg->parent->stringify;
+		my ($g, $cfg, $home) = use_home({ develop => {} });
+		skip why_not('search', $home), 1 unless can_revoke_search($home);
+		with_revoked(search => $cfg->parent, sub {
+			throws_ok { $load->() } qr/\AFailed to parse \Q$cfg\E: \S/, 'L.5: other stat error';
+		});
 	}
 	took('L.5');
 	{

@@ -1,7 +1,7 @@
 # ABSTRACT: What NVIDIA driver a GPU generation needs (experimental)
 
 package Rex::GPU::NVIDIA::Requirement;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 use Carp qw( croak );
 use Scalar::Util qw( blessed );
@@ -133,6 +133,29 @@ sub BUILD {
 # constraint (either module, no bounds -- the driver selection these GPUs got
 # before they had a row); it exists for the compute flag and the label.
 #
+# Grace Hopper GH200 (karr #72): 2342 and 2348 sit inside that block but get
+# their own rows ahead of it -- open kernel module only, by MAINTAINER
+# DECISION, not by NVIDIA's driver documentation. The open-only evidence is
+# NVIDIA's blog post "NVIDIA Transitions Fully Towards Open-Source GPU Kernel
+# Modules" (2024), which says Grace Hopper and Blackwell platforms must use
+# the open modules. NVIDIA's driver README disagrees: kernel_open.html
+# ("Open Linux Kernel Modules", aarch64 and Linux-x86_64 alike) of 560.35.03
+# .. 580.126.09 says the proprietary flavor supports "later GPUs until
+# Blackwell", of 590.48.01 and 615.71.09 "Turing, Ampere, Ada, and Hopper",
+# with no Grace exception in any of them; and NVIDIA-Linux-aarch64-615.71.09
+# .run ships a proprietary kernel/nv-kernel.o_binary. Checked 2026-09-26.
+# IDs, from NVIDIA's supportedchips READMEs (aarch64 and Linux-x86_64,
+# checked 2026-09-26); no other product uses them:
+#   * 2342 GH200 120GB (10DE:16EB, 10DE:1805), GH200 480GB (10DE:1809):
+#     in 535.247.01, 545.29.06 (16EB and 1809 only), 550.54.14, 560.35.03,
+#     565.77, 570.86.16, 570.172.08, 615.71.09; NOT in 535.104.05. In the
+#     open-gpu-kernel-modules README from tag 550.54.14 on (not up to
+#     545.23.06). min_branch 535: whole branches only, so an early 535
+#     point release (535.104.05) is not caught here.
+#   * 2348 GH200 144G HBM3e (10DE:18D2): from 565.77 on (not in 560.35.03);
+#     open-gpu-kernel-modules README of 570.172.08, 580.95.05, 615.71.09.
+#     min_branch 565.
+#
 # Everything else — the gaps above 2FFF and any future ID — has no row:
 # either kernel module, no bounds, no compute verdict.
 sub generations {
@@ -145,6 +168,10 @@ sub generations {
       kernel_module => 'open', min_branch => 580, compute => 1 },
     { generation => 'Blackwell Ultra', first => 0x31c2, last => 0x31c3, # GB300
       kernel_module => 'open', min_branch => 580, compute => 1 },
+    { generation => 'Grace Hopper', first => 0x2342, last => 0x2342,    # GH200 120GB/480GB, see above
+      kernel_module => 'open', min_branch => 535, compute => 1 },
+    { generation => 'Grace Hopper', first => 0x2348, last => 0x2348,    # GH200 144G HBM3e
+      kernel_module => 'open', min_branch => 565, compute => 1 },
     { generation => 'Turing/Ampere/Ada/Hopper', first => 0x1df7, last => 0x28ff,
       compute => 1 },
     { generation => 'Maxwell/Pascal/Volta', first => 0x1340, last => 0x1df6,
@@ -342,7 +369,7 @@ Rex::GPU::NVIDIA::Requirement - What NVIDIA driver a GPU generation needs (exper
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -458,7 +485,8 @@ wins, so a narrower row goes before a block it sits in. An ID no row covers
 gets C<either> with no bounds and no C<compute> verdict. The built-in rows
 cover every ID from C<0000> to C<2FFF> without a gap, plus the Blackwell
 Ultra IDs; the Turing-to-Hopper row carries no constraint (C<either>, no
-bounds), only its label and C<compute>.
+bounds), only its label and C<compute> -- the GH200 IDs C<2342> and C<2348>
+inside it have open-only rows of their own.
 
 Override it in a subclass to add or replace rows; prepend to
 C<< $self->SUPER::generations >> to keep the built-in ones:
@@ -516,8 +544,18 @@ as current, Maxwell Gen1 (GM107/GM108) too.
 =item * Turing, Ampere, Ada, Hopper C<1DF7>-C<28FF>: NVIDIA's current list
 (615.71.09) runs from C<1E02> (TITAN RTX) to C<28F8> in this range; no
 legacy list has an ID above C<1DF6>. No constraint (C<either>, no bounds):
-the default driver selection. Compute, GeForce MX450/MX550/MX570 and GTX 16xx
+the default driver selection -- except GH200 (next item). Compute, GeForce MX450/MX550/MX570 and GTX 16xx
 included.
+
+=item * Grace Hopper GH200 C<2342> (120GB, 480GB) and C<2348> (144G HBM3e)
+have their own rows ahead of that block: open kernel module only, oldest
+branch 535 (C<2342>) and 565 (C<2348>). The IDs are from NVIDIA's
+C<supportedchips> READMEs (C<2342> first in 535.247.01, not in 535.104.05;
+C<2348> first in 565.77), checked 2026-09-26. Open-only is a maintainer
+decision (karr #72) following NVIDIA's blog post "NVIDIA Transitions Fully
+Towards Open-Source GPU Kernel Modules"; NVIDIA's driver README
+(C<kernel_open.html>, up to 615.71.09) still lists Hopper as supported by the
+proprietary flavor, with no Grace exception.
 
 =item * Kepler or older, every ID below C<1340> (Kepler C<0FC6>-C<12BA>, Fermi and
 earlier): the 470 and older legacy lists. Proprietary only, nothing newer

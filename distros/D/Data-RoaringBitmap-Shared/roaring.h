@@ -31,6 +31,7 @@
 #define ROARING_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -59,7 +60,7 @@
 
 #define RB_MAGIC          0x474E5252U  /* "RRNG" (little-endian) */
 #define RB_VERSION        2   /* 2: added the occupancy bitmap region (layout change) */
-#define RB_ERR_BUFLEN     256
+#define RB_ERR_BUFLEN     (PATH_MAX + 256)
 #define RB_READER_SLOTS   1024         /* max concurrent reader processes for dead-process recovery */
 
 /* Occupancy bitmap: one bit per reader slot, set when a process claims a slot and
@@ -130,11 +131,17 @@ struct RbHeader {
     uint32_t slotless_rdepth;         /* 84  readers holding with no reader-slot (documented residual); also aligns stat_ops */
     uint64_t stat_ops;                /* 88 */
     uint8_t  sealed;                  /* 96  0 = mutable, 1 = frozen (read-only; lock-free reads) */
-    uint8_t  _pad1[159];              /* 97..255 */
+    uint8_t  _pad0[3];                /* 97..99 */
+    uint32_t pub_hi;                  /* 100 1 + bucket of an in-flight container switch, 0 = none */
+    RbBucket pub;                     /* 104 that switch's new bucket value, replayed by recovery */
+    uint8_t  _pad1[136];              /* 120..255 */
 };
 typedef struct RbHeader RbHeader;
 
 _Static_assert(sizeof(RbHeader) == 256, "RbHeader must be 256 bytes");
+_Static_assert(offsetof(RbHeader, pub_hi) / 64 == offsetof(RbHeader, wlock) / 64
+               && (offsetof(RbHeader, pub) + sizeof(RbBucket) - 1) / 64 == offsetof(RbHeader, wlock) / 64,
+               "the switch record shares the write lock's cache line");
 
 /* ---- Process-local handle ---- */
 
@@ -223,6 +230,9 @@ static inline int rb_pid_alive(uint32_t pid) {
     return !rb_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
 
+static void rb_drain_readers(RbHandle *h);
+static void rb_repair_locked(RbHandle *h);
+
 /* Force-recover a stale WRITE lock left by a dead writer (held or mid-drain).
  * CAS to OUR pid to hold the lock while fixing shared state, then release.
  * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
@@ -233,8 +243,9 @@ static inline void rb_recover_stale_lock(RbHandle *h, uint32_t observed_wlock) {
     if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
+    /* The dead writer may have been mid-drain, so readers can still hold. */
+    rb_drain_readers(h);
+    rb_repair_locked(h);
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -471,10 +482,15 @@ static inline void rb_rwlock_wrlock(RbHandle *h) {
         rb_unpark(h);
         spin = 0;
     }
-    /* Phase 2: we own wlock, so no NEW reader can join (they see wlock!=0 and
-     * yield).  Drain the readers that were already holding when we won the CAS.
-     * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
-     * of the Dekker handshake. */
+    rb_drain_readers(h);
+}
+
+/* Phase 2 of taking the write lock: we own wlock, so no NEW reader can join
+ * (they see wlock!=0 and yield).  Drain the readers that were already holding
+ * when we won the CAS.  The SEQ_CST CAS on wlock + the SEQ_CST rdepth loads below
+ * are the writer side of the Dekker handshake. */
+static void rb_drain_readers(RbHandle *h) {
+    RbHeader *hdr = h->hdr;
     for (;;) {
         uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
         int busy = 0;
@@ -591,23 +607,32 @@ static inline uint32_t rb_avail_slots(RbHandle *h) {
     return (hdr->container_cap - hdr->container_used) + hdr->free_count;
 }
 
-/* Allocate one container slot.  Returns a 1-based slot index, or 0 if the pool
- * is exhausted.  The returned slot is fully zeroed.  Pops the freelist first
- * (the freelist threads through the first 4 bytes of each freed slot), else
- * bumps the high-water mark. */
-static inline uint32_t rb_alloc_slot(RbHandle *h) {
+/* Allocate one container slot, contents unspecified.  Returns a 1-based slot
+ * index, or 0 if the pool is exhausted.  Pops the freelist first (the freelist
+ * threads through the first 4 bytes of each freed slot), else bumps the
+ * high-water mark. */
+static inline uint32_t rb_alloc_slot_raw(RbHandle *h) {
     RbHeader *hdr = h->hdr;
     uint32_t idx;
     if (hdr->free_head) {
         idx = hdr->free_head;
-        hdr->free_head = *(uint32_t *)rb_slot(h, idx);   /* next free slot */
+        uint32_t next = *(uint32_t *)rb_slot(h, idx);   /* next free slot */
+        /* Count before head: a kill between them under-counts, never over-counts an empty list. */
         hdr->free_count--;
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        hdr->free_head = next;
     } else if (hdr->container_used < hdr->container_cap) {
         idx = hdr->container_used++;
     } else {
         return 0;
     }
-    memset(rb_slot(h, idx), 0, RB_CONTAINER_BYTES);
+    return idx;
+}
+
+/* As rb_alloc_slot_raw, but the returned slot is fully zeroed. */
+static inline uint32_t rb_alloc_slot(RbHandle *h) {
+    uint32_t idx = rb_alloc_slot_raw(h);
+    if (idx) memset(rb_slot(h, idx), 0, RB_CONTAINER_BYTES);
     return idx;
 }
 
@@ -615,8 +640,68 @@ static inline uint32_t rb_alloc_slot(RbHandle *h) {
 static inline void rb_free_slot(RbHandle *h, uint32_t i) {
     RbHeader *hdr = h->hdr;
     *(uint32_t *)rb_slot(h, i) = hdr->free_head;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     hdr->free_head = i;
     hdr->free_count++;
+}
+
+/* Point bucket hi at a container built in a fresh slot.  Its three words are
+ * separate stores, so the new value goes to the header record first and
+ * recovery replays it when a kill lands between them. */
+static inline void rb_switch_bucket(RbHandle *h, uint32_t hi, uint32_t off,
+                                    uint32_t card, uint32_t type) {
+    RbHeader *hdr = h->hdr;
+    RbBucket *bt = &rb_buckets(h)[hi];
+    hdr->pub.container_off = off;
+    hdr->pub.cardinality   = card;
+    hdr->pub.type          = type;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_store_n(&hdr->pub_hi, hi + 1, __ATOMIC_RELAXED);
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    bt->container_off = off;
+    bt->cardinality   = card;
+    bt->type          = type;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    __atomic_store_n(&hdr->pub_hi, 0, __ATOMIC_RELAXED);
+}
+
+/* Copy-on-write replacement of bucket hi's container: switch to the slot
+ * `fresh`, then free the old one (a kill between them only strands the old
+ * slot, which recovery reclaims). */
+static inline void rb_replace_container(RbHandle *h, uint32_t hi, uint32_t fresh,
+                                        uint32_t card, uint32_t type) {
+    uint32_t old = rb_buckets(h)[hi].container_off;
+    rb_switch_bucket(h, hi, fresh, card, type);
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    rb_free_slot(h, old);
+}
+
+/* Empty bucket hi and free its slot.  The type unpublishes it first: a kill
+ * before the free only strands the slot, never leaves it shared. */
+static inline void rb_unlink_bucket(RbHandle *h, uint32_t hi) {
+    RbBucket *bt = &rb_buckets(h)[hi];
+    uint32_t off = bt->container_off;
+    bt->type = RB_TYPE_NONE;
+    bt->container_off = 0;
+    bt->cardinality = 0;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    rb_free_slot(h, off);
+}
+
+/* Write a sorted array result into bucket hi: a fresh slot when one is free,
+ * else in place (a kill mid-copy then tears the container). */
+static inline void rb_commit_array(RbHandle *h, uint32_t hi, const uint16_t *vals, uint32_t n) {
+    if (n == 0) { rb_unlink_bucket(h, hi); return; }
+    uint32_t s = rb_alloc_slot_raw(h);
+    if (s) {
+        memcpy(rb_array(h, s), vals, (size_t)n * sizeof(uint16_t));
+        rb_replace_container(h, hi, s, n, RB_TYPE_ARRAY);
+        return;
+    }
+    RbBucket *bt = &rb_buckets(h)[hi];
+    memcpy(rb_array(h, bt->container_off), vals, (size_t)n * sizeof(uint16_t));
+    bt->type = RB_TYPE_ARRAY;
+    bt->cardinality = n;
 }
 
 /* ================================================================
@@ -676,32 +761,55 @@ static inline int rb_add_locked(RbHandle *h, uint32_t x) {
 
     if (bt->type == RB_TYPE_NONE) {
         uint32_t s = rb_alloc_slot(h);              /* guaranteed available by caller */
-        bt->container_off = s;
-        bt->type = RB_TYPE_ARRAY;
-        bt->cardinality = 1;
         rb_array(h, s)[0] = lo;
+        bt->container_off = s;
+        bt->cardinality = 1;
+        /* The type publishes the bucket: everything it names goes first. */
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        bt->type = RB_TYPE_ARRAY;
         h->hdr->cardinality++;
         return 1;
     }
     if (bt->type == RB_TYPE_ARRAY) {
         uint16_t *vals = rb_array(h, bt->container_off);
+        uint32_t card = rb_array_card(bt);
         uint32_t pos;
-        if (rb_array_search(vals, rb_array_card(bt), lo, &pos)) return 0;
+        if (rb_array_search(vals, card, lo, &pos)) return 0;
         /* A full array container (RB_ARRAY_MAX entries) cannot hold one more
          * value without overflowing its fixed-size slot; promote it to a
          * bitmap FIRST, then set the bit.  (The new value is genuinely absent,
          * confirmed above, so this always grows the set.) */
-        if (bt->cardinality >= RB_ARRAY_MAX) {
+        if (card >= RB_ARRAY_MAX) {
+            uint32_t s = rb_alloc_slot(h);
+            if (s) {
+                uint64_t *bits = rb_bitmap(h, s);
+                for (uint32_t i = 0; i < card; i++)
+                    bits[vals[i] >> 6] |= (uint64_t)1 << (vals[i] & 63);
+                bits[lo >> 6] |= (uint64_t)1 << (lo & 63);
+                rb_replace_container(h, hi, s, card + 1, RB_TYPE_BITMAP);
+                h->hdr->cardinality++;
+                return 1;
+            }
             rb_array_to_bitmap(h, hi);
             uint64_t *bits = rb_bitmap(h, bt->container_off);
-            bits[lo >> 6] |= (uint64_t)1 << (lo & 63);
             bt->cardinality++;
+            __atomic_signal_fence(__ATOMIC_SEQ_CST);
+            bits[lo >> 6] |= (uint64_t)1 << (lo & 63);
             h->hdr->cardinality++;
             return 1;
         }
-        memmove(&vals[pos + 1], &vals[pos], (size_t)(bt->cardinality - pos) * sizeof(uint16_t));
-        vals[pos] = lo;
-        bt->cardinality++;
+        uint32_t s = rb_alloc_slot_raw(h);
+        if (s) {
+            uint16_t *nv = rb_array(h, s);
+            memcpy(nv, vals, (size_t)pos * sizeof(uint16_t));
+            nv[pos] = lo;
+            memcpy(nv + pos + 1, vals + pos, (size_t)(card - pos) * sizeof(uint16_t));
+            rb_replace_container(h, hi, s, card + 1, RB_TYPE_ARRAY);
+        } else {
+            memmove(&vals[pos + 1], &vals[pos], (size_t)(card - pos) * sizeof(uint16_t));
+            vals[pos] = lo;
+            bt->cardinality++;
+        }
         h->hdr->cardinality++;
         return 1;
     }
@@ -711,8 +819,10 @@ static inline int rb_add_locked(RbHandle *h, uint32_t x) {
         uint32_t w = lo >> 6;
         uint64_t b = (uint64_t)1 << (lo & 63);
         if (bits[w] & b) return 0;
-        bits[w] |= b;
+        /* Count before bit: a kill between them over-counts, which never frees a live container. */
         bt->cardinality++;
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        bits[w] |= b;
         h->hdr->cardinality++;
         return 1;
     }
@@ -747,13 +857,25 @@ static inline int rb_remove_locked(RbHandle *h, uint32_t x) {
         uint32_t card = rb_array_card(bt);
         uint32_t pos;
         if (!rb_array_search(vals, card, lo, &pos)) return 0;
+        uint32_t s = card > 1 ? rb_alloc_slot_raw(h) : 0;
+        if (s) {
+            uint16_t *nv = rb_array(h, s);
+            memcpy(nv, vals, (size_t)pos * sizeof(uint16_t));
+            memcpy(nv + pos, vals + pos + 1, (size_t)(card - pos - 1) * sizeof(uint16_t));
+            rb_replace_container(h, hi, s, card - 1, RB_TYPE_ARRAY);
+            h->hdr->cardinality--;
+            return 1;
+        }
         memmove(&vals[pos], &vals[pos + 1], (size_t)(card - pos - 1) * sizeof(uint16_t));
         bt->cardinality--;
         h->hdr->cardinality--;
         if (bt->cardinality == 0) {
-            rb_free_slot(h, bt->container_off);
-            bt->container_off = 0;
+            uint32_t off = bt->container_off;
+            /* Unlink before freeing: a kill between them leaks the slot, never shares it. */
             bt->type = RB_TYPE_NONE;
+            bt->container_off = 0;
+            __atomic_signal_fence(__ATOMIC_SEQ_CST);
+            rb_free_slot(h, off);
         }
         return 1;
     }
@@ -766,9 +888,11 @@ static inline int rb_remove_locked(RbHandle *h, uint32_t x) {
         bt->cardinality--;
         h->hdr->cardinality--;
         if (bt->cardinality == 0) {
-            rb_free_slot(h, bt->container_off);
-            bt->container_off = 0;
+            uint32_t off = bt->container_off;
             bt->type = RB_TYPE_NONE;
+            bt->container_off = 0;
+            __atomic_signal_fence(__ATOMIC_SEQ_CST);
+            rb_free_slot(h, off);
         }
         return 1;
     }
@@ -780,9 +904,10 @@ static inline void rb_clear_locked(RbHandle *h) {
     RbHeader *hdr = h->hdr;
     RbBucket *bt = rb_buckets(h);
     memset(bt, 0, (size_t)RB_NUM_BUCKETS * sizeof(RbBucket));
+    hdr->free_count = 0;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     hdr->container_used = 1;   /* slot 0 reserved */
     hdr->free_head = 0;
-    hdr->free_count = 0;
     hdr->cardinality = 0;
 }
 
@@ -890,7 +1015,7 @@ static inline void rb_recompute_cardinality(RbHandle *a, RbBucket *abt) {
 }
 
 /* a |= b.  Caller has verified rb_avail_slots(a) >= rb_union_new_slots_needed.
- * Every bucket combination is handled in place. */
+ * A rewritten array container is built in a spare slot when one is free. */
 static inline void rb_union_locked(RbHandle *a, RbHandle *b) {
     RbBucket *abt = rb_buckets(a);
     RbBucket *bbt = rb_buckets(b);
@@ -902,8 +1027,9 @@ static inline void rb_union_locked(RbHandle *a, RbHandle *b) {
             uint32_t s = rb_alloc_slot(a);          /* guaranteed available */
             memcpy(rb_slot(a, s), rb_slot(b, bbt[hi].container_off), RB_CONTAINER_BYTES);
             abt[hi].container_off = s;
-            abt[hi].type = bbt[hi].type;
             abt[hi].cardinality = bbt[hi].cardinality;
+            __atomic_signal_fence(__ATOMIC_SEQ_CST);
+            abt[hi].type = bbt[hi].type;
             continue;
         }
 
@@ -923,19 +1049,33 @@ static inline void rb_union_locked(RbHandle *a, RbHandle *b) {
             while (ai < ac) tmp[n++] = av[ai++];
             while (bi < bc) tmp[n++] = bv[bi++];
             if (n <= RB_ARRAY_MAX) {
-                memcpy(av, tmp, (size_t)n * sizeof(uint16_t));
-                abt[hi].cardinality = n;
+                if (n != ac) rb_commit_array(a, hi, tmp, n);
             } else {
-                uint64_t *bits = rb_bitmap(a, abt[hi].container_off);
-                memset(bits, 0, RB_CONTAINER_BYTES);
+                uint32_t s = rb_alloc_slot(a);
+                uint64_t *bits = rb_bitmap(a, s ? s : abt[hi].container_off);
+                if (!s) memset(bits, 0, RB_CONTAINER_BYTES);
                 for (uint32_t i = 0; i < n; i++) bits[tmp[i] >> 6] |= (uint64_t)1 << (tmp[i] & 63);
-                abt[hi].type = RB_TYPE_BITMAP;
-                abt[hi].cardinality = n;
+                if (s) {
+                    rb_replace_container(a, hi, s, n, RB_TYPE_BITMAP);
+                } else {
+                    abt[hi].type = RB_TYPE_BITMAP;
+                    abt[hi].cardinality = n;
+                }
             }
             continue;
         }
 
         if (abt[hi].type == RB_TYPE_ARRAY && bbt[hi].type == RB_TYPE_BITMAP) {
+            uint32_t s = rb_alloc_slot_raw(a);
+            if (s) {
+                uint64_t *nbits = rb_bitmap(a, s);
+                const uint16_t *av = rb_array(a, abt[hi].container_off);
+                uint32_t ac = rb_array_card(&abt[hi]);
+                memcpy(nbits, rb_bitmap(b, bbt[hi].container_off), RB_CONTAINER_BYTES);
+                for (uint32_t i = 0; i < ac; i++) nbits[av[i] >> 6] |= (uint64_t)1 << (av[i] & 63);
+                rb_replace_container(a, hi, s, (uint32_t)rb_popcount_bitmap(nbits), RB_TYPE_BITMAP);
+                continue;
+            }
             /* array(a) | bitmap(b): copy b's bitmap into a, then OR a's old
              * array values back in.  Snapshot a's array first (slot reused). */
             uint16_t tmp[RB_ARRAY_MAX];
@@ -950,7 +1090,8 @@ static inline void rb_union_locked(RbHandle *a, RbHandle *b) {
             continue;
         }
 
-        /* bitmap(a) | array(b)  and  bitmap(a) | bitmap(b) */
+        /* bitmap(a) | array(b)  and  bitmap(a) | bitmap(b): in place; each word only
+         * gains bits, and recovery recounts a cardinality a kill leaves stale. */
         {
             uint64_t *abits = rb_bitmap(a, abt[hi].container_off);
             abt[hi].cardinality = rb_or_into_bitmap(abits, b, &bbt[hi]);
@@ -960,7 +1101,8 @@ static inline void rb_union_locked(RbHandle *a, RbHandle *b) {
     rb_recompute_cardinality(a, abt);
 }
 
-/* a &= b.  Never needs new slots (intersection only shrinks or frees).  Caller
+/* a &= b.  Needs no new slots: intersection only shrinks or frees, and a
+ * rewritten container borrows a spare slot only when one is free.  Caller
  * holds a's write lock and b's read lock. */
 static inline void rb_intersect_locked(RbHandle *a, RbHandle *b) {
     RbBucket *abt = rb_buckets(a);
@@ -969,73 +1111,116 @@ static inline void rb_intersect_locked(RbHandle *a, RbHandle *b) {
         if (abt[hi].type == RB_TYPE_NONE) continue;
 
         if (bbt[hi].type == RB_TYPE_NONE) {
-            rb_free_slot(a, abt[hi].container_off);
-            abt[hi].container_off = 0;
-            abt[hi].type = RB_TYPE_NONE;
-            abt[hi].cardinality = 0;
+            rb_unlink_bucket(a, hi);
             continue;
         }
 
-        if (abt[hi].type == RB_TYPE_ARRAY && bbt[hi].type == RB_TYPE_ARRAY) {
-            /* array & array -> two-pointer intersect into a C-stack temp. */
+        if (abt[hi].type == RB_TYPE_ARRAY) {
+            /* array(a) & either -> a's values that b holds, into a C-stack temp. */
             uint16_t tmp[RB_ARRAY_MAX];
-            uint16_t *av = rb_array(a, abt[hi].container_off);
-            const uint16_t *bv = rb_array(b, bbt[hi].container_off);
-            uint32_t ai = 0, bi = 0, n = 0;
-            uint32_t ac = rb_array_card(&abt[hi]), bc = rb_array_card(&bbt[hi]);
-            while (ai < ac && bi < bc) {
-                uint16_t x = av[ai], y = bv[bi];
-                if (x < y) ai++;
-                else if (x > y) bi++;
-                else { tmp[n++] = x; ai++; bi++; }
-            }
-            memcpy(av, tmp, (size_t)n * sizeof(uint16_t));
-            abt[hi].cardinality = n;
-        }
-        else if (abt[hi].type == RB_TYPE_ARRAY && bbt[hi].type == RB_TYPE_BITMAP) {
-            /* array(a) & bitmap(b): keep a's values whose bit is set in b. */
-            uint16_t *av = rb_array(a, abt[hi].container_off);
-            const uint64_t *bb = rb_bitmap(b, bbt[hi].container_off);
+            const uint16_t *av = rb_array(a, abt[hi].container_off);
             uint32_t n = 0, ac = rb_array_card(&abt[hi]);
-            for (uint32_t i = 0; i < ac; i++) {
-                uint16_t lo = av[i];
-                if ((bb[lo >> 6] >> (lo & 63)) & 1) av[n++] = lo;
+            if (bbt[hi].type == RB_TYPE_ARRAY) {
+                const uint16_t *bv = rb_array(b, bbt[hi].container_off);
+                uint32_t ai = 0, bi = 0, bc = rb_array_card(&bbt[hi]);
+                while (ai < ac && bi < bc) {
+                    uint16_t x = av[ai], y = bv[bi];
+                    if (x < y) ai++;
+                    else if (x > y) bi++;
+                    else { tmp[n++] = x; ai++; bi++; }
+                }
+            } else {
+                const uint64_t *bb = rb_bitmap(b, bbt[hi].container_off);
+                for (uint32_t i = 0; i < ac; i++) {
+                    uint16_t lo = av[i];
+                    if ((bb[lo >> 6] >> (lo & 63)) & 1) tmp[n++] = lo;
+                }
             }
-            abt[hi].cardinality = n;
+            if (n != ac) rb_commit_array(a, hi, tmp, n);
+            continue;
         }
-        else if (abt[hi].type == RB_TYPE_BITMAP && bbt[hi].type == RB_TYPE_ARRAY) {
-            /* bitmap(a) & array(b) -> result is b's values that are set in a;
-             * write it back as an ARRAY into a's slot.  Snapshot b's array to
-             * a temp (a's slot is being overwritten). */
+
+        if (bbt[hi].type == RB_TYPE_ARRAY) {
+            /* bitmap(a) & array(b) -> b's values that are set in a, as an ARRAY. */
             uint16_t tmp[RB_ARRAY_MAX];
             const uint16_t *bv = rb_array(b, bbt[hi].container_off);
-            uint64_t *abits = rb_bitmap(a, abt[hi].container_off);
+            const uint64_t *abits = rb_bitmap(a, abt[hi].container_off);
             uint32_t n = 0, bc = rb_array_card(&bbt[hi]);
             for (uint32_t i = 0; i < bc; i++) {
                 uint16_t lo = bv[i];
                 if ((abits[lo >> 6] >> (lo & 63)) & 1) tmp[n++] = lo;
             }
-            uint16_t *av = rb_array(a, abt[hi].container_off);
-            memcpy(av, tmp, (size_t)n * sizeof(uint16_t));   /* same slot, array view */
-            abt[hi].type = RB_TYPE_ARRAY;
-            abt[hi].cardinality = n;
+            rb_commit_array(a, hi, tmp, n);
+            continue;
         }
-        else { /* bitmap(a) & bitmap(b) */
+
+        /* bitmap(a) & bitmap(b): in place; each word only loses bits, and
+         * recovery recounts a cardinality a kill leaves stale. */
+        {
             uint64_t *abits = rb_bitmap(a, abt[hi].container_off);
             const uint64_t *bb = rb_bitmap(b, bbt[hi].container_off);
             for (uint32_t w = 0; w < 1024; w++) abits[w] &= bb[w];
             abt[hi].cardinality = (uint32_t)rb_popcount_bitmap(abits);
-        }
-
-        /* If the bucket emptied, free its slot. */
-        if (abt[hi].cardinality == 0) {
-            rb_free_slot(a, abt[hi].container_off);
-            abt[hi].container_off = 0;
-            abt[hi].type = RB_TYPE_NONE;
+            if (abt[hi].cardinality == 0) rb_unlink_bucket(a, hi);
         }
     }
 
     rb_recompute_cardinality(a, abt);
+}
+
+/* Run by the process that took over the write lock from a dead writer.
+ * Finishes an interrupted bucket switch, then rebuilds from the bucket table
+ * what it determines: bitmap counts, the freelist (reclaiming slots a kill
+ * stranded between allocate, switch and free) and the total.  Rewrites only
+ * derived state, so a crash here is recovered by running it again. */
+static void rb_repair_locked(RbHandle *h) {
+    RbHeader *hdr = h->hdr;
+    RbBucket *bt = rb_buckets(h);
+    if (hdr->sealed) return;
+    uint32_t p = __atomic_load_n(&hdr->pub_hi, __ATOMIC_RELAXED);
+    if (p) {
+        if (p <= RB_NUM_BUCKETS) {
+            bt[p - 1].container_off = hdr->pub.container_off;
+            bt[p - 1].cardinality   = hdr->pub.cardinality;
+            bt[p - 1].type          = hdr->pub.type;
+        }
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
+        __atomic_store_n(&hdr->pub_hi, 0, __ATOMIC_RELAXED);
+    }
+    uint32_t used = hdr->container_used;
+    if (used < 1 || used > h->container_cap) return;
+    uint8_t *live = (uint8_t *)calloc(used / 8 + 1, 1);
+    if (!live) return;
+    uint64_t total = 0;
+    for (uint32_t hi = 0; hi < RB_NUM_BUCKETS; hi++) {
+        RbBucket *b = &bt[hi];
+        if (b->type == RB_TYPE_NONE) continue;
+        uint32_t off = b->container_off;
+        if (off == 0 || off >= used) continue;
+        if (b->type != RB_TYPE_ARRAY)
+            b->cardinality = (uint32_t)rb_popcount_bitmap(rb_bitmap(h, off));
+        if (b->cardinality == 0) {
+            b->type = RB_TYPE_NONE;
+            b->container_off = 0;
+            continue;
+        }
+        live[off >> 3] |= (uint8_t)(1u << (off & 7));
+        total += b->cardinality;
+    }
+    uint32_t head = 0, nfree = 0;
+    hdr->free_count = 0;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    for (uint32_t i = used; i-- > 1; ) {
+        if (live[i >> 3] & (1u << (i & 7))) continue;
+        *(uint32_t *)rb_slot(h, i) = head;
+        head = i;
+        nfree++;
+    }
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->free_head = head;
+    hdr->free_count = nfree;
+    hdr->cardinality = total;
+    free(live);
 }
 
 /* ================================================================
@@ -1164,14 +1349,36 @@ static int rb_secure_open(const char *path, mode_t file_mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int rb_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int rb_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* Opt-in (DATA_ROARINGBITMAP_SHARED_SPARSE=0): reserving commits memory this module otherwise fills lazily. */
+static int rb_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_ROARINGBITMAP_SHARED_SPARSE");
+    if (!sp || strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static RbHandle *rb_create(const char *path, uint64_t container_cap_in, mode_t file_mode, char *errbuf) {
@@ -1206,9 +1413,18 @@ static RbHandle *rb_create(const char *path, uint64_t container_cap_in, mode_t f
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             RB_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && rb_reserve(fd, total) < 0) {
+            RB_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { RB_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            RB_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!rb_validate_header((RbHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -1218,9 +1434,13 @@ static RbHandle *rb_create(const char *path, uint64_t container_cap_in, mode_t f
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((RbHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && rb_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && rb_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, file_mode) < 0) {
                         RB_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (rb_reserve(fd, total) < 0) {
+                        RB_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     rb_init_header(base, container_cap, total);
@@ -1257,6 +1477,10 @@ static RbHandle *rb_create_memfd(const char *name, uint64_t container_cap_in, ch
     if (ftruncate(fd, (off_t)total) < 0) {
         RB_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (rb_reserve(fd, total) < 0) {
+        RB_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { RB_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -1269,6 +1493,11 @@ static RbHandle *rb_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { RB_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(RbHeader)) { RB_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(RbHeader, magic)) != (ssize_t)sizeof magic || magic != RB_MAGIC) {
+        RB_ERR("invalid roaring-bitmap file"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { RB_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -1323,6 +1552,11 @@ static RbHandle *rb_open_readonly(const char *path, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { RB_ERR("fstat %s: %s", path, strerror(errno)); close(fd); return NULL; }
     if ((uint64_t)st.st_size < sizeof(RbHeader)) { RB_ERR("%s: file too small", path); close(fd); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(RbHeader, magic)) != (ssize_t)sizeof magic || magic != RB_MAGIC) {
+        RB_ERR("%s: invalid roaring-bitmap file", path); close(fd); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ, MAP_SHARED, fd, 0);
     close(fd);   /* the mapping keeps the file; a read-only view needs no fd (no msync/ftruncate) */

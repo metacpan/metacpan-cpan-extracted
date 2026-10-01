@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::VaultProvider;
 # ABSTRACT: Vault configures this store to sync secrets using the HashiCorp Vault provider.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s auth                => '+IO::K8s::ExternalSecrets::V1::VaultAuth';
@@ -42,7 +42,7 @@ IO::K8s::ExternalSecrets::V1::VaultProvider - Vault configures this store to syn
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 auth
 

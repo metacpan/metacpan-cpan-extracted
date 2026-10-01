@@ -1,7 +1,7 @@
 package Data::SortedSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Data::SortedSet::Shared', $VERSION);
 
@@ -87,6 +87,12 @@ creates a Linux memfd (transferable via its C<memfd> descriptor);
 C<new_from_fd> reopens one in another process. The descriptor you pass is
 duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it
 does not disturb the handle.
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of the initialization dying with
+SIGBUS; set C<DATA_SORTEDSET_SHARED_SPARSE=1> to skip the reservation. On
+tmpfs and memfd the segment is memory, and a memory cgroup too small for it
+gets an OOM kill rather than a croak.
 
 =head2 String-keyed sets
 
@@ -301,10 +307,20 @@ its contents while other processes are using it.
 
 The write lock is a futex-based rwlock with PID-encoded ownership; if a writer
 dies while holding it, the next writer detects the dead owner and recovers.
-Reader slots are reclaimed similarly.  Recovery restores B<locking only>, never
-tree consistency: a writer killed mid-mutation (a node split, underflow, or
-insert) can leave the B+tree structurally corrupt.  B<Limitation>: PID reuse is
-not detected, which is very unlikely in practice but cannot be ruled out.
+Reader slots are reclaimed similarly.  The recovering process also repairs
+what the dead writer left half done.  Each C<add>, C<incr>, C<remove> and
+C<pop_*> changes the B+tree first and the member index second, recording which
+one it is changing: a write killed while changing the tree is undone, by
+rebuilding the tree from the index, and one killed later is completed, by
+rebuilding the index from the tree.  Either way the set is exactly as it was
+before or after that write.  An interrupted C<clear> finishes if it had already
+emptied the tree and is undone otherwise.  The repair takes time proportional
+to the set's size and capacity, holding the write lock: about 0.4 s per million
+members on a current x86 core.  A writer running a version of this module
+before 0.07 does not record which structure it is changing; if one is killed
+mid-write, the members that write was moving can be lost.  B<Limitation>: PID
+reuse is not detected, which is very unlikely in practice but cannot be ruled
+out.
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a
 crashed lock holder's contribution through its reader-slot. The slot table holds

@@ -397,12 +397,13 @@ merge(self, other)
         hist_rwlock_wrlock(h);
         if (h->hdr->sealed) { hist_rwlock_wrunlock(h); croak("Data::Histogram::Shared->merge: histogram is frozen (read-only)"); }
         if (other_total > 0) hist_merge_counts(hist_counts(h), tmp, counts_len);   /* empty other -> nothing to add */
-        if (h->hdr->total_count > INT64_MAX - other_total) h->hdr->total_count = INT64_MAX;
-        else h->hdr->total_count += other_total;
         if (other_total > 0) {  /* only adopt min/max if other actually recorded something */
             if (other_min < h->hdr->min_value) h->hdr->min_value = other_min;
             if (other_max > h->hdr->max_value) h->hdr->max_value = other_max;
         }
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);   /* the total goes last, as in hist_record_locked */
+        if (h->hdr->total_count > INT64_MAX - other_total) h->hdr->total_count = INT64_MAX;
+        else h->hdr->total_count += other_total;
         __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
         hist_rwlock_wrunlock(h);
     }

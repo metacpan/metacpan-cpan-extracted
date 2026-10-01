@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Sysctl;
 # ABSTRACT: Sysctl defines a kernel parameter to be set
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::Sysctl - Sysctl defines a kernel parameter to be set
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

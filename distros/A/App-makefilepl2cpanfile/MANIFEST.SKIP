@@ -74,3 +74,4 @@ mutation.json
 CLAUDE.md
 \.claude
 \.circleci
+^\.perlcriticrc$

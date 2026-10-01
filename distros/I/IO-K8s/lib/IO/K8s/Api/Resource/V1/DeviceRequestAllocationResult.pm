@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceRequestAllocationResult;
 # ABSTRACT: DeviceRequestAllocationResult contains the allocation result for one request.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s adminAccess => Bool;
@@ -12,7 +12,7 @@ k8s bindingConditions => [Str];
 k8s bindingFailureConditions => [Str];
 
 
-k8s consumedCapacity => { Str => 1 };
+k8s consumedCapacity => HashRef[Quantity];
 
 
 k8s device => Str, 'required';
@@ -50,7 +50,7 @@ IO::K8s::Api::Resource::V1::DeviceRequestAllocationResult - DeviceRequestAllocat
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 adminAccess
 
@@ -84,13 +84,13 @@ Must be a DNS subdomain and should end with a DNS domain owned by the vendor of 
 
 =head2 pool
 
-This name together with the driver name and the device name field identify which device was allocated (C<E<lt>driver nameE<gt>/E<lt>pool nameE<gt>/E<lt>device nameE<gt>>).
+This name together with the driver name and the device name field identify which device was allocated (C<< <driver name>/<pool name>/<device name> >>).
 
 Must not be longer than 253 characters and may contain one or more DNS sub-domains separated by slashes.
 
 =head2 request
 
-Request is the name of the request in the claim which caused this device to be allocated. If it references a subrequest in the firstAvailable list on a DeviceRequest, this field must include both the name of the main request and the subrequest using the format C<<main request>/<subrequest>>.
+Request is the name of the request in the claim which caused this device to be allocated. If it references a subrequest in the firstAvailable list on a DeviceRequest, this field must include both the name of the main request and the subrequest using the format C<< <main request>/<subrequest> >>.
 
 Multiple devices may have been allocated per request.
 

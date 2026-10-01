@@ -212,4 +212,15 @@ ok !-e $cu, 'class-method unlink removed the file';
     pass 'double DESTROY did not crash';
 }
 
+# adds whose running total passes INT64_MAX while every value stays in range
+{
+    my $MAX = 9223372036854775807;
+    my $w = Data::SegmentTree::Shared->new(undef, 2);
+    $w->range_add(0, 1, $MAX);
+    $w->range_add(0, 0, -$MAX);
+    $w->range_add(0, 0, -5);
+    is $w->min(0, 1), -5,   'min after wrapping adds';
+    is $w->max(0, 1), $MAX, 'max after wrapping adds';
+}
+
 done_testing;

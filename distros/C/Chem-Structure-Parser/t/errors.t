@@ -344,6 +344,22 @@ SKIP: {
 	throws_ok { Chem::Structure::Parser::_features($info,
 	                { %o, sides => [ $A, $B ], pocket_distance => 0 }, 'x') }
 		qr/^x: the interface distances must be positive numbers/, 'XS: a pocket of no size';
+
+	# Every option is checked before anything is computed.  A bad threshold
+	# used to be found where its calculation was reached, by which time the
+	# surface had been worked out and written into every atom of $info: the
+	# call died and left the structure half-annotated.
+	my $bare = structure_info("$data/fold.pdb", features => 0);
+	throws_ok { Chem::Structure::Parser::_features($bare,
+	                { %o, sasa => 1, store => 1, contacts => 1, contact_distance => -1 }, 'x') }
+		qr/^x: contact_distance must be a positive number/, 'XS: a negative contact distance';
+	my $any = 0;
+	for my $c (values %{ $bare->{chains} }) {
+		for my $r (values %{ $c->{residues} }) {
+			$any++ if exists $r->{sasa} || grep { exists $_->{sasa} } values %{ $r->{atoms} };
+		}
+	}
+	is($any, 0, 'and it died before the surface was computed and stored');
 }
 
 done_testing();

@@ -1,7 +1,7 @@
 package Data::DisjointSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::DisjointSet::Shared', $VERSION);
 
@@ -229,6 +229,12 @@ lock, so the final partition is independent of how the processes interleave.
     wait;
     print $d->num_sets, "\n";   # reflects the child's unions
 
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of dying with SIGBUS while they
+initialize it; C<DATA_DISJOINTSET_SHARED_SPARSE=1> skips the reservation. On
+tmpfs and memfd the segment is memory, and a memory cgroup too small for it
+gets an OOM kill rather than a croak.
+
 =head1 SECURITY
 
 Backing files are created with mode C<0600> (owner-only) by default, so only
@@ -246,8 +252,13 @@ its contents while other processes are using it.
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
 ownership; if a holder dies, the next contender detects the dead owner and
-recovers. Because C<union> updates a couple of words while holding the lock, a
-crash leaves the partition consistent up to the last completed C<union>.
+recovers. It also re-derives every set's size and C<num_sets> from the parent
+links, so an interrupted C<union> has either merged its two sets or not, and
+C<set_size> and C<num_sets> agree with the partition; this takes time
+proportional to C<capacity>.
+C<reset> rewrites every element, so it marks itself in progress in the header
+first; if its writer dies part-way, the process that recovers the lock runs the
+C<reset> again from the start, and every element is a singleton afterwards.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a

@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2::CiliumEgressGatewayPolicy;
 # ABSTRACT: CiliumEgressGatewayPolicy
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
-    resource_plural => 'ciliumegressgatewaypolicies';
+    resource_plural => 'ciliumegressgatewaypolicies',
+    subresources    => {};
 
 k8s spec => '+IO::K8s::Cilium::V2::CiliumEgressGatewayPolicySpec';
 
@@ -22,7 +23,7 @@ IO::K8s::Cilium::V2::CiliumEgressGatewayPolicy - CiliumEgressGatewayPolicy
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

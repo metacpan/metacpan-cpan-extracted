@@ -11,6 +11,7 @@ build_requires:
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0.13'
   Test::Most: '0'
+  Test::Permissions: '0'
   Test::Returns: '0.04'
   Test::Without::Module: '0'
 configure_requires:
@@ -27,7 +28,10 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
+  Fcntl: '0'
   File::HomeDir: '0'
+  Getopt::Long: '0'
   IPC::System::Simple: '0'
   Params::Get: '0.17'
   Path::Tiny: '0.034'
@@ -35,10 +39,10 @@ requires:
   Text::Diff: '0'
   YAML::Tiny: '0'
   autodie: '0'
-  perl: '5.014'
+  perl: '5.026'
 resources:
   bugtracker: https://github.com/nigelhorne/App-makefilepl2cpanfile/issues
   homepage: https://metacpan.org/pod/App::makefilepl2cpanfile
   repository: git://github.com/nigelhorne/App-makefilepl2cpanfile.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

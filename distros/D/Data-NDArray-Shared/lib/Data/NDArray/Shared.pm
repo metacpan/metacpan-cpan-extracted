@@ -2,7 +2,7 @@ package Data::NDArray::Shared;
 use strict;
 use warnings;
 use Carp ();
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 require XSLoader;
 XSLoader::load('Data::NDArray::Shared', $VERSION);
 
@@ -249,6 +249,12 @@ C<new_from_fd> reopens one in another process. The descriptor you pass is
 duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it
 does not disturb the handle. C<new_readonly> opens a B<frozen> file read-only
 for lock-free access (see L</"FROZEN (READ-ONLY) MODE">).
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of dying with C<SIGBUS> while the
+array is zero-filled; set C<DATA_NDARRAY_SHARED_SPARSE=1> to skip the
+reservation. On tmpfs and memfd the segment is memory, and a memory cgroup too
+small for it gets an OOM kill rather than a croak.
 
 =head2 Element access
 
@@ -550,9 +556,13 @@ its contents while other processes are using it.
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
 ownership; if a holder dies, the next contender detects the dead owner and
-recovers. Because each mutation updates the data buffer (and, for C<reshape>, a
-few header words) while holding the lock, a crash leaves the array consistent up
-to the last completed operation. B<Limitation>: PID reuse is not detected (very
+recovers. A whole-array operation killed part-way leaves some elements updated
+and the rest not. A C<reshape> killed part-way can leave C<ndim>, C<shape> and
+C<strides> mixed; the process that recovers the lock, or the next one to open
+the file, detects that (the shape's product no longer equals C<size>, or the
+strides are not row-major) and resets the array to its 1-D view: C<ndim> 1,
+C<shape> C<(size)>. The data itself is never touched, and a mixed shape that is
+still self-consistent is kept. B<Limitation>: PID reuse is not detected (very
 unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a

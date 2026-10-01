@@ -1,7 +1,7 @@
 # ABSTRACT: Shared board-level computations for the rendering commands
 
 package App::karr::Board;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use App::karr::Config;
 
@@ -84,7 +84,7 @@ App::karr::Board - Shared board-level computations for the rendering commands
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 

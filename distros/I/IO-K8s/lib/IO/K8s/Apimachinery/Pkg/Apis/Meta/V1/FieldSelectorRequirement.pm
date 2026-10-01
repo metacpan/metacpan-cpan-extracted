@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::FieldSelectorRequirement;
 # ABSTRACT: FieldSelectorRequirement is a selector that contains values, a key, and an operator that relates the key and values.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s key => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::FieldSelectorRequirement - FieldSele
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 key
 

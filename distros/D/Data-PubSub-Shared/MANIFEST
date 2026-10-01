@@ -42,6 +42,7 @@ xt/destroy_during_call.t
 xt/detached_sub.t
 xt/die_in_callback.t
 xt/eg_runs.t
+xt/enospc.t
 xt/fanout_1k.t
 xt/fd_leak.t
 xt/fd_validation.t

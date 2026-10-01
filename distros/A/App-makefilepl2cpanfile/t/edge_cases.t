@@ -48,8 +48,7 @@ use warnings;
 # it does have (File::HomeDir, Path::Tiny, YAML::Tiny).
 
 use Test::Most;
-use lib 't/lib';
-use Test::Permissions qw(can_revoke_read can_revoke_search can_revoke_write);
+use Test::Permissions qw(can_revoke_create can_revoke_read can_revoke_search why_not with_revoked);
 use Test::Mockingbird;
 use File::Temp qw(tempdir);
 use Path::Tiny;
@@ -959,22 +958,21 @@ subtest 'generate: reference as existing arg - no crash, no spurious develop mer
 
 subtest 'generate: unreadable Makefile.PL (mode 000) must croak' => sub {
 	# Strategy: create a file, remove all permissions, then verify the
-	# -r guard fires.  Root bypasses permissions, so skip under euid 0.
+	# -r guard fires.  Skipped where chmod cannot revoke read access
+	# (root, Windows, filesystems that ignore permissions).
 	SKIP: {
-		skip 'chmod cannot make a file unreadable here (root or Windows)', 1
-			unless can_revoke_read();
+		my $dir = tempdir(CLEANUP => 1);
+		skip why_not('read', $dir), 1 unless can_revoke_read($dir);
 
 		my $g   = empty_home();
-		my $dir = tempdir(CLEANUP => 1);
 		my $mf  = path($dir)->child('Makefile.PL');
 		$mf->spew_utf8($MF_SIMPLE);
-		chmod 0000, "$mf";
 
-		throws_ok {
-			App::makefilepl2cpanfile::generate(makefile => "$mf")
-		} qr/Cannot read/, 'mode-000 Makefile.PL causes croak';
-
-		chmod 0644, "$mf";    # restore so temp-cleanup can remove it
+		with_revoked(read => "$mf", sub {
+			throws_ok {
+				App::makefilepl2cpanfile::generate(makefile => "$mf")
+			} qr/Cannot read/, 'mode-000 Makefile.PL causes croak';
+		});
 	}
 };
 
@@ -1144,21 +1142,21 @@ subtest 'upstream: config path cannot be examined (stat() failure) - croaks' => 
 	# the output without explanation; the error must reach the caller.  A
 	# real EACCES is produced by making ~/.config unsearchable.
 	SKIP: {
-		skip 'chmod cannot make a directory unsearchable here (root or Windows)', 1 unless can_revoke_search();
 		my $home = path(tempdir(CLEANUP => 1));
+		skip why_not('search', $home), 1 unless can_revoke_search($home);
 		my $cfg_dir = $home->child('.config');
 		$cfg_dir->mkpath;
 		$cfg_dir->child('makefilepl2cpanfile.yml')->spew_utf8("develop:\n  X: 1\n");
-		chmod 0, "$cfg_dir";
 		my $g  = mock_scoped 'File::HomeDir::my_home' => sub { "$home" };
 		my $mf = make_mf($MF_SIMPLE);
 		my $msg_eacces = do { local $! = POSIX::EACCES(); "$!" };
 
-		throws_ok {
-			App::makefilepl2cpanfile::generate(makefile => "$mf", with_develop => 1)
-		} qr/\AFailed to parse \Q$cfg_dir\E\/makefilepl2cpanfile\.yml: \Q$msg_eacces\E at /,
-			'stat() failure on the config path croaks with the errno text';
-		chmod 0755, "$cfg_dir";
+		with_revoked(search => "$cfg_dir", sub {
+			throws_ok {
+				App::makefilepl2cpanfile::generate(makefile => "$mf", with_develop => 1)
+			} qr/\AFailed to parse \Q$cfg_dir\E\/makefilepl2cpanfile\.yml: \Q$msg_eacces\E at /,
+				'stat() failure on the config path croaks with the errno text';
+		});
 	}
 };
 
@@ -1897,16 +1895,16 @@ subtest 'filesystem: hostile config file locations' => sub {
 		like $_[1][0], qr/\ANo 'develop' key found in /, 'develop is a list: warned';
 	});
 	SKIP: {
-		skip 'chmod cannot make a file unreadable here (root or Windows)', 1 unless can_revoke_read();
 		my $home = path(tempdir(CLEANUP => 1));
+		skip why_not('read', $home), 1 unless can_revoke_read($home);
 		my $cfg  = $home->child('.config', 'makefilepl2cpanfile.yml');
 		$cfg->parent->mkpath;
 		$cfg->spew_utf8("develop:\n  X: 1\n");
-		chmod 0, "$cfg";
 		my $g = mock_scoped 'File::HomeDir::my_home' => sub { "$home" };
-		throws_ok { App::makefilepl2cpanfile::generate(makefile => "$mf") }
-			qr/\AFailed to parse \Q$cfg\E: \S.* at /, 'unreadable config: documented croak with the reason';
-		chmod 0600, "$cfg";
+		with_revoked(read => "$cfg", sub {
+			throws_ok { App::makefilepl2cpanfile::generate(makefile => "$mf") }
+				qr/\AFailed to parse \Q$cfg\E: \S.* at /, 'unreadable config: documented croak with the reason';
+		});
 	}
 };
 
@@ -2130,13 +2128,11 @@ END_PERL
 	}
 
 	SKIP: {
-		skip 'chmod cannot make a directory read-only here (root or Windows)', 4 unless can_revoke_write();
 		my $dir = path(tempdir(CLEANUP => 1));
+		skip why_not('create', $dir), 4 unless can_revoke_create($dir);
 		$dir->child('Makefile.PL')->spew_utf8($MF_SIMPLE);
 		$dir->child($HOSTILE{cpanfile})->spew_utf8($old);
-		chmod 0555, "$dir";
-		my ($out, $err, $exit) = $run->($dir, $BIN_PATH);
-		chmod 0755, "$dir";
+		my ($out, $err, $exit) = with_revoked(create => "$dir", sub { $run->($dir, $BIN_PATH) });
 		isnt $exit, 0, 'read-only directory: non-zero exit';
 		isnt $err, q{}, 'read-only directory: error reported';
 		unlike $out, qr/\Q$HOSTILE{written}\E/, 'read-only directory: no success message';
@@ -2191,8 +2187,13 @@ subtest 'performance: pathological inputs complete in linear-ish time' => sub {
 		'long whitespace run inside a comment');
 	is $inner->{runtime}{requires}{A}{comment}, "a${run}b", 'inner whitespace kept, outer trimmed';
 
-	within_time_limit(sub { App::makefilepl2cpanfile::parse_prereqs('recommends => {' x $HOSTILE{bomb_depth}) },
-		'unclosed legacy blocks');
+	# Unclosed openers: the innermost level of each block regex once read
+	# on to the next '}' (to the end of the input here), once per opener.
+	for my $opener ('recommends => {', 'recommends => { x => {', 'PREREQ_PM => {',
+		'prereqs => {', 'prereqs => { runtime => {', 'prereqs => { runtime => { requires => {') {
+		within_time_limit(sub { App::makefilepl2cpanfile::parse_prereqs($opener x $HOSTILE{bomb_depth}) },
+			$opener eq 'recommends => {' ? 'unclosed legacy blocks' : "unclosed '$opener'");
+	}
 	within_time_limit(sub { App::makefilepl2cpanfile::parse_prereqs("PREREQ_PM => {" . ('{' x $HOSTILE{bomb_depth})) },
 		'brace bomb');
 	within_time_limit(sub { App::makefilepl2cpanfile::parse_prereqs(q{'} x $HOSTILE{bomb_depth} . "# PREREQ_PM => { 'X' => 0 }") },

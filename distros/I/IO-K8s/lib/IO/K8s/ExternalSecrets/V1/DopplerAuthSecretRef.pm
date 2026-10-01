@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::DopplerAuthSecretRef;
 # ABSTRACT: SecretRef authenticates using a Doppler service token stored in a Kubernetes Secret.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s dopplerToken => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::DopplerAuthSecretRef - SecretRef authenticates usi
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 dopplerToken
 

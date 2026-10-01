@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::Workload;
 # ABSTRACT: Workload allows for expressing scheduling constraints that should be used when managing the lifecycle of workloads from the scheduling perspective, including scheduling, preemption, eviction and other phases. Workload API enablement is toggled by the GenericWorkload feature gate.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -22,7 +22,7 @@ IO::K8s::Api::Scheduling::V1alpha3::Workload - Workload allows for expressing sc
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 DESCRIPTION
 

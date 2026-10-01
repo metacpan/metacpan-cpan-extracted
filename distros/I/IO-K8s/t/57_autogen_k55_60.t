@@ -73,7 +73,10 @@ subtest 'k55: additionalProperties: true falls back to opaque hash, nested round
     );
 
     my $info = $class->_k8s_attr_info;
-    ok($info->{blob}{is_hash_of_str}, 'additionalProperties: true registers as the opaque hash-of-str shape');
+    # k191: the opaque map is Opaque / is_hash_opaque now; is_hash_of_str
+    # became the string map. Same claim (opaque), the flag's name changed.
+    ok($info->{blob}{is_hash_opaque}, 'additionalProperties: true registers as the opaque map (Opaque)');
+    ok(!$info->{blob}{is_hash_of_str}, '... not as a string map');
 
     my $nested = { a => 1, b => { c => 2, d => [ 1, 2, 3 ] } };
     my $obj = $class->new(blob => $nested);
@@ -93,7 +96,8 @@ subtest 'k55: additionalProperties: false ALSO falls back to the same opaque has
     );
 
     my $info = $class->_k8s_attr_info;
-    ok($info->{blob}{is_hash_of_str}, 'additionalProperties: false is NOT narrowed -- same opaque hash-of-str shape');
+    # k191: opaque flag renamed, as above.
+    ok($info->{blob}{is_hash_opaque}, 'additionalProperties: false is NOT narrowed -- same opaque map (Opaque)');
 
     my $nested = { anything => 'goes', nested => { still => 'accepted' } };
     my $obj;

@@ -1,7 +1,7 @@
 package Data::Pool::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Data::Pool::Shared', $VERSION);
@@ -18,7 +18,7 @@ sub CLONE_SKIP { 1 }  # blessed C-pointer handle: never clone into ithreads (dou
 # Guard -- auto-free on scope exit
 
 package Data::Pool::Shared::Guard {
-    our $VERSION = '0.09';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.10';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         my $self = shift;
         # only the creating process frees the slot: after fork the child inherits
@@ -183,6 +183,22 @@ Each slot records the PID of its allocator. C<recover_stale> scans for
 slots owned by dead processes and frees them. Call periodically or on
 startup for crash recovery.
 
+A slot is claimed by writing the allocator's PID into its owner word, and
+only then marked in the allocation bitmap; a free clears the bitmap bit
+first and the owner word last. A process killed at any point inside C<alloc>
+or C<free> therefore leaves the slot either free or carrying its PID, and
+C<recover_stale> frees it once that process is dead. A slot freed by a process
+other than its allocator, if that process is killed in the middle of the free,
+stays taken until the allocator is dead too. A process killed inside C<alloc>,
+C<free> or C<recover_stale> can leave C<used> one too high for each such kill,
+and one inside C<free_n> or C<alloc_n> by up to the number of slots it handles
+(C<available> never goes below 0); a blocked C<alloc> rescans at least once a
+second, so it still finds a free slot.
+
+The backing-file format is version 2. A file written by a release that
+used format 1 is refused with C<pool file format version 1 is not supported>;
+recreate it.
+
 =head1 CONSTRUCTORS
 
     # Raw pool
@@ -208,6 +224,12 @@ startup for crash recovery.
 The descriptor you pass to C<new_from_fd> is duplicated
 (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it does not
 disturb the pool.
+
+C<new> and C<new_memfd> reserve the whole segment when they create one, so a
+full filesystem makes them croak instead of dying with C<SIGBUS> while the
+segment is initialized; set C<DATA_POOL_SHARED_SPARSE=1> to skip the
+reservation. On tmpfs and memfd the segment is memory, and a memory cgroup too
+small for it gets an OOM kill rather than a croak.
 
 =head1 METHODS
 

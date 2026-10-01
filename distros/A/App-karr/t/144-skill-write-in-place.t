@@ -122,7 +122,7 @@ subtest 'the content is encoded exactly once' => sub {
 
 subtest 'a target that does not exist yet is still created' => sub {
     my $dir  = tempdir( CLEANUP => 1 );
-    my $file = path($dir)->child('deep/skills/kanban-issues-karr-cli/SKILL.md');
+    my $file = path($dir)->child('deep/skills/kanban-issues-karr-ticket/SKILL.md');
 
     ok( !$file->exists, 'nothing there to begin with' );
     App::karr::Cmd::Skill->new->_write_skill( $file, $NEW );
@@ -267,12 +267,12 @@ subtest 'karr skill install/update through the real CLI keep the inode' => sub {
     # the long version of why this matters). The #285 layout: a directory
     # with SKILL.md and references/ under it.
     my $share_lib = path( tempdir( CLEANUP => 1 ) );
-    my $share_dir = $share_lib->child(qw( auto share dist App-karr kanban-issues-karr-cli ));
+    my $share_dir = $share_lib->child(qw( auto share dist App-karr kanban-issues-karr-ticket ));
     $share_dir->child('references')->mkpath;
     $share_dir->child('SKILL.md')->spew_utf8($NEW);
     $share_dir->child('references/extra.md')->spew_utf8($REF);
 
-    my $installed = path($dir)->child('.claude/skills/kanban-issues-karr-cli/SKILL.md');
+    my $installed = path($dir)->child('.claude/skills/kanban-issues-karr-ticket/SKILL.md');
     $installed->parent->mkpath;
     $installed->spew_utf8($OLD);
     my $chained = path($dir)->child('elsewhere/SKILL.md');

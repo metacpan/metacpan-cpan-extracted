@@ -27,7 +27,10 @@ use lib "$Bin/lib";
 #   * a subclass overriding one step changes exactly that step;
 #   * setup_class_for_os picks Debian / Ubuntu / RHEL / SUSE / none by OS,
 #     and an OS without a class still probes nvidia-smi and rejects Kepler
-#     before it dies.
+#     before it dies;
+#   * karr #69: Ubuntu's kernel_packages is the running kernel's headers only
+#     (linux-headers-$kernel) -- never linux-headers-generic, including on a
+#     vendor kernel's uname -r.
 # That install_driver still emits the same commands is t/96's job (goldens).
 #
 # NOT covered: anything a real host does with these commands -- none of this
@@ -241,7 +244,7 @@ for my $os (qw( rocky-9 rocky-10 leap-15.6 leap-16.0 )) {
   is($plan->{source}{name}, 'ubuntu-server', '... but the source is chosen');
   $s->resolve_plan($plan);
   is_deeply($plan->{packages},
-    [ 'linux-headers-6.8.0-1', 'linux-headers-generic', 'nvidia-driver-595-server' ],
+    [ 'linux-headers-6.8.0-1', 'nvidia-driver-595-server' ],
     'overridden run_cmd feeds the apt-cache search in resolve_plan');
   is_deeply($plan->{verify}, [ 'nvidia-driver-595-server' ], 'the chosen driver is verified');
   is($plan->{source}{branch}, 595, 'the exact branch is recorded');
@@ -313,7 +316,7 @@ for my $os (qw( rocky-9 rocky-10 leap-15.6 leap-16.0 )) {
   $s = My::Chooser->new(%facts, gpu => gpu_fixture('ada'), pick => 'nvidia-driver-590-server');
   $plan = $s->plan;
   $s->resolve_plan($plan);
-  is_deeply($plan->{packages}, [ 'linux-headers-6.8.0-1', 'linux-headers-generic', 'nvidia-driver-590-server' ],
+  is_deeply($plan->{packages}, [ 'linux-headers-6.8.0-1', 'nvidia-driver-590-server' ],
     'a subclass replacing resolve_source picks the package');
 
   $s = My::Chooser->new(%facts, gpu => gpu_fixture('volta'), pick => 'nvidia-driver-590-server');
@@ -327,7 +330,7 @@ for my $os (qw( rocky-9 rocky-10 leap-15.6 leap-16.0 )) {
   my $source = $plan->{source};
   $s->resolve_plan($plan);
   is($plan->{source}, $source, 'unchanged source: the same reference stays in the plan');
-  is_deeply($plan->{packages}, [ 'linux-headers-6.8.0-1', 'linux-headers-generic', 'nvidia-driver-580-server' ],
+  is_deeply($plan->{packages}, [ 'linux-headers-6.8.0-1', 'nvidia-driver-580-server' ],
     '... with the packages plan gave it');
 }
 
@@ -442,10 +445,35 @@ for my $os (qw( rocky-9 rocky-10 leap-15.6 leap-16.0 )) {
 
 is(Rex::GPU::NVIDIA::Setup->_cuda_repo_arch('arm64'), 'sbsa', '_cuda_repo_arch on the class');
 is(Rex::GPU::NVIDIA::Setup->_major_version('10.1'), 10, '_major_version keeps the dots in mind');
-is(Rex::GPU::NVIDIA::_os_major_version('15.6'), 15, 'old wrapper _os_major_version still answers');
+is(Rex::GPU::NVIDIA::Setup->_major_version('15.6'), 15, '_major_version on the class (was _os_major_version)');
 is($RPM->_rpm_version_in_branch('580.95.05', 580), 1, '_rpm_version_in_branch on the class');
 is($SUSE->repo_url('15.6'), 'https://download.nvidia.com/opensuse/leap/15.6/',
   'repo_url on the class');
+
+#### karr #69: Ubuntu installs only the running kernel's headers, never
+#### linux-headers-generic (that metapackage follows the GA -generic kernel,
+#### so on an HWE or vendor kernel it names headers for a different kernel
+#### than the one DKMS builds for)
+
+is($UBU->new(kernel => '6.8.0-85-generic', arch => 'amd64')->kernel_packages,
+  'linux-headers-6.8.0-85-generic',
+  'k69: Ubuntu kernel_packages is the running kernel headers only, no linux-headers-generic');
+is($UBU->new(kernel => '6.17.0-1029-nvidia', arch => 'amd64')->kernel_packages,
+  'linux-headers-6.17.0-1029-nvidia',
+  '... same on a vendor kernel (a DGX Spark-style uname -r), not linux-headers-generic');
+
+{
+  # end to end: a host reporting a vendor uname -r gets exactly that
+  # kernel's headers in the apt-get install line.
+  my $rec = record_host(
+    host => host_profile('ubuntu-24.04', responses => [ [ 'uname -r' => '6.17.0-1029-nvidia', 0 ] ]),
+    code => sub { Rex::GPU::NVIDIA::install_driver(gpu => gpu_fixture('ada')) });
+  is($rec->{error}, undef, 'k69: vendor-kernel Ubuntu install lives');
+  my ($install) = grep { / install -y / } @{ $rec->{lines} };
+  like($install, qr/ install -y linux-headers-6\.17\.0-1029-nvidia nvidia-driver-\d+-server$/,
+    'k69: install line names only that kernel\'s headers');
+  unlike($install, qr/linux-headers-generic/, '... and never linux-headers-generic');
+}
 
 #### Sources and their selection (karr #33)
 
@@ -497,7 +525,7 @@ is($SUSE->repo_url('15.6'), 'https://download.nvidia.com/opensuse/leap/15.6/',
   }
   my $plan = My::Ubuntu::Pinned->new(%facts, os => 'Ubuntu', release => '24.04')->plan;
   is($plan->{source}{name}, 'ubuntu-server-580', 'subclass sources: its order wins');
-  is_deeply($plan->{packages}, [ 'linux-headers-6.1.0-test', 'linux-headers-generic', 'nvidia-driver-580-server' ],
+  is_deeply($plan->{packages}, [ 'linux-headers-6.1.0-test', 'nvidia-driver-580-server' ],
     '... and its package lands after the kernel headers');
 
   # a requirement passed to new(): no candidate on RHEL / Leap dies, listing each

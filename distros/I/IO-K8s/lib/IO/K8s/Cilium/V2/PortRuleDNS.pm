@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::PortRuleDNS;
 # ABSTRACT: PortRuleDNS is a list of allowed DNS lookups.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s matchName    => Str, { pattern => qr/^([-a-zA-Z0-9_]+[.]?)+$/ };
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::PortRuleDNS - PortRuleDNS is a list of allowed DNS lookups.
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 matchName
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Policy::V1::PodDisruptionBudgetStatus;
 # ABSTRACT: PodDisruptionBudgetStatus represents information about the status of a PodDisruptionBudget. Status may trail the actual state of a system.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
@@ -12,7 +12,7 @@ k8s currentHealthy => Int, 'required';
 k8s desiredHealthy => Int, 'required';
 
 
-k8s disruptedPods => { Str => 1 };
+k8s disruptedPods => HashRef[Time];
 
 
 k8s disruptionsAllowed => Int, 'required';
@@ -38,7 +38,7 @@ IO::K8s::Api::Policy::V1::PodDisruptionBudgetStatus - PodDisruptionBudgetStatus 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 conditions
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::TopologySelectorLabelRequirement;
 # ABSTRACT: A topology selector requirement is a selector that matches given label. This is an alpha feature and may change in the future.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s key => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::TopologySelectorLabelRequirement - A topology selector r
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 key
 

@@ -1,16 +1,19 @@
 Revision history for Data::Heap::Shared
 
+0.10      2026-09-26
+          - A process killed mid push or pop no longer loses, duplicates or
+            misorders an element: the next lock holder finishes it.
+          - Segments are reserved, so a full filesystem fails the constructor;
+            DATA_HEAP_SHARED_SPARSE=1 skips the reservation.
+          - A failed create no longer leaves a full-size file behind.
+
 0.09      2026-09-15
           - Recover a lock left ownerless by a corrupt file instead of hanging.
 
 0.08      2026-08-12
-          - Recover a file left behind by an interrupted create instead of
-            leaving the path unopenable.
-          - Hardening: re-entrancy with tied and overloaded arguments, and
-            DESTROY on an invocant that is not one of ours.
-          - Documentation and test-harness corrections.
-          - unlink() reports a removal that failed; one already gone is not an
-            error.
+          - A file left by an interrupted create is recovered, not refused.
+          - Hardening against tied and overloaded arguments.
+          - unlink() reports a failed removal; a missing file is no error.
 
 0.07      2026-07-22
           - Fix a use-after-free in pop_wait(): an overloaded or tied timeout

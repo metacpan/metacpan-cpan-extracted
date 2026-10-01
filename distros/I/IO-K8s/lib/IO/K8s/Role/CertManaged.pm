@@ -1,6 +1,6 @@
 package IO::K8s::Role::CertManaged;
 # ABSTRACT: Role for cert-manager certificate and issuer management
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use Carp qw(croak);
 # Imports above `use Moo::Role` on purpose: Role::Tiny treats subs already in
 # the package as not-methods, so their names stay off every consumer. A `use`
@@ -141,7 +141,7 @@ IO::K8s::Role::CertManaged - Role for cert-manager certificate and issuer manage
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -198,8 +198,8 @@ Returns C<$self> for chaining.
     $cert->with_issuer($name, kind => 'Issuer', group => 'cert-manager.io');
 
 Sets C<spec.issuerRef> to point at the named issuer. C<kind> defaults to
-C<Issuer> and C<group> to C<cert-manager.io>; pass C<kind =E<gt>
-'ClusterIssuer'> for cluster-scoped issuers. Returns C<$self> for chaining.
+C<Issuer> and C<group> to C<cert-manager.io>; pass C<< kind =>
+'ClusterIssuer' >> for cluster-scoped issuers. Returns C<$self> for chaining.
 
     $cert->with_issuer('letsencrypt-prod', kind => 'ClusterIssuer');
 
@@ -229,7 +229,7 @@ Returns C<$self> for chaining.
     $cert->renew_before(hours => $n);
 
 Sets C<spec.renewBefore> from either C<days> or C<hours>. The value is
-formatted as a Go duration string C<"<n>h0m0s"> -- the wire format
+formatted as a Go duration string C<< "<n>h0m0s" >> -- the wire format
 cert-manager accepts. Pass exactly one of the two keys; if both are given
 C<days> wins. Returns C<$self> for chaining.
 
@@ -238,7 +238,7 @@ C<days> wins. Returns C<$self> for chaining.
     $issuer->letsencrypt(email => $addr, production => 1, secret => 'le-account');
 
 Configures C<spec.acme> to obtain certificates from Let's Encrypt. The
-C<email> option is mandatory and croaks if missing; C<production =E<gt> 1>
+C<email> option is mandatory and croaks if missing; C<< production => 1 >>
 selects the production ACME directory and C<0> (the default) selects the
 staging directory. C<secret> names the Secret that holds the ACME account
 private key (defaults to C<letsencrypt-account-key>). Returns C<$self> for
@@ -271,7 +271,7 @@ for chaining.
 
 Appends an HTTP-01 challenge solver to C<spec.acme.solvers>. The solver
 configures cert-manager to satisfy ACME challenges via an Ingress; pass
-C<class =E<gt> $name> to write that exact C<ingress.class> value. Without
+C<< class => $name >> to write that exact C<ingress.class> value. Without
 C<class>, this method emits an empty C<ingress> block and does not choose an
 Ingress class. Returns C<$self> for chaining.
 
@@ -286,7 +286,7 @@ Ingress class. Returns C<$self> for chaining.
 Appends a DNS-01 challenge solver to C<spec.acme.solvers>. The
 C<provider> option selects the underlying solver block -- C<cloudflare>
 and C<route53> get the matching cloud-specific shape; any other provider
-name is written as a bare C<< { provider =E<gt> {} } >> block, leaving
+name is written as a bare C<< { provider => {} } >> block, leaving
 the details for the consumer to fill in. C<secret> / C<key> are
 Cloudflare-specific (the Kubernetes Secret holding the API token and the
 key inside that Secret, defaulting to C<api-token>); C<region> is

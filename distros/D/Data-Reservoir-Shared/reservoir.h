@@ -20,6 +20,7 @@
 #ifndef RSV_H
 #define RSV_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,7 +50,7 @@
 
 #define RSV_MAGIC        0x52565352U  /* Reservoir */
 #define RSV_VERSION      2   /* 2: added the occupancy bitmap region (layout change) */
-#define RSV_ERR_BUFLEN   256
+#define RSV_ERR_BUFLEN   (PATH_MAX + 256)
 #ifndef RSV_READER_SLOTS
 #define RSV_READER_SLOTS 1024         /* max concurrent reader processes for dead-process recovery */
 #endif
@@ -87,6 +88,12 @@ typedef struct {
     uint32_t _rsv2;    /* reserved (was writers_parked); unused, kept for layout size */
 } RsvReaderSlot;
 
+/* Weighted (A-Res) min-heap entry: `key` = u^(1/weight), the smallest at the
+ * root so a heavier arrival can evict it.  `item` indexes the items region (a
+ * fixed cell that stays put -- only these 16-byte entries move during sift). */
+typedef struct { double key; uint64_t item; } RsvHeapEnt;
+_Static_assert(sizeof(RsvHeapEnt) == 16, "RsvHeapEnt must be 16 bytes");
+
 struct RsvHeader {
     uint32_t magic, version;          /* 0,4 */
     uint32_t mode;                    /* 8   RSV_MODE_UNIFORM | RSV_MODE_WEIGHTED */
@@ -106,17 +113,14 @@ struct RsvHeader {
     uint64_t seen;                    /* 96  total items observed (mutable, under wrlock) */
     uint64_t rng_state;               /* 104 xorshift64 RNG state (mutable, under wrlock) */
     uint64_t heap_off;                /* 112 weighted A-Res min-heap region (0 in uniform mode) */
-    uint8_t  _pad[136];               /* 120..255 */
+    uint32_t jsift;                   /* 120 RSV_J_UP/DOWN | hole while a heap sift is in flight, else 0 */
+    uint32_t _pad2;                   /* 124 */
+    RsvHeapEnt jent;                  /* 128 entry the in-flight sift will place at its hole */
+    uint8_t  _pad[112];               /* 144..255 */
 };
 typedef struct RsvHeader RsvHeader;
 
 _Static_assert(sizeof(RsvHeader) == 256, "RsvHeader must be 256 bytes");
-
-/* Weighted (A-Res) min-heap entry: `key` = u^(1/weight), the smallest at the
- * root so a heavier arrival can evict it.  `item` indexes the items region (a
- * fixed cell that stays put -- only these 16-byte entries move during sift). */
-typedef struct { double key; uint64_t item; } RsvHeapEnt;
-_Static_assert(sizeof(RsvHeapEnt) == 16, "RsvHeapEnt must be 16 bytes");
 
 /* ---- Process-local handle ---- */
 
@@ -211,14 +215,15 @@ static inline int rsv_pid_alive(uint32_t pid) {
  * CAS to OUR pid to hold the lock while fixing shared state, then release.
  * Using our pid (not a bare WRITER_BIT sentinel) means a subsequent recovering
  * process can detect and re-recover if we crash mid-recovery. */
+static void rsv_journal_replay(RsvHandle *h);
 static inline void rsv_recover_stale_lock(RsvHandle *h, uint32_t observed_wlock) {
     RsvHeader *hdr = h->hdr;
     uint32_t mypid = RSV_RWLOCK_WR((uint32_t)getpid());
     if (!__atomic_compare_exchange_n(&hdr->wlock, &observed_wlock,
             mypid, 0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
         return;
-    /* We now hold the write lock as mypid.  No additional shared state needs
-     * repair here (this module has no seqlock); just release the lock. */
+    /* A journal is only set past the writer's reader drain, so no reader holds while we replay it. */
+    rsv_journal_replay(h);
     __atomic_store_n(&hdr->wlock, 0, __ATOMIC_RELEASE);
     if (__atomic_load_n(&hdr->rwait, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->wlock, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -677,14 +682,36 @@ static int rsv_secure_open(const char *path, mode_t mode, char *errbuf) {
     return -1;
 }
 
-/* True iff the whole mapped region is zero -- what an abandoned mid-init
+/* True iff the whole file is zero -- what an abandoned mid-init
    creator leaves.  Lets recovery re-init only a provably-empty file, never
    one that merely starts with a zero word.  Cold path, so a byte scan is
-   fine. */
-static inline int rsv_region_is_zero(const void *p, size_t n) {
-    const unsigned char *b = (const unsigned char *)p;
-    for (size_t i = 0; i < n; i++) if (b[i]) return 0;
+   fine.  Read, not mapped: a read fault on a tmpfs hole allocates the page. */
+static int rsv_file_is_zero(int fd, uint64_t size) {
+    char buf[16384];
+    for (uint64_t off = 0; off < size; ) {
+        ssize_t n = pread(fd, buf, size - off < sizeof buf ? (size_t)(size - off) : sizeof buf, (off_t)off);
+        if (n <= 0) return 0;
+        for (ssize_t i = 0; i < n; i++) if (buf[i]) return 0;
+        off += (uint64_t)n;
+    }
     return 1;
+}
+
+/* Opt-in (DATA_RESERVOIR_SHARED_SPARSE=0): reserving commits memory this module otherwise fills lazily. */
+static int rsv_reserve(int fd, uint64_t size) {
+    const char *sp = getenv("DATA_RESERVOIR_SHARED_SPARSE");
+    if (!sp || strcmp(sp, "0")) return 0;
+    /* Before Linux 6.11 tmpfs gives up at any pending signal and undoes the allocation, so a
+     * periodic one could keep it from ever completing; SIGSTOP cannot be blocked. */
+    sigset_t all, old;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, &old);
+    int e;
+    do e = posix_fallocate(fd, 0, (off_t)size); while (e == EINTR);
+    sigprocmask(SIG_SETMASK, &old, NULL);
+    if (e == 0 || e == EOPNOTSUPP || e == EINVAL) return 0;
+    errno = e;
+    return -1;
 }
 
 static RsvHandle *rsv_create(const char *path, uint64_t k, uint64_t item_size, uint32_t weighted, mode_t mode, char *errbuf) {
@@ -718,9 +745,18 @@ static RsvHandle *rsv_create(const char *path, uint64_t k, uint64_t item_size, u
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             RSV_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
+        if (is_new && rsv_reserve(fd, total) < 0) {
+            RSV_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
+            if (ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         map_size = is_new ? (size_t)total : (size_t)st.st_size;
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        if (base == MAP_FAILED) { RSV_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
+        if (base == MAP_FAILED) {
+            RSV_ERR("mmap: %s", strerror(errno));
+            if (is_new && ftruncate(fd, 0) < 0) { /* best effort */ }
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (!is_new) {
             if (!rsv_validate_header((RsvHeader *)base, (uint64_t)st.st_size)) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -730,9 +766,13 @@ static RsvHandle *rsv_create(const char *path, uint64_t k, uint64_t item_size, u
                  * exactly our size, still uninitialized, and owned by us;
                  * anything else still errors. */
                 if (((RsvHeader *)base)->magic == 0 && (uint64_t)st.st_size == total
-                    && st.st_uid == geteuid() && rsv_region_is_zero(base, map_size)) {
+                    && st.st_uid == geteuid() && rsv_file_is_zero(fd, map_size)) {
                     if (fchmod(fd, mode) < 0) {
                         RSV_ERR("%s: fchmod: %s", path, strerror(errno));
+                        munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+                    }
+                    if (rsv_reserve(fd, total) < 0) {
+                        RSV_ERR("%s: cannot reserve %llu bytes: %s", path, (unsigned long long)total, strerror(errno));
                         munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
                     }
                     rsv_init_header(base, k, item_size, weighted, total);
@@ -764,6 +804,10 @@ static RsvHandle *rsv_create_memfd(const char *name, uint64_t k, uint64_t item_s
     if (ftruncate(fd, (off_t)total) < 0) {
         RSV_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    if (rsv_reserve(fd, total) < 0) {
+        RSV_ERR("memfd: cannot reserve %llu bytes: %s", (unsigned long long)total, strerror(errno));
+        close(fd); return NULL;
+    }
     (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { RSV_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
@@ -776,6 +820,11 @@ static RsvHandle *rsv_open_fd(int fd, char *errbuf) {
     struct stat st;
     if (fstat(fd, &st) < 0) { RSV_ERR("fstat: %s", strerror(errno)); return NULL; }
     if ((uint64_t)st.st_size < sizeof(RsvHeader)) { RSV_ERR("too small"); return NULL; }
+    /* before mmap: a creator may truncate the file until it has set magic */
+    uint32_t magic;
+    if (pread(fd, &magic, sizeof magic, offsetof(RsvHeader, magic)) != (ssize_t)sizeof magic || magic != RSV_MAGIC) {
+        RSV_ERR("invalid reservoir table"); return NULL;
+    }
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { RSV_ERR("mmap: %s", strerror(errno)); return NULL; }
@@ -862,17 +911,21 @@ static int rsv_add_locked(RsvHandle *h, const void *item, uint64_t len) {
     uint64_t smax = rsv_slots_max(h);
     if (k > smax) k = smax;                     /* Layer B: never index past the mapping */
     if (k == 0) return 0;
-    uint64_t s = ++hdr->seen;                   /* 1-based index of this item */
+    uint64_t s = hdr->seen + 1;                 /* 1-based index of this item */
     uint64_t idx;
     if (s <= k) {
         idx = s - 1;                            /* still filling the reservoir */
     } else {
+        hdr->seen = s;
         uint64_t j = rsv_rng_next(hdr) % s;     /* uniform in [0, s) */
         if (j >= k) return 0;                   /* discard (prob (s-k)/s) */
         idx = j;                                /* replace slot j (prob k/s) */
     }
-    if (idx >= smax) return 0;                  /* Layer B: reject a wrapped/corrupt seen (idx underflow) -> no OOB */
+    if (idx >= smax) { hdr->seen = s; return 0; }   /* Layer B: reject a wrapped/corrupt seen (idx underflow) -> no OOB */
     rsv_store(h, idx, item, len);
+    /* While filling, the count publishes the slot: store the item first. */
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->seen = s;
     return 1;
 }
 
@@ -888,23 +941,66 @@ static inline uint64_t rsv_heap_max(RsvHandle *h) {
     if (off == 0 || off >= h->mmap_size) return 0;
     return (h->mmap_size - off) / sizeof(RsvHeapEnt);
 }
-static inline void rsv_heap_swap(RsvHeapEnt *hp, uint64_t a, uint64_t b) {
-    RsvHeapEnt t = hp[a]; hp[a] = hp[b]; hp[b] = t;
+/* Journaled hole sifts: entry e, saved in hdr->jent, belongs at the hole hp[i], which may hold a
+ * stale duplicate; each step copies one entry into the hole and records the new hole in jsift.
+ * A writer killed mid-sift leaves jsift set, and lock recovery finishes the sift. */
+#define RSV_J_UP   0x40000000U
+#define RSV_J_DOWN 0x80000000U
+#define RSV_J_HOLE 0x3FFFFFFFU
+
+static inline void rsv_journal_begin(RsvHeader *hdr, RsvHeapEnt e, uint32_t dir, uint64_t i) {
+    hdr->jent = e;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->jsift = dir | (uint32_t)i;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
 }
-static inline void rsv_heap_sift_up(RsvHeapEnt *hp, uint64_t i) {
+static inline void rsv_journal_step(RsvHeader *hdr, RsvHeapEnt *hp, uint64_t i, uint64_t next, uint32_t dir) {
+    hp[i] = hp[next];
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->jsift = dir | (uint32_t)next;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+}
+static inline void rsv_journal_end(RsvHeader *hdr, RsvHeapEnt *hp, uint64_t i, RsvHeapEnt e) {
+    hp[i] = e;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+    hdr->jsift = 0;
+}
+static inline void rsv_heap_sift_up(RsvHeader *hdr, RsvHeapEnt *hp, uint64_t i, RsvHeapEnt e) {
     while (i > 0) {
         uint64_t p = (i - 1) / 2;
-        if (hp[i].key < hp[p].key) { rsv_heap_swap(hp, i, p); i = p; } else break;
+        if (!(e.key < hp[p].key)) break;
+        rsv_journal_step(hdr, hp, i, p, RSV_J_UP);
+        i = p;
     }
+    rsv_journal_end(hdr, hp, i, e);
 }
-static inline void rsv_heap_sift_down(RsvHeapEnt *hp, uint64_t i, uint64_t size) {
+static inline void rsv_heap_sift_down(RsvHeader *hdr, RsvHeapEnt *hp, uint64_t i, uint64_t size, RsvHeapEnt e) {
     for (;;) {
-        uint64_t l = 2*i + 1, r = 2*i + 2, m = i;
-        if (l < size && hp[l].key < hp[m].key) m = l;
-        if (r < size && hp[r].key < hp[m].key) m = r;
-        if (m == i) break;
-        rsv_heap_swap(hp, i, m); i = m;
+        uint64_t c = 2*i + 1;
+        if (c >= size) break;
+        if (c + 1 < size && hp[c + 1].key < hp[c].key) c++;
+        if (!(hp[c].key < e.key)) break;
+        rsv_journal_step(hdr, hp, i, c, RSV_J_DOWN);
+        i = c;
     }
+    rsv_journal_end(hdr, hp, i, e);
+}
+
+/* A fill killed before publishing its item never happened; any other sift is finished. */
+static void rsv_journal_replay(RsvHandle *h) {
+    RsvHeader *hdr = h->hdr;
+    uint32_t j = hdr->jsift;
+    if (!j) return;
+    uint64_t k = h->k, smax = rsv_slots_max(h), hmax = rsv_heap_max(h);
+    if (k > smax) k = smax;
+    if (k > hmax) k = hmax;                     /* Layer B, as in rsv_add_weighted_locked */
+    uint64_t size = hdr->seen < k ? hdr->seen : k, i = j & RSV_J_HOLE;
+    RsvHeapEnt e = hdr->jent;
+    if (h->mode == RSV_MODE_WEIGHTED && i < size && e.item < k) {
+        if ((j & ~RSV_J_HOLE) == RSV_J_UP)   { rsv_heap_sift_up(hdr, rsv_heap(h), i, e); return; }
+        if ((j & ~RSV_J_HOLE) == RSV_J_DOWN) { rsv_heap_sift_down(hdr, rsv_heap(h), i, size, e); return; }
+    }
+    hdr->jsift = 0;
 }
 
 /* observe one weighted item.  A-Res: assign it key = u^(1/weight), u ~ U(0,1];
@@ -925,19 +1021,33 @@ static int rsv_add_weighted_locked(RsvHandle *h, const void *item, uint64_t len,
     RsvHeapEnt *hp = rsv_heap(h);
     uint64_t size = hdr->seen < k ? hdr->seen : k;   /* items currently kept */
     if (size < k) {                             /* still filling: append + sift up */
+        RsvHeapEnt e = { key, size };
         rsv_store(h, size, item, len);
-        hp[size].key = key; hp[size].item = size;
-        rsv_heap_sift_up(hp, size);
-        hdr->seen++;
+        if (size > 0 && key < hp[(size - 1) / 2].key) {
+            rsv_journal_begin(hdr, e, RSV_J_UP, size);
+            hdr->seen++;
+            __atomic_signal_fence(__ATOMIC_SEQ_CST);
+            rsv_heap_sift_up(hdr, hp, size, e);
+        } else {
+            hp[size] = e;
+            /* The count publishes the entry. */
+            __atomic_signal_fence(__ATOMIC_SEQ_CST);
+            hdr->seen++;
+        }
         return 1;
     }
     hdr->seen++;                                /* full: this item was observed regardless */
     if (key > hp[0].key) {                       /* heavier than the current minimum: evict it */
         uint64_t cell = hp[0].item;
         if (cell >= k) return 0;                /* Layer B: corrupt heap entry -> refuse */
+        RsvHeapEnt e = { key, cell };
         rsv_store(h, cell, item, len);
-        hp[0].key = key;
-        rsv_heap_sift_down(hp, 0, k);
+        if ((k > 1 && hp[1].key < key) || (k > 2 && hp[2].key < key)) {
+            rsv_journal_begin(hdr, e, RSV_J_DOWN, 0);
+            rsv_heap_sift_down(hdr, hp, 0, k, e);
+        } else {
+            hp[0].key = key;
+        }
         return 1;
     }
     return 0;                                    /* lighter: discard */
@@ -960,10 +1070,12 @@ static inline void rsv_clear_locked(RsvHandle *h) {
     uint64_t k = h->k;                          /* cached geometry */
     uint64_t smax = rsv_slots_max(h);
     if (k > smax) k = smax;
+    /* Empty first: a writer killed mid-loop then leaves no counted slot already zeroed. */
+    h->hdr->seen = 0;
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
     for (uint64_t i = 0; i < k; i++) {           /* zero each slot's length word */
         uint64_t z = 0; memcpy(rsv_slot(h, i), &z, sizeof(uint64_t));
     }
-    h->hdr->seen = 0;
 }
 
 #endif /* RSV_H */

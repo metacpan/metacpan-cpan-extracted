@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ThanosSpec;
 # ABSTRACT: thanos defines the configuration of the optional Thanos sidecar.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s additionalArgs          => ['+IO::K8s::PrometheusOperator::V1::Argument'];
@@ -64,7 +64,7 @@ IO::K8s::PrometheusOperator::V1::ThanosSpec - thanos defines the configuration o
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 additionalArgs
 

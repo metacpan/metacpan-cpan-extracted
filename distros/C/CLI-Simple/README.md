@@ -201,7 +201,7 @@ distribution in one step.
 
 # VERSION
 
-This documentation refers to version 2.2.3.
+This documentation refers to version 2.2.4.
 
 # FEATURES
 
@@ -712,28 +712,38 @@ calling `new()`.
 
 ## `help_sections`
 
-By default `CLI::Simple` passes a standard set of POD section names to
-[Pod::Usage](https://metacpan.org/pod/Pod%3A%3AUsage) when rendering help output:
+By default `CLI::Simple` renders the following POD sections when they
+are present:
 
-    SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE
+    SYNOPSIS
+    DESCRIPTION/Commands
+    DESCRIPTION/Options
+    OPTIONS
 
-You can override this by passing an array of sections names during construction.
+`SYNOPSIS` is the preferred source for usage information. For
+backward compatibility, if the POD does not contain a `SYNOPSIS`
+section, `USAGE` is used instead.
 
-    my $cli = CLI::Simple->new( help_sections => [qw(SYNOPSIS COMMANDS OPTIONS)], ...);
+`SYNOPSIS` and `USAGE` are not both displayed by default.
 
-You must do this during construction or add `help_sections` to your
-`extra_options` and set the defaults for `help_sections`:
+You can override the default selection by passing an array reference of
+section names during construction:
 
     my $cli = CLI::Simple->new(
-      commands        => $commands,
-      extra_options   => [ qw(help_sections) ],
-      default_options => { help_sections => [qw(SYNOPIS COMMANDS OPTIONS)] },
-      option_specs    => \@option_specs
+      help_sections => [qw(SYNOPSIS COMMANDS OPTIONS)],
+      ...
     );
 
+When `help_sections` is supplied explicitly, `CLI::Simple` honors the
+list exactly as provided. For example, an application may request both
+`SYNOPSIS` and `USAGE`:
+
+    help_sections => [qw(SYNOPSIS USAGE)]
+
 Section names follow [Pod::Usage](https://metacpan.org/pod/Pod%3A%3AUsage) conventions. Subsections are
-specified with a `/` separator, e.g. `DESCRIPTION/Commands` renders
-only the `Commands` subsection under `=head1 DESCRIPTION`.
+specified with a `/` separator; for example,
+`DESCRIPTION/Commands` renders only the `Commands` subsection under
+`DESCRIPTION`.
 
 # INTERNAL COMMANDS
 
@@ -1353,23 +1363,32 @@ methods, just like options set via the command line.
 
 # ADDING USAGE TO YOUR SCRIPTS
 
-To provide built-in usage/help output, include a `=head1 USAGE`
+To provide built-in usage/help output, include a `=head1 SYNOPSIS`
 section in your script's POD:
 
-    =head1 USAGE
-
-      usage: myscript [options] command args
-
-      Options
-      -------
-      --help, -h      Display help
-      ...
+    =head1 SYNOPSIS
+    
+    ```
+    usage: myscript [options] command args
+    
+    Options
+    -------
+    --help, -h      Display help
+    ...
+    ```
 
 If the user supplies the command `help`, or the `--help` option,
-`CLI::Simple` will display this section automatically:
+`CLI::Simple` displays the configured help sections using
+[Pod::Usage](https://metacpan.org/pod/Pod%3A%3AUsage).
 
-    perl myscript.pm --help
-    perl myscript.pm help
+For backward compatibility, `USAGE` is also supported. If a `USAGE`
+section is present, it is used as the usage section.
+
+If no `USAGE` section is present, `SYNOPSIS` is used instead.
+
+When both `SYNOPSIS` and `USAGE` are present, `USAGE` is used by
+default. Applications that explicitly configure `help_sections` may
+select the desired section.
 
 ## Custom help() Method
 
@@ -1377,14 +1396,12 @@ If you need full control over the help output, you can define a custom
 `help` method and assign it as a command:
 
     commands => {
-      help => \&help,
+      help => &help,
       ...
-    }
+    };
 
-This is useful if your module follows the modulino pattern and you
-want to present usage information that differs from the embedded
-POD. Without a custom handler, `CLI::Simple` defaults to displaying the
-`USAGE` POD section.
+This is useful if your module follows the modulino pattern and you want
+to present help information that differs from the embedded POD.
 
 # ADDING ADDITIONAL SETTERS
 

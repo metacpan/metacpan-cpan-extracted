@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1beta3::PriorityLevelConfigurationStatus;
 # ABSTRACT: PriorityLevelConfigurationStatus represents the current state of a "request-priority".
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s conditions => ['Flowcontrol::V1beta3::PriorityLevelConfigurationCondition'];
@@ -20,7 +20,7 @@ IO::K8s::Api::Flowcontrol::V1beta3::PriorityLevelConfigurationStatus - PriorityL
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 conditions
 

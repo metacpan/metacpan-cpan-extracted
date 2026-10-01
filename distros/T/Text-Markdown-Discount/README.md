@@ -29,19 +29,36 @@ _markdown_ is exported by default.
 
 ## FUNCTION
 
-- `Text::Markdown::Discount::with_html5_tags()`
+- `markdown($text, [$flags_or_options])`
 
-    This function enables html5 block-level elements support.
-    `Text::Markdown::Discount::markdown()` will handle these html5 tags as
-    block elements: aside, footer, header, hgroup, nav, section, article.
+The legacy form accepts a scalar bitmap made by combining `MKD_*`
+constants:
 
-    **NOTE**: There is no way to disable/re-enable this feature in one process right now.
+    my $html = markdown(
+        $text,
+        MKD_NOHEADER | MKD_NOPANTS | MKD_FENCEDCODE,
+    );
 
-        use Text::Markdown::Discount;
-        Text::Markdown::Discount::with_html5_tags();
-        my $html = markdown('<article>content</article>');
-        #
-        # In $html, <article> tag won't be wrapped with <p> tag
+The options form accepts a hash reference:
+
+    my $html = markdown($text, {
+        flags           => MKD_NOHEADER | MKD_NOPANTS,
+        normal_listitem => 1,
+        alt_as_title    => 1,
+        extended_attr   => 1,
+    });
+
+The `flags` option is the same legacy bitmap accepted by the scalar form.
+If it is omitted or undefined, the existing default bitmap is used.
+
+`normal_listitem` disables GitHub-style checkbox list items.
+`alt_as_title` uses image alt text as its title when no title is specified.
+With the bundled Discount 3.0.2.0 release, images are not rendered as expected
+when this option is enabled. The option is passed through unchanged so it will
+follow upstream behavior when Discount is updated.
+`extended_attr` enables extended attribute suffixes on links, images, and
+reference links. These options do not consume bits in the legacy bitmap and
+are therefore safe on 32-bit Perl builds.
 
 # SEE ALSO
 

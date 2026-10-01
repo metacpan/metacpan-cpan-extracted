@@ -92,10 +92,10 @@ subtest 'HGX H100: 8 GPUs + 4 NVSwitches' => sub {
 };
 
 subtest 'NVSwitch recognised by ID with a stale pci.ids, and by name' => sub {
-  my $sw = Rex::GPU::Detect::_parse_nvswitch_line(
+  my $sw = Rex::GPU::Detect->_parse_nvswitch_line(
     '07:00.0 Bridge [0680]: NVIDIA Corporation Device [10de:1af1] (rev a1)');
   is($sw->{device_id}, '1af1', 'A100 NVSwitch by ID, name "Device"');
-  $sw = Rex::GPU::Detect::_parse_nvswitch_line(
+  $sw = Rex::GPU::Detect->_parse_nvswitch_line(
     '07:00.0 Bridge [0680]: NVIDIA Corporation GXXX [Future NVSwitch] [10de:ffff] (rev a1)');
   is($sw->{device_id}, 'ffff', 'unknown ID named NVSwitch');
 };
@@ -104,12 +104,12 @@ subtest 'other NVIDIA bridges and other classes are not NVSwitches' => sub {
   my @log;
   no warnings 'redefine';
   local *Rex::Logger::info = sub { push @log, $_[0] };
-  is(Rex::GPU::Detect::_parse_nvswitch_line(
+  is(Rex::GPU::Detect->_parse_nvswitch_line(
     '00:08.0 Bridge [0680]: NVIDIA Corporation MCP55 Ethernet [10de:0373] (rev a3)'), undef,
     'nForce bridge (10de:0373) skipped');
   like($log[0], qr/not known as an NVSwitch/, '... and logged');
-  is(Rex::GPU::Detect::_parse_nvswitch_line($H100_LINE), undef, 'a GPU line is not an NVSwitch');
-  is(Rex::GPU::Detect::_parse_nvswitch_line(
+  is(Rex::GPU::Detect->_parse_nvswitch_line($H100_LINE), undef, 'a GPU line is not an NVSwitch');
+  is(Rex::GPU::Detect->_parse_nvswitch_line(
     '07:00.0 Bridge [0680]: Mellanox Technologies Device [15b3:1021]'), undef, 'non-NVIDIA bridge');
 };
 

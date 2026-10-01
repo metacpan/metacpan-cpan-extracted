@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::TLSConfig;
 # ABSTRACT: TLS store the configuration that will be applied to all Listeners handling HTTPS traffic and matching given port.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s validation => '+IO::K8s::GatewayAPI::V1::FrontendTLSValidation';
@@ -20,7 +20,7 @@ IO::K8s::GatewayAPI::V1::TLSConfig - TLS store the configuration that will be ap
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 validation
 

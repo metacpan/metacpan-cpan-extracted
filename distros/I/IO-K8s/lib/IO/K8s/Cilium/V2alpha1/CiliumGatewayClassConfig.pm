@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2alpha1::CiliumGatewayClassConfig;
 # ABSTRACT: CiliumGatewayClassConfig is a Kubernetes third-party resource which is used to configure Gateways owned by GatewayClass.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
-    resource_plural => 'ciliumgatewayclassconfigs';
+    resource_plural => 'ciliumgatewayclassconfigs',
+    subresources    => { status => {} };
 with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => '+IO::K8s::Cilium::V2alpha1::CiliumGatewayClassConfigSpec';
@@ -25,7 +26,7 @@ IO::K8s::Cilium::V2alpha1::CiliumGatewayClassConfig - CiliumGatewayClassConfig i
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 spec
 

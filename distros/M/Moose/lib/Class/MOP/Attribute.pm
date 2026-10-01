@@ -1,5 +1,5 @@
 package Class::MOP::Attribute;
-our $VERSION = '2.4000';
+our $VERSION = '2.4001';
 
 use strict;
 use warnings;
@@ -510,7 +510,7 @@ Class::MOP::Attribute - Attribute Meta Object
 
 =head1 VERSION
 
-version 2.4000
+version 2.4001
 
 =head1 SYNOPSIS
 

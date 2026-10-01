@@ -1,6 +1,6 @@
 package Data::PerfectHash::Shared;
 use strict; use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use XSLoader;
 XSLoader::load('Data::PerfectHash::Shared', $VERSION);
 
@@ -8,7 +8,7 @@ XSLoader::load('Data::PerfectHash::Shared', $VERSION);
 sub CLONE_SKIP { 1 }
 
 package Data::PerfectHash::Shared::Builder;   # blessed builder handle
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 sub CLONE_SKIP { 1 }
 
 1;

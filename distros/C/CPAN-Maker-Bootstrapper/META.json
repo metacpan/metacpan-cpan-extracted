@@ -35,27 +35,25 @@
       "runtime" : {
          "requires" : {
             "CLI::Simple" : "v2.2.2",
-            "CLI::Simple::Constants" : "v2.2.2",
-            "CLI::Simple::Utils" : "v2.2.2",
             "CPAN::Maker" : "v2.0.11",
-            "CPAN::Maker::Role::ModuleUtils" : "v2.0.10",
-            "CPAN::Maker::Role::Provides" : "0",
             "Class::Accessor::Fast" : "0.51",
             "Config::Tiny" : "2.30",
             "Email::Valid" : "1.204",
             "File::Copy::Recursive" : "0.45",
             "File::HomeDir" : "1.006",
             "File::ShareDir" : "1.118",
+            "HTTP::Tiny" : "0",
             "IO::Interactive" : "1.027",
             "IO::Scalar" : "2.113",
+            "IO::Socket::SSL" : "0",
             "JSON" : "4.10",
             "Log::Log4perl" : "0",
             "Module::Metadata" : "1.000038",
             "Module::ScanDeps::Static" : "v1.9.3",
+            "Net::SSLeay" : "0",
             "Pod::Extract" : "v1.0.2",
             "Readonly" : "2.05",
             "Role::Tiny" : "2.002004",
-            "Role::Tiny::With" : "2.002004",
             "Text::ASCIITable" : "0.22",
             "YAML::Tiny" : "1.76",
             "perl" : "5.010"
@@ -74,7 +72,7 @@
    "provides" : {
       "CPAN::Maker::Bootstrapper" : {
          "file" : "lib/CPAN/Maker/Bootstrapper.pm",
-         "version" : "v2.3.3"
+         "version" : "v2.3.5"
       },
       "CPAN::Maker::Bootstrapper::ConfigReader" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/ConfigReader.pm",
@@ -96,9 +94,17 @@
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/Critic.pm",
          "version" : "0"
       },
+      "CPAN::Maker::Bootstrapper::Role::DarkPANRequires" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/DarkPANRequires.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::DepsFilter" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/DepsFilter.pm",
+         "version" : "0"
+      },
       "CPAN::Maker::Bootstrapper::Role::ExtraFiles" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm",
-         "version" : "v2.3.3"
+         "version" : "v2.3.5"
       },
       "CPAN::Maker::Bootstrapper::Role::Filter" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/Filter.pm",
@@ -110,7 +116,7 @@
       },
       "CPAN::Maker::Bootstrapper::Role::Installer" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/Installer.pm",
-         "version" : "v2.3.3"
+         "version" : "v2.3.5"
       },
       "CPAN::Maker::Bootstrapper::Role::LLM::Annotator" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm",
@@ -130,6 +136,10 @@
       },
       "CPAN::Maker::Bootstrapper::Role::LLM::Utils" : {
          "file" : "lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::PAUSEUpload" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/PAUSEUpload.pm",
          "version" : "0"
       },
       "CPAN::Maker::Bootstrapper::Role::Provides" : {
@@ -170,6 +180,6 @@
          "web" : "http://github.com/rlauer6/CPAN-Maker-Bootstrapper"
       }
    },
-   "version" : "v2.3.3",
+   "version" : "v2.3.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

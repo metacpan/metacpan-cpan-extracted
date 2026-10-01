@@ -6,6 +6,7 @@
 require 5.010;
 use strict;
 use warnings FATAL => 'all';
+use File::Temp ();
 use Chem::Structure::Parser;
 use Test::Exception;
 use Test::More;
@@ -247,6 +248,33 @@ throws_ok { Chem::Structure::Parser::_parse_file('t/data/does.not.exist.pdb') } 
 	'_parse_file: a missing file dies, and says so';
 throws_ok { Chem::Structure::Parser::_parse_string('', 'not a hashref') } qr/hash reference/,
 	'_parse_string: options must be a hash reference';
+
+# A regular file is read into a buffer of exactly its size, which stat() gives;
+# a named pipe has no size to give, and is read in growing chunks instead.  The
+# two must read the same.  mkfifo() is POSIX, and the fork below is the writer
+# a pipe needs, so this is only possible where both are.
+SKIP: {
+	my $dir  = File::Temp::tempdir(CLEANUP => 1);
+	my $fifo = "$dir/mini.fifo";
+	skip 'no named pipes here', 2
+		unless $^O ne 'MSWin32' && eval { require POSIX; POSIX::mkfifo($fifo, 0600) };
+	my $pid = fork;
+	skip 'no fork here', 2 unless defined $pid;
+	if (!$pid) {
+		open my $in,  '<', 't/data/mini.pdb' or POSIX::_exit(1);
+		open my $out, '>', $fifo             or POSIX::_exit(1);
+		local $/;
+		print {$out} <$in>;
+		close $out;
+		POSIX::_exit(0);
+	}
+	my $p = Chem::Structure::Parser::_parse_file($fifo);
+	waitpid $pid, 0;
+	my $f = Chem::Structure::Parser::_parse_file('t/data/mini.pdb');
+	delete $_->{file} for $p, $f;
+	is($p->{n_atoms}, $f->{n_atoms}, '_parse_file: a named pipe is read to the end');
+	is_deeply($p, $f, 'and reads the same as the file does');
+}
 
 #--------
 # the answer does not depend on the locale.

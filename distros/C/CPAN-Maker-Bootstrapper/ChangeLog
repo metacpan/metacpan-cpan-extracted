@@ -1,3 +1,58 @@
+Wed Sep 30 10:54:44 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.5]:
+	* VERSION: bump
+	* README.md: generated
+	* release-notes.md: updated
+	* release-notes/release-notes-2.3.5.md: new
+	* .prompts/release-notes.prompt: new
+	* MANIFEST: sorted
+	* .includes/publish.mk: new
+	* buildspec.yml: add above to build
+	* cmb_md5sums.txt: generated
+	* lib/CPAN/Maker/Bootstrapper/Role/DarkPANRequires.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/DepsFilter.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/PAUSEUpload.pm.in: new
+	* cpan-maker-bootstrapper.yml: add new commands above
+	* .includes/update.mk
+	(MANAGED_MK_FILES): new
+	(MANAGED_FILES): remove .mk files to above
+	(INCLUDES_FILES): new
+	(MANIFEST): new
+	* Makefile
+	- create cpanfile.darkpan, cpanm.darkpan
+	- update .raw pattern recipe/remove packages that are part of an already specfied package
+	- include new publish.mk
+	(CLEANFILES): +cpanfile.*
+	(test-requires.raw): just normalize test-requires.scan file
+	(test-requires): separate recipe to remove provides
+	* requires
+	- removed packages included in other packages
+	- +IO::Socket::SSL, Net::SSLeay
+	* cpanfile: likewise
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- POD updates
+	* project.mk
+	(DEPS): +MANIFEST
+	* recommends: nothing
+	* test-requires.skip: no longer needed
+
+Mon Sep 28 04:49:20 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.4]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.3.4.md: new
+	* README.md: generated
+	* Makefile
+	(test-local): new
+	(test): add test-local as dependency
+	(extra-files)
+	- stop overwriting extra-files.skip
+	(test-requires): normlize scan
+	* VERSION: bump
+	* lib/CPAN/Maker/Bootstrapper.pm.in: POD updates
+	* cmb_md5sums.txt: generated
+
 Fri Sep 25 06:16:03 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.3.3]:

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::PushSecretDataToMatch;
 # ABSTRACT: Match pattern for selecting keys from the source Secret.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s regexp => Str;
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1alpha1::PushSecretDataToMatch - Match pattern for se
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 regexp
 

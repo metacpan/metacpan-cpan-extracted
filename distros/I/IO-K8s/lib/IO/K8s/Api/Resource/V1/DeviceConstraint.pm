@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceConstraint;
 # ABSTRACT: DeviceConstraint must have exactly one field set besides Requests.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s distinctAttribute => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1::DeviceConstraint - DeviceConstraint must have exactl
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 distinctAttribute
 
@@ -44,7 +44,7 @@ Must include the domain qualifier.
 
 =head2 requests
 
-Requests is a list of the one or more requests in this claim which must co-satisfy this constraint. If a request is fulfilled by multiple devices, then all of the devices must satisfy the constraint. If this is not specified, this constraint applies to all requests in this claim. References to subrequests must include the name of the main request and may include the subrequest using the format C<<main request>/<subrequest>>. If just the main request is given, the constraint applies to all subrequests.
+Requests is a list of the one or more requests in this claim which must co-satisfy this constraint. If a request is fulfilled by multiple devices, then all of the devices must satisfy the constraint. If this is not specified, this constraint applies to all requests in this claim. References to subrequests must include the name of the main request and may include the subrequest using the format C<< <main request>/<subrequest> >>. If just the main request is given, the constraint applies to all subrequests.
 
 =head1 SUPPORT
 

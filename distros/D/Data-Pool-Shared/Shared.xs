@@ -238,7 +238,7 @@ available(self)
   PREINIT:
     EXTRACT_POOL(self);
   CODE:
-    RETVAL = (UV)h->hdr->capacity - __atomic_load_n(&h->hdr->used, __ATOMIC_RELAXED);
+    RETVAL = (UV)pool_available(h);
   OUTPUT:
     RETVAL
 
@@ -250,7 +250,7 @@ owner(self, slot)
     EXTRACT_POOL(self);
   CODE:
     CHECK_SLOT(h, slot);
-    RETVAL = __atomic_load_n(&h->owners[slot], __ATOMIC_RELAXED);
+    RETVAL = __atomic_load_n(&h->owners[slot], __ATOMIC_RELAXED) & ~POOL_OWNER_RECOVERING;
   OUTPUT:
     RETVAL
 
@@ -390,7 +390,7 @@ stats(self)
     hv_store(hv, "elem_size", 9, newSVuv(hdr->elem_size), 0);
     hv_store(hv, "used", 4, newSVuv((UV)__atomic_load_n(&hdr->used, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "available", 9,
-        newSVuv((UV)hdr->capacity - (UV)__atomic_load_n(&hdr->used, __ATOMIC_RELAXED)), 0);
+        newSVuv((UV)pool_available(h)), 0);
     hv_store(hv, "waiters", 7, newSVuv((UV)__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     hv_store(hv, "allocs", 6, newSVuv((UV)__atomic_load_n(&hdr->stat_allocs, __ATOMIC_RELAXED)), 0);

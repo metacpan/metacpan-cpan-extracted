@@ -260,8 +260,8 @@ subtest 'domain-qualified expand_class returns undef for unknown' => sub {
         resource_plural => 'firewallrules';
     with 'IO::K8s::Role::Namespaced';
 
-    k8s spec   => { Str => 1 };
-    k8s status => { Str => 1 };
+    k8s spec   => Opaque;
+    k8s status => Opaque;
     1;
 }
 
@@ -273,8 +273,8 @@ subtest 'domain-qualified expand_class returns undef for unknown' => sub {
         resource_plural => 'networkpolicies';
     with 'IO::K8s::Role::Namespaced';
 
-    k8s spec   => { Str => 1 };
-    k8s status => { Str => 1 };
+    k8s spec   => Opaque;
+    k8s status => Opaque;
     1;
 }
 

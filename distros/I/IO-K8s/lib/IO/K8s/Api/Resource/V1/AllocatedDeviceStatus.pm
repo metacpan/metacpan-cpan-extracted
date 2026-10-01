@@ -1,12 +1,12 @@
 package IO::K8s::Api::Resource::V1::AllocatedDeviceStatus;
 # ABSTRACT: AllocatedDeviceStatus contains the status of an allocated device, if the driver chooses to report it. This may include driver-specific information. The combination of Driver, Pool, Device, and ShareID must match the corresponding key in Status.Allocation.Devices.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
 
 
-k8s data => { Str => 1 };
+k8s data => Opaque;
 
 
 k8s device => Str, 'required';
@@ -38,7 +38,7 @@ IO::K8s::Api::Resource::V1::AllocatedDeviceStatus - AllocatedDeviceStatus contai
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 conditions
 
@@ -66,7 +66,7 @@ NetworkData contains network-related information specific to the device.
 
 =head2 pool
 
-This name together with the driver name and the device name field identify which device was allocated (C<E<lt>driver nameE<gt>/E<lt>pool nameE<gt>/E<lt>device nameE<gt>>).
+This name together with the driver name and the device name field identify which device was allocated (C<< <driver name>/<pool name>/<device name> >>).
 
 Must not be longer than 253 characters and may contain one or more DNS sub-domains separated by slashes.
 

@@ -26,15 +26,14 @@ use Test::Future;
 # fail
 {
    test_out( "not ok 1 - pending Future" );
-   test_fail( +8 );
+   test_fail( +7 );
    test_err( "# The following Futures are still pending:" );
    test_err( qr/^# 0x[0-9a-f]+\n/ );
    test_err( qr/^# Writing heap dump to \S+\n/ ) if Test::Future::HAVE_DEVEL_MAT_DUMPER;
 
    my $f;
-   no_pending_futures {
-      $f = Future->new;
-   } 'pending Future';
+   # This must remain on one line to be immune from changes in Perl #24396
+   no_pending_futures { $f = Future->new; } 'pending Future';
 
    test_test( "pending Future fails" );
 

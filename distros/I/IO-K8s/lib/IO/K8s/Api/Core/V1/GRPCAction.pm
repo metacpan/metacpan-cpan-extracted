@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::GRPCAction;
 # ABSTRACT: 
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s mode => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::GRPCAction -
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 mode
 

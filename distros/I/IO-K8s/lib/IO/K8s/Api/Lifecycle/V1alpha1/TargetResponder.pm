@@ -1,6 +1,6 @@
 package IO::K8s::Api::Lifecycle::V1alpha1::TargetResponder;
 # ABSTRACT: TargetResponder allows you to specify the responder reacting to the Eviction. Responders should observe and communicate through the Eviction API (see .state) to help with the graceful eviction of a target (e.g. termination of a pod).
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Lifecycle::V1alpha1::TargetResponder - TargetResponder allows you 
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 name
 

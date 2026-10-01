@@ -16,7 +16,7 @@ my $k8s = IO::K8s->new;
         resource_plural => 'boolcrds';
 
     with 'IO::K8s::Role::Namespaced';
-    k8s spec => { Str => 1 };
+    k8s spec => Opaque;   # k191: the opaque spec; { Str => 1 } is the string map now
 }
 
 subtest 'ConfigMap to_yaml' => sub {

@@ -1,11 +1,11 @@
 package IO::K8s::Cilium::V2::PortRule;
 # ABSTRACT: PortRule is a list of ports/protocol combinations with optional Layer 7 rules which must be met.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s listener       => '+IO::K8s::Cilium::V2::Listener';
 k8s originatingTLS => '+IO::K8s::Cilium::V2::TLSContext';
-k8s ports          => ['Networking::V1::NetworkPolicyPort'];
+k8s ports          => ['+IO::K8s::Cilium::V2::PortProtocol'];
 k8s rules          => '+IO::K8s::Cilium::V2::L7Rules';
 k8s serverNames    => [Str], { pattern => qr/^([-a-zA-Z0-9_*]+[.]?)+$/ };
 k8s terminatingTLS => '+IO::K8s::Cilium::V2::TLSContext';
@@ -30,7 +30,7 @@ IO::K8s::Cilium::V2::PortRule - PortRule is a list of ports/protocol combination
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 listener
 

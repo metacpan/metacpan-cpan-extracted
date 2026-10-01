@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequestStatus;
 # ABSTRACT: ResourcePoolStatusRequestStatus contains the calculated pool status information.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequestStatus - ResourcePool
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 conditions
 
@@ -43,7 +43,7 @@ PoolCount is the total number of pools that matched the filter criteria, regardl
 
 =head2 pools
 
-Pools contains the first C<spec.limit> matching pools, sorted by driver then pool name. If C<len(pools) < poolCount>, the list was truncated. When omitted, no pools matched the request filters.
+Pools contains the first C<spec.limit> matching pools, sorted by driver then pool name. If C<< len(pools) < poolCount >>, the list was truncated. When omitted, no pools matched the request filters.
 
 =head1 SUPPORT
 

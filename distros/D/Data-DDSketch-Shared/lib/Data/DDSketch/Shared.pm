@@ -1,7 +1,7 @@
 package Data::DDSketch::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::DDSketch::Shared', $VERSION);
 
@@ -116,7 +116,9 @@ C<quantile> returns the estimated value at quantile C<$q> (e.g. C<0.99> for the
 99th percentile), guaranteed within relative error C<alpha> of the true value; it
 returns C<undef> for an empty sketch and croaks if C<$q> is outside C<[0, 1]>.
 C<min>, C<max>, and C<count> are B<exact> (tracked separately from the
-buckets); C<sum> and C<mean> are double-precision running values subject to
+buckets; a writer crash can turn C<min> and C<max> into estimates, see
+L</"CRASH SAFETY">);
+C<sum> and C<mean> are double-precision running values subject to
 floating-point rounding.
 
 =head2 Merging and introspection
@@ -161,6 +163,13 @@ new_from_fd($fd) >>. The descriptor you pass is duplicated
 disturb the handle. Every process's C<add> feeds the one shared sketch, so a
 fleet of workers can each measure part of a workload into a single
 distribution.
+
+C<new> and C<new_memfd> create a new segment sparse: pages are allocated as
+they are first written, and once the filesystem is full, a write to a page not
+yet allocated dies with SIGBUS. Set C<DATA_DDSKETCH_SHARED_SPARSE=0> to
+reserve the whole segment at creation, so a full filesystem makes them croak
+instead; on tmpfs and memfd that commits the segment's memory at once, and a
+memory cgroup too small for it gets an OOM kill rather than a croak.
 
 =head1 FROZEN (READ-ONLY) MODE
 
@@ -219,12 +228,19 @@ the mapping.
 =head1 CRASH SAFETY
 
 Mutation is guarded by a futex-based write-preferring rwlock with PID-encoded
-ownership and dead-owner recovery. Each C<add> is a short bounded update, but
-recovery restores locking only -- it performs no state repair. C<add> commits
-the scalar aggregates (count, sum, min, max) before the bucket counter, so a
-crash in that window leaves C<count> ahead of the buckets and
-C<quantile(1.0)> can return C<undef> on a non-empty sketch until the next
-C<add> completes.
+ownership and dead-owner recovery. The process that recovers the lock also
+repairs what the dead writer left half done: the buckets and C<zero_count> are
+authoritative, and C<count> is recounted from them. So an interrupted C<add>
+reads as done once its bucket was bumped, and an interrupted C<clear>,
+C<add_many> or C<merge> as partly applied. When the recount changes C<count>,
+the exact values of C<sum>, C<min> and C<max> are lost: recovery sets C<min>
+and C<max> to the representative values of the lowest and highest non-empty
+buckets and C<sum> to the bucket-weighted sum of the representatives. Outside
+the collapsed end buckets each representative is within C<alpha> of the values
+it stands for, so C<sum> can be off by C<alpha> times the sum of the absolute
+values, which is large next to a sum of mixed-sign values. An C<add> killed
+after its count but before its sum, min and max updates leaves those three
+missing that one value, or estimated as above if the sketch was empty.
 B<Limitation>: PID reuse is not detected (very unlikely in practice).
 
 Reader-slot exhaustion (slotless readers): dead-process recovery attributes a

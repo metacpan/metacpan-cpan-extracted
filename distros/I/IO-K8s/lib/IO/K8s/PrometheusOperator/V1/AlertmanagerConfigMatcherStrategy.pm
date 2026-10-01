@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::AlertmanagerConfigMatcherStrategy;
 # ABSTRACT: alertmanagerConfigMatcherStrategy defines how AlertmanagerConfig objects process incoming alerts.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s type => Str, { enum => [qw(OnNamespace OnNamespaceExceptForAlertmanagerNamespace None)], default => 'OnNamespace' };
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::AlertmanagerConfigMatcherStrategy - alertmanage
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 type
 

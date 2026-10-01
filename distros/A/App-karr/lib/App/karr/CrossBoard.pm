@@ -1,7 +1,7 @@
 # ABSTRACT: Cross-board dependencies -- a link from a card here to a card on another board
 
 package App::karr::CrossBoard;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use Path::Tiny;
 use Try::Tiny;
@@ -21,7 +21,11 @@ use constant ESCALATED_FROM_PREFIX => 'escalated-from:';
 # not start with '-' or '.' either, so a name can never be mistaken for an
 # option or for a relative path.
 my $BOARD_RE = qr/[A-Za-z0-9_][A-Za-z0-9._-]*/;
-my $REF_RE   = qr/\A($BOARD_RE)\#([0-9]+)\z/;
+# The id side accepts the house kNNN spelling (foo#k30 == foo#30): an optional
+# leading k/K in front of the digits, stripped by capturing only the digits, so
+# what lands on the card and comes back out (format_ref) stays numeric. The same
+# strip App::karr::Role::BoardAccess/normalize_task_id makes for a local id.
+my $REF_RE   = qr/\A($BOARD_RE)\#[kK]?([0-9]+)\z/;
 
 sub parse_ref {
     my ( $class, $flag, $raw ) = @_;
@@ -315,7 +319,7 @@ App::karr::CrossBoard - Cross-board dependencies -- a link from a card here to a
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -415,7 +419,10 @@ L<App::karr::Role::DependencyCheck>, L<App::karr::Foundation>
 
 Parses one C<< <board>#<id> >> reference into C<< { board => 'other-repo', id
 => 7 } >>, with the id numified so it round-trips as a number through YAML and
-C<--json>. Anything else is a usage error (exit 2) naming the flag and the
+C<--json>. The id side accepts the house C<kNNN> spelling
+(C<< other-repo#k7 >> == C<< other-repo#7 >>), the same strip
+L<App::karr::Role::BoardAccess/normalize_task_id> makes for a local id.
+Anything else is a usage error (exit 2) naming the flag and the
 value -- including, deliberately, anything path-shaped, because a path on a
 card is wrong on every machine but the one that wrote it.
 

@@ -1,9 +1,9 @@
 package IO::K8s::ExternalSecrets::V1::FetchingPolicy;
 # ABSTRACT: FetchingPolicy configures the provider to interpret the `data.secretKey.remoteRef.key` field in ExternalSecret as secret ID or secret name
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
-k8s byID   => { Str => 1 };
+k8s byID   => Opaque;
 k8s byName => '+IO::K8s::ExternalSecrets::V1::ByName';
 
 
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::FetchingPolicy - FetchingPolicy configures the pro
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 byID
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::TypedLocalObjectReference;
 # ABSTRACT: TypedLocalObjectReference allows to reference typed object inside the same namespace.
-our $VERSION = '1.108';
+our $VERSION = '1.109';
 use IO::K8s::Resource;
 
 k8s apiGroup => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Scheduling::V1alpha3::TypedLocalObjectReference - TypedLocalObject
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head2 apiGroup
 

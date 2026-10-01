@@ -1,7 +1,7 @@
 # ABSTRACT: Single-shot foundation daemon -- periodic agent execution across karr boards
 
 package App::karr::Foundation;
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 use Moo;
 use MooX::Options (
   usage_string => 'USAGE: karr-foundation [ask QUESTION | answer ID ANSWER | chain | plan] [options]',
@@ -52,10 +52,16 @@ with 'App::karr::Role::CliArgs';
 
 # Instruction handed to a synthesized agent command via the $PROMPT variable
 # when neither the .karr file nor the config overrides it.
+#
+# The backlog sentence is there because "the next actionable task" is the
+# phrase an agent with an empty `karr pick` goes looking for work under, and a
+# backlog card promoted by that agent is a hold that no longer holds (k306):
+# moving a card out of backlog is the maintainer's call.
 our $DEFAULT_PROMPT =
     'Use the karr-coordinator skill: pick the next actionable task on this '
   . 'board, complete it, and move it forward. If you cannot proceed, block '
-  . 'the task with a reason.';
+  . 'the task with a reason. Leave cards in backlog where they are: moving '
+  . 'one to todo is the maintainer\'s call.';
 
 # The same, for a ticket-mode run. It cannot be $DEFAULT_PROMPT: that one opens
 # by telling the agent to pick its own work, which is the one thing a run that
@@ -1536,18 +1542,29 @@ sub _skip_disabled {
 # Task state / actionability
 # ---------------------------------------------------------------------------
 
-# A task is actionable when an agent could still pick it: not terminal
-# (done/archived) and not blocked. Mirrors `karr pick` eligibility.
+# A task is actionable when there is still work in it: not terminal on its
+# board, not held back in backlog, and not blocked. Terminal is the snapshot's
+# own verdict, taken from the board's configured statuses when _task_states
+# read it (its final status plus `archived`, #67) -- a board whose last column
+# is `shipped` is drained when everything on it is shipped, and has no `done`
+# to wait for (#305). Held back is the board's verdict the same way (k306): a
+# backlog card waits for someone to promote it, not for an agent, so a board
+# with nothing but backlog left is drained.
+#
+# This is not `karr pick` eligibility, and deliberately does not ask the claim:
+# the drain's own agent claims the card it works on, and that card has to stay
+# actionable for the drain to keep going and for _stuck_tasks to see it stall.
 sub _is_actionable {
   my ( $self, $st ) = @_;
   return 0 unless $st;
   return 0 if $st->{blocked};
-  my $status = $st->{status} // '';
-  return 0 if $status eq 'done' || $status eq 'archived';
+  return 0 if $st->{terminal};
+  return 0 if $st->{held_back};
   return 1;
 }
 
-# Snapshot every task as id => { status, claimed_by, updated, blocked }.
+# Snapshot every task as
+# id => { status, claimed_by, updated, blocked, terminal, held_back }.
 sub _task_states {
   my ( $self, $repo ) = @_;
   my $git = App::karr::Git->new( dir => "$repo" );
@@ -1561,6 +1578,8 @@ sub _task_states {
       claimed_by => ( $t->has_claimed_by ? $t->claimed_by : undef ),
       updated    => $t->updated,
       blocked    => ( $t->has_blocked ? 1 : 0 ),
+      terminal   => ( $store->is_terminal_status( $t->status ) ? 1 : 0 ),
+      held_back  => ( $store->is_held_back_status( $t->status ) ? 1 : 0 ),
     };
   }
   return %states;
@@ -1750,6 +1769,14 @@ sub _drain_repo {
     $last_exit = $exit;
     $first     = 0;
     $iter++;
+
+    # --dry-run started nothing: the runner logged the START it would have made
+    # and DRY-RUN (skipped), and came back without a run. There is no run to
+    # judge, so nothing below may judge one -- ticket mode called the unmoved
+    # card a STALL for an agent that never started (#314). Idle, like a run
+    # that did nothing, and no second would-be START: nothing a skipped run
+    # "did" can change what the next iteration would see.
+    last if $self->dry_run;
 
     my $hash_after = $self->_ref_hash( $repo ) // '';
     my $progressed = ( $hash_before ne $hash_after ) ? 1 : 0;
@@ -2161,7 +2188,7 @@ App::karr::Foundation - Single-shot foundation daemon -- periodic agent executio
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 
@@ -2607,21 +2634,22 @@ to draining it.
 
 B<Ticket mode.> Before the agent starts, foundation picks the card the run is
 about -- L<App::karr::Foundation::Picker>, applying C<karr pick>'s eligibility
-and ranking (not terminal, not blocked, not held by a live claim; class, then
-priority, then id). It is told to the agent twice: spliced into C<$PROMPT> as a
-closing sentence naming the id, and exported as C<$KARR_TASK> for a command
-template that wants the bare number. Nothing is appended to the command itself
--- how arguments are appended belongs to the per-agent contract (C<kind:>),
-which is a separate piece of work, and an environment variable works with every
-template that exists today.
+and ranking (not terminal, not held back in C<backlog>, not blocked, not held
+by a live claim; class, then priority, then id). It is told to the agent twice:
+spliced into C<$PROMPT> as a closing sentence naming the id, and exported as
+C<$KARR_TASK> for a command template that wants the bare number. Nothing is
+appended to the command itself -- how arguments are appended belongs to the
+per-agent contract (C<kind:>), which is a separate piece of work, and an
+environment variable works with every template that exists today.
 
 Foundation names the card; it does B<not> claim it. The claim is the agent's
-work session, minted with C<karr agentname> and reused across its own C<move>
-and C<handoff> (#176), and the board's per-repo lock plus the one-agent-per-
-repository rule already keep anybody else off the card for the length of the
-run. So an agent that dies mid-work leaves at most its own claim -- released by
-C<claim_timeout>, or by C<karr unlock> for a pick lock -- and costs one attempt
-on foundation's counter.
+work session: the C<KARR_CLAIM> foundation exports for the run (the checkout's
+C<karr agent-name --unique>, minted once per run), which the agent's own
+C<move> and C<handoff> default to (#176, #281), and the board's per-repo lock
+plus the one-agent-per-repository rule already keep anybody else off the card
+for the length of the run. So an agent that dies mid-work leaves at most its
+own claim -- released by C<claim_timeout>, or by C<karr unlock> for a pick lock
+-- and costs one attempt on foundation's counter.
 
 The run is then judged by that card and not by the board hash: C<progress> when
 it moved (status, claim or C<updated> changed, or it left the actionable set),
@@ -2668,12 +2696,15 @@ C<on_drained_max_runtime>, because how long an agent may take says nothing
 about how long a release gate may.
 
 B<Drained> is a fact about the board, not a name for an outcome: no actionable
-task is left on it -- everything done, archived or blocked. That is deliberately
-the same question C<--force> and C<< on_idle: always-run >> are answers to, and
-it is the only one that stays meaningful across the run modes. A drain that
-ends in a C<common-error> does not count: a rate-limited agent leaves a board
-that looks exactly like one it worked through, and foundation does not believe
-that run itself.
+task is left on it -- everything is in the board's own final status (or
+archived), held back in C<backlog>, or blocked. A backlog card waits for a
+person to promote it, not for an agent (L<App::karr::Config/is_held_back_status>),
+so a board with only backlog left is drained, is skipped while it does not
+change, and runs C<on_drained>. That is deliberately the same question C<--force> and
+C<< on_idle: always-run >> are answers to, and it is the only one that stays
+meaningful across the run modes. A drain that ends in a C<common-error> does
+not count: a rate-limited agent leaves a board that looks exactly like one it
+worked through, and foundation does not believe that run itself.
 
 B<An empty board is not the same as finished work.> The hook may fail and file
 tickets, at which point the board is no longer drained; the next tick works

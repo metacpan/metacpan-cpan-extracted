@@ -1,9 +1,12 @@
 package IO::K8s::Types;
 # ABSTRACT: Type::Tiny type library for Kubernetes resources
-our $VERSION = '1.108';
-use Type::Library -base, -declare => qw( IntOrStr Quantity Time );
+our $VERSION = '1.109';
+use strict;
+use warnings;
+use Type::Library -base, -declare => qw( IntOrStr Quantity Time Opaque );
 use Type::Utils -all;
 use Types::Standard -types;
+use Error::TypeTiny ();
 
 # Re-export common Types::Standard types
 BEGIN { extends 'Types::Standard' }
@@ -22,6 +25,20 @@ declare Quantity, as Str,
 declare Time, as Str,
     where { /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})\z/ },
     message { "Value '$_' is not a valid RFC3339 timestamp" };
+
+# The free map (k191): any hash, values untyped and copied through as they
+# are -- RawExtension, fieldsV1, a CRD's preserve-unknown object. The same
+# check as a bare HashRef; its own name is what the k8s DSL reads to tell it
+# from a string map. Deliberately not parameterizable: a map whose values
+# have a type is HashRef[X], and Opaque[X] dies rather than meaning that.
+# The generator is there only to refuse: without one, Type::Library gives
+# the exported Opaque an empty prototype, and Opaque[Str] would be a Perl
+# syntax error that never names the type.
+declare Opaque, as HashRef,
+    constraint_generator => sub {
+        Error::TypeTiny::croak('Opaque takes no parameters: it is the free map; '
+            . 'declare a map with typed values as HashRef[...]');
+    };
 
 # Core V1 Types
 class_type 'Pod', { class => 'IO::K8s::Api::Core::V1::Pod' };
@@ -73,6 +90,7 @@ class_type 'CustomResourceDefinition', { class => 'IO::K8s::ApiextensionsApiserv
 # Export tags
 our %EXPORT_TAGS = (
     k8s_scalars => [qw( IntOrStr Quantity Time )],
+    k8s_maps => [qw( Opaque )],
     core => [qw( Pod PodSpec PodStatus Container Service ServiceSpec
                  ConfigMap Secret Namespace Node
                  PersistentVolume PersistentVolumeClaim )],
@@ -99,7 +117,7 @@ IO::K8s::Types - Type::Tiny type library for Kubernetes resources
 
 =head1 VERSION
 
-version 1.108
+version 1.109
 
 =head1 SYNOPSIS
 
@@ -128,6 +146,15 @@ IO::K8s::Types - Type::Tiny type library for Kubernetes resources
 =head1 EXPORT TAGS
 
 =over 4
+
+=item :k8s_scalars
+
+IntOrStr, Quantity, Time
+
+=item :k8s_maps
+
+Opaque -- the free map: any hash, values untyped. Not parameterizable; a
+map with typed values is C<HashRef[...]>.
 
 =item :core
 

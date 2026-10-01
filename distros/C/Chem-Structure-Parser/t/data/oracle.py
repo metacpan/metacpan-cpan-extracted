@@ -24,8 +24,11 @@ if len(st):
         for res in chain:
             for at in res:
                 alt = '' if at.altloc in ('', '\x00') else at.altloc
-                rows.append('%s|%d|%s|%s|%s|%.3f|%.3f|%.3f|%s' % (
-                    chain.name, res.seqid.num, res.seqid.icode.strip(),
+                # a residue with no number -- a blank residue-number field --
+                # prints an empty field, which is how t/oracle.t prints its own
+                num = '' if res.seqid.num is None else '%d' % res.seqid.num
+                rows.append('%s|%s|%s|%s|%s|%.3f|%.3f|%.3f|%s' % (
+                    chain.name, num, res.seqid.icode.strip(),
                     at.name, alt, at.pos.x, at.pos.y, at.pos.z, res.name))
 print('\n'.join(sorted(rows)))
 # rstrip so that a field the file does not answer prints as a bare '#field'

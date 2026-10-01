@@ -1,10 +1,38 @@
 ==================================================
-Changes from 2025-08-13 00:00:00 +0000 to present.
+Changes from 2025-10-01 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.09 at 2026-08-13 08:07:35 +0000
+version 0.10 at 2026-10-01 06:50:38 +0000
 -----------------------------------------
+
+  Change: d1e0b7d5b75e8b2dd5b3137245bceef1e6b4bb69
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-09-30 13:51:12 +0000
+
+    bump VERSION 
+
+  Change: 1c1334bef9c45d36cc29bb671b2fee8d3a21cd87
+  Author: Lee J <lee@payprop.com>
+  Date : 2026-09-30 13:50:01 +0000
+
+    Merge pull request #6 from payprop/lee/more_floating_point_fixes
+
+    round to zero in ->to_file check 
+
+  Change: fcae54dbaf8f440f6856cf55667fd625d78dd026
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-09-30 12:03:38 +0000
+
+    round to zero in ->to_file check
+
+    w/r/t/ 9d7e5297619e4c434e41068eac96771fff963574 - sprintf to prevent
+    floating point issues, we are dealing with minor units so there
+    should *never* be a difference of < 1, if there is then it's floating
+    point so just ignore that
+
+    tweak test coverage for above, bump VERSION and Changes for CPAN
+    release 
 
   Change: eae882169c69b5172b8afc95bbfbe917b68ea6ef
   Author: Lee J <lee@payprop.com>
