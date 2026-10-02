@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.51';
+our $VERSION = '0.55';
 
 1;
 
@@ -63,6 +63,17 @@ session; this needs Hyperman 0.48 or newer. HTTP/2 and HTTP/3 have no 101
 at all: the upgrade is an Extended CONNECT (RFC 8441 / RFC 9220) that the
 server accepts by opening a stream, and a browser uses it for every
 WebSocket once the server has advertised the setting.
+
+An Extended CONNECT is answered by a C<websocket> route and by nothing
+else. It is matched as the GET the route is registered under, and a match
+that is not a websocket route is a 404 - the same 404 for a path with no
+route at all, for a path that is a route only under another method, and
+for a path under an C<api> or a C<mount> prefix. On this transport a 2xx
+is the acceptance, so an upgrade allowed to reach an ordinary handler
+would hand any page anywhere that handler's status. One consequence worth
+knowing: a mounted application's own websocket routes are not reachable
+over HTTP/2 or HTTP/3, because a mount answers for itself and never comes
+back past the check.
 
 Frames are decoded in C to RFC 6455, strictly: unmasked client frames,
 fragmented or over-long control frames and reserved opcodes are protocol

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::NodeAllocatableOverhead;
 # ABSTRACT: NodeAllocatableOverhead defines auxiliary resource overheads incurred when allocating a device. Overheads can be specified as a fixed cost per pod referencing the claim, a variable cost per container reference, or both. Kubelet accounts for this overhead by adding it to both the pod-level and container-level cgroups of referencing containers.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s perContainer => Quantity;
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1beta2::NodeAllocatableOverhead - NodeAllocatableOverhe
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 perContainer
 

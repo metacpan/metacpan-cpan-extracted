@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::PushSecretRewrite;
 # ABSTRACT: PushSecretRewrite defines how to transform secret keys before pushing.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s regexp    => '+IO::K8s::ExternalSecrets::V1alpha1::ExternalSecretRewriteRegexp';
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1alpha1::PushSecretRewrite - PushSecretRewrite define
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 regexp
 

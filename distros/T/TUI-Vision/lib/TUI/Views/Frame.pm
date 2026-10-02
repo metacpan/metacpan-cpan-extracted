@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -53,12 +53,15 @@ our $initFrame =
   "\x06\x0A\x0C\x05\x00\x05\x03\x0A\x09\x16\x1A\x1C\x15\x00\x15\x13\x1A\x19";
 
 # for UnitedStates code page
-our $frameChars = encode('cp437' => "   └ │┌├ ┘─┴┐┤┬┼   ╚ ║╔╟ ╝═╧╗╢╤ ");
+our $frameChars = encode( cp437 => "   └ │┌├ ┘─┴┐┤┬┼   ╚ ║╔╟ ╝═╧╗╢╤ ");
 
 our $closeIcon  = "[~\xFE~]";    # "[~■~]"
 our $zoomIcon   = "[~\x18~]";    # "[~↑~]"
 our $unZoomIcon = "[~\x12~]";    # "[~↕~]"
-our $dragIcon   = encode('cp437' => "~─┘~");
+# our $closeIcon  = encode( cp437 => "[~■~]" );
+# our $zoomIcon   = encode( cp437 => "[~↑~]" );
+# our $unZoomIcon = encode( cp437 => "[~↕~]" );
+our $dragIcon   = encode( cp437 => "~─┘~"  );
 
 # import frameLine
 require TUI::Views::Frame::Line;
@@ -288,9 +291,9 @@ responsible for drawing the window frame, including the title, border lines,
 and standard window icons such as close, zoom, and resize indicators.
 
 Frame objects are normally created and managed automatically by
-C<TWindow>. Applications rarely instantiate C<TFrame> directly and typically
-do not interact with it except through subclassing or customization hooks
-provided by the window.
+L<TWindow|TUI::Views::Window>. Applications rarely instantiate C<TFrame> 
+directly and typically do not interact with it except through subclassing or 
+customization hooks provided by the window.
 
 To customize the appearance of a window frame, applications override
 C<TWindow::initFrame> to instantiate a C<TFrame>-derived object with modified
@@ -303,28 +306,28 @@ of C<TFrame>.
 
 =head2 $initFrame
 
-Initial frame definition table used to map frame styles and states.
+Initial frame definition table used to map frame styles and states (I<Str>).
 
 =head2 $frameChars
 
 Character set used to draw frame borders.
-The default value uses CP437 line-drawing characters.
+The default value uses C<CP437> line-drawing characters (I<Str>).
 
 =head2 $closeIcon
 
-Icon text used for the close window command.
+Icon text (I<Str>) used for the close window command.
 
 =head2 $zoomIcon
 
-Icon text used for the zoom window command.
+Icon text (I<Str>) used for the zoom window command.
 
 =head2 $unZoomIcon
 
-Icon text used for the unzoom window command.
+Icon text (I<Str>) used for the unzoom window command.
 
 =head2 $dragIcon
 
-Icon text used to indicate window dragging (CP437).
+Icon text (I<Str>) used to indicate window dragging (C<CP437>).
 
 =head1 CONSTRUCTOR
 
@@ -339,7 +342,7 @@ normally called internally by C<TWindow::initFrame>.
 
 =item bounds
 
-Bounding rectangle of the frame (I<TRect>).
+Bounding rectangle of the frame (L<TRect|TUI::Objects::Rect>).
 
 =back
 
@@ -349,8 +352,8 @@ Bounding rectangle of the frame (I<TRect>).
 
 Factory-style constructor using positional arguments.
 
-This constructor is equivalent to calling C<new> with the C<bounds> parameter
-and is provided for compatibility with traditional Turbo Vision construction
+This constructor is equivalent to calling C<new> with the $bounds parameter
+and is provided for compatibility with traditional I<Turbo Vision> construction
 patterns.
 
 =head1 METHODS
@@ -395,7 +398,7 @@ Handles interactive dragging of the owning window using the mouse.
 
 =head1 SEE ALSO
 
-L<TUI::Views::Window>, L<TUI::Views::View>
+L<TWindow|TUI::Views::Window>, L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 
@@ -414,7 +417,6 @@ Copyright (c) 1990-1994, 1997 by Borland International
 Copyright (c) 2021-2026 the L</AUTHORS> as listed above.
 
 This software is licensed under the MIT license (see the LICENSE file, which is
-part of the distribution). This documentation is provided under the same terms
-as the Turbo Vision library itself.
+part of the distribution).
 
 =cut

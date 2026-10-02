@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::GatewayTLSConfig;
 # ABSTRACT: TLS specifies frontend and backend tls configuration for entire gateway.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s backend  => '+IO::K8s::GatewayAPI::V1::GatewayBackendTLS';
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::GatewayTLSConfig - TLS specifies frontend and backend t
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 backend
 

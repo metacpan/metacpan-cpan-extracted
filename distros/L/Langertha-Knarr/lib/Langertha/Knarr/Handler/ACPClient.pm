@@ -1,30 +1,18 @@
 package Langertha::Knarr::Handler::ACPClient;
-# ABSTRACT: Steerboard handler that consumes a remote ACP (BeeAI) agent
-our $VERSION = '1.101';
+# ABSTRACT: Knarr handler that consumes a remote ACP (BeeAI) agent
+our $VERSION = '1.102';
 use Moose;
 use Future::AsyncAwait;
 use JSON::MaybeXS;
 use HTTP::Request;
-use Net::Async::HTTP;
-use IO::Async::Loop;
 use Langertha::Knarr::Response;
 
-with 'Langertha::Knarr::Handler';
+with 'Langertha::Knarr::Handler', 'Langertha::Knarr::Role::UpstreamHTTP';
 
 
 has url        => ( is => 'ro', isa => 'Str', required => 1 );  # base URL of ACP server
 has agent_name => ( is => 'ro', isa => 'Str', required => 1 );
 has model_id   => ( is => 'ro', isa => 'Str', lazy => 1, default => sub { $_[0]->agent_name } );
-
-has loop => ( is => 'ro', lazy => 1, default => sub { IO::Async::Loop->new } );
-
-has _http => ( is => 'ro', lazy => 1, builder => '_build_http' );
-sub _build_http {
-  my ($self) = @_;
-  my $h = Net::Async::HTTP->new;
-  $self->loop->add($h);
-  return $h;
-}
 
 has _json => ( is => 'ro', default => sub { JSON::MaybeXS->new( utf8 => 1, canonical => 1 ) } );
 
@@ -59,7 +47,7 @@ async sub handle_chat_f {
   $http_req->header( 'Content-Type' => 'application/json' );
   $http_req->content( $self->_json->encode($body) );
 
-  my $resp = await $self->_http->do_request( request => $http_req );
+  my $resp = await $self->_upstream_request_f( request => $http_req );
   die "ACP remote failed: " . $resp->status_line . "\n" unless $resp->is_success;
 
   my $data = $self->_json->decode( $resp->decoded_content );
@@ -86,11 +74,11 @@ __END__
 
 =head1 NAME
 
-Langertha::Knarr::Handler::ACPClient - Steerboard handler that consumes a remote ACP (BeeAI) agent
+Langertha::Knarr::Handler::ACPClient - Knarr handler that consumes a remote ACP (BeeAI) agent
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -119,6 +107,11 @@ appended).
 =head2 agent_name
 
 Required. The C<agent_name> to send in each ACP run request.
+
+=head2 timeout
+
+Seconds the remote agent may take to answer, in total. Default C<300>;
+C<0> disables it. See L<Langertha::Knarr::Role::UpstreamHTTP>.
 
 =head2 model_id
 

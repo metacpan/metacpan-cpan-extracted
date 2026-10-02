@@ -1,0 +1,31 @@
+{
+   "input" : [
+      {
+         "content" : "What is the weather in Berlin right now? Use the get_weather tool.",
+         "role" : "user",
+         "type" : "message"
+      }
+   ],
+   "max_output_tokens" : 300,
+   "preset" : "fast",
+   "stream" : false,
+   "tools" : [
+      {
+         "description" : "Get the current weather for a city.",
+         "name" : "get_weather",
+         "parameters" : {
+            "properties" : {
+               "city" : {
+                  "description" : "City name",
+                  "type" : "string"
+               }
+            },
+            "required" : [
+               "city"
+            ],
+            "type" : "object"
+         },
+         "type" : "function"
+      }
+   ]
+}

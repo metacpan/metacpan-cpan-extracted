@@ -9,6 +9,7 @@ lib/Image/Synchronize/ProgressBar.pm
 lib/Image/Synchronize/Timerange.pm
 lib/Image/Synchronize/Timestamp.pm
 Makefile.PL
+LICENSE
 MANIFEST
 README
 t/Image-Synchronize-CameraOffsets.t

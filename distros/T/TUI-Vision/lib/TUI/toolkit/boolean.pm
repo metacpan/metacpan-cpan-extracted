@@ -1,4 +1,5 @@
 package TUI::toolkit::boolean;
+# ABSTRACT: Boolean constants for Perl
 
 use strict;
 use warnings;
@@ -28,3 +29,64 @@ BEGIN {
 }
 
 1
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+TUI::toolkit::boolean - boolean constants for Perl
+
+=head1 SYNOPSIS
+
+  use TUI::toolkit::boolean;
+
+  if ( true ) {
+    print "This is true\n";
+  }
+
+  if ( false ) {
+    print "This will not print\n";
+  }
+
+
+=head1 DESCRIPTION
+
+This module provides boolean constants C<true> and C<false> for use in Perl 
+code. It exports these constants by default. If Perl v5.36 or later is 
+available, it will use the built-in boolean type.
+
+=head1 EXPORTS
+
+The module exports the following constants by default:
+
+=over
+
+=item true
+
+Boolean true value.
+
+=item false
+
+Boolean false value.
+
+=back
+
+=head1 SEE ALSO
+
+L<perlfunc/true>, L<perlfunc/false>
+
+=head1 AUTHOR
+
+J. Schneider <brickpool@cpan.org>
+
+=head1 LICENSE
+
+Copyright (c) 2026 the L</AUTHOR> as listed above.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

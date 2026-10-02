@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -179,11 +179,6 @@ __END__
 
 TUI::Objects::Point - two-dimensional point value type
 
-=head1 HIERARCHY
-
-  TPoint (value type)
-    used by TRect and view-related classes
-
 =head1 SYNOPSIS
 
   use TUI::Objects;
@@ -201,12 +196,24 @@ TUI::Objects::Point - two-dimensional point value type
 =head1 DESCRIPTION
 
 C<TPoint> represents a two-dimensional point with integer coordinates. It is a
-lightweight value type and is not derived from C<TObject>. Instances are
-typically used to represent positions, sizes, or offsets within the Turbo
-Vision coordinate system.
+lightweight value type and is not derived from 
+L<TObject|TUI::Objects::TObject>. Instances are typically used to represent 
+positions, sizes, or offsets within the L<TUI::Vision> coordinate system.
 
 The class supports arithmetic and comparison operators through Perl operator
 overloading, allowing points to be combined and compared naturally.
+
+=head1 ATTRIBUTES
+
+The following attributes define the coordinates of the point.
+
+=head2 x
+
+Horizontal coordinate (I<Int>).
+
+=head2 y
+
+Vertical coordinate (I<Int>).
 
 =head1 CONSTRUCTOR
 
@@ -239,22 +246,6 @@ Factory-style constructor using positional arguments.
 
 This constructor is provided for compatibility with traditional Turbo Vision
 construction patterns.
-
-=head1 ATTRIBUTES
-
-The following attributes define the coordinates of the point.
-
-=over
-
-=item x
-
-Horizontal coordinate (I<Int>).
-
-=item y
-
-Vertical coordinate (I<Int>).
-
-=back
 
 =head1 METHODS
 
@@ -333,8 +324,8 @@ natural arithmetic expressions.
 
 =head1 SEE ALSO
 
-L<TUI::Objects::Rect>,
-L<TUI::Views::View>
+L<TRect|TUI::Objects::Rect>,
+L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 

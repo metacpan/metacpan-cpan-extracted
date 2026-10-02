@@ -30,8 +30,14 @@ my $new_var;
 $event->{infoPtr} = \$new_var;
 is( refaddr( $event->{infoPtr} ), refaddr( \$new_var ),
   'infoPtr field is updated correctly' );
+is( $event->{infoInt}, refaddr( \$new_var ), 
+  'infoPtr field stores the reference address as expected' );
 $event->{infoPtr} = 'non-ref';
 is( $event->{infoInt}, 0, 'infoPtr field handling non references correctly' );
+$event->{infoPtr} = 0x2345;
+is( $event->{infoInt}, 0x2345, 
+  'infoPtr field stores integer values as expected' );
+is( $event->{infoPtr}, undef, 'infoPtr field is fetched correctly' );
 
 # Test infoLong field
 $event = MessageEvent->new( infoLong => 0x12345678 );
@@ -50,7 +56,6 @@ $event = MessageEvent->new( infoWord => 42 );
 is( $event->{infoInt}, 42, 'infoInt field is set correctly' );
 $event->{infoInt} = 84;
 is( $event->{infoInt}, 84, 'infoInt field is updated correctly' );
-is( $event->{infoPtr}, 84, 'infoPtr field is fetched correctly' );
 
 # Test infoByte field
 $event = MessageEvent->new( infoByte => 0x12 );

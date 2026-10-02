@@ -1,5 +1,8 @@
 Revision history for Devel-ebug
 
+0.68      2026-10-02 01:44:26 -0600
+  - Test fixes, no functional changes.  (gh#71, gh#72, richardleach++)
+
 0.67      2026-09-26 22:00:23 -0600
   - break_point_subroutine() takes an optional condition, like
     break_point(), and the ebug console accepts one after a subroutine

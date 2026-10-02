@@ -1,6 +1,17 @@
 Revision history for Chem-Structure-Parser
 
 
+0.037 2026-10-01 CDT
+
+ - bzip2 files are read as gzip files are: a .bz2 is unpacked as it is
+   read, by every function that takes a file name -- structure_info() and
+   its views, structure_sequences() and structure_rmsd() -- in both formats,
+   with a file of several bzip2 streams, as pbzip2 writes, read to the end.
+   A .bz2 used to die saying it was not unpacked.  A .Z still dies, now
+   saying that gzip and bzip2 are what is read instead.
+ - The minimum perl is now 5.10.1, up from 5.10.0: 5.10.1 is the first perl
+   whose core has IO::Uncompress::Bunzip2, which reads the .bz2 files.
+
 0.036 2026-09-30 CDT
 
  - A residue or serial number too big for its PDB columns is read as the

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::PodMonitorSpec;
 # ABSTRACT: spec defines the specification of desired Pod selection for target discovery by Prometheus.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s attachMetadata                 => '+IO::K8s::PrometheusOperator::V1::AttachMetadata';
@@ -62,7 +62,7 @@ IO::K8s::PrometheusOperator::V1::PodMonitorSpec - spec defines the specification
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 attachMetadata
 

@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::ReferenceGrant;
 # ABSTRACT: ReferenceGrant identifies kinds of resources in other namespaces that are trusted to reference the specified kinds of resources in the same namespace as the policy.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1beta1',
     resource_plural => 'referencegrants',
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1beta1::ReferenceGrant - ReferenceGrant identifies kinds o
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

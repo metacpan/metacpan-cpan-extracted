@@ -1,5 +1,16 @@
 Revision history for Crypt-Age
 
+0.005     2026-10-01 16:25:03Z
+  - Reading a header no longer overwrites the caller's $_. The header parser
+    read its lines with a bare while (<$fh>), which assigns to the global $_,
+    so decrypt, decrypt_file, decrypt_filehandle, Crypt::Age::Header->parse
+    and ->parse_from_fh all left a header line (or undef) in it. A caller
+    decrypting inside for (@files) had the array element itself rewritten,
+    and one looping over literals died with "Modification of a read-only
+    value attempted". The loops now read into lexicals; t/08-topic-preserved.t
+    checks every one of those entry points, on success and on a rejected
+    header. Found through File::SOPS.
+
 0.004     2026-09-17 22:33:50Z
   - SECURITY (CVE-2026-85783): a header's recipient stanzas are now capped,
     at 128 by default, and the cap is enforced while the header is read

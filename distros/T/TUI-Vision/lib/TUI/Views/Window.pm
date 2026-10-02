@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -51,6 +51,12 @@ sub name() { 'TWindow' }
 sub new_TWindow { __PACKAGE__->from(@_) }
 
 extends ( TGroup, TWindowInit );
+
+# Moo does not inherit attributes from secondary extends() classes.
+# Redeclare attribute provided by TWindowInit.
+if ( TUI::toolkit::is_Moo ) {
+  has createFrame => ( is => 'bare', default => sub { die 'required' } );
+}
 
 # declare global variables
 our $minWinSize = TPoint->new( x => 16, y => 6 );
@@ -381,7 +387,7 @@ __END__
 
 =head1 NAME
 
-TUI::Views::Window - base class for windows in TUI::Vision
+TUI::Views::Window - base class for managing windows
 
 =head1 HIERARCHY
 
@@ -422,48 +428,46 @@ for C<TWindow>.
 
 =head2 $minWinSize
 
-Specifies the minimum allowed window size, represented as a C<TPoint>.
+Specifies the minimum allowed window size, represented as a 
+L<TPoint|TUI::Objects::Point>.
 
 =head1 ATTRIBUTES
 
 The following attributes define the state and appearance of a window. Unless
 otherwise noted, attributes are part of the public window state.
 
-=over
+=head2 flags
 
-=item flags
-
-Window behavior flags (I<Int>), typically a combination of C<wfXXXX>
-constants. These flags control whether the window can be moved, resized,
+Window behavior flags (I<PositiveOrZeroInt>), typically a combination of 
+C<wfXXXX> constants. These flags control whether the window can be moved, resized,
 closed, or zoomed.
 
-=item frame
+=head2 frame
 
-Reference to the window frame object (I<TFrame>).  
+Reference to the window frame object (L<TFrame|TUI::Views::Frame>).  
 This attribute is created internally and represents the visual border of the
 window.
 
-=item number
+=head2 number
 
-Window number identifier (I<Int>).  
+Window number identifier (I<PositiveOrZeroInt>).  
 If the value is between 1 and 9, the window can be selected directly using the
 C<Alt-n> key combination.
 
-=item palette
+=head2 palette
 
 Palette selector for the window (I<Int>).  
 Determines which predefined window palette is used.
 
-=item title
+=head2 title
 
 Title string displayed in the window frame (I<Str>).
 
-=item zoomRect
+=head2 zoomRect
 
-Rectangle storing the window's normal (unzoomed) bounds (I<TRect>).  
-This value is used to restore the window when toggling the zoom state.
-
-=back
+Rectangle storing the window's normal (unzoomed) bounds 
+(L<TRect|TUI::Objects::Rect>). This value is used to restore the window when 
+toggling the zoom state.
 
 =head1 CONSTRUCTOR
 
@@ -481,7 +485,7 @@ Creates a new window with the specified bounds, title, and window number.
 
 =item bounds
 
-Bounding rectangle of the window (I<TRect>).
+Bounding rectangle of the window (L<TRect|TUI::Objects::Rect>).
 
 =item title
 
@@ -489,8 +493,8 @@ Title string displayed in the window frame (I<Str>).
 
 =item number
 
-Window number identifier (I<Int>).  
-Values from 1 to 9 allow direct keyboard selection.
+Window number identifier (I<PositiveOrZeroInt>). Values from 1 to 9 allow 
+direct keyboard selection.
 
 =back
 
@@ -501,7 +505,7 @@ Values from 1 to 9 allow direct keyboard selection.
 Factory-style constructor using positional arguments.
 
 This constructor is provided for compatibility with traditional Turbo Vision
-construction patterns and is functionally equivalent to calling C<new> with
+construction patterns and is functionally equivalent to calling L</new> with
 named parameters.
 
 =head1 DESTRUCTOR
@@ -511,9 +515,6 @@ named parameters.
   $self->DEMOLISH($in_global_destruction);
 
 Destroys the window and removes it from the view hierarchy.
-
-This method corresponds to the Turbo Vision destructor and is normally invoked
-automatically by the owning group or application.
 
 =head1 METHODS
 
@@ -587,7 +588,9 @@ L</zoomRect>.
 
 =head1 SEE ALSO
 
-L<TUI::Views::View>, L<TUI::Views::Group>, L<TUI::Views::Frame>
+L<TView|TUI::Views::View>, 
+L<TGroup|TUI::Views::Group>, 
+L<TFrame|TUI::Views::Frame>
 
 =head1 AUTHORS
 

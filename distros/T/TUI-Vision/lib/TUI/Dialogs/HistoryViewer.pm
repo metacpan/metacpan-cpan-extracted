@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -23,8 +23,8 @@ use TUI::toolkit::Types qw(
   :types
 );
 
-use TUI::Const                            qw( EOS );
-use TUI::Dialogs::Const                   qw( cpHistoryViewer );
+use TUI::Const qw( EOS );
+use TUI::Dialogs::Const qw( cpHistoryViewer );
 use TUI::Dialogs::HistoryViewer::HistList qw(
   historyCount
   historyStr
@@ -65,9 +65,9 @@ sub BUILDARGS {    # \%args (%args)
   local $Carp::CarpLevel = $Carp::CarpLevel + 1;
   my $args2 = $class->SUPER::BUILDARGS(
     bounds     => $args1->{bounds},
+    numCols    => 1,
     hScrollBar => $args1->{hScrollBar},
     vScrollBar => $args1->{vScrollBar},
-    numCols    => 1,
   );
   return { %$args1, %$args2 };
 }
@@ -84,7 +84,7 @@ sub BUILD {    # void (\%args)
     $self->historyWidth() - $self->{size}{x} + 3
   );
   return;
-} #/ sub BUILD
+}
 
 sub from {    # $obj ($bounds, $aHScrollBar, $aVScrollBar, $aHistoryId)
   state $sig = signature(
@@ -94,7 +94,7 @@ sub from {    # $obj ($bounds, $aHScrollBar, $aVScrollBar, $aHistoryId)
   my ( $class, @args ) = $sig->( @_ );
   return $class->new( bounds => $args[0], hScrollBar => $args[1], 
     vScrollBar => $args[2], historyId  => $args[3] );
-} #/ sub from
+}
 
 sub getPalette {    # $palette ()
   state $sig = signature(
@@ -107,7 +107,7 @@ sub getPalette {    # $palette ()
     size => length( cpHistoryViewer ),
   );
   return $palette->clone();
-} #/ sub getPalette
+}
 
 sub getText {    # void (\$dest, $item, $maxChars)
   state $sig = signature(
@@ -116,9 +116,9 @@ sub getText {    # void (\$dest, $item, $maxChars)
   );
   my ( $self, $dest, $item, $maxChars ) = $sig->( @_ );
   my $str = historyStr( $self->{historyId}, $item );
-  $$dest = $str ? substr( $str, 0, $maxChars ) : EOS;
+  $$dest = length( $str ) ? substr( $str, 0, $maxChars ) : EOS;
   return;
-} #/ sub getText
+}
 
 sub handleEvent {    # void ($event)
   no warnings 'uninitialized';
@@ -127,23 +127,18 @@ sub handleEvent {    # void ($event)
     pos    => [Object],
   );
   my ( $self, $event ) = $sig->( @_ );
-  if (
-    (
-      $event->{what} == evMouseDown && ( $event->{mouse}{eventFlags} & meDoubleClick )
-    )
-    || ( $event->{what} == evKeyDown
-      && $event->{keyDown}{keyCode} == kbEnter )
-    )
-  {
+  if ( ( $event->{what} == evMouseDown 
+        && ( $event->{mouse}{eventFlags} & meDoubleClick ) )
+    || ( $event->{what} == evKeyDown 
+        && $event->{keyDown}{keyCode} == kbEnter )
+  ) {
     $self->endModal( cmOK );
     $self->clearEvent( $event );
-  } #/ if ( ( $event->{what} ...))
-  elsif (
-    ( $event->{what} == evKeyDown && $event->{keyDown}{keyCode} == kbEsc )
-    || ( $event->{what} == evCommand
-      && $event->{message}{command} == cmCancel )
-    )
-  {
+  }
+  elsif ( 
+       ( $event->{what} == evKeyDown && $event->{keyDown}{keyCode} == kbEsc )
+    || ( $event->{what} == evCommand && $event->{message}{command} == cmCancel )
+  ) {
     $self->endModal( cmCancel );
     $self->clearEvent( $event );
   }
@@ -166,7 +161,7 @@ sub historyWidth {    # $width ()
     $width = max( $width, $T );
   }
   return $width;
-} #/ sub historyWidth
+}
 
 1
 
@@ -199,13 +194,14 @@ TUI::Dialogs::HistoryViewer - list viewer for dialog input history
 =head1 DESCRIPTION
 
 C<THistoryViewer> implements the list viewer used to display input history
-entries managed by C<THistory>. It is responsible for presenting the stored
-history values in a scrollable list and handling user interaction with that
-list.
+entries managed by L<THistory|TUI::Dialogs::History>. It is responsible for 
+presenting the stored history values in a scrollable list and handling user 
+interaction with that list.
 
-The history viewer is normally created indirectly by a C<THistory> object when
-the history control is activated. Application code rarely needs to instantiate
-or interact with C<THistoryViewer> directly.
+The history viewer is normally created indirectly by a 
+L<THistory|TUI::Dialogs::History> object when the history control is activated. 
+Application code rarely needs to instantiate or interact with C<THistoryViewer> 
+directly.
 
 The viewer displays the history entries associated with a specific history
 identifier. Input fields that share the same history ID also share the same
@@ -216,14 +212,10 @@ history list.
 The following attributes are managed internally and exposed as read-only
 accessors.
 
-=over
-
-=item historyId
+=head2 historyId
 
 Numeric identifier selecting which history list is displayed
 (I<PositiveOrZeroInt>).
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -242,7 +234,7 @@ Creates a new history viewer for displaying a specific history list.
 
 =item bounds
 
-Bounding rectangle of the list viewer (I<TRect>).
+Bounding rectangle of the list viewer (L<TRect|TUI::Objects::Rect>).
 
 =item hScrollBar
 
@@ -270,7 +262,8 @@ Numeric identifier of the history list to display.
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 METHODS
 
@@ -301,9 +294,9 @@ Returns the width of the longest entry in the history list.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::History>,
-L<TUI::Dialogs::InputLine>,
-L<TUI::Views::ListViewer>
+L<THistory|TUI::Dialogs::History>,
+L<TInputLine|TUI::Dialogs::InputLine>,
+L<TListViewer|TUI::Views::ListViewer>
 
 =head1 AUTHORS
 
@@ -322,7 +315,6 @@ Copyright (c) 1990-1994, 1997 by Borland International
 Copyright (c) 2026 the L</AUTHORS> as listed above.
 
 This software is licensed under the MIT license (see the LICENSE file, which is
-part of the distribution). This documentation is provided under the same terms
-as the Turbo Vision library itself.
+part of the distribution).
 
 =cut

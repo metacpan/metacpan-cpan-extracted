@@ -1,0 +1,111 @@
+# Skeid Configuration for Service Stack
+# Location: /etc/skeid/skeid.yaml (mounted from examples/service/skeid.yaml)
+
+pricing:
+  "*":
+    input_per_million: 0.10
+    output_per_million: 0.40
+
+# Nodes. api_key_ref is a key reference: the OpenBao KeyBroker reads the api_key field of the
+# KV v2 secret it names, per request, into memory only. skeid-init stores SKEID_GROQ_KEY there.
+nodes:
+  - id: groq-main
+    url: https://api.groq.com/openai/v1
+    model: llama-3.3-70b-versatile
+    engine: openai
+    api_key_ref: secret/skeid/remote/groq
+  # skeid-init stores SKEID_OPENAI_KEY where this node looks for it:
+  # - id: openai-main
+  #   url: https://api.openai.com/v1
+  #   model: gpt-4o-mini
+  #   engine: openai
+  #   api_key_ref: secret/skeid/remote/openai
+
+# Usage storage via PostgreSQL.
+# This stack chooses postgresql over the (faster, simpler) jsonlog dir mode on
+# purpose: it is a multi-frontend deployment that wants one queryable billing
+# store with real SQL reports across every worker and container. A single-node
+# quick start is better served by `backend: jsonlog, path: /var/log/skeid/events/`
+# (see the README "Usage and billing" section) -- no database to run.
+# Skeid creates the usage_events table itself on start (auto_migrate, from
+# share/sql/usage_events.postgresql.sql) and adds any column an older table lacks.
+usage_store:
+  backend: postgresql
+  dsn: "dbi:Pg:dbname=skeid;host=postgres;port=5432"
+  user: skeid
+  password_env: SKEID_USAGE_DB_PASSWORD
+
+# Admin API protection
+admin:
+  api_key_env: SKEID_ADMIN_API_KEY
+
+# Routing config
+routing:
+  wait_timeout_ms: 2000
+  wait_poll_ms: 25
+  # Believe x-skeid-key-id from the client. Only correct when something in front of Skeid
+  # authenticates the caller and sets the header -- otherwise any client can pick its own
+  # routing policy and somebody else's invoice.
+  trust_key_id_header: false
+
+# Model aliases (ADR 0008). A client-facing name resolves to an ordered list of tiers, tried
+# until one has free capacity. Tag your nodes (tags: [local] / [cloud]) to use this.
+#
+# aliases:
+#   house-model:
+#     tiers:
+#       - tags: [local]
+#         model: qwen3-32b
+#         wait_ms: 200      # wait this long for a local GPU before paying for cloud
+#       - tags: [cloud]
+#         model: llama-3.3-70b-versatile
+#
+# wait_ms defaults to 0 -- fall through immediately unless you ask to wait.
+
+# Per-key routing policy (ADR 0008). Profiles are the standard setups; a key takes one, or one
+# plus an override of a single field. Keys are named by the id their API key resolves to --
+# `skeid keyid sk-alice-secret-key` prints it -- so the config never holds a customer key.
+#
+# policies:
+#   standard:  { deny_tags: [cloud] }     # our hardware only, 429 rather than spill to cloud
+#   burstable: {}                         # cloud is fine when local is full
+#   trial:     { models: [house-model] }  # one product, and it may go anywhere
+# default_policy: standard
+# keys:
+#   alice: burstable                      # by readable name, via the names: registry below
+#   bigcorp:
+#     policy: standard
+#     deny_tags: [cloud, eu-outside]      # replaces the profile's deny list
+#   k_1122334455aae5f60718293a4b5c6d7e8f901a2b: burstable  # or still by the raw key id, with no name entry
+#
+# names: is a readable-name -> key-id registry that lives here in the config. It makes the
+# keys: lines legible and turns key rotation into a one-line edit -- repoint the name and every
+# policy that named the customer follows. Its values are ids from `skeid keyid`, never customer
+# keys, and it is read only at config load, never on the request path (ADR 0008).
+# names:
+#   alice:   k_28f8389e824f2273c846b9562cffc72a4f10a651  # `skeid keyid sk-alice-secret-key` prints this
+#   bigcorp: k_9c8b7a6f5e4de5f60718293a4b5c6d7e8f901a2b
+#
+# Unlisted keys take default_policy, so a deployment where every customer is configured the
+# same way carries no key entries at all.
+
+# Capacity probes (ADR 0009). inflight counts only what THIS Skeid sent, so two frontends in
+# front of the same GPU each think it is half as busy as it is. A probe reads what the node
+# itself reports, including traffic Skeid never saw.
+#
+# nodes:
+#   - id: gpu-1
+#     url: http://gpu-1:8000/v1
+#     model: qwen3-32b
+#     tags: [local]
+#     max_conns: 32
+#     capacity:
+#       probe: prometheus
+#       path: /metrics          # or a full url: for a sidecar
+#       interval_ms: 2000
+#       # running/waiting default to the vLLM, SGLang and TGI metric names
+#       # limit: 32             # defaults to max_conns
+#
+# Cloud nodes need no configuration: rate-limit headers are read off responses Skeid already
+# receives, so a provider that says "0 remaining" stops being admitted until it says otherwise.
+# A probe can only ever narrow max_conns, never raise it.

@@ -1,13 +1,14 @@
 package Langertha::Knarr::Protocol::A2A;
 # ABSTRACT: Google Agent2Agent (A2A) wire protocol for Knarr
 
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 use Moose;
 use JSON::MaybeXS;
 use Data::UUID;
 use Time::HiRes qw( time );
 use Langertha::Knarr::Request;
 use Langertha::Knarr::Response;
+use Langertha::Knarr ();
 
 with 'Langertha::Knarr::Protocol';
 
@@ -31,6 +32,18 @@ with 'Langertha::Knarr::Protocol';
 has _json => ( is => 'ro', default => sub { JSON::MaybeXS->new( utf8 => 1, canonical => 1 ) } );
 has _uuid => ( is => 'ro', default => sub { Data::UUID->new } );
 
+has agent_name => (
+  is => 'ro',
+  isa => 'Str',
+  default => 'Langertha Knarr Agent',
+);
+
+has agent_description => (
+  is => 'ro',
+  isa => 'Str',
+  default => 'LLM agent served through Langertha Knarr',
+);
+
 has agent_card => (
   is => 'ro',
   isa => 'HashRef',
@@ -41,10 +54,12 @@ has agent_card => (
 sub _build_agent_card {
   my ($self) = @_;
   return {
-    name => 'Langertha Steerboard Agent',
-    description => 'Steerboard-exposed agent',
+    name => $self->agent_name,
+    description => $self->agent_description,
     url => '/',
-    version => '0.0.1',
+    # Knarr's own version, as knarr --version prints it; 'dev' only for a
+    # tree whose Langertha::Knarr carries no $VERSION.
+    version => $Langertha::Knarr::VERSION // 'dev',
     capabilities => {
       streaming => JSON::MaybeXS::true(),
       pushNotifications => JSON::MaybeXS::false(),
@@ -65,7 +80,7 @@ sub protocol_routes {
   ];
 }
 
-# A2A puts everything through JSON-RPC; we surface a normalized Steerboard
+# A2A puts everything through JSON-RPC; we surface a normalized Knarr
 # request from the "tasks/send" or "tasks/sendSubscribe" method params.
 sub parse_chat_request {
   my ($self, $http_req, $body_ref) = @_;
@@ -181,7 +196,7 @@ Langertha::Knarr::Protocol::A2A - Google Agent2Agent (A2A) wire protocol for Kna
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 
@@ -202,11 +217,27 @@ the original C<id> preserved, transitions C<status.state> from
 C<working> to C<completed>, and emits artifact append events for the
 text deltas.
 
+=head2 agent_name
+
+The C<name> in the default L</agent_card>. Default
+C<Langertha Knarr Agent>. Configured as C<a2a.name> in the config file or
+C<KNARR_A2A_NAME> (see L<Langertha::Knarr::Config/a2a_name>); C<knarr start>
+passes it through L<Langertha::Knarr/protocol_args>.
+
+=head2 agent_description
+
+The C<description> in the default L</agent_card>. Default
+C<LLM agent served through Langertha Knarr>. Configured as
+C<a2a.description> or C<KNARR_A2A_DESCRIPTION>.
+
 =head2 agent_card
 
-The HashRef returned by the discovery endpoint. Defaults to a generic
-"Knarr Agent" card with C<streaming: true>; override to advertise
-specific skills, version, etc.
+The HashRef returned by the discovery endpoint. Defaults to a card with
+L</agent_name>, L</agent_description>, Knarr's own version
+(C<$Langertha::Knarr::VERSION>, C<dev> when it has none) and
+C<streaming: true>; pass a whole
+card to advertise specific skills, version, etc. (L</agent_name> and
+L</agent_description> are then not used).
 
 =head1 SUPPORT
 

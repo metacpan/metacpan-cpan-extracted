@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::DopplerOIDCAuth;
 # ABSTRACT: OIDCConfig authenticates using Kubernetes ServiceAccount tokens via OIDC.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s expirationSeconds => Int, { default => 600 };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::DopplerOIDCAuth - OIDCConfig authenticates using K
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 expirationSeconds
 

@@ -1,11 +1,11 @@
 package TUI::Dialogs::HistoryViewer::HistList;
-# ABSTARCT: Implements the behavior of the HistRec list
+# ABSTRACT: Implements the behavior of the HistRec list
 
 use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -17,6 +17,10 @@ our @EXPORT_OK = qw(
   clearHistory
   initHistory
   doneHistory
+);
+
+our %EXPORT_TAGS = (
+  all => \@EXPORT_OK,
 );
 
 use TUI::toolkit qw( :utils );
@@ -178,7 +182,7 @@ __END__
 
 =head1 NAME
 
-TUI::Dialogs::HistoryViewer::HistList - TVision style input history functions
+TUI::Dialogs::HistoryViewer::HistList - input history functions
 
 =head1 SYNOPSIS
 
@@ -197,14 +201,13 @@ TUI::Dialogs::HistoryViewer::HistList - TVision style input history functions
 
 =head1 DESCRIPTION
 
-C<TUI::Dialogs::HistoryViewer::HistList> provides a set of functions 
-implementing a Turbo Vision compatible input history mechanism. It is used by 
-dialog controls such as input lines to store and retrieve previously entered 
-values.
+C<HistList> provides a set of functions implementing a I<Turbo Vision> 
+compatible input history mechanism. It is used by dialog controls such as input 
+lines to store and retrieve previously entered values.
 
 History entries are grouped by numeric identifiers. Each group maintains an
 ordered list of strings. The implementation mirrors the behavior of the
-original Turbo Vision history list routines, while adapting the interface to
+original I<Turbo Vision> history list routines, while adapting the interface to
 idiomatic Perl usage.
 
 This module is purely functional. It does not define any classes or objects.
@@ -249,7 +252,7 @@ Each entry associates a history group identifier with a string value.
 Adds a string to the history group identified by C<$id>.
 
 If the string already exists in the same history group, it may be moved or
-reordered according to Turbo Vision history semantics.
+reordered according to I<Turbo Vision> history semantics.
 
 =head2 historyCount
 
@@ -292,7 +295,7 @@ This function is typically called during application shutdown.
 
 =head1 COMPATIBILITY NOTES
 
-This module follows the Turbo Vision C++ history model and preserves its
+This module follows the I<Turbo Vision> history model and preserves its
 behavior and semantics.
 
 Internally, the original implementation relied on global state and shared
@@ -326,15 +329,15 @@ but make the interface safer and more natural to use in Perl.
 
 =head1 IMPORTANT
 
-The history functions are intended for use within TUI::Vision applications
+The history functions are intended for use within L<TUI::Vision> applications
 only. They depend on application-level initialization performed during program
 startup.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::InputLine>,
-L<TUI::Dialogs::HistoryViewer>,
-L<TUI::App::Application>
+L<TInputLine|TUI::Dialogs::InputLine>,
+L<TListBox|TUI::Dialogs::HistoryViewer>,
+L<TApplication|TUI::App::Application>
 
 =head1 AUTHORS
 

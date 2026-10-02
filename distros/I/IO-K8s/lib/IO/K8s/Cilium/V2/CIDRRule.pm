@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CIDRRule;
 # ABSTRACT: CIDRRule is a rule that specifies a CIDR prefix to/from which outside communication is allowed, along with an optional list of subnets within that CIDR prefix to/from which outside communication is not allowed.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s cidr              => Str;
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::CIDRRule - CIDRRule is a rule that specifies a CIDR prefix 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 cidr
 

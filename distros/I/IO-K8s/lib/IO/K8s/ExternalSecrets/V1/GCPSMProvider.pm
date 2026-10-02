@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::GCPSMProvider;
 # ABSTRACT: GCPSM configures this store to sync secrets using Google Cloud Platform Secret Manager provider
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s auth                         => '+IO::K8s::ExternalSecrets::V1::GCPSMAuth';
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::GCPSMProvider - GCPSM configures this store to syn
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 auth
 

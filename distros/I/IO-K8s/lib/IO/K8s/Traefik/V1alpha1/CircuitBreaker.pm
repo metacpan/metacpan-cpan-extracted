@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::CircuitBreaker;
 # ABSTRACT: CircuitBreaker holds the circuit breaker configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s checkPeriod      => IntOrStr, { pattern => "^([0-9]+(ns|us|\x{b5}s|ms|s|m|h)?)+\$" };
@@ -28,7 +28,7 @@ IO::K8s::Traefik::V1alpha1::CircuitBreaker - CircuitBreaker holds the circuit br
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 checkPeriod
 

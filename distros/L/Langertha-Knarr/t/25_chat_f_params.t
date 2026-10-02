@@ -90,6 +90,40 @@ subtest 'unsupported caps cause params to be dropped' => sub {
   ok !exists $cap->{tool_choice}, 'tool_choice dropped';
 };
 
+# Hermes-wire engines (NousResearch, AKI native) advertise tools_hermes but,
+# since Langertha k234, not tools_native: core chat_f renders the tools into
+# the system prompt and handles tool_choice per wire. Gating on tools_native
+# alone would silently drop a client's tools on those backends (knarr k15).
+sub _captured_tools {
+  my ($caps) = @_;
+  my $engine = CaptureEngine->new( caps => $caps );
+  my $h = Langertha::Knarr::Handler::Engine->new( engine => $engine );
+  my $req = Langertha::Knarr::Request->new(
+    protocol    => 'openai',
+    model       => 'cap-1',
+    messages    => [ { role => 'user', content => 'hi' } ],
+    tools       => [ { type => 'function', function => { name => 'f', parameters => {} } } ],
+    tool_choice => { type => 'function', function => { name => 'f' } },
+  );
+  $h->handle_chat_f( Langertha::Knarr::Session->new( id => 's' ), $req )->get;
+  return $engine->captured;
+}
+
+subtest 'tools and tool_choice forwarded to a hermes-only engine' => sub {
+  my $cap = _captured_tools( { tools_native => 0, tools_hermes => 1 } );
+  is $cap->{tools},
+    [ { type => 'function', function => { name => 'f', parameters => {} } } ],
+    'tools forwarded on tools_hermes';
+  is $cap->{tool_choice}, { type => 'function', function => { name => 'f' } },
+    'tool_choice forwarded on tools_hermes';
+};
+
+subtest 'tools and tool_choice dropped with neither tools capability' => sub {
+  my $cap = _captured_tools( { tools_native => 0, tools_hermes => 0 } );
+  ok !exists $cap->{tools},       'tools dropped';
+  ok !exists $cap->{tool_choice}, 'tool_choice dropped';
+};
+
 # response_format is gated on the capability matching the *kind* of format
 # asked for, not on json_schema alone -- Langertha registers
 # response_format_json_object and response_format_json_schema separately.

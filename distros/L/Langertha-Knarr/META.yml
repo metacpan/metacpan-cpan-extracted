@@ -19,106 +19,124 @@ name: Langertha-Knarr
 provides:
   Langertha::Knarr:
     file: lib/Langertha/Knarr.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::CLI:
     file: lib/Langertha/Knarr/CLI.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::CLI::Cmd::Check:
     file: lib/Langertha/Knarr/CLI/Cmd/Check.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::CLI::Cmd::Container:
     file: lib/Langertha/Knarr/CLI/Cmd/Container.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::CLI::Cmd::Init:
     file: lib/Langertha/Knarr/CLI/Cmd/Init.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::CLI::Cmd::Models:
     file: lib/Langertha/Knarr/CLI/Cmd/Models.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::CLI::Cmd::Start:
     file: lib/Langertha/Knarr/CLI/Cmd/Start.pm
-    version: '1.101'
+    version: '1.102'
+  Langertha::Knarr::CLI::Role::GlobalOptions:
+    file: lib/Langertha/Knarr/CLI/Role/GlobalOptions.pm
+    version: '1.102'
   Langertha::Knarr::Config:
     file: lib/Langertha/Knarr/Config.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler:
     file: lib/Langertha/Knarr/Handler.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler::A2AClient:
     file: lib/Langertha/Knarr/Handler/A2AClient.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler::ACPClient:
     file: lib/Langertha/Knarr/Handler/ACPClient.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler::Code:
     file: lib/Langertha/Knarr/Handler/Code.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler::Engine:
     file: lib/Langertha/Knarr/Handler/Engine.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler::Passthrough:
     file: lib/Langertha/Knarr/Handler/Passthrough.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler::Raider:
     file: lib/Langertha/Knarr/Handler/Raider.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler::RequestLog:
     file: lib/Langertha/Knarr/Handler/RequestLog.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler::Router:
     file: lib/Langertha/Knarr/Handler/Router.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Handler::Tracing:
     file: lib/Langertha/Knarr/Handler/Tracing.pm
-    version: '1.101'
+    version: '1.102'
+  Langertha::Knarr::Image:
+    file: lib/Langertha/Knarr/Image.pm
+    version: '1.102'
+  Langertha::Knarr::Manifest:
+    file: lib/Langertha/Knarr/Manifest.pm
+    version: '1.102'
   Langertha::Knarr::PSGI:
     file: lib/Langertha/Knarr/PSGI.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::PSGI::FakeReq:
-    file: lib/Langertha/Knarr/PSGI.pm
-    version: '1.101'
+    file: lib/Langertha/Knarr/PSGI/FakeReq.pm
+    version: '1.102'
+  Langertha::Knarr::PassthroughUsage:
+    file: lib/Langertha/Knarr/PassthroughUsage.pm
+    version: '1.102'
   Langertha::Knarr::Protocol:
     file: lib/Langertha/Knarr/Protocol.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Protocol::A2A:
     file: lib/Langertha/Knarr/Protocol/A2A.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Protocol::ACP:
     file: lib/Langertha/Knarr/Protocol/ACP.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Protocol::AGUI:
     file: lib/Langertha/Knarr/Protocol/AGUI.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Protocol::Anthropic:
     file: lib/Langertha/Knarr/Protocol/Anthropic.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Protocol::Ollama:
     file: lib/Langertha/Knarr/Protocol/Ollama.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Protocol::OpenAI:
     file: lib/Langertha/Knarr/Protocol/OpenAI.pm
-    version: '1.101'
+    version: '1.102'
+  Langertha::Knarr::Reasoning:
+    file: lib/Langertha/Knarr/Reasoning.pm
+    version: '1.102'
   Langertha::Knarr::Request:
     file: lib/Langertha/Knarr/Request.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::RequestLog:
     file: lib/Langertha/Knarr/RequestLog.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Response:
     file: lib/Langertha/Knarr/Response.pm
-    version: '1.101'
+    version: '1.102'
+  Langertha::Knarr::Role::UpstreamHTTP:
+    file: lib/Langertha/Knarr/Role/UpstreamHTTP.pm
+    version: '1.102'
   Langertha::Knarr::Router:
     file: lib/Langertha/Knarr/Router.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Session:
     file: lib/Langertha/Knarr/Session.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Stream:
     file: lib/Langertha/Knarr/Stream.pm
-    version: '1.101'
+    version: '1.102'
   Langertha::Knarr::Tracing:
     file: lib/Langertha/Knarr/Tracing.pm
-    version: '1.101'
+    version: '1.102'
 recommends:
   HTTP::Message::PSGI: '0'
   Plack: '0'
@@ -131,7 +149,7 @@ requires:
   IO::Async: '0.802'
   IO::Async::SSL: '0'
   JSON::MaybeXS: '0'
-  Langertha: '0.500'
+  Langertha: '0.503'
   Log::Any: '0'
   MIME::Base64: '0'
   Module::Runtime: '0'
@@ -143,6 +161,7 @@ requires:
   Net::Async::HTTP::Server: '0'
   Time::HiRes: '0'
   Try::Tiny: '0'
+  URI: '0'
   YAML::PP: '0'
 resources:
   IRC: irc://irc.perl.org/#langertha
@@ -150,16 +169,17 @@ resources:
   bugtracker: https://github.com/Getty/langertha-knarr/issues
   homepage: https://github.com/Getty/langertha-knarr
   repository: https://github.com/Getty/langertha-knarr.git
-version: '1.101'
+version: '1.102'
 x_Dist_Zilla:
   perl:
-    version: '5.036000'
+    version: '5.040001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .karr
             - README.md
           exclude_match: []
           include_dotfiles: 1
@@ -171,16 +191,16 @@ x_Dist_Zilla:
       name: '@Author::GETTY/Git::GatherDir'
       version: '2.052'
     -
+      class: Dist::Zilla::Plugin::GatherAgentContext
+      name: '@Author::GETTY/GatherAgentContext'
+      version: '0.001'
+    -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
       version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '6.037'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: '@Author::GETTY/@Filter/License'
       version: '6.037'
     -
       class: Dist::Zilla::Plugin::Readme
@@ -221,6 +241,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
       version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::LicenseFile
+      name: '@Author::GETTY/LicenseFile'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
@@ -269,7 +293,7 @@ x_Dist_Zilla:
           inherit_version: 1
           meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000038'
           version: '0.006'
       name: '@Author::GETTY/MetaProvides::Package'
       version: '2.004003'
@@ -293,10 +317,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: '@Author::GETTY/Prereqs::FromCPANfile'
@@ -399,8 +423,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -432,7 +456,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -445,11 +469,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.101'
+          tag: '1.102'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -460,8 +484,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
@@ -484,10 +508,11 @@ x_Dist_Zilla:
             - Changes
             - Makefile.PL
           allow_dirty_match:
+            - (?^:^bin/)
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -501,7 +526,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@Author::GETTY/Git::Push'
       version: '2.052'
@@ -559,6 +584,6 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.037'
 x_authority: cpan:GETTY
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

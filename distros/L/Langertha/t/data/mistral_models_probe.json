@@ -1,0 +1,68 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "mistral-small-2603",
+      "object": "model",
+      "created": 1774137600,
+      "owned_by": "mistralai",
+      "capabilities": {
+        "completion_chat": true,
+        "completion_fim": false,
+        "function_calling": true,
+        "fine_tuning": false,
+        "vision": true,
+        "classification": false
+      },
+      "name": "mistral-small-2603",
+      "description": "Mistral Small 4",
+      "max_context_length": 262144,
+      "aliases": ["mistral-small-latest"],
+      "deprecation": null,
+      "default_model_temperature": 0.3,
+      "type": "base"
+    },
+    {
+      "id": "codestral-2508",
+      "object": "model",
+      "created": 1754006400,
+      "owned_by": "mistralai",
+      "capabilities": {
+        "completion_chat": true,
+        "completion_fim": true,
+        "function_calling": true,
+        "fine_tuning": false,
+        "vision": false,
+        "classification": false
+      },
+      "name": "codestral-2508",
+      "description": "Codestral",
+      "max_context_length": 256000,
+      "aliases": ["codestral-latest"],
+      "deprecation": null,
+      "default_model_temperature": 0.3,
+      "type": "base"
+    },
+    {
+      "id": "pixtral-large-2411",
+      "object": "model",
+      "created": 1731974400,
+      "owned_by": "mistralai",
+      "capabilities": {
+        "completion_chat": true,
+        "completion_fim": false,
+        "function_calling": true,
+        "fine_tuning": false,
+        "vision": true,
+        "classification": false
+      },
+      "name": "pixtral-large-2411",
+      "description": "Pixtral Large",
+      "max_context_length": 131072,
+      "aliases": ["pixtral-large-latest", "mistral-large-pixtral-2411"],
+      "deprecation": null,
+      "default_model_temperature": 0.7,
+      "type": "base"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::SecretObjectReference;
 # ABSTRACT: SecretObjectReference identifies an API object including its namespace, defaulting to Secret.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s group     => Str, { pattern => qr/^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/, default => '' };
@@ -26,7 +26,7 @@ IO::K8s::GatewayAPI::V1::SecretObjectReference - SecretObjectReference identifie
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 group
 

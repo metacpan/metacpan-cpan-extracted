@@ -422,18 +422,18 @@ subtest '/t/20-modules/Type-Params/slurpy.t' => sub {
 {
   package Local::FooBar;
 
-	sub foo { 42 }
-	my $check;
-	sub bar {
-		$check ||= ::signature(
-			method     => 1,
-			positional => [
-				::Int, { default => sub { shift->foo } },
-			],
-		);
-		my ( $self, $num ) = &$check;
-		return $num / 2;
-	}
+  sub foo { 42 }
+  my $check;
+  sub bar {
+    $check ||= ::signature(
+      method     => 1,
+      positional => [
+        ::Int, { default => sub { shift->foo } },
+      ],
+    );
+    my ( $self, $num ) = &$check;
+    return $num / 2;
+  }
 }
 subtest '/t/20-modules/Type-Params/v2-defaults.t' => sub {
   my $object = bless {}, 'Local::FooBar';

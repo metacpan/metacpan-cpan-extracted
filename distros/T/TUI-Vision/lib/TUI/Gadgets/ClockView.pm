@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -120,7 +120,8 @@ Creates a new clock view.
 
 =item bounds
 
-Bounding rectangle defining the position and size of the view (I<TRect>).
+Bounding rectangle defining the position and size of the view 
+(L<TRect|TUI::Objects::Rect>).
 
 =back
 
@@ -147,8 +148,8 @@ changed.
 
 =head1 SEE ALSO
 
-L<TUI::Views::View>,
-L<TUI::Views::DrawBuffer>
+L<TView|TUI::Views::View>,
+L<TDrawBuffer|TUI::Views::DrawBuffer>
 
 =head1 AUTHORS
 

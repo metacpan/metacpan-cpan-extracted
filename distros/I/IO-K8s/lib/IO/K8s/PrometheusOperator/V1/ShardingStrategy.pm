@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ShardingStrategy;
 # ABSTRACT: shardingStrategy defines the sharding strategy for distributing scraped targets across Prometheus shards.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s mode     => Str, { enum => [qw(Address Topology)] };
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::ShardingStrategy - shardingStrategy defines the
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 mode
 

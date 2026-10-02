@@ -1347,36 +1347,50 @@ Slurpy processing produces either an array reference or a hash reference,
 depending on the slurpy mode. This value is then validated against the
 type constraint of the slurpy parameter.
 
-=item * B<Array-slurpy>
+=item * 
+
+Simple types such as C<Any> or C<Ref> accept these structures and are
+therefore valid slurpy parameter types, resulting in an array reference.
+
+=back
+
+Array-slurpy Rules:
 
 Remaining arguments are collected into an array reference:
 
 =over 4
 
-=item - Zero remaining arguments: []
+=item *
 
-=item - One remaining argument: [ $value ]
+Zero remaining arguments: []
 
-=item - Multiple remaining arguments: [ @values ]
+=item * 
+
+One remaining argument: [ $value ]
+
+=item * 
+
+Multiple remaining arguments: [ @values ]
 
 =back
 
-=item * B<Hash-slurpy>
+Hash-slurpy Rules:
 
 Remaining arguments are collected into a hash reference:
 
 =over 4
 
-=item - Zero remaining arguments: {}
+=item *
 
-=item - One remaining argument: ( ref $value eq 'HASH' ) ? $value : { $value }
+Zero remaining arguments: {}
 
-=item - Multiple remaining arguments: { @values }
+=item *
 
-=back
+One remaining argument: ( ref $value eq 'HASH' ) ? $value : { $value }
 
-B<Note>: Simple types such as C<Any> or C<Ref> accept these structures and are
-therefore valid slurpy parameter types, resulting in an array reference.
+=item *
+
+Multiple remaining arguments: { @values }
 
 =back
 
@@ -1390,22 +1404,25 @@ This module implements only a subset of Type::Params. Notable limits:
 
 =over 4
 
-=item * Only C<signature> is supported
+=item *
 
-=item * No coercions or automatic type conversions.
+Only C<signature> is supported
 
-=item * No advanced parameter kinds.
+=item *
 
-No parameter unions, parameter packs, or complex tuple types.
+No coercions or automatic type conversions.
 
-The L<Type::Standard> objects C<Slurpy['a]> and C<Optional['a]> are not 
-recognized and therefore do not replace the parameters 
+=item *
+
+No parameter unions, parameter packs, or complex tuple types. The 
+L<Type::Standard> objects C<Slurpy['a]> and C<Optional['a]> are not recognized 
+and therefore do not replace the parameters 
 C<< optional => 1 >> or C<< slurpy => 1 >>.
 
-=item * Having any optionals, default or aliases disables the fast-path.
+=item *
 
-Note that having any parameter with a optional or default disables the 
-fast-path optimization in which the validator can return C<@_> unchanged.
+Having any optionals, default or aliases disables the fast-path optimization in 
+which the validator can return C<@_> unchanged.
 
 =back
 

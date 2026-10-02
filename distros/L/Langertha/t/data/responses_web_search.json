@@ -1,0 +1,204 @@
+{
+  "id": "resp_0775496f8ce2b6b0006ab5d8fb520887d2be5a38306df84b3c",
+  "object": "response",
+  "created_at": 1790302459,
+  "status": "completed",
+  "access_programs": null,
+  "background": false,
+  "billing": {
+    "payer": "developer"
+  },
+  "completed_at": 1790302462,
+  "error": null,
+  "frequency_penalty": 0.0,
+  "incomplete_details": null,
+  "instructions": null,
+  "max_output_tokens": 2000,
+  "max_tool_calls": null,
+  "model": "gpt-5.6-luna",
+  "moderation": null,
+  "output": [
+    {
+      "id": "rs_0775496f8ce2b6b0006ab5d8fc2ec487d29102d9ed5646a223",
+      "type": "reasoning",
+      "content": [],
+      "encrypted_content": "gAAAAABqtdj_umgeUKi1aL6OyJyBETAXHe6cpu1qTvWugCnV3BFr8rdGsN2ocv6PnP0wLQG7aBPSOjn0sq4rh2Lm5JzOrMXEe2D9zCQmt9HO_M0za5Ttm_vYaWOItCmyK3HVIT9poUJeXUiLp7fPZRG-l5L2xIEq9b40GX12CxYG9zVUSEETnCj3n5miIZGIeUUJtLO3yKLS0IJfLGACxBq5fMN-dK7tXuZhxND_uQNeZXR2KPDTCEgjvWyLEyCOJE6FLpGCOJ-8mkl24kajziPK5Yw2B4pRXdyr0jK6sCBuW3AfrHiJ6uJa9HSCOQ9uCBhPRCTzTAJElrPjm41M-XlOXvyHkWasUegTvJiiDnL8vu6P3buMYk5Lep-2sw43_E5WG1XwZHchua2ykLYLe2b5B4BCfBmqdUJZJvrjY05hJoSSKQs1sX-iHtVii-iCcj4bsuggthQfK3ggHFX8g3MkIG6tl8HA2y0G4bvHpp7eeMYTDNQZz8Mu__yA81kPHKky09HS8ta3TOiQuDomfTbIjUn0QFGGkbvGY13n-qOw45EKiLsznGPc91lYiKhLw6s6Qkbl2roIy80zFG2aheO4oyUkQMlguCYlHSDmApw6kHApDgLCl7seHNJm5wC4zGCu9r5Je9s44otm4COmq3XrwRlOle4zzjUykSxWOeJi7ipzPxdGr-bPuGJxWGx43vIR6bckCooEmL5jl-b0rPvrWrwUrc39ctk75AHmQNxcoM0nmUreIE0nJnpdjlwIcYUfUY72Q7VOYuf-4L8Kp0oDjlUYJnAjfLtnVj_Ql1T8M8Gw8y99HGKo2t96qHf2R7d1japirs9IQkt7aKZlOVzfqKjKx8WBnjj8W9FZtRN_WNc7lEX6zewkxwMNe1gqzE60gWjmkMjK9EEeUCh9yifo5aeZXL5n7AyJ6IcW7SNVDjI75uLgMGfcRj1xlyIMZuddRTheRE-ke38uR3oNtjhob3nNm5aMrKAEEFPaWOmAY0AmTe-EsAZwo2MjfcNTc2ui3fDIVSrHRwPVNctX12As1y7BoAk_OdVHc6vIKJj-W1vCVc-ZwLi9OfOOXSCulC-Gbwqf6agJVlBg2fy1Kd7F5s8eODEVr_VKSiPPGBh5zFZz3ShPLvyRUJlB2Ib_QnZ5NFFpC1BKNwPo9guBBYjC4ewjwT35WO8xR_kaQWkaIlcWttDUcV_ilftZkvvAS7ECDZP9uSYBTeos-TaarjVfmw9iMKAZsQ==",
+      "summary": []
+    },
+    {
+      "id": "ws_0775496f8ce2b6b0006ab5d8fc6a9087d293ca4743cf2fdfe9",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "queries": [
+          "site:perl.org current stable release Perl 5"
+        ],
+        "query": "site:perl.org current stable release Perl 5",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://dev.perl.org/perl5/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.perl.org/get.html"
+          },
+          {
+            "type": "url",
+            "url": "https://www.nntp.perl.org/group/perl.perl5.porters/2026/07/msg271063.html"
+          },
+          {
+            "type": "url",
+            "url": "https://www.nntp.perl.org/group/perl.perl5.porters/2026/07/msg271102.html"
+          },
+          {
+            "type": "url",
+            "url": "https://perldoc.perl.org/5.12.3/perlfaq1"
+          },
+          {
+            "type": "url",
+            "url": "https://dev.perl.org/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.nntp.perl.org/group/perl.perl5.porters/2026/08/msg271122.html"
+          },
+          {
+            "type": "url",
+            "url": "https://perldoc.perl.org/5.32.1/perlfaq1"
+          },
+          {
+            "type": "url",
+            "url": "https://perldoc.perl.org/5.43.9/perlpolicy"
+          },
+          {
+            "type": "url",
+            "url": "https://www.nntp.perl.org/group/perl.perl5.porters/2026/08/msg271123.html"
+          },
+          {
+            "type": "url",
+            "url": "https://www.nntp.perl.org/group/perl.perl5.porters/2026/08/msg271149.html"
+          },
+          {
+            "type": "url",
+            "url": "https://perldoc.perl.org/5.28.2/perlfaq1"
+          },
+          {
+            "type": "url",
+            "url": "https://blob.perl.org/books/beginning-perl/3145_Intro.pdf"
+          },
+          {
+            "type": "url",
+            "url": "https://blob.perl.org/books/beginning-perl/3145_Chap01.pdf"
+          },
+          {
+            "type": "url",
+            "url": "https://blob.perl.org/perlweb/dev/perl6/talks/2001/Perl6-Notes-200108.v2.pdf"
+          },
+          {
+            "type": "url",
+            "url": "https://dev.perl.org/perl5/?utm_source=openai"
+          }
+        ]
+      }
+    },
+    {
+      "id": "msg_0775496f8ce2b6b0006ab5d8fdfa4487d298bfe0038a622542",
+      "type": "message",
+      "status": "completed",
+      "content": [
+        {
+          "type": "output_text",
+          "annotations": [
+            {
+              "type": "url_citation",
+              "end_index": 120,
+              "start_index": 57,
+              "title": "Perl - dev.perl.org",
+              "url": "https://dev.perl.org/perl5/?utm_source=openai"
+            }
+          ],
+          "logprobs": [],
+          "text": "The current stable release of Perl 5 is **Perl 5.44.0**. ([dev.perl.org](https://dev.perl.org/perl5/?utm_source=openai))"
+        }
+      ],
+      "phase": "final_answer",
+      "role": "assistant"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "presence_penalty": 0.0,
+  "previous_response_id": null,
+  "prompt_cache_key": null,
+  "prompt_cache_retention": "24h",
+  "reasoning": {
+    "context": "all_turns",
+    "effort": "low",
+    "mode": "standard",
+    "summary": null
+  },
+  "safety_identifier": null,
+  "service_tier": "default",
+  "store": true,
+  "temperature": 1.0,
+  "text": {
+    "format": {
+      "type": "text"
+    },
+    "verbosity": "medium"
+  },
+  "tool_choice": "auto",
+  "tool_usage": {
+    "image_gen": {
+      "input_tokens": 0,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "output_tokens": 0,
+      "output_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 0
+      },
+      "total_tokens": 0
+    },
+    "web_search": {
+      "num_requests": 1
+    }
+  },
+  "tools": [
+    {
+      "type": "web_search",
+      "return_token_budget": "default",
+      "search_content_types": [
+        "text"
+      ],
+      "search_context_size": "medium",
+      "user_location": {
+        "type": "approximate",
+        "city": null,
+        "country": "US",
+        "region": null,
+        "timezone": null
+      }
+    }
+  ],
+  "top_logprobs": 0,
+  "top_p": 0.98,
+  "truncation": "disabled",
+  "usage": {
+    "input_tokens": 8542,
+    "input_tokens_details": {
+      "cache_write_tokens": 4394,
+      "cached_tokens": 0
+    },
+    "output_tokens": 87,
+    "output_tokens_details": {
+      "reasoning_tokens": 49
+    },
+    "total_tokens": 8629
+  },
+  "user": null,
+  "metadata": {}
+}

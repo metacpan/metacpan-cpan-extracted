@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeSnapshotContent;
 # ABSTRACT: VolumeSnapshotContent represents the actual "on-disk" snapshot object in the underlying storage system
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'snapshot.storage.k8s.io/v1',
     resource_plural => 'volumesnapshotcontents',
@@ -25,7 +25,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeSnapshotContent - VolumeSnapshotContent repre
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

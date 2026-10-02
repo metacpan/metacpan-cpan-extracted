@@ -168,6 +168,18 @@ load time: a prefork Perl app server (Starman in prefork mode, or mod_perl2's pr
 worker processes *after* the application has already loaded, so a thread started eagerly at load
 time simply wouldn't exist in a forked child.
 
+A script that reports an error and exits straight away doesn't lose it: when the program ends
+normally, an `END` block sends whatever is still queued and waits for a delivery already under
+way, for at most 5 seconds. A program that never reported anything doesn't wait at all. Call
+`ForgeOps::Tracker::flush()` yourself (optionally with a timeout in seconds; it returns 1 once
+everything has gone out) if the program might exit another way (`POSIX::_exit`, `exec`), or you
+want delivery done before moving on:
+
+```perl
+ForgeOps::Tracker::report($@);
+ForgeOps::Tracker::flush(2); # wait up to 2 seconds
+```
+
 ## Backtrace parsing
 
 Perl doesn't hand you a structured stack trace by default. `EventBuilder` parses two real shapes

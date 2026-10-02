@@ -5,7 +5,7 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(break_point break_point_delete break_point_subroutine break_points break_points_with_condition all_break_points_with_condition watch_point break_on_load);
 
-our $VERSION = '0.67'; # VERSION
+our $VERSION = '0.68'; # VERSION
 
 # set a break point (by default in the current file)
 sub break_point {
@@ -124,7 +124,7 @@ Devel::ebug::Plugin::ActionPoints
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 AUTHOR
 
@@ -137,6 +137,8 @@ Contributors:
 Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
 
 Taisuke Yamada
+
+Richard Leach (HYDAHY)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -6,9 +6,8 @@ use Carp qw(croak cluck);
 use Cwd qw(abs_path);
 use Digest::MD5 qw(md5_hex);
 
-our $VERSION = '5.26.3';
-
-my $CREATED = '2026-08-11';
+our $VERSION = '5.26.4';
+my $CREATED  = '2026-08-11';
 
 our %RAMDISK_TIERS = (
     '0'            => 0,

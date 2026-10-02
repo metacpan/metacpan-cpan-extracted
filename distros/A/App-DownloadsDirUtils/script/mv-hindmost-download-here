@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-03'; # DATE
+our $DATE = '2026-09-25'; # DATE
 our $DIST = 'App-DownloadsDirUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/DownloadsDirUtils/mv_hindmost_download_here",
@@ -40,7 +40,7 @@ mv-hindmost-download-here - Move the hindmost file(s) from the downloads directo
 
 =head1 VERSION
 
-This document describes version 0.008 of mv-hindmost-download-here (from Perl distribution App-DownloadsDirUtils), released on 2025-05-03.
+This document describes version 0.009 of mv-hindmost-download-here (from Perl distribution App-DownloadsDirUtils), released on 2026-09-25.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<mv-hindmost-download-here> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help,
 
 B<mv-hindmost-download-here> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<mv-hindmost-download-here> [B<L<--all|/"--all, -a">>|B<L<-a|/"--all, -a">>] [B<L<--as|/"--as=s">>=I<L<pathname::unix::basename|Sah::Schema::pathname::unix::basename>>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>] [(B<L<--dir|/"--dirs-json=s">>=I<L<dirname|Sah::Schema::dirname>>)+|B<L<--dirs-json|/"--dirs-json=s">>=I<json>] [B<L<--dry-run|/"--dry-run">>] [B<L<--exclude-filename-pattern|/"--exclude-filename-pattern=s, -X">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-X|/"--exclude-filename-pattern=s, -X">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-case|/"--ignore-case, -i">>|B<L<-i|/"--ignore-case, -i">>|B<L<--no-ignore-case|/"--ignore-case, -i">>|B<L<--noignore-case|/"--ignore-case, -i">>] [B<L<--include-filename-pattern|/"--include-filename-pattern=s, -I">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-I|/"--include-filename-pattern=s, -I">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--num-ranks|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>|B<L<-N|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>] [B<L<--num-results|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--recursive|/"--recursive, -R">>|B<L<-R|/"--recursive, -R">>] [B<L<--to-dir|/"--to-dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--type|/"--type=s, -t">>=I<str>|B<L<-d|/"--type=s, -t">>|B<L<-f|/"--type=s, -t">>|B<L<-t|/"--type=s, -t">>=I<str>] -- [I<L<dir|/"--dirs-json=s">>] ...
+B<mv-hindmost-download-here> [B<L<--all|/"--all, -a">>|B<L<-a|/"--all, -a">>] [B<L<--as|/"--as=s, --rename">>=I<L<pathname::unix::basename|Sah::Schema::pathname::unix::basename>>|B<L<--rename|/"--as=s, --rename">>=I<L<pathname::unix::basename|Sah::Schema::pathname::unix::basename>>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>] [(B<L<--dir|/"--dirs-json=s">>=I<L<dirname|Sah::Schema::dirname>>)+|B<L<--dirs-json|/"--dirs-json=s">>=I<json>] [B<L<--dry-run|/"--dry-run">>] [B<L<--exclude-filename-pattern|/"--exclude-filename-pattern=s, -X">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-X|/"--exclude-filename-pattern=s, -X">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-case|/"--ignore-case, -i">>|B<L<-i|/"--ignore-case, -i">>|B<L<--no-ignore-case|/"--ignore-case, -i">>|B<L<--noignore-case|/"--ignore-case, -i">>] [B<L<--include-filename-pattern|/"--include-filename-pattern=s, -I">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-I|/"--include-filename-pattern=s, -I">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--num-ranks|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>|B<L<-N|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>] [B<L<--num-results|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--recursive|/"--recursive, -R">>|B<L<-R|/"--recursive, -R">>] [B<L<--to-dir|/"--to-dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--type|/"--type=s, -t">>=I<str>|B<L<-d|/"--type=s, -t">>|B<L<-f|/"--type=s, -t">>|B<L<-t|/"--type=s, -t">>=I<str>] -- [I<L<dir|/"--dirs-json=s">>] ...
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--as>=I<s>
+=item B<--as>=I<s>, B<--rename>
 
 Rename file.
 
@@ -488,7 +488,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

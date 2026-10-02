@@ -1,0 +1,667 @@
+# PODNAME: TUI::Manual::10
+# ABSTRACT: Advanced Topics in TUI::Vision
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+TUI::Manual::10 - Advanced Topics in TUI::Vision
+
+=head1 ADVANCED TOPICS
+
+=head2 Terminal Backends
+
+One of the goals of L<TUI::Vision> is to preserve the I<Turbo Vision> 
+programming model while supporting multiple terminal environments.
+
+Unlike the original implementations, which were closely tied to a specific 
+operating system and console environment, L<TUI::Vision> separates the 
+application framework from the underlying terminal driver.
+
+This approach allows the same application code to operate across different 
+environments without modification.
+
+Historically, the project began as a Windows-oriented implementation. Over 
+time, support was extended to additional terminal environments, allowing 
+applications to run on both modern Windows terminals and Unix systems.
+
+Multiple backend implementations are available. These backends are responsible 
+for translating framework operations into terminal-specific input, output and 
+screen-management functionality while presenting a consistent interface to the 
+framework itself.
+
+From the perspective of an application developer, backend selection is largely 
+transparent. Applications interact with views, events, windows, dialogs and 
+other framework objects regardless of the terminal environment in which they 
+are executed.
+
+=head2 Extended Color Model
+
+Classic I<Turbo Vision> was designed around BIOS color attributes.
+
+In the original Borland implementation:
+
+    uchar    -> color attribute
+    ushort   -> attribute pair
+    TPalette -> array of uchar
+
+A palette entry therefore represented a single BIOS color attribute and the 
+palette system was limited to the traditional 16 DOS colors.
+
+The Perl port preserves the original palette architecture while adopting the 
+extended color model introduced by I<modern port of Turbo Vision 2.0> 
+implementations. Existing palette-oriented code therefore continues to work 
+unchanged while applications may optionally take advantage of RGB, XTerm and 
+other modern color representations.
+
+The relationship between the main color types is:
+
+    TColor
+        |
+        v
+    TColorAttr
+        |
+        +----> TAttrPair
+        |
+        v
+    TPalette
+        |
+        v
+    TView / TDrawBuffer
+
+=head3 TColor
+
+L<TColor|TUI::Drivers::Color> represents a single color value.
+
+A color may be stored as:
+
+=over
+
+=item *
+
+the terminal default color
+
+=item *
+
+a BIOS color value
+
+=item *
+
+an XTerm palette index
+
+=item *
+
+a 24-bit RGB color
+
+=back
+
+L<TColor|TUI::Drivers::Color> represents only the color itself. It contains no 
+styling information and does not distinguish between foreground and background 
+usage.
+
+Examples:
+
+    TColor->new( bios  => 0xF );
+    TColor->new( xterm => 196 );
+    TColor->new( rgb   => 0x7F00BB );
+
+=head3 TColorAttr
+
+L<TColorAttr|TUI::Drivers::ColorAttr> describes the appearance of a single 
+screen cell.
+
+It consists of:
+
+=over
+
+=item *
+
+a foreground color
+
+=item *
+
+a background color
+
+=item *
+
+optional style flags
+
+=back
+
+Foreground and background values are represented by 
+L<TColor|TUI::Drivers::Color> objects.
+
+For compatibility with legacy I<Turbo Vision> code, a 
+L<TColorAttr|TUI::Drivers::ColorAttr> may also be created directly from a BIOS 
+color attribute.
+
+Examples:
+
+    my $attr = TColorAttr->new(
+        bios => 0x1F,
+    );
+
+    my $attr = TColorAttr->new(
+        fg => TColor->new( rgb => 0xFFFFFF ),
+        bg => TColor->new( rgb => 0x000080 ),
+    );
+
+Most drawing operations ultimately consume 
+L<TColorAttr|TUI::Drivers::ColorAttr> values.
+
+=head3 TAttrPair
+
+L<TAttrPair|TUI::Drivers::AttrPair> stores two 
+L<TColorAttr|TUI::Drivers::ColorAttr> values.
+
+Historically I<Turbo Vision> often worked with pairs of attributes, typically a 
+normal and a highlighted appearance.
+
+For example:
+
+    my $attrs = TAttrPair->new(
+        lo => $normal,
+        hi => $highlight,
+    );
+
+Types such as L<TMenuBar|TUI::Menus::MenuBar> and drawing routines such as
+C<< TDrawBuffer->moveCStr >> commonly use attribute pairs.
+
+=head3 TPalette
+
+L<TPalette|TUI::Views::Palette> maps palette indices to color attributes.
+
+I<Turbo Vision> controls traditionally refer to colors through numeric palette 
+indices rather than embedding concrete colors directly into drawing code.
+
+Views resolve those indices through:
+
+    $view->mapColor($index)
+
+and attribute pairs through:
+
+    $view->getColor($indices)
+
+This indirection is a fundamental part of the I<Turbo Vision> rendering 
+architecture and remains unchanged in the Perl port L<TUI::Vision>.
+
+=head4 Internal Layout
+
+For compatibility with the original I<Turbo Vision> implementation, 
+L<TPalette|TUI::Views::Palette> preserves the classic length-prefixed layout:
+
+    [ count, entry1, entry2, ... ]
+
+Element C<[0]> contains the number of palette entries. Actual palette data 
+begins at index C<[1]>.
+
+This mirrors the original Pascal and C++ implementation where palettes were 
+stored as length-prefixed strings.
+
+=head4 Legacy Palette Entries
+
+Traditional palettes are commonly constructed from BIOS color attributes:
+
+    my $palette = TPalette->new(
+        data => "\x1F\x70\x4F",
+        size => 3,
+    );
+
+Each palette entry represents a classic BIOS color attribute exactly as in 
+Borland I<Turbo Vision>.
+
+=head4 Extended Palette Entries
+
+The I<modern port of Turbo Vision 2.0> expands palette entries from BIOS 
+attributes to full color attributes.
+
+The Perl implementation therefore allows palette entries to contain arbitrary 
+values, including L<TColorAttr|TUI::Drivers::ColorAttr> instances:
+
+    my $palette = TPalette->new(
+        copy_from => [
+            3,
+            TColorAttr->new( bios => 0x01 ),
+            TColorAttr->new( bios => 0x02 ),
+            TColorAttr->new( bios => 0x03 ),
+        ]
+    );
+
+This allows palettes to carry RGB colors, XTerm colors, terminal default colors 
+and style information without requiring changes to the traditional palette API.
+
+=head3 Compatibility Model
+
+Backward compatibility is a primary design goal.
+
+Legacy applications that use BIOS attributes continue to work exactly as they 
+did in classic I<Turbo Vision>.
+
+Applications may progressively adopt extended colors by replacing BIOS 
+attributes with L<TColorAttr|TUI::Drivers::ColorAttr> objects while keeping the existing
+palette-oriented rendering model.
+
+The palette system, palette indices, C<mapColor>, C<getColor> and the general 
+view architecture therefore remain conceptually unchanged. Only the type of 
+information stored in palette entries becomes richer.
+
+=head3 Rendering Flow
+
+In classic Borland I<Turbo Vision> the rendering pipeline was based entirely
+on BIOS color attributes:
+
+    nibble (0-15)
+        -> color value (3bit BIOS color + intensity)
+
+    uchar
+        -> color attribute (foreground + background + intensity)
+
+    ushort
+        -> attribute pair (lo + hi byte)
+
+    TPalette
+        -> palette entries (string of uchar's)
+
+    mapColor() / getColor()
+        -> palette lookup
+
+    TDrawBuffer
+        -> screen output (pointer of attribute/char pairs)
+
+Every palette entry ultimately contained a BIOS color attribute and the result 
+of C<mapColor> was therefore always a single byte value.
+
+The Perl implementation preserves the same palette-oriented architecture but
+extends the types participating in the lookup process:
+
+    TColor
+        -> color value (BIOS, RGB, XTerm, default)
+
+    TColorAttr
+        -> color attribute (foreground + background + style)
+
+    TAttrPair
+        -> attribute pair (lo + hi TColorAttr)
+
+    TPalette
+        -> palette entries (array of octets or TColorAttr's)
+
+    mapColor() / getColor()
+        -> palette lookup
+
+    TDrawBuffer
+        -> screen output (Array of TScreenCell)
+
+The overall rendering model remains unchanged. Views still refer to palette 
+indices, palettes still resolve those indices, and drawing code still obtains 
+its display attributes through C<mapColor> and C<getColor>.
+
+What changes is the information carried by a palette entry. In classic Turbo 
+Vision a palette entry was a BIOS attribute. In the modern color architecture a 
+palette entry may instead be a complete L<TColorAttr|TUI::Drivers::ColorAttr>, allowing RGB colors, 
+XTerm colors, terminal default colors and style information to flow through the 
+same palette system.
+
+As a result, existing palette-based drawing code continues to operate in the 
+traditional way while transparently supporting extended color attributes.
+
+=head2 Unicode and wcwidth
+
+=over
+
+=item * Unicode
+
+=item * wcwidth
+
+=item * combining characters
+
+=item * grapheme clusters
+
+=item * double width characters
+
+=item * terminal inconsistencies
+
+=item * TScreenCell
+
+=back
+
+=head2 The TUI::Vision Cache Manager TUI::Memory
+
+The I<Turbo Vision> Pascal framework provided a small set of routines for 
+managing reclaimable caches in resource-constrained environments. While the 
+original design was closely associated with a limited heap model, the 
+underlying idea of controlling optional, regenerable data remains useful.
+
+The Perl port reuses the public I<Turbo Vision> cache API as the basis for a
+general cache management subsystem. Rather than managing heap memory directly,
+L<TUI::Memory> provides a lightweight abstraction for caches whose contents may
+be discarded and recreated when required.
+
+Cache allocations are represented by ordinary hash references and are
+registered with a configurable guaranteed minimum size. Instead of measuring
+actual memory consumption, the subsystem tracks the combined number of entries
+across all registered caches.
+
+When C<lowMemory> is invoked, cache entries exceeding their guaranteed minimum
+allocation may be discarded automatically. This allows applications and
+framework components to reduce the size of temporary caches before additional
+resources are allocated.
+
+Object lifetime remains entirely under the control of Perl's garbage
+collector. The cache manager neither owns nor destroys application objects. Its
+sole responsibility is managing the size and retention of optional cached data.
+
+This approach has proven useful for performance-related caches throughout the
+framework, including glyph metadata, character width calculations, color and
+attribute conversion tables, and other derived lookup structures. Such data can
+typically be regenerated on demand and therefore lends itself naturally to
+cache-based management.
+
+Routines such as C<newCache>, C<disposeCache> and C<lowMemory> should therefore
+be viewed as a cache abstraction inspired by I<Turbo Vision> Pascal rather than 
+a re-implementation of its historical memory manager. The original API provides 
+a natural fit for I<Turbo Vision> applications while serving a different 
+purpose in the Perl port.
+
+=head2 Toolkit Abstraction
+
+L<TUI::Vision> was designed to remain independent of any single object 
+framework.
+
+While the original I<Turbo Vision> implementations relied on the object systems 
+provided by their languages (Pascal and C++), Perl offers multiple approaches 
+to object-oriented programming. L<TUI::Vision> therefore introduces a small
+abstraction layer that allows different object toolkit's to be used without 
+affecting the framework itself.
+
+This behavior allows framework modules and application code to share a single 
+object model without requiring explicit configuration.
+
+Applications may use:
+
+=over 4
+
+=item * L<Moo>
+
+=item * L<Moos>
+
+=item * L<Moose>
+
+=item * L<TUI::toolkit>
+
+=item * L<UNIVERSAL::Object>
+
+=back
+
+The easiest way is to load L<TUI::toolkit>:
+
+    package MyClass;
+
+    use TUI::toolkit;
+    use TUI::Vision;
+
+    has name => ( is => 'rw' );
+
+When L<TUI::toolkit> is used, it automatically selects an appropriate backend 
+and exposes a consistent set of features such as C<has>, C<extends>, 
+C<signature>, C<assert>, C<true> and C<false>.
+
+The toolkit selection is performed at compile time. If one of the supported 
+object systems has already been loaded, that toolkit is used directly. 
+
+L<TUI::toolkit> prefers L<Moos>, followed by L<Moo>, L<Moose> and finally
+L<UNIVERSAL::Object>. 
+
+Applications are not required to use L<TUI::toolkit>.
+
+For example, a project that already uses Moo may simply load Moo directly:
+
+    package MyClass;
+
+    use Moo;
+    use TUI::Vision;
+
+    has name => ( is => 'rw' );
+
+In this situation L<TUI::toolkit> is not used at all. L<TUI::Vision> will 
+detect the existing toolkit and integrate with it.
+
+The same principle applies to L<Moose>, L<Moos> and L<UNIVERSAL::Object>.
+
+When a project uses L<UNIVERSAL::Object> directly, the convenience features 
+normally supplied by L<TUI::toolkit> are not installed automatically. The 
+application is therefore responsible for providing whatever additional behavior 
+it requires.
+
+The abstraction layer exists to ensure that framework modules can operate 
+consistently regardless of which supported object system is selected by the 
+application.
+
+=head2 Ownership and Garbage Collection
+
+One of the less visible but most important differences between L<TUI::Vision> 
+and the original I<Turbo Vision> implementations concerns memory management.
+
+I<Turbo Vision> was originally developed for Pascal and C++, languages in which 
+object lifetime is explicitly controlled by the programmer. Objects are 
+allocated and destroyed according to well-defined ownership rules, and 
+application code is expected to release resources at the appropriate time.
+
+Perl follows a different model. Most objects are reclaimed automatically 
+through reference counting and garbage collection. Developers therefore rarely 
+need to release memory explicitly.
+
+This difference is often misunderstood when porting applications.
+
+Although Perl frees memory automatically, objects frequently own resources 
+other than memory. File handles, terminal resources, caches, buffers and other 
+application-specific resources may still require explicit cleanup.
+
+In practice, the responsibilities of the programmer change rather than 
+disappear.
+
+In C++ a common bug is a dangling reference caused by an object being destroyed 
+too early. In Perl the corresponding problem is often a memory leak caused by 
+references being retained longer than intended.
+
+As a result, Perl applications must still pay attention to ownership, lifetime 
+and resource management even though explicit calls to C<free()> and C<delete()> 
+no longer exist.
+
+When porting I<Turbo Vision> applications, ownership relationships are often 
+more important than the individual implementation details. Understanding which 
+object is responsible for another object frequently determines whether the 
+resulting Perl implementation behaves correctly.
+
+Another common porting mistake occurs when object references are replaced 
+instead of updating the object they reference.
+
+In C++, passing objects by reference often allows a callee to modify the 
+caller's object directly. In Perl, assigning a new reference to a scalar merely 
+changes what that scalar points to and does not update the original object.
+
+This distinction is particularly important in event-driven code where changes 
+must propagate back through a hierarchy of cooperating objects.
+
+=head2 Reference Cycles
+
+Automatic memory management introduces a new class of problems that
+rarely exist in traditional I<Turbo Vision> implementations.
+
+Perl allows objects to reference one another freely. If two or more objects 
+form a closed chain of references, the resulting cycle can prevent memory from 
+being reclaimed.
+
+A simplified example looks like this:
+
+    Parent View -.
+        |        ^
+        v        |
+    Child View --'
+
+A child view may reference its parent while the parent also references the 
+child. Similar situations can arise in collections, event structures, helper 
+objects and application-specific view hierarchies.
+
+I<Turbo Vision> applications are particularly vulnerable because they 
+frequently employ tree structures and ownership relationships between many 
+cooperating objects.
+
+Perl provides weak references to help break such cycles when necessary:
+
+    use Scalar::Util 'weaken';
+
+The correct use of weak references depends on the ownership model of the 
+application and should always be considered carefully.
+
+Blindly weakening arbitrary references may solve one problem while introducing 
+another.
+
+For this reason, L<TUI::Vision> generally follows the ownership relationships 
+established by the original I<Turbo Vision> architecture and avoids introducing 
+unnecessary bidirectional references.
+
+When diagnosing potential leaks, it is often useful to examine object creation 
+and destruction patterns directly.
+
+The L<Devel::Leak> module provides two useful diagnostic functions:
+
+    my $count = Devel::Leak::NoteSV($handle);
+
+    ...
+
+    my $count = Devel::Leak::CheckSV($handle);
+
+C<NoteSV> records the currently allocated Perl values, while C<CheckSV> reports 
+values that remain allocated after a section of code has executed.
+
+A typical usage pattern is:
+
+    use Devel::Leak;
+
+    my $count = Devel::Leak::NoteSV($handle);
+
+    # code under investigation
+
+    Devel::Leak::CheckSV($handle);
+
+For developers familiar with I<Turbo Vision> Pascal, this technique is often 
+useful as a replacement for the diagnostic role historically performed by 
+C<SetMemTop> during memory-leak investigations.
+
+Reference cycles are not unique to L<TUI::Vision>, but they appear frequently 
+in applications built from interconnected views, collections and event-driven 
+components. Understanding ownership and reference relationships is therefore 
+an essential requirement for developing reliable long-running applications.
+
+=head2 Differences from Turbo Vision C++
+
+Although heavily inspired by I<A modern port of Turbo Vision 2.0>, 
+L<TUI::Vision> should not be regarded as a binding to the original C++ 
+implementation.
+
+The objective of the project is not to expose an existing C++ library to Perl, 
+but to provide a native Perl implementation of the framework.
+
+This distinction has several practical consequences.
+
+L<TUI::Vision> applications, framework extensions and experiments can be
+implemented entirely in Perl without requiring a C++ compiler, XS bindings or 
+foreign-function interfaces (FFI).
+
+The implementation therefore emphasizes readability, portability and 
+maintainability within the Perl ecosystem.
+
+Many of the concepts introduced by I<Turbo Vision> remain familiar, including 
+the view hierarchy, event handling, windows, dialogs, menu bars, status lines 
+and stream-based persistence. However, the underlying implementation reflects 
+Perl conventions rather than the design constraints of the original C++ 
+codebase.
+
+Developers familiar with I<Turbo Vision> C++ will recognize most of the 
+architectural ideas while also encountering a number of Perl-specific 
+adaptations throughout the framework.
+
+=head2 Differences from Turbo Vision Pascal
+
+Many of the concepts found in L<TUI::Vision> originate from the Pascal versions 
+of I<Turbo Vision>.
+
+The overall architecture remains recognizable, but the mechanisms used to 
+implement that architecture necessarily differ from those available in Pascal.
+
+Object construction, memory management and data representation all follow 
+Perl conventions.
+
+One example is the exchange of dialog data. Traditional I<Turbo Vision> 
+applications frequently used records to transfer information between dialogs 
+and application code. In L<TUI::Vision> the same concept is typically 
+implemented using array references or lightweight Perl data objects.
+
+Similarly, object lifetime is largely governed by Perl's memory management 
+model rather than explicit allocation and destruction operations.
+
+For this reason, developers porting applications from Pascal should focus 
+primarily on understanding the architectural similarities rather than 
+attempting a direct line-by-line translation.
+
+=head2 Porting Existing Applications
+
+One of the strengths of L<TUI::Vision> is that many existing Turbo Vision
+applications can be ported incrementally.
+
+Applications originally written in Pascal or C++ often share a common set of 
+concepts:
+
+=over 4
+
+=item * Views and groups
+
+=item * Windows and dialogs
+
+=item * Menus and status lines
+
+=item * Event handling
+
+=item * Streamable objects
+
+=back
+
+Because these concepts remain central to L<TUI::Vision>, many existing designs 
+can be transferred to Perl with relatively small architectural changes.
+
+Successful ports generally focus on preserving the original object model and 
+user interface structure while adapting implementation details to Perl idioms.
+
+Mechanical translations are rarely ideal. Instead, the most effective approach 
+is usually to identify the original I<Turbo Vision> concepts and reimplement 
+them using the facilities provided by L<TUI::Vision>.
+
+Throughout this manual, examples and patterns have been chosen to reflect the 
+original I<Turbo Vision> programming model where practical, making them useful 
+references when porting legacy applications.
+
+=head2 Conclusion
+
+The preceding chapters focused primarily on the public architecture of
+L<TUI::Vision> and the mechanisms used to build applications.
+
+This chapter explored several implementation details that become important when 
+extending the framework, integrating it into existing projects or porting 
+software from historical I<Turbo Vision> implementations.
+
+Although topics such as terminal backends, color handling, memory management 
+and toolkit integration are largely invisible to ordinary applications, they 
+play a significant role in understanding how the framework operates internally.
+
+Together these advanced topics illustrate how the original I<Turbo Vision> 
+concepts have been adapted to modern Perl while preserving the architecture and 
+programming model that inspired the framework.
+
+L<first|TUI::Manual::01> chapter.
+
+=cut

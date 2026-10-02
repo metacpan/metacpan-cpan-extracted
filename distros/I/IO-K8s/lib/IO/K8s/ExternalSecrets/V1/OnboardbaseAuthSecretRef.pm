@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OnboardbaseAuthSecretRef;
 # ABSTRACT: Auth configures how the Operator authenticates with the Onboardbase API
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apiKeyRef   => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::OnboardbaseAuthSecretRef - Auth configures how the
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apiKeyRef
 

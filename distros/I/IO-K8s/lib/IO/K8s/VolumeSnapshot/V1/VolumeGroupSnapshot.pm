@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeGroupSnapshot;
 # ABSTRACT: VolumeGroupSnapshot is a user's request for creating a point-in-time group snapshot
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'groupsnapshot.storage.k8s.io/v1',
     resource_plural => 'volumegroupsnapshots',
@@ -29,7 +29,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeGroupSnapshot - VolumeGroupSnapshot is a user
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

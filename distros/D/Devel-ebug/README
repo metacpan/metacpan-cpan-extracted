@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.67
+    version 0.68
 
 SYNOPSIS
 
@@ -570,6 +570,8 @@ AUTHOR
     Brock Wilcox <awwaiid@thelackthereof.org>
 
     Taisuke Yamada
+
+    Richard Leach (HYDAHY)
 
 COPYRIGHT AND LICENSE
 

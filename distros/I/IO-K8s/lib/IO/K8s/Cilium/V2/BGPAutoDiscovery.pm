@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::BGPAutoDiscovery;
 # ABSTRACT: AutoDiscovery is the configuration for auto-discovery of the peer address.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s defaultGateway => '+IO::K8s::Cilium::V2::DefaultGateway';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::BGPAutoDiscovery - AutoDiscovery is the configuration for a
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 defaultGateway
 

@@ -1,0 +1,55 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "gemma-4-31b-it",
+      "object": "model",
+      "created": 1767225600,
+      "owned_by": "tsi",
+      "meta_data": {
+        "input_modalities": ["text", "image"]
+      }
+    },
+    {
+      "id": "gpt-oss-120b",
+      "object": "model",
+      "created": 1754438400,
+      "owned_by": "tsi",
+      "meta_data": {
+        "input_modalities": ["text"]
+      }
+    },
+    {
+      "id": "Qwen3.6-35B-A3B-FP8",
+      "object": "model",
+      "created": 1767225600,
+      "owned_by": "tsi",
+      "meta_data": {
+        "input_modalities": ["TEXT", "IMAGE"]
+      }
+    },
+    {
+      "id": "Llama-3.3-70B-Instruct",
+      "object": "model",
+      "created": 1733356800,
+      "owned_by": "tsi",
+      "meta_data": {
+        "input_modalities": null
+      }
+    },
+    {
+      "id": "text-embedding-bge-m3",
+      "object": "model",
+      "created": 1706745600,
+      "owned_by": "tsi",
+      "meta_data": {}
+    },
+    {
+      "id": "jina-embeddings-v2-base-de",
+      "object": "model",
+      "created": 1706745600,
+      "owned_by": "tsi",
+      "meta_data": null
+    }
+  ]
+}

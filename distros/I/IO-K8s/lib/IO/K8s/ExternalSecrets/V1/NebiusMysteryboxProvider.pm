@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::NebiusMysteryboxProvider;
 # ABSTRACT: NebiusMysterybox configures this store to sync secrets using NebiusMysterybox provider
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apiDomain  => Str, { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::NebiusMysteryboxProvider - NebiusMysterybox config
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apiDomain
 

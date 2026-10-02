@@ -6,7 +6,7 @@
 # The structure is also checked for reference cycles: a residue that pointed
 # back at its chain would never be freed, and no test of a single file would
 # ever notice.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

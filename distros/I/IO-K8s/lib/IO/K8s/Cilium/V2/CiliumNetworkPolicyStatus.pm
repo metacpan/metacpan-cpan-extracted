@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumNetworkPolicyStatus;
 # ABSTRACT: Status is the status of the Cilium policy rule
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s conditions         => ['+IO::K8s::Cilium::V2::NetworkPolicyCondition'];
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::CiliumNetworkPolicyStatus - Status is the status of the Cil
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 conditions
 

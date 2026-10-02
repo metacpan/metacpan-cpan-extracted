@@ -1,6 +1,6 @@
 package IO::K8s::Api::Lifecycle::V1alpha1::EvictionRequestSpec;
 # ABSTRACT: EvictionRequestSpec is a specification of an EvictionRequest.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s intent => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Lifecycle::V1alpha1::EvictionRequestSpec - EvictionRequestSpec is 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 intent
 

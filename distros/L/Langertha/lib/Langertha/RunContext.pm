@@ -1,6 +1,6 @@
 package Langertha::RunContext;
-# ABSTRACT: Shared execution context for Raid and Raider runs
-our $VERSION = '0.502';
+# ABSTRACT: Structured, dependency-free execution context for runnable nodes
+our $VERSION = '0.503';
 use Moose;
 use Carp qw( croak );
 use Scalar::Util qw( blessed );
@@ -133,11 +133,11 @@ __END__
 
 =head1 NAME
 
-Langertha::RunContext - Shared execution context for Raid and Raider runs
+Langertha::RunContext - Structured, dependency-free execution context for runnable nodes
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ Chronological trace entries describing orchestration progress.
 
 =head2 history
 
-Optional conversation/history payload mirrored from Raider runs.
+Optional conversation/history payload (e.g. mirrored from an agent run).
 
 =head2 add_trace
 

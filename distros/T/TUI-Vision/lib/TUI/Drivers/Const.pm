@@ -1,6 +1,7 @@
 package TUI::Drivers::Const;
 # ABSTRACT: constants for driver and event handling
 
+use 5.010;
 use strict;
 use warnings;
 
@@ -40,6 +41,9 @@ our %EXPORT_TAGS = (
     smCO80
     smMono
     smFont8x8
+    smColor256
+    smColorHigh
+    smUpdate
   )],
 
   kbXXXX => [qw(
@@ -207,8 +211,24 @@ our %EXPORT_TAGS = (
     kbCtrlShift
     kbAltShift
   )],
-);
 
+  ctXXXX => [qw(
+    ctDefault
+    ctBIOS
+    ctRGB
+    ctXTerm
+  )],
+
+  slXXXX => [qw(
+    slBold
+    slItalic
+    slUnderline
+    slBlink
+    slReverse
+    slStrike
+    slNoShadow
+  )],
+);
 
 # add all the other %EXPORT_TAGS ":class" tags to the ":all" class and
 # @EXPORT_OK, deleting duplicates
@@ -223,8 +243,8 @@ our %EXPORT_TAGS = (
       @EXPORT_OK;
 }
 
-use constant _WINDOWS => $^O eq 'MSWin32';
-use if _WINDOWS, 'Win32::Console';
+use constant _WIN32 => ($^O eq 'MSWin32') && !$ENV{WT_SESSION};
+use if _WIN32, 'Win32::Console';
 
 use constant {
   eventQSize  => 16,
@@ -263,10 +283,13 @@ use constant {
 
 use constant {
   # Display video modes
-  smBW80    => 0x0002,
-  smCO80    => 0x0003,
-  smMono    => 0x0007,
-  smFont8x8 => 0x0100,
+  smBW80      => 0x0002,
+  smCO80      => 0x0003,
+  smMono      => 0x0007,
+  smFont8x8   => 0x0100,
+  smColor256  => 0x0200,
+  smColorHigh => 0x0400,
+  smUpdate    => 0x8000,
 };
 
 # NOTE: these Control key definitions are intended only to provide
@@ -426,18 +449,18 @@ use constant {
 
 use constant {
   # Keyboard state and shift masks
-  kbLeftShift   => _WINDOWS ? Win32::Console::SHIFT_PRESSED()      : 0x0001,
-  kbRightShift  => _WINDOWS ? Win32::Console::SHIFT_PRESSED()      : 0x0002,
-  kbLeftCtrl    => _WINDOWS ? Win32::Console::LEFT_CTRL_PRESSED()  : 0x0004,
-  kbRightCtrl   => _WINDOWS ? Win32::Console::RIGHT_CTRL_PRESSED() : 0x0004,
-  kbLeftAlt     => _WINDOWS ? Win32::Console::LEFT_ALT_PRESSED()   : 0x0008,
-  kbRightAlt    => _WINDOWS ? Win32::Console::RIGHT_ALT_PRESSED()  : 0x0008,
-  kbScrollState => _WINDOWS ? Win32::Console::SCROLLLOCK_ON()      : 0x0010,
-  kbNumState    => _WINDOWS ? Win32::Console::NUMLOCK_ON()         : 0x0020,
-  kbCapsState   => _WINDOWS ? Win32::Console::CAPSLOCK_ON()        : 0x0040,
-  kbEnhanced    => _WINDOWS ? Win32::Console::ENHANCED_KEY()       : undef,
+  kbLeftShift   => _WIN32 ? Win32::Console::SHIFT_PRESSED()      : 0x0001,
+  kbRightShift  => _WIN32 ? Win32::Console::SHIFT_PRESSED()      : 0x0002,
+  kbLeftCtrl    => _WIN32 ? Win32::Console::LEFT_CTRL_PRESSED()  : 0x0004,
+  kbRightCtrl   => _WIN32 ? Win32::Console::RIGHT_CTRL_PRESSED() : 0x0004,
+  kbLeftAlt     => _WIN32 ? Win32::Console::LEFT_ALT_PRESSED()   : 0x0008,
+  kbRightAlt    => _WIN32 ? Win32::Console::RIGHT_ALT_PRESSED()  : 0x0008,
+  kbScrollState => _WIN32 ? Win32::Console::SCROLLLOCK_ON()      : 0x0010,
+  kbNumState    => _WIN32 ? Win32::Console::NUMLOCK_ON()         : 0x0020,
+  kbCapsState   => _WIN32 ? Win32::Console::CAPSLOCK_ON()        : 0x0040,
+  kbEnhanced    => _WIN32 ? Win32::Console::ENHANCED_KEY()       : undef,
   # Ensure this doesn't overlap above values
-  kbInsState    => _WINDOWS ? 0x200                                : 0x0080,   
+  kbInsState    => _WIN32 ? 0x200                                : 0x0080,   
 };
 
 # On some operating systems, distinguishing between the right and left shift
@@ -453,6 +476,27 @@ use constant {
   kbShift     => kbLeftShift | kbRightShift,
   kbCtrlShift => kbLeftCtrl | kbRightCtrl,
   kbAltShift  => kbLeftAlt | kbRightAlt,
+};
+
+# TColor
+use constant {
+  ctDefault => 0x0,    # Terminal default.
+  ctBIOS    => 0x1,    # TColorBIOS.
+  ctRGB     => 0x2,    # TColorRGB.
+  ctXTerm   => 0x3,    # TColorXTerm.
+};
+
+# TColorAttr Style masks
+use constant {
+  slBold      => 0x001,
+  slItalic    => 0x002,
+  slUnderline => 0x004,
+  slBlink     => 0x008,
+  slReverse   => 0x010,
+  slStrike    => 0x020,
+
+  # Private masks
+  slNoShadow  => 0x200,    # Don't draw window shadows over this cell.
 };
 
 1
@@ -474,7 +518,8 @@ TUI::Drivers::Const - constants for driver and event handling
 
 =head1 DESCRIPTION
 
-C<TUI::Drivers::Const> defines constants used by the TUI::Vision driver layer.
+C<TUI::Drivers::Const> defines constants used by the L<TUI::Vision> driver 
+layer.
 
 The constants in this module are grouped by purpose and exported via tag-based
 export groups. They are used by the event system, keyboard and mouse handling,
@@ -482,14 +527,14 @@ screen and video mode selection, and low-level driver logic.
 
 This module only defines constants. The semantic meaning and practical usage of
 these constants is documented in higher-level driver modules such as
-C<TUI::Drivers::Event>, C<TUI::Drivers::Screen>, and 
-C<TUI::Drivers::HardwareInfo>.
+L<TEvent|TUI::Drivers::Event>, L<TScreen|TUI::Drivers::Screen>, and 
+L<HardwareInfo|TUI::Drivers::HardwareInfo>.
 
 =head1 CONSTANTS
 
 =head2 Event type constants (evXXXX)
 
-Event type and event mask constants used by the TUI::Vision event system.
+Event type and event mask constants used by the L<TUI::Vision> event system.
 
 These constants identify mouse, keyboard, command, broadcast, and message
 events and are used when dispatching and filtering events.
@@ -520,6 +565,14 @@ Constants representing keyboard input codes and modifier states.
 These include control key combinations, function keys, extended keys, and
 keyboard state masks. They are used by the keyboard and event handling logic
 to interpret raw input.
+
+=head2 Style masks constants (slXXXX)
+
+Constants representing text style attributes for screen cells.
+
+These values are used to define bold, italic, underline, blink, reverse, and 
+strike-through text styles. They are used in conjunction with color attributes 
+to control the appearance of text in the user interface.
 
 =head1 EXPORT TAGS
 
@@ -555,10 +608,10 @@ C<:all> - import all constants
 
 =head1 SEE ALSO
 
-L<TUI::Drivers::Event>,
-L<TUI::Drivers::Screen>,
-L<TUI::Drivers::Display>,
-L<TUI::Drivers::HardwareInfo>
+L<TEvent|TUI::Drivers::Event>,
+L<TScreen|TUI::Drivers::Screen>,
+L<TDisplay|TUI::Drivers::Display>,
+L<THardwareInfo|TUI::Drivers::HardwareInfo>
 
 =head1 AUTHORS
 
@@ -579,5 +632,10 @@ Copyright (c) 2026 the L</AUTHORS> as listed above.
 This software is licensed under the MIT license (see the LICENSE file, which is
 part of the distribution).
 
-=cut
+=head1 ACKNOWLEDGEMENTS
 
+Style mask constants and their usage are not part of the original 
+I<Turbo Vision> design by Borland International. The constants are taken from 
+I<A modern port of Turbo Vision 2.0>, which is licensed under the MIT License.
+
+=cut

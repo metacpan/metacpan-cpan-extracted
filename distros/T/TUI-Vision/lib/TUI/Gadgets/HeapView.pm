@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -72,17 +72,20 @@ sub update {    # void ()
 } #/ sub update
 
 sub heapSize {    # $total ()
-  state $sig = signature(
-    method => Object,
-    pos    => [],
-  );
-  my ( $self ) = $sig->( @_ );
-
+  no warnings 'redefine';
   if ( $^O eq 'MSWin32' ) {
     require TUI::Gadgets::HeapView::Win32;
-    goto &TUI::Gadgets::HeapView::Win32::heapSize;
+    *heapSize = \&TUI::Gadgets::HeapView::Win32::heapSize;
   }
-  return -1;
+  elsif ( $^O eq 'linux' ) {
+    require TUI::Gadgets::HeapView::Linux;
+    *heapSize = \&TUI::Gadgets::HeapView::Linux::heapSize;
+  }
+  else {
+    require TUI::Gadgets::HeapView::Unix;
+    *heapSize = \&TUI::Gadgets::HeapView::Unix::heapSize;
+  }
+  goto &heapSize;
 }
 
 1
@@ -132,7 +135,8 @@ Creates a new heap view.
 
 =item bounds
 
-Bounding rectangle defining the position and size of the view (I<TRect>).
+Bounding rectangle defining the position and size of the view 
+(L<TRect|TUI::Objects::Rect>).
 
 =back
 
@@ -154,7 +158,8 @@ Renders the heap usage information.
 
   my $total = $view->heapSize();
 
-Returns the total heap size currently available to the application.
+Returns the total heap size currently available to the application, or <0 if an 
+error occurs or the platform does not support heap size retrieval.
 
 =head2 update
 
@@ -165,8 +170,8 @@ Refreshes the internal heap statistics and updates the display.
 =head1 SEE ALSO
 
 L<TUI::Views::HelpView::Win32>,
-L<TUI::Views::View>,
-L<TUI::Views::DrawBuffer>
+L<TView|TUI::Views::View>,
+L<TDrawBuffer|TUI::Views::DrawBuffer>
 
 =head1 AUTHORS
 

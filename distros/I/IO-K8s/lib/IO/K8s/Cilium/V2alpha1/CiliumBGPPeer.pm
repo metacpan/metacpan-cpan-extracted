@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPPeer;
 # ABSTRACT: CiliumBGPPeer
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name          => Str, { required => 'schema' };
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2alpha1::CiliumBGPPeer - CiliumBGPPeer
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

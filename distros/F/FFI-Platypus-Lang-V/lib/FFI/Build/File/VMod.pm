@@ -4,7 +4,7 @@ use experimental qw( signatures );
 use stable qw( postderef );
 use true;
 
-package FFI::Build::File::VMod 0.03 {
+package FFI::Build::File::VMod 0.04 {
 
     # ABSTRACT: Class to track V source in FFI::Build
 
@@ -59,7 +59,11 @@ package FFI::Build::File::VMod 0.03 {
             local $CWD = $vmod->parent;
             say "+mkdir -p @{[ $lib_path->parent->mkdir ]}";
             $lib_path->parent->mkdir;
-            $platform->run('v', '-prod', '-shared', -o => "$lib_path", '.');
+            # V calls GC_set_pages_executable(0) before GC_INIT() in main(),
+            # but shared libraries skip that, so on platforms that forbid
+            # PROT_EXEC mappings (macOS arm64) libgc aborts with
+            # "Cannot allocate executable pages".
+            $platform->run('v', '-prod', '-shared', -cflags => '-DNO_EXECUTE_PERMISSION', -o => "$lib_path", '.');
             die "command failed" if $?;
             die "no shared library" unless -f $lib_path;
             say "+cd -";
@@ -132,7 +136,7 @@ FFI::Build::File::VMod - Class to track V source in FFI::Build
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -167,6 +171,7 @@ ffi/foo.v:
 
  module foo
  
+ @[export: 'foo_add']
  pub fn add(a i32, b i32) i32 {
      return a + b
  }
@@ -185,7 +190,7 @@ lib/Foo.pm:
  
      my $ffi = FFI::Platypus->new( api => 2, lang => 'V' );
      $ffi->bundle;
-     $ffi->mangler(sub ($sym) { return "libfoo__$sym" });
+     $ffi->mangler(sub ($sym) { return "foo_$sym" });
  
      $ffi->attach(add => ['i32','i32'] => 'i32');
  }

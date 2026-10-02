@@ -3,7 +3,7 @@
 # These are the things a hand-written PDB reader gets wrong, so they are
 # tested against the raw columnar result rather than through the assembled
 # hash of hashes, where a mistake could be masked.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use File::Temp ();

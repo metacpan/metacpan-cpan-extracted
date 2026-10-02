@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -341,7 +341,8 @@ sub getFileName {    # void ($s)
       else {
         fnmerge( $buf, $drive, $path, $name, undef );
         &$noWildChars( local $_ = '', $TExt );
-        substr( $buf, length( $buf ) ) = $_;
+        substr( $buf, length( $buf ) ) = $_
+          if length( $_ ) && $_ ne '.';
       }
     }
   } #/ if ( ( $name eq '' || ...))
@@ -536,7 +537,7 @@ TUI::StdDlg::FileDialog - common file selection dialog
   
 =head1 DESCRIPTION
 
-C<TFileDialog> implements the standard TUI::Vision file dialog used for
+C<TFileDialog> implements the standard L<TUI::Vision> file dialog used for
 opening, replacing, or selecting files.
 
 The dialog combines several specialized views, including a file list, an input
@@ -551,64 +552,60 @@ used by C<TFileDialog>.
 
 =head2 $filesText
 
-Label text for the files list section.
+Label text for the files list section (I<Str>).
 
 =head2 $openText
 
-Label text for the open action.
+Label text for the open action (I<Str>).
 
 =head2 $okText
 
-Label text for the confirmation button.
+Label text for the confirmation button (I<Str>).
 
 =head2 $replaceText
 
-Label text for the replace action.
+Label text for the replace action (I<Str>).
 
 =head2 $clearText
 
-Label text for the clear action.
+Label text for the clear action (I<Str>).
 
 =head2 $cancelText
 
-Label text for the cancel action.
+Label text for the cancel action (I<Str>).
 
 =head2 $helpText
 
-Label text for the help command.
+Label text for the help command (I<Str>).
 
 =head2 $invalidDriveText
 
-Message text displayed for an invalid drive or directory.
+Message text displayed for an invalid drive or directory (I<Str>).
 
 =head2 $invalidFileText
 
-Message text displayed for an invalid file name.
+Message text displayed for an invalid file name (I<Str>).
 
 =head1 ATTRIBUTES
 
 The following attributes are part of the public dialog state and may be queried
 or updated during dialog execution.
 
-=over
-
-=item fileName
+=head2 fileName
 
 The currently selected file name (I<Str>).
 
-=item fileList
+=head2 fileList
 
 Reference to the file list view used by the dialog (I<TFileList>).
 
-=item wildCard
+=head2 wildCard
 
 Current wildcard filter applied to the file list (I<Str>).
 
-=item directory
+=head2 directory
 
 Current directory shown by the dialog (I<Str>).
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -650,13 +647,7 @@ History identifier used for filename input history (I<Int>).
 
 =head2 new_TFileDialog
 
-  my $dlg = new_TFileDialog(
-    $wildCard,
-    $title,
-    $inputName,
-    $options,
-    $histId
-  );
+  my $dlg = new_TFileDialog($wildCard, $title, $inputName, $options, $histId);
 
 Factory-style constructor using positional arguments.
 
@@ -700,10 +691,10 @@ Checks whether the dialog should accept the specified command.
 
 =head1 SEE ALSO
 
-L<TUI::StdDlg::FileList>,
-L<TUI::StdDlg::FileInputLine>,
-L<TUI::StdDlg::FileInfoPane>,
-L<TUI::Dialogs::Dialog>
+L<TFileList|TUI::StdDlg::FileList>,
+L<TFileInputLine|TUI::StdDlg::FileInputLine>,
+L<TFileInfoPane|TUI::StdDlg::FileInfoPane>,
+L<TDialog|TUI::Dialogs::Dialog>
 
 =head1 AUTHORS
 

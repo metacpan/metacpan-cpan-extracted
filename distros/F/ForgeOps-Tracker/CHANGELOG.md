@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.1 (2026-10-01)
+
+- A script that reports an error and exits straight away no longer loses it. When the program ends normally, the client now sends whatever errors, changes and traces are still waiting and lets a delivery already under way finish, for at most 5 seconds. A program that never reported anything doesn't wait at all, and the program's exit status is kept.
+- New `ForgeOps::Tracker::flush($timeout)` sends everything still waiting right now and returns 1 once it has gone out (timeout in seconds, default 5). Use it before `POSIX::_exit` or `exec`, which skip the automatic send.
+
 ## 0.12.0 (2026-09-29)
 
 - SQL masking now also catches strings with a backslash-escaped quote (`'o\'brien'`, `E'o\'brien'`), prefixed strings (`E''`, `X''`, `N''`, `B''`, `U&''`, prefix included), hex, binary and exponent numbers (`0x1F`, `0b101`, `3e10`, `1.5E-3`, `.5`), and, on MySQL and MariaDB, `"double-quoted"` strings. `ForgeOps::Tracker::SqlStatement::mask($sql, system => $db_system)` takes the database's name, and a database span's statement is masked with its `db_system`.

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ClusterSecretStoreCondition;
 # ABSTRACT: ClusterSecretStoreCondition describes a condition by which to choose namespaces to process ExternalSecrets in for a ClusterSecretStore instance.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s namespaceRegexes  => [Str];
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::ClusterSecretStoreCondition - ClusterSecretStoreCo
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 namespaceRegexes
 

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::AzureSDK;
 # ABSTRACT: sdk defines the Azure SDK config that is being used to authenticate.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s tenantId => Str, { pattern => qr/^[0-9a-zA-Z-.]+$/ };
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::AzureSDK - sdk defines the Azure SDK config tha
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 tenantId
 

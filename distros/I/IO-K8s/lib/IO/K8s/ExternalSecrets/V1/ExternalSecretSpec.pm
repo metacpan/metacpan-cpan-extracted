@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ExternalSecretSpec;
 # ABSTRACT: ExternalSecretSpec defines the desired state of ExternalSecret.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use utf8;
 use IO::K8s::Resource;
 
@@ -34,7 +34,7 @@ IO::K8s::ExternalSecrets::V1::ExternalSecretSpec - ExternalSecretSpec defines th
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 data
 

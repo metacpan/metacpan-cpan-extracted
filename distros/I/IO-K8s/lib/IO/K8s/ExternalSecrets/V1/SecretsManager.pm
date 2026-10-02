@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::SecretsManager;
 # ABSTRACT: SecretsManager defines how the provider behaves when interacting with AWS SecretsManager
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s forceDeleteWithoutRecovery => Bool;
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::SecretsManager - SecretsManager defines how the pr
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 forceDeleteWithoutRecovery
 

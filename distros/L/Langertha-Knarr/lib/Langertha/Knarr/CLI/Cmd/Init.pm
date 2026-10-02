@@ -1,5 +1,5 @@
 package Langertha::Knarr::CLI::Cmd::Init;
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 # ABSTRACT: Scan environment and generate Knarr configuration
 use Moo;
 use MooX::Cmd;
@@ -76,20 +76,28 @@ Langertha::Knarr::CLI::Cmd::Init - Scan environment and generate Knarr configura
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 
 Implements the C<knarr init> command. Scans C<%ENV> and any C<.env> files
 for known API key variables (C<.env> and C<.env.local> in the current
-directory are always scanned), then generates a complete YAML configuration
-and writes it to stdout or a file.
+directory and C<$HOME/.env> are always scanned when they exist), then
+generates a complete YAML configuration and writes it to stdout or a file.
 
     knarr init > knarr.yaml
     knarr init -e .env.production -o production.yaml
+    knarr init -l 0.0.0.0:8080 -l 0.0.0.0:11434 > knarr.yaml   # for a container
+
+The generated config listens on C<127.0.0.1:8080> and C<127.0.0.1:11434>
+unless C<-l> says otherwise, enables C<auto_discover>, sets OpenAI as the
+default engine when an OpenAI key was found, names the variable each key
+was found in as C<api_key_env> (the default engine included), and has no
+C<passthrough:> section.
 
 See L<knarr> for full option details, L<Langertha::Knarr::Config/scan_env>
-for the env scanning logic, and L<Langertha::Knarr> for the config format.
+for the env scanning logic, and L<Langertha::Knarr::Config> for the config
+format.
 
 =head1 SEE ALSO
 

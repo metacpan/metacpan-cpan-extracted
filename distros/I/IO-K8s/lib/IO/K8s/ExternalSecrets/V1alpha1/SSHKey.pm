@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::SSHKey;
 # ABSTRACT: SSHKey generates SSH key pairs.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
     resource_plural => 'sshkeys',
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::SSHKey - SSHKey generates SSH key pairs.
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

@@ -44,19 +44,19 @@ To install this module type the following:
 
 DEPENDENCIES
 
-This module requires these other modules and libraries:
+This module requires these other non-core modules:
+
+  Clone
 
   IO::Interactive
 
-  Image::ExifTool version 10.14 or up
+  Image::ExifTool
 
-  Path::Class
-
-  Path::Iterator::Rule
-
-  Term::ProgressBar
+  Modern::Perl
 
   Text::Glob
+
+  Win32::UTCFileTime (Windows only, for Perl up to 5.33.5)
 
   XML::Twig
 
@@ -64,7 +64,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2018 - 2023 Louis Strous
+Copyright (C) 2018 - 2026 Louis Strous
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.2 or,

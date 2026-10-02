@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::DelineaProvider;
 # ABSTRACT: Delinea DevOps Secrets Vault https://docs.delinea.com/online-help/products/devops-secrets-vault/current
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s clientId     => '+IO::K8s::ExternalSecrets::V1::DelineaProviderSecretRef', { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::DelineaProvider - Delinea DevOps Secrets Vault htt
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 clientId
 

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumLoadBalancerIPPoolIPBlock;
 # ABSTRACT: CiliumLoadBalancerIPPoolIPBlock describes a single IP block.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s cidr  => Str;
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::CiliumLoadBalancerIPPoolIPBlock - CiliumLoadBalancerIPPoolI
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 cidr
 

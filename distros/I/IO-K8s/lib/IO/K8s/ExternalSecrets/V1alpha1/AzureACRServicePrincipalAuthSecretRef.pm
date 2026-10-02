@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::AzureACRServicePrincipalAuthSecretRef;
 # ABSTRACT: AzureACRServicePrincipalAuthSecretRef defines the secret references for Azure Service Principal authentication.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s clientId     => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1alpha1::AzureACRServicePrincipalAuthSecretRef - Azur
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 clientId
 

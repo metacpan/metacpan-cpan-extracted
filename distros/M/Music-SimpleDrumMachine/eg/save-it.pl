@@ -9,7 +9,7 @@ use Music::SimpleDrumMachine ();
 
 my $name = shift || 'usb';
 my $bpm  = shift || 120;
-my $chan = shift // 9; # nb: -1 is a no-go
+my $chan = shift // 9;
 my $file = shift || 'drums.mid';
 
 my $beats  = 16;
@@ -31,7 +31,7 @@ my $dm = Music::SimpleDrumMachine->new(
         part_B => \&part_B,
         part_C => \&part_C,
     },
-    save    => $file, # save doubles as the output filename
+    save    => $file,
     verbose => 1,
 );
 

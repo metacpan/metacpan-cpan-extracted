@@ -348,6 +348,8 @@ t/1011-ws-live.t
 t/1012-ws-origin.t
 t/1013-after-response-live.t
 t/1014-ws-extended-connect.t
+t/1015-ws-tls.t
+t/1016-ws-connect-gate.t
 t/1020-sse.t
 t/1030-room-bus.t
 t/1031-sse-bus.t

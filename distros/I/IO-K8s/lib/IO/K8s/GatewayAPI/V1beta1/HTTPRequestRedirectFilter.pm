@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::HTTPRequestRedirectFilter;
 # ABSTRACT: RequestRedirect defines a schema for a filter that responds to the request with an HTTP redirection.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s hostname   => Str, { pattern => qr/^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/ };
@@ -28,7 +28,7 @@ IO::K8s::GatewayAPI::V1beta1::HTTPRequestRedirectFilter - RequestRedirect define
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 hostname
 

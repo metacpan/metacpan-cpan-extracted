@@ -128,7 +128,11 @@ Know which function you are holding before you branch on a version.
 
 ## Kubernetes integration — CDI + the containerd include
 
-- **CDI** (`generate_cdi_specs`): `nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml`.
+- **CDI** (`generate_cdi_specs`): `nvidia-ctk cdi list` decides (k76) — only what does not
+  resolve of `nvidia.com/gpu=all` (`/etc/cdi/nvidia.yaml`, never next to
+  `nvidia-cdi-refresh`) and `management.nvidia.com/gpu=all` (`/etc/cdi/management.nvidia.yaml`,
+  `--mode=management` **with** `--vendor=management.nvidia.com --class=gpu`, else kind
+  `nvidia.com/gpu` collides) is written; never dies.
   This is how the k8s device plugin enumerates GPUs *without a privileged container*.
 - **RKE2 and K3s share one mechanism** (`_configure_containerd_rke2`): write
   `…/rke2/agent/etc/containerd/config.toml.tmpl` importing `/etc/containerd/conf.d/*.toml`,

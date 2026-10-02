@@ -1,6 +1,6 @@
 package Langertha::Stream;
 # ABSTRACT: Iterator for streaming responses
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Carp qw( croak );
 
@@ -49,6 +49,15 @@ sub content {
 }
 
 
+sub citations {
+  my ($self) = @_;
+  for my $chunk (@{$self->chunks}) {
+    return $chunk->citations if eval { $chunk->has_citations } && $chunk->citations;
+  }
+  return undef;
+}
+
+
 sub each {
   my ($self, $callback) = @_;
   croak "each() requires a callback" unless ref $callback eq 'CODE';
@@ -81,7 +90,7 @@ Langertha::Stream - Iterator for streaming responses
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -147,6 +156,18 @@ Returns all remaining chunks as a list and advances the cursor to the end.
 
 Returns the concatenated C<content> of all chunks in the stream as a single
 string, regardless of the current cursor position.
+
+=head2 citations
+
+    my $citations = $stream->citations;
+
+Returns the search-augmented source citations of the stream, or C<undef> when
+the engine surfaced none. Search-augmented engines
+(L<Langertha::Engine::Perplexity>) attach the C<search_results> block to the
+final L<Langertha::Stream::Chunk> (see L<Langertha::Stream::Chunk/citations>);
+this walks the chunks and returns the first citation list found, regardless of
+the cursor position — the streaming counterpart to
+L<Langertha::Response/citations>.
 
 =head2 each
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test2::V0;
-use JSON::MaybeXS qw( encode_json );
+use JSON::MaybeXS qw( encode_json is_bool );
 
 use Langertha::Tool;
 use Langertha::ToolCall;
@@ -19,6 +19,49 @@ use Langertha::ToolChoice;
   is( $t->to_openai->{function}{parameters}{required}[0], 'path', 'openai parameters' );
   is( $t->to_anthropic->{name}, 'list_files', 'anthropic name' );
   is( $t->to_anthropic->{input_schema}{type}, 'object', 'anthropic schema' );
+  # k133: strict tool use is emitted ONLY for a closed schema
+  # (additionalProperties:false + non-empty required). This schema has
+  # required but no additionalProperties, so strict must NOT appear.
+  ok( !exists $t->to_anthropic->{strict},
+    'anthropic: no strict without additionalProperties:false' );
+}
+
+# --- Tool: strict tool use (k133) ---
+{
+  # Closed schema -> strict:true. Sabotage check: drop the _schema_is_strict
+  # guard in Tool->to_anthropic and the open-schema cases below emit strict too.
+  my $closed = Langertha::Tool->new(
+    name        => 'extract',
+    input_schema => {
+      type                 => 'object',
+      properties           => { city => { type => 'string' } },
+      required             => ['city'],
+      additionalProperties => 0,
+    },
+  );
+  my $anth = $closed->to_anthropic;
+  ok( $anth->{strict}, 'anthropic: closed schema (additionalProperties:false + required) emits strict:true' );
+  ok( is_bool($anth->{strict}), 'anthropic: strict is a JSON boolean, not a Perl 1' );
+
+  # additionalProperties:false but NO required -> not strict-eligible.
+  my $no_required = Langertha::Tool->new(
+    name        => 'x',
+    input_schema => { type => 'object', properties => {}, additionalProperties => 0 },
+  );
+  ok( !exists $no_required->to_anthropic->{strict},
+    'anthropic: additionalProperties:false without required is not strict' );
+
+  # additionalProperties:true + required -> open schema, not strict.
+  my $open = Langertha::Tool->new(
+    name        => 'y',
+    input_schema => { type => 'object', required => ['a'], additionalProperties => 1 },
+  );
+  ok( !exists $open->to_anthropic->{strict},
+    'anthropic: additionalProperties:true is not strict even with required' );
+
+  # Default (schemaless) tool -> no strict.
+  ok( !exists Langertha::Tool->new( name => 'z' )->to_anthropic->{strict},
+    'anthropic: schemaless tool is not strict' );
 }
 
 # from_openai roundtrip
@@ -49,17 +92,33 @@ use Langertha::ToolChoice;
   is( $t->name, 'calc', 'name' );
 }
 
+# from_gemini / from_hash: Gemini declares a schema as parameters or
+# parametersJsonSchema; the door reads both (ADR 0018, k227 review M2), or a
+# declaration converted for another wire loses its arguments.
+{
+  my $schema = { type => 'object', properties => { q => { type => 'string' } } };
+  for my $key (qw( parameters parametersJsonSchema parameters_json_schema )) {
+    my $t = Langertha::Tool->from_hash( { name => 'g', $key => $schema } );
+    is( $t->input_schema, $schema, "from_hash: $key is the schema" );
+  }
+}
+
 # from_list mixed
 {
   my $list = Langertha::Tool->from_list([
     { type => 'function', function => { name => 'a' } },
     { name => 'b', input_schema => {} },
-    { garbage => 1 },
-    {},
   ]);
-  is( scalar @$list, 2, 'two valid tools, two skipped' );
+  is( scalar @$list, 2, 'two valid tools' );
   is( $list->[0]->name, 'a', 'first' );
   is( $list->[1]->name, 'b', 'second' );
+  # A hash with neither type nor name is no longer skipped silently (karr
+  # k210): it croaks, so a malformed tool cannot vanish from a request.
+  for my $bad ( { garbage => 1 }, {} ) {
+    my $ok = eval { Langertha::Tool->from_list( [ { name => 'b' }, $bad ] ); 1 };
+    ok( !$ok, 'nameless untyped hash croaks' );
+    like( $@, qr/no type and no name/, 'message says why' );
+  }
 }
 
 # --- ToolCall ---
@@ -100,9 +159,41 @@ use Langertha::ToolChoice;
   is( $call->arguments->{y}, 2, 'input mapped' );
 }
 
+# from_anthropic with input as a JSON *string* (AKI.IO /anthropic wire shape) -- karr k124
+{
+  my $call = Langertha::ToolCall->from_anthropic({
+    type  => 'tool_use',
+    id    => 'call_096bb7f8c49043adb6506902',
+    name  => 'add',
+    input => '{"a": 7, "b": 15}',
+  });
+  ok( $call, 'parsed anthropic tool_use with JSON-string input' );
+  is( $call->arguments->{a}, 7,  'string input decoded (a)' );
+  is( $call->arguments->{b}, 15, 'string input decoded (b)' );
+}
+
+# from_gemini with args as a HASH (Google-native functionCall shape)
+{
+  my $call = Langertha::ToolCall->from_gemini({
+    functionCall => { name => 'calc', args => { x => 1, y => 2 } },
+  });
+  ok( $call, 'parsed' );
+  is( $call->arguments->{y}, 2, 'object args mapped' );
+}
+
+# from_gemini with args as a JSON *string* (Vertex-style proxy / OpenRouter / LM Studio) -- karr k131
+{
+  my $call = Langertha::ToolCall->from_gemini({
+    functionCall => { name => 'add', args => '{"a": 7, "b": 15}' },
+  });
+  ok( $call, 'parsed gemini functionCall with JSON-string args' );
+  is( $call->arguments->{a}, 7,  'string args decoded (a)' );
+  is( $call->arguments->{b}, 15, 'string args decoded (b)' );
+}
+
 # extract from openai response
 {
-  my @calls = Langertha::ToolCall->extract({
+  my @calls = Langertha::ToolCall->extract_sniff({
     choices => [{
       message => {
         content => '',
@@ -119,7 +210,7 @@ use Langertha::ToolChoice;
 
 # extract from anthropic response
 {
-  my @calls = Langertha::ToolCall->extract({
+  my @calls = Langertha::ToolCall->extract_sniff({
     content => [
       { type => 'text', text => 'hi' },
       { type => 'tool_use', id => 't1', name => 'first', input => {} },
@@ -139,6 +230,14 @@ use Langertha::ToolChoice;
   is( scalar @$calls, 1, 'one hermes call' );
   is( $calls->[0]->name, 'go', 'hermes name' );
   is( $calls->[0]->arguments->{x}, 1, 'hermes args' );
+}
+
+# to_hash always carries synthetic, so a trace can tell native from synthesized
+{
+  my $native = Langertha::ToolCall->new( name => 'a', arguments => {} );
+  is( $native->to_hash->{synthetic}, 0, 'native call to_hash synthetic=0' );
+  my $synth = Langertha::ToolCall->new( name => 'a', arguments => {}, synthetic => 1 );
+  is( $synth->to_hash->{synthetic}, 1, 'synthetic call to_hash synthetic=1' );
 }
 
 # --- ToolChoice ---

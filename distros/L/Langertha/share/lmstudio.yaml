@@ -25,17 +25,29 @@ paths:
                 model:
                   type: string
                 input:
-                  description: Text or array of message objects
+                  description: >-
+                    One user turn: text, or an array of content parts (no roles,
+                    no assistant messages; continue a conversation with
+                    previous_response_id)
                   oneOf:
                     - type: string
                     - type: array
                       items:
                         type: object
+                        required:
+                          - type
                         properties:
                           type:
                             type: string
+                            enum:
+                              - text
+                              - image
                           content:
                             type: string
+                            description: Text of a text part
+                          data_url:
+                            type: string
+                            description: Base64 data URL of an image part
                 system_prompt:
                   type: string
                 temperature:
@@ -46,6 +58,12 @@ paths:
                   type: integer
                 stream:
                   type: boolean
+                store:
+                  type: boolean
+                  description: Store the chat server-side and return a response_id (server default true)
+                previous_response_id:
+                  type: string
+                  description: response_id of a stored chat to continue from
       responses:
         '200':
           description: Chat response

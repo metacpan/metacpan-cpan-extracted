@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeSnapshotContentSource;
 # ABSTRACT: source specifies whether the snapshot is (or should be) dynamically provisioned or already exists, and just requires a Kubernetes object representation.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s snapshotHandle => Str;
@@ -22,7 +22,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeSnapshotContentSource - source specifies whet
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 snapshotHandle
 

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ReplacePathRegex;
 # ABSTRACT: ReplacePathRegex holds the replace path regex middleware configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s regex       => Str;
@@ -22,7 +22,7 @@ IO::K8s::Traefik::V1alpha1::ReplacePathRegex - ReplacePathRegex holds the replac
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 regex
 

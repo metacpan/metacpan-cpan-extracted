@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Route;
 # ABSTRACT: Route holds the HTTP route configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s kind          => Str, { enum => [qw(Rule)] };
@@ -32,7 +32,7 @@ IO::K8s::Traefik::V1alpha1::Route - Route holds the HTTP route configuration.
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 kind
 

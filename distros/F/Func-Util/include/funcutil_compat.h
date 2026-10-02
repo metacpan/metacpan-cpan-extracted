@@ -152,11 +152,64 @@ typedef OP * (*Perl_call_checker)(pTHX_ OP *, GV *, SV *);
 #  endif
 #endif
 
-/* op_convert_list - introduced in 5.22
- * Fallback: use Perl_convert which exists in older Perls */
+/* op_convert_list - the 5.21.6 rename of core's convert()
+ *
+ * Perl_convert is NOT a usable fallback, for the same reason pad_alloc above
+ * needs one: embed.fnc flags it `pR`, with no A, X or E, so it never entered
+ * the exported symbol list. It is declared in proto.h, so it compiles; ELF
+ * exports it regardless, so it links on Linux; Windows exports only what is
+ * in perl5xx.def, so the DLL link fails there with
+ * `undefined reference to _imp__Perl_convert`.
+ *
+ * Reimplementing all of convert() is not possible either: it ends in
+ * fold_constants(op_integerize(op_std_init(o))) and all three are core
+ * statics. It is also not necessary. The one call in this distribution is
+ * op_convert_list(OP_LIST, OPf_STACKED, arg), and regen/opcodes declares
+ *
+ *     list    list    ck_null    m@    L
+ *
+ * so for OP_LIST every one of those steps is a no-op: ck_null is the identity
+ * check, no `s` means op_std_init contextualizes nothing, no `t` means it
+ * allocates no target, and no `f` means op_integerize and fold_constants both
+ * decline. `m` (OA_MARK) is set, so the pushmark is kept rather than nulled,
+ * and the only other branch there tests the second kid for OP_COREARGS, which
+ * a call checker's argument never is.
+ *
+ * What is left is the wrap, built on newLISTOP, which is `Apda` - exported
+ * everywhere - plus the sibling repair below, which core does through its own
+ * static force_list(). The assert is the guard on that reasoning: it holds
+ * for OP_LIST and was not checked for anything else. */
 #if !PERL_VERSION_GE(5,22,0)
 #  ifndef op_convert_list
-#    define op_convert_list(type, flags, op) Perl_convert(aTHX_ type, flags, op)
+static OP *fu_convert_list(pTHX_ I32 type, I32 flags, OP *o) {
+    assert(type == OP_LIST);
+    PERL_UNUSED_ARG(type);
+    if (!o || o->op_type != OP_LIST) {
+        OP *head = o, *tail = o;
+        OP *rest = o ? OpSIBLING(o) : NULL;
+        if (o) OpLASTSIB_set(o, NULL);
+        o = newLISTOP(OP_LIST, 0, head, NULL);
+        /* newLISTOP was handed one kid, so it set op_last to that kid. The
+         * caller's argument is the head of a chain, and the rest of it has to
+         * be re-attached and op_last moved to the real end, or the optree is
+         * malformed: the kids are reachable through the sibling links while
+         * op_last names the first of them. That crashes - verified, a SEGV on
+         * clamp($x, $l, $h) - rather than misbehaving quietly. */
+        if (rest) {
+            OpMORESIB_set(tail, rest);
+            while (OpSIBLING(tail)) tail = OpSIBLING(tail);
+            OpLASTSIB_set(tail, o);
+            cLISTOPx(o)->op_last = tail;
+            o->op_flags |= OPf_KIDS;
+        }
+    }
+    else {
+        o->op_flags &= ~OPf_WANT;
+    }
+    o->op_flags |= flags;
+    return o;
+}
+#    define op_convert_list(type, flags, op) fu_convert_list(aTHX_ (type), (flags), (op))
 #  endif
 #endif
 

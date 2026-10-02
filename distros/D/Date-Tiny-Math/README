@@ -1,0 +1,42 @@
+Date-Tiny-Math
+
+This module derives from Date::Tiny and adds some calendar date math
+capabilities.  This module is a pure Perl module, not dependent on any
+non-standard modules.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Date::Tiny::Math
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Tiny-Math
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Date-Tiny-Math
+
+    Search CPAN
+        https://metacpan.org/release/Date-Tiny-Math
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Louis Strous.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

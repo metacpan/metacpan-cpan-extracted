@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrArray;
 # ABSTRACT: JSONSchemaPropsOrArray represents a value that can either be a JSONSchemaProps or an array of JSONSchemaProps. Mainly here for serialization purposes.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use v5.10;
 use Moo;
 use Types::Standard ();
@@ -86,7 +86,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOr
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

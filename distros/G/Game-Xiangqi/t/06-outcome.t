@@ -5,6 +5,14 @@ use Test::More;
 use Game::Xiangqi::Engine ':all';
 my $E = 'Game::Xiangqi::Engine';
 
+# Every subtest below calls its board $b, which is sort's own $b. A sort block
+# written inside one of those scopes compares the BOARD, not the element: perl
+# resolves the lexical and the comparator silently becomes nonsense. 5.18 and
+# 5.20 say so as a warning and run on; 5.14 makes it fatal, which is how this
+# was found. So the numeric sort lives out here, at file scope, where nothing
+# shadows $a and $b.
+sub nsort { return sort { $a <=> $b } @_ }
+
 # THE RULE EVERYBODY GETS WRONG IS THE ENDING.
 #
 #   "Unlike in chess, in which stalemate is a draw, in xiangqi, it is a loss for
@@ -128,7 +136,7 @@ subtest 'outcome never returns a draw, by construction' => sub {
         my (undef, $u) = $b->do_move($legal[ ($i * 7) % @legal ]);
         push @stack, $u;
     }
-    my @reasons = sort { $a <=> $b } keys %seen;
+    my @reasons = nsort(keys %seen);
     ok(!grep({ $_ != ONGOING && $_ != BY_CHECKMATE && $_ != BY_STALEMATE } @reasons),
         'every reason seen is one of the three, and none of them is a draw');
 };

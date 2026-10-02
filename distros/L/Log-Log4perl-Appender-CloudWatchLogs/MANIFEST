@@ -1,0 +1,15 @@
+bin/aws-logs
+ChangeLog
+cpanfile.darkpan
+cpanm.darkpan
+lib/Amazon/CloudWatchLogs.pm
+lib/Log/Log4perl/Appender/CloudWatchLogs.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+release-notes.md
+share/README.md
+t/00-cloudwatchlogs.t
+t/00-log-log4perl-appender-cloudwatchlogs.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

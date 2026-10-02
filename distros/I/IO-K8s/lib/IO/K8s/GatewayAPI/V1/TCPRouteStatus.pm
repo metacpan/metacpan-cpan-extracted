@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::TCPRouteStatus;
 # ABSTRACT: Status defines the current state of TCPRoute.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s parents => ['+IO::K8s::GatewayAPI::V1::RouteParentStatus'], { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::GatewayAPI::V1::TCPRouteStatus - Status defines the current state of TC
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 parents
 

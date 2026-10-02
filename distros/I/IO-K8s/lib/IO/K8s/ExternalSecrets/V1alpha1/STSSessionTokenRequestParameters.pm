@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::STSSessionTokenRequestParameters;
 # ABSTRACT: RequestParameters contains parameters that can be passed to the STS service.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s serialNumber    => Str;
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::STSSessionTokenRequestParameters - RequestPa
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 serialNumber
 

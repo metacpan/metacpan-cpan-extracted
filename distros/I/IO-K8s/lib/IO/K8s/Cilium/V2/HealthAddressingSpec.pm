@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::HealthAddressingSpec;
 # ABSTRACT: HealthAddressing is the addressing information for health connectivity checking.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s ipv4 => Str;
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::HealthAddressingSpec - HealthAddressing is the addressing i
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 ipv4
 

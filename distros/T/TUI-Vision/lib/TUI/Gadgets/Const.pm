@@ -1,23 +1,37 @@
 package TUI::Gadgets::Const;
 # ABSTRACT: constants for gadget components
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
+  maxLineLength
 );
 
 our %EXPORT_TAGS = (
+
   cmXXXX => [qw(
     cmFndEventView
   )],
+
+  cpXXXX => [qw(
+    cpMousePalette
+  )],
+
+  hlXXXX => [qw(
+    hlChangeDir
+  )],
+
 );
+
+use TUI::StdDlg::Const qw( cmChangeDir );
 
 # add all the other %EXPORT_TAGS ":class" tags to the ":all" class and
 # @EXPORT_OK, deleting duplicates
@@ -32,8 +46,24 @@ our %EXPORT_TAGS = (
       @EXPORT_OK;
 }
 
+# Constants for Gadgets events
 use constant {
-  cmFndEventView => 114
+  cmFndEventView => 114,
+};
+
+# History id for the change directory dialog
+use constant {
+  hlChangeDir => cmChangeDir,
+};
+
+# Maximum line length inside TFileViewer
+use constant {
+  maxLineLength => 256,
+};
+
+# Palette for TClickTester
+use constant {
+  cpMousePalette => "\x07\x08",
 };
 
 1
@@ -48,14 +78,15 @@ TUI::Gadgets::Const - constants for gadget components
 
 =head1 SYNOPSIS
 
-  use TUI::Gadgets::Const qw(:all);
+  use TUI::Gadgets::Const qw( :all );
 
   # or import specific constant groups
-  use TUI::Gadgets::Const qw(:cmXXXX);
+  use TUI::Gadgets::Const qw( :cmXXXX );
 
 =head1 DESCRIPTION
 
-C<TUI::Gadgets::Const> defines constants used by TUI::Vision gadget components.
+These module defines constants used by L<TUI::Vision> L<gadget|TUI::Gadgets> 
+components.
 
 The constants in this module are grouped by purpose and exported via tag-based
 export groups. They are used by gadget views to identify commands and events
@@ -70,8 +101,22 @@ these constants is documented in the corresponding gadget modules.
 
 Command identifiers used by gadget components.
 
-These values are delivered via C<$event-E<gt>{command}> and are handled by
+These values are delivered via C<< $event->{command} >> and are handled by
 gadget views such as event viewers and diagnostic tools.
+
+=head2 Gadget color palettes (cpXXXX)
+
+Color palette constants used by gadget components.
+
+These values define the color schemes for various gadget elements, such as the 
+mouse pointer in L<TClickTester|TUI::Gadgets::TClickTester>.
+
+=head2 History identifiers for dialogs (hlXXXX)
+
+History identifiers used by gadget dialogs.
+
+These values are used to track the history of user interactions within dialogs, 
+such as the change directory dialog.
 
 =head1 EXPORT TAGS
 
@@ -79,21 +124,21 @@ Constants are exported using the following tag-based export groups:
 
 =over
 
-=item *
+=item * C<:cmXXXX> - gadget command identifiers
 
-C<:cmXXXX> - gadget command identifiers
+=item * C<:cpXXXX> - gadget color palettes
 
-=item *
+=item * C<:hlXXXX> - history identifiers for dialogs
 
-C<:all> - import all constants
+=item * C<:all> - import all constants
 
 =back
 
 =head1 SEE ALSO
 
-L<TUI::Gadgets>,
-L<TUI::Gadgets::EventViewer>,
-L<TUI::Drivers::Event>
+L<Gadgets|TUI::Gadgets>,
+L<TEventViewer|TUI::Gadgets::EventViewer>,
+L<TEvent|TUI::Drivers::Event>
 
 =head1 AUTHORS
 

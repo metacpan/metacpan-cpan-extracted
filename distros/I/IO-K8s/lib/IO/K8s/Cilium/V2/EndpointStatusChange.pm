@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::EndpointStatusChange;
 # ABSTRACT: EndpointStatusChange Indication of a change of status swagger:model EndpointStatusChange
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s code      => Str;
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::EndpointStatusChange - EndpointStatusChange Indication of a
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 code
 

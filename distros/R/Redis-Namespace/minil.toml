@@ -1,1 +1,1 @@
-badges = ['travis', 'metacpan']
+badges = ['github-actions/test.yml', 'metacpan']

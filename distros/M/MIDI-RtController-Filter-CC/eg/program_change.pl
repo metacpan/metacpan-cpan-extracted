@@ -15,7 +15,8 @@ my $controller = MIDI::RtController->new(
 my $filter = MIDI::RtController::Filter::CC->new(rtc => $controller);
 
 $filter->channel(0);
-$filter->trigger(2);
+$filter->trigger(1);
+$filter->value(41);
 
 $controller->add_filter('program_change', all => $filter->curry::program_change);
 

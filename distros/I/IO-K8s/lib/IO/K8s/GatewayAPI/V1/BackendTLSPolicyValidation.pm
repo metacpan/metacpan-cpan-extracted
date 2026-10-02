@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::BackendTLSPolicyValidation;
 # ABSTRACT: Validation contains backend TLS validation configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s caCertificateRefs       => ['+IO::K8s::GatewayAPI::V1::LocalObjectReference'];
@@ -26,7 +26,7 @@ IO::K8s::GatewayAPI::V1::BackendTLSPolicyValidation - Validation contains backen
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 caCertificateRefs
 

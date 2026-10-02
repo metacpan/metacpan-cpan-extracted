@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::RedirectRegex;
 # ABSTRACT: RedirectRegex holds the redirect regex middleware configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s permanent   => Bool;
@@ -24,7 +24,7 @@ IO::K8s::Traefik::V1alpha1::RedirectRegex - RedirectRegex holds the redirect reg
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 permanent
 

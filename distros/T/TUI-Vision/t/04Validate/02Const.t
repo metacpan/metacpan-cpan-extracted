@@ -7,7 +7,7 @@ BEGIN {
   use_ok 'TUI::Validate::Const', qw( 
     :voXXXX
     :vsXXXX
-    :vtXXXX
+    :TVTransfer
   );
 }
 

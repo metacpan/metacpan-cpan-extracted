@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -172,7 +172,25 @@ TUI::Menus::MenuBar - manages the menu bar at the top of the application
 
   use TUI::Menus;
 
+  # Common Turbo Vision style call 
   my $menuBar = new_TMenuBar($bounds, $menu);
+
+  # The following section demonstrates how to build a menu bar 
+  # using chained menu and submenu objects.
+  sub initMenuBar {
+    my ( $class, $r ) = @_;
+    $r->{b}{y} = $r->{a}{y} + 1;
+    return new_TMenuBar(
+      $r,
+      new_TSubMenu( '~F~ile', hcNoContext )
+        + new_TMenuItem( '~O~pen...', cmFileOpen, kbF3, hcNoContext, 'F3' )
+        + new_TMenuItem( '~S~ave as...', cmFileSave, hcNoContext )
+        + newLine
+        + new_TMenuItem( 'E~x~it', cmQuit, kbAltX, hcNoContext, 'Alt-X' )
+      + new_TSubMenu( '~H~elp', hcNoContext )
+        + new_TMenuItem( '~A~bout', cmAbout, hcNoContext )
+    );
+  }
 
 =head1 DESCRIPTION
 
@@ -203,7 +221,7 @@ Creates a new menu bar.
 
 =item bounds
 
-Bounding rectangle of the menu bar (I<TRect>).
+Bounding rectangle of the menu bar (L<TRect|TUI::Objects::Rect>).
 
 =item menu
 
@@ -218,7 +236,8 @@ Root menu structure defining the contents of the menu bar (I<TMenu> or undef).
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 METHODS
 
@@ -236,32 +255,12 @@ Returns the screen rectangle occupied by the specified menu item. This method
 is used internally to determine whether a mouse click occurred on a particular
 menu entry.
 
-=head1 EXAMPLE
-
-The following example shows how a menu bar can be constructed using chained
-menu and submenu objects.
-
-  sub initMenuBar {
-    my ( $class, $r ) = @_;
-    $r->{b}{y} = $r->{a}{y} + 1;
-    return new_TMenuBar(
-      $r,
-      new_TSubMenu( '~F~ile', hcNoContext )
-        + new_TMenuItem( '~O~pen...', cmFileOpen, kbF3, hcNoContext, 'F3' )
-        + new_TMenuItem( '~S~ave as...', cmFileSave, hcNoContext )
-        + newLine
-        + new_TMenuItem( 'E~x~it', cmQuit, kbAltX, hcNoContext, 'Alt-X' )
-      + new_TSubMenu( '~H~elp', hcNoContext )
-        + new_TMenuItem( '~A~bout', cmAbout, hcNoContext )
-    );
-  }
-
 =head1 SEE ALSO
 
-L<TUI::Menus::Menu>,
-L<TUI::Menus::MenuBox>,
-L<TUI::Menus::MenuView>,
-L<TUI::Views::View>
+L<TMenu|TUI::Menus::Menu>,
+L<TMenuBox|TUI::Menus::MenuBox>,
+L<TMenuView|TUI::Menus::MenuView>,
+L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 

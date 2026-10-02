@@ -1,5 +1,12 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0602 2026-10-01 21:34:31
+    - Make the number of bars before a change, definable.
+
+0.0601 2026-10-01 18:16:43
+    - Improve documentation and comments.
+    - Convert tests to use the Test2 suite.
+
 0.0600 2026-08-25 19:49:57
     - Add the save attribute and logic.
 

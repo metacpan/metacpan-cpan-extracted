@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -98,16 +98,17 @@ be toggled independently. Each checkbox corresponds to a bit in an internal
 value mask, allowing multiple items to be selected at the same time.
 
 The control inherits navigation, drawing, and event handling behavior from
-C<TCluster>. Only the marking and toggle logic are specialized to support
-multi-state selection.
+L<TCluster|TUI::Dialogs::Cluster>. Only the marking and toggle logic are 
+specialized to support multi-state selection.
 
 =head2 Commonly Used Features
 
-Typical code creates a short C<TSItem> chain, constructs C<TCheckBoxes>, and
-inserts it into a dialog. The selected state is stored as a bitmask, so each
-checkbox corresponds to one bit in C<value>. In practice you usually read and
-write that value through dialog data transfer, while C<mark> and C<press> are
-mainly useful when implementing or testing custom event behavior.
+Typical code creates a short L<TSItem|TUI::Dialogs::StrItem> chain, constructs 
+C<TCheckBoxes>, and inserts it into a dialog. The selected state is stored as a 
+bitmask, so each checkbox corresponds to one bit  in C<value>. In practice you 
+usually read and write that value through dialog data transfer, while L</mark> 
+and L</press> are mainly useful when implementing  or testing custom event 
+behavior.
 
 =head1 VARIABLES
 
@@ -115,8 +116,8 @@ The following global variable affects the visual rendering of C<TCheckBoxes>.
 
 =head2 $button
 
-Defines the character pattern used to display a single checkbox item,
-for example C< [ ] >.
+Defines the character pattern (I<Str>) used to display a single checkbox item,
+for example C<' [ ] '>.
 
 =head1 CONSTRUCTOR
 
@@ -134,7 +135,7 @@ Creates a new checkbox cluster.
 =item bounds
 
 Bounding rectangle defining the position and size of the checkbox group
-(I<TRect>).
+(L<TRect|TUI::Objects::Rect>).
 
 =item strings
 
@@ -172,9 +173,9 @@ Toggles the bit assigned to the given item index in the internal value mask.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::RadioButtons>,
-L<TUI::Dialogs::Dialog>,
-L<TUI::Views::Cluster>
+L<TRadioButtons|TUI::Dialogs::RadioButtons>,
+L<TDialog|TUI::Dialogs::Dialog>,
+L<TCluster|TUI::Views::Cluster>
 
 =head1 AUTHORS
 

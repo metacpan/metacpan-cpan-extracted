@@ -195,6 +195,7 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
 
     STRLEN mlen, plen;
     const char *method;
+    int ext_connect = 0;
 
     {   /* Reverse-proxy trust, before anything reads the env: REMOTE_ADDR is
          * rewritten to the real client so rate_limit, block_ip, the access
@@ -219,11 +220,23 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
      *
      * Only the METHOD USED FOR MATCHING changes. REQUEST_METHOD in $env
      * still reads CONNECT, which is what punk_ws_dispatch keys on and what
-     * an application should see. */
+     * an application should see.
+     *
+     * `ext_connect` is what the rewrite costs and has to pay back. Matching
+     * as GET reaches every GET route, every API operation and every mount,
+     * while the origin check lives in punk_ws_dispatch and so runs only once
+     * a `ws` route has matched. On this transport a 2xx IS the acceptance,
+     * written as :status on the CONNECT stream, so a page anywhere could
+     * otherwise open a socket at any path and read open-or-error as that
+     * path's status - the cross-origin status read a browser exists to
+     * prevent, with the user's cookies attached. The flag is carried to the
+     * gate below, which is where a CONNECT that did not land on a websocket
+     * route stops. */
     if (mlen == 7 && memEQ(method, "CONNECT", 7)) {
         SV **cp = hv_fetchs(env, "psgix.connect_protocol", 0);
         if (cp && *cp && SvOK(*cp) && SvCUR(*cp) == 9
             && memEQ(SvPVX(*cp), "websocket", 9)) {
+            ext_connect = 1;
             method = "GET";
             mlen   = 3;
         }
@@ -292,8 +305,13 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
      * arrives here with an empty one - and punk_oa croaks when Open::API's
      * ABI does not match. That made Open::API an effective hard requirement
      * of the dynamic-route path for every app in the world, and the failure
-     * it produced named the API path, which the app was not using. */
-    if (!rec && apims && av_len(apims) >= 0) {
+     * it produced named the API path, which the app was not using.
+     *
+     * An Extended CONNECT skips the whole loop. An OpenAPI operation is
+     * never a websocket route, so there is nothing here it can legitimately
+     * reach, and the gate below would refuse the answer anyway - after the
+     * operation's handler had already run. */
+    if (!rec && !ext_connect && apims && av_len(apims) >= 0) {
         const oa_abi *A = punk_oa(aTHX);
         SSize_t ai, an = av_len(apims) + 1;
         for (ai = 0; ai < an; ai++) {
@@ -352,7 +370,16 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
         }
     }
 
-    if (!rec && mounts) {                    /* 3. PSGI / static mounts */
+    /* 3. PSGI / static mounts.
+     *
+     * Also skipped on an Extended CONNECT, and for a sharper reason than the
+     * API mounts: a mounted app owns its answer and never comes back through
+     * the gate below, so delegating one would hand a request Punk's own
+     * router is about to refuse to an app that sees REQUEST_METHOD CONNECT
+     * and answers on path alone. A mounted PUNK app with websocket routes of
+     * its own is the case this gives up; it is not reachable over HTTP/2 or
+     * HTTP/3 until a mount can declare that it wants the handshake. */
+    if (!rec && !ext_connect && mounts) {
         SSize_t mi, mn = av_len(mounts) + 1;
         for (mi = 0; mi < mn; mi++) {
             SV **mp = av_fetch(mounts, mi, 0);
@@ -435,6 +462,37 @@ static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
                 if (pr_allow(aTHX_ rt, method, mlen, path, tl, allowv))
                     caps = sv_2mortal(newRV_inc((SV *)allowv));
             }
+        }
+    }
+
+    /* The Extended CONNECT gate: an upgrade is answerable by a websocket
+     * route and by nothing else.
+     *
+     * Everything above matched as GET, which is the point and also the whole
+     * exposure: without this, a CONNECT landing on an ordinary route ran its
+     * guards and its handler, and the status came back as :status on the
+     * CONNECT stream, where 2xx means accepted. A cross-origin page reads
+     * that as open-or-error and has a one-bit oracle on any path, cookies
+     * included - and the body that follows is written as DATA frames the
+     * client parses as RFC 6455, so it is not reliably one bit either.
+     *
+     * The refusal is ONE status for every miss, and deliberately not the 405
+     * merge or on_not_found below: "this path is a route under some other
+     * method" and "the app has a custom 404" are both answers, and an answer
+     * that varies by path is the same oracle in a smaller font. A route that
+     * IS a websocket falls through to the dispatch, where the origin check
+     * and the route's own `origin` option decide. */
+    if (ext_connect) {
+        int is_ws = 0;
+        if (rec && SvROK(rec) && SvTYPE(SvRV(rec)) == SVt_PVHV) {
+            SV **w = hv_fetchs((HV *)SvRV(rec), K_WS, 0);
+            is_ws = (w && *w && SvTRUE(*w));
+        }
+        if (!is_ws) {
+            SV *out = ps_err_triplet(aTHX_ 404, PS_ERR_404,
+                                     sizeof(PS_ERR_404) - 1, NULL);
+            if (PK_OBS_WANT_RES) pk_obs_fire_res(aTHX_ c, out);
+            return out;
         }
     }
 

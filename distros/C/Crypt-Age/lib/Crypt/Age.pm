@@ -9,7 +9,7 @@ use Crypt::Age::Header;
 use namespace::clean;
 
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 sub generate_keypair {
     my ($class) = @_;
@@ -279,7 +279,7 @@ Crypt::Age - Perl implementation of age encryption (age-encryption.org)
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

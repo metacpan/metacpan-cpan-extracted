@@ -6,7 +6,7 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed reftype refaddr);
 
 # ABSTRACT: Serialization for the Devel::ebug wire protocol
-our $VERSION = '0.67'; # VERSION
+our $VERSION = '0.68'; # VERSION
 
 
 our $JSON;
@@ -150,7 +150,7 @@ Devel::ebug::Wire - Serialization for the Devel::ebug wire protocol
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 SYNOPSIS
 
@@ -243,6 +243,8 @@ Contributors:
 Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
 
 Taisuke Yamada
+
+Richard Leach (HYDAHY)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::SourceCriterion;
 # ABSTRACT: SourceCriterion defines what criterion is used to group requests as originating from a common source.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s ipStrategy        => '+IO::K8s::Traefik::V1alpha1::IPStrategy';
@@ -24,7 +24,7 @@ IO::K8s::Traefik::V1alpha1::SourceCriterion - SourceCriterion defines what crite
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 ipStrategy
 

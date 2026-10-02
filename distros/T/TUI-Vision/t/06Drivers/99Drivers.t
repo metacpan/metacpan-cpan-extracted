@@ -4,6 +4,16 @@ use warnings;
 use Test::More;
 
 BEGIN {
+  if ( $^O ne 'MSWin32' ) { 
+    plan skip_all => 'No TTY available'
+      unless -t STDIN
+          && -t STDOUT
+          && defined( $ENV{TERM} )
+          && $ENV{TERM} ne 'dumb';
+  }
+}
+
+BEGIN {
   use_ok 'TUI::Drivers';
 }
 
@@ -24,7 +34,13 @@ isa_ok( CharScanType->new(),   'CharScanType' );
 isa_ok( KeyDownEvent->new(),   'KeyDownEvent' );
 isa_ok( MessageEvent->new(),   'MessageEvent' );
 isa_ok( MouseEventType->new(), 'MouseEventType' );
-isa_ok( new_TEvent(),           TEvent );
+
+isa_ok( new_TEvent(),       TEvent );
+isa_ok( TScreenCharacter->new(),   TScreenCharacter );
+isa_ok( TColorAttr->new(),  TColorAttr );
+isa_ok( TColor->new(),      TColor );
+isa_ok( TAttrPair->new(),   TAttrPair );
+isa_ok( TScreenCell->new(), TScreenCell );
 
 SKIP: {
   skip 'No mouse available', 2 unless THardwareInfo->getButtonCount();

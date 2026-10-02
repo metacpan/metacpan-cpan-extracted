@@ -1,6 +1,6 @@
 package Langertha::Knarr::Response;
 # ABSTRACT: Normalized chat response shared across all Knarr handlers and protocol formatters
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 use Moose;
 use Scalar::Util qw( blessed );
 use Langertha::Usage;
@@ -13,6 +13,12 @@ has content => (
 );
 
 has model => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  default => sub { undef },
+);
+
+has upstream_model => (
   is => 'ro',
   isa => 'Maybe[Str]',
   default => sub { undef },
@@ -137,6 +143,7 @@ sub clone_with {
   return ref($self)->new(
     content       => $self->content,
     model         => $self->model,
+    upstream_model => $self->upstream_model,
     usage         => $self->usage,
     tool_calls    => $self->tool_calls,
     finish_reason => $self->finish_reason,
@@ -164,7 +171,7 @@ Langertha::Knarr::Response - Normalized chat response shared across all Knarr ha
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 
@@ -187,7 +194,18 @@ Plain assistant text. Defaults to empty string.
 
 =head2 model
 
-The model id that produced the response, if known.
+The model id the response is labeled with for the client, if known: the
+model that produced it, or the configured name a handler answers under
+(L<Langertha::Knarr::Handler::Router> labels a routed answer with the model
+of its config entry).
+
+=head2 upstream_model
+
+The model the backend reported answering with, when a handler relabeled
+L</model> for the client; C<undef> otherwise, L</model> then being the
+reported one. Providers answer with a concrete name for the one asked
+(C<gpt-4o> answers as C<gpt-4o-2024-08-06>); the Langfuse generation records
+this one, see L<Langertha::Knarr::Handler::Tracing>.
 
 =head2 usage
 

@@ -6,6 +6,17 @@ use FindBin ();
 use Game::Xiangqi::Engine ':all';
 my $E = 'Game::Xiangqi::Engine';
 
+# Every subtest below calls its board $b, which is sort's own $b. A sort block
+# written inside one of those scopes compares the BOARD, not the element: perl
+# resolves the lexical and the comparator silently becomes nonsense. 5.18 and
+# 5.20 say so as a warning and run on; 5.14 makes it fatal, which is how this
+# was found. So the one comparator that needs a hash lives out here, at file
+# scope, where nothing shadows $a and $b.
+sub by_count_desc {
+    my ($h) = @_;
+    return sort { $h->{$b} <=> $h->{$a} } keys %$h;
+}
+
 # THE LADDER IS CITED, NOT GENERATED. t/perft.txt is transcribed from
 # https://www.chessprogramming.org/Chinese_Chess_Perft_Results (data by Patrice
 # Duhamel and Nguyen Pham), fetched 25 Sep 2026. A baseline of our own counts
@@ -68,7 +79,7 @@ for my $p (sort { $a <=> $b } keys %RUN) {
             }
             diag("divide at depth $d, by root move:");
             my %div = $b->perft_divide($d);
-            for my $mv (sort { $div{$b} <=> $div{$a} } keys %div) {
+            for my $mv (by_count_desc(\%div)) {
                 diag(sprintf("  %d -> %d  (%d,%d) to (%d,%d)",
                     $mv, $div{$mv},
                     $E->file_of($E->move_from($mv)), $E->rank_of($E->move_from($mv)),

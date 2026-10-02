@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::SecretOrConfigMap;
 # ABSTRACT: cert defines the Client certificate to present when doing client-authentication.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s configMap => 'Core::V1::ConfigMapKeySelector';
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1alpha1::SecretOrConfigMap - cert defines the Clie
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 configMap
 

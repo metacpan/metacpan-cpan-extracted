@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionSpec;
 # ABSTRACT: StorageVersionSpec is an empty spec.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 1;
@@ -17,7 +17,7 @@ IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionSpec - StorageVersionSp
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

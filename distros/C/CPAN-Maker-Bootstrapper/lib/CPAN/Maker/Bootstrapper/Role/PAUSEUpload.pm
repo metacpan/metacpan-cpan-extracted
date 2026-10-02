@@ -79,8 +79,10 @@ sub cmd_publish_to_cpan {
     }
   );
 
-  die sprintf "ERROR: upload failed - %s %s\n%s", $res->{status}, $res->{reason}, $res->{content}
+  die sprintf "ERROR: upload failed - %s %s\n", $res->{status}, $res->{reason}
     if !$res->{success};
+
+  print {*STDERR} "Successfully uploaded $file for PAUSE_USER $user\n";
 
   return $SUCCESS;
 }

@@ -12,7 +12,7 @@ use IO::K8s::Resource ();
 use IO::K8s::Unstructured ();
 use namespace::clean;
 
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
@@ -1458,7 +1458,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 

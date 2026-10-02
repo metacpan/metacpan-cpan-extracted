@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ExternalSecretRewriteRegexp;
 # ABSTRACT: Used to rewrite with regular expressions.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s source => Str, { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ExternalSecretRewriteRegexp - Used to rewrit
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 source
 

@@ -52,8 +52,8 @@ ok($gemini->can('chat_with_tools_f'), 'chat_with_tools_f available');
   is(scalar @$decls, 2, 'two function declarations');
   is($decls->[0]{name}, 'echo', 'first function name');
   is($decls->[0]{description}, 'Echo the input text', 'first function description');
-  is($decls->[0]{parameters}{type}, 'object', 'parameters type');
-  is_deeply($decls->[0]{parameters}{required}, ['message'], 'parameters required');
+  is($decls->[0]{parametersJsonSchema}{type}, 'object', 'parametersJsonSchema type');
+  is_deeply($decls->[0]{parametersJsonSchema}{required}, ['message'], 'parametersJsonSchema required');
   is($decls->[1]{name}, 'add', 'second function name');
 }
 

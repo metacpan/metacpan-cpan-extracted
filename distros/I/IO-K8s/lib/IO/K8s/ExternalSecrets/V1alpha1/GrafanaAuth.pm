@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GrafanaAuth;
 # ABSTRACT: Auth is the authentication configuration to authenticate against the Grafana instance.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s basic => '+IO::K8s::ExternalSecrets::V1alpha1::GrafanaBasicAuth';
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GrafanaAuth - Auth is the authentication con
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 basic
 

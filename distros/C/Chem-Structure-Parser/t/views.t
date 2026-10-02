@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # The flat views over a parsed structure, and the summary.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

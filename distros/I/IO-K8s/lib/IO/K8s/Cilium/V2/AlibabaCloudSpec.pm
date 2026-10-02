@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::AlibabaCloudSpec;
 # ABSTRACT: AlibabaCloud is the AlibabaCloud IPAM specific configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s 'availability-zone'   => Str;
@@ -34,7 +34,7 @@ IO::K8s::Cilium::V2::AlibabaCloudSpec - AlibabaCloud is the AlibabaCloud IPAM sp
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 availability-zone
 

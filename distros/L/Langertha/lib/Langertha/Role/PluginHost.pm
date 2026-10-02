@@ -1,6 +1,6 @@
 package Langertha::Role::PluginHost;
 # ABSTRACT: Role for objects that host plugins (Raider, Engine)
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose::Role;
 use Future::AsyncAwait;
 use Log::Any qw( $log );
@@ -21,18 +21,39 @@ sub _build_plugins {
   return $self->can('_sugar_plugins') ? $self->_sugar_plugins : [];
 }
 
-has _plugin_instances => (
-  is      => 'ro',
-  isa     => 'ArrayRef',
-  lazy    => 1,
-  builder => '_build_plugin_instances',
+has plugin_instances => (
+  is       => 'ro',
+  isa      => 'ArrayRef',
+  lazy     => 1,
+  builder  => '_build_plugin_instances',
+  # constructor key kept as the original private name (compat)
+  init_arg => '_plugin_instances',
 );
 
-has _plugin_args => (
+
+sub _plugin_instances { $_[0]->plugin_instances }
+
+has plugin_args => (
   is      => 'ro',
   isa     => 'HashRef',
-  default => sub { {} },
+  lazy    => 1,
+  builder => '_build_plugin_args',
 );
+
+
+has _legacy_plugin_args => (
+  is        => 'ro',
+  isa       => 'HashRef',
+  init_arg  => '_plugin_args',
+  predicate => '_has_legacy_plugin_args',
+);
+
+sub _build_plugin_args {
+  my ( $self ) = @_;
+  return $self->_has_legacy_plugin_args ? $self->_legacy_plugin_args : {};
+}
+
+sub _plugin_args { $_[0]->plugin_args }
 
 sub _parse_plugin_specs {
   my ( $self ) = @_;
@@ -59,12 +80,12 @@ sub _build_plugin_instances {
     if (ref $spec eq 'ARRAY') {
       my ($name, $args) = @$spec;
       my $class = $self->_resolve_plugin_name($name);
-      push @instances, $class->new(%{$self->_plugin_args}, %$args, host => $self);
+      push @instances, $class->new(%{$self->plugin_args}, %$args, host => $self);
     } elsif (ref $spec && $spec->isa('Langertha::Plugin')) {
       push @instances, $spec;
     } else {
       my $class = $self->_resolve_plugin_name($spec);
-      push @instances, $class->new(%{$self->_plugin_args}, host => $self);
+      push @instances, $class->new(%{$self->plugin_args}, host => $self);
     }
   }
   # Build event registry and validate dependencies
@@ -115,7 +136,7 @@ async sub fire_event_f {
   $log->tracef("[%s] Firing event: %s", ref $self, $event_name);
   my $method = "on_${event_name}";
   my @results;
-  for my $plugin (@{$self->_plugin_instances}) {
+  for my $plugin (@{$self->plugin_instances}) {
     if ($plugin->can($method)) {
       push @results, await $plugin->$method(@args);
     }
@@ -127,15 +148,18 @@ async sub fire_event_f {
 
 # --- Plugin hook dispatch ---
 
-async sub _plugin_pipeline_tool_call {
+async sub plugin_pipeline_tool_call_f {
   my ( $self, $name, $input ) = @_;
-  for my $plugin (@{$self->_plugin_instances}) {
+  for my $plugin (@{$self->plugin_instances}) {
     my @result = await $plugin->plugin_before_tool_call($name, $input);
     return () unless @result;
     ( $name, $input ) = @result;
   }
   return ( $name, $input );
 }
+
+
+sub _plugin_pipeline_tool_call { shift->plugin_pipeline_tool_call_f(@_) }
 
 1;
 
@@ -151,7 +175,7 @@ Langertha::Role::PluginHost - Role for objects that host plugins (Raider, Engine
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 DESCRIPTION
 
@@ -184,6 +208,34 @@ ArrayRef of plugin specifications. Each entry may be:
 
 =back
 
+=head2 plugin_instances
+
+    for my $plugin (@{ $host->plugin_instances }) {
+      await $plugin->plugin_before_llm_call($conversation, $iteration);
+    }
+
+Read-only ArrayRef of the instantiated L<Langertha::Plugin> objects, in the
+order given in L</plugins>. Built lazily on first access: short names are
+resolved, constructed with L</plugin_args> plus any per-plugin args and
+C<< host => $self >>, and C<requires_events> is checked against the loaded
+plugins' C<provides_events> (dies when a required event has no provider).
+A host that runs its own hook chain (for example L<Langertha::Raider>)
+iterates this list and calls the hook on each plugin itself.
+
+C<_plugin_instances> remains an alias of this reader.
+
+=head2 plugin_args
+
+    plugins     => ['MyPlugin'],
+    plugin_args => { verbose => 1 },
+
+HashRef of constructor arguments passed to every plugin the host builds from
+a name. Per-plugin args (C<< Name => { ... } >> in L</plugins>) win over these;
+C<host> always wins. Already-instantiated plugin objects are not touched.
+
+The older constructor key C<_plugin_args> is still accepted and used when
+C<plugin_args> is not given; the C<_plugin_args> reader is an alias of this one.
+
 =head2 fire_event_f
 
     my @results = await $host->fire_event_f('history_saved', $data);
@@ -211,6 +263,22 @@ L<Langertha::Plugin/requires_events>.
 =item * L<Langertha::Raider> - Autonomous agent that consumes this role
 
 =back
+
+=head2 plugin_pipeline_tool_call_f
+
+    my @call = await $host->plugin_pipeline_tool_call_f($name, $input);
+    return skipped_result() unless @call;
+    my ( $tool_name, $tool_input ) = @call;
+
+Runs C<plugin_before_tool_call> through every plugin in L</plugin_instances>,
+in order, as a pipeline: each plugin receives the C<($name, $input)> the
+previous one returned. Returns a Future resolving to the final
+C<($name, $input)> pair, or to the empty list as soon as any plugin returns
+the empty list, meaning the tool call is skipped (later plugins are not
+asked). With no plugins it returns the arguments unchanged. A plugin's
+failure fails the returned Future.
+
+C<_plugin_pipeline_tool_call> remains an alias of this method.
 
 =head1 SUPPORT
 

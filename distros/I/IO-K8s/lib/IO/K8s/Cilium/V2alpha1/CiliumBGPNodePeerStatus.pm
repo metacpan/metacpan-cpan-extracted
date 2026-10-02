@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPNodePeerStatus;
 # ABSTRACT: CiliumBGPNodePeerStatus is the status of a BGP peer.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s establishedTime => Str;
@@ -32,7 +32,7 @@ IO::K8s::Cilium::V2alpha1::CiliumBGPNodePeerStatus - CiliumBGPNodePeerStatus is 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 establishedTime
 

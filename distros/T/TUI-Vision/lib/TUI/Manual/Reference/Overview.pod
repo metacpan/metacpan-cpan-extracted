@@ -1,0 +1,121 @@
+# PODNAME: TUI::Manual::Reference::Overview
+# ABSTRACT: Overview of TUI::Vision Classes
+
+__END__
+
+=pod
+
+=head1 NAME
+
+TUI::Manual::Reference::Overview - Overview of TUI::Vision Classes
+
+=head1 OVERVIEW
+
+  TObject
+  |
+  +- TCollection
+  |  |
+  |  +- TDirCollection
+  |  +- TLineCollection
+  |  +- TSortedCollection
+  |     |
+  |     +- TFileCollection
+  |     +- TStringCollection
+  |
+  +- TGroup
+  |  |
+  |  +- TDeskTop
+  |  +- TProgram
+  |  |  +- TApplication
+  |  |
+  |  +- TWindow
+  |     |
+  |     +- TDialog
+  |     |  |
+  |     |  +- TChDirDialog
+  |     |  +- TColorDialog
+  |     |  +- TFileDialog
+  |     |  +- TMouseDialog
+  |     |
+  |     +- TFileWindow
+  |     +- THistoryWindow
+  |
+  +- TView
+    |
+    +- TBackground
+    +- TButton
+    +- TCluster
+    |  |
+    |  +- TCheckBoxes
+    |  +- TMultiCheckBoxes
+    |  +- TRadioButtons
+    |
+    +- TClockView
+    +- TColorDisplay
+    +- TColorSelector
+    +- TEventViewer
+    +- TFileInfoPane
+    +- TFrame
+    +- THeapView
+    +- THistory
+    +- TInputLine
+    |  +- TFileInputLine
+    |
+    +- TListViewer
+    |  |
+    |  +- TColorGroupList
+    |  +- TColorItemList
+    |  +- THistoryViewer
+    |  |
+    |  +- TListBox
+    |     |
+    |     +- TDirListBox
+    |     +- TEditListBox
+    |     +- TSortedListBox
+    |        |
+    |        +- TFileList
+    |
+    +- TMenuView
+    |  |
+    |  +- TMenuBar
+    |  +- TMenuBox
+    |     +- TMenuPopup
+    |
+    +- TMonoSelector
+    +- TScrollBar
+    +- TScroller
+    |  |
+    |  +- TFileViewer
+    |  +- TTextDevice
+    |     +- TTerminal
+    |
+    +- TStaticText
+    |  |
+    |  +- TClickTester
+    |  +- TLabel
+    |  +- TParamText
+    |
+    +- TStatusLine
+
+=head2 Source Module Inventory
+
+  lib/TUI/
+    +-- App/      - TProgram, TApplication, TDeskTop, TBackground, etc.
+    +-- ColorSel/ - TColorDialog, TColorDisplay, TColorSelector, TMonoSelector, 
+    |               TColorGroupList, TColorItemList, etc.
+    +-- Dialogs/  - TDialog, TButton, TInputLine, TLabel, etc.
+    +-- Drivers/  - TEvent, TScreen, TEventQueue, THardwareInfo, etc.
+    +-- Editors/  - TEditor, TMemo, TFileEditor, TIndicator, etc.
+    +-- Gadgets/  - TClockView, TClickTester, TEventViewer,
+    |               TFileViewer, TFileWindow, THeapView, TMouseDialog, etc.
+    +-- Help/     - THelpFile, THelpTopic, THelpViewer, etc.
+    +-- Memory/   - Memory manager
+    +-- Menus/    - TMenuBar, TMenuBox, TStatusLine, etc.
+    +-- Objects/  - TObject, TPoint, TRect, TCollection, TSortedCollection, etc.
+    +-- StdDlg/   - TFileDialog, TChDirDialog, TDirListBox, etc.
+    +-- TextView/ - TTextDevice, TTerminal, etc.
+    +-- toolkit/  - Object toolkit
+    +-- Validate/ - TValidator, TFilterValidator, TPXPictureValidator, etc.
+    +-- Views/    - TDrawBuffer, TView, TGroup, TFrame, TScroller, TWindow, etc.
+
+=cut

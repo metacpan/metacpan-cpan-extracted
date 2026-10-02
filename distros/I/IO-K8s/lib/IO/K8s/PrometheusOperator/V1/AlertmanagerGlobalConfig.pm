@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::AlertmanagerGlobalConfig;
 # ABSTRACT: global defines the global parameters of the Alertmanager configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s httpConfig     => '+IO::K8s::PrometheusOperator::V1::HTTPConfigWithProxy';
@@ -46,7 +46,7 @@ IO::K8s::PrometheusOperator::V1::AlertmanagerGlobalConfig - global defines the g
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 httpConfig
 

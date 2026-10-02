@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ShareableCapacityStatus;
 # ABSTRACT: ShareableCapacityStatus reports aggregate amounts for a single shareable capacity key.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s available => Quantity, 'required';
@@ -29,7 +29,7 @@ IO::K8s::Api::Resource::V1alpha3::ShareableCapacityStatus - ShareableCapacitySta
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 available
 

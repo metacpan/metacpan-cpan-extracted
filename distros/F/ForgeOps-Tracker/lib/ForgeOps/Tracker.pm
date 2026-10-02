@@ -24,7 +24,7 @@ use Time::HiRes ();
 # directly: retrying the identical 0.2.0 tarball came back 409 Conflict, not the original success
 # response repeated). No functional change from 0.2.0; this bump exists solely to get a fresh,
 # uploadable version number.
-our $VERSION = '0.12.0';
+our $VERSION = '0.12.1';
 
 my $configuration;
 my $reporter;
@@ -562,6 +562,18 @@ sub flush_metrics {
     $metric_buffer->flush if $metric_buffer;
     $infrastructure_metric_buffer->flush if $infrastructure_metric_buffer;
     return;
+}
+
+# flush($timeout): sends every error event, change and trace still waiting on the background thread
+# right now, and waits for one it already has under way, giving up after $timeout seconds (default
+# 5). Returns 1 if everything went out in time. A program that ends normally does this by itself
+# from an END block, so a script that reports an error and exits needs nothing more; call flush() if
+# it might exit another way (POSIX::_exit, exec) or you want delivery confirmed before moving on.
+sub flush {
+    my ($timeout) = @_;
+    my @queues = grep { defined } ($reporter && $reporter->{delivery_queue}), $change_queue, $span_queue;
+    return 1 unless @queues;
+    return ForgeOps::Tracker::DeliveryQueue->drain_all($timeout, @queues);
 }
 
 # @internal not part of the public API: resets module state between test cases. The startup change

@@ -6,8 +6,6 @@ Clone - recursively copy Perl datatypes
 
 ## Synopsis
 
-## Synopsis
-
 ```perl
 use Clone 'clone';
 
@@ -134,7 +132,7 @@ Clone properly handles circular references, preventing infinite loops:
 
 ## Limitations
 
-* **Maximum Recursion Depth**: Clone uses a recursion depth counter to prevent stack overflow. The default limit is 4000 rdepth units on Linux/macOS and 2000 on Windows/Cygwin. Each nesting level consumes approximately 2 rdepth units, so the effective limits are roughly 2000 nesting levels on Linux/macOS and 1000 on Windows/Cygwin. For arrays, exceeding the limit triggers an iterative fallback. For other types, it produces a warning and a shallow copy. You can override the limit via `clone($data, $depth)`.
+* **Maximum Recursion Depth**: Clone uses a recursion depth counter to prevent stack overflow. The default limit is 4000 rdepth units on Linux/macOS and 2000 on Windows/Cygwin. Each nesting level consumes approximately 2 rdepth units, so the effective limits are roughly 2000 nesting levels on Linux/macOS and 1000 on Windows/Cygwin. Exceeding the limit triggers an iterative fallback that still deep-copies arrays, hashes and all reference types (including deeply nested scalar references); it drives nested containers through a heap-allocated work queue, so its C stack usage does not grow with nesting depth. Only non-clonable types (globs, code refs, formats, IO handles) are shared past the limit, as they are at any depth. You can override the limit via `clone($data, $depth)`.
 
 * **Filehandles and IO Objects**: Filehandles and IO objects are cloned, but the underlying file descriptor is shared. Both the original and cloned filehandle will refer to the same file position. For DBI database handles and similar objects, Clone attempts to handle them safely, but behavior may vary depending on the object type.
 

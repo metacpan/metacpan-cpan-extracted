@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::PortRuleHTTP;
 # ABSTRACT: PortRuleHTTP is a list of HTTP protocol constraints.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s headerMatches => ['+IO::K8s::Cilium::V2::HeaderMatch'];
@@ -28,7 +28,7 @@ IO::K8s::Cilium::V2::PortRuleHTTP - PortRuleHTTP is a list of HTTP protocol cons
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 headerMatches
 

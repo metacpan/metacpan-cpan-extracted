@@ -14,23 +14,18 @@ subtest 'fexpand basic expansion' => sub {
   $path = 'foo/bar.txt';
   fexpand( $path );
 
-  if ( $^O eq 'MSWin32' ) {
-    like(
-      $path,
-      qr{^[A-Z]:\\},
-      'Windows: relative path expanded to absolute with drive'
-    );
-  }
-  else {
-    like(
-      $path,
-      qr{^/},
-      'Unix: relative path expanded to absolute'
-    );
-  }
   like(
     $path,
-    qr{foo\\bar\.txt$}i,
+    $^O eq 'MSWin32'
+      ? qr{^[A-Z]:\\}
+      : qr{^/},
+    'relative path expanded to absolute'
+  );
+  like(
+    $path,
+    $^O eq 'MSWin32'
+      ? qr{foo\\bar\.txt$}i
+      : qr{foo/bar\.txt$}i,
     'path suffix preserved'
   );
 }; #/ 'fexpand basic expansion' => sub

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ACRWorkloadIdentity;
 # ABSTRACT: WorkloadIdentity uses Azure Workload Identity to authenticate with Azure.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s serviceAccountRef => '+IO::K8s::ExternalSecrets::V1::ServiceAccountSelector';
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ACRWorkloadIdentity - WorkloadIdentity uses 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 serviceAccountRef
 

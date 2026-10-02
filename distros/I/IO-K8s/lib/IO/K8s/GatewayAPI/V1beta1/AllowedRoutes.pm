@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::AllowedRoutes;
 # ABSTRACT: AllowedRoutes defines the types of routes that MAY be attached to a Listener and the trusted namespaces where those Route resources MAY be present.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s kinds      => ['+IO::K8s::GatewayAPI::V1beta1::RouteGroupKind'];
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1beta1::AllowedRoutes - AllowedRoutes defines the types of
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 kinds
 

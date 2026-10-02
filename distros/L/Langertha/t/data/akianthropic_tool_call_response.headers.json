@@ -1,0 +1,8 @@
+{
+   "access-control-allow-origin" : "*",
+   "connection" : "close",
+   "content-length" : "375",
+   "content-type" : "application/json",
+   "date" : "Tue, 01 Sep 2026 19:24:43 GMT",
+   "server" : "Apache"
+}

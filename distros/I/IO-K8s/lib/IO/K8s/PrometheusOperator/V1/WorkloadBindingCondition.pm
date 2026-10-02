@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::WorkloadBindingCondition;
 # ABSTRACT: ConfigResourceCondition describes the status of configuration resources linked to Prometheus, PrometheusAgent, Alertmanager or ThanosRuler.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time, { required => 'schema' };
@@ -30,7 +30,7 @@ IO::K8s::PrometheusOperator::V1::WorkloadBindingCondition - ConfigResourceCondit
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 lastTransitionTime
 

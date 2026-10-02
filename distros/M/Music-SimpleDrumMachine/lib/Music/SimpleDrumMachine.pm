@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0602';
 
 use v5.36;
 use feature 'try';
@@ -33,6 +33,13 @@ has beats => (
     is      => 'ro',
     isa     => sub { croak "$_[0] is not an integer" unless $_[0] =~ /^\d+$/ },
     default => sub { 16 },
+);
+
+
+has bars => (
+    is      => 'ro',
+    isa     => sub { croak "$_[0] is not a positive integer" unless $_[0] =~ /^[1-9]\d*$/ },
+    default => sub { 4 },
 );
 
 
@@ -291,7 +298,6 @@ my %attrs = (
         _bar_count  => 0, # how many measures?
         _hats       => 0, # 1st hihat beat bit
         _part_inc   => 0, # number of next_part
-        _trigger    => 0, # trigger a fill
         _filled     => 0, # we just filled
     },
 );
@@ -343,15 +349,17 @@ sub BUILD {
             $self->_ticks($self->_ticks + 1);
 
             if ($self->_ticks % $self->_nth == 0) {
+                my $phrase = $self->beats * $self->bars; # steps in a phrase
+                my $pos    = $self->_beat_count % $phrase;
                 if (($self->filling || (ref($self->next_part) && $self->next_part->[ $self->_part_inc % $self->next_part->@* ] =~ /fill/))
-                    && ($self->_beat_count + $self->beats - $self->_trigger) % ($self->beats * $self->divisions - 1) == 0
+                    && $self->bars > 1
+                    && $pos == $phrase - $self->beats # the last bar of the phrase
                 ) {
                     $self->_adjust_drums(1); # fill!
                     $self->_filled($self->_filled + 1);
                 }
-                if ($self->_beat_count % ($self->beats * $self->divisions) == 0) {
+                if ($pos == 0) {
                     $self->_adjust_drums(0); # normal part
-                    $self->_trigger($self->_trigger + 1);
                 }
                 my @hits; # for the score, if saving
                 for my $drum (keys $self->drums->%*) { # fill the queue
@@ -452,7 +460,7 @@ sub _adjust_drums($self, $fill_flag) {
     }
     if ($self->filling) {
         $self->_hats($self->drums->{closed}{pat}[0]); # save bit
-        $self->drums->{fillcrash}{pat} = [ (0) x ($self->beats * $self->divisions) ];
+        $self->drums->{fillcrash}{pat} = [ (0) x ($self->beats * $self->bars) ];
         $self->_adjust_cymbals;
         $self->_filled(0);
     }
@@ -541,26 +549,29 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0600
+version 0.0602
 
 =head1 SYNOPSIS
 
   use Music::SimpleDrumMachine ();
 
-  my $dm = Music::SimpleDrumMachine->new( # use defaults
+  # use defaults
+  my $dm = Music::SimpleDrumMachine->new(
     port_name => 'midi device', # required
   );
-
-  # OR:
+  # Or set things:
   $dm = Music::SimpleDrumMachine->new(
     port_name => 'midi device',
     bpm       => 100,
+    save      => 'drums.mid',
     parts     => {
         part_A => \&part_A,
         part_B => \&part_B,
     },
     next_part => 'part_A',
-    fills     => { fill_A => \&fill_A },
+    fills     => {
+        fill_A => \&fill_A,
+    },
     next_fill => 'fill_A',
     verbose   => 1,
   );
@@ -624,6 +635,17 @@ channel.
 The number of beats in a phrase.
 
 Default: C<16>
+
+=head2 bars
+
+  $bars = $dm->bars;
+
+The number of measures (bars) a part plays before the next part is
+chosen. When this is greater than C<1>, the last bar of the phrase is
+available for a fill. With C<1>, a part changes every measure and
+there is no room for fills.
+
+Default: C<4>
 
 =head2 bpm
 

@@ -1,6 +1,6 @@
 package Langertha::UsageRecord;
 # ABSTRACT: Tagged ledger entry combining Usage, Cost, and request metadata
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Langertha::Usage;
 use Langertha::Cost;
@@ -44,11 +44,21 @@ sub to_hash {
     tool_names      => $self->tool_names,
     input_cost_usd  => $self->cost->input_usd  + 0,
     output_cost_usd => $self->cost->output_usd + 0,
+    cache_read_cost_usd  => $self->cost->cache_read_usd + 0,
+    cache_write_cost_usd => $self->cost->cache_write_usd + 0,
     total_cost_usd  => $self->cost->total_usd  + 0,
     currency        => $self->cost->currency,
     pricing_version => $self->pricing_version,
   };
 }
+
+# Make the object transparent to any JSON encoder configured with
+# convert_blessed => 1 (the house default, see Langertha::Plugin::Langfuse).
+# to_hash is the complete canonical representation — every attribute is
+# flattened into the ledger hash, and api_key_id is a normalized identifier
+# (which key was used), not the credential itself — so this is a plain
+# delegator, nothing is dropped.
+sub TO_JSON { shift->to_hash }
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -65,7 +75,7 @@ Langertha::UsageRecord - Tagged ledger entry combining Usage, Cost, and request 
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SUPPORT
 

@@ -1,0 +1,195 @@
+# PODNAME: Langertha::Runtime::Metrics::EngineContract
+# ABSTRACT: Wire contract for self-hosted inference engine /metrics endpoints
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Langertha::Runtime::Metrics::EngineContract - Wire contract for self-hosted inference engine /metrics endpoints
+
+=head1 VERSION
+
+version 0.503
+
+=head1 DESCRIPTION
+
+This document captures, per engine, the exact HTTP shape of the
+runtime-metrics surface that L<Langertha::Role::Runtime::MetricsPoll>
+scrapes. Engines listed here are self-hosted (no API key); the
+contract is what their server emits at a known URL path.
+
+The contract drives two things:
+
+=over 4
+
+=item * Which URL path to GET
+
+=item * How to parse the response body into the Prometheus text-format
+record shape C<< { name, type, value, labels } >> that
+L<Langertha::Runtime::Metrics> consumes.
+
+=back
+
+Each engine section lists the wire format (Prometheus text vs.
+custom JSON), the URL path, the namespace prefix or metric-key shape
+to allowlist, and a short worked example of the response body.
+
+=head2 vLLM C</metrics>
+
+=over 4
+
+=item * URL: C<{base}/metrics> (base is the C<url> attribute without
+the trailing C</v1>)
+
+=item * Format: Prometheus text exposition format
+
+=item * Allowlist prefixes: C<vllm:>, C<http:> (HTTP-level request /
+latency / queue stats), C<process:>
+
+=item * Authentication: none (local server)
+
+=back
+
+Representative payload:
+
+    # HELP vllm:gpu_cache_usage_perc GPU cache usage
+    # TYPE vllm:gpu_cache_usage_perc gauge
+    vllm:gpu_cache_usage_perc{model_name="Qwen/Qwen2.5-7B-Instruct"} 0.42
+    # HELP vllm:num_requests_running Number of running requests
+    # TYPE vllm:num_requests_running gauge
+    vllm:num_requests_running{model_name="Qwen/Qwen2.5-7B-Instruct"} 3
+    # HELP vllm:prompt_tokens_total Prompt tokens processed
+    # TYPE vllm:prompt_tokens_total counter
+    vllm:prompt_tokens_total{model_name="Qwen/Qwen2.5-7B-Instruct"} 18234
+    # HELP http_requests_total Total HTTP requests
+    # TYPE http_requests_total counter
+    http_requests_total{endpoint="v1.chat.completions",method="POST",status="200"} 412
+
+=head2 SGLang C</metrics>
+
+=over 4
+
+=item * URL: C<{base}/metrics>
+
+=item * Format: Prometheus text exposition format
+
+=item * Allowlist prefixes: C<sglang:> (SGLang-specific runtime metrics),
+C<http:>
+
+=back
+
+Representative payload:
+
+    # HELP sglang:num_running_reqs Number of running requests
+    # TYPE sglang:num_running_reqs gauge
+    sglang:num_running_reqs{model="Qwen/Qwen2.5-7B-Instruct"} 2
+    # HELP sglang:prompt_tokens_total Prompt tokens processed
+    # TYPE sglang:prompt_tokens_total counter
+    sglang:prompt_tokens_total{model="Qwen/Qwen2.5-7B-Instruct"} 9431
+    # HELP sglang:gen_throughput Generation throughput (tokens/s)
+    # TYPE sglang:gen_throughput gauge
+    sglang:gen_throughput{model="Qwen/Qwen2.5-7B-Instruct"} 18.4
+
+=head2 llama.cpp server C</metrics>
+
+=over 4
+
+=item * URL: C<{base}/metrics>
+
+=item * Format: Prometheus text exposition format
+
+=item * Allowlist prefixes: C<llama_> (note the C<_> separator; llama.cpp
+emits underscore-prefixed names, not colon-prefixed)
+
+=back
+
+Representative payload:
+
+    # HELP llama_prompt_tokens_total Total prompt tokens processed
+    # TYPE llama_prompt_tokens_total counter
+    llama_prompt_tokens_total 12450
+    # HELP llama_tokens_predicted_total Total generated tokens
+    # TYPE llama_tokens_predicted_total counter
+    llama_tokens_predicted_total 8213
+    # HELP llama_requests_processing Number of in-flight requests
+    # TYPE llama_requests_processing gauge
+    llama_requests_processing 1
+    # HELP llama_request_duration_seconds Request duration histogram
+    # TYPE llama_request_duration_seconds histogram
+    llama_request_duration_seconds_bucket{le="0.5"} 47
+    llama_request_duration_seconds_bucket{le="1.0"} 51
+    llama_request_duration_seconds_bucket{le="+Inf"} 52
+    llama_request_duration_seconds_sum 23.4
+    llama_request_duration_seconds_count 52
+
+=head2 Ollama C</api/ps> (NOT Prometheus)
+
+=over 4
+
+=item * URL: C<{base}/api/ps>
+
+=item * Format: JSON (C<{"models":[{name, model, size, ...}, ...]}>)
+
+=item * Authentication: none
+
+=back
+
+This is B<not> a Prometheus endpoint. There is no equivalent
+C</metrics> route exposed by Ollama at the time of writing. Wiring it
+into L<Langertha::Runtime::Metrics> would require a JSON-to-Prometheus
+adapter (one synthetic metric per loaded model, e.g.
+C<ollama_model_size_bytes{model="..."}>) that lives outside the
+current Prometheus-only parser. The MetricsPoll role therefore does
+B<not> compose onto L<Langertha::Engine::Ollama> for now — see the
+follow-up karr ticket tracked alongside this contract for the adapter
+work.
+
+=head1 NAME
+
+Langertha::Runtime::Metrics::EngineContract - Wire contract for self-hosted inference engine /metrics endpoints
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Langertha::Runtime::Metrics> - Prometheus text-format parser
+
+=item * L<Langertha::Role::Runtime::MetricsPoll> - Async scraper that
+hits the endpoints documented above
+
+=item * L<https://prometheus.io/docs/instrumenting/exposition_formats/>
+- Prometheus text exposition format spec
+
+=back
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/langertha/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <getty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

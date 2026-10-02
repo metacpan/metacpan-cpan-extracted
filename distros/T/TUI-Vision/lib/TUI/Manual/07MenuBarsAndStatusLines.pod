@@ -1,0 +1,310 @@
+# PODNAME: TUI::Manual::07
+# ABSTRACT: Menu Bars and Status Lines in TUI::Vision
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+TUI::Manual::07 - Menu Bars and Status Lines in TUI::Vision
+
+=head1 MENU BARS AND STATUS LINES
+
+Among the many ideas introduced by I<Turbo Vision>, two have remained 
+remarkably distinctive: the menu bar and the status line.
+
+Unlike ordinary views, these elements are not associated with a particular 
+window. A menu bar remains available regardless of which window is currently 
+active, while a status line occupies a permanent position at the bottom of the 
+screen. Together they form a persistent application frame around the desktop.
+
+In a typical L<TUI::Vision> application the user interacts with many windows 
+over the lifetime of a session. Windows may be opened, closed, resized, moved 
+or hidden. The menu bar and status line, however, remain constant. They provide 
+a stable point of interaction and help establish a consistent user interface.
+
+Historically, L<TMenuBar|TUI::Menus::MenuBar> and 
+L<TStatusLine|TUI::Views::StatusLine> were among the most visible features of 
+I<Turbo Vision>. They allowed applications to offer a rich command-oriented 
+interface without requiring a pointing device. Commands could be discovered 
+through menus, invoked through keyboard shortcuts and presented through the 
+status line, all while occupying only a small portion of the screen.
+
+L<TUI::Vision> continues this model. Although modern terminal applications 
+often draw inspiration from graphical user interfaces, the command-oriented 
+approach introduced by I<Turbo Vision> remains both practical and efficient. 
+The menu bar and status line are therefore not merely decorative elements but 
+integral parts of the application's overall interaction model.
+
+=head2 The Application Frame
+
+Within L<TUI::Vision>, the menu bar and status line are not standalone user 
+interface elements. Both are created as part of the application itself and 
+exist independently of any window displayed on the desktop.
+
+A typical application consists of three permanent objects:
+
+    TMenuBar
+    TDeskTop
+    TStatusLine
+
+Together these objects occupy the entire screen area. Windows managed by the 
+application are inserted into the desktop and operate within the space 
+remaining between the menu bar and status line.
+
+    TMenuBar
+    ┌────────────────────────────────────────────────────┐
+    |File  Help                                          |
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░ TDeskTop ░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |Alt+X Exit  F10 Menu  F1 Help                       |
+    └────────────────────────────────────────────────────┘ 
+    TStatusLine
+
+
+This arrangement is established by L<TApplication|TUI::App::Application> during 
+initialization. The menu bar and status line therefore do not belong to a 
+particular window and are not affected by operations such as moving, resizing 
+or closing windows.
+
+From a programming perspective, both objects provide application-wide services. 
+L<TMenuBar|TUI::Menus::MenuBar> exposes commands through a hierarchical menu 
+structure, while L<TStatusLine|TUI::Views::StatusLine> provides an alternative 
+representation of commonly used commands and keyboard shortcuts.
+
+Because both objects exist outside the window hierarchy, they remain available 
+regardless of which window currently owns the input focus.
+
+=head2 A Typical Menu Definition
+
+The menu system used by L<TUI::Vision> consists of a small number of classes 
+that cooperate to describe the structure of an application's menus.
+
+The following example illustrates a common arrangement:
+
+    TMenuBar
+        |
+        +-- TSubMenu "File"
+        |      |
+        |      +-- TMenuItem "Open"
+        |      +-- TMenuItem "Exit"
+        |
+        +-- TSubMenu "Window"
+               |
+               +-- TMenuItem "Next"
+
+Although a user perceives this structure as a menu bar containing drop-down 
+menus, L<TUI::Vision> models it as a hierarchy of objects.
+
+The menu bar itself is represented by L<TMenuBar|TUI::Menus::MenuBar>. The 
+entries visible within the menu bar are instances of 
+L<TSubMenu|TUI::Menus::SubMenu>. Each submenu may in turn contain additional 
+submenus or individual menu entries, represented by 
+L<TMenuItem|TUI::Menus::MenuItem> objects.
+
+The hierarchy is usually created during application initialization and remains 
+largely unchanged throughout the lifetime of the application.
+
+=head2 Building a Menu Hierarchy
+
+L<TUI::Vision> expresses menu structures as nested object definitions. As a 
+result, the source code often resembles a textual representation of the menu 
+hierarchy itself.
+
+The following definition creates a menu bar containing two submenus and a small 
+number of menu items:
+
+    my $menu_bar = new_TMenuBar(
+
+        new_TSubMenu(
+            '~F~ile',
+            new_TMenuItem(
+                '~O~pen', cmOpen, kbF3
+            ),
+            new_TMenuItem(
+                'E~x~it', cmQuit, kbAltX
+            ),
+        ),
+
+        new_TSubMenu(
+            '~W~indow',
+            new_TMenuItem(
+                '~N~ext', cmNext, kbF6
+            ),
+        ),
+    );
+
+Reading such definitions becomes considerably easier once the relationship 
+between the objects is understood. A L<TMenuBar|TUI::Menus::MenuBar> contains 
+one or more L<TSubMenu|TUI::Menus::SubMenu> objects, while each 
+L<TSubMenu|TUI::Menus::SubMenu> serves as a container for additional submenus 
+or individual L<TMenuItem|TUI::Menus::MenuItem> objects.
+
+The nesting found in the source code is therefore not accidental. It is a 
+direct representation of the menu structure itself.
+
+=head2 Menu Definitions in Practice
+
+Large L<TUI::Vision> applications often contain menu definitions with dozens 
+of submenus and hundreds of menu items. Despite their size, they all follow the 
+same object hierarchy introduced above.
+
+Example:
+
+    # You can also split menu entries using ScalarRef's.
+    # Whether you nest them or split them is a matter of taste.
+    # You can insert a blank line using newLine.
+    # If a dialog box opens for a menu item, it is advisable to write ...
+    # after the name.
+    sub initMenuBar {
+        my ( $class, $r ) = @_;
+        $r->{b}{y} = $r->{a}{y} + 1;
+        return
+        new_TMenuBar( $r, 
+            new_TSubMenu( '~F~ile', hcNoContext ) + 
+            new_TMenuItem( '~L~ist', cmList, kbF2, hcNoContext, 'F2' ) +
+            newLine +
+            new_TMenuItem( 'E~x~it', cmQuit, kbAltX, hcNoContext, 'Alt-X' ) +
+            new_TSubMenu( '~H~elp', hcNoContext ) + 
+            new_TMenuItem( '~A~bout', cmAbout, hcNoContext )
+        );
+    }
+
+=head2 Status Lines
+
+Unlike menu bars, status lines are not primarily organized as a menu hierarchy. 
+Their purpose is to associate application contexts with a specific set of 
+visible status items.
+
+A typical status line might appear as follows:
+
+    F1 Help   F3 Open   Alt+X Exit
+
+At first glance this appears to be a simple collection of labels. Internally, 
+however, L<TUI::Vision> uses several cooperating classes to determine which 
+entries are visible and when they should be displayed.
+
+    TStatusLine
+        |
+        +-- TStatusDef
+        |       |
+        |       +-- TStatusItem
+        |       +-- TStatusItem
+        |
+        +-- TStatusDef
+                |
+                +-- TStatusItem
+                +-- TStatusItem
+
+A L<TStatusLine|TUI::Menus::StatusLine> contains one or more instances of 
+L<TStatusDef|TUI::Menus::StatusDef>. Each status definition covers a particular 
+help context and contains the L<TStatusItem|TUI::Menus::StatusItem> objects 
+that should be displayed while that context is active.
+
+Unlike menu definitions, which are generally static, status line definitions 
+are often selected dynamically as the user moves through the application.
+
+The following example illustrates the principles involved in defining a status 
+line:
+
+    Context 0
+        F1 Help   Alt+X Exit
+
+    Context 10
+        F2 Save   F3 Open   Alt+X Exit
+
+    Context 20
+        F5 Zoom   F6 Next   Alt+F3 Close
+
+Each of these definitions could be represented by a separate
+TStatusDef object contained within the same TStatusLine.
+
+=head2 Building a Status Line
+
+Status lines are commonly constructed by overriding the
+C<initStatusLine> method of L<TApplication|TUI::App::Application>.
+
+The following example creates a status line containing several
+frequently used commands. Two status definitions are installed, each
+covering the same help context range but presenting different status
+items.
+
+    sub initStatusLine {
+      my ( $class, $r ) = @_;
+
+      $r->{a}{y} = $r->{b}{y} - 1;
+
+      return new_TStatusLine( $r,
+        new_TStatusDef( 0, 50 ) +
+          new_TStatusItem( "~F1~ Help", kbF1,  cmHelp ) +
+          new_TStatusItem( "~Alt-X~ Exit", kbAltX, cmQuit ) +
+          ...
+        new_TStatusDef( 0, 50 ) +
+          new_TStatusItem( "Howdy", kbF1, cmHelp )
+      );
+    );
+   
+Several characteristics of the status line implementation become apparent in 
+this example.
+
+A L<TStatusLine|TUI::Menus::StatusLine> acts as the container for one or more 
+L<TStatusDef|TUI::Menus::StatusDef> objects. Each 
+L<TStatusDef|TUI::Menus::StatusDef> associates a range of help contexts with a 
+set of status items.
+
+The status items themselves are represented by 
+L<TStatusItem|TUI::Menus::StatusItem> instances. In contrast to the tree-like 
+structure used by menus, status items are typically combined into a linear 
+chain that describes the contents of a particular status definition.
+
+The example also illustrates where status lines are typically created. Like 
+menu bars, they are usually constructed during application initialization and 
+returned by an overridden C<initStatusLine> method.
+
+    TStatusLine
+        |
+        +-- TStatusDef (0..50)
+        |       |
+        |       +-- TStatusItem "F1 Help"
+        |       +-- TStatusItem "Alt-X Exit"
+        |       +-- TStatusItem ...
+        |
+        +-- TStatusDef (0..50)
+                |
+                +-- TStatusItem "Howdy"
+
+Although status lines often appear static to the user, the underlying model 
+allows different status definitions to be selected according to the active help 
+context. This mechanism enables different parts of an application to present 
+context-sensitive status information while sharing the same 
+L<TStatusLine|TUI::Menus::StatusLine> object.
+
+=head2 Conclusion
+
+Menu bars and status lines occupy a special position within a L<TUI::Vision> 
+application. Unlike most views, they are created directly by 
+L<TApplication|TUI::App::Application> and remain outside the normal window 
+hierarchy.
+
+Understanding this distinction is important when studying the remaining 
+L<TUI::Vision> classes. Most objects encountered in later chapters operate within 
+the framework established by L<TApplication|TUI::App::Application>, 
+L<TDeskTop|TUI::App::DeskTop>, L<TMenuBar|TUI::Menus::MenuBar> and 
+L<TStatusLine|TUI::Menus::StatusLine>.
+
+L<next|TUI::Manual::08> chapter.
+
+=cut

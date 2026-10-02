@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OvhProvider;
 # ABSTRACT: OVHcloud configures this store to sync secrets using the OVHcloud provider.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s auth        => '+IO::K8s::ExternalSecrets::V1::OvhAuth', { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::OvhProvider - OVHcloud configures this store to sy
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 auth
 

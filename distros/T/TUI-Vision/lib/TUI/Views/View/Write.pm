@@ -1,18 +1,22 @@
 package TUI::Views::View::Write;
 # ABSTRACT: TView write member functions.
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
 use Scalar::Util qw( weaken );
 
+use TUI::Drivers::Const qw( slNoShadow );
+use TUI::Drivers::ColorAttr;
 use TUI::Drivers::HardwareInfo;
 use TUI::Drivers::HWMouse;
 use TUI::Drivers::Screen;
+use TUI::Drivers::ScreenCell;
 use TUI::Views::Const qw(
   sfVisible
   sfShadow
@@ -32,7 +36,8 @@ use vars qw(
   *screenBuffer = \${ TScreen . '::screenBuffer' };
 }
 
-use constant HIDEMOUSE => 0;
+use constant HIDEMOUSE => !!0;
+use constant LEGACY => THardwareInfo->isa('TUI::Drivers::HardwareInfo::Win32');
 
 my $X       = 0;
 my $Y       = 0;
@@ -50,10 +55,10 @@ use subs qw(
   L30
   L40
   L50
-  copyShort
-  copyShort2CharInfo
+  copyCell
+  copyCell2CharInfo
   applyShadow
-  reverseAttribute
+  reversed
 );
 
 sub L0 {
@@ -220,66 +225,87 @@ sub L50 {
   };
   no warnings 'uninitialized';
   if ( $owner->{buffer} != $screenBuffer ) {
-    copyShort( $dst, $src );
+    copyCell( $dst, $src );
   }
   else {
-    copyShort2CharInfo( $dst, $src );
+    LEGACY 
+      ? copyCell2CharInfo( $dst, $src )
+      : copyCell( $dst, $src );
     THardwareInfo->screenWrite( $X, $Y, $dst, $Count - $X );
   }
   return;
 } #/ sub L50
 
-# On Windows and DOS, Turbo Vision stores a byte of text and a byte of
-# attributes for every cell. On Windows, all TGroup buffers follow this scheme, 
-# with the exception of the top one, which corresponds to the Win32 console API.
+# Our Turbo Vision port stores a TScreenCharacter for text and a TColorAttr for
+# attributes for every cell. On Windows, all TGroup buffers follow this schema
+# except the topmost one, which interfaces with the Win32 Console API.
 
-sub copyShort {
-  my ( $dst, $src ) = @_;
-  if ( $edx == 0 ) {
-    my $n = $Count - $X;
-    @$dst[ 0 .. $n - 1 ] = @$src[ 0 .. $n - 1 ];
-  }
-  else {
-    for ( my $i = 0 ; $i < $Count - $X ; ++$i ) {
-      my ( $c, $color ) = unpack 'CC' => pack 'v'  => $src->[$i];
-      $dst->[$i]        = unpack 'v'  => pack 'CC' => $c, applyShadow( $color );
-    }
-  }
-  return;
-} #/ sub copyShort
-
-sub copyShort2CharInfo {
+sub copyCell2CharInfo {
   my ( $dst, $src ) = @_;
   my $i;
   if ( $edx == 0 ) {
     # Expand character/attribute pair
-    my $n = $Count - $X;
-    @$dst[ 0 .. 2 * $n - 1 ] = unpack 'C*' => pack "v*" => @$src[ 0 .. $n - 1 ];
+    for ( $i = 0 ; $i < $Count - $X ; ++$i ) {
+      my $c    = $src->[$i];
+      my $ch   = ord $c->character->getText();
+      my $attr = $c->attribute->asBIOS();
+      splice( @$dst, 2 * $i, 2, $ch, $attr );
+    }
   }
   else {
     # Mix in shadow attribute
     for ( $i = 0 ; $i < $Count - $X ; ++$i ) {
-      my ( $c, $color ) = unpack 'CC' => pack 'v' => $src->[$i];
-      splice( @$dst, 2 * $i, 2, $c, applyShadow( $color ) );
+      my $c    = $src->[$i];
+      my $ch   = ord $c->character->getText();
+      my $attr = applyShadow( $c->attribute )->asBIOS();
+      splice( @$dst, 2 * $i, 2, $ch, $attr );
     }
   }
   return;
-} #/ sub copyShort2CharInfo
+} #/ sub copyCell2CharInfo
+
+sub copyCell {
+  my ( $dst, $src ) = @_;
+  if ( $edx == 0 ) {
+    for ( my $i = 0 ; $i < $Count - $X ; ++$i ) {
+      # The following lines manually copy the contents of the source cell to 
+      # the destination cell. it is equivalent to using the assign method:
+      #   $dst->[$i]->assign( $src->[$i] );
+      ${ $dst->[$i][0] } = ${ $src->[$i][0] };
+      ${ $dst->[$i][1] } = ${ $src->[$i][1] };
+    }
+  }
+  else {
+    for ( my $i = 0 ; $i < $Count - $X ; ++$i ) {
+      ${ $dst->[$i][0] } = ${ $src->[$i][0] };
+      ${ $dst->[$i][1] } = ${ applyShadow( $src->[$i]->attribute ) };
+    }
+  }
+  return;
+} #/ sub copyCell
 
 sub applyShadow {
   my ( $attr ) = @_;
-  my $shadowAttrInv = reverseAttribute( $shadowAttr );
-  return $attr
-    if $attr == $shadowAttr 
-    || $attr == $shadowAttrInv;
-  return $attr & 0xf0
-    ? $shadowAttr
-    : $shadowAttrInv;
-}
 
-sub reverseAttribute {
-  my ( $attr ) = @_;
-  return ( ( $attr & 0x0f ) << 4 ) | ( ( $attr & 0xf0 ) >> 4 );
+  # Coercing the BIOS shadow attribute to a TColorAttr object
+  local $shadowAttr = ref $shadowAttr 
+                    ? $shadowAttr 
+                    : TColorAttr->new( bios => $shadowAttr );
+
+  # Because we can't know if the cell has already been shadowed, we compare 
+  # against the shadow attributes. This may yield some false positives.
+  my $shadowAttrInv = $shadowAttr->reversed();
+  if ( $attr == $shadowAttr || $attr == $shadowAttrInv ) {
+    return $attr;
+  }
+  else {
+    if ( $attr->getBackground()->toBIOS( 0 ) != 0 ) {
+      return $shadowAttr;
+    }
+    else {    # Reverse the shadow attribute on black areas.
+      return $shadowAttrInv;
+    }
+  }
 }
 
 1
@@ -296,7 +322,7 @@ TUI::Views::View::Write - TView write member functions.
 
 TView write member functions.
 
-The content was taken from the framework
+The content was ported from the framework
 "A modern port of Turbo Vision 2.0", which is licensed under MIT license.
 
 =head1 SEE ALSO

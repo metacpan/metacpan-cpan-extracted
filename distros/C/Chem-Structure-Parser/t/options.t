@@ -2,7 +2,7 @@
 # The options, which are what makes a 33 MB structure readable at all, and
 # the checking of them, because an ignored typo is a wrong answer that
 # arrives without a word.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

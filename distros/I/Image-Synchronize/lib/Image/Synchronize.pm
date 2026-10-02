@@ -29,7 +29,7 @@ Louis Strous, E<lt>imsync@quae.nl<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2023 by Louis Strous
+Copyright (C) 2018-2025 by Louis Strous
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.2 or,
@@ -48,9 +48,7 @@ use File::Copy qw(
   copy
   move
 );
-use File::Spec qw(
-  case_tolerant
-);
+use File::Spec;
 use Image::ExifTool 10.14;
 use Image::Synchronize::CameraOffsets;
 use Image::Synchronize::GpsPositionCollection;
@@ -94,7 +92,7 @@ BEGIN {
 # always use x.yyy version numbering, so that string comparison and
 # numeric comparison give the same ordering, to avoid trouble due to
 # different ways of interpreting version numbers.
-our $VERSION = '2.011';
+our $VERSION = '2.015';
 
 # TODO: check each folder for an .imsync-cameraoffsets.yaml file
 # TODO: allow timezone specification on --time
@@ -446,6 +444,12 @@ sub camera_id {
     }
     push @values, $value // '';
   }
+  if (not($values[0])
+      and $values[1]) {
+    # the manufacturer (the make) is not filled in but the model is.
+    # Assume that the first word of the model is the make.
+    ($values[0]) = $values[1] =~ /(\w+)/;
+  }
   my $id = join( '|', @values );
   if ($id =~ /^\|+$/) {
     $id = undef;
@@ -660,12 +664,12 @@ sub potential_donors {
       # that has it.
 
       # descending priority order:
-      # 1. current file name with '.yaml' appended
+      # 1. current file name with '.yaml' or '.json' appended
       # 2. greatest directory prefix in common with current file
       # 3. metadata file
       # 4. greatest basename pattern prefix in common with current file
       # 5. lexicographic order
-      my $t1 = "${file}.yaml";
+      my $t1 = qr/^${file}\.(yaml|json)$/;
       my $t3 = basename_pattern($file);
       @targets = map { $_->[0] }
         sort {
@@ -677,7 +681,7 @@ sub potential_donors {
             }
         map { [
                $_,
-               ($_ eq $t1)? 1: 0,
+               ($_ =~ $t1)? 1: 0,
                length_of_common_directory_prefix($_, $file),
                ($self->{original_info}->{$_}->get('is_metadata') // 0),
                length_of_common_prefix(basename_pattern($_), $t3)
@@ -1170,12 +1174,7 @@ sub determine_new_values_for_file {
   my $timesource_letter;    # letter to identify time source in report
 
   my $create_time = $new_info->get('CreateDate');
-  if (defined $create_time) {
-    if (not $create_time->has_timezone_offset
-        and $info->get('supposedly_utc')) {
-      $create_time->set_timezone_offset(0); # assume UTC
-    }
-  } else {
+  if (not defined $create_time) {
     ($create_time, my $donator) =
       $self->get_from_targets('CreateDate', $donator_files);
     if (defined $create_time) {
@@ -1270,7 +1269,8 @@ sub determine_new_values_for_file {
       ($target_time, my $donator) =
         $self->get_from_targets('DateTimeOriginal', $donator_files);
       if (defined $target_time) {
-        push @messages, " Target timestamp copied from '$donator' (DateTimeOriginal).";
+        push @messages, " Target timestamp copied from '$donator' "
+          . "(DateTimeOriginal).";
         $timesource_letter //= 'n'; # source is other file
       }
     }
@@ -1286,8 +1286,18 @@ sub determine_new_values_for_file {
     ($target_time, my $donator) =
       $self->get_from_targets('FileModifyDate', $donator_files);
     if (defined $target_time) {
-      push @messages, " Target timestamp copied from '$donator' (FileModifyDate).";
+      push @messages, " Target timestamp copied from '$donator' "
+        . "(FileModifyDate).";
       $timesource_letter //= 'n'; # source is other file
+    }
+  }
+  if (not(defined $target_time)
+      && $info->get('is_metadata')) {
+    $target_time = $info->get('TargetFileModifyDate');
+    if (defined $target_time) {
+      push @messages, " Target timestamp is metadata target file's "
+        . "FileModifyDate.";
+      $timesource_letter //= 'm'; # source is metadata target
     }
   }
 
@@ -1354,6 +1364,13 @@ sub determine_new_values_for_file {
     my $position = $self->repository('user_locations')->{$file};
     if ( defined $position ) {
       $extra_info->set( 'explicit_change', 1 );
+    } elsif (my $ul = $self->repository('user_locations')->{''}) {
+      foreach my $tp (@$ul) {
+        if ($tp->[0]->contains_local($target_time)) {
+          $position = $tp->[1];
+          $extra_info->set('explicit_change', 1);
+        }
+      }
     } elsif (
              not( $info->get('GPSDateTime') ) # none yet
              or (
@@ -1415,7 +1432,8 @@ sub determine_new_values_for_file {
         foreach my $ix (0..$#gps_location_tags) {
           my $v = $info->get($gps_location_tags[$ix]);
           $new_info->set( $gps_location_tags[$ix],  $position->[$ix] )
-            if defined($position->[$ix]) and (not(defined $v) or $position->[$ix] != $v);
+            if defined($position->[$ix]) and (not(defined $v) or
+                                              $position->[$ix] != $v);
         }
         my $v = $info->get('GPSDateTime');
         $new_info->set( 'GPSDateTime', $target_time )
@@ -2119,7 +2137,8 @@ sub has_embedded_timestamp {
 sub has_useful_timestamp {
   my ($self, $file, $image_info) = @_;
   return ( has_embedded_timestamp($image_info)
-           || defined($self->repository('user_times')->{$file}) );
+           || defined($self->repository('user_times')->{$file})
+           || defined($image_info->get('TargetFileModifyDate')));
 }
 
 # identify @files that match the $pattern.  The match is case
@@ -2389,7 +2408,8 @@ sub inspect_files {
             $self->enhance_image_info($file, $metainfo);
             my @tags = $metainfo->tags;
             if (@tags) {
-              log_message(2, { name => $file }, " Is a $type metadata file.\n" );
+              log_message(2, { name => $file },
+                          " Is a $type metadata file.\n" );
               # $info->set('is_metadata', 1);
               foreach my $tag ($metainfo->tags) {
                 my ($group, $value) = $metainfo->get_context($tag);
@@ -2399,6 +2419,17 @@ sub inspect_files {
                     $value = Image::Synchronize::Timestamp->new($value);
                   }
                   $info->set($group, $tag, $value);
+                } elsif ($tag eq 'FileModifyDate') {
+                  # for a metadata file, not just its own file
+                  # modification date is of interest (because it may
+                  # need synchronization) but also the file
+                  # modification date that is written inside the
+                  # metadata file, because the latter timestamp may be
+                  # the timestamp of last resort for the target time
+                  # of the metadata file and the file that it applies
+                  # to.
+                  $info->set('TargetFileModifyDate',
+                             Image::Synchronize::Timestamp->new($value));
                 }
               }
               ++$count_gps_times if defined $info->{GPSDateTime};
@@ -2540,8 +2571,8 @@ my %convert_for_writing = (
 
 sub set_file_modification_time {
   my ($self, $file, $time_utc) = @_;
-  utime undef, $time_utc, $file;
-#  return $self->backend->SetFileTime($file, undef, $time_utc);
+  utime 0, $time_utc, $file;
+  #  return $self->backend->SetFileTime($file, undef, $time_utc);
 }
 
 #   $et->modify_file($file);
@@ -3042,8 +3073,8 @@ sub process_user_camera_ids {
       return;
     }
   };
-  return $self->process_user_items( 'cameraid', 'user_camera_ids', $action_cref,
-    @files );
+  return $self->process_user_items( 'cameraid', 'user_camera_ids',
+                                    $action_cref, 0, @files );
 }
 
 #    t  a  r  g  e  t              =  s o u r c e
@@ -3056,7 +3087,8 @@ sub process_user_locations {
     if ($rhs) {
       @sources = identify_files( $rhs, keys %{ $self->{original_info} } );
       if ( @sources > 1 ) {
-        log_warn("--location RHS '$rhs' matches more than one file; ignored.\n");
+        log_warn("--location RHS '$rhs' matches more than one file; "
+                 . "ignored.\n");
         return;
       }
       elsif ( @sources == 0 ) {    # is it a location?
@@ -3084,7 +3116,7 @@ sub process_user_locations {
     return;
   };
   return $self->process_user_items( 'location', 'user_locations',
-    $action_cref );
+                                    $action_cref, 1 );
 }
 
 # (FILE_END|TIMESTAMP(/TIMESTAMP)?)=(TIME|OFFSET|FILE_END)
@@ -3108,13 +3140,13 @@ sub process_user_times {
     elsif (
           $rhs
       and $rhs =~ /^
-                              (?<sign>[-+])?
-                              (?:(?<year>\d+)y)?
-                              (?:(?<day>\d+)d)?
-                              (?:(?<hour>\d+)h)?
-                              (?:(?<minute>\d+)m)?
-                              (?:(?<second>[\d.]+)s)?
-                              $/x
+                   (?<sign>[-+])?
+                   (?:(?<year>\d+)y)?
+                   (?:(?<day>\d+)d)?
+                   (?:(?<hour>\d+)h)?
+                   (?:(?<minute>\d+)m)?
+                   (?:(?<second>[\d.]+)s)?
+                   $/x
       )
     {    # multi-unit offset
       # TODO: support timezone offset
@@ -3181,7 +3213,7 @@ sub process_user_times {
     }
     return $value;
   };
-  return $self->process_user_items( 'time', 'user_times', $action_cref );
+  return $self->process_user_items( 'time', 'user_times', $action_cref, 1 );
 }
 
 # process the 'follow' option.
@@ -3196,7 +3228,7 @@ sub process_follow {
     ++$count;
     return undef;    # don't need to remember anything else
   };
-  $self->process_user_items( 'follow', undef, $action_cref, @files );
+  $self->process_user_items( 'follow', undef, $action_cref, 1, @files );
   if ($count) {
     default_logger()
       ->set_printer_condition( '', 'follow',
@@ -3205,7 +3237,8 @@ sub process_follow {
   return $self;
 }
 
-#   $self->process_user_items($option, $repository, $action);
+#   $self->process_user_items($option, $repository, $action,
+#                             $defer_time_based, @files);
 #
 # Processes the structured value of a command-line option.
 #
@@ -3219,21 +3252,31 @@ sub process_follow {
 # C<$action> is a CODE reference through which the command-line option
 # value is processed.
 #
+# C<$defer_time_based> says whether to defer processing of time-based
+# filters (i.e., timestamps or time ranges, see below).  If true, then
+# the C<$action> is performed on the hash value and the timestamp or
+# time range and the outcome of the action are stored in the
+# repository for later use.  If false, then the time-based filter is
+# applied to the C<CreateDate> of the files and the C<$action> is
+# performed on the matching files.
+#
+# C<@files> are the files to search through.  If none are specified,
+# then the files to search through are those for which information has
+# been gathered through L</inspect_files>.
+#
 # The value of command-line option C<$option> may be a HASH or an ARRAY
 # reference.  The hash keys or array elements are scalars that identify
 # the files with which to associate the results.
 #
-# The files to search through are those for which information has been
-# gathered through L</inspect_files>.
-#
-# If any of those files have a path that ends with the hash key or array
-# element, then those files are the targets for that hash key or array
-# element.
+# If any of the files to search through have a path that ends with the
+# hash key or array element, then those files are the targets for that
+# hash key or array element.
 #
 # Otherwise, if the hash key or array element can be parsed as a
 # timestamp (L<Image::Synchronize::Timestamp>) or time range
-# (L<ImsyncTimerange>), then the files whose C<CreateDate> is equal to
-# the timestamp or falls within the time range are the targets.
+# (L<ImsyncTimerange>), and if C<$defer_time_based> is false, then the
+# files whose C<CreateDate> is equal to the timestamp or falls within
+# the time range are the targets.
 #
 # If the value of the command-line option is a HASH reference, then
 # the results are obtained through
@@ -3255,7 +3298,7 @@ sub process_follow {
 #
 # Returns C<$self>.
 sub process_user_items {
-  my ( $self, $option, $repository, $action, @files ) = @_;
+  my ( $self, $option, $repository, $action, $defer_time_based, @files ) = @_;
   my $in_spec = $self->option($option);
   my $out_repository = $self->repository($repository) if defined $repository;
   if ($in_spec) {
@@ -3289,13 +3332,18 @@ sub process_user_items {
           $t = Image::Synchronize::Timestamp->new($key);
         }
         if ( defined $t ) {
-          @targets = $self->find_info_targets($t);
+          if ($defer_time_based) {
+            # remember for later use, when the target times are known
+            my $rhs = $action->($in_spec->{$key});
+            push @{$out_repository->{''}}, [$t, $rhs];
+          } else {
+            @targets = $self->find_info_targets($t);
+          }
         }
       }
       unless (@targets) {
-        log_warn(
-"Target '$key' does not match any of the specified files and does not look like a time instant or range; ignored.\n"
-        );
+        log_warn("Target '$key' does not match any of the "
+                 . "specified files; ignored.\n") unless $defer_time_based;
         next;
       }
       foreach my $target (@targets) {
@@ -3529,6 +3577,7 @@ EOD
   o: embedded original timestamp
   c: embedded creation timestamp
   t: --time
+  m: metadata target file modification timestamp
   n: other file with same number
 
 EOD

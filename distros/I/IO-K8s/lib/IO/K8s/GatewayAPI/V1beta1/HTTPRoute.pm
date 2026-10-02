@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::HTTPRoute;
 # ABSTRACT: HTTPRoute provides a way to route HTTP requests.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1beta1',
     resource_plural => 'httproutes',
@@ -27,7 +27,7 @@ IO::K8s::GatewayAPI::V1beta1::HTTPRoute - HTTPRoute provides a way to route HTTP
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

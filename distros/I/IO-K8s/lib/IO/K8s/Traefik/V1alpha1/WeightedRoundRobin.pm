@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::WeightedRoundRobin;
 # ABSTRACT: Weighted defines the Weighted Round Robin configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s services => ['+IO::K8s::Traefik::V1alpha1::Service'];
@@ -22,7 +22,7 @@ IO::K8s::Traefik::V1alpha1::WeightedRoundRobin - Weighted defines the Weighted R
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 services
 

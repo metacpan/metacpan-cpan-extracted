@@ -1,7 +1,8 @@
 package Langertha::Knarr::CLI::Cmd::Start;
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 # ABSTRACT: Start the Knarr proxy server
 use Moo;
+with 'Langertha::Knarr::CLI::Role::GlobalOptions';
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: knarr start [options]';
 use Log::Any qw( $log );
@@ -12,7 +13,7 @@ option port => (
   is      => 'ro',
   format  => 'i@',
   short   => 'p',
-  doc     => 'Port(s) to listen on, repeatable (default: 8080 11434)',
+  doc     => 'Port(s) to listen on, on the -H host; repeatable, replaces the config listen: (default: the config listen:, which defaults to 127.0.0.1:8080 and 127.0.0.1:11434)',
   default => sub { [] },
 );
 
@@ -20,7 +21,7 @@ option host => (
   is      => 'ro',
   format  => 's',
   short   => 'H',
-  doc     => 'Host to bind to (default: 0.0.0.0)',
+  doc     => 'Host the -p ports bind to, no effect without -p (default: 0.0.0.0)',
   default => '0.0.0.0',
 );
 
@@ -28,8 +29,8 @@ option workers => (
   is      => 'ro',
   format  => 'i',
   short   => 'w',
-  doc     => 'Number of worker processes (default: 1)',
-  default => 1,
+  doc     => 'Number of worker processes; more than 1 forks that many, supervised and restarted by this process (default: the config workers:, else KNARR_WORKERS, else 1, no fork)',
+  predicate => 'has_workers',
 );
 
 option from_env => (
@@ -62,14 +63,13 @@ option log_dir => (
 
 sub execute {
   my ($self, $args, $chain) = @_;
-  my $main = $chain->[0];
 
-  my $verbose = $main->verbose;
+  my $verbose = $self->verbose_enabled($chain);
   Log::Any::Adapter->set('Stderr', log_level => $verbose ? 'trace' : 'warning');
 
   require Langertha::Knarr::Config;
 
-  my $config_file = $main->config;
+  my $config_file = $self->config_file($chain);
   my $config;
 
   if (-f $config_file) {
@@ -92,6 +92,8 @@ sub execute {
     print STDERR "\n";
     exit 1;
   }
+
+  my $workers = $self->_workers($config);
 
   # Inject CLI trace_name into config
   if ($self->has_trace_name) {
@@ -169,7 +171,7 @@ sub execute {
   my $lf_sec = $config->langfuse->{secret_key} // _strip_quotes($ENV{LANGFUSE_SECRET_KEY});
   my $lf_url = $config->langfuse->{url} // _strip_quotes($ENV{LANGFUSE_URL}) // _strip_quotes($ENV{LANGFUSE_BASE_URL}) // 'https://cloud.langfuse.com';
   if ($lf_pub && $lf_sec) {
-    _log("Langfuse: enabled -> $lf_url");
+    _log("Langfuse: enabled -> $lf_url (" . $config->langfuse_transport . ")");
   } else {
     _log("Langfuse: disabled (set LANGFUSE_PUBLIC_KEY + LANGFUSE_SECRET_KEY to enable)");
   }
@@ -209,8 +211,10 @@ sub execute {
     if ( %$upstreams ) {
       require Langertha::Knarr::Handler::Passthrough;
       $passthrough = Langertha::Knarr::Handler::Passthrough->new(
-        upstreams => $upstreams,
-        loop      => $loop,
+        upstreams     => $upstreams,
+        loop          => $loop,
+        timeout       => $config->upstream_timeout,
+        stall_timeout => $config->upstream_stall_timeout,
       );
     }
   }
@@ -248,15 +252,37 @@ sub execute {
     ( $passthrough ? ( raw_passthrough => $passthrough ) : () ),
     ( $tracing->_enabled ? ( tracing => $tracing ) : () ),
     ( $config->has_proxy_api_key ? ( auth_token => $config->proxy_api_key ) : () ),
+    ( defined $config->public_url ? ( public_url => $config->public_url ) : () ),
+    ( defined $config->ollama_compat_version
+      ? ( ollama_compat_version => $config->ollama_compat_version ) : () ),
+    protocol_args => $config->protocol_args,
+    workers       => $workers,
   );
 
   _log("Starting server:");
   for my $addr (@$listen_addrs) {
     _log("  http://$addr");
   }
+  _log("Workers: $workers") if $workers > 1;
   _log("");
 
   $knarr->run;
+}
+
+# The worker count: -w, else the config's workers: / KNARR_WORKERS (k51).
+# A bad value stops start here, before the banner and before any bind.
+sub _workers {
+  my ($self, $config) = @_;
+  if ( $self->has_workers ) {
+    return $self->workers if $self->workers >= 1;
+    _err("-w/--workers must be 1 or more, got " . $self->workers);
+    exit 1;
+  }
+  my $workers = eval { $config->workers };
+  return $workers if defined $workers;
+  ( my $err = $@ ) =~ s/ at \S+ line \d+\.?\n?\z//;
+  _err($err);
+  exit 1;
 }
 
 sub _log { print STDERR "[knarr] $_[0]\n" }
@@ -283,7 +309,7 @@ Langertha::Knarr::CLI::Cmd::Start - Start the Knarr proxy server
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 
@@ -293,8 +319,21 @@ and starts the server.
 With C<--from-env>, the config is built automatically from environment
 variables when no config file is found — this is how the Docker image starts.
 
-See L<knarr> for the full option reference and L<Langertha::Knarr> for the
-configuration file format.
+The listen addresses come from C<-p> when given (each port on C<-H>,
+default C<0.0.0.0>), otherwise from the config's C<listen:>, which defaults
+to C<127.0.0.1:8080> and C<127.0.0.1:11434>. C<-H> alone changes nothing.
+
+C<-w>/C<--workers> I<N> (else the config's C<workers:> or C<KNARR_WORKERS>,
+default C<1>; a value below C<1> stops C<start> before the banner) serves
+from N processes: Knarr binds
+the listen addresses, runs auto-discovery and the capability probe once,
+then forks N workers that accept on the same sockets, and supervises them
+-- a worker that exits is restarted, C<SIGTERM>/C<SIGINT> stops them all.
+Sessions (a Raider conversation) live in one worker and are not routed
+back to it. See L<Langertha::Knarr/workers> and L<Langertha::Knarr/run>.
+
+See L<knarr> for the full option reference and L<Langertha::Knarr::Config>
+for the configuration file format.
 
 =head1 SEE ALSO
 

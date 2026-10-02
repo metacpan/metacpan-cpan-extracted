@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::IntegrationInfo;
 # ABSTRACT: IntegrationInfo specifies the name and version of the integration built using the 1Password Go SDK.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name    => Str, { default => '1Password SDK' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::IntegrationInfo - IntegrationInfo specifies the na
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

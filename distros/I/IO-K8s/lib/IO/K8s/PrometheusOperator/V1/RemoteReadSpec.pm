@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::RemoteReadSpec;
 # ABSTRACT: RemoteReadSpec defines the configuration for Prometheus to read back samples from a remote endpoint.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s authorization        => '+IO::K8s::PrometheusOperator::V1::Authorization';
@@ -54,7 +54,7 @@ IO::K8s::PrometheusOperator::V1::RemoteReadSpec - RemoteReadSpec defines the con
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 authorization
 

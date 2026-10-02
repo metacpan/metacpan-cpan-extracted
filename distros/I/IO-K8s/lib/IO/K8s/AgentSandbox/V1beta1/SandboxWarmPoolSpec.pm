@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolSpec;
 # ABSTRACT: SandboxWarmPoolSpec
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s replicas           => Int, { minimum => 0, default => 1 };
@@ -24,7 +24,7 @@ IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolSpec - SandboxWarmPoolSpec
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 replicas
 

@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -154,7 +154,7 @@ TUI::Menus::StatusDef - status line definition entry
 =head1 DESCRIPTION
 
 C<TStatusDef> represents a single definition entry used to describe the
-contents of a TUI::Vision status line. Each definition associates a range of
+contents of a L<TUI::Vision> status line. Each definition associates a range of
 help context identifiers with a list of status line items.
 
 Multiple C<TStatusDef> objects can be linked together to form a definition
@@ -174,25 +174,22 @@ status line entries.
 The following attributes describe the definition entry. Optional attributes
 may be omitted entirely.
 
-=over
-
-=item min
+=head2 min
 
 Lower bound of the help context range (I<PositiveOrZeroInt>).
 
-=item max
+=head2 max
 
 Upper bound of the help context range (I<PositiveOrZeroInt>).
 
-=item items
+=head2 items
 
 Optional reference to a list of status line items (I<TStatusItem>).
 
-=item next
+=head2 next
 
-Optional reference to the next C<TStatusDef> in the definition chain.
-
-=back
+Optional reference to the next L<TStatusDef|TUI::Menus::StatusDef> in the
+definition chain.
 
 =head1 CONSTRUCTOR
 
@@ -247,10 +244,10 @@ construction patterns.
 Combines two status definition chains into a single linked list. When C<$swap>
 is true, the order of the operands is reversed.
 
-Implements the C<+> operator for chaining status definitions.
+Implements the C<'+'> operator for chaining status definitions.
 
 This allows multiple C<TStatusDef> objects to be combined into a single
-definition list using the C<+> operator.
+definition list using the C<'+'> operator.
 
 =head1 AUTHORS
 

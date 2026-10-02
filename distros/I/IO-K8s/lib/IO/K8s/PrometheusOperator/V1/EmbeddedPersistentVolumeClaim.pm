@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::EmbeddedPersistentVolumeClaim;
 # ABSTRACT: volumeClaimTemplate defines the PVC spec to be used by the Prometheus StatefulSets.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apiVersion => Str;
@@ -28,7 +28,7 @@ IO::K8s::PrometheusOperator::V1::EmbeddedPersistentVolumeClaim - volumeClaimTemp
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apiVersion
 

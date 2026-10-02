@@ -264,8 +264,8 @@ sub is_FileHandle ($) {
   return !!0;
 }
 
-sub is_ArrayLike ($) { defined($_[0]) && reftype($_[0]) eq 'ARRAY' }
-sub is_HashLike  ($) { defined($_[0]) && reftype($_[0]) eq 'HASH' }
+sub is_ArrayLike ($) { ref($_[0]) && reftype($_[0]) eq 'ARRAY' }
+sub is_HashLike  ($) { ref($_[0]) && reftype($_[0]) eq 'HASH' }
 
 # ----------------------------------------------------------------------
 # Type constructors (non-parametric)
@@ -772,7 +772,7 @@ Using types with L<TUI::toolkit::Params> signatures
 =head1 DESCRIPTION
 
 C<TUI::toolkit::Types> provides a set of lightweight type constraints that are
-compatible with C<Type::API> and mimic much of the behavior of L<MooseX::Types> 
+compatible with L<Type::API> and mimic much of the behavior of L<MooseX::Types> 
 and L<Types::Standard>, but without depending on XS or any non-core Perl 
 modules.
 
@@ -993,8 +993,6 @@ Predicates:
 =item * do not throw exceptions.
 
 =back
-
-=head2 Predicate example
 
 Predicate functions are well-suited for assertion frameworks or any
 situation where a simple boolean check is needed without throwing

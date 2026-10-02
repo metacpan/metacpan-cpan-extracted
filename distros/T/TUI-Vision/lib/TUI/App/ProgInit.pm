@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -132,18 +132,18 @@ Creates a new program initialization helper.
 
 =item createStatusLine
 
-Code reference that is called with a C<TRect> argument and must return a
-C<TStatusLine> object.
+Code reference (I<CodeRef>) that is called with a L<TRect|TUI::Objects::Rect> 
+argument and must return a L<TStatusLine|TUI::Menus::StatusLine> object.
 
 =item createMenuBar
 
-Code reference that is called with a C<TRect> argument and must return a
-C<TMenuBar> object.
+Code reference (I<CodeRef>) that is called with a L<TRect|TUI::Objects::Rect> 
+argument and must return a L<TMenuBar|TUI::Menus::MenuBar> object.
 
 =item createDeskTop
 
-Code reference that is called with a C<TRect> argument and must return a
-C<TDeskTop> object.
+Code reference (I<CodeRef>) that is called with a L<TRect|TUI::Objects::Rect> 
+argument and must return a L<TDeskTop|TUI::App::DeskTop> object.
 
 =back
 
@@ -182,9 +182,9 @@ specified rectangle.
 
 =head1 SEE ALSO
 
-L<TUI::App::Program>,
-L<TUI::App::Application>,
-L<TUI::App::DeskInit>
+L<TProgram|TUI::App::Program>,
+L<TApplication|TUI::App::Application>,
+L<TDeskInit|TUI::App::DeskInit>
 
 =head1 AUTHORS
 

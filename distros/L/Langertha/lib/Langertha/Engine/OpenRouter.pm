@@ -1,8 +1,9 @@
 package Langertha::Engine::OpenRouter;
 # ABSTRACT: OpenRouter API
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Carp qw( croak );
+use Scalar::Util qw( looks_like_number );
 
 extends 'Langertha::Engine::OpenAIBase';
 
@@ -26,6 +27,33 @@ sub _build_supported_operations {[qw(
   createChatCompletion
 )]}
 
+# image_input (k266, ADR 0019): a gateway: the model behind it is unknown to
+# the client, so no static claim. The catch-all is a layer-3 row, not a
+# layer-2 delete, so a fact probed from /models (architecture.input_modalities)
+# can answer per model (ADR 0032).
+sub model_capability_corrections {
+  return ( qr/\A/ => { image_input => 0 } );
+}
+
+# usage.cost is what OpenRouter charged, in its credits, and "OpenRouter uses a
+# credit system where the base currency is US dollars" (openrouter.ai/docs/faq,
+# read 2026-09-30). The wire number names no unit and "cost" is too generic to
+# read as USD from every OpenAI-compatible server, so this engine states it:
+# the copy of the usage block gets the canonical cost_usd key that
+# Langertha::Usage reads (ADR 0018 tier 3, ADR 0031, k363).
+# cost_details.upstream_inference_cost (BYOK: what the key's own provider
+# charged) is not OpenRouter's bill and is not folded in.
+sub _wire_usage {
+  my ( $self, $usage ) = @_;
+  return $usage unless ref $usage eq 'HASH';
+  my $cost = $usage->{cost};
+  return $usage unless defined $cost && !ref $cost && looks_like_number($cost);
+  return { %$usage, cost_usd => 0 + $cost };
+}
+
+sub model_metadata_format { 'openrouter' }
+sub model_metadata_url    { $_[0]->url . $_[0]->list_models_path }
+
 __PACKAGE__->meta->make_immutable;
 
 
@@ -43,7 +71,7 @@ Langertha::Engine::OpenRouter - OpenRouter API
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -75,6 +103,10 @@ C<model> must be specified explicitly.
 
 Supports chat, streaming, and MCP tool calling. Embeddings and transcription
 are not supported.
+
+What OpenRouter charged for a request (C<usage.cost>, in its credits, which
+are US dollars) is read as L<Langertha::Usage/cost_usd>, on responses and on
+the stream's usage frame.
 
 Get your API key at L<https://openrouter.ai/settings/keys> and set
 C<LANGERTHA_OPENROUTER_API_KEY> in your environment.

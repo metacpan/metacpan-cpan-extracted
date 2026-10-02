@@ -18,7 +18,7 @@ knarr - Langertha LLM Proxy with Langfuse Tracing
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -28,8 +28,10 @@ version 1.101
     knarr start --from-env                     # Auto-detect config from ENV
     knarr start --from-env -p 8080 -p 11434   # ENV config, explicit ports
     knarr start -c production.yaml -p 9090     # Custom config and port
+    knarr start -c production.yaml -v          # Custom config, verbose
     knarr init > knarr.yaml                    # Generate config from environment
     knarr init -e .env -e .env.local           # Scan .env files
+    knarr init -l 0.0.0.0:8080 -o knarr.yaml   # Listen on all interfaces
     knarr models                               # List configured models
     knarr models --format json                 # JSON output
     knarr check                                # Validate config file
@@ -41,8 +43,14 @@ that accepts requests in OpenAI, Anthropic, Ollama, A2A, ACP, or AG-UI
 format, routes them to any Langertha backend engine, and traces everything
 via Langfuse.
 
-See L<Langertha::Knarr> for full documentation including Docker usage, config
-file format, routing behaviour, and environment variable reference.
+The configuration file format, with the environment variable behind each
+setting, is documented in L<Langertha::Knarr::Config>; the model routing
+order in L<Langertha::Knarr::Router/resolve>. The README of the
+distribution covers Docker usage, passthrough and every environment
+variable. L<Langertha::Knarr> documents the server and its Perl API.
+
+Long options can be written with dashes or underscores (C<--log-file>,
+C<--log_file>) in any position.
 
 =head1 COMMANDS
 
@@ -56,9 +64,16 @@ file format, routing behaviour, and environment variable reference.
 
 =item B<check> — Validate the config file and report configuration status
 
+=item B<container> — Deprecated alias for C<start --from-env -p 8080 -p 11434>,
+the Docker image's own command: always C<0.0.0.0:8080> and C<0.0.0.0:11434>,
+no options of its own; for other ports use C<start --from-env -p ...>
+
 =back
 
 =head1 GLOBAL OPTIONS
+
+Accepted before the subcommand, and after C<start>, C<check> and C<models>
+(C<knarr start -c prod.yaml -v>); a value given after the subcommand wins.
 
 =over
 
@@ -78,25 +93,43 @@ Enable verbose logging to stderr. Also enabled by C<KNARR_DEBUG=1>.
 
 =item B<--from-env>
 
-Build config from environment variables when no config file is found.
-This is how the Docker image starts.
+Build config from environment variables when no config file is found:
+one engine per API key found, C<auto_discover> and C<passthrough> on, and
+OpenAI as the default engine when an OpenAI key is set. This is how the
+Docker image starts (C<start --from-env -p 8080 -p 11434>).
 
 =item B<-p>, B<--port> I<port>
 
-Port to listen on. Repeatable (e.g. C<-p 8080 -p 11434>). Defaults to
-8080 and 11434.
+Port to listen on, on the host from C<-H>. Repeatable (e.g. C<-p 8080 -p
+11434>). Given at least once, it replaces the config's C<listen:>. Without
+C<-p> Knarr listens on the config's C<listen:> addresses, which default to
+C<127.0.0.1:8080> and C<127.0.0.1:11434> (loopback only, also under
+C<--from-env>).
 
 =item B<-H>, B<--host> I<host>
 
-Host to bind to. Defaults to C<0.0.0.0>.
+Host the C<-p> ports bind to. Defaults to C<0.0.0.0>. Has no effect
+without C<-p>.
 
 =item B<-w>, B<--workers> I<n>
 
-Number of worker processes. Defaults to C<1>.
+Number of worker processes. Wins over the config's C<workers:> and
+C<KNARR_WORKERS>; without any of them C<1> (one process, nothing forked).
+Anything but a whole number of C<1> or more stops C<start> before it
+binds anything.
+With more, Knarr binds the listen addresses, runs auto-discovery and the
+capability probe once, then forks I<n> workers that accept on the same
+sockets. The first process stays as their supervisor: it restarts a worker
+that exits (pausing up to 30 seconds when one keeps dying right after its
+start or cannot be forked, while the others serve on) and passes
+C<SIGTERM>/C<SIGINT> on to all of them, exiting once they are gone. Each worker keeps its own sessions: a Raider conversation
+continues only when its next request reaches the same worker, which
+nothing guarantees.
 
 =item B<-n>, B<--trace-name> I<name>
 
-Langfuse trace name. Overrides C<KNARR_TRACE_NAME> and the config file.
+Langfuse trace name. Overrides the config file, C<LANGFUSE_TRACE_NAME> and
+C<KNARR_TRACE_NAME>.
 
 =item B<--log-file> I<path>
 
@@ -117,12 +150,14 @@ the config file.
 =item B<-e>, B<--env-file> I<path>
 
 Additional .env file to scan. Repeatable. C<.env> and C<.env.local> in the
-current directory are scanned automatically.
+current directory and C<$HOME/.env> are scanned automatically when they
+exist.
 
 =item B<-l>, B<--listen> I<addr>
 
 Listen address to include in generated config. Repeatable. Defaults to
-C<127.0.0.1:8080> and C<127.0.0.1:11434>.
+C<127.0.0.1:8080> and C<127.0.0.1:11434>; use C<0.0.0.0:...> for a config
+that must be reachable from outside, e.g. in a container.
 
 =item B<-o>, B<--output> I<path>
 

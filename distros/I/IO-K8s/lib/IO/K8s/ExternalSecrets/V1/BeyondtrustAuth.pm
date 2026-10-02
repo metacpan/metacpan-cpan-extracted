@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::BeyondtrustAuth;
 # ABSTRACT: Auth configures how the operator authenticates with Beyondtrust.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apiKey         => '+IO::K8s::ExternalSecrets::V1::BeyondTrustProviderSecretRef';
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::BeyondtrustAuth - Auth configures how the operator
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apiKey
 

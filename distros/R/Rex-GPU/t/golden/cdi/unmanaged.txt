@@ -4,5 +4,8 @@
 run: systemctl is-enabled nvidia-cdi-refresh.path 2>/dev/null
 run: systemctl is-active nvidia-cdi-refresh.path 2>/dev/null
 run: test -f /run/cdi/nvidia.yaml
+run: nvidia-ctk cdi list 2>/dev/null
 run: mkdir -p /etc/cdi
 run: nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml 2>/dev/null
+run: nvidia-ctk cdi generate --mode=management --vendor=management.nvidia.com --class=gpu --output=/etc/cdi/management.nvidia.yaml 2>&1
+run: nvidia-ctk cdi list 2>/dev/null

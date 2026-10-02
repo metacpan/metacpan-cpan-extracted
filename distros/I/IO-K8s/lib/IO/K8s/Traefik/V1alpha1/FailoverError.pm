@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::FailoverError;
 # ABSTRACT: Errors defines which errors should trigger the use of the fallback service.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s maxRequestBodyBytes => Int;
@@ -22,7 +22,7 @@ IO::K8s::Traefik::V1alpha1::FailoverError - Errors defines which errors should t
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 maxRequestBodyBytes
 

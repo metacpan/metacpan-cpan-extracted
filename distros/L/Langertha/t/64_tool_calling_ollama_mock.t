@@ -12,48 +12,41 @@ use lib path(__FILE__)->parent->child('lib')->stringify;
 
 BEGIN {
   eval {
-    require IO::Async::Loop;
     require Future::AsyncAwait;
-    require Net::Async::MCP;
-    require MCP::Server;
     1;
-  } or plan skip_all => 'Requires IO::Async, Net::Async::MCP, and MCP modules';
+  } or plan skip_all => 'Requires Future::AsyncAwait';
 }
 
-use IO::Async::Loop;
 use Future::AsyncAwait;
-use Net::Async::MCP;
-use MCP::Server;
+use Test::MockMCP;
 use Test::MockAsyncHTTP;
 
 my $data_dir = path(__FILE__)->parent->child('data');
 my $json = JSON::MaybeXS->new(utf8 => 1);
 
-# --- Build real in-process MCP server ---
+# --- Build a duck-typed MCP server (Test::MockMCP) with the add tool ---
 
-my $server = MCP::Server->new(name => 'test', version => '1.0');
-
-$server->tool(
-  name        => 'add',
-  description => 'Add two numbers together and return the result',
-  input_schema => {
-    type       => 'object',
-    properties => {
-      a => { type => 'number', description => 'First number' },
-      b => { type => 'number', description => 'Second number' },
+my $mcp = Test::MockMCP->new(
+  tools => [
+    {
+      name        => 'add',
+      description => 'Add two numbers together and return the result',
+      input_schema => {
+        type       => 'object',
+        properties => {
+          a => { type => 'number', description => 'First number' },
+          b => { type => 'number', description => 'Second number' },
+        },
+        required => ['a', 'b'],
+      },
+      code => sub {
+        my ($self, $args) = @_;
+        my $result = $args->{a} + $args->{b};
+        return $self->text_result("$result");
+      },
     },
-    required => ['a', 'b'],
-  },
-  code => sub {
-    my ($self, $args) = @_;
-    my $result = $args->{a} + $args->{b};
-    return $self->text_result("$result");
-  },
+  ],
 );
-
-my $loop = IO::Async::Loop->new;
-my $mcp = Net::Async::MCP->new(server => $server);
-$loop->add($mcp);
 
 # --- Load fixtures captured from real Ollama API ---
 

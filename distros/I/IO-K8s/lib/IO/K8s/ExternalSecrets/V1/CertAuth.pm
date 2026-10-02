@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::CertAuth;
 # ABSTRACT: has both clientCert and clientKey as secretKeySelector
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s clientCert => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::CertAuth - has both clientCert and clientKey as se
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 clientCert
 

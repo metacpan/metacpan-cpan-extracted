@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Headers;
 # ABSTRACT: Headers holds the headers middleware configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s accessControlAllowCredentials     => Bool;
@@ -84,7 +84,7 @@ IO::K8s::Traefik::V1alpha1::Headers - Headers holds the headers middleware confi
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 accessControlAllowCredentials
 

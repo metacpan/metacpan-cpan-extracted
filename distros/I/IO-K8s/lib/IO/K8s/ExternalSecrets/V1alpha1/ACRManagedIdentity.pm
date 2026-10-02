@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ACRManagedIdentity;
 # ABSTRACT: ManagedIdentity uses Azure Managed Identity to authenticate with Azure.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s identityId => Str;
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ACRManagedIdentity - ManagedIdentity uses Az
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 identityId
 

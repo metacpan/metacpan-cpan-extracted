@@ -53,7 +53,7 @@ subtest 'Anthropic formatter emits tool_use blocks' => sub {
   is $blocks->[1]{id},   'call_42';
   is $blocks->[1]{name}, 'get_weather';
   is $blocks->[1]{input}{city}, 'Berlin';
-  is $d->{stop_reason}, 'tool_calls';  # finish_reason was preserved from response
+  is $d->{stop_reason}, 'tool_use', 'OpenAI tool_calls finish_reason mapped to Anthropic tool_use (k17)';
 };
 
 subtest 'Anthropic formatter without finish_reason defaults to tool_use' => sub {

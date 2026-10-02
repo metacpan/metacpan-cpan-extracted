@@ -6,7 +6,7 @@ use warnings;
 
 # PODNAME: ebug_backend_perl
 # ABSTRACT: Backend for ebug
-our $VERSION = '0.67'; # VERSION
+our $VERSION = '0.68'; # VERSION
 
 
 exec $^X, "-d:ebug::Backend", @ARGV;
@@ -23,7 +23,7 @@ ebug_backend_perl - Backend for ebug
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 SEE ALSO
 
@@ -40,6 +40,8 @@ Contributors:
 Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
 
 Taisuke Yamada
+
+Richard Leach (HYDAHY)
 
 =head1 COPYRIGHT AND LICENSE
 

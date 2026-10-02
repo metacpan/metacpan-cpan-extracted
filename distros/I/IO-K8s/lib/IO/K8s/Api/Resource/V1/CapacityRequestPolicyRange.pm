@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::CapacityRequestPolicyRange;
 # ABSTRACT: CapacityRequestPolicyRange defines a valid range for consumable capacity values.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s max => Quantity;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1::CapacityRequestPolicyRange - CapacityRequestPolicyRa
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 max
 

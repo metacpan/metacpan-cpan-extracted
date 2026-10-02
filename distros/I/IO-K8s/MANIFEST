@@ -2069,6 +2069,7 @@ t/14_role_conditions.t
 t/150_k188_yaml_string_quoting.t
 t/151_k191_typed_maps.t
 t/152_k191_no_legacy_ref_warning.t
+t/153_k196_number_wire_type.t
 t/15_role_specbuilder.t
 t/16_role_netpol.t
 t/17_role_routable.t

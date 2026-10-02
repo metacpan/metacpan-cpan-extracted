@@ -39,7 +39,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter-CC
   repository: https://github.com/ology/MIDI-RtController-Filter-CC.git
-version: '0.1406'
+version: '0.1408'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

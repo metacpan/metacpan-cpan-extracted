@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1beta1::SingleCompositeDisruptionMode;
 # ABSTRACT: SingleCompositeDisruptionMode means that individual children of a CompositePodGroup can be disrupted or preempted independently.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 1;
@@ -17,7 +17,7 @@ IO::K8s::Api::Scheduling::V1beta1::SingleCompositeDisruptionMode - SingleComposi
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SUPPORT
 

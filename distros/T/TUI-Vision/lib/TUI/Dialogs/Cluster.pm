@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -182,7 +182,7 @@ sub drawMultiBox {    # void ($icon, $marker)
 
       my $col = $self->$column( $cur );
 
-      next if $col >= $self->{size}{x};
+      next unless $col < $self->{size}{x};
 
       if ( !$self->buttonState( $cur ) ) {
         $color = $cDis;
@@ -634,47 +634,46 @@ C<TCluster> itself is not intended to be instantiated directly.
 
 =head2 Commonly Used Features
 
-Most application code uses one of TCluster's concrete subclasses:
-L<TUI::Dialogs::RadioButtons> for single-select clusters and
-L<TUI::Dialogs::CheckBoxes> for multi-select clusters. These subclasses inherit
-all navigation and state management from TCluster while providing their own
-C<mark()> and C<press()> implementations for distinct user interactions.
+Most application code uses one of C<TCluster>'s concrete subclasses:
+L<TRadioButtons|TUI::Dialogs::RadioButtons> for single-select clusters and 
+L<TCheckBoxes|TUI::Dialogs::CheckBoxes> for multi-select clusters. These 
+subclasses inherit all navigation and state management from  C<TCluster> while 
+providing their own L<mark()|/mark> and L<press()|/press> implementations for
+distinct user 
+interactions.
 
 TCluster provides a common interface for cluster-type controls: manage
 selection via keyboard and mouse, track enabled/disabled items via an enable
-mask, and exchange selection state with dialogs using C<getData()> and
-C<setData()>. Typical workflow is to build a C<TSItem> linked-list, pass it to
-a subclass constructor, insert the resulting control into a L<TUI::Dialogs::Dialog>,
-then retrieve the final selection via C<getData()> after the dialog is closed.
+mask, and exchange selection state with dialogs using L<getData()|/getData> and
+L<setData()|/setData>. Typical workflow is to build a L<TSItem|TUI::Dialogs::StrItem> 
+linked-list, pass it to a subclass constructor, insert the resulting control 
+into a L<TDialog|TUI::Dialogs::Dialog>, then retrieve the final selection via 
+L<getData()|/getData> after the dialog is closed.
 
 =head1 ATTRIBUTES
 
 The following attributes represent the internal state of the cluster.
 
-=over
+=head2 value
 
-=item value
+Numeric value (I<PositiveOrZeroInt>). representing the current selection state.
 
-Numeric value representing the current selection state.
+For L<TRadioButtons|TUI::Dialogs::RadioButtons>, this value contains the index 
+of the selected item. For L<TCheckBoxes|TUI::Dialogs::CheckBoxes>, this value 
+is a bit mask where each bit represents the state of one checkbox.
 
-For C<TRadioButtons>, this value contains the index of the selected item.
-For C<TCheckBoxes>, this value is a bit mask where each bit represents the state
-of one checkbox.
-
-=item enableMask
+=head2 enableMask
 
 Bitmask indicating which items are enabled and selectable
 (I<PositiveOrZeroInt>).
 
-=item sel
+=head2 sel
 
 Index of the currently selected item (I<PositiveOrZeroInt>).
 
-=item strings
+=head2 strings
 
 Collection containing the text labels of all cluster items (I<TSItem>).
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -692,12 +691,12 @@ Creates a new cluster control.
 =item bounds
 
 Bounding rectangle defining the position and size of the cluster control
-(I<TRect>).
+(L<TRect|TUI::Objects::Rect>).
 
 =item strings
 
 Linked list of item descriptors consumed and converted into an internal string
-collection (I<TSItem>).
+collection (I<HashLike> e.g. L<TSItem|TUI::Dialogs::StrItem>).
 
 =back
 
@@ -812,10 +811,10 @@ Handles view state changes and moves the selection if required.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::RadioButtons>,
-L<TUI::Dialogs::CheckBoxes>,
-L<TUI::Dialogs::Dialog>,
-L<TUI::Views::View>
+L<TRadioButtons|TUI::Dialogs::RadioButtons>,
+L<TCheckBoxes|TUI::Dialogs::CheckBoxes>,
+L<TDialog|TUI::Dialogs::Dialog>,
+L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 

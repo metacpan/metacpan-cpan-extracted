@@ -26,18 +26,22 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Langertha::Skeid",
   "PREREQ_PM" => {
+    "Digest::SHA" => "6.02",
+    "File::ShareDir" => "1.118",
+    "HTTP::Tiny" => "0.080",
     "JSON::MaybeXS" => "1.004004",
-    "Langertha" => "0.400",
+    "Langertha" => "0.503",
     "Mojolicious" => "9.0",
     "Moo" => "2.005005",
-    "YAML::PP" => "0.038"
+    "YAML::PP" => "0.038",
+    "namespace::clean" => "0.27"
   },
   "TEST_REQUIRES" => {
     "Test2::Suite" => 0,
     "Test::File::ShareDir" => 0,
     "Test::Mojo" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,14 +49,18 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Digest::SHA" => "6.02",
+  "File::ShareDir" => "1.118",
+  "HTTP::Tiny" => "0.080",
   "JSON::MaybeXS" => "1.004004",
-  "Langertha" => "0.400",
+  "Langertha" => "0.503",
   "Mojolicious" => "9.0",
   "Moo" => "2.005005",
   "Test2::Suite" => 0,
   "Test::File::ShareDir" => 0,
   "Test::Mojo" => 0,
-  "YAML::PP" => "0.038"
+  "YAML::PP" => "0.038",
+  "namespace::clean" => "0.27"
 );
 
 

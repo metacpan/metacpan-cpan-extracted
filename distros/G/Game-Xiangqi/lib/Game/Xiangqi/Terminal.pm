@@ -11,7 +11,7 @@ use Game::Xiangqi;
 use Game::Xiangqi::Engine ':all';
 use Game::Xiangqi::Notation;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $N = 'Game::Xiangqi::Notation';
 
@@ -87,8 +87,8 @@ sub _encode_out {
 }
 
 sub out    { my $s = shift; if (@_) { $s->_fh(shift); $s->_encode_out } $s->_fh }
-sub ascii  { my $s = shift; if (@_) { $s->_ascii(shift ? 1 : 0); $s->_encode_out } $s->_ascii }
-sub colour { my $s = shift; $s->_colour(shift ? 1 : 0) if @_; $s->_colour }
+sub ascii  { my $s = shift; if (@_) { $s->_ascii(shift() ? 1 : 0); $s->_encode_out } $s->_ascii }
+sub colour { my $s = shift; $s->_colour(shift() ? 1 : 0) if @_; $s->_colour }
 
 sub _say { my ($self, @t) = @_; my $fh = $self->_fh; print {$fh} @t, "\n" }
 sub _out { my ($self, @t) = @_; my $fh = $self->_fh; print {$fh} @t }

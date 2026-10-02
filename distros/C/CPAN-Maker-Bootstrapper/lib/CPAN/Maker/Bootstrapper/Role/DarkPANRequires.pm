@@ -5,6 +5,7 @@ use warnings;
 
 use Carp qw(croak);
 use CLI::Simple::Constants qw(:booleans);
+use CLI::Simple::Utils qw(slurp choose);
 use Data::Dumper;
 use English qw(-no_match_vars);
 use HTTP::Tiny;
@@ -24,8 +25,23 @@ sub cmd_create_darkpan_requires {
 ########################################################################
   my ($self) = @_;
 
-  open my $requires_fh, '<', $REQUIRES_FILE
-    or croak sprintf 'Could not open %s: %s', $REQUIRES_FILE, $OS_ERROR;
+  my ($requires_file) = $self->get_args;
+  $requires_file //= $REQUIRES_FILE;
+
+  my $filter = choose {
+    my $filter_file = $self->get_filter;
+
+    return {}
+      if !$filter_file;
+
+    die "ERROR: $filter_file not found\n"
+      if !-f $filter_file;
+
+    return { map { $_ => 1 } split /\n/xsm, slurp($filter_file) };
+  };
+
+  open my $requires_fh, '<', $requires_file
+    or die sprintf 'ERROR: Could not open %s: %s', $requires_file, $OS_ERROR;
 
   my $darkpan_index = $self->fetch_darkpan_index;
 
@@ -54,6 +70,8 @@ sub cmd_create_darkpan_requires {
       $self->get_logger->warn( sprintf '%s is available from both CPAN and the configured DarkPAN; preferring DarkPAN',
         $module );
     }
+
+    next if exists $filter->{$module};  # filter unwanted darkpan distributions
 
     $version //= 0;
 

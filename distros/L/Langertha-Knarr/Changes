@@ -1,5 +1,475 @@
 Revision history for Langertha-Knarr
 
+1.102     2026-10-01 17:35:07Z
+
+    - The JSONL request log (logging.file / logging.dir) now carries
+      prompt-cache tokens: usage gets cached_tokens (cache reads) and
+      cache_write_tokens (cache writes) beside input_tokens /
+      output_tokens / total_tokens, only when not zero, split the way the
+      Langfuse trace splits them. The existing fields keep their meaning.
+      A usage that counts no token is logged as null instead of 0/0/0.
+
+    - Langfuse generations now carry prompt-cache tokens, on both
+      transports, for routed answers, routed streams and the raw
+      passthrough. The usage details are Langfuse's exclusive buckets:
+      input is the uncached input, cache reads are input_cached_tokens,
+      cache writes input_cache_creation, total their sum. Anthropic's
+      cache_read_input_tokens / cache_creation_input_tokens were dropped
+      before, so a cached request showed a handful of input tokens; OpenAI's
+      cached_tokens stayed inside input and was priced as uncached. The v2
+      usage keeps the whole input. A usage that counts no tokens (an error
+      body, a hash without a count key) is no usage, instead of a 0/0/0.
+
+    - A config section of the wrong type (a2a: Support Agent, models: as a
+      list, a default: string, listen: as a mapping, ...), a file that is
+      not valid YAML and an empty config file are reported by knarr check
+      and stop knarr start and knarr models with a message naming the
+      section, instead of a Perl error. passthrough: as a list is now such
+      an error rather than silently off.
+
+    - Upgrade note for docker-compose users: LANGFUSE_NEXTAUTH_SECRET,
+      LANGFUSE_SALT and LANGFUSE_DB_PASSWORD are now required in .env and
+      compose refuses to start without them; an existing Postgres volume
+      keeps its old password, so set LANGFUSE_DB_PASSWORD=langfuse or start
+      over with docker compose down -v.
+
+    - docker-compose.yml sets up its Langfuse on startup: an organization
+      and a project named knarr, with LANGFUSE_PUBLIC_KEY and
+      LANGFUSE_SECRET_KEY from .env as the project's API keys, so traces
+      arrive without first creating a project in the Langfuse UI. A
+      dashboard login is created when LANGFUSE_INIT_USER_PASSWORD is set.
+      Langfuse's NEXTAUTH_SECRET and SALT and the Postgres password come
+      from .env instead of fixed values. The Knarr container no longer gets
+      the whole .env, so the Langfuse server secrets stay out of it: it
+      gets only the variables Knarr reads, each from .env or the shell (the
+      shell wins); a custom api_key_env name needs its own line under the
+      knarr service's environment:. Langfuse's dashboard port 3000 is
+      published on 127.0.0.1 unless LANGFUSE_BIND says otherwise, and
+      KNARR_BIND restricts Knarr's 8080 and 11434 to one address.
+
+    - langfuse.transport: otel (or KNARR_LANGFUSE_TRANSPORT=otel) sends each
+      trace to Langfuse's OpenTelemetry endpoint
+      (/api/public/otel/v1/traces, OTLP over HTTP, JSON) instead of the
+      deprecated ingestion API: a root span with the trace's name, tag,
+      metadata, input and output, and a proxy-request generation span with
+      model, token usage, timing and tool calls; a failed request marks
+      both spans as errors. Needs Langfuse Cloud or self-hosted v3.22 or
+      later; the default stays ingestion, which the Langfuse v2 in
+      docker-compose.yml needs.
+
+    - langfuse.timeout (or KNARR_LANGFUSE_TIMEOUT) sets how long a trace
+      post to Langfuse may take before it is logged as failed, on either
+      transport; the default is now 15 seconds instead of 5, and 0 sets no
+      limit. knarr init mentions both new settings in its commented
+      langfuse section.
+
+    - The A2A agent card at /.well-known/agent.json now names the agent
+      "Langertha Knarr Agent" and reports Knarr's own version. a2a.name and
+      a2a.description in the config (KNARR_A2A_NAME, KNARR_A2A_DESCRIPTION)
+      set its name and description. Langertha::Knarr takes protocol_args to
+      pass such settings to its protocols.
+
+    - /api/show "vision" and the manifest's image_input are now right for
+      gateway and self-hosted models. Once the server listens (after
+      auto-discovery), Knarr asks the provider's own model metadata,
+      concurrently and in the background, whether each routed model sees
+      images: a catalogue endpoint (OpenRouter, Mistral, LM Studio,
+      T-Systems) once for all its models, however many were discovered,
+      and Ollama and llama.cpp once per model (needs a Langertha with
+      probe_model_capabilities_f, and import_learned_capabilities for the
+      one-request-per-endpoint catalogue; older ones probe each model or
+      send nothing). A probe that fails or exceeds probe_timeout
+      (KNARR_PROBE_TIMEOUT, default 10 seconds) is logged and not retried,
+      and the model keeps its previous answer. probe_capabilities: 0
+      (KNARR_PROBE_CAPABILITIES=0) turns it off; under PSGI call the
+      router's probe_capabilities_f yourself.
+
+    - An upstream that never answers no longer holds a client forever.
+      Passthrough, the A2A and ACP clients and routed engines now time out:
+      upstream_timeout (KNARR_UPSTREAM_TIMEOUT, default 300 seconds) is the
+      total time of a non-streaming request and the routed engines'
+      user_agent_timeout unless a model sets its own; a passthrough stream
+      may go upstream_stall_timeout (KNARR_UPSTREAM_STALL_TIMEOUT, default
+      120) seconds without data. 0 disables either. An expired request
+      answers 504 in the client protocol's error shape, and a stream that
+      stalls mid-way ends with the protocol's error frame instead of an
+      "[error: ...]" text chunk, on the raw passthrough and through the
+      handler chain (routed engines with a Langertha that reports timeouts,
+      the Passthrough handler, the Tracing and RequestLog decorators), on
+      the native server and under PSGI. A streaming passthrough that fails
+      before its headers is answered with 502 or 504 like a non-streaming
+      one; other handler failures keep their 500. A stream that fails while
+      the client waits for its next chunk reports the failure instead of
+      ending as if complete, and a stream behind the Tracing or RequestLog
+      decorator no longer stalls when the upstream is slower than the
+      client. PSGI streams from a routed engine or the Passthrough handler
+      now work when the upstream answers after the request started.
+
+    - Security fix: the PSGI adapter now enforces auth_token
+      (proxy_api_key). Under Plack a protected Knarr answered chat,
+      streaming chat, /v1/models, the other model listings and
+      /.well-known/langertha.json without a key; it now applies the same
+      check and the same 401 as the native server on every route, with the
+      A2A agent card still anonymous. Upgrade if you serve Knarr via PSGI
+      with a key set.
+
+    - GET /api/version answers Ollama's {"version":"x.y.z"} on the native
+      server and PSGI instead of a 500. The version is the Ollama version
+      Knarr's Ollama endpoints are compatible with, not Knarr's own:
+      0.34.4 by default, set with the new ollama_compat_version config key
+      or KNARR_OLLAMA_COMPAT_VERSION. It must be three dot-separated
+      numbers (Open WebUI parses each part as an integer; a value like
+      0.34.4-knarr is refused at startup and by knarr check) and at least
+      0.6.4 for VS Code Copilot. The route needs proxy_api_key when one is
+      set.
+
+    - Images reach every engine, whatever shape the client sends them in:
+      the OpenAI (image_url parts, data: URLs or links), Anthropic (image
+      blocks, base64 or url) and Ollama (a message's images array, or the
+      request's images on /api/generate; the media type is read from the
+      image bytes) endpoints turn them into Langertha image objects, and
+      Langertha writes them in the routed engine's own format. Links are
+      not fetched by Knarr. Needs a Langertha whose image objects write
+      every engine format; with an older one images pass through as sent.
+      An OpenAI image_url detail hint is not carried. Traces and request
+      logs record images as image_url parts.
+
+    - POST /api/show answers on the native server and PSGI, so VS Code
+      Copilot's Ollama provider works against Knarr. For a model /api/tags
+      lists it returns Ollama's shape with capabilities completion, plus
+      tools when the routed engine takes tools, plus vision when that
+      engine claims image input for the upstream model (needs a Langertha
+      with the image_input capability; never thinking), and the context
+      length in model_info when the engine knows it. An
+      unlisted model gets Ollama's 404 {"error":"model 'x' not found"},
+      a request without model a 400. Needs proxy_api_key when one is set.
+
+    - A model's context_size config key now reaches engines that take a
+      context window (Ollama and LMStudio native): they send it upstream
+      (Ollama's num_ctx) and /api/show reports it as the context length.
+      Other engines ignore it with one warning when the config is loaded;
+      knarr check refuses a value that is not a positive integer. Models
+      found by auto_discover do not inherit it from the entry they were
+      discovered through (they keep its url, key, system_prompt,
+      temperature and response_size).
+
+    - The PSGI adapter now does the same raw passthrough as the native
+      server: a model the router does not configure goes to the upstream
+      byte for byte, with the client's headers, and its answer comes back
+      unchanged (tool calls, usage, cache fields and all) instead of being
+      re-framed by the handler chain. A streamed answer arrives whole under
+      PSGI, like every stream there.
+
+    - Knarr serves a Langertha provider manifest at
+      GET /.well-known/langertha.json on the native server and PSGI, so
+      raider --provider HOST can configure itself. It lists the OpenAI
+      (openai-chat), Anthropic (anthropic-compat) and Ollama endpoints
+      under the public URL (new public_url config key / KNARR_PUBLIC_URL,
+      else taken from the request), every configured alias and
+      auto-discovered model with its engine's capabilities as far as that
+      protocol forwards them (image_input on every endpoint where Knarr
+      translates images, see below; with an older Langertha only where the
+      engine reads that protocol's own image parts), and
+      api_key auth when proxy_api_key is set
+      (the route needs the key then, like /v1/models). Upstream URLs, keys,
+      key variable names and passthrough targets are never published.
+      Needs a Langertha with Langertha::Manifest; with an older one the
+      route answers 404.
+
+    - Non-streaming OpenAI answers encode tool-call arguments once:
+      non-ASCII values in function.arguments no longer reach the client
+      double-encoded ("KÃ¶ln" instead of "Köln"), with any Langertha
+      version.
+
+    - Non-streaming Handler::Passthrough answers now carry the upstream's
+      tool calls (OpenAI message.tool_calls, Anthropic tool_use blocks,
+      Ollama message.tool_calls) and its finish reason, so the client gets
+      the calls in its own protocol's shape with a tool-call stop reason
+      instead of a text-only answer.
+
+    - Routed streams now deliver the backend's tool calls. They arrive
+      whole when the stream closes, before the terminal frames: Anthropic
+      as one tool_use content block per call (content_block_start, one
+      input_json_delta with the full arguments, content_block_stop),
+      OpenAI as one chunk with delta.tool_calls, Ollama as
+      message.tool_calls on the done line. Handler::Passthrough assembles
+      the upstream's streamed tool calls the same way, and the tracing and
+      request-log decorators record them. Langertha::Knarr::Stream carries
+      them as tool_calls, and format_stream_close / format_stream_done
+      receive them as a third argument. Engine streams need a Langertha
+      whose stream parser attaches the assembled calls to its chunks;
+      with one that does not, the stream carries none.
+
+    - A routed stream now carries the token usage the backend reported: the
+      Langfuse generation and the request log record it, and the client
+      gets it the way its protocol does -- Anthropic on message_delta,
+      Ollama as prompt_eval_count / eval_count on the done line, OpenAI in
+      a usage chunk before [DONE] when the request asks with
+      stream_options.include_usage. Langertha::Knarr::Stream carries it as
+      usage, and format_stream_close / format_stream_done receive it as a
+      fourth argument. An OpenAI upstream's separate usage frame and
+      Anthropic's input tokens from message_start need a Langertha newer
+      than 0.503.
+
+    - The Langfuse generation of a routed request names the model the
+      upstream reported answering with (gpt-4o-2024-08-06 for gpt-4o), the
+      configured model kept in its metadata as configured_model; clients
+      still see the configured name. Langertha::Knarr::Response and Stream
+      carry the reported one as upstream_model.
+
+    - Two models routed to the same engine, URL and API key now each get
+      their own engine instance, so the upstream request carries the model
+      the client asked for. This covers auto-discovered gateway models and
+      names routed to the default engine as well.
+
+    - A model configured without a model: key now reports the model that
+      actually answered (the upstream's, else the engine's default model)
+      instead of the alias name. Router->resolve returns a third value
+      that is true for such alias-only configs.
+
+    - auto_discover now queries every configured endpoint: two models on
+      the same engine class with a different URL or API key variable each
+      contribute their discovered models.
+
+
+    - Streams now end with the backend's real finish reason instead of a
+      fixed "normal end": the Anthropic message_delta stop_reason uses the
+      same mapping as non-streaming answers, OpenAI streams end with a
+      terminal chunk (empty delta, finish_reason) before data: [DONE], and
+      the Ollama done_reason is mapped into Ollama vocabulary (length stays
+      length, everything else becomes stop) on both streaming and
+      non-streaming answers. Non-streaming OpenAI answers map a backend's
+      end_turn, max_tokens, tool_use or Gemini STOP / MAX_TOKENS / SAFETY
+      to OpenAI's finish_reason vocabulary instead of passing it verbatim.
+      Langertha::Knarr::Stream carries the reason as finish_reason, and
+      format_stream_close / format_stream_done receive it as a second
+      argument.
+
+    - The Anthropic protocol now answers with a stop_reason from Anthropic's
+      own vocabulary: tool_calls and function_call become tool_use, length
+      becomes max_tokens, stop becomes end_turn (tool_use when the reply
+      carries tool calls), content_filter becomes refusal. Values already
+      in Anthropic vocabulary pass through; any other value falls back to
+      end_turn or tool_use.
+
+    - The routed path now forwards tools and tool_choice to Hermes-wire
+      engines (NousResearch, AKI native), which carry tools in the system
+      prompt and advertise tools_hermes rather than tools_native. Both are
+      forwarded when the engine supports either capability, and still
+      dropped when it supports neither.
+
+    - Langertha floor raised from 0.500 to 0.503, matching the real
+      runtime dependency. Knarr requires the canonical per-request
+      controls chat_f extracts (reasoning_effort, seed, parallel_tool_use,
+      prompt_cache_key) and Langertha::ToolCall's TO_JSON, all of which
+      land in 0.503; a clean install against 0.500-0.502 runs the control
+      and streaming paths red or degrades them silently.
+
+    - Tool calls are now recorded in both observability sinks on the routed
+      path. The Langfuse trace keeps the full call (tool name, call id and
+      complete arguments); the JSONL request log keeps a trimmed form (tool
+      name, call id and an arguments preview capped at 200 characters, with a
+      truncated flag), because the log is the running operational record and
+      arguments can be large or carry user data.
+
+    - The routed path now forwards per-request generation controls from the
+      client body, capability-gated like temperature and max_tokens:
+      reasoning_effort, seed, parallel_tool_use and prompt_cache_key. A
+      configured model honours them (raw passthrough always did); each
+      protocol parser reads a control only where its wire carries the field
+      (OpenAI top-level seed / parallel_tool_calls / prompt_cache_key,
+      Ollama options.seed), and Langertha places each on the target engine's
+      own wire. The gate is strict: a control is dropped onto an engine
+      whose role inventory does not advertise it, even where the engine's
+      wire would accept the field.
+
+    - Routed streaming now forwards the same capability-filtered
+      generation parameters as the non-streaming path: both streaming
+      handlers call the engine's chat_stream_realtime_f with chat_f_args
+      (tools, tool_choice, response_format, temperature, max_tokens), so a
+      stream:true request behaves like stream:false, and tool-calling
+      works while streaming.
+
+    - Routed streaming responses now record time-to-first-token in the
+      Langfuse trace. The decorator measures it in the proxy: the clock
+      starts before the upstream stream opens and stops at the first
+      delta, so completionStartTime is emitted for streamed requests too.
+      This figure is the proxy's own view and includes its dispatch
+      overhead, unlike the engine-measured non-streaming path. An empty
+      or failed stream records no timing.
+
+    - The Anthropic and Ollama faces now forward a client's thinking
+      request on the routed path. Anthropic thinking (disabled: none,
+      adaptive or enabled without a budget: medium, budget_tokens: the
+      nearest level of Langertha's BudgetPolicy for the model) and Ollama
+      think (false: none, true: medium, a level string as sent) become the
+      request's reasoning_effort, capability-gated like the OpenAI field;
+      an explicit reasoning_effort or output_config.effort wins. The
+      default level and budget anchors are overridable through the
+      protocol's reasoning attribute (Langertha::Knarr::Reasoning).
+      budget_tokens needs a Langertha with
+      Langertha::Reasoning::BudgetPolicy; older ones leave it unmapped.
+      The manifest's anthropic and ollama endpoints now claim
+      reasoning_effort.
+
+    - knarr start, check and models accept -c/--config and -v/--verbose
+      after the subcommand too (knarr start -c prod.yaml -v), as
+      documented; a value given after the subcommand wins.
+
+    - Dashed long options work in every position: knarr start --from-env
+      --log-file x.jsonl no longer fails with "Unknown option: log-file".
+
+    - Raw passthrough only takes a request when an upstream exists for the
+      client's protocol. An unconfigured model in any other protocol
+      (Ollama without an ollama upstream, A2A, ACP, AG-UI) goes to the
+      default engine, so default: under --from-env works again.
+
+    - A model nothing can serve (not configured, no passthrough for the
+      protocol, no default engine) is answered with 404 in the client
+      protocol's error shape instead of a 500 carrying a Perl error;
+      streaming requests get the 404 before the stream starts.
+
+    - A request that names no model (A2A always, ACP without agent_name,
+      AG-UI, OpenAI, Anthropic and Ollama bodies without one) reaches the
+      default engine with the model configured under default:, or the
+      provider's default when none is set, instead of a model called
+      'default' that a real upstream rejects. A model the client names
+      still reaches the default engine as asked.
+
+    - The README, POD and example configs now match the code: listen and
+      -p/-H behaviour, passthrough, routing of unknown models per protocol,
+      the A2A, ACP and AG-UI examples, the config key and environment
+      variable reference. docker-compose now pins Langfuse v2
+      (langfuse/langfuse:2), which runs on Postgres alone.
+
+    - Prebuilt single-file knarr binaries for Linux (x86_64 and aarch64)
+      are attached to each GitHub release as knarr-VERSION-linux-ARCH, each
+      also as a .tar.gz, with one checksums file for all of them. No Perl
+      is needed on the target, only libssl and libcrypto (and
+      ca-certificates for HTTPS upstreams). scripts/build-binary.sh builds
+      them with PAR::Packer; scripts/verify-binary.sh and
+      scripts/check-binary-libs.sh smoke-test them.
+
+    - Security fix: Knarr's own proxy key (proxy_api_key, KNARR_API_KEY)
+      no longer reaches a passthrough upstream. Knarr removes it from
+      Authorization and x-api-key wherever it appears, bare or as Bearer,
+      also when a client sends a header twice and the values arrive
+      merged, and drops a header that held nothing else. The client's own
+      provider key is forwarded alongside. This holds on the raw
+      passthrough and through the Passthrough handler, on the native
+      server and under PSGI. The proxy key is accepted as one of several
+      values of a header.
+
+    - knarr start --from-env and knarr init now give the default engine
+      the API key variable they found (api_key_env), so a default OpenAI
+      engine works with a plain OPENAI_API_KEY instead of failing for want
+      of LANGERTHA_OPENAI_API_KEY.
+
+    - knarr container works again as the deprecated Docker alias: it runs
+      knarr start --from-env -p 8080 -p 11434 and listens on 0.0.0.0:8080
+      and 0.0.0.0:11434. An Ollama /api/generate request on the raw
+      passthrough now reaches the upstream's /api/generate instead of
+      /api/chat. knarr start --help describes -p, -H and -w as they
+      behave. The PSGI request wrapper is now a module of its own,
+      Langertha::Knarr::PSGI::FakeReq.
+
+    - With auto_discover and passthrough both on (--from-env, the Docker
+      image), a model known only from auto-discovery now passes through
+      byte for byte when the passthrough upstream of the client's protocol
+      is the provider that listed it, host and path alike (a gateway
+      serving several providers under paths of one host is several
+      upstreams), and the client sends its own provider key:
+      Authorization for OpenAI, x-api-key or Authorization for Anthropic,
+      the proxy key not counting. Claude Code's requests to Anthropic
+      keep cache_control, usage and tool_use details untouched and use
+      Claude Code's own credentials. Without a provider key of its own, a
+      client gets a discovered model through the engine that listed it,
+      with that engine's key, also under --from-env and in the Docker
+      image; so do a model discovered from another provider, a model
+      configured under models:, and a request in a protocol without a
+      passthrough upstream. So does a client whose key the upstream
+      refuses with 401 (the placeholder key an SDK sends when it has
+      none): the engine answers with Knarr's key instead of the 401
+      reaching the client, streaming too, on the native server and under
+      PSGI. The upstream is asked once and the request is traced once,
+      with passthrough_fallback: 401 in the trace's metadata; other
+      statuses, and the 401 for a model nobody configured or discovered,
+      pass through unchanged. Discovery still fills /v1/models, /api/tags,
+      the manifest and the capability probe. A model several endpoints
+      list belongs to one of them, the same on every run: the
+      passthrough upstream first, else the first by model config name;
+      the others are logged at debug level.
+
+    - Ollama's /api/generate answers in Ollama's generate shape on the
+      routed path as well: the text on response, streaming and
+      non-streaming, instead of the /api/chat shape. A passthrough handler
+      in the handler chain sends it to the upstream's /api/generate and
+      reads its answer.
+
+    - The raw passthrough now forwards a header the client sends twice as
+      two lines, in order, instead of only its last value; the proxy key
+      is still taken out of every line. The upstream's response headers
+      come back to the client too -- Set-Cookie sent twice, retry-after,
+      request ids, rate limits -- where only the status, content type and
+      body did before. A body in an encoding Knarr's HTTP client decodes
+      (gzip, deflate) goes back decoded, without its Content-Encoding; a
+      buffered answer in any other (br, zstd, stacked encodings) goes back
+      as the upstream sent it, with its Content-Encoding, instead of as an
+      empty body, and a Content-Encoding sent over several header lines is
+      kept or dropped as a whole. Under PSGI the server already joins a
+      repeated request header into one value, which is forwarded as that
+      one line.
+
+    - knarr start serves from several worker processes: -w/--workers N,
+      the config's workers: or KNARR_WORKERS (-w wins; the Docker image
+      picks up KNARR_WORKERS as is). Knarr binds the listen addresses,
+      runs auto-discovery and the capability probe once, then forks N
+      workers that accept on the same sockets. The first process
+      supervises them, restarts a worker that exits (pausing up to 30
+      seconds when one keeps dying at start) and passes SIGTERM/SIGINT on
+      to all of them. A replacement that cannot be forked (out of
+      processes or memory) does not stop the server: the other workers
+      keep serving and the fork is retried after the same growing pause. A
+      SIGTERM or SIGINT that reaches a worker right after its fork ends
+      only that worker. Each worker looks up upstream hostnames through its
+      own resolver, not the one the supervisor's capability probe started,
+      so no worker gets another's answer. Sessions stay in the worker that
+      created them. The default of 1 forks nothing, as before; a worker
+      count below 1 stops start before anything is bound.
+
+    - Request log lines are written in one piece, so workers sharing a log
+      file never interleave them, and per-request files in logging.dir are
+      named {timestamp}_{pid}-{seq}_{format}_{model}.json, so requests that
+      finish in the same millisecond no longer overwrite each other's file.
+
+    - Listen sockets queue up to SOMAXCONN pending connections instead of
+      IO::Async's default of 3.
+
+    - Token usage now reaches Langfuse: generations carry the counts as
+      usage { input, output, total, unit } for Langfuse v2 and
+      usageDetails for v3, instead of the input_tokens / output_tokens /
+      total_tokens keys Langfuse dropped, which left every generation at
+      0 / 0 / 0. A provider's own usage hash is mapped the same way, and
+      a request without usage sends none rather than zeros.
+
+    - Raw passthrough: its Langfuse generation now carries the token usage
+      and model the upstream reported, read from a copy of the answer (the
+      JSON body, or a stream's usage frames: OpenAI's final usage chunk,
+      Anthropic's message_start and message_delta, Ollama's done frame).
+      The bytes the client gets are unchanged, and nothing is read when
+      tracing is off.
+
+    - A header the client sends twice (Authorization, x-api-key,
+      anthropic-version) now reaches the upstream twice through a
+      Handler::Passthrough in the handler chain, in its order, for OpenAI,
+      Anthropic and Ollama requests, instead of as one merged value;
+      Knarr's proxy key is taken out of each line on its own. The request's
+      forward_headers is now a list of [ name, value ] pairs, no longer a
+      hash: read it with the new forward_header_pairs and forward_header
+      methods on Langertha::Knarr::Request. Under PSGI the server still
+      joins a repeated header into one value, which goes on as one line.
+
+
 1.101     2026-08-15 00:13:51Z
 
     - Fixed: the routed path died on any real engine response that
@@ -355,3 +825,7 @@ Revision history for Langertha-Knarr
   - Passthrough mode with Langfuse tracing
   - Docker container mode with auto-detect from ENV
   - CLI: start, container, models, check, init
+
+    - The Passthrough handler in the handler chain now forwards the
+      client's Authorization on Ollama requests too, so an authenticated
+      remote Ollama works behind it. Knarr's own proxy key is never sent.

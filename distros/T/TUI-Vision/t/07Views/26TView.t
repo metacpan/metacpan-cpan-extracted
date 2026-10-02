@@ -8,6 +8,8 @@ BEGIN {
   use_ok 'TUI::Objects::Point';
   use_ok 'TUI::Objects::Rect';
   use_ok 'TUI::Drivers::Const', qw( evMouseDown );
+  use_ok 'TUI::Drivers::AttrPair';
+  use_ok 'TUI::Drivers::ColorAttr';
   use_ok 'TUI::Drivers::Event';
   use_ok 'TUI::Views::Const', qw( sfVisible );
   use_ok 'TUI::Views::Palette';
@@ -48,13 +50,27 @@ subtest 'mapColor method' => sub {
 };
 
 # Test the getColor method
-subtest 'getColor method' => sub {
+subtest 'getColor (classic) returns an integer' => sub {
   my $view = TView->new( bounds => $bounds );
+  my $attr = $view->getColor( 0x100 );
+  ok( !ref $attr, 'returns plain integer' );
   is( 
-    $view->getColor( 0x100 ), 
+    $attr,
     ( 0x100 | $TUI::Views::View::errorAttr ),
     'getColor method returns correct color'
   );
+};
+
+subtest 'getColor (modern) returns a TAttrPair object' => sub {
+  no warnings 'redefine';
+  local *TUI::Views::View::mapColor = sub {
+    return TColorAttr->new( bios => $_[1] )
+  };
+
+  my $view = TView->new( bounds => $bounds );
+  my $attr = $view->getColor( 0x100 );
+  isa_ok( $attr, TAttrPair );
+  is( $attr->asBIOS, 0x100, 'getColor method returns correct value' );
 };
 
 # Test the getState method

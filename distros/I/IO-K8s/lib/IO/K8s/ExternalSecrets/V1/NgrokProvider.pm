@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::NgrokProvider;
 # ABSTRACT: Ngrok configures this store to sync secrets using the ngrok provider.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apiUrl => Str, { default => 'https://api.ngrok.com' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::NgrokProvider - Ngrok configures this store to syn
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apiUrl
 

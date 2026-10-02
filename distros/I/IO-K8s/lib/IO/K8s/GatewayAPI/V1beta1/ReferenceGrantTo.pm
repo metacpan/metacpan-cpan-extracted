@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::ReferenceGrantTo;
 # ABSTRACT: ReferenceGrantTo describes what Kinds are allowed as targets of the references.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s group => Str, { required => 'schema', pattern => qr/^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/ };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1beta1::ReferenceGrantTo - ReferenceGrantTo describes what
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 group
 

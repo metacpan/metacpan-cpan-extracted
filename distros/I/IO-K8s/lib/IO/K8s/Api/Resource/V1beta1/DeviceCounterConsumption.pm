@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::DeviceCounterConsumption;
 # ABSTRACT: DeviceCounterConsumption defines a set of counters that a device will consume from a CounterSet.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s compatibilityGroups => [Str];
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1beta1::DeviceCounterConsumption - DeviceCounterConsump
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 compatibilityGroups
 

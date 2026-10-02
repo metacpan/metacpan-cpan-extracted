@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::AddPrefix;
 # ABSTRACT: AddPrefix holds the add prefix middleware configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s prefix => Str;
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::AddPrefix - AddPrefix holds the add prefix middlewar
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 prefix
 

@@ -1,9 +1,11 @@
 package TUI::StdDlg::Const;
+# ABSTRACT: Constants for standard dialog components
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -205,7 +207,7 @@ TUI::StdDlg::Const - constants for standard dialog components
   
 =head1 DESCRIPTION
 
-C<TUI::StdDlg::Const> defines the constants used by the TUI::Vision standard
+This module defines the constants used by the L<TUI::Vision> standard
 dialog subsystem.
 
 The constants in this module are grouped by purpose and exported via tag-based
@@ -214,8 +216,8 @@ classes to control behavior, command handling, palette selection, and file
 attribute filtering.
 
 This module only defines constants. The semantic meaning and practical usage of
-these constants is documented in the corresponding higher-level modules, most
-notably C<TUI::StdDlg> and the individual dialog classes.
+these constants is documented in the corresponding modules and the individual 
+dialog classes.
 
 =head1 CONSTANTS
 
@@ -223,8 +225,8 @@ notably C<TUI::StdDlg> and the individual dialog classes.
 
 Command identifiers used by standard dialogs and list views.
 
-These values are delivered via C<$event-E<gt>{command}> and are handled by dialog
-and view classes.
+These values are delivered via C<< $event->{command} >> and are handled by 
+dialog and view classes.
 
 =head2 File dialog option flags (fdXXXX)
 
@@ -265,10 +267,10 @@ An additional C<:all> export tag is provided to import all constants at once.
 
 =head1 SEE ALSO
 
-L<TUI::StdDlg>,
-L<TUI::StdDlg::FileDialog>,
-L<TUI::StdDlg::ChDirDialog>,
-L<TUI::StdDlg::FileCollection>
+L<StdDlg|TUI::StdDlg>,
+L<TFileDialog|TUI::StdDlg::FileDialog>,
+L<TChDirDialog|TUI::StdDlg::ChDirDialog>,
+L<TFileCollection|TUI::StdDlg::FileCollection>
 
 =head1 AUTHORS
 

@@ -1,10 +1,11 @@
 package TUI::Objects::SortedCollection;
 # ABSTRACT: sorted collection base class
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -40,9 +41,10 @@ TUI::Objects::SortedCollection - sorted collection base class
 =head1 HIERARCHY
 
   TObject
-    TCollection
-      TSortedCollection
-        TStringCollection
+    TNSCollection
+      TNSSortedCollection
+        TSortedCollection
+          TStringCollection
 
 =head1 SYNOPSIS
 
@@ -87,12 +89,12 @@ appropriate position based on a comparison function supplied by derived
 classes.
 
 The class itself does not define how items are compared or which part of an
-item constitutes the sort key. Subclasses must override C<keyOf> to extract a
-key from an item and C<compare> to define the ordering of those keys.
+item constitutes the sort key. Subclasses must override L</keyOf> to extract a
+key from an item and L</compare> to define the ordering of those keys.
 
-Duplicate handling is configurable via the C<duplicates> attribute. By default,
-items with identical keys are rejected. When duplicates are enabled, items with
-equal keys are inserted adjacent to existing entries.
+Duplicate handling is configurable via the L</duplicates> attribute. 
+By default, items with identical keys are rejected. When duplicates are 
+enabled, items with equal keys are inserted adjacent to existing entries.
 
 C<TSortedCollection> is typically used as a base class for domain-specific
 collections such as string collections.
@@ -100,21 +102,17 @@ collections such as string collections.
 =head2 Commonly Used Features
 
 Typical usage follows a short cycle: create the collection, insert items, and
-use C<search> or C<indexOf> for lookup. For subclasses, the practical
-requirements are to implement C<keyOf> and C<compare>; duplicate handling is
-then adjusted as needed through C<duplicates>.
+use L</search> or L</indexOf> for lookup. For subclasses, the practical
+requirements are to implement L</keyOf> and L</compare>; duplicate handling is
+then adjusted as needed through L</duplicates>.
 
 =head1 ATTRIBUTES
 
-=over
+=head2 duplicates
 
-=item duplicates
-
-Boolean flag controlling whether duplicate keys are permitted.  
+Boolean flag controlling whether duplicate keys are permitted (I<Bool>).  
 If false (the default), duplicate items are rejected. If true, duplicate items
 are inserted next to existing items with the same key.
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -148,7 +146,8 @@ A value of zero disables automatic growth.
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 METHODS
 

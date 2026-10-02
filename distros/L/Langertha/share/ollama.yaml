@@ -99,8 +99,8 @@ components:
           oneOf:
             - type: boolean
             - type: string
-              enum: [high, medium, low]
-          description: When true, returns separate thinking output in addition to content. Can be a boolean (true/false) or a string ("high", "medium", "low") for supported models.
+              enum: [low, medium, high, max]
+          description: When true, returns separate thinking output in addition to content. Can be a boolean (true/false) or a graded level string (low, medium, high, max) for supported models such as gpt-oss (max is live-probed 2026-09-17 via ollama.com gpt-oss:20b, beyond the documented low/medium/high). Ollama honors `think` only as a top-level field, not under `options`.
         raw:
           type: boolean
           description: When true, returns the raw response from the model without any prompt templating
@@ -291,8 +291,8 @@ components:
           oneOf:
             - type: boolean
             - type: string
-              enum: [high, medium, low]
-          description: When true, returns separate thinking output in addition to content. Can be a boolean (true/false) or a string ("high", "medium", "low") for supported models.
+              enum: [low, medium, high, max]
+          description: When true, returns separate thinking output in addition to content. Can be a boolean (true/false) or a graded level string (low, medium, high, max) for supported models such as gpt-oss (max is live-probed 2026-09-17 via ollama.com gpt-oss:20b, beyond the documented low/medium/high). Ollama honors `think` only as a top-level field, not under `options`.
         keep_alive:
           oneOf:
             - type: string

@@ -7,6 +7,7 @@ use Langertha::Skeid;
 {
   my $calls = 0;
   my $skeid = Langertha::Skeid->new(
+    config_reload_interval => 0,   # the default throttles to one run per second (skeid #38)
     config_loader => sub {
       $calls++;
       return {
@@ -20,7 +21,7 @@ use Langertha::Skeid;
   ok $calls >= 1, 'loader called at build time';
   $skeid->call_function('nodes.list', {});
   $skeid->call_function('nodes.list', {});
-  ok $calls >= 3, 'loader called per task dispatch';
+  ok $calls >= 3, 'loader called per task dispatch with no throttle';
 }
 
 {

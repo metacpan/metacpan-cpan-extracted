@@ -1,6 +1,6 @@
 package IO::K8s::APIObject;
 # ABSTRACT: Base class for top-level Kubernetes API objects
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use v5.10;
 use strict;
 use warnings;
@@ -170,7 +170,7 @@ IO::K8s::APIObject - Base class for top-level Kubernetes API objects
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 

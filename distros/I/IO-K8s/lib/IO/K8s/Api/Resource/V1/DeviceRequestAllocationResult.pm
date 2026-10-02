@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceRequestAllocationResult;
 # ABSTRACT: DeviceRequestAllocationResult contains the allocation result for one request.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s adminAccess => Bool;
@@ -50,7 +50,7 @@ IO::K8s::Api::Resource::V1::DeviceRequestAllocationResult - DeviceRequestAllocat
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 adminAccess
 

@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::GeneratedCert;
 # ABSTRACT: DefaultGeneratedCert defines the default generated certificate configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s domain   => '+IO::K8s::Traefik::V1alpha1::Domain';
@@ -22,7 +22,7 @@ IO::K8s::Traefik::V1alpha1::GeneratedCert - DefaultGeneratedCert defines the def
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 domain
 

@@ -24,7 +24,7 @@ can_ok( $background, 'getPalette' );
 my $palette = $background->getPalette();
 isa_ok( $palette, TPalette, 'getPalette returns a TPalette object' );
 is(
-  substr($$palette, 1, length( cpBackground) ),
+  substr( pack( 'C*', @$palette ), 1, length( cpBackground ) ),
   cpBackground, 
   'getPalette returns correct content'
 );

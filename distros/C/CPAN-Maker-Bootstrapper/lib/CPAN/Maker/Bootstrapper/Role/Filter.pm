@@ -9,31 +9,6 @@ use Data::Dumper;
 use Role::Tiny;
 
 ########################################################################
-sub _fetch_requires {
-########################################################################
-  my ( $self, $infile ) = @_;
-
-  return {}
-    if !-s $infile;
-
-  my %requires;
-
-  open my $fh, '<', $infile
-    or die "ERROR: could not open $infile for reading\n";
-
-  while ( my $line = <$fh> ) {
-    chomp $line;
-    next if !$line;
-    my ( $m, $v ) = split q{ }, $line;
-    $requires{$m} = $v // 0;
-  }
-
-  close $fh;
-
-  return \%requires;
-}
-
-########################################################################
 sub cmd_filter {
 ########################################################################
   my ($self) = @_;
@@ -71,6 +46,31 @@ sub cmd_filter {
   print join q{}, map {"$_ $new_requires{$_}\n"} sort keys %new_requires;
 
   return $SUCCESS;
+}
+
+########################################################################
+sub _fetch_requires {
+########################################################################
+  my ( $self, $infile ) = @_;
+
+  return {}
+    if !-s $infile;
+
+  my %requires;
+
+  open my $fh, '<', $infile
+    or die "ERROR: could not open $infile for reading\n";
+
+  while ( my $line = <$fh> ) {
+    chomp $line;
+    next if !$line;
+    my ( $m, $v ) = split q{ }, $line;
+    $requires{$m} = $v // 0;
+  }
+
+  close $fh;
+
+  return \%requires;
 }
 
 1;

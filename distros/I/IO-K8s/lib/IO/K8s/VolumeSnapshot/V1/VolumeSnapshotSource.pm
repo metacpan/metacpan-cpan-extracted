@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeSnapshotSource;
 # ABSTRACT: source specifies where a snapshot will be created from.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s persistentVolumeClaimName => Str;
@@ -22,7 +22,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeSnapshotSource - source specifies where a sna
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 persistentVolumeClaimName
 

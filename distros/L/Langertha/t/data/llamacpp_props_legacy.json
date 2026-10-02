@@ -1,0 +1,9 @@
+{
+  "default_generation_settings": {
+    "id": 0,
+    "n_ctx": 1024
+  },
+  "total_slots": 1,
+  "model_path": "../models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "chat_template": "..."
+}

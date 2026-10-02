@@ -6,7 +6,7 @@
 # element, and a residue number shifted by one is a different residue.  Hand
 # editing gets that wrong silently.  Run this from t/data/ after changing a
 # fixture, and commit both the script and what it wrote.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use autodie ':default';

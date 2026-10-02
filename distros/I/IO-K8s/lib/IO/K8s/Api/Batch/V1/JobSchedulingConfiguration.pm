@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::JobSchedulingConfiguration;
 # ABSTRACT: JobSchedulingConfiguration composes the reusable workload-aware scheduling building blocks.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s disruptionMode => 'Scheduling::V1alpha3::WorkloadPodGroupDisruptionMode';
@@ -29,7 +29,7 @@ IO::K8s::Api::Batch::V1::JobSchedulingConfiguration - JobSchedulingConfiguration
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 disruptionMode
 

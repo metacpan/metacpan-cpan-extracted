@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::VenafiTPP;
 # ABSTRACT: TPP specifies CyberArk Certificate Manager Self-Hosted configuration settings.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s caBundle          => Str;
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::VenafiTPP - TPP specifies CyberArk Certificate Manager
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 caBundle
 

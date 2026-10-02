@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::AzureWorkloadIdentity;
 # ABSTRACT: workloadIdentity defines the Azure Workload Identity authentication.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s clientId => Str, { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::AzureWorkloadIdentity - workloadIdentity define
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 clientId
 

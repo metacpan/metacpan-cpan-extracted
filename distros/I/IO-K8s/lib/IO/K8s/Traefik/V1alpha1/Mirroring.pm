@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Mirroring;
 # ABSTRACT: Mirroring defines the Mirroring service configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s healthCheck        => '+IO::K8s::Traefik::V1alpha1::ServerHealthCheck';
@@ -56,7 +56,7 @@ IO::K8s::Traefik::V1alpha1::Mirroring - Mirroring defines the Mirroring service 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 healthCheck
 

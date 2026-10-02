@@ -30,6 +30,30 @@ is($vllm->api_key, undef, 'api_key defaults to undef');
 # Test: composes OpenAICompatible
 ok($vllm->does('Langertha::Role::OpenAICompatible'), 'vLLM composes OpenAICompatible');
 
+# Test: composes Embedding (karr #70)
+ok($vllm->does('Langertha::Role::Embedding'), 'vLLM composes Embedding');
+
+# Test: composes Runtime::MetricsPoll
+ok($vllm->does('Langertha::Role::Runtime::MetricsPoll'), 'vLLM composes Runtime::MetricsPoll');
+
+# Test: _build_supported_operations contains createEmbedding (karr #70)
+{
+  my $ops = $vllm->_build_supported_operations;
+  ok((grep { $_ eq 'createEmbedding' } @$ops),
+    '_build_supported_operations contains createEmbedding');
+  ok((grep { $_ eq 'createChatCompletion' } @$ops),
+    '_build_supported_operations contains createChatCompletion');
+}
+
+# Test: no fixed embedding model on a single-model server (karr #70, k297:
+# the 'default' placeholder 404s on vLLM 0.10/0.11, so no model is sent)
+is($vllm->default_embedding_model, undef,
+  'default_embedding_model is undef');
+
+# Test: embedding_model falls back to the caller's model
+is($vllm->embedding_model, 'Qwen/Qwen2.5-3B-Instruct',
+  'embedding_model is the caller-set model when no embedding_model is set');
+
 # Test: tool calling methods available
 ok($vllm->can('format_tools'), 'has format_tools');
 ok($vllm->can('response_tool_calls'), 'has response_tool_calls');

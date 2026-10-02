@@ -1,0 +1,10 @@
+: OPENROUTER PROCESSING
+
+data: {"id":"gen-1790726400-doc","provider":"OpenAI","model":"openai/gpt-4o","object":"chat.completion.chunk","created":1790726400,"choices":[{"index":0,"delta":{"role":"assistant","content":"Hi"},"finish_reason":null,"native_finish_reason":null,"logprobs":null}]}
+
+data: {"id":"gen-1790726400-doc","provider":"OpenAI","model":"openai/gpt-4o","object":"chat.completion.chunk","created":1790726400,"choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":"stop","native_finish_reason":"stop","logprobs":null}]}
+
+data: {"id":"gen-1790726400-doc","provider":"OpenAI","model":"openai/gpt-4o","object":"chat.completion.chunk","created":1790726400,"choices":[],"usage":{"prompt_tokens":194,"completion_tokens":2,"total_tokens":196,"cost":0.95,"is_byok":false,"prompt_tokens_details":{"cached_tokens":0,"cache_write_tokens":100,"audio_tokens":0},"cost_details":{"upstream_inference_cost":19},"completion_tokens_details":{"reasoning_tokens":0}}}
+
+data: [DONE]
+

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::EvictionResponder;
 # ABSTRACT: EvictionResponder allows you to specify the responder reacting to an Eviction. Responders should observe and communicate through the Eviction Resource API to help with the graceful eviction of a target (e.g. termination of a pod).
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::EvictionResponder - EvictionResponder allows you to spec
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

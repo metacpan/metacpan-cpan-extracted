@@ -43,27 +43,27 @@
    "provides" : {
       "Crypt::Age" : {
          "file" : "lib/Crypt/Age.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Crypt::Age::Header" : {
          "file" : "lib/Crypt/Age/Header.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Crypt::Age::Keys" : {
          "file" : "lib/Crypt/Age/Keys.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Crypt::Age::Primitives" : {
          "file" : "lib/Crypt/Age/Primitives.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Crypt::Age::Stanza" : {
          "file" : "lib/Crypt/Age/Stanza.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Crypt::Age::Stanza::X25519" : {
          "file" : "lib/Crypt/Age/Stanza/X25519.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/Getty/p5-crypt-age"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -89,6 +89,7 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
+                     ".karr",
                      "README.md"
                   ],
                   "exclude_match" : [],
@@ -103,6 +104,11 @@
             },
             "name" : "@Author::GETTY/Git::GatherDir",
             "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherAgentContext",
+            "name" : "@Author::GETTY/GatherAgentContext",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -372,8 +378,8 @@
                "Dist::Zilla::Plugin::RewriteVersion" : {
                   "add_tarball_name" : 0,
                   "finders" : [
-                     ":ExecFiles",
-                     ":InstallModules"
+                     ":InstallModules",
+                     ":PerlExecFiles"
                   ],
                   "global" : 0,
                   "skip_version_provider" : 0
@@ -434,7 +440,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.004",
+                  "tag" : "0.005",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -454,8 +460,8 @@
             "config" : {
                "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
                   "finders" : [
-                     ":ExecFiles",
-                     ":InstallModules"
+                     ":InstallModules",
+                     ":PerlExecFiles"
                   ],
                   "global" : 0,
                   "munge_makefile_pl" : 1

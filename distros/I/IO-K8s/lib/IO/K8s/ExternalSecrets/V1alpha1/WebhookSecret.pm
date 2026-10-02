@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::WebhookSecret;
 # ABSTRACT: WebhookSecret defines a secret reference that will be used in webhook templates.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name      => Str, { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1alpha1::WebhookSecret - WebhookSecret defines a secr
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

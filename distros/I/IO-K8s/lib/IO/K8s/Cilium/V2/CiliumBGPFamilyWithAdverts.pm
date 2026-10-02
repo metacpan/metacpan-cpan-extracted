@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPFamilyWithAdverts;
 # ABSTRACT: CiliumBGPFamilyWithAdverts represents a AFI/SAFI address family pair along with reference to BGP Advertisements.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s advertisements => 'Meta::V1::LabelSelector';
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::CiliumBGPFamilyWithAdverts - CiliumBGPFamilyWithAdverts rep
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 advertisements
 

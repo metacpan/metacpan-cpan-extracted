@@ -1,9 +1,10 @@
 package Langertha::Knarr::Handler::Tracing;
 # ABSTRACT: Decorator handler that records every request as a Langfuse trace
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 use Moose;
 use Future;
 use Future::AsyncAwait;
+use Time::HiRes qw( gettimeofday tv_interval );
 use Langertha::Knarr::Stream;
 use Langertha::Knarr::Response;
 
@@ -49,6 +50,22 @@ sub _open_trace {
       tools       => $request->tools,
     },
     format   => $request->protocol,
+    # A raw passthrough the upstream refused (k66): this is its one trace.
+    ( defined $request->extra->{passthrough_fallback}
+      ? ( passthrough_fallback => $request->extra->{passthrough_fallback} ) : () ),
+  );
+}
+
+# The generation's model is the one the backend reported answering with; the
+# name the handler labeled the answer with (the configured model a Router
+# relabels it to, k70) goes into the metadata when it differs.
+sub _model_opts {
+  my ($self, $label, $reported, $fallback) = @_;
+  my $model = $reported // $label // $fallback;
+  return (
+    model => $model,
+    ( defined $reported && defined $label && $label ne $reported
+      ? ( configured_model => $label ) : () ),
   );
 }
 
@@ -62,12 +79,13 @@ sub _close_trace {
   $self->tracing->end_trace(
     $trace,
     output => $resp->content,
-    model  => $resp->model,
+    $self->_model_opts( $resp->model, $resp->upstream_model ),
     ( $resp->usage              ? ( usage       => $resp->usage )      : () ),
     ( $resp->timing             ? ( timing      => $resp->timing )     : () ),
     ( defined $resp->id         ? ( response_id => $resp->id )         : () ),
     ( defined $resp->thinking   ? ( thinking    => $resp->thinking )   : () ),
     ( $resp->rate_limit         ? ( rate_limit  => $resp->rate_limit ) : () ),
+    ( $resp->has_tool_calls     ? ( tool_calls  => $resp->tool_calls ) : () ),
   );
 }
 
@@ -86,7 +104,8 @@ async sub handle_chat_f {
   })->else( sub {
     my ($err) = @_;
     $self->tracing->end_trace( $trace, error => "$err" );
-    return Future->fail($err);
+    # The whole failure: a timeout's category rides along (k36).
+    return Future->fail(@_);
   });
   return await $f;
 }
@@ -94,6 +113,13 @@ async sub handle_chat_f {
 async sub handle_stream_f {
   my ($self, $session, $request) = @_;
   my $trace = $self->_open_trace($request);
+
+  # TTFT for the routed streaming path is measured here, in the proxy: the
+  # decorator only ever sees deltas and never a Langertha::Response, so unlike
+  # the non-streaming path there is no engine-measured timing to hand off. The
+  # clock starts before the upstream stream is opened, so this ttft includes
+  # the proxy's own dispatch overhead.
+  my $stream_start = [ gettimeofday ];
 
   my $upstream_stream;
   my $err = do {
@@ -107,22 +133,38 @@ async sub handle_stream_f {
   }
 
   my $accumulated = '';
+  my $ttft;
   my $closed = 0;
 
   return Langertha::Knarr::Stream->new(
+    upstream => $upstream_stream,
     source => sub {
       $upstream_stream->next_chunk_f->then( sub {
         my ($delta) = @_;
         if ( defined $delta ) {
+          $ttft = tv_interval($stream_start) unless defined $ttft;
           $accumulated .= $delta;
           return Future->done($delta);
         }
         unless ( $closed ) {
           $closed = 1;
+          # Only claim a ttft when a delta actually arrived; an empty stream
+          # leaves $ttft undef and end_trace keeps its wall-clock fallback.
           $self->tracing->end_trace(
             $trace,
             output => $accumulated,
-            model  => $request->model,
+            $self->_model_opts(
+              ( $upstream_stream->can('model')          ? $upstream_stream->model          : undef ),
+              ( $upstream_stream->can('upstream_model') ? $upstream_stream->upstream_model : undef ),
+              $request->model,
+            ),
+            ( defined $ttft ? ( timing => { ttft_seconds => $ttft } ) : () ),
+            # The complete tool calls, known once the stream is exhausted (k19).
+            ( $upstream_stream->can('has_tool_calls') && $upstream_stream->has_tool_calls
+                ? ( tool_calls => $upstream_stream->tool_calls ) : () ),
+            # So is the token usage the backend reported on its chunks.
+            ( $upstream_stream->can('usage') && $upstream_stream->usage
+                ? ( usage => $upstream_stream->usage ) : () ),
           );
         }
         return Future->done(undef);
@@ -132,7 +174,7 @@ async sub handle_stream_f {
           $closed = 1;
           $self->tracing->end_trace( $trace, error => "$e" );
         }
-        return Future->fail($e);
+        return Future->fail(@_);
       });
     },
   );
@@ -155,7 +197,7 @@ Langertha::Knarr::Handler::Tracing - Decorator handler that records every reques
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -174,10 +216,25 @@ Decorator handler that opens a Langfuse trace + generation around every
 chat or stream request and closes it with the assistant text once the
 inner handler resolves (or fails). Streaming requests accumulate every
 delta into a single output before closing the trace, so the Langfuse
-view shows the full assembled response.
+view shows the full assembled response, with the token usage the backend
+reported on its stream (L<Langertha::Knarr::Stream/usage>).
+
+The generation's C<model> is the model the backend reported answering with
+(L<Langertha::Knarr::Response/upstream_model>,
+L<Langertha::Knarr::Stream/upstream_model>), which can be more concrete than
+the one asked for. When a handler labeled the answer with another name --
+L<Langertha::Knarr::Handler::Router> answers under the configured model --
+that name is recorded as C<configured_model> in the generation's metadata.
+Without a reported model the generation gets the label, and a stream without
+either the model the client asked for.
 
 C<knarr start> mounts this automatically when
 the config supplies Langfuse credentials.
+
+A raw passthrough request that L<Langertha::Knarr> answers through the
+handler chain after the upstream refused the client's key (see
+L<Langertha::Knarr/raw_passthrough>) is traced here only, once, with the
+refusing status as C<passthrough_fallback> in the trace's metadata.
 
 =head2 wrapped
 

@@ -1,0 +1,19 @@
+{
+  "default_generation_settings": {
+    "id": 0,
+    "id_task": -1,
+    "n_ctx": 1024,
+    "speculative": false,
+    "is_processing": false
+  },
+  "total_slots": 1,
+  "model_path": "../models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+  "chat_template": "...",
+  "chat_template_caps": {},
+  "modalities": {
+    "vision": false
+  },
+  "media_marker": "<__media_YoNhud46VdDqbuFmKYEO9PY7A4ARzRfg__>",
+  "build_info": "b(build number)-(build commit hash)",
+  "is_sleeping": false
+}

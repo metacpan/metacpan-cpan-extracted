@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::BarbicanProviderUsernameRef;
 # ABSTRACT: BarbicanProviderUsernameRef defines a reference to a secret containing username for the Barbican provider.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s secretRef => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::BarbicanProviderUsernameRef - BarbicanProviderUser
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 secretRef
 

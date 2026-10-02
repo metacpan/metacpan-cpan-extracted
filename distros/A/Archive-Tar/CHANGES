@@ -1,3 +1,7 @@
+3.14  02/10/2026 (Lukas Mai && Jitka Plesnikova)
+- Make tests pass with spaces in $^X or build directory
+- Use three-arg open when probing magic bytes
+
 3.12  02/06/2026 (Stig Palmquist)
 - Allow '..' links in secure extract in parent path for
   symlinks and hardlinks

@@ -1,5 +1,7 @@
 package TUI::Drivers::EventQueue;
+# ABSTRACT: Internal mouse event queue and dispatcher
 
+use 5.010;
 use strict;
 use warnings;
 
@@ -16,10 +18,22 @@ use TUI::Drivers::Const qw(
 );
 use TUI::Drivers::Event;
 use TUI::Drivers::HardwareInfo;
+use TUI::Drivers::HWMouse;
 use TUI::Drivers::Mouse;
 use TUI::Drivers::Screen;
 
 sub TEventQueue() { __PACKAGE__ }
+
+# import global variables
+use vars qw(
+  $mouseRangeX
+  $mouseRangeY
+);
+{
+  no strict 'refs';
+  *mouseRangeX = \${ THWMouse . '::mouseRangeX' };
+  *mouseRangeY = \${ THWMouse . '::mouseRangeY' };
+}
 
 # predeclare global variable names
 our $downTicks = 0;
@@ -59,12 +73,10 @@ sub resume {    # void ($class)
   THardwareInfo->clearPendingEvent();
 
   $mouseEvents = true;
-  eval {
-    TMouse->setRange( 
-      $TUI::Drivers::Screen::screenWidth - 1, 
-      $TUI::Drivers::Screen::screenHeight - 1 
-    )
-  };
+  TMouse->setRange( 
+    $TUI::Drivers::Screen::screenWidth - 1, 
+    $TUI::Drivers::Screen::screenHeight - 1 
+  );
   return;
 } #/ sub resume
 
@@ -84,6 +96,14 @@ my $getMouseState = sub {    # $bool ($class, $ev)
 
   return false unless THardwareInfo->getMouseEvent( $curMouse );
 
+  if ( $mouseRangeX ) {
+    $curMouse->{where}{x} = $mouseRangeX
+      if $curMouse->{where}{x} > $mouseRangeX;
+  }
+  if ( $mouseRangeY ) {
+    $curMouse->{where}{y} = $mouseRangeY
+      if $curMouse->{where}{y} > $mouseRangeY;
+  }
   if ( $mouseReverse && $curMouse->{buttons} && $curMouse->{buttons} != 3 ) {
     $curMouse->{buttons} ^= 3;
   }
@@ -162,11 +182,6 @@ __END__
 
 TUI::Drivers::EventQueue - internal mouse event queue and dispatcher
 
-=head1 HIERARCHY
-
-  TEventQueue (internal manager)
-    used by TEvent and the event system
-
 =head1 SYNOPSIS
 
   use TUI::Drivers::EventQueue;
@@ -178,26 +193,27 @@ TUI::Drivers::EventQueue - internal mouse event queue and dispatcher
 =head1 DESCRIPTION
 
 C<TEventQueue> implements the low-level event queue responsible for collecting
-and dispatching mouse events within the TUI::Vision framework.
+and dispatching mouse events within the L<TUI::Vision> framework.
 
 This module manages mouse state, button transitions, double-click detection,
 auto-repeat handling, and movement tracking. It serves as the bridge between
-hardware input and the higher-level C<TEvent> abstraction.
+hardware input and the higher-level L<TEvent|TUI::Drivers::Event> abstraction.
 
 C<TEventQueue> is an internal framework component. Application code normally
-interacts with events through C<TEvent> and should not depend directly on this
-module.
+interacts with events through L<TEvent|TUI::Drivers::Event> and should not 
+depend directly on this module.
 
 =head2 Commonly Used Features
 
 In typical runtime flow, C<TEventQueue> is started and stopped automatically
-via C<resume()> and C<suspend()> during driver/application lifecycle handling.
-The most frequently used operation is C<getMouseEvent($event)>, which updates a
-provided C<TEvent> instance in-place and sets C<< $event->{what} >> to one of
-C<evMouseDown>, C<evMouseUp>, C<evMouseMove>, C<evMouseAuto>, or C<evNothing>.
+via L</resume> and L</suspend> during driver/application lifecycle handling.
+The most frequently used operation is L</getMouseEvent>,
+which updates a provided L<TEvent|TUI::Drivers::Event> instance in-place and 
+sets C<< $event->{what} >> to one of C<evMouseDown>, C<evMouseUp>, 
+C<evMouseMove>, C<evMouseAuto>, or C<evNothing>.
 
 Configuration usually centers on timing and behavior globals such as
-C<$doubleDelay>, C<$repeatDelay>, and C<$mouseReverse>. These values influence
+L</$doubleDelay>, L</$repeatDelay>, and L</$mouseReverse>. These values influence
 double-click recognition, mouse auto-repeat generation, and button mapping,
 and are primarily relevant for driver-level customization rather than
 application-level dialog/view code.
@@ -209,47 +225,51 @@ handling in C<TEventQueue>.
 
 =head2 $downTicks
 
-Counts the number of ticks since the last mouse button press.
+Counts the number of ticks since the last mouse button press 
+(I<PositiveOrZeroInt>).
 
 =head2 $mouseEvents
 
-Indicates whether mouse events are currently enabled.
+Indicates whether mouse events are currently enabled (I<Bool>).
 
 =head2 $mouseReverse
 
-Indicates whether mouse button order is reversed.
+Indicates whether mouse button order is reversed (I<Bool>).
 
 =head2 $doubleDelay
 
-Defines the delay (in ticks) used to detect double-click events.
+Defines the delay (in ticks) used to detect double-click events 
+(I<PositiveOrZeroInt>).
 
 =head2 $repeatDelay
 
-Defines the delay (in ticks) before auto-repeat events are generated.
+Defines the delay (in ticks) before auto-repeat events are generated 
+(I<PositiveOrZeroInt>).
 
 =head2 $autoTicks
 
-Counts ticks used for auto-repeat handling.
+Counts ticks used for auto-repeat handling (I<PositiveOrZeroInt>).
 
 =head2 $autoDelay
 
-Defines the delay before auto-repeat processing starts.
+Defines the delay before auto-repeat processing starts (I<PositiveOrZeroInt>).
 
 =head2 $mouse
 
-Holds the current C<TMouse> driver instance.
+Holds the current driver instance (I<TMouse>).
 
 =head2 $lastMouse
 
-Stores the previous mouse event state.
+Stores the previous mouse event state (I<MouseEventType>).
 
 =head2 $curMouse
 
-Stores the current mouse event state.
+Stores the current mouse event state (I<MouseEventType>).
 
 =head2 $downMouse
 
-Stores the mouse event state at the time the button was pressed.
+Stores the mouse event state at the time the button was pressed 
+ (I<MouseEventType>).
 
 =head1 METHODS
 
@@ -273,24 +293,26 @@ This method is called automatically during program shutdown.
 
   TEventQueue->getMouseEvent($event);
 
-Retrieves the next mouse event and populates the provided C<TEvent> object.
+Retrieves the next mouse event and populates the provided 
+L<TEvent|TUI::Drivers::Event> object.
 
 If no mouse event is available, the event's C<what> field is set to
 C<evNothing>.
 
-This method is a low-level helper used internally by C<TEvent>. Application
-code should normally call C<TEvent-E<gt>getMouseEvent> instead.
+This method is a low-level helper used internally by 
+L<TEvent|TUI::Drivers::Event>. Application code should normally call 
+C<< TEvent->getMouseEvent() >> instead.
 
 =head1 IMPLEMENTATION DETAILS
 
-Following the original Turbo Vision design, C<TEventQueue> is implemented as a
-singleton class with class methods and global state. 
+Following the original I<Turbo Vision> design, C<TEventQueue> is implemented as 
+a singleton class with class methods and global state. 
 
 =head2 Scope and limitations
 
 C<TEventQueue> processes mouse events only.
 
-Keyboard events are handled separately through C<TEvent-E<gt>getKeyEvent> and
+Keyboard events are handled separately through C<< TEvent->getKeyEvent() >> and
 are not part of this queue.
 
 =head2 Lifecycle
@@ -339,10 +361,10 @@ public API.
 
 =head1 SEE ALSO
 
-L<TUI::Drivers::Event>,
+L<TEvent|TUI::Drivers::Event>,
 L<TUI::Drivers::Const>,
-L<TUI::Drivers::HardwareInfo>,
-L<TUI::Drivers::Mouse>
+L<THardwareInfo|TUI::Drivers::HardwareInfo>,
+L<TMouse|TUI::Drivers::Mouse>
 
 =head1 AUTHORS
 

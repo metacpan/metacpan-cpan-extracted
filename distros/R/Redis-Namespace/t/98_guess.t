@@ -6,7 +6,8 @@ use Test::RedisServer;
 eval { Test::RedisServer->new } or plan skip_all => 'redis-server is required in PATH to run this test';
 
 use Redis::Namespace;
-%Redis::Namespace::COMMANDS = (); # clear commands list for test.
+# remove the generated commands for test.
+delete $Redis::Namespace::{$_} for qw(set setnx get mset mget xadd xread);
 
 my $redis_server = Test::RedisServer->new;
 my $redis = Redis->new( $redis_server->connect_info );

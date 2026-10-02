@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::DigestAuth;
 # ABSTRACT: DigestAuth holds the digest auth middleware configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s headerField  => Str;
@@ -26,7 +26,7 @@ IO::K8s::Traefik::V1alpha1::DigestAuth - DigestAuth holds the digest auth middle
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 headerField
 

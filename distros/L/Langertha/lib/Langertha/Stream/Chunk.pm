@@ -1,6 +1,6 @@
 package Langertha::Stream::Chunk;
 # ABSTRACT: Represents a single chunk from a streaming response
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Langertha::ToolCall;
 
@@ -46,11 +46,39 @@ has usage => (
   predicate => 'has_usage',
 );
 
+has cached_tokens => (
+  is => 'ro',
+  isa => 'Maybe[Int]',
+  predicate => 'has_cached_tokens',
+);
+
 has tool_calls => (
   is        => 'ro',
   isa       => 'Maybe[ArrayRef[Langertha::ToolCall]]',
   predicate => 'has_tool_calls',
 );
+
+
+has citations => (
+  is        => 'ro',
+  isa       => 'Maybe[ArrayRef]',
+  predicate => 'has_citations',
+);
+
+
+has thinking => (
+  is        => 'ro',
+  isa       => 'Maybe[Str]',
+  predicate => 'has_thinking',
+);
+
+
+has refusal => (
+  is        => 'ro',
+  isa       => 'Maybe[Str]',
+  predicate => 'has_refusal',
+);
+
 
 
 
@@ -71,7 +99,7 @@ Langertha::Stream::Chunk - Represents a single chunk from a streaming response
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -121,16 +149,86 @@ Use C<has_finish_reason> to check availability.
 
 =head2 tool_calls
 
-Optional ArrayRef of L<Langertha::ToolCall> objects associated with
-this chunk. Populated when the engine emits tool-call information
-mid-stream (e.g. Anthropic's C<content_block_stop> for a C<tool_use>
-block, or the final OpenAI delta carrying assembled tool_calls). Most
-chunks have no tool calls — use C<has_tool_calls> to check.
+Optional ArrayRef of finished L<Langertha::ToolCall> objects that complete
+on this chunk. Every call the model streams lands on exactly one chunk, as the
+same object the non-streaming reply of that response carries on
+L<Langertha::Response/tool_calls>; a chunk never holds a fragment. Where it
+lands depends on the dialect:
+
+=over
+
+=item * Chat-Completions (L<Langertha::Role::OpenAICompatible>): the
+C<delta.tool_calls> fragments are assembled per C<index>, and all calls land on
+the chunk that carries C<finish_reason>.
+
+=item * Anthropic Messages (L<Langertha::Role::AnthropicCompatible>): each
+C<tool_use> block is assembled from its C<input_json_delta> fragments and lands
+on the chunk for its C<content_block_stop>, before the final chunk.
+
+=item * Gemini and Ollama native: calls arrive whole and land on the chunk that
+carries them.
+
+=item * Open-Responses (L<Langertha::Role::ResponsesCompatible>): the calls land
+on the final chunk, read from the terminal C<response.completed> event.
+
+=item * Hermes (L<Langertha::Role::HermesTools>, tools in the prompt): the
+C<E<lt>tool_callE<gt>> blocks are withheld from C<content> and their calls land
+on the final chunk (see L<Langertha::Role::Chat/chat_stream_realtime_f>).
+
+=back
+
+Most chunks have no tool calls — use C<has_tool_calls> to check, or
+L<Langertha::Role::Chat/aggregate_tool_calls> to collect them all in stream
+order.
+
+=head2 citations
+
+Optional ArrayRef of search-augmented source citations, populated on the final
+chunk when a search-augmented engine emits them mid-stream. The Open-Responses
+envelope (L<Langertha::Engine::Perplexity>) lifts the C<search_results> block
+out of the terminal C<response.completed> C<output[]> here, so a streamed reply
+surfaces the same sources the non-streaming path exposes as
+L<Langertha::Response/citations>. Most chunks carry none — use C<has_citations>
+to check. L<Langertha::Stream/citations> reassembles them off the stream.
+
+=head2 thinking
+
+Optional incremental chain-of-thought / reasoning text delivered in this
+chunk, parallel to L</content> and L</tool_calls>. Populated by the dialect
+stream parsers from their verified per-provider delta spelling — the
+OpenAI-compatible C<delta.reasoning_content> / bare C<delta.reasoning>,
+Anthropic's C<thinking_delta>, Gemini's C<thought> parts, and Ollama native
+C<message.thinking>. Most chunks carry no thinking — use C<has_thinking> to
+check. The full streamed thinking is reassembled by
+L<Langertha::Role::Chat/aggregate_thinking>, the streaming counterpart of
+L<Langertha::Response/thinking> on the non-streaming path.
+
+=head2 refusal
+
+Optional fragment of a refusal delivered in this chunk: the OpenAI-compatible
+C<delta.refusal>, and the whole refusal of a Responses API stream on its final
+chunk. Concatenated in order, the fragments are the text
+L<Langertha::Response/refusal> carries on the non-streaming path. Use
+C<has_refusal> to check.
 
 =head2 usage
 
 Token usage counts as a HashRef, if provided by the engine on the final
-chunk. Keys vary by provider. Use C<has_usage> to check availability.
+chunk. Keys vary by provider. Use C<has_usage> to check availability. An
+OpenAI-compatible stream requested with C<include_usage> reports it on a
+content-less chunk after the final one;
+L<Langertha::Role::Chat/aggregate_usage> finds it either way.
+
+=head2 cached_tokens
+
+Number of prompt tokens served from the prefix cache, if reported by the
+provider on the final chunk. Populated from
+C<usage.prompt_tokens_details.cached_tokens> on the OpenAI-compatible wire
+(SGLang with C<return_cached_tokens_details> enabled, and other servers
+that emit the detail block) and from C<usage.input_tokens_details.cached_tokens>
+on the Open-Responses wire (OpenAI Responses / Perplexity Agent). C<undef>
+when the provider does not report it. Use C<has_cached_tokens> to check
+availability.
 
 =head1 SEE ALSO
 

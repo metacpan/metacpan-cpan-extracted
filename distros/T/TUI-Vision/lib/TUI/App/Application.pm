@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -118,17 +118,13 @@ TUI::App::Application - generic application base class
 
 =head1 DESCRIPTION
 
-C<TApplication> is the standard base class for TUI::Vision applications.
-It extends C<TProgram> with application-level initialization and shutdown
-behavior and integrates system services such as event handling, screen
-management, and history tracking.
-
-In this C++-based port, C<TApplication> follows the Turbo Vision C++ model.
-Pascal-specific constructs such as C<Init>, C<Done>, C<Load>, and C<Store> are
-not part of the public API and are therefore not documented.
+C<TApplication> is the standard base class for L<TUI::Vision> applications.
+It extends L<TProgram|TUI::App::Program> with application-level initialization 
+and shutdown behavior and integrates system services such as event handling, 
+screen management, and history tracking.
 
 Most applications should derive directly from C<TApplication> rather than from
-C<TProgram>.
+L<TProgram|TUI::App::Program>.
 
 =head2 Commonly Used Features
 
@@ -137,11 +133,12 @@ and customized by overriding initialization hooks such as C<initMenuBar()>,
 C<initStatusLine()>, and, when needed, C<initDeskTop()>. The common runtime
 flow is: create application object with C<< $app->new() >>, call C<run()>, and 
 let the object lifecycle handle startup/shutdown services inherited from 
-C<TProgram> plus C<TApplication>-specific history initialization.
+L<TProgram|TUI::App::Program> plus C<TApplication>-specific history 
+initialization.
 
-The C<suspend()> and C<resume()> methods are primarily used when the
+The L<suspend()|/suspend> and L<resume()|/resume> methods are primarily used when the
 application temporarily gives up control of screen/event processing (for
-example around external operations), then restores TUI::Vision services.
+example around external operations), then restores L<TUI::Vision> services.
 
 =head1 CONSTRUCTOR
 
@@ -191,7 +188,7 @@ management.
 
 =head1 EXAMPLE
 
-The following example shows a minimal TUI::Vision application derived from
+The following example shows a minimal L<TUI::Vision> application derived from
 C<TApplication>. It demonstrates menu creation, event handling, and the use of
 a dialog.
 
@@ -316,9 +313,9 @@ a dialog.
 
 =head1 SEE ALSO
 
-L<TUI::App::Program>,
-L<TUI::Views::View>,
-L<TUI::Views::Group>
+L<TProgram|TUI::App::Program>,
+L<TView|TUI::Views::View>,
+L<TGroup|TUI::Views::Group>
 
 =head1 AUTHORS
 

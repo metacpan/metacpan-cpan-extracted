@@ -21,7 +21,7 @@
 #
 # Both halves skip rather than fail when there is nothing to read: the
 # distribution has to build on a machine with no structures on it.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

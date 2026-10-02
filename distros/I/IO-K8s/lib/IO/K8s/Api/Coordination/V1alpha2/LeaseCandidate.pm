@@ -1,6 +1,6 @@
 package IO::K8s::Api::Coordination::V1alpha2::LeaseCandidate;
 # ABSTRACT: LeaseCandidate defines a candidate for a Lease object. Candidates are created such that coordinated leader election will pick the best leader from the list of candidates.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Coordination::V1alpha2::LeaseCandidate - LeaseCandidate defines a 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

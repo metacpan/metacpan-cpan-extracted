@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GrafanaSpec;
 # ABSTRACT: GrafanaSpec controls the behavior of the grafana generator.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s auth           => '+IO::K8s::ExternalSecrets::V1alpha1::GrafanaAuth', { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GrafanaSpec - GrafanaSpec controls the behav
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 auth
 

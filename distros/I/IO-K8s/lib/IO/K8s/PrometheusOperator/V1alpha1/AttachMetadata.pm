@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::AttachMetadata;
 # ABSTRACT: attachMetadata defines the metadata to attach to discovered targets.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s node => Bool;
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1alpha1::AttachMetadata - attachMetadata defines t
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 node
 

@@ -1,0 +1,8 @@
+# Per-engine form with a shared default.
+default:
+  temperature: 0.3
+  response_size: 1024
+openai:
+  temperature: 0.7
+anthropic:
+  response_size: 8192

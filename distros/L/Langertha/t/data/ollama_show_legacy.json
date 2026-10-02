@@ -1,0 +1,13 @@
+{
+  "modelfile": "FROM llama2",
+  "parameters": "stop \"[INST]\"",
+  "template": "[INST] {{ .Prompt }} [/INST]",
+  "details": {
+    "parent_model": "",
+    "format": "gguf",
+    "family": "llama",
+    "families": ["llama"],
+    "parameter_size": "7B",
+    "quantization_level": "Q4_0"
+  }
+}

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::NodeAllocatableResource;
 # ABSTRACT: NodeAllocatableResource defines the translation between the DRA device/capacity units requested to the corresponding quantity of the node allocatable resource. At least one of Mapping or Overhead must be specified. Not specifying either is an invalid configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s mapping => 'Resource::V1::NodeAllocatableMapping';
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1::NodeAllocatableResource - NodeAllocatableResource de
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 mapping
 

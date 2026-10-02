@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::LightSailSDConfig;
 # ABSTRACT: LightSailSDConfig configurations allow retrieving scrape targets from AWS Lightsail instances.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s accessKey            => 'Core::V1::ConfigMapKeySelector';
@@ -52,7 +52,7 @@ IO::K8s::PrometheusOperator::V1alpha1::LightSailSDConfig - LightSailSDConfig con
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 accessKey
 

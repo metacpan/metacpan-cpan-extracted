@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.1406';
+our $VERSION = '0.1408';
 
 use v5.36;
 
@@ -20,7 +20,7 @@ use Types::Standard qw(Maybe Int);
 use namespace::clean;
 
 use constant KNOWN_FILTERS => qw(
-    single clock_it breathe scatter stair_step ramp_up ramp_down flicker threshold program_change remap
+    single clock_it breathe scatter stair_step ramp_up ramp_down flicker threshold program_change
 );
 
 extends 'MIDI::RtController::Filter';
@@ -413,8 +413,6 @@ sub flicker ($self, $device, $dt, $event) {
 
 
 sub threshold ($self, $device, $dt, $event) {
-    return 0 if $self->running;
-
     my ($ev, $chan, $note, $val) = $event->@*;
 
     return 0 unless defined $self->trigger && defined $val;
@@ -438,12 +436,14 @@ sub threshold ($self, $device, $dt, $event) {
 
 
 sub program_change ($self, $device, $dt, $event) {
-    my ($ev, $chan) = $event->@*;
+    my ($ev, $chan, $note, $val) = $event->@*;
 
-    return 0 unless defined $self->trigger;
+    return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
+    return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
-    my $program = $self->trigger;
+    my $program = $self->value;
 
+    say "Program change: $program" if $self->verbose;
     $self->rtc->send_it([ 'patch_change', $self->channel, $program ]);
 
     return $self->continue;
@@ -463,7 +463,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.1406
+version 0.1408
 
 =head1 SYNOPSIS
 
@@ -731,7 +731,7 @@ these step attribute settings.
   $control->add_filter('program_change', all => $filter->curry::program_change);
 
 This filter handles MIDI program/patch change messages over the
-configured MIDI B<channel> with the B<trigger>.
+configured MIDI B<channel> with the B<trigger> and B<value>.
 
 =head1 SEE ALSO
 

@@ -21,6 +21,11 @@ pod_spelling_system:
    - SIGINT
    - EXPR
    - ret
+   - HYDAHY
+   - perl5db
+   - couldn
+   - isn
+   - signalled
 
 
 pod_coverage:

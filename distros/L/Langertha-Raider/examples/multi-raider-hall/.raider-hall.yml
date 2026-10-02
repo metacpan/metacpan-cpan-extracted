@@ -1,0 +1,68 @@
+# Example multi-raider hall config.
+#
+# Three raiders with distinct personas/engines, one singleton slot,
+# one cron entry, ACP open on localhost. Edit to taste.
+
+longhouse: false
+preferred_lib_target: .raider-hall/lib
+
+raiders:
+  # Git / release guy. OpenAI + a couple of power packs.
+  bjorn:
+    engine:  openai
+    model:   gpt-4o-mini
+    persona: caveman
+    packs:   [git-guru, perl-hacker]
+
+  # Reviewer. Anthropic, slower + more thoughtful.
+  lagertha:
+    engine:  anthropic
+    model:   claude-haiku-4-5
+    persona: polite
+    packs:   [testing-fu]
+
+  # Scheduler puppet — always spawned as `1freya` so parallel fires
+  # queue on her slot instead of starting a second one.
+  freya:
+    engine:  openai
+    model:   gpt-4o-mini
+    persona: teacher
+    packs:   []
+
+cron:
+  - id:      morning-report
+    name:    1freya                    # leading "1" = singleton slot
+    cron:    '0 9 * * *'               # 09:00 local, every day
+    mission: "Look at yesterday's git log, summarise merges, write 5 bullet points."
+    coalesce: false
+
+# ACP adapter on TCP — talk to the hall over the Agent Client
+# Protocol (Zed, `raider acp connect`, or any ACP-conforming client).
+acp:
+  port: 38421
+  host: 127.0.0.1
+
+# Seconds a raider gets to end its run on a cancel (ACP session/cancel,
+# SIGINT) before the hall sends SIGTERM, and again before SIGKILL.
+# 0 never escalates.
+cancel_grace: 5
+
+# An MCP adapter for other agents to drive the hall is not implemented;
+# an `mcp:` section here has no effect.
+
+# Uncomment + drop in your bot token to turn on Telegram routing.
+# Each bot has its own allowlist + routing map. Raiders get the
+# incoming text as their mission and call `telegram_reply` to answer.
+# `allowlist` holds Telegram *user* ids (the sender); an empty or
+# missing allowlist lets nobody in. Private chats with an allowlisted
+# user always work; group chats must also be listed in `allowed_chats`.
+#
+# telegram:
+#   bots:
+#     ops:
+#       token: '123456:ABC-DEF-…'
+#       allowlist: [1234567890]            # user ids allowed to talk
+#       allowed_chats: [-1001234567890]    # optional: groups to answer in
+#       routing:
+#         1234567890: bjorn            # this chat_id reaches Björn
+#         '*':        lagertha          # everyone else → Lagertha

@@ -3,7 +3,7 @@
 # molecule, and reading all of them when one was wanted is the difference
 # between a structure that fits in memory and one that does not -- so the
 # default is one model, and the rest are there on request.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

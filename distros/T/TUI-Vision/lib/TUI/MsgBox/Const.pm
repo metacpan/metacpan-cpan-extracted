@@ -1,10 +1,11 @@
 package TUI::MsgBox::Const;
 # ABSTRACT: constants for message box dialogs
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -87,16 +88,15 @@ TUI::MsgBox::Const - constants for message box dialogs
 
 =head1 DESCRIPTION
 
-C<TUI::MsgBox::Const> defines constants used by TUI::Vision message box
-dialogs.
+This module defines constants used by L<TUI::Vision> message box dialogs.
 
 The constants in this module are grouped by purpose and exported via tag-based
 export groups. They are used to control the type of message box displayed and
 the set of buttons shown to the user.
 
 This module only defines constants. The semantic meaning and practical usage of
-these constants is documented in higher-level modules such as C<TUI::MsgBox>
-and the message box helper functions.
+these constants is documented in higher-level modules such message box helper 
+functions.
 
 =head1 CONSTANTS
 
@@ -126,9 +126,9 @@ C<:all> - import all constants
 
 =head1 SEE ALSO
 
-L<TUI::MsgBox>,
-L<TUI::Dialogs::Dialog>,
-L<TUI::Dialogs::Button>
+L<MsgBox|TUI::MsgBox>,
+L<TDialog|TUI::Dialogs::Dialog>,
+L<TButton|TUI::Dialogs::Button>
 
 =head1 AUTHORS
 

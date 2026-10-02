@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::AzureCustomCloudConfig;
 # ABSTRACT: CustomCloudConfig defines custom Azure endpoints for non-standard clouds.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s activeDirectoryEndpoint => Str, { required => 'schema' };
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::AzureCustomCloudConfig - CustomCloudConfig defines
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 activeDirectoryEndpoint
 

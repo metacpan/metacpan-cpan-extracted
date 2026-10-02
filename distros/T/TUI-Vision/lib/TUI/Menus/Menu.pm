@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -138,12 +138,13 @@ TUI::Menus::Menu - container for menu item lists
 =head1 DESCRIPTION
 
 C<TMenu> represents a container used to build menu structures for menu bars
-and menu boxes. It holds a linked list of C<TMenuItem> objects and an optional
-default item.
+and menu boxes. It holds a linked list of L<TMenuItem|TUI::Menus::MenuItem> 
+objects and an optional default item.
 
 Menu objects are typically created indirectly using helper constructors and
-combined using the overloaded C<+> operator. The resulting menu structure is
-passed to menu views such as C<TMenuBar> or C<TMenuBox>.
+combined using the overloaded C<'+'> operator. The resulting menu structure is
+passed to menu views such as L<TMenuBar|TUI::Menus::MenuBar> or 
+L<TMenuBox|TUI::Menus::MenuBox>.
 
 C<TMenu> is a data structure and does not perform any drawing or event
 processing itself.
@@ -152,18 +153,14 @@ processing itself.
 
 The following attributes describe the contents of the menu.
 
-=over
-
-=item items
+=head2 items
 
 Reference to the first menu item in the list (I<TMenuItem>).
 
-=item deflt
+=head2 deflt
 
 Optional reference to the default menu item (I<TMenuItem>).  
 This item may be highlighted or preselected depending on the menu view.
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -195,7 +192,8 @@ Optional default menu item (I<TMenuItem>).
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 METHODS
 
@@ -208,9 +206,9 @@ Gets or sets the default menu item.
 
 =head1 SEE ALSO
 
-L<TUI::Menus::MenuItem>,
-L<TUI::Menus::MenuBar>,
-L<TUI::Menus::MenuBox>
+L<TMenuItem|TUI::Menus::MenuItem>,
+L<TMenuBar|TUI::Menus::MenuBar>,
+L<TMenuBox|TUI::Menus::MenuBox>
 
 =head1 AUTHORS
 

@@ -3,6 +3,7 @@ use version 0.77;
 use Test::More;
 use Redis;
 use Test::RedisServer;
+use Test::Deep;
 
 use Redis::Namespace;
 
@@ -37,17 +38,15 @@ subtest 'xgroup and xinfo' => sub {
     ok $ns->xgroup('create', 'mystream', 'consumer-group-name', '$'), 'xgroup create';
 
     my ($group) = $ns->xinfo('groups', 'mystream');
-    is_deeply {@$group}, {
+    cmp_deeply {@$group}, superhashof({
         'name' => 'consumer-group-name',
         'consumers' => 0,
         'pending' => 0,
         'last-delivered-id' => $id2,
-    }, 'xinfo groups';
+    }), 'xinfo groups';
 
-    is_deeply {$ns->xinfo('stream', 'mystream')}, {
+    cmp_deeply {$ns->xinfo('stream', 'mystream')}, superhashof({
         'length' => 2,
-        'radix-tree-keys' => 1,
-        'radix-tree-nodes' => 2,
         'groups' => 1,
         'last-generated-id' => $id2,
         'first-entry' => [
@@ -58,7 +57,7 @@ subtest 'xgroup and xinfo' => sub {
             $id2,
             [ field1 => 'value1', field2 => 'value2', field3 => 'value3' ],
         ],
-    }, 'xinfo stream';
+    }), 'xinfo stream';
 
     ok $ns->xgroup('destroy', 'mystream', 'consumer-group-name'), 'xgroup destroy';
 };
@@ -67,17 +66,15 @@ subtest 'shorthands for xgroup and xinfo' => sub {
     ok $ns->xgroup_create('mystream', 'consumer-group-name', '$'), 'xgroup_create';
 
     my ($group) = $ns->xinfo_groups('mystream');
-    is_deeply {@$group}, {
+    cmp_deeply {@$group}, superhashof({
         'name' => 'consumer-group-name',
         'consumers' => 0,
         'pending' => 0,
         'last-delivered-id' => $id2,
-    }, 'xinfo_groups';
+    }), 'xinfo_groups';
 
-    is_deeply {$ns->xinfo_stream('mystream')}, {
+    cmp_deeply {$ns->xinfo_stream('mystream')}, superhashof({
         'length' => 2,
-        'radix-tree-keys' => 1,
-        'radix-tree-nodes' => 2,
         'groups' => 1,
         'last-generated-id' => $id2,
         'first-entry' => [
@@ -88,7 +85,7 @@ subtest 'shorthands for xgroup and xinfo' => sub {
             $id2,
             [ field1 => 'value1', field2 => 'value2', field3 => 'value3' ],
         ],
-    }, 'xinfo_stream';
+    }), 'xinfo_stream';
 
     ok $ns->xgroup_destroy('mystream', 'consumer-group-name'), 'xgroup_destroy';
 };

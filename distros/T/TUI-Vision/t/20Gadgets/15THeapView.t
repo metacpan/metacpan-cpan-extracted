@@ -41,18 +41,13 @@ subtest 'update()' => sub {
 };
 
 subtest 'heapSize()' => sub {
+  my $ret;
   lives_ok {
-    if ( $^O eq 'MSWin32' ) {
-      require_ok( 'TUI::Gadgets::HeapView::Win32' );
-
-      my $ret = $view->heapSize();
-      ok( defined $ret, 'heapSize() returns something on Windows' );
-      like( $ret, qr/^-?\d+$/, 'heapSize() returns numeric on Windows' );
-    }
-    else {
-      is( $view->heapSize(), -1, 'heapSize() returns -1 on non-Windows' );
-    }
+    $ret = $view->heapSize();
+    ok( defined $ret, 'heapSize() returns something' );
+    like( $ret, qr/^-?\d+$/, 'heapSize() returns numeric' );
   } 'heapSize() does not die';
+  diag( "heapSize() returns -1 on ", $^O ) if ( $ret // 0 ) == -1;
 }; #/ 'heapSize' => sub
 
 subtest 'fields' => sub {

@@ -8,7 +8,7 @@ our @EXPORT = qw(undo run run_nowait wait_for_stop interrupt return step next);
 use Carp qw(croak);
 use Devel::ebug::Plugin::Basic ();
 
-our $VERSION = '0.67'; # VERSION
+our $VERSION = '0.68'; # VERSION
 
 # undo
 sub undo {
@@ -110,7 +110,7 @@ Devel::ebug::Plugin::Run
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 AUTHOR
 
@@ -123,6 +123,8 @@ Contributors:
 Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
 
 Taisuke Yamada
+
+Richard Leach (HYDAHY)
 
 =head1 COPYRIGHT AND LICENSE
 

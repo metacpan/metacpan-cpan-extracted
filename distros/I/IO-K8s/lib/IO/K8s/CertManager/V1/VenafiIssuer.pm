@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::VenafiIssuer;
 # ABSTRACT: Venafi configures this issuer to sign certificates using a CyberArk Certificate Manager Self-Hosted or SaaS policy zone.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s cloud => '+IO::K8s::CertManager::V1::VenafiCloud';
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::VenafiIssuer - Venafi configures this issuer to sign c
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 cloud
 

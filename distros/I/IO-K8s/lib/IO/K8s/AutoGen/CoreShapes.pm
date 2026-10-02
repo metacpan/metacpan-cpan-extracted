@@ -1,6 +1,6 @@
 package IO::K8s::AutoGen::CoreShapes;
 # ABSTRACT: Precomputed core/apimachinery shape index for AutoGen's reuse_core
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use strict;
 use warnings;
 
@@ -495,7 +495,7 @@ IO::K8s::AutoGen::CoreShapes - Precomputed core/apimachinery shape index for Aut
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SUPPORT
 

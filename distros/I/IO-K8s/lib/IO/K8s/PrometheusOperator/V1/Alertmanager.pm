@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::Alertmanager;
 # ABSTRACT: The `Alertmanager` custom resource definition (CRD) defines a desired [Alertmanager](https://prometheus.io/docs/alerting) setup to run in a Kubernetes cluster.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'monitoring.coreos.com/v1',
     resource_plural => 'alertmanagers',
@@ -33,7 +33,7 @@ IO::K8s::PrometheusOperator::V1::Alertmanager - The `Alertmanager` custom resour
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

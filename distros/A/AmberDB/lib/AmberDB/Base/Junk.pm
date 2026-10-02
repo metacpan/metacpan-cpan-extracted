@@ -4,9 +4,8 @@ use 5.016;
 use warnings;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.3';
-
-my $CREATED = '2026-08-28';
+our $VERSION = '5.26.4';
+my $CREATED  = '2026-08-28';
 
 # $rdbm_recs = $adb->prefetch_junk_rdbm($table_info, \@records);
 # Scans @records for all foreign table keys referenced in junk_rules (e.g. "2->14"),

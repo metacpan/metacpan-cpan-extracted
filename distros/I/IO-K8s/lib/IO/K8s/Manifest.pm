@@ -1,6 +1,6 @@
 package IO::K8s::Manifest;
 # ABSTRACT: Internal collector for loading .pk8s manifest files
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use v5.10;
 use strict;
 use warnings;
@@ -208,7 +208,7 @@ IO::K8s::Manifest - Internal collector for loading .pk8s manifest files
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

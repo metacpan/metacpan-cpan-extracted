@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::NebiusCAProvider;
 # ABSTRACT: The provider for the CA bundle to use to validate NebiusMysterybox server certificate.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s certSecretRef => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::NebiusCAProvider - The provider for the CA bundle 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 certSecretRef
 

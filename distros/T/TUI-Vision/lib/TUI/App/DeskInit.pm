@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -85,9 +85,9 @@ C<TDeskInit> encapsulates the logic required to create the desktop background
 view during application initialization.
 
 The class stores a background factory callback which is invoked to construct a
-C<TBackground> instance for a given screen rectangle. This allows applications
-to customize how the desktop background is created without embedding that logic
-directly into the desktop or application classes.
+L<TBackground|TUI::App::Background> instance for a given screen rectangle. This 
+allows applications to customize how the desktop background is created without 
+embedding that logic directly into the desktop or application classes.
 
 C<TDeskInit> is not a view itself and is not intended to be used directly by
 application code beyond application setup.
@@ -106,9 +106,9 @@ Creates a new desktop initialization helper.
 
 =item createBackground
 
-A code reference that is called with a C<TRect> argument and must return a
-C<TBackground> object. This callback defines how the desktop background view is
-constructed.
+A code reference (I<CodeRef>) that is called with a L<TRect|TUI::Objects::Rect> 
+argument and must return a L<TBackground|TUI::App::Background> object. This 
+callback defines how the desktop background view is constructed.
 
 =back
 
@@ -129,8 +129,8 @@ for the specified rectangle.
 
 =head1 SEE ALSO
 
-L<TUI::App::DeskTop>,
-L<TUI::App::Background>
+L<TDeskTop|TUI::App::DeskTop>,
+L<TBackground|TUI::App::Background>
 
 =head1 AUTHORS
 

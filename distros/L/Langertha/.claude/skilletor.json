@@ -1,0 +1,29 @@
+{
+  "sources": {
+    "getty": {
+      "git": "https://github.com/Getty/skills.git",
+      "ref": "main"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr.git",
+      "ref": "main"
+    }
+  },
+  "install": {
+    "skills": [
+      "getty-git-commit-style@getty",
+      "getty-git-usage@getty",
+      "getty-perl-moose@getty",
+      "perl-io-async-future@getty",
+      "perl-release-dist-ini@getty",
+      "getty-perl-pod@karr",
+      "getty-perl-release-author-getty@karr",
+      "kanban-issues-karr-coordination@karr",
+      "kanban-issues-karr-ticket@karr"
+    ]
+  },
+  "targets": [
+    "claude"
+  ],
+  "gitignore": true
+}

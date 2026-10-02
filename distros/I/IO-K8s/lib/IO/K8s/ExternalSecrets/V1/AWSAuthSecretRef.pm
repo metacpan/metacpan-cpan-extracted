@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::AWSAuthSecretRef;
 # ABSTRACT: AWSAuthSecretRef holds secret references for AWS credentials both AccessKeyID and SecretAccessKey must be defined in order to properly authenticate.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s accessKeyIDSecretRef     => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::AWSAuthSecretRef - AWSAuthSecretRef holds secret r
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 accessKeyIDSecretRef
 

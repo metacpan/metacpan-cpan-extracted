@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::AddressPair;
 # ABSTRACT: AddressPair is a pair of IPv4 and/or IPv6 address.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s ipv4 => Str;
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2alpha1::AddressPair - AddressPair is a pair of IPv4 and/or IP
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 ipv4
 

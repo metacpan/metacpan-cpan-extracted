@@ -1,6 +1,6 @@
 package Langertha::Role::HermesTools;
 # ABSTRACT: Hermes-style tool calling via XML tags
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose::Role;
 use JSON::MaybeXS;
 
@@ -67,79 +67,65 @@ sub hermes_extract_content {
 }
 
 
-# --- Role::Tools method implementations ---
+has hermes_schema_prompt => (
+  is => 'ro',
+  isa => 'Str',
+  lazy => 1,
+  builder => '_build_hermes_schema_prompt',
+);
 
-sub format_tools {
-  my ( $self, $tools ) = @_;
-  return $tools;
+sub _build_hermes_schema_prompt {
+  return <<'PROMPT';
+Answer in JSON that adheres to this JSON schema:
+<schema>
+%s
+</schema>
+PROMPT
 }
 
 
-around build_tool_chat_request => sub {
-  my ( $orig, $self, $conversation, $formatted_tools, %extra ) = @_;
-  my $tools_json = $self->json->encode($formatted_tools);
-  my $tool_prompt = sprintf($self->hermes_tool_prompt, $tools_json);
-  my $system_msg = { role => 'system', content => $tool_prompt };
-  my @conv = ( $system_msg, @$conversation );
-  return $self->chat_request(\@conv, %extra);
+# The hermes wire puts the schema of a json_schema response_format into a
+# leading system message as well, as _hermes_tool_messages does with the tools
+# (karr k234). Any other response_format leaves the conversation alone.
+sub _hermes_schema_messages {
+  my ( $self, $conversation, $format ) = @_;
+  return $conversation
+    unless ref $format eq 'HASH' && ( $format->{type} // '' ) eq 'json_schema'
+      && ref $format->{json_schema} eq 'HASH' && ref $format->{json_schema}{schema} eq 'HASH';
+  my $prompt = sprintf( $self->hermes_schema_prompt, $self->encode_json_text( $format->{json_schema}{schema} ) );
+  return [ { role => 'system', content => $prompt }, @$conversation ];
+}
+
+# The hermes wire has no tools / tool_choice / parallel_tool_calls body key:
+# the tools ride the system prompt, which cannot force a tool (karr k234,
+# ADR 0002). Composing Role::Tools gives the native flags, so this layer-2 rule
+# clears them for every hermes engine (NousResearch, AKI native; ADR 0016: two
+# consumers from different parents, so the rule lives on the role). Kept:
+# tools_hermes, tool_choice_auto (what the prompt says) and tool_choice_none
+# (chat_f withholds the tools, k231). The rule keys on the resolved tag, not
+# on the composition (karr k251): a tool_wire_format => 'openai' constructor
+# override sends the tools natively, so it keeps the native flags from the
+# role inventory and loses tools_hermes instead. Deleting only, so the order
+# against an engine's own around engine_capabilities or its model corrections
+# does not matter.
+around engine_capabilities => sub {
+  my ( $orig, $self, @rest ) = @_;
+  my $caps = $self->$orig(@rest);
+  if ( $self->tool_wire_format eq 'hermes' ) {
+    delete @{$caps}{qw( tools_native tool_choice_any tool_choice_named parallel_tool_use )};
+  }
+  else {
+    delete $caps->{tools_hermes};
+  }
+  return $caps;
 };
 
-
-sub response_tool_calls {
-  my ( $self, $data ) = @_;
-  my $content = $self->hermes_extract_content($data);
-  return [] unless $content;
-
-  my $tag = $self->hermes_call_tag;
-  my @tool_calls;
-  while ($content =~ m{<\Q$tag\E>\s*(.*?)\s*</\Q$tag\E>}sg) {
-    my $json_str = $1;
-    eval {
-      my $tc = $self->decode_json_text($json_str);
-      push @tool_calls, $tc;
-    };
-  }
-  return \@tool_calls;
-}
-
-
-sub extract_tool_call {
-  my ( $self, $tc ) = @_;
-  return ( $tc->{name}, $tc->{arguments} );
-}
-
-
-sub response_text_content {
-  my ( $self, $data ) = @_;
-  my $content = $self->hermes_extract_content($data) // '';
-  my $tag = $self->hermes_call_tag;
-  $content =~ s{<\Q$tag\E>.*?</\Q$tag\E>}{}sg;
-  $content =~ s/^\s+|\s+$//g;
-  return $content;
-}
-
-
-sub format_tool_results {
-  my ( $self, $data, $results ) = @_;
-  my $content = $self->hermes_extract_content($data);
-  my $res_tag = $self->hermes_response_tag;
-
-  my @messages;
-  push @messages, { role => 'assistant', content => $content };
-
-  for my $r (@$results) {
-    my $tool_content = join('', map { $_->{text} // '' } @{$r->{result}{content}});
-    push @messages, {
-      role => 'tool',
-      content => "<${res_tag}>\n"
-        . $self->json->encode({ name => $r->{tool_call}{name}, content => $tool_content })
-        . "\n</${res_tag}>",
-    };
-  }
-
-  return @messages;
-}
-
+# The tool-format behaviour (format_tools, response_tool_calls,
+# extract_tool_call, response_text_content, format_tool_results,
+# build_tool_chat_request) is provided by the tag-driven defaults in
+# Langertha::Role::Tools for tool_wire_format => 'hermes'. This role now only
+# carries the Hermes-specific configuration (tag names + prompt template) those
+# defaults read.
 
 
 1;
@@ -156,7 +142,7 @@ Langertha::Role::HermesTools - Hermes-style tool calling via XML tags
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -167,19 +153,29 @@ version 0.502
     with 'Langertha::Role::Tools';
     with 'Langertha::Role::HermesTools';
 
+    sub _build_tool_wire_format { 'hermes' }
+
 =head1 DESCRIPTION
 
-This role implements tool calling via Hermes-style XML tags. Instead of using
-an API's native C<tools> parameter, tool definitions are injected into the
-system prompt as C<E<lt>toolsE<gt>> XML and the model responds with
-C<E<lt>tool_callE<gt>> XML tags containing JSON. This works with any chat
-model regardless of native tool API support.
+This role configures Hermes-style tool calling: instead of using an API's
+native C<tools> parameter, tool definitions are injected into the system prompt
+as C<E<lt>toolsE<gt>> XML and the model responds with C<E<lt>tool_callE<gt>> XML
+tags containing JSON. This works with any chat model regardless of native tool
+API support.
 
-Engines composing this role get implementations of the five methods required
-by L<Langertha::Role::Tools>: L</format_tools>, L</response_tool_calls>,
-L</extract_tool_call>, L</format_tool_results>, and L</response_text_content>.
-It also provides L</build_tool_chat_request> to inject tools into the system
-prompt instead of passing them as an API parameter.
+The behaviour itself lives in the tag-driven defaults of
+L<Langertha::Role::Tools> (selected by C<tool_wire_format =E<gt> 'hermes'>). This
+role now only carries the Hermes-specific I<configuration> those defaults read:
+the call/response tag names (L</hermes_call_tag>, L</hermes_response_tag>), the
+prompt template (L</hermes_tool_prompt>), and the response-content extractor
+(L</hermes_extract_content>). Compose it alongside L<Langertha::Role::Tools> and
+set C<_build_tool_wire_format> to C<'hermes'>.
+
+The C<hermes> wire has no C<tools>, C<tool_choice> or C<parallel_tool_calls>
+body key, so the role clears C<tools_native>, C<tool_choice_any>,
+C<tool_choice_named> and C<parallel_tool_use> from
+L<Langertha::Role::Capabilities/engine_capabilities>; C<tools_hermes>,
+C<tool_choice_auto> and C<tool_choice_none> stay.
 
 =head2 hermes_call_tag
 
@@ -219,34 +215,15 @@ Extracts raw text content from a parsed LLM response for Hermes tool call
 parsing. Defaults to OpenAI response format (C<choices[0].message.content>).
 Override this method in engines with non-OpenAI response structures.
 
-=head2 format_tools
+=head2 hermes_schema_prompt
 
-Returns the MCP tool definitions as-is for JSON encoding into the Hermes
-system prompt.
-
-=head2 build_tool_chat_request
-
-Builds a chat request with tool definitions injected into the system prompt
-as XML, rather than passing them as an API parameter.
-
-=head2 response_tool_calls
-
-Parses C<E<lt>tool_callE<gt>> XML tags from the model's text output and
-returns an ArrayRef of tool call HashRefs with C<name> and C<arguments>.
-
-=head2 extract_tool_call
-
-Extracts tool name and arguments from a Hermes tool call HashRef.
-
-=head2 response_text_content
-
-Extracts the final text content from the response, stripping any
-C<E<lt>tool_callE<gt>> XML tags.
-
-=head2 format_tool_results
-
-Formats tool execution results as C<E<lt>tool_responseE<gt>> XML messages
-for the next conversation turn.
+The system prompt template for Hermes structured output, in the form of the
+Hermes function-calling prompt format. Must contain a C<%s> placeholder where
+the JSON schema is inserted. L<Langertha::Role::Chat/chat_f> and
+L<Langertha::Role::Chat/chat_stream_realtime_f> put it in front of the
+conversation for every C<json_schema> C<response_format> on a C<hermes>
+engine that takes C<response_format> (including the rewrite of a forced
+tool), so a backend that ignores C<response_format> still sees the schema.
 
 =head1 SEE ALSO
 

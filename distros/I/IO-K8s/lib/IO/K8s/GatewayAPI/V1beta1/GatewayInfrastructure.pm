@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::GatewayInfrastructure;
 # ABSTRACT: Infrastructure defines infrastructure level attributes about this Gateway instance.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s annotations   => { Str => 1 };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1beta1::GatewayInfrastructure - Infrastructure defines inf
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 annotations
 

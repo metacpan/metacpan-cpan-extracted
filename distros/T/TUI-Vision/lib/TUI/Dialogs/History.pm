@@ -1,12 +1,12 @@
 package TUI::Dialogs::History;
-# ABSTRACT: A TWindow-based history browser for TVision input controls
+# ABSTRACT: A TWindow-based history browser for input controls
 
 use 5.010;
 use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +16,7 @@ our @EXPORT = qw(
   new_THistory
 );
 
+use Encode qw( encode );
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   is_Object
@@ -53,6 +54,7 @@ extends TView;
 
 # declare global variables
 our $icon = "\xDE~\x19~\xDD";    # cp437: "▐~↓~▌"
+# our $icon = encode( cp437 => "▐~↓~▌" );
 
 # protected attributes
 has link      => ( is => 'ro', default => sub { die 'required' } );
@@ -257,26 +259,23 @@ The following global variable affects the visual rendering of C<THistory>.
 
 =head2 $icon
 
-Defines the character sequence used to display the history indicator icon.
-The default value uses CP437 characters to render a framed arrow symbol.
+Defines the character sequence (I<Str>) used to display the history indicator 
+icon. The default value uses C<CP437> characters to render a framed arrow 
+symbol.
 
 =head1 ATTRIBUTES
 
 The following attributes are managed internally and exposed as read-only
 accessors.
 
-=over
-
-=item link
+=head2 link
 
 Reference to the associated input line control (I<TInputLine>).
 
-=item historyId
+=head2 historyId
 
 Numeric identifier for the history list (I<PositiveOrZeroInt>).  
 Input fields using the same identifier share the same history.
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -294,7 +293,7 @@ Creates a new history control linked to an input field.
 
 =item bounds
 
-Bounding rectangle of the history control (I<TRect>).
+Bounding rectangle of the history control (L<TRect|TUI::Objects::Rect>).
 
 =item link
 
@@ -313,7 +312,8 @@ Numeric identifier used to group history entries.
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 METHODS
 
@@ -361,7 +361,9 @@ Shuts down the history control and releases associated resources.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::Dialog>, L<TUI::Dialogs::InputLine>, L<TUI::Views::View>
+L<TDialog|TUI::Dialogs::Dialog>, 
+L<TInputLine|TUI::Dialogs::InputLine>, 
+L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 
@@ -380,7 +382,6 @@ Copyright (c) 1990-1994, 1997 by Borland International
 Copyright (c) 2026 the L</AUTHORS> as listed above.
 
 This software is licensed under the MIT license (see the LICENSE file, which is
-part of the distribution). This documentation is provided under the same terms
-as the Turbo Vision library itself.
+part of the distribution).
 
 =cut

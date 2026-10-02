@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -327,6 +327,26 @@ TUI::Menus::StatusLine - defines the class TStatusLine
     TView
       TStatusLine
 
+=head1 SYNOPSIS
+
+  # The following example shows a typical status line definition using chained
+  # status items and a single status definition that applies to all help 
+  # contexts.
+
+  sub initStatusLine {
+    my ( $class, $bounds ) = @_;
+
+    $bounds->{a}{y} = $bounds->{b}{y} - 1;
+
+    return new_TStatusLine(
+      $bounds,
+      new_TStatusDef( 0, 0xFFFF )
+        + new_TStatusItem( '~Alt+X~ Exit', kbAltX, cmQuit )
+        + new_TStatusItem( '~F10~ Menu', kbF10, cmMenu )
+        + new_TStatusItem( '~F1~ Help', kbF1, cmHelp )
+    );
+  }
+
 =head1 DESCRIPTION
 
 C<TStatusLine> represents the message line displayed at the bottom of a Turbo
@@ -349,31 +369,27 @@ The following global variable affects the visual rendering of C<TStatusLine>.
 
 =head2 $hintSeparator
 
-Defines the character sequence used to separate individual hints
-in the status line. The default value uses a CP437 vertical separator.
+Defines the character sequence (I<Str>) used to separate individual hints
+in the status line. The default value uses a C<CP437> vertical separator.
 
 =head1 ATTRIBUTES
 
 The following attributes are exposed as read-only accessors and are intended
 for internal use by the status line implementation.
 
-=over
-
-=item defs
+=head2 defs
 
 Read-only reference to the linked list of status definitions
 (I<TStatusDef>). This attribute is required and defines which status items
 apply to which help context ranges.
 
-=item items
+=head2 items
 
 Read-only reference to the currently active list of status items
 (I<TStatusItem>). This list is managed internally and updated as the help
 context changes.
 
-=back
-
-=head1 METHODS
+=head1 CONSTRUCTOR
 
 =head2 new
 
@@ -389,7 +405,7 @@ initializes it with a list of status definitions.
 
 =item bounds
 
-Bounding rectangle of the status line (I<TRect>).  
+Bounding rectangle of the status line (L<TRect|TUI::Objects::Rect>).  
 The height is typically one row and the line is placed at the bottom of the
 desktop.
 
@@ -406,12 +422,16 @@ Status definition list associated with this status line
 
 Factory constructor for creating a status line instance.
 
+=head1 DESTRUCTOR
+
 =head2 DEMOLISH
 
   $self->DEMOLISH($in_global_destruction);
 
 Performs cleanup of the status line object and disposes of associated resources.
 This method is normally called automatically by the owning view or application.
+
+=head1 METHODS
 
 =head2 disposeItems
 
@@ -460,31 +480,10 @@ Updates the status line contents based on the current help context. This method
 selects the appropriate status definition and rebuilds the list of visible
 status items.
 
-=head1 EXAMPLE
-
-The following example shows a typical status line definition using chained
-status items and a single status definition that applies to all help contexts.
-
-  sub initStatusLine {
-    my ( $class, $bounds ) = @_;
-
-    $bounds->{a}{y} = $bounds->{b}{y} - 1;
-
-    return new_TStatusLine(
-      $bounds,
-      new_TStatusDef( 0, 0xFFFF )
-        + new_TStatusItem( '~Alt+X~ Exit', kbAltX, cmQuit )
-        + new_TStatusItem( '~F10~ Menu', kbF10, cmMenu )
-        + new_TStatusItem( '~F1~ Help', kbF1, cmHelp )
-    );
-  }
-
-This pattern mirrors the traditional Turbo Vision status line construction
-while using Perl-specific operator overloading for clarity.
-
 =head1 SEE ALSO
 
-L<TUI::Menus::StatusDef>, L<TUI::Menus::StatusItem>
+L<TStatusDef|TUI::Menus::StatusDef>, 
+L<TStatusItem|TUI::Menus::StatusItem>
 
 =head1 AUTHORS
 

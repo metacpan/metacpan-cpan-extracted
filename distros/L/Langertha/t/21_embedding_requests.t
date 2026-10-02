@@ -9,10 +9,10 @@ use JSON::MaybeXS;
 
 use Langertha::Engine::OpenAI;
 use Langertha::Engine::Ollama;
+use Langertha::Engine::Mistral;
+use Langertha::Engine::Scaleway;
 
 my $json = JSON::MaybeXS->new->canonical(1)->utf8(1);
-
-plan(9);
 
 my $ollama_testurl = 'http://test.url:12345';
 my $ollama = Langertha::Engine::Ollama->new(
@@ -43,5 +43,19 @@ is_deeply($openai_data, {
   input => 'testprompt',
   model => 'model',
 }, 'OpenAI request body is correct');
+
+# k291: the OpenAI role's default embedding model (text-embedding-3-large) is
+# an OpenAI id; an engine inheriting it sends a model its provider does not
+# serve, and every call relying on the default fails with a 4xx. Each hosted
+# embedding engine sends its own provider's model when none is set.
+for my $case (
+  [ 'Langertha::Engine::OpenAI',   'text-embedding-3-large' ],
+  [ 'Langertha::Engine::Mistral',  'mistral-embed' ],
+  [ 'Langertha::Engine::Scaleway', 'qwen3-embedding-8b' ],
+) {
+  my ( $class, $model ) = @$case;
+  my $body = $json->decode($class->new( api_key => 'k' )->embedding('x')->content);
+  is($body->{model}, $model, "$class sends its own default embedding model");
+}
 
 done_testing;

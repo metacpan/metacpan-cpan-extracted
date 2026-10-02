@@ -1,6 +1,6 @@
 package IO::K8s::Role::Loadbalanced;
 # ABSTRACT: Role for traffic distribution (weighted backends, mirroring)
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use Moo::Role;
 
 # The fluent setters below build the spec through IO::K8s::Role::SpecBuilder
@@ -48,7 +48,7 @@ IO::K8s::Role::Loadbalanced - Role for traffic distribution (weighted backends, 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 

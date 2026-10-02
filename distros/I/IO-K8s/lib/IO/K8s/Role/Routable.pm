@@ -1,6 +1,6 @@
 package IO::K8s::Role::Routable;
 # ABSTRACT: Role for building HTTP/gRPC routing rules
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use Carp qw( croak );
 use Scalar::Util qw( looks_like_number );
 # Imports above `use Moo::Role` on purpose: Role::Tiny treats subs already in
@@ -212,7 +212,7 @@ IO::K8s::Role::Routable - Role for building HTTP/gRPC routing rules
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 

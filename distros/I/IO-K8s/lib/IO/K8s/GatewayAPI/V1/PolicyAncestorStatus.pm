@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::PolicyAncestorStatus;
 # ABSTRACT: PolicyAncestorStatus describes the status of a route with respect to an associated Ancestor.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s ancestorRef    => '+IO::K8s::GatewayAPI::V1::ParentReference', { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1::PolicyAncestorStatus - PolicyAncestorStatus describes t
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 ancestorRef
 

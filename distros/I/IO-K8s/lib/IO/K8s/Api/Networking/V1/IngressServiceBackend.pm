@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::IngressServiceBackend;
 # ABSTRACT: IngressServiceBackend references a Kubernetes Service as a Backend.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Networking::V1::IngressServiceBackend - IngressServiceBackend refe
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

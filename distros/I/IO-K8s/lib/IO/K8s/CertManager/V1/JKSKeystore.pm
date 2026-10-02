@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::JKSKeystore;
 # ABSTRACT: JKS configures options for storing a JKS keystore in the `spec.secretName` Secret resource.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s alias             => Str;
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::JKSKeystore - JKS configures options for storing a JKS
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 alias
 

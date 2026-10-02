@@ -13,9 +13,9 @@ with 'CPAN::Maker::Role::ModuleUtils';
 
 CLI::Simple->import(qw(:roles));
 
-our $VERSION   = '2.3.5';
-our $GIT_SHA   = '4a59b617de075c35aefe39115d9abc4b54bd0224';
-our $GIT_DIRTY = '2.0.0-25-g4a59b617de075c35aefe39115d9abc4b54bd0224';
+our $VERSION   = '2.3.6';
+our $GIT_SHA   = 'd12beeed203e99052fe6891b3a39039d73026733';
+our $GIT_DIRTY = '2.0.0-26-gd12beeed203e99052fe6891b3a39039d73026733';
 
 with 'CPAN::Maker::Bootstrapper::Role::Init';
 with 'CPAN::Maker::Bootstrapper::Role::LLM::Utils';
@@ -806,9 +806,23 @@ C<make> examines F<requires> and generates:
   cpanfile.darkpan
   cpanm.darkpan
 
-F<cpanfile.darkpan> contains the non-CPAN dependencies in cpanfile
-syntax. F<cpanm.darkpan> contains the same dependencies in a form
-suitable for passing to L<cpanm|App::cpanminus>.
+For each module listed in F<requires>, the build checks whether the module
+is available from the configured DarkPAN. Modules found there are added to
+the generated DarkPAN manifests.
+
+For modules available from the DarkPAN, the build also checks MetaCPAN. If
+a module is available from both CPAN and the DarkPAN, the DarkPAN version is
+preferred and the module remains in the generated manifests. This allows the
+DarkPAN to provide a version of a module that is also published on CPAN.
+
+Modules that should not be obtained from the DarkPAN may be listed in
+F<darkpan.skip>, one module name per line. Those modules are omitted from
+both generated DarkPAN manifests.
+
+F<cpanfile.darkpan> contains dependencies selected for resolution from
+the DarkPAN in cpanfile syntax. F<cpanm.darkpan> contains the same
+dependencies in a form suitable for passing to
+L<cpanm|App::cpanminus>.
 
 The configured DarkPAN must publish:
 
@@ -1042,11 +1056,27 @@ name one or more modules to restrict the output.
 
 =item create-darkpan-requires
 
-  cmb create-darkpan-requires
+  cmb create-darkpan-requires [--filter file] [requires-file]
 
-Examines F<requires> and identifies dependencies available from the configured
-DarkPAN. If a dependency is available from both CPAN and the DarkPAN, the
-DarkPAN is preferred.
+Examines F<requires> (or C<requires-file>) and identifies dependencies
+available from the configured DarkPAN. Each dependency is checked
+against the DarkPAN F<02packages.details.txt.gz> index. Dependencies
+found on the DarkPAN are included in the generated manifests.
+
+For each dependency found on the DarkPAN, MetaCPAN is also checked. If the
+module is available from both CPAN and the DarkPAN, a warning is emitted and
+the DarkPAN is preferred.
+
+The optional C<--filter> argument names a file containing module names to
+exclude from the generated manifests, one module per line:
+
+  cmb create-darkpan-requires --filter darkpan.skip requires
+
+This is useful when a module is available from both CPAN and the DarkPAN but
+the distribution author wants that dependency to be resolved from CPAN.
+
+When invoked through the generated Makefile, F<darkpan.skip> is used
+automatically when it exists.
 
 The generated files are intended as installation aids and are included with
 the distribution. They do not alter normal Perl dependency resolution by
@@ -1114,7 +1144,7 @@ Filters C<source-file> to STDOUT, substituting C<@TOKEN@> placeholders
 with values drawn from the environment (or from a C<--vars-file>). This
 is the mechanism the generated F<Makefile> uses to turn F<.pm.in> and
 F<.pl.in> sources into their built C<.pm>/C<.pl> counterparts -- for
-example filling C<2.3.5> from the F<VERSION> file or
+example filling C<2.3.6> from the F<VERSION> file or
 C<@BUILD_DATE@> at build time.
 
 A placeholder is only I<required> to resolve if it appears in live code.
@@ -2584,10 +2614,10 @@ tarball must be rebuilt.
 
 C<CPAN::Maker::Bootstrapper> uses this mechanism for generated DarkPAN
 dependency manifests. When C<DARKPAN_REQUIRES> is enabled,
-F<cpanfile.darkpan> and F<cpanm.darkpan> are added to
-F<buildspec.yml> as extra files and to F<extra-files.skip> because
-they are generated during the build rather than maintained in source
-control. See L</DARKPAN_REQUIRES>.
+F<cpanfile.darkpan> and F<cpanm.darkpan> are added to F<buildspec.yml>
+as extra files and to F<extra-files.skip> because presumably the
+developer has enabled C<DARKPAN_REQUIRES> for the purpose of adding
+them to the distribution. See L</DARKPAN_REQUIRES>.
 
 =head2 I want to pin a version or add a module the scanner missed
 
@@ -2886,7 +2916,7 @@ C<make requires> and C<make test-requires> to analyze your source files
 
 =head1 VERSION
 
-This documentation refers to version 2.3.5
+This documentation refers to version 2.3.6
 
 =head1 AUTHOR
 

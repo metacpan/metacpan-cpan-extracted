@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha2::TopologyConstraint;
 # ABSTRACT: TopologyConstraint defines a topology constraint for a PodGroup.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s key => Str, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Scheduling::V1alpha2::TopologyConstraint - TopologyConstraint defi
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 key
 

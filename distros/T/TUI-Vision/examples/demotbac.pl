@@ -6,13 +6,15 @@ use
 
 {
   package TSampleProgram;
-  use parent ::TApplication;
+  use TUI::toolkit;
+  extends ::TApplication;
   sub initDeskTop;
 }
 
 {
   package TNewDeskTop; 
-  use parent ::TDeskTop;
+  use TUI::toolkit;
+  extends ::TDeskTop;
   sub initBackground;
 }
 

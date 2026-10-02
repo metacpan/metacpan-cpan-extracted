@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "IO::Async" => "0.802",
     "IO::Async::SSL" => 0,
     "JSON::MaybeXS" => 0,
-    "Langertha" => "0.500",
+    "Langertha" => "0.503",
     "Log::Any" => 0,
     "MIME::Base64" => 0,
     "Module::Runtime" => 0,
@@ -46,6 +46,7 @@ my %WriteMakefileArgs = (
     "Net::Async::HTTP::Server" => 0,
     "Time::HiRes" => 0,
     "Try::Tiny" => 0,
+    "URI" => 0,
     "YAML::PP" => 0
   },
   "TEST_REQUIRES" => {
@@ -53,7 +54,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Test2::Suite" => 0
   },
-  "VERSION" => "1.101",
+  "VERSION" => "1.102",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,7 +71,7 @@ my %FallbackPrereqs = (
   "IO::Async" => "0.802",
   "IO::Async::SSL" => 0,
   "JSON::MaybeXS" => 0,
-  "Langertha" => "0.500",
+  "Langertha" => "0.503",
   "Log::Any" => 0,
   "MIME::Base64" => 0,
   "Module::Runtime" => 0,
@@ -84,6 +85,7 @@ my %FallbackPrereqs = (
   "Test2::Suite" => 0,
   "Time::HiRes" => 0,
   "Try::Tiny" => 0,
+  "URI" => 0,
   "YAML::PP" => 0
 );
 

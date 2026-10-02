@@ -1,5 +1,24 @@
 Revision history for Rex-GPU
 
+0.004     2026-10-01 16:14:46Z
+  - Not run on GPU hardware yet; checked against the commands sent to the
+    host.
+
+  [CDI]
+  - generate_cdi_specs checks with `nvidia-ctk cdi list` that
+    nvidia.com/gpu=all and management.nvidia.com/gpu=all resolve, and
+    writes only what is missing under /etc/cdi: nvidia.yaml, and
+    management.nvidia.yaml via --mode=management
+    --vendor=management.nvidia.com --class=gpu. Fixes hosts without
+    nvidia-cdi-refresh (DGX OS / GB10, toolkit 1.19), where /run/cdi is
+    empty after a reboot and the GPU Operator validator failed on
+    "unresolvable CDI devices management.nvidia.com/gpu=all". Also in the
+    "toolkit already present" case. Specs that resolve are left alone
+    (also nvidia-cdi-refresh's under /run/cdi); next to nvidia-cdi-refresh
+    no static nvidia.yaml is written. A CLI without the management mode,
+    or without `cdi list`, is a warning, not a die. An existing
+    /etc/cdi/nvidia.yaml is no longer rewritten on every run (k76).
+
 0.003     2026-10-01 04:00:20Z
   - None of the changes below has run on GPU hardware yet; they are
     checked against the commands they send to the host.

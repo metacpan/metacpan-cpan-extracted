@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -33,7 +33,10 @@ use TUI::Drivers::Const qw(
   :evXXXX
   :kbXXXX
 );
+use TUI::Drivers::AttrPair;
+use TUI::Drivers::ColorAttr;
 use TUI::Drivers::Event;
+use TUI::Drivers::ScreenCell;
 use TUI::Views::Const qw(
   maxViewWidth
   :phaseType
@@ -108,11 +111,18 @@ my (
   $writeView,
 );
 
+# macro for coercing a value into a TColorAttr object
+my $coerceAttr = sub {
+  return ref $_[0] ? $_[0] : TColorAttr->new( bios => $_[0] );
+};
+
+# macro for locking a value (making it readonly)
 my $lock_value = sub {
   Internals::SvREADONLY( $_[0] => 1 )
     if exists &Internals::SvREADONLY;
 };
 
+# macro for unlocking a value (making it writable)
 my $unlock_value = sub {
   Internals::SvREADONLY( $_[0] => 0 )
     if exists &Internals::SvREADONLY;
@@ -404,7 +414,7 @@ sub calcBounds {    # void ($bounds, $delta);
 
   my $grow = sub {    # ($i)
     if ( $self->{growMode} & gfGrowRel ) {
-      $_[0] = ( $_[0] * $s + ( ( $s - $d ) >> 1 ) ) / ( $s - $d );
+      $_[0] = int( ( $_[0] * $s + ( ( $s - $d ) >> 1 ) ) / ( $s - $d ) );
     }
     else {
       $_[0] += $d;
@@ -940,21 +950,30 @@ sub execute {    # $cmd ()
   return cmCancel;
 }
 
-sub getColor {    # $int ($color)
+sub getColor {    # $pair ($color)
   state $sig = signature(
     method => Object,
     pos    => [PositiveOrZeroInt],
   );
   my ( $self, $color ) = $sig->( @_ );
-  my $colorPair = $color >> 8;
 
-  if ( $colorPair != 0 ) {
-    $colorPair = $self->mapColor( $colorPair ) << 8;
-  }
+  # Get the high and low color values from the color integer
+  my $hi = ( $color >> 8 ) & 0xff;
+  my $lo = $color & 0xff;
 
-  $colorPair |= $self->mapColor( $color & 0xff );
+  # Map the color values to the actual colors in the palette
+  $hi = $self->mapColor( $hi ) if $hi;
+  $lo = $self->mapColor( $lo );
 
-  return $colorPair;
+  # no objects, just return the color value as an integer
+  return ( $hi << 8 ) | $lo
+    unless ref $hi && ref $lo;
+
+  # objects, return a TAttrPair object with the high and low colors
+  return TAttrPair->new(
+    hi => $hi->$coerceAttr(),
+    lo => $lo->$coerceAttr(),
+  );
 }
 
 sub getPalette {    # $palette ()
@@ -967,30 +986,30 @@ sub getPalette {    # $palette ()
   return $palette->clone();
 }
 
-sub mapColor {    # $int ($color)
+sub mapColor {    # $attr ($index)
   state $sig = signature(
     method => Object,
     pos    => [PositiveOrZeroInt],
   );
-  my ( $self, $color ) = $sig->( @_ );
+  my ( $self, $index ) = $sig->( @_ );
 
-  return $errorAttr
-    unless $color;
-
-  my $cur = $self;
-  do {
-    my $p = $cur->getPalette();
-    if ( $p->at( 0 ) ) {
-      if ( $color > $p->at( 0 ) ) {
-        return $errorAttr;
-      }
-      $color = $p->at( $color );
-      return $errorAttr
-        unless $color;
+  my $p = $self->getPalette();
+  my $color;
+  if ( $p->[0] != 0 ) {
+    if ( 0 < $index && $index <= $p->[0] ) {
+      $color = STRICT ? $p->at( $index ) : $p->[$index];
     }
-    $cur = $cur->{owner};
-  } while ( $cur );
-
+    else {
+      return $errorAttr;
+    }
+  }
+  else {
+    $color = $index;
+  }
+  return $errorAttr
+    if $color == 0;
+  return $self->{owner}->mapColor( $color )
+    if $self->{owner};
   return $color;
 } #/ sub mapColor
 
@@ -1270,25 +1289,18 @@ sub writeBuf {    # void ($x, $y, $w, $h, $b)
   return;
 }
 
-my $setCell = sub {    # void ($cell, $ch, $attr)
-  assert ( @_ == 3 );
-  assert ( is_ScalarRef \$_[0] );
-  assert ( is_Int $_[1] );
-  assert ( is_Int $_[2] );
-  $_[0] = ( ( $_[2] & 0xff ) << 8 ) | $_[1] & 0xff;
-  return;
-};
-
 sub writeChar {    # void ($x, $y, $c, $color, $count)
   state $sig = signature(
     method => Object,
     pos    => [Int, Int, Str, PositiveOrZeroInt, Int],
   );
   my ( $self, $x, $y, $c, $color, $count ) = $sig->( @_ );
-  my $attr = $self->mapColor( $color );
   if ( $count > 0 ) {
-    &$setCell( my $cell, ord( $c ), $attr );
-    my $buf = [ ( $cell ) x $count ];
+    my $attr = $self->mapColor( $color )->$coerceAttr();
+    my $cell = TScreenCell->new( ch => $c, attr => $attr );
+    my $buf = [
+      map { $cell->clone() } 1 .. $count
+    ];
     $self->$writeView( $x, $y, $count, $buf );
   }
   return;
@@ -1315,16 +1327,13 @@ sub writeStr {    # void ($x, $y, $str, $color)
   if ( $str ) {
     my $length = length( $str );
     if ( $length > 0 ) {
-      my $attr = $self->mapColor( $color );
-      my $buf  = [ ( 0 ) x maxViewWidth ];
-      my $i    = 0;
-      foreach my $c ( split //, $str ) {
-        &$setCell( $buf->[$i], ord( $c ), $attr );
-        $i++;
-      }
+      my $attr = $self->mapColor( $color )->$coerceAttr();
+      my $buf = [ 
+        map { TScreenCell->new( ch => $_, attr => $attr ) } split //, $str
+      ];
       $self->$writeView( $x, $y, $length, $buf );
-    } #/ if ( $length > 0 )
-  } #/ if ( $str )
+    }
+  }
   return;
 } #/ sub writeStr
 
@@ -1449,7 +1458,7 @@ __END__
 
 =head1 NAME
 
-TUI::Views::View - base class for all visual components in TUI::Vision
+TUI::Views::View - base class for all visual components
 
 =head1 HIERARCHY
 
@@ -1466,7 +1475,7 @@ TUI::Views::View - base class for all visual components in TUI::Vision
 
 =head1 DESCRIPTION
 
-C<TView> is the fundamental base class for all visible objects in TUI::Vision.
+C<TView> is the fundamental base class for all visible objects in TUI::Vision
 Every visual component shown on the screen ultimately derives from C<TView>.
 
 The class provides the core infrastructure required for drawing, event
@@ -1486,15 +1495,16 @@ state, options, event mask, and geometry attributes.
 =head2 Commonly Used Features
 
 In day-to-day application code, the most relevant configuration fields are
-C<growMode>, C<dragMode>, C<helpCtx>, C<state>, C<options>, and C<eventMask>.
-They define resize behavior, input handling, help context, and event routing.
+L</growMode>, L</dragMode>, L</helpCtx>, L</state>, L</options>, and 
+L</eventMask>. They define resize behavior, input handling, help context, and 
+event routing.
 
 The methods most commonly touched outside framework internals are
-C<clearEvent>, C<commandEnabled>, C<dataSize>, C<disableCommands>, C<draw>,
-C<drawView>, C<enableCommands>, C<getColor>, C<getCommands>, C<getHelpCtx>,
-C<getPalette>, C<getState>, C<hideCursor>, C<normalCursor>, C<select>,
-C<setCommands>, C<setState>, C<show>, C<showCursor>, C<valid>, C<writeLine>,
-and C<writeStr>.
+L</clearEvent>, L</commandEnabled>, L</dataSize>, L</disableCommands>, 
+L</draw>, L</drawView>, L</enableCommands>, L</getColor>, L</getCommands>, 
+L</getHelpCtx>, L</getPalette>, L</getState>, L</hideCursor>, L</normalCursor>, 
+L</select>, L</setCommands>, L</setState>, L</show>, L</showCursor>, L</valid>, 
+L</writeLine>, and L</writeStr>.
 
 =head1 VARIABLES
 
@@ -1503,32 +1513,35 @@ properties shared by all C<TView> objects.
 
 =head2 $shadowSize
 
-Default size of the view shadow, specified as a C<TPoint>.
+Default size of the view shadow, specified as a L<TPoint|TUI::Objects::Point>.
 
 =head2 $shadowAttr
 
-Attribute value used when drawing view shadows.
+Attribute value used when drawing view shadows (I<PositiveInt> or 
+L<TColorAttr|TUI::Objects::ColorAttr>).
 
 =head2 $showMarkers
 
-Controls whether focus and selection markers are displayed.
+Controls whether focus and selection markers are displayed (I<Bool>).
 
 =head2 $specialChars
 
-Array reference defining special navigation and marker characters.
+Array reference defining special navigation and marker characters 
+(I<ArrayRef[Str]>).
 
 =head2 $errorAttr
 
-Attribute value used to render views in an error state.
+Attribute value used to render views in an error state (I<PositiveInt> or 
+L<TColorAttr|TUI::Objects::ColorAttr>).
 
 =head2 $commandSetChanged
 
-Indicates whether the active command set has been modified.
+Indicates whether the active command set has been modified (I<Bool>).
 
 =head2 $curCommandSet
 
-Holds the current default command set used for command enabling
-and dispatch.
+Holds the current default command set used for command enabling and dispatch (
+L<TCommandSet|TUI::Views::CommandSet>).
 
 =head1 ATTRIBUTES
 
@@ -1536,57 +1549,57 @@ The following attributes define the geometry, state, and ownership of a view.
 Unless otherwise noted, attributes are part of the public view state and may
 be read or modified by application code.
 
-=over
-
-=item next
+=head2 next
 
 Internal link to the next view in the owner's Z-ordered view list.
-This attribute is managed internally.
+This attribute is managed internally (L<TView|TUI::Views::View>).
 
-=item size
+=head2 size
 
-Size of the view as a C<TPoint>.
+Size of the view as a L<TPoint|TUI::Objects::Point>.
 
-=item origin
+=head2 origin
 
-Upper-left corner of the view relative to its owner.
+Upper-left corner of the view relative to its owner 
+(L<TPoint|TUI::Objects::Point>).
 
-=item cursor
+=head2 cursor
 
-Current cursor position within the view.
+Current cursor position within the view (L<TPoint|TUI::Objects::Point>).
 
-=item owner
+=head2 owner
 
-Owning group of this view (I<TGroup>). This reference is managed internally.
+Owning group of this view (L<TGroup|TUI::Views::Group>). This reference is 
+managed internally.
 
-=item options
+=head2 options
 
-View option flags (I<Int>), typically a combination of C<ofXXXX> constants.
+View option flags (I<PositiveOrZeroInt>), typically a combination of C<ofXXXX> 
+constants.
 
-=item eventMask
+=head2 eventMask
 
-Event mask controlling which event classes are accepted by the view.
+Event mask controlling which event classes are accepted by the view 
+(I<PositiveOrZeroInt>, C<evXXXX> constants).
 
-=item state
+=head2 state
 
 Current state flags of the view, such as visibility, selection, and cursor
-mode (C<sfXXXX> constants).
+mode (I<PositiveOrZeroInt>, C<sfXXXX> constants).
 
-=item growMode
+=head2 growMode
 
 Grow mode flags controlling how the view resizes when its owner changes size
-(C<gfXXXX> constants).
+(I<PositiveOrZeroInt>, C<gfXXXX> constants).
 
-=item dragMode
+=head2 dragMode
 
 Drag behavior flags controlling how the view responds to mouse dragging
-(C<dmXXXX> constants).
+(I<PositiveOrZeroInt>, C<dmXXXX> constants).
 
-=item helpCtx
+=head2 helpCtx
 
-Help context identifier associated with the view.
-
-=back
+Help context identifier associated with the view (I<PositiveOrZeroInt>).
 
 =head1 CONSTRUCTOR
 
@@ -1601,7 +1614,7 @@ The view is created with default state, option, and event mask values.
 
 =item bounds
 
-Bounding rectangle of the view (I<TRect>).
+Bounding rectangle of the view (L<TRect|TUI::Objects::Rect>).
 
 =back
 
@@ -1611,8 +1624,8 @@ Bounding rectangle of the view (I<TRect>).
 
 Factory-style constructor using positional arguments.
 
-This constructor is equivalent to calling C<new> with the C<bounds> parameter
-and is provided for compatibility with traditional Turbo Vision construction
+This constructor is equivalent to calling C<new> with the $bounds parameter
+and is provided for compatibility with traditional I<Turbo Vision> construction
 patterns.
 
 =head1 DESTRUCTOR
@@ -1622,8 +1635,6 @@ patterns.
   $self->DEMOLISH($in_global_destruction);
 
 Destroys the view and removes it from the screen and the view hierarchy.
-This method corresponds to the Turbo Vision destructor and is normally called
-automatically by the owning group.
 
 =head1 METHODS
 
@@ -1819,9 +1830,9 @@ Returns the clipping rectangle of the view.
 
 =head2 getColor
 
-  my $int = $self->getColor($color);
+  my $pair = $self->getColor($color);
 
-Returns the color of the view.
+Returns the color or a color pair of the view.
 
 =head2 getCommands
 
@@ -1921,7 +1932,7 @@ Converts a global point to a local point.
 
 =head2 mapColor
 
-  my $int = $self->mapColor($color);
+  my $attr = $self->mapColor($color);
 
 Maps a color to the view's palette.
 

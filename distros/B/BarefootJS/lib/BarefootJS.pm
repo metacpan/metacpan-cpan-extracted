@@ -1,5 +1,5 @@
 package BarefootJS;
-our $VERSION = "0.39.1";
+our $VERSION = "0.39.2";
 use strict;
 use warnings;
 use utf8;
@@ -1103,7 +1103,7 @@ sub get ($self, $collection, $key) {
         return $collection->{$key};
     }
     if (ref($collection) eq 'ARRAY') {
-        return undef unless $key =~ /^-?\d+$/;
+        return undef unless $key =~ /^(?:0|[1-9]\d*)$/;
         my $idx = $key + 0;
         # JS-semantics negative index is "not found" (`arr[-1] ===
         # undefined`), NOT Perl's native from-the-end wraparound — guard
@@ -2145,7 +2145,7 @@ package BarefootJS::Date;
 # compartment where `$BarefootJS::VERSION` is not visible and collapses to
 # 0. scripts/sync-perl-versions.ts bumps every `our $VERSION` line in the
 # file, so this stays in lockstep with the package version above.
-our $VERSION = "0.39.1";
+our $VERSION = "0.39.2";
 
 sub new {
     my ($class, $epoch_ms) = @_;

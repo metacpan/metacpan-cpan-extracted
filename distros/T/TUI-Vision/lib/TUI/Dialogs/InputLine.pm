@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -38,8 +38,10 @@ use TUI::Drivers::Const qw(
   meDoubleClick
 );
 use TUI::Drivers::Util qw( ctrlToArrow );
-use TUI::Validate::Const qw( :vtXXXX );
+use TUI::Validate::Const qw( :TVTransfer );
 use TUI::Views::Const qw(
+  cmCancel
+  cmValid
   ofSelectable
   ofFirstClick
   :sfXXXX
@@ -186,7 +188,7 @@ sub draw {    # void ()
     $l = max( 0, $l );
     $r = min( $self->{size}{x} - 2, $r );
     if ( $l < $r ) {
-      $b->moveChar( $l + 1, 0, $self->getColor( 3 ), $r - $l );
+      $b->moveChar( $l + 1, undef, $self->getColor( 3 ), $r - $l );
     }
   } #/ if ( ( $self->{state} ...))
   $self->writeLine( 0, 0, $self->{size}{x}, $self->{size}{y}, $b );
@@ -434,6 +436,30 @@ sub setState {    # void ($aState, $enable)
   return;
 } #/ sub setState
 
+sub valid {    # $bool ($command)
+  state $sig = signature(
+    method => Object,
+    pos    => [PositiveOrZeroInt],
+  );
+  my ( $self, $command ) = $sig->( @_ );
+
+  if ( $self->{validator} ) {
+    if ( $command == cmValid ) {
+      my $status = $self->{validator}->can( 'status' )
+        ? $self->{validator}->status()
+        : 0;
+      return $status == 0;
+    }
+    elsif ( $command != cmCancel ) {
+      unless ( $self->{validator}->validate( $self->{data} ) ) {
+        $self->select();
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 sub setValidator {    # void ($aValid|undef)
   state $sig = signature(
     method => Object,
@@ -635,33 +661,29 @@ visible input area. The default value is a CP437 character.
 The following attributes are part of the public state of the input line.
 Internal and private attributes are intentionally not documented.
 
-=over
-
-=item data
+=head2 data
 
 Current text stored in the input field (I<Str>).
 
-=item maxLen
+=head2 maxLen
 
 Maximum allowed length of the input text (I<Int>).
 
-=item curPos
+=head2 curPos
 
 Current cursor position within the text (I<Int>).
 
-=item firstPos
+=head2 firstPos
 
 Index of the first visible character, used for horizontal scrolling (I<Int>).
 
-=item selStart
+=head2 selStart
 
 Start index of the current selection (I<Int>).
 
-=item selEnd
+=head2 selEnd
 
 End index of the current selection (I<Int>).
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -679,7 +701,7 @@ Creates a new input line control.
 
 =item bounds
 
-Bounding rectangle of the input field (I<TRect>).  
+Bounding rectangle of the input field (L<TRect|TUI::Objects::Rect>).  
 The rectangle must describe a single-line area.
 
 =item maxLen
@@ -700,7 +722,8 @@ Optional validator object used for input checking and data transfer
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 DESTRUCTOR
 
@@ -708,9 +731,7 @@ provided for compatibility with traditional Turbo Vision construction patterns.
 
   $self->DEMOLISH($in_global_destruction);
 
-Destroys the input line and releases associated resources. This method
-corresponds to the Turbo Vision destructor and is normally invoked
-automatically.
+Destroys the input line and releases associated resources. 
 
 =head1 METHODS
 
@@ -772,12 +793,18 @@ lines.
 
 Installs or replaces the validator object used for input checking.
 
+=head2 valid
+
+  my $isValid = $input->valid($command);
+
+Checks the validity of the current input text based on the installed validator
+
 =head1 SEE ALSO
 
-L<TUI::Dialogs::Dialog>,
-L<TUI::Dialogs::Label>,
-L<TUI::Dialogs::History>,
-L<TUI::Validators::Validator>
+L<TDialog|TUI::Dialogs::Dialog>,
+L<TLabel|TUI::Dialogs::Label>,
+L<THistory|TUI::Dialogs::History>,
+L<TValidator|TUI::Validate::Validator>
 
 =head1 AUTHORS
 

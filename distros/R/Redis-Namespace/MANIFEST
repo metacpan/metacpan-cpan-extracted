@@ -3,6 +3,7 @@ Changes
 LICENSE
 META.json
 README.md
+author/generate_commands.pl
 cpanfile
 lib/Redis/Namespace.pm
 minil.toml
@@ -16,10 +17,11 @@ t/07_rem_namespace.t
 t/08_migrate.t
 t/09_stream.t
 t/10_keys.t
+t/11_scan_callback.t
+t/12_filters.t
 t/97_subcommands.t
 t/98_guess.t
 xt/02_perlcritic.t
-xt/99_redis_doc.t
 xt/perlcriticrc
 xt/release/kwalitee.t
 META.yml

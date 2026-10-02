@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -17,6 +17,7 @@ our @EXPORT = qw(
   new_TDirListBox
 );
 
+use Encode qw( encode );
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
   Maybe
@@ -49,12 +50,12 @@ sub new_TDirListBox { __PACKAGE__->from( @_ ) }
 extends TListBox;
 
 # declare global variables
-our $pathDir   = "\xC0\xC4\xC2";    # cp437: "└─┬";
-our $firstDir  = "\xC0\xC2\xC4";    # cp437:   "└┬─";
-our $middleDir = " \xC3\xC4";       # cp437:   " ├─";
-our $lastDir   = " \xC0\xC4";       # cp437:   " └─";
+our $pathDir   = encode( cp437 => "└─┬"   );
+our $firstDir  = encode( cp437 =>   "└┬─" );
+our $middleDir = encode( cp437 =>   " ├─" );
+our $lastDir   = encode( cp437 =>   " └─" );
 our $drives    = "Drives";
-our $graphics  = "\xC0\xC3\xC4";    # cp437: "└├─";
+our $graphics  = encode( cp437 => "└├─"   );
 
 # private attributes
 has dir => ( is => 'bare', default => EOS );
@@ -331,11 +332,12 @@ TUI::StdDlg::DirListBox - list box view for directory entries
 C<TDirListBox> implements a specialized list box used by standard TUI::Vision
 dialogs to display and navigate directory entries.
 
-The list box presents directory items backed by a C<TDirCollection> and
-operates on directory entry records of type C<TDirEntry>. It supports keyboard
-and mouse navigation, selection, and directory changes.
+The list box presents directory items backed by a 
+L<TDirCollection|TUI::StdDlg::DirCollection> and operates on directory entry 
+records of type L<TDirEntry|TUI::StdDlg::DirEntry>. It supports keyboard and 
+mouse navigation, selection, and directory changes.
 
-This view is primarily used by C<TChDirDialog>.
+This view is primarily used by L<TChDirDialog|TUI::StdDlg::ChDirDialog>.
 
 =head1 VARIABLES
 
@@ -344,31 +346,31 @@ by C<TDirListBox>.
 
 =head2 $pathDir
 
-Defines the character sequence used to display the path directory prefix.
+Defines the character sequence (I<Str>) used to display the path directory prefix.
 The default value uses CP437 line-drawing characters.
 
 =head2 $firstDir
 
-Defines the characters used to display the first directory entry
+Defines the characters (I<Str>) used to display the first directory entry
 in a directory tree (CP437).
 
 =head2 $middleDir
 
-Defines the characters used for intermediate directory entries
+Defines the characters (I<Str>) used for intermediate directory entries
 in the directory tree (CP437).
 
 =head2 $lastDir
 
-Defines the characters used for the last directory entry
+Defines the characters (I<Str>) used for the last directory entry
 in the directory tree (CP437).
 
 =head2 $drives
 
-Label text used for the drives list.
+Label text (I<Str>) used for the drives list.
 
 =head2 $graphics
 
-Defines additional line-drawing characters used for directory tree
+Defines additional line-drawing characters (I<Str>) used for directory tree
 rendering (CP437).
 
 =head1 CONSTRUCTOR
@@ -386,11 +388,13 @@ Creates a new directory list box.
 
 =item bounds
 
-Bounding rectangle defining the position and size of the list box (I<TRect>).
+Bounding rectangle defining the position and size of the list box 
+(L<TRect|TUI::Objects::Rect>).
 
 =item vScrollBar
 
-Optional vertical scroll bar associated with the list box (I<TScrollBar>).
+Optional vertical scroll bar associated with the list box 
+(L<TScrollBar|TUI::Views::ScrollBar> or undef).
 
 =back
 
@@ -402,7 +406,8 @@ Factory-style constructor using positional arguments.
 
 =head1 METHODS
 
-The following methods operate on directory entry objects (C<TDirEntry>).
+The following methods operate on directory entry objects 
+(L<TDirEntry|TUI::StdDlg::DirEntry>).
 
 =head2 getText
 
@@ -421,7 +426,7 @@ Returns true if the specified directory entry is currently selected.
   my $collection = $list->list();
 
 Returns the directory collection backing this list box
-(C<TDirCollection>).
+(L<TDirCollection|TUI::StdDlg::DirCollection>).
 
 =head2 newDirectory
 
@@ -443,10 +448,10 @@ Updates the list box state and refreshes the display if necessary.
 
 =head1 SEE ALSO
 
-L<TUI::StdDlg::ChDirDialog>,
-L<TUI::StdDlg::DirCollection>,
-L<TUI::StdDlg::DirEntry>,
-L<TUI::Views::ListBox>
+L<TChDirDialog|TUI::StdDlg::ChDirDialog>,
+L<TDirCollection|TUI::StdDlg::DirCollection>,
+L<TDirEntry|TUI::StdDlg::DirEntry>,
+L<TListBox|TUI::Views::ListBox>
 
 =head1 AUTHORS
 

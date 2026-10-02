@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumL2AnnouncementPolicySpec;
 # ABSTRACT: Spec is a human readable description of a L2 announcement policy
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s externalIPs     => Bool;
@@ -28,7 +28,7 @@ IO::K8s::Cilium::V2alpha1::CiliumL2AnnouncementPolicySpec - Spec is a human read
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 externalIPs
 

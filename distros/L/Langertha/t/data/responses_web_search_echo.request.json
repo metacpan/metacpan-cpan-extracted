@@ -1,0 +1,62 @@
+{
+   "input" : [
+      {
+         "content" : "Use web search to find out which city hosts the Perl and Raku Conference 2026, then call get_weather for that city. Answer in one sentence.",
+         "role" : "user"
+      },
+      {
+         "action" : {
+            "queries" : [
+               "Perl and Raku Conference 2026 city host"
+            ],
+            "query" : "Perl and Raku Conference 2026 city host",
+            "type" : "search"
+         },
+         "id" : "ws_063086215007b563006ab5d907d76487d2b9745fc12f6acbd2",
+         "status" : "completed",
+         "type" : "web_search_call"
+      },
+      {
+         "arguments" : "{\"city\":\"Greenville, South Carolina\"}",
+         "call_id" : "call_kcSDMmpaoCvPu0AvsvjiwYA0",
+         "id" : "fc_063086215007b563006ab5d90b594887d2838cab8b716fb72f",
+         "name" : "get_weather",
+         "status" : "completed",
+         "type" : "function_call"
+      },
+      {
+         "call_id" : "call_kcSDMmpaoCvPu0AvsvjiwYA0",
+         "output" : "{\"city\":\"Greenville, South Carolina\",\"temp_c\":18,\"conditions\":\"cloudy\"}",
+         "type" : "function_call_output"
+      }
+   ],
+   "max_output_tokens" : 2000,
+   "model" : "gpt-5.6-luna",
+   "reasoning" : {
+      "effort" : "low"
+   },
+   "tools" : [
+      {
+         "type" : "web_search"
+      },
+      {
+         "description" : "Get the current weather for a city.",
+         "name" : "get_weather",
+         "parameters" : {
+            "additionalProperties" : false,
+            "properties" : {
+               "city" : {
+                  "description" : "City name",
+                  "type" : "string"
+               }
+            },
+            "required" : [
+               "city"
+            ],
+            "type" : "object"
+         },
+         "strict" : true,
+         "type" : "function"
+      }
+   ]
+}

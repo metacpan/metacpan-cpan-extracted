@@ -245,6 +245,14 @@ sub synth_scalar {
         $v = $opts->{maximum} if defined $opts->{maximum} && $v > $opts->{maximum};
         return $v;
     }
+    if ($info->{is_num}) {
+        # A numeric string on purpose (k196): the way a quoted YAML value
+        # arrives, and TO_JSON must still put it out as a JSON number.
+        my $v = '1.5';
+        $v = $opts->{minimum} if defined $opts->{minimum} && $v < $opts->{minimum};
+        $v = $opts->{maximum} if defined $opts->{maximum} && $v > $opts->{maximum};
+        return $v;
+    }
     if ($info->{is_int_or_string}) {
         # IntOrStr must survive whichever form the caller gave it - toggle
         # between a numeric-looking string and a real string so both forms
@@ -463,6 +471,10 @@ for my $class (@classes) {
                 }
                 elsif ($info->{is_int}) {
                     like($json_iso->encode($out1->{$key}), qr/^-?\d+\z/,
+                        "$class ($mode) .$key serializes as an unquoted number");
+                }
+                elsif ($info->{is_num}) {
+                    like($json_iso->encode($out1->{$key}), qr/^-?[\d.]+(?:[eE][-+]?\d+)?\z/,
                         "$class ($mode) .$key serializes as an unquoted number");
                 }
                 elsif ($info->{is_array_of_int}) {

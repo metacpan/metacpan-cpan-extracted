@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::SecretRef;
 # ABSTRACT: Secret ref to fill in credentials
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s key  => Str, { pattern => qr/^[-._a-zA-Z0-9]+$/ };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1alpha1::SecretRef - Secret ref to fill in credential
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 key
 

@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -51,7 +51,7 @@ use TUI::Menus::MenuBar;
 use TUI::Menus::StatusDef;
 use TUI::Menus::StatusItem;
 use TUI::Menus::StatusLine;
-use TUI::Memory::Util qw( lowMemory );
+use TUI::Memory qw( lowMemory );
 use TUI::Objects::Point;
 use TUI::Objects::Rect;
 use TUI::Views::Const qw( 
@@ -68,6 +68,14 @@ sub TProgram() { __PACKAGE__ }
 sub new_TProgram { __PACKAGE__->from(@_) }
 
 extends ( TGroup, TProgInit );
+
+# Moo does not inherit attributes from secondary extends() classes.
+# Redeclare attribute provided by TProgInit.
+if ( TUI::toolkit::is_Moo ) {
+  has createStatusLine => ( is => 'bare', default => sub { die 'required' } );
+  has createMenuBar    => ( is => 'bare', default => sub { die 'required' } );
+  has createDeskTop    => ( is => 'bare', default => sub { die 'required' } );
+}
 
 # declare global variables
 our $exitText = "~Alt-X~ Exit";
@@ -241,6 +249,12 @@ sub getEvent {    # void ($event)
       $statusLine->handleEvent( $event );
     }
   } #/ if ( $self->{statusLine...})
+  if( $event->{what} == evCommand 
+    && $event->{message}{command} == cmScreenChanged
+  ) {
+    $self->setScreenMode( smUpdate );
+    $self->clearEvent( $event );
+  }
   return;
 } #/ sub getEvent
 
@@ -405,7 +419,7 @@ sub setScreenMode { # void ($mode)
   TScreen->setVideoMode( $mode );
   $self->initScreen();
   $self->{buffer} = $screenBuffer;
-  $r = TRect->new( ax => 0, bx => 0, ay => $screenWidth, by => $screenHeight );
+  $r = TRect->new( ax => 0, ay => 0, bx => $screenWidth, by => $screenHeight );
   $self->changeBounds( $r );
   $self->setState( sfExposed, 0 );
   $self->setState( sfExposed, 1 );
@@ -562,13 +576,13 @@ TUI::App::Program - central program object managing application execution
 
 =head1 DESCRIPTION
 
-C<TProgram> implements the core functionality of a TUI::Vision application.
+C<TProgram> implements the core functionality of a L<TUI::Vision> application.
 It manages the event loop, screen initialization, desktop, menu bar, and status
 line.
 
-Most applications derive from C<TApplication>, which extends C<TProgram> with
-additional behavior. However, it is also possible to derive an application
-directly from C<TProgram>.
+Most applications derive from L<TApplication|TUI::App::Application>, which 
+extends C<TProgram> with additional behavior. However, it is also possible to 
+derive an application directly from C<TProgram>.
 
 C<TProgram> owns all top-level views of the application and coordinates event
 dispatch, idle processing, and shutdown.
@@ -576,11 +590,12 @@ dispatch, idle processing, and shutdown.
 =head2 Commonly Used Features
 
 In normal applications you instantiate a C<TProgram>-derived class and call
-C<run>; most day-to-day customization happens by overriding C<initMenuBar>,
-C<initStatusLine>, C<handleEvent>, and sometimes C<idle>. C<TProgram> wires
+L</run>; most day-to-day customization happens by overriding L</initMenuBar>,
+L</initStatusLine>, L</handleEvent>, and sometimes L</idle>. C<TProgram> wires
 the desktop, menu bar, and status line during construction, then drives the
-main event loop for you. While many projects derive from C<TApplication>, the
-same workflow applies because C<TApplication> builds directly on this class.
+main event loop for you. While many projects derive from 
+L<TApplication|TUI::App::Application>, the same workflow applies because 
+L<TApplication|TUI::App::Application> builds directly on this class.
 
 =head1 VARIABLES
 
@@ -589,32 +604,33 @@ to access application state and top-level views.
 
 =head2 $exitText
 
-Label text for the standard application exit command, including optional
-accelerator markers.
+Label text (I<Str>) for the standard application exit command, including 
+optional accelerator markers.
 
 =head2 $application
 
-Reference to the running application object (usually C<TApplication>).
+Reference to the running application object (usually 
+L<TApplication|TUI::App::Application>).
 
 =head2 $statusLine
 
-Reference to the application's C<TStatusLine> instance.
+Reference to the application's L<TStatusLine|TUI::Menus::StatusLine> instance.
 
 =head2 $menuBar
 
-Reference to the application's C<TMenuBar> instance.
+Reference to the application's L<TMenuBar|TUI::Menus::MenuBar> instance.
 
 =head2 $deskTop
 
-Reference to the application's C<TDeskTop> container.
+Reference to the application's L<TDeskTop|TUI::App::DeskTop> container.
 
 =head2 $appPalette
 
-Index of the active application color palette.
+Index of the active application L<TPalette|TUI::Views::Palette> color palette.
 
 =head2 $pending
 
-Pending C<TEvent> object queued for later processing.
+Pending L<TEvent|TUI::Drivers::Event> object queued for later processing.
 
 =head1 CONSTRUCTOR
 
@@ -622,10 +638,10 @@ Pending C<TEvent> object queued for later processing.
 
   my $program = TProgram->new();
 
-Creates a new program object and initializes TUI::Vision support.
+Creates a new program object and initializes L<TUI::Vision> support.
 
-This constructor corresponds to the Turbo Vision 2.0 constructor and calls
-C<initScreen>, C<initDeskTop>, C<initMenuBar>, and C<initStatusLine>.
+This constructor calls C<initScreen>, C<initDeskTop>, C<initMenuBar>, and 
+C<initStatusLine>.
 
 =head2 new_TProgram
 
@@ -769,9 +785,9 @@ Validates a newly created view and handles low-memory conditions.
 
 =head1 SEE ALSO
 
-L<TUI::App::Application>,
-L<TUI::Views::View>,
-L<TUI::Views::Group>
+L<TApplication|TUI::App::Application>,
+L<TView|TUI::Views::View>,
+L<TGroup|TUI::Views::Group>
 
 =head1 AUTHORS
 

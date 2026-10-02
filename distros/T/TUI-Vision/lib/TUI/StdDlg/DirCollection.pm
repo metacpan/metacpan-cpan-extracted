@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -89,11 +89,11 @@ TUI::StdDlg::DirCollection - collection of directory entries
 
 C<TDirCollection> is a collection used by the standard dialog subsystem to
 store directory entries. It is a typed collection in the sense that the items
-handled by its public operations are directory entry objects (C<TDirEntry>).
+handled by its public operations are directory entry objects 
+(L<TDirEntry|TUI::StdDlg::DirEntry>).
 
 Capacity management follows the standard collection model: the collection is
-created with an initial capacity (C<limit>) and grows in increments of
-C<delta> when needed.
+created with an initial capacity and grows when needed.
 
 =head1 CONSTRUCTOR
 
@@ -126,68 +126,74 @@ Factory-style constructor using positional arguments.
 
 =head1 METHODS
 
-The following methods operate on directory entry objects (C<TDirEntry>) rather
-than generic items.
+The following methods operate on directory entry objects 
+(L<TDirEntry|TUI::StdDlg::DirEntry>) rather than generic items.
 
 =head2 at
 
   my $entry | undef = $dirs->at($index);
 
-Returns the C<TDirEntry> at the specified index.
+Returns the L<TDirEntry|TUI::StdDlg::DirEntry> at the specified index.
 
 =head2 atInsert
 
   $dirs->atInsert($index, $entry | undef);
 
-Inserts a C<TDirEntry> at the specified index.
+Inserts a L<TDirEntry|TUI::StdDlg::DirEntry> at the specified index.
 
 =head2 atPut
 
   $dirs->atPut($index, $entry | undef);
 
-Replaces the C<TDirEntry> at the specified index.
+Replaces the L<TDirEntry|TUI::StdDlg::DirEntry> at the specified index.
 
 =head2 firstThat
 
   my $entry | undef = $dirs->firstThat(\&test, $arg | undef);
 
-Returns the first C<TDirEntry> for which the test function returns true.
+Returns the first L<TDirEntry|TUI::StdDlg::DirEntry> for which the test 
+function returns true.
 
 =head2 lastThat
 
   my $entry | undef = $dirs->lastThat(\&test, $arg | undef);
 
-Returns the last matching C<TDirEntry> by scanning the collection in reverse.
+Returns the last matching L<TDirEntry|TUI::StdDlg::DirEntry> by scanning the 
+collection in reverse.
 
 =head2 free
 
   $dirs->free($entry);
 
-Removes the specified C<TDirEntry> from the collection and frees it.
+Removes the specified L<TDirEntry|TUI::StdDlg::DirEntry> from the collection 
+and frees it.
 
 =head2 indexOf
 
   my $index = $dirs->indexOf($entry | undef);
 
-Returns the index of the specified C<TDirEntry>, or C<-1> if not found.
+Returns the index of the specified L<TDirEntry|TUI::StdDlg::DirEntry>, or C<-1> 
+if not found.
 
 =head2 insert
 
   my $index = $dirs->insert($entry | undef);
 
-Inserts a C<TDirEntry> into the collection and returns its index.
+Inserts a L<TDirEntry|TUI::StdDlg::DirEntry> into the collection and returns 
+its index.
 
 =head2 remove
 
   $dirs->remove($entry);
 
-Removes the specified C<TDirEntry> from the collection without freeing it.
+Removes the specified L<TDirEntry|TUI::StdDlg::DirEntry> from the collection 
+without freeing it.
 
 =head1 SEE ALSO
 
-L<TUI::StdDlg::DirListBox>,
-L<TUI::StdDlg::ChDirDialog>,
-L<TUI::Objects::Collection>
+L<TDirListBox|TUI::StdDlg::DirListBox>,
+L<TChDirDialog|TUI::StdDlg::ChDirDialog>,
+L<TCollection|TUI::Objects::Collection>
 
 =head1 AUTHORS
 

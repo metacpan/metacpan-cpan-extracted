@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ExternalSecretRewriteTransform;
 # ABSTRACT: Used to apply string transformation on the secrets.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s template => Str, { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ExternalSecretRewriteTransform - Used to app
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 template
 

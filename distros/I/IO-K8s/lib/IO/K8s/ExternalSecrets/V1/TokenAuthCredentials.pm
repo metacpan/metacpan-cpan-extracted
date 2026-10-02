@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::TokenAuthCredentials;
 # ABSTRACT: TokenAuthCredentials represents the credentials for access token-based authentication.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s accessToken => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::TokenAuthCredentials - TokenAuthCredentials repres
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 accessToken
 

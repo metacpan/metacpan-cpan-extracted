@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -389,8 +389,8 @@ TUI::StdDlg::ChDirDialog - common dialog for selecting a directory
 
 =head1 DESCRIPTION
 
-C<TChDirDialog> implements the standard TUI::Vision dialog used for selecting
-and changing directories.
+C<TChDirDialog> implements the standard L<TUI::Vision> dialog used for 
+selecting and changing directories.
 
 The dialog presents a directory list, an input line for the directory path,
 and command buttons. It allows navigation through the directory hierarchy
@@ -404,39 +404,39 @@ used by C<TChDirDialog>.
 
 =head2 $changeDirTitle
 
-Title text of the change directory dialog.
+Title text I<Str> of the change directory dialog.
 
 =head2 $dirNameText
 
-Label text for the directory name input field.
+Label text I<Str> for the directory name input field.
 
 =head2 $dirTreeText
 
-Label text for the directory tree view.
+Label text I<Str> for the directory tree view.
 
 =head2 $okText
 
-Label text for the confirmation button.
+Label text I<Str> for the confirmation button.
 
 =head2 $chdirText
 
-Label text for the change directory action.
+Label text I<Str> for the change directory action.
 
 =head2 $revertText
 
-Label text for the revert action.
+Label text I<Str> for the revert action.
 
 =head2 $helpText
 
-Label text for the help command.
+Label text I<Str> for the help command.
 
 =head2 $drivesText
 
-Label text for the drives selection area.
+Label text I<Str> for the drives selection area.
 
 =head2 $invalidText
 
-Message text displayed for an invalid directory.
+Message text I<Str> displayed for an invalid directory.
 
 =head1 CONSTRUCTOR
 
@@ -507,9 +507,9 @@ Checks whether the dialog should accept the specified command.
 
 =head1 SEE ALSO
 
-L<TUI::StdDlg::DirListBox>,
-L<TUI::StdDlg::DirEntry>,
-L<TUI::Dialogs::Dialog>
+L<TDirListBox|TUI::StdDlg::DirListBox>,
+L<TDirEntry|TUI::StdDlg::DirEntry>,
+L<TDialog|TUI::Dialogs::Dialog>
 
 =head1 AUTHORS
 

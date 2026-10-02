@@ -32,10 +32,10 @@ CPANSec says otherwise.
 Only the most recent release on CPAN. Fixes are shipped as a new release
 rather than as a patch to an older one.
 
-Every perl the module installs on is supported: it declares 5.10 as its
+Every perl the module installs on is supported: it declares 5.10.1 as its
 minimum and is built and tested on 5.10.1, 5.12.5, 5.42.3 and 5.44.0, on the
 `double`, `long double` and `__float128` NV widths and threaded as well as
-unthreaded. A report that needs a perl older than 5.10 is a report about a
+unthreaded. A report that needs a perl older than 5.10.1 is a report about a
 configuration the distribution declines to install on; a report that needs one
 of the above is in scope, and saying which one it is saves most of the work of
 reproducing it.

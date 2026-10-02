@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -209,20 +209,21 @@ from a collection. It is typically used in dialog boxes to present lists of
 strings, such as filenames or other selectable entries.
 
 The list box manages the data collection internally and displays its contents
-using the inherited drawing logic from C<TListViewer>. While it is designed
-primarily for string data, subclasses may override C<getText> to display other
-data types.
+using the inherited drawing logic from L<TListViewer|TUI::Views::ListViewer>. 
+While it is designed primarily for string data, subclasses may override 
+C<getText()> to display other data types.
 
-Unlike C<TListViewer>, C<TListBox> does not support a horizontal scroll bar.
-Scrolling is performed vertically using an optional vertical scroll bar.
+Unlike L<TListViewer|TUI::Views::ListViewer>, C<TListBox> does not support a 
+horizontal scroll bar. Scrolling is performed vertically using an optional 
+vertical scroll bar.
 
 =head2 Commonly Used Features
 
 In normal dialog code, you construct the control and then immediately attach a
-collection through C<newList>. That call sets the visible range from the
+collection through L<newList()|/newList>. That call sets the visible range from the
 collection size and refreshes the view, so replacing the collection is the
 usual way to repopulate the box. If your rows are not plain strings, override
-C<getText> to format each row for display.
+L<getText()|/getText> to format each row for display.
 
 =head1 STRUCTURES
 
@@ -252,15 +253,11 @@ Index of the currently selected item (I<Int>).
 The following attributes are exposed as read-only accessors and are managed
 internally by the list box implementation.
 
-=over
-
-=item items
+=head2 items
 
 Reference to the collection of items displayed by the list box
 (I<TCollection>, e.g. C<TStringCollection>). The collection typically contains 
 string objects.
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -278,7 +275,7 @@ Creates a new list box control.
 
 =item bounds
 
-Bounding rectangle of the list box (I<TRect>).
+Bounding rectangle of the list box (L<TRect|TUI::Objects::Rect>).
 
 =item numCols
 
@@ -299,7 +296,8 @@ Optional vertical scroll bar associated with the list box
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 METHODS
 
@@ -346,9 +344,9 @@ Restores the list box state from the supplied record.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::ListViewer>,
-L<TUI::Dialogs::Dialog>,
-L<TUI::Views::View>
+L<TListViewer|TUI::Dialogs::ListViewer>,
+L<TDialog|TUI::Dialogs::Dialog>,
+L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 

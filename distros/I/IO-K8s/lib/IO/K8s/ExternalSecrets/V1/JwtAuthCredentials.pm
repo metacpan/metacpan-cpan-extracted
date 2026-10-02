@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::JwtAuthCredentials;
 # ABSTRACT: JwtAuthCredentials represents the credentials for JWT authentication.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s identityId => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::JwtAuthCredentials - JwtAuthCredentials represents
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 identityId
 

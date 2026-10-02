@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificateRequest;
 # ABSTRACT: A CertificateRequest is used to request a signed certificate from one of the configured issuers.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'cert-manager.io/v1',
     resource_plural => 'certificaterequests',
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::CertificateRequest - A CertificateRequest is used to r
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

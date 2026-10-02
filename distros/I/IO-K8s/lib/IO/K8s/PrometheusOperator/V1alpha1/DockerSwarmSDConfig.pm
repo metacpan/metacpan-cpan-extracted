@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::DockerSwarmSDConfig;
 # ABSTRACT: DockerSwarmSDConfig configurations allow retrieving scrape targets from Docker Swarm engine.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s authorization        => '+IO::K8s::PrometheusOperator::V1alpha1::SafeAuthorization';
@@ -48,7 +48,7 @@ IO::K8s::PrometheusOperator::V1alpha1::DockerSwarmSDConfig - DockerSwarmSDConfig
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 authorization
 

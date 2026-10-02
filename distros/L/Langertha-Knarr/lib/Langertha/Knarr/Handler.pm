@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler;
 # ABSTRACT: Role for Knarr backend handlers (Raider, Engine, Code, ...)
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 use Moose::Role;
 use Future::AsyncAwait;
 use Langertha::Knarr::Stream;
@@ -15,7 +15,10 @@ requires 'list_models';
 async sub handle_stream_f {
   my ($self, $session, $request) = @_;
   my $r = Langertha::Knarr::Response->coerce( await $self->handle_chat_f($session, $request) );
-  return Langertha::Knarr::Stream->from_list( $r->content );
+  my $stream = Langertha::Knarr::Stream->from_list( $r->content );
+  $stream->finish_reason( $r->finish_reason );
+  $stream->tool_calls( $r->tool_calls );
+  return $stream;
 }
 
 1;
@@ -32,7 +35,7 @@ Langertha::Knarr::Handler - Role for Knarr backend handlers (Raider, Engine, Cod
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 SYNOPSIS
 

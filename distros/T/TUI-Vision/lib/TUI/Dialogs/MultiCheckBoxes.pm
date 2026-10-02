@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -199,8 +199,8 @@ number of bits, determined by the supplied mask and shift values. This allows
 multiple stateful items to be encoded efficiently in a single scalar value.
 
 C<TMultiCheckBoxes> inherits navigation, layout, and focus handling from
-C<TCluster>, while extending the marking and activation logic to support
-multi-state cycling.
+L<TCluster|TUI::Dialogs::Cluster>, while extending the marking and activation 
+logic to support multi-state cycling.
 
 =head1 CONSTRUCTOR
 
@@ -220,11 +220,13 @@ Creates a new multi-state checkbox cluster.
 
 =item bounds
 
-Bounding rectangle defining the position and size of the cluster (I<TRect>).
+Bounding rectangle defining the position and size of the cluster 
+(L<TRect|TUI::Objects::Rect>).
 
 =item strings
 
-Linked list of item descriptors providing the labels (I<TSItem>).
+Linked list of item descriptors providing the labels 
+(L<TSItem|TUI::Dialogs::TStrItem>).
 
 =item selRange
 
@@ -232,8 +234,8 @@ Number of distinct states each item cycles through (I<Int>).
 
 =item flags
 
-Packed integer describing the bit mask and bit shift used for encoding item
-states.
+Packed integer (I<Int>) describing the bit mask and bit shift used for encoding 
+item states.
 
 The low byte defines the state mask, the high byte defines the bit shift per
 item.
@@ -339,10 +341,10 @@ these values after construction.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::CheckBoxes>,
-L<TUI::Dialogs::RadioButtons>,
-L<TUI::Dialogs::Cluster>,
-L<TUI::Dialogs::Dialog>
+L<TCheckBoxes|TUI::Dialogs::CheckBoxes>,
+L<TRadioButtons|TUI::Dialogs::RadioButtons>,
+L<TCluster|TUI::Dialogs::Cluster>,
+L<TDialog|TUI::Dialogs::Dialog>
 
 =head1 AUTHORS
 

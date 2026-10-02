@@ -1,6 +1,6 @@
 package Langertha::Engine::Whisper;
 # ABSTRACT: Whisper compatible transcription server
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 
 extends 'Langertha::Engine::TranscriptionBase';
@@ -9,6 +9,8 @@ extends 'Langertha::Engine::TranscriptionBase';
 sub default_transcription_model { '' }
 
 sub default_model { '' }
+
+sub api_key_env { undef }
 
 has '+url' => (
   required => 1,
@@ -33,7 +35,7 @@ Langertha::Engine::Whisper - Whisper compatible transcription server
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -48,8 +50,8 @@ version 0.502
 =head1 DESCRIPTION
 
 Provides access to a self-hosted Whisper-compatible transcription server.
-Extends L<Langertha::Engine::TranscriptionBase> and supports the
-C<createTranscription> and C<createTranslation> operations.
+Extends L<Langertha::Engine::TranscriptionBase> and transcribes through the
+server's C</audio/transcriptions> endpoint.
 
 C<url> is required. The API key defaults to C<'whisper'>. The transcription
 model defaults to an empty string so the server uses its built-in default.

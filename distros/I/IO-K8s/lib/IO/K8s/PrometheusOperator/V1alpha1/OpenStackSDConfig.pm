@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::OpenStackSDConfig;
 # ABSTRACT: OpenStackSDConfig allow retrieving scrape targets from OpenStack Nova instances.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s allTenants                  => Bool;
@@ -54,7 +54,7 @@ IO::K8s::PrometheusOperator::V1alpha1::OpenStackSDConfig - OpenStackSDConfig all
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 allTenants
 

@@ -1,9 +1,11 @@
 package TUI::Views;
+# ABSTRACT: View components for the TUI::Vision framework
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -86,10 +88,10 @@ TUI::Views - Core view classes for the TUI::Vision framework
 
 =head1 DESCRIPTION
 
-TUI::Views provides the core view and windowing subsystem for the
-TUI::Vision framework. It corresponds to the Turbo Vision view
-architecture and includes all fundamental UI components such as views,
-groups, frames, windows, palettes, and drawing buffers.
+C<TUI::Views> provides the core view and windowing subsystem for the
+L<TUI::Vision> framework. It corresponds to Borland's I<Turbo Vision> view
+architecture and includes all fundamental UI components such as views, groups, 
+frames, windows, palettes, and drawing buffers.
 
 This module re-exports a wide range of view-related classes, including:
 

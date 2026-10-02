@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::IBMAuthContainerAuth;
 # ABSTRACT: IBMAuthContainerAuth defines container-based authentication with IAM Trusted Profile.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s iamEndpoint   => Str;
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::IBMAuthContainerAuth - IBMAuthContainerAuth define
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 iamEndpoint
 

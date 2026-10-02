@@ -16,22 +16,22 @@ name: Crypt-Age
 provides:
   Crypt::Age:
     file: lib/Crypt/Age.pm
-    version: '0.004'
+    version: '0.005'
   Crypt::Age::Header:
     file: lib/Crypt/Age/Header.pm
-    version: '0.004'
+    version: '0.005'
   Crypt::Age::Keys:
     file: lib/Crypt/Age/Keys.pm
-    version: '0.004'
+    version: '0.005'
   Crypt::Age::Primitives:
     file: lib/Crypt/Age/Primitives.pm
-    version: '0.004'
+    version: '0.005'
   Crypt::Age::Stanza:
     file: lib/Crypt/Age/Stanza.pm
-    version: '0.004'
+    version: '0.005'
   Crypt::Age::Stanza::X25519:
     file: lib/Crypt/Age/Stanza/X25519.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   CryptX: '0.067'
   Moo: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-crypt-age/issues
   homepage: https://github.com/Getty/p5-crypt-age
   repository: https://github.com/Getty/p5-crypt-age.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -50,6 +50,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .karr
             - README.md
           exclude_match: []
           include_dotfiles: 1
@@ -60,6 +61,10 @@ x_Dist_Zilla:
           include_untracked: 0
       name: '@Author::GETTY/Git::GatherDir'
       version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::GatherAgentContext
+      name: '@Author::GETTY/GatherAgentContext'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
@@ -269,8 +274,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -315,7 +320,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.004'
+          tag: '0.005'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -330,8 +335,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}

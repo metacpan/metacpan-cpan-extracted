@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Sticky;
 # ABSTRACT: Sticky defines the sticky sessions configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s cookie => '+IO::K8s::Traefik::V1alpha1::Cookie';
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::Sticky - Sticky defines the sticky sessions configur
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 cookie
 

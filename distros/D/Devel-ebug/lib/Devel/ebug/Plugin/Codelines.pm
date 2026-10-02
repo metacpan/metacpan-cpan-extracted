@@ -5,7 +5,7 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(codelines);
 
-our $VERSION = '0.67'; # VERSION
+our $VERSION = '0.68'; # VERSION
 
 # return some lines of code
 sub codelines {
@@ -39,7 +39,7 @@ Devel::ebug::Plugin::Codelines
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 AUTHOR
 
@@ -52,6 +52,8 @@ Contributors:
 Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
 
 Taisuke Yamada
+
+Richard Leach (HYDAHY)
 
 =head1 COPYRIGHT AND LICENSE
 

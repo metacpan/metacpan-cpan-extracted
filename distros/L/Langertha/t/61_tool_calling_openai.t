@@ -255,4 +255,73 @@ is($openai->tool_max_iterations, 10, 'tool_max_iterations defaults to 10');
   ok($vllm->can('chat_with_tools_f'), 'vLLM has chat_with_tools_f');
 }
 
+# karr k136: the assistant echo must carry the provider's reasoning fields back.
+# DeepSeek answers HTTP 400 on the next iteration of a tool loop when
+# reasoning_content is missing while tools are present; Moonshot, OpenRouter,
+# Mistral and xAI have the same obligation in softer forms.
+{
+  my $details = [ { type => 'reasoning.text', text => 'call echo', signature => 'sig_1' } ];
+  my $data = {
+    choices => [{
+      message => {
+        role              => 'assistant',
+        content           => undef,
+        reasoning_content => 'The user wants an echo, so I call the tool.',
+        reasoning         => 'The user wants an echo, so I call the tool.',
+        reasoning_details => $details,
+        tool_calls        => [
+          { id => 'call_r1', type => 'function', function => { name => 'echo', arguments => '{}' } },
+        ],
+      },
+    }],
+  };
+
+  my $results = [
+    {
+      tool_call => { id => 'call_r1' },
+      result => { content => [{ type => 'text', text => 'Echo: hi' }], isError => JSON->false },
+    },
+  ];
+
+  my @messages = $openai->format_tool_results($data, $results);
+  is($messages[0]{reasoning_content}, 'The user wants an echo, so I call the tool.',
+    'reasoning_content echoed back (DeepSeek 400s on the next iteration without it)');
+  is($messages[0]{reasoning}, 'The user wants an echo, so I call the tool.',
+    'the reasoning spelling is echoed too');
+  is_deeply($messages[0]{reasoning_details}, $details,
+    'reasoning_details round-trip unmodified, signature included (OpenRouter)');
+  is($messages[0]{tool_calls}[0]{id}, 'call_r1', 'tool_calls still preserved');
+}
+
+# The echo is an allowlist, not the whole message: a provider that sends no
+# reasoning gets exactly the three keys it always got, and no key whose value
+# is undef (some OpenAI-compatible servers reject unknown inbound keys).
+{
+  my $data = {
+    choices => [{
+      message => {
+        role       => 'assistant',
+        content    => 'Let me echo that.',
+        tool_calls => [
+          { id => 'call_abc', type => 'function', function => { name => 'echo', arguments => '{}' } },
+        ],
+        # not echoed: neither a reasoning field nor part of the old three keys
+        annotations => [],
+      },
+    }],
+  };
+
+  my $results = [
+    {
+      tool_call => { id => 'call_abc' },
+      result => { content => [{ type => 'text', text => 'Echo: hi' }], isError => JSON->false },
+    },
+  ];
+
+  my @messages = $openai->format_tool_results($data, $results);
+  is_deeply([sort keys %{$messages[0]}], [qw( content role tool_calls )],
+    'without reasoning the echo is exactly role/content/tool_calls, nothing invented');
+}
+
+
 done_testing;

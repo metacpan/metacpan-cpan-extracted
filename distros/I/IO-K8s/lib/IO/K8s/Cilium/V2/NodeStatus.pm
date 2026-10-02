@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::NodeStatus;
 # ABSTRACT: Status defines the realized specification/configuration and status of the node.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s 'alibaba-cloud' => '+IO::K8s::Cilium::V2::AlibabaCloudENIStatus';
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::NodeStatus - Status defines the realized specification/conf
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 alibaba-cloud
 

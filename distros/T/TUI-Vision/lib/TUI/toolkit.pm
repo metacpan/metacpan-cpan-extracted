@@ -1,4 +1,5 @@
 package TUI::toolkit;
+# ABSTRACT: Unified OO facade for the TUI::Vision framework
 
 use 5.010;
 use strict;
@@ -62,7 +63,7 @@ BEGIN { $] >= 5.010 ? require mro : require MRO::Compat }
 BEGIN { require Devel::GlobalDestruction unless $] >= 5.014 }
 BEGIN { *PERL_ONLY = $ENV{PERL_ONLY} ? sub() { !!1 } : sub() { !!0 } }
 BEGIN { sub XS_ASSERT () { eval q[ require PerlX::Assert ]; !$@ } }
-BEGIN { sub XS_PARAMS () { eval q[ require Type::Params  ]; !$@ } }
+BEGIN { sub XS_PARAMS () { eval q[ use Type::Params 2    ]; !$@ } }
 BEGIN { sub SUB_UTIL  () { eval q[ require Sub::Util     ]; !$@ } }
 
 our $name;
@@ -171,7 +172,8 @@ sub import {
   });
 
   # exports living in this module
-  Importer->import_into( $class, $caller, @{ $EXPORT_TAGS{backend} } );
+  Importer->import_into( $class, $caller, $_ )
+    for grep { $want{$_} } @{ $EXPORT_TAGS{backend} };
 } #/ sub import
 
 sub unimport {
@@ -401,12 +403,11 @@ TUI::toolkit - Unified OO facade for the TUI::Vision framework
 
 =head1 DESCRIPTION
 
-TUI::toolkit provides a unified object system facade for the
-TUI::Vision framework. It corresponds to the functionality of
-C<TV::toolkit> and offers a consistent set of OO features regardless of
-which backend toolkit is available.
+C<TUI::toolkit> provides a unified object system facade for the L<TUI::Vision> 
+framework. It offers a consistent set of OO features regardless of which 
+backend toolkit is available.
 
-C<TV::toolkit> dynamically selected an OO backend from:
+C<TUI::toolkit> dynamically selected an OO backend from:
 
 =over 4
 
@@ -454,7 +455,7 @@ which backend toolkit is already in use.
 
 =head1 BACKEND BEHAVIOR
 
-If any of these toolkits are already loaded, C<TUI::toolkit> uses them
+If any of these toolkit's are already loaded, C<TUI::toolkit> uses them
 directly:
 
 =over 4
@@ -471,10 +472,9 @@ No attempt is made to replace or extend the backend beyond injecting
 C<dump> and C<DESTROY> when appropriate.
 
 If none of Moos/Moo/Moose are loaded, a very small L<LUNIVERSAL::Object> based 
-OO layer is used. 
-
-This exists only to keep modules functional in environments where no of the 
-other toolkits are available. It is not intended to be a full object system.
+OO layer is used.  This exists only to keep modules functional in environments 
+where no of the other toolkits are available. It is not intended to be a full 
+object system.
 
 =head1 SEE ALSO
 

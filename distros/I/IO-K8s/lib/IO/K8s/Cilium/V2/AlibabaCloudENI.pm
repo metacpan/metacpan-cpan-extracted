@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::AlibabaCloudENI;
 # ABSTRACT: ENI represents an AlibabaCloud Elastic Network Interface
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s 'instance-id'          => Str;
@@ -40,7 +40,7 @@ IO::K8s::Cilium::V2::AlibabaCloudENI - ENI represents an AlibabaCloud Elastic Ne
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 instance-id
 

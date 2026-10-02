@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPAdvertisement;
 # ABSTRACT: CiliumBGPAdvertisement is the Schema for the ciliumbgpadvertisements API
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumbgpadvertisements',
@@ -23,7 +23,7 @@ IO::K8s::Cilium::V2::CiliumBGPAdvertisement - CiliumBGPAdvertisement is the Sche
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

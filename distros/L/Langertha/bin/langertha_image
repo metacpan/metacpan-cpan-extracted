@@ -1,0 +1,519 @@
+#!/usr/bin/env perl
+# ABSTRACT: Generate images through OpenAI or an explicit subscription proxy
+# PODNAME: langertha_image
+
+use strict;
+use warnings;
+use utf8;
+use Getopt::Long qw( GetOptionsFromArray Configure );
+use Pod::Usage qw( pod2usage );
+use Path::Tiny qw( path );
+use MIME::Base64 qw( decode_base64 encode_base64 );
+use File::Temp qw( tempfile );
+use URI;
+use Encode ();
+
+our $VERSION = '0.503';
+
+Configure(qw( no_auto_abbrev no_ignore_case ));
+
+use constant MAX_DOWNLOAD_BYTES => 64 * 1024 * 1024;
+
+# Text inputs (prompt, prefix) arrive as raw bytes and are sent to the provider
+# as characters; paths stay bytes end to end so what is printed is the real name.
+sub _decode_text {
+  my ( $text, $what ) = @_;
+  return $text unless defined $text;
+  my $decoded = eval { Encode::decode( 'UTF-8', $text, Encode::FB_CROAK | Encode::LEAVE_SRC ) };
+  die "$what is not valid UTF-8\n" unless defined $decoded;
+  return $decoded;
+}
+
+sub _resolve_backend_url {
+  my ( $backend_option, $url_option, $environment ) = @_;
+
+  my $backend = defined $backend_option
+    ? lc $backend_option
+    : lc( $environment->{LANGERTHA_IMAGE_BACKEND} // 'openai' );
+  die "backend must be proxy or openai\n"
+    unless $backend eq 'proxy' || $backend eq 'openai';
+
+  my $url = defined $url_option
+    ? $url_option
+    : $backend eq 'proxy'
+      ? $environment->{LANGERTHA_IMAGE_PROXY_URL}
+      : $environment->{LANGERTHA_IMAGE_OPENAI_URL};
+
+  die "proxy backend requires --url or LANGERTHA_IMAGE_PROXY_URL\n"
+    if $backend eq 'proxy' && !defined $url;
+
+  if ( defined $url ) {
+    my $uri = URI->new($url);
+    die "image URL must be http(s), without credentials, query, or fragment, and end in /v1\n"
+      unless defined $uri->scheme
+          && $uri->scheme =~ /\Ahttps?\z/
+          && $uri->can('userinfo')
+          && !defined $uri->userinfo
+          && !defined $uri->query
+          && !defined $uri->fragment
+          && $uri->path =~ m{/v1/?\z};
+    $url =~ s{/\z}{};
+  }
+
+  return ( $backend, $url );
+}
+
+sub _read_prompt {
+  my ( $arguments, $prompt_file ) = @_;
+  die "use either PROMPT or --prompt-file, not both\n"
+    if defined $prompt_file && @{$arguments};
+  die "exactly one PROMPT or --prompt-file is required\n"
+    unless defined $prompt_file || @{$arguments} == 1;
+
+  my $prompt = defined $prompt_file
+    ? path($prompt_file)->slurp_utf8
+    : $arguments->[0];
+  die "prompt must not be empty\n" unless defined $prompt && $prompt =~ /\S/;
+  return $prompt;
+}
+
+sub _effective_prompt {
+  my ( $prompt, $prefix_option, $environment ) = @_;
+  my $prefix = defined $prefix_option
+    ? $prefix_option
+    : $environment->{LANGERTHA_IMAGE_PROMPT_PREFIX};
+  return defined $prefix && length $prefix ? "$prefix\n\n$prompt" : $prompt;
+}
+
+sub _default_output_path {
+  my ( $home, $prompt ) = @_;
+  my $slug = lc $prompt;
+  $slug =~ s/[^a-z0-9]+/-/g;
+  $slug =~ s/\A-+|-+\z//g;
+  $slug = substr $slug, 0, 48;
+  $slug =~ s/-+\z//;
+  $slug = 'image' unless length $slug;
+  return path($home)->child("langertha-image-$slug.png")->absolute;
+}
+
+sub _output_paths {
+  my ( $base, $count ) = @_;
+  my $absolute = path($base)->absolute;
+  return ($absolute) if $count == 1;
+
+  my $parent = $absolute->parent;
+  my ( $stem, $extension ) = $absolute->basename =~ /\A(.+?)(\.[^.]+)?\z/;
+  $extension //= q{};
+  return map { $parent->child("$stem-$_$extension") } 1 .. $count;
+}
+
+sub _decode_base64_image {
+  my ($encoded) = @_;
+  die "malformed b64_json\n"
+    unless defined $encoded
+        && !ref $encoded
+        && length $encoded
+        && $encoded =~ m{\A(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\z};
+
+  my $bytes = decode_base64($encoded);
+  die "non-canonical b64_json\n" unless encode_base64( $bytes, q{} ) eq $encoded;
+  return $bytes;
+}
+
+sub _validate_image_bytes {
+  my ($bytes) = @_;
+  die "empty image result\n" unless defined $bytes && length $bytes;
+  return 1 if substr( $bytes, 0, 8 ) eq "\x89PNG\r\n\x1a\n";
+  return 1 if substr( $bytes, 0, 3 ) eq "\xff\xd8\xff";
+  return 1 if substr( $bytes, 0, 6 ) eq 'GIF87a';
+  return 1 if substr( $bytes, 0, 6 ) eq 'GIF89a';
+  return 1 if length($bytes) >= 12
+           && substr( $bytes, 0, 4 ) eq 'RIFF'
+           && substr( $bytes, 8, 4 ) eq 'WEBP';
+  die "provider result is not a supported image\n";
+}
+
+sub _redacted_url {
+  my ($url) = @_;
+  my $uri = URI->new($url);
+  my $scheme = $uri->scheme // q{};
+  return "<$scheme: URL>" unless $scheme =~ /\Ahttps?\z/ && $uri->can('query');
+  $uri->userinfo(undef) if $uri->can('userinfo');
+  $uri->query(undef);
+  $uri->fragment(undef);
+  return $uri->as_string;
+}
+
+sub _image_bytes {
+  my ($item) = @_;
+  if ( defined $item->{b64_json} ) {
+    return _decode_base64_image( $item->{b64_json} );
+  }
+  my $url = $item->{url};
+  require Langertha::Content::Image;
+  my $failure = sub { return 'image download failed from ' . _redacted_url($url) . "\n" };
+  my $image = eval { Langertha::Content::Image->from_url($url) }
+    or die $failure->();
+  my $encoded = eval { $image->ensure_base64( max_bytes => MAX_DOWNLOAD_BYTES ) };
+  die $failure->() unless defined $encoded;
+  return _decode_base64_image($encoded);
+}
+
+# Writes to a temporary file in the target directory and renames it into place
+# only after the bytes passed the signature check, so a failure never leaves a
+# finished-looking file (and --force never destroys the old one for bad data).
+# Without --force the move must not clobber a file that appeared after the
+# preflight: link() fails if the target exists, rename() would replace it.
+sub _move_into_place {
+  my ( $temp, $target, $force ) = @_;
+  if ( !$force ) {
+    if ( link $temp, $target ) {
+      unlink $temp;
+      return 1;
+    }
+    die "output exists: $target\n" if -e $target || -l $target;
+    # no hard links on this filesystem: fall through to rename
+  }
+  rename $temp, $target or die "cannot move image into place: $target\n";
+  return 1;
+}
+
+sub _write_image_bytes {
+  my ( $bytes, $target, $force ) = @_;
+  _validate_image_bytes($bytes);
+  my $parent = $target->parent;
+  die "output directory does not exist: $parent\n" unless $parent->is_dir;
+  die "output exists: $target\n" if !$force && ( -e "$target" || -l "$target" );
+
+  my ( $handle, $temp ) = tempfile( '.langertha_image-XXXXXXXX', DIR => "$parent" );
+  my $written = eval {
+    binmode $handle;
+    print {$handle} $bytes or die "cannot write image\n";
+    close $handle or die "cannot write image\n";
+    chmod 0666 & ~umask, $temp;
+    _move_into_place( $temp, "$target", $force );
+    1;
+  };
+  my $error = $@;
+  unless ($written) {
+    close $handle if defined fileno $handle;
+    unlink $temp;
+    die $error;
+  }
+  return $target;
+}
+
+sub _materialize_image {
+  my ( $engine, $item, $target, $force ) = @_;
+  my $bytes = _image_bytes($item);
+  return _write_image_bytes( $bytes, path($target)->absolute, $force )->stringify;
+}
+
+sub _validate_images {
+  my ( $images, $count ) = @_;
+  die "image response must be an array\n" unless ref($images) eq 'ARRAY';
+  die "provider returned a different image count\n" unless @{$images} == $count;
+  for my $item ( @{$images} ) {
+    die "image item must be an object\n" unless ref($item) eq 'HASH';
+    my $has_b64 = defined $item->{b64_json};
+    my $has_url = defined $item->{url};
+    die "image item needs exactly one of b64_json or url\n" unless $has_b64 xor $has_url;
+    my $source = $has_b64 ? $item->{b64_json} : $item->{url};
+    die "image item source must be a non-empty string\n" if ref $source || !length $source;
+  }
+  return 1;
+}
+
+sub _usage_line {
+  my ($call_result) = @_;
+  return unless $call_result->has_usage;
+  my $usage = $call_result->usage;
+  return sprintf 'usage: input_tokens=%d output_tokens=%d total_tokens=%d',
+    $usage->input_tokens, $usage->output_tokens, $usage->total_tokens;
+}
+
+sub _run {
+  my (@arguments) = @_;
+  my %opt = ( force => 0 );
+  my @warnings;
+  my $parsed = do {
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    GetOptionsFromArray( \@arguments, \%opt,
+      'backend=s', 'url=s', 'prompt-file=s', 'prompt-prefix=s', 'output=s',
+      'model=s', 'size=s', 'quality=s', 'background=s', 'n=s', 'force!', 'help|h' );
+  };
+  if ( !$parsed ) {
+    print STDERR @warnings;
+    die "see langertha_image --help\n";
+  }
+
+  if ( $opt{help} ) {
+    pod2usage( -input => __FILE__, -verbose => 99, -exitval => 'NOEXIT', -output => \*STDOUT,
+      -sections => 'SYNOPSIS|DESCRIPTION|OPTIONS|ENVIRONMENT|OUTPUT|BILLING BOUNDARY|ERRORS' );
+    return 0;
+  }
+
+  my $environment = \%ENV;
+  my $count = defined $opt{n} ? $opt{n} : ( $environment->{LANGERTHA_IMAGE_N} // 1 );
+  die "--n must be an integer from 1 to 10\n"
+    unless $count =~ /\A[0-9]+\z/ && $count >= 1 && $count <= 10;
+  $count += 0;
+
+  @arguments = map { _decode_text( $_, 'PROMPT' ) } @arguments;
+  my $prompt = _read_prompt( \@arguments, $opt{'prompt-file'} );
+  my $prefix = defined $opt{'prompt-prefix'}
+    ? _decode_text( $opt{'prompt-prefix'}, '--prompt-prefix' )
+    : _decode_text( $environment->{LANGERTHA_IMAGE_PROMPT_PREFIX}, 'LANGERTHA_IMAGE_PROMPT_PREFIX' );
+  my $effective_prompt = _effective_prompt( $prompt, $prefix, $environment );
+  my ( $backend, $url ) = _resolve_backend_url( $opt{backend}, $opt{url}, $environment );
+
+  my %image_option;
+  for my $name (qw( model size quality background )) {
+    my $value = defined $opt{$name} ? $opt{$name} : $environment->{ 'LANGERTHA_IMAGE_' . uc $name };
+    $image_option{$name} = $value if defined $value && length $value;
+  }
+
+  my $base = defined $opt{output}
+    ? path( $opt{output} )->absolute
+    : _default_output_path( $environment->{HOME} // path('~')->stringify, $prompt );
+  my @targets = _output_paths( $base, $count );
+  my $parent = $targets[0]->parent;
+  die "output directory does not exist: $parent\n" unless $parent->is_dir;
+  die "output directory is not writable: $parent\n" unless -w "$parent";
+  unless ( $opt{force} ) {
+    for my $target (@targets) {
+      die "output exists (use --force to replace): $target\n" if -e "$target" || -l "$target";
+    }
+  }
+
+  print STDERR "backend: $backend\n";
+
+  require Langertha::Engine::OpenAI;
+  my %engine_arguments = defined $url ? ( url => $url ) : ();
+  $engine_arguments{api_key} = undef if $backend eq 'proxy';
+  my $engine = Langertha::Engine::OpenAI->new(%engine_arguments);
+
+  my $call_result = eval {
+    $engine->simple_image_result( $effective_prompt, n => $count,
+      map { ( $_ => $image_option{$_} ) } sort keys %image_option );
+  };
+  if ( !$call_result ) {
+    my $error = $@ || "image request failed\n";
+    $error =~ s/ at .+? line \d+\.?\s*\z//s;
+    chomp $error;
+    die "image request failed: $error\n";
+  }
+  my $images = $call_result->value;
+
+  print STDERR 'model: ' . $call_result->model . "\n" if $call_result->has_model;
+  my $usage_line = _usage_line($call_result);
+  print STDERR "$usage_line\n" if defined $usage_line;
+  printf STDERR "runtime: %.3f seconds\n", $call_result->total_seconds if $call_result->has_total_seconds;
+
+  _validate_images( $images, $count );
+
+  my @finalized;
+  for my $index ( 0 .. $#{$images} ) {
+    my $final = eval { _materialize_image( $engine, $images->[$index], $targets[$index], $opt{force} ) };
+    if ( !defined $final ) {
+      my $reason = $@;
+      chomp $reason;
+      print STDERR "already finalized: $_\n" for @finalized;
+      die 'image ' . ( $index + 1 ) . " failed: $reason\n";
+    }
+    push @finalized, $final;
+    print STDOUT "$final\n";
+  }
+  return 0;
+}
+
+sub main {
+  my (@arguments) = @_;
+  my $code = eval { _run(@arguments) };
+  return $code if defined $code;
+  my $error = $@;
+  $error = "langertha_image failed\n" unless defined $error && length $error;
+  $error .= "\n" unless $error =~ /\n\z/;
+  print STDERR "langertha_image: $error";
+  return 2;
+}
+
+exit main(@ARGV) unless caller;
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+langertha_image - Generate images through OpenAI or an explicit subscription proxy
+
+=head1 VERSION
+
+version 0.503
+
+=head1 SYNOPSIS
+
+  langertha_image [options] PROMPT
+  langertha_image [options] --prompt-file FILE
+
+  # OpenAI Platform (LANGERTHA_OPENAI_API_KEY is exported)
+  langertha_image --backend openai --output "$HOME/cat.png" 'A cat at a loom'
+
+  # local subscription proxy, no API key
+  langertha_image --backend proxy --url http://127.0.0.1:18765/v1 \
+    --prompt-file prompt.txt --output "$HOME/poster.png"
+
+=head1 DESCRIPTION
+
+Generates one to ten images through L<Langertha::Engine::OpenAI> and stores
+them as files. The backend is always chosen explicitly: C<proxy> for an
+OpenAI-compatible local subscription proxy, C<openai> for the regular OpenAI
+Platform. There is no discovery, no C<auto> mode and no fallback from one to
+the other.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--backend> proxy|openai
+
+The route to use. Defaults to C<LANGERTHA_IMAGE_BACKEND>, then C<openai>.
+
+=item B<--url> URL
+
+Base URL including C</v1> for the chosen backend, for this call only. Must be
+http(s) and carry no credentials, query or fragment.
+
+=item B<--prompt-file> FILE
+
+Read the prompt from FILE (UTF-8) instead of the positional argument. Give
+exactly one of PROMPT or C<--prompt-file>.
+
+=item B<--prompt-prefix> TEXT
+
+Text placed as its own paragraph before the prompt. Overrides
+C<LANGERTHA_IMAGE_PROMPT_PREFIX>.
+
+=item B<--output> FILE
+
+Target path. Without it the name is derived from the prompt and placed in
+C<$HOME> (C<langertha-image-E<lt>slugE<gt>.png>). The directory must exist. With
+C<--n> above 1 the files get a C<-1>, C<-2>, ... suffix before the extension.
+
+=item B<--model> ID
+
+Image model. Defaults to C<LANGERTHA_IMAGE_MODEL>, then the engine default.
+
+=item B<--size> SIZE
+
+Output size, e.g. C<1024x1024>. Defaults to C<LANGERTHA_IMAGE_SIZE>.
+
+=item B<--quality> LEVEL
+
+Quality level. Defaults to C<LANGERTHA_IMAGE_QUALITY>.
+
+=item B<--background> MODE
+
+Background mode, e.g. C<opaque>. Defaults to C<LANGERTHA_IMAGE_BACKGROUND>.
+
+=item B<--n> COUNT
+
+Number of images, 1 to 10. Defaults to C<LANGERTHA_IMAGE_N>, then 1.
+
+=item B<--force>
+
+Replace existing target files. Without it an existing target (or dangling
+symlink) is an error raised before any request is sent.
+
+=item B<--help>
+
+Print this help.
+
+=back
+
+An API key is never accepted as an option, so it cannot land in process lists
+or shell history.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item LANGERTHA_IMAGE_BACKEND
+
+Default for C<--backend>.
+
+=item LANGERTHA_IMAGE_PROXY_URL
+
+Base URL for the C<proxy> backend. Never read by C<openai>.
+
+=item LANGERTHA_IMAGE_OPENAI_URL
+
+Base URL for the C<openai> backend. Never read by C<proxy>.
+
+=item LANGERTHA_IMAGE_PROMPT_PREFIX
+
+Default for C<--prompt-prefix>.
+
+=item LANGERTHA_IMAGE_MODEL, LANGERTHA_IMAGE_SIZE, LANGERTHA_IMAGE_QUALITY, LANGERTHA_IMAGE_BACKGROUND, LANGERTHA_IMAGE_N
+
+Defaults for the matching options.
+
+=item LANGERTHA_OPENAI_API_KEY
+
+API key of the C<openai> backend (Langertha's regular resolution). The
+C<proxy> backend sends no key and no Authorization header.
+
+=back
+
+=head1 OUTPUT
+
+stdout carries only the finished file paths, one per line. stderr carries the
+backend, model, token usage and runtime. Base64 payloads and signed image URLs
+(query, credentials) are never printed.
+
+=head1 BILLING BOUNDARY
+
+C<proxy> talks only to the URL you gave it and uses no API key: it is the
+subscription route. C<openai> uses the OpenAI Platform key and is billed
+separately. A failed C<proxy> call never falls back to C<openai>.
+
+=head1 ERRORS
+
+The exit status is 0 on success and non-zero otherwise. Invalid options, a
+missing proxy URL, an existing target and a missing output directory fail before
+any request. An empty, malformed or wrong-sized provider answer, invalid Base64
+or a failed download creates no file; temporary files are removed. If image N
+of several fails, the images finished before it stay and are listed on stderr as
+C<already finalized: PATH>.
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/langertha/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <getty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

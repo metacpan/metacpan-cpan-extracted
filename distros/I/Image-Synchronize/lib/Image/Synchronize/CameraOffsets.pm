@@ -519,26 +519,28 @@ sub relevant_part {
   my ($self) = @_;
   $self->make_effective;
   my %relevant;
-  while ( my ( $camera_id, $c ) = each %{ $self->{effective} } ) {
-    next unless $self->{accessed_cameras}->{$camera_id};
-    my $e = $relevant{$camera_id} = {};
-    my ( $first, $last );
-    my @times = sort { $a <=> $b } keys %{$c};
-    foreach my $i ( 0 .. $#times ) {
-      $first = $i
-        if not( defined $first )
-        && $times[$i] >= $self->{min_added_time};
-      $last = $i if $times[$i] <= $self->{max_added_time};
-    }
-    if ( defined $first ) {
+  if (defined $self->{min_added_time}) {
+    while ( my ( $camera_id, $c ) = each %{ $self->{effective} } ) {
+      next unless $self->{accessed_cameras}->{$camera_id};
+      my $e = $relevant{$camera_id} = {};
+      my ( $first, $last );
+      my @times = sort { $a <=> $b } keys %{$c};
+      foreach my $i ( 0 .. $#times ) {
+        $first = $i
+          if not( defined $first )
+          && $times[$i] >= $self->{min_added_time};
+        $last = $i if $times[$i] <= $self->{max_added_time};
+      }
+      if ( defined $first ) {
 
-      # expand range so it includes at least the entire relevant range
-      --$first if $first > 0 && $times[$first] > $self->{min_added_time};
-      ++$last if $last < $#times && $times[$last] < $self->{max_added_time};
+        # expand range so it includes at least the entire relevant range
+        --$first if $first > 0 && $times[$first] > $self->{min_added_time};
+        ++$last if $last < $#times && $times[$last] < $self->{max_added_time};
 
-      foreach my $i ( $first .. $last ) {
-        $relevant{$camera_id}->{ display_time( $times[$i] ) } =
-          display_offset( $c->{ $times[$i] } );
+        foreach my $i ( $first .. $last ) {
+          $relevant{$camera_id}->{ display_time( $times[$i] ) } =
+            display_offset( $c->{ $times[$i] } );
+        }
       }
     }
   }

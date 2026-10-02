@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Cookie;
 # ABSTRACT: Cookie defines the sticky cookie configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s domain   => Str;
@@ -32,7 +32,7 @@ IO::K8s::Traefik::V1alpha1::Cookie - Cookie defines the sticky cookie configurat
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 domain
 

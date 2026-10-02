@@ -1,7 +1,7 @@
 # ABSTRACT: NVIDIA driver setup for Debian (experimental)
 
 package Rex::GPU::NVIDIA::Setup::Debian;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 use Rex::Logger ();
 use namespace::autoclean;
@@ -372,7 +372,7 @@ Rex::GPU::NVIDIA::Setup::Debian - NVIDIA driver setup for Debian (experimental)
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

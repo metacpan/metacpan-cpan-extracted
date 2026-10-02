@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::Sigv4;
 # ABSTRACT: sigv4 defines AWS's Signature Verification 4 for the URL.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s accessKey          => 'Core::V1::ConfigMapKeySelector';
@@ -32,7 +32,7 @@ IO::K8s::PrometheusOperator::V1::Sigv4 - sigv4 defines AWS's Signature Verificat
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 accessKey
 

@@ -3,34 +3,122 @@ services:
     image: raudssus/langertha-knarr
     # Or build locally: build: .
     ports:
-      - "8080:8080"
-      - "11434:11434"
-    env_file:
-      - path: .env
-        required: false
+      # All interfaces unless KNARR_BIND names one (KNARR_BIND=127.0.0.1)
+      - "${KNARR_BIND:+${KNARR_BIND}:}8080:8080"
+      - "${KNARR_BIND:+${KNARR_BIND}:}11434:11434"
+    # Only what Knarr reads, from .env or the shell; a name that is set in
+    # neither stays unset. No env_file: .env also holds the Langfuse server
+    # secrets below, which Knarr must not see. Add a line here for any other
+    # variable Knarr should get.
     environment:
       - LANGFUSE_URL=http://langfuse:3000
+      - LANGFUSE_PUBLIC_KEY
+      - LANGFUSE_SECRET_KEY
+      - LANGFUSE_TRACE_NAME
+      - KNARR_API_KEY
+      - KNARR_DEBUG
+      - KNARR_TRACE_NAME
+      # The Langfuse v2 below has only the ingestion API, so leave
+      # KNARR_LANGFUSE_TRANSPORT unset (otel needs v3.22+ or Langfuse Cloud)
+      - KNARR_LANGFUSE_TRANSPORT
+      - KNARR_LANGFUSE_TIMEOUT
+      - KNARR_LOG_FILE
+      - KNARR_LOG_DIR
+      - KNARR_PUBLIC_URL
+      - KNARR_UPSTREAM_TIMEOUT
+      - KNARR_UPSTREAM_STALL_TIMEOUT
+      - KNARR_PROBE_CAPABILITIES
+      - KNARR_PROBE_TIMEOUT
+      - KNARR_WORKERS
+      - KNARR_A2A_NAME
+      - KNARR_A2A_DESCRIPTION
+      - KNARR_OLLAMA_COMPAT_VERSION
+      # Provider keys (the LANGERTHA_ name wins over the bare one)
+      - LANGERTHA_OPENAI_API_KEY
+      - OPENAI_API_KEY
+      - LANGERTHA_ANTHROPIC_API_KEY
+      - ANTHROPIC_API_KEY
+      - LANGERTHA_GROQ_API_KEY
+      - GROQ_API_KEY
+      - LANGERTHA_MISTRAL_API_KEY
+      - MISTRAL_API_KEY
+      - LANGERTHA_DEEPSEEK_API_KEY
+      - DEEPSEEK_API_KEY
+      - LANGERTHA_MINIMAX_API_KEY
+      - MINIMAX_API_KEY
+      - LANGERTHA_CEREBRAS_API_KEY
+      - CEREBRAS_API_KEY
+      - LANGERTHA_OPENROUTER_API_KEY
+      - OPENROUTER_API_KEY
+      - LANGERTHA_PERPLEXITY_API_KEY
+      - PERPLEXITY_API_KEY
+      - LANGERTHA_REPLICATE_API_KEY
+      - REPLICATE_API_TOKEN
+      - LANGERTHA_HUGGINGFACE_API_KEY
+      - HUGGINGFACE_API_KEY
+      - LANGERTHA_GEMINI_API_KEY
+      - GEMINI_API_KEY
+      - LANGERTHA_XAI_API_KEY
+      - XAI_API_KEY
+      - LANGERTHA_MOONSHOT_API_KEY
+      - MOONSHOT_API_KEY
+      - LANGERTHA_NOUSRESEARCH_API_KEY
+      - NOUSRESEARCH_API_KEY
+      - LANGERTHA_AKI_API_KEY
+      - AKI_API_KEY
+      - LANGERTHA_SCALEWAY_API_KEY
+      - SCALEWAY_API_KEY
+      - LANGERTHA_TSYSTEMS_API_KEY
+      - TSYSTEMS_API_KEY
+      - LANGERTHA_HETZNER_API_KEY
     depends_on:
       - langfuse
 
+  # Langfuse v2: runs on Postgres alone. Langfuse v3 (the :latest tag) also
+  # needs ClickHouse, Redis and S3-compatible storage, which this file does
+  # not provide.
   langfuse:
-    image: langfuse/langfuse:latest
+    image: langfuse/langfuse:2
     ports:
-      - "3000:3000"
+      # Loopback only: the admin login is created automatically. Set
+      # LANGFUSE_BIND=0.0.0.0 to reach the dashboard from other hosts.
+      - "${LANGFUSE_BIND:-127.0.0.1}:3000:3000"
     environment:
-      - DATABASE_URL=postgresql://langfuse:langfuse@db:5432/langfuse
-      - NEXTAUTH_SECRET=knarr-langfuse-secret
+      # No defaults on purpose: generate these into .env (see .env.example).
+      - DATABASE_URL=postgresql://langfuse:${LANGFUSE_DB_PASSWORD:?set LANGFUSE_DB_PASSWORD in .env (openssl rand -hex 16)}@db:5432/langfuse
       - NEXTAUTH_URL=http://localhost:3000
-      - SALT=knarr-salt
+      - NEXTAUTH_SECRET=${LANGFUSE_NEXTAUTH_SECRET:?set LANGFUSE_NEXTAUTH_SECRET in .env (openssl rand -base64 32)}
+      - SALT=${LANGFUSE_SALT:?set LANGFUSE_SALT in .env (openssl rand -base64 32)}
+      # Headless init: on startup Langfuse creates this org and project and
+      # registers Knarr's own LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY as the
+      # project's API keys. Without both keys no keys are created. The login
+      # user is created only when LANGFUSE_INIT_USER_PASSWORD is set.
+      - LANGFUSE_INIT_ORG_ID=${LANGFUSE_INIT_ORG_ID:-knarr}
+      - LANGFUSE_INIT_ORG_NAME=${LANGFUSE_INIT_ORG_NAME:-Knarr}
+      - LANGFUSE_INIT_PROJECT_ID=${LANGFUSE_INIT_PROJECT_ID:-knarr}
+      - LANGFUSE_INIT_PROJECT_NAME=${LANGFUSE_INIT_PROJECT_NAME:-Knarr}
+      - LANGFUSE_INIT_PROJECT_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
+      - LANGFUSE_INIT_PROJECT_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
+      - LANGFUSE_INIT_USER_EMAIL=${LANGFUSE_INIT_USER_EMAIL:-admin@knarr.local}
+      - LANGFUSE_INIT_USER_NAME=${LANGFUSE_INIT_USER_NAME:-Knarr Admin}
+      - LANGFUSE_INIT_USER_PASSWORD=${LANGFUSE_INIT_USER_PASSWORD:-}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:16-alpine
     environment:
       - POSTGRES_USER=langfuse
-      - POSTGRES_PASSWORD=langfuse
+      # Only applied when the pgdata volume is created; an existing volume
+      # keeps its password (it was "langfuse" before this was configurable).
+      - POSTGRES_PASSWORD=${LANGFUSE_DB_PASSWORD:?set LANGFUSE_DB_PASSWORD in .env (openssl rand -hex 16)}
       - POSTGRES_DB=langfuse
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langfuse -d langfuse"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
     volumes:
       - pgdata:/var/lib/postgresql/data
 

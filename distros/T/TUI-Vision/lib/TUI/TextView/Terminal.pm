@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -91,7 +91,7 @@ sub DEMOLISH {    # void ($in_global_destruction)
   return;
 }
 
-# The following subroutine was taken from the framework
+# The following subroutine was ported from the framework
 # "A modern port of Turbo Vision 2.0", which is licensed under MIT licence.
 #
 # Copyright 2019-2021 by magiblot <magiblot@hotmail.com>
@@ -185,7 +185,7 @@ sub calcWidth {    # $width ()
   ...
 }
 
-# The following subroutine was taken from the framework
+# The following subroutine was ported from the framework
 # "A modern port of Turbo Vision 2.0", which is licensed under MIT licence.
 #
 # Copyright 2019-2021 by magiblot <magiblot@hotmail.com>
@@ -297,7 +297,7 @@ sub nextLine {    # $offset ($pos)
   return $pos;
 }
 
-# The following two subroutines was taken from the framework
+# The following two subroutines was ported from the framework
 # "A modern port of Turbo Vision 2.0", which is licensed under MIT licence.
 #
 # Copyright 2019-2021 by magiblot <magiblot@hotmail.com>
@@ -430,15 +430,16 @@ boundaries are detected using line feed characters, which makes the terminal
 suitable for log output, console-style views, and similar streaming text use
 cases.
 
-C<TTerminal> extends C<TTextDevice> and is commonly used as a rendering target
-for redirected text output. Reading from the buffer is not supported by
-default and must be implemented explicitly by subclasses if required.
+C<TTerminal> extends L<TTextDevice|TUI::TextView::TextDevice> and is commonly 
+used as a rendering target for redirected text output. Reading from the buffer 
+is not supported by default and must be implemented explicitly by subclasses if 
+required.
 
 =head2 Commonly Used Features
 
 In application code, C<TTerminal> is usually initialized once and then written
 through the text-device interface (C<print>, C<printf>, C<say>, C<syswrite>).
-When explicit capacity checks are needed before larger writes, C<canInsert>
+When explicit capacity checks are needed before larger writes, L</canInsert>
 provides the primary guard.
 
 =head1 ATTRIBUTES
@@ -447,36 +448,34 @@ The following attributes are exposed as read-only accessors and are intended
 for internal use by the terminal implementation. They reflect the current state
 of the circular buffer and should not be modified directly.
 
-=over
-
-=item bufSize
+=head2 bufSize
 
 Read-only size of the internal circular buffer in bytes (I<Int>).  
 This value is defined at construction time and does not change.
 
-=item buffer
+=head2 buffer
 
-Read-only reference to the internal buffer storage.  
+Read-only reference to the internal buffer storage (I<Str>).  
 The buffer is allocated and managed internally by the terminal.
 
-=item queFront
+=head2 queFront
 
-Read-only index pointing to the first byte currently stored in the buffer.
+Read-only index pointing to the first byte currently stored in the buffer 
+(I<Int>).
 
-=item queBack
+=head2 queBack
 
-Read-only index pointing to the most recently written byte in the buffer.
+Read-only index pointing to the most recently written byte in the buffer 
+(I<Int>).
 
-=back
-
-=head1 METHODS
+=head1 CONSTRUCTOR
 
 =head2 new
 
   my $term = TTerminal->new(
     bounds     => $bounds,
-    hScrollBar => $hBar,
-    vScrollBar => $vBar,
+    hScrollBar => $hBar | undef,
+    vScrollBar => $vBar | undef,
     bufSize    => $bufSize
   );
 
@@ -486,19 +485,21 @@ Creates and initializes a new terminal view.
 
 =item bounds
 
-Bounding rectangle of the terminal view (I<TRect>).  
+Bounding rectangle of the terminal view (L<TRect|TUI::Objects::Rect>).  
 This parameter is required.
 
 =item hScrollBar
 
-Horizontal scroll bar associated with the terminal (I<TScrollBar>).
+Horizontal scroll bar associated with the terminal 
+(L<TScrollBar|TUI::Views::ScrollBar> or C<undef>).
 
 This parameter must be provided, but its value may be C<undef> if no horizontal
 scroll bar is required.
 
 =item vScrollBar
 
-Vertical scroll bar associated with the terminal (I<TScrollBar>).
+Vertical scroll bar associated with the terminal 
+(L<TScrollBar|TUI::Views::ScrollBar> or C<undef>).
 
 This parameter must be provided, but its value may be C<undef> if no vertical
 scroll bar is required.
@@ -517,6 +518,8 @@ older data is discarded.
 
 Factory constructor for creating a terminal instance using positional
 parameters.
+
+=head1 METHODS
 
 =head2 bufInc
 
@@ -591,13 +594,12 @@ Returns the color palette used to draw the terminal view.
 
   DEMOLISH($in_global_destruction);
 
-Cleans up the terminal instance and releases the internal buffer. This method
-corresponds to the Turbo Vision destructor and is normally invoked
-automatically.
+Cleans up the terminal instance and releases the internal buffer. 
 
 =head1 SEE ALSO
 
-L<TUI::TextView::TextDevice>, L<TUI::Views::Scroller>
+L<TTextDevice|TUI::TextView::TextDevice>, 
+L<TScroller|TUI::Views::Scroller>
 
 =head1 AUTHORS
 

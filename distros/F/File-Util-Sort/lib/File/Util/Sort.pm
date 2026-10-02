@@ -5,15 +5,17 @@ use strict;
 use warnings;
 use Log::ger;
 
+use Cwd 'abs_path';
 use Exporter 'import';
 use Fcntl ':mode';
 use File::chdir;
 use Perinci::Sub::Util qw(gen_modified_sub);
+use List::Util qw(uniq);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-03'; # DATE
+our $DATE = '2026-09-25'; # DATE
 our $DIST = 'File-Util-Sort'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our %SPEC;
 
@@ -268,11 +270,16 @@ sub sort_files {
     }; # $code_get_files
 
     my @recs;
+    my %seen_abs_paths;
   DIR:
     for my $dir (@$dirs) {
         my $res = $code_get_recs->($dir);
         return $res unless $res->[0] == 200;
-        push @recs, @{ $res->[2] };
+        for my $rec (@{ $res->[2] }) {
+            #log_trace "rec=%s", $rec;
+            my $abs_path = abs_path("$rec->{dir}/$rec->{name}");
+            push @recs, $rec unless $seen_abs_paths{$abs_path}++;
+        }
     } # DIR
 
     my ($code_key, $code_cmp);
@@ -695,7 +702,7 @@ File::Util::Sort - Routines related to sorting files in one or more directories
 
 =head1 VERSION
 
-This document describes version 0.011 of File::Util::Sort (from Perl distribution File-Util-Sort), released on 2025-05-03.
+This document describes version 0.012 of File::Util::Sort (from Perl distribution File-Util-Sort), released on 2026-09-25.
 
 =head1 DESCRIPTION
 
@@ -1552,6 +1559,12 @@ L<App::FileSortUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 =head1 CONTRIBUTING
 
 
@@ -1572,7 +1585,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

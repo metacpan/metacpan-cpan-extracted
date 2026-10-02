@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceAllocationConfiguration;
 # ABSTRACT: DeviceAllocationConfiguration gets embedded in an AllocationResult.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s opaque => 'Resource::V1::OpaqueDeviceConfiguration';
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1::DeviceAllocationConfiguration - DeviceAllocationConf
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 opaque
 

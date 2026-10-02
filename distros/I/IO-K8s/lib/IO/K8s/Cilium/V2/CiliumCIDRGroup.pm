@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumCIDRGroup;
 # ABSTRACT: CiliumCIDRGroup is a list of external CIDRs (i.e: CIDRs selecting peers outside the clusters) that can be referenced as a single entity from CiliumNetworkPolicies.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumcidrgroups';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::CiliumCIDRGroup - CiliumCIDRGroup is a list of external CID
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

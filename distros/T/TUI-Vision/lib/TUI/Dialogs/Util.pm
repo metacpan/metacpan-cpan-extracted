@@ -5,12 +5,20 @@ use 5.010;
 use strict;
 use warnings;
 
+our $VERSION = '2.000002';
+$VERSION =~ tr/_//d;
+our $AUTHORITY = 'cpan:BRICKPOOL';
+
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
   hotKey
   prevWord
   nextWord
+);
+
+our %EXPORT_TAGS = (
+  all => \@EXPORT_OK,
 );
 
 use TUI::toolkit qw( signature );

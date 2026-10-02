@@ -5,6 +5,10 @@ use 5.010;
 use strict;
 use warnings;
 
+our $VERSION = '2.000002';
+$VERSION =~ tr/_//d;
+our $AUTHORITY = 'cpan:BRICKPOOL';
+
 use Exporter 'import';
 our @EXPORT_OK = qw(
   _dos_findfirst
@@ -88,15 +92,16 @@ TUI::StdDlg::Dos - DOS-style directory search structures and functions
 
 =head1 DESCRIPTION
 
-C<TUI::StdDlg::Dos> provides low-level data structures and helper functions used
-by the standard dialog subsystem to perform directory searches in a
-DOS-compatible manner.
+This module provides low-level data structures and helper functions used by the 
+standard dialog subsystem to perform directory searches in a DOS-compatible 
+manner.
 
 The module defines record-style structures representing directory entries and
 exposes search functions that iterate over matching filesystem objects. These
 facilities are used internally by directory and file selection dialogs.
 
-This module does not define any objects derived from C<TObject>.
+This module does not define any objects derived from 
+L<TObject|TUI::Objects::Object>.
 
 =head1 STRUCTURES
 
@@ -209,9 +214,9 @@ entries are available.
 
 =head1 SEE ALSO
 
-L<TUI::StdDlg::DirCollection>,
-L<TUI::StdDlg::DirListBox>,
-L<TUI::StdDlg::ChDirDialog>
+L<TDirCollection|TUI::StdDlg::DirCollection>,
+L<TDirListBox|TUI::StdDlg::DirListBox>,
+L<TChDirDialog|TUI::StdDlg::ChDirDialog>
 
 =head1 AUTHORS
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.51';
+our $VERSION = '0.55';
 
 1;
 
@@ -128,7 +128,10 @@ Nor is a websocket handshake over HTTP/2 or HTTP/3, which arrives as an
 Extended CONNECT (RFC 8441) rather than the GET an upgrade is. It is routed
 as that GET and checked as that GET was: by the handshake's own origin check
 (L<Punk::WebSocket>), which is what stands between a page elsewhere and an
-authenticated socket on either transport. A browser opens every websocket
+authenticated socket on either transport. That exemption holds because an
+Extended CONNECT reaches a C<websocket> route or a 404 and nothing in
+between, so the origin check is the only thing it can arrive at. A browser
+opens every websocket
 this way once the server has advertised the setting, so a CSRF refusal here
 would refuse them all.
 

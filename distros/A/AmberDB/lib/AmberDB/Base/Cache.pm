@@ -4,9 +4,8 @@ use 5.016;
 use warnings;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.3';
-
-my $CREATED = '2026-08-11';
+our $VERSION = '5.26.4';
+my $CREATED  = '2026-08-11';
 
 # ============================================================================
 # AmberDB In-Memory (L1 Process) Object Cache & Staging Buffer Engine

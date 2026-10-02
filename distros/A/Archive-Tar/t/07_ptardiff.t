@@ -12,7 +12,7 @@ my $foo = File::Spec->catfile("t", "ptardiff", "foo");
 my $bar = File::Spec->catfile("t", "ptardiff", "bar");
 my $tarfile = File::Spec->catfile("t", "ptardiff.tar");
 my $ptardiff = File::Spec->catfile($Bin, "..", "bin", "ptardiff");
-my $cmd = "$^X $ptardiff $tarfile";
+my $cmd = qq/"$^X" "$ptardiff" $tarfile/;
 
 eval { require Text::Diff; };
 plan skip_all => 'Text::Diff required to test ptardiff' if $@;

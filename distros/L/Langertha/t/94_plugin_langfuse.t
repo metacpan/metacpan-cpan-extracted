@@ -13,6 +13,7 @@ use HTTP::Response;
 
 use Langertha::Plugin::Langfuse;
 use Langertha::Chat;
+use Langertha::Response;
 use Langertha::Embedder;
 
 my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
@@ -21,14 +22,26 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 
 {
   package MockChatRequest;
-  sub new { bless { response_call => $_[1] }, $_[0] }
+  sub new { bless { response_call => $_[1], wire_body => $_[2] }, $_[0] }
   sub response_call { $_[0]->{response_call} }
+  # The raw wire body the mock provider answers with. MockUserAgent sends it
+  # back as a real JSON HTTP::Response, so the tool loops decode, hand to the
+  # plugins and parse it as they do a real reply (karr #81, k347).
+  sub wire_body { $_[0]->{wire_body} }
 }
 
 {
   package MockUserAgent;
+  use HTTP::Response;
+  use JSON::MaybeXS ();
   sub new { bless {}, $_[0] }
-  sub request { 'fake_response' }
+  sub request {
+    my ($self, $request) = @_;
+    return HTTP::Response->new( 200, 'OK', [ 'Content-Type' => 'application/json' ],
+      JSON::MaybeXS->new( utf8 => 1 )->encode( $request->wire_body ) )
+      if ref $request && $request->can('wire_body') && $request->wire_body;
+    return 'fake_response';
+  }
 }
 
 {
@@ -390,7 +403,7 @@ subtest 'Chat with Langfuse + tools creates spans for tool calls' => sub {
     sub chat_request {
       my ($self, $messages, %extra) = @_;
       my $data = shift @{$self->_response_queue} // { final_text => 'done' };
-      return MockChatRequest->new(sub { $data });
+      return MockChatRequest->new(sub { $data }, $data);
     }
 
     sub build_tool_chat_request {
@@ -408,7 +421,31 @@ subtest 'Chat with Langfuse + tools creates spans for tool calls' => sub {
       );
     }
     sub response_text_content { $_[1]->{final_text} // '' }
-    sub parse_response { $_[1] }
+    sub json { JSON::MaybeXS->new(utf8 => 1) }
+    sub parse_response { $_[0]->json->decode($_[1]->content) }
+    # This mock's wire: final_text plus a tool_calls list of { name, input }.
+    sub chat_response {
+      my ($self, $http_response) = @_;
+      my $data = $self->parse_response($http_response);
+      return Langertha::Response->new(
+        content    => $data->{final_text} // '',
+        raw        => $data,
+        tool_calls => [ map { { name => $_->{name}, arguments => $_->{input} // {} } }
+          @{ $data->{tool_calls} // [] } ],
+      );
+    }
+    sub tool_wire_format { 'mock' }
+
+    # The loop helpers are the real ones from Role::Tools, not copies, so the
+    # Chat loops are tested with what they really run (k347).
+    sub tool_loop_response      { Langertha::Role::Tools::tool_loop_response(@_) }
+    sub _tool_loop_block_reason { Langertha::Role::Tools::_tool_loop_block_reason(@_) }
+    sub _chat_response_from_data { Langertha::Role::Tools::_chat_response_from_data(@_) }
+    sub _hermes_lift            { Langertha::Role::Tools::_hermes_lift(@_) }
+    sub tool_loop_calls         { Langertha::Role::Tools::tool_loop_calls(@_) }
+    sub _tool_loop_tools        { Langertha::Role::Tools::_tool_loop_tools(@_) }
+    sub _langertha_carp { Carp::carp($_[1]) }
+
     sub think_tag_filter { 0 }
 
     __PACKAGE__->meta->make_immutable;
@@ -563,6 +600,22 @@ subtest 'Embedder with Langfuse plugin creates trace + generation' => sub {
 
   my $update = $lf->_batch->[2];
   is_deeply($update->{body}{output}, { dimensions => 3 }, 'trace output has dimensions');
+};
+
+# k289: a batch returns an ArrayRef of vectors; the trace reports the vector
+# width, not the number of inputs.
+subtest 'Langfuse embedding trace on a batch reports the vector width' => sub {
+  my $lf = Langertha::Plugin::Langfuse->new(
+    host       => Langertha::Embedder->new(engine => MockEmbeddingEngine->new),
+    public_key => 'pk-test',
+    secret_key => 'sk-test',
+  );
+  my $batch = [ [0.1, 0.2, 0.3], [0.4, 0.5, 0.6] ];
+  $lf->plugin_before_embedding([qw( a b )])->get;
+  my $out = $lf->plugin_after_embedding([qw( a b )], $batch)->get;
+  is($out, $batch, 'the batch passes through unchanged');
+  is_deeply($lf->_batch->[-1]{body}{output}, { dimensions => 3 },
+    'trace output dimensions is the vector width');
 };
 
 subtest 'Langfuse plugin via Name => Args syntax' => sub {

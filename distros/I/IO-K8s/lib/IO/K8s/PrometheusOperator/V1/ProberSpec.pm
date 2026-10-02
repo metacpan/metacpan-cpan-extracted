@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ProberSpec;
 # ABSTRACT: prober defines the specification for the prober to use for probing targets.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s noProxy              => Str;
@@ -32,7 +32,7 @@ IO::K8s::PrometheusOperator::V1::ProberSpec - prober defines the specification f
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 noProxy
 

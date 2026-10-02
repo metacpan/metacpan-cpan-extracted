@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::StripPrefix;
 # ABSTRACT: StripPrefix holds the strip prefix middleware configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s forceSlash => Bool;
@@ -22,7 +22,7 @@ IO::K8s::Traefik::V1alpha1::StripPrefix - StripPrefix holds the strip prefix mid
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 forceSlash
 

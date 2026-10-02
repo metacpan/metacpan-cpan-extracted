@@ -1,6 +1,6 @@
 package Langertha::Engine::OpenAIBase;
 # ABSTRACT: Base class for OpenAI-compatible engines
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Carp qw( croak );
 use Module::Runtime qw( use_module );
@@ -12,17 +12,44 @@ with map { 'Langertha::Role::'.$_ } qw(
   OpenAPI
   Models
   Temperature
+  ReasoningEffort
+  PromptCache
   ResponseSize
   SystemPrompt
   ResponseFormat
   Streaming
   Chat
+  ImageInput
 );
 
 sub _build_openapi_operations {
   return use_module('Langertha::Spec::OpenAI')->data;
 }
 
+# The OpenAI family caches automatically — there is no request-side enable
+# breakpoint, only the prompt_cache_key routing hint. Clear the Anthropic-style
+# enable flag here so the whole family advertises only the key (ADR 0002).
+# Partner direction: Langertha::Engine::AnthropicBase runs the symmetric
+# correction and deletes prompt_cache_key, keeping prompt_cache. The pair is
+# canon in L<ADR 0015|docs/adr/0015-role-composition-patterns.md>.
+around engine_capabilities => sub {
+  my ( $orig, $self, @rest ) = @_;
+  my $caps = $self->$orig(@rest);
+  delete $caps->{prompt_cache};
+  return $caps;
+};
+
+
+# The tools + structured-output response_format conflict is a property of the
+# serving STACK, not of the gpt-oss model: Groq and Cerebras enforce it
+# stack-wide (each via its own model_capability_exclusions override), while
+# AKI's gpt-oss-120b serves tools + a json_schema response_format at HTTP 200
+# (live-verified 2026-09-19, karr #184). So it is NOT gated here on the shared
+# OpenAI base — doing so was a false-positive on the AKIOpenAI / TSystems
+# defaults and aggregator routes. This base composes no exclusion rule and
+# inherits the Langertha::Role::Chat no-op; the per-model
+# model_capability_exclusions seam stays and Groq/Cerebras carry the rule
+# (ADR 0024).
 
 sub default_model { croak "".(ref $_[0])." requires model to be set" }
 
@@ -44,7 +71,7 @@ Langertha::Engine::OpenAIBase - Base class for OpenAI-compatible engines
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -82,12 +109,14 @@ Concrete engines that extend this class:
 =over 4
 
 =item * Cloud providers — L<Langertha::Engine::OpenAI>, L<Langertha::Engine::DeepSeek>,
-L<Langertha::Engine::Groq>, L<Langertha::Engine::Mistral>,
-L<Langertha::Engine::Cerebras>, L<Langertha::Engine::MiniMax>,
-L<Langertha::Engine::NousResearch>, L<Langertha::Engine::OpenRouter>,
-L<Langertha::Engine::Replicate>, L<Langertha::Engine::HuggingFace>,
-L<Langertha::Engine::Perplexity>, L<Langertha::Engine::AKIOpenAI>,
-L<Langertha::Engine::TSystems>, L<Langertha::Engine::Scaleway>
+L<Langertha::Engine::Groq>, L<Langertha::Engine::Hetzner>,
+L<Langertha::Engine::MiniMax>, L<Langertha::Engine::Mistral>,
+L<Langertha::Engine::Moonshot>, L<Langertha::Engine::XAI>,
+L<Langertha::Engine::Cerebras>, L<Langertha::Engine::NousResearch>,
+L<Langertha::Engine::OpenRouter>, L<Langertha::Engine::Replicate>,
+L<Langertha::Engine::HuggingFace>, L<Langertha::Engine::Perplexity>,
+L<Langertha::Engine::AKIOpenAI>, L<Langertha::Engine::TSystems>,
+L<Langertha::Engine::Scaleway>
 
 =item * Self-hosted — L<Langertha::Engine::OllamaOpenAI>,
 L<Langertha::Engine::vLLM>, L<Langertha::Engine::SGLang>,

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::TSDBSpec;
 # ABSTRACT: tsdb defines the runtime reloadable configuration of the timeseries database(TSDB).
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s chunkEncoding                  => '+IO::K8s::PrometheusOperator::V1::ChunkEncodingSpec';
@@ -24,7 +24,7 @@ IO::K8s::PrometheusOperator::V1::TSDBSpec - tsdb defines the runtime reloadable 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 chunkEncoding
 

@@ -131,28 +131,29 @@ SKIP: {
     eval {
         $simple->doPayment(0);
     };
-    like($@, qr/amount.*must be positive integer/i, 'doPayment() rejects zero amount');
+    like($@, qr/amount must be a positive integer/i, 'doPayment() rejects zero amount');
 
     eval {
         $simple->doPayment(-100);
     };
-    like($@, qr/amount.*must be positive integer/i, 'doPayment() rejects negative amount');
+    like($@, qr/amount must be a positive integer/i, 'doPayment() rejects negative amount');
 
-    # Test cancelPayment with invalid parameters
+    # Test cancelPayment with invalid parameters. Pass undef explicitly, omitted arguments
+    # die in the subroutine signature before the parameter validation is reached
     eval {
-        $simple->cancelPayment();
+        $simple->cancelPayment(undef, 1000, reference_number => '1234');
     };
     like($@, qr/trace_number parameter is required/i, 'cancelPayment() requires trace_number');
 
     eval {
-        $simple->cancelPayment('1234');
+        $simple->cancelPayment('1234', undef, reference_number => '1234');
     };
-    like($@, qr/amount parameter is required/i, 'cancelPayment() requires amount');
+    like($@, qr/amount must be a positive integer/i, 'cancelPayment() requires amount');
 
     eval {
-        $simple->cancelPayment('1234', 0);
+        $simple->cancelPayment('1234', 0, reference_number => '1234');
     };
-    like($@, qr/amount.*must be positive integer/i, 'cancelPayment() rejects zero amount');
+    like($@, qr/amount must be a positive integer/i, 'cancelPayment() rejects zero amount');
 
     # Test endOfDay (may fail with mock terminal, but should not crash)
     my $eod_result;

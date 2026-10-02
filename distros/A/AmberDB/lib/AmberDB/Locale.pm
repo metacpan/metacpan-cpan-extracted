@@ -6,7 +6,7 @@ use utf8;
 use Encode qw(decode encode);
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.3';
+our $VERSION = '5.26.4';
 my $CREATED  = '2017-07-22';
 
 my %LOCALE_CACHE;

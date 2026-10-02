@@ -1,5 +1,13 @@
 Revision history for Punk
 
+0.55    2026-10-02
+        - SECURITY (CVE-2026-104380): an Extended CONNECT on HTTP/2 or
+          HTTP/3 was routed as a GET to any route, API operation or mount,
+          not only a `websocket` one, so a cross-origin page could read any
+          path's status as a websocket open or error. It now answers a
+          websocket route or a 404. Affects 0.48 to 0.54.
+        - ADDS: Punk::Test `request_ok($method, $path, %options)`.
+
 0.54    2026-09-22
         - FIX: robots.txt carried the `*` group alone, and AdsBot-Google,
           AdsBot-Google-Mobile and Mediapartners-Google ignore it.

@@ -1,3 +1,8 @@
+0.009   2026-09-25  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add alias --rename for --as.
+
+
 0.008   2025-05-03  Released-By: PERLANCAR; Urgency: medium
 
         - Update prereqs version (fix bug in prereq File::Util::Sort).

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::NebiusAuth;
 # ABSTRACT: Auth defines parameters to authenticate in MysteryBox
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s serviceAccountCredsSecretRef => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::NebiusAuth - Auth defines parameters to authentica
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 serviceAccountCredsSecretRef
 

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::Exemplars;
 # ABSTRACT: exemplars related settings that are runtime reloadable.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s maxSize => Int;
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::Exemplars - exemplars related settings that are
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 maxSize
 

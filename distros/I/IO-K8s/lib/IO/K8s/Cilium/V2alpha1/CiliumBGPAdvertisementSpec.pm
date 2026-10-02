@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPAdvertisementSpec;
 # ABSTRACT: CiliumBGPAdvertisementSpec
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s advertisements => ['+IO::K8s::Cilium::V2alpha1::BGPAdvertisement'], { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2alpha1::CiliumBGPAdvertisementSpec - CiliumBGPAdvertisementSp
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 advertisements
 

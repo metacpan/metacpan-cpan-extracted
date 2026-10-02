@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ScalewayProvider;
 # ABSTRACT: Scaleway configures this store to sync secrets using the Scaleway provider.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s accessKey => '+IO::K8s::ExternalSecrets::V1::ScalewayProviderSecretRef', { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::ScalewayProvider - Scaleway configures this store 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 accessKey
 

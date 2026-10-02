@@ -1,6 +1,6 @@
 package Langertha::Role::Models;
 # ABSTRACT: Role for APIs with several models
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose::Role;
 
 requires qw(
@@ -52,6 +52,7 @@ has _models_cache => (
 sub clear_models_cache {
   my ($self) = @_;
   $self->_clear_models_cache;
+  $self->clear_models;   # the lazy models attribute rebuilds on next access
   return;
 }
 
@@ -71,7 +72,7 @@ Langertha::Role::Models - Role for APIs with several models
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head2 models
 
@@ -92,8 +93,9 @@ Time-to-live in seconds for the models list cache. Defaults to C<3600> (one hour
 
     $engine->clear_models_cache;
 
-Clears the internal models list cache, forcing a fresh fetch on the next
-access to C<models>.
+Clears the internal models list cache and resets the C<models> attribute, so
+the next access to C<models> (or C<list_models>) fetches again. A C<models>
+list passed to the constructor is dropped as well.
 
 =head1 SEE ALSO
 

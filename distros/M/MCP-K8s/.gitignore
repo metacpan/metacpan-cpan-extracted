@@ -1,2 +1,36 @@
 MCP-K8s-*
 /.build/
+
+# Claude Code — commit: skills/, agents/, rules/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+
+# Tracked: shared config & extensibility
+!/.claude/
+.claude/*
+!.claude/settings.json
+!.claude/agents/
+!.claude/agents/**
+!.claude/skills/
+!.claude/skills/**
+!.claude/rules/
+!.claude/rules/**
+!.claude/hooks/
+!.claude/hooks/**
+
+# Local overrides (machine-specific)
+.claude/*.local.*
+.claude/local/
+
+# Credentials & session state (never track)
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+# karr materialized task view -- never commit
+tasks/
+config.yml
+
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Discovery::V1::EndpointPort;
 # ABSTRACT: EndpointPort represents a Port used by an EndpointSlice
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s appProtocol => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Discovery::V1::EndpointPort - EndpointPort represents a Port used 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 appProtocol
 

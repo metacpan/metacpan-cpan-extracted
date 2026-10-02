@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::Port;
 # ABSTRACT: Port Layer 4 port / protocol pair swagger:model Port
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name     => Str;
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2alpha1::Port - Port Layer 4 port / protocol pair swagger:mode
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

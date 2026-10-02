@@ -22,7 +22,7 @@ App::ClipboardUtils::Manual::HowTo::ClipaddCookbook - Cookbook for clipadd
 
 =head1 VERSION
 
-This document describes version 0.014 of App::ClipboardUtils::Manual::HowTo::ClipaddCookbook (from Perl distribution App-ClipboardUtils), released on 2025-10-16.
+This document describes version 0.015 of App::ClipboardUtils::Manual::HowTo::ClipaddCookbook (from Perl distribution App-ClipboardUtils), released on 2026-09-20.
 
 =head1 DESCRIPTION
 
@@ -132,7 +132,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026, 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

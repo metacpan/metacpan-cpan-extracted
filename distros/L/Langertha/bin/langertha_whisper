@@ -28,7 +28,7 @@ if ($ENV{LANGERTHA_WHISPER_OPENAI_API_KEY}) {
   $engine = Langertha::Engine::Whisper->new(
     url => $ENV{LANGERTHA_WHISPER_WHISPER_URL},
     $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ? ( model => $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ) : (),
-  );  
+  );
 } else {
   die "Requires LANGERTHA_WHISPER_WHISPER_URL or LANGERTHA_WHISPER_OPENAI_API_KEY or LANGERTHA_WHISPER_GROQ_API_KEY";
 }
@@ -50,7 +50,7 @@ langertha_whisper - Simple transcription with a Whisper compatible server or Ope
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,22 @@
+{
+  "sources": {
+    "getty": { "git": "https://github.com/Getty/skills" },
+    "karr": { "git": "https://github.com/Getty/karr" },
+    "langertha": { "git": "https://github.com/Getty/langertha" }
+  },
+  "install": {
+    "skills": [
+      "getty-git-commit-style@getty",
+      "getty-git-usage@getty",
+      "getty-perl-core@getty",
+      "getty-perl-moo@getty",
+      "perl-release-dist-ini@getty",
+      "getty-perl-pod@karr",
+      "getty-perl-release-author-getty@karr",
+      "kanban-issues-karr-coordination@karr",
+      "kanban-issues-karr-ticket@karr",
+      "perl-ai-langertha@langertha"
+    ]
+  },
+  "targets": ["claude"]
+}

@@ -18,7 +18,7 @@
 # The dump itself is t/data/features.py -- one copy, run by this script and by
 # the test, so the frozen answer and the live one cannot drift into being
 # answers to different questions.  mdtraj 1.11.1.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use autodie ':default';

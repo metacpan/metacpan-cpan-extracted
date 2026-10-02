@@ -1,5 +1,11 @@
 Revision history for Func-Util
 
+1.01    2026-10-02
+        - FIX: the pre-5.22 op_convert_list fallback called Perl_convert,
+          which perl never exports, so the DLL link failed on Windows. It
+          no longer calls it, and it now repairs the argument chain core's
+          force_list repairs, which the old fallback did not.
+
 0.04    2026-05-17
         - Fix build on Solaris/illumos: drop GNU-only
           `-Wl,--allow-shlib-undefined` from

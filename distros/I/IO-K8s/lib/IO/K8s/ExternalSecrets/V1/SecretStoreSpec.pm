@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::SecretStoreSpec;
 # ABSTRACT: SecretStoreSpec defines the desired state of SecretStore.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s conditions      => ['+IO::K8s::ExternalSecrets::V1::ClusterSecretStoreCondition'];
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::SecretStoreSpec - SecretStoreSpec defines the desi
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 conditions
 

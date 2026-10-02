@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -97,8 +97,8 @@ TUI::Dialogs::HistInit - initializer for history list viewer creation
 
 =head1 DESCRIPTION
 
-C<TUI::Dialogs::HistInit> encapsulates the initialization logic required to
-create history list viewer objects in TUI::Vision dialogs.
+C<HistInit> encapsulates the initialization logic required to create history 
+list viewer objects in L<TUI::Vision> dialogs.
 
 The class stores a user-supplied callback which is invoked whenever a list
 viewer needs to be constructed. This allows dialogs to customize the concrete
@@ -147,8 +147,8 @@ Invokes the stored callback and returns a newly created list viewer object.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::History>,
-L<TUI::Dialogs::ListBox>
+L<THistory|TUI::Dialogs::History>,
+L<TListBox|TUI::Dialogs::ListBox>
 
 =head1 AUTHORS
 

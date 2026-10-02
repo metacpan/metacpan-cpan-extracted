@@ -1,10 +1,11 @@
 package Langertha::ImageGen;
 # ABSTRACT: Image generation abstraction wrapping an engine with optional overrides
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Future::AsyncAwait;
 use Carp qw( croak );
 use Log::Any qw( $log );
+use Scalar::Util qw( refaddr );
 
 with 'Langertha::Role::PluginHost';
 
@@ -62,14 +63,26 @@ async sub _run_plugin_before_image_gen {
   return $prompt;
 }
 
+# $call_result (optional) is the Langertha::CallResult of the *_result path;
+# every hook gets the same one, while the images are piped hook to hook.
 async sub _run_plugin_after_image_gen {
-  my ( $self, $prompt, $result ) = @_;
+  my ( $self, $prompt, $result, $call_result ) = @_;
   for my $plugin (@{$self->_plugin_instances}) {
     if ($plugin->can('plugin_after_image_gen')) {
-      $result = await $plugin->plugin_after_image_gen($prompt, $result);
+      $result = await $plugin->plugin_after_image_gen($prompt, $result,
+        defined $call_result ? ($call_result) : ());
     }
   }
   return $result;
+}
+
+# The engine's CallResult when the hooks returned its own images, else a new
+# one carrying the hooks' value (CallResult is immutable).
+sub _with_hooked_value {
+  my ( $call_result, $value ) = @_;
+  my $old = $call_result->value;
+  return $call_result if ref $value && ref $old && refaddr($value) == refaddr($old);
+  return $call_result->with_value($value);
 }
 
 sub simple_image {
@@ -95,6 +108,41 @@ sub simple_image {
 }
 
 
+async sub simple_image_f {
+  my ( $self, $prompt ) = @_;
+  $log->debugf("[ImageGen] simple_image_f via %s, model=%s",
+    ref $self->engine, $self->has_model ? $self->model : 'default');
+  my $engine = $self->_assert_image_engine;
+  $prompt = await $self->_run_plugin_before_image_gen($prompt);
+  my $result = await $engine->simple_image_f($prompt, $self->_extra);
+  return await $self->_run_plugin_after_image_gen($prompt, $result);
+}
+
+
+sub simple_image_result {
+  my ( $self, $prompt ) = @_;
+  $log->debugf("[ImageGen] simple_image_result via %s, model=%s",
+    ref $self->engine, $self->has_model ? $self->model : 'default');
+  my $engine = $self->_assert_image_engine;
+  $prompt = $self->_run_plugin_before_image_gen($prompt)->get;
+  my $call_result = $engine->simple_image_result($prompt, $self->_extra);
+  my $images = $self->_run_plugin_after_image_gen($prompt, $call_result->value, $call_result)->get;
+  return _with_hooked_value($call_result, $images);
+}
+
+
+async sub simple_image_result_f {
+  my ( $self, $prompt ) = @_;
+  $log->debugf("[ImageGen] simple_image_result_f via %s, model=%s",
+    ref $self->engine, $self->has_model ? $self->model : 'default');
+  my $engine = $self->_assert_image_engine;
+  $prompt = await $self->_run_plugin_before_image_gen($prompt);
+  my $call_result = await $engine->simple_image_result_f($prompt, $self->_extra);
+  my $images = await $self->_run_plugin_after_image_gen($prompt, $call_result->value, $call_result);
+  return _with_hooked_value($call_result, $images);
+}
+
+
 
 __PACKAGE__->meta->make_immutable;
 
@@ -112,7 +160,7 @@ Langertha::ImageGen - Image generation abstraction wrapping an engine with optio
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -125,9 +173,9 @@ version 0.502
 
     my $image_gen = Langertha::ImageGen->new(
         engine  => $engine,
-        model   => 'dall-e-3',
+        model   => 'gpt-image-2',
         size    => '1024x1024',
-        quality => 'hd',
+        quality => 'high',
         plugins => ['Langfuse'],
     );
 
@@ -156,11 +204,11 @@ C<image_model> via C<%extra> pass-through.
 
 =head2 size
 
-Optional image size (e.g. C<'1024x1024'>, C<'1792x1024'>).
+Optional image size (e.g. C<'1024x1024'>, C<'1536x1024'>).
 
 =head2 quality
 
-Optional quality setting (e.g. C<'standard'>, C<'hd'>).
+Optional quality setting (e.g. C<'low'>, C<'medium'>, C<'high'> for GPT image models).
 
 =head2 simple_image
 
@@ -170,6 +218,36 @@ Returns the image generation result for C<$prompt>. If C<model>,
 C<size>, or C<quality> overrides are set, uses them via C<%extra>;
 otherwise delegates to the engine's C<simple_image>. Plugin hooks
 C<plugin_before_image_gen> and C<plugin_after_image_gen> are fired.
+
+=head2 simple_image_f
+
+    my $result = await $image_gen->simple_image_f('A cat in space');
+
+Async variant of L</simple_image>: the same result, overrides and plugin
+hooks, with the hooks awaited and the request sent through the engine's
+async backend (see L<Langertha::Role::ImageGeneration/simple_image_f>).
+
+=head2 simple_image_result
+
+    my $result = $image_gen->simple_image_result('A cat in space');
+    my $images = $result->value;
+    say $result->usage->output_tokens if $result->has_usage;
+
+Like L</simple_image>, with the same overrides and plugin hooks, but returns
+the L<Langertha::CallResult> of
+L<Langertha::Role::ImageGeneration/simple_image_result>: C<value> is the
+image result after the after-hooks, and C<usage>, C<rate_limit>, C<model>
+and C<total_seconds> are the call's. C<plugin_after_image_gen> gets that
+C<CallResult> as an extra third argument (see L<Langertha::Plugin>). When a
+hook returns a different value, the result is a new C<CallResult> with that
+value and the other attributes copied.
+
+=head2 simple_image_result_f
+
+    my $result = await $image_gen->simple_image_result_f('A cat in space');
+
+Async variant of L</simple_image_result>: the same result, overrides and
+hooks, sent through the engine's async backend like L</simple_image_f>.
 
 =head1 SEE ALSO
 

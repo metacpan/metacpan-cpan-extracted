@@ -1,10 +1,11 @@
 package TUI::Dialogs::Const;
 # ABSTRACT: constants for dialog components
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -161,16 +162,16 @@ TUI::Dialogs::Const - constants for dialog components
 
 =head1 DESCRIPTION
 
-C<TUI::Dialogs::Const> defines constants used by TUI::Vision dialog components
-such as dialogs, buttons, labels, input lines, and history views.
+C<TUI::Dialogs::Const> defines constants used by L<TUI::Vision> dialog 
+components such as dialogs, buttons, labels, input lines, and history views.
 
 The constants in this module are grouped by purpose and exported via tag-based
 export groups. They control dialog behavior, button flags, command handling,
 palette layouts, and dialog palette selection.
 
 This module only defines constants. The semantic meaning and practical usage of
-these constants is documented in higher-level modules such as C<TUI::Dialogs>,
-C<TDialog>, and the individual dialog view classes.
+these constants is documented in higher-level modules such as 
+L<TDialog|TUI::Dialogs::Dialog>, and the individual dialog view classes.
 
 =head1 CONSTANTS
 
@@ -231,11 +232,11 @@ C<:all> - import all constants
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs>,
-L<TUI::Dialogs::Dialog>,
-L<TUI::Dialogs::Button>,
-L<TUI::Dialogs::InputLine>,
-L<TUI::Dialogs::History>
+L<Dialogs|TUI::Dialogs>,
+L<TDialog|TUI::Dialogs::Dialog>,
+L<TButton|TUI::Dialogs::Button>,
+L<TInputLine|TUI::Dialogs::InputLine>,
+L<THistory|TUI::Dialogs::History>
 
 =head1 AUTHORS
 

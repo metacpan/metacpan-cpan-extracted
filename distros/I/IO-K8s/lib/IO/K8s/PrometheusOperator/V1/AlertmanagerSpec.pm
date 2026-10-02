@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::AlertmanagerSpec;
 # ABSTRACT: spec defines the specification of the desired behavior of the Alertmanager cluster.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s additionalArgs                       => ['+IO::K8s::PrometheusOperator::V1::Argument'];
@@ -144,7 +144,7 @@ IO::K8s::PrometheusOperator::V1::AlertmanagerSpec - spec defines the specificati
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 additionalArgs
 

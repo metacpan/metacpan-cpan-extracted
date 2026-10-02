@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ShardStatus;
 # ABSTRACT: ShardStatus
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s availableReplicas   => Int, { required => 'schema' };
@@ -28,7 +28,7 @@ IO::K8s::PrometheusOperator::V1::ShardStatus - ShardStatus
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 availableReplicas
 

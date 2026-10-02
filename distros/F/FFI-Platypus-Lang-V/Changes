@@ -1,7 +1,11 @@
 Revision history for FFI-Platypus-Lang-V
 
-0.03      2025-10-05 23:14:05 -0600
-  - Updtes for recent versions of V
+0.04      2026-10-02 03:33:19 -0600
+  - Build V shared libraries with -DNO_EXECUTE_PERMISSION to work around
+    a bug in V 0.4.x (fixed in 0.5) that caused a "Cannot allocate
+    executable pages" abort with -prod on macOS arm64 (gh#6)
+  - Support V 0.5.x: functions must be exported with @[export], and
+    sources may no longer live in a src/ directory (gh#6)
 
 0.02      2024-12-21 04:43:04 -0700
   - Bump required Path::Tiny to 0.130 for ->mkdir

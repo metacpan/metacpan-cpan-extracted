@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +16,7 @@ our @EXPORT = qw(
   new_TScrollBar
 );
 
+use Encode qw( encode );
 use List::Util qw( min max );
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
@@ -51,6 +52,8 @@ extends TView;
 # declare global variables
 our $vChars = "\x1E\x1F\xB1\xFE\xB2";    # cp437: "▲▼░■▒"
 our $hChars = "\x11\x10\xB1\xFE\xB2";    # cp437: "◄►░■▒"
+# our $hChars = encode( cp437 => "◄►░■▒" );
+# our $vChars = encode( cp437 => "▲▼░■▒" );
 
 # public attributes
 has value  => ( is => 'rw', default => 0 );
@@ -484,8 +487,8 @@ scroll bar is created.
 =head2 Commonly Used Features
 
 In everyday code, scroll bars are usually created once and then configured with
-either C<setParams> (single-call setup) or the C<setRange>/C<setStep>/
-C<setValue> trio (incremental setup). After that, application logic mainly
+either L</setParams> (single-call setup) or the L</setRange>/L</setStep>/
+L</setValue> trio (incremental setup). After that, application logic mainly
 reacts to scroll events rather than manipulating internal fields directly.
 
 =head1 VARIABLES
@@ -496,40 +499,36 @@ C<TScrollBar> elements.
 =head2 $vChars
 
 Defines the character set used for vertical scroll bars.
-The default value uses CP437 characters (up, down, track, thumb).
+The default value uses C<CP437> characters (I<Str>): up, down, track, thumb.
 
 =head2 $hChars
 
 Defines the character set used for horizontal scroll bars.
-The default value uses CP437 characters (left, right, track, thumb).
+The default value uses C<CP437> characters (I<Str>): left, right, track, thumb.
 
 =head1 ATTRIBUTES
 
 The following attributes describe the state and behavior of the scroll bar.
 
-=over
-
-=item value
+=head2 value
 
 Current position of the scroll bar (I<Int>).
 
-=item minVal
+=head2 minVal
 
 Lower bound of the scroll bar range (I<Int>).
 
-=item maxVal
+=head2 maxVal
 
 Upper bound of the scroll bar range (I<Int>).
 
-=item pgStep
+=head2 pgStep
 
 Page step size used for page-up and page-down operations (I<Int>).
 
-=item arStep
+=head2 arStep
 
 Arrow step size used for single-step movements (I<Int>).
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -543,7 +542,7 @@ Creates a new scroll bar with the specified bounds.
 
 =item bounds
 
-Bounding rectangle of the scroll bar (I<TRect>).
+Bounding rectangle of the scroll bar (L<TRect|TUI::Objects::Rect>).
 
 =back
 
@@ -553,8 +552,8 @@ Bounding rectangle of the scroll bar (I<TRect>).
 
 Factory-style constructor using positional arguments.
 
-This constructor is equivalent to calling C<new> with the C<bounds> parameter
-and is provided for compatibility with traditional Turbo Vision construction
+This constructor is equivalent to calling C<new> with the $bounds parameter
+and is provided for compatibility with traditional I<Turbo Vision> construction
 patterns.
 
 =head1 METHODS

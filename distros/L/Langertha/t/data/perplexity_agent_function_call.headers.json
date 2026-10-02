@@ -1,0 +1,18 @@
+{
+   "access-control-allow-origin" : "*",
+   "alt-svc" : "h3=\":443\"; ma=86400",
+   "cf-cache-status" : "DYNAMIC",
+   "cf-ray" : "a42dda235de45172-DUS",
+   "connection" : "close",
+   "content-length" : "1409",
+   "content-type" : "application/json",
+   "date" : "Tue, 29 Sep 2026 20:49:03 GMT",
+   "server" : "cloudflare",
+   "server-timing" : "cfCacheStatus;desc=\"DYNAMIC\", cfEdge;dur=95,cfOrigin;dur=1411",
+   "strict-transport-security" : "max-age=15552000; includeSubDomains; preload",
+   "x-ratelimit-limit" : "1",
+   "x-ratelimit-remaining" : "0",
+   "x-ratelimit-reset" : "1790714944",
+   "x-ratelimit-used" : "1",
+   "x-request-id" : "b587721d-74a5-46ea-9167-8c3092b96ed1"
+}

@@ -1,6 +1,6 @@
 package Langertha::Engine::HuggingFace;
 # ABSTRACT: HuggingFace Inference Providers API
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Carp qw( croak );
 use URI;
@@ -26,6 +26,20 @@ sub default_model { croak "".(ref $_[0])." requires model to be set" }
 sub _build_supported_operations {[qw(
   createChatCompletion
 )]}
+
+# The router's chat-completion spec lists tools / tool_choice / tool_prompt but
+# not parallel_tool_calls; whether a backend provider honors it varies. Clear
+# parallel_tool_use (the flag means the wire documents the field); the raw
+# parallel_tool_calls kwarg still reaches a backend that honors it
+# (karr k242, docs only).
+around engine_capabilities => sub {
+  my ( $orig, $self, @rest ) = @_;
+  my $caps = $self->$orig(@rest);
+  delete $caps->{parallel_tool_use};
+  # image_input (k266, ADR 0019): a gateway: the model behind it is unknown to the client, so no claim.
+  delete $caps->{image_input};
+  return $caps;
+};
 
 has hub_url => (
   is => 'ro',
@@ -106,7 +120,7 @@ Langertha::Engine::HuggingFace - HuggingFace Inference Providers API
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 

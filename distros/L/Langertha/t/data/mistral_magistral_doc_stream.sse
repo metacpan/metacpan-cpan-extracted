@@ -1,0 +1,12 @@
+data: {"id":"8e1b1b1c","object":"chat.completion.chunk","created":1759500534,"model":"magistral-medium-latest","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"8e1b1b1c","object":"chat.completion.chunk","created":1759500534,"model":"magistral-medium-latest","choices":[{"index":0,"delta":{"content":[{"type":"thinking","thinking":[{"type":"text","text":"Okay, the user wants 2 + 2. "}]}]},"finish_reason":null}]}
+
+data: {"id":"8e1b1b1c","object":"chat.completion.chunk","created":1759500534,"model":"magistral-medium-latest","choices":[{"index":0,"delta":{"content":[{"type":"thinking","thinking":[{"type":"text","text":"That is 4."}]},{"type":"text","text":"2 + 2"}]},"finish_reason":null}]}
+
+data: {"id":"8e1b1b1c","object":"chat.completion.chunk","created":1759500534,"model":"magistral-medium-latest","choices":[{"index":0,"delta":{"content":" = **4**"},"finish_reason":null}]}
+
+data: {"id":"8e1b1b1c","object":"chat.completion.chunk","created":1759500534,"model":"magistral-medium-latest","choices":[{"index":0,"delta":{"content":""},"finish_reason":"stop"}],"usage":{"prompt_tokens":20,"total_tokens":679,"completion_tokens":659}}
+
+data: [DONE]
+

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::GitlabAuth;
 # ABSTRACT: Auth configures how secret-manager authenticates with a GitLab instance.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s SecretRef => '+IO::K8s::ExternalSecrets::V1::GitlabSecretRef', { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::GitlabAuth - Auth configures how secret-manager au
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 SecretRef
 

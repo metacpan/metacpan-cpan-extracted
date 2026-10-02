@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::RequestLog;
 # ABSTRACT: Decorator handler that writes per-request JSON logs via Knarr::RequestLog
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -58,13 +58,15 @@ async sub handle_chat_f {
     $self->request_log->end_request(
       $handle,
       output => $resp->content,
-      ( $resp->usage ? ( usage => $resp->usage ) : () ),
+      ( $resp->usage         ? ( usage      => $resp->usage )      : () ),
+      ( $resp->has_tool_calls ? ( tool_calls => $resp->tool_calls ) : () ),
     );
     return Future->done($r);
   })->else( sub {
     my ($err) = @_;
     $self->request_log->end_request( $handle, error => "$err" );
-    return Future->fail($err);
+    # The whole failure: a timeout's category rides along (k36).
+    return Future->fail(@_);
   });
 }
 
@@ -87,6 +89,7 @@ async sub handle_stream_f {
   my $closed = 0;
 
   return Langertha::Knarr::Stream->new(
+    upstream => $upstream,
     source => sub {
       $upstream->next_chunk_f->then( sub {
         my ($delta) = @_;
@@ -96,7 +99,15 @@ async sub handle_stream_f {
         }
         unless ( $closed ) {
           $closed = 1;
-          $self->request_log->end_request( $handle, output => $accumulated );
+          # The complete tool calls, known once the stream is exhausted (k19).
+          $self->request_log->end_request(
+            $handle,
+            output => $accumulated,
+            ( $upstream->can('has_tool_calls') && $upstream->has_tool_calls
+                ? ( tool_calls => $upstream->tool_calls ) : () ),
+            ( $upstream->can('usage') && $upstream->usage
+                ? ( usage => $upstream->usage ) : () ),
+          );
         }
         return Future->done(undef);
       })->else( sub {
@@ -105,7 +116,7 @@ async sub handle_stream_f {
           $closed = 1;
           $self->request_log->end_request( $handle, error => "$e" );
         }
-        return Future->fail($e);
+        return Future->fail(@_);
       });
     },
   );
@@ -128,7 +139,7 @@ Langertha::Knarr::Handler::RequestLog - Decorator handler that writes per-reques
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 SYNOPSIS
 

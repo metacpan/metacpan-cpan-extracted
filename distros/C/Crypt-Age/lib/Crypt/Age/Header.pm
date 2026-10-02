@@ -1,6 +1,6 @@
 package Crypt::Age::Header;
 # ABSTRACT: age file header parsing and generation
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moo;
 use Carp qw(croak);
 use Crypt::Misc qw(slow_eq);
@@ -253,8 +253,12 @@ sub parse_from_fh {
     # read the rest of the header
     my (@stanzas, $mac);
     my $n = 0;
-    while (<$fh>) {
-        if (my ($mac64) = m{\A ---\x{20} (\S{43}) \x{0a} \z}mxs) {
+    # A lexical line, never a bare while (<$fh>): that form assigns to the
+    # caller's global $_, and a caller decrypting inside for (@files) has $_
+    # aliased to its own array element -- or to a read-only literal, which
+    # turns the assignment into a die (k49).
+    while (defined(my $line = <$fh>)) {
+        if (my ($mac64) = $line =~ m{\A ---\x{20} (\S{43}) \x{0a} \z}mxs) {
             $bytes .= '---';
             $mac = Crypt::Age::Stanza::decode_base64_no_padding($mac64);
             last;
@@ -298,21 +302,21 @@ sub parse_from_fh {
         # dispatch below. (\S used to stand in for VCHAR here and let every
         # non-whitespace byte through, which is what the test kit's
         # stanza_invalid_character vector caught.)
-        my ($ta) = m{\A ->\x{20} ([\x21-\x7e]+ (?:\x{20}[\x21-\x7e]+)*) \x{0a} \z}mxs
+        my ($ta) = $line =~ m{\A ->\x{20} ([\x21-\x7e]+ (?:\x{20}[\x21-\x7e]+)*) \x{0a} \z}mxs
             or croak "Invalid age stanza #$n start line: expected '-> ' followed"
                 . " by space-separated arguments of printable ASCII (0x21-0x7e)";
 
-        $bytes .= $_;
+        $bytes .= $line;
 
         # Read stanza's body lines
         my $body_b64 = '';
         my $body_completed = 0;
-        while (<$fh>) {
-            $bytes .= $_;
-            chomp;
-            my $len = length($_);
+        while (defined(my $body_line = <$fh>)) {
+            $bytes .= $body_line;
+            chomp $body_line;
+            my $len = length($body_line);
             croak "Invalid age stanza #$n body" if $len > 64;
-            $body_b64 .= $_;
+            $body_b64 .= $body_line;
             if ($len < 64) {
                 $body_completed = 1;
                 last;
@@ -571,7 +575,7 @@ Crypt::Age::Header - age file header parsing and generation
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

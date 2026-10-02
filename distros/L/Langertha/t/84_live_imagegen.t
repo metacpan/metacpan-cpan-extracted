@@ -30,7 +30,7 @@ subtest 'OpenAI image generation via engine' => sub {
 subtest 'ImageGen wrapper with model override' => sub {
   my $ig = Langertha::ImageGen->new(
     engine => $engine,
-    model  => 'dall-e-3',
+    model  => 'gpt-image-2.5-flare',
     size   => '1024x1024',
   );
 
@@ -40,7 +40,7 @@ subtest 'ImageGen wrapper with model override' => sub {
 
   my $img = $images->[0];
   ok($img->{url} || $img->{b64_json}, 'image has url or b64_json');
-  ok($img->{revised_prompt}, 'DALL-E 3 returns revised_prompt') if $img->{revised_prompt};
+  ok($img->{revised_prompt}, 'revised_prompt returned') if $img->{revised_prompt};
   diag "Revised prompt: $img->{revised_prompt}" if $img->{revised_prompt};
 };
 

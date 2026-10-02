@@ -4,9 +4,8 @@ use 5.016;
 use warnings;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.3';
-
-my $CREATED = '2026-08-28';
+our $VERSION = '5.26.4';
+my $CREATED  = '2026-08-28';
 
 # $adb->facet_rules($table_info, @record);
 # ------------------------------------------------

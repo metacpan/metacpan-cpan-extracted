@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ChallengeSpec;
 # ABSTRACT: ChallengeSpec
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s authorizationURL => Str, { required => 'schema' };
@@ -36,7 +36,7 @@ IO::K8s::CertManager::V1::ChallengeSpec - ChallengeSpec
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 authorizationURL
 

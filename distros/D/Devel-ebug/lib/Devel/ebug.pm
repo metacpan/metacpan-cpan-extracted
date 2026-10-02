@@ -16,7 +16,7 @@ use Module::Pluggable require => 1;
 use base qw(Class::Accessor::Chained::Fast);
 
 # ABSTRACT: A simple, extensible Perl debugger
-our $VERSION = '0.67'; # VERSION
+our $VERSION = '0.68'; # VERSION
 
 __PACKAGE__->mk_accessors(qw(
     backend
@@ -250,7 +250,7 @@ Devel::ebug - A simple, extensible Perl debugger
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 SYNOPSIS
 
@@ -817,6 +817,8 @@ Contributors:
 Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
 
 Taisuke Yamada
+
+Richard Leach (HYDAHY)
 
 =head1 COPYRIGHT AND LICENSE
 

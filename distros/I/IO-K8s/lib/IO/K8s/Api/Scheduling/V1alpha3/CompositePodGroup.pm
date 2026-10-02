@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::CompositePodGroup;
 # ABSTRACT: CompositePodGroup represents a runtime instance of pod groups grouped together. CompositePodGroups are created by workload controllers (LWS, JobSet, etc...) from Workload.compositePodGroupTemplates. CompositePodGroup API enablement is toggled by the CompositePodGroup feature gate.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -25,7 +25,7 @@ IO::K8s::Api::Scheduling::V1alpha3::CompositePodGroup - CompositePodGroup repres
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

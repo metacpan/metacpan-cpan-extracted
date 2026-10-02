@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::Engine;
 # ABSTRACT: Knarr handler that proxies directly to a Langertha engine
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -42,17 +42,41 @@ async sub handle_stream_f {
   unless ( _supports_streaming($engine) ) {
     # Engine doesn't support native streaming — fall back to single-chunk.
     my $r = await $self->handle_chat_f($session, $request);
-    return Langertha::Knarr::Stream->from_list( $r->content );
+    my $stream = Langertha::Knarr::Stream->from_list( $r->content );
+    $stream->finish_reason( $r->finish_reason );
+    $stream->tool_calls( $r->tool_calls );
+    $stream->usage( $r->usage ) if $r->usage;
+    $stream->model( $r->model );
+    $stream->upstream_model( $r->upstream_model );
+    return $stream;
   }
 
   return Langertha::Knarr::Stream->from_callback( sub {
-    my ($emit, $done, $fail) = @_;
+    my ($emit, $done, $fail, $finish, $tool_call, $usage, $model) = @_;
     my $cb = sub {
       my ($chunk) = @_;
       my $text = ref $chunk && $chunk->can('content') ? $chunk->content : "$chunk";
       $emit->($text);
+      # Langertha::Stream::Chunk carries the backend's finish_reason on the
+      # terminal chunk; the protocol maps it when it closes the stream.
+      $finish->( $chunk->finish_reason )
+        if ref $chunk && $chunk->can('has_finish_reason') && $chunk->has_finish_reason;
+      # Core assembles streamed tool-call fragments and attaches the finished
+      # Langertha::ToolCall objects to a chunk (Role::Chat::aggregate_tool_calls
+      # collects the same); a core whose parser attaches none yields none. The
+      # protocol emits them when it closes the stream (k19).
+      $tool_call->( @{ $chunk->tool_calls } )
+        if ref $chunk && $chunk->can('has_tool_calls') && $chunk->has_tool_calls;
+      # The token usage rides on a chunk too, cumulative (the last report is
+      # the stream's totals); the protocol puts it on its terminal frames and
+      # the tracing decorator on the generation.
+      $usage->( $chunk->usage )
+        if ref $chunk && $chunk->can('has_usage') && $chunk->has_usage;
+      # The model the backend reports answering with, for the trace.
+      $model->( $chunk->model )
+        if ref $chunk && $chunk->can('has_model') && $chunk->has_model;
     };
-    my $f = $engine->simple_chat_stream_realtime_f( $cb, @{ $request->messages } );
+    my $f = $engine->chat_stream_realtime_f( chunk_callback => $cb, $request->chat_f_args($engine) );
     $f->on_done( $done );
     $f->on_fail( $fail );
     $f->retain;
@@ -85,7 +109,7 @@ Langertha::Knarr::Handler::Engine - Knarr handler that proxies directly to a Lan
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -110,9 +134,9 @@ C<< $engine->chat_f >> with the full set of generation parameters
 (C<tools>, C<tool_choice>, C<response_format>, C<temperature>,
 C<max_tokens>) forwarded from the client request — subject to the
 engine's reported capabilities. Streaming requests use
-C<simple_chat_stream_realtime_f> for native token-by-token delivery;
-engines that don't support streaming fall back to a single-chunk
-emission.
+C<chat_stream_realtime_f> with the same capability-filtered generation
+parameters for native token-by-token delivery; engines that don't
+support streaming fall back to a single-chunk emission.
 
 For routing across multiple engines based on model name, use
 L<Langertha::Knarr::Handler::Router> with a L<Langertha::Knarr::Router>

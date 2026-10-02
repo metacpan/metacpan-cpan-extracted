@@ -1,8 +1,9 @@
 package Langertha::Role::ResponseFormat;
 # ABSTRACT: Role for an engine where you can specify structured output
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose::Role;
 use JSON::MaybeXS qw( decode_json );
+use Encode qw( encode_utf8 );
 
 has response_format => (
   isa => 'HashRef',
@@ -17,7 +18,13 @@ sub decode_loose_json {
 
   my $try = sub {
     my ($s) = @_;
-    my $r = eval { decode_json($s) };
+    # decode_json (the JSON::MaybeXS utf8 variant) expects bytes, but $s reaches
+    # us as a Perl-Unicode string (already-decoded response content). Decoding it
+    # directly dies with "Wide character in subroutine entry" on any non-ASCII
+    # byte, so UTF-8-encode first -- same convention as ToolCall::_args_kwargs
+    # and Role::JSON's decode_json_text. All three strategies route through this
+    # closure, so the fence/substring candidates are encoded here too.
+    my $r = eval { decode_json( encode_utf8($s) ) };
     return $@ ? undef : $r;
   };
 
@@ -35,7 +42,16 @@ sub decode_loose_json {
       return $r;
     }
     while ( length $candidate > 2 ) {
+      my $before = length $candidate;
       $candidate =~ s/\}[^}]*$/\}/ or last;
+      # The substitution collapses trailing junk after the final '}' into that
+      # '}'. When the candidate already ends at '}' (which the greedy capture
+      # above guarantees), it is a no-op that still reports a successful
+      # substitution, so `or last` never fires -- an unbalanced candidate such
+      # as '{{"a":1}' would spin here forever and wedge the async event loop.
+      # Bail the moment the length stops shrinking: the method must terminate
+      # (returning undef), never hang. -- karr k161
+      last unless length $candidate < $before;
       if ( my $r = $try->($candidate) ) {
         return $r;
       }
@@ -60,7 +76,7 @@ Langertha::Role::ResponseFormat - Role for an engine where you can specify struc
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head2 decode_loose_json
 

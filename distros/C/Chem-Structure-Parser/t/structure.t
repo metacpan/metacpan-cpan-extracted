@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # The assembled hash of hashes: chains, residues, atoms, and the numbers that
 # go with them, read from t/data/mini.pdb.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

@@ -1,0 +1,4 @@
+# skills: inside the default: section.
+default:
+  skills: [openai]
+  temperature: 0.4

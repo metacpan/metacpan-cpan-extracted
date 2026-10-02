@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::FrontendTLSConfig;
 # ABSTRACT: Frontend describes TLS config when client connects to Gateway.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s default => '+IO::K8s::GatewayAPI::V1::TLSConfig', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::FrontendTLSConfig - Frontend describes TLS config when 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 default
 

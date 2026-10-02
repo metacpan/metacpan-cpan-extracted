@@ -3,21 +3,32 @@ abstract: 'MCP Server for Kubernetes with RBAC-aware dynamic tools'
 author:
   - 'Torsten Raudssus <torsten@raudssus.de>'
 build_requires:
+  File::Temp: '0'
   Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MCP-K8s
+provides:
+  MCP::K8s:
+    file: lib/MCP/K8s.pm
+    version: '0.003'
+  MCP::K8s::Permissions:
+    file: lib/MCP/K8s/Permissions.pm
+    version: '0.003'
+  MCP::Kubernetes:
+    file: lib/MCP/Kubernetes.pm
+    version: '0.003'
 requires:
-  IO::K8s: '1.002'
+  IO::K8s: '1.109'
   JSON::MaybeXS: '1.002000'
-  Kubernetes::REST: '1.002'
-  MCP: '0.06'
+  Kubernetes::REST: '1.109'
+  MCP: '0.15'
   Moo: '0'
   namespace::clean: '0'
   perl: '5.020'
@@ -25,16 +36,18 @@ resources:
   bugtracker: https://github.com/Getty/p5-mcp-k8s/issues
   homepage: https://github.com/Getty/p5-mcp-k8s
   repository: https://github.com/Getty/p5-mcp-k8s.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
-    version: '5.036000'
+    version: '5.040001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
+          exclude_filename:
+            - .karr
+            - README.md
           exclude_match: []
           include_dotfiles: 1
           prefix: ''
@@ -45,68 +58,96 @@ x_Dist_Zilla:
       name: '@Author::GETTY/Git::GatherDir'
       version: '2.052'
     -
+      class: Dist::Zilla::Plugin::GatherAgentContext
+      name: '@Author::GETTY/GatherAgentContext'
+      version: '0.001'
+    -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '6.032'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: '@Author::GETTY/@Filter/License'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::GETTY/@Filter/Readme'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::GETTY/@Filter/ExtraTests'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::GETTY/@Filter/ExecDir'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::GETTY/@Filter/ShareDir'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::GETTY/@Filter/MakeMaker'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::GETTY/@Filter/Manifest'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::GETTY/@Filter/TestRelease'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::GETTY/@Filter/ConfirmRelease'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
-      version: '6.032'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::LicenseFile
+      name: '@Author::GETTY/LicenseFile'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::GETTY/MetaJSON'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
-      version: '6.032'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@Author::GETTY/Test::ChangesHasContent'
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.037'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000038'
+          version: '0.006'
+      name: '@Author::GETTY/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
@@ -123,10 +164,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: '@Author::GETTY/Prereqs::FromCPANfile'
@@ -222,15 +263,15 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Author::GETTY/@Git::VersionManager/pluginbundle version'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -262,7 +303,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -275,11 +316,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -290,8 +331,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
@@ -300,7 +341,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::GETTY/@Git::VersionManager/NextRelease'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -314,10 +355,11 @@ x_Dist_Zilla:
             - Changes
             - Makefile.PL
           allow_dirty_match:
+            - (?^:^bin/)
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -331,56 +373,64 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@Author::GETTY/Git::Push'
       version: '2.052'
     -
+      class: Dist::Zilla::Plugin::GitHub::CreateRelease
+      name: '@Author::GETTY/GitHub::CreateRelease'
+      version: '0.0012'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.032'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.032'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.037'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.032'
+    version: '6.037'
 x_authority: cpan:GETTY
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

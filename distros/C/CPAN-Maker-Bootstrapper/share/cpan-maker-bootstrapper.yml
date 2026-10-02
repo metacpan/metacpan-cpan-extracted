@@ -31,6 +31,7 @@ options:
 - debug|d
 - dry-run|D
 - file-list|L=s
+- filter=s
 - finalize-annotations|F
 - history!
 - max-diff-files=i

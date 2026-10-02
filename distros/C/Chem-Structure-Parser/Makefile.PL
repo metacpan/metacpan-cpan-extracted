@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.010001;
 use ExtUtils::MakeMaker 6.52;
 
 use Config;
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Chem-Structure-Parser",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Chem::Structure::Parser",
   "PREREQ_PM" => {
     "Exporter" => 0,
@@ -61,7 +61,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.036",
+  "VERSION" => "0.037",
   "test" => {
     "TESTS" => "t/*.t"
   }

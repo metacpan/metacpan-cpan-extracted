@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GithubAccessTokenSpec;
 # ABSTRACT: GithubAccessTokenSpec defines the desired state to generate a GitHub access token.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s appID        => Str, { required => 'schema' };
@@ -30,7 +30,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GithubAccessTokenSpec - GithubAccessTokenSpe
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 appID
 

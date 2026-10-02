@@ -172,8 +172,8 @@ TUI::Drivers::Util - utility functions for keyboard and event handling
 
 =head1 DESCRIPTION
 
-C<TUI::Drivers::Util> provides a collection of low-level helper functions used
-by the TUI::Vision driver and event system.
+This module provides a collection of low-level helper functions used by the 
+L<TUI::Vision> driver and event system.
 
 The functions in this module operate on key codes and character values and are
 used to translate between control, alternate, and normal key representations.
@@ -185,13 +185,13 @@ This module is purely functional and does not define any objects.
 =head2 Commonly Used Features
 
 Typical usage falls into three groups: converting control-key navigation
-shortcuts to arrow/navigation key codes via C<ctrlToArrow()>, translating
-between Alt key codes and characters via C<getAltCode()>/C<getAltChar()>, and
+shortcuts to arrow/navigation key codes via L</ctrlToArrow>, translating
+between Alt key codes and characters via L</getAltCode>/L</getAltChar>, and
 translating between Ctrl key codes and characters via
-C<getCtrlCode()>/C<getCtrlChar()>.
+L</getCtrlCode>/L</getCtrlChar>.
 
-C<cstrlen()> is commonly used when text contains TUI::Vision marker
-characters C<~> and a marker-aware length is needed.
+L</cstrlen> is commonly used when text contains L<TUI::Vision> marker
+characters C<'~'> and a marker-aware length is needed.
 
 =head1 FUNCTIONS
 
@@ -243,7 +243,7 @@ Returns the Ctrl-modified key code corresponding to the given character.
 =head1 SEE ALSO
 
 L<TUI::Drivers::Const>,
-L<TUI::Drivers::Event>
+L<TEvent|TUI::Drivers::Event>
 
 =head1 AUTHORS
 

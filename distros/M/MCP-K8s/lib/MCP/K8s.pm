@@ -1,6 +1,6 @@
 package MCP::K8s;
 # ABSTRACT: MCP Server for Kubernetes with RBAC-aware dynamic tools
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 use MCP::Server;
 extends 'MCP::Server';
@@ -48,6 +48,12 @@ has context_name => (
   is        => 'ro',
   lazy      => 1,
   default   => sub { $ENV{MCP_K8S_CONTEXT} },
+  predicate => 1,
+);
+
+
+has kubeconfig_path => (
+  is        => 'ro',
   predicate => 1,
 );
 
@@ -141,16 +147,23 @@ sub _read_file {
 sub _build_api {
   my ($self) = @_;
 
+  # Materialize the env-backed attributes up-front. The lazy `default`
+  # subs read $ENV{MCP_K8S_TOKEN} / $ENV{MCP_K8S_SERVER}, but `has_token`
+  # and `has_server_endpoint` are still false until the reader is called
+  # once. Gating Tier 1 on the predicates silently skipped Tier 1 when the
+  # token came purely from the environment — see Issue #1.
+  my $token = $self->token;
+
   # Tier 1: Direct token from MCP_K8S_TOKEN
-  if ($self->has_token && defined $self->token && length $self->token) {
-    my $endpoint = ($self->has_server_endpoint && $self->server_endpoint)
-      ? $self->server_endpoint
-      : $IN_CLUSTER_DEFAULT_SERVER;
+  if (defined $token && length $token) {
+    my $endpoint = $self->server_endpoint;
+    $endpoint = $IN_CLUSTER_DEFAULT_SERVER
+      unless defined $endpoint && length $endpoint;
     my %server = (endpoint => $endpoint);
     $server{ssl_ca_file} = $IN_CLUSTER_CA_PATH if -f $IN_CLUSTER_CA_PATH;
     return Kubernetes::REST->new(
       server      => \%server,
-      credentials => { token => $self->token },
+      credentials => { token => $token },
     );
   }
 
@@ -158,9 +171,9 @@ sub _build_api {
   if (-f $IN_CLUSTER_TOKEN_PATH) {
     my $sa_token = $self->_read_file($IN_CLUSTER_TOKEN_PATH);
     if (defined $sa_token && length $sa_token) {
-      my $endpoint = ($self->has_server_endpoint && $self->server_endpoint)
-        ? $self->server_endpoint
-        : $IN_CLUSTER_DEFAULT_SERVER;
+      my $endpoint = $self->server_endpoint;
+      $endpoint = $IN_CLUSTER_DEFAULT_SERVER
+        unless defined $endpoint && length $endpoint;
       my %server = (endpoint => $endpoint);
       $server{ssl_ca_file} = $IN_CLUSTER_CA_PATH if -f $IN_CLUSTER_CA_PATH;
       return Kubernetes::REST->new(
@@ -170,9 +183,21 @@ sub _build_api {
     }
   }
 
-  # Tier 3: Kubeconfig (original behavior)
+  # Tier 3: Kubeconfig. Same predicate-with-lazy-default trap as Tier 1:
+  # `has_context_name` stays false until the reader fires, so an env-only
+  # MCP_K8S_CONTEXT would be silently dropped. Pass the materialized value
+  # through, dropping empty/undef so Kubeconfig keeps its current-context
+  # fallback when nothing is set. kubeconfig_path has no env default, but
+  # the same gate applies: Kubeconfig's own kubeconfig_path default is a
+  # plain (non-lazy) default, so an explicit undef or '' would override
+  # its KUBECONFIG / ~/.kube/config lookup instead of leaving it alone.
+  my $context_name = $self->context_name;
+  my $kubeconfig_path = $self->kubeconfig_path;
   my %kc_args;
-  $kc_args{context_name} = $self->context_name if $self->has_context_name;
+  $kc_args{context_name} = $context_name
+    if defined $context_name && length $context_name;
+  $kc_args{kubeconfig_path} = $kubeconfig_path
+    if defined $kubeconfig_path && length $kubeconfig_path;
   my $kc = Kubernetes::REST::Kubeconfig->new(%kc_args);
   return $kc->api;
 }
@@ -229,7 +254,12 @@ sub _resource_plural {
   # Tier 1: Static map (fast path)
   return $RESOURCE_PLURALS{$resource} if $RESOURCE_PLURALS{$resource};
 
-  # Tier 2: IO::K8s class method (CRD classes like IO::K8s::...)
+  # Tier 2: resource_plural() on the IO::K8s class the Kind resolves to.
+  # Built-in Kinds resolve from the client's built-in map without a request;
+  # an unknown Kind costs the client's aggregated discovery (GET /api, /apis),
+  # which the tool's own API call right after would trigger anyway. A Kind
+  # nothing ships resolves to a fabricated name or IO::K8s::Unstructured,
+  # neither of which can resource_plural, so it falls through to tier 3.
   my $class = eval { $self->api->expand_class($resource) };
   if ($class && $class->can('resource_plural')) {
     my $plural = eval { $class->resource_plural };
@@ -308,6 +338,14 @@ sub _resolve_namespace {
   return $allowed[0] if @allowed == 1;
 
   return undef;
+}
+
+sub _is_conflict_error {
+  my ($self, $err) = @_;
+
+
+  return 0 unless defined $err;
+  return $err =~ /409|AlreadyExists/i ? 1 : 0;
 }
 
 sub _format_resource_summary {
@@ -408,6 +446,14 @@ sub _update_tool_descriptions {
     }
   }
   $self->_descriptions_updated(1);
+}
+
+sub _tools {
+  my ($self, $context) = @_;
+
+
+  $self->_update_tool_descriptions;
+  return $self->SUPER::_tools($context);
 }
 
 
@@ -537,11 +583,19 @@ sub _register_tools {
       if ($output eq 'json') {
         return $self->_to_json($obj->TO_JSON);
       } elsif ($output eq 'yaml') {
-        eval { require YAML::XS };
-        if ($@) {
-          return $self->_to_json($obj->TO_JSON);
+        # IO::K8s::Role::APIObject::to_yaml, not a YAML dump of TO_JSON.
+        # TO_JSON hands out JSON::PP::Boolean objects for every boolean field,
+        # and a generic dumper serialises those as Perl internals —
+        # "hostNetwork: !!perl/scalar:JSON::PP::Boolean 1" instead of
+        # "hostNetwork: true", which kubectl apply rejects. to_yaml runs
+        # YAML::PP with the JSON schema and boolean => 'JSON::PP', which is
+        # what makes the output a manifest.
+        unless ($obj->can('to_yaml')) {
+          return "Cannot render $resource/$name as YAML: " . ref($obj)
+               . " does not implement to_yaml (not a top-level Kubernetes API"
+               . " object). Retry with output 'json'.";
         }
-        return YAML::XS::Dump($obj->TO_JSON);
+        return $obj->to_yaml;
       } else {
         return $self->_to_json($self->_format_resource_summary($obj));
       }
@@ -631,8 +685,15 @@ sub _register_tools {
         },
         patch_type => {
           type        => 'string',
-          description => 'Patch strategy: strategic (default), merge, json',
+          description => 'Patch strategy: strategic (default, merge for status), merge, json',
           enum        => ['strategic', 'merge', 'json'],
+        },
+        subresource => {
+          type        => 'string',
+          description => 'Write to a subresource instead of the main endpoint. '
+            . 'Use "status" for status fields: the API server strips status '
+            . 'from writes to the main endpoint and still answers 2xx.',
+          enum        => ['status'],
         },
       },
       required => ['resource', 'name', 'patch'],
@@ -640,16 +701,34 @@ sub _register_tools {
     code => sub {
       my ($tool, $args) = @_;
 
-      my $resource   = $args->{resource};
-      my $name       = $args->{name};
-      my $ns         = $self->_resolve_namespace($args);
-      my $patch      = $args->{patch};
-      my $patch_type = $args->{patch_type} // 'strategic';
-      my $plural     = $self->_resource_plural($resource);
+      my $resource    = $args->{resource};
+      my $name        = $args->{name};
+      my $ns          = $self->_resolve_namespace($args);
+      my $patch       = $args->{patch};
+      my $subresource = $args->{subresource};
+      my $plural      = $self->_resource_plural($resource);
 
-      unless ($self->permissions->can_do('patch', $plural, $ns // '')) {
-        return "Permission denied: cannot patch $resource" . ($ns ? " in namespace $ns" : "");
+      if (defined $subresource && $subresource ne 'status') {
+        return "Unsupported subresource '$subresource': only 'status' is supported";
       }
+      my $to_status = defined $subresource && $subresource eq 'status';
+
+      # The status subresource is its own RBAC resource: patch on <plural>
+      # does not grant patch on <plural>/status. The plural cache cannot help
+      # here — _discover_resource_plurals skips names containing '/' — so the
+      # subresource is appended to the base plural.
+      my $rbac_resource = $to_status ? "$plural/status" : $plural;
+
+      unless ($self->permissions->can_do('patch', $rbac_resource, $ns // '')) {
+        return "Permission denied: cannot patch "
+          . ($to_status ? "$resource status" : $resource)
+          . ($ns ? " in namespace $ns" : "");
+      }
+
+      # Status writes default to a merge patch: custom resources answer 415 to
+      # a strategic merge patch. An explicit patch_type still wins.
+      my $patch_type = $args->{patch_type}
+        // ($to_status ? 'merge' : 'strategic');
 
       my %api_args = (
         patch => $patch,
@@ -657,13 +736,17 @@ sub _register_tools {
       );
       $api_args{namespace} = $ns if defined $ns;
 
-      my $patched = eval { $self->api->patch($resource, $name, %api_args) };
+      # patch() writes the main endpoint, which silently drops a status stanza
+      # for every resource that has a status subresource.
+      my $method  = $to_status ? 'patch_status' : 'patch';
+      my $patched = eval { $self->api->$method($resource, $name, %api_args) };
       return "Failed to patch $resource/$name: $@" if $@;
 
       return $self->_to_json({
         status => 'patched',
         kind   => $resource,
         name   => $name,
+        ($to_status ? (subresource => 'status') : ()),
         ($ns ? (namespace => $ns) : ()),
       });
     },
@@ -767,22 +850,19 @@ sub _register_tools {
         return "Permission denied: cannot read pod logs in namespace $ns";
       }
 
-      # Build the log URL path directly
-      my $path = "/api/v1/namespaces/$ns/pods/$name/log";
-      my %params;
-      $params{tailLines} = $tail_lines if $tail_lines;
-      $params{container} = $container if $container;
-      $params{previous}  = 'true' if $previous;
+      # Kubernetes::REST's log() builds /api/v1/namespaces/$ns/pods/$name/log
+      # and the query parameters itself. It raises API errors (404, 403, ...)
+      # instead of handing back the response, so the status check lives in the
+      # eval now.
+      my %log_args = (name => $name, namespace => $ns);
+      $log_args{tailLines} = $tail_lines if $tail_lines;
+      $log_args{container} = $container  if $container;
+      $log_args{previous}  = 1           if $previous;
 
-      my $response = eval { $self->api->_request('GET', $path, undef, parameters => \%params) };
+      my $content = eval { $self->api->log('Pod', %log_args) };
       return "Failed to get logs for pod/$name: $@" if $@;
 
-      if ($response->status >= 400) {
-        return "Error getting logs: " . $response->status . " " . ($response->content // '');
-      }
-
-      my $content = $response->content // '';
-      return $content || "(no log output)";
+      return ($content // '') || "(no log output)";
     },
   ), 'Get pod logs. Available in namespaces: ', '_logs'];
 
@@ -980,7 +1060,7 @@ sub _register_tools {
 
         # If 409 Conflict / AlreadyExists, fall through to patch
         my $err = "$@";
-        unless ($err =~ /409|AlreadyExists/i) {
+        unless ($self->_is_conflict_error($err)) {
           return "Failed to create $resource: $err";
         }
       }
@@ -1016,6 +1096,7 @@ sub run_stdio {
 
 
   $self = $self->new unless ref $self;
+  # Not redundant with the _tools override: fails fast before to_stdio.
   $self->_update_tool_descriptions;
   $self->to_stdio;
 }
@@ -1034,7 +1115,7 @@ MCP::K8s - MCP Server for Kubernetes with RBAC-aware dynamic tools
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -1065,6 +1146,12 @@ version 0.002
   );
   $k8s->to_stdio;
 
+  # Embedded, with a kubeconfig outside the default location:
+  my $k8s = MCP::K8s->new(
+    kubeconfig_path => '/etc/myapp/clusters/prod/kubeconfig',
+    context_name    => 'prod',
+  );
+
 =head1 DESCRIPTION
 
 MCP::K8s provides an MCP (Model Context Protocol) server that gives AI
@@ -1080,13 +1167,13 @@ namespaces available, so the LLM always knows exactly what it can do.
 
 =over 4
 
-=item 1. B<Connect> — Authenticates via direct token, in-cluster service account, or kubeconfig
+=item 1. B<Register> — Registers the MCP tools at construction; no cluster connection needed yet
 
-=item 2. B<Discover> — Submits C<SelfSubjectRulesReview> requests to discover RBAC permissions per namespace
+=item 2. B<Connect> — On the first request, authenticates via direct token, in-cluster service account, or kubeconfig
 
-=item 3. B<Register> — Creates MCP tools with dynamic descriptions reflecting actual permissions
+=item 3. B<Discover> — Submits C<SelfSubjectRulesReview> requests to discover RBAC permissions per namespace, then rewrites the tool descriptions to reflect them
 
-=item 4. B<Serve> — Runs the MCP protocol over stdio, checking permissions on every tool call
+=item 4. B<Serve> — Answers MCP requests over any transport (stdio, HTTP, embedded via L<Net::Async::MCP>), checking permissions on every tool call
 
 =back
 
@@ -1106,6 +1193,18 @@ and L<MCP::Server> (protocol implementation).
 
 Optional. Kubeconfig context name to use. Read from C<$ENV{MCP_K8S_CONTEXT}>
 by default. If not set, the kubeconfig's C<current-context> is used.
+
+=head2 kubeconfig_path
+
+Optional. Path to the kubeconfig file used by the kubeconfig auth tier,
+passed through to L<Kubernetes::REST::Kubeconfig/kubeconfig_path>. For an
+embedder that keeps its kubeconfigs outside the default location: with a
+same-named context in C<~/.kube/config>, only the explicit path tells the
+two apart. Accepts whatever Kubeconfig accepts there — a single path, a
+C<KUBECONFIG>-style path list, or an arrayref. Not read from the
+environment; if not set, Kubeconfig does its own lookup
+(C<$ENV{KUBECONFIG}>, then C<~/.kube/config>). Has no effect when
+L</token> or the in-cluster service account engages an earlier tier.
 
 =head2 token
 
@@ -1130,7 +1229,9 @@ ArrayRef of namespace names to operate on. Configured via:
 
 =item * Auto-discovery — lists all namespaces from the cluster
 
-=item * Fallback — C<['default']> if discovery fails
+=item * In-cluster fallback — the service account's mounted namespace, if listing fails
+
+=item * Fallback — C<['default']> if discovery fails outside a cluster
 
 =back
 
@@ -1168,7 +1269,8 @@ lookup:
 
 =item 1. Static C<%RESOURCE_PLURALS> map (fast, zero-cost)
 
-=item 2. C<IO::K8s> class C<resource_plural()> method (supports CRDs like Cilium)
+=item 2. C<resource_plural()> on the L<IO::K8s> class the Kind resolves to
+via the client's C<expand_class>
 
 =item 3. API server discovery cache (lazy, one-time query)
 
@@ -1176,13 +1278,28 @@ lookup:
 
 =back
 
+Tier 2 answers every built-in Kind: L<IO::K8s> carries the upstream plurals
+on its classes, and L<Kubernetes::REST>'s C<expand_class> resolves a name its
+built-in map knows without a request, even when C<resource_map_from_cluster>
+is set. It also answers for a CRD provider's class registered with the
+client, which brings its own C<resource_plural()>.
+
+For a Kind nothing ships, C<expand_class> consults the client's aggregated
+discovery (C<GET /api>, C<GET /apis>) — the same resolution the tool's own
+API call does right after, so this tier moves that cost rather than adding
+it. Such a Kind resolves to L<IO::K8s::Unstructured> or to a class name that
+does not load; neither has C<resource_plural()>, so the lookup falls through.
+
+Tier 3 is therefore the source for CRDs without a class: it asks C</api/v1>
+and C</apis> and gets back the plurals the API server itself uses.
+
 =head2 _discover_resource_plurals
 
   $self->_discover_resource_plurals;
 
 Query the API server's discovery endpoints (C</api/v1> and C</apis>) to
 build a Kind-to-plural mapping. Results are cached in
-L</_resource_plurals_cache>. Failures are silently ignored — the cache
+C<_resource_plurals_cache>. Failures are silently ignored — the cache
 simply remains empty and callers fall through to heuristic pluralization.
 
 =head2 _resolve_namespace
@@ -1193,6 +1310,29 @@ Resolve the namespace for a tool call. If C<< $args->{namespace} >> is
 provided, uses that. Otherwise, if only one namespace is accessible,
 auto-fills it. Returns C<undef> if the namespace cannot be determined
 (the tool should handle this case).
+
+=head2 _is_conflict_error
+
+  if ($self->_is_conflict_error("$@")) { ... }
+
+Decide whether a failed C<create> failed because the resource already
+exists (HTTP 409 / C<AlreadyExists>), which is the signal for
+L</k8s_apply> to fall back to a patch.
+
+This is a string match, deliberately. L<Kubernetes::REST> 1.108 does not
+raise a typed exception for API errors: C<create> runs the response
+through C<_check_response>, which C<croak>s with
+
+  Kubernetes API error (create <class>): <status> <body>
+
+C<Kubernetes::REST::Error> and C<Kubernetes::REST::RemoteError> still
+exist, but only as compatibility helpers for the deprecated v0 API — no
+code path in 1.108 throws them, so there is no C<< ->code >> to check.
+The match stays wide (status code B<or> C<reason>) so that it survives a
+reworded error as long as either token is still in it; narrowing it to
+the exact croak format above would trade one fragility for a worse one.
+
+Revisit when the client grows typed errors.
 
 =head2 _format_resource_summary
 
@@ -1212,6 +1352,23 @@ tool with C<output =E<gt> 'json'> should be used.
 
 Format an arrayref of L<IO::K8s> objects into an arrayref of summary
 hashrefs using L</_format_resource_summary>.
+
+=head2 _tools
+
+Override of L<MCP::Server/_tools>. Enriches the tool descriptions with the
+discovered RBAC permissions before handing the list to the caller, then
+defers to the parent implementation.
+
+C<_tools> is the single funnel every transport passes through for
+C<tools/list> (and C<tools/call>), so this is the one place that covers
+stdio, the inherited HTTP transport, and an embedded server driven through
+L<Net::Async::MCP> alike. Hooking anywhere else — as C<run_stdio> alone
+used to — leaves every other path serving the static descriptions, and the
+descriptions are what tell the LLM which resources exist per namespace.
+
+Discovery stays lazy: the first C<< ->api >> access happens here, on the first
+request, not in C<BUILD>. C<_update_tool_descriptions> is idempotent via
+its own guard, so the per-request cost after the first one is a boolean.
 
 =head1 MCP TOOLS
 
@@ -1301,11 +1458,25 @@ B<Parameters:>
 
 =item C<namespace> (string) — Target namespace
 
-=item C<patch_type> (string) — Strategy: C<strategic> (default), C<merge>, or C<json>
+=item C<patch_type> (string) — Strategy: C<strategic> (default; C<merge> with C<subresource>), C<merge>, or C<json>
+
+=item C<subresource> (string) — C<status> to write the status subresource
 
 =back
 
 See L<Kubernetes::REST/patch> for details on patch strategies.
+
+B<Status writes need C<< subresource => 'status' >>.> Once a resource has a
+status subresource — every CRD declaring one, plus the built-ins that always
+had one — the API server strips C<status> from any write to the main endpoint
+and still answers 2xx. Without this parameter the patch reports success and
+stores nothing. With it, the call goes to L<Kubernetes::REST/patch_status>,
+which addresses C</status>, and the patch type defaults to C<merge> rather
+than C<strategic>, because custom resources answer a strategic merge patch
+with 415. An explicit C<patch_type> still wins.
+
+The status subresource is a separate resource in RBAC as well: this path
+requires C<patch> on C<< <plural>/status >>, not on C<< <plural> >>.
 
 =head2 k8s_delete
 
@@ -1325,8 +1496,8 @@ B<Parameters:>
 
 =head2 k8s_logs
 
-Get container logs from a pod. Essential for debugging. Uses the raw
-C</api/v1/namespaces/{ns}/pods/{name}/log> endpoint.
+Get container logs from a pod. Essential for debugging. Reads the pod's
+C<log> subresource through L<Kubernetes::REST>'s C<log()>.
 
 B<Parameters:>
 
@@ -1414,6 +1585,12 @@ Start the MCP server on stdio. If called as a class method, creates a
 new instance first. This is the main entry point used by the C<mcp-k8s>
 script.
 
+Discovery is run here, before the transport starts. L</_tools> would do it
+on the first C<tools/list> anyway, so this is not what makes the
+descriptions correct — it is what makes an unreachable cluster fail at
+process start, on stderr, instead of turning into a JSON-RPC internal error
+once a client is already attached.
+
 =head1 ENVIRONMENT
 
 =over 4
@@ -1455,7 +1632,7 @@ MCP::K8s supports three authentication methods, tried in order:
 
 =item 2. B<In-cluster> — Auto-detected when running as a Kubernetes pod (reads mounted service account token from C</var/run/secrets/kubernetes.io/serviceaccount/token>)
 
-=item 3. B<Kubeconfig> — Reads C<~/.kube/config> (or C<$KUBECONFIG>), optionally filtered by C<MCP_K8S_CONTEXT>
+=item 3. B<Kubeconfig> — Reads C<~/.kube/config> (or C<$KUBECONFIG>), optionally filtered by C<MCP_K8S_CONTEXT>. An embedder names a specific file with the L</kubeconfig_path> constructor argument.
 
 =back
 

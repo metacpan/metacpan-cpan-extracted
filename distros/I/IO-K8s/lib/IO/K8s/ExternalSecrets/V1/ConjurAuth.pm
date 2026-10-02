@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::ConjurAuth;
 # ABSTRACT: Defines authentication settings for connecting to Conjur.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apikey => '+IO::K8s::ExternalSecrets::V1::ConjurAPIKey';
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::ConjurAuth - Defines authentication settings for c
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apikey
 

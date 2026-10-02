@@ -7,6 +7,7 @@ use warnings;
 use Test2::Bundle::More;
 
 use Langertha::Chat;
+use Langertha::Response;
 
 # --- Mock request/response/engine ---
 
@@ -17,12 +18,24 @@ use Langertha::Chat;
     bless \%args, $class;
   }
   sub response_call { $_[0]->{response_call} }
+  # The raw wire body the mock provider answers with. MockUserAgent sends it
+  # back as a real JSON HTTP::Response, so the tool loops decode, hand to the
+  # plugins and parse it as they do a real reply (karr #81, k347).
+  sub wire_body { $_[0]->{wire_body} }
 }
 
 {
   package MockUserAgent;
+  use HTTP::Response;
+  use JSON::MaybeXS ();
   sub new { bless {}, $_[0] }
-  sub request { 'fake_http_response' }
+  sub request {
+    my ($self, $request) = @_;
+    return HTTP::Response->new( 200, 'OK', [ 'Content-Type' => 'application/json' ],
+      JSON::MaybeXS->new( utf8 => 1 )->encode( $request->wire_body ) )
+      if ref $request && $request->can('wire_body') && $request->wire_body;
+    return 'fake_http_response';
+  }
 }
 
 {
@@ -380,6 +393,7 @@ subtest 'Chat with system_prompt + plugin injection — both present' => sub {
     my $resp_data = shift @{$self->_response_queue} // { final_text => 'done' };
     return MockChatRequest->new(
       response_call => sub { $resp_data },
+      wire_body     => $resp_data,
     );
   }
 
@@ -429,9 +443,32 @@ subtest 'Chat with system_prompt + plugin injection — both present' => sub {
   }
 
   sub parse_response {
-    my ($self, $data) = @_;
-    return $data;  # already parsed in our mock
+    my ($self, $http_response) = @_;
+    return $self->json->decode($http_response->content);
   }
+
+  # This mock's wire: final_text plus a tool_calls list of { name, input }.
+  sub chat_response {
+    my ($self, $http_response) = @_;
+    my $data = $self->parse_response($http_response);
+    return Langertha::Response->new(
+      content    => $data->{final_text} // '',
+      raw        => $data,
+      tool_calls => [ map { { name => $_->{name}, arguments => $_->{input} // {} } }
+        @{ $data->{tool_calls} // [] } ],
+    );
+  }
+  sub tool_wire_format { 'mock' }
+
+  # The loop helpers are the real ones from Role::Tools, not copies, so the
+  # Chat loops are tested with what they really run (k347).
+  sub tool_loop_response      { Langertha::Role::Tools::tool_loop_response(@_) }
+  sub _tool_loop_block_reason { Langertha::Role::Tools::_tool_loop_block_reason(@_) }
+  sub _chat_response_from_data { Langertha::Role::Tools::_chat_response_from_data(@_) }
+  sub _hermes_lift            { Langertha::Role::Tools::_hermes_lift(@_) }
+  sub tool_loop_calls         { Langertha::Role::Tools::tool_loop_calls(@_) }
+  sub _tool_loop_tools        { Langertha::Role::Tools::_tool_loop_tools(@_) }
+  sub _langertha_carp { Carp::carp($_[1]) }
 
   sub think_tag_filter { 0 }
   sub json { JSON::MaybeXS->new(utf8 => 1) }

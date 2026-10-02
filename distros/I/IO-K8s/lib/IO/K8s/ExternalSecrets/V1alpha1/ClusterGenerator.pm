@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ClusterGenerator;
 # ABSTRACT: ClusterGenerator represents a cluster-wide generator which can be referenced as part of `generatorRef` fields.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
     resource_plural => 'clustergenerators',
@@ -23,7 +23,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ClusterGenerator - ClusterGenerator represen
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

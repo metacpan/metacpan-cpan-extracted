@@ -1,6 +1,6 @@
 package Langertha::Role::ResponseSize;
 # ABSTRACT: Role for an engine where you can specify the response size (in tokens)
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose::Role;
 
 has response_size => (
@@ -13,8 +13,31 @@ has response_size => (
 sub get_response_size {
   my ( $self ) = @_;
   return $self->response_size if $self->has_response_size;
+  my $model_default = $self->_model_response_size_default;
+  return $model_default if defined $model_default;
   return $self->default_response_size if $self->can('default_response_size');
   return;
+}
+
+
+# Default: no per-model defaults. Engines override with an ordered list of
+# ( $matcher => $tokens ) pairs, matched against chat_model like
+# Role::Capabilities' model_capability_corrections (ADR 0019 k225 Update).
+sub model_response_size_defaults { return () }
+
+sub _model_response_size_default {
+  my ( $self ) = @_;
+  my @defaults = $self->model_response_size_defaults;
+  return unless @defaults && $self->can('chat_model');
+  my $model = $self->chat_model // '';
+  my $size;
+  while ( @defaults >= 2 ) {
+    my ( $matcher, $tokens ) = splice @defaults, 0, 2;
+    my $hit = ref $matcher eq 'Regexp' ? ( $model =~ $matcher )
+            :                            ( $model eq $matcher );
+    $size = $tokens if $hit;   # later matching entries win
+  }
+  return $size;
 }
 
 
@@ -33,7 +56,7 @@ Langertha::Role::ResponseSize - Role for an engine where you can specify the res
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head2 response_size
 
@@ -46,7 +69,23 @@ parameter from the request.
     my $size = $engine->get_response_size;
 
 Returns the effective response size: the explicit C<response_size> if set,
-otherwise the engine's C<default_response_size>, otherwise C<undef>.
+otherwise the per-model default from L</model_response_size_defaults> for the
+current C<chat_model>, otherwise the engine's C<default_response_size>,
+otherwise C<undef>.
+
+=head2 model_response_size_defaults
+
+    sub model_response_size_defaults {
+      return ( qr/\Akimi-k3(?!\d)/ => 16000 );
+    }
+
+Per-model default response size, used only when the caller set no
+C<response_size>. Returns an B<ordered> list of C<< ( $matcher => $tokens ) >>
+pairs; C<$matcher> is an exact model id (C<eq>) or a C<qr//> matched against
+C<chat_model>, and later matching entries win. A matching entry replaces the
+engine's C<default_response_size> for that model; it never overrides an
+explicit C<response_size> or a per-request C<max_tokens>. The default returns
+an empty list.
 
 =head1 SEE ALSO
 

@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS usage_events (
   provider TEXT,
   engine TEXT,
   model TEXT,
+  requested_model TEXT,
   node_id TEXT,
   route_url TEXT,
   status_code INTEGER,
@@ -16,10 +17,15 @@ CREATE TABLE IF NOT EXISTS usage_events (
   input_tokens INTEGER NOT NULL DEFAULT 0,
   output_tokens INTEGER NOT NULL DEFAULT 0,
   total_tokens INTEGER NOT NULL DEFAULT 0,
+  cached_tokens INTEGER,
+  cache_write_tokens INTEGER,
+  content_bytes INTEGER,
   tool_calls INTEGER NOT NULL DEFAULT 0,
   cost_input_usd REAL NOT NULL DEFAULT 0,
   cost_output_usd REAL NOT NULL DEFAULT 0,
   cost_total_usd REAL NOT NULL DEFAULT 0,
+  cost_cache_read_usd REAL,
+  cost_cache_write_usd REAL,
   error_type TEXT,
   error_message TEXT
 );
@@ -27,3 +33,4 @@ CREATE TABLE IF NOT EXISTS usage_events (
 CREATE INDEX IF NOT EXISTS usage_events_created_at_idx ON usage_events(created_at);
 CREATE INDEX IF NOT EXISTS usage_events_api_key_id_idx ON usage_events(api_key_id);
 CREATE INDEX IF NOT EXISTS usage_events_model_idx ON usage_events(model);
+CREATE INDEX IF NOT EXISTS usage_events_requested_model_idx ON usage_events(requested_model);

@@ -1,11 +1,14 @@
 package Langertha::Role::Langfuse;
 # ABSTRACT: Langfuse observability integration
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose::Role;
 use Time::HiRes qw( gettimeofday tv_interval );
 use Carp qw( croak );
-use JSON::MaybeXS ();
+use JSON::MaybeXS qw( JSON );
 use MIME::Base64 qw( encode_base64 );
+use Scalar::Util qw( blessed );
+use Future;
+use Future::AsyncAwait;
 
 
 has langfuse_public_key => (
@@ -62,6 +65,29 @@ has _langfuse_batch => (
   default => sub { [] },
 );
 
+has langfuse_max_batch => (
+  is => 'ro',
+  isa => 'Int',
+  default => 1000,
+);
+
+
+# Every event goes through here so the batch stays bounded (karr k305).
+sub _langfuse_push {
+  my ( $self, $event ) = @_;
+  my $batch = $self->_langfuse_batch;
+  push @$batch, $event;
+  my $max = $self->langfuse_max_batch;
+  if ( $max > 0 && @$batch > $max ) {
+    splice @$batch, 0, @$batch - $max;
+    unless ( $self->{_langfuse_overflow_warned}++ ) {
+      warn ref($self) . ": Langfuse batch reached langfuse_max_batch ($max events) "
+         . "without a flush; dropping the oldest events. Call langfuse_flush regularly.\n";
+    }
+  }
+  return;
+}
+
 sub _langfuse_id {
   my ( $self ) = @_;
   # Simple UUID v4 generation without external dependency
@@ -75,7 +101,7 @@ sub _langfuse_id {
   );
 }
 
-sub _langfuse_timestamp {
+sub langfuse_timestamp {
   my ( $self ) = @_;
   my ($s, $us) = gettimeofday;
   my @t = gmtime($s);
@@ -83,11 +109,15 @@ sub _langfuse_timestamp {
     $t[5]+1900, $t[4]+1, $t[3], $t[2], $t[1], $t[0], int($us/1000));
 }
 
+
+# Private alias kept for existing callers; the internal call sites use it too.
+sub _langfuse_timestamp { $_[0]->langfuse_timestamp }
+
 sub langfuse_trace {
   my ( $self, %opts ) = @_;
   return unless $self->langfuse_enabled;
   my $id = $opts{id} || $self->_langfuse_id;
-  push @{$self->_langfuse_batch}, {
+  $self->_langfuse_push({
     id   => $self->_langfuse_id,
     type => 'trace-create',
     timestamp => $self->_langfuse_timestamp,
@@ -103,10 +133,10 @@ sub langfuse_trace {
       $opts{release}     ? ( release     => $opts{release} )     : (),
       $opts{version}     ? ( version     => $opts{version} )     : (),
       defined $opts{public}
-        ? ( public => $opts{public} ? JSON::MaybeXS->true : JSON::MaybeXS->false ) : (),
+        ? ( public => $opts{public} ? JSON->true : JSON->false ) : (),
       $opts{environment} ? ( environment => $opts{environment} ) : (),
     },
-  };
+  });
   return $id;
 }
 
@@ -115,7 +145,7 @@ sub langfuse_generation {
   my ( $self, %opts ) = @_;
   return unless $self->langfuse_enabled;
   my $id = $opts{id} || $self->_langfuse_id;
-  push @{$self->_langfuse_batch}, {
+  $self->_langfuse_push({
     id   => $self->_langfuse_id,
     type => 'generation-create',
     timestamp => $self->_langfuse_timestamp,
@@ -140,7 +170,7 @@ sub langfuse_generation {
       $opts{status_message} ? ( statusMessage  => $opts{status_message} ) : (),
       $opts{version}        ? ( version        => $opts{version} )        : (),
     },
-  };
+  });
   return $id;
 }
 
@@ -149,7 +179,7 @@ sub langfuse_span {
   my ( $self, %opts ) = @_;
   return unless $self->langfuse_enabled;
   my $id = $opts{id} || $self->_langfuse_id;
-  push @{$self->_langfuse_batch}, {
+  $self->_langfuse_push({
     id   => $self->_langfuse_id,
     type => 'span-create',
     timestamp => $self->_langfuse_timestamp,
@@ -168,7 +198,7 @@ sub langfuse_span {
       $opts{status_message} ? ( statusMessage => $opts{status_message} ) : (),
       $opts{version}        ? ( version       => $opts{version} )        : (),
     },
-  };
+  });
   return $id;
 }
 
@@ -177,7 +207,7 @@ sub langfuse_update_trace {
   my ( $self, %opts ) = @_;
   return unless $self->langfuse_enabled;
   my $id = $opts{id} // croak("langfuse_update_trace requires id");
-  push @{$self->_langfuse_batch}, {
+  $self->_langfuse_push({
     id   => $self->_langfuse_id,
     type => 'trace-create',
     timestamp => $self->_langfuse_timestamp,
@@ -193,10 +223,10 @@ sub langfuse_update_trace {
       $opts{release}     ? ( release     => $opts{release} )     : (),
       $opts{version}     ? ( version     => $opts{version} )     : (),
       defined $opts{public}
-        ? ( public => $opts{public} ? JSON::MaybeXS->true : JSON::MaybeXS->false ) : (),
+        ? ( public => $opts{public} ? JSON->true : JSON->false ) : (),
       $opts{environment} ? ( environment => $opts{environment} ) : (),
     },
-  };
+  });
   return $id;
 }
 
@@ -205,7 +235,7 @@ sub langfuse_update_span {
   my ( $self, %opts ) = @_;
   return unless $self->langfuse_enabled;
   my $id = $opts{id} // croak("langfuse_update_span requires id");
-  push @{$self->_langfuse_batch}, {
+  $self->_langfuse_push({
     id   => $self->_langfuse_id,
     type => 'span-update',
     timestamp => $self->_langfuse_timestamp,
@@ -218,7 +248,7 @@ sub langfuse_update_span {
       $opts{level}          ? ( level         => $opts{level} )          : (),
       $opts{status_message} ? ( statusMessage => $opts{status_message} ) : (),
     },
-  };
+  });
   return $id;
 }
 
@@ -227,7 +257,7 @@ sub langfuse_update_generation {
   my ( $self, %opts ) = @_;
   return unless $self->langfuse_enabled;
   my $id = $opts{id} // croak("langfuse_update_generation requires id");
-  push @{$self->_langfuse_batch}, {
+  $self->_langfuse_push({
     id   => $self->_langfuse_id,
     type => 'generation-update',
     timestamp => $self->_langfuse_timestamp,
@@ -243,59 +273,184 @@ sub langfuse_update_generation {
       defined $opts{completion_start_time}
         ? ( completionStartTime => $opts{completion_start_time} ) : (),
     },
-  };
+  });
   return $id;
 }
 
 
-sub langfuse_flush {
-  my ( $self ) = @_;
-  return unless $self->langfuse_enabled;
-  my $batch = $self->_langfuse_batch;
-  return unless @$batch;
+has langfuse_timeout => (
+  is => 'ro',
+  isa => 'Num',
+  default => 10,
+);
 
-  require LWP::UserAgent;
-  my $ua = LWP::UserAgent->new(agent => 'Langertha-Langfuse/'.$VERSION);
 
-  my $auth = encode_base64(
-    $self->langfuse_public_key . ':' . $self->langfuse_secret_key, ''
-  );
+has langfuse_flush_batch_size => (
+  is => 'ro',
+  isa => 'Int',
+  default => 100,
+);
 
-  my $body = $self->json->encode({ batch => $batch });
 
-  my $request = HTTP::Request->new(
-    POST => $self->langfuse_url . '/api/public/ingestion',
+# --- Ingestion transport (karr k303) -----------------------------------------
+# The helpers below use no engine state and are called as class methods, so
+# Langertha::Plugin::Langfuse shares them instead of carrying a copy.
+
+sub _langfuse_ingestion_request {
+  my ( $class, %args ) = @_;
+  require HTTP::Request;
+  my $auth = encode_base64( $args{public_key} . ':' . $args{secret_key}, '' );
+  return HTTP::Request->new(
+    POST => $args{url} . '/api/public/ingestion',
     [
       'Content-Type'  => 'application/json',
       'Authorization' => 'Basic ' . $auth,
     ],
-    $body,
+    $args{json}->encode({ batch => $args{events} }),
   );
+}
 
-  my $response = $ua->request($request);
-  $self->_langfuse_batch([]);
-
-  unless ($response->is_success) {
-    warn "Langfuse ingestion failed: " . $response->status_line;
+# Sends @{$args{chunks}} one request after another and returns a Future of
+# the responses; it never fails. $args{engine} (anything with
+# _async_do_request_f) carries the request on its async backend with the
+# short timeout; without one, or when that backend is the synchronous LWP
+# shim (whose user agent has the provider's timeout), a dedicated LWP agent
+# with the short timeout does. A transport failure (timeout, refused) stops
+# the flush: the remaining chunks would only wait out the same timeout.
+async sub _langfuse_send_chunks_f {
+  my ( $class, %args ) = @_;
+  my @chunks = @{ $args{chunks} };
+  my @responses;
+  while ( my $chunk = shift @chunks ) {
+    my $request  = $class->_langfuse_ingestion_request( %args, events => $chunk );
+    my $response = await $class->_langfuse_send_f( $args{engine}, $request, %args );
+    push @responses, $response;
+    $class->_langfuse_check_ingestion( $response, scalar @$chunk );
+    if ( @chunks && ( $response->header('Client-Warning') // '' ) eq 'Internal response' ) {
+      my $dropped = 0;
+      $dropped += @$_ for @chunks;
+      warn "Langfuse ingestion: endpoint unreachable, dropping $dropped more event(s)\n";
+      last;
+    }
   }
+  return @responses;
+}
 
-  return $response;
+sub _langfuse_send_f {
+  my ( $class, $engine, $request, %args ) = @_;
+  my $http = $engine ? $engine->_async_http : undef;
+  unless ( blessed($http) && !$http->isa('Langertha::Request::SyncHTTP') ) {
+    require LWP::UserAgent;
+    my $ua = LWP::UserAgent->new( agent => $args{agent}, timeout => $args{timeout} );
+    return Future->done( $ua->request($request) );
+  }
+  return $engine->_async_do_request_f( request => $request, timeout => $args{timeout} )
+    ->else( sub {
+      my ( $message ) = @_;
+      $message = ( split /\n/, "$message" )[0] // 'request failed';
+      # Same shape LWP gives a transport failure, so both paths report alike.
+      require HTTP::Response;
+      return Future->done( HTTP::Response->new(
+        500, $message, [ 'Client-Warning' => 'Internal response' ],
+      ) );
+    } );
+}
+
+# Warns about what did not arrive; never dies. Langfuse answers a batch with
+# 207 Multi-Status, listing per-event failures under "errors".
+sub _langfuse_check_ingestion {
+  my ( $class, $response, $count ) = @_;
+  unless ( $response->is_success ) {
+    warn "Langfuse ingestion failed: " . $response->status_line . " ($count event(s) lost)\n";
+    return;
+  }
+  return unless $response->code == 207;
+  my $data = eval { JSON::MaybeXS->new( utf8 => 1 )->decode( $response->content ) };
+  my $errors = ref $data eq 'HASH' && ref $data->{errors} eq 'ARRAY' ? $data->{errors} : [];
+  return unless @$errors;
+  my $first  = ref $errors->[0] eq 'HASH' ? $errors->[0] : {};
+  my $detail = join ' ', grep { defined && !ref && length } @{$first}{qw( status message )};
+  warn sprintf "Langfuse ingestion: %d of %d event(s) rejected%s\n",
+    scalar @$errors, $count, length $detail ? " (first: $detail)" : '';
+  return;
+}
+
+sub _langfuse_flush_args {
+  my ( $self ) = @_;
+  my @events = @{ $self->_langfuse_batch };
+  return unless @events;
+  $self->_langfuse_batch([]);
+  my $size = $self->langfuse_flush_batch_size;
+  $size = 1 if $size < 1;
+  my @chunks;
+  push @chunks, [ splice @events, 0, $size ] while @events;
+  return (
+    chunks     => \@chunks,
+    url        => $self->langfuse_url,
+    public_key => $self->langfuse_public_key,
+    secret_key => $self->langfuse_secret_key,
+    json       => $self->json,
+    agent      => 'Langertha-Langfuse/' . $VERSION,
+    timeout    => $self->langfuse_timeout,
+  );
+}
+
+sub langfuse_flush {
+  my ( $self ) = @_;
+  return unless $self->langfuse_enabled;
+  my %args = $self->_langfuse_flush_args or return;
+  my @responses = __PACKAGE__->_langfuse_send_chunks_f(%args)->get;
+  return $responses[-1];
+}
+
+
+async sub langfuse_flush_f {
+  my ( $self ) = @_;
+  return unless $self->langfuse_enabled;
+  my %args = $self->_langfuse_flush_args or return;
+  return await __PACKAGE__->_langfuse_send_chunks_f( %args, engine => $self );
 }
 
 
 # Auto-instrumentation: wraps simple_chat to record a trace and generation
 # for every call when Langfuse is enabled.
 
+# Returns an ISO-8601 timestamp (UTC, ms resolution) at
+# $start_hires + $delta_seconds. Used to compute endTime /
+# completionStartTime from a client-measured total_seconds / ttft_seconds
+# carried on a Langertha::Response, anchored to the moment the simple_chat
+# wrapper entered — not to wall-clock now, which has already advanced
+# past end. Sub-millisecond precision in the underlying hires time is
+# rounded to whole milliseconds to match the rest of Langfuse timestamp
+# formatting.
+sub _langfuse_iso_after {
+  my ( $self, $start_hires, $delta_seconds ) = @_;
+  # Guard against clock skew / monotonic drift producing a negative delta
+  # (Perl's % preserves sign on negatives, which would yield a negative $us
+  # and an out-of-range millisecond field below). Clamp to zero — better
+  # to report a same-instant end_time than a wall-clock trip into the past.
+  $delta_seconds = 0 if $delta_seconds < 0;
+  my ($s, $us) = @$start_hires;
+  my $delta_us = $delta_seconds * 1_000_000;
+  $s += int( ($us + $delta_us) / 1_000_000 );
+  $us = int( ($us + $delta_us) % 1_000_000 );
+  $us = 0 if $us < 0;
+  my @t = gmtime($s);
+  return sprintf("%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
+    $t[5]+1900, $t[4]+1, $t[3], $t[2], $t[1], $t[0], int($us/1000));
+}
+
 around simple_chat => sub {
   my ( $orig, $self, @messages ) = @_;
   return $self->$orig(@messages) unless $self->langfuse_enabled;
 
-  my $t0 = $self->_langfuse_timestamp;
-  my $start = [gettimeofday];
+  my $start      = [gettimeofday];
+  my $start_time = $self->_langfuse_timestamp;
 
   my $response = $self->$orig(@messages);
 
-  my $t1 = $self->_langfuse_timestamp;
+  my $t1        = $self->_langfuse_timestamp;
+  my $end_time  = $t1;
 
   # Build usage from Response if available
   my $usage;
@@ -305,6 +460,21 @@ around simple_chat => sub {
       output => $response->completion_tokens,
       total  => $response->total_tokens,
     };
+  }
+
+  # Prefer response-side timing (carries total_seconds and optionally
+  # ttft_seconds) when available. Both are deltas measured from the
+  # same anchor as our wrapper's $start — anchor end / completion_start
+  # to that anchor so the generation event spans the real call window
+  # rather than drifting into the future.
+  my $completion_start_time;
+  if (ref $response && $response->isa('Langertha::Response')) {
+    if ($response->has_total) {
+      $end_time = $self->_langfuse_iso_after($start, $response->total_seconds);
+    }
+    if ($response->has_ttft) {
+      $completion_start_time = $self->_langfuse_iso_after($start, $response->ttft_seconds);
+    }
   }
 
   my $trace_id = $self->langfuse_trace(
@@ -320,8 +490,9 @@ around simple_chat => sub {
                     ? $response->model : $self->chat_model,
     input      => \@messages,
     output     => "$response",
-    start_time => $t0,
-    end_time   => $t1,
+    start_time => $start_time,
+    end_time   => $end_time,
+    defined $completion_start_time ? ( completion_start_time => $completion_start_time ) : (),
     $usage ? ( usage => $usage ) : (),
   );
 
@@ -343,7 +514,7 @@ Langertha::Role::Langfuse - Langfuse observability integration
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -364,6 +535,9 @@ Then use any engine as normal — C<simple_chat> is auto-traced:
 
     my $response = $engine->simple_chat('Hello!');
     $engine->langfuse_flush;  # send events to Langfuse
+
+    # inside an event loop, without blocking it:
+    await $engine->langfuse_flush_f;
 
 Or pass keys explicitly:
 
@@ -452,6 +626,39 @@ self-hosted instance URL (e.g. C<http://localhost:3000>).
 Bool indicating whether Langfuse integration is active. Lazy — defaults
 to true when both public and secret keys are available (from constructor
 or environment variables).
+
+=head2 langfuse_max_batch
+
+The most events kept in memory between two L</langfuse_flush> calls. Default
+C<1000> (500 traced C<simple_chat> calls, each a trace and a generation). The
+events are only sent when someone flushes, and Langfuse turns on by itself as
+soon as C<LANGFUSE_PUBLIC_KEY> and C<LANGFUSE_SECRET_KEY> are in the
+environment, so a long-running process that never flushes would otherwise
+keep every prompt and answer it ever sent. When the batch is full the
+B<oldest> event is dropped for each new one, with a single warning per engine
+object. C<0> removes the cap.
+
+Nothing is flushed automatically: a flush is an HTTP request, and
+C<simple_chat> should not pay for one at an unpredictable moment. Call
+L</langfuse_flush> (or L</langfuse_flush_f>) yourself, for example after each
+request in a server.
+
+=head2 langfuse_timestamp
+
+    my $t0 = $engine->langfuse_timestamp;   # 2026-09-25T12:34:56.789Z
+    ...
+    $engine->langfuse_span(
+      trace_id   => $trace_id,
+      name       => 'tool: search',
+      start_time => $t0,
+      end_time   => $engine->langfuse_timestamp,
+    );
+
+Returns the current time as an ISO-8601 UTC string with millisecond
+precision (C<YYYY-MM-DDTHH:MM:SS.mmmZ>) — the format this role stamps on
+every Langfuse event. Use it for C<start_time> / C<end_time> when you create
+spans or generations yourself. The older private name C<_langfuse_timestamp>
+still works and returns the same.
 
 =head2 langfuse_trace
 
@@ -550,12 +757,53 @@ and C<output> after the span's work completes.
 Updates an existing generation. C<id> is required. Use this to add
 C<output>, C<usage>, and C<end_time> after the LLM call completes.
 
+=head2 langfuse_timeout
+
+Seconds a flush may wait for Langfuse per request. Default C<10>, deliberately
+short: Langfuse is observability, and an ingestion endpoint that accepts the
+connection and never answers must not hold up the application (LWP's own
+default would be 180 seconds). The engine's
+L<Langertha::Role::HTTP/user_agent_timeout> does not apply here; it is meant
+for the LLM provider. On the L<Net::Async::HTTP> backend it is the total time
+of the request, on the synchronous LWP path the time without activity on the
+connection.
+
+=head2 langfuse_flush_batch_size
+
+The most events sent in one ingestion request. Default C<100>. A flush with
+more events sends several requests one after another, so a large backlog does
+not become one body that Langfuse rejects for its size.
+
 =head2 langfuse_flush
 
     $engine->langfuse_flush;
 
-Sends all batched events to the Langfuse ingestion API. Clears the batch
-after sending. Warns on HTTP errors but does not die.
+Sends all batched events to the Langfuse ingestion API over a dedicated
+L<LWP::UserAgent> with L</langfuse_timeout>, and clears the batch. Blocks
+until the requests are done, so do not call it from inside an event loop;
+use L</langfuse_flush_f> there. More than L</langfuse_flush_batch_size>
+events go out as several requests. Returns the L<HTTP::Response> of the last
+request, or nothing when there was nothing to send.
+
+It never dies. It warns when a request fails (the events of that request are
+lost, and after a timeout or refused connection the rest of the flush is
+dropped too, instead of waiting out the timeout once per request), and when
+Langfuse accepts the request but rejects single events (C<207 Multi-Status>
+with an C<errors> list): the warning gives the number rejected and the first
+error.
+
+=head2 langfuse_flush_f
+
+    await $engine->langfuse_flush_f;
+
+Async L</langfuse_flush>: sends the batched events through the engine's own
+async backend (L<Langertha::Role::AsyncHTTP>) with L</langfuse_timeout> as
+the request's total timeout, so a slow or silent Langfuse never blocks the
+event loop. The batch is taken when the call starts; events recorded while
+it runs wait for the next flush. The future resolves to the
+L<HTTP::Response> of each request and B<never fails>; problems are warned
+about as in L</langfuse_flush>. On the synchronous fallback (no
+L<Net::Async::HTTP>) it runs like L</langfuse_flush>.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -568,6 +816,13 @@ after sending. Warns on HTTP errors but does not die.
 =item C<LANGFUSE_URL> — Auto-populates C<langfuse_url> (default: C<https://cloud.langfuse.com>)
 
 =back
+
+With both keys in the environment every engine records C<simple_chat> calls
+without being asked to, but sends nothing until L</langfuse_flush> is called.
+Events wait in memory up to L</langfuse_max_batch>; past that the oldest are
+dropped with one warning. A process that has the variables set but never
+flushes therefore holds a bounded amount of trace data, not every prompt it
+ever sent.
 
 =head1 SELF-HOSTING LANGFUSE
 

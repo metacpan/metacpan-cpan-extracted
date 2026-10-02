@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::IPAMPoolRequest;
 # ABSTRACT: IPAMPoolRequest
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s needed => '+IO::K8s::Cilium::V2::IPAMPoolDemand';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::IPAMPoolRequest - IPAMPoolRequest
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 needed
 

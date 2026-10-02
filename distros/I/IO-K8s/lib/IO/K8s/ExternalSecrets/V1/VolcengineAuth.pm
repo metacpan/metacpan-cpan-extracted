@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::VolcengineAuth;
 # ABSTRACT: Auth defines the authentication method to use.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s secretRef => '+IO::K8s::ExternalSecrets::V1::VolcengineAuthSecretRef';
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::VolcengineAuth - Auth defines the authentication m
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 secretRef
 

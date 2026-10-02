@@ -956,7 +956,7 @@ sub parse_components_ {
                 )?              # minute is optional
                 (?:
                   :             # separator minute - second
-                  (?<second>\d+)
+                  (?<second>\d+(?:\.\d+)?) # second may have fractional part
                 )?              # second is optional
                 (?:             # start timezone
                   (?<tzutc>Z)   # Z means UTC
@@ -970,7 +970,7 @@ sub parse_components_ {
                     )?          # minute is optional
                     (?:
                       :           # separator timezone minute - second
-                      (?<tzsecond>\d+)
+                      (?<tzsecond>\d+(?:\.\d+)?)
                     )?          # second is optional
                   )             # end numeric timezone
                 )?              # end timezone, timezone is optional
@@ -1023,8 +1023,7 @@ sub components_to_time_and_offset_ {
     return if $@;               # unparseable time
     $has_date = 1;
   } else {
-    $time = $components[3]*3600 + ($components[4] // 0)*60
-      + ($components[5] // 0);
+    $time = $components[3]*3600 + $components[4]*60 + $components[5];
   }
   return ( $time, $components[6], $has_date );
 }

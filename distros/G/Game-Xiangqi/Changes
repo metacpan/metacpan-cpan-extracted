@@ -1,4 +1,10 @@
 Revision history for Game-Xiangqi
 
+0.02    2026-10-02
+        - FIX: `shift ?` in Terminal.pm parsed as ?PATTERN? before perl 5.22,
+          so the module did not compile and t/19, t/20 and t/21 failed.
+        - FIX: two sort blocks compared the subtest's board, named $b, and
+          not the element; fatal on perl 5.14, a warning after it.
+
 0.01    2026-09-25
 	First version

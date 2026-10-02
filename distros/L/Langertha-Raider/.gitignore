@@ -1,0 +1,54 @@
+# karr materialized task view -- never commit
+tasks/
+config.yml
+
+# Perl / Dist::Zilla distribution
+.build/
+_build/
+blib/
+/Build
+/Makefile
+/Makefile.old
+/pm_to_blib
+/MANIFEST.bak
+/MYMETA.*
+Langertha-Raider-*
+*.tar.gz
+*.bak
+*.old
+*.swp
+
+# Carton / Carmel
+carton.lock
+/local/
+/.carton/
+/cpanfile.snapshot
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+*.orig
+*.rej
+
+# Standalone binary (scripts/build-binary.sh) and its release packaging
+/raider
+/raider-*-linux-*
+/pkg/
+
+# Raider runtime state
+.raider_history
+
+# Per-project raider config -- opt-in per repo; not shipped in the dist
+.raider.md
+.raider.yml
+# Examples intentionally ship sample configs
+!examples/**/.raider.md
+!examples/**/.raider.yml
+!examples/**/.raider-hall.yml
+
+# Auto-generated skill docs (regenerate via /skill or --export-skill)
+RAIDER-SKILL.md
+
+# Codex runtime mount / local session marker
+.codex

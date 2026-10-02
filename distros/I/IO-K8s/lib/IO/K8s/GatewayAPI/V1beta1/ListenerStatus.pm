@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::ListenerStatus;
 # ABSTRACT: ListenerStatus is the status associated with a Listener.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s attachedRoutes => Int, { required => 'schema' };
@@ -26,7 +26,7 @@ IO::K8s::GatewayAPI::V1beta1::ListenerStatus - ListenerStatus is the status asso
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 attachedRoutes
 

@@ -1,7 +1,8 @@
 package Langertha::Knarr::CLI::Cmd::Models;
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 # ABSTRACT: List configured models and their backends
 use Moo;
+with 'Langertha::Knarr::CLI::Role::GlobalOptions';
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: knarr models [options]';
 
@@ -16,8 +17,7 @@ option format => (
 
 sub execute {
   my ($self, $args, $chain) = @_;
-  my $main = $chain->[0];
-  my $config_file = $main->config;
+  my $config_file = $self->config_file($chain);
 
   unless (-f $config_file) {
     print STDERR "Config file not found: $config_file\n";
@@ -28,6 +28,13 @@ sub execute {
   require Langertha::Knarr::Router;
 
   my $config = Langertha::Knarr::Config->new(file => $config_file);
+  # Like check and start (k67): stdout is the model list, errors go to stderr
+  my @errors = $config->validate;
+  if (@errors) {
+    print STDERR "Configuration INVALID:\n";
+    print STDERR "  - $_\n" for @errors;
+    exit 1;
+  }
   my $router = Langertha::Knarr::Router->new(config => $config);
   my $models = $router->list_models;
 
@@ -90,16 +97,18 @@ Langertha::Knarr::CLI::Cmd::Models - List configured models and their backends
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 
-Implements the C<knarr models> command. Loads the config file, triggers
-auto-discovery (if enabled), and prints the full model list as a table or
-JSON. Each row shows the model ID, engine class, backend model name, and
+Implements the C<knarr models> command. Loads and validates the config
+file (an invalid one exits C<1> with the errors of C<knarr check>, on
+stderr), triggers auto-discovery (if enabled), and prints the full model
+list as a table or JSON. Each row shows the model ID, engine class, backend model name, and
 whether it was explicitly configured or auto-discovered.
 
-See L<knarr> for option details and L<Langertha::Knarr> for full documentation.
+See L<knarr> for option details and L<Langertha::Knarr::Config> for the
+configuration file format.
 
 =head1 SEE ALSO
 

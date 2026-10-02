@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::RollingUpdateStatefulSetStrategy;
 # ABSTRACT: rollingUpdate is used to communicate parameters when type is RollingUpdate.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s maxUnavailable => IntOrStr;
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::RollingUpdateStatefulSetStrategy - rollingUpdat
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 maxUnavailable
 

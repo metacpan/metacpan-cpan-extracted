@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::STSSessionTokenSpec;
 # ABSTRACT: STSSessionTokenSpec defines the desired state to generate an AWS STS session token.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s auth              => '+IO::K8s::ExternalSecrets::V1::AWSAuth';
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1alpha1::STSSessionTokenSpec - STSSessionTokenSpec de
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 auth
 

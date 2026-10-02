@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -499,13 +499,15 @@ model.
 =head2 Commonly Used Features
 
 Most applications use C<TButton> as a dialog control: create a button with
-title/command/flags, insert it into a C<TDialog>, then react to the command
-returned by C<execView()>. Typical setups include one default action button
-(C<bfDefault>) and one normal cancel button (C<bfNormal>).
+title/command/flags, insert it into a L<TDialog|TUI::Dialogs::Dialog>, then 
+react to the command returned by C<execView()>. Typical setups include one 
+default action button (C<bfDefault>) and one normal cancel button 
+(C<bfNormal>).
 
-In day-to-day use you rarely call low-level methods directly; C<handleEvent()>,
-C<draw()>, and default-button behavior are managed by the framework. Manual
-calls to C<makeDefault()> are only needed for advanced dialog interactions
+In day-to-day use you rarely call low-level methods directly;
+L<handleEvent()|/handleEvent>,
+L<draw()|/draw>, and default-button behavior are managed by the framework. Manual
+calls to L<makeDefault()|/makeDefault> are only needed for advanced dialog interactions
 where default focus behavior is changed dynamically.
 
 =head1 VARIABLES
@@ -514,11 +516,34 @@ The following global variables affect the visual rendering of C<TButton>.
 
 =head2 $shadows
 
-Defines the characters used to draw the button shadow.
+Defines the characters (I<Str>) used to draw the button shadow.
 
 =head2 $markers
 
-Defines the characters used as button markers, for example C<[]>.
+Defines the characters (I<Str>) used as button markers, for example C<'[]'>.
+
+=head1 ATTRIBUTES
+
+The following attributes are exposed as read-only accessors.
+
+=head2 title
+
+The caption displayed on the button (I<Str>).
+
+=head2 command
+
+The command identifier triggered when the button is pressed
+(I<PositiveOrZeroInt>).
+
+=head2 flags
+
+Bit-mask of behavioral settings such as default, broadcast, or selectable
+(I<PositiveOrZeroInt>).
+
+=head2 amDefault
+
+Boolean flag indicating whether the button is currently treated as the dialog's
+default button (I<Bool>).
 
 =head1 CONSTRUCTOR
 
@@ -537,7 +562,8 @@ Creates a new button control.
 
 =item bounds
 
-The rectangular region defining the button's position (I<TRect>).
+The rectangular region defining the button's position 
+(L<TRect|TUI::Objects::Rect>).
 
 =item title
 
@@ -561,33 +587,6 @@ Behavioral flags controlling default state, focus handling, and selection
   my $btn = new_TButton($bounds, $title, $command, $flags);
 
 Factory-style constructor using positional arguments.
-
-=head1 ATTRIBUTES
-
-The following attributes are exposed as read-only accessors.
-
-=over
-
-=item title
-
-The caption displayed on the button (I<Str>).
-
-=item command
-
-The command identifier triggered when the button is pressed
-(I<PositiveOrZeroInt>).
-
-=item flags
-
-Bit-mask of behavioral settings such as default, broadcast, or selectable
-(I<PositiveOrZeroInt>).
-
-=item amDefault
-
-Boolean flag indicating whether the button is currently treated as the dialog's
-default button (I<Bool>).
-
-=back
 
 =head1 METHODS
 
@@ -635,9 +634,9 @@ Updates the control's internal state and refreshes its appearance.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::Dialog>,
-L<TUI::Dialogs::Label>,
-L<TUI::Views::View>
+L<TDialog|TUI::Dialogs::Dialog>,
+L<TLabel|TUI::Dialogs::Label>,
+L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 

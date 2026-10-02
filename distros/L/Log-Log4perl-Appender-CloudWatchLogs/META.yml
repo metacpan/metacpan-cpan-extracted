@@ -1,0 +1,49 @@
+---
+abstract: Log::Log4perl::Appender::CloudWatchLogs
+author:
+  - 'Rob Lauer <rclauer@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-Appender-CloudWatchLogs
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Amazon::CloudWatchLogs:
+    file: lib/Amazon/CloudWatchLogs.pm
+    version: v1.0.7
+  Log::Log4perl::Appender::CloudWatchLogs:
+    file: lib/Log/Log4perl/Appender/CloudWatchLogs.pm
+    version: v1.0.7
+recommends:
+  Date::Manip: '6.98'
+requires:
+  Amazon::API::CloudWatchLogs: v1.43.90
+  CLI::Simple: v2.0.1
+  Class::Accessor::Fast: '0.51'
+  Data::UUID: '1.227'
+  Date::Format: '2.24'
+  JSON: '4.10'
+  Log::Log4perl::Appender: '0'
+  Number::Bytes::Human: '0.11'
+  Readonly: '2.05'
+  Text::ASCIITable: '0.22'
+  Tie::IxHash: '1.23'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/rlauer6/Log-Log4perl-Appender-CloudWatchLogs/issues
+  homepage: http://github.com/rlauer6/Log-Log4perl-Appender-CloudWatchLogs.git
+  repository: git://github.com/rlauer6/Log-Log4perl-Appender-CloudWatchLogs.git
+version: v1.0.7
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

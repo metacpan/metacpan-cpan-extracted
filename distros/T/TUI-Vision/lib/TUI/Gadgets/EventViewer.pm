@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +16,7 @@ our @EXPORT = qw(
 );
 
 require bytes;
+use Carp ();
 use Encode qw( decode );
 use Symbol ();
 use TUI::toolkit;
@@ -24,7 +25,11 @@ use TUI::toolkit::Types qw(
   :types
 );
 
-use TUI::Drivers::Const qw( :evXXXX );
+use TUI::Drivers::Const qw(
+  kbCtrlShift
+  kbAltShift
+  :evXXXX
+);
 use TUI::Gadgets::Const qw( cmFndEventView );
 use TUI::Gadgets::PrintConstants qw(
   printKeyCode
@@ -41,6 +46,8 @@ use TUI::Views::Const qw(
   wnNoNumber
 );
 use TUI::Views::Window;
+
+use constant _WIN32 => ($^O eq 'MSWin32') && !$ENV{WT_SESSION};
 
 sub TEventViewer() { __PACKAGE__ }
 sub name() { 'TEventViewer' }
@@ -118,7 +125,7 @@ $init = sub {    # void ($bufSize)
   return;
 }; #/ sub $init
 
-sub from {    # $evntview ($bounds, aBufSize)
+sub from {    # $eventView ($bounds, aBufSize)
   state $sig = signature(
     method => 1,
     pos    => [Object, PositiveOrZeroInt],
@@ -204,7 +211,7 @@ my $printConstants = sub {    # void ($value, $doPrint)
     $os->$doPrint( $value );
     close $os;
   };
-  if ( !@! && $buf !~ /^0/ ) {
+  if ( !$@ && (split //, $buf)[0] ) {
     print " (", $buf, ")";
   }
   return;
@@ -264,15 +271,15 @@ $printEvent = sub {    # void ($out, $ev)
       \&printControlKeyState );
     print ",\n";
     print "    .text = {";
-    # TODO: The field {charScan}{charCode} contains characters from the CP437 
-    # code page in the original. For full Unicode support, the two new fields 
-    # 'text' and 'textLength' should be used (L</SEE ALSO>).
-    my @text = $ev->{keyDown}{charScan}{charCode} ? 
-      unpack( 'C*', bytes::substr(
-        decode( 'cp437', chr $ev->{keyDown}{charScan}{charCode} ),
-          0 )) : ();
+    # NOTE: {charScan}{charCode} reflects the native character encoding
+    # used by the backend. For Win32 this is typically the legacy code page.
+    # The pseudo-fields 'text' and 'textLength' always show the UTF-8 byte
+    # sequence corresponding to the character.
+    my @text = $charCode && !( $ev->{keyDown}{controlKeyState} & ( kbCtrlShift | kbAltShift ) )
+      ? unpack( 'C*', bytes::substr( decode( 'cp437' => chr $charCode ), 0 ) )
+      : ();
     my $textLength = @text;
-    print join(', ', map { sprintf "0x%02X", $_ } @text );
+    print join(', ', map { sprintf "'\\x%02X'", $_ } @text );
     print "},\n",
           "    .textLength = ", $textLength, "\n", 
           "  }\n";
@@ -321,15 +328,15 @@ TUI::Gadgets::EventViewer - terminal window for displaying received events
 =head1 DESCRIPTION
 
 C<TEventViewer> implements a terminal-style window that displays the attributes
-of C<TEvent> objects received by the application.
+of L<TEvent|TUI::Drivers::Event> objects received by the application.
 
 The window captures incoming events and renders them in textual form, allowing
 developers to observe and debug event flow during program execution. It is
 intended as a diagnostic gadget and is typically used during development or
 testing.
 
-The implementation is inspired by the Turbo Vision C++ event viewer and by the
-TTYWindow concept.
+The implementation is ported from the I<modern port of Turbo Vision 2.0> event 
+viewer which is inspired by the TTYWindow concept.
 
 =head1 CONSTRUCTOR
 
@@ -346,7 +353,8 @@ Creates a new event viewer window.
 
 =item bounds
 
-Bounding rectangle defining the position and size of the window (I<TRect>).
+Bounding rectangle defining the position and size of the window 
+(L<TRect|TUI::Objects::Rect>).
 
 =item bufSize
 
@@ -372,7 +380,8 @@ Processes incoming events and records them for display.
 
   $viewer->print($event);
 
-Formats and appends the specified C<TEvent> to the internal output buffer.
+Formats and appends the specified L<TEvent|TUI::Drivers::Event> to the internal 
+output buffer.
 
 =head2 toggle
 
@@ -388,33 +397,23 @@ Releases window resources and stops event recording.
 
 =head1 SEE ALSO
 
-L<TUI::Drivers::Event>,
-L<TUI::Views::Window>,
-L<TUI::Gadgets::HeapView>
+L<TEvent|TUI::Drivers::Event>,
+L<TWindow|TUI::Views::Window>,
+L<THeapView|TUI::Gadgets::HeapView>
 
 =head1 AUTHORS
 
 =over
 
-=item * Borland International (original Turbo Vision design)
+=item * magiblot <magiblot@hotmail.com> (original color attribute design)
 
 =item * J. Schneider <brickpool@cpan.org> (Perl implementation and maintenance)
 
 =back
 
-=head1 CONTRIBUTORS
-
-=over
-
-=item * magiblot <magiblot@hotmail.com>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 1990-1994, 1997 by Borland International
-
-Copyright (c) 2019-2026 the L</AUTHORS> and L</CONTRIBUTORS> as listed above.
+Copyright (c) 2019-2026 the L</AUTHORS> listed above.
 
 This software is licensed under the MIT license (see the LICENSE file, which is
 part of the distribution).

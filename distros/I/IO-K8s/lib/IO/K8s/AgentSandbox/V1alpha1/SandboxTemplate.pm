@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1alpha1::SandboxTemplate;
 # ABSTRACT: Reusable sandbox configuration template
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'extensions.agents.x-k8s.io/v1alpha1',
     resource_plural => 'sandboxtemplates';
@@ -29,7 +29,7 @@ IO::K8s::AgentSandbox::V1alpha1::SandboxTemplate - Reusable sandbox configuratio
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

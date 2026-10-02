@@ -1,16 +1,13 @@
 package TUI::Drivers::HardwareInfo::Win32;
+# ABSTRACT: Win32 driver for TUI::Drivers::HardwareInfo
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
-
-use Exporter 'import';
-our @EXPORT_OK = qw(
-  THardwareInfo
-);
 
 use PerlX::Assert::PP;
 use English qw( -no_match_vars );
@@ -27,6 +24,7 @@ use Win32::Console::PatchForRT33513;
 use Win32API::File;
 
 use TUI::Drivers::Const qw(
+  evCommand
   evKeyDown
   :smXXXX
   kbAltShift
@@ -34,10 +32,12 @@ use TUI::Drivers::Const qw(
   kbShift
   kbIns
   kbInsState
+  kbCtrlA
   kbCtrlC
+  kbCtrlZ
 );
-
-sub THardwareInfo() { __PACKAGE__ }
+use TUI::Drivers::Util qw( getAltCode );
+use TUI::Views::Const qw( cmScreenChanged );
 
 # We use variables to avoid polluting the namespace when importing Win32 API 
 # functions. 
@@ -147,6 +147,8 @@ use vars qw(
   *ctrlBreakHit = \$TUI::Drivers::SystemError::ctrlBreakHit;
 }
 
+# declare local variables
+
 my @ShiftCvt = (
          0,      0,      0,      0,      0,      0,      0,      0,
          0,      0,      0,      0,      0,      0,      0,      0,
@@ -192,6 +194,10 @@ my @AltCvt = (
     0x8c00
 );
 
+my @lastSize = ( 0, 0 );
+
+# private functions
+
 my $isValid = sub {    # $bool ($self)
   my ( $self ) = @_;
   return undef unless ref( $self );
@@ -208,7 +214,7 @@ INIT {
     $platform = 'Windows';
   }
 
-  # The following content was taken from the framework
+  # The following content was ported from the framework
   # "A modern port of Turbo Vision 2.0", which is licensed under MIT licence.
   #
   # Copyright 2019-2021 by magiblot <magiblot@hotmail.com>
@@ -292,6 +298,7 @@ INIT {
   $consoleMode = $consoleHandle[cnInput]->Mode();
   @crInfo      = $consoleHandle[cnOutput]->Cursor();
   @sbInfo      = $consoleHandle[cnOutput]->Info();
+  @lastSize    = @sbInfo[ dwSizeX, dwSizeY ];
 }
 
 END {
@@ -368,7 +375,7 @@ sub getScreenCols { # $cols ($class)
 sub getScreenMode {    # $mode ($class)
   my $class = shift;
   assert ( $class and !ref $class );
-  my $mode  = 0;
+  my $mode = 0;
   if ( $platform eq 'Windows' ) {
     $mode = smCO80;    # B/W, mono not supported if running on Windows
   }
@@ -440,7 +447,10 @@ sub screenWrite {    # void ($class, $x, $y, $buf, $len)
 }
 
 sub allocateScreenBuffer {    # \@buffer ($class)
-  assert ( $_[0] and !ref $_[0] );
+  my ( $class ) = @_;
+  assert ( $class and !ref $class );
+  $class->reloadScreenInfo();
+
   my $x = $sbInfo[dwSizeX];
   my $y = $sbInfo[dwSizeY];
 
@@ -539,13 +549,25 @@ sub getKeyEvent {    # $bool ($class, $event)
       $event->{keyDown}{charScan}{charCode} = $irBuffer[uChar];
       $event->{keyDown}{controlKeyState}    = $irBuffer[dwControlKeyState1];
 
+      # Win32::OutputDebugString(sprintf(
+      #   "scan=%d char=%d ctrl=%#x",
+      #   $irBuffer[wVirtualScanCode],
+      #   $irBuffer[uChar],
+      #   $irBuffer[dwControlKeyState1],
+      # ));
+
       # Convert Windows style virtual scan codes to PC BIOS codes.
       if ( $event->{keyDown}{controlKeyState} &
         ( kbShift | kbAltShift | kbCtrlShift ) 
       ) {
         my $index = $irBuffer[wVirtualScanCode];
-
-        if ( ( $event->{keyDown}{controlKeyState} & kbShift )
+        if ( ( $event->{keyDown}{controlKeyState} & kbAltShift ) 
+          && ( $event->{keyDown}{controlKeyState} & kbCtrlShift ) 
+        ) {
+          # AltGr is usually reported as Ctrl+Alt on Win32 consoles.
+          # Do not translate through AltCvt/CtrlCvt in that case.
+        }
+        elsif ( ( $event->{keyDown}{controlKeyState} & kbShift )
           && $ShiftCvt[$index] 
         ) {
           $event->{keyDown}{keyCode} = $ShiftCvt[$index];
@@ -553,12 +575,30 @@ sub getKeyEvent {    # $bool ($class, $event)
         elsif ( ( $event->{keyDown}{controlKeyState} & kbCtrlShift )
           && $CtrlCvt[$index] 
         ) {
-          $event->{keyDown}{keyCode} = $CtrlCvt[$index];
+          my $charCode = $event->{keyDown}{charScan}{charCode};
+          if ( $charCode >= kbCtrlA && $charCode <= kbCtrlZ ) {
+            # Do not translate through CtrlCvt if the charCode is already a 
+            # control character.
+            $event->{keyDown}{keyCode} = $charCode;
+          } else {
+            # Borland default behavior is to translate the charCode through 
+            # CtrlCvt if the Ctrl key is pressed.
+            $event->{keyDown}{keyCode} = $CtrlCvt[$index];
+          }
         }
         elsif ( ( $event->{keyDown}{controlKeyState} & kbAltShift )
           && $AltCvt[$index] 
         ) {
-          $event->{keyDown}{keyCode} = $AltCvt[$index];
+          my $ch = chr $event->{keyDown}{charScan}{charCode};
+          if ( $ch =~ /^[A-Za-z]$/ ) {
+            # Do not translate through AltCvt if the charCode is already a 
+            # letter. Translate to kbAltA..kbAltZ instead.
+            $event->{keyDown}{keyCode} = getAltCode( $ch );
+          } else {
+            # Borland default behavior is to translate the charCode through 
+            # AltCvt if the Alt key is pressed.
+            $event->{keyDown}{keyCode} = $AltCvt[$index];
+          }
         }
       } #/ if ( $event->{keyDown}...)
 
@@ -578,12 +618,23 @@ sub getKeyEvent {    # $bool ($class, $event)
       $pendingEvent = 0;
       return true;
     } #/ if ( $irBuffer[EventType...])
-    elsif ( $irBuffer[EventType] != MOUSE_EVENT ) {
-      # Ignore all events except mouse events.  Pending mouse events will
-      # be read on the next polling loop.
-      $pendingEvent = 0;
+    elsif ( $irBuffer[EventType] == MOUSE_EVENT ) {
+      # Pending mouse events will be read on the next polling loop.
+      return false;
+    } #/ if ( $pendingEvent )
+
+    # Other events are not handled by Win32::Console, but we can check the 
+    # screen buffer information when no other events are occurring. This 
+    # allows us to detect changes in screen size.
+    $pendingEvent = 0;
+    if ( $class->screenChanged() ) {
+      $event->{what} = evCommand;
+      $event->{message}{command} = cmScreenChanged;
+      $event->{message}{infoPtr} = undef;
+      return true;
     }
-  } #/ if ( $pendingEvent )
+    return false;
+  }
 
   return false;
 } #/ sub getKeyEvent
@@ -614,6 +665,50 @@ sub setCritErrorHandler {  # $bool ($class, $install)
 
 my $ctrlBreakHandler = sub { ... };
 
+# Additional functions (not part of the original Borland interface).
+
+sub getColorCount {    # $count ($class)
+  assert ( $_[0] and !ref $_[0] );
+  # Windows console supports 16 colors in the default color palette.
+  return 16;
+}
+
+sub reloadScreenInfo {    # void ($class)
+  my ( $class ) = @_;
+  assert ( $class and !ref $class );
+  return unless ref $consoleHandle[cnOutput];
+  @sbInfo = $consoleHandle[cnOutput]->Info();
+
+  my @curPos = $consoleHandle[cnOutput]->Cursor();
+  # Set the cursor temporally to (0, 0) to prevent the console from crashing
+  # due to https://github.com/microsoft/terminal/issues/7511.
+  $consoleHandle[cnOutput]->Cursor( 0, 0 );
+  # Make sure the buffer size matches the viewport size so that the
+  # scrollbars are not shown.
+  $sbInfo[dwSizeX] = $sbInfo[srWindowRight] - $sbInfo[srWindowLeft] + 1;
+  $sbInfo[dwSizeY] = $sbInfo[srWindowBottom] - $sbInfo[srWindowTop] + 1;
+  $consoleHandle[cnOutput]->Size( $sbInfo[dwSizeX], $sbInfo[dwSizeY] );
+  # Restore the cursor position (it does not matter if it is out of bounds).
+  $consoleHandle[cnOutput]->Cursor( @curPos );
+
+  return;
+}
+
+sub screenChanged {    # $bool ($class)
+  assert ( $_[0] and !ref $_[0] );
+  my @size = do { 
+    my ( $left, $top, $right, $bottom ) = $consoleHandle[cnOutput]->Window();
+    ( $right - $left + 1, $bottom - $top + 1 );
+  };
+  if ( $size[dwSizeX] != $lastSize[dwSizeX] 
+    || $size[dwSizeY] != $lastSize[dwSizeY]
+  ) {
+	  @lastSize = @size;
+    return true;
+  }
+  return false;
+}
+
 1
 
 __END__
@@ -626,13 +721,13 @@ TUI::Drivers::HardwareInfo::Win32 - Win32 hardware backend for THardwareInfo
 
 =head1 DESCRIPTION
 
-C<TUI::Drivers::HardwareInfo::Win32> provides the Windows-specific 
-implementation of the C<THardwareInfo> hardware interface used by the Turbo 
-Vision driver layer.
+this module provides the Windows-specific implementation of the 
+L<THardwareInfo|TUI::Drivers::HardwareInfo> hardware interface used by the 
+I<Turbo Vision> driver layer.
 
-The module encapsulates access to the Win32 console, keyboard, mouse, timer,
-and screen facilities. It maintains global process-level state and interfaces
-directly with the Windows Console API.
+The module encapsulates access to the L<Win32 console|Win32::Console>, 
+keyboard, mouse, timer, and screen facilities. It maintains global 
+process-level state and interfaces directly with the Windows Console API.
 
 This module is not instantiated. All interaction is performed through
 class-level method calls.
@@ -642,17 +737,18 @@ is loaded. Console state is restored automatically when the program terminates.
 
 =head1 VARIABLES
 
-The following variables are internal to the Win32 backend implementation and
-are not part of the portable C<THardwareInfo> interface.
+The following variables are internal to the Win32 backend implementation and 
+are not part of the portable L<THardwareInfo|TUI::Drivers::HardwareInfo> 
+interface.
 
 =head2 $insertState
 
-Tracks the current insert mode state.
+Tracks the current insert mode state (I<Bool>).
 
 =head2 $platform
 
-Contains the platform identifier string. For this backend, the value is
-C<Windows>.
+Contains the platform identifier string (I<Str>). For this backend, the value 
+is C<'Windows'>.
 
 =head2 @consoleHandle
 
@@ -661,15 +757,15 @@ state.
 
 =head2 $ownsConsole
 
-Indicates whether the console was allocated by this module.
+Indicates whether the console was allocated by this module (I<Bool>).
 
 =head2 $consoleMode
 
-Stores the console input mode.
+Stores the console input mode (I<PositiveOrZeroInt>).
 
 =head2 $pendingEvent
 
-Indicates whether a pending input event is buffered.
+Indicates whether a pending input event is buffered (I<PositiveOrZeroInt>).
 
 =head2 @irBuffer
 
@@ -686,8 +782,9 @@ Stores console screen buffer information.
 =head1 IMPLEMENTATION
 
 This module contains the Windows-specific implementation behind
-L<TUI::Drivers::HardwareInfo> (C<THardwareInfo>). Public API semantics and
-usage are documented in L<TUI::Drivers::HardwareInfo>.
+L<THardwareInfo|TUI::Drivers::HardwareInfo>. Public API semantics and usage are 
+documented in usage are documented in 
+L<THardwareInfo|TUI::Drivers::HardwareInfo>.
 
 In this backend, those methods are mapped to Win32 console facilities for
 keyboard/mouse input, screen and caret control, timing, and control/error
@@ -698,10 +795,10 @@ other backends.
 
 =head1 SEE ALSO
 
-L<TUI::Drivers::HardwareInfo>,
-L<TUI::Drivers::Screen>,
-L<TUI::Drivers::HWMouse>,
-L<TUI::Drivers::SystemError>
+L<THardwareInfo|TUI::Drivers::HardwareInfo>,
+L<TScreen|TUI::Drivers::Screen>,
+L<THWMouse|TUI::Drivers::HWMouse>,
+L<TSystemError|TUI::Drivers::SystemError>
 
 =head1 AUTHORS
 

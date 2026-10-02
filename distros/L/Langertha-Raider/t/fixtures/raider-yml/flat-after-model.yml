@@ -1,0 +1,6 @@
+# flat.yml after the REPL command "/model gpt-4o" wrote default: { model: }.
+temperature: 0.2
+packs: [git-guru]
+perl: true
+default:
+  model: gpt-4o

@@ -1,9 +1,11 @@
 package TUI::TextView;
+# ABSTRACT: TextView widget class for the TUI::Vision framework
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -65,8 +67,8 @@ TUI::TextView - Text rendering components for the TUI::Vision framework
 
 =head1 DESCRIPTION
 
-TUI::TextView provides the text rendering subsystem for the TUI::Vision
-framework. It corresponds to the Turbo Vision text device and terminal
+C<TUI::TextView> provides the text rendering subsystem for the TUI::Vision
+framework. It corresponds to Borland's I<Turbo Vision> text device and terminal
 abstraction layers and is responsible for low-level text output,
 character cell handling, and terminal interaction.
 

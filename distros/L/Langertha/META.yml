@@ -3,9 +3,12 @@ abstract: 'The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId'
 author:
   - 'Torsten Raudssus <getty@cpan.org>'
 build_requires:
+  HTTP::Daemon: '0'
   Math::Vector::Similarity: '0'
   Module::Runtime: '0'
+  Perl::Critic: '1.156'
   Test2::Suite: '0'
+  Test::Perl::Critic: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -16,27 +19,433 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Langertha
+provides:
+  Langertha:
+    file: lib/Langertha.pm
+    version: '0.503'
+  Langertha::CachedContent:
+    file: lib/Langertha/CachedContent.pm
+    version: '0.503'
+  Langertha::CallResult:
+    file: lib/Langertha/CallResult.pm
+    version: '0.503'
+  Langertha::Chat:
+    file: lib/Langertha/Chat.pm
+    version: '0.503'
+  Langertha::Content:
+    file: lib/Langertha/Content.pm
+    version: '0.503'
+  Langertha::Content::Image:
+    file: lib/Langertha/Content/Image.pm
+    version: '0.503'
+  Langertha::Cost:
+    file: lib/Langertha/Cost.pm
+    version: '0.503'
+  Langertha::Embedder:
+    file: lib/Langertha/Embedder.pm
+    version: '0.503'
+  Langertha::Engine::AKI:
+    file: lib/Langertha/Engine/AKI.pm
+    version: '0.503'
+  Langertha::Engine::AKIAnthropic:
+    file: lib/Langertha/Engine/AKIAnthropic.pm
+    version: '0.503'
+  Langertha::Engine::AKIOpenAI:
+    file: lib/Langertha/Engine/AKIOpenAI.pm
+    version: '0.503'
+  Langertha::Engine::Anthropic:
+    file: lib/Langertha/Engine/Anthropic.pm
+    version: '0.503'
+  Langertha::Engine::AnthropicBase:
+    file: lib/Langertha/Engine/AnthropicBase.pm
+    version: '0.503'
+  Langertha::Engine::Cerebras:
+    file: lib/Langertha/Engine/Cerebras.pm
+    version: '0.503'
+  Langertha::Engine::DeepSeek:
+    file: lib/Langertha/Engine/DeepSeek.pm
+    version: '0.503'
+  Langertha::Engine::Gemini:
+    file: lib/Langertha/Engine/Gemini.pm
+    version: '0.503'
+  Langertha::Engine::Groq:
+    file: lib/Langertha/Engine/Groq.pm
+    version: '0.503'
+  Langertha::Engine::Hetzner:
+    file: lib/Langertha/Engine/Hetzner.pm
+    version: '0.503'
+  Langertha::Engine::HuggingFace:
+    file: lib/Langertha/Engine/HuggingFace.pm
+    version: '0.503'
+  Langertha::Engine::LMStudio:
+    file: lib/Langertha/Engine/LMStudio.pm
+    version: '0.503'
+  Langertha::Engine::LMStudioAnthropic:
+    file: lib/Langertha/Engine/LMStudioAnthropic.pm
+    version: '0.503'
+  Langertha::Engine::LMStudioOpenAI:
+    file: lib/Langertha/Engine/LMStudioOpenAI.pm
+    version: '0.503'
+  Langertha::Engine::LlamaCpp:
+    file: lib/Langertha/Engine/LlamaCpp.pm
+    version: '0.503'
+  Langertha::Engine::MiniMax:
+    file: lib/Langertha/Engine/MiniMax.pm
+    version: '0.503'
+  Langertha::Engine::MiniMaxAnthropic:
+    file: lib/Langertha/Engine/MiniMaxAnthropic.pm
+    version: '0.503'
+  Langertha::Engine::Mistral:
+    file: lib/Langertha/Engine/Mistral.pm
+    version: '0.503'
+  Langertha::Engine::Moonshot:
+    file: lib/Langertha/Engine/Moonshot.pm
+    version: '0.503'
+  Langertha::Engine::MoonshotAnthropic:
+    file: lib/Langertha/Engine/MoonshotAnthropic.pm
+    version: '0.503'
+  Langertha::Engine::NousResearch:
+    file: lib/Langertha/Engine/NousResearch.pm
+    version: '0.503'
+  Langertha::Engine::Ollama:
+    file: lib/Langertha/Engine/Ollama.pm
+    version: '0.503'
+  Langertha::Engine::OllamaOpenAI:
+    file: lib/Langertha/Engine/OllamaOpenAI.pm
+    version: '0.503'
+  Langertha::Engine::OpenAI:
+    file: lib/Langertha/Engine/OpenAI.pm
+    version: '0.503'
+  Langertha::Engine::OpenAIBase:
+    file: lib/Langertha/Engine/OpenAIBase.pm
+    version: '0.503'
+  Langertha::Engine::OpenAIResponses:
+    file: lib/Langertha/Engine/OpenAIResponses.pm
+    version: '0.503'
+  Langertha::Engine::OpenRouter:
+    file: lib/Langertha/Engine/OpenRouter.pm
+    version: '0.503'
+  Langertha::Engine::Perplexity:
+    file: lib/Langertha/Engine/Perplexity.pm
+    version: '0.503'
+  Langertha::Engine::Remote:
+    file: lib/Langertha/Engine/Remote.pm
+    version: '0.503'
+  Langertha::Engine::Replicate:
+    file: lib/Langertha/Engine/Replicate.pm
+    version: '0.503'
+  Langertha::Engine::SGLang:
+    file: lib/Langertha/Engine/SGLang.pm
+    version: '0.503'
+  Langertha::Engine::Scaleway:
+    file: lib/Langertha/Engine/Scaleway.pm
+    version: '0.503'
+  Langertha::Engine::TSystems:
+    file: lib/Langertha/Engine/TSystems.pm
+    version: '0.503'
+  Langertha::Engine::TranscriptionBase:
+    file: lib/Langertha/Engine/TranscriptionBase.pm
+    version: '0.503'
+  Langertha::Engine::VLLMHook:
+    file: lib/Langertha/Engine/VLLMHook.pm
+    version: '0.503'
+  Langertha::Engine::Whisper:
+    file: lib/Langertha/Engine/Whisper.pm
+    version: '0.503'
+  Langertha::Engine::XAI:
+    file: lib/Langertha/Engine/XAI.pm
+    version: '0.503'
+  Langertha::Engine::vLLM:
+    file: lib/Langertha/Engine/vLLM.pm
+    version: '0.503'
+  Langertha::HTTP::BoundedDecode:
+    file: lib/Langertha/HTTP/BoundedDecode.pm
+    version: '0.503'
+  Langertha::HTTP::ConnectCheck:
+    file: lib/Langertha/HTTP/ConnectCheck.pm
+    version: '0.503'
+  Langertha::HTTP::Redirect:
+    file: lib/Langertha/HTTP/Redirect.pm
+    version: '0.503'
+  Langertha::HTTP::UserAgent:
+    file: lib/Langertha/HTTP/UserAgent.pm
+    version: '0.503'
+  Langertha::ImageGen:
+    file: lib/Langertha/ImageGen.pm
+    version: '0.503'
+  Langertha::Input:
+    file: lib/Langertha/Input.pm
+    version: '0.503'
+  Langertha::Input::Tools:
+    file: lib/Langertha/Input/Tools.pm
+    version: '0.503'
+  Langertha::Manifest:
+    file: lib/Langertha/Manifest.pm
+    version: '0.503'
+  Langertha::Manifest::Auth:
+    file: lib/Langertha/Manifest/Auth.pm
+    version: '0.503'
+  Langertha::Manifest::Builder:
+    file: lib/Langertha/Manifest/Builder.pm
+    version: '0.503'
+  Langertha::Manifest::Endpoint:
+    file: lib/Langertha/Manifest/Endpoint.pm
+    version: '0.503'
+  Langertha::Manifest::Model:
+    file: lib/Langertha/Manifest/Model.pm
+    version: '0.503'
+  Langertha::Manifest::Validation:
+    file: lib/Langertha/Manifest/Validation.pm
+    version: '0.503'
+  Langertha::Metrics:
+    file: lib/Langertha/Metrics.pm
+    version: '0.503'
+  Langertha::ModelProbe:
+    file: lib/Langertha/ModelProbe.pm
+    version: '0.503'
+  Langertha::Moment:
+    file: lib/Langertha/Moment.pm
+    version: '0.503'
+  Langertha::Output:
+    file: lib/Langertha/Output.pm
+    version: '0.503'
+  Langertha::Output::Tools:
+    file: lib/Langertha/Output/Tools.pm
+    version: '0.503'
+  Langertha::Plugin:
+    file: lib/Langertha/Plugin.pm
+    version: '0.503'
+  Langertha::Plugin::Langfuse:
+    file: lib/Langertha/Plugin/Langfuse.pm
+    version: '0.503'
+  Langertha::Pricing:
+    file: lib/Langertha/Pricing.pm
+    version: '0.503'
+  Langertha::PromptCache:
+    file: lib/Langertha/PromptCache.pm
+    version: '0.503'
+  Langertha::RateLimit:
+    file: lib/Langertha/RateLimit.pm
+    version: '0.503'
+  Langertha::Reasoning:
+    file: lib/Langertha/Reasoning.pm
+    version: '0.503'
+  Langertha::Reasoning::BudgetPolicy:
+    file: lib/Langertha/Reasoning/BudgetPolicy.pm
+    version: '0.503'
+  Langertha::Reasoning::Profile:
+    file: lib/Langertha/Reasoning/Profile.pm
+    version: '0.503'
+  Langertha::Request::HTTP:
+    file: lib/Langertha/Request/HTTP.pm
+    version: '0.503'
+  Langertha::Request::SyncHTTP:
+    file: lib/Langertha/Request/SyncHTTP.pm
+    version: '0.503'
+  Langertha::Response:
+    file: lib/Langertha/Response.pm
+    version: '0.503'
+  Langertha::Result:
+    file: lib/Langertha/Result.pm
+    version: '0.503'
+  Langertha::Role::AnthropicCompatible:
+    file: lib/Langertha/Role/AnthropicCompatible.pm
+    version: '0.503'
+  Langertha::Role::AsyncHTTP:
+    file: lib/Langertha/Role/AsyncHTTP.pm
+    version: '0.503'
+  Langertha::Role::CachedContent:
+    file: lib/Langertha/Role/CachedContent.pm
+    version: '0.503'
+  Langertha::Role::Capabilities:
+    file: lib/Langertha/Role/Capabilities.pm
+    version: '0.503'
+  Langertha::Role::Chat:
+    file: lib/Langertha/Role/Chat.pm
+    version: '0.503'
+  Langertha::Role::ContextSize:
+    file: lib/Langertha/Role/ContextSize.pm
+    version: '0.503'
+  Langertha::Role::Embedding:
+    file: lib/Langertha/Role/Embedding.pm
+    version: '0.503'
+  Langertha::Role::HTTP:
+    file: lib/Langertha/Role/HTTP.pm
+    version: '0.503'
+  Langertha::Role::HermesTools:
+    file: lib/Langertha/Role/HermesTools.pm
+    version: '0.503'
+  Langertha::Role::ImageGeneration:
+    file: lib/Langertha/Role/ImageGeneration.pm
+    version: '0.503'
+  Langertha::Role::ImageInput:
+    file: lib/Langertha/Role/ImageInput.pm
+    version: '0.503'
+  Langertha::Role::JSON:
+    file: lib/Langertha/Role/JSON.pm
+    version: '0.503'
+  Langertha::Role::KeepAlive:
+    file: lib/Langertha/Role/KeepAlive.pm
+    version: '0.503'
+  Langertha::Role::Langfuse:
+    file: lib/Langertha/Role/Langfuse.pm
+    version: '0.503'
+  Langertha::Role::Models:
+    file: lib/Langertha/Role/Models.pm
+    version: '0.503'
+  Langertha::Role::OpenAICompatible:
+    file: lib/Langertha/Role/OpenAICompatible.pm
+    version: '0.503'
+  Langertha::Role::OpenAPI:
+    file: lib/Langertha/Role/OpenAPI.pm
+    version: '0.503'
+  Langertha::Role::ParallelToolUse:
+    file: lib/Langertha/Role/ParallelToolUse.pm
+    version: '0.503'
+  Langertha::Role::PluginHost:
+    file: lib/Langertha/Role/PluginHost.pm
+    version: '0.503'
+  Langertha::Role::PromptCache:
+    file: lib/Langertha/Role/PromptCache.pm
+    version: '0.503'
+  Langertha::Role::ReasoningEffort:
+    file: lib/Langertha/Role/ReasoningEffort.pm
+    version: '0.503'
+  Langertha::Role::ResponseFormat:
+    file: lib/Langertha/Role/ResponseFormat.pm
+    version: '0.503'
+  Langertha::Role::ResponseSize:
+    file: lib/Langertha/Role/ResponseSize.pm
+    version: '0.503'
+  Langertha::Role::ResponsesCompatible:
+    file: lib/Langertha/Role/ResponsesCompatible.pm
+    version: '0.503'
+  Langertha::Role::Runnable:
+    file: lib/Langertha/Role/Runnable.pm
+    version: '0.503'
+  Langertha::Role::Runtime::MetricsPoll:
+    file: lib/Langertha/Role/Runtime/MetricsPoll.pm
+    version: '0.503'
+  Langertha::Role::RuntimeKnobs:
+    file: lib/Langertha/Role/RuntimeKnobs.pm
+    version: '0.503'
+  Langertha::Role::Seed:
+    file: lib/Langertha/Role/Seed.pm
+    version: '0.503'
+  Langertha::Role::ServerTools:
+    file: lib/Langertha/Role/ServerTools.pm
+    version: '0.503'
+  Langertha::Role::StaticModels:
+    file: lib/Langertha/Role/StaticModels.pm
+    version: '0.503'
+  Langertha::Role::Streaming:
+    file: lib/Langertha/Role/Streaming.pm
+    version: '0.503'
+  Langertha::Role::SystemPrompt:
+    file: lib/Langertha/Role/SystemPrompt.pm
+    version: '0.503'
+  Langertha::Role::Temperature:
+    file: lib/Langertha/Role/Temperature.pm
+    version: '0.503'
+  Langertha::Role::ThinkTag:
+    file: lib/Langertha/Role/ThinkTag.pm
+    version: '0.503'
+  Langertha::Role::Tools:
+    file: lib/Langertha/Role/Tools.pm
+    version: '0.503'
+  Langertha::Role::Transcription:
+    file: lib/Langertha/Role/Transcription.pm
+    version: '0.503'
+  Langertha::RunContext:
+    file: lib/Langertha/RunContext.pm
+    version: '0.503'
+  Langertha::Runtime::Knobs:
+    file: lib/Langertha/Runtime/Knobs.pm
+    version: '0.503'
+  Langertha::Runtime::Metrics:
+    file: lib/Langertha/Runtime/Metrics.pm
+    version: '0.503'
+  Langertha::Runtime::Metrics::OTLP:
+    file: lib/Langertha/Runtime/Metrics/OTLP.pm
+    version: '0.503'
+  Langertha::ServerTool:
+    file: lib/Langertha/ServerTool.pm
+    version: '0.503'
+  Langertha::ServerToolCall:
+    file: lib/Langertha/ServerToolCall.pm
+    version: '0.503'
+  Langertha::Spec::LMStudio:
+    file: lib/Langertha/Spec/LMStudio.pm
+    version: '0.503'
+  Langertha::Spec::Mistral:
+    file: lib/Langertha/Spec/Mistral.pm
+    version: '0.503'
+  Langertha::Spec::Ollama:
+    file: lib/Langertha/Spec/Ollama.pm
+    version: '0.503'
+  Langertha::Spec::OpenAI:
+    file: lib/Langertha/Spec/OpenAI.pm
+    version: '0.503'
+  Langertha::Stream:
+    file: lib/Langertha/Stream.pm
+    version: '0.503'
+  Langertha::Stream::Chunk:
+    file: lib/Langertha/Stream/Chunk.pm
+    version: '0.503'
+  Langertha::Tool:
+    file: lib/Langertha/Tool.pm
+    version: '0.503'
+  Langertha::ToolCall:
+    file: lib/Langertha/ToolCall.pm
+    version: '0.503'
+  Langertha::ToolChoice:
+    file: lib/Langertha/ToolChoice.pm
+    version: '0.503'
+  Langertha::ToolResult:
+    file: lib/Langertha/ToolResult.pm
+    version: '0.503'
+  Langertha::Usage:
+    file: lib/Langertha/Usage.pm
+    version: '0.503'
+  Langertha::UsageRecord:
+    file: lib/Langertha/UsageRecord.pm
+    version: '0.503'
+  Langertha::VLLMHook::Config:
+    file: lib/Langertha/VLLMHook/Config.pm
+    version: '0.503'
+  LangerthaX:
+    file: lib/LangerthaX.pm
+    version: '0.503'
 recommends:
+  IO::Async: '0'
   IO::Async::SSL: '0'
+  Net::Async::HTTP: '0'
 requires:
+  Compress::Raw::Bzip2: '0'
+  Compress::Raw::Zlib: '0'
   File::ShareDir::ProjectDistDir: '0'
   Future: '0'
   Future::AsyncAwait: '0.66'
+  HTTP::Date: '0'
+  HTTP::Message: '0'
+  IO::Socket::SSL: '0'
   Import::Into: '0'
   JSON::MaybeXS: '0'
   JSON::PP: '0'
   JSON::Schema::Modern: '0.617'
   LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
   Log::Any: '0'
   MIME::Base64: '0'
   Module::Pluggable: '0'
   Module::Runtime: '0'
   Moose: '0'
   MooseX::NonMoose: '0'
-  Net::Async::MCP: '0'
+  Net::SSLeay: '0'
   OpenAPI::Modern: '0.089'
   Path::Tiny: '0'
   Time::HiRes: '0'
+  Time::Moment: '0'
   URI: '0'
   YAML::PP: '0'
   YAML::XS: '0'
@@ -46,16 +455,17 @@ resources:
   bugtracker: https://github.com/Getty/langertha/issues
   homepage: https://github.com/Getty/langertha
   repository: https://github.com/Getty/langertha.git
-version: '0.502'
+version: '0.503'
 x_Dist_Zilla:
   perl:
-    version: '5.036000'
+    version: '5.040001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .karr
             - README.md
           exclude_match: []
           include_dotfiles: 1
@@ -67,16 +477,16 @@ x_Dist_Zilla:
       name: '@Author::GETTY/Git::GatherDir'
       version: '2.052'
     -
+      class: Dist::Zilla::Plugin::GatherAgentContext
+      name: '@Author::GETTY/GatherAgentContext'
+      version: '0.001'
+    -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
       version: '6.037'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '6.037'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: '@Author::GETTY/@Filter/License'
       version: '6.037'
     -
       class: Dist::Zilla::Plugin::Readme
@@ -118,6 +528,10 @@ x_Dist_Zilla:
       name: '@Author::GETTY/@Filter/UploadToCPAN'
       version: '6.037'
     -
+      class: Dist::Zilla::Plugin::LicenseFile
+      name: '@Author::GETTY/LicenseFile'
+      version: '0.002'
+    -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
       version: '6.037'
@@ -129,6 +543,30 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
       version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@Author::GETTY/Test::ChangesHasContent'
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.037'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000038'
+          version: '0.006'
+      name: '@Author::GETTY/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
@@ -149,10 +587,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: '@Author::GETTY/Prereqs::FromCPANfile'
@@ -255,8 +693,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -288,7 +726,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -301,11 +739,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.502'
+          tag: '0.503'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -316,8 +754,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
@@ -340,10 +778,11 @@ x_Dist_Zilla:
             - Changes
             - Makefile.PL
           allow_dirty_match:
+            - (?^:^bin/)
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -357,10 +796,18 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@Author::GETTY/Git::Push'
       version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::GitHub::CreateRelease
+      name: '@Author::GETTY/GitHub::CreateRelease'
+      version: '0.0012'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: Test::Perl::Critic
+      version: '3.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -401,12 +848,16 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
       version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.037'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
     version: '6.037'
 x_authority: cpan:GETTY
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,6 +1,7 @@
 package TUI::Drivers::SystemError;
 # ABSTRACT: defines the class TSystemError
 
+use 5.010;
 use strict;
 use warnings;
 
@@ -67,8 +68,8 @@ TUI::Drivers::SystemError - system error and Ctrl-Break handling
 
 =head1 DESCRIPTION
 
-C<TUI::Drivers::SystemError> provides system-level error handling facilities
-used by the TUI::Vision driver layer.
+This module provides system-level error handling facilities used by the 
+L<TUI::Vision> driver layer.
 
 The module exposes global state related to Ctrl-Break handling and provides
 class methods to suspend and resume system-level interrupt processing. This
@@ -76,16 +77,16 @@ functionality is used to coordinate application behavior during critical
 sections and shutdown.
 
 In typical applications, C<TSystemError> is coordinated by the application
-lifecycle (for example via C<TApplication-E<gt>suspend()> and
-C<TApplication-E<gt>resume()>), rather than being called directly in business
+lifecycle (for example via C<< TApplication->suspend() >> and
+C<< TApplication->resume() >>), rather than being called directly in business
 logic.
 
 =head2 Commonly Used Features
 
-The most common interaction is checking C<$ctrlBreakHit>, which is set by the
+The most common interaction is checking L</$ctrlBreakHit>, which is set by the
 platform backend when a Ctrl-Break condition is observed.
 
-C<suspend()> and C<resume()> are primarily lifecycle hooks around driver
+L</suspend> and L</resume> are primarily lifecycle hooks around driver
 subsystems. In strict debugging mode, backend Ctrl-Break handler changes are
 intentionally skipped.
 
@@ -93,17 +94,20 @@ intentionally skipped.
 
 =head2 $ctrlBreakHit
 
-Indicates whether a Ctrl-Break event has occurred.
+Indicates whether a Ctrl-Break event has occurred (I<Bool>).
 
 This variable is set to a true value whenever the user triggers a Ctrl-Break
 interrupt. The flag may be cleared by assigning it a false value.
 
 =head2 $saveCtrlBreak
 
-Reserved internal state flag for Ctrl-Break handling compatibility.
+Compatibility variable (I<Bool>) from the original I<Turbo Vision> DOS 
+implementation.
 
-It is declared as part of the driver state surface but is not actively
-modified by this module's current implementation.
+Historically it stored the previous DOS Ctrl-Break flag so that the system 
+state could be restored when I<Turbo Vision> released control of the terminal. 
+The Perl port does not use this mechanism and the variable is retained only for 
+compatibility.
 
 =head1 METHODS
 
@@ -127,8 +131,8 @@ was active before C<suspend> was called.
 
 =head1 SEE ALSO
 
-L<TUI::Drivers::HardwareInfo>,
-L<TUI::Drivers::Event>
+L<THardwareInfo|TUI::Drivers::HardwareInfo>,
+L<TEvent|TUI::Drivers::Event>
 
 =head1 AUTHORS
 

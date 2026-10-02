@@ -1,6 +1,6 @@
 package Langertha::Engine::Groq;
 # ABSTRACT: GroqCloud API
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Carp qw( croak );
 
@@ -32,6 +32,89 @@ sub _build_supported_operations {[qw(
   createTranscription
 )]}
 
+# karr #148 / #184: Groq rejects a JSON response_format combined with tool use --
+# BOTH json_object and json_schema 400 alongside tools, with the same "json mode
+# cannot be combined with tool/function calling" message (live-verified
+# 2026-09-19). Its Structured Outputs (json_schema) additionally reject streaming;
+# json_object + streaming is not disproven and is left through. This is a
+# Groq-platform property that holds across the models it serves, so an all-models
+# matcher (qr//) expresses it on the model-scoped exclusion seam
+# (Langertha::Role::Chat). There is no shared gpt-oss base rule (removed k184),
+# so this all-models rule is the only exclusion on Groq's own gpt-oss route.
+# Consulted by chat_f (streaming => 0) and chat_stream_realtime_f (streaming => 1).
+sub model_capability_exclusions {
+  return (
+    qr// => \&_exclude_json_schema_with_tools_or_streaming,
+  );
+}
+
+sub _exclude_json_schema_with_tools_or_streaming {
+  my ( $self, %request ) = @_;
+  my $rf   = $request{response_format};
+  my $type = ( ref $rf eq 'HASH' ) ? ( $rf->{type} // '' ) : '';
+  # Streaming: only json_schema is live-confirmed to 400 (json_object + streaming
+  # is not disproven, so it is left through).
+  if ( $request{streaming} && $type eq 'json_schema' ) {
+    croak "".(ref $self)." cannot combine response_format json_schema with "
+      ."streaming: Groq Structured Outputs do not support streaming and the "
+      ."API rejects this with HTTP 400. Use the non-streaming chat_f for "
+      ."json_schema output.";
+  }
+  # Tools: BOTH json_object and json_schema 400 alongside tools.
+  if ( $request{has_tools} && ( $type eq 'json_schema' || $type eq 'json_object' ) ) {
+    croak "".(ref $self)." cannot combine tools with a JSON response_format "
+      ."(json_object or json_schema) in one request: Groq rejects json mode "
+      ."combined with tool/function calling with HTTP 400. Send tools or a JSON "
+      ."response_format, not both.";
+  }
+  return;
+}
+
+# image_input (k266, ADR 0019 k266 Update): the only Groq vision model is
+# qwen/qwen3.8-27b (console.groq.com/docs/vision, llm-advisor, docs only,
+# 2026-09-25); the catch-all first row clears the flag for every other id.
+#
+# Groq has no default model: building chat_model croaks, and the layer-3 walk
+# reads chat_model. With no model configured the table is therefore empty (so
+# supports() keeps answering instead of croaking, as it did before k266) and
+# the around below makes no image_input claim in its place.
+sub _has_configured_model {
+  my ( $self ) = @_;
+  return $self->has_chat_model || $self->has_model;
+}
+
+sub model_capability_corrections {
+  my ( $self ) = @_;
+  return () unless $self->_has_configured_model;
+  return (
+    qr/\A/             => { image_input => 0 },
+    'qwen/qwen3.8-27b' => { image_input => 1 },
+  );
+}
+
+around engine_capabilities => sub {
+  my ( $orig, $self, @rest ) = @_;
+  my $caps = $self->$orig(@rest);
+  delete $caps->{image_input} unless $self->_has_configured_model;
+  return $caps;
+};
+
+# Groq reports a stream's usage under x_groq.usage on its last chunk instead
+# of a top-level usage (Groq API reference / SDK chunk type; not live-verified).
+# One provider's spelling, so it is read here (ADR 0018 tier 3), guarded by the
+# canonical predicate: a top-level usage, when Groq sends one, wins. -- k298
+around parse_stream_chunk => sub {
+  my ( $orig, $self, $data, @rest ) = @_;
+  my $chunk = $self->$orig( $data, @rest );
+  return $chunk if $chunk && $chunk->has_usage;
+  my $x_groq = ref $data eq 'HASH' ? $data->{x_groq} : undef;
+  my %usage  = $self->_openai_stream_usage_kwargs( ref $x_groq eq 'HASH' ? $x_groq->{usage} : undef );
+  return $chunk unless %usage;
+  return $chunk->meta->clone_object( $chunk, %usage ) if $chunk;
+  require Langertha::Stream::Chunk;
+  return Langertha::Stream::Chunk->new( content => '', raw => $data, is_final => 0, %usage );
+};
+
 __PACKAGE__->meta->make_immutable;
 
 
@@ -49,7 +132,7 @@ Langertha::Engine::Groq - GroqCloud API
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -64,7 +147,8 @@ version 0.502
     print $groq->simple_chat('Say something nice');
 
     # Audio transcription
-    my $text = $groq->transcription('/path/to/audio.mp3');
+    my $text = $groq->simple_transcription('/path/to/audio.mp3');
+    # async: await $groq->simple_transcription_f(...)
 
 =head1 DESCRIPTION
 

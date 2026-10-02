@@ -85,6 +85,61 @@ my $session = Langertha::Knarr::Session->new( id => 's' );
   is( $tracer->events->[1]{output}, 'alpha', 'stream output accumulated' );
 }
 
+# --- Streaming records proxy-measured TTFT (regression for karr k12) ---
+# The routed streaming path has no Langertha::Response, so the decorator must
+# measure time-to-first-token itself and hand end_trace a timing hash. If that
+# timing is ever dropped again, the two asserts below fail.
+{
+  my $tracer  = MockTracer->new;
+  my $wrapped = Langertha::Knarr::Handler::Code->new(
+    code        => sub { 'sync-fallback' },
+    stream_code => sub { my @p = ('to', 'ke', 'n'); sub { @p ? shift @p : undef } },
+  );
+  my $h = Langertha::Knarr::Handler::Tracing->new(
+    wrapped => $wrapped,
+    tracing => $tracer,
+  );
+  my $req = Langertha::Knarr::Request->new(
+    protocol => 'openai',
+    model    => 'gpt-test',
+    stream   => 1,
+    messages => [ { role => 'user', content => 'hi' } ],
+  );
+  my $stream = $h->handle_stream_f( $session, $req )->get;
+  1 while defined $stream->next_chunk_f->get;
+
+  my $end = $tracer->events->[1];
+  is( $end->{kind}, 'end', 'stream end recorded' );
+  is( ref $end->{timing}, 'HASH', 'end_trace received a timing hash' );
+  ok( defined $end->{timing}{ttft_seconds}, 'timing carries a defined ttft_seconds' );
+}
+
+# --- Empty stream claims no TTFT ---
+# No delta ever arrives, so the decorator must not invent a ttft.
+{
+  my $tracer  = MockTracer->new;
+  my $wrapped = Langertha::Knarr::Handler::Code->new(
+    code        => sub { 'sync-fallback' },
+    stream_code => sub { sub { undef } },
+  );
+  my $h = Langertha::Knarr::Handler::Tracing->new(
+    wrapped => $wrapped,
+    tracing => $tracer,
+  );
+  my $req = Langertha::Knarr::Request->new(
+    protocol => 'openai',
+    model    => 'gpt-test',
+    stream   => 1,
+    messages => [ { role => 'user', content => 'hi' } ],
+  );
+  my $stream = $h->handle_stream_f( $session, $req )->get;
+  1 while defined $stream->next_chunk_f->get;
+
+  my $end = $tracer->events->[1];
+  is( $end->{kind}, 'end', 'empty stream end recorded' );
+  ok( !exists $end->{timing}, 'no timing when no delta was seen' );
+}
+
 # --- Tracing skips list_models ---
 {
   my $tracer = MockTracer->new;

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumClusterwideEnvoyConfig;
 # ABSTRACT: CiliumClusterwideEnvoyConfig
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumclusterwideenvoyconfigs',
@@ -23,7 +23,7 @@ IO::K8s::Cilium::V2::CiliumClusterwideEnvoyConfig - CiliumClusterwideEnvoyConfig
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

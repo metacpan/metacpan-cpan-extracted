@@ -7,9 +7,8 @@ use Fcntl qw(:flock);
 use IO::Handle;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
-our $VERSION = '5.26.3';
-
-my $CREATED = '2026-08-11';
+our $VERSION = '5.26.4';
+my $CREATED  = '2026-08-11';
 
 # Journal field separator — ASCII Record Separator (0x1E).
 # Tab cannot be used because raw DB values contain literal tabs.

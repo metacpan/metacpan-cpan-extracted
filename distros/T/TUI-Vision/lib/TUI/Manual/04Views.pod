@@ -1,0 +1,30 @@
+# PODNAME: TUI::Manual::04
+# ABSTRACT: Views and Groups in TUI::Vision
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+TUI::Manual::04 - Views and Groups in TUI::Vision
+
+=head1 VIEWS AND GROUPS
+
+=head2 The Role of TView
+
+=head2 The Role of TGroup
+
+=head2 Geometry and Bounds
+
+=head2 Visibility and Focus
+
+=head2 Event Handling in Views
+
+=head2 Conclusion
+
+L<next|TUI::Manual::05> chapter.
+
+=cut

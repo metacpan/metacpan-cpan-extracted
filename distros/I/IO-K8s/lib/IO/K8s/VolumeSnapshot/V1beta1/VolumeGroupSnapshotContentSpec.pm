@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1beta1::VolumeGroupSnapshotContentSpec;
 # ABSTRACT: VolumeGroupSnapshotContentSpec describes common group snapshot content attributes
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s deletionPolicy => Str, { required => 'schema', enum => [qw(Delete Retain)] };
@@ -32,7 +32,7 @@ IO::K8s::VolumeSnapshot::V1beta1::VolumeGroupSnapshotContentSpec - VolumeGroupSn
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 deletionPolicy
 

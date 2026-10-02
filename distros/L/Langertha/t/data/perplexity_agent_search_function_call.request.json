@@ -1,0 +1,31 @@
+{
+   "input" : [
+      {
+         "content" : "Search the web to find out which city hosts the Perl and Raku Conference 2026, then call get_weather for that city.",
+         "role" : "user",
+         "type" : "message"
+      }
+   ],
+   "max_output_tokens" : 300,
+   "preset" : "fast",
+   "stream" : false,
+   "tools" : [
+      {
+         "description" : "Get the current weather for a city.",
+         "name" : "get_weather",
+         "parameters" : {
+            "properties" : {
+               "city" : {
+                  "description" : "City name",
+                  "type" : "string"
+               }
+            },
+            "required" : [
+               "city"
+            ],
+            "type" : "object"
+         },
+         "type" : "function"
+      }
+   ]
+}

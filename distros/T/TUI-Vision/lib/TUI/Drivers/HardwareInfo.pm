@@ -1,4 +1,5 @@
 package TUI::Drivers::HardwareInfo;
+# ABSTRACT: Platform-independent hardware interface dispatcher
 
 use strict;
 use warnings;
@@ -11,7 +12,11 @@ my %module = (
   MSWin32 => 'Win32',
 );
 
-my $module = $module{$^O} || 'Unix';
+# Use the Termbox backend by default. 
+my $module = $module{$^O} || 'Termbox';
+if ( $^O eq 'MSWin32' ) {
+  $module = $ENV{WT_SESSION} ? 'Termbox' : 'Win32';
+}
 
 sub THardwareInfo() { "TUI::Drivers::HardwareInfo::$module" }
 
@@ -41,7 +46,7 @@ TUI::Drivers::HardwareInfo - platform-independent hardware interface dispatcher
 =head1 DESCRIPTION
 
 C<THardwareInfo> provides the platform-independent entry point for
-hardware-related operations used by the TUI::Vision driver layer.
+hardware-related operations used by the L<TUI::Vision> driver layer.
 
 This module does not implement any hardware access itself. Instead, it selects
 and loads a platform-specific backend at runtime and exposes it under the
@@ -60,12 +65,13 @@ C<THardwareInfo> must not be instantiated.
 
 Typical code uses C<THardwareInfo> as a static interface for low-level driver
 queries and operations, for example: reading screen dimensions
-(C<getScreenCols()>/C<getScreenRows()>), checking timing
-(C<getTickCount()>), reading platform information (C<getPlatform()>), and
+(L</getScreenCols>/L</getScreenRows>), checking timing
+(L</getTickCount>), reading platform information (L</getPlatform>), and
 performing caret/screen operations needed by the event and display layers.
 
 In normal application code, these methods are usually accessed indirectly
-through higher-level modules such as C<TScreen>, C<TDisplay>, C<TEventQueue>,
+through higher-level modules such as L<TScreen|TUI::Drivers::Screen>, 
+L<TDisplay|TUI::Drivers::Display>, L<TEventQueue|TUI::Drivers::EventQueue>,
 and mouse/system-error wrappers.
 
 =head1 PLATFORM DISPATCH
@@ -75,8 +81,16 @@ corresponding backend module.
 
 Current backend availability in this distribution:
 
-- Windows systems: C<TUI::Drivers::HardwareInfo::Win32>
-- Non-Windows systems: no backend module is currently shipped
+=over 4
+
+=item * Windows systems: L<TUI::Drivers::HardwareInfo::Win32>
+
+=item * Non-Windows systems: L<TUI::Drivers::HardwareInfo::Termbox>
+
+=back
+
+B<Note:> On Windows, prefer the L<Termbox::PP> backend if running under Windows 
+Terminal (C<WT_SESSION>).
 
 As of now, this dispatcher is effectively Win32-only. Attempting to load
 C<THardwareInfo> on unsupported platforms will fail until additional backend
@@ -219,12 +233,31 @@ Installs or removes the Ctrl-Break handler.
 
 Installs or removes the critical error handler.
 
+=head2 getColorCount
+
+  my $count = THardwareInfo->getColorCount();
+
+Returns the number of colors supported by the current terminal.
+
+=head2 reloadScreenInfo
+
+  THardwareInfo->reloadScreenInfo();
+
+Reloads the screen information from the underlying platform. 
+This is typically called when the screen has been resized.
+
+=head2 screenChanged
+
+  my $bool = THardwareInfo->screenChanged();
+
+Returns true if the screen has changed since the last call to this method.
+
 =head1 SEE ALSO
 
 L<TUI::Drivers::HardwareInfo::Win32>,
-L<TUI::Drivers::Screen>,
-L<TUI::Drivers::HWMouse>,
-L<TUI::Drivers::SystemError>
+L<TScreen|TUI::Drivers::Screen>,
+L<THWMouse|TUI::Drivers::HWMouse>,
+L<TSystemError|TUI::Drivers::SystemError>
 
 =head1 AUTHORS
 

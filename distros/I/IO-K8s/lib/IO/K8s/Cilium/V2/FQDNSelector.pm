@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::FQDNSelector;
 # ABSTRACT: FQDNSelector
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s matchName    => Str, { pattern => qr/^([-a-zA-Z0-9_]+[.]?)+$/ };
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::FQDNSelector - FQDNSelector
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 matchName
 

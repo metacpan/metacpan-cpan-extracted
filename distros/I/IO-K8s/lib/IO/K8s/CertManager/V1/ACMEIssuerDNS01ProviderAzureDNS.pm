@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEIssuerDNS01ProviderAzureDNS;
 # ABSTRACT: Use the Microsoft Azure DNS API to manage DNS01 challenge records.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s clientID              => Str;
@@ -36,7 +36,7 @@ IO::K8s::CertManager::V1::ACMEIssuerDNS01ProviderAzureDNS - Use the Microsoft Az
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 clientID
 

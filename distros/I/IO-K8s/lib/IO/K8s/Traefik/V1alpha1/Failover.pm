@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::Failover;
 # ABSTRACT: Failover defines the Failover service configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s errors   => '+IO::K8s::Traefik::V1alpha1::FailoverError', { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::Traefik::V1alpha1::Failover - Failover defines the Failover service con
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 errors
 

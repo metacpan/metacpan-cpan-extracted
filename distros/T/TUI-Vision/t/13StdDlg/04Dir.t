@@ -102,13 +102,17 @@ subtest 'getcurdir' => sub {
 #--------------
 note 'setdisk';
 #--------------
-subtest 'setdisk' => sub {
-  my $cur = getdisk();
+SKIP: {
+  skip 'setdisk is Windows-only (drive letters)', 1 if $^O ne 'MSWin32';
 
-  my $rc = setdisk( $cur + 1 );
-  ok( $rc >= 0, 'setdisk succeeds for current drive' );
-  is( getdisk(), $cur, 'current drive unchanged or restored' );
-};
+  subtest 'setdisk' => sub {
+    my $cur = getdisk();
+
+    my $rc = setdisk( $cur + 1 );
+    ok( $rc >= 0, 'setdisk succeeds for current drive' );
+    is( getdisk(), $cur, 'current drive unchanged or restored' );
+  };
+}
 
 #-------------------------
 note 'findfirst/findnext';

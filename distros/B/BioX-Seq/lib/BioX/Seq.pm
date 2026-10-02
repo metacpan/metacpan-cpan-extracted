@@ -1,4 +1,4 @@
-package BioX::Seq 0.008012;
+package BioX::Seq 0.008014;
 
 use 5.016;
 use strict;
@@ -148,7 +148,7 @@ sub qual : lvalue {
 sub range {
 
     my ($self, $start, $end) = @_;
-    if ($start < 1 || $end > length($self->{seq})) {
+    if ($start < 1 || $end < 1 || $start > $end || $end > length($self->{seq})) {
         warn "Range outside of sequence length\n";
         return;
     }
@@ -226,7 +226,7 @@ sub as_input {
     die "No input format found"
         if (! defined $self->{_input_format});
     my $method = 'as_' . $self->{_input_format};
-    $self->$method();
+    $self->$method($arg2);
 
 }
 

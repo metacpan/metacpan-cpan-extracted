@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -92,26 +92,27 @@ __END__
 
 =head1 NAME
 
-TUI::Objects::Object - root class for all TUI::Vision objects
+TUI::Objects::Object - root class for all L<TUI::Vision> objects
 
 =head1 HIERARCHY
 
   TObject
     TView
-    TCollection
+    TNSCollection
     TStream
     TStringList
     TStrListMaker
     TResourceFile
+    ...
 
 =head1 DESCRIPTION
 
-C<TObject> is the root class of the TUI::Vision object hierarchy. Nearly all
+C<TObject> is the root class of the L<TUI::Vision> object hierarchy. Nearly all
 objects used by the framework are derived from C<TObject>, and all objects that
 can be written to streams must descend from it.
 
 The class defines the basic initialization and destruction semantics shared by
-all TUI::Vision objects. Descendant classes are expected to follow these rules
+all L<TUI::Vision> objects. Descendant classes are expected to follow these rules
 by invoking their parent constructors and destructors appropriately.
 
 C<TObject> itself does not provide visible behavior and is not normally used
@@ -125,9 +126,8 @@ directly by application code.
 
 Creates a new object and performs base initialization.
 
-This constructor corresponds to the Turbo Vision constructor. All
-derived classes must ensure that their base class constructor is invoked before
-performing class-specific initialization.
+All derived classes must ensure that their base class constructor is invoked 
+before performing class-specific initialization.
 
 =head2 new_TObject
 
@@ -145,10 +145,6 @@ construction patterns and is primarily used internally.
   $self->DEMOLISH($in_global_destruction);
 
 Destroys the object and releases associated resources.
-
-This method corresponds to the Turbo Vision destructor. Descendant
-classes should perform their cleanup before delegating to the base
-implementation.
 
 =head1 METHODS
 
@@ -173,9 +169,8 @@ method to release internal resources prior to destruction.
 
 =head1 SEE ALSO
 
-L<TUI::Views::View>,
-L<TUI::Objects::Collection>,
-L<TUI::Objects::Stream>
+L<TView|TUI::Views::View>,
+L<TCollection|TUI::Objects::Collection>
 
 =head1 AUTHORS
 

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::AzureKVProvider;
 # ABSTRACT: AzureKV configures this store to sync secrets using Azure Key Vault provider
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s authSecretRef     => '+IO::K8s::ExternalSecrets::V1::AzureKVAuth';
@@ -36,7 +36,7 @@ IO::K8s::ExternalSecrets::V1::AzureKVProvider - AzureKV configures this store to
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 authSecretRef
 

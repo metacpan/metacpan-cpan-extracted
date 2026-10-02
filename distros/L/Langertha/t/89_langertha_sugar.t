@@ -6,6 +6,14 @@ use warnings;
 
 use Test2::Bundle::More;
 
+use Langertha::Chat;
+
+# Langertha::Raider lives in the langertha-raider distribution. The lazy
+# `use Langertha qw( Raider )` sugar still wires it up when it is installed;
+# the Raider subtests below are guarded so the core distribution stays green
+# without it. The Plugin sugar and the import-error handling are core.
+my $has_raider = eval { require Langertha::Raider; 1 };
+
 # --- Helper: minimal mock engine ---
 
 {
@@ -26,71 +34,7 @@ use Test2::Bundle::More;
   __PACKAGE__->meta->make_immutable;
 }
 
-# --- Test: use Langertha qw( Raider ) ---
-
-{
-  package TestSugarRaider;
-  use Langertha qw( Raider );
-  __PACKAGE__->meta->make_immutable;
-}
-
-subtest 'use Langertha qw( Raider ) sets up class' => sub {
-  ok(TestSugarRaider->isa('Langertha::Raider'), 'extends Langertha::Raider');
-  ok(TestSugarRaider->isa('Moose::Object'), 'is a Moose class');
-
-  my $raider = TestSugarRaider->new(
-    engine     => MockEngine->new,
-    raider_mcp => 1,
-  );
-  ok($raider->can('raid_f'), 'has raid_f');
-  is_deeply($raider->plugins, [], 'no plugins registered');
-};
-
-# --- Test: plugin sugar registers plugin names ---
-
-{
-  package TestSugarRaiderWithPlugin;
-  use Langertha qw( Raider );
-  plugin 'TestSugarPlugin';
-  __PACKAGE__->meta->make_immutable;
-}
-
-subtest 'plugin() sugar registers plugin name' => sub {
-  my $raider = TestSugarRaiderWithPlugin->new(
-    engine     => MockEngine->new,
-    raider_mcp => 1,
-  );
-
-  is_deeply($raider->plugins, ['TestSugarPlugin'], 'TestSugarPlugin registered');
-  is(scalar @{$raider->_plugin_instances}, 1, 'one instance');
-  isa_ok($raider->_plugin_instances->[0], 'TestSugarPlugin');
-};
-
-# --- Test: use Langertha qw( Raider ) with around modifier ---
-
-{
-  package TestSugarRaiderCustom;
-  use Langertha qw( Raider );
-
-  has custom_flag => (is => 'rw', default => 0);
-
-  # Raider subclass can override hooks directly? No — hooks are on Plugin.
-  # But we can add a plugin inline that modifies behavior.
-
-  __PACKAGE__->meta->make_immutable;
-}
-
-subtest 'use Langertha qw( Raider ) allows custom attributes' => sub {
-  my $raider = TestSugarRaiderCustom->new(
-    engine     => MockEngine->new,
-    raider_mcp => 1,
-  );
-  is($raider->custom_flag, 0, 'custom attribute works');
-  $raider->custom_flag(1);
-  is($raider->custom_flag, 1, 'attribute writable');
-};
-
-# --- Test: use Langertha qw( Plugin ) ---
+# --- Test: use Langertha qw( Plugin ) (core) ---
 
 {
   package TestSugarPlugin;
@@ -107,39 +51,6 @@ subtest 'use Langertha qw( Raider ) allows custom attributes' => sub {
   __PACKAGE__->meta->make_immutable;
 }
 
-subtest 'use Langertha qw( Plugin ) sets up plugin class' => sub {
-  ok(TestSugarPlugin->isa('Langertha::Plugin'), 'extends Langertha::Plugin');
-  ok(TestSugarPlugin->isa('Moose::Object'), 'is a Moose class');
-};
-
-subtest 'sugar-defined plugin works' => sub {
-  my $raider = Langertha::Raider->new(
-    engine     => MockEngine->new,
-    raider_mcp => 1,
-  );
-
-  my $plugin = TestSugarPlugin->new(raider => $raider);
-  is($plugin->my_attr, 'works', 'attribute available');
-
-  my $msgs = [{ role => 'user', content => 'hello' }];
-  my $result = $plugin->plugin_before_raid($msgs)->get;
-  is(scalar @$result, 2, 'plugin modified');
-  is($result->[1]{content}, 'injected', 'injection works');
-};
-
-subtest 'sugar-defined plugin via plugins attribute' => sub {
-  my $raider = Langertha::Raider->new(
-    engine     => MockEngine->new,
-    raider_mcp => 1,
-    plugins    => ['TestSugarPlugin'],
-  );
-
-  is(scalar @{$raider->_plugin_instances}, 1, 'one instance');
-  isa_ok($raider->_plugin_instances->[0], 'TestSugarPlugin');
-};
-
-# --- Test: multiple plugins ---
-
 {
   package TestPlugin::AlphaSugar;
   use Moose;
@@ -154,45 +65,132 @@ subtest 'sugar-defined plugin via plugins attribute' => sub {
   __PACKAGE__->meta->make_immutable;
 }
 
-{
-  package TestSugarRaiderMulti;
-  use Langertha qw( Raider );
-  plugin 'TestPlugin::AlphaSugar';
-  plugin 'TestSugarPlugin';
-  __PACKAGE__->meta->make_immutable;
-}
-
-subtest 'multiple plugins via sugar' => sub {
-  my $raider = TestSugarRaiderMulti->new(
-    engine     => MockEngine->new,
-    raider_mcp => 1,
-  );
-
-  is_deeply($raider->plugins, ['TestPlugin::AlphaSugar', 'TestSugarPlugin'], 'both registered');
-  is(scalar @{$raider->_plugin_instances}, 2, 'two instances');
-  isa_ok($raider->_plugin_instances->[0], 'TestPlugin::AlphaSugar');
-  isa_ok($raider->_plugin_instances->[1], 'TestSugarPlugin');
+subtest 'use Langertha qw( Plugin ) sets up plugin class' => sub {
+  ok(TestSugarPlugin->isa('Langertha::Plugin'), 'extends Langertha::Plugin');
+  ok(TestSugarPlugin->isa('Moose::Object'), 'is a Moose class');
 };
 
-# --- Test: plugins can be overridden at instantiation ---
+subtest 'sugar-defined plugin works' => sub {
+  # A plugin host is any Langertha::Role::PluginHost consumer; Langertha::Chat
+  # is a core one, so the plugin hook is exercised without Langertha::Raider.
+  my $host = Langertha::Chat->new(engine => MockEngine->new);
 
-subtest 'plugins overridden at instantiation' => sub {
-  # Class has TestSugarPlugin registered via sugar
-  my $raider = TestSugarRaiderWithPlugin->new(
-    engine     => MockEngine->new,
-    raider_mcp => 1,
-    plugins    => [],  # override: no plugins
-  );
+  my $plugin = TestSugarPlugin->new(host => $host);
+  is($plugin->my_attr, 'works', 'attribute available');
 
-  is_deeply($raider->plugins, [], 'override works');
-  is(scalar @{$raider->_plugin_instances}, 0, 'no instances');
+  my $msgs = [{ role => 'user', content => 'hello' }];
+  my $result = $plugin->plugin_before_raid($msgs)->get;
+  is(scalar @$result, 2, 'plugin modified');
+  is($result->[1]{content}, 'injected', 'injection works');
 };
 
-# --- Test: invalid import argument ---
+# --- Test: invalid import argument (core) ---
 
 subtest 'invalid import argument dies' => sub {
   eval { Langertha->import('Nonsense') };
   like($@, qr/Unknown Langertha import 'Nonsense'/, 'dies with useful error');
 };
+
+# --- Test: use Langertha qw( Raider ) sugar (langertha-raider) ---
+
+SKIP: {
+  skip 'Langertha::Raider not installed (extracted to langertha-raider)', 6
+    unless $has_raider;
+
+  # The Raider-subclass packages call `use Langertha qw( Raider )` at compile
+  # time, which pulls in Langertha::Raider; define them via string eval so the
+  # file still compiles when that distribution is absent.
+  my $setup_ok = eval q{
+    package TestSugarRaider {
+      use Langertha qw( Raider );
+      __PACKAGE__->meta->make_immutable;
+    }
+    package TestSugarRaiderWithPlugin {
+      use Langertha qw( Raider );
+      plugin 'TestSugarPlugin';
+      __PACKAGE__->meta->make_immutable;
+    }
+    package TestSugarRaiderCustom {
+      use Langertha qw( Raider );
+      has custom_flag => (is => 'rw', default => 0);
+      __PACKAGE__->meta->make_immutable;
+    }
+    package TestSugarRaiderMulti {
+      use Langertha qw( Raider );
+      plugin 'TestPlugin::AlphaSugar';
+      plugin 'TestSugarPlugin';
+      __PACKAGE__->meta->make_immutable;
+    }
+    1;
+  };
+  BAIL_OUT("Raider sugar package setup failed: $@") unless $setup_ok;
+
+  subtest 'use Langertha qw( Raider ) sets up class' => sub {
+    ok(TestSugarRaider->isa('Langertha::Raider'), 'extends Langertha::Raider');
+    ok(TestSugarRaider->isa('Moose::Object'), 'is a Moose class');
+
+    my $raider = TestSugarRaider->new(
+      engine     => MockEngine->new,
+      raider_mcp => 1,
+    );
+    ok($raider->can('raid_f'), 'has raid_f');
+    is_deeply($raider->plugins, [], 'no plugins registered');
+  };
+
+  subtest 'plugin() sugar registers plugin name' => sub {
+    my $raider = TestSugarRaiderWithPlugin->new(
+      engine     => MockEngine->new,
+      raider_mcp => 1,
+    );
+
+    is_deeply($raider->plugins, ['TestSugarPlugin'], 'TestSugarPlugin registered');
+    is(scalar @{$raider->_plugin_instances}, 1, 'one instance');
+    isa_ok($raider->_plugin_instances->[0], 'TestSugarPlugin');
+  };
+
+  subtest 'use Langertha qw( Raider ) allows custom attributes' => sub {
+    my $raider = TestSugarRaiderCustom->new(
+      engine     => MockEngine->new,
+      raider_mcp => 1,
+    );
+    is($raider->custom_flag, 0, 'custom attribute works');
+    $raider->custom_flag(1);
+    is($raider->custom_flag, 1, 'attribute writable');
+  };
+
+  subtest 'sugar-defined plugin via plugins attribute' => sub {
+    my $raider = Langertha::Raider->new(
+      engine     => MockEngine->new,
+      raider_mcp => 1,
+      plugins    => ['TestSugarPlugin'],
+    );
+
+    is(scalar @{$raider->_plugin_instances}, 1, 'one instance');
+    isa_ok($raider->_plugin_instances->[0], 'TestSugarPlugin');
+  };
+
+  subtest 'multiple plugins via sugar' => sub {
+    my $raider = TestSugarRaiderMulti->new(
+      engine     => MockEngine->new,
+      raider_mcp => 1,
+    );
+
+    is_deeply($raider->plugins, ['TestPlugin::AlphaSugar', 'TestSugarPlugin'], 'both registered');
+    is(scalar @{$raider->_plugin_instances}, 2, 'two instances');
+    isa_ok($raider->_plugin_instances->[0], 'TestPlugin::AlphaSugar');
+    isa_ok($raider->_plugin_instances->[1], 'TestSugarPlugin');
+  };
+
+  subtest 'plugins overridden at instantiation' => sub {
+    my $raider = TestSugarRaiderWithPlugin->new(
+      engine     => MockEngine->new,
+      raider_mcp => 1,
+      plugins    => [],  # override: no plugins
+    );
+
+    is_deeply($raider->plugins, [], 'override works');
+    is(scalar @{$raider->_plugin_instances}, 0, 'no instances');
+  };
+}
 
 done_testing;

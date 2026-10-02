@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::ResourceClaimTemplateSpec;
 # ABSTRACT: ResourceClaimTemplateSpec contains the metadata and fields for a ResourceClaim.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Resource::V1beta1::ResourceClaimTemplateSpec - ResourceClaimTempla
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

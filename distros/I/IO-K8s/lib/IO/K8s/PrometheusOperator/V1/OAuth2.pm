@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::OAuth2;
 # ABSTRACT: oauth2 defines the OAuth2 settings used by the client.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s clientId             => '+IO::K8s::PrometheusOperator::V1::SecretOrConfigMap', { required => 'schema' };
@@ -38,7 +38,7 @@ IO::K8s::PrometheusOperator::V1::OAuth2 - oauth2 defines the OAuth2 settings use
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 clientId
 

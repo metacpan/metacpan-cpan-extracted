@@ -41,7 +41,7 @@
 # __float128 perl -- the same because what is left is gemmi's own double
 # arithmetic, not this module's.  The tolerance is 1e-11, fifty times the
 # worst seen.  Never widen it to make a failure go away.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

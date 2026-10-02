@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::LocalPolicyTargetReferenceWithSectionName;
 # ABSTRACT: LocalPolicyTargetReferenceWithSectionName identifies an API object to apply a direct policy to.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s group       => Str, { required => 'schema', pattern => qr/^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/ };
@@ -26,7 +26,7 @@ IO::K8s::GatewayAPI::V1::LocalPolicyTargetReferenceWithSectionName - LocalPolicy
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 group
 

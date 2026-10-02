@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeSnapshotError;
 # ABSTRACT: error is the last observed error during snapshot creation, if any.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s message => Str;
@@ -22,7 +22,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeSnapshotError - error is the last observed er
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 message
 

@@ -5,6 +5,7 @@ use Future;
 use File::Temp qw( tempdir );
 use JSON::MaybeXS;
 use Path::Tiny;
+use POSIX ();
 
 use Langertha::Knarr::Session;
 use Langertha::Knarr::Request;
@@ -86,6 +87,38 @@ my $session = Langertha::Knarr::Session->new( id => 's' );
   my $entry = $json->decode( $lines[0] );
   is( $entry->{output}, 'alpha-bet', 'accumulated stream output logged' );
   is( $entry->{model},  'gpt-stream', 'stream model logged' );
+}
+
+# --- logging.dir: requests finishing in the same millisecond, in one
+# process or in two workers (k51), each get their own file ---
+{
+  my $dir = tempdir( CLEANUP => 1 );
+  my $drlog = Langertha::Knarr::RequestLog->new( config => Langertha::Knarr::Config->new(
+    data => { models => {}, logging => { dir => $dir } } ) );
+  no warnings 'redefine';
+  local *Langertha::Knarr::RequestLog::_file_timestamp = sub { '20260929_201530_123' };
+  my $log_one = sub {
+    my $h = $drlog->start_request( model => 'gpt-4o', format => 'openai',
+      messages => [ { role => 'user', content => 'hi' } ] );
+    $drlog->end_request( $h, output => 'x' );
+  };
+  $log_one->() for 1 .. 2;
+  my $child = fork // die "fork: $!";
+  unless ($child) {
+    $log_one->();   # a worker forked with the same sequence state
+    POSIX::_exit(0);
+  }
+  waitpid( $child, 0 );
+  $log_one->();
+
+  my @names = sort map { $_->basename } path($dir)->children;
+  is( scalar @names, 4, 'four requests in one millisecond: four files' ) or diag "@names";
+  like( $_, qr/\A20260929_201530_123_\d+-\d+_openai_gpt-4o\.json\z/,
+    "$_: timestamp_pid-seq_format_model.json" ) for @names;
+  my %pids = map { /_(\d+)-\d+_/ ? ( $1 => 1 ) : () } @names;
+  is( [ sort keys %pids ], [ sort( $$, $child ) ], 'named by the process that wrote them' );
+  is( [ sort map { /-(\d+)_/ } grep { /_${$}-/ } @names ], [ 1, 2, 3 ],
+    'numbered per process' );
 }
 
 done_testing;

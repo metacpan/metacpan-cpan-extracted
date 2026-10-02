@@ -771,9 +771,23 @@ Key Makefile targets:
         cpanfile.darkpan
         cpanm.darkpan
 
-    `cpanfile.darkpan` contains the non-CPAN dependencies in cpanfile
-    syntax. `cpanm.darkpan` contains the same dependencies in a form
-    suitable for passing to [cpanm](https://metacpan.org/pod/App%3A%3Acpanminus).
+    For each module listed in `requires`, the build checks whether the module
+    is available from the configured DarkPAN. Modules found there are added to
+    the generated DarkPAN manifests.
+
+    For modules available from the DarkPAN, the build also checks MetaCPAN. If
+    a module is available from both CPAN and the DarkPAN, the DarkPAN version is
+    preferred and the module remains in the generated manifests. This allows the
+    DarkPAN to provide a version of a module that is also published on CPAN.
+
+    Modules that should not be obtained from the DarkPAN may be listed in
+    `darkpan.skip`, one module name per line. Those modules are omitted from
+    both generated DarkPAN manifests.
+
+    `cpanfile.darkpan` contains dependencies selected for resolution from
+    the DarkPAN in cpanfile syntax. `cpanm.darkpan` contains the same
+    dependencies in a form suitable for passing to
+    [cpanm](https://metacpan.org/pod/App%3A%3Acpanminus).
 
     The configured DarkPAN must publish:
 
@@ -1003,11 +1017,27 @@ If you want a different `README.md` generated create a
 
 - create-darkpan-requires
 
-        cmb create-darkpan-requires
+        cmb create-darkpan-requires [--filter file] [requires-file]
 
-    Examines `requires` and identifies dependencies available from the configured
-    DarkPAN. If a dependency is available from both CPAN and the DarkPAN, the
-    DarkPAN is preferred.
+    Examines `requires` (or `requires-file`) and identifies dependencies
+    available from the configured DarkPAN. Each dependency is checked
+    against the DarkPAN `02packages.details.txt.gz` index. Dependencies
+    found on the DarkPAN are included in the generated manifests.
+
+    For each dependency found on the DarkPAN, MetaCPAN is also checked. If the
+    module is available from both CPAN and the DarkPAN, a warning is emitted and
+    the DarkPAN is preferred.
+
+    The optional `--filter` argument names a file containing module names to
+    exclude from the generated manifests, one module per line:
+
+        cmb create-darkpan-requires --filter darkpan.skip requires
+
+    This is useful when a module is available from both CPAN and the DarkPAN but
+    the distribution author wants that dependency to be resolved from CPAN.
+
+    When invoked through the generated Makefile, `darkpan.skip` is used
+    automatically when it exists.
 
     The generated files are intended as installation aids and are included with
     the distribution. They do not alter normal Perl dependency resolution by
@@ -1075,7 +1105,7 @@ If you want a different `README.md` generated create a
     with values drawn from the environment (or from a `--vars-file`). This
     is the mechanism the generated `Makefile` uses to turn `.pm.in` and
     `.pl.in` sources into their built `.pm`/`.pl` counterparts -- for
-    example filling `2.3.5` from the `VERSION` file or
+    example filling `2.3.6` from the `VERSION` file or
     `@BUILD_DATE@` at build time.
 
     A placeholder is only _required_ to resolve if it appears in live code.
@@ -2408,10 +2438,10 @@ tarball must be rebuilt.
 
 `CPAN::Maker::Bootstrapper` uses this mechanism for generated DarkPAN
 dependency manifests. When `DARKPAN_REQUIRES` is enabled,
-`cpanfile.darkpan` and `cpanm.darkpan` are added to
-`buildspec.yml` as extra files and to `extra-files.skip` because
-they are generated during the build rather than maintained in source
-control. See ["DARKPAN\_REQUIRES"](#darkpan_requires).
+`cpanfile.darkpan` and `cpanm.darkpan` are added to `buildspec.yml`
+as extra files and to `extra-files.skip` because presumably the
+developer has enabled `DARKPAN_REQUIRES` for the purpose of adding
+them to the distribution. See ["DARKPAN\_REQUIRES"](#darkpan_requires).
 
 ## I want to pin a version or add a module the scanner missed
 
@@ -2691,7 +2721,7 @@ tools.
 
 # VERSION
 
-This documentation refers to version 2.3.5
+This documentation refers to version 2.3.6
 
 # AUTHOR
 

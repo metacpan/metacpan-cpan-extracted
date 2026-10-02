@@ -1,5 +1,17 @@
 Revision history for Alien-uPB-Core
 
+0.21      2026-10-01 14:23:39 CEST
+
+    - Release 0.20_02 as stable without changes
+
+0.20_02   2026-10-01 12:37:37 CEST
+
+    - New revision of uPB (fixes another compilation error).
+
+0.20_01   2026-10-01 11:36:23 CEST
+
+    - New revision of uPB (fixes compilation error).
+
 0.20      2021-11-20 19:52:02 CET
 
     - New revision of uPB (fixes handling of timezones for timestamp types on Mac)

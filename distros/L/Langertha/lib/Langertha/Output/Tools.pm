@@ -1,5 +1,5 @@
 package Langertha::Output::Tools;
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 # ABSTRACT: Backwards-compat facade over Langertha::ToolCall
 use strict;
 use warnings;
@@ -42,7 +42,9 @@ sub extract_from_raw {
     $meta{finish_reason} = $raw->{stop_reason} if defined $raw->{stop_reason};
   }
 
-  $meta{tool_calls} = [ map { $_->to_hash } Langertha::ToolCall->extract($raw) ];
+  # This legacy facade has no wire format in scope, so it uses the sniffing
+  # fallback. New code passes a known format to Langertha::ToolCall->extract.
+  $meta{tool_calls} = [ map { $_->to_hash } Langertha::ToolCall->extract_sniff($raw) ];
   return \%meta;
 }
 
@@ -121,7 +123,7 @@ Langertha::Output::Tools - Backwards-compat facade over Langertha::ToolCall
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SUPPORT
 

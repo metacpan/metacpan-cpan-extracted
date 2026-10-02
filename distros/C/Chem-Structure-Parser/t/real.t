@@ -9,7 +9,7 @@
 # Set STRUCTURE_INFO_TEST_DIR to a directory of .pdb/.ent files to run it
 # somewhere else.  With nothing to read, the file skips rather than fails --
 # the distribution has to build on a machine with no structures on it.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OpenBaoAuth;
 # ABSTRACT: Auth configures how secret-manager authenticates with the OpenBao server.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s appRole        => '+IO::K8s::ExternalSecrets::V1::OpenBaoAppRole';
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::OpenBaoAuth - Auth configures how secret-manager a
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 appRole
 

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::NamespaceSelector;
 # ABSTRACT: namespaceSelector defines in which namespace(s) Prometheus should discover the services.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s any        => Bool;
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::NamespaceSelector - namespaceSelector defines i
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 any
 

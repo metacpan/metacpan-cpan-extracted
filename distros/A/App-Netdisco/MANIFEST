@@ -719,8 +719,15 @@ xt/89-login-return-url.t
 xt/90-pseudodevice-ports-and-hash-cost.t
 xt/91-external-credentials-host.t
 xt/92-password-rehash-on-login.t
+xt/94-metrics-allow-empty.t
+xt/95-csv-routes-render-csv-templates.t
+xt/96-worker-action-is-literal.t
+xt/97-api-auth-failure-status.t
+xt/98-api-delete-count.t
+xt/99-api-json-errors.t
 xt/bin/regenerate-portsort-corpus
 xt/bin/regenerate-snapshots
+xt/js/admin-button-dispatch.test.js
 xt/js/daterange-presets.test.js
 xt/js/deferred-nodes.test.js
 xt/js/disco-queue.test.js

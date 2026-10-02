@@ -6,7 +6,7 @@
 # What the numbers *are* is t/features.t's job -- it compares them against
 # mdtraj and Biopython.  This file is about the parts that are this module's own
 # and that no other implementation has an opinion on.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';
@@ -955,7 +955,7 @@ for my $who (qw(structure_features structure_sasa structure_pi_stacking
 		"model => 'all' reports the model whose chains \$info->{chains} holds");
 }
 
-# ---- a gzipped file ------------------------------------------------------
+# ---- a compressed file ---------------------------------------------------
 SKIP: {
 	# the package is loaded at run time here, so $GzipError is a name perl sees
 	# once and warns about; the warning is about this file, not about the module
@@ -967,6 +967,16 @@ SKIP: {
 	is_deeply(structure_features(structure_info("$dir/stack.pdb.gz")),
 	          structure_features(structure_info("$data/stack.pdb")),
 		'a gzipped file gives the same properties as the file it was made from');
+}
+SKIP: {
+	no warnings 'once';
+	eval { require IO::Compress::Bzip2; 1 } or skip 'IO::Compress::Bzip2 is not installed', 1;
+	my $dir = tempdir(CLEANUP => 1);
+	IO::Compress::Bzip2::bzip2("$data/stack.pdb" => "$dir/stack.pdb.bz2")
+		or skip "cannot bzip2 the fixture: $IO::Compress::Bzip2::Bzip2Error", 1;
+	is_deeply(structure_features(structure_info("$dir/stack.pdb.bz2")),
+	          structure_features(structure_info("$data/stack.pdb")),
+		'and so does a bzip2 file');
 }
 
 # ---- the neighbour grid --------------------------------------------------

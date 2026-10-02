@@ -1,0 +1,885 @@
+#!/usr/bin/env perl
+# PODNAME: raider
+# ABSTRACT: Autonomous CLI agent with filesystem and bash access
+
+use strict;
+use warnings;
+
+our $VERSION = '0.503';
+
+use Langertha::Raider::CLI::Main;
+
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDIN,  ':encoding(UTF-8)';
+
+exit Langertha::Raider::CLI::Main->new->run(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+raider - Autonomous CLI agent with filesystem and bash access
+
+=head1 VERSION
+
+version 0.503
+
+=head1 SYNOPSIS
+
+    raider "Find all TODO comments in lib/ and summarize them"
+    raider -e openai -m gpt-4o "Run the test suite and fix any trivial failures"
+    raider -i -r ~/dev/myproject
+    raider --perl --pack testing-fu "Run prove -l t and explain failures"
+    raider --json "Summarize README.md" > result.json
+    raider --stream-json "Run the tests" | jq -c 'select(.type == "tool.call")'
+    raider config explain -m gpt-4o
+    raider config migrate --dry-run
+    raider session list
+    raider --continue "Now fix the first one"
+    raider provider inspect provider.example --json
+    raider --provider provider.example -m example-model -k "$KEY" "Summarize README.md"
+    raider hall start --acp-port 38421
+    raider acp prompt 127.0.0.1:38421 --raider bjorn "Summarize status"
+
+=head1 DESCRIPTION
+
+F<raider> is the command line of L<Langertha::Raider::CLI>: it runs
+L<Langertha::Raider::CLI::Main>, which parses the options below and builds
+a L<Langertha::Raider::CLI> for the working directory. That wires an LLM engine
+(via L<Langertha>) to the file tools, C<bash> (L<MCP::Run::Bash>) and the web tools,
+then runs the L<Langertha::Raider> multi-turn agent loop on your prompt.
+Optional profile, pack, and Perl-native tool flags let the same CLI load
+project agent instructions, persona/power bundles, and C<perl_eval> /
+C<perl_check> / C<perl_cpanm> tools.
+
+Settings of a project live in its config file: F<.raider/config.yml> in the
+working directory, or else the legacy F<.raider.yml> there. Both take the
+same keys; where this page names F<.raider.yml>, the file in use is meant.
+When both exist, only F<.raider/config.yml> is read: F<raider> warns on
+standard error that it ignores F<.raider.yml>, and C<config explain> names
+the file in use and the ignored one. What F<raider> saves (C</model>,
+C<--claude>, C<--openai>, C<--skills>) goes to the file in use, and to
+F<.raider.yml> when there is none.
+
+Under the project file lies the home file F<~/.raider/config.yml>, with
+the same keys: built-in defaults, then the home file, then the project
+file, then the command line. The project replaces a home value, except
+that C<skills> and C<no_detect> add up and C<detect:> rules are replaced
+per pack. F<raider> never writes the home file. Run in the home directory
+itself, F<~/.raider/config.yml> is the project file and is read once. A
+home file that does not parse stops F<raider> like a broken project file.
+
+C<project_tools> in F<~/.raider/config.yml> maps a workspace selector
+(C<*>, a path glob starting with C</> or C<~/>, or a workspace name) to
+the home tools a project gets. Only the home file grants: in a project file
+it is ignored, and C<config explain> says so. For now C<config explain>
+only shows which selectors match the project and which tools they grant;
+nothing is mounted from it yet, and workspace names never match. An
+invalid C<project_tools> stops F<raider> with exit status 3.
+
+The project instructions follow the same rule: F<.raider/instructions.md>
+in the working directory, or else the legacy F<.raider.md> there, is added
+to the default persona. Where this page names F<.raider.md>, the file in
+use is meant. When both exist, only F<.raider/instructions.md> is read,
+F<raider> warns that it ignores F<.raider.md>, and C<config explain> names
+the ignored file under C<instructions:>. The prompt-builder (C</prompt>)
+writes the file in use, and F<.raider.md> when there is none.
+
+C<raider config migrate [--dry-run] [-r DIR]> moves the legacy files of a
+project to the new layout: F<.raider.yml> to F<.raider/config.yml> and
+F<.raider.md> to F<.raider/instructions.md>, each only when it exists. It
+first shows what it does -- per file the new file, the backup and whether
+the content changes -- and with C<--dry-run> stops there. Each new file is
+written atomically with the legacy file's permissions, then the legacy
+file is renamed to F<.raider.yml.bak> or F<.raider.md.bak>, so afterwards
+the same settings are read from the new files; F<.raider/> is created with
+its F<.gitignore>. A step that fails leaves its legacy file in use. An
+C<api_key> (top level, C<default:> or an engine section) is not copied
+into F<.raider/config.yml>, which is meant to be shared: it is reported
+with where it was, never printed, and belongs in F<~/.raider/config.yml>
+or the engine's C<*_API_KEY> variable; its lines are dropped (comments
+stay), and where that would change the meaning of the file the file is
+rewritten from its parsed content, which drops comments and says so.
+Nothing is merged: when a new file or a backup already exists, when
+F<.raider> is no directory, or in the home directory itself (where
+F<.raider/config.yml> is the home file), nothing is written and the exit
+status is 1. Only C<config migrate> in front of the options is the
+subcommand. Its report is for humans only; there is no C<--json> form.
+
+Interactive mode (C<-i>) opens a REPL with conversation history retained
+across turns. With L<Term::ReadLine::Gnu> installed, line editing and
+persistent input history (F<~/.raider_history>) are enabled automatically —
+including across Ctrl-C interrupts. Slash commands available in the REPL:
+C</help>, C</clear>, C</metrics>, C</stats>, C</reload>, C</prompt>,
+C</skill>, C</skill-claude>, C</config>, C</model>, C</packs>, C</pack>,
+C</quit>.
+
+Two more line prefixes run shell commands, with C<$SHELL -c> (C</bin/sh>
+without C<SHELL>) in the root (C<--root>); Ctrl-C while one runs ends the
+command, not F<raider>. C<!CMD> runs C<CMD> on the terminal (C<less> and
+C<vim> work), prints a non-zero exit status, and sends nothing to the model
+and records nothing in the session. C<?CMD> runs C<CMD> with its output
+shown as it comes and captured (standard input is F</dev/null>), then sends
+the command, its exit status and its output -- standard output and
+standard error, cut to its first and last 10000 characters when longer
+than 20000 -- to the model as the next prompt, recorded in the session like
+any other. A C<?CMD> ended by Ctrl-C sends nothing. A line that is only
+C<!> or C<?> is a prompt.
+
+Subcommands are dispatched before normal raider startup: C<raider hall ...>
+manages a Raider Hall daemon, and C<raider acp ...> runs the bundled ACP
+client. C<raider config explain [options]> takes the normal options and
+prints every effective setting with its source -- a command-line flag, a
+layer of the config file, an environment variable or the built-in default --
+without writing the config file or contacting a model; C</config> prints the
+same inside the REPL. The options may also come first
+(C<raider -e openai config explain>); there only the exact words
+C<config explain> are the subcommand, any other prompt starting with
+C<config> is sent as a prompt. C<raider provider inspect HOST> fetches,
+validates and shows a provider's manifest, and C<raider --provider HOST>
+runs on the endpoint it declares; see L</PROVIDERS>.
+
+With C<--json>, C<--msgpack> or C<--yaml>, F<raider> prints one document
+describing the run instead of the human-oriented output, which is useful
+for scripting; C<--stream-json>, C<--stream-msgpack> and C<--stream-yaml>
+follow the run as it happens. See L</MACHINE OUTPUT>.
+
+When standard input is not a terminal, the REPL (C<-i>) reads its lines
+from it and ends at its end.
+
+=head1 TOOLS
+
+The model gets one tool set per run, and the tool list in its prompt is
+generated from exactly the tools the engine is offered:
+
+=over
+
+=item * C<list_files>, C<read_file>, C<write_file>, C<edit_file>
+(L<Langertha::Raider::FileTools>), confined to C<-r>.
+
+=item * C<bash> (L<MCP::Run::Bash>), a real shell started in C<-r>,
+120 seconds per command by default. It is not confined to C<-r>.
+
+=item * C<web_search>, C<web_fetch> (L<Langertha::Raider::WebTools>).
+
+=item * C<perl_eval>, C<perl_check>, C<perl_cpanm>
+(L<Langertha::Raider::PerlTools>) when granted: by C<--perl>, by C<perl:>
+in F<.raider.yml> (C<perl: false> denies them), or else when an active pack
+requests them -- the bundled C<perl> pack, detected in a Perl workspace.
+Switching such a pack with C</pack> or re-detecting it with C</reload>
+mounts or unmounts them for the next raid.
+
+=item * C<telegram_reply>, C<hall_status>, C<hall_spawn>
+(L<Langertha::Raider::HallTools>) only for a raider a Hall started (see
+L</RAIDER_HALL_SOCKET>).
+
+=back
+
+C<raider config explain> shows whether the Perl tools are mounted and why;
+C<--export-skill> writes the same tool list as a table.
+
+=head1 OPTIONS
+
+=head2 -e, --engine NAME
+
+The engine: C<anthropic>, C<openai>, C<deepseek>, C<groq>, C<mistral>,
+C<gemini>, C<minimax>, C<cerebras>, C<openrouter> or C<ollama>. Without
+it, C<-o engine=>, then C<engine:> in F<.raider.yml>, then the first API key
+set in the environment (C<anthropic>, C<openai>, C<deepseek>, C<groq>,
+C<mistral>, C<gemini>, in that order; see L</ENVIRONMENT>) decide, else
+C<anthropic>.
+
+=head2 -m, --model NAME
+
+The model. Without it, C<-o model=>, then C<model:> in F<.raider.yml>, then
+a cheap per-engine default (C<claude-haiku-4-5>, C<gpt-4o-mini>, ...), else
+the engine's own default. C<openrouter> needs one.
+
+=head2 -k, --api-key KEY
+
+The API key, over C<api_key:> in F<.raider.yml> and the engine's
+environment variable. With C<--provider> the only source of the key,
+together with C<-o api_key=>.
+
+=head2 --provider HOST[:PORT] | https://HOST[:PORT]
+
+Runs on the model endpoint a provider's manifest declares, for this one
+run; see L</Using a provider>. Not with C<-e>, C<-o engine=>, C<-o url=>
+or C<config explain>.
+
+=head2 --allow-internal
+
+With C<--provider> (and C<provider inspect>): releases loopback, private,
+link-local and reserved provider addresses; see L</PROVIDERS>.
+
+=head2 -o, --option KEY=VALUE
+
+An engine attribute (repeatable), e.g. C<-o temperature=0.2 -o
+response_size=4096>, merged over F<.raider.yml>; the command line wins.
+Integers, decimals and C<true> / C<false> become numbers. raider's own
+F<.raider.yml> keys (C<engine>, C<perl>, C<packs=a,b>, C<skills=a,b>,
+C<detect>, C<no_detect=a,b>, C<preferred_lib_target>) configure raider
+instead and never reach the engine.
+
+=head2 -r, --root DIR
+
+The working directory, default the current one. The file tools are
+confined to it, C<bash> starts in it, and F<.raider/config.yml> (or
+F<.raider.yml>), F<.raider/instructions.md> (or F<.raider.md>) and
+F<.raider/> are read from it.
+
+=head2 -M, --mission TEXT
+
+The instructions: replaces the default persona and F<.raider.md> for this
+run. Skills, packs and the tool list still apply.
+
+=head2 --bare
+
+An isolated context: no F<.raider.md>, no skills, no C<packs:>, no default
+packs, no detection. C<--pack NAME> and C</pack NAME> still work.
+
+=head2 -i, --interactive
+
+The REPL. It is the default when standard input is a terminal and no prompt
+is given; C<-i> also forces it otherwise.
+
+=head2 --json[=N], --msgpack[=N], --yaml[=N]
+
+Print one document for the run, see L</MACHINE OUTPUT>.
+
+=head2 --stream-json[=N], --stream-msgpack[=N], --stream-yaml[=N]
+
+Print the run as events while it happens, ending with the document; see
+L</Streams>.
+
+=head2 --no-session
+
+Record nothing; see L</SESSIONS>.
+
+=head2 --session ID
+
+Continue session C<ID>: its conversation is replayed and the run (or the
+REPL) is recorded in it.
+
+=head2 --continue
+
+The same with the newest session of the project.
+
+=head2 --max-iterations N
+
+Hard cap on tool rounds per raid. Default 10000, effectively unlimited.
+
+=head2 --no-color
+
+No ANSI colors, as with C<ANSI_COLORS_DISABLED>.
+
+=head2 --trace, --no-trace
+
+Show or hide the live progress of tool calls. On by default when standard
+output is a terminal; off with a machine output flag, where C<--trace>
+sends it to standard error.
+
+=head2 --perl
+
+Mount the Perl tools (C<perl_eval>, C<perl_check>, C<perl_cpanm>), see
+L</TOOLS>.
+
+=head2 --pack NAME
+
+Enable a pack (repeatable). Given at all, the listed packs replace
+C<packs:> of F<.raider.yml> and the default packs; detection still adds.
+
+=head2 --no-pack NAME
+
+Switch a pack off (repeatable), also a default or detected one.
+
+=head2 --no-detect, --detect
+
+Switch pack detection off, or on over C<detect: false> in F<.raider.yml>.
+
+=head2 --claude
+
+Load F<CLAUDE.md> and F<.claude/skills/*/SKILL.md> as skills. Saved to
+C<skills:> in F<.raider.yml> on first use.
+
+=head2 --openai, --codex
+
+Load F<AGENTS.md>. Saved like C<--claude>.
+
+=head2 --skills DIR
+
+Load the F<*.md> files in C<DIR> as skills (repeatable). Saved like
+C<--claude>.
+
+=head2 --customize-prompt
+
+Start the REPL with the prompt-builder, which writes F<.raider.md> with
+you (C</prompt> in the REPL).
+
+=head2 --export-skill [PATH]
+
+Write a plain-markdown "how to use raider" document for the current
+configuration (default F<RAIDER-SKILL.md> in C<-r>) and exit.
+
+=head2 --export-claude-skill [PATH]
+
+Write the same as a Claude Code F<SKILL.md> with frontmatter (default
+F<.claude/skills/raider/SKILL.md> in C<-r>) and exit.
+
+=head2 --version
+
+Print the version of raider (L<Langertha::Raider>) and of L<Langertha>
+core on one line, C<raider VERSION (Langertha VERSION)>, and exit.
+
+=head2 -h, --help
+
+Print the option summary and exit.
+
+=head1 MACHINE OUTPUT
+
+C<--json>, C<--msgpack> and C<--yaml> print one document for the run, once,
+when it has ended. C<--stream-json>, C<--stream-msgpack> and
+C<--stream-yaml> print events while the run happens, the last of which
+carries that same document (see L</Streams>). Nothing else goes to standard
+output: the live trace is off unless C<--trace> asks for it, and then goes
+to standard error like every diagnostic. The six flags exclude each other;
+giving two is a usage error. A usage or configuration error (exit status
+C<2> or C<3>) prints no document and no events, only its message on
+standard error.
+
+The flags write the same model in three encodings:
+
+=over
+
+=item C<--json> -- a pretty-printed JSON object with sorted keys, UTF-8.
+C<--stream-json> writes JSON Lines: one compact object per event and line.
+
+=item C<--msgpack> -- one MessagePack map; text is written as UTF-8 C<str>,
+never C<bin>. Standard output is binary. C<--stream-msgpack> writes one map
+per event, back to back (MessagePack objects delimit themselves).
+
+=item C<--yaml> -- one YAML document, starting with C<--->, UTF-8.
+C<--stream-yaml> writes one YAML document per event, each starting with
+C<--->.
+
+=back
+
+Every field and type is the same in all three encodings.
+
+=head2 The document
+
+A run that completed:
+
+    {
+       "elapsed" : 2.731,
+       "metrics" : { "iterations" : 2, "raids" : 1, "time_ms" : 2710.4, "tool_calls" : 1 },
+       "response" : "The README describes ...",
+       "status" : "completed",
+       "version" : 1
+    }
+
+A run that failed:
+
+    { "elapsed" : 0.42, "error" : "...", "status" : "failed", "version" : 1 }
+
+A run cancelled by C<SIGINT> (Ctrl-C; see L</EXIT STATUS>):
+
+    { "elapsed" : 3.912, "status" : "cancelled", "version" : 1 }
+
+A run stopped by C<SIGTERM>, by a second C<SIGINT> while it is being
+cancelled, or by either signal before it started:
+
+    { "elapsed" : 5.107, "signal" : "TERM", "status" : "interrupted", "version" : 1 }
+
+=over
+
+=item C<version> -- integer, the format version (see below).
+
+=item C<status> -- how the run ended: C<completed>, C<failed>,
+C<cancelled> or C<interrupted>. These are the run states of the redesign
+(ADR 0009) that end a run and that the CLI can produce today; C<refused>
+is reserved for when it can.
+
+=item C<response> -- the agent's final answer (C<completed> only).
+
+=item C<metrics> -- the raider's cumulative metrics: C<raids>,
+C<iterations>, C<tool_calls>, C<time_ms> (C<completed> only).
+
+=item C<error> -- the error message (C<failed> only).
+
+=item C<signal> -- the signal that stopped the run, C<INT> or C<TERM>
+(C<interrupted> only).
+
+=item C<elapsed> -- seconds the run took, to the millisecond.
+
+=item C<session> -- the session the run is recorded in (see
+L</SESSIONS>): C<id> and C<path> of its journal. Missing with
+C<--no-session> and for a signal during startup.
+
+=back
+
+=head2 Streams
+
+A stream is a sequence of events, each flushed as soon as it happens. Every
+event has these fields:
+
+=over
+
+=item C<version> -- the format version, as in the document.
+
+=item C<type> -- what happened (below).
+
+=item C<seq> -- 1, 2, 3, ... within the run.
+
+=item C<time> -- when, in epoch seconds with fractions.
+
+=back
+
+The types of version 1, with the fields each adds:
+
+=over
+
+=item C<run.started> -- C<engine> and, when there is one, C<model>. A run
+interrupted during startup (reading the configuration or the prompt) has
+none: its stream is the C<interrupted> state change and C<run.finished>.
+
+=item C<run.state> -- C<state>: C<running> when the run starts, then the
+C<status> it ends with (see L</The document>).
+
+=item C<tool.call> -- C<name> and C<arguments> of a tool call, before it
+runs; C<call>, its id within the run (C<c1>, C<c2>, ...); C<status>,
+C<dispatched>.
+
+=item C<tool.result> -- C<call> and C<name> of the call; C<status>
+(C<succeeded>, C<failed> when the tool reported an error, or C<cancelled>
+for a call a cancelled run cut off); C<ok> (the
+same as a boolean); C<size>, the length of the result text in characters;
+C<content>, its first 1000 characters; and C<truncated> (a boolean, true
+when C<content> was cut). The cut limits how much of a tool's output
+reaches the stream, but it is no filter: a secret in a tool's arguments or
+output can still show up.
+
+=item C<message> -- a finished assistant message: C<role> (C<assistant>)
+and C<content>. Version 1 reports the final answer of the run.
+
+=item C<run.finished> -- always the last event, also when the run failed.
+Its fields are exactly the document of L</The document>; a consumer that
+only wants the result reads the last event.
+
+=back
+
+A run that calls one tool, as C<--stream-json>:
+
+    {"engine":"openai","model":"gpt-4o-mini","seq":1,"time":1790000000.1,"type":"run.started","version":1}
+    {"seq":2,"state":"running","time":1790000000.1,"type":"run.state","version":1}
+    {"arguments":{"command":"ls"},"name":"bash","seq":3,"time":1790000001.2,"type":"tool.call","version":1}
+    {"content":"...","name":"bash","ok":true,"seq":4,"size":42,"time":1790000001.3,"truncated":false,"type":"tool.result","version":1}
+    {"content":"There are ...","role":"assistant","seq":5,"time":1790000002.4,"type":"message","version":1}
+    {"seq":6,"state":"completed","time":1790000002.4,"type":"run.state","version":1}
+    {"elapsed":2.312,"metrics":{...},"response":"There are ...","seq":7,"status":"completed","time":1790000002.4,"type":"run.finished","version":1}
+
+Token deltas are not part of version 1. New event types may appear within a
+version, so a consumer must skip types it does not know.
+
+=head2 Versions
+
+C<--json=N> (C<--msgpack=N>, C<--yaml=N>, and the C<--stream-*> flags) asks for format version C<N>; the
+version belongs to the model, so it means the same in every encoding and
+for documents and streams alike. The
+only version is C<1>, which is also what the plain flags write; any other
+C<N> is a usage error. Only the C<=N> form carries a version -- in
+C<raider --json 2 ...> the C<2> is part of the prompt.
+
+Within a version, fields are only ever added, never renamed, removed or
+changed in meaning, so a consumer must ignore fields it does not know. A
+breaking change is a new version, chosen with C<--json=2>; the plain flag
+stays on the old version for at least one release after the new one ships.
+
+=head1 SESSIONS
+
+Every run is recorded in a session journal (ADR 0015):
+F<.raider/sessions/E<lt>idE<gt>.jsonl> under the working directory
+(C<-r>), one JSON object per line. A one-shot run starts a new session and
+names it on standard error (with a machine output flag, in the document's
+C<session> instead); the REPL starts one with its first prompt and records
+every prompt of it there. C<--no-session> records nothing.
+
+Creating F<.raider/> also writes F<.raider/.gitignore> excluding
+C<sessions/> and C<lib/>, unless that file exists: a journal holds the
+whole output of every tool, so it is not committed by default. API keys
+never enter it.
+
+A run is recorded as C<run.started>, the input as C<message>, every
+C<tool.call> and C<tool.result> (with the whole result text, where the
+stream cuts it), the answer as C<message>, and C<run.finished> with how it
+ended -- also when it failed or was interrupted. A C</clear> in the REPL
+is recorded as C<history.cleared>. While a raider writes a
+session it holds a lock on it; a second writer fails at once instead of
+waiting. A journal that cannot be written in the middle of a run (a full
+disk) is a warning on standard error; the run goes on.
+
+Wherever a command takes a session C<ID>, a shorter form names it too: a
+unique start of the id (C<20260925-08>) or its four hex digits at the end
+(C<3f2a>). A form that fits more than one session is refused with the
+candidates listed.
+
+    raider session list                  # the project's sessions, newest first
+    raider session show ID               # one session, event by event
+    raider session show ID --json        # the whole journal as one document
+    raider session resume ID             # the REPL, continuing session ID
+    raider --session ID "and now ..."    # one more run in session ID
+    raider --continue "and now ..."      # the same in the newest session
+    raider -i --continue                 # the REPL on the newest session
+    raider session fork ID               # a new session with ID's history
+    raider session rm ID                 # delete session ID
+
+C<session list> shows id, number of runs, the state of the last run and
+the first prompt of each session; C<session show> prints every event, then
+what the crash rules found. Both read without the lock, take C<-r> for the
+project and a document format (C<--json>, C<--msgpack>, C<--yaml>), as do
+C<session fork> and C<session rm>. As for
+C<config explain>, the options may come first; there only
+C<session list> and C<session show|resume|fork|rm> followed by a session id
+are the subcommand, any other prompt starting with C<session> is sent as a
+prompt.
+
+C<session fork ID> starts a new session in the same project whose
+C<session.created> names the original in C<forked_from>, and copies what a
+resume would replay as the conversation into it, as C<message> events
+outside any run. The original is only read, not locked or changed; the
+fork has its own journal from then on and is continued like any session
+(C<session resume>, C<--session>). C<session rm ID> deletes the journal
+and its lock file; it takes the lock first, so a session another raider
+has open is refused with exit status C<4>. Raider never deletes a session
+on its own.
+
+Continuing a session (C<--session ID>, C<--continue>, C<session resume>)
+takes its lock, replays the conversation -- the input and answer of every
+run that got an answer, and all recorded events into the full session
+history; after a C<history.cleared> only what came later -- and records
+the new runs in the same journal. Nothing recorded
+is executed again. It reports what it found on standard error (in the REPL,
+under the banner): lines that could not be read, runs that never ended
+(they count as C<interrupted>), and tool calls without a result, whose
+outcome is C<unknown>. The context (F<.raider.md>, packs, configuration) is
+built fresh, not replayed. A session another raider has open ends F<raider>
+with exit status C<4>.
+
+=head1 PROVIDERS
+
+    raider provider inspect HOST[:PORT] | https://HOST[:PORT] [--json] [--allow-internal]
+
+fetches C<https://HOST[:PORT]/.well-known/langertha.json>, the provider
+manifest of ADR 0007, validates it with L<Langertha::Manifest> and shows
+what it declares: the provider id, the issuer, every endpoint (id,
+dialect, base URL, auth reference), every auth entry (id, type) and every
+model (id, endpoint, the capabilities it claims). Warnings follow for what
+this raider cannot use -- an endpoint dialect it has no adapter for, an
+auth type it cannot supply, a capability name Langertha does not know
+(treated as absent) -- and for an issuer that is not the origin the
+manifest came from or an endpoint on plain C<http> or an internal address.
+C<extensions> are shown as inert: kept as published, never interpreted,
+loaded or run. A manifest with a command-, code-, secret- or prompt-shaped
+field (C<command>, C<exec>, C<api_key>, C<system_prompt>, ...), an unknown
+field or another schema version is not valid.
+
+Inspecting stores nothing, binds no credential and trusts nothing: the
+manifest states what the provider claims. The fetch sends no API key, no
+C<Authorization> header and no cookie, and is bounded:
+
+=over
+
+=item * C<https> only; a target with userinfo, a query, a fragment or
+another path than the well-known one is a usage error.
+
+=item * at most 1 MiB of body, 10 seconds from resolving the host to the
+last byte, and 3 redirects, each within the origin (scheme, host and
+port). A redirect to another origin is not followed; it is reported with
+its target and the manifest counts as C<refused>.
+
+=item * the host is resolved once and every address it resolves to is
+checked; the request goes to a checked address, never to a second lookup
+of the name, while TLS still verifies the certificate against the name.
+Loopback, private (RFC 1918, shared address space, IPv6 unique local),
+link-local and reserved addresses are refused, unless C<--allow-internal>
+releases them. Cloud metadata addresses (C<169.254.169.254>,
+C<fd00:ec2::254>, ...), the unspecified address, multicast and
+C<240.0.0.0/4> are refused always. A host with one refused address among
+its addresses is refused.
+
+=back
+
+C<--allow-internal> releases loopback, private, link-local and reserved
+target addresses for this one inspection -- for a knarr or skeid you
+deliberately run on an internal address. Nothing remembers it.
+
+=head2 Using a provider
+
+    raider --provider HOST[:PORT] | https://HOST[:PORT] [-m MODEL] [-k KEY] [--allow-internal] [options] [prompt...]
+
+fetches and validates the manifest as C<provider inspect> does (same
+limits and address rules) and runs on the endpoint of one of its models:
+one-shot, machine output and the REPL work as with C<-e>. Nothing is
+stored and nothing is remembered: naming the host on the command line is
+the whole release, as with C<-o url=>. C<raider provider add> with a
+stored alias and credential is not there yet. The rules are provisional:
+
+=over
+
+=item * B<The model.> C<-m> (or C<-o model=>) must be a model id of the
+manifest. Without it the manifest must list exactly one model id;
+several are a usage error that lists them. C<model:> in F<.raider.yml>
+does not apply. A model listed on several endpoints runs on the one whose
+dialect raider has an adapter for; with more than one such endpoint raider
+does not choose and the run is refused.
+
+=item * B<The engine> follows from the endpoint's dialect:
+C<openai-chat> runs as C<openai>, C<anthropic> as C<anthropic>, C<gemini>
+as C<gemini>, C<ollama> as C<ollama> (native API), C<responses>,
+C<perplexity-agent>, C<anthropic-compat> and C<aki> on their own
+Langertha engines -- C<anthropic-compat> without native structured output,
+through a synthetic tool and a forced tool choice instead (ADR 0007). The
+engine's C<url> is the endpoint's C<base_url>, whatever F<.raider.yml>
+says; the other engine options of F<.raider.yml> and C<-o> apply as with
+C<-e>. A dialect this raider has no adapter for is an error, and so is
+C<lmstudio>: Langertha's native LM Studio engine has no tool calling.
+
+=item * B<The key> comes only from C<-k> or C<-o api_key=>. Neither
+C<api_key:> in F<.raider.yml> nor any environment variable is used: a key
+for another provider never reaches this one. An endpoint with an auth
+reference needs a key (a usage error without one); an auth type other than
+C<api_key> is an error. An endpoint without auth gets no key.
+
+=item * B<The origin.> The endpoint's C<base_url> must be C<https> and of
+the same origin (scheme, host, port) as the manifest; anything else is
+refused, so the key goes nowhere but the origin named on the command line.
+The endpoint's host is resolved and checked again before the run, under
+the rules of C<provider inspect> (C<--allow-internal> releases it the same
+way). The engine then connects to the first of the checked addresses,
+never to a new lookup of the name (TLS still verifies the certificate
+against the host name), so a DNS answer that changes after the check
+cannot send the key elsewhere. A redirect to another host is never
+followed; the model requests are POSTs, which are not redirected at all,
+and the engine's synchronous requests (the REPL's C</model>) follow no
+redirect.
+
+=item * A model that does not declare C<tools_native> is a warning on
+stderr, not an error: raider works through tool calls.
+
+=back
+
+Failures are reported on stderr before anything runs, without a machine
+document: a usage error exits with C<2>, a provider that cannot be used as
+it is (refused, not fetched, not valid, an unknown dialect or auth type)
+with C<1>.
+
+=head2 The provider document
+
+C<--json>, C<--msgpack> and C<--yaml> write one document (no stream):
+
+    {
+       "address" : "93.184.216.34",
+       "elapsed" : 0.214,
+       "final_url" : "https://provider.example/.well-known/langertha.json",
+       "manifest" : { "schema_version" : 1, "kind" : "langertha-provider", ... },
+       "notes" : [],
+       "redirects" : [],
+       "status" : "completed",
+       "url" : "https://provider.example/.well-known/langertha.json",
+       "version" : 1,
+       "warnings" : []
+    }
+
+C<status> is C<completed> for a valid manifest, C<refused> for a target
+address or redirect the rules above do not allow, and C<failed> for
+anything else: the network, TLS, an HTTP status, a limit, invalid JSON or
+an invalid manifest. C<manifest> is the validated manifest as
+L<Langertha::Manifest/to_hash> writes it; C<warnings> and C<notes> are
+one sentence each; C<url> is the manifest URL, C<final_url> the one the
+body came from after C<redirects>, C<address> the address connected to.
+C<refused> and C<failed> carry C<error> instead of C<manifest>, and a
+redirect that was not followed its target in C<location>. The version
+and compatibility rules are those of L</Versions>.
+
+=head1 EXIT STATUS
+
+=over
+
+=item C<0> -- success, including C<--help>, C<--version>, the exports, C<config explain>,
+C<config migrate> (also with nothing to migrate, and C<--dry-run>), C<session list>, C<session show>, C<session fork>, C<session rm>,
+C<provider inspect> of a valid manifest and leaving the REPL.
+
+=item C<1> -- the run failed: the engine, a tool or the network raised an
+error. With a machine output flag, the document says C<failed>. For
+C<config migrate>: the migration was refused, also with C<--dry-run>, or
+a step failed. For C<provider inspect>: the manifest was refused, could not be fetched or is
+not valid (the document says C<refused> or C<failed>). For C<--provider>
+also: its endpoint cannot be used (another origin, not C<https>, a refused
+address, a dialect or auth type this raider has no adapter for, no
+models, a model on several endpoints); see L</Using a provider>.
+
+=item C<2> -- usage error: unknown option, a C<-o> that is not
+C<KEY=VALUE>, an unknown C<config> subcommand, no prompt, more than one
+machine output flag, a machine output flag with C<-i>, or an unknown format
+version; for C<config migrate> a word after it or a machine output flag;
+for C<provider inspect> also no target or more than one, a
+target that is no host or C<https> origin, or a C<--stream-*> flag; for
+C<--provider> a target that is none, C<-e>, C<-o engine=>, C<-o url=> or
+C<config explain> with it, a model the manifest does not list, no C<-m>
+where it lists several, or no C<-k> where the endpoint needs a key; and
+C<--allow-internal> without C<--provider>.
+
+=item C<3> -- configuration error: the config file (project or home; for
+C<config migrate> the F<.raider.yml> to migrate) cannot be read, the
+engine is unknown, or a pack detection rule is invalid.
+
+=item C<4> -- the session to continue (C<--session>, C<--continue>,
+C<session resume>) or to remove (C<session rm>) is in use by another
+raider. A usage error (C<2>) is also an unknown or ambiguous session, a
+C<--session> that is no session id, C<--continue> without any session, or
+more than one of C<--session>, C<--continue> and C<--no-session>.
+
+=item C<130>, C<143> -- a one-shot run was cancelled by C<SIGINT> or
+interrupted by C<SIGTERM>. On C<SIGINT> (Ctrl-C) F<raider> cancels the run:
+it ends the tool commands still running, abandons a model request in
+flight, lets the run end at its next safe point and writes its document
+-- C<cancelled>, or what the run reached if it ended anyway -- or its
+events, or a note. A second C<SIGINT> while it cancels, a C<SIGTERM>, and
+with a machine format either signal during startup end the tool commands
+and write the C<interrupted> document at once. Either way F<raider> then
+dies of that same signal, so a shell reports 128 plus the signal number
+and a parent that waits for it sees a process killed by the signal. A
+model or embedding request that blocks the process (not an asynchronous
+one) holds a cancel up until it returns; the second C<SIGINT> does not
+wait.
+
+=back
+
+The C<hall> and C<acp> subcommands keep their own exit statuses.
+
+=head1 ENVIRONMENT
+
+API keys come from the environment variables below only. Claude Code
+subscription/OAuth credentials are not consumed by this CLI; Anthropic
+usage goes through the API key path.
+
+=head2 ANTHROPIC_API_KEY
+
+The key of the C<anthropic> engine. Set, it also makes C<anthropic> the
+engine when nothing names one; so do the next five, in this order.
+
+=head2 OPENAI_API_KEY
+
+The key of C<openai>.
+
+=head2 DEEPSEEK_API_KEY
+
+The key of C<deepseek>.
+
+=head2 GROQ_API_KEY
+
+The key of C<groq>.
+
+=head2 MISTRAL_API_KEY
+
+The key of C<mistral>.
+
+=head2 GEMINI_API_KEY
+
+The key of C<gemini>.
+
+=head2 MINIMAX_API_KEY
+
+The key of C<minimax>. This one and the next two are only read for their
+engine; they never pick it.
+
+=head2 CEREBRAS_API_KEY
+
+The key of C<cerebras>.
+
+=head2 OPENROUTER_API_KEY
+
+The key of C<openrouter>.
+
+=head2 BRAVE_API_KEY
+
+Adds Brave to C<web_search>, next to the keyless DuckDuckGo.
+
+=head2 SERPER_API_KEY
+
+Adds Serper to C<web_search>.
+
+=head2 GOOGLE_API_KEY
+
+With L</GOOGLE_CSE_ID>, adds Google Custom Search to C<web_search>.
+
+=head2 GOOGLE_CSE_ID
+
+The Custom Search engine id for L</GOOGLE_API_KEY>.
+
+=head2 RAIDER_PACK_DIRS
+
+Colon-separated directories searched for packs after the project's
+F<.raider/packs/>, F<~/.raider/packs/> and the bundled ones; see
+L<Langertha::Raider::Packs/build_packs>.
+
+=head2 HOME
+
+Where F<~/.raider/packs/> and the REPL history F<~/.raider_history> are.
+
+=head2 ANSI_COLORS_DISABLED
+
+Set, the output and the trace have no colors (C<--no-color> and the
+machine output flags set it themselves).
+
+=head2 RAIDER_HALL_SOCKET
+
+The control socket of the Hall that started this raider. When it names a
+socket, the Hall tools C<telegram_reply>, C<hall_status> and C<hall_spawn>
+are mounted; the Hall sets it, together with C<RAIDER_HALL_TELEGRAM_BOT>,
+C<RAIDER_HALL_TELEGRAM_CHAT_ID> and C<RAIDER_HALL_TELEGRAM_THREAD_ID> for a
+Telegram mission (see L<Langertha::Raider::HallTools>).
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Langertha::Raider::CLI>
+
+=item * L<Langertha::Raider>
+
+=item * L<raider-hall> -- the Hall daemon, also reachable as C<raider hall>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/langertha-raider/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

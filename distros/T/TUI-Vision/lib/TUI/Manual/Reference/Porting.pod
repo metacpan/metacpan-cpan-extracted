@@ -1,0 +1,308 @@
+# PODNAME: TUI::Manual::Reference::Porting
+# ABSTRACT: Porting Notes
+
+__END__
+
+=pod
+
+=head1 NAME
+
+TUI::Manual::Reference::Porting - Porting Notes
+
+=head1 PORTING NOTES
+
+This document describes the porting of Borland I<Turbo Vision> to Perl.
+It focuses on implementation status, class mapping and technical
+considerations arising from differences between C++ and Perl.
+
+This document is primarily intended for maintainers and contributors.
+
+The TUI framework is based on the original I<Turbo Vision> 2.0 C++ sources.
+The goal of the port is conceptual compatibility rather than a
+mechanical translation of code.
+
+Borland's I<Turbo Vision> classes are mapped to Perl modules in a mostly 
+one-to-one fashion.
+
+This port is based on the original codebase of Borland C++ 4.02
+(Turbo Vision 2.0 sources including bug fixes by Eric Woodruff:
+L<tv2fixed.zip|http://www.sigala.it/sergio/tvision/source/tv2fixed.zip>).
+
+The Perl implementation also draws inspiration from I<magiblot>'s
+I<A modern port of Turbo Vision 2.0>. Besides using C++ ports of various
+assembler routines, the extended color model was adapted from that project and
+forms the basis of the enhanced color handling available in the Perl port.
+
+=head2 Class Implementation Status
+
+The following table provides an overview of the implementation status
+of major I<Turbo Vision> classes in the Perl port. The status reflects
+practical usability rather than theoretical completeness.
+
+ Status legend:
+  [ ] Not implemented
+  [x] Implemented
+  [o] Partially implemented
+  [+] Port extension
+
+The status table is intended as a practical guide rather than a strict
+feature checklist.
+
+The meanings of the status indicators are as follows:
+
+=over 4
+
+=item [ ] Not implemented
+
+The class does not exist in the Perl port. References to this class are
+documented for transparency and orientation only. No compatibility is
+provided.
+
+=item [x] Implemented
+
+The class is usable for typical applications. Core functionality is
+present and stable. Some optional or rarely used features may still be
+missing, but the class can be relied upon in normal use.
+
+=item [o] Partially implemented
+
+The class exists and provides limited functionality. Common use cases
+may work, but parts of the API, platform-specific behavior or advanced
+features are missing or incomplete. Use with care.
+
+=item [+] Port extension
+
+The class is specific to the Perl port and has no direct equivalent in the
+original I<Turbo Vision> implementation. It was introduced to support
+additional functionality provided by modern terminals, color handling or
+the Perl implementation architecture.
+
+=back
+
+The table focuses on practical relevance. A class marked as implemented
+does not imply full parity with the original C++ version in every
+detail.
+
+=head3 Core Primitives
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TObject            TUI::Objects::Object         [x]
+ TPoint             TUI::Objects::Point          [x]
+ TRect              TUI::Objects::Rect           [x]
+ TDrawBuffer        TUI::Views::DrawBuffer       [x]
+ TPalette           TUI::Views::Palette          [x]
+ TCommandSet        TUI::Views::CommandSet       [x]
+
+=head3 Color and Screen Primitives
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TColorAttr         TUI::Drivers::ColorAttr      [+]
+ TColor             TUI::Drivers::Color          [+]
+ TAttrPairs         TUI::Drivers::AttrPairs      [+]
+ TCellChar          TUI::Drivers::CellChar       [+]
+ TScreenCell        TUI::Drivers::ScreenCell     [+]
+
+=head3 Event System
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TEvent             TUI::Drivers::Event          [x]
+ KeyDownEvent       TUI::Drivers::Event          [x]
+ MouseEvent         TUI::Drivers::Event          [x]
+ MessageEvent       TUI::Drivers::Event          [x]
+ TEventQueue        TUI::Drivers::EventQueue     [x]
+
+=head3 Driver Layer
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ THWMouse           TUI::Drivers::HWMouse        [o]
+ TMouse             TUI::Drivers::Mouse          [x]
+ TSystemError       TUI::Drivers::SystemError    [o]
+ TScreen            TUI::Drivers::Screen         [x]
+ TDisplay           TUI::Drivers::Display        [x]
+ THardwareInfo      TUI::Drivers::HardwareInfo   [x]
+
+=head3 View Hierarchy
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TView              TUI::Views::View             [x]
+ TGroup             TUI::Views::Group            [x]
+ TFrame             TUI::Views::Frame            [x]
+ TScrollBar         TUI::Views::ScrollBar        [x]
+ TScroller          TUI::Views::Scroller         [x]
+ TListViewer        TUI::Views::ListViewer       [x]
+
+=head3 Application Framework
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TBackground        TUI::App::Background         [x]
+ TDeskInit          TUI::App::DeskInit           [x]
+ TDeskTop           TUI::App::DeskTop            [x]
+ TProgInit          TUI::App::ProgInit           [x]
+ TProgram           TUI::App::Program            [x]
+ TApplication       TUI::App::Application        [x]
+ TWindowInit        TUI::Views::WindowInit       [x]
+ TWindow            TUI::Views::Window           [x]
+ TDialog            TUI::Dialogs::Dialog         [x]
+
+=head3 Dialog Controls
+
+Buttons and Clusters
+
+ Class              Perl Module                   Status
+ ------------------ ----------------------------- ------
+ TButton            TUI::Dialogs::Button          [x]
+ TSItem             TUI::Dialogs::StrItem         [x]
+ TCluster           TUI::Dialogs::Cluster         [x]
+ TRadioButtons      TUI::Dialogs::RadioButtons    [x]
+ TCheckBoxes        TUI::Dialogs::CheckBoxes      [x]
+ TMultiCheckBoxes   TUI::Dialogs::MultiCheckBoxes [x]
+
+Input and Text
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TInputLine         TUI::Dialogs::InputLine      [x]
+ TStaticText        TUI::Dialogs::StaticText     [x]
+ TParamText         TUI::Dialogs::ParamText      [x]
+ TLabel             TUI::Dialogs::Label          [x]
+
+Lists and History
+
+ Class              Perl Module                           Status
+ ------------------ ------------------------------------- ------
+ TListBox           TUI::Dialogs::ListBox                 [x]
+ TListBoxRec        TUI::Dialogs::ListBox                 [x]
+ TSortedListBox     TUI::StdDlg::SortedListBox            [x]
+ HistRec            TUI::Dialogs::HistoryViewer::HistList [x]
+ THistoryViewer     TUI::Dialogs::HistoryViewer           [x]
+ THistInit          TUI::Dialogs::HistInit                [x]
+ THistoryWindow     TUI::Dialogs::HistoryWindow           [x]
+ THistory           TUI::Dialogs::History                 [x]
+
+=head3 Standard Dialogs
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ ffblk/find_t       TUI::StdDlg::Dos             [x]
+ FindFirstRec       TUI::StdDlg::FindFirstRec    [x]
+ TSearchRec         TUI::StdDlg::FileCollection  [x]
+ TFileCollection    TUI::StdDlg::FileCollection  [x]
+ TFileInputLine     TUI::StdDlg::FileInputLine   [x]
+ TFileList          TUI::StdDlg::FileList        [x]
+ TFileInfoPane      TUI::StdDlg::FileInfoPane    [x]
+ TFileDialog        TUI::StdDlg::FileDialog      [x]
+ TDirEntry          TUI::StdDlg::DirEntry        [x]
+ TDirCollection     TUI::StdDlg::DirCollection   [x]
+ TDirListBox        TUI::StdDlg::DirListBox      [x]
+ TChDirDialog       TUI::StdDlg::ChDirDialog     [x]
+
+=head3 Color Selection Dialog
+
+ Class              Perl Module                   Status
+ ------------------ ----------------------------- ------
+ TColorDisplay      TUI::ColorSel::ColorDisplay   [x]
+ TColorDialog       TUI::ColorSel::ColorDialog    [x]
+ TColorGroup        TUI::ColorSel::ColorGroup     [x]
+ TColorGroupList    TUI::ColorSel::ColorGroupList [x]
+ TColorIndex        TUI::ColorSel::ColorGroup     [x]
+ TColorItem         TUI::ColorSel::ColorItem      [x]
+ TColorItemList     TUI::ColorSel::ColorItemList  [x]
+ TColorSelector     TUI::ColorSel::ColorSelector  [x]
+ TMonoSelector      TUI::ColorSel::MonoSelector   [x]
+
+=head3 Menu System
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TMenuItem          TUI::Menus::MenuItem         [x]
+ TMenu              TUI::Menus::Menu             [x]
+ TMenuView          TUI::Menus::MenuView         [x]
+ TMenuBar           TUI::Menus::MenuBar          [x]
+ TMenuBox           TUI::Menus::MenuBox          [x]
+ TMenuPopup         (missing)                    [ ]
+ TSubMenu           TUI::Menus::SubMenu          [x]
+ TStatusLine        TUI::Menus::StatusLine       [x]
+ TStatusItem        TUI::Menus::StatusItem       [x]
+ TStatusDef         TUI::Menus::StatusDef        [x]
+
+=head3 Message Box System
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ messageBox()       TUI::MsgBox::MsgBoxText      [x]
+ messageBoxRect()   TUI::MsgBox::MsgBoxText      [x]
+ inputBox()         TUI::MsgBox::MsgBoxText      [x]
+ inputBoxRect()     TUI::MsgBox::MsgBoxText      [x]
+
+=head3 Validator System
+
+ Class                   Perl Module                          Status
+ ----------------------- ------------------------------------ ------
+ TValidator              TUI::Validate::Validator             [x]
+ TFilterValidator        TUI::Validate::FilterValidator       [x]
+ TRangeValidator         TUI::Validate::RangeValidator        [x]
+ TLookupValidator        TUI::Validate::LookupValidator       [x]
+ TStringLookupValidator  TUI::Validate::StringLookupValidator [x]
+ TPXPictureValidator     TUI::Validate::PXPictureValidator    [x]
+
+=head3 Collections Framework
+
+ Class                Perl Module                       Status
+ -------------------- --------------------------------- ------
+ TNSCollection        TUI::Objects::NSCollection        [x]
+ TNSSortedCollection  TUI::Objects::NSSortedCollection  [x]
+ TCollection          TUI::Objects::Collection          [x]
+ TLineCollection      TUI::Gadgets::LineCollection      [x]
+ TSortedCollection    TUI::Objects::SortedCollection    [x]
+ TStringCollection    TUI::Objects::StringCollection    [x]
+ TStringList          (missing)                         [ ]
+ TStrListMaker        (missing)                         [ ]
+ TResourceCollection  (missing)                         [ ]
+ TResourceFile        (missing)                         [ ]
+
+=head3 Editors and Text Devices
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TEditor            (missing)                    [ ]
+ TMemo              (missing)                    [ ]
+ TFileEditor        (missing)                    [ ]
+ TEditWindow        (missing)                    [ ]
+ TIndicator         (missing)                    [ ]
+ TTextDevice        TUI::TextView::TextDevice    [x]
+ TTerminal          TUI::TextView::Terminal      [x]
+
+=head3 Gadgets
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TCalcDisplay       (missing)                    [ ]
+ TCalendarView      (missing)                    [ ]
+ TClickTester       TUI::Gadgets::ClickTester    [x]
+ TClockView         TUI::Gadgets::ClockView      [x]
+ TEventViewer       TUI::Gadgets::EventViewer    [x]
+ TFileViewer        TUI::Gadgets::FileViewer     [x]
+ TFileWindow        TUI::Gadgets::FileWindow     [x]
+ THeapView          TUI::Gadgets::HeapView       [x]
+ TMouseDialog       TUI::Gadgets::MouseDialog    [x]
+ TPuzzleView        (missing)                    [ ]
+
+=head3 Help System
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TParagraph         (missing)                    [ ]
+ TCrossRef          (missing)                    [ ]
+ THelpTopic         (missing)                    [ ]
+ THelpIndex         (missing)                    [ ]
+ THelpFile          (missing)                    [ ]
+ THelpViewer        (missing)                    [ ]
+ THelpWindow        (missing)                    [ ]
+
+=cut

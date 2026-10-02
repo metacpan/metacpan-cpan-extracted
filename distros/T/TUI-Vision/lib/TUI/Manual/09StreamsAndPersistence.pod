@@ -1,0 +1,30 @@
+# PODNAME: TUI::Manual::09
+# ABSTRACT: Streams and Persistence in TUI::Vision
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+TUI::Manual::09 - Streams and Persistence in TUI::Vision
+
+=head1 STREAMS AND PERSISTENCE
+
+=head2 Why Streams Exist
+
+=head2 Streamable Objects
+
+=head2 Stream Registration
+
+=head2 Object Graphs
+
+=head2 Resource Files
+
+=head2 Conclusion
+
+L<next|TUI::Manual::10> chapter.
+
+=cut

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::Filter;
 # ABSTRACT: Filter name and value pairs to limit the discovery process to a subset of available resources.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name   => Str, { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1alpha1::Filter - Filter name and value pairs to l
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

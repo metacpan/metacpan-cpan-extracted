@@ -11,7 +11,7 @@ use Game::Xiangqi::Engine ':all';
 use Game::Xiangqi::Notation;
 use Game::Xiangqi::Error;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $E = 'Game::Xiangqi::Engine';
 my $N = 'Game::Xiangqi::Notation';

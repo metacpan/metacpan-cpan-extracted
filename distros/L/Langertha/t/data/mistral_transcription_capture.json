@@ -1,0 +1,1 @@
+{"model":"voxtral-mini-latest","text":"This is an example sound file in Augvorbis format from Wikipedia, the free encyclopedia.","language":null,"segments":[],"usage":{"prompt_audio_seconds":6,"prompt_tokens":3,"total_tokens":399,"completion_tokens":21,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":375},"service_tier":"standard"},"finish_reason":null}

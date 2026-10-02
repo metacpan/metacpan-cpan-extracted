@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::Service;
 # ABSTRACT: Service selects policy targets that are bundled as part of a logical load-balanced service.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s k8sService         => '+IO::K8s::Cilium::V2::K8sServiceNamespace';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::Service - Service selects policy targets that are bundled a
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 k8sService
 

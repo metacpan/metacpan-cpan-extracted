@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ClusterIssuer;
 # ABSTRACT: A ClusterIssuer represents a certificate issuing authority which can be referenced as part of `issuerRef` fields.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'cert-manager.io/v1',
     resource_plural => 'clusterissuers',
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::ClusterIssuer - A ClusterIssuer represents a certifica
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

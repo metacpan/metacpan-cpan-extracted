@@ -1,0 +1,25 @@
+{
+   "input" : [
+      {
+         "content" : "What is the weather in Berlin right now? Use the get_weather tool.",
+         "role" : "user",
+         "type" : "message"
+      },
+      {
+         "arguments" : "{\"city\":\"Berlin\"}",
+         "call_id" : "call_jYNSwNK1Hq1n90240LgqMsP0",
+         "id" : "fc_5afbae7f-f4b9-496f-abbe-d50c40b1aec0",
+         "name" : "get_weather",
+         "status" : "completed",
+         "type" : "function_call"
+      },
+      {
+         "call_id" : "call_jYNSwNK1Hq1n90240LgqMsP0",
+         "output" : "{\"city\":\"Berlin\",\"temp_c\":21,\"conditions\":\"sunny\"}",
+         "type" : "function_call_output"
+      }
+   ],
+   "max_output_tokens" : 300,
+   "preset" : "fast",
+   "stream" : false
+}

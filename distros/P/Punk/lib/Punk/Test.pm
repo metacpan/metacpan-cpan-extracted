@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
+our $VERSION = '0.55';
 
 use Test::Builder ();
 use Scalar::Util ();
@@ -62,6 +62,7 @@ sub patch_ok   { my $self = shift; $self->_request_ok('PATCH',   @_) }
 sub delete_ok  { my $self = shift; $self->_request_ok('DELETE',  @_) }
 sub head_ok    { my $self = shift; $self->_request_ok('HEAD',    @_) }
 sub options_ok { my $self = shift; $self->_request_ok('OPTIONS', @_) }
+sub request_ok { my $self = shift; $self->_request_ok(@_) }
 
 # Sign a user straight into the jar - the signed session cookie is minted
 # through the app's own session config, so tests reach guarded pages without
@@ -1166,6 +1167,15 @@ chunked encoding - therefore behaves as it does on an ordinary HTTP/1.1
 request. Override it through C<env> to test another version:
 
     $t->get_ok('/report', env => { SERVER_PROTOCOL => 'HTTP/2' });
+
+=head2 request_ok($method, $path, %options)
+
+    $t->request_ok('PROPFIND', '/dav/doc');
+    $t->request_ok('CONNECT', '/chat',
+        env => { 'psgix.connect_protocol' => 'websocket' });
+
+The same request with the method spelled out, for the methods that have
+no helper of their own. Options are the ones above.
 
 =head3 Uploads
 

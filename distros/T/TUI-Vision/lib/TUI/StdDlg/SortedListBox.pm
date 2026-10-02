@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -206,28 +206,24 @@ TUI::StdDlg::SortedListBox - list box with automatic item sorting
 
 =head1 DESCRIPTION
 
-C<TSortedListBox> is a subclass of C<TListBox> that adds automatic sorting
-behavior for its items.
+C<TSortedListBox> is a subclass of L<TListBox|TUI::Views::ListBox> that adds 
+automatic sorting behavior for its items.
 
 The list box maintains its contents in sorted order based on keys extracted
 from the item text. It is designed as a reusable base class for list views that
 require ordered presentation, such as file and directory lists.
 
-This class does not define its own construction parameters and relies on the
-standard C<TListBox> initialization.
-
 =head1 ATTRIBUTES
 
-=over
-
-=item shiftState
+=head2 shiftState
 
 Current keyboard shift state used during incremental search and navigation
 (I<Int>).
 
-=back
-
 =head1 CONSTRUCTOR
+
+This class does not define its own construction parameters and relies on the
+standard L<TListBox|TUI::Views::ListBox> initialization.
 
 =head2 new
 
@@ -238,18 +234,21 @@ Current keyboard shift state used during incremental search and navigation
 
 Creates a new sorted list box.
 
-This constructor is inherited from C<TListBox> and initializes the view with
-the specified bounds and optional vertical scroll bar.
+This constructor is inherited from L<TListBox|TUI::Views::ListBox> and 
+initializes the view with the specified bounds and optional vertical scroll 
+bar.
 
 =over
 
 =item bounds
 
-Bounding rectangle defining the position and size of the list box (I<TRect>).
+Bounding rectangle defining the position and size of the list box 
+(L<TRect|TUI::Objects::Rect>).
 
 =item vScrollBar
 
-Optional vertical scroll bar associated with the list box (I<TScrollBar>).
+Optional vertical scroll bar associated with the list box 
+(L<TScrollBar|TUI::Views::ScrollBar> or C<undef>).
 
 =back
 
@@ -293,8 +292,8 @@ Assigns a new sorted collection to the list box and refreshes its contents.
 
 =head1 SEE ALSO
 
-L<TUI::Views::ListBox>,
-L<TUI::StdDlg::FileList>
+L<TListBox|TUI::Views::ListBox>,
+L<TFileList|TUI::StdDlg::FileList>
 
 =head1 AUTHORS
 

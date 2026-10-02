@@ -102,13 +102,14 @@ subtest 'routed usage survives the Langfuse encode' => sub {
   my ($gen) = grep { $_->{type} eq 'generation-update' } @$batch;
   ok $gen, 'generation-update in the batch';
   is $gen->{body}{usage}, {
-    input_tokens  => 42,
-    output_tokens => 17,
-    total_tokens  => 59,
-  }, 'usage flattened to canonical token counts';
+    input  => 42,
+    output => 17,
+    total  => 59,
+    unit   => 'TOKENS',
+  }, 'usage flattened to the token counts Langfuse stores';
 };
 
-subtest 'plain hashref usage is recorded verbatim' => sub {
+subtest 'plain hashref usage in Langfuse keys keeps its counts' => sub {
   my ( $tracing, $http ) = build_tracing;
   my $trace = $tracing->start_trace( model => 'gpt-test', format => 'openai' );
   $tracing->end_trace( $trace,
@@ -118,8 +119,8 @@ subtest 'plain hashref usage is recorded verbatim' => sub {
 
   my $batch = posted_batch($http) or return;
   my ($gen) = grep { $_->{type} eq 'generation-update' } @$batch;
-  is $gen->{body}{usage}, { input => 100, output => 50, total => 150 },
-    'documented hashref shape passes through untouched';
+  is $gen->{body}{usage}, { input => 100, output => 50, total => 150, unit => 'TOKENS' },
+    'documented hashref shape keeps its counts';
 };
 
 subtest 'flush drops an unencodable batch instead of failing the request' => sub {

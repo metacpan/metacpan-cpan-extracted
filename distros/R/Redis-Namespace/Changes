@@ -1,5 +1,17 @@
 Revision history for Perl extension Redis::Namespace
 
+0.14 2026-10-01T10:40:39Z
+        - generate the methods of Valkey commands from the command reference of Valkey
+          e.g. DELIFEQ, COMMANDLOG, SCRIPT SHOW
+        - generate the methods of Redis commands from the command reference of Redis (redis/docs).
+          %BEFORE_FILTERS, %AFTER_FILTERS, %COMMANDS and %UNSAFE_COMMANDS are removed.
+        - support more commands of recent Redis
+        - sub-command names are now case-insensitive
+        - the responses are converted in scalar context and pipeline mode too
+        - strict mode rejects unsafe sub-commands. e.g. config_get
+        - strict mode rejects more unsafe commands: FAILOVER, REPLCONF, TRIMSLOTS,
+          ACL DELUSER/LOAD/SAVE/SETUSER and FUNCTION DELETE/FLUSH/RESTORE
+
 0.13 2019-12-12T04:00:48Z
         - support more commands of Redis 5.0
 

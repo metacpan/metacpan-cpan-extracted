@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::OtherName;
 # ABSTRACT: OtherName
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s oid       => Str;
@@ -22,7 +22,7 @@ IO::K8s::CertManager::V1::OtherName - OtherName
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 oid
 

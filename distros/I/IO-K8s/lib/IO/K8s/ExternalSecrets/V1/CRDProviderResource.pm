@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::CRDProviderResource;
 # ABSTRACT: Resource identifies the CRD by its API group, version and kind.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use utf8;
 use IO::K8s::Resource;
 
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::CRDProviderResource - Resource identifies the CRD 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 group
 

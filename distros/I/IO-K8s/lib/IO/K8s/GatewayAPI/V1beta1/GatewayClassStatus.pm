@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::GatewayClassStatus;
 # ABSTRACT: Status defines the current state of GatewayClass.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s conditions        => ['Meta::V1::Condition'], { default => [{'lastTransitionTime' => '1970-01-01T00:00:00Z','message' => 'Waiting for controller','reason' => 'Pending','status' => 'Unknown','type' => 'Accepted'}] };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1beta1::GatewayClassStatus - Status defines the current st
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 conditions
 

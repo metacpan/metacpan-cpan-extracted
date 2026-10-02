@@ -1,5 +1,18 @@
 Revision history for IO-K8s
 
+1.110     2026-10-01 15:57:19Z
+
+  - Fix a 1.109 regression: JSONSchemaProps minimum, maximum and multipleOf
+    (OpenAPI type: number) are now Num and go out as JSON numbers. They were
+    declared Str, and since 1.109 serializes every Str value as a JSON
+    string, any CRD with a numeric bound -- from to_crd, load_yaml or
+    struct_to_object -- reached the API server as "minimum":"1" and was
+    refused with a 400 (cannot unmarshal string into ... of type float64).
+    A numeric string such as "0.5" is numified on the way out; a
+    non-numeric bound is now refused. compare_to_schema describes Num,
+    [Num] and HashRef[Num] fields as number, array<number> and
+    hash<number>.
+
 1.109     2026-10-01 02:33:28Z
 
   - Behaviour change: { Str => 1 } is now a map of strings. Every scalar

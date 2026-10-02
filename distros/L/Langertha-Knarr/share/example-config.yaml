@@ -1,7 +1,11 @@
 # Knarr — Langertha LLM Proxy Configuration
 # See: https://github.com/Getty/langertha-knarr
-# Full reference: Langertha::Knarr (POD) and the README
+# Full reference: Langertha::Knarr::Config (POD) and the README
+# Check it with: knarr check -c this-file.yaml
 
+# Default without this key: 127.0.0.1:8080 + 127.0.0.1:11434 (loopback only).
+# Use 0.0.0.0:... to be reachable from other machines or from outside a
+# container. `knarr start -p PORT` replaces this list with 0.0.0.0:PORT.
 listen:
   - "127.0.0.1:8080"    # OpenAI/Anthropic clients
   - "127.0.0.1:11434"   # Ollama clients (native port)
@@ -14,7 +18,8 @@ models:
   # (OpenAI defaults to gpt-5.6-terra)
   gpt-4o:
     engine: OpenAI
-    # api_key from LANGERTHA_OPENAI_API_KEY env (engine default)
+    # api_key from LANGERTHA_OPENAI_API_KEY env (engine default; the bare
+    # OPENAI_API_KEY is only read with api_key_env: OPENAI_API_KEY)
 
   # Explicit `model:` overrides the engine default
   gpt-4o-mini:
@@ -40,39 +45,84 @@ models:
     system_prompt: "You are a terse assistant. Answer in one sentence."
 
   # api_key_env: read the key from a named environment variable
-  # (instead of the engine's default LANGERTHA_* / bare-name lookup)
+  # (instead of the engine's own LANGERTHA_* variable)
   mistral:
     engine: Mistral
     model: mistral-small-latest
     api_key_env: MY_MISTRAL_KEY
 
-  # Local engines are reached by URL, no API key needed
+  # Local engines are reached by URL, no API key needed. Knarr itself
+  # listens on 11434 above, so a local Ollama runs on another port here
+  # (OLLAMA_HOST=127.0.0.1:11435 ollama serve) or on another host.
   local-llama:
     engine: OllamaOpenAI
-    url: http://localhost:11434/v1
+    url: http://localhost:11435/v1
     model: llama3.3
+    user_agent_timeout: 600   # seconds for this upstream (default: upstream_timeout)
+
+  # context_size: only engines that take a context window (Ollama and
+  # LMStudio native) send it upstream (Ollama's num_ctx); others ignore it
+  local-qwen:
+    engine: Ollama
+    url: http://localhost:11435
+    model: qwen3:8b
+    context_size: 32768
 
   deepseek:
     engine: DeepSeek
     model: deepseek-v4-flash
 
-# Default engine for models without explicit config (optional)
+# Default engine (optional): answers requests without a model (A2A, ACP
+# without agent_name) with its own `model:`, and unknown models in a protocol
+# that has no passthrough upstream below (Ollama here, A2A, ACP, AG-UI).
+# Without it such requests get a 404.
 default:
   engine: OpenAI
+  api_key_env: OPENAI_API_KEY
 
-# Auto-discover models from configured engines
+# Auto-discover models from configured engines, for the model lists. A
+# discovered model still passes through when the passthrough upstream of
+# the client's protocol is the endpoint that listed it and the client sends
+# its own provider key; otherwise it is routed through its engine.
 auto_discover: true
 
-# Passthrough: forward requests directly to upstream APIs
-# Client's own API key is used — no key duplication needed
-# Use 'true' for default URLs, or set custom upstream URLs
+# Passthrough (off without this key): an unknown model is forwarded byte for
+# byte to the upstream of its protocol with the client's own API key and
+# headers — no key duplication needed.
 passthrough:
   anthropic: https://api.anthropic.com
   openai: https://api.openai.com
-# Shorthand: passthrough: true  (enables all with defaults)
+  # ollama: http://gpu-box:11434     # no default URL for ollama
+# Shorthand: passthrough: true  (openai + anthropic with the URLs above)
 
-# Optional: proxy authentication
+# Optional: proxy authentication (or KNARR_API_KEY)
 # proxy_api_key: your-secret-key
+
+# Optional: public base URL for /.well-known/langertha.json (or
+# KNARR_PUBLIC_URL); default: taken from each request
+# public_url: https://knarr.example
+
+# Optional: upstream timeouts in seconds, 0 disables
+# upstream_timeout: 300         # total time of a non-streaming request
+# upstream_stall_timeout: 120   # time a passthrough stream may go without data
+
+# Optional: ask gateway / self-hosted engines once after startup which
+# models see images (/api/show "vision", manifest image_input)
+# probe_capabilities: 1
+# probe_timeout: 10
+
+# Optional: worker processes on the same listen sockets (or KNARR_WORKERS;
+# knarr start -w wins); 1 = one process, no fork
+# workers: 1
+
+# Optional: Ollama version reported at GET /api/version (x.y.z only)
+# ollama_compat_version: 0.34.4
+
+# Optional: name and description of the A2A agent card at
+# /.well-known/agent.json (or KNARR_A2A_NAME / KNARR_A2A_DESCRIPTION)
+# a2a:
+#   name: Langertha Knarr Agent
+#   description: LLM agent served through Langertha Knarr
 
 # Optional: Langfuse tracing (or set env vars)
 # langfuse:
@@ -80,6 +130,10 @@ passthrough:
 #   public_key: pk-lf-...
 #   secret_key: sk-lf-...
 #   trace_name: my-proxy   # optional, default knarr-proxy
+#   transport: otel        # optional: OpenTelemetry (OTLP/HTTP) instead of the
+#                          # deprecated ingestion API (default ingestion);
+#                          # needs Langfuse Cloud or self-hosted v3.22+
+#   timeout: 15            # optional: seconds per trace post, 0 for no limit
 
 # Optional: request logging — JSONL file and/or per-request JSON directory
 # logging:

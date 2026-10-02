@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::BeyondtrustWorkloadCredentialsServer;
 # ABSTRACT: Server configures the BeyondTrust Workload Credentials server connection details.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apiUrl => Str, { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::BeyondtrustWorkloadCredentialsServer - Server conf
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apiUrl
 

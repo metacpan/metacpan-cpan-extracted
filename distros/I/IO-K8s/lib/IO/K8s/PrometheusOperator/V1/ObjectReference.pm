@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ObjectReference;
 # ABSTRACT: ObjectReference references a PodMonitor, ServiceMonitor, Probe or PrometheusRule object.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s group     => Str, { enum => [qw(monitoring.coreos.com)], default => 'monitoring.coreos.com' };
@@ -26,7 +26,7 @@ IO::K8s::PrometheusOperator::V1::ObjectReference - ObjectReference references a 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 group
 

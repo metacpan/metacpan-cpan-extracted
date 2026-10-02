@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::HeaderMatch;
 # ABSTRACT: HeaderMatch extends the HeaderValue for matching requirement of a named header field against an immediate string or a secret value.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s mismatch => Str, { enum => [qw(LOG ADD DELETE REPLACE)] };
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::HeaderMatch - HeaderMatch extends the HeaderValue for match
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 mismatch
 

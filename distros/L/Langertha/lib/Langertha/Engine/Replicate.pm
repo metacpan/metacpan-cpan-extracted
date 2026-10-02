@@ -1,6 +1,6 @@
 package Langertha::Engine::Replicate;
 # ABSTRACT: Replicate API
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Carp qw( croak );
 
@@ -26,6 +26,18 @@ sub _build_supported_operations {[qw(
   createChatCompletion
 )]}
 
+# Replicate's OpenAPI (api.replicate.com/openapi.json) has no chat/completions
+# path, so nothing documents parallel_tool_calls: clear parallel_tool_use
+# (karr k242, docs only; the endpoint question itself is karr k243).
+around engine_capabilities => sub {
+  my ( $orig, $self, @rest ) = @_;
+  my $caps = $self->$orig(@rest);
+  delete $caps->{parallel_tool_use};
+  # image_input (k266, ADR 0019): a gateway: the model behind it is unknown to the client, so no claim.
+  delete $caps->{image_input};
+  return $caps;
+};
+
 __PACKAGE__->meta->make_immutable;
 
 
@@ -43,7 +55,7 @@ Langertha::Engine::Replicate - Replicate API
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -63,16 +75,27 @@ version 0.502
 
 =head1 DESCRIPTION
 
-Provides access to Replicate's OpenAI-compatible chat endpoint. Replicate
-hosts thousands of open-source models with pay-per-use pricing.
+Replicate hosts thousands of open-source models with pay-per-use pricing.
+This engine speaks the OpenAI C</chat/completions> wire format and, by
+default, POSTs to C<https://api.replicate.com/v1/chat/completions>.
+
+B<Unverified against the hosted API.> Replicate's official OpenAPI document
+(C<https://api.replicate.com/openapi.json>, checked 2026-09-25) lists no
+C</chat/completions> path, only C</predictions>, C</models/{owner}/{name}/predictions>,
+C</deployments/...> and similar, and its documentation index
+(C<https://replicate.com/docs/llms.txt>) has no OpenAI-compatibility page. The
+OpenAI-compatible examples on Replicate model pages are for a Cog container run
+locally. The project has no Replicate key, so whether the hosted endpoint
+answers has never been tested. To talk to a locally run Cog container or an
+OpenAI-compatible proxy in front of Replicate, set C<url> to that server's
+base URL (for example C<http://localhost:5000/v1>).
 
 Model names use C<owner/model> format (e.g., C<meta/llama-4-maverick>,
 C<meta/llama-4-scout>). No default model is set; C<model> must be specified
 explicitly.
 
-Supports chat, streaming, and MCP tool calling via the OpenAI-compatible
-endpoint at C<https://api.replicate.com/v1>. Embeddings and transcription
-are not supported through this interface.
+Chat, streaming, and MCP tool calling use the OpenAI wire format as above.
+Embeddings and transcription are not supported through this interface.
 
 Get your API token at L<https://replicate.com/account/api-tokens> and set
 C<LANGERTHA_REPLICATE_API_KEY> in your environment.
@@ -84,8 +107,6 @@ B<THIS API IS WORK IN PROGRESS>
 =over
 
 =item * L<https://www.replicatestatus.com/> - Replicate service status
-
-=item * L<https://replicate.com/docs/topics/openai-compatibility> - Replicate OpenAI compatibility docs
 
 =item * L<https://replicate.com/explore> - Browse available models
 

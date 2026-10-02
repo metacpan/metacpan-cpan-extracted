@@ -1,3 +1,46 @@
+0.003     2026-10-01 16:06:40Z
+  - Require IO::K8s 1.109 and Kubernetes::REST 1.109: string-map fields
+    (labels, annotations, ConfigMap data, ...) now serialize numeric values
+    as JSON strings, which the API server requires.
+  - Fix RBAC-aware tool descriptions reaching only run_stdio clients. They
+    are now built on the first tools/list or tools/call of any transport,
+    so the Net::Async::MCP path from README, an embedded to_stdio and the
+    HTTP to_action all tell the LLM which resources exist per namespace. A
+    server whose API cannot be built answers tools/list with a JSON-RPC
+    error instead of the static list.
+  - Fix k8s_get output => 'yaml' writing booleans as
+    "!!perl/scalar:JSON::PP::Boolean 1", which kubectl rejects. YAML now
+    comes from IO::K8s to_yaml; the optional YAML::XS dependency and its
+    silent fallback to JSON are gone.
+  - k8s_patch takes an optional subresource => 'status', routed to
+    patch_status() with a merge default (an explicit patch_type wins) and
+    gated on <plural>/status. Without it a status write to the main
+    endpoint returned 2xx while the API server dropped the status.
+  - Fix RBAC discovery dropping every subresource but pods/log, which
+    denied a narrow Role granting e.g. patch on deployments/status.
+    Subresources are kept as the API server reports them; tool
+    descriptions are unchanged.
+  - BEHAVIOUR CHANGE: a namespace whose only grants are subresources now
+    counts as reachable. With more than one reachable namespace, tools ask
+    for an explicit namespace instead of auto-filling.
+  - k8s_logs reads logs through Kubernetes::REST's log(); an HTTP error
+    now reads "Failed to get logs for pod/<name>: ... 404 ..." instead of
+    "Error getting logs: 404 ...".
+  - Plural lookup resolves built-in Kinds through IO::K8s's upstream
+    plurals without a request; expand_class() no longer downloads
+    /openapi/v2. CRDs without a class still come from API discovery.
+  - Fix MCP_K8S_TOKEN, MCP_K8S_SERVER and MCP_K8S_CONTEXT being ignored
+    when set only in the environment; all three auth tiers honour them
+    now (closes #1).
+  - MCP::K8s->new takes kubeconfig_path, passed through to
+    Kubernetes::REST::Kubeconfig, so an embedder names the kubeconfig file
+    directly instead of going through KUBECONFIG. No new env var.
+  - Require MCP 0.15, Kubernetes::REST 1.108 and IO::K8s 1.108.
+  - The Net::Async::MCP examples in README and examples/ need
+    Net::Async::MCP 0.004 or newer: MCP 0.15 speaks the stateless
+    2026-07-28 revision, which 0.003 rejects with "-32602 Missing protocol
+    version". Not a dependency of this distribution; mcp-k8s is unaffected.
+
 0.002     2026-03-05 21:29:05Z
 
   - MCP::K8s now inherits from MCP::Server instead of composing it

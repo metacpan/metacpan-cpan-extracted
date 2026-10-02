@@ -1,6 +1,6 @@
 package IO::K8s::Role::MiddlewareBuilder;
 # ABSTRACT: Role for building Traefik middleware configuration
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use Moo::Role;
 
 # The fluent setters below build the spec through IO::K8s::Role::SpecBuilder
@@ -75,7 +75,7 @@ IO::K8s::Role::MiddlewareBuilder - Role for building Traefik middleware configur
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 

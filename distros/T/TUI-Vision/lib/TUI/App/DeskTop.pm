@@ -4,8 +4,9 @@ package TUI::App::DeskTop;
 use 5.010;
 use strict;
 use warnings;
+use utf8;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,6 +17,7 @@ our @EXPORT = qw(
 );
 
 use Carp ();
+use Encode qw( encode );
 use Scalar::Util qw( weaken );
 use TUI::toolkit;
 use TUI::toolkit::Types qw(
@@ -29,6 +31,7 @@ use TUI::Drivers::Const qw(
   evCommand
 );
 use TUI::Objects::Point;
+use TUI::Objects::Rect;
 use TUI::Views::Const qw(
   :cmXXXX
   :gfXXXX
@@ -43,8 +46,14 @@ sub new_TDeskTop { __PACKAGE__->from(@_) }
 
 extends ( TGroup, TDeskInit );
 
+# Moo does not inherit attributes from secondary extends() classes.
+# Redeclare attribute provided by TDeskInit.
+if ( TUI::toolkit::is_Moo ) {
+  has createBackground => ( is => 'bare', default => sub { die 'required' } );
+}
+
 # declare global variables
-our $defaultBkgrnd = "\xB0";
+our $defaultBkgrnd = encode( cp437 => "░" );
 
 # protected attributes
 has background        => ( is => 'ro' );
@@ -116,7 +125,7 @@ my $doCascade = sub {    # void ($p, $r)
   assert ( is_Object $p );
   assert ( is_Object $r );
   if ( $p->$Tileable() && $cascadeNum >= 0 ) {
-    my $NR = $r;
+    my $NR = $r->clone();
     $NR->{a}{x} += $cascadeNum;
     $NR->{a}{y} += $cascadeNum;
     $p->locate( $NR );
@@ -378,14 +387,14 @@ TUI::App::DeskTop - manages the application desktop area and owned views
 
 =head1 DESCRIPTION
 
-C<TDeskTop> represents the desktop area of a TUI::Vision application. It manages
-the screen region between the menu bar and the status line and owns the
+C<TDeskTop> represents the desktop area of a L<TUI::Vision> application. It 
+manages the screen region between the menu bar and the status line and owns the
 background view as well as all top-level windows and dialogs.
 
 Each application has exactly one desktop object, referenced by the global
 variable C<$deskTop>. Windows and non-modal dialogs are inserted into the
 desktop, while modal dialogs are executed via C<execView> inherited from
-C<TGroup>.
+L<TGroup|TUI::Views::Group>.
 
 C<TDeskTop> also provides functionality to rearrange its child windows using
 cascading or tiling layouts.
@@ -397,12 +406,13 @@ top-level views. Non-modal windows and dialogs are inserted with C<insert()>,
 while modal dialogs are run with C<execView()> so the caller can react to the
 returned command.
 
-Window management operations are typically C<tile()> and C<cascade()> to
+Window management operations are typically L<tile()|/tile> and L<cascade()|/cascade> to
 rearrange visible tileable windows, plus keyboard focus cycling handled through
 desktop event processing. Most projects use the desktop created by
 C<TProgram::initDeskTop>; custom desktop subclasses are mainly needed when you
-want alternative background behavior via C<initBackground()> or custom layout
-error handling via C<tileError()>.
+want alternative background behavior via L<initBackground()|/initBackground>
+or custom layout
+error handling via L<tileError()|/tileError>.
 
 =head1 VARIABLES
 
@@ -411,24 +421,21 @@ used by C<TDeskTop>.
 
 =head2 $defaultBkgrnd
 
-Defines the default background character used to fill the desktop area.
+Defines the default background character (I<Str>) used to fill the desktop area.
 
 =head1 ATTRIBUTES
 
 The following attributes are managed internally and exposed as read-only
 accessors.
 
-=over
+=head2 background
 
-=item background
+The L<TBackground|TUI::App::Background> object forming the visual backdrop of 
+the desktop.
 
-The C<TBackground> object forming the visual backdrop of the desktop.
+=head2 tileColumnsFirst
 
-=item tileColumnsFirst
-
-Boolean flag controlling whether tiling prefers columns before rows.
-
-=back
+Boolean flag (I<Bool>) controlling whether tiling prefers columns before rows.
 
 =head1 CONSTRUCTOR
 
@@ -440,12 +447,21 @@ Boolean flag controlling whether tiling prefers columns before rows.
 
 Creates a new desktop object.
 
+=head2 new_TDeskTop
+
+  my $deskTop = new_TDeskTop($bounds);
+
+Factory-style constructor using positional arguments.
+
+This constructor is provided for compatibility with traditional Turbo Vision
+construction patterns.
+
 =over
 
 =item bounds
 
 Bounding rectangle defining the usable screen area of the desktop
-(I<TRect>).
+(L<TRect|TUI::Objects::Rect>).
 
 =back
 
@@ -497,10 +513,10 @@ Subclasses may override this method to report layout errors.
 
 =head1 SEE ALSO
 
-L<TUI::App::Background>,
-L<TUI::App::Program>,
-L<TUI::Views::Window>,
-L<TUI::Views::Group>
+L<TBackground|TUI::App::Background>,
+L<TProgram|TUI::App::Program>,
+L<TWindow|TUI::Views::Window>,
+L<TGroup|TUI::Views::Group>
 
 =head1 AUTHORS
 

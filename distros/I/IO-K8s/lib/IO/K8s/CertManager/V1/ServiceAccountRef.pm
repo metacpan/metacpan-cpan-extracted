@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ServiceAccountRef;
 # ABSTRACT: A reference to a service account that will be used to request a bound token (also known as "projected token").
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s audiences => [Str];
@@ -22,7 +22,7 @@ IO::K8s::CertManager::V1::ServiceAccountRef - A reference to a service account t
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 audiences
 

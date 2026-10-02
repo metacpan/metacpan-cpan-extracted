@@ -7,6 +7,7 @@ use Getopt::Long qw(GetOptions GetOptionsFromArray);
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Mojo::Server::Daemon;
+use Mojo::Server::Prefork;
 use JSON::MaybeXS;
 use Langertha::Skeid;
 use Langertha::Skeid::Proxy;
@@ -19,44 +20,84 @@ if (@ARGV && defined($ARGV[0]) && $ARGV[0] !~ /^-/) {
 if ($cmd eq 'usage') {
   exit _run_usage(@ARGV);
 }
+if ($cmd eq 'keyid') {
+  exit _run_keyid(@ARGV);
+}
 if ($cmd ne 'serve') {
   die _usage_text();
 }
 
 my $listen = '127.0.0.1:8090';
-my $config = 'skeid.yaml';
+my $config;
 my $admin_api_key = '';
+my $workers = 1;
 
 GetOptions(
   'listen|l=s' => \$listen,
   'config|c=s' => \$config,
   'admin-api-key=s' => \$admin_api_key,
+  'workers|w=i' => \$workers,
 ) or die _usage_text();
 
+$workers = 1 if !$workers || $workers < 1;
+
 my %opts;
-$opts{config_file} = $config if defined($config) && -f $config;
+my $config_file = _config_file($config);
+$opts{config_file} = $config_file if defined $config_file;
 $opts{admin_api_key} = $admin_api_key if defined($admin_api_key) && length($admin_api_key);
+# Set before build_app so the first probe interval and the first admission decision already
+# know how many processes are sharing the node (ADR 0010).
+$opts{worker_count} = $workers;
 
 my $app = Langertha::Skeid::Proxy->build_app(%opts);
 
+# A write-behind usage store (usage_store.flush_interval_ms) holds events in memory until its
+# timer fires. The loop stops before that on SIGINT/SIGTERM to a single process, and a prefork
+# worker leaves through exit after a graceful stop (SIGQUIT) -- both run END, the last point the
+# database handle is still alive. Without it those events, billed requests, would be gone
+# (skeid k78). A worker the prefork manager SIGKILLs runs nothing.
+END {
+  local $?;
+  $app->skeid->flush_usage if $app;
+}
+
 print "Starting Skeid proxy on http://$listen\n";
 print "Config: ", ($opts{config_file} // '(none)'), "\n";
+print "Workers: $workers\n" if $workers > 1;
 
-my $daemon = Mojo::Server::Daemon->new(
-  app    => $app,
-  listen => ["http://$listen"],
-);
-$daemon->run;
+# An operator who wrote max_conns meant it for the node, not for each process. When the split
+# cannot honour that, say so -- silently admitting more than was configured is how a GPU ends
+# up queueing.
+warn "WARNING: $_\n" for @{ $app->skeid->worker_share_warnings };
+
+if ($workers > 1) {
+  my $prefork = Mojo::Server::Prefork->new(
+    app     => $app,
+    listen  => ["http://$listen"],
+    workers => $workers,
+  );
+  $prefork->run;
+} else {
+  my $daemon = Mojo::Server::Daemon->new(
+    app    => $app,
+    listen => ["http://$listen"],
+  );
+  # Daemon->run handles INT and TERM only; SIGQUIT (the image's STOPSIGNAL) would otherwise
+  # kill the process with its default action, before END could flush a write-behind queue.
+  $SIG{QUIT} = sub { $daemon->ioloop->stop };
+  $daemon->run;
+}
 
 sub _run_usage {
   my (@argv) = @_;
 
-  my $config = 'skeid.yaml';
+  my $config;
   my $since  = '';
   my $limit  = 20;
   my $as_json = 0;
   my $backend = '';
   my $db_path = '';
+  my $log_path = '';
   my $dsn = '';
   my $db_user = '';
   my $db_pass = '';
@@ -72,6 +113,7 @@ sub _run_usage {
     'json!'         => \$as_json,
     'backend=s'     => \$backend,
     'db|sqlite=s'   => \$db_path,
+    'log-path|jsonlog=s' => \$log_path,
     'dsn=s'         => \$dsn,
     'db-user=s'     => \$db_user,
     'db-pass=s'     => \$db_pass,
@@ -81,7 +123,8 @@ sub _run_usage {
   ) or die _usage_text();
 
   my %skeid_opts;
-  $skeid_opts{config_file} = $config if defined($config) && -f $config;
+  my $config_file = _config_file($config);
+  $skeid_opts{config_file} = $config_file if defined $config_file;
 
   my $skeid = Langertha::Skeid->new(%skeid_opts);
 
@@ -96,6 +139,10 @@ sub _run_usage {
   if (defined $dsn && length $dsn) {
     $usage_store{backend} ||= 'postgresql';
     $usage_store{dsn} = $dsn;
+  }
+  if (defined $log_path && length $log_path) {
+    $usage_store{backend} ||= 'jsonlog';
+    $usage_store{log_path} = $log_path;
   }
   $usage_store{user} = $db_user if defined($db_user) && length($db_user);
   $usage_store{password} = $db_pass if defined($db_pass) && length($db_pass);
@@ -125,20 +172,23 @@ sub _run_usage {
   }
 
   my $backend_name = $report->{backend} // '';
-  my $db_label = $backend_name eq 'sqlite'
-    ? ($report->{db_path} // '')
-    : ($backend_name eq 'postgresql' ? 'configured DSN' : '(none)');
+  my $db_label = $backend_name eq 'sqlite'     ? ($report->{db_path} // '')
+               : $backend_name eq 'jsonlog'    ? ($report->{log_path} // '')
+               : $backend_name eq 'postgresql' ? 'configured DSN'
+               :                                 '(none)';
   print "Usage backend: $backend_name\n";
   print "Store: $db_label\n";
   print "Since: ", ($report->{since} && length($report->{since}) ? $report->{since} : '(all)'), "\n";
   print "\n";
 
   my $tot = $report->{totals} || {};
-  printf "Totals: requests=%d input=%d output=%d total=%d tools=%d cost=\$%.8f\n",
+  printf "Totals: requests=%d input=%d output=%d total=%d cached=%d cache_write=%d tools=%d cost=\$%.8f\n",
     ($tot->{requests} // 0),
     ($tot->{input_tokens} // 0),
     ($tot->{output_tokens} // 0),
     ($tot->{total_tokens} // 0),
+    ($tot->{cached_tokens} // 0),
+    ($tot->{cache_write_tokens} // 0),
     ($tot->{tool_calls} // 0),
     ($tot->{total_cost_usd} // 0);
 
@@ -165,17 +215,50 @@ sub _run_usage {
   print "\nRecent:\n";
   print "  (none)\n" unless @{$report->{recent} || []};
   for my $row (@{$report->{recent} || []}) {
-    printf "  #%d %s %-9s %-20s model=%s status=%d tokens=%d cost=\$%.8f\n",
-      ($row->{id} // 0),
+    # %s, not %d: a jsonlog event id is a string (time, pid, nonce, sequence), a DBI one a row id.
+    printf "  #%s %s %-9s %-20s model=%s status=%d tokens=%d cached=%d cost=\$%.8f\n",
+      ($row->{id} // ''),
       ($row->{created_at} || ''),
       ($row->{api_format} || ''),
       ($row->{api_key_id} || 'anonymous'),
       ($row->{model} || ''),
       ($row->{status_code} // 0),
       ($row->{total_tokens} // 0),
+      ($row->{cached_tokens} // 0),
       ($row->{cost_total_usd} // 0);
   }
 
+  return 0;
+}
+
+# The config file to load. Without --config, ./skeid.yaml is used when it exists and Skeid runs
+# without a config when it does not. A --config that names no file ends the program: the
+# operator asked for that config, and starting without it would serve no nodes (skeid k68).
+sub _config_file {
+  my ($config) = @_;
+  return (-f 'skeid.yaml' ? 'skeid.yaml' : undef) unless defined $config;
+  return $config if -f $config;
+  print STDERR 'ERROR: config file not found: ' . $config
+    . (-e $config ? ' (not a regular file)' : '') . "\n";
+  exit 2;
+}
+
+# Prints the key id a customer key routes and bills under. Needed because a config names
+# customers in keys:, and must be able to do that without holding their keys.
+sub _run_keyid {
+  my (@argv) = @_;
+
+  my @keys = grep { defined && length } @argv;
+  if (!@keys) {
+    # Reading from stdin keeps the key off the command line, and out of the shell history.
+    while (my $line = <STDIN>) {
+      chomp $line;
+      push @keys, $line if length $line;
+    }
+  }
+  die _usage_text() unless @keys;
+
+  print Langertha::Skeid->key_id_for_key($_), "\n" for @keys;
   return 0;
 }
 
@@ -183,10 +266,14 @@ sub _usage_text {
   return <<'USAGE';
 Usage:
   skeid serve [--listen host:port] [--config skeid.yaml] [--admin-api-key KEY]
+              [--workers N]    N > 1 runs prefork; each worker takes max_conns/N
   skeid usage [--config skeid.yaml] [--since ISO8601] [--limit N] [--json]
-              [--backend sqlite|postgresql] [--db /path/to.sqlite]
-              [--dsn dbi:Pg:...] [--db-user USER] [--db-pass PASS|--db-pass-env ENV]
+              [--backend jsonlog|sqlite|postgresql] [--log-path /path/to/events/]
+              [--db /path/to.sqlite] [--dsn dbi:Pg:...]
+              [--db-user USER] [--db-pass PASS|--db-pass-env ENV]
               [--api-key-id ID] [--model NAME]
+  skeid keyid [KEY ...]        the key id to use in the config's keys: section
+                               (reads stdin when given no argument)
 USAGE
 }
 
@@ -202,7 +289,175 @@ skeid - Skeid control-plane CLI and proxy launcher
 
 =head1 VERSION
 
-version 0.002
+version 0.003
+
+=head1 SYNOPSIS
+
+  skeid serve [--listen host:port] [--config skeid.yaml] [--admin-api-key KEY] [--workers N]
+  skeid usage [--config skeid.yaml] [--since ISO8601] [--limit N] [--json]
+              [--backend jsonlog|sqlite|postgresql] [--log-path /path/to/events/]
+              [--db /path/to.sqlite] [--dsn dbi:Pg:...]
+              [--db-user USER] [--db-pass PASS | --db-pass-env VAR]
+              [--api-key-id ID] [--model NAME]
+  skeid keyid [KEY ...]
+
+=head1 DESCRIPTION
+
+Runs the Skeid proxy (L<Langertha::Skeid::Proxy>), reports recorded usage, and prints the
+customer key id a key routes and bills under. With no command, or when the first argument is an
+option, the command is C<serve>. An unknown command prints the usage text and exits non-zero.
+
+The config file is described in L<Langertha::Skeid/CONFIGURATION>.
+
+=head1 COMMANDS
+
+=head2 serve
+
+  skeid serve --config /etc/skeid/skeid.yaml --listen 0.0.0.0:8090 --workers 4
+
+Builds the app with L<Langertha::Skeid::Proxy/build_app> and serves it -- with
+L<Mojo::Server::Daemon>, or L<Mojo::Server::Prefork> when C<--workers> is above 1. Prints the
+address and config it starts with, and warns for every node whose C<max_conns> cannot be split
+across the workers and frontends (L<Langertha::Skeid/worker_share_warnings>).
+
+=head2 --listen, -l
+
+C<host:port> to listen on (default C<127.0.0.1:8090>).
+
+=head2 --config, -c
+
+The YAML config. A path given here that is not an existing file ends the command with
+C<ERROR: config file not found: ...> on standard error and exit code 2 -- Skeid does not start
+without the config it was told to use. Without C<--config>, F<skeid.yaml> in the working
+directory is used when it exists; when it does not, Skeid starts without a config, with no
+nodes (the admin API can add them). A config file that disappears while Skeid runs keeps the
+config in force and is warned about once (L<Langertha::Skeid/maybe_reload_config>).
+
+=head2 --admin-api-key
+
+Admin API key. It wins over any key the config names, on every reload; without it the key comes
+from the config, else from C<SKEID_ADMIN_API_KEY> (see L<Langertha::Skeid/admin>). A key on the
+command line is visible in the process list, so in production prefer C<admin.api_key_env> in
+the config.
+
+=head2 --workers, -w
+
+Prefork worker count (default 1; below 1 counts as 1). Each worker admits its share of every
+node's C<max_conns> and polls capacity probes at its share of the rate (ADR 0010). Under several
+workers a SQLite usage store is unsafe, and an admin API write reaches only the worker that
+served it.
+
+A usage store with C<flush_interval_ms> holds events in memory until they are written; stopping
+the server writes them. Stop a prefork server with C<SIGQUIT> (graceful): on C<SIGINT> or
+C<SIGTERM> Mojolicious's prefork manager kills its workers with C<SIGKILL>, and what they still
+held is lost. A single process (C<--workers 1>) flushes on C<SIGINT>, C<SIGTERM> and C<SIGQUIT>.
+
+=head2 usage
+
+  skeid usage --config /etc/skeid/skeid.yaml --since 2026-09-01T00:00:00Z --limit 50
+
+Prints a usage report: the backend and store (a C<jsonlog> path, the SQLite file, or
+C<configured DSN>), totals, per API key id, per model, and the newest events. The store is the
+config's C<usage_store>; any of C<--backend>, C<--log-path>, C<--db>, C<--dsn>, C<--db-user>,
+C<--db-pass> or C<--db-pass-env> replaces it with a store built from those options alone. Exits
+0, or 2 after printing C<ERROR: ...> when the report fails (no store configured, say) or
+C<--config> names no file.
+
+=head2 --config, -c
+
+As for C<serve>: a missing file is an error; without the option, F<skeid.yaml> is read when it
+exists.
+
+=head2 --since
+
+Only events with C<created_at> at or after this ISO 8601 UTC timestamp.
+
+=head2 --limit
+
+How many recent events to list (default 20, at most 500; below 1 means 20).
+
+=head2 --json
+
+Print the report as JSON instead of the text summary.
+
+=head2 --backend
+
+C<jsonlog>, C<sqlite> or C<postgresql>. Implied by C<--log-path>, C<--db> or C<--dsn>.
+
+=head2 --log-path, --jsonlog
+
+A C<jsonlog> store: its event directory (one file per event) or its JSON-lines file. An
+existing directory, or a path ending in C</>, is read as a directory; anything else as a file.
+
+=head2 --db, --sqlite
+
+SQLite database file.
+
+=head2 --dsn
+
+PostgreSQL DSN, C<dbi:Pg:...>.
+
+=head2 --db-user, --db-pass
+
+PostgreSQL credentials. A password on the command line lands in the shell history; prefer
+C<--db-pass-env>.
+
+=head2 --db-pass-env
+
+Name of an environment variable holding the PostgreSQL password.
+
+=head2 --api-key-id
+
+Only events of this customer key id.
+
+=head2 --model
+
+Only events for this served model.
+
+=head2 keyid
+
+  echo -n "$CUSTOMER_KEY" | skeid keyid
+  skeid keyid sk-alice-secret
+
+Prints the customer key id (L<Langertha::Skeid/key_id_for_key>) of each key given, one per line
+-- the id a config's C<keys:> and C<names:> sections use, so the config never holds the key.
+Without arguments it reads one key per line from standard input, which keeps the key out of the
+shell history. With no key at all it prints the usage text and exits non-zero.
+
+=head1 ENVIRONMENT
+
+C<serve> and C<usage> build a L<Langertha::Skeid>, which reads C<SKEID_ROUTE_WAIT_TIMEOUT_MS>,
+C<SKEID_ROUTE_WAIT_POLL_MS>, C<SKEID_TRUST_KEY_ID_HEADER>, C<SKEID_FRONTEND_COUNT>,
+C<SKEID_ADMIN_API_KEY>, C<SKEID_USAGE_DB>, C<SKEID_CAPACITY_MAX_AGE_MS> and
+C<SKEID_CONFIG_RELOAD_INTERVAL> (L<Langertha::Skeid/ENVIRONMENT>), and whatever variables the
+config names. C<serve> also reads:
+
+=head2 OPENBAO_ROLE_ID, OPENBAO_SECRET_ID
+
+Both set: upstream keys (C<api_key_ref>) are resolved from OpenBao through AppRole.
+
+=head2 OPENBAO_ADDR
+
+The OpenBao address (default C<http://127.0.0.1:8200>).
+
+=head2 OPENBAO_VERIFY_SSL
+
+C<0>, C<false>, C<no> or C<off> disables TLS verification towards OpenBao -- for a dev vault
+only.
+
+=head2 SKEID_UPSTREAM_POOL
+
+Upstream connections kept per process (default 100).
+
+=head2 SKEID_UPSTREAM_TIMEOUT
+
+Seconds an upstream request may take, and may be silent for (default 300; a positive integer).
+The client's connection is kept open for as long on top of the server's own inactivity timeout,
+on the routes that call an upstream -- see L<Langertha::Skeid::Proxy/build_app>.
+
+=head1 SEE ALSO
+
+L<Langertha::Skeid>, L<Langertha::Skeid::Proxy>
 
 =head1 SUPPORT
 

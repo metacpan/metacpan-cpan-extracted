@@ -2,8 +2,8 @@ NAME
     App::ClipboardUtils - CLI utilities related to clipboard
 
 VERSION
-    This document describes version 0.014 of App::ClipboardUtils (from Perl
-    distribution App-ClipboardUtils), released on 2025-10-16.
+    This document describes version 0.015 of App::ClipboardUtils (from Perl
+    distribution App-ClipboardUtils), released on 2026-09-20.
 
 DESCRIPTION
     This distribution contains the following CLI utilities related to
@@ -113,11 +113,35 @@ FUNCTIONS
         Split content by specified string/regex, add the split content as
         multiple clipboard entries.
 
-        Cannot be used together with "--fragments" or "--command-line"
-        option.
+        Cannot be used together with "--fragments" or
+        "--split-by-org-headlines" or "--command-line" option.
 
         Note that if you supply a regex, you should not have any capture
         groups in the regex.
+
+    *   split_by_org_headlines => *bool*
+
+        Only add contents inside Org headlines.
+
+        Cannot be used together with "--split-by" or "--command-line"
+        option.
+
+        Example content:
+
+         * headline 1
+         Content 1
+         Second line
+         ** headline 1.1
+         Content 1.1
+         ** headline 1.2
+         Content 1.2
+         * headline 2
+         Content 2
+
+        Command:
+
+         % cat document.org | clipadd --split-by-org-headlines
+         % cat document.org | clipadd -o
 
     *   tee => *true*
 
@@ -205,7 +229,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026, 2025 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

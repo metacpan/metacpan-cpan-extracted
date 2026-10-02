@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -66,14 +66,15 @@ __END__
 
 =head1 NAME
 
-TStringCollection - sorted collection specialized for strings
+TUI::Objects::StringCollection - sorted collection specialized for strings
 
 =head1 HIERARCHY
 
   TObject
-    TCollection
-      TSortedCollection
-        TStringCollection
+    TNSCollection
+      TNSSortedCollection
+        TSortedCollection
+          TStringCollection
 
 =head1 SYNOPSIS
 
@@ -89,10 +90,10 @@ TStringCollection - sorted collection specialized for strings
 
 =head1 DESCRIPTION
 
-C<TStringCollection> is a specialized variant of C<TSortedCollection> designed
-for storing and managing collections of strings. It provides a ready-to-use
-implementation that maintains its elements in sorted order using string
-comparison semantics.
+C<TStringCollection> is a specialized variant of 
+L<TSortedCollection|TUI::Objects::SortedCollection> designed for storing and 
+managing collections of strings. It provides a ready-to-use implementation that 
+maintains its elements in sorted order using string comparison semantics.
 
 Unlike its base class, C<TStringCollection> supplies concrete implementations
 for key extraction, comparison, and item management. This allows string data
@@ -100,7 +101,8 @@ to be stored, sorted, and serialized without requiring subclasses to override
 any behavior.
 
 Apart from its string-specific functionality, all collection management
-features are inherited unchanged from C<TSortedCollection>.
+features are inherited unchanged from 
+L<TSortedCollection|TUI::Objects::SortedCollection>.
 
 =head1 CONSTRUCTOR
 
@@ -134,7 +136,8 @@ A value of zero disables automatic growth.
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 METHODS
 

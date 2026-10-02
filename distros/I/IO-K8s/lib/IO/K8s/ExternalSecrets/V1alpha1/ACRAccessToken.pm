@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ACRAccessToken;
 # ABSTRACT: ACRAccessToken returns an Azure Container Registry token that can be used for pushing/pulling images.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
     resource_plural => 'acraccesstokens',
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ACRAccessToken - ACRAccessToken returns an A
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

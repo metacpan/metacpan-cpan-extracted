@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::UDPRouteRule;
 # ABSTRACT: UDPRouteRule is the configuration for a given rule.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s backendRefs => ['+IO::K8s::GatewayAPI::V1::BackendRef'], { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::UDPRouteRule - UDPRouteRule is the configuration for a 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 backendRefs
 

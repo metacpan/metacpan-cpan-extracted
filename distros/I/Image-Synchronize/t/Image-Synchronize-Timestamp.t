@@ -135,6 +135,7 @@ foreach my $test
   (
    '+06:00:00',
    '+6:0',
+   '06:00',
  )
 {
   my $et = Image::Synchronize::Timestamp->new($test);

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::PortProtocol;
 # ABSTRACT: PortProtocol specifies an L4 port with an optional transport protocol
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s endPort  => Int, { minimum => 0, maximum => 65535 };
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::PortProtocol - PortProtocol specifies an L4 port with an op
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 endPort
 

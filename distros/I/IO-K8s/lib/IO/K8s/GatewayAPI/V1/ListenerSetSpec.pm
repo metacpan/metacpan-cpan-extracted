@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::ListenerSetSpec;
 # ABSTRACT: Spec defines the desired state of ListenerSet.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s listeners => ['+IO::K8s::GatewayAPI::V1::ListenerEntry'], { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::ListenerSetSpec - Spec defines the desired state of Lis
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 listeners
 

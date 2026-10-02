@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;

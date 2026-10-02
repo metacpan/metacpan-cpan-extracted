@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::WorkloadPodGroupGangSchedulingPolicy;
 # ABSTRACT: WorkloadPodGroupGangSchedulingPolicy defines the parameters for gang (all-or-nothing) scheduling.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s minCount => Int;
@@ -20,7 +20,7 @@ IO::K8s::Api::Scheduling::V1alpha3::WorkloadPodGroupGangSchedulingPolicy - Workl
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 minCount
 

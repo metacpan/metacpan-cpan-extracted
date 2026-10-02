@@ -213,10 +213,14 @@ every function here is exported, so Perl parses the bareword as a call to
 
 Reads `$file` and returns a hash reference. The format is worked out from the
 file name — `.pdb`, `.ent`, `.cif`, `.mmcif`, `.pdbx` — and from the first
-records in the file when the name gives nothing away. `.gz` files are read as
-they are, without unpacking to a temporary file — a file of several gzip members,
-as `bgzip` writes, included. A `.bz2` or `.Z` file dies saying so: only gzip is
-unpacked, and read as it stands one would be a structure with no atoms in it.
+records in the file when the name gives nothing away. `.gz` and `.bz2` files
+are read as they are, without unpacking to a temporary file — a file of several
+gzip or bzip2 members, as `bgzip` and `pbzip2` write, included — and so is every
+function below that takes a file name in place of a structure. The suffix is
+what says a file is compressed, in either case (`.GZ`, `.BZ2`), and the name
+with it taken off is what says the format. Both are read through IO::Compress,
+which is part of perl. A `.Z` file dies saying so: `compress` is
+not unpacked, and read as it stands one would be a structure with no atoms in it.
 
 A plain string in second place names a *view*, and asks for that and nothing
 else: the file is read, the view is taken out of it, and the rest is thrown

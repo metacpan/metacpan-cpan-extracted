@@ -1,0 +1,4 @@
+# Flat legacy form: every key at top level.
+temperature: 0.2
+packs: [git-guru]
+perl: true

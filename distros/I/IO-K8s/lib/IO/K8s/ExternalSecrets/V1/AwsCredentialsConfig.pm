@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::AwsCredentialsConfig;
 # ABSTRACT: awsSecurityCredentials is for configuring AWS region and credentials to use for obtaining the access token, when using the AWS metadata server is not an option.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s awsCredentialsSecretRef => 'Core::V1::SecretReference', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::AwsCredentialsConfig - awsSecurityCredentials is f
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 awsCredentialsSecretRef
 

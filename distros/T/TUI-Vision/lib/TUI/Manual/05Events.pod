@@ -1,0 +1,32 @@
+# PODNAME: TUI::Manual::05
+# ABSTRACT: Events in TUI::Vision
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+TUI::Manual::05 - Events in TUI::Vision
+
+=head1 EVENTS
+
+=head2 The Event Loop
+
+=head2 Event Propagation
+
+=head2 Command Events
+
+=head2 Broadcast Events
+
+=head2 Focus and Ownership
+
+=head2 Writing Event Handlers
+
+=head2 Conclusion
+
+L<next|TUI::Manual::06> chapter.
+
+=cut

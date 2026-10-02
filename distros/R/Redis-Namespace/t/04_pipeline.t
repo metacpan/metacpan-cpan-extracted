@@ -37,11 +37,21 @@ pipeline_ok 'keys in pipelined mode',
 pipeline_ok 'info in pipelined mode',
     (
         [info => [], code(sub { ref $_[0] eq 'HASH' && keys %{ $_[0] } })],
-        [ info => [qw<oops oops>],
-          undef,
-          re(qr{^ERR (?:syntax error|wrong number of arguments for 'info' command)$})
-      ],
     );
+
+{
+    # Redis 7.0+ accepts multiple sections and returns an empty reply for unknown ones,
+    # while older versions return an error.
+    my @responses;
+    $ns->info(qw<oops oops>, sub { push @responses, [@_] });
+    $ns->wait_all_responses;
+    cmp_deeply(\@responses, [
+        any(
+            [ undef, re(qr{^ERR (?:syntax error|wrong number of arguments for 'info' command)$}) ],
+            [ {}, undef ],
+        ),
+    ], 'info with unknown sections in pipelined mode');
+}
 
 pipeline_ok 'pipeline with multi-bulk reply',
     ([hmset => [kapow => (a => 1, b => 2, c => 3)], 'OK'], [hmget => [kapow => qw<c b a>], [3, 2, 1]],);

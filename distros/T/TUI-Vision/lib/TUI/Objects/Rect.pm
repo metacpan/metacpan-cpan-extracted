@@ -8,7 +8,7 @@ use warnings;
 use List::Util qw( min max );
 use TUI::Objects::Point;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -39,14 +39,14 @@ our %HAS; BEGIN {
 
 # This method accepts a variable number of arguments:
 #
-# If four arguments I<(ax, ay, bx, by)> are provided, it creates two I<TPoint> 
+# If four arguments I<(ax, ay, bx, by)> are provided, it creates two L<TPoint|TUI::Objects::Point> 
 # objects for points I<a> and I<b> with the specified coordinates.
 #
 # If two arguments I<(a, b)> are provided, it sets points I<a> and I<b> to the
-# provided I<TPoint> objects.
+# provided L<TPoint|TUI::Objects::Point> objects.
 #
 # If no or any other number of arguments are provided, it initializes points 
-# I<a> and I<b> with new I<TPoint> objects with default values.
+# I<a> and I<b> with new L<TPoint|TUI::Objects::Point> objects with default values.
 sub new {    # \$obj (%args)
   my ( $class, $self );
   if ( @_ < 4 ) {
@@ -273,11 +273,6 @@ __END__
 
 TUI::Objects::Rect - rectangular area defined by two points
 
-=head1 HIERARCHY
-
-  TRect (value type)
-    composed of two TPoint objects
-
 =head1 SYNOPSIS
 
   use TUI::Objects;
@@ -302,9 +297,9 @@ C<TRect> represents a rectangular area defined by two corner points. The
 attribute C<a> specifies the upper-left corner and C<b> specifies the
 lower-right corner of the rectangle.
 
-C<TRect> is a lightweight value type and is not derived from C<TObject>. It is
-used throughout TUI::Vision to describe screen locations and sizes of views,
-dialogs, and controls.
+C<TRect> is a lightweight value type and is not derived from 
+L<TObject|TUI::Objects::TObject>. It is used throughout L<TUI::Vision> to 
+describe screen locations and sizes of views, dialogs, and controls.
 
 The class provides a set of geometric operations such as moving, resizing,
 intersection, and containment testing. Rectangles can also be compared for
@@ -312,11 +307,23 @@ equality using operator overloading.
 
 =head2 Commonly Used Features
 
-Most code constructs rectangles directly with C<TRect-E<gt>new> using
+Most code constructs rectangles directly with C<< TRect->new >> using
 coordinate arguments, then passes them into view and dialog constructors.
-For incremental layout changes, C<move> and C<grow> are the common operations,
-and C<clone> is useful when you need a temporary variant without mutating the
-original bounds object.
+For incremental layout changes, L</move> and L</grow> are the common 
+operations, and L</clone> is useful when you need a temporary variant without 
+mutating the original bounds object.
+
+=head1 ATTRIBUTES
+
+The following attributes define the rectangle geometry.
+
+=head2 a
+
+Upper-left corner of the rectangle (L<TPoint|TUI::Objects::Point>).
+
+=head2 b
+
+Lower-right corner of the rectangle (L<TPoint|TUI::Objects::Point>).
 
 =head1 CONSTRUCTOR
 
@@ -339,21 +346,21 @@ original bounds object.
 Creates a new rectangle.
 
 When point coordinates are supplied, the constructor creates internal
-C<TPoint> objects automatically.
+L<TPoint|TUI::Objects::Point> objects automatically.
 
 =over
 
 =item a
 
-Upper-left corner as a C<TPoint>.
+Upper-left corner (L<TPoint|TUI::Objects::Point>).
 
 =item b
 
-Lower-right corner as a C<TPoint>.
+Lower-right corner (L<TPoint|TUI::Objects::Point>).
 
 =item ax, ay, bx, by
 
-Integer coordinates used to initialize the corner points.
+Integer coordinates used to initialize the corner points (I<Int>).
 
 =back
 
@@ -365,22 +372,6 @@ Factory-style constructor using positional arguments.
 
 This constructor is provided for compatibility with traditional Turbo Vision
 construction patterns.
-
-=head1 ATTRIBUTES
-
-The following attributes define the rectangle geometry.
-
-=over
-
-=item a
-
-Upper-left corner of the rectangle (I<TPoint>).
-
-=item b
-
-Lower-right corner of the rectangle (I<TPoint>).
-
-=back
 
 =head1 METHODS
 
@@ -469,8 +460,8 @@ C<!=> maps to C<not_equal>
 
 =head1 SEE ALSO
 
-L<TUI::Objects::Point>,
-L<TUI::Views::View>
+L<TPoint|TUI::Objects::Point>,
+L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 

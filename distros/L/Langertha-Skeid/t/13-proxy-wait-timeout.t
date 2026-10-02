@@ -18,6 +18,24 @@ use Langertha::Skeid::Proxy;
   sub rendered { $_[0]{rendered} }
 }
 
+# The request path is async-only (ADR 0005), so routing is exercised through
+# _begin_route_async and the IO loop. Waiting for capacity must never block the
+# loop -- a synchronous variant would pass these same assertions while stalling
+# every other in-flight request, which is exactly what this shape rules out.
+sub route_sync {
+  my ($c, $model) = @_;
+  my @res;
+  my $done = 0;
+  Mojo::IOLoop->timer(5 => sub { Mojo::IOLoop->stop if Mojo::IOLoop->is_running });
+  Langertha::Skeid::Proxy::_begin_route_async($c, $model, 'test-key', sub {
+    @res = grep { defined } @_;
+    $done = 1;
+    Mojo::IOLoop->stop if Mojo::IOLoop->is_running;
+  });
+  Mojo::IOLoop->start unless $done;
+  return @res;
+}
+
 {
   my $skeid = Langertha::Skeid->new(
     route_wait_timeout_ms => 120,
@@ -35,7 +53,7 @@ use Langertha::Skeid::Proxy;
 
   my $c = Local::FakeController->new($skeid);
   my $start = time;
-  my @res = Langertha::Skeid::Proxy::_begin_route($c, 'qwen2.5');
+  my @res = route_sync($c, 'qwen2.5');
   my $elapsed_ms = int((time - $start) * 1000);
 
   is scalar(@res), 0, 'no route returned when saturated';
@@ -53,7 +71,7 @@ use Langertha::Skeid::Proxy;
   my $c = Local::FakeController->new($skeid);
 
   my $start = time;
-  my @res = Langertha::Skeid::Proxy::_begin_route($c, 'unknown-model');
+  my @res = route_sync($c, 'unknown-model');
   my $elapsed_ms = int((time - $start) * 1000);
 
   is scalar(@res), 0, 'no route returned for unknown model';
@@ -88,7 +106,7 @@ use Langertha::Skeid::Proxy;
     Mojo::IOLoop->stop if Mojo::IOLoop->is_running;
   });
 
-  Langertha::Skeid::Proxy::_begin_route_async($c, 'qwen2.5', sub {
+  Langertha::Skeid::Proxy::_begin_route_async($c, 'qwen2.5', 'test-key', sub {
     ($route, $node_id) = @_;
     $done = 1;
     Mojo::IOLoop->stop if Mojo::IOLoop->is_running;

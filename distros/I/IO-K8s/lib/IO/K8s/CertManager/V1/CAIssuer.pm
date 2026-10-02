@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CAIssuer;
 # ABSTRACT: CA configures this issuer to sign certificates using a signing CA keypair stored in a Secret resource.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s crlDistributionPoints  => [Str];
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::CAIssuer - CA configures this issuer to sign certifica
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 crlDistributionPoints
 

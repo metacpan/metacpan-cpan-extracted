@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::Grafana;
 # ABSTRACT: Grafana represents a generator for Grafana service account tokens.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
     resource_plural => 'grafanas',
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::Grafana - Grafana represents a generator for
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

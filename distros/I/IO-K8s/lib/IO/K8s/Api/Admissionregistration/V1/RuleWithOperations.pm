@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::RuleWithOperations;
 # ABSTRACT: RuleWithOperations is a tuple of Operations and Resources. It is recommended to make sure that all the tuple expansions are valid.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apiGroups => [Str];
@@ -32,7 +32,7 @@ IO::K8s::Api::Admissionregistration::V1::RuleWithOperations - RuleWithOperations
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apiGroups
 

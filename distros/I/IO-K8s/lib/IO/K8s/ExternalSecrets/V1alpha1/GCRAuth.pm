@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GCRAuth;
 # ABSTRACT: Auth defines the means for authenticating with GCP
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s secretRef                  => '+IO::K8s::ExternalSecrets::V1::GCPSMAuthSecretRef';
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GCRAuth - Auth defines the means for authent
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 secretRef
 

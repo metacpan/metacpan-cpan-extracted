@@ -1,0 +1,175 @@
+# PODNAME: TUI::Manual::02
+# ABSTRACT: Getting Started with TUI::Vision
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+TUI::Manual::02 - Getting Started with TUI::Vision
+
+=head1 GETTING STARTED
+
+This chapter introduces the basic steps required to create and run a
+L<TUI::Vision> application.
+
+Unlike the previous chapter, which focused on the history and design
+goals of the framework, the purpose of this chapter is entirely
+practical. By the end, you will have seen how a TUI::Vision
+application is installed, created and executed.
+
+=head2 Installation
+
+L<TUI::Vision> is distributed through I<CPAN> and can be installed using the
+standard Perl toolchain.
+
+Using C<cpan>:
+
+    cpan TUI::Vision
+
+Using C<cpanm>:
+
+    cpanm TUI::Vision
+
+Once installed, all framework modules become available through the
+normal Perl module search path.
+
+=head2 A Minimal Application
+
+At its core, every L<TUI::Vision> program is built around an instance of
+L<TApplication|TUI::App::Application>.
+
+The smallest useful application consists of little more than the
+application object itself:
+
+    use TUI::App;
+
+    my $app = TApplication->new();
+    $app->run();
+
+Although this example appears simple, it already demonstrates the
+basic structure shared by all L<TUI::Vision> programs.
+
+The application object acts as the central coordinator for the user
+interface and is responsible for creating and managing the framework's
+major components.
+
+=head2 Running an Application
+
+When the application is started, several things happen automatically.
+
+First, the application object is created:
+
+    my $app = TApplication->new();
+
+Execution then enters the application's main event loop:
+
+    $app->run();
+
+While the event loop is active, L<TUI::Vision> is responsible for
+receiving user input, updating views, processing commands and
+managing the application's windows and dialogs.
+
+The application typically remains inside this loop until the user
+selects an action that terminates the program.
+
+From a conceptual point of view, the life cycle can be represented as
+follows:
+
+    Application Startup
+            |
+            v
+      TApplication
+            |
+            v
+        run()
+            |
+            v
+       Event Loop
+            |
+            v
+     Application Exit
+
+The event system itself is discussed in detail in a later chapter.
+
+=head2 The Application Object
+
+L<TApplication|TUI::App::Application> occupies a central position within the 
+framework.
+
+Most applications contain exactly one instance of 
+L<TApplication|TUI::App::Application>, which acts as the root of the user 
+interface hierarchy.
+
+A typical application consists of the following permanent objects:
+
+    TApplication
+         |
+         +-- TMenuBar
+         |
+         +-- TDeskTop
+         |
+         +-- TStatusLine
+
+These objects are created and managed by the application itself and
+remain available throughout the lifetime of the program.
+
+The application object is also responsible for coordinating event
+processing, view management and application shutdown.
+
+Later chapters examine each of these components in greater detail.
+
+=head2 The Desktop
+
+The desktop forms the central workspace of a L<TUI::Vision> application.
+
+Conceptually, the screen is divided into three areas:
+
+    ┌────────────────────────────────────────────────────┐
+    | Menu Bar                                           |
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░ TDeskTop ░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+    | Status Line                                        |
+    └────────────────────────────────────────────────────┘ 
+
+The desktop occupies the area between the menu bar and the status
+line.
+
+Windows and dialogs are inserted into the desktop and operate within
+this workspace. Throughout the lifetime of the application, windows
+may appear, disappear, move or resize, while the desktop itself
+remains in place.
+
+Understanding the role of the desktop is important because almost all
+visible application objects ultimately exist within its environment.
+
+=head2 Conclusion
+
+A L<TUI::Vision> application begins with a 
+L<TApplication|TUI::App::Application> object and executes within the 
+framework's event-driven environment.
+
+Although only a few lines of code are required to create a minimal
+program, several important framework objects already exist behind the
+scenes, including the desktop, menu bar and status line.
+
+The next chapter examines the overall architecture of L<TUI::Vision> and
+introduces the view hierarchy upon which the remainder of the
+framework is built.
+
+L<next|TUI::Manual::03> chapter.
+
+=cut

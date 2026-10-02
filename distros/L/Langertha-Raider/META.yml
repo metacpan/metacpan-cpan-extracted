@@ -1,0 +1,664 @@
+---
+abstract: 'Autonomous agent with conversation history and MCP tools'
+author:
+  - 'Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>'
+build_requires:
+  Test2::Suite: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Langertha-Raider
+provides:
+  App::Raider:
+    file: lib/App/Raider.pm
+    version: '0.503'
+  App::Raider::FileTools:
+    file: lib/App/Raider/FileTools.pm
+    version: '0.503'
+  App::Raider::Plugin::Situation:
+    file: lib/App/Raider/Plugin/Situation.pm
+    version: '0.503'
+  App::Raider::Plugin::Trace:
+    file: lib/App/Raider/Plugin/Trace.pm
+    version: '0.503'
+  App::Raider::Skill:
+    file: lib/App/Raider/Skill.pm
+    version: '0.503'
+  App::Raider::WebTools:
+    file: lib/App/Raider/WebTools.pm
+    version: '0.503'
+  Langertha::Raid:
+    file: lib/Langertha/Raid.pm
+    version: '0.503'
+  Langertha::Raid::Loop:
+    file: lib/Langertha/Raid/Loop.pm
+    version: '0.503'
+  Langertha::Raid::Parallel:
+    file: lib/Langertha/Raid/Parallel.pm
+    version: '0.503'
+  Langertha::Raid::Sequential:
+    file: lib/Langertha/Raid/Sequential.pm
+    version: '0.503'
+  Langertha::Raider:
+    file: lib/Langertha/Raider.pm
+    version: '0.503'
+  Langertha::Raider::ACP::CLI:
+    file: lib/Langertha/Raider/ACP/CLI.pm
+    version: '0.503'
+  Langertha::Raider::ACP::Client:
+    file: lib/Langertha/Raider/ACP/Client.pm
+    version: '0.503'
+  Langertha::Raider::Application:
+    file: lib/Langertha/Raider/Application.pm
+    version: '0.503'
+  Langertha::Raider::Approval:
+    file: lib/Langertha/Raider/Approval.pm
+    version: '0.503'
+  Langertha::Raider::Binary:
+    file: lib/Langertha/Raider/Binary.pm
+    version: '0.503'
+  Langertha::Raider::CLI:
+    file: lib/Langertha/Raider/CLI.pm
+    version: '0.503'
+  Langertha::Raider::CLI::Commands:
+    file: lib/Langertha/Raider/CLI/Commands.pm
+    version: '0.503'
+  Langertha::Raider::CLI::Machine:
+    file: lib/Langertha/Raider/CLI/Machine.pm
+    version: '0.503'
+  Langertha::Raider::CLI::Main:
+    file: lib/Langertha/Raider/CLI/Main.pm
+    version: '0.503'
+  Langertha::Raider::CLI::Output:
+    file: lib/Langertha/Raider/CLI/Output.pm
+    version: '0.503'
+  Langertha::Raider::CLI::PromptBuilder:
+    file: lib/Langertha/Raider/CLI/PromptBuilder.pm
+    version: '0.503'
+  Langertha::Raider::CLI::Provider:
+    file: lib/Langertha/Raider/CLI/Provider.pm
+    version: '0.503'
+  Langertha::Raider::CLI::REPL:
+    file: lib/Langertha/Raider/CLI/REPL.pm
+    version: '0.503'
+  Langertha::Raider::CLI::Runner:
+    file: lib/Langertha/Raider/CLI/Runner.pm
+    version: '0.503'
+  Langertha::Raider::CLI::Sessions:
+    file: lib/Langertha/Raider/CLI/Sessions.pm
+    version: '0.503'
+  Langertha::Raider::Config:
+    file: lib/Langertha/Raider/Config.pm
+    version: '0.503'
+  Langertha::Raider::Config::Migrate:
+    file: lib/Langertha/Raider/Config/Migrate.pm
+    version: '0.503'
+  Langertha::Raider::ConnectCheck:
+    file: lib/Langertha/Raider/ConnectCheck.pm
+    version: '0.503'
+  Langertha::Raider::Detect:
+    file: lib/Langertha/Raider/Detect.pm
+    version: '0.503'
+  Langertha::Raider::EngineResolver:
+    file: lib/Langertha/Raider/EngineResolver.pm
+    version: '0.503'
+  Langertha::Raider::FileTools:
+    file: lib/Langertha/Raider/FileTools.pm
+    version: '0.503'
+  Langertha::Raider::Hall:
+    file: lib/Langertha/Raider/Hall.pm
+    version: '0.503'
+  Langertha::Raider::Hall::ACP:
+    file: lib/Langertha/Raider/Hall/ACP.pm
+    version: '0.503'
+  Langertha::Raider::Hall::ACP::SubStream:
+    file: lib/Langertha/Raider/Hall/ACP/SubStream.pm
+    version: '0.503'
+  Langertha::Raider::Hall::CLI:
+    file: lib/Langertha/Raider/Hall/CLI.pm
+    version: '0.503'
+  Langertha::Raider::Hall::Cron:
+    file: lib/Langertha/Raider/Hall/Cron.pm
+    version: '0.503'
+  Langertha::Raider::Hall::MCP:
+    file: lib/Langertha/Raider/Hall/MCP.pm
+    version: '0.503'
+  Langertha::Raider::Hall::Protocol:
+    file: lib/Langertha/Raider/Hall/Protocol.pm
+    version: '0.503'
+  Langertha::Raider::Hall::Raider:
+    file: lib/Langertha/Raider/Hall/Raider.pm
+    version: '0.503'
+  Langertha::Raider::Hall::Telegram:
+    file: lib/Langertha/Raider/Hall/Telegram.pm
+    version: '0.503'
+  Langertha::Raider::HallTools:
+    file: lib/Langertha/Raider/HallTools.pm
+    version: '0.503'
+  Langertha::Raider::Home:
+    file: lib/Langertha/Raider/Home.pm
+    version: '0.503'
+  Langertha::Raider::Instructions:
+    file: lib/Langertha/Raider/Instructions.pm
+    version: '0.503'
+  Langertha::Raider::Packs:
+    file: lib/Langertha/Raider/Packs.pm
+    version: '0.503'
+  Langertha::Raider::Packs::Collection:
+    file: lib/Langertha/Raider/Packs/Collection.pm
+    version: '0.503'
+  Langertha::Raider::Packs::Pack:
+    file: lib/Langertha/Raider/Packs/Pack.pm
+    version: '0.503'
+  Langertha::Raider::PerlTools:
+    file: lib/Langertha/Raider/PerlTools.pm
+    version: '0.503'
+  Langertha::Raider::Plugin::Events:
+    file: lib/Langertha/Raider/Plugin/Events.pm
+    version: '0.503'
+  Langertha::Raider::Plugin::Situation:
+    file: lib/Langertha/Raider/Plugin/Situation.pm
+    version: '0.503'
+  Langertha::Raider::Plugin::Trace:
+    file: lib/Langertha/Raider/Plugin/Trace.pm
+    version: '0.503'
+  Langertha::Raider::Provider::Activation:
+    file: lib/Langertha/Raider/Provider/Activation.pm
+    version: '0.503'
+  Langertha::Raider::Provider::Change:
+    file: lib/Langertha/Raider/Provider/Change.pm
+    version: '0.503'
+  Langertha::Raider::Provider::Fetch:
+    file: lib/Langertha/Raider/Provider/Fetch.pm
+    version: '0.503'
+  Langertha::Raider::Result:
+    file: lib/Langertha/Raider/Result.pm
+    version: '0.503'
+  Langertha::Raider::Session:
+    file: lib/Langertha/Raider/Session.pm
+    version: '0.503'
+  Langertha::Raider::Session::Journal:
+    file: lib/Langertha/Raider/Session/Journal.pm
+    version: '0.503'
+  Langertha::Raider::SessionStore:
+    file: lib/Langertha/Raider/SessionStore.pm
+    version: '0.503'
+  Langertha::Raider::Skill:
+    file: lib/Langertha/Raider/Skill.pm
+    version: '0.503'
+  Langertha::Raider::ToolArgs:
+    file: lib/Langertha/Raider/ToolArgs.pm
+    version: '0.503'
+  Langertha::Raider::ToolEffects:
+    file: lib/Langertha/Raider/ToolEffects.pm
+    version: '0.503'
+  Langertha::Raider::WebTools:
+    file: lib/Langertha/Raider/WebTools.pm
+    version: '0.503'
+recommends:
+  Term::Choose: '0'
+  Term::ReadLine::Gnu: '0'
+  Term::Table: '0'
+requires:
+  Data::MessagePack: '0'
+  Digest::SHA: '0'
+  File::ShareDir: '0'
+  File::Which: '0'
+  Future: '0'
+  Future::AsyncAwait: '0.66'
+  Getopt::Long: '0'
+  HTML::TreeBuilder: '0'
+  HTTP::Request::Common: '0'
+  IO::Async: '0'
+  IO::Async::SSL: '0'
+  IO::Prompt::Tiny: '0'
+  IPC::Run: '0'
+  JSON::MaybeXS: '1.002004'
+  Langertha: '0.503'
+  Langertha::Manifest: '0'
+  Log::Any: '0'
+  MCP::Run::Bash: '0.106'
+  MCP::Server: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  Net::Async::HTTP: '0'
+  Net::Async::MCP: '0.004'
+  Net::Async::WebSearch: '0.003'
+  Path::Tiny: '0'
+  Schedule::Cron: '0'
+  Term::ANSIColor: '0'
+  Time::HiRes: '0'
+  URI: '0'
+  YAML::PP: '0'
+  namespace::autoclean: '0.31'
+resources:
+  IRC: irc://irc.perl.org/#langertha
+  IRC_user: Getty
+  bugtracker: https://github.com/Getty/langertha-raider/issues
+  homepage: https://github.com/Getty/langertha-raider
+  repository: https://github.com/Getty/langertha-raider.git
+version: '0.503'
+x_Dist_Zilla:
+  perl:
+    version: '5.040001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - .karr
+            - README.md
+          exclude_match:
+            - ^CLAUDE\.md$
+            - ^CONTEXT\.md$
+            - ^\.claude/
+            - ^\.github/
+            - ^docs/
+            - ^scripts/
+          include_dotfiles: 1
+          prefix: ''
+          prune_directory: []
+          root: .
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: '@Author::GETTY/Git::GatherDir'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::GatherAgentContext
+      name: '@Author::GETTY/GatherAgentContext'
+      version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::GETTY/@Filter/ManifestSkip'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::GETTY/@Filter/MetaYAML'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Author::GETTY/@Filter/Readme'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Author::GETTY/@Filter/ExtraTests'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::GETTY/@Filter/ExecDir'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::GETTY/@Filter/ShareDir'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Author::GETTY/@Filter/MakeMaker'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::GETTY/@Filter/Manifest'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::GETTY/@Filter/TestRelease'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::GETTY/@Filter/ConfirmRelease'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::GETTY/@Filter/UploadToCPAN'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::LicenseFile
+      name: '@Author::GETTY/LicenseFile'
+      version: '0.002'
+    -
+      class: Dist::Zilla::Plugin::Run::AfterRelease
+      config:
+        Dist::Zilla::Plugin::Run::Role::Runner:
+          fatal_errors: 1
+          quiet: 0
+          run:
+            - '%x %o/maint/release-after.pl --archive %a --dir %d --version %v'
+          version: '0.050'
+      name: '@Author::GETTY/Run::AfterRelease'
+      version: '0.050'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::GETTY/MetaConfig'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::GETTY/MetaJSON'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::GETTY/PodSyntaxTests'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@Author::GETTY/Test::ChangesHasContent'
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.037'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000038'
+          version: '0.006'
+      name: '@Author::GETTY/MetaProvides::Package'
+      version: '2.004003'
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@Author::GETTY/GithubMeta'
+      version: '0.58'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@Author::GETTY/MetaResources'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: '@Author::GETTY/InstallRelease'
+      version: '0.008'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Author::GETTY/Authority'
+      version: '1.009'
+    -
+      class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
+      config:
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.47.3
+          repo_root: .
+      name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
+      version: '0.015'
+    -
+      class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
+      name: '@Author::GETTY/Prereqs::FromCPANfile'
+      version: '0.08'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugins:
+            - '@Author::GETTY'
+          finder:
+            - ':InstallModules'
+            - ':PerlExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@GETTY/SingleEncoding'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@GETTY/Name'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@GETTY/Version'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@GETTY/Prelude'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@GETTY/Synopsis'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@GETTY/Description'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@GETTY/Overview'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@GETTY/Stability'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@GETTY/Leftovers'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@GETTY/postlude'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: '@GETTY/Support'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: '@GETTY/Contributing'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@GETTY/Authors'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@GETTY/Legal'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@GETTY/List'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@GETTY/GETTY'
+              version: '4.020'
+      name: '@Author::GETTY/PodWeaver'
+      version: '4.010'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Author::GETTY/@Git::VersionManager/pluginbundle version'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::RewriteVersion::Transitional
+      config:
+        Dist::Zilla::Plugin::RewriteVersion:
+          add_tarball_name: 0
+          finders:
+            - ':InstallModules'
+            - ':PerlExecFiles'
+          global: 0
+          skip_version_provider: 0
+        Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
+      name: '@Author::GETTY/@Git::VersionManager/RewriteVersion::Transitional'
+      version: '0.009'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Update
+      name: '@Author::GETTY/@Git::VersionManager/MetaProvides::Update'
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromRelease
+      config:
+        Dist::Zilla::Plugin::CopyFilesFromRelease:
+          filename:
+            - Changes
+          match: []
+      name: '@Author::GETTY/@Git::VersionManager/CopyFilesFromRelease'
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%V%n%n%c
+          signoff: 0
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.47.3
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::GETTY/@Git::VersionManager/release snapshot'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: '0.503'
+          tag_format: '%v'
+          tag_message: v%V
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.47.3
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::GETTY/@Git::VersionManager/Git::Tag'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+      config:
+        Dist::Zilla::Plugin::BumpVersionAfterRelease:
+          finders:
+            - ':InstallModules'
+            - ':PerlExecFiles'
+          global: 0
+          munge_makefile_pl: 1
+        Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
+      name: '@Author::GETTY/@Git::VersionManager/BumpVersionAfterRelease::Transitional'
+      version: '0.009'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Author::GETTY/@Git::VersionManager/NextRelease'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: 'increment $VERSION after %v release'
+          signoff: 0
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Build.PL
+            - Changes
+            - Makefile.PL
+          allow_dirty_match:
+            - (?^:^bin/)
+            - (?^:^lib/.*\.pm$)
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.47.3
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::GETTY/@Git::VersionManager/post-release commit'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.47.3
+          repo_root: .
+      name: '@Author::GETTY/Git::Push'
+      version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::GitHub::CreateRelease
+      name: '@Author::GETTY/GitHub::CreateRelease'
+      version: '0.0012'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.037'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: '6.037'
+x_authority: cpan:GETTY
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

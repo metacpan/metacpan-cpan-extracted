@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1beta1::SandboxStatus;
 # ABSTRACT: SandboxStatus
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s conditions  => ['Meta::V1::Condition'];
@@ -30,7 +30,7 @@ IO::K8s::AgentSandbox::V1beta1::SandboxStatus - SandboxStatus
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 conditions
 

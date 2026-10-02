@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::VaultCertAuth;
 # ABSTRACT: Cert authenticates with TLS Certificates by passing client certificate, private key and ca certificate Cert authentication method
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s clientCert => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::VaultCertAuth - Cert authenticates with TLS Certif
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 clientCert
 

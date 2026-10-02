@@ -44,13 +44,13 @@ for my $spec (@specs) {
     for my $method (sort keys %{$paths->{$path}}) {
       next unless ref $paths->{$path}{$method} eq 'HASH';
       my $op = $paths->{$path}{$method};
-      my $opId = $op->{operationId} or next;
+      my $operation_id = $op->{operationId} or next;
       my $ct;
       if ($op->{requestBody} && $op->{requestBody}{content}) {
         $ct = 'application/json' if $op->{requestBody}{content}{'application/json'};
         $ct //= 'multipart/form-data' if $op->{requestBody}{content}{'multipart/form-data'};
       }
-      $operations{$opId} = {
+      $operations{$operation_id} = {
         method       => uc($method),
         path         => $path,
         defined $ct ? (content_type => $ct) : (),

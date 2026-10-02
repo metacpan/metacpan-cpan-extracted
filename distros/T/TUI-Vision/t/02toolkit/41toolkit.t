@@ -14,7 +14,7 @@ BEGIN {
   package Export::Ok;
   use Scalar::Util qw( blessed );
   use TUI::toolkit;
-  assert ( TUI::toolkit::is_Moos );
+  assert ( TUI::toolkit::is_UNIVERSAL );
   $INC{"Export/Ok.pm"} = 1;
 }
 
@@ -93,10 +93,10 @@ subtest 'create_method redefine warns' => sub {
 subtest 'assert' => sub {
   no TUI::toolkit;
   use TUI::toolkit qw( assert );
-  lives_ok { assert( 1 == 1 ) } 'assert does not die on true condition';
+  lives_ok { assert ( 1 == 1 ) } 'assert does not die on true condition';
   SKIP: {
     skip "Strict mode causes assert to die on false condition", 1 unless STRICT;
-    throws_ok { assert( 1 == 0 ) } qr/Assertion failed/, 
+    throws_ok { assert ( 1 == 0 ) } qr/Assertion failed/, 
       'assert dies on false condition';
   }
 };

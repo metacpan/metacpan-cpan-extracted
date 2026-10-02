@@ -20,7 +20,7 @@ mcp-k8s - MCP Server for Kubernetes with RBAC-aware dynamic tools
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -129,7 +129,7 @@ The server registers 10 MCP tools, each gated by RBAC permissions:
 
 =item B<k8s_create> — Create a resource from a manifest
 
-=item B<k8s_patch> — Partially update a resource
+=item B<k8s_patch> — Partially update a resource (strategic/merge/JSON patch), optionally its C<status> subresource
 
 =item B<k8s_delete> — Delete a resource
 

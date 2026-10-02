@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -219,24 +219,21 @@ Vision behavior. For example, a leading centering marker causes the text to be
 centered horizontally within its bounds.
 
 C<TStaticText> is typically used for labels, messages, and explanatory text.
-Related views include C<TLabel> and C<TParamText>.
+Related views include L<TLabel|TUI::Dialogs::Label> and 
+L<TParamText|TUI::Dialogs::ParamText>.
 
 =head2 Commonly Used Features
 
-Most code only instantiates C<TStaticText> with C<new> (or C<new_TStaticText>)
-and inserts it into a dialog. After initialization, it usually remains a
-passive display element; direct method calls are uncommon outside framework
-internals.
+Most code only instantiates C<TStaticText> with L</new> (or 
+L</new_TStaticText>) and inserts it into a dialog. After initialization, it 
+usually remains a passive display element; direct method calls are uncommon 
+outside framework internals.
 
 =head1 ATTRIBUTES
 
-=over
-
-=item text
+=head2 text
 
 Text string displayed by the static text view (I<Str>).
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -253,7 +250,7 @@ Creates a new static text view.
 
 =item bounds
 
-Bounding rectangle of the view (I<TRect>).
+Bounding rectangle of the view (L<TRect|TUI::Objects::Rect>).
 
 =item text
 
@@ -268,7 +265,8 @@ Text to be displayed (I<Str>).
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 DESTRUCTOR
 
@@ -276,9 +274,7 @@ provided for compatibility with traditional Turbo Vision construction patterns.
 
   $self->DEMOLISH($in_global_destruction);
 
-Destroys the static text view and releases associated resources. This method
-corresponds to the Turbo Vision destructor and is normally invoked
-automatically by the owning group.
+Destroys the static text view and releases associated resources. 
 
 =head1 METHODS
 

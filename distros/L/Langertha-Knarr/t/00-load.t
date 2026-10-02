@@ -10,7 +10,11 @@ my @modules = qw(
   Langertha::Knarr::RequestLog
   Langertha::Knarr::Request
   Langertha::Knarr::Session
+  Langertha::Knarr::Image
+  Langertha::Knarr::Manifest
   Langertha::Knarr::Stream
+  Langertha::Knarr::PassthroughUsage
+  Langertha::Knarr::Role::UpstreamHTTP
   Langertha::Knarr::Handler
   Langertha::Knarr::Handler::Code
   Langertha::Knarr::Handler::Engine
@@ -29,6 +33,7 @@ my @modules = qw(
   Langertha::Knarr::Protocol::ACP
   Langertha::Knarr::Protocol::AGUI
   Langertha::Knarr::PSGI
+  Langertha::Knarr::PSGI::FakeReq
   Langertha::Knarr::CLI
   Langertha::Knarr::CLI::Cmd::Start
   Langertha::Knarr::CLI::Cmd::Models

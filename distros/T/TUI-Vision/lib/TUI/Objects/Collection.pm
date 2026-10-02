@@ -1,10 +1,11 @@
 package TUI::Objects::Collection;
 # ABSTRACT: TCollection provides a mechanism for managing any data collection.
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -70,7 +71,7 @@ TUI::Objects::Collection - dynamic container for managing collections of items
 
 C<TCollection> provides a dynamically sizable container for storing and
 accessing arbitrary items. It behaves similarly to a resizable array and is
-used throughout the TUI::Vision framework as the base class for specialized
+used throughout the L<TUI::Vision> framework as the base class for specialized
 collection types.
 
 The collection automatically grows when its capacity is exceeded. Growth
@@ -79,25 +80,54 @@ behavior is controlled by the C<limit> and C<delta> attributes.
 Several specialized collections derive from C<TCollection>, including sorted
 collections, string collections, and resource collections.
 
-C<TNSCollection> represents the non-storable base variant used internally,
-while C<TCollection> provides the public, reusable collection interface.
+L<TNSCollection|TUI::Objects::NSCollection> represents the non-storable base 
+variant used internally, while C<TCollection> provides the public, reusable 
+collection interface.
 
 =head2 Commonly Used Features
 
 C<TCollection> is both a base class and a practical general-purpose container
 for application code. In day-to-day usage, the most common operations are
-construction with C<limit>/C<delta>, insertion with C<insert()> or
-C<atInsert()>, random access with C<at()>, replacement with C<atPut()>, and
-removal with C<remove()>, C<atRemove()>, or C<atFree()>.
+construction with L</limit>/L</delta>, insertion with L</insert> or
+L</atInsert>, random access with L</at>, replacement with L</atPut>, and
+removal with L</remove>, L</atRemove>, or L</atFree>.
 
-Search and traversal are typically done with C<indexOf()>, C<firstThat()>,
-C<lastThat()>, and C<forEach()>. For lifecycle and cleanup, C<removeAll()>,
-C<freeAll()>, and C<pack()> are frequently used to reset state or compact the
+Search and traversal are typically done withL</indexOf>, L</firstThat>,
+L</lastThat>, and L</forEach>. For lifecycle and cleanup, L</removeAll>,
+L</freeAll>, and L</pack> are frequently used to reset state or compact the
 collection.
 
-Specialized containers like C<TStringCollection> and C<TSortedCollection>
-build on this behavior, so understanding C<TCollection> methods is directly
-useful even when working with derived classes.
+Specialized containers like L<TStringCollection|TUI::Objects::StringCollection> 
+and L<TSortedCollection|TUI::Objects::SortedCollection> build on this behavior, 
+so understanding C<TCollection> methods is directly useful even when working 
+with derived classes.
+
+=head1 ATTRIBUTES
+
+The following attributes represent the internal state of the collection.
+
+=head2 items
+
+Array reference holding the items in the collection (I<ArrayRef>).
+
+=head2 count
+
+Current number of items stored in the collection (I<Int>).
+
+=head2 limit
+
+The current capacity of the collection (I<Int>). When the number of elements 
+reaches this value, the collection grows according to C<delta>.
+
+=head2 delta
+
+Growth increment used when the collection needs to expand (I<Int>). Increasing 
+the limit by larger deltas reduces the frequency of reallocations.
+
+=head2 shouldDelete
+
+Boolean flag indicating whether items should be freed when removed from the
+collection (I<Bool>).
 
 =head1 CONSTRUCTOR
 
@@ -114,50 +144,20 @@ Creates a new collection.
 
 =item limit
 
-Initial capacity of the collection.
+Initial capacity of the collection (I<Int>).
 
 =item delta
 
-Growth increment used when the collection exceeds its current capacity.
+Growth increment used when the collection exceeds its current capacity (I<Int>).
 
 =back
 
 =head2 new_TCollection
 
-  my $collection = new_TCollection($limit | undef, $delta | undef);
+  my $collection = new_TCollection();
+  my $collection = new_TCollection($limit, $delta);
 
 Factory-style constructor using positional arguments.
-
-=head1 ATTRIBUTES
-
-The following attributes represent the internal state of the collection.
-
-=over
-
-=item items
-
-Array reference holding the items in the collection.
-
-=item count
-
-Current number of items stored in the collection.
-
-=item limit
-
-The current capacity of the collection. When the number of elements reaches
-this value, the collection grows according to C<delta>.
-
-=item delta
-
-Growth increment used when the collection needs to expand. Increasing the
-limit by larger deltas reduces the frequency of reallocations.
-
-=item shouldDelete
-
-Boolean flag indicating whether items should be freed when removed from the
-collection.
-
-=back
 
 =head1 METHODS
 
@@ -234,13 +234,6 @@ Removes the specified item from the collection and frees it.
 
 Frees all items in the collection and clears it.
 
-=head2 freeItem
-
-  $collection->freeItem($item);
-
-Frees a single item. This method may be overridden by subclasses to customize
-item disposal.
-
 =head2 indexOf
 
   my $index = $collection->indexOf($item | undef);
@@ -292,9 +285,9 @@ Performs shutdown processing for the collection.
 
 =head1 SEE ALSO
 
-L<TUI::Objects::SortedCollection>,
-L<TUI::Objects::StringCollection>,
-L<TUI::Objects::Object>
+L<TSortedCollection|TUI::Objects::SortedCollection>,
+L<TStringCollection|TUI::Objects::StringCollection>,
+L<TObject|TUI::Objects::Object>
 
 =head1 AUTHORS
 

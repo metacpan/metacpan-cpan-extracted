@@ -1,12 +1,14 @@
 package Langertha::Knarr::Protocol::Anthropic;
 # ABSTRACT: Anthropic-compatible wire protocol (/v1/messages) for Knarr
 
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 use Moose;
 use JSON::MaybeXS;
 use Time::HiRes qw( time );
 use Langertha::Knarr::Request;
 use Langertha::Knarr::Response;
+use Langertha::Knarr::Image;
+use Langertha::Knarr::Reasoning;
 
 with 'Langertha::Knarr::Protocol';
 
@@ -28,6 +30,19 @@ with 'Langertha::Knarr::Protocol';
 # ----------------------
 
 has _json => ( is => 'ro', default => sub { JSON::MaybeXS->new( utf8 => 1, canonical => 1 ) } );
+# Tool arguments become a JSON string inside an event that _json encodes to
+# UTF-8, so they are encoded to characters here, not to bytes.
+has _args_json => ( is => 'ro', default => sub { JSON::MaybeXS->new( canonical => 1 ) } );
+
+has reasoning => (
+  is      => 'ro',
+  isa     => 'Langertha::Knarr::Reasoning',
+  lazy    => 1,
+  builder => '_build_reasoning',
+);
+
+sub _build_reasoning { Langertha::Knarr::Reasoning->new }
+
 
 sub protocol_name { 'anthropic' }
 
@@ -35,6 +50,28 @@ sub protocol_routes {
   return [
     { method => 'POST', path => '/v1/messages', action => 'chat' },
   ];
+}
+
+# Provider manifest (k14): anthropic-compat, not anthropic. parse_chat_request
+# below carries tools and tool_choice but not output_config.format, so a
+# client must do structured output the shim way (synthetic tool + forced
+# tool_choice). thinking and output_config.effort arrive as reasoning_effort
+# (k13); cache_control and disable_parallel_tool_use are not forwarded.
+sub manifest_endpoint {
+  return {
+    dialect      => 'anthropic-compat',
+    path         => '',
+    capabilities => [qw(
+      chat streaming system_prompt
+      tools_native tools_hermes
+      tool_choice_auto tool_choice_any tool_choice_none tool_choice_named
+      temperature response_size reasoning_effort
+      image_input
+    )],
+    # image blocks become Langertha::Content::Image objects (k33); an older
+    # core gets them as sent, readable only by Anthropic-shape engines.
+    image_content_formats => Langertha::Knarr::Image::content_formats(qw( anthropic )),
+  };
 }
 
 sub _msg_id { 'msg_' . int( time() * 1000 ) }
@@ -53,13 +90,9 @@ sub parse_chat_request {
   }
   my @msgs;
   push @msgs, { role => 'system', content => $system_str } if defined $system_str;
-  push @msgs, @{ $data->{messages} || [] };
-  # Capture auth headers for passthrough
-  my %fwd;
-  for my $h (qw( x-api-key anthropic-version authorization )) {
-    my $v = scalar $http_req->header($h);
-    $fwd{$h} = $v if defined $v && length $v;
-  }
+  push @msgs, @{ Langertha::Knarr::Image::anthropic_messages( $data->{messages} || [] ) };
+  # Capture auth headers for passthrough, one pair per line (k60)
+  my $fwd = $self->_forward_headers( $http_req, qw( x-api-key anthropic-version authorization ) );
   return Langertha::Knarr::Request->new(
     protocol    => 'anthropic',
     raw         => $data,
@@ -68,11 +101,33 @@ sub parse_chat_request {
     stream      => $data->{stream} ? 1 : 0,
     temperature => $data->{temperature},
     max_tokens  => $data->{max_tokens},
+    reasoning_effort => scalar $self->reasoning->from_anthropic($data),
     system      => $system_str,
     tools       => $data->{tools},
     tool_choice => $data->{tool_choice},
-    extra       => { forward_headers => \%fwd },
+    extra       => { forward_headers => $fwd },
   );
+}
+
+# Anthropic's stop_reason is a closed enum; the engine Response carries the
+# backend's own finish_reason (OpenAI tool_calls/length/stop/content_filter,
+# Gemini STOP/MAX_TOKENS, ...). Values already in Anthropic vocabulary pass
+# through; a value with no Anthropic counterpart falls back like an absent one.
+my %STOP_REASON = (
+  ( map { $_ => $_ } qw( end_turn max_tokens stop_sequence tool_use pause_turn refusal ) ),
+  tool_calls     => 'tool_use',
+  function_call  => 'tool_use',
+  length         => 'max_tokens',
+  content_filter => 'refusal',
+);
+
+sub _stop_reason {
+  my ( $finish_reason, $has_tool_calls ) = @_;
+  my $fallback = $has_tool_calls ? 'tool_use' : 'end_turn';
+  return $fallback unless defined $finish_reason;
+  my $key = lc $finish_reason;
+  return $fallback if $key eq 'stop';
+  return $STOP_REASON{$key} // $fallback;
 }
 
 sub format_chat_response {
@@ -82,8 +137,7 @@ sub format_chat_response {
   push @blocks, { type => 'text', text => $r->content } if length $r->content;
   push @blocks, map { $_->to_anthropic_block } @{ $r->tool_calls };
   push @blocks, { type => 'text', text => '' } unless @blocks;
-  my $stop_reason = $r->finish_reason
-                 // ( $r->has_tool_calls ? 'tool_use' : 'end_turn' );
+  my $stop_reason = _stop_reason( $r->finish_reason, $r->has_tool_calls );
   my $usage = $r->usage && $r->usage->can('to_anthropic_format')
     ? $r->usage->to_anthropic_format
     : { input_tokens => 0, output_tokens => 0 };
@@ -137,20 +191,74 @@ sub format_stream_chunk {
   });
 }
 
+# The routed stream carries the backend's tool calls complete, not as they
+# were fragmented upstream, so each call closes the stream as its own
+# tool_use block: content_block_start with an empty input, one
+# input_json_delta holding the full arguments, content_block_stop (k19).
+# message_delta carries the stream's usage, cumulative as Anthropic's own
+# does -- input_tokens included, since message_start went out before the
+# backend reported any.
 sub format_stream_close {
-  my ($self, $request) = @_;
+  my ($self, $request, $finish_reason, $tool_calls, $usage) = @_;
+  my @calls = @{ $tool_calls // [] };
+  my $stop_reason = _stop_reason( $finish_reason, scalar @calls );
+  my @tool_events;
+  my $index = 0;
+  for my $tc (@calls) {
+    $index++;
+    my $block = $tc->to_anthropic_block( fallback_id => "toolu_knarr_$index" );
+    push @tool_events,
+      $self->_sse_event( content_block_start => {
+        type  => 'content_block_start',
+        index => $index,
+        content_block => { type => 'tool_use', id => $block->{id}, name => $block->{name}, input => {} },
+      }),
+      $self->_sse_event( content_block_delta => {
+        type  => 'content_block_delta',
+        index => $index,
+        delta => { type => 'input_json_delta', partial_json => $self->_args_json->encode( $block->{input} ) },
+      }),
+      $self->_sse_event( content_block_stop => { type => 'content_block_stop', index => $index } );
+  }
   return join( '',
     $self->_sse_event( content_block_stop => { type => 'content_block_stop', index => 0 } ),
+    @tool_events,
     $self->_sse_event( message_delta => {
       type => 'message_delta',
-      delta => { stop_reason => 'end_turn', stop_sequence => undef },
-      usage => { output_tokens => 0 },
+      delta => { stop_reason => $stop_reason, stop_sequence => undef },
+      usage => ( $usage && $usage->can('to_anthropic_format')
+        ? $usage->to_anthropic_format : { output_tokens => 0 } ),
     }),
     $self->_sse_event( message_stop => { type => 'message_stop' } ),
   );
 }
 
 sub format_stream_done { '' }
+
+# Anthropic's error types by HTTP status; anything else is an api_error.
+my %ERROR_TYPE = (
+  400 => 'invalid_request_error', 401 => 'authentication_error',
+  403 => 'permission_error',      404 => 'not_found_error',
+  413 => 'request_too_large',     429 => 'rate_limit_error',
+  504 => 'timeout_error',         529 => 'overloaded_error',
+);
+
+sub _error_payload {
+  my ($status, $message) = @_;
+  return { type => 'error',
+    error => { type => $ERROR_TYPE{$status} // 'api_error', message => "$message" } };
+}
+
+sub format_error_response {
+  my ($self, $status, $message) = @_;
+  return ( $status, { 'Content-Type' => 'application/json' },
+    $self->_json->encode( _error_payload( $status, $message ) ) );
+}
+
+sub format_stream_error {
+  my ($self, $status, $message) = @_;
+  return $self->_sse_event( error => _error_payload( $status, $message ) );
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -167,7 +275,7 @@ Langertha::Knarr::Protocol::Anthropic - Anthropic-compatible wire protocol (/v1/
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 
@@ -183,6 +291,12 @@ L<Langertha::Knarr::Protocol>. Loaded by default.
 Streaming emits the full event sequence the Anthropic SDK expects:
 C<message_start>, C<content_block_start>, C<content_block_delta>×N,
 C<content_block_stop>, C<message_delta>, C<message_stop>.
+
+=head2 reasoning
+
+The L<Langertha::Knarr::Reasoning> that maps the body's C<thinking> (and an
+explicit C<output_config.effort>) onto the request's C<reasoning_effort>.
+Pass your own to override its default level or budget anchors.
 
 =head1 SUPPORT
 

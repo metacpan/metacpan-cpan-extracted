@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::TLSTCP;
 # ABSTRACT: TLS defines the TLS configuration on a layer 4 / TCP Route.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s certResolver => Str;
@@ -30,7 +30,7 @@ IO::K8s::Traefik::V1alpha1::TLSTCP - TLS defines the TLS configuration on a laye
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 certResolver
 

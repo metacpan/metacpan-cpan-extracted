@@ -46,6 +46,9 @@ B<Requirements:>
 
 =item * C<create>, C<get>, C<patch>, C<delete> permissions on C<configmaps>
 
+=item * L<Net::Async::MCP> 0.004 or newer — 0.003 predates the stateless
+protocol revision MCP 0.15 speaks and fails with C<-32602 Missing protocol version>
+
 =back
 
 B<Safety:> Only creates a single ConfigMap with test data. Cleans up after
@@ -154,7 +157,7 @@ my $mcp = Net::Async::MCP->new(server => $server);
 $loop->add($mcp);
 
 # ── AI Engine ────────────────────────────────────────────────────────
-my $model = $ENV{MCP_K8S_DEMO_MODEL} || 'claude-sonnet-4-6';
+my $model = $ENV{MCP_K8S_DEMO_MODEL} || 'claude-sonnet-5';
 info("Model: $model");
 print "\n";
 

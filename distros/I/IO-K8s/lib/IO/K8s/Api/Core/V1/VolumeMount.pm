@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::VolumeMount;
 # ABSTRACT: VolumeMount describes a mounting of a Volume within a container.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s bindMountOptions => [Str];
@@ -41,7 +41,7 @@ IO::K8s::Api::Core::V1::VolumeMount - VolumeMount describes a mounting of a Volu
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 bindMountOptions
 

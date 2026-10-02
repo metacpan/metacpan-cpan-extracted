@@ -90,6 +90,6 @@ echo "[vast-start] Skeid pid=${SKEID_PID}"
 
 echo ""
 echo "[vast-start] === READY ==="
-echo "[vast-start] vLLM  : http://0.0.0.0:${VLLM_PORT}/v1"
-echo "[vast-start] Skeid : http://0.0.0.0:${SKEID_LISTEN}/v1"
+echo "[vast-start] vLLM  : http://${VLLM_HOST}:${VLLM_PORT}/v1"
+echo "[vast-start] Skeid : http://${SKEID_LISTEN}/v1"
 echo "[vast-start] Logs  : tail -f ${LOGDIR}/vllm.log ${LOGDIR}/skeid.log"

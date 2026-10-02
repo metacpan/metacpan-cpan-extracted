@@ -2,7 +2,7 @@
 # The header and annotation records, which is everything above the
 # coordinates: who made the structure, how, out of what, and what is bonded
 # to what.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

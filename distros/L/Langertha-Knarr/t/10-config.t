@@ -142,6 +142,12 @@ YAML
   like $yaml, qr/engine: Anthropic/, 'generated config has Anthropic';
   like $yaml, qr/auto_discover: true/, 'auto_discover enabled';
   like $yaml, qr/listen:/, 'has listen directive';
+  like $yaml, qr/^# langfuse:\n(?:#   .*\n)*#   transport: otel /m,
+    'commented langfuse section offers the transport';
+  like $yaml, qr/^# langfuse:\n(?:#   .*\n)*#   timeout: 15 /m,
+    'and the flush timeout';
+  my $parsed = YAML::PP->new->load_string($yaml);
+  ok !exists $parsed->{langfuse}, 'langfuse stays commented out';
 }
 
 # Test: Langfuse config
@@ -367,6 +373,134 @@ YAML
     $name .= '-default' if $name eq 'openai' || $name eq 'anthropic';
     is $parsed->{models}{$name}{model}, $expected{$engine},
       "generate_config model for $engine from engine class";
+  }
+}
+
+# Test: workers (k51) -- config key, else KNARR_WORKERS, else 1; bad values
+# croak on read and are reported by validate
+{
+  local $ENV{KNARR_WORKERS};
+  my $models = { m => { engine => 'OpenAI' } };
+  is( Langertha::Knarr::Config->new( data => { models => $models } )->workers, 1,
+    'workers default 1' );
+  is( Langertha::Knarr::Config->new( data => { models => $models, workers => 4 } )->workers, 4,
+    'workers from the config' );
+  {
+    local $ENV{KNARR_WORKERS} = '3';
+    is( Langertha::Knarr::Config->new( data => { models => $models } )->workers, 3,
+      'workers from KNARR_WORKERS' );
+    is( Langertha::Knarr::Config->new( data => { models => $models, workers => 2 } )->workers, 2,
+      'the config wins over KNARR_WORKERS' );
+    is( Langertha::Knarr::Config->from_env( include_test => 0 )->workers, 3,
+      'KNARR_WORKERS applies under --from-env' );
+  }
+  for my $bad ( 0, -1, 'two', '1.5' ) {
+    my $config = Langertha::Knarr::Config->new( data => { models => $models, workers => $bad } );
+    ok( !eval { $config->workers; 1 }, "workers '$bad' croaks on read" );
+    like( $@, qr/workers '\Q$bad\E' must be a whole number of 1 or more/, "... with the reason" );
+    ok( ( grep { /workers '\Q$bad\E' must be/ } $config->validate ), "... and validate reports it" );
+  }
+}
+
+# Test: a section of the wrong YAML type (k67) croaks on read and is
+# reported by validate -- never a HASH dereference die
+{
+  local @ENV{qw( KNARR_LOG_FILE KNARR_LOG_DIR KNARR_A2A_NAME KNARR_A2A_DESCRIPTION )};
+  my $models = { m => { engine => 'OpenAI' } };
+  my @cases = (
+    [ a2a         => 'Support Agent',       [qw( a2a_name a2a_description protocol_args )] ],
+    [ logging     => 'yes',                 [qw( log_file log_dir )] ],
+    [ langfuse    => [ 'x' ],               [qw( langfuse )] ],
+    [ default     => 'OpenAI',              [qw( default_engine )] ],
+    [ models      => [qw( a b )],           [qw( models engine_definitions )] ],
+    [ passthrough => [ 'openai' ],          [qw( passthrough )] ],
+  );
+  for my $case (@cases) {
+    my ( $key, $value, $readers ) = @$case;
+    my $config = Langertha::Knarr::Config->new( data => {
+      ( $key eq 'models' ? () : ( models => $models ) ), $key => $value,
+    } );
+    my $want = ref $value eq 'ARRAY' ? qr/not a list/ : qr/not '\Q$value\E'/;
+    for my $reader (@$readers) {
+      ok( !eval { $config->$reader; 1 }, "$key of the wrong type: $reader croaks" );
+      like( $@, qr/\A\Q$key\E must be .*mapping.*$want/, "... naming $key" );
+      unlike( $@, qr/HASH ref|HASH reference/, '... not as a dereference' );
+    }
+    my @errors = $config->validate;
+    is( scalar @errors, 1, "$key of the wrong type: validate reports one error" );
+    like( $errors[0], qr/\A\Q$key\E must be .*$want\z/, '... without file and line' );
+  }
+
+  # Every wrong section at once: all reported, no knock-on errors
+  my @errors = Langertha::Knarr::Config->new( data => {
+    models => $models, a2a => 'A', logging => 'L', langfuse => 'F', default => 'D',
+  } )->validate;
+  is_deeply( [ sort map { /\A(\w+) must be/ ? $1 : $_ } @errors ],
+    [qw( a2a default langfuse logging )], 'every wrong section is reported' );
+
+  # The legal shapes stay legal
+  for my $pt ( 1, 0, { openai => 'http://127.0.0.1:1' } ) {
+    my $config = Langertha::Knarr::Config->new( data => { models => $models, passthrough => $pt } );
+    is_deeply( [ $config->validate ], [], 'passthrough '.( ref $pt ? 'mapping' : $pt ).' is valid' );
+  }
+  my $config = Langertha::Knarr::Config->new( data => {
+    models => $models, a2a => { name => 'Bot' }, logging => {}, langfuse => undef,
+  } );
+  is_deeply( [ $config->validate ], [], 'mappings and empty sections are valid' );
+  is( $config->a2a_name, 'Bot', 'a2a.name read from its mapping' );
+
+  # A models entry that is not a mapping
+  @errors = Langertha::Knarr::Config->new( data => {
+    models => { x => 'OpenAI', y => { engine => 'OpenAI' } },
+  } )->validate;
+  is_deeply( \@errors, [ "Model 'x' must be a mapping of key: value pairs" ],
+    'a models entry of the wrong type is reported' );
+
+  # listen: a string or a list of strings, nothing else
+  for my $listen ( { a => 'b' }, [ '127.0.0.1:1', { a => 'b' } ], [ [ '127.0.0.1:1' ] ] ) {
+    my $config = Langertha::Knarr::Config->new( data => { models => $models, listen => $listen } );
+    ok( !eval { $config->listen; 1 }, 'listen of the wrong type croaks on read' );
+    is_deeply( [ $config->validate ], [ 'listen must be a host:port string or a list of them' ],
+      '... and validate reports it' );
+  }
+  for my $listen ( '127.0.0.1:1', [ '127.0.0.1:1', '127.0.0.1:2' ] ) {
+    is_deeply( [ Langertha::Knarr::Config->new( data => { models => $models, listen => $listen } )->validate ],
+      [], 'listen '.( ref $listen ? 'list' : 'string' ).' is valid' );
+  }
+}
+
+# Test: a config file that does not load (k67) is reported by validate
+{
+  my %files = (
+    empty   => [ '',                   qr/must be a mapping of key: value pairs\z/ ],
+    list    => [ "- a\n- b\n",         qr/must be a mapping of key: value pairs\z/ ],
+    invalid => [ "models: {\n",        qr/is not valid YAML: / ],
+  );
+  for my $name ( sort keys %files ) {
+    my ( $yaml, $want ) = @{ $files{$name} };
+    my ($fh, $file) = tempfile(SUFFIX => '.yaml', UNLINK => 1);
+    print $fh $yaml;
+    close $fh;
+    my @errors = eval { Langertha::Knarr::Config->new( file => $file )->validate };
+    is( $@, '', "$name file: validate does not die" );
+    is( scalar @errors, 1, "$name file: one error" );
+    like( $errors[0] // '', qr/\AConfig file \Q$file\E /, '... naming the file' );
+    like( $errors[0] // '', $want, '... with the reason' );
+  }
+}
+
+# Test: knarr check, start and models stop cleanly on a section of the
+# wrong type (k67) -- start runs validate before anything binds
+{
+  my ($fh, $file) = tempfile(SUFFIX => '.yaml', UNLINK => 1);
+  print $fh "models:\n  m:\n    engine: OpenAI\na2a: Support Agent\n";
+  close $fh;
+  for my $cmd (qw( check start models )) {
+    my $out = qx{"$^X" -Ilib bin/knarr $cmd -c "$file" 2>&1};
+    is( $? >> 8, 1, "knarr $cmd exits 1" );
+    like( $out, qr/  - a2a must be a mapping of key: value pairs, not 'Support Agent'$/m,
+      "... reporting the a2a section" );
+    unlike( $out, qr/HASH ref| at \S+ line \d+/, '... without a Perl error or its file and line' );
   }
 }
 

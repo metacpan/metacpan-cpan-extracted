@@ -1,0 +1,12 @@
+# HELP vllm:lora_requests_info Running stats on lora requests.
+# TYPE vllm:lora_requests_info gauge
+vllm:lora_requests_info{max_lora="2",running_lora_adapters="sql-lora,chat-lora",waiting_lora_adapters=""} 1.7588e+09
+# HELP vllm:num_requests_running Number of requests in model execution batches.
+# TYPE vllm:num_requests_running gauge
+vllm:num_requests_running{engine="0", model_name="Qwen/Qwen3-8B"} 3.0
+# HELP vllm:request_success_total Count of successfully processed requests.
+# TYPE vllm:request_success_total counter
+vllm:request_success_total{engine="0",finished_reason="stop",model_name="Qwen/Qwen3-8B",} 12.0
+# HELP vllm:escaped_info Label values with every escape of the exposition format.
+# TYPE vllm:escaped_info gauge
+vllm:escaped_info{path="C:\\models\\qwen",quote="say \"hi\"",multi="a\nb",brace="a}b"} 1.0

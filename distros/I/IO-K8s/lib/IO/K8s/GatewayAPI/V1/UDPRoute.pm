@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::UDPRoute;
 # ABSTRACT: UDPRoute provides a way to route UDP traffic.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
     resource_plural => 'udproutes',
@@ -26,7 +26,7 @@ IO::K8s::GatewayAPI::V1::UDPRoute - UDPRoute provides a way to route UDP traffic
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

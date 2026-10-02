@@ -1,0 +1,9 @@
+# Power pack: detected in a Perl workspace, requests the Perl tools.
+exclusive_group: power
+tools: [perl]
+detect:
+  may:
+    - { file: cpanfile }
+    - { file: dist.ini }
+    - { file: Makefile.PL }
+    - { file: 'lib/**/*.pm' }

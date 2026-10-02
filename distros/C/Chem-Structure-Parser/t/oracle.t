@@ -34,7 +34,7 @@
 #
 #   * a file with no CRYST1 has no cell here and a 1x1x1 cell in gemmi, which
 #     is gemmi's default rather than the file's answer.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

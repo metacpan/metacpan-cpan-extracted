@@ -118,4 +118,36 @@ use Langertha::Skeid;
   is(scalar(@files), 1, 'trailing slash: event written as file');
 }
 
+# --- Reconfiguring the log location actually moves the writes ---
+# Only backend/dsn/user/password distinguished two jsonlog configs, and a jsonlog config has
+# none of those -- so a reconfigured path compared equal to the old one and events kept going
+# to the previous location. Silent, and only visible when someone goes looking for the events.
+{
+  my $dir   = tempdir(CLEANUP => 1);
+  my $first = "$dir/first";
+  my $second = "$dir/second";
+
+  my $skeid = Langertha::Skeid->new(
+    usage_store => { backend => 'jsonlog', path => $first, mode => 'dir' },
+  );
+  $skeid->call_function('usage.record', {
+    model   => 'test',
+    metrics => { usage => { input => 1, output => 1, total => 2 } },
+  });
+
+  $skeid->call_function('usage.configure', {
+    usage_store => { backend => 'jsonlog', path => $second, mode => 'dir' },
+  });
+  $skeid->call_function('usage.record', {
+    model   => 'test',
+    metrics => { usage => { input => 1, output => 1, total => 2 } },
+  });
+
+  my @first_files  = glob("$first/*.json");
+  my @second_files = glob("$second/*.json");
+  is(scalar(@first_files), 1, 'reconfigure: first location keeps its event');
+  is(scalar(@second_files), 1, 'reconfigure: new event lands in the new location');
+  is($skeid->usage_store->{path}, $second, 'reconfigure: store config points at the new path');
+}
+
 done_testing;

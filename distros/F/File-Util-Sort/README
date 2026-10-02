@@ -3,8 +3,8 @@ NAME
     directories
 
 VERSION
-    This document describes version 0.011 of File::Util::Sort (from Perl
-    distribution File-Util-Sort), released on 2025-05-03.
+    This document describes version 0.012 of File::Util::Sort (from Perl
+    distribution File-Util-Sort), released on 2026-09-25.
 
 DESCRIPTION
 FUNCTIONS
@@ -807,6 +807,9 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
     requests on GitHub.
@@ -824,7 +827,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

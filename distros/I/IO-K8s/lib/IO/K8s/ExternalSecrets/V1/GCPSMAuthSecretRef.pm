@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::GCPSMAuthSecretRef;
 # ABSTRACT: Specify credentials in a Secret object
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s secretAccessKeySecretRef => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::GCPSMAuthSecretRef - Specify credentials in a Secr
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 secretAccessKeySecretRef
 

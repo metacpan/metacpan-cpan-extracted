@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::NgrokVault;
 # ABSTRACT: Vault configures the ngrok vault to sync secrets with.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name => Str, { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::NgrokVault - Vault configures the ngrok vault to s
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

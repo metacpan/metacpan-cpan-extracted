@@ -1,5 +1,11 @@
 Revision history for BioX-Seq
 
+0.008014 2026-10-01
+         Pass on argument to as_input() if given; add tests
+
+0.008013 2026-10-01
+         Add additional bounds checks and related tests
+
 0.008012 2026-09-28
          Moved deps from build_requires to test_requires
 

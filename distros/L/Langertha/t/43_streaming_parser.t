@@ -9,7 +9,7 @@ use Langertha::Engine::OpenAI;
 use Langertha::Engine::Ollama;
 use Langertha::Engine::Anthropic;
 
-plan(21);
+plan(23);
 
 my $json = JSON::MaybeXS->new->utf8(1);
 
@@ -78,7 +78,7 @@ event: content_block_delta
 data: {"type":"content_block_delta","delta":{"text":" World"}}
 
 event: message_delta
-data: {"type":"message_delta","delta":{"stop_reason":"end_turn"}}
+data: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"output_tokens":15}}
 
 event: message_stop
 data: {"type":"message_stop"}
@@ -91,6 +91,11 @@ is($anthropic_chunks->[0]->content, 'Hello', 'Anthropic: first chunk content');
 is($anthropic_chunks->[1]->content, ' World', 'Anthropic: second chunk content');
 is($anthropic_chunks->[2]->finish_reason, 'end_turn', 'Anthropic: message_delta has stop_reason');
 ok($anthropic_chunks->[3]->is_final, 'Anthropic: message_stop is final');
+# karr k167: Anthropic splits finish_reason/usage (message_delta) from is_final
+# (message_stop). The cross-dialect contract (OpenAI/Ollama above) puts both on
+# the is_final chunk, so the message_delta metadata is replayed onto message_stop.
+is($anthropic_chunks->[3]->finish_reason, 'end_turn', 'k167: is_final chunk carries finish_reason');
+is($anthropic_chunks->[3]->usage->{output_tokens}, 15, 'k167: is_final chunk carries usage');
 
 # Test callback functionality
 my @callback_results;

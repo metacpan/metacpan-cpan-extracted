@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 0.5;
+our $VERSION = 0.6;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -310,7 +310,8 @@ sub doPayment($self, $amount, %options) {
     }
 
     # Validate amount
-    if(!defined $amount || $amount !~ /^\d+$/ || $amount <= 0) {
+    # The numeric compare catches floats like 28.999999999999996 that stringify as "29"
+    if(!defined $amount || $amount !~ /^\d+$/ || $amount != int($amount) || $amount <= 0) {
         croak("doPayment: amount must be a positive integer (cents)");
     }
 
@@ -416,7 +417,8 @@ sub cancelPayment($self, $traceNumber, $amount, %options) {
     if(!defined $traceNumber) {
         croak("cancelPayment: trace_number parameter is required");
     }
-    if(!defined $amount || $amount !~ /^\d+$/ || $amount <= 0) {
+    # The numeric compare catches floats like 28.999999999999996 that stringify as "29"
+    if(!defined $amount || $amount !~ /^\d+$/ || $amount != int($amount) || $amount <= 0) {
         croak("cancelPayment: amount must be a positive integer (cents)");
     }
     if(!exists $options{reference_number} || !defined $options{reference_number}) {

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::PassboltAuth;
 # ABSTRACT: Auth defines the information necessary to authenticate against Passbolt Server
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s passwordSecretRef   => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::PassboltAuth - Auth defines the information necess
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 passwordSecretRef
 

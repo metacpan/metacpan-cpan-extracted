@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test2::Bundle::More;
 
 # Facade test — silence the deprecation warning emitted at load time.
 BEGIN { $SIG{__WARN__} = sub {

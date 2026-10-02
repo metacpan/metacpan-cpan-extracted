@@ -164,4 +164,38 @@ ok($ollama->can('chat_with_tools_f'), 'chat_with_tools_f available');
   is($messages[2]{role}, 'tool', 'second tool result');
 }
 
+# karr k136: Ollama keeps the chain-of-thought in message.thinking; it must
+# survive into the assistant echo, like reasoning_content does on the openai
+# branch. Absent thinking still yields exactly the old three keys.
+{
+  my $data = {
+    message => {
+      role       => 'assistant',
+      content    => '',
+      thinking   => 'The user wants an echo, so I call the tool.',
+      tool_calls => [
+        { function => { name => 'echo', arguments => { message => 'hi' } } },
+      ],
+    },
+  };
+
+  my $results = [
+    {
+      tool_call => { function => { name => 'echo', arguments => { message => 'hi' } } },
+      result => { content => [{ type => 'text', text => 'Echo: hi' }], isError => JSON->false },
+    },
+  ];
+
+  my @messages = $ollama->format_tool_results($data, $results);
+  is($messages[0]{thinking}, 'The user wants an echo, so I call the tool.',
+    'message.thinking echoed back into the assistant message');
+  ok($messages[0]{tool_calls}, 'tool_calls still preserved alongside it');
+
+  delete $data->{message}{thinking};
+  my @plain = $ollama->format_tool_results($data, $results);
+  is_deeply([sort keys %{$plain[0]}], [qw( content role tool_calls )],
+    'without thinking the echo is exactly role/content/tool_calls');
+}
+
+
 done_testing;

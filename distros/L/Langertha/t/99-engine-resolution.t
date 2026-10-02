@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use Test::More;
+use Test2::Bundle::More;
+use Scalar::Util qw( blessed );
 use lib 't/lib';
 
 use Langertha;
@@ -42,7 +43,7 @@ like($@, qr/Engine 'NoSuchEngine' not found/, 'unknown engine croaks');
 
 {
   my $engine = Langertha->new_engine('TestEngine', answer => 42);
-  isa_ok($engine, 'LangerthaX::Engine::TestEngine', 'new_engine builds custom engine instance');
+  ok(blessed($engine) && $engine->isa('LangerthaX::Engine::TestEngine'), 'new_engine builds custom engine instance');
   is($engine->{answer}, 42, 'new_engine passes constructor params');
 }
 

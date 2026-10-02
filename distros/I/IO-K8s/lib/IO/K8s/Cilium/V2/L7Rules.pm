@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::L7Rules;
 # ABSTRACT: Rules is a list of additional port level rules which must be met in order for the PortRule to allow the traffic.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s dns  => ['+IO::K8s::Cilium::V2::PortRuleDNS'];
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::L7Rules - Rules is a list of additional port level rules wh
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 dns
 

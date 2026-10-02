@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -108,7 +108,8 @@ $decideCaretSize = sub {    # $int ()
   if ( $self->{state} & sfCursorIns ) {
     return 100;
   }
-  return $cursorLines & 0x0f;
+  # https://github.com/magiblot/tvision/issues/228
+  return $cursorLines & 0xff;
 };
 
 1
@@ -125,7 +126,7 @@ TUI::Views::View::Cursor - TView resetCursor member functions.
 
 TView resetCursor member functions.
 
-The content was taken from the framework
+The content was ported from the framework
 "A modern port of Turbo Vision 2.0", which is licensed under MIT license.
 
 =head1 METHODS

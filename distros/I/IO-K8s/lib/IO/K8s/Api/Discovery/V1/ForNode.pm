@@ -1,6 +1,6 @@
 package IO::K8s::Api::Discovery::V1::ForNode;
 # ABSTRACT: ForNode provides information about which nodes should consume this endpoint.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Discovery::V1::ForNode - ForNode provides information about which 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

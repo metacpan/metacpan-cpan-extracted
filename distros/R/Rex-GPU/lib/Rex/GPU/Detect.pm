@@ -1,7 +1,7 @@
 # ABSTRACT: GPU hardware detection via PCI class codes
 
 package Rex::GPU::Detect;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -459,7 +459,7 @@ Rex::GPU::Detect - GPU hardware detection via PCI class codes
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

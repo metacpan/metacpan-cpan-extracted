@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ShareableSummaryStatus;
 # ABSTRACT: ShareableSummaryStatus reports aggregate capacity for a pool that contains devices with AllowMultipleAllocations.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s capacity => ['Resource::V1alpha3::ShareableCapacityStatus'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1alpha3::ShareableSummaryStatus - ShareableSummaryStatu
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 capacity
 

@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEIssuerDNS01ProviderAkamai;
 # ABSTRACT: Use the Akamai DNS zone management API to manage DNS01 challenge records.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s accessTokenSecretRef  => '+IO::K8s::CertManager::V1::SecretKeySelector', { required => 'schema' };
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::ACMEIssuerDNS01ProviderAkamai - Use the Akamai DNS zon
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 accessTokenSecretRef
 

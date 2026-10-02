@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::VenafiNGTS;
 # ABSTRACT: NGTS specifies Palo Alto Networks Next Generation Trust Services (NGTS) configuration using OAuth 2.0 Client Credentials.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s credentialsRef => '+IO::K8s::CertManager::V1::CertManagerLocalObjectReference', { required => 'schema' };
@@ -26,7 +26,7 @@ IO::K8s::CertManager::V1::VenafiNGTS - NGTS specifies Palo Alto Networks Next Ge
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 credentialsRef
 

@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::BackendTLSPolicySpec;
 # ABSTRACT: Spec defines the desired state of BackendTLSPolicy.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s options    => { Str => 1 };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1::BackendTLSPolicySpec - Spec defines the desired state o
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 options
 

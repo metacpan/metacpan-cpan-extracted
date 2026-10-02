@@ -23,9 +23,17 @@ sub get_rss_kb {
         return undef;
     }
     elsif ($^O eq 'darwin') {
-        my $rss = `ps -o rss= -p $$`;
-        chomp $rss;
-        return $rss =~ /^\s*(\d+)/ ? $1 : undef;
+        # Use list form of open to avoid invoking a shell. Also redirect
+        # STDERR to /dev/null before the fork so that if the exec is blocked
+        # by a sandbox (e.g. MacPorts build user with no valid shell), the
+        # "Can't exec" message from the child is discarded instead of
+        # polluting test output. STDERR is restored when the function returns
+        # via Perl's 'local' mechanism.
+        open(local *STDERR, '>', '/dev/null') or return undef;
+        open(my $ps, '-|', '/bin/ps', '-o', 'rss=', '-p', $$) or return undef;
+        my $rss = <$ps>;
+        close $ps;
+        return defined($rss) && $rss =~ /^\s*(\d+)/ ? $1 : undef;
     }
     return undef;
 }

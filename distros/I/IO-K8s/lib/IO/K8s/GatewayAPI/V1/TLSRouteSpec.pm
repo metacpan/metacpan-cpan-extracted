@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::TLSRouteSpec;
 # ABSTRACT: Spec defines the desired state of TLSRoute.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s hostnames  => [Str], { required => 'schema', pattern => qr/^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/ };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1::TLSRouteSpec - Spec defines the desired state of TLSRou
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 hostnames
 

@@ -1,5 +1,7 @@
 package TUI::Drivers::Event;
+# ABSTRACT: Unified event structure for input handling
 
+use 5.014;
 use strict;
 use warnings;
 
@@ -240,10 +242,12 @@ package MessageEvent {
 
   use PerlX::Assert::PP;
   use Hash::Util qw( lock_hash );
-  use Scalar::Util qw(
-    blessed
-    weaken
+  use Hash::Util::FieldHash qw(
+    id
+    id_2obj
+    register
   );
+  use Scalar::Util qw( blessed );
   use Tie::Hash;
 
   our %HAS = (
@@ -256,10 +260,10 @@ package MessageEvent {
     infoPtr => sub {
       my ( $this, $info ) = @_;
       if ( @_ > 1 ) {
-        $this->[1] = $info;
-        weaken $this->[1] if ref $info;
+        $this->[1] = id $info;
+        register $info if ref $info;
       }
-      $this->[1];
+      $this->[1] ? id_2obj $this->[1] : undef;
     },
     infoLong => sub {
       no warnings qw( uninitialized numeric );
@@ -315,15 +319,7 @@ package MessageEvent {
     my $clone = bless {}, $class;
     tie %$clone, $class;
     $clone->{command} = $self->{command};
-    if ( blessed $self->{infoPtr} && $self->{infoPtr}->can( 'clone' ) ) {
-      $clone->{infoPtr} = $self->{infoPtr}->clone();
-    }
-    elsif ( ref $self->{infoPtr} ) {
-      weaken( $clone->{infoPtr} = $self->{infoPtr} );
-    }
-    else {
-      $clone->{infoPtr} = $self->{infoPtr};
-    }
+    $clone->{infoInt} = $self->{infoInt};
     return $clone;
   }
 
@@ -505,6 +501,8 @@ sub getKeyEvent {    # void ($self)
   assert ( blessed $self );
   if ( THardwareInfo->getKeyEvent( $self ) ) {
 
+    return if $self->{what} != evKeyboard;
+
     # Need to handle special case of Alt-Space, Ctrl-Ins, Shift-Ins,
     # Ctrl-Del, Shift-Del
 
@@ -553,8 +551,8 @@ TUI::Drivers::Event - unified event structure for input handling
 
 =head1 HIERARCHY
 
-  TEvent (value type, tied hash)
-    used throughout the event system
+  Tie::Hash
+    TEvent
 
 =head1 SYNOPSIS
 
@@ -573,13 +571,13 @@ TUI::Drivers::Event - unified event structure for input handling
 
 =head1 DESCRIPTION
 
-C<TEvent> represents the central event structure used throughout TUI::Vision.
+C<TEvent> represents the central event structure used throughout TUI::Vision
 It models all input and message events such as keyboard input, mouse activity,
 and broadcast messages.
 
-This type is implemented as a tied hash and is not derived from C<TObject>.
-Its structure mirrors the Turbo Vision event union, with the active event
-variant selected by the C<what> field.
+This type is implemented as a tied hash and is not derived from 
+L<TObject|TUI::Objects::Object>. Its structure mirrors the I<Turbo Vision> C++ 
+event union, with the active event variant selected by the C<what> field.
 
 Depending on the event type, one of the variant substructures is active and
 accessible via the corresponding hash key.
@@ -599,7 +597,7 @@ handlers inspect C<what> and then read/write the active variant
 =item *
 
 As a synthetic event in tests and higher-level components, e.g. creating
-keyboard, mouse, broadcast, or command events with C<TEvent->new(...)> and
+keyboard, mouse, broadcast, or command events with C<< TEvent->new(...) >> and
 injecting them into controls/dialogs.
 
 =back
@@ -618,19 +616,21 @@ A C<TEvent> object exposes the following top-level fields:
 
 =item what
 
-Event type bitmask indicating the active event variant.
+Event type bitmask indicating the active event variant (I<Int>).
 
 =item mouse
 
-Mouse event data, present when C<what> includes C<evMouse>.
+Mouse event data (I<MouseEventType>), present when C<what> includes C<evMouse>.
 
 =item keyDown
 
-Keyboard event data, present when C<what> includes C<evKeyboard>.
+Keyboard event data (I<KeyDownEvent>), present when C<what> includes 
+C<evKeyboard>.
 
 =item message
 
-Message event data, present when C<what> includes C<evMessage>.
+Message event data (I<MessageEvent>), present when C<what> includes 
+C<evMessage>.
 
 =back
 
@@ -640,8 +640,8 @@ C<what>.
 =head1 INTERNAL REPRESENTATION
 
 Internally, C<TEvent> is implemented as a tied hash that models the original
-Turbo Vision C++ event union. The active event variant is selected by the value 
-of the C<what> field.
+I<Turbo Vision> C++ event union. The active event variant is selected by the 
+value of the C<what> field.
 
 Conceptually, the structure can be viewed as follows:
 
@@ -748,7 +748,7 @@ structure accordingly.
 
 =head1 HASH INTERFACE
 
-C<TEvent> implements the C<Tie::Hash> interface. Fields are accessed via normal
+C<TEvent> implements the L<Tie::Hash> interface. Fields are accessed via normal
 hash operations.
 
 Direct deletion or clearing of fields is not supported.
@@ -763,7 +763,7 @@ When C<what> contains C<evMouse>, the C<mouse> field is active and provides:
 
 =item where
 
-Mouse position as a C<TPoint>.
+Mouse position as a L<TPoint|TUI::Objects::Point>.
 
 =item buttons
 
@@ -843,9 +843,9 @@ process the corresponding data.
 
 =head1 SEE ALSO
 
-L<TUI::Drivers::EventQueue>,
+L<TEventQueue|TUI::Drivers::EventQueue>,
 L<TUI::Drivers::Const>,
-L<TUI::Views::View>
+L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 

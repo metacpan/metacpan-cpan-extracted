@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -35,9 +35,9 @@ sub BUILDARGS {    # \%args (%args)
   state $sig = signature(
     method => 1,
     named => [
-      text    => Str,               { alias    => 'aText' },
-      keyCode => PositiveOrZeroInt, { alias    => 'key' },
-      command => PositiveOrZeroInt, { alias    => 'cmd' },
+      text    => Str,               { alias   => 'aText' },
+      keyCode => PositiveOrZeroInt, { alias   => 'key' },
+      command => PositiveOrZeroInt, { alias   => 'cmd' },
       next    => Maybe[Object],     { default => undef },
     ],
     caller_level => +1,
@@ -77,7 +77,7 @@ __END__
 
 =head1 NAME
 
-TStatusItem - status line item for status line definitions
+TUI::Menus::StatusItem - status line item for status line definitions
 
 =head1 SYNOPSIS
 
@@ -91,13 +91,14 @@ TStatusItem - status line item for status line definitions
 
 =head1 DESCRIPTION
 
-C<TStatusItem> represents a single entry displayed on a TUI::Vision status
+C<TStatusItem> represents a single entry displayed on a L<TUI::Vision> status
 line. Each item associates a text label with a keyboard shortcut and a command
 identifier that is sent when the item is activated.
 
 Status items are typically linked together to form a list and are referenced by
-a C<TStatusDef> object. The status line displays the items belonging to the
-definition whose help context range matches the current application state.
+a L<TStatusDef|TUI::Menus::StatusDef> object. The status line displays the 
+items belonging to the definition whose help context range matches the current 
+application state.
 
 This class is primarily used internally by the menu and status line
 infrastructure and is rarely manipulated directly by application code.
@@ -106,26 +107,23 @@ infrastructure and is rarely manipulated directly by application code.
 
 The following attributes describe the status line item.
 
-=over
-
-=item text
+=head2 text
 
 Text label displayed on the status line (I<Str>).
 
-=item keyCode
+=head2 keyCode
 
 Scan code of the hot key associated with the item (I<PositiveOrZeroInt>).
 
-=item command
+=head2 command
 
 Command identifier generated when the item is selected
 (I<PositiveOrZeroInt>, typically a C<cmXXXX> constant).
 
-=item next
+=head2 next
 
-Optional reference to the next C<TStatusItem> in the item list.
-
-=back
+Optional reference to the next status line 
+(L<TStatusItem|TUI::Menus::StatusItem>) in the item list.
 
 =head1 CONSTRUCTOR
 
@@ -135,7 +133,7 @@ Optional reference to the next C<TStatusItem> in the item list.
     text    => $text,
     keyCode => $key,
     command => $command,
-    next    => $next
+    next    => $next | undef
   );
 
 Creates a new status line item.
@@ -144,19 +142,19 @@ Creates a new status line item.
 
 =item text
 
-Text label of the item.
+Text label of the item (I<Str>).
 
 =item keyCode
 
-Hot key scan code.
+Hot key scan code (I<PositiveOrZeroInt>).
 
 =item command
 
-Command identifier.
+Command identifier (I<PositiveOrZeroInt>).
 
 =item next
 
-Optional reference to the next status line item.
+Optional reference to the next status line item (I<TStatusItem> or undef).
 
 =back
 
@@ -166,13 +164,14 @@ Optional reference to the next status line item.
 
 Factory-style constructor using positional arguments.
 
-The C<$next> parameter is optional and may be omitted entirely. This constructor
-is provided for compatibility with traditional Turbo Vision construction
+The $next parameter is optional and may be omitted entirely. This constructor
+is provided for compatibility with traditional I<Turbo Vision> construction
 patterns.
 
 =head1 SEE ALSO
 
-L<TUI::Menus::StatusDef>, L<TUI::Menus::StatusLine>
+L<TStatusDef|TUI::Menus::StatusDef>, 
+L<TStatusLine|TUI::Menus::StatusLine>
 
 =head1 AUTHORS
 

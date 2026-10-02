@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::GRPCRouteSpec;
 # ABSTRACT: Spec defines the desired state of GRPCRoute.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s hostnames  => [Str], { pattern => qr/^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/ };
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1::GRPCRouteSpec - Spec defines the desired state of GRPCR
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 hostnames
 

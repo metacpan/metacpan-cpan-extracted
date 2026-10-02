@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OnePasswordAuth;
 # ABSTRACT: Auth defines the information necessary to authenticate against OnePassword Connect Server
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s secretRef => '+IO::K8s::ExternalSecrets::V1::OnePasswordAuthSecretRef', { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::ExternalSecrets::V1::OnePasswordAuth - Auth defines the information nec
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 secretRef
 

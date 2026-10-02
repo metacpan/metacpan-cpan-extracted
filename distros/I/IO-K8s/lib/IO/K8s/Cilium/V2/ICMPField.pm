@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::ICMPField;
 # ABSTRACT: ICMPField is a ICMP field.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s family => Str, { enum => [qw(IPv4 IPv6)], default => 'IPv4' };
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::ICMPField - ICMPField is a ICMP field.
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 family
 

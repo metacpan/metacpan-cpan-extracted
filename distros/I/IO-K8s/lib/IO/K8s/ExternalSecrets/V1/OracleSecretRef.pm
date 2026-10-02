@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OracleSecretRef;
 # ABSTRACT: SecretRef to pass through sensitive information.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s fingerprint => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::OracleSecretRef - SecretRef to pass through sensit
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 fingerprint
 

@@ -1,6 +1,6 @@
 package IO::K8s::Role::Resource;
 # ABSTRACT: Role providing Kubernetes resource instance behavior
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use v5.10;
 use Moo ();
 use mro ();
@@ -576,15 +576,18 @@ sub _describe_local_type {
     my ($info) = @_;
     return 'string'         if $info->{is_str};
     return 'integer'        if $info->{is_int};
+    return 'number'         if $info->{is_num};
     return 'int-or-string'  if $info->{is_int_or_string};
     return 'quantity'       if $info->{is_quantity};
     return 'date-time'      if $info->{is_time};
     return 'boolean'        if $info->{is_bool};
     return 'array<string>'  if $info->{is_array_of_str};
     return 'array<integer>' if $info->{is_array_of_int};
+    return 'array<number>'  if $info->{is_array_of_num};
     return 'array<boolean>' if $info->{is_array_of_bool};
     return 'array<object>'  if $info->{is_array_of_objects};
     return 'hash<string>'   if $info->{is_hash_of_str};
+    return 'hash<number>'   if $info->{is_hash_of_num};
     return 'hash<object>'   if $info->{is_hash_of_objects};
     return 'object'         if $info->{is_hash_opaque};
     return 'object'         if $info->{is_object};
@@ -636,7 +639,7 @@ IO::K8s::Role::Resource - Role providing Kubernetes resource instance behavior
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 UNKNOWN FIELDS
 

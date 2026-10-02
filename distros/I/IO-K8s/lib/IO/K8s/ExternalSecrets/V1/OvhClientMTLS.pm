@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OvhClientMTLS;
 # ABSTRACT: OvhClientMTLS defines the configuration required to authenticate to OVHcloud's Secret Manager using mTLS.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s caBundle      => Str;
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1::OvhClientMTLS - OvhClientMTLS defines the configur
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 caBundle
 

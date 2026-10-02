@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::ListenerEntry;
 # ABSTRACT: ListenerEntry
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s allowedRoutes => '+IO::K8s::GatewayAPI::V1::AllowedRoutes', { default => {'namespaces' => {'from' => 'Same'}} };
@@ -30,7 +30,7 @@ IO::K8s::GatewayAPI::V1::ListenerEntry - ListenerEntry
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 allowedRoutes
 

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::BGPServiceOptions;
 # ABSTRACT: Service defines configuration options for advertisementType service.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s addresses             => [Str], { required => 'schema', enum => [qw(LoadBalancerIP ClusterIP ExternalIP)] };
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2alpha1::BGPServiceOptions - Service defines configuration opt
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 addresses
 

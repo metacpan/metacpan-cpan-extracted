@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use JSON::MaybeXS;
 
+use IO::K8s::Unstructured;
+use Kubernetes::REST;
 use MCP::K8s;
 
 # =================================================================
@@ -84,6 +86,39 @@ use MCP::K8s;
       return MockHTTPResp->new(404, '{}');
     }
   }
+}
+
+# A client whose resource map comes from the cluster, the Kubernetes::REST
+# default. Since 1.108 its expand_class resolves names the built-in map (or a
+# registered provider) knows without a request, so plural tier 2 asks it.
+# Kinds nothing ships come back the way 1.108 returns them: a Kind the
+# cluster serves as IO::K8s::Unstructured, anything else as a fabricated
+# class name that does not load.
+{
+  package MockClusterMapAPI;
+  our @ISA = ('MockDiscoveryAPI');
+  sub resource_map_from_cluster { 1 }
+  sub expand_class {
+    my ($self, $kind) = @_;
+    push @{ $self->{expanded} }, $kind;
+    return $kind eq 'StaticWebsite'       ? 'MockCRDClass'
+         : $kind eq 'PriorityClass'       ? 'MockBuiltinClass'
+         : $kind eq 'CiliumNetworkPolicy' ? 'IO::K8s::Unstructured'
+         :                                  'IO::K8s::'.$kind;
+  }
+}
+
+# A CRD provider class registered with the client.
+{
+  package MockCRDClass;
+  sub resource_plural { 'staticwebsites' }
+}
+
+# Stands in for a shipped IO::K8s class; its plural is one tiers 3 and 4
+# cannot produce, so only tier 2 can be the source.
+{
+  package MockBuiltinClass;
+  sub resource_plural { 'priorityclasses-from-io-k8s' }
 }
 
 {
@@ -236,6 +271,80 @@ subtest 'discovery called only once (cached)' => sub {
 
   my $call_count_after = scalar @{ $api->{calls} };
   is($call_count_after, $call_count_before, 'no additional API calls after cache populated');
+};
+
+subtest 'tier 2 answers with resource_map_from_cluster set' => sub {
+  my $cluster_api = MockClusterMapAPI->new;
+  my $cluster_k8s = MCP::K8s->new(
+    api        => $cluster_api,
+    namespaces => ['test-ns'],
+  );
+
+  # Neither Kind is in the static map or the discovery endpoints, and no
+  # discovery request is made: the class the client resolves is the source.
+  is($cluster_k8s->_resource_plural('PriorityClass'), 'priorityclasses-from-io-k8s',
+    'built-in class resource_plural() answers');
+  is($cluster_k8s->_resource_plural('StaticWebsite'), 'staticwebsites',
+    'registered CRD class resource_plural() answers');
+  is_deeply($cluster_api->{expanded}, ['PriorityClass', 'StaticWebsite'],
+    'expand_class was consulted for both');
+  is(scalar @{ $cluster_api->{calls} }, 0,
+    'tier 2 answered before any discovery request');
+
+  is($cluster_k8s->_resource_plural('Pod'), 'pods',
+    'static map still answers first');
+  is(scalar @{ $cluster_api->{expanded} }, 2,
+    'static map hit does not reach expand_class');
+};
+
+subtest 'tier 2 falls through for Kinds without a class' => sub {
+  my $cluster_api = MockClusterMapAPI->new;
+  my $cluster_k8s = MCP::K8s->new(
+    api        => $cluster_api,
+    namespaces => ['test-ns'],
+  );
+
+  is($cluster_k8s->_resource_plural('CiliumNetworkPolicy'), 'ciliumnetworkpolicies',
+    'Unstructured has no resource_plural - tier 3 discovery answers');
+  ok(scalar @{ $cluster_api->{calls} }, 'discovery endpoints were asked');
+  is($cluster_k8s->_resource_plural('ZzzzUnknownThing'), 'zzzzunknownthings',
+    'fabricated class name does not load - heuristic answers');
+};
+
+# The upstream contract the 1.108 floor rests on: the real client resolves a
+# built-in Kind to a class carrying its plural without any request, even with
+# resource_map_from_cluster at its default. _request is replaced, so nothing
+# here can reach the network.
+subtest 'Kubernetes::REST expand_class is fetch-free for built-ins' => sub {
+  my @requests;
+  no warnings 'redefine';
+  local *Kubernetes::REST::_request = sub {
+    push @requests, $_[2];
+    die "unexpected request $_[1] $_[2]\n";
+  };
+  my $real_api = Kubernetes::REST->new(
+    server      => { endpoint => 'http://127.0.0.1:1' },
+    credentials => { token => 'unused' },
+  );
+  ok($real_api->resource_map_from_cluster, 'client default fetches its map');
+  my $real_k8s = MCP::K8s->new(
+    api        => $real_api,
+    namespaces => ['test-ns'],
+  );
+
+  my %expected = (
+    PriorityClass            => 'priorityclasses',
+    StorageClass             => 'storageclasses',
+    IngressClass             => 'ingressclasses',
+    Lease                    => 'leases',
+    EndpointSlice            => 'endpointslices',
+    CustomResourceDefinition => 'customresourcedefinitions',
+  );
+  for my $kind (sort keys %expected) {
+    is($real_k8s->_resource_plural($kind), $expected{$kind},
+      $kind.' => '.$expected{$kind});
+  }
+  is_deeply(\@requests, [], 'no request made');
 };
 
 done_testing;

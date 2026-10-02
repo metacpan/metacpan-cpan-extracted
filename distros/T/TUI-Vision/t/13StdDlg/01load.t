@@ -22,7 +22,7 @@ BEGIN {
   use_ok 'TUI::StdDlg::ChDirDialog';
 }
 
-isa_ok( FindFirstRec->allocate( [], 0, '' ), FindFirstRec() );
+isa_ok( FindFirstRec->allocate( [], 0, '*' ), FindFirstRec() );
 isa_ok( ffblk->new(), 'ffblk' );
 isa_ok( find_t->new(), 'find_t' );
 isa_ok( TSearchRec->new(), 'TSearchRec' );

@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaProps;
 # ABSTRACT: JSONSchemaProps is a JSON-Schema following Specification Draft 4 (http://json-schema.org/).
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s '$ref' => Str;
@@ -47,7 +47,7 @@ k8s maxLength => Int;
 
 k8s maxProperties => Int;
 
-k8s maximum => Str;
+k8s maximum => Num;
 
 k8s minItems => Int;
 
@@ -55,9 +55,9 @@ k8s minLength => Int;
 
 k8s minProperties => Int;
 
-k8s minimum => Str;
+k8s minimum => Num;
 
-k8s multipleOf => Str;
+k8s multipleOf => Num;
 
 k8s not => 'Apiextensions::V1::JSONSchemaProps';
 
@@ -114,7 +114,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaProps -
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 default
 

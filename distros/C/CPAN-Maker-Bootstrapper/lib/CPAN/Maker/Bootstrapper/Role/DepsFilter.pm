@@ -42,7 +42,9 @@ sub cmd_deps_filter {
 
   my $filtered_list = $self->_filter_packages( $index, $requires );
 
-  print {*STDOUT} join( "\n", sort values %{$filtered_list} ), "\n";
+  if ( %{$filtered_list} ) {
+    print {*STDOUT} join( "\n", sort values %{$filtered_list} ), "\n";
+  }
 
   return $SUCCESS;
 }

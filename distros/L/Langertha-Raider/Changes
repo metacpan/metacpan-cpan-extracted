@@ -1,0 +1,516 @@
+Revision history for Langertha-Raider
+
+0.503     2026-10-01 21:25:19Z
+
+  [Distribution]
+    - Langertha-Raider is the merge of the App-Raider distribution with the
+      agent engine extracted from Langertha core. Langertha::Raider,
+      Langertha::Raider::Result and the Langertha::Raid orchestration layer
+      (Raid::Loop, Raid::Parallel, Raid::Sequential) ship here under their
+      own names. Every App::Raider::* module is renamed to
+      Langertha::Raider::*, with the CLI entry point App::Raider becoming
+      Langertha::Raider::CLI; the raider and raider-hall executables keep
+      their names. Requires Langertha 0.503 and Net::Async::MCP 0.004.
+    - The six App::Raider packages previously indexed on CPAN (App::Raider,
+      App::Raider::FileTools, App::Raider::Plugin::Situation,
+      App::Raider::Plugin::Trace, App::Raider::Skill, App::Raider::WebTools)
+      ship as empty reserved-namespace stubs pointing to their
+      Langertha::Raider replacements.
+    - Langertha::Raider calls only Langertha's public engine methods
+      (async_request_f, async_loop, langfuse_timestamp,
+      Langertha::Usage->from_raw) and Role::PluginHost's public plugin hooks
+      (plugin_instances, plugin_args, plugin_pipeline_tool_call_f).
+      Langertha::Raider::Result is self-contained.
+    - IO::Async::SSL is a requirement: every cloud engine and web_search
+      speak https, and without it every request fails.
+    - Docker builds install from the Dist::Zilla build directory via cpm and
+      the MetaCPAN resolver; no cpanfile.snapshot is shipped. GitHub and
+      Docker release publishing runs from maint/release-after.pl.
+
+  [Standalone binary]
+    - Standalone Linux binaries (x86_64, aarch64) are attached to each GitHub
+      release by the release-binaries workflow; the build, verify and
+      runtime-library scripts are in scripts/ and not shipped to CPAN.
+    - New raider --version: prints raider's and Langertha's version and exits 0.
+    - The binary's hall runs the binary directly instead of perl <binary>,
+      which died with "Unrecognized character \x7F"; RAIDER_HALL_RAIDER_BIN
+      still overrides it.
+    - perl_eval, perl_check and perl_cpanm run the perl on PATH inside the
+      binary, whose $^X is no usable interpreter, and return a tool error
+      saying so when there is none. The lib's perl-version marker records
+      the version of the perl that uses the lib, not the packed one.
+
+  [CLI and REPL]
+    - bin/raider is a thin wrapper around internal
+      Langertha::Raider::CLI::* classes (Main, REPL, Runner, Commands,
+      PromptBuilder, Output). raider exits 0 on success, 1 when the run
+      failed, 2 on a usage error, 3 on a configuration error and 4 when a
+      session is open in another raider.
+    - Machine output is versioned: --json, --msgpack and --yaml print one
+      document with "version" (1), "status" (completed or failed) and the
+      run's session; --FORMAT=N selects the version, an unknown one is a
+      usage error. --json encodes UTF-8 once and keeps the live trace off
+      unless --trace is given; the document's elapsed has millisecond
+      resolution.
+    - New --stream-json, --stream-msgpack and --stream-yaml: run.started,
+      run.state, tool.call, tool.result, message and run.finished events
+      as the run happens, run.finished always last; tool.call and
+      tool.result carry call and status. All six machine flags exclude each
+      other, and so does -i; with any of them --trace goes to stderr and
+      stdout carries only the machine output. Requires Data::MessagePack.
+      raider -i reads piped input to its end.
+    - A one-shot raider cancels its run on the first SIGINT (Ctrl-C): it
+      writes the cancelled document or run.finished, then dies of SIGINT
+      (exit 130); a second SIGINT, or SIGTERM, interrupts at once, writing
+      the "interrupted" document and dying of the same signal (130/143),
+      also when the signal arrives during startup. Tool commands still
+      running (bash, perl_eval, perl_cpanm) are ended first, and a tool call
+      that ends with an error after a cancel is reported as cancelled.
+    - The REPL's first Ctrl-C cancels the running turn: tool commands are
+      ended, the model request is abandoned, the session journal records the
+      run as cancelled, and the REPL goes on; a second Ctrl-C within 2s
+      quits, ending tool commands too.
+    - New Langertha::Raider->cancel stops a raid at its next safe point and
+      is safe in a signal handler; the raid returns a Result of type
+      cancelled (is_cancelled), and a tool call it cut off is reported as
+      cancelled. Langertha::Raid::Parallel passes on a cancelled branch as
+      the raid's result.
+    - New raider config explain [options] (the options may also come first)
+      and REPL /config: every effective setting with its source (flag,
+      .raider.yml layer, environment, default), the instructions source
+      (-M, .raider.md, default), bare, where each pack comes from, and
+      whether the Perl tools are on and why, and each mounted tool with its
+      source and what it can do (read, write, network, code, message; tools
+      outside the built-in table show as unknown). Information only, nothing
+      is enforced.
+    - Explicit -m and -k beat model:/api_key: from .raider.yml, and the
+      banner shows the model the engine is actually built with. When neither
+      -m nor a table default is set (e.g. -e minimax), the engine's own
+      default_model applies.
+    - -o with raider's own keys (perl, packs=a,b, skills=a,b,
+      preferred_lib_target, engine) configures raider like .raider.yml and
+      overrides it; only engine attributes reach the engine.
+    - raider reads the project config from .raider/config.yml (same keys as
+      .raider.yml). When both files exist only .raider/config.yml is loaded,
+      raider warns on start, and raider config explain names the file in use
+      and the ignored one. /model and saved skills write to the file in use.
+    - raider reads ~/.raider/config.yml under the project config (default <
+      home < project < command line). Project values replace home ones,
+      skills and no_detect add up, detect: rules are replaced per pack.
+      raider config explain names home values "home" and prints the home
+      file. A broken home file stops raider (exit 3); raider never writes it.
+    - New raider config migrate [--dry-run] moves .raider.yml to
+      .raider/config.yml and .raider.md to .raider/instructions.md: shows
+      what it does first, writes atomically, keeps the legacy files as .bak,
+      creates .raider/.gitignore, and leaves any api_key out of the shareable
+      .raider/config.yml, reporting where it was. Refuses without writing
+      when a target or backup already exists.
+    - ~/.raider/config.yml takes project_tools, a map from workspace selector
+      ("*", a path glob, a workspace name) to tool names. raider config
+      explain shows which selectors match the project, which tools they grant
+      and which packs request them; a project file cannot grant. Information
+      only: nothing is mounted from it yet, and workspace names never match
+      yet.
+    - raider reads the project instructions from .raider/instructions.md, else
+      .raider.md. When both exist only .raider/instructions.md is used, raider
+      warns on start, and raider config explain names the ignored file under
+      instructions:. /prompt writes the file in use (.raider.md when there is
+      none).
+    - .raider.yml has one reader and writer, Langertha::Raider::Config
+      (internal). Top-level keys apply next to default: and engine sections,
+      so /model or a skills: hash no longer drops packs, perl or engine
+      options; skills: merge across sections and with --claude / --openai /
+      --skills, which all persist; engine: picks the engine. A file that
+      does not parse, or a mapping under one of raider's own keys (packs:,
+      perl:, engine:, ...), stops raider with a one-line error (line, column
+      and reason for a parse error) instead of being ignored. Raider-only
+      keys never reach the engine constructor.
+    - -M now replaces only the instructions (default persona and .raider.md);
+      skills, packs (configured, flagged or detected) and the tool
+      description still apply. Anyone who used -M to drop everything else
+      needs --bare. /reload and /pack keep a -M mission, and /reload, the
+      banner and the generated raider skill name it as the persona.
+    - New --bare: isolated context without .raider.md, skills, pack
+      detection, packs: or default packs; --pack NAME and /pack NAME still
+      switch packs on. -M TEXT --bare gives TEXT plus the tool description.
+    - New --pack NAME for one-shot pack activation.
+    - REPL: a line !CMD runs CMD with $SHELL -c in the root on the terminal
+      and sends nothing to the model; ?CMD runs it with its output shown and
+      captured, then sends the command, its exit status and its output (head
+      and tail past 20000 characters) to the model as the next prompt,
+      recorded in the session. Ctrl-C ends the command, not raider; a ?CMD
+      ended by Ctrl-C sends nothing. A line that is only ! or ? is a prompt.
+    - raider --help lists --trace next to --no-trace.
+    - New raider provider inspect HOST[:PORT]|https://HOST fetches
+      /.well-known/langertha.json (https only, 1 MiB, 10 s, up to 3
+      same-origin redirects, no credentials sent; internal addresses are
+      refused unless --allow-internal, cloud metadata never), validates it
+      with Langertha::Manifest and shows provider, issuer, endpoints, auth and
+      models, with warnings for unknown dialects, auth types and capabilities.
+      --json, --msgpack and --yaml give one versioned document. Requires
+      Langertha::Manifest from Langertha core.
+    - New raider --provider HOST[:PORT] runs one invocation on the endpoint
+      a provider manifest declares, mapped to the matching Langertha engine;
+      nothing is stored. -m picks the model (required when the manifest
+      lists several). The key comes only from -k or -o api_key=, never from
+      *_API_KEY in the environment or .raider.yml. The endpoint must be https
+      on the manifest's origin; internal addresses need --allow-internal, as
+      for provider inspect. The engine connects to the endpoint address
+      raider checked (Langertha connect_address) instead of looking the name
+      up again; TLS still verifies the host name. Not combinable with -e,
+      -o engine= or -o url=.
+      The REPL banner shows the -k key as set without printing it.
+    - Saving skills (--skills, --claude, the /skill writers) no longer writes
+      an empty skills: ~ into an existing default: section of the project
+      config.
+
+  [Packs]
+    - Packs are also found in <project>/.raider/packs/<name>/ and
+      ~/.raider/packs/<name>/ (same layout as the shipped packs); for the
+      same name the project beats home, and home beats the shipped pack. A
+      pack directory with an unreadable pack.yml is skipped and reported in
+      raider config explain and /packs instead of stopping the start; one
+      without a SKILL.md loads. The never-used pack keys mcp,
+      add_allowed_commands and engine_options are ignored.
+    - Packs can activate by workspace detection: declarative must / may /
+      must_not rules on files and their content, from a pack's pack.yml or
+      detect: in .raider.yml; switched off with no_detect:, detect: false,
+      --no-pack NAME or --no-detect. raider config explain and /packs show
+      each pack's source (flag, config, default, detected) and the rule
+      clause that matched; /reload detects packs again.
+    - New bundled perl pack: in a Perl workspace (cpanfile, dist.ini,
+      Makefile.PL or lib/**/*.pm) the perl_eval / perl_check / perl_cpanm
+      tools are on without --perl; perl: false keeps them off. The bundled
+      git-guru pack drops a pack.yml key the loader never read.
+
+  [Tools]
+    - The tool description in the system prompt and the exported how-to-use
+      document (/skill, /skill-claude) are generated from the tool servers
+      mounted for the run (name and parameters from each tool's input
+      schema, optional parameters in brackets), so the Perl and Hall tools
+      are described when mounted and only then. -M and --bare keep it.
+      Switching the perl pack on or off with /pack (or /reload) mounts or
+      unmounts the perl_* tools; the exported Markdown no longer contains
+      POD markup.
+    - MCP servers are named raider-files, raider-web, raider-perl and
+      raider-hall; the Claude skill export is named raider
+      (.claude/skills/raider/SKILL.md) and points out a leftover app-raider
+      skill.
+    - Perl tools: --perl unlocks perl_eval / perl_check / perl_cpanm with a
+      private local::lib per raider and auto-recovery on missing modules.
+      perl_eval and perl_check run the current perl in the working root
+      with the private lib; perl_check says BEGIN/use run; real errors are
+      no longer reported as "timeout"; perl_cpanm rejects targets outside
+      the root, uses the local::lib correctly and records only successful
+      installs. The tools kill the child process when it times out, and
+      every timeout (including the retry after an auto-install and cpanm
+      itself) comes back as a result instead of an exception; new
+      install_timeout option. A relative preferred_lib_target resolves
+      against the working root for PERL5LIB and cpanm alike.
+    - Filesystem confinement rejects symlink escapes for read and write
+      operations.
+    - A raid, and the web_fetch / web_search tools, fail at once with the
+      module's name when IO::Async::Internals::Connector, or for https
+      IO::Async::SSL (IO::Socket::SSL, Net::SSLeay, libssl), does not load,
+      instead of the first request failing and every later one to that host
+      hanging (a Net::Async::HTTP 0.50 connection-slot leak). web_fetch
+      checks each redirect target too, so an http to https redirect without
+      IO::Async::SSL is a tool error and does not block later fetches from
+      that host. WebTools sync wrappers await IO::Async futures through the
+      loop.
+    - Plugin self-tools are offered to the model once per raid. A tool name
+      offered by two tool sources (engine mcp_servers, inline MCP, catalog
+      MCPs, self-tools) is sent once: the first source wins and a warning
+      names both. A raider_-prefixed name an MCP source registered is
+      called on that source instead of failing as "Unknown self-tool".
+    - A tool call whose arguments do not decode (on a reply that did not
+      hit its token limit) is answered with an "arguments are not valid
+      JSON" error result the model can retry, instead of running the tool
+      on {}.
+
+  [Raid engine]
+    - Inline MCP tools and raider_wait run on the engine's event loop, so an
+      engine on its own loop no longer hangs a raid. A raider whose engines
+      (engine, compression_engine, engine_catalog, embedding_engine) sit on
+      different event loops fails at the start of raid_f and respond_f,
+      naming the engine, instead of hanging.
+    - The trace and Langfuse count tokens from Gemini, Ollama and AKI native
+      responses too. Usage follows Langertha's reading: input_tokens wins
+      over prompt_tokens when a response has both, and a count missing from
+      a usage block goes to Langfuse as 0 instead of null.
+    - Raid tool-loop replies are read via Langertha::Role::Tools
+      tool_loop_response, so a 200 body carrying an error ends the raid
+      loudly instead of silently with "". Gemini thoughts and truncated
+      tool calls are dropped as in core, and an unknown tool returns an
+      error result instead of aborting the raid. compress_history_f reads
+      the summary the same way and croaks instead of producing an empty one.
+    - Raider compresses its context inside a single long raid, dropping the
+      oldest tool exchanges first, not only between raids. The mission and
+      system prompt carrying activated skill content is never compacted.
+    - Session-history embeddings no longer block the event loop: each
+      message is embedded in the background through simple_embedding_f, a
+      failed embedding is logged and skipped, and the search tool ranks only
+      what is embedded so far (falling back to text match if the query
+      itself cannot be embedded). no_session_embeddings is no longer needed
+      as a deadlock workaround. An embedding engine without
+      simple_embedding_f gets no embeddings.
+    - session_history keeps tool_call and tool_result turns as structured
+      blocks, so history replayed into a later raid (and the embedding text
+      derived from it) no longer stringifies or drops them. New
+      clear_session_history empties session_history and its embeddings
+      together.
+    - The session history renderer (session_history tool, history query)
+      no longer drops or blanks the tool results Langertha sends natively:
+      a Responses function_call_output whose output is an input_text /
+      input_image part array, a Gemini functionResponse with inlineData
+      parts, and an Anthropic tool_result with image blocks keep their
+      text and show each image as [image], never as base64. A Gemini
+      functionResponse carrying the tool's structured content is shown
+      whole, as JSON, instead of as an empty "tool_result:". An Anthropic
+      text document shows its text (and title) instead of a bare
+      <document>, a PDF document shows as [document], and a search_result
+      keeps its title and source URL next to its text.
+      A custom content document (source type content) shows its text
+      chunks instead of a bare [document], and a document's context
+      field is kept on its own [context] line.
+      A tool-result PDF (Responses input_file, Gemini functionResponse
+      inlineData) shows as [document] name.pdf or [document]
+      application/pdf instead of <input_file> or <block>; its base64
+      payload is never shown.
+    - A raid paused by an interactive self-tool (raider_ask_user etc.) in
+      the middle of a parallel-tool batch no longer re-runs the calls that
+      completed before it or drops the self-tools queued after it:
+      respond_f resumes with only the calls after the pausing one, so side
+      effects fire once and every tool_use gets exactly one tool_result
+      (strict providers such as Anthropic rejected the duplicates with a
+      400).
+    - Tool calls resumed after raider_ask_user or raider_pause go
+      through the same dispatch as any other call: they run
+      plugin_before_tool_call, so they get their tool.call event and
+      plugin gates apply to them.
+    - The answer to a paused raider_ask_user or raider_pause call and the
+      result of raider_wait go through plugin_after_tool_call, so every
+      tool.call event gets its tool.result. A cancelled raider_wait gets a
+      cancelled tool result like a cut-off MCP call.
+    - A plugin_before_llm_call that returns a fresh conversation also
+      updates what a paused raid resumes with, so respond_f keeps every
+      assistant and tool_result message from before the pause.
+    - Langertha::Raider::Result is always true in boolean context, so
+      `if (my $r = $raider->raid(...))` no longer skips question, pause and
+      abort results with empty text. Stringification is unchanged.
+    - Langertha::Raider checks each tool call's arguments against the tool's
+      inputSchema before running it: a missing required key or a top-level
+      property of the wrong type gets an error result the model can correct,
+      and the tool does not run. The check is lenient: numeric strings, 0/1
+      booleans and null for an optional property pass. raider_ask_user
+      called without question returns that error instead of dying with a
+      Result type-constraint error.
+
+  [Sessions]
+    - Every run is recorded in a session journal,
+      .raider/sessions/<id>.jsonl in the project: the input, every tool call
+      with its whole result, the answer and how the run ended, also when it
+      failed or was interrupted. .raider/.gitignore keeps journals out of
+      git (also written when .raider/lib is created); --no-session switches
+      recording off. A journal that cannot be written mid-run is a warning;
+      the run goes on.
+    - New raider session list, session show ID [--json], session resume ID,
+      session fork ID and session rm ID (refused while another raider has
+      it open), and --session ID / --continue for one-shot and REPL: the
+      conversation is replayed, nothing recorded is run again, and runs
+      without an end or tool calls without a result are reported. Session
+      ids can be shortened to a unique start or their last four hex digits.
+      /clear in the REPL is recorded and honoured on resume.
+
+  [Hall]
+    - raider hall start/spawn/attach/logs/kill no longer treat options as
+      positional arguments (e.g. `start --daemon DIR` ignored DIR).
+      spawn/attach/logs/kill take an optional hall DIR as first argument
+      without it leaking into NAME, MISSION or ID; a name that is a plain
+      directory stays a name. start/stop/status/ps/install fail with "Not a
+      directory" when DIR is not a directory instead of using the current
+      directory.
+    - Hall raiders run with --stream-json: stdout goes to a file per run,
+      stderr to the slot log, and raider.done carries status and response
+      or error from run.finished; a raider killed before its result is a
+      clear failure. Only the newest 20 events files per slot are kept
+      (logs.keep_events in .raider-hall.yml, 0 keeps all).
+    - raider hall attach ID prints the run's --stream-json events until the
+      raider exits; raider hall spawn --attach spawns and then attaches (the
+      run ID line goes to stderr, a queued mission is not attached). The
+      spawn reply names events_path, and carries queue_depth for a busy
+      slot.
+    - The hall ends each run in the slot log with one "[hall] raider ID
+      STATUS: TEXT" line and marks each run's start, so raider hall logs ID
+      shows the answer or error and only that run's part, also after the
+      run has ended; logs --follow prints new output until the raider
+      exits. A slot log over logs.max_log_size (default 1 MiB, 0 off) moves
+      to SLOT.log.1 when the slot's next run starts. Run IDs stay unique
+      (SLOT-TIME.2, .3, ...).
+    - A plain hall raider name (bjorn) runs its missions in parallel and each
+      run is tracked and reported on its own; numbered names (1bjorn) stay
+      singletons with a queue that survives restarts. Missions a previous
+      hall left waiting run first after a start, and a new mission never
+      overtakes them.
+    - Hall runs keep their conversation in a session journal under the hall
+      root: a Telegram chat (or topic), a cron job, an ACP session and a
+      numbered slot each continue their own session, a plain-name run gets a
+      fresh one. raider.done, ps and attach name the session; a run whose
+      session is in use outside the hall fails at once with a raider.done
+      saying so. A mission for a binding that is already running waits in
+      that binding's queue, kept across hall restarts. raider hall session
+      reset BINDING and Telegram /new start a binding over in a new session
+      (journals are kept); ACP bindings are forgotten on hall start, and so
+      are the bindings and waiting missions of cron jobs no longer
+      configured.
+    - A hall cron job with coalesce: true drops an occurrence (cron.coalesced)
+      while its previous run is still running or waiting. Cron scheduling
+      does not block the IO::Async loop.
+    - A hall raider's persona: X in .raider-hall.yml starts that raider with
+      the pack X as well. The never-used raider keys mcp and isolated are
+      gone (raider hall add-raider --isolated is removed; old configs get a
+      one-time note in the slot log). preferred_lib_target in
+      .raider-hall.yml is read (default .raider/lib): each hall raider
+      installs modules there and gets <target>/lib/perl5 on PERL5LIB.
+    - Hall raiders without an engine: leave the choice to raider
+      (.raider.yml, then API-key autodetection) instead of anthropic;
+      raider hall init and add-raider write engine: only when --engine is
+      given.
+    - Hall raiders get telegram_reply, hall_status and hall_spawn tools
+      (keyed on $RAIDER_HALL_SOCKET). Docker-aware systemd install: inside
+      a container the unit is written to .raider-hall/systemd/<name>.service
+      with a cp one-liner printed; --docker uses docker run and publishes
+      the ACP port.
+    - Hall Telegram access is fail-closed: an empty or missing allowlist
+      rejects every message, allowlist holds sender user ids (from.id), and
+      group chats must also be listed in the new allowed_chats. Rejections
+      emit telegram.rejected; startup warns about empty allowlists and chat
+      ids found in allowlist. telegram.in events carry the sender's
+      first_name and username, also in group chats.
+    - Telegram replies: a raider spawned for a Telegram message gets its bot
+      and chat id (RAIDER_HALL_TELEGRAM_BOT/_CHAT_ID), and telegram_reply is
+      bound to that chat (and forum topic), needing only text. The Telegram
+      bots stop polling with a warning and a telegram.poll_error event
+      naming the module, and their replies return an error, instead of
+      hanging on the Bot API when a connect module does not load.
+    - Hall fixes: singleton queue replay, --pack propagation, Telegram
+      future retention, MCP tool result handling, a mission passed as a
+      single argv instead of split on whitespace, no double-reaping of child
+      processes, and the shutdown grace-period timer now fires.
+
+  [ACP]
+    - Hall ACP speaks JSON-RPC 2.0 line-framed over TCP (initialize /
+      session/new / session/prompt / session/cancel); configure via
+      acp: { port, host } in .raider-hall.yml or --acp-port N on
+      raider hall start. raider acp ping|prompt|connect HOST:PORT drives any
+      ACP-conforming agent from the same binary.
+    - A prompt that has to wait is answered when its run ends (end_turn or
+      cancelled) instead of at once, also when the hall had to start that
+      run without its session (hall.session_error names the run);
+      session/cancel ends waiting prompts as cancelled and cancels the
+      running hall raider with SIGINT, so its run ends as cancelled. If it
+      does not end, the hall escalates to SIGTERM, then SIGKILL, each after
+      cancel_grace in .raider-hall.yml (default 5 seconds, 0 never
+      escalates). raider hall kill still stops it with SIGTERM.
+    - A failed raider run ends session/prompt as a JSON-RPC error (-32000)
+      instead of streaming the error text as an agent_message_chunk with
+      stopReason end_turn; a killed raider is forwarded as that failure
+      rather than raw log text.
+
+  [Documentation]
+    - README describes the current CLI, config and Hall/ACP behavior, the
+      standalone binary and a Roadmap for planned features.
+      examples/multi-raider-hall/ walks through a minimal multi-raider
+      village wired for cron and ACP.
+    - perldoc raider documents every option, the tool set and the
+      environment variables raider reads (API keys, web-search keys,
+      RAIDER_PACK_DIRS, RAIDER_HALL_SOCKET, ...); raider-hall has a manual
+      page of its own; Langertha::Raider::Hall documents
+      RAIDER_HALL_RAIDER_BIN, RAIDER_HALL_ACP_PORT, RAIDER_HALL_ACP_HOST and
+      the environment it gives its raiders; Langertha::Raider::Packs
+      documents the pack.yml keys; Langertha::Raider documents run_f, its
+      raid plugin hooks, automatic context management and the
+      session_history archive. The Hall parts and the raider acp dispatcher
+      are marked internal. engine: is documented as optional for hall
+      raiders, and the hall MCP adapter (.raider-hall.mcp) as not
+      implemented. Broken POD links and empty sections are fixed.
+
+  [Tests]
+    - Test suite for packs, Perl tools, Hall, ACP server and client, plus an
+      opt-in live task suite (t/live, RAIDER_LIVE_TASKS=1) that drives
+      bin/raider against a fresh workspace and isolated home and checks the
+      result and session journal; a provider error fails the run. t/42 runs
+      a real OpenAI API session, gated on OPENAI_API_KEY.
+
+0.003    2026-04-21 01:46:09Z
+
+    - Switch bash tool from the retired MCP::Server::Run::Bash to
+      MCP::Run::Bash (same API, renamed upstream distribution).
+    - Dockerfile installs App::Raider from the dzil-built tarball
+      instead of the source tree (no Makefile.PL in Dist::Zilla dists).
+    - Docker Hub image published as raudssus/raider. dzil release now
+      runs run_after_release hooks that create the GitHub release,
+      build the runtime-root image, and push raudssus/raider:VERSION
+      plus :latest.
+    - Ship a cpanfile.snapshot for reproducible Carton deployments.
+
+0.002     2026-04-20 20:28:50Z
+
+    - /model REPL command: show current engine and model, list available
+      models from the engine grouped by date-snapshot families (e.g.
+      gpt-4o [+3 snapshots]); /model list [FILTER] for the full or
+      substring-filtered list; /model NAME saves the chosen model to
+      .raider.yml under default.model.
+    - Model list colours: names in bright-blue, structural labels grey —
+      consistent with the rest of the banner.
+    - Fixed _build_skill_sources calling _normalize_skill_spec in scalar
+      context, silently dropping the CLAUDE.md spec from the claude
+      profile when loaded from .raider.yml ("seeing CLAUDE.md, ignoring"
+      even with profiles: claude active).
+    - Fixed Term::ReadLine::Gnu detection: require Term::ReadLine::Gnu
+      fails with "invalid to load directly"; now detected via
+      Term::ReadLine->new + ->ReadLine =~ /Gnu/.
+    - Readline history now persists across Ctrl-C / SIGTERM via signal
+      handlers that call WriteHistory before exit.
+
+0.001     2026-04-20 17:44:05Z
+
+    - Initial release.
+    - CLI agent (App::Raider) wrapping Langertha::Raider with a default
+      viking persona ("Langertha"), caveman-style communication, and
+      effectively unlimited tool-calling iterations per raid.
+    - Tools: filesystem (list_files, read_file, write_file, edit_file),
+      bash (MCP::Server::Run::Bash), web_search and web_fetch
+      (Net::Async::WebSearch + Net::Async::HTTP).
+    - Engine auto-detection from available *_API_KEY env var with cheap
+      per-engine default models (claude-haiku-4-5, gpt-4o-mini, etc.).
+    - .raider.md for persona customization; hot-reload via /reload;
+      /prompt spawns a sub-agent prompt-builder that writes .raider.md.
+    - .raider.yml for engine options (temperature, response_size, ...)
+      with flat or default/<engine> layers; -o key=value CLI override.
+    - Skill / profile loading: --claude loads CLAUDE.md and
+      .claude/skills/*/SKILL.md; --openai/--codex loads AGENTS.md;
+      --skills DIR adds plain-markdown dirs. Choices persist to
+      .raider.yml with (saved) banner tag on first use.
+    - App::Raider::Skill generates self-describing how-to-use-raider
+      documentation from the live config, as plain markdown or as a
+      Claude Code SKILL.md with YAML frontmatter; usable via CLI
+      (--export-skill / --export-claude-skill) or REPL (/skill,
+      /skill-claude).
+    - REPL: Term::ReadLine::Gnu with persistent ~/.raider_history,
+      IO::Prompt::Tiny fallback; plain-ASCII output with blue/green
+      palette; slash commands /help /clear /metrics /stats /reload
+      /prompt /skill /skill-claude /quit.
+    - App::Raider::Plugin::Trace streams per-iteration tool calls,
+      args, results and cumulative token counts; meta-line after each
+      raid shows elapsed time, history size vs. context cap, and
+      cumulative tokens in / out / total.
+    - App::Raider::Plugin::Situation injects a compact single-line
+      situation block (local time, timezone, host, user) at the start
+      of each session.
+    - Auto-compression at 70% of a 40k-token context window to stay
+      under typical per-minute rate limits.
+    - Dockerfile with multi-stage build: runtime-root for root use,
+      runtime-user with RAIDER_UID/RAIDER_GID build args for host-uid
+      matching. README includes a shell-alias recipe that mounts $PWD
+      and forwards API-key env vars.

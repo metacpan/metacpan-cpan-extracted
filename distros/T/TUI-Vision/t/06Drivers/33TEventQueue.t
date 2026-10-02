@@ -47,7 +47,10 @@ BEGIN {
     }
     return 0;
   } #/ sub getMouseEvent
-  sub getTickCount { return 100; }
+  sub getTickCount    { 100 }
+  sub getButtonCount  { 3 }
+  sub cursorOn        { }
+  sub cursorOff       { }
   $INC{"TUI/Drivers/HardwareInfo.pm"} = 1;
 } #/ BEGIN
 

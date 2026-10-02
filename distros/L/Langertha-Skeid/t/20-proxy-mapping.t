@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use Langertha::Skeid::Proxy;
+use Langertha::Skeid::Protocol::Anthropic;
+use Langertha::Skeid::Protocol::Ollama;
 
 {
   my $input = {
@@ -33,7 +35,7 @@ use Langertha::Skeid::Proxy;
     ],
   };
 
-  my $out = Langertha::Skeid::Proxy::_anthropic_request_to_openai($input);
+  my $out = Langertha::Skeid::Protocol::Anthropic->request_to_openai($input);
   is $out->{model}, 'qwen', 'model mapped';
   is $out->{messages}[0]{role}, 'system', 'system mapped';
   is $out->{messages}[1]{role}, 'user', 'user mapped';
@@ -65,7 +67,7 @@ use Langertha::Skeid::Proxy;
     usage => { prompt_tokens => 10, completion_tokens => 5 },
   };
 
-  my $out = Langertha::Skeid::Proxy::_openai_response_to_anthropic($res, 'qwen');
+  my $out = Langertha::Skeid::Protocol::Anthropic->response_from_openai($res, 'qwen');
   is $out->{type}, 'message', 'anthropic type';
   is $out->{stop_reason}, 'tool_use', 'stop reason mapped';
   is $out->{usage}{input_tokens}, 10, 'usage mapped';
@@ -83,7 +85,7 @@ use Langertha::Skeid::Proxy;
     usage => { prompt_tokens => 3, completion_tokens => 1 },
   };
 
-  my $out = Langertha::Skeid::Proxy::_openai_response_to_ollama_chat($res);
+  my $out = Langertha::Skeid::Protocol::Ollama->response_from_openai($res);
   is $out->{model}, 'qwen', 'ollama model mapped';
   is $out->{message}{content}, 'OK', 'ollama message mapped';
   is $out->{prompt_eval_count}, 3, 'ollama prompt tokens mapped';

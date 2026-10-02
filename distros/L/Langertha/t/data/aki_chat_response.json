@@ -1,0 +1,1 @@
+{"text":"OK.","max_seq_len":65536,"success":true,"job_id":"0f6aaeff-f431-45d6-99c8-5f3b67c4f344-d9fa","prompt_length":38,"num_generated_tokens":3,"num_cached_tokens":16,"current_context_length":41,"model_name":"Llama-3.1-8B-Instruct","total_duration":0.428,"compute_duration":0.419,"ep_version":3}

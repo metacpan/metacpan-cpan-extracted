@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::DeviceTaintRule;
 # ABSTRACT: DeviceTaintRule adds one taint to all devices which match the selector. This has the same effect as if the taint was specified directly in the ResourceSlice by the DRA driver.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1beta2::DeviceTaintRule - DeviceTaintRule adds one tain
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

@@ -33,10 +33,12 @@ sub updateIntlChars {    # void ($class)
   my $class = shift;
   assert ( $class and !ref $class );
   my $cp = &$getCodePage();
-  # Some 8-bit code pages are supported directly.
+  # Some 8-bit code pages are supported directly and
+  # preserve the original CP437 frame characters when using UTF-8 with 
+  # Windows Virtual Terminal (VT) mode (CP65001).
   return 
     if $cp =~ /^(437|720|737|775|850|852|855|857|858|859|860|861|862|863|865)$/
-    || $cp =~ /^(866|869)$/;
+    || $cp =~ /^(866|869|65001)$/;
 
   require TUI::Views::Frame;
   require TUI::Views::ScrollBar;
@@ -163,8 +165,8 @@ TUI::Drivers::Display - low-level display abstraction
 
 =head1 DESCRIPTION
 
-C<TDisplay> provides a low-level abstraction layer for screen and
-cursor operations used by the TUI::Vision driver subsystem.
+C<TDisplay> provides a low-level abstraction layer for screen and cursor 
+operations used by the L<TUI::Vision> driver subsystem.
 
 The module defines a set of class-level routines for querying and modifying
 display parameters such as screen size, cursor shape, and video mode. It does
@@ -174,18 +176,19 @@ C<TDisplay> is not an object-oriented class. It must not be instantiated.
 All interaction is performed via class method calls of the form
 C<< TDisplay->method >>.
 
-This module is primarily used internally by C<TScreen> and related driver
-components.
+This module is primarily used internally by L<TScreen|TUI::Drivers::Screen> and 
+related driver components.
 
 =head2 Commonly Used Features
 
 Most code interacts with C<TDisplay> through class-style calls to query and
-control the terminal state: C<getCols()>, C<getRows()>, C<getCrtMode()>,
-C<setCrtMode()>, C<getCursorType()>, C<setCursorType()>, and C<clearScreen()>.
+control the terminal state: L</getCols>, L</getRows>, L</getCrtMode>,
+L</setCrtMode>, L</getCursorType>, L</setCursorType>, and L</clearScreen>.
 
-C<TDisplay> is a thin abstraction over C<THardwareInfo> and is generally used
-inside the driver stack (for example C<TScreen>) rather than directly in
-application dialogs or views. The C<updateIntlChars()> routine adjusts frame,
+C<TDisplay> is a thin abstraction over 
+L<THardwareInfo|TUI::Drivers::HardwareInfo> and is generally used inside the 
+driver stack (for example L<TScreen|TUI::Drivers::Screen>) rather than directly 
+in application dialogs or views. The L</updateIntlChars> routine adjusts frame,
 scrollbar, and desktop drawing characters based on the active code page.
 
 =head1 METHODS
@@ -240,8 +243,8 @@ Updates the display's international character mappings.
 
 =head1 SEE ALSO
 
-L<TUI::Drivers::Screen>,
-L<TUI::Drivers::HardwareInfo>
+L<TScreen|TUI::Drivers::Screen>,
+L<THardwareInfo|TUI::Drivers::HardwareInfo>
 
 =head1 AUTHORS
 

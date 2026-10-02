@@ -1,4 +1,4 @@
-requires 'perl', '5.010001';
+requires 'perl', '5.014000';
 requires 'Redis';
 
 on 'test' => sub {
@@ -12,8 +12,6 @@ on 'test' => sub {
 };
 
 on 'develop' => sub {
-   requires 'JSON';
-   requires 'Furl';
    requires 'Test::Kwalitee';
    requires 'Test::Kwalitee::Extra';
 };

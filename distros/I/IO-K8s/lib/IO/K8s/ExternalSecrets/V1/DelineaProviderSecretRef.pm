@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::DelineaProviderSecretRef;
 # ABSTRACT: ClientSecret is the secret part of the credential.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s secretRef => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::DelineaProviderSecretRef - ClientSecret is the sec
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 secretRef
 

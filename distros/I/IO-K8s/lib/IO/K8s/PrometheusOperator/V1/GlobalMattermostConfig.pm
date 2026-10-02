@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::GlobalMattermostConfig;
 # ABSTRACT: mattermost defines the default Mattermost Config
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s webhookURL => 'Core::V1::ConfigMapKeySelector';
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::GlobalMattermostConfig - mattermost defines the
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 webhookURL
 

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::AlertmanagerWebSpec;
 # ABSTRACT: web defines the web command line flags when starting Alertmanager.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s getConcurrency => Int, { minimum => 0 };
@@ -26,7 +26,7 @@ IO::K8s::PrometheusOperator::V1::AlertmanagerWebSpec - web defines the web comma
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 getConcurrency
 

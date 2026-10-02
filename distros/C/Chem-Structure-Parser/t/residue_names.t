@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # aa3to1(), res1() and res_type() -- the residue name table in the XS.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Chem::Structure::Parser;

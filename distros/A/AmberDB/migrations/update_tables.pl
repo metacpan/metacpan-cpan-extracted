@@ -9,10 +9,9 @@ use 5.016;
 use strict;
 use warnings;
 
-$| = 1; # Autoflush STDOUT immediately
 use Getopt::Long qw(GetOptions);
 use FindBin;
-BEGIN { require "$FindBin::Bin/../lib/init.pl"; }
+use lib "$FindBin::Bin/../lib";
 use AmberDB;
 use AmberDB::Tools;
 

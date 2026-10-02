@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate;
 # ABSTRACT: PersistentVolumeClaimTemplate
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s metadata => '+IO::K8s::AgentSandbox::V1beta1::EmbeddedObjectMetadata';
@@ -22,7 +22,7 @@ IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate - PersistentVolume
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 metadata
 

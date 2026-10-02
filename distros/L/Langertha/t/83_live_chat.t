@@ -12,9 +12,12 @@ BEGIN {
   push @available, 'anthropic'    if $ENV{TEST_LANGERTHA_ANTHROPIC_API_KEY};
   push @available, 'gemini'       if $ENV{TEST_LANGERTHA_GEMINI_API_KEY};
   push @available, 'groq'         if $ENV{TEST_LANGERTHA_GROQ_API_KEY};
+  push @available, 'hetzner'      if $ENV{TEST_LANGERTHA_HETZNER_API_KEY};
   push @available, 'mistral'      if $ENV{TEST_LANGERTHA_MISTRAL_API_KEY};
   push @available, 'deepseek'     if $ENV{TEST_LANGERTHA_DEEPSEEK_API_KEY};
   push @available, 'minimax'      if $ENV{TEST_LANGERTHA_MINIMAX_API_KEY};
+  push @available, 'moonshot'     if $ENV{TEST_LANGERTHA_MOONSHOT_API_KEY};
+  push @available, 'xai'          if $ENV{TEST_LANGERTHA_XAI_API_KEY};
   push @available, 'perplexity'   if $ENV{TEST_LANGERTHA_PERPLEXITY_API_KEY};
   push @available, 'cerebras'     if $ENV{TEST_LANGERTHA_CEREBRAS_API_KEY};
   push @available, 'openrouter'   if $ENV{TEST_LANGERTHA_OPENROUTER_API_KEY};
@@ -63,7 +66,7 @@ if ($ENV{TEST_LANGERTHA_OPENAI_API_KEY}) {
   require Langertha::Engine::OpenAI;
   test_chat('OpenAI', Langertha::Engine::OpenAI->new(
     api_key => $ENV{TEST_LANGERTHA_OPENAI_API_KEY},
-    model => 'gpt-4o-mini',
+    model => 'gpt-5.6-terra',
   ));
 }
 
@@ -81,7 +84,7 @@ if ($ENV{TEST_LANGERTHA_GEMINI_API_KEY}) {
   require Langertha::Engine::Gemini;
   test_chat('Gemini', Langertha::Engine::Gemini->new(
     api_key => $ENV{TEST_LANGERTHA_GEMINI_API_KEY},
-    model => 'gemini-2.5-flash',
+    model => 'gemini-3.5-flash',
   ));
 }
 
@@ -91,6 +94,16 @@ if ($ENV{TEST_LANGERTHA_GROQ_API_KEY}) {
   test_chat('Groq', Langertha::Engine::Groq->new(
     api_key => $ENV{TEST_LANGERTHA_GROQ_API_KEY},
     model => 'llama-3.3-70b-versatile',
+  ));
+}
+
+# --- Hetzner ---
+if ($ENV{TEST_LANGERTHA_HETZNER_API_KEY}) {
+  require Langertha::Engine::Hetzner;
+  my $hetzner_model = $ENV{TEST_LANGERTHA_HETZNER_MODEL} || 'Qwen/Qwen3.6-35B-A3B-FP8';
+  test_chat("Hetzner/$hetzner_model", Langertha::Engine::Hetzner->new(
+    api_key => $ENV{TEST_LANGERTHA_HETZNER_API_KEY},
+    model => $hetzner_model,
   ));
 }
 
@@ -107,7 +120,7 @@ if ($ENV{TEST_LANGERTHA_DEEPSEEK_API_KEY}) {
   require Langertha::Engine::DeepSeek;
   test_chat('DeepSeek', Langertha::Engine::DeepSeek->new(
     api_key => $ENV{TEST_LANGERTHA_DEEPSEEK_API_KEY},
-    model => 'deepseek-chat',
+    model => 'deepseek-flash',
   ));
 }
 
@@ -116,6 +129,27 @@ if ($ENV{TEST_LANGERTHA_MINIMAX_API_KEY}) {
   require Langertha::Engine::MiniMax;
   test_chat('MiniMax', Langertha::Engine::MiniMax->new(
     api_key => $ENV{TEST_LANGERTHA_MINIMAX_API_KEY},
+  ));
+}
+
+# --- Moonshot (Kimi) ---
+if ($ENV{TEST_LANGERTHA_MOONSHOT_API_KEY}) {
+  require Langertha::Engine::Moonshot;
+  test_chat('Moonshot', Langertha::Engine::Moonshot->new(
+    api_key => $ENV{TEST_LANGERTHA_MOONSHOT_API_KEY},
+  ));
+
+  require Langertha::Engine::MoonshotAnthropic;
+  test_chat('MoonshotAnthropic', Langertha::Engine::MoonshotAnthropic->new(
+    api_key => $ENV{TEST_LANGERTHA_MOONSHOT_API_KEY},
+  ));
+}
+
+# --- XAI (Grok) ---
+if ($ENV{TEST_LANGERTHA_XAI_API_KEY}) {
+  require Langertha::Engine::XAI;
+  test_chat('XAI', Langertha::Engine::XAI->new(
+    api_key => $ENV{TEST_LANGERTHA_XAI_API_KEY},
   ));
 }
 
@@ -138,7 +172,7 @@ if ($ENV{TEST_LANGERTHA_CEREBRAS_API_KEY}) {
 # --- OpenRouter (use :free model) ---
 if ($ENV{TEST_LANGERTHA_OPENROUTER_API_KEY}) {
   require Langertha::Engine::OpenRouter;
-  my $model = $ENV{TEST_LANGERTHA_OPENROUTER_MODEL} || 'meta-llama/llama-3.3-70b-instruct:free';
+  my $model = $ENV{TEST_LANGERTHA_OPENROUTER_MODEL} || 'google/gemma-4-26b-a4b-it:free';
   test_chat("OpenRouter/$model", Langertha::Engine::OpenRouter->new(
     api_key => $ENV{TEST_LANGERTHA_OPENROUTER_API_KEY},
     model => $model,

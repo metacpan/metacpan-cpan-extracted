@@ -1,0 +1,13 @@
+.git
+.codex
+Langertha-Raider-*
+*.tar.gz
+!Langertha-Raider-*.tar.gz
+.build
+_build
+blib
+pm_to_blib
+.raider_history
+local
+.carton
+carton.lock

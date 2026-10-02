@@ -33,7 +33,7 @@
 #
 # Set STRUCTURE_INFO_PYTHON to a python that can import mdtraj and numpy to run
 # the live half as well; /home/con/.pyenv/versions/3.14.2/bin/python3 is one.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;

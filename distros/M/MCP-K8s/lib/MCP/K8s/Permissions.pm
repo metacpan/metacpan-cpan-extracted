@@ -1,6 +1,6 @@
 package MCP::K8s::Permissions;
 # ABSTRACT: RBAC discovery and permission checking for Kubernetes
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 use Carp qw( croak );
 use Scalar::Util qw( weaken );
@@ -77,9 +77,13 @@ sub _discover_namespace {
     my @resources = @{ $rule->resources // [] };
 
     for my $resource (@resources) {
-      # Skip subresources except pods/log which we handle specifically
-      next if $resource =~ m{/} && $resource ne 'pods/log';
-
+      # Subresources (pods/log, deployments/status, ...) are kept. RBAC treats
+      # them as resources in their own right — patch on 'deployments' does not
+      # grant patch on 'deployments/status' — so can_do has to be able to see
+      # them, or a correctly narrow Role gets a false denial. They can never
+      # collide with a base plural: a subresource name always contains '/'.
+      # Filtering happens on the presentation side instead, in
+      # L</allowed_resources>, which is what feeds the tool descriptions.
       for my $verb (@verbs) {
         $ns_rules{$resource}{$verb} = 1;
         # Wildcard verb means all standard verbs
@@ -261,7 +265,7 @@ MCP::K8s::Permissions - RBAC discovery and permission checking for Kubernetes
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -306,7 +310,17 @@ when a service account lacks the required permissions.
 B<Wildcard handling:> The C<*> wildcard in verbs or resources is expanded
 at discovery time. A rule with C<verbs: ["*"]> grants all standard Kubernetes
 verbs (get, list, watch, create, update, patch, delete). A rule with
-C<resources: ["*"]> grants access to all resource types.
+C<resources: ["*"]> grants access to all resource types — subresources
+included, as in Kubernetes itself.
+
+B<Subresources:> Entries like C<pods/log> or C<deployments/status> are kept
+in the map exactly as the API server reports them, because RBAC treats them
+as resources in their own right: C<patch> on C<deployments> does not grant
+C<patch> on C<deployments/status>. Callers therefore ask for the full name —
+C<< $perms->can_do('patch', 'deployments/status', $ns) >>. They cannot
+collide with a base plural, which never contains a C</>. Presentation is
+where they are filtered out again: L</allowed_resources> omits them, so the
+tool descriptions built from it stay about main endpoints.
 
 =head2 api
 

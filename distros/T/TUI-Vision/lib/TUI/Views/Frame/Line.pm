@@ -1,10 +1,11 @@
 package TUI::Views::Frame::Line;
 # ABSTRACT: TFrame frameLine member function.
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -95,7 +96,7 @@ TUI::Views::Frame::Line - TFrame frameLine member function.
 
 TFrame frameLine member functions.
 
-The content was taken from the framework
+The content was ported from the framework
 "A modern port of Turbo Vision 2.0", which is licensed under MIT license.
 
 =head1 SEE ALSO

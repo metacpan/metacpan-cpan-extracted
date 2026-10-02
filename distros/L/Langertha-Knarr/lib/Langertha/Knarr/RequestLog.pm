@@ -1,5 +1,5 @@
 package Langertha::Knarr::RequestLog;
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 # ABSTRACT: Local disk logging of proxy requests
 use Moo;
 use Time::HiRes qw( gettimeofday tv_interval );
@@ -7,6 +7,14 @@ use Scalar::Util qw( blessed );
 use JSON::MaybeXS ();
 use File::Spec;
 use Log::Any qw( $log );
+use Langertha::Knarr::Image;
+use Langertha::Knarr::Tracing;
+
+# The JSONL log is the running operational record, not the detailed trace, so
+# tool-call arguments are capped: enough to see what was called, without
+# spilling large or user-data-bearing payloads onto disk on every request.
+# The full arguments live in the Langfuse trace (see Langertha::Knarr::Tracing).
+my $ARG_PREVIEW_MAX = 200;
 
 
 has config => (
@@ -65,6 +73,29 @@ sub _build__json_pretty {
   return JSON::MaybeXS->new(utf8 => 1, convert_blessed => 1, pretty => 1, canonical => 1);
 }
 
+# Sequence number of the next per-request file of this process.
+has _file_seq => (
+  is      => 'rw',
+  default => 0,
+);
+
+sub _next_file_seq {
+  my ($self) = @_;
+  return $self->_file_seq( $self->_file_seq + 1 );
+}
+
+has _json_compact => (
+  is      => 'lazy',
+  builder => '_build__json_compact',
+);
+
+# Character-string (no utf8) canonical encoder used only to render a stable
+# preview of tool-call arguments; the preview then rides inside the entry that
+# _json / _json_pretty encode to bytes.
+sub _build__json_compact {
+  return JSON::MaybeXS->new(canonical => 1, convert_blessed => 1);
+}
+
 sub _timestamp {
   my ($s, $us) = gettimeofday;
   my @t = gmtime($s);
@@ -78,12 +109,56 @@ sub _timestamp {
 # warns, the whole log entry would silently disappear. A plain hashref (the
 # shape end_request's own SYNOPSIS documents) passes through untouched; an
 # object we cannot flatten is dropped rather than costing the entry.
+# The canonical counts keep their meaning; prompt-cache tokens ride beside
+# them as cached_tokens / cache_write_tokens when not zero, split the way
+# the Langfuse trace splits them (k65), so nothing is counted twice (k71).
+# A usage that counts no token at all is no usage, not a 0/0/0.
 sub _usage_hash {
   my ($u) = @_;
   return undef unless defined $u;
-  return $u->to_hash if blessed($u) && $u->can('to_hash');
+  if ( blessed($u) && $u->can('to_hash') ) {
+    my $counts = Langertha::Knarr::Tracing::_usage_hash($u) or return undef;
+    return {
+      %{ $u->to_hash },
+      $counts->{input_cached_tokens}  ? ( cached_tokens      => $counts->{input_cached_tokens} )  : (),
+      $counts->{input_cache_creation} ? ( cache_write_tokens => $counts->{input_cache_creation} ) : ()
+    };
+  }
   return $u if ref($u) eq 'HASH';
   return undef;
+}
+
+# Trim the response's tool calls for the JSONL entry: tool name + call id plus
+# an arguments preview capped at $ARG_PREVIEW_MAX characters. The full
+# arguments are recorded in the Langfuse trace instead.
+sub _tool_calls_trimmed {
+  my ($self, $tcs) = @_;
+  return undef unless ref $tcs eq 'ARRAY' && @$tcs;
+  my @out;
+  for my $tc (@$tcs) {
+    my ($id, $name, $args);
+    if ( blessed($tc) ) {
+      $id   = $tc->can('id')        ? $tc->id        : undef;
+      $name = $tc->can('name')      ? $tc->name      : undef;
+      $args = $tc->can('arguments') ? $tc->arguments : undef;
+    }
+    elsif ( ref $tc eq 'HASH' ) {
+      ($id, $name, $args) = @{$tc}{qw( id name arguments )};
+    }
+    else { next }
+    my $preview = ref $args      ? $self->_json_compact->encode($args)
+                : defined $args  ? "$args"
+                :                  '';
+    my $truncated = length($preview) > $ARG_PREVIEW_MAX ? \1 : \0;
+    $preview = substr( $preview, 0, $ARG_PREVIEW_MAX ) if ${$truncated};
+    push @out, {
+      id        => $id,
+      name      => $name,
+      arguments => $preview,
+      truncated => $truncated,
+    };
+  }
+  return @out ? \@out : undef;
 }
 
 sub _file_timestamp {
@@ -106,7 +181,8 @@ sub start_request {
     engine    => $opts{engine},
     path      => $opts{path},
     stream    => $opts{stream} ? \1 : \0,
-    messages  => $opts{messages},
+    # Image objects (k33) carry no TO_JSON; the log writes plain parts.
+    messages  => Langertha::Knarr::Image::plain_messages( $opts{messages} ),
     params    => $opts{params},
   };
 }
@@ -130,6 +206,7 @@ sub end_request {
     params      => $handle->{params},
     output      => $opts{output},
     usage       => _usage_hash( $opts{usage} ),
+    tool_calls  => $self->_tool_calls_trimmed( $opts{tool_calls} ),
     duration_ms => $duration_ms,
     status      => $opts{error} ? 'error' : 'ok',
     error       => $opts{error},
@@ -145,7 +222,12 @@ sub _write_jsonl {
     open my $fh, '>>', $self->log_file
       or die "Cannot open log file " . $self->log_file . ": $!";
     flock($fh, 2); # LOCK_EX
-    print $fh $self->_json->encode($entry) . "\n";
+    # One write(2) on the O_APPEND handle: lines from several workers
+    # (k51) never interleave.
+    my $line = $self->_json->encode($entry) . "\n";
+    my $written = syswrite( $fh, $line );
+    die "Short write to log file " . $self->log_file . ": " . ( $! || 'partial line' )
+      unless defined $written && $written == length $line;
     close $fh;
   };
   if ($@) {
@@ -168,7 +250,10 @@ sub _write_file {
     $model  =~ s/[^a-zA-Z0-9._-]/_/g;
     $format =~ s/[^a-zA-Z0-9._-]/_/g;
 
-    my $filename = _file_timestamp() . "_${format}_${model}.json";
+    # pid and a per-process sequence number: two requests finishing in the
+    # same millisecond, in one worker or in two (k51), get two files.
+    my $filename = _file_timestamp() . '_' . $$ . '-' . $self->_next_file_seq
+      . "_${format}_${model}.json";
     my $path = File::Spec->catfile($dir, $filename);
 
     open my $fh, '>', $path
@@ -196,7 +281,7 @@ Langertha::Knarr::RequestLog - Local disk logging of proxy requests
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -243,12 +328,17 @@ C<log_dir> settings.
 
 Path to the JSONL log file. One JSON object per line, suitable for
 C<tail -f knarr.jsonl | jq>. Resolved from C<logging.file> in config or
-C<KNARR_LOG_FILE> environment variable.
+C<KNARR_LOG_FILE> environment variable. Several workers (C<knarr start -w>)
+append to the same file: each line goes out as one write under an
+exclusive lock, so lines never interleave.
 
 =head2 log_dir
 
 Path to a directory for per-request JSON files. Each request produces a
-pretty-printed C<{timestamp}_{format}_{model}.json> file. Resolved from
+pretty-printed C<{timestamp}_{pid}-{seq}_{format}_{model}.json> file, e.g.
+C<20260929_201530_123_4711-1_openai_gpt-4o.json>: the process id and a
+sequence number counted per process keep requests that finish in the same
+millisecond -- in one process or in several workers -- in separate files. Resolved from
 C<logging.dir> in config or C<KNARR_LOG_DIR> environment variable.
 
 =head2 start_request
@@ -281,8 +371,18 @@ Does nothing when C<$handle> is C<undef> (logging was disabled at start).
 
 C<usage> takes a L<Langertha::Usage> (the shape every routed response
 carries) or a plain hashref. Objects are flattened with C<to_hash> to
-C<input_tokens> / C<output_tokens> / C<total_tokens>; hashrefs are logged
-verbatim.
+C<input_tokens> / C<output_tokens> / C<total_tokens>, plus C<cached_tokens>
+(prompt-cache reads) and C<cache_write_tokens> (prompt-cache writes) when
+the request had any; those are informational, the three canonical counts
+are unchanged. An object that counts no token is logged as C<null>.
+Hashrefs are logged verbatim.
+
+C<tool_calls> takes the response's L<Langertha::ToolCall> list and is logged
+B<trimmed>: each call keeps its C<name> and C<id> plus an C<arguments> preview
+capped at 200 characters (C<truncated> flags whether it was cut). The full
+arguments are recorded in the Langfuse trace instead (see
+L<Langertha::Knarr::Tracing/end_trace>), because the JSONL log is the running
+operational record and tool arguments can be large or carry user data.
 
 =head1 SEE ALSO
 

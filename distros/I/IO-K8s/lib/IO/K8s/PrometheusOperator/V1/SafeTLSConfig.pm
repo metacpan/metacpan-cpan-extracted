@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::SafeTLSConfig;
 # ABSTRACT: tlsConfig defines the TLS configuration to use when connecting to the OAuth2 server.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s ca                 => '+IO::K8s::PrometheusOperator::V1::SecretOrConfigMap';
@@ -32,7 +32,7 @@ IO::K8s::PrometheusOperator::V1::SafeTLSConfig - tlsConfig defines the TLS confi
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 ca
 

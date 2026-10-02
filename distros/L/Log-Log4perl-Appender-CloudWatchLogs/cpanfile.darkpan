@@ -1,0 +1,1 @@
+requires 'Amazon::API::CloudWatchLogs', '>=1.43.90';

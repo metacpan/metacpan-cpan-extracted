@@ -9,7 +9,7 @@ use Game::Xiangqi::Engine;
 use Game::Xiangqi::Bot;
 use Game::Xiangqi::Terminal;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 exit main(@ARGV) unless caller;
 

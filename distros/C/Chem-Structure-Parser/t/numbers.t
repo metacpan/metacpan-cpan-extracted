@@ -15,7 +15,7 @@
 # The eight six-decimal cases after the fixed shapes are the first eight that
 # perlbrew's 5.44.0-i686 (gcc -m32, FLT_EVAL_METHOD 2, NV double) read one ulp
 # off strtod() before the fast path learned to leave fractions alone there.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Chem::Structure::Parser;

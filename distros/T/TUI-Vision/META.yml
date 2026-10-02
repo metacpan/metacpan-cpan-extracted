@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,45 +21,61 @@ no_index:
     - t
     - inc
 provides:
+  PerlX::Assert::PP:
+    file: lib/PerlX/Assert/PP.pm
+    version: '0.04'
   TUI::App:
     file: lib/TUI/App.pm
-    version: v2.0.1
+    version: v2.0.2
+  TUI::ColorSel:
+    file: lib/TUI/ColorSel.pm
+    version: v2.0.2
   TUI::Dialogs:
     file: lib/TUI/Dialogs.pm
-    version: v2.0.1
+    version: v2.0.2
   TUI::Drivers:
     file: lib/TUI/Drivers.pm
-    version: v2.0.1
+    version: v2.0.2
+  TUI::Editors:
+    file: lib/TUI/Editors.pm
+    version: v2.0.2
   TUI::Gadgets:
     file: lib/TUI/Gadgets.pm
-    version: v2.0.1
+    version: v2.0.2
+  TUI::Help:
+    file: lib/TUI/Help.pm
+    version: v2.0.2
   TUI::Memory:
     file: lib/TUI/Memory.pm
-    version: v2.0.1
+    version: v2.0.2
   TUI::MsgBox:
     file: lib/TUI/MsgBox.pm
-    version: v2.0.1
+    version: v2.0.2
   TUI::Objects:
     file: lib/TUI/Objects.pm
-    version: v2.0.1
+    version: v2.0.2
   TUI::StdDlg:
     file: lib/TUI/StdDlg.pm
-    version: v2.0.1
+    version: v2.0.2
   TUI::TextView:
     file: lib/TUI/TextView.pm
-    version: v2.0.1
+    version: v2.0.2
   TUI::Validate:
     file: lib/TUI/Validate.pm
-    version: v2.0.1
+    version: v2.0.2
   TUI::Views:
     file: lib/TUI/Views.pm
-    version: v2.0.1
+    version: v2.0.2
   TUI::Vision:
     file: lib/TUI/Vision.pm
-    version: v2.0.1
+    version: v2.0.2
   TUI::toolkit:
     file: lib/TUI/toolkit.pm
-    version: v2.0.1
+    version: v2.0.2
+recommends:
+  PerlX::Assert: '0.905'
+  Sub::Util: '1.40'
+  Type::Params: '2.000001'
 requires:
   Carp: '1.01'
   Class::Struct: '0'
@@ -67,21 +83,17 @@ requires:
   Encode: '0'
   Import::Into: '1.002005'
   Importer: '0.026'
-  List::Util: '1.33'
   Module::Loaded: '0'
   Params::Check: '0'
-  Scalar::Util: '1.36'
+  Scalar::List::Utils: '1.36'
+  Termbox::PP: v0.6.0
+  Terminal::WCWidth: '0'
   UNIVERSAL::Object: '0.17'
-  Win32: '0.59'
-  Win32::API: '0.84'
-  Win32::Console: '0.10'
-  Win32::Console::PatchForRT33513: '0.008'
-  Win32API::File: '0.1101'
   autodie::Scope::Guard: '0'
-  perl: '5.010'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/brickpool/TUI-Vision/issues
-  homepage: http://brickpool.de
   repository: https://github.com/brickpool/TUI-Vision.git
-version: '2.000001'
+version: '2.000002'
+x_homepage: http://brickpool.de
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

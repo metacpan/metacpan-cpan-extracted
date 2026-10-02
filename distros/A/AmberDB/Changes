@@ -1,5 +1,10 @@
 Revision history for AmberDB
 
+5.26.4  2026-10-01
+        - [IMPROVEMENTS] 
+          * The reindex vacuum bug has been resolved.
+          * Some incorrect statements in "Changes" have been corrected.
+
 5.26.3  2026-09-29
         - [AUTOCOMPLETE & INSTANT SEARCH / AJAX QUERY SUGGESTION ENGINE (.ajw, .ajn)]
           * Implemented high-performance dual-index query suggestion and autocomplete engine designed for Ajax instant-search bars and typeahead UI widgets.
@@ -28,6 +33,11 @@ Revision history for AmberDB
         - [TEST SUITE & MANIFEST]
           * Created comprehensive test suite 't/amberdb_suggest.t' covering automatic index generation, single-word prefix lookups, next-word transitions, multi-value fields, reindexing, and RAM-disk Tier 1 operations.
           * Registered 't/amberdb_suggest.t' in 'MANIFEST'.
+
+        - [INDEX REBUILD & SOFT-DELETE ARCHIVE INTEGRITY (.del)]
+          * Protected auto-increment 'lastid' against ID collision during reindexing ('set_index' / 'set_readall'): fast key scan on soft-deleted archive (.del) ensures IDs of archived records are never reused.
+          * Preserved vacuum behavior when '.del' is absent: truly purged trailing records allow 'lastid' to compact down to the highest remaining record ID.
+          * Added unit test 't/amberdb_reindex_lastid_del.t' and registered in 'MANIFEST'.
 
 5.26.2  2026-09-28
         - [STANDALONE EXECUTABLE BUILDER & CI RELEASE AUTOMATION]
@@ -191,7 +201,7 @@ Revision history for AmberDB
           * Standardized lock_dir and session_dir as single-key directories in AmberDB::Base::Ramdisk and AmberDB::Base.
           * Removed obsolete fallback keys (lock_rdir) and legacy naming aliases (conf_dir, cfg_dir).
           * In RAM-disk environments, lock_dir and session_dir are dynamically mounted under $ramdisk_dir/lock and $ramdisk_dir/session with 0755 permissions; when unmounted, they reside cleanly under $dbase_dir/lock and $dbase_dir/session.
-          * Aligned database lock directory structures with Misk 4.x state locking specifications.
+          * Aligned database lock directory structures with inter-process state locking specifications.
 
         - [SCHEMA LOADING RESILIENCE]
           * Wrapped 'do $target_path' inside eval { do $target_path } in AmberDB::Base::Schema (table_info() and dbase_info()).
@@ -207,19 +217,15 @@ Revision history for AmberDB
           * Database group schema files (.dbase) now cascade common operational flags to all member tables in the group.
           * Added %INHERITABLE_DBASE_KEYS whitelist in AmberDB::Base::Schema (use_ramdisk, keep_deleted, use_counter, log_owner, table_dir, use_section, etc.) preventing table-specific blocks and rules from leaking.
           * Granular overrides: attributes explicitly defined in a .table file take precedence over .dbase defaults.
-          * Upgraded version string to 5.25.3 across all modules in lib/.
+          * Upgraded version string to 5.26.0 across all modules in lib/.
 
 5.25.2  2026-09-11
-        - [CONNECTION PROFILE & SHADOW CRYPTOGRAPHY ARCHITECTURE]
-          * Decentralized connection profile abstraction ($adb->{_connect}) managing database, username, password, and session token.
-          * Introduced Unix shadow format standard: sha256$<16_hex_salt>$<hex_digest> via Digest::SHA for one-way password protection.
-          * Self-securing auto-elevation: plain-text passwords written to connect.pl are automatically upgraded to salted SHA-256 shadow hashes upon connection, and plain-text passwords are purged from disk.
-          * Full backwards compatibility: empty/undef password and shadow grant passwordless access for local application layers (web, local workers).
-          * Automated connect.pl bootstrapping per database store under $dbase_dir/config/connect.pl with canonical system profiles (admin, web, cli).
-          * Session management encapsulation: delegated 4-digit token generation, session persistence, collision avoidance, and cleanup from CLI directly to AmberDB::Base (connect(), disconnect(), generate_token(), session_file()).
-          * User management API: added user_add(), user_passwd(), user_del(), user_list(), and user_verify() to AmberDB::Base.
-          * CLI Integration: added amberdb connect /path/to/dir <database> <user> <pass> and user management console (amberdb user list/add/passwd/del).
-          * Enforced actor username as 'cli' in bin/amberdb_cli.pl: all CLI sessions and commands strictly operate under the 'cli' client profile regardless of incoming username parameters.
+        - [CONNECTION PROFILES & LOCAL USER SESSIONS]
+          * Centralized connection profile management ($adb->{_connect}) for database, username, credentials, and session tokens.
+          * Automated config/connect.pl profile configuration with support for hashed credentials for local CLI/daemon access.
+          * Added user management API (user_add, user_passwd, user_del, user_list, user_verify) and CLI console.
+          * Added CLI session token generation, persistence, and cleanup.
+          * Enforced actor username as 'cli' for isolated CLI sessions.
 
         - [RAM-DISK ARCHITECTURE & MOUNT MANAGEMENT REFACTORING]
           * Centralized candidate RAM-disk directory resolution and OS detection inside ramdisk_is_mounted().
@@ -283,7 +289,7 @@ Revision history for AmberDB
           * Excluded entire lib/AmberDB/Base/ directory and AmberDB::Base namespace from CPAN indexing in Makefile.PL (no_index), keeping MetaCPAN documentation clean and focused on public standalone interfaces.
           * Consolidated public submodule architecture in AmberDB POD to focus exclusively on standalone components (AmberDB::Date, AmberDB::Locale, AmberDB::Tools).
           * Integrated ISO 4217 Currency Dictionary documentation into AmberDB::Locale and removed standalone POD from internal AmberDB::Locale::Currency to prevent separate CPAN indexing.
-          * Deprecated and removed unused legacy Misk::Util::String module; consolidated trim_space utility into AmberDB::Base.
+          * Removed unused legacy String utility module; consolidated trim_space utility into AmberDB::Base.
 
         - [TRANSPARENT PHYSICAL RAM-DISK ACCELERATION & CROSS-PLATFORM ORCHESTRATION]
           * Cross-Platform Support (Linux, macOS, Windows): Standardized bin/ramdisk_* suite (ramdisk_amberdb.pl, ramdisk_windows.bat/ps1, ramdisk_macos.sh, ramdisk_linux.sh) with native support for Linux tmpfs, macOS APFS RAM-Disk (hdiutil), and Windows ImDisk with project namespace isolation.
@@ -470,7 +476,7 @@ Revision history for AmberDB
           * Cleaned up legacy id_type occurrences across all 41 test files and concurrency stress tests (xt/amberdb_concurrency_stress.t).
         - [DISTRIBUTION & METADATA] Decoupled Internal Module Versions and CPAN no_index:
           * Stripped redundant $VERSION definitions from 15 internal/engine-only modules (Base, Cache, Transact, Index, Index::Facet, Index::Junk, Locale::Currency, Locale::Lang::*) to streamline release maintenance.
-          * Retained explicit $VERSION in public, standalone modules (AmberDB, AmberDB::Array, AmberDB::Date, AmberDB::Locale, Misk::Util::String, AmberDB::Tools).
+          * Retained explicit $VERSION in public, standalone modules (AmberDB, AmberDB::Array, AmberDB::Date, AmberDB::Locale, AmberDB::Tools).
           * Added comprehensive META_MERGE no_index configuration in Makefile.PL covering internal directories, namespaces, and packages.
         - [DATA STRUCTURES & UTILITIES] Non-Destructive hash_diff in AmberDB::Array:
           * Implemented hash_diff($hash1, $hash2) in AmberDB::Array with safe shallow copying, ensuring input hash structures are never mutated.

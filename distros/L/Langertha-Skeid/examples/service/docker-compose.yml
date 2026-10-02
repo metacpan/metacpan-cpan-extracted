@@ -1,0 +1,95 @@
+services:
+  openbao:
+    image: openbao/openbao:latest
+    container_name: skeid-openbao
+    restart: unless-stopped
+    environment:
+      # The image's default command is `server -dev`: in-memory storage, unsealed, KV v2 at
+      # secret/. Everything written into it is gone after a restart -- run skeid-init again.
+      # skeid-init authenticates with this same token; both read it from .env.
+      BAO_DEV_ROOT_TOKEN_ID: ${OPENBAO_ROOT_TOKEN:-skeid-dev-root-token}
+    ports:
+      - "5501:8200"
+    healthcheck:
+      test: ["CMD-SHELL", "bao status -address=http://127.0.0.1:8200"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    init: true
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: skeid-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: skeid
+      POSTGRES_USER: skeid
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-skeid_password_change_me}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5533:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skeid -d skeid"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # One-shot: AppRole, policy and provider keys. Runs in the openbao image because all it
+  # needs is the bao CLI. `docker compose run --rm skeid-init`
+  skeid-init:
+    image: openbao/openbao:latest
+    restart: "no"
+    depends_on:
+      openbao:
+        condition: service_healthy
+    environment:
+      BAO_ADDR: http://openbao:8200
+      BAO_TOKEN: ${OPENBAO_ROOT_TOKEN:-skeid-dev-root-token}
+      SKEID_GROQ_KEY: ${SKEID_GROQ_KEY:-}
+      SKEID_OPENAI_KEY: ${SKEID_OPENAI_KEY:-}
+      SKEID_ANTHROPIC_KEY: ${SKEID_ANTHROPIC_KEY:-}
+    volumes:
+      - ./init-skeid.sh:/init-skeid.sh:ro
+    entrypoint: ["/bin/sh", "/init-skeid.sh"]
+    profiles:
+      - init
+
+  skeid:
+    # The published image; set SKEID_IMAGE in .env to run a local build instead.
+    image: ${SKEID_IMAGE:-raudssus/langertha-skeid:latest}
+    container_name: skeid-proxy
+    restart: unless-stopped
+    # The image's STOPSIGNAL is SIGQUIT (graceful; flushes a write-behind usage store). Do not
+    # set stop_signal here. Streams longer than the 10 s default grace get SIGKILLed: add
+    # stop_grace_period when usage_store.flush_interval_ms is on.
+    depends_on:
+      openbao:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5591:8090"
+    environment:
+      # AppRole credentials printed by skeid-init. Both set => the OpenBao KeyBroker is wired;
+      # its token lives in memory only.
+      OPENBAO_ADDR: http://openbao:8200
+      OPENBAO_ROLE_ID: ${OPENBAO_ROLE_ID:-}
+      OPENBAO_SECRET_ID: ${OPENBAO_SECRET_ID:-}
+
+      # Named by skeid.yaml (admin.api_key_env, usage_store.password_env).
+      SKEID_ADMIN_API_KEY: ${SKEID_ADMIN_API_KEY:-change-me-in-prod}
+      SKEID_USAGE_DB_PASSWORD: ${POSTGRES_PASSWORD:-skeid_password_change_me}
+    volumes:
+      # Skeid runs as uid 10001 in the image: the file has to be readable for others.
+      - ./skeid.yaml:/etc/skeid/skeid.yaml:ro
+    healthcheck:
+      # perl and HTTP::Tiny (core) are in the image; curl is not guaranteed to be.
+      test: ["CMD", "perl", "-MHTTP::Tiny", "-e", "exit(HTTP::Tiny->new(timeout => 5)->get(q{http://127.0.0.1:8090/health})->{success} ? 0 : 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  postgres-data:

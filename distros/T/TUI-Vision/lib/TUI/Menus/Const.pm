@@ -1,10 +1,11 @@
 package TUI::Menus::Const;
 # ABSTRACT: constants for menu classes
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -71,15 +72,16 @@ TUI::Menus::Const - constants for menu components
 
 =head1 DESCRIPTION
 
-C<TUI::Menus::Const> defines constants used by TUI::Vision menu components.
+These module defines constants used by L<TUI::Vision> menu components.
 
 The constants in this module are grouped by purpose and exported via tag-based
 export groups. They are used by menu views, menu boxes, menu bars, and status
 lines to control appearance and menu action handling.
 
 This module only defines constants. The semantic meaning and practical usage of
-these constants is documented in higher-level modules such as C<TUI::Menus>,
-C<TMenuView>, C<TMenuBar>, and C<TStatusLine>.
+these constants is documented in higher-level modules such as 
+L<TMenuView|TUI::Menus::MenuView>, L<TMenuBar|TUI::Menus::MenuBar>, and 
+L<TStatusLine|TUI::Menus::StatusLine>.
 
 =head1 CONSTANTS
 
@@ -118,10 +120,10 @@ C<:all> - import all constants
 
 =head1 SEE ALSO
 
-L<TUI::Menus>,
-L<TUI::Menus::MenuView>,
-L<TUI::Menus::MenuBar>,
-L<TUI::Menus::StatusLine>
+L<Menus|TUI::Menus>,
+L<TMenuView|TUI::Menus::MenuView>,
+L<TMenuBar|TUI::Menus::MenuBar>,
+L<TStatusLine|TUI::Menus::StatusLine>
 
 =head1 AUTHORS
 

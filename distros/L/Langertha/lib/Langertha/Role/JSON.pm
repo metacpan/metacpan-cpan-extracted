@@ -1,9 +1,9 @@
 package Langertha::Role::JSON;
 # ABSTRACT: Role for JSON
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose::Role;
 use JSON::MaybeXS;
-use Encode qw( encode_utf8 );
+use Encode qw( encode_utf8 decode_utf8 );
 
 sub json { shift->_json }
 
@@ -14,12 +14,24 @@ sub decode_json_text {
 }
 
 
+sub encode_json_text {
+  my ( $self, $data ) = @_;
+  return decode_utf8( $self->_json->encode($data) );
+}
+
+
 
 has _json => (
   is => 'ro',
   lazy_build => 1,
 );
-sub _build__json { JSON::MaybeXS->new( utf8 => 1, canonical => 1 ) }
+# convert_blessed => 1 lets the encoder serialize the distribution's value
+# objects (Usage, Cost, Tool, ToolCall, ToolChoice, UsageRecord, ...) through
+# their TO_JSON, matching what those classes' POD calls "the house default".
+# Plain request bodies carry no blessed values, so this changes nothing for
+# them; it only turns a croak into a serialization when a caller hands a value
+# object to $engine->json. -- karr k120
+sub _build__json { JSON::MaybeXS->new( utf8 => 1, canonical => 1, convert_blessed => 1 ) }
 
 
 1;
@@ -36,7 +48,7 @@ Langertha::Role::JSON - Role for JSON
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head2 decode_json_text
 
@@ -50,14 +62,29 @@ UTF-8-encodes the text before delegating to it. Use this instead of
 C<< $self->json->decode >> whenever the source is Perl-Unicode rather
 than the raw HTTP body.
 
+=head2 encode_json_text
+
+    my $text = $engine->encode_json_text($data);
+
+The mirror of L</decode_json_text>: encodes C<$data> to a JSON I<character>
+string, for JSON that travels as a string value inside another JSON document
+or inside prompt text (a hermes tool prompt, AKI's C<chat_context>, a lifted
+structured-output C<content>). The request body is encoded to UTF-8 bytes
+exactly once, by L</json> at the transport; a nested value encoded to bytes
+here would be encoded a second time there. Same settings as L</json>
+(C<canonical>, C<convert_blessed>).
+
 =head2 json
 
     my $data = $engine->json->decode($json_string);
     my $json_string = $engine->json->encode($data);
 
-Returns the shared L<JSON::MaybeXS> instance configured with C<utf8> and
-C<canonical> encoding. Used internally by L<Langertha::Role::HTTP> and
-L<Langertha::Role::Streaming> for all JSON serialization.
+Returns the shared L<JSON::MaybeXS> instance configured with C<utf8>,
+C<canonical>, and C<convert_blessed> encoding. Used internally by
+L<Langertha::Role::HTTP> and L<Langertha::Role::Streaming> for all JSON
+serialization. C<convert_blessed> means the distribution's value objects
+(with their C<TO_JSON> methods) serialize through this encoder instead of
+croaking.
 
 =head1 SEE ALSO
 

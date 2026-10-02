@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -16,9 +16,8 @@ our @EXPORT = qw(
 );
 
 require bytes;
-use TUI::toolkit qw( signature );
+use TUI::toolkit qw( assert signature );
 use TUI::toolkit::Types qw(
-  is_Object
   :types
 );
 
@@ -31,21 +30,23 @@ sub new {    # $obj (%args)
     named => [
       data      => Str,               { optional => 1 },
       size      => PositiveOrZeroInt, { optional => 1 },
-      copy_from => Object,            { optional => 1 },
+      copy_from => ArrayLike,         { optional => 1 },
     ],
   );
   my ( $class, $args ) = $sig->( @_ );
-  my $data = "\0";
+  my @data = ( 0 );
   if ( defined $args->{data} && defined $args->{size} ) {
-    my $d   = $args->{data};
     my $len = $args->{size};
-    $data = pack( 'C'.'a' x $len, $len, unpack( '(a)*', $d ) );
+    $data[0] = $len;
+    @data[ 1 .. $len ] = unpack "(C)$len", $args->{data};
+    $_ //= 0 for @data;
   }
   elsif ( defined $args->{copy_from} ) {
     my $tp = $args->{copy_from};
-    $data = $$tp;
+    assert ( $tp->[0] == @$tp - 1 );
+    @data = @$tp;
   }
-  return bless \$data, $class;
+  return bless \@data, $class;
 }
 
 sub from {    # $obj ($tp|$d, $len)
@@ -60,7 +61,7 @@ sub from {    # $obj ($tp|$d, $len)
   else {
     state $sig = signature(
       method => 1,
-      pos    => [Object],
+      pos    => [ArrayLike],
     );
     my ( $class, $tp ) = $sig->( @_ );
     return $class->new( copy_from => $tp );
@@ -73,32 +74,30 @@ sub clone {    # $clone ($self)
     pos    => [],
   );
   my ( $self ) = $sig->( @_ );
-  my $data = $$self;
-  return bless \$data, ref $self;
+  my @data = @$self;
+  return bless \@data, ref $self;
 }
 
 sub assign {    # $self ($tp)
   state $sig = signature(
     method => 1,
-    pos    => [Object],
+    pos    => [ArrayLike],
   );
   my ( $self, $tp ) = $sig->( @_ );
-  $$self = $$tp;
+  assert ( $tp->[0] == @$tp - 1 );
+  @$self = @$tp;
   return $self;
 }
 
-sub at {    # $byte ($index)
+sub at {    # $entry ($index)
   state $sig = signature(
     method => 1,
     pos    => [Int],
   );
   my ( $self, $index ) = $sig->( @_ );
-  return ord bytes::substr( $$self, $index, 1 );
+  assert ( $index >= 0 && $index <= @$self );
+  return $self->[$index];
 }
-
-use overload
-  '@{}' => sub { [ unpack('C*', ${+shift}) ] },
-  fallback => 1;
 
 1
 
@@ -110,43 +109,58 @@ __END__
 
 TUI::Views::Palette - color palette representation based on string data
 
-=head1 HIERARCHY
-
-  TPalette (scalar-based type)
-    used by TView and derived classes
-
 =head1 SYNOPSIS
 
   use TUI::Views;
 
   my $palette = TPalette->new(
-    data => $data,
-    size => length($data)
+    data => "\x01\x02\x03",
+    size => 3,
   );
 
-  my $byte = $palette->at($index);
+  my $len   = $palette->at(0);  # 3
+  my $first = $palette->at(1);  # ord("\x01")
 
-  my @colors = @{$palette};
-  # @colors now contains the palette entries as integer values
+  my @entries = @{$palette};    # length-prefixed palette data
+
+  my $copy = TPalette->new(
+    copy_from => \@data
+  );
+
+  my @data = @{$copy};
+
+  my $other = TPalette->new(
+    copy_from => [
+      3,
+      TColorAttr->new( bios => 0x01 ),
+      TColorAttr->new( bios => 0x02 ),
+      TColorAttr->new( bios => 0x03 ),
+    ]
+  );
+
+  my @attr = @{$other};         # palette entries as TColorAttr objects
 
 =head1 DESCRIPTION
 
-C<TPalette> represents a color palette as used by TUI::Vision views. Unlike
-most TUI::Vision classes, C<TPalette> is not derived from C<TObject> and does
-not use a hash-based object layout. Instead, it is conceptually based on scalar
-string data.
+C<TPalette> represents a color palette as used by L<TUI::Vision> views. Unlike 
+most L<TUI::Vision> classes, C<TPalette> is not derived from 
+L<TObject|TUI::Objects::Object>.
 
-This design mirrors the original Turbo Vision definition, where C<TPalette> is
-simply a string type. Each character in the string represents a color entry.
-The Perl implementation preserves this model while providing a small set of
-object-style methods for convenience and compatibility.
+The original L<TUI::Vision> implementation stored a palette as a length-prefixed
+Pascal string. For compatibility, the Perl port preserves the same logical
+layout while using an array-based object representation internally:
+
+  [ count, entry1, entry2, ... ]
+
+Element C<[0]> contains the number of palette entries and palette data begins
+at index C<1>.
 
 Palette objects are typically created once and then shared or cloned by views
 that require color information.
 
-C<TPalette> supports array dereferencing through operator overloading.
-Dereferencing a palette as an array returns a list of byte values representing
-the palette entries.
+Palette entries are commonly integer attribute values obtained from string
+data, but may also be arbitrary objects such as instances of 
+L<TColorAttr|TUI::Drivers::ColorAttr>.
 
 =head1 CONSTRUCTOR
 
@@ -174,8 +188,8 @@ Number of entries in the palette (I<PositiveOrZeroInt>).
 
 =item copy_from
 
-Optional palette to copy data from. When provided, C<data> and C<size> are
-ignored (I<TPalette>).
+Optional palette to copy data from (I<TPalette>). Ignored when C<data> and 
+C<size> are provided.
 
 =back
 
@@ -187,7 +201,7 @@ ignored (I<TPalette>).
 Factory-style constructor using positional arguments.
 
 This constructor forwards to the internal implementation and is provided for
-compatibility with traditional Turbo Vision construction patterns.
+compatibility with traditional I<Turbo Vision> construction patterns.
 
 =head1 METHODS
 
@@ -199,7 +213,7 @@ Assigns the contents of another palette to this palette.
 
 =head2 at
 
-  my $byte = $palette->at($index);
+  my $entry = $palette->at($index);
 
 Returns the palette entry at the specified index as an integer value.
 
@@ -211,8 +225,8 @@ Creates and returns a clone of the palette.
 
 =head1 SEE ALSO
 
-L<TUI::Views::View>,
-L<TUI::Views::PaletteConst>
+L<TView|TUI::Views::View>,
+L<TPalette|TUI::Views::Palette>
 
 =head1 AUTHORS
 
@@ -224,11 +238,19 @@ L<TUI::Views::PaletteConst>
 
 =back
 
+=head1 CONTRIBUTORS
+
+=over
+
+=item * magiblot <magiblot@hotmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 1990-1994, 1997 by Borland International
 
-Copyright (c) 2021-2026 the L</AUTHORS> as listed above.
+Copyright (c) 2019-2026 the L</AUTHORS> and L</CONTRIBUTORS> as listed above.
 
 This software is licensed under the MIT license (see the LICENSE file, which is
 part of the distribution).

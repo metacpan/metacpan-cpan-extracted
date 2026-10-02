@@ -11,9 +11,9 @@ use Perinci::Object;
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-03'; # DATE
+our $DATE = '2026-09-25'; # DATE
 our $DIST = 'App-DownloadsDirUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our %SPEC;
 
@@ -103,6 +103,9 @@ MARKDOWN
             as => {
                 summary => 'Rename file',
                 schema => 'pathname::unix::basename*',
+                cmdline_aliases => {
+                    rename=>{},
+                },
             },
         },
         modify_meta => sub {
@@ -165,7 +168,7 @@ App::DownloadsDirUtils - Utilities related to downloads directories
 
 =head1 VERSION
 
-This document describes version 0.008 of App::DownloadsDirUtils (from Perl distribution App-DownloadsDirUtils), released on 2025-05-03.
+This document describes version 0.009 of App::DownloadsDirUtils (from Perl distribution App-DownloadsDirUtils), released on 2026-09-25.
 
 =head1 DESCRIPTION
 
@@ -1322,6 +1325,12 @@ Source repository is at L<https://github.com/perlancar/perl-App-DownloadsDirUtil
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
 =head1 CONTRIBUTING
 
 
@@ -1342,7 +1351,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

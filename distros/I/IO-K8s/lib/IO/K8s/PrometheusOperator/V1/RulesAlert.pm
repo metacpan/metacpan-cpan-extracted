@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::RulesAlert;
 # ABSTRACT: alert defines the parameters of the Prometheus rules' engine.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s forGracePeriod     => Str;
@@ -24,7 +24,7 @@ IO::K8s::PrometheusOperator::V1::RulesAlert - alert defines the parameters of th
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 forGracePeriod
 

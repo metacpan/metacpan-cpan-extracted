@@ -5,6 +5,10 @@ use 5.010;
 use strict;
 use warnings;
 
+our $VERSION = '2.000002';
+$VERSION =~ tr/_//d;
+our $AUTHORITY = 'cpan:BRICKPOOL';
+
 use Exporter 'import';
 our @EXPORT_OK = qw(
   findfirst
@@ -21,10 +25,7 @@ our %EXPORT_TAGS = (
   all => \@EXPORT_OK,
 );
 
-use Cwd qw(
-  getcwd
-  getdcwd
-);
+use Cwd qw( getcwd );
 use List::Util qw( min );
 use Scalar::Util qw(
   blessed
@@ -215,7 +216,7 @@ sub getcurdir {   # $int ($drive, $direc|undef)
     return -1 if $idx < 0 || $idx > 25;
 
     my $letter = chr( ord( 'A' ) + $idx );
-    my $full   = getdcwd( $letter . ':' );
+    my $full   = Cwd::getdcwd( $letter . ':' );
     return -1 if !defined( $full ) || $full eq '';
 
     $full =~ tr{\/}{\\};
@@ -230,7 +231,7 @@ sub getcurdir {   # $int ($drive, $direc|undef)
 
   return -1 unless $drive == 0 || ( $drive - 1 ) == getdisk();
 
-  my $cwd = getcwd();
+  my $cwd = Cwd::getcwd();
   return -1 unless length $cwd;
 
   $cwd =~ tr{/}{\\};
@@ -269,7 +270,7 @@ sub setdisk {    # $int ($drive)
     require Win32API::File;
     return -1 unless $drive >= 1 && $drive <= 26;
     my $letter = chr( ord( 'A' ) + $drive - 1 );
-	  Win32::SetCwd( "${letter}:\\" ) or return -1;
+    Win32::SetCwd( "${letter}:\\" ) or return -1;
     my $mask = Win32API::File::GetLogicalDrives();
     my $count = 0;
     $count++ while $mask &= $mask - 1;
@@ -304,8 +305,8 @@ TUI::StdDlg::Dir - directory and path utility functions
 
 =head1 DESCRIPTION
 
-C<TUI::StdDlg::Dir> provides a set of directory- and path-related utility
-functions compatible with the traditional Borland C/C++ runtime library.
+This module provides a set of directory- and path-related utility functions 
+compatible with the traditional Borland C/C++ runtime library API.
 
 The functions in this module are used by the standard dialog subsystem to
 perform directory traversal, path manipulation, and drive handling. Although
@@ -386,7 +387,7 @@ parameters are not treated as read-only.
 =head1 SEE ALSO
 
 L<TUI::StdDlg::Dos>,
-L<TUI::StdDlg::FindFirstRec>,
+L<FindFirstRec|TUI::StdDlg::FindFirstRec>,
 L<TUI::StdDlg::Util>
 
 =head1 AUTHORS

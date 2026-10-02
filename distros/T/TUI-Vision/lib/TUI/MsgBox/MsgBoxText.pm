@@ -1,5 +1,5 @@
 package TUI::MsgBox::MsgBoxText;
-# ABSTRACT: Message Box and Input Box functions for TVision
+# ABSTRACT: Message Box and Input Box functions for the framework
 
 use 5.010;
 use strict;
@@ -12,6 +12,10 @@ our @EXPORT_OK = qw(
   messageBoxRect
   inputBox
   inputBoxRect
+);
+
+our %EXPORT_TAGS = (
+  all => \@EXPORT_OK,
 );
 
 use Carp ();
@@ -82,6 +86,7 @@ my @Titles = (
 );
 
 sub messageBox {    # $command ($msg|$aOptions, $aOptions|$fmt, @list)
+  no warnings 'uninitialized';
   assert ( @_ >= 2 );
   my $r = TRect->new( ax => 0, ay => 0, bx => 40, by => 9 );
   $r->move(
@@ -149,7 +154,7 @@ sub messageBoxRect {    # $command ($r, $msg|$aOptions, $aOptions|$fmt, @list)
 
   $dialog->selectNext( false );
 
-  $ccode = $application->execView( $dialog );
+  $ccode = $application ? $application->execView( $dialog ) : cmCancel;
 
   TObject->destroy( $dialog );
 
@@ -256,16 +261,16 @@ TUI::MsgBox::MsgBoxText - message box and input box helper functions
 =head1 DESCRIPTION
 
 C<TUI::MsgBox::MsgBoxText> provides a set of convenience functions for 
-displaying simple message boxes and input dialogs in TUI::Vision applications.
+displaying simple message boxes and input dialogs in L<TUI::Vision> 
+applications.
 
-This module implements functional equivalents of the Turbo Vision
-C<inputBox>, C<messageBox>, and related helper routines found in the original
-demo sources.
+This module implements the common functional routines C<inputBox>, 
+C<messageBox> and other related helper routines.
 
 All functions in this module are implemented as plain subroutines. No objects
 are created or required.
 
-These functions may only be used within a running TUI::Vision application.
+These functions may only be used within a running L<TUI::Vision> application.
 
 =head1 VARIABLES
 
@@ -274,41 +279,41 @@ message boxes.
 
 =head2 $yesText
 
-Label text for the affirmative response button.
+Label text (I<Str>) for the affirmative response button.
 
 =head2 $noText
 
-Label text for the negative response button.
+Label text (I<Str>) for the negative response button.
 
 =head2 $okText
 
-Label text for the confirmation button.
+Label text (I<Str>) for the confirmation button.
 
 =head2 $cancelText
 
-Label text for the cancel action.
+Label text (I<Str>) for the cancel action.
 
 =head2 $warningText
 
-Title text used for warning message boxes.
+Title text (I<Str>) used for warning message boxes.
 
 =head2 $errorText
 
-Title text used for error message boxes.
+Title text (I<Str>) used for error message boxes.
 
 =head2 $informationText
 
-Title text used for informational message boxes.
+Title text (I<Str>) used for informational message boxes.
 
 =head2 $confirmText
 
-Title text used for confirmation message boxes.
+Title text (I<Str>) used for confirmation message boxes.
 
 =head1 FUNCTIONS
 
 =head2 inputBox
 
-  my $command = inputBox($title, $label, $string, $limit);
+  my $command = inputBox($title, $aLabel, $s, $limit);
 
 Displays a modal dialog containing a single input field.
 
@@ -318,13 +323,14 @@ Displays a modal dialog containing a single input field.
 
 Dialog window title (I<Str>).
 
-=item label
+=item aLabel
 
 Prompt text displayed next to the input field (I<Str>).
 
-=item string
+=item s
 
-Initial value of the input field. The value may be modified by the user.
+Initial value of the input field (I<Str>). The value may be modified by the 
+user.
 
 =item limit
 
@@ -336,7 +342,7 @@ Returns either C<cmOk> or C<cmCancel> depending on user selection.
 
 =head2 inputBoxRect
 
-  my $command = inputBoxRect($bounds, $title, $label, \$string, $limit);
+  my $command = inputBoxRect($bounds, $title, $aLabel, \@s, $limit);
 
 Identical to C<inputBox>, but allows explicit control over dialog position and
 size.
@@ -345,19 +351,19 @@ size.
 
 =item bounds
 
-Bounding rectangle of the dialog (I<TRect>).
+Bounding rectangle of the dialog (L<TRect|TUI::Objects::Rect>).
 
 =item title
 
 Dialog window title (I<Str>).
 
-=item label
+=item aLabel
 
 Prompt text displayed next to the input field (I<Str>).
 
-=item string
+=item s
 
-Scalar reference receiving the edited text.
+Reference receiving the edited text (I<ArrayLike>).
 
 =item limit
 
@@ -405,7 +411,7 @@ size.
 
 =item bounds
 
-Bounding rectangle of the message box (I<TRect>).
+Bounding rectangle of the message box (L<TRect|TUI::Objects::Rect>).
 
 =item message
 
@@ -481,14 +487,14 @@ C<mfOkCancel>
 
 =head1 IMPORTANT
 
-These functions require a running TUI::Vision application environment.
-They must not be used outside of a TUI::Vision program.
+These functions require a running L<TUI::Vision> application environment.
+They must not be used outside of a L<TUI::Vision> program.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::Dialog>,
-L<TUI::Dialogs::StaticText>,
-L<TUI::Dialogs::InputLine>
+L<TDialog|TUI::Dialogs::Dialog>,
+L<TStaticText|TUI::Dialogs::StaticText>,
+L<TInputLine|TUI::Dialogs::InputLine>
 
 =head1 AUTHORS
 

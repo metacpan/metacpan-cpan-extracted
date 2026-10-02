@@ -6,8 +6,8 @@ use strict;
 use Carp qw(croak cluck);
 use File::Spec;
 
-our $VERSION = '5.26.3';
-my $CREATED = '2018-10-08';
+our $VERSION = '5.26.4';
+my $CREATED  = '2018-10-08';
 
 sub new {
 
@@ -251,6 +251,16 @@ sub set_readall {
     if ( @all_records && $all_records[-1] > $cur_max ) {
         $cur_max = $all_records[-1];
     }
+
+    my $del_path = "$table_path.del";
+    if ( -e $del_path && $adb->table_read($del_path) ) {
+        $adb->recs_scan( $del_path, sub {
+            my ($k) = @_;
+            $cur_max = $k if $k > $cur_max;
+        } );
+        $adb->table_close($del_path);
+    }
+
     my $old_lastid = $adb->table_lastid($tableid) // 0;
     my $last_id = $cur_max > $old_lastid ? $cur_max : $old_lastid;
 

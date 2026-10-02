@@ -1,0 +1,63 @@
+# Langertha Perl::Critic configuration
+#
+# Adopted from the open PR (lmist:readiness/naming-consistency) and extended
+# with always-on, low-noise policies that pass clean on the current tree.
+#
+# Run locally:
+#   perlcritic --profile .perlcriticrc lib/ bin/ maint/
+
+# Default severity filter — show only violations at severity 5 or lower
+# (i.e. everything). The enabled policies below set their own severities.
+severity = 5
+
+# === Naming baseline (from the open PR) ===
+# Capitalization with Langertha exemptions:
+#   - vLLM brand (lowercase 'v' in the package name)
+#   - Moose lifecycle methods (BUILD, BUILDARGS, DEMOLISH, FOREIGNBUILDARGS, ...)
+#   - $VERSION and %ROLE_TO_CAPS (ALL_CAPS globals)
+[NamingConventions::Capitalization]
+package_exemptions = main vLLM
+subroutine_exemptions = AUTOLOAD BUILD BUILDARGS CLEAR CLOSE DELETE DEMOLISH DESTROY EXISTS EXTEND FETCH FETCHSIZE FIRSTKEY GETC NEXTKEY POP PRINT PRINTF PUSH READ READLINE SCALAR SHIFT SPLICE STORE STORESIZE TIEARRAY TIEHANDLE TIEHASH TIESCALAR UNSHIFT UNTIE WRITE FOREIGNBUILDARGS MODIFY_CODE_ATTRIBUTES MODIFY_DEFAULT_ATTRIBUTES
+global_variable_exemptions = \$VERSION @ISA @EXPORT(?:_OK)? %EXPORT_TAGS \$AUTOLOAD %ENV %SIG \$TODO %ROLE_TO_CAPS
+
+[NamingConventions::ProhibitAmbiguousNames]
+
+# === Always-on, low-noise policies ===
+[CodeLayout::ProhibitTrailingWhitespace]
+
+# Note: CodeLayout::RequireConsistentNewlineAtEndOfFile does not exist in
+# Perl::Critic 1.156. The closest sibling is RequireConsistentNewlines.
+[CodeLayout::RequireConsistentNewlines]
+
+[BuiltinFunctions::ProhibitStringyEval]
+
+# === Disabled core policies (not part of our baseline) ===
+# These policies fire on the current codebase but are out of scope for the
+# initial adoption. Each is documented below; see karr #69 for the why.
+[-InputOutput::RequireEncodingWithUTF8Layer]
+[-Subroutines::ProhibitExplicitReturnUndef]
+[-TestingAndDebugging::ProhibitNoStrict]
+[-TestingAndDebugging::RequireUseStrict]
+[-Variables::ProhibitConditionalDeclarations]
+
+# === Dropped policies (kept here for reference — see karr #69 for the why) ===
+#
+# [ControlStructures::ProhibitPostfixControls]    — 346 violations across the
+#     tree. Most are idiomatic one-liners in engine code. Deferred until the
+#     codebase is willing to absorb a wide-ranging cleanup.
+#
+# [Subroutines::ProhibitExplicitReturnUndef]      — 91 violations of
+#     `return undef;` across value objects (ToolChoice, ToolCall,
+#     CachedContent, ...). Convention is established; deferred. Disabled
+#     above so it does not pollute `perlcritic` output.
+#
+# [Subroutines::RequireFinalReturn]               — 150 violations, including
+#     `BUILD`/`DEMOLISH`/`import` and many `async sub`s from
+#     Future::AsyncAwait (which the policy doesn't understand). Deferred.
+#
+# [TestingAndDebugging::RequireUseStrict]         — 111 violations. Most files
+#     rely on `use Moose;` / `use Moose::Role;` to enable strictures; some
+#     place `our $VERSION` before `use strict;`. Disabled above; deferred.
+#
+# [TestingAndDebugging::RequireUseWarnings]        — 111 violations, same root
+#     cause as RequireUseStrict. Deferred.

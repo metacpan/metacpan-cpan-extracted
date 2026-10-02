@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -300,10 +300,10 @@ infrastructure required by terminal-style views.
 
 The class itself does not implement a concrete device. Instead, it defines a
 minimal interface for reading and writing text buffers that must be implemented
-by derived classes such as C<TTerminal>. In addition to the scrolling behavior
-inherited from C<TScroller>, C<TTextDevice> integrates with Perl's
-C<IO::Handle> interface and supports standard output methods such as
-C<print>, C<printf>, and C<say>.
+by derived classes such as L<TTerminal|TUI::TextView::Terminal>. In addition to 
+the scrolling behavior inherited from L<TScroller|TUI::Views::Scroller>, 
+C<TTextDevice> integrates with Perl's L<IO::Handle> interface and supports 
+standard output methods such as C<print>, C<printf>, and C<say>.
 
 Most input-related methods are implemented as stubs and return fixed values.
 Reading support must be provided explicitly by subclasses if required.
@@ -313,44 +313,55 @@ Reading support must be provided explicitly by subclasses if required.
 The following attributes are exposed as read-only accessors and are intended for
 internal use by the text device implementation.
 
-=over
+=head2 opened
 
-=item opened
-
-Indicates whether the device is considered open.  
+Indicates whether the device is considered open (I<Bool>).  
 This attribute defaults to true and is managed internally.
 
-=back
+=head1 CONSTRUCTOR
 
-The following attributes are private and not part of the public API. They are
-documented here for completeness only.
+This class does not define its own construction parameters and relies on the
+standard L<TScroller|TUI::Views::Scroller> initialization.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+  my $scroller = TTextDevice->new(
+    bounds     => $bounds,
+    hScrollBar => $hBar | undef,
+    vScrollBar => $vBar | undef,
+  );
+
+Creates a new scroller with the specified bounds and optional scroll bars.
 
 =over
 
-=item egress
+=item bounds
 
-Internal output buffer used for staged writes.
+Bounding rectangle of the scroller (L<TRect|TUI::Objects::Rect>).
 
-=item esize
+=item hScrollBar
 
-Size of the internal output buffer (default: 2048 bytes).
+Horizontal scroll bar associated with the scroller 
+(L<TScrollBar|TUI::Views::ScrollBar> or C<undef>).
 
-=item autoflush
+=item vScrollBar
 
-Boolean flag controlling whether output is flushed automatically after each
-write operation.
+Vertical scroll bar associated with the scroller 
+(L<TScrollBar|TUI::Views::ScrollBar> or C<undef>).
 
 =back
-
-=head1 METHODS
 
 =head2 new_TTextDevice
 
   my $device = new_TTextDevice($bounds, $aHScrollBar, $aVScrollBar);
 
-Factory constructor for creating a new C<TTextDevice> instance. This constructor
-delegates initialization to C<TScroller> and prepares the object for use as a
-text output device.
+Factory constructor for creating a new C<TTextDevice> instance. This 
+constructor delegates initialization to L<TScroller|TUI::Views::Scroller> and 
+prepares the object for use as a text output device.
+
+=head1 METHODS
 
 =head2 autoflush
 
@@ -395,8 +406,9 @@ Appends data to the device and forces an immediate flush.
 
   my $num | undef = $self->syswrite($scalar, | $length, | $offset);
 
-Writes raw data to the device. This method delegates the actual output operation
-to C<do_sputn> and mirrors the behavior of the original Turbo Vision runtime.
+Writes raw data to the device. This method delegates the actual output 
+operation to C<do_sputn> and mirrors the behavior of the original 
+I<Turbo Vision> runtime.
 
 =head2 flush
 
@@ -527,7 +539,8 @@ C<undef>.
 
 =head1 SEE ALSO
 
-L<TUI::TextView::Terminal>, L<TUI::Views::Scroller>
+L<TTerminal|TUI::TextView::Terminal>, 
+L<TScroller|TUI::Views::Scroller>
 
 =head1 AUTHORS
 

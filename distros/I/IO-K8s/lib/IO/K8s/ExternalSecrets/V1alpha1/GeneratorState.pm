@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::GeneratorState;
 # ABSTRACT: GeneratorState represents the state created and managed by a generator resource.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'generators.external-secrets.io/v1alpha1',
     resource_plural => 'generatorstates',
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1alpha1::GeneratorState - GeneratorState represents t
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

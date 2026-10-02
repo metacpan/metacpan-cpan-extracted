@@ -49,7 +49,7 @@
 # and not there.  The surfaces differ in fourteen by at most 0.23 A^2, one or
 # two sphere points, which is mdtraj's float32 kernel as t/data/features.py
 # discusses it.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

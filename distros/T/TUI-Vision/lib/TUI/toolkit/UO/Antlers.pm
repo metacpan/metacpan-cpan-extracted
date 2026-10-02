@@ -349,12 +349,12 @@ distribution.
 
 Similar to the L<fields> pragma, C<TUI::toolkit::UO::Antlers> declares 
 individual fields (stored in a global variable C<%HAS>). L<UNIVERSAL::Object> 
-is used as the base class, and access methods can be created using an C<has> 
+is used as the base class, and access methods can be created using an L</has> 
 keyword.
 
 This module also recognizes the superclasses of a class and ensures that their 
 fields are inherited correctly. Inheritance occurs automatically if you use 
-C<extends> to set up the class hierarchy.
+L</extends> to set up the class hierarchy.
 
 =head1 FUNCTIONS
 

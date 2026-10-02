@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::CRDProvider;
 # ABSTRACT: CRD configures this store to sync secrets from arbitrary Kubernetes resources, including both custom resources (CRDs) and core API resources.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s auth      => '+IO::K8s::ExternalSecrets::V1::KubernetesAuth';
@@ -28,7 +28,7 @@ IO::K8s::ExternalSecrets::V1::CRDProvider - CRD configures this store to sync se
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 auth
 

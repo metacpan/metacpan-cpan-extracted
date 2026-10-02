@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificateACMEStatus;
 # ABSTRACT: ACME stores information that is fetched from the ACME CA server.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s ari => '+IO::K8s::CertManager::V1::CertificateACMEARIStatus';
@@ -20,7 +20,7 @@ IO::K8s::CertManager::V1::CertificateACMEStatus - ACME stores information that i
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 ari
 

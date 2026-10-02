@@ -54,7 +54,7 @@ Module {
     name: 'libfoo'
 }
 
-@@ ffi/src/libfoo.v
+@@ ffi/libfoo.v
 This will not compile
 
 @@ ffi/libfoo.c

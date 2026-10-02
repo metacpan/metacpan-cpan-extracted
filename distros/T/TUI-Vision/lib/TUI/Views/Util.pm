@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -78,8 +78,8 @@ TUI::Views::Util - utility functions for views
 
 =head1 DESCRIPTION
 
-C<TUI::Views::Util> provides low-level utility functions used throughout the
-TUI::Vision view system.
+This module provides low-level utility functions used throughout the
+L<TUI::Vision> view system.
 
 The functions in this module operate on views and events and are intended to
 simplify common interaction patterns such as message dispatching and command
@@ -105,17 +105,17 @@ starting at the specified receiver.
 =item receiver
 
 The target view that receives the message. If C<undef>, the message is sent to
-the current view context. (TView | undef)
+the current view context. (I<TView> or undef)
 
 =item what
 
 The event type being sent. This is typically C<evMessage> or
-C<evBroadcast>. (Int)
+C<evBroadcast>. (I<Int>)
 
 =item command
 
 The command identifier associated with the message. This usually corresponds
-to a C<cmXXXX> constant. (Int)
+to a C<cmXXXX> constant. (I<Int>)
 
 =item infoPtr
 
@@ -124,14 +124,14 @@ message.
 
 This value may be used to pass a data structure, an object, or a reference to
 the sending view, depending on the semantics of the command.
-(Ref | undef)
+(I<Ref> or undef)
 
 =back
 
 =head1 USAGE NOTES
 
-The C<message> function is a convenience wrapper around the TUI::Vision event
-dispatch mechanism.
+The C<message> function is a convenience wrapper around the L<TUI::Vision> 
+event dispatch mechanism.
 
 Messages are delivered by invoking the C<handleEvent> method of the receiver.
 If the receiver does not handle the message, it may be propagated to child
@@ -140,14 +140,14 @@ views depending on the event type and view hierarchy.
 The return value indicates which view actually processed the message. This
 allows callers to detect whether a command was handled and by whom.
 
-This function is intended for use within a running TUI::Vision application.
+This function is intended for use within a running L<TUI::Vision> application.
 Calling it outside of a valid view context will have no useful effect.
 
 =head1 SEE ALSO
 
-L<TUI::Drivers::Event>,
-L<TUI::Views::View>,
-L<TUI::Views::Group>
+L<TEvent|TUI::Drivers::Event>,
+L<TView|TUI::Views::View>,
+L<TGroup|TUI::Views::Group>
 
 =head1 AUTHORS
 

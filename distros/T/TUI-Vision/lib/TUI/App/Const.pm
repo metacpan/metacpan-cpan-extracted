@@ -1,10 +1,11 @@
 package TUI::App::Const;
 # ABSTRACT: constants for TUI::App and related components
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -166,7 +167,7 @@ TUI::App::Const - constants for application-level components
 
 =head1 DESCRIPTION
 
-C<TUI::App::Const> defines constants used by TUI::Vision application-level
+This module defines constants used by L<TUI::Vision> application-level
 components such as the program object, application palettes, and help system.
 
 The constants in this module are grouped by purpose and exported via tag-based
@@ -174,8 +175,8 @@ export groups. They are used to control application appearance, help context
 selection, and palette configuration.
 
 This module only defines constants. The semantic meaning and practical usage of
-these constants is documented in higher-level modules such as C<TUI::App>,
-C<TProgram>, and C<TApplication>.
+these constants is documented in higher-level modules such as 
+L<TProgram|TUI::App::Program> or L<TApplication|TUI::App::Application>.
 
 =head1 CONSTANTS
 
@@ -226,9 +227,9 @@ C<:all> - import all constants
 
 =head1 SEE ALSO
 
-L<TUI::App>,
-L<TUI::App::Program>,
-L<TUI::App::Application>
+L<App|TUI::App>,
+L<TProgram|TUI::App::Program>,
+L<TApplication|TUI::App::Application>
 
 =head1 AUTHORS
 

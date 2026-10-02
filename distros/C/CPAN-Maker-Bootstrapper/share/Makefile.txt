@@ -196,8 +196,11 @@ endif
 
 DEPS += cpanfile.darkpan cpanm.darkpan
 
-cpanfile.darkpan cpanm.darkpan: requires
-	$(NO_ECHO)$(BOOTSTRAPPER) create-darkpan-requires; \
+cpanfile.darkpan cpanm.darkpan: requires $(wildcard darkpan.skip)
+	$(NO_ECHO)if [[ -e darkpan.skip ]]; then \
+	  filter="--filter darkpan.skip"; \
+	fi; \
+	$(BOOTSTRAPPER) create-darkpan-requires $$filter $<; \
 	$(BOOTSTRAPPER) extra-files . cpanfile.darkpan cpanm.darkpan; \
 	extra_files_skip=$$(mktemp); trap 'rm -f $$extra_files_skip' EXIT; \
 	touch extra-files.skip; \
@@ -393,8 +396,10 @@ CLEANFILES += \
     extra-files.mk \
     module.pm.tmpl \
     release-*.{lst,diffs} \
-    cpanfile.* \
-    *.darkpan
+    cpanfile.recommends \
+    cpanfile.requires \
+    cpanfile.runtime \
+    cpanfile.suggests
 
 .PHONY: clean-local
 clean-local::

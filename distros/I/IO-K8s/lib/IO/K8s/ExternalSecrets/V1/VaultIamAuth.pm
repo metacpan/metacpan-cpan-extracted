@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::VaultIamAuth;
 # ABSTRACT: Iam authenticates with vault by passing a special AWS request signed with AWS IAM credentials AWS IAM authentication method
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s externalID          => Str;
@@ -34,7 +34,7 @@ IO::K8s::ExternalSecrets::V1::VaultIamAuth - Iam authenticates with vault by pas
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 externalID
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 # ABSTRACT: Read a molecular structure file into a hash of hashes, sequences and all, using XS for the coordinate section
-require 5.010;
+require 5.010001;
 use strict;
 package Chem::Structure::Parser;
-our $VERSION = 0.036;
+our $VERSION = 0.037;
 require XSLoader;
 use warnings FATAL => 'all';
 # No `use autodie': it would ask every installer for a prerequisite in order to
@@ -154,13 +154,13 @@ sub structure_info {
 	die 'structure_info: no file name given' unless defined $file && length $file;
 	die "structure_info: '$file' does not exist"  unless -e $file;
 	die "structure_info: '$file' is a directory"  if -d $file;
-	# The format is worked out from the name with a .bz2 or .Z taken off, but
-	# only gzip is ever unpacked, so either of those was read as the raw bytes
-	# of a compressed file and came back as a structure with no atoms in it.
-	die "structure_info: '$file' is compressed with "
-	    . ($file =~ /\.bz2\z/i ? 'bzip2' : 'compress')
-	    . ', which this module does not unpack; gzip it, or unpack it first'
-		if $file =~ /\.(?:bz2|z)\z/i;
+	# The format is worked out from the name with a .Z taken off, but a .Z is
+	# never unpacked, so it was read as the raw bytes of a compressed file and
+	# came back as a structure with no atoms in it.  IO::Compress has no reader
+	# for compress(1)'s LZW.
+	die "structure_info: '$file' is compressed with compress, which this module "
+	    . 'does not unpack; gzip or bzip2 it, or unpack it first'
+		if $file =~ /\.z\z/i;
 	my $o   = _options(\%opt, 'structure_info');
 	my $fmt = defined $o->{format} ? _alias($o->{format}) : _detect_format($file);
 	my $reader = $READER{$fmt}
@@ -1671,25 +1671,49 @@ sub _sniff_format {
 
 sub _head {
 	my ($file) = @_;
-	my $text = _slurp_maybe_gzipped($file, 8192);
+	my $text = _slurp_maybe_compressed($file, 8192);
 	return $text;
 }
 
-# .gz is worth handling here: a directory of a few thousand structures is
-# usually kept compressed, and gunzipping into a temporary file first is both
-# slower and something the caller then has to clean up.
-sub _slurp_maybe_gzipped {
+# .gz and .bz2 are worth handling here: a directory of a few thousand
+# structures is usually kept compressed, and unpacking into a temporary file
+# first is both slower and something the caller then has to clean up.
+#
+# Both decompressors are IO::Compress, which is in core on every perl this
+# module installs on -- Bunzip2 joined it in 5.10.1, which is why that is the
+# minimum -- but which some vendors package apart from perl, so each is loaded
+# when a file needs it rather than asked of every installer.
+# The suffix is the whole of the rule: a file is unpacked because it is named
+# as compressed, and its name is what says how.
+my %UNPACK = (
+	gz  => { class => 'IO::Uncompress::Gunzip',  verb => 'gunzip',
+	         what  => 'gzipped',
+	         error => sub { no warnings 'once'; $IO::Uncompress::Gunzip::GunzipError } },
+	bz2 => { class => 'IO::Uncompress::Bunzip2', verb => 'bunzip2',
+	         what  => 'compressed with bzip2',
+	         error => sub { no warnings 'once'; $IO::Uncompress::Bunzip2::Bunzip2Error } },
+);
+
+# the key in %UNPACK that a file name asks for, or undef for a plain file
+sub _compression {
+	my ($file) = @_;
+	return $file =~ /\.(gz|bz2)\z/i ? lc $1 : undef;
+}
+
+sub _slurp_maybe_compressed {
 	my ($file, $limit) = @_;
-	if ($file =~ /\.gz\z/i) {
-		eval { require IO::Uncompress::Gunzip; 1 }
-			or die "Chem::Structure::Parser: '$file' is gzipped but IO::Uncompress::Gunzip is not installed: $@";
+	if (my $kind = _compression($file)) {
+		my $u = $UNPACK{$kind};
+		(my $pm = "$u->{class}.pm") =~ s{::}{/}g;
+		eval { require $pm; 1 }
+			or die "Chem::Structure::Parser: '$file' is $u->{what} but $u->{class} is not installed: $@";
 		# MultiStream, because bgzip and `cat a.gz b.gz' both write a file of
 		# several gzip members, and without it the reader stops at the end of the
 		# first: mini.pdb split in two came back as 38 lines and no atoms, where
-		# zcat gives the whole file
-		my $z = IO::Uncompress::Gunzip->new($file, MultiStream => 1)
-			or die "Chem::Structure::Parser: cannot gunzip '$file': "
-			       . do { no warnings 'once'; $IO::Uncompress::Gunzip::GunzipError };
+		# zcat gives the whole file.  pbzip2 and `cat a.bz2 b.bz2' do the same to
+		# bzip2 streams, and bzcat reads all of them too.
+		my $z = $u->{class}->new($file, MultiStream => 1)
+			or die "Chem::Structure::Parser: cannot $u->{verb} '$file': " . $u->{error}->();
 		my ($text, $buf) = ('', '');
 		# read() returns 0 at the end of the stream and a negative number on
 		# error, so a `> 0' loop reads a truncated or corrupt archive as a short
@@ -1749,8 +1773,8 @@ sub _read_cif { return _read($XS{mmcif}, @_) }
 sub _read {
 	my ($xs, $file, $o) = @_;
 	my $p;
-	if ($file =~ /\.gz\z/i) {
-		my $text = _slurp_maybe_gzipped($file, undef);
+	if (_compression($file)) {
+		my $text = _slurp_maybe_compressed($file, undef);
 		$p = $xs->{string}->($text, _xs_options($o));
 		$p = _retry_model($p, $o, $xs->{string}, $text);
 	} else {
@@ -3620,10 +3644,14 @@ C<res_type()> before C<h> is ever reached. Use one of the three forms above.
 
 Reads C<$file> and returns a hash reference. The format is worked out from the
 file name — C<.pdb>, C<.ent>, C<.cif>, C<.mmcif>, C<.pdbx> — and from the first
-records in the file when the name gives nothing away. C<.gz> files are read as
-they are, without unpacking to a temporary file — a file of several gzip members,
-as C<bgzip> writes, included. A C<.bz2> or C<.Z> file dies saying so: only gzip is
-unpacked, and read as it stands one would be a structure with no atoms in it.
+records in the file when the name gives nothing away. C<.gz> and C<.bz2> files
+are read as they are, without unpacking to a temporary file — a file of several
+gzip or bzip2 members, as C<bgzip> and C<pbzip2> write, included — and so is every
+function below that takes a file name in place of a structure. The suffix is
+what says a file is compressed, in either case (C<.GZ>, C<.BZ2>), and the name
+with it taken off is what says the format. Both are read through IO::Compress,
+which is part of perl. A C<.Z> file dies saying so: C<compress> is
+not unpacked, and read as it stands one would be a structure with no atoms in it.
 
 A plain string in second place names a I<view>, and asks for that and nothing
 else: the file is read, the view is taken out of it, and the rest is thrown

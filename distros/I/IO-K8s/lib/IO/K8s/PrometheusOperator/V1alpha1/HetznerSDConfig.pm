@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::HetznerSDConfig;
 # ABSTRACT: HetznerSDConfig allow retrieving scrape targets from Hetzner Cloud API and Robot API.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s authorization        => '+IO::K8s::PrometheusOperator::V1alpha1::SafeAuthorization';
@@ -46,7 +46,7 @@ IO::K8s::PrometheusOperator::V1alpha1::HetznerSDConfig - HetznerSDConfig allow r
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 authorization
 

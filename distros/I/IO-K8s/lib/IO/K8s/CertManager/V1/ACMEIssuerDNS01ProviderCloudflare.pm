@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEIssuerDNS01ProviderCloudflare;
 # ABSTRACT: Use the Cloudflare API to manage DNS01 challenge records.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apiKeySecretRef   => '+IO::K8s::CertManager::V1::SecretKeySelector';
@@ -24,7 +24,7 @@ IO::K8s::CertManager::V1::ACMEIssuerDNS01ProviderCloudflare - Use the Cloudflare
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apiKeySecretRef
 

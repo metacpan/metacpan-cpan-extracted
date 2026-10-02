@@ -1,0 +1,30 @@
+# PODNAME: TUI::Manual::03
+# ABSTRACT: Architecture of TUI::Vision
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+TUI::Manual::03 - Architecture of TUI::Vision
+
+=head1 ARCHITECTURE
+
+=head2 Core Concepts
+
+=head2 The Application Object
+
+=head2 The View Hierarchy
+
+=head2 Ownership and Lifetime
+
+=head2 Event Driven Design
+
+=head2 Conclusion
+
+L<next|TUI::Manual::04> chapter.
+
+=cut

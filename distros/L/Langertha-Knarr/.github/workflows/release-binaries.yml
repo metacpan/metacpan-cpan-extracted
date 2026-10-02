@@ -1,0 +1,139 @@
+name: release-binaries
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build and attach assets to (dry-run)
+        required: true
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    container:
+      # Pinned to bookworm, and not only for its older glibc (2.36; a binary
+      # built against it runs on newer glibc too). The base image also decides
+      # which optional libs the bundled XS modules link: the trixie-based
+      # perl:5.40 carries more -dev packages (libthai-dev and friends), so an
+      # XS module can pick up a link dependency there that a target lacks.
+      # Bumping this tag is safe only if check-binary-libs.sh below still
+      # passes.
+      image: perl:5.40-bookworm
+    # Values that reach shell here go through env, never inline ${{ }} in a
+    # run: body -- a crafted tag name must not be able to inject shell.
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      ARCH: ${{ matrix.arch }}
+    steps:
+      - name: Install system build deps
+        run: |
+          apt-get update
+          apt-get install -y build-essential git curl unzip libssl-dev zlib1g-dev
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+            | tee /usr/share/keyrings/githubcli-archive-keyring.gpg >/dev/null
+          chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+            > /etc/apt/sources.list.d/github-cli.list
+          apt-get update
+          apt-get install -y gh
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.TAG }}
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install Perl deps (knarr's cpanfile + PAR::Packer)
+        env:
+          # TAR_OPTIONS silences GNU tar's warning on the com.apple.provenance
+          # LIBARCHIVE pax header some CPAN tarballs carry (cosmetic).
+          TAR_OPTIONS: "--warning=no-unknown-keyword"
+        run: |
+          cpanm --notest --installdeps .
+          cpanm --notest PAR::Packer
+      - name: Compute version and asset base name
+        id: v
+        run: |
+          v="${TAG#v}"
+          echo "v=$v" >> "$GITHUB_OUTPUT"
+          echo "base=knarr-$v-linux-$ARCH" >> "$GITHUB_OUTPUT"
+      - name: Build binary
+        env:
+          KNARR_BIN_OUT: ${{ steps.v.outputs.base }}
+        run: ./scripts/build-binary.sh
+      - name: Verify binary
+        env:
+          BASE: ${{ steps.v.outputs.base }}
+        run: ./scripts/verify-binary.sh "$BASE"
+      - name: Record and check runtime libs
+        env:
+          BASE: ${{ steps.v.outputs.base }}
+        run: |
+          # The packed binary is portable only if nothing in it needs a lib on
+          # the target beyond the documented set. Every compiled object pp
+          # packed is checked -- the loader and each .so in the PAR archive --
+          # because an XS module can pick up a link dependency from the build
+          # image. The documented set lives in the script; README.md names the
+          # same libs, and a README that has lost one fails here too. Not piped
+          # through tee: the default run shell has no pipefail, so tee's 0
+          # would replace the check's 1; the step log is the record.
+          ./scripts/check-binary-libs.sh "$BASE"
+          for lib in $(./scripts/check-binary-libs.sh --list); do
+            grep -qF "\`$lib\`" README.md \
+              || { printf '::error::README.md does not list runtime lib %s\n' "$lib" >&2; exit 1; }
+          done
+      - name: Package
+        env:
+          BASE: ${{ steps.v.outputs.base }}
+          V: ${{ steps.v.outputs.v }}
+        run: |
+          mkdir -p "pkg/$BASE"
+          cp "$BASE" "pkg/$BASE/knarr"
+          cp LICENSE "pkg/$BASE/LICENSE"
+          cp share/example-config.yaml "pkg/$BASE/knarr.example.yaml"
+          printf 'knarr %s (linux-%s)\nRuntime libs required on target: %s\nhttps://github.com/Getty/langertha-knarr\n' \
+            "$V" "$ARCH" "$(./scripts/check-binary-libs.sh --list)" > "pkg/$BASE/README"
+          tar -C pkg -czf "$BASE.tar.gz" "$BASE"
+      - name: Upload assets to the release
+        # Per-arch: the raw binary and the .tar.gz. A single checksums file over
+        # all archs cannot be written here (each matrix job sees only its own
+        # arch); the `checksums` job below builds it once both have uploaded.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ steps.v.outputs.base }}
+        run: |
+          gh release upload "$TAG" \
+            "$BASE" "$BASE.tar.gz" \
+            --clobber --repo "$GITHUB_REPOSITORY"
+  checksums:
+    # One SHA256SUMS-style file over every arch's assets, in place of a
+    # .sha256 beside each asset. Runs after both build jobs so all four assets
+    # are already attached; downloads them back and hashes them.
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    steps:
+      - name: Build and upload one checksums file
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${TAG#v}"
+          out="knarr-$v-checksums.txt"
+          mkdir dl
+          # The `-linux-` glob matches the binaries and tarballs but never the
+          # checksums file itself, nor the dist tarball dzil release uploads
+          # (Langertha-Knarr-<v>.tar.gz), so a re-run does not hash its own
+          # output.
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'knarr-*-linux-*' --dir dl
+          ( cd dl && sha256sum knarr-*-linux-* ) > "$out"
+          gh release upload "$TAG" "$out" --clobber --repo "$GITHUB_REPOSITORY"

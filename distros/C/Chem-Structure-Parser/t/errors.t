@@ -5,7 +5,7 @@
 # reader that quietly returns an empty structure for a missing file turns a
 # typo in a path into an afternoon of wondering why every protein came back
 # with no chains.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';
@@ -27,21 +27,22 @@ throws_ok { structure_info("$data/no.such.file.pdb") } qr/does not exist/,
 	'a file that is not there dies, and says which one';
 throws_ok { structure_info($data) } qr/is a directory/, 'a directory dies';
 {
-	# only gzip is unpacked; the other two suffixes the name rule strips used
-	# to be read as the compressed bytes and come back with no atoms at all
+	# gzip and bzip2 are unpacked (t/compressed.t); a .Z, the one other suffix
+	# the name rule strips, used to be read as the compressed bytes and come back
+	# with no atoms at all.  The bytes are compress(1)'s magic number.
 	my $dir = tempdir(CLEANUP => 1);
-	for my $f ('mini.pdb.bz2', 'mini.pdb.Z', 'mini.cif.BZ2') {
+	for my $f ('mini.pdb.Z', 'mini.cif.z') {
 		open my $fh, '>:raw', "$dir/$f" or die $!;
-		print {$fh} "BZh91AY&SY";
+		print {$fh} "\x1f\x9d\x90";
 		close $fh or die $!;
 	}
-	throws_ok { structure_info("$dir/mini.pdb.bz2") }
-		qr/^structure_info: '[^']*mini\.pdb\.bz2' is compressed with bzip2, which this module does not unpack/,
-		'a .bz2 dies rather than coming back empty';
-	throws_ok { structure_info("$dir/mini.pdb.Z") } qr/is compressed with compress/,
-		'and so does a .Z';
-	throws_ok { structure_info("$dir/mini.cif.BZ2") } qr/is compressed with bzip2/,
+	throws_ok { structure_info("$dir/mini.pdb.Z") }
+		qr/^structure_info: '[^']*mini\.pdb\.Z' is compressed with compress, which this module does not unpack/,
+		'a .Z dies rather than coming back empty';
+	throws_ok { structure_info("$dir/mini.cif.z") } qr/is compressed with compress/,
 		'whatever case the suffix is in';
+	throws_ok { structure_info("$dir/mini.pdb.Z") } qr/gzip or bzip2 it/,
+		'and says what would be read instead';
 }
 
 #--------

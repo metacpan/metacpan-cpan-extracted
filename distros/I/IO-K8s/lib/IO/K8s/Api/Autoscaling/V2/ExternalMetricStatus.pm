@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::ExternalMetricStatus;
 # ABSTRACT: ExternalMetricStatus indicates the current value of a global metric not associated with any Kubernetes object.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s current => 'Autoscaling::V2::MetricValueStatus', 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Autoscaling::V2::ExternalMetricStatus - ExternalMetricStatus indic
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 current
 

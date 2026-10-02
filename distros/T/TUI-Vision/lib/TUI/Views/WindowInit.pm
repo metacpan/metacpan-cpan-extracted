@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -25,7 +25,7 @@ sub TWindowInit() { __PACKAGE__ }
 sub new_TWindowInit { __PACKAGE__->from(@_) }
 
 # declare attributes
-has createFrame => ( is => 'bare' );
+has createFrame => ( is => 'bare', default => sub { die 'required' } );
 
 sub BUILDARGS {    # \%args (%args)
   state $sig = signature(
@@ -82,15 +82,11 @@ essential for setting up the user interface elements in a TWindow class.
 
 =head1 ATTRIBUTES
 
-=over
+=head2 createFrame
 
-=item createFrame
+A subroutine reference used to create the frame for a window. (I<CodeRef>)
 
-A subroutine reference used to create the frame for a window. (CodeRef)
-
-=back
-
-=head1 METHODS
+=head1 CONSTRUCTOR
 
 =head2 new
 
@@ -102,15 +98,17 @@ Initializes the code reference for a frame.
 
 =item cFrame
 
-Required parameter to specify the frame creation subroutine. (CodeRef)
+Required parameter to specify the frame creation subroutine. (I<CodeRef>)
 
 =back
 
-=head2 from
+=head2 new_TWindowInit
 
-  my $obj = TWindowInit->from($cFrame);
+  my $obj = new_TWindowInit($cFrame);
 
 Creates a TWindowInit object from the specified frame creation subroutine.
+
+=head1 METHODS
 
 =head2 createFrame
 

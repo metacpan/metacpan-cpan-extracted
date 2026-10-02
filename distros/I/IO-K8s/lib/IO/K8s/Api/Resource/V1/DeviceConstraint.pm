@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceConstraint;
 # ABSTRACT: DeviceConstraint must have exactly one field set besides Requests.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s distinctAttribute => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1::DeviceConstraint - DeviceConstraint must have exactl
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 distinctAttribute
 

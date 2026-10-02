@@ -110,6 +110,7 @@ t/amberdb_range_sort_slice.t
 t/amberdb_read_field_methods.t
 t/amberdb_read_order.t
 t/amberdb_recs.t
+t/amberdb_reindex_lastid_del.t
 t/amberdb_repeat.t
 t/amberdb_schema_types.t
 t/amberdb_search_filter.t
@@ -120,8 +121,8 @@ t/amberdb_simple_mode.t
 t/amberdb_slug_bulk.t
 t/amberdb_slug_facet_bulk.t
 t/amberdb_sort.t
-t/amberdb_suggest.t
 t/amberdb_standard_api_args.t
+t/amberdb_suggest.t
 t/amberdb_table_use_simple.t
 t/amberdb_tools.t
 t/amberdb_transact.t

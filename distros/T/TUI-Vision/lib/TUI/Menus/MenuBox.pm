@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -288,7 +288,7 @@ For standalone menu boxes, the parent menu may be omitted.
 
 In most applications C<TMenuBox> is never referenced directly, because
 pull-down menus are built automatically through the menu bar. The practical
-use case is a standalone pop-up: construct the box with C<new_TMenuBox>,
+use case is a standalone pop-up: construct the box with L</new_TMenuBox>,
 passing the desired bounding rectangle, a menu built from C<new_TMenu> and
 C<new_TMenuItem> calls, and C<undef> as the parent. Pass the resulting object
 to C<< $desktop->execView >>, which returns the command constant of the
@@ -297,11 +297,11 @@ selected item.
 =head1 VARIABLES
 
 The following global variable defines the frame characters used by
-C<TMenuView>.
+L<TMenuView|TUI::Menus::MenuView>.
 
 =head2 $frameChars
 
-Character sequence used to draw menu frames and borders.
+Character sequence (I<Str>) used to draw menu frames and borders.
 
 =head1 CONSTRUCTOR
 
@@ -319,7 +319,7 @@ Creates a new menu box.
 
 =item bounds
 
-Bounding rectangle of the menu box (I<TRect>).
+Bounding rectangle of the menu box (L<TRect|TUI::Objects::Rect>).
 
 =item menu
 
@@ -339,7 +339,8 @@ standalone menu boxes.
 Factory-style constructor using positional arguments.
 
 This constructor is equivalent to calling C<new> with named parameters and is
-provided for compatibility with traditional Turbo Vision construction patterns.
+provided for compatibility with traditional I<Turbo Vision> construction 
+patterns.
 
 =head1 METHODS
 
@@ -359,10 +360,10 @@ menu entry.
 
 =head1 SEE ALSO
 
-L<TUI::Menus::MenuBar>,
-L<TUI::Menus::MenuView>,
-L<TUI::Menus::MenuItem>,
-L<TUI::Views::View>
+L<TMenuBar|TUI::Menus::MenuBar>,
+L<TMenuView|TUI::Menus::MenuView>,
+L<TMenuItem|TUI::Menus::MenuItem>,
+L<TView|TUI::Views::View>
 
 =head1 AUTHORS
 

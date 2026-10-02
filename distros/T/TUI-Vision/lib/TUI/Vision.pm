@@ -1,9 +1,11 @@
 package TUI::Vision;
+# ABSTRACT: Main module for the TUI::Vision framework
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -22,6 +24,9 @@ use TUI::MsgBox;
 use TUI::TextView;
 use TUI::Memory;
 use TUI::Validate;
+use TUI::ColorSel;
+use TUI::Editors;
+use TUI::Help;
 use TUI::toolkit;
 
 sub import {
@@ -39,6 +44,9 @@ sub import {
   TUI::TextView->import::into( $target );
   TUI::Memory->import::into( $target );
   TUI::Validate->import::into( $target );
+  TUI::ColorSel->import::into( $target );
+  TUI::Editors->import::into( $target );
+  TUI::Help->import::into( $target );
   TUI::toolkit->import::into( $target );
 }
 
@@ -57,6 +65,9 @@ sub unimport {
   TUI::TextView->unimport::out_of( $caller );
   TUI::Memory->unimport::out_of( $caller );
   TUI::Validate->unimport::out_of( $caller );
+  TUI::ColorSel->unimport::out_of( $caller );
+  TUI::Editors->unimport::out_of( $caller );
+  TUI::Help->unimport::out_of( $caller );
   TUI::toolkit->unimport::out_of( $caller );
 }
 
@@ -75,16 +86,17 @@ TUI::Vision - Perl TUI Framework (Turbo Vision 2.0 Port)
   use TUI::Vision;
 
   # Imports the framework aggregators (Objects, App, Views, Dialogs,
-  # Menus, Drivers, Gadgets, StdDlg, MsgBox, TextView, Memory, Validate)
+  # Menus, Drivers, Gadgets, StdDlg, MsgBox, TextView, Memory, ColorSel, 
+  # Editors, Help, Validate)
   # and the toolkit helpers into your package.
 
 =head1 DESCRIPTION
 
-TUI::Vision is the top-level umbrella module of the framework.
+C<TUI::Vision> is the top-level umbrella module of the framework.
 
 It aggregates and re-exports the main subsystem modules through
-C<Import::Into>, so applications can import the common TUI::Vision surface via
-a single C<use TUI::Vision;> statement.
+C<Import::Into>, so applications can import the common surface via a single 
+C<use TUI::Vision;> statement.
 
 =head1 AUTHORS
 

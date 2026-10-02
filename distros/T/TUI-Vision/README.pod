@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-TUI::Vision - Turbo Vision inspired TUI framework for Perl
+README - Turbo Vision inspired TUI framework for Perl
 
 =head1 SYNOPSIS
 
@@ -10,6 +10,7 @@ TUI::Vision - Turbo Vision inspired TUI framework for Perl
 
   use Moo;
   use TUI::Objects;
+  use TUI::Drivers;
   use TUI::App;
   use TUI::Menus;
   use TUI::Dialogs;
@@ -46,12 +47,12 @@ TUI::Vision - Turbo Vision inspired TUI framework for Perl
     $dialog->insert(
       TStaticText->new(
         bounds => TRect->new( ax => 3, ay => 3, bx => 35, by => 5 ),
-        text   => 'Hello from TUI::Vision'
+        text   => "\003Hello from TUI::Vision"
       )
     );
     $dialog->insert(
       TButton->new(
-        bounds  => TRect->new( ax => 14, ay => 7, bx => 26, by => 9 ),
+        bounds  => TRect->new( ax => 14, ay => 6, bx => 26, by => 8 ),
         title   => '~O~K',
         command => cmOK,
         flags   => bfDefault
@@ -72,7 +73,7 @@ TUI::Vision - Turbo Vision inspired TUI framework for Perl
 
 TUI::Vision provides a Perl port of the classic Turbo Vision framework.
 It is designed as a modular and portable text user interface (TUI)
-framework for Perl applications, inspired by Turbo Vision 2.0.
+framework for Perl applications, based on Turbo Vision 2.0.
 
 The framework is a clean and native Perl implementation,
 adapted for contemporary Perl environments while preserving the
@@ -88,31 +89,39 @@ distribution:
 
 =over 4
 
-=item * Core object system L<TUI::Objects>
+=item * Core object system (L<Objects|TUI::Objects>)
 
-=item * View and windowing system L<TUI::Views>
+=item * View and windowing system (L<Views|TUI::Views>)
 
-=item * Dialogs and widgets L<TUI::Dialogs>
+=item * L<Dialogs|TUI::Dialogs> and controls
 
-=item * Menus and status lines L<TUI::Menus>
+=item * L<Menus|TUI::Menus> and status lines
 
-=item * Application framework L<TUI::App>
+=item * Application framework: L<App|TUI::App>
 
-=item * Drivers and hardware abstraction L<TUI::Drivers>
+=item * L<Drivers|TUI::Drivers> and hardware abstraction
 
-=item * Gadgets and diagnostic tools L<TUI::Gadgets>
+=item * L<Gadgets|TUI::Gadgets> and diagnostic tools
 
-=item * Standard dialogs L<TUI::StdDlg>
+=item * Standard dialogs (L<StdDlg|TUI::StdDlg>)
 
-=item * Message boxes L<TUI::MsgBox>
+=item * Message boxes (L<MsgBox|TUI::MsgBox>)
 
-=item * Text rendering subsystem L<TUI::TextView>
+=item * Text rendering subsystem (L<TextView|TUI::TextView>)
 
-=item * Memory utilities L<TUI::Memory>
+=item * Editor components (L<Editor|TUI::Editor>)
 
-=item * Validation utilities L<TUI::Validate>
+=item * Color selection components (L<ColorSel|TUI::ColorSel>)
 
-=item * Unified OO toolkit L<TUI::toolkit>
+=item * Help system (L<Help|TUI::Help>)
+
+=item * Turbo Vision Demo gadgets (L<Gadgets|TUI::Gadgets>)
+
+=item * L<Memory|TUI::Memory> utilities
+
+=item * Validation utilities (L<Validate|TUI::Validate>)
+
+=item * Unified OO L<toolkit|TUI::toolkit>
 
 =back
 
@@ -124,9 +133,9 @@ This distribution is under active development.
 
 =over
 
-=item Turbo Vision Development Team
+=item * Turbo Vision Development Team
 
-=item J. Schneider <brickpool@cpan.org> (Perl implementation and maintenance)
+=item * J. Schneider <brickpool@cpan.org> (Perl implementation and maintenance)
 
 =back
 

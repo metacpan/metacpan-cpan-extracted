@@ -204,8 +204,10 @@ sub fetch_seq {
 
     $start_bp = $start_bp // 1;
     $end_bp   = $end_bp   // $len;
+    die "Coordinates out of bounds" if (
+        $start_bp < 1 || $end_bp < 1 || $start_bp > $end_bp || $end_bp > $len
+    );
     --$start_bp; #make 0-based
-    die "Coordinates out of bounds" if ($start_bp < 0 || $end_bp > $len);
     my $l = $end_bp - $start_bp;
 
     seek $fh, $off + $start_bp + int(($start_bp)/$bpl)*$eol, 0;

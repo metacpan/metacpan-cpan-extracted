@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::ServersTransportTCPSpec;
 # ABSTRACT: ServersTransportTCPSpec defines the desired state of a ServersTransportTCP.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s dialKeepAlive    => IntOrStr, { pattern => "^([0-9]+(ns|us|\x{b5}s|ms|s|m|h)?)+\$" };
@@ -28,7 +28,7 @@ IO::K8s::Traefik::V1alpha1::ServersTransportTCPSpec - ServersTransportTCPSpec de
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 dialKeepAlive
 

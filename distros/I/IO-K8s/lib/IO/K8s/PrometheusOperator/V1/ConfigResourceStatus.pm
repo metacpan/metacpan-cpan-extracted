@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ConfigResourceStatus;
 # ABSTRACT: status defines the status subresource.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s bindings => ['+IO::K8s::PrometheusOperator::V1::WorkloadBinding'];
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::ConfigResourceStatus - status defines the statu
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 bindings
 

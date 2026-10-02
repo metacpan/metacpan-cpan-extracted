@@ -1,6 +1,6 @@
 package IO::K8s::K3s::V1::Addon;
 # ABSTRACT: Addon is used to track application of a manifest file on disk.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'k3s.cattle.io/v1',
     resource_plural => 'addons';
@@ -23,7 +23,7 @@ IO::K8s::K3s::V1::Addon - Addon is used to track application of a manifest file 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

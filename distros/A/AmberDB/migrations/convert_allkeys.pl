@@ -4,15 +4,12 @@
 # Converts 'allkeys' index key to 'keys' in all table index files (.inx) in dbstore.
 
 
+use 5.016;
+use strict;
+use warnings;
 use FindBin;
-use Cwd qw(cwd getcwd);
-BEGIN {
-    require "$FindBin::Bin/../lib/init.pl";
-    use vars qw($root_dir);
-    $root_dir = cwd();
-}
-use Misk::Pragma;
-use Misk::Core;
+use lib "$FindBin::Bin/../lib";
+use Cwd qw(cwd);
 use DB_File;
 use Fcntl qw(O_RDWR);
 
@@ -20,11 +17,9 @@ print "=================================================================\n";
 print " AmberDB Table Index Key Converter ('allkeys' -> 'keys')   \n";
 print "=================================================================\n\n";
 
-my $ctx = Misk::Core->boot(root_dir => "$root_dir", role => "cli");
-my $adb = $ctx->{adb};
-
-my $dbstore_dir = $ctx->{path}->{dbase_dir};
-my $tables_dir  = "$dbstore_dir/table";
+my $root_dir    = cwd();
+my $dbstore_dir = -d "$root_dir/dbstore" ? "$root_dir/dbstore" : "$root_dir";
+my $tables_dir  = -d "$dbstore_dir/table" ? "$dbstore_dir/table" : ( -d "$dbstore_dir/tables" ? "$dbstore_dir/tables" : $dbstore_dir );
 
 unless ( -d $tables_dir ) {
     die "Error: Database tables directory '$tables_dir' does not exist.\n";
@@ -32,13 +27,15 @@ unless ( -d $tables_dir ) {
 
 print "Database Directory  : $tables_dir\n\n";
 
-# Discover files in tables_dir
-my @files = $ctx->{file}->listfiles($tables_dir);
+opendir(my $dh, $tables_dir) or die "Cannot open directory '$tables_dir': $!\n";
+my @files = sort readdir($dh);
+closedir($dh);
 
 my %tables;
 my %side_files = ( del => 0, aut => 0, cnt => 0 );
 
 foreach my $file ( sort @files ) {
+    next if $file =~ /^\./; # skip . and .. and hidden files
     $file =~ s|\Q$tables_dir\E/?||i;
     next if $file =~ /^\_/; # skip temporary/hidden files
     next if $file =~ /\s/;  # skip backup filenames with spaces

@@ -3,7 +3,7 @@ package Devel::ebug::Backend;
 use strict;
 use warnings;
 
-our $VERSION = '0.67'; # VERSION
+our $VERSION = '0.68'; # VERSION
 
 package DB;
 
@@ -16,7 +16,7 @@ use Module::Pluggable
 
 use vars qw(@dbline %dbline);
 
-our $VERSION = '0.67'; # VERSION
+our $VERSION = '0.68'; # VERSION
 
 # Let's catch INT signals and set a flag when they occur
 $SIG{INT} = sub {
@@ -338,7 +338,7 @@ Devel::ebug::Backend
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 AUTHOR
 
@@ -351,6 +351,8 @@ Contributors:
 Brock Wilcox E<lt>awwaiid@thelackthereof.orgE<gt>
 
 Taisuke Yamada
+
+Richard Leach (HYDAHY)
 
 =head1 COPYRIGHT AND LICENSE
 

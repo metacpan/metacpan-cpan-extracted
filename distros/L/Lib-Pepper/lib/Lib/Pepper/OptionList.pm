@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 0.5;
+our $VERSION = 0.6;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -100,6 +100,11 @@ sub addInt($self, $key, $value) {
     }
     if(!defined $value) {
         croak('addInt: value parameter is required');
+    }
+    # The XS layer converts with SvIV, which silently truncates floats (28.999999999999996 becomes 28).
+    # Floats stringify rounded ("29"), so the regex alone can not catch them, the numeric compare does.
+    if($value !~ /^\-?\d+$/ || $value != int($value)) {
+        croak("addInt('$key'): value must be an integer, got " . sprintf('%.17g', $value));
     }
 
     my $result = Lib::Pepper::pepOptionListAddIntElement($self->{handle}, $key, $value);

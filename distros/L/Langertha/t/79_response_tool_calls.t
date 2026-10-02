@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use Test::More;
+use Test2::Bundle::More;
+use Scalar::Util qw( blessed );
 
 use Langertha::Response;
 use Langertha::ToolCall;
@@ -24,7 +25,7 @@ use Langertha::ToolCall;
     }],
   );
   ok $r->has_tool_calls, 'predicate true';
-  isa_ok $r->tool_calls->[0], 'Langertha::ToolCall', 'HashRef upgraded to object';
+  ok blessed($r->tool_calls->[0]) && $r->tool_calls->[0]->isa('Langertha::ToolCall'), 'HashRef upgraded to object';
   is_deeply $r->tool_call_args, { summary => 'hi' }, 'first tool args';
   is_deeply $r->tool_call_args('extract'), { summary => 'hi' }, 'named tool args';
   is $r->tool_call_args('missing'), undef, 'unknown name -> undef';

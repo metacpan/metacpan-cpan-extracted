@@ -19,7 +19,7 @@
 #
 # t/oracle.t is the other half of this: it runs the comparison itself, against
 # gemmi, over as many structures as are to hand.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

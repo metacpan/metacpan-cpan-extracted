@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ACMEIssuer;
 # ABSTRACT: ACME configures this issuer to communicate with a RFC8555 (ACME) server to obtain signed x509 certificates.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s caBundle                    => Str;
@@ -40,7 +40,7 @@ IO::K8s::CertManager::V1::ACMEIssuer - ACME configures this issuer to communicat
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 caBundle
 

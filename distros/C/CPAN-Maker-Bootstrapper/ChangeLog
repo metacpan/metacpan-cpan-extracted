@@ -1,3 +1,27 @@
+Thu Oct  1 06:24:45 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.6]:
+	* README.md: generated
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-2.3.6.md: new
+	* cmb_md5sums.txt: generated
+	* Makefile
+	(cpanfile.darkpan)
+	- filter requires files if darkpan.skip file found
+	(CLEANFILES)
+	- -*.darkpan, +cpanfile.{requires,recommends,runtime,suggests}
+	* cpan-maker-bootstrapper.yml: + --filter option
+	* gitignore: !cpanfile.darkpan
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- POD updates
+	* lib/CPAN/Maker/Bootstrapper/Role/DarkPANRequires.pm.in
+	(cmd_create_darkpan_requires): use --filter to remove modules
+	* lib/CPAN/Maker/Bootstrapper/Role/DepsFilter.pm.in
+	(cmd_deps_filter): do not write empty files
+	* lib/CPAN/Maker/Bootstrapper/Role/Filter.pm.in
+	- move cmd method to top of file
+
 Wed Sep 30 10:54:44 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.3.5]:

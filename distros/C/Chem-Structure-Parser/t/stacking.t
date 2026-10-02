@@ -28,7 +28,7 @@
 # forms, what is written onto a residue, and the edges of the two ramps -- which
 # is t/properties.t's job for every other feature and is done here because the
 # fixture is here.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';

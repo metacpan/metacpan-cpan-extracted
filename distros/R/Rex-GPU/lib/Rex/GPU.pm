@@ -1,7 +1,7 @@
 # ABSTRACT: GPU detection and driver management for Rex
 
 package Rex::GPU;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -154,7 +154,7 @@ Rex::GPU - GPU detection and driver management for Rex
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -206,9 +206,12 @@ from the official NVIDIA repository for all supported distributions, unless
 it is already installed (then it is left as it is, not upgraded; see
 L<Rex::GPU::NVIDIA/install_container_toolkit>).
 
-=item 4. B<CDI spec generation> — Writes C</etc/cdi/nvidia.yaml> so the
-Kubernetes device plugin can enumerate GPU resources without privileged
-container access.
+=item 4. B<CDI spec generation> — Makes C<nvidia.com/gpu=all> and
+C<management.nvidia.com/gpu=all> resolvable, writing under C</etc/cdi> only
+what C<nvidia-ctk cdi list> does not already show, so the Kubernetes device
+plugin can enumerate GPU resources without privileged container access and
+the GPU Operator validator finds its management device (see
+L<Rex::GPU::NVIDIA/generate_cdi_specs>).
 
 =item 5. B<Containerd runtime configuration> — Injects the NVIDIA runtime
 into the containerd config for the target Kubernetes distribution.

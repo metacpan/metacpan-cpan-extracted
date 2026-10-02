@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::AWSGroup;
 # ABSTRACT: AWSGroup is an structure that can be used to whitelisting information from AWS integration
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s labels              => { Str => 1 };
@@ -26,7 +26,7 @@ IO::K8s::Cilium::V2::AWSGroup - AWSGroup is an structure that can be used to whi
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 labels
 

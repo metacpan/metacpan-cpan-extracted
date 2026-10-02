@@ -1,3 +1,10 @@
+0.015   2026-09-20  Released-By: PERLANCAR; Urgency: medium
+
+        [cli clipadd]
+
+        - Add option: --split-by-org-headlines (-o).
+
+
 0.014   2025-10-16  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::TracingConfig;
 # ABSTRACT: tracingConfig defines tracing in Prometheus.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s clientType       => Str, { enum => [qw(http grpc HTTP GRPC)] };
@@ -34,7 +34,7 @@ IO::K8s::PrometheusOperator::V1::TracingConfig - tracingConfig defines tracing i
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 clientType
 

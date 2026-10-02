@@ -1,0 +1,176 @@
+#!/usr/bin/env perl
+# ABSTRACT: Raider Hall daemon CLI
+# PODNAME: raider-hall
+
+use strict;
+use warnings;
+
+our $VERSION = '0.503';
+
+use Langertha::Raider::Hall::CLI;
+
+Langertha::Raider::Hall::CLI->main(@ARGV);
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+raider-hall - Raider Hall daemon CLI
+
+=head1 VERSION
+
+version 0.503
+
+=head1 SYNOPSIS
+
+    raider-hall init --name bjorn
+    raider-hall start --daemon --acp-port 38421
+    raider-hall spawn bjorn "summarise yesterday's git log"
+    raider-hall ps
+    raider-hall logs bjorn-1790000000 --follow
+    raider-hall stop
+
+=head1 DESCRIPTION
+
+F<raider-hall> runs the subcommands of L<Langertha::Raider::Hall>, the
+optional daemon that runs raiders on demand, on cron, for Telegram messages
+and over ACP. It is the same as C<raider hall>: C<raider-hall start> and
+C<raider hall start> do the same thing.
+
+The hall is the directory holding F<.raider-hall.yml> (see
+L<Langertha::Raider::Hall/CONFIG FILE>); C<DIR> defaults to the current
+one. C<raider-hall SUBCOMMAND --help> prints the options of a subcommand.
+
+=head1 COMMANDS
+
+=head2 init [--name NAME] [--engine ENGINE] [--persona PACK]
+
+Write a starter F<.raider-hall.yml> with one raider in the current
+directory; asks for the name without C<--name>. Never overwrites one.
+
+=head2 add-raider NAME [--engine E] [--persona P] [--model M] [--pack X]...
+
+Add a raider entry to F<.raider-hall.yml>. A running hall reads the file
+once at start, so restart it to use the new entry.
+
+=head2 start [DIR] [--daemon] [--acp-port N] [--acp-host H]
+
+Run the hall, in the foreground or with C<--daemon> in the background.
+C<--acp-port> opens the ACP adapter on TCP port C<N>, over C<acp:> of the
+config; C<--acp-host> binds it to C<H> (default C<127.0.0.1>), and only
+counts together with C<--acp-port>.
+
+=head2 stop [DIR]
+
+Send C<SIGTERM> to the running hall.
+
+=head2 status [DIR]
+
+The hall's status as JSON.
+
+=head2 ps [DIR]
+
+The running raiders: slot, PID, name.
+
+=head2 spawn [DIR] NAME MISSION [--attach]
+
+Start raider C<NAME> on C<MISSION> and print its run ID. A name with a
+leading number (C<1bjorn>) is a singleton slot: a mission for a busy one
+waits in its queue. C<--attach> then prints the run's event stream as
+C<attach> does, with the run ID line on stderr; a queued mission has no
+run yet and is not attached.
+
+=head2 attach [DIR] ID
+
+The event stream of the running raider C<ID>: its C<--stream-json>
+events, one JSON object per line, from the start of the run and as they
+come, until the raider has exited. For the human-readable output, see
+C<logs --follow>; for an ended run, C<logs>.
+
+=head2 logs [DIR] ID [--follow]
+
+The run's part of its slot log; C<--follow> keeps reading while it runs.
+
+=head2 kill [DIR] ID
+
+Stop the running raider C<ID> with C<SIGTERM>.
+
+=head2 session reset [DIR] BINDING
+
+Start a new session for a binding (C<telegram:BOT:CHAT_ID>, C<cron:ID>,
+C<slot:1NAME>, ...); see L<Langertha::Raider::Hall/session_bindings>.
+
+=head2 install [DIR] [--docker | --host] [--image IMG] [--name NAME] [--acp-port N] [--acp-host H] [--stdout]
+
+Write a systemd user unit that starts the hall, native or through
+C<docker run>.
+
+=head1 ENVIRONMENT
+
+=head2 RAIDER_HALL_RAIDER_BIN
+
+The F<raider> executable the hall starts its raiders with. Without it (or
+when it is not executable), the standalone binary the hall itself runs
+from, else the F<raider> next to the running script, then the one on
+C<PATH>. From a standalone binary the hall execs it directly; otherwise
+it runs it with the perl that runs the hall.
+
+=head2 RAIDER_HALL_ACP_PORT
+
+Opens the ACP adapter on this TCP port, over C<acp: { port: ... }> of the
+config. C<start --acp-port> sets it.
+
+=head2 RAIDER_HALL_ACP_HOST
+
+The address the ACP adapter binds to, over C<acp: { host: ... }>; default
+C<127.0.0.1>. C<start --acp-host> sets it (together with C<--acp-port>).
+
+The hall sets C<RAIDER_HALL_SOCKET>, C<RAIDER_HALL_ROOT>,
+C<RAIDER_HALL_SLOT>, C<RAIDER_HALL_MODE> and, for a Telegram mission,
+C<RAIDER_HALL_TELEGRAM_BOT>, C<RAIDER_HALL_TELEGRAM_CHAT_ID> and
+C<RAIDER_HALL_TELEGRAM_THREAD_ID> for the raiders it starts; see
+L<Langertha::Raider::Hall/ENVIRONMENT>.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Langertha::Raider::Hall>
+
+=item * L<raider>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/langertha-raider/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

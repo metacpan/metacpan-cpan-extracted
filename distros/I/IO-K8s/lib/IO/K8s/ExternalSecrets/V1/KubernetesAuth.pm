@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::KubernetesAuth;
 # ABSTRACT: Auth configures how secret-manager authenticates with a Kubernetes instance.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s cert           => '+IO::K8s::ExternalSecrets::V1::CertAuth';
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::KubernetesAuth - Auth configures how secret-manage
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 cert
 

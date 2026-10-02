@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPNodeConfigOverrideSpec;
 # ABSTRACT: Spec is the specification of the desired behavior of the CiliumBGPNodeConfigOverride.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s bgpInstances => ['+IO::K8s::Cilium::V2::CiliumBGPNodeConfigInstanceOverride'], { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::Cilium::V2::CiliumBGPNodeConfigOverrideSpec - Spec is the specification
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 bgpInstances
 

@@ -1,0 +1,66 @@
+# Build artifacts (Dist::Zilla / ExtUtils::MakeMaker)
+Langertha-*
+Langertha-*.tar.gz
+.build/
+blib/
+inc/
+pm_to_blib
+MANIFEST
+MANIFEST.bak
+META.*
+MYMETA.*
+Makefile
+Makefile.old
+*.tar.gz
+*.html
+cover_db/
+cpanfile.snapshot
+
+# Carton / Carmel (isolated deps — never bake into the image)
+/local/
+/.carmel/
+
+# Environment & secrets — NEVER into build context
+.env
+.env.*
+.bash_history
+.home
+.data
+
+# Python
+__pycache__
+*.pyc
+
+# karr local logs
+.karr.log
+.karr.state
+
+# Claude Code — keep settings/rules/skills/agents (they shape dev workflow)
+# but drop local session data, credentials, and project-local state.
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+# GitHub workflow scratch
+.github/ISSUE_TEMPLATE/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Test artefacts
+*.tap
+.nytprof/
+devel*.out
+
+# dist.ini is required by the build — DO NOT ignore
+!dist.ini
+!cpanfile

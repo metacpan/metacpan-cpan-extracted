@@ -142,6 +142,82 @@ my $engine_off = Langertha::Engine::OpenAI->new(
   is($thinking2, undef, 'no thinking extracted for wrong tag');
 }
 
+# --- Orphan closing tag and untouched text (karr k302) ---
+# DeepSeek-R1 and Qwen3-thinking chat templates put the opening <think> into
+# the generation prompt, so a server without a reasoning parser returns
+# "reasoning...</think>answer": the reasoning must not leak into content. And
+# a reply without any think tag is the model's text byte for byte — the filter
+# runs on every engine, so trimming there would eat the first line's
+# indentation of every code answer.
+
+{
+  my ($text, $thinking) = $engine_on->filter_think_content(
+    "Let me think about it.\n</think>\n\nThe answer is 4."
+  );
+  is($text, 'The answer is 4.', 'orphan closing tag: content after it');
+  is($thinking, "Let me think about it.\n", 'orphan closing tag: everything before it is thinking');
+}
+
+{
+  my ($text, $thinking) = $engine_on->filter_think_content(
+    "first</think>Answer <think>second</think> more"
+  );
+  is($text, 'Answer  more', 'orphan closing tag followed by a pair: both removed');
+  is($thinking, "first\nsecond", 'orphan closing tag followed by a pair: both thoughts');
+}
+
+{
+  my ($text, $thinking) = $engine_on->filter_think_content("</think>Answer.");
+  is($text, 'Answer.', 'bare orphan closing tag: tag removed');
+  is($thinking, undef, 'bare orphan closing tag: no empty thinking');
+}
+
+{
+  my $code = "    def f():\n        return 1\n";
+  my ($text, $thinking) = $engine_on->filter_think_content($code);
+  is($text, $code, 'no tag: leading indentation and trailing newline kept exactly');
+  is($thinking, undef, 'no tag: no thinking');
+}
+
+{
+  my ($text, $thinking) = $engine_on->filter_think_content(
+    "<think>plan</think>\n\n    indented code\n"
+  );
+  is($text, "    indented code\n",
+    'after a leading block: the blank lines go, the first line keeps its indentation');
+}
+
+{
+  my ($text, $thinking) = $engine_on->filter_think_content(
+    "<think>a<think>b</think>c</think>done"
+  );
+  is($text, 'c</think>done', 'nested tags are not balanced: the first closing tag ends the block');
+  is($thinking, 'a<think>b', 'nested tags: thinking up to the first closing tag');
+}
+
+{
+  my $vllm_resp = HTTP::Response->new(200, 'OK');
+  $vllm_resp->header('Content-Type' => 'application/json');
+  $vllm_resp->content($json->encode({
+    id => 'chatcmpl-qwen3', model => 'Qwen/Qwen3-8B',
+    choices => [{ message => { role => 'assistant',
+      content => "Two and two.\n</think>\n\nThe answer is 4." }, finish_reason => 'stop' }],
+  }));
+  my $resp = $engine_on->chat_response($vllm_resp);
+  is($resp->content, 'The answer is 4.', 'chat_response: orphan closing tag reasoning out of content');
+  is($resp->thinking, "Two and two.\n", 'chat_response: orphan reasoning on thinking');
+
+  my $plain_resp = HTTP::Response->new(200, 'OK');
+  $plain_resp->header('Content-Type' => 'application/json');
+  $plain_resp->content($json->encode({
+    id => 'chatcmpl-plain', model => 'gpt-4o-mini',
+    choices => [{ message => { role => 'assistant', content => "  indented\n" }, finish_reason => 'stop' }],
+  }));
+  my $plain = $engine_on->chat_response($plain_resp);
+  is($plain->content, "  indented\n", 'chat_response without tags: content untouched');
+  ok(!$plain->has_thinking, 'chat_response without tags: no thinking');
+}
+
 # --- Response clone_with ---
 
 {
@@ -162,7 +238,7 @@ my $engine_off = Langertha::Engine::OpenAI->new(
   is($clone->id, 'resp-123', 'clone_with preserves id');
   is($clone->model, 'gpt-4o', 'clone_with preserves model');
   is($clone->finish_reason, 'stop', 'clone_with preserves finish_reason');
-  is($clone->created, 1700000000, 'clone_with preserves created');
+  is(0 + $clone->created, 1700000000, 'clone_with preserves created');
   is($clone->prompt_tokens, 10, 'clone_with preserves usage');
 }
 

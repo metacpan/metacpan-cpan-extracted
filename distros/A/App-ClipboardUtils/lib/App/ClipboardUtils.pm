@@ -5,9 +5,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-10-16'; # DATE
+our $DATE = '2026-09-20'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use Clipboard::Any ();
 use Clone::PP qw(clone);
@@ -25,7 +25,7 @@ our %SPEC;
         schema => ['str_or_re*'],
         description => <<'MARKDOWN',
 
-Cannot be used together with `--fragments` or `--command-line` option.
+Cannot be used together with `--fragments` or `--split-by-org-headlines` or `--command-line` option.
 
 Note that if you supply a regex, you should not have any capture groups in the
 regex.
@@ -72,6 +72,34 @@ MARKDOWN
         #cmdline_aliases => {f=>{}},
     };
 
+    $SPEC{add_clipboard_content}{args}{split_by_org_headlines} = {
+        summary => 'Only add contents inside Org headlines',
+        schema => ['bool*'],
+        description => <<'MARKDOWN',
+
+Cannot be used together with `--split-by` or `--command-line` option.
+
+Example content:
+
+    * headline 1
+    Content 1
+    Second line
+    ** headline 1.1
+    Content 1.1
+    ** headline 1.2
+    Content 1.2
+    * headline 2
+    Content 2
+
+Command:
+
+    % cat document.org | clipadd --split-by-org-headlines
+    % cat document.org | clipadd -o
+
+MARKDOWN
+        cmdline_aliases => {o=>{}},
+    };
+
     $SPEC{add_clipboard_content}{args}{tee} = {
         summary => 'Pass stdin to stdout',
         schema => ['true*'],
@@ -104,7 +132,7 @@ MARKDOWN
     };
 
     $SPEC{add_clipboard_content}{args_rels}{"choose_one&"} = [
-        [qw/command_line split_by fragments/],
+        [qw/command_line split_by split_by_org_headlines fragments/],
     ];
 }
 
@@ -113,6 +141,10 @@ sub add_clipboard_content {
     my $split_by = delete $args{split_by};
     my $tee = delete $args{tee};
     my $command_line = $args{command_line};
+
+    if (my $split_by_org_headlines = delete $args{split_by_org_headlines}) {
+        $split_by = qr/^\*+\s.*\R/m;
+    }
 
     if (defined $command_line) {
 
@@ -125,7 +157,8 @@ sub add_clipboard_content {
             if (defined $split_by) {
                 my $content = delete $args{content};
                 my @split_parts = split /($split_by)/, $content;
-                log_trace "split_by=%s, split_contents=%s", $split_by, \@split_parts;
+                log_debug "split_by=%s, num_parts=%d", $split_by, scalar(@split_parts);
+                log_trace "split_contents=%s", \@split_parts;
 
                 my $i = 0;
                 while (my ($part, $separator) = splice @split_parts, 0, 2) {
@@ -230,7 +263,7 @@ App::ClipboardUtils - CLI utilities related to clipboard
 
 =head1 VERSION
 
-This document describes version 0.014 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2025-10-16.
+This document describes version 0.015 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2026-09-20.
 
 =head1 DESCRIPTION
 
@@ -356,10 +389,33 @@ Read L<Text::Fragment> for more details on text fragments.
 
 Split content by specified stringE<sol>regex, add the split content as multiple clipboard entries.
 
-Cannot be used together with C<--fragments> or C<--command-line> option.
+Cannot be used together with C<--fragments> or C<--split-by-org-headlines> or C<--command-line> option.
 
 Note that if you supply a regex, you should not have any capture groups in the
 regex.
+
+=item * B<split_by_org_headlines> => I<bool>
+
+Only add contents inside Org headlines.
+
+Cannot be used together with C<--split-by> or C<--command-line> option.
+
+Example content:
+
+ * headline 1
+ Content 1
+ Second line
+ ** headline 1.1
+ Content 1.1
+ ** headline 1.2
+ Content 1.2
+ * headline 2
+ Content 2
+
+Command:
+
+ % cat document.org | clipadd --split-by-org-headlines
+ % cat document.org | clipadd -o
 
 =item * B<tee> => I<true>
 
@@ -456,7 +512,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026, 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

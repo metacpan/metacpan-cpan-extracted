@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::AlertingSpec;
 # ABSTRACT: alerting defines the settings related to Alertmanager.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s alertmanagers => ['+IO::K8s::PrometheusOperator::V1::AlertmanagerEndpoints'], { required => 'schema' };
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::AlertingSpec - alerting defines the settings re
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 alertmanagers
 

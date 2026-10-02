@@ -1,3 +1,4 @@
+#!/bin/perl
 use Modern::Perl;
 
 use Image::Synchronize::Timerange;

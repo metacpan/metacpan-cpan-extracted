@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::PushSecretSpec;
 # ABSTRACT: PushSecretSpec configures the behavior of the PushSecret.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s data            => ['+IO::K8s::ExternalSecrets::V1alpha1::PushSecretData'];
@@ -34,7 +34,7 @@ IO::K8s::ExternalSecrets::V1alpha1::PushSecretSpec - PushSecretSpec configures t
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 data
 

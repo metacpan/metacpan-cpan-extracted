@@ -5,10 +5,9 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
-
 
 use Config;
 use TUI::toolkit qw( :utils );
@@ -98,12 +97,12 @@ TUI::Gadgets::HeapView::Win32 - Win32 heap usage backend for HeapView
 
   use TUI::Gadgets::HeapView::Win32;
 
-  my $total = TUI::Gadgets::HeapView::Win32->heapSize;
+  my $total = TUI::Gadgets::HeapView::Win32->heapSize();
 
 =head1 DESCRIPTION
 
-C<TUI::Gadgets::HeapView::Win32> provides the Windows-specific implementation
-used by C<THeapView> to retrieve memory usage information.
+This module provides the Windows-specific implementation used by 
+L<THeapView|TUI::Gadgets::HeapView> to retrieve memory usage information.
 
 On Win32 systems, heap usage is derived from the process virtual memory
 statistics provided by the operating system. This module encapsulates the
@@ -115,13 +114,14 @@ The module is not intended to be used directly by application code.
 
 =head2 heapSize
 
-  my $total = TUI::Gadgets::HeapView::Win32->heapSize;
+  my $total = TUI::Gadgets::HeapView::Win32->heapSize();
 
-Returns the total amount of virtual memory currently used by the process.
+Returns the amount of private virtual memory currently committed
+to the process, as reported by C<PROCESS_MEMORY_COUNTERS_EX::PrivateUsage>.
 
 =head1 SEE ALSO
 
-L<TUI::Gadgets::HeapView>
+L<THeapView|TUI::Gadgets::HeapView>
 
 =head1 AUTHORS
 

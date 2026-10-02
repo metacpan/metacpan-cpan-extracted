@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::PrometheusRuleExcludeConfig;
 # ABSTRACT: PrometheusRuleExcludeConfig enables users to configure excluded PrometheusRule names and their namespaces to be ignored while enforcing namespace label for alerts and metrics.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s ruleName      => Str, { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::PrometheusRuleExcludeConfig - PrometheusRuleExc
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 ruleName
 

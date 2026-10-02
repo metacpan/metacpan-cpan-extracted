@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::StripPrefixRegex;
 # ABSTRACT: StripPrefixRegex holds the strip prefix regex middleware configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s regex => [Str];
@@ -20,7 +20,7 @@ IO::K8s::Traefik::V1alpha1::StripPrefixRegex - StripPrefixRegex holds the strip 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 regex
 

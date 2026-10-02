@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::NodeAllocatableMapping;
 # ABSTRACT: NodeAllocatableMapping defines how a DRA allocation directly translates into a node allocatable resource quantity. The mapping can be derived from either the count of allocated devices or the specific capacity consumed. These options are mutually exclusive. Kubelet adds this mapped resource quantity from claim to both requests and limits at the pod-level cgroup, and to limits at the container-level cgroup for each container referencing the claim.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s capacityKey => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1beta1::NodeAllocatableMapping - NodeAllocatableMapping
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 capacityKey
 

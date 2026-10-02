@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::HTTPHeaderFilter;
 # ABSTRACT: ResponseHeaderModifier defines a schema for a filter that modifies response headers.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s add    => ['Core::V1::HTTPHeader'];
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1::HTTPHeaderFilter - ResponseHeaderModifier defines a sch
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 add
 

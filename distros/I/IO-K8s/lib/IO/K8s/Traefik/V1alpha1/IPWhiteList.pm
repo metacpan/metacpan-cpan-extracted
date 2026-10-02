@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::IPWhiteList;
 # ABSTRACT: Deprecated: please use IPAllowList instead.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s ipStrategy  => '+IO::K8s::Traefik::V1alpha1::IPStrategy';
@@ -22,7 +22,7 @@ IO::K8s::Traefik::V1alpha1::IPWhiteList - Deprecated: please use IPAllowList ins
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 ipStrategy
 

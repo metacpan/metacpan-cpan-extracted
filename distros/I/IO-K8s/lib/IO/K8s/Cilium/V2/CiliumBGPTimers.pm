@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumBGPTimers;
 # ABSTRACT: Timers defines the BGP timers for the peer.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s connectRetryTimeSeconds => Int, { minimum => 1, maximum => 2147483647, default => 120 };
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::CiliumBGPTimers - Timers defines the BGP timers for the pee
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 connectRetryTimeSeconds
 

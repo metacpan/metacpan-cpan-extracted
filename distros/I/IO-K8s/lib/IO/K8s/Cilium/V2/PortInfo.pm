@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::PortInfo;
 # ABSTRACT: PortInfo specifies L4 port number and name along with the transport protocol
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s name     => Str, { pattern => qr/^([0-9]{1,4})|([a-zA-Z0-9]-?)*[a-zA-Z](-?[a-zA-Z0-9])*$/ };
@@ -24,7 +24,7 @@ IO::K8s::Cilium::V2::PortInfo - PortInfo specifies L4 port number and name along
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 name
 

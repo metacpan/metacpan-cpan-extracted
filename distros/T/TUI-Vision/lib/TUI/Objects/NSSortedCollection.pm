@@ -1,4 +1,3 @@
-
 package TUI::Objects::NSSortedCollection;
 # ABSTRACT: Defines the class TNSSortedCollection
 
@@ -6,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -128,14 +127,22 @@ __END__
 
 TUI::Objects::NSSortedCollection - internal non-storable base for sorted coll's
 
+=head1 HIERARCHY
+
+  TObject
+    TNSCollection
+      TNSSortedCollection
+        TSortedCollection
+
 =head1 DESCRIPTION
 
 C<TNSSortedCollection> is the non-storable base variant of sorted collection
-classes in the TUI::Vision framework. It extends C<TNSCollection> with support
-for ordered insertion and lookup.
+classes in the L<TUI::Vision> framework. It extends C<TNSCollection> with 
+support for ordered insertion and lookup.
 
 This class exists primarily for internal use by the framework. Public-facing
-code should use C<TSortedCollection> or one of its derived classes instead.
+code should use L<TSortedCollection|TUI::Objects::SortedCollection> or one of 
+its derived classes instead.
 
 The non-storable variants are required to separate internal collection behavior
 from the storable collection types used elsewhere in the library.
@@ -152,9 +159,9 @@ Derived public classes are expected to provide a concrete comparison strategy.
 
 =head1 SEE ALSO
 
-L<TUI::Objects::SortedCollection>,
-L<TUI::Objects::Collection>,
-L<TUI::Objects::NSCollection>
+L<TSortedCollection|TUI::Objects::SortedCollection>,
+L<TCollection|TUI::Objects::Collection>,
+L<TNSCollection|TUI::Objects::NSCollection>
 
 =head1 AUTHORS
 

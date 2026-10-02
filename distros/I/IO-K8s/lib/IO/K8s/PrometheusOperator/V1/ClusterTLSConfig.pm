@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::ClusterTLSConfig;
 # ABSTRACT: clusterTLS defines the mutual TLS configuration for the Alertmanager cluster's gossip protocol.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s client => '+IO::K8s::PrometheusOperator::V1::SafeTLSConfig', { required => 'schema' };
@@ -22,7 +22,7 @@ IO::K8s::PrometheusOperator::V1::ClusterTLSConfig - clusterTLS defines the mutua
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 client
 

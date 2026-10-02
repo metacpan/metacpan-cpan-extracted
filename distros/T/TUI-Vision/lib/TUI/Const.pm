@@ -1,10 +1,11 @@
 package TUI::Const;
 # ABSTRACT: Miscellaneous system-wide configuration parameters.
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -56,7 +57,7 @@ TUI::Const - system-wide configuration constants
 
 =head1 DESCRIPTION
 
-C<TUI::Const> defines system-wide constants used throughout the TUI::Vision
+C<TUI::Const> defines system-wide constants used throughout the L<TUI::Vision>
 framework.
 
 The constants in this module provide common limits, sentinel values, and size

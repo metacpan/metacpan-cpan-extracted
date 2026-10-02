@@ -24,7 +24,6 @@ terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 
-use Win32;
 use Test::More;
 
 sub diag_version {
@@ -48,7 +47,8 @@ sub diag_version {
     return diag sprintf('  %-40s    undef', $module);
   }
 
-  my ($major, $rest) = split /\./, $version;
+  my ($major, @rest) = split /\./, $version;
+  my $rest = join('.', @rest);
   $major =~ s/^v//;
   return "$major\.$rest" if $return;
   return diag sprintf('  %-40s % 4d.%s', $module, $major, $rest);
@@ -72,7 +72,16 @@ use constant MANUAL_TESTS => exists($ENV{MANUAL_TESTS})
                           && !$ENV{AUTOMATED_TESTING}
                           && !$ENV{NONINTERACTIVE_TESTING};
 
-use constant PERL_ONLY => exists($ENV{PERL_ONLY}) && $ENV{PERL_ONLY};
+use constant _WIN32     => $^O eq 'MSWin32';
+use constant PERL_ONLY  => exists($ENV{PERL_ONLY}) && $ENV{PERL_ONLY};
+use constant WT_SESSION => exists($ENV{WT_SESSION}) && $ENV{WT_SESSION};
+
+use if _WIN32, 'Win32';
+
+BEGIN {
+  eval { require Termbox     } unless $ENV{PERL_ONLY};
+  eval { require Termbox::PP } if $ENV{PERL_ONLY} || $@;
+}
 
 sub banner {
   diag( ' ' );
@@ -80,10 +89,11 @@ sub banner {
   diag( ' ' );
   diag( "  OS:           $^O" );
   diag( "  PERL:         $]" );
-  diag( "  CP:           ", Win32::GetConsoleOutputCP() );
+  diag( "  CP:           ", Win32::GetConsoleOutputCP() ) if _WIN32;
   diag( "  STRICT:       ", STRICT       ? "enabled"  : "not enabled"  );
   diag( "  MANUAL_TESTS: ", MANUAL_TESTS ? "enabled"  : "not enabled"  );
   diag( "  PERL_ONLY:    ", PERL_ONLY    ? "enabled"  : "not enabled"  );
+  diag( "  WT_SESSION:   ", WT_SESSION   ? "set"      : "not set"      );
   diag( ' ' );
   diag( '# ' x 36 );
 }
@@ -92,6 +102,7 @@ banner();
 
 while (<DATA>) {
   chomp;
+  s/\r\z//;
     
   if (/^#\s*(.*)$/ or /^$/) {
     diag($1 || "");
@@ -123,6 +134,7 @@ __DATA__
 Devel::StrictMode
 Importer
 Import::Into
+Termbox
 UNIVERSAL::Object
 Win32::API
 Win32::Console
@@ -164,7 +176,13 @@ MRO::Compat
 namespace::sweep
 PerlX::Assert
 Sub::Util
-Type::Tiny/Types::Standard
+Type::Tiny/Type::Params
+
+$LANG
+$LOCALE
+$TERM
+$COLORTERM
+$ESCDELAY
 
 $AUTOMATED_TESTING
 $NONINTERACTIVE_TESTING
@@ -180,3 +198,4 @@ $PERL_PLATFORM_OVERRIDE
 
 $PERLX_ASSERT_PP_FILTER
 $PERL_ONLY
+$WT_SESSION

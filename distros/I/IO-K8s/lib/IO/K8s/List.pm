@@ -1,6 +1,6 @@
 package IO::K8s::List;
 # ABSTRACT: Generic list container for Kubernetes API responses
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use v5.10;
 use Moo;
 with 'IO::K8s::Role::Resource';
@@ -286,7 +286,7 @@ IO::K8s::List - Generic list container for Kubernetes API responses
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 

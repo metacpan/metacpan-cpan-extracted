@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -119,7 +119,7 @@ TUI::App::Background - forms the background for the applications
 =head1 DESCRIPTION
 
 C<TBackground> represents the background view that forms the visual backdrop of
-a TUI::Vision application. It fills its bounding rectangle by repeatedly
+a L<TUI::Vision> application. It fills its bounding rectangle by repeatedly
 drawing a single character pattern.
 
 Background views are typically created and managed automatically by the
@@ -128,16 +128,26 @@ unless a custom background is desired.
 
 =head2 Commonly Used Features
 
-Most programs use C<TBackground> indirectly through C<TDeskTop>; the default
-desktop creation path already instantiates a background object with the global
-desktop pattern. Direct usage is uncommon and usually limited to customizing
-appearance by overriding C<TDeskTop::initBackground()> and returning a
-background with a different C<pattern> character.
+Most programs use C<TBackground> indirectly through 
+L<TDeskTop|TUI::App::DeskTop>; the default desktop creation path already 
+instantiates a background object with the global desktop pattern. Direct usage 
+is uncommon and usually limited to customizing appearance by overriding 
+C<TDeskTop::initBackground()> and returning a background with a different 
+L</pattern> character.
 
 For custom backgrounds, the typical workflow is: derive a desktop class,
 override C<initBackground()> to create 
 C<<TBackground->new(bounds => ..., pattern => ... )>>, then return that desktop 
 from the application's C<initDeskTop()> override.
+
+=head1 ATTRIBUTES
+
+The following attributes are managed internally and exposed as read-only
+accessors.
+
+=head2 pattern
+
+The character pattern replicated to fill the background (I<Str>).
 
 =head1 CONSTRUCTOR
 
@@ -154,7 +164,8 @@ Creates a new background view.
 
 =item bounds
 
-Bounding rectangle defining the area covered by the background (I<TRect>).
+Bounding rectangle defining the area covered by the background 
+(L<TRect|TUI::Objects::Rect>).
 
 =item pattern
 
@@ -162,18 +173,14 @@ Single-character string used as the background pattern (I<Str>).
 
 =back
 
-=head1 ATTRIBUTES
+=head2 new
 
-The following attributes are managed internally and exposed as read-only
-accessors.
+  my $background = new_TBackground($bounds, $pattern);
 
-=over
+Factory-style constructor using positional arguments.
 
-=item pattern
-
-The character pattern replicated to fill the background (I<Str>).
-
-=back
+This constructor is provided for compatibility with traditional Turbo Vision
+construction patterns.
 
 =head1 METHODS
 
@@ -225,9 +232,9 @@ providing a custom C<TBackground> implementation.
 
 =head1 SEE ALSO
 
-L<TUI::App::DeskTop>,
-L<TUI::Views::View>,
-L<TUI::Objects::Rect>
+L<TDeskTop|TUI::App::DeskTop>,
+L<TView|TUI::Views::View>,
+L<TRect|TUI::Objects::Rect>
 
 =head1 AUTHORS
 

@@ -24,8 +24,8 @@ use parent qw(
 our $DB_HASH;
 our $hash_info;
 
-our $VERSION = '5.26.3';
-my $CREATED = '2005-01-28';
+our $VERSION = '5.26.4';
+my $CREATED  = '2005-01-28';
 
 
 # ------------------------------------------------
@@ -5207,6 +5207,15 @@ sub table_lastid {
     my @all_keys = $self->table_keys($tableid);
     my @nums = sort { $b <=> $a } grep /^[0-9]+$/, @all_keys;
     $last_id  = $nums[0] // 0;
+
+    my $del_path = "$table_path.del";
+    if ( -e $del_path && $self->table_read($del_path) ) {
+        $self->recs_scan( $del_path, sub {
+            my ($k) = @_;
+            $last_id = $k if $k > $last_id;
+        } );
+        $self->table_close($del_path);
+    }
     if (    defined $last_id
         and $last_id =~ /^[0-9]+$/
         and $table_info->{record_index} )

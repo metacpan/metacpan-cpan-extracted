@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::QueueConfig;
 # ABSTRACT: queueConfig allows tuning of the remote write queue parameters.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s batchSendDeadline => Str, { pattern => qr/^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$/ };
@@ -38,7 +38,7 @@ IO::K8s::PrometheusOperator::V1::QueueConfig - queueConfig allows tuning of the 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 batchSendDeadline
 

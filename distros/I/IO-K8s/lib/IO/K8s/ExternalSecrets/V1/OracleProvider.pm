@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OracleProvider;
 # ABSTRACT: Oracle configures this store to sync secrets using Oracle Vault provider
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s auth              => '+IO::K8s::ExternalSecrets::V1::OracleAuth';
@@ -32,7 +32,7 @@ IO::K8s::ExternalSecrets::V1::OracleProvider - Oracle configures this store to s
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 auth
 

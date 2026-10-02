@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeGroupSnapshotContent;
 # ABSTRACT: VolumeGroupSnapshotContent represents an on-disk group snapshot
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'groupsnapshot.storage.k8s.io/v1',
     resource_plural => 'volumegroupsnapshotcontents',
@@ -28,7 +28,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeGroupSnapshotContent - VolumeGroupSnapshotCon
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

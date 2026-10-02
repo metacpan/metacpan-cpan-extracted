@@ -1,6 +1,6 @@
 package Langertha::Role::Runnable;
-# ABSTRACT: Common async execution contract for Raider and Raid nodes
-our $VERSION = '0.502';
+# ABSTRACT: Common async execution contract (run_f) for runnable nodes
+our $VERSION = '0.503';
 use Moose::Role;
 
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Langertha::Role::Runnable - Common async execution contract for Raider and Raid nodes
+Langertha::Role::Runnable - Common async execution contract (run_f) for runnable nodes
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -37,8 +37,10 @@ version 0.502
 
 =head1 DESCRIPTION
 
-Minimal execution contract shared by L<Langertha::Raider> and orchestration
-nodes under L<Langertha::Raid>. Consumers must implement C<run_f($ctx)>.
+Minimal, dependency-free execution contract: consumers implement C<run_f($ctx)>
+and return a Future. A generic core primitive with no coupling to any particular
+runner — the Raider agent and the Raid orchestration nodes in the langertha-raider
+distribution are consumers, but nothing here depends on them.
 
 =head2 run_f
 

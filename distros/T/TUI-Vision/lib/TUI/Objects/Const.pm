@@ -1,9 +1,11 @@
 package TUI::Objects::Const;
+# ABSTRACT: Constants for object and collection components
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -61,15 +63,16 @@ TUI::Objects::Const - constants for object and collection components
 
 =head1 DESCRIPTION
 
-C<TUI::Objects::Const> defines constants used by the TUI::Vision object and
-collection infrastructure.
+This module defines constants used by the L<TUI::Vision> object and collection 
+infrastructure.
 
 The constants in this module are used by collection classes and related object
 management code to represent special index values and size limits.
 
 This module only defines constants. The semantic meaning and practical usage of
 these constants is documented in the corresponding object and collection
-modules, such as C<TCollection> and C<TSortedCollection>.
+modules, such as L<TCollection|TUI::Objects::Collection> and 
+L<TSortedCollection|TUI::Objects::SortedCollection>.
 
 =head1 CONSTANTS
 
@@ -105,8 +108,8 @@ The C<:all> tag imports all constants defined by this module.
 
 =head1 SEE ALSO
 
-L<TUI::Objects::Collection>,
-L<TUI::Objects::SortedCollection>
+L<TCollection|TUI::Objects::Collection>,
+L<TSortedCollection|TUI::Objects::SortedCollection>
 
 =head1 AUTHORS
 

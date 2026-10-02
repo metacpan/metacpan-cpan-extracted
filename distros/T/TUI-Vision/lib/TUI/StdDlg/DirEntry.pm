@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -52,7 +52,7 @@ sub new {    # \$obj (%args)
   return $self;
 }
 
-sub from {    # $obj ($x, $y)
+sub from {    # $obj ($txt, $dir)
   state $sig = signature(
     method => 1,
     pos => [Str, Str],
@@ -107,9 +107,10 @@ C<TDirEntry> represents a single directory entry used by the standard dialog
 subsystem. It is a lightweight data object that stores the display text and the
 associated directory path.
 
-This class is not derived from C<TObject> and does not participate in the view
-hierarchy. It exists solely as a structured data container and is used by
-collections and list boxes to represent directory items.
+This class is not derived from L<TObject|TUI::Objects::TObject> and does not 
+participate in the view hierarchy. It exists solely as a structured data 
+container and is used by collections and list boxes to represent directory 
+items.
 
 =head1 CONSTRUCTOR
 
@@ -134,6 +135,12 @@ Filesystem path associated with this entry (I<Str>).
 
 =back
 
+=head2 new_TDirEntry
+
+  my $entry = new_TDirEntry($txt, $dir);
+
+Factory-style constructor using positional arguments.
+
 =head1 METHODS
 
 =head2 text
@@ -150,9 +157,9 @@ Returns the directory path associated with the entry.
 
 =head1 SEE ALSO
 
-L<TUI::StdDlg::DirCollection>,
-L<TUI::StdDlg::DirListBox>,
-L<TUI::StdDlg::ChDirDialog>
+L<TDirCollection|TUI::StdDlg::DirCollection>,
+L<TDirListBox|TUI::StdDlg::DirListBox>,
+L<TChDirDialog|TUI::StdDlg::ChDirDialog>
 
 =head1 AUTHORS
 

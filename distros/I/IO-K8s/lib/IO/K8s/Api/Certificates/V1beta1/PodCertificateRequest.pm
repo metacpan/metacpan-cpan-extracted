@@ -1,6 +1,6 @@
 package IO::K8s::Api::Certificates::V1beta1::PodCertificateRequest;
 # ABSTRACT: PodCertificateRequest encapsulates a pod's request for a certificate from a signer, as well as the signer's response, if any.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Certificates::V1beta1::PodCertificateRequest - PodCertificateReque
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 DESCRIPTION
 

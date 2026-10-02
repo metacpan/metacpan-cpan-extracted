@@ -1,4 +1,41 @@
-0.07
+0.08
+	- Released at 2026-10-01T22:28:15+0900
+	- add Perl::Critic::PJCJ
+	- add Perl::Critic::Grape
+	- add Perl::Critic::Community
+	- add Perl::Critic::Policy::ProhibitUseLib
+	- add Perl::Critic::Policy::ProhibitPipeOpen
+	- add Perl::Critic::Policy::PreferredBinaries
+	- add Perl::Critic::Policy::ProhibitUsageSubs
+	- add Perl::Critic::Policy::ProhibitPrintSTDERR
+	- add Perl::Critic::Policy::ProhibitLeadingZeros
+	- add Perl::Critic::Policy::RequireFatalWarnings
+	- add Perl::Critic::PolicyBundle::LoopsAndLabels
+	- add Perl::Critic::Policy::ProhibitUnusedImports
+	- add Perl::Critic::Policy::RequireQwForLiteralLists
+	- add Perl::Critic::Policy::ProhibitUnusedDefinitions
+	- add Perl::Critic::Policy::ProhibitNoWarningsRedefine
+	- add Perl::Critic::Policy::Security::RandBytesFromHash
+	- add Perl::Critic::Policy::ProhibitRegexForSimpleSubstring
+	- add Perl::Critic::Policy::BuiltinFunctions::ProhibitForeach
+	- add Perl::Critic::Policy::Plicease::ProhibitArrayAssignAref
+	- add Perl::Critic::Policy::Subroutines::ProhibitTailRecursion
+	- add Perl::Critic::Policy::InputOutput::ProhibitRepeatedPrints
+	- add Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat
+	- add Perl::Critic::Policy::ErrorHandling::RequireReturnFromEval
+	- add Perl::Critic::Policy::Variables::ProhibitUselessVarClearing
+	- add Perl::Critic::Policy::RegularExpressions::ProhibitRegexToChomp
+	- add Perl::Critic::Policy::Subroutines::ProhibitSingleUseLexicalSubs
+	- add Perl::Critic::Policy::Subroutines::ProhibitUnderscorePrivateSubs
+	- add Perl::Critic::Policy::Performance::ProhibitRegexForSimpleSubstring
+	- add Perl::Critic::Policy::BuiltinFunctions::ProhibitChainingSameListSub
+	- add Perl::Critic::Policy::RegularExpressions::ProhibitRegexToStripAffix
+	- add Perl::Critic::Policy::ControlStructures::ProhibitReturnInMappingBlock
+	- add Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength
+	- add Perl::Critic::Policy::RegularExpressions::ProhibitRegexForStringEquality
+	- add Perl::Critic::Policy::RegularExpressions::PreventUselessMetacharacterEscapes
+
+add 0.07
 	- Released at 2023-01-09T12:15:43+0900
 	- add Perl::Critic::Utils::DataConversion
 	- add Perl::Critic::Utils::POD::ParseInteriorSequence

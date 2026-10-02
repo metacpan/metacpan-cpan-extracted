@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -302,21 +302,22 @@ TUI::StdDlg::FileList - list box view for file and directory entries
 
 =head1 DESCRIPTION
 
-C<TFileList> implements a specialized list box used by standard
-TUI::Vision file dialogs to display directory contents.
+C<TFileList> implements a specialized list box used by standard L<TUI::Vision> 
+file dialogs to display directory contents.
 
-The list presents files and directories obtained from a C<TFileCollection>
-instance and supports keyboard and mouse navigation, selection, and activation
-of entries.
+The list presents files and directories obtained from a 
+L<TFileCollection|TUI::StdDlg::FileCollection> instance and supports keyboard 
+and mouse navigation, selection, and activation of entries.
 
-This class extends C<TListBox> with file-specific behavior and integrates
-tightly with other standard dialog components.
+This class extends L<TListBox|TUI::Views::ListBox> with file-specific behavior 
+and integrates tightly with other standard dialog components.
 
-C<TFileList> is typically managed by C<TFileDialog> and not used
-directly by application code.
+C<TFileList> is typically managed by L<TFileDialog|TUI::StdDlg::FileDialog> and 
+not used directly by application code.
 
-The list view relies on C<TFileCollection> for sorting and filtering file
-entries and reflects changes immediately when a new collection is assigned.
+The list view relies on L<TFileCollection|TUI::StdDlg::FileCollection> for 
+sorting and filtering file entries and reflects changes immediately when a new 
+collection is assigned.
 
 This class extends the generic list box behavior with file-specific logic such
 as directory scanning, filename display formatting, and hotkey extraction.
@@ -327,7 +328,8 @@ The following global variable defines the error message used by C<TFileList>.
 
 =head2 $tooManyFiles
 
-Message text displayed when the number of files exceeds the supported limit.
+Message text (I<Str>) displayed when the number of files exceeds the supported 
+limit.
 
 =head1 CONSTRUCTOR
 
@@ -344,11 +346,13 @@ Creates a new file list view.
 
 =item bounds
 
-Bounding rectangle defining the position and size of the list box (I<TRect>).
+Bounding rectangle defining the position and size of the list box 
+(L<TRect|TUI::Objects::Rect>).
 
 =item vScrollBar
 
-Optional vertical scroll bar associated with the list box (I<TScrollBar>).
+Optional vertical scroll bar associated with the list box 
+(L<TScrollBar|TUI::Views::ScrollBar> or C<undef>).
 
 =back
 
@@ -426,10 +430,10 @@ Restores the selection state from external input.
 
 =head1 SEE ALSO
 
-L<TUI::StdDlg::FileDialog>,
-L<TUI::StdDlg::FileCollection>,
-L<TUI::Views::ListBox>,
-L<TUI::Views::ScrollBar>
+L<TFileDialog|TUI::StdDlg::FileDialog>,
+L<TFileCollection|TUI::StdDlg::FileCollection>,
+L<TListBox|TUI::Views::ListBox>,
+L<TScrollBar|TUI::Views::ScrollBar>
 
 =head1 AUTHORS
 

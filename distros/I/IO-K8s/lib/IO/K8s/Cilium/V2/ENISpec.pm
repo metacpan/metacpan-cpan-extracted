@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::ENISpec;
 # ABSTRACT: ENI is the AWS ENI specific configuration.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s 'availability-zone'         => Str;
@@ -44,7 +44,7 @@ IO::K8s::Cilium::V2::ENISpec - ENI is the AWS ENI specific configuration.
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 availability-zone
 

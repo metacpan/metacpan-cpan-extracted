@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::DopplerAuth;
 # ABSTRACT: Auth configures how the Operator authenticates with the Doppler API
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s oidcConfig => '+IO::K8s::ExternalSecrets::V1::DopplerOIDCAuth';
@@ -22,7 +22,7 @@ IO::K8s::ExternalSecrets::V1::DopplerAuth - Auth configures how the Operator aut
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 oidcConfig
 

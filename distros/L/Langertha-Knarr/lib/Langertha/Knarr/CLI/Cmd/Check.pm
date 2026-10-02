@@ -1,15 +1,15 @@
 package Langertha::Knarr::CLI::Cmd::Check;
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 # ABSTRACT: Validate Knarr configuration file
 use Moo;
+with 'Langertha::Knarr::CLI::Role::GlobalOptions';
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: knarr check [options]';
 
 
 sub execute {
   my ($self, $args, $chain) = @_;
-  my $main = $chain->[0];
-  my $config_file = $main->config;
+  my $config_file = $self->config_file($chain);
 
   unless (-f $config_file) {
     print STDERR "Config file not found: $config_file\n";
@@ -45,7 +45,8 @@ sub execute {
   my $lf_pub = $lf->{public_key} // $ENV{LANGFUSE_PUBLIC_KEY};
   my $lf_sec = $lf->{secret_key} // $ENV{LANGFUSE_SECRET_KEY};
   if ($lf_pub && $lf_sec) {
-    print "  Langfuse: enabled (", ($lf->{url} // $ENV{LANGFUSE_URL} // 'cloud.langfuse.com'), ")\n";
+    print "  Langfuse: enabled (", ($lf->{url} // $ENV{LANGFUSE_URL} // 'cloud.langfuse.com'),
+      ", ", $config->langfuse_transport, ")\n";
   } else {
     print "  Langfuse: disabled (set LANGFUSE_PUBLIC_KEY + LANGFUSE_SECRET_KEY to enable)\n";
   }
@@ -65,7 +66,7 @@ Langertha::Knarr::CLI::Cmd::Check - Validate Knarr configuration file
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 
@@ -74,7 +75,8 @@ L<Langertha::Knarr::Config/validate>, and prints a status summary including
 listen addresses, model count, auto-discover state, proxy auth state, and
 Langfuse tracing state. Exits with a non-zero code on invalid config.
 
-See L<knarr> for option details and L<Langertha::Knarr> for full documentation.
+See L<knarr> for option details and L<Langertha::Knarr::Config> for the
+configuration file format.
 
 =head1 SEE ALSO
 

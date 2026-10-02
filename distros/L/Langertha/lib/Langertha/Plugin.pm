@@ -1,6 +1,6 @@
 package Langertha::Plugin;
 # ABSTRACT: Base class for plugins
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 use Moose;
 use Future::AsyncAwait;
 
@@ -90,7 +90,7 @@ Langertha::Plugin - Base class for plugins
 
 =head1 VERSION
 
-version 0.502
+version 0.503
 
 =head1 SYNOPSIS
 
@@ -122,13 +122,15 @@ version 0.502
 =head1 DESCRIPTION
 
 Base class for Langertha plugins. Plugins are Moose classes that extend
-C<Langertha::Plugin> and override hook methods. Plugins can be attached
-to any plugin host — L<Langertha::Raider> or an engine class that
-consumes L<Langertha::Role::PluginHost>.
+C<Langertha::Plugin> and override hook methods. Plugins can be attached to
+any plugin host — a wrapper class such as L<Langertha::Chat>,
+L<Langertha::Embedder> or L<Langertha::ImageGen>, an engine that consumes
+L<Langertha::Role::PluginHost>, or L<Langertha::Raider> from the
+C<langertha-raider> distribution.
 
 Plugins are registered via the C<plugins> attribute on the host:
 
-    my $raider = Langertha::Raider->new(
+    my $chat = Langertha::Chat->new(
         engine  => $engine,
         plugins => ['Langfuse', 'MyPlugin'],
     );
@@ -173,6 +175,30 @@ Transform the tool result after execution.
 =item B<plugin_after_raid>($result) -> $result
 
 Transform the final L<Langertha::Raider::Result> before return.
+
+=item B<plugin_before_embedding>($text) -> $text
+
+Transform the input before an embedding request (L<Langertha::Embedder>).
+
+=item B<plugin_after_embedding>($text, $vector, $call_result?) -> $vector
+
+Inspect or transform the embedding. C<$call_result> is passed only when the
+call went through L<Langertha::Embedder/simple_embedding_result> (or its
+C<_f>): the L<Langertha::CallResult> of the request, with its C<usage>,
+C<rate_limit>, C<model> and C<total_seconds>. Every hook gets the same
+object, whose C<value> is the engine's vector before any hook ran; the
+return value of one hook is the C<$vector> of the next. A hook written for
+two arguments keeps working.
+
+=item B<plugin_before_image_gen>($prompt) -> $prompt
+
+Transform the prompt before an image generation request (L<Langertha::ImageGen>).
+
+=item B<plugin_after_image_gen>($prompt, $result, $call_result?) -> $result
+
+Inspect or transform the generated images. C<$call_result> is passed only
+when the call went through L<Langertha::ImageGen/simple_image_result> (or its
+C<_f>), with the same meaning as for C<plugin_after_embedding>.
 
 =back
 

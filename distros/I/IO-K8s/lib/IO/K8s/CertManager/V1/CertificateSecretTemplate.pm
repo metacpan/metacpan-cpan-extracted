@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificateSecretTemplate;
 # ABSTRACT: Defines annotations and labels to be copied to the Certificate's Secret.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s annotations => { Str => 1 };
@@ -22,7 +22,7 @@ IO::K8s::CertManager::V1::CertificateSecretTemplate - Defines annotations and la
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 annotations
 

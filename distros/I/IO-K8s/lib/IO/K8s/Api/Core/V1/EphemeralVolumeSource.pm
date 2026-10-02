@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::EphemeralVolumeSource;
 # ABSTRACT: Represents an ephemeral volume that is handled by a normal storage driver.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s volumeClaimTemplate => 'Core::V1::PersistentVolumeClaimTemplate';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::EphemeralVolumeSource - Represents an ephemeral volume t
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 volumeClaimTemplate
 

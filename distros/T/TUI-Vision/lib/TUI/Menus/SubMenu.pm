@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -57,22 +57,20 @@ $add_menu_item = sub {    # $s ($s, $i, |undef)
   assert ( is_Object $s );
   assert ( is_Object $i and $i->isa( TMenuItem ) );
   my $sub = $s;
-  while ( $sub->{next} ) {
-    $sub = $sub->{next};
-  }
+  $sub = $sub->{next}
+    while $sub->{next};
 
   if ( !$sub->{subMenu} ) {
     $sub->{subMenu} = TMenu->new( items => $i );
   }
   else {
     my $cur = $sub->{subMenu}{items};
-    while ( $cur->{next} ) {
-      $cur = $cur->{next};
-    }
+    $cur = $cur->{next}
+      while $cur->{next};
     $cur->{next} = $i;
   }
   return $s;
-}; #/ sub $add_menu_item
+};
 
 sub _add_sub_menu { goto &$add_sub_menu }
 $add_sub_menu = sub {    # $s1 ($s1, $s2, |undef)
@@ -81,9 +79,8 @@ $add_sub_menu = sub {    # $s1 ($s1, $s2, |undef)
   assert ( is_Object $s1 );
   assert ( is_Object $s2 and $s2->isa( TSubMenu ) );
   my $cur = $s1;
-  while ( $cur->{next} ) {
-    $cur = $cur->{next};
-  }
+  $cur = $cur->{next}
+    while $cur->{next};
   $cur->{next} = $s2;
   return $s1;
 };
@@ -137,33 +134,76 @@ TUI::Menus::SubMenu - submenu item for menu bars and menu boxes
 =head1 DESCRIPTION
 
 C<TSubMenu> represents a submenu entry that can be attached to a menu bar or
-menu box. It is a specialized form of C<TMenuItem> that owns a list of child
-menu items.
+menu box. It is a specialized form of L<TMenuItem|TUI::Menus::MenuItem> that 
+owns a list of child menu items.
 
 Submenus are typically constructed using operator chaining, allowing menu
 structures to be built declaratively.
 
 =head1 CONSTRUCTOR
 
-=head2 new_TSubMenu
+This class does not define its own construction parameters and relies on the
+standard L<TMenuItem|TUI::Menus::MenuItem> initialization.
 
-  my $submenu = new_TSubMenu($title, $key | undef, $helpCtx | undef);
+=head2 new
+
+  my $item = TSubMenu->new(
+    name    => $name,
+    command => $command,
+    subMenu => $subMenu,
+    # optional ..
+    (
+      helpCtx => $helpCtx,
+      next    => $next,
+    )
+  );
 
 Creates a new submenu item.
 
 =over
 
-=item title
+=item name
 
-The displayed submenu title, usually containing a hotkey marker (I<Str>).
+Text displayed for the menu item (I<Str>).
 
-=item key
+=item command
 
-Optional keyboard shortcut associated with the submenu (I<Int>).
+Command identifier (I<PositiveOrZeroInt>). This parameter is optional for 
+submenu entries.
+
+=item subMenu
+
+Optional submenu associated with this item (I<Object>).
 
 =item helpCtx
 
-Optional help context identifier (I<Int>).
+Optional help context identifier (I<PositiveOrZeroInt>).
+
+=item next
+
+Optional reference to the next menu item (I<Object>).
+
+=back
+
+=head2 new_TSubMenu
+
+  my $submenu = new_TSubMenu($name, $key, $helpCtx = hcNoContext);
+
+Creates a new submenu item.
+
+=over
+
+=item name
+
+The displayed submenu name, usually containing a hotkey marker (I<Str>).
+
+=item key
+
+Keyboard shortcut associated with the submenu (I<PositiveOrZeroInt>).
+
+=item helpCtx
+
+Optional help context identifier (I<PositiveOrZeroInt>).
 
 =back
 
@@ -178,19 +218,30 @@ Adds a menu item or submenu to this submenu.
 This method implements the C<+> operator, allowing menu items to be chained
 together.
 
+=head1 OPERATORS
+
+=head2 +
+
+  my $list = $submenu1 + $submenu2;
+
+Appends C<$submenu2> to the end of the list beginning at C<$submenu1>.
+
+The operation returns the head element of the resulting list, allowing
+multiple append operations to be chained.
+
 =head1 USAGE NOTES
 
 C<TSubMenu> is not normally instantiated directly via C<new>. Instead, the
 factory function C<new_TSubMenu> should be used.
 
 Menu structures are commonly built using chained additions, which preserves
-the original Turbo Vision menu construction style.
+the original I<Turbo Vision> menu construction style.
 
 =head1 SEE ALSO
 
-L<TUI::Menus::MenuItem>,
-L<TUI::Menus::MenuBar>,
-L<TUI::Menus::MenuBox>
+L<TMenuItem|TUI::Menus::MenuItem>,
+L<TMenuBar|TUI::Menus::MenuBar>,
+L<TMenuBox|TUI::Menus::MenuBox>
 
 =head1 AUTHORS
 

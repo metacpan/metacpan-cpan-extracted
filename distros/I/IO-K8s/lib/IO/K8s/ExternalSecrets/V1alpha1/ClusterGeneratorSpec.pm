@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ClusterGeneratorSpec;
 # ABSTRACT: ClusterGeneratorSpec defines the desired state of a ClusterGenerator.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s generator => '+IO::K8s::ExternalSecrets::V1alpha1::ClusterGeneratorGenerator', { required => 'schema' };
@@ -27,7 +27,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ClusterGeneratorSpec - ClusterGeneratorSpec 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 generator
 

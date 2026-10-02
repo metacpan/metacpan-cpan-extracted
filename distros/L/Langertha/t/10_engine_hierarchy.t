@@ -57,6 +57,7 @@ like($@, qr/url/, 'OpenAIBase requires url');
 use Langertha::Engine::AnthropicBase;
 
 ok(Langertha::Engine::AnthropicBase->isa('Langertha::Engine::Remote'), 'AnthropicBase isa Remote');
+ok(Langertha::Engine::AnthropicBase->does('Langertha::Role::AnthropicCompatible'), 'AnthropicBase does AnthropicCompatible');
 ok(Langertha::Engine::AnthropicBase->does('Langertha::Role::Models'), 'AnthropicBase does Models');
 ok(Langertha::Engine::AnthropicBase->does('Langertha::Role::Chat'), 'AnthropicBase does Chat');
 ok(Langertha::Engine::AnthropicBase->does('Langertha::Role::Streaming'), 'AnthropicBase does Streaming');
@@ -80,6 +81,7 @@ use Langertha::Engine::Anthropic;
 ok(Langertha::Engine::Anthropic->isa('Langertha::Engine::Remote'), 'Anthropic isa Remote');
 ok(Langertha::Engine::Anthropic->isa('Langertha::Engine::AnthropicBase'), 'Anthropic isa AnthropicBase');
 ok(!Langertha::Engine::Anthropic->isa('Langertha::Engine::OpenAIBase'), 'Anthropic is NOT OpenAIBase');
+ok(Langertha::Engine::Anthropic->does('Langertha::Role::AnthropicCompatible'), 'Anthropic does AnthropicCompatible');
 ok(Langertha::Engine::Anthropic->does('Langertha::Role::Chat'), 'Anthropic does Chat');
 ok(Langertha::Engine::Anthropic->does('Langertha::Role::Streaming'), 'Anthropic does Streaming');
 ok(Langertha::Engine::Anthropic->does('Langertha::Role::Tools'), 'Anthropic does Tools');
@@ -88,7 +90,7 @@ ok(!Langertha::Engine::Anthropic->does('Langertha::Role::OpenAICompatible'), 'An
 {
   my $a = Langertha::Engine::Anthropic->new(api_key => 'test-key');
   is($a->url, 'https://api.anthropic.com', 'Anthropic url defaults correctly');
-  is($a->default_model, 'claude-sonnet-4-6', 'Anthropic default_model');
+  is($a->default_model, 'claude-sonnet-5', 'Anthropic default_model');
   my $req = $a->chat('hello');
   is($req->header('x-api-key'), 'test-key', 'Anthropic uses x-api-key header');
   is($req->header('content-type'), 'application/json', 'Anthropic sets content-type');
@@ -107,9 +109,9 @@ ok(Langertha::Engine::Gemini->does('Langertha::Role::Tools'), 'Gemini does Tools
 {
   my $g = Langertha::Engine::Gemini->new(api_key => 'test-key');
   is($g->url, 'https://generativelanguage.googleapis.com', 'Gemini url defaults correctly');
-  is($g->default_model, 'gemini-2.5-flash', 'Gemini default_model');
+  is($g->default_model, 'gemini-3-flash-preview', 'Gemini default_model');
   my $req = $g->chat('hello');
-  like($req->uri, qr{/v1beta/models/gemini-2\.5-flash:generateContent}, 'Gemini chat endpoint');
+  like($req->uri, qr{/v1beta/models/gemini-3-flash-preview:generateContent}, 'Gemini chat endpoint');
   like($req->uri, qr{key=test-key}, 'Gemini api_key in URL');
 }
 
@@ -239,6 +241,7 @@ use Langertha::Engine::LMStudioAnthropic;
 ok(Langertha::Engine::LMStudioAnthropic->isa('Langertha::Engine::AnthropicBase'), 'LMStudioAnthropic isa AnthropicBase');
 ok(Langertha::Engine::LMStudioAnthropic->isa('Langertha::Engine::Remote'), 'LMStudioAnthropic isa Remote');
 ok(!Langertha::Engine::LMStudioAnthropic->isa('Langertha::Engine::OpenAIBase'), 'LMStudioAnthropic is NOT OpenAIBase');
+ok(Langertha::Engine::LMStudioAnthropic->does('Langertha::Role::AnthropicCompatible'), 'LMStudioAnthropic does AnthropicCompatible');
 ok(Langertha::Engine::LMStudioAnthropic->does('Langertha::Role::Chat'), 'LMStudioAnthropic does Chat');
 ok(Langertha::Engine::LMStudioAnthropic->does('Langertha::Role::Streaming'), 'LMStudioAnthropic does Streaming');
 ok(Langertha::Engine::LMStudioAnthropic->does('Langertha::Role::Tools'), 'LMStudioAnthropic does Tools');
@@ -273,7 +276,7 @@ ok(!Langertha::Engine::AKI->does('Langertha::Role::OpenAICompatible'), 'AKI does
 {
   my $a = Langertha::Engine::AKI->new(api_key => 'test-key');
   is($a->url, 'https://aki.io', 'AKI url defaults correctly');
-  is($a->default_model, 'llama3_8b_chat', 'AKI default_model');
+  is($a->default_model, 'minimax_m3', 'AKI default_model (MiniMax M3; llama3_8b_chat EOL 2026-09-30, karr k132)');
 }
 
 # ======================================================================
@@ -347,14 +350,14 @@ test_openai_cloud_engine(
   class => 'Langertha::Engine::OpenAI',
   name => 'OpenAI',
   url => 'https://api.openai.com/v1',
-  model => 'gpt-4o-mini',
+  model => 'gpt-5.6-terra',
   env_var => 'LANGERTHA_OPENAI_API_KEY',
   has_tools => 1,
   has_embedding => 1,
   has_transcription => 1,
   has_response_format => 1,
 );
-is(Langertha::Engine::OpenAI->new(api_key => 'k')->default_model, 'gpt-4o-mini', 'OpenAI default_model');
+is(Langertha::Engine::OpenAI->new(api_key => 'k')->default_model, 'gpt-5.6-terra', 'OpenAI default_model');
 
 # --- DeepSeek ---
 
@@ -364,12 +367,12 @@ test_openai_cloud_engine(
   class => 'Langertha::Engine::DeepSeek',
   name => 'DeepSeek',
   url => 'https://api.deepseek.com',
-  model => 'deepseek-chat',
+  model => 'deepseek-flash',
   env_var => 'LANGERTHA_DEEPSEEK_API_KEY',
   has_tools => 1,
   has_response_format => 1,
 );
-is(Langertha::Engine::DeepSeek->new(api_key => 'k')->default_model, 'deepseek-chat', 'DeepSeek default_model');
+is(Langertha::Engine::DeepSeek->new(api_key => 'k')->default_model, 'deepseek-flash', 'DeepSeek default_model');
 
 # --- Groq ---
 
@@ -386,18 +389,71 @@ test_openai_cloud_engine(
   has_response_format => 1,
 );
 
-# --- Perplexity (NO tools!) ---
+# --- XAI (Grok) ---
+
+use Langertha::Engine::XAI;
+
+test_openai_cloud_engine(
+  class => 'Langertha::Engine::XAI',
+  name => 'XAI',
+  url => 'https://api.x.ai/v1',
+  model => 'grok-4.7',
+  env_var => 'LANGERTHA_XAI_API_KEY',
+  has_tools => 1,
+  has_response_format => 1,
+);
+# grok-4.7 is the current flagship and the only chat model on docs.x.ai/docs/models
+# (last updated 2026-09-21; advisor-verified 2026-09-25, docs only — karr k205).
+# Same specs as grok-4.6 on chat/completions; the prior default was grok-4.6 (k152).
+is(Langertha::Engine::XAI->new(api_key => 'k')->default_model, 'grok-4.7',
+  'XAI default_model is grok-4.7 (current flagship, not the superseded grok-4.6)');
+
+# --- Perplexity (Agent API — Responses envelope, NOT OpenAI; client function tools since k213) ---
+# Lean engine (k139): parent = Remote, composes Role::ResponsesCompatible (the
+# Open-Responses wire envelope, shared with OpenAIResponses) — deliberately NOT
+# OpenAIBase / OpenAICompatible / OpenAPI. Bespoke assertions rather than
+# test_openai_cloud_engine, which is /chat/completions-shaped.
 
 use Langertha::Engine::Perplexity;
 
-test_openai_cloud_engine(
-  class => 'Langertha::Engine::Perplexity',
-  name => 'Perplexity',
-  url => 'https://api.perplexity.ai',
-  model => 'sonar',
-  env_var => 'LANGERTHA_PERPLEXITY_API_KEY',
-  has_tools => 0,
-);
+{
+  my $class = 'Langertha::Engine::Perplexity';
+
+  ok($class->isa('Langertha::Engine::Remote'), 'Perplexity isa Remote');
+  ok(!$class->isa('Langertha::Engine::OpenAIBase'), 'Perplexity is NOT an OpenAIBase');
+  ok($class->does('Langertha::Role::ResponsesCompatible'), 'Perplexity does ResponsesCompatible');
+  ok($class->does('Langertha::Role::Chat'), 'Perplexity does Chat');
+  ok($class->does('Langertha::Role::Streaming'), 'Perplexity does Streaming');
+  ok($class->does('Langertha::Role::StaticModels'), 'Perplexity does StaticModels');
+  ok($class->does('Langertha::Role::ReasoningEffort'), 'Perplexity does ReasoningEffort');
+  ok($class->does('Langertha::Role::ResponseFormat'), 'Perplexity does ResponseFormat');
+  ok($class->does('Langertha::Role::Tools'), 'Perplexity does Tools (Agent API function tools, k213)');
+  ok(!$class->does('Langertha::Role::OpenAICompatible'), 'Perplexity does NOT OpenAICompatible');
+  ok(!$class->does('Langertha::Role::OpenAPI'), 'Perplexity does NOT OpenAPI');
+  ok(!$class->does('Langertha::Role::PromptCache'), 'Perplexity does NOT PromptCache');
+
+  my $engine = $class->new(api_key => 'test-key', model => 'sonar-pro');
+  is($engine->url, 'https://api.perplexity.ai', 'Perplexity url default correct');
+
+  {
+    local $ENV{LANGERTHA_PERPLEXITY_API_KEY} = 'env-key-12345';
+    my $e2 = $class->new(model => 'sonar');
+    is($e2->api_key, 'env-key-12345', 'Perplexity reads api_key from LANGERTHA_PERPLEXITY_API_KEY');
+  }
+
+  my $req = $engine->chat_request([{ role => 'user', content => 'test prompt' }]);
+  is($req->method, 'POST', 'Perplexity chat request is POST');
+  like($req->uri, qr{/v1/agent$}, 'Perplexity chat endpoint is /v1/agent (Agent API)');
+  is($req->header('Authorization'), 'Bearer test-key', 'Perplexity sets Bearer Authorization header');
+
+  my $body = $json->decode($req->content);
+  is($body->{preset}, 'low', 'sonar-pro maps to preset "low"');
+  ok(!exists $body->{model}, 'no model key when a preset is chosen');
+  ok(!exists $body->{messages}, 'no /chat/completions messages array');
+  is($body->{input}[0]{type}, 'message', 'input item carries type:message');
+  is($body->{input}[0]{role}, 'user', 'input item has user role');
+  is($body->{input}[0]{content}, 'test prompt', 'input item has correct content');
+}
 is(Langertha::Engine::Perplexity->new(api_key => 'k')->default_model, 'sonar', 'Perplexity default_model');
 
 # --- Mistral ---
@@ -412,6 +468,7 @@ test_openai_cloud_engine(
   env_var => 'LANGERTHA_MISTRAL_API_KEY',
   has_tools => 1,
   has_embedding => 1,
+  has_transcription => 1,
   has_response_format => 1,
 );
 is(Langertha::Engine::Mistral->new(api_key => 'k')->default_model, 'mistral-small-latest', 'Mistral default_model');
@@ -440,13 +497,13 @@ test_openai_cloud_engine(
   class => 'Langertha::Engine::Scaleway',
   name => 'Scaleway',
   url => 'https://api.scaleway.ai/v1',
-  model => 'llama-3.1-8b-instruct',
+  model => 'llama-3.3-70b-instruct',
   env_var => 'LANGERTHA_SCALEWAY_API_KEY',
   has_tools => 1,
   has_embedding => 1,
   has_response_format => 1,
 );
-is(Langertha::Engine::Scaleway->new(api_key => 'k')->default_model, 'llama-3.1-8b-instruct', 'Scaleway default_model');
+is(Langertha::Engine::Scaleway->new(api_key => 'k')->default_model, 'llama-3.3-70b-instruct', 'Scaleway default_model (k307: llama-3.1-8b-instruct is EOL)');
 
 # --- MiniMax (OpenAI-compatible endpoint) ---
 
@@ -462,7 +519,7 @@ ok(Langertha::Engine::MiniMax->does('Langertha::Role::StaticModels'), 'MiniMax d
 {
   my $m = Langertha::Engine::MiniMax->new(api_key => 'test-key');
   is($m->url, 'https://api.minimax.io/v1', 'MiniMax url default correct');
-  is($m->default_model, 'MiniMax-M2.7', 'MiniMax default_model');
+  is($m->default_model, 'MiniMax-M3', 'MiniMax default_model');
 
   local $ENV{LANGERTHA_MINIMAX_API_KEY} = 'env-key-12345';
   my $m2 = Langertha::Engine::MiniMax->new;
@@ -475,16 +532,74 @@ use Langertha::Engine::MiniMaxAnthropic;
 
 ok(Langertha::Engine::MiniMaxAnthropic->isa('Langertha::Engine::AnthropicBase'), 'MiniMaxAnthropic isa AnthropicBase');
 ok(!Langertha::Engine::MiniMaxAnthropic->isa('Langertha::Engine::OpenAIBase'), 'MiniMaxAnthropic is NOT OpenAIBase');
+ok(Langertha::Engine::MiniMaxAnthropic->does('Langertha::Role::AnthropicCompatible'), 'MiniMaxAnthropic does AnthropicCompatible');
 ok(Langertha::Engine::MiniMaxAnthropic->does('Langertha::Role::Tools'), 'MiniMaxAnthropic does Tools');
 ok(Langertha::Engine::MiniMaxAnthropic->does('Langertha::Role::StaticModels'), 'MiniMaxAnthropic does StaticModels');
 {
   my $m = Langertha::Engine::MiniMaxAnthropic->new(api_key => 'test-key');
-  is($m->url, 'https://api.minimax.io/anthropic/v1', 'MiniMaxAnthropic url default correct');
-  is($m->default_model, 'MiniMax-M2.7', 'MiniMaxAnthropic default_model');
+  is($m->url, 'https://api.minimax.io/anthropic', 'MiniMaxAnthropic url default correct (no trailing /v1)');
+  is($m->default_model, 'MiniMax-M3', 'MiniMaxAnthropic default_model');
   my $req = $m->chat('test prompt');
   is($req->method, 'POST', 'MiniMaxAnthropic chat request is POST');
-  like($req->uri, qr{/v1/messages$}, 'MiniMaxAnthropic chat endpoint is /v1/messages');
+  # Regression for the double-/v1 404 bug (karr #18): AnthropicBase appends
+  # /v1/messages, so the composed URL must carry exactly one /v1.
+  is($req->uri, 'https://api.minimax.io/anthropic/v1/messages', 'MiniMaxAnthropic composed URL has a single /v1');
+  unlike($req->uri, qr{/v1/v1/}, 'MiniMaxAnthropic URL has no double /v1');
   is($req->header('x-api-key'), 'test-key', 'MiniMaxAnthropic uses x-api-key header');
+}
+
+# --- Moonshot (Kimi, OpenAI-compatible endpoint) ---
+
+use Langertha::Engine::Moonshot;
+
+ok(Langertha::Engine::Moonshot->isa('Langertha::Engine::OpenAIBase'), 'Moonshot isa OpenAIBase');
+ok(Langertha::Engine::Moonshot->isa('Langertha::Engine::Remote'), 'Moonshot isa Remote');
+ok(!Langertha::Engine::Moonshot->isa('Langertha::Engine::AnthropicBase'), 'Moonshot is NOT AnthropicBase');
+ok(Langertha::Engine::Moonshot->does('Langertha::Role::Chat'), 'Moonshot does Chat');
+ok(Langertha::Engine::Moonshot->does('Langertha::Role::Streaming'), 'Moonshot does Streaming');
+ok(Langertha::Engine::Moonshot->does('Langertha::Role::Tools'), 'Moonshot does Tools');
+ok(Langertha::Engine::Moonshot->does('Langertha::Role::StaticModels'), 'Moonshot does StaticModels');
+{
+  my $m = Langertha::Engine::Moonshot->new(api_key => 'test-key');
+  is($m->url, 'https://api.moonshot.ai/v1', 'Moonshot url default correct');
+  is($m->default_model, 'kimi-k3', 'Moonshot default_model');
+  # kimi-k3 takes a top-level reasoning_effort; the K2.x line uses a `thinking`
+  # object instead, so the flag is cleared per model (karr k207, layer 3) and
+  # re-asserted for kimi-k2.6 alone, which serializes it as the toggle (k219).
+  ok($m->supports('reasoning_effort'), 'Moonshot kimi-k3 advertises reasoning_effort');
+  ok(Langertha::Engine::Moonshot->new(api_key => 'test-key', model => 'kimi-k2.6')
+      ->supports('reasoning_effort'), 'Moonshot kimi-k2.6 advertises reasoning_effort (the toggle)');
+  ok(!Langertha::Engine::Moonshot->new(api_key => 'test-key', model => 'kimi-k2.7-code')
+      ->supports('reasoning_effort'), 'Moonshot kimi-k2.7-code clears reasoning_effort (per model)');
+
+  my $req = $m->chat('test prompt');
+  like($req->uri, qr{/chat/completions$}, 'Moonshot chat endpoint is /chat/completions');
+  is($req->header('Authorization'), 'Bearer test-key', 'Moonshot sets Authorization header');
+
+  local $ENV{LANGERTHA_MOONSHOT_API_KEY} = 'env-key-12345';
+  my $m2 = Langertha::Engine::Moonshot->new;
+  is($m2->api_key, 'env-key-12345', 'Moonshot reads api_key from LANGERTHA_MOONSHOT_API_KEY');
+}
+
+# --- MoonshotAnthropic (Kimi via Anthropic-compatible endpoint) ---
+
+use Langertha::Engine::MoonshotAnthropic;
+
+ok(Langertha::Engine::MoonshotAnthropic->isa('Langertha::Engine::AnthropicBase'), 'MoonshotAnthropic isa AnthropicBase');
+ok(!Langertha::Engine::MoonshotAnthropic->isa('Langertha::Engine::OpenAIBase'), 'MoonshotAnthropic is NOT OpenAIBase');
+ok(Langertha::Engine::MoonshotAnthropic->does('Langertha::Role::AnthropicCompatible'), 'MoonshotAnthropic does AnthropicCompatible');
+ok(Langertha::Engine::MoonshotAnthropic->does('Langertha::Role::Tools'), 'MoonshotAnthropic does Tools');
+ok(Langertha::Engine::MoonshotAnthropic->does('Langertha::Role::StaticModels'), 'MoonshotAnthropic does StaticModels');
+{
+  my $m = Langertha::Engine::MoonshotAnthropic->new(api_key => 'test-key');
+  is($m->url, 'https://api.moonshot.ai/anthropic', 'MoonshotAnthropic url default correct (no trailing /v1)');
+  is($m->default_model, 'kimi-k3', 'MoonshotAnthropic default_model');
+  my $req = $m->chat('test prompt');
+  is($req->method, 'POST', 'MoonshotAnthropic chat request is POST');
+  # Same single-/v1 invariant as the MiniMaxAnthropic regression (karr #18).
+  is($req->uri, 'https://api.moonshot.ai/anthropic/v1/messages', 'MoonshotAnthropic composed URL has a single /v1');
+  unlike($req->uri, qr{/v1/v1/}, 'MoonshotAnthropic URL has no double /v1');
+  is($req->header('x-api-key'), 'test-key', 'MoonshotAnthropic uses x-api-key header');
 }
 
 # --- NousResearch ---
@@ -512,12 +627,33 @@ use Langertha::Engine::AKIOpenAI;
 test_openai_cloud_engine(
   class => 'Langertha::Engine::AKIOpenAI',
   name => 'AKIOpenAI',
-  url => 'https://aki.io/v1',
+  url => 'https://aki.io/openai/v1',
   model => 'llama3_8b_chat',
   env_var => 'LANGERTHA_AKI_API_KEY',
   has_tools => 1,
 );
-is(Langertha::Engine::AKIOpenAI->new(api_key => 'k')->default_model, 'llama3-chat-8b', 'AKIOpenAI default_model');
+is(Langertha::Engine::AKIOpenAI->new(api_key => 'k')->default_model, 'gpt-oss-120b', 'AKIOpenAI default_model (gpt-oss-120b; llama3-chat-8b EOL 2026-09-30, karr k132)');
+
+# --- AKIAnthropic (AKI.IO via Anthropic-compatible endpoint) ---
+
+use Langertha::Engine::AKIAnthropic;
+
+ok(Langertha::Engine::AKIAnthropic->isa('Langertha::Engine::AnthropicBase'), 'AKIAnthropic isa AnthropicBase');
+ok(!Langertha::Engine::AKIAnthropic->isa('Langertha::Engine::OpenAIBase'), 'AKIAnthropic is NOT OpenAIBase');
+ok(Langertha::Engine::AKIAnthropic->does('Langertha::Role::AnthropicCompatible'), 'AKIAnthropic does AnthropicCompatible');
+ok(Langertha::Engine::AKIAnthropic->does('Langertha::Role::Tools'), 'AKIAnthropic does Tools');
+ok(Langertha::Engine::AKIAnthropic->does('Langertha::Role::StaticModels'), 'AKIAnthropic does StaticModels');
+{
+  my $a = Langertha::Engine::AKIAnthropic->new(api_key => 'test-key');
+  is($a->url, 'https://aki.io/anthropic', 'AKIAnthropic url default correct (no trailing /v1)');
+  is($a->default_model, 'gpt-oss-120b', 'AKIAnthropic default_model (gpt-oss-120b; llama3-chat-8b EOL 2026-09-30, karr k132)');
+  my $req = $a->chat('test prompt');
+  is($req->method, 'POST', 'AKIAnthropic chat request is POST');
+  # Same single-/v1 invariant as the MiniMaxAnthropic regression (karr #18).
+  is($req->uri, 'https://aki.io/anthropic/v1/messages', 'AKIAnthropic composed URL has a single /v1');
+  unlike($req->uri, qr{/v1/v1/}, 'AKIAnthropic URL has no double /v1');
+  is($req->header('x-api-key'), 'test-key', 'AKIAnthropic uses x-api-key header');
+}
 
 # ======================================================================
 # Part 4: OpenAI-compatible local engines (extend OpenAIBase, url required)
@@ -532,6 +668,10 @@ ok(Langertha::Engine::OllamaOpenAI->does('Langertha::Role::Embedding'), 'OllamaO
 ok(Langertha::Engine::OllamaOpenAI->does('Langertha::Role::Tools'), 'OllamaOpenAI does Tools');
 
 {
+  # The optional Ollama Cloud key must not leak into the local-server
+  # assertions (see t/13_ollama_auth.t).
+  delete local $ENV{LANGERTHA_OLLAMA_API_KEY};
+
   # url required, no default
   eval { Langertha::Engine::OllamaOpenAI->new(model => 'test') };
   like($@, qr/url/, 'OllamaOpenAI requires url');
@@ -550,6 +690,8 @@ use Langertha::Engine::vLLM;
 
 ok(Langertha::Engine::vLLM->isa('Langertha::Engine::OpenAIBase'), 'vLLM isa OpenAIBase');
 ok(Langertha::Engine::vLLM->does('Langertha::Role::Tools'), 'vLLM does Tools');
+ok(Langertha::Engine::vLLM->does('Langertha::Role::Embedding'), 'vLLM does Embedding (karr #70)');
+ok(Langertha::Engine::vLLM->does('Langertha::Role::Runtime::MetricsPoll'), 'vLLM does Runtime::MetricsPoll');
 
 {
   # url required, no default
@@ -562,6 +704,13 @@ ok(Langertha::Engine::vLLM->does('Langertha::Role::Tools'), 'vLLM does Tools');
   my $req = $v->chat('hello');
   is($req->header('Authorization'), undef, 'vLLM no Authorization header');
   like($req->uri, qr{/chat/completions$}, 'vLLM uses /chat/completions');
+
+  # karr #70: createEmbedding is now in _build_supported_operations
+  my $ops = $v->_build_supported_operations;
+  ok((grep { $_ eq 'createEmbedding' } @$ops),
+    'vLLM _build_supported_operations contains createEmbedding');
+  is($v->default_embedding_model, undef,
+    'vLLM has no fixed default_embedding_model (k297)');
 }
 
 # --- SGLang ---
@@ -620,7 +769,7 @@ test_openai_cloud_engine(
   env_var => 'LANGERTHA_CEREBRAS_API_KEY',
   has_tools => 1,
 );
-is(Langertha::Engine::Cerebras->new(api_key => 'k')->default_model, 'llama3.1-8b', 'Cerebras default_model');
+is(Langertha::Engine::Cerebras->new(api_key => 'k')->default_model, 'gpt-oss-120b', 'Cerebras default_model');
 
 # --- OpenRouter (cloud, meta-provider) ---
 
@@ -724,6 +873,86 @@ ok(Langertha::Engine::LlamaCpp->does('Langertha::Role::Tools'), 'LlamaCpp does T
 }
 
 # ======================================================================
+# Part 6b: api_key_env / api_key_required — class methods describing the
+# credentials an engine can be configured with (karr #44, #93). Three
+# states: required (name + true), optional (name + false), none
+# (undef + false). The name is derived from the class name by default;
+# vendor-key-sharing protocol variants override it.
+# ======================================================================
+
+use Langertha::Engine::Hetzner;
+use Langertha::Engine::OpenAIResponses;
+
+# Regular engines: derivation LANGERTHA_<UC(CLASS)>_API_KEY
+for my $case (
+  [ 'Langertha::Engine::Anthropic', 'LANGERTHA_ANTHROPIC_API_KEY' ],
+  [ 'Langertha::Engine::OpenAI',    'LANGERTHA_OPENAI_API_KEY' ],
+  [ 'Langertha::Engine::DeepSeek',   'LANGERTHA_DEEPSEEK_API_KEY' ],
+  [ 'Langertha::Engine::Gemini',     'LANGERTHA_GEMINI_API_KEY' ],
+  [ 'Langertha::Engine::AKI',        'LANGERTHA_AKI_API_KEY' ],
+  [ 'Langertha::Engine::Hetzner',    'LANGERTHA_HETZNER_API_KEY' ],
+) {
+  my ( $class, $env ) = @$case;
+  is($class->api_key_env, $env, "$class api_key_env derives $env");
+  ok($class->api_key_required, "$class api_key_required (cloud provider)");
+}
+
+# Protocol variants share their vendor's key (derivation would be wrong)
+is(Langertha::Engine::AKIOpenAI->api_key_env, 'LANGERTHA_AKI_API_KEY',
+  'AKIOpenAI api_key_env shares AKI key');
+is(Langertha::Engine::AKIAnthropic->api_key_env, 'LANGERTHA_AKI_API_KEY',
+  'AKIAnthropic api_key_env shares AKI key');
+is(Langertha::Engine::MiniMaxAnthropic->api_key_env, 'LANGERTHA_MINIMAX_API_KEY',
+  'MiniMaxAnthropic api_key_env shares MiniMax key');
+is(Langertha::Engine::MoonshotAnthropic->api_key_env, 'LANGERTHA_MOONSHOT_API_KEY',
+  'MoonshotAnthropic api_key_env shares Moonshot key');
+is(Langertha::Engine::OpenAIResponses->api_key_env, 'LANGERTHA_OPENAI_API_KEY',
+  'OpenAIResponses api_key_env shares OpenAI key');
+
+is(Langertha::Engine::OpenAIResponses->api_key_required, 1,
+  'OpenAIResponses api_key_required (shared vendor key is still mandatory)');
+
+# Optional key (karr #93): these engines DO read an env var and still work
+# without it, so they advertise the name and answer false to required. A
+# consumer scanning the environment has to be able to discover that
+# LANGERTHA_OLLAMA_API_KEY unlocks Ollama Cloud and LANGERTHA_LMSTUDIO_API_KEY
+# a secured LM Studio - answering undef here hid exactly that.
+my @optional_key = (
+  [ 'Langertha::Engine::Ollama',            'LANGERTHA_OLLAMA_API_KEY' ],
+  [ 'Langertha::Engine::OllamaOpenAI',      'LANGERTHA_OLLAMA_API_KEY' ],
+  [ 'Langertha::Engine::LMStudio',          'LANGERTHA_LMSTUDIO_API_KEY' ],
+  [ 'Langertha::Engine::LMStudioOpenAI',    'LANGERTHA_LMSTUDIO_API_KEY' ],
+  [ 'Langertha::Engine::LMStudioAnthropic', 'LANGERTHA_LMSTUDIO_API_KEY' ],
+  [ 'Langertha::Engine::vLLM',              'LANGERTHA_VLLM_API_KEY' ],
+  [ 'Langertha::Engine::SGLang',            'LANGERTHA_SGLANG_API_KEY' ],
+  [ 'Langertha::Engine::LlamaCpp',          'LANGERTHA_LLAMACPP_API_KEY' ],
+);
+for my $case (@optional_key) {
+  my ( $class, $env ) = @$case;
+  is($class->api_key_env, $env, "$class api_key_env advertises $env");
+  is($class->api_key_required, 0, "$class api_key_required is false (optional)");
+}
+
+# The advertised name must be the name the engine actually reads, otherwise
+# the advertisement is decoration: set it and the built api_key must carry it.
+for my $case (@optional_key) {
+  my ( $class, $env ) = @$case;
+  local $ENV{$env} = 'pinned-'.lc($env);
+  my $engine = $class->new( url => 'http://test.invalid:1234' );
+  is($engine->api_key, 'pinned-'.lc($env),
+    "$class reads its advertised $env");
+}
+
+# No credentials at all: these read no env var, so undef stays the honest
+# answer (an explicit api_key => ... still works for a server started with one)
+for my $class (qw(
+  Langertha::Engine::Whisper
+)) {
+  is($class->api_key_env, undef, "$class api_key_env is undef (reads no env var)");
+  is($class->api_key_required, 0, "$class api_key_required is false");
+}
+
+# ======================================================================
 # Part 6: Cross-cutting concerns
 # ======================================================================
 
@@ -741,8 +970,13 @@ for my $class (qw(
   Langertha::Engine::Perplexity
   Langertha::Engine::Mistral
   Langertha::Engine::MiniMax
+  Langertha::Engine::MiniMaxAnthropic
+  Langertha::Engine::Moonshot
+  Langertha::Engine::MoonshotAnthropic
+  Langertha::Engine::XAI
   Langertha::Engine::NousResearch
   Langertha::Engine::AKIOpenAI
+  Langertha::Engine::AKIAnthropic
   Langertha::Engine::OllamaOpenAI
   Langertha::Engine::SGLang
   Langertha::Engine::vLLM

@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::OracleAuth;
 # ABSTRACT: Auth configures how secret-manager authenticates with the Oracle Vault.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s secretRef => '+IO::K8s::ExternalSecrets::V1::OracleSecretRef', { required => 'schema' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::OracleAuth - Auth configures how secret-manager au
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 secretRef
 

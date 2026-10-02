@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::ConsulSDConfig;
 # ABSTRACT: ConsulSDConfig defines a Consul service discovery configuration See https://prometheus.io/docs/prometheus/latest/configuration/configuration/#consul_sd_config
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s allowStale           => Bool;
@@ -68,7 +68,7 @@ IO::K8s::PrometheusOperator::V1alpha1::ConsulSDConfig - ConsulSDConfig defines a
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 allowStale
 

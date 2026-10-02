@@ -1,0 +1,6 @@
+# skills: given as a single hash spec, next to flat options.
+skills:
+  type: dir
+  path: myskills
+perl: true
+temperature: 0.3

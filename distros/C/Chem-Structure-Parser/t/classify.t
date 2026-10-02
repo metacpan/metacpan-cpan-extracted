@@ -14,7 +14,7 @@
 # continued it, and 3lms's GLY 501, which falls inside a chain numbered 4, 567,
 # 1501, 1889; both sit after the chain's TER record, which is gemmi's reason
 # for calling them non-polymer when it reads the PDB file.
-require 5.010;
+require 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use Chem::Structure::Parser;

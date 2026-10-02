@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::GatewayStatusAddress;
 # ABSTRACT: GatewayStatusAddress describes a network address that is bound to a Gateway.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s type  => Str, { pattern => '^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\\/[A-Za-z0-9\\/\\-._~%!$&\'()*+,;=:]+$', default => 'IPAddress' };
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1beta1::GatewayStatusAddress - GatewayStatusAddress descri
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 type
 

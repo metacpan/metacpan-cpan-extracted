@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -135,7 +135,7 @@ sub DEMOLISH {    # void ($in_global_destruction)
   return;
 }
 
-# The following subroutine was taken from the framework
+# The following subroutine was ported from the framework
 # "A modern port of Turbo Vision 2.0", which is licensed under MIT licence.
 #
 # Copyright 2019-2021 by magiblot <magiblot@hotmail.com>
@@ -771,8 +771,8 @@ TUI::Menus::MenuView - abstract base class for menu views
 =head1 DESCRIPTION
 
 C<TMenuView> implements the shared behavior required by menu views such as
-C<TMenuBar> and C<TMenuBox>. It manages menu navigation, item selection, hotkey
-handling, and modal execution of menus.
+L<TMenuBar|TUI::Menus::MenuBar> and L<TMenuBox|TUI::Menus::MenuBox>. It manages 
+menu navigation, item selection, hotkey handling, and modal execution of menus.
 
 This class is abstract and is not intended to be instantiated directly.
 Applications normally interact with derived classes rather than with
@@ -786,21 +786,17 @@ called directly by application code.
 The following attributes are managed internally and exposed as read-only
 accessors.
 
-=over
-
-=item menu
+=head2 menu
 
 Reference to the menu data structure defining the menu items (I<TMenu>).
 
-=item parentMenu
+=head2 parentMenu
 
 Optional reference to the parent menu view (I<TMenuView>).
 
-=item current
+=head2 current
 
 Reference to the currently selected menu item (I<TMenuItem>).
-
-=back
 
 =head1 CONSTRUCTOR
 
@@ -813,17 +809,18 @@ Reference to the currently selected menu item (I<TMenuItem>).
   );
 
 Creates a new menu view. This constructor is intended to be called only by
-derived classes such as C<TMenuBar> and C<TMenuBox>.
+derived classes such as L<TMenuBar|TUI::Menus::MenuBar> and 
+L<TMenuBox|TUI::Menus::MenuBox>.
 
 =over
 
 =item bounds
 
-Bounding rectangle of the menu view (I<TRect>).
+Bounding rectangle of the menu view (L<TRect|TUI::Objects::Rect>).
 
 =item menu
 
-Menu data structure defining the menu items (I<TMenu>).
+Optional menu data structure defining the menu items (I<TMenu>).
 
 =item parentMenu
 
@@ -838,7 +835,7 @@ Optional parent menu view (I<TMenuView>).
 Factory-style constructor using positional arguments.
 
 This constructor exists primarily for internal use and for compatibility with
-traditional Turbo Vision construction patterns.
+traditional I<Turbo Vision> construction patterns.
 
 =head1 METHODS
 
@@ -908,10 +905,10 @@ Gets or sets the parent menu view.
 
 =head1 SEE ALSO
 
-L<TUI::Menus::MenuBar>,
-L<TUI::Menus::MenuBox>,
-L<TUI::Menus::Menu>,
-L<TUI::Menus::MenuItem>
+L<TMenuBar|TUI::Menus::MenuBar>,
+L<TMenuBox|TUI::Menus::MenuBox>,
+L<TMenu|TUI::Menus::Menu>,
+L<TMenuItem|TUI::Menus::MenuItem>
 
 =head1 AUTHORS
 

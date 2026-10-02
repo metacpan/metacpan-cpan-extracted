@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::PrometheusWebSpec;
 # ABSTRACT: web defines the configuration of the Prometheus web server.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s httpConfig     => '+IO::K8s::PrometheusOperator::V1::WebHTTPConfig';
@@ -26,7 +26,7 @@ IO::K8s::PrometheusOperator::V1::PrometheusWebSpec - web defines the configurati
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 httpConfig
 

@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1::VolumeSnapshot;
 # ABSTRACT: VolumeSnapshot is a user's request for either creating a point-in-time snapshot of a persistent volume, or binding to a pre-existing snapshot.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'snapshot.storage.k8s.io/v1',
     resource_plural => 'volumesnapshots',
@@ -26,7 +26,7 @@ IO::K8s::VolumeSnapshot::V1::VolumeSnapshot - VolumeSnapshot is a user's request
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

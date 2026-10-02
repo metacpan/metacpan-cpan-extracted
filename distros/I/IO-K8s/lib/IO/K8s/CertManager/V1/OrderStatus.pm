@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::OrderStatus;
 # ABSTRACT: OrderStatus
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s authorizations => ['+IO::K8s::CertManager::V1::ACMEAuthorization'];
@@ -32,7 +32,7 @@ IO::K8s::CertManager::V1::OrderStatus - OrderStatus
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 authorizations
 

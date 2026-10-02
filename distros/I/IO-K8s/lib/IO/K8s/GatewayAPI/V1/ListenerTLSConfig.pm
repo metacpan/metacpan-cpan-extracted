@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::ListenerTLSConfig;
 # ABSTRACT: TLS is the TLS configuration for the Listener.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s certificateRefs => ['+IO::K8s::GatewayAPI::V1::SecretObjectReference'];
@@ -24,7 +24,7 @@ IO::K8s::GatewayAPI::V1::ListenerTLSConfig - TLS is the TLS configuration for th
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 certificateRefs
 

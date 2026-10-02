@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1alpha1::K8SSelectorConfig;
 # ABSTRACT: K8SSelectorConfig is Kubernetes Selector Config
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s field => Str;
@@ -24,7 +24,7 @@ IO::K8s::PrometheusOperator::V1alpha1::K8SSelectorConfig - K8SSelectorConfig is 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 field
 

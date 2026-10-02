@@ -39,9 +39,10 @@ Module {
     dependencies: []
 }
 
-@@ ffi/src/libfoo.v
+@@ ffi/libfoo.v
 module libfoo
 
+@[export: 'libfoo_add']
 pub fn add(a i32, b i32) i32 {
     return a + b
 }
@@ -60,7 +61,7 @@ package V::FFI {
 
     my $ffi = FFI::Platypus->new( api => 2, lang => 'V' );
     $ffi->bundle;
-    $ffi->mangler(sub ($sym) { return "libfoo__$sym" });
+    $ffi->mangler(sub ($sym) { return "libfoo_$sym" });
 
     $ffi->attach(add => ['i32','i32'] => 'i32');
 }

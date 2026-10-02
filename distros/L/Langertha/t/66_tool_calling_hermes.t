@@ -1,6 +1,11 @@
 #!/usr/bin/env perl
 # ABSTRACT: Test Hermes-native tool calling via <tool_call> XML tags
 
+# Since karr k238 (ADR 0033) NousResearch derives tool_wire_format from the
+# model: hermes for a Hermes slug, openai otherwise. This file exercises the
+# hermes wire, so every engine uses a Hermes model (Hermes-4-70B). The
+# model -> wire derivation itself is t/66_nousresearch_model_wire.t.
+
 use strict;
 use warnings;
 
@@ -39,7 +44,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   is($nous->hermes_call_tag, 'tool_call', 'default call tag');
@@ -57,7 +62,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $engine = Langertha::Engine::NousResearch->new(
     api_key            => 'test-key',
-    model              => 'test',
+    model              => 'Hermes-4-70B',
     hermes_call_tag    => 'function_call',
     hermes_response_tag => 'function_response',
   );
@@ -75,7 +80,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $engine = Langertha::Engine::NousResearch->new(
     api_key                  => 'test-key',
-    model                    => 'test',
+    model                    => 'Hermes-4-70B',
     hermes_tool_instructions => 'Du bist ein hilfreicher Assistent.',
   );
 
@@ -92,7 +97,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $openai = Langertha::Engine::OpenAI->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   ok(!$openai->does('Langertha::Role::HermesTools'), 'OpenAI: does not compose HermesTools');
@@ -105,7 +110,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   my $data = {
@@ -130,7 +135,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   my $data = {
@@ -155,7 +160,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   my $data = {
@@ -183,7 +188,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   my $data = {
@@ -206,7 +211,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   is_deeply($nous->response_tool_calls({}), [], 'empty data returns empty');
@@ -220,7 +225,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   my $data = {
@@ -239,13 +244,83 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 }
 
 # ========================================================================
+# response_tool_calls — valid-but-non-object JSON is skipped, not crashed
+# (karr k163: [1,2], "hello", 42, and an object without a name each decode
+#  fine, so the old eval-only guard let them through to the tool loop's
+#  $tc->{name}/$tc->{arguments} — either dying "Not a HASH reference" or
+#  resolving to name='' -> "Tool '' not found" and killing the whole raid)
+# ========================================================================
+
+{
+  my $nous = Langertha::Engine::NousResearch->new(
+    api_key => 'test-key',
+    model   => 'Hermes-4-70B',
+  );
+
+  for my $case (
+    [ 'array'          => '[1, 2]' ],
+    [ 'bare string'    => '"hello"' ],
+    [ 'bare number'    => '42' ],
+    [ 'object no name' => '{"arguments": {}}' ],
+  ) {
+    my ( $label, $payload ) = @$case;
+    my $data = {
+      choices => [{
+        message => {
+          role    => 'assistant',
+          content => "<tool_call>\n$payload\n</tool_call>",
+        },
+      }],
+    };
+    my $calls;
+    my $survived = eval { $calls = $nous->response_tool_calls($data); 1 };
+    ok($survived, "response_tool_calls survives non-object JSON ($label)");
+    is(scalar @{ $calls || [] }, 0, "non-object JSON skipped ($label)");
+  }
+}
+
+# ========================================================================
+# response_tool_calls — broken calls skipped, the valid one between them kept,
+# and the survivor flows through the tool loop's extract path without dying
+# ========================================================================
+
+{
+  my $nous = Langertha::Engine::NousResearch->new(
+    api_key => 'test-key',
+    model   => 'Hermes-4-70B',
+  );
+
+  my $data = {
+    choices => [{
+      message => {
+        role    => 'assistant',
+        content => "<tool_call>\n[1, 2]\n</tool_call>\n"
+          . "<tool_call>\n\"hello\"\n</tool_call>\n"
+          . "<tool_call>\n{\"name\": \"add\", \"arguments\": {\"a\": 7, \"b\": 15}}\n</tool_call>\n"
+          . "<tool_call>\n{\"arguments\": {}}\n</tool_call>",
+      },
+    }],
+  };
+
+  my $calls = $nous->response_tool_calls($data);
+  is(scalar @$calls, 1, 'only the one valid call survives the broken siblings');
+  is($calls->[0]{name}, 'add', 'valid call name');
+
+  # The tool loop does $self->extract_tool_call($tc) then $tc->{name}; the
+  # survivor must flow through without dying.
+  my ( $name, $args ) = $nous->extract_tool_call($calls->[0]);
+  is($name, 'add', 'extract_tool_call name from survivor');
+  is_deeply($args, { a => 7, b => 15 }, 'extract_tool_call arguments from survivor');
+}
+
+# ========================================================================
 # response_text_content — strips tool_call tags
 # ========================================================================
 
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   my $data = {
@@ -267,7 +342,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   my $data = {
@@ -289,7 +364,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $nous = Langertha::Engine::NousResearch->new(
     api_key => 'test-key',
-    model   => 'test',
+    model   => 'Hermes-4-70B',
   );
 
   my $data = {
@@ -333,7 +408,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $engine = Langertha::Engine::NousResearch->new(
     api_key             => 'test-key',
-    model               => 'test',
+    model               => 'Hermes-4-70B',
     hermes_response_tag => 'fn_response',
   );
 
@@ -365,7 +440,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $engine = Langertha::Engine::NousResearch->new(
     api_key         => 'test-key',
-    model           => 'test',
+    model           => 'Hermes-4-70B',
     hermes_call_tag => 'function_call',
   );
 
@@ -403,7 +478,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 {
   my $engine = Langertha::Engine::NousResearch->new(
     api_key         => 'test-key',
-    model           => 'test',
+    model           => 'Hermes-4-70B',
     hermes_call_tag => 'fn_call',
   );
 
@@ -426,45 +501,39 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 my $has_async_deps;
 BEGIN {
   $has_async_deps = eval {
-    require IO::Async::Loop;
     require Future::AsyncAwait;
-    require Net::Async::MCP;
-    require MCP::Server;
     1;
   };
 }
 
 SKIP: {
-  skip 'Requires IO::Async, Future::AsyncAwait, Net::Async::MCP, and MCP modules', 15
+  skip 'Requires Future::AsyncAwait', 15
     unless $has_async_deps;
 
-  # Must import async/await at compile time, so we loaded in BEGIN above
-  Future::AsyncAwait->import;
   require Test::MockAsyncHTTP;
+  require Test::MockMCP;
 
-  my $server = MCP::Server->new(name => 'test', version => '1.0');
-
-  $server->tool(
-    name        => 'add',
-    description => 'Add two numbers together and return the result',
-    input_schema => {
-      type       => 'object',
-      properties => {
-        a => { type => 'number', description => 'First number' },
-        b => { type => 'number', description => 'Second number' },
+  my $mcp = Test::MockMCP->new(
+    tools => [
+      {
+        name        => 'add',
+        description => 'Add two numbers together and return the result',
+        input_schema => {
+          type       => 'object',
+          properties => {
+            a => { type => 'number', description => 'First number' },
+            b => { type => 'number', description => 'Second number' },
+          },
+          required => ['a', 'b'],
+        },
+        code => sub {
+          my ($self, $args) = @_;
+          my $result = $args->{a} + $args->{b};
+          return $self->text_result("$result");
+        },
       },
-      required => ['a', 'b'],
-    },
-    code => sub {
-      my ($self, $args) = @_;
-      my $result = $args->{a} + $args->{b};
-      return $self->text_result("$result");
-    },
+    ],
   );
-
-  my $loop = IO::Async::Loop->new;
-  my $mcp = Net::Async::MCP->new(server => $server);
-  $loop->add($mcp);
 
   # Hermes-style responses: text with <tool_call> tags
   my $tool_call_response = Test::MockAsyncHTTP->mock_json_response({

@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::PrometheusRule;
 # ABSTRACT: The `PrometheusRule` custom resource definition (CRD) defines [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) and [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) rules to be evaluated by `Prometheus` or `ThanosRuler` objects.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::APIObject
     api_version     => 'monitoring.coreos.com/v1',
     resource_plural => 'prometheusrules',
@@ -26,7 +26,7 @@ IO::K8s::PrometheusOperator::V1::PrometheusRule - The `PrometheusRule` custom re
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 spec
 

@@ -1,6 +1,6 @@
 package IO::K8s::VolumeSnapshot::V1beta2::GroupSnapshotHandles;
 # ABSTRACT: GroupSnapshotHandles identifies a pre-existing CSI group snapshot
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s volumeGroupSnapshotHandle => Str, { required => 'schema' };
@@ -23,7 +23,7 @@ IO::K8s::VolumeSnapshot::V1beta2::GroupSnapshotHandles - GroupSnapshotHandles id
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 volumeGroupSnapshotHandle
 

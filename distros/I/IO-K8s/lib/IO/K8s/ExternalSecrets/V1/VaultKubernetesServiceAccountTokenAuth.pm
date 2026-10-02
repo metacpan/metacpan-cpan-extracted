@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::VaultKubernetesServiceAccountTokenAuth;
 # ABSTRACT: Optional ServiceAccountToken specifies the Kubernetes service account for which to request a token for with the `TokenRequest` API.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s audiences         => [Str];
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::VaultKubernetesServiceAccountTokenAuth - Optional 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 audiences
 

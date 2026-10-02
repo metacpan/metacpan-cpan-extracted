@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::PulumiProvider;
 # ABSTRACT: Pulumi configures this store to sync secrets using the Pulumi provider
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s accessToken  => '+IO::K8s::ExternalSecrets::V1::PulumiProviderSecretRef';
@@ -30,7 +30,7 @@ IO::K8s::ExternalSecrets::V1::PulumiProvider - Pulumi configures this store to s
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 accessToken
 

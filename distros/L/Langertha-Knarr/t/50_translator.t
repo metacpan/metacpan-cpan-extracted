@@ -14,7 +14,7 @@ use Langertha::Knarr::Handler::ACPClient;
 my $json = JSON::MaybeXS->new( utf8 => 1, canonical => 1 );
 my $loop = IO::Async::Loop->new;
 
-# --- Backend: a Steerboard with Code handler, exposes ALL protocols ---
+# --- Backend: a Knarr with Code handler, exposes ALL protocols ---
 my $backend_handler = Langertha::Knarr::Handler::Code->new(
   code => sub {
     my ($s, $r) = @_;

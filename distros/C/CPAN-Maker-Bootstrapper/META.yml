@@ -22,7 +22,7 @@ no_index:
 provides:
   CPAN::Maker::Bootstrapper:
     file: lib/CPAN/Maker/Bootstrapper.pm
-    version: v2.3.5
+    version: v2.3.6
   CPAN::Maker::Bootstrapper::ConfigReader:
     file: lib/CPAN/Maker/Bootstrapper/ConfigReader.pm
     version: '0'
@@ -46,7 +46,7 @@ provides:
     version: '0'
   CPAN::Maker::Bootstrapper::Role::ExtraFiles:
     file: lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm
-    version: v2.3.5
+    version: v2.3.6
   CPAN::Maker::Bootstrapper::Role::Filter:
     file: lib/CPAN/Maker/Bootstrapper/Role/Filter.pm
     version: '0'
@@ -55,7 +55,7 @@ provides:
     version: '0'
   CPAN::Maker::Bootstrapper::Role::Installer:
     file: lib/CPAN/Maker/Bootstrapper/Role/Installer.pm
-    version: v2.3.5
+    version: v2.3.6
   CPAN::Maker::Bootstrapper::Role::LLM::Annotator:
     file: lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm
     version: '0'
@@ -120,5 +120,5 @@ resources:
   bugtracker: http://github.com/rlauer6/CPAN-Maker-Bootstrapper/issues
   homepage: http://github.com/rlauer6/CPAN-Maker-Bootstrapper
   repository: git://github.com/rlauer6/CPAN-Maker-Bootstrapper.git
-version: v2.3.5
+version: v2.3.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

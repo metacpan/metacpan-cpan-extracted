@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1beta1::PodSpec;
 # ABSTRACT: PodSpec
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s activeDeadlineSeconds         => Int;
@@ -102,7 +102,7 @@ IO::K8s::AgentSandbox::V1beta1::PodSpec - PodSpec
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 activeDeadlineSeconds
 

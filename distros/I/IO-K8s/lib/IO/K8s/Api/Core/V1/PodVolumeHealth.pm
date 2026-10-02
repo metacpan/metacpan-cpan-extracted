@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodVolumeHealth;
 # ABSTRACT: PodVolumeHealth contains health information for a volume used by a pod, reported by the CSI node plugin via the kubelet.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s healthConditions => ['Core::V1::VolumeHealthCondition'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::PodVolumeHealth - PodVolumeHealth contains health inform
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 healthConditions
 

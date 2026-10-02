@@ -1,9 +1,11 @@
 package TUI::Dialogs;
+# ABSTRACT: Dialog components for the TUI::Vision framework
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -126,9 +128,9 @@ TUI::Dialogs - Dialog components for the TUI::Vision framework
 
 =head1 DESCRIPTION
 
-TUI::Dialogs provides the dialog and widget layer for the TUI::Vision
-framework. It corresponds to the Turbo Vision dialog subsystem and
-includes a wide range of interactive UI components.
+C<TUI::Dialogs> provides the dialog and widget layer for the TUI::Vision
+framework. It corresponds to the I<Turbo Vision> dialog subsystem and includes 
+a wide range of interactive UI components.
 
 This module re-exports numerous dialog-related classes, including:
 
@@ -145,7 +147,7 @@ L<THistoryWindow|TUI::Dialogs::HistoryWindow>,
 and L<THistInit|TUI::Dialogs::HistInit>
 
 =item * Basic widgets - 
-L<TButton|TUI::Dialogs::Button>, L<TLabel|TUI::Dialogs::Label>,
+L<TButton|TUI::Dialogs::Button>,, L<TLabel|TUI::Dialogs::Label>,
 L<TStaticText|TUI::Dialogs::StaticText>, L<TInputLine|TUI::Dialogs::InputLine>, 
 L<TParamText|TUI::Dialogs::ParamText>.
 

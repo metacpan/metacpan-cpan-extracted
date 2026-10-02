@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::PasswordSpec;
 # ABSTRACT: PasswordSpec controls the behavior of the password generator.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s allowRepeat      => Bool, { required => 'schema', default => 0 };
@@ -34,7 +34,7 @@ IO::K8s::ExternalSecrets::V1alpha1::PasswordSpec - PasswordSpec controls the beh
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 allowRepeat
 

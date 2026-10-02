@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -125,28 +125,37 @@ TUI::Dialogs::ParamText - formatted dynamic text control for dialogs
 
 =head1 DESCRIPTION
 
-C<TParamText> is a dynamic text control derived from C<TStaticText>. It allows
-formatted text to be displayed inside dialogs using printf-style format
-strings.
+C<TParamText> is a dynamic text control derived from 
+L<TStaticText|TUI::Dialogs::StaticText>. It allows formatted text to be 
+displayed inside dialogs using printf-style format strings.
 
 The control maintains an internal string buffer and recomputes its displayed
-text whenever C<setText> is called. This mirrors the original Turbo Vision
-behavior, where formatted strings are generated using the C<FormatStr>
-procedure.
+text whenever L</setText> is called. This mirrors the original Turbo Vision
+behavior, where formatted strings are generated using the C<formatStr>
+function.
 
 C<TParamText> is typically used for status messages, confirmations, or prompts
 that include variable data.
 
 =head2 Commonly Used Features
 
-In practice you will call C<new_TParamText> to create the control, call
-C<setText> once to supply the format string together with any arguments, and
+In practice you will call L</new_TParamText> to create the control, call
+L</setText> once to supply the format string together with any arguments, and
 then insert the control into the dialog. Unlike the Pascal original, which
 required manually assigning a pointer to a parameter record, the Perl
 implementation accepts the format string and its arguments directly in
-C<setText>, so no separate data structure needs to be maintained. When the
-dialog data changes you simply call C<setText> again with the new values;
-C<getText> is rarely needed outside of tests.
+L</setText>, so no separate data structure needs to be maintained. When the
+dialog data changes you simply call L</setText> again with the new values;
+L</getText> is rarely needed outside of tests.
+
+=head1 ATTRIBUTES
+
+The following attributes are managed internally and exposed as read-only
+accessors.
+
+=head2 str
+
+Internal formatted text buffer (I<Str>).
 
 =head1 CONSTRUCTOR
 
@@ -162,7 +171,7 @@ Creates a new parameterized text control.
 
 =item bounds
 
-Bounding rectangle of the control (I<TRect>).
+Bounding rectangle of the control (L<TRect|TUI::Objects::Rect>).
 
 =back
 
@@ -174,19 +183,6 @@ Factory-style constructor using positional arguments.
 
 This constructor is provided for compatibility with traditional Turbo Vision
 construction patterns.
-
-=head1 ATTRIBUTES
-
-The following attributes are managed internally and exposed as read-only
-accessors.
-
-=over
-
-=item str
-
-Internal formatted text buffer (I<Str>).
-
-=back
 
 =head1 METHODS
 
@@ -211,9 +207,9 @@ redraw of the view.
 
 =head1 SEE ALSO
 
-L<TUI::Dialogs::StaticText>,
-L<TUI::Dialogs::Label>,
-L<TUI::Dialogs::Dialog>
+L<TStaticText|TUI::Dialogs::StaticText>,
+L<TLabel|TUI::Dialogs::Label>,
+L<TDialog|TUI::Dialogs::Dialog>
 
 =head1 AUTHORS
 

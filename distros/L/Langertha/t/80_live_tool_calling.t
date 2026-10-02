@@ -33,60 +33,53 @@ BEGIN {
   eval {
     require IO::Async::Loop;
     require Future::AsyncAwait;
-    require Net::Async::MCP;
-    require MCP::Server;
-    require MCP::Tool;
     1;
-  } or plan skip_all => 'Requires IO::Async, Net::Async::MCP, and MCP modules';
+  } or plan skip_all => 'Requires IO::Async and Future::AsyncAwait';
 }
 
+use lib 't/lib';
 use IO::Async::Loop;
 use Future::AsyncAwait;
-use Net::Async::MCP;
-use MCP::Server;
-use MCP::Tool;
+use Test::MockMCP;
 
-# --- Build a test MCP server with deterministic tools ---
+# --- Build a duck-typed MCP server (Test::MockMCP) with deterministic tools ---
 
-my $server = MCP::Server->new(name => 'test', version => '1.0');
-
-$server->tool(
-  name        => 'add',
-  description => 'Add two numbers together and return the result',
-  input_schema => {
-    type       => 'object',
-    properties => {
-      a => { type => 'number', description => 'First number' },
-      b => { type => 'number', description => 'Second number' },
+my $mcp = Test::MockMCP->new(
+  tools => [
+    {
+      name        => 'add',
+      description => 'Add two numbers together and return the result',
+      input_schema => {
+        type       => 'object',
+        properties => {
+          a => { type => 'number', description => 'First number' },
+          b => { type => 'number', description => 'Second number' },
+        },
+        required => ['a', 'b'],
+      },
+      code => sub {
+        my ($self, $args) = @_;
+        my $result = $args->{a} + $args->{b};
+        return $self->text_result("$result");
+      },
     },
-    required => ['a', 'b'],
-  },
-  code => sub {
-    my ($self, $args) = @_;
-    my $result = $args->{a} + $args->{b};
-    return $self->text_result("$result");
-  },
-);
-
-$server->tool(
-  name        => 'get_secret_code',
-  description => 'Returns the secret code for the given room name. You MUST call this tool to get the code, do not guess.',
-  input_schema => {
-    type       => 'object',
-    properties => {
-      room => { type => 'string', description => 'The room name to look up' },
+    {
+      name        => 'get_secret_code',
+      description => 'Returns the secret code for the given room name. You MUST call this tool to get the code, do not guess.',
+      input_schema => {
+        type       => 'object',
+        properties => {
+          room => { type => 'string', description => 'The room name to look up' },
+        },
+        required => ['room'],
+      },
+      code => sub {
+        my ($self, $args) = @_;
+        return $self->text_result("XYLOPHONE-42");
+      },
     },
-    required => ['room'],
-  },
-  code => sub {
-    my ($self, $args) = @_;
-    return $self->text_result("XYLOPHONE-42");
-  },
+  ],
 );
-
-my $loop = IO::Async::Loop->new;
-my $mcp = Net::Async::MCP->new(server => $server);
-$loop->add($mcp);
 
 my $prompt = 'What is 7 plus 15? Use the add tool to calculate this. Answer with just the number.';
 my $secret_prompt = 'What is the secret code for room "lobby"? Use the get_secret_code tool. Reply with just the code.';
@@ -105,6 +98,13 @@ async sub test_engine_secret {
   diag "$name secret response: $response";
 }
 
+sub engine_fail {
+  my ($name) = @_;
+  return unless $@;
+  diag "$name error: $@";
+  fail "$name: engine call failed";
+}
+
 async sub run_tests {
   await $mcp->initialize;
 
@@ -117,10 +117,10 @@ async sub run_tests {
     eval {
       await test_engine('Anthropic', Langertha::Engine::Anthropic->new(
         api_key => $ENV{TEST_LANGERTHA_ANTHROPIC_API_KEY},
-        model => 'claude-sonnet-4-6', mcp_servers => [$mcp],
+        model => 'claude-sonnet-5', mcp_servers => [$mcp],
       ));
     };
-    diag "Anthropic error: $@" if $@;
+    engine_fail('Anthropic');
   }
 
   # --- OpenAI ---
@@ -132,7 +132,7 @@ async sub run_tests {
         model => 'gpt-4o-mini', mcp_servers => [$mcp],
       ));
     };
-    diag "OpenAI error: $@" if $@;
+    engine_fail('OpenAI');
   }
 
   # --- Gemini ---
@@ -144,7 +144,7 @@ async sub run_tests {
         model => 'gemini-2.5-flash', mcp_servers => [$mcp],
       ));
     };
-    diag "Gemini error: $@" if $@;
+    engine_fail('Gemini');
   }
 
   # --- Groq ---
@@ -153,10 +153,10 @@ async sub run_tests {
     eval {
       await test_engine('Groq', Langertha::Engine::Groq->new(
         api_key => $ENV{TEST_LANGERTHA_GROQ_API_KEY},
-        model => 'moonshotai/kimi-k2-instruct', mcp_servers => [$mcp],
+        model => 'llama-3.3-70b-versatile', mcp_servers => [$mcp],
       ));
     };
-    diag "Groq error: $@" if $@;
+    engine_fail('Groq');
   }
 
   # --- Mistral ---
@@ -168,7 +168,7 @@ async sub run_tests {
         model => 'mistral-small-latest', mcp_servers => [$mcp],
       ));
     };
-    diag "Mistral error: $@" if $@;
+    engine_fail('Mistral');
   }
 
   # --- DeepSeek ---
@@ -177,10 +177,10 @@ async sub run_tests {
     eval {
       await test_engine('DeepSeek', Langertha::Engine::DeepSeek->new(
         api_key => $ENV{TEST_LANGERTHA_DEEPSEEK_API_KEY},
-        model => 'deepseek-chat', mcp_servers => [$mcp],
+        model => 'deepseek-flash', mcp_servers => [$mcp],
       ));
     };
-    diag "DeepSeek error: $@" if $@;
+    engine_fail('DeepSeek');
   }
 
   # --- MiniMax ---
@@ -192,7 +192,7 @@ async sub run_tests {
         mcp_servers => [$mcp],
       ));
     };
-    diag "MiniMax error: $@" if $@;
+    engine_fail('MiniMax');
   }
 
   # --- Perplexity ---
@@ -208,7 +208,7 @@ async sub run_tests {
         model => 'Hermes-4-70B', mcp_servers => [$mcp],
       ));
     };
-    diag "NousResearch error: $@" if $@;
+    engine_fail('NousResearch');
   }
 
   # --- Cerebras ---
@@ -217,24 +217,28 @@ async sub run_tests {
     eval {
       await test_engine('Cerebras', Langertha::Engine::Cerebras->new(
         api_key => $ENV{TEST_LANGERTHA_CEREBRAS_API_KEY},
-        model => 'llama3.1-8b',
+        model => 'gpt-oss-120b',
         mcp_servers => [$mcp],
       ));
     };
-    diag "Cerebras error: $@" if $@;
+    engine_fail('Cerebras');
   }
 
   # --- OpenRouter ---
   if ($ENV{TEST_LANGERTHA_OPENROUTER_API_KEY}) {
     require Langertha::Engine::OpenRouter;
-    my $or_model = $ENV{TEST_LANGERTHA_OPENROUTER_MODEL} || 'meta-llama/llama-3.3-70b-instruct:free';
+    # meta-llama/llama-3.3-70b-instruct:free was retired (API: "unavailable for
+    # free; use meta-llama/llama-3.3-70b-instruct"). gemma-4-26b-a4b-it:free is
+    # a live free tier with tool calling (verified 2026-08-13); a couple of
+    # other :free ids also pass but are slower / more contended.
+    my $or_model = $ENV{TEST_LANGERTHA_OPENROUTER_MODEL} || 'google/gemma-4-26b-a4b-it:free';
     eval {
       await test_engine("OpenRouter/$or_model", Langertha::Engine::OpenRouter->new(
         api_key => $ENV{TEST_LANGERTHA_OPENROUTER_API_KEY},
         model => $or_model, mcp_servers => [$mcp],
       ));
     };
-    diag "OpenRouter/$or_model error: $@" if $@;
+    engine_fail("OpenRouter/$or_model");
   }
 
   # --- Replicate ---
@@ -247,7 +251,7 @@ async sub run_tests {
         model => $rep_model, mcp_servers => [$mcp],
       ));
     };
-    diag "Replicate/$rep_model error: $@" if $@;
+    engine_fail("Replicate/$rep_model");
   }
 
   # --- HuggingFace ---
@@ -260,7 +264,7 @@ async sub run_tests {
         model => $hf_model, mcp_servers => [$mcp],
       ));
     };
-    diag "HuggingFace/$hf_model error: $@" if $@;
+    engine_fail("HuggingFace/$hf_model");
   }
 
   # --- vLLM ---
@@ -277,7 +281,7 @@ async sub run_tests {
         model => $model, mcp_servers => [$mcp],
       ));
     };
-    diag "vLLM/$model error: $@" if $@;
+    engine_fail("vLLM/$model");
   }
 
   # --- TSystems ---
@@ -289,7 +293,7 @@ async sub run_tests {
         model => 'gpt-oss-120b', mcp_servers => [$mcp],
       ));
     };
-    diag "TSystems error: $@" if $@;
+    engine_fail('TSystems');
   }
 
   # --- Scaleway ---
@@ -301,33 +305,41 @@ async sub run_tests {
         model => 'llama-3.1-8b-instruct', mcp_servers => [$mcp],
       ));
     };
-    diag "Scaleway error: $@" if $@;
+    engine_fail('Scaleway');
   }
 
-  # --- AKI.IO (via OpenAI-compatible API, HermesTools) ---
+  # --- AKI.IO (via OpenAI-compatible API, native tool_calls) ---
   if ($ENV{TEST_LANGERTHA_AKI_API_KEY}) {
     require Langertha::Engine::AKIOpenAI;
-    my $aki_model = $ENV{TEST_LANGERTHA_AKI_OPENAI_MODEL} || 'qwen3-chat';
+    # qwen3-chat is retired (500 even with a larger response_size); the current
+    # Qwen chat model is qwen3.6-chat-35b. Qwen models spend tokens thinking
+    # first, so an explicit response_size (max_tokens) is required or the call
+    # dies with "Response finished before thinking was completed!".
+    my $aki_model = $ENV{TEST_LANGERTHA_AKI_OPENAI_MODEL} || 'qwen3.6-chat-35b';
     eval {
       await test_engine_secret("AKIOpenAI/$aki_model", Langertha::Engine::AKIOpenAI->new(
         api_key => $ENV{TEST_LANGERTHA_AKI_API_KEY},
-        model => $aki_model, mcp_servers => [$mcp],
+        model => $aki_model, response_size => 1024, mcp_servers => [$mcp],
       ));
     };
-    diag "AKIOpenAI/$aki_model error: $@" if $@;
+    engine_fail("AKIOpenAI/$aki_model");
   }
 
   # --- AKI.IO (native API, HermesTools) ---
   if ($ENV{TEST_LANGERTHA_AKI_API_KEY}) {
     require Langertha::Engine::AKI;
-    my $aki_model = $ENV{TEST_LANGERTHA_AKI_NATIVE_MODEL} || 'qwen3_chat';
+    # qwen3_chat does not exist in GET /api/endpoints; kimi_k2 is the strongest
+    # tool-calling endpoint in the live catalog (verified 2026-08-13). The
+    # native wire (key + chat_context + wait_for_result) is unchanged — a raw
+    # messages/max_tokens-shaped POST is what the API rejects.
+    my $aki_model = $ENV{TEST_LANGERTHA_AKI_NATIVE_MODEL} || 'kimi_k2';
     eval {
       await test_engine_secret("AKI-native/$aki_model", Langertha::Engine::AKI->new(
         api_key => $ENV{TEST_LANGERTHA_AKI_API_KEY},
         model => $aki_model, mcp_servers => [$mcp],
       ));
     };
-    diag "AKI-native/$aki_model error: $@" if $@;
+    engine_fail("AKI-native/$aki_model");
   }
 
   # --- Ollama ---
@@ -343,7 +355,7 @@ async sub run_tests {
           model => $model, mcp_servers => [$mcp],
         ));
       };
-      diag "Ollama/$model error: $@" if $@;
+      engine_fail("Ollama/$model");
     }
   }
 }

@@ -1,7 +1,7 @@
 # ABSTRACT: GPU detection from sysfs, without lspci or pciutils
 
 package Rex::GPU::Detect::Sysfs;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -193,7 +193,7 @@ Rex::GPU::Detect::Sysfs - GPU detection from sysfs, without lspci or pciutils
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

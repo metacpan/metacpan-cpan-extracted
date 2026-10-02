@@ -215,7 +215,10 @@ A file matches if the file's path name ends with the given text.
 =item * by timestamp.
 
 A file matches if the file's embedded creation timestamp (tag
-I<CreateDate>) corresponds to the given timestamp.
+I<CreateDate>) corresponds to the given timestamp.  The timestamp to
+use for option C<--location> is the target file's new timestamp (that
+ends up in the I<DateTimeOriginal> tag), and the timestamp to use for
+other options is the embedded I<CreateDate>.
 
 The timestamp must include a date and a time, and may include a time
 zone offset designation.  Here are two examples (in ISO 8601 format)
@@ -290,8 +293,9 @@ creation timestamp.
 Specifies the camera ID to associate with a target file C<FILE>, if
 the camera ID that imsync proposed is not appropriate somehow.
 
-C<FILE> may be a partial path name, or a timestamp, or a time range,
-and identifies the files with which to associate the camera ID.
+C<FILE> may be a partial path name, or a timestamp, or a time range
+(for the I<CreateDate> embedded timestamp), and identifies the files
+with which to associate the camera ID.
 
 C<ID> is the camera ID to associate with the files, instead of the
 default camera ID which depends on several embedded tags.  Whitespace
@@ -336,8 +340,8 @@ L<Image::ExifTool/Options>.
   --follow FILE
 
 Make logging be as verbose as possible for the target C<FILE>.
-C<FILE> may be a partial file name, a timestamp, or a timestamp range.
-See also L</--verbose>.
+C<FILE> may be a partial file name, a timestamp, or a timestamp range
+(for the I<CreateDate> embedded timestamp).  See also L</--verbose>.
 
 =head2 --force
 
@@ -404,7 +408,8 @@ if the location (if any) proposed by imsync is not appropriate
 somehow.
 
 The target may be identified by a partial file name, a timestamp, or a
-timestamp range.
+timestamp range (for the updated timestamp that ends up in the
+embedded I<DateTimeOriginal>).
 
 The location may be identified by a partial file name, a location
 specification, or an empty value.  If it is a partial file name then
@@ -549,9 +554,10 @@ was shifted forward by one hour (just) before that file was recorded.
 Use this when the camera clock switches from Standard Time to Daylight
 Savings Time.
 
-C<FILE> may be a partial path name, or a timestamp, or a time range.
-If it is a time range that matches multiple files, then the effect is
-as if only the first file matched.
+C<FILE> may be a partial path name, or a timestamp, or a time range
+(for the I<CreateDate> embedded timestamp).  If it is a time range
+that matches multiple files, then the effect is as if only the first
+file matched.
 
 The opposite is L</--wintertime>.
 
@@ -563,7 +569,8 @@ Specifies the target time or time offset or camera timezone offset for
 one or more target files, if the time proposed by imsync is not
 appropriate somehow.
 
-C<FILE> may be a partial path name, or a timestamp, or a time range.
+C<FILE> may be a partial path name, or a timestamp, or a time range
+(for the I<CreateDate> embedded timestamp).
 
 C<TIME> may be a timestamp or a time only or an offset or a partial
 path name.
@@ -635,9 +642,10 @@ shifted backward by one hour (just) before that file was recorded.
 Use this when the camera clock switched from Daylight Savings Time to
 Standard Time.
 
-C<FILE> may be a partial path name, or a timestamp, or a time range.
-If it is a time range that matches multiple images, then the effect is
-as if only the first image matched.
+C<FILE> may be a partial path name, or a timestamp, or a time range
+(for the I<CreateDate> embedded timestamp).  If it is a time range
+that matches multiple images, then the effect is as if only the first
+image matched.
 
 The opposite is L</--summertime>.
 
@@ -871,6 +879,10 @@ is C<Brand|Model|SerialNumber|U>.
 At present, only Apple QuickTime movies fall into this category.  Use
 the L</--cameraid> option to assign different camera IDs when needed.
 
+NOTE: Before version 2.013, a supposedly-UTC image file's embedded
+creation time stamp was assumed to be given relative to UTC if it had
+no explicit time zone.  This assumption has been dropped.
+
 =head2 GPS Fix Lag
 
 An image recording device such as a smartphone that incorporates a GPS
@@ -991,6 +1003,18 @@ I<DateTimeOriginal>), then it is used as the target time.
 
 Otherwise, if the file has an embedded creation timestamp (tag
 I<CreateDate>), then it is used as the target time.
+
+Otherwise, if the file is a metadata file then the file modification
+time included in the metadata (i.e., the modification time of the file
+to which the metadata applies, not the modification time of the
+metadata file itself) is used as the target time.  That timestamp is
+the only remaining one that might indicate when the metadata target
+file was created.  For example, if I copy AVI movies (that lack
+embedded timestamps) from a wildlife camera to a laptop then the
+creation and access timestamps of the copies on the laptop indicate
+when the I<copies> were made, not when the camera recorded the movies.
+But the modification timestamp of the copies corresponds to the end
+time of the movies.
 
 Otherwise, the file is considered not to be a regular image file, and
 is marked for later processing after all regular image files have been

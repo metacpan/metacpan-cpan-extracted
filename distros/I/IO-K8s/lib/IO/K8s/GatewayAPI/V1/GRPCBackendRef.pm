@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::GRPCBackendRef;
 # ABSTRACT: GRPCBackendRef defines how a GRPCRoute forwards a gRPC request.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s filters   => ['+IO::K8s::GatewayAPI::V1::GRPCRouteFilter'];
@@ -32,7 +32,7 @@ IO::K8s::GatewayAPI::V1::GRPCBackendRef - GRPCBackendRef defines how a GRPCRoute
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 filters
 

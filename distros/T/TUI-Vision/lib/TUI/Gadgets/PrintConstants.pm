@@ -1,10 +1,11 @@
 package TUI::Gadgets::PrintConstants;
+# ABSTRACT: Helpers for printing symbolic event constants
 
 use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -19,6 +20,10 @@ our @EXPORT_OK = qw(
   printMouseEventFlags
 );
 
+our %EXPORT_TAGS = (
+  all => \@EXPORT_OK,
+);
+
 use TUI::toolkit qw( :utils );
 use TUI::toolkit::Types qw(
   :is
@@ -31,6 +36,8 @@ use TUI::Drivers::Const qw(
   :mbXXXX
   :meXXXX
 );
+
+use constant _WIN32 => ($^O eq 'MSWin32') && !$ENV{WT_SESSION};
 
 {
   no strict 'refs';
@@ -99,20 +106,14 @@ my %keyCodes = (
 );
 
 my %controlKeyStateFlags = (
-  NM( 'kbLeftShift' ),
-  NM( 'kbRightShift' ),
-  NM( 'kbCtrlShift' ),
-  NM( 'kbAltShift' ),
-  NM( 'kbShift' ),
+  _WIN32 ? ( NM( 'kbLeftShift' ), NM( 'kbRightShift' ) ) : NM( 'kbShift' ),
+  _WIN32 ? ( NM( 'kbLeftCtrl' ),  NM( 'kbRightCtrl' ) )  : NM( 'kbCtrlShift' ),
+  _WIN32 ? ( NM( 'kbLeftAlt' ),   NM( 'kbRightAlt' ) )   : NM( 'kbAltShift' ),
   NM( 'kbScrollState' ),
-  NM( 'kbLeftCtrl' ),
-  NM( 'kbRightCtrl' ),
-  NM( 'kbLeftAlt' ),
-  NM( 'kbRightAlt' ),
   NM( 'kbNumState' ),
   NM( 'kbCapsState' ),
+  _WIN32 ? NM( 'kbEnhanced' ) : (),
   NM( 'kbInsState' ),
-  NM( 'kbEnhanced' ),
   # NM( 'kbPaste' ),
   NMEND(),
 );
@@ -162,7 +163,7 @@ sub _printFlags { goto &$printFlags }
 $printFlags = sub {
   my ( $os, $flags, $constants ) = @_;
   assert ( @_ == 3 );
-  assert ( is_Object $os );
+  assert ( is_FileHandle $os );
   assert ( is_PositiveOrZeroInt $flags );
   assert ( is_HashRef $constants );
 
@@ -185,7 +186,7 @@ sub _printCode { goto &$printCode }
 $printCode = sub {
   my ( $os, $code, $constants ) = @_;
   assert ( @_ == 3 );
-  assert ( is_Object $os );
+  assert ( is_FileHandle $os );
   assert ( is_PositiveOrZeroInt $code );
   assert ( is_HashRef $constants );
 
@@ -200,7 +201,7 @@ $printCode = sub {
 
 sub printKeyCode {
   state $sig = signature(
-    pos => [ Object, PositiveOrZeroInt ],
+    pos => [ FileHandle, PositiveOrZeroInt ],
   );
   my ( $os, $keyCode ) = $sig->( @_ );
   &$printCode( $os, $keyCode, \%keyCodes );
@@ -209,7 +210,7 @@ sub printKeyCode {
 
 sub printControlKeyState {
   state $sig = signature(
-    pos => [ Object, PositiveOrZeroInt ],
+    pos => [ FileHandle, PositiveOrZeroInt ],
   );
   my ( $os, $controlKeyState ) = $sig->( @_ );
   &$printFlags( $os, $controlKeyState, \%controlKeyStateFlags );
@@ -218,7 +219,7 @@ sub printControlKeyState {
 
 sub printEventCode {
   state $sig = signature(
-    pos => [ Object, PositiveOrZeroInt ],
+    pos => [ FileHandle, PositiveOrZeroInt ],
   );
   my ( $os, $eventCode ) = $sig->( @_ );
   &$printCode( $os, $eventCode, \%eventCodes );
@@ -227,7 +228,7 @@ sub printEventCode {
 
 sub printMouseButtonState {
   state $sig = signature(
-    pos => [ Object, PositiveOrZeroInt ],
+    pos => [ FileHandle, PositiveOrZeroInt ],
   );
   my ( $os, $buttonState ) = $sig->( @_ );
   &$printFlags( $os, $buttonState, \%mouseButtonFlags );
@@ -236,7 +237,7 @@ sub printMouseButtonState {
 
 sub printMouseWheelState {
   state $sig = signature(
-    pos => [ Object, PositiveOrZeroInt ],
+    pos => [ FileHandle, PositiveOrZeroInt ],
   );
   my ( $os, $wheelState ) = $sig->( @_ );
   &$printFlags( $os, $wheelState, \%mouseWheelFlags );
@@ -245,7 +246,7 @@ sub printMouseWheelState {
 
 sub printMouseEventFlags {
   state $sig = signature(
-    pos => [ Object, PositiveOrZeroInt ],
+    pos => [ FileHandle, PositiveOrZeroInt ],
   );
   my ( $os, $eventFlags ) = $sig->( @_ );
   &$printFlags( $os, $eventFlags, \%mouseEventFlags );
@@ -278,8 +279,8 @@ TUI::Gadgets::PrintConstants - helpers for printing symbolic event constants
 
 =head1 DESCRIPTION
 
-C<TUI::Gadgets::PrintConstants> provides helper functions for printing symbolic
-representations of TUI::Vision constants.
+This module provides helper functions for printing symbolic representations of 
+L<TUI::Vision> constants.
 
 The functions translate numeric event, key, and mouse codes into their
 corresponding symbolic names and write the result to a supplied output object.
@@ -287,7 +288,7 @@ If a value cannot be mapped to a known constant, its numeric representation is
 printed instead.
 
 This module is intended for debugging and diagnostic output and is commonly
-used by gadgets such as C<TEventViewer>.
+used by gadgets such as L<TEventViewer|TUI::Gadgets::EventViewer>.
 
 =head1 FUNCTIONS
 
@@ -335,8 +336,8 @@ Prints the symbolic names of mouse event flags.
 =head1 SEE ALSO
 
 L<TUI::Drivers::Const>,
-L<TUI::Drivers::Event>,
-L<TUI::Gadgets::EventViewer>
+L<TEvent|TUI::Drivers::Event>,
+L<TEventViewer|TUI::Gadgets::EventViewer>
 
 =head1 AUTHORS
 

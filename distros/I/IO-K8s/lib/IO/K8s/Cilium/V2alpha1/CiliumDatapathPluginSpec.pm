@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumDatapathPluginSpec;
 # ABSTRACT: CiliumDatapathPluginSpec
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s attachmentPolicy => Str, { required => 'schema', enum => [qw(Always BestEffort)] };
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2alpha1::CiliumDatapathPluginSpec - CiliumDatapathPluginSpec
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 attachmentPolicy
 

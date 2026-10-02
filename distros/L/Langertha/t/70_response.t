@@ -7,6 +7,7 @@ use warnings;
 use Test2::Bundle::More;
 use JSON::MaybeXS;
 use HTTP::Response;
+use Path::Tiny;
 
 use Langertha::Response;
 use Langertha::Engine::OpenAI;
@@ -43,7 +44,7 @@ is("$r2", 'Hi', 'full Response stringifies');
 is($r2->id, 'resp-123', 'id accessor');
 is($r2->model, 'gpt-4o', 'model accessor');
 is($r2->finish_reason, 'stop', 'finish_reason accessor');
-is($r2->created, 1700000000, 'created accessor');
+is(0 + $r2->created, 1700000000, 'created numifies to the Unix timestamp');
 is($r2->prompt_tokens, 10, 'prompt_tokens convenience');
 is($r2->completion_tokens, 5, 'completion_tokens convenience');
 is($r2->total_tokens, 15, 'total_tokens from usage');
@@ -97,7 +98,7 @@ is("$openai_resp", 'OpenAI says hello', 'OpenAI Response stringifies');
 is($openai_resp->id, 'chatcmpl-abc123', 'OpenAI id extracted');
 is($openai_resp->model, 'gpt-4o-mini-2024-07-18', 'OpenAI model extracted');
 is($openai_resp->finish_reason, 'stop', 'OpenAI finish_reason extracted');
-is($openai_resp->created, 1700000001, 'OpenAI created extracted');
+is(0 + $openai_resp->created, 1700000001, 'OpenAI created extracted');
 is($openai_resp->prompt_tokens, 12, 'OpenAI prompt_tokens');
 is($openai_resp->completion_tokens, 4, 'OpenAI completion_tokens');
 is($openai_resp->total_tokens, 16, 'OpenAI total_tokens');
@@ -149,6 +150,7 @@ $gemini_http->content($json->encode({
     totalTokenCount => 11,
   },
   modelVersion => 'gemini-2.5-flash-preview-04-17',
+  responseId => 'mCvJaNXTBvqd1dkPx6WbwAQ',
 }));
 $gemini_http->header('Content-Type' => 'application/json');
 
@@ -160,6 +162,9 @@ is($gemini_resp->finish_reason, 'STOP', 'Gemini finish_reason extracted');
 is($gemini_resp->prompt_tokens, 8, 'Gemini prompt_tokens normalized');
 is($gemini_resp->completion_tokens, 3, 'Gemini completion_tokens normalized');
 is($gemini_resp->total_tokens, 11, 'Gemini total_tokens normalized');
+# karr k335: every other engine fills Response.id from the wire's response id;
+# Gemini's is responseId. Without it id is undef on Gemini alone.
+is($gemini_resp->id, 'mCvJaNXTBvqd1dkPx6WbwAQ', 'Gemini id from responseId');
 
 # --- Ollama chat_response returns Response ---
 
@@ -193,6 +198,15 @@ is($ollama_resp->completion_tokens, 10, 'Ollama completion_tokens from eval_coun
 ok($ollama_resp->has_timing, 'Ollama timing populated');
 is($ollama_resp->timing->{total_duration}, 5000000000, 'Ollama timing total_duration');
 is($ollama_resp->timing->{load_duration}, 1000000000, 'Ollama timing load_duration');
+is($ollama_resp->timing->{prompt_eval_duration}, 200000000, 'Ollama timing prompt_eval_duration');
+is($ollama_resp->timing->{eval_duration}, 300000000, 'Ollama timing eval_duration');
+is($ollama_resp->timing->{total_seconds}, 5, 'Ollama timing total_seconds derived from ns');
+is($ollama_resp->timing->{load_seconds}, 1, 'Ollama timing load_seconds derived from ns');
+is($ollama_resp->timing->{prompt_eval_seconds}, 0.2, 'Ollama timing prompt_eval_seconds derived from ns');
+is($ollama_resp->timing->{eval_seconds}, 0.3, 'Ollama timing eval_seconds derived from ns');
+ok($ollama_resp->has_total, 'Ollama has_total from total_seconds');
+is($ollama_resp->total_seconds, 5, 'Ollama total_seconds convenience');
+ok(!$ollama_resp->has_ttft, 'Ollama has_ttft false (sync engine)');
 
 # --- AKI chat_response returns Response ---
 
@@ -215,6 +229,225 @@ isa_ok($aki_resp, 'Langertha::Response');
 is("$aki_resp", 'AKI says hello', 'AKI Response stringifies');
 is($aki_resp->model, 'Meta-Llama-3-8B-Instruct', 'AKI model from model_name');
 ok($aki_resp->has_timing, 'AKI timing populated');
-is($aki_resp->timing->{total_duration}, 0.7, 'AKI timing total_duration');
+is($aki_resp->total_seconds, 0.7, 'AKI total_duration (seconds) surfaces as total_seconds');
+ok(!exists $aki_resp->timing->{total_duration},
+  'AKI no longer emits the raw total_duration key (Ollama-ns collision, karr k126)');
+
+# --- clone_with: probes survives (the gap that bit karr #4) ---
+
+subtest 'clone_with carries probes through (karr #5 regression gate)' => sub {
+  my $r = Langertha::Response->new(
+    content => 'x',
+    probes  => { qk_cache => [ [1, 2], [3, 4] ], config => { layer => 0 } },
+  );
+  ok($r->has_probes, 'probes set');
+
+  my $r2 = $r->clone_with(content => 'y');
+  ok($r2->has_probes, 'probes survives a content override');
+  is_deeply($r2->probes->{qk_cache}, [ [1, 2], [3, 4] ], 'probes qk_cache intact');
+  is($r2->probes->{config}{layer}, 0, 'probes config intact');
+
+  # Sequential chain: probes → rate_limit (mirrors simple_chat chain)
+  require Langertha::RateLimit;
+  my $rl = Langertha::RateLimit->new(
+    requests_remaining => 50,
+    tokens_remaining   => 2000,
+    raw                => {},
+  );
+  my $r3 = $r2->clone_with(rate_limit => $rl);
+  ok($r3->has_probes, 'probes survives a sequential rate_limit override');
+  ok($r3->has_rate_limit, 'rate_limit applied');
+  is_deeply($r3->probes->{qk_cache}, [ [1, 2], [3, 4] ], 'probes still intact');
+  is($r3->rate_limit->requests_remaining, 50, 'rate_limit value carried');
+};
+
+# --- clone_with: raw survives ---
+
+subtest 'clone_with carries raw through' => sub {
+  my $r = Langertha::Response->new(
+    content => 'hello',
+    raw     => { id => 'r1', nested => { a => 1 } },
+  );
+  ok($r->has_raw, 'raw set');
+
+  my $r2 = $r->clone_with(content => 'world');
+  ok($r2->has_raw, 'raw survives a content override');
+  is($r2->raw->{id}, 'r1', 'raw id intact');
+  is($r2->raw->{nested}{a}, 1, 'raw nested hash intact');
+};
+
+# --- clone_with: timing -> tool_calls chain (karr #5 2-step regression) ---
+
+subtest 'clone_with timing then tool_calls preserves both' => sub {
+  my $r = Langertha::Response->new(content => 'orig');
+  ok(!$r->has_timing, 'no timing initially');
+  ok(!$r->has_tool_calls, 'no tool_calls initially');
+
+  my $r2 = $r->clone_with(timing => { total_seconds => 1.5 });
+  ok($r2->has_timing, 'timing set after first clone');
+  is($r2->total_seconds, 1.5, 'total_seconds readable');
+  ok(!$r2->has_tool_calls, 'no tool_calls yet');
+
+  my $r3 = $r2->clone_with(
+    tool_calls => [{
+      name      => 'extract',
+      arguments => { x => 1 },
+      synthetic => 1,
+    }],
+  );
+  ok($r3->has_timing, 'timing survives second clone');
+  is($r3->total_seconds, 1.5, 'total_seconds survives second clone');
+  ok($r3->has_tool_calls, 'tool_calls set after second clone');
+  is($r3->tool_call('extract')->arguments->{x}, 1, 'tool_calls value reachable');
+};
+
+# --- Ollama chat_response over what a real server actually sends (karr #92) ---
+#
+# The hand-written Ollama payload above omits created_at, the one field every
+# real Ollama server sends — and it sends it as an RFC3339 string, which no
+# Maybe[Int] will take. That killed every non-streaming Ollama chat from
+# 1fac6c4 onwards without the suite noticing, because the only other Ollama
+# coverage (t/64_tool_calling_ollama_mock.t) drives chat_with_tools_f, which
+# reads the raw parse_response HashRef and never builds a Response at all.
+# These fixtures are captured verbatim from a real server, so the constructor
+# is fed the wire shape rather than a payload written to fit the class.
+
+sub ollama_http {
+  my ( $body ) = @_;
+  my $http = HTTP::Response->new(200, 'OK');
+  $http->header('Content-Type' => 'application/json');
+  $http->content($body);
+  return $http;
+}
+
+subtest 'Ollama chat_response over captured server fixtures (karr #92)' => sub {
+  my $data_dir = path(__FILE__)->parent->child('data');
+
+  my $call_body = $data_dir->child('ollama_tool_call_response.json')->slurp_raw;
+  my $call_resp = eval { $ollama->chat_response(ollama_http($call_body)) };
+  # Test definedness, not truth: a tool-call-only reply has empty content and
+  # Response stringifies to content, so the object itself is false here.
+  ok(defined $call_resp, 'tool-call fixture: Response constructed, no type-constraint croak')
+    or diag($@);
+
+  SKIP: {
+    skip 'no Response to inspect', 6 unless defined $call_resp;
+    isa_ok($call_resp, 'Langertha::Response');
+    is(0 + $call_resp->created, 1771732845, 'created numifies to Unix seconds');
+    is($call_resp->raw->{created_at}, '2026-02-22T04:00:45.027209927Z',
+      'native RFC3339 stamp preserved verbatim under raw');
+    is($call_resp->model, 'qwen3:8b', 'model from fixture');
+    is($call_resp->finish_reason, 'stop', 'finish_reason from done_reason');
+    is(scalar @{$call_resp->tool_calls}, 1, 'tool call extracted from the same payload');
+  }
+
+  my $result_body = $data_dir->child('ollama_tool_result_response.json')->slurp_raw;
+  my $result_resp = eval { $ollama->chat_response(ollama_http($result_body)) };
+  ok(defined $result_resp, 'tool-result fixture: Response constructed') or diag($@);
+
+  SKIP: {
+    skip 'no Response to inspect', 2 unless defined $result_resp;
+    is("$result_resp", '22', 'tool-result fixture stringifies to its content');
+    is(0 + $result_resp->created, 1771732852, 'created numifies to Unix seconds');
+  }
+};
+
+subtest 'Ollama created_at normalization (karr #92)' => sub {
+  my %stamps = (
+    'fractional UTC'         => '2026-02-22T04:00:45.027209927Z',
+    'whole-second UTC'       => '2026-02-22T04:00:45Z',
+    'positive UTC offset'    => '2026-02-22T05:00:45+01:00',
+    'negative UTC offset'    => '2026-02-22T03:00:45-01:00',
+    'offset without a colon' => '2026-02-22T03:00:45-0100',
+    'epoch seconds'          => 1771732845,
+    'epoch seconds as text'  => '1771732845',
+  );
+  for my $name (sort keys %stamps) {
+    my $body = $json->encode({
+      model       => 'qwen3:8b',
+      created_at  => $stamps{$name},
+      message     => { role => 'assistant', content => 'hi' },
+      done        => JSON->true,
+      done_reason => 'stop',
+    });
+    my $resp = eval { $ollama->chat_response(ollama_http($body)) };
+    ok(defined $resp, "$name: Response constructed") or diag($@);
+    is(defined $resp ? 0 + $resp->created : undef, 1771732845,
+      "$name: created numifies to the expected Unix timestamp");
+  }
+
+  # A stamp we cannot read must drop the field, never take the response down:
+  # created is informational metadata, the content is what the caller asked for.
+  for my $bad ('not-a-timestamp', '0001-01-01T00:00:00Z', '') {
+    my $body = $json->encode({
+      model      => 'qwen3:8b',
+      created_at => $bad,
+      message    => { role => 'assistant', content => 'hi' },
+      done       => JSON->true,
+    });
+    my $resp = eval { $ollama->chat_response(ollama_http($body)) };
+    ok(defined $resp, "unreadable created_at '$bad': Response still constructed") or diag($@);
+    ok(defined $resp && !$resp->has_created, "unreadable created_at '$bad': created left unset");
+    is(defined $resp ? "$resp" : undef, 'hi', "unreadable created_at '$bad': content intact");
+  }
+
+  # TO_JSON must keep emitting a number for created, whichever form the server
+  # used — a trace consumer sees the same shape for Ollama as for OpenAI.
+  my $encoder = JSON::MaybeXS->new->canonical(1)->convert_blessed(1);
+  for my $stamp ('2026-02-22T04:00:45.027209927Z', '1771732845') {
+    my $body = $json->encode({
+      model      => 'qwen3:8b',
+      created_at => $stamp,
+      message    => { role => 'assistant', content => 'hi' },
+      done       => JSON->true,
+    });
+    my $resp = $ollama->chat_response(ollama_http($body));
+    like($encoder->encode($resp), qr/"created":1771732845(?![0-9"])/,
+      "created serializes as a JSON number (from '$stamp')");
+  }
+};
+
+# --- Boolean context (karr #100) ---
+#
+# `use overload '""' => ..., fallback => 1` makes Perl derive bool from the
+# string overload, so a Response whose content is the empty string was FALSE --
+# exactly the shape of a tool-call-only reply (see the Ollama fixture subtest
+# above) and of an Anthropic reply that is pure tool_use. A caller writing
+# `if (my $resp = $engine->simple_chat(...))` silently skipped a perfectly good
+# response. An explicit bool overload separates "this object exists" from "its
+# content is non-empty"; callers who mean the latter ask `length "$resp"`.
+
+subtest 'Response is true in boolean context whatever its content (karr #100)' => sub {
+  my $tool_only = Langertha::Response->new(
+    content    => '',
+    tool_calls => [
+      { name => 'get_weather', arguments => { city => 'Berlin' }, id => 'call_1' },
+    ],
+  );
+
+  ok($tool_only, 'tool-call-only Response (empty content) is true');
+  ok(!!$tool_only, 'double negation stays true');
+  is(($tool_only ? 'taken' : 'skipped'), 'taken', 'ternary takes the true branch');
+  is(scalar @{ $tool_only->tool_calls }, 1,
+    'the tool call a false Response would have hidden is reachable');
+
+  ok(Langertha::Response->new(content => ''), 'empty content, no tool calls: still true');
+  ok(Langertha::Response->new(content => '0'),
+    q{content '0' is true -- the classic Perl false-string trap does not leak through});
+
+  # The stringification contract is the part nobody may break.
+  is("$tool_only", '', 'empty-content Response still stringifies to the empty string');
+  is("" . Langertha::Response->new(content => '0'), '0', q{content '0' still stringifies to '0'});
+  is(length("$tool_only"), 0, 'length() over the stringification still reports emptiness');
+  ok(!length("$tool_only"), 'emptiness stays testable -- that is what length is for');
+
+  # Comparison and concatenation keep routing through the '""' overload.
+  my $hello = Langertha::Response->new(content => 'hello');
+  ok($hello eq 'hello', 'eq against a plain string works');
+  ok($hello ne 'goodbye', 'ne against a plain string works');
+  ok($tool_only eq '', 'empty-content Response is still eq to the empty string');
+  is($hello . '!', 'hello!', 'concatenation still uses the content');
+};
+
 
 done_testing;

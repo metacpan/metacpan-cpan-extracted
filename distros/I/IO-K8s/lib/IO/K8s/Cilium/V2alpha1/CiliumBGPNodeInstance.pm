@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPNodeInstance;
 # ABSTRACT: CiliumBGPNodeInstance is a single BGP router instance configuration on the node.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s localASN  => Int, { minimum => 1, maximum => 4294967295 };
@@ -28,7 +28,7 @@ IO::K8s::Cilium::V2alpha1::CiliumBGPNodeInstance - CiliumBGPNodeInstance is a si
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 localASN
 

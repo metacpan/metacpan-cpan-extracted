@@ -140,7 +140,7 @@ BEGIN {
       $r->assign( 21, 3, 33, 6 );
       $view = new_TRadioButtons($r,
         new_TSItem('~B~ig',
-        new_TSItem('~M~ediun',
+        new_TSItem('~M~edium',
         new_TSItem('~S~mall',
         undef)))
       );

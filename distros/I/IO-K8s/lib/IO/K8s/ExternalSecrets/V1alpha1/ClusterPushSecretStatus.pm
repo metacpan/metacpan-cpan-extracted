@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::ClusterPushSecretStatus;
 # ABSTRACT: ClusterPushSecretStatus contains the status information for the ClusterPushSecret resource.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s conditions            => ['+IO::K8s::ExternalSecrets::V1alpha1::PushSecretStatusCondition'];
@@ -26,7 +26,7 @@ IO::K8s::ExternalSecrets::V1alpha1::ClusterPushSecretStatus - ClusterPushSecretS
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 conditions
 

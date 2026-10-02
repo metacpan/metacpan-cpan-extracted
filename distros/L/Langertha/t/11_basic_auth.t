@@ -66,6 +66,10 @@ use Langertha::Engine::LlamaCpp;
 use Langertha::Engine::OllamaOpenAI;
 
 {
+  # An Ollama Cloud key in the environment would replace Basic with Bearer
+  # (see t/13_ollama_auth.t) -- keep this case about the URL userinfo.
+  delete local $ENV{LANGERTHA_OLLAMA_API_KEY};
+
   my $o = Langertha::Engine::OllamaOpenAI->new(
     url   => 'http://user:pass@ollama.internal:11434/v1',
     model => 'llama3.3',
@@ -150,6 +154,9 @@ use Langertha::Engine::LMStudioOpenAI;
 use Langertha::Engine::Ollama;
 
 {
+  # Same here: no Ollama Cloud key, so update_request stays out of the way.
+  delete local $ENV{LANGERTHA_OLLAMA_API_KEY};
+
   my $o = Langertha::Engine::Ollama->new(
     url   => 'http://admin:ollama@localhost:11434',
     model => 'llama3.3',

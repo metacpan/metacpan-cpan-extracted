@@ -1,6 +1,6 @@
 package IO::K8s::PrometheusOperator::V1::GlobalTelegramConfig;
 # ABSTRACT: telegram defines the default Telegram config
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s apiURL => Str, { pattern => qr/^(http|https):\/\/.+$/ };
@@ -20,7 +20,7 @@ IO::K8s::PrometheusOperator::V1::GlobalTelegramConfig - telegram defines the def
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 apiURL
 

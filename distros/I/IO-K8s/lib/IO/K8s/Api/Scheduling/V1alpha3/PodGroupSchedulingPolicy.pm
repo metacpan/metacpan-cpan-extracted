@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1alpha3::PodGroupSchedulingPolicy;
 # ABSTRACT: PodGroupSchedulingPolicy defines the scheduling configuration for a PodGroup. Exactly one policy must be set. The policy is chosen at creation time by setting either the Basic or Gang field. The PodGroup may not change policy after creation. Fields within chosen policy may be updated after creation when their individual fields allow it.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s basic => 'Scheduling::V1alpha3::BasicSchedulingPolicy';
@@ -23,7 +23,7 @@ IO::K8s::Api::Scheduling::V1alpha3::PodGroupSchedulingPolicy - PodGroupSchedulin
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 basic
 

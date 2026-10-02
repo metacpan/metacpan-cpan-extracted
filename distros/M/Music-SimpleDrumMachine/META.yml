@@ -6,6 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V0: '0'
   Test::More: '0.88'
   perl: v5.36.0
   strict: '0'
@@ -35,7 +36,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-SimpleDrumMachine
   repository: https://github.com/ology/Music-SimpleDrumMachine.git
-version: '0.0600'
+version: '0.0602'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

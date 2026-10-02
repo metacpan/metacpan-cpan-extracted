@@ -20,6 +20,7 @@
 buildspec.yml.current
 buildspec.yml.tmpl
 cpanfile.*
+!cpanfile.darkpan
 extra-files
 extra-files.mk
 local/**

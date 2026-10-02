@@ -9,7 +9,7 @@ use String::Koremutake;
 use Test::More;
 
 plan skip_all => 'interrupt is not supported on Windows' if $^O eq 'MSWin32';
-plan tests => 24;
+plan tests => 23;
 
 # true if the program is still running after a moment: the answer to the
 # queued basic request only arrives once it stops
@@ -71,10 +71,13 @@ sub loop {
 }
 
 # --- the program's own pid is signalled, not a shell around it ------------
+#
+# proc->pid may or may not differ from the program's own pid here: some
+# shells exec() straight into a single simple command instead of keeping
+# themselves around as a wrapper process, so that is not asserted below.
 
 {
   my $ebug = loop('corpus/infinite_loop.pl "two words"');
-  isnt($ebug->pid, $ebug->proc->pid, 'a program run through the shell has a different pid to proc');
   is($ebug->pid, $ebug->eval('$$'), 'pid is the program itself');
   $ebug->run_nowait;
   ok(still_running($ebug), 'running');

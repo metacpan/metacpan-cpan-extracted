@@ -1,7 +1,7 @@
 # ABSTRACT: NVIDIA GPU driver and container toolkit management
 
 package Rex::GPU::NVIDIA;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.14.4;
 use warnings;
 
@@ -874,6 +874,7 @@ sub generate_cdi_specs {
   my $active = run "systemctl is-active nvidia-cdi-refresh.path 2>/dev/null", auto_die => 0;
   chomp $active if defined $active;
 
+  my $managed = 0;
   if ($class->_cdi_managed_source_present(
       enabled_state => $enabled,
       active_state  => $active,
@@ -888,12 +889,95 @@ sub generate_cdi_specs {
     # — the unit re-runs itself on the next driver change; if the unit name
     # differs (detected via the /run/cdi file), this is a harmless no-op.
     run "systemctl start nvidia-cdi-refresh.service 2>/dev/null", auto_die => 0;
+    $managed = 1;
+  }
+
+  # k76: what resolves decides, not which files exist. GB10/DGX OS with
+  # toolkit 1.19 has no nvidia-cdi-refresh and an empty /run/cdi after a
+  # reboot, and nothing there writes management.nvidia.com/gpu=all, which the
+  # GPU Operator validator asks for. Only a device that does not resolve gets
+  # a spec under /etc/cdi; a working spec (also one of nvidia-cdi-refresh's
+  # under /run/cdi) is left alone, so no kind appears twice.
+  my $list = run "nvidia-ctk cdi list 2>/dev/null", auto_die => 0;
+  if ($? != 0) {
+    Rex::Logger::info("  nvidia-ctk cdi list failed — cannot check which CDI devices "
+      . "resolve; management.nvidia.com/gpu=all is not generated", "warn");
+    $class->_write_cdi_spec('nvidia.com/gpu=all') unless $managed;
     return;
   }
 
-  run "mkdir -p /etc/cdi", auto_die => 0;
-  run "nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml 2>/dev/null", auto_die => 0;
-  Rex::Logger::info("  [ok] CDI specs written to /etc/cdi/nvidia.yaml");
+  my @missing = $class->_cdi_missing_devices($list, $class->_cdi_required_devices);
+  unless (@missing) {
+    Rex::Logger::info("  [ok] CDI devices resolve: " . join(', ', $class->_cdi_required_devices));
+    return;
+  }
+
+  my $wrote = 0;
+  for my $device (@missing) {
+    if ($managed && $device eq 'nvidia.com/gpu=all') {
+      # A static /etc/cdi/nvidia.yaml would define the kind the refresh unit
+      # owns a second time (karr #11) -- say so instead.
+      Rex::Logger::info("  nvidia-cdi-refresh did not make $device resolvable — not writing "
+        . "a static /etc/cdi/nvidia.yaml next to it; check "
+        . "`systemctl status nvidia-cdi-refresh.service`", "warn");
+      next;
+    }
+    run "mkdir -p /etc/cdi", auto_die => 0 unless $wrote++;
+    $class->_write_cdi_spec($device, mkdir => 0);
+  }
+  return unless $wrote;
+
+  my @still = $class->_cdi_missing_devices(
+    scalar(run "nvidia-ctk cdi list 2>/dev/null", auto_die => 0),
+    $class->_cdi_required_devices);
+  Rex::Logger::info("  CDI devices still not resolvable: " . join(', ', @still)
+    . " — CDI consumers (GPU Operator validator, device plugin) will fail on them", "warn")
+    if @still;
+}
+
+# The CDI devices generate_cdi_specs makes resolvable (k76): the GPU kind the
+# device plugin hands out and the management kind the GPU Operator validator
+# requests.
+sub _cdi_required_devices { ( 'nvidia.com/gpu=all', 'management.nvidia.com/gpu=all' ) }
+
+# Write the /etc/cdi spec that provides $device. nvidia.com/gpu=all is the
+# plain `nvidia-ctk cdi generate`. The management spec needs --vendor (alias
+# --cdi-vendor) and --class: without --vendor, --mode=management writes kind
+# nvidia.com/gpu, whose `all` collides with nvidia.yaml's (toolkit 1.19.1;
+# flag names identical in 1.20.1). A CLI without the management mode answers
+# "invalid discovery mode" -- a warning, never a die.
+sub _write_cdi_spec {
+  my ( $class, $device, %opt ) = @_;
+  run "mkdir -p /etc/cdi", auto_die => 0 if $opt{mkdir} // 1;
+  if ($device eq 'nvidia.com/gpu=all') {
+    run "nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml 2>/dev/null", auto_die => 0;
+    Rex::Logger::info("  [ok] CDI specs written to /etc/cdi/nvidia.yaml");
+    return 1;
+  }
+  if ($device eq 'management.nvidia.com/gpu=all') {
+    my $out = run "nvidia-ctk cdi generate --mode=management --vendor=management.nvidia.com "
+      . "--class=gpu --output=/etc/cdi/management.nvidia.yaml 2>&1", auto_die => 0;
+    if ($? != 0) {
+      $out //= '';
+      $out =~ s/\s+\z//;
+      Rex::Logger::info("  could not generate the CDI spec for $device (nvidia-ctk cdi generate "
+        . "--mode=management: " . ($out eq '' ? 'failed' : $out) . ")", "warn");
+      return 0;
+    }
+    Rex::Logger::info("  [ok] CDI management spec written to /etc/cdi/management.nvidia.yaml");
+    return 1;
+  }
+  Rex::Logger::info("  no CDI spec known for $device", "warn");
+  return 0;
+}
+
+# Pure (k76): which of @wanted does not appear as a whole line in the output
+# of `nvidia-ctk cdi list` (one fully qualified device per line, the
+# "Found N CDI devices" count goes to stderr)? Order of @wanted is kept.
+sub _cdi_missing_devices {
+  my ( $class, $list, @wanted ) = @_;
+  my %have = map { s/^\s+|\s+\z//gr => 1 } split /\n/, ($list // '');
+  return grep { !$have{$_} } @wanted;
 }
 
 # Pure predicate for the generate_cdi_specs managed-source short-circuit: is a
@@ -985,7 +1069,7 @@ Rex::GPU::NVIDIA - NVIDIA GPU driver and container toolkit management
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -1130,10 +1214,12 @@ Container Device Interface specifications let the Kubernetes device plugin
 enumerate GPU resources without requiring privileged container access. When a
 managed CDI source — the C<nvidia-cdi-refresh> systemd unit shipped by modern
 C<nvidia-container-toolkit> — already keeps C</run/cdi/nvidia.yaml> fresh, that
-source is left to own CDI; otherwise a static spec is written to
-C</etc/cdi/nvidia.yaml> by C<nvidia-ctk cdi generate>. Only one of the two
-default scan dirs (C</etc/cdi>, C</run/cdi>) is populated, so C<nvidia.com/gpu>
-is never defined twice.
+source is left to own CDI. Whatever does not resolve afterwards
+(C<nvidia-ctk cdi list>) is written under C</etc/cdi>: C<nvidia.yaml> for
+C<nvidia.com/gpu=all> (never next to a managed source, so C<nvidia.com/gpu>
+is not defined twice) and C<management.nvidia.yaml> for
+C<management.nvidia.com/gpu=all>, which the GPU Operator validator needs.
+See L</generate_cdi_specs>.
 
 =head2 Containerd configuration
 
@@ -1800,10 +1886,39 @@ duplicate-device load error in CDI consumers — and would drift against the
 refreshed copy over driver updates. In that case the managed generator is
 triggered once (so C</run/cdi> is populated immediately) and left to own CDI.
 
-Otherwise — no managed refresh unit and no existing C</run/cdi/nvidia.yaml> —
-output is written to C</etc/cdi/nvidia.yaml> via C<nvidia-ctk cdi generate>, and
-the C</etc/cdi/> directory is created if it does not exist. Only one of the two
-scan dirs is ever populated.
+Then C<nvidia-ctk cdi list> decides what is written. Two devices have to
+resolve: C<nvidia.com/gpu=all> (the device plugin) and
+C<management.nvidia.com/gpu=all> (the GPU Operator validator asks for it).
+Only a device that does B<not> resolve gets a spec under C</etc/cdi>, which is
+created if it does not exist:
+
+=over 4
+
+=item * C<nvidia.com/gpu=all> — C<nvidia-ctk cdi generate
+--output=/etc/cdi/nvidia.yaml>, but only without a managed source; with one,
+a missing device is a warning, and no second copy of its kind is written.
+
+=item * C<management.nvidia.com/gpu=all> — C<nvidia-ctk cdi generate
+--mode=management --vendor=management.nvidia.com --class=gpu
+--output=/etc/cdi/management.nvidia.yaml>. Without C<--vendor> the toolkit
+writes the management spec as kind C<nvidia.com/gpu>, and its C<all> collides
+with the one in C<nvidia.yaml>. A toolkit whose C<nvidia-ctk> has no
+management mode is a warning.
+
+=back
+
+A spec that already resolves is left untouched, wherever it lives — also
+C</run/cdi/nvidia.yaml> from C<nvidia-cdi-refresh> — so a second run writes
+nothing. That is what a host without C<nvidia-cdi-refresh> needs (DGX OS with
+toolkit 1.19: C</run/cdi> is empty after every reboot). After writing,
+C<nvidia-ctk cdi list> runs again, and a device that still does not resolve
+is a warning. If C<nvidia-ctk cdi list> itself fails, nothing can be checked:
+a host without a managed source gets C</etc/cdi/nvidia.yaml> as before, no
+management spec is attempted, and a warning says so. This step never dies.
+
+Because an existing C</etc/cdi/nvidia.yaml> that still resolves is no longer
+rewritten, a driver update does not refresh it on the next run; regenerate it
+as described under B<MIG> below.
 
 The managed-source check keys on the C<nvidia-cdi-refresh.path> systemd unit
 state (installed/armed) rather than only on the presence of

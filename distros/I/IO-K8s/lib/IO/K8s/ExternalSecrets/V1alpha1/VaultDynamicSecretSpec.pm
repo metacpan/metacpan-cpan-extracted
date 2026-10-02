@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1alpha1::VaultDynamicSecretSpec;
 # ABSTRACT: VaultDynamicSecretSpec defines the desired spec of VaultDynamicSecret.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s allowEmptyResponse => Bool, { default => 0 };
@@ -36,7 +36,7 @@ IO::K8s::ExternalSecrets::V1alpha1::VaultDynamicSecretSpec - VaultDynamicSecretS
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 allowEmptyResponse
 

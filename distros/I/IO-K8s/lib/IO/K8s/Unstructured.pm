@@ -1,6 +1,6 @@
 package IO::K8s::Unstructured;
 # ABSTRACT: Untyped Kubernetes object for a Kind nothing else resolves
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 
@@ -27,7 +27,7 @@ IO::K8s::Unstructured - Untyped Kubernetes object for a Kind nothing else resolv
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head1 SYNOPSIS
 

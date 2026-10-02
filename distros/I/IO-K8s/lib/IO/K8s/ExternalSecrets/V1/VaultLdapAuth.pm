@@ -1,6 +1,6 @@
 package IO::K8s::ExternalSecrets::V1::VaultLdapAuth;
 # ABSTRACT: Ldap authenticates with Vault by passing username/password pair using the LDAP authentication method
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s path      => Str, { required => 'schema', default => 'ldap' };
@@ -24,7 +24,7 @@ IO::K8s::ExternalSecrets::V1::VaultLdapAuth - Ldap authenticates with Vault by p
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 path
 

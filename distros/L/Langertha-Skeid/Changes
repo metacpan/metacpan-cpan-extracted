@@ -1,5 +1,525 @@
 Revision history for Langertha-Skeid
 
+0.003     2026-10-01 21:11:26Z
+
+    - Docker image stops on SIGQUIT so write-behind usage events are flushed;
+      serve handles SIGQUIT in single-process mode; the image build fails
+      without Cpanel::JSON::XS
+    - A SQLite or PostgreSQL usage store can write behind the request:
+      usage_store.flush_interval_ms queues each event and writes the queue in
+      one transaction per interval, so the answer no longer waits for the
+      database. Off by default (0 = write each event at once). Queued events
+      are written on reload, shutdown, before a report and by flush_usage; a
+      process killed without a flush loses them. An event a flush cannot write
+      is logged as "usage event lost", as before
+    - GET /v1/models and GET /api/tags list the alias names as well as the
+      node models, one entry per name (an alias named like a model is listed
+      once), and follow the policy of the key presented -- no key means the
+      default policy. A name the key's models do not grant, an alias whose
+      tiers are all denied and a model only denied nodes serve are left out.
+      Both faces build the list from one Langertha::Skeid method, list_models
+    - A client that hangs up is counted apart from node errors: the slot is
+      given back as a third outcome, aborted, which shows in the node metrics
+      as "aborted" and does not raise "error", the registry snapshot's
+      errors_in_window or last_failure_at. The usage event is ok 0,
+      status_code 499, error_type client_abort
+    - An Ollama request (/api/chat, /api/generate) that the translator cannot read
+      is answered with a 400 in Ollama's error shape, before anything is routed
+      or metered, instead of an HTML 500. The exception's text is neither sent
+      nor logged
+    - An Anthropic request (/v1/messages) whose translation fails for a reason
+      of the translator's own is answered with the fixed text "Invalid request"
+      instead of the exception's text, which can quote the request. A deliberate
+      refusal (a provider built-in tool, an unsupported image source) keeps its
+      worded message
+    - Every answer carries an x-request-id header: on all three faces, on
+      refusals, upstream errors and translator failures, and on streams before
+      the first byte. The id is fixed when the request arrives -- the client's
+      own x-request-id if it sent one, else a generated one -- and it is the
+      request_id of the usage event and of the "usage event lost" log line. An
+      x-request-id from the upstream never replaces it on the relayed answer
+    - A translator that dies on the Anthropic or Ollama face is answered in
+      that face's own error shape: an HTTP 500 while nothing was sent, an
+      error event or line once the stream is open. The upstream is cancelled,
+      the slot is given back, and one usage event is written as failed with
+      status_code 500 and error_type translation_error. The exception's text
+      is neither logged nor sent to the client
+    - A client that hangs up before its answer is complete now ends its
+      request. It used to go unnoticed: a request waiting for capacity kept
+      polling, then took a slot it never gave back; a request already at a
+      node kept the node generating and its slot taken until the node was
+      done, and then lost its usage event; on the Anthropic and Ollama
+      streaming faces the slot was never given back at all, and an abandoned
+      stream kept its controller and everything still queued for the client
+      in memory. Now the wait stops without taking a slot, the upstream
+      connection is closed so the node stops generating, the slot is given
+      back exactly once, and one usage event is written as failed with
+      status_code 499 and error_type client_abort, priced from the usage
+      the stream had reported until then. A client that leaves while the
+      node key is still being resolved never reaches the node and records
+      no usage event, also when that node's key turns out to be
+      unavailable
+    - Complete POD for every module and the skeid command, including a full
+      configuration and environment reference in Langertha::Skeid and a
+      route/auth/error reference in Langertha::Skeid::Proxy.
+    - examples/README.md documents every example script with its options
+      and environment, and carries the Avatar, one-box and Vast lab recipes
+    - Docker images no longer take a KNARR_SRC build argument; Skeid does not
+      depend on Langertha::Knarr. LANGERTHA_SRC still installs a specific
+      Langertha before the cpanfile
+    - Ollama streaming (/api/chat) now carries tool calls: fragmented
+      arguments, parallel calls and Unicode are accumulated through
+      Langertha's stream parser and rendered as message.tool_calls on the
+      closing line, matching what non-streamed /api/chat already returned.
+      A stream that ends without completing a pending tool call, or whose
+      translator fails while finalizing, closes with a safe Ollama error
+      line instead of a false done:true or invented empty arguments. A
+      translated stream is now finalized before its Usage event and
+      admission are closed, so a translator error discovered only at the
+      end of the stream is billed and recorded as failed, not as ok
+    - Routing at saturation checks each node at most once per selection
+      instead of once per unit of weight: two fully busy nodes weighted
+      1000:1000 used to cost 3000 admission checks to fail over, now 2.
+      Normal weighted round-robin sequencing, cursor progress across a
+      wrap, and partial saturation are unchanged
+    - The routing cache and its round-robin cursors are bounded at 256
+      entries per inventory generation, FIFO-evicted together, so a stream
+      of client-chosen model names that never resolve to a node can no
+      longer grow either one without limit. Any real inventory change
+      (a node added, removed, moved or its health flipped) still clears
+      every cursor and restarts its fairness, but calling set_node_health
+      with a node's current value is now a no-op and no longer does
+    - A config file that fails to parse is retried with the same bounded
+      back-off as a failing config_loader (1s doubling to 60s) instead of
+      being re-parsed on every dispatch. The last good config stays in
+      force; a different mtime, including one that changed again while a
+      failed version was being retried, is always read immediately
+    - An upstream HTTP error (a 429 with Retry-After, or any other 4xx/5xx)
+      is now observed for capacity on every face -- OpenAI JSON, and the
+      Anthropic/Ollama streaming paths -- before the error is returned, not
+      only on success. A rate-limited node backs off instead of receiving
+      the very next request immediately
+    - Fix jsonlog event ids colliding under load: a dir-mode write is created
+      exclusively (O_EXCL), retried up to 16 times, and the id is built from
+      timestamp, pid, a per-process random nonce and a sequence, all
+      refreshed after a fork, so two events sharing a second and a pid never
+      overwrite each other. A write, fsync, close or lock failure is now
+      reported as failed instead of a silently truncated or lost event
+    - Fix a request-lifecycle leak: the recursive routing callback, and on a
+      streamed response the drain callback and the completed upstream read
+      listener, kept the finished controller (and its upstream connection)
+      alive after the response had ended. Each callback now clears its own
+      self-reference once its work is done, so a completed request releases
+      its controller instead of accumulating until the process is restarted
+    - The admin API key is checked in constant time, like the registry
+      read key and the snapshot signature; all three share one comparison
+      (Langertha::Skeid::Secret)
+    - Optional Skeid-to-Skeid registry. A downstream with registry.enabled
+      publishes a signed snapshot of its nodes (inflight, max_conns,
+      health, recent errors, current capacity reading; never URLs, key
+      references, customer key ids or usage) on the route
+      GET /skeid/registry/snapshot, HMAC-SHA256 with the secret named by
+      registry.secret_env. The route takes the registry read key named
+      by registry.read_key_env, which opens no other route, or the admin
+      API key. A fronting Skeid reads it with capacity probe registry
+      (read_key_env or admin_key_env, secret_env, optional url, tags,
+      interval_ms, max_skew_s), preferring the read key and never
+      falling back to the admin key, and forgets the reading on a bad
+      signature, a stale, future or replayed snapshot, or a missing
+      secret. Off by default; the route answers 404 until enabled.
+      Enabling it needs a read key or an admin API key and a secret of
+      at least 32 bytes. Serve the route over TLS only
+    - When two sources report capacity for one node, the tighter reading
+      wins while it is current: while it carries a pending backoff, or
+      is younger than the longer of the two sources' poll intervals. A stale
+      rate-limit reading from the last response no longer keeps a probe
+      that reports the node empty out. A probe that fails or stops
+      forgets only its own reading, so a 429 backoff survives it. A
+      config reload that drops a node drops its reading too
+    - A capacity probe whose interval_ms (times the worker count) is not
+      below capacity_max_age_ms warns at start
+    - Errors on the Ollama routes (/api/chat, /api/generate, /api/tags,
+      /api/ps) are answered in Ollama's shape, {"error": "<message>"} with
+      the failure's HTTP status, instead of the OpenAI error object an
+      Ollama client cannot decode: invalid body, key policy, no capacity,
+      no node, and upstream errors with the upstream's own message. A
+      stream that fails after it opened ends with an Ollama error line and
+      no done:true line
+    - Ollama format reaches the model on /api/chat and /api/generate:
+      "json" is sent upstream as response_format json_object, a JSON schema
+      as response_format json_schema (named ollama_format, no strict). The
+      Ollama face of the provider manifest publishes
+      response_format_json_object and response_format_json_schema
+    - A non-streamed Ollama /api/chat answer sends done as the JSON
+      boolean true, as Ollama does, instead of the number 1 that typed
+      clients (Go, Rust serde, pydantic) reject
+    - Ollama POST /api/generate is served, with the same key policy,
+      routing, usage event and pricing as /api/chat. system and prompt,
+      with the request's images, become one chat conversation upstream;
+      the answer comes back in generate's shape (response, done,
+      done_reason, prompt_eval_count, eval_count), streamed as NDJSON
+      unless stream is false. think, suffix, template, raw, context and
+      keep_alive are not forwarded, and no context is returned
+    - Images inside an Anthropic tool_result reach the model. An OpenAI
+      tool message cannot carry them, so the tool message keeps the
+      result's other blocks and one user message after the tool messages
+      carries every result's images, each labelled "Images from tool
+      result <tool_use_id>:". A Files API image there is answered with 400
+    - Images reach the model through the Anthropic and Ollama faces. An
+      Anthropic image block (base64 or url source) and an Ollama message's
+      images become OpenAI image_url parts, text and images in the order
+      the client sent them; Ollama's raw base64 gets a data URL typed from
+      its magic bytes (PNG, JPEG, GIF, WebP, else PNG). An Anthropic image
+      from the Files API is answered with 400. The provider manifest may
+      claim image_input for a model on every face, when the installed
+      Langertha's manifest knows the flag
+    - Streamed requests are priced: their usage event stores the same
+      tokens and costs as the same usage answered in one piece, on the
+      OpenAI, Anthropic and Ollama faces. A stream cut after its usage frame
+      is billed from it and still recorded as failed
+    - A model's pricing rule may set cached_input_per_million and
+      cache_write_per_million. A request's usage event then prices
+      prompt-cache reads and writes at those rates into the new
+      cost_cache_read_usd and cost_cache_write_usd, both part of
+      cost_total_usd, with cost_input_usd covering only the uncached input;
+      OpenAI-, Anthropic- and /anthropic-shim-shaped usage each price every
+      token once. A rule without them bills as before. Every usage event
+      also records the prompt-cache write count as cache_write_tokens. The
+      DBI stores add the three fields as nullable columns on the existing
+      table. A rate that is not a
+      number >= 0 fails the config load. Needs a Langertha newer than
+      0.503; an older one ignores the two keys with a one-time warning
+    - Taking a node in or out of rotation through the admin API no longer
+      restarts every capacity probe and drops their readings. Probes restart
+      only when a probed node is added, removed, moved to another URL or
+      given a different capacity block, or the worker count changes; a probe
+      that is stopped ignores the answer to a poll still in flight
+    - Customer key ids (skeid keyid) are the key's full SHA-1 digest, k_ plus
+      40 hex digits, instead of its first 12 hex digits, which are a prefix of
+      the new id. A config that still names a customer by the short id in
+      keys: or names: keeps routing, billing and serving the manifest to that
+      key, with a one-time deprecation warning; listing both the short id and
+      the full id it prefixes is a load error. Usage events keep the id they
+      were recorded under, so a report by api_key_id splits at the upgrade:
+      query both ids for one customer's full history
+    - A config_loader runs at most once per config_reload_interval (default
+      1s, env SKEID_CONFIG_RELOAD_INTERVAL) instead of on every dispatch, and
+      may return ($config, $version). A load whose version, or else canonical
+      digest, matches the last applied config changes nothing; an unchanged
+      nodes section keeps the node list, so capacity probes are not restarted
+      and health set through the admin API survives. A config file touched
+      without a change is likewise a no-op
+    - GET /.well-known/langertha.json serves a provider manifest per customer
+      key: only the models that key's keys: entry lists under manifest.models,
+      on the openai, anthropic (anthropic-compat) and ollama faces under
+      manifest.public_url, each claiming only the capabilities that face
+      carries upstream, never a node URL or upstream key. Off until
+      manifest.enabled; 401 without a key, 403 for a key without a grant, 404
+      when disabled or on a Langertha without Langertha::Manifest
+    - A config reload that fails leaves the previous config fully in force
+      instead of half-applied, and no longer fails the request that
+      triggered it: the request is served under the kept config, the failure
+      is logged, and a failing config_loader is retried with a back-off (up
+      to a minute) without reapplying the same broken result. GET /health
+      shows config_reload ok and failed_at; the admin route GET /skeid/config
+      (and the config.status function) also gives the error
+    - A streamed request's usage event carries content_bytes, the UTF-8
+      byte count of the content relayed or translated (non-ASCII included),
+      on every face; it is optional (absent on non-streamed events), never
+      turned into a token estimate, and stored in a new nullable
+      content_bytes column added to existing sqlite/postgresql tables
+    - An Ollama client's replayed tool round-trip reaches the OpenAI upstream
+      in OpenAI's shape on /api/chat: tool_calls arguments objects become JSON
+      strings (non-ASCII intact), calls without an id get call_skeid_N, and
+      each tool message is tied to its call by tool_call_id (matched by
+      tool_name, else in order)
+    - Non-ASCII text in tool_use input and structured tool_result content
+      reaches the upstream intact on /v1/messages instead of double-encoded into
+      mojibake
+    - A streamed text block now opens with data type content_block_start,
+      as Anthropic specifies, so Anthropic SDKs that dispatch on the data
+      type see the text block begin
+    - The Anthropic face reports stop_reason tool_use when the upstream
+      reply carries tool calls but finishes with stop (gpt-oss on
+      vLLM-style servers, e.g. AKI.IO), on /v1/messages and in the
+      streamed message_delta alike, so Anthropic clients run the tools
+    - Relay a streaming upstream that answers with exactly
+      Content-Type: text/event-stream (no charset) and an unchunked body
+      (Content-Length or close-delimited). Mojolicious parsed such a body
+      itself, so the client got an empty stream and the request was metered
+      as served with no tokens
+    - Answer every error on /v1/messages in Anthropic's shape,
+      {type: "error", error: { type, message } }, so Anthropic SDKs parse it and
+      raise the matching exception: invalid JSON, translation failures, 403,
+      429, 503 and upstream errors alike. error.type follows the HTTP status
+      per Anthropic's documented error reference (400 invalid_request_error,
+      401 authentication_error, 402 billing_error, 403 permission_error,
+      404 not_found_error, 409 conflict_error, 413 request_too_large,
+      429 rate_limit_error, 500 api_error, 504 timeout_error,
+      529 overloaded_error; checked against the docs, not live). Statuses it
+      does not list, such as Skeid's own 502 and 503, fall back to api_error
+      (5xx) or invalid_request_error (4xx). A streamed request the upstream
+      refuses gets that HTTP error before any event is sent; a stream that
+      fails after it opened (dropped upstream connection, body shorter than
+      its framing, upstream error chunk) ends with an `event: error` frame and
+      no message_stop. An error chunk keeps the upstream's error.type when
+      Anthropic uses the same one, else api_error. The OpenAI and Ollama
+      faces keep their error shape
+    - Upstream error responses carry the upstream's own error message
+      ("Upstream error: context too long") instead of the HTTP reason phrase,
+      on every face
+    - Meter a stream whose upstream hangs up before the end of its chunked or
+      Content-Length body as failed (ok = 0, and a failed request for the
+      node) on every face
+    - Answer an Anthropic request that carries a provider built-in tool
+      (web_search_20250305, bash_*, text_editor_*, computer_*, mcp_toolset, ...)
+      with a JSON 400 invalid_request_error naming the tool type and its
+      category, instead of an HTML 500. Skeid forwards function tools only.
+      Any other failure to translate a /v1/messages body is a JSON 400 too.
+      Needs a Langertha with Langertha::Tool->classify
+    - Record cached_tokens (the prompt-cache read count) on every usage event.
+      It is read off the upstream usage payload (OpenAI's
+      prompt_tokens_details.cached_tokens, plus a flat cached_tokens fallback) on
+      both the streaming and non-streaming paths, stored in a new nullable
+      cached_tokens column added additively to the sqlite and postgresql schemas
+      (old tables migrate on prepare, like requested_model), and surfaced in the
+      usage report, GET /skeid/usage and bin/skeid usage. Recording only: cost is
+      still priced with no cache discount, so cached tokens currently bill at the
+      normal input rate -- the pricing correction waits on Langertha::Pricing
+      modelling a cache-discount rate (ADR 0013)
+    - Partition max_conns across multiple Skeid frontends: routing.frontend_count
+      (or SKEID_FRONTEND_COUNT) divides a node's max_conns among the separate
+      Skeid hosts in front of it, the way worker_count divides it among prefork
+      workers. The two compose -- a process admits max_conns/(frontend_count *
+      worker_count) -- and a max_conns that cannot be split cleanly warns at
+      startup. Default 1 leaves single-frontend deployments unchanged. It does
+      not scale probe or vault timers: separate frontends each hold their own
+      (ADR 0012)
+    - Stream Anthropic tool_use in SSE: when the upstream OpenAI stream emits
+      tool_calls, each one becomes its own content_block_start(type=tool_use),
+      every arguments chunk becomes an input_json_delta with partial_json, and
+      a content_block_stop closes it before message_delta. Parallel tool calls
+      get distinct Anthropic indices, allocated in order of first appearance.
+      content_block_start is now lazy: it fires on the first delta that fills
+      the block, not on message_start, so a stream whose first content is a
+      tool call no longer emits an empty text block before it
+    - Add t/33-agent-flow.t, a Claude-Code-style scenario test: three
+      sequential streamed turns at /v1/messages on a shared messages array,
+      with a synthetic prior tool_use and tool_result, plus a standalone
+      tool_use turn. Exercises translation, streaming, the usage accumulator
+      and admission control together -- the path a real agent client walks
+    - Fix SSE streaming, which was broken end to end: the relay finished the
+      response on its first chunk, so clients received correct headers, a 200,
+      and an empty body. Chunks are now queued and drained through write_chunk
+      with a drain callback, and empty chunks are never relayed
+    - Fix usage accounting for streamed responses: SSE frames split across read
+      boundaries were dropped, which most often lost the final frame carrying
+      the token counts
+    - Support admin_api_key_env / admin.api_key_env, consistent with
+      usage_store's password_env. The shipped service stack used api_key_env
+      and silently ran with the admin API disabled
+    - Split protocol translation into Langertha::Skeid::Protocol::Anthropic
+      and ::Ollama, and the usage store into Langertha::Skeid::UsageStore
+      with ::JsonLog and ::DBI backends
+    - Fix jsonlog usage store ignoring a reconfigured path
+    - Declare File::ShareDir, namespace::clean and HTTP::Tiny in cpanfile;
+      all three were used at runtime but undeclared
+    - Stop forwarding hop-by-hop headers upstream (RFC 7230). A client sending
+      "Connection: close" made Skeid close its own upstream connection, so the
+      connection pool never held anything
+    - Raise the upstream connection pool from Mojo::UserAgent's default of 5 to
+      100, overridable with SKEID_UPSTREAM_POOL
+    - Remove the unused synchronous twins of the async request path
+    - Nodes carry tags, and routing can select by them (select_nodes,
+      nodes.select, and a tags argument on pick_node / route_state). Tags are
+      the grouping the per-key routing policy of ADR 0008 is built on
+    - Cache the node lists routing derives from the inventory, invalidated by
+      any change to it
+    - Model aliases: a client-facing model name resolves to an ordered list of
+      tiers, each selecting nodes by tag, naming the model to ask them for, and
+      carrying its own wait window. A saturated tier falls through to the next;
+      a tier with no eligible node is skipped without waiting. An exhausted
+      plan is 503 when nothing was ever eligible and 429 when everything was
+      busy. A model without an alias routes exactly as before
+    - Usage events record requested_model alongside model, so an alias cannot
+      silently lose which product a request was billed for.
+      Langertha::Skeid::UsageStore::DBI adds the column to a pre-existing table
+    - Per-key routing policy: a customer key decides which models it may ask
+      for and which node tags it may not be served from. Named profiles with a
+      default_policy and sparse per-key overrides, resolved once at config load
+      into shared immutable objects, so ten thousand identically-configured
+      customers cost no key entries and a request costs one hash lookup. A
+      refusal is 403, never a capacity code; running out of permitted capacity
+      stays 429 rather than falling through to a denied node
+    - deny_tags filters node selection, not just the routing plan. Denying the
+      cloud tier of an alias was otherwise worthless: the same node still
+      answered to its own model name
+    - SECURITY: stop taking the customer key id from the client's
+      x-skeid-key-id / x-api-key-id header. It selects the routing policy and
+      the invoice, and any client could set it to another customer's. The id is
+      now derived from the presented API key; the header is honoured only under
+      routing.trust_key_id_header, for deployments that authenticate callers in
+      front of Skeid. Deployments relying on the header must either set that
+      option or move to derived ids
+    - Add "skeid keyid", which prints the key id a customer key resolves to --
+      the name a keys: entry uses, so the config never holds a customer key
+    - Declare Digest::SHA in cpanfile; it was used at runtime but undeclared
+    - Key resolution no longer blocks the event loop. Langertha::Skeid::KeyBroker
+      gains key_async (the request path's only entry point), an in-memory TTL
+      cache with a short negative cache, and coalescing of concurrent misses for
+      one reference into a single resolution. A broker that only implements the
+      blocking resolve_key keeps working; ::OpenBao resolves non-blocking via
+      Mojo::UserAgent and renews its token on a timer rather than when a request
+      discovers it expired. Verified with a test that the process still answers
+      other requests while a resolution is outstanding
+    - SECURITY: KeyBroker::OpenBao verifies the OpenBao TLS certificate. It
+      hardcoded verify_ssl => 0, so anything able to intercept the connection
+      could hand out the AppRole token and every secret resolved with it. Set
+      OPENBAO_VERIFY_SSL=0 for a dev vault with a self-signed certificate
+    - KeyBroker::OpenBao no longer puts a vault response body in a warning, and
+      no longer leaks its token by keeping the renewal timer alive after the
+      broker is gone
+    - Node capacity is probed, not only counted (ADR 0009). inflight counts
+      what this process sent, which undercounts the moment a second frontend, a
+      prefork worker or a batch job shares the node -- each counter sees its own
+      share and together they over-admit. Nodes can now carry a capacity block
+      selecting a probe: ratelimit (reads x-ratelimit-* / anthropic-ratelimit-* /
+      Retry-After off responses Skeid already has, so it costs nothing),
+      prometheus (polls vLLM/SGLang/TGI metrics on a timer), or custom (a
+      callback or a class, because Skeid fronts whatever an operator runs).
+      Absent means inflight, so an existing config routes exactly as before
+    - A capacity reading may only narrow what max_conns allows, never widen it,
+      so a stale or broken probe cannot become an overload -- and for a rented
+      node max_conns keeps its meaning as a spend limit
+    - skeid serve --workers N runs Mojo::Server::Prefork. Measured at 170.7
+      req/s with 4 workers against 128.1 with one, and TTFT p50 falls from
+      120ms to 88ms and stops growing with concurrency (334 req/s at c=32).
+      Only ~1.2ms per request is Skeid's own logic, so more loops was the only
+      lever left
+    - max_conns is divided among the workers (ADR 0010). inflight is
+      per-process, so without this N workers each admit up to max_conns and a
+      node configured for 8 sees 32. A max_conns below the worker count cannot
+      be honoured and now warns at startup instead of quietly over-admitting
+    - Capacity probe intervals are multiplied by the worker count, so the rate
+      a node's metrics endpoint sees from the process group stays what was
+      configured rather than N times it
+    - Note for prefork deployments: the usage store becomes a multi-writer
+      store. jsonlog in directory mode and postgresql are fine; SQLite is not
+      recommended above one worker
+    - The ratelimit probe reads request and token quotas separately and lets
+      the tightest one decide. For an LLM API the token budget is usually what
+      runs out first, and a node with requests to spare and no tokens left
+      answers 429 all the same
+    - Readings expire after capacity_max_age_ms (5s) and every failure reports
+      nothing rather than something old, degrading to inflight. A provider's 429
+      becomes a backoff that outlives the age limit and never touches the
+      healthy flag: rate-limited is busy, not broken
+    - Add bench/: a C fake-LLM server with configurable TTFT and token rate,
+      plus a measuring client for TTFT and throughput distributions
+    - The examples/service compose stack works as written: init-skeid.sh runs
+      in the OpenBao image with the bao CLI (no curl or psql needed), grants
+      the AppRole policy on the KV v2 paths so key reads are no longer denied,
+      stores SKEID_GROQ_KEY for the sample node and no longer writes customer
+      keys nothing reads; usage_schema.sql is gone, Skeid creates the
+      usage_events table from share/sql on start. The skeid image tag is
+      SKEID_IMAGE (default latest), SKEID_REMOTE_KEY_REF and the SQLite-only
+      SKEID_USAGE_DB are dropped from the stack, and vast-start.sh prints the
+      right base URL
+    - GET /api/tags lists the same models as GET /v1/models: each distinct node
+      model once, and no entry for a node configured without a model (it
+      matches any requested name, so none reaches it in particular)
+    - A usage event the store cannot write is now logged at error level
+      ("usage event lost: request_id=... store=... api_key_id=... model=...
+      status=...: reason") for a thrown error and for a store's { ok => 0 }
+      answer alike, so a lost billing event is visible at the default log
+      level; the response still completes. The DBI store reports a failing
+      insert or report query as { ok => 0, error } instead of dying, with a
+      password= from its DSN masked in the error text
+    - skeid serve and skeid usage stop with "ERROR: config file not found:
+      PATH" and exit code 2 when --config names a file that does not exist,
+      instead of starting with no config and no nodes; the library croaks the
+      same way for a missing config_file at construction and on config.reload.
+      Without --config, ./skeid.yaml is still used when present. A config
+      file that disappears while Skeid runs keeps the config in force and is
+      warned about once. The Docker image's default command passes --config
+      /etc/skeid/skeid.yaml, so the image now exits when no config is mounted
+      there instead of starting empty
+    - skeid usage reports a jsonlog store correctly: recent event ids print as
+      strings (no numeric warning, no truncated id) and the Store line names
+      the log path. New --log-path (alias --jsonlog) builds a jsonlog store
+      from the command line, --backend takes jsonlog, and the jsonlog report
+      carries log_path
+    - The admin API key now has one order that every config reload re-applies:
+      an explicit key (skeid serve --admin-api-key, build_app admin_api_key,
+      new admin_api_key, the new set_admin_api_key) wins over the config's key
+      (any of its four spellings; empty turns the admin API off), which wins
+      over SKEID_ADMIN_API_KEY; with none the admin API is off. A CLI key is
+      no longer replaced by the next changed config, and SKEID_ADMIN_API_KEY
+      now also works alongside a config file that names no key
+    - A config reload makes the running config equal to the file, as a
+      restart with it would: a section the previous config declared and the
+      new one drops (nodes, pricing, aliases, the policy sections, a routing
+      key) is cleared, and pricing replaces the price list instead of merging
+      per model. Sections no config ever declared stay with whoever set them
+      (nodes pushed through the admin API, pricing.set). A usage_store taken
+      out of the file is deliberately kept until restart and warned about
+      once, so a reload cannot silently stop recording billing data; a
+      changed usage_store is still swapped live
+    - A SQLite or PostgreSQL usage store whose connection dropped reconnects
+      once and retries the event, instead of losing every later usage event
+      until restart. A failed reconnect is reported as a lost event, never
+      thrown, and the next event tries again
+    - Security: a node that names a key of its own (api_key_ref, api_key_env)
+      and gets no key from it is no longer called with the client's key. When
+      the key broker failed or was not running (a failed OpenBao login at
+      start), or the variable was unset or empty, the request used to go
+      upstream with the customer's own Authorization / x-api-key as its
+      credential. It is now refused with 503 upstream_key_unavailable in the
+      shape of the face that was called, streamed or not, recorded as a
+      failed usage event and logged with the key reference. The same goes
+      for a node that left the inventory after it was selected. When a node
+      key is injected, the client's Authorization and x-api-key are now
+      dropped in any spelling: a client's X-Api-Key used to travel upstream
+      beside the node's key, only x-api-key was removed. A node that names
+      no key source still forwards the client's header unchanged
+    - A completion that takes longer than 30 seconds, or a stream whose
+      first token or whose gap between two tokens does, is no longer cut by
+      Skeid itself. Mojolicious closes a connection that was silent for 30s
+      (server) or 40s (user agent), while the upstream was allowed 300s. Both
+      sides now follow SKEID_UPSTREAM_TIMEOUT (seconds, default 300): an
+      upstream request may take that long and be silent for all of it, and
+      the client's connection of a request that calls an upstream is kept
+      open as long on top of the server's inactivity timeout, so the client
+      is still there for the answer or for the upstream's timeout error.
+      Other routes keep the server's timeout
+    - The Docker image runs Skeid as the unprivileged user skeid (uid and
+      gid 10001) instead of root, and no longer carries build-essential
+      and libpq-dev: the Dockerfile builds in one stage and ships another.
+      DBI, DBD::Pg and DBD::SQLite are installed from the cpanfile's
+      recommends instead of by a second, unversioned install, so the
+      sqlite usage store now works in the image too. The user owns
+      /var/log/skeid/events and /var/lib/skeid in the image; a host
+      directory mounted over them has to be writable for uid 10001
+    - The cpanfile recommends Cpanel::JSON::XS 4.20; measured: without it
+      streaming throughput drops 43%
+
+0.003    2026-05-16 17:10:00Z
+
+    - Add OpenBao KeyBroker integration (Langertha::Skeid::KeyBroker::OpenBao)
+      for secure API key management with AppRole auth
+    - Fix OpenBao AppRole token lifecycle: initial token is renew-only,
+      refresh() uses renew-self to get client_token for API calls
+    - Fix needs_refresh() to trigger on first call when no client_token exists
+    - Add streaming token tracking via SSE chunk parsing
+    - Add content byte tracking for usage estimation when provider doesn't
+      return usage in streaming chunks (GROQ compatibility)
+    - Add service stack Docker Compose example with OpenBao + PostgreSQL
+    - Add init-skeid.sh for automatic AppRole setup and customer key creation
+    - Add usage_schema.sql for PostgreSQL usage events schema
+    - Add skeid.yaml example for service stack configuration
+    - Dockerfile: add libpq-dev, jq, explicit DBI/DBD::Pg install
+    - cpanfile: fix DBI from recommends to requires for PostgreSQL users
+
 0.002     2026-04-10 00:37:36Z
 
     - Drop Langertha::Knarr dependency. Skeid no longer goes through

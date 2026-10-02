@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::CertificateRequestSpec;
 # ABSTRACT: Specification of the desired state of the CertificateRequest resource.
-our $VERSION = '1.109';
+our $VERSION = '1.110';
 use IO::K8s::Resource;
 
 k8s duration  => Str;
@@ -36,7 +36,7 @@ IO::K8s::CertManager::V1::CertificateRequestSpec - Specification of the desired 
 
 =head1 VERSION
 
-version 1.109
+version 1.110
 
 =head2 duration
 

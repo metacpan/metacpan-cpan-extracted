@@ -1,5 +1,5 @@
 package Langertha::Knarr::Config;
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 # ABSTRACT: YAML configuration loader and validator
 use Moo;
 use YAML::PP;
@@ -26,7 +26,10 @@ sub _build_data {
   my $file = $self->file;
   croak "Config file not found: $file" unless -f $file;
   my $ypp = YAML::PP->new;
-  my $data = $ypp->load_file($file);
+  my $data = eval { $ypp->load_file($file) };
+  croak "Config file $file is not valid YAML: ".$self->_error_text($@) if $@;
+  croak "Config file $file must be a mapping of key: value pairs"
+    unless ref $data eq 'HASH';
   _interpolate_env($data);
   $log->debugf("Loaded config from %s", $file);
   return $data;
@@ -148,9 +151,11 @@ sub from_env {
     passthrough   => 1,
   );
 
-  # Set default engine if OpenAI found
+  # Set default engine if OpenAI found, reading its key from the variable
+  # that was found: the engine by itself reads only LANGERTHA_OPENAI_API_KEY
+  # (k45)
   if ($found->{OpenAI}) {
-    $data{default} = { engine => 'OpenAI' };
+    $data{default} = { engine => 'OpenAI', api_key_env => $found->{OpenAI}{api_key_env} };
   }
 
   return $class->new(data => \%data);
@@ -166,7 +171,11 @@ sub _build_listen {
   my ($self) = @_;
   my $raw = $self->data->{listen};
   return ['127.0.0.1:8080', '127.0.0.1:11434'] unless defined $raw;
-  return ref $raw eq 'ARRAY' ? $raw : [$raw];
+  my $list = ref $raw eq 'ARRAY' ? $raw : [$raw];
+  # A mapping would be bound as "HASH(0x...)" (k67); validate reports it
+  croak "listen must be a host:port string or a list of them"
+    if grep { ref } @$list;
+  return $list;
 }
 
 has models => (
@@ -177,7 +186,23 @@ has models => (
 
 sub _build_models {
   my ($self) = @_;
-  return $self->data->{models} // {};
+  my $models = $self->_section('models') // {};
+  $self->_warn_unused_context_size( "Model '$_'", $models->{$_} )
+    for sort keys %$models;
+  return $models;
+}
+
+# A context_size only reaches engines that compose Role::ContextSize (k30);
+# say so once, at load, instead of dropping the operator's intent silently.
+# An engine class that does not load is left for the router to report.
+sub _warn_unused_context_size {
+  my ($self, $label, $def) = @_;
+  return unless ref $def eq 'HASH'
+    && defined $def->{context_size} && $def->{engine};
+  my $class = eval { Langertha->resolve_engine_class( $def->{engine} ) };
+  return if !defined $class || $class->can('context_size');
+  $log->warnf( "%s: engine %s does not take context_size, ignoring it",
+    $label, $def->{engine} );
 }
 
 has default_engine => (
@@ -188,7 +213,9 @@ has default_engine => (
 
 sub _build_default_engine {
   my ($self) = @_;
-  return $self->data->{default} // undef;
+  my $default = $self->_section('default');
+  $self->_warn_unused_context_size( 'Default', $default );
+  return $default;
 }
 
 has log_file => (
@@ -199,7 +226,7 @@ has log_file => (
 
 sub _build_log_file {
   my ($self) = @_;
-  return $self->data->{logging}{file} // _strip_quotes($ENV{KNARR_LOG_FILE}) // undef;
+  return ( $self->_section('logging') // {} )->{file} // _strip_quotes($ENV{KNARR_LOG_FILE}) // undef;
 }
 
 has log_dir => (
@@ -210,7 +237,7 @@ has log_dir => (
 
 sub _build_log_dir {
   my ($self) = @_;
-  return $self->data->{logging}{dir} // _strip_quotes($ENV{KNARR_LOG_DIR}) // undef;
+  return ( $self->_section('logging') // {} )->{dir} // _strip_quotes($ENV{KNARR_LOG_DIR}) // undef;
 }
 
 has langfuse => (
@@ -221,7 +248,34 @@ has langfuse => (
 
 sub _build_langfuse {
   my ($self) = @_;
-  return $self->data->{langfuse} // {};
+  return $self->_section('langfuse') // {};
+}
+
+has langfuse_transport => (
+  is      => 'lazy',
+  builder => '_build_langfuse_transport',
+);
+
+
+sub _build_langfuse_transport {
+  my ($self) = @_;
+  my $value = $self->langfuse->{transport} // _strip_quotes($ENV{KNARR_LANGFUSE_TRANSPORT});
+  return 'ingestion' unless defined $value && length $value;
+  croak "langfuse.transport '$value' must be ingestion or otel"
+    unless $value =~ /\A(?:ingestion|otel)\z/i;
+  return lc $value;
+}
+
+has langfuse_timeout => (
+  is      => 'lazy',
+  builder => '_build_langfuse_timeout',
+);
+
+
+sub _build_langfuse_timeout {
+  my ($self) = @_;
+  return _seconds( 'langfuse.timeout' =>
+    $self->langfuse->{timeout} // _strip_quotes($ENV{KNARR_LANGFUSE_TIMEOUT}), 15 );
 }
 
 has proxy_api_key => (
@@ -240,6 +294,151 @@ sub has_proxy_api_key {
   return defined $self->proxy_api_key;
 }
 
+has public_url => (
+  is      => 'lazy',
+  builder => '_build_public_url',
+);
+
+
+sub _build_public_url {
+  my ($self) = @_;
+  return $self->data->{public_url} // $ENV{KNARR_PUBLIC_URL} // undef;
+}
+
+
+has ollama_compat_version => (
+  is      => 'lazy',
+  builder => '_build_ollama_compat_version',
+);
+
+
+sub _build_ollama_compat_version {
+  my ($self) = @_;
+  my $version = $self->data->{ollama_compat_version} // $ENV{KNARR_OLLAMA_COMPAT_VERSION};
+  return undef unless defined $version;
+  # Open WebUI int()s every dotted part (k28): digits and dots only.
+  croak "ollama_compat_version '$version' must be three dot-separated numbers"
+    . " like 0.34.4 (Ollama clients parse each part as an integer)"
+    unless $version =~ /\A\d+\.\d+\.\d+\z/;
+  return $version;
+}
+
+has a2a_name => (
+  is      => 'lazy',
+  builder => '_build_a2a_name',
+);
+
+
+sub _build_a2a_name {
+  my ($self) = @_;
+  return ( $self->_section('a2a') // {} )->{name} // _strip_quotes($ENV{KNARR_A2A_NAME}) // undef;
+}
+
+has a2a_description => (
+  is      => 'lazy',
+  builder => '_build_a2a_description',
+);
+
+
+sub _build_a2a_description {
+  my ($self) = @_;
+  return ( $self->_section('a2a') // {} )->{description} // _strip_quotes($ENV{KNARR_A2A_DESCRIPTION}) // undef;
+}
+
+sub protocol_args {
+  my ($self) = @_;
+  return { A2A => {
+    ( defined $self->a2a_name ? ( agent_name => $self->a2a_name ) : () ),
+    ( defined $self->a2a_description ? ( agent_description => $self->a2a_description ) : () ),
+  } };
+}
+
+
+has upstream_timeout => (
+  is      => 'lazy',
+  builder => '_build_upstream_timeout',
+);
+
+
+sub _build_upstream_timeout {
+  my ($self) = @_;
+  return _seconds( upstream_timeout =>
+    $self->data->{upstream_timeout} // _strip_quotes($ENV{KNARR_UPSTREAM_TIMEOUT}), 300 );
+}
+
+has upstream_stall_timeout => (
+  is      => 'lazy',
+  builder => '_build_upstream_stall_timeout',
+);
+
+
+sub _build_upstream_stall_timeout {
+  my ($self) = @_;
+  return _seconds( upstream_stall_timeout =>
+    $self->data->{upstream_stall_timeout} // _strip_quotes($ENV{KNARR_UPSTREAM_STALL_TIMEOUT}), 120 );
+}
+
+has probe_capabilities => (
+  is      => 'lazy',
+  builder => '_build_probe_capabilities',
+);
+
+
+sub _build_probe_capabilities {
+  my ($self) = @_;
+  my $value = $self->data->{probe_capabilities};
+  unless ( defined $value ) {
+    $value = _strip_quotes($ENV{KNARR_PROBE_CAPABILITIES});
+    return 1 unless defined $value && length $value;
+  }
+  return !$value || $value =~ /\A(?:false|no|off)\z/i ? 0 : 1;
+}
+
+has probe_timeout => (
+  is      => 'lazy',
+  builder => '_build_probe_timeout',
+);
+
+
+sub _build_probe_timeout {
+  my ($self) = @_;
+  return _seconds( probe_timeout =>
+    $self->data->{probe_timeout} // _strip_quotes($ENV{KNARR_PROBE_TIMEOUT}), 10 );
+}
+
+has workers => (
+  is      => 'lazy',
+  builder => '_build_workers',
+);
+
+
+sub _build_workers {
+  my ($self) = @_;
+  my $value = $self->data->{workers} // _strip_quotes($ENV{KNARR_WORKERS});
+  return 1 unless defined $value && length $value;
+  croak "workers '$value' must be a whole number of 1 or more"
+    unless $value =~ /\A[1-9][0-9]*\z/;
+  return $value + 0;
+}
+
+# A config section (models:, default:, logging:, ...) that is not a mapping
+# croaks when read (k67), instead of dying later as a HASH dereference;
+# validate reports it.
+sub _section {
+  my ($self, $key) = @_;
+  my $value = $self->data->{$key};
+  return $value if !defined $value || ref $value eq 'HASH';
+  croak "$key must be a mapping of key: value pairs, not "
+    . ( ref $value eq 'ARRAY' ? 'a list' : "'".$value."'" );
+}
+
+sub _seconds {
+  my ($name, $value, $default) = @_;
+  return $default unless defined $value && length $value;
+  croak "$name '$value' must be a number of seconds (0 disables it)"
+    unless $value =~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/;
+  return $value + 0;
+}
 
 has auto_discover => (
   is      => 'lazy',
@@ -273,7 +472,8 @@ sub _build_passthrough {
     return $raw ? { %PASSTHROUGH_DEFAULTS } : {};
   }
 
-  return {} unless ref $raw eq 'HASH';
+  croak "passthrough must be true, false or a mapping of format: URL, not a list"
+    unless ref $raw eq 'HASH';
 
   my %result;
   for my $format (keys %$raw) {
@@ -300,11 +500,33 @@ sub validate {
   my ($self) = @_;
   my @errors;
 
+  # A file that does not load leaves nothing else to check (k67)
+  return $self->_error_text($@) unless eval { $self->data; 1 };
+
+  # A section that is not a mapping croaks when read (k67)
+  for my $key (qw( models default langfuse logging a2a )) {
+    push @errors, $self->_error_text($@) unless eval { $self->_section($key); 1 };
+  }
+  for my $attr (qw( passthrough listen )) {
+    push @errors, $self->_error_text($@) unless eval { $self->$attr; 1 };
+  }
+  return @errors if @errors;
+
   my $models = $self->models;
   for my $name (keys %$models) {
     my $def = $models->{$name};
+    if ( defined $def && ref $def ne 'HASH' ) {
+      push @errors, "Model '$name' must be a mapping of key: value pairs";
+      next;
+    }
     unless ($def->{engine}) {
       push @errors, "Model '$name': missing 'engine' key";
+    }
+    if ( defined $def->{context_size} && $def->{context_size} !~ /\A[1-9][0-9]*\z/ ) {
+      push @errors, "Model '$name': context_size must be a positive integer";
+    }
+    unless ( eval { _seconds( user_agent_timeout => $def->{user_agent_timeout}, 0 ); 1 } ) {
+      push @errors, "Model '$name': user_agent_timeout must be a number of seconds";
     }
   }
 
@@ -312,13 +534,31 @@ sub validate {
     unless ($default->{engine}) {
       push @errors, "Default: missing 'engine' key";
     }
+    if ( defined $default->{context_size} && $default->{context_size} !~ /\A[1-9][0-9]*\z/ ) {
+      push @errors, "Default: context_size must be a positive integer";
+    }
+    unless ( eval { _seconds( user_agent_timeout => $default->{user_agent_timeout}, 0 ); 1 } ) {
+      push @errors, "Default: user_agent_timeout must be a number of seconds";
+    }
   }
 
   unless (keys %$models || $self->default_engine) {
     push @errors, "No models configured and no default engine set";
   }
 
+  for my $attr (qw( ollama_compat_version upstream_timeout upstream_stall_timeout probe_timeout workers langfuse_transport langfuse_timeout )) {
+    next if eval { $self->$attr; 1 };
+    push @errors, $self->_error_text($@);
+  }
+
   return @errors;
+}
+
+# A croak as a validation error: without the trailing "at FILE line N."
+sub _error_text {
+  my ($self, $err) = @_;
+  $err =~ s/\s+at \S+ line \d+\.?\s*\z//;
+  return $err;
 }
 
 sub engine_definitions {
@@ -412,6 +652,7 @@ sub generate_config {
   if ($found->{OpenAI}) {
     push @lines, "default:";
     push @lines, "  engine: OpenAI";
+    push @lines, "  api_key_env: $found->{OpenAI}{api_key_env}" if $found->{OpenAI}{api_key_env};
   } else {
     push @lines, "# default:";
     push @lines, "#   engine: OpenAI";
@@ -431,6 +672,8 @@ sub generate_config {
   push @lines, "#   url: http://localhost:3000";
   push @lines, "#   public_key: pk-lf-...";
   push @lines, "#   secret_key: sk-lf-...";
+  push @lines, "#   transport: otel   # default ingestion; otel needs Langfuse Cloud or v3.22+";
+  push @lines, "#   timeout: 15       # seconds per trace POST, 0 disables";
 
   return join("\n", @lines) . "\n";
 }
@@ -458,7 +701,7 @@ Langertha::Knarr::Config - YAML configuration loader and validator
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -480,7 +723,10 @@ Loads and validates Knarr configuration from a YAML file or from environment
 variables. All string values in the YAML file support C<${ENV_VAR}>
 interpolation.
 
-See L<Langertha::Knarr> for the full configuration file format reference.
+The attributes below are the configuration file reference: each one
+names its YAML key and, where there is one, its environment variable. The
+README has an annotated example, and C<share/example-config.yaml> in the
+distribution is a commented starting point.
 
 =head2 file
 
@@ -522,26 +768,53 @@ Class method. Builds a config object purely from environment variables
 (zero-config Docker mode). Calls L</scan_env> to detect which API keys are
 set, assigns each detected engine its L</default_model_for> model, enables
 C<auto_discover> and C<passthrough>, and sets OpenAI as the default engine
-when C<OPENAI_API_KEY> is present.
+when an OpenAI key is present. Every generated entry, the default engine
+included, names the variable its key was found in as C<api_key_env>, so
+C<OPENAI_API_KEY> works as well as C<LANGERTHA_OPENAI_API_KEY>.
 
 Options are passed through to L</scan_env> (e.g. C<include_test>).
 
 =head2 listen
 
-ArrayRef of C<host:port> strings to listen on. Defaults to
-C<['127.0.0.1:8080', '127.0.0.1:11434']>.
+ArrayRef of C<host:port> strings to listen on (C<listen:>, a list or a
+single string). Defaults to C<['127.0.0.1:8080', '127.0.0.1:11434']>, so
+a config without C<listen:> only answers on loopback. C<knarr start -p>
+replaces it with the given ports on C<-H> (default C<0.0.0.0>); the Docker
+image starts that way.
 
 =head2 models
 
 HashRef of model name → model definition hashref from the C<models:> config
 section. Each definition may include C<engine>, C<model>, C<api_key_env>,
-C<api_key>, C<url>, C<system_prompt>, C<temperature>, and C<response_size>.
+C<api_key>, C<url>, C<system_prompt>, C<temperature>, C<response_size>,
+C<context_size>, and C<user_agent_timeout> (seconds the engine waits for
+its upstream; defaults to L</upstream_timeout>, C<0> disables it).
+
+C<context_size> is passed to engines that compose
+L<Langertha::Role::ContextSize> (Ollama, LMStudio native), which send it on
+the wire (Ollama's C<num_ctx>, LM Studio's C<context_length>) and report it
+from C</api/show>. For any other engine it is ignored, with one warning
+when the models are loaded.
+
+Models found by L</auto_discover> inherit the endpoint-level keys of the
+entry they were discovered through, but not the model-specific C<model> and
+C<context_size>; see L<Langertha::Knarr::Router/DESCRIPTION> for the split.
 
 =head2 default_engine
 
 HashRef from the C<default:> config section, or C<undef> if not set. At
 minimum contains C<engine>. Used as the fallback when a model name is not
-explicitly configured and no passthrough URL matches.
+explicitly configured and no passthrough URL matches -- that is, no
+L</passthrough> upstream exists for the protocol the client speaks (Ollama
+without an C<ollama> entry, and A2A, ACP and AG-UI always). Without a
+default engine such a request is answered with C<404> in the client
+protocol's error shape.
+
+A C<model> in this section is what the default engine uses for a request
+that names no model (A2A always, ACP without C<agent_name>); a model the
+client names replaces it. The section takes the same keys as a
+L</models> entry, C<api_key_env> or C<api_key> included; without either
+the engine reads only its own C<LANGERTHA_*_API_KEY> variable.
 
 =head2 log_file
 
@@ -556,14 +829,46 @@ C<logging.dir> in config or C<KNARR_LOG_DIR> environment variable.
 =head2 langfuse
 
 HashRef from the C<langfuse:> config section. May contain C<url>,
-C<public_key>, C<secret_key>, and C<trace_name>. Returns an empty hashref
-when the section is absent.
+C<public_key>, C<secret_key>, C<trace_name>, C<transport> (see
+L</langfuse_transport>) and C<timeout> (see L</langfuse_timeout>). Returns an empty hashref when the section is
+absent.
+
+=head2 langfuse_transport
+
+How L<Langertha::Knarr::Tracing> sends traces to Langfuse: C<ingestion>
+(the default) posts trace and generation events to Langfuse's
+C</api/public/ingestion> API; C<otel> exports them as OpenTelemetry spans
+(OTLP/HTTP, JSON encoded) to C</api/public/otel/v1/traces>, the path
+Langfuse now recommends (Langfuse Cloud, or self-hosted v3.22 and later;
+Langfuse v2 has only the ingestion API). See
+L<Langertha::Knarr::Tracing/OpenTelemetry transport>. Read from C<langfuse.transport>, falling back to
+the C<KNARR_LANGFUSE_TRANSPORT> environment variable, so it also applies
+under C<--from-env>. Case does not matter. Any other value croaks when
+read, and L</validate> reports it.
+
+=head2 langfuse_timeout
+
+Seconds a trace POST to Langfuse may take before it is given up and logged
+as a C<Langfuse flush error> warning, for either
+L</langfuse_transport>. Default C<15>; C<0> disables it. The POST never
+holds a request, so this only decides when a slow Langfuse is reported as
+failed. Read from C<langfuse.timeout>, falling back to the
+C<KNARR_LANGFUSE_TIMEOUT> environment variable. A value that is not a
+non-negative number croaks when read, and L</validate> reports it.
 
 =head2 proxy_api_key
 
 Optional shared secret that clients must present in the C<Authorization: Bearer>
 or C<x-api-key> header. Falls back to the C<KNARR_API_KEY> environment variable.
-When not set, the proxy is open (no auth required).
+When not set, the proxy is open (no auth required). It is never forwarded to a
+passthrough upstream; see L<Langertha::Knarr/auth_token>.
+
+=head2 public_url
+
+Optional public base URL of this Knarr (e.g. C<https://knarr.example>),
+published in the provider manifest at C</.well-known/langertha.json>. Falls
+back to the C<KNARR_PUBLIC_URL> environment variable. When not set, the
+manifest takes the base URL from each request.
 
 =head2 has_proxy_api_key
 
@@ -571,18 +876,121 @@ When not set, the proxy is open (no auth required).
 
 Returns true when a L</proxy_api_key> is configured.
 
+=head2 ollama_compat_version
+
+Optional Ollama version to report at C<GET /api/version> (see
+L<Langertha::Knarr/ollama_compat_version>). Falls back to the
+C<KNARR_OLLAMA_COMPAT_VERSION> environment variable. When not set, Knarr's
+default applies. A value that is not three dot-separated numbers
+(C<0.34.4>) croaks when read, and L</validate> reports it: Ollama clients
+parse each part as an integer.
+
+=head2 a2a_name
+
+Optional name of the A2A agent card at C</.well-known/agent.json> (see
+L<Langertha::Knarr::Protocol::A2A/agent_name>). Resolved from C<a2a.name> in
+config or the C<KNARR_A2A_NAME> environment variable. When not set, the
+card says C<Langertha Knarr Agent>.
+
+=head2 a2a_description
+
+Optional description of the A2A agent card (see
+L<Langertha::Knarr::Protocol::A2A/agent_description>). Resolved from
+C<a2a.description> in config or the C<KNARR_A2A_DESCRIPTION> environment
+variable. When not set, Knarr's default description applies.
+
+=head2 protocol_args
+
+    my $knarr = Langertha::Knarr->new( ..., protocol_args => $config->protocol_args );
+
+Returns the L<Langertha::Knarr/protocol_args> HashRef for the configured
+protocol settings: C<< { A2A => { agent_name => ..., agent_description => ... } } >>,
+with only the keys that are set (L</a2a_name>, L</a2a_description>).
+
+=head2 upstream_timeout
+
+Seconds an upstream may take to answer a non-streaming request. Default
+C<300>; C<0> disables it. Falls back to the C<KNARR_UPSTREAM_TIMEOUT>
+environment variable. It is the total time of a raw passthrough request
+(answered with C<504> in the client protocol's error shape when it runs
+out), and it becomes the C<user_agent_timeout> of every routed engine
+whose model config sets none -- Langertha applies that as the total time
+of a plain request and as the time without data of a streaming one. A
+value that is not a non-negative number croaks when read, and
+L</validate> reports it.
+
+=head2 upstream_stall_timeout
+
+Seconds a streaming raw passthrough request may go without data from the
+upstream, the wait for its response headers included. Default C<120>;
+C<0> disables it. Falls back to the C<KNARR_UPSTREAM_STALL_TIMEOUT>
+environment variable. A stream that stalls before its headers is answered
+with C<504>; one that stalls later ends with the protocol's error frame.
+Croaks when read and is reported by L</validate> like
+L</upstream_timeout>.
+
+=head2 probe_capabilities
+
+Boolean, default C<1>. When true, L<Langertha::Knarr/start> asks every routed
+engine that can read its provider's model metadata (OpenRouter, Mistral,
+LM Studio, T-Systems, Ollama, llama.cpp; Langertha core's C<probe_model_capabilities_f>)
+which capabilities its model has, once at startup, after auto-discovery. What
+it learns (today: whether the model sees images) then shows as C<vision> in
+C<POST /api/show> and as C<image_input> in the provider manifest. Engines
+without such metadata and a Langertha too old to probe (0.503) send nothing.
+A failed probe is logged and changes nothing. Set C<0> (or
+C<KNARR_PROBE_CAPABILITIES=0>) to never send these requests. See
+L<Langertha::Knarr::Router/probe_capabilities_f>.
+
+=head2 probe_timeout
+
+Seconds one capability probe (see L</probe_capabilities>) may take before it
+is given up and logged. Default C<10>; C<0> leaves only the engine's own
+C<user_agent_timeout>. Falls back to C<KNARR_PROBE_TIMEOUT>. A value that is
+not a non-negative number croaks when read, and L</validate> reports it.
+
+=head2 workers
+
+Number of processes C<knarr start> serves from. Default C<1>: one process,
+nothing forked. With more, it forks that many workers on the same listen
+sockets and supervises them (see L<Langertha::Knarr/workers>). Falls back
+to C<KNARR_WORKERS>, so it also applies under C<--from-env>; C<knarr start
+-w N> wins over both. A value that is not a whole number of C<1> or more
+croaks when read, and L</validate> reports it.
+
 =head2 auto_discover
 
-Boolean. When true, L<Langertha::Knarr::Router> queries each configured engine
-for its model list at startup, making all discovered models available without
-explicit config entries. Defaults to C<0>.
+Boolean. When true, L<Langertha::Knarr::Router> asks each configured
+endpoint (engine, URL and API key variable) for its model list the first time
+a model is resolved, making all discovered models available without
+explicit config entries and listing them (C</v1/models>, C</api/tags>, the
+manifest). A discovered model is routed through its engine, except when the
+L</passthrough> upstream of the client's protocol is the endpoint that
+listed it (same scheme, host, port and path, an engine's trailing C</v1>
+aside, so a gateway's C</openai> and C</groq> paths are two upstreams) and
+the request carries the client's own provider key (C<Authorization> for
+OpenAI, C<x-api-key> or C<Authorization> for Anthropic, not counting the
+L</proxy_api_key>; Ollama needs none): then it passes through byte for byte
+like an unknown model, with that key. Without one it is routed through its
+engine, with the engine's key, and so it is when the upstream refuses that
+key with C<401> (see L<Langertha::Knarr/raw_passthrough>). A model under L</models> is always routed.
+Defaults to C<0>; L</from_env> and the C<knarr init> output turn it on.
 
 =head2 passthrough
 
-HashRef of format name → upstream base URL. C<passthrough: true> in YAML
-enables all known formats with their default upstream URLs
-(C<https://api.openai.com> and C<https://api.anthropic.com>). Per-format
-URLs can be customised or set to C<false> to disable selectively.
+HashRef of format name (C<openai>, C<anthropic>, C<ollama>) → upstream
+base URL. Empty, and passthrough off, unless the config has a
+C<passthrough:> key; L</from_env> turns it on. C<passthrough: true> in YAML
+enables C<openai> and C<anthropic> with their default upstream URLs
+(C<https://api.openai.com> and C<https://api.anthropic.com>); C<ollama>
+has no default and needs its URL. Per-format URLs can be customised or set
+to C<false> to disable selectively.
+
+A request for a model that is neither configured nor auto-discovered (or
+auto-discovered from that very upstream, see L</auto_discover>) goes
+to the upstream of its protocol byte for byte, with the client's own
+headers and key. A protocol without an upstream sends such a request to
+the L</default_engine> instead.
 
 =head2 passthrough_url_for
 
@@ -596,9 +1004,21 @@ C<anthropic>), or C<undef> if passthrough is not configured for that format.
     my @errors = $config->validate;
 
 Validates the configuration and returns a list of error strings. Returns an
-empty list when the config is valid. Checks that every model entry has an
-C<engine> key, that the default engine (if set) has an C<engine> key, and
-that at least one model or default engine is configured.
+empty list when the config is valid. A config file that does not load (not
+YAML, or not a mapping) is reported alone, and so are the sections
+C<models>, C<default>, C<langfuse>, C<logging>, C<a2a> and C<passthrough>
+when one is not a mapping (C<passthrough> may also be C<true> or C<false>),
+and C<listen> when it is not a string or a list of strings: reading such a
+section croaks. Otherwise it checks that every model entry is a
+mapping with an
+C<engine> key, that the default engine (if set) has an C<engine> key,
+that at least one model or default engine is configured, that a model's
+C<context_size> (and the default engine's), when set, is a positive integer, and its
+C<user_agent_timeout> a non-negative number, and that
+L</ollama_compat_version>, when set, is three dot-separated numbers, and that
+L</upstream_timeout>, L</upstream_stall_timeout> and L</probe_timeout> are
+non-negative numbers, and that L</workers> is a whole number of C<1> or
+more.
 
 =head2 scan_env
 
@@ -642,7 +1062,7 @@ Returns a string.
 
 =over
 
-=item * L<Langertha::Knarr> — Main documentation and config format reference
+=item * L<Langertha::Knarr> — Main documentation
 
 =item * L<Langertha::Knarr::Router> — Uses config to resolve models to engines
 

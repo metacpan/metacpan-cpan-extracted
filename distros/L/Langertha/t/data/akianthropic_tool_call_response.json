@@ -1,0 +1,1 @@
+{"id":"3be23acc-aa93-42da-b324-b7e64d98aa91-aa33","content":[{"type":"tool_use","id":"call_3b2b39e1c113404aa75ff88f","name":"add","input":"{\"a\": 7, \"b\": 15}"}],"model":"llama3-chat-8b","role":"assistant","stop_reason":"tool_use","stop_sequence":null,"type":"message","usage":{"input_tokens":227,"output_tokens":23,"cache_read_input_tokens":128},"service_tier":"standard"}

@@ -354,4 +354,78 @@ is($dis->langfuse_update_span(id => 'x'), undef, 'update_span returns undef when
 is($dis->langfuse_update_generation(id => 'x'), undef, 'update_generation returns undef when disabled');
 is(scalar @{$dis->_langfuse_batch}, 0, 'no events batched on disabled engine');
 
+# --- _langfuse_iso_after: timing-derived endTime / completionStartTime (karr #33) ---
+# Pure function: takes [gettimeofday] + delta_seconds, returns ISO-8601 ms-precision
+# string in UTC. Anchored to the start of the simple_chat wrapper so the generation
+# event spans the real call window, not the wall-clock now. Negative deltas
+# (clock-skew safety) clamp to zero. Microseconds overflow into whole seconds.
+
+subtest '_langfuse_iso_after: zero delta returns start instant' => sub {
+  # 2025-01-01T00:00:00Z = epoch 1735689600
+  is($engine->_langfuse_iso_after([1735689600, 0], 0),
+    '2025-01-01T00:00:00.000Z', 'zero delta + us=0 → start instant');
+};
+
+subtest '_langfuse_iso_after: sub-second positive delta adds milliseconds' => sub {
+  is($engine->_langfuse_iso_after([1735689600, 0], 0.123),
+    '2025-01-01T00:00:00.123Z', '123ms delta renders correctly');
+  is($engine->_langfuse_iso_after([1735689600, 0], 0.001),
+    '2025-01-01T00:00:00.001Z', '1ms delta renders correctly');
+  is($engine->_langfuse_iso_after([1735689600, 0], 0.999),
+    '2025-01-01T00:00:00.999Z', '999ms delta renders correctly');
+};
+
+subtest '_langfuse_iso_after: sub-millisecond delta rounds down to 0ms' => sub {
+  is($engine->_langfuse_iso_after([1735689600, 0], 0.0001),
+    '2025-01-01T00:00:00.000Z', 'sub-ms rounds to 0ms');
+  is($engine->_langfuse_iso_after([1735689600, 0], 0.0009),
+    '2025-01-01T00:00:00.000Z', 'sub-ms rounds to 0ms (high end)');
+};
+
+subtest '_langfuse_iso_after: delta crossing whole-second boundary' => sub {
+  is($engine->_langfuse_iso_after([1735689600, 0], 1.5),
+    '2025-01-01T00:00:01.500Z', '1.5s delta from us=0');
+  is($engine->_langfuse_iso_after([1735689600, 0], 60.0),
+    '2025-01-01T00:01:00.000Z', '60s delta renders as minute rollover');
+};
+
+subtest '_langfuse_iso_after: us_start + delta overflow correctly' => sub {
+  # start = epoch 0 + 500_000us; delta 0.7 → 1_200_000us total → 1.2s
+  is($engine->_langfuse_iso_after([1735689600, 500_000], 0.7),
+    '2025-01-01T00:00:01.200Z', 'us_start + delta overflows into whole second');
+  # 999_000us + 2ms = 1_001_000us → 1.001s
+  is($engine->_langfuse_iso_after([1735689600, 999_000], 0.002),
+    '2025-01-01T00:00:01.001Z', 'us_start near boundary + small delta');
+  # 999_000us + 1ms = 1_000_000us → exactly 1.000s, s overflows by 1, us = 0
+  is($engine->_langfuse_iso_after([1735689600, 999_000], 0.001),
+    '2025-01-01T00:00:01.000Z', 'us_start = 999ms + 1ms delta overflows to 1.000s');
+  # 998_000us + 1ms = 999_000us → stays in same second (no overflow)
+  is($engine->_langfuse_iso_after([1735689600, 998_000], 0.001),
+    '2025-01-01T00:00:00.999Z', 'us_start = 998ms + 1ms delta stays in same second');
+};
+
+subtest '_langfuse_iso_after: negative delta clamps to zero (clock-skew safety)' => sub {
+  # The guard exists because Perl % preserves sign on negatives, which would
+  # yield a negative $us and an out-of-range millisecond field. Better to
+  # report a same-instant end_time than a wall-clock trip into the past.
+  is($engine->_langfuse_iso_after([1735689600, 0], -1.5),
+    '2025-01-01T00:00:00.000Z', 'negative delta clamps to start instant');
+  is($engine->_langfuse_iso_after([1735689600, 0], -0.001),
+    '2025-01-01T00:00:00.000Z', 'tiny negative delta clamps');
+  # Negative delta with non-zero us_start: still clamps to the start instant.
+  is($engine->_langfuse_iso_after([1735689600, 500_000], -2.0),
+    '2025-01-01T00:00:00.500Z', 'negative delta clamps, us_start preserved');
+};
+
+subtest '_langfuse_iso_after: large delta advances date correctly' => sub {
+  # 1735689600 = 2025-01-01T00:00:00Z; +86400s = 2025-01-02
+  is($engine->_langfuse_iso_after([1735689600, 0], 86400),
+    '2025-01-02T00:00:00.000Z', '86400s delta → next day');
+  # +366*86400 ≈ 1 year forward (2025 is not leap, 2026 is not leap, but 366
+  # days from 2025-01-01 lands on 2026-01-02 — keeping this loose to avoid
+  # leap-year coupling; pick a clean epoch-relative check).
+  is($engine->_langfuse_iso_after([1735689600, 0], 86400 * 31),
+    '2025-02-01T00:00:00.000Z', '31-day delta rolls month forward');
+};
+
 done_testing;

@@ -1,0 +1,16 @@
+{
+   "include" : [
+      "web_search_call.action.sources"
+   ],
+   "input" : "What is the current stable release of Perl 5? Answer in one sentence and cite the source.",
+   "max_output_tokens" : 2000,
+   "model" : "gpt-5.6-luna",
+   "reasoning" : {
+      "effort" : "low"
+   },
+   "tools" : [
+      {
+         "type" : "web_search"
+      }
+   ]
+}

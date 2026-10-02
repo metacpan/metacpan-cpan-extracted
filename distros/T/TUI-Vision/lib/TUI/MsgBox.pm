@@ -1,9 +1,11 @@
 package TUI::MsgBox;
+# ABSTRACT: Message box components for the TUI::Vision framework
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '2.000001';
+our $VERSION = '2.000002';
 $VERSION =~ tr/_//d;
 our $AUTHORITY = 'cpan:BRICKPOOL';
 
@@ -61,9 +63,9 @@ TUI::MsgBox - Message box utilities for the TUI::Vision framework
 
 =head1 DESCRIPTION
 
-TUI::MsgBox provides message box and input box utilities for the
-TUI::Vision framework. It corresponds to the Turbo Vision message box
-subsystem and offers simple modal dialogs for displaying messages,
+C<TUI::MsgBox> provides message box and input box utilities for the 
+L<TUI::Vision> framework. It corresponds to Borland's I<Turbo Vision> message 
+box subsystem and offers simple modal dialogs for displaying messages, 
 warnings, confirmations, and text prompts.
 
 This module re-exported:

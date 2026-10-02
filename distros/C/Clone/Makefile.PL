@@ -29,14 +29,11 @@ my %WriteMakefile_params = (
     # Prevent macOS extended attributes (com.apple.provenance, etc.) from
     # being embedded in the distribution tarball.
     # - COPYFILE_DISABLE=1 stops macOS tar from adding ._AppleDouble sidecar files.
-    # - PREOP strips any xattrs already set on the dist directory files (e.g.
-    #   com.apple.provenance set by macOS on git-cloned files) before tar runs.
-    #   xattr(1) is macOS-specific; the "|| true" makes it a no-op elsewhere.
     dist => {
         COMPRESS => 'gzip -9f',
         SUFFIX   => 'gz',
-        TAR      => 'COPYFILE_DISABLE=1 TAR_OPTIONS="--no-xattrs --no-acls" gtar',
-        PREOP    => 'command -v xattr >/dev/null 2>&1 && xattr -cr $(DISTVNAME) || true',
+        TAR      => 'COPYFILE_DISABLE=1 tar',
+        TARFLAGS => '--format=ustar -cvf',
     },
 );
 
