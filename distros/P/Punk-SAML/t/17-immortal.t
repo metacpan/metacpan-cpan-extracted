@@ -98,6 +98,7 @@ use Punk;
 use Punk::Plugin::SAML;
 host 'https://app.example.com';
 session secret => 'session-secret-here-32-bytes-ok!';
+cache 'memory', max_bytes => '1M';
 plugin 'SAML' => { secret => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' };
 saml_idp okta => {
     entity_id => $main::IDP_ENTITY,
@@ -155,6 +156,29 @@ for my $case (
 # reaches the checks as an immortal rather than as a string
 holds_steady 'an absent in_response_to owns no immortal', sub {
     eval { Punk::SAML::Response->verify($GOOD, %base, in_response_to => undef) };
+};
+
+# ---- the replay check --------------------------------------------------
+#
+# _replayed pushes an immortal on two of its arguments: the context, which
+# is undef when nothing is driving a request, and `replay_until`, which is
+# absent from an identity that never went through a full verification.
+# Both reach a call_sv argument list, which is the shape this file exists
+# for.
+
+holds_steady 'the replay check owns no immortal', sub {
+    eval { Punk::SAML::Response->_replayed(undef, sub { 0 },
+             { assertion_id => '_a1', replay_until => time + 300 }, 120) };
+};
+
+holds_steady 'the replay check with no replay_until owns no immortal', sub {
+    eval { Punk::SAML::Response->_replayed(undef, sub { 0 },
+             { assertion_id => '_a1' }, 120) };
+};
+
+# and the refusal path, which builds an error and unwinds
+holds_steady 'a replay check with no assertion id owns no immortal', sub {
+    eval { Punk::SAML::Response->_replayed(undef, sub { 0 }, {}, 120) };
 };
 
 # ---- the builders ------------------------------------------------------

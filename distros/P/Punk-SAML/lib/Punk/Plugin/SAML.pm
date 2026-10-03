@@ -24,6 +24,11 @@ Punk::Plugin::SAML - sign in with SAML 2.0 identity providers
     session secret => secret('session_key');
     auth model => 'User';
 
+    # Where spent assertion ids are remembered, so one assertion buys one
+    # session. Required, shared across the worker pool, and the reason the
+    # backend is `file`: see THE REPLAY STORE.
+    cache 'file', dir => '/var/cache/myapp';
+
     plugin 'SAML' => {
         secret => secret('saml.flow_key'),
     };
@@ -192,6 +197,20 @@ Default 3600. See L</KEY ROTATION>.
 
 A coderef or the name of a context method, replacing the failure page.
 
+=item C<seen>
+
+The replay store: where the assertion ids that have already been spent
+are remembered. Either the name of one of the C<cache> keyword's stores,
+or a coderef of your own. Defaults to the C<default> store, and the
+plugin B<croaks at boot> if that store is not declared. See
+L</THE REPLAY STORE>.
+
+=item C<allow_replay>
+
+Turns the replay check off. Off by default, meaning the check is on.
+Setting this accepts the same assertion as many times as it is
+presented; read L</THE REPLAY STORE> before you do.
+
 =back
 
 C<host> is not an option of this plugin but it is required by it: the
@@ -282,9 +301,17 @@ refuses.
         session_index   => '_a1b2...',
         authn_instant   => 1725600000,
         not_on_or_after => 1725600300,
+        replay_until    => 1725600300,
         assertion_id    => '_c3d4...',
         raw             => $xml_bytes,
     }
+
+C<not_on_or_after> is the C<Conditions> window and is absent when the
+assertion carries no C<Conditions>. C<replay_until> is the B<bearer>
+window, is always present because the plugin requires it, and is the one
+to key a replay record on: Profiles section 4.1.4.5 names it as how long
+a spent id must be remembered for. A C<seen> coderef is handed it as its
+third argument.
 
 B<Every attribute value is an arrayref, always, including when there is
 one value.> SAML attributes are multi-valued and C<groups> is the one
@@ -391,7 +418,14 @@ C<allow_idp_initiated> - C<unsolicited>
 =item * There is an C<AuthnStatement>, which is what makes this an
 authentication rather than an attribute query - C<xml_shape>
 
-=item * The assertion has not been presented before - C<replay>
+=item * The bearer C<SubjectConfirmationData> has a C<NotOnOrAfter>.
+It is required rather than merely honoured when present, because it is
+the only attribute in the document that bounds how long the assertion is
+worth anything - C<xml_shape>
+
+=item * The assertion has not been presented before - C<replay>. This
+one needs somewhere to remember spent ids and will not boot without it;
+see L</THE REPLAY STORE>
 
 =item * Every timestamp is a well-formed C<xs:dateTime> in UTC. A
 timezone offset is refused: Core section 1.3.3 requires UTC -
@@ -480,10 +514,95 @@ and can read at leisure. It is a quiet attack and it does not look like
 one from the inside.
 
 Turning it on is a decision that the identity provider is trusted to that
-degree, and that the flow record, which is single use and is the defence
-against a replayed assertion in an application-initiated login, is not
-needed. With it on, a login lands at C<default_to>, or at the provider's
-C<RelayState> after C<< $c->safe_path >> has flattened it.
+degree, and that the flow record is not needed. With it on, a login lands
+at C<default_to>, or at the provider's C<RelayState> after
+C<< $c->safe_path >> has flattened it.
+
+It also puts the whole weight of replay detection on L</THE REPLAY
+STORE>, because with no flow record there is nothing else that makes an
+assertion good only once. Do not combine C<allow_idp_initiated> with
+C<allow_replay>.
+
+=head1 THE REPLAY STORE
+
+A bearer assertion is a password that the holder did not choose and
+cannot change. Whoever presents it is signed in as its subject, so it has
+to stop working the moment it has been used once, and the only party able
+to enforce that is this application: Profiles section 4.1.4.5 makes it a
+B<MUST> on the service provider.
+
+So the plugin remembers every assertion id it has accepted, until the
+bearer C<NotOnOrAfter> it was accepted under has passed. A second
+presentation of the same id is C<replay> and no session is created.
+
+C<seen> says where that is remembered:
+
+    cache 'file', dir => '/var/cache/myapp';   # the default store
+    plugin 'SAML' => { secret => $secret };    # ... used by default
+
+    cache saml => { backend => 'file', dir => '/var/cache/saml' };
+    plugin 'SAML' => { secret => $secret, seen => 'saml' };
+
+    plugin 'SAML' => { secret => $secret, seen => sub {
+        my ($c, $assertion_id, $until) = @_;
+        # true if seen before; record it until $until either way
+        $c->db->query(...);
+    } };
+
+B<The store must be shared across the worker pool.> This is the one thing
+to get right and the reason the default is a C<cache> store rather than
+anything the plugin could have built itself: an in-process hash means a
+replay that lands on another worker finds an empty store and succeeds,
+which is a bypass that appears one time in C<workers> and will never show
+up in testing. C<file> is shared and is the C<cache> keyword's default
+backend. C<memory> is B<not> shared and is wrong here.
+
+C<Punk::Cache::File> creates its directory but not the parents of it, so
+give it a path whose parent already exists.
+
+The plugin croaks at boot rather than at the first login when the store
+it was told to use does not exist, because an application that cannot
+detect a replayed assertion is not a conformant service provider and
+finding that out at three in the morning is worse than finding it out at
+deploy.
+
+If the store cannot be reached when a login arrives, the login is refused
+with C<config> and logged. It fails B<closed>: "the store is broken" and
+"this assertion is fresh" must not produce the same session.
+
+=head2 What the flow record is, and is not
+
+The flow record in the C<_saml_flow> cookie is B<not> this check, and
+0.01 and 0.02 wrongly said it was.
+
+It is single use per B<browser>. The ACS takes the record and writes the
+cookie back before it verifies anything, so the browser that has just
+completed a login is holding a cookie with no record in it and cannot
+present the same C<Response> again. That is worth having - it stops a
+tampered assertion being retried against one flow until something gets
+through - but it is not replay detection.
+
+An attacker who captures one delivered ACS request holds the cookie as it
+was B<on the wire>, which is the cookie from before the ACS took the
+record. Until 0.03 that pair could be presented again, as often as liked,
+until C<flow_ttl> ran out, and with C<allow_idp_initiated> on there was no
+record involved at all. Replay detection is what L</THE REPLAY STORE>
+does, and it is why it is on by default.
+
+=head2 A race that is left open
+
+The check reads the store and then writes to it, and C<Punk::Cache> has
+no compare-and-set to make that one operation. Two B<genuinely
+simultaneous> presentations of one assertion can therefore both read
+absent and both proceed.
+
+This is written down rather than left to be discovered. It is a window of
+milliseconds against the minutes an assertion is otherwise replayable
+for, so it is a large improvement on no check at all and not a complete
+one. An application that needs the stronger guarantee should pass a
+C<seen> of its own backed by something with an atomic insert - a unique
+constraint on a table of assertion ids is the usual answer, and the
+insert failing is the replay.
 
 =head1 WHAT IS NOT SUPPORTED
 

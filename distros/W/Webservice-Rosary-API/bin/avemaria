@@ -30,13 +30,32 @@ sub _mystery_heading {
 
 sub _prayer_role {
   my $prayer = shift // q{};
-  return q{hail_mary}  if $prayer =~ m/^hail__mary/;
-  return q{our_father} if $prayer =~ m/^our__father/;
-  return q{glory_be}   if $prayer =~ m/^glory_be/;
-  return q{fatima}     if $prayer =~ m/^oh_my_jesus/;
+  return q{hail_mary}   if $prayer =~ m/^hail__mary/;
+  return q{our_father}  if $prayer =~ m/^our__father/;
+  return q{glory_be}    if $prayer =~ m/^glory_be/;
+  return q{fatima}      if $prayer =~ m/^oh_my_jesus/;
+  return q{major_prayer} if $prayer =~ m/^(?:i_believe|holy_queen|final_prayer)$/;
   return q{neutral};
 }
 
+sub _hail_mary_role {
+  my $ordinal = shift // 1;
+  return $ordinal % 2 ? q{hail_mary} : q{hail_mary_alt};
+}
+
+sub _format_prayer_text {
+  my ($prayer, $text) = @_;
+  $prayer //= q{};
+  $text //= q{};
+  $text =~ s/\\r\\n|\\n/\n/g;
+  $text =~ s/Lead/\nLead/; # us to Heaven
+
+  # The API closing prayer may arrive as one long physical line. Keep it
+  # readable in the same 72-column terminal presentation as meditations.
+  $text = fold_text($text, 72) if $prayer eq q{final_prayer};
+
+  return $text;
+}
 sub _mystery_role {
   my ($group, $bold) = @_;
   $group = lc($group // q{});
@@ -62,8 +81,10 @@ sub _color_palette {
     mystery_glorious_title  => "\e[1;38;5;180m",   # bold soft gold
     mystery_luminous        => "\e[38;5;183m",     # tranquil lavender-violet
     mystery_luminous_title  => "\e[1;38;5;183m",   # bold lavender-violet
-    hail_mary               => "\e[38;5;117m",     # Hail Mary is always light blue
+    hail_mary               => "\e[38;5;117m",     # Marian blue
+    hail_mary_alt           => "\e[38;5;255m",     # soft white alternate
     our_father              => "\e[38;5;114m",     # soft green
+    major_prayer            => "\e[1;38;5;255m",   # bold white: Creed and major closing prayers
     glory_be                => "\e[38;5;180m",     # warm muted gold
     fatima                  => "\e[38;5;183m",     # gentle lavender
     fruit                   => "\e[38;5;151m",     # pale teal-green
@@ -86,7 +107,9 @@ sub _color_palette {
     mystery_luminous        => "\e[38;5;97m",      # muted violet
     mystery_luminous_title  => "\e[1;38;5;97m",    # bold muted violet
     hail_mary               => "\e[38;5;31m",      # Marian blue
+    hail_mary_alt           => "\e[38;5;236m",     # charcoal alternate
     our_father              => "\e[38;5;65m",      # muted green
+    major_prayer            => "\e[1;38;5;232m",   # bold near-black for a light background
     glory_be                => "\e[38;5;136m",     # subdued gold
     fatima                  => "\e[38;5;97m",      # muted violet
     fruit                   => "\e[38;5;30m",      # restrained teal
@@ -437,10 +460,12 @@ Usage - to Pray the Rosary in the commandline:
 
   Color is never emitted unless --color is requested. NO_COLOR and non-terminal
   output remain uncolored. --color by itself uses the --dark profile. Hail Marys
-  are always light Marian blue and Our Fathers soft green. Joyful Mystery headings
-  are light blue, Sorrowful dark red/maroon, Glorious soft yellow/gold, and
-  Luminous gentle violet. Each individual Mystery title is bold in its family's
-  color. Other prayers and supporting text use coordinated tranquil accents.
+  alternate light Marian blue and a neutral foreground (soft white on dark,
+  charcoal on light), starting with blue for the introductory Hail Marys and
+  again at each decade. Our Fathers are soft green. Joyful Mystery headings are
+  light blue, Sorrowful dark red/maroon, Glorious soft yellow/gold, and Luminous
+  gentle violet. Each individual Mystery title is bold in its family's color.
+  Other prayers and supporting text use coordinated tranquil accents.
 
   While --pray is streaming in an interactive terminal:
 
@@ -593,7 +618,7 @@ sub PrayTheRosary {
     speed    => $o->speed,
     controls => $o->controls,
     on_quit  => sub {
-      print "\nRemember to pray the Rosary every day! +JMJ+\n";
+      print "\nPray the Rosary every day, +JMJ+\n";
       exit EXIT_SUCCESS;
     },
   );
@@ -659,6 +684,7 @@ EOF
 
     my $count  = 0;
     my $decade = 0;
+    my $hail_mary_ordinal = 0;
 
     if ($o->scroll) {
       _say_styled($Name, $MysteryRole, $Palette);
@@ -670,12 +696,10 @@ EOF
     }
 
     foreach my $Prayer (map { lc } @Prayers) {
-      my $Text = $Mystery->$Prayer;
-      $Text = q{} if not defined $Text;
-      $Text =~ s/\\r\\n|\\n/\n/g;
-      $Text =~ s/Lead/\nLead/; # us to Heaven
+      my $Text = _format_prayer_text($Prayer, $Mystery->$Prayer);
 
       my $is_decade = $Prayer =~ m/^announce_(\d+)$/ ? 1 : 0;
+      $hail_mary_ordinal = 0 if $is_decade;
       my $detail = $is_decade && ref($Details) eq q{ARRAY}
         ? $Details->[$decade]
         : undef;
@@ -740,7 +764,11 @@ EOF
       }
 
       if (length $Text) {
-        _stream_styled($Text, _prayer_role($Prayer), $Stream, $Palette);
+        my $role = _prayer_role($Prayer);
+        if ($role eq q{hail_mary}) {
+          $role = _hail_mary_role(++$hail_mary_ordinal);
+        }
+        _stream_styled($Text, $role, $Stream, $Palette);
       }
       _prompt_continue($Stream) if $o->i and length $Text;
     }
@@ -756,4 +784,3 @@ EOF
 1;
 
 __END__
-

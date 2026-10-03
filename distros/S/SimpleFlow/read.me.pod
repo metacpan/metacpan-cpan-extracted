@@ -6,7 +6,7 @@ SimpleFlow - easy, simple workflow manager (and logger); for keeping track of an
 
 =head1 VERSION
 
-version 0.191
+version 0.192
 
 =head1 DESCRIPTION
 
@@ -37,12 +37,17 @@ With a CPAN client:
 
  cpanm SimpleFlow
 
-Or from a checkout:
+Or from a release tarball, unpacked:
 
  perl Makefile.PL
  make
  make test
  make install
+
+A git checkout has no C<Makefile.PL>: it is written by
+L<Dist::Zilla>, so run C<dzil build> there
+first and install from the tarball it makes, or run the tests in place with
+C<prove -Ilib t/>.
 
 =head1 Synopsis
 
@@ -74,6 +79,7 @@ it (here from a script called C<example.pl>, run in C</home/you/project>):
      dry.run            0,
      duration           0.00192999839782715,
      env                {},
+     env.secret         [],
      executor           "local",
      executor.args      [],
      exit               0,
@@ -200,6 +206,12 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>hash ref</td>
   <td><code>{}</code></td>
   <td>Environment variables for the command only; a value of <code>undef</code> removes one. See Environment and directory.</td>
+</tr>
+<tr>
+  <td><code>env.secret</code></td>
+  <td>array ref</td>
+  <td><code>[]</code></td>
+  <td>Names in <code>env</code> whose values are never printed, logged or traced. See Secrets.</td>
 </tr>
 <tr>
   <td><code>executor</code></td>
@@ -392,6 +404,514 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
 
 =end html
 
+=begin :text
+
+=over
+
+=item C<cmd>
+
+Type: scalar or array; Default: C<undef>.
+
+B<Required.> The command to run. A string is handed to the shell; an array ref is run L<without a shell|/"Running without a shell">.
+
+=item C<conda.env>
+
+Type: name or path; Default: C<undef>.
+
+Run the command in this conda environment. See L</"Containers, conda and clusters">.
+
+=item C<container>
+
+Type: image; Default: C<undef>.
+
+Run the command in a container made from this image.
+
+=item C<container.args>
+
+Type: array ref; Default: C<[]>.
+
+More arguments for the container engine, before the image.
+
+=item C<container.engine>
+
+Type: name; Default: C<'docker'>.
+
+C<'docker'>, C<'podman'>, C<'singularity'> or C<'apptainer'>.
+
+=item C<die>
+
+Type: bool (C<0>/C<1>); Default: C<1>.
+
+Die if the command fails (non-zero exit, a kill by signal, a timeout, or a missing output file). Set to C<0> to warn and continue instead.
+
+=item C<dir>
+
+Type: directory; Default: C<undef>.
+
+Run the step in this directory; every file it declares is relative to it. See L</"Environment and directory">.
+
+=item C<dry.run>
+
+Type: bool; Default: C<0>.
+
+Print the command (and log it) but do not execute it.
+
+=item C<env>
+
+Type: hash ref; Default: C<{}>.
+
+Environment variables for the command only; a value of C<undef> removes one. See L</"Environment and directory">.
+
+=item C<env.secret>
+
+Type: array ref; Default: C<[]>.
+
+Names in C<env> whose values are never printed, logged or traced. See L</"Secrets">.
+
+=item C<executor>
+
+Type: C<'local'>/C<'slurm'>; Default: C<'local'>.
+
+Where the command runs: here, or as a SLURM job step through C<srun>.
+
+=item C<executor.args>
+
+Type: array ref; Default: C<[]>.
+
+More arguments for the executor (C<srun>).
+
+=item C<input.dirs>
+
+Type: scalar or array; Default: C<undef>.
+
+Directories that must exist before running, as C<input.files> must.
+
+=item C<input.dir>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<input.dirs> for a B<single> directory.
+
+=item C<input.files>
+
+Type: scalar or array; Default: C<undef>.
+
+File(s) that must exist and be readable B<before> running; otherwise C<task> dies (except in a L<dry run|/"Dry runs">, which lists them instead).
+
+=item C<input.file>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<input.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<input.files>.
+
+=item C<on.failure>
+
+Type: code ref; Default: C<undef>.
+
+Called with the record when the command ran and failed, before C<task> dies. See L</"Hooks">.
+
+=item C<on.success>
+
+Type: code ref; Default: C<undef>.
+
+Called with the record when the command ran and succeeded.
+
+=item C<output.dirs>
+
+Type: scalar or array; Default: C<undef>.
+
+Directories the step makes, checked like C<output.files>. See L</"Directory outputs">.
+
+=item C<output.dir>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<output.dirs> for a B<single> directory. Cannot be combined with C<output.dirs>.
+
+=item C<output.files>
+
+Type: scalar or array; Default: C<undef>.
+
+File(s) expected to exist B<after> running; used both for the missing-output check and for L<skip detection|/"Skipping completed work">.
+
+=item C<output.file>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<output.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<output.files>.
+
+=item C<lock>
+
+Type: bool; Default: C<0>.
+
+Hold a lock on the outputs while the step runs, so that a second copy of the pipeline waits for this one. See L</"Locking">.
+
+=item C<log.fh>
+
+Type: open filehandle; Default: C<undef>.
+
+If given, the full result record is also written here. Must be a real, open filehandle; C<task> switches it to autoflush.
+
+=item C<mem>
+
+Type: e.g. C<'16G'>; Default: C<undef>.
+
+Memory to ask the executor for.
+
+=item C<note>
+
+Type: scalar; Default: C<''>.
+
+Free-text note copied into the result and the log.
+
+=item C<overwrite>
+
+Type: bool; Default: C<0>.
+
+If false and all C<output.files> already exist, the command is skipped. Set true to always run.
+
+=item C<protect>
+
+Type: bool; Default: C<0>.
+
+Make the outputs read-only once the step succeeds. See L</"Protected outputs">.
+
+=item C<quiet>
+
+Type: bool; Default: C<0>.
+
+Suppress the record printed to the terminal. The log and error messages on C<STDERR> are unaffected. See L</"Quiet runs">.
+
+=item C<retries>
+
+Type: whole number; Default: C<0>.
+
+Run a failed step again, up to this many more times. See L</"Retries">.
+
+=item C<retry.delay>
+
+Type: seconds; Default: C<0>.
+
+How long to wait before each retry; may be fractional.
+
+=item C<stale>
+
+Type: bool; Default: C<0>.
+
+Also re-run when an input file is newer than an output file. See L</"Out-of-date outputs">.
+
+=item C<stale.cmd>
+
+Type: bool; Default: C<0>.
+
+Also re-run when the command differs from the one that made the outputs. See L</"Re-running a changed command">.
+
+=item C<stderr.file>
+
+Type: path; Default: C<undef>.
+
+Write the command's standard error to this file instead of the record. See L</"Output to files">.
+
+=item C<stdin>
+
+Type: C<'devnull'>/C<'inherit'>; Default: C<'devnull'>.
+
+What the command sees on its standard input. The default is the null device; C<'inherit'> hands it the caller's own. See L</"Standard input">.
+
+=item C<stdout.file>
+
+Type: path; Default: C<undef>.
+
+Write the command's standard output to this file instead of the record.
+
+=item C<threads>
+
+Type: whole number; Default: C<undef>.
+
+CPUs the command uses: given to it as C<SIMPLEFLOW_THREADS>, and asked of the executor.
+
+=item C<timeout>
+
+Type: whole seconds; Default: C<0>.
+
+Kill the command if it runs longer than this. C<0> means no limit. See L</"Timeouts">.
+
+=item C<trace.fh>
+
+Type: open filehandle; Default: C<undef>.
+
+Append one line of JSON per task to this filehandle. See L</"Tracing">.
+
+=item C<walltime>
+
+Type: e.g. C<'2:00:00'>; Default: C<undef>.
+
+Time to ask the executor for, as SLURM writes it.
+
+=item C<wrapper>
+
+Type: array ref; Default: C<undef>.
+
+A command to run the command inside, e.g. C<['nice', '-n', '10']>.
+
+=back
+
+=end :text
+
+=begin :man
+
+=over
+
+=item C<cmd>
+
+Type: scalar or array; Default: C<undef>.
+
+B<Required.> The command to run. A string is handed to the shell; an array ref is run L<without a shell|/"Running without a shell">.
+
+=item C<conda.env>
+
+Type: name or path; Default: C<undef>.
+
+Run the command in this conda environment. See L</"Containers, conda and clusters">.
+
+=item C<container>
+
+Type: image; Default: C<undef>.
+
+Run the command in a container made from this image.
+
+=item C<container.args>
+
+Type: array ref; Default: C<[]>.
+
+More arguments for the container engine, before the image.
+
+=item C<container.engine>
+
+Type: name; Default: C<'docker'>.
+
+C<'docker'>, C<'podman'>, C<'singularity'> or C<'apptainer'>.
+
+=item C<die>
+
+Type: bool (C<0>/C<1>); Default: C<1>.
+
+Die if the command fails (non-zero exit, a kill by signal, a timeout, or a missing output file). Set to C<0> to warn and continue instead.
+
+=item C<dir>
+
+Type: directory; Default: C<undef>.
+
+Run the step in this directory; every file it declares is relative to it. See L</"Environment and directory">.
+
+=item C<dry.run>
+
+Type: bool; Default: C<0>.
+
+Print the command (and log it) but do not execute it.
+
+=item C<env>
+
+Type: hash ref; Default: C<{}>.
+
+Environment variables for the command only; a value of C<undef> removes one. See L</"Environment and directory">.
+
+=item C<env.secret>
+
+Type: array ref; Default: C<[]>.
+
+Names in C<env> whose values are never printed, logged or traced. See L</"Secrets">.
+
+=item C<executor>
+
+Type: C<'local'>/C<'slurm'>; Default: C<'local'>.
+
+Where the command runs: here, or as a SLURM job step through C<srun>.
+
+=item C<executor.args>
+
+Type: array ref; Default: C<[]>.
+
+More arguments for the executor (C<srun>).
+
+=item C<input.dirs>
+
+Type: scalar or array; Default: C<undef>.
+
+Directories that must exist before running, as C<input.files> must.
+
+=item C<input.dir>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<input.dirs> for a B<single> directory.
+
+=item C<input.files>
+
+Type: scalar or array; Default: C<undef>.
+
+File(s) that must exist and be readable B<before> running; otherwise C<task> dies (except in a L<dry run|/"Dry runs">, which lists them instead).
+
+=item C<input.file>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<input.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<input.files>.
+
+=item C<on.failure>
+
+Type: code ref; Default: C<undef>.
+
+Called with the record when the command ran and failed, before C<task> dies. See L</"Hooks">.
+
+=item C<on.success>
+
+Type: code ref; Default: C<undef>.
+
+Called with the record when the command ran and succeeded.
+
+=item C<output.dirs>
+
+Type: scalar or array; Default: C<undef>.
+
+Directories the step makes, checked like C<output.files>. See L</"Directory outputs">.
+
+=item C<output.dir>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<output.dirs> for a B<single> directory. Cannot be combined with C<output.dirs>.
+
+=item C<output.files>
+
+Type: scalar or array; Default: C<undef>.
+
+File(s) expected to exist B<after> running; used both for the missing-output check and for L<skip detection|/"Skipping completed work">.
+
+=item C<output.file>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<output.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<output.files>.
+
+=item C<lock>
+
+Type: bool; Default: C<0>.
+
+Hold a lock on the outputs while the step runs, so that a second copy of the pipeline waits for this one. See L</"Locking">.
+
+=item C<log.fh>
+
+Type: open filehandle; Default: C<undef>.
+
+If given, the full result record is also written here. Must be a real, open filehandle; C<task> switches it to autoflush.
+
+=item C<mem>
+
+Type: e.g. C<'16G'>; Default: C<undef>.
+
+Memory to ask the executor for.
+
+=item C<note>
+
+Type: scalar; Default: C<''>.
+
+Free-text note copied into the result and the log.
+
+=item C<overwrite>
+
+Type: bool; Default: C<0>.
+
+If false and all C<output.files> already exist, the command is skipped. Set true to always run.
+
+=item C<protect>
+
+Type: bool; Default: C<0>.
+
+Make the outputs read-only once the step succeeds. See L</"Protected outputs">.
+
+=item C<quiet>
+
+Type: bool; Default: C<0>.
+
+Suppress the record printed to the terminal. The log and error messages on C<STDERR> are unaffected. See L</"Quiet runs">.
+
+=item C<retries>
+
+Type: whole number; Default: C<0>.
+
+Run a failed step again, up to this many more times. See L</"Retries">.
+
+=item C<retry.delay>
+
+Type: seconds; Default: C<0>.
+
+How long to wait before each retry; may be fractional.
+
+=item C<stale>
+
+Type: bool; Default: C<0>.
+
+Also re-run when an input file is newer than an output file. See L</"Out-of-date outputs">.
+
+=item C<stale.cmd>
+
+Type: bool; Default: C<0>.
+
+Also re-run when the command differs from the one that made the outputs. See L</"Re-running a changed command">.
+
+=item C<stderr.file>
+
+Type: path; Default: C<undef>.
+
+Write the command's standard error to this file instead of the record. See L</"Output to files">.
+
+=item C<stdin>
+
+Type: C<'devnull'>/C<'inherit'>; Default: C<'devnull'>.
+
+What the command sees on its standard input. The default is the null device; C<'inherit'> hands it the caller's own. See L</"Standard input">.
+
+=item C<stdout.file>
+
+Type: path; Default: C<undef>.
+
+Write the command's standard output to this file instead of the record.
+
+=item C<threads>
+
+Type: whole number; Default: C<undef>.
+
+CPUs the command uses: given to it as C<SIMPLEFLOW_THREADS>, and asked of the executor.
+
+=item C<timeout>
+
+Type: whole seconds; Default: C<0>.
+
+Kill the command if it runs longer than this. C<0> means no limit. See L</"Timeouts">.
+
+=item C<trace.fh>
+
+Type: open filehandle; Default: C<undef>.
+
+Append one line of JSON per task to this filehandle. See L</"Tracing">.
+
+=item C<walltime>
+
+Type: e.g. C<'2:00:00'>; Default: C<undef>.
+
+Time to ask the executor for, as SLURM writes it.
+
+=item C<wrapper>
+
+Type: array ref; Default: C<undef>.
+
+A command to run the command inside, e.g. C<['nice', '-n', '10']>.
+
+=back
+
+=end :man
+
 
 
 Any key but those naming a particular step can also be given once for the whole
@@ -477,8 +997,8 @@ C<0>, C<stdout> and C<stderr> are C<''>, C<duration> is C<0>).
   <td>Captured output, with trailing whitespace stripped; <code>''</code> for a stream sent to <code>stdout.file</code> or <code>stderr.file</code>. When the command could not be launched at all (<code>exit</code> is <code>-1</code>), <code>stderr</code> says why, e.g. <code>cannot run "x": No such file or directory</code>.</td>
 </tr>
 <tr>
-  <td><code>conda.env</code>, <code>container</code>, <code>container.args</code>, <code>container.engine</code>, <code>die</code>, <code>dry.run</code>, <code>env</code>, <code>executor</code>, <code>executor.args</code>, <code>lock</code>, <code>mem</code>, <code>note</code>, <code>overwrite</code>, <code>protect</code>, <code>quiet</code>, <code>retries</code>, <code>retry.delay</code>, <code>stale</code>, <code>stale.cmd</code>, <code>stderr.file</code>, <code>stdin</code>, <code>stdout.file</code>, <code>threads</code>, <code>timeout</code>, <code>walltime</code>, <code>wrapper</code></td>
-  <td>The (defaulted) argument values used. A string option not given is <code>''</code>, a list <code>[]</code>, <code>env</code> is <code>{}</code>, and <code>threads</code> is <code>0</code>. The hooks are not recorded: they are code.</td>
+  <td><code>conda.env</code>, <code>container</code>, <code>container.args</code>, <code>container.engine</code>, <code>die</code>, <code>dry.run</code>, <code>env</code>, <code>env.secret</code>, <code>executor</code>, <code>executor.args</code>, <code>lock</code>, <code>mem</code>, <code>note</code>, <code>overwrite</code>, <code>protect</code>, <code>quiet</code>, <code>retries</code>, <code>retry.delay</code>, <code>stale</code>, <code>stale.cmd</code>, <code>stderr.file</code>, <code>stdin</code>, <code>stdout.file</code>, <code>threads</code>, <code>timeout</code>, <code>walltime</code>, <code>wrapper</code></td>
+  <td>The (defaulted) argument values used. A string option not given is <code>''</code>, a list <code>[]</code>, <code>env</code> is <code>{}</code>, and <code>threads</code> is <code>0</code>. The values <code>env.secret</code> names are <code>(secret)</code> in <code>env</code>. The hooks are not recorded: they are code.</td>
 </tr>
 <tr>
   <td><code>output.files</code></td>
@@ -524,6 +1044,214 @@ C<0>, C<stdout> and C<stderr> are C<''>, C<duration> is C<0>).
 </table>
 
 =end html
+
+=begin :text
+
+=over
+
+=item C<cmd>
+
+The command that was run. An array-ref C<cmd> is recorded space-joined for readability; that is not a shell-quoted round trip, since it never went near a shell.
+
+=item C<dir>
+
+Working directory at execution time: the absolute path of C<dir>, if it was given.
+
+=item C<done>
+
+C<"now"> (just ran), C<"before"> (skipped, outputs already existed), or C<"not yet"> (dry run).
+
+=item C<will.do>
+
+C<"done">, C<"no"> (skipped), C<"no: dry run">, or C<"FAILED">. C<"FAILED"> is set whenever the command exited non-zero, was killed by a signal, timed out, or left a declared output file missing — B<whether or not C<die> is set>.
+
+=item C<duration>
+
+Wall-clock seconds the command took (C<0> for skips/dry runs). With L<retries|/"Retries">, the last attempt's.
+
+=item C<attempts>
+
+How many times the command was run: C<0> for a skip or a dry run, C<1> without retries.
+
+=item C<start.time>
+
+When the last attempt started, in epoch seconds with a fractional part; C<0> if none did.
+
+=item C<cpu.user>, C<cpu.system>
+
+CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows.
+
+=item C<exit>
+
+Exit code of the command, or C<-1> if it could not be launched at all (C<stderr> then says why).
+
+=item C<signal>
+
+Signal number if the command process was killed by a signal, else C<0>. A non-zero C<signal> makes the step C<"FAILED">, even though C<exit> is then C<0>. Always C<0> on Windows (no POSIX signals).
+
+=item C<timed.out>
+
+C<1> if the command was killed for exceeding its C<timeout>, else C<0>.
+
+=item C<out.of.date>
+
+C<1> if C<stale> was set and an input was newer than an output, else C<0>.
+
+=item C<stdout>, C<stderr>
+
+Captured output, with trailing whitespace stripped; C<''> for a stream sent to C<stdout.file> or C<stderr.file>. When the command could not be launched at all (C<exit> is C<-1>), C<stderr> says why, e.g. C<cannot run "x": No such file or directory>.
+
+=item C<conda.env>, C<container>, C<container.args>, C<container.engine>, C<die>, C<dry.run>, C<env>, C<env.secret>, C<executor>, C<executor.args>, C<lock>, C<mem>, C<note>, C<overwrite>, C<protect>, C<quiet>, C<retries>, C<retry.delay>, C<stale>, C<stale.cmd>, C<stderr.file>, C<stdin>, C<stdout.file>, C<threads>, C<timeout>, C<walltime>, C<wrapper>
+
+The (defaulted) argument values used. A string option not given is C<''>, a list C<[]>, C<env> is C<{}>, and C<threads> is C<0>. The values C<env.secret> names are C<(secret)> in C<env>. The hooks are not recorded: they are code.
+
+=item C<output.files>
+
+Array ref of the output files (a scalar argument, or an C<output.file>, is normalised to a one-element array).
+
+=item C<output.dirs>
+
+Array ref of the output directories, normalised as C<output.files> is.
+
+=item C<input.dirs>
+
+Array ref of the input directories, normalised the same way; C<[]> if none.
+
+=item C<cmd.changed>
+
+C<1> if C<stale.cmd> was set and the command on record for the outputs was a different one, else C<0>.
+
+=item C<wrapped.cmd>
+
+The command as actually run, inside its executor, container, conda environment and wrapper, space-joined; C<''> if it ran as it is.
+
+=item C<output.file.size>
+
+Hash of C<filename =E<gt> size in bytes> for the outputs, as the command left them (measured before a failed step's outputs are moved aside).
+
+=item C<failed.outputs>
+
+Array ref of the names a failed step's outputs were L<moved to|/"Failure behaviour">, each the output's own name with C<.failed> appended; C<[]> on every other path.
+
+=item C<input.files>
+
+Array ref of the input files, normalised the same way (present only if you passed C<input.files> or C<input.file>).
+
+=item C<input.file.size>
+
+Hash of C<filename =E<gt> size in bytes> for the inputs (present only if you passed C<input.files> or C<input.file>). In a dry run, an input that does not exist yet has C<undef>.
+
+=item C<source.file>, C<source.line>
+
+Where in I<your> code the C<task> was called: handy when debugging a long pipeline.
+
+=back
+
+=end :text
+
+=begin :man
+
+=over
+
+=item C<cmd>
+
+The command that was run. An array-ref C<cmd> is recorded space-joined for readability; that is not a shell-quoted round trip, since it never went near a shell.
+
+=item C<dir>
+
+Working directory at execution time: the absolute path of C<dir>, if it was given.
+
+=item C<done>
+
+C<"now"> (just ran), C<"before"> (skipped, outputs already existed), or C<"not yet"> (dry run).
+
+=item C<will.do>
+
+C<"done">, C<"no"> (skipped), C<"no: dry run">, or C<"FAILED">. C<"FAILED"> is set whenever the command exited non-zero, was killed by a signal, timed out, or left a declared output file missing — B<whether or not C<die> is set>.
+
+=item C<duration>
+
+Wall-clock seconds the command took (C<0> for skips/dry runs). With L<retries|/"Retries">, the last attempt's.
+
+=item C<attempts>
+
+How many times the command was run: C<0> for a skip or a dry run, C<1> without retries.
+
+=item C<start.time>
+
+When the last attempt started, in epoch seconds with a fractional part; C<0> if none did.
+
+=item C<cpu.user>, C<cpu.system>
+
+CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows.
+
+=item C<exit>
+
+Exit code of the command, or C<-1> if it could not be launched at all (C<stderr> then says why).
+
+=item C<signal>
+
+Signal number if the command process was killed by a signal, else C<0>. A non-zero C<signal> makes the step C<"FAILED">, even though C<exit> is then C<0>. Always C<0> on Windows (no POSIX signals).
+
+=item C<timed.out>
+
+C<1> if the command was killed for exceeding its C<timeout>, else C<0>.
+
+=item C<out.of.date>
+
+C<1> if C<stale> was set and an input was newer than an output, else C<0>.
+
+=item C<stdout>, C<stderr>
+
+Captured output, with trailing whitespace stripped; C<''> for a stream sent to C<stdout.file> or C<stderr.file>. When the command could not be launched at all (C<exit> is C<-1>), C<stderr> says why, e.g. C<cannot run "x": No such file or directory>.
+
+=item C<conda.env>, C<container>, C<container.args>, C<container.engine>, C<die>, C<dry.run>, C<env>, C<env.secret>, C<executor>, C<executor.args>, C<lock>, C<mem>, C<note>, C<overwrite>, C<protect>, C<quiet>, C<retries>, C<retry.delay>, C<stale>, C<stale.cmd>, C<stderr.file>, C<stdin>, C<stdout.file>, C<threads>, C<timeout>, C<walltime>, C<wrapper>
+
+The (defaulted) argument values used. A string option not given is C<''>, a list C<[]>, C<env> is C<{}>, and C<threads> is C<0>. The values C<env.secret> names are C<(secret)> in C<env>. The hooks are not recorded: they are code.
+
+=item C<output.files>
+
+Array ref of the output files (a scalar argument, or an C<output.file>, is normalised to a one-element array).
+
+=item C<output.dirs>
+
+Array ref of the output directories, normalised as C<output.files> is.
+
+=item C<input.dirs>
+
+Array ref of the input directories, normalised the same way; C<[]> if none.
+
+=item C<cmd.changed>
+
+C<1> if C<stale.cmd> was set and the command on record for the outputs was a different one, else C<0>.
+
+=item C<wrapped.cmd>
+
+The command as actually run, inside its executor, container, conda environment and wrapper, space-joined; C<''> if it ran as it is.
+
+=item C<output.file.size>
+
+Hash of C<filename =E<gt> size in bytes> for the outputs, as the command left them (measured before a failed step's outputs are moved aside).
+
+=item C<failed.outputs>
+
+Array ref of the names a failed step's outputs were L<moved to|/"Failure behaviour">, each the output's own name with C<.failed> appended; C<[]> on every other path.
+
+=item C<input.files>
+
+Array ref of the input files, normalised the same way (present only if you passed C<input.files> or C<input.file>).
+
+=item C<input.file.size>
+
+Hash of C<filename =E<gt> size in bytes> for the inputs (present only if you passed C<input.files> or C<input.file>). In a dry run, an input that does not exist yet has C<undef>.
+
+=item C<source.file>, C<source.line>
+
+Where in I<your> code the C<task> was called: handy when debugging a long pipeline.
+
+=back
+
+=end :man
 
 
 
@@ -602,13 +1330,23 @@ given the terminal's foreground for the duration, as a shell gives it to a job,
 so that it can read from the terminal; your script takes it back afterwards.
 A Ctrl-Z then suspends the command and your script together, as a shell
 suspends a job, with the timeout's clock stopped, and C<fg> carries on with
-both.
+both. The same holds without a C<timeout>.
 
-Without a C<timeout>, the command shares your script's process group, so a
-Ctrl-C reaches it directly, as under C<system>. A C<TERM> or C<HUP> sent to your
-script alone, by a batch scheduler or C<kill>, is passed on to the command,
-which is waited for; then the record is written and the signal passed on to
-your script, as with a timeout.
+Without a C<timeout> the command has a process group of its own as well, so
+that a signal reaches the whole of it, not just the shell at its head. A
+C<TERM> or C<HUP> sent to your script, by a batch scheduler or C<kill>, is passed
+on to the command's group, which is waited for; then the record is written and
+the signal passed on to your script, as with a timeout. A Ctrl-C (C<INT>) or
+C<QUIT> is passed on to the group in the same way, but, as under C<system>, not
+to your script afterwards: the step fails, killed by the signal, and C<die>
+decides what happens next. A Ctrl-Z stops the command and your script together,
+and C<fg> or C<bg> carries on with both. A command that opens the terminal
+itself, as C<ssh> or C<sudo> do to ask for a password, is given its foreground
+while your script has it to give.
+
+If one of your own signal handlers dies while a command runs, the command's
+group is killed and waited for before the exception reaches your code.
+Before 0.192 the command was left running.
 
 An C<alarm> your script already had pending is kept: it is put back when the
 command finishes, less the time the command took, and if it fell due while the
@@ -659,6 +1397,29 @@ the command itself sees it. Your script is back in its own directory when
 C<task> returns, however it returns, dying included. The record's C<dir> is the
 absolute path the step ran in.
 
+=head2 Secrets
+
+The record holds the C<env> a step was given, and the record is printed, written
+to the log and written to the trace. A credential passed in C<env> would be
+written out with it. C<env.secret> names the variables whose values must not be:
+
+ my $t = task(
+     cmd          => 'fetch-data --to data.csv',
+     env          => { API_TOKEN => $token },
+     'env.secret' => ['API_TOKEN'],
+ );
+
+The command is given the real value; everywhere else, the record included, it
+is C<(secret)>, and so it is in the arguments printed with an error. A secret's
+value is not part of what L<stale.cmd|/"Re-running a changed command">
+compares, so a new token does not re-run every step. C<env.secret> in
+L<%SimpleFlow::DEFAULTS|/"Defaults for a whole pipeline"> is combined with a
+step's own, as C<env> is.
+
+Nothing else is hidden: the command line, C<note> and every other C<env> value
+are written out in full. Pass a credential through C<env>, never on the command
+line.
+
 =head2 Output to files
 
 A command that prints a great deal is better written to a file than held in
@@ -671,7 +1432,10 @@ memory and printed in the record:
  );
 
 The files are emptied when the step starts and receive the output of every
-attempt, in order; the record's C<stdout> and C<stderr> are then C<''>. Naming the
+attempt, in order; the record's C<stdout> and C<stderr> are then C<''>. That holds
+even when the file is also a declared output, or is inside one: a failed
+attempt that is to be retried leaves such an output where it is, and only a
+step that has failed for good moves it aside. Naming the
 same file for both puts the two streams in it interleaved, as a terminal would
 show them. A step that is skipped, or dry-run, leaves the files alone, so they
 still hold the output of the run that made the step's outputs. This is
@@ -726,8 +1490,9 @@ Nextflow's C<trace.txt>:
  local %SimpleFlow::DEFAULTS = ('trace.fh' => $trace);
 
 Each line holds every field of the record except C<stdout> and C<stderr>, which
-can be any size, plus C<time>, when the line was written. Open the file without
-an encoding layer: the lines are UTF-8 already.
+can be any size, plus C<time>, when the line was written: the command line and
+C<env> included, so see L</"Secrets">. Open the file without an encoding
+layer: the lines are UTF-8 already.
 
 =head2 Locking
 
@@ -750,6 +1515,19 @@ on would let two runs through. A step with no declared outputs has nothing to
 lock, and a dry run takes no lock. The locks are C<flock> locks, which some
 network filesystems do not honour.
 
+An output is locked under its real directory and its own name, so C<out> and
+C<sub/../out>, or a name reached through a linked directory, are one output
+here; an output that is itself a symbolic link is locked under what it points
+at as well. A step also takes a shared lock on every directory above each of
+its outputs, so that a step whose output is a directory, and one whose output
+is a file inside it, do not run at once. Two hard links to one file are still
+two outputs.
+
+C<.simpleflow/>, and C<.simpleflow/cmd/> under it, must be directories, not
+symbolic links: C<task> refuses a link there, and opens nothing inside them
+through one. These guard against a link planted by someone else; they do not
+make a working directory others can write to safe to run a pipeline in.
+
 =head2 Re-running a changed command
 
 By default a step whose outputs exist is skipped even if its command has been
@@ -762,13 +1540,19 @@ C<params> and C<code> rerun triggers do:
      'stale.cmd'   => 1,
  );
 
-Changing the command, its C<env>, or what it runs inside (its container,
-conda environment, executor or wrapper) makes C<cmd.changed> C<1> and the step
-run again. What made each set of outputs is kept, as a digest, in
+Changing the command, its C<env>, its C<threads>, or what it runs inside (its
+container, conda environment, executor or wrapper) makes C<cmd.changed> C<1> and
+the step run again. What made each set of outputs is kept, as a digest, in
 C<.simpleflow/cmd/> in the working directory, and written only after a
 successful run. Outputs that exist with nothing on record, made before
 C<stale.cmd> was used, or by hand, are not re-run: the command is recorded
 against them, so that the next change is seen.
+
+A step run I<without> C<stale.cmd> over outputs that have a command on record
+still replaces them, so after it succeeds its own command is recorded in place
+of the old one, and a later C<stale.cmd> run of the old command runs again
+rather than taking the other's outputs as its own. With nothing on record, a
+step without C<stale.cmd> records nothing.
 
 =head2 Hooks
 
@@ -890,7 +1674,10 @@ C<'inherit'> is the behaviour of 0.162 and earlier, and comes with its hazards:
 the command consumes input your own script can then no longer read, and a
 command that prompts will hang exactly as it used to. The caller's standard
 input is saved and restored around every run either way, including when the
-command dies, and a caller that had closed it keeps it closed.
+command dies, and a caller that had closed it keeps it closed. A C<STDIN> that
+is not descriptor 0, such as one opened on an in-memory scalar, is not the
+command's standard input in any case: it is left alone, and descriptor 0 is
+pointed at the null device and put back instead.
 
 =head2 Dry runs
 
@@ -923,7 +1710,12 @@ traceback or C<make> says what went wrong.
 
 Whichever of those happened, every declared output that I<does> exist is moved to
 C<< E<lt>fileE<gt>.failed >> (replacing any C<.failed> left from before), and the new names are
-listed in the record's C<failed.outputs> and on C<STDERR>. A command that fails
+listed in the record's C<failed.outputs> and on C<STDERR>. A name declared twice
+is moved once; a file inside a declared directory moves with the directory,
+under its own name; and when one output is named like another's C<.failed>, as
+C<out> and C<out.failed> are, the longer name is moved first, so that neither is
+lost. When the message quotes standard error from a C<stderr.file> that was one
+of the outputs, it is read before the file is moved. A command that fails
 part-way often leaves a truncated file behind; left under its own name, it would
 pass the L<skip test|/"Skipping completed work"> on the next run and become the
 result for good. Snakemake deletes a failed job's outputs for the same reason;
@@ -949,7 +1741,7 @@ C<%SimpleFlow::DEFAULTS> gives a value to any key a C<task> call leaves undefine
  );
 
 A task that sets a key itself keeps its own value. C<env> is the one exception:
-a task's own C<env> is merged with the default one, its own entries winning.
+a task's own C<env> is merged with the default one, its own entries winning, and its own C<env.secret> is added to the default one.
 Keys that name a particular step (C<cmd>, the C<input.*> and C<output.*> lists,
 C<stdout.file> and C<stderr.file>) are refused in C<%DEFAULTS>, since every step
 would then run the same command or claim the same files, and so is any key
@@ -983,7 +1775,9 @@ Each entry of C<tasks> is the arguments of one C<task>, which runs in full, in a
 child process of its own: its checks, its log, its record, its options, and
 C<%SimpleFlow::DEFAULTS>. Each record's C<source.file> and C<source.line> are the
 C<parallel> call's. Output from several steps at once interleaves, a record at
-a time, on the terminal and in a shared log.
+a time, on the terminal, in a shared log and in a shared L<trace|/"Tracing">:
+each step writes its record holding a lock, so that no two records are mixed
+within a line.
 
 When a step fails, and C<task> would die, no further step is started; those
 already running are left to finish, and then C<parallel> dies with every
@@ -1015,7 +1809,9 @@ your script it was called, alongside a timeline of when each ran. It is one
 self-contained file, with no scripts and nothing fetched, which follows the
 reader's light or dark setting, so that it can be mailed or archived as it
 is. C<report> returns the number of tasks it read, and dies naming the line of
-the trace it could not read.
+the trace it could not read: one that is not strict JSON in UTF-8, nests more
+than 512 deep, or has a time that is not a number of seconds or a command that
+is not a string. A C<title> may be a character string or UTF-8 bytes.
 
 =head1 Dependencies
 
@@ -1050,3 +1846,7 @@ distribution, in the format CPAN itself reads.
 =head1 COPYRIGHT AND LICENSE
 
 This software is free.  It is licensed under the same terms as Perl itself
+
+=head1 Thanks
+
+A lot of this work used Claude AI, which was paid for by the University of Idaho's IMCI

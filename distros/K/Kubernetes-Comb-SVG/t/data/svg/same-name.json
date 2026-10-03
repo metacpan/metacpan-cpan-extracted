@@ -1,0 +1,8 @@
+{
+  "kind": "List",
+  "items": [
+    { "metadata": { "name": "db", "namespace": "prod" } },
+    { "metadata": { "name": "db", "namespace": "dev" } },
+    { "metadata": { "name": "api", "namespace": "dev" }, "spec": { "dependsOn": [ "db" ] } }
+  ]
+}

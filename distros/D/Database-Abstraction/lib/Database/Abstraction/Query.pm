@@ -17,11 +17,11 @@ Database::Abstraction::Query - Fluent, chainable query builder for Database::Abs
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 SYNOPSIS
 
@@ -298,7 +298,15 @@ sub _apply_perl_sort_limit
 		# (ASC|DESC) is already a non-regex check after capture; $dir is either
 		# 'ASC', 'DESC', or undef — hoist the direction decision out of the sort
 		# comparator so it is not evaluated O(N log N) times for an N-row result.
-		my ($col, $dir) = ($order_by =~ /\A(\S+)(?:\s+(ASC|DESC))?\z/i);
+		my ($col, $dir) = ($order_by =~ /
+			\A
+			(\S+)           # column expression (non-whitespace)
+			(?:
+				\s+         # whitespace separator
+				(ASC|DESC)  # sort direction keyword
+			)?
+			\z
+		/xi);
 		$dir //= 'ASC';
 		my $desc = ($dir eq 'DESC');	# evaluated once, not on every comparison
 		@{$rows} = sort {

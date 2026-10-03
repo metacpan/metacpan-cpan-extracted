@@ -92,6 +92,6 @@
          "web" : "https://github.com/nigelhorne/App-access2csv"
       }
    },
-   "version" : "v0.001.0",
+   "version" : "v0.001.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

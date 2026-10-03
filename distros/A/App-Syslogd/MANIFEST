@@ -1,0 +1,33 @@
+Changes
+cpanfile
+etc/syslogd
+lib/App/Syslogd.pm
+lib/App/Syslogd/Cache.pm
+lib/App/Syslogd/I18N.pm
+lib/App/Syslogd/I18N/en.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/cache.t
+t/cgi_security.t
+t/critic.t
+t/data-flow.t
+t/domain.t
+t/edge_cases.t
+t/function.t
+t/i18n.t
+t/integration.t
+t/locales.t
+t/logic.t
+t/path.t
+t/pod-coverage.t
+t/pod.t
+t/server.t
+t/transaction.t
+t/transition.t
+t/unit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

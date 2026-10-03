@@ -1,0 +1,26 @@
+{
+  "kind": "Comb",
+  "metadata": {
+    "name": "odd",
+    "namespace": [ "not", "a", "string" ],
+    "labels": "not-a-hash"
+  },
+  "spec": {
+    "class": { "not": "a string" },
+    "enabled": "yes",
+    "dependsOn": "db"
+  },
+  "status": {
+    "phase": [ "Running" ],
+    "conditions": { "message": "not an array" },
+    "endpoints": [
+      "a string",
+      { "port": 80 },
+      { "name": "web", "port": { "number": 80 } },
+      { "name": [ "x" ], "port": 1 },
+      null,
+      { "name": "dns", "port": "53" }
+    ],
+    "upstream": "prod"
+  }
+}

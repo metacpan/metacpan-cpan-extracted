@@ -117,9 +117,9 @@ subtest 'gate (c): exactly one non-empty name' => sub {
 # App::Access2CSV::Exporter::run: fail fast, in order
 #######################################################################
 
-subtest 'fail-fast order: database > programs > tables > folder' => sub {
+subtest 'fail-fast order: database > programs > tables > directory' => sub {
 	# Premise 1: run() checks the database, then finds the programs, then
-	# lists the tables, then makes the folder.
+	# lists the tables, then makes the directory.
 	# Premise 2: each case makes one step fail.
 	# Conclusion: no later step runs at all.
 	my ($dir, $db) = new_database('T');
@@ -140,13 +140,13 @@ subtest 'fail-fast order: database > programs > tables > folder' => sub {
 
 	my ($bad_dir, $bad_db) = new_database('FAIL');
 	throws_ok { $e->run($bad_db) } qr/\Amdb-tables failed /, 'step 3 fails';
-	is(scalar($mkdir->()), 0, '... so no folder was made');
+	is(scalar($mkdir->()), 0, '... so no directory was made');
 	ok(!-e $out, '... and none exists');
 
 	restore_all();
 };
 
-subtest 'dry run always succeeds and never makes the folder' => sub {
+subtest 'dry run always succeeds and never makes the directory' => sub {
 	# Premise 1: a dry run returns before mkdir and exports nothing.
 	# Premise 2: a table that would fail to export is present.
 	# Conclusion: status 0, and make_path is never called.

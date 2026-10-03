@@ -45,6 +45,7 @@ use Punk;
 use Punk::Plugin::SAML;
 host 'https://app.example.com';
 session secret => 'session-secret-here-32-bytes-ok!';
+cache 'memory', max_bytes => '1M';
 plugin 'SAML' => { secret => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
                    allow_idp_initiated => $allow };
 saml_idp okta => {
@@ -59,10 +60,18 @@ saml_login '/saml' => { on_login => sub { return } };
 }
 
 # An unsolicited Response: no InResponseTo, because nothing was asked.
+#
+# A FRESH assertion id every time. With allow_idp_initiated on there is no
+# flow record to be single-use, so the replay cache is the only thing
+# standing between one captured Response and an unlimited number of
+# logins - which means a block that expects a 303 cannot reuse an id that
+# another block already spent.
+my $aid = 0;
 sub unsolicited {
     my (%o) = @_;
-    return $idp->sign($idp->response(in_response_to => undef, %o),
-                      '_assertion1');
+    my $id = '_assertion' . ++$aid;
+    return $idp->sign($idp->response(in_response_to => undef,
+                                     assertion_id => $id, %o), $id);
 }
 
 # POST it with no flow cookie, which is the whole point: the browser never

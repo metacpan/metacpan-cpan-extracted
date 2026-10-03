@@ -59,9 +59,36 @@ my $SAFE_QUALIFIED  = qr/\A[a-zA-Z_][a-zA-Z0-9_.]*\z/;
 # Compiled once at load; reused in _infer_type() across all schema() calls.
 use constant INFER_TYPE_SAMPLE_SIZE => 100;
 my $INFER_INT_RE  = qr/\A-?\d+\z/;
-my $INFER_REAL_RE = qr/\A-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\z/;
-my $INFER_TS_RE   = qr/\A\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])[T ]\d{2}:\d{2}/;
-my $INFER_DATE_RE = qr/\A\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])\z/;
+my $INFER_REAL_RE = qr/
+    \A              # start of string
+    -?              # optional leading minus
+    \d+             # integer part -- required
+    (?:\.\d+)?      # optional decimal part
+    (?:             # optional exponent block:
+        [eE]        #   e or E marker
+        [+-]?       #   optional sign
+        \d+         #   exponent digits
+    )?
+    \z              # end of string
+/x;
+# No \z anchor: intentionally matches any valid timestamp prefix so that full
+# timestamps with seconds, fractional seconds, or timezone offsets are still
+# classified as TIMESTAMP -- e.g. 2024-01-01 12:34:00.000+05:30
+my $INFER_TS_RE   = qr/
+    \A                              # start of string
+    \d{4}                           # 4-digit year
+    - (?:0[1-9]|1[0-2])            # month 01-12
+    - (?:0[1-9]|[12]\d|3[01])      # day   01-31
+    [T\ ]                           # ISO 8601 date-time separator: T or space
+    \d{2}:\d{2}                     # HH:MM -- no end anchor, see note above
+/x;
+my $INFER_DATE_RE = qr/
+    \A                              # start of string
+    \d{4}                           # 4-digit year
+    - (?:0[1-9]|1[0-2])            # month 01-12
+    - (?:0[1-9]|[12]\d|3[01])      # day   01-31
+    \z                              # end of string
+/x;
 
 # Module-level constant: valid JOIN types after uc() normalisation.
 # Built once at compile time; reused by every _build_joins call.
@@ -73,11 +100,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 DESCRIPTION
 
@@ -778,7 +805,7 @@ sub new {
 		}
 		if(defined $src->{'url'}) {
 			croak("$class: unsafe url '$src->{url}'")
-				unless $src->{'url'} =~ /\Ahttps?:\/\//i;
+				unless $src->{'url'} =~ m{\Ahttps?://}i;
 		}
 		if(defined $src->{'table'}) {
 			croak("$class: unsafe table name '$src->{table}'")
@@ -860,9 +887,9 @@ sub _open :Protected
 	# DSN-based connection bypasses file detection entirely
 	if(my $dsn = $self->{'dsn'} || $defaults{'dsn'}) {
 		my $dialect = 'generic';
-		if    ($dsn =~ /^dbi:SQLite:/i) { $dialect = 'sqlite'   }
-		elsif ($dsn =~ /^dbi:Pg:/i)     { $dialect = 'postgres' }
-		elsif ($dsn =~ /^dbi:mysql:/i)  { $dialect = 'mysql'    }
+		if    ($dsn =~ /\Adbi:SQLite:/i) { $dialect = 'sqlite'   }
+		elsif ($dsn =~ /\Adbi:Pg:/i)     { $dialect = 'postgres' }
+		elsif ($dsn =~ /\Adbi:mysql:/i)  { $dialect = 'mysql'    }
 		$self->{'_dialect'} = $dialect;
 
 		$dbh = DBI->connect(
@@ -995,7 +1022,9 @@ sub _open :Protected
 	if(my $host = $self->{'host'} || $defaults{'host'}) {
 		if($self->_is_local_host($host)) {
 			$self->_debug("host '$host' is local; reading directory directly");
-			$dir = Cwd::abs_path($self->{'directory'} || $defaults{'directory'});
+			my $raw_dir = $self->{'directory'} || $defaults{'directory'};
+			Carp::croak(ref($self), ': no directory specified') unless $raw_dir;
+			$dir = Cwd::abs_path($raw_dir);
 		} else {
 			require File::Slurp::Remote;
 			require POSIX;
@@ -1070,7 +1099,9 @@ sub _open :Protected
 			$dir = $tmpdir;
 		}
 	} else {
-		$dir = Cwd::abs_path($self->{'directory'} || $defaults{'directory'});
+		my $raw_dir = $self->{'directory'} || $defaults{'directory'};
+		Carp::croak(ref($self), ': no directory specified') unless $raw_dir;
+		$dir = Cwd::abs_path($raw_dir);
 	}
 	# Probe for SQLite files (.sql, .sqlite, .sqlite3)
 	my $slurp_file;
@@ -1549,11 +1580,11 @@ sub selectall_arrayref {
 		$params = $self->_merge_base_criteria($params);
 		my $rows = $self->_scan_berkeley($params);
 		if(defined $bsc) {
-			my $desc = ($bsd eq 'DESC');
-			@{$rows} = sort {
-				$desc ? (($b->{$bsc} // '') cmp ($a->{$bsc} // ''))
-				      : (($a->{$bsc} // '') cmp ($b->{$bsc} // ''))
-			} @{$rows};
+			if($bsd eq 'DESC') {
+				@{$rows} = sort { ($b->{$bsc} // '') cmp ($a->{$bsc} // '') } @{$rows};
+			} else {
+				@{$rows} = sort { ($a->{$bsc} // '') cmp ($b->{$bsc} // '') } @{$rows};
+			}
 		}
 		if(defined($bl) || defined($bo)) {
 			splice(@{$rows}, 0, int($bo)) if $bo;
@@ -1613,11 +1644,11 @@ sub selectall_arrayref {
 				@rc = @{$self->{'data'}};
 			}
 			if(defined $sort_col) {
-				my $desc = ($sort_dir eq 'DESC');
-				@rc = sort {
-					$desc ? (($b->{$sort_col} // '') cmp ($a->{$sort_col} // ''))
-					      : (($a->{$sort_col} // '') cmp ($b->{$sort_col} // ''))
-				} @rc;
+				if($sort_dir eq 'DESC') {
+					@rc = sort { ($b->{$sort_col} // '') cmp ($a->{$sort_col} // '') } @rc;
+				} else {
+					@rc = sort { ($a->{$sort_col} // '') cmp ($b->{$sort_col} // '') } @rc;
+				}
 			}
 			if(defined($offset) || defined($limit)) {
 				splice(@rc, 0, $offset) if $offset;
@@ -1631,11 +1662,11 @@ sub selectall_arrayref {
 				unless exists($self->{'data'}->{$params->{'entry'}});
 			my @rc = ($self->{'data'}->{$params->{'entry'}});
 			if(defined $sort_col) {
-				my $desc = ($sort_dir eq 'DESC');
-				@rc = sort {
-					$desc ? (($b->{$sort_col} // '') cmp ($a->{$sort_col} // ''))
-					      : (($a->{$sort_col} // '') cmp ($b->{$sort_col} // ''))
-				} @rc;
+				if($sort_dir eq 'DESC') {
+					@rc = sort { ($b->{$sort_col} // '') cmp ($a->{$sort_col} // '') } @rc;
+				} else {
+					@rc = sort { ($a->{$sort_col} // '') cmp ($b->{$sort_col} // '') } @rc;
+				}
 			}
 			if(defined($offset) || defined($limit)) {
 				splice(@rc, 0, $offset) if $offset;
@@ -1654,11 +1685,11 @@ sub selectall_arrayref {
 				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}, $_) } @param_keys
 			} values %{$self->{'data'}};
 			if(defined $sort_col) {
-				my $desc = ($sort_dir eq 'DESC');
-				@rc = sort {
-					$desc ? (($b->{$sort_col} // '') cmp ($a->{$sort_col} // ''))
-					      : (($a->{$sort_col} // '') cmp ($b->{$sort_col} // ''))
-				} @rc;
+				if($sort_dir eq 'DESC') {
+					@rc = sort { ($b->{$sort_col} // '') cmp ($a->{$sort_col} // '') } @rc;
+				} else {
+					@rc = sort { ($a->{$sort_col} // '') cmp ($b->{$sort_col} // '') } @rc;
+				}
 			}
 			if(defined($offset) || defined($limit)) {
 				splice(@rc, 0, $offset) if $offset;
@@ -1675,11 +1706,11 @@ sub selectall_arrayref {
 				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}, $_) } @param_keys
 			} @{$self->{'data'}};
 			if(defined $sort_col) {
-				my $desc = ($sort_dir eq 'DESC');
-				@rc = sort {
-					$desc ? (($b->{$sort_col} // '') cmp ($a->{$sort_col} // ''))
-					      : (($a->{$sort_col} // '') cmp ($b->{$sort_col} // ''))
-				} @rc;
+				if($sort_dir eq 'DESC') {
+					@rc = sort { ($b->{$sort_col} // '') cmp ($a->{$sort_col} // '') } @rc;
+				} else {
+					@rc = sort { ($a->{$sort_col} // '') cmp ($b->{$sort_col} // '') } @rc;
+				}
 			}
 			if(defined($offset) || defined($limit)) {
 				splice(@rc, 0, $offset) if $offset;
@@ -1756,7 +1787,7 @@ sub selectall_arrayref {
 
 		my $rc;
 		while(my $href = $sth->fetchrow_hashref()) {
-			push @{$rc}, $href if %{$href};
+			push @{$rc}, $href;
 		}
 		$c->set($key, $rc, $self->{'cache_duration'}) if $c;
 
@@ -1839,11 +1870,11 @@ sub each_row
 		$params = $self->_merge_base_criteria($params);
 		my $rows = $self->_scan_berkeley($params);
 		if(defined $bsc) {
-			my $desc = ($bsd eq 'DESC');
-			@{$rows} = sort {
-				$desc ? (($b->{$bsc} // '') cmp ($a->{$bsc} // ''))
-				      : (($a->{$bsc} // '') cmp ($b->{$bsc} // ''))
-			} @{$rows};
+			if($bsd eq 'DESC') {
+				@{$rows} = sort { ($b->{$bsc} // '') cmp ($a->{$bsc} // '') } @{$rows};
+			} else {
+				@{$rows} = sort { ($a->{$bsc} // '') cmp ($b->{$bsc} // '') } @{$rows};
+			}
 		}
 		if(defined($bl) || defined($bo)) {
 			splice(@{$rows}, 0, int($bo)) if $bo;
@@ -1918,11 +1949,11 @@ sub each_row
 		}
 		if(@rc) {
 			if(defined $sort_col) {
-				my $desc = ($sort_dir eq 'DESC');
-				@rc = sort {
-					$desc ? (($b->{$sort_col} // '') cmp ($a->{$sort_col} // ''))
-					      : (($a->{$sort_col} // '') cmp ($b->{$sort_col} // ''))
-				} @rc;
+				if($sort_dir eq 'DESC') {
+					@rc = sort { ($b->{$sort_col} // '') cmp ($a->{$sort_col} // '') } @rc;
+				} else {
+					@rc = sort { ($a->{$sort_col} // '') cmp ($b->{$sort_col} // '') } @rc;
+				}
 			}
 			if(defined($offset) || defined($limit)) {
 				splice(@rc, 0, $offset) if $offset;
@@ -2033,11 +2064,11 @@ sub selectall_array
 		$params = $self->_merge_base_criteria($params);
 		my $rows = $self->_scan_berkeley($params);
 		if(defined $bsc) {
-			my $desc = ($bsd eq 'DESC');
-			@{$rows} = sort {
-				$desc ? (($b->{$bsc} // '') cmp ($a->{$bsc} // ''))
-				      : (($a->{$bsc} // '') cmp ($b->{$bsc} // ''))
-			} @{$rows};
+			if($bsd eq 'DESC') {
+				@{$rows} = sort { ($b->{$bsc} // '') cmp ($a->{$bsc} // '') } @{$rows};
+			} else {
+				@{$rows} = sort { ($a->{$bsc} // '') cmp ($b->{$bsc} // '') } @{$rows};
+			}
 		}
 		if(defined($bl) || defined($bo)) {
 			splice(@{$rows}, 0, int($bo)) if $bo;
@@ -2084,11 +2115,11 @@ sub selectall_array
 				? values %{$self->{'data'}}
 				: @{$self->{'data'}};
 			if(defined $sort_col) {
-				my $desc = ($sort_dir eq 'DESC');
-				@rc = sort {
-					$desc ? (($b->{$sort_col} // '') cmp ($a->{$sort_col} // ''))
-					      : (($a->{$sort_col} // '') cmp ($b->{$sort_col} // ''))
-				} @rc;
+				if($sort_dir eq 'DESC') {
+					@rc = sort { ($b->{$sort_col} // '') cmp ($a->{$sort_col} // '') } @rc;
+				} else {
+					@rc = sort { ($a->{$sort_col} // '') cmp ($b->{$sort_col} // '') } @rc;
+				}
 			}
 			if(defined($offset) || defined($limit)) {
 				splice(@rc, 0, $offset) if $offset;
@@ -2120,11 +2151,11 @@ sub selectall_array
 				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}, $_) } @param_keys
 			} values %{$self->{'data'}};
 			if(defined $sort_col) {
-				my $desc = ($sort_dir eq 'DESC');
-				@rc = sort {
-					$desc ? (($b->{$sort_col} // '') cmp ($a->{$sort_col} // ''))
-					      : (($a->{$sort_col} // '') cmp ($b->{$sort_col} // ''))
-				} @rc;
+				if($sort_dir eq 'DESC') {
+					@rc = sort { ($b->{$sort_col} // '') cmp ($a->{$sort_col} // '') } @rc;
+				} else {
+					@rc = sort { ($a->{$sort_col} // '') cmp ($b->{$sort_col} // '') } @rc;
+				}
 			}
 			if(defined($offset) || defined($limit)) {
 				splice(@rc, 0, $offset) if $offset;
@@ -2141,11 +2172,11 @@ sub selectall_array
 				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}, $_) } @param_keys
 			} @{$self->{'data'}};
 			if(defined $sort_col) {
-				my $desc = ($sort_dir eq 'DESC');
-				@rc = sort {
-					$desc ? (($b->{$sort_col} // '') cmp ($a->{$sort_col} // ''))
-					      : (($a->{$sort_col} // '') cmp ($b->{$sort_col} // ''))
-				} @rc;
+				if($sort_dir eq 'DESC') {
+					@rc = sort { ($b->{$sort_col} // '') cmp ($a->{$sort_col} // '') } @rc;
+				} else {
+					@rc = sort { ($a->{$sort_col} // '') cmp ($b->{$sort_col} // '') } @rc;
+				}
 			}
 			if(defined($offset) || defined($limit)) {
 				splice(@rc, 0, $offset) if $offset;
@@ -2448,7 +2479,13 @@ sub fetchrow_hashref {
 		Carp::croak(ref($self), ': fetchrow_hashref is meaningless on a NoSQL database');
 	}
 
-	my $target = delete($params->{'table'}) // $table;
+	my $raw_target = delete $params->{'table'};
+	if(defined $raw_target) {
+		$raw_target =~ s/\A.*:://;
+		Carp::croak(ref($self), ": unsafe table name '$raw_target'")
+			unless $raw_target =~ $SAFE_QUALIFIED;
+	}
+	my $target = $raw_target // $table;
 	my $join_spec = delete $params->{'join'};
 	$params = $self->_merge_base_criteria($params);
 	my $join_clause = $join_spec ? $self->_build_joins($join_spec) : '';
@@ -2752,9 +2789,11 @@ sub schema {
 		if(ref($data) eq 'HASH') {
 			($first) = values %{$data};
 			if($self->{'infer_types'} && $first) {
-				my @rows  = values %{$data};
-				my $last  = $#rows < INFER_TYPE_SAMPLE_SIZE - 1 ? $#rows : INFER_TYPE_SAMPLE_SIZE - 1;
-				@sample = @rows[0 .. $last];
+				my $n = 0;
+				for my $row (values %{$data}) {
+					push @sample, $row;
+					last if ++$n >= INFER_TYPE_SAMPLE_SIZE;
+				}
 			}
 		} elsif(ref($data) eq 'ARRAY' && @{$data}) {
 			$first = $data->[0];
@@ -2927,7 +2966,7 @@ has been disabled with C<< auto_load => 0 >>.
 
 sub AUTOLOAD {
 	our $AUTOLOAD;
-	my ($column) = $AUTOLOAD =~ /::(\w+)\z/;
+	my ($column) = $AUTOLOAD =~ /::([A-Za-z_]\w*)\z/;
 
 	return if($column eq 'DESTROY');
 	return if($column =~ /\A_/);	# never treat private method names as column lookups
@@ -3219,10 +3258,10 @@ sub _infer_type
 	my ($vals) = @_;
 	my @non_null = grep { defined($_) && $_ ne '' } @{$vals};
 	return 'TEXT' unless @non_null;
-	return 'INTEGER'   unless grep { $_ !~ $INFER_INT_RE  } @non_null;
-	return 'REAL'      unless grep { $_ !~ $INFER_REAL_RE } @non_null;
-	return 'TIMESTAMP' unless grep { $_ !~ $INFER_TS_RE   } @non_null;
-	return 'DATE'      unless grep { $_ !~ $INFER_DATE_RE } @non_null;
+	return 'INTEGER'   if all { $_ =~ $INFER_INT_RE  } @non_null;
+	return 'REAL'      if all { $_ =~ $INFER_REAL_RE } @non_null;
+	return 'TIMESTAMP' if all { $_ =~ $INFER_TS_RE   } @non_null;
+	return 'DATE'      if all { $_ =~ $INFER_DATE_RE } @non_null;
 	return 'TEXT';
 }
 
@@ -3650,6 +3689,8 @@ sub _open_table
 	my $table;
 	if($params->{'table'}) {
 		($table = $params->{'table'}) =~ s/\A.*:://;
+		Carp::croak(ref($self), ": unsafe table name '$table'")
+			unless $table =~ $SAFE_QUALIFIED;
 	} else {
 		$table = $self->{'_table_name'} //= do {
 			my $t = $self->{'table'} || ref($self);

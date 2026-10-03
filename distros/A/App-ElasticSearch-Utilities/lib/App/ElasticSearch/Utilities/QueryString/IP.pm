@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::IP;
 use v5.16;
 use warnings;
 
-our $VERSION = '9.0'; # VERSION
+our $VERSION = '9.1'; # VERSION
 
 use Net::CIDR::Lite;
 use namespace::autoclean;
@@ -43,7 +43,7 @@ App::ElasticSearch::Utilities::QueryString::IP - Expand IP CIDR Notation to ES r
 
 =head1 VERSION
 
-version 9.0
+version 9.1
 
 =head1 SYNOPSIS
 

@@ -39,7 +39,7 @@ Readonly::Hash my %SAFE_LIST_OPS => map { $_ => 1 } ('IN', 'NOT IN');
 # A bare undef criterion value (col => undef) also generates IS NULL.
 Readonly::Hash my %SAFE_NOARG_OPS => map { $_ => 1 } ('IS NULL', 'IS NOT NULL');
 
-our $VERSION = '0.008.1';
+our $VERSION = '0.008.2';
 
 # Package-level cache for threads availability.  undef = not yet checked;
 # 1 = available; 0 = not available.  Checked lazily on the first parallel
@@ -74,7 +74,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.008.1
+Version 0.008.2
 
 =head1 SYNOPSIS
 
@@ -583,6 +583,30 @@ to calling C<remove_column> once per name after construction.
                       # Permanent row restrictions on individual databases.
                       # See the filters section for full details.
 
+    base_criteria  => { type => 'hashref',  optional => 1 }
+                      # Column name => value hashref.
+                      # Permanent criteria applied to every query, specified by
+                      # column name rather than database index.  Each key must
+                      # be a column that appears in the merged view (or the
+                      # join_column); each value is a plain scalar or an
+                      # operator hashref in the same format as
+                      # selectall_arrayref accepts.  Criteria are automatically
+                      # routed to the database that owns each column (same
+                      # routing used by selectall_arrayref).
+                      # Equivalent to filters but more convenient when you know
+                      # the column name but not which database index owns it.
+                      # When a column appears in both base_criteria and filters,
+                      # the filters entry takes precedence.
+                      # See the base_criteria section for full details.
+                      #
+                      # DOMAIN -- EP valid:   hashref of column-name => scalar or
+                      #                       operator-hashref pairs.  Unknown column
+                      #                       names emit warn_unknown_column (carp)
+                      #                       and are silently dropped.
+                      # DOMAIN -- EP invalid: non-hashref value => croak from
+                      #                       validate_strict.
+                      # DOMAIN -- BVA:        {} empty hashref is a safe no-op.
+
     collision_prefix => { type => 'hashref', optional => 1 }
                       # Zero-based database index (>0) => prefix string.
                       # When a secondary database has a column that collides
@@ -687,6 +711,11 @@ to calling C<remove_column> once per name after construction.
     bless the object with all fields initialised
     call _build_col_index to map every column to its owning database
         and verify join_column presence in each database
+    if base_criteria given:
+        partition base_criteria by column ownership into per-db slices
+        for each database with a non-empty slice:
+            merge the slice into _filters[i]
+            (explicit filters win on plain-scalar conflicts)
     for each column in remove_columns: call remove_column
     return the new object
 
@@ -718,6 +747,7 @@ sub new {
 			},
 			join_map	      => { type => 'hashref',  optional => 1 },
 			filters		      => { type => 'hashref',  optional => 1 },
+			base_criteria     => { type => 'hashref',  optional => 1 },
 			collision_prefix  => { type => 'hashref',  optional => 1 },
 			remove_columns	  => { type => 'arrayref', optional => 1 },
 			backend	=> {
@@ -793,6 +823,22 @@ sub new {
 
 	$self->_build_col_index();
 	$self->_validate_schema_types();
+
+	# base_criteria: partition by column ownership into _filters.
+	# Security: _copy_criteria() deep-copies before partitioning so
+	# post-construction mutation of the caller's hashref cannot bypass filters.
+	# Explicit filters (db-indexed) take precedence: they are treated as
+	# "extra" in _merge_criteria so their values win on plain-scalar conflicts.
+	if (my $bc = $p->{base_criteria}) {
+		my $partitioned = $self->_partition_criteria(_copy_criteria($bc));
+		for my $i (0 .. $#{ $self->{_dbs} }) {
+			next unless %{ $partitioned->[$i] };
+			$self->{_filters}{$i} = _merge_criteria(
+				$partitioned->[$i],
+				$self->{_filters}{$i} // {},
+			);
+		}
+	}
 
 	# Propagate the logger to every component database if one was supplied.
 	# set_logger() is used here (rather than a direct hash write) to honour each
@@ -940,6 +986,55 @@ When using C<add_database>, pass C<filter> (singular) to set the base
 criteria for the new database:
 
     $join->add_database($orders, filter => { age_days => { '>' => 60 } });
+
+=head2 base_criteria - permanent view-level row filters by column name
+
+C<base_criteria> is a convenience alternative to C<filters> for callers who
+know the column names they want to restrict but prefer not to track database
+indices.
+
+    my $join = Database::Join->new(
+        databases     => [ $customers, $orders ],
+        join_column   => 'entry',
+        base_criteria => { active => 1, deleted_at => undef },
+    );
+
+    # Every query automatically sees only active, non-deleted rows.
+    my $rows = $join->selectall_arrayref();
+
+At construction time C<base_criteria> is partitioned by column ownership
+using the same routing logic as C<selectall_arrayref>.  Each criterion is
+sent to the database that owns that column and stored as a permanent base
+filter (equivalent to the corresponding C<filters> entry).
+
+B<Unknown columns> emit a C<warn_unknown_column> carp and are silently
+dropped, just as they would be in a query call.
+
+B<Key-set semantics> are identical to C<filters>: any database that receives
+a C<base_criteria> slice acts as an inner-join partner regardless of
+C<join_type>.
+
+B<Precedence>: when a column appears in both C<base_criteria> and C<filters>,
+the C<filters> entry wins on plain-scalar conflicts; operator-hashref values
+are combined with AND semantics.
+
+B<Use cases>
+
+=over 4
+
+=item *
+
+Row-level security: C<< base_criteria => { tenant_id => $tid } >>
+
+=item *
+
+Soft-delete filtering: C<< base_criteria => { deleted_at => undef } >>
+
+=item *
+
+Status gates: C<< base_criteria => { active => 1 } >>
+
+=back
 
 =head2 collision_prefix - preserve colliding columns from secondary databases
 
@@ -4033,27 +4128,34 @@ Unicode is used throughout this section as required by Z notation.
 
     ─── Init ──────────────────────────────────────────────────────────
     ΔDatabase_Join
-    dbs?           : seq DATABASE_ABSTRACTION
-    join_col?      : NAME
-    join_type?     : {left, inner, outer}
-    join_map?      : ℕ ⇸ NAME
-    filters?       : ℕ ⇸ CRITERIA
-    removed?       : ℙ NAME
-    backend?       : {array, sqlite, auto}   -- default auto
+    dbs?            : seq DATABASE_ABSTRACTION
+    join_col?       : NAME
+    join_type?      : {left, inner, outer}
+    join_map?       : ℕ ⇸ NAME
+    filters?        : ℕ ⇸ CRITERIA
+    base_criteria?  : CRITERIA              -- optional; column-name keyed
+    removed?        : ℙ NAME
+    backend?        : {array, sqlite, auto}   -- default auto
     max_array_rows? : ℕ                      -- default 10000
-    tmpdir?        : PATH                    -- default File::Spec->tmpdir
+    tmpdir?         : PATH                    -- default File::Spec->tmpdir
     ───────────────────────────────────────────────────────────────────
     #dbs? ≥ 1
-    dbs'           = dbs?
-    join_col'      = join_col?
-    join_type'     = join_type?
-    join_map'      = join_map?
-    filters'       = filters?
-    col_db'        = buildColIndex(dbs?, join_col?, join_map?)
-    removed'       = removed?
-    backend'       = backend?
+    dbs'            = dbs?
+    join_col'       = join_col?
+    join_type'      = join_type?
+    join_map'       = join_map?
+    -- base_criteria is partitioned by column ownership and merged into filters:
+    -- bc_slice(i) = partition(base_criteria?, i)
+    -- filters'(i) = merge_criteria(bc_slice(i), filters?(i))
+    --             when bc_slice(i) ≠ ∅; otherwise filters?(i)
+    -- (filters? wins on plain-scalar conflicts; operator hashrefs are ANDed)
+    filters'        = ∀ i : 0 ‥ #dbs?-1 •
+                          merge_criteria(partition(base_criteria?, i), filters?(i) ∪ ∅)
+    col_db'         = buildColIndex(dbs?, join_col?, join_map?)
+    removed'        = removed?
+    backend'        = backend?
     max_array_rows' = max_array_rows?
-    tmpdir'        = tmpdir?
+    tmpdir'         = tmpdir?
 
     ─── SelectAllArrayref ─────────────────────────────────────────────
     ΞDatabase_Join        -- state unchanged
@@ -4172,6 +4274,29 @@ Unicode is used throughout this section as required by Z notation.
                ∧ base(col) ∈ HASHREF ∧ extra(col) ∈ HASHREF
             then col ↦ base(col) ∪ extra(col)   -- operator union
             else col ↦ (if col ∈ dom extra then extra(col) else base(col)) }
+
+=head2 base_criteria
+
+    ─── BaseCriteria ────────────────────────────────────────────────
+    base_criteria : CRITERIA              -- column-name keyed
+    col_db        : NAME ⇸ ℕ
+    filters       : ℕ ⇸ CRITERIA         -- after Init
+    ─────────────────────────────────────────────────────────────────
+    -- base_criteria is applied once at construction by partitioning
+    -- its columns into per-db slices and merging into filters:
+    ∀ i : 0 ‥ #dbs-1 •
+        bc_slice(i) = partition(base_criteria, i)
+        filters(i)  = merge_criteria(bc_slice(i), filters_explicit(i))
+
+    -- where filters_explicit is the filters parameter as supplied.
+    -- merge_criteria semantics: explicit filters win on plain-scalar
+    -- conflicts; operator hashrefs are combined (AND).
+
+    -- Unknown columns are dropped (warn_unknown_column carp);
+    -- the join_column is broadcast to all databases.
+
+    -- Key-set semantics: any database that receives a non-empty
+    -- bc_slice acts as an inner-join partner (same as filters).
 
 =head2 selectall_arrayref
 

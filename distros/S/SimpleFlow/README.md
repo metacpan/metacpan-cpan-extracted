@@ -25,12 +25,17 @@ With a CPAN client:
 
     cpanm SimpleFlow
 
-Or from a checkout:
+Or from a release tarball, unpacked:
 
     perl Makefile.PL
     make
     make test
     make install
+
+A git checkout has no `Makefile.PL`: it is written by
+[Dist::Zilla](https://metacpan.org/pod/Dist::Zilla), so run `dzil build` there
+first and install from the tarball it makes, or run the tests in place with
+`prove -Ilib t/`.
 
 # Synopsis
 
@@ -62,6 +67,7 @@ it (here from a script called `example.pl`, run in `/home/you/project`):
         dry.run            0,
         duration           0.00192999839782715,
         env                {},
+        env.secret         [],
         executor           "local",
         executor.args      [],
         exit               0,
@@ -132,6 +138,7 @@ flat key/value list or a single hash reference; the only required key is `cmd`.
 | `dir`          | directory        | `undef` | Run the step in this directory; every file it declares is relative to it. See [Environment and directory](#environment-and-directory). |
 | `dry.run`      | bool             | `0`     | Print the command (and log it) but do not execute it. |
 | `env`          | hash ref         | `{}`    | Environment variables for the command only; a value of `undef` removes one. See [Environment and directory](#environment-and-directory). |
+| `env.secret`   | array ref        | `[]`    | Names in `env` whose values are never printed, logged or traced. See [Secrets](#secrets). |
 | `executor`     | `'local'`/`'slurm'` | `'local'` | Where the command runs: here, or as a SLURM job step through `srun`. |
 | `executor.args` | array ref       | `[]`    | More arguments for the executor (`srun`). |
 | `input.dirs`   | scalar or array  | `undef` | Directories that must exist before running, as `input.files` must. |
@@ -197,7 +204,7 @@ execution-only fields simply hold their empty values (`exit` and `signal` are
 | `timed.out`        | `1` if the command was killed for exceeding its `timeout`, else `0`. |
 | `out.of.date`      | `1` if `stale` was set and an input was newer than an output, else `0`. |
 | `stdout`, `stderr` | Captured output, with trailing whitespace stripped; `''` for a stream sent to `stdout.file` or `stderr.file`. When the command could not be launched at all (`exit` is `-1`), `stderr` says why, e.g. `cannot run "x": No such file or directory`. |
-| `conda.env`, `container`, `container.args`, `container.engine`, `die`, `dry.run`, `env`, `executor`, `executor.args`, `lock`, `mem`, `note`, `overwrite`, `protect`, `quiet`, `retries`, `retry.delay`, `stale`, `stale.cmd`, `stderr.file`, `stdin`, `stdout.file`, `threads`, `timeout`, `walltime`, `wrapper` | The (defaulted) argument values used. A string option not given is `''`, a list `[]`, `env` is `{}`, and `threads` is `0`. The hooks are not recorded: they are code. |
+| `conda.env`, `container`, `container.args`, `container.engine`, `die`, `dry.run`, `env`, `env.secret`, `executor`, `executor.args`, `lock`, `mem`, `note`, `overwrite`, `protect`, `quiet`, `retries`, `retry.delay`, `stale`, `stale.cmd`, `stderr.file`, `stdin`, `stdout.file`, `threads`, `timeout`, `walltime`, `wrapper` | The (defaulted) argument values used. A string option not given is `''`, a list `[]`, `env` is `{}`, and `threads` is `0`. The values `env.secret` names are `(secret)` in `env`. The hooks are not recorded: they are code. |
 | `output.files`     | Array ref of the output files (a scalar argument, or an `output.file`, is normalised to a one-element array). |
 | `output.dirs`      | Array ref of the output directories, normalised as `output.files` is. |
 | `input.dirs`       | Array ref of the input directories, normalised the same way; `[]` if none. |
@@ -284,13 +291,23 @@ given the terminal's foreground for the duration, as a shell gives it to a job,
 so that it can read from the terminal; your script takes it back afterwards.
 A Ctrl-Z then suspends the command and your script together, as a shell
 suspends a job, with the timeout's clock stopped, and `fg` carries on with
-both.
+both. The same holds without a `timeout`.
 
-Without a `timeout`, the command shares your script's process group, so a
-Ctrl-C reaches it directly, as under `system`. A `TERM` or `HUP` sent to your
-script alone, by a batch scheduler or `kill`, is passed on to the command,
-which is waited for; then the record is written and the signal passed on to
-your script, as with a timeout.
+Without a `timeout` the command has a process group of its own as well, so
+that a signal reaches the whole of it, not just the shell at its head. A
+`TERM` or `HUP` sent to your script, by a batch scheduler or `kill`, is passed
+on to the command's group, which is waited for; then the record is written and
+the signal passed on to your script, as with a timeout. A Ctrl-C (`INT`) or
+`QUIT` is passed on to the group in the same way, but, as under `system`, not
+to your script afterwards: the step fails, killed by the signal, and `die`
+decides what happens next. A Ctrl-Z stops the command and your script together,
+and `fg` or `bg` carries on with both. A command that opens the terminal
+itself, as `ssh` or `sudo` do to ask for a password, is given its foreground
+while your script has it to give.
+
+If one of your own signal handlers dies while a command runs, the command's
+group is killed and waited for before the exception reaches your code.
+Before 0.192 the command was left running.
 
 An `alarm` your script already had pending is kept: it is put back when the
 command finishes, less the time the command took, and if it fell due while the
@@ -341,6 +358,29 @@ the command itself sees it. Your script is back in its own directory when
 `task` returns, however it returns, dying included. The record's `dir` is the
 absolute path the step ran in.
 
+## Secrets
+
+The record holds the `env` a step was given, and the record is printed, written
+to the log and written to the trace. A credential passed in `env` would be
+written out with it. `env.secret` names the variables whose values must not be:
+
+    my $t = task(
+        cmd          => 'fetch-data --to data.csv',
+        env          => { API_TOKEN => $token },
+        'env.secret' => ['API_TOKEN'],
+    );
+
+The command is given the real value; everywhere else, the record included, it
+is `(secret)`, and so it is in the arguments printed with an error. A secret's
+value is not part of what [`stale.cmd`](#re-running-a-changed-command)
+compares, so a new token does not re-run every step. `env.secret` in
+[`%SimpleFlow::DEFAULTS`](#defaults-for-a-whole-pipeline) is combined with a
+step's own, as `env` is.
+
+Nothing else is hidden: the command line, `note` and every other `env` value
+are written out in full. Pass a credential through `env`, never on the command
+line.
+
 ## Output to files
 
 A command that prints a great deal is better written to a file than held in
@@ -353,7 +393,10 @@ memory and printed in the record:
     );
 
 The files are emptied when the step starts and receive the output of every
-attempt, in order; the record's `stdout` and `stderr` are then `''`. Naming the
+attempt, in order; the record's `stdout` and `stderr` are then `''`. That holds
+even when the file is also a declared output, or is inside one: a failed
+attempt that is to be retried leaves such an output where it is, and only a
+step that has failed for good moves it aside. Naming the
 same file for both puts the two streams in it interleaved, as a terminal would
 show them. A step that is skipped, or dry-run, leaves the files alone, so they
 still hold the output of the run that made the step's outputs. This is
@@ -408,8 +451,9 @@ Nextflow's `trace.txt`:
     local %SimpleFlow::DEFAULTS = ('trace.fh' => $trace);
 
 Each line holds every field of the record except `stdout` and `stderr`, which
-can be any size, plus `time`, when the line was written. Open the file without
-an encoding layer: the lines are UTF-8 already.
+can be any size, plus `time`, when the line was written: the command line and
+`env` included, so see [Secrets](#secrets). Open the file without an encoding
+layer: the lines are UTF-8 already.
 
 ## Locking
 
@@ -432,6 +476,19 @@ on would let two runs through. A step with no declared outputs has nothing to
 lock, and a dry run takes no lock. The locks are `flock` locks, which some
 network filesystems do not honour.
 
+An output is locked under its real directory and its own name, so `out` and
+`sub/../out`, or a name reached through a linked directory, are one output
+here; an output that is itself a symbolic link is locked under what it points
+at as well. A step also takes a shared lock on every directory above each of
+its outputs, so that a step whose output is a directory, and one whose output
+is a file inside it, do not run at once. Two hard links to one file are still
+two outputs.
+
+`.simpleflow/`, and `.simpleflow/cmd/` under it, must be directories, not
+symbolic links: `task` refuses a link there, and opens nothing inside them
+through one. These guard against a link planted by someone else; they do not
+make a working directory others can write to safe to run a pipeline in.
+
 ## Re-running a changed command
 
 By default a step whose outputs exist is skipped even if its command has been
@@ -444,13 +501,19 @@ edited since they were made. `stale.cmd => 1` re-runs it, as Snakemake's
         'stale.cmd'   => 1,
     );
 
-Changing the command, its `env`, or what it runs inside (its container,
-conda environment, executor or wrapper) makes `cmd.changed` `1` and the step
-run again. What made each set of outputs is kept, as a digest, in
+Changing the command, its `env`, its `threads`, or what it runs inside (its
+container, conda environment, executor or wrapper) makes `cmd.changed` `1` and
+the step run again. What made each set of outputs is kept, as a digest, in
 `.simpleflow/cmd/` in the working directory, and written only after a
 successful run. Outputs that exist with nothing on record, made before
 `stale.cmd` was used, or by hand, are not re-run: the command is recorded
 against them, so that the next change is seen.
+
+A step run *without* `stale.cmd` over outputs that have a command on record
+still replaces them, so after it succeeds its own command is recorded in place
+of the old one, and a later `stale.cmd` run of the old command runs again
+rather than taking the other's outputs as its own. With nothing on record, a
+step without `stale.cmd` records nothing.
 
 ## Hooks
 
@@ -572,7 +635,10 @@ that really does read the data your script was given — ask for it:
 the command consumes input your own script can then no longer read, and a
 command that prompts will hang exactly as it used to. The caller's standard
 input is saved and restored around every run either way, including when the
-command dies, and a caller that had closed it keeps it closed.
+command dies, and a caller that had closed it keeps it closed. A `STDIN` that
+is not descriptor 0, such as one opened on an in-memory scalar, is not the
+command's standard input in any case: it is left alone, and descriptor 0 is
+pointed at the null device and put back instead.
 
 ## Dry runs
 
@@ -605,7 +671,12 @@ traceback or `make` says what went wrong.
 
 Whichever of those happened, every declared output that *does* exist is moved to
 `<file>.failed` (replacing any `.failed` left from before), and the new names are
-listed in the record's `failed.outputs` and on `STDERR`. A command that fails
+listed in the record's `failed.outputs` and on `STDERR`. A name declared twice
+is moved once; a file inside a declared directory moves with the directory,
+under its own name; and when one output is named like another's `.failed`, as
+`out` and `out.failed` are, the longer name is moved first, so that neither is
+lost. When the message quotes standard error from a `stderr.file` that was one
+of the outputs, it is read before the file is moved. A command that fails
 part-way often leaves a truncated file behind; left under its own name, it would
 pass the [skip test](#skipping-completed-work) on the next run and become the
 result for good. Snakemake deletes a failed job's outputs for the same reason;
@@ -631,7 +702,7 @@ With `die => 0`, `task` instead warns and returns its result hash with
     );
 
 A task that sets a key itself keeps its own value. `env` is the one exception:
-a task's own `env` is merged with the default one, its own entries winning.
+a task's own `env` is merged with the default one, its own entries winning, and its own `env.secret` is added to the default one.
 Keys that name a particular step (`cmd`, the `input.*` and `output.*` lists,
 `stdout.file` and `stderr.file`) are refused in `%DEFAULTS`, since every step
 would then run the same command or claim the same files, and so is any key
@@ -665,7 +736,9 @@ Each entry of `tasks` is the arguments of one `task`, which runs in full, in a
 child process of its own: its checks, its log, its record, its options, and
 `%SimpleFlow::DEFAULTS`. Each record's `source.file` and `source.line` are the
 `parallel` call's. Output from several steps at once interleaves, a record at
-a time, on the terminal and in a shared log.
+a time, on the terminal, in a shared log and in a shared [trace](#tracing):
+each step writes its record holding a lock, so that no two records are mixed
+within a line.
 
 When a step fails, and `task` would die, no further step is started; those
 already running are left to finish, and then `parallel` dies with every
@@ -697,7 +770,9 @@ your script it was called, alongside a timeline of when each ran. It is one
 self-contained file, with no scripts and nothing fetched, which follows the
 reader's light or dark setting, so that it can be mailed or archived as it
 is. `report` returns the number of tasks it read, and dies naming the line of
-the trace it could not read.
+the trace it could not read: one that is not strict JSON in UTF-8, nests more
+than 512 deep, or has a time that is not a number of seconds or a command that
+is not a string. A `title` may be a character string or UTF-8 bytes.
 
 # Dependencies
 
@@ -726,3 +801,7 @@ distribution, in the format CPAN itself reads.
 # COPYRIGHT AND LICENSE
 
 This software is free.  It is licensed under the same terms as Perl itself
+
+# Thanks
+
+A lot of this work used Claude AI, which was paid for by the University of Idaho's IMCI

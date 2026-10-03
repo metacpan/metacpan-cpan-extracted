@@ -17,16 +17,18 @@ use Path::Tiny qw( path );
 ok(path('SECURITY.md')->is_file(), 'Policy file SECURITY.md exists');
 
 # Read file and remove whitespace from the end.
-my $policy = path('SECURITY.md')->slurp_utf8 =~ s/[[:space:]]+$//r;
+my $policy = path('SECURITY.md')->slurp_utf8 =~ s/[[:space:]]+$//rmsx;
 
+my (@policy_lines, @wanted_lines);
+foreach (split qr{\R}msx, $policy) { push @policy_lines, $_; }
 do {
     local $INPUT_RECORD_SEPARATOR = undef;
     my $wanted = <DATA>;
     # Remove whitespace from the end.
-    $wanted =~ s/[[:space:]]+$//;
-
-    is($policy, $wanted, 'Policy file SECURITY.md is current');
+    $wanted =~ s/[[:space:]]+$//msx;
+    foreach (split qr{\R}msx, $wanted) { push @wanted_lines, $_; }
 };
+    is(\@policy_lines, \@wanted_lines, 'Policy file SECURITY.md is current');
 
 done_testing;
 

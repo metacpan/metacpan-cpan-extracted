@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::Underscored;
 use v5.16;
 use warnings;
 
-our $VERSION = '9.0'; # VERSION
+our $VERSION = '9.1'; # VERSION
 
 use CLI::Helpers qw(:output);
 use namespace::autoclean;
@@ -49,7 +49,7 @@ App::ElasticSearch::Utilities::QueryString::Underscored - Extend some _<type>_ q
 
 =head1 VERSION
 
-version 9.0
+version 9.1
 
 =head1 SYNOPSIS
 

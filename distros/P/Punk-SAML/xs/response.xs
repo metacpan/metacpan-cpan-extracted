@@ -79,6 +79,29 @@ verify(class, bytes, ...)
     OUTPUT:
         RETVAL
 
+# _replayed($c, $seen, $identity, $skew): true if this assertion has been
+# presented before.
+#
+# The route's half of the replay check, and NOT part of verify: verify
+# takes its own `seen` coderef and has no application to find a cache in,
+# while this has a context and reaches the `cache` store through it.
+#
+# Croaks when it cannot tell. The ACS calls it under G_EVAL and turns
+# that into a `config` refusal, because a store that cannot be reached
+# must not produce the same login as an assertion that is fresh.
+IV
+_replayed(class, c, seen, identity, skew)
+        SV *class
+        SV *c
+        SV *seen
+        SV *identity
+        IV skew
+    CODE:
+        PERL_UNUSED_VAR(class);
+        RETVAL = psaml_replayed(aTHX_ c, seen, identity, skew);
+    OUTPUT:
+        RETVAL
+
 MODULE = Punk::SAML  PACKAGE = Punk::SAML
 
 # Sign raw bytes, for the suite's fixture builder. The same gap phase 5

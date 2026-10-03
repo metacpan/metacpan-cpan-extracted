@@ -1,5 +1,6 @@
 Changes
 MANIFEST
+MANIFEST.SKIP
 Makefile.PL
 PSAML.xs
 README
@@ -73,6 +74,7 @@ t/14-rotation.t
 t/15-cli.t
 t/16-lifetime.t
 t/17-immortal.t
+t/18-replay.t
 t/lib/FakeIdP.pm
 t/manifest.t
 t/pod-coverage.t

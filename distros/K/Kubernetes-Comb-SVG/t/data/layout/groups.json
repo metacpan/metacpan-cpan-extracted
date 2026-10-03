@@ -1,0 +1,57 @@
+{
+   "items" : [
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "z"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "labels" : {
+               "tier" : "beta"
+            },
+            "name" : "b1"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "a2"
+            ]
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "labels" : {
+               "tier" : "alpha"
+            },
+            "name" : "a2"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "a1"
+            ]
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "labels" : {
+               "tier" : "alpha"
+            },
+            "name" : "a1"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "labels" : {
+               "tier" : "beta"
+            },
+            "name" : "b0"
+         }
+      }
+   ],
+   "kind" : "List"
+}

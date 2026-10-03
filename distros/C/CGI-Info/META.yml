@@ -11,6 +11,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
   FindBin: '0'
+  IO::Interactive: '0'
   IPC::Run3: '0'
   IPC::System::Simple: '0'
   JSON::PP: '4.02'
@@ -37,7 +38,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -58,7 +59,7 @@ requires:
   Net::CIDR: '0'
   Object::Configure: '0.19'
   Params::Get: '0.13'
-  Params::Validate::Strict: '0.35'
+  Params::Validate::Strict: '0.4'
   Readonly: '0'
   Return::Set: '0'
   Scalar::Util: '0'
@@ -75,5 +76,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info
   homepage: https://metacpan.org/pod/CGI::Info
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '1.14'
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

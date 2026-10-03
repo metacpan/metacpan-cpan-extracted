@@ -487,7 +487,7 @@ subtest 'run: existing files' => sub {
 	($status) = export($db, output_dir => $out, overwrite => 1);
 	is($status, $CONFIG{exit_ok}, 'overwrite replaces');
 
-	# A folder where the file should go cannot be replaced by rename
+	# A directory where the file should go cannot be replaced by rename
 	mkdir "$out/Blocked.csv" or die $!;
 	open my $fh, '>', "$out/Blocked.csv/keep" or die $!;
 	close $fh;
@@ -555,7 +555,7 @@ subtest 'run: dry run and row counts' => sub {
 	my ($status, $stdout) = export($db, output_dir => $out, dry_run => 1, show_counts => 1);
 	verbose_diag('dry run', $stdout);
 	is($status, $CONFIG{exit_ok}, 'dry run: 0');
-	ok(!-e $out, 'nothing created, not even the folder');
+	ok(!-e $out, 'nothing created, not even the directory');
 	like($stdout, qr/^DRY RUN\n=======$/m, 'title');
 	like($stdout, qr/^TABLE\s+ROWS\s+OUTPUT FILE$/m, 'ROWS column');
 	like($stdout, qr/^Orders\s+$CONFIG{row_count}\s+Orders\.csv$/m, 'row');
@@ -615,7 +615,7 @@ subtest 'run: fatal errors croak before writing anything' => sub {
 		ticked('run: Interrupted by signal');
 	}
 
-	throws_ok { $e->run($dir) } qr/\ADatabase \Q$dir\E is not a regular file at /, 'folder';
+	throws_ok { $e->run($dir) } qr/\ADatabase \Q$dir\E is not a regular file at /, 'directory';
 	ticked('run: Database is not a regular file');
 
 	SKIP: {
@@ -656,11 +656,11 @@ subtest 'run: mdbtools problems are fatal' => sub {
 	ok(!-e $out, 'nothing created');
 };
 
-subtest 'run: output folder cannot be created' => sub {
+subtest 'run: output directory cannot be created' => sub {
 	my ($dir, $db) = workspace();
 	my $guard = mdbtools_scenario(tables => ['A']);
 
-	# A regular file in the way: the reason must be about the folder we
+	# A regular file in the way: the reason must be about the directory we
 	# asked for, not about its parent
 	my $out = File::Spec->catdir($db, 'sub');
 	throws_ok { $CONFIG{exporter}->new(output_dir => $out, progress => 0)->run($db) }
@@ -712,7 +712,7 @@ subtest 'app: exit 0 for success, --help and --man' => sub {
 	ticked('app: returns 0');
 	ok(-e "$out/Orders.csv", 'file written');
 	ok(-e $log, 'log file created');
-	is($made[0]{logger}, $log, 'log goes to --log file');
+	is(join(':', (stat $made[0]{logger}{fd})[0, 1]), join(':', (stat $log)[0, 1]), 'log goes to --log file');
 
 	($status, $stdout) = cli('--help');
 	is($status, $CONFIG{exit_ok}, '--help: 0');
@@ -806,12 +806,12 @@ subtest 'app: exit 3 for fatal errors, as one clean line' => sub {
 	ticked('app: Standard input is empty');
 
 	SKIP: {
-		# A folder as standard input opens but cannot be read on Unix.
-		# Windows refuses to open a folder as a file at all, and offers no
+		# A directory as standard input opens but cannot be read on Unix.
+		# Windows refuses to open a directory as a file at all, and offers no
 		# other simple way to make reading standard input fail.
 		skip('cannot make reading standard input fail on Windows', 2) if $^O eq 'MSWin32';
 		($status, undef, $stderr) = $with_stdin->($dir, '--no-log', '-');
-		is($status, $CONFIG{exit_fatal}, 'unreadable standard input (a folder)');
+		is($status, $CONFIG{exit_fatal}, 'unreadable standard input (a directory)');
 		is($stderr, "access2csv: Cannot read standard input: $OS{eisdir}\n", 'exact message');
 	}
 	ticked('app: Cannot read standard input');

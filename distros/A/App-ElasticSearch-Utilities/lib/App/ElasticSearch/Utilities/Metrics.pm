@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Metrics;
 use v5.16;
 use warnings;
 
-our $VERSION = '9.0'; # VERSION
+our $VERSION = '9.1'; # VERSION
 
 use App::ElasticSearch::Utilities qw(es_connect);
 use CLI::Helpers qw(:output);
@@ -334,7 +334,7 @@ App::ElasticSearch::Utilities::Metrics - Fetches performance metrics about the n
 
 =head1 VERSION
 
-version 9.0
+version 9.1
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,360 @@
+#!/usr/bin/env perl
+# PODNAME: comb-svg
+# ABSTRACT: Render Kubernetes::Comb custom resources from JSON as an SVG honeycomb
+
+use strict;
+use warnings;
+use Getopt::Long qw( GetOptionsFromArray );
+use JSON::MaybeXS;
+use Path::Tiny;
+use Scalar::Util qw( blessed );
+use Kubernetes::Comb::SVG;
+
+our $VERSION = '0.001';
+
+my $ME = 'comb-svg';
+
+sub svg_class { 'Kubernetes::Comb::SVG' }
+
+sub usage {
+  return join( "\n",
+    'Usage: '.$ME.' [options] [FILE|-]',
+    '',
+    'Reads Comb custom resources as JSON (a List, an array or one resource)',
+    'from FILE or standard input and writes the SVG to standard output.',
+    '',
+    '  --title TEXT        heading and <title> of the picture',
+    '  --group-label KEY   label key whose value names the group of a Comb',
+    '  --layout NAME       depth (rows by dependency, the default) or packed',
+    '  --columns N         cells per row before a row wraps',
+    '  --rows N            packed: number of rows, without --columns',
+    '  --aspect W:H        packed: target shape, without --columns and --rows',
+    '  --size N            radius of a hexagon in SVG units',
+    '  --no-edges          leave out the dependency edges (--edges draws them)',
+    '  --no-legend         leave out the legend',
+    '  --color KEY=COLOUR  colour of a phase or of bg, fg, muted, border, edge;',
+    '                      KEY=LIGHT,DARK for the two modes; repeatable',
+    '  --blink PHASES      phases whose cells pulse, comma-separated',
+    '  --blink-seconds N   period of the pulse in seconds',
+    '  --help              this text',
+    '  --version           the version',
+    ''
+  );
+}
+
+# One line on stderr, nothing on stdout, exit 1 — for usage and data alike.
+sub fail {
+  my ( $message ) = @_;
+  $message =~ s/\s+\z//;
+  $message =~ s/\s*\n\s*/ /g;
+  print STDERR $ME.': '.$message."\n";
+  exit 1;
+}
+
+# What an exception says, without where it was thrown.
+sub reason {
+  my ( $error ) = @_;
+  $error = ''.$error;
+  $error =~ s/\A(.*) at \S.*? line \d+\.?\s*\z/$1/s;
+  return $error;
+}
+
+sub options {
+  my ( $argv ) = @_;
+  my %opt = ( legend => 1 );
+  my @complaints;
+  Getopt::Long::Configure(qw( no_ignore_case no_auto_abbrev ));
+  my $ok = do {
+    local $SIG{__WARN__} = sub { push @complaints, @_ };
+    GetOptionsFromArray( $argv, \%opt,
+      'title=s', 'group-label=s', 'layout=s', 'columns=s', 'rows=s', 'aspect=s', 'size=s',
+      'edges!', 'legend!', 'color=s@', 'blink=s@', 'blink-seconds=s', 'help', 'version'
+    );
+  };
+  fail( ( @complaints ? $complaints[0] : 'bad options' ).' (try --help)' ) unless $ok;
+  return \%opt if $opt{help} || $opt{version};
+
+  fail( '--columns needs a positive integer, got "'.$opt{columns}.'"' )
+    if defined $opt{columns} && $opt{columns} !~ /\A[1-9][0-9]{0,8}\z/;
+  fail( '--layout needs depth or packed, got "'.$opt{layout}.'"' )
+    if defined $opt{layout} && $opt{layout} !~ /\A(?:depth|packed)\z/;
+  fail( '--rows needs a positive integer, got "'.$opt{rows}.'"' )
+    if defined $opt{rows} && $opt{rows} !~ /\A[1-9][0-9]{0,8}\z/;
+  if ( defined $opt{aspect} ) {
+    my $number = qr/[0-9]{1,9}(?:\.[0-9]{1,9})?|\.[0-9]{1,9}/;
+    my ( $width, $height ) = $opt{aspect} =~ m{\A($number)(?:[:/]($number))?\z};
+    $height = 1 unless defined $height;
+    fail( '--aspect needs a positive number or W:H, got "'.$opt{aspect}.'"' )
+      unless defined $width && $width > 0 && $height > 0;
+    $opt{aspect} = $width / $height;
+  }
+  fail( '--size needs a positive number, got "'.$opt{size}.'"' )
+    if defined $opt{size}
+    && !( $opt{size} =~ /\A(?:[0-9]{1,9}(?:\.[0-9]{1,9})?|\.[0-9]{1,9})\z/ && $opt{size} > 0 );
+  fail( '--blink-seconds needs a positive number, got "'.$opt{'blink-seconds'}.'"' )
+    if defined $opt{'blink-seconds'}
+    && !( $opt{'blink-seconds'} =~ /\A(?:[0-9]{1,9}(?:\.[0-9]{1,9})?|\.[0-9]{1,9})\z/
+      && $opt{'blink-seconds'} > 0 );
+  $opt{blink} = [ grep { length } map { split /,/ } @{ $opt{blink} } ] if $opt{blink};
+  $opt{theme} = theme( $opt{color} ) if $opt{color};
+  fail( 'more than one input file (try --help)' ) if @$argv > 1;
+  return \%opt;
+}
+
+# The --color values as a theme: KEY=COLOUR, or KEY=LIGHT,DARK with the comma
+# outside parentheses, so rgb(1,2,3) stays one colour. Whether a key or a
+# colour is one the picture knows is left to the module, which ignores what
+# it does not accept; the last --color of a key wins.
+sub theme {
+  my ( $colors ) = @_;
+  my %theme;
+  for my $color (@$colors) {
+    my ( $key, $value ) = $color =~ /\A([^=]+)=(.+)\z/s;
+    my @modes = defined $value ? split( /,(?![^(]*\))/, $value, -1 ) : ();
+    fail( '--color needs KEY=COLOUR or KEY=LIGHT,DARK, got "'.$color.'"' )
+      unless @modes == 1 || @modes == 2;
+    $theme{$key} = @modes == 1 ? $modes[0] : { light => $modes[0], dark => $modes[1] };
+  }
+  return \%theme;
+}
+
+sub read_input {
+  my ( $file ) = @_;
+  if ( !defined $file || $file eq '-' ) {
+    binmode STDIN;
+    local $/;
+    my $bytes = <STDIN>;
+    return ( defined $bytes ? $bytes : '', 'standard input' );
+  }
+  my $bytes = eval { path($file)->slurp_raw };
+  if ( my $error = $@ ) {
+    fail( 'cannot read '.$file.': '
+      .( blessed $error && $error->isa('Path::Tiny::Error') ? $error->{err} : reason($error) ) );
+  }
+  return ( $bytes, $file );
+}
+
+sub main {
+  my @argv = @_;
+  utf8::decode($_) for @argv;
+  my $opt = options( \@argv );
+
+  if ( $opt->{help} ) {
+    print usage();
+    return 0;
+  }
+  if ( $opt->{version} ) {
+    print $ME.' '.$VERSION."\n";
+    return 0;
+  }
+
+  my ( $bytes, $source ) = read_input( $argv[0] );
+  my $combs = eval { JSON::MaybeXS->new( utf8 => 1, allow_nonref => 1 )->decode($bytes) };
+  fail( 'invalid JSON in '.$source.': '.reason($@) ) if $@;
+  fail( $source.' is neither a List, an array of Combs nor a Comb' )
+    unless ref $combs eq 'HASH' || ref $combs eq 'ARRAY';
+
+  my $svg = eval {
+    svg_class()->new(
+      combs => $combs,
+      legend => $opt->{legend},
+      defined $opt->{edges}         ? ( edges       => $opt->{edges} )         : (),
+      defined $opt->{title}         ? ( title       => $opt->{title} )         : (),
+      defined $opt->{'group-label'} ? ( group_label => $opt->{'group-label'} ) : (),
+      defined $opt->{layout}        ? ( layout      => $opt->{layout} )        : (),
+      defined $opt->{columns}       ? ( columns     => $opt->{columns} + 0 )   : (),
+      defined $opt->{rows}          ? ( rows        => $opt->{rows} + 0 )      : (),
+      defined $opt->{aspect}        ? ( aspect      => $opt->{aspect} )        : (),
+      defined $opt->{size}          ? ( size        => $opt->{size} + 0 )      : (),
+      defined $opt->{theme}         ? ( theme       => $opt->{theme} )         : (),
+      defined $opt->{blink}         ? ( blink       => $opt->{blink} )         : (),
+      defined $opt->{'blink-seconds'} ? ( blink_seconds => $opt->{'blink-seconds'} + 0 ) : ()
+    )->render;
+  };
+  if ( my $error = $@ ) {
+    $error = reason($error);
+    $error =~ s/\A[\w:]+->\w+: //;
+    fail($error);
+  }
+
+  print $svg;
+  return 0;
+}
+
+exit main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+comb-svg - Render Kubernetes::Comb custom resources from JSON as an SVG honeycomb
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  kubectl get combs -A -o json | comb-svg --group-label app.kubernetes.io/part-of > combs.svg
+  comb-svg combs.json --title "Lab" --columns 4 --no-legend > combs.svg
+  comb-svg combs.json --layout packed --aspect 16:9 --blink Error,Blocked --color Error=#ff0033 > monitor.svg
+  comb-svg combs.json --layout packed --rows 3 --color 'bg=#ffffff,#000000' > wall.svg
+  comb-svg --help
+
+=head1 DESCRIPTION
+
+Reads L<Kubernetes::Comb> custom resources as JSON and writes one
+self-contained SVG honeycomb to standard output, drawn by
+L<Kubernetes::Comb::SVG>, which describes the picture. The command never
+talks to a cluster: it draws what it is given, so the JSON comes from
+C<kubectl>, a file or any other tool. The SVG is pure ASCII and the same
+input gives the same bytes.
+
+The input is the file named as the one argument, or standard input when there
+is no argument or it is C<->. It is JSON, read as UTF-8, in one of three
+shapes: a C<List> (a hash with C<items>, as C<kubectl get combs -o json>
+prints it), an array of custom resources, or one custom resource. More than
+one file is an error. Only the options below exist; the C<link> option of the
+module is not available on the command line. Options are case-sensitive and
+must be spelled out in full.
+
+An unknown phase, a missing C<status>, a dependency on a name that is not in
+the input, a dependency cycle: all give a picture. An empty array gives a
+valid picture without cells.
+
+=head2 Exit status
+
+C<0> after the SVG was written, and for C<--help> and C<--version>. C<1> on
+any error, with one line C<comb-svg: message> on standard error and nothing on
+standard output: an unknown option or a bad option value, more than one input
+file, a file that cannot be read, invalid JSON, JSON that is neither an object
+nor an array, and an element without C<metadata.name>.
+
+=head1 OPTIONS
+
+=head2 --title TEXT
+
+Heading and C<< <title> >> of the picture. Default C<Combs>.
+
+=head2 --group-label KEY
+
+Label key (for example C<app.kubernetes.io/part-of>) whose value names the
+group of a Comb. Groups are drawn under their own headings in name order,
+Combs without the label last. Without the option there are no groups.
+
+=head2 --layout NAME
+
+C<depth> (the default) places a Comb below the Combs it depends on. C<packed>
+is the status monitor: the Combs sorted by C<namespace/name> fill one compact
+honeycomb, whatever they depend on, and the edges are left out unless
+C<--edges> is given. Its grid comes from C<--columns>, else C<--rows>, else
+C<--aspect>.
+
+=head2 --columns N
+
+Cells per row before a row wraps, a positive integer. Default C<6>; in the
+C<packed> layout there is no default and the option fixes the grid.
+
+=head2 --rows N
+
+C<packed> only, without C<--columns>: the number of rows, a positive integer.
+The columns follow from the number of Combs.
+
+=head2 --aspect W:H
+
+C<packed> only, without C<--columns> and C<--rows>: width to height of the
+area to fill, as C<16:9>, C<16/9> or one number such as C<1.78>. The grid
+that comes closest to that shape is used. Default C<16:9>.
+
+=head2 --size N
+
+Radius of a hexagon in SVG units, a positive decimal number (no exponent); the
+rest of the picture scales with it. Default C<56>.
+
+=head2 --no-edges
+
+Leave out the dependency edges. They are drawn by default, except in the
+C<packed> layout, where C<--edges> draws them. Placement does not change.
+
+=head2 --edges
+
+Draw the dependency edges. Only needed with C<--layout packed>, where they are
+left out by default.
+
+=head2 --no-legend
+
+Leave out the legend of the phases. It is drawn by default.
+
+=head2 --color KEY=COLOUR
+
+The colour of a phase (C<Running>, C<Pending>, C<Blocked>, C<NeedsConfig>,
+C<Disabled>, C<Error>, C<Stopped>, C<NotDeployed> or C<Unknown>) or of a surface of the
+picture (C<bg>, C<fg>, C<muted>, C<border>, C<edge>), the C<theme> of the
+module. C<KEY=LIGHT,DARK> gives one colour for light and one for dark mode; a
+comma inside parentheses, as in C<rgb(1,2,3)>, does not separate. Repeatable,
+the last one for a key wins. A key or a colour the module does not accept is
+ignored and the built-in colour stays; a value that is not C<KEY=...> with one
+or two colours is an error.
+
+  comb-svg combs.json --color Error=#ff0033 --color 'bg=#ffffff,rgb(0,0,0)'
+
+=head2 --blink PHASES
+
+The phases whose cells pulse, separated by commas (C<Error,Blocked>);
+repeatable. Phase names are the eight phases and C<Unknown>, case-sensitive; a name that is no phase is
+ignored. Where the viewer asks for reduced motion the cells do not move and
+have a thicker outline instead. Without the option nothing is animated.
+
+=head2 --blink-seconds N
+
+Period of the pulse in seconds, a positive decimal number (no exponent).
+Default C<1.2>.
+
+=head2 --help
+
+Print the usage and exit with status C<0>. The text is written by hand into
+the script and does not come from this documentation.
+
+=head2 --version
+
+Print C<comb-svg VERSION> and exit with status C<0>.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Kubernetes::Comb::SVG>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-kubernetes-comb-svg/issues>.
+
+=head2 IRC
+
+Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <getty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

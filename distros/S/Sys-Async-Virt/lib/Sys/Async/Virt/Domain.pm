@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v12.7.0
+#                   and LibVirt version v12.8.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -18,14 +18,14 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt::Domain v0.6.7;
+class Sys::Async::Virt::Domain v0.6.8;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::TypedParams v12.7.0;
-use Protocol::Sys::Virt::URI v12.7.0;
-use Protocol::Sys::Virt::Remote::XDR v12.7.0;
+use Protocol::Sys::Virt::TypedParams v12.8.0;
+use Protocol::Sys::Virt::URI v12.8.0;
+use Protocol::Sys::Virt::Remote::XDR v12.8.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -2396,7 +2396,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.6.7
+v0.6.8
 
 =head1 SYNOPSIS
 

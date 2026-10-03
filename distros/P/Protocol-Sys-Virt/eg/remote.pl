@@ -35,17 +35,12 @@ sub handle_reply {
 
     say 'header: ' . $json->encode( $args{header} );
     say $json->encode( $args{error} ) if $args{error};
-#    say Dumper( $args{data} );
     if ($proc == $prot->PROC_CONNECT_OPEN) {
-#        $remote->call( $prot->PROC_CONNECT_LIST_ALL_DOMAINS,
-#                       { need_results => 99, flags => 0 } );
         $remote->call( $prot->PROC_CONNECT_LIST_ALL_STORAGE_POOLS,
                        { need_results => 99, flags => 0 } );
         return;
     }
     if ($proc == $prot->PROC_CONNECT_LIST_ALL_DOMAINS) {
-#        $remote->call( $prot->PROC_DOMAIN_CREATE,
-#                       { dom => $args{data}->{domains}->[1] } );
         return;
     }
     if ($proc == $prot->PROC_CONNECT_LIST_ALL_STORAGE_POOLS) {

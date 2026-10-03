@@ -1,11 +1,27 @@
 # Net::QUIC examples
 
-These examples show how Net::QUIC fits into common Perl event systems.
+These examples show how to connect Net::QUIC to common Perl event loops.
 
-The event-loop modules used here are optional example dependencies. Net::QUIC
-does not require Linux::Event, AnyEvent, IO::Async, Mojolicious, or EV.
+You do not need to understand ngtcp2 to follow them.
 
-Install only the event system you want to try. For example:
+Every example does the same basic job:
+
+1. create a UDP socket
+2. create a `Net::QUIC::Driver`
+3. connect UDP reads, writes, and one timer to Driver
+4. wait for the QUIC handshake
+5. open a Stream
+6. send a message
+7. read the echoed reply
+8. close the Connection
+
+Only the event-loop glue changes.
+
+## Optional dependencies
+
+Net::QUIC itself does not require these event-loop modules.
+
+Install only the one you want to try:
 
 ```text
 cpanm Linux::Event
@@ -16,56 +32,60 @@ cpanm Mojolicious
 cpanm EV
 ```
 
-The important part is that every event loop implements the same small
-Net::QUIC::Driver contract:
+## The Driver contract
+
+All examples implement the same small contract.
+
+The event loop reports events to Driver:
 
 ```text
-event loop -> Driver
-
-UDP ready       -> start
-UDP packet      -> receive
-timer expired   -> timeout
-UDP writable    -> writable
-
-Driver -> event loop
-
-UDP datagram    -> send callback
-next deadline   -> set_timeout callback
+UDP transport ready   -> start
+UDP packet arrived    -> receive
+timer fired           -> timeout
+UDP writable again    -> writable
 ```
 
-The QUIC application code is otherwise the same.
+Driver asks the event loop to do two things:
 
-## Files
+```text
+send one UDP packet   -> send callback
+replace the timer     -> set_timeout callback
+```
+
+That is the part worth comparing between examples.
+
+The application-side Connection and Stream code is almost the same in every
+case.
+
+## Example files
 
 ```text
 linux-event-client.pl
-    Linux::Event client integration.
+    Linux::Event client.
 
 anyevent-client.pl
-    AnyEvent client integration.
+    AnyEvent client.
 
 io-async-client.pl
-    IO::Async client integration using callback APIs.
+    IO::Async client using callbacks.
 
 io-async-async-await-client.pl
-    IO::Async transport integration with a Future::AsyncAwait application.
+    IO::Async transport with a Future::AsyncAwait application.
 
 mojo-ioloop-client.pl
-    Mojolicious / Mojo::IOLoop client integration.
+    Mojo::IOLoop client.
 
 ev-client.pl
-    Direct EV client integration.
+    Direct EV client.
 
 io-select-echo-server.pl
-    Small echo server using core IO::Select. This is mainly a convenient
-    local test target for the client examples.
+    Small echo server using core IO::Select.
 ```
 
-The examples intentionally do not hide the Driver calls inside another
-Net::QUIC wrapper. The point is to show exactly how little event-loop glue is
-required.
+The examples intentionally show the Driver calls instead of hiding them behind
+another wrapper.
 
-## Running the local echo server
+## Start the local echo server
 
 From a Net::QUIC source checkout:
 
@@ -78,24 +98,26 @@ perl examples/io-select-echo-server.pl \
     t/data/server-key.pem
 ```
 
-The test certificate is for `localhost`.
+The included test certificate is for `localhost`.
 
-This simple server example intentionally requires a concrete bind address such
-as `127.0.0.1`. It does not implement destination-address ancillary data for
-a wildcard bind.
+The example server deliberately binds to one concrete address,
+`127.0.0.1`.
 
-A production server may bind to `0.0.0.0` or `::`, but the UDP integration
-must then recover the concrete destination address of each received packet and
-pass that address as the Driver's `local` value. It must also preserve
-`$datagram->local` as the source address for outbound packets.
+That keeps the example small.
 
-On Linux, this is typically implemented with packet-info ancillary data and
-`recvmsg` / `sendmsg`. The exact socket API is deliberately outside
-Net::QUIC because the event loop owns UDP I/O.
+A production server can bind to `0.0.0.0` or `::`, but then the UDP adapter
+must discover the actual local destination address of every packet and pass it
+to Net::QUIC.
 
-## Running a client
+On Linux this is commonly done with packet information and
+`recvmsg` / `sendmsg`.
 
-Each client accepts the same arguments:
+If that sounds unfamiliar, ignore it for the first example and use the concrete
+`127.0.0.1` address shown above.
+
+## Run a client
+
+Every client accepts:
 
 ```text
 HOST PORT ALPN SERVER_NAME CA_FILE MESSAGE
@@ -113,7 +135,7 @@ perl examples/anyevent-client.pl \
     "hello from AnyEvent"
 ```
 
-Equivalent commands can be used with:
+Use the same arguments with:
 
 ```text
 linux-event-client.pl
@@ -124,95 +146,133 @@ ev-client.pl
 ```
 
 If `CA_FILE` is `-`, the client uses OpenSSL's normal system trust
-locations instead of adding a private CA file.
+locations instead of adding the supplied test CA file.
 
-## What the client examples do
+## What the clients do
 
-Each client:
+Each client follows the same sequence.
 
-1. creates one connected UDP socket
-2. gives its packed local and peer addresses to Net::QUIC::Driver
-3. connects the event loop's readable, writable, and timer events to Driver
-4. waits for the QUIC/TLS handshake
-5. opens one bidirectional QUIC stream
-6. sends the supplied message and FIN
-7. prints the echoed bytes
-8. performs a normal QUIC connection close
+First it creates a connected UDP socket and asks the kernel for the actual local
+address.
 
-The UDP output adapters preserve whole-datagram backpressure semantics. If the
-kernel cannot immediately accept a UDP packet, the adapter retains that packet,
-reports backpressure to Driver, and later calls `writable` after the queue
-drains.
+Then it creates Driver:
+
+```perl
+my $driver = Net::QUIC::Driver->client(
+    local       => $local,
+    peer        => $peer,
+    alpn        => $alpn,
+    server_name => $server_name,
+    send        => sub { ... },
+    set_timeout => sub { ... },
+);
+```
+
+When UDP is ready:
+
+```perl
+$driver->start;
+```
+
+When a packet arrives:
+
+```perl
+$driver->receive($bytes, $local, $peer);
+```
+
+When Driver's requested timer fires:
+
+```perl
+$driver->timeout;
+```
+
+If UDP output temporarily becomes blocked and later becomes writable:
+
+```perl
+$driver->writable;
+```
+
+Application code waits for:
+
+```perl
+$connection->ready
+```
+
+and then uses ordinary Stream methods.
+
+## UDP backpressure
+
+Sometimes the operating system cannot immediately accept another UDP packet.
+
+The examples keep the unsent packet queued and tell Driver to stop producing
+more output for the moment.
+
+When the socket becomes writable again, they call:
+
+```perl
+$driver->writable;
+```
+
+This is what the Driver documentation calls backpressure.
+
+## ECN
+
+The small examples use ordinary `recv` and `send`.
+
+They intentionally do not demonstrate ECN ancillary-data handling.
+
+That is still a valid Net::QUIC integration.
+
+An ECN-aware production adapter can use the event loop or platform equivalent
+of `recvmsg` / `sendmsg` to:
+
+- read the two ECN bits from the received IP packet and pass them as the
+  optional fourth argument to `$driver->receive(...)`
+- apply `$datagram->ecn` to the outgoing IP header
+
+If the adapter does not provide ECN metadata, QUIC simply stops using ECN on
+that path.
 
 ## Linux::Event
 
 The Linux::Event example is shorter because
-`Linux::Event::IO::Sock::Dgram` already provides packet queues,
-backpressure, `on_drain`, packed addresses, and timer integration.
+`Linux::Event::IO::Sock::Dgram` already provides useful UDP queueing,
+backpressure, packed addresses, and timer integration.
 
 ## AnyEvent
 
-The AnyEvent example uses an I/O watcher for UDP reads, a second watcher only
-while UDP output is backpressured, and one replaceable timer watcher for QUIC.
+The AnyEvent example uses:
 
-Replacing the QUIC timer is simply a matter of dropping the previous timer
-watcher and creating the new one requested by Driver.
+- one watcher for UDP reads
+- a write watcher only while output is blocked
+- one replaceable timer watcher
 
 ## IO::Async
 
-There are two IO::Async examples because they show two useful application
-styles over the same Net::QUIC Driver contract.
+There are two IO::Async examples.
 
-`io-async-client.pl` keeps both the transport integration and application
-logic callback-driven. It does not require Future::AsyncAwait.
+`io-async-client.pl` uses callbacks for both the transport and application
+logic.
 
-`io-async-async-await-client.pl` keeps the same callback-driven UDP and timer
-adapter, but turns QUIC state changes into IO::Async Futures. The application
-side can then use Future::AsyncAwait:
+`io-async-async-await-client.pl` uses the same callback-driven UDP adapter but
+uses Future::AsyncAwait for the application flow.
 
-```perl
-async sub run_client {
-    await wait_for_handshake();
-
-    my $stream = await open_bidi_stream();
-
-    $stream->send($message);
-    $stream->finish;
-
-    my $reply = await read_until_fin($stream);
-
-    $connection->close;
-    await wait_for_connection_close();
-
-    return $reply;
-}
-```
-
-This does not make Net::QUIC itself depend on Futures or async/await. It is
-only an application-layer style built on top of the same Driver events.
-
-Both examples map UDP readiness through `watch_io` and the QUIC deadline
-through `watch_time` / `unwatch_time`.
+That means async/await is optional application style, not a Net::QUIC
+requirement.
 
 ## Mojo::IOLoop
 
-The Mojolicious example uses `Mojo::IOLoop` and its reactor directly. The
-reactor watches the UDP handle for reads, enables write readiness only during
-backpressure, and `Mojo::IOLoop->timer` supplies the one-shot QUIC timer.
+The Mojo example uses `Mojo::IOLoop` and its reactor directly.
 
 No Mojolicious web application or HTTP layer is involved.
 
 ## EV
 
-The EV example maps the Driver contract directly onto `EV::io` and
-`EV::timer` watchers.
+The EV example maps Driver directly to `EV::io` and `EV::timer` watchers.
 
-Like the other raw-socket examples, it keeps one unsent UDP datagram queued
-when the kernel would block and calls `writable` after write readiness returns.
+## Server-side application code
 
-## Server examples in applications
-
-A real server normally uses the same event-loop UDP integration but constructs:
+A real server uses the same UDP/timer idea but constructs:
 
 ```perl
 Net::QUIC::Driver->server(...)
@@ -220,8 +280,7 @@ Net::QUIC::Driver->server(...)
 
 instead of `client`.
 
-The UDP receive and timer wiring does not change. New QUIC connections are
-pulled with:
+New QUIC Connections are pulled with:
 
 ```perl
 while (my $connection = $driver->next_connection) {
@@ -229,5 +288,17 @@ while (my $connection = $driver->next_connection) {
 }
 ```
 
-The `io-select-echo-server.pl` example shows that server-side Connection and
-Stream handling in full.
+The IO::Select echo server shows complete server-side Connection and Stream
+handling.
+
+## What to read next
+
+For ordinary applications:
+
+1. read the top-level `README.md`
+2. read `Net::QUIC::Driver`
+3. read `Net::QUIC::Connection`
+4. read `Net::QUIC::Stream`
+
+Read `Net::QUIC::Endpoint` only if you deliberately want the lower-level
+manual service-loop API.

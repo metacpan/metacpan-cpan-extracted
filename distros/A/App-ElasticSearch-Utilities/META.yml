@@ -69,10 +69,10 @@ requires:
 resources:
   bugtracker: https://github.com/reyjrar/es-utils/issues
   repository: git://github.com/reyjrar/es-utils.git
-version: '9.0'
+version: '9.1'
 x_Dist_Zilla:
   perl:
-    version: '5.042002'
+    version: '5.042003'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneCruft
@@ -397,7 +397,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^release-(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.55.0
+          git_version: 2.56.0
           repo_root: .
       name: Git::NextVersion
       version: '2.052'
@@ -422,7 +422,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.55.0
+          git_version: 2.56.0
           repo_root: .
       name: Git::Check
       version: '2.052'
@@ -430,7 +430,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.55.0
+          git_version: 2.56.0
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -460,7 +460,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.55.0
+          git_version: 2.56.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -473,11 +473,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-9.0
+          tag: release-9.1
           tag_format: release-%v
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.55.0
+          git_version: 2.56.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -505,7 +505,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.55.0
+          git_version: 2.56.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -519,7 +519,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.55.0
+          git_version: 2.56.0
           repo_root: .
       name: Git::Push
       version: '2.052'
@@ -582,6 +582,6 @@ x_contributors:
   - 'Samit Badle <Samit.Badle@gmail.com>'
   - 'Takumi Sakamoto <takumi.saka@gmail.com>'
   - 'Vitaly Shupak <vitaly.shupak@deshaw.com>'
-x_generated_by_perl: v5.42.2
+x_generated_by_perl: v5.42.3
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: BSD-3-Clause

@@ -13,7 +13,7 @@ requires 'List::Util', '1.33';
 requires 'Log::Abstraction', '0.33';
 requires 'Object::Configure';
 requires 'Params::Get', '0.13';
-requires 'Params::Validate::Strict', '0.39';
+requires 'Params::Validate::Strict', '0.40';
 requires 'Readonly', '2.00';
 requires 'Scalar::Util';
 requires 'Sub::Protected';

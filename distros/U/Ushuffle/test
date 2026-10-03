@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+# Demo; run from this directory after building: perl test
+
+use strict;
+use warnings;
+
+use ExtUtils::testlib;
+use Ushuffle qw(shuffle);
+
+my $in = "ACACGUAGAUGGGGA";
+my $k  = 2;
+
+print "In : ", $in, "\n";
+print "Out: ", shuffle($in, $k), "\n";
+
+my $shuffler = Ushuffle::Shuffler->new($in, $k);
+print "Out: ", $shuffler->shuffle, "\n" for 1 .. 4;

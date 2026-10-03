@@ -1,0 +1,10 @@
+{
+  "enabledPlugins": {
+    "briefing@getty": true,
+    "skilletor@getty": true,
+    "loadguard@getty": true,
+    "superpowers@claude-plugins-official": true,
+    "caveman@caveman": true,
+    "ruler@getty": true
+  }
+}

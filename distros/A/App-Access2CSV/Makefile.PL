@@ -104,6 +104,6 @@ WriteMakefile(
 			},
 		},
 	},
-	clean => { FILES => 'App-access2csv-*' },
+	clean => { FILES => 'App-Access2CSV-*' },
 	dist => $dist,
 );

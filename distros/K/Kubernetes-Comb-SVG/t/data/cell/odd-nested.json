@@ -1,0 +1,11 @@
+{
+  "kind": "Comb",
+  "metadata": { "name": "odd", "labels": { "team": { "nested": true } } },
+  "spec": "not-a-hash",
+  "status": {
+    "phase": "Error",
+    "conditions": [ "text", null, { "message": [ "list" ] }, { "message": "boom" }, { "message": "" } ],
+    "endpoints": "none",
+    "upstream": { "context": [ "dev" ], "via": "prod" }
+  }
+}

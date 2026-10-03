@@ -1,0 +1,7 @@
+{
+  "kind": "List",
+  "items": [
+    { "metadata": { "name": "one" }, "status": { "phase": "Running" } },
+    { "metadata": { "name": "two" }, "status": { "phase": "Error" } }
+  ]
+}

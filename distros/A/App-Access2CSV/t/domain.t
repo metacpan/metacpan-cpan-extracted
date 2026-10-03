@@ -45,6 +45,7 @@ Readonly::Hash my %CONFIG => (
 	exit_usage   => 2,
 	exit_fatal   => 3,
 	name_max     => 255,
+	max_name_bytes => 240,
 	csv_suffix   => '.csv',
 	access_max   => 64,
 	big_count    => 2**53,
@@ -215,14 +216,14 @@ subtest 'new output_dir: empty | 1 character | long | non-ASCII | reference' => 
 	lives_ok { $class->new(output_dir => '0') } 'valid: "0", the 1-character minimum';
 	throws_ok { $class->new(output_dir => []) } qr/'output_dir'/, 'invalid: reference';
 
-	# Non-ASCII folder names, given as UTF-8 bytes as they come from @ARGV
+	# Non-ASCII directory names, given as UTF-8 bytes as they come from @ARGV
 	my ($dir, $db) = new_database('T');
 	foreach my $name (qw(german emoji zalgo arabic)) {
-		my $folder = File::Spec->catdir($dir, bytes($TEXT{$name}));
+		my $directory = File::Spec->catdir($dir, bytes($TEXT{$name}));
 		my $status;
-		capture { $status = $class->new(output_dir => $folder, progress => 0)->run($db) };
-		is($status, $CONFIG{exit_ok}, "$name folder: exported");
-		ok(-f "$folder/T.csv", "$name folder: name not corrupted");
+		capture { $status = $class->new(output_dir => $directory, progress => 0)->run($db) };
+		is($status, $CONFIG{exit_ok}, "$name directory: exported");
+		ok(-f "$directory/T.csv", "$name directory: name not corrupted");
 	}
 };
 
@@ -301,7 +302,7 @@ subtest 'new language: code | empty | reference' => sub {
 # App::Access2CSV::Exporter::run
 #######################################################################
 
-subtest 'run database: file | missing | folder | device | empty | undef' => sub {
+subtest 'run database: file | missing | directory | device | empty | undef' => sub {
 	my ($dir, $db) = new_database('T');
 	my $e = $CONFIG{exporter}->new(output_dir => "$dir/out", progress => 0, dry_run => 1);
 
@@ -309,7 +310,7 @@ subtest 'run database: file | missing | folder | device | empty | undef' => sub 
 	capture { $status = $e->run($db) };
 	is($status, $CONFIG{exit_ok}, 'valid: readable regular file');
 	throws_ok { $e->run("$dir/missing") } qr/\ACannot read database \Q$dir\E.missing: \Q$OS{enoent}\E at /, 'missing';
-	throws_ok { $e->run($dir) } qr/\ADatabase \Q$dir\E is not a regular file at /, 'folder';
+	throws_ok { $e->run($dir) } qr/\ADatabase \Q$dir\E is not a regular file at /, 'directory';
 	throws_ok { $e->run('/dev/null') } qr/\ADatabase \/dev\/null is not a regular file at /, 'device';
 	throws_ok { $e->run('') } qr/Parameter 'database' .*must be at least 1/, 'empty (below the 1-character minimum)';
 	throws_ok { $e->run(undef) } qr/Required parameter 'database' is missing/, 'undef';
@@ -325,49 +326,74 @@ subtest 'run database: path component length 255 | 256' => sub {
 	throws_ok { $e->run($over) } qr/: \Q$OS{enametoolong}\E at /, '256: too long';
 };
 
-subtest 'table name length: 1 | 64 | 251 | 252 bytes' => sub {
-	# A file name is the table name plus ".csv", and at most 255 bytes, so
-	# 251 is the longest table name that works
-	my $max = $CONFIG{name_max} - length($CONFIG{csv_suffix});
+subtest 'table name length: 1 | 64 | 65 | 255 characters' => sub {
+	# Access allows 64 characters: names up to that are kept, longer ones
+	# (a damaged or hostile database) are shortened to 64.  0.001.0 did
+	# not shorten, so names over 251 bytes failed with "File name too
+	# long" (see the cpantesters report in t/stdin.t)
+	my $max = $CONFIG{access_max};
 	my %names = (
 		one      => 'a',
-		access   => 'b' x $CONFIG{access_max},
-		at_max   => 'c' x $max,
-		over_max => 'd' x ($max + 1),
+		at_max   => 'b' x $max,
+		over_max => 'c' x ($max + 1),
+		os_max   => 'd' x $CONFIG{name_max},
 	);
 	my ($status, $stderr, $out) = export([values %names]);
 	verbose_diag('files', dir_entries($out));
-	is($status, $CONFIG{exit_failure}, 'only the over-long one fails');
-	ok(-f "$out/$names{$_}.csv", "$_: exported") foreach qw(one access at_max);
-	like($stderr, qr/FAILED: d+: .*\Q$OS{enametoolong}\E/, 'over_max: fails with the OS reason');
-	is(scalar(@{ dir_entries($out) }), 3, 'no temporary file left for the failed one');
+	is($status, $CONFIG{exit_ok}, 'every table exported');
+	ok(-f "$out/$names{$_}$CONFIG{csv_suffix}", "$_: kept as it is") foreach qw(one at_max);
+	ok(-f "$out/" . ('c' x $max) . $CONFIG{csv_suffix}, 'over_max: shortened to 64');
+	ok(-f "$out/" . ('d' x $max) . $CONFIG{csv_suffix}, 'longer than the OS allows: shortened, not failed');
+	is(scalar(@{ dir_entries($out) }), scalar(keys %names), 'one file each, no temporary files');
 };
 
-subtest 'table name length in multibyte characters: 125 | 126 x "u-umlaut"' => sub {
-	# u-umlaut is 1 character but 2 bytes in UTF-8.  The file system sets
-	# the limit, and they differ: Linux counts 255 bytes, macOS (APFS)
-	# counts 255 characters.  So 126 u-umlauts (252 bytes + ".csv") is too
-	# long on Linux but fine on a Mac.  Ask the file system which rule it
-	# uses, then check the exporter follows it: whatever fits is exported
-	# intact, whatever does not fails cleanly.
-	my $u = bytes("\x{fc}");
-	my $fits = int(($CONFIG{name_max} - length($CONFIG{csv_suffix})) / length($u));
-	my $long = $u x ($fits + 1);
+subtest 'table name length: shortened names that collide are numbered' => sub {
+	my $max = $CONFIG{access_max};
+	my ($status, undef, $out) = export([('f' x $max) . 'one', ('f' x $max) . 'two']);
+	is($status, $CONFIG{exit_ok}, 'both exported');
+	is_deeply(dir_entries($out), [('f' x $max) . $CONFIG{csv_suffix}, ('f' x $max) . "_2$CONFIG{csv_suffix}"], 'second one gets _2');
+};
 
-	my $probe_dir = tempdir(CLEANUP => 1);
-	my $counts_bytes = !open(my $probe, '>', "$probe_dir/$long$CONFIG{csv_suffix}");
-	close $probe if $probe;
-	verbose_diag('file system limit counts', $counts_bytes ? 'bytes' : 'characters');
-
-	my ($status, $stderr, $out) = export([$u x $fits, $long]);
-	ok(-f "$out/" . ($u x $fits) . '.csv', "$fits characters (" . ($fits * length($u)) . ' bytes): exported, not corrupted');
-	if($counts_bytes) {
-		is($status, $CONFIG{exit_failure}, 'limit in bytes: one fits, one does not');
-		like($stderr, qr/\Q$OS{enametoolong}\E/, ($fits + 1) . ' characters (' . length($long) . ' bytes): too long, reported');
-	} else {
-		is($status, $CONFIG{exit_ok}, 'limit in characters: both fit');
-		ok(-f "$out/$long$CONFIG{csv_suffix}", ($fits + 1) . ' characters: exported, not corrupted');
+subtest 'table name length in multibyte text: shortened at a whole character' => sub {
+	# At most 64 characters and 240 bytes of UTF-8 (64 emoji would be 256
+	# bytes, over the 255 most file systems allow).  A name is never cut
+	# inside a character, nor between a letter and its accent or inside a
+	# joined emoji, which would leave a broken or different-looking name.
+	my %units = (
+		'u-umlaut: 1 character, 2 bytes'              => "\x{fc}",
+		'emoji: 1 character, 4 bytes'                 => $TEXT{emoji},
+		'joined emoji: 5 characters, 18 bytes'        => $TEXT{family},
+		'e and combining acute: 2 characters, 3 bytes' => "e\x{301}",
+	);
+	foreach my $case (sort keys %units) {
+		my $unit = bytes($units{$case});
+		my $by_chars = int($CONFIG{access_max} / length($units{$case}));
+		my $by_bytes = int($CONFIG{max_name_bytes} / length($unit));
+		my $fits = ($by_chars < $by_bytes) ? $by_chars : $by_bytes;
+		my ($status, $stderr, $out) = export([$unit x ($fits + 1)]);
+		is($status, $CONFIG{exit_ok}, "$case: exported");
+		is_deeply(dir_entries($out), [($unit x $fits) . $CONFIG{csv_suffix}], "$case: $fits whole ones kept");
 	}
+};
+
+subtest 'table name bytes that are not UTF-8 become "_"' => sub {
+	# macOS refuses file names that are not valid UTF-8 ("Illegal byte
+	# sequence"), so 0.001.0 failed these tables there.  Each bad byte is
+	# replaced, on every system, so the name is the same everywhere.
+	my %names = (
+		'Latin-1 e-acute'          => ["Caf\xE9", 'Caf_'],
+		'cut-off UTF-8 character'  => ["Tea\xC3", 'Tea_'],
+		'UTF-16 surrogate'         => ["a\xED\xA0\x80b", 'a_b'],
+		'valid UTF-8 kept'         => [bytes("Cr\x{e8}me"), bytes("Cr\x{e8}me")],
+	);
+	my ($status, $stderr, $out) = export([map { $_->[0] } values %names]);
+	is($status, $CONFIG{exit_ok}, 'every table exported') or diag($stderr);
+	is_deeply(dir_entries($out), [sort map { $_->[1] . $CONFIG{csv_suffix} } values %names], 'bad bytes replaced, valid UTF-8 kept');
+
+	# Then shortened like any other name
+	($status, undef, $out) = export(["\xE9" x $CONFIG{name_max}]);
+	is($status, $CONFIG{exit_ok}, 'long Latin-1 name: exported');
+	is_deeply(dir_entries($out), [('_' x $CONFIG{access_max}) . $CONFIG{csv_suffix}], 'long Latin-1 name: replaced, then shortened to 64');
 };
 
 subtest 'table name characters: German, emoji, Zalgo, RTL text' => sub {
@@ -528,8 +554,8 @@ subtest 'argv --table: 0 | 1 | many | non-ASCII' => sub {
 };
 
 subtest 'argv --log: empty | file | --no-log' => sub {
-	# The default log goes to the current folder, so run in an empty one:
-	# a log someone left in the real current folder must not matter, and
+	# The default log goes to the current directory, so run in an empty one:
+	# a log someone left in the real current directory must not matter, and
 	# a failing test must not leave one there either
 	my ($dir, $db) = new_database('T');
 	my $work = tempdir(CLEANUP => 1);

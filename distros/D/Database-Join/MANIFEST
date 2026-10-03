@@ -13,6 +13,7 @@ t/20-remove-column.t
 t/30-add-database.t
 t/40-filters.t
 t/50-logic-proofs.t
+t/base-criteria.t
 t/cgi_security.t
 t/cities.t
 t/collision-prefix.t
@@ -30,13 +31,14 @@ t/eof.t
 t/eol.t
 t/function.t
 t/integration.t
+t/json.t
 t/lib/Database/cities.pm
 t/lib/Database/djcust.pm
-t/lib/Database/djloyalty.pm
-t/lib/Database/djscore.pm
 t/lib/Database/djjson_a.pm
 t/lib/Database/djjson_b.pm
 t/lib/Database/djjson_c.pm
+t/lib/Database/djloyalty.pm
+t/lib/Database/djscore.pm
 t/lib/Database/djtsv_a.pm
 t/lib/Database/djtsv_b.pm
 t/lib/Database/lp_a.pm
@@ -53,7 +55,6 @@ t/sqlite-backend.t
 t/test1_2.t
 t/transaction.t
 t/transition.t
-t/json.t
 t/tsv.t
 t/unit.t
 t/xlsx.t

@@ -1,0 +1,116 @@
+=head1 NAME
+
+Ushuffle::Shuffler - repeated k-let preserving shuffles of one sequence
+
+=head1 VERSION
+
+This document describes Ushuffle::Shuffler as of Ushuffle version 1.00.
+
+=head1 SYNOPSIS
+
+  use Ushuffle;
+
+  my $shuffler = Ushuffle::Shuffler->new('ACACGUAGAUGGGGA', 2);
+
+  for (1 .. 1000) {
+      my $shuffled = $shuffler->shuffle;
+      ...
+  }
+
+  print $shuffler->sequence, "\n";    # ACACGUAGAUGGGGA
+  print $shuffler->k, "\n";           # 2
+
+=head1 DESCRIPTION
+
+A shuffler holds one sequence and a let size and returns a new shuffle of
+that sequence on every request. See L<Ushuffle> for what a shuffle is.
+
+Shuffling a sequence takes two steps: the sequence is prepared for the let
+size, and a shuffle is drawn from the prepared form. The C<shuffle> function
+of L<Ushuffle> does both on every call. A shuffler prepares its sequence once
+and then only draws, which makes it about twice as fast when many shuffles of
+the same sequence are needed.
+
+The class has no file of its own. It becomes available with C<use Ushuffle>.
+
+=head1 METHODS
+
+=head2 new
+
+  my $shuffler = Ushuffle::Shuffler->new($sequence, $k);
+
+Creates a shuffler for C<$sequence> and the let size C<$k>. The arguments are
+those of the C<shuffle> function of L<Ushuffle>, and the constructor dies in
+the same cases: if the sequence is undefined, contains a NUL byte or a
+character above 255, or if C<$k> is not a positive integer.
+
+The shuffler keeps its own copy of the sequence. Later changes to
+C<$sequence> do not affect it.
+
+Called on an existing shuffler instead of the class, C<new> returns a new,
+independent shuffler of the same class.
+
+=head2 shuffle
+
+  my $shuffled = $shuffler->shuffle;
+
+Returns a new shuffle of the sequence, drawn with equal probability from all
+valid ones. The same shuffle can come up more than once.
+
+=head2 sequence
+
+  my $sequence = $shuffler->sequence;
+
+Returns the sequence the shuffler was created with, as a byte string.
+
+=head2 k
+
+  my $k = $shuffler->k;
+
+Returns the let size the shuffler was created with.
+
+=head1 USING SEVERAL SHUFFLERS
+
+Any number of shufflers can exist at the same time, and they do not disturb
+each other. The underlying library, however, keeps the prepared form of only
+one sequence. A shuffler whose sequence has been displaced, by another
+shuffler or by a call of the C<shuffle> function, prepares it again on its
+next C<shuffle>. Results are the same either way, but the speed advantage is
+lost while shufflers take turns. To get many shuffles of several sequences,
+finish with one sequence before going on to the next:
+
+  for my $sequence (@sequences) {
+      my $shuffler = Ushuffle::Shuffler->new($sequence, 2);
+      push @{ $shuffles{$sequence} }, $shuffler->shuffle for 1 .. 1000;
+  }
+
+=head1 SUBCLASSING
+
+C<new> blesses the object into the class it is called on, so a subclass
+inherits a working constructor. The object is a reference to a scalar that
+holds a pointer, which leaves no room for additional attributes; a subclass
+that needs any has to keep them elsewhere, for example in a hash keyed by the
+object's address.
+
+=head1 THREADS
+
+A shuffler belongs to the thread that created it and is not copied into
+threads started afterwards; such a thread creates its own. See
+L<Ushuffle/THREADS>.
+
+=head1 SEE ALSO
+
+L<Ushuffle>
+
+=head1 AUTHOR
+
+Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2026 Michael T. Wolfinger.
+
+This documentation is part of the Ushuffle distribution and is distributed
+under the same terms. See L<Ushuffle/COPYRIGHT AND LICENSE>.
+
+=cut

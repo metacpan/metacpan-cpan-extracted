@@ -1,5 +1,19 @@
 Revision history for Database::Join
 
+0.008.2	Fri Oct  2 12:43:58 PM EDT 2026
+	[ Enhancements ]
+	- base_criteria constructor parameter: a hashref of column-name => value pairs
+	  that is ANDed into every query automatically.  Criteria are routed to the
+	  database that owns each column using the same partitioning logic as
+	  selectall_arrayref.  Serves the same use cases as Database::Abstraction 0.46's
+	  base_criteria (row-level security, soft-delete filtering, status gates) but
+	  across a multi-database joined view.  Equivalent to filters but specified by
+	  column name instead of database index; explicit filters entries win on
+	  plain-scalar conflicts.  Unknown column names emit warn_unknown_column (carp)
+	  and are silently dropped.  Key-set semantics are identical to filters: any
+	  database that receives a non-empty base_criteria slice acts as an inner-join
+	  partner regardless of join_type.
+
 0.008.1	Tue Sep 29 07:14:50 AM EDT 2026
 	[ Enhancements ]
 	- set_logger() now accepts the named-pair form set_logger(logger => $obj),

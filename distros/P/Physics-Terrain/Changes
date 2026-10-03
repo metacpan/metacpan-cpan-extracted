@@ -1,4 +1,7 @@
 Revision history for Physics::Terrain
 
+0.02	2026-10-02
+        - start_turn returned undef for a wind of -7, PT_ERR_STATE negated
+
 0.01	2026-09-18
         - First version

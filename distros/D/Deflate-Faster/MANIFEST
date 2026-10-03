@@ -1,0 +1,29 @@
+bench/bench_objects.pl
+bench/BenchPayloads.pm
+bench/bench_vs_gzip_faster.pl
+bench/bench_vs_gzip_libdeflate.pl
+Changes
+cpanfile
+deflate-faster-perl.c
+Faster.xs
+lib/Deflate/Faster.pm
+lib/Deflate/Faster.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/01-deflate-faster.t
+t/02-empty-output.t
+t/03-max-size.t
+t/04-png.t
+t/05-dropin-compat.t
+t/06-threads.t
+t/07-review-regressions.t
+typemap
+xt/cpan-changes.t
+xt/manifest.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

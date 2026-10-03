@@ -64,6 +64,9 @@ Readonly::Hash my %CONFIG => (
 	pod_full      => 2,
 	utf8_bom      => "\xEF\xBB\xBF",
 	sentinel      => "sentinel error\n",
+	max_name_chars => 64,
+	max_name_bytes => 240,
+	name_max      => 255,
 );
 
 # The text Perl itself uses for ENOENT, in the current locale
@@ -74,6 +77,13 @@ sub verbose_diag {
 	my ($label, $data) = @_;
 	diag("$label: ", Test::More::explain($data)) if $ENV{TEST_VERBOSE};
 	return;
+}
+
+# UTF-8 bytes of a character string, the form mdbtools gives names in
+sub bytes {
+	my $text = shift;
+	utf8::encode($text);
+	return $text;
 }
 
 # An exporter with progress lines switched off, so output stays clean
@@ -333,7 +343,7 @@ subtest 'Exporter::run calls its steps in order and maps failures to status' => 
 
 	@order = ();
 	is(new_exporter(dry_run => 1)->run($CONFIG{database}), $CONFIG{exit_ok}, 'dry run: 0');
-	ok(!grep({ /^(?:mkdir|export)/ } @order), 'dry run neither creates the folder nor exports');
+	ok(!grep({ /^(?:mkdir|export)/ } @order), 'dry run neither creates the directory nor exports');
 	ok((grep { $_ eq 'dry_run' } @order), 'dry run listing produced');
 };
 
@@ -472,19 +482,19 @@ subtest 'Exporter::_select_tables applies the table filter' => sub {
 	is_deeply(\@warned, [], 'no warning when all are found');
 };
 
-subtest 'Exporter::_make_output_dir creates the folder or croaks' => sub {
+subtest 'Exporter::_make_output_dir creates the directory or croaks' => sub {
 	my $dir = tempdir(CLEANUP => 1);
 
-	# An existing folder must not even reach File::Path
+	# An existing directory must not even reach File::Path
 	my $spy = spy("$CONFIG{exporter}::make_path");
 	my $e = new_exporter(output_dir => $dir);
-	is($e->_make_output_dir(), $e, 'existing folder: returns $self');
+	is($e->_make_output_dir(), $e, 'existing directory: returns $self');
 	is(scalar($spy->()), 0, 'make_path not called');
 	restore_all();
 
 	my $nested = File::Spec->catdir($dir, 'a', 'b');
 	new_exporter(output_dir => $nested)->_make_output_dir();
-	ok(-d $nested, 'nested folders created');
+	ok(-d $nested, 'nested directory created');
 
 	# File::Path reports errors through its error option
 	my $bad = File::Spec->catdir($dir, 'denied');
@@ -496,7 +506,7 @@ subtest 'Exporter::_make_output_dir creates the folder or croaks' => sub {
 	throws_ok { new_exporter(output_dir => $bad)->_make_output_dir() } qr/\ACannot create output directory \Q$bad\E: Permission denied at /, 'exact message';
 };
 
-subtest 'Exporter::_make_output_dir notices a folder that silently did not appear' => sub {
+subtest 'Exporter::_make_output_dir notices a directory that silently did not appear' => sub {
 	my $bad = File::Spec->catdir(tempdir(CLEANUP => 1), 'ghost');
 	my $guard = mock_scoped("$CONFIG{exporter}::make_path" => sub { ${ $_[1]{error} } = []; $! = ENOENT; return });
 	throws_ok { new_exporter(output_dir => $bad)->_make_output_dir() } qr/\ACannot create output directory \Q$bad\E: \Q$ENOENT_TEXT\E at /, 'OS text used';
@@ -816,6 +826,51 @@ subtest 'Exporter::_csv_filename makes safe, unique names' => sub {
 	returns_ok($e->_csv_filename('z'), { type => 'string', matches => qr/\.csv\z/ }, 'a .csv name');
 };
 
+subtest 'Exporter::_csv_filename replaces bad bytes, shortens long names, then trims the end' => sub {
+	my $e = new_exporter();
+	my $max = $CONFIG{max_name_chars};
+	is($e->_csv_filename(('a' x ($max - 1)) . ' bc'), ('a' x ($max - 1)) . '.csv', 'space left at the cut is removed');
+	is($e->_csv_filename(('b' x ($max - 1)) . '.c'), ('b' x ($max - 1)) . '.csv', 'dot left at the cut is removed');
+	is($e->_csv_filename("Caf\xE9 \xC3"), 'Caf_ _.csv', 'bytes that are not UTF-8 replaced');
+	is($e->_csv_filename(('c' x ($max - 1)) . "\xFF\xFF"), ('c' x ($max - 1)) . '_.csv', 'replaced before shortening');
+};
+
+subtest 'Exporter::_shorten_name keeps whole graphemes within both limits' => sub {
+	my $e = new_exporter();
+	my $max = $CONFIG{max_name_chars};
+
+	is($e->_shorten_name('a' x $max), 'a' x $max, 'at the limit: unchanged');
+	is($e->_shorten_name('a' x ($max + 1)), 'a' x $max, 'one over: cut');
+
+	# Characters in, characters out (and bytes in, bytes out)
+	my $chars = "\x{fc}" x $CONFIG{name_max};
+	utf8::upgrade($chars);    # below U+0100, Perl would otherwise keep it as bytes
+	my $short = $e->_shorten_name($chars);
+	ok(utf8::is_utf8($short), 'character string stays a character string');
+	is($short, "\x{fc}" x $max, 'counted in characters, not bytes');
+
+	my $bytes = $chars;
+	utf8::encode($bytes);
+	$short = $e->_shorten_name($bytes);
+	ok(!utf8::is_utf8($short), 'byte string stays a byte string');
+	is($short, bytes("\x{fc}" x $max), 'UTF-8 bytes: 64 whole characters');
+
+	# 64 emoji are 256 bytes: the byte limit applies first
+	my $emoji = "\x{1F600}";
+	is($e->_shorten_name($emoji x $max), $emoji x ($CONFIG{max_name_bytes} / 4), 'byte limit: 60 emoji');
+
+	# A 4-byte character that would cross the byte limit is dropped whole
+	$short = $e->_shorten_name(bytes('xx' . ($emoji x ($max - 2))));
+	is($short, bytes('xx' . ($emoji x 59)), 'not split at the byte limit');
+	ok(utf8::decode(my $copy = $short), 'result is still valid UTF-8');
+
+	# A letter is not separated from its combining accent (2 characters)
+	my $accented = "e\x{301}";
+	is($e->_shorten_name($accented x $max), $accented x ($max / 2), 'graphemes kept whole');
+	is($e->_shorten_name('x' . ($accented x $max)), 'x' . ($accented x ($max / 2 - 1)), 'one that would be cut is dropped');
+
+};
+
 subtest 'Exporter::_dry_run prints the table list' => sub {
 	my $guard = mock_scoped($CONFIG{exporter},
 		_csv_filename => sub { "$_[1].csv" },
@@ -996,7 +1051,13 @@ subtest 'App::_make_logger opens the log only when wanted' => sub {
 	isa_ok($CONFIG{app}->_make_logger({ log => $file }), 'Local::Logger');
 	is($@, $CONFIG{sentinel}, '$@ localised');
 	ok(-e $file, 'file created up front');
-	is_deeply($created[0], { logger => $file, level => 'info' }, 'info level');
+	is_deeply([sort keys %{$created[0]}], [qw(level logger)], 'only logger and level given');
+	is($created[0]{level}, 'info', 'info level');
+	is_deeply([keys %{$created[0]{logger}}], ['fd'], 'logger is a handle, not a file name');
+	my $fd = $created[0]{logger}{fd};
+	ok(defined fileno($fd), 'handle is open');
+	is(join(':', (stat $fd)[0, 1]), join(':', (stat $file)[0, 1]), 'handle is on the log file');
+	ok($fd->autoflush(), 'each line is written at once');
 
 	$CONFIG{app}->_make_logger({ log => $file, verbose => 1 });
 	is($created[1]{level}, 'debug', 'verbose: debug level');

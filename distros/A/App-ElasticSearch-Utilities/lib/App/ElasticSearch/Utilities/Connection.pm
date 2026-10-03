@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Connection;
 use v5.16;
 use warnings;
 
-our $VERSION = '9.0'; # VERSION
+our $VERSION = '9.1'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use App::ElasticSearch::Utilities::VersionHacks qw(_fix_version_request);
@@ -293,7 +293,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 9.0
+version 9.1
 
 =head1 SYNOPSIS
 

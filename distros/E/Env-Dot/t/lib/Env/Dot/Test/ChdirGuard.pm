@@ -10,6 +10,7 @@ use English '-no_match_vars';
 
 our $VERSION = '0.022';
 
+
 =pod
 
 =head1 STATUS
@@ -37,7 +38,7 @@ later subtests always start from a known cwd.
 
 =cut
 
-sub new { my ( $class, $dir ) = @_; return bless { dir => $dir }, $class; }
+sub new { my ($class, $dir) = @_; return bless { dir => $dir }, $class; }
 
 sub DESTROY { my ($self) = @_; chdir $self->{'dir'} or croak "Cannot chdir: $OS_ERROR"; return; }
 

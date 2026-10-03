@@ -335,7 +335,7 @@ subtest 'State: CHECKING -> Trigger: database missing / program missing -> State
 		restore_all();
 	}
 
-	ok(!-e "$dir/out", 'no file or folder written');
+	ok(!-e "$dir/out", 'no file or directory written');
 	($status) = run_exporter($e, $db);
 	is($status, $CONFIG{exit_ok}, 'FATAL -> READY: the object still works');
 };
@@ -358,7 +358,7 @@ subtest 'State: LISTING -> Trigger: mdb-tables fails -> State: FATAL' => sub {
 	my ($status, $error) = run_exporter($CONFIG{exporter}->new(output_dir => "$dir/out", progress => 0), $db);
 	is_deeply(\@TRACE, [$S{checking}, $S{listing}], 'stops in LISTING');
 	like($error, qr/\Amdb-tables failed /, 'action - croak');
-	ok(!-e "$dir/out", 'no folder made');
+	ok(!-e "$dir/out", 'no directory made');
 	restore_all();
 };
 
@@ -419,7 +419,7 @@ subtest 'State: DRY RUN -> Trigger: row count fails -> warning, "?" shown -> ret
 };
 
 subtest 'State: LISTING -> Trigger: no tables selected -> State: SUMMARY (no PREPARING) -> return 0' => sub {
-	# Nothing to export: no output folder is made, and the summary says so
+	# Nothing to export: no output directory is made, and the summary says so
 	my ($dir, $db) = new_database('A');
 	my $logger = Local::Recorder->new();
 	my $e = $CONFIG{exporter}->new(output_dir => "$dir/out", progress => 0, tables => [], logger => $logger);
@@ -427,7 +427,7 @@ subtest 'State: LISTING -> Trigger: no tables selected -> State: SUMMARY (no PRE
 	my ($status) = run_exporter($e, $db);
 	is_deeply(\@TRACE, [$S{checking}, $S{listing}, $S{summary}], 'path: LISTING -> SUMMARY');
 	is($status, $CONFIG{exit_ok}, 'return 0');
-	ok(!-e "$dir/out", 'no output folder made');
+	ok(!-e "$dir/out", 'no output directory made');
 	ok((grep { /\AProcessed 0 tables, 0 failed\z/ } @{ $logger->{info} }), 'action - summary logged');
 	restore_all();
 };
@@ -438,7 +438,7 @@ subtest 'State: LISTING -> Trigger: only unknown names selected -> SUMMARY, with
 	my ($status, undef, undef, $stderr) = run_exporter($CONFIG{exporter}->new(output_dir => "$dir/out", progress => 0, tables => ['Nope']), $db);
 	is_deeply(\@TRACE, [$S{checking}, $S{listing}, $S{summary}], 'path');
 	like($stderr, qr/Table not found in database: Nope/, 'action - warning');
-	ok(!-e "$dir/out", 'no output folder made');
+	ok(!-e "$dir/out", 'no output directory made');
 	restore_all();
 };
 

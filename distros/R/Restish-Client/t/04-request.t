@@ -324,4 +324,22 @@ throws_ok(
     );
 }
 
+# METHOD aliases send the matching HTTP method
+{
+    $mock_ua->map('https://ident.os.example.com/v3/test/alias',
+        sub {
+            my $req = shift;
+            return HTTP::Response->new(200, 'OK',
+                HTTP::Headers->new, '{"method":"' . $req->method . '"}');
+        });
+
+    my $client = Restish::Client->new(
+        uri_host => 'https://ident.os.example.com');
+
+    foreach my $method (qw(GET POST PUT PATCH DELETE LIST)) {
+        my $res = $client->$method(uri => '/v3/test/alias');
+        is( $res->{method}, $method, "$method alias sends $method request" );
+    }
+}
+
 done_testing();

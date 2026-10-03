@@ -119,6 +119,11 @@ use Net::QUIC::Stream;
         $self->{reset} = [$id, $code];
         return;
     }
+    sub _stream_stop_sending {
+        my ($self, $id, $code) = @_;
+        $self->{stop_sending} = [$id, $code];
+        return;
+    }
     sub _notify_output {
         my ($self) = @_;
         $self->{notified}++;
@@ -152,6 +157,10 @@ $stream->reset(9);
 is($stream_connection->{notified}, 4,
     'Stream reset notifies integration output');
 
+$stream->stop_sending(10);
+is($stream_connection->{notified}, 5,
+    'Stream stop_sending notifies integration output');
+
 undef $stream;
 is($stream_connection->{released}, 1,
     'Stream test object releases its retained stream state');
@@ -162,6 +171,14 @@ my $peer  = pack_sockaddr_in(4433, inet_aton('127.0.0.1'));
 my $fake = T::Driver::Endpoint->new;
 my @sent;
 my @scheduled;
+
+my $plain_datagram =
+    Net::QUIC::Datagram->_new('plain', $local, $peer);
+my $ecn_datagram =
+    Net::QUIC::Datagram->_new('marked', $local, $peer, 2);
+
+is($plain_datagram->ecn, 0, 'Datagram defaults to Not-ECT');
+is($ecn_datagram->ecn, 2, 'Datagram exposes supplied ECN codepoint');
 
 push @{$fake->{out}}, Net::QUIC::Datagram->_new('first', $local, $peer);
 push @{$fake->{out}}, Net::QUIC::Datagram->_new('second', $local, $peer);
@@ -214,6 +231,17 @@ is(
     'receive forwards one UDP datagram to the endpoint',
 );
 is($scheduled[-1], 0.5, 'receive replaces the requested QUIC timeout');
+
+$driver->receive('incoming-ecn', $local, $peer, 3);
+
+is(
+    $fake->{received},
+    [
+        ['incoming', $local, $peer],
+        ['incoming-ecn', $local, $peer, 3],
+    ],
+    'receive forwards ECN metadata only when supplied',
+);
 
 $fake->{timeout_after} = undef;
 $driver->timeout;

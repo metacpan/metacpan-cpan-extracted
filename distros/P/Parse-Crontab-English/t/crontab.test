@@ -1,0 +1,54 @@
+*/1	0,4-23	*	*	1-7	cd /home/xyz/def && touch cfdt15.ran && ./create_fd_tickets15.pl run >cfdt15.out 2>cfdt15.err
+*/10	6-23	*	*	1-7	cd /home/xyz/abc && ./auto_create_order10.pl run >aco.out 2>aco.err
+2	10	*	*	*	cd /home/xyz/tuv && ./report_warnings.pl  6-10 run >rw.out 2>rw.err
+2	12	*	*	*	cd /home/xyz/tuv && ./report_warnings.pl 10-12 run >rw.out 2>rw.err
+2	14	*	*	*	cd /home/xyz/tuv && ./report_warnings.pl 12-14 run >rw.out 2>rw.err
+2	16	*	*	*	cd /home/xyz/tuv && ./report_warnings.pl 14-16 run >rw.out 2>rw.err
+2	18	*	*	*	cd /home/xyz/tuv && ./report_warnings.pl 16-18 run >rw.out 2>rw.err
+2	20	*	*	*	cd /home/xyz/tuv && ./report_warnings.pl 18-20 run >rw.out 2>rw.err
+5,35	8-19	*	*	*	cd /home/xyz/abc && ./upd_avail6_v3.pl run >ua63.out 2>ua63.err
+35	8-19	*	*	*	cd /home/xyz/abc && ./jw_upd_avail.pl run >jw_ua.out 2>jw_ua.err
+10,40	8-19	*	*	*	cd /home/xyz/abc && ./upd_category_v3.pl run > ucat3.out 2> ucat3.err
+25,55	6-19	*	*	1-6	cd /home/xyz/abc && ./upd_bcstatus4.pl run >updbcs4.out 2>updbcs4.err
+15	6-19	*	*	1-6	cd /home/xyz/abc && ./upd_prices_v3.pl run >up3.out 2>up3.err
+45	6-19	*	*	1-6	cd /home/xyz/abc && ./upd_variant_prices_v3.pl run >uvp3.out 2>uvp3.err
+22	6-19	*	*	1-6	cd /home/xyz/abc && ./upd_variant_inv_v3.pl run >uvi3.out 2>uvi3.err
+25	6-19	*	*	1-6	cd /home/xyz/abc && ./jw_upd_vpi.pl run >jw_uv.out 2>jw_uv.err
+45	6-23	*	*	1-6	cd /home/xyz/abc && ./upd_vis_v3.pl run >uv3.out 2>uv3.err
+0	21	*	*	*	cd /home/xyz/def && ./upd_status.pl run >us.out 2>us.err
+*/15	6-19	*	*	1-6	cd /home/xyz/def && ./upd_sage_status4.pl run >updss4.out 2>updss4.err
+*/15	6-19	*	*	1-6	cd /home/xyz/def && ./create_po_tickets3.pl run >cpot3.out 2>cpot3.err
+10,40	6-19	*	*	1-6	cd /home/xyz/def && ./upd_po_tickets.pl run >upot.out 2>upot.err
+0	3,13,20	*	*	*	cd /home/xyz/abc && ./upd_cb6_v3.pl run >ucb6.out 2>ucb6.err
+4,14,24,34,44,54	6-19	*	*	1-6	cd /home/xyz/def && ./upd_fd_shipping2.pl run >ufs.out 2>ufs.err && ./upd_fd_invoice.pl run >ufi.out 2>ufi.err
+2	7	*	*	*	cd /home/xyz/qrs && ./load_charges.pl auto run >lc.out 2>lc.err
+30	7	*	*	2-6	cd /home/xyz/ghi && ./sales.pl run >sales.out 2>sales.err
+7	8,12,16	*	*	1-6	cd /home/xyz/tuv && ./upd_items.pl run >upd_items.out 2>upd_items.err
+7	19	*	*	7	cd /home/xyz/tuv && ./upd_items.pl run >upd_items.out 2>upd_items.err
+37	6,8,10,12,14,16,18	*	*	1-6	cd /home/xyz/tuv && ./upd_tracking.pl run >upd_tracking.out 2>upd_tracking.err
+17	19	*	*	7	cd /home/xyz/tuv && ./upd_tracking.pl run >upd_tracking.out 2>upd_tracking.err
+57	6,8,10,12,14,16,18	*	*	1-6	cd /home/xyz/tuv && ./upd_depts.pl run >upd_depts.out 2>upd_depts.err
+17	19	*	*	7	cd /home/xyz/tuv && ./upd_depts.pl run >upd_depts.out 2>upd_depts.err
+17	8-22	*	*	*	cd /home/xyz/abc && ./upd_image2_v3.pl run >ui3.out 2>ui3.err
+55	5	*	*	*	cd /home/xyz/abc && ./upd_days_stock_v3.pl run >uds.out 2>uds.err
+0	21	*	*	*	cd /home/xyz/abc && ./upd_sales_proj2.pl run >usp2.out 2>usp2.err
+47	7	*	*	1-6	cd /home/xyz/ghi && ./customer_orders3.pl run >co3.out 2>co3.err
+1	0	*	*	1	cd /home/xyz/ghi && ./weekly_sales3.pl run >ws3.out 2>ws3.err
+6	0	*	*	0-6	cd /home/xyz/ghi && ./daily_sales3.pl run >ds3.out 2>ds3.err
+36	8,15	*	*	*	crontab -l >/home/xyz/crontab.latest
+45	23	*	*	*	cd /home/xyz && tuv/cleanup_log_files.sh >tuv/clf.out 2>tuv/clf.err
+47	*	*	*	*	cd /home/xyz && tuv/check_error_logs2.pl run >tuv/cel2.out 2>tuv/cel2.err
+0	6	*	*	*	cd /home/xyz/ghi && ./sage_issues.pl run >si.out 2>si.err
+0	13	*	*	7	cd /home/xyz/ghi && ./weekly_cleanup.sh >wc.out 2>wc.err
+*/5	8-23	*	*	*	cd /home/xyz/tuv && ./save_error_logs.pl ~/abc run >>sel.out 2>>sel.err
+15	8-14	*	*	*	cd /home/xyz/tuv && ./save_error_logs.pl ~/ghi run >>sel.out 2>>sel.err
+*/5	8-23	*	*	*	cd /home/xyz/tuv && ./save_error_logs.pl ~/def run >>sel.out 2>>sel.err
+15	7	*	*	*	cd /home/xyz/tuv && ./save_error_logs.pl ~/qrs run >>sel.out 2>>sel.err
+*/5	8-23	*	*	*	cd /home/xyz/tuv && ./save_error_logs.pl ~/tuv run >>sel.out 2>>sel.err
+1	7	*	*	*	cd /home/xyz/tuv && ./cleanup_error_files.pl abc ghi def qrs >>cef.out 2>>cef.err
+2   16  *   *   1,3,5   cd /home/xyz/extra && ./mwf_script.sh >mwf.out 2>mwf.err
+15  9-17 *   *   0-2,4,6 cd /home/xyz/extra && ./several_days.sh >sev.out 2>sev.err
+0   11  1   *   *   cd /home/xyz/extra && ./day_of_month_argument.sh >doma.out 2>doma.err
+0   14  *   1   *   cd /home/xyz/extra && ./month_argument.sh >ma.out 2>ma.err
+0   11  1-5,13,20-22   *   *   cd /home/xyz/extra && ./day_of_month_argument.sh >doms.out 2>doms.err
+0   14  *   1,4,7,10   *   cd /home/xyz/extra && ./every_third_month_argument.sh >etma.out 2>etma.err

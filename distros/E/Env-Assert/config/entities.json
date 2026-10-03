@@ -1,0 +1,79 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "updated": "2026-04-14",
+    "purpose": "Canonical name registry for all project entities. Single source of truth. Check this before writing any entity name in code, config, or docs.",
+    "docs": "protocol/gates-v1.0.md (Gate 2)"
+  },
+
+  "repos": {
+    "env-assert": { "value": "Env-Assert", "description": "Ensure that the environment variables match what you need, or abort. Module and executable." }
+  },
+
+  "related_projects": {
+    "env-dot": { "value": "Env::Dot", "description": "Sister project. Read environment variables from a .env file directly into your program. Also provides envdot script." }
+  },
+
+  "modules": {
+    "env-assert-module": { "value": "Env::Assert", "path": "lib/Env/Assert.pm", "description": "Main module. Asserts environment on import via 'use Env::Assert'." },
+    "env-assert-functions": { "value": "Env::Assert::Functions", "path": "lib/Env/Assert/Functions.pm", "description": "Core functionality. Exports assert, report_errors, file_to_desc and error constants." }
+  },
+
+  "executables": {
+    "envassert": { "value": "envassert", "path": "bin/envassert", "description": "CLI script. Reads .envdesc and checks environment variables." },
+    "envassert-self-contained": { "value": "envassert.self-contained", "path": "envassert.self-contained", "description": "FatPacked standalone executable. No CPAN dependencies needed, only Perl." }
+  },
+
+  "functions": {
+    "assert": { "value": "assert", "module": "Env::Assert::Functions", "description": "Core assertion function. Compares environment hash against description hash." },
+    "report_errors": { "value": "report_errors", "module": "Env::Assert::Functions", "description": "Formats assertion errors for human-readable output." },
+    "file_to_desc": { "value": "file_to_desc", "module": "Env::Assert::Functions", "description": "Parses .envdesc file rows into a description hashref with options and variables." }
+  },
+
+  "cli_options": {
+    "break-at-first-error": { "value": "--break-at-first-error", "short": "-b", "description": "Stop checking at first error. Default: false." },
+    "env-description": { "value": "--env-description", "short": "-e", "description": "Path to environment description file. Default: .envdesc." },
+    "exact": { "value": "--exact", "short": "-x", "description": "Fail if environment contains variables not in description. Overrides .envdesc option." },
+    "stdin": { "value": "--stdin", "short": "-s", "description": "Read environment description from STDIN instead of file." }
+  },
+
+  "dzil": {
+    "mikkoi-bundle": { "value": "@MIKKOI", "description": "Dist::Zilla plugin bundle used in dist.ini." }
+  },
+
+  "urls": {
+    "homepage": { "value": "https://metacpan.org/dist/Env-Assert", "description": "MetaCPAN distribution page." },
+    "bugtracker": { "value": "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Env-Assert", "description": "RT bug tracker.", "mailto": "bug-Env-Assert@rt.cpan.org" },
+    "repository": { "value": "https://github.com/mikkoi/env-assert", "description": "GitHub repository.", "git": "git://github.com/mikkoi/env-assert.git" }
+  },
+
+  "test_helpers": {
+    "test2-platform-guards": {
+      "value": "Test2::Require::Platform / Test2::Deny::Platform",
+      "path": "t/lib/Test2/",
+      "description": "Custom test guard modules. Require or Deny runs on specific platforms (OS, CI).",
+      "modules": [
+        "Test2::Require::Platform::OS::Unix",
+        "Test2::Require::Platform::OS::DOSOrDerivative",
+        "Test2::Require::Platform::CI::GitHubCI",
+        "Test2::Deny::Platform::OS::DOSOrDerivative",
+        "Test2::Deny::Platform::CI::GitHubCI"
+      ]
+    }
+  },
+
+  "tests_bin": {
+    "_description": "Tests for bin/envassert CLI",
+    "envassert-script": { "value": "envassert-script.t", "path": "t/envassert-script.t", "description": "Tests envassert CLI with .envdesc file input." },
+    "envassert-script-stdin": { "value": "envassert-script-stdin.t", "path": "t/envassert-script-stdin.t", "description": "Tests envassert CLI with --stdin input." },
+    "envassert-script-three": { "value": "envassert-script.t", "path": "t/three/envassert-script.t", "description": "Tests envassert CLI with error scenarios (missing var)." }
+  },
+
+  "tests_lib": {
+    "_description": "Tests for lib/ modules",
+    "env-assert-use": { "value": "env-assert.t", "path": "t/env-assert.t", "description": "Tests Env::Assert module import/use behavior." },
+    "env-assert-private": { "value": "env-assert-private.t", "path": "t/env-assert-private.t", "description": "Tests private/internal functions in Env::Assert::Functions." },
+    "env-assert-public-assert": { "value": "env-assert-public-assert.t", "path": "t/env-assert-public-assert.t", "description": "Tests the exported assert() function." },
+    "env-assert-public-report-errors": { "value": "env-assert-public-report_errors.t", "path": "t/env-assert-public-report_errors.t", "description": "Tests the exported report_errors() function." }
+  }
+}

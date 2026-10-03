@@ -1,151 +1,375 @@
-```
-NAME
-    Restish::Client - A RESTish client...in perl!
+# NAME
 
-SYNOPSIS
+Restish::Client - A lightweight client for JSON REST APIs
+
+# VERSION
+
+Version 1.10
+
+# SYNOPSIS
+
+    use Restish::Client;
+
+    my $client = Restish::Client->new(
+        uri_host            => 'https://api.example.com/v1/',
+        head_params_default => { Authorization => "Bearer $token" },
+    );
+
+    # GET /v1/users?status=active
+    my $users = $client->GET(
+        uri          => 'users',
+        query_params => { status => 'active' },
+    );
+
+    # POST a JSON body
+    my $user = $client->POST(
+        uri         => 'users',
+        body_params => { name => 'Alice', email => 'alice@example.com' },
+    );
+
+    # DELETE /v1/users/42, with the id escaped into the path
+    $client->DELETE(
+        uri             => 'users/%(id)s',
+        template_params => { id => $user->{id} },
+    );
+
+    die sprintf "Request failed (%s): %s\n",
+        $client->response_code, $client->response_body
+        unless $client->is_success;
+
+# DESCRIPTION
+
+**Restish::Client** wraps [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) for APIs that speak JSON over HTTP.
+Give it a base URL once, then make requests with relative paths. Request
+bodies are encoded as JSON, JSON responses are decoded into Perl data, and the
+last response is kept so you can inspect its status, headers and body.
+
+- Path templates with automatic escaping: `users/%(id)s`
+- Query strings built from a hashref
+- Default headers sent with every request
+- Optional cookie jar, in memory or saved to disk
+- Form-encoded requests through ["thin\_request"](#thin_request)
+
+# CONSTRUCTOR
+
+## new
+
+    my $client = Restish::Client->new(%options);
+
+- `uri_host` _(required)_
+
+    Base URL for every request. Must start with `http://` or `https://`.
+    It cannot be changed later; create a new client for a different host.
+
+- `head_params_default`
+
+    Hashref of headers to send with every request. See ["head\_params\_default"](#head_params_default).
+
+- `ssl_opts`
+
+    Hashref of SSL options for the user agent. See ["ssl\_opts"](#ssl_opts).
+
+- `cookie_jar`
+
+    `1` to keep cookies in memory, or a file path to save them. See ["cookie\_jar"](#cookie_jar).
+
+- `agent_options`
+
+    Hashref of extra options for ["new" in LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent#new), such as `timeout`. The
+    `agent` string defaults to `Restish::Client/VERSION`. The client sets
+    `default_headers`, `ssl_opts` and `env_proxy` itself, so use its own
+    options for those.
+
+- `require_https`
+
+    If `1`, `new` dies unless `uri_host` is an `https://` URL. Defaults to `0`.
+
+- `debug`
+
+    Print each request and response to STDERR. See ["debug"](#debug).
+
+A client using a Vault token and a client certificate:
+
     my $client = Restish::Client->new(
         uri_host            => 'https://vault.example.com/',
-        head_params_default => { X-Vault-Token => a_token },
-        agent_options       => { timeout => 5 },
+        head_params_default => { 'X-Vault-Token' => $token },
         require_https       => 1,
-        ssl_opts => {
-            -=> 1,
-            SSL_cert_file   => "/etc/ssl/certs/cert.pem",
-            SSL_key_file    => "/etc/ssl/private_keys/key.pem",
+        agent_options       => { timeout => 10 },
+        ssl_opts            => {
+            SSL_cert_file => '/etc/ssl/certs/client.pem',
+            SSL_key_file  => '/etc/ssl/private/client.key',
         },
-        cooke_jar           => 1,
     );
 
-    $client->head_params_default({ 'X-Vault-Token' => $auth_token });
-    $client->ssl_opts({ SSL_use_cert => 1 });
+Proxy settings are always read from the environment (`https_proxy`,
+`no_proxy` and so on).
 
-    $client->cookie_jar(1); # OR
-    $client->cookie_jar(/path/to/cookiejar);
+# MAKING REQUESTS
 
-    $client->request( method      => 'POST',
-                      uri         => 'already/escaped/path',  
-                      query_params  => { param1 => value1, param2 => value2 },
-                      body_params => { body_param1 => bvalue1, body_param2 => bvalue2 },
-                      head_params => { X-Subject-Token => $subject_token } 
+## request
+
+    my $data = $client->request(
+        method          => 'POST',
+        uri             => 'users/%(id)s/keys',
+        template_params => { id => 42 },
+        query_params    => { notify => 1 },
+        body_params     => { key => $public_key },
+        head_params     => { 'X-Request-Id' => $request_id },
     );
 
-    # request method shorthand
-    $client->GET(
-        uri => 'endpoint',
+Send a request and return the response data.
+
+- `method` _(required)_
+
+    `GET`, `POST`, `PUT`, `PATCH`, `DELETE` or `LIST`.
+
+- `uri` _(required)_
+
+    Path relative to `uri_host`. The leading `/` is optional. The path is used
+    as given, so put any values that need escaping in `template_params`.
+
+- `template_params`
+
+    Hashref of values for the `%(name)s` placeholders in `uri`. Each value is
+    URI-escaped before it is inserted.
+
+- `query_params`
+
+    Hashref of query string parameters. Keys and values are escaped.
+
+- `body_params`
+
+    Data to send as a JSON body. Sets `Content-Type: application/json`.
+
+- `raw_body`
+
+    A body to send unchanged, such as file contents. Set `content_type` with it.
+
+- `content_type`
+
+    Value for the `Content-Type` header.
+
+- `head_params`
+
+    Hashref of headers for this request only. They override any header of the
+    same name in ["head\_params\_default"](#head_params_default).
+
+An unknown argument name is fatal, so a typo such as `query_param` fails
+loudly instead of sending an unfiltered request.
+
+**Returns:**
+
+- the decoded data, if the body starts with `{` or `[`
+- the body as a string, if it is anything else
+- `1`, if the body is empty or false
+- `0`, if the status is not 2xx (including connection errors, which
+LWP reports as status 500)
+
+Invalid JSON in a successful response is fatal. Because a successful request
+can return a false value, check ["is\_success"](#is_success) when you need to be certain.
+
+Uploading a file:
+
+    $client->POST(
+        uri          => 'uploads',
+        query_params => { filename => 'report.pdf' },
+        raw_body     => $pdf_data,
+        content_type => 'application/pdf',
     );
 
-DESCRIPTION
-    This module provides a Perl wrapper for the REST-like API's.
+## GET, POST, PUT, PATCH, DELETE, LIST
 
-  METHODS
-    "new"
+    my $user = $client->GET( uri => 'users/42' );
 
-                Construct a new Restish::Client object. The uri_host is used
-                as the base uri for each API call, and serves as a template
-                if string interpolation is used (see below).
+    $client->PUT(
+        uri         => 'users/42',
+        body_params => { name => 'Bob' },
+    );
 
-                Optionally provide any data that can be set via a mutator,
-                such as head_params_default or the ssl_opts.
+Shortcuts for ["request"](#request) with `method` already set. They take the same
+arguments. `LIST` is a non-standard method used by some APIs, such as
+HashiCorp Vault.
 
-                Options can be passed to the user agent (currently LWP) via
-                agent_options.
+## thin\_request
 
-                If require_https is set, new() will die if uri_host is not
-                an https uri.
+    my $res = $client->thin_request($method, $uri, \%query, @lwp_args);
 
-    "head_params_default"
+Send a request through the matching [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) method (`get`, `post`,
+`put`, `patch` or `delete`). Use it for endpoints that take form-encoded
+bodies instead of JSON.
 
-                Supply a hashref specifying default header parameters to be
-                sent with every request using this object.
+- `$method`
 
-    "ssl_opts"
-                Supply a hashref specifying default LWP UserAgent SSL
-                options to be sent with every request using this object.
+    `GET`, `POST`, `PUT`, `PATCH` or `DELETE`. `LIST` is not supported.
 
-    "cookie_jar"
-                Enable LWP UserAgent's cookie_jar. Optionally store the
-                cookie jar to disk.
+- `$uri`
 
-    "request"
-                Send a request based off of the object's base uri_host,
-                returning a Perl data structure of the parsed JSON response
-                in the event of a 2xx series response code. c<method> and
-                c<uri> are required.
+    Path relative to `uri_host`, as for ["request"](#request).
 
-                If the request returns a 4xx or 5xx response status code,
-                the return value will be 0.
+- `\%query`
 
-                The c<response_code>, c<response_header>, and
-                c<response_body> methods can be used to retrieve more
-                information about the previous request.
+    Hashref (or arrayref of pairs) for the query string, or `undef` for none.
+    **This argument is positional**: pass `undef` when you have form data but
+    no query parameters.
 
-                The URI is specified as a string that supports
-                Text::Sprintf::Named compatible string interpretation.
-                Interpolated values will be escaped, but the
-                non-interpolated section will not be escaped. The URI can
-                begin with a slash or the slash can be omitted.
+- `@lwp_args`
 
-                    my $res = $client->request(
-                        method      => 'GET',
-                        uri         => '/%(tenant_id)s/%(other)s',
-                        template_params      => { tenant_id => 'cde381ab', other => 'blah' }
-                        );
+    Passed unchanged to LWP::UserAgent. For `POST`, `PUT` and `PATCH`, an
+    optional hashref of form fields followed by any header pairs. For `GET` and
+    `DELETE`, header pairs only; these cannot send a body.
 
-                Optionally specify parameters. URI parameters will be
-                escaped in the query string. Body parameters will be encoded
-                as JSON. Head parameters will be sent in addition to any
-                default parameters specified using the
-                c<head_params_default> method.
+**Returns** the decoded data if the response has a JSON `Content-Type`,
+otherwise the body as a string. Returns `0` if the request failed or the JSON
+could not be decoded.
 
-                Invalid parameters, such as an invalid uri or not supplying
-                a hashref to query_params, will result in an exception.
+    # POST form fields
+    my $res = $client->thin_request('POST', 'public/auth', undef,
+        { user => $user, pass => $pass });
 
-    "METHOD Aliases"
-                $client->METHOD(params) will ship the METHOD as
-                method=>$method to the request
+    # GET /servers?status=active
+    my $servers = $client->thin_request('GET', 'servers',
+        { status => 'active' });
 
-    "thin_request"
-                Send a request directly to a LWP::UserAgent request method.
-                These arguments of the requst may be in the form of
-                key=>value, or multiples of k1=>v1, k2=>v2. Complex
-                structures are not supported.
+    # GET with an extra header
+    my $res = $client->thin_request('GET', 'servers', undef,
+        'X-Request-Id' => $id);
 
-                Usage:
+    # PUT /servers/web1?notify=1 with form fields
+    $client->thin_request('PUT', 'servers/web1', { notify => 1 },
+        { status => 'down' });
 
-                  # For GET/DELETE supply each k=>v pair as a new array element
-                  $client->thin_request('GET', $URI, key1=> val1, key2 => val2);
+# INSPECTING THE RESPONSE
 
-                  # For POST/PUT if you wrap the k=>v pairs into a structure they will be sent as form data
-                  $client->thin_request('PUT', $URI, {key1 => val1, key2 => val2});
+The client keeps the response from the most recent request. Each method
+below returns `undef` until a request has been made.
 
-                Example:
+## is\_success
 
-                  my $res = $client->thin_request('POST', "public/auth", { user => $user, pass => $pass });
+    if ($client->is_success) { ... }
 
-    "is_success"
-                Shortcut to the whether the last response succeeded
+True if the last response had a 2xx status.
 
-    "response_code"
-                Returns the response code of the last request.
+## response\_code
 
-    "response_header"
-                    my $ctype = $client->response_header('Content-Type');
+    my $status = $client->response_code;    # e.g. 404
 
-                Returns the value of a selected response header of the last
-                request.
+The HTTP status code of the last response.
 
-    "response_body"
-                Returns a string of the response body of the last request.
+## response\_header
 
-    "debug"     Dump information on every request(). Set to undef, {}, or a
-                hashref of configuration flags.
+    my $type = $client->response_header('Content-Type');
 
-                "undef"     The default level: don't dump anything.
+The value of one header from the last response.
 
-                "{}"        Dump the LWP object's default header object,
-                            request object, and response object.
+## response\_body
 
-                "{trim_tokens =" 0}>
-                            Whether to trim tokens.
+    warn "Error: ", $client->response_body unless $client->is_success;
 
-```
+The body of the last response as a decoded string. Useful for error details,
+since a failed ["request"](#request) returns only `0`.
+
+# ATTRIBUTES
+
+Each attribute can be passed to ["new"](#new) or changed later through its
+accessor. A change applies from the next request on.
+
+## head\_params\_default
+
+    $client->head_params_default({ 'X-Vault-Token' => $token });
+
+Hashref of headers sent with every request. Setting it replaces the whole
+set. `Accept: application/json` is also sent, unless this hashref sets
+`Accept` itself.
+
+## ssl\_opts
+
+    $client->ssl_opts({ SSL_ca_file => '/etc/ssl/certs/internal-ca.pem' });
+
+Hashref passed to ["ssl\_opts" in LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent#ssl_opts), such as a CA file or a client
+certificate.
+
+## cookie\_jar
+
+    $client->cookie_jar(1);                        # in memory
+    $client->cookie_jar('/var/tmp/cookies.txt');   # saved to a file
+
+Keep cookies between requests. With a file path, cookies (including session
+cookies) are loaded from and saved to that file. The jar is created on the
+first request, so set this before making any.
+
+## debug
+
+    $client->debug({});                      # print everything
+    $client->debug({ trim_tokens => 1 });    # leave tokens out
+    $client->debug(undef);                   # off (the default)
+
+When set to a hashref, ["request"](#request) prints the agent's default headers, the
+request and the response to STDERR. With `trim_tokens`, the
+`X-Auth-Token`, `X-Subject-Token` and `X-Vault-Token` headers are left out.
+["thin\_request"](#thin_request) prints nothing.
+
+# ERRORS
+
+Invalid arguments are fatal: a missing `uri_host` or `uri`, an unknown
+method or argument name, a non-hashref where a hashref is expected, or a path
+that does not form a valid URL. The client throws these with ["croak" in Carp](https://metacpan.org/pod/Carp#croak).
+
+An HTTP error is _not_ fatal. ["request"](#request) and ["thin\_request"](#thin_request) return `0`,
+and the response methods tell you what went wrong.
+
+# SUBCLASSING
+
+Restish::Client is a [Moo](https://metacpan.org/pod/Moo) class, so subclasses can use `extends` and
+method modifiers.
+
+## error
+
+    sub error {
+        my ($self, $message) = @_;
+        My::Exception->throw($message);
+    }
+
+Called with the message for each error raised while making a request. The
+default croaks. Errors from constructor and attribute validation always croak.
+
+## \_get\_agent
+
+    package My::Client;
+    use Moo;
+    extends 'Restish::Client';
+
+    around _get_agent => sub {
+        my ($orig, $self) = @_;
+        my $ua = $self->$orig;
+        $ua->agent('My::Client/1.0');
+        return $ua;
+    };
+
+Returns the [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) for a request. A new agent is built for each
+request from the client's attributes. Wrap it to add handlers or change
+settings.
+
+# TESTING
+
+Set `$Restish::Client::CANONICAL` to `1` to encode `body_params` with
+sorted keys, so request bodies can be compared as strings in tests.
+
+# SEE ALSO
+
+[LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent), [HTTP::Request::Common](https://metacpan.org/pod/HTTP%3A%3ARequest%3A%3ACommon), [Text::Sprintf::Named](https://metacpan.org/pod/Text%3A%3ASprintf%3A%3ANamed), [Moo](https://metacpan.org/pod/Moo)
+
+# BUGS
+
+Please report bugs at
+[https://github.com/thend20/perl-restish-client/issues](https://github.com/thend20/perl-restish-client/issues).
+
+# AUTHOR
+
+Tim H <thend20@pair.com>
+
+# LICENSE
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License, version 3, as published by
+the Free Software Foundation. See the `LICENSE` file distributed with it, or
+[https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html).

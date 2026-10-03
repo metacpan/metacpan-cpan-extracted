@@ -9,9 +9,9 @@ use open ':std', IO => ':encoding(UTF-8)';
 
 # PODNAME: envassert
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
-use English      qw( -no_match_vars );                   # Avoids regex performance penalty in perl 5.18 and earlier
+use English qw( -no_match_vars ); # Avoids regex performance penalty in perl 5.18 and earlier
 use Getopt::Long qw( :config auto_version auto_help );
 use Carp;
 use Pod::Usage;
@@ -21,10 +21,10 @@ use Env::Assert::Functions qw( :all );
 local $OUTPUT_AUTOFLUSH = 1;
 
 use constant {
-    YEAR_START        => 1900,
-    MONTH_START       => 1,
+    YEAR_START => 1900,
+    MONTH_START => 1,
     ENV_DESC_FILENAME => '.envdesc',
-    INDENT            => q{    },
+    INDENT => q{    },
 };
 
 my $man = 0;
@@ -33,37 +33,35 @@ my $env_desc_filename = ENV_DESC_FILENAME;
 my $exact;
 my $stdin = 0;
 GetOptions(
-    'man'                     => \$man,
+    'man' => \$man,
     'break-at-first-error|b!' => \$break_at_first_error,
-    'env-description|e=s'     =>,
-    \$env_desc_filename,
+    'env-description|e=s' => , \$env_desc_filename,
     'exact|x!' => \$exact,
-    'stdin!'   => \$stdin,
+    'stdin!' => \$stdin,
 ) or pod2usage(2);
-pod2usage( -exitval => 0, -verbose => 2 ) if $man;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
 
 sub main {
 
     my @env_desc_rows;
-    if ($stdin) {
+    if( $stdin ) {
         @env_desc_rows = <>;
-    }
-    else {
+    } else {
         open my $fh, q{<}, $env_desc_filename or croak "Cannot open file '$env_desc_filename'";
         @env_desc_rows = <$fh>;
         close $fh or croak "Cannot close file '$env_desc_filename'";
     }
 
-    my $desc = file_to_desc(@env_desc_rows);
+    my $desc = file_to_desc( @env_desc_rows );
     my %parameters;
     $parameters{'break_at_first_error'} = $break_at_first_error
-      if defined $break_at_first_error;
+        if defined $break_at_first_error;
     $desc->{'options'}->{'exact'} = $exact
-      if defined $exact;
+        if defined $exact;
     my $r = assert( \%ENV, $desc, \%parameters );
-    if ( !$r->{'success'} ) {
+    if( ! $r->{'success'} ) {
         print {*STDOUT} report_errors( $r->{'errors'} )
-          or croak 'Cannot print errors to STDOUT';
+            or croak 'Cannot print errors to STDOUT';
         return 1;
     }
     return 0;
@@ -75,15 +73,11 @@ __END__
 
 =pod
 
-=encoding UTF-8
+=for stopwords env envassert envdesc
 
 =head1 NAME
 
 envassert - Ensure that the environment variables match what you need, or abort.
-
-=head1 VERSION
-
-version 0.015
 
 =head1 SYNOPSIS
 
@@ -97,6 +91,48 @@ Options:
     --env-description, -e
     --exact, -x
     --stdin, -s
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--version>
+
+Prints the version and exits.
+
+=item B<-b>, B<--break-at-first-error>
+
+Break checking at the first error and report back.
+Default: false
+
+=item B<-e>, B<--env-description>
+
+Path to file which has the environment description.
+Default: .envdesc
+
+=item B<-x>, B<--exact>
+
+Fail check if environment contains variables not defined in environment description.
+This option will override the equivalent option in .envdesc file.
+Default: false
+
+=item B<-s>, B<--stdin>
+
+Read environment description from STDIN, not from a file.
+Incompatible with option B<--env-description>.
+Default: false
+
+=back
+
 
 =head1 DESCRIPTION
 
@@ -189,51 +225,6 @@ include F<envassert> in a docker container build.
     curl -LSs -o envassert https://raw.githubusercontent.com/mikkoi/env-assert/main/envassert.self-contained
     chmod +x ./envassert
 
-=for stopwords env envassert envdesc
-
-=head1 NAME
-
-envassert - Ensure that the environment variables match what you need, or abort.
-
-=head1 OPTIONS
-
-=over 8
-
-=item B<--help>
-
-Print a brief help message and exits.
-
-=item B<--man>
-
-Prints the manual page and exits.
-
-=item B<--version>
-
-Prints the version and exits.
-
-=item B<-b>, B<--break-at-first-error>
-
-Break checking at the first error and report back.
-Default: false
-
-=item B<-e>, B<--env-description>
-
-Path to file which has the environment description.
-Default: .envdesc
-
-=item B<-x>, B<--exact>
-
-Fail check if environment contains variables not defined in environment description.
-This option will override the equivalent option in .envdesc file.
-Default: false
-
-=item B<-s>, B<--stdin>
-
-Read environment description from STDIN, not from a file.
-Incompatible with option B<--env-description>.
-Default: false
-
-=back
 
 =head1 EXAMPLES
 
@@ -247,7 +238,7 @@ Default: false
 
     #!/usr/bin/env sh
     # Ensure we have the required environment setup.
-    envassert <<'EOF'
+    envassert --stdin <<'EOF'
     NUMERIC_VAR=^[[:digit:]]+$
     TIME_VAR=^\d{2}:\d{2}:\d{2}$
     EOF
@@ -263,16 +254,5 @@ L<Env::Dot> is a "sister" to Env::Assert.
 Read environment variables from a F<.env> file directly into you program.
 There is also script F<envdot> which can turn F<.env> file's content
 into environment variables for different shells.
-
-=head1 AUTHOR
-
-Mikko Koivunalho <mikkoi@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2023 by Mikko Koivunalho.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

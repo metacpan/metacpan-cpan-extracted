@@ -344,7 +344,7 @@ subtest 'lifecycle: exceptions thrown inside the external call' => sub {
 };
 
 subtest 'lifecycle: rename fails at the very end' => sub {
-	# The data is complete but cannot be moved into place (a folder is in
+	# The data is complete but cannot be moved into place (a directory is in
 	# the way).  The finished temporary file must not be left behind.
 	my ($dir, $db) = new_database(qw(Orders));
 	my $out = "$dir/out";
@@ -357,7 +357,7 @@ subtest 'lifecycle: rename fails at the very end' => sub {
 	my $track = track_temp_files(sub { $e->run($db) });
 	like($track->{stderr}, qr/FAILED: Orders: Cannot write /, 'reported');
 	lifecycle_ok($track, 'failed rename');
-	is_deeply(dir_entries($out), ['Orders.csv'], 'only the folder that was in the way');
+	is_deeply(dir_entries($out), ['Orders.csv'], 'only the directory that was in the way');
 };
 
 subtest 'lifecycle: the log file probe' => sub {

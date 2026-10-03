@@ -340,7 +340,7 @@ subtest '_select_tables: filter given x some names missing' => sub {
 	}
 };
 
-subtest '_make_output_dir: failed = errors reported OR folder still missing' => sub {
+subtest '_make_output_dir: failed = errors reported OR director still missing' => sub {
 	# 2 inputs, 4 rows, forced through a mocked make_path
 	foreach my $row (@{ truth_table(2) }) {
 		my ($errors, $made) = @{$row};
@@ -362,7 +362,7 @@ subtest '_make_output_dir: failed = errors reported OR folder still missing' => 
 	}
 };
 
-subtest '_make_output_dir: reason = error for this folder, else the last error, else $!' => sub {
+subtest '_make_output_dir: reason = error for this director, else the last error, else $!' => sub {
 	my $dir = File::Spec->catdir(tempdir(CLEANUP => 1), 'out');
 	my %cases = (
 		'own=1'              => [[{ '/parent' => 'P' }, { $dir => 'Own' }], 'Own'],
@@ -594,7 +594,7 @@ subtest 'contradiction: a count below zero' => sub {
 };
 
 subtest 'contradiction: a database that is not a regular file' => sub {
-	# Premise: the database is a readable regular file.  A folder
+	# Premise: the database is a readable regular file.  A director
 	# contradicts it; nothing may happen after the check.
 	my $dir = tempdir(CLEANUP => 1);
 	my $which = spy("$CONFIG{exporter}::which");

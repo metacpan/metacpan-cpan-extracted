@@ -59,7 +59,7 @@ es-index-scan.pl - Scan indexes for potential issues
 
 =head1 VERSION
 
-version 9.0
+version 9.1
 
 =head1 AUTHOR
 

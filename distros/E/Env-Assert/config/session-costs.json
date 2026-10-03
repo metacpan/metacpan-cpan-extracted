@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "purpose": "Session cost tracking for L2D&D gate compliance"
+  },
+  "pricing": {
+    "model": "claude-opus-4-6",
+    "input_per_1k_tokens": 0.015,
+    "output_per_1k_tokens": 0.075,
+    "last_verified": "2026-04-14"
+  },
+  "cumulative": {
+    "total_sessions": 1,
+    "total_estimated_cost_usd": 2.80
+  },
+  "active_sessions": {},
+  "completed_sessions": {
+    "session_2026-04-14_1": {
+      "status": "completed",
+      "started": "2026-04-14T11:29:35Z",
+      "ended": "2026-04-14T13:53:52Z",
+      "periods": {
+        "gate0": {
+          "opened": "2026-04-14T11:29:35Z",
+          "closed": "2026-04-14T11:29:35Z",
+          "closed_by": "gate0_complete",
+          "estimated_input_chars": 3200,
+          "estimated_output_chars": 900
+        },
+        "work_1": {
+          "opened": "2026-04-14T11:29:35Z",
+          "closed": "2026-04-14T13:53:52Z",
+          "closed_by": "session_end",
+          "estimated_input_chars": 600000,
+          "estimated_output_chars": 28000,
+          "estimated_cost_usd": 2.80,
+          "note": "Entity discovery, AI Disclosure policy, PR, branch management."
+        }
+      }
+    }
+  }
+}

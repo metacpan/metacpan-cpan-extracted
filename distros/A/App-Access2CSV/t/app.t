@@ -100,6 +100,54 @@ subtest 'successful export with a log' => sub {
 	is($status, 0, '--overwrite: exit 0');
 };
 
+subtest 'regression: --log names that Log::Abstraction refuses by name' => sub {
+	# 0.001.0 gave Log::Abstraction the file name, which it rejects - at
+	# the first message, not when created - if it contains "..", "$", "!",
+	# ";" and similar.  The log was created empty, every message was lost
+	# and only a "Cannot write to the log" warning was printed.
+	my $work = tempdir(CLEANUP => 1);
+	mkdir File::Spec->catdir($work, 'sub') or die "$work/sub: $!";
+	my %names = (
+		'parent directory' => File::Spec->catfile($work, 'sub', File::Spec->updir(), 'up.log'),
+		'dollar'        => File::Spec->catfile($work, 'cost$.log'),
+		'exclamation'   => File::Spec->catfile($work, 'done!.log'),
+		'semicolon'     => File::Spec->catfile($work, 'a;b.log'),
+	);
+	foreach my $case (sort keys %names) {
+		my $file = $names{$case};
+		my $out = File::Spec->catdir($work, "out-$case");
+		my ($status, undef, $stderr) = cli('--no-progress', '--log', $file, '--output-dir', $out, $db);
+		is($status, 0, "$case: exit 0");
+		unlike($stderr, qr/Cannot write to the log/, "$case: no logging failure");
+
+		open my $fh, '<', $file or die "$file: $!";
+		my $text = do { local $/; <$fh> };
+		close $fh;
+		like($text, qr/Exported Customers => /, "$case: export logged");
+		like($text, qr/Processed 2 tables, 0 failed/, "$case: summary logged");
+	}
+};
+
+subtest 'regression: the log is closed when the run ends' => sub {
+	# The log handle is now kept open for the whole run; it must not
+	# outlive it (on Windows, an open file cannot be deleted)
+	my $work = tempdir(CLEANUP => 1);
+	my $file = File::Spec->catfile($work, 'closed.log');
+	my ($status) = cli('--no-progress', '--log', $file, '--output-dir', File::Spec->catdir($work, 'out'), $db);
+	is($status, 0, 'exit 0');
+	ok(unlink($file), 'log can be deleted') or diag("$file: $!");
+
+	SKIP: {
+		my $fds = "/proc/$$/fd";
+		skip("no $fds on this system", 1) unless -d $fds;
+		($status) = cli('--no-progress', '--log', $file, '--output-dir', File::Spec->catdir($work, 'out2'), $db);
+		opendir(my $dh, $fds) or die "$fds: $!";
+		my @open = grep { (readlink("$fds/$_") // '') =~ /closed\.log/ } readdir $dh;
+		closedir $dh;
+		is(scalar(@open), 0, 'no file descriptor left on the log');
+	}
+};
+
 subtest '--no-log writes no log' => sub {
 	my $work = tempdir(CLEANUP => 1);
 	my ($status, $stdout) = cli('--no-log', '--dry-run', '--output-dir', File::Spec->catdir($work, 'out'), $db);

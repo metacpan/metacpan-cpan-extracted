@@ -26,7 +26,7 @@ BEGIN {
 
 # Quoted, not the bare number: a numeric version is stringified through %g,
 # so 0.20 would become "0.2" and compare as older than "0.15" on CPAN.
-our $VERSION = '0.191';
+our $VERSION = '0.192';
 
 use Cwd 'getcwd';
 use Digest::MD5 'md5_hex';
@@ -51,9 +51,9 @@ our @EXPORT_OK = (@EXPORT, 'parallel', 'report');
 
 # Defaults for every task() in the program, for any key the call itself leaves
 # undefined: local %SimpleFlow::DEFAULTS = ('dry.run' => 1) dry-runs a whole
-# pipeline from one line. "env" is merged with a task's own rather than
-# replaced by it. Keys that name one particular step are refused; see
-# @PER_STEP_KEYS in task().
+# pipeline from one line. "env" and "env.secret" are merged with a task's own
+# rather than replaced by it. Keys that name one particular step are refused;
+# see @PER_STEP_KEYS in task().
 our %DEFAULTS;
 
 # [file, line] for task() to report as its caller, instead of its real one;
@@ -196,15 +196,33 @@ sub _clipped {
 # JSON line (if one was given). "quiet" silences only this routine chatter;
 # errors still go to STDERR, since a caller that asked for less noise did not
 # ask to be kept in the dark about a failure.
+#
+# In one of parallel()'s workers the record is written holding an flock on
+# $REPORT_LOCK, so that the records of tasks running at once do not
+# interleave. Until 0.192 nothing kept them apart, and a long trace line,
+# which perl writes in several write()s, could be split by another worker's:
+# the trace was no longer JSON lines, and report() refused it. The lock is
+# on a file each worker opens for itself, since workers that share one open
+# file -- the inherited log or trace handle -- share its flock too.
+our $REPORT_LOCK; # undef = not in a worker; else the lock file's path
 sub _report {
 	my ($r, $log_fh, $quiet, $trace_fh) = @_;
 	my $clipped = _clipped($r);
+	my $lock;
+	if (defined $REPORT_LOCK) {
+		open $lock, '>>', $REPORT_LOCK or die "cannot open \"$REPORT_LOCK\" to write a record: $!";
+		flock $lock, Fcntl::LOCK_EX() or die "cannot lock \"$REPORT_LOCK\" to write a record: $!";
+	}
 	# string_max => 0 turns Data::Printer 1.x's own clipping off: the fields
 	# arrive clipped already, and a second pass would print a second
 	# "skipping" mark. Older releases ignore the property either way.
 	p(%$clipped, output => $log_fh, string_max => 0) if defined $log_fh;
 	p(%$clipped, string_max => 0) unless $quiet;
 	print {$trace_fh} _trace_line($r), "\n" if defined $trace_fh;
+	if (defined $lock) {
+		_flush(\*STDOUT); # the log and trace handles are autoflushed already
+		close $lock; # and with it the lock
+	}
 	return;
 }
 
@@ -263,6 +281,43 @@ sub _json_string {
 	$string =~ s/(["\\])/\\$1/g;
 	$string =~ s/([\x00-\x1f])/sprintf('\\u%04x', ord $1)/ge;
 	return qq{"$string"};
+}
+
+# What "env.secret" puts in place of a value it hides.
+my $SECRET_SHOWN = '(secret)';
+
+# The names "env.secret" holds, sorted and once each, as far as they can be
+# read: this also runs on arguments not yet validated, for an error message.
+sub _secret_names {
+	my $args = shift;
+	my $names = $args->{'env.secret'};
+	return () if ref $names ne 'ARRAY';
+	my %seen;
+	return sort grep { (defined $_) && (ref $_ eq '') && (not $seen{$_}++) } @$names;
+}
+
+# A copy of the arguments, or of %DEFAULTS, that is safe to print: the "env"
+# values that "env.secret" names are hidden. Only "env" is copied deeply.
+sub _shown_args {
+	my $args = shift;
+	my %shown = %$args;
+	my @secret = _secret_names($args);
+	if ((ref $args->{env} eq 'HASH') && (scalar @secret > 0)) {
+		my %env = %{ $args->{env} };
+		foreach my $name (grep { exists $env{$_} } @secret) {
+			$env{$name} = $SECRET_SHOWN if defined $env{$name}; # undef, removing one, gives nothing away
+		}
+		$shown{env} = \%env;
+	}
+	return \%shown;
+}
+
+# Print the arguments to STDERR before an error, as every argument error does,
+# with the secrets hidden.
+sub _dump_args {
+	my $shown = _shown_args(shift);
+	p $shown, output => 'STDERR';
+	return;
 }
 
 # Turn Devel::Confess on -- stack traces, in colour on a terminal -- for the
@@ -350,7 +405,7 @@ sub _normalise_files {
 	# The two forms are mutually exclusive: mixing them is almost always a
 	# mistake (which one holds the truth?), so refuse it outright.
 	if ((defined $args->{$single}) && (defined $args->{$plural})) {
-		p $args, output => 'STDERR';
+		_dump_args($args);
 		die "\"$single\" and \"$plural\" cannot both be given; use one or the other";
 	}
 	my @files;
@@ -362,21 +417,21 @@ sub _normalise_files {
 		} elsif ($ref eq '') { # a scalar
 			@files = ($args->{$plural});
 		} else {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die "ref type \"$ref\" is not allowed for \"$plural\"";
 		}
 	} elsif (defined $args->{$single}) {
 		$given = $single;
 		my $ref = ref $args->{$single};
 		if ($ref ne '') { # a single file only, never a ref
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die "$ref isn't allowed for \"$single\"; it takes a single filename (use \"$plural\" for a list)";
 		}
 		@files = ($args->{$single});
 	}
 	my @bad = grep { (not defined $files[$_]) || (length $files[$_] == 0) } 0 .. $#files;
 	if (scalar @bad > 0) {
-		p $args, output => 'STDERR';
+		_dump_args($args);
 		die 'undefined or 0-length filenames are not allowed (found in "'
 			. $given . '" at ' . ((scalar @bad == 1) ? 'index ' : 'indices ')
 			. join(', ', @bad) . ')';
@@ -392,9 +447,27 @@ sub _normalise_files {
 # reason; moving them keeps the partial contents for debugging. A move that
 # fails is warned about rather than fatal, since the step has failed already
 # and its own message is the one the caller needs.
+#
+# Until 0.192 each name was moved as it came, and three kinds of list lost
+# data. A name given twice had its .failed deleted, as "left from before", by
+# its own second pass. An output named like another's .failed, as in ['out',
+# 'out.failed'], was deleted to make room for the other. And a file inside a
+# directory output was renamed in place, then carried off with the directory,
+# so the name reported for it did not exist. So the list is cut down first,
+# to one entry for each path, and to none for a path inside a directory that
+# is moved itself, which takes it along under its own name; and the longest
+# names are moved first, so that "out.failed" is out of the way before "out"
+# is moved onto it.
 sub _move_aside {
+	my %seen;
+	my @unique = grep { not $seen{_canonical($_)}++ } grep { -e $_ } @_;
+	my @dirs = map { _canonical($_) } grep { (-d $_) && (not -l $_) } @unique;
+	my @movable = grep {
+		my $path = _canonical($_);
+		not grep { _is_within($path, $_) } @dirs;
+	} @unique;
 	my @moved;
-	foreach my $file (grep { -e $_ } @_) {
+	foreach my $file (sort { (length $b <=> length $a) || ($a cmp $b) } @movable) {
 		my $aside = "$file.failed";
 		# a .failed left by an earlier failure is removed first, so this
 		# does not rest on rename() replacing a file on every platform, and
@@ -411,13 +484,42 @@ sub _move_aside {
 			warn "cannot move \"$file\", an output of a failed step, to \"$aside\": $!; the next run will take it as done";
 		}
 	}
-	return @moved;
+	return sort @moved;
+}
+
+# A path made absolute and tidied, so that "out" and "./out" compare equal.
+# Only the text is compared: a symbolic link and its target are two paths.
+sub _canonical {
+	return File::Spec->canonpath(File::Spec->rel2abs(shift));
+}
+
+# True when $path is strictly inside directory $dir; both are _canonical.
+sub _is_within {
+	my ($path, $dir) = @_;
+	my @path = File::Spec->splitdir($path);
+	my @dir  = File::Spec->splitdir($dir);
+	return 0 if scalar @path <= scalar @dir;
+	foreach my $i (0 .. $#dir) {
+		return 0 if $path[$i] ne $dir[$i];
+	}
+	return 1;
 }
 
 # Remove the write permission from each output, and from everything inside a
 # directory output, as Snakemake's protected() does, so that a finished result
 # is not overwritten by accident. Symbolic links are left alone: chmod would
 # follow one to whatever it points at, which is not the step's to protect.
+#
+# On POSIX each path is opened with O_NOFOLLOW and changed through the handle,
+# so that the thing tested is the thing changed. Until 0.192 the path was
+# tested with -l and then chmod-ed by name, and something swapped in between
+# -- a symbolic link, by anyone who can write to the output tree -- had its
+# target's permission changed instead. A path that cannot be opened, such as
+# a file without read permission, is still done by name; so is everything on
+# MSWin32, which has neither O_NOFOLLOW nor fchmod. O_NONBLOCK keeps a FIFO
+# among the outputs from blocking the open.
+my $O_NOFOLLOW = eval { Fcntl::O_NOFOLLOW() } // 0; # 0 = this system has none
+my $O_NONBLOCK = eval { Fcntl::O_NONBLOCK() } // 0; # 0 = this system has none
 sub _protect {
 	foreach my $output (@_) {
 		my @paths = ($output);
@@ -425,7 +527,15 @@ sub _protect {
 			no warnings 'File::Find'; # see _tree_mtime
 			File::Find::find({ no_chdir => 1, wanted => sub { push @paths, $File::Find::name } }, $output);
 		}
-		foreach my $path (grep { not -l $_ } @paths) {
+		foreach my $path (@paths) {
+			if (($^O ne 'MSWin32') && $O_NOFOLLOW
+					&& (sysopen my $fh, $path, Fcntl::O_RDONLY() | $O_NOFOLLOW | $O_NONBLOCK)) {
+				my $mode = (stat $fh)[2];
+				chmod(($mode & 07777) & ~0222, $fh)
+					or warn "cannot make \"$path\" read-only for \"protect\": $!";
+				next;
+			}
+			next if -l $path;
 			my $mode = (stat $path)[2];
 			next if not defined $mode;
 			chmod(($mode & 07777) & ~0222, $path)
@@ -435,37 +545,98 @@ sub _protect {
 	return;
 }
 
+# Make $dir, where SimpleFlow keeps its lock files and command records, unless
+# it is there, and refuse one that is a symbolic link. Until 0.192 a link was
+# followed, and someone who could write to the working directory could point
+# ".simpleflow" anywhere and have the files made there. The files in it are
+# opened with O_NOFOLLOW, for the same reason. These guard against a link,
+# not against a directory others can write to: the working directory, and the
+# outputs, are to be writable only by those trusted to run the pipeline.
+sub _metadata_dir {
+	my ($dir, $what) = @_; # $what: what the directory is for, for the message
+	if ((not -d $dir) && (not mkdir $dir) && (not -d $dir)) { # another run may make it first
+		die "cannot make \"$dir\" in " . getcwd() . " for $what: $!";
+	}
+	die "\"$dir\" in " . getcwd() . " is a symbolic link, which is not followed for $what; make it a directory"
+		if -l $dir;
+	return;
+}
+
 # Take an exclusive lock for each declared output of a step, and return the
 # handles holding them; the locks go when the handles do, however task()
 # returns. A second run of the same pipeline that reaches the step meanwhile
 # waits here, and then finds the outputs made. The lock files are in
-# ".simpleflow" in the working directory, one per output, named for its
-# absolute path, and are left there afterwards: removing a lock file another
-# process is waiting on would let a third take a lock on a new file of the
-# same name, and the two would both run. Two runs in different working
-# directories do not see each other's locks, as with Snakemake's.
+# ".simpleflow" in the working directory, one per path, named for it, and are
+# left there afterwards: removing a lock file another process is waiting on
+# would let a third take a lock on a new file of the same name, and the two
+# would both run. Two runs in different working directories do not see each
+# other's locks, as with Snakemake's.
+#
+# Until 0.192 the lock was named for the output's absolute path as written,
+# so two names for one file -- "out" and "sub/../out", or through a linked
+# directory -- took two locks, and a directory output did not exclude a step
+# whose output was a file inside it. Now an output is named for its real
+# directory (Cwd::realpath) and its own name, and, when it is itself a
+# symbolic link, for what that resolves to as well; and a step takes a shared
+# lock on every directory above each output, which a step whose output is that
+# directory locks exclusively. Hard links, which have no one name, are still
+# two files here.
 sub _lock_outputs {
 	my ($cmd_string, @outputs) = @_;
-	my %seen;
-	my @absolute = grep { not $seen{$_}++ } map { File::Spec->rel2abs($_) } @outputs;
-	return () if scalar @absolute == 0;
-	my $lock_dir = '.simpleflow';
-	if ((not -d $lock_dir) && (not mkdir $lock_dir) && (not -d $lock_dir)) { # another run may make it first
-		die "cannot make \"$lock_dir\" in " . getcwd() . " for the lock files of \"lock\": $!";
+	my %mode; # path => Fcntl::LOCK_EX() for an output, LOCK_SH() for a directory above one
+	$mode{$_} = Fcntl::LOCK_EX() foreach map { _lock_names($_) } @outputs;
+	foreach my $locked (keys %mode) {
+		$mode{$_} //= Fcntl::LOCK_SH() foreach _ancestors($locked);
 	}
+	return () if scalar keys %mode == 0;
+	my $lock_dir = '.simpleflow';
+	_metadata_dir($lock_dir, 'the lock files of "lock"');
 	my @held;
 	# in sorted order, so that two runs cannot each hold a lock the other wants
-	foreach my $output (sort @absolute) {
-		my $lock_file = File::Spec->catfile($lock_dir, md5_hex($output) . '.lock');
-		open my $fh, '>>', $lock_file
-			or die "cannot open \"$lock_file\", the lock file for \"$output\": $!";
-		if (not flock $fh, Fcntl::LOCK_EX() | Fcntl::LOCK_NB()) {
-			say STDERR "waiting for another run to finish \"$cmd_string\", which holds the lock on \"$output\"";
-			flock $fh, Fcntl::LOCK_EX() or die "cannot lock \"$lock_file\" for \"$output\": $!";
+	foreach my $path (sort keys %mode) {
+		# md5_hex takes bytes, and until 0.192 a name with a character above
+		# 255 died "Wide character in subroutine entry" here. Encoded as
+		# _signature_file encodes it, which is also how perl itself hands
+		# such a name to the system.
+		my $bytes = $path;
+		utf8::encode($bytes) if utf8::is_utf8($bytes);
+		my $lock_file = File::Spec->catfile($lock_dir, md5_hex($bytes) . '.lock');
+		sysopen(my $fh, $lock_file, Fcntl::O_WRONLY() | Fcntl::O_APPEND() | Fcntl::O_CREAT() | $O_NOFOLLOW)
+			or die "cannot open \"$lock_file\", the lock file for \"$path\": $!";
+		if (not flock $fh, $mode{$path} | Fcntl::LOCK_NB()) {
+			say STDERR "waiting for another run, which holds a lock on \"$path\", to finish before running \"$cmd_string\"";
+			flock $fh, $mode{$path} or die "cannot lock \"$lock_file\" for \"$path\": $!";
 		}
 		push @held, $fh;
 	}
 	return @held;
+}
+
+# The names an output is locked under: its real directory and its own name,
+# and, for a symbolic link, what it resolves to.
+sub _lock_names {
+	my $absolute = File::Spec->canonpath(File::Spec->rel2abs(shift));
+	my ($volume, $dirs, $name) = File::Spec->splitpath($absolute);
+	my $parent = File::Spec->catpath($volume, $dirs, '');
+	my $real_parent = (-d $parent) ? _realpath($parent) : undef;
+	my @names = (defined $real_parent) ? (File::Spec->catfile($real_parent, $name)) : ($absolute);
+	if (-l $absolute) {
+		my $target = _realpath($absolute);
+		push @names, $target if (defined $target) && ($target ne $names[0]);
+	}
+	return @names;
+}
+# Cwd::realpath, or undef where it cannot resolve the path; some versions die
+# rather than return undef.
+sub _realpath {
+	my $path = shift;
+	no warnings; # a path it cannot resolve is an undef here, not a warning
+	return eval { Cwd::realpath($path) };
+}
+# Every directory above $path, outermost first.
+sub _ancestors {
+	my @parts = File::Spec->splitdir(shift);
+	return grep { $_ ne '' } map { File::Spec->catdir(@parts[0 .. $_ - 1]) } 1 .. $#parts;
 }
 
 # Run $cmd in a child of its own and wait for it, as system() would, and
@@ -482,23 +653,34 @@ sub _lock_outputs {
 # passed on to the command, which is waited for, and the signal is then
 # re-raised by task() once the record is written.
 #
-# Without a timeout the child stays in perl's process group, so a Ctrl-C at
-# the terminal reaches it directly, as under system(); perl ignores INT and
-# QUIT meanwhile, as system() does. With a timeout the child leads a process
-# group of its own, so that the timeout can kill the group as a whole -- a
-# shell command is usually a pipeline, not a single process, and killing only
-# the shell would leave its children behind. That group is not the terminal's
-# foreground group, so a Ctrl-C reaches only perl, and every interrupting
-# signal is caught and answered by killing the group.
+# The child leads a process group of its own, so that a signal can reach the
+# command as a whole: a shell command is usually a pipeline, not a single
+# process, and signalling only the shell leaves its children behind. Until
+# 0.192 that was so only under a timeout; without one the child stayed in
+# perl's group, a TERM was passed to the shell alone, and the rest of the
+# pipeline ran on as orphans. perl's own group cannot be signalled instead:
+# it holds whatever else the caller's shell started with perl, such as a
+# "tee" its output is piped into.
 #
-# $foreground is true when the command's stdin is the caller's terminal. A
-# timed command, in its own group, would be stopped by SIGTTIN on reading
-# the terminal: until 0.19 it sat stopped until the timeout killed it, and was
-# reported as timed out. It is now handed the terminal's foreground, as a
-# shell hands it to a job, and the caller takes it back afterwards. Stopped
-# from the terminal (Ctrl-Z), it is suspended as a shell would suspend a job:
-# perl stops too, and on being continued gives the command back the terminal
-# and continues it. The timeout does not run while it is suspended.
+# So perl stands in for a shell's job control. The command's group is not the
+# terminal's foreground group, and a Ctrl-C or Ctrl-Z there reaches perl
+# alone. With a timeout, an interrupt (HUP, INT, QUIT, TERM) kills the group,
+# as the timeout does. Without one, it is passed on to the group and the
+# command waited for; INT and QUIT are then not re-raised, as system() does
+# not, and HUP and TERM are. A Ctrl-Z (TSTP) stops the group and perl with it,
+# and both carry on when perl is continued.
+#
+# $foreground is true when the command's stdin is the caller's terminal. The
+# command is then handed the terminal's foreground, as a shell hands it to a
+# job, and perl takes it back afterwards; a Ctrl-C or Ctrl-Z then reaches the
+# command alone. Until 0.19 a timed command reading the terminal was stopped
+# by SIGTTIN until the timeout killed it, and reported as timed out. A command
+# that opens the terminal itself -- ssh or sudo asking for a password, with
+# stdin on the null device -- is stopped by SIGTTIN or SIGTTOU too, and is
+# given the foreground then, as "fg" would. Stopped from the terminal (Ctrl-Z),
+# a command is suspended as a shell would suspend a job: perl stops too, and on
+# being continued gives the command back the terminal, if it had it, and
+# continues it. The timeout does not run while it is suspended.
 #
 # A failed exec cannot report its errno through the exit status, so the child
 # writes it down a pipe that exec closes on success -- the method perl's own
@@ -506,31 +688,35 @@ sub _lock_outputs {
 # system() would report it: exit -1, with the reason.
 sub _run_forked {
 	my ($cmd, $timeout, $foreground) = @_;
-	my $own_group = ($timeout > 0) ? 1 : 0;
-	$foreground = 0 if not $own_group; # already in the terminal's group
+	my $timed = ($timeout > 0) ? 1 : 0;
+	my $cmd_string = (ref $cmd eq 'ARRAY') ? join(' ', @$cmd) : $cmd;
 	# The caller's own pending alarm, if any: "alarm $timeout" below would
 	# replace it and "alarm 0" cancel it, as both did until 0.19. It is put
 	# back at the end, less the time spent here.
-	my $caller_alarm = $own_group ? alarm(0) : 0;
+	my $caller_alarm = $timed ? alarm(0) : 0;
 	my $started = Time::HiRes::time();
-	# perl marks every descriptor above $^F (2) close-on-exec, so this pipe
-	# closes itself in the child when the exec succeeds
+	my $tty = _controlling_terminal(); # undef = perl has none
+	# Only a perl in the terminal's foreground can hand it on; one in the
+	# background would take it from the job that has it.
+	$foreground = ($foreground && _is_foreground($tty)) ? 1 : 0;
+	# The write end must close itself in the child when the exec succeeds.
+	# perl marks a new descriptor close-on-exec only above $^F, and until
+	# 0.192 nothing else did, so a caller that had raised $^F handed the
+	# command the write end: the sysread below then waited for the command to
+	# end, before the alarm was set, and "timeout" never fired.
 	pipe(my $exec_failed_read, my $exec_failed_write)
-		or die "cannot make a pipe to run \"" . ((ref $cmd eq 'ARRAY') ? join(' ', @$cmd) : $cmd) . "\": $!";
-	# Ignored from before the fork, as system() ignores them, so that the
-	# child cannot be interrupted before the parent is ready; the child puts
-	# back what the caller had before it execs.
-	my %caller_sig = map { $_ => $SIG{$_} } qw(INT QUIT);
-	local @SIG{qw(INT QUIT)} = ('IGNORE', 'IGNORE') if not $own_group;
+		or die "cannot make a pipe to run \"$cmd_string\": $!";
+	fcntl($exec_failed_write, Fcntl::F_SETFD(), Fcntl::FD_CLOEXEC())
+		or die "cannot mark a pipe close-on-exec to run \"$cmd_string\": $!";
 	# Held back from before the fork until the handlers below are in place.
-	# The command can send one as soon as it has started, and until 0.20 one
+	# The command can send one as soon as it has started, and until 0.191 one
 	# that arrived before the handlers went to the caller's alone: the command
 	# was neither killed nor passed it, and ran on to be reported as done. A
 	# CPAN smoker (perl 5.16.3, Alpine) lost such a race in t/07.coverage.t.
-	my $held = POSIX::SigSet->new(POSIX::SIGHUP(), POSIX::SIGINT(), POSIX::SIGQUIT(), POSIX::SIGTERM());
+	my $held = POSIX::SigSet->new(POSIX::SIGHUP(), POSIX::SIGINT(), POSIX::SIGQUIT(), POSIX::SIGTERM(), POSIX::SIGTSTP());
 	my $caller_mask = POSIX::SigSet->new();
 	POSIX::sigprocmask(POSIX::SIG_BLOCK(), $held, $caller_mask)
-		or die "cannot block signals to run \"" . ((ref $cmd eq 'ARRAY') ? join(' ', @$cmd) : $cmd) . "\": $!";
+		or die "cannot block signals to run \"$cmd_string\": $!";
 	my $pid = fork();
 	if (not defined $pid) {
 		my $error = $!;
@@ -540,19 +726,16 @@ sub _run_forked {
 	}
 	if ($pid == 0) { # the child
 		close $exec_failed_read;
-		if ($own_group) {
-			setpgrp(0, 0); # lead a new process group, so the kill below reaches the whole pipeline
-			_take_terminal($$) if $foreground;
-		} else {
-			# an ignored signal stays ignored across exec, a caught one becomes
-			# the default, which is what system() leaves its child with
-			$SIG{$_} = $caller_sig{$_} // 'DEFAULT' foreach keys %caller_sig;
-		}
+		setpgrp(0, 0); # lead a new process group, so that a signal reaches the whole pipeline
+		_take_terminal($tty, $$) if $foreground;
 		# A failed exec warns "Can't exec", which "warnings FATAL" turns into
 		# a die -- and a die here unwinds into the caller's evals as a second
 		# copy of the caller's program. Until 0.18 exactly that happened.
 		no warnings 'exec';
-		POSIX::sigprocmask(POSIX::SIG_SETMASK(), $caller_mask); # a blocked mask survives exec
+		# A blocked mask survives exec. The caller's handlers become the
+		# default across it, and one it ignores stays ignored, which is what
+		# system() leaves its child with.
+		POSIX::sigprocmask(POSIX::SIG_SETMASK(), $caller_mask);
 		my $exec_ok = (ref $cmd eq 'ARRAY')
 			? exec({ $cmd->[0] } @{ $cmd }) # the block form never uses the shell, even for one word
 			: exec($cmd);
@@ -564,7 +747,8 @@ sub _run_forked {
 	close $exec_failed_write;
 	# From both sides, as a shell does, since either may run first; the one
 	# that runs before the child's setpgrp fails harmlessly.
-	_take_terminal($pid) if $foreground;
+	_take_terminal($tty, $pid) if $foreground;
+	my $has_terminal = $foreground; # 1 = the command's group has the terminal's foreground
 	# Returns at once with nothing when the exec succeeded, and with the
 	# child's errno when it did not.
 	my $got = sysread $exec_failed_read, my $errno, 16;
@@ -572,55 +756,79 @@ sub _run_forked {
 	if ((defined $got) && ($got > 0)) {
 		waitpid $pid, 0;
 		POSIX::sigprocmask(POSIX::SIG_SETMASK(), $caller_mask); # one held meanwhile goes to the caller
-		_take_terminal(getpgrp()) if $foreground;
+		_take_terminal($tty, getpgrp()) if $has_terminal;
 		_restore_alarm($caller_alarm, $started);
 		local $! = $errno + 0;
 		return (-1, 0, "$!", undef);
 	}
-	# Signals that would otherwise end perl alone. One the caller ignores
-	# stays ignored.
-	my @interrupts = grep {
-		not ((defined $SIG{$_}) && ($SIG{$_} eq 'IGNORE'))
-	} $own_group ? qw(HUP INT QUIT TERM) : qw(HUP TERM);
+	# Signals that would otherwise reach perl alone. One the caller ignores
+	# stays ignored, by perl and, since it is inherited, by the command.
+	my @interrupts = grep { not _ignored($_) } qw(HUP INT QUIT TERM);
 	my $timed_out = 0;
-	my $interrupted; # undef, or the name of the signal that arrived
+	my $interrupted; # undef, or the name of the signal to re-raise
+	my $cut_short = 0; # 1 = the wait was ended by one of the two dies below
 	my $status;
+	# Stop the command and perl with it, as a shell stops a job, with the
+	# clock stopped; on being continued, give the command the terminal if it
+	# wants it and perl has it to give, and continue it. $wants_terminal: the
+	# command had the terminal, or stopped asking for it.
+	my $suspend = sub {
+		my $wants_terminal = shift;
+		my $left = $timed ? Time::HiRes::alarm(0) : 0;
+		_take_terminal($tty, getpgrp()) if $has_terminal;
+		$has_terminal = 0;
+		kill 'STOP', $$;
+		if ($wants_terminal && _is_foreground($tty)) {
+			_take_terminal($tty, $pid);
+			$has_terminal = 1;
+		}
+		kill 'CONT', -$pid;
+		Time::HiRes::alarm($left) if $left > 0;
+	};
 	eval {
 		# only with a timeout: otherwise an alarm is the caller's own business
-		local $SIG{ALRM} = sub { $timed_out = 1; die "SF_TIMEOUT\n" } if $own_group;
-		# In its own group the command is killed below, so the wait is cut
-		# short. Otherwise it is sent the same signal, and waited for as
-		# before: perl's waitpid resumes after a handler that returns.
-		local @SIG{@interrupts} = ($own_group)
-			? (sub { $interrupted = shift; die "SF_INTERRUPTED\n" }) x @interrupts
-			: (sub { $interrupted = shift; kill $interrupted, $pid }) x @interrupts;
+		local $SIG{ALRM} = sub { $timed_out = 1; $cut_short = 1; die "SF_TIMEOUT\n" } if $timed;
+		# With a timeout the command is killed below, so the wait is cut
+		# short. Otherwise its group is sent the same signal, and it is waited
+		# for as before: perl's waitpid resumes after a handler that returns.
+		local @SIG{@interrupts} = $timed
+			? (sub { $interrupted = shift; $cut_short = 1; die "SF_INTERRUPTED\n" }) x @interrupts
+			: (sub {
+				my $signal = shift;
+				$interrupted = $signal if ($signal eq 'HUP') || ($signal eq 'TERM');
+				kill $signal, -$pid;
+			}) x @interrupts;
+		# A Ctrl-Z at the terminal, which reaches perl alone unless the
+		# command has the terminal
+		local $SIG{TSTP} = sub { kill 'STOP', -$pid; $suspend->($has_terminal) } if not _ignored('TSTP');
 		# one held since the fork is delivered here, to the handlers above
 		POSIX::sigprocmask(POSIX::SIG_SETMASK(), $caller_mask);
-		alarm $timeout if $own_group;
+		alarm $timeout if $timed;
 		while (1) {
-			my $waited = waitpid $pid, ($foreground ? POSIX::WUNTRACED() : 0);
+			my $waited = waitpid $pid, POSIX::WUNTRACED();
 			$status = $?;
-			last if not (($waited == $pid) && $foreground && POSIX::WIFSTOPPED(${^CHILD_ERROR_NATIVE}));
-			# Stopped from the terminal: suspend, as a shell suspends a job,
-			# with the clock stopped, and carry on when continued.
-			my $left = Time::HiRes::alarm(0);
-			_take_terminal(getpgrp());
-			kill 'STOP', $$;
-			_take_terminal($pid);
-			kill 'CONT', -$pid;
-			Time::HiRes::alarm($left) if $left > 0;
+			last if not (($waited == $pid) && POSIX::WIFSTOPPED(${^CHILD_ERROR_NATIVE}));
+			my $stop = POSIX::WSTOPSIG(${^CHILD_ERROR_NATIVE});
+			# by a STOP from something other than the terminal, which is the
+			# sender's to continue
+			next if $stop == POSIX::SIGSTOP();
+			my $wants_terminal = (($stop == POSIX::SIGTTIN()) || ($stop == POSIX::SIGTTOU())) ? 1 : 0;
+			if ($wants_terminal && _is_foreground($tty)) { # perl has it to give, as "fg" would
+				_take_terminal($tty, $pid);
+				$has_terminal = 1;
+				kill 'CONT', -$pid;
+				next;
+			}
+			# a Ctrl-Z while it had the terminal, or the terminal wanted while
+			# perl is in the background
+			$suspend->($wants_terminal || $has_terminal);
 		}
-		alarm 0 if $own_group;
+		alarm 0 if $timed;
 		1;
 	} or do {
 		my $error = $@;
 		my $reaped_status = $?; # holds the child's status if waitpid above had already returned
-		alarm 0 if $own_group;
-		if ((not $timed_out) && (not defined $interrupted)) { # something else went wrong
-			_take_terminal(getpgrp()) if $foreground;
-			_restore_alarm($caller_alarm, $started);
-			die $error;
-		}
+		alarm 0 if $timed;
 		# The alarm can land after waitpid has reaped the child but before
 		# "alarm 0" cancels it. The child then finished within its limit, a
 		# second waitpid would return -1 and overwrite its real status, and
@@ -634,27 +842,61 @@ sub _run_forked {
 		} elsif ($waited == $pid) { # exited of its own accord at the deadline
 			$timed_out = 0;
 			$status    = $?;
-		} else { # 0: still running
+		} else { # 0: still running, or stopped, which KILL ends as well
 			kill 'KILL', -$pid; # negative pid: the process group, not just the shell
 			waitpid $pid, 0;
 			$status = $?;
 			$timed_out = 0 if defined $interrupted; # it was the interrupt that killed it
 		}
+		# Anything but the two dies above -- a caller's own handler that
+		# died, for an alarm of its own, say -- is passed on as it is, once
+		# the command is gone. Until 0.192 the command was left running,
+		# unwaited for. A flag, not the text of $@, tells them apart, since
+		# Devel::Confess appends a stack trace to that.
+		if (not $cut_short) {
+			_take_terminal($tty, getpgrp()) if $has_terminal;
+			_restore_alarm($caller_alarm, $started);
+			die $error;
+		}
 	};
-	_take_terminal(getpgrp()) if $foreground;
+	_take_terminal($tty, getpgrp()) if $has_terminal;
 	_restore_alarm($caller_alarm, $started);
 	return ($status, $timed_out, '', $interrupted);
 }
 
-# Make process group $pgrp the foreground group of the terminal on fd 0. A
+# True when the caller ignores signal $name; task() leaves such a signal
+# ignored, as system() does.
+sub _ignored {
+	my $name = shift;
+	return ((defined $SIG{$name}) && ($SIG{$name} eq 'IGNORE')) ? 1 : 0;
+}
+
+# A handle on perl's controlling terminal, or undef when it has none, as in a
+# batch job or a daemon. Marked close-on-exec, so that the command does not
+# inherit it whatever $^F is.
+sub _controlling_terminal {
+	return undef if $^O eq 'MSWin32';
+	open my $tty, '+<', '/dev/tty' or return undef;
+	fcntl($tty, Fcntl::F_SETFD(), Fcntl::FD_CLOEXEC()) or return undef;
+	return $tty;
+}
+
+# True when perl's process group is the terminal's foreground group.
+sub _is_foreground {
+	my $tty = shift;
+	return 0 if not defined $tty;
+	return (POSIX::tcgetpgrp(fileno $tty) == getpgrp()) ? 1 : 0;
+}
+
+# Make process group $pgrp the foreground group of the terminal $tty. A
 # process outside the foreground group that tries this is sent SIGTTOU, which
-# stops it, so SIGTTOU is ignored for the call, as shells do. A failure --
-# fd 0 is a terminal but not this process's controlling one, say -- leaves
-# things as they were, which is no worse than before 0.19.
+# stops it, so SIGTTOU is ignored for the call, as shells do. A failure leaves
+# things as they were.
 sub _take_terminal {
-	my $pgrp = shift;
+	my ($tty, $pgrp) = @_;
+	return if not defined $tty;
 	local $SIG{TTOU} = 'IGNORE';
-	POSIX::tcsetpgrp(0, $pgrp);
+	POSIX::tcsetpgrp(fileno $tty, $pgrp);
 	return;
 }
 
@@ -805,7 +1047,7 @@ sub _capture {
 # interrupted a timed run, or undef, and why the command could not be
 # launched, or ''.
 sub _run_once {
-	my ($r, $cmd, $cmd_ref, $cmd_string) = @_;
+	my ($r, $cmd, $cmd_ref, $cmd_string, $env) = @_; # $env: the real values, which $r->{env} may hide
 	# _capture redirects fd 1 and fd 2 and nothing else, as Capture::Tiny did
 	# before it, so before 0.17 the command inherited the caller's fd 0. A
 	# command that prompts -- "rm" over a write-protected file, "cp -i", git
@@ -821,25 +1063,42 @@ sub _run_once {
 	# descriptor, and "open local *STDIN" attaches the glob to some other fd
 	# while fd 0 goes on pointing at the terminal; reopening STDIN closes
 	# fd 0, so the new open reclaims it as the lowest free descriptor.
-	my $saved_stdin;
-	if ($r->{stdin} eq 'devnull') {
+	#
+	# That holds only when STDIN is fd 0, or closed. A caller's STDIN can be
+	# an in-memory scalar, whose fileno is -1, or some other descriptor; until
+	# 0.192 such a STDIN was saved with "<&" as well, which perl 5.44.0 could
+	# not reopen, and task() died "cannot restore STDIN" after the command
+	# had run. Then the glob is not the command's stdin anyway, so it is left
+	# alone, and fd 0 itself is pointed at the null device and put back.
+	my $stdin_fd = fileno STDIN; # undef = closed, -1 = no descriptor, else the descriptor
+	my $stdin_is_fd0 = ((not defined $stdin_fd) || ($stdin_fd == 0)) ? 1 : 0; # 1 = reopen the glob
+	my ($saved_stdin, $saved_fd0); # $saved_fd0: undef = fd 0 was closed
+	if (($r->{stdin} eq 'devnull') && $stdin_is_fd0) {
 		# a caller may legitimately have closed STDIN: there is then nothing
 		# to save, and it is closed again below rather than restored
-		if (defined fileno STDIN) {
+		if (defined $stdin_fd) {
 			open $saved_stdin, '<&', \*STDIN
 				or die "cannot save STDIN before running \"$cmd_string\": $!";
 		}
 		open STDIN, '<', File::Spec->devnull
 			or die 'cannot reopen STDIN on ' . File::Spec->devnull . ": $!";
+	} elsif ($r->{stdin} eq 'devnull') {
+		$saved_fd0 = POSIX::dup(0);
+		my $null = POSIX::open(File::Spec->devnull, POSIX::O_RDONLY());
+		die 'cannot open ' . File::Spec->devnull . " for the command's stdin: $!" if not defined $null;
+		if ($null != 0) { # 0 itself when fd 0 was closed, as the lowest free descriptor
+			defined POSIX::dup2($null, 0) or die 'cannot point descriptor 0 at ' . File::Spec->devnull . ": $!";
+			POSIX::close($null);
+		}
 	}
 	# "env": the command's environment is the caller's with these changes,
 	# and the caller's is put back when this returns. %ENV is localised only
 	# when there is something to change, so that a task without "env" does
 	# not touch the environment at all.
-	local %ENV = %ENV if (scalar keys %{ $r->{env} } > 0) || ($r->{threads} > 0);
-	foreach my $name (keys %{ $r->{env} }) {
-		if (defined $r->{env}{$name}) {
-			$ENV{$name} = $r->{env}{$name};
+	local %ENV = %ENV if (scalar keys %$env > 0) || ($r->{threads} > 0);
+	foreach my $name (keys %$env) {
+		if (defined $env->{$name}) {
+			$ENV{$name} = $env->{$name};
 		} else {
 			delete $ENV{$name}; # undef: the command runs without it
 		}
@@ -886,7 +1145,15 @@ sub _run_once {
 	my $run_error = $@;
 	my $t1 = Time::HiRes::time();
 	my @cpu_after = times;
-	if ($r->{stdin} eq 'devnull') {
+	if (($r->{stdin} eq 'devnull') && (not $stdin_is_fd0)) {
+		if (defined $saved_fd0) {
+			defined POSIX::dup2($saved_fd0, 0)
+				or die "cannot restore descriptor 0 after running \"$cmd_string\": $!";
+			POSIX::close($saved_fd0);
+		} else {
+			POSIX::close(0); # it was closed when we were called; leave it that way
+		}
+	} elsif ($r->{stdin} eq 'devnull') {
 		if (defined $saved_stdin) {
 			open STDIN, '<&', $saved_stdin
 				or die "cannot restore STDIN after running \"$cmd_string\": $!";
@@ -1012,11 +1279,28 @@ sub _wrapped_cmd {
 # shell, the environment it was given, and what it runs inside. Separated by
 # NUL, which cannot occur in a command's words or the environment, so that
 # ['a b'] and ['a', 'b'] differ.
+#
+# What it runs inside went in as "wrapped.cmd", which is space-joined, so
+# until 0.192 a wrapper of ['w', 'a b'] and one of ['w', 'a', 'b'] had the
+# same digest. The words of those layers -- $run_cmd, less the command's own
+# part -- are now added with their boundaries, but only when one of them holds
+# a space: without one, the space-joined form is already unambiguous, and
+# leaving the digest as it was keeps every digest 0.191 recorded valid, so an
+# upgrade does not re-run every "stale.cmd" step. Likewise "threads", which
+# reaches a local command only as SIMPLEFLOW_THREADS, is added only when it
+# is set; under SLURM it is in srun's --cpus-per-task already.
 sub _command_signature {
-	my ($r, $cmd) = @_;
+	my ($r, $cmd, $run_cmd) = @_;
 	my @parts = (ref $cmd eq 'ARRAY') ? ('list', @$cmd) : ('string', $cmd);
 	push @parts, 'env', map { (defined $r->{env}{$_}) ? "$_=$r->{env}{$_}" : $_ } sort keys %{ $r->{env} };
 	push @parts, 'wrapped', $r->{'wrapped.cmd'};
+	if ($r->{'wrapped.cmd'} ne '') {
+		# a string command is the last word, after the shell and its -c
+		my $own_words = (ref $cmd eq 'ARRAY') ? scalar @$cmd : 1;
+		my @layers = @{ $run_cmd }[0 .. $#$run_cmd - $own_words];
+		push @parts, 'layers', @layers if grep { / / } @layers;
+	}
+	push @parts, 'threads', $r->{threads} if ($r->{threads} > 0) && ($r->{executor} ne 'slurm');
 	my $joined = join "\0", @parts;
 	utf8::encode($joined) if utf8::is_utf8($joined); # md5_hex takes bytes
 	return md5_hex($joined);
@@ -1032,7 +1316,12 @@ sub _signature_file {
 }
 sub _read_signature {
 	my $file = shift;
-	open my $fh, '<', $file or return undef; # none on record
+	# not through a symbolic link; see _metadata_dir
+	foreach my $dir ('.simpleflow', File::Spec->catdir('.simpleflow', 'cmd')) {
+		die "\"$dir\" in " . getcwd() . ' is a symbolic link, which is not followed for the command records of "stale.cmd"; make it a directory'
+			if -l $dir;
+	}
+	sysopen(my $fh, $file, Fcntl::O_RDONLY() | $O_NOFOLLOW) or return undef; # none on record
 	my $signature = <$fh>;
 	close $fh;
 	return undef if not defined $signature;
@@ -1042,16 +1331,24 @@ sub _read_signature {
 sub _write_signature {
 	my ($file, $signature) = @_;
 	my ($volume, $dirs) = File::Spec->splitpath($file);
-	my $dir = File::Spec->catpath($volume, $dirs, '');
-	File::Path::mkpath($dir) if not -d $dir;
-	# written under another name and renamed into place, so that a run killed
+	# canonpath, to drop the trailing slash, through which -l would follow a link
+	my $dir = File::Spec->canonpath(File::Spec->catpath($volume, $dirs, ''));
+	_metadata_dir('.simpleflow', 'the command records of "stale.cmd"');
+	_metadata_dir($dir, 'the command records of "stale.cmd"');
+	# Written under another name and renamed into place, so that a run killed
 	# part-way through never leaves half a signature, which would read as a
-	# changed command
-	my $partial = "$file.$$";
-	open my $fh, '>', $partial or die "cannot record the command for \"stale.cmd\" in \"$partial\": $!";
-	print {$fh} "$signature\n";
-	close $fh or die "cannot record the command for \"stale.cmd\" in \"$partial\": $!";
-	rename $partial, $file or die "cannot record the command for \"stale.cmd\" in \"$file\": $!";
+	# changed command. The other name is File::Temp's, made with O_EXCL: until
+	# 0.192 it was "<file>.<pid>", opened with truncation, which followed a
+	# link planted under that predictable name. rename() replaces a link at
+	# $file itself, rather than following it.
+	my $partial = File::Temp->new(DIR => $dir, TEMPLATE => 'partial-XXXXXXXX', UNLINK => 0);
+	my $partial_name = $partial->filename;
+	my $ok = (print {$partial} "$signature\n") && (close $partial) && (rename $partial_name, $file);
+	if (not $ok) {
+		my $error = $!;
+		unlink $partial_name;
+		die "cannot record the command for \"stale.cmd\" in \"$file\": $error";
+	}
 	return;
 }
 
@@ -1153,6 +1450,7 @@ sub task {
 		'dir',         # directory to run the step in; its file names are relative to it
 		'dry.run',     # dry run or not
 		'env',         # hash ref: environment variables for the command; undef removes one
+		'env.secret',  # array ref: names in "env" whose values are never printed, logged or traced
 		'executor',    # 'local' (the default) or 'slurm': where the command runs
 		'executor.args', # array ref: more arguments for the executor (srun)
 		'input.dir',   # a single input directory; the convenience form of "input.dirs"
@@ -1201,7 +1499,7 @@ sub task {
 		(not grep { $_ eq $key } @defined_args) || (grep { $_ eq $key } @PER_STEP_KEYS)
 	} sort keys %DEFAULTS;
 	if (scalar @bad_defaults > 0) {
-		p %DEFAULTS, output => 'STDERR';
+		_dump_args(\%DEFAULTS);
 		die '%SimpleFlow::DEFAULTS holds ' . join(', ', map { "\"$_\"" } @bad_defaults)
 			. ', which it cannot: a default must be a key task() accepts, and not one that names a particular step ('
 			. join(', ', @PER_STEP_KEYS) . ')';
@@ -1215,9 +1513,13 @@ sub task {
 	if ((ref $DEFAULTS{env} eq 'HASH') && (ref $given->{env} eq 'HASH')) {
 		$args->{env} = { %{ $DEFAULTS{env} }, %{ $given->{env} } }; # the task's own win
 	}
+	# and a secret of the pipeline's stays one in a task that names its own
+	if ((ref $DEFAULTS{'env.secret'} eq 'ARRAY') && (ref $given->{'env.secret'} eq 'ARRAY')) {
+		$args->{'env.secret'} = [@{ $DEFAULTS{'env.secret'} }, @{ $given->{'env.secret'} }];
+	}
 	foreach my $key ('log.fh', 'trace.fh') {
 		if ((defined $args->{$key}) && (not openhandle($args->{$key}))) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die "the \"$key\" given to $current_sub isn't actually a filehandle";
 		}
 		_autoflush($args->{$key}) if defined $args->{$key};
@@ -1230,21 +1532,21 @@ sub task {
 	# literal command "ARRAY(0x5ed9d076e618)".
 	my $cmd_ref = ref $args->{cmd};
 	if (($cmd_ref ne '') && ($cmd_ref ne 'ARRAY')) {
-		p $args, output => 'STDERR';
+		_dump_args($args);
 		die "\"cmd\" must be a string or an array ref, not a $cmd_ref";
 	}
 	if ($cmd_ref eq 'ARRAY') {
 		if (scalar @{ $args->{cmd} } == 0) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die '"cmd" is an empty array ref; there is no command to run';
 		}
 		my @undefined_words = grep { not defined $args->{cmd}[$_] } 0 .. $#{ $args->{cmd} };
 		if (scalar @undefined_words > 0) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die '"cmd" array ref holds undefined elements at index/indices ' . join(', ', @undefined_words);
 		}
 	} elsif (length $args->{cmd} == 0) {
-		p $args, output => 'STDERR';
+		_dump_args($args);
 		die '"cmd" is the empty string; there is no command to run';
 	}
 	# The printable form of the command, used in every message and stored as
@@ -1258,31 +1560,31 @@ sub task {
 		# trailing newline, which $ matches before, and any Unicode digit,
 		# which then died "isn't numeric" instead of with this message
 		if ($args->{timeout} !~ /\A[0-9]+\z/) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die '"timeout" must be a whole number of seconds (0 means no limit)';
 		}
 		if (($args->{timeout} > 0) && ($^O eq 'MSWin32')) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die '"timeout" is not supported on MSWin32: it needs fork() and POSIX process groups to kill the command';
 		}
 	}
 	if ((defined $args->{retries}) && ($args->{retries} !~ /\A[0-9]+\z/)) {
-		p $args, output => 'STDERR';
+		_dump_args($args);
 		die '"retries" must be a whole number (0 means no retries)';
 	}
 	if ((defined $args->{'retry.delay'}) && ($args->{'retry.delay'} !~ /\A[0-9]+(?:\.[0-9]+)?\z/)) {
-		p $args, output => 'STDERR';
+		_dump_args($args);
 		die '"retry.delay" must be a number of seconds, 0 or more';
 	}
 	if (defined $args->{stdin}) {
 		if (($args->{stdin} ne 'devnull') && ($args->{stdin} ne 'inherit')) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die "\"stdin\" must be \"devnull\" (the default) or \"inherit\", not \"$args->{stdin}\"";
 		}
 	}
 	if (defined $args->{env}) {
 		if (ref $args->{env} ne 'HASH') {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die '"env" must be a hash ref of variable names and values';
 		}
 		# no '=' or NUL in a name, since the environment is "NAME=value\0"
@@ -1290,14 +1592,21 @@ sub task {
 		my @bad_names  = grep { ($_ eq '') || /[=\0]/ } sort keys %{ $args->{env} };
 		my @bad_values = grep { ref $args->{env}{$_} ne '' } sort keys %{ $args->{env} };
 		if ((scalar @bad_names > 0) || (scalar @bad_values > 0)) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die '"env" can hold only names without "=" and string (or undef) values; these cannot be set: '
 				. join(', ', map { "\"$_\"" } @bad_names, @bad_values);
 		}
 	}
+	if (defined $args->{'env.secret'}) {
+		my $names = $args->{'env.secret'};
+		if ((ref $names ne 'ARRAY') || (grep { (not defined $_) || (ref $_ ne '') || ($_ eq '') || /[=\0]/ } @$names)) {
+			_dump_args($args);
+			die '"env.secret" must be an array ref of the names of environment variables';
+		}
+	}
 	foreach my $key ('on.success', 'on.failure') {
 		if ((defined $args->{$key}) && (ref $args->{$key} ne 'CODE')) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die "\"$key\" must be a code ref, which is called with the record";
 		}
 	}
@@ -1307,7 +1616,7 @@ sub task {
 		if ((ref $list ne 'ARRAY')
 				|| (($key eq 'wrapper') && (scalar @$list == 0))
 				|| (grep { (not defined $_) || (ref $_ ne '') } @$list)) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die "\"$key\" must be an array ref of words"
 				. (($key eq 'wrapper') ? ', at least one, the program that runs the command' : '');
 		}
@@ -1325,22 +1634,22 @@ sub task {
 	foreach my $key (sort keys %pattern) {
 		next if not defined $args->{$key};
 		if ((ref $args->{$key} ne '') || ($args->{$key} !~ $pattern{$key}[0])) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die "\"$key\" must be $pattern{$key}[1]";
 		}
 	}
 	if ((defined $args->{'executor.args'}) && (($args->{executor} // 'local') eq 'local')) {
-		p $args, output => 'STDERR';
+		_dump_args($args);
 		die '"executor.args" needs an executor other than "local" to be given to';
 	}
 	if ((defined $args->{'container.args'}) && (not defined $args->{container})) {
-		p $args, output => 'STDERR';
+		_dump_args($args);
 		die '"container.args" needs a "container" to be given to';
 	}
 	foreach my $key ('dir', 'stdout.file', 'stderr.file') {
 		next if not defined $args->{$key};
 		if ((ref $args->{$key} ne '') || (length $args->{$key} == 0)) {
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die "\"$key\" must be a path, not " . ((ref $args->{$key} ne '') ? 'a reference' : 'the empty string');
 		}
 	}
@@ -1352,7 +1661,7 @@ sub task {
 		my $caller_dir = getcwd();
 		if (not chdir $args->{dir}) {
 			my $error = $!;
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			die "cannot run in \"dir\" \"$args->{dir}\": $error";
 		}
 		$back_to_caller_dir = SimpleFlow::Guard->new(sub {
@@ -1379,7 +1688,12 @@ sub task {
 	);
 	$r{'die'}     = $args->{'die'}     // 1; # by default, true
 	$r{'dry.run'} = $args->{'dry.run'} // 0; # by default, false
-	$r{env}       = { %{ $args->{env} // {} } }; # by default, no changes; a copy, not the caller's hash
+	# The environment the command is given; the record's "env" is this with
+	# the values "env.secret" names hidden, since the record is printed,
+	# logged and traced. Until 0.192 every value was written out in full.
+	my %command_env = %{ $args->{env} // {} }; # by default, no changes; a copy, not the caller's hash
+	$r{'env.secret'} = [_secret_names($args)]; # by default, none
+	$r{env}       = _shown_args({ env => \%command_env, 'env.secret' => $r{'env.secret'} })->{env};
 	$r{lock}      = ($args->{lock}    // 0) ? 1 : 0; # by default, false
 	$r{note}      = $args->{note}      // '';# by default, no note
 	$r{overwrite} = $args->{overwrite} // 0; # by default, false
@@ -1425,7 +1739,7 @@ sub task {
 	if (scalar @missing_inputs > 0) {
 		if (!$r{'dry.run'}) {
 			say STDERR 'this list of arguments:';
-			p $args, output => 'STDERR';
+			_dump_args($args);
 			say STDERR 'Cannot run because these files are either missing or unreadable in: ' . getcwd();
 			p @missing_inputs, output => 'STDERR';
 			die 'the above files are missing or are not readable';
@@ -1493,12 +1807,22 @@ sub task {
 	# them is not this one; see _command_signature. Outputs with no command on
 	# record -- made before stale.cmd was used, or by hand -- are taken as
 	# made by this one, which is recorded, so that the next change is seen.
+	#
+	# A step run without stale.cmd still replaces the outputs, so when there
+	# is a command on record for them, this one's is written over it after a
+	# successful run, further down. Until 0.192 it was left, and a later
+	# stale.cmd run of the command on record took the other one's outputs as
+	# its own. With nothing on record, nothing is written: a pipeline that
+	# never asks for stale.cmd gets no .simpleflow/ from it.
 	my ($signature, $signature_file, $recorded_signature);
 	if (($r{'stale.cmd'}) && (scalar @outputs > 0)) {
-		$signature = _command_signature(\%r, $args->{cmd});
+		$signature = _command_signature(\%r, $args->{cmd}, $run_cmd);
 		$signature_file = _signature_file(@outputs);
 		$recorded_signature = _read_signature($signature_file);
 		$r{'cmd.changed'} = ((defined $recorded_signature) && ($recorded_signature ne $signature)) ? 1 : 0;
+	} elsif ((scalar @outputs > 0) && (-e _signature_file(@outputs))) {
+		$signature = _command_signature(\%r, $args->{cmd}, $run_cmd);
+		$signature_file = _signature_file(@outputs);
 	}
 
 	if (
@@ -1513,7 +1837,7 @@ sub task {
 		say colored(['black on_green'], "\"$cmd_string\"\n") . ' has been done before' unless $r{quiet};
 		$r{'output.file.size'} = { map {$_ => -s $_} @output_files };
 		_write_signature($signature_file, $signature)
-			if (defined $signature) && (not defined $recorded_signature) && (!$r{'dry.run'});
+			if $r{'stale.cmd'} && (defined $signature) && (not defined $recorded_signature) && (!$r{'dry.run'});
 		_report(\%r, $log_fh, $r{quiet}, $trace_fh);
 		return \%r;
 	} else {
@@ -1565,12 +1889,12 @@ sub task {
 		close $fh;
 	}
 
-	my ($interrupted, $launch_error, @missing_outputs, %output_file_size);
+	my ($interrupted, $launch_error, @missing_outputs, %output_file_size, @stderr_tail);
 	my %moved; # every .failed name, over all the attempts
 	my $attempts = $r{retries} + 1;
 	foreach my $attempt (1 .. $attempts) {
 		$r{attempts} = $attempt;
-		($interrupted, $launch_error) = _run_once(\%r, $run_cmd, $run_cmd_ref, $cmd_string);
+		($interrupted, $launch_error) = _run_once(\%r, $run_cmd, $run_cmd_ref, $cmd_string, \%command_env);
 		# A command that timed out, exited non-zero, was killed by a signal, or
 		# failed to produce its declared outputs has failed, whether or not
 		# "die" is set. Until 0.16 the FAILED assignment for a non-zero exit
@@ -1590,8 +1914,28 @@ sub task {
 		# wrote rather than that the declared names are now empty.
 		%output_file_size = map {$_ => -s $_} @output_files;
 		$r{'output.file.size'} = { %output_file_size };
+		# Not retried: success, the last attempt, or an interrupt, which is
+		# the caller asking for the whole program to stop.
+		my $retrying = (($attempt < $attempts) && (not defined $interrupted)) ? 1 : 0;
 		if ($r{'will.do'} eq 'FAILED') {
-			my @moved_now = _move_aside(@outputs);
+			# Read now, while the file is where stderr.file says: when it is
+			# also an output it is about to be moved, and until 0.192 the
+			# message then went without it.
+			@stderr_tail = _stderr_tail(\%r);
+			# An output that is, or holds, stdout.file or stderr.file stays
+			# where it is until the last attempt, since those files are to
+			# hold every attempt, in order. Until 0.192 it was moved aside
+			# with the rest, and the retry began a new file -- or, inside a
+			# moved directory, could not open one.
+			my @to_move = @outputs;
+			if ($retrying) {
+				my @streams = map { _canonical($_) } grep { $_ ne '' } $r{'stdout.file'}, $r{'stderr.file'};
+				@to_move = grep {
+					my $output = _canonical($_);
+					not grep { ($_ eq $output) || _is_within($_, $output) } @streams;
+				} @outputs;
+			}
+			my @moved_now = _move_aside(@to_move);
 			$moved{$_} = 1 foreach @moved_now;
 			$r{'failed.outputs'} = [sort keys %moved];
 			if (scalar @moved_now > 0) {
@@ -1601,9 +1945,7 @@ sub task {
 				say {$log_fh} $moved if defined $log_fh;
 			}
 		}
-		# Not retried: success, the last attempt, or an interrupt, which is
-		# the caller asking for the whole program to stop.
-		last if ($r{'will.do'} ne 'FAILED') || ($attempt == $attempts) || (defined $interrupted);
+		last if ($r{'will.do'} ne 'FAILED') || (not $retrying);
 		my $retry = "\"$cmd_string\" " . join('; ', _why_failed(\%r, $interrupted, $launch_error, @missing_outputs))
 			. "; attempt $attempt of $attempts, retrying"
 			. (($r{'retry.delay'} > 0) ? " in $r{'retry.delay'}s" : '');
@@ -1613,7 +1955,7 @@ sub task {
 	}
 	$r{done} = 'now';
 	if (scalar @missing_outputs > 0) {
-		my $clipped_args = _clipped($args);
+		my $clipped_args = _clipped(_shown_args($args));
 		say STDERR "this input to $current_sub:";
 		p $clipped_args, output => 'STDERR';
 		say {$log_fh} "this input to $current_sub:" if defined $log_fh;
@@ -1638,6 +1980,7 @@ sub task {
 		warn 'the above output directories are empty.';
 	}
 	_protect(@outputs) if $r{protect} && ($r{'will.do'} eq 'done');
+	# with or without stale.cmd; see where $signature is set
 	_write_signature($signature_file, $signature) if (defined $signature) && ($r{'will.do'} eq 'done');
 	# The record is printed once, whatever happened. Until 0.19 each kind of
 	# failure had its own branch with its own _report, and the missing-output
@@ -1660,8 +2003,7 @@ sub task {
 	my $failure = "\"$cmd_string\" " . join('; ', _why_failed(\%r, $interrupted, $launch_error, @missing_outputs))
 		. (($r{attempts} > 1) ? " (after $r{attempts} attempts)" : '')
 		. ", from $c[1] line $c[2]";
-	my @tail = _stderr_tail(\%r);
-	$failure .= "; stderr ended with:\n" . join('', map { "\t$_\n" } @tail) if scalar @tail > 0;
+	$failure .= "; stderr ended with:\n" . join('', map { "\t$_\n" } @stderr_tail) if scalar @stderr_tail > 0;
 	die $failure if $r{'die'}; # the resolved value (defaults to 1), not the raw arg
 	# die => 0 asks task not to stop the pipeline, not to keep quiet: a warning
 	# is the only signal a caller gets that did not look at will.do.
@@ -1739,6 +2081,7 @@ sub parallel {
 	# re-raised here once every child is gone. One the caller ignores stays
 	# ignored.
 	my %running; # pid => [index, the File::Temp its record comes back in]
+	my $report_lock = File::Temp->new; # see $REPORT_LOCK
 	my $interrupted;
 	my @interrupts = grep { not ((defined $SIG{$_}) && ($SIG{$_} eq 'IGNORE')) } qw(HUP INT QUIT TERM);
 	my %caller_sig = map { $_ => $SIG{$_} } @interrupts;
@@ -1756,11 +2099,20 @@ sub parallel {
 				my $pid = fork();
 				die "fork() failed, so parallel() cannot start task $i: $!" if not defined $pid;
 				if ($pid == 0) { # the child: one task, its record to the file, and out
-					$SIG{$_} = $caller_sig{$_} // 'DEFAULT' foreach @interrupts;
-					my $record = eval { task(%{ $tasks[$i] }) };
-					my $error = $@;
-					Storable::nstore({ record => $record, error => (defined $record) ? '' : $error }, $result->filename);
-					_flush($_) foreach values %handles;
+					# Everything up to the _exit is in the eval. Until 0.192
+					# only task() was, and a failure to store the record or
+					# flush a handle unwound into the caller's own evals as a
+					# second copy of the caller's program. The parent then
+					# reports that it got no record.
+					eval {
+						$SIG{$_} = $caller_sig{$_} // 'DEFAULT' foreach @interrupts;
+						local $REPORT_LOCK = $report_lock->filename;
+						my $record = eval { task(%{ $tasks[$i] }) };
+						my $error = $@;
+						Storable::nstore({ record => $record, error => (defined $record) ? '' : $error }, $result->filename);
+						_flush($_) foreach values %handles;
+						1;
+					} or eval { print STDERR "parallel() could not return the record of task $i: $@" };
 					# _exit, not exit: exit would run END blocks and the
 					# destructors of the parent's objects, File::Temp's among them
 					POSIX::_exit(0);
@@ -1773,7 +2125,16 @@ sub parallel {
 			# the caller has. Polled every 20 ms: half the time perl took to
 			# start here (29-44 ms), so a slot is refilled before its next task
 			# could have started anyway.
-			my @finished = grep { waitpid($_, POSIX::WNOHANG()) == $_ } keys %running;
+			#
+			# -1 is a child that is no longer ours to wait for: a caller whose
+			# SIGCHLD is ignored has its children reaped by the kernel, and a
+			# caller's own SIGCHLD handler may reap them first. Either way it
+			# has ended, and its record, if it wrote one, is in its file.
+			# Until 0.192 only its pid counted, and parallel() waited for ever.
+			my @finished = grep {
+				my $waited = waitpid($_, POSIX::WNOHANG());
+				($waited == $_) || ($waited == -1);
+			} keys %running;
 			if (scalar @finished == 0) {
 				Time::HiRes::sleep(0.02);
 				next;
@@ -1834,6 +2195,15 @@ sub report {
 		die "report() needs \"$key\", a file name" if (not defined $opt{$key}) || (ref $opt{$key} ne '') || ($opt{$key} eq '');
 	}
 	my $title = $opt{title} // 'SimpleFlow report';
+	# A title of UTF-8 bytes -- read from a file or the command line, say --
+	# is taken as the characters it encodes, as _json_string takes a byte
+	# string. Until 0.192 it was encoded again with the page, and the two bytes
+	# of the e in "caf\xc3\xa9" came out as two characters. Bytes that are not
+	# UTF-8 are Latin-1 characters, as perl itself treats them.
+	if (not utf8::is_utf8($title)) {
+		my $decoded = $title;
+		$title = $decoded if utf8::decode($decoded);
+	}
 	open my $in, '<', $opt{trace} or die "cannot read the trace \"$opt{trace}\": $!";
 	my @tasks;
 	while (my $line = <$in>) {
@@ -1844,6 +2214,8 @@ sub report {
 			$why =~ s/ at \S+ line \d+.*//s;
 			die "line $. of the trace \"$opt{trace}\" is not a task's record: $why";
 		}
+		my $bad = _bad_trace_field($task);
+		die "line $. of the trace \"$opt{trace}\" is not a task's record: $bad" if defined $bad;
 		push @tasks, $task;
 	}
 	close $in;
@@ -1942,6 +2314,30 @@ HTML
 	close $out or die "cannot write the report \"$opt{html}\": $!";
 	return scalar @tasks;
 }
+# Why a decoded trace line cannot be shown, or undef if it can. The page does
+# arithmetic with the times and puts the rest in its cells, and until 0.192 a
+# line with a string for a time died "isn't numeric", deep inside report(),
+# and one with a list for a command showed "ARRAY(0x...)". A start time is
+# epoch seconds below 1e15, the year 31690708: past 1e16 perl's localtime
+# dies on 5.44.0 ("too large", at 1e17) and returns nothing on 5.10.1.
+my @TRACE_TIMES = ('start.time', 'duration', 'cpu.user', 'cpu.system');
+my @TRACE_TEXTS = ('cmd', 'note', 'will.do', 'exit', 'signal', 'attempts', 'source.file', 'source.line');
+sub _bad_trace_field {
+	my $task = shift;
+	foreach my $field (@TRACE_TIMES) {
+		my $value = $task->{$field};
+		next if not defined $value;
+		return "its \"$field\" is not a number of seconds, 0 or more"
+			if (ref $value ne '') || ($value !~ $JSON_NUMBER) || ($value < 0); # "Inf" fails the pattern
+	}
+	return "its \"start.time\" is not a time since the epoch, in seconds"
+		if (defined $task->{'start.time'}) && ($task->{'start.time'} >= 1e15);
+	foreach my $field (@TRACE_TEXTS) {
+		return "its \"$field\" is not a single value" if ref $task->{$field} ne '';
+	}
+	return undef;
+}
+
 sub _html {
 	my $text = shift;
 	$text = '' if not defined $text;
@@ -1956,41 +2352,56 @@ sub _html {
 # Read one JSON value, as report() needs to read a trace. JSON::PP, which could
 # do it, is core only from perl 5.14. The text is UTF-8 bytes, as _json writes
 # them; true and false are read as 1 and 0, null as undef.
+#
+# Until 0.192 it took more than JSON: bytes that were not UTF-8, raw control
+# characters in a string, an unpaired UTF-16 surrogate, and whitespace beyond
+# JSON's four; and it nested without limit, so a line of "[[[[..." recursed as
+# deep as it was long. Each is now refused, nesting past $JSON_MAX_DEPTH -- 512,
+# JSON::PP's own default max_depth (JSON::PP 4.16, "max_depth") -- among them.
+# A trace line is at most 3 deep: the record, a hash or array in it, and the
+# values of that. There is no limit on a line's length, as JSON::PP has none by
+# default: a trace holds each task's whole "note".
+my $JSON_MAX_DEPTH = 512;
 sub _json_decode {
 	my $text = shift;
-	utf8::decode($text); # bytes of UTF-8 in, characters out; ASCII is unchanged
-	my $value = _json_value(\$text);
-	$text =~ /\G\s*/gc;
+	utf8::decode($text) or die "it is not UTF-8\n"; # bytes of UTF-8 in, characters out
+	my $value = _json_value(\$text, 0);
+	$text =~ /\G[ \t\n\r]*/gc;
 	die 'unexpected text after the JSON value, at character ' . (pos($text) // 0) . "\n"
 		if (pos($text) // 0) != length $text;
 	return $value;
 }
 my %JSON_ESCAPE = ('"' => '"', '\\' => '\\', '/' => '/', b => "\b", f => "\f", n => "\n", r => "\r", t => "\t");
 sub _json_value {
-	my $t = shift;
-	$$t =~ /\G\s*/gc;
-	if ($$t =~ /\G\{/gc) {
-		my %hash;
-		$$t =~ /\G\s*/gc;
-		return \%hash if $$t =~ /\G\}/gc;
-		while (1) {
-			$$t =~ /\G\s*"/gc or die 'expected a string for a key, at character ' . (pos($$t) // 0) . "\n";
-			my $key = _json_string_body($t);
-			$$t =~ /\G\s*:/gc or die 'expected ":" after a key, at character ' . (pos($$t) // 0) . "\n";
-			$hash{$key} = _json_value($t);
-			$$t =~ /\G\s*/gc;
-			next if $$t =~ /\G,/gc;
+	my ($t, $depth) = @_;
+	# "Deep recursion" warns at 100 levels, and is fatal here; $JSON_MAX_DEPTH
+	# is the limit, as JSON::PP turns the warning off for its own
+	no warnings 'recursion';
+	$$t =~ /\G[ \t\n\r]*/gc;
+	if ($$t =~ /\G([\{\[])/gc) {
+		die "the JSON nests deeper than $JSON_MAX_DEPTH, at character " . (pos($$t) // 0) . "\n"
+			if $depth >= $JSON_MAX_DEPTH;
+		if ($1 eq '{') {
+			my %hash;
+			$$t =~ /\G[ \t\n\r]*/gc;
 			return \%hash if $$t =~ /\G\}/gc;
-			die 'expected "," or "}" in an object, at character ' . (pos($$t) // 0) . "\n";
+			while (1) {
+				$$t =~ /\G[ \t\n\r]*"/gc or die 'expected a string for a key, at character ' . (pos($$t) // 0) . "\n";
+				my $key = _json_string_body($t);
+				$$t =~ /\G[ \t\n\r]*:/gc or die 'expected ":" after a key, at character ' . (pos($$t) // 0) . "\n";
+				$hash{$key} = _json_value($t, $depth + 1);
+				$$t =~ /\G[ \t\n\r]*/gc;
+				next if $$t =~ /\G,/gc;
+				return \%hash if $$t =~ /\G\}/gc;
+				die 'expected "," or "}" in an object, at character ' . (pos($$t) // 0) . "\n";
+			}
 		}
-	}
-	if ($$t =~ /\G\[/gc) {
 		my @array;
-		$$t =~ /\G\s*/gc;
+		$$t =~ /\G[ \t\n\r]*/gc;
 		return \@array if $$t =~ /\G\]/gc;
 		while (1) {
-			push @array, _json_value($t);
-			$$t =~ /\G\s*/gc;
+			push @array, _json_value($t, $depth + 1);
+			$$t =~ /\G[ \t\n\r]*/gc;
 			next if $$t =~ /\G,/gc;
 			return \@array if $$t =~ /\G\]/gc;
 			die 'expected "," or "]" in an array, at character ' . (pos($$t) // 0) . "\n";
@@ -2008,7 +2419,7 @@ sub _json_string_body {
 	my $t = shift;
 	my $string = '';
 	while (1) {
-		if ($$t =~ /\G([^"\\]+)/gc) {
+		if ($$t =~ /\G([^"\\\x00-\x1f]+)/gc) {
 			$string .= $1;
 		} elsif ($$t =~ /\G"/gc) {
 			return $string;
@@ -2016,11 +2427,18 @@ sub _json_string_body {
 			$string .= $JSON_ESCAPE{$1};
 		} elsif ($$t =~ /\G\\u([0-9a-fA-F]{4})/gc) {
 			my $code = hex $1;
-			# a character beyond U+FFFF is written as a UTF-16 surrogate pair
-			if (($code >= 0xD800) && ($code <= 0xDBFF) && ($$t =~ /\G\\u([dD][c-fC-F][0-9a-fA-F]{2})/gc)) {
+			# a character beyond U+FFFF is written as a UTF-16 surrogate pair,
+			# and half of one is not a character
+			if (($code >= 0xD800) && ($code <= 0xDBFF)) {
+				$$t =~ /\G\\u([dD][c-fC-F][0-9a-fA-F]{2})/gc
+					or die 'an unpaired UTF-16 surrogate, at character ' . (pos($$t) // 0) . "\n";
 				$code = 0x10000 + (($code - 0xD800) << 10) + (hex($1) - 0xDC00);
+			} elsif (($code >= 0xDC00) && ($code <= 0xDFFF)) {
+				die 'an unpaired UTF-16 surrogate, at character ' . (pos($$t) // 0) . "\n";
 			}
 			$string .= chr $code;
+		} elsif ($$t =~ /\G(?=[\x00-\x1f])/gc) {
+			die 'a raw control character in a string, at character ' . (pos($$t) // 0) . "\n";
 		} else {
 			die 'a string is not closed, or has a bad escape, at character ' . (pos($$t) // 0) . "\n";
 		}
@@ -2039,7 +2457,7 @@ SimpleFlow - easy, simple workflow manager (and logger); for keeping track of an
 
 =head1 VERSION
 
-version 0.191
+version 0.192
 
 =head1 DESCRIPTION
 
@@ -2070,12 +2488,17 @@ With a CPAN client:
 
  cpanm SimpleFlow
 
-Or from a checkout:
+Or from a release tarball, unpacked:
 
  perl Makefile.PL
  make
  make test
  make install
+
+A git checkout has no C<Makefile.PL>: it is written by
+L<Dist::Zilla>, so run C<dzil build> there
+first and install from the tarball it makes, or run the tests in place with
+C<prove -Ilib t/>.
 
 =head1 Synopsis
 
@@ -2107,6 +2530,7 @@ it (here from a script called C<example.pl>, run in C</home/you/project>):
      dry.run            0,
      duration           0.00192999839782715,
      env                {},
+     env.secret         [],
      executor           "local",
      executor.args      [],
      exit               0,
@@ -2233,6 +2657,12 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>hash ref</td>
   <td><code>{}</code></td>
   <td>Environment variables for the command only; a value of <code>undef</code> removes one. See Environment and directory.</td>
+</tr>
+<tr>
+  <td><code>env.secret</code></td>
+  <td>array ref</td>
+  <td><code>[]</code></td>
+  <td>Names in <code>env</code> whose values are never printed, logged or traced. See Secrets.</td>
 </tr>
 <tr>
   <td><code>executor</code></td>
@@ -2425,6 +2855,514 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
 
 =end html
 
+=begin :text
+
+=over
+
+=item C<cmd>
+
+Type: scalar or array; Default: C<undef>.
+
+B<Required.> The command to run. A string is handed to the shell; an array ref is run L<without a shell|/"Running without a shell">.
+
+=item C<conda.env>
+
+Type: name or path; Default: C<undef>.
+
+Run the command in this conda environment. See L</"Containers, conda and clusters">.
+
+=item C<container>
+
+Type: image; Default: C<undef>.
+
+Run the command in a container made from this image.
+
+=item C<container.args>
+
+Type: array ref; Default: C<[]>.
+
+More arguments for the container engine, before the image.
+
+=item C<container.engine>
+
+Type: name; Default: C<'docker'>.
+
+C<'docker'>, C<'podman'>, C<'singularity'> or C<'apptainer'>.
+
+=item C<die>
+
+Type: bool (C<0>/C<1>); Default: C<1>.
+
+Die if the command fails (non-zero exit, a kill by signal, a timeout, or a missing output file). Set to C<0> to warn and continue instead.
+
+=item C<dir>
+
+Type: directory; Default: C<undef>.
+
+Run the step in this directory; every file it declares is relative to it. See L</"Environment and directory">.
+
+=item C<dry.run>
+
+Type: bool; Default: C<0>.
+
+Print the command (and log it) but do not execute it.
+
+=item C<env>
+
+Type: hash ref; Default: C<{}>.
+
+Environment variables for the command only; a value of C<undef> removes one. See L</"Environment and directory">.
+
+=item C<env.secret>
+
+Type: array ref; Default: C<[]>.
+
+Names in C<env> whose values are never printed, logged or traced. See L</"Secrets">.
+
+=item C<executor>
+
+Type: C<'local'>/C<'slurm'>; Default: C<'local'>.
+
+Where the command runs: here, or as a SLURM job step through C<srun>.
+
+=item C<executor.args>
+
+Type: array ref; Default: C<[]>.
+
+More arguments for the executor (C<srun>).
+
+=item C<input.dirs>
+
+Type: scalar or array; Default: C<undef>.
+
+Directories that must exist before running, as C<input.files> must.
+
+=item C<input.dir>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<input.dirs> for a B<single> directory.
+
+=item C<input.files>
+
+Type: scalar or array; Default: C<undef>.
+
+File(s) that must exist and be readable B<before> running; otherwise C<task> dies (except in a L<dry run|/"Dry runs">, which lists them instead).
+
+=item C<input.file>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<input.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<input.files>.
+
+=item C<on.failure>
+
+Type: code ref; Default: C<undef>.
+
+Called with the record when the command ran and failed, before C<task> dies. See L</"Hooks">.
+
+=item C<on.success>
+
+Type: code ref; Default: C<undef>.
+
+Called with the record when the command ran and succeeded.
+
+=item C<output.dirs>
+
+Type: scalar or array; Default: C<undef>.
+
+Directories the step makes, checked like C<output.files>. See L</"Directory outputs">.
+
+=item C<output.dir>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<output.dirs> for a B<single> directory. Cannot be combined with C<output.dirs>.
+
+=item C<output.files>
+
+Type: scalar or array; Default: C<undef>.
+
+File(s) expected to exist B<after> running; used both for the missing-output check and for L<skip detection|/"Skipping completed work">.
+
+=item C<output.file>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<output.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<output.files>.
+
+=item C<lock>
+
+Type: bool; Default: C<0>.
+
+Hold a lock on the outputs while the step runs, so that a second copy of the pipeline waits for this one. See L</"Locking">.
+
+=item C<log.fh>
+
+Type: open filehandle; Default: C<undef>.
+
+If given, the full result record is also written here. Must be a real, open filehandle; C<task> switches it to autoflush.
+
+=item C<mem>
+
+Type: e.g. C<'16G'>; Default: C<undef>.
+
+Memory to ask the executor for.
+
+=item C<note>
+
+Type: scalar; Default: C<''>.
+
+Free-text note copied into the result and the log.
+
+=item C<overwrite>
+
+Type: bool; Default: C<0>.
+
+If false and all C<output.files> already exist, the command is skipped. Set true to always run.
+
+=item C<protect>
+
+Type: bool; Default: C<0>.
+
+Make the outputs read-only once the step succeeds. See L</"Protected outputs">.
+
+=item C<quiet>
+
+Type: bool; Default: C<0>.
+
+Suppress the record printed to the terminal. The log and error messages on C<STDERR> are unaffected. See L</"Quiet runs">.
+
+=item C<retries>
+
+Type: whole number; Default: C<0>.
+
+Run a failed step again, up to this many more times. See L</"Retries">.
+
+=item C<retry.delay>
+
+Type: seconds; Default: C<0>.
+
+How long to wait before each retry; may be fractional.
+
+=item C<stale>
+
+Type: bool; Default: C<0>.
+
+Also re-run when an input file is newer than an output file. See L</"Out-of-date outputs">.
+
+=item C<stale.cmd>
+
+Type: bool; Default: C<0>.
+
+Also re-run when the command differs from the one that made the outputs. See L</"Re-running a changed command">.
+
+=item C<stderr.file>
+
+Type: path; Default: C<undef>.
+
+Write the command's standard error to this file instead of the record. See L</"Output to files">.
+
+=item C<stdin>
+
+Type: C<'devnull'>/C<'inherit'>; Default: C<'devnull'>.
+
+What the command sees on its standard input. The default is the null device; C<'inherit'> hands it the caller's own. See L</"Standard input">.
+
+=item C<stdout.file>
+
+Type: path; Default: C<undef>.
+
+Write the command's standard output to this file instead of the record.
+
+=item C<threads>
+
+Type: whole number; Default: C<undef>.
+
+CPUs the command uses: given to it as C<SIMPLEFLOW_THREADS>, and asked of the executor.
+
+=item C<timeout>
+
+Type: whole seconds; Default: C<0>.
+
+Kill the command if it runs longer than this. C<0> means no limit. See L</"Timeouts">.
+
+=item C<trace.fh>
+
+Type: open filehandle; Default: C<undef>.
+
+Append one line of JSON per task to this filehandle. See L</"Tracing">.
+
+=item C<walltime>
+
+Type: e.g. C<'2:00:00'>; Default: C<undef>.
+
+Time to ask the executor for, as SLURM writes it.
+
+=item C<wrapper>
+
+Type: array ref; Default: C<undef>.
+
+A command to run the command inside, e.g. C<['nice', '-n', '10']>.
+
+=back
+
+=end :text
+
+=begin :man
+
+=over
+
+=item C<cmd>
+
+Type: scalar or array; Default: C<undef>.
+
+B<Required.> The command to run. A string is handed to the shell; an array ref is run L<without a shell|/"Running without a shell">.
+
+=item C<conda.env>
+
+Type: name or path; Default: C<undef>.
+
+Run the command in this conda environment. See L</"Containers, conda and clusters">.
+
+=item C<container>
+
+Type: image; Default: C<undef>.
+
+Run the command in a container made from this image.
+
+=item C<container.args>
+
+Type: array ref; Default: C<[]>.
+
+More arguments for the container engine, before the image.
+
+=item C<container.engine>
+
+Type: name; Default: C<'docker'>.
+
+C<'docker'>, C<'podman'>, C<'singularity'> or C<'apptainer'>.
+
+=item C<die>
+
+Type: bool (C<0>/C<1>); Default: C<1>.
+
+Die if the command fails (non-zero exit, a kill by signal, a timeout, or a missing output file). Set to C<0> to warn and continue instead.
+
+=item C<dir>
+
+Type: directory; Default: C<undef>.
+
+Run the step in this directory; every file it declares is relative to it. See L</"Environment and directory">.
+
+=item C<dry.run>
+
+Type: bool; Default: C<0>.
+
+Print the command (and log it) but do not execute it.
+
+=item C<env>
+
+Type: hash ref; Default: C<{}>.
+
+Environment variables for the command only; a value of C<undef> removes one. See L</"Environment and directory">.
+
+=item C<env.secret>
+
+Type: array ref; Default: C<[]>.
+
+Names in C<env> whose values are never printed, logged or traced. See L</"Secrets">.
+
+=item C<executor>
+
+Type: C<'local'>/C<'slurm'>; Default: C<'local'>.
+
+Where the command runs: here, or as a SLURM job step through C<srun>.
+
+=item C<executor.args>
+
+Type: array ref; Default: C<[]>.
+
+More arguments for the executor (C<srun>).
+
+=item C<input.dirs>
+
+Type: scalar or array; Default: C<undef>.
+
+Directories that must exist before running, as C<input.files> must.
+
+=item C<input.dir>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<input.dirs> for a B<single> directory.
+
+=item C<input.files>
+
+Type: scalar or array; Default: C<undef>.
+
+File(s) that must exist and be readable B<before> running; otherwise C<task> dies (except in a L<dry run|/"Dry runs">, which lists them instead).
+
+=item C<input.file>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<input.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<input.files>.
+
+=item C<on.failure>
+
+Type: code ref; Default: C<undef>.
+
+Called with the record when the command ran and failed, before C<task> dies. See L</"Hooks">.
+
+=item C<on.success>
+
+Type: code ref; Default: C<undef>.
+
+Called with the record when the command ran and succeeded.
+
+=item C<output.dirs>
+
+Type: scalar or array; Default: C<undef>.
+
+Directories the step makes, checked like C<output.files>. See L</"Directory outputs">.
+
+=item C<output.dir>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<output.dirs> for a B<single> directory. Cannot be combined with C<output.dirs>.
+
+=item C<output.files>
+
+Type: scalar or array; Default: C<undef>.
+
+File(s) expected to exist B<after> running; used both for the missing-output check and for L<skip detection|/"Skipping completed work">.
+
+=item C<output.file>
+
+Type: scalar; Default: C<undef>.
+
+Convenience form of C<output.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<output.files>.
+
+=item C<lock>
+
+Type: bool; Default: C<0>.
+
+Hold a lock on the outputs while the step runs, so that a second copy of the pipeline waits for this one. See L</"Locking">.
+
+=item C<log.fh>
+
+Type: open filehandle; Default: C<undef>.
+
+If given, the full result record is also written here. Must be a real, open filehandle; C<task> switches it to autoflush.
+
+=item C<mem>
+
+Type: e.g. C<'16G'>; Default: C<undef>.
+
+Memory to ask the executor for.
+
+=item C<note>
+
+Type: scalar; Default: C<''>.
+
+Free-text note copied into the result and the log.
+
+=item C<overwrite>
+
+Type: bool; Default: C<0>.
+
+If false and all C<output.files> already exist, the command is skipped. Set true to always run.
+
+=item C<protect>
+
+Type: bool; Default: C<0>.
+
+Make the outputs read-only once the step succeeds. See L</"Protected outputs">.
+
+=item C<quiet>
+
+Type: bool; Default: C<0>.
+
+Suppress the record printed to the terminal. The log and error messages on C<STDERR> are unaffected. See L</"Quiet runs">.
+
+=item C<retries>
+
+Type: whole number; Default: C<0>.
+
+Run a failed step again, up to this many more times. See L</"Retries">.
+
+=item C<retry.delay>
+
+Type: seconds; Default: C<0>.
+
+How long to wait before each retry; may be fractional.
+
+=item C<stale>
+
+Type: bool; Default: C<0>.
+
+Also re-run when an input file is newer than an output file. See L</"Out-of-date outputs">.
+
+=item C<stale.cmd>
+
+Type: bool; Default: C<0>.
+
+Also re-run when the command differs from the one that made the outputs. See L</"Re-running a changed command">.
+
+=item C<stderr.file>
+
+Type: path; Default: C<undef>.
+
+Write the command's standard error to this file instead of the record. See L</"Output to files">.
+
+=item C<stdin>
+
+Type: C<'devnull'>/C<'inherit'>; Default: C<'devnull'>.
+
+What the command sees on its standard input. The default is the null device; C<'inherit'> hands it the caller's own. See L</"Standard input">.
+
+=item C<stdout.file>
+
+Type: path; Default: C<undef>.
+
+Write the command's standard output to this file instead of the record.
+
+=item C<threads>
+
+Type: whole number; Default: C<undef>.
+
+CPUs the command uses: given to it as C<SIMPLEFLOW_THREADS>, and asked of the executor.
+
+=item C<timeout>
+
+Type: whole seconds; Default: C<0>.
+
+Kill the command if it runs longer than this. C<0> means no limit. See L</"Timeouts">.
+
+=item C<trace.fh>
+
+Type: open filehandle; Default: C<undef>.
+
+Append one line of JSON per task to this filehandle. See L</"Tracing">.
+
+=item C<walltime>
+
+Type: e.g. C<'2:00:00'>; Default: C<undef>.
+
+Time to ask the executor for, as SLURM writes it.
+
+=item C<wrapper>
+
+Type: array ref; Default: C<undef>.
+
+A command to run the command inside, e.g. C<['nice', '-n', '10']>.
+
+=back
+
+=end :man
+
 
 
 Any key but those naming a particular step can also be given once for the whole
@@ -2510,8 +3448,8 @@ C<0>, C<stdout> and C<stderr> are C<''>, C<duration> is C<0>).
   <td>Captured output, with trailing whitespace stripped; <code>''</code> for a stream sent to <code>stdout.file</code> or <code>stderr.file</code>. When the command could not be launched at all (<code>exit</code> is <code>-1</code>), <code>stderr</code> says why, e.g. <code>cannot run "x": No such file or directory</code>.</td>
 </tr>
 <tr>
-  <td><code>conda.env</code>, <code>container</code>, <code>container.args</code>, <code>container.engine</code>, <code>die</code>, <code>dry.run</code>, <code>env</code>, <code>executor</code>, <code>executor.args</code>, <code>lock</code>, <code>mem</code>, <code>note</code>, <code>overwrite</code>, <code>protect</code>, <code>quiet</code>, <code>retries</code>, <code>retry.delay</code>, <code>stale</code>, <code>stale.cmd</code>, <code>stderr.file</code>, <code>stdin</code>, <code>stdout.file</code>, <code>threads</code>, <code>timeout</code>, <code>walltime</code>, <code>wrapper</code></td>
-  <td>The (defaulted) argument values used. A string option not given is <code>''</code>, a list <code>[]</code>, <code>env</code> is <code>{}</code>, and <code>threads</code> is <code>0</code>. The hooks are not recorded: they are code.</td>
+  <td><code>conda.env</code>, <code>container</code>, <code>container.args</code>, <code>container.engine</code>, <code>die</code>, <code>dry.run</code>, <code>env</code>, <code>env.secret</code>, <code>executor</code>, <code>executor.args</code>, <code>lock</code>, <code>mem</code>, <code>note</code>, <code>overwrite</code>, <code>protect</code>, <code>quiet</code>, <code>retries</code>, <code>retry.delay</code>, <code>stale</code>, <code>stale.cmd</code>, <code>stderr.file</code>, <code>stdin</code>, <code>stdout.file</code>, <code>threads</code>, <code>timeout</code>, <code>walltime</code>, <code>wrapper</code></td>
+  <td>The (defaulted) argument values used. A string option not given is <code>''</code>, a list <code>[]</code>, <code>env</code> is <code>{}</code>, and <code>threads</code> is <code>0</code>. The values <code>env.secret</code> names are <code>(secret)</code> in <code>env</code>. The hooks are not recorded: they are code.</td>
 </tr>
 <tr>
   <td><code>output.files</code></td>
@@ -2557,6 +3495,214 @@ C<0>, C<stdout> and C<stderr> are C<''>, C<duration> is C<0>).
 </table>
 
 =end html
+
+=begin :text
+
+=over
+
+=item C<cmd>
+
+The command that was run. An array-ref C<cmd> is recorded space-joined for readability; that is not a shell-quoted round trip, since it never went near a shell.
+
+=item C<dir>
+
+Working directory at execution time: the absolute path of C<dir>, if it was given.
+
+=item C<done>
+
+C<"now"> (just ran), C<"before"> (skipped, outputs already existed), or C<"not yet"> (dry run).
+
+=item C<will.do>
+
+C<"done">, C<"no"> (skipped), C<"no: dry run">, or C<"FAILED">. C<"FAILED"> is set whenever the command exited non-zero, was killed by a signal, timed out, or left a declared output file missing — B<whether or not C<die> is set>.
+
+=item C<duration>
+
+Wall-clock seconds the command took (C<0> for skips/dry runs). With L<retries|/"Retries">, the last attempt's.
+
+=item C<attempts>
+
+How many times the command was run: C<0> for a skip or a dry run, C<1> without retries.
+
+=item C<start.time>
+
+When the last attempt started, in epoch seconds with a fractional part; C<0> if none did.
+
+=item C<cpu.user>, C<cpu.system>
+
+CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows.
+
+=item C<exit>
+
+Exit code of the command, or C<-1> if it could not be launched at all (C<stderr> then says why).
+
+=item C<signal>
+
+Signal number if the command process was killed by a signal, else C<0>. A non-zero C<signal> makes the step C<"FAILED">, even though C<exit> is then C<0>. Always C<0> on Windows (no POSIX signals).
+
+=item C<timed.out>
+
+C<1> if the command was killed for exceeding its C<timeout>, else C<0>.
+
+=item C<out.of.date>
+
+C<1> if C<stale> was set and an input was newer than an output, else C<0>.
+
+=item C<stdout>, C<stderr>
+
+Captured output, with trailing whitespace stripped; C<''> for a stream sent to C<stdout.file> or C<stderr.file>. When the command could not be launched at all (C<exit> is C<-1>), C<stderr> says why, e.g. C<cannot run "x": No such file or directory>.
+
+=item C<conda.env>, C<container>, C<container.args>, C<container.engine>, C<die>, C<dry.run>, C<env>, C<env.secret>, C<executor>, C<executor.args>, C<lock>, C<mem>, C<note>, C<overwrite>, C<protect>, C<quiet>, C<retries>, C<retry.delay>, C<stale>, C<stale.cmd>, C<stderr.file>, C<stdin>, C<stdout.file>, C<threads>, C<timeout>, C<walltime>, C<wrapper>
+
+The (defaulted) argument values used. A string option not given is C<''>, a list C<[]>, C<env> is C<{}>, and C<threads> is C<0>. The values C<env.secret> names are C<(secret)> in C<env>. The hooks are not recorded: they are code.
+
+=item C<output.files>
+
+Array ref of the output files (a scalar argument, or an C<output.file>, is normalised to a one-element array).
+
+=item C<output.dirs>
+
+Array ref of the output directories, normalised as C<output.files> is.
+
+=item C<input.dirs>
+
+Array ref of the input directories, normalised the same way; C<[]> if none.
+
+=item C<cmd.changed>
+
+C<1> if C<stale.cmd> was set and the command on record for the outputs was a different one, else C<0>.
+
+=item C<wrapped.cmd>
+
+The command as actually run, inside its executor, container, conda environment and wrapper, space-joined; C<''> if it ran as it is.
+
+=item C<output.file.size>
+
+Hash of C<filename =E<gt> size in bytes> for the outputs, as the command left them (measured before a failed step's outputs are moved aside).
+
+=item C<failed.outputs>
+
+Array ref of the names a failed step's outputs were L<moved to|/"Failure behaviour">, each the output's own name with C<.failed> appended; C<[]> on every other path.
+
+=item C<input.files>
+
+Array ref of the input files, normalised the same way (present only if you passed C<input.files> or C<input.file>).
+
+=item C<input.file.size>
+
+Hash of C<filename =E<gt> size in bytes> for the inputs (present only if you passed C<input.files> or C<input.file>). In a dry run, an input that does not exist yet has C<undef>.
+
+=item C<source.file>, C<source.line>
+
+Where in I<your> code the C<task> was called: handy when debugging a long pipeline.
+
+=back
+
+=end :text
+
+=begin :man
+
+=over
+
+=item C<cmd>
+
+The command that was run. An array-ref C<cmd> is recorded space-joined for readability; that is not a shell-quoted round trip, since it never went near a shell.
+
+=item C<dir>
+
+Working directory at execution time: the absolute path of C<dir>, if it was given.
+
+=item C<done>
+
+C<"now"> (just ran), C<"before"> (skipped, outputs already existed), or C<"not yet"> (dry run).
+
+=item C<will.do>
+
+C<"done">, C<"no"> (skipped), C<"no: dry run">, or C<"FAILED">. C<"FAILED"> is set whenever the command exited non-zero, was killed by a signal, timed out, or left a declared output file missing — B<whether or not C<die> is set>.
+
+=item C<duration>
+
+Wall-clock seconds the command took (C<0> for skips/dry runs). With L<retries|/"Retries">, the last attempt's.
+
+=item C<attempts>
+
+How many times the command was run: C<0> for a skip or a dry run, C<1> without retries.
+
+=item C<start.time>
+
+When the last attempt started, in epoch seconds with a fractional part; C<0> if none did.
+
+=item C<cpu.user>, C<cpu.system>
+
+CPU seconds the command, and everything it waited for, spent in user and system mode. The clock counts in ticks of 1/100 s on Linux. Not known to be filled in on Windows.
+
+=item C<exit>
+
+Exit code of the command, or C<-1> if it could not be launched at all (C<stderr> then says why).
+
+=item C<signal>
+
+Signal number if the command process was killed by a signal, else C<0>. A non-zero C<signal> makes the step C<"FAILED">, even though C<exit> is then C<0>. Always C<0> on Windows (no POSIX signals).
+
+=item C<timed.out>
+
+C<1> if the command was killed for exceeding its C<timeout>, else C<0>.
+
+=item C<out.of.date>
+
+C<1> if C<stale> was set and an input was newer than an output, else C<0>.
+
+=item C<stdout>, C<stderr>
+
+Captured output, with trailing whitespace stripped; C<''> for a stream sent to C<stdout.file> or C<stderr.file>. When the command could not be launched at all (C<exit> is C<-1>), C<stderr> says why, e.g. C<cannot run "x": No such file or directory>.
+
+=item C<conda.env>, C<container>, C<container.args>, C<container.engine>, C<die>, C<dry.run>, C<env>, C<env.secret>, C<executor>, C<executor.args>, C<lock>, C<mem>, C<note>, C<overwrite>, C<protect>, C<quiet>, C<retries>, C<retry.delay>, C<stale>, C<stale.cmd>, C<stderr.file>, C<stdin>, C<stdout.file>, C<threads>, C<timeout>, C<walltime>, C<wrapper>
+
+The (defaulted) argument values used. A string option not given is C<''>, a list C<[]>, C<env> is C<{}>, and C<threads> is C<0>. The values C<env.secret> names are C<(secret)> in C<env>. The hooks are not recorded: they are code.
+
+=item C<output.files>
+
+Array ref of the output files (a scalar argument, or an C<output.file>, is normalised to a one-element array).
+
+=item C<output.dirs>
+
+Array ref of the output directories, normalised as C<output.files> is.
+
+=item C<input.dirs>
+
+Array ref of the input directories, normalised the same way; C<[]> if none.
+
+=item C<cmd.changed>
+
+C<1> if C<stale.cmd> was set and the command on record for the outputs was a different one, else C<0>.
+
+=item C<wrapped.cmd>
+
+The command as actually run, inside its executor, container, conda environment and wrapper, space-joined; C<''> if it ran as it is.
+
+=item C<output.file.size>
+
+Hash of C<filename =E<gt> size in bytes> for the outputs, as the command left them (measured before a failed step's outputs are moved aside).
+
+=item C<failed.outputs>
+
+Array ref of the names a failed step's outputs were L<moved to|/"Failure behaviour">, each the output's own name with C<.failed> appended; C<[]> on every other path.
+
+=item C<input.files>
+
+Array ref of the input files, normalised the same way (present only if you passed C<input.files> or C<input.file>).
+
+=item C<input.file.size>
+
+Hash of C<filename =E<gt> size in bytes> for the inputs (present only if you passed C<input.files> or C<input.file>). In a dry run, an input that does not exist yet has C<undef>.
+
+=item C<source.file>, C<source.line>
+
+Where in I<your> code the C<task> was called: handy when debugging a long pipeline.
+
+=back
+
+=end :man
 
 
 
@@ -2635,13 +3781,23 @@ given the terminal's foreground for the duration, as a shell gives it to a job,
 so that it can read from the terminal; your script takes it back afterwards.
 A Ctrl-Z then suspends the command and your script together, as a shell
 suspends a job, with the timeout's clock stopped, and C<fg> carries on with
-both.
+both. The same holds without a C<timeout>.
 
-Without a C<timeout>, the command shares your script's process group, so a
-Ctrl-C reaches it directly, as under C<system>. A C<TERM> or C<HUP> sent to your
-script alone, by a batch scheduler or C<kill>, is passed on to the command,
-which is waited for; then the record is written and the signal passed on to
-your script, as with a timeout.
+Without a C<timeout> the command has a process group of its own as well, so
+that a signal reaches the whole of it, not just the shell at its head. A
+C<TERM> or C<HUP> sent to your script, by a batch scheduler or C<kill>, is passed
+on to the command's group, which is waited for; then the record is written and
+the signal passed on to your script, as with a timeout. A Ctrl-C (C<INT>) or
+C<QUIT> is passed on to the group in the same way, but, as under C<system>, not
+to your script afterwards: the step fails, killed by the signal, and C<die>
+decides what happens next. A Ctrl-Z stops the command and your script together,
+and C<fg> or C<bg> carries on with both. A command that opens the terminal
+itself, as C<ssh> or C<sudo> do to ask for a password, is given its foreground
+while your script has it to give.
+
+If one of your own signal handlers dies while a command runs, the command's
+group is killed and waited for before the exception reaches your code.
+Before 0.192 the command was left running.
 
 An C<alarm> your script already had pending is kept: it is put back when the
 command finishes, less the time the command took, and if it fell due while the
@@ -2692,6 +3848,29 @@ the command itself sees it. Your script is back in its own directory when
 C<task> returns, however it returns, dying included. The record's C<dir> is the
 absolute path the step ran in.
 
+=head2 Secrets
+
+The record holds the C<env> a step was given, and the record is printed, written
+to the log and written to the trace. A credential passed in C<env> would be
+written out with it. C<env.secret> names the variables whose values must not be:
+
+ my $t = task(
+     cmd          => 'fetch-data --to data.csv',
+     env          => { API_TOKEN => $token },
+     'env.secret' => ['API_TOKEN'],
+ );
+
+The command is given the real value; everywhere else, the record included, it
+is C<(secret)>, and so it is in the arguments printed with an error. A secret's
+value is not part of what L<stale.cmd|/"Re-running a changed command">
+compares, so a new token does not re-run every step. C<env.secret> in
+L<%SimpleFlow::DEFAULTS|/"Defaults for a whole pipeline"> is combined with a
+step's own, as C<env> is.
+
+Nothing else is hidden: the command line, C<note> and every other C<env> value
+are written out in full. Pass a credential through C<env>, never on the command
+line.
+
 =head2 Output to files
 
 A command that prints a great deal is better written to a file than held in
@@ -2704,7 +3883,10 @@ memory and printed in the record:
  );
 
 The files are emptied when the step starts and receive the output of every
-attempt, in order; the record's C<stdout> and C<stderr> are then C<''>. Naming the
+attempt, in order; the record's C<stdout> and C<stderr> are then C<''>. That holds
+even when the file is also a declared output, or is inside one: a failed
+attempt that is to be retried leaves such an output where it is, and only a
+step that has failed for good moves it aside. Naming the
 same file for both puts the two streams in it interleaved, as a terminal would
 show them. A step that is skipped, or dry-run, leaves the files alone, so they
 still hold the output of the run that made the step's outputs. This is
@@ -2759,8 +3941,9 @@ Nextflow's C<trace.txt>:
  local %SimpleFlow::DEFAULTS = ('trace.fh' => $trace);
 
 Each line holds every field of the record except C<stdout> and C<stderr>, which
-can be any size, plus C<time>, when the line was written. Open the file without
-an encoding layer: the lines are UTF-8 already.
+can be any size, plus C<time>, when the line was written: the command line and
+C<env> included, so see L</"Secrets">. Open the file without an encoding
+layer: the lines are UTF-8 already.
 
 =head2 Locking
 
@@ -2783,6 +3966,19 @@ on would let two runs through. A step with no declared outputs has nothing to
 lock, and a dry run takes no lock. The locks are C<flock> locks, which some
 network filesystems do not honour.
 
+An output is locked under its real directory and its own name, so C<out> and
+C<sub/../out>, or a name reached through a linked directory, are one output
+here; an output that is itself a symbolic link is locked under what it points
+at as well. A step also takes a shared lock on every directory above each of
+its outputs, so that a step whose output is a directory, and one whose output
+is a file inside it, do not run at once. Two hard links to one file are still
+two outputs.
+
+C<.simpleflow/>, and C<.simpleflow/cmd/> under it, must be directories, not
+symbolic links: C<task> refuses a link there, and opens nothing inside them
+through one. These guard against a link planted by someone else; they do not
+make a working directory others can write to safe to run a pipeline in.
+
 =head2 Re-running a changed command
 
 By default a step whose outputs exist is skipped even if its command has been
@@ -2795,13 +3991,19 @@ C<params> and C<code> rerun triggers do:
      'stale.cmd'   => 1,
  );
 
-Changing the command, its C<env>, or what it runs inside (its container,
-conda environment, executor or wrapper) makes C<cmd.changed> C<1> and the step
-run again. What made each set of outputs is kept, as a digest, in
+Changing the command, its C<env>, its C<threads>, or what it runs inside (its
+container, conda environment, executor or wrapper) makes C<cmd.changed> C<1> and
+the step run again. What made each set of outputs is kept, as a digest, in
 C<.simpleflow/cmd/> in the working directory, and written only after a
 successful run. Outputs that exist with nothing on record, made before
 C<stale.cmd> was used, or by hand, are not re-run: the command is recorded
 against them, so that the next change is seen.
+
+A step run I<without> C<stale.cmd> over outputs that have a command on record
+still replaces them, so after it succeeds its own command is recorded in place
+of the old one, and a later C<stale.cmd> run of the old command runs again
+rather than taking the other's outputs as its own. With nothing on record, a
+step without C<stale.cmd> records nothing.
 
 =head2 Hooks
 
@@ -2923,7 +4125,10 @@ C<'inherit'> is the behaviour of 0.162 and earlier, and comes with its hazards:
 the command consumes input your own script can then no longer read, and a
 command that prompts will hang exactly as it used to. The caller's standard
 input is saved and restored around every run either way, including when the
-command dies, and a caller that had closed it keeps it closed.
+command dies, and a caller that had closed it keeps it closed. A C<STDIN> that
+is not descriptor 0, such as one opened on an in-memory scalar, is not the
+command's standard input in any case: it is left alone, and descriptor 0 is
+pointed at the null device and put back instead.
 
 =head2 Dry runs
 
@@ -2956,7 +4161,12 @@ traceback or C<make> says what went wrong.
 
 Whichever of those happened, every declared output that I<does> exist is moved to
 C<< E<lt>fileE<gt>.failed >> (replacing any C<.failed> left from before), and the new names are
-listed in the record's C<failed.outputs> and on C<STDERR>. A command that fails
+listed in the record's C<failed.outputs> and on C<STDERR>. A name declared twice
+is moved once; a file inside a declared directory moves with the directory,
+under its own name; and when one output is named like another's C<.failed>, as
+C<out> and C<out.failed> are, the longer name is moved first, so that neither is
+lost. When the message quotes standard error from a C<stderr.file> that was one
+of the outputs, it is read before the file is moved. A command that fails
 part-way often leaves a truncated file behind; left under its own name, it would
 pass the L<skip test|/"Skipping completed work"> on the next run and become the
 result for good. Snakemake deletes a failed job's outputs for the same reason;
@@ -2982,7 +4192,7 @@ C<%SimpleFlow::DEFAULTS> gives a value to any key a C<task> call leaves undefine
  );
 
 A task that sets a key itself keeps its own value. C<env> is the one exception:
-a task's own C<env> is merged with the default one, its own entries winning.
+a task's own C<env> is merged with the default one, its own entries winning, and its own C<env.secret> is added to the default one.
 Keys that name a particular step (C<cmd>, the C<input.*> and C<output.*> lists,
 C<stdout.file> and C<stderr.file>) are refused in C<%DEFAULTS>, since every step
 would then run the same command or claim the same files, and so is any key
@@ -3016,7 +4226,9 @@ Each entry of C<tasks> is the arguments of one C<task>, which runs in full, in a
 child process of its own: its checks, its log, its record, its options, and
 C<%SimpleFlow::DEFAULTS>. Each record's C<source.file> and C<source.line> are the
 C<parallel> call's. Output from several steps at once interleaves, a record at
-a time, on the terminal and in a shared log.
+a time, on the terminal, in a shared log and in a shared L<trace|/"Tracing">:
+each step writes its record holding a lock, so that no two records are mixed
+within a line.
 
 When a step fails, and C<task> would die, no further step is started; those
 already running are left to finish, and then C<parallel> dies with every
@@ -3048,7 +4260,9 @@ your script it was called, alongside a timeline of when each ran. It is one
 self-contained file, with no scripts and nothing fetched, which follows the
 reader's light or dark setting, so that it can be mailed or archived as it
 is. C<report> returns the number of tasks it read, and dies naming the line of
-the trace it could not read.
+the trace it could not read: one that is not strict JSON in UTF-8, nests more
+than 512 deep, or has a time that is not a number of seconds or a command that
+is not a string. A C<title> may be a character string or UTF-8 bytes.
 
 =head1 Dependencies
 
@@ -3083,3 +4297,7 @@ distribution, in the format CPAN itself reads.
 =head1 COPYRIGHT AND LICENSE
 
 This software is free.  It is licensed under the same terms as Perl itself
+
+=head1 Thanks
+
+A lot of this work used Claude AI, which was paid for by the University of Idaho's IMCI

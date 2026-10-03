@@ -29,3 +29,7 @@
 
 # OS specific
 ^\.DS_Store$
+
+# Old releases and the retired Pair::Restish::Client copy
+^Restish-Client-
+^pair-restish-client-master/

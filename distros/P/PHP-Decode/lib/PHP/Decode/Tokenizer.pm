@@ -6,7 +6,7 @@ package PHP::Decode::Tokenizer;
 use strict;
 use warnings;
 
-our $VERSION = '1.47';
+our $VERSION = '1.48';
 
 # Initialize PHP::Decode::Tokenizer
 # {inscript}   - set to indicate already inside of script
@@ -435,11 +435,13 @@ sub tokenize_line {
 				}
 				$self->add_comment($1, pos);
 				if ($2 eq '?>') {
-					$self->add_script_end('?>', pos);
-					$self->{inscript} = 0;
+					my $cur = pos;
 					if (/\G(\n|\r\n)/sgc) {
-						$self->add_white("\n");
+						$self->add_script_end("?>\n", pos);
+					} else {
+						$self->add_script_end('?>', $cur);
 					}
+					$self->{inscript} = 0;
 				}
 			#}
 		} elsif (/\G(\n)/sgc) {
@@ -471,11 +473,13 @@ sub tokenize_line {
 			} elsif (($self->{inscript} == 2) && /\G(\/script\s*>)/sgci) {
 				# <script language='php'> .. </script>
 				#
-				$self->add_script_end('?>', pos);
-				$self->{inscript} = 0;
+				my $cur = pos;
 				if (/\G(\n|\r\n)/sgc) {
-					$self->add_white("\n");
+					$self->add_script_end("?>\n", pos);
+				} else {
+					$self->add_script_end('?>', $cur);
 				}
+				$self->{inscript} = 0;
 			} elsif (/\G(<<)/sgc) {
 				# heredoc or nowdoc
 				# http://php.net/manual/de/language.types.string.php
@@ -510,11 +514,13 @@ sub tokenize_line {
 				# http://php.net/manual/en/language.basic-syntax.instruction-separation.php
 				# the closing tag includes an optional immediately following newline
 				#
-				$self->add_script_end('?>', pos);
-				$self->{inscript} = 0;
+				my $cur = pos;
 				if (/\G(\n|\r\n)/sgc) {
-					$self->add_white("\n");
+					$self->add_script_end("?>\n", pos);
+				} else {
+					$self->add_script_end('?>', $cur);
 				}
+				$self->{inscript} = 0;
 			} else {
 				$self->add('?');
 			}

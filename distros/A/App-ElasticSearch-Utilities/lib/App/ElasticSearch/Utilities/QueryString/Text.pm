@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::Text;
 use v5.16;
 use warnings;
 
-our $VERSION = '9.0'; # VERSION
+our $VERSION = '9.1'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Const::Fast;
@@ -68,7 +68,7 @@ App::ElasticSearch::Utilities::QueryString::Text - Provides a better interface f
 
 =head1 VERSION
 
-version 9.0
+version 9.1
 
 =head1 SYNOPSIS
 

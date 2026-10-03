@@ -1,5 +1,33 @@
 #include "xs/net_quic_connection.h"
 
+static uint32_t
+net_quic_wire_version(int version)
+{
+    switch (version) {
+    case 1:
+        return NGTCP2_PROTO_VER_V1;
+    case 2:
+        return NGTCP2_PROTO_VER_V2;
+    default:
+        croak("QUIC version must be 1 or 2");
+    }
+
+    return NGTCP2_PROTO_VER_V1;
+}
+
+static int
+net_quic_public_version(uint32_t version)
+{
+    switch (version) {
+    case NGTCP2_PROTO_VER_V1:
+        return 1;
+    case NGTCP2_PROTO_VER_V2:
+        return 2;
+    default:
+        return 0;
+    }
+}
+
 static int
 net_quic_stream_close_limit_cb(
     ngtcp2_conn *conn,
@@ -98,6 +126,7 @@ net_quic_start_error_close(
         }
 
         ep->closebuflen = (size_t)nwrite;
+        ep->close_ecn = pi.ecn & NGTCP2_ECN_MASK;
         ep->closebuf_pending = 1;
     }
 
@@ -142,7 +171,7 @@ net_quic_apply_transport_config(
         params->initial_max_streams_bidi = 100;
         params->initial_max_streams_uni = 100;
         params->active_connection_id_limit = 4;
-        params->disable_active_migration = 1;
+        params->disable_active_migration = 0;
         return;
     }
 
@@ -196,7 +225,7 @@ net_quic_apply_transport_config(
     params->initial_max_streams_bidi = max_bidi_streams;
     params->initial_max_streams_uni = max_uni_streams;
     params->active_connection_id_limit = 4;
-    params->disable_active_migration = 1;
+    params->disable_active_migration = 0;
 }
 
 static net_quic_server_tls *
@@ -315,10 +344,11 @@ _crypto_self_test()
 MODULE = Net::QUIC    PACKAGE = Net::QUIC::_ServerTLS
 
 SV *
-_new(class, cert_file_sv, key_file_sv)
+_new(class, cert_file_sv, key_file_sv, accept_early_data = 0)
     const char *class
     SV *cert_file_sv
     SV *key_file_sv
+    int accept_early_data
     PREINIT:
         net_quic_server_tls *tls = NULL;
         const char *cert_file;
@@ -341,7 +371,12 @@ _new(class, cert_file_sv, key_file_sv)
             croak("unable to allocate shared server TLS context");
         }
 
-        tls_error = net_quic_server_tls_init(tls, cert_file, key_file);
+        tls_error = net_quic_server_tls_init(
+            tls,
+            cert_file,
+            key_file,
+            accept_early_data ? 1 : 0
+        );
         if (tls_error != NULL) {
             net_quic_server_tls_dispose(tls);
             Safefree(tls);
@@ -374,7 +409,7 @@ DESTROY(self)
 MODULE = Net::QUIC    PACKAGE = Net::QUIC::Connection
 
 SV *
-_client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, transport_sv = &PL_sv_undef)
+_client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, transport_sv = &PL_sv_undef, session_ticket_sv = &PL_sv_undef, early_transport_sv = &PL_sv_undef, address_token_sv = &PL_sv_undef, version = 1, version_locked = 0)
     const char *class
     SV *local_sv
     SV *peer_sv
@@ -382,6 +417,11 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
     SV *server_name_sv
     SV *ca_file_sv
     SV *transport_sv
+    SV *session_ticket_sv
+    SV *early_transport_sv
+    SV *address_token_sv
+    int version
+    int version_locked
     PREINIT:
         net_quic_connection *ep = NULL;
         const char *local;
@@ -389,13 +429,21 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
         const char *alpn;
         const char *server_name;
         const char *ca_file;
+        const char *session_ticket = NULL;
+        const char *early_transport = NULL;
+        const char *address_token = NULL;
         STRLEN locallen;
         STRLEN peerlen;
         STRLEN alpnlen;
         STRLEN server_namelen;
         STRLEN ca_file_len;
+        STRLEN session_ticket_len = 0;
+        STRLEN early_transport_len = 0;
+        STRLEN address_token_len = 0;
         ngtcp2_callbacks callbacks;
         ngtcp2_settings settings;
+        uint32_t versions[2];
+        uint32_t chosen_version;
         ngtcp2_transport_params params;
         ngtcp2_path path;
         ngtcp2_cid dcid;
@@ -408,6 +456,27 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
         alpn = SvPVbyte(alpn_sv, alpnlen);
         server_name = SvPVbyte(server_name_sv, server_namelen);
         ca_file = SvPVbyte(ca_file_sv, ca_file_len);
+        if (SvOK(session_ticket_sv)) {
+            session_ticket = SvPVbyte(session_ticket_sv, session_ticket_len);
+            if (session_ticket_len == 0) {
+                croak("session_ticket cannot be empty");
+            }
+        }
+        if (SvOK(early_transport_sv)) {
+            early_transport = SvPVbyte(early_transport_sv, early_transport_len);
+            if (early_transport_len == 0) {
+                croak("early-data transport state cannot be empty");
+            }
+            if (session_ticket == NULL) {
+                croak("early-data transport state requires a session ticket");
+            }
+        }
+        if (SvOK(address_token_sv)) {
+            address_token = SvPVbyte(address_token_sv, address_token_len);
+            if (address_token_len == 0) {
+                croak("address_token cannot be empty");
+            }
+        }
 
         if (alpnlen == 0 || alpnlen > 255) {
             croak("alpn must contain 1 to 255 bytes");
@@ -454,6 +523,16 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
             croak("unable to allocate Net::QUIC::Connection strings");
         }
 
+        if (session_ticket != NULL) {
+            Newx(ep->resume_ticket, session_ticket_len, uint8_t);
+            if (ep->resume_ticket == NULL) {
+                net_quic_connection_free(aTHX_ ep);
+                croak("unable to allocate TLS session ticket");
+            }
+            memcpy(ep->resume_ticket, session_ticket, (size_t)session_ticket_len);
+            ep->resume_ticket_len = (size_t)session_ticket_len;
+        }
+
         ep->conn_ref.get_conn = net_quic_get_conn;
         ep->conn_ref.user_data = ep;
 
@@ -472,6 +551,7 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
         callbacks.stream_open = net_quic_stream_open_cb;
         callbacks.stream_close = net_quic_stream_close_limit_cb;
         callbacks.stream_reset = net_quic_stream_reset_cb;
+        callbacks.recv_stop_sending = net_quic_recv_stop_sending_cb;
         callbacks.extend_max_local_streams_bidi =
             net_quic_extend_max_local_streams_bidi_cb;
         callbacks.extend_max_local_streams_uni =
@@ -480,13 +560,19 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
         callbacks.decrypt = ngtcp2_crypto_decrypt_cb;
         callbacks.hp_mask = ngtcp2_crypto_hp_mask_cb;
         callbacks.recv_retry = ngtcp2_crypto_recv_retry_cb;
+        callbacks.recv_new_token = net_quic_recv_new_token_cb;
         callbacks.rand = net_quic_rand_cb;
         callbacks.update_key = ngtcp2_crypto_update_key_cb;
         callbacks.delete_crypto_aead_ctx = ngtcp2_crypto_delete_crypto_aead_ctx_cb;
         callbacks.delete_crypto_cipher_ctx = ngtcp2_crypto_delete_crypto_cipher_ctx_cb;
         callbacks.version_negotiation = ngtcp2_crypto_version_negotiation_cb;
+        callbacks.tls_early_data_rejected =
+            net_quic_tls_early_data_rejected_cb;
         callbacks.get_new_connection_id2 = net_quic_get_new_connection_id_cb;
         callbacks.get_path_challenge_data2 = ngtcp2_crypto_get_path_challenge_data2_cb;
+        callbacks.begin_path_validation = net_quic_begin_path_validation_cb;
+        callbacks.path_validation = net_quic_path_validation_cb;
+        callbacks.select_preferred_addr = net_quic_select_preferred_addr_cb;
 
         if (net_quic_random_bytes(dcid.data, NGTCP2_MIN_INITIAL_DCIDLEN) != 0 ||
             net_quic_random_bytes(scid.data, 16) != 0) {
@@ -498,6 +584,24 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
 
         ngtcp2_settings_default(&settings);
         settings.initial_ts = net_quic_now();
+
+        chosen_version = net_quic_wire_version(version);
+        versions[0] = chosen_version;
+        versions[1] = chosen_version == NGTCP2_PROTO_VER_V1
+            ? NGTCP2_PROTO_VER_V2
+            : NGTCP2_PROTO_VER_V1;
+
+        settings.preferred_versions = versions;
+        settings.preferred_versionslen = version_locked ? 1 : 2;
+        settings.available_versions = versions;
+        settings.available_versionslen = version_locked ? 1 : 2;
+        settings.original_version = chosen_version;
+
+        if (address_token != NULL) {
+            settings.token = (const uint8_t *)address_token;
+            settings.tokenlen = (size_t)address_token_len;
+            settings.token_type = NGTCP2_TOKEN_TYPE_NEW_TOKEN;
+        }
 
         ngtcp2_transport_params_default(&params);
         net_quic_apply_transport_config(&settings, &params, transport_sv);
@@ -513,7 +617,7 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
             &dcid,
             &scid,
             &path,
-            NGTCP2_PROTO_VER_V1,
+            chosen_version,
             &callbacks,
             &settings,
             &params,
@@ -523,6 +627,22 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
         if (rv != 0) {
             net_quic_connection_free(aTHX_ ep);
             croak("ngtcp2_conn_client_new failed: %s", ngtcp2_strerror(rv));
+        }
+
+        if (early_transport != NULL) {
+            rv = ngtcp2_conn_decode_and_set_0rtt_transport_params(
+                ep->conn,
+                (const uint8_t *)early_transport,
+                (size_t)early_transport_len
+            );
+            if (rv != 0) {
+                net_quic_connection_free(aTHX_ ep);
+                croak(
+                    "invalid early-data transport state: %s",
+                    ngtcp2_strerror(rv)
+                );
+            }
+            ep->early_data_attempted = 1;
         }
 
         if (net_quic_tls_client_finish(aTHX_ ep) != 0) {
@@ -535,7 +655,7 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
         RETVAL
 
 SV *
-_server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_sv = &PL_sv_undef, server_secret_sv = &PL_sv_undef, transport_sv = &PL_sv_undef)
+_server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_sv = &PL_sv_undef, server_secret_sv = &PL_sv_undef, transport_sv = &PL_sv_undef, preferred_address_sv = &PL_sv_undef, validated_token_type = 0, issue_new_token = 0, preferred_version = 0)
     const char *class
     SV *initial_sv
     SV *local_sv
@@ -545,6 +665,10 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
     SV *odcid_sv
     SV *server_secret_sv
     SV *transport_sv
+    SV *preferred_address_sv
+    int validated_token_type
+    int issue_new_token
+    int preferred_version
     PREINIT:
         net_quic_connection *ep = NULL;
         const char *initial;
@@ -560,10 +684,18 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
         STRLEN alpnlen;
         const char *odcid_data = NULL;
         STRLEN odcid_len = 0;
+        const char *preferred_address = NULL;
+        STRLEN preferred_address_len = 0;
+        ngtcp2_sockaddr_union preferred_addr_storage;
+        ngtcp2_socklen preferred_addrlen = 0;
+        int preferred_addr_present = 0;
         ngtcp2_version_cid vcid;
         ngtcp2_pkt_hd hd;
         ngtcp2_callbacks callbacks;
         ngtcp2_settings settings;
+        uint32_t available_versions[2];
+        uint32_t preferred_versions[2];
+        uint32_t server_preferred_version = 0;
         ngtcp2_transport_params params;
         ngtcp2_path path;
         ngtcp2_cid dcid;
@@ -587,6 +719,24 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
             if (odcid_len == 0 || odcid_len > NGTCP2_MAX_CIDLEN) {
                 croak("original destination connection ID has invalid length");
             }
+        }
+        if (SvOK(preferred_address_sv)) {
+            preferred_address = SvPVbyte(
+                preferred_address_sv,
+                preferred_address_len
+            );
+            if (net_quic_copy_sockaddr(
+                    &preferred_addr_storage,
+                    &preferred_addrlen,
+                    preferred_address,
+                    preferred_address_len
+                ) != 0 ||
+                net_quic_sockaddr_is_unspecified(&preferred_addr_storage)) {
+                croak(
+                    "preferred_address must be a concrete packed IPv4 or IPv6 socket address"
+                );
+            }
+            preferred_addr_present = 1;
         }
 
         if (alpnlen == 0 || alpnlen > 255) {
@@ -621,6 +771,14 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
             croak("unable to allocate Net::QUIC::Connection");
         }
         ep->is_server = 1;
+        ep->issue_new_token = issue_new_token ? 1 : 0;
+
+        if (validated_token_type != NGTCP2_TOKEN_TYPE_UNKNOWN &&
+            validated_token_type != NGTCP2_TOKEN_TYPE_RETRY &&
+            validated_token_type != NGTCP2_TOKEN_TYPE_NEW_TOKEN) {
+            net_quic_connection_free(aTHX_ ep);
+            croak("invalid validated token type");
+        }
 
         if (server_secret_data != NULL) {
             memcpy(
@@ -686,6 +844,7 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
         callbacks.stream_open = net_quic_stream_open_cb;
         callbacks.stream_close = net_quic_stream_close_limit_cb;
         callbacks.stream_reset = net_quic_stream_reset_cb;
+        callbacks.recv_stop_sending = net_quic_recv_stop_sending_cb;
         callbacks.extend_max_local_streams_bidi =
             net_quic_extend_max_local_streams_bidi_cb;
         callbacks.extend_max_local_streams_uni =
@@ -701,6 +860,8 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
         callbacks.get_new_connection_id2 = net_quic_get_new_connection_id_cb;
         callbacks.remove_connection_id = net_quic_remove_connection_id_cb;
         callbacks.get_path_challenge_data2 = ngtcp2_crypto_get_path_challenge_data2_cb;
+        callbacks.begin_path_validation = net_quic_begin_path_validation_cb;
+        callbacks.path_validation = net_quic_path_validation_cb;
 
         ngtcp2_cid_init(&dcid, vcid.scid, vcid.scidlen);
 
@@ -713,14 +874,37 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
         ngtcp2_settings_default(&settings);
         settings.initial_ts = net_quic_now();
 
-        if (odcid_data != NULL) {
+        available_versions[0] = NGTCP2_PROTO_VER_V1;
+        available_versions[1] = NGTCP2_PROTO_VER_V2;
+        settings.available_versions = available_versions;
+        settings.available_versionslen = 2;
+
+        if (preferred_version != 0) {
+            server_preferred_version = net_quic_wire_version(preferred_version);
+            preferred_versions[0] = server_preferred_version;
+            preferred_versions[1] =
+                server_preferred_version == NGTCP2_PROTO_VER_V1
+                    ? NGTCP2_PROTO_VER_V2
+                    : NGTCP2_PROTO_VER_V1;
+            settings.preferred_versions = preferred_versions;
+            settings.preferred_versionslen = 2;
+        }
+
+        if (validated_token_type != NGTCP2_TOKEN_TYPE_UNKNOWN) {
             if (hd.tokenlen == 0) {
                 net_quic_connection_free(aTHX_ ep);
-                croak("Retry-validated connection is missing its token");
+                croak("validated connection is missing its token");
             }
+
+            if (odcid_data != NULL &&
+                validated_token_type != NGTCP2_TOKEN_TYPE_RETRY) {
+                net_quic_connection_free(aTHX_ ep);
+                croak("original destination CID requires a Retry token");
+            }
+
             settings.token = hd.token;
             settings.tokenlen = hd.tokenlen;
-            settings.token_type = NGTCP2_TOKEN_TYPE_RETRY;
+            settings.token_type = (ngtcp2_token_type)validated_token_type;
         }
 
         ngtcp2_transport_params_default(&params);
@@ -736,6 +920,48 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
         if (rv != 0) {
             net_quic_connection_free(aTHX_ ep);
             croak("unable to generate server stateless reset token");
+        }
+
+        if (preferred_addr_present) {
+            params.preferred_addr_present = 1;
+            params.preferred_addr.cid.datalen = NET_QUIC_SERVER_CIDLEN;
+
+            if (net_quic_random_bytes(
+                    params.preferred_addr.cid.data,
+                    params.preferred_addr.cid.datalen
+                ) != 0) {
+                net_quic_connection_free(aTHX_ ep);
+                croak("unable to generate preferred-address connection ID");
+            }
+
+            rv = ngtcp2_crypto_generate_stateless_reset_token(
+                params.preferred_addr.stateless_reset_token,
+                ep->server_secret,
+                sizeof(ep->server_secret),
+                &params.preferred_addr.cid
+            );
+            if (rv != 0) {
+                net_quic_connection_free(aTHX_ ep);
+                croak("unable to generate preferred-address reset token");
+            }
+
+            if (preferred_addr_storage.sa.sa_family == NGTCP2_AF_INET) {
+                memcpy(
+                    &params.preferred_addr.ipv4,
+                    &preferred_addr_storage.in,
+                    sizeof(params.preferred_addr.ipv4)
+                );
+                params.preferred_addr.ipv4_present = 1;
+            } else if (
+                preferred_addr_storage.sa.sa_family == NGTCP2_AF_INET6
+            ) {
+                memcpy(
+                    &params.preferred_addr.ipv6,
+                    &preferred_addr_storage.in6,
+                    sizeof(params.preferred_addr.ipv6)
+                );
+                params.preferred_addr.ipv6_present = 1;
+            }
         }
 
         if (odcid_data != NULL) {
@@ -779,6 +1005,16 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
             croak("unable to register server QUIC connection ID");
         }
 
+        if (preferred_addr_present &&
+            net_quic_queue_cid_event(
+                aTHX_ ep,
+                1,
+                &params.preferred_addr.cid
+            ) != 0) {
+            net_quic_connection_free(aTHX_ ep);
+            croak("unable to register preferred-address connection ID");
+        }
+
         if (net_quic_tls_server_finish(aTHX_ ep) != 0) {
             net_quic_connection_free(aTHX_ ep);
             croak("unable to configure Picotls server session");
@@ -799,7 +1035,8 @@ _open_stream(self, bidirectional)
     CODE:
         ep = net_quic_connection_from_sv(self);
 
-        if (!ep->ready) {
+        if (!ep->ready &&
+            (!ep->early_data_attempted || ep->early_data_rejected)) {
             croak("cannot open a QUIC stream before the handshake is ready");
         }
 
@@ -836,7 +1073,8 @@ _open_bidi_stream(self)
     CODE:
         ep = net_quic_connection_from_sv(self);
 
-        if (!ep->ready) {
+        if (!ep->ready &&
+            (!ep->early_data_attempted || ep->early_data_rejected)) {
             croak("cannot open a QUIC stream before the handshake is ready");
         }
 
@@ -865,6 +1103,51 @@ _take_stream_available(self)
         events = ep->stream_available_events;
         ep->stream_available_events = 0;
         RETVAL = (UV)events;
+    OUTPUT:
+        RETVAL
+
+void
+_set_stream_activity_enabled(self, enabled)
+    SV *self
+    int enabled
+    PREINIT:
+        net_quic_connection *ep;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        net_quic_stream_set_activity_enabled(ep, enabled ? 1 : 0);
+        if (!enabled) {
+            net_quic_stream_reclaim_closed(aTHX_ ep);
+        }
+
+int
+_stream_activity_pending(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        RETVAL = ep->stream_activity_head != NULL ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+SV *
+_next_active_stream_id(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+        int64_t stream_id;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_next_activity(ep);
+
+        if (stream == NULL) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            stream_id = stream->id;
+            net_quic_stream_reclaim_closed(aTHX_ ep);
+            RETVAL = newSViv((IV)stream_id);
+        }
     OUTPUT:
         RETVAL
 
@@ -926,23 +1209,28 @@ _stream_retain(self, stream_id_iv)
             croak("too many Net::QUIC::Stream references");
         }
 
-void
+int
 _stream_release(self, stream_id_iv)
     SV *self
     IV stream_id_iv
     PREINIT:
         net_quic_connection *ep;
         net_quic_stream_state *stream;
+        int rv;
     CODE:
         ep = net_quic_connection_from_sv(self);
         stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
         if (stream == NULL) {
-            XSRETURN_EMPTY;
+            RETVAL = 0;
+        } else {
+            rv = net_quic_stream_release(aTHX_ ep, stream);
+            if (rv < 0) {
+                croak("Net::QUIC::Stream reference count underflow");
+            }
+            RETVAL = rv;
         }
-
-        if (net_quic_stream_release(aTHX_ ep, stream) != 0) {
-            croak("Net::QUIC::Stream reference count underflow");
-        }
+    OUTPUT:
+        RETVAL
 
 UV
 _stream_state_count(self)
@@ -952,6 +1240,63 @@ _stream_state_count(self)
     CODE:
         ep = net_quic_connection_from_sv(self);
         RETVAL = (UV)net_quic_stream_count(ep);
+    OUTPUT:
+        RETVAL
+
+SV *
+_send_buffer_limit(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+
+        if (!ep->stream_tx_buffer_limit_enabled) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            RETVAL = newSVuv((UV)ep->stream_tx_buffer_limit);
+        }
+    OUTPUT:
+        RETVAL
+
+void
+_set_send_buffer_limit(self, limit_uv)
+    SV *self
+    UV limit_uv
+    PREINIT:
+        net_quic_connection *ep;
+        uint64_t limit;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        limit = (uint64_t)limit_uv;
+
+        if (ep->stream_tx_buffered_bytes > limit) {
+            croak(
+                "send buffer limit cannot be smaller than currently buffered data"
+            );
+        }
+
+        ep->stream_tx_buffer_limit = limit;
+        ep->stream_tx_buffer_limit_enabled = 1;
+
+void
+_clear_send_buffer_limit(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        ep->stream_tx_buffer_limit_enabled = 0;
+        ep->stream_tx_buffer_limit = 0;
+
+UV
+_send_buffered_bytes(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        RETVAL = (UV)ep->stream_tx_buffered_bytes;
     OUTPUT:
         RETVAL
 
@@ -987,6 +1332,7 @@ _stream_send(self, stream_id_iv, data_sv)
         net_quic_stream_state *stream;
         const char *data;
         STRLEN datalen;
+        uint64_t available;
         int rv;
     CODE:
         ep = net_quic_connection_from_sv(self);
@@ -996,14 +1342,97 @@ _stream_send(self, stream_id_iv, data_sv)
         }
 
         data = SvPVbyte(data_sv, datalen);
+
+        if (ep->stream_tx_buffer_limit_enabled) {
+            available = ep->stream_tx_buffer_limit -
+                        ep->stream_tx_buffered_bytes;
+            if ((uint64_t)datalen > available) {
+                croak(
+                    "QUIC send buffer limit exceeded; use send_some for partial acceptance"
+                );
+            }
+        }
+
         rv = net_quic_stream_queue_data(
-            aTHX_ stream,
+            aTHX_ ep,
+            stream,
             (const uint8_t *)data,
             (size_t)datalen
         );
         if (rv != 0) {
             croak("unable to queue QUIC stream data: %s", ngtcp2_strerror(rv));
         }
+
+UV
+_stream_send_some(self, stream_id_iv, data_sv)
+    SV *self
+    IV stream_id_iv
+    SV *data_sv
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+        const char *data;
+        STRLEN datalen;
+        uint64_t available;
+        uint64_t accepted;
+        int rv;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
+        if (stream == NULL) {
+            croak("unknown QUIC stream");
+        }
+
+        if (!ep->stream_tx_buffer_limit_enabled) {
+            croak(
+                "send_some requires a configured connection send_buffer_limit"
+            );
+        }
+
+        data = SvPVbyte(data_sv, datalen);
+        available = ep->stream_tx_buffer_limit -
+                    ep->stream_tx_buffered_bytes;
+        accepted = (uint64_t)datalen;
+        if (accepted > available) {
+            accepted = available;
+        }
+
+        if (accepted != 0) {
+            rv = net_quic_stream_queue_data(
+                aTHX_ ep,
+                stream,
+                (const uint8_t *)data,
+                (size_t)accepted
+            );
+            if (rv != 0) {
+                croak(
+                    "unable to queue QUIC stream data: %s",
+                    ngtcp2_strerror(rv)
+                );
+            }
+        }
+
+        RETVAL = (UV)accepted;
+    OUTPUT:
+        RETVAL
+
+UV
+_stream_send_buffered_bytes(self, stream_id_iv)
+    SV *self
+    IV stream_id_iv
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
+        if (stream == NULL) {
+            croak("unknown QUIC stream");
+        }
+
+        RETVAL = (UV)stream->tx_buffered_bytes;
+    OUTPUT:
+        RETVAL
 
 void
 _stream_finish(self, stream_id_iv)
@@ -1042,17 +1471,30 @@ _stream_take_data(self, stream_id_iv)
             croak("unknown QUIC stream");
         }
 
-        rv = net_quic_stream_consume_rx(ep, stream, &chunk);
-        if (rv != 0) {
+        if (stream->rx_mode == NET_QUIC_STREAM_RX_MODE_EXPLICIT) {
             croak(
-                "unable to consume QUIC stream data: %s",
-                ngtcp2_strerror(rv)
+                "cannot use next_data after explicit QUIC stream receive consumption"
             );
         }
 
-        if (chunk == NULL) {
+        if (stream->rx_head == NULL) {
             RETVAL = &PL_sv_undef;
         } else {
+            if (net_quic_stream_select_rx_mode(
+                    stream,
+                    NET_QUIC_STREAM_RX_MODE_AUTO
+                ) != 0) {
+                croak("unable to select automatic QUIC stream receive mode");
+            }
+
+            rv = net_quic_stream_consume_rx(ep, stream, &chunk);
+            if (rv != 0) {
+                croak(
+                    "unable to consume QUIC stream data: %s",
+                    ngtcp2_strerror(rv)
+                );
+            }
+
             av = newAV();
             av_push(
                 av,
@@ -1062,6 +1504,122 @@ _stream_take_data(self, stream_id_iv)
             RETVAL = newRV_noinc((SV *)av);
             net_quic_stream_rx_chunk_free(aTHX_ chunk);
         }
+    OUTPUT:
+        RETVAL
+
+SV *
+_stream_take_data_chunk(self, stream_id_iv)
+    SV *self
+    IV stream_id_iv
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+        net_quic_stream_rx_chunk *chunk;
+        AV *av;
+        int rv;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
+        if (stream == NULL) {
+            croak("unknown QUIC stream");
+        }
+
+        if (stream->rx_mode == NET_QUIC_STREAM_RX_MODE_AUTO) {
+            croak(
+                "cannot use next_data_chunk after automatic QUIC stream receive consumption"
+            );
+        }
+
+        if (stream->rx_head == NULL) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            if (net_quic_stream_select_rx_mode(
+                    stream,
+                    NET_QUIC_STREAM_RX_MODE_EXPLICIT
+                ) != 0) {
+                croak("unable to select explicit QUIC stream receive mode");
+            }
+
+            rv = net_quic_stream_take_rx_explicit(stream, &chunk);
+            if (rv != 0) {
+                croak(
+                    "unable to take QUIC stream data without consuming it: %s",
+                    ngtcp2_strerror(rv)
+                );
+            }
+
+            av = newAV();
+            av_push(
+                av,
+                newSVpvn((const char *)chunk->data, (STRLEN)chunk->len)
+            );
+            av_push(av, newSViv(chunk->fin ? 1 : 0));
+            RETVAL = newRV_noinc((SV *)av);
+            net_quic_stream_rx_chunk_free(aTHX_ chunk);
+        }
+    OUTPUT:
+        RETVAL
+
+void
+_stream_consume(self, stream_id_iv, amount_uv)
+    SV *self
+    IV stream_id_iv
+    UV amount_uv
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+        uint64_t amount;
+        int rv;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
+        if (stream == NULL) {
+            croak("unknown QUIC stream");
+        }
+
+        if (stream->rx_mode == NET_QUIC_STREAM_RX_MODE_AUTO) {
+            croak(
+                "cannot use consume after automatic QUIC stream receive consumption"
+            );
+        }
+
+        if (net_quic_stream_select_rx_mode(
+                stream,
+                NET_QUIC_STREAM_RX_MODE_EXPLICIT
+            ) != 0) {
+            croak("unable to select explicit QUIC stream receive mode");
+        }
+
+        amount = (uint64_t)amount_uv;
+        if (amount > stream->rx_unconsumed) {
+            croak(
+                "cannot consume more QUIC stream data than has been delivered"
+            );
+        }
+
+        rv = net_quic_stream_consume_explicit_rx(ep, stream, amount);
+        if (rv != 0) {
+            croak(
+                "unable to consume explicit QUIC stream data: %s",
+                ngtcp2_strerror(rv)
+            );
+        }
+
+UV
+_stream_acked_offset(self, stream_id_iv)
+    SV *self
+    IV stream_id_iv
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
+        if (stream == NULL) {
+            croak("unknown QUIC stream");
+        }
+
+        RETVAL = (UV)stream->tx_acked_through;
     OUTPUT:
         RETVAL
 
@@ -1096,6 +1654,23 @@ _stream_closed(self, stream_id_iv)
             croak("unknown QUIC stream");
         }
         RETVAL = stream->closed ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+int
+_stream_early_data(self, stream_id_iv)
+    SV *self
+    IV stream_id_iv
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
+        if (stream == NULL) {
+            croak("unknown QUIC stream");
+        }
+        RETVAL = stream->early_data ? 1 : 0;
     OUTPUT:
         RETVAL
 
@@ -1143,6 +1718,50 @@ _stream_local_reset_code(self, stream_id_iv)
     OUTPUT:
         RETVAL
 
+SV *
+_stream_remote_stop_sending_code(self, stream_id_iv)
+    SV *self
+    IV stream_id_iv
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
+        if (stream == NULL) {
+            croak("unknown QUIC stream");
+        }
+
+        if (!stream->remote_stop_sending) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            RETVAL = newSVuv((UV)stream->remote_stop_sending_code);
+        }
+    OUTPUT:
+        RETVAL
+
+SV *
+_stream_local_stop_sending_code(self, stream_id_iv)
+    SV *self
+    IV stream_id_iv
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
+        if (stream == NULL) {
+            croak("unknown QUIC stream");
+        }
+
+        if (!stream->local_stop_sending) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            RETVAL = newSVuv((UV)stream->local_stop_sending_code);
+        }
+    OUTPUT:
+        RETVAL
+
 void
 _stream_reset(self, stream_id_iv, app_error_code_uv)
     SV *self
@@ -1159,19 +1778,63 @@ _stream_reset(self, stream_id_iv, app_error_code_uv)
             croak("unknown QUIC stream");
         }
 
-        rv = ngtcp2_conn_shutdown_stream(
+        if (stream->local_reset || stream->remote_stop_sending || stream->closed) {
+            XSRETURN_EMPTY;
+        }
+
+        rv = ngtcp2_conn_shutdown_stream_write(
             ep->conn,
             0,
             stream->id,
             (uint64_t)app_error_code_uv
         );
         if (rv != 0) {
-            croak("unable to reset QUIC stream: %s", ngtcp2_strerror(rv));
+            croak("unable to reset QUIC stream send side: %s", ngtcp2_strerror(rv));
         }
 
         stream->local_reset = 1;
         stream->local_reset_code = (uint64_t)app_error_code_uv;
         stream->write_shutdown = 1;
+        net_quic_stream_free_tx(aTHX_ ep, stream);
+        net_quic_stream_reclaim_closed(aTHX_ ep);
+
+void
+_stream_stop_sending(self, stream_id_iv, app_error_code_uv)
+    SV *self
+    IV stream_id_iv
+    UV app_error_code_uv
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_stream_state *stream;
+        int rv;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        stream = net_quic_stream_find(ep, (int64_t)stream_id_iv);
+        if (stream == NULL) {
+            croak("unknown QUIC stream");
+        }
+
+        if (stream->local_stop_sending || stream->closed) {
+            XSRETURN_EMPTY;
+        }
+
+        rv = ngtcp2_conn_shutdown_stream_read(
+            ep->conn,
+            0,
+            stream->id,
+            (uint64_t)app_error_code_uv
+        );
+        if (rv != 0) {
+            croak(
+                "unable to stop receiving QUIC stream: %s",
+                ngtcp2_strerror(rv)
+            );
+        }
+
+        stream->local_stop_sending = 1;
+        stream->local_stop_sending_code = (uint64_t)app_error_code_uv;
+        stream->read_shutdown = 1;
+        net_quic_stream_discard_rx(aTHX_ ep, stream);
         net_quic_stream_reclaim_closed(aTHX_ ep);
 
 void
@@ -1195,7 +1858,8 @@ _queue_stream_data(self, stream_id_iv, data_sv, fin)
 
         data = SvPVbyte(data_sv, datalen);
         rv = net_quic_stream_queue_data(
-            aTHX_ stream,
+            aTHX_ ep,
+            stream,
             (const uint8_t *)data,
             (size_t)datalen
         );
@@ -1222,13 +1886,22 @@ _take_stream_data(self)
     CODE:
         ep = net_quic_connection_from_sv(self);
         stream = ep->streams;
-        while (stream != NULL && stream->rx_head == NULL) {
+        while (stream != NULL &&
+               (stream->rx_head == NULL ||
+                stream->rx_mode == NET_QUIC_STREAM_RX_MODE_EXPLICIT)) {
             stream = stream->next;
         }
 
         if (stream == NULL) {
             RETVAL = &PL_sv_undef;
         } else {
+            if (net_quic_stream_select_rx_mode(
+                    stream,
+                    NET_QUIC_STREAM_RX_MODE_AUTO
+                ) != 0) {
+                croak("unable to select automatic QUIC stream receive mode");
+            }
+
             rv = net_quic_stream_consume_rx(ep, stream, &chunk);
             if (rv != 0) {
                 croak(
@@ -1288,7 +1961,8 @@ _next_datagram(self)
                 ep->txbuf,
                 ep->closebuflen,
                 &close_local,
-                &close_peer
+                &close_peer,
+                ep->close_ecn
             );
             goto next_datagram_done;
         }
@@ -1396,7 +2070,8 @@ _next_datagram(self)
                 ep->txbuf,
                 (size_t)nwrite,
                 &ps.path.local,
-                &ps.path.remote
+                &ps.path.remote,
+                pi.ecn
             );
         }
 
@@ -1407,11 +2082,12 @@ _next_datagram(self)
         RETVAL
 
 void
-_receive_datagram(self, data_sv, local_sv, peer_sv)
+_receive_datagram(self, data_sv, local_sv, peer_sv, ecn_uv = 0)
     SV *self
     SV *data_sv
     SV *local_sv
     SV *peer_sv
+    UV ecn_uv
     PREINIT:
         net_quic_connection *ep;
         const char *data;
@@ -1443,12 +2119,17 @@ _receive_datagram(self, data_sv, local_sv, peer_sv)
             croak("local and peer must be packed IPv4 or IPv6 socket addresses");
         }
 
+        if (ecn_uv > NGTCP2_ECN_CE) {
+            croak("ECN codepoint must be an integer from 0 through 3");
+        }
+
         memset(&path, 0, sizeof(path));
         path.local.addr = &local_addr.sa;
         path.local.addrlen = local_addrlen;
         path.remote.addr = &peer_addr.sa;
         path.remote.addrlen = peer_addrlen;
         memset(&pi, 0, sizeof(pi));
+        pi.ecn = (uint8_t)ecn_uv;
 
         now = net_quic_now();
         rv = ngtcp2_conn_read_pkt(
@@ -1459,6 +2140,13 @@ _receive_datagram(self, data_sv, local_sv, peer_sv)
             (size_t)datalen,
             now
         );
+
+        /*
+         * recv_stop_sending runs inside ngtcp2_conn_read_pkt before ngtcp2
+         * clears its own references to queued stream data.  Release our
+         * transmit buffers only after the read call has returned.
+         */
+        net_quic_stream_apply_deferred_discards(aTHX_ ep);
 
         if (rv == NGTCP2_ERR_DRAINING || rv == NGTCP2_ERR_CLOSING) {
             net_quic_capture_peer_close(ep);
@@ -1678,6 +2366,7 @@ _close(self, app_error_code_uv = 0)
             }
 
             ep->closebuflen = (size_t)nwrite;
+            ep->close_ecn = pi.ecn & NGTCP2_ECN_MASK;
             ep->closebuf_pending = 1;
         }
 
@@ -1855,6 +2544,156 @@ _transport_info(self)
     OUTPUT:
         RETVAL
 
+void
+_migrate(self, local_sv)
+    SV *self
+    SV *local_sv
+    PREINIT:
+        net_quic_connection *ep;
+        const ngtcp2_path *current;
+        const char *local;
+        STRLEN locallen;
+        ngtcp2_sockaddr_union local_addr;
+        ngtcp2_socklen local_addrlen;
+        ngtcp2_path path;
+        ngtcp2_tstamp now;
+        int rv;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+
+        if (ep->is_server) {
+            croak("only a QUIC client can initiate active migration");
+        }
+        if (!ep->ready) {
+            croak("cannot migrate before the QUIC handshake is ready");
+        }
+
+        local = SvPVbyte(local_sv, locallen);
+        if (net_quic_copy_sockaddr(
+                &local_addr,
+                &local_addrlen,
+                local,
+                locallen
+            ) != 0 ||
+            net_quic_sockaddr_is_unspecified(&local_addr)) {
+            croak("migration local address must be a concrete packed IPv4 or IPv6 socket address");
+        }
+
+        current = ngtcp2_conn_get_path2(ep->conn);
+        if (current == NULL ||
+            current->remote.addr == NULL ||
+            current->remote.addrlen == 0) {
+            croak("QUIC connection has no current network path");
+        }
+
+        memset(&path, 0, sizeof(path));
+        path.local.addr = &local_addr.sa;
+        path.local.addrlen = local_addrlen;
+        path.remote = current->remote;
+
+        now = net_quic_now();
+        rv = ngtcp2_conn_initiate_migration(ep->conn, &path, now);
+        if (rv == NGTCP2_ERR_INVALID_STATE) {
+            croak("cannot migrate before the QUIC handshake is confirmed or while another path transition is active");
+        }
+        if (rv == NGTCP2_ERR_CONN_ID_BLOCKED) {
+            croak("cannot migrate because no unused peer connection ID is available");
+        }
+        if (rv == NGTCP2_ERR_INVALID_ARGUMENT) {
+            croak("migration requires a different local network path");
+        }
+        if (rv != 0) {
+            croak("unable to start QUIC migration: %s", ngtcp2_strerror(rv));
+        }
+
+UV
+path_max_udp_payload_size(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        RETVAL = (UV)ngtcp2_conn_get_path_max_tx_udp_payload_size2(ep->conn);
+    OUTPUT:
+        RETVAL
+
+SV *
+_path(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        const ngtcp2_path *path;
+        AV *av;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        path = ngtcp2_conn_get_path2(ep->conn);
+
+        if (path == NULL ||
+            path->local.addr == NULL ||
+            path->remote.addr == NULL) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            av = newAV();
+            av_push(
+                av,
+                newSVpvn(
+                    (const char *)path->local.addr,
+                    (STRLEN)path->local.addrlen
+                )
+            );
+            av_push(
+                av,
+                newSVpvn(
+                    (const char *)path->remote.addr,
+                    (STRLEN)path->remote.addrlen
+                )
+            );
+            RETVAL = newRV_noinc((SV *)av);
+        }
+    OUTPUT:
+        RETVAL
+
+SV *
+_path_validation(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        AV *av;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+
+        if (ep->path_validation_status == NET_QUIC_PATH_VALIDATION_NONE) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            av = newAV();
+            av_push(av, newSViv(ep->path_validation_status));
+            av_push(av, newSVuv((UV)ep->path_validation_flags));
+
+            if (ep->path_validation_has_path) {
+                av_push(
+                    av,
+                    newSVpvn(
+                        (const char *)&ep->path_validation_local_addr.sa,
+                        (STRLEN)ep->path_validation_local_addrlen
+                    )
+                );
+                av_push(
+                    av,
+                    newSVpvn(
+                        (const char *)&ep->path_validation_peer_addr.sa,
+                        (STRLEN)ep->path_validation_peer_addrlen
+                    )
+                );
+            } else {
+                av_push(av, newSVsv(&PL_sv_undef));
+                av_push(av, newSVsv(&PL_sv_undef));
+            }
+
+            RETVAL = newRV_noinc((SV *)av);
+        }
+    OUTPUT:
+        RETVAL
+
 int
 ready(self)
     SV *self
@@ -1863,6 +2702,212 @@ ready(self)
     CODE:
         ep = net_quic_connection_from_sv(self);
         RETVAL = ep->ready ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+
+SV *
+version(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        uint32_t version;
+        int public_version;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        version = ngtcp2_conn_get_negotiated_version2(ep->conn);
+        public_version = net_quic_public_version(version);
+
+        if (public_version == 0) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            RETVAL = newSViv(public_version);
+        }
+    OUTPUT:
+        RETVAL
+
+int
+client_chosen_version(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        uint32_t version;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        version = ngtcp2_conn_get_client_chosen_version2(ep->conn);
+        RETVAL = net_quic_public_version(version);
+        if (RETVAL == 0) {
+            croak("unknown QUIC client-chosen version");
+        }
+    OUTPUT:
+        RETVAL
+
+int
+resumed(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        RETVAL = ep->resumed ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+SV *
+_session_ticket_state(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        AV *av;
+        int public_version;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+
+        if (ep->session_ticket == NULL ||
+            ep->session_ticket_len == 0 ||
+            ep->session_ticket_version == 0) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            public_version =
+                net_quic_public_version(ep->session_ticket_version);
+            if (public_version == 0) {
+                croak("unknown TLS session ticket QUIC version");
+            }
+
+            av = newAV();
+            av_push(av, newSViv(public_version));
+            av_push(
+                av,
+                newSVpvn(
+                    (const char *)ep->session_ticket,
+                    (STRLEN)ep->session_ticket_len
+                )
+            );
+            RETVAL = newRV_noinc((SV *)av);
+        }
+    OUTPUT:
+        RETVAL
+
+
+SV *
+_address_token_state(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        AV *av;
+        int public_version;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+
+        if (ep->address_token == NULL ||
+            ep->address_token_len == 0 ||
+            ep->address_token_version == 0) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            public_version =
+                net_quic_public_version(ep->address_token_version);
+            if (public_version == 0) {
+                croak("unknown NEW_TOKEN QUIC version");
+            }
+
+            av = newAV();
+            av_push(av, newSViv(public_version));
+            av_push(
+                av,
+                newSVpvn(
+                    (const char *)ep->address_token,
+                    (STRLEN)ep->address_token_len
+                )
+            );
+            RETVAL = newRV_noinc((SV *)av);
+        }
+    OUTPUT:
+        RETVAL
+
+
+SV *
+_early_data_transport_params(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        uint8_t *buf = NULL;
+        size_t buflen = 256;
+        ngtcp2_ssize nwrite;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+
+        if (!ep->ready ||
+            ep->session_ticket == NULL ||
+            ep->session_ticket_len == 0) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            for (;;) {
+                Newx(buf, buflen, uint8_t);
+                if (buf == NULL) {
+                    croak("unable to allocate early-data transport state");
+                }
+
+                nwrite = ngtcp2_conn_encode_0rtt_transport_params2(
+                    ep->conn,
+                    buf,
+                    buflen
+                );
+
+                if (nwrite != NGTCP2_ERR_NOBUF) {
+                    break;
+                }
+
+                Safefree(buf);
+                buf = NULL;
+
+                if (buflen >= 16384) {
+                    croak("early-data transport state is unexpectedly large");
+                }
+                buflen *= 2;
+            }
+
+            if (nwrite < 0) {
+                Safefree(buf);
+                croak(
+                    "unable to encode early-data transport state: %s",
+                    ngtcp2_strerror((int)nwrite)
+                );
+            }
+
+            RETVAL = newSVpvn((const char *)buf, (STRLEN)nwrite);
+            Safefree(buf);
+        }
+    OUTPUT:
+        RETVAL
+
+int
+_early_data_status(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        ptls_early_data_acceptance_t acceptance;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+
+        if (!ep->early_data_attempted) {
+            RETVAL = 0;
+        } else if (ep->early_data_rejected) {
+            RETVAL = 3;
+        } else if (ep->early_data_accepted) {
+            RETVAL = 2;
+        } else if (ep->picotls_ctx.ptls != NULL) {
+            acceptance =
+                ep->picotls_ctx.handshake_properties.client.early_data_acceptance;
+            if (acceptance == PTLS_EARLY_DATA_ACCEPTED) {
+                RETVAL = 2;
+            } else if (acceptance == PTLS_EARLY_DATA_REJECTED) {
+                RETVAL = 3;
+            } else {
+                RETVAL = 1;
+            }
+        } else {
+            RETVAL = 1;
+        }
     OUTPUT:
         RETVAL
 
@@ -2038,6 +3083,7 @@ _server_front_door(class, data_sv, peer_sv, secret_sv, validate_address)
         ngtcp2_cid reset_cid;
         ngtcp2_stateless_reset_token reset_token;
         uint8_t token[NGTCP2_CRYPTO_MAX_RETRY_TOKENLEN2];
+        uint8_t regular_token_secret[NET_QUIC_SERVER_SECRET_LEN];
         uint8_t response[NGTCP2_MAX_UDP_PAYLOAD_SIZE];
         uint8_t reset_random[NET_QUIC_STATELESS_RESET_MAX_RANDLEN];
         uint8_t unused_random;
@@ -2257,6 +3303,10 @@ _server_front_door(class, data_sv, peer_sv, secret_sv, validate_address)
                                 (STRLEN)odcid.datalen
                             )
                         );
+                        av_push(
+                            av,
+                            newSViv(NGTCP2_TOKEN_TYPE_RETRY)
+                        );
                         RETVAL = newRV_noinc((SV *)av);
                     } else {
                         nwrite = ngtcp2_crypto_write_connection_close(
@@ -2282,6 +3332,106 @@ _server_front_door(class, data_sv, peer_sv, secret_sv, validate_address)
                                 )
                             );
                         }
+                        RETVAL = newRV_noinc((SV *)av);
+                    }
+                } else if (
+                    hd.tokenlen != 0 &&
+                    hd.token[0] == NGTCP2_CRYPTO_TOKEN_MAGIC_REGULAR
+                ) {
+                    now = net_quic_system_now();
+
+                    if (net_quic_new_token_secret(
+                            regular_token_secret,
+                            (const uint8_t *)secret,
+                            hd.version
+                        ) != 0) {
+                        croak("unable to derive NEW_TOKEN version secret");
+                    }
+
+                    rv = ngtcp2_crypto_verify_regular_token(
+                        hd.token,
+                        hd.tokenlen,
+                        regular_token_secret,
+                        sizeof(regular_token_secret),
+                        &peer_addr.sa,
+                        peer_addrlen,
+                        NET_QUIC_NEW_TOKEN_TIMEOUT,
+                        now
+                    );
+
+                    ptls_clear_memory(
+                        regular_token_secret,
+                        sizeof(regular_token_secret)
+                    );
+
+                    if (rv == 0) {
+                        av_push(av, newSViv(2));
+                        av_push(av, newSV(0));
+                        av_push(
+                            av,
+                            newSViv(NGTCP2_TOKEN_TYPE_NEW_TOKEN)
+                        );
+                        RETVAL = newRV_noinc((SV *)av);
+                    } else if (validate_address) {
+                        /*
+                         * An invalid NEW_TOKEN is not a fatal token error.
+                         * Treat the address as unvalidated and use Retry.
+                         */
+                        retry_scid.datalen = NET_QUIC_SERVER_CIDLEN;
+                        if (net_quic_random_bytes(
+                                retry_scid.data,
+                                retry_scid.datalen
+                            ) != 0) {
+                            croak("unable to generate Retry connection ID");
+                        }
+
+                        tokenlen = ngtcp2_crypto_generate_retry_token2(
+                            token,
+                            (const uint8_t *)secret,
+                            (size_t)secretlen,
+                            hd.version,
+                            &peer_addr.sa,
+                            peer_addrlen,
+                            &retry_scid,
+                            &hd.dcid,
+                            now
+                        );
+
+                        if (tokenlen < 0) {
+                            croak("unable to generate QUIC Retry token");
+                        }
+
+                        nwrite = ngtcp2_crypto_write_retry(
+                            response,
+                            sizeof(response),
+                            hd.version,
+                            &hd.scid,
+                            &retry_scid,
+                            &hd.dcid,
+                            token,
+                            (size_t)tokenlen
+                        );
+
+                        if (nwrite < 0) {
+                            croak("unable to write QUIC Retry packet");
+                        }
+
+                        av_push(av, newSViv(1));
+                        av_push(
+                            av,
+                            newSVpvn(
+                                (const char *)response,
+                                (STRLEN)nwrite
+                            )
+                        );
+                        RETVAL = newRV_noinc((SV *)av);
+                    } else {
+                        av_push(av, newSViv(2));
+                        av_push(av, newSV(0));
+                        av_push(
+                            av,
+                            newSViv(NGTCP2_TOKEN_TYPE_UNKNOWN)
+                        );
                         RETVAL = newRV_noinc((SV *)av);
                     }
                 } else if (hd.tokenlen != 0 && validate_address) {
@@ -2334,6 +3484,10 @@ _server_front_door(class, data_sv, peer_sv, secret_sv, validate_address)
                 } else {
                     av_push(av, newSViv(2));
                     av_push(av, newSV(0));
+                    av_push(
+                        av,
+                        newSViv(NGTCP2_TOKEN_TYPE_UNKNOWN)
+                    );
                     RETVAL = newRV_noinc((SV *)av);
                 }
             }

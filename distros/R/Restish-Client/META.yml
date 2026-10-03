@@ -1,5 +1,5 @@
 ---
-abstract: 'A RESTish client...in perl!'
+abstract: 'A lightweight client for JSON REST APIs'
 author:
   - 'Tim H <thend20@pair.com>'
 build_requires:
@@ -10,7 +10,7 @@ configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
-license: apache
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,7 +18,7 @@ name: Restish-Client
 provides:
   Restish::Client:
     file: lib/Restish/Client.pm
-    version: '1.0'
+    version: '1.10'
 requires:
   Carp: '0'
   Data::Validate::URI: '0'
@@ -35,7 +35,7 @@ requires:
 resources:
   bugtracker: https://github.com/thend20/perl-restish-client/issues
   homepage: https://github.com/thend20/perl-restish-client
-  license: http://apache.org/licenses/LICENSE-2.0
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://github.com/thend20/perl-restish-client.git
-version: '1.0'
+version: '1.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

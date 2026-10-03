@@ -58,5 +58,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-access2csv
   repository: git://github.com/nigelhorne/App-access2csv.git
-version: v0.001.0
+version: v0.001.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

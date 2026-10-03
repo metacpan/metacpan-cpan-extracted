@@ -5,7 +5,7 @@ use warnings;
 
 use XSLoader ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -17,9 +17,55 @@ __END__
 
 Net::QUIC - QUIC transport for Perl
 
+=head1 DESCRIPTION
+
+Net::QUIC gives Perl applications secure QUIC connections and byte streams.
+
+If QUIC is new to you, the useful model is:
+
+    one Connection
+        |
+        +-- Stream
+        +-- Stream
+        +-- Stream
+
+A Connection is one secure relationship with a peer.
+
+A Stream is one reliable ordered sequence of bytes inside that Connection.
+
+Net::QUIC handles the QUIC protocol, TLS 1.3, retransmission, flow control,
+timers, connection IDs, migration, and the other transport details.
+
+Your event loop still owns the UDP socket.
+
+You do not need to know ngtcp2 to use Net::QUIC. It is an internal native
+dependency.
+
+Net::QUIC is not HTTP/3 and is not a web framework. It provides connections
+and byte streams. Your application decides what the bytes mean.
+
+=head1 START HERE
+
+Most applications use three classes:
+
+    Net::QUIC::Driver
+        |
+        +-- Net::QUIC::Connection
+                    |
+                    +-- Net::QUIC::Stream
+
+L<Net::QUIC::Driver> connects Net::QUIC to UDP and a timer.
+
+L<Net::QUIC::Connection> represents one QUIC connection.
+
+L<Net::QUIC::Stream> sends and receives application bytes.
+
+L<Net::QUIC::Endpoint> is the lower-level engine under Driver. Most
+applications do not need to use Endpoint directly.
+
 =head1 SYNOPSIS
 
-Most applications start with L<Net::QUIC::Driver>:
+Create a client Driver:
 
     use Net::QUIC::Driver;
 
@@ -44,70 +90,48 @@ Most applications start with L<Net::QUIC::Driver>:
 
     $driver->start;
 
-=head1 DESCRIPTION
+After the handshake is ready:
 
-Net::QUIC is a QUIC transport library for Perl.
+    return if !$connection->ready;
 
-It owns QUIC and TLS protocol state but does not choose an event loop or own
-the application's UDP socket.
+    my $stream = $connection->open_bidi_stream;
 
-The ordinary public model is:
+    if ($stream) {
+        $stream->send("hello\n");
+        $stream->finish;
+    }
 
-    Driver
-      |
-      +-- Connection
-              |
-              +-- Stream
+Read streams opened by the peer:
 
-L<Net::QUIC::Driver> connects QUIC to an event loop.
+    while (my $stream = $connection->next_stream) {
+        while (defined(my $bytes = $stream->next_data)) {
+            handle_bytes($bytes);
+        }
+    }
 
-L<Net::QUIC::Connection> represents one QUIC connection.
+=head1 QUIC STREAMS ARE BYTE STREAMS
 
-L<Net::QUIC::Stream> sends and receives ordered application bytes.
+A QUIC Stream is an ordered sequence of bytes.
 
-L<Net::QUIC::Endpoint> exists underneath Driver as the lower-level transport
-engine. Most applications do not need to drive Endpoint directly.
+It is not a sequence of application messages.
 
-=head1 WHAT NET::QUIC DOES
+One call to:
 
-Net::QUIC handles the QUIC-specific work, including:
+    $stream->send($message);
 
-    QUIC packet processing
-    TLS 1.3
-    certificate verification
-    stream flow control
-    retransmission state
-    connection IDs
-    QUIC timers
-    connection close and draining
+does not guarantee one matching C<next_data> result on the peer.
 
-The event-loop integration supplies:
+If the application needs messages, add framing above the Stream, such as a
+newline, fixed record size, or length prefix.
 
-    one UDP socket
-    readable and writable readiness
+=head1 WHAT DRIVER NEEDS
+
+Driver is the recommended event-loop integration layer.
+
+The event loop owns:
+
+    UDP I/O
     one replaceable one-shot timer
-
-QUIC streams carry ordered bytes. They do not provide application message
-boundaries.
-
-Net::QUIC is not HTTP/3 and is not a web framework.
-
-=head1 INSTALLATION
-
-Install from CPAN in the usual way:
-
-    cpanm Net::QUIC
-
-Net::QUIC uses L<Alien::ngtcp2> for its native QUIC and TLS dependencies. A
-normal installation does not require the application developer to separately
-configure ngtcp2.
-
-Event-loop modules shown in F<examples/> are optional integrations rather than
-Net::QUIC runtime dependencies.
-
-=head1 EVENT LOOP INTEGRATION
-
-Driver is the recommended integration layer.
 
 The adapter supplies two callbacks:
 
@@ -129,112 +153,161 @@ Conceptually:
     UDP packet received
         -> $driver->receive($bytes, $local, $peer)
 
-    requested QUIC timeout fired
+    requested timer fired
         -> $driver->timeout
 
-    UDP output recovered from backpressure
+    UDP output became writable again
         -> $driver->writable
 
-Driver owns output draining, backpressure pause/resume state, and timeout
-replacement.
+That is the ordinary Driver contract.
 
-Application Stream operations automatically notify Driver when they may create
-new QUIC output.
+There is no application-visible QUIC pump loop.
 
-There is no ordinary application-visible QUIC pump loop.
+Driver automatically drains pending output, updates the timer, pauses for UDP
+backpressure, and resumes after C<writable>.
 
-The packed C<local> address passed with a received UDP packet is part of the
-QUIC network path. It must be the concrete local destination address, not a
-wildcard bind address such as C<0.0.0.0> or C<::>.
+The optional fourth argument to C<receive> is the packet's ECN codepoint:
 
-A wildcard-bound UDP adapter must therefore recover the packet's actual local
-destination address with the operating system's packet-info mechanism and
-preserve the selected local source address when sending Net::QUIC Datagrams.
+    $driver->receive($bytes, $local, $peer, $ecn);
 
-Net::QUIC leaves these socket operations to the event-loop adapter.
+Adapters that do not support ECN can keep using the three-argument form.
 
-See L<Net::QUIC::Driver> for the full contract.
+See L<Net::QUIC::Driver> for the full adapter contract.
 
-=head1 CONNECTIONS AND STREAMS
+=head1 LOCAL AND PEER ADDRESSES
 
-A client Driver exposes its Connection with:
+C<local> and C<peer> are packed IPv4 or IPv6 socket addresses.
+
+C<local> must be the actual local address used by that packet.
+
+Wildcard bind addresses such as:
+
+    0.0.0.0
+    ::
+
+are not concrete QUIC paths.
+
+A server may bind its UDP socket to a wildcard address, but the adapter must
+recover the real destination address for each received packet.
+
+If the event system cannot do that, bind the QUIC socket to one concrete local
+address instead.
+
+=head1 CONNECTIONS
+
+A client Driver has one Connection:
 
     my $connection = $driver->connection;
 
-A server Driver can expose many Connections:
+A server Driver can create many:
 
     while (my $connection = $driver->next_connection) {
         ...
     }
 
-Check handshake readiness with:
+Wait for the handshake before ordinary application work:
 
     if ($connection->ready) {
         ...
     }
 
-Open a bidirectional stream with:
+Open streams with:
 
-    my $stream = $connection->open_bidi_stream;
+    $connection->open_bidi_stream;
+    $connection->open_uni_stream;
 
-    if ($stream) {
-        $stream->send("hello");
-        $stream->finish;
-    }
+These methods can return undef when the peer's current stream limit has been
+reached. That is normal flow control, not a failed Connection.
 
-C<open_bidi_stream> and C<open_uni_stream> can return undef when the peer's
-current stream limit has been reached. That is normal QUIC flow control, not a
-Connection failure.
+=head1 ADVANCED PROTOCOL ENGINES
 
-Peer-created streams are returned by:
+Ordinary applications can ignore this section.
 
-    while (my $stream = $connection->next_stream) {
-        ...
-    }
+Protocol engines that need explicit receive consumption, acknowledgement
+progress, Stream wake-ups, or bounded transmit memory can use:
 
-Received stream bytes are read with:
+    Connection:
+        on_stream_activity
+        next_active_stream_id
+        send_buffer_limit
+        send_buffered_bytes
 
-    while (defined(my $bytes = $stream->next_data)) {
-        ...
-    }
+    Stream:
+        next_data_chunk
+        consume
+        acked_offset
+        send_some
+        send_buffered_bytes
 
-See L<Net::QUIC::Connection> and L<Net::QUIC::Stream>.
+The ordinary C<send>, C<finish>, and C<next_data> API remains unchanged.
 
-=head1 CONNECTION OUTCOMES
+These are transport primitives. Net::QUIC does not add HTTP/3 or other
+application-protocol semantics.
 
-A normal application close is started with:
+See L<Net::QUIC::Connection> and L<Net::QUIC::Stream> for the details.
+
+=head1 CLOSING AND ERRORS
+
+Start a normal close with:
 
     $connection->close;
 
-Connection close and remote protocol/TLS outcomes can be inspected with:
+Remote close conditions and protocol/TLS outcomes are available through:
 
     my $info = $connection->close_info;
 
-C<close_info> distinguishes application close, transport errors, TLS errors,
-certificate failures, handshake timeout, idle timeout, and dropped
-Connections.
-
-Local API misuse and local implementation failures remain Perl exceptions.
+Local programming mistakes and invalid local configuration still throw Perl
+exceptions.
 
 =head1 TLS
 
 QUIC always uses TLS 1.3.
 
-Net::QUIC uses Picotls for QUIC TLS, with OpenSSL underneath for cryptography
-and certificate verification.
+Clients verify server certificates by default.
 
-Client certificate verification is enabled by default.
+C<server_name> is the DNS name or IP address expected in the certificate.
 
-C<server_name> is used for DNS-name or IP-address verification. A private CA
-may be added with C<ca_file>.
+For a private CA, use:
 
-There is no insecure skip-verification option.
+    ca_file => '/path/to/private-ca.pem'
+
+Net::QUIC does not provide an insecure skip-verification switch.
+
+=head1 ADVANCED QUIC FEATURES
+
+Net::QUIC also supports:
+
+    QUIC v1 and QUIC v2
+    session resumption
+    optional 0-RTT early data
+    Retry and NEW_TOKEN address validation
+    active connection migration
+    server preferred addresses
+    PMTU discovery
+    ECN
+
+These features are documented in L<Net::QUIC::Connection>,
+L<Net::QUIC::Endpoint>, and the main README.
+
+Applications that only need ordinary reliable streams do not need to use most
+of them directly.
+
+=head1 INSTALLATION
+
+Install from CPAN:
+
+    cpanm Net::QUIC
+
+Net::QUIC uses L<Alien::ngtcp2> for its native dependencies.
+
+A normal installation does not require you to separately configure ngtcp2,
+Picotls, or OpenSSL.
+
+The event-loop modules shown in F<examples/> are optional example dependencies.
 
 =head1 EXAMPLES
 
-The distribution includes complete event-loop examples in F<examples/>.
-
-The current examples cover:
+The distribution includes examples for:
 
     Linux::Event
     AnyEvent
@@ -242,28 +315,25 @@ The current examples cover:
     Mojo::IOLoop
     EV
 
-There is also a small IO::Select QUIC echo server that can be used as a local
-test target for the client examples.
+There is also a small IO::Select echo server.
 
 See F<examples/README.md>.
 
 =head1 LOW-LEVEL ENDPOINT
 
-L<Net::QUIC::Endpoint> remains available for integrations that deliberately
-want direct control over:
+L<Net::QUIC::Endpoint> is available when an integration deliberately wants to
+manage the lower-level cycle itself:
 
     receive_datagram
     next_datagram
     timeout_after
     handle_timeout
 
-Endpoint callers are responsible for draining QUIC output and maintaining its
-timer themselves.
-
-Driver exists so ordinary event-loop adapters do not need to repeat that
-logic.
+Most event-loop adapters are simpler with Driver.
 
 =head1 NATIVE INFORMATION
+
+These methods are mainly diagnostic.
 
 =head2 ngtcp2_version
 
@@ -283,15 +353,14 @@ Returns ngtcp2's numeric version value.
 
 Returns C<picotls>.
 
-This is diagnostic information. Application code normally does not need to
-branch on the TLS implementation.
+Application code normally does not need to branch on the native TLS
+implementation.
 
 =head1 NATIVE DEPENDENCY
 
 Net::QUIC requires L<Alien::ngtcp2> 0.03 or newer.
 
-Alien::ngtcp2 supplies the tested ngtcp2 and Picotls build. Normal Net::QUIC
-applications do not choose a TLS backend.
+Alien::ngtcp2 supplies the tested ngtcp2 and Picotls build.
 
 =head1 SEE ALSO
 
@@ -306,8 +375,6 @@ L<Net::QUIC::Stream>
 L<Net::QUIC::Datagram>
 
 L<Alien::ngtcp2>
-
-L<https://github.com/ngtcp2/ngtcp2>
 
 =head1 AUTHOR
 

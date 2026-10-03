@@ -1,15 +1,18 @@
 #ifndef DD_DESTRUCTURE_H
 #define DD_DESTRUCTURE_H
 
-/* op_convert_list() is the 5.21.6 public rename of the older core function
- * convert() (identical signature). ppport.h knows the symbol but cannot
- * emulate it, so on pre-5.21.6 perls map it to Perl_convert() directly --
- * the long Perl_-prefixed name (with aTHX_) is used because the short
- * convert() macro is not exposed to non-core XS, whereas Perl_convert is
- * declared in proto.h and exported from libperl. */
-#ifndef op_convert_list
-#  define op_convert_list(type, flags, o) Perl_convert(aTHX_ (type), (flags), (o))
-#endif
+/* This file needs `[ LIST ]`, and newANONLIST() IS that: core defines it as
+ * op_convert_list(OP_ANONLIST, OPf_SPECIAL, o) -- convert() under that name
+ * before 5.21.6 -- so calling it gets the anonlist's ck_fun and its scalar
+ * contextualization from core rather than from a copy here.
+ *
+ * It is also the only spelling that links everywhere. `Perl_convert` was
+ * declared in proto.h on old perls, which is why it compiled, but embed.fnc
+ * flagged it `pR` with no A, X or E, so it was never added to the exported
+ * symbol list. ELF exports it anyway and Windows does not, so a shim built
+ * on it links on Linux and fails on Windows with
+ * `undefined reference to _imp__Perl_convert`. newANONLIST is `Apa` -- A for
+ * exported -- and has been there since 5.003007. */
 
 #define DD_MAX_ELEMS 4096
 /* ---- pattern model ---------------------------------------------------------
@@ -541,7 +544,7 @@ static OP *dd_listassign_lhs(pTHX_ dd_pat *pat) {
 /* An empty arrayref `[]`, used to guard an undef array source so that, like the
  * per-element path, an undef source binds empties rather than dying on @{undef}. */
 static OP *dd_empty_aref(pTHX) {
-	return op_convert_list(OP_ANONLIST, OPf_SPECIAL, NULL);
+	return newANONLIST(NULL);
 }
 
 #endif /* DD_DESTRUCTURE_H */

@@ -1,0 +1,78 @@
+{
+   "abstract" : "shuffle sequences while preserving their k-let counts",
+   "author" : [
+      "Michael T. Wolfinger <michael@wolfinger.eu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "keywords" : [
+      "bioinformatics",
+      "sequence shuffling",
+      "k-let",
+      "k-mer",
+      "dinucleotide shuffling",
+      "RNA",
+      "DNA",
+      "null model",
+      "uShuffle"
+   ],
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Ushuffle",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Ushuffle" : {
+         "file" : "lib/Ushuffle.pm",
+         "version" : "1.00"
+      },
+      "Ushuffle::Shuffler" : {
+         "file" : "lib/Ushuffle.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mtw/ushuffle-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mtw/ushuffle-perl.git",
+         "web" : "https://github.com/mtw/ushuffle-perl"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

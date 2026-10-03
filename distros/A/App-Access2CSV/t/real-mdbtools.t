@@ -12,7 +12,7 @@
 # "mdb-export -- DB TABLE" prints, each row count what mdb-count prints.
 #
 # No database ships with this distribution (the usual test files have no
-# clear licence).  Point ACCESS2CSV_TEST_DATA at a folder of .mdb/.accdb
+# clear licence).  Point ACCESS2CSV_TEST_DATA at a directory of .mdb/.accdb
 # files to run this, e.g. the mdbtools project's test data:
 #
 #	git clone --depth 1 https://github.com/mdbtools/mdbtestdata
@@ -42,7 +42,7 @@ Readonly::Hash my %CONFIG => (
 );
 
 BEGIN {
-	plan(skip_all => 'set ACCESS2CSV_TEST_DATA to a folder of Access databases to test against real mdbtools')
+	plan(skip_all => 'set ACCESS2CSV_TEST_DATA to a directory of Access databases to test against real mdbtools')
 		unless $ENV{ACCESS2CSV_TEST_DATA} && -d $ENV{ACCESS2CSV_TEST_DATA};
 	foreach my $program (qw(mdb-tables mdb-export mdb-count)) {
 		plan(skip_all => "$program (mdbtools) is not installed") unless which($program);

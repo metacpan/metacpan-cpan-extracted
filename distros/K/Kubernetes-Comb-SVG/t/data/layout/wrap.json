@@ -1,0 +1,64 @@
+{
+   "items" : [
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "base8"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "base7"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "base6"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "base5"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "base4"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "base3"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "base2"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "base1"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "top"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "base1"
+            ]
+         }
+      }
+   ],
+   "kind" : "List"
+}

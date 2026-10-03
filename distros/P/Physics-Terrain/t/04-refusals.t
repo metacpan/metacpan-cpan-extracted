@@ -12,7 +12,7 @@ use Test::More;
 
 use Physics::Terrain;
 
-plan tests => 16;
+plan tests => 18;
 
 my $flat = { profile => 'flat', floor => 400 };
 
@@ -31,6 +31,13 @@ my $flat = { profile => 'flat', floor => 400 };
 	is $field->start_turn(5), undef, 'a turn for a body that does not exist is refused';
 	is $field->advance(0), 'idle', 'and nothing advances';
 	is $field->error, undef, 'with no error left behind on the field';
+}
+
+{
+	# the state code is 7 and the wind runs -20 to 20: a wind of -7 is a wind
+	my $field = Physics::Terrain->new(seed => 1, gen => $flat, bodies => [[0, 300, 0]], wind => -7);
+	is $field->start_turn(0), -7, 'a turn whose wind is -7 returns -7, not the refusal';
+	is $field->start_turn(5), undef, 'and a body that does not exist is still refused';
 }
 
 {

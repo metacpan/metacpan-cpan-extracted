@@ -1,0 +1,51 @@
+{
+   "items" : [
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "web"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "api"
+            ]
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "nats"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "api"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "db",
+               "nats"
+            ]
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "db"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "cache"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "db"
+            ]
+         }
+      }
+   ],
+   "kind" : "List"
+}

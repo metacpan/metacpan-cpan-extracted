@@ -1,5 +1,9 @@
 Revision history for Archive-Ar-Libarchive
 
+2.10      2026-10-02 03:54:29 -0600
+  - Fix write callback return type to match archive_write_callback,
+    which fixes compile error on newer clang
+
 2.09      2021-11-15 07:35:40 -0700
   - Remove unused dependency on ExtUtils::CChecker (gh#24)
 

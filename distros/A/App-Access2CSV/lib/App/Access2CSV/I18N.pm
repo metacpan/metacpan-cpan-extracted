@@ -17,7 +17,7 @@ use Return::Set qw(set_return);
 use Sub::Private;
 use Sub::Protected;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.001.1';
 
 # The wrappers installed by Sub::Private/Sub::Protected add stack frames;
 # listing them here stops Carp from blaming the wrapper for our errors
@@ -168,7 +168,7 @@ App::Access2CSV::I18N - Message catalog and translated error messages for App::A
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.001.1
 
 =head1 SYNOPSIS
 

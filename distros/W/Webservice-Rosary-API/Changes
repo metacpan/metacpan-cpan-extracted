@@ -6,7 +6,7 @@
 	- added error handling when "mp3Link" gets a "200 OK"
           response from the server, but there is no content.
 	- moved "AveMara" commandline program to "avemaria,"
-	  to match lowercase convention of most *nix utilties 
+	  to match lowercase convention of most *nix utilties
         - "avemaria" command with arguments will run the
 	  equivalent of, "avemaria $(date "+%A") --pray -t"
 	- added the "about" subcommand
@@ -30,6 +30,8 @@
 	- added conservative HTTP failure handling with descriptive exceptions,
 	  a 10-second default timeout, injectable user agents, and stale-cache
 	  fallback
+
+0.1.7	Fri Aug 28 03:10:00 AM CDT 2026
 	- added a small in-memory response cache (300 second default TTL); the
 	  random endpoint is never served from a fresh cache entry
 	- fixed Saturday validation in day() and fixed single-item array handling
@@ -38,14 +40,11 @@
 	  --sleep, and --speed timing controls
 	- added live text-stream controls: SPACE/p pauses or resumes, +/- changes
 	  speed in real time, and 0 resets the initial speed
+	- added q quit confirmation; confirmed quits print "Pray the Rosary every day, +JMJ+" and restore the terminal cleanly
+	- added --unceasingly prayer mode to continuously repeat the selected Rosary; it implies --pray, reuses cached API data, preserves live speed changes between cycles, and remains stoppable with q or Ctrl-C
+	- organized CLI options by prayer mode, presentation, timing/interaction, and color; -t now enforces its documented --fully requirement
 	- explicit DAY_OR_MYSTERY without --pray now follows the documented
 	  summary behavior; bare avemaria still starts guided prayer
-        +JMJ+
-
-0.1.7	Fri Aug 28 03:10:00 AM CDT 2026
-        - --unceasingly will loop the Rosary until you hit "q" or ctrl-c, e.g.,
-          avemaria --pray --unceasingly # will run continuously until interrupted;
-          try wit --scroll and --color for a nicer impact (see POD and below) 
 	- added traditional opening intentions: the first Our Father for the
 	  intentions and well-being of Pope Leo XIV, followed by Hail Marys for
 	  an increase in Faith, Hope, and Charity
@@ -53,12 +52,18 @@
 	  Mystery; --fully retains the longer meditation text
 	- reduced --scroll clutter by showing the overall heading once and section
 	  headings only when a new decade begins; Mystery headings are uppercase
+
+0.1.8	Fri Oct 2 03:10:00 AM CDT 2026
+        - October is a month in the Catholic Church dedicated to the Holy Rosary
 	- added opt-in --color output with tranquil dark-background and
-	  light-background profiles selected with --dark or --light
-	- normal prayer mode now presents each decade title and Fruit of the
-	  Mystery; --fully retains the longer meditation text
-	- reduced --scroll clutter by showing the overall heading once and section
-	  headings only when a new decade begins; Mystery headings are uppercase
-	- added opt-in --color output with tranquil dark-background and
-	  light-background profiles selected with --dark or --light
-        +JMJ+
+	  light-background profiles selected with --dark or --light; --color alone
+	  defaults to --dark
+	- color Mystery families consistently: Joyful light blue, Sorrowful muted
+	  dark red/maroon, Glorious soft yellow/gold, and Luminous gentle violet;
+	  individual Mystery titles are bold in the matching family color
+	- color the Apostles Creed, Hail Holy Queen, and closing O God prayer
+	  as bold white in the dark profile (bold near-black in the light profile);
+	  fold the closing prayer to the standard 72-column presentation width
+	- when --color is enabled, alternate Hail Marys between Marian blue and
+	  a neutral foreground; each introductory group and decade starts blue
+	  (soft white alternate on --dark, charcoal alternate on --light)

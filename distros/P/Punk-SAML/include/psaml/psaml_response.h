@@ -204,6 +204,10 @@ PERL_STATIC_INLINE SV *psaml_verify_response(pTHX_ SV *bytes,
   HV *out;
   STRLEN vl;
   const char *v;
+  /* The bearer window, carried out of the Subject block: it is the
+   * length of time a replay cache has to remember this assertion for,
+   * and the identity hands it to whoever keeps that cache. */
+  IV conf_na = 0;
 
   doc = psaml_parse_response(aTHX_ bytes, &guard);
 
@@ -379,11 +383,30 @@ PERL_STATIC_INLINE SV *psaml_verify_response(pTHX_ SV *bytes,
         psaml_throw(aTHX_ PSAML_E_BAD_DESTINATION,
                     "the SubjectConfirmationData Recipient is not this "
                     "application's assertion consumer URL");
+      /* NotOnOrAfter is REQUIRED here, not optional.
+       *
+       * Profiles section 4.1.4.2 makes it mandatory on the bearer
+       * SubjectConfirmationData, and it is the only attribute in the
+       * document that bounds how long the assertion is worth anything.
+       * Treating it as optional - which this did until 0.03 - left an
+       * assertion with no window at all unbounded in time: IssueInstant
+       * is not a freshness check and Conditions/@NotOnOrAfter is
+       * likewise only enforced when present, so a Response minted a
+       * year ago verified exactly as well as one minted a second ago.
+       * With allow_idp_initiated on there was then nothing whatsoever
+       * to stop it being presented again for ever. */
       {
         IV na = psaml_attr_time(aTHX_ scd, "NotOnOrAfter", &have);
-        if (have && na <= o->now - o->skew)
+        if (!have)
+          psaml_throw(aTHX_ PSAML_E_XML_SHAPE,
+                      "the bearer SubjectConfirmationData has no "
+                      "NotOnOrAfter, which the Web Browser SSO profile "
+                      "requires and which bounds how long this assertion "
+                      "can be replayed");
+        if (na <= o->now - o->skew)
           psaml_throw(aTHX_ PSAML_E_EXPIRED,
                       "the SubjectConfirmationData window has closed");
+        conf_na = na;
       }
       v = psaml_attr(aTHX_ scd, "InResponseTo", &vl);
       if (v) in_response_to = sv_2mortal(newSVpvn(v, vl));
@@ -474,6 +497,12 @@ PERL_STATIC_INLINE SV *psaml_verify_response(pTHX_ SV *bytes,
       if (have) (void)hv_stores(out, "not_on_or_after", newSViv(t));
     }
   }
+  /* How long a replay cache must remember this id for. Profiles section
+   * 4.1.4.5 names the bearer SubjectConfirmationData's NotOnOrAfter and
+   * not the Conditions one, because that is the window the assertion can
+   * actually be presented in; past it every other check refuses anyway,
+   * so a cache entry that outlives it is only occupying space. */
+  (void)hv_stores(out, "replay_until", newSViv(conf_na));
   {
     HV *attrs = newHV(), *friendly = newHV();
     psaml_read_attributes(aTHX_ assertion, attrs, friendly);
@@ -485,6 +514,109 @@ PERL_STATIC_INLINE SV *psaml_verify_response(pTHX_ SV *bytes,
   (void)hv_stores(out, "raw", newSVsv(bytes));
 
   return newRV_noinc((SV *)out);
+}
+
+/* ---- the replay store ------------------------------------------------- */
+
+/* True if this assertion has been presented before.
+ *
+ * Called by the ACS route between a successful verification and
+ * on_login. AFTER, because an id out of an unverified document is
+ * attacker-chosen and writing it to the store would let anyone fill the
+ * cache with whatever they liked; BEFORE, because on_login is where the
+ * session is established and one assertion must not buy two.
+ *
+ * `seen` is either a coderef - the application's own store, called with
+ * the context, the id and the window - or the name of one of the `cache`
+ * keyword's stores. The second is the default, because Profiles section
+ * 4.1.4.5 makes the check a MUST and the deployment that configured
+ * nothing is the one that needs it most.
+ *
+ * CROAKS rather than returning 0 when it cannot tell. "the store is
+ * unreachable" and "the assertion is fresh" must not produce the same
+ * login, so the caller wraps this in G_EVAL and turns a failure into a
+ * `config` refusal. Fail closed.
+ *
+ * The get-then-set is not atomic, and Punk::Cache has no compare-and-set
+ * to make it so. Two genuinely simultaneous presentations of one
+ * assertion can therefore both read absent and both proceed. That is a
+ * window of milliseconds against the minutes the assertion is otherwise
+ * replayable for, and closing it needs an addition to Punk::Cache rather
+ * than anything here; it is written down in the POD rather than left for
+ * somebody to discover. */
+PERL_STATIC_INLINE int psaml_replayed(pTHX_ SV *c, SV *seen, SV *identity,
+                                      IV skew) {
+  HV *ih;
+  SV *id, *until;
+
+  if (!identity || !SvROK(identity) || SvTYPE(SvRV(identity)) != SVt_PVHV)
+    croak("%s: the replay check was handed no identity", PSAML_WHO);
+  ih = (HV *)SvRV(identity);
+
+  id = psaml_hget(aTHX_ ih, "assertion_id");
+  if (!id || !SvOK(id) || !SvCUR(id))
+    croak("%s: the Assertion has no ID, so a replay of it cannot be "
+          "detected", PSAML_WHO);
+  until = psaml_hget(aTHX_ ih, "replay_until");
+
+  /* the application's own store */
+  if (psaml_is_code(aTHX_ seen)) {
+    SV *args[3], *r;
+    int out;
+    args[0] = c;
+    args[1] = id;
+    args[2] = (until && SvOK(until)) ? until : &PL_sv_undef;
+    r = psaml_call_cv(aTHX_ seen, args, 3);
+    out = (r && SvTRUE(r)) ? 1 : 0;
+    if (r) SvREFCNT_dec(r);
+    return out;
+  }
+
+  if (!seen || !SvOK(seen) || !SvCUR(seen))
+    croak("%s: the replay check has no store: `seen` is neither a coderef "
+          "nor the name of a `cache` store", PSAML_WHO);
+
+  {
+    SV *store, *key, *got, *args[3];
+    IV ttl;
+
+    /* $c->cache($name). It croaks on an undeclared store, which on_compile
+     * has already refused, so reaching that croak means the store was
+     * taken away after boot and the login fails rather than passes. */
+    args[0] = seen;
+    store = psaml_call(aTHX_ c, "cache", args, 1);
+    if (!store)
+      croak("%s: there is no `cache` store named '%s' to remember "
+            "assertion ids in", PSAML_WHO, SvPV_nolen(seen));
+    sv_2mortal(store);
+
+    /* Prefixed, because the store is shared with whatever else the
+     * application caches and an assertion id is provider-chosen. */
+    key = sv_2mortal(newSVpvs("punk_saml.replay:"));
+    sv_catsv(key, id);
+
+    args[0] = key;
+    got = psaml_call(aTHX_ store, "get", args, 1);
+    if (got) { SvREFCNT_dec(got); return 1; }
+
+    /* Remembered for as long as the assertion would still be ACCEPTED:
+     * the bearer window plus the skew the verifier allows past it. An
+     * entry that expired at the window alone would stop remembering the
+     * id while that id was still good for a login.
+     *
+     * A ttl of 0 means NO EXPIRY in Punk::Cache, so the floor is 1 and
+     * never 0: an assertion whose window has already closed gets a
+     * near-useless entry, which is right, because it will not be
+     * accepted again on its own merits either. */
+    ttl = ((until && SvOK(until)) ? SvIV(until) : 0) + skew - (IV)time(NULL);
+    if (ttl < 1) ttl = 1;
+
+    args[0] = key;
+    args[1] = sv_2mortal(newSVpvs("1"));
+    args[2] = sv_2mortal(newSViv(ttl));
+    SvREFCNT_dec(psaml_call(aTHX_ store, "set", args, 3));
+    return 0;
+  }
 }
 
 #endif /* PSAML_RESPONSE_H */

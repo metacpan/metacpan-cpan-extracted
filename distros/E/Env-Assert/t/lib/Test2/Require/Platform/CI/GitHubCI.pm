@@ -6,10 +6,10 @@ use base 'Test2::Require';
 
 our $VERSION = '0.000160';
 
-use English qw( -no_match_vars );    # Avoids regex performance
+use English qw( -no_match_vars ) ;  # Avoids regex performance
 
 sub IS_PLATFORM {
-    if ( $ENV{CI} && $ENV{GITHUB_ACTIONS} && $ENV{GITHUB_RUN_ID} ) {
+    if( $ENV{CI} && $ENV{GITHUB_ACTIONS} && $ENV{GITHUB_RUN_ID} ) {
         return 1;
     }
     return;
@@ -18,11 +18,10 @@ sub IS_PLATFORM {
 sub skip {
     my $class = shift;
 
-    if ( IS_PLATFORM() ) {
+    if (IS_PLATFORM()) {
         return;
-    }
-    else {
-        return ( __PACKAGE__ =~ m/^Test2::(.*)$/msx )[0];
+    } else {
+        return (__PACKAGE__ =~ m/^Test2::(.*)$/msx)[0];
     }
 }
 

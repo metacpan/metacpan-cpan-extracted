@@ -121,6 +121,7 @@ use Punk;
 use Punk::Plugin::SAML;
 host 'https://app.example.com';
 session secret => 'session-secret-here-32-bytes-ok!';
+cache 'memory', max_bytes => '1M';
 plugin 'SAML' => { secret => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'$extra };
 $idp_body
 saml_login '/saml' => { on_login => sub { return } };

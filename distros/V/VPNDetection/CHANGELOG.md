@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.5.0 - 2026-10-03
+
+### Features
+
+- Add the authorization code sign-in, with PKCE ([`8fd7644`](https://github.com/vpndetection-io/sdk-perl/commit/8fd76443a1f1b19462517e934267d5418499f314))
+
 ## 3.4.1 - 2026-09-29
 
 ### Fixes

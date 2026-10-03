@@ -1,0 +1,5 @@
+{
+  "kind": "Comb",
+  "metadata": { "name": "nats" },
+  "spec": { "class": "MyApp::Comb::NATS" }
+}

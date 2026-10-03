@@ -93,6 +93,12 @@ is local::bin::avemaria::_mystery_heading('friday', 'Sorrowful'),
   'overall Mystery heading is uppercase';
 is local::bin::avemaria::_prayer_role('hail__mary_9_3'), 'hail_mary',
   'Hail Marys use the Marian color role';
+is local::bin::avemaria::_hail_mary_role(1), 'hail_mary',
+  'first Hail Mary in a group uses Marian blue';
+is local::bin::avemaria::_hail_mary_role(2), 'hail_mary_alt',
+  'second Hail Mary in a group uses the neutral alternate';
+is local::bin::avemaria::_hail_mary_role(3), 'hail_mary',
+  'Hail Mary alternation returns to Marian blue';
 is local::bin::avemaria::_prayer_role('our__father_4'), 'our_father',
   'Our Fathers use the green color role';
 is local::bin::avemaria::_prayer_role('glory_be_4'), 'glory_be',
@@ -112,8 +118,16 @@ my $dark = local::bin::avemaria::_color_palette('dark');
 my $light = local::bin::avemaria::_color_palette('light');
 ok $dark->{hail_mary} ne $dark->{our_father},
   'dark profile keeps Marian and Our Father colors distinct';
+ok $dark->{hail_mary} ne $dark->{hail_mary_alt},
+  'dark profile alternates Marian blue with a neutral foreground';
+like $dark->{hail_mary_alt}, qr/38;5;255m/,
+  'dark profile Hail Mary alternate is soft white';
 ok $light->{hail_mary} ne $light->{our_father},
   'light profile keeps Marian and Our Father colors distinct';
+ok $light->{hail_mary} ne $light->{hail_mary_alt},
+  'light profile alternates Marian blue with a neutral foreground';
+like $light->{hail_mary_alt}, qr/38;5;236m/,
+  'light profile Hail Mary alternate is charcoal';
 ok $dark->{hail_mary} ne $light->{hail_mary},
   'dark and light profiles use different contrast values';
 is $dark->{hail_mary}, $dark->{mystery_joyful},
@@ -130,8 +144,25 @@ is(($light->{mystery_sorrowful_title} =~ /88m/) ? 1 : 0, 1,
   'light profile uses a deeper maroon for Sorrowful titles');
 
 
+is local::bin::avemaria::_prayer_role('i_believe'), 'major_prayer',
+  'Apostles Creed uses the major-prayer role';
+is local::bin::avemaria::_prayer_role('holy_queen'), 'major_prayer',
+  'Hail Holy Queen uses the major-prayer role';
+is local::bin::avemaria::_prayer_role('final_prayer'), 'major_prayer',
+  'closing O God prayer uses the major-prayer role';
+like $dark->{major_prayer}, qr/^\e\[1;38;5;255m$/,
+  'major prayers are bold white in the dark profile';
+like $light->{major_prayer}, qr/^\e\[1;38;5;232m$/,
+  'major prayers use bold near-black in the light profile';
+
+my $long_closing = join q{ }, ('O God, whose only begotten Son, by His life, death and resurrection, has purchased for us the rewards of eternal life;') x 2;
+my $folded_closing = local::bin::avemaria::_format_prayer_text('final_prayer', $long_closing);
+ok !(grep { length($_) > 72 } split /\n/, $folded_closing),
+  'final O God prayer is folded to 72 columns';
+is local::bin::avemaria::_format_prayer_text('holy_queen', 'Hail Holy Queen'), 'Hail Holy Queen',
+  'other major prayers are not unnecessarily folded';
+
 like Webservice::Rosary::Stream->controls_help, qr/q quit/,
   'interactive help advertises q quit';
 
 done_testing;
-

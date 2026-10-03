@@ -1,5 +1,17 @@
 Revision history for Restish-Client
 
+1.10    2026-10-02
+        - Add PUT shortcut method
+        - thin_request: remove redundant empty-body handling for POST, report
+          the invalid method in errors, and stop warning when a response has
+          no Content-Type
+        - Rewrite the documentation: fix the broken thin_request examples,
+          reorder sections, and document return values, errors and subclassing
+        - Regenerate README.md from the POD
+        - Fix license metadata: the distribution is GPL v3 (matching LICENSE),
+          not Apache 2.0
+        - Add tests for the method shortcuts and thin_request
+
 1.0     2025-12-04
         - Initial CPAN release
         - Basic REST client functionality with Moo-based interface

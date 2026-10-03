@@ -551,16 +551,23 @@ alive(self, seat = -1)
         RETVAL
 
 # Starts a turn for body $active and returns the wind; undef when there is
-# no such body (error says 'state').
+# no such body (error says 'state'). A WIND OF -7 IS NOT A REFUSAL: the
+# engine negates PT_ERR_STATE, which is 7, and the wind runs -20 to 20, so
+# the two collided and one turn in forty-one came back undef with the body
+# standing there (every client then aimed against a wind of its own; found
+# by the app's identity test, 2 Oct 2026). The refusal is the body not
+# existing, so that is what decides.
 SV *
 start_turn(self, active)
         SV *self
         IV active
     PREINIT:
+        struct pt_state *s;
         int32_t r;
     CODE:
-        r = (PT->start_turn)(pt_self(aTHX_ self, "start_turn"), (int32_t) active);
-        RETVAL = r == -PT_ERR_STATE ? newSV(0) : newSViv(r);
+        s = pt_self(aTHX_ self, "start_turn");
+        r = (PT->start_turn)(s, (int32_t) active);
+        RETVAL = (r == -PT_ERR_STATE && (active < 0 || active >= (PT->body_count)(s))) ? newSV(0) : newSViv(r);
     OUTPUT:
         RETVAL
 

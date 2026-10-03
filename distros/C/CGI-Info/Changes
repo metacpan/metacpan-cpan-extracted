@@ -1,5 +1,10 @@
 Revision history for CGI-Info
 
+1.15	Fri Oct  2 11:36:07 AM EDT 2026
+	[ Bug fixes ]
+	- Bumped to latest version of Params::Validate::Strict
+	- Look into GH#38
+
 1.14	Thu Jul 23 21:29:19 EDT 2026
 	[ Enhancements ]
 	- Add is_ai() method: returns true for known AI training/inference crawlers (ClaudeBot, GPTBot, PerplexityBot, CCBot, etc.)
@@ -24,6 +29,15 @@ Revision history for CGI-Info
 	- Fix spelling of overridden in POD comments
 	- Add Readonly to PREREQ_PM in Makefile.PL
 	- Refactor bin/info.pl to use cookie() instead of deprecated get_cookie() and improve cookie parsing split regex
+
+	- Add t/path.t: 106-test exhaustive CFG path-coverage file mapping every uniquely identifiable
+	  execution path through new(), params(), param(), protocol(), status(), cookie(), is_ai(),
+	  browser_type(), _log(), _warn(), _error(), _get_env(), AUTOLOAD(), set_logger(), cache(), reset()
+	- Cache protocol() result in the object so getservbyport() is never called twice on the same instance;
+	  class-method calls (CGI::Info->protocol()) are unaffected (no caching on a string $self)
+	- Annotate unreachable blocks in cookie() and AUTOLOAD() with TODO comments for future removal:
+	  cookie()'s !defined/$field and ref($field) guards are dead because validate_strict() croaks first;
+	  AUTOLOAD()'s digit-leading method-name guard is unreachable from normal Perl dispatch
 
 	[ Bug fixes]
 	- Fix bin/info.pl: add use autodie qw(:all); replace bare foreach(keys(%FORM)) with for my $key (sort keys %FORM)

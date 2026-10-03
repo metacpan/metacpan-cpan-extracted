@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#  Template script to exercise the Parse::Crontab::English module.
+
+use FindBin qw/$Bin/;
+use File::Temp qw/tempfile/;
+use autodie;
+
+use lib "$Bin/../lib";
+
+use Parse::Crontab::English;
+
+{
+    my $filename = pop @ARGV;
+    my $fh;
+
+    #  Handle either a filename on the command line, or stuff coming from a
+    #  stream (like 'crontab -l | explain_crontab').
+
+    if ( defined $filename ) {
+
+      ( -e $filename ) or die "$0: Unable to fine $filename";
+
+    } else {
+
+      ( $fh, $filename ) = tempfile();
+
+      print $fh <STDIN>;
+      close $fh;
+
+      -z $filename and die "$0: Nothing on STDIN";
+    }
+
+    my $sch = Parse::Crontab::English->new ( { file => $filename } );
+
+    #  Sort the output by incoming line number, so that the summary is in the
+    #  same order as the original file or stream.
+
+    foreach my $cmd (
+      sort { $sch->{ summary }{ $a }[0]{ line_num } <=>
+             $sch->{ summary }{ $b }[0]{ line_num } }
+      keys %{ $sch->{ summary } } ) {
+
+      print "Command line: $cmd\n";
+
+      my $list = $sch->{ summary }{ $cmd };
+      foreach my $detail ( @$list ) {
+
+        print "--> Detail (line $detail->{ line_num }):\n";
+
+        #  It's only interesting if it's *not* every month.
+
+        if ( $detail->{ month_desc } !~ /^every month/ ) {
+
+          print "  --> Description of the months: $detail->{ month_desc }\n";
+        }
+
+        #  It's only interesting if it's *not* every day of the month.
+
+        if ( $detail->{ day_desc } !~ /^every day/ ) {
+
+          print "  --> Description of Days of the month: $detail->{ day_desc }\n";
+        }
+
+        #  Same, it's only interesting if it's *not* every day of the week.
+
+        if ( $detail->{ dow_desc } !~ /^every day/ ) {
+
+          print "  --> Description of Days of the week: $detail->{ dow_desc }\n";
+        }
+
+        print "  --> Description of Hours and Minutes: $detail->{ hm_desc }\n";
+        print "  --> Detail of Hours and Minutes: $detail->{ hours_minutes }\n";
+      }
+    }
+}

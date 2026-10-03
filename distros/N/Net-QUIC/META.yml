@@ -28,22 +28,22 @@ no_index:
 provides:
   Net::QUIC:
     file: lib/Net/QUIC.pm
-    version: '0.01'
+    version: '0.03'
   Net::QUIC::Connection:
     file: lib/Net/QUIC/Connection.pm
-    version: '0.01'
+    version: '0.03'
   Net::QUIC::Datagram:
     file: lib/Net/QUIC/Datagram.pm
-    version: '0.01'
+    version: '0.03'
   Net::QUIC::Driver:
     file: lib/Net/QUIC/Driver.pm
-    version: '0.01'
+    version: '0.03'
   Net::QUIC::Endpoint:
     file: lib/Net/QUIC/Endpoint.pm
-    version: '0.01'
+    version: '0.03'
   Net::QUIC::Stream:
     file: lib/Net/QUIC/Stream.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   Alien::ngtcp2: '0.03'
   Carp: '0'
@@ -55,5 +55,5 @@ resources:
   bugtracker: https://github.com/haxmeister/perl-Net-QUIC/issues
   homepage: https://github.com/haxmeister/perl-Net-QUIC
   repository: https://github.com/haxmeister/perl-Net-QUIC.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

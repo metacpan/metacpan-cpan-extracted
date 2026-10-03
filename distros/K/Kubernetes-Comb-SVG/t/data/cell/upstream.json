@@ -1,0 +1,14 @@
+{
+  "kind": "Comb",
+  "metadata": { "name": "db" },
+  "status": {
+    "phase": "Running",
+    "upstream": {
+      "class": "Kubernetes::Comb::Upstream::K8s",
+      "context": "dev",
+      "reachable": true,
+      "phase": "Running",
+      "via": [ "dev", "prod" ]
+    }
+  }
+}

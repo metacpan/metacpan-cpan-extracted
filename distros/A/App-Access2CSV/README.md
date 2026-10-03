@@ -4,7 +4,7 @@ App::Access2CSV - Export the tables of a Microsoft Access database to CSV files
 
 ## Version
 
-Version 0.001.0
+Version 0.001.1
 
 ## Synopsis
 
@@ -15,7 +15,7 @@ Version 0.001.0
     # See what would be written, with row counts, without writing anything
     access2csv --dry-run --show-counts shop.accdb
 
-    # Export only two tables, into a folder called "exports"
+    # Export only two tables, into a directory called "exports"
     access2csv --output-dir exports --table Customers --table Orders shop.mdb
 
     # Make files that Excel opens correctly, replace old files, no log file
@@ -54,9 +54,16 @@ Each file has the name of its table plus `.csv`, for example
 computers (`< > : " / \ | ? *` and control characters).  They are
 changed to `_`, and so are invisible text-direction controls (such as
 U+202E, "right-to-left override"), which could make a file name look
-like something else.  Spaces and dots at the end, and spaces at the start,
+like something else.  Bytes that are not valid UTF-8 (only a damaged
+database has them, and macOS cannot store them in a file name) are also
+changed to `_`.  Spaces and dots at the end, and spaces at the start,
 are removed.  A name such as `CON` or `NUL` (reserved on Windows) gets a
 `_` in front.  An empty name becomes `unnamed`.
+
+Access names are at most 64 characters, so a longer name can only come
+from a damaged database.  It is shortened to 64 characters (and to 240
+bytes, to fit the file name limit of most systems), without cutting a
+character in half.
 
 If two tables would get the same file name, the second one gets `_2`,
 the third `_3`, and so on.  Upper and lower case count as the same here,
@@ -67,13 +74,13 @@ because Windows and macOS treat `Orders.csv` and `ORDERS.csv` as one file.
 If the database name is `-`, the database is read from standard input
 instead of a file, so it can be piped in.  mdbtools can only read a real
 file, so the data is first copied to a private temporary file (readable
-by you only) in the temporary folder (`TMPDIR`, or `/tmp`), and that
+by you only) in the temporary directory (`TMPDIR`, or `/tmp`), and that
 copy is deleted when the program ends - whether it succeeds, fails or is
 interrupted.
 
 `-` is refused if standard input is a terminal (there is nothing to
-read but the keyboard), and empty input is an error.  To use a file that
-is really called `-`, write `./-`.
+read but the keyboard), and a directory or empty input is an error.  To use
+a file that is really called `-`, write `./-`.
 
 ### How Files Are Written
 
@@ -116,8 +123,8 @@ For more control, use [App::Access2CSV::Exporter](https://metacpan.org/pod/App%3
 
 - **--output-dir** _DIR_
 
-    The folder to write the CSV files to.  It is created if it does not exist.
-    Default: the current folder.
+    The directory to write the CSV files to.  It is created if it does not exist.
+    Default: the directory.
 
 - **--table** _NAME_
 
@@ -138,7 +145,7 @@ For more control, use [App::Access2CSV::Exporter](https://metacpan.org/pod/App%3
 - **--dry-run**
 
     Only print a list of the tables and the file names they would get.
-    Nothing is written.  The output folder is not created.
+    Nothing is written.  The output directory is not created.
 
 - **--show-counts**
 
@@ -159,7 +166,7 @@ For more control, use [App::Access2CSV::Exporter](https://metacpan.org/pod/App%3
 - **--log** _FILE_
 
     Add log messages to the end of _FILE_.  Default: `access2csv.log` in
-    the current folder.  An empty name (`--log ''`) means no log.  _FILE_
+    the directory.  An empty name (`--log ''`) means no log.  _FILE_
     must not be a symbolic link (see ["SECURITY"](#security)).
 
 - **--no-log**
@@ -176,7 +183,7 @@ For more control, use [App::Access2CSV::Exporter](https://metacpan.org/pod/App%3
 
 - **--version**
 
-    Print the version ("access2csv version 0.001.0"), then stop.
+    Print the version ("access2csv version 0.001.1"), then stop.
 
 ## Exit Status
 
@@ -217,7 +224,7 @@ error message gives the line number.  Nothing is silently replaced.
 
 ### Names on the Command Line
 
-Database paths, folder names, log file names and table names are used
+Database paths, directory names, log file names and table names are used
 exactly as the operating system gives them to the program (as bytes).
 On Linux and macOS, where the terminal uses UTF-8, names with accented
 letters, non-Latin scripts and emoji work.  On Windows, the command line
@@ -232,8 +239,8 @@ All messages that the program prints and logs are in plain ASCII English.
 - `PATH`
 
     Used to find `mdb-tables`, `mdb-export` and `mdb-count`.  Only
-    absolute folders in `PATH` are used: relative entries such as `.` are
-    ignored, so a program planted in the current folder is never run.
+    absolute directories in `PATH` are used: relative entries such as `.` are
+    ignored, so a program planted in the directory is never run.
 
 - `LANGUAGE`, `LC_ALL`, `LC_MESSAGES`, `LANG`
 
@@ -262,13 +269,13 @@ harm.
 are only ever names.
 - **No planted programs.**  Relative `PATH` entries are ignored
 (see ["ENVIRONMENT"](#environment)).  The mdbtools programs are started with a cleaned
-environment: `PATH` holds only absolute folders, and `IFS`, `CDPATH`,
+environment: `PATH` holds only absolute directories, and `IFS`, `CDPATH`,
 `ENV` and `BASH_ENV` are removed.
 - **Taint mode.**  The program runs under Perl's taint mode
 (`perl -T`).  Every outside value - the database path, table names,
 `--output-dir`, `--log` and the program paths found in `PATH` - is
 checked first and only then marked as safe.  Under `-T`, Perl also
-refuses to start mdbtools while `PATH` contains a folder other users can
+refuses to start mdbtools while `PATH` contains a directory other users can
 write to; the program then stops with "Insecure directory in
 $ENV{PATH}".
 - **Private copies of piped input.**  A database read from standard
@@ -276,14 +283,14 @@ input is copied with [File::Temp](https://metacpan.org/pod/File%3A%3ATemp) (a ne
 by you only) and deleted when the program ends, also after an error or
 an interruption.
 - **Safe file names.**  Table names cannot place a file outside the
-output folder, and control characters - including invisible
+output directory, and control characters - including invisible
 text-direction controls and C1 controls - are replaced by `_`.
 - **Safe terminal and log output.**  Table names and mdbtools error
 text are printed with control characters shown as escapes such as
 `\x1B`.  So a table name cannot retitle or clear your terminal, hide
 text, or forge lines in the log.
 - **No writing through symbolic links.**  If the log file is a
-symbolic link (for example one planted in a shared folder such as
+symbolic link (for example one planted in a shared directory such as
 `/tmp`), the program stops instead of writing to the file it points at.
 Existing CSV files that are links are replaced, never written through.
 - **Spreadsheet formulas are NOT neutralised.**  A value such as
@@ -295,8 +302,8 @@ checking them, or import them as text.
 
 ## Common Pitfalls
 
-- **A log file appears in the current folder.**  By default the log is
-`access2csv.log` in the folder you run the program from.  Use **--log** to
+- **A log file appears in the directory directory.**  By default the log is
+`access2csv.log` in the directory you run the program from.  Use **--log** to
 choose another place, or **--no-log**.
 - **The second run fails.**  If the CSV files already exist, each table
 fails (exit status 1) unless you give **--overwrite**.
@@ -318,7 +325,7 @@ the program to end.
 - **A file called "-".**  `-` means standard input, even after
 `--`.  Write `./-` for a file with that name.
 - **Piped databases need temporary space.**  The whole database is
-copied to the temporary folder first; if that folder is small, set
+copied to the temporary directory first; if that directory is small, set
 `TMPDIR` to one with room.
 
 ## Methods
@@ -343,7 +350,7 @@ A number from 0 to 3, as described in ["EXIT STATUS"](#exit-status).
 #### Side Effects
 
 - Everything that ["run" in App::Access2CSV::Exporter](https://metacpan.org/pod/App%3A%3AAccess2CSV%3A%3AExporter#run) does: it creates
-the output folder, writes CSV files, and prints progress to standard error.
+the output directory, writes CSV files, and prints progress to standard error.
 - It prints help or usage text (help to standard output, usage errors
 to standard error).
 - It prints a fatal error, if there is one, to standard error as one
@@ -436,7 +443,8 @@ Valid and invalid values (tested in `t/domain.t`):
     | access2csv: Standard input is empty:| "-" was given, but the pipe   | Check the command that       |
     |  no database was piped in (exit 3)  | delivered nothing             | produces the database        |
     | access2csv: Cannot read standard    | Reading the pipe failed; E is | See E                        |
-    |  input: E (exit 3)                  | the reason                    |                              |
+    |  input: E (exit 3)                  | the reason ("Is a directory"  |                              |
+    |                                     | if a directory was given)        |                              |
     | access2csv: Interrupted by SIGx     | Stopped (Ctrl-C, kill) while  | Run again                    |
     |  while reading the database from    | waiting for piped input; the  |                              |
     |  standard input (exit 3)            | partial copy was deleted      |                              |
@@ -482,7 +490,7 @@ tests (`t/exporter.t`, `t/app.t`) run there.  Most other test files
 use Unix-only facilities (signals, symbolic links, `/proc`, taint-mode
 child processes, terminals) and are skipped on Windows, so those
 features are tested on Unix only.
-- The default log file is created in the current folder, which may
+- The default log file is created in the directory, which may
 surprise users.
 - Settings come from the command line only.  `%DEFAULTS` is laid out
 so that [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure) could read them from a configuration file,
@@ -493,7 +501,7 @@ but this is not connected yet.
 Most tests use stand-in mdbtools programs.  `t/real-mdbtools.t` checks
 the program against the real mdbtools and real Access files: every CSV
 must be byte for byte what `mdb-export` prints.  No database ships with
-this distribution; point `ACCESS2CSV_TEST_DATA` at a folder of
+this distribution; point `ACCESS2CSV_TEST_DATA` at a directory of
 `.mdb`/`.accdb` files, for example the mdbtools project's test data:
 
 ```

@@ -1,4 +1,4 @@
-package JSCalendar::Duration 0.004;
+package JSCalendar::Duration 0.005;
 # ABSTRACT: Convert seconds to JSCalendar durations and back
 
 use strict;
@@ -33,6 +33,10 @@ sub duration_to_seconds {
     croak("Invalid duration '$input', must start with 'P'");
   }
 
+  unless (length $toparse) {
+    croak("Invalid duration '$input', no components after 'P'");
+  }
+
   if ($toparse =~ s/^(\d+)W\z//) {
     # Weeks must appear on their own, no day or time component.
     $seconds += (86400 * 7 * $1);
@@ -43,10 +47,14 @@ sub duration_to_seconds {
     $seconds += (86400 * $1);
   }
 
-  return $seconds unless $toparse;
+  return $seconds unless length $toparse;
 
   unless ($toparse =~ s/^T//) {
     croak("Invalid duration '$input', expected T here: '$toparse'");
+  }
+
+  unless (length $toparse) {
+    croak("Invalid duration '$input', no components after 'T'");
   }
 
   if ($toparse =~ s/^(\d+)H//) {
@@ -61,7 +69,7 @@ sub duration_to_seconds {
     $seconds += $1;
   }
 
-  if ($toparse) {
+  if (length $toparse) {
     croak("Invalid duration '$input': confused by '$toparse'");
   }
 
@@ -158,7 +166,7 @@ JSCalendar::Duration - Convert seconds to JSCalendar durations and back
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -181,14 +189,15 @@ a JSCalendar duration (L<https://tools.ietf.org/html/draft-ietf-calext-jscalenda
 =head1 PERL VERSION
 
 This module should work on any version of perl still receiving updates from
-the Perl 5 Porters.  This means it should work on any version of perl released
-in the last two to three years.  (That is, if the most recently released
-version is v5.40, then this module should work on both v5.40 and v5.38.)
+the Perl 5 Porters.  This means it should work on any version of perl
+released in the last two to three years.  (That is, if the most recently
+released version is v5.40, then this module should work on both v5.40 and
+v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 EXPORTS
 
@@ -231,6 +240,10 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 =item *
 
 Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
+Ricardo Signes <rjbs@users.noreply.github.com>
 
 =back
 

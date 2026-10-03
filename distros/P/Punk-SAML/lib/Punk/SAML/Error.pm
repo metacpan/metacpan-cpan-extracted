@@ -45,7 +45,7 @@ the document is not well-formed XML, carries a DOCTYPE, or has two elements with
 
 =item C<xml_shape>
 
-the document parsed but is not the shape a Response must have: a wrong root, a wrong Version, no Assertion or more than one, no Subject, no NameID, no bearer SubjectConfirmation, or no AuthnStatement.
+the document parsed but is not the shape a Response must have: a wrong root, a wrong Version, no Assertion or more than one, no Subject, no NameID, no bearer SubjectConfirmation, a bearer SubjectConfirmationData with no NotOnOrAfter, or no AuthnStatement.
 
 =item C<bad_base64>
 
@@ -101,7 +101,9 @@ the Response answers a different login, or answers one this application has no r
 
 =item C<replay>
 
-the assertion has been presented before.
+the assertion has been presented before. The ACS route checks this on
+every login against the store named by the plugin's C<seen>; see
+L<Punk::Plugin::SAML/THE REPLAY STORE>.
 
 =item C<unsolicited>
 
@@ -117,7 +119,10 @@ the provider returned a StatusCode other than Success. The nested code and any S
 
 =item C<config>
 
-a provider was misconfigured or its metadata could not be used.
+a provider was misconfigured or its metadata could not be used, or the
+replay store could not be reached. The last of those is deliberately a
+refusal: a store that cannot answer must not produce the same login as
+an assertion that is fresh.
 
 =back
 

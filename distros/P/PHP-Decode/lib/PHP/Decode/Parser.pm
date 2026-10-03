@@ -13,7 +13,7 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(is_variable is_symbol is_null is_const is_numval is_strval is_array is_block global_var global_split inst_var inst_split method_name method_split ns_name ns_split);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = '0.127';
+our $VERSION = '0.130';
 
 # avoid 'Deep recursion' warnings for depth > 100
 #
@@ -794,6 +794,9 @@ sub bighex {
 	sub add_script_end {
 		my ($tab, $sym) = @_;
 		#push(@{$tab->{tok}}, $sym);
+		if ($sym =~ /\n$/) {
+			$tab->add_white("\n");
+		}
 		return;
 	}
 	sub add_noscript {
@@ -1301,7 +1304,7 @@ sub read_array {
 sub _read_statement {
 	my ($self, $tok, $last_op) = @_;
 
-	if ((scalar @$tok > 0) && ($tok->[0] =~ /^([\;\:\,\)\]\}]|else|endif|endwhile|endfor|endforeach|as|=>|catch|finally)$/i)) {
+	if ((scalar @$tok > 0) && ($tok->[0] =~ /^([\;\:\,\)\]\}]|else|endif|endwhile|endfor|endforeach|endswitch|as|=>|catch|finally)$/i)) {
 		my $sym = shift @$tok;
 		return $sym;
 	} elsif ((scalar @$tok > 0) && ($tok->[0] =~ /^null$/i)) {
@@ -1643,7 +1646,7 @@ sub _read_statement {
 			# http://php.net/manual/en/control-structures.alternative-syntax.php
 			#
 			shift @$tok;
-			my $block = $self->read_code_block($tok, 'endif', ';');
+			my $block = $self->read_code_block($tok, 'endif', ';', ['else', 'elseif']);
 			$then = $self->setblk('std', $block);
 		} else {
 			$then = $self->read_statement($tok);
@@ -2637,18 +2640,24 @@ sub read_block {
 	return \@out;
 }
 
+# $stop is optional list of keywords which end the block
+# without being consumed (like 'else' for alternative if syntax)
+#
 sub read_code_block {
-	my ($self, $tok, $close, $separator) = @_;
+	my ($self, $tok, $close, $separator, $stop) = @_;
 	my @out = ();
 
 	$self->{debug}->('parse', "B+$close") if $self->{debug};
 
 	while (scalar @$tok > 0) {
+		if (defined $stop && grep { lc($tok->[0]) eq $_ } @$stop) {
+			return \@out;
+		}
 		my $stmt = $self->read_statement($tok, undef);
 
 		$self->{debug}->('parse', "B-$close $stmt") if $self->{debug};
 
-		if ($stmt eq $close) {
+		if (lc($stmt) eq $close) {
 			# block end
 			#
 			return \@out;

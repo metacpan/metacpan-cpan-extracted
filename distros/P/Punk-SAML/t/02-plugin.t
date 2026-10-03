@@ -68,6 +68,12 @@ sub build {
     # runtime of a body that is already compiled.
     my $code = "package $pkg; use Punk; use Punk::Plugin::SAML;\n";
     $code .= "host '$host';\n" if defined $host;
+    # Somewhere for the replay check to remember assertion ids. Every
+    # application that is expected to BOOT needs one, because on_compile
+    # refuses without it; `no_cache => 1` leaves it out so that refusal
+    # can itself be tested. The memory backend is right here and wrong in
+    # production: it lives in one process, and the suite is one process.
+    $code .= "cache 'memory', max_bytes => '1M';\n" unless $arg{no_cache};
     $code .= $arg{body};
     $code .= "\n1;";
     my $ok = eval "$code";                     ## no critic

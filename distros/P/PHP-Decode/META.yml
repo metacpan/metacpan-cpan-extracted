@@ -3,27 +3,31 @@ abstract: 'Parse and transform obfuscated php code'
 author:
   - 'Barnim Dzwillo @ Strato AG'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PHP-Decode
 no_index:
   directory:
     - t
     - inc
 requires:
-  Compress::Zlib: 1
-  Digest::MD5: 1
-  Digest::SHA1: 1
-  HTML::Entities: 1
-  MIME::Base64: 1
-  Tie::IxHash: 1
-  URI::Escape: 1
-  perl: 5.016
-version: 0.302
+  Compress::Zlib: '1'
+  Digest::MD5: '1'
+  Digest::SHA: '1'
+  HTML::Entities: '1'
+  MIME::Base64: '1'
+  Tie::IxHash: '1'
+  URI::Escape: '1'
+  perl: '5.016'
+resources:
+  repository: https://github.com/bdzwillo/php_decode.git
+version: '0.303'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

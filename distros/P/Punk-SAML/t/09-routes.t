@@ -46,6 +46,11 @@ use Punk::Plugin::SAML;
 host 'https://app.example.com';
 session secret => 'session-secret-here-32-bytes-ok!';
 
+# Where the replay check remembers assertion ids. One process in the
+# suite, so the memory backend is honest here; in production it is not,
+# because a replay landing on another worker would find an empty store.
+cache 'memory', max_bytes => '1M';
+
 plugin 'SAML' => { secret => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' };
 
 saml_idp okta => {
@@ -124,9 +129,22 @@ sub post_acs {
     return $t2;
 }
 
+# A signed Response with an assertion id NO OTHER BLOCK HAS USED.
+#
+# The replay cache is application-wide and Punk::Test shares one compiled
+# app per class, so an assertion id is good for exactly one accepted login
+# in this whole file. A block that wants a 303 mints its own id; reusing
+# one is a `replay` refusal, which is the point of the cache and was the
+# first thing it caught when it went in.
+my $aid = 0;
+sub fresh_response {
+    my (%o) = @_;
+    my $id = '_assertion' . ++$aid;
+    return $idp->sign($idp->response(assertion_id => $id, %o), $id);
+}
+
 {
-    my $xml = $idp->sign($idp->response(in_response_to => $flow_id),
-                         '_assertion1');
+    my $xml = fresh_response(in_response_to => $flow_id);
     my $r = post_acs($xml, $flow_id, $flow_cookie);
     is $r->status, 303, 'a valid assertion is accepted and redirects'
         or diag $r->body;
@@ -145,8 +163,7 @@ sub post_acs {
 # The earlier version of this test posted the cookie from before the first
 # POST and accepted either a 303 or a 403, which is not an assertion.
 {
-    my $xml = $idp->sign($idp->response(in_response_to => $flow_id),
-                         '_assertion1');
+    my $xml = fresh_response(in_response_to => $flow_id);
     my $first = post_acs($xml, $flow_id, $flow_cookie);
     is $first->status, 303, 'the first POST of a flow succeeds';
 
@@ -162,8 +179,7 @@ sub post_acs {
 
 # no cookie at all
 {
-    my $xml = $idp->sign($idp->response(in_response_to => $flow_id),
-                         '_assertion1');
+    my $xml = fresh_response(in_response_to => $flow_id);
     my $r = post_acs($xml, $flow_id, undef);
     is $r->status, 403, 'no flow cookie is refused';
     like $r->body, qr/Sign-in failed/, 'with the failure page';
@@ -173,8 +189,7 @@ sub post_acs {
 
 # a tampered assertion
 {
-    my $xml = $idp->sign($idp->response(in_response_to => $flow_id),
-                         '_assertion1');
+    my $xml = fresh_response(in_response_to => $flow_id);
     $xml =~ s/jo\@example\.com/admin\@example.com/;
     my $r = post_acs($xml, $flow_id, $flow_cookie);
     is $r->status, 403, 'a tampered assertion is refused';
@@ -189,6 +204,7 @@ use Punk;
 use Punk::Plugin::SAML;
 host 'https://app.example.com';
 session secret => 'session-secret-here';
+cache 'memory', max_bytes => '1M';
 plugin 'SAML' => { secret => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' };
 saml_idp okta => { entity_id => 'https://idp.example.com/entity',
                    sso_url   => 'https://idp.example.com/sso',
@@ -216,6 +232,7 @@ use Punk::Plugin::SAML;
 host 'https://app.example.com';
 session secret => 'session-secret-here';
 csrf;
+cache 'memory', max_bytes => '1M';
 plugin 'SAML' => { secret => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' };
 saml_idp okta => { entity_id => 'https://i/e', sso_url => 'https://i/s',
                    certs => 'x' };
@@ -255,7 +272,7 @@ sub login_and_land {
     my ($id)     = $loc =~ /RelayState=(_[0-9a-f]{32})/;
     my ($cookie) = ($t1->header('Set-Cookie') // '') =~ /^_saml_flow=([^;]+)/;
 
-    my $xml = $idp->sign($idp->response(in_response_to => $id), '_assertion1');
+    my $xml = fresh_response(in_response_to => $id);
     my $r = post_acs($xml, $id, $cookie);
     return ($r->status, $r->header('Location'));
 }

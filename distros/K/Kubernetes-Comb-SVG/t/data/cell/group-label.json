@@ -1,0 +1,10 @@
+{
+  "kind": "Comb",
+  "metadata": {
+    "name": "nats",
+    "labels": {
+      "app.kubernetes.io/part-of": "messaging",
+      "tier": "backend"
+    }
+  }
+}

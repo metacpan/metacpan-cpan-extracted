@@ -1,5 +1,22 @@
 Revision history for Punk-SAML
 
+0.03    2026-10-03
+        - SECURITY: the ACS route never performed the replay check the POD
+          listed. A captured assertion consumer POST (body plus the
+          _saml_flow cookie as sent) could be presented again until
+          flow_ttl expired, and with allow_idp_initiated on, indefinitely.
+        - The replay check is now on by default, backed by a `cache` store
+          named by the new `seen` option. The plugin refuses to boot
+          without one; `allow_replay => 1` turns the check off.
+        - SECURITY: NotOnOrAfter on the bearer SubjectConfirmationData is
+          now required, as the Web Browser SSO profile says. It was
+          honoured only when present, and IssueInstant is not a freshness
+          check, so an assertion with no window was unbounded in time.
+        - The identity carries `replay_until`, the bearer window.
+        - INCOMPATIBLE: an application with no `cache` store no longer
+          boots, and an identity provider that omits the bearer
+          NotOnOrAfter is now refused.
+
 0.02    2026-09-11
         - Fix the build on older ExtUtils::ParseXS: an XSUB local named sp
           shadowed the stack pointer.

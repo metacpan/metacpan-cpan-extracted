@@ -13,6 +13,12 @@ net_quic_system_fclose(FILE *fp)
     return fclose(fp);
 }
 
+static void *
+net_quic_system_calloc(size_t count, size_t size)
+{
+    return calloc(count, size);
+}
+
 static void
 net_quic_system_free(void *ptr)
 {
@@ -23,6 +29,7 @@ net_quic_system_free(void *ptr)
 #include "perl.h"
 #include "XSUB.h"
 
+#include <limits.h>
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
@@ -37,6 +44,7 @@ net_quic_system_free(void *ptr)
 #endif
 
 #include <ngtcp2/ngtcp2_crypto_picotls.h>
+#include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/x509_vfy.h>
@@ -49,6 +57,7 @@ net_quic_system_free(void *ptr)
 #define NET_QUIC_STATELESS_RESET_MAX_RANDLEN \
     (NGTCP2_MAX_CIDLEN + 22 - NGTCP2_STATELESS_RESET_TOKENLEN)
 #define NET_QUIC_RETRY_TOKEN_TIMEOUT (10 * NGTCP2_SECONDS)
+#define NET_QUIC_NEW_TOKEN_TIMEOUT (24 * 60 * 60 * NGTCP2_SECONDS)
 
 static const char *
 net_quic_crypto_backend(void)
@@ -83,6 +92,12 @@ struct net_quic_cid_event {
 #define NET_QUIC_CLOSE_INITIATOR_LOCAL 1
 #define NET_QUIC_CLOSE_INITIATOR_PEER  2
 
+#define NET_QUIC_PATH_VALIDATION_NONE       0
+#define NET_QUIC_PATH_VALIDATION_VALIDATING 1
+#define NET_QUIC_PATH_VALIDATION_SUCCESS    2
+#define NET_QUIC_PATH_VALIDATION_FAILURE    3
+#define NET_QUIC_PATH_VALIDATION_ABORTED    4
+
 struct net_quic_connection {
     ngtcp2_conn *conn;
     ngtcp2_crypto_conn_ref conn_ref;
@@ -96,7 +111,20 @@ struct net_quic_connection {
     size_t alpnlen;
     char *server_name;
     SV *server_tls_owner;
+    uint8_t *resume_ticket;
+    size_t resume_ticket_len;
+    uint8_t *session_ticket;
+    size_t session_ticket_len;
+    uint32_t session_ticket_version;
+    uint8_t *address_token;
+    size_t address_token_len;
+    uint32_t address_token_version;
+    int issue_new_token;
     int ready;
+    int resumed;
+    int early_data_attempted;
+    int early_data_accepted;
+    int early_data_rejected;
     int is_server;
     int local_bidi_stream_waiting;
     int local_uni_stream_waiting;
@@ -112,7 +140,16 @@ struct net_quic_connection {
     uint64_t close_info_frame_type;
     int close_info_native_error;
 
+    int path_validation_status;
+    uint32_t path_validation_flags;
+    int path_validation_has_path;
+    ngtcp2_sockaddr_union path_validation_local_addr;
+    ngtcp2_socklen path_validation_local_addrlen;
+    ngtcp2_sockaddr_union path_validation_peer_addr;
+    ngtcp2_socklen path_validation_peer_addrlen;
+
     size_t closebuflen;
+    uint8_t close_ecn;
     int closebuf_pending;
     ngtcp2_sockaddr_union close_local_addr;
     ngtcp2_socklen close_local_addrlen;
@@ -127,9 +164,18 @@ struct net_quic_connection {
 
     net_quic_stream_state *streams;
     net_quic_stream_state *streams_tail;
+    net_quic_stream_state **stream_index;
+    size_t stream_index_bucket_count;
+    size_t stream_index_size;
     net_quic_stream_state *incoming_stream_head;
     net_quic_stream_state *incoming_stream_tail;
+    net_quic_stream_state *stream_activity_head;
+    net_quic_stream_state *stream_activity_tail;
     net_quic_stream_state *tx_cursor;
+    int stream_activity_enabled;
+    int stream_tx_buffer_limit_enabled;
+    uint64_t stream_tx_buffer_limit;
+    uint64_t stream_tx_buffered_bytes;
 
     ptls_context_t ptls_ctx;
     ngtcp2_crypto_picotls_ctx picotls_ctx;
@@ -458,12 +504,176 @@ net_quic_remove_connection_id_cb(
 }
 
 static int
+net_quic_new_token_secret(
+    uint8_t out[NET_QUIC_SERVER_SECRET_LEN],
+    const uint8_t base[NET_QUIC_SERVER_SECRET_LEN],
+    uint32_t version
+)
+{
+    static const uint8_t label[] = "Net::QUIC NEW_TOKEN v1";
+    uint8_t input[
+        NET_QUIC_SERVER_SECRET_LEN + sizeof(label) - 1 + 4
+    ];
+    unsigned int digest_len = 0;
+    size_t offset = 0;
+
+    memcpy(input + offset, base, NET_QUIC_SERVER_SECRET_LEN);
+    offset += NET_QUIC_SERVER_SECRET_LEN;
+    memcpy(input + offset, label, sizeof(label) - 1);
+    offset += sizeof(label) - 1;
+    input[offset++] = (uint8_t)(version >> 24);
+    input[offset++] = (uint8_t)(version >> 16);
+    input[offset++] = (uint8_t)(version >> 8);
+    input[offset++] = (uint8_t)version;
+
+    if (EVP_Digest(
+            input,
+            offset,
+            out,
+            &digest_len,
+            EVP_sha256(),
+            NULL
+        ) != 1 ||
+        digest_len != NET_QUIC_SERVER_SECRET_LEN) {
+        ptls_clear_memory(input, sizeof(input));
+        return -1;
+    }
+
+    ptls_clear_memory(input, sizeof(input));
+    return 0;
+}
+
+static int
+net_quic_submit_new_token(
+    net_quic_connection *ep,
+    ngtcp2_conn *conn,
+    const ngtcp2_path *path
+)
+{
+    uint8_t token[NGTCP2_CRYPTO_MAX_REGULAR_TOKENLEN];
+    uint8_t token_secret[NET_QUIC_SERVER_SECRET_LEN];
+    uint32_t version;
+    ngtcp2_ssize tokenlen;
+    ngtcp2_tstamp now;
+    int rv;
+
+    if (!ep->is_server || !ep->issue_new_token || path == NULL ||
+        path->remote.addr == NULL || path->remote.addrlen == 0) {
+        return 0;
+    }
+
+    version = ngtcp2_conn_get_negotiated_version2(conn);
+    if (version == 0 ||
+        net_quic_new_token_secret(
+            token_secret,
+            ep->server_secret,
+            version
+        ) != 0) {
+        return NGTCP2_ERR_CALLBACK_FAILURE;
+    }
+
+    now = net_quic_system_now();
+    tokenlen = ngtcp2_crypto_generate_regular_token(
+        token,
+        token_secret,
+        sizeof(token_secret),
+        path->remote.addr,
+        path->remote.addrlen,
+        now
+    );
+    ptls_clear_memory(token_secret, sizeof(token_secret));
+
+    if (tokenlen < 0) {
+        return NGTCP2_ERR_CALLBACK_FAILURE;
+    }
+
+    rv = ngtcp2_conn_submit_new_token(
+        conn,
+        token,
+        (size_t)tokenlen
+    );
+
+    ptls_clear_memory(token, sizeof(token));
+
+    return rv == 0 ? 0 : NGTCP2_ERR_CALLBACK_FAILURE;
+}
+
+static int
+net_quic_recv_new_token_cb(
+    ngtcp2_conn *conn,
+    const uint8_t *token,
+    size_t tokenlen,
+    void *user_data
+)
+{
+    dTHX;
+    net_quic_connection *ep = (net_quic_connection *)user_data;
+    uint8_t *copy;
+
+    (void)conn;
+
+    if (token == NULL || tokenlen == 0) {
+        return NGTCP2_ERR_CALLBACK_FAILURE;
+    }
+
+    Newx(copy, tokenlen, uint8_t);
+    if (copy == NULL) {
+        return NGTCP2_ERR_CALLBACK_FAILURE;
+    }
+
+    memcpy(copy, token, tokenlen);
+
+    if (ep->address_token != NULL) {
+        ptls_clear_memory(ep->address_token, ep->address_token_len);
+        Safefree(ep->address_token);
+    }
+
+    ep->address_token = copy;
+    ep->address_token_len = tokenlen;
+    ep->address_token_version =
+        ngtcp2_conn_get_negotiated_version2(conn);
+
+    if (ep->address_token_version == 0) {
+        ptls_clear_memory(ep->address_token, ep->address_token_len);
+        Safefree(ep->address_token);
+        ep->address_token = NULL;
+        ep->address_token_len = 0;
+        return NGTCP2_ERR_CALLBACK_FAILURE;
+    }
+
+    return 0;
+}
+
+static int
 net_quic_handshake_completed_cb(ngtcp2_conn *conn, void *user_data)
 {
     net_quic_connection *ep = (net_quic_connection *)user_data;
-    (void)conn;
 
     ep->ready = 1;
+    ep->resumed = ep->picotls_ctx.ptls != NULL
+        && ptls_is_psk_handshake(ep->picotls_ctx.ptls);
+
+    if (ep->early_data_attempted && ep->picotls_ctx.ptls != NULL) {
+        ptls_early_data_acceptance_t acceptance =
+            ep->picotls_ctx.handshake_properties.client.early_data_acceptance;
+
+        if (acceptance == PTLS_EARLY_DATA_ACCEPTED) {
+            ep->early_data_accepted = 1;
+            ep->early_data_rejected = 0;
+        } else if (acceptance == PTLS_EARLY_DATA_REJECTED) {
+            ep->early_data_accepted = 0;
+            ep->early_data_rejected = 1;
+        }
+    }
+
+    if (ep->is_server && ep->issue_new_token) {
+        const ngtcp2_path *path = ngtcp2_conn_get_path2(conn);
+
+        if (net_quic_submit_new_token(ep, conn, path) != 0) {
+            return NGTCP2_ERR_CALLBACK_FAILURE;
+        }
+    }
+
     return 0;
 }
 
@@ -545,6 +755,185 @@ net_quic_copy_ngtcp2_addr(
     return 0;
 }
 
+
+static int
+net_quic_record_path_validation(
+    net_quic_connection *ep,
+    int status,
+    uint32_t flags,
+    const ngtcp2_path *path
+)
+{
+    ep->path_validation_status = status;
+    ep->path_validation_flags = flags;
+    ep->path_validation_has_path = 0;
+
+    if (path == NULL) {
+        return 0;
+    }
+
+    if (net_quic_copy_ngtcp2_addr(
+            &ep->path_validation_local_addr,
+            &ep->path_validation_local_addrlen,
+            &path->local
+        ) != 0 ||
+        net_quic_copy_ngtcp2_addr(
+            &ep->path_validation_peer_addr,
+            &ep->path_validation_peer_addrlen,
+            &path->remote
+        ) != 0) {
+        return -1;
+    }
+
+    ep->path_validation_has_path = 1;
+    return 0;
+}
+
+static int
+net_quic_begin_path_validation_cb(
+    ngtcp2_conn *conn,
+    uint32_t flags,
+    const ngtcp2_path *path,
+    const ngtcp2_path *fallback_path,
+    void *user_data
+)
+{
+    net_quic_connection *ep = (net_quic_connection *)user_data;
+
+    (void)conn;
+    (void)fallback_path;
+
+    return net_quic_record_path_validation(
+        ep,
+        NET_QUIC_PATH_VALIDATION_VALIDATING,
+        flags,
+        path
+    ) == 0
+        ? 0
+        : NGTCP2_ERR_CALLBACK_FAILURE;
+}
+
+static int
+net_quic_path_validation_cb(
+    ngtcp2_conn *conn,
+    uint32_t flags,
+    const ngtcp2_path *path,
+    const ngtcp2_path *fallback_path,
+    ngtcp2_path_validation_result result,
+    void *user_data
+)
+{
+    net_quic_connection *ep = (net_quic_connection *)user_data;
+    int status;
+
+    (void)conn;
+    (void)fallback_path;
+
+    switch (result) {
+    case NGTCP2_PATH_VALIDATION_RESULT_SUCCESS:
+        status = NET_QUIC_PATH_VALIDATION_SUCCESS;
+        break;
+    case NGTCP2_PATH_VALIDATION_RESULT_FAILURE:
+        status = NET_QUIC_PATH_VALIDATION_FAILURE;
+        break;
+    case NGTCP2_PATH_VALIDATION_RESULT_ABORTED:
+        status = NET_QUIC_PATH_VALIDATION_ABORTED;
+        break;
+    default:
+        return NGTCP2_ERR_CALLBACK_FAILURE;
+    }
+
+    if (net_quic_record_path_validation(
+            ep,
+            status,
+            flags,
+            path
+        ) != 0) {
+        return NGTCP2_ERR_CALLBACK_FAILURE;
+    }
+
+    if (result == NGTCP2_PATH_VALIDATION_RESULT_SUCCESS &&
+        (flags & NGTCP2_PATH_VALIDATION_FLAG_NEW_TOKEN) != 0 &&
+        ep->is_server &&
+        ep->issue_new_token) {
+        return net_quic_submit_new_token(ep, conn, path);
+    }
+
+    return 0;
+}
+
+
+static int
+net_quic_select_preferred_addr_cb(
+    ngtcp2_conn *conn,
+    ngtcp2_path *dest,
+    const ngtcp2_preferred_addr *paddr,
+    void *user_data
+)
+{
+    net_quic_connection *ep = (net_quic_connection *)user_data;
+    const ngtcp2_path *current;
+
+    (void)ep;
+
+    current = ngtcp2_conn_get_path2(conn);
+    if (current == NULL ||
+        current->local.addr == NULL ||
+        current->local.addrlen == 0) {
+        return NGTCP2_ERR_CALLBACK_FAILURE;
+    }
+
+    if (current->local.addr->sa_family == NGTCP2_AF_INET &&
+        paddr->ipv4_present) {
+        ngtcp2_sockaddr_in remote = paddr->ipv4;
+
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || \
+    defined(__OpenBSD__)
+        remote.sin_len = (uint8_t)sizeof(remote);
+#endif
+
+        ngtcp2_addr_copy_byte(
+            &dest->local,
+            current->local.addr,
+            current->local.addrlen
+        );
+        ngtcp2_addr_copy_byte(
+            &dest->remote,
+            (const ngtcp2_sockaddr *)&remote,
+            (ngtcp2_socklen)sizeof(remote)
+        );
+        return 0;
+    }
+
+    if (current->local.addr->sa_family == NGTCP2_AF_INET6 &&
+        paddr->ipv6_present) {
+        ngtcp2_sockaddr_in6 remote = paddr->ipv6;
+
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || \
+    defined(__OpenBSD__)
+        remote.sin6_len = (uint8_t)sizeof(remote);
+#endif
+
+        ngtcp2_addr_copy_byte(
+            &dest->local,
+            current->local.addr,
+            current->local.addrlen
+        );
+        ngtcp2_addr_copy_byte(
+            &dest->remote,
+            (const ngtcp2_sockaddr *)&remote,
+            (ngtcp2_socklen)sizeof(remote)
+        );
+        return 0;
+    }
+
+    /*
+     * No preferred address matches the current local address family.
+     * Leaving dest untouched tells ngtcp2 to ignore the offer.
+     */
+    return 0;
+}
+
 static void
 net_quic_start_close_wait(
     net_quic_connection *ep,
@@ -613,6 +1002,20 @@ net_quic_connection_free(pTHX_ net_quic_connection *ep)
 
     Safefree(ep->alpn);
     Safefree(ep->server_name);
+
+    if (ep->resume_ticket != NULL) {
+        ptls_clear_memory(ep->resume_ticket, ep->resume_ticket_len);
+        Safefree(ep->resume_ticket);
+    }
+    if (ep->session_ticket != NULL) {
+        ptls_clear_memory(ep->session_ticket, ep->session_ticket_len);
+        Safefree(ep->session_ticket);
+    }
+    if (ep->address_token != NULL) {
+        ptls_clear_memory(ep->address_token, ep->address_token_len);
+        Safefree(ep->address_token);
+    }
+
     Safefree(ep);
 }
 
@@ -647,7 +1050,8 @@ net_quic_datagram_new(
     const uint8_t *data,
     size_t datalen,
     const ngtcp2_addr *local,
-    const ngtcp2_addr *peer
+    const ngtcp2_addr *peer,
+    uint8_t ecn
 )
 {
     AV *av = newAV();
@@ -656,6 +1060,7 @@ net_quic_datagram_new(
     av_push(av, newSVpvn((const char *)data, (STRLEN)datalen));
     av_push(av, newSVpvn((const char *)local->addr, (STRLEN)local->addrlen));
     av_push(av, newSVpvn((const char *)peer->addr, (STRLEN)peer->addrlen));
+    av_push(av, newSVuv((UV)(ecn & NGTCP2_ECN_MASK)));
 
     rv = newRV_noinc((SV *)av);
     sv_bless(rv, gv_stashpv("Net::QUIC::Datagram", GV_ADD));

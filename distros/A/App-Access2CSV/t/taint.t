@@ -7,7 +7,7 @@
 #	- every normal workflow works (each input is validated, then untainted)
 #	- failures still give the true reason, not a taint message or a stale $!
 #	- taint mode's own protections still bite where they should, e.g. a
-#	  program in a folder that anyone can write to is not run
+#	  program in a directory that anyone can write to is not run
 #
 # Set TEST_VERBOSE=1 to see internal state.
 
@@ -128,13 +128,13 @@ subtest 'failures give the true reason, not a taint or stale error' => sub {
 	is($stderr, "access2csv: Cannot read database $dir/missing.accdb: $ENOENT_TEXT\n", 'true reason');
 
 	($status, undef, $stderr) = tainted($SAFE_PATH, '--log', "$dir/no/such/x.log", $db);
-	is($status, $CONFIG{exit_fatal}, 'log in a missing folder: fatal');
+	is($status, $CONFIG{exit_fatal}, 'log in a missing directory: fatal');
 	is($stderr, "access2csv: Cannot open log file $dir/no/such/x.log: $ENOENT_TEXT\n", 'true reason');
 	unlike($stderr, qr/Insecure/, 'not a taint failure');
 };
 
-subtest 'taint protection: programs in a folder anyone can write to are not run' => sub {
-	# Taint mode refuses to start programs while PATH contains a folder
+subtest 'taint protection: programs in a directory anyone can write to are not run' => sub {
+	# Taint mode refuses to start programs while PATH contains a directory
 	# that other users can write to (they could replace the program).  The
 	# refusal must be a clean fatal error, and the planted program must
 	# not run.
@@ -157,7 +157,7 @@ subtest 'taint protection: programs in a folder anyone can write to are not run'
 
 subtest 'mdbtools run in a clean environment (with or without -T)' => sub {
 	# perlsec: IFS, CDPATH, ENV and BASH_ENV can change how programs start,
-	# and relative PATH entries point at the current folder.  None of them
+	# and relative PATH entries point at the current directory.  None of them
 	# may reach the mdbtools processes.
 	my %seen;
 	my $real = \&App::Access2CSV::Exporter::run3;
@@ -172,7 +172,7 @@ subtest 'mdbtools run in a clean environment (with or without -T)' => sub {
 		is($ENV{IFS}, ';', 'the caller\'s own environment is left alone');
 	}
 	verbose_diag('child environment', \%seen);
-	is($seen{path}, $SAFE_PATH, 'only absolute PATH folders are passed on');
+	is($seen{path}, $SAFE_PATH, 'only absolute PATH directories are passed on');
 	is($seen{$_}, 0, "$_ removed") foreach qw(IFS CDPATH ENV BASH_ENV);
 };
 

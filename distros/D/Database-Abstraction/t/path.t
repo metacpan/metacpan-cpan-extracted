@@ -18,8 +18,15 @@
 #   _fixate                   3 paths  (tested via slurp state)
 #   _quote_identifier         2 paths  (dbh present, ANSI fallback)
 #   _is_deep_db               5 paths
-#   _open_table               5 paths  (explicit table, cached, cold)
+#   _open_table               6 paths  (explicit table no-prefix, cached, cold)
 #   AUTOLOAD                  9 paths  (guards, no_entry, keyed, SQL)
+#   _parse_sort_by            5 paths  (undef, scalar, array, invalid col, invalid dir)
+#   _match_criterion (extra)  5 paths  (> fail, < pass/fail, >= pass, <= pass)
+#   _build_where_conditions  23 paths  (< / >= / <= operators, unsafe column croak)
+#   _build_where (extra)      1 path   (-and with empty list → zero-iteration loop)
+#   _scan_berkeley            2 paths  (join croak, -or/-and croak)
+#   _merge_base_criteria      3 paths  (no base, merge, caller wins)
+#   _like_match (extra)       2 paths  (middle-% DP, empty string DP)
 
 use strict;
 use warnings;
@@ -29,7 +36,7 @@ use File::Spec;
 use File::Temp ();
 use Readonly;
 use Scalar::Util qw(blessed);
-use Test::Most  tests => 102;
+use Test::Most  tests => 128;
 use Test::NoWarnings;
 
 use lib 't/lib';
@@ -595,4 +602,197 @@ note('AUTOLOAD paths');
 	my $noentry_db = Database::test4ne->new({ directory => $DATA_DIR });
 	my $ord = $noentry_db->ordinal(cardinal => 'ninety');
 	ok(!defined $ord, 'AUTOLOAD: no_entry slurp, key not found → undef');
+}
+
+# ============================================================
+# Section 13: _parse_sort_by — 5 execution paths, 7 tests
+# ============================================================
+# Package-level function (no $self); called as Database::Abstraction::_parse_sort_by($sb, $method)
+
+note('_parse_sort_by');
+
+Readonly my $SORT_METHOD => 'selectall_arrayref';
+
+# P13-1: undef sort_by → (undef, 'ASC') early-return path
+{
+	my ($col, $dir) = Database::Abstraction::_parse_sort_by(undef, $SORT_METHOD);
+	ok(!defined($col), '_parse_sort_by: undef input → col is undef');
+	is($dir, 'ASC',    '_parse_sort_by: undef input → direction defaults to ASC');
+}
+
+# P13-2: plain scalar column name → valid return
+{
+	my ($col, $dir) = Database::Abstraction::_parse_sort_by('entry', $SORT_METHOD);
+	is($col, 'entry', '_parse_sort_by: scalar column → col returned');
+	is($dir, 'ASC',   '_parse_sort_by: scalar column, no dir → ASC default');
+}
+
+# P13-3: arrayref [$col, 'DESC'] → both elements extracted
+{
+	my ($col, $dir) = Database::Abstraction::_parse_sort_by(['entry', 'DESC'], $SORT_METHOD);
+	is($dir, 'DESC', '_parse_sort_by: arrayref with DESC → direction is DESC');
+}
+
+# P13-4: lowercase 'desc' is normalised to 'DESC' via uc()
+{
+	my ($col, $dir) = Database::Abstraction::_parse_sort_by(['entry', 'desc'], $SORT_METHOD);
+	is($dir, 'DESC', '_parse_sort_by: lowercase desc normalised via uc() → DESC');
+}
+
+# P13-5: invalid column name → carp + (undef, 'ASC')
+{
+	my @warns;
+	local $SIG{__WARN__} = sub { push @warns, @_ };
+	my ($col, $dir) = Database::Abstraction::_parse_sort_by('1bad_col', $SORT_METHOD);
+	ok(scalar(@warns) > 0, '_parse_sort_by: digit-prefixed column → carp warning emitted');
+	ok(!defined($col),     '_parse_sort_by: invalid column → col falls back to undef');
+}
+
+# ============================================================
+# Section 14: _match_criterion extra operator paths — 5 tests
+# ============================================================
+
+note('_match_criterion extra operators');
+
+# P14-1: > FAIL — row <= criterion
+ok(!$db->_match_criterion(3, { '>' => 10 }),
+    '_match_criterion: > fail (row 3 not > 10) → false');
+
+# P14-2: < pass — row < criterion
+is($db->_match_criterion(3, { '<' => 10 }), 1,
+    '_match_criterion: < pass (row 3 < 10) → 1');
+
+# P14-3: < fail — row >= criterion
+ok(!$db->_match_criterion(10, { '<' => 3 }),
+    '_match_criterion: < fail (row 10 not < 3) → false');
+
+# P14-4: >= boundary pass — row equals criterion
+is($db->_match_criterion(5, { '>=' => 5 }), 1,
+    '_match_criterion: >= boundary (row 5 >= 5) → 1');
+
+# P14-5: <= boundary pass — row equals criterion
+is($db->_match_criterion(5, { '<=' => 5 }), 1,
+    '_match_criterion: <= boundary (row 5 <= 5) → 1');
+
+# ============================================================
+# Section 15: _build_where_conditions extra operators — 4 tests
+# ============================================================
+
+note('_build_where_conditions extra operators');
+
+{
+	my $bwc = sub { $db->_build_where_conditions(@_) };
+
+	# P15-1: < operator
+	my ($sql, $args) = $bwc->({ col => { '<' => 5 } });
+	like($sql, qr/col < \?/, '_build_where_conditions: < → < ?');
+
+	# P15-2: >= operator
+	($sql, $args) = $bwc->({ col => { '>=' => 5 } });
+	like($sql, qr/col >= \?/, '_build_where_conditions: >= → >= ?');
+
+	# P15-3: <= operator
+	($sql, $args) = $bwc->({ col => { '<=' => 5 } });
+	like($sql, qr/col <= \?/, '_build_where_conditions: <= → <= ?');
+
+	# P15-4: unsafe column name → croak (digit-prefixed fails $SAFE_QUALIFIED)
+	throws_ok {
+		$bwc->({ '1unsafe' => 'val' })
+	} qr/unsafe.*column/i, '_build_where_conditions: digit-prefixed column → croak';
+}
+
+# ============================================================
+# Section 16: _build_where — empty -and list (zero-iteration loop)
+# ============================================================
+
+note('_build_where empty -and');
+
+# P16-1: -and with empty list → loop body never executes → empty SQL
+{
+	my ($sql, $args) = $db->_build_where({ '-and' => [] });
+	is($sql, '', '_build_where: -and with empty list → empty SQL (zero-iteration loop)');
+}
+
+# ============================================================
+# Section 17: _scan_berkeley — 2 croak paths
+# ============================================================
+
+note('_scan_berkeley croak paths');
+
+# Build a fake BerkeleyDB-flavoured object.  _scan_berkeley only needs
+# $self->{'berkeley'} to be truthy; it croaks before touching the DB.
+{
+	my $fake_bdb = bless { berkeley => {}, _table_name => 'test1' }, 'Database::test1';
+
+	# P17-1: 'join' key in params → croak
+	throws_ok {
+		$fake_bdb->_scan_berkeley({ join => { table => 'other', on => 'a=b' } })
+	} qr/BerkeleyDB does not support JOINs/,
+	    '_scan_berkeley: join param → croak with JOIN message';
+
+	# P17-2: '-or' key in params → croak
+	throws_ok {
+		$fake_bdb->_scan_berkeley({ '-or' => [{ entry => 'x' }] })
+	} qr/BerkeleyDB does not support -or\/-and/,
+	    '_scan_berkeley: -or param → croak with -or/-and message';
+}
+
+# ============================================================
+# Section 18: _merge_base_criteria — 3 paths (via public API)
+# ============================================================
+# _merge_base_criteria is :Private; paths are reached through selectall_arrayref/count.
+
+note('_merge_base_criteria paths');
+
+# P18-1: no base_criteria → object behaves normally (all rows visible)
+{
+	my $plain = Database::test1->new($DATA_DIR);
+	is($plain->count(), 4, '_merge_base_criteria: no base_criteria → all 4 rows visible');
+}
+
+# P18-2: base_criteria set → rows filtered automatically
+{
+	my $filtered = Database::test1->new(
+		directory     => $DATA_DIR,
+		base_criteria => { entry => 'one' },
+	);
+	is($filtered->count(), 1, '_merge_base_criteria: base_criteria={entry=>one} → only 1 row');
+}
+
+# P18-3: caller criteria wins over base_criteria on key collision
+# base={entry=>'one'}, caller passes {entry=>'two'} → caller wins → 'two' row returned
+{
+	my $filtered = Database::test1->new(
+		directory     => $DATA_DIR,
+		base_criteria => { entry => 'one' },
+	);
+	my $rows = $filtered->selectall_arrayref({ entry => 'two' });
+	is(scalar @{$rows}, 1, '_merge_base_criteria: caller entry=two overrides base entry=one');
+}
+
+# ============================================================
+# Section 19: _like_match additional DP paths — 2 tests
+# ============================================================
+
+note('_like_match additional DP paths');
+
+# P19-1: 'a%b' — % in the middle (not at start or end alone), no fast path → full DP
+is(Database::Abstraction::_like_match('axyzb', 'a%b'), 1,
+    '_like_match: a%b (middle %) → full DP, match');
+
+# P19-2: empty string against bare '%' fast-path was tested; now empty string against '_' → no match
+ok(!Database::Abstraction::_like_match('', '_'),
+    '_like_match: empty string vs _ (requires exactly 1 char) → false');
+
+# ============================================================
+# Section 20: _open_table — no-prefix table param path
+# ============================================================
+
+note('_open_table no-prefix table param');
+
+# P20-1: explicit 'table' with no '::' prefix → returned unchanged (regex no-op)
+{
+	my $db2 = Database::test1->new($DATA_DIR);
+	my $t = $db2->_open_table({ table => 'simple' });
+	is($t, 'simple', '_open_table: table with no :: prefix → returned as-is (regex no-op)');
 }

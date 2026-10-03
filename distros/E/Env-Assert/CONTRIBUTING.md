@@ -39,6 +39,20 @@ file, please install Perl::Tidy and use perltidy before submitting patches.
 If there is a `tidyall.ini` file, you can also install Code::TidyAll and run
 `tidyall` on a file or `tidyall -a` to tidy all files.
 
+### AI-assisted contributions
+
+This project uses AI-assisted development tools. If you also use AI tools
+when preparing your contribution, please note the following:
+
+- Review, understand, and test all AI-generated code before submitting.
+  Do not submit raw, unreviewed AI output.
+- Be prepared to disclose which AI tools you used if asked.
+- Consider the ethical implications of your tool choices, particularly
+  regarding training data practices.
+
+See [AI_DISCLOSURE.md](AI_DISCLOSURE.md) for the full policy on AI usage
+in this project.
+
 ### Patching documentation
 
 Much of the documentation Pod is generated at release time.  Some is

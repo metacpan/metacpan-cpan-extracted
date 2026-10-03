@@ -21,6 +21,7 @@ t/10-compile.t
 t/20-new.t
 t/30-basics.t
 t/40-more.t
+t/all-fuzz.t
 t/allow.t
 t/apoc.t
 t/as_string.t
@@ -89,6 +90,7 @@ t/noplan.t
 t/object_configure.t
 t/param.t
 t/params.t
+t/path.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-links.t

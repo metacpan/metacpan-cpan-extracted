@@ -220,6 +220,24 @@ my $keyed = VPNDetection->new(api_key => $token->{apikey});
 
 A denied sign-in dies with `VPNDetection::OauthAccessDeniedError` and a code that ran out with `VPNDetection::OauthExpiredTokenError`. Client IDs are issued on request from support@vpndetection.io, and `$client->oauth->revoke('your-client-id', $token->{refresh_token})` signs the machine out again.
 
+### Sign in with OAuth (authorization code)
+
+An app that can take a browser redirect signs the person in there instead, with a PKCE pair made for that one sign-in:
+
+```perl
+my $client = VPNDetection->new;
+my $redirect_uri = 'http://127.0.0.1:8765/callback';
+my $pkce = $client->oauth->create_pkce;
+
+my $url = $client->oauth->authorization_url('your-client-id', $redirect_uri, $pkce->{challenge},
+    scope => 'apikeys.use', state => 'your-state');
+# Open $url in the browser. Its redirect to $redirect_uri carries code and state.
+my $token = $client->oauth->exchange_authorization_code('your-client-id', $code,
+    $pkce->{verifier}, $redirect_uri);
+```
+
+Check that `state` came back as you sent it before you exchange `code`, which works once. The client ID can also be the https URL of a client metadata document your app serves, and such an app is never handed a key, so `$token->{apikey}` stays absent.
+
 ### Absent is not false
 
 A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.

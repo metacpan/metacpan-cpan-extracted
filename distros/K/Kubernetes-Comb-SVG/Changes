@@ -1,0 +1,40 @@
+Revision history for Kubernetes-Comb-SVG
+
+0.001     2026-10-03 04:30:44Z
+
+ - First release. Renders a set of Kubernetes::Comb custom resources as one
+   self-contained SVG honeycomb: one hexagon per Comb, coloured by phase. No
+   script, no external reference, the same input always gives the same bytes.
+ - Kubernetes::Comb::SVG->render draws the picture. Input is a list of Comb
+   custom resources (hashes or TO_JSON objects, an array or a List); nothing
+   is fetched from a cluster.
+ - Two layouts. layout => 'depth' (default): groups by a label, rows by
+   dependency depth, dependency edges from spec.dependsOn. layout => 'packed':
+   a status monitor, all Combs sorted by namespace/name in one compact
+   honeycomb that fits a screen; the grid comes from columns, else rows, else
+   aspect (default 16/9).
+ - A cell shows the name (broken into two lines after a hyphen, dot or
+   underscore before it is cut), the phase and, when the Comb is not Running,
+   the reason of its Ready condition. The tooltip carries the rest.
+ - Phases with a colour of their own: Running, Pending, Blocked, NeedsConfig,
+   Disabled, Error, Stopped, NotDeployed; anything else is Unknown.
+ - A Comb that borrows its service from an upstream (status.upstream recorded,
+   not unreachable, phase Running or Pending) is drawn with a dashed outline and the
+   upstream context.
+ - theme sets the phase colours and the surfaces of the picture; a value is
+   one colour or { light => ..., dark => ... }. The colours are CSS custom
+   properties (--comb-*) and, with the classes, the documented styling
+   interface. Light and dark colour schemes are built in.
+ - blink and blink_seconds make the cells of the named phases pulse through a
+   CSS animation; with prefers-reduced-motion they get a thicker outline
+   instead.
+ - Further options: title, group_label, size, edges, legend and a link
+   callback that makes cells clickable.
+ - bin/comb-svg renders Comb custom resources from a JSON file or standard
+   input to an SVG on standard output, with the same options as flags.
+ - Kubernetes::Comb::SVG::Cell (a Comb read into a cell) and
+   Kubernetes::Comb::SVG::Layout (cells placed on the honeycomb) are public
+   and documented, for callers who want the data without the drawing.
+ - examples/demo.svg and examples/monitor.svg show both layouts, rendered by
+   examples/demo.pl from examples/demo.json; the README and the documentation
+   show them as PNG.

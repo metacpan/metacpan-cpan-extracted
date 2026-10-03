@@ -1,6 +1,112 @@
 Revision history for SimpleFlow
 
 
+0.192 2026-10-02 (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ These were reported in an independent review of 0.191 by Joshua S. Day
+ (Astra-Review.md, github.com/haxmeister/SimpleFlow, commit 5e9b03d).
+
+ - **Moving a failed step's outputs aside could destroy them.** A name
+     declared twice had its `.failed` deleted by its own second pass; an
+     output named like another's `.failed`, as `out` and `out.failed`, was
+     deleted to make room for the other; and a file inside a declared
+     directory was reported under a name that no longer existed. Each path is
+     now moved once, a file inside a moved directory goes with it under its
+     own name, and the longest names are moved first.
+ - **`parallel()` could write a broken trace.** Its workers wrote through one
+     inherited handle with nothing to keep them apart, and a long trace line
+     could be split by another worker's, which `report()` then refused. Each
+     worker now writes its record holding a lock.
+ - **`stale.cmd` could take one command's outputs for another's.** A run
+     without `stale.cmd` that replaced the outputs left the previous command
+     on record; it now records its own when there is a record to replace.
+     The digest also ignored the word boundaries of a wrapper, container or
+     executor argument holding a space, and ignored `threads` on a local
+     step; both now count.
+ - **`lock` died on an output name with a character above 255**, "Wide
+     character in subroutine entry".
+ - **`stdout.file` or `stderr.file` lost earlier attempts when it was also an
+     output.** A failed attempt moved it aside, so a retry began a new file.
+     Such an output now stays in place until the step has failed for good.
+ - **The failure message left out stderr when `stderr.file` was an output,**
+     because the file had been moved aside before it was read.
+ - **A `STDIN` on an in-memory scalar made `task()` die** "cannot restore
+     STDIN" on perl 5.44.0, after the command had succeeded. A `STDIN` that
+     is not descriptor 0 is now left alone, and descriptor 0 itself is
+     redirected and put back.
+ - **`timeout` never fired for a caller that had raised `$^F`,** which gave
+     the command the pipe that reports a failed exec, so `task()` waited for
+     the command to end before it set the alarm. The pipe is now marked
+     close-on-exec explicitly.
+ - **`parallel()` waited for ever when the caller ignored `SIGCHLD`,** or
+     reaped its children itself. A worker that is no longer there to wait for
+     now counts as finished.
+ - **A worker in `parallel()` that failed to store its record ran on** as a
+     second copy of the caller's program; it now always exits.
+ - **Without a timeout, a signal reached only the command's first
+     process.** A `TERM` or `HUP` sent to the caller went to the shell at the
+     head of a pipeline, and the rest ran on as orphans; an `INT` sent to the
+     caller alone, by `kill`, was ignored. Every command now leads a process
+     group of its own, as a timed one already did, and a signal is passed to
+     the group. Ctrl-Z, and a command that opens the terminal itself, are
+     handled as a shell handles a job.
+ - **A die from one of the caller's own signal handlers left the command
+     running**, never waited for. Its group is now killed and reaped first.
+ - **`.simpleflow/` and its files were used through symbolic links.** A
+     link at `.simpleflow` or `.simpleflow/cmd` is now refused, the lock
+     files and command records are opened without following one, and a
+     command record is staged under a `File::Temp` name rather than a
+     predictable `<record>.<pid>` that was opened with truncation.
+ - **`protect` tested for a symbolic link and then changed the permission
+     by name,** so a link swapped in between had its target changed. It now
+     changes a handle opened without following links, where it can open one.
+ - **`lock` treated two names for one output as two outputs,** such as `out`
+     and `sub/../out`, and a directory output did not exclude a step whose
+     output was a file inside it.
+ - **`report()` read more than JSON:** bytes that were not UTF-8, raw
+     control characters, unpaired surrogates and unbounded nesting, and it
+     died "isn't numeric" on a time that was not a number. Each is now
+     refused with a message naming the line and what is wrong with it.
+ - **`report()` encoded a `title` given as UTF-8 bytes a second time.**
+
+ [Added]
+
+ - `env.secret`, the names of `env` variables whose values are shown as
+     `(secret)` in the record, the log, the trace and argument errors. The
+     record has an `env.secret` field on every path.
+
+ [Changed]
+
+ - Without a `timeout`, a command now has its own process group, and a
+     Ctrl-C at the terminal reaches the caller, which passes it on, rather
+     than reaching the command directly. The step's result is the same.
+ - A lock is named for the output's real path, so the lock files of 0.192
+     differ from those of 0.191, and the two do not see each other's locks.
+ - A `stale.cmd` step that sets `threads` on a local executor, or whose
+     wrapper, container or executor arguments hold a word with a space, has
+     a new digest, and runs once more after the upgrade. Every other digest
+     0.191 recorded is still valid.
+ - A step run without `stale.cmd` now writes `.simpleflow/cmd/` when, and
+     only when, a record for its outputs is already there.
+ - `failed.outputs` no longer lists a file inside a directory output that
+     was moved aside; the directory's own entry covers it.
+
+ [Documentation]
+
+ - The tables of arguments and of the record's fields were HTML only, and
+     `perldoc`, `pod2text` and man pages showed neither. `md2pod.pl` now also
+     writes each as a POD list for those readers.
+ - Installing from a git checkout needs `dzil build` first; the checkout has
+     no `Makefile.PL`.
+ - `SECURITY.md` says what SimpleFlow trusts: the working directory, the
+     trace `report()` reads, and what a record writes out.
+
+ [Tests]
+
+ - `t/09.fixes.t` covers each of the above, and fails against 0.191.
+
 0.191 2026-09-27 (Claude Opus 5.5 helped)
 
  [Fixed]

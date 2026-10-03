@@ -10,7 +10,7 @@ use Net::DNS::Domain;
 use Net::IDN::PP;
 use Net::IP;
 use Net::RDAP::EPPStatusMap;
-use Net::RDAP 0.41;
+use Net::RDAP 0.42;
 use Pod::Usage;
 use POSIX qw(setlocale LC_ALL);
 use Term::ANSIColor;
@@ -32,7 +32,7 @@ use locale;
 use vars qw($VERSION $LH);
 use strict;
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 $LH = App::rdapper::l10n->get_handle;
 

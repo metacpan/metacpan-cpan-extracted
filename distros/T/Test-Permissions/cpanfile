@@ -11,7 +11,7 @@ requires 'File::Spec';
 requires 'File::Temp';
 requires 'IPC::System::Simple';   # needed by autodie qw(:all)
 requires 'Params::Get', '0.17';
-requires 'Params::Validate::Strict';
+requires 'Params::Validate::Strict', '0.40';   # rejects undef for a required string with min
 requires 'Readonly';
 requires 'Return::Set';
 requires 'Test::More';   # skip_unless_can_revoke calls Test::More::skip

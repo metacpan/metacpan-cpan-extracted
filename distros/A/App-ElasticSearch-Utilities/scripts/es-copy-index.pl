@@ -182,7 +182,7 @@ while( $res && @{ $res->{hits}{hits} }) {
             body => $body
         );
         if ($s2 ne "200") {
-            output({stderr=>1,color=>'red'},"Failed to put documents to $HOST{to} (http status = $status): " . $JSON->encode([ $s2, $r2 ]));
+            output({stderr=>1,color=>'red'},"Failed to put documents to $HOST{to} (http status = $s2): " . $JSON->encode([ $s2, $r2 ]));
             next;
         }
         $success=1;
@@ -228,7 +228,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 9.0
+version 9.1
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,5 @@
+[
+  { "metadata": { "name": "web" }, "spec": { "dependsOn": [ "api" ] } },
+  { "metadata": { "name": "api" }, "spec": { "dependsOn": [ "db" ] } },
+  { "metadata": { "name": "db" } }
+]

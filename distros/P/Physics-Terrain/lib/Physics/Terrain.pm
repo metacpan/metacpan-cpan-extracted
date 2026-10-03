@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Physics::Terrain', $VERSION);
@@ -23,7 +23,7 @@ Physics::Terrain - a destructible field, bodies that walk and fall on it, shells
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

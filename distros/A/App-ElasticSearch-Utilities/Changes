@@ -1,16 +1,44 @@
 ==================================================
-Changes from 2024-07-31 00:00:00 +0000 to present.
+Changes from 2024-10-03 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 9.0 at 2026-07-31 12:40:13 +0000
+version 9.1 at 2026-10-03 01:54:30 +0000
 ----------------------------------------
+
+  Change: 3593ef09f812d644feb286ec3942eb26adfa0db8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-10-02 21:52:37 +0000
+
+    fix(bugs): Fix all the bugs filed by dajiaohuang
+
+    This project doesn't accept AI generated code. I've never gotten a swarm of
+    bug reports like this before. The issues are real and the fixes are good, I
+    just don't understand why my little project was chosen. The author comes
+    out of nowhere and offers no insight into their use of the code.
+
+    I do appreciate the issues and fixes, but the original author's GitHub
+    looks suspiciously like a user using AI to amp up GitHub metrics to make
+    themselves seem more interesting as a hire. I would rather receive patches
+    from people who love Perl as much as I do.
+
+    This closes #40, #42, and #42 opened by @dajiaohuang. 
+
+  Change: d4479bee8a36242a91147592ec57e657403576e1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-08-01 00:34:16 +0000
+
+    chore(cleanup): cleanup some utility functions 
 
   Change: 83eab5ef1ad1d83800536de1a4534b1973a688b1
   Author: Brad Lhotsky <brad@divisionbyzero.net>
   Date : 2026-07-31 08:38:57 +0000
 
     Release checks and tweaks 
+
+----------------------------------------
+version 9.0 at 2026-07-31 12:26:31 +0000
+----------------------------------------
 
   Change: 311354f7def4f827e927f9606b616f0d207a4370
   Author: Brad Lhotsky <brad@divisionbyzero.net>
@@ -121,5 +149,5 @@ version 8.9 at 2026-05-22 12:46:42 +0000
     chore: Adding things to the .gitignore from gitignore.io 
 
 =================================================
-Plus 97 releases after 2024-07-31 00:00:00 +0000.
+Plus 97 releases after 2024-10-03 00:00:00 +0000.
 =================================================

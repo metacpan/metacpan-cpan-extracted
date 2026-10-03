@@ -31,7 +31,7 @@ WriteMakefile(
 		'Log::Abstraction'         => '0.33',
 		'Object::Configure'        => 0,
 		'Params::Get'              => '0.13',
-		'Params::Validate::Strict' => '0.39',
+		'Params::Validate::Strict' => 0.40,
 		'Readonly'                 => '2.00',
 		'Scalar::Util'             => 0,
 		'Sub::Protected'           => 0,

@@ -11,41 +11,41 @@ use open ':std', IO => ':encoding(UTF-8)';
 
 # PODNAME: envdot
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
-use English      qw( -no_match_vars );                   # Avoids regex performance penalty in perl 5.18 and earlier
+use English qw( -no_match_vars ); # Avoids regex performance penalty in perl 5.18 and earlier
 use Getopt::Long qw( :config auto_version auto_help );
 use Carp;
 use Errno;
 use Pod::Usage;
 
-use Env::Dot::Functions       qw(:all);
+use Env::Dot::Functions qw(:all);
 use Env::Dot::ScriptFunctions qw( convert_variables_into_commands );
 
 local $OUTPUT_AUTOFLUSH = 1;
 
 use constant {
     DEFAULT_OPTION_DOTENV_FILENAME => '.env',
-    DEFAULT_OPTION_SHELL           => q{sh},
+    DEFAULT_OPTION_SHELL => q{sh},
     DEFAULT_OPTION_READ_FROM_STDIN => 0,
-    EXIT_SUCCESS                   => 0,
-    EXIT_ERROR_NO_FILE             => ( exists &Errno::ENOENT ? Errno::ENOENT : 255 ),
-    EXIT_ERROR_OTHER_ERROR         => ( exists &Errno::EINVAL ? Errno::EINVAL : 255 ),
+    EXIT_SUCCESS => 0,
+    EXIT_ERROR_NO_FILE => (exists &Errno::ENOENT ? Errno::ENOENT : 255),
+    EXIT_ERROR_OTHER_ERROR => (exists &Errno::EINVAL ? Errno::EINVAL : 255),
 };
 
 my %SHELL_ALTERNATIVES = (
-    sh   => 'sh',
+    sh => 'sh',
     bash => 'sh',
     dash => 'sh',
-    ksh  => 'sh',
-    csh  => 'csh',
+    ksh => 'sh',
+    csh => 'csh',
     tcsh => 'csh',
     fish => 'fish',
 );
 
-my $man             = 0;
-my $export          = 1;
-my $shell           = $SHELL_ALTERNATIVES{ $ENV{SHELL} } // DEFAULT_OPTION_SHELL;
+my $man = 0;
+my $export = 1;
+my $shell = $SHELL_ALTERNATIVES{ $ENV{SHELL} } // DEFAULT_OPTION_SHELL;
 my $dotenv_filepath = DEFAULT_OPTION_DOTENV_FILENAME;
 my $read_from_stdin = DEFAULT_OPTION_READ_FROM_STDIN;
 GetOptions(
@@ -53,37 +53,35 @@ GetOptions(
     'export!'    => \$export,
     'shell|s=s'  => \$shell,
     'dotenv|e=s' => \$dotenv_filepath,
-    ''           => \$read_from_stdin,    ## no critic (ValuesAndExpressions::ProhibitEmptyQuotes)
+    ''           => \$read_from_stdin,  ## no critic (ValuesAndExpressions::ProhibitEmptyQuotes)
 ) or pod2usage(2);
-pod2usage( -exitval => 0, -verbose => 2 ) if $man;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
 
 sub main {
     my $var_name = get_envdot_filepaths_var_name();
     my @dotenv_filepaths;
-    if ( exists $ENV{$var_name} ) {
-        @dotenv_filepaths = interpret_dotenv_filepath_var( $ENV{$var_name} );
-    }
-    elsif ($read_from_stdin) {
+    if( exists $ENV{ $var_name } ) {
+        @dotenv_filepaths = interpret_dotenv_filepath_var( $ENV{ $var_name } );
+    } elsif( $read_from_stdin ) {
         croak 'Error: Option not implemented';
-    }
-    else {
-        if ( !-f $dotenv_filepath ) {
+    } else {
+        if( ! -f $dotenv_filepath ) {
             print {*STDERR} "Error: File not found: '$dotenv_filepath'\n"
-              or croak 'Cannot print error message';
+                or croak 'Cannot print error message';
             return EXIT_ERROR_NO_FILE;
         }
-        @dotenv_filepaths = ($dotenv_filepath);    # The CLI parameter
+        @dotenv_filepaths = ( $dotenv_filepath ); # The CLI parameter
     }
 
     my @vars;
-    foreach my $dotenv_filepath ( reverse @dotenv_filepaths ) {
+    foreach my $dotenv_filepath (reverse @dotenv_filepaths) {
         local $EVAL_ERROR = undef;
         my @these_vars;
-        eval { @these_vars = get_dotenv_vars($dotenv_filepath); 1; } or do {
+        eval { @these_vars = get_dotenv_vars( $dotenv_filepath ); 1; } or do {
             my $e = $EVAL_ERROR;
-            my ( $err, $l, $fp ) = extract_error_msg($e);
-            print {*STDERR} 'Error: ' . $err . ( $l ? qq{ line $l} : q{} ) . ( $fp ? qq{ file '$fp'} : q{} ) . "\n"
-              or croak 'Cannot print error message';
+            my ($err, $l, $fp) = extract_error_msg($e);
+            print {*STDERR} 'Error: ' . $err . ($l ? qq{ line $l} : q{}) . ($fp ? qq{ file '$fp'} : q{}) . "\n"
+                or croak 'Cannot print error message';
             return EXIT_ERROR_OTHER_ERROR;
         };
         push @vars, @these_vars;
@@ -91,7 +89,7 @@ sub main {
     $_->{'opts'}->{'export'} = $export foreach (@vars);
 
     print {*STDOUT} convert_variables_into_commands( $shell, @vars )
-      or croak 'Cannot print variables to STDOUT';
+        or croak 'Cannot print variables to STDOUT';
 
     return EXIT_SUCCESS;
 }
@@ -102,15 +100,12 @@ __END__
 
 =pod
 
-=encoding UTF-8
+=for stopwords dotenv env envdot shdotenv subshells
 
 =head1 NAME
 
 envdot - Read .env file and turn its content into environment variables for different shells.
 
-=head1 VERSION
-
-version 0.022
 
 =head1 SYNOPSIS
 
@@ -141,36 +136,6 @@ include F<envdot> in a docker container build.
     curl -LSs -o envdot https://raw.githubusercontent.com/mikkoi/env-dot/main/envdot.self-contained
     chmod +x ./envdot
 
-=head1 DESCRIPTION
-
-B<envdot> reads your F<.env> file and converts it
-into environment variable commands suitable for
-different shells (shell families): B<sh>, B<csh> and B<fish>.
-
-F<.env> files can be written in different flavors.
-B<envdot> supports the often used B<sh> compatible flavor and
-the B<docker> flavor which are not compatible with each other.
-
-If you have several F<.env> files, you can read them in at one go
-with the help of the environment variable B<ENVDOT_FILEPATHS>.
-Separate the full paths with 'B<:>' character.
-
-Env::Dot will load the files in the B<reverse order>,
-starting from the last. This is the same ordering as used in B<PATH> variable:
-the first overrules the following ones, that is, when reading from the last path
-to the first path, if same variable is present in more than one file, the later
-one replaces the one already read.
-
-If you have set the variable ENVDOT_FILEPATHS, then B<envdot> will use that.
-Otherwise, it uses the command line parameter.
-If no parameter, then default value is used. Default is the file
-F<.env> in the current directory.
-
-=for stopwords dotenv env envdot shdotenv subshells
-
-=head1 NAME
-
-envdot - Read .env file and turn its content into environment variables for different shells.
 
 =head1 OPTIONS
 
@@ -211,6 +176,33 @@ Default: current directory F<.env>
 
 =back
 
+
+=head1 DESCRIPTION
+
+B<envdot> reads your F<.env> file and converts it
+into environment variable commands suitable for
+different shells (shell families): B<sh>, B<csh> and B<fish>.
+
+F<.env> files can be written in different flavors.
+B<envdot> supports the often used B<sh> compatible flavor and
+the B<docker> flavor which are not compatible with each other.
+
+If you have several F<.env> files, you can read them in at one go
+with the help of the environment variable B<ENVDOT_FILEPATHS>.
+Separate the full paths with 'B<:>' character.
+
+Env::Dot will load the files in the B<reverse order>,
+starting from the last. This is the same ordering as used in B<PATH> variable:
+the first overrules the following ones, that is, when reading from the last path
+to the first path, if same variable is present in more than one file, the later
+one replaces the one already read.
+
+If you have set the variable ENVDOT_FILEPATHS, then B<envdot> will use that.
+Otherwise, it uses the command line parameter.
+If no parameter, then default value is used. Default is the file
+F<.env> in the current directory.
+
+
 =head1 EXAMPLES
 
     eval `envdot --no-export --shell csh`
@@ -219,9 +211,11 @@ Default: current directory F<.env>
 
     ENVDOT_FILEPATHS='../.env:subdir/.env:.env' eval `envdot`
 
+
 =head1 DEPENDENCIES
 
 No external dependencies outside Perl's standard distribution.
+
 
 =head1 SEE ALSO
 
@@ -238,16 +232,5 @@ to configure application with the help of environment variables.
 
 L<shdotenv|https://github.com/ko1nksm/shdotenv> is a project to provide dotenv
 for shells with support for POSIX-compliant and multiple .env file syntax.
-
-=head1 AUTHOR
-
-Mikko Koivunalho <mikkoi@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2023 by Mikko Koivunalho.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

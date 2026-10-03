@@ -1,0 +1,23 @@
+Revision history for Perl extension Ushuffle.
+
+1.00  2026-10-02
+	- first public release
+	- new interface: shuffle($sequence, $k) returns the shuffled string,
+	  Ushuffle::Shuffler gives repeated shuffles of one sequence, and
+	  set_seed seeds the random number generator
+	- removed shuffle($s, $t, $l, $k), shuffle1 and shuffle2, which wrote
+	  into a caller-supplied buffer without checking its size
+	- the random number generator is seeded when the module is loaded
+	- safe to use from several threads; calls into the library are
+	  serialized
+	- requires perl 5.10.1
+	- bundled library updated to https://github.com/s-will/ushuffle master
+	  (commit 2c4b8f3), i.e. release 1.2.2 plus a fix for an integer
+	  overflow in the hash function on sequences of tens of millions of
+	  characters
+	- the library is compiled as part of the extension; the module files
+	  are no longer generated with h2xs
+
+0.01
+	- original version; created by h2xs 1.23 with options
+		-O -n Ushuffle ./Ushuffle/ushufflelib/ushuffle.h

@@ -92,6 +92,7 @@ t/tabs.t
 t/test7.t
 t/test8.t
 t/transaction.t
+t/transition.t
 t/tsv.t
 t/two_databases.t
 t/unit.t

@@ -1,0 +1,272 @@
+#!/usr/bin/env perl
+
+# Receive syslog datagrams over UDP and append them to a CSV file.
+# All of the work is in App::Syslogd; this file only turns the command
+# line into constructor arguments, so that the logic can be unit tested.
+#
+#	syslogd [--port 514] [--address 0.0.0.0] [--file /var/log/syslog/syslog.csv]
+#		[--no-resolve] [--language en]
+#
+# Send SIGHUP to reopen the log file after rotation, SIGTERM or SIGINT to
+# stop.
+
+use strict;
+use warnings;
+use autodie qw(:all);
+
+# Installed as /usr/local/etc/syslogd, so "../lib" is /usr/local/lib: copy
+# lib/App there.  The same path also finds lib/ when run from a git
+# checkout (etc/../lib), and a normal @INC install still works.
+#
+# Under perl -T, $Bin is tainted (it comes from $0), and a library path
+# made from it would let whoever chooses $0 choose the code that is loaded.
+# So with -T only an installed App::Syslogd (or one named with -I) is used.
+use FindBin qw($Bin);
+use if !${^TAINT}, lib => "$Bin/../lib";
+
+use Getopt::Long qw(GetOptions);
+use IO::Handle;
+use Readonly;
+use App::Syslogd;
+
+# Exit statuses (documented under EXIT STATUS).  Errors are caught and
+# turned into these: a bare die would exit with whatever $! happened to
+# hold (13 for a refused file, 22 for a bad address, ...).
+Readonly my $EXIT_OK => 0;		# stopped cleanly
+Readonly my $EXIT_FAILURE => 1;		# could not start, or failed while running
+Readonly my $EXIT_USAGE => 2;		# started wrongly: a bad option, or by a web server
+
+# Report an error and exit with a fixed status
+sub fail {
+	my ($status, $message) = @_;
+	print STDERR $message;
+	exit($status);
+}
+
+# Status lines must appear when they happen, not when the buffer fills:
+# under systemd or a pipe STDOUT is not a terminal, so without this the
+# "listening" line would only be seen when the server exits
+STDOUT->autoflush(1);
+
+# This is a server, never a CGI program.  If a web server runs it (it was
+# dropped into cgi-bin, say), a query without "=" becomes command-line
+# arguments (RFC 3875 4.4, "ISINDEX"), so any visitor could start a
+# listening daemon writing to a file of their choice.  Refuse before the
+# command line is even read.  RFC 3875 requires GATEWAY_INTERFACE;
+# REQUEST_METHOD covers servers that leave it out.
+if(defined($ENV{GATEWAY_INTERFACE}) || defined($ENV{REQUEST_METHOD})) {
+	fail($EXIT_USAGE, App::Syslogd->i18n('not_cgi') . "\n");
+}
+
+# Only options the user actually gave are passed on, so App::Syslogd's
+# %DEFAULTS stay the single place where defaults are defined
+my %opts;
+GetOptions(\%opts, 'port=i', 'address=s', 'file=s', 'resolve!', 'language=s')
+	or fail($EXIT_USAGE, App::Syslogd->i18n('usage', { program => $0 }) . "\n");
+
+# Bind first so a busy port is reported before anything is written
+my $server = eval { App::Syslogd->new(\%opts)->open_socket()->reopen_log() }
+	or fail($EXIT_FAILURE, $@);
+
+print $server->i18n('listening', { address => $server->address(), port => $server->port() }), "\n";
+
+# Returns only on SIGTERM or SIGINT
+eval { $server->run(); 1 } or fail($EXIT_FAILURE, $@);
+
+print $server->i18n('shutdown', { count => $server->count() }), "\n";
+exit($EXIT_OK);
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+syslogd - receive syslog messages over UDP and write them to a CSV file
+
+=head1 SYNOPSIS
+
+	/usr/local/etc/syslogd [--port 514] [--address 0.0.0.0] [--file /var/log/syslog/syslog.csv]
+		[--no-resolve] [--language en]
+
+	# Without root, on a port above 1023, logging addresses only
+	/usr/local/etc/syslogd --port 5514 --file /var/log/remote.csv --no-resolve
+
+	# Under taint mode: the module must be installed or named with -I
+	perl -T -I/usr/local/lib /usr/local/etc/syslogd --port 5514
+
+=head1 DESCRIPTION
+
+A small wrapper around L<App::Syslogd>.  It turns the command line into
+options, opens the socket and the log, prints a "listening" line, and runs
+until SIGTERM or SIGINT.  Then it prints how many messages it recorded.
+
+=head2 Purpose
+
+Run a syslog server from the command line.
+
+=head2 Arguments
+
+The command-line options below.  Options that are not given are not passed
+on, so the defaults of L<App::Syslogd> apply.
+
+=over 4
+
+=item C<--port N> - UDP port (a whole number, 0 to 65535; default 514).
+
+=item C<--address A> - local address to listen on (default C<0.0.0.0>).
+
+=item C<--file F> - the CSV log file (default F</var/log/syslog/syslog.csv>;
+the directory must exist, and on Debian and Ubuntu F</var/log/syslog> is a
+file, so give C<--file> there).
+
+=item C<--resolve> / C<--no-resolve> - write host names (the default) or
+addresses.
+
+=item C<--language TAG> - the language of the program's messages.
+
+=back
+
+=head2 Returns
+
+The exit status: 0 after a clean stop (SIGTERM or SIGINT); 1 if the server
+could not start or failed while running; 2 if it was started wrongly (see
+L</EXIT STATUS>).
+
+=head2 Side Effects
+
+Binds a UDP socket; creates or appends to the log file (mode 0600); prints
+a "listening" line and, on stopping, a "shutting down" line on standard
+output.  It never reads standard input.
+
+=head2 Usage
+
+	/usr/local/etc/syslogd --port 5514 --file /var/log/remote.csv
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+The program takes no HTTP input.  It reads no C<QUERY_STRING>,
+C<PATH_INFO>, cookies, other C<HTTP_*> variables or request body, and if
+C<GATEWAY_INTERFACE> or C<REQUEST_METHOD> is set (it was started by a web
+server) it refuses to run.  Its inputs are the command line:
+
+	{
+		port => { type => 'integer', min => 0, max => 65535, optional => 1 },
+		address => { type => 'string', min => 1, optional => 1 },
+		file => { type => 'string', min => 1, optional => 1 },
+		resolve => { type => 'boolean', optional => 1 },
+		language => { type => 'string', min => 1, optional => 1 },
+	}
+
+and the environment that L<App::Syslogd> reads (C<App__Syslogd__*>,
+C<LANG>, C<LANGUAGE>, C<LC_*>).
+
+=head4 OUTPUT
+
+	{
+		exit_status => { type => 'integer', min => 0, max => 2 },
+		stdout => { type => 'string', matches => qr/\ASyslog server listening on .+\n(?:Syslog server shutting down after recording .+\n)?\z/ },
+	}
+
+=head3 FORMAL SPECIFICATION
+
+	[OPTION, VALUE, LINE]
+	argv? : seq STRING ; env? : NAME ⇸ VALUE
+	out! : seq LINE ; status! : 0 .. 2
+
+	SyslogdOk
+	  argv?, env?, out!, status!
+	  ─────────
+	  GATEWAY_INTERFACE ∉ dom env? ∧ REQUEST_METHOD ∉ dom env?
+	  parses(argv?)
+	  status! = 0
+	  out! = ⟨listening(address, port), shutdown(count)⟩
+
+	SyslogdRefused
+	  argv?, env?, out!, status!
+	  ─────────
+	  (GATEWAY_INTERFACE ∈ dom env? ∨ REQUEST_METHOD ∈ dom env?) ∨
+	  ¬ parses(argv?) ∨ ¬ startable(argv?, env?)
+	  out! = ⟨⟩
+	  status! = 2 ⇔ (GATEWAY_INTERFACE ∈ dom env? ∨ REQUEST_METHOD ∈ dom env? ∨ ¬ parses(argv?))
+	  status! = 1 ⇔ ¬ (status! = 2)
+
+	Syslogd ≙ SyslogdOk ∨ SyslogdRefused
+
+	-- Running as CGI is decided before the command line is read:
+	CgiFirst ≙ (GATEWAY_INTERFACE ∈ dom env? ∨ REQUEST_METHOD ∈ dom env?)
+	             ⇒ ¬ parsed ∧ ¬ bound ∧ ¬ logging
+
+=head1 EXIT STATUS
+
+	+--------+----------------------------------------------------------------+
+	| Status | Meaning                                                        |
+	+--------+----------------------------------------------------------------+
+	| 0      | stopped cleanly by SIGTERM or SIGINT                           |
+	| 1      | could not start (the socket or the log could not be opened, a  |
+	|        | setting was invalid) or failed while running                   |
+	| 2      | started wrongly: a bad option (the usage message), or by a web |
+	|        | server                                                         |
+	+--------+----------------------------------------------------------------+
+
+Errors that stop Perl before the program runs (for example, App::Syslogd
+cannot be found) are reported by Perl itself, with Perl's own status.
+
+=head1 SIGNALS
+
+B<SIGHUP> reopens the log file (for log rotation); B<SIGTERM> and B<SIGINT>
+stop the server.
+
+=head1 ENVIRONMENT
+
+C<App__Syslogd__port>, C<App__Syslogd__file> and the other
+C<App__Syslogd__*> variables set options, and win over the command line
+(see L<App::Syslogd/new>).  C<LANG>, C<LANGUAGE> and C<LC_*> choose the
+language.  C<GATEWAY_INTERFACE> or C<REQUEST_METHOD> make the program
+refuse to run.
+
+=head1 SECURITY
+
+=over 4
+
+=item * It refuses to run from a web server: as a CGI program a query
+without "=" becomes its command line (RFC 3875, "ISINDEX"), so any visitor
+could start a listening server writing where they chose.
+
+=item * It never runs another program, and passes file names straight to
+the system, never to a shell.
+
+=item * It only adds to an empty file or to one of its own logs (a file
+that starts with the column-names line), so even as root a mistaken or
+hostile C<--file> cannot append to, or change the permissions of, a file
+such as F</etc/passwd>.
+
+=item * Without C<-T> it loads L<App::Syslogd> from F<../lib> next to
+itself (F</usr/local/lib> once installed): keep that directory writable
+only by root.  With C<-T> that path is not used, because it is built from
+C<$0>; the module must then be installed or named with C<-I>.  Under C<-T>
+option values from the command line or the environment are tainted, so a
+C<--file> is refused by taint mode.
+
+=item * Getopt::Long's "Unknown option" warning and the usage message show
+the option name and C<$0> as given; both come from whoever starts the
+program, so they cannot carry anyone else's text.
+
+=back
+
+See also L<App::Syslogd/SECURITY>.
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+This program is released under the GNU General Public License, version 2
+(see the F<LICENSE> file).  If you use it, please let me know.
+
+=cut

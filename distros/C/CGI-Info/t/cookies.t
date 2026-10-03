@@ -18,8 +18,7 @@ COOKIES: {
 	ok($i->get_cookie(cookie_name => 'foo') eq 'bar');
 	ok($i->get_cookie(cookie_name => 'foo') eq 'bar');
 	ok(!defined($i->get_cookie(cookie_name => 'bar')));
-	diag('Ignore message about cookie_name argument not given');
-	throws_ok { $i->get_cookie(cookie_name => undef) } qr/^what cookie do you want/ , 'dies when the cookie name is not defined';
+	throws_ok { $i->get_cookie(cookie_name => undef) } qr/(?:^what cookie do you want|cookie_name.+undefined)/, 'dies when the cookie name is not defined';
 
 	$ENV{'HTTP_COOKIE'} = 'fred=wilma; foo=bar';
 	$i = new_ok('CGI::Info');
@@ -29,7 +28,7 @@ COOKIES: {
 	ok($i->get_cookie({cookie_name => 'fred'}) eq 'wilma');
 	ok(!defined($i->get_cookie(cookie_name => 'bar')));
 	ok(!defined($i->get_cookie({cookie_name => 'bar'})));
-	throws_ok { $i->get_cookie(cookie_name => undef) } qr/^what cookie do you want/ , 'dies when the cookie name is not defined';
+	throws_ok { $i->get_cookie(cookie_name => undef) } qr/(?:^what cookie do you want|cookie_name.+undefined)/, 'dies when the cookie name is not defined';
 
 	local $SIG{__WARN__} = sub { die $_[0] };
 	eval {
@@ -49,7 +48,6 @@ COOKIES: {
 	my $obj = new_ok('CGI::Info');
 
 	# Check for missing field
-	diag('Ignore message about what cookie would you like');
 	throws_ok { $obj->cookie() } qr/^Usage/ , 'undef if no cookie field is provided';
 	cmp_ok($obj->cookie('user'), 'eq', 'JohnDoe');
 }

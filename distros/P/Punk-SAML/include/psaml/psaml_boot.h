@@ -31,12 +31,16 @@
 #include "psaml_flow.h"
 #include "psaml_request.h"
 
+/* The `cache` store the replay check uses when `seen` does not name
+ * another, and Punk's own name for its unnamed store. */
+#define PSAML_DEFAULT_CACHE "default"
+
 static const char *const PSAML_OPTS[] = {
     "secret", "entity_id", "prefix", "key", "cert",
     "sign_requests", "sign_metadata", "require_signed", "skew",
     "flow_ttl", "max_response", "allow_sha1", "allow_idp_initiated",
     "default_to", "name_id_format", "force_authn", "metadata",
-    "metadata_refresh", "render", NULL
+    "metadata_refresh", "render", "seen", "allow_replay", NULL
 };
 
 static const char *const PSAML_IDP_OPTS[] = {
@@ -124,7 +128,7 @@ PERL_STATIC_INLINE HV *psaml_opts(pTHX_ SV *app, SV *optsv) {
   {
     static const char *const flags[] = {
       "sign_requests", "sign_metadata", "allow_sha1",
-      "allow_idp_initiated", "force_authn", NULL
+      "allow_idp_initiated", "force_authn", "allow_replay", NULL
     };
     int i;
     for (i = 0; flags[i]; i++)
@@ -140,7 +144,7 @@ PERL_STATIC_INLINE HV *psaml_opts(pTHX_ SV *app, SV *optsv) {
   {
     static const char *const keep[] = {
       "entity_id", "key", "cert", "default_to", "name_id_format",
-      "render", NULL
+      "render", "seen", NULL
     };
     int i;
     for (i = 0; keep[i]; i++) {
@@ -167,6 +171,28 @@ PERL_STATIC_INLINE HV *psaml_opts(pTHX_ SV *app, SV *optsv) {
     if (r && SvROK(r) && !psaml_is_code(aTHX_ r))
       croak("%s: `render` takes a coderef or the name of a context method",
             PSAML_WHO);
+  }
+
+  /* `seen`, the replay store.
+   *
+   * A coderef is a store of the application's own; a string names one of
+   * the `cache` keyword's stores, and the default is the default store.
+   * The default is a NAME rather than nothing because an SP that cannot
+   * detect a replayed assertion is not conformant - Profiles section
+   * 4.1.4.5 makes the check a MUST - and the deployment that configures
+   * nothing is exactly the one that needs it. on_compile checks that the
+   * named store is actually declared. */
+  {
+    SV *s = psaml_hget(aTHX_ out, "seen");
+    int use_default;
+    if (s && SvROK(s) && !psaml_is_code(aTHX_ s))
+      croak("%s: `seen` takes a coderef or the name of a `cache` store",
+            PSAML_WHO);
+    if (!s || !SvOK(s))         use_default = 1;
+    else if (SvROK(s))          use_default = 0;
+    else                        use_default = SvCUR(s) ? 0 : 1;
+    if (use_default)
+      (void)hv_stores(out, "seen", newSVpvs(PSAML_DEFAULT_CACHE));
   }
 
   PERL_UNUSED_ARG(app);
@@ -1146,6 +1172,68 @@ XS_INTERNAL(psaml_rt_acs) {
             newSVpvs("the Response produced no identity"));
   }
 
+  /* Replay, AFTER the signature and the windows and BEFORE on_login.
+   *
+   * After, because an id out of an unverified document is attacker-chosen
+   * and writing it to the store would let anyone fill the cache with
+   * whatever they liked. Before, because on_login is where the session
+   * is established and an assertion that has already bought one must not
+   * buy a second.
+   *
+   * The flow record is NOT this check and never was. It is single-use per
+   * BROWSER: the ACS takes it and writes the cookie back before verifying,
+   * so the browser that just signed in cannot replay. An attacker holding
+   * a copy of the request as it went over the wire holds the cookie as it
+   * was BEFORE that, record and all, and until 0.03 could present the
+   * pair again until flow_ttl ran out. With allow_idp_initiated on there
+   * is no record at all and nothing bounded it but the assertion.
+   *
+   * G_EVAL because the store is the application's: a cache that cannot be
+   * reached is a `config` refusal in the log, not a 500 for the browser,
+   * and either way the login does not proceed. Fail closed. */
+  if (!failed && identity
+      && !psaml_opt_bool(aTHX_ opts, "allow_replay", 0)) {
+    dSP;
+    int count;
+    int replayed = 0;
+    SV *ev = NULL;
+    SV *seen = psaml_hget(aTHX_ opts, "seen");
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpvs("Punk::SAML::Response")));
+    XPUSHs(c);
+    XPUSHs(seen ? seen : &PL_sv_undef);
+    XPUSHs(identity);
+    /* skew as well: the verifier accepts an assertion until its window
+     * plus the skew, so a cache entry that expired at the window alone
+     * would stop remembering it while it was still being accepted. */
+    XPUSHs(sv_2mortal(newSViv(psaml_opt_iv(aTHX_ opts, "skew", 120))));
+    PUTBACK;
+    count = call_method("_replayed", G_SCALAR | G_EVAL);
+    SPAGAIN;
+    if (SvTRUE(ERRSV)) ev = newSVsv(ERRSV);
+    if (count > 0) {
+      SV *r = POPs;
+      replayed = SvTRUE(r) ? 1 : 0;
+    }
+    PUTBACK;
+    FREETMPS; LEAVE;
+    if (ev) {
+      /* the store itself broke. Not a replay, not a pass.
+       *
+       * `ev` goes in as the +1 it already is: psaml_error_new puts the
+       * message straight into the hash, so a mortal here would be freed
+       * by the next FREETMPS while the error still held it. */
+      failed = 1;
+      err = psaml_error_new(aTHX_ PSAML_E_CONFIG, ev);
+    }
+    else if (replayed) {
+      failed = 1;
+      err = psaml_error_new(aTHX_ PSAML_E_REPLAY,
+              newSVpvs("this assertion has been presented before"));
+    }
+  }
+
   if (failed || !identity) {
     /* the code goes to the log with the provider; the REASON never
      * reaches the browser. A verifier that told the far side which check
@@ -1326,6 +1414,42 @@ XS_INTERNAL(psaml_on_compile) {
     SV *url = psaml_join_url(aTHX_ host, SvPV_nolen(pfx));
     sv_catpvs(url, "/metadata");
     psaml_app_set(aTHX_ app, PSAML_K_ENTITY, url);
+  }
+
+  /* The replay store, checked HERE and not at the first login.
+   *
+   * on_compile runs before Punk builds the cache stores, so what exists
+   * to look at is `cache_spec`, the keyword's own record. That is enough,
+   * and it is the right thing to read: every keyword has recorded by now,
+   * so `cache` on either side of the `plugin` line reads the same.
+   *
+   * Croaking is deliberate. A replay cache that is quietly absent is the
+   * 0.01 and 0.02 behaviour, where the POD promised a check that nothing
+   * performed, and an option that silently does nothing is worse than one
+   * that refuses. A deployment that genuinely wants no cache says so with
+   * `allow_replay`. */
+  if (!psaml_opt_bool(aTHX_ opts, "allow_replay", 0)) {
+    SV *seen = psaml_hget(aTHX_ opts, "seen");
+    if (seen && SvOK(seen) && !SvROK(seen)) {
+      STRLEN nl;
+      const char *np = SvPV_const(seen, nl);
+      HV *ah = (SvROK(app) && SvTYPE(SvRV(app)) == SVt_PVHV)
+             ? (HV *)SvRV(app) : NULL;
+      SV **spec = ah ? hv_fetchs(ah, "cache_spec", 0) : NULL;
+      HV *specs = (spec && *spec && SvROK(*spec)
+                   && SvTYPE(SvRV(*spec)) == SVt_PVHV)
+                ? (HV *)SvRV(*spec) : NULL;
+      if (!specs || !hv_exists(specs, np, (I32)nl))
+        croak("%s: the replay check needs somewhere to remember assertion "
+              "ids, and there is no `cache` store named '%.*s'. Profiles "
+              "section 4.1.4.5 makes the check a MUST, so this is a "
+              "refusal and not a warning. Declare a store (`cache 'file', "
+              "dir => '/var/cache/myapp'`), or name another with `seen "
+              "=> 'store'`, or pass your own `seen => sub {...}`. "
+              "`allow_replay => 1` turns the check off and says in the "
+              "configuration that you meant to",
+              PSAML_WHO, (int)nl, np);
+    }
   }
 
   /* Every provider resolved HERE, before the fork. A `metadata` source is

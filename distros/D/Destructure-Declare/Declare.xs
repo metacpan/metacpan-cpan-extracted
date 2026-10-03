@@ -76,7 +76,7 @@ static OP *dd_parse_let(pTHX) {
 	 * context and capture it into an anonymous arrayref, then reuse the exact
 	 * positional codegen as for an [ ... ] arrayref pattern. */
 	if (pat.shape == DD_LIST)
-		rhs = op_convert_list(OP_ANONLIST, OPf_SPECIAL, rhs);   /* [ LIST ] */
+		rhs = newANONLIST(rhs);   /* [ LIST ] */
 
 	/* my $src = RHS;  (the once-only source ref) */
 	src = dd_temp(aTHX);

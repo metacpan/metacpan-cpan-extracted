@@ -4,35 +4,40 @@ use strict;
 use warnings;
 use 5.010;
 
+=for :stopwords env dotenv filepath filepaths
+
+=cut
+
 use Exporter 'import';
 our @EXPORT_OK = qw(
-  get_dotenv_vars
-  interpret_dotenv_filepath_var
-  get_envdot_filepaths_var_name
-  extract_error_msg
-  create_error_msg
+    get_dotenv_vars
+    interpret_dotenv_filepath_var
+    get_envdot_filepaths_var_name
+    extract_error_msg
+    create_error_msg
 );
 our %EXPORT_TAGS = (
     'all' => [
         qw(
-          get_dotenv_vars
-          interpret_dotenv_filepath_var
-          get_envdot_filepaths_var_name
-          extract_error_msg
-          create_error_msg
+            get_dotenv_vars
+            interpret_dotenv_filepath_var
+            get_envdot_filepaths_var_name
+            extract_error_msg
+            create_error_msg
         )
     ],
 );
 
-use Cwd     qw( abs_path );
+use Cwd qw( abs_path );
 use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.18 and earlier
 use File::Spec;
 use IO::File;
 use Carp;
 
+
 # ABSTRACT: Read environment variables from a .env file
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use constant {
     OPTION_FILE_TYPE                         => q{file:type},
@@ -52,11 +57,68 @@ my %DOTENV_OPTIONS = (
     'var:allow_interpolate'            => 1,
 );
 my %DOS_PLATFORMS = (
-    'dos'     => 'MS-DOS/PC-DOS',
-    'os2'     => 'OS/2',
-    'MSWin32' => 'Windows',
-    'cygwin'  => 'Cygwin',
-);
+        'dos'     => 'MS-DOS/PC-DOS',
+        'os2'     => 'OS/2',
+        'MSWin32' => 'Windows',
+        'cygwin'  => 'Cygwin',
+    );
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Env::Dot::Functions - Read environment variables from a .env file, functions
+
+=head1 STATUS
+
+This module is currently being developed so changes in the API are possible,
+though not likely.
+
+
+=head1 SYNOPSIS
+
+    use Env::Dot::Functions qw( get_dotenv_vars interpret_dotenv_filepath_var );
+    # or
+    use Env::Dot::Functions ':all';
+
+=head1 DESCRIPTION
+
+=for stopwords envdot
+
+This package just contains functions for use
+in the main package L<Env::Dot> and in
+the command line tool B<envdot>.
+
+=head1 FUNCTIONS
+
+No functions are automatically exported to the calling namespace.
+
+=head2 get_dotenv_vars(@)
+
+=for stopwords env
+
+Return all variables from the F<.env> file
+as a list of hashes (name/value pairs).
+This list is created in the same order the variables
+are read from the files and may therefore contain
+the same variable several times.
+
+The files, however, are read in reversed order, just like
+paths in variable B<PATH> are used.
+
+Arguments:
+
+=over 8
+
+=item * filepaths, list of dotenv filepaths.
+
+=back
+
+If a file does not exist, we break the execution.
+
+=cut
 
 sub get_dotenv_vars {
     my (@dotenv_filepaths) = @_;
@@ -74,15 +136,29 @@ sub get_dotenv_vars {
     return @vars;
 }
 
+=head2 interpret_dotenv_filepath_var( $filepaths )
+
+Return a list of file paths.
+
+=cut
+
 sub interpret_dotenv_filepath_var {
     my ($var_content) = @_;
-    if ( exists $DOS_PLATFORMS{$OSNAME} ) {
+    if( exists $DOS_PLATFORMS{ $OSNAME } ) {
         return split qr{;}msx, $var_content;
-    }
-    else {
+    } else {
         return split qr{:}msx, $var_content;
     }
 }
+
+=head2 get_envdot_filepaths_var_name
+
+=for stopwords env
+
+Return the name of the environment variable
+which user can use to specify the paths of .env files.
+
+=cut
 
 sub get_envdot_filepaths_var_name {
     return q{ENVDOT_FILEPATHS};
@@ -94,7 +170,7 @@ sub _read_dotenv_file_recursively {
     my ($filepath) = @_;
     $filepath = abs_path($filepath);
     my @rows       = _read_dotenv_file($filepath);
-    my %r          = _interpret_dotenv( $filepath, @rows );
+    my %r          = _interpret_dotenv($filepath, @rows);
     my @these_vars = @{ $r{'vars'} };
     if ( $r{'opts'}->{ OPTION_READ_FROM_PARENT() } ) {
         my $parent_filepath = _get_parent_dotenv_filepath($filepath);
@@ -115,28 +191,27 @@ sub _read_dotenv_file_recursively {
 sub _get_parent_dotenv_filepath {
     my ($current_filepath) = @_;
 
-    my ( $volume, $directories ) = File::Spec->splitpath($current_filepath);
-    my $parent_path = File::Spec->catpath( $volume, $directories );
+    my ($volume, $directories) = File::Spec->splitpath($current_filepath);
+    my $parent_path = File::Spec->catpath($volume, $directories);
     my $parent_filepath;
 
-    while ( defined $parent_path && $parent_path ne File::Spec->rootdir() ) {
-        $parent_path     = abs_path( File::Spec->catdir( $parent_path, File::Spec->updir ) );
-        $parent_filepath = File::Spec->catfile( $parent_path, '.env' );
-        return $parent_filepath if ( defined $parent_path && -f $parent_filepath );
+    while( defined $parent_path && $parent_path ne File::Spec->rootdir() ) {
+        $parent_path     = abs_path(File::Spec->catdir($parent_path, File::Spec->updir));
+        $parent_filepath = File::Spec->catfile($parent_path, '.env' );
+        return $parent_filepath if( defined $parent_path && -f $parent_filepath );
     }
-
     # Explicitly return undef as sub doc decrees.
-    return undef;    ## no critic (Subroutines::ProhibitExplicitReturnUndef)
+    return undef; ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 }
 
 sub _interpret_dotenv {
-    my ( $fp, @rows ) = @_;
+    my ($fp, @rows) = @_;
     my %options = (
         OPTION_READ_FROM_PARENT()          => DEFAULT_OPTION_READ_FROM_PARENT,
         OPTION_READ_ALLOW_MISSING_PARENT() => DEFAULT_OPTION_READ_ALLOW_MISSING_PARENT,
         'file:type'                        => DEFAULT_OPTION_FILE_TYPE,
         'var:allow_interpolate'            => 0,
-    );               # Options related to reading the file. Applied as they are read.
+    );    # Options related to reading the file. Applied as they are read.
     my @vars;
     my $row_num = 1;
     foreach (@rows) {
@@ -216,7 +291,7 @@ sub _interpret_dotenv {
                 }
             }
             elsif ( $options{'file:type'} eq OPTION_FILE_TYPE_PLAIN ) {
-                1;    # document no-operation
+                1;  # document no-operation
             }
             my %opts = ( allow_interpolate => $options{'var:allow_interpolate'}, );
             push @vars, { name => $name, value => $value, opts => \%opts, };
@@ -224,7 +299,7 @@ sub _interpret_dotenv {
         }
         else {
             my $err = "Invalid line: '$_'";
-            croak create_error_msg( $err, $row_num, $fp );
+            croak create_error_msg($err, $row_num, $fp);
         }
         $row_num++;
     }
@@ -233,7 +308,7 @@ sub _interpret_dotenv {
 
 sub _interpret_opts {
     my ($opts_str) = @_;
-    my @opts       = split qr{ [[:space:]]{0,} [,] [[:space:]]{0,} }msx, $opts_str;
+    my @opts = split qr{ [[:space:]]{0,} [,] [[:space:]]{0,} }msx, $opts_str;
     my %opts;
     foreach (@opts) {
         ## no critic (ControlStructures::ProhibitPostfixControls)
@@ -261,110 +336,43 @@ sub _read_dotenv_file {
 # Message structure:
 # <msg>! [line <num>] [file <filepath>]
 
-sub extract_error_msg {
-    my ($msg) = @_;
-    if ( !$msg ) {
-        croak 'Parameter error: missing parameter \'msg\'';
-    }
-    ## no critic (RegularExpressions::ProhibitComplexRegexes)
-    my ( $err, $line, $filepath ) =
-      $msg =~ m/^ ([^!]{1,}) \! (?: \s line \s ([[:digit:]]{1,}) (?: \s file \s \'([^']{1,})\' )? )? .* $/msx;
-    return $err, $line, $filepath;
-}
-
-sub create_error_msg {
-    my ( $err, $line, $filepath ) = @_;
-    if ( !$err ) {
-        croak 'Parameter error: missing parameter \'err\'';
-    }
-    if ( !$line && $filepath ) {
-        croak 'Parameter error: missing parameter \'line\'';
-    }
-    return "${err}!" . ( defined $line ? " line ${line}" : q{} ) . ( defined $filepath ? " file '${filepath}'" : q{} );
-}
-
-1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Env::Dot::Functions - Read environment variables from a .env file
-
-=head1 VERSION
-
-version 0.022
-
-=head1 SYNOPSIS
-
-    use Env::Dot::Functions qw( get_dotenv_vars interpret_dotenv_filepath_var );
-    # or
-    use Env::Dot::Functions ':all';
-
-=head1 DESCRIPTION
-
-=for :stopwords env dotenv filepath filepaths
-
-=head1 STATUS
-
-This module is currently being developed so changes in the API are possible,
-though not likely.
-
-=for stopwords envdot
-
-This package just contains functions for use
-in the main package L<Env::Dot> and in
-the command line tool B<envdot>.
-
-=head1 FUNCTIONS
-
-No functions are automatically exported to the calling namespace.
-
-=head2 get_dotenv_vars(@)
-
-=for stopwords env
-
-Return all variables from the F<.env> file
-as a list of hashes (name/value pairs).
-This list is created in the same order the variables
-are read from the files and may therefore contain
-the same variable several times.
-
-The files, however, are read in reversed order, just like
-paths in variable B<PATH> are used.
-
-Arguments:
-
-=over 8
-
-=item * filepaths, list of dotenv filepaths.
-
-=back
-
-If a file does not exist, we break the execution.
-
-=head2 interpret_dotenv_filepath_var( $filepaths )
-
-Return a list of file paths.
-
-=head2 get_envdot_filepaths_var_name
-
-=for stopwords env
-
-Return the name of the environment variable
-which user can use to specify the paths of .env files.
-
 =head2 extract_error_msg
 
 Extract the elements of error message (exception): err, line and filepath.
 
+=cut
+
+sub extract_error_msg {
+    my ($msg) = @_;
+    if( ! $msg ) {
+        croak 'Parameter error: missing parameter \'msg\'';
+    }
+    ## no critic (RegularExpressions::ProhibitComplexRegexes)
+    my ($err, $line, $filepath) = $msg =~
+        m/^ ([^!]{1,}) \! (?: \s line \s ([[:digit:]]{1,}) (?: \s file \s \'([^']{1,})\' )? )? .* $/msx;
+    return $err, $line, $filepath;
+}
+
 =head2 create_error_msg
 
 create an error message (exception) from the three elements: err, line and filepath.
+
+=cut
+
+sub create_error_msg {
+    my ($err, $line, $filepath) = @_;
+    if( ! $err ) {
+        croak 'Parameter error: missing parameter \'err\'';
+    }
+    if( ! $line && $filepath ) {
+        croak 'Parameter error: missing parameter \'line\'';
+    }
+    return "${err}!"
+        . (defined $line ? " line ${line}" : q{})
+        . (defined $filepath ? " file '${filepath}'" : q{});
+}
+
+=pod
 
 =head1 AUTHOR
 
@@ -378,3 +386,6 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+1;
+__END__

@@ -1,0 +1,13 @@
+Revision history for Alien-nghttp3
+
+0.01  2026-10-02
+    - Initial release.
+    - Use a system libnghttp3 1.18.0 or newer when available.
+    - Include nghttp3 1.18.0 source for the fallback build.
+    - Build the fallback without downloading nghttp3 from the network.
+    - Build only libnghttp3 for the fallback.
+    - Keep the distribution independent of QUIC implementations, TLS,
+      event loops, and HTTP frameworks.
+    - Support Perl 5.20 and newer.
+    - Require Alien::Build 2.84 or newer.
+    - Test the native library with a real XS compile and link test.

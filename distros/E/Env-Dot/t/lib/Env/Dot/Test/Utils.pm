@@ -12,30 +12,29 @@ use File::Spec ();
 use File::Temp ();
 
 our @EXPORT_OK = qw(
-  create_test_file
+    create_test_file
 );
 our %EXPORT_TAGS = (
     'all' => [
         qw(
-          create_test_file
+            create_test_file
         )
     ],
 );
 
-my ( $dir, $dir_path );
-
+my ($dir, $dir_path);
 sub create_test_file {
-    my ( $dirs, $fn, $content, $args ) = @_;
+    my ($dirs, $fn, $content, $args) = @_;
     $dir = File::Temp->newdir(
         TEMPLATE => 'temp-envdot-test-XXXXX',
-        CLEANUP  => $args->{'cleanup'} // 1,
-        DIR      => File::Spec->tmpdir,
+        CLEANUP => $args->{'cleanup'}//1,
+        DIR => File::Spec->tmpdir,
     );
     $dir_path = abs_path( $dir->dirname );
-    make_path( File::Spec->catdir( $dir_path, @{$dirs} ) );
+    make_path( File::Spec->catdir( $dir_path, @{ $dirs } ) );
 
-    my $fh = FileHandle->new( File::Spec->catfile( $dir_path, @{$dirs}, $fn ), 'w' );
-    print {$fh} $content or croak;
+    my $fh = FileHandle->new( File::Spec->catfile( $dir_path, @{ $dirs }, $fn ), 'w' );
+    print { $fh } $content or croak;
     $fh->close;
 
     return $dir, $dir_path;

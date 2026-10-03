@@ -7,7 +7,7 @@
 # it is atomic: "a failed export never leaves a half-written CSV file,
 # and an old file is only replaced by a complete new one."
 #
-#	begin     create a hidden temporary file in the output folder
+#	begin     create a hidden temporary file in the output directory
 #	write     byte order mark (utf8-bom), then mdb-export's data
 #	          (cp1252: spooled, then converted line by line)
 #	commit    close, set permissions, rename over the final name
@@ -226,7 +226,7 @@ subtest 'Phase: failure before the commit -> rollback, old file untouched' => su
 };
 
 subtest 'Phase: the commit itself fails -> rollback' => sub {
-	# The rename cannot happen (a non-empty folder has the final name).
+	# The rename cannot happen (a non-empty directory has the final name).
 	# Whatever was there before must stay exactly as it was.
 	my $dir = tempdir(CLEANUP => 1);
 	my $db = make_database($dir, 'Orders');

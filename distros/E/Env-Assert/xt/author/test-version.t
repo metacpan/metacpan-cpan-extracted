@@ -8,7 +8,7 @@ use Test::Version;
 my @imports = qw( version_all_ok );
 
 my $params = {
-    is_strict      => 0,
+    is_strict      => 1,
     has_version    => 1,
     multiple       => 0,
 

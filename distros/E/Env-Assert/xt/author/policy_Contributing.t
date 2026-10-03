@@ -17,16 +17,18 @@ use Path::Tiny qw( path );
 ok(path('CONTRIBUTING.md')->is_file(), 'Policy file CONTRIBUTING.md exists');
 
 # Read file and remove whitespace from the end.
-my $policy = path('CONTRIBUTING.md')->slurp_utf8 =~ s/[[:space:]]+$//r;
+my $policy = path('CONTRIBUTING.md')->slurp_utf8 =~ s/[[:space:]]+$//rmsx;
 
+my (@policy_lines, @wanted_lines);
+foreach (split qr{\R}msx, $policy) { push @policy_lines, $_; }
 do {
     local $INPUT_RECORD_SEPARATOR = undef;
     my $wanted = <DATA>;
     # Remove whitespace from the end.
-    $wanted =~ s/[[:space:]]+$//;
-
-    is($policy, $wanted, 'Policy file CONTRIBUTING.md is current');
+    $wanted =~ s/[[:space:]]+$//msx;
+    foreach (split qr{\R}msx, $wanted) { push @wanted_lines, $_; }
 };
+    is(\@policy_lines, \@wanted_lines, 'Policy file CONTRIBUTING.md is current');
 
 done_testing;
 
@@ -71,6 +73,20 @@ file, please install Perl::Tidy and use perltidy before submitting patches.
 
 If there is a `tidyall.ini` file, you can also install Code::TidyAll and run
 `tidyall` on a file or `tidyall -a` to tidy all files.
+
+### AI-assisted contributions
+
+This project uses AI-assisted development tools. If you also use AI tools
+when preparing your contribution, please note the following:
+
+- Review, understand, and test all AI-generated code before submitting.
+  Do not submit raw, unreviewed AI output.
+- Be prepared to disclose which AI tools you used if asked.
+- Consider the ethical implications of your tool choices, particularly
+  regarding training data practices.
+
+See [AI_DISCLOSURE.md](AI_DISCLOSURE.md) for the full policy on AI usage
+in this project.
 
 ### Patching documentation
 

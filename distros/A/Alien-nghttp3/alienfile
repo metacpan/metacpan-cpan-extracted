@@ -1,0 +1,116 @@
+use alienfile 2.84;
+
+use Config;
+use File::Spec ();
+use IPC::Cmd qw(can_run);
+
+my $minimum_version = '1.18.0';
+
+sub _cmake_path {
+    my ($path) = @_;
+
+    return $path if !defined $path;
+
+    $path =~ s{\\}{/}g if $^O eq 'MSWin32';
+
+    return $path;
+}
+
+sub _cmake_generator_args {
+    return () if $^O ne 'MSWin32';
+
+    my $cc = lc($Config{cc} || '');
+    return () if $cc !~ /(?:gcc|mingw)/;
+
+    my @args = ('-G', 'MinGW Makefiles');
+    my $make = can_run($Config{make} || '')
+        || can_run('mingw32-make')
+        || can_run('gmake');
+
+    if (defined($make) && length($make)) {
+        push @args,
+            '-DCMAKE_MAKE_PROGRAM=' . _cmake_path($make);
+    }
+
+    return @args;
+}
+
+plugin 'PkgConfig' => (
+    pkg_name        => 'libnghttp3',
+    atleast_version => $minimum_version,
+);
+
+share {
+    requires 'Alien::cmake3' => '0.10';
+
+    start_url 'vendor/nghttp3-1.18.0/';
+    plugin 'Fetch::LocalDir';
+    plugin 'Extract::Directory';
+
+    build sub {
+        my ($build) = @_;
+
+        require Alien::cmake3;
+
+        my $prefix = $build->install_prop->{prefix};
+        my $cmake = Alien::cmake3->exe;
+        my $path_sep = $Config{path_sep} || ':';
+        my $build_dir = File::Spec->catdir(
+            File::Spec->curdir,
+            '.alien-nghttp3-build',
+        );
+
+        local $ENV{PATH} = join(
+            $path_sep,
+            Alien::cmake3->bin_dir,
+            $ENV{PATH} || (),
+        );
+
+        my @generator_args = _cmake_generator_args();
+
+        $build->system(
+            $cmake,
+            '-S', File::Spec->curdir,
+            '-B', $build_dir,
+            @generator_args,
+            "-DCMAKE_INSTALL_PREFIX=$prefix",
+            '-DCMAKE_BUILD_TYPE=Release',
+            '-DCMAKE_POSITION_INDEPENDENT_CODE=ON',
+            '-DENABLE_LIB_ONLY=ON',
+            '-DENABLE_SHARED_LIB=OFF',
+            '-DENABLE_STATIC_LIB=ON',
+            '-DBUILD_TESTING=OFF',
+        );
+
+        $build->system(
+            $cmake,
+            '--build', $build_dir,
+            '--config', 'Release',
+        );
+
+        $build->system(
+            $cmake,
+            '--build', $build_dir,
+            '--target', 'install',
+            '--config', 'Release',
+        );
+
+        return 1;
+    };
+
+    after 'gather' => sub {
+        my ($build) = @_;
+
+        my $compiler_type
+            = $build->meta_prop->{platform}->{compiler_type} || '';
+        my $define = $compiler_type eq 'microsoft'
+            ? '/DNGHTTP3_STATICLIB'
+            : '-DNGHTTP3_STATICLIB';
+
+        for my $key (qw(cflags cflags_static)) {
+            my $value = $build->runtime_prop->{$key} || '';
+            $build->runtime_prop->{$key}
+                = join ' ', grep { length } $value, $define;
+        }
+    };
+};

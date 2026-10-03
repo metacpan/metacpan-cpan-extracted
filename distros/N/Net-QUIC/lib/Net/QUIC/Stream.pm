@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 use Net::QUIC ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub _new {
     my ($class, $connection, $id, $local_initiated, $bidirectional) = @_;
@@ -31,7 +31,13 @@ sub DESTROY {
     my $connection = $self->{connection};
     return if !defined $connection;
 
-    eval { $connection->_stream_release($self->{id}) };
+    my $need_output = eval {
+        $connection->_stream_release($self->{id});
+    };
+
+    eval { $connection->_notify_output }
+        if $need_output;
+
     return;
 }
 
@@ -72,6 +78,25 @@ sub send {
     return;
 }
 
+sub send_some {
+    my ($self, $bytes) = @_;
+
+    croak "send_some requires bytes" if !defined $bytes;
+    croak "cannot send on this unidirectional QUIC stream"
+        if !$self->can_send;
+
+    my $accepted =
+        $self->{connection}->_stream_send_some($self->{id}, $bytes);
+
+    $self->{connection}->_notify_output if $accepted;
+    return $accepted;
+}
+
+sub send_buffered_bytes {
+    my ($self) = @_;
+    return $self->{connection}->_stream_send_buffered_bytes($self->{id});
+}
+
 sub finish {
     my ($self) = @_;
 
@@ -96,6 +121,36 @@ sub next_data {
     return $event->[0];
 }
 
+sub next_data_chunk {
+    my ($self) = @_;
+
+    croak "cannot receive on this unidirectional QUIC stream"
+        if !$self->can_receive;
+
+    my $event = $self->{connection}->_stream_take_data_chunk($self->{id});
+    return if !defined $event;
+
+    return wantarray ? @$event : $event;
+}
+
+sub consume {
+    my ($self, $amount) = @_;
+
+    croak "cannot receive on this unidirectional QUIC stream"
+        if !$self->can_receive;
+    croak "consume requires a non-negative integer byte count"
+        if !defined($amount) || ref($amount) || $amount !~ /\A\d+\z/;
+
+    $self->{connection}->_stream_consume($self->{id}, $amount);
+    $self->{connection}->_notify_output if $amount;
+    return;
+}
+
+sub acked_offset {
+    my ($self) = @_;
+    return $self->{connection}->_stream_acked_offset($self->{id});
+}
+
 sub remote_finished {
     my ($self) = @_;
     return $self->{connection}->_stream_remote_finished($self->{id});
@@ -104,6 +159,11 @@ sub remote_finished {
 sub closed {
     my ($self) = @_;
     return $self->{connection}->_stream_closed($self->{id});
+}
+
+sub early_data {
+    my ($self) = @_;
+    return $self->{connection}->_stream_early_data($self->{id});
 }
 
 sub remote_reset_code {
@@ -116,8 +176,21 @@ sub local_reset_code {
     return $self->{connection}->_stream_local_reset_code($self->{id});
 }
 
+sub remote_stop_sending_code {
+    my ($self) = @_;
+    return $self->{connection}->_stream_remote_stop_sending_code($self->{id});
+}
+
+sub local_stop_sending_code {
+    my ($self) = @_;
+    return $self->{connection}->_stream_local_stop_sending_code($self->{id});
+}
+
 sub reset {
     my ($self, $app_error_code) = @_;
+
+    croak "cannot reset the send side of this QUIC stream"
+        if !$self->can_send;
 
     $app_error_code = 0 if !defined $app_error_code;
     croak "application error code must be a non-negative integer"
@@ -128,42 +201,33 @@ sub reset {
     return;
 }
 
+sub stop_sending {
+    my ($self, $app_error_code) = @_;
+
+    croak "cannot stop the receive side of this QUIC stream"
+        if !$self->can_receive;
+
+    $app_error_code = 0 if !defined $app_error_code;
+    croak "application error code must be a non-negative integer"
+        if $app_error_code !~ /\A\d+\z/;
+
+    $self->{connection}->_stream_stop_sending($self->{id}, $app_error_code);
+    $self->{connection}->_notify_output;
+    return;
+}
+
 1;
 
 __END__
 
 =head1 NAME
 
-Net::QUIC::Stream - one QUIC byte stream
-
-=head1 SYNOPSIS
-
-Send bytes:
-
-    $stream->send("hello");
-    $stream->finish;
-
-Read bytes:
-
-    while (defined(my $bytes = $stream->next_data)) {
-        handle_bytes($bytes);
-    }
-
-Check for a clean peer FIN:
-
-    if ($stream->remote_finished) {
-        ...
-    }
-
-Abort the stream:
-
-    $stream->reset($application_error_code);
+Net::QUIC::Stream - one reliable QUIC byte stream
 
 =head1 DESCRIPTION
 
-Net::QUIC::Stream represents one QUIC byte stream.
-
-A QUIC stream is an ordered sequence of bytes.
+A Stream is one ordered sequence of bytes inside a
+L<Net::QUIC::Connection>.
 
 It is not a sequence of application messages.
 
@@ -173,24 +237,37 @@ One call to:
 
 does not guarantee one matching C<next_data> result on the peer.
 
-Applications that need message boundaries should add their own framing above
-the QUIC stream.
+If the application needs message boundaries, add framing above the Stream.
 
-A Stream does not own a socket. UDP and timer integration normally stays in
-L<Net::QUIC::Driver>.
+=head1 BASIC USE
+
+Send bytes:
+
+    $stream->send("hello");
+    $stream->finish;
+
+Read available bytes:
+
+    while (defined(my $bytes = $stream->next_data)) {
+        handle_bytes($bytes);
+    }
+
+Check whether the peer finished cleanly:
+
+    if ($stream->remote_finished) {
+        ...
+    }
 
 =head1 STREAM DIRECTION
 
-A bidirectional stream allows both endpoints to send.
+A bidirectional Stream allows both endpoints to send.
 
-A unidirectional stream allows only its creator to send application bytes.
+A unidirectional Stream allows only the endpoint that created it to send
+application bytes.
 
 Use:
 
     $stream->can_send
-
-and:
-
     $stream->can_receive
 
 when code needs to handle either kind.
@@ -203,31 +280,29 @@ when code needs to handle either kind.
 
 Returns the QUIC stream ID.
 
+Most applications do not need to interpret the numeric value.
+
 =head2 local_initiated
 
     if ($stream->local_initiated) {
         ...
     }
 
-Returns true when this endpoint opened the stream.
+Returns true when this endpoint opened the Stream.
 
 =head2 bidirectional
 
-    if ($stream->bidirectional) {
-        ...
-    }
+Returns true for a bidirectional Stream.
 
-Returns true for a bidirectional stream and false for a unidirectional stream.
+Returns false for a unidirectional Stream.
 
 =head2 can_send
 
-Returns true when this endpoint is allowed to send application bytes on the
-stream.
+Returns true when this endpoint can send application bytes on the Stream.
 
 =head2 can_receive
 
-Returns true when this endpoint is allowed to receive application bytes on the
-stream.
+Returns true when this endpoint can receive application bytes on the Stream.
 
 =head2 send
 
@@ -237,28 +312,58 @@ Queues bytes for reliable ordered delivery.
 
 The bytes are copied into Net::QUIC-owned memory.
 
-Large sends are stored internally in fixed-size pieces so fully acknowledged
-earlier bytes can be released without keeping the entire original send
-allocation alive.
+When the Stream belongs to a Connection obtained through
+L<Net::QUIC::Driver>, Driver is notified automatically when new transport work
+is needed.
 
-When this Stream belongs to a Connection obtained through Driver, C<send>
-automatically notifies Driver that QUIC may have new output.
+If the Connection has an explicit
+L<Net::QUIC::Connection/send_buffer_limit>, C<send> stays all-or-nothing and
+throws rather than exceeding that limit. Use L</send_some> when partial
+acceptance is wanted.
 
-No extra integration call is required.
+=head2 send_some
+
+    my $accepted = $stream->send_some($bytes);
+
+Advanced bounded transmit interface.
+
+The Connection must first have a
+L<Net::QUIC::Connection/send_buffer_limit> configured.
+
+Returns the number of prefix bytes copied into Net::QUIC-owned transmit
+memory. This can be zero or less than C<length($bytes)> when the configured
+connection-wide buffer is full.
+
+The caller retains ownership only of bytes that were not accepted and may
+release or reuse the accepted input after this method returns.
+
+When C<send_some> accepts fewer bytes than requested, pause the producer.
+L<Net::QUIC::Connection/on_stream_activity> wakes protocol engines when ACK or
+other Stream progress can make more buffer space available.
+
+=head2 send_buffered_bytes
+
+    my $bytes = $stream->send_buffered_bytes;
+
+Returns the number of this Stream's transmit data bytes currently retained by
+Net::QUIC.
+
+It includes data that has been sent but is still retained until peer
+acknowledgement.
 
 =head2 finish
 
     $stream->finish;
 
-Closes the local send side cleanly after all bytes already queued with
-C<send>.
+Finishes this endpoint's send side cleanly after all already queued bytes.
 
-This sends QUIC FIN.
+This is the normal way to say:
+
+    I am done sending.
 
 It does not discard queued data.
 
-On a bidirectional stream, the peer may continue sending bytes back after this
-endpoint calls C<finish>.
+On a bidirectional Stream, the peer can continue sending data back.
 
 =head2 next_data
 
@@ -266,20 +371,77 @@ endpoint calls C<finish>.
         ...
     }
 
-Returns the next received chunk, or undef when no received data is currently
-waiting.
+Returns the next received byte chunk.
+
+Returns undef when no received data is currently waiting.
 
 Always test with C<defined>.
 
-Reading data returns its receive flow-control credit to QUIC. With a Driver
-integration, any protocol output made possible by that credit is serviced
-automatically.
+Reading data also returns receive flow-control credit to QUIC automatically.
+
+Do not mix C<next_data> with L</next_data_chunk> or L</consume> on the same
+Stream.
+
+=head2 next_data_chunk
+
+    my ($bytes, $fin) = $stream->next_data_chunk;
+
+This is an advanced receive interface for protocol engines.
+
+It returns the next received byte chunk without returning receive flow-control
+credit to QUIC.
+
+In list context it returns:
+
+    ($bytes, $fin)
+
+C<$fin> is true when this chunk carries the peer's clean end-of-stream marker.
+
+In scalar context it returns an array reference containing those same two
+values.
+
+Returns undef, or an empty list in list context, when no received data is
+currently waiting.
+
+Each chunk is delivered only once. After processing the bytes, report the
+number actually consumed with L</consume>.
+
+Do not mix C<next_data_chunk> with L</next_data> on the same Stream.
+
+=head2 consume
+
+    $stream->consume($byte_count);
+
+Returns receive flow-control credit for bytes previously delivered by
+L</next_data_chunk>.
+
+The byte count may be smaller than the amount delivered. Additional bytes may
+be consumed later.
+
+A count of zero is valid.
+
+It is an error to consume more bytes than have been delivered and not already
+consumed.
+
+Calling C<consume> selects the explicit receive mode for the Stream, even when
+the byte count is zero. Do not use L</next_data> after selecting explicit
+receive mode.
+
+=head2 acked_offset
+
+    my $offset = $stream->acked_offset;
+
+Returns the number of bytes from the start of this Stream that the peer has
+acknowledged contiguously.
+
+The value starts at zero and never moves backward.
+
+This is an advanced protocol-engine interface. Ordinary applications normally
+do not need acknowledgement offsets.
 
 =head2 remote_finished
 
-Returns true after a clean FIN has been received from the peer.
-
-This means the peer has finished its send side.
+Returns true after the peer cleanly finished its send side.
 
 =head2 reset
 
@@ -289,45 +451,93 @@ or:
 
     $stream->reset($application_error_code);
 
-Aborts the local stream send side with a QUIC application error code.
+Abruptly aborts this endpoint's send side.
 
-The code defaults to zero.
+Queued transmit data that has not completed can be discarded.
+
+On a bidirectional Stream, the receive side remains independent and can still
+receive data from the peer.
+
+The application error code defaults to zero.
+
+For an ordinary clean finish, use L</finish> instead.
+
+=head2 stop_sending
+
+    $stream->stop_sending;
+
+or:
+
+    $stream->stop_sending($application_error_code);
+
+Abruptly stops this endpoint's receive side and asks the peer to stop sending.
+
+Unread buffered receive data is discarded.
+
+On a bidirectional Stream, this endpoint's send side remains independent.
+
+The application error code defaults to zero.
 
 =head2 remote_reset_code
 
     my $code = $stream->remote_reset_code;
 
-Returns the application error code when the peer reset the stream, or undef if
-no peer reset has been received.
+Returns the application error code received when the peer reset its send side.
+
+Returns undef when no peer reset has been received.
 
 =head2 local_reset_code
 
     my $code = $stream->local_reset_code;
 
-Returns the application error code passed to C<reset> on this endpoint, or
-undef if this endpoint has not reset the stream.
+Returns the application error code this endpoint passed to L</reset>.
 
-Keeping local and remote reset codes separate makes the reset direction
-unambiguous.
+Returns undef when this endpoint has not reset its send side.
+
+=head2 remote_stop_sending_code
+
+    my $code = $stream->remote_stop_sending_code;
+
+Returns the application error code received when the peer asked this endpoint
+to stop sending.
+
+Returns undef when no such request has been received.
+
+=head2 local_stop_sending_code
+
+    my $code = $stream->local_stop_sending_code;
+
+Returns the application error code this endpoint passed to
+L</stop_sending>.
+
+Returns undef when this endpoint has not stopped its receive side.
+
+=head2 early_data
+
+    if ($stream->early_data) {
+        ...
+    }
+
+Returns true when this Stream carried 0-RTT early data.
+
+This matters because 0-RTT data can be replayed.
+
+A server can use this flag even after the handshake finishes to keep
+replay-sensitive application handling separate.
 
 =head2 closed
 
-Returns true after ngtcp2 reports that the stream is fully closed.
+Returns true when QUIC has completely closed the Stream.
 
 =head1 OBJECT LIFETIME
 
-A Stream object keeps its L<Net::QUIC::Connection> alive.
+A Stream object keeps its Connection alive.
 
-Closed native stream state remains available while a Stream object still needs
-it. This keeps final status and unread buffered receive data usable after QUIC
-closes the stream.
+Dropping the Perl Stream object does not discard transmit data that QUIC still
+needs to send or finish.
 
-Once the native stream is closed and no public Stream object or pending
-incoming-stream queue entry needs it, Net::QUIC reclaims that state.
-
-Dropping a Stream object before native close does not discard already queued
-transmit data. Net::QUIC keeps the native stream state until QUIC can finish or
-close it.
+Final status and unread buffered receive data remain available while the public
+Stream object still needs them.
 
 =head1 SEE ALSO
 

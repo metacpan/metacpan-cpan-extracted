@@ -1,0 +1,15 @@
+# The stock T_PTROBJ is not used because, before perl 5.12, it does not check
+# that the argument is a reference: a method called on the class name would
+# then dereference a plain string.
+
+TYPEMAP
+Ushuffle::Shuffler	T_SHUFFLER
+
+INPUT
+T_SHUFFLER
+	if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\"))
+	    $var = INT2PTR($type, SvIV((SV *) SvRV($arg)));
+	else
+	    croak(\"$var is not of type ${ntype}\");
+	if ($var == NULL)
+	    croak(\"$var is a ${ntype} that has already been destroyed\")

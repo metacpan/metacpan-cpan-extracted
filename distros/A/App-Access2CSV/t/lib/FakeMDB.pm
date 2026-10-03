@@ -28,13 +28,13 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(install_fake_mdbtools make_database fake_path);
 
 # PATH as it was before any test changed it.  Tests set PATH to stand-in
-# folders; appending the *current* PATH would carry an earlier folder
+# directories; appending the *current* PATH would carry an earlier directory
 # (with all three programs) along, so a program meant to be missing would
 # still be found.
 my $ORIGINAL_PATH = $ENV{PATH} // '';
 
 # fake_path(@programs): a whole PATH value for tests.  On Unix, only the
-# stand-in folder, so real mdbtools cannot interfere.  On Windows the
+# stand-in directory, so real mdbtools cannot interfere.  On Windows the
 # original PATH is kept after it: with PATH replaced entirely, Windows
 # could not start any process at all (not even perl.exe).
 sub fake_path {

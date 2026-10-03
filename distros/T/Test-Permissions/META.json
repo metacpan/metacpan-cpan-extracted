@@ -50,7 +50,7 @@
             "File::Temp" : "0",
             "IPC::System::Simple" : "0",
             "Params::Get" : "0.17",
-            "Params::Validate::Strict" : "0",
+            "Params::Validate::Strict" : "0.40",
             "Readonly" : "0",
             "Return::Set" : "0",
             "Test::More" : "0",
@@ -83,6 +83,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Permissions"
       }
    },
-   "version" : "v0.001.0",
+   "version" : "v0.001.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

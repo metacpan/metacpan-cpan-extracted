@@ -1,0 +1,6 @@
+[
+  { "metadata": { "name": "zeta",  "labels": { "tier": "backend" } } },
+  { "metadata": { "name": "alpha", "labels": { "tier": "frontend" } } },
+  { "metadata": { "name": "loose" } },
+  { "metadata": { "name": "beta",  "labels": { "tier": "backend" } } }
+]

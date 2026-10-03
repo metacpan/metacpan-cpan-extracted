@@ -1,0 +1,66 @@
+Revision history for App-Syslogd
+
+0.002.0	Fri Oct  2 08:49:35 AM EDT 2026
+	First CPAN release.  The logic of the syslogd program
+	(https://github.com/nigelhorne/syslogd) moves into the module
+	App::Syslogd; etc/syslogd is now a thin wrapper around it.
+
+	[ Behaviour ]
+	- The default log file is now /var/log/syslog/syslog.csv (was
+	  /tmp/syslog.log), and its directory must already exist.  On
+	  Debian and Ubuntu /var/log/syslog is a file, so give --file there
+	- Proper CSV via Text::CSV; control characters (including newlines)
+	  are written as \xNN, so each record is one line
+	- A message without a valid PRI (0-191) is recorded as user.notice,
+	  as RFC 3164 4.3.3 requires, rather than as a hex dump
+	- Host names via getnameinfo (honours /etc/hosts), remembered in a
+	  small built-in cache, App::Syslogd::Cache; CHI is no longer needed,
+	  but a CHI object can still be passed as "cache".  --no-resolve
+	  logs addresses instead
+	- IPv6 and --address are supported; datagrams up to 65535 bytes are
+	  accepted without truncation
+	- SIGHUP closes and reopens the log file, for logrotate and
+	  newsyslog; SIGTERM and SIGINT stop cleanly
+	- Settings can also come from configuration files and
+	  App__Syslogd__* environment variables (Object::Configure), and are
+	  validated like arguments
+	- Messages can be translated through Locale::Maketext (English is
+	  shipped)
+	- etc/syslogd exits 0 (stopped cleanly), 1 (could not start, or
+	  failed) or 2 (started wrongly), and prints its status lines at once
+	- Faster: with names looked up, a datagram takes about 27
+	  microseconds instead of 42 (the built-in cache), and about 25%
+	  less again from cheaper constants and no seek before each write
+
+	[ Security ]
+	- The log file is opened with O_NOFOLLOW, O_NONBLOCK and mode 0600.
+	  Symbolic links, hard links, FIFOs and files owned by another user
+	  are refused
+	- An existing log file must be empty or start with the column-names
+	  line; any other file is refused and left untouched, so even as
+	  root a wrong --file cannot append to /etc/passwd
+	- NUL bytes are refused in the address, file and language settings
+	- Control characters in reverse-DNS names are escaped, as they are
+	  in messages
+	- etc/syslogd refuses to run from a web server, and works under
+	  perl -T (the module must then be installed, or given with -I)
+
+	[ Reliability ]
+	- A failed write never leaves half a line in the log, and is
+	  reported instead of being lost
+	- run() starts all or nothing, refuses to be run again from inside
+	  its own loop, and never leaves the object marked as running
+	- A failing DNS cache falls back to the address instead of stopping
+	  the server
+	- new(), open_socket(), reopen_log(), process() and run() no longer
+	  change the caller's $! or $@
+	- Windows: works without O_NOFOLLOW and fchmod (an existing log's
+	  permissions are left alone there)
+
+	[ Documentation and tests ]
+	- The POD is rewritten in plain English, with INSTALLATION, SAMPLE
+	  CONFIGURATION (systemd, FreeBSD rc.d, logrotate, newsyslog,
+	  Monit), SECURITY, LIMITATIONS, a formal specification and a state
+	  diagram
+	- An extensive test suite, including security, taint-mode and
+	  state-machine tests

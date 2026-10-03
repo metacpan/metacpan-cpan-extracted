@@ -1,0 +1,11 @@
+{
+  "kind": "Comb",
+  "metadata": { "name": "nats" },
+  "status": {
+    "phase": "Running",
+    "endpoints": [
+      { "name": "client", "protocol": "tcp", "port": 4222, "cluster": "nats.platform.svc:4222" },
+      { "name": "monitor", "port": 8222 }
+    ]
+  }
+}

@@ -4,10 +4,10 @@ use Module::Build;
 
 my $build = Module::Build->new(
     module_name       => 'Restish::Client',
-    license           => 'apache',
+    license           => 'gpl3',
     dist_author       => 'Tim H <thend20@pair.com>',
     dist_version_from => 'lib/Restish/Client.pm',
-    dist_abstract     => 'A RESTish client...in perl!',
+    dist_abstract     => 'A lightweight client for JSON REST APIs',
 
     configure_requires => {
         'Module::Build' => '0.42',

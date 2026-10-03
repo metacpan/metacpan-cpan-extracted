@@ -9,7 +9,7 @@ use Scalar::Util qw(weaken);
 use Net::QUIC ();
 use Net::QUIC::Endpoint ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub new {
     my ($class, %args) = @_;
@@ -114,10 +114,25 @@ sub start {
 }
 
 sub receive {
-    my ($self, $bytes, $local, $peer) = @_;
+    my ($self, $bytes, $local, $peer, $ecn) = @_;
 
     $self->_require_started('receive');
-    $self->{endpoint}->receive_datagram($bytes, $local, $peer);
+
+    if (defined $ecn) {
+        $self->{endpoint}->receive_datagram(
+            $bytes,
+            $local,
+            $peer,
+            $ecn,
+        );
+    } else {
+        $self->{endpoint}->receive_datagram(
+            $bytes,
+            $local,
+            $peer,
+        );
+    }
+
     $self->_service;
     return;
 }
@@ -220,7 +235,52 @@ __END__
 
 =head1 NAME
 
-Net::QUIC::Driver - simple event-loop integration for Net::QUIC
+Net::QUIC::Driver - connect Net::QUIC to an event loop
+
+=head1 DESCRIPTION
+
+Driver is the recommended integration API.
+
+Net::QUIC needs two things from an event loop:
+
+    UDP I/O
+    one replaceable one-shot timer
+
+Driver turns those two things into a working QUIC transport.
+
+Your application normally does not call a separate QUIC pump. Driver handles
+the routine transport work after UDP reads, timer expirations, writable
+notifications, and application Stream operations.
+
+If you are writing an event-loop adapter, start here.
+
+=head1 QUICK MODEL
+
+The adapter gives Driver two callbacks:
+
+    send
+    set_timeout
+
+The adapter reports four events to Driver:
+
+    start
+    receive
+    timeout
+    writable
+
+In plain language:
+
+    UDP transport is ready
+        -> start
+
+    one UDP packet arrived
+        -> receive
+
+    the requested timer fired
+        -> timeout
+
+    UDP output was blocked and can send again
+        -> writable
 
 =head1 SYNOPSIS
 
@@ -235,11 +295,13 @@ Net::QUIC::Driver - simple event-loop integration for Net::QUIC
         send => sub {
             my ($datagram) = @_;
 
-            return send_udp_datagram(
+            send_one_udp_packet(
                 $datagram->data,
                 $datagram->local,
                 $datagram->peer,
             );
+
+            return 1;
         },
 
         set_timeout => sub {
@@ -255,76 +317,28 @@ Net::QUIC::Driver - simple event-loop integration for Net::QUIC
 
     my $connection = $driver->connection;
 
-    # Once the UDP transport is ready to send:
     $driver->start;
 
-    # From the UDP receive callback:
+From the UDP read callback:
+
     $driver->receive($bytes, $local, $peer);
 
-    # From the one-shot timer callback:
+From the timer callback:
+
     $driver->timeout;
 
-    # When UDP output recovers from backpressure:
+If UDP sending had become blocked and later recovers:
+
     $driver->writable;
-
-=head1 DESCRIPTION
-
-Net::QUIC::Driver is the recommended way to connect Net::QUIC to an event
-loop.
-
-The event loop owns the UDP socket and one replaceable timer. Driver owns the
-QUIC servicing rules around those two things.
-
-L<Net::QUIC::Endpoint> remains the lower-level engine underneath Driver. Driver
-drains Endpoint output, stops when the UDP transport reports backpressure, and
-replaces the event-loop timeout whenever QUIC's next deadline changes.
-
-An adapter normally reports only four lifecycle events:
-
-    start
-    receive
-    timeout
-    writable
-
-C<start> is a one-time readiness notification. It lets an adapter construct the
-Driver before its UDP transport is ready without causing constructor-time I/O.
-
-After startup, the ordinary event-loop inputs are only:
-
-    receive     a UDP datagram arrived
-    timeout     the requested QUIC timeout expired
-    writable    UDP output can accept more packets again
-
-The adapter supplies only two operations in the other direction:
-
-    send          transmit one complete UDP datagram
-    set_timeout   replace or cancel QUIC's one-shot timeout
-
-Application stream operations do not require a separate Driver call. When a
-Connection is obtained through the Driver, Net::QUIC installs a private output
-notification so state-changing application operations can cause pending QUIC
-output and deadline changes to be serviced automatically.
-
-If an adapter can provide UDP receive/send readiness and a one-shot timer, it
-usually has everything Driver needs.
-
-Driver methods return after the corresponding QUIC work has been serviced.
-The surrounding event callback can then inspect application state normally.
-For example, after C<receive> returns a client can check C<ready>, pull peer
-streams with C<next_stream>, and consume their data.
-
-Driver handles the transport bookkeeping; it does not impose an application
-dispatcher.
 
 =head1 DRIVER OR ENDPOINT?
 
-Use Driver for ordinary event-loop integration.
+Use Driver unless you have a specific reason not to.
 
-Use L<Net::QUIC::Endpoint> directly only when the integration deliberately
-wants to own QUIC output draining and timeout maintenance itself.
+L<Net::QUIC::Endpoint> is the lower-level engine underneath Driver. Endpoint
+makes the caller manually drain output and maintain the QUIC timer.
 
-Driver is not a second protocol layer. It is a small piece of integration
-bookkeeping around Endpoint.
+Driver does that bookkeeping for you.
 
 =head1 CONSTRUCTORS
 
@@ -333,41 +347,44 @@ bookkeeping around Endpoint.
     my $driver = Net::QUIC::Driver->client(
         local       => $local,
         peer        => $peer,
-        alpn        => $alpn,
-        server_name => $server_name,
+        alpn        => 'my-protocol',
+        server_name => 'example.com',
         send        => sub { ... },
         set_timeout => sub { ... },
     );
 
-Creates a client L<Net::QUIC::Endpoint> and wraps it in a Driver.
+Creates a client Driver.
 
-C<local> and C<peer> are packed IPv4 or IPv6 socket addresses for this UDP
-socket and the remote server.
+C<local> is the packed local UDP socket address.
 
-C<alpn> identifies the application protocol carried over QUIC. The client and
-server must use a compatible ALPN value.
+C<peer> is the packed server UDP address.
+
+C<alpn> is the application protocol name that client and server agree to use.
 
 C<server_name> is the DNS name or IP address expected in the server
-certificate. It is used for certificate verification and does not have to be
-the same textual value used to obtain C<peer>.
+certificate.
 
-Endpoint options other than C<send> and C<set_timeout> are passed directly to
-L<Net::QUIC::Endpoint/client>.
+Other client options are passed to L<Net::QUIC::Endpoint/client>. This includes
+session resumption, 0-RTT, address-token reuse, QUIC version selection, and
+transport limits.
 
 =head2 server
 
     my $driver = Net::QUIC::Driver->server(
-        alpn             => $alpn,
-        certificate_file => $certificate_file,
-        private_key_file => $private_key_file,
+        alpn             => 'my-protocol',
+        certificate_file => 'server-cert.pem',
+        private_key_file => 'server-key.pem',
         send              => sub { ... },
         set_timeout       => sub { ... },
     );
 
-Creates a server L<Net::QUIC::Endpoint> and wraps it in a Driver.
+Creates a server Driver.
 
-New server Connections obtained through C<next_connection> receive the same
-automatic application-output notification as the client Connection.
+One server Driver can manage many QUIC Connections on one UDP socket.
+
+Pull newly created Connections with L</next_connection>.
+
+Other server options are passed to L<Net::QUIC::Endpoint/server>.
 
 =head2 new
 
@@ -377,8 +394,9 @@ automatic application-output notification as the client Connection.
         set_timeout => sub { ... },
     );
 
-Wraps an existing Endpoint-compatible object. Most adapters can use C<client>
-or C<server> instead.
+Wraps an existing Endpoint-compatible object.
+
+Most code should use C<client> or C<server> instead.
 
 =head1 ADAPTER CALLBACKS
 
@@ -390,30 +408,46 @@ or C<server> instead.
         return 1;
     }
 
-Receives one L<Net::QUIC::Datagram>.
+Receives one complete L<Net::QUIC::Datagram>.
 
-The Datagram contains one complete UDP packet:
+Useful values are:
 
-    $datagram->data     payload bytes
-    $datagram->peer     packed destination socket address
-    $datagram->local    packed local socket address chosen by QUIC
+    $datagram->data
+    $datagram->local
+    $datagram->peer
+    $datagram->ecn
 
-The adapter should send C<data> as one UDP datagram to C<peer>. C<local>
-is the concrete local source address associated with that QUIC path.
+C<data> is one complete UDP payload. Do not split it.
+
+C<peer> is the destination address.
+
+C<local> is the local source address QUIC expects for that packet.
 
 For a socket bound to one concrete local address, the socket normally already
-selects that source address.
+uses the right source address.
 
-For a wildcard-bound socket, the adapter must explicitly preserve the
-Datagram's C<local> source address when transmitting. The mechanism is
-platform-specific; for example, Linux IPv4 can use packet information with
-C<sendmsg>.
+For a wildcard-bound socket or a migrating connection, the adapter may need a
+platform-specific source-address mechanism such as C<sendmsg> packet
+information.
 
-Return true when the adapter can immediately accept another datagram.
+The callback return value controls output flow:
 
-Return false only after accepting this datagram when output has crossed the
-adapter's backpressure threshold. Driver then stops asking Net::QUIC for more
-datagrams until C<writable> is called.
+=over 4
+
+=item * true
+
+The adapter can accept another UDP datagram immediately.
+
+=item * false
+
+This datagram was accepted, but the adapter cannot accept another one yet.
+
+=back
+
+That temporary inability to accept more output is often called
+I<backpressure>.
+
+When output becomes available again, call L</writable>.
 
 =head2 set_timeout
 
@@ -422,14 +456,14 @@ datagrams until C<writable> is called.
         ...
     }
 
-Replace the adapter's current one-shot QUIC timeout.
+Replace the current one-shot QUIC timer.
 
-C<$seconds> is a non-negative number of seconds relative to now. C<undef> means
-QUIC currently needs no timed wakeup and the adapter should cancel its existing
-QUIC timeout.
+C<$seconds> is relative to now and can be fractional.
 
-The value can change after any QUIC state transition. It is not a recurring
-interval.
+C<undef> means cancel the current QUIC timer.
+
+This is not a repeating interval. Driver can request a different value after
+any QUIC state change.
 
 =head1 METHODS
 
@@ -437,10 +471,9 @@ interval.
 
     $driver->start;
 
-Marks the UDP transport ready and performs the initial QUIC service pass.
+Tells Driver that the UDP transport is ready.
 
-For a client this normally sends the Initial packet and requests the first QUIC
-timeout.
+For a client this normally causes the first QUIC packet to be produced.
 
 C<start> is idempotent.
 
@@ -448,84 +481,99 @@ C<start> is idempotent.
 
     $driver->receive($bytes, $local, $peer);
 
-Report one received UDP datagram.
+Reports one received UDP datagram.
 
-C<$local> must be the packed concrete destination address on which this packet
-was received. C<0.0.0.0> and C<::> are wildcard bind addresses and are not
-valid QUIC paths.
+C<$local> is the concrete local address on which the packet arrived.
 
-A socket bound to a wildcard address therefore needs destination-address packet
-information from the operating system. On Linux IPv4 this can be obtained with
-C<IP_PKTINFO> and C<recvmsg>. The equivalent mechanism for other address
-families or operating systems belongs in the UDP adapter.
+C<$peer> is the sender's address.
 
-C<$peer> is the packed address of the remote sender.
+Both are packed IPv4 or IPv6 socket addresses.
 
-Driver gives the packet to the Endpoint, sends any datagrams QUIC produces, and
-updates the requested timeout.
+C<0.0.0.0> and C<::> are wildcard bind addresses and are not valid packet
+paths. A wildcard-bound server therefore needs the operating system's
+destination-address information for each received packet.
+
+An ECN-aware adapter can pass one optional fourth argument:
+
+    $driver->receive($bytes, $local, $peer, $ecn);
+
+where C<$ecn> is the two-bit IP-header value from 0 through 3.
+
+Adapters that do not support ECN can omit it.
+
+Driver processes the packet, sends any resulting output, and updates the timer
+before returning.
 
 =head2 timeout
 
     $driver->timeout;
 
-Report that the one-shot timeout most recently requested through
-C<set_timeout> has fired.
+Reports that the currently requested one-shot QUIC timer fired.
 
-Driver lets QUIC process the expiry, sends any resulting datagrams, and updates
-the next timeout.
+Driver processes the timeout, sends any resulting packets, and requests the
+next timer value.
 
 =head2 writable
 
     $driver->writable;
 
-Report that UDP output has recovered after C<send> returned false.
+Reports that UDP output can accept packets again after C<send> returned false.
 
-Driver resumes sending queued QUIC datagrams and updates the timeout.
+Driver resumes output and updates the timer.
 
 =head2 connection
 
-Returns the client Connection and enables automatic application-output
-notification for it.
+    my $connection = $driver->connection;
 
-A server Driver follows the Endpoint rule and does not provide one singular
-Connection through this method.
+Client only.
+
+Returns the client's L<Net::QUIC::Connection>.
 
 =head2 next_connection
 
-Returns the next new server Connection, or undef when none is waiting.
+    while (my $connection = $driver->next_connection) {
+        ...
+    }
 
-The returned Connection is automatically connected to the Driver's private
-application-output notification.
+Server only.
+
+Returns the next newly created Connection, or undef when none is waiting.
+
+A new server Connection can be returned before its handshake is complete.
+Check:
+
+    $connection->ready
+
+before ordinary application work.
 
 =head2 endpoint
 
-Returns the underlying low-level Endpoint.
+Returns the underlying L<Net::QUIC::Endpoint>.
 
-This escape hatch is intended for integrations that need Endpoint-specific
-functionality. Code that directly drives the Endpoint is responsible for not
-bypassing Driver's integration rules.
+This is an escape hatch for integrations that need Endpoint-specific
+functionality.
 
 =head2 started
 
 Returns true after C<start>.
 
-=head1 LOW-LEVEL ENDPOINT
+=head1 APPLICATION OPERATIONS
 
-Driver does not replace L<Net::QUIC::Endpoint>.
+Connections and Streams obtained through Driver automatically notify it when
+application operations create transport work.
 
-Endpoint remains useful for tests, unusual integrations, and code that
-deliberately wants direct control over:
+For example:
 
-    receive_datagram
-    next_datagram
-    timeout_after
-    handle_timeout
+    $stream->send(...);
+    $stream->finish;
+    $stream->reset(...);
+    $connection->close;
 
-Driver is the simpler recommended API for ordinary event-loop adapters.
+do not require a separate Driver service call.
 
 =head1 EXAMPLES
 
-The distribution includes complete Driver integrations in F<examples/> for:
+Complete Driver integrations are included in F<examples/> for:
 
     Linux::Event
     AnyEvent
@@ -533,9 +581,20 @@ The distribution includes complete Driver integrations in F<examples/> for:
     Mojo::IOLoop
     EV
 
-F<examples/io-select-echo-server.pl> provides a small local QUIC echo server
-that can be used to run the client examples.
+There is also a small IO::Select echo server.
 
 See F<examples/README.md>.
+
+=head1 SEE ALSO
+
+L<Net::QUIC>
+
+L<Net::QUIC::Connection>
+
+L<Net::QUIC::Stream>
+
+L<Net::QUIC::Endpoint>
+
+L<Net::QUIC::Datagram>
 
 =cut

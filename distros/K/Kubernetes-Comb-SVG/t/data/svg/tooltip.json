@@ -1,0 +1,11 @@
+[
+  { "metadata": { "name": "db", "namespace": "lab" } },
+  { "metadata": { "name": "api", "namespace": "lab" },
+    "spec": { "class": "My::Api", "dependsOn": [ "db", "gone" ] },
+    "status": {
+      "phase": "Blocked",
+      "conditions": [ { "type": "Ready", "message": "waiting for db" } ],
+      "endpoints": [ { "name": "http", "port": 8080 }, { "name": "admin" } ],
+      "upstream": { "context": "prod", "via": [ "prod", "edge" ] }
+    } }
+]

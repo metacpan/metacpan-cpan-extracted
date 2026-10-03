@@ -56,6 +56,7 @@ Readonly::Hash my %CONFIG => (
 	fake_bin      => '/fake/bin',
 	huge_length   => 1_000_000,
 	long_name     => 300,
+	max_name_chars => 64,
 	many_tables   => 1000,
 	huge_count    => '99999999999999999999',
 	bad_status    => 4,
@@ -240,7 +241,7 @@ subtest 'new: hostile settings' => sub {
 	throws_ok { $class->new('output_dir') } qr/./, 'odd number of arguments';
 
 	# Boundary values that are valid
-	lives_ok { $class->new(output_dir => '0') } '"0" is a valid folder name';
+	lives_ok { $class->new(output_dir => '0') } '"0" is a valid directory name';
 	lives_ok { $class->new(tables => []) } 'empty table list';
 	lives_ok { $class->new(language => "../../etc\n") } 'hostile language is only a catalog key';
 	is($class->new(output_dir => 'a', output_dir => 'b')->{output_dir}, 'b', 'duplicate key: the last one wins, as in any Perl hash');
@@ -262,16 +263,16 @@ subtest 'run: hostile database arguments' => sub {
 };
 
 subtest 'run: special files posing as databases' => sub {
-	# Devices, FIFOs and folders must be refused before any program runs:
+	# Devices, FIFOs and directories must be refused before any program runs:
 	# a FIFO would otherwise block mdbtools forever
 	my $dir = tempdir(CLEANUP => 1);
 	my $e = $CONFIG{exporter}->new(progress => 0, output_dir => "$dir/out");
 	my $fifo = "$dir/pipe.accdb";
 	mkfifo($fifo, $CONFIG{private_mode}) or die "mkfifo: $!";
 	symlink("$dir/nowhere", "$dir/dangling.accdb") or die "symlink: $!";
-	mkdir "$dir/folder.accdb" or die $!;
+	mkdir "$dir/directory.accdb" or die $!;
 
-	foreach my $path ('/dev/null', '/dev/urandom', $fifo, "$dir/folder.accdb") {
+	foreach my $path ('/dev/null', '/dev/urandom', $fifo, "$dir/directory.accdb") {
 		next unless -e $path;
 		throws_ok { $e->run($path) } qr/\ADatabase \Q$path\E is not a regular file at /, "$path refused";
 	}
@@ -353,22 +354,22 @@ subtest 'security: names starting with "-" are not mdbtools options' => sub {
 	unlike($stderr, qr/option parsing failed/, 'no name was parsed as an option');
 };
 
-subtest 'security: hostile table names cannot escape the output folder' => sub {
+subtest 'security: hostile table names cannot escape the output directory' => sub {
 	# Path traversal through table names: every file must land inside
-	# the output folder, and nothing may be written to its parent
+	# the output directory, and nothing may be written to its parent
 	my $dir = tempdir(CLEANUP => 1);
 	my @evil = ('../../escaped', '..', '.', '/etc/passwd', '..\\..\\win', "sub/../../up");
 	my $db = make_database($dir, @evil);
 
 	my ($status) = export($db, output_dir => "$dir/out/inner");
 	is($status, $CONFIG{exit_ok}, 'exported');
-	is_deeply(dir_entries("$dir/out"), ['inner'], 'nothing written beside the output folder');
+	is_deeply(dir_entries("$dir/out"), ['inner'], 'nothing written beside the output directory');
 	is_deeply(dir_entries($dir), [sort 'out', 'test.accdb'], 'nothing written further up');
 	is(scalar(@{ dir_entries("$dir/out/inner") }), scalar(@evil), 'every table has its own file inside');
 	ok(!grep({ m{/} || /\A\./ } @{ dir_entries("$dir/out/inner") }), 'no slashes, no hidden or dot files');
 };
 
-subtest 'security: symlinks planted in the output folder' => sub {
+subtest 'security: symlinks planted in the output directory' => sub {
 	# Without --overwrite, any existing entry - even a dangling symlink -
 	# must count as "already exists".  With --overwrite, the link itself is
 	# replaced; the file it points to must never be written through.
@@ -396,11 +397,11 @@ subtest 'security: symlinks planted in the output folder' => sub {
 	ok(!-e "$dir/nowhere", 'still not created');
 };
 
-subtest 'filesystem: unusable output folders' => sub {
+subtest 'filesystem: unusable output directories' => sub {
 	my ($dir, $db) = new_database('Orders');
 
 	my (undef, undef, undef, $error) = export($db, output_dir => '/dev/null');
-	like($error, qr/\ACannot create output directory \/dev\/null: /, '/dev/null as a folder');
+	like($error, qr/\ACannot create output directory \/dev\/null: /, '/dev/null as a directory');
 
 	symlink("$dir/loop", "$dir/loop") or die $!;
 	(undef, undef, undef, $error) = export($db, output_dir => "$dir/loop/sub");
@@ -412,20 +413,21 @@ subtest 'filesystem: unusable output folders' => sub {
 		chmod oct(555), "$dir/ro";
 		my ($status, undef, $stderr) = export($db, output_dir => "$dir/ro");
 		chmod oct(755), "$dir/ro";
-		is($status, $CONFIG{exit_failure}, 'read-only folder: the table fails');
+		is($status, $CONFIG{exit_failure}, 'read-only directory: the table fails');
 		like($stderr, qr/FAILED: Orders: .*\Q$OS{EACCES}\E/, 'with the OS reason');
 		is_deeply(dir_entries("$dir/ro"), [], 'no temporary files left');
 	}
 };
 
-subtest 'filesystem: file name longer than the OS allows' => sub {
-	# POD LIMITATIONS: names are not shortened.  An over-long one must
-	# fail just that table, cleanly, and not the whole run
+subtest 'filesystem: table name longer than the OS allows' => sub {
+	# 0.001.0 did not shorten names, so this table failed with "File name
+	# too long".  A hostile or corrupt database can give any length (a
+	# NetBSD tester saw a 500-byte one); it is now shortened and exported
 	my ($dir, $db) = new_database('x' x $CONFIG{long_name}, 'Orders');
 	my ($status, undef, $stderr) = export($db, output_dir => "$dir/out");
-	is($status, $CONFIG{exit_failure}, 'one table fails');
-	like($stderr, qr/\Q$OS{ENAMETOOLONG}\E/, 'OS reason given');
-	is_deeply(dir_entries("$dir/out"), ['Orders.csv'], 'other table exported, no temporary files left');
+	is($status, $CONFIG{exit_ok}, 'both tables exported');
+	unlike($stderr, qr/\Q$OS{ENAMETOOLONG}\E/, 'no "File name too long"');
+	is_deeply(dir_entries("$dir/out"), ['Orders.csv', ('x' x $CONFIG{max_name_chars}) . '.csv'], 'shortened to 64 characters, no temporary files left');
 };
 
 subtest 'filesystem: truncated output from mdb-export' => sub {
@@ -616,7 +618,7 @@ subtest 'app: hostile command lines' => sub {
 	is($status, $CONFIG{exit_ok}, 'a thousand repeated --table options');
 
 	($status, undef, $stderr) = cli('--log', $dir, $db);
-	is($status, $CONFIG{exit_fatal}, 'log file is a folder');
+	is($status, $CONFIG{exit_fatal}, 'log file is a directory');
 	like($stderr, qr/\Aaccess2csv: Cannot open log file \Q$dir\E: \Q$OS{EISDIR}\E\n\z/, 'with the OS reason');
 
 	my @list;
@@ -654,7 +656,7 @@ subtest 'regression: earlier bugs stay fixed' => sub {
 	is($status, $CONFIG{exit_usage}, 'unknown option is a usage error');
 	ok(!-e "$dir/bogus", 'and nothing was exported');
 
-	# 3. --dry-run created the output folder
+	# 3. --dry-run created the output directory
 	export($db, output_dir => "$dir/dry", dry_run => 1);
 	ok(!-e "$dir/dry", 'dry run creates nothing');
 
@@ -663,9 +665,9 @@ subtest 'regression: earlier bugs stay fixed' => sub {
 	capture { $e->run($db) for 1 .. 2 };
 	is(scalar(@{ dir_entries("$dir/again") }), 5, 'same five names on the second run');
 
-	# 5. make_path blamed the parent ("File exists") instead of the folder
+	# 5. make_path blamed the parent ("File exists") instead of the directory
 	(undef, undef, undef, $error) = export($db, output_dir => "$db/sub");
-	unlike($error, qr/File exists/, 'reason is about the folder itself');
+	unlike($error, qr/File exists/, 'reason is about the directory itself');
 
 	# 6. the caller's $@ was cleared by new() and i18n()
 	local $@ = $CONFIG{sentinel};

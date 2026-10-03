@@ -1,0 +1,9 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    { "kind": "Comb", "metadata": { "name": "db", "namespace": "one" }, "status": { "phase": "Running" } },
+    { "kind": "Comb", "metadata": { "name": "api" }, "spec": { "dependsOn": [ "db" ] }, "status": { "phase": "Pending" } },
+    { "kind": "Comb", "metadata": { "name": "db", "namespace": "one" }, "status": { "phase": "Error" } }
+  ]
+}

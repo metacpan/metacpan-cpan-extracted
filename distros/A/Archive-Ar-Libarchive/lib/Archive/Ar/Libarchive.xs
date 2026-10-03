@@ -197,7 +197,7 @@ ar_read_callback(struct archive *archive, void *cd, const void **buffer)
     return status;
 }
 
-static __LA_INT64_T
+static __LA_SSIZE_T
 ar_write_callback(struct archive *archive, void *cd, const void *buffer, size_t length)
 {
   struct ar *ar = (struct ar *)cd;

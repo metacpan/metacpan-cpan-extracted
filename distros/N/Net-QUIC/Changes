@@ -1,5 +1,97 @@
 Revision history for Net-QUIC
 
+0.03  2026-10-02
+    - Add an advanced protocol-engine interface while keeping Net::QUIC
+      transport-neutral and preserving the ordinary send/finish/next_data API.
+    - Add Stream->next_data_chunk and Stream->consume for explicit receive
+      consumption and exact receive flow-control credit.
+    - Prevent ordinary next_data and explicit receive mode from being mixed on
+      the same Stream.
+    - Add Stream->acked_offset as a monotonic contiguous peer-acknowledgement
+      high-water mark.
+    - Add Connection->on_stream_activity and next_active_stream_id with
+      coalesced per-Stream wake-ups for receive, ACK, FIN, reset,
+      STOP_SENDING, close, and newly created peer Streams.
+    - Add Connection->send_buffer_limit and send_buffered_bytes plus
+      Stream->send_some and send_buffered_bytes for hard connection-wide
+      transmit-memory bounds and producer backpressure.
+    - Keep bounded transmit accounting O(1) and release retained bytes on ACK,
+      reset, STOP_SENDING, close, and Stream reclamation.
+    - Restore connection receive credit when a closed explicit-receive Stream
+      is reclaimed with unread or delivered-but-unconsumed bytes.
+    - Add native Stream-ID indexing so protocol-engine lookups remain fast with
+      thousands of live Streams instead of scanning the Stream list.
+    - Add repeatable protocol-engine performance benchmarks. On the release
+      benchmark runner, worst-case lookup at 5000 Streams improved from about
+      24 thousand lookups/sec to about 4.7 million lookups/sec.
+    - Add focused coverage for explicit receive consumption, ACK progress,
+      activity coalescing, bounded transmit buffering, receive-credit
+      reclamation, QUIC v2 protocol-engine behavior, and high Stream counts.
+    - Keep exact FIN acknowledgement intentionally unexposed because ngtcp2
+      does not provide a complete public FIN-ACK signal for every data+FIN
+      case.
+
+0.02  2026-10-02
+    - Simplify the public documentation for readers who are new to QUIC,
+      event-loop integration, and the native implementation.
+    - Add ECN metadata plumbing between UDP adapters and ngtcp2.
+    - Add Datagram->ecn with the outgoing two-bit IP-header ECN codepoint.
+    - Add an optional ECN argument to Endpoint->receive_datagram and
+      Driver->receive while preserving the existing three-argument API.
+    - Pass received ECN markings into ngtcp2 so ACK ECN counts and native
+      per-path ECN validation work correctly.
+    - Preserve ECN markings on normal output and connection-close packets.
+    - Verify that preserved ECN feedback keeps ECT(0) active and stripped ECN
+      feedback makes ngtcp2 fall back to Not-ECT.
+    - Add full client/server QUIC v2 transport support.
+    - Add RFC 9368 Compatible Version Negotiation for v1 and v2.
+    - Add client version => 1|2 and server preferred_version => 1|2.
+    - Add Connection->version and Connection->client_chosen_version.
+    - Bind TLS session tickets and NEW_TOKEN address tokens to the QUIC version
+      that issued them while keeping their public values opaque.
+    - Automatically select and lock the correct version when saved session,
+      address-token, or 0-RTT state is reused.
+    - Verify that ngtcp2 PMTU discovery is active on established paths and
+      restarts after validated path migration.
+    - Add Connection->path_max_udp_payload_size for the discovered current-path
+      UDP payload ceiling.
+    - Add NEW_TOKEN address-validation reuse for future client connections.
+    - Add Connection->address_token and client address_token => $token.
+    - Automatically issue NEW_TOKEN after validated server handshakes and
+      after validated peer path changes that request a fresh token.
+    - Accept valid NEW_TOKEN on the stateless front door without another Retry.
+    - Treat invalid NEW_TOKEN as an unvalidated address and fall back to Retry.
+    - Add validated client connection migration to a new local network path.
+    - Add Connection->path, Connection->path_validation, and
+      Connection->path_validation_status.
+    - Wire ngtcp2 path-validation start/result callbacks for clients and servers.
+    - Add optional server preferred_address advertisement and automatic client
+      validation/selection for a matching address family.
+    - Keep migration event-loop neutral: Datagram continues to carry the exact
+      local and peer addresses selected by QUIC.
+    - Add path tests for successful migration, unreachable-path failure with
+      fallback, preferred-address CID routing, and existing-stream continuity.
+    - Split stream aborts into independent RESET_STREAM and STOP_SENDING operations.
+    - Make Stream->reset abort only the local send side, matching its documented behavior.
+    - Add Stream->stop_sending for aborting the local receive side.
+    - Expose local and peer STOP_SENDING application error codes.
+    - Preserve the opposite direction of bidirectional streams after either directional abort.
+    - Add TLS 1.3 session resumption with opaque client session tickets.
+    - Add Connection->session_ticket and Connection->resumed.
+    - Protect server session tickets with a per-server AES-256-GCM key.
+    - Fall back to a full handshake when a saved ticket is expired, invalid,
+      or belongs to a different server ticket key.
+    - Add explicit QUIC 0-RTT / early-data support on top of session resumption.
+    - Add Connection->early_data_state as one opaque ticket-plus-transport blob.
+    - Add Connection->early_data_status with none/pending/accepted/rejected state.
+    - Add Stream->early_data so servers can retain replay-sensitive origin.
+    - Require explicit client early_data and server accept_early_data opt-in.
+    - Roll rejected 0-RTT streams back through ngtcp2 and invalidate stale
+      Stream objects without disturbing the continuing TLS handshake.
+    - Add conservative single-use 0-RTT ticket replay protection; the first
+      successful ticket use consumes its 0-RTT allowance, while later uses can
+      still resume TLS with early application data rejected.
+
 0.01  2026-09-29
     - First stable CPAN release.
     - Add a real localhost UDP Driver loopback test using kernel UDP sockets.

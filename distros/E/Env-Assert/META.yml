@@ -8,7 +8,10 @@ build_requires:
   FileHandle: '0'
   FindBin: '0'
   Test2::Require: '0'
-  Test2::V0: '0'
+  Test2::Suite: '1.302200'
+  Test2::Tools::GenTemp: '1.302200'
+  Test2::V0: '1.302200'
+  Test2::V1: '1.302200'
   Test::Script: '1.28'
   base: '0'
   lib: '0'
@@ -17,7 +20,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 keywords:
   - environment
   - variable
@@ -45,7 +48,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Env-Assert
   homepage: https://metacpan.org/dist/Env-Assert
   repository: git://github.com/mikkoi/env-assert.git
-version: '0.015'
+version: '0.016'
 x_contributors:
   - 'Ivan Bessarabov <ivan@bessarabov.ru>'
   - 'gregor herrmann <gregoa@debian.org>'

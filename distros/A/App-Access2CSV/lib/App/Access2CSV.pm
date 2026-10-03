@@ -12,9 +12,11 @@ BEGIN { $Sub::Private::config{mode} = 'enforce' }
 use parent 'App::Access2CSV::I18N';
 
 use App::Access2CSV::Exporter;
+use Errno qw(EISDIR);
 use Fcntl qw(O_APPEND O_CREAT O_WRONLY);
 use File::Temp;
 use Getopt::Long qw(GetOptionsFromArray);
+use IO::Handle;
 use Log::Abstraction;
 use Pod::Usage qw(pod2usage);
 use Readonly;
@@ -22,7 +24,7 @@ use Return::Set qw(set_return);
 use Scalar::Util qw(blessed);
 use Sub::Private;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.001.1';
 
 # ---------------------------------------------------------------------
 # Roadmap (from the pre-release gap analysis)
@@ -58,9 +60,6 @@ our $VERSION = '0.001.0';
 # TODO: IPC::Run3 does not reveal the child's process ID, so after SIGTERM
 #	the running mdb-export is not stopped.  Moving to IPC::Run or
 #	IPC::Open3 would allow that, and streaming for --jobs.
-# TODO: The log symlink check and Log::Abstraction's own open are two
-#	steps; closing that gap needs Log::Abstraction to accept an open
-#	filehandle.
 # TODO: I18N.pm also holds helpers unrelated to messages (_printable,
 #	_interrupt_signals, the coverage CHECK block); move them to a small
 #	shared module, and remove the duplicated control-character patterns
@@ -118,7 +117,7 @@ App::Access2CSV - Export the tables of a Microsoft Access database to CSV files
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.001.1
 
 =head1 SYNOPSIS
 
@@ -128,7 +127,7 @@ Version 0.001.0
 	# See what would be written, with row counts, without writing anything
 	access2csv --dry-run --show-counts shop.accdb
 
-	# Export only two tables, into a folder called "exports"
+	# Export only two tables, into a directory called "exports"
 	access2csv --output-dir exports --table Customers --table Orders shop.mdb
 
 	# Make files that Excel opens correctly, replace old files, no log file
@@ -172,9 +171,16 @@ C<Orders.csv>.  Some characters are not allowed in file names on some
 computers (C<< < > : " / \ | ? * >> and control characters).  They are
 changed to C<_>, and so are invisible text-direction controls (such as
 U+202E, "right-to-left override"), which could make a file name look
-like something else.  Spaces and dots at the end, and spaces at the start,
+like something else.  Bytes that are not valid UTF-8 (only a damaged
+database has them, and macOS cannot store them in a file name) are also
+changed to C<_>.  Spaces and dots at the end, and spaces at the start,
 are removed.  A name such as C<CON> or C<NUL> (reserved on Windows) gets a
 C<_> in front.  An empty name becomes C<unnamed>.
+
+Access names are at most 64 characters, so a longer name can only come
+from a damaged database.  It is shortened to 64 characters (and to 240
+bytes, to fit the file name limit of most systems), without cutting a
+character in half.
 
 If two tables would get the same file name, the second one gets C<_2>,
 the third C<_3>, and so on.  Upper and lower case count as the same here,
@@ -185,13 +191,13 @@ because Windows and macOS treat C<Orders.csv> and C<ORDERS.csv> as one file.
 If the database name is C<->, the database is read from standard input
 instead of a file, so it can be piped in.  mdbtools can only read a real
 file, so the data is first copied to a private temporary file (readable
-by you only) in the temporary folder (C<TMPDIR>, or F</tmp>), and that
+by you only) in the temporary directory (C<TMPDIR>, or F</tmp>), and that
 copy is deleted when the program ends - whether it succeeds, fails or is
 interrupted.
 
 C<-> is refused if standard input is a terminal (there is nothing to
-read but the keyboard), and empty input is an error.  To use a file that
-is really called C<->, write F<./->.
+read but the keyboard), and a directory or empty input is an error.  To use
+a file that is really called C<->, write F<./->.
 
 =head2 How files are written
 
@@ -232,8 +238,8 @@ For more control, use L<App::Access2CSV::Exporter> directly.
 
 =item B<--output-dir> I<DIR>
 
-The folder to write the CSV files to.  It is created if it does not exist.
-Default: the current folder.
+The directory to write the CSV files to.  It is created if it does not exist.
+Default: the directory.
 
 =item B<--table> I<NAME>
 
@@ -254,7 +260,7 @@ Also show the Perl file and line number in fatal error messages.
 =item B<--dry-run>
 
 Only print a list of the tables and the file names they would get.
-Nothing is written.  The output folder is not created.
+Nothing is written.  The output directory is not created.
 
 =item B<--show-counts>
 
@@ -275,7 +281,7 @@ Default: C<utf8>.
 =item B<--log> I<FILE>
 
 Add log messages to the end of I<FILE>.  Default: F<access2csv.log> in
-the current folder.  An empty name (C<--log ''>) means no log.  I<FILE>
+the directory.  An empty name (C<--log ''>) means no log.  I<FILE>
 must not be a symbolic link (see L</SECURITY>).
 
 =item B<--no-log>
@@ -292,7 +298,7 @@ Print this whole manual, then stop.
 
 =item B<--version>
 
-Print the version ("access2csv version 0.001.0"), then stop.
+Print the version ("access2csv version 0.001.1"), then stop.
 
 =back
 
@@ -339,7 +345,7 @@ error message gives the line number.  Nothing is silently replaced.
 
 =head2 Names on the command line
 
-Database paths, folder names, log file names and table names are used
+Database paths, directory names, log file names and table names are used
 exactly as the operating system gives them to the program (as bytes).
 On Linux and macOS, where the terminal uses UTF-8, names with accented
 letters, non-Latin scripts and emoji work.  On Windows, the command line
@@ -356,8 +362,8 @@ All messages that the program prints and logs are in plain ASCII English.
 =item C<PATH>
 
 Used to find C<mdb-tables>, C<mdb-export> and C<mdb-count>.  Only
-absolute folders in C<PATH> are used: relative entries such as C<.> are
-ignored, so a program planted in the current folder is never run.
+absolute directories in C<PATH> are used: relative entries such as C<.> are
+ignored, so a program planted in the directory is never run.
 
 =item C<LANGUAGE>, C<LC_ALL>, C<LC_MESSAGES>, C<LANG>
 
@@ -391,14 +397,14 @@ are only ever names.
 
 =item * B<No planted programs.>  Relative C<PATH> entries are ignored
 (see L</ENVIRONMENT>).  The mdbtools programs are started with a cleaned
-environment: C<PATH> holds only absolute folders, and C<IFS>, C<CDPATH>,
+environment: C<PATH> holds only absolute directories, and C<IFS>, C<CDPATH>,
 C<ENV> and C<BASH_ENV> are removed.
 
 =item * B<Taint mode.>  The program runs under Perl's taint mode
 (C<perl -T>).  Every outside value - the database path, table names,
 C<--output-dir>, C<--log> and the program paths found in C<PATH> - is
 checked first and only then marked as safe.  Under C<-T>, Perl also
-refuses to start mdbtools while C<PATH> contains a folder other users can
+refuses to start mdbtools while C<PATH> contains a directory other users can
 write to; the program then stops with "Insecure directory in
 $ENV{PATH}".
 
@@ -408,7 +414,7 @@ by you only) and deleted when the program ends, also after an error or
 an interruption.
 
 =item * B<Safe file names.>  Table names cannot place a file outside the
-output folder, and control characters - including invisible
+output directory, and control characters - including invisible
 text-direction controls and C1 controls - are replaced by C<_>.
 
 =item * B<Safe terminal and log output.>  Table names and mdbtools error
@@ -417,7 +423,7 @@ C<\x1B>.  So a table name cannot retitle or clear your terminal, hide
 text, or forge lines in the log.
 
 =item * B<No writing through symbolic links.>  If the log file is a
-symbolic link (for example one planted in a shared folder such as
+symbolic link (for example one planted in a shared directory such as
 F</tmp>), the program stops instead of writing to the file it points at.
 Existing CSV files that are links are replaced, never written through.
 
@@ -434,8 +440,8 @@ checking them, or import them as text.
 
 =over 4
 
-=item * B<A log file appears in the current folder.>  By default the log is
-F<access2csv.log> in the folder you run the program from.  Use B<--log> to
+=item * B<A log file appears in the directory directory.>  By default the log is
+F<access2csv.log> in the directory you run the program from.  Use B<--log> to
 choose another place, or B<--no-log>.
 
 =item * B<The second run fails.>  If the CSV files already exist, each table
@@ -465,7 +471,7 @@ C<< App::Access2CSV->run(@args) >>, not C<< App::Access2CSV->run(\@args) >>.
 C<-->.  Write F<./-> for a file with that name.
 
 =item * B<Piped databases need temporary space.>  The whole database is
-copied to the temporary folder first; if that folder is small, set
+copied to the temporary directory first; if that directory is small, set
 C<TMPDIR> to one with room.
 
 =back
@@ -494,7 +500,7 @@ C<run> never calls C<exit> itself.
 =over 4
 
 =item * Everything that L<App::Access2CSV::Exporter/run> does: it creates
-the output folder, writes CSV files, and prints progress to standard error.
+the output directory, writes CSV files, and prints progress to standard error.
 
 =item * It prints help or usage text (help to standard output, usage errors
 to standard error).
@@ -582,7 +588,8 @@ Valid and invalid values (tested in F<t/domain.t>):
 	| access2csv: Standard input is empty:| "-" was given, but the pipe   | Check the command that       |
 	|  no database was piped in (exit 3)  | delivered nothing             | produces the database        |
 	| access2csv: Cannot read standard    | Reading the pipe failed; E is | See E                        |
-	|  input: E (exit 3)                  | the reason                    |                              |
+	|  input: E (exit 3)                  | the reason ("Is a directory"  |                              |
+	|                                     | if a directory was given)        |                              |
 	| access2csv: Interrupted by SIGx     | Stopped (Ctrl-C, kill) while  | Run again                    |
 	|  while reading the database from    | waiting for piped input; the  |                              |
 	|  standard input (exit 3)            | partial copy was deleted      |                              |
@@ -737,7 +744,7 @@ sub _make_logger :Private {
 
 	my $file = $opt->{log};
 
-	# Never write through a symbolic link: in a shared folder such as /tmp
+	# Never write through a symbolic link: in a shared directory such as /tmp
 	# anyone could plant "access2csv.log" pointing at a file of yours
 	if(-l $file) {
 		$class->_croak_i18n('log_open_failed', { params => [$file, $class->i18n('log_is_symlink')] });
@@ -747,19 +754,28 @@ sub _make_logger :Private {
 	# it is untainted (for taint mode); a NUL byte cannot name a file at all
 	($file) = $file =~ /\A([^\x00]+)\z/s or $class->_croak_i18n('log_open_failed', { params => [$opt->{log}, $class->i18n('invalid_name')] });
 
-	# Log::Abstraction silently ignores an unwritable file, which would lose
-	# the log without telling anyone, so prove that we can append first.
-	# O_NOFOLLOW (where the OS has it) closes the gap between the -l test
-	# above and the open.  The eval must not overwrite the caller's $@.
+	# Open the log once, here, and give Log::Abstraction the handle, not the
+	# name.  Given a name, it reopens the file for every message (following
+	# any link planted since the -l test above), rejects names containing
+	# "..", "$", "!", ";" and the like only when the first message is
+	# written, and ignores a file it cannot open - losing the log without
+	# telling anyone.  O_NOFOLLOW (where the OS has it) closes the gap
+	# between the -l test and this open.  The eval must not overwrite the
+	# caller's $@.
 	local $@;
+	my $fh;
 	eval {
-		sysopen my $fh, $file, O_WRONLY | O_APPEND | O_CREAT | _no_follow();
-		close $fh;
+		sysopen $fh, $file, O_WRONLY | O_APPEND | O_CREAT | _no_follow();
 		1;
 	} or $class->_croak_i18n('log_open_failed', { params => [$file, _failure_reason($@)] });
 
+	# Write each line as it is logged, as reopening the file did, so a
+	# killed run still leaves its log behind
+	$fh->autoflush(1);
+
+	# The handle is closed when the last reference to the logger goes
 	my $logger = Log::Abstraction->new(
-		logger => $file,
+		logger => { fd => $fh },
 		level  => $opt->{verbose} ? $LOG_LEVEL_VERBOSE : $LOG_LEVEL,
 	);
 
@@ -775,20 +791,29 @@ sub _make_logger :Private {
 #                 a real, seekable file.
 # Entry Criteria: STDIN is not a terminal (checked by _parse_options).
 # Exit Status:    Returns the File::Temp object; the file is deleted when
-#                 the object is destroyed.  Croaks if the input is empty,
-#                 cannot be read, cannot be stored, or the copy is
-#                 interrupted.
+#                 the object is destroyed.  Croaks if the input is a
+#                 directory or empty, cannot be read, cannot be stored, or
+#                 the copy is interrupted.
 # Side Effects:   Reads all of STDIN; writes a file (mode 0600) in the
-#                 temporary folder (TMPDIR).
+#                 temporary directory (TMPDIR).
 sub _read_stdin :Private {
 	my $class = shift;
 
 	# Perl's default action for INT/TERM/... exits at once, which would
-	# leave the copy behind in the temporary folder.  Raise an exception
+	# leave the copy behind in the temporary directory.  Raise an exception
 	# instead, so the File::Temp object is destroyed and deletes the file.
 	my $interrupted;
 	my @ours = @{ $class->_interrupt_signals() };
 	local @SIG{@ours} = (sub { $interrupted = $_[0]; die "\n" }) x @ours;
+
+	# A directory as standard input ("access2csv - < dir").  On Linux reading
+	# it fails with EISDIR, but NetBSD (and FreeBSD before 13) return the
+	# directory's raw entries, which would be copied as if they were a
+	# database.  Refuse it on every system, with the reason Linux gives.
+	# https://www.cpantesters.org/cpan/report/e9759fca-bda8-11f1-b0a1-a794297aa253
+	if(-d STDIN) {
+		$class->_croak_i18n('stdin_read_failed', { params => [do { local $! = EISDIR; "$!" }] });
+	}
 
 	my $copy = File::Temp->new(TEMPLATE => $STDIN_TEMPLATE, TMPDIR => 1, UNLINK => 1);
 	binmode $copy, ':raw';
@@ -908,7 +933,7 @@ use Unix-only facilities (signals, symbolic links, F</proc>, taint-mode
 child processes, terminals) and are skipped on Windows, so those
 features are tested on Unix only.
 
-=item * The default log file is created in the current folder, which may
+=item * The default log file is created in the directory, which may
 surprise users.
 
 =item * Settings come from the command line only.  C<%DEFAULTS> is laid out
@@ -922,7 +947,7 @@ but this is not connected yet.
 Most tests use stand-in mdbtools programs.  F<t/real-mdbtools.t> checks
 the program against the real mdbtools and real Access files: every CSV
 must be byte for byte what C<mdb-export> prints.  No database ships with
-this distribution; point C<ACCESS2CSV_TEST_DATA> at a folder of
+this distribution; point C<ACCESS2CSV_TEST_DATA> at a directory of
 C<.mdb>/C<.accdb> files, for example the mdbtools project's test data:
 
 	git clone --depth 1 https://github.com/mdbtools/mdbtestdata

@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Text::Fold" => 0,
     "Util::H2O::More" => "0.4.2"
   },
-  "VERSION" => "0.1.7",
+  "VERSION" => "0.1.8",
   "test" => {
     "TESTS" => "t/*.t"
   }

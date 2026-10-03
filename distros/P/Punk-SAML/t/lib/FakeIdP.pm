@@ -95,9 +95,19 @@ XML
       . ($o{extra_in_assertion} // '')
       . qq{<saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">$nameid</saml:NameID>}
       . qq{<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">}
-      . qq{<saml:SubjectConfirmationData$irt_attr Recipient="$recip" NotOnOrAfter="$na"/>}
+      # NotOnOrAfter is omitted only on purpose. The profile requires it on
+      # the bearer confirmation and the verifier refuses without it, so
+      # `no_conf_window` exists to test that refusal and nothing else: an
+      # assertion with no window here is one nothing bounds in time.
+      . qq{<saml:SubjectConfirmationData$irt_attr Recipient="$recip"}
+      . ($o{no_conf_window} ? '' : qq{ NotOnOrAfter="$na"}) . qq{/>}
       . qq{</saml:SubjectConfirmation></saml:Subject>}
-      . qq{<saml:Conditions NotBefore="$nb" NotOnOrAfter="$na">}
+      # `no_cond_window` drops the Conditions window too, which together
+      # with no_conf_window builds the document that used to be accepted
+      # for ever: IssueInstant is not a freshness check, so with neither
+      # NotOnOrAfter present nothing in the assertion bounded it at all.
+      . ($o{no_cond_window} ? qq{<saml:Conditions NotBefore="$nb">}
+                            : qq{<saml:Conditions NotBefore="$nb" NotOnOrAfter="$na">})
       . ($o{no_audience} ? '' : qq{<saml:AudienceRestriction><saml:Audience>$aud</saml:Audience></saml:AudienceRestriction>})
       . qq{</saml:Conditions>}
       . ($o{no_authn} ? '' : qq{<saml:AuthnStatement AuthnInstant="} . _t($now) . qq{" SessionIndex="_sess1">}

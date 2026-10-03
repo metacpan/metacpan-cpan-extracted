@@ -103,10 +103,10 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "9.0",
+   "version" : "9.1",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.042002"
+         "version" : "5.042003"
       },
       "plugins" : [
          {
@@ -525,7 +525,7 @@
                   "version_regexp" : "(?^u:^release-(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.55.0",
+                  "git_version" : "2.56.0",
                   "repo_root" : "."
                }
             },
@@ -557,7 +557,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.55.0",
+                  "git_version" : "2.56.0",
                   "repo_root" : "."
                }
             },
@@ -568,7 +568,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.55.0",
+                  "git_version" : "2.56.0",
                   "repo_root" : "."
                }
             },
@@ -607,7 +607,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.55.0",
+                  "git_version" : "2.56.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -624,12 +624,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-9.0",
+                  "tag" : "release-9.1",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.55.0",
+                  "git_version" : "2.56.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -666,7 +666,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.55.0",
+                  "git_version" : "2.56.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -686,7 +686,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.55.0",
+                  "git_version" : "2.56.0",
                   "repo_root" : "."
                }
             },
@@ -767,8 +767,8 @@
       "Takumi Sakamoto <takumi.saka@gmail.com>",
       "Vitaly Shupak <vitaly.shupak@deshaw.com>"
    ],
-   "x_generated_by_perl" : "v5.42.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "BSD-3-Clause"
 }
 

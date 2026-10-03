@@ -9,5 +9,6 @@ t/01-Client.t
 t/02-uri.t
 t/03-params.t
 t/04-request.t
+t/05-thin_request.t
 META.yml
 META.json

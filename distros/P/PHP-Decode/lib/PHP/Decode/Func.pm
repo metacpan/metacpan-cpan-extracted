@@ -18,7 +18,7 @@ use PHP::Decode::Op;
 use PHP::Decode::Parser qw(:all);
 use PHP::Decode::Transformer;
 
-my $VERSION = '0.129';
+our $VERSION = '0.132';
 
 # if block contains just a sequence of strings, then return joined string
 #
@@ -1667,6 +1667,9 @@ sub get_refvar_val {
 	unless ($ctx->{infunction} && !$ctx->{incall}) {
 		if (is_variable($var)) {
 			my $val = $ctx->getvar($var, 1);
+			if (!defined $val && $ctx->is_superglobal($var)) {
+				return; # unknown contents
+			}
 			return (1, $val); # valid
 		} elsif ($var =~ /^(\#elem\d+)$/) {
 			my ($v, $i) = @{$parser->{strmap}{$var}};
@@ -1704,6 +1707,24 @@ sub set_refvar_val {
 		}
 	}
 	return;
+}
+
+# check for php numeric string
+# https://www.php.net/manual/en/language.types.numeric-strings.php
+#
+sub is_numeric_str {
+	my ($s) = @_;
+	return $s =~ /^\s*[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?\s*$/;
+}
+
+# integer steps from $start to $end (might be descending)
+#
+sub range_steps {
+	my ($start, $end, $step) = @_;
+	my $dir = ($start <= $end) ? $step : -$step;
+	my $cnt = int(abs($end - $start) / $step);
+
+	return map { $start + $_ * $dir } (0 .. $cnt);
 }
 
 sub exec_cmd {
@@ -2527,21 +2548,23 @@ sub exec_cmd {
 			my $step = '1';
 			if (scalar @$args == 3) {
 				$step = $parser->get_strval($$args[2]);
-				$step = 0 if ($step eq '');
+				$step = 0 if (!defined $step || ($step eq ''));
 			}
-			if (defined $s1 && defined $s2) {
-				my $arr = $parser->newarr();
+			if (defined $s1 && defined $s2 && ($step =~ /^-?\d+$/) && ($step != 0)) {
 				my @parts;
 
-				# https://perldoc.perl.org/perlop#Range-Operators
-				# If the initial value specified isn't part of a magical increment sequence
-				# (that is, a non-empty string matching /^[a-zA-Z]*[0-9]*\z/), only the
-				# initial value will be returned.
-				if (($s1 =~ /^[a-zA-Z0-9]*$/) && ($s2 =~ /^[a-zA-Z0-9]*$/)) {
-					@parts = ($s1 .. $s2);
+				# php ranges might be descending and use abs(step).
+				# for non-numeric strings only the first char is used.
+				# (float ranges are not supported)
+				#
+				if (($s1 =~ /^-?\d+$/) && ($s2 =~ /^-?\d+$/)) {
+					@parts = range_steps($s1, $s2, abs($step));
+				} elsif (($s1 ne '') && ($s2 ne '') && !is_numeric_str($s1) && !is_numeric_str($s2)) {
+					@parts = map { chr } range_steps(ord($s1), ord($s2), abs($step));
 				} else {
-					@parts = map { chr } (ord($s1) .. ord($s2));
+					return;
 				}
+				my $arr = $parser->newarr();
 
 				foreach my $p (@parts) {
 					$ctx->{log}->($ctx, 'cmd', $cmd, "['$s1', '$s2']: part: $p") if $ctx->{log};
@@ -2763,11 +2786,10 @@ sub exec_cmd {
 							set_refvar_val($ctx, $var, $newarr->{name});
 						}
 					} else {
+						$res = '#null';
 					}
-				} else {
-					$res = '#null';
+					return $res;
 				}
-				return $res;
 			}
 		}
 	} elsif ($cmd eq 'each') {
@@ -3668,7 +3690,7 @@ Execute a php built-in function.
 Requires the PHP::Decode::Parser, PHP::Decode::Transformer and PHP::Decode::Array Modules.
 
 Some other Modules are required to implement the php functions:
-List::Util, Compress::Zlib, Digest::MD5, Digest::SHA1, HTML::Entities, URI::Escape, File::Basename.
+List::Util, Compress::Zlib, Digest::MD5, Digest::SHA, HTML::Entities, URI::Escape, File::Basename.
 
 =head1 AUTHORS
 

@@ -1,0 +1,432 @@
+=encoding utf-8
+
+=head1 Name
+
+Deflate::Faster - High-speed DEFLATE, zlib, and gzip compression and decompression using libdeflate
+
+=head1 Synopsis
+
+    # High-performance drop-in replacement for Gzip::Faster
+    use Deflate::Faster qw(gzip gunzip);
+
+    my $compressed   = gzip($data);
+    my $decompressed = gunzip($compressed);
+
+    # Optional compression level (0 = uncompressed, 1 = fastest, 6 = default, 12 = maximum)
+    my $fast_gz = gzip($data, 1);
+
+    # Raw DEFLATE and zlib formats
+    use Deflate::Faster qw(deflate inflate deflate_raw inflate_raw);
+
+    my $zlib_stream = deflate($data);
+    my $original    = inflate($zlib_stream);
+
+    my $raw_stream  = deflate_raw($data);
+    my $unraw       = inflate_raw($raw_stream);
+
+    # File operations
+    use Deflate::Faster qw(gzip_file gunzip_file gzip_to_file gunzip_to_file);
+
+    gzip_to_file($data, 'output.gz');
+    my $content = gunzip_file('output.gz');
+
+    # Object-oriented interface with metadata and safety limits
+    my $df = Deflate::Faster->new();
+    $df->level(1);
+    $df->copy_perl_flags(1);     # Preserve Perl UTF-8 flag
+    $df->max_size(10 * 1024*1024); # Guard against decompression bombs
+    my $out = $df->zip($data);
+    my $in  = $df->unzip($out);
+
+=head1 Description
+
+C<Deflate::Faster> provides ultra-fast in-memory and file compression and
+decompression for the B<DEFLATE>, B<zlib>, and B<gzip> formats. It is designed
+as a high-performance alternative and drop-in upgrade for L<Gzip::Faster>.
+
+Under the hood, C<Deflate::Faster> is powered by B<libdeflate> (by Eric Biggers),
+a whole-buffer DEFLATE engine designed for high throughput. libdeflate utilizes
+modern CPU SIMD instructions: (V)PCLMULQDQ for hardware-accelerated CRC-32, AVX2
+and AVX-VNNI for Adler-32, and an optimized scalar core with BMI2 instructions on
+x86_64, as well as ARM NEON and PMULL on AArch64.
+
+Key features:
+
+=over 4
+
+=item * B<High Throughput>: Typically 1.5x to 4x faster than standard zlib and C<Gzip::Faster> across a wide variety of payloads.
+
+=item * B<Thread-local Engine Caching>: Compressor and decompressor C contexts are cached in thread-local storage (TLS), eliminating per-call allocator overhead and heap churn while remaining fully thread-safe.
+
+=item * B<Direct Buffer Sizing>: Compresses and decompresses directly into Perl scalar buffers, automatically shrinking output buffers to eliminate excess heap memory retention.
+
+=item * B<Drop-in API Compatibility>: Provides drop-in compatible functions and methods matching L<Gzip::Faster>.
+
+=item * B<Full Multi-member Gzip Support>: Transparently decompresses concatenated gzip streams (such as BGZF files or concatenated logs) while strictly rejecting corrupted trailers and trailing garbage.
+
+=item * B<Extended Compression Levels>: Supports levels C<0> (uncompressed/stored) through C<12> (maximum compression), with level C<6> as default.
+
+=back
+
+=head1 Functions
+
+=head2 gzip
+
+    my $zipped = gzip($plain, [$level]);
+
+Compresses C<$plain> data into the standard gzip format (RFC 1952). An optional
+C<$level> between 0 and 12 may be supplied (defaults to 6). C<$level = -1> or C<undef>
+selects the default level.
+
+Returns C<undef> with a warning if C<$plain> is undefined or empty.
+
+=head2 gunzip
+
+    my $plain = gunzip($zipped);
+
+Decompresses C<$zipped> gzip data into the original plain text or binary scalar.
+Transparently decompresses multi-member gzip streams (concatenated gzip members).
+Also auto-detects and decompresses zlib streams (RFC 1950) if passed.
+
+Returns C<undef> with a warning if C<$zipped> is undefined or empty. Croaks if the
+input is corrupt, truncated, or followed by trailing garbage.
+
+=head2 deflate
+
+    my $deflated = deflate($plain, [$level]);
+
+Compresses C<$plain> into the zlib container format (RFC 1950, with zlib header
+and Adler-32 trailer).
+
+=head2 inflate
+
+    my $plain = inflate($deflated);
+
+Decompresses C<$deflated> zlib stream. Croaks if input is invalid or contains trailing bytes.
+
+=head2 deflate_raw
+
+    my $raw = deflate_raw($plain, [$level]);
+
+Compresses C<$plain> into raw DEFLATE format (RFC 1951, without container headers
+or checksum trailers).
+
+=head2 inflate_raw
+
+    my $plain = inflate_raw($raw);
+
+Decompresses raw DEFLATE data. Croaks if input is invalid or contains trailing bytes.
+
+=head2 gzip_file
+
+    my $zipped = gzip_file($file, %options);
+
+Reads C<$file> and returns its gzip-compressed content. Supported options:
+
+=over 4
+
+=item * C<level>: Compression level (0..12).
+
+=item * C<file_name>: Custom filename recorded in the gzip header (defaults to the path of C<$file>).
+
+=item * C<mod_time>: Custom modification timestamp recorded in the gzip header (defaults to the file's C<mtime>).
+
+=item * C<copy_perl_flags>: Preserves Perl's internal UTF-8 flag.
+
+=back
+
+=head2 gunzip_file
+
+    my $plain = gunzip_file($file, %options);
+
+Reads and decompresses gzip file C<$file>. Supported options:
+
+=over 4
+
+=item * C<max_size>: Maximum allowed uncompressed size in bytes.
+
+=item * C<copy_perl_flags>: Restores Perl's UTF-8 flag if present in the header and the data is valid UTF-8.
+
+=item * C<file_name>: Scalar reference (e.g. C<< file_name => \$name >>) to receive the filename from the header.
+
+=item * C<mod_time>: Scalar reference (e.g. C<< mod_time => \$mtime >>) to receive the modification timestamp.
+
+=back
+
+=head2 gzip_to_file
+
+    gzip_to_file($plain, $file, %options);
+
+Compresses C<$plain> and writes the result directly to C<$file> using unbuffered system I/O.
+Accepts the same options as L</gzip_file>.
+
+=head2 gunzip_to_file
+
+    gunzip_to_file($zipped, $file, %options);
+
+Decompresses C<$zipped> and writes the plain data directly to C<$file>. Accepts C<max_size>.
+Always writes raw binary bytes to the destination file.
+
+=head1 Methods (Object-Oriented)
+
+=head2 new
+
+    my $df = Deflate::Faster->new();
+
+Creates a new compression/decompression object. Subclasses correctly inherit and receive objects
+blessed into their respective class.
+
+=head2 zip
+
+    my $zipped = $df->zip($plain);
+
+Compresses data using the object's configured parameters. Note that if a C<file_name> was set
+on the object, it is written to the header and then cleared from the object, matching L<Gzip::Faster>.
+
+=head2 unzip
+
+    my $plain = $df->unzip($zipped);
+
+Decompresses data using the object's configured parameters. Clears any previous C<file_name> and
+C<mod_time> before decompression and populates them if present in the decompressed stream.
+
+=head2 level
+
+    $df->level($level);
+
+Sets compression level (0..12, default 6). Values C<-1> or C<undef> reset to the default level.
+Out-of-range values warn and are clamped.
+
+=head2 raw
+
+    $df->raw(1);
+
+Enables (1) or disables (0) raw DEFLATE format (RFC 1951).
+
+=head2 gzip_format
+
+    $df->gzip_format(1);
+
+Enables (1) or disables (0) gzip format (RFC 1952).
+
+=head2 max_size
+
+    $df->max_size(1024 * 1024);
+
+Sets the maximum allowed decompression size in bytes to prevent decompression bomb attacks.
+An undefined value (C<undef>), zero (C<0>), negative integers, or values below 1 (such as fractional
+values like C<0.5>) indicate unlimited decompression (the default). Strings with numeric prefixes
+and suffixes (such as C<"10MB"> or C<"1_000">) undergo standard Perl integer conversion, limiting to
+their integer prefix (e.g. 10 or 1 byte) with a warning under C<use warnings>. Strings with no numeric
+prefix (such as C<"none"> or C<"abc">) evaluate to C<0> and select unlimited decompression (also with
+a warning). If decompression output exceeds the configured limit, decompression croaks without
+allocating excess memory.
+
+On gzip streams with a plausible uncompressed size (ISIZE) exceeding the initial 64 MB allocation buffer,
+the buffer expands exponentially up to eight times (8x) the data already verified and decompressed
+in earlier passes. For complete protection against excessive memory consumption or decompression
+bombs, configure an explicit C<max_size>.
+
+=head2 file_name
+
+    $df->file_name("archive.tar");
+    my $name = $df->file_name();
+
+Sets or gets the filename field in the gzip header. Returns an independent scalar copy.
+Embedded NUL bytes are safely truncated at the first NUL.
+
+=head2 mod_time
+
+    $df->mod_time(time());
+    my $mtime = $df->mod_time();
+
+Sets or gets the modification timestamp in the gzip header. Returns an independent scalar copy.
+
+=head2 copy_perl_flags
+
+    $df->copy_perl_flags(1);
+
+When enabled (1), C<zip> records Perl's internal UTF-8 flag in an extra header field (C<GF\1\0>).
+Upon decompression, C<unzip> inspects this field and, if valid UTF-8, restores the UTF-8 flag on the
+resulting string.
+
+=head1 Differences from Gzip::Faster
+
+While C<Deflate::Faster> provides drop-in API compatibility with L<Gzip::Faster>, there are several
+intentional improvements and behavioral differences:
+
+=over 4
+
+=item * B<Multi-member Gzip Streams>: C<Deflate::Faster> automatically decompresses multi-member gzip files (such as concatenated C<.gz> files or BGZF format). L<Gzip::Faster> croaks with "Zlib did not finish processing the string".
+
+=item * B<Trailing Garbage and Padding>: C<Deflate::Faster> strictly rejects invalid trailing bytes (including trailing NUL padding or garbage) following a valid stream, croaking with an error.
+
+=item * B<Compression Level Defaults>: C<level(undef)> and C<level(-1)> select the default level (level 6). Out-of-range negative levels clamp to the default with a warning.
+
+=item * B<Metadata Getters and State>: Calling C<< $df->file_name(undef) >> or C<< $df->mod_time(undef) >> acts as a getter returning C<undef> without overwriting previously configured metadata.
+
+=item * B<OS Header Field>: In custom gzip headers, C<Deflate::Faster> writes OS byte C<0xff> (unknown/unspecified OS per RFC 1952), whereas L<Gzip::Faster> writes C<0x03> (Unix) or C<0x00>.
+
+=item * B<Error Messages>: Exception strings from C<Deflate::Faster> use consistent, clean diagnostics (such as "Data input to inflate is not in libz format") rather than zlib numerical error codes.
+
+=item * B<Subclassing>: Calling C<< Subclass->new >> returns an object blessed into C<Subclass>, whereas L<Gzip::Faster> hardcoded blessing into C<Gzip::Faster>.
+
+=item * B<Extended Compression Levels>: Supports levels C<0> through C<12>, whereas L<Gzip::Faster> supports C<0> through C<9>.
+
+=back
+
+=head1 Diagnostics
+
+=over 4
+
+=item C<Attempt to compress empty string>
+
+(W) The input passed to C<gzip>, C<deflate>, or C<deflate_raw> was defined but empty (0 bytes). C<undef> is returned.
+
+=item C<Attempt to uncompress empty string>
+
+(W) The input passed to C<gunzip>, C<inflate>, or C<inflate_raw> was defined but empty. C<undef> is returned.
+
+=item C<Empty input>
+
+(W) The input scalar passed to compression or decompression was undefined (C<undef>). C<undef> is returned.
+
+=item C<Data input to inflate is not in libz format>
+
+(F) The input data was not a valid gzip, zlib, or raw DEFLATE stream, or was truncated, or contained invalid trailing garbage.
+
+=item C<Uncompressed data exceeds max_size of %d bytes>
+
+(F) Decompressed output exceeded the limit set by L</max_size>.
+
+=item C<Cannot set compression level to less than 0>
+
+(W) The requested compression level was negative (other than -1) and was clamped to 0.
+
+=item C<Cannot set compression level to more than 12>
+
+(W) The requested compression level exceeded 12 and was clamped to 12.
+
+=back
+
+=head1 Benchmarks
+
+Comparative benchmark against L<Gzip::Faster> on Linux x86_64:
+
+    Payload: Small string (72 bytes, alternating 8 diverse payloads)
+      Compression:
+        Gzip::Faster:             31,355 ops/s
+        Deflate::Faster (lvl 6): 180,551 ops/s   (+476% / 5.8x faster)
+        Deflate::Faster (lvl 1): 224,438 ops/s   (+616% / 7.2x faster)
+      Decompression:
+        Deflate::Faster:       1,410,301 ops/s
+        Gzip::Faster:          1,458,101 ops/s   (comparable throughput on tiny payloads)
+      Roundtrip:
+        Gzip::Faster:             28,395 ops/s
+        Deflate::Faster (lvl 6): 158,553 ops/s   (+458% / 5.6x faster)
+
+    Payload: Medium text (2 KB, alternating 8 diverse payloads)
+      Compression:
+        Gzip::Faster:             18,793 ops/s
+        Deflate::Faster (lvl 6):  67,995 ops/s   (+262% / 3.6x faster)
+        Deflate::Faster (lvl 1): 120,849 ops/s   (+543% / 6.4x faster)
+      Decompression:
+        Gzip::Faster:            239,253 ops/s
+        Deflate::Faster:         311,229 ops/s   (+30%  / 1.3x faster)
+      Roundtrip:
+        Gzip::Faster:             16,286 ops/s
+        Deflate::Faster (lvl 6):  52,813 ops/s   (+224% / 3.2x faster)
+
+    Payload: Large text (100 KB, alternating 8 diverse payloads)
+      Compression:
+        Gzip::Faster:              1,203 ops/s
+        Deflate::Faster (lvl 6):   1,575 ops/s   (+31%  / 1.3x faster)
+        Deflate::Faster (lvl 1):   4,931 ops/s   (+310% / 4.1x faster)
+      Decompression:
+        Gzip::Faster:              6,998 ops/s
+        Deflate::Faster:          23,530 ops/s   (+236% / 3.4x faster)
+      Roundtrip:
+        Gzip::Faster:              1,022 ops/s
+        Deflate::Faster (lvl 6):   1,500 ops/s   (+47%  / 1.5x faster)
+
+    Payload: Huge text (1 MB, alternating 8 diverse payloads)
+      Compression:
+        Gzip::Faster:                117 ops/s
+        Deflate::Faster (lvl 6):     160 ops/s   (+37%  / 1.4x faster)
+        Deflate::Faster (lvl 1):     507 ops/s   (+335% / 4.4x faster)
+      Decompression:
+        Gzip::Faster:                774 ops/s
+        Deflate::Faster:           2,595 ops/s   (+235% / 3.4x faster)
+      Roundtrip:
+        Gzip::Faster:                101 ops/s
+        Deflate::Faster (lvl 6):     150 ops/s   (+49%  / 1.5x faster)
+
+To avoid synthetic microbenchmark pitfalls (such as CPU L1 cache pinning and branch predictor
+over-training from looping over the exact same static buffer), the benchmarks cycle across eight diverse,
+realistic payloads per size tier (JSON API responses, HTML DOM trees, C/XS source code, HTTP access logs,
+English prose, SQL database transactions, cluster configuration, and CSV records).
+
+C<Deflate::Faster> demonstrates substantial compression throughput gains across all payload sizes
+(up to 7.2x faster at level 1 and up to 5.8x faster at level 6). Decompression is 1.3x to 3.4x faster
+on medium, large, and huge payloads, with roundtrip throughput up to 5.6x faster.
+
+=head1 Comparison with Gzip::Libdeflate
+
+Both C<Deflate::Faster> and L<Gzip::Libdeflate> are Perl wrappers around C<libdeflate>.
+However, their design goals and feature sets differ:
+
+=over 4
+
+=item * B<Drop-in compatibility>: C<Deflate::Faster> provides familiar procedural and OO interfaces matching L<Gzip::Faster>. L<Gzip::Libdeflate> has no procedural exports and uses an incompatible OO-only API.
+
+=item * B<Thread-local Engine Caching>: Thanks to thread-local compressor and decompressor caching with POSIX thread destructors, C<Deflate::Faster>'s procedural C<gzip> / C<gunzip> avoid object creation and method dispatch while remaining leak-free across thread lifecycles. On small payloads, procedural calls are up to 9x faster than per-call C<< Gzip::Libdeflate->new(...) >> object creation.
+
+=item * B<Dynamic buffer sizing for all formats>: C<Deflate::Faster> dynamically unpacks gzip, zlib, and raw DEFLATE streams without requiring the caller to know the uncompressed size. L<Gzip::Libdeflate> requires the caller to specify the exact uncompressed C<size> in advance when decompressing zlib or raw DEFLATE data.
+
+=item * B<Perl UTF-8 and metadata support>: C<Deflate::Faster> supports UTF-8 flag preservation, safety limits (C<max_size> to guard against decompression bombs), and header metadata (C<file_name>, C<mod_time>).
+
+=back
+
+=head1 Thread safety
+
+C<Deflate::Faster> caches compressor and decompressor contexts in thread-local storage (C<__thread> /
+C<_Thread_local>) paired with POSIX thread key destructors, ensuring that per-thread engine contexts
+are cleanly released upon thread termination without leaking memory.
+
+C<Deflate::Faster> implements C<CLONE_SKIP>, ensuring that objects existing in a parent thread are
+safely isolated and not cloned into child threads upon thread creation.
+
+=head1 Exports
+
+By default, exports C<gzip>, C<gunzip>, C<gzip_file>, C<gunzip_file>, and C<gzip_to_file>.
+
+Exportable on demand: C<deflate>, C<inflate>, C<deflate_raw>, C<inflate_raw>, C<gunzip_to_file>.
+
+Export tag C<:all> exports everything.
+
+=head1 See also
+
+=over 4
+
+=item * L<Gzip::Faster>
+
+=item * L<Gzip::Libdeflate>
+
+=item * L<Compress::Raw::Zlib>
+
+=item * L<libdeflate|https://github.com/ebiggers/libdeflate>
+
+=back
+
+=head1 Author
+
+vividsnow
+
+=head1 License
+
+This software is copyright (c) 2026 by vividsnow.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

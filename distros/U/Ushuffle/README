@@ -1,0 +1,56 @@
+Ushuffle version 1.00
+=====================
+
+A Perl interface to uShuffle, a library for shuffling sequences while
+preserving their k-let counts (Jiang, Anderson, Gillespie and Mayne, BMC
+Bioinformatics 9:192, 2008). Such shuffles are the usual null model when
+assessing the significance of a feature of a biological sequence.
+
+    use Ushuffle qw(shuffle set_seed);
+
+    # one shuffle that keeps all dinucleotide counts of the input
+    my $shuffled = shuffle('ACACGUAGAUGGGGA', 2);
+
+    # many shuffles of the same sequence
+    my $shuffler = Ushuffle::Shuffler->new('ACACGUAGAUGGGGA', 2);
+    print $shuffler->shuffle, "\n" for 1 .. 100;
+
+    # reproducible output
+    set_seed(42);
+
+After installation, "perldoc Ushuffle" and "perldoc Ushuffle::Shuffler"
+show the full documentation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Perl 5.10.1 or later, a C compiler, and a C library providing random() and
+srandom(). No Perl modules outside the core are needed.
+
+BUNDLED LIBRARY
+
+ushufflelib/ contains ushuffle.c and ushuffle.h, unmodified, from the
+master branch of https://github.com/s-will/ushuffle at commit 2c4b8f3
+(1 October 2026): release 1.2.2 plus the fix for an integer overflow in the
+hash function that was merged there as pull request #1.
+
+SUPPORT
+
+Please report bugs through the issue tracker at
+https://github.com/mtw/ushuffle-perl/issues
+
+COPYRIGHT AND LICENCE
+
+The Perl interface is Copyright (c) 2026 Michael T. Wolfinger.
+The uShuffle library is Copyright (c) 2007 Minghui Jiang, James Anderson,
+Joel Gillespie, and Martin Mayne.
+
+Both are distributed under the BSD licence in the file LICENSE.

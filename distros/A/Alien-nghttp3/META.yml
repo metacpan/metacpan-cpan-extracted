@@ -1,0 +1,46 @@
+---
+abstract: 'Find or build libnghttp3'
+author:
+  - 'Joshua S. Day <haxmeister@hotmail.com>'
+build_requires:
+  Alien::Build::MM: '2.84'
+  Alien::cmake3: '0.10'
+  Test2::V0: '0'
+  Test::Alien: '2.84'
+configure_requires:
+  Alien::Build: '1.40'
+  Alien::Build::MM: '2.84'
+  Alien::Build::Plugin::Fetch::LocalDir: '0.72'
+  Alien::Build::Plugin::PkgConfig::Negotiate: '1.53'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-nghttp3
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Alien::nghttp3:
+    file: lib/Alien/nghttp3.pm
+    version: '0.01'
+requires:
+  Alien::Base: '2.84'
+  Alien::Build: '0.25'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/haxmeister/perl-Alien-nghttp3/issues
+  homepage: https://github.com/haxmeister/perl-Alien-nghttp3
+  repository: https://github.com/haxmeister/perl-Alien-nghttp3.git
+version: '0.01'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.84'
+  requires:
+    share:
+      Alien::cmake3: '0.10'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

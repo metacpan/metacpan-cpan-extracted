@@ -1,0 +1,518 @@
+{
+  "apiVersion": "v1",
+  "items": [
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "platform"
+        },
+        "name": "cache",
+        "namespace": "platform"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Cache"
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "redis",
+            "port": 6379,
+            "protocol": "tcp"
+          }
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "platform"
+        },
+        "name": "db",
+        "namespace": "platform"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Postgres",
+        "upstream": "shared"
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "postgres",
+            "port": 5432,
+            "protocol": "tcp"
+          }
+        ],
+        "phase": "Running",
+        "upstream": {
+          "class": "Kubernetes::Comb::Upstream::K8s",
+          "context": "shared",
+          "phase": "Running",
+          "reachable": true,
+          "via": [
+            "shared"
+          ]
+        }
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "platform"
+        },
+        "name": "nats",
+        "namespace": "platform"
+      },
+      "spec": {
+        "class": "MyApp::Comb::NATS"
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "client",
+            "port": 4222,
+            "protocol": "tcp"
+          },
+          {
+            "name": "monitor",
+            "port": 8222,
+            "protocol": "http"
+          }
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "platform"
+        },
+        "name": "search",
+        "namespace": "platform"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Search"
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "http",
+            "port": 9200,
+            "protocol": "http"
+          }
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "platform"
+        },
+        "name": "storage",
+        "namespace": "platform"
+      },
+      "spec": {
+        "class": "MyApp::Comb::ObjectStore"
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "s3",
+            "port": 9000,
+            "protocol": "http"
+          },
+          {
+            "name": "console",
+            "port": 9001,
+            "protocol": "http"
+          }
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "platform"
+        },
+        "name": "vault",
+        "namespace": "platform"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Vault"
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "api",
+            "port": 8200,
+            "protocol": "http"
+          }
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "auth",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Auth",
+        "dependsOn": [
+          "cache",
+          "db"
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "http",
+            "port": 8080,
+            "protocol": "http"
+          }
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "catalog",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Catalog",
+        "dependsOn": [
+          "platform/db",
+          "platform/search"
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "message": "migration 0042_add_sku failed: column \"sku\" of relation \"product\" already exists",
+            "reason": "MigrationFailed",
+            "status": "False",
+            "type": "Ready"
+          }
+        ],
+        "phase": "Error"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "mailer",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Mailer",
+        "dependsOn": [
+          "nats"
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "message": "secret mailer-smtp has no key \"password\"",
+            "reason": "SecretIncomplete",
+            "status": "False",
+            "type": "Configured"
+          }
+        ],
+        "phase": "NeedsConfig"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "media",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Media",
+        "dependsOn": [
+          "storage"
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "message": "rollout in progress: 1 of 3 replicas ready",
+            "reason": "RolloutInProgress",
+            "status": "False",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "http",
+            "port": 8080,
+            "protocol": "http"
+          }
+        ],
+        "phase": "Pending"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "payments",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Payments",
+        "dependsOn": [
+          "vault"
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "http",
+            "port": 8080,
+            "protocol": "http"
+          }
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "api",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::API",
+        "dependsOn": [
+          "auth"
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "http",
+            "port": 8080,
+            "protocol": "http"
+          },
+          {
+            "name": "metrics",
+            "port": 9090,
+            "protocol": "http"
+          }
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "cart",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Cart",
+        "dependsOn": [
+          "catalog"
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "message": "waiting for catalog (Error)",
+            "reason": "DependencyNotReady",
+            "status": "False",
+            "type": "Ready"
+          }
+        ],
+        "phase": "Blocked"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "newsletter",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Newsletter",
+        "dependsOn": [
+          "mailer"
+        ],
+        "enabled": false
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "orders",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Orders",
+        "dependsOn": [
+          "payments"
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "status": "True",
+            "type": "Ready"
+          }
+        ],
+        "endpoints": [
+          {
+            "name": "http",
+            "port": 8080,
+            "protocol": "http"
+          }
+        ],
+        "phase": "Running"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "reports",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Reports",
+        "dependsOn": [
+          "orders"
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "message": "stopped",
+            "reason": "Stopped",
+            "status": "False",
+            "type": "Ready"
+          }
+        ],
+        "phase": "Stopped"
+      }
+    },
+    {
+      "kind": "Comb",
+      "metadata": {
+        "labels": {
+          "app.kubernetes.io/part-of": "shop"
+        },
+        "name": "loyalty",
+        "namespace": "shop"
+      },
+      "spec": {
+        "class": "MyApp::Comb::Loyalty"
+      },
+      "status": {
+        "conditions": [
+          {
+            "message": "not deployed",
+            "reason": "NotDeployed",
+            "status": "False",
+            "type": "Ready"
+          }
+        ],
+        "phase": "NotDeployed"
+      }
+    }
+  ],
+  "kind": "List"
+}

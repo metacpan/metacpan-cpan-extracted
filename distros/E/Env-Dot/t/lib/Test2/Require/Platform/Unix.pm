@@ -6,7 +6,7 @@ use base 'Test2::Require';
 
 our $VERSION = '0.000160';
 
-use English qw( -no_match_vars );    # Avoids regex performance
+use English qw( -no_match_vars ) ;  # Avoids regex performance
 
 my %PLATFORMS = (
     'aix'      => 1,
@@ -31,18 +31,17 @@ my %PLATFORMS = (
 );
 
 sub IS_PLATFORM {
-    return 1 if exists $PLATFORMS{$OSNAME};
+    return 1 if exists $PLATFORMS{ $OSNAME };
     return 0;
 }
 
 sub skip {
     my $class = shift;
 
-    if ( IS_PLATFORM() ) {
+    if (IS_PLATFORM()) {
         return;
-    }
-    else {
-        return ( __PACKAGE__ =~ m/^Test2::(.*)$/msx )[0];
+    } else {
+        return (__PACKAGE__ =~ m/^Test2::(.*)$/msx)[0];
     }
 }
 

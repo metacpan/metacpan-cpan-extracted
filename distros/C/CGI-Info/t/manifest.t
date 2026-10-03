@@ -1,4 +1,4 @@
-#!perl -w
+#!perl -T
 
 use strict;
 use warnings;
@@ -8,4 +8,4 @@ use Test::Most;
 use Test::Needs { 'Test::CheckManifest' => '0.9' };
 
 Test::CheckManifest->import();
-ok_manifest({ filter => [qr/(\.git)|(\..+\.yml$)/] });
+ok_manifest({ filter => [qr/(?:\.git|\..+\.yml\z)/] });

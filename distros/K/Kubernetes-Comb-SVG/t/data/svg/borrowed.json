@@ -1,0 +1,19 @@
+[
+  { "metadata": { "name": "with-context" },
+    "status": { "phase": "Running", "upstream": { "context": "prod", "via": [ "prod" ] } } },
+  { "metadata": { "name": "no-context" },
+    "status": { "phase": "Running", "upstream": { "reachable": true } } },
+  { "metadata": { "name": "own" }, "status": { "phase": "Running" } },
+  { "metadata": { "name": "both" },
+    "status": { "phase": "Running", "upstream": {
+      "class": "Kubernetes::Comb::Upstream::K8s", "context": "dev", "reachable": true, "via": [ "dev", "prod" ] } } },
+  { "metadata": { "name": "class-only" },
+    "status": { "phase": "Pending", "upstream": { "class": "Kubernetes::Comb::Upstream::K8s" } } },
+  { "metadata": { "name": "needs-config" },
+    "status": { "phase": "NeedsConfig", "upstream": {
+      "class": "Kubernetes::Comb::Upstream::K8s", "context": "dev", "reachable": true, "via": [ "dev" ] } } },
+  { "metadata": { "name": "unreachable" },
+    "status": { "phase": "Pending", "upstream": { "context": "dev", "reachable": false } } },
+  { "metadata": { "name": "switched-off" }, "spec": { "enabled": false },
+    "status": { "phase": "Running", "upstream": { "reachable": true } } }
+]

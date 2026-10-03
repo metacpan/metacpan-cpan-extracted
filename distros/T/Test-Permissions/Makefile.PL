@@ -44,7 +44,7 @@ WriteMakefile(
 		'File::Temp' => 0,
 		'IPC::System::Simple' => 0,	# needed by autodie qw(:all)
 		'Params::Get' => 0.17,
-		'Params::Validate::Strict' => 0,
+		'Params::Validate::Strict' => '0.40',	# rejects undef for a required string with min
 		'Readonly' => 0,
 		'Return::Set' => 0,
 		'Test::More' => 0,	# skip_unless_can_revoke calls Test::More::skip

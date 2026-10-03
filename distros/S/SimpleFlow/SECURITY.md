@@ -34,3 +34,22 @@ Reports of that kind are welcome as documentation bugs rather than as
 vulnerabilities in SimpleFlow itself. What *is* in scope is SimpleFlow doing
 something with a command, its output, its temporary state or its log that the
 caller did not ask for and could not predict from the documentation.
+
+## What SimpleFlow trusts
+
+- **The working directory and the outputs.** `lock` and `stale.cmd` keep
+  their files in `.simpleflow/` in the working directory, and `protect`
+  changes the permissions of the outputs. SimpleFlow refuses a `.simpleflow/`
+  that is a symbolic link, opens nothing in it through one, and changes a
+  protected output through a handle opened without following links. Those
+  defeat a link planted by someone else; they do not make a directory that
+  others can write to safe to run a pipeline in.
+- **The trace that `report` reads.** It is meant to be one your own pipeline
+  wrote. `report` refuses a line that is not strict JSON, nests more than 512
+  deep or has fields of the wrong type, and escapes everything it puts in the
+  page, but it sets no limit on a line's length.
+- **What is written out.** The record of every step -- printed, logged and
+  traced -- holds its command line, its `note` and its `env`. `env.secret`
+  hides the values of the variables it names; nothing else is hidden, so a
+  credential belongs in `env`, under `env.secret`, and never on the command
+  line.

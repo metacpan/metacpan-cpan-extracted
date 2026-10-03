@@ -1,21 +1,18 @@
 # Generated from Makefile.PL using makefilepl2cpanfile
 
-requires 'perl', '5.008';
+requires 'perl', '5.010';
 
 requires 'Carp';
 requires 'Cwd';
-requires 'ExtUtils::MakeMaker', '6.64';
 requires 'File::Basename';
 requires 'File::Spec', '3.4';
-requires 'HTTP::BrowserDetect', '3.10';
-requires 'IO::Interactive';
+requires 'HTTP::BrowserDetect', '3.10';   # Include bingbot
 requires 'JSON::MaybeXS';
-requires 'List::Util', '1.33';
 requires 'Log::Abstraction', '0.10';
 requires 'Net::CIDR';
 requires 'Object::Configure', '0.19';
 requires 'Params::Get', '0.13';
-requires 'Params::Validate::Strict', '0.28';
+requires 'Params::Validate::Strict', '0.40';
 requires 'Readonly';
 requires 'Return::Set';
 requires 'Scalar::Util';
@@ -29,7 +26,7 @@ requires 'boolean';
 requires 'namespace::clean';
 
 on 'configure' => sub {
-	requires 'ExtUtils::MakeMaker', '6.64';
+	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 };
 
 on 'test' => sub {
@@ -40,9 +37,10 @@ on 'test' => sub {
 	requires 'Errno';
 	requires 'File::Temp';
 	requires 'FindBin';
+	requires 'IO::Interactive';
 	requires 'IPC::Run3';
 	requires 'IPC::System::Simple';
-	requires 'JSON::PP', '4.02';
+	requires 'JSON::PP', '4.02';   # Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
 	requires 'LWP::UserAgent';
 	requires 'POSIX';
 	requires 'Taint::Runtime';
@@ -58,7 +56,6 @@ on 'test' => sub {
 	requires 'Test::RequiresInternet';
 	requires 'Test::Returns';
 	requires 'Test::Script', '1.12';
-	requires 'Test::Warn';
 	requires 'Test::Which';
 	requires 'Tie::Filehandle::Preempt::Stdin';
 	requires 'autodie';

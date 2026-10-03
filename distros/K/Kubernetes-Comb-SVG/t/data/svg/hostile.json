@@ -1,0 +1,16 @@
+[
+  {
+    "metadata": {
+      "name": "</svg><script>alert(1)</script>",
+      "namespace": "ns\"'&<>",
+      "labels": { "tier": "grp\"'&<script>" }
+    },
+    "status": {
+      "phase": "Pending",
+      "conditions": [ { "message": "msg \"quoted\" & <b>bold</b> 'x'" } ],
+      "upstream": { "class": "Evil::</title><script>c</script>&\"'", "context": "ctx\"><script>x</script>&" }
+    }
+  },
+  { "metadata": { "name": "q\"uo'te&amp;<>" }, "status": { "phase": "Run\"ning<script>" } },
+  { "metadata": { "name": "ctl\u0001\u0008\u000bx" } }
+]

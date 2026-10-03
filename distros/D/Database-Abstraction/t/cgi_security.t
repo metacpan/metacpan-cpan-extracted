@@ -906,4 +906,520 @@ subtest 'SEC12: DSN with hostile content causes a safe error, not silent success
 	pass('SEC12 completed without Perl crash');
 };
 
+# ---------------------------------------------------------------------------
+# SEC13: url parameter scheme validation
+# ---------------------------------------------------------------------------
+
+subtest 'SEC13: hostile url scheme is rejected at construction time' => sub {
+	# Attack: supply a non-http(s) URL scheme to bypass the HTTP-only fetch layer.
+	# file:// reads local files; javascript: triggers code in some contexts;
+	# ftp:// is an unintended scheme.  Guard: $src->{'url'} =~ /\Ahttps?:\/\//i
+	# croaks "unsafe url" before any network call is made.
+
+	{
+		package Database::sec13;
+		use base 'Database::Abstraction';
+	}
+
+	local %ENV;
+	$ENV{REQUEST_METHOD} = 'GET';
+
+	# 13.1 ftp:// — unintended scheme that bypasses https-only intent
+	throws_ok {
+		Database::sec13->new(url => 'ftp://evil.example.com/data.html')
+	} qr/unsafe url/i,
+	  'SEC13.1 ftp:// url scheme is rejected before any network call';
+
+	# 13.2 file:// — direct local file read (path traversal via URL)
+	throws_ok {
+		Database::sec13->new(url => 'file:///etc/passwd')
+	} qr/unsafe url/i,
+	  'SEC13.2 file:// url scheme (local file read) is rejected';
+
+	# 13.3 javascript: pseudo-protocol — potential code execution vector
+	throws_ok {
+		Database::sec13->new(url => 'javascript:alert(document.cookie)')
+	} qr/unsafe url/i,
+	  'SEC13.3 javascript: pseudo-URL is rejected';
+
+	# 13.4 data: URI — embeds arbitrary HTML/JavaScript inline
+	throws_ok {
+		Database::sec13->new(url => 'data:text/html,<script>evil()</script>')
+	} qr/unsafe url/i,
+	  'SEC13.4 data: URI is rejected';
+
+	# 13.5 Empty string — not http(s), fails the guard.
+	# An empty string is falsy so the "where are the files?" directory check fires
+	# first unless directory is also supplied; we supply it so the url guard runs.
+	throws_ok {
+		Database::sec13->new(directory => $DATA_DIR, url => '')
+	} qr/unsafe url/i,
+	  'SEC13.5 empty string as url is rejected by the url scheme guard';
+
+	# 13.6 Uppercase HTTPS must pass the case-insensitive guard
+	# (Any subsequent croak must NOT be "unsafe url" — it may be a network error.)
+	{
+		eval { Database::sec13->new(url => 'HTTPS://example.com/') };
+		unlike($@ // '', qr/unsafe url/i,
+			'SEC13.6 HTTPS:// (uppercase) passes the scheme guard');
+	}
+
+	# 13.7 Lowercase http:// must also pass
+	{
+		eval { Database::sec13->new(url => 'http://example.com/') };
+		unlike($@ // '', qr/unsafe url/i,
+			'SEC13.7 http:// (lowercase) passes the scheme guard');
+	}
+};
+
+# ---------------------------------------------------------------------------
+# SEC14: host parameter injection
+# ---------------------------------------------------------------------------
+
+subtest 'SEC14: hostile host parameter is rejected before any SSH call' => sub {
+	# Attack: shell metacharacters or path-traversal in the host param.
+	# The module eventually calls File::Slurp::Remote with the host string;
+	# a hostile value could inject SSH options or shell commands.
+	# Guard in new(): /\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*@)?[a-zA-Z0-9:][a-zA-Z0-9._:-]*\z/
+	# — rejects spaces, semicolons, backticks, dollar signs, and newlines.
+
+	{
+		package Database::sec14;
+		use base 'Database::Abstraction';
+	}
+
+	local %ENV;
+	$ENV{REQUEST_METHOD} = 'GET';
+
+	# 14.1 Semicolon — classic command injection separator in shell SSH calls
+	throws_ok {
+		Database::sec14->new(directory => $DATA_DIR,
+			host => 'evil.host.com;rm -rf /')
+	} qr/unsafe host/i,
+	  'SEC14.1 semicolon in host rejected (command injection prevention)';
+
+	# 14.2 Space — splits host into shell arguments
+	throws_ok {
+		Database::sec14->new(directory => $DATA_DIR,
+			host => 'evil host')
+	} qr/unsafe host/i,
+	  'SEC14.2 space in host rejected (argument injection prevention)';
+
+	# 14.3 Backtick — command substitution in shell context
+	throws_ok {
+		Database::sec14->new(directory => $DATA_DIR,
+			host => 'evil`id`host')
+	} qr/unsafe host/i,
+	  'SEC14.3 backtick command substitution in host rejected';
+
+	# 14.4 Newline — could inject extra SSH options or split log output
+	throws_ok {
+		Database::sec14->new(directory => $DATA_DIR,
+			host => "evil.com\nevil")
+	} qr/unsafe host/i,
+	  'SEC14.4 newline in host rejected';
+
+	# 14.5 Dollar-paren command substitution
+	throws_ok {
+		Database::sec14->new(directory => $DATA_DIR,
+			host => 'evil$(id)host')
+	} qr/unsafe host/i,
+	  'SEC14.5 $() command substitution in host rejected';
+
+	# 14.6 Path-traversal sequence before user@ prefix
+	throws_ok {
+		Database::sec14->new(directory => $DATA_DIR,
+			host => '../evil@host.com')
+	} qr/unsafe host/i,
+	  'SEC14.6 path-traversal prefix in host rejected';
+
+	# 14.7 Valid user@host must pass the guard
+	# (The local -d check or SSH will fire next; the croak must NOT be "unsafe host".)
+	{
+		package Database::sec14b;
+		use base 'Database::Abstraction';
+	}
+	eval { Database::sec14b->new(directory => $DATA_DIR, host => 'user@remote.example.com') };
+	unlike($@ // '', qr/unsafe host/i,
+		'SEC14.7 valid user@host passes the host guard');
+};
+
+# ---------------------------------------------------------------------------
+# SEC15: table constructor parameter injection
+# ---------------------------------------------------------------------------
+
+subtest 'SEC15: hostile table constructor parameter is rejected before DB access' => sub {
+	# Attack: the table name is interpolated directly into SQL queries (e.g.
+	# "SELECT * FROM <table> WHERE ...").  Guard: $src->{'table'} =~ $SAFE_QUALIFIED
+	# — allows only letters, digits, underscores, and a single dot.
+
+	{
+		package Database::sec15;
+		use base 'Database::Abstraction';
+	}
+
+	local %ENV;
+	$ENV{REQUEST_METHOD} = 'GET';
+
+	# 15.1 Semicolon / statement-terminator injection
+	throws_ok {
+		Database::sec15->new(directory => $DATA_DIR,
+			table => 'test1; DROP TABLE test1--')
+	} qr/unsafe table name/i,
+	  'SEC15.1 semicolon in table name croaks "unsafe table name"';
+
+	# 15.2 UNION keyword — space not in $SAFE_QUALIFIED
+	throws_ok {
+		Database::sec15->new(directory => $DATA_DIR,
+			table => 'test1 UNION SELECT 1,2,3')
+	} qr/unsafe table name/i,
+	  'SEC15.2 UNION keyword in table name croaks';
+
+	# 15.3 Backtick — MySQL identifier quoting / command substitution
+	throws_ok {
+		Database::sec15->new(directory => $DATA_DIR,
+			table => 'test1`id`')
+	} qr/unsafe table name/i,
+	  'SEC15.3 backtick in table name croaks';
+
+	# 15.4 Null byte — C-string truncation in older OS/Perl combinations
+	throws_ok {
+		Database::sec15->new(directory => $DATA_DIR,
+			table => "test1\x00evil")
+	} qr/unsafe table name/i,
+	  'SEC15.4 null byte in table name croaks';
+
+	# 15.5 CRLF injection — header-split potential when error is reflected in CGI output
+	throws_ok {
+		Database::sec15->new(directory => $DATA_DIR,
+			table => "test1\r\nX-Inject: evil")
+	} qr/unsafe table name/i,
+	  'SEC15.5 CRLF in table name croaks (header-split prevention)';
+
+	# 15.6 Single-quote — would break a quoted SQL identifier
+	throws_ok {
+		Database::sec15->new(directory => $DATA_DIR,
+			table => "test1'evil")
+	} qr/unsafe table name/i,
+	  'SEC15.6 single-quote in table name croaks';
+
+	# 15.7 Schema.table dotted notation must pass (dot is valid in $SAFE_QUALIFIED)
+	{
+		package Database::sec15b;
+		use base 'Database::Abstraction';
+	}
+	eval { Database::sec15b->new(directory => $DATA_DIR, table => 'schema.table1') };
+	unlike($@ // '', qr/unsafe table name/i,
+		'SEC15.7 schema.table1 dotted notation passes the table guard');
+};
+
+# ---------------------------------------------------------------------------
+# SEC16: base_criteria key injection
+# ---------------------------------------------------------------------------
+
+subtest 'SEC16: hostile base_criteria is rejected at construction time' => sub {
+	# Attack: an adversary controls base_criteria (e.g. from deserialized JSON or
+	# a config file).  base_criteria keys are interpolated into SQL WHERE clauses;
+	# hostile keys must be rejected before any object is blessed.  Values are
+	# always bind parameters (safe); only keys pose an injection risk.
+
+	{
+		package Database::sec16;
+		use base 'Database::Abstraction';
+	}
+
+	local %ENV;
+	$ENV{REQUEST_METHOD} = 'GET';
+
+	# 16.1 Arrayref base_criteria — must be a hashref
+	throws_ok {
+		Database::sec16->new(directory => $DATA_DIR,
+			base_criteria => ['entry', 'one'])
+	} qr/base_criteria must be a hashref/i,
+	  'SEC16.1 arrayref base_criteria croaks "base_criteria must be a hashref"';
+
+	# 16.2 Scalar string base_criteria — not a hashref
+	throws_ok {
+		Database::sec16->new(directory => $DATA_DIR,
+			base_criteria => 'entry = 1')
+	} qr/base_criteria must be a hashref/i,
+	  'SEC16.2 scalar base_criteria croaks';
+
+	# 16.3 Semicolon in base_criteria key — SQL injection via column name
+	throws_ok {
+		Database::sec16->new(directory => $DATA_DIR,
+			base_criteria => { 'entry; DROP TABLE test1--' => 'one' })
+	} qr/unsafe base_criteria key/i,
+	  'SEC16.3 semicolon in base_criteria key croaks "unsafe base_criteria key"';
+
+	# 16.4 Null byte in base_criteria key — C-string truncation / identifier bypass
+	throws_ok {
+		Database::sec16->new(directory => $DATA_DIR,
+			base_criteria => { "entry\x00evil" => 'one' })
+	} qr/unsafe base_criteria key/i,
+	  'SEC16.4 null byte in base_criteria key croaks';
+
+	# 16.5 CRLF in base_criteria key — header-split if key appears in error output
+	throws_ok {
+		Database::sec16->new(directory => $DATA_DIR,
+			base_criteria => { "entry\r\nX-Inject: evil" => 'one' })
+	} qr/unsafe base_criteria key/i,
+	  'SEC16.5 CRLF in base_criteria key croaks';
+
+	# 16.6 UNION injection via base_criteria key — space not in $SAFE_QUALIFIED
+	throws_ok {
+		Database::sec16->new(directory => $DATA_DIR,
+			base_criteria => { '1 UNION SELECT * FROM test1--' => 'x' })
+	} qr/unsafe base_criteria key/i,
+	  'SEC16.6 UNION keyword in base_criteria key croaks';
+
+	# 16.7 -or grouping key is explicitly exempt from the identifier check
+	# (base_criteria allows -or/-and keys for logical grouping)
+	{
+		package Database::sec16b;
+		use base 'Database::Abstraction';
+	}
+	my $obj;
+	lives_ok {
+		$obj = Database::sec16b->new(directory => $DATA_DIR,
+			base_criteria => { '-or' => [{entry => 'one'}, {entry => 'two'}] })
+	} 'SEC16.7 -or grouping key in base_criteria is accepted';
+	ok(defined $obj, 'SEC16.7 object with -or base_criteria key is successfully created');
+
+	# 16.8 Injection string in base_criteria VALUE must not bypass the filter
+	# (values are bind parameters — injection produces 0 rows, not extra rows)
+	{
+		my $db = Database::test1->new(
+			directory     => $DATA_DIR,
+			base_criteria => { entry => "' OR 1=1--" },
+		);
+		my $cnt = $db->count();
+		is($cnt, 0,
+			'SEC16.8 injection string in base_criteria value returns 0 rows (bind param)');
+	}
+};
+
+# ---------------------------------------------------------------------------
+# SEC17: sort_by column / direction injection
+# ---------------------------------------------------------------------------
+
+subtest 'SEC17: hostile sort_by is carped and neutralised, never injected into ORDER BY' => sub {
+	# Attack: an adversary controls the sort_by parameter (e.g. from a GET param
+	# "?sort=score;+DROP+TABLE+...").  _parse_sort_by() validates the column name
+	# against $SAFE_QUALIFIED and the direction as strictly ASC/DESC.  On failure
+	# it carps (does NOT croak) and returns (undef, 'ASC'), so no ORDER BY is
+	# emitted and the query still completes safely with all rows intact.
+
+	plan skip_all => 'DBD::SQLite required' unless $HAVE_SQLITE;
+
+	local %ENV;
+	$ENV{REQUEST_METHOD} = 'GET';
+	$ENV{QUERY_STRING}   = 'sort=score%3B+DROP+TABLE--';
+
+	my $db = _make_sqlite_db('Database::sec17', alice => 10, bob => 20, carol => 30);
+
+	# 17.1 SQL injection in sort_by column — must carp but NOT croak; all rows returned
+	my (@warns, $rows);
+	{
+		local $SIG{__WARN__} = sub { push @warns, @_ };
+		lives_ok {
+			$rows = $db->selectall_arrayref(sort_by => 'score; DROP TABLE sec17--')
+		} 'SEC17.1 SQL injection in sort_by column does not croak';
+	}
+	ok(scalar @warns > 0,  'SEC17.1 a carp warning is emitted for the hostile sort_by column');
+	is(scalar @{$rows}, 3, 'SEC17.1 all 3 rows returned (hostile sort_by was silently dropped)');
+
+	# 17.2 Space in sort_by column — space not in $SAFE_QUALIFIED
+	@warns = ();
+	{
+		local $SIG{__WARN__} = sub { push @warns, @_ };
+		lives_ok {
+			$rows = $db->selectall_arrayref(sort_by => 'score ASC; UNION SELECT')
+		} 'SEC17.2 space-containing sort_by column does not croak';
+	}
+	ok(scalar @warns > 0, 'SEC17.2 carp warning emitted for space in sort_by column');
+
+	# 17.3 Hostile direction string — not ASC or DESC
+	@warns = ();
+	{
+		local $SIG{__WARN__} = sub { push @warns, @_ };
+		lives_ok {
+			$rows = $db->selectall_arrayref(sort_by => ['score', 'UNION SELECT 1'])
+		} 'SEC17.3 hostile sort_by direction does not croak';
+	}
+	ok(scalar @warns > 0,  'SEC17.3 carp warning emitted for hostile direction string');
+	is(scalar @{$rows}, 3, 'SEC17.3 all 3 rows returned (hostile direction was silently dropped)');
+
+	# 17.4 Null byte in sort_by column name — not in $SAFE_QUALIFIED
+	@warns = ();
+	{
+		local $SIG{__WARN__} = sub { push @warns, @_ };
+		lives_ok {
+			$rows = $db->selectall_arrayref(sort_by => "score\x00evil")
+		} 'SEC17.4 null byte in sort_by column does not croak';
+	}
+	ok(scalar @warns > 0, 'SEC17.4 carp warning emitted for null byte in sort_by column');
+
+	# 17.5 Table must be intact after all hostile sort_by attempts
+	$rows = $db->selectall_arrayref();
+	is(scalar @{$rows}, 3,
+		'SEC17.5 table intact after all hostile sort_by attempts (3 rows survive)');
+};
+
+# ---------------------------------------------------------------------------
+# SEC18: Clone-path new() id and table guard bypass prevention
+# ---------------------------------------------------------------------------
+
+subtest 'SEC18: clone-path new() applies id and table guards on the blessed-object path' => sub {
+	# Attack (fixed in 0.41): when $class is a blessed object, new() enters the
+	# clone branch (Scalar::Util::blessed($class)).  Without the guard in that branch
+	# a hostile id/table value like "entry; DROP TABLE t" would be merged into the
+	# clone without validation.  The guard validates id and table before the early
+	# return on the blessed path.
+
+	local %ENV;
+	$ENV{REQUEST_METHOD} = 'GET';
+
+	my $orig = Database::test1->new($DATA_DIR);
+	$orig->count();   # ensure fully initialised
+
+	# 18.1 Hostile id in clone path — statement-terminator injection
+	throws_ok {
+		$orig->new(id => "entry; DROP TABLE test1--")
+	} qr/unsafe id column name/i,
+	  'SEC18.1 hostile id in $obj->new() (clone path) croaks';
+
+	# 18.2 CRLF in id during clone — header-split potential if error is reflected
+	throws_ok {
+		$orig->new(id => "entry\r\nX-Inject: evil")
+	} qr/unsafe id column name/i,
+	  'SEC18.2 CRLF in id during clone croaks (header-split prevention)';
+
+	# 18.3 Hostile table in clone path — statement-terminator injection
+	throws_ok {
+		$orig->new(table => 'test1; DROP TABLE test1--')
+	} qr/unsafe table name/i,
+	  'SEC18.3 hostile table in $obj->new() (clone path) croaks';
+
+	# 18.4 Null byte in table during clone
+	throws_ok {
+		$orig->new(table => "test1\x00evil")
+	} qr/unsafe table name/i,
+	  'SEC18.4 null byte in table during clone croaks';
+
+	# 18.5 Cloning with a valid id must succeed (guard is correctly gated)
+	my $clone;
+	lives_ok {
+		$clone = $orig->new(id => 'entry')
+	} 'SEC18.5 cloning with a valid id succeeds after the hostile-id rejections';
+	ok(defined $clone, 'SEC18.5 clone object is defined and usable');
+};
+
+# ---------------------------------------------------------------------------
+# SEC19: each_row callback exception does not leak the DBI statement handle
+# ---------------------------------------------------------------------------
+
+subtest 'SEC19: each_row re-throws callback exceptions with DBI handle properly finished' => sub {
+	# Reliability / resource-leak concern: if a user-supplied callback throws, a
+	# naive implementation would leave the DBI statement handle open (cursor not
+	# finish()ed), holding a server-side resource until the next GC cycle.
+	# The module calls $sth->finish() before re-throwing, so the connection is
+	# left in a valid state and the same $db object can be queried immediately after.
+
+	plan skip_all => 'DBD::SQLite required' unless $HAVE_SQLITE;
+
+	local %ENV;
+	$ENV{REQUEST_METHOD} = 'GET';
+
+	my $db = _make_sqlite_db('Database::sec19', alice => 10, bob => 20, carol => 30);
+
+	# 19.1 Callback throws after visiting the first row; each_row must re-throw.
+	my $visited = 0;
+	throws_ok {
+		$db->each_row(sub {
+			$visited++;
+			die "deliberate callback exception\n" if $visited >= 1;
+		})
+	} qr/deliberate callback exception/,
+	  'SEC19.1 exception in each_row callback is re-thrown by each_row';
+
+	ok($visited >= 1, 'SEC19.1 callback was invoked at least once before the exception');
+
+	# 19.2 After the exception the db object must still accept queries.
+	# This proves the DBI statement handle was finish()ed before re-throw.
+	my $rows;
+	lives_ok {
+		$rows = $db->selectall_arrayref()
+	} 'SEC19.2 db is still queryable after each_row exception (no DBI handle leak)';
+	is(scalar @{$rows}, 3,
+		'SEC19.2 all 3 rows returned from post-exception query (db connection state intact)');
+};
+
+# ---------------------------------------------------------------------------
+# SEC20: hostile table parameter in query methods is rejected before SQL build
+# ---------------------------------------------------------------------------
+
+subtest 'SEC20: hostile table param in query methods is rejected' => sub {
+	# Attack: query methods (selectall_arrayref, fetchrow_hashref, etc.) accept
+	# a "table" key in their criteria hash to override the FROM clause target.
+	# If this value reaches the SQL string unvalidated it becomes a FROM-clause
+	# injection vector: "SELECT * FROM hostile; DROP TABLE users".
+	# Fix: _open_table and fetchrow_hashref now validate the caller-supplied
+	# table name against $SAFE_QUALIFIED before interpolation.
+
+	plan skip_all => 'DBD::SQLite required' unless $HAVE_SQLITE;
+
+	local %ENV;
+	$ENV{REQUEST_METHOD} = 'GET';
+
+	my $db = _make_sqlite_db('Database::sec20', alice => 10, bob => 20);
+
+	# 20.1 Semicolon / statement-terminator via selectall_arrayref table param
+	throws_ok {
+		$db->selectall_arrayref(table => 'users; DROP TABLE users--')
+	} qr/unsafe table name/i,
+	  'SEC20.1 semicolon in selectall_arrayref table param croaks "unsafe table name"';
+
+	# 20.2 UNION keyword via selectall_arrayref table param (space not allowed)
+	throws_ok {
+		$db->selectall_arrayref(table => 'a UNION SELECT 1,2')
+	} qr/unsafe table name/i,
+	  'SEC20.2 UNION keyword in selectall_arrayref table param croaks';
+
+	# 20.3 Semicolon / statement-terminator via fetchrow_hashref table param
+	throws_ok {
+		$db->fetchrow_hashref(table => 'foo; DROP TABLE foo--')
+	} qr/unsafe table name/i,
+	  'SEC20.3 semicolon in fetchrow_hashref table param croaks "unsafe table name"';
+
+	# 20.4 Backtick injection via fetchrow_hashref table param
+	throws_ok {
+		$db->fetchrow_hashref(table => 'foo`id`')
+	} qr/unsafe table name/i,
+	  'SEC20.4 backtick in fetchrow_hashref table param croaks';
+
+	# 20.5 Null byte via selectall_array table param
+	throws_ok {
+		$db->selectall_array(table => "foo\x00evil")
+	} qr/unsafe table name/i,
+	  'SEC20.5 null byte in selectall_array table param croaks';
+
+	# 20.6 count() table param injection
+	throws_ok {
+		$db->count(table => 'foo; DELETE FROM foo--')
+	} qr/unsafe table name/i,
+	  'SEC20.6 semicolon in count table param croaks "unsafe table name"';
+
+	# 20.7 Valid dotted schema.table notation must pass (regression guard)
+	my $c;
+	lives_ok {
+		# The db is already open on a different table; just check that the guard
+		# does not croak on a syntactically valid qualified name.
+		# (The query itself may fail — we only verify no security croak fires.)
+		eval { $c = $db->count(table => 'schema.sometable') };
+	} 'SEC20.7 schema.table dotted notation is not rejected by the table guard';
+	unlike($@ // '', qr/unsafe table name/i,
+		'SEC20.7 no "unsafe table name" error for dotted notation');
+};
+
 done_testing();

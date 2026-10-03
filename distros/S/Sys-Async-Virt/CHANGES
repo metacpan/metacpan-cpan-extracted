@@ -1,5 +1,11 @@
 -----
 
+0.6.8   2026-10-03
+   [Added]
+       * Example script eg/free-mem.pl
+   [Changed]
+       * Updated libvirt to v12.8.0
+
 0.6.7   2026-09-01
    [Added]
        * Added constants IOTHREAD_POLL_WEIGHT,

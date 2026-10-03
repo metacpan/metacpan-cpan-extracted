@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "updated": "2026-04-14",
+    "purpose": "Supply chain audit & L2D&D|/D2L&D assimilation tracking for all critical components. Pre-approval contract: fork_target set = approved for autonomous forking.",
+    "docs": "protocol/supply-chain-v1.0.md"
+  },
+
+  "dist-zilla-pluginbundle-mikkoi": {
+    "name": "@MIKKOI",
+    "type": "dzil-plugin-bundle",
+    "critical": true,
+    "owner": "mikkoi",
+    "source": "https://github.com/mikkoi/dist-zilla-pluginbundle-mikkoi",
+    "fork": null,
+    "description": "Dist::Zilla plugin bundle. Controls build, test, release pipeline and dependency declarations for all mikkoi CPAN distributions.",
+    "assimilation": {
+      "level": 0,
+      "docs_read": [],
+      "key_learnings": []
+    }
+  },
+
+  "dist-zilla-plugin-software-policies": {
+    "name": "Dist::Zilla::Plugin::Software::Policies",
+    "type": "dzil-plugin",
+    "critical": true,
+    "owner": "mikkoi",
+    "source": "CPAN",
+    "source_local": "/home/mikkoi/other/own_github/dist-zilla-plugin-software-policies",
+    "fork": null,
+    "description": "Generates policy files (License, Contributing, CodeOfConduct, Security, AIDisclosure). Available on CPAN. Build/test time dependency managed by @MIKKOI bundle. AIDisclosure requires >= 0.003.",
+    "assimilation": {
+      "level": 1,
+      "docs_read": ["dist.ini usage in env-dot and env-assert"],
+      "key_learnings": [
+        "dzil policies command generates/regenerates policy files",
+        "AIDisclosure policy creates AI_DISCLOSURE.md",
+        "Contributing policy supports ai_disclosure=1 and ai_assisted=1 attributes to add AI section to CONTRIBUTING.md"
+      ]
+    }
+  }
+}

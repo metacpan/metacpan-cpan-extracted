@@ -1,0 +1,42 @@
+{
+   "items" : [
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "labels" : {
+               "tier" : "alpha"
+            },
+            "name" : "a1"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "labels" : {
+               "tier" : "beta"
+            },
+            "name" : "b1"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "a1"
+            ]
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "labels" : {
+               "tier" : "alpha"
+            },
+            "name" : "a3"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "b1"
+            ]
+         }
+      }
+   ],
+   "kind" : "List"
+}

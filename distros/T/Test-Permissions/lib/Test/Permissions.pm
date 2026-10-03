@@ -28,11 +28,11 @@ Test::Permissions - Find out whether chmod can really take access away, so tests
 
 =head1 VERSION
 
-0.001.0
+0.001.1
 
 =cut
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.001.1';
 
 # One tag per family of functions.  A new family gets its own tag and
 # prefix, and is added to :all.

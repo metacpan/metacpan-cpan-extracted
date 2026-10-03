@@ -1,0 +1,5 @@
+{
+  "kind": "Comb",
+  "metadata": { "name": "api" },
+  "spec": { "dependsOn": [ "db", "nats", "db" ] }
+}

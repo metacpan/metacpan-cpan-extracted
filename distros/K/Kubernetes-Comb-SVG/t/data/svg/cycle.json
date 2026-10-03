@@ -1,0 +1,5 @@
+[
+  { "metadata": { "name": "a" }, "spec": { "dependsOn": [ "b" ] } },
+  { "metadata": { "name": "b" }, "spec": { "dependsOn": [ "a" ] } },
+  { "metadata": { "name": "c" }, "spec": { "dependsOn": [ "c" ] } }
+]

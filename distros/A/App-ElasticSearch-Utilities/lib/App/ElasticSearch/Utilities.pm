@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use v5.16;
 use warnings;
 
-our $VERSION = '9.0'; # VERSION
+our $VERSION = '9.1'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:all);
@@ -249,16 +249,16 @@ sub es_utils_initialize {
         INSECURE    => exists $opts->{insecure} ? 1
                     :  exists $_GLOBALS{insecure} ? $_GLOBALS{insecure}
                     :  0,
-        CACERT      => exists $opts->{cacert} ? 1
+        CACERT      => exists $opts->{cacert} ? $opts->{cacert}
                     :  exists $_GLOBALS{cacert} ? $_GLOBALS{cacert}
                     :  undef,
-        CAPATH      => exists $opts->{capath} ? 1
+        CAPATH      => exists $opts->{capath} ? $opts->{capath}
                     :  exists $_GLOBALS{capath} ? $_GLOBALS{capath}
                     :  undef,
-        CERT        => exists $opts->{cert} ? 1
+        CERT        => exists $opts->{cert} ? $opts->{cert}
                     :  exists $_GLOBALS{cert} ? $_GLOBALS{cert}
                     :  undef,
-        KEY         => exists $opts->{key} ? 1
+        KEY         => exists $opts->{key} ? $opts->{key}
                     :  exists $_GLOBALS{key} ? $_GLOBALS{key}
                     :  undef,
     );
@@ -612,6 +612,7 @@ sub es_indices {
         state       => 'open',
         check_state => 1,
         check_dates => 1,
+        show_hidden => 0,
         @_
     );
 
@@ -647,6 +648,7 @@ sub es_indices {
 
     foreach my $index (sort keys %idx) {
         if(!exists $args{_all}) {
+            next if $index =~ /^\./ && !$args{show_hidden};
             my $status = $idx{$index};
             # State Check Disqualification
             if($args{state} ne 'all' && $args{check_state})  {
@@ -692,16 +694,21 @@ sub es_indices {
 sub es_index_strip_date {
     my ($index) = @_;
 
-    return -1 unless defined $index;
+    return unless length $index;
 
     es_utils_initialize() unless keys %DEF;
 
     # Try the Date Pattern
-    if( my $base = $index =~ s/[^a-z0-9]+$PATTERN_REGEX{DATE}.*$//rio ) {
-        return $base;
-    }
-    return;
+    return $index =~ s/[^a-z0-9]+$PATTERN_REGEX{DATE}.*$//rio;
 }
+
+
+sub es_index_base {
+    my ($index) = @_;
+    my $base = es_index_strip_date($index);
+    return $base =~ s/[\-_.]\d+$//r;
+}
+
 
 
 my %_stripped=();
@@ -712,10 +719,8 @@ sub es_index_bases {
     return unless defined $index;
 
     # Strip to the base
-    my $stripped = es_index_strip_date($index);
-    # Remove the rollover portion
-    $stripped =~ s/[\-_.]\d+$//;
-    return unless defined $stripped and length $stripped;
+    my $stripped = es_index_base($index);
+    return unless length $stripped;
 
     # Compute if we haven't already memoized
     if( !exists $_stripped{$stripped} ) {
@@ -1091,7 +1096,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 9.0
+version 9.1
 
 =head1 SYNOPSIS
 
@@ -1506,6 +1511,10 @@ If you'd like to proceed you need to catch that error.
 =head2 es_index_strip_date( 'index-name' )
 
 Returns the index name with the date removed.
+
+=head2 es_index_base('index-name')
+
+Returns the full index base stripped of timestamps and rollover index
 
 =head2 es_index_bases( 'index-name' )
 

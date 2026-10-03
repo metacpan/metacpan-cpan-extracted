@@ -1,0 +1,6 @@
+[
+  { "kind": "Comb", "metadata": { "name": "db" } },
+  { "kind": "Comb", "metadata": { "name": "db", "namespace": "one" } },
+  { "kind": "Comb", "metadata": { "name": "api" }, "spec": { "dependsOn": [ "db", "one/db", "nats" ] } },
+  { "kind": "Comb", "metadata": { "name": "job", "namespace": "two" }, "spec": { "dependsOn": [ "db", "api" ] } }
+]

@@ -53,7 +53,13 @@ subtest 'awkward names' => sub {
 subtest 'unicode names are kept' => sub {
 	my $e = App::Access2CSV::Exporter->new();
 
-	is($e->_csv_filename("Caf\x{e9}"), "Caf\x{e9}.csv", 'non-ASCII characters are not mangled');
+	# As UTF-8 bytes (the form mdbtools gives) and as a character string.
+	# A plain "Caf\x{e9}" is neither: Perl keeps it as the Latin-1 byte
+	# E9, which is not UTF-8, so it becomes "_" (see t/domain.t)
+	is($e->_csv_filename("Caf\xC3\xA9"), "Caf\xC3\xA9.csv", 'non-ASCII UTF-8 bytes are not mangled');
+	my $chars = "Gr\x{fc}\x{df}e";
+	utf8::upgrade($chars);
+	is($e->_csv_filename($chars), "$chars.csv", 'non-ASCII characters are not mangled');
 };
 
 subtest 'the fast suffix search chooses exactly what the simple one did' => sub {

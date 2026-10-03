@@ -2,6 +2,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
+perl-PHP-Decode.spec
 php_decode
 t/01_use.t
 t/02_array.t

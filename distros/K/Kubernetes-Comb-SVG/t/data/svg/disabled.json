@@ -1,0 +1,4 @@
+[
+  { "metadata": { "name": "off" }, "spec": { "enabled": false }, "status": { "phase": "Running" } },
+  { "metadata": { "name": "on" },  "status": { "phase": "Running" } }
+]

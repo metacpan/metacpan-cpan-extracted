@@ -4,13 +4,13 @@
       "Barnim Dzwillo @ Strato AG"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PHP-Decode",
    "no_index" : {
@@ -34,15 +34,28 @@
          "requires" : {
             "Compress::Zlib" : "1",
             "Digest::MD5" : "1",
-            "Digest::SHA1" : "1",
+            "Digest::SHA" : "1",
             "HTML::Entities" : "1",
             "MIME::Base64" : "1",
             "Tie::IxHash" : "1",
             "URI::Escape" : "1",
             "perl" : "5.016"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.302"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bdzwillo/php_decode.git",
+         "web" : "https://github.com/bdzwillo/php_decode"
+      }
+   },
+   "version" : "0.303",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

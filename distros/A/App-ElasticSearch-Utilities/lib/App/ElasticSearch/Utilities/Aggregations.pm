@@ -167,10 +167,10 @@ sub es_flatten_aggregations {
     my $extract = sub {
         my ($key, $hash) = @_;
 
-        if( $hash->{value_as_string} ) {
+        if( defined $hash->{value_as_string} ) {
             push @{ $row }, $key, $hash->{value_as_string};
         }
-        elsif( $hash->{value} ) {
+        elsif( defined $hash->{value} ) {
             push @{ $row }, $key, es_format_numeric($hash->{value});
         }
         elsif( $hash->{values} ) {
@@ -183,7 +183,7 @@ sub es_flatten_aggregations {
             foreach my $k (sort keys %{ $hash }) {
                 last if $k eq 'buckets';
                 push @{ $row }, "$key.$k", $hash->{$k}
-                    if defined $hash->{values}{$k};
+                    if defined $hash->{$k};
             }
         }
     };
@@ -258,7 +258,7 @@ App::ElasticSearch::Utilities::Aggregations - Code to simplify creating and work
 
 =head1 VERSION
 
-version 9.0
+version 9.1
 
 =head1 FUNCTIONS
 

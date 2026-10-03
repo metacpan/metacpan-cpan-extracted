@@ -1,5 +1,9 @@
 Revision history for Test-Permissions
 
+0.001.1	Fri Oct  2 09:21:53 AM EDT 2026
+	[ Bug Fixes ]
+	Bump minimum version of Params::Validate::Strict
+
 0.001.0	Wed Sep 30 10:32:18 AM EDT 2026
 	First version, taken from App-makefilepl2cpanfile's private
 	  t/lib/Test/Permissions.pm and extended:

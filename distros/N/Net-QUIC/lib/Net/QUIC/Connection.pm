@@ -8,10 +8,149 @@ use Hash::Util::FieldHash qw(fieldhash);
 use Net::QUIC ();
 use Net::QUIC::Stream ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 fieldhash my %OUTPUT_CALLBACK;
 fieldhash my %STREAM_AVAILABLE_CALLBACK;
+fieldhash my %STREAM_ACTIVITY_CALLBACK;
+fieldhash my %STREAM_ACTIVITY_NOTIFIED;
+
+my $EARLY_DATA_MAGIC = "NQED";
+my $EARLY_DATA_VERSION = 1;
+my $EARLY_DATA_HEADER_LEN = 13;
+
+my $SAVED_STATE_VERSION = 1;
+my $SESSION_TICKET_MAGIC = "NQST";
+my $ADDRESS_TOKEN_MAGIC = "NQAT";
+
+sub _encode_saved_state {
+    my ($class, $magic, $version, $bytes) = @_;
+
+    die "invalid saved QUIC version"
+        if !defined($version) || $version !~ /\A[12]\z/;
+    die "saved QUIC state cannot be empty"
+        if !defined($bytes) || $bytes eq '';
+
+    return pack(
+        'a4CC',
+        $magic,
+        $SAVED_STATE_VERSION,
+        $version,
+    ) . $bytes;
+}
+
+sub _decode_saved_state {
+    my ($class, $magic, $name, $state) = @_;
+
+    die "$name cannot be empty"
+        if !defined($state) || ref($state) || $state eq '';
+
+    if (length($state) >= 6 && substr($state, 0, 4) eq $magic) {
+        my ($got_magic, $format, $version) =
+            unpack('a4CC', substr($state, 0, 6));
+
+        die "invalid Net::QUIC $name"
+            if $got_magic ne $magic
+            || $format != $SAVED_STATE_VERSION
+            || ($version != 1 && $version != 2)
+            || length($state) == 6;
+
+        return (substr($state, 6), $version);
+    }
+
+    # Net::QUIC 0.01 exposed raw values before QUIC v2 support.
+    # Those values could only have been created by a v1 connection.
+    return ($state, 1);
+}
+
+sub _decode_session_ticket {
+    my ($class, $state) = @_;
+    return $class->_decode_saved_state(
+        $SESSION_TICKET_MAGIC,
+        'session_ticket',
+        $state,
+    );
+}
+
+sub _decode_address_token {
+    my ($class, $state) = @_;
+    return $class->_decode_saved_state(
+        $ADDRESS_TOKEN_MAGIC,
+        'address_token',
+        $state,
+    );
+}
+
+sub session_ticket {
+    my ($self) = @_;
+    my $state = $self->_session_ticket_state;
+    return if !defined $state;
+
+    return __PACKAGE__->_encode_saved_state(
+        $SESSION_TICKET_MAGIC,
+        $state->[0],
+        $state->[1],
+    );
+}
+
+sub address_token {
+    my ($self) = @_;
+    my $state = $self->_address_token_state;
+    return if !defined $state;
+
+    return __PACKAGE__->_encode_saved_state(
+        $ADDRESS_TOKEN_MAGIC,
+        $state->[0],
+        $state->[1],
+    );
+}
+
+sub _encode_early_data_state {
+    my ($class, $ticket, $transport) = @_;
+
+    die "missing TLS session ticket for early-data state"
+        if !defined($ticket) || $ticket eq '';
+    die "missing QUIC transport parameters for early-data state"
+        if !defined($transport) || $transport eq '';
+
+    return pack(
+        'a4CNN',
+        $EARLY_DATA_MAGIC,
+        $EARLY_DATA_VERSION,
+        length($ticket),
+        length($transport),
+    ) . $ticket . $transport;
+}
+
+sub _decode_early_data_state {
+    my ($class, $state) = @_;
+
+    die "early_data must be an opaque state returned by early_data_state"
+        if !defined($state)
+        || ref($state)
+        || length($state) < $EARLY_DATA_HEADER_LEN;
+
+    my ($magic, $version, $ticket_len, $transport_len) =
+        unpack('a4CNN', substr($state, 0, $EARLY_DATA_HEADER_LEN));
+
+    die "invalid Net::QUIC early-data state"
+        if $magic ne $EARLY_DATA_MAGIC
+        || $version != $EARLY_DATA_VERSION
+        || $ticket_len == 0
+        || $transport_len == 0
+        || $ticket_len > length($state) - $EARLY_DATA_HEADER_LEN
+        || $transport_len
+            != length($state) - $EARLY_DATA_HEADER_LEN - $ticket_len;
+
+    my $ticket = substr($state, $EARLY_DATA_HEADER_LEN, $ticket_len);
+    my $transport = substr(
+        $state,
+        $EARLY_DATA_HEADER_LEN + $ticket_len,
+        $transport_len,
+    );
+
+    return ($ticket, $transport);
+}
 
 sub _set_output_callback {
     my ($self, $callback) = @_;
@@ -61,6 +200,73 @@ sub _dispatch_stream_availability {
     return;
 }
 
+sub on_stream_activity {
+    my ($self, $callback) = @_;
+
+    delete $STREAM_ACTIVITY_NOTIFIED{$self};
+
+    if (defined $callback) {
+        die "stream activity callback must be a coderef"
+            if ref($callback) ne 'CODE';
+        $STREAM_ACTIVITY_CALLBACK{$self} = $callback;
+        $self->_set_stream_activity_enabled(1);
+    } else {
+        delete $STREAM_ACTIVITY_CALLBACK{$self};
+        $self->_set_stream_activity_enabled(0);
+    }
+
+    $self->_dispatch_stream_activity;
+    return $self;
+}
+
+sub _dispatch_stream_activity {
+    my ($self) = @_;
+
+    my $callback = $STREAM_ACTIVITY_CALLBACK{$self};
+    return if !$callback;
+    return if $STREAM_ACTIVITY_NOTIFIED{$self};
+    return if !$self->_stream_activity_pending;
+
+    $STREAM_ACTIVITY_NOTIFIED{$self} = 1;
+    $callback->($self);
+    return;
+}
+
+sub next_active_stream_id {
+    my ($self) = @_;
+
+    my $id = $self->_next_active_stream_id;
+
+    delete $STREAM_ACTIVITY_NOTIFIED{$self}
+        if !defined($id) || !$self->_stream_activity_pending;
+
+    return $id;
+}
+
+sub send_buffer_limit {
+    my ($self, @args) = @_;
+
+    return $self->_send_buffer_limit if !@args;
+
+    my $limit = $args[0];
+
+    if (!defined $limit) {
+        $self->_clear_send_buffer_limit;
+        return $self;
+    }
+
+    die "send buffer limit must be a non-negative integer"
+        if ref($limit) || $limit !~ /\A\d+\z/;
+
+    $self->_set_send_buffer_limit($limit);
+    return $self;
+}
+
+sub send_buffered_bytes {
+    my ($self) = @_;
+    return $self->_send_buffered_bytes;
+}
+
 sub open_bidi_stream {
     my ($self) = @_;
     my $id = $self->_open_stream(1);
@@ -104,6 +310,78 @@ sub close_info {
     return $self->_close_info;
 }
 
+sub migrate {
+    my ($self, $local) = @_;
+
+    die "missing migration local address"
+        if !defined $local;
+
+    $self->_migrate($local);
+    $self->_notify_output;
+    return;
+}
+
+sub path {
+    my ($self) = @_;
+
+    my $path = $self->_path;
+    return if !defined $path;
+
+    return {
+        local => $path->[0],
+        peer  => $path->[1],
+    };
+}
+
+sub path_validation {
+    my ($self) = @_;
+
+    my $state = $self->_path_validation;
+    return { status => 'none' } if !defined $state;
+
+    my @status = qw(none validating succeeded failed aborted);
+    my $status = $status[$state->[0]];
+
+    die "invalid native path validation status"
+        if !defined $status;
+
+    return {
+        status            => $status,
+        local             => $state->[2],
+        peer              => $state->[3],
+        preferred_address => ($state->[1] & 0x01) ? 1 : 0,
+        new_token         => ($state->[1] & 0x02) ? 1 : 0,
+    };
+}
+
+sub path_validation_status {
+    my ($self) = @_;
+    return $self->path_validation->{status};
+}
+
+sub early_data_state {
+    my ($self) = @_;
+
+    my $ticket = $self->session_ticket;
+    return if !defined $ticket;
+
+    my $transport = $self->_early_data_transport_params;
+    return if !defined $transport;
+
+    return __PACKAGE__->_encode_early_data_state($ticket, $transport);
+}
+
+sub early_data_status {
+    my ($self) = @_;
+    my @status = qw(none pending accepted rejected);
+    my $value = $self->_early_data_status;
+
+    die "invalid native early-data status"
+        if !defined($status[$value]);
+
+    return $status[$value];
+}
+
 sub closed {
     my ($self) = @_;
     return $self->_retired;
@@ -117,17 +395,30 @@ __END__
 
 Net::QUIC::Connection - one QUIC connection
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-A client Connection normally comes from L<Net::QUIC::Driver>:
+A Connection is one secure QUIC relationship with a peer.
+
+It can contain many independent L<Net::QUIC::Stream> objects.
+
+Application protocol code normally works with Connection and Stream. UDP
+socket and timer handling normally stays in L<Net::QUIC::Driver>.
+
+A client Driver has one Connection.
+
+A server Driver can create many Connections.
+
+=head1 BASIC USE
+
+Get the client Connection:
 
     my $connection = $driver->connection;
 
-Wait for the QUIC/TLS handshake:
+Wait for the handshake:
 
     return if !$connection->ready;
 
-Open a bidirectional stream:
+Open a bidirectional Stream:
 
     my $stream = $connection->open_bidi_stream;
 
@@ -136,31 +427,17 @@ Open a bidirectional stream:
         $stream->finish;
     }
 
-Accept streams opened by the peer:
+Accept Streams opened by the peer:
 
     while (my $stream = $connection->next_stream) {
         ...
     }
 
-Close the Connection normally:
+Close normally:
 
     $connection->close;
 
-=head1 DESCRIPTION
-
-Net::QUIC::Connection represents one QUIC connection.
-
-Application protocol code normally works with Connection and
-L<Net::QUIC::Stream>. UDP socket and timer integration normally stays in
-L<Net::QUIC::Driver>.
-
-A client Driver owns one Connection. A server Driver can expose many
-Connections through C<next_connection>.
-
-Connection objects are created by Driver or L<Net::QUIC::Endpoint>. Direct
-native construction is private.
-
-=head1 HANDSHAKE READINESS
+=head1 HANDSHAKE AND SAVED STATE
 
 =head2 ready
 
@@ -168,12 +445,106 @@ native construction is private.
         ...
     }
 
-Returns true after the QUIC cryptographic handshake has completed.
+Returns true after the QUIC/TLS handshake is ready for normal application
+work.
 
-A server Connection may be returned before this becomes true.
+A server can expose a Connection before this becomes true.
 
-Application work that requires an established connection should wait for
-C<ready>.
+=head2 client_chosen_version
+
+    my $version = $connection->client_chosen_version;
+
+Returns 1 or 2 for the QUIC version used by the client's first Initial packet.
+
+This can differ from L</version> when Compatible Version Negotiation switches
+the connection to another supported version during the handshake.
+
+=head2 version
+
+    my $version = $connection->version;
+
+Returns the final negotiated QUIC version, 1 or 2.
+
+It can be undef before version negotiation is complete.
+
+Most applications do not need to branch on this value.
+
+=head2 session_ticket
+
+    my $ticket = $connection->session_ticket;
+
+Returns the newest opaque TLS session ticket received by the client, or undef
+if none is available.
+
+A later client can pass it as:
+
+    session_ticket => $ticket
+
+to attempt a faster resumed TLS handshake.
+
+Treat the ticket as opaque bytes.
+
+If it is expired or otherwise unusable, the connection falls back to a normal
+full handshake.
+
+=head2 resumed
+
+    if ($connection->resumed) {
+        ...
+    }
+
+Returns true when the completed TLS handshake actually resumed a previous
+session.
+
+=head2 address_token
+
+    my $token = $connection->address_token;
+
+Returns the newest opaque QUIC address-validation token received by the client,
+or undef if none is available.
+
+A later client can pass it as:
+
+    address_token => $token
+
+A valid token can let a server with address validation enabled accept the new
+connection without another Retry round trip.
+
+Treat the token as opaque bytes.
+
+=head2 early_data_state
+
+    my $state = $connection->early_data_state;
+
+Returns one opaque value that a client can save for a later 0-RTT attempt.
+
+A later client supplies it as:
+
+    early_data => $state
+
+0-RTT allows some application data to be sent before the new handshake
+completes.
+
+0-RTT data can be replayed. Only use it for operations that are safe to repeat.
+
+=head2 early_data_status
+
+    my $status = $connection->early_data_status;
+
+Returns one of:
+
+    none
+    pending
+    accepted
+    rejected
+
+C<pending> means this client is attempting 0-RTT and does not yet know whether
+the server accepted it.
+
+If 0-RTT is rejected, the normal TLS handshake can still complete.
+
+Streams created for the rejected early-data attempt become invalid. Open new
+Streams after C<ready> and resend only operations that are safe to repeat.
 
 =head1 OPENING STREAMS
 
@@ -181,48 +552,35 @@ C<ready>.
 
     my $stream = $connection->open_bidi_stream;
 
-Opens a local bidirectional stream and returns a L<Net::QUIC::Stream>.
+Opens a bidirectional Stream.
 
-Both endpoints can send application bytes on a bidirectional stream.
+Both endpoints can send on a bidirectional Stream.
 
 Returns undef when the peer's current bidirectional stream limit has been
 reached.
 
-That is normal QUIC flow control. It does not mean the Connection failed.
-
-Other failures still throw an exception.
+That is normal QUIC flow control, not a Connection failure.
 
 =head2 open_uni_stream
 
     my $stream = $connection->open_uni_stream;
 
-Opens a local unidirectional stream.
+Opens a unidirectional Stream.
 
-This endpoint can send application bytes on the stream but cannot receive
-application bytes from it.
+Only this endpoint can send application bytes on a locally opened
+unidirectional Stream.
 
 Returns undef when the peer's current unidirectional stream limit has been
 reached.
-
-Other failures still throw an exception.
 
 =head2 on_stream_available
 
     $connection->on_stream_available(sub {
         my ($connection, $type) = @_;
-
-        return if $type ne 'bidi';
-
-        my $stream = $connection->open_bidi_stream;
-        return if !defined $stream;
-
         ...
     });
 
-Registers a callback for stream-limit recovery.
-
-Use it when C<open_bidi_stream> or C<open_uni_stream> returned undef and the
-application wants to continue when the peer later grants more stream credit.
+Registers a callback for new local stream credit.
 
 C<$type> is:
 
@@ -232,12 +590,8 @@ or:
 
     uni
 
-The callback runs outside ngtcp2's internal callback stack, so opening a stream
-from it is safe.
-
-Pass undef to remove the callback:
-
-    $connection->on_stream_available(undef);
+Use this when C<open_bidi_stream> or C<open_uni_stream> returned undef and the
+application wants to try again when the peer allows another Stream.
 
 =head1 PEER-CREATED STREAMS
 
@@ -247,10 +601,171 @@ Pass undef to remove the callback:
         ...
     }
 
-Returns the next stream opened by the peer, or undef when no new incoming
-stream is waiting.
+Returns the next Stream opened by the peer.
 
-The returned object is a L<Net::QUIC::Stream>.
+Returns undef when no new peer-created Stream is waiting.
+
+A Stream can be bidirectional or unidirectional. Use:
+
+    $stream->can_send
+    $stream->can_receive
+
+when code needs to handle either kind.
+
+=head2 on_stream_activity
+
+    $connection->on_stream_activity(sub {
+        my ($connection) = @_;
+        ...
+    });
+
+Registers an advanced protocol-engine wake-up callback.
+
+The callback runs when one or more Streams have meaningful new activity, such
+as received data, FIN, acknowledgement progress, RESET_STREAM, STOP_SENDING,
+stream close, or a newly peer-created Stream.
+
+The callback does not receive one event object per transport event. Activity is
+coalesced by Stream.
+
+Drain the changed Stream IDs with L</next_active_stream_id>.
+
+Pass undef to disable activity tracking:
+
+    $connection->on_stream_activity(undef);
+
+Activity tracking is opt-in so ordinary applications pay no queueing cost.
+
+=head2 next_active_stream_id
+
+    while (defined(my $id = $connection->next_active_stream_id)) {
+        ...
+    }
+
+Returns the next Stream ID with coalesced activity.
+
+Returns undef when the activity queue is empty.
+
+A protocol engine should normally drain this queue when L</on_stream_activity>
+wakes it. State such as received data, acknowledgement offsets, reset codes,
+and STOP_SENDING codes remains available on the corresponding Stream object.
+
+=head1 BOUNDED TRANSMIT BUFFERING
+
+These methods are for advanced producers that need a hard bound on Stream data
+retained by Net::QUIC.
+
+=head2 send_buffer_limit
+
+    $connection->send_buffer_limit(4 * 1024 * 1024);
+
+Enables a connection-wide limit on retained Stream transmit bytes.
+
+The limit counts Stream data that is queued for sending plus data already sent
+but still retained until peer acknowledgement.
+
+Use:
+
+    my $limit = $connection->send_buffer_limit;
+
+to read the current limit.
+
+It returns undef when bounded transmit mode is disabled.
+
+Disable the limit with:
+
+    $connection->send_buffer_limit(undef);
+
+A new limit cannot be smaller than the amount of Stream data already retained.
+
+When a limit is enabled, ordinary L<Net::QUIC::Stream/send> remains
+all-or-nothing. It throws instead of exceeding the configured bound.
+Advanced producers should use L<Net::QUIC::Stream/send_some>.
+
+=head2 send_buffered_bytes
+
+    my $bytes = $connection->send_buffered_bytes;
+
+Returns the total number of Stream data bytes currently retained for transmit
+across this Connection.
+
+This includes sent data that still has to remain available until it is
+acknowledged.
+
+=head1 NETWORK PATH
+
+A QUIC Connection can survive some network-address changes without being
+recreated.
+
+Most applications do not need to inspect path state during ordinary use.
+
+=head2 path
+
+    my $path = $connection->path;
+
+Returns the active network path:
+
+    {
+        local => $packed_local_address,
+        peer  => $packed_peer_address,
+    }
+
+=head2 migrate
+
+    $connection->migrate($new_packed_local_address);
+
+Client only.
+
+Starts migration to another local address while keeping the same QUIC
+Connection.
+
+Net::QUIC validates the new path before switching to it.
+
+If validation fails, the previous working path stays active.
+
+=head2 path_validation_status
+
+    my $status = $connection->path_validation_status;
+
+Returns:
+
+    none
+    validating
+    succeeded
+    failed
+    aborted
+
+This is the simple path-validation view.
+
+=head2 path_validation
+
+    my $info = $connection->path_validation;
+
+Returns the detailed current or most recent path-validation state.
+
+The hash includes at least:
+
+    status
+
+and, when a validation has occurred:
+
+    local
+    peer
+
+It also reports whether the validation was associated with a server preferred
+address or a fresh address-validation token.
+
+=head2 path_max_udp_payload_size
+
+    my $bytes = $connection->path_max_udp_payload_size;
+
+Returns the currently discovered maximum UDP payload size for the active path.
+
+A new path starts at QUIC's safe 1200-byte baseline. The native QUIC engine can
+raise this value when larger packets work.
+
+This is mainly diagnostic. Applications normally do not need to manage PMTU
+discovery themselves.
 
 =head1 CLOSING
 
@@ -262,17 +777,12 @@ or:
 
     $connection->close($application_error_code);
 
-Starts a normal QUIC application-level Connection close.
+Starts a normal application-level QUIC close.
 
-The application error code defaults to zero.
+The default application error code is zero.
 
-Calling C<close> again while the Connection is already closing is harmless.
-
-C<close> does not immediately destroy the object. QUIC has a closing/draining
-period during which late packets still need network and timer service.
-
-When the Connection belongs to a Driver, Driver automatically services the
-close packet and timeout changes.
+Closing is not immediate destruction. QUIC has a short closing/draining period
+so late packets can still be handled correctly.
 
 =head2 closed
 
@@ -280,10 +790,7 @@ close packet and timeout changes.
         ...
     }
 
-Returns true after the Connection has completely finished its QUIC closing or
-draining period and no longer needs network or timer service.
-
-C<close_info> can become available before C<closed> becomes true.
+Returns true when the Connection no longer needs network or timer service.
 
 =head1 CLOSE AND ERROR INFORMATION
 
@@ -291,17 +798,19 @@ C<close_info> can become available before C<closed> becomes true.
 
     my $info = $connection->close_info;
 
-Returns undef while no Connection close or failure has been recorded.
+Returns undef while no close or failure has been recorded.
 
-Once a close or failure is known, returns a small hash reference.
+Otherwise it returns a hash describing the outcome.
 
-The common fields are:
+For example, a normal peer application close can look like:
 
-    type
-    initiator
-    code
+    {
+        type      => 'application',
+        initiator => 'peer',
+        code      => 0,
+    }
 
-C<type> is one of:
+C<type> can be:
 
     application
     transport
@@ -314,54 +823,35 @@ C<type> is one of:
 C<initiator> is:
 
     local
-
-or:
-
     peer
 
 C<code> is the application error code, QUIC transport error code, or TLS alert
 code as appropriate.
 
-For example, a normal peer application close can be:
+A peer transport error can also include C<frame_type>.
 
-    {
-        type      => 'application',
-        initiator => 'peer',
-        code      => 0,
-    }
+A locally detected native transport failure can include C<native_error>.
 
-C<frame_type> is included when a peer transport close identifies the QUIC frame
-that caused the error.
+Remote protocol errors, certificate failures, handshake failures, idle timeout,
+and normal closes are Connection outcomes rather than ordinary Perl
+exceptions.
 
-C<native_error> is included for failures detected locally by ngtcp2.
-
-TLS certificate verification failures use:
-
-    type => 'certificate'
-
-Other TLS failures use:
-
-    type => 'tls'
-
-Handshake timeout uses:
-
-    type => 'handshake'
-
-Local API misuse, invalid configuration, allocation failure, and internal
-implementation failures still throw Perl exceptions. Those are local
-programming or system failures rather than ordinary remote Connection
-outcomes.
+Local programming mistakes, invalid configuration, allocation failure, and
+internal implementation failures still throw Perl exceptions.
 
 =head1 DRIVER NOTIFICATION
 
-Connections obtained through L<Net::QUIC::Driver> are privately connected back
-to that Driver.
+Connections obtained through L<Net::QUIC::Driver> automatically notify Driver
+when application operations create new transport work.
 
-State-changing application calls such as stream send/finish/reset, data
-consumption, and Connection close can therefore cause QUIC output and timer
-changes to be serviced automatically.
+For example:
 
-Application code does not need to call a separate pump or service method.
+    $stream->send(...);
+    $stream->finish;
+    $stream->reset(...);
+    $connection->close;
+
+do not require a separate service or pump call.
 
 =head1 SEE ALSO
 

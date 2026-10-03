@@ -27,7 +27,7 @@ use Scalar::Util qw(blessed);
 use Sub::Private;
 use Sub::Protected;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.001.1';
 
 # Stop Carp from reporting errors against the access-control wrappers
 our @CARP_NOT = qw(Sub::Private Sub::Protected App::Access2CSV::I18N);
@@ -91,6 +91,14 @@ Readonly::Scalar my $RESERVED_NAME_RE => qr/\A(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-
 Readonly::Scalar my $UNNAMED      => 'unnamed';
 Readonly::Scalar my $CSV_SUFFIX   => '.csv';
 
+# Longest file name (before any _2 suffix and ".csv").  Access allows 64
+# characters, so a longer name comes from a damaged or hostile database.
+# 64 characters can still be 256 bytes of UTF-8 (emoji), and most file
+# systems allow 255 bytes per name, so there is a byte limit too, leaving
+# room for "_" plus a collision number and ".csv"
+Readonly::Scalar my $MAX_NAME_CHARS => 64;
+Readonly::Scalar my $MAX_NAME_BYTES => 240;
+
 # Ends option parsing in mdbtools, so a table or database name that
 # starts with "-" is never taken for an option (glib parses options
 # anywhere on the command line, not only before the file name)
@@ -149,17 +157,17 @@ App::Access2CSV::Exporter - Export the tables of a Microsoft Access database to 
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.001.1
 
 =head1 SYNOPSIS
 
 	use App::Access2CSV::Exporter;
 
-	# 1. The simplest case: every table, into the current folder
+	# 1. The simplest case: every table, into the current directory
 	my $exporter = App::Access2CSV::Exporter->new();
 	my $status = $exporter->run('shop.accdb');	# 0 = all OK, 1 = some failed
 
-	# 2. Some tables, into a folder, for Excel, replacing old files
+	# 2. Some tables, into a directory, for Excel, replacing old files
 	my $exporter = App::Access2CSV::Exporter->new(
 		output_dir => 'exports',
 		tables     => ['Customers', 'Orders'],
@@ -200,7 +208,7 @@ Access's own internal tables (names starting with C<MSys>, C<USys> or
 C<~>) are skipped.
 
 Each file is first written to a hidden temporary file in the output
-folder, and renamed to its real name only when it is complete.  So a
+directory, and renamed to its real name only when it is complete.  So a
 failed export never leaves a half-written CSV file, and an old file is
 only replaced by a complete new one.  New files get the usual
 permissions (0666 minus your umask).
@@ -208,8 +216,8 @@ permissions (0666 minus your umask).
 An exporter can be used for more than one C<run>.  Each C<run> starts
 again with the same file names, so running twice gives the same files.
 
-The mdbtools programs are looked up only in absolute C<PATH> folders, so
-a program planted in the current folder is never run, and they are
+The mdbtools programs are looked up only in absolute C<PATH> directory, so
+a program planted in the current directory is never run, and they are
 started with a cleaned environment (see L<App::Access2CSV/SECURITY>).
 The module works under taint mode (C<perl -T>).  Table names are
 printed and logged with control characters escaped, so a hostile name
@@ -220,7 +228,7 @@ arguments, never through a shell, and after a C<--> marker.  So names
 containing shell characters (C<; | E<gt> $( )>), spaces or newlines, or
 starting with C<->, are always treated as names, never as commands or
 options.  A table name can never place a file outside the output
-folder: C</> and C<\> are replaced, and names cannot start with a dot.
+directory: C</> and C<\> are replaced, and names cannot start with a dot.
 
 An existing entry at the target name - including a symbolic link, even a
 broken one - counts as "already exists".  With C<overwrite>, the link
@@ -278,7 +286,7 @@ the log", stops logging for this exporter, and carries on exporting.
 =item * B<run can croak.>  C<run> returns 1 when some tables fail, but it
 croaks (throws an exception) when nothing can be exported at all: the
 database is missing or unreadable, mdbtools is not installed, or the
-output folder cannot be created.  Wrap C<run> in C<eval> if your program
+output directory cannot be created.  Wrap C<run> in C<eval> if your program
 must keep going.
 
 =item * B<run may change the show_counts setting.>  If C<show_counts> is
@@ -316,7 +324,7 @@ default is used.
 
 =over 4
 
-=item C<output_dir> - the folder for the CSV files.  Default: the current folder.
+=item C<output_dir> - the directory for the CSV files.  Default: the current directory.
 
 =item C<tables> - an array reference of table names to export.  Default:
 all tables.  An empty array means no tables.
@@ -449,8 +457,8 @@ sub new {
 	# Copy the table list so later changes by the caller cannot affect us
 	$params->{tables} = [ @{ $params->{tables} } ] if $params->{tables};
 
-	# The output folder is the invoking user's own choice; it is only used
-	# as a folder name, so it is untainted here (see _untaint)
+	# The output directory is the invoking user's own choice; it is only used
+	# as a directory name, so it is untainted here (see _untaint)
 	$params->{output_dir} = _untaint($params->{output_dir}) if defined $params->{output_dir};
 
 	my $self = bless { %DEFAULTS, %{$params}, used_names => {}, next_suffix => {}, programs => {} }, $class;
@@ -487,7 +495,7 @@ C<1> if at least one table was not exported (the others were).
 
 =over 4
 
-=item * Creates the output folder if needed (not in dry-run mode, and
+=item * Creates the output directory if needed (not in dry-run mode, and
 not when no table is selected).
 
 =item * Writes one CSV file per table (not in dry-run mode).
@@ -503,7 +511,7 @@ names in C<tables>, and about a missing C<mdb-count>.
 
 =item * Croaks, before writing anything, if the database cannot be read, a
 needed mdbtools program is missing, C<mdb-tables> fails, or the output
-folder cannot be created.
+directory cannot be created.
 
 =item * Switches C<show_counts> off for this exporter if C<mdb-count> is
 missing.
@@ -554,7 +562,7 @@ Valid and invalid values (tested in F<t/domain.t>):
 
 	database    valid:   a readable regular file
 	            invalid: "" (below the 1-character minimum), undef,
-	                     a missing file, a folder, a device or FIFO,
+	                     a missing file, a directory, a device or FIFO,
 	                     an unreadable file
 	            edges:   each part of the path may be up to 255 bytes;
 	                     256 gives "File name too long"
@@ -562,18 +570,21 @@ Valid and invalid values (tested in F<t/domain.t>):
 The table names that mdbtools reports are data, not arguments, but they
 have limits of their own:
 
-	length      a CSV file name is the table name plus ".csv", and the
-	            file system limits file names, so table names up to 251
-	            units work and longer ones fail (that table only).  The
-	            unit depends on the file system: Linux counts bytes (125
-	            u-umlauts, 2 bytes each, fit; 126 do not), macOS counts
-	            characters (up to 251 of any letter fit).  Access allows
-	            at most 64 characters, well within either limit.
+	length      a CSV file name is the table name plus ".csv".  Access
+	            allows at most 64 characters, so longer names (only from
+	            a damaged or hostile database) are shortened to 64
+	            characters, and also to at most 240 bytes of UTF-8 (64
+	            emoji would be 256 bytes; most file systems allow 255).
+	            A name is never cut inside a character, nor between a
+	            letter and its accents or inside a joined emoji.
+	            Shortened names that clash are numbered as usual.
 	characters  non-ASCII letters, emoji, joined emoji, combining marks
 	            and right-to-left text are kept byte for byte.
 	            Characters that are unsafe in file names - including
 	            invisible text-direction controls such as U+202E - are
-	            replaced by "_".
+	            replaced by "_".  So is each byte that is not part of
+	            valid UTF-8 (only a damaged database has them; macOS
+	            refuses such file names).
 	collisions  the first name has no suffix, then _2, _3, ... _10 ...
 	cp1252      U+00FF and the Euro sign convert; U+0100 and above
 	            (except the few Windows-1252 symbols), the C1 controls
@@ -604,14 +615,14 @@ only that table fails; C<run> warns, logs, and carries on.
 	| Cannot read database F: E (fatal)       | F does not exist, or cannot  | Check the path                |
 	|                                         | be reached; E is the reason  |                               |
 	|                                         | from the operating system    |                               |
-	| Database F is not a regular file (fatal)| F is a folder or a device    | Give the database file        |
+	| Database F is not a regular file (fatal)| F is a directory or a device    | Give the database file        |
 	| Database F is not readable (fatal)      | No permission to read F      | Fix the permissions           |
 	|                                         | (never happens for root)     |                               |
 	| Required program not found in PATH: P   | mdbtools is not installed,   | Install mdbtools, or fix PATH |
 	|  (fatal)                                | or not in PATH               |                               |
 	| mdb-tables failed with exit status N: E | mdbtools cannot read the     | Check that F is a real Access |
 	|  (fatal)                                | file                         | database                      |
-	| Cannot create output directory D: E     | The folder cannot be made;   | Check permissions and path    |
+	| Cannot create output directory D: E     | The directory cannot be made;   | Check permissions and path    |
 	|  (fatal)                                | E is the reason for D itself |                               |
 	|                                         | (e.g. "Not a directory" when |                               |
 	|                                         | a file is in the way)        |                               |
@@ -658,7 +669,7 @@ only that table fails; C<run> warns, logs, and carries on.
 		      if a count fails)
 		return 0
 	if there are tables to export:
-		create the output folder (croak if that fails)
+		create the output directory (croak if that fails)
 	for each table:
 		print "[n/total] table" if progress is on
 		try to export the table
@@ -727,7 +738,7 @@ sub run {
 		return set_return($EXIT_OK, { %RUN_STATUS_SCHEMA });
 	}
 
-	# The output folder is only made when there is something to put in it;
+	# The output directory is only made when there is something to put in it;
 	# with no tables selected the run goes straight to the summary
 	my $failed = (@{$tables} ? $self->_make_output_dir() : $self)->_export_all($database, $tables);
 	return set_return($failed ? $EXIT_FAILURE : $EXIT_OK, { %RUN_STATUS_SCHEMA });
@@ -793,7 +804,7 @@ sub _find_program :Private {
 
 	# Only absolute paths are trusted.  A relative entry in PATH (".", or
 	# an empty one) would run whatever file of that name is in the current
-	# folder - a classic way to plant a program.
+	# directory - a classic way to plant a program.
 	my ($path) = grep { defined && File::Spec->file_name_is_absolute($_) } which($program);
 
 	# An absolute path to an existing program: safe to untaint
@@ -1111,7 +1122,7 @@ sub _run_program :Private {
 	local ($?, $.);
 
 	# Start the program in a clean environment (as perlsec asks, and as
-	# taint mode requires): PATH keeps only absolute folders, and variables
+	# taint mode requires): PATH keeps only absolute directory, and variables
 	# that can change how a program is started are removed
 	# (File::Spec->path and path_sep, not ":": Windows separates PATH with
 	# ";" and its paths contain ":", as in C:\\)
@@ -1163,6 +1174,14 @@ sub _csv_filename :Protected {
 
 	my $name = $table // '';
 
+	# macOS only accepts file names that are valid UTF-8 (anything else
+	# fails with "Illegal byte sequence").  mdbtools gives UTF-8, so other
+	# bytes come from a damaged database: each one becomes "_", on every
+	# system, so a table gets the same file name everywhere
+	if(!utf8::is_utf8($name)) {
+		$name = $UTF8_CODEC->encode($UTF8_CODEC->decode($name, sub { '_' }));
+	}
+
 	# Replace characters that are illegal somewhere, then strip leading
 	# and trailing whitespace; Windows also silently drops trailing dots
 	$name =~ s/$UNSAFE_CHARS_RE/_/g;
@@ -1178,6 +1197,11 @@ sub _csv_filename :Protected {
 		$name =~ s/\xC2[\x80-\x9F]/_/g;
 	}
 	$name =~ s/\A\s+//;
+
+	# Shorten over-long names (a hostile or corrupt database can give any
+	# length), before trailing spaces and dots are removed, as shortening
+	# may leave some at the end
+	$name = $self->_shorten_name($name);
 	$name =~ s/[\s.]+\z//;
 
 	# Avoid hidden files, Windows device names and empty names
@@ -1202,6 +1226,43 @@ sub _csv_filename :Protected {
 	$used->{lc $file} = 1;
 
 	return $file;
+}
+
+# _shorten_name
+# Purpose:        Keep a file name within $MAX_NAME_CHARS characters and
+#                 $MAX_NAME_BYTES bytes of UTF-8, without cutting a
+#                 character, or a character from its accents (a grapheme,
+#                 such as a joined emoji), in half.
+# Entry Criteria: $name is a character string, or a byte string of valid
+#                 UTF-8 (_csv_filename has replaced any other bytes).
+# Exit Status:    Returns $name if it fits, otherwise its longest
+#                 beginning that fits, in the same form (bytes or
+#                 characters).
+# Side Effects:   None.
+sub _shorten_name :Private {
+	my ($self, $name) = @_;
+
+	my $chars = utf8::is_utf8($name);
+	my $bytes = $name;
+	utf8::encode($bytes) if $chars;
+
+	my $text = $bytes;
+	utf8::decode($text);
+	return $name if length($text) <= $MAX_NAME_CHARS && length($bytes) <= $MAX_NAME_BYTES;
+
+	# Whole graphemes, as many as fit both limits
+	my ($kept, $count, $size) = ('', 0, 0);
+	foreach my $grapheme ($text =~ /(\X)/g) {
+		my $encoded = $grapheme;
+		utf8::encode($encoded);
+		last if $count + length($grapheme) > $MAX_NAME_CHARS
+			|| $size + length($encoded) > $MAX_NAME_BYTES;
+		$kept .= $grapheme;
+		$count += length $grapheme;
+		$size += length $encoded;
+	}
+	utf8::encode($kept) unless $chars;
+	return $kept;
 }
 
 # _dry_run
@@ -1345,11 +1406,11 @@ trust them; for example, C<encoding> is always one of the three names,
 so no "unknown encoding" branch is needed.
 
 =item * B<Fail fast, in a fixed order.>  C<run> checks the database, then
-finds the programs, then lists the tables, then makes the folder.
+finds the programs, then lists the tables, then makes the directory.
 Premise 1: each step needs the one before it.  Premise 2: a failure in
 one step is fatal.  Conclusion: when a step fails, nothing after it
 runs - no program is looked up for a missing database, no program is run
-when one is missing, and no folder is made when the table list fails.
+when one is missing, and no directory is made when the table list fails.
 
 =item * B<A dry run always succeeds.>  Premise 1: a dry run writes no
 files.  Premise 2: only writing a file can fail a table.  Conclusion: a
@@ -1385,9 +1446,10 @@ breaks covers several lines.
 place are two separate steps.  If another program creates the same file
 between them, that file is replaced.
 
-=item * File names are made safe for Windows, macOS and Unix, but are not
-shortened.  Access table names are at most 64 characters, which is well
-within normal limits.
+=item * File names are made safe for Windows, macOS and Unix, and
+shortened to 64 characters and 240 bytes.  A few file systems allow
+less than 255 bytes per name (eCryptfs allows about 143); there a long
+name can still fail with "File name too long", for that table only.
 
 =item * Row counts need one extra C<mdb-count> run for each table.
 
@@ -1448,7 +1510,8 @@ finds the same (smallest free) suffix as starting from 2.
 	│ ΔExporter
 	│ table? : NAME ; file! : FILENAME
 	├────────────────────────────────────────────────────────────
-	│ b = safe(table?)
+	│ b = shorten(safe(table?))
+	│ #b ≤ 64 ∧ #utf8(b) ≤ 240
 	│ file! = (if lower(b ⁀ ".csv") ∉ lower⦇used_names⦈ then b ⁀ ".csv"
 	│          else b ⁀ "_" ⁀ min{ k : ℕ | k ≥ 2 ∧
 	│                 lower(b ⁀ "_" ⁀ k ⁀ ".csv") ∉ lower⦇used_names⦈ } ⁀ ".csv")
@@ -1535,11 +1598,11 @@ the way.
 	     +------------+-------------+                          |       |
 	     | dry_run    | no tables   | tables to export         |       |
 	     v            | selected    v                          |       |
-	 +------------+   |    +----------------+  mkdir fails     |       |
-	 |  DRY RUN   |   |    |   PREPARING    |------------------+       |
-	 | print list |   |    | output folder  |                  |       |
-	 | to STDOUT  |   |    +----------------+                  v       |
-	 +------------+   |            | folder exists     +--------------+|
+	 +------------+   |    +------------------+  mkdir fails   |       |
+	 |  DRY RUN   |   |    |   PREPARING      |----------------+       |
+	 | print list |   |    | output directory |                |       |
+	 | to STDOUT  |   |    +------------------+                v       |
+	 +------------+   |            | directory exists  +--------------+|
 	     |            |            v                   |    FATAL     ||
 	     |            |    +----------------+          | croak; no    ||
 	     |            |    |   EXPORTING    |<--+      | file written |+

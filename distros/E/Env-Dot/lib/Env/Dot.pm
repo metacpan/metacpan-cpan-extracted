@@ -9,7 +9,7 @@ use Carp;
 
 # ABSTRACT: Read environment variables from .env file
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 # We define our own import routine because
 # this is the point (when `use Env::Dot` is called)
@@ -19,12 +19,12 @@ our $VERSION = '0.022';
     no warnings 'redefine';    ## no critic [TestingAndDebugging::ProhibitNoWarnings]
 
     sub import {
-        my ( $class, $cmd, $args ) = @_;
+        my ($class, $cmd, $args) = @_;
 
         # We also allow only: 'use Env::Dot;'
-        croak "Unknown argument '$cmd'" if ( $cmd && $cmd ne 'read' );
+        croak "Unknown argument '$cmd'" if( $cmd && $cmd ne 'read' );
 
-        if ( !load_vars( %{ $args // {} } ) ) {
+        if( ! load_vars( %{ $args // {} } ) ) {
             croak 'Errors in environment detected.';
         }
         return;
@@ -32,11 +32,11 @@ our $VERSION = '0.022';
 }
 
 use Env::Dot::Functions qw(
-  get_dotenv_vars
-  interpret_dotenv_filepath_var
-  get_envdot_filepaths_var_name
-  extract_error_msg
-  create_error_msg
+    get_dotenv_vars
+    interpret_dotenv_filepath_var
+    get_envdot_filepaths_var_name
+    extract_error_msg
+    create_error_msg
 );
 
 use constant {
@@ -49,76 +49,21 @@ use constant {
     INDENT                       => q{    },
 };
 
-sub load_vars {
-    my (%args) = @_;
-    my %allowed_args = ( 'dotenv_file' => 1, 'required' => 1, );
-    foreach my $arg ( keys %args ) {
-        croak "Illegal argument '$arg'" if ( !exists $allowed_args{$arg} );
-    }
-    my @dotenv_filepaths;
-    if ( $args{'dotenv_file'} ) {
-        @dotenv_filepaths = ( $args{'dotenv_file'} );
-    }
-    elsif ( exists $ENV{ get_envdot_filepaths_var_name() } ) {
-        @dotenv_filepaths = interpret_dotenv_filepath_var( $ENV{ get_envdot_filepaths_var_name() } );
-    }
-    else {
-        if ( -f DEFAULT_ENVDOT_FILEPATHS ) {
-            @dotenv_filepaths = (DEFAULT_ENVDOT_FILEPATHS);    # The CLI parameter
-        }
-        elsif ( $args{'required'} // DEFAULT_ENVDOT_FILE_REQUIRED ) {
-            croak 'No .env file found';
-        }
-    }
-
-    my @vars;
-    eval { @vars = get_dotenv_vars(@dotenv_filepaths); 1; } or do {
-        my $e = $EVAL_ERROR;
-        my ( $err, $l, $fp ) = extract_error_msg($e);
-        croak 'Error: ' . $err . ( $l ? qq{ line $l} : q{} ) . ( $fp ? qq{ file '$fp'} : q{} );
-    };
-    my %new_env;
-
-    # Populate new env with the dotenv variables.
-    foreach my $var (@vars) {
-        $new_env{ $var->{'name'} } = $var->{'value'};
-    }
-    foreach my $var_name ( sort keys %ENV ) {
-        $new_env{$var_name} = $ENV{$var_name};
-    }
-
-    # We need to replace the current %ENV, not change individual values.
-    ## no critic [Variables::RequireLocalizedPunctuationVars]
-    %ENV = %new_env;
-    return \%ENV;
-}
-
-1;
-
-__END__
-
 =pod
 
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
 Env::Dot - Read environment variables from .env file
 
-=head1 VERSION
-
-version 0.022
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-More flexibility in how you manage and use your F<.env> file.
-
 =head1 STATUS
 
 This module is currently being developed so changes in the API are possible,
 though not likely.
+
+
+=head1 SYNOPSIS
 
 =for test_synopsis BEGIN { die 'SKIP: no .env file here' }
 
@@ -138,6 +83,10 @@ though not likely.
     use Env::Dot read => {
         required => 1,
     };
+
+=head1 DESCRIPTION
+
+More flexibility in how you manage and use your F<.env> file.
 
 =for stopwords dotenv
 
@@ -325,6 +274,52 @@ No functions exported to the calling namespace.
 Load variables from F<.env> file or files in environment variable
 B<ENVDOT_FILEPATHS>.
 
+=cut
+
+sub load_vars {
+    my (%args) = @_;
+    my %allowed_args = ('dotenv_file' => 1, 'required' => 1, );
+    foreach my $arg (keys %args) {
+        croak "Illegal argument '$arg'" if (!exists $allowed_args{$arg});
+    }
+    my @dotenv_filepaths;
+    if ( $args{'dotenv_file'} ) {
+        @dotenv_filepaths = ($args{'dotenv_file'});
+    } elsif ( exists $ENV{ get_envdot_filepaths_var_name() } ) {
+        @dotenv_filepaths = interpret_dotenv_filepath_var( $ENV{ get_envdot_filepaths_var_name() } );
+    } else {
+        if ( -f DEFAULT_ENVDOT_FILEPATHS ) {
+            @dotenv_filepaths = (DEFAULT_ENVDOT_FILEPATHS);    # The CLI parameter
+        } elsif( $args{'required'}//DEFAULT_ENVDOT_FILE_REQUIRED ) {
+            croak 'No .env file found';
+        }
+    }
+
+    my @vars;
+    eval { @vars = get_dotenv_vars(@dotenv_filepaths); 1; } or do {
+        my $e = $EVAL_ERROR;
+        my ($err, $l, $fp) = extract_error_msg($e);
+        croak 'Error: ' . $err . ($l ? qq{ line $l} : q{}) . ($fp ? qq{ file '$fp'} : q{})
+    };
+    my %new_env;
+
+    # Populate new env with the dotenv variables.
+    foreach my $var (@vars) {
+        $new_env{ $var->{'name'} } = $var->{'value'};
+    }
+    foreach my $var_name ( sort keys %ENV ) {
+        $new_env{$var_name} = $ENV{$var_name};
+    }
+
+    # We need to replace the current %ENV, not change individual values.
+    ## no critic [Variables::RequireLocalizedPunctuationVars]
+    %ENV = %new_env;
+    return \%ENV;
+}
+
+
+=pod
+
 =head1 SEE ALSO
 
 L<Env::Assert> will verify that you certainly have those environmental
@@ -343,6 +338,46 @@ to configure application with the help of environment variables.
 L<shdotenv|https://github.com/ko1nksm/shdotenv> is a project to provide dotenv
 for shells with support for POSIX-compliant and multiple .env file syntax.
 
+=head1 ADOPTION
+
+If you're interested in adopting this module, and the author/maintainer
+appears to be no longer active, please consult the PAUSE module
+adoption process documented at L<https://github.com/Perl-Toolchain-Gang/pause/blob/master/doc/takeover-policy.md>.
+
+The PAUSE admins (modules@perl.org) may grant co-maintainer or
+primary-maintainer permissions to a suitable adopter if:
+
+=over 4
+
+=item *
+
+There has been no release for a year or more, AND
+
+=item *
+
+There are outstanding issues, pull requests, or bug reports that would
+benefit from attention, AND
+
+=item *
+
+Reasonable attempts to contact me have failed (CPAN email address,
+GitHub issues on the project repository, and any other channels listed
+in this distribution) over a period of at least one month, AND
+
+=item *
+
+The prospective adopter intends to make changes that benefit users of
+the module.
+
+=back
+
+=for stopwords maintainership
+
+In the event of my death or permanent incapacity, my heirs are not
+obligated to maintain these modules, and I explicitly authorize the
+PAUSE admins to transfer maintainership without further consultation
+once the conditions above are met.
+
 =head1 AUTHOR
 
 Mikko Koivunalho <mikkoi@cpan.org>
@@ -355,3 +390,6 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+1;
+__END__

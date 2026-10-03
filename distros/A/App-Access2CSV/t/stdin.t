@@ -9,7 +9,7 @@
 # interruption), and the guards: a terminal is refused, empty input is
 # an error, "./-" still names a file called "-".
 #
-# TMPDIR points at a folder per test, so a left-over copy would show.
+# TMPDIR points at a directory per test, so a left-over copy would show.
 #
 # Set TEST_VERBOSE=1 to see internal state.
 
@@ -76,7 +76,7 @@ sub list_dir {
 }
 
 # piped(\$input, @argv): run bin/access2csv with $input on standard input
-# and TMPDIR set to a fresh folder; returns a hashref of the outcome
+# and TMPDIR set to a fresh directory; returns a hashref of the outcome
 sub piped {
 	my ($input, @argv) = @_;
 	my $tmp = tempdir(CLEANUP => 1);
@@ -145,16 +145,50 @@ subtest 'empty standard input is an error, not a confusing mdbtools failure' => 
 };
 
 subtest 'a read error gives the real reason' => sub {
-	# A folder as standard input: open succeeds, read fails (EISDIR)
-	my $folder = tempdir(CLEANUP => 1);
+	# A directory as standard input: open succeeds, read fails (EISDIR)
+	my $directory = tempdir(CLEANUP => 1);
 	my $eisdir = do { local $! = Errno::EISDIR(); "$!" };
 	my $tmp = tempdir(CLEANUP => 1);
 	local $ENV{TMPDIR} = $tmp;
 	my ($stdout, $stderr);
-	run3([$^X, "-I$LIB", $SCRIPT, '--no-log', '-'], $folder, \$stdout, \$stderr);
+	run3([$^X, "-I$LIB", $SCRIPT, '--no-log', '-'], $directory, \$stdout, \$stderr);
 	is($? >> 8, $CONFIG{exit_fatal}, 'exit 3');
 	is($stderr, "access2csv: Cannot read standard input: $eisdir\n", 'exact message');
 	is_deeply(list_dir($tmp, $CONFIG{copy_glob}), [], 'copy deleted');
+};
+
+subtest 'regression: a directory is refused before anything is read' => sub {
+	# On NetBSD (and FreeBSD before 13) reading a directory does not fail
+	# with EISDIR: it returns the directory's raw entries, which 0.001.0
+	# copied and exported as if they were a database (exit 1, a 500-byte
+	# "table name").  The directory must be refused before the copy is even
+	# started, so this fails on any system if the check is lost.
+	# https://www.cpantesters.org/cpan/report/e9759fca-bda8-11f1-b0a1-a794297aa253
+	my $directory = tempdir(CLEANUP => 1);
+	my $eisdir = do { local $! = Errno::EISDIR(); "$!" };
+	local $ENV{TMPDIR} = tempdir(CLEANUP => 1);
+
+	# Count the stdin copies started (Capture::Tiny makes its own temp
+	# files, so only the stdin template counts)
+	my $copies = 0;
+	my $real = \&File::Temp::new;
+	my $guard = mock_scoped('File::Temp::new' => sub {
+		my (undef, %args) = @_;
+		$copies++ if ($args{TEMPLATE} // '') =~ /\Aaccess2csv-stdin-/;
+		return $real->(@_);
+	});
+
+	open my $saved, '<&', \*STDIN or die $!;
+	open STDIN, '<', $directory or die "$directory: $!";
+	my $status;
+	my (undef, $stderr) = capture { $status = App::Access2CSV->run('--no-log', '-') };
+	open STDIN, '<&', $saved or die $!;
+	undef $guard;
+
+	is($status, $CONFIG{exit_fatal}, 'exit 3');
+	is($stderr, "access2csv: Cannot read standard input: $eisdir\n", 'exact message, the same on every system');
+	is($copies, 0, 'no copy of standard input was started');
+	is_deeply(list_dir($ENV{TMPDIR}, $CONFIG{copy_glob}), [], 'nothing left in the temporary directory');
 };
 
 subtest 'a terminal on standard input is refused' => sub {
@@ -181,7 +215,7 @@ subtest 'a terminal on standard input is refused' => sub {
 subtest 'interrupted while waiting for input: stopped, copy removed' => sub {
 	# A slow pipe: part of the data arrives, then the writer stalls.
 	# Ctrl-C (INT to the process group) or SIGTERM must stop the program
-	# and must not leave the partial copy in the temporary folder.
+	# and must not leave the partial copy in the temporary directory.
 	foreach my $case (['INT', 1], ['TERM', 0]) {
 		my ($signal, $group) = @{$case};
 		my $tmp = tempdir(CLEANUP => 1);

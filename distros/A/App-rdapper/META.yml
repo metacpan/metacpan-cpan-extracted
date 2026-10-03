@@ -42,5 +42,5 @@ requires:
 resources:
   bugtracker: https://github.com/gbxyz/rdapper/issues
   repository: https://github.com/gbxyz/rdapper.git
-version: '1.25'
+version: '1.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,0 +1,14 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    { "kind": "Comb", "metadata": { "name": "db", "namespace": "one" } },
+    { "kind": "Comb", "metadata": { "name": "db", "namespace": "two" } },
+    { "kind": "Comb", "metadata": { "name": "cache", "namespace": "two" } },
+    { "kind": "Comb", "metadata": { "name": "api", "namespace": "one" },
+      "spec": { "dependsOn": [ "db", "cache", "two/db", "one/db", "ghost", "three/db", "api" ] } },
+    { "kind": "Comb", "metadata": { "name": "web", "namespace": "three" },
+      "spec": { "dependsOn": [ "db", "cache", "one/api" ] } },
+    { "kind": "Comb", "metadata": { "name": "db", "namespace": "two" }, "status": { "phase": "Error" } }
+  ]
+}

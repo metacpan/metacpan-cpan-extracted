@@ -1,0 +1,5 @@
+{
+  "apiVersion": "comb.example.org/v1",
+  "kind": "Comb",
+  "metadata": { "name": "nats" }
+}

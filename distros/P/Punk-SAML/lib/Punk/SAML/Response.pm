@@ -40,6 +40,14 @@ returning true if it has been presented before. It is an argument because
 whether the store is shared across the worker pool is the application's
 decision, and this method has no application.
 
+B<The ACS route does not reach the store through this option> - it has a
+context and a configured store, so it performs the check itself after a
+successful verification. Passing no C<seen> here therefore means "no
+replay check", which is the right default for a method whose other
+callers are C<punk saml verify> and the suite, and the wrong one for a
+route. L<Punk::Plugin::SAML/THE REPLAY STORE> is the route's half, and it
+is on by default and refuses to boot without somewhere to remember ids.
+
 =head2 The identity
 
     {
@@ -51,9 +59,15 @@ decision, and this method has no application.
         session_index   => '_a1b2...',
         authn_instant   => 1725600000,
         not_on_or_after => 1725600300,
+        replay_until    => 1725600300,
         assertion_id    => '_c3d4...',
         raw             => $bytes,
     }
+
+C<replay_until> is the bearer C<SubjectConfirmationData>'s
+C<NotOnOrAfter>, which this method requires, and is how long a replay
+record for C<assertion_id> has to be kept. C<not_on_or_after> is the
+C<Conditions> window and is absent when there are no C<Conditions>.
 
 B<Every attribute value is an arrayref, always,> including when there is
 one value. SAML attributes are multi-valued and C<groups> is the one

@@ -1,0 +1,10 @@
+{
+  "kind": "Comb",
+  "metadata": { "name": "api" },
+  "status": {
+    "phase": "Running",
+    "conditions": [
+      { "type": "Ready", "status": "True", "message": "all resources ready" }
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "kind": "Comb",
+  "metadata": { "name": "nats" },
+  "spec": { "enabled": true },
+  "status": { "phase": "Running" }
+}

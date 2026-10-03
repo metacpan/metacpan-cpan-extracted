@@ -1,5 +1,9 @@
 Revision history for Destructure-Declare
 
+1.01    2026-10-02
+        - FIX: the pre-5.21.6 op_convert_list fallback called Perl_convert,
+          which perl never exports, so the DLL link failed on Windows. 
+
 0.02    2026-06-20
         - Fix load failure on perl < 5.21.6 ("undefined symbol: op_convert_list",
           reported by CPAN Testers on 5.14.4) 

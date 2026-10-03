@@ -1,0 +1,13 @@
+{
+  "kind": "Comb",
+  "metadata": { "name": "api" },
+  "status": {
+    "phase": "Blocked",
+    "conditions": [
+      { "type": "Ready", "status": "False", "reason": "DependencyNotReady", "message": "waiting for db" },
+      { "type": "Configured", "status": "True" },
+      { "type": "Deployed", "status": "False", "message": "nothing deployed yet" },
+      { "type": "Again", "status": "False", "message": "waiting for db" }
+    ]
+  }
+}

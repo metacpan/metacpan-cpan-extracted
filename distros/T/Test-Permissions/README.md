@@ -4,7 +4,7 @@ Test::Permissions - Find out whether chmod can really take access away, so tests
 
 ## Version
 
-0.001.0
+0.001.1
 
 ## Synopsis
 

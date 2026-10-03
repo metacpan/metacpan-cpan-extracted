@@ -1,0 +1,53 @@
+Parse-Crontab-English
+
+This module takes a parsed data structure from Parse::Crontab and turns the
+scheduled run times into something that's a bit more readable. So instead of
+having to parse through
+
+    0   21   *   *   *   *   some_shell_script.sh
+
+you'll get an explanation like 'Once, at 21h00'. Although I guess I want 'Once
+daily, at 21h00'.
+
+Longer lists will be expanded completely, but a shorter description will be
+available, so 'at the hours 6h00, 7h00, 8h00, 9h00, 10h00, 11h00, 12h00, 13h00,
+14h00, 15h00, 16h00, 17h00, 18h00, and 19h00, at :45 after the hour' will also
+be available as '14 times, starting at 6h45, and ending at 19h45'.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Parse::Crontab::English
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-Crontab-English
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Parse-Crontab-English
+
+    Search CPAN
+        https://metacpan.org/release/Parse-Crontab-English
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by T. Alex Beamish.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

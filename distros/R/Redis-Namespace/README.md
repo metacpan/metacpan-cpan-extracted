@@ -55,7 +55,13 @@ It is useful when you have multiple systems using Redis differently in your app.
 
     $ns->scan_callback( match => 'foo:*', sub { my $key = shift; ... } );
 
-Execute a callback exactly once for every matching key within the namespace.
+Execute a callback for every matching key within the namespace.
+The keys are iterated with the Redis `SCAN` command.
+
+Note that `SCAN` may return the same key more than once during an iteration,
+and `scan_callback` does not deduplicate the results.
+So the callback may be called more than once for the same key.
+If your callback has side effects, make it idempotent or deduplicate the keys yourself.
 
 The key is passed as one and only argument to the callback.
 

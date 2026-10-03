@@ -1,0 +1,232 @@
+# nghttp3
+#
+# Copyright (c) 2019 nghttp3 contributors
+# Copyright (c) 2016 ngtcp2 contributors
+# Copyright (c) 2012 nghttp2 contributors
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+cmake_minimum_required(VERSION 3.20)
+# XXX using 0.1.90 instead of 0.2.0-DEV
+project(nghttp3 VERSION 1.18.0 LANGUAGES C)
+
+# See versioning rule:
+#  https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+set(LT_CURRENT  18)
+set(LT_REVISION 0)
+set(LT_AGE      9)
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(Version)
+
+math(EXPR LT_SOVERSION "${LT_CURRENT} - ${LT_AGE}")
+set(LT_VERSION "${LT_SOVERSION}.${LT_AGE}.${LT_REVISION}")
+set(PACKAGE_VERSION     "${PROJECT_VERSION}")
+HexVersion(PACKAGE_VERSION_NUM ${PROJECT_VERSION_MAJOR} ${PROJECT_VERSION_MINOR} ${PROJECT_VERSION_PATCH})
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the build type" FORCE)
+
+  # Include "None" as option to disable any additional (optimization) flags,
+  # relying on just CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (which are empty by
+  # default). These strings are presented in cmake-gui.
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+    "None" "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+include(GNUInstallDirs)
+include(CMakeDependentOption)
+
+include(CMakeOptions.txt)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Do not disable assertions based on CMAKE_BUILD_TYPE.
+foreach(_build_type "Release" "MinSizeRel" "RelWithDebInfo")
+  foreach(_lang C CXX)
+    string(TOUPPER "CMAKE_${_lang}_FLAGS_${_build_type}" _var)
+    string(REGEX REPLACE "(^| )[/-]D *NDEBUG($| )" " " ${_var} "${${_var}}")
+  endforeach()
+endforeach()
+
+enable_testing()
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+
+# Checks for header files.
+include(CheckIncludeFile)
+check_include_file("arpa/inet.h"   HAVE_ARPA_INET_H)
+check_include_file("unistd.h"      HAVE_UNISTD_H)
+check_include_file("sys/endian.h"  HAVE_SYS_ENDIAN_H)
+check_include_file("endian.h"      HAVE_ENDIAN_H)
+check_include_file("byteswap.h"    HAVE_BYTESWAP_H)
+
+include(CheckTypeSize)
+# Checks for typedefs, structures, and compiler characteristics.
+# AC_TYPE_SIZE_T
+check_type_size("ssize_t" SIZEOF_SSIZE_T)
+if(SIZEOF_SSIZE_T STREQUAL "")
+  # ssize_t is a signed type in POSIX storing at least -1.
+  # Set it to a pointer-size int.
+  set(ssize_t ptrdiff_t)
+endif()
+
+# Checks for symbols.
+include(CheckSymbolExists)
+if(HAVE_ENDIAN_H)
+  check_symbol_exists(be64toh "endian.h" HAVE_DECL_BE64TOH)
+endif()
+if(NOT HAVE_DECL_BE64TOH AND HAVE_SYS_ENDIAN_H)
+  check_symbol_exists(be64toh "sys/endian.h" HAVE_DECL_BE64TOH)
+endif()
+
+check_symbol_exists(bswap_64 "byteswap.h" HAVE_DECL_BSWAP_64)
+
+if(${CMAKE_C_BYTE_ORDER} STREQUAL "BIG_ENDIAN")
+  set(WORDS_BIGENDIAN 1)
+endif()
+
+set(WARNCFLAGS)
+set(WARNCXXFLAGS)
+if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
+  if(CMAKE_C_COMPILER_ARCHITECTURE_ID MATCHES "x64")
+    set(CMAKE_C_FLAGS "/guard:ehcont ${CMAKE_C_FLAGS}")
+  endif()
+  if(CMAKE_CXX_COMPILER_ARCHITECTURE_ID MATCHES "x64")
+    set(CMAKE_CXX_FLAGS "/guard:ehcont ${CMAKE_CXX_FLAGS}")
+  endif()
+
+  if(ENABLE_WERROR)
+    set(WARNCFLAGS    /WX)
+    set(WARNCXXFLAGS  /WX)
+  endif()
+else()
+  if(ENABLE_WERROR)
+    set(WARNCFLAGS   "-Werror")
+    set(WARNCXXFLAGS "-Werror")
+  endif()
+
+  include(cmake/PickyWarningsC.cmake)
+  include(cmake/PickyWarningsCXX.cmake)
+
+  if(ENABLE_ASAN)
+    include(CMakePushCheckState)
+    include(CheckCCompilerFlag)
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=address")
+    check_c_compiler_flag(-fsanitize=address C__fsanitize_address_VALID)
+    if(ENABLE_LIB_ONLY)
+      # Bypass C++-specific check for lib-only builds where C++ is not enabled.
+      set(CXX__fsanitize_address_VALID TRUE)
+    else()
+      check_cxx_compiler_flag(-fsanitize=address CXX__fsanitize_address_VALID)
+    endif()
+    cmake_pop_check_state()
+    if(NOT C__fsanitize_address_VALID OR NOT CXX__fsanitize_address_VALID)
+      message(WARNING "ENABLE_ASAN was requested, but not supported!")
+    else()
+      set(CMAKE_C_FLAGS "-fsanitize=address ${CMAKE_C_FLAGS}")
+      set(CMAKE_CXX_FLAGS "-fsanitize=address ${CMAKE_CXX_FLAGS}")
+    endif()
+  endif()
+endif()
+
+if(ENABLE_STATIC_CRT)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
+if(ENABLE_DEBUG)
+  set(DEBUGBUILD 1)
+endif()
+
+if(ENABLE_LIB_ONLY)
+  set(ENABLE_EXAMPLES 0)
+else()
+  enable_language(CXX)
+  set(ENABLE_EXAMPLES 1)
+endif()
+
+add_definitions(-DHAVE_CONFIG_H)
+configure_file(cmakeconfig.h.in config.h)
+# autotools-compatible names
+# Sphinx expects relative paths in the .rst files. Use the fact that the files
+# below are all one directory level deep.
+file(RELATIVE_PATH top_srcdir   "${CMAKE_CURRENT_BINARY_DIR}/dir" "${CMAKE_CURRENT_SOURCE_DIR}")
+file(RELATIVE_PATH top_builddir "${CMAKE_CURRENT_BINARY_DIR}/dir" "${CMAKE_CURRENT_BINARY_DIR}")
+set(abs_top_srcdir  "${CMAKE_CURRENT_SOURCE_DIR}")
+set(abs_top_builddir "${CMAKE_CURRENT_BINARY_DIR}")
+# libnghttp3.pc (pkg-config file)
+set(prefix          "${CMAKE_INSTALL_PREFIX}")
+set(exec_prefix     "${CMAKE_INSTALL_PREFIX}")
+set(libdir          "${CMAKE_INSTALL_FULL_LIBDIR}")
+set(includedir      "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+set(VERSION         "${PACKAGE_VERSION}")
+# For init scripts and systemd service file (in contrib/)
+set(bindir          "${CMAKE_INSTALL_FULL_BINDIR}")
+set(sbindir         "${CMAKE_INSTALL_FULL_SBINDIR}")
+foreach(name
+  lib/libnghttp3.pc
+  lib/includes/nghttp3/version.h
+)
+  configure_file("${name}.in" "${name}" @ONLY)
+endforeach()
+
+if(ENABLE_SHARED_LIB AND ENABLE_STATIC_LIB AND MSVC AND NOT STATIC_LIB_SUFFIX)
+  set(STATIC_LIB_SUFFIX "_static")
+endif()
+
+include_directories(
+  "${CMAKE_CURRENT_BINARY_DIR}" # for config.h
+)
+# For use in src/CMakeLists.txt
+set(PKGDATADIR "${CMAKE_INSTALL_FULL_DATADIR}/${CMAKE_PROJECT_NAME}")
+
+install(FILES README.rst DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+
+add_subdirectory(lib)
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
+add_subdirectory(examples)
+
+
+string(TOUPPER "${CMAKE_BUILD_TYPE}" _build_type)
+message(STATUS "summary of build options:
+
+    Package version: ${VERSION}
+    Library version: ${LT_CURRENT}:${LT_REVISION}:${LT_AGE}
+    Install prefix:  ${CMAKE_INSTALL_PREFIX}
+    Target system:   ${CMAKE_SYSTEM_NAME}
+    Compiler:
+      Build type:     ${CMAKE_BUILD_TYPE}
+      C compiler:     ${CMAKE_C_COMPILER}
+      CFLAGS:         ${CMAKE_C_FLAGS_${_build_type}} ${CMAKE_C_FLAGS}
+      C++ compiler:   ${CMAKE_CXX_COMPILER}
+      CXXFLAGS:       ${CMAKE_CXX_FLAGS_${_build_type}} ${CMAKE_CXX_FLAGS}
+      WARNCFLAGS:     ${WARNCFLAGS}
+      WARNCXXFLAGS:   ${WARNCXXFLAGS}
+    Library:
+      Shared:         ${ENABLE_SHARED_LIB}
+      Static:         ${ENABLE_STATIC_LIB}
+    Test:
+      Build Test:     ${BUILD_TESTING}
+    Library only:     ${ENABLE_LIB_ONLY}
+    Examples:         ${ENABLE_EXAMPLES}
+")

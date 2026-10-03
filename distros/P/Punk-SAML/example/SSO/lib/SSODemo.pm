@@ -17,6 +17,26 @@ our $VERSION = '0.01';
 # yours, reachable through $app->config.
 config 'config/punk.yml';
 
+# Where the SAML plugin remembers the assertion ids it has already
+# accepted, so that one assertion buys exactly one session.
+#
+# REQUIRED by Punk::Plugin::SAML, which refuses to boot without it. A
+# bearer assertion is a password its holder did not choose, and anyone who
+# gets a copy of one delivered assertion consumer POST can present it
+# again until its window closes unless the ids are remembered.
+#
+# `file` and not `memory`, and the arithmetic is the reason: a memory
+# store lives in ONE process, so under `workers => 8` a replay landing on
+# another worker finds an empty store and succeeds. The filesystem is
+# shared by the pool. A keyword rather than a punk.yml section because
+# `cache` has no config form.
+#
+# One path segment, because Punk::Cache::File creates its directory but
+# not the parents of it: 'tmp/cache' under a missing tmp/ is a boot croak.
+# Relative to the application root here because this is an example;
+# /var/cache/<app> in a deployment.
+cache 'file', dir => 'cache';
+
 # Punk::Auth, with no model and no database: `auth_id` reads the signed
 # session straight back, which is all this example needs. A real
 # application says `auth model => 'User'` and gets $c->user with it.

@@ -1,0 +1,31 @@
+{
+   "items" : [
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "db",
+            "namespace" : "prod"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "db",
+            "namespace" : "dev"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "api",
+            "namespace" : "dev"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "db"
+            ]
+         }
+      }
+   ],
+   "kind" : "List"
+}

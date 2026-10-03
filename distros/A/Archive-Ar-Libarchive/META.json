@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,7 @@
             "Dist::Zilla::Plugin::PPPort" : "0",
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.62",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep" : "0",
@@ -130,9 +130,9 @@
          "web" : "https://github.com/uperl/Archive-Ar-Libarchive"
       }
    },
-   "version" : "2.09",
-   "x_generated_by_perl" : "v5.35.5",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "2.10",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

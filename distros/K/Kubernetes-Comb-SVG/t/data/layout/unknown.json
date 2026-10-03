@@ -1,0 +1,34 @@
+{
+   "items" : [
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "api"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "ghost",
+               "db"
+            ]
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "db"
+         }
+      },
+      {
+         "kind" : "Comb",
+         "metadata" : {
+            "name" : "lonely"
+         },
+         "spec" : {
+            "dependsOn" : [
+               "ghost"
+            ]
+         }
+      }
+   ],
+   "kind" : "List"
+}

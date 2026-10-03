@@ -75,4 +75,28 @@ subtest "non-ASCII" => sub {
   like($error, qr/ASCII/, "...and the error mentions ASCII");
 };
 
+sub duration_rejected {
+  my ($input, $error_re) = @_;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  my $ok = eval { duration_to_seconds($input); 1 };
+  my $error = $@;
+
+  ok(!$ok, "'$input' is rejected")
+    and like($error, $error_re, "...with the expected error");
+}
+
+subtest "empty components" => sub {
+  duration_rejected('P',    qr{no components after 'P'});
+  duration_rejected('PT',   qr{no components after 'T'});
+  duration_rejected('P1DT', qr{no components after 'T'});
+};
+
+subtest "trailing zero" => sub {
+  duration_rejected('P1D0',    qr{expected T here: '0'});
+  duration_rejected('PT1H0',   qr{confused by '0'});
+  duration_rejected('P1DT1H0', qr{confused by '0'});
+};
+
 done_testing;

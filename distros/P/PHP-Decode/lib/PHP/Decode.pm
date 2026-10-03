@@ -8,7 +8,7 @@ use warnings;
 use PHP::Decode::Parser;
 use PHP::Decode::Transformer;
 
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 
 sub new {
 	my ($class, %args) = @_;
@@ -341,7 +341,7 @@ Required by PHP::Decode::Transformer:
 
 =item * MD5 hash L<Digest::MD5>
 
-=item * SHA1 hash L<Digest::SHA1>
+=item * SHA1 hash L<Digest::SHA>
 
 =item * HTML text encode/decode L<HTML::Entities>
 

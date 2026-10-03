@@ -15,7 +15,7 @@ use Carp;
 
 # ABSTRACT: Read environment variables from a .env file
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use constant {
     OPTION_FILE_TYPE         => q{file:type},
@@ -34,6 +34,48 @@ my %VAR_OUTPUT = (
     q{csh}  => \&_convert_var_to_csh,
     q{fish} => \&_convert_var_to_fish,
 );
+
+=pod
+
+=encoding utf8
+
+=for stopwords envdot env
+
+=head1 NAME
+
+Env::Dot::ScriptFunctions - Read environment variables from a .env file, functions for the binary script
+
+=head1 STATUS
+
+This module is currently being developed so changes in the API are possible,
+though not likely.
+
+
+=head1 SYNOPSIS
+
+    use Env::Dot::ScriptFunctions qw( convert_variables_into_commands );
+
+=head1 DESCRIPTION
+
+=for stopwords envdot
+
+This package just contains functions for use
+in the main package L<Env::Dot> and in
+the command line tool B<envdot>.
+
+=head1 FUNCTIONS
+
+No functions are automatically exported to the calling namespace.
+
+=head2 convert_variables_into_commands()
+
+# Return all variables from the F<.env> file
+# as a list of hashes (name/value pairs).
+# This list is created in the same order the variables
+# are read from the files and may therefore contain
+# the same variable several times.
+
+=cut
 
 sub convert_variables_into_commands {
     my ( $shell, @vars ) = @_;
@@ -88,55 +130,11 @@ sub _convert_var_to_fish {
     my ( $name, $value, $want_export, $allow_interpolate ) =
       ( $variable->{'name'}, $variable->{'value'}, $variable->{'opts'}->{'export'}, $variable->{'opts'}->{'allow_interpolate'}, );
     my $quote = $allow_interpolate ? q{"} : q{'};
-    return sprintf "set -e %s; set -x -U %s $quote%s$quote", $name, $name, $value;
+    my $export_flag = $want_export ? q{--export} : q{--unexport};
+    return sprintf "set --erase $export_flag --universal %s $quote%s$quote", $name, $value;
 }
 
-1;
-
-__END__
-
 =pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Env::Dot::ScriptFunctions - Read environment variables from a .env file
-
-=head1 VERSION
-
-version 0.022
-
-=head1 SYNOPSIS
-
-    use Env::Dot::ScriptFunctions qw( convert_variables_into_commands );
-
-=head1 DESCRIPTION
-
-=for stopwords envdot env
-
-=head1 STATUS
-
-This module is currently being developed so changes in the API are possible,
-though not likely.
-
-=for stopwords envdot
-
-This package just contains functions for use
-in the main package L<Env::Dot> and in
-the command line tool B<envdot>.
-
-=head1 FUNCTIONS
-
-No functions are automatically exported to the calling namespace.
-
-=head2 convert_variables_into_commands()
-
-# Return all variables from the F<.env> file
-# as a list of hashes (name/value pairs).
-# This list is created in the same order the variables
-# are read from the files and may therefore contain
-# the same variable several times.
 
 =head1 AUTHOR
 
@@ -150,3 +148,6 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+1;
+__END__

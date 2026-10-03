@@ -1,0 +1,184 @@
+{
+  "ready-first": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Error",
+      "conditions": [
+        { "type": "DependenciesReady", "status": "False", "reason": "UpstreamNotRunning", "message": "db is Pending" },
+        { "type": "Ready", "status": "False", "reason": "DeployFailed", "message": "helm upgrade failed" },
+        { "type": "ConfigReady", "status": "Unknown", "reason": "NotChecked" }
+      ]
+    }
+  },
+  "ready-true": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Pending",
+      "conditions": [
+        { "type": "ConfigReady", "status": "False", "reason": "MissingPrerequisites" },
+        { "type": "Ready", "status": "True", "reason": "Deployed", "message": "waiting for the rollout" }
+      ]
+    }
+  },
+  "first-not-true": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Blocked",
+      "conditions": [
+        { "type": "ConfigReady", "status": "True", "reason": "Complete" },
+        { "type": "DependenciesReady", "status": "False", "reason": "UpstreamUnreachable", "message": "no route to prod" },
+        { "type": "Deployed", "status": "False", "reason": "DeployFailed" }
+      ]
+    }
+  },
+  "needs-config": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "NeedsConfig",
+      "conditions": [
+        { "type": "Ready", "status": "False", "reason": "MissingPrerequisites", "message": "secret api-db is missing" },
+        { "type": "DependenciesReady", "status": "Unknown", "reason": "NotChecked" },
+        { "type": "ConfigReady", "status": "Unknown", "reason": "NotChecked" }
+      ]
+    }
+  },
+  "all-true": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Pending",
+      "conditions": [
+        { "type": "ConfigReady", "status": "True", "reason": "Complete" },
+        { "type": "DependenciesReady", "status": "True", "reason": "AllRunning" }
+      ]
+    }
+  },
+  "no-conditions": {
+    "metadata": { "name": "api" },
+    "status": { "phase": "Error" }
+  },
+  "not-checked": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Pending",
+      "conditions": [
+        { "type": "DependenciesReady", "status": "Unknown", "reason": "NotChecked", "message": "dependencies not looked at yet" },
+        { "type": "ConfigReady", "status": "False", "reason": "MissingPrerequisites" }
+      ]
+    }
+  },
+  "not-checked-alone": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Pending",
+      "conditions": [
+        { "type": "DependenciesReady", "status": "Unknown", "reason": "NotChecked" },
+        { "type": "ConfigReady", "status": "False", "reason": "MissingPrerequisites" }
+      ]
+    }
+  },
+  "disabled": {
+    "metadata": { "name": "api" },
+    "spec": { "enabled": false },
+    "status": {
+      "phase": "Disabled",
+      "conditions": [
+        { "type": "Ready", "status": "False", "reason": "Disabled", "message": "disabled by spec.enabled" }
+      ]
+    }
+  },
+  "stopped": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Stopped",
+      "conditions": [
+        { "type": "Ready", "status": "False", "reason": "Stopped", "message": "stopped" }
+      ]
+    }
+  },
+  "not-deployed": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "NotDeployed",
+      "conditions": [
+        { "type": "Ready", "status": "False", "reason": "not_deployed", "message": "Not deployed.\nRun the deploy to bring it up." }
+      ]
+    }
+  },
+  "raw-phase": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Hibernating",
+      "conditions": [
+        { "type": "Ready", "status": "False", "reason": "hibernating", "message": "asleep until Monday" }
+      ]
+    }
+  },
+  "unknown-repeated": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Hibernating",
+      "conditions": [
+        { "type": "Ready", "status": "Unknown", "reason": "Unknown", "message": "UNKNOWN" }
+      ]
+    }
+  },
+  "multi-line": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Error",
+      "conditions": [
+        { "type": "Ready", "status": "False", "message": "\n  helm upgrade failed  \r\nError: timed out waiting for the condition\n" }
+      ]
+    }
+  },
+  "padded-reason": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Error",
+      "conditions": [
+        { "type": "Ready", "status": "False", "reason": "  DeployFailed ", "message": "helm upgrade failed" }
+      ]
+    }
+  },
+  "running": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Running",
+      "conditions": [
+        { "type": "Ready", "status": "False", "reason": "DeployFailed", "message": "stale" }
+      ]
+    }
+  },
+  "odd-not-a-list": {
+    "metadata": { "name": "api" },
+    "status": { "phase": "Error", "conditions": { "type": "Ready", "reason": "DeployFailed" } }
+  },
+  "odd-entries": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Error",
+      "conditions": [
+        "text", 5, null, [], {},
+        { "type": [ "Ready" ], "status": { "is": "False" }, "reason": { "x": 1 }, "message": [ "m" ] },
+        { "type": "Ready", "status": "False", "reason": "DeployFailed" }
+      ]
+    }
+  },
+  "odd-refs": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Error",
+      "conditions": [
+        { "type": "Deployed", "status": false, "reason": [ "DeployFailed" ], "message": { "text": "m" } },
+        { "type": "Other", "status": "False", "reason": "UpstreamUnreachable" }
+      ]
+    }
+  },
+  "odd-number": {
+    "metadata": { "name": "api" },
+    "status": {
+      "phase": "Error",
+      "conditions": [ "text", { "status": 0, "reason": 42 } ]
+    }
+  }
+}

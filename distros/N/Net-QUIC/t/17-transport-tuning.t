@@ -41,7 +41,7 @@ is(
         max_bidi_streams            => 100,
         max_uni_streams             => 100,
         active_connection_id_limit  => 4,
-        disable_active_migration    => 1,
+        disable_active_migration    => 0,
     },
     'default QUIC transport policy is explicit and stable',
 );
@@ -68,7 +68,7 @@ is(
         max_bidi_streams            => 7,
         max_uni_streams             => 3,
         active_connection_id_limit  => 4,
-        disable_active_migration    => 1,
+        disable_active_migration    => 0,
     },
     'transport overrides reach ngtcp2',
 );
