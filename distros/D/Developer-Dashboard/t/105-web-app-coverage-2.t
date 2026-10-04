@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Digest::SHA qw(sha256_hex);
+use Errno qw(EACCES EIO EPERM);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -610,6 +611,24 @@ is( $m->_legacy_ajax_allowed( {} ), 1, '_legacy_ajax_allowed empty' );
 is( $m->_legacy_ajax_allowed( { file => 'x' } ), 1, '_legacy_ajax_allowed with file' );
 ok( !$m->_legacy_ajax_allowed( { token => 't' } ), '_legacy_ajax_allowed token denied by default' );
 
+my $external_raw = $m->_legacy_external_redirect_response(
+    target    => 'https://example.test/path?keep=1',
+    raw_query => 'new=2',
+);
+is( $external_raw->[0], 302, 'external bookmark redirect accepts the raw incoming query' );
+is( $external_raw->[3]{Location}, 'https://example.test/path?keep=1&new=2',
+    'external bookmark redirect appends a raw query to an existing saved query' );
+is( $m->_legacy_external_redirect_response( target => 'https://example.test/path', params => { q => 'one' } )->[3]{Location},
+    'https://example.test/path?q=one',
+    'external bookmark redirect builds an incoming query from parsed request parameters' );
+is( $m->_legacy_external_redirect_response( target => 'https://example.test/path', raw_query => '' )->[3]{Location},
+    'https://example.test/path',
+    'external bookmark redirect does not append an empty query' );
+is( $m->_legacy_external_redirect_response( target => "https://example.test/bad\npath" )->[0], 400,
+    'external bookmark redirect rejects control characters in its target' );
+is( $m->_legacy_external_redirect_response( target => 'https://example.test/path', raw_query => "bad\nquery" )->[0], 400,
+    'external bookmark redirect rejects control characters in the incoming query' );
+
 is_deeply( { Developer::Dashboard::Web::App::_parse_query('') }, {}, '_parse_query empty' );
 is_deeply( { Developer::Dashboard::Web::App::_parse_query('=v&a=1') }, { a => 1 }, '_parse_query drops empty keys' );
 
@@ -872,6 +891,25 @@ is( $m->_missing_named_page_response('x')->[0], 200, 'missing page editor -> 200
     my $unreadable = File::Spec->catfile( $absroot, 'noperm.js' );
     wfile( $unreadable, "x\n", 0000 );
     is( $m->_serve_static_file_at_path( 'js', 'noperm.js', $unreadable )->[0], 404, 'serve at an unreadable path -> 404' );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_open_static_file = sub { return ( undef, EIO ); };
+        is( $m->_serve_static_file_at_path( 'js', 'io-error.js', File::Spec->catfile( $absroot, 'ok.js' ), '', [$absroot] )->[0], 500,
+            'unexpected static-file open errors remain server errors' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_open_static_file = sub { return ( undef, EPERM ); };
+        is( $m->_serve_static_file_at_path( 'js', 'permission-error.js', File::Spec->catfile( $absroot, 'ok.js' ), '', [$absroot] )->[0], 404,
+            'permission errors while opening a static file are indistinguishable from missing files' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::App::_open_static_file = sub { return ( undef, EACCES ); };
+        is( $m->_serve_static_file_at_path( 'js', 'access-error.js', File::Spec->catfile( $absroot, 'ok.js' ), '', [$absroot] )->[0], 404,
+            'access-denied open errors are indistinguishable from missing static files' );
+    }
     chmod 0644, $unreadable;
 }
 
@@ -1000,6 +1038,29 @@ is( $m->_page_route_urls( Developer::Dashboard::PageDocument->new( id => 'bare',
 # a saved URL-forward bookmark without a query (2187 // default)
 wfile( File::Spec->catfile( $paths->dashboards_root, 'forward-noq' ), "/app/welcome\n", 0644 );
 ok( $m->_legacy_app_response( id => 'forward-noq' )->[0], 'saved URL forward without a query string' );
+
+wfile( File::Spec->catfile( $paths->dashboards_root, 'forward-protocol-relative' ), "//example.test/path\n", 0644 );
+my $protocol_relative = $m->_legacy_app_response( id => 'forward-protocol-relative' );
+is( $protocol_relative->[3]{Location}, '//example.test/path',
+    'protocol-relative saved bookmarks preserve their authority-relative redirect target' );
+
+wfile( File::Spec->catfile( $paths->dashboards_root, 'forward-unsupported-scheme' ), "ftp://example.test/file\n", 0644 );
+is( $m->_legacy_app_response( id => 'forward-unsupported-scheme' )->[0], 400,
+    'saved bookmarks reject unsupported external URL schemes' );
+
+wfile( File::Spec->catfile( $paths->dashboards_root, 'forward-empty-path' ), "?only=query\n", 0644 );
+is( $m->_legacy_app_response( id => 'forward-empty-path' )->[0], 400,
+    'saved bookmarks reject a target with an empty path' );
+
+wfile( File::Spec->catfile( $paths->dashboards_root, 'forward-local-token' ),
+    "http://127.0.0.1:7890/app/welcome?token=local\n", 0644 );
+{
+    no warnings 'redefine';
+    local $ENV{_PORT} = '7890';
+    local *Developer::Dashboard::Web::App::dispatch_request = sub { return [ 200, 'text/plain', 'local token' ]; };
+    is( $m->_legacy_app_response( id => 'forward-local-token' )->[0], 200,
+        'a matching localhost transient-token URL is forwarded internally rather than redirected externally' );
+}
 
 # custom route spec with no skill name and no kind (2259 default)
 {
@@ -1476,11 +1537,22 @@ is_deeply( { Developer::Dashboard::Web::App::_parse_query('a=1&&b=2') }, { a => 
 }
 
 # ---- static serving: unreadable file and undef path (2918, 2987) ----
-{
+SKIP: {
     my $root2918 = File::Spec->catdir( $home, 'root2918' );
     make_path($root2918);
     my $unread = File::Spec->catfile( $root2918, 'x.js' );
     wfile( $unread, "x\n", 0000 );
+
+    # DD-1021: root (or any process holding CAP_DAC_OVERRIDE) genuinely CAN
+    # read a mode-0000 file - not a -r stat lie, a real open() succeeds too.
+    # Attempt the actual capability the code under test relies on, rather
+    # than predicating on identity ($> == 0), per t/78-doctor-coverage.t's
+    # established fix for the same class of defect.
+    if ( open my $probe, '<', $unread ) {
+        close $probe or die "Unable to close probe on $unread: $!";
+        chmod 0644, $unread;
+        skip 'this process can read a mode-0000 file, so the unreadable-file 404 cannot occur', 1;
+    }
     is( $m->_serve_static_file_from_roots( 'js', 'x.js', $root2918 )->[0], 404, 'file present but unreadable (2918 l&&!r)' );
     chmod 0644, $unread;
 }
@@ -1806,7 +1878,7 @@ __END__
 
 =head1 NAME
 
-t/101-web-app-coverage.t - branch and condition coverage closure for the web app backend
+t/105-web-app-coverage-2.t - branch and condition coverage closure for the web app backend
 
 =head1 PURPOSE
 
@@ -1814,8 +1886,10 @@ This test is the executable coverage-closure contract for
 C<Developer::Dashboard::Web::App>. It drives the browser-facing route table,
 helper login, transient-token policy, saved-page render/source/edit/action
 flows, saved and skill-local Ajax endpoints, static asset serving, and the
-defensive fallback paths so every Devel::Cover branch and condition in the
-module is exercised on the Linux test host.
+defensive fallback paths. Static-file permission denials are checked with DAC
+capabilities dropped so a root test process observes the same refusal as an
+ordinary user; unrelated open failures remain explicit server errors. Together
+these cases exercise every Devel::Cover branch and condition in the module.
 
 =head1 WHY IT EXISTS
 
@@ -1833,8 +1907,10 @@ the web app backend.
 
 =head1 HOW TO USE
 
-Run C<prove -lv t/101-web-app-coverage.t> while iterating, then keep it green
-under C<prove -lr t> and the Devel::Cover gate before release.
+Run C<prove -lv t/105-web-app-coverage-2.t> while iterating, then keep it green
+under C<prove -lr t> and the Devel::Cover gate before release. Permission
+assertions in the full Linux container suite should run with
+C<CAP_DAC_OVERRIDE> and C<CAP_DAC_READ_SEARCH> dropped.
 
 =head1 WHAT USES IT
 
@@ -1845,7 +1921,7 @@ file to keep the web app backend's branch and condition coverage complete.
 
 Example 1:
 
-  prove -lv t/101-web-app-coverage.t
+  prove -lv t/105-web-app-coverage-2.t
 
 Run the focused coverage-closure test by itself.
 
@@ -1854,5 +1930,11 @@ Example 2:
   prove -lr t
 
 Run it inside the full repository suite before release.
+
+Example 3:
+
+  setpriv --bounding-set=-dac_override,-dac_read_search prove -lv t/105-web-app-coverage-2.t
+
+Run permission-denial coverage as container root without DAC bypass.
 
 =cut

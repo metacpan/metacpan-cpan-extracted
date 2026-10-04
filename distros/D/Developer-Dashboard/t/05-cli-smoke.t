@@ -506,18 +506,10 @@ is( $usage_exit, 1, 'dashboard with no arguments exits with usage status' );
 like( $usage_stdout . $usage_stderr, qr/SYNOPSIS|dashboard init/, 'dashboard with no arguments renders POD-backed usage' );
 
 my $help = _run("$perl -I'$lib' '$dashboard' help");
-like($help, qr/Description:/, 'dashboard help renders the fuller POD help');
-like($help, qr/dashboard serve \[logs \[-f\] \[-n N\]\|workers <N>\]/, 'dashboard help documents serve logs tail/follow flags and serve workers commands');
-like($help, qr/dashboard serve .*--no-editor.*--no-endit.*--no-indicators.*--no-indicator/s, 'dashboard help documents serve no-editor and no-indicators aliases');
-like($help, qr/dashboard workspace \[workspace-ref\]/, 'dashboard help documents the built-in workspace subcommand');
-like($help, qr/dashboard docker enable <service>/, 'dashboard help documents docker enable for isolated compose services');
-like($help, qr/dashboard docker disable <service>/, 'dashboard help documents docker disable for isolated compose services');
-like($help, qr/dashboard docker list \[--enabled\|--disabled\]/, 'dashboard help documents docker list filters for isolated compose services');
-like($help, qr/dashboard skills enable <repo-name>/, 'dashboard help documents skill enable');
-like($help, qr/dashboard skills disable <repo-name>/, 'dashboard help documents skill disable');
-like($help, qr/dashboard skills usage <repo-name> \[-o json\|table\]/, 'dashboard help documents skill usage inspection');
-like($help, qr/dashboard which \[--edit\] <cmd>/, 'dashboard help documents the built-in which command and --edit mode');
-unlike($help, qr/dashboard skill <repo-name> <command>/, 'dashboard help no longer documents the removed singular skill dispatcher');
+like($help, qr/^Available built-in commands:/m, 'dashboard help renders the concise command index');
+like($help, qr/^  dashboard api \[ls\|add\|rm\] \[options\]/m, 'dashboard help shows actionable usage for each built-in command');
+like($help, qr/^  dashboard version\b/m, 'dashboard help includes the public version command');
+unlike($help, qr/dashboard skill <repo-name> <command>/, 'dashboard help does not advertise the removed singular skill dispatcher');
 my ( $invalid_cmd_stdout, $invalid_cmd_stderr, $invalid_cmd_exit ) = capture {
     system $perl, '-I' . $lib, $dashboard, 'dcoekr';
     return $? >> 8;
@@ -540,6 +532,14 @@ like( $complete_top_alias, qr/^docker$/m, 'dashboard complete suggests docker fo
 like( $complete_top_alias, qr/^doctor$/m, 'dashboard complete suggests doctor for the d2 alias as well' );
 my $complete_sub = _run("$perl -I'$lib' '$dashboard' complete 2 dashboard docker co");
 is( $complete_sub, "compose\n", 'dashboard complete suggests docker subcommands' );
+my $complete_docker = _run("$perl -I'$lib' '$dashboard' complete 2 d2 docker ''");
+like( $complete_docker, qr/^development$/m, 'dashboard complete exposes the docker development subcommand after d2 docker' );
+my $complete_docker_development = _run("$perl -I'$lib' '$dashboard' complete 3 d2 docker development ''");
+is( $complete_docker_development, "enable\ndisable\n", 'dashboard complete exposes development enable and disable actions' );
+my $docker_help = _run("$perl -I'$lib' '$dashboard' docker --help");
+like( $docker_help, qr/^Usage: dashboard docker/m, 'docker --help prints Docker command usage' );
+like( $docker_help, qr/dashboard docker development enable <service>/, 'docker --help documents development overlays' );
+like( $docker_help, qr/compose-arguments\.\.\./, 'docker --help documents Compose passthrough' );
 my $completion_skill_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'skills', 'completion-skill', 'cli' );
 make_path($completion_skill_root);
 my $completion_skill_command = File::Spec->catfile( $completion_skill_root, 'run-test' );
@@ -1218,11 +1218,11 @@ PL
     is( $skill_env->{root}, 'root', 'dashboard dotted skill commands still inherit the home .env layer' );
     is( $skill_env->{child}, 'child', 'dashboard dotted skill commands still inherit the child .env layer' );
     is( $skill_env->{skill_only}, 'skill', 'dashboard dotted skill commands additionally load skill-local env files' );
-    is( $skill_env->{shared}, 'skill', 'skill-local env files override the inherited non-skill layered env when the skill is running' );
+    is( $skill_env->{shared}, 'child', 'the invocation cwd env overrides skill-local values when a skill is running' );
     is(
         _portable_path( $skill_env->{audit}{envfile} ),
-        _portable_path( File::Spec->catfile( $env_project, '.developer-dashboard', 'skills', 'envskill', '.env' ) ),
-        'dashboard dotted skill commands expose env audit metadata for the effective skill-local override',
+        _portable_path( File::Spec->catfile( $env_project, '.env' ) ),
+        'dashboard dotted skill commands expose env audit metadata for the effective cwd env override',
     );
 }
 {
@@ -1306,12 +1306,36 @@ is( $bash_d2_version, "$expected_version\n", 'the real d2 command dispatches das
 my $bash_completion = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard do); COMP_CWORD=1; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
 like( $bash_completion, qr/^docker$/m, 'dashboard shell bash completion suggests docker through the generated completion helper' );
 like( $bash_completion, qr/^doctor$/m, 'dashboard shell bash completion suggests doctor through the generated completion helper' );
+my $bash_global_help_entry = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard ''); COMP_CWORD=1; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+like( $bash_global_help_entry, qr/^help$/m, 'dashboard shell bash completion exposes the global help entrypoint' );
+like( $bash_global_help_entry, qr/^version$/m, 'dashboard shell bash completion exposes the built-in version command' );
 my $bash_completion_alias = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(d2 do); COMP_CWORD=1; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
 like( $bash_completion_alias, qr/^docker$/m, 'dashboard shell bash completion also works through the d2 alias' );
 like( $bash_completion_alias, qr/^doctor$/m, 'dashboard shell bash completion keeps the same candidates for d2' );
+my $bash_api_actions = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard api ''); COMP_CWORD=2; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+like( $bash_api_actions, qr/^ls$/m, 'dashboard bash TAB completion lists the API default action' );
+like( $bash_api_actions, qr/^add$/m, 'dashboard bash TAB completion lists API add' );
+like( $bash_api_actions, qr/^rm$/m, 'dashboard bash TAB completion lists API removal' );
+my $bash_docker_development_actions = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard docker development ''); COMP_CWORD=3; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+is( $bash_docker_development_actions, "enable\ndisable\n", 'dashboard bash TAB completion offers both Docker development marker actions' );
+my $bash_file_actions = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard file ''); COMP_CWORD=2; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+like( $bash_file_actions, qr/^resolve$/m, 'dashboard bash TAB completion lists file resolution' );
+like( $bash_file_actions, qr/^list$/m, 'dashboard bash TAB completion lists file aliases' );
+my $bash_path_actions = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard path ''); COMP_CWORD=2; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+like( $bash_path_actions, qr/^cdr$/m, 'dashboard bash TAB completion lists the implemented cdr action' );
+like( $bash_path_actions, qr/^complete-cdr$/m, 'dashboard bash TAB completion lists the cdr completion protocol' );
+like( $bash_path_actions, qr/^rm$/m, 'dashboard bash TAB completion lists the path rm alias' );
+my $bash_api_options = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard api add -); COMP_CWORD=3; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+like( $bash_api_options, qr/^--secret$/m, 'dashboard bash TAB completion suggests API command options' );
+like( $bash_api_options, qr/^--help$/m, 'dashboard bash TAB completion suggests explicit help options' );
+my $bash_api_default_options = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard api -); COMP_CWORD=2; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+like( $bash_api_default_options, qr/^--key$/m, 'dashboard bash TAB completion suggests the API default-list key filter' );
+like( $bash_api_default_options, qr/^--output$/m, 'dashboard bash TAB completion suggests the API default-list output option' );
+my $bash_global_help = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard help docker ''); COMP_CWORD=3; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+like( $bash_global_help, qr/^compose$/m, 'dashboard bash TAB completion suggests actions after global help target' );
 my $bash_cdr_completion = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(cdr foobar alpha); COMP_CWORD=2; _dashboard_complete_cdr; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
 like( $bash_cdr_completion, qr/^alpha-foo$/m, 'dashboard shell bash cdr completion suggests alias-root narrowing candidates' );
-like( $bash_cdr_completion, qr/^alpha-foo-bar$/m, 'dashboard shell bash cdr completion includes other matching alias-root candidates' );
+unlike( $bash_cdr_completion, qr/^alpha-foo-bar$/m, 'dashboard shell bash cdr completion does not recursively suggest deeper descendants' );
 my $which_dir_bookmarks = _run("bash -lc '. \"$shell_bootstrap_file\"; which_dir bookmarks_root'");
 is_same_path_output( $which_dir_bookmarks, $bookmarks_root, 'which_dir resolves bookmarks_root through the shell helper' );
 my $cdr_bookmarks = _run("bash -lc '. \"$shell_bootstrap_file\"; cdr bookmarks_root; pwd'");
@@ -1342,10 +1366,10 @@ like( $shell_bootstrap, qr/TICKET_REF/, 'dashboard shell bash bootstrap also rec
 like( $shell_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell bash bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
 like( $shell_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell bash bootstrap enables a two-line tmux status block for ticket sessions' );
 like( $shell_bootstrap, qr/tmux set-option -q status-interval 15/, 'dashboard shell bash bootstrap refreshes the tmux status block automatically for ticket sessions without hot-looping' );
-like( $shell_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell bash bootstrap renders the indicator strip into the first tmux status row' );
-like( $shell_bootstrap, qr/status-format\[0\] "#\('\Q$dashboard\E' ps1 --mode tmux-status-top --width #\{client_width\}\)"/, 'dashboard shell bash bootstrap renders the tmux ticket indicator row through the explicit dashboard entrypoint path' );
-unlike( $shell_bootstrap, qr/status-format\[0\] "#\(dashboard ps1 --mode tmux-status-top --width #\{client_width\}\)"/, 'dashboard shell bash bootstrap does not depend on a bare dashboard PATH lookup for tmux ticket status rendering' );
-like( $shell_bootstrap, qr/tmux set-option -q status-format\[1\] "\$_dd_default_status"/, 'dashboard shell bash bootstrap restores the normal tmux status row beneath the indicators' );
+like( $shell_bootstrap, qr/tmux set-option -q 'status-format\[0\]'.*tmux-status-top --width #\{client_width\}/s, 'dashboard shell bash bootstrap renders the indicator strip into the first tmux status row' );
+like( $shell_bootstrap, qr/status-format\[0\]' "#\('\Q$dashboard\E' ps1 --mode tmux-status-top --width #\{client_width\}\)"/, 'dashboard shell bash bootstrap renders the tmux ticket indicator row through the explicit dashboard entrypoint path' );
+unlike( $shell_bootstrap, qr/status-format\[0\]'? "#\(dashboard ps1 --mode tmux-status-top --width #\{client_width\}\)"/, 'dashboard shell bash bootstrap does not depend on a bare dashboard PATH lookup for tmux ticket status rendering' );
+like( $shell_bootstrap, qr/tmux set-option -q 'status-format\[1\]' "\$_dd_default_status"/, 'dashboard shell bash bootstrap restores the normal tmux status row beneath the indicators' );
 like( $shell_bootstrap, qr/_dd_update_prompt\(\)/, 'dashboard shell bash bootstrap centralizes prompt refresh through one helper so later distro PS1 assignments cannot permanently override it' );
 like( $shell_bootstrap, qr/PROMPT_COMMAND=.*_dd_update_prompt/s, 'dashboard shell bash bootstrap installs a PROMPT_COMMAND refresh hook so the dashboard prompt survives later bashrc prompt assignments' );
 like( $shell_bootstrap, qr/ps1 --jobs \\j --mode compact --no-indicators/, 'dashboard shell bash bootstrap suppresses prompt indicators when tmux owns the status line' );
@@ -1358,8 +1382,8 @@ like( $zsh_bootstrap, qr/TICKET_REF/, 'dashboard shell zsh bootstrap also recogn
 like( $zsh_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell zsh bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
 like( $zsh_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell zsh bootstrap enables a two-line tmux status block for ticket sessions' );
 like( $zsh_bootstrap, qr/tmux set-option -q status-interval 15/, 'dashboard shell zsh bootstrap refreshes the tmux status block automatically for ticket sessions without hot-looping' );
-like( $zsh_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell zsh bootstrap renders the indicator strip into the first tmux status row' );
-like( $zsh_bootstrap, qr/tmux set-option -q status-format\[1\] "\$default_status"/, 'dashboard shell zsh bootstrap restores the normal tmux status row beneath the indicators' );
+like( $zsh_bootstrap, qr/tmux set-option -q 'status-format\[0\]'.*tmux-status-top --width #\{client_width\}/s, 'dashboard shell zsh bootstrap renders the indicator strip into the first tmux status row' );
+like( $zsh_bootstrap, qr/tmux set-option -q 'status-format\[1\]' "\$default_status"/, 'dashboard shell zsh bootstrap restores the normal tmux status row beneath the indicators' );
 like( $zsh_bootstrap, qr/ps1 --jobs \$\{#jobstates\} --mode compact --no-indicators/, 'dashboard shell zsh bootstrap suppresses prompt indicators when tmux owns the status line' );
 like( $zsh_bootstrap, qr/path cdr/, 'dashboard shell zsh bootstrap keeps the cdr path helper functions' );
 unlike( $zsh_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell zsh bootstrap no longer defines a d2 shell function because d2 is now a real installed command' );
@@ -1378,8 +1402,8 @@ like( $sh_bootstrap, qr/TICKET_REF/, 'dashboard shell sh bootstrap also recogniz
 like( $sh_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell sh bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
 like( $sh_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell sh bootstrap enables a two-line tmux status block for ticket sessions' );
 like( $sh_bootstrap, qr/tmux set-option -q status-interval 15/, 'dashboard shell sh bootstrap refreshes the tmux status block automatically for ticket sessions without hot-looping' );
-like( $sh_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell sh bootstrap renders the indicator strip into the first tmux status row' );
-like( $sh_bootstrap, qr/tmux set-option -q status-format\[1\] "\$_dd_default_status"/, 'dashboard shell sh bootstrap restores the normal tmux status row beneath the indicators' );
+like( $sh_bootstrap, qr/tmux set-option -q 'status-format\[0\]'.*tmux-status-top --width #\{client_width\}/s, 'dashboard shell sh bootstrap renders the indicator strip into the first tmux status row' );
+like( $sh_bootstrap, qr/tmux set-option -q 'status-format\[1\]' "\$_dd_default_status"/, 'dashboard shell sh bootstrap restores the normal tmux status row beneath the indicators' );
 like( $sh_bootstrap, qr/ps1 --mode compact --no-indicators/, 'dashboard shell sh bootstrap suppresses prompt indicators when tmux owns the status line' );
 unlike( $sh_bootstrap, qr/\\j/, 'dashboard shell sh bootstrap does not rely on bash-specific job expansion' );
 unlike( $sh_bootstrap, qr/\bperl\s+-MJSON::XS\b/, 'dashboard shell sh bootstrap does not decode helper JSON through a bare perl command either' );
@@ -1523,15 +1547,38 @@ like( $file_del_again, qr/notes\s+no\s+no-change/, 'dashboard file del is idempo
 
 my $docker_green_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'green' );
 make_path($docker_green_root);
+open my $docker_green_base_fh, '>', File::Spec->catfile( $docker_green_root, 'compose.yml' )
+  or die "Unable to write docker green base compose file: $!";
+print {$docker_green_base_fh} "services:\n  green:\n    image: alpine\n";
+close $docker_green_base_fh;
 open my $docker_green_fh, '>', File::Spec->catfile( $docker_green_root, 'development.compose.yml' )
   or die "Unable to write docker green development compose file: $!";
-print {$docker_green_fh} "services:\n  green:\n    image: alpine\n";
+print {$docker_green_fh} "services:\n  green:\n    environment:\n      MODE: development\n";
 close $docker_green_fh;
 my $docker_dry_run = _run("$perl -I'$lib' '$dashboard' docker compose --dry-run up -d --build green");
 my $docker_dry_run_data = json_decode($docker_dry_run);
 ok( grep( { $_ eq '-d' } @{ $docker_dry_run_data->{command} } ), 'dashboard docker compose leaves short docker passthrough flags such as -d untouched' );
 ok( grep( { $_ eq '--build' } @{ $docker_dry_run_data->{command} } ), 'dashboard docker compose leaves docker passthrough flags such as --build untouched' );
 ok( grep( { $_ eq 'green' } @{ $docker_dry_run_data->{services} } ), 'dashboard docker compose still infers service names from passthrough args when docker flags are present' );
+ok( grep( { /\/green\/compose\.yml\z/ } @{ $docker_dry_run_data->{files} } ), 'dashboard docker compose always includes the green base compose file' );
+ok( !grep( { /\/green\/development\.compose\.yml\z/ } @{ $docker_dry_run_data->{files} } ), 'dashboard docker compose omits green development compose until enabled' );
+my $docker_development_enable = _run("$perl -I'$lib' '$dashboard' docker development enable green");
+like( $docker_development_enable, qr/"development"\s*:\s*1/, 'dashboard docker development enable reports development mode enabled' );
+ok( -f File::Spec->catfile( $docker_green_root, 'develop.yml' ), 'dashboard docker development enable creates the develop.yml marker' );
+my $docker_dev_dry_run = json_decode( _run("$perl -I'$lib' '$dashboard' docker compose --dry-run up green") );
+my ($green_base_pos) = grep { $docker_dev_dry_run->{files}[$_] =~ /\/green\/compose\.yml\z/ } 0 .. $#{ $docker_dev_dry_run->{files} };
+my ($green_dev_pos)  = grep { $docker_dev_dry_run->{files}[$_] =~ /\/green\/development\.compose\.yml\z/ } 0 .. $#{ $docker_dev_dry_run->{files} };
+ok( defined $green_base_pos && defined $green_dev_pos, 'dashboard docker compose includes both files after development enable' );
+ok( defined $green_base_pos && defined $green_dev_pos && $green_base_pos < $green_dev_pos, 'dashboard docker compose orders the development file after its base file' );
+my $docker_development_disable = _run("$perl -I'$lib' '$dashboard' docker development disable green");
+like( $docker_development_disable, qr/"development"\s*:\s*0/, 'dashboard docker development disable reports development mode disabled' );
+ok( !-e File::Spec->catfile( $docker_green_root, 'develop.yml' ), 'dashboard docker development disable removes the develop.yml marker' );
+unlink File::Spec->catfile( $docker_green_root, 'development.compose.yml' ) or die $!;
+_run("$perl -I'$lib' '$dashboard' docker development enable green");
+my $docker_missing_dev_dry_run = _run("$perl -I'$lib' '$dashboard' docker compose --dry-run config green");
+like( $docker_missing_dev_dry_run, qr/"files"/, 'dashboard docker compose succeeds when develop.yml exists but development.compose.yml is missing' );
+ok( grep( { /\/green\/compose\.yml\z/ } @{ json_decode($docker_missing_dev_dry_run)->{files} } ), 'dashboard docker compose retains the base file when the opted-in development file is missing' );
+_run("$perl -I'$lib' '$dashboard' docker development disable green");
 my $fake_bin = File::Spec->catdir( $ENV{HOME}, 'fake-bin' );
 make_path($fake_bin);
 my $fake_docker = File::Spec->catfile( $fake_bin, 'docker' );
@@ -1684,6 +1731,10 @@ close $skill_package_json_fh;
 open my $skill_makefile_fh, '>', File::Spec->catfile( $skill_repo, 'Makefile' ) or die "Unable to write skill Makefile: $!";
 print {$skill_makefile_fh} ".PHONY: all test install clean\nall:\n\t\@:\ntest:\n\t\@:\ninstall:\n\t\@:\nclean:\n\t\@:\n";
 close $skill_makefile_fh;
+open my $skill_ddfile_fh, '>', File::Spec->catfile( $skill_repo, 'ddfile' ) or die "Unable to write skill ddfile: $!";
+close $skill_ddfile_fh;
+open my $skill_ddfile_local_fh, '>', File::Spec->catfile( $skill_repo, 'ddfile.local' ) or die "Unable to write skill ddfile.local: $!";
+close $skill_ddfile_local_fh;
 open my $skill_index_fh, '>', File::Spec->catfile( $skill_repo, 'dashboards', 'index' ) or die "Unable to write skill index: $!";
 print {$skill_index_fh} "TITLE: Demo Skill Index\n:--------------------------------------------------------------------------------:\nBOOKMARK: index\n:--------------------------------------------------------------------------------:\nHTML:\nDemo Skill Index\n";
 close $skill_index_fh;
@@ -1724,6 +1775,9 @@ like( $skill_progress_stderr, qr/\[ \] Fetch skill source/, 'dashboard skills in
 like( $skill_progress_stderr, qr/\[OK\] Install package\.json dependencies from .*demo-skill.*package\.json/, 'dashboard skills install progress output shows that package.json was detected and handed to npx-wrapped npm' );
 like( $skill_progress_stderr, qr/\[OK\] Install Makefile dependencies from .*demo-skill.*Makefile/, 'dashboard skills install progress output shows that Makefile dependencies were processed before ddfile work' );
 like( $skill_progress_stderr, qr/\[OK\] Install cpanfile dependencies/, 'dashboard skills install progress output marks dependency steps complete after work finishes' );
+like( $skill_progress_stderr, qr/\[OK\] Install ddfile dependencies \(skipped: no dependency installs needed\)/, 'dashboard skills install reports an existing empty ddfile without claiming it is missing' );
+like( $skill_progress_stderr, qr/\[OK\] Install ddfile\.local dependencies \(skipped: no dependency installs needed\)/, 'dashboard skills install reports an existing empty ddfile.local without claiming it is missing' );
+unlike( $skill_progress_stderr, qr/Install ddfile(?:\.local)? dependencies \(skipped: ddfile(?:\.local)? not present\)/, 'dashboard skills install does not call a present dependency manifest missing' );
 open my $fake_npx_log_fh, '<', $fake_npx_log or die "Unable to read $fake_npx_log: $!";
 my @fake_npx_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$fake_npx_log_fh>;
 close $fake_npx_log_fh;
@@ -2009,6 +2063,32 @@ close $manifest_local_ddfile_fh;
 my $skill_dotted_dispatch = _run("$perl -I'$lib' '$dashboard' demo-skill.foo alpha beta");
 like( $skill_dotted_dispatch, qr/skill-hook/, 'dashboard <skill>.<command> runs skill-local hooks before the skill command body' );
 like( $skill_dotted_dispatch, qr/alpha\|beta/, 'dashboard <skill>.<command> forwards remaining args to the skill command body' );
+
+# DD-954: a skill with ONLY a cli/__init__ self-script (no other subcommand,
+# and no top-level .d2/cli/<name>) responds to a bare "dashboard <name>"
+# invocation by running that __init__ script directly.
+my $init_skill_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'skills', 'init-skill', 'cli' );
+make_path($init_skill_root);
+my $init_skill_command = File::Spec->catfile( $init_skill_root, '__init__' );
+open my $init_skill_fh, '>', $init_skill_command or die "Unable to write $init_skill_command: $!";
+print {$init_skill_fh} "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{init-self|\@ARGV\\n};\n";
+close $init_skill_fh;
+chmod 0755, $init_skill_command or die "Unable to chmod $init_skill_command: $!";
+my $bare_init_dispatch = _run("$perl -I'$lib' '$dashboard' init-skill one two");
+like( $bare_init_dispatch, qr/init-self\|one two/, 'dashboard <skill-with-only-init> runs the skill\'s own cli/__init__ with no subcommand needed' );
+
+# An explicit top-level command for the same name still wins over __init__.
+my $init_override_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'cli' );
+make_path($init_override_root);
+my $init_override_command = File::Spec->catfile( $init_override_root, 'init-skill' );
+open my $init_override_fh, '>', $init_override_command or die "Unable to write $init_override_command: $!";
+print {$init_override_fh} "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{top-level-wins\\n};\n";
+close $init_override_fh;
+chmod 0755, $init_override_command or die "Unable to chmod $init_override_command: $!";
+my $bare_init_overridden = _run("$perl -I'$lib' '$dashboard' init-skill");
+like( $bare_init_overridden, qr/top-level-wins/, 'an explicit top-level .d2/cli/<name> still wins over a skill\'s own cli/__init__' );
+unlike( $bare_init_overridden, qr/init-self/, 'the __init__ fallback is never reached once a top-level command resolves' );
+unlink $init_override_command or die "Unable to remove $init_override_command: $!";
 {
     # 'ask' is now a reserved built-in command, so this stdin-passthrough check
     # uses a non-reserved custom command name to keep exercising the user
@@ -2069,6 +2149,18 @@ printf '%s\\n' "\$*" > '$fake_editor_log'
 SH
 close $fake_editor_fh;
 chmod 0755, $fake_editor or die "Unable to chmod $fake_editor: $!";
+
+my $grep_content_target = File::Spec->catfile( $open_root, 'content-match.txt' );
+open my $grep_content_fh, '>', $grep_content_target or die "Unable to write $grep_content_target: $!";
+print {$grep_content_fh} "needle is in the file body\n";
+close $grep_content_fh;
+my $of_grep_print = _run("$perl -I'$lib' '$dashboard' of --print grep -nr needle '$open_root'");
+is( $of_grep_print, "$grep_content_target\n", 'dashboard of grep -nr searches file contents and prints the matching file' );
+my $of_grep_open = _run("EDITOR='$fake_editor' $perl -I'$lib' '$dashboard' of grep -nr needle '$open_root'");
+open my $grep_editor_log_fh, '<', $fake_editor_log or die "Unable to read $fake_editor_log after grep open: $!";
+my $grep_editor_args = do { local $/; <$grep_editor_log_fh> };
+close $grep_editor_log_fh;
+is( $grep_editor_args, "$grep_content_target\n", 'dashboard of grep opens the unique content match in the configured editor' );
 
 my $open_select = _run(qq{printf '2\\n' | EDITOR='$fake_editor' $perl -I'$lib' '$dashboard' of '$open_root' alpha});
 like($open_select, qr/^\d+: \Q$open_target\E$/m, 'dashboard of lists the first matching open-file path');
@@ -3646,12 +3738,22 @@ __END__
 =head1 DESCRIPTION
 
 This test verifies the main command-line entrypoints for Developer Dashboard.
+It also verifies Docker service base/development compose selection and the
+development marker commands through the staged helper without starting real
+containers. Built-in and nested help, catalog-backed actions/options, the
+version command, and generated Bash completion are exercised through the same
+public CLI dispatch; the zsh bootstrap's completion registration is checked.
+The cdr completion case verifies that alias-root suggestions stay at the
+immediate child level instead of recursively walking deeper descendants on
+every TAB.
+The open-file smoke cases also prove that content grep returns matching paths
+instead of treating `grep` and its switches as filename patterns.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This test is the executable regression contract for the thin CLI, helper staging, and low-level runtime contracts. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+This test is the executable regression contract for the thin CLI, helper staging, low-level runtime contracts, Docker help and completion, Docker service development overlays, and the user-facing `dashboard of grep` invocation. Its shell completion checks cover command-only root candidates, nested actions, parser-backed flags such as API's implicit list options, and bounded cdr directory traversal. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
@@ -3659,11 +3761,11 @@ It exists because the thin CLI, helper staging, and low-level runtime contracts 
 
 =head1 WHEN TO USE
 
-Use this file when changing the thin CLI, helper staging, and low-level runtime contracts, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
+Use this file when changing the thin CLI, helper staging, completion candidate scope, cdr directory traversal, and low-level runtime contracts, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/05-cli-smoke.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. 
+Run it directly with C<prove -lv t/05-cli-smoke.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. The Docker assertions use Compose resolution/dry-run output; they do not start the declared services.
 
 =head1 WHAT USES IT
 
@@ -3688,6 +3790,16 @@ Example 3:
   prove -lr t
 
 Put the focused fix back through the whole repository suite before calling the work finished.
+
+Example 4:
+
+  dashboard docker development enable green
+  dashboard docker compose --dry-run config green
+  dashboard docker development disable green
+
+Verify that the base compose file remains selected, the opt-in development
+overlay is layered above it, and disabling the marker returns to the base-only
+configuration without starting containers.
 
 =for comment FULL-POD-DOC END
 

@@ -1,0 +1,80 @@
+{
+   "abstract" : "DKIM2 signing and verification for email",
+   "author" : [
+      "Bron Gondwana <brong@fastmailteam.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mail-DKIM2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Mail::AuthenticationResults" : "0",
+            "Mail::Milter::Authentication" : "0",
+            "Net::SMTP" : "0",
+            "Sendmail::PMilter" : "1.28",
+            "Sys::Syslog" : "0"
+         },
+         "requires" : {
+            "Algorithm::Diff" : "0",
+            "Carp" : "0",
+            "CryptX" : "0.060",
+            "Email::MIME" : "0",
+            "Exporter" : "0",
+            "File::Path" : "0",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "Net::DNS" : "0",
+            "perl" : "5.020000"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "TOML::Parser" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08"
+         },
+         "requires" : {
+            "Path::Tiny" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dkim2wg/interop/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dkim2wg/interop.git",
+         "web" : "https://github.com/dkim2wg/interop"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

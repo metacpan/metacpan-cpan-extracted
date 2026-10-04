@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.12.3 (2026-10-03)
+
+- `IO::Socket::SSL` (1.42+) and `Net::SSLeay` (1.49+) are now prerequisites, so `cpanm ForgeOps::Tracker` installs them. `HTTP::Tiny` needs both to send over https, which a ForgeOps DSN always is, and neither is core Perl: on a perl without them the client installed cleanly and then delivered nothing, without saying why.
+- When the DSN is https and this perl can't make https requests, `init()` now logs one line, once per process, through `logger` (or `warn` when no logger is set): `[ForgeOps] Not sending: the DSN is https, and this perl can't make https requests. Install IO::Socket::SSL and Net::SSLeay (cpanm IO::Socket::SSL Net::SSLeay) to send.`
+
+## 0.12.2 (2026-10-02)
+
+- `cpanm ForgeOps::Tracker` now passes its own tests on a clean Perl. The tests' local HTTP server needs `HTTP::Server::PSGI`, and several tests use `Plack::Test`, but only `Test::More` was listed as a test requirement, so the install failed. `Plack` and `HTTP::Message` (already one of Plack's prerequisites) are now in `TEST_REQUIRES` and the cpanfile's test requirements. They are still not runtime dependencies. Dancer2 stays optional: the Dancer2 integration tests, and the Dancer2 part of the trace context tests, now skip when it isn't installed.
+- With a DSN set and an environment that isn't enabled, `init()` now logs one line, once per process, through `logger` (or `warn` when no logger is set): `[ForgeOps] Not sending: this environment is "development", and only production, staging are enabled. Set FORGE_OPS_ENVIRONMENT=production (or add "development" to the enabled environments) to send from here.` Nothing is logged without a DSN. The environment default is unchanged: `FORGE_OPS_ENVIRONMENT`, else `production`.
+
 ## 0.12.1 (2026-10-01)
 
 - A script that reports an error and exits straight away no longer loses it. When the program ends normally, the client now sends whatever errors, changes and traces are still waiting and lets a delivery already under way finish, for at most 5 seconds. A program that never reported anything doesn't wait at all, and the program's exit status is kept.

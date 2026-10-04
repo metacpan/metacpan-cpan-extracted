@@ -160,6 +160,7 @@ net_quic_apply_transport_config(
     UV stream_window;
     UV max_bidi_streams;
     UV max_uni_streams;
+    UV max_datagram_frame_size;
 
     if (!SvOK(transport_sv)) {
         settings->handshake_timeout = 10 * NGTCP2_SECONDS;
@@ -170,6 +171,7 @@ net_quic_apply_transport_config(
         params->initial_max_data = 1024 * 1024;
         params->initial_max_streams_bidi = 100;
         params->initial_max_streams_uni = 100;
+        params->max_datagram_frame_size = 0;
         params->active_connection_id_limit = 4;
         params->disable_active_migration = 0;
         return;
@@ -181,7 +183,7 @@ net_quic_apply_transport_config(
     }
 
     av = (AV *)SvRV(transport_sv);
-    if (av_len(av) != 5) {
+    if (av_len(av) != 6) {
         croak("invalid internal transport configuration");
     }
 
@@ -191,6 +193,7 @@ net_quic_apply_transport_config(
     stream_window = net_quic_transport_value(av, 3);
     max_bidi_streams = net_quic_transport_value(av, 4);
     max_uni_streams = net_quic_transport_value(av, 5);
+    max_datagram_frame_size = net_quic_transport_value(av, 6);
 
     if (handshake_ms == 0 ||
         handshake_ms > UINT64_MAX / NGTCP2_MILLISECONDS) {
@@ -212,6 +215,9 @@ net_quic_apply_transport_config(
     if (max_uni_streams > NGTCP2_MAX_VARINT) {
         croak("max_uni_streams is outside the supported range");
     }
+    if (max_datagram_frame_size > 65535) {
+        croak("max_datagram_frame_size is outside the supported range");
+    }
 
     settings->handshake_timeout =
         (ngtcp2_duration)handshake_ms * NGTCP2_MILLISECONDS;
@@ -224,6 +230,7 @@ net_quic_apply_transport_config(
     params->initial_max_data = connection_window;
     params->initial_max_streams_bidi = max_bidi_streams;
     params->initial_max_streams_uni = max_uni_streams;
+    params->max_datagram_frame_size = max_datagram_frame_size;
     params->active_connection_id_limit = 4;
     params->disable_active_migration = 0;
 }
@@ -547,6 +554,7 @@ _client_new(class, local_sv, peer_sv, alpn_sv, server_name_sv, ca_file_sv, trans
         callbacks.recv_crypto_data = ngtcp2_crypto_recv_crypto_data_cb;
         callbacks.handshake_completed = net_quic_handshake_completed_cb;
         callbacks.recv_stream_data = net_quic_recv_stream_data_cb;
+        callbacks.recv_datagram = net_quic_recv_datagram_cb;
         callbacks.acked_stream_data_offset = net_quic_acked_stream_data_offset_cb;
         callbacks.stream_open = net_quic_stream_open_cb;
         callbacks.stream_close = net_quic_stream_close_limit_cb;
@@ -840,6 +848,7 @@ _server_new(class, initial_sv, local_sv, peer_sv, alpn_sv, server_tls_sv, odcid_
         callbacks.recv_crypto_data = ngtcp2_crypto_recv_crypto_data_cb;
         callbacks.handshake_completed = net_quic_handshake_completed_cb;
         callbacks.recv_stream_data = net_quic_recv_stream_data_cb;
+        callbacks.recv_datagram = net_quic_recv_datagram_cb;
         callbacks.acked_stream_data_offset = net_quic_acked_stream_data_offset_cb;
         callbacks.stream_open = net_quic_stream_open_cb;
         callbacks.stream_close = net_quic_stream_close_limit_cb;
@@ -1240,6 +1249,161 @@ _stream_state_count(self)
     CODE:
         ep = net_quic_connection_from_sv(self);
         RETVAL = (UV)net_quic_stream_count(ep);
+    OUTPUT:
+        RETVAL
+
+SV *
+_peer_max_datagram_frame_size(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        const ngtcp2_transport_params *params;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        params = ngtcp2_conn_get_remote_transport_params2(ep->conn);
+
+        if (params == NULL) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            RETVAL = newSVuv((UV)params->max_datagram_frame_size);
+        }
+    OUTPUT:
+        RETVAL
+
+UV
+_max_datagram_payload_size(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        RETVAL = (UV)net_quic_max_datagram_payload_size(ep);
+    OUTPUT:
+        RETVAL
+
+UV
+_local_max_datagram_frame_size(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        const ngtcp2_transport_params *params;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        params = ngtcp2_conn_get_local_transport_params2(ep->conn);
+        RETVAL = (UV)params->max_datagram_frame_size;
+    OUTPUT:
+        RETVAL
+
+UV
+_datagram_receive_drops(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        RETVAL = (UV)ep->datagram_rx_dropped;
+    OUTPUT:
+        RETVAL
+
+IV
+_queue_datagram(self, data_sv)
+    SV *self
+    SV *data_sv
+    PREINIT:
+        net_quic_connection *ep;
+        const ngtcp2_transport_params *params;
+        net_quic_application_datagram *datagram;
+        const char *data;
+        STRLEN datalen;
+        size_t max_payload_size;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+
+        if (!ep->ready &&
+            (!ep->early_data_attempted || ep->early_data_rejected)) {
+            croak(
+                "QUIC DATAGRAM send requires a completed handshake or 0-RTT state"
+            );
+        }
+        if (ep->retired || ep->close_wait ||
+            ngtcp2_conn_in_closing_period2(ep->conn) ||
+            ngtcp2_conn_in_draining_period2(ep->conn)) {
+            croak("cannot send QUIC DATAGRAM on a closing connection");
+        }
+
+        params = ngtcp2_conn_get_remote_transport_params2(ep->conn);
+        if (params == NULL || params->max_datagram_frame_size == 0) {
+            croak("peer does not support QUIC DATAGRAM");
+        }
+
+        data = SvPVbyte(data_sv, datalen);
+        if (!net_quic_datagram_payload_fits(
+                params->max_datagram_frame_size,
+                (size_t)datalen
+            )) {
+            croak("QUIC DATAGRAM payload exceeds peer max_datagram_frame_size");
+        }
+
+        max_payload_size = net_quic_max_datagram_payload_size(ep);
+        if ((size_t)datalen > max_payload_size) {
+            croak("QUIC DATAGRAM payload exceeds current path capacity");
+        }
+
+        if (ep->datagram_tx_pending != NULL) {
+            RETVAL = 0;
+        } else {
+            datagram = net_quic_application_datagram_new(
+                (const uint8_t *)data,
+                (size_t)datalen
+            );
+            if (datagram == NULL) {
+                croak("unable to allocate QUIC DATAGRAM");
+            }
+
+            datagram->early_data = ep->ready ? 0 : 1;
+            ep->datagram_tx_pending = datagram;
+            RETVAL = 1;
+        }
+    OUTPUT:
+        RETVAL
+
+SV *
+_take_received_datagram(self)
+    SV *self
+    PREINIT:
+        net_quic_connection *ep;
+        net_quic_application_datagram *datagram;
+        AV *av;
+    CODE:
+        ep = net_quic_connection_from_sv(self);
+        datagram = ep->datagram_rx_head;
+
+        if (datagram == NULL) {
+            RETVAL = &PL_sv_undef;
+        } else {
+            ep->datagram_rx_head = datagram->next;
+            if (ep->datagram_rx_head == NULL) {
+                ep->datagram_rx_tail = NULL;
+            }
+
+            ep->datagram_rx_buffered_bytes -= datagram->len;
+            --ep->datagram_rx_count;
+
+            av = newAV();
+            av_push(
+                av,
+                datagram->len == 0
+                    ? newSVpvn("", 0)
+                    : newSVpvn(
+                        (const char *)datagram->data,
+                        (STRLEN)datagram->len
+                    )
+            );
+            av_push(av, newSViv(datagram->early_data ? 1 : 0));
+            RETVAL = newRV_noinc((SV *)av);
+
+            net_quic_application_datagram_free(datagram);
+        }
     OUTPUT:
         RETVAL
 
@@ -1930,6 +2094,7 @@ _next_datagram(self)
         net_quic_connection *ep;
         net_quic_stream_state *stream;
         net_quic_stream_tx_chunk *chunk;
+        net_quic_application_datagram *application_datagram;
         ngtcp2_path_storage ps;
         ngtcp2_pkt_info pi;
         ngtcp2_addr close_local;
@@ -1940,6 +2105,7 @@ _next_datagram(self)
         uint32_t flags;
         size_t remaining;
         size_t attempts;
+        int datagram_accepted;
     CODE:
         ep = net_quic_connection_from_sv(self);
 
@@ -1980,9 +2146,43 @@ _next_datagram(self)
         now = net_quic_now();
         nwrite = 0;
         wdatalen = -1;
+
+        if (ep->datagram_tx_pending != NULL) {
+            application_datagram = ep->datagram_tx_pending;
+            datagram_accepted = 0;
+
+            nwrite = ngtcp2_conn_write_datagram(
+                ep->conn,
+                &ps.path,
+                &pi,
+                ep->txbuf,
+                sizeof(ep->txbuf),
+                &datagram_accepted,
+                0,
+                0,
+                application_datagram->data,
+                application_datagram->len,
+                now
+            );
+
+            if (nwrite < 0) {
+                ep->datagram_tx_pending = NULL;
+                net_quic_application_datagram_free(application_datagram);
+                croak(
+                    "ngtcp2 DATAGRAM write failed: %s",
+                    ngtcp2_strerror((int)nwrite)
+                );
+            }
+
+            if (datagram_accepted) {
+                ep->datagram_tx_pending = NULL;
+                net_quic_application_datagram_free(application_datagram);
+            }
+        }
+
         attempts = net_quic_stream_count(ep);
 
-        while (attempts-- != 0) {
+        while (nwrite == 0 && attempts-- != 0) {
             stream = net_quic_stream_next_tx(ep);
             if (stream == NULL) {
                 break;

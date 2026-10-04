@@ -1,0 +1,108 @@
+NAME
+    String::Increment::Parts - Increment string parts (numbers or letter
+    sequences)
+
+VERSION
+    This document describes version 0.001 of String::Increment::Parts (from
+    Perl distribution String-Increment-Parts), released on 2026-07-22.
+
+DESCRIPTION
+FUNCTIONS
+  increment_string_parts
+    Usage:
+
+     increment_string_parts(%args) -> any
+
+    Increment string parts (numbers or letter sequences).
+
+    This routine takes a string and splits it into a list of (uppercase
+    letter sequences, lowercase letter sequences, 0-9 sequences [nonnegative
+    integers], or anything in between). After that you can tell it to
+    increment the letter/number sequences.
+
+    This routine is handy when you want to generate a serial sequence of
+    codes.
+
+    Note that for incrementing letters, Perl's auto-increment or
+    auto-decrement is used. If you instruct the function to increment by 100
+    (set "inc" argument to 100), it will do so 100 times.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all_indexes => *bool*
+
+        (No description)
+
+    *   filename => *bool*
+
+        Treat string as filename and do not include the extension as parts.
+
+    *   inc => *int* (default: 1)
+
+        (No description)
+
+    *   indexes => *array[int]* (default: [-1])
+
+        (No description)
+
+    *   n => *posint* (default: 1)
+
+        How many times to repeat the increment and return the result.
+
+    *   string* => *str*
+
+        (No description)
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Increment-Parts>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-Increment-Parts>.
+
+SEE ALSO
+    String::Incremental.
+
+    Perl's auto-increment and auto-decrement documentation in perlop.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar <perlancar@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Increment-Part
+    s>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

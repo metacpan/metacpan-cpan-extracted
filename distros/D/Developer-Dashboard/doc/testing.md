@@ -68,6 +68,11 @@ singleton workers during `dashboard stop`, `dashboard restart`, and browser
 or `stream_value()` against a finite saved Ajax handler and assert the final
 DOM after incremental chunks land.
 
+The Ajax helper regression also checks transient code templating:
+`data => { args => 123 }` must encode `my $foobar = 123;` rather than leaving
+`[% args %]` in the token payload. Run the focused regression test when
+changing the `Ajax` helper.
+
 ### Source-tree gates and git worktrees
 
 Some test files only make sense against a checkout rather than an installed
@@ -443,7 +448,7 @@ The extension tests also cover:
 - when changing starter-page refresh logic, run `prove -lv t/04-update-manager.t` and `prove -lv t/05-cli-smoke.t` so the core seeded-page init/update refresh path stays covered against stale managed saved copies
 - when changing bookmark rendering, verify both the browser route and the CLI render path with the same TT bookmark: run `prove -lv t/05-cli-smoke.t` for `dashboard page render <id>` coverage and `integration/browser/run-bookmark-browser-smoke.pl --bookmark-file /path/to/bookmark` for the browser route
 - when changing Template Toolkit rendering or `nav/*.tt`, verify syntax-error handling too: broken TT must surface a visible `runtime-error` block and must not leak raw `[% ... %]` source in either the browser route or `dashboard page render`
-- when changing `dashboard serve --ssl`, run `prove -lv t/17-web-server-ssl.t` and `prove -lv t/33-web-server-ssl-browser.t` so both the certificate profile and the real Chromium browser path stay covered; the generated cert must keep SAN coverage for `localhost`, `127.0.0.1`, `::1`, the concrete non-wildcard bind host, and any configured `web.ssl_subject_alt_names`, older dashboard certs must regenerate when stale or when the expected SAN list changes, plain HTTP must redirect on the public port, and Chromium must reach the privacy interstitial plus the real dashboard page when certificate trust is bypassed for the test browser, including one configured alias hostname
+- when changing `dashboard serve --ssl`, run `prove -lv t/17-web-server-ssl.t` and `prove -lv t/33-web-server-ssl-browser.t` so both the certificate profile and the real Chromium browser path stay covered; the generated cert must keep SAN coverage for `localhost`, `127.0.0.1`, `::1`, the concrete non-wildcard bind host, and any configured `web.ssl_subject_alt_names`, older dashboard certs must regenerate when stale or when the expected SAN list changes, plain HTTP must redirect on the public port, and Chromium must report the certificate privacy interstitial (as DOM or a headless certificate diagnostic) plus reach the real dashboard page when certificate trust is bypassed for the test browser, including one configured alias hostname
 - when changing layered machine auth for saved `/ajax/...` handlers, run `prove -lv t/07-core-units.t` and `prove -lv t/08-web-update-coverage.t` so `config/api.json` still follows `DD-OOP-LAYERS`, installed skill `config/api.json` fragments still contribute to skill-local saved ajax routes, helper sessions still work on API-registered ajax routes, remote machine callers still need matching `X-DD-API-Key` plus `X-DD-API-Secret` headers, and registered remote ajax routes still fail closed with `403 {"status":"forbidden"}`
 - when changing the operator-facing `dashboard api` workflow, also run `prove -lv t/05-cli-smoke.t` and `prove -lv t/22-cli-module-coverage.t` so the built-in helper still lists the effective merged registry, hashes raw secrets from `--secret` or `--maybe-secret` before persistence, writes only to the deepest writable `config/api.json` layer, keeps duplicate route adds idempotent, and masks inherited keys through child-layer tombstones instead of rewriting parent files
 - when changing runtime-local optional Perl dependency handling, run `prove -lv t/05-cli-smoke.t` and `prove -lv t/28-runtime-cpan-env.t` to verify `dashboard cpan DBD::Driver` still installs into `./.developer-dashboard/local`, appends the runtime `cpanfile`, records `DBI` automatically for requested `DBD::*` drivers, and keeps the runtime-local `PERL5LIB` wiring script-local instead of reintroducing a dedicated manager module
@@ -509,7 +514,7 @@ integration/blank-env/run-host-integration.sh
 This integration path builds the distribution tarball on the host with
 `dzil build`, rebuilds `dd-int-test:latest` from the current
 `integration/blank-env/Dockerfile`, runs that container with only the tarball
-mounted into it, installs the tarball with `cpanm --notest`, and then
+mounted into it, installs and tests the tarball with `cpanm`, and then
 exercises the installed `dashboard` command inside the clean Perl container.
 The blank-environment image must also carry the native CPAN build baseline
 needed by packaged installs, including `libexpat1-dev`, `libssl-dev`,
@@ -639,3 +644,26 @@ guests do not fail while pulling `Test::SharedFork`.
 The supported Windows runtime baseline is PowerShell plus Strawberry Perl.
 Git Bash is optional. Scoop is optional. They remain setup helpers, not
 runtime requirements for Developer Dashboard itself.
+
+## Docker Coverage Environment Notes
+
+Run the coverage gate from the repository directory through `d2 docker compose`;
+do not run the Perl suite on the host. The development container must trust the
+mounted checkout before tests that inspect Git metadata run:
+
+```sh
+d2 docker compose exec -T dev git config --global --add safe.directory /work
+d2 docker compose exec -T dev git config --global user.email tira-tests@example.invalid
+d2 docker compose exec -T dev git config --global user.name TiraTests
+```
+
+These settings are disposable container state. If a previous container created
+root-owned files under the local runtime configuration, restore readability
+before invoking `d2` again; never replace or discard the user's configuration.
+
+The repository-wide gate also executes operator-local specifications under
+`.claude/tools/`. A clean Docker result for the product suite does not imply
+those external checks can pass: `t-ci-health` requires a valid live GitHub
+credential, and `t-tira-author` requires the separate Tira project-person
+command. Record those as environment blockers rather than attributing them to
+Developer Dashboard code changes.

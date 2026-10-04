@@ -69,8 +69,9 @@ WriteMakefile(
         'Compress::Raw::Zlib'   => '2.220',
         'IO::Compress::Gzip'    => '2.220',
         'IO::Uncompress::Gunzip'=> '2.220',
-        'Dancer2'               => '0.206000',
+        'Dancer2'               => '2.2.0',
         'Plack'                 => '1.0054',
+        'Pod::Text'             => '6.1.1',
         'Socket'                => '2.041',
         'Starman'               => '0.4018',
         'Storable'              => '3.41',
@@ -148,6 +149,6 @@ install ::
 pure_install :: install-private-cli-tools
 
 install-private-cli-tools :
-	$(NOECHO) $(PERL) -e 'use File::Copy; use File::Path qw(make_path); use File::Spec; my $$home = $$ENV{HOME} || $$ENV{USERPROFILE} || eval { (getpwuid($$>))[7] } || die "Unable to resolve a home directory for the private CLI helper staging\n"; my $$cli_dir = File::Spec->catdir($$home, ".developer-dashboard", "cli"); make_path($$cli_dir) unless -d $$cli_dir; for my $$cmd (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file workspace file files path paths ps1 encode decode indicator collector config auth api ask init cpan page action docker serve stop restart log shell doctor housekeeper skills which upgrade complete pax)) { my $$src = File::Spec->catfile("share", "private-cli", $$cmd); my $$dst = File::Spec->catfile($$cli_dir, $$cmd); if (-f $$src) { File::Copy::copy($$src, $$dst) or warn "Failed to copy $$src to $$dst: $$!"; chmod(0755, $$dst); print "Installed $$cmd to $$cli_dir\n"; } }'
+	$(NOECHO) $(PERL) -e 'use File::Copy; use File::Path qw(make_path); use File::Spec; my $$home = $$ENV{HOME} || $$ENV{USERPROFILE} || eval { (getpwuid($$>))[7] } || die "Unable to resolve a home directory for the private CLI helper staging\n"; my $$cli_dir = File::Spec->catdir($$home, ".developer-dashboard", "cli"); make_path($$cli_dir) unless -d $$cli_dir; for my $$cmd (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file workspace file files path paths ps1 encode decode indicator collector config auth api ask init cpan page action docker serve stop restart log shell doctor housekeeper skills which upgrade complete)) { my $$src = File::Spec->catfile("share", "private-cli", $$cmd); my $$dst = File::Spec->catfile($$cli_dir, $$cmd); if (-f $$src) { File::Copy::copy($$src, $$dst) or warn "Failed to copy $$src to $$dst: $$!"; chmod(0755, $$dst); print "Installed $$cmd to $$cli_dir\n"; } }'
 END_POSTAMBLE
 }

@@ -7,7 +7,7 @@ use Test::More;
 
 my @tricky = ('two words', 'a$b', q{it's "quoted"}, '*', '');
 
-plan tests => 16;
+plan tests => 19;
 
 sub args_of {
   my($ebug) = @_;
@@ -56,6 +56,22 @@ sub args_of {
   $ebug->args(['two words']);
   $ebug->load;
   is_deeply(args_of($ebug), [ 'two words' ], 'args work with a custom backend');
+}
+
+{
+  local $^O = 'MSWin32';
+  is_deeply([ Devel::ebug::_backend_words('C:\Strawberry\perl\bin\perl.exe bin/ebug_backend_perl') ],
+    [ 'C:\Strawberry\perl\bin\perl.exe', 'bin/ebug_backend_perl' ],
+    'on Windows, backslashes in the backend are path separators');
+  is_deeply([ Devel::ebug::_backend_words('"C:\Program Files\perl\bin\perl.exe" -d:ebug::Backend') ],
+    [ 'C:\Program Files\perl\bin\perl.exe', '-d:ebug::Backend' ],
+    'and a quoted path with spaces is one word');
+}
+
+{
+  local $^O = 'linux';
+  is_deeply([ Devel::ebug::_backend_words('perl two\ words') ], [ 'perl', 'two words' ],
+    'elsewhere, backslash still escapes');
 }
 
 SKIP: {

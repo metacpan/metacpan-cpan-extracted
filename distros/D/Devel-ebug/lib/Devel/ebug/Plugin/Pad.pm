@@ -5,7 +5,7 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(pad pad_human);
 
-our $VERSION = '0.68'; # VERSION
+our $VERSION = '0.69'; # VERSION
 
 # find the pad
 sub pad {
@@ -50,7 +50,7 @@ Devel::ebug::Plugin::Pad
 
 =head1 VERSION
 
-version 0.68
+version 0.69
 
 =head1 AUTHOR
 

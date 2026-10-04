@@ -3,7 +3,7 @@ package Developer::Dashboard::ActionRunner;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -157,7 +157,8 @@ my %RESOLVABLE_ACCESSOR = map { $_ => 1 } qw(
 sub run_command_action {
     my ( $self, %args ) = @_;
     my $cmd = $args{command} || die 'Missing command';
-    my $cwd = $args{cwd} || cwd();    # uncoverable condition false
+    my $cwd = $args{cwd};
+    $cwd = cwd() if !$cwd;
     if ( !File::Spec->file_name_is_absolute($cwd) && $RESOLVABLE_ACCESSOR{$cwd} ) {
         $cwd = $self->{paths}->$cwd();
     }
@@ -168,7 +169,7 @@ sub run_command_action {
     my $background = $args{background} ? 1 : 0;
 
     if ($background) {
-        pipe my $reader, my $writer or die "Unable to create background action pipe: $!";    # uncoverable branch true
+        pipe my $reader, my $writer or die "Unable to create background action pipe: $!";
         my $pid = $self->_fork_process;
         die "Unable to fork background action: $!" if !defined $pid;
         if ($pid) {
@@ -187,7 +188,7 @@ sub run_command_action {
         }
         local $SIG{CHLD} = 'DEFAULT';
         close $reader;
-        my $boot_ok = eval {
+        eval {
             $self->_detach_background_session() or die "Unable to detach background action session: $!";
             open STDIN, '<', File::Spec->devnull() or die "Unable to redirect background action stdin: $!";
             open STDOUT, '>>', $self->{files}->dashboard_log or die "Unable to redirect background action stdout: $!";
@@ -198,9 +199,8 @@ sub run_command_action {
                 chdir $cwd or die "Unable to chdir to background action cwd '$cwd': $!";
                 local %ENV = ( %ENV, %{$env} );
                 my @argv = shell_command_argv($cmd);
-                # uncoverable branch true
-                # uncoverable branch false
-                exec { $argv[0] } @argv or die "Unable to exec background action command: $!";
+                $self->_exec_command(@argv);
+                die "Unable to exec background action command: $!";
             }
             local $SIG{TERM} = sub {
                 kill 'TERM', $command_pid;
@@ -228,14 +228,12 @@ sub run_command_action {
                 select undef, undef, undef, 0.05;
             }
         };
-        if ( !$boot_ok ) {    # uncoverable branch false
-            my $error = $@ || "Unable to start background action\n";    # uncoverable condition right
-            if ($writer) {    # uncoverable branch false
-                print {$writer} 'err: ' . $error;
-                close $writer;
-            }
-            exit 1;
-        }
+        # The eval body above only ever leaves through exit or die, so reaching
+        # this point always means the boot failed and $@ holds the reason.
+        my $error = $@;
+        print {$writer} 'err: ' . $error;
+        close $writer;
+        exit 1;
     }
 
     return $self->_run_command(
@@ -253,6 +251,17 @@ sub run_command_action {
 # Output: child pid in parent, zero in child, or undef on failure.
 sub _fork_process {
     return fork();
+}
+
+# _exec_command(@argv)
+# Replaces the current process with the given command. Kept as its own single
+# statement sub so the failure path (exec returning) is a plain statement in the
+# caller that Devel::Cover can record, rather than code trailing an exec.
+# Input: command argv list.
+# Output: false when the exec failed; never returns on success.
+sub _exec_command {
+    my ( $self, @argv ) = @_;
+    return exec { $argv[0] } @argv;
 }
 
 # _detach_background_session()
@@ -328,12 +337,10 @@ sub _read_process_state {
     local $?;
     my $proc = "/proc/$pid/stat";
     if ( -r $proc ) {
-        open my $fh, '<', $proc or return;    # uncoverable branch true
+        open my $fh, '<', $proc or return;
         local $/;
         my $stat = scalar <$fh>;
-        if ( defined $stat ) {    # uncoverable branch false
-            return $1 if $stat =~ /^\d+\s+\(.*\)\s+(\S)/s;    # uncoverable branch false
-        }
+        return $1 if $stat =~ /^\d+\s+\(.*\)\s+(\S)/s;
     }
 
     my ( $stdout, undef, $exit_code ) = capture {

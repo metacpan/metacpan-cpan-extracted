@@ -14,6 +14,9 @@ use Test::More;
 my $ROOT   = abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
 my $ORIGIN = getcwd();
 
+plan skip_all => 'checkout-only workflow scan; release tarballs exclude .github'
+    if !-d File::Spec->catdir( $ROOT, '.github', 'workflows' );
+
 # _workflow_files()
 # Lists the continuous-integration workflow definitions that the repository owns.
 # Input: none; the workflow directory is resolved from the repository root.

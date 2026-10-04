@@ -1,5 +1,36 @@
 Revision history for Net-QUIC
 
+0.04  2026-10-03
+    - Add RFC 9221 QUIC DATAGRAM transport as an opt-in Connection feature.
+    - Negotiate DATAGRAM receive capability directionally with the
+      max_datagram_frame_size QUIC transport parameter.
+    - Add Connection->send_datagram with one bounded pending transmit slot so
+      unreliable application data cannot silently grow an unbounded queue.
+    - Add Connection->next_received_datagram and on_datagram for pull-style or
+      callback-style DATAGRAM receive handling.
+    - Bound the native DATAGRAM receive fallback queue by both byte count and
+      item count, and expose datagram_receive_drops for overflow visibility.
+    - Add can_send_datagram, can_receive_datagram,
+      peer_max_datagram_frame_size, local_max_datagram_frame_size, and
+      max_datagram_payload_size capability and sizing introspection.
+    - Limit application DATAGRAM payloads to both the peer-advertised frame
+      limit and the current QUIC path capacity without fragmenting payloads.
+    - Preserve zero-length DATAGRAM payloads and verify that lost DATAGRAMs are
+      not retransmitted.
+    - Support QUIC DATAGRAM with saved 0-RTT transport state, retain received
+      early-data origin, and discard pending early DATAGRAM state when 0-RTT
+      is rejected.
+    - Verify RFC 9221 behavior over QUIC v1 and QUIC v2.
+    - Clarify that Net::QUIC::Datagram is the UDP packet wrapper used by
+      event-loop adapters, while RFC 9221 DATAGRAM is Connection application
+      data carried inside QUIC.
+    - Keep HTTP/3 DATAGRAM flow identifiers, Capsules, WebTransport, and other
+      application-protocol semantics outside Net::QUIC.
+    - Restore connection receive flow-control credit when an explicit-receive
+      Stream is dropped before remote close and later reclaimed natively.
+    - Add regression coverage for deferred Stream reclamation after the Perl
+      Stream object has already been released.
+
 0.03  2026-10-02
     - Add an advanced protocol-engine interface while keeping Net::QUIC
       transport-neutral and preserving the ordinary send/finish/next_data API.

@@ -3,7 +3,7 @@ package Developer::Dashboard::Auth;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Crypt::URandom qw(urandom);
 use Fcntl qw(:mode);
@@ -187,7 +187,8 @@ sub verify_user {
 sub _expected_password_hash {
     my ( $self, $user, $username, $password ) = @_;
     if ( ( $user->{password_scheme} || '' ) eq $PBKDF2_SCHEME ) {
-        my $iterations = $user->{iterations} || $PBKDF2_ITERATIONS;    # uncoverable condition false
+        my $iterations = $user->{iterations};
+        $iterations = $PBKDF2_ITERATIONS if !$iterations;
         return _pbkdf2_hmac_sha256_hex( $password, $user->{salt}, $iterations );
     }
     return $self->_password_hash( $username, $password, $user->{salt} );

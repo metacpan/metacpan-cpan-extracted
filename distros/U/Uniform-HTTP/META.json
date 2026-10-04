@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0.98"
          }
       },
       "configure" : {
@@ -55,6 +55,6 @@
          "web" : "https://github.com/haxmeister/perl-Uniform-HTTP"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

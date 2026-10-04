@@ -343,9 +343,12 @@ $connection->close;
 
 also notify Driver automatically when transport work is needed.
 
-## Net::QUIC::Datagram
+## UDP packet wrapper: Net::QUIC::Datagram
 
-The `send` callback receives a `Net::QUIC::Datagram`.
+The Driver `send` callback receives a `Net::QUIC::Datagram`.
+
+This class is an outbound UDP packet wrapper for the event-loop adapter. It is
+not an RFC 9221 application DATAGRAM carried inside QUIC.
 
 Useful fields are:
 
@@ -411,6 +414,73 @@ $driver->writable;
 ```
 
 Driver then continues where it stopped.
+
+## QUIC DATAGRAM (RFC 9221)
+
+QUIC DATAGRAM carries unreliable, unordered application bytes inside a QUIC
+connection.
+
+It is optional and directional. To advertise that this endpoint can receive
+DATAGRAM frames:
+
+```perl
+transport => {
+    max_datagram_frame_size => 65535,
+}
+```
+
+The default is zero, so existing applications do not enable DATAGRAM
+implicitly.
+
+After negotiation:
+
+```perl
+if ($connection->can_send_datagram) {
+    my $accepted = $connection->send_datagram($bytes);
+}
+```
+
+`send_datagram` uses one bounded pending slot. It returns false if that slot
+is already occupied rather than building an unbounded queue. A true result
+means Net::QUIC accepted the bytes for QUIC transmission; it does not mean the
+peer received them. Lost DATAGRAMs are not retransmitted.
+
+Pull received payloads with:
+
+```perl
+while (defined(my $bytes = $connection->next_received_datagram)) {
+    ...
+}
+```
+
+or register:
+
+```perl
+$connection->on_datagram(sub {
+    my ($connection, $bytes, $early_data) = @_;
+    ...
+});
+```
+
+The receive fallback queue is bounded. Excess unreliable DATAGRAMs are dropped
+and can be observed with `datagram_receive_drops`.
+
+For the current safe payload ceiling:
+
+```perl
+my $bytes = $connection->max_datagram_payload_size;
+```
+
+That value reflects both the peer's DATAGRAM limit and the current QUIC path
+capacity. Higher protocols must subtract their own framing overhead.
+
+A returning client with saved `early_data` state can use QUIC DATAGRAM in
+0-RTT when the remembered peer transport parameters permit it. As with all
+0-RTT, the application must treat the operation as replayable.
+
+This is raw RFC 9221 transport only. HTTP/3 DATAGRAM flow identifiers,
+SETTINGS_H3_DATAGRAM, Capsules, WebTransport, and other application-protocol
+semantics belong above Net::QUIC.
 
 ## TLS and certificate verification
 
@@ -878,10 +948,11 @@ It does not define:
 - an application message format
 - a web framework
 
-QUIC DATAGRAM is a separate optional QUIC extension and is not required for the
-base transport implemented here.
+Raw RFC 9221 QUIC DATAGRAM transport is supported, but HTTP/3 DATAGRAM,
+Capsules, WebTransport, and other application-protocol meanings are not defined
+by Net::QUIC.
 
-qlog and advanced congestion-control configuration are also separate tooling or
+qlog and advanced congestion-control configuration remain separate tooling or
 advanced configuration work.
 
 ## Native implementation

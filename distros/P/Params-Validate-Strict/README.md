@@ -1,32 +1,34 @@
-# NAME
+## Name
 
 Params::Validate::Strict - Validates a set of parameters against a schema
 
-# VERSION
+## Version
 
-Version 0.39
+Version 0.41
 
-# SYNOPSIS
+## Synopsis
 
-    my $schema = {
-        username => { type => 'string', min => 3, max => 50 },
-        age => { type => 'integer', min => 0, max => 150 },
-    };
+```perl
+my $schema = {
+    username => { type => 'string', min => 3, max => 50 },
+    age => { type => 'integer', min => 0, max => 150 },
+};
 
-    my $input = {
-         username => 'john_doe',
-         age => '30',   # Will be coerced to integer
-    };
+my $input = {
+     username => 'john_doe',
+     age => '30',   # Will be coerced to integer
+};
 
-    my $validated_input = validate_strict(schema => $schema, input => $input);
+my $validated_input = validate_strict(schema => $schema, input => $input);
 
-    if(defined($validated_input)) {
-        print "Example 1: Validation successful!\n";
-        print 'Username: ', $validated_input->{username}, "\n";
-        print 'Age: ', $validated_input->{age}, "\n";   # It's an integer now
-    } else {
-        print "Example 1: Validation failed: $@\n";
-    }
+if(defined($validated_input)) {
+    print "Example 1: Validation successful!\n";
+    print 'Username: ', $validated_input->{username}, "\n";
+    print 'Age: ', $validated_input->{age}, "\n";   # It's an integer now
+} else {
+    print "Example 1: Validation failed: $@\n";
+}
+```
 
 Upon first reading this may seem overly complex and full of scope creep in a sledgehammer to crack a nut sort of way,
 however two use cases make use of the extensive logic that comes with this code
@@ -53,9 +55,9 @@ and I have a couple of other reasons for writing it.
     even if nobody else finds it useful,
     though I hope you will.
 
-# METHODS
+## Methods
 
-## validate\_strict
+### Validate\_Strict
 
 Validates a set of parameters against a schema.
 
@@ -70,11 +72,13 @@ This function takes two mandatory arguments:
     where every element describes one parameter and carries a mandatory
     `name` key:
 
-        $schema = [
-          { name => 'username', type => 'string', min => 3, max => 50 },
-          { name => 'age',      type => 'integer', min => 0, max => 150 },
-          { name => 'role',     type => 'string', optional => 1, default => 'user' },
-        ];
+    ```perl
+    $schema = [
+      { name => 'username', type => 'string', min => 3, max => 50 },
+      { name => 'age',      type => 'integer', min => 0, max => 150 },
+      { name => 'role',     type => 'string', optional => 1, default => 'user' },
+    ];
+    ```
 
     The arrayref form is normalised to the standard hashref form before any further
     processing.  It is particularly useful when declaration order matters (e.g.
@@ -85,13 +89,15 @@ This function takes two mandatory arguments:
     For some sort of compatibility with [Data::Processor](https://metacpan.org/pod/Data%3A%3AProcessor),
     it is possible to wrap the schema within a hash like this:
 
-        $schema = {
-          description => 'Describe what this schema does',
-          error_msg => 'An error message',
-          schema => {
-            # ... schema goes here
-          }
-        }
+    ```perl
+    $schema = {
+      description => 'Describe what this schema does',
+      error_msg => 'An error message',
+      schema => {
+        # ... schema goes here
+      }
+    }
+    ```
 
 - `args` || `input`
 
@@ -129,48 +135,52 @@ It takes optional arguments:
     Each custom type is defined as a hash reference containing the same validation rules available for regular parameters
     (`type`, `min`, `max`, `matches`, `memberof`, `values`, `enum`, `notmemberof`, `callback`, etc.).
 
-        my $custom_types = {
-          email => {
-            type => 'string',
-            matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/,
-            error_msg => 'Invalid email address format'
-          }, phone => {
-            type => 'string',
-            matches => qr/^\+?[1-9]\d{1,14}$/,
-            min => 10,
-            max => 15
-          }, percentage => {
-            type => 'number',
-            min => 0,
-            max => 100
-          }, status => {
-            type => 'string',
-            memberof => ['draft', 'published', 'archived']
-          }
-        };
+    ```perl
+    my $custom_types = {
+      email => {
+        type => 'string',
+        matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/,
+        error_msg => 'Invalid email address format'
+      }, phone => {
+        type => 'string',
+        matches => qr/^\+?[1-9]\d{1,14}$/,
+        min => 10,
+        max => 15
+      }, percentage => {
+        type => 'number',
+        min => 0,
+        max => 100
+      }, status => {
+        type => 'string',
+        memberof => ['draft', 'published', 'archived']
+      }
+    };
 
-        my $schema = {
-          user_email => { type => 'email' },
-          contact_number => { type => 'phone', optional => 1 },
-          completion => { type => 'percentage' },
-          post_status => { type => 'status' }
-        };
+    my $schema = {
+      user_email => { type => 'email' },
+      contact_number => { type => 'phone', optional => 1 },
+      completion => { type => 'percentage' },
+      post_status => { type => 'status' }
+    };
 
-        my $validated = validate_strict(
-          schema => $schema,
-          input => $input,
-          custom_types => $custom_types
-        );
+    my $validated = validate_strict(
+      schema => $schema,
+      input => $input,
+      custom_types => $custom_types
+    );
+    ```
 
     Custom types can be extended or overridden in the schema by specifying additional constraints:
 
-        my $schema = {
-          admin_username => {
-            type => 'username',  # Uses custom type definition
-            min => 5,            # Overrides custom type's min value
-            max => 15            # Overrides custom type's max value
-          }
-        };
+    ```perl
+    my $schema = {
+      admin_username => {
+        type => 'username',  # Uses custom type definition
+        min => 5,            # Overrides custom type's min value
+        max => 15            # Overrides custom type's max value
+      }
+    };
+    ```
 
     Custom types work seamlessly with nested schema, optional parameters, and all other validation features.
 
@@ -179,7 +189,7 @@ The schema can define the following rules for each parameter:
 - `type`
 
     The data type of the parameter.
-    Valid types are `string`, `integer`, `number`, `float` `boolean`, `scalar`, `scalarref`, `stringref`, `hashref`, `arrayref`, `object`, `coderef` and `void`.
+    Valid types are `string`, `integer`, `number`, `float`, `boolean`, `scalar`, `scalarref`, `stringref`, `hashref`, `arrayref`, `object`, `coderef`, `regex`, `handle`, `arraylike`, `hashlike`, `codelike`, `invocant` and `void`.
     `scalar` accepts any plain scalar value (string, number, boolean, etc.) but rejects references (arrayrefs, hashrefs, coderefs, objects).
     `scalarref` accepts a reference to a scalar value (e.g. `\$var`) but rejects plain scalars, arrayrefs, hashrefs, coderefs, and objects.
     `stringref` accepts a reference to a scalar that contains a plain string (e.g. `\$str`) and rejects plain scalars, references-to-references, arrayrefs, hashrefs, coderefs, and objects.
@@ -188,23 +198,33 @@ The schema can define the following rules for each parameter:
     The `min`/`max` constraints apply to the **length** (in characters) of the referenced string.
     All other string rules (`matches`, `nomatch`, `memberof`, etc.) operate on the dereferenced string value.
     The validated return value is the dereferenced plain string.
+    `regex` accepts a compiled regular expression (`qr//` object); the value is returned unchanged.
+    `handle` accepts a file handle: a glob reference with a defined `fileno`, an `IO::Handle` subclass instance, or any value for which `fileno` returns a defined value.
+    `arraylike` accepts an array reference or a blessed object that overloads `@{}` array dereferencing.
+    `hashlike` accepts a hash reference or a blessed object that overloads `%{}` hash dereferencing.
+    `codelike` accepts a code reference or a blessed object that overloads `&{}` code dereferencing.
+    `invocant` accepts either a blessed object instance or a plain string that is a syntactically valid Perl class name (e.g. `'MyApp::Widget'`).
 
     A type can be an arrayref when a parameter could have different types (e.g. a string or an object).
 
-        $schema = {
-          username => [
-            { type => 'string', min => 3, max => 50 },        # Name
-            { type => 'integer', 'min' => 1 },        # UID that isn't root
-          ]
-        };
+    ```perl
+    $schema = {
+      username => [
+        { type => 'string', min => 3, max => 50 },        # Name
+        { type => 'integer', 'min' => 1 },        # UID that isn't root
+      ]
+    };
+    ```
 
     As a shorthand, `type` itself may be an arrayref of type name strings (a _union type_),
     or a pipe-separated string, when all other constraints are shared between the alternatives:
 
-        $schema = {
-          data => { type => ['string', 'arrayref'] },
-          id   => { type => 'string|integer', optional => 1 },
-        };
+    ```perl
+    $schema = {
+      data => { type => ['string', 'arrayref'] },
+      id   => { type => 'string|integer', optional => 1 },
+    };
+    ```
 
     This is equivalent to the full array-of-rules form but more concise.
     Whitespace around the `|` is ignored, so `'string | arrayref'` is the same as `'string|arrayref'`.
@@ -221,53 +241,109 @@ The schema can define the following rules for each parameter:
     `can` can be a simple scalar string of a method name,
     or an arrayref of a list of method names, all of which must be supported by the object.
 
-        $schema = {
-          gedcom => { type => object, can => 'get_individual' }
-        }
+    ```perl
+    $schema = {
+      gedcom => { type => object, can => 'get_individual' }
+    }
+    ```
 
 - `isa`
 
     The parameter must be an object of type `isa`.
+    Requires `type => 'object'`.
+
+- `does`
+
+    The parameter must be a blessed object that satisfies the role via `->DOES`.
+    Requires `type => 'object'`.
+
+    ```perl
+    handler => { type => 'object', does => 'My::Role::Printable' }
+    ```
+
+- `classisa`
+
+    The parameter must be a string holding a syntactically valid Perl class name
+    that passes `->isa('Base::Class')`.
+    The class must already be loaded (its `@ISA` must be reachable).
+    Does not accept blessed object references; use `isa` for those.
+
+    ```perl
+    backend => { type => 'string', classisa => 'My::Backend::Base' }
+    ```
+
+- `subclass`
+
+    Like `classisa`, but requires a _strict_ subclass: the value must not equal
+    the base class name itself.
+
+    ```perl
+    plugin => { type => 'string', subclass => 'My::Plugin::Base' }
+    ```
+
+- `classdoes`
+
+    Like `classisa`, but tests `->DOES` (role consumption) instead of `->isa`.
+
+    ```perl
+    consumer => { type => 'string', classdoes => 'My::Role::Loggable' }
+    ```
+
+- `driver`
+
+    The parameter must be a valid class name that: (1) can be loaded via `require`,
+    and (2) passes `->isa('Base::Class')`.
+    The module is actually loaded as a side effect of validation.
+
+    ```perl
+    store => { type => 'string', driver => 'Cache::Store' }
+    ```
 
 - `memberof`
 
     The parameter must be a member of the given arrayref.
 
-        status => {
-          type => 'string',
-          memberof => ['draft', 'published', 'archived']
-        }
+    ```perl
+    status => {
+      type => 'string',
+      memberof => ['draft', 'published', 'archived']
+    }
 
-        priority => {
-          type => 'integer',
-          memberof => [1, 2, 3, 4, 5]
-        }
+    priority => {
+      type => 'integer',
+      memberof => [1, 2, 3, 4, 5]
+    }
+    ```
 
     For string types, the comparison is case-sensitive by default. Use the `case_sensitive`
     flag to control this behavior:
 
-        # Case-sensitive (default) - must be exact match
-        code => {
-          type => 'string',
-          memberof => ['ABC', 'DEF', 'GHI']
-          # 'abc' will fail
-        }
+    ```perl
+    # Case-sensitive (default) - must be exact match
+    code => {
+      type => 'string',
+      memberof => ['ABC', 'DEF', 'GHI']
+      # 'abc' will fail
+    }
 
-        # Case-insensitive - any case accepted
-        code => {
-          type => 'string',
-          memberof => ['ABC', 'DEF', 'GHI'],
-          case_sensitive => 0
-          # 'abc', 'Abc', 'ABC' all pass, original case preserved
-        }
+    # Case-insensitive - any case accepted
+    code => {
+      type => 'string',
+      memberof => ['ABC', 'DEF', 'GHI'],
+      case_sensitive => 0
+      # 'abc', 'Abc', 'ABC' all pass, original case preserved
+    }
+    ```
 
     For numeric types (`integer`, `number`, `float`), the comparison uses numeric
     equality (`==` operator):
 
-        rating => {
-          type => 'number',
-          memberof => [0.5, 1.0, 1.5, 2.0]
-        }
+    ```perl
+    rating => {
+      type => 'number',
+      memberof => [0.5, 1.0, 1.5, 2.0]
+    }
+    ```
 
     Note that `memberof` cannot be combined with `min` or `max` constraints as they
     serve conflicting purposes - `memberof` defines an explicit whitelist while `min`/`max`
@@ -286,52 +362,60 @@ The schema can define the following rules for each parameter:
     The parameter must not be a member of the given arrayref (blacklist).
     This is the inverse of `memberof`.
 
-        username => {
-          type => 'string',
-          notmemberof => ['admin', 'root', 'system', 'administrator']
-        }
+    ```perl
+    username => {
+      type => 'string',
+      notmemberof => ['admin', 'root', 'system', 'administrator']
+    }
 
-        port => {
-          type => 'integer',
-          notmemberof => [22, 23, 25, 80, 443]  # Reserved ports
-        }
+    port => {
+      type => 'integer',
+      notmemberof => [22, 23, 25, 80, 443]  # Reserved ports
+    }
+    ```
 
     Like `memberof`, string comparisons are case-sensitive by default but can be controlled
     with the `case_sensitive` flag:
 
-        # Case-sensitive (default)
-        username => {
-          type => 'string',
-          notmemberof => ['Admin', 'Root']
-          # 'admin' would pass, 'Admin' would fail
-        }
+    ```perl
+    # Case-sensitive (default)
+    username => {
+      type => 'string',
+      notmemberof => ['Admin', 'Root']
+      # 'admin' would pass, 'Admin' would fail
+    }
 
-        # Case-insensitive
-        username => {
-          type => 'string',
-          notmemberof => ['Admin', 'Root'],
-          case_sensitive => 0
-          # 'admin', 'ADMIN', 'Admin' all fail
-        }
+    # Case-insensitive
+    username => {
+      type => 'string',
+      notmemberof => ['Admin', 'Root'],
+      case_sensitive => 0
+      # 'admin', 'ADMIN', 'Admin' all fail
+    }
+    ```
 
     The blacklist is checked after any `transform` rules are applied, allowing you to
     normalize input before checking:
 
-        username => {
-          type => 'string',
-          transform => sub { lc($_[0]) },  # Normalize to lowercase
-          notmemberof => ['admin', 'root', 'system']
-        }
+    ```perl
+    username => {
+      type => 'string',
+      transform => sub { lc($_[0]) },  # Normalize to lowercase
+      notmemberof => ['admin', 'root', 'system']
+    }
+    ```
 
     `notmemberof` can be combined with other validation rules:
 
-        username => {
-          type => 'string',
-          notmemberof => ['admin', 'root', 'system'],
-          min => 3,
-          max => 20,
-          matches => qr/^[a-z0-9_]+$/
-        }
+    ```perl
+    username => {
+      type => 'string',
+      notmemberof => ['admin', 'root', 'system'],
+      min => 3,
+      max => 20,
+      matches => qr/^[a-z0-9_]+$/
+    }
+    ```
 
 - `case_sensitive`
 
@@ -343,24 +427,26 @@ The schema can define the following rules for each parameter:
     with different casing to match. The original case of the input value is preserved in
     the validated output.
 
-        # Case-sensitive (default)
-        status => {
-          type => 'string',
-          memberof => ['Draft', 'Published', 'Archived'] # Input 'draft' will fail - must match exact case
-        }
+    ```perl
+    # Case-sensitive (default)
+    status => {
+      type => 'string',
+      memberof => ['Draft', 'Published', 'Archived'] # Input 'draft' will fail - must match exact case
+    }
 
-        # Case-insensitive
-        status => {
-          type => 'string',
-          memberof => ['Draft', 'Published', 'Archived'],
-          case_sensitive => 0 # Input 'draft', 'DRAFT', or 'DrAfT' will all pass
-        }
+    # Case-insensitive
+    status => {
+      type => 'string',
+      memberof => ['Draft', 'Published', 'Archived'],
+      case_sensitive => 0 # Input 'draft', 'DRAFT', or 'DrAfT' will all pass
+    }
 
-        country_code => {
-          type => 'string',
-          memberof => ['US', 'UK', 'CA', 'FR'],
-          case_sensitive => 0  # Accept 'us', 'US', 'Us', etc.
-        }
+    country_code => {
+      type => 'string',
+      memberof => ['US', 'UK', 'CA', 'FR'],
+      case_sensitive => 0  # Accept 'us', 'US', 'Us', etc.
+    }
+    ```
 
     This flag has no effect on numeric types (`integer`, `number`, `float`) as numbers
     do not have case.
@@ -394,22 +480,24 @@ The schema can define the following rules for each parameter:
     continuation of the previous rule.  Terminals are double-quoted; non-terminals
     use angle brackets.  Alternatives are separated by `|`.
 
-        $schema = {
-          na_tel_no => {
-            type => 'string',
-            bnf  => [
-              '<telephone-number> ::= <country-code-opt> <area-code> <separator-opt>',
-              '<central-office-code> <separator-opt> <station-code>',
-              '<country-code-opt> ::= "" | "+1" | "1"',
-              '<separator-opt>    ::= "" | "-" | " " | "."',
-              '<area-code>        ::= <digit2-9> <digit0-9> <digit0-9>',
-              '<central-office-code> ::= <digit2-9> <digit0-9> <digit0-9>',
-              '<station-code>     ::= <digit0-9> <digit0-9> <digit0-9> <digit0-9>',
-              '<digit0-9> ::= "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"',
-              '<digit2-9> ::= "2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"',
-            ],
-          },
-        };
+    ```perl
+    $schema = {
+      na_tel_no => {
+        type => 'string',
+        bnf  => [
+          '<telephone-number> ::= <country-code-opt> <area-code> <separator-opt>',
+          '<central-office-code> <separator-opt> <station-code>',
+          '<country-code-opt> ::= "" | "+1" | "1"',
+          '<separator-opt>    ::= "" | "-" | " " | "."',
+          '<area-code>        ::= <digit2-9> <digit0-9> <digit0-9>',
+          '<central-office-code> ::= <digit2-9> <digit0-9> <digit0-9>',
+          '<station-code>     ::= <digit0-9> <digit0-9> <digit0-9> <digit0-9>',
+          '<digit0-9> ::= "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"',
+          '<digit2-9> ::= "2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"',
+        ],
+      },
+    };
+    ```
 
     Implemented by [Params::Validate::Strict::BNF](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict%3A%3ABNF).  Recursive grammars are not
     supported.
@@ -420,6 +508,51 @@ The schema can define the following rules for each parameter:
     this integer value defines which position the argument will be in.
     If this is set for all arguments,
     `validate_strict` will return a reference to an array, rather than a reference to a hash.
+
+- `slurp`
+
+    Valid only in positional-argument schemas (those where every parameter has a
+    `position` value).  When `slurp => 1` is set, this parameter collects
+    _all_ remaining positional arguments starting from `position` into an
+    arrayref, rather than taking only the single element at that index.
+
+    ```perl
+    # sub log_message($level, @messages)
+    my $schema = {
+      level    => { type => 'string',   position => 0 },
+      messages => { type => 'arrayref', position => 1, slurp => 1 },
+    };
+    ```
+
+    The slurp parameter is implicitly optional: if there are no arguments at or
+    beyond `position`, the value is an empty arrayref.  Combine with `min =>
+    1` to require at least one element:
+
+    ```perl
+    messages => { type => 'arrayref', position => 1, slurp => 1, min => 1 }
+    ```
+
+    At most one slurp parameter may be defined per schema, and it must have the
+    highest `position` value.  The return value at that position is an arrayref.
+
+- `aliases`
+
+    An arrayref of alternative input-key names that are also accepted for this
+    parameter.  When any alias is found in the input the parameter is stored
+    under its canonical schema key; if both the canonical name and an alias are
+    present the canonical name takes precedence.  Aliases are not treated as
+    unknown parameters regardless of the `unknown_parameter_handler` setting.
+
+    ```perl
+    colour => {
+      type    => 'string',
+      aliases => ['color'],
+      memberof => ['red', 'green', 'blue'],
+    }
+    ```
+
+    Only named (hashref) input supports aliases; positional (arrayref) input
+    ignores them.
 
 - `regex`
 
@@ -436,26 +569,28 @@ The schema can define the following rules for each parameter:
 
     Use this to test more complex examples:
 
-        my $schema = {
-          even_number => {
-            type => 'integer',
-            callback => sub { $_[0] % 2 == 0 }
-        };
+    ```perl
+    my $schema = {
+      even_number => {
+        type => 'integer',
+        callback => sub { $_[0] % 2 == 0 }
+    };
 
-        # Specify the arguments for a routine which has a second, optional argument, which, if given, must be less than or equal to the first
-        my $schema = {
-          first => {
-            type => 'integer'
-          }, second => {
-            type => 'integer',
-            optional => 1,
-            callback => sub {
-              my($value, $args) = @_;
-              # The 'defined' is needed in case 'second' is evaluated before 'first'
-              return (defined($args->{first}) && $value <= $args->{first}) ? 1 : 0
-            }
-          }
-        };
+    # Specify the arguments for a routine which has a second, optional argument, which, if given, must be less than or equal to the first
+    my $schema = {
+      first => {
+        type => 'integer'
+      }, second => {
+        type => 'integer',
+        optional => 1,
+        callback => sub {
+          my($value, $args) = @_;
+          # The 'defined' is needed in case 'second' is evaluated before 'first'
+          return (defined($args->{first}) && $value <= $args->{first}) ? 1 : 0
+        }
+      }
+    };
+    ```
 
 - `optional`
 
@@ -467,59 +602,69 @@ The schema can define the following rules for each parameter:
     to determine if the parameter is optional or not.
     The code will be called with two arguments: the value of the parameter and hash ref of all parameters:
 
-        my $schema = {
-          optional_field => {
-            type => 'string',
-            optional => sub {
-              my ($value, $all_params) = @_;
-              return $all_params->{make_optional} ? 1 : 0;
-            }
-          },
-          make_optional => { type => 'boolean' }
-        };
+    ```perl
+    my $schema = {
+      optional_field => {
+        type => 'string',
+        optional => sub {
+          my ($value, $all_params) = @_;
+          return $all_params->{make_optional} ? 1 : 0;
+        }
+      },
+      make_optional => { type => 'boolean' }
+    };
 
-        my $result = validate_strict(schema => $schema, input => { make_optional => 1 });
+    my $result = validate_strict(schema => $schema, input => { make_optional => 1 });
+    ```
 
     If the parameter is not optional, it can be passed an undef value, which will not flag an error.
     This is by design.
     So this will not say that the required parameter 's' is missing:
 
-        validate_strict(
-            schema => { s => { type => 'string' } },
-            input  => { s => undef },
-        );
+    ```perl
+    validate_strict(
+        schema => { s => { type => 'string' } },
+        input  => { s => undef },
+    );
+    ```
 
 - `default`
 
     Populate missing optional parameters with the specified value.
     Note that this value is not validated.
 
-        username => {
-          type => 'string',
-          optional => 1,
-          default => 'guest'
-        }
+    ```perl
+    username => {
+      type => 'string',
+      optional => 1,
+      default => 'guest'
+    }
+    ```
 
 - `element_type`
 
     Extends the validation to individual elements of arrays.
 
-        tags => {
-          type => 'arrayref',
-          element_type => 'number',   # Float means the same
-          min => 1,   # this is the length of the array, not the min value for each of the numbers. For that, add a C<schema> rule
-          max => 5
-        }
+    ```perl
+    tags => {
+      type => 'arrayref',
+      element_type => 'number',   # Float means the same
+      min => 1,   # this is the length of the array, not the min value for each of the numbers. For that, add a C<schema> rule
+      max => 5
+    }
+    ```
 
 - `error_msg`
 
     The custom error message to be used in the event of a validation failure.
 
-        age => {
-          type => 'integer',
-          min => 18,
-          error_msg => 'You must be at least 18 years old'
-        }
+    ```perl
+    age => {
+      type => 'integer',
+      min => 18,
+      error_msg => 'You must be at least 18 years old'
+    }
+    ```
 
 - `nullable`
 
@@ -531,32 +676,34 @@ The schema can define the following rules for each parameter:
 
     You can validate nested hashrefs and arrayrefs using the `schema` property:
 
-        my $schema = {
-            user => {       # 'user' is a hashref
-                type => 'hashref',
-                schema => { # Specify what the elements of the hash should be
-                    name => { type => 'string' },
-                    age => { type => 'integer', min => 0 },
-                    hobbies => {    # 'hobbies' is an array ref that this user has
-                        type => 'arrayref',
-                        schema => { type => 'string' }, # Validate each hobby
-                        min => 1 # At least one hobby
-                    }
+    ```perl
+    my $schema = {
+        user => {       # 'user' is a hashref
+            type => 'hashref',
+            schema => { # Specify what the elements of the hash should be
+                name => { type => 'string' },
+                age => { type => 'integer', min => 0 },
+                hobbies => {    # 'hobbies' is an array ref that this user has
+                    type => 'arrayref',
+                    schema => { type => 'string' }, # Validate each hobby
+                    min => 1 # At least one hobby
                 }
-            }, metadata => {
-                type => 'hashref',
-                schema => {
-                    created => { type => 'string' },
-                    tags => {
-                        type => 'arrayref',
-                        schema => {
-                            type => 'string',
-                            matches => qr/^[a-z]+$/ # Or you can say matches => '^[a-z]+$'
-                        }
+            }
+        }, metadata => {
+            type => 'hashref',
+            schema => {
+                created => { type => 'string' },
+                tags => {
+                    type => 'arrayref',
+                    schema => {
+                        type => 'string',
+                        matches => qr/^[a-z]+$/ # Or you can say matches => '^[a-z]+$'
                     }
                 }
             }
-        };
+        }
+    };
+    ```
 
 - `validate`
 
@@ -565,19 +712,21 @@ The schema can define the following rules for each parameter:
     and return a string containing a reason for rejection,
     or undef if it's allowed.
 
-        my $schema = {
-          user => {
-            type => 'string',
-            validate => sub {
-              if($_[0]->{'password'} eq 'bar') {
-                return undef;
-              }
-              return 'Invalid password, try again';
-            }
-          }, password => {
-             type => 'string'
+    ```perl
+    my $schema = {
+      user => {
+        type => 'string',
+        validate => sub {
+          if($_[0]->{'password'} eq 'bar') {
+            return undef;
           }
-        };
+          return 'Invalid password, try again';
+        }
+      }, password => {
+         type => 'string'
+      }
+    };
+    ```
 
 - `transform`
 
@@ -589,91 +738,97 @@ The schema can define the following rules for each parameter:
     Common use cases include trimming whitespace, normalizing case, formatting phone numbers,
     sanitizing user input, and converting between data formats.
 
-        # Simple string transformations
-        username => {
-          type => 'string',
-          transform => sub { lc(trim($_[0])) },  # lowercase and trim
-          matches => qr/^[a-z0-9_]+$/
-        }
+    ```perl
+    # Simple string transformations
+    username => {
+      type => 'string',
+      transform => sub { lc(trim($_[0])) },  # lowercase and trim
+      matches => qr/^[a-z0-9_]+$/
+    }
 
-        email => {
-          type => 'string',
-          transform => sub { lc(trim($_[0])) },  # normalize email
-          matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/
-        }
+    email => {
+      type => 'string',
+      transform => sub { lc(trim($_[0])) },  # normalize email
+      matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/
+    }
 
-        # Array transformations
-        tags => {
-          type => 'arrayref',
-          transform => sub { [map { lc($_) } @{$_[0]}] },  # lowercase all elements
-          element_type => 'string'
-        }
+    # Array transformations
+    tags => {
+      type => 'arrayref',
+      transform => sub { [map { lc($_) } @{$_[0]}] },  # lowercase all elements
+      element_type => 'string'
+    }
 
-        keywords => {
-          type => 'arrayref',
-          transform => sub {
-            my @arr = map { lc(trim($_)) } @{$_[0]};
-            my %seen;
-            return [grep { !$seen{$_}++ } @arr];  # remove duplicates
-          }
-        }
+    keywords => {
+      type => 'arrayref',
+      transform => sub {
+        my @arr = map { lc(trim($_)) } @{$_[0]};
+        my %seen;
+        return [grep { !$seen{$_}++ } @arr];  # remove duplicates
+      }
+    }
 
-        # Numeric transformations
-        quantity => {
-          type => 'integer',
-          transform => sub { int($_[0] + 0.5) },  # round to nearest integer
-          min => 1
-        }
+    # Numeric transformations
+    quantity => {
+      type => 'integer',
+      transform => sub { int($_[0] + 0.5) },  # round to nearest integer
+      min => 1
+    }
 
-        # Sanitization
-        slug => {
-          type => 'string',
-          transform => sub {
-            my $str = lc(trim($_[0]));
-            $str =~ s/[^\w\s-]//g;  # remove special characters
-            $str =~ s/\s+/-/g;      # replace spaces with hyphens
-            return $str;
-          },
-          matches => qr/^[a-z0-9-]+$/
-        }
+    # Sanitization
+    slug => {
+      type => 'string',
+      transform => sub {
+        my $str = lc(trim($_[0]));
+        $str =~ s/[^\w\s-]//g;  # remove special characters
+        $str =~ s/\s+/-/g;      # replace spaces with hyphens
+        return $str;
+      },
+      matches => qr/^[a-z0-9-]+$/
+    }
 
-        phone => {
-          type => 'string',
-          transform => sub {
-            my $str = $_[0];
-            $str =~ s/\D//g;  # remove all non-digits
-            return $str;
-          },
-          matches => qr/^\d{10}$/
-        }
+    phone => {
+      type => 'string',
+      transform => sub {
+        my $str = $_[0];
+        $str =~ s/\D//g;  # remove all non-digits
+        return $str;
+      },
+      matches => qr/^\d{10}$/
+    }
+    ```
 
     The `transform` function is applied to the value before any validation checks (`min`/`minimum`, `max`,
     `matches`, `callback`, etc.), ensuring that validation rules are checked against the cleaned data.
 
     Transformations work with all parameter types including nested structures:
 
-        user => {
-          type => 'hashref',
-          schema => {
-            name => {
-              type => 'string',
-              transform => sub { trim($_[0]) }
-            }, email => {
-              type => 'string',
-              transform => sub { lc(trim($_[0])) }
-            }
-          }
+    ```perl
+    user => {
+      type => 'hashref',
+      schema => {
+        name => {
+          type => 'string',
+          transform => sub { trim($_[0]) }
+        }, email => {
+          type => 'string',
+          transform => sub { lc(trim($_[0])) }
         }
+      }
+    }
+    ```
 
     Transformations can also be defined in custom types for reusability:
 
-        my $custom_types = {
-          email => {
-            type => 'string',
-            transform => sub { lc(trim($_[0])) },
-            matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/
-          }
-        };
+    ```perl
+    my $custom_types = {
+      email => {
+        type => 'string',
+        transform => sub { lc(trim($_[0])) },
+        matches => qr/^[^@\s]+\@[^@\s]+\.[^@\s]+$/
+      }
+    };
+    ```
 
     Note that the transformed value is what gets returned in the validated result and is what
     subsequent validation rules will check against. If a transformation might fail, ensure it
@@ -683,15 +838,17 @@ The schema can define the following rules for each parameter:
 
     Many validators also allow a code ref to be passed so that you can create your own, conditional validation rule, e.g.:
 
-        $schema = {
-          age => {
-            type => 'integer',
-            min => sub {
-                my ($value, $all_params) = @_;
-                return $all_params->{country} eq 'US' ? 21 : 18;
-            }
-          }
+    ```perl
+    $schema = {
+      age => {
+        type => 'integer',
+        min => sub {
+            my ($value, $all_params) = @_;
+            return $all_params->{country} eq 'US' ? 21 : 18;
         }
+      }
+    }
+    ```
 
 - `validator`
 
@@ -707,114 +864,124 @@ The schema can define the following rules for each parameter:
     and the value is a code reference that accepts a hash reference of all validated parameters.
     The subroutine should return `undef` if the validation passes, or an error message string if it fails.
 
-        my $schema = {
-          password => { type => 'string', min => 8 },
-          password_confirm => { type => 'string' }
-        };
+    ```perl
+    my $schema = {
+      password => { type => 'string', min => 8 },
+      password_confirm => { type => 'string' }
+    };
 
-        my $cross_validation = {
-          passwords_match => sub {
-            my $params = shift;
-            return $params->{password} eq $params->{password_confirm}
-              ? undef : "Passwords don't match";
-          }
-        };
+    my $cross_validation = {
+      passwords_match => sub {
+        my $params = shift;
+        return $params->{password} eq $params->{password_confirm}
+          ? undef : "Passwords don't match";
+      }
+    };
 
-        my $validated = validate_strict(
-          schema => $schema,
-          input => $input,
-          cross_validation => $cross_validation
-        );
+    my $validated = validate_strict(
+      schema => $schema,
+      input => $input,
+      cross_validation => $cross_validation
+    );
+    ```
 
     Common use cases include password confirmation, date range validation, numeric comparisons,
     and conditional requirements:
 
-        # Date range validation
-        my $cross_validation = {
-          date_range_valid => sub {
-            my $params = shift;
-            return $params->{start_date} le $params->{end_date}
-              ? undef : "Start date must be before or equal to end date";
-          }
-        };
+    ```perl
+    # Date range validation
+    my $cross_validation = {
+      date_range_valid => sub {
+        my $params = shift;
+        return $params->{start_date} le $params->{end_date}
+          ? undef : "Start date must be before or equal to end date";
+      }
+    };
 
-        # Price range validation
-        my $cross_validation = {
-          price_range_valid => sub {
-            my $params = shift;
-            return $params->{min_price} <= $params->{max_price}
-              ? undef : "Minimum price must be less than or equal to maximum price";
-          }
-        };
+    # Price range validation
+    my $cross_validation = {
+      price_range_valid => sub {
+        my $params = shift;
+        return $params->{min_price} <= $params->{max_price}
+          ? undef : "Minimum price must be less than or equal to maximum price";
+      }
+    };
 
-        # Conditional required field
-        my $cross_validation = {
-          address_required_for_delivery => sub {
-            my $params = shift;
-            if ($params->{shipping_method} eq 'delivery' && !$params->{delivery_address}) {
-              return "Delivery address is required when shipping method is 'delivery'";
-            }
-            return undef;
-          }
-        };
+    # Conditional required field
+    my $cross_validation = {
+      address_required_for_delivery => sub {
+        my $params = shift;
+        if ($params->{shipping_method} eq 'delivery' && !$params->{delivery_address}) {
+          return "Delivery address is required when shipping method is 'delivery'";
+        }
+        return undef;
+      }
+    };
+    ```
 
     Multiple cross-validations can be defined in the same hash, and they are all checked in order.
     If any cross-validation fails, the function will `croak` with the error message returned by the validation:
 
-        my $cross_validation = {
-          passwords_match => sub {
-            my $params = shift;
-            return $params->{password} eq $params->{password_confirm}
-              ? undef : "Passwords don't match";
-          },
-          emails_match => sub {
-            my $params = shift;
-            return $params->{email} eq $params->{email_confirm}
-              ? undef : "Email addresses don't match";
-          },
-          age_matches_birth_year => sub {
-            my $params = shift;
-            my $current_year = (localtime)[5] + 1900;
-            my $calculated_age = $current_year - $params->{birth_year};
-            return abs($calculated_age - $params->{age}) <= 1
-              ? undef : "Age doesn't match birth year";
-          }
-        };
+    ```perl
+    my $cross_validation = {
+      passwords_match => sub {
+        my $params = shift;
+        return $params->{password} eq $params->{password_confirm}
+          ? undef : "Passwords don't match";
+      },
+      emails_match => sub {
+        my $params = shift;
+        return $params->{email} eq $params->{email_confirm}
+          ? undef : "Email addresses don't match";
+      },
+      age_matches_birth_year => sub {
+        my $params = shift;
+        my $current_year = (localtime)[5] + 1900;
+        my $calculated_age = $current_year - $params->{birth_year};
+        return abs($calculated_age - $params->{age}) <= 1
+          ? undef : "Age doesn't match birth year";
+      }
+    };
+    ```
 
     Cross-validations receive the parameters after individual validation and transformation have been applied,
     so you can rely on the data being in the correct format and type:
 
-        my $schema = {
-          email => {
-            type => 'string',
-            transform => sub { lc($_[0]) }  # Lowercased before cross-validation
-          },
-          email_confirm => {
-            type => 'string',
-            transform => sub { lc($_[0]) }
-          }
-        };
+    ```perl
+    my $schema = {
+      email => {
+        type => 'string',
+        transform => sub { lc($_[0]) }  # Lowercased before cross-validation
+      },
+      email_confirm => {
+        type => 'string',
+        transform => sub { lc($_[0]) }
+      }
+    };
 
-        my $cross_validation = {
-          emails_match => sub {
-            my $params = shift;
-            # Both emails are already lowercased at this point
-            return $params->{email} eq $params->{email_confirm}
-              ? undef : "Email addresses don't match";
-          }
-        };
+    my $cross_validation = {
+      emails_match => sub {
+        my $params = shift;
+        # Both emails are already lowercased at this point
+        return $params->{email} eq $params->{email_confirm}
+          ? undef : "Email addresses don't match";
+      }
+    };
+    ```
 
     Cross-validations can access nested structures and optional fields:
 
-        my $cross_validation = {
-          guardian_required_for_minors => sub {
-            my $params = shift;
-            if ($params->{user}{age} < 18 && !$params->{guardian}) {
-              return "Guardian information required for users under 18";
-            }
-            return undef;
-          }
-        };
+    ```perl
+    my $cross_validation = {
+      guardian_required_for_minors => sub {
+        my $params = shift;
+        if ($params->{user}{age} < 18 && !$params->{guardian}) {
+          return "Guardian information required for users under 18";
+        }
+        return undef;
+      }
+    };
+    ```
 
 - metadata
 
@@ -824,13 +991,25 @@ The schema can define the following rules for each parameter:
 - `semantic`
 
     A hint about the semantic meaning of the parameter value.
-    Currently only `unix_timestamp` is supported.
+    Supported values: `unix_timestamp`, `identifier`, `class_name`.
 
-        ts => { type => 'integer', semantic => 'unix_timestamp' }
+    ```perl
+    ts     => { type => 'integer', semantic => 'unix_timestamp' }
+    func   => { type => 'string',  semantic => 'identifier' }
+    module => { type => 'string',  semantic => 'class_name' }
+    ```
 
     When `semantic` is `unix_timestamp`, the value must be a non-negative integer no greater than
     `2147483647` (i.e. a valid 32-bit Unix epoch timestamp).
     Values outside this range cause the function to `croak`.
+
+    When `semantic` is `identifier`, the value must match `/\A[A-Za-z_]\w*\z/`, a single
+    valid Perl bareword identifier.  Package separators (`::`) are not permitted; use
+    `class_name` for those.
+
+    When `semantic` is `class_name`, the value must match
+    `/\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/`, a syntactically valid Perl class name such
+    as `'Foo'` or `'Foo::Bar::Baz'`.  The class does not need to be loaded.
 
     Unknown semantic values emit a warning but do not cause an error.
 
@@ -852,81 +1031,93 @@ The schema can define the following rules for each parameter:
 
         Parameters that cannot be specified together.
 
-            relationships => [
-              {
-                type => 'mutually_exclusive',
-                params => ['file', 'content'],
-                description => 'Cannot specify both file and content'
-              }
-            ]
+        ```perl
+        relationships => [
+          {
+            type => 'mutually_exclusive',
+            params => ['file', 'content'],
+            description => 'Cannot specify both file and content'
+          }
+        ]
+        ```
 
     - **required\_group**
 
         At least one parameter from the group must be specified.
 
-            relationships => [
-              {
-                type => 'required_group',
-                params => ['id', 'name'],
-                logic => 'or',
-                description => 'Must specify either id or name'
-              }
-            ]
+        ```perl
+        relationships => [
+          {
+            type => 'required_group',
+            params => ['id', 'name'],
+            logic => 'or',
+            description => 'Must specify either id or name'
+          }
+        ]
+        ```
 
     - **conditional\_requirement**
 
         If one parameter is specified, another becomes required.
 
-            relationships => [
-              {
-                type => 'conditional_requirement',
-                if => 'async',
-                then_required => 'callback',
-                description => 'When async is specified, callback is required'
-              }
-            ]
+        ```perl
+        relationships => [
+          {
+            type => 'conditional_requirement',
+            if => 'async',
+            then_required => 'callback',
+            description => 'When async is specified, callback is required'
+          }
+        ]
+        ```
 
     - **dependency**
 
         One parameter requires another to be present.
 
-            relationships => [
-              {
-                type => 'dependency',
-                param => 'port',
-                requires => 'host',
-                description => 'port requires host to be specified'
-              }
-            ]
+        ```perl
+        relationships => [
+          {
+            type => 'dependency',
+            param => 'port',
+            requires => 'host',
+            description => 'port requires host to be specified'
+          }
+        ]
+        ```
 
     - **value\_constraint**
 
         Specific value requirements between parameters.
 
-            relationships => [
-              {
-                type => 'value_constraint',
-                if => 'ssl',
-                then => 'port',
-                operator => '==',
-                value => 443,
-                description => 'When ssl is specified, port must equal 443'
-              }
-            ]
+        ```perl
+        relationships => [
+          {
+            type => 'value_constraint',
+            if => 'ssl',
+            then => 'port',
+            operator => '==',
+            value => 443,
+            description => 'When ssl is specified, port must equal 443'
+          }
+        ]
+        ```
 
     - **value\_conditional**
 
         Parameter required when another has a specific value.
 
-            relationships => [
-              {
-                type => 'value_conditional',
-                if => 'mode',
-                equals => 'secure',
-                then_required => 'key',
-                description => "When mode equals 'secure', key is required"
-              }
-            ]
+        ```perl
+        relationships => [
+          {
+            type => 'value_conditional',
+            if => 'mode',
+            equals => 'secure',
+            then_required => 'key',
+            description => "When mode equals 'secure', key is required"
+          }
+        ]
+        ```
 
     If a parameter is optional and its value is `undef`,
     validation will be skipped for that parameter.
@@ -937,168 +1128,236 @@ The schema can define the following rules for each parameter:
 
     The `description` field is optional but recommended for clearer error messages.
 
-## Example Usage
+### Example Usage
 
-    my $schema = {
-      host => { type => 'string' },
-      port => { type => 'integer' },
-      ssl => { type => 'boolean' },
-      file => { type => 'string', optional => 1 },
-      content => { type => 'string', optional => 1 }
-    };
+```perl
+my $schema = {
+  host => { type => 'string' },
+  port => { type => 'integer' },
+  ssl => { type => 'boolean' },
+  file => { type => 'string', optional => 1 },
+  content => { type => 'string', optional => 1 }
+};
 
-    my $relationships = [
-      {
-        type => 'mutually_exclusive',
-        params => ['file', 'content']
-      }, {
-        type => 'required_group',
-        params => ['host', 'file']
-      },
-      {
-        type => 'dependency',
-        param => 'port',
-        requires => 'host'
-      },
-      {
-        type => 'value_constraint',
-        if => 'ssl',
-        then => 'port',
-        operator => '==',
-        value => 443
-      }
-    ];
+my $relationships = [
+  {
+    type => 'mutually_exclusive',
+    params => ['file', 'content']
+  }, {
+    type => 'required_group',
+    params => ['host', 'file']
+  },
+  {
+    type => 'dependency',
+    param => 'port',
+    requires => 'host'
+  },
+  {
+    type => 'value_constraint',
+    if => 'ssl',
+    then => 'port',
+    operator => '==',
+    value => 443
+  }
+];
 
-    my $validated = validate_strict(
-      schema => $schema,
-      input => $input,
-      relationships => $relationships
-    );
+my $validated = validate_strict(
+  schema => $schema,
+  input => $input,
+  relationships => $relationships
+);
+```
 
-# MIGRATION FROM LEGACY VALIDATORS
+## Migration From Legacy Validators
 
-## From [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate)
+### From [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate)
 
-    # Old style
-    validate(@_, {
-        name => { type => SCALAR },
-        age => { type => SCALAR, regex => qr/^\d+$/ }
-    });
+```perl
+# Old style
+validate(@_, {
+    name => { type => SCALAR },
+    age => { type => SCALAR, regex => qr/^\d+$/ }
+});
 
-    # New style
-    validate_strict(
-        schema => {     # or "members"
-            name => 'string',
-            age => { type => 'integer', min => 0 }
-        },
-        args => { @_ }
-    );
+# New style
+validate_strict(
+    schema => {     # or "members"
+        name => 'string',
+        age => { type => 'integer', min => 0 }
+    },
+    args => { @_ }
+);
+```
 
-## From [Type::Params](https://metacpan.org/pod/Type%3A%3AParams)
+### From [Type::Params](https://metacpan.org/pod/Type%3A%3AParams)
 
-    # Old style
-    my ($name, $age) = validate_positional \@_, Str, Int;
+```perl
+# Old style
+my ($name, $age) = validate_positional \@_, Str, Int;
 
-    # New style - requires converting to named parameters first
-    my %args = (name => $_[0], age => $_[1]);
-    my $validated = validate_strict(
-        schema => { name => 'string', age => 'integer' },
-        args => \%args
-    );
+# New style - requires converting to named parameters first
+my %args = (name => $_[0], age => $_[1]);
+my $validated = validate_strict(
+    schema => { name => 'string', age => 'integer' },
+    args => \%args
+);
+```
 
-# AUTHOR
+### Compile\_Schema
+
+```perl
+my $validator = compile_schema(\%schema);
+my $result    = $validator->(\%input);
+
+# with optional keyword args
+my $validator = compile_schema(\%schema,
+    description            => 'User registration',
+    custom_types           => \%types,
+    unknown_parameter_handler => 'warn',
+);
+```
+
+Pre-captures a schema (and any optional keyword arguments accepted by
+`validate_strict`) into a reusable validator closure.  Calling the returned
+coderef is equivalent to:
+
+```perl
+validate_strict(schema => \%schema, input => \%input, %opts);
+```
+
+but avoids the overhead of argument parsing on every call - useful when the
+same schema is applied repeatedly in a hot path.
+
+#### Arguments
+
+- `\%schema` (required)
+
+    The validation schema as a hashref or arrayref, identical to the `schema`
+    argument of `validate_strict`.
+
+- `%opts` (optional)
+
+    Any keyword arguments accepted by `validate_strict` other than `schema`
+    and `input`: `description`, `custom_types`,
+    `unknown_parameter_handler`, `logger`, `relationships`,
+    `cross_validation`, etc.
+
+#### Returns
+
+A code reference `sub ($input) -> \%validated`.
+
+## Author
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
-# FORMAL SPECIFICATION
+## Formal Specification
 
-    [PARAM_NAME, VALUE, TYPE_NAME, CONSTRAINT_VALUE]
+```perl
+[PARAM_NAME, VALUE, TYPE_NAME, CONSTRAINT_VALUE]
 
-    ValidationRule ::= SimpleType | ComplexRule | UnionType
+ValidationRule ::= SimpleType | ComplexRule | UnionType
 
-    SimpleType ::= string | integer | number | scalar | scalarref | stringref | arrayref | hashref | coderef | object
+SimpleType ::= string | integer | number | float | boolean | scalar
+           | scalarref | stringref | arrayref | hashref | coderef
+           | object | void | regex | handle
+           | arraylike | hashlike | codelike | invocant
 
-    UnionType ::= seq SimpleType    -- at least two members; written as type => ['a', 'b']
+UnionType ::= seq SimpleType    -- at least two members; written as type => ['a', 'b']
 
-    ComplexRule == [
-        type: SimpleType | UnionType;
-        min: ℕ₁;
-        max: ℕ₁;
-        optional: 𝔹;
-        matches: REGEX;
-        regex: REGEX;
-        nomatch: REGEX;
-        memberof: seq VALUE;
-        enum: seq VALUE;
-        values: seq VALUE;
-        notmemberof: seq VALUE;
-        callback: FUNCTION;
-        isa: TYPE_NAME;
-        can: METHOD_NAME
-    ]
+ComplexRule == [
+    type: SimpleType | UnionType;
+    min: ℕ₁;
+    max: ℕ₁;
+    optional: 𝔹;
+    matches: REGEX;
+    regex: REGEX;
+    nomatch: REGEX;
+    memberof: seq VALUE;
+    enum: seq VALUE;
+    values: seq VALUE;
+    notmemberof: seq VALUE;
+    callback: FUNCTION;
+    isa: TYPE_NAME;
+    does: ROLE_NAME;
+    can: METHOD_NAME | seq METHOD_NAME;
+    classisa: TYPE_NAME;
+    subclass: TYPE_NAME;
+    classdoes: ROLE_NAME;
+    driver: TYPE_NAME;
+    semantic: 'unix_timestamp' | 'identifier' | 'class_name';
+    aliases: seq PARAM_NAME;
+    slurp: 𝔹;
+    position: ℕ₀;
+    default: VALUE;
+    transform: FUNCTION;
+    error_msg: STRING
+]
 
-    Schema == PARAM_NAME ⇸ ValidationRule
+Schema == PARAM_NAME ⇸ ValidationRule
 
-    Arguments == PARAM_NAME ⇸ VALUE
+Arguments == PARAM_NAME ⇸ VALUE
 
-    ValidatedResult == PARAM_NAME ⇸ VALUE
+ValidatedResult == PARAM_NAME ⇸ VALUE
 
-    ∀ rule: ComplexRule •
-      rule.min ≤ rule.max ∧
-      ¬((rule.memberof ∨ rule.enum ∨ rule.values) ∧ rule.min) ∧
-      ¬((rule.memberof ∨ rule.enum ∨ rule.values) ∧ rule.max) ∧
-      ¬(rule.notmemberof ∧ rule.min) ∧
-      ¬(rule.notmemberof ∧ rule.max)
+∀ rule: ComplexRule •
+  rule.min ≤ rule.max ∧
+  ¬((rule.memberof ∨ rule.enum ∨ rule.values) ∧ rule.min) ∧
+  ¬((rule.memberof ∨ rule.enum ∨ rule.values) ∧ rule.max) ∧
+  ¬(rule.notmemberof ∧ rule.min) ∧
+  ¬(rule.notmemberof ∧ rule.max)
 
-    ∀ schema: Schema; args: Arguments •
-      dom(validate_strict(schema, args)) ⊆ dom(schema) ∪ dom(args)
+∀ schema: Schema; args: Arguments •
+  dom(validate_strict(schema, args)) ⊆ dom(schema) ∪ dom(args)
 
-    validate_strict: Schema × Arguments → ValidatedResult
+validate_strict: Schema × Arguments → ValidatedResult
 
-    ∀ schema: Schema; args: Arguments •
-      let result == validate_strict(schema, args) •
-        (∀ name: dom(schema) ∩ dom(args) •
-          name ∈ dom(result) ⇒
-          type_matches(result(name), schema(name))) ∧
-        (∀ name: dom(schema) •
-          ¬optional(schema(name)) ⇒ name ∈ dom(args))
+∀ schema: Schema; args: Arguments •
+  let result == validate_strict(schema, args) •
+    (∀ name: dom(schema) ∩ dom(args) •
+      name ∈ dom(result) ⇒
+      type_matches(result(name), schema(name))) ∧
+    (∀ name: dom(schema) •
+      ¬optional(schema(name)) ⇒ name ∈ dom(args))
 
-    type_matches: VALUE × ValidationRule → 𝔹
+type_matches: VALUE × ValidationRule → 𝔹
+```
 
-# EXAMPLE
+## Example
 
-    use Params::Get;
-    use Params::Validate::Strict;
+```perl
+use Params::Get;
+use Params::Validate::Strict;
 
-    sub where_am_i
-    {
-        my $params = Params::Validate::Strict::validate_strict({
-            args => Params::Get::get_params(undef, \@_),
-            description => 'Print a string of latitude and longitude',
-            error_msg => 'Latitude is a number between +/- 90, longitude is a number between +/- 180',
-            members => {
-                'latitude' => {
-                    type => 'number',
-                    min => -90,
-                    max => 90
-                }, 'longitude' => {
-                    type => 'number',
-                    min => -180,
-                    max => 180
-                }
+sub where_am_i
+{
+    my $params = Params::Validate::Strict::validate_strict({
+        args => Params::Get::get_params(undef, \@_),
+        description => 'Print a string of latitude and longitude',
+        error_msg => 'Latitude is a number between +/- 90, longitude is a number between +/- 180',
+        members => {
+            'latitude' => {
+                type => 'number',
+                min => -90,
+                max => 90
+            }, 'longitude' => {
+                type => 'number',
+                min => -180,
+                max => 180
             }
-        });
+        }
+    });
 
-        print 'You are at ', $params->{'latitude'}, ', ', $params->{'longitude'}, "\n";
-    }
+    print 'You are at ', $params->{'latitude'}, ', ', $params->{'longitude'}, "\n";
+}
 
-    where_am_i({ latitude => 3.14, longitude => -155 });
+where_am_i({ latitude => 3.14, longitude => -155 });
+```
 
-# BUGS
+## Bugs
 
-# SECURITY
+## Security
 
-## Taint mode
+### Taint Mode
 
 This module does **not** untaint its return values.
 When running under Perl's taint mode (`-T`), any value that was derived from
@@ -1107,10 +1366,12 @@ validated result, even if the module accepted it.
 Callers that require untainted values must perform their own regex capture after
 validation, for example:
 
-    my $validated = validate_strict(%args);
-    my ($safe_name) = ($validated->{name} =~ /\A([\w\s]+)\z/);
+```perl
+my $validated = validate_strict(%args);
+my ($safe_name) = ($validated->{name} =~ /\A([\w\s]+)\z/);
+```
 
-## User-supplied regex patterns
+### User-Supplied Regex Patterns
 
 The `matches` rule accepts pre-compiled `qr//` objects supplied by the caller.
 A pathologically constructed pattern (e.g. `qr/(a+)+b/`) can cause catastrophic
@@ -1118,7 +1379,7 @@ backtracking and peg a CPU core when matched against a hostile input value.
 Use possessive quantifiers (`++`) or atomic groups (`(?>...)`) in any
 `matches` pattern that will be applied to untrusted data.
 
-## Error message content
+### Error Message Content
 
 Error and warning messages produced by this module may include the parameter
 value supplied by the caller.
@@ -1128,17 +1389,28 @@ and HTTP response-splitting attacks.
 Callers should nevertheless apply their own output encoding before including any
 validated value in an HTTP response, HTML page, or structured log entry.
 
-# SEE ALSO
+## See Also
 
 - [Test Dashboard](https://nigelhorne.github.io/Params-Validate-Strict/coverage/)
 - [Data::Processor](https://metacpan.org/pod/Data%3A%3AProcessor)
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet)
 - [Params::Smart](https://metacpan.org/pod/Params%3A%3ASmart)
+
+    This is where the ideas for `aliases`, `slurp` and `compile_schema` came from.
+
+- [Params::Util](https://metacpan.org/pod/Params%3A%3AUtil)
+
+    This is where the ideas for `regex`, `handle`, `arraylike`, `hashlike`, `codelike`, `invocant` came from.
+
+- [Params::SomeUtil](https://metacpan.org/pod/Params%3A%3ASomeUtil)
+
+    A maintained fork of [Params::Util](https://metacpan.org/pod/Params%3A%3AUtil) 1.07 with bug fixes.  The same type-predicate ideas apply.
+
 - [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate)
 - [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
 - [App::Test::Generator](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator)
 
-# SUPPORT
+## Support
 
 This module is provided as-is without any warranty.
 
@@ -1150,7 +1422,9 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Params::Validate::Strict
+```
+perldoc Params::Validate::Strict
+```
 
 You can also look for information at:
 
@@ -1170,7 +1444,7 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=Params::Validate::Strict](http://deps.cpantesters.org/?module=Params::Validate::Strict)
 
-# LICENSE AND COPYRIGHT
+## License and Copyright
 
 Copyright 2025-2026 Nigel Horne.
 

@@ -3,7 +3,7 @@ package Devel::ebug::Backend::Plugin::Eval;
 use strict;
 use warnings;
 
-our $VERSION = '0.68'; # VERSION
+our $VERSION = '0.69'; # VERSION
 
 sub register_commands {
   return (
@@ -58,7 +58,7 @@ Devel::ebug::Backend::Plugin::Eval
 
 =head1 VERSION
 
-version 0.68
+version 0.69
 
 =head1 AUTHOR
 

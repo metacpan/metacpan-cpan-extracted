@@ -50,6 +50,9 @@ BEGIN {
 		}
 	}
 	sub sendmail { }
+	# Log::Abstraction calls Email::Sender::Simple->send(); route it to
+	# sendmail(), which subtests replace with mock_scoped
+	sub send { my $class = shift; return sendmail(@_) }
 
 	package Email::Sender::Transport::SMTP;
 	our $VERSION = '1.0';
@@ -392,9 +395,9 @@ subtest 'syslog — error level maps to priority "err" not "warning"' => sub {
 	plan tests => 1;
 
 	my $logged_priority;
-	my $g_open = mock_scoped 'Log::Abstraction::openlog'  => sub { };
+	my $g_open = mock_scoped 'Sys::Syslog::openlog'  => sub { };
 	my $g_log  = mock_scoped 'Sys::Syslog::syslog'        => sub { $logged_priority = $_[0] };
-	my $g_sock = mock_scoped 'Log::Abstraction::setlogsock' => sub { };
+	my $g_sock = mock_scoped 'Sys::Syslog::setlogsock' => sub { };
 
 	my $logger = Log::Abstraction->new(
 		logger      => { syslog => { facility => 'local0' } },
@@ -409,9 +412,9 @@ subtest 'syslog — warn level maps to priority "warning"' => sub {
 	plan tests => 1;
 
 	my $logged_priority;
-	my $g_open = mock_scoped 'Log::Abstraction::openlog'   => sub { };
+	my $g_open = mock_scoped 'Sys::Syslog::openlog'   => sub { };
 	my $g_log  = mock_scoped 'Sys::Syslog::syslog'         => sub { $logged_priority = $_[0] };
-	my $g_sock = mock_scoped 'Log::Abstraction::setlogsock' => sub { };
+	my $g_sock = mock_scoped 'Sys::Syslog::setlogsock' => sub { };
 
 	my $logger = Log::Abstraction->new(
 		logger      => { syslog => { facility => 'local0' } },
@@ -426,7 +429,7 @@ subtest 'syslog — server key renamed to host before setlogsock' => sub {
 	plan tests => 1;
 
 	my %sock_args;
-	my $g_open = mock_scoped 'Log::Abstraction::openlog'   => sub { };
+	my $g_open = mock_scoped 'Sys::Syslog::openlog'   => sub { };
 	my $g_log  = mock_scoped 'Sys::Syslog::syslog'         => sub { };
 	my $g_sock = mock_scoped 'Sys::Syslog::setlogsock' => sub { %sock_args = %{$_[0]} };
 
@@ -443,9 +446,9 @@ subtest 'syslog — setlogsock not called when syslog hash is empty after key ex
 	plan tests => 1;
 
 	my $sock_called = 0;
-	my $g_open = mock_scoped 'Log::Abstraction::openlog'   => sub { };
+	my $g_open = mock_scoped 'Sys::Syslog::openlog'   => sub { };
 	my $g_log  = mock_scoped 'Sys::Syslog::syslog'         => sub { };
-	my $g_sock = mock_scoped 'Log::Abstraction::setlogsock' => sub { $sock_called++ };
+	my $g_sock = mock_scoped 'Sys::Syslog::setlogsock' => sub { $sock_called++ };
 
 	# Only facility and level — both deleted before the setlogsock check
 	# leaving an empty hash → setlogsock not called
@@ -462,9 +465,9 @@ subtest 'syslog — syslog() failure carps with Data::Dumper output' => sub {
 	plan tests => 1;
 
 	my $carped = 0;
-	my $g_open = mock_scoped 'Log::Abstraction::openlog' => sub { };
+	my $g_open = mock_scoped 'Sys::Syslog::openlog' => sub { };
 	my $g_log  = mock_scoped 'Sys::Syslog::syslog'       => sub { die "syslog failed\n" };
-	my $g_sock = mock_scoped 'Log::Abstraction::setlogsock' => sub { };
+	my $g_sock = mock_scoped 'Sys::Syslog::setlogsock' => sub { };
 	my $g_carp = mock_scoped 'Carp::carp'                => sub { $carped++ };
 
 	my $logger = Log::Abstraction->new(
@@ -480,9 +483,9 @@ subtest 'syslog — message skipped when below syslog level threshold' => sub {
 	plan tests => 1;
 
 	my $logged = 0;
-	my $g_open = mock_scoped 'Log::Abstraction::openlog' => sub { };
+	my $g_open = mock_scoped 'Sys::Syslog::openlog' => sub { };
 	my $g_log  = mock_scoped 'Sys::Syslog::syslog'       => sub { $logged++ };
-	my $g_sock = mock_scoped 'Log::Abstraction::setlogsock' => sub { };
+	my $g_sock = mock_scoped 'Sys::Syslog::setlogsock' => sub { };
 
 	# syslog level set to 3 (error); warn(4) > 3 so syslog skipped
 	my $logger = Log::Abstraction->new(

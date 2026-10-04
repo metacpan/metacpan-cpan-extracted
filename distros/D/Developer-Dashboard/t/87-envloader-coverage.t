@@ -112,6 +112,15 @@ sub write_file {
         'ARRAY',
         'load_skill_layers accepts an explicit skill_layers list',
     );
+    my $skill_cli_root = File::Spec->catdir( $home, 'skills', 'foo', 'cli' );
+    write_file( File::Spec->catfile( $skill_cli_root, '.env' ), "SKILL_CLI_ENV=loaded\n" );
+    is_deeply(
+        $EL->load_skill_cli_layers( skill_layers => [ File::Spec->catdir( $home, 'skills', 'foo' ) ] ),
+        [ File::Spec->catfile( $skill_cli_root, '.env' ) ],
+        'load_skill_cli_layers loads .env files from participating skill cli directories',
+    );
+    is_deeply( $EL->load_skill_cli_layers, [], 'load_skill_cli_layers returns no files when skill_layers is omitted' );
+    is( $ENV{SKILL_CLI_ENV}, 'loaded', 'load_skill_cli_layers applies the skill cli env file' );
 }
 
 {
@@ -352,6 +361,83 @@ write_file( File::Spec->catfile( $ab,  '.env' ),    "AK=abval\n" );
     ok( !exists $ENV{qq_QK}, 'a same-prefix override within one layer does not create a parent alias' );
 }
 
+# ---------------------------------------------------------------------------
+# DD-1044: a .env.pl that assigns $ENV{KEY} to the SAME value it already had
+# (inherited from the OS environment, or from an earlier layer) must still be
+# recorded in the audit - the file genuinely set it, even though the value
+# didn't change. The pre/post %ENV value-diff alone cannot see this: it
+# only detects keys whose VALUE changed, not keys a .env.pl explicitly
+# assigned.
+# ---------------------------------------------------------------------------
+{
+    local %ENV                                   = %ENV;
+    local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT}    = undef;
+    local %Developer::Dashboard::EnvAudit::AUDIT = ();
+    local $ENV{SAME_VALUE_KEY} = 'unchanged';
+
+    my $pl = write_file(
+        File::Spec->catfile( $home, 'samevalue', '.env.pl' ),
+        "\$ENV{SAME_VALUE_KEY} = 'unchanged';\n1;\n",
+    );
+    $EL->_load_env_pl_file($pl);
+    my $recorded = Developer::Dashboard::EnvAudit->key('SAME_VALUE_KEY');
+    ok( defined $recorded, 'a .env.pl assignment that keeps the same value is still recorded in the audit (DD-1044)' );
+    is( $recorded->{envfile}, $pl, 'the audit records the correct .env.pl source file for a same-value assignment' );
+}
+
+{
+    local %ENV                                   = %ENV;
+    local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT}    = undef;
+    local %Developer::Dashboard::EnvAudit::AUDIT = ();
+    local $ENV{DYNAMIC_ENV_KEY} = 'before';
+
+    my $pl = write_file(
+        File::Spec->catfile( $home, 'dynamic-assignment', '.env.pl' ),
+        "my \$key = 'DYNAMIC_ENV_KEY';\n\$ENV{\$key} = 'after';\n1;\n",
+    );
+    $EL->_load_env_pl_file($pl);
+    is( $ENV{DYNAMIC_ENV_KEY}, 'after', 'a dynamically named .env.pl assignment updates the inherited value' );
+    is(
+        Developer::Dashboard::EnvAudit->key('DYNAMIC_ENV_KEY')->{envfile}, $pl,
+        'the runtime value-diff records dynamic assignments that static scanning cannot name',
+    );
+
+    my $same_value = write_file(
+        File::Spec->catfile( $home, 'dynamic-same-value', '.env.pl' ),
+        "my \$key = 'DYNAMIC_SAME_VALUE';\n\$ENV{\$key} = 'same';\n1;\n",
+    );
+    local $ENV{DYNAMIC_SAME_VALUE} = 'same';
+    $EL->_load_env_pl_file($same_value);
+    ok(
+        !defined Developer::Dashboard::EnvAudit->key('DYNAMIC_SAME_VALUE'),
+        'a dynamic assignment of an unchanged value is not misreported without a literal assignment target',
+    );
+
+    my $from_undef = write_file(
+        File::Spec->catfile( $home, 'dynamic-from-undef', '.env.pl' ),
+        "my \$key = 'DYNAMIC_FROM_UNDEF';\n\$ENV{\$key} = 'now-defined';\n1;\n",
+    );
+    local $ENV{DYNAMIC_FROM_UNDEF} = undef;
+    $EL->_load_env_pl_file($from_undef);
+    is( $ENV{DYNAMIC_FROM_UNDEF}, 'now-defined',
+        'dynamic env.pl assignments are recorded when the inherited value was undef' );
+
+    my $to_undef = write_file(
+        File::Spec->catfile( $home, 'dynamic-to-undef', '.env.pl' ),
+        "my \$key = 'DYNAMIC_TO_UNDEF';\n\$ENV{\$key} = undef;\n1;\n",
+    );
+    local $ENV{DYNAMIC_TO_UNDEF} = 'before';
+    $EL->_load_env_pl_file($to_undef);
+    ok( !defined $ENV{DYNAMIC_TO_UNDEF},
+        'dynamic env.pl assignments are recorded when they clear an inherited value' );
+}
+
+{
+    my $missing = File::Spec->catfile( $home, 'missing-env-source.pl' );
+    is_deeply( [ $EL->_env_pl_assigned_keys($missing) ], [], 'the assignment scanner returns no keys when its source cannot be opened' );
+    is_deeply( [ $EL->_env_pl_assigned_keys($home) ], [], 'the assignment scanner returns no keys when reading a directory yields no source text' );
+}
+
 {
     local %ENV                                   = %ENV;
     local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT}    = undef;
@@ -418,14 +504,14 @@ write_file( File::Spec->catfile( $ab,  '.env' ),    "AK=abval\n" );
 
     is_deeply(
         [ $EL->_plain_directory_layers( Local::MockPaths->new( cwd => '/x/y/z', home => '/other', project_root => '' ) ) ],
-        [],
-        '_plain_directory_layers returns nothing when cwd is outside home and there is no project root',
+        ['/x/y/z'],
+        '_plain_directory_layers loads the invocation cwd when it is outside home and there is no project root',
     );
 
     is_deeply(
         [ $EL->_plain_directory_layers( Local::MockPaths->new( cwd => '/x/y/z', home => '/other', project_root => '/p/q' ) ) ],
-        [],
-        '_plain_directory_layers returns nothing when cwd is under neither home nor the project root',
+        ['/x/y/z'],
+        '_plain_directory_layers still loads the invocation cwd when it is under neither home nor the project root',
     );
 
     is_deeply(

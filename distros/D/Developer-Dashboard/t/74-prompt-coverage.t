@@ -7,8 +7,10 @@ use utf8;
 use lib 'lib';
 
 use Test::More;
+use File::Path qw(make_path);
 use File::Temp qw(tempdir);
 use File::Spec;
+use Cwd qw(abs_path);
 
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::IndicatorStore;
@@ -240,6 +242,210 @@ sub write_file {
     write_file( File::Spec->catfile( $ok, '.git', 'HEAD' ), "ref: refs/heads/main\n" );
     is( $prompt->_git_branch($ok), 'main', 'symbolic HEAD resolves to a branch (line 196 both-true, line 205 defined)' );
 
+    my $slash_branch = File::Spec->catdir( $base, 'slash-branch' );
+    mkdir $slash_branch or die "mkdir $slash_branch: $!";
+    mkdir File::Spec->catdir( $slash_branch, '.git' ) or die "mkdir slash-branch/.git: $!";
+    write_file( File::Spec->catfile( $slash_branch, '.git', 'HEAD' ), "ref: refs/heads/foo/bar\n" );
+    is( $prompt->_git_branch($slash_branch), 'foo/bar', 'symbolic branch names retain every slash-delimited component' );
+
+    my $other_remote = File::Spec->catdir( $base, 'other-remote' );
+    mkdir $other_remote or die "mkdir $other_remote: $!";
+    mkdir File::Spec->catdir( $other_remote, '.git' ) or die "mkdir other-remote/.git: $!";
+    write_file( File::Spec->catfile( $other_remote, '.git', 'HEAD' ), "ref: refs/remotes/upstream/topic/deep\n" );
+    is( $prompt->_git_branch($other_remote), 'upstream/topic/deep', 'symbolic refs from non-origin remotes keep their full remote label' );
+
+    my $other_symbolic = File::Spec->catdir( $base, 'other-symbolic' );
+    mkdir $other_symbolic or die "mkdir $other_symbolic: $!";
+    mkdir File::Spec->catdir( $other_symbolic, '.git' ) or die "mkdir other-symbolic/.git: $!";
+    write_file( File::Spec->catfile( $other_symbolic, '.git', 'HEAD' ), "ref: refs/tags/v2.4\n" );
+    is( $prompt->_git_branch($other_symbolic), 'v2.4', 'other symbolic refs retain the final label component' );
+
+    my $invalid_detached = File::Spec->catdir( $base, 'invalid-detached' );
+    mkdir $invalid_detached or die "mkdir $invalid_detached: $!";
+    mkdir File::Spec->catdir( $invalid_detached, '.git' ) or die "mkdir invalid-detached/.git: $!";
+    write_file( File::Spec->catfile( $invalid_detached, '.git', 'HEAD' ), "not-a-git-object\n" );
+    is( $prompt->_git_branch($invalid_detached), undef, 'malformed detached HEAD metadata has no branch label' );
+
+    my $without_head = File::Spec->catdir( $base, 'without-head' );
+    mkdir $without_head or die "mkdir $without_head: $!";
+    mkdir File::Spec->catdir( $without_head, '.git' ) or die "mkdir without-head/.git: $!";
+    is( $prompt->_git_branch($without_head), undef, 'a Git directory without HEAD has no branch label' );
+    is( $prompt->_git_metadata_dir($without_head), File::Spec->catdir( $without_head, '.git' ), 'a repository without a git pointer uses its metadata directory directly' );
+
+    my $remote_branch = File::Spec->catdir( $base, 'detached-origin' );
+    mkdir $remote_branch or die "mkdir $remote_branch: $!";
+    my $remote_git = File::Spec->catdir( $remote_branch, '.git' );
+    mkdir $remote_git or die "mkdir detached-origin/.git: $!";
+    my $remote_commit = '0123456789abcdef0123456789abcdef01234567';
+    write_file( File::Spec->catfile( $remote_git, 'HEAD' ), "$remote_commit\n" );
+    my $remote_ref = File::Spec->catfile( $remote_git, 'refs', 'remotes', 'origin', 'foo', 'bar' );
+    make_path( File::Spec->catdir( $remote_git, 'refs', 'remotes', 'origin', 'foo' ) );
+    write_file( $remote_ref, "$remote_commit\n" );
+    write_file( File::Spec->catfile( $remote_git, 'refs', 'remotes', 'origin', 'HEAD' ), "$remote_commit\n" );
+    write_file( File::Spec->catfile( $remote_git, 'refs', 'remotes', 'origin', 'invalid-ref' ), "not-a-commit\n" );
+    write_file( File::Spec->catfile( $remote_git, 'refs', 'remotes', 'origin', 'empty-ref' ), '' );
+    write_file( File::Spec->catfile( $remote_git, 'refs', 'remotes', 'origin', 'different-ref' ), "abcdef0123456789abcdef0123456789abcdef01\n" );
+    my $outside_ref = File::Spec->catfile( $base, 'outside-origin-ref' );
+    write_file( $outside_ref, "$remote_commit\n" );
+    SKIP: {
+        skip 'file symlinks unavailable', 2
+          if !symlink( $outside_ref, File::Spec->catfile( $remote_git, 'refs', 'remotes', 'origin', 'linked-ref' ) );
+        is( $prompt->_git_branch($remote_branch), 'origin/foo/bar', 'symlinked loose origin refs are skipped' );
+    }
+    SKIP: {
+        skip 'named pipes are unavailable', 1
+          if $^O eq 'MSWin32' || !eval { require POSIX; POSIX->can('mkfifo') };
+        my $fifo = File::Spec->catfile( $remote_git, 'refs', 'remotes', 'origin', 'fifo-ref' );
+        skip 'could not create a named pipe', 1 if !POSIX::mkfifo( $fifo, 0600 );
+        is( $prompt->_git_branch($remote_branch), 'origin/foo/bar', 'non-file entries under origin refs are skipped' );
+    }
+    is( $prompt->_git_branch($remote_branch), 'origin/foo/bar', 'detached HEAD keeps origin prefix when no same-commit local branch exists' );
+    my $origin_only_git = File::Spec->catdir( $base, 'origin-only-git' );
+    my $origin_only_ref = File::Spec->catfile( $origin_only_git, 'refs', 'remotes', 'origin', 'feature', 'nested' );
+    make_path( File::Spec->catdir( $origin_only_git, 'refs', 'remotes', 'origin', 'feature' ) );
+    write_file( $origin_only_ref, "$remote_commit\n" );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Prompt::_git_ref_commit = sub { return; };
+        is(
+            $prompt->_origin_branch_for_commit( $origin_only_git, $remote_commit ),
+            'origin/feature/nested',
+            'a matched origin ref with no local commit keeps the origin prefix',
+        );
+    }
+
+    is( $prompt->_origin_branch_for_commit( undef, $remote_commit ), undef, 'origin lookup rejects a missing Git directory' );
+    is( $prompt->_origin_branch_for_commit( '', $remote_commit ), undef, 'origin lookup rejects an empty Git directory' );
+    is( $prompt->_origin_branch_for_commit( $remote_git, undef ), undef, 'origin lookup rejects an undefined commit id' );
+    is( $prompt->_origin_branch_for_commit( $remote_git, 'bad-commit' ), undef, 'origin lookup rejects a malformed commit id' );
+    is( $prompt->_git_ref_commit( $remote_git, undef ), undef, 'ref lookup rejects an undefined ref name' );
+    is( $prompt->_git_ref_commit( undef, 'refs/heads/main' ), undef, 'ref lookup rejects an undefined Git directory' );
+    is( $prompt->_git_ref_commit( $remote_git, 'refs/tags/main' ), undef, 'ref lookup rejects ref namespaces outside heads and remotes' );
+    is( $prompt->_git_ref_commit( $remote_git, 'refs/heads//main' ), undef, 'ref lookup rejects empty path segments' );
+    is( $prompt->_git_ref_commit( $remote_git, 'refs/heads/main.lock' ), undef, 'ref lookup rejects lock-file names' );
+    is( $prompt->_git_ref_commit( $remote_git, 'refs/heads/../escape' ), undef, 'ref lookup rejects parent traversal segments' );
+    is( $prompt->_git_ref_commit( $remote_git, 'refs/heads/missing' ), undef, 'ref lookup returns undef when no loose or packed entry exists' );
+
+    my $linked_refs = File::Spec->catdir( $base, 'linked-ref-parent' );
+    mkdir $linked_refs or die "mkdir $linked_refs: $!";
+    my $linked_git = File::Spec->catdir( $linked_refs, '.git' );
+    mkdir $linked_git or die "mkdir $linked_git: $!";
+    my $outside_heads = File::Spec->catdir( $base, 'outside-heads' );
+    make_path($outside_heads);
+    write_file( File::Spec->catfile( $outside_heads, 'main' ), "$remote_commit\n" );
+    make_path( File::Spec->catdir( $linked_git, 'refs' ) );
+    SKIP: {
+        skip 'directory symlinks unavailable', 1
+          if !symlink( $outside_heads, File::Spec->catdir( $linked_git, 'refs', 'heads' ) );
+        is( $prompt->_git_ref_commit( $linked_git, 'refs/heads/main' ), undef, 'a symlinked ref parent is not followed' );
+    }
+
+    my $local_remote_branch = File::Spec->catdir( $base, 'local-origin-branch' );
+    mkdir $local_remote_branch or die "mkdir $local_remote_branch: $!";
+    my $local_remote_git = File::Spec->catdir( $local_remote_branch, '.git' );
+    mkdir $local_remote_git or die "mkdir local-origin-branch/.git: $!";
+    write_file( File::Spec->catfile( $local_remote_git, 'HEAD' ), "ref: refs/remotes/origin/foo/bar\n" );
+    my $local_remote_ref = File::Spec->catfile( $local_remote_git, 'refs', 'remotes', 'origin', 'foo', 'bar' );
+    make_path( File::Spec->catdir( $local_remote_git, 'refs', 'remotes', 'origin', 'foo' ) );
+    write_file( $local_remote_ref, "$remote_commit\n" );
+    my $empty_local_ref = File::Spec->catfile( $local_remote_git, 'refs', 'heads', 'empty' );
+    make_path( File::Spec->catdir( $local_remote_git, 'refs', 'heads' ) );
+    write_file( $empty_local_ref, '' );
+    is( $prompt->_git_ref_commit( $local_remote_git, 'refs/heads/empty' ), undef, 'an empty loose ref has no commit id' );
+    my $malformed_local_ref = File::Spec->catfile( $local_remote_git, 'refs', 'heads', 'malformed' );
+    write_file( $malformed_local_ref, "not-a-commit\n" );
+    is( $prompt->_git_ref_commit( $local_remote_git, 'refs/heads/malformed' ), undef, 'a malformed loose ref has no commit id' );
+    my $same_local_ref = File::Spec->catfile( $local_remote_git, 'refs', 'heads', 'foo', 'bar' );
+    make_path( File::Spec->catdir( $local_remote_git, 'refs', 'heads', 'foo' ) );
+    write_file( $same_local_ref, "$remote_commit\n" );
+    is( $prompt->_git_branch($local_remote_branch), 'foo/bar', 'origin prefix is omitted when same-named local branch points to same commit' );
+
+    my $different_local_ref = File::Spec->catfile( $local_remote_git, 'refs', 'heads', 'foo', 'bar' );
+    write_file( $different_local_ref, "abcdef0123456789abcdef0123456789abcdef01\n" );
+    is( $prompt->_git_branch($local_remote_branch), 'origin/foo/bar', 'origin prefix remains when same-named local branch points elsewhere' );
+
+    my $symbolic_remote = File::Spec->catdir( $base, 'symbolic-origin' );
+    mkdir $symbolic_remote or die "mkdir $symbolic_remote: $!";
+    my $symbolic_git = File::Spec->catdir( $symbolic_remote, '.git' );
+    mkdir $symbolic_git or die "mkdir symbolic-origin/.git: $!";
+    write_file( File::Spec->catfile( $symbolic_git, 'HEAD' ), "ref: refs/remotes/origin/foo/bar\n" );
+    my $symbolic_remote_ref = File::Spec->catfile( $symbolic_git, 'refs', 'remotes', 'origin', 'foo', 'bar' );
+    make_path( File::Spec->catdir( $symbolic_git, 'refs', 'remotes', 'origin', 'foo' ) );
+    write_file( $symbolic_remote_ref, "$remote_commit\n" );
+    is( $prompt->_git_branch($symbolic_remote), 'origin/foo/bar', 'symbolic remote HEAD retains origin prefix without local same-commit branch' );
+    my $symbolic_local_ref = File::Spec->catfile( $symbolic_git, 'refs', 'heads', 'foo', 'bar' );
+    make_path( File::Spec->catdir( $symbolic_git, 'refs', 'heads', 'foo' ) );
+    write_file( $symbolic_local_ref, "$remote_commit\n" );
+    is( $prompt->_git_branch($symbolic_remote), 'foo/bar', 'symbolic remote HEAD omits origin prefix for matching local branch' );
+
+    my $missing_symbolic_remote = File::Spec->catdir( $base, 'missing-symbolic-origin' );
+    mkdir $missing_symbolic_remote or die "mkdir $missing_symbolic_remote: $!";
+    my $missing_symbolic_git = File::Spec->catdir( $missing_symbolic_remote, '.git' );
+    mkdir $missing_symbolic_git or die "mkdir missing-symbolic-origin/.git: $!";
+    write_file( File::Spec->catfile( $missing_symbolic_git, 'HEAD' ), "ref: refs/remotes/origin/missing/topic\n" );
+    is( $prompt->_git_branch($missing_symbolic_remote), 'origin/missing/topic', 'a missing symbolic origin ref retains its full origin-qualified name' );
+
+    my $packed_remote = File::Spec->catdir( $base, 'packed-origin' );
+    mkdir $packed_remote or die "mkdir $packed_remote: $!";
+    my $packed_git = File::Spec->catdir( $packed_remote, '.git' );
+    mkdir $packed_git or die "mkdir packed-origin/.git: $!";
+    write_file( File::Spec->catfile( $packed_git, 'HEAD' ), "$remote_commit\n" );
+    write_file( File::Spec->catfile( $packed_git, 'packed-refs' ), "# pack-refs with: peeled fully-peeled\n$remote_commit refs/remotes/origin/HEAD\n$remote_commit refs/remotes/origin/foo/bar\nabcdef0123456789abcdef0123456789abcdef01 refs/remotes/origin/unmatched\n^$remote_commit\n" );
+    is( $prompt->_git_branch($packed_remote), 'origin/foo/bar', 'detached HEAD keeps prefix for a packed origin ref without matching local branch' );
+    is( $prompt->_git_ref_commit( $packed_git, 'refs/remotes/origin/foo/bar' ), $remote_commit, 'packed refs resolve an exact ref name' );
+    is( $prompt->_git_ref_commit( $packed_git, 'refs/remotes/origin/absent' ), undef, 'packed refs without an exact name return undef' );
+    is( $prompt->_git_ref_commit( $packed_git, 'refs/heads/./escape' ), undef, 'packed ref resolution rejects dot path segments' );
+    my $packed_local_git = File::Spec->catdir( $packed_remote, '.git' );
+    write_file( File::Spec->catfile( $packed_local_git, 'packed-refs' ), "# pack-refs with: peeled fully-peeled\n$remote_commit refs/remotes/origin/foo/bar\n$remote_commit refs/heads/foo/bar\n" );
+    is( $prompt->_git_branch($packed_remote), 'foo/bar', 'packed local branch at the same commit permits omitting origin prefix' );
+
+    my $mismatch_git = File::Spec->catdir( $base, 'origin-local-mismatch' );
+    make_path( File::Spec->catdir( $mismatch_git, 'refs', 'remotes', 'origin', 'foo' ) );
+    make_path( File::Spec->catdir( $mismatch_git, 'refs', 'heads', 'foo' ) );
+    write_file( File::Spec->catfile( $mismatch_git, 'refs', 'remotes', 'origin', 'foo', 'bar' ), "$remote_commit\n" );
+    write_file( File::Spec->catfile( $mismatch_git, 'refs', 'heads', 'foo', 'bar' ), "abcdef0123456789abcdef0123456789abcdef01\n" );
+    is(
+        $prompt->_origin_branch_for_commit( $mismatch_git, $remote_commit ),
+        'origin/foo/bar',
+        'a local branch at a different commit does not hide the origin prefix',
+    );
+
+    my $symlinked_origin = File::Spec->catdir( $base, 'symlinked-origin' );
+    mkdir $symlinked_origin or die "mkdir $symlinked_origin: $!";
+    my $symlinked_git = File::Spec->catdir( $symlinked_origin, '.git' );
+    mkdir $symlinked_git or die "mkdir symlinked-origin/.git: $!";
+    write_file( File::Spec->catfile( $symlinked_git, 'HEAD' ), "$remote_commit\n" );
+    my $outside_origin = File::Spec->catdir( $base, 'outside-origin' );
+    make_path( File::Spec->catdir( $outside_origin, 'foo' ) );
+    write_file( File::Spec->catfile( $outside_origin, 'foo', 'bar' ), "$remote_commit\n" );
+    my $origin_refs_parent = File::Spec->catdir( $symlinked_git, 'refs', 'remotes' );
+    make_path($origin_refs_parent);
+    SKIP: {
+        skip 'directory symlinks unavailable', 1
+          if !symlink( $outside_origin, File::Spec->catdir( $origin_refs_parent, 'origin' ) );
+        is( $prompt->_git_branch($symlinked_origin), substr( $remote_commit, 0, 7 ), 'origin refs root symlink is not followed outside git metadata' );
+    }
+
+    my $symlinked_packed = File::Spec->catdir( $base, 'symlinked-packed' );
+    mkdir $symlinked_packed or die "mkdir $symlinked_packed: $!";
+    my $symlinked_packed_git = File::Spec->catdir( $symlinked_packed, '.git' );
+    mkdir $symlinked_packed_git or die "mkdir symlinked-packed/.git: $!";
+    write_file( File::Spec->catfile( $symlinked_packed_git, 'HEAD' ), "$remote_commit\n" );
+    my $outside_packed_refs = File::Spec->catfile( $base, 'outside-packed-refs' );
+    write_file( $outside_packed_refs, "$remote_commit refs/remotes/origin/foo/bar\n" );
+    SKIP: {
+        skip 'file symlinks unavailable', 1
+          if !symlink( $outside_packed_refs, File::Spec->catfile( $symlinked_packed_git, 'packed-refs' ) );
+        is( $prompt->_git_branch($symlinked_packed), substr( $remote_commit, 0, 7 ), 'packed-refs symlink is not followed outside git metadata' );
+        is( $prompt->_git_ref_commit( $symlinked_packed_git, 'refs/heads/missing' ), undef, 'direct ref lookup refuses a symlinked packed-refs file' );
+    }
+
+    my $detached_unknown = File::Spec->catdir( $base, 'detached-unknown' );
+    mkdir $detached_unknown or die "mkdir $detached_unknown: $!";
+    mkdir File::Spec->catdir( $detached_unknown, '.git' ) or die "mkdir detached-unknown/.git: $!";
+    write_file( File::Spec->catfile( $detached_unknown, '.git', 'HEAD' ), "abcdef0123456789abcdef0123456789abcdef01\n" );
+    is( $prompt->_git_branch($detached_unknown), 'abcdef0', 'detached commits without a matching origin ref retain their short SHA display' );
+
     is( $prompt->_git_branch(undef), undef, 'undef project root yields no branch (line 196 falsy root)' );
     is(
         $prompt->_git_branch( File::Spec->catdir( $base, 'absent' ) ),
@@ -290,6 +496,28 @@ sub write_file {
     mkdir $empty_git or die "mkdir $empty_git: $!";
     write_file( File::Spec->catfile( $empty_git, '.git' ), '' );
     is( $prompt->_git_metadata_dir($empty_git), undef, 'an empty .git file returns undef (line 231 undef side)' );
+    is( $prompt->_git_branch($empty_git), undef, 'a worktree metadata lookup that resolves to no Git directory has no branch' );
+
+    my $malformed_git = File::Spec->catdir( $base, 'malformed-git' );
+    mkdir $malformed_git or die "mkdir $malformed_git: $!";
+    write_file( File::Spec->catfile( $malformed_git, '.git' ), "not a gitdir pointer\n" );
+    is( $prompt->_git_metadata_dir($malformed_git), undef, 'a malformed .git pointer returns undef' );
+
+    my $missing_gitdir = File::Spec->catdir( $base, 'missing-gitdir' );
+    mkdir $missing_gitdir or die "mkdir $missing_gitdir: $!";
+    write_file( File::Spec->catfile( $missing_gitdir, '.git' ), "gitdir: absent-metadata\n" );
+    is( $prompt->_git_metadata_dir($missing_gitdir), undef, 'a pointer to a missing git directory returns undef' );
+
+    my $relative_wt = File::Spec->catdir( $base, 'relative-wt' );
+    mkdir $relative_wt or die "mkdir $relative_wt: $!";
+    my $relative_gitdir = File::Spec->abs2rel( $realgit, $relative_wt );
+    write_file( File::Spec->catfile( $relative_wt, '.git' ), "gitdir: $relative_gitdir\n" );
+    is( $prompt->_git_metadata_dir($relative_wt), abs_path($realgit), 'a relative worktree gitdir pointer resolves from its worktree root' );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Prompt::abs_path = sub { return undef };
+        is( $prompt->_git_metadata_dir($wt), $realgit, 'a valid gitdir path is retained if canonicalization cannot resolve it' );
+    }
 
     # Unreadable .git file -> open() fails even though -f is true.
     my $noread_git = File::Spec->catdir( $base, 'noread-git' );
@@ -326,8 +554,12 @@ renderer module so its Devel::Cover report reaches full branch and condition
 coverage alongside the statement and subroutine coverage the wider suite already
 provides. It exercises current-directory and ticket selection, tmux status
 suppression, indicator colour and label formatting, tmux status-line width
-folding, ANSI stripping, and git metadata resolution for both ordinary
-repositories and worktree pointer files.
+folding, ANSI stripping, and git metadata resolution for ordinary repositories
+and worktree pointer files. Branch-label tests cover nested local names,
+detached HEAD resolution through loose and packed origin refs, malformed refs,
+symlink and non-file entries, and injected Git metadata I/O failures. These
+expectations apply to every supported shell because Bash, Zsh, sh, and
+PowerShell adapters all invoke the same C<dashboard ps1> renderer.
 
 =head1 WHY IT EXISTS
 
@@ -335,9 +567,10 @@ The prompt renderer accumulated defensive fallbacks and multi-way conditionals
 that the general suite executed only on their common side: an explicit working
 directory, a present ticket reference, numeric tmux widths, well-formed
 indicator records, and readable git metadata. The rarely taken sides -- an
-undefined ticket, an empty or unreadable HEAD, a non-numeric width, a nameless
-indicator record, a zero width, and a worktree gitdir file -- were never
-reached, leaving branch and condition gaps. This test reproduces each of those
+undefined ticket, malformed refs, symlinked refs, injected open/close failures,
+a non-numeric width, a nameless indicator record, a zero width, and relative or
+invalid worktree gitdir pointers -- were never reached, leaving branch and
+condition gaps. This test reproduces each of those
 sides directly so the renderer's edge handling stays verified and cannot silently
 rot, and so the coverage gate keeps reporting full branch and condition coverage.
 
@@ -352,9 +585,10 @@ report shows a new uncovered branch or condition in the prompt renderer.
 
 Run C<prove -lv t/74-prompt-coverage.t> while iterating, and confirm it stays
 green under C<prove -lr t>. Under the coverage gate it closes the renderer's
-branch and condition columns; the two genuinely unreachable sides (a working
-directory function that never returns false, and defined guards over values that
-are never undef) are annotated in the module as uncoverable rather than tested.
+statement, branch, condition, and subroutine columns using deterministic Git
+fixtures and injected I/O failures. No behavior is excused by an uncoverable
+annotation. Branch-label behavior is shell-independent: Bash, Zsh, sh, and
+PowerShell adapters all invoke the same C<dashboard ps1> renderer.
 
 =head1 WHAT USES IT
 

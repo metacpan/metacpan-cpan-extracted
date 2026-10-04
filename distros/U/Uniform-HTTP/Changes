@@ -1,5 +1,39 @@
 Revision history for Uniform-HTTP
 
+0.04  2026-10-04
+    - Add separate ordered trailer fields to Message, Request, and Response,
+      preserving duplicate fields, spelling, order, and bytes.
+    - Add generic Request protocol metadata for Extended CONNECT without
+      interpreting tokens or inferring them from Upgrade.
+    - Add freeze_initial() and freeze_trailers(), with per-section mutation
+      capabilities, while retaining full freeze and independent completeness.
+    - Refine is_mutable() to report whether any section is mutable; callers
+      editing partially mutable messages check the relevant section capability.
+    - Define unavailable versus empty adapter trailers and independent fidelity.
+    - Preserve ordinary CONNECT, exact targets, neutral versions, and separate
+      informational responses without introducing protocol or stream machinery.
+    - Document the modern HTTP standards audit, adapter upgrade contract, and
+      simple usage examples. Add byte, lifecycle, and modern semantic tests.
+    - Declare the test dependency explicitly while retaining Perl 5.16 support.
+
+0.03  2026-10-04
+    - Add optional request scheme and authority metadata without inference.
+    - Define exact HTTP/2 and HTTP/3 ordinary CONNECT mapping by exposing the
+      source :authority bytes as the semantic authority-form target.
+    - Keep authority handling deliberately minimal and byte-oriented instead of
+      turning Uniform into a URI parser or protocol validator.
+    - Keep is_complete() and is_mutable() as portable adapter capabilities.
+    - Add canonical-only freeze(), mark_incomplete(), and mark_complete()
+      helpers for detached Uniform message objects.
+    - Freeze all represented message values, including a buffered body, while
+      allowing canonical completeness state to advance independently.
+    - Keep message state changes free of parsing, serialization, I/O, event-loop,
+      transaction, stream, or framework response commitment.
+    - Simplify the README and public module documentation around normal use,
+      while keeping detailed adapter and contract documents for implementers.
+    - Add standard CPAN, CI, license, and Perl badges to the README.
+    - Keep repository-only metadata out of the release tarball.
+
 0.02  2026-09-13
     - Rename the distribution from Uniform-HTTP-Auth to Uniform-HTTP.
     - Preserve the Uniform::HTTP::Auth module name and its 0.01 public API.

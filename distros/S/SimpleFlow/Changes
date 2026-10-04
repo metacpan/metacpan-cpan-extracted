@@ -1,6 +1,26 @@
 Revision history for SimpleFlow
 
 
+0.193 2026-10-03 (Claude Opus 5.5 helped)
+
+ [Changed]
+
+ - **Incompatible: every argument whose name held a dot now has an
+     underscore instead.** The arguments of `task()` are `conda_env`,
+     `container_args`, `container_engine`, `dry_run`, `env_secret`,
+     `executor_args`, `input_dir`, `input_dirs`, `input_file`,
+     `input_files`, `log_fh`, `on_failure`, `on_success`, `output_dir`,
+     `output_dirs`, `output_file`, `output_files`, `retry_delay`,
+     `stale_cmd`, `stderr_file`, `stdout_file` and `trace_fh`, and that of
+     `parallel()` is `keep_going`. A dotted name is refused as an unknown
+     argument, in a call and in `%SimpleFlow::DEFAULTS` alike. The options
+     copied onto the returned record and into a trace take the new names,
+     as do `input_files` and `output_files`, and `input.file.size` and
+     `output.file.size` become `input_file.size` and `output_file.size`.
+     The record's other fields, such as `will.do`, `start.time` and
+     `failed.outputs`, are not arguments and keep their names. A
+     `stale_cmd` digest recorded by 0.192 is still valid.
+
 0.192 2026-10-02 (Claude Opus 5.5 helped)
 
  [Fixed]

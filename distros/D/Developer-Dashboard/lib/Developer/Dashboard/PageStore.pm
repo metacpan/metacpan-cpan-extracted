@@ -3,12 +3,12 @@ package Developer::Dashboard::PageStore;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 use utf8;
 
 use Encode qw(decode FB_CROAK FB_DEFAULT);
 use Cwd qw(abs_path);
-use Fcntl qw(:DEFAULT O_NOFOLLOW);
+use Fcntl qw(:DEFAULT);
 use File::Find ();
 use File::Spec;
 use File::Basename qw(basename dirname);
@@ -19,9 +19,18 @@ use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::Platform qw(is_windows);
 use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
 
-# Fallback no-follow flag: O_NOFOLLOW where the platform provides the macro,
-# otherwise 0 so path-based fallback opens still work on such runtimes.
-my $NOFOLLOW = eval { O_NOFOLLOW } || 0;    # uncoverable condition false O_NOFOLLOW is defined on every POSIX test host
+# _nofollow_flag()
+# Resolves the no-follow open flag: O_NOFOLLOW where the platform provides the
+# macro, otherwise 0 so path-based fallback opens still work on such runtimes.
+# Looked up at call time so a platform without the macro can be modelled.
+# Input: none.
+# Output: integer open flag.
+sub _nofollow_flag {
+    my $flag = eval { Fcntl->can('O_NOFOLLOW')->() };
+    return $flag ? $flag : 0;
+}
+
+my $NOFOLLOW = _nofollow_flag();
 
 # new(%args)
 # Constructs the page persistence and token transport store.
@@ -230,8 +239,6 @@ sub _validated_page_id {
     my ( $self, $id ) = @_;
     my $normalized = $self->_normalized_page_id($id);
     die 'Invalid page id' if $normalized eq '';
-    # uncoverable branch true leading separators are stripped by normalization and drive-qualified absolutes only exist on Windows
-    die 'Invalid page id' if File::Spec->file_name_is_absolute($normalized);
     die 'Invalid page id' if $normalized =~ /\A[A-Za-z]:/;
     die 'Invalid page id' if grep { $_ eq '' || $_ eq '.' || $_ eq '..' } split m{[\\/]}, $normalized, -1;
     return $normalized;
@@ -255,9 +262,7 @@ sub _assert_page_path_contained {
         my $probe = $file;
         if ( $args{for_write} && !-e $probe && !-l $probe ) {
             while ( !-e $probe && !-l $probe ) {
-                my $parent = dirname($probe);
-                last if $parent eq $probe;    # uncoverable branch true the filesystem root always exists so the walk stops on an existing ancestor first
-                $probe = $parent;
+                $probe = dirname($probe);
             }
         }
         my $probe_real = abs_path($probe);
@@ -431,8 +436,7 @@ sub _read_saved_instruction {
       };
     local $/;
     my $raw = <$fh>;
-    close $fh or die "Unable to close $file: $!";    # uncoverable branch true
-    return '' if !defined $raw;    # uncoverable branch true
+    close $fh or die "Unable to close $file: $!";
     my $text = eval { decode( 'UTF-8', $raw, FB_CROAK ) } || decode( 'UTF-8', $raw, FB_DEFAULT );
     return $self->_normalize_legacy_icon_markup($text);
 }

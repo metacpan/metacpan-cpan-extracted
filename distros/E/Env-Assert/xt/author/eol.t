@@ -12,6 +12,7 @@ my @files = (
     'lib/Env/Assert/Functions.pm',
     't/env-assert-private.t',
     't/env-assert-public-assert.t',
+    't/env-assert-public-file_to_desc.t',
     't/env-assert-public-report_errors.t',
     't/env-assert.t',
     't/env-assert/another-envdesc',

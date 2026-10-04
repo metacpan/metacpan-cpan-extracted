@@ -1,3 +1,1114 @@
+5.51  2026-10-03
+
+  - Problem 25 follow-up: keep help handling within internal CLI dispatch and
+    pass native help flags through to dotted external skill commands.
+  - Add a Docker regression fixture for `d2 tira.tasklist.prune --help` and
+    document the internal-versus-skill help ownership boundary.
+
+5.50  2026-10-03
+
+  - Problem 35: configure Dist::Zilla's UploadToCPAN releaser so an explicit `dzil release`
+    has a real PAUSE upload action; keep the upload separate from `dzil build`
+    and document that credentials belong outside the repository.
+  - Add a release metadata regression test for the configured Releaser plugin.
+
+5.49  2026-10-03
+
+  - Problem 12, 32, 33, and 34 delivery follow-up: publish the final Docker,
+    coverage, package-build, and blank-container integration evidence in the
+    numbered problem report.
+  - Refresh the release archive to include the completed problem status index.
+
+5.48  2026-10-03
+
+  - Problem 12 follow-up: normalize dotted workspace refs consistently for
+    tmux session lookup and creation, and reuse a duplicate session only after
+    verifying the tagged logical workspace owner.
+  - Problem 32: separate path aliases from command completion and bound cdr
+    candidates to direct children, narrowing one directory per entered term.
+  - Problem 33: add regression coverage confirming an unregistered leading
+    cdr word remains a search term and participates in completion narrowing.
+  - Problem 34: use invocation-directory Compose files as the base project and
+    restrict automatic runtime service merging to services declared there.
+  - Add Docker regression and complete statement, branch, condition, and
+    subroutine coverage verification for the affected library.
+
+5.47  2026-10-03
+
+  - Problem 34: use invocation-directory Compose files as the local project
+    base and limit automatic runtime service overlays to declared local
+    services; keep explicit service selection and no-local-base discovery
+    behavior intact.
+  - Add Problem 33 regressions proving an unregistered first cdr argument
+    remains a search term for both target resolution and later TAB narrowing.
+  - Problem 12 follow-up: map dotted workspaces to tmux's underscore-normalized
+    session names, check existing session ownership, and confirm duplicate
+    create races before reuse.
+  - Problem 32: keep path aliases out of root command completion, offer them
+    beside tmux sessions for `workspace`, and restrict initial `cdr` TAB
+    candidates and subsequent narrowing to one directory level per term to
+    avoid recursive tree scans.
+  - Add regression tests for completion namespaces, direct-child cdr listing,
+    and concurrent workspace session creation; synchronize docs and POD.
+
+5.46  2026-10-03
+
+  - Align the main manual with the blank-environment integration behavior:
+    plain cpanm runs the distribution tests, then installed d2 version and
+    delegated grep/Compose help are verified against the archive.
+  - Rebuild the final release artifact and Docker image after documenting the
+    selected-home marker rule and installed short-entrypoint regression gate.
+
+5.45  2026-10-03
+
+  - Strengthen blank-environment release verification through the installed
+    d2 entrypoint: compare its version with the tarball, verify delegated grep
+    help, and preserve native Docker Compose config/help arguments.
+  - Record explicit Problem 31 coverage that all Docker marker creation uses
+    the selected home runtime while marker discovery/removal spans active
+    service layers.
+
+5.44  2026-10-03
+
+  - Problem 12: Resolve workspace -c targets through configured aliases and
+    skill Folder.pm methods at any nested skill depth, preserving config-first
+    precedence and propagating real resolver errors.
+  - Problem 25: Pass delegated grep and Docker Compose help requests through to
+    their owning CLIs even when internal options or Compose selectors come
+    first, while retaining Dashboard's explicit built-in help.
+  - Problem 30: Parse standard five-field collector cron expressions from
+    config.json, apply crontab day matching and named/ranged/stepped fields,
+    deduplicate each minute, and reject missing or invalid schedules before
+    launching a collector loop.
+  - Problem 31: Honor disabled.yml and develop.yml markers from every active
+    service config layer; service-enable and development-disable remove all
+    matching markers across those layers.
+  - Complete the 100% statement, branch, condition, and subroutine coverage
+    gate across the full Perl library.
+  - Run the blank-environment tarball install with plain `cpanm` so the
+    packaged distribution test suite executes after installation.
+  - Validate release installation with `cpanm`'s test phase enabled.
+  - Add Docker regression coverage for skill workspace aliases and downstream
+    help dispatch; synchronize CLI documentation and POD.
+  - Enable an init reaper in the blank-environment test container so process
+    tree assertions observe terminated descendants instead of unreaped zombies.
+
+5.41  2026-10-02
+
+  - Exclude all root-level Devel::Cover databases, including custom
+    `cover_db_*` names, from distribution archives; add a release-metadata
+    regression guard for the exclusion.
+
+5.40  2026-10-02
+
+  - Problem 27: Restore `dashboard of grep ...` as a recursive content search,
+    using argv-safe grep execution and the existing file chooser; retain full
+    Perl module source lookup across every directory in `@INC`.
+  - Problem 28: Resolve collector `cwd` values from configured path aliases and
+    skill-qualified `lib/Folder.pm` aliases, with config aliases taking priority.
+  - Close the reachable four-metric coverage gaps found by the release gate,
+    including grep editor/no-match dispatch and collector alias resolution.
+
+5.38  2026-10-01
+
+  - Problem 26 follow-up: preserve `origin/` in `dashboard ps1` unless a
+    same-named local branch points to the exact same commit. Apply the rule to
+    symbolic and detached HEADs, including loose and packed refs.
+
+5.37  2026-10-01
+
+  - Problem 26: preserve complete slash-delimited branch names in `dashboard
+    ps1` for every shell adapter. Detached HEADs matching loose or packed
+    `origin` refs retain the `origin/` prefix unless a same-named local branch
+    points to the same commit;
+    symlinked ref roots are ignored. Add regression coverage for both ref
+    formats, symlink rejection, unmatched detached HEADs, and shared-renderer
+    delegation from every supported shell bootstrap.
+
+5.36  2026-10-01
+
+  - Problem 7: resolve nested skill cli/__init__ entrypoints when addressed
+    directly at any nesting depth. Prefer the deepest matching initializer
+    after checking explicit commands, and document the dotted invocation.
+
+5.35  2026-10-01
+
+  - Problem 25: add a shared help catalog for every internal CLI command,
+    compatibility alias, public action, and the direct version command.
+    Route help before command execution and align TAB candidates with the same
+    catalog, including nested actions and recognized option flags. Add concise
+    global help, package/runtime regressions, and workspace completion that
+    does not query tmux for option flags. Keep release metadata version-neutral.
+
+5.34  2026-09-30
+
+  - Complete Problem 24's Pod::Text 6.1.1 security floor and fail-closed
+    isolated dependency audit guard. Keep the workflow release-gate assertion
+    in the checkout-only metadata test so the packaged test suite does not
+    require the intentionally unshipped .github tree. Problem 20 aggregate
+    coverage remains paused.
+
+  - Problem 20: bring lib/ to 100.0 percent statement, branch, condition and
+    subroutine coverage. Add coverage tests t/300-t/305, t/330-t/331, t/360-t/362,
+    t/390, t/420-t/422 and t/450-t/451; failure paths are injected with
+    CORE::GLOBAL overrides so they run the same for root and non-root users.
+    Genuinely unreachable branches carry their own uncoverable annotation.
+    Fix scheme-relative bookmark targets (//host/path) dying on
+    URI::_generic host(). Route the effective-uid check in SkillManager through
+    _effective_uid so both answers are testable.
+
+5.33  2026-09-30
+
+  - Problem 24: Require Pod::Text 6.1.1 or later for CLI help rendering and
+    enforce the fixed module path/version in the isolated dependency audit.
+    Correct the CI audit step classification and guard the exact CPANSA
+    podlators advisory against CPAN::Audit's independent Pod::Man version
+    mapping. Keep Problem 20's aggregate coverage work paused.
+
+5.32  2026-09-30
+
+  - Correct Problem 21–23 report release labels and preserve the actual
+    post-push 8.0/10 Scorecard result and its unresolved governance actions.
+    Keep Problem 20 coverage paused.
+
+5.31  2026-09-30
+
+  - Correct the Problem 21–23 delivery report to reflect the pushed 5.30
+    release and live 8.0/10 Scorecard result. Record remaining GitHub-side
+    governance tasks explicitly; Problem 20 coverage remains paused.
+
+5.30  2026-09-30
+
+  - Complete the Problem 21–23 report with expected outcomes, Docker
+    reproductions, root causes, current Git references, and explicit delivery
+    status. Keep Problem 20 aggregate coverage paused as requested.
+
+5.29  2026-09-30
+
+  - Ship the final Problem 23 delivery report with the verified archive and
+    image results instead of the pre-verification in-progress status.
+
+5.28  2026-09-30
+
+  - Exclude stale generated pax-output artifacts from source distributions so
+    an old local binary cannot leak into the interpreted-only package.
+
+5.27  2026-09-30
+
+  - Exclude stale generated pax-output artifacts from source distributions so
+    an old local binary cannot leak into the interpreted-only package.
+  - Keep the blank-environment outsider-browser check portable across
+    Chromium's generic 401 page and its HTTP response failure while continuing
+    to assert that bootstrap guidance and the login form are not exposed.
+
+5.26  2026-09-30
+
+  - Remove the vendored PAX compiler, self-compilation cache, CLI command,
+    private helper staging entry, and compiled-binary release workflow. Keep
+    the interpreted Perl CLI as the single supported execution path, and add
+    Docker regression coverage for the removed integration. Make the blank
+    container's outsider-browser assertion accept Chromium's generic 401 page
+    or its equivalent HTTP response failure while still rejecting leaked
+    bootstrap content.
+
+5.25  2026-09-30
+
+  - Preserve eligible module source paths across standalone runtime-family
+    expansion and payload mapping. Excluded compiled modules no longer mask
+    runtime copies, duplicate modules are not re-added, and PAX-owned modules
+    are packaged relative to their actual import root. Add Docker regressions
+    for each collision/layout case and complete Problems 21 and 22 validation.
+
+5.23  2026-09-30
+
+  - Preserve known dependency source paths while expanding Perl package-family
+    files, preventing a stale duplicate from being re-added to standalone
+    runtime manifests. Add a Docker regression using matching module-relative
+    paths.
+
+5.22  2026-09-29
+
+  - Complete Problems 21 and 22 delivery: verify both runtime roots
+    participate together and keep ddfile.local dependencies private to their
+    owning skill. Stabilize the standalone-image source-path regression with a
+    unique fixture namespace. Confirm package tests in an init-enabled blank
+    Docker container and update the Chromium headless SSL diagnostic checks.
+
+5.21  2026-09-29
+
+  - Complete delivery fixes for Problems 21 and 22: verify both runtime roots
+    participate together and keep ddfile.local dependencies private to their
+    owning skill. Update Docker regressions and packaged-test compatibility for
+    newer Chromium headless certificate diagnostics.
+
+5.20  2026-09-29
+
+  - Discover both .d2 and .developer-dashboard runtime directories at each
+    home and project depth, preserving canonical lookup/write precedence while
+    allowing commands, config, Docker, dashboards, skills, and environment
+    files from both roots to participate.
+  - Install dependencies from an installed skill's ddfile.local into that
+    skill's private skills/ tree instead of the runtime-wide skills root.
+    Add Docker-run regressions for dual runtime roots and private dependencies.
+
+5.18  2026-09-28
+
+  - Preserve response headers set by skill Dancer2 before hooks when the
+    adapter applies default security headers; explicit backend response
+    headers retain final precedence. Document Dancer2 hook syntax and verify
+    that request-local hook variables are readable in page and Ajax CODE.
+    Confirm that skill Dashboard.pm code loads once at PSGI app startup.
+
+5.17  2026-09-28
+
+  - Add bookmark HEAD content for raw metadata/script/style injection into the
+    rendered document head, with parsing, serialization, editor highlighting,
+    and explicit trusted-content documentation.
+
+5.16  2026-09-28
+
+  - Correct skill install progress labels when ddfile or ddfile.local exists
+    but no dependency install is needed; report a missing manifest only when
+    the file is actually absent.
+
+5.15  2026-09-28
+
+  - Add -b/--branch to remote skill installs. Fresh installs try master then
+    main by default; reinstalls keep the installed checkout's current named
+    branch unless an explicit branch overrides it.
+
+5.14  2026-09-28
+
+  - Include each skill's configured and Folder.pm path aliases in d2 skill
+    command completion after the skill-qualified prefix, loading only that
+    skill's Folder.pm for the completion request.
+
+5.13  2026-09-28
+
+  - Added skill-provided path aliases through lib/Folder.pm. cdr and path
+    resolve now check skill config aliases first, then call the matching
+    Folder method. d2 paths, path list, and cdr completion merge names from
+    Folder->__list__ without modifying skill files; path add continues to
+    persist only in config/config.json.
+
+5.12  2026-09-28
+
+  - Added useful help output to d2 docker --help, dashboard docker --help,
+    and the related -h/help/no-subcommand forms. Docker command completion now
+    includes the development subcommand and its enable/disable actions, so the
+    available nested commands can be explored interactively.
+
+5.11  2026-09-28
+
+  - Fixed skill dashboard CODE blocks and saved skill Ajax handlers so the
+    active skill's ordered .env and .env.pl files are loaded into a scoped
+    environment. Values now reach both page rendering and Ajax subprocesses
+    without leaking into the web worker or other requests. Added PageRuntime
+    and installed-skill route regressions for the documented FOO=BAR case.
+
+5.10  2026-09-27
+
+  - Fixed a `dashboard serve --foreground` startup hang for any skill
+    declaring a collector: CollectorRunner::_find_running_loop scanned
+    every /proc PID and fell back to spawning a `ps -o args= -p $pid`
+    subprocess whenever a candidate's cmdline was readable-but-empty -
+    the permanent, non-racy shape of a kernel thread, not just a
+    vanished-process race. On a host with hundreds of kernel threads that
+    cost one subprocess spawn per thread, sequentially, making the
+    startup hang 90+ seconds with zero output. Now skips a
+    readable-but-empty cmdline candidate before ever calling
+    _read_process_title, since it can never match a collector's own
+    non-empty process title.
+
+5.09  2026-09-27
+
+  - Fixed a dependency-scan masking defect: _locate_module_runtime_file
+    walked @INC/roots and returned the FIRST existing file for a module
+    name, discarding the dependency scan's own already-known source_path
+    for that module. If an earlier @INC entry held a stale/duplicate copy
+    of the module, the wrong file was silently bundled into a compiled
+    standalone binary. _locate_module_runtime_file now accepts an optional
+    known_source_paths lookup (built in _runtime_selected_files from
+    %args{dependencies}) and prefers it over the @INC walk.
+
+5.08  2026-09-27
+
+  - Fixed a compiled-standalone-binary crash: three closures in
+    StandaloneRuntime.pm's recursive merge/collect ops
+    (config_merge_hashes, skill_dispatcher_merge_skill_hashes,
+    suggest_collect_skill_commands) resolved their own recursion via
+    _code_for($name), the bare unqualified sub name, instead of
+    _code_for($full), the package-qualified name available in the same
+    scope - _code_for() does a raw typeglob lookup, so the bare name
+    resolved against the wrong package and returned undef, crashing
+    `dashboard init`.
+
+5.07  2026-09-27
+
+  - Added explicit Docker development overlay toggles through
+    `dashboard docker development enable|disable <service>` and the
+    `develop.yml` service marker.
+  - Kept each service `compose.yml` as the base and append
+    `development.compose.yml` only when opted in; a missing opted-in overlay
+    is skipped while the base remains active.
+  - Added regression coverage for overlay ordering, marker commands, missing
+    overlays, safe service paths, and PAX standalone runtime parity.
+
+5.06  2026-09-27
+
+  - Made the skill directory providing an `/app/<skill>/<page>` dashboard the
+    first `@INC` entry for its CODE blocks, ahead of other layered skill libs.
+  - Made the skill directory providing a Perl CLI script the first `@INC`
+    entry and first skill library in `PERL5LIB`, ahead of generic dashboard
+    and shared local Perl libraries.
+  - Added tests that print and check the actual `@INC` from dashboard CODE and
+    a dispatched Perl CLI script; both verify the page/command skill's `lib/`
+    directory comes first.
+  - Excluded and pruned generated `pax-output/` binaries from distribution
+    scans and tarballs; an ignored 90+ MB compiled dashboard and deep excluded
+    trees had made `dzil build` spend minutes walking build output.
+
+5.05  2026-09-27
+
+  - Fixed transient Ajax URL generation to encode the rendered Template Toolkit
+    code instead of the original template source. For example, data containing
+    `args => 123` now turns `my $foobar = [% args %];` into executable Perl
+    before tokenization. Added regression coverage for the generated payload.
+  - Documented templating behavior for both transient URLs and saved Ajax files.
+
+5.04  2026-09-26
+
+  - DD-1059: added the missing full-POD-DOC block to
+    t/226-pax-paxfile-parser.t (a race in the shared main checkout meant
+    this fix landed only as an uncommitted working-tree change before
+    5.03 was tagged - see FIXED_BUGS.md).
+
+5.03  2026-09-26
+
+  - Fixed a background-job grandchild surviving the process-group SIGKILL in
+    `Local::BoundedCommand::run_bounded` (t/lib/, test harness) when run
+    inside a container started without an init that reaps orphans - the
+    kind of container this project's own gate scripts use. The group kill
+    already reached and killed the grandchild; nothing ever reaped it once
+    its immediate parent died, so it was a permanent zombie and `kill 0`
+    kept reporting it alive. `run_bounded` now declares itself a Linux/
+    x86_64 subreaper before forking (best-effort, a documented no-op
+    elsewhere), and the cleanup sweep now runs on both its polite (TERM)
+    and escalated (KILL) exit paths - the first version of the fix only
+    swept on the escalated path and missed the common case where TERM
+    alone already finishes the job. (DD-1051)
+  - Documented the mechanism at docs/bounded-command-orphan-reaping.md.
+  - Filed DD-1067 for the same defect class found, independently and
+    pre-existing, in PageRuntime's own `_terminate_saved_ajax_process`.
+
+5.02  2026-09-26
+
+  - DD-1059: brought lib/Developer/Dashboard/Pax/Paxfile.pm to 100.0 percent
+    Devel::Cover on all four metrics (statement, branch, condition,
+    subroutine), up from 11.5 percent. Added t/226-pax-paxfile-parser.t (17
+    assertions) covering every load_optional/load/_scalar code path,
+    including the open()-failure branch and both directions of the
+    defined-or section-reuse condition. Added missing purpose/input/output
+    comments to all three subroutines.
+
+5.01  2026-09-26
+
+  - Resolved bare skill-qualified workspace aliases (for example,
+    `bar.foo`) without requiring `-c`, starting the tmux session in the
+    registered directory.
+  - Automatically imported the namespaced DataHelper JSON functions in every
+    saved-page CODE block.
+  - Loaded trusted skill `lib/Dashboard.pm` extensions into the shared Dancer2
+    app at web startup, including on restart and serve commands, with routes
+    behind the dashboard authorization gate.
+  - Excluded generated PAX test executables from distribution scanning so
+    Dist::Zilla no longer decodes binary scratch output as UTF-8 source.
+  - Marked inline helper packages as no-index metadata so the provides scan
+    does not warn that they lack standalone module files.
+  - Added focused regression coverage and operator documentation for all three
+    changes.
+
+5.00  2026-09-26
+
+  - Prepared the 5.00 release metadata and synchronized module versions,
+    POD, and the generated README.
+
+4.99  2026-09-26
+
+  - Made the final checkout-only coverage workflow gate skip cleanly in
+    installed release tarballs where .github/ is intentionally excluded.
+
+4.98  2026-09-26
+
+  - Made source-checkout-only release gates skip cleanly in installed tarballs,
+    added UTF-8 POD metadata to the non-ASCII regression test, and removed a
+    coverage-gate warning when checkout paths are unavailable.
+
+4.97  2026-09-26
+
+  - Added skill C<lib/> directories to skill CLI C<PERL5LIB> and skill page
+    CODE C<@INC> so both command scripts and dashboard CODE blocks can load
+    modules shipped by their skill.
+  - Loaded skill C<cli/.env> files and changed skill-command env precedence so
+    the invocation cwd C<.env> is applied last and can override skill values.
+  - Allowed cwd C<.env> loading even when C<d2> is launched outside the home or
+    project-root ancestry.
+  - Rendered skill C<cli/__init__> completion entries as the bare skill name
+    instead of C<skill.__init__>.
+  - Removed the public C<ticket> helper alias in favour of C<workspace>.
+  - Added regression coverage for multi-level nested skill command resolution.
+  - Fixed checkout-only GitHub workflow validation so packaged tarball installs
+    skip it cleanly when C<.github/> is intentionally excluded from the
+    release payload.
+
+4.95  2026-09-25
+
+  - Merged incoming query parameters into saved skill bookmark URLs, replacing
+    matching keys while preserving saved parameters and appending new values.
+
+4.94  2026-09-25
+
+  - Fixed skill bookmark files containing saved HTTP(S) URLs so they forward
+    to the target instead of being parsed as instruction documents.
+
+4.93  2026-09-25
+
+  - Fixed saved URL bookmark forwarding so instruction parsing errors are not
+    leaked when a legacy entry is routed through named-page loading.
+
+4.92  2026-09-25
+
+  - Bumped the release metadata and every library version to 4.92.
+  - Restored legacy saved URL bookmark compatibility: external HTTP(S)
+    bookmarks redirect with the incoming query, local routes forward
+    internally, and legacy selected array parameters are resolved.
+  - Made Template Toolkit bookmark includes skill-aware, supporting both
+    relative skill dashboard fragments and explicit skills/<name>/dashboards
+    include paths.
+  - Made saved Ajax C<code> templates render their supplied C<data> values
+    before the generated handler is stored.
+  - Kept dashboard-owned init helpers inside the private C<cli/dd> namespace
+    for both C<dashboard init> and C<d2 init>, without overwriting user CLI files.
+  - Nested skill CLI commands now inherit the DD-OOP runtime env chain and
+    every parent skill's C<.env> and C<.env.pl> before the leaf command runs.
+
+4.91  2026-09-25
+
+  - Raised the Dancer2 dependency floor to 2.2.0, the first release outside
+    the newly reported vulnerable ranges.
+
+4.90  2026-09-25
+
+  - DD-1050: removed 'lib' from _skip_dependency_module's skip-list
+    regex in StandaloneImage.pm. Unlike strict/warnings (true
+    compile-time-only pragmas), lib.pm is a real, physically-requirable
+    module whose import() runs real code (unshift @INC) - any 'use lib'
+    reached through StandaloneRuntime.pm's require wrapper at runtime
+    needs the actual lib.pm file bundled. Confirmed live via a real
+    GitHub Release linux-amd64 binary (commit bf1c4ccc/v4.87) crashing
+    --help and jq with "Can't locate lib.pm in @INC" in a hostile env -i
+    container. Same class of defect as DD-1022 (overload).
+
+4.89  2026-09-24
+
+  - DD-1052: quoted every status-format[N] literal in the zsh/bash/sh
+    POSIX-family shell blocks of _dd_apply_tmux_ticket_status inside
+    share/private-cli/_dashboard-core. An unquoted status-format[N]
+    is treated as a glob pattern by zsh, which aborts the shell hook
+    with a NOMATCH error under zsh's default options - crashing the
+    tmux ticket-status integration on macOS, whose default shell is
+    zsh. PowerShell block left unquoted (different argument-parsing
+    model, does not reproduce the bug).
+
+4.88  2026-09-24
+
+  - DD-1029 follow-up: added the standard purpose/input/output header
+    comment to _declared_modules (missed in the original overloading.pm
+    fix), and extended the docs vault page explaining the
+    overload.pm -> overloading.pm transitive-dependency discovery gap.
+    No executable change - the functional fix already shipped in v4.87.
+
+4.87  2026-09-24
+
+  - DD-1035 follow-up: fixed a real regression in v4.86's own fix, caught
+    by real GitHub Actions CI before this ticket reached a terminal
+    column (Test workflow's "Run tests" step, t/183's "self-built pax
+    runs without source checkout in its working directory"). v4.86 made
+    $PAX_OWN_LIB_ROOT's exclusion from the normal by-@INC selection
+    genuinely work for the first time - correct for hybrid_compiled_pcu_v1
+    dependencies (that's what it fixed) - but the same exclusion also
+    stopped bundled_pure_perl/bundled_xs dependencies whose real
+    source_path happens to live under that root (e.g.
+    Developer::Dashboard::Pax::CLI, hit when the pax tool compiles
+    itself - a genuine self-hosting case). Widened the force-include
+    mechanism to cover any dependency living under $PAX_OWN_LIB_ROOT,
+    not only hybrid_compiled_pcu_v1-packaged ones. New regression test
+    AC-5 in t/223. Reproduced and fixed locally using the exact
+    hostile-environment condition t/183 constructs (env -i, no
+    inherited PERL5LIB/@INC) before landing.
+
+4.86  2026-09-24
+
+  - DD-1035: fixed a real, published-release-breaking bug where a
+    standalone PAX binary could crash with "Can't locate
+    Developer/Dashboard/SeedSync.pm in @INC" on --help/jq (any subcommand
+    reaching a hybrid_compiled_pcu_v1-packaged dependency). Two coupled
+    defects in StandaloneImage.pm: (1) $PAX_OWN_LIB_ROOT was computed via
+    File::Spec->catdir(...,updir,updir,updir) with no abs_path() wrap, so
+    its own exclusion of this checkout's lib/ from runtime_inc bundling
+    was silently a no-op; (2) the force-include mechanism for
+    hybrid_compiled_pcu_v1 dependencies only ever protected an
+    already-selected file from exclusion, never added a file the normal
+    by-@INC selection failed to find. Fixed both together (fixing either
+    alone would have made things worse). Affects all 46
+    hybrid_compiled_pcu_v1-packaged modules in this project, not just
+    SeedSync. Never reproduced on any local/container host this ticket
+    was diagnosed on - every one happened to have a stray installed copy
+    of this project's own package somewhere on @INC, masking the gap that
+    only a genuinely clean GitHub Actions runner exposes. New regression
+    test t/223 (4 assertions), 2 branches genuinely unreachable and
+    annotated. Verified clean on Alpine (musl libc, distinct Perl
+    version) in addition to the Debian-based gate container.
+
+4.85  2026-09-23
+
+  - DD-1010: bin/dashboard's self-compile mechanism (DD-882) now actually
+    execs a resolved PAX cache hit instead of discarding it, via the same
+    _exec_switchboard_command() the ps1 allowlist already used. Re-enabled
+    once DD-930's own root cause (a CodeUnitCompiler EnvLoader.pm
+    special-case producing an unreachable EnvAudit->record call in the
+    compiled binary) shipped. t/182 updated (11/11 PASS, including a real
+    compiled-binary regression run). Full suite verified clean in a
+    container - 9 pre-existing environmental failures found and
+    independently confirmed unrelated to this change (cpan-audit missing,
+    git-worktree-in-container, Devel::Cover missing from the dev image).
+    Real timing measured: cold PAX compile 86.8s, interpreted "version"
+    165ms, self-exec warm run 129-138ms, the same compiled binary invoked
+    directly 2-4ms - the compiled binary itself is 40-80x faster, though
+    bin/dashboard's own outer interpreted startup currently dominates the
+    end-to-end warm-path cost for a trivial command.
+
+4.84  2026-09-23
+
+  - DD-1021: t/09-runtime-manager.t and t/105-web-app-coverage-2.t now
+    pass in a root, ss-less, file-less container - t/09 stubbed
+    command_in_path('ss') alongside the existing capture() mock; t/105
+    uses an attempt-based (not identity-based) skip for its
+    unreadable-file assertion, matching t/78's established pattern.
+  - DD-1043: d2 <skill>.version now natively reads VERSION= from a
+    skill's own .env when the skill ships no cli/version script,
+    instead of requiring every skill to hand-write one.
+  - DD-1044: EnvLoader::_load_env_pl_file now records a .env.pl's
+    same-value re-assignment ($ENV{KEY} set to the value it already
+    had) in DEVELOPER_DASHBOARD_ENV_AUDIT - a pure before/after value
+    diff could never see this case.
+  - DD-1009: Pax::ArtifactCache::write_artifact now writes its
+    cache-metadata JSON atomically (temp path + rename), closing the
+    same truncate-on-interrupt defect class already fixed in DD-989
+    and DD-1003.
+  - DD-1023: release-github.yml and test.yml now install binutils
+    explicitly before their build-dependent steps, fixing t/183's
+    self-hosted pax-build scenarios on a runner missing `as`.
+
+4.83  2026-09-22
+
+  - DD-1015: real Windows amd64 PAX build wired into pax-release.yml,
+    replacing the placeholder - MinGW-w64's real GNU objcopy supports
+    the same binary-to-object conversion the Linux path already uses,
+    targeting PE-COFF. windows-arm64 stays a placeholder pending
+    verification of binutils' PE-ARM64 target name against the real
+    tool.
+  - DD-1025: the GitHub Release page only ever attached the source
+    tarball - the compiled PAX binaries existed only as ephemeral
+    workflow-run artifacts, not discoverable on the release page and
+    subject to expiry. Fixed by calling pax-release.yml as a reusable
+    workflow from release-github.yml and attaching its build outputs
+    to the release as real assets.
+
+4.82  2026-09-22
+
+  - DD-1022: `_skip_dependency_module` wrongly treated `overload` as a
+    compile-time-only pragma like strict/warnings/utf8, so it was
+    never bundled into a standalone binary's runtime payload. Any
+    subcommand whose code path reached File::Temp (which itself
+    `use overload`s stringification/numification) crashed at BEGIN
+    time with "Can't locate overload.pm in @INC" - shipped in v4.78/
+    v4.79 undetected because the release smoke-check only ever ran
+    `dashboard version`. Fixed by removing `overload` from the skip
+    list.
+
+4.81  2026-09-22
+
+  - DD-1020 (real fix for t/183, found via real CI on v4.80): the
+    compiler probe added for DD-1020's objcopy architecture detection
+    ran BEFORE _compile_launcher's own PATH restoration was applied,
+    so it failed under a caller that deliberately strips $ENV{PATH}
+    (t/183's own standalone-execution test) - misdiagnosed as DD-1023
+    ("as"/binutils missing from the runner, which was never actually
+    true). Fixed by moving the probe inside the same PATH-restoration
+    scope the objcopy/cc calls already use.
+
+4.80  2026-09-22
+
+  - DD-1019: t/159 and t/185 were failing for real, deterministic reasons
+    (not CI-load flakiness as first assumed) - a stale $?-guard baseline
+    entry, 2 genuinely-unguarded local $?; gaps, a heredoc blind spot in
+    the sweep's own comment-stripper, and t/185 missing the DD_PAX=on
+    opt-in that a later change required. All fixed and verified.
+  - DD-1011: t/43's usage-string regexes for 'file add'/'path add' were
+    stale since DD-1005 added the -c/--create flag. Corrected.
+  - DD-1023: release-github.yml and test.yml's runners lacked a working
+    assembler (as), breaking t/183's self-hosted pax-build scenarios.
+    Fixed by installing binutils explicitly.
+
+4.79  2026-09-22
+
+  - DD-1020 (correction, same day as v4.78's fix): the archname-based
+    objcopy architecture detection was itself wrong for linux-i686
+    cross-compilation - a real GitHub Actions run confirmed linux-arm64
+    genuinely fixed (native aarch64 runner) while linux-i686 still
+    failed, because `$Config{archname}` reflects the Perl interpreter's
+    own build, not a `-m32`-wrapped cross-compile target. Replaced with
+    a real compiler probe (`_compile_probe_object_header`) that compiles
+    a trivial source with the actual `cc` and reads back the genuine
+    ELF class/machine the result carries, honoring any PATH wrapper.
+
+4.78  2026-09-22
+
+  - DD-1020: `_compile_launcher`'s objcopy invocations previously hardcoded
+    an x86_64 `--output`/`--binary-architecture` spec unconditionally,
+    breaking non-x86_64 PAX build hosts - confirmed live in real CI, where
+    linux-arm64 and linux-i686 both failed at the objcopy step while
+    linux-amd64 succeeded fully. Added `_objcopy_target_for_arch`, which
+    detects the build host's real architecture from `$Config{archname}`
+    and selects the correct objcopy target pair, verified against the
+    real objcopy/binutils tool for x86_64/i686/aarch64. Unblocks DDE-006's
+    linux-i686 and linux-arm64 multi-platform PAX CI targets.
+
+4.77  2026-09-22
+
+  - DD-1018 (follow-up): a real PAX Release CI run of v4.76's two prior
+    fixes surfaced a third defect - `share/private-cli/pax`'s FindBin-
+    based lib resolution failed in the actual GitHub Actions environment
+    ("Can't locate Developer/Dashboard/Pax/CLI.pm"), though every local
+    invocation this session ran succeeded. Fixed by passing `-Ilib`
+    explicitly on the `perl` invocation in `pax-release.yml`'s Linux
+    build step, sidestepping FindBin+cwd inference entirely.
+
+4.76  2026-09-22
+
+  - DD-1018: `pax-release.yml`'s Linux matrix jobs now bootstrap Perl and
+    `cpanm` via the same `shogo82148/actions-setup-perl` step `test.yml`
+    already uses (real CI runs failed with "cpanm: command not found"
+    otherwise). Also re-pinned `actions/upload-artifact` from v4.6.2
+    (node20, below this project's enforced node24 floor) to v7.0.1
+    (node24-verified) - a second real defect found via the same live CI
+    investigation. Every real PAX Release workflow run failed from one
+    of these two causes until now.
+
+4.75  2026-09-22
+
+  - DD-1017: `bin/d2`'s dispatch line unconditionally routed through the
+    perl interpreter to invoke its sibling `dashboard` file, assuming it
+    was always Perl source - crashing whenever that sibling was itself a
+    PAX-compiled standalone binary. Fixed by detecting compiled-vs-
+    interpreted via the sibling's first two bytes (Perl source always
+    opens with a `#!` shebang, a compiled binary never does) and
+    execing the compiled binary directly with no perl interpreter when
+    appropriate. The existing interpreted-source dispatch path is
+    completely unchanged.
+
+4.74  2026-09-22
+
+  - DD-1013: wired `.github/workflows/pax-release.yml`'s linux-amd64/
+    arm64/i686 matrix jobs (part of epic DDE-006) to a real `dashboard pax
+    build` invocation and a native smoke check comparing the compiled
+    binary's own `version` output against the source-Perl CLI's, failing
+    the job on any divergence. linux-i686 installs gcc-multilib and
+    routes around `_which('cc')`'s hardcoded PATH resolution (it never
+    reads `$ENV{CC}`) with a PATH-prepended wrapper forcing `-m32` -
+    caught and fixed a self-recursion bug in that wrapper before landing
+    (it execed the bare name `cc` instead of an absolute path, so it
+    called itself forever). d2 is deferred pending DD-1017 (bin/d2's
+    re-exec line cannot currently dispatch to a compiled dashboard
+    binary, found live while implementing this ticket).
+
+4.73  2026-09-22
+
+  - DD-1012: added `.github/workflows/pax-release.yml`, part of epic
+    DDE-006 (Multi-platform PAX CI) - a push-to-master workflow skeleton
+    matching `package-ghcr.yml`'s established trigger convention, with a
+    6-entry build matrix covering the owner-confirmed platform/arch
+    targets (mac arm64; linux arm64/amd64/i686; windows arm64/amd64) and
+    per-target artifact-upload wiring. The real `dashboard pax build`
+    invocation and functional verification per platform are deferred to
+    sibling tickets under the same epic.
+
+4.72  2026-09-22
+
+  - DD-1002: nine `lib/Developer/Dashboard/Pax/*.pm` modules each hand-rolled
+    their own `JSON::XS->new->...->encode()` chain with independently
+    drifted option sets, instead of using the shared
+    `Developer::Dashboard::JSON` wrapper the rest of the codebase already
+    uses. Added `json_encode_with_options($value, %opts)` supporting the
+    ascii/pretty/utf8 combinations these call sites need, and converted all
+    nine sites (`ArtifactCache.pm`, `AppImage.pm`, `AppServer.pm`, `CLI.pm`,
+    `CodeUnitCompiler.pm` (6 sites), `ProfileGuidedAOT.pm`,
+    `StandaloneImage.pm`) - `Pax/Capture.pm`'s isolated child-probe call
+    site is a documented, deliberate exception (runs with no guaranteed
+    `-I lib` path).
+
+4.71  2026-09-22
+
+  - DD-1006: `_compile_launcher` in `Pax::StandaloneImage` ran a build eval
+    followed by a cwd-restore eval and read `$@` once for both failure
+    paths' `reason` field. Perl resets `$@` at the start and on successful
+    completion of every eval, so when the build eval failed but the
+    subsequent restore eval succeeded (the common case), the restore
+    eval's success silently erased the real build-failure diagnostic
+    before it was ever read - a failed standalone-image build reported an
+    empty reason. Fixed by capturing each eval's `$@` into its own
+    variable immediately after that eval returns, before the other eval
+    can run and clobber it.
+
+4.70  2026-09-22
+
+  - DD-1005: `d2 path add`/`d2 file add` now accept a `-c`/`--create` flag
+    (with an optional octal chmod mode, in bare/space-separated/=-form/
+    short-flag syntax) marking an alias as lazily creatable. The first
+    time anything resolves a lazy-create alias whose target is missing,
+    it is created - a directory (with parents) for a path alias via
+    `PathRegistry::resolve_dir`, or just the parent directory chain for a
+    file alias via `FileRegistry::resolve_file` (per Q-184: a file
+    alias's own target file is left absent, since the caller intends to
+    write it). The create/mode metadata composes cleanly with DD-1004's
+    nested skill-depth alias storage, and is fully backward compatible -
+    an alias saved without `-c`/`--create` stores and reads back exactly
+    as a plain path string, as it always did.
+
+4.69  2026-09-21
+
+  - DD-1003: `PaxCache::_run_compile_and_install`'s `md5_file` digest write
+    is now atomic (write to a sibling temp path, then `rename()`), matching
+    the atomic-install pattern already used for `bin_file` two lines above
+    it. Previously a plain `open('>', $md5_file)` truncated the file to
+    zero bytes the instant `open()` succeeded, well before the digest was
+    written - any interruption in that window (SIGKILL, OOM, host reboot)
+    left `md5_file` as a real, existing, zero-byte file beside an
+    already-valid, already-renamed binary, permanently wedging
+    `resolve()` into treating a fresh cache as stale forever.
+    `t/206-paxcache-md5-atomic-write.t` proves the fix directly via a
+    fork+SIGKILL race against the real `_run_compile_and_install` path.
+
+4.68  2026-09-21
+
+  - DD-1004: `d2 path add`/`d2 file add` now support skill-depth-prefixed
+    dotted alias names (e.g. `d2 path add foo.bar.something /foobar`),
+    resolving arbitrarily nested `skills/<a>/skills/<b>/...` directories.
+    The write NEVER targets a skill's own `config/config.json` directly, at
+    any depth, regardless of whether that skill carries its own `.git`
+    (owner correction, Q-182, generalising the original git-preservation
+    framing): it always walks up to the nearest git-free PARENT ancestor,
+    or the global config's `skills` fallback section when none exists
+    (always true for a depth-1 name, which has no parent skill) - storing
+    the alias as a NESTED hash mirroring the remaining depth segments,
+    never a flattened dotted string. A user's override this way always
+    shadows a skill's own shipped default at read time without ever
+    modifying that skill's file, letting a skill's shipped config survive
+    every future `d2 skill install`/update untouched. New:
+    `PathRegistry::nested_skill_dir_chain`/`nested_skill_entries`/
+    `skill_config_write_location`; `Config::split_skill_alias_name`,
+    `save_skill_path_alias`/`save_skill_file_alias`,
+    `remove_skill_path_alias`/`remove_skill_file_alias`, and the top-level
+    `save_path_alias`/`save_file_alias`/`remove_path_alias`/
+    `remove_file_alias` dispatchers both CLI::Paths and CLI::Files now
+    route through. An undotted alias name keeps today's exact global-config
+    behavior, byte-for-byte unchanged. Added t/205-skill-depth-alias.t.
+
+4.67  2026-09-21
+
+  - DD-989: fixed a symlink-clobber vulnerability in
+    Developer::Dashboard::IndicatorStore::set_indicator. Its staging path
+    used to be the bare literal "$file.pending" with no pid/time/counter
+    uniquifier at all, and permissions were secured only AFTER the write -
+    the exact write-then-secure anti-pattern already fixed six other times
+    (DD-599/600/601/602/848/850), but worse: a fully predictable path,
+    missed by both prior sweeps because neither searched for a
+    pending-file writer with no uniquifier whatsoever. Live-reproduced: a
+    symlink pre-planted at the predictable staging path let a local actor
+    clobber an arbitrary victim file's content and leave the real
+    status.json pointing at the victim afterward. Fixed by routing through
+    the shared Developer::Dashboard::PathRegistry::atomic_write_secure
+    helper via a new _pending_indicator_file staging-path helper (pid +
+    time + a per-process monotonic counter), matching the pattern already
+    used by SessionStore.pm/Auth.pm/Collector.pm/CLI/Ask.pm/Zipper.pm.
+    Added t/204-indicatorstore-pending-path-symlink.t, a regression test
+    that plants a symlink at the historical predictable path and asserts
+    the victim file is untouched and the real indicator file ends up a
+    regular file with correct content. Updated
+    docs/pending-file-staging-paths-across-the-codebase.md to add
+    IndicatorStore as the 7th migrated site. Filed DD-999 (pre-existing
+    500-line module-size overage) and DD-1000 (unaudited lock-file symlink
+    exposure, low severity) as separate, out-of-scope follow-ups found
+    during this ticket's audits.
+
+4.66  2026-09-21
+
+  - DD-993: fixed a CI-only, warnings-FATAL build failure ("Prototype
+    mismatch: sub Developer::Dashboard::RuntimeManager::sleep (;$) vs
+    (;@)") in t/100-runtimemanager-coverage.t and
+    t/106-runtimemanager-coverage-2.t. RuntimeManager.pm imports its
+    "sleep" from Time::HiRes, so RuntimeManager::sleep is an alias whose
+    prototype is whatever the running Perl's Time::HiRes gives sleep() -
+    "(;$)" on the Perl 5.44 GitHub Actions used, "(;@)" on the Perl 5.40.1
+    this project's own Docker image bundles, which is why the bug was
+    invisible locally. Both coverage files installed their test-only mock
+    of RuntimeManager::sleep as a permanent (non-local) typeglob
+    assignment guarded only by "no warnings 'redefine'", which does not
+    cover Perl's separate 'prototype' warning category - even an
+    unprototyped override mismatches "(;$) vs none" once only 'redefine'
+    is silenced. Fixed by silencing both categories together
+    ("no warnings qw(redefine prototype);") and dropping the mock's own
+    explicit prototype. Added
+    t/203-runtimemanager-sleep-mock-prototype.t, a deterministic,
+    Perl-version-independent regression test for the mechanism, and a new
+    system-scoped section in docs/expected-warnings-in-tests.md on
+    overriding subs imported (not locally declared) from another module.
+
+4.65  2026-09-21
+
+  - DD-941: t/15-release-metadata.t's retired-internal-wording gate
+    (unlike $doc, qr/\blegacy\b/i) correctly bans that retired wording,
+    case-insensitively, in shipped docs/POD, but FIXED_BUGS.md's
+    append-only DD-931 (4.37) and DD-933 (4.42) entries legitimately
+    reference the real, current,
+    shipping identifier __PAX_RUNTIME_LEGACY_NAMESPACE__ and describe it in
+    prose as a "legacy-namespace alias" - the DD-931 entry uses that phrase
+    without the literal identifier present on the same line, so an
+    identifier-only exemption did not close the gate (owner decision,
+    Q-179). Widened the allow-list (a new _strip_legacy_namespace_mentions
+    helper in t/15-release-metadata.t) to also strip the phrase
+    "legacy-namespace" case-insensitively before the check runs, alongside
+    the existing identifier exemption, while a genuinely retired bare
+    mention of that same banned term anywhere else still fails the gate.
+    No FIXED_BUGS.md entry was reworded.
+
+4.64  2026-09-21
+
+  - DD-926: pax build's intermediate build cache directory
+    (.pax-launcher-build, under Developer::Dashboard::Pax::StandaloneImage's
+    _compile_launcher) was a single literal path shared by every uid that
+    ever built against the same output parent directory (commonly bare
+    /tmp). A root-owned build (e.g. from inside a developer-dashboard:latest
+    container) left it root-owned, permanently breaking every later
+    non-root build sharing that output parent with a Permission Denied that
+    did not self-clear. Namespaced the directory per invoking uid
+    (.pax-launcher-build-<uid>, via a new _pax_launcher_build_dir_name
+    helper), the same technique File::Temp uses to avoid this exact
+    shared-/tmp collision class. Cache reuse within one uid's repeated
+    builds is unchanged.
+
+4.63  2026-09-21
+
+  - DD-986: CLI/Skills.pm kept its own private _render_table/_format_row,
+    left out of DD-773's consolidation of Files.pm/Paths.pm/Which.pm onto
+    the shared Developer::Dashboard::CLI::TableHelpers::render_table.
+    Confirmed via grep of every real call site that its ANSI-stripping
+    behavior (_plain_text) was dead weight - the only content-producing
+    helpers feeding cells return hardcoded plain text. Migrated Skills.pm
+    onto the shared helper, removed ~40 lines of duplicated code, verified
+    byte-identical output for representative skill-list data.
+
+4.62  2026-09-21
+
+  - DD-984: Developer::Dashboard.pm's "Layered Env Files" POD section had
+    no cross-reference to DD-979's env->include/# include feature,
+    documented ~2500 lines later with no backlink either. Added a pointer
+    paragraph in both directions; README.md regenerated.
+
+4.61  2026-09-21
+
+  - DD-985: fixed a path-traversal vulnerability (CWE-22) in
+    'dashboard of'/open-file's exact-match fast path
+    (_scope_relative_path_match). A '..' segment in the search
+    pattern escaped the resolved scope directory entirely, so
+    ordinary usage such as 'dashboard of myproject ../../.ssh
+    id_rsa' could open or print any file readable by the invoking
+    user, with no special flag required. Fixed by resolving through
+    the project's existing lexical containment helper
+    (_contained_cache_path, the same one DD-498's Zip Slip fix
+    established) instead of a second bespoke check. The
+    regex-search fallback path was confirmed structurally
+    non-vulnerable and left untouched.
+
+4.60  2026-09-21
+
+  - DD-979: new .env/.env.pl skill include feature. A "# include
+    <foo.bar>" comment directive in a plain .env file (or "# include
+    <foo.bar.*>" to also pull in every nested sub-skill) loads that
+    skill's own .env/.env.pl into the current environment on request;
+    env->include('foo.bar') does the same programmatically from a
+    .env.pl file after `use Developer::Dashboard;`. env is a real
+    second package (Perl resolves a bareword before -> as a literal
+    package name at parse time, so it cannot be a plain exported sub
+    like d2). Included variables are namespaced
+    <UPPERCASE.DOTTED.PATH with single underscores>__<name> (foo.bar's
+    BOB=1 becomes FOO_BAR__BOB), resolved DD-OOP-LAYERS-style across
+    every layer with deeper layers winning without dropping
+    shallower-only keys. Hardened against a path-traversal exposure
+    found during implementation (a spec like "../.." surviving the
+    dot-split as a bare "/" segment) with an explicit _valid_segment()
+    guard. New module Developer::Dashboard::EnvInclude, 100.0/100.0/
+    100.0/100.0 coverage, 42 new tests, new SYSTEM-scoped doc
+    docs/env-skill-include-directive.md.
+
+4.59  2026-09-21
+
+  - DD-978: the parallel gap to DD-977, for file_aliases instead of
+    path_aliases - a skill's own config/config.json file_aliases block
+    was completely invisible to cdr/d2 paths. Added
+    Config::_skill_file_aliases() (an exact parallel to DD-977's
+    _skill_path_aliases()), merged into file_aliases(). Same
+    skill-name qualification convention, same OOP-LAYERS-safe-by-
+    construction merge behavior. Verified with 20 new tests and a
+    live end-to-end docker probe.
+
+4.58  2026-09-21
+
+  - DD-977: a skill's own config/config.json path_aliases block was
+    completely invisible to cdr/d2 paths - Config::path_aliases()
+    only ever read the top-level project/global merged config key.
+    Added Config::_skill_path_aliases(), which merges in each
+    installed skill's own path_aliases, qualified by skill name
+    (skill.alias). Verified OOP-LAYERS recursive merge with two real
+    layers of one skill. file_aliases has the identical gap, tracked
+    separately as DD-978.
+
+4.57  2026-09-19
+
+  - DD-964: docs/pax-coverage-measurement.md's follow-up-work pointer
+    cited DD-929, which is now closed (done-not-released) and never
+    did that follow-up. Filed DD-967 as the real open follow-up ticket
+    and updated the doc to cite it instead.
+
+4.56  2026-09-19
+
+  - DD-929: lib/Developer/Dashboard/Pax/*.pm was entirely absent (zero
+    rows) from every Devel::Cover run - a PAX-compiled binary's extraction
+    root gets spliced onto PERL5LIB before exec, and Devel::Cover's
+    default startup behavior silently ignores anything already on @INC
+    at that point. The extraction path was already stable
+    (content-addressed by source_hash); the missing piece was telling
+    Devel::Cover to -select it explicitly. Added
+    Developer::Dashboard::Pax::CoverageSelect (4 tested helper
+    functions) and t/200-pax-coverage-select.t (32 tests, including a
+    live build-and-run integration check), plus
+    docs/pax-coverage-measurement.md documenting the mechanism.
+
+4.55  2026-09-18
+
+  - DD-958: Platform.pm's resolve_runnable_file (lines 183-184) and
+    command_argv_for_path (line 226/227's Windows fallback) each had an
+    untested direction, on both the forced-Windows side and its natural
+    Linux counterpart - Devel::Cover's true/false columns track the
+    literal written condition, not its display-rewritten "unless" text.
+    Added 4 targeted test assertions to t/84-platform-coverage.t (2
+    forced via the project's established local $OS_NAME override, 2
+    natural-Linux counterparts); Platform.pm now 100.0 on all 4
+    Devel::Cover metrics. New SYSTEM-scoped page
+    docs/forced-windows-unit-tests.md documents the override convention.
+
+4.54  2026-09-18
+
+  - DD-928: Zipper.pm's load_saved_ajax_code open()-failure branch now
+    carries a correct `# uncoverable branch true` annotation (it had
+    none), restoring 100.0 branch coverage - the failure path is only
+    reachable as a non-root user, and gate containers run as root.
+    Extends docs/uncoverable-annotations.md with the underlying
+    mechanism: Devel::Cover rewrites `EXPR or STATEMENT` as
+    `unless(EXPR){STATEMENT}`, inverting true/false from the naive
+    reading.
+
+4.53  2026-09-18
+
+  - DD-953: measured PAX self-compiled vs interpreter speed for the 7
+    data-query CLI commands (jq/yq/tomq/propq/iniq/csvq/xmlq) against an
+    equivalent ~50,000-record fixture, in a developer-dashboard:latest
+    container - documented in docs/pax-alpine-and-runtime-speed-measured.md.
+    Finding: the compiled binary was slower on every command (1.2x-6.4x),
+    the opposite of the earlier dashboard-version benchmark - a real
+    parsing workload's own cost dominates the standalone binary's
+    unpacking overhead. No code changes; a measurement/documentation
+    ticket only.
+
+4.52  2026-09-18
+
+  - DD-951: skills using Go now get per-layer module/build cache
+    isolation - `_exec_go_source` sets GOMODCACHE/GOCACHE to a skill
+    layer's own `local/go-cache/` directory whenever a sibling go.mod is
+    found, so two skills declaring different Go module versions never
+    share one global cache. Mirrors DD-823 (Java/Maven) and DD-824
+    (Python/venv). A skill with no go.mod is unaffected.
+
+4.51  2026-09-18
+
+  - DD-946: `dashboard ask`'s direct-API backend (--claude, with a key
+    set) now runs a real Anthropic tool_use round-trip loop instead of a
+    single non-streaming POST, offering two read-only tools (read_file,
+    grep_repo) scoped to the current project root - closing the gap
+    where only the CLI-fallback path could answer genuinely
+    repo-specific questions. A plain question needing no repo search is
+    unchanged (one request, same shape as before).
+
+4.50  2026-09-18
+
+  - DD-952: added Amazon Nova as a dashboard ask backend (--nova), against
+    Nova's own standalone REST endpoint (api.nova.amazon.com/v1/chat/
+    completions, bearer-token auth via NOVA_API_KEY) - the same direct-API
+    shape --claude already uses, not AWS Bedrock/SigV4.
+
+4.49  2026-09-18
+
+  - DD-954: a skill's own cli/__init__.<ext> self-script now runs when
+    it is invoked with no subcommand at all - d2 <skill-name> (bare) and
+    d2 <skill>.<nested-skill> (dotted, when no explicit subcommand file
+    exists) both fall back to it, any extension. An explicit top-level or
+    subcommand always wins over the fallback.
+
+4.48  2026-09-18
+
+  - DD-948: dashboard ask's CLI-fallback backend path (codex/copilot/gemini,
+    or claude with no API key set) now tees its child process's output
+    live to the caller's terminal instead of fully buffering it until the
+    process exits. Switched _run_cli from Capture::Tiny's capture{} to
+    tee{}. The direct-API path is unchanged (real streaming there needs
+    Anthropic SSE wiring, a separate, larger change).
+
+4.47  2026-09-18
+
+  - DD-950: excluded a stray NYTProf profiling artifact (nytprof.out) from
+    the release tarball. dzil's GatherDir gathers from disk, not git, so an
+    untracked, ungitignored leftover file ships exactly like a real source
+    file - the same mechanism that let FIX.md leak into the 4.22 tarball
+    (DD-401). Found auditing DD-947's 4.46 build. Added dist.ini exclusion,
+    .gitignore entries for nytprof.out/nytprof/, and RED-then-GREEN test
+    coverage in t/15-release-metadata.t.
+
+4.46  2026-09-18
+
+  - DD-947: extracted CollectorRunner.pm's command-execution cluster
+    (run_command, await_windows_command, spawn_windows_command,
+    record_command_pid, command_launcher_argv, command_pid_from_file,
+    await_command_pid, forward_command_signal, terminate_command_process,
+    exit_code_from_status) into a new sibling module,
+    Developer::Dashboard::CommandRunner - first cut toward DD-641's
+    1963-line oversized-module finding. Confirmed zero instance-state
+    ($self->{...}) dependency in the 241-line cluster before moving it;
+    every original call site kept as a one-line forwarder so no existing
+    caller changed. CommandRunner.pm reaches 100.0 on all four
+    Devel::Cover metrics. CollectorRunner.pm drops from 1963 to 1754
+    lines.
+
 4.45  2026-09-18
 
   - DD-942: closed Ask.pm's pre-existing branch/condition coverage gap

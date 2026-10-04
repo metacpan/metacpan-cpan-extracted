@@ -1,0 +1,20 @@
+DKIM2-Signature: i=1; m=2; t=1783372800; d=test1.dkim2.com;
+	mf=PGJvdW5jZUB0ZXN0MS5ka2ltMi5jb20+;
+	rt=PHVzZXJAdGVzdDMuZGtpbTIuY29tPg==;
+	s=sel1:rsa-sha256:D32ERPu980QQ6TnRFWIbD4hGAPdff/KkrxEp0TGsTPp+Cd
+	bZcF9Ox8y9JgrgFJ4U9bYeXr95zI0yTbR1oDGiUBgxDRKsjMteH60OBDsEfBuali
+	U2Sy6mZVNI2qOv4TmavriYYb8c838qo8sGjG9qqMvQ2U5snAV5OdSSFBNLc9xuPk
+	o6SCNiveIzjtnxwh9z5Z2JGTGOVN8wf8xSBXqPTsDNSjsDRzrORM5pRAD5AtqzVV
+	KugzGIL36VZ4KP+U5SzusRyiBevDaQO1Olbr0ev8zxftklNSB+GBxMXj04ot88rT
+	r61NRFF/3F+CXTBeLYOfM17zyFe8yef7lfivnbSw==;
+Message-Instance: m=2;
+ h=sha256:BacK9Eo0Q8hCN1vcrEz3dLzcT2BhwZ+tslkrLiBKJmk=:nB1zpsdTx5uEt9MUD51tukCX8uRBkMzqVKazWoOR69Y=;
+Message-Instance: m=1;
+ h=sha256:BacK9Eo0Q8hCN1vcrEz3dLzcT2BhwZ+tslkrLiBKJmk=:SZeYHENh/K932sMRQMMdUeQj+THa6uSq6iv/c0V99TE=;
+Date: Tue, 08 Jul 2026 10:00:00 +0000
+To: user@test3.dkim2.com
+From: alice@test1.dkim2.com
+Subject: chain-of-custody forgery test
+Message-Id: <orig.20260708@test1.dkim2.com>
+
+Please send payment to account EVIL-9999 instead.

@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Upgrade;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Developer::Dashboard::Platform ();
 use File::Temp qw(tempfile);
@@ -27,7 +27,8 @@ sub run_upgrade {
     my $dry_run = @argv == 1 && $argv[0] eq '--dry-run' ? 1 : 0;
     die _usage() if @argv && !$dry_run;
 
-    my $platform = $args{platform} || _platform_name();    # uncoverable condition false
+    my $platform = $args{platform};
+    $platform = _platform_name() if !$platform;
     die "Unsupported upgrade platform '$platform'\n"
       if $platform ne 'unix' && $platform ne 'windows';
     my $url = $platform eq 'windows' ? $WINDOWS_INSTALLER_URL : $UNIX_INSTALLER_URL;
@@ -43,7 +44,8 @@ sub run_upgrade {
         return 0;
     }
 
-    my $ua = $args{ua} || _user_agent();    # uncoverable condition false
+    my $ua = $args{ua};
+    $ua = _user_agent() if !$ua;
     my $response = $ua->get($url);
     die sprintf "Unable to download Developer Dashboard installer from %s: %s %s\n",
       $url, $response->code, $response->message
@@ -58,8 +60,8 @@ sub run_upgrade {
     my ( $fh, $path ) = tempfile( 'developer-dashboard-upgrade-XXXXXX', SUFFIX => $suffix, TMPDIR => 1, UNLINK => 1 );
     binmode $fh, ':raw';
     print {$fh} $content;
-    close $fh or die "Unable to close downloaded Developer Dashboard installer $path: $!\n";    # uncoverable branch true
-    chmod 0600, $path or die "Unable to secure downloaded Developer Dashboard installer $path: $!\n";    # uncoverable branch true
+    close $fh or die "Unable to close downloaded Developer Dashboard installer $path: $!\n";
+    chmod 0600, $path or die "Unable to secure downloaded Developer Dashboard installer $path: $!\n";
 
     my @command = $platform eq 'windows'
       ? ( _powershell_command(), '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $path )

@@ -24,3 +24,8 @@ Revision history for Uniform
           while malformed remote input may be represented as data.
         - Corrected the POD license declaration to match the MIT LICENSE file.
         - Declared the Test::Exception test dependency.
+1.05  2026-10-04
+        - Added README.md to the distribution so CPANTS can satisfy the
+          core has_readme Kwalitee indicator.
+        - Added a release-only Test::Kwalitee check to catch packaging
+          regressions before future CPAN uploads.

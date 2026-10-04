@@ -45,7 +45,7 @@ __DATA__
 Ensure that the environment variables match what is requested, or abort. Module and executable.
 
 
-0.016
+0.018
 
 
 # SYNOPSIS
@@ -104,7 +104,7 @@ There are three kinds of errors:
     "Variable &lt;var\_name> is missing from description"
 
     This error will only be reported if you have set
-    the special option **exact**. See below.
+    the special option **env:exact**. See below.
 
 ## Environment Description Language
 
@@ -115,11 +115,11 @@ similar to a `.env` file.
 ### `.envdesc` Format
 
 In `.envdesc` file there is only environment variables, comments
-or empty rows.
+meta commands or empty rows.
 Example:
 
     # Required env
-    ## envassert (opts: exact=1)
+    ## envassert (opts: env:exact)
     FILENAME=^[[:word:]]{1,}$
 
 Env var name is followed by a regular expression. The regexp is
@@ -135,11 +135,26 @@ You can specify different environment related options with these commands.
 
 Supported options:
 
-- exact
+- env:exact, default: 0
 
-    The option _exact_ means that all allowed env variables
+    The option _env:exact_ means that all allowed env variables
     are described in this file. Any unknown env var causes an error
     when verifying.
+
+    By default, this option if off (false).
+
+- var:required, default: 1
+
+    The option _var:required_ means that the next environment
+    variable defined is required. This is the default assumption.
+    If you set this to "0", the next var definition will became optional.
+    If the variable is present in the current environment,
+    its content will be checked. If it is not present, it will not be checked.
+
+    This is also applies to situation when **env:exact** is true.
+    If the variable is missing, it is will not cause an error.
+
+    By default, this option if on (true).
 
 ## CLI interface without dependencies
 

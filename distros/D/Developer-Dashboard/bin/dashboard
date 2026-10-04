@@ -41,9 +41,8 @@ my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
 my $switchboard_cwd = eval { cwd() };
 my $switchboard_paths;
 
-_maybe_exec_self_compiled_dashboard();
-
 my $cmd = shift @ARGV || '';
+
 _load_runtime_env();
 
 # DD-835 (reverses DD-832): also set before the main gate runs, as an
@@ -54,6 +53,51 @@ $ENV{DEVELOPER_DASHBOARD_COMMAND} = $cmd if $cmd ne '';
 my $main_gate_results = _run_main_gate_hooks( $cmd, @ARGV );
 _prime_command_result_env( $cmd, $main_gate_results, @ARGV ) if $cmd ne '';
 
+if ( $cmd eq 'help' ) {
+    require Developer::Dashboard::CLI::Help;
+    if ( !@ARGV || $ARGV[0] eq '--help' || $ARGV[0] eq '-h' ) {
+        print Developer::Dashboard::CLI::Help::overview_text();
+        exit 0;
+    }
+    if (@ARGV) {
+        my $target = shift @ARGV;
+        my $action;
+        while (@ARGV) {
+            my $candidate = shift @ARGV;
+            my @available = Developer::Dashboard::CLI::Help::actions_for(
+                defined $action ? "$target $action" : $target,
+            );
+            die "Unknown help target '$candidate' for '$target'\n"
+              if !grep { $_ eq $candidate } @available;
+            if ( defined $action ) {
+                $target = "$target $action";
+            }
+            $action = $candidate;
+        }
+        print Developer::Dashboard::CLI::Help::help_text( $target, $action );
+        exit 0;
+    }
+}
+elsif ( $cmd eq '--help' || $cmd eq '-h' ) {
+    require Developer::Dashboard::CLI::Help;
+    print Developer::Dashboard::CLI::Help::overview_text();
+    exit 0;
+}
+elsif ( $cmd ne '' ) {
+    require Developer::Dashboard::InternalCLI;
+    if ( $cmd eq 'version' || Developer::Dashboard::InternalCLI::canonical_helper_name($cmd) ne '' ) {
+        require Developer::Dashboard::CLI::Help;
+        my @request = Developer::Dashboard::CLI::Help::help_request(
+            command => $cmd,
+            args    => \@ARGV,
+        );
+        if (@request) {
+            print Developer::Dashboard::CLI::Help::help_text(@request);
+            exit 0;
+        }
+    }
+}
+
 if ( $cmd eq '' ) {
     pod2usage(
         -exitval  => 1,
@@ -61,13 +105,6 @@ if ( $cmd eq '' ) {
         -sections => [qw(NAME SYNOPSIS)],
     );
 }
-elsif ( $cmd eq 'help' || $cmd eq '--help' || $cmd eq '-h' ) {
-    pod2usage(
-        -exitval => 0,
-        -verbose => 99,
-    );
-}
-
 if ( $cmd eq 'version' ) {
     require Developer::Dashboard;
     print $Developer::Dashboard::VERSION, "\n";
@@ -76,11 +113,6 @@ if ( $cmd eq 'version' ) {
 
 if ( my @helper_command = _builtin_helper_command($cmd) ) {
     my ( $helper_path, @helper_argv ) = @helper_command;
-    if ( !@helper_argv ) {
-        if ( my $cached = _pax_cached_binary_for( $cmd, $helper_path ) ) {
-            _exec_switchboard_command( $cached, @ARGV );
-        }
-    }
     _exec_switchboard_command( $helper_path, @helper_argv, @ARGV );
 }
 
@@ -91,6 +123,11 @@ if ( my $custom_path = _custom_command_path($cmd) ) {
 if ( my ( $skill_name, $skill_command ) = _skill_dotted_command_parts($cmd) ) {
     my $helper_path = _builtin_helper_path('skills');
     _exec_switchboard_command( $helper_path, '_exec', $skill_name, $skill_command, @ARGV );
+}
+
+if ( my $skill_name = _skill_bare_init_command_name($cmd) ) {
+    my $helper_path = _builtin_helper_path('skills');
+    _exec_switchboard_command( $helper_path, '_exec', $skill_name, '__init__', @ARGV );
 }
 
 if ( $cmd ne '' ) {
@@ -430,110 +467,28 @@ sub _skill_dotted_command_parts {
     return ( $skill_name, $skill_command );
 }
 
-# _maybe_exec_self_compiled_dashboard()
-# DD-882 (owner correction, Telegram msg #2001, 2026-09-15): checks whether
-# a fresh PAX-compiled binary is cached for THIS entrypoint's own source
-# file and, if so, execs it directly with the original argv - never blocks
-# on a miss, exactly like every other PaxCache-backed command; a cache miss
-# just falls through to run interpreted, having already triggered a
-# background compile as a side effect of the resolve() call.
-#
-# DD-905 (2026-09-16) temporarily DISABLED the exec side after finding a
-# real PAX-compiled binary of this entrypoint silently corrupted %ENV
-# loading: Developer::Dashboard::EnvLoader's _load_env_file (a plain
-# line-by-line <$fh> read of .env) read the WHOLE file as one "line".
-# DD-922 (2026-09-16) root-caused and fixed THAT defect: the vendored Pax
-# StandaloneRuntime's own _run_script_unit (and its three sibling
-# _run_*_unit dispatchers) localized $/ to slurp ONE JSON metadata file,
-# but that `local $/;` spanned the REST of the sub - including the later
-# `eval $wrapped` that runs the entrypoint's own compiled source. `eval
-# STRING` shares its caller's dynamic scope rather than opening a fresh
-# one, so every real-file read the entrypoint's own code performed (this
-# EnvLoader.pm read included) silently ran in slurp mode too. Fixed by
-# confining each `local $/;` to a bare block around just its own read, so
-# $/ is back to normal before any later `eval` of user/bootstrap source
-# runs. See StandaloneRuntime.pm's own DD-922 comments at each fixed site.
-#
-# DD-930 (2026-09-17) re-DISABLED the exec side again, minutes after DD-922
-# re-enabled it: a REAL self-compiled binary of this entrypoint (run against
-# a project with real .env-adjacent config) now dies with "Can't locate
-# object method 'record' via package '__PAX_RUNTIME_LEGACY_NAMESPACE__::
-# EnvAudit'" - a DIFFERENT, previously-unreachable defect in the vendored
-# Pax CodeUnitCompiler's own narrow special-case handling of EnvLoader.pm's
-# _load_env_pl_file sub (it pattern-matches that sub's source shape and
-# substitutes a custom runtime op whose EnvAudit->record call never
-# resolves in the compiled binary's "legacy namespace"). Never surfaced
-# before DD-922 because self-exec had been off the whole time since DD-905.
-# Re-enable only after DD-930's own root cause is fixed.
-#
-# Guarded by an environment variable so the compiled binary - which embeds
-# this exact same self-check code, since PAX compiles the whole script
-# body - never re-runs the check and never re-execs itself: without the
-# guard, the first real invocation would exec the compiled binary, whose
-# own startup would recompute the identical cache hit and exec itself
-# again, forever. The guard is deleted before falling through to normal
-# dispatch (both on a hit that already exec'd - which never returns here -
-# and on a miss) so a LATER child `dashboard` invocation this same process
-# spawns (a collector, an action) still gets its own independent,
-# unsuppressed self-check rather than inheriting a stale suppression.
-# Also skipped whenever $ENV{HARNESS_ACTIVE} is set (the standard
-# Test::Harness/prove signal, which leaks to any child `dashboard` a test
-# spawns via system()/exec() - see this project's own established lesson on
-# that). Without this, the test suite's habit of using a fresh tempdir HOME
-# per test block turns every one of those blocks into a genuinely new
-# "machine" from PaxCache's per-machine-cache point of view, so each
-# spawns its OWN full real background PAX compile of this ~40-module
-# codebase with zero chance of the cache ever being reused - discovered
-# live when that multiplied into dozens of concurrent real compiles and
-# made t/05-cli-smoke.t alone take 10+ minutes instead of seconds. A real
-# ephemeral/ CI environment has the identical shape (fresh HOME, thrown
-# away after one run), so this is a genuine, not merely test-only,
-# consideration - HARNESS_ACTIVE is the cleanly-available signal for the
-# specific case this project's own suite hits every run.
-# Input: none (reads @ARGV, $Bin, %ENV).
-# Output: never returns on a successful self-exec; otherwise returns.
-sub _maybe_exec_self_compiled_dashboard {
-    return if $ENV{HARNESS_ACTIVE};
-    if ( !$ENV{DEVELOPER_DASHBOARD_PAX_SELF_EXECED} ) {
-        my $self_path = File::Spec->catfile( $Bin, 'dashboard' );
-        if ( -f $self_path ) {
-            require Developer::Dashboard::PaxCache;
-            my $cache = Developer::Dashboard::PaxCache->new( paths => _switchboard_paths() );
-            # DD-930: still resolve() so a background compile stays warm for
-            # whoever fixes the real defect, but never act on a defined hit -
-            # see this sub's own DD-930 comment above for why.
-            $cache->resolve($self_path);
-        }
-    }
-    delete $ENV{DEVELOPER_DASHBOARD_PAX_SELF_EXECED};
-    return;
+# _skill_bare_init_command_name($cmd)
+# DD-954: resolves a bare "dashboard <name>" (no dotted subcommand at all)
+# to an installed skill whose own cli/__init__.<ext> self-script exists, so
+# a skill can be invoked directly without a subcommand. An explicit
+# top-level command (built-in, custom, or an installed skill with its OWN
+# top-level .d2/cli/<name>, all checked earlier in the dispatch chain above)
+# always wins - this only ever runs once nothing more specific matched.
+# Input: top-level command token such as skill-name.
+# Output: skill name string when it resolves to an installed skill carrying
+# its own cli/__init__ self-script, or an empty list otherwise.
+sub _skill_bare_init_command_name {
+    my ($cmd) = @_;
+    return if !defined $cmd || $cmd eq '' || $cmd =~ /\./;
+    require Developer::Dashboard::SkillManager;
+    my $paths = _switchboard_paths();
+    my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
+    my $skill_path = $manager->get_skill_path( $cmd, include_disabled => 1 );
+    return if !$skill_path;
+    return if !resolve_runnable_file( File::Spec->catfile( $skill_path, 'cli', '__init__' ) );
+    return $cmd;
 }
 
-# _pax_cached_binary_for($cmd, $helper_path)
-# Checks whether a fresh PAX-compiled binary is cached for one staged
-# built-in helper, scoped to an explicit small allowlist (DD-877's proof of
-# concept: 'ps1' only) so a first rollout has a small, reversible blast
-# radius. Never blocks: a cache miss triggers a background compile and
-# returns undef so the caller falls through to the normal interpreted exec.
-# Input: top-level command name string and its resolved staged helper path.
-# Output: cached compiled binary path string, or undef.
-my %PAX_CACHE_ELIGIBLE_COMMANDS = ( ps1 => 1 );
-
-sub _pax_cached_binary_for {
-    my ( $cmd, $helper_path ) = @_;
-    return undef if is_windows();
-    return undef if !$PAX_CACHE_ELIGIBLE_COMMANDS{$cmd};
-    return undef if !defined $helper_path || $helper_path eq '';
-    require Developer::Dashboard::PaxCache;
-    my $cache = Developer::Dashboard::PaxCache->new( paths => _switchboard_paths() );
-    return $cache->resolve($helper_path);
-}
-
-# _exec_switchboard_command($path, @argv)
-# Replaces the current dashboard process with a resolved built-in helper or
-# layered custom command target.
-# Input: resolved file or directory path plus argv list for the target command.
-# Output: never returns on success; false when the target is not runnable.
 sub _exec_switchboard_command {
     my ( $path, @argv ) = @_;
     return 0 if !defined $path || $path eq '';
@@ -670,7 +625,7 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard collector stop <name>
   dashboard collector restart <name>
   dashboard housekeeper
-  dashboard skills install <git-url-or-local-dir>
+  dashboard skills install [-b branch] <git-url-or-local-dir>
   dashboard skills enable <repo-name>
   dashboard skills disable <repo-name>
   dashboard skills uninstall <repo-name>
@@ -700,6 +655,7 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard docker list [--enabled|--disabled]
   dashboard docker enable <service> [service...]
   dashboard docker disable <service> [service...]
+  dashboard docker development {enable|disable} <service> [service...]
       dashboard serve [logs [-f] [-n N]|workers <N>] [--host HOST] [--port PORT] [--workers N] [--foreground] [--no-editor|--no-endit] [--no-indicators|--no-indicator]
   dashboard stop
   dashboard restart [--host HOST] [--port PORT] [--workers N]
@@ -746,6 +702,15 @@ execs the resolved helper or custom command
 The real built-in command implementations live outside this entrypoint, either
 in private staged helper scripts under F<share/private-cli/> or in reusable
 Perl modules loaded by those helpers.
+
+Built-in help requests are resolved through the shared CLI help catalog after
+the established main and per-command hook gates have run, but before a helper
+body is dispatched. Root commands and actions accept C<--help>, C<-h>, or a
+trailing C<help>; the global form is C<dashboard help E<lt>commandE<gt>
+[action...]>. Bare C<dashboard help>, C<dashboard --help>, and C<dashboard
+-h> print a concise index of public built-in commands instead of this full
+manual. Shell completion calls the same catalog-backed C<dashboard
+complete> command for public command, action, and option candidates.
 
 =head2 The main gate
 

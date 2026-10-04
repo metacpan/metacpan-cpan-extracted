@@ -3,7 +3,7 @@ package Developer::Dashboard::Codec;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Exporter 'import';
 use IO::Compress::Gzip qw(gzip $GzipError);
@@ -20,7 +20,7 @@ sub encode_payload {
     my ($text) = @_;
     return if !defined $text;
 
-    gzip \$text => \my $zipped    # uncoverable branch true
+    gzip \$text => \my $zipped
       or die "gzip failed: $GzipError";
 
     return encode_base64( $zipped, '' );

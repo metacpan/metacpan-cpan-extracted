@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
+use Capture::Tiny qw(capture);
 use Test::More;
 use Cwd qw(abs_path cwd);
 use File::Basename qw(dirname);
@@ -38,6 +39,9 @@ use Developer::Dashboard::CLI::Ticket qw(
 use Developer::Dashboard::Config      ();
 use Developer::Dashboard::FileRegistry ();
 use Developer::Dashboard::PathRegistry ();
+use Developer::Dashboard::JSON qw(json_encode);
+
+my $repo = abs_path('.');
 
 # Warnings are fatal in this repository: collect any and assert none escaped.
 my @warnings;
@@ -148,6 +152,109 @@ my $ws_env_file = File::Spec->catfile( abs_path($ws_dir), '.env' );
 {
     is( registered_workspace_dir( File::Spec->rootdir ), File::Spec->rootdir, 'registered_workspace_dir passes an absolute path straight through' );
     is( registered_workspace_dir('dd-ticket-unregistered-workspace'), '', 'registered_workspace_dir returns empty for a name no layer registers' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::resolve_dir = sub { die "unexpected resolver failure\n" };
+    like(
+        error_from( sub { registered_workspace_dir('bar.root') } ),
+        qr/unexpected resolver failure/,
+        'registered_workspace_dir propagates real path resolver errors instead of treating them as absent aliases',
+    );
+}
+
+{
+    my $skill_target = File::Spec->catdir( $home, 'skill-project' );
+    my $skill_config = File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'bar', 'config', 'config.json' );
+    make_path($skill_target);
+    write_file( $skill_config, json_encode( { path_aliases => { foo => $skill_target } } ) );
+
+    is( registered_workspace_dir('bar.foo'), $skill_target,
+        'registered_workspace_dir resolves a path alias qualified by its owning skill' );
+
+    my $old_cwd = cwd();
+    my $plan = run_workspace_command(
+        args   => ['bar.foo'],
+        tmux   => ok_tmux(),
+        attach => sub { return { exit_code => 0 } },
+    );
+    is( $plan->{session}, 'bar.foo', 'workspace keeps the qualified skill alias as the tmux session name' );
+    is( $plan->{cwd}, $skill_target, 'workspace alias starts the session in its resolved skill path without requiring -c' );
+    chdir $old_cwd or die "Unable to restore cwd to $old_cwd: $!";
+}
+
+{
+    my $skill_root = File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'bar' );
+    my $nested_root = File::Spec->catdir( $skill_root, 'skills', 'baz' );
+    my $deep_root = File::Spec->catdir( $nested_root, 'skills', 'qux' );
+    my $skill_target = File::Spec->catdir( $home, 'folder-project' );
+    my $nested_target = File::Spec->catdir( $home, 'nested-folder-project' );
+    my $deep_target = File::Spec->catdir( $home, 'deep-folder-project' );
+    my $configured_target = File::Spec->catdir( $home, 'configured-folder-project' );
+    make_path( $skill_target, $nested_target, $deep_target, $configured_target );
+    write_file(
+        File::Spec->catfile( $skill_root, 'lib', 'Folder.pm' ),
+        "package Folder; sub __list__ { return qw(root collision); } sub root { return '$skill_target'; } sub collision { return '$skill_target'; } 1;\n",
+    );
+    write_file(
+        File::Spec->catfile( $skill_root, 'config', 'config.json' ),
+        json_encode( { path_aliases => { collision => $configured_target } } ),
+    );
+    write_file(
+        File::Spec->catfile( $nested_root, 'lib', 'Folder.pm' ),
+        "package Folder; sub __list__ { return qw(nested); } sub nested { return '$nested_target'; } 1;\n",
+    );
+    write_file(
+        File::Spec->catfile( $deep_root, 'lib', 'Folder.pm' ),
+        "package Folder; sub __list__ { return qw(leaf); } sub leaf { return '$deep_target'; } 1;\n",
+    );
+
+    for my $case (
+        [ 'bar.root',       $skill_target,  'top-level skill Folder.pm alias' ],
+        [ 'bar.baz.nested', $nested_target, 'nested skill Folder.pm alias' ],
+        [ 'bar.baz.qux.leaf', $deep_target, 'deeper nested skill Folder.pm alias' ],
+    ) {
+        my ( $alias, $target, $label ) = @{$case};
+        is( registered_workspace_dir($alias), $target, "registered_workspace_dir resolves $label" );
+        my $old_cwd = cwd();
+        my $plan = run_workspace_command(
+            args   => [ $alias, '-c' ],
+            tmux   => ok_tmux(),
+            attach => sub { return { exit_code => 0 } },
+        );
+        is( $plan->{cwd}, $target, "workspace -c starts in the $label target" );
+        chdir $old_cwd or die "Unable to restore cwd to $old_cwd: $!";
+    }
+    is( registered_workspace_dir('bar.collision'), $configured_target,
+        'configured skill path aliases take precedence over same-named Folder.pm methods' );
+
+    my $fake_bin = File::Spec->catdir( $home, 'fake-tmux-bin' );
+    my $tmux_trace = File::Spec->catfile( $home, 'tmux.trace' );
+    my $fake_tmux = File::Spec->catfile( $fake_bin, 'tmux' );
+    write_file(
+        $fake_tmux,
+        "#!/bin/sh\nprintf '%s|%s\\n' \"\$PWD\" \"\$*\" >> \"\$TMUX_TRACE\"\n[ \"\$1\" = has-session ] && exit 1\nexit 0\n",
+    );
+    chmod 0755, $fake_tmux or die "Unable to chmod $fake_tmux: $!";
+    {
+        local $ENV{PATH} = "$fake_bin:$ENV{PATH}";
+        local $ENV{TMUX_TRACE} = $tmux_trace;
+        my ( $stdout, $stderr, $exit ) = capture {
+            system $^X, "-I" . File::Spec->catdir( $repo, 'lib' ),
+              File::Spec->catfile( $repo, 'bin', 'd2' ),
+              'workspace', 'bar.baz.qux.leaf', '-c';
+            return $? >> 8;
+        };
+        is( $exit, 0, 'd2 workspace -c accepts a deepest nested skill Folder.pm alias through the public short entrypoint' );
+        is( $stderr, '', 'public workspace alias resolution emits no error' );
+        open my $trace_fh, '<', $tmux_trace or die "Unable to read $tmux_trace: $!";
+        local $/;
+        my $trace = <$trace_fh>;
+        close $trace_fh or die "Unable to close $tmux_trace: $!";
+        like( $trace, qr/\Q$deep_target\E\|new-session .* -c \Q$deep_target\E/s,
+            'public workspace CLI creates its tmux session in the deepest Folder.pm target' );
+    }
 }
 
 {
@@ -618,6 +725,15 @@ like( error_from( sub { session_exists() } ), qr/Missing session name/, 'session
 
 is( session_exists( session => 'DD-1', tmux => ok_tmux() ), 1, 'session_exists reports an existing session' );
 is( session_exists( session => 'DD-1', tmux => tmux_stub( sub { return { exit_code => 1 } } ) ), 0, 'session_exists reports a missing session' );
+{
+    my @session_query;
+    session_exists(
+        session => 'ch.docker',
+        tmux    => tmux_stub( sub { @session_query = @_; return { exit_code => 0 } } ),
+    );
+    is_deeply( \@session_query, [ 'has-session', '-t', 'ch_docker' ],
+        'session_exists uses tmux-normalized names when a workspace contains dots' );
+}
 
 {
     my $err = error_from( sub { session_exists( session => 'DD-1', tmux => tmux_stub( sub { return { exit_code => 2, stderr => "inspect refused\n", stdout => "inspect detail\n" } } ) ) } );
@@ -642,6 +758,15 @@ is_deeply(
     [ 'alpha', 'beta' ],
     'list_sessions splits session names on either line ending and drops blank lines',
 );
+
+is( Developer::Dashboard::CLI::Ticket::_tmux_session_name('ch.docker'), 'ch_docker',
+    '_tmux_session_name mirrors tmux period-to-underscore normalization' );
+is( Developer::Dashboard::CLI::Ticket::_tmux_session_name('DD-123'), 'DD-123',
+    '_tmux_session_name leaves ordinary workspace references unchanged' );
+like( error_from( sub { Developer::Dashboard::CLI::Ticket::_tmux_session_name() } ), qr/Missing session name/,
+    '_tmux_session_name rejects an absent workspace reference' );
+like( error_from( sub { Developer::Dashboard::CLI::Ticket::_tmux_session_name('') } ), qr/Missing session name/,
+    '_tmux_session_name rejects an empty workspace reference' );
 is_deeply( [ list_sessions( tmux => tmux_stub( sub { return { exit_code => 1 } } ) ) ], [], 'list_sessions reports no sessions when tmux has no server running' );
 
 {
@@ -674,11 +799,237 @@ is_deeply( [ list_sessions( tmux => tmux_stub( sub { return { exit_code => 1 } }
     my $create_plan = build_ticket_plan( args => ['DD-3'], cwd => $ws_dir, tmux => tmux_stub( sub { return { exit_code => 1 } } ) );
     is( $create_plan->{cwd},    $ws_dir, 'build_ticket_plan honours an explicit session cwd' );
     is( $create_plan->{create}, 1,       'build_ticket_plan asks for creation when the session does not exist' );
+    is( $create_plan->{tmux_session}, 'DD-3', 'build_ticket_plan records the exact tmux session name separately from the workspace reference' );
     is_deeply( $create_plan->{attach_argv}, [ 'attach-session', '-t', 'DD-3' ], 'build_ticket_plan builds the attach argv for the resolved session' );
     is( $create_plan->{create_argv}[0], 'new-session', 'build_ticket_plan builds a detached new-session argv' );
 }
 
 # --- run_workspace_command / run_ticket_command -----------------------------
+
+{
+    my @calls;
+    my $has_session_calls = 0;
+    my $tmux = sub {
+        my (%args) = @_;
+        my @argv = @{ $args{args} || [] };
+        push @calls, [@argv];
+        if ( $argv[0] eq 'has-session' ) {
+            $has_session_calls++;
+            return { exit_code => $has_session_calls == 1 ? 1 : 0 };
+        }
+        if ( $argv[0] eq 'new-session' ) {
+            return { exit_code => 1, stderr => "duplicate session: ch.docker\n" };
+        }
+        return { exit_code => 0 };
+    };
+    my @attached;
+    my $old_cwd = cwd();
+    my $plan = run_workspace_command(
+        args       => [ 'ch.docker', '-c' ],
+        resolve_dir => sub { return $ws_dir },
+        tmux       => $tmux,
+        attach     => sub { my (%args) = @_; push @attached, $args{args}; return { exit_code => 0 } },
+    );
+    chdir $old_cwd or die "Unable to restore cwd to $old_cwd: $!";
+    is( $plan->{exists}, 1, 'run_workspace_command accepts a duplicate-session response after confirming the session now exists' );
+    is( $plan->{create}, 0, 'run_workspace_command updates its plan when another caller created the session first' );
+    is( $has_session_calls, 2, 'run_workspace_command rechecks session state only after a failed create' );
+    is( scalar( grep { $_->[0] eq 'new-session' } @calls ), 1, 'run_workspace_command makes only one create attempt for a racing session' );
+    my ($create_call) = grep { $_->[0] eq 'new-session' } @calls;
+    my ($session_flag) = grep { $create_call->[$_] eq '-s' } 0 .. $#{$create_call};
+    is( $create_call->[ $session_flag + 1 ], 'ch_docker', 'run_workspace_command creates dotted workspaces under tmux-normalized names' );
+    is_deeply( $attached[0], [ 'attach-session', '-t', 'ch_docker' ], 'run_workspace_command attaches using the tmux-normalized session target' );
+}
+
+{
+    my $has_session_calls = 0;
+    my $tmux = sub {
+        my (%args) = @_;
+        my $operation = $args{args}[0];
+        return { exit_code => ++$has_session_calls <= 2 ? 1 : 0 } if $operation eq 'has-session';
+        return { exit_code => 1, stderr => "duplicate session: ch.docker\n" } if $operation eq 'new-session';
+        return { exit_code => 0 };
+    };
+    like(
+        error_from( sub { run_workspace_command( args => ['ch.docker'], tmux => $tmux, attach => sub { return { exit_code => 0 } } ) } ),
+        qr/Unable to create tmux ticket session 'ch\.docker': duplicate session/,
+        'run_workspace_command reports the duplicate when a successful session recheck still finds no session',
+    );
+}
+
+{
+    my $has_calls = 0;
+    my $tmux = sub {
+        my (%args) = @_;
+        my @argv = @{ $args{args} || [] };
+        if ( $argv[0] eq 'has-session' ) {
+            $has_calls++;
+            return { exit_code => 1 } if $has_calls == 1;
+            return { exit_code => 2, stderr => "server unavailable\n" };
+        }
+        return { exit_code => 1, stderr => "duplicate session: ch.docker\n" }
+          if $argv[0] eq 'new-session';
+        return { exit_code => 0 };
+    };
+    my $err = error_from(
+        sub {
+            run_workspace_command(
+                args        => ['ch.docker'],
+                tmux        => $tmux,
+                resolve_dir => sub { return undef },
+                attach      => sub { return { exit_code => 0 } },
+            );
+        }
+    );
+    like( $err, qr/Unable to create tmux ticket session 'ch\.docker': duplicate session/,
+        'run_workspace_command preserves a duplicate error when the recheck says the session is still absent' );
+}
+
+{
+    my $has_calls = 0;
+    my $tmux = sub {
+        my (%args) = @_;
+        my @argv = @{ $args{args} || [] };
+        if ( $argv[0] eq 'has-session' ) {
+            $has_calls++;
+            return { exit_code => 1 } if $has_calls == 1;
+            return { exit_code => 2, stderr => "server unavailable\n" };
+        }
+        return { exit_code => 1, stderr => "duplicate session: ch.docker\n" }
+          if $argv[0] eq 'new-session';
+        return { exit_code => 2, stderr => "server unavailable\n" };
+    };
+    my $err = error_from(
+        sub {
+            run_workspace_command(
+                args   => ['ch.docker'],
+                tmux   => $tmux,
+                attach => sub { return { exit_code => 0 } },
+            );
+        }
+    );
+    like( $err, qr/duplicate session: ch\.docker.*Session recheck failed: Unable to inspect tmux session 'ch\.docker': server unavailable/s,
+        'run_workspace_command reports both the create race and failed confirmation query' );
+}
+
+{
+    my @attached;
+    my $tmux = sub {
+        my (%args) = @_;
+        my @argv = @{ $args{args} || [] };
+        return { exit_code => 0 }
+          if $argv[0] eq 'has-session';
+        return { exit_code => 0, stdout => "WORKSPACE_REF=ch_docker\n" }
+          if $argv[0] eq 'show-environment' && $argv[-1] eq 'WORKSPACE_REF';
+        return { exit_code => 0 };
+    };
+    my $err = error_from(
+        sub {
+            run_workspace_command(
+                args   => ['ch.docker'],
+                tmux   => $tmux,
+                attach => sub { my (%args) = @_; push @attached, $args{args}; return { exit_code => 0 } },
+            );
+        }
+    );
+    like( $err, qr/Tmux session 'ch_docker' belongs to workspace 'ch_docker', not 'ch\.docker'/,
+        'run_workspace_command refuses to attach to an unrelated workspace that collides after tmux dot normalization' );
+    is( scalar @attached, 0, 'run_workspace_command does not attach after detecting a normalized-name collision' );
+}
+
+{
+    like(
+        error_from( sub { Developer::Dashboard::CLI::Ticket::_verify_workspace_session_identity( tmux_session => 'ch_docker' ) } ),
+        qr/Missing workspace name/,
+        '_verify_workspace_session_identity requires a logical workspace name',
+    );
+    like(
+        error_from( sub { Developer::Dashboard::CLI::Ticket::_verify_workspace_session_identity( workspace => 'ch.docker' ) } ),
+        qr/Missing session name/,
+        '_verify_workspace_session_identity requires a normalized tmux session name',
+    );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CLI::Ticket::tmux_command = sub { return { exit_code => 1 }; };
+        is(
+            Developer::Dashboard::CLI::Ticket::_verify_workspace_session_identity(
+                workspace    => 'ch.docker',
+                tmux_session => 'ch_docker',
+                tmux         => undef,
+            ),
+            1,
+            '_verify_workspace_session_identity accepts tmux absence as the ordinary missing-session result',
+        );
+    }
+
+    is(
+        Developer::Dashboard::CLI::Ticket::_verify_workspace_session_identity(
+            workspace    => 'ch.docker',
+            tmux_session => 'ch_docker',
+            tmux         => tmux_stub( sub { return { exit_code => 0, stdout => "WORKSPACE_REF=ch.docker\n" } } ),
+        ),
+        1,
+        '_verify_workspace_session_identity accepts the matching logical workspace environment',
+    );
+    is(
+        Developer::Dashboard::CLI::Ticket::_verify_workspace_session_identity(
+            workspace    => 'ch.docker',
+            tmux_session => 'ch_docker',
+            tmux         => tmux_stub( sub { return { exit_code => 0, stdout => "WORKSPACE_REF=\n" } } ),
+        ),
+        1,
+        '_verify_workspace_session_identity accepts a present but empty workspace marker as unowned',
+    );
+    like(
+        error_from(
+            sub {
+                Developer::Dashboard::CLI::Ticket::_verify_workspace_session_identity(
+                    workspace    => 'ch.docker',
+                    tmux_session => 'ch_docker',
+                    tmux         => tmux_stub( sub { return { exit_code => 2, stderr => "query failed\n" } } ),
+                );
+            }
+        ),
+        qr/Unable to verify tmux workspace session 'ch_docker': query failed/,
+        '_verify_workspace_session_identity reports a tmux query error',
+    );
+    like(
+        error_from(
+            sub {
+                Developer::Dashboard::CLI::Ticket::_verify_workspace_session_identity(
+                    workspace    => 'ch.docker',
+                    tmux_session => 'ch_docker',
+                    tmux         => tmux_stub( sub { return { exit_code => 2, stderr => '', stdout => 'query output' } } ),
+                );
+            }
+        ),
+        qr/Unable to verify tmux workspace session 'ch_docker': query output/,
+        '_verify_workspace_session_identity preserves stdout when tmux stderr is empty',
+    );
+    like(
+        error_from(
+            sub {
+                Developer::Dashboard::CLI::Ticket::_verify_workspace_session_identity(
+                    workspace    => 'ch.docker',
+                    tmux_session => 'ch_docker',
+                    tmux         => tmux_stub( sub { return { exit_code => 2, stderr => 'query stderr', stdout => '' } } ),
+                );
+            }
+        ),
+        qr/Unable to verify tmux workspace session 'ch_docker': query stderr/,
+        '_verify_workspace_session_identity preserves stderr when tmux stdout is empty',
+    );
+    is(
+        Developer::Dashboard::CLI::Ticket::_verify_workspace_session_identity(
+            workspace    => 'ch.docker',
+            tmux_session => 'ch_docker',
+            tmux         => tmux_stub( sub { return { exit_code => 1 } } ),
+        ),
+        1,
+        '_verify_workspace_session_identity treats exit status one as a missing session',
+    );
+}
 
 {
     my $tmux = tmux_stub(
@@ -743,6 +1094,39 @@ is_deeply( [ list_sessions( tmux => tmux_stub( sub { return { exit_code => 1 } }
     my $plan = run_workspace_command( args => [ '-c', 'DD-7' ], tmux => ok_tmux(), resolve_dir => sub { return $ws_dir } );
     is( $plan->{cwd}, $ws_dir, 'run_workspace_command changes into the resolved workspace directory before planning the session' );
     chdir $home or die "Unable to chdir to $home: $!";
+
+    my $alias_plan = run_workspace_command( args => ['DD-7A'], tmux => ok_tmux(), resolve_dir => sub { return $ws_dir } );
+    is( $alias_plan->{cwd}, $ws_dir, 'run_workspace_command also changes into a resolved path alias without -c' );
+    chdir $home or die "Unable to restore cwd after path alias test: $!";
+    my $unresolved_plan = run_workspace_command( args => ['DD-7B'], tmux => ok_tmux(), resolve_dir => sub { return undef } );
+    ok( $unresolved_plan->{cwd}, 'run_workspace_command keeps the normal cwd when the workspace is not a path alias' );
+
+    my $blocked_dir = File::Spec->catdir( $home, 'blocked-workspace-directory' );
+    make_path($blocked_dir);
+    SKIP: {
+        chmod 0000, $blocked_dir or skip 'chmod not honored on this filesystem', 2;
+        if ( opendir my $probe, $blocked_dir ) {
+            closedir $probe or die "Unable to close permission probe for $blocked_dir: $!";
+            chmod 0700, $blocked_dir or die "Unable to restore permissions on $blocked_dir: $!";
+            skip 'running root can still access a mode-0000 directory', 2;
+        }
+        my $chdir_error = error_from( sub {
+            run_workspace_command( args => ['DD-7C'], tmux => ok_tmux(), resolve_dir => sub { return $blocked_dir } );
+        } );
+        like( $chdir_error, qr/Unable to change directory to .*blocked-workspace-directory.*for workspace path alias 'DD-7C'/,
+            'run_workspace_command reports a real chdir failure for an inaccessible directory' );
+        $chdir_error = error_from( sub {
+            run_workspace_command( args => [ '-c', 'DD-7D' ], tmux => ok_tmux(), resolve_dir => sub { return $blocked_dir } );
+        } );
+        like( $chdir_error, qr/Unable to change directory to .*blocked-workspace-directory.*for workspace 'DD-7D'/,
+            'run_workspace_command reports a real chdir failure for an inaccessible -c target' );
+        chmod 0700, $blocked_dir or die "Unable to restore permissions on $blocked_dir: $!";
+    }
+    my $file_error = error_from( sub {
+        run_workspace_command( args => ['DD-7E'], tmux => ok_tmux(), resolve_dir => sub { return File::Spec->catfile( $ws_dir, '.env' ) } );
+    } );
+    like( $file_error, qr/Workspace path alias 'DD-7E' resolves to .*which is not a directory/,
+        'run_workspace_command refuses a non-directory path alias without -c' );
 }
 
 {
@@ -944,18 +1328,26 @@ coverage.
 =head1 WHEN TO USE
 
 Use this file when changing how the helper picks a workspace name, what tmux
-environment variables a session is seeded with, how the top status row is
+environment variables a session is seeded with, how concurrent duplicate
+session creation is handled, how the top status row is
 composed, how C<-c> resolves a registered directory, or how tmux failures are
-reported back to the user - and whenever the coverage gate reports an
-uncovered branch or condition in the ticket helper.
+reported back to the user. It also pins path-alias chdir failures for both the
+ordinary and C<-c> forms - and whenever the coverage gate reports an
+uncovered branch or condition in the ticket helper. Skill aliases are checked
+at root, nested, and deeper skill levels; a public CLI subprocess with a fake
+tmux verifies the actual C<workspace -c> handoff.
 
 =head1 HOW TO USE
 
 Run C<prove -lv t/91-cli-ticket-coverage.t> while iterating, then keep it green
 under C<prove -lr t> and under the Devel::Cover run before release. The test is
-hermetic: it roots HOME at a temporary directory, moves the process into it,
-and resolves both C<tmux> and C<dashboard> through stub executables it writes
-itself, so it never contacts a real tmux server.
+hermetic: it roots HOME at a temporary directory and moves the process into
+it. A public-entrypoint subprocess invokes C<bin/d2> with a fake C<tmux>, so
+C<workspace -c> is verified through the short command without contacting a
+real tmux server. A race fixture makes the initial existence query miss a
+session, returns tmux's duplicate-session error on creation, and confirms the
+second query controls whether attachment proceeds; an unconfirmed duplicate
+and a failed confirmation query remain visible errors.
 
 =head1 WHAT USES IT
 

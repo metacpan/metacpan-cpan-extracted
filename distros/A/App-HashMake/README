@@ -1,0 +1,55 @@
+App-HashMake
+
+HashMake is a make-like tool that uses the hash value of a target file rather
+than comparing the timestamps of a target with the dependent files. The hash
+values of targets are stored in a hidden file called .hash_index in the
+directory of the makefile. if a file's hash value has changed, then the actions
+associated with that target are run.
+
+If the target doesn't exist, no action is taken.  Otherwise, we load the index
+file if it exists.  If the target's hash value matches what we have in the
+index, no action is taken; otherwise, if the value is different, or if it's
+missing, we perform the action. That new hash value will cause a new index file
+to be outpout after all targets have been evaluated.
+
+The hashmake command line arguments should match the ones from make.
+
+by default, it will look for a file called Hash-MakeFile, but that name can be
+overrideen with the -f command line argument.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::HashMake
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-HashMake
+
+    GitHub issue tracker
+        https://github.com/talexb/App-HashMake/issues
+
+    Search CPAN
+        https://metacpan.org/release/App-HashMake
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by T. Alex Beamish <talexb@gmail.com>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

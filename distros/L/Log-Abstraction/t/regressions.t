@@ -32,8 +32,8 @@ sub slurp {
 sub mock_syslog {
 	my %calls = (syslog => [], closelog => 0, openlog => 0);
 	my @guards = (
-		mock_scoped('Log::Abstraction::openlog' => sub { $calls{openlog}++ }),
-		mock_scoped('Log::Abstraction::setlogsock' => sub { }),
+		mock_scoped('Sys::Syslog::openlog' => sub { $calls{openlog}++ }),
+		mock_scoped('Sys::Syslog::setlogsock' => sub { }),
 		mock_scoped('Sys::Syslog::setlogsock' => sub { }),
 		mock_scoped('Sys::Syslog::syslog' => sub { push @{$calls{syslog}}, [@_] }),
 		mock_scoped('Sys::Syslog::closelog' => sub { $calls{closelog}++ }),

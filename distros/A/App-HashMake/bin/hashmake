@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#  2026-0721: Main script for HashMake. Collect command line arguments, set up
+#  the operating environment.
+
+#  2026-0820: Make these arguments mirror the ones from make(1).
+
+use Getopt::Std;
+
+use lib 'lib';
+
+use App::HashMake;
+
+my @version_info = ( <<VERSION
+Hashmake $App::HashMake::VERSION
+Copyright (c) 2026 by T. Alex Beamish
+License: Artistic License 2.0
+VERSION
+);
+
+{
+    #  v - Show version information and quit. Overrides all other arguments.
+    #  d - Turn on debug info.
+    #  s - Don't output messages.
+    #  n - Print the commands that would be executed.
+    #  f - Specify a non-standard hash.makefile
+    #  y - Working directory (because we can't write to target directory)
+    #  B - Force rebuild (proceed as if there's no index file).
+    #  t - Touch intead of running the commands. (Pretend commands were run.)
+    #  h - Display help
+
+    getopts ( 'vdsnf:y:Bth', \my %opts );
+
+    if ( exists $opts{ v } ) {
+
+      print join ( "\n", @version_info );
+      exit ( 0 );
+    }
+
+    if ( exists $opts{ h } ) {
+
+      #  These options were created to mirror make(1) as much as possible.
+
+      my %help = (
+        'v'      => "Show version information and quit. Overrides all other arguments.",
+        'd'      => "Turn on debug info.",
+        's'      => "Don't output messages.",
+        'n'      => "Print the commands that would be executed.",
+        'f FILE' => "Specify a non-standard hash.makefile. Default is Hash.Makefile,\n" .
+          "          and the environment variable HASH_MAKEFILE can also be used for this.",
+        'y DIR'  => "Working directory (if the target directory is not writable)",
+        'B'      => "Force rebuild (proceed as if there's no index file).",
+        't'      => "Touch intead of running the commands. (Pretend commands were run.)",
+        'h'      => "Show this help and quit. Overrides all other arguments.",
+      );
+
+      print "Usage: hashmake [options]\nOptions:\n\n";
+
+      print join ( "\n",
+        map { sprintf ( " -%-8s%s", $_, $help{ $_ } ) } sort keys %help ) . "\n";
+
+      exit ( 0 );
+    }
+
+    my ( $result, $output ) = App::HashMake::run ( \%opts );
+
+    #  The module just collects the errors and the output but doesn't actually
+    #  output anything. This allows us to do testing without having to capture
+    #  the output.  This may or may not be a smart approach.
+
+    #  If there are errors, output them.
+
+    if ( @{ $output->{ err } } ) {
+
+      print STDERR join ( "\n", @{ $output->{ err } } ) . "\n";
+    }
+
+    #  If there's output, and we're not in silent mode, output it.
+
+    if ( @{ $output->{ out } } && ! exists $opts{ s } ) {
+
+      print join ( "\n", @{ $output->{ out } } ) . "\n";
+    }
+    exit ( $result );
+}

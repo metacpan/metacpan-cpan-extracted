@@ -35,3 +35,11 @@ CPANSA-Dancer2-2026-13577
 # _secure_compare is ever used to compare a variable-length attacker-supplied
 # value directly.
 CPANSA-String-Compare-ConstantTime-2024-13939
+
+# CPANSA-podlators-2026-82560 covers Pod::Text. CPAN::Audit currently attributes
+# the installed distribution through Pod::Man's independent 5.01_02 module
+# version, which remains unchanged in podlators 6.1.1. The isolated-root gate
+# verifies the actual Pod::Text loaded from that root is at least 6.1.1 before
+# applying this exact disposition. Remove this entry if the scanner maps the
+# advisory to Pod::Text's version directly.
+CPANSA-podlators-2026-82560

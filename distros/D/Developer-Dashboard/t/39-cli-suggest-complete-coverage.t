@@ -25,7 +25,7 @@ use Developer::Dashboard::CLI::Suggest ();
 
     is_deeply(
         [ Developer::Dashboard::CLI::Complete::complete( words => [ 'dashboard', '' ], index => 1 ) ],
-        [ qw(docker doctor alpha.run beta.go) ],
+        [ qw(docker doctor alpha.run beta.go help) ],
         'complete returns deduplicated top-level and skill candidates when the current token is empty',
     );
     is_deeply(
@@ -35,16 +35,71 @@ use Developer::Dashboard::CLI::Suggest ();
     );
     is_deeply(
         [ Developer::Dashboard::CLI::Complete::complete( words => [ 'dashboard', 'docker' ], index => 3 ) ],
-        [ qw(compose list enable disable) ],
+        [ qw(compose list enable disable development) ],
         'complete treats an out-of-range completion index as an empty current token for second-level built-ins',
+    );
+    is_deeply(
+        [ Developer::Dashboard::CLI::Complete::complete( words => [ 'd2', 'docker', '', '' ], index => 2 ) ],
+        [ qw(compose list enable disable development) ],
+        'complete lists every Docker subcommand when the current word is empty after docker',
+    );
+    is_deeply(
+        [ Developer::Dashboard::CLI::Complete::complete( words => [ 'd2', 'docker', 'development', '' ], index => 3 ) ],
+        [ qw(enable disable) ],
+        'complete lists development actions after docker development',
+    );
+}
+
+{
+    my $completion_home = tempdir( CLEANUP => 1 );
+    my $skill_root = File::Spec->catdir( $completion_home, '.developer-dashboard', 'skills', 'completion-skill' );
+    my $config_dir = File::Spec->catdir( $skill_root, 'config' );
+    my $lib_dir = File::Spec->catdir( $skill_root, 'lib' );
+    make_path( $config_dir, $lib_dir );
+    _write_plain_file(
+        File::Spec->catfile( $config_dir, 'config.json' ),
+        '{"path_aliases":{"f":"/skill/f","g":"/skill/g"}}',
+    );
+    _write_plain_file(
+        File::Spec->catfile( $lib_dir, 'Folder.pm' ),
+        "package Folder;\n"
+          . join( "\n", map { "sub $_ { return '/skill/$_' }" } qw(a b c d e) ) . "\n"
+          . "sub __list__ { return ('a' .. 'e') }\n1;\n",
+    );
+
+    local $ENV{HOME} = $completion_home;
+    is_deeply(
+        [ Developer::Dashboard::CLI::Complete::complete( words => [ 'd2', 'completion-skill.' ], index => 1 ) ],
+        [],
+        'd2 command completion after a skill prefix does not mix in Folder.pm or config path aliases',
+    );
+    is_deeply(
+        [ Developer::Dashboard::CLI::Complete::complete(
+            words => [ 'd2', 'workspace', 'completion-skill.' ],
+            index => 2,
+            ticket_sessions => sub { return () },
+        ) ],
+        [ map { "completion-skill.$_" } qw(a b c d e f g) ],
+        'workspace completion merges Folder->__list__ aliases with skill config aliases',
+    );
+    is_deeply(
+        [ Developer::Dashboard::CLI::Complete::complete(
+            words => [ 'd2', 'workspace', 'completion-skill.c' ],
+            index => 2,
+            ticket_sessions => sub { return () },
+        ) ],
+        ['completion-skill.c'],
+        'workspace path alias completion filters module-provided aliases by the current prefix',
     );
 }
 
 for my $case (
-    [ skills    => [ qw(install enable disable uninstall list usage) ] ],
-    [ skill     => [ qw(install enable disable uninstall list usage) ] ],
-    [ docker    => [ qw(compose list enable disable) ] ],
-    [ path      => [ qw(list resolve add del locate project-root) ] ],
+    [ skills    => [ qw(install uninstall enable disable list usage) ] ],
+    [ skill     => [ qw(install uninstall enable disable list usage) ] ],
+    [ docker    => [ qw(compose list enable disable development) ] ],
+    [ api       => [ qw(ls add rm) ] ],
+    [ file      => [ qw(resolve locate add del list) ] ],
+    [ path      => [ qw(resolve locate cdr complete-cdr add del rm project-root list) ] ],
     [ restart   => [ qw(web collector) ] ],
     [ stop      => [ qw(web collector) ] ],
     [ log       => [ qw(web collector) ] ],
@@ -67,9 +122,86 @@ for my $case (
 }
 
 is_deeply(
+    [ Developer::Dashboard::CLI::Complete::complete( words => [ 'dashboard', 'ticket', 'DD-' ], index => 2 ) ],
+    [],
+    'complete no longer treats ticket as a workspace alias',
+);
+
+is_deeply(
     [ Developer::Dashboard::CLI::Complete::_subcommand_candidates('unknown') ],
     [],
     '_subcommand_candidates returns an empty list for unsupported built-ins',
+);
+
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_help_target_candidates( [ 'd2', 'help' ], 3 ) ],
+    [],
+    'help completion tolerates a missing namespace word',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_help_target_candidates( [ 'd2', 'help', 'docker', undef, '' ], 4 ) ],
+    [ Developer::Dashboard::CLI::Help::actions_for('docker') ],
+    'help completion skips an undefined action token',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_help_target_candidates( [ 'd2', 'help', 'docker', '', '' ], 4 ) ],
+    [ Developer::Dashboard::CLI::Help::actions_for('docker') ],
+    'help completion skips an empty action token',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_help_target_candidates( [ 'd2', 'help', 'docker', '--', '' ], 4 ) ],
+    [ Developer::Dashboard::CLI::Help::actions_for('docker') ],
+    'help completion skips option tokens while selecting an action namespace',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_help_target_candidates( [ 'd2', 'help', 'docker', 'unknown', '' ], 4 ) ],
+    [ Developer::Dashboard::CLI::Help::actions_for('docker') ],
+    'help completion stops at an unknown action and keeps the containing namespace',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_help_target_candidates( [ 'd2', 'help', 'docker', 'development', '' ], 4 ) ],
+    [qw(enable disable)],
+    'help completion descends into nested action namespaces',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_option_context( undef, 3 ) ],
+    [],
+    'option context rejects a missing word list',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_option_context( [], 1 ) ],
+    [],
+    'option context rejects an index before command arguments',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_option_context( [ 'd2' ], 2 ) ],
+    [ '', undef ],
+    'option context tolerates a command word that is absent from the snapshot',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_option_context( [ 'd2', 'docker', 'development', 'enable', '-' ], 4 ) ],
+    [ 'docker development', 'enable' ],
+    'option context descends through nested actions and identifies the leaf action',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_option_context( [ 'd2', 'docker', '', 'enable', '-' ], 4 ) ],
+    [ 'docker', 'enable' ],
+    'option context skips an empty action token before identifying the leaf action',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_option_context( [ 'd2', 'docker', undef, 'enable', '-' ], 4 ) ],
+    [ 'docker', 'enable' ],
+    'option context skips an undefined action token before identifying the leaf action',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_option_context( [ 'd2', 'docker', 'unknown', '-' ], 3 ) ],
+    [ 'docker', undef ],
+    'option context stops at an action that is not in the command catalog',
+);
+is_deeply(
+    [ Developer::Dashboard::CLI::Complete::_option_context( [ 'd2', 'skill', 'install', '-' ], 3 ) ],
+    [ 'skills', 'install' ],
+    'option context canonicalizes the skill compatibility alias',
 );
 
 is_deeply(
@@ -139,6 +271,7 @@ make_path( File::Spec->catdir( $skill_alpha_root, 'cli' ) );
 make_path( File::Spec->catdir( $skill_alpha_root, 'skills', 'nested', 'cli' ) );
 make_path( File::Spec->catdir( $skill_disabled_root, 'cli' ) );
 _write_executable( File::Spec->catfile( $skill_alpha_root, 'cli', 'run-test' ), "#!/usr/bin/env perl\n" );
+_write_executable( File::Spec->catfile( $skill_alpha_root, 'cli', '__init__.pl' ), "#!/usr/bin/env perl\n" );
 _write_executable( File::Spec->catfile( $skill_alpha_root, 'skills', 'nested', 'cli', 'deep' ), "#!/usr/bin/env perl\n" );
 _write_executable( File::Spec->catfile( $skill_disabled_root, 'cli', 'run-test' ), "#!/usr/bin/env perl\n" );
 _write_plain_file( File::Spec->catfile( $skill_alpha_root, 'cli', 'skip-me' ), "plain\n" );
@@ -206,8 +339,8 @@ is( scalar grep( $_ eq 'jq', @top ), 1, 'top_level_candidates keeps canonical he
 
 is_deeply(
     [ $suggest->skill_commands('alpha-skill') ],
-    [ qw(alpha-skill.run-test alpha-skill.nested.deep) ],
-    'skill_commands lists one explicit skill including nested skill trees',
+    [ qw(alpha-skill alpha-skill.run-test alpha-skill.nested.deep) ],
+    'skill_commands lists one explicit skill including a bare __init__ skill command and nested skill trees',
 );
 is_deeply(
     [ $suggest->skill_commands('missing-skill') ],
@@ -216,7 +349,7 @@ is_deeply(
 );
 is_deeply(
     [ $suggest->skill_commands() ],
-    [ qw(alpha-skill.run-test alpha-skill.nested.deep disabled-skill.run-test) ],
+    [ qw(alpha-skill alpha-skill.run-test alpha-skill.nested.deep disabled-skill.run-test) ],
     'skill_commands without an explicit skill scans all installed skill roots including disabled ones',
 );
 {
@@ -254,12 +387,12 @@ is_deeply( [ $suggest->skill_command_suggestions('zzzzzzzz') ], [], 'skill_comma
 
 is_deeply(
     [ map { $_->{full} } $suggest->_all_skill_command_entries ],
-    [ qw(alpha-skill.run-test alpha-skill.nested.deep disabled-skill.run-test) ],
+    [ qw(alpha-skill alpha-skill.run-test alpha-skill.nested.deep disabled-skill.run-test) ],
     '_all_skill_command_entries traverses every installed skill root',
 );
 is_deeply(
     [ map { $_->{full} } $suggest->_skill_command_entries('alpha-skill') ],
-    [ qw(alpha-skill.run-test alpha-skill.nested.deep) ],
+    [ qw(alpha-skill alpha-skill.run-test alpha-skill.nested.deep) ],
     '_skill_command_entries traverses one concrete skill root',
 );
 is_deeply(
@@ -269,7 +402,7 @@ is_deeply(
 );
 is_deeply(
     [ map { $_->{full} } $suggest->_collect_skill_commands( $skill_alpha_root, 'alpha-skill' ) ],
-    [ qw(alpha-skill.run-test alpha-skill.nested.deep) ],
+    [ qw(alpha-skill alpha-skill.run-test alpha-skill.nested.deep) ],
     '_collect_skill_commands recurses into nested skill trees',
 );
 
@@ -337,12 +470,18 @@ This test file exercises the pure-Perl branch logic in
 C<Developer::Dashboard::CLI::Complete> and
 C<Developer::Dashboard::CLI::Suggest> so the shell-completion and typo-guidance
 helpers stay fully covered.
+Docker assertions also pin the available subcommand list and nested
+development-action completion used when tabbing after C<d2 docker>. The static
+action map includes the API and file command trees as well as the full path
+action set. Skill Folder.pm aliases and skill-config aliases are also pinned in
+the dotted C<d2 E<lt>skillE<gt>.> completion path.
 
 =head1 PURPOSE
 
 It exists to pin every branch in the new command-completion and command-
 suggestion modules, including disabled-skill guidance, no-suggestion paths,
-deduplication, and nested skill discovery.
+deduplication, nested skill discovery, Docker's nested command completion, and
+skill path alias completion.
 
 =head1 WHY IT EXISTS
 
@@ -352,8 +491,8 @@ This file closes that gap so the repo can keep the 100 percent coverage rule.
 
 =head1 WHEN TO USE
 
-Run this test after changing shell completion, typo guidance, or dotted skill
-command discovery.
+Run this test after changing shell completion, typo guidance, dotted skill
+command discovery, or completion of skill path aliases.
 
 =head1 HOW TO USE
 

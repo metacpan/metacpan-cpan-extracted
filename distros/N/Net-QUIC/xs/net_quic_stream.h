@@ -673,6 +673,7 @@ net_quic_stream_reclaim_closed(pTHX_ net_quic_connection *ep)
         next = stream->next;
 
         if (net_quic_stream_reclaimable(stream)) {
+            net_quic_stream_discard_rx(aTHX_ ep, stream);
             net_quic_stream_unlink_free(aTHX_ ep, stream);
         }
     }
@@ -1422,6 +1423,12 @@ net_quic_tls_early_data_rejected_cb(
     ep->local_bidi_stream_waiting = 0;
     ep->local_uni_stream_waiting = 0;
     ep->stream_available_events = 0;
+
+    if (ep->datagram_tx_pending != NULL &&
+        ep->datagram_tx_pending->early_data) {
+        net_quic_application_datagram_free(ep->datagram_tx_pending);
+        ep->datagram_tx_pending = NULL;
+    }
 
     for (stream = ep->streams; stream != NULL; stream = next) {
         next = stream->next;

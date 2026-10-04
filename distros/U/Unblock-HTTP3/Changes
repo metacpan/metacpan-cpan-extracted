@@ -1,0 +1,74 @@
+Revision history for Unblock-HTTP3
+
+0.01  2026-10-04
+    - Start Unblock::HTTP3.
+    - Require released Net::QUIC 0.04 for QUIC transport and RFC 9221 DATAGRAM.
+    - Use Alien::nghttp3 0.01 for libnghttp3.
+    - Add native client and server libnghttp3 connection state.
+    - Add the HTTP/3 control and QPACK stream bridge.
+    - Use Uniform::HTTP 0.04 as the runtime HTTP message layer.
+    - Make Unblock::HTTP3::Request and Unblock::HTTP3::Response thin subclasses
+      of the canonical Uniform request and response classes.
+    - Accept plain Uniform::HTTP::Request objects directly for client requests.
+    - Use Uniform's Extended CONNECT protocol metadata, ordered trailers,
+      section mutability, fidelity, and completeness APIs directly.
+    - Move streaming-body and buffered receive progress into Transaction so a
+      Uniform body is exposed only when the complete buffered body is known.
+    - Remove the duplicate Unblock::HTTP3::_Message implementation.
+    - Add Unblock::HTTP3::Transaction for multiplexed request/response state.
+    - Add real request and response exchange over UDP, QUIC, and TLS.
+    - Add buffered request and response bodies.
+    - Add incremental outgoing bodies with ACK-driven backpressure.
+    - Add streaming incoming bodies with explicit QUIC receive credit.
+    - Add request and response trailers.
+    - Reject framing and routing fields such as Content-Length, Host, and TE
+      from outgoing trailers.
+    - Add 1xx informational responses.
+    - Add basic CONNECT tunnels with bidirectional DATA and half-close.
+    - Add generic Extended CONNECT negotiation and :protocol support.
+    - Add generic RFC 9297 Capsule framing, parsing, dispatch, and streams.
+    - Add RFC 9297 HTTP Datagrams over Net::QUIC 0.04, including
+      SETTINGS_H3_DATAGRAM, Quarter Stream ID routing, Transaction send/receive
+      APIs, bounded receive buffering, and H3_DATAGRAM_ERROR handling.
+    - Add persistent opaque HTTP/3 SETTINGS state for 0-RTT.
+    - Add explicit replay-aware 0-RTT requests and HTTP Datagrams.
+    - Validate accepted 0-RTT SETTINGS, including RFC 9204 QPACK rules.
+    - Roll rejected QUIC 0-RTT back to fresh HTTP/3 state for safe 1-RTT retry.
+    - Add generic HTTP/3 extension unidirectional streams.
+    - Add RFC 9218 request priority fields and live Transaction priority updates.
+    - Synchronize libnghttp3 client-stream ID validation with Net::QUIC stream limits.
+    - Add rejected CONNECT handling and CONNECT cleanup coverage.
+    - Add out-of-order multiplexing coverage.
+    - Add STOP_SENDING, RESET_STREAM, and stream-close handling.
+    - Release cancelled streaming buffers while preserving late ACK
+      accounting.
+    - Add bounded transmit and receive buffering.
+    - Add field-section and body resource limits.
+    - Honor peer SETTINGS_MAX_FIELD_SECTION_SIZE before sending header or
+      trailer sections.
+    - Add configurable QPACK limits.
+    - Validate HTTP/3 62-bit integer settings before native setup.
+    - Add generic extension SETTINGS advertisement, peer inspection, and validation.
+    - Respect HTTP/3-reserved and GREASE setting identifiers.
+    - Add HTTP/3 field validation and connection-specific field rules.
+    - Validate Host/:authority routing, http/https path form, and CONNECT
+      host/port semantics.
+    - Reject malformed received routing fields with H3_MESSAGE_ERROR on the
+      affected request stream without closing unrelated streams.
+    - Add bodyless response rules for HEAD, 204, 205, and 304.
+    - Validate outgoing Content-Length for buffered and streaming bodies.
+    - Add HTTP/3 graceful shutdown support.
+    - Map fatal libnghttp3 parser errors to QUIC application close errors.
+    - Remove completed stream, transaction, and native body state.
+    - Keep event loops, UDP sockets, TLS, and QUIC packet processing
+      outside Unblock::HTTP3.
+    - Test dependencies from CPAN rather than GitHub development code.
+    - Make TLS loopback tests self-contained with bundled localhost fixtures
+      instead of requiring the openssl command-line tool.
+    - Simplify README and public POD into the standard practical CPAN format.
+    - Add consistent SYNOPSIS, METHODS, SEE ALSO, AUTHOR, and LICENSE sections
+      across the public API documentation.
+    - Keep repository-only planning, release, contribution, security, and
+      public-network test material out of the CPAN distribution.
+    - Add public interoperability tests against Cloudflare and LiteSpeed HTTP/3
+      servers, with Google retained as a diagnostic target.

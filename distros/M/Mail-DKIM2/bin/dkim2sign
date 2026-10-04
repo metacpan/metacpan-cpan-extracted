@@ -1,0 +1,125 @@
+#!/usr/bin/perl -w
+#
+# Standalone DKIM2 signer CLI (draft-ietf-dkim-dkim2-spec-06).
+#
+# Reads a message, computes a Message-Instance when the content has changed
+# since the top instance, signs, and writes the result to stdout. The
+# counterpart of dkim2verify, and of python/dkim2sign.py and c/dkim2sign, so a
+# cross-implementation harness can treat them all the same way.
+#
+#   dkim2sign -s SELECTOR -d DOMAIN -k KEYFILE [--mailfrom '<a@b>']
+#                [--rcptto '<c@d>']... [--timestamp N] [--next-domain D]
+#                [--flag F]... [MESSAGE|-]
+#
+# Per §9.1/§9.2.5 an unmodified hop adds no Message-Instance: if the top
+# instance already matches the content, its m= is reused and only a
+# DKIM2-Signature is added.
+
+use 5.020;
+use strict;
+use warnings;
+use Email::MIME;
+use Getopt::Long qw(GetOptions);
+use FindBin;
+use lib -d "$FindBin::Bin/../lib/Mail/DKIM2" ? "$FindBin::Bin/../lib" : ();   # running from a checkout
+
+use Mail::DKIM2::Common qw(fold_header);
+use Mail::DKIM2::MessageInstance;
+use Mail::DKIM2::Signer;
+
+my ($selector, $domain, $keyfile, $timestamp, $next_domain);
+my $mailfrom = '<>';
+my $hash_algs = 'sha256';
+my (@rcptto, @flags);
+
+GetOptions(
+    's|selector=s'    => \$selector,
+    'd|domain=s'      => \$domain,
+    'k|keyfile=s'     => \$keyfile,
+    'mailfrom=s'      => \$mailfrom,
+    'rcptto=s'        => \@rcptto,
+    'timestamp=i'     => \$timestamp,
+    'next-domain=s'   => \$next_domain,
+    'flag=s'          => \@flags,
+    'hash=s'          => \$hash_algs,
+) or die _usage();
+
+die _usage() unless defined $selector && defined $domain && defined $keyfile;
+
+# spec-06 §3.1: signer chooses one or both hash algorithms for the
+# Message-Instance h= tag. Default MUST remain sha256 (byte-identical to
+# pre-spec-06 output).
+my %HASH_ALG_SETS = (
+    sha256 => ['sha256'],
+    sha512 => ['sha512'],
+    both   => ['sha256', 'sha512'],
+);
+my $algs = $HASH_ALG_SETS{$hash_algs}
+    or die _usage("invalid --hash value '$hash_algs' (expected sha256|sha512|both)");
+
+my $file = shift // '-';
+my $raw = $file eq '-'
+    ? do { local $/; binmode STDIN; <STDIN> }
+    : do { open my $fh, '<:raw', $file or die "$file: $!\n"; local $/; <$fh> };
+die "empty message\n" unless defined $raw && length $raw;
+
+# Normalise to CRLF: the hashes are defined over CRLF line endings.
+$raw =~ s/\r\n/\n/g;
+$raw =~ s/\r/\n/g;
+$raw =~ s/\n/\r\n/g;
+
+my $msg = Email::MIME->new($raw);
+
+# §9.1/§9.2.5: only add an instance if this hop actually changed something.
+# MessageInstance->verify returns the version it matched, so a true result means
+# the top instance still describes the message and must be reused.
+my $mi_header;
+unless (Mail::DKIM2::MessageInstance->verify($msg)) {
+    my $mi = Mail::DKIM2::MessageInstance->calculate($msg, undef, Algs => $algs);
+    ($mi_header = fold_header('Message-Instance: ' . $mi->as_string))
+        =~ s/^Message-Instance:\s*//;
+    $msg->header_raw_prepend('Message-Instance', $mi_header);
+}
+
+my $signer = Mail::DKIM2::Signer->new(
+    Selector => $selector,
+    Domain   => $domain,
+    KeyFile  => $keyfile,
+    ($next_domain
+        ? (NextDomain => $next_domain)
+        : (MailFrom => $mailfrom, RcptTo => (@rcptto ? \@rcptto : ['<>']))),
+    (defined $timestamp ? (Timestamp => $timestamp) : ()),
+    (@flags ? (Flags => \@flags) : ()),
+);
+$signer->PRINT($msg->as_string);
+$signer->CLOSE;
+
+die "signing failed: " . ($signer->result_detail // 'no result') . "\n"
+    unless ($signer->result // '') eq 'signed';
+
+(my $sig_header = $signer->as_string) =~ s/^DKIM2-Signature:\s*//;
+$msg->header_raw_prepend('DKIM2-Signature', $sig_header);
+
+my $out = $msg->as_string;
+$out =~ s/\r\n/\n/g;
+$out =~ s/\n/\r\n/g;
+binmode STDOUT;
+print $out;
+
+sub _usage {
+    my ($err) = @_;
+    my $usage = <<"USAGE";
+usage: $0 -s SELECTOR -d DOMAIN -k KEYFILE [options] [MESSAGE|-]
+
+  -s, --selector S   DKIM2 selector
+  -d, --domain D     signing domain
+  -k, --keyfile F    PEM private key
+      --mailfrom A   MAIL FROM, bracketed (default <>)
+      --rcptto A     RCPT TO, bracketed; repeatable
+      --timestamp N  fixed t= (default: now)
+      --next-domain D  emit nd= for an imaginary forwarding hop, omitting mf=/rt=
+      --flag F       f= flag; repeatable
+      --hash A       hash algorithm(s) for Message-Instance h=: sha256|sha512|both (default sha256)
+USAGE
+    return $err ? "$err\n$usage" : $usage;
+}

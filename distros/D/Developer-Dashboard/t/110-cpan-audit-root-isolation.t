@@ -13,6 +13,8 @@ my $ROOT = File::Spec->rel2abs( File::Spec->catdir( $FindBin::Bin, File::Spec->u
 my $GATE = File::Spec->catfile( $ROOT, 'script', 'cpan-audit-project' );
 
 plan skip_all => "audit gate not present at $GATE" if !-f $GATE;
+plan skip_all => 'checkout-only audit documentation is not shipped in release tarballs'
+    if !-f File::Spec->catfile( $ROOT, 'docs', 'gate-map.md' );
 
 # _run_gate($root, %env)
 # Purpose: execute the audit gate against a library root and report exactly what

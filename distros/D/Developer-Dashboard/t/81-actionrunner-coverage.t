@@ -576,11 +576,12 @@ my $source_page = Developer::Dashboard::PageDocument->new(
     my @CALLS;
     sub new { return bless {}, shift }
     sub calls { return @CALLS }
+    sub reset { @CALLS = () }
     sub named_paths { push @CALLS, 'named_paths'; return {} }
 }
 
 {
-    @DDActionRunnerCwdSpy::CALLS = ();
+    DDActionRunnerCwdSpy::reset();
     my $spy_paths = DDActionRunnerCwdSpy->new;
     my $spy_runner = Developer::Dashboard::ActionRunner->new( files => $files, paths => $spy_paths );
     eval { $spy_runner->run_command_action( command => 'true', cwd => 'named_paths' ) };

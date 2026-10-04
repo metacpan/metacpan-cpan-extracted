@@ -3,7 +3,7 @@ package Developer::Dashboard::StreamDrain;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Exporter 'import';
 
@@ -102,7 +102,7 @@ the select set and close it.
 
 C<SkillDispatcher> and C<SkillManager> each carried a byte-identical copy of
 this step. Copy-paste was provable rather than inferred: both files carried the
-same authored C<# uncoverable condition left> annotation on the same end-of-file
+same authored coverage-exemption annotation on the same end-of-file
 branch. A bug in that step therefore had to be found and fixed twice, and this
 project has already paid that cost - the C<$?>-pollution defect in the same
 family of readers was fixed through two unrelated ticket series before a

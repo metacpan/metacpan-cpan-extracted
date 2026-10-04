@@ -66,8 +66,8 @@ if (
 		($r->{done} eq 'now') &&
 		(!$r->{'exit'}) &&
 		($r->{overwrite} == 0) &&
-		(ref $r->{'output.files'} eq 'ARRAY') &&
-		(scalar @{ $r->{'output.files'} } == 0)
+		(ref $r->{'output_files'} eq 'ARRAY') &&
+		(scalar @{ $r->{'output_files'} } == 0)
 	) {
 	$simple_task = 1;
 } else {
@@ -79,8 +79,8 @@ if (
 my ($fh, $fname) = tempfile( UNLINK => 0, SUFFIX => '.log' );
 $r = quietly { task({
 	cmd            => perl_cmd('exit 0'),
-	'log.fh'       => $fh,
-	'output.files' => $fname,
+	'log_fh'       => $fh,
+	'output_files' => $fname,
 	overwrite      => 1
 }) };
 # say2 says to both the terminal and the log, so the terminal half is captured
@@ -95,7 +95,7 @@ $log_write = 1 if ((-f $fname) && (-s $fname > 0));
 # --- re-run: task must notice the output already exists
 $r = quietly { task({
 	cmd            => perl_cmd('exit 0'),
-	'output.files' => $fname,
+	'output_files' => $fname,
 	overwrite      => 0
 }) };
 if (
@@ -114,10 +114,10 @@ if (
 # --- dry run --------------------------------------------------------------
 $r = quietly { task({
 	cmd       => perl_cmd('exit 0'),
-	'dry.run' => 1
+	'dry_run' => 1
 }) };
 if (
-	($r->{'dry.run'})	        &&
+	($r->{'dry_run'})	        &&
 	($r->{duration} == 0)	  &&
 	((defined $r->{'will.do'}) && ($r->{'will.do'} eq 'no: dry run'))
 	) {
@@ -137,17 +137,17 @@ dies_ok {
 # --- task dies on empty filenames ----------------------------------------
 dies_ok {
 	quietly { task({
-		'input.files' => '',
+		'input_files' => '',
 		cmd           => perl_cmd('exit 0')
 	}) };
-} '"task" dies when given an empty filename in "input.files"';
+} '"task" dies when given an empty filename in "input_files"';
 
 dies_ok {
 	quietly { task({
-		'output.files' => '',
+		'output_files' => '',
 		cmd           => perl_cmd('exit 0')
 	}) };
-} '"task" dies when given an empty filename in "output.files"';
+} '"task" dies when given an empty filename in "output_files"';
 
 # --- overwrite => true actually re-runs and rewrites the file ------------
 sleep 1;
@@ -159,7 +159,7 @@ note("\$fname = $fname");
 $r = quietly { task({
 	cmd            => qq{$PERL -e "print 1" > "$fname"}, # portable redirect
 	overwrite      => 'true',
-	'output.files' => $fname
+	'output_files' => $fname
 }) };
 note(sprintf '%s vs %lf', $mod0, -M $fname);
 if (
@@ -242,7 +242,7 @@ my ($r2, $missing_err);
 lives_ok {
 	(undef, $missing_err, $r2) = capture { task({
 		cmd            => perl_cmd('exit 0'),
-		'output.files' => $missing,
+		'output_files' => $missing,
 		die            => 0,
 	}) };
 } 'task survives a missing output file when die => 0 (regression: undef == 0 was fatal)';
@@ -265,85 +265,85 @@ subtest 'note field' => sub {
 	is($d->{note}, '', 'note defaults to the empty string');
 };
 
-# --- output.files: scalar normalisation + output.file.size ---------------
-subtest 'output.files normalisation and output.file.size' => sub {
+# --- output_files: scalar normalisation + output_file.size ---------------
+subtest 'output_files normalisation and output_file.size' => sub {
 	my (undef, $o1) = tempfile(UNLINK => 0, SUFFIX => '.dat');
 	my $t = quietly { task({
 		cmd            => qq{$PERL -e "print 12345" > "$o1"}, # writes exactly 5 bytes
-		'output.files' => $o1,                                # scalar form
+		'output_files' => $o1,                                # scalar form
 		overwrite      => 'true',
 	}) };
-	is(ref $t->{'output.files'}, 'ARRAY', 'scalar output.files is normalised to an arrayref');
-	is_deeply($t->{'output.files'}, [$o1], 'output.files arrayref holds the filename');
-	is($t->{'output.file.size'}{$o1}, 5,      'output.file.size reports the byte count');
-	is($t->{'output.file.size'}{$o1}, -s $o1, 'output.file.size matches -s on disk');
+	is(ref $t->{'output_files'}, 'ARRAY', 'scalar output_files is normalised to an arrayref');
+	is_deeply($t->{'output_files'}, [$o1], 'output_files arrayref holds the filename');
+	is($t->{'output_file.size'}{$o1}, 5,      'output_file.size reports the byte count');
+	is($t->{'output_file.size'}{$o1}, -s $o1, 'output_file.size matches -s on disk');
 	unlink $o1;
 };
 
-# --- output.file: single-file convenience form ---------------------------
-subtest 'output.file (single file)' => sub {
+# --- output_file: single-file convenience form ---------------------------
+subtest 'output_file (single file)' => sub {
 	my (undef, $o1) = tempfile(UNLINK => 0, SUFFIX => '.dat');
 	my $t = quietly { task({
 		cmd           => qq{$PERL -e "print 12345" > "$o1"}, # writes exactly 5 bytes
-		'output.file' => $o1,
+		'output_file' => $o1,
 		overwrite     => 'true',
 	}) };
-	is(ref $t->{'output.files'}, 'ARRAY', 'output.file is folded into the output.files arrayref');
-	is_deeply($t->{'output.files'}, [$o1], 'output.files arrayref holds the single filename');
-	is($t->{'output.file.size'}{$o1}, 5,      'output.file.size reports the byte count');
-	is($t->{'output.file.size'}{$o1}, -s $o1, 'output.file.size matches -s on disk');
+	is(ref $t->{'output_files'}, 'ARRAY', 'output_file is folded into the output_files arrayref');
+	is_deeply($t->{'output_files'}, [$o1], 'output_files arrayref holds the single filename');
+	is($t->{'output_file.size'}{$o1}, 5,      'output_file.size reports the byte count');
+	is($t->{'output_file.size'}{$o1}, -s $o1, 'output_file.size matches -s on disk');
 
-	# it must drive the "already done" skip logic just like output.files does
+	# it must drive the "already done" skip logic just like output_files does
 	my $again = quietly { task({
 		cmd           => qq{$PERL -e "print 12345" > "$o1"},
-		'output.file' => $o1,
+		'output_file' => $o1,
 		overwrite     => 0,
 	}) };
-	is($again->{done}, 'before', 'output.file that already exists is detected as done before');
+	is($again->{done}, 'before', 'output_file that already exists is detected as done before');
 
 	unlink $o1;
 };
 
-# --- output.file / output.files are mutually exclusive and single-valued --
-subtest 'output.file validation' => sub {
+# --- output_file / output_files are mutually exclusive and single-valued --
+subtest 'output_file validation' => sub {
 	dies_ok {
 		quietly { task({
 			cmd            => perl_cmd('exit 0'),
-			'output.file'  => 'a.dat',
-			'output.files' => 'b.dat',
+			'output_file'  => 'a.dat',
+			'output_files' => 'b.dat',
 		}) }
-	} 'dies when both output.file and output.files are given';
+	} 'dies when both output_file and output_files are given';
 
 	dies_ok {
 		quietly { task({
 			cmd           => perl_cmd('exit 0'),
-			'output.file' => ['a.dat', 'b.dat'], # a list is not allowed here
+			'output_file' => ['a.dat', 'b.dat'], # a list is not allowed here
 		}) }
-	} 'dies when output.file is given a reference instead of a single filename';
+	} 'dies when output_file is given a reference instead of a single filename';
 
 	throws_ok {
 		quietly { task({
 			cmd           => perl_cmd('exit 0'),
-			'output.file' => '', # 0-length filename
+			'output_file' => '', # 0-length filename
 			die           => 0,
 		}) }
-	} qr/0-length filenames/, 'dies on a 0-length output.file';
+	} qr/0-length filenames/, 'dies on a 0-length output_file';
 };
 
-# --- input.files: scalar + array forms, and input.file.size --------------
-subtest 'input.files and input.file.size' => sub {
+# --- input_files: scalar + array forms, and input_file.size --------------
+subtest 'input_files and input_file.size' => sub {
 	my ($fh1, $i1) = tempfile(UNLINK => 0); print {$fh1} 'abc';  close $fh1; # 3 bytes
 	my ($fh2, $i2) = tempfile(UNLINK => 0); print {$fh2} 'wxyz'; close $fh2; # 4 bytes
 
-	my $scalar = quietly { task({ cmd => perl_cmd('exit 0'), 'input.files' => $i1 }) };
-	is($scalar->{'input.file.size'}{$i1}, 3,   'input.file.size (scalar form) reports size');
-	# 0.16: input.files is normalised to an array ref on the result, exactly as
-	# output.files always was. Before 0.16 a scalar argument was stored raw.
-	is_deeply($scalar->{'input.files'}, [$i1], 'scalar input.files is normalised to an arrayref');
+	my $scalar = quietly { task({ cmd => perl_cmd('exit 0'), 'input_files' => $i1 }) };
+	is($scalar->{'input_file.size'}{$i1}, 3,   'input_file.size (scalar form) reports size');
+	# 0.16: input_files is normalised to an array ref on the result, exactly as
+	# output_files always was. Before 0.16 a scalar argument was stored raw.
+	is_deeply($scalar->{'input_files'}, [$i1], 'scalar input_files is normalised to an arrayref');
 
-	my $array = quietly { task({ cmd => perl_cmd('exit 0'), 'input.files' => [$i1, $i2] }) };
-	is($array->{'input.file.size'}{$i1}, 3, 'input.file.size (array form) reports first size');
-	is($array->{'input.file.size'}{$i2}, 4, 'input.file.size (array form) reports second size');
+	my $array = quietly { task({ cmd => perl_cmd('exit 0'), 'input_files' => [$i1, $i2] }) };
+	is($array->{'input_file.size'}{$i1}, 3, 'input_file.size (array form) reports first size');
+	is($array->{'input_file.size'}{$i2}, 4, 'input_file.size (array form) reports second size');
 
 	unlink $i1, $i2;
 };
@@ -370,9 +370,9 @@ subtest 'argument validation' => sub {
 		'dies when the required "cmd" key is missing';
 	dies_ok { quietly { task({ cmd => perl_cmd('exit 0'), bogus_key => 1 }) } }
 		'dies on an unrecognised argument key';
-	dies_ok { quietly { task({ cmd => perl_cmd('exit 0'), 'log.fh' => 'not a filehandle' }) } }
-		'dies when log.fh is not a real filehandle';
-	dies_ok { quietly { task({ cmd => perl_cmd('exit 0'), 'input.files' => 'this_file_should_not_exist_42' }) } }
+	dies_ok { quietly { task({ cmd => perl_cmd('exit 0'), 'log_fh' => 'not a filehandle' }) } }
+		'dies when log_fh is not a real filehandle';
+	dies_ok { quietly { task({ cmd => perl_cmd('exit 0'), 'input_files' => 'this_file_should_not_exist_42' }) } }
 		'dies when a declared input file is missing';
 };
 
@@ -381,7 +381,7 @@ ok($simple_task, 'Verified: Simple task works');
 ok($log_write,   'Verified: Can write to log files with subroutine "say2"');
 ok($stopping,    'Verified: tasks do not run when output files exist');
 ok($dry_run,     'Verified: dry run works');
-ok($overwrite,   'Verified: "overwrite" option overwrites files in "output.files"');
+ok($overwrite,   'Verified: "overwrite" option overwrites files in "output_files"');
 
 unlink $fname if -f $fname;
 done_testing();

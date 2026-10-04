@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::OpenFileChooser;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Exporter 'import';
 
@@ -54,8 +54,7 @@ sub _editor_supports_tabs {
 # a real OS file descriptor at all (see below).
 sub _stdin_has_pending_input {
     my ($timeout_seconds) = @_;
-    # uncoverable branch true
-    return 1 if -t STDIN;    ## no critic (InputOutput::ProhibitInteractiveTest)
+    return 1 if _stdin_is_tty();
 
     # select()/IO::Select can only examine a real OS file descriptor (a pipe,
     # socket, terminal or regular file) - an in-memory filehandle opened as
@@ -87,9 +86,16 @@ sub _stdin_has_pending_input {
         my $select = IO::Select->new( \*STDIN );
         $select->can_read($timeout_seconds) ? 1 : 0;
     };
-    # uncoverable branch true
-    return 1 if !defined $ready;    # this eval's own failure path needs a platform where IO::Select genuinely misbehaves on a real fd, not reproducible on the Linux test host
+    return 1 if !defined $ready;    # IO::Select misbehaving on this platform: fall back to the ordinary blocking read
     return $ready;
+}
+
+# _stdin_is_tty()
+# Wraps the tty test so tests can exercise both answers without a real terminal.
+# Input: none.
+# Output: true when STDIN is a terminal.
+sub _stdin_is_tty {
+    return -t STDIN;    ## no critic (InputOutput::ProhibitInteractiveTest)
 }
 
 # _select_open_file_matches(%args)
@@ -128,7 +134,6 @@ sub _select_open_file_matches {
     );
 
     return @chosen if @chosen;
-    return @matches if $selection eq '';    # uncoverable branch true a blank selection always yields chosen matches above, so this reblank guard is only reached for non-empty invalid input
     die "Invalid file selection '$selection'\n";
 }
 

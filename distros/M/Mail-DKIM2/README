@@ -1,0 +1,75 @@
+Mail::DKIM2 - DKIM2 signing and verification for email
+
+DESCRIPTION
+
+Mail::DKIM2 implements DKIM2 (draft-ietf-dkim-dkim2-spec-06), in which every
+hop that handles a message signs it, each signature covers the ones before
+it, and a Message-Instance header records hashes of the message at each hop
+together with a Recipe for undoing that hop's changes.
+
+  - Sign a message with a DKIM2-Signature for this hop
+  - Verify every signature in the chain and the Message-Instance chain
+  - Compute, verify and undo Message-Instance headers and their Recipes
+  - Generate, authenticate and propagate DKIM2-signed DSNs
+  - Streaming interface for milters; one-shot load() for everything else
+  - dkim2sign and dkim2verify command-line tools
+
+See the Mail::DKIM2 module documentation for the conventions and STATUS.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    Perl 5.20 or later
+    Algorithm::Diff
+    CryptX
+    Email::MIME
+    JSON
+    Net::DNS
+
+Recommended: Sendmail::PMilter for dkim2-milter, Mail::Milter::Authentication
+for the DKIM2Sign/DKIM2Verify handlers.
+
+The test suite needs Path::Tiny and the keys/ and dns.json fixtures from
+https://github.com/dkim2wg/interop.
+
+SYNOPSIS
+
+    use Mail::DKIM2;
+
+    my $signer = Mail::DKIM2::Signer->new(
+        Domain   => 'example.com',
+        Selector => 'sel1',
+        KeyFile  => '/etc/dkim2/sel1.pem',
+        MailFrom => '<sender@example.com>',
+        RcptTo   => ['<recipient@example.net>'],
+    )->load($message);
+    print $signer->as_string if $signer->result eq 'signed';
+
+    my $verifier = Mail::DKIM2::Verifier->new->load($message);
+    print $verifier->result_detail, "\n";
+
+SEE ALSO
+
+    Running a Postfix mailing-list host with DKIM2 (Mailman 3 or Sympa):
+    https://github.com/dkim2wg/interop/blob/master/docs/dkim2-postfix-list-host-guide.md
+
+    https://datatracker.ietf.org/doc/draft-ietf-dkim-dkim2-spec/
+    https://github.com/dkim2wg/interop
+    https://dkim2.com/
+
+AUTHOR
+
+    Bron Gondwana <brong@fastmailteam.com>
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025-2026 by Fastmail Pty Ltd.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

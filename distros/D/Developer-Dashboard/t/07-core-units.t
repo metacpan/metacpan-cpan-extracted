@@ -607,7 +607,6 @@ BASHRC
             pyq    => 'yq',
             ptomq  => 'tomq',
             pjp    => 'propq',
-            ticket => 'workspace',
             skill  => 'skills',
             logs   => 'log',
         },

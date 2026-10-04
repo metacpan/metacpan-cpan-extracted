@@ -204,6 +204,22 @@ GET /ajax/<repo-name>/<sub-skill>/<filename>   - Serve nested skill-local saved 
 
 ## Example Usage in Bookmarks
 
+Bookmark instructions may include a `HEAD:` section for raw content that must
+be inside the rendered document's `<head>` (for example metadata or a script
+tag):
+
+```
+TITLE: Styled Application
+:--------------------------------------------------------------------------------:
+HEAD: <meta name="theme-color" content="#123456">
+<script defer src="/js/app.js"></script>
+:--------------------------------------------------------------------------------:
+HTML: <div id="app"></div>
+```
+
+`HEAD:` content is inserted as trusted HTML and is not escaped. Do not include
+untrusted or user-supplied text in this section.
+
 ### jQuery AJAX Example
 ```
 TITLE: AJAX Test

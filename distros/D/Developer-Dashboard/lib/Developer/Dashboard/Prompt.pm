@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Cwd qw(abs_path cwd);
 use File::Basename qw(basename);
@@ -36,7 +36,7 @@ sub render {
     my ( $self, %args ) = @_;
 
     my $jobs = defined $args{jobs} ? $args{jobs} : 0;
-    my $cwd  = $args{cwd} || cwd();    # uncoverable condition false
+    my $cwd  = $args{cwd} ? $args{cwd} : cwd();
     my $mode = $args{mode} || 'compact';
     my $color = exists $args{color} ? $args{color} : 0;
     my $max_age = defined $args{max_age} ? $args{max_age} : 300;
@@ -83,7 +83,7 @@ sub render_tmux_status {
     my ( $top, $bottom ) = $self->_tmux_status_lines(%args);
     return $top    if $line eq 'top';
     return $bottom if $line eq 'bottom';
-    return join "\n", grep { defined $_ && $_ ne q{} } ( $top, $bottom );    # uncoverable branch false
+    return join "\n", grep { $_ ne q{} } ( $top, $bottom );
 }
 
 # _timestamp()
@@ -113,7 +113,7 @@ sub _indicator_parts {
         my $stale = $self->{indicators}->is_stale( $indicator, max_age => $max_age ) ? 1 : 0;
         my $part = $mode eq 'extended'
           ? join( '', grep { defined && $_ ne '' } $status_icon, $icon, $label )
-          : join( '', grep { defined && $_ ne '' } $status_icon, ( $icon || substr( $label, 0, 1 ) ) );    # uncoverable branch false
+          : join( '', grep { $_ ne '' } $status_icon, ( $icon || substr( $label, 0, 1 ) ) );
         if ($color) {
             my $status = $indicator->{status} || '';
             my $ansi = $stale ? "\e[33m" : $status =~ /^(ok|clean)$/ ? "\e[32m" : $status =~ /^(missing|error|dirty|down)$/ ? "\e[31m" : "\e[36m";
@@ -208,10 +208,135 @@ sub _git_branch {
     $head =~ s/\s+\z//;
 
     if ( $head =~ /^ref:\s+(.+)$/ ) {
-        return basename($1);
+        my $reference = $1;
+        return $1 if $reference =~ m{\Arefs/heads/(.+)\z};
+        if ( $reference =~ m{\Arefs/remotes/([^/]+)/(.+)\z} ) {
+            my ( $remote, $branch ) = ( $1, $2 );
+            return "$remote/$branch" if $remote ne 'origin';
+
+            my $remote_commit = $self->_git_ref_commit( $git_dir, $reference );
+            my $local_commit = $self->_git_ref_commit( $git_dir, "refs/heads/$branch" );
+            return $branch
+              if defined $remote_commit
+              && defined $local_commit
+              && lc($remote_commit) eq lc($local_commit);
+
+            return "origin/$branch";
+        }
+        return basename($reference);
     }
 
+    my $origin_branch = $head =~ /\A[0-9a-f]{40,64}\z/i
+      ? $self->_origin_branch_for_commit( $git_dir, $head )
+      : undef;
+    return $origin_branch if defined $origin_branch;
+
     return substr( $head, 0, 7 ) if $head =~ /\A[0-9a-f]{7,40}\z/i;
+    return;
+}
+
+# _origin_branch_for_commit($git_dir, $commit)
+# Finds an origin remote-tracking branch whose loose or packed ref points to a
+# detached HEAD commit, allowing the prompt to show a useful branch label
+# instead of a short object id after `git checkout origin/<branch>`.
+# Input: git metadata directory path and full hexadecimal commit id.
+# Output: matching local branch name when it points to this commit, otherwise
+# the complete origin/<branch> name, or undef.
+sub _origin_branch_for_commit {
+    my ( $self, $git_dir, $commit ) = @_;
+    return if !defined $git_dir || $git_dir eq '';
+    return if !defined $commit || $commit !~ /\A[0-9a-f]{40,64}\z/i;
+
+    my %matches;
+    my $origin_root = File::Spec->catdir( $git_dir, 'refs', 'remotes', 'origin' );
+    if ( -d $origin_root && !-l $origin_root ) {
+        my @directories = ($origin_root);
+        while (@directories) {
+            my $directory = shift @directories;
+            opendir my $dh, $directory or die "Unable to open $directory: $!";
+            my @entries = sort grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+            closedir $dh or die "Unable to close $directory: $!";
+
+            for my $entry (@entries) {
+                my $path = File::Spec->catfile( $directory, $entry );
+                next if -l $path;
+                if ( -d $path ) {
+                    push @directories, $path;
+                    next;
+                }
+                next if !-f $path;
+
+                my $branch = File::Spec->abs2rel( $path, $origin_root );
+                $branch =~ s{\\}{/}g;
+                next if $branch eq 'HEAD';
+                open my $ref_fh, '<', $path or die "Unable to open $path: $!";
+                my $ref = <$ref_fh>;
+                close $ref_fh or die "Unable to close $path: $!";
+                next if !defined $ref || $ref !~ /\A([0-9a-f]{40,64})\s*\z/i;
+                $matches{$branch} = 1 if lc($1) eq lc($commit);
+            }
+        }
+    }
+
+    my $packed_refs = File::Spec->catfile( $git_dir, 'packed-refs' );
+    if ( -f $packed_refs && !-l $packed_refs ) {
+        open my $packed_fh, '<', $packed_refs or die "Unable to open $packed_refs: $!";
+        while ( my $line = <$packed_fh> ) {
+            next if $line =~ /\A\^/;
+            next if $line !~ /\A([0-9a-f]{40,64})\s+refs\/remotes\/origin\/(.+?)\s*\z/i;
+            my ( $ref_commit, $branch ) = ( $1, $2 );
+            $matches{$branch} = 1 if $branch ne 'HEAD' && lc($ref_commit) eq lc($commit);
+        }
+        close $packed_fh or die "Unable to close $packed_refs: $!";
+    }
+
+    for my $branch ( sort keys %matches ) {
+        my $local_commit = $self->_git_ref_commit( $git_dir, "refs/heads/$branch" );
+        return $branch
+          if defined $local_commit
+          && lc($local_commit) eq lc($commit);
+    }
+
+    my ($branch) = sort keys %matches;
+    return defined $branch ? "origin/$branch" : undef;
+}
+
+# _git_ref_commit($git_dir, $reference)
+# Reads an exact loose or packed branch ref while refusing symlinked metadata.
+# Input: Git metadata directory and a refs/heads or refs/remotes ref name.
+# Output: full hexadecimal object id, or undef when the ref is unavailable.
+sub _git_ref_commit {
+    my ( $self, $git_dir, $reference ) = @_;
+    return if !defined $git_dir || !defined $reference;
+    return if $reference !~ m{\Arefs/(?:heads|remotes)/([A-Za-z0-9._/-]+)\z};
+    my @parts = split m{/}, $1;
+    return if grep { $_ eq '' || $_ eq '.' || $_ eq '..' || /\.lock\z/ } @parts;
+
+    my $path = File::Spec->catfile( $git_dir, split m{/}, $reference );
+    my $parent = $git_dir;
+    for my $part ( split m{/}, $reference ) {
+        $parent = File::Spec->catfile( $parent, $part );
+        return if -l $parent;
+    }
+    if ( -f $path ) {
+        open my $ref_fh, '<', $path or die "Unable to open $path: $!";
+        my $line = <$ref_fh>;
+        close $ref_fh or die "Unable to close $path: $!";
+        return $1 if defined $line && $line =~ /\A([0-9a-f]{40,64})\s*\z/i;
+    }
+
+    my $packed_refs = File::Spec->catfile( $git_dir, 'packed-refs' );
+    return if !-f $packed_refs || -l $packed_refs;
+    open my $packed_fh, '<', $packed_refs or die "Unable to open $packed_refs: $!";
+    while ( my $line = <$packed_fh> ) {
+        next if $line =~ /\A\^/;
+        if ( $line =~ /\A([0-9a-f]{40,64})\s+\Q$reference\E\s*\z/i ) {
+            my $commit = $1;
+            close $packed_fh or die "Unable to close $packed_refs: $!";
+            return $commit;
+        }
+    }
+    close $packed_fh or die "Unable to close $packed_refs: $!";
     return;
 }
 
@@ -263,7 +388,14 @@ Developer::Dashboard::Prompt - prompt rendering for Developer Dashboard
 
 This module renders the shell prompt from cached indicator state, current
 directory context, and git metadata. It is designed to stay fast enough for
-per-prompt execution.
+per-prompt execution. The prompt renderer is shared by every generated shell
+adapter, so branch labels are not shell-specific. Local branch names retain
+their complete slash-delimited names. A detached HEAD that matches an
+C<origin> remote-tracking ref displays C<origin/branch> unless the same-named
+local branch points to the same commit, in which case the redundant prefix is
+omitted. Other remote names are retained. Loose and packed refs are supported,
+but symlinked ref paths and packed-ref files are not followed. An unmatched
+detached HEAD keeps its short commit id.
 
 =head1 METHODS
 

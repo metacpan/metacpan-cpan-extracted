@@ -1,0 +1,22 @@
+DKIM2-Signature: i=1; m=2; t=1783372800; d=test1.dkim2.com;
+	mf=PGJvdW5jZUB0ZXN0MS5ka2ltMi5jb20+;
+	rt=PHVzZXJAdGVzdDMuZGtpbTIuY29tPg==;
+	s=sel1:rsa-sha256:UqGEAFF/UbkzqlrUhEU4b/rQb9Oj2RJaTyy5B0hAe2s74V
+	yafO55A73Wcjfsh5rxTyucJVA+FiqgaY0+Kn7vTdKNdTmFAB3zujJURKqLPgoXhm
+	4ALIFalYf6dFf6Ltcje4PGPjP7jW0ON5KdRFHj4Brh4yQ/khoHNlYDd/sIrqtJM/
+	vxAES+fRyjmRtM/MhWVAbkITzZkHDfh0iTIp8hhIcnNBzSzmhXIz/aky6b09uh7m
+	fYPo47YLhlyNYtZSN8DkChtTBLA68Yu8OGRXTivPLb8WhgEZtWYXRjQtL5msqyjw
+	szEQUg+Y501eis3iMCyKnNFk52w6WtUPM1ADoMow==;
+Message-Instance: m=2;
+ h=sha256:hX1I9qilKcViJMY00vjHTXXjFSMxnj2Q9FGjTtb7pZ8=:MnX6igDWzj6j3ejfmAZlCobKmsgjaenfoIBBV+/YYWk=; r=eyJiIjpbeyJjIjpbMSwxXX1dfQ==;
+Message-Instance: m=1;
+ h=sha256:hX1I9qilKcViJMY00vjHTXXjFSMxnj2Q9FGjTtb7pZ8=:frkWUeckx6VRcredySX0HfwFRwyfVcRrJH2zJjBXCwY=;
+Date: Tue, 08 Jul 2026 10:00:00 +0000
+To: user@test3.dkim2.com
+From: alice@test1.dkim2.com
+Subject: invoice
+Message-Id: <inv.20260708@test1.dkim2.com>
+
+Pay account EVIL-9999
+-- 
+Alice <alice@test1.dkim2.com>

@@ -2,14 +2,16 @@ package Developer::Dashboard::CLI::OpenFile;
 
 use strict;
 use warnings;
+use sort 'stable';
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Cwd qw(cwd);
 use Exporter 'import';
 use File::Find ();
 use File::Spec;
 use Getopt::Long qw(GetOptionsFromArray);
+use Developer::Dashboard::CLI::OpenFileGrep qw(grep_matching_files);
 
 use Developer::Dashboard::CLI::OpenFileChooser qw(_default_editor _editor_supports_tabs _select_open_file_matches _stdin_has_pending_input _selection_matches);
 use Developer::Dashboard::CLI::OpenFileJavaSource qw(
@@ -37,19 +39,48 @@ our @EXPORT_OK = qw(run_open_file_command build_path_registry _unique_matches _u
 # Output: Developer::Dashboard::PathRegistry instance.
 sub build_path_registry {
     return Developer::Dashboard::PathRegistry->new(
-        workspace_roots => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],    # uncoverable branch false the interpolated map above always yields a defined string
-        project_roots   => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],    # uncoverable branch false the interpolated map above always yields a defined string
+        workspace_roots => [ grep { -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
+        project_roots   => [ grep { -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
     );
 }
 
 # run_open_file_command(%args)
 # Resolves and opens or prints matching files from a direct path, file:line reference, or search scope.
 # Input: optional path registry object and mutable argv array reference.
-# Output: exits after printing matches or execing the configured editor.
+# Output: prints matches, execs grep for native --help, or execs the configured editor.
 sub run_open_file_command {
     my (%args) = @_;
-    my $paths = $args{paths} || build_path_registry();    # uncoverable condition false build_path_registry always returns a blessed registry object
+    my $paths = $args{paths};
+    $paths = build_path_registry() if !$paths;
     my @argv  = @{ $args{args} || [] };
+
+    # Keep the established `of grep ...` shape before Getopt::Long sees grep's
+    # own flags such as -nr. The grep adapter receives arguments as an argv
+    # list, never as shell text.
+    my $grep_print = 0;
+    if ( @argv && $argv[0] eq '--print' && @argv > 1 && $argv[1] eq 'grep' ) {
+        $grep_print = 1;
+        shift @argv;
+    }
+    if ( @argv && $argv[0] eq 'grep' ) {
+        shift @argv;
+        if ( grep { defined $_ && $_ eq '--help' } @argv ) {
+            _command_exec( 'grep', @argv );
+        }
+        my @matches = grep_matching_files( args => \@argv );
+        die "No files found\n" if !@matches;
+        if ($grep_print) {
+            print join( "\n", @matches ), "\n";
+            _command_exit(0);
+        }
+        @matches = _select_open_file_matches( matches => \@matches );
+        my $editor_cmd = _default_editor('');
+        my @command = split /\s+/, $editor_cmd;
+        push @command, '-p' if _editor_supports_tabs( command => \@command );
+        push @command, @matches;
+        _command_exec(@command);
+    }
+
     my $print  = 0;
     my $line   = 0;
     my $editor = '';
@@ -122,10 +153,7 @@ sub _ordered_scope_matches {
     }
 
     return map { $_->{file} }
-      sort {
-             $a->{rank}  <=> $b->{rank}
-          || $a->{index} <=> $b->{index}
-      } @ranked;    # uncoverable branch true : entries carry unique indexes, so this tiebreaker is never 0 and the comparator never returns 0
+      sort { $a->{rank} <=> $b->{rank} } @ranked;    # perl's sort is stable (use sort 'stable'), so equal ranks keep their original index order
 }
 
 # _resolved_scope_match_regex($regexes, $index, $pattern)
@@ -137,8 +165,9 @@ sub _ordered_scope_matches {
 # Output: compiled regex object.
 sub _resolved_scope_match_regex {
     my ( $regexes, $index, $pattern ) = @_;
-    # uncoverable condition false _compile_open_file_regex only returns undef for an undef/empty pattern, already excluded by _scope_match_rank before this is called
-    return $regexes->[$index] || _compile_open_file_regex($pattern);
+    my $regex = $regexes->[$index];
+    $regex = _compile_open_file_regex($pattern) if !$regex;
+    return $regex;
 }
 
 # _scope_match_rank(%args)
@@ -178,9 +207,7 @@ sub _scope_match_rank {
         }
         elsif (
             do {
-                # uncoverable condition left (DD-917) $regex is freshly declared undef on every loop iteration and nothing sets it before this point, so the already-resolved side of ||= is never taken
-                # uncoverable condition false (DD-917) _resolved_scope_match_regex never returns a falsy value, so $regex is never falsy after this line
-                $regex ||= _resolved_scope_match_regex( \@regexes, $index, $pattern );
+                $regex = _resolved_scope_match_regex( \@regexes, $index, $pattern );
                 $basename =~ $regex;
             }
           )
@@ -260,7 +287,8 @@ sub _resolve_open_file_matches {
         return ( $line, $relative_match ) if defined $relative_match;
     }
     else {
-        $scope = $paths->current_project_root || cwd();    # uncoverable condition false cwd never returns an empty value on the test host
+        $scope = $paths->current_project_root;
+        $scope = cwd() if !$scope;
         @patterns = grep { defined && $_ ne '' } ( $first, @argv );
     }
 
@@ -311,7 +339,8 @@ sub _open_file_registries {
 # _scope_relative_path_match(%args)
 # Resolves an exact relative file path inside one search scope before regex fallback search.
 # Input: scope directory path and pattern array reference representing one relative path.
-# Output: exact file path string or undef when the pattern list is not one existing relative file.
+# Output: exact file path string or undef when the pattern list is not one existing relative
+# file, or when it would resolve outside the scope directory.
 sub _scope_relative_path_match {
     my (%args) = @_;
     my $scope    = $args{scope}   || return;
@@ -319,8 +348,13 @@ sub _scope_relative_path_match {
     return if !@patterns;
     return if grep { !defined $_ || $_ eq '' } @patterns;
 
-    my $relative = File::Spec->catfile(@patterns);
-    my $target   = File::Spec->catfile( $scope, $relative );
+    # DD-985: patterns come straight from the CLI's argv, so a '..' segment
+    # must never be allowed to walk the target outside $scope. Reuses the
+    # same lexical containment resolver the DD-498 Zip Slip fix already
+    # established (_contained_cache_path, imported above from
+    # OpenFileJavaSource) rather than a second bespoke check.
+    my $target = _contained_cache_path( $scope, @patterns );
+    return if !defined $target;
     return -f $target ? $target : undef;
 }
 
@@ -435,20 +469,28 @@ sub _command_exit {
 # _command_exec(@command)
 # Wraps process exec so tests can override it and inspect the final editor command.
 # A failed exec() returns false rather than dying, so without this check a
-# missing or unexecutable editor binary would fall through silently and the
-# whole command would exit 0 as though the editor had actually run (DD-910).
+# missing or unexecutable external command would fall through silently and the
+# whole command could exit 0 as though it had run (DD-910).
 # Input: shell command array.
 # Output: never returns during normal command execution.
 sub _command_exec {
     my (@command) = @_;
-    exec { $command[0] } @command;
+    _exec_raw(@command);
 
-    # Reached only when exec() fails to replace the process image, and
-    # proven reachable by t/98-cli-openfile-coverage.t's own passing
-    # assertion - but the exec() op boundary is structurally invisible to
-    # this coverage instrument, matching the documented fork/exec pattern
-    # already annotated the same way in PaxCache.pm.
-    die "Unable to run editor '$command[0]': $!\n";    # uncoverable statement
+    # Reached only when exec() fails to replace the process image. The raw
+    # exec lives in its own tiny helper because Devel::Cover cannot attribute
+    # a statement that follows a failed exec in the same sub; tests replace
+    # _exec_raw to reach this die in-process.
+    die "Unable to run command '$command[0]': $!\n";
+}
+
+# _exec_raw(@command)
+# Performs the bare exec of the editor command; returns only when exec fails.
+# Input: shell command array.
+# Output: false when exec fails, never returns on success.
+sub _exec_raw {
+    my (@command) = @_;
+    return exec { $command[0] } @command;
 }
 
 1;
@@ -496,8 +538,16 @@ match the candidate path, except when those remaining arguments join into one
 existing relative file path inside the resolved scope. In that exact-file case,
 the helper opens the scoped file directly instead of falling back to regex
 search. A single hit opens or prints that file, while multiple hits are ranked
-and shown as a chooser or plain list. Perl module lookup maps C<Foo::Bar> to
-C<Foo/Bar.pm>; Java lookup maps dotted class names to C<.java> source files or
+and shown as a chooser or plain list. C<dashboard of grep -nr PATTERN DIR>
+instead searches file contents and opens each unique matching file; adding
+C<--print> before C<grep> prints those paths without launching an editor. The
+grep arguments are passed directly to the executable, not through a shell.
+When C<--help> is supplied after C<grep>, the helper execs grep unchanged so
+its native usage text and exit status reach the caller rather than being
+parsed as search results.
+Perl module lookup maps C<Foo::Bar> to C<Foo/Bar.pm> under every existing
+directory in the running process's C<@INC>; Java lookup maps dotted class
+names to C<.java> source files or
 local source archives entirely offline. When neither is found, the helper
 prints a notice and stops rather than reaching the network - pass C<--online>
 to let it fall through to a Maven Central search and download a source jar

@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Config ();
 use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
@@ -14,6 +14,8 @@ use JSON::XS qw(encode_json decode_json);
 use Capture::Tiny qw(capture);
 use File::Basename qw(dirname basename);
 use Symbol qw(gensym);
+use URI;
+use URI::Escape qw(uri_escape uri_unescape);
 use Developer::Dashboard::CLI::Suggest;
 use Developer::Dashboard::StreamDrain qw(_drain_ready_handle);
 use Developer::Dashboard::EnvLoader;
@@ -29,7 +31,8 @@ use Developer::Dashboard::Platform qw(command_argv_for_path is_runnable_file res
 # Output: SkillDispatcher object.
 sub new {
     my ( $class, %args ) = @_;
-    my $manager = $args{manager} || Developer::Dashboard::SkillManager->new( paths => $args{paths} );    # uncoverable condition false
+    my $manager = $args{manager};
+    $manager = Developer::Dashboard::SkillManager->new( paths => $args{paths} ) if !$manager;
     return bless {
         manager => $manager,
     }, $class;
@@ -55,20 +58,25 @@ sub dispatch {
     my $command_spec = $self->_command_spec( $skill_name, $command );
     my $cmd_path = $command_spec ? $command_spec->{cmd_path} : undef;
     my $command_skill_path = $command_spec ? $command_spec->{skill_path} : undef;
-    return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) } if !$cmd_path;
+    if ( !$cmd_path ) {
+        return $self->_native_version_fallback($skill_name) if $command eq 'version';
+        return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) };
+    }
 
     my $hook_result = $self->execute_hooks( $skill_name, $command, @args );
     return $hook_result if $hook_result->{error};
     my @skill_layers = @{ $command_spec->{skill_layers} };
+    my @env_skill_layers = @{ $command_spec->{env_skill_layers} || \@skill_layers };
 
     my %env = $self->_skill_env(
         skill_name   => $skill_name,
         skill_path   => $command_skill_path,
-        skill_layers => \@skill_layers,
+        skill_layers => \@env_skill_layers,
         command      => $command_spec->{command_name},
         result_state => $hook_result->{result_state},
     );
     my @command = command_argv_for_path($cmd_path);
+    _prepend_skill_lib_to_perl_argv( \@command, $command_skill_path );
 
     my ( $stdout, $stderr, $exit ) = capture {
         local %ENV = ( %ENV, %env );
@@ -79,8 +87,9 @@ sub dispatch {
         else {
             Developer::Dashboard::Runtime::Result::clear_last_result();
         }
+        Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@env_skill_layers );
+        Developer::Dashboard::EnvLoader->load_skill_cli_layers( skill_layers => \@env_skill_layers );
         Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
-        Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
         system( @command, @args );
     };
     my $hook_stdout = join '', map { $_->{stdout} } values %{ $hook_result->{hooks} };
@@ -115,20 +124,28 @@ sub exec_command {
     my $command_spec = $self->_command_spec( $skill_name, $command );
     my $cmd_path = $command_spec ? $command_spec->{cmd_path} : undef;
     my $command_skill_path = $command_spec ? $command_spec->{skill_path} : undef;
-    return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) } if !$cmd_path;
+    if ( !$cmd_path ) {
+        if ( $command eq 'version' ) {
+            my $fallback = $self->_native_version_fallback($skill_name);
+            return $self->_exec_resolved_command( '<native version fallback>', [ $^X, '-e', 'print $ARGV[0]' ], [ $fallback->{stdout} ] );
+        }
+        return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) };
+    }
 
     my @skill_layers = @{ $command_spec->{skill_layers} };
-    my $hook_result = $self->_execute_hooks_streaming( $skill_name, $command_spec->{command_name}, \@skill_layers, @args );
+    my @env_skill_layers = @{ $command_spec->{env_skill_layers} || \@skill_layers };
+    my $hook_result = $self->_execute_hooks_streaming( $skill_name, $command_spec->{command_name}, \@skill_layers, { env_skill_layers => \@env_skill_layers }, @args );
     return $hook_result if $hook_result->{error};
 
     my %env = $self->_skill_env(
         skill_name   => $skill_name,
         skill_path   => $command_skill_path,
-        skill_layers => \@skill_layers,
+        skill_layers => \@env_skill_layers,
         command      => $command_spec->{command_name},
         result_state => $hook_result->{result_state},
     );
     my @command = command_argv_for_path($cmd_path);
+    _prepend_skill_lib_to_perl_argv( \@command, $command_skill_path );
     %ENV = ( %ENV, %env );
     Developer::Dashboard::Runtime::Result::set_current( $hook_result->{result_state} );
     if ( ref( $hook_result->{last_result} ) eq 'HASH' ) {
@@ -137,8 +154,9 @@ sub exec_command {
     else {
         Developer::Dashboard::Runtime::Result::clear_last_result();
     }
+    Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@env_skill_layers );
+    Developer::Dashboard::EnvLoader->load_skill_cli_layers( skill_layers => \@env_skill_layers );
     Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
-    Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
     return $self->_exec_resolved_command( $cmd_path, \@command, \@args );
 }
 
@@ -154,6 +172,7 @@ sub execute_hooks {
     return { hooks => {}, result_state => {} } if !$self->{manager}->is_enabled($skill_name);
     my $command_spec = $self->_command_spec( $skill_name, $command );
     my @skill_layers = $command_spec ? @{ $command_spec->{skill_layers} } : $self->_skill_layers($skill_name);
+    my @env_skill_layers = $command_spec ? @{ $command_spec->{env_skill_layers} || \@skill_layers } : @skill_layers;
     return { hooks => {}, result_state => {} } if !@skill_layers;
     my $resolved_command = $command_spec ? $command_spec->{command_name} : $command;
 
@@ -162,7 +181,7 @@ sub execute_hooks {
     for my $layer_path (@skill_layers) {
         my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$resolved_command.d" );
         next if !-d $hooks_dir;
-        opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";    # uncoverable branch true
+        opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";
         for my $entry ( sorted_dir_entries($dh) ) {
             my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
             next unless is_runnable_file($hook_path);
@@ -170,11 +189,12 @@ sub execute_hooks {
             my %env = $self->_skill_env(
                 skill_name   => $skill_name,
                 skill_path   => $layer_path,
-                skill_layers => \@skill_layers,
+                skill_layers => \@env_skill_layers,
                 command      => $resolved_command,
                 result_state => \%results,
             );
             my @command = command_argv_for_path($hook_path);
+            _prepend_skill_lib_to_perl_argv( \@command, $layer_path );
             my ( $stdout, $stderr, $exit ) = capture {
                 local %ENV = ( %ENV, %env );
                 Developer::Dashboard::Runtime::Result::set_current( \%results );
@@ -184,8 +204,9 @@ sub execute_hooks {
                 else {
                     Developer::Dashboard::Runtime::Result::clear_last_result();
                 }
+                Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@env_skill_layers );
+                Developer::Dashboard::EnvLoader->load_skill_cli_layers( skill_layers => \@env_skill_layers );
                 Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
-                Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
                 system( @command, @args );
             };
             my $result_key = $entry;
@@ -228,13 +249,15 @@ sub _execute_hooks_streaming {
     return { hooks => {}, result_state => {} } if !$skill_name || !$command;
     my @skill_layers = @{ $self->_arrayref_or_empty($skill_layers) };
     return { hooks => {}, result_state => {} } if !@skill_layers;
-
+    my $options = @args && ref( $args[0] ) eq 'HASH' && exists $args[0]{env_skill_layers} ? shift @args : {};
+    my @env_layers = @{ $self->_arrayref_or_empty( $options->{env_skill_layers} ) };
+    @env_layers = @skill_layers if !@env_layers;
     my %results;
     my $last_result = {};
     for my $layer_path (@skill_layers) {
         my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$command.d" );
         next if !-d $hooks_dir;
-        opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";    # uncoverable branch true
+        opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";
         for my $entry ( sorted_dir_entries($dh) ) {
             my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
             next unless is_runnable_file($hook_path);
@@ -242,16 +265,17 @@ sub _execute_hooks_streaming {
             my %env = $self->_skill_env(
                 skill_name   => $skill_name,
                 skill_path   => $layer_path,
-                skill_layers => \@skill_layers,
+                skill_layers => \@env_layers,
                 command      => $command,
                 result_state => \%results,
             );
             my @hook_command = command_argv_for_path($hook_path);
+            _prepend_skill_lib_to_perl_argv( \@hook_command, $layer_path );
             my $run = $self->_run_child_command_streaming(
                 command      => \@hook_command,
                 args         => \@args,
                 env          => \%env,
-                skill_layers => \@skill_layers,
+                skill_layers => \@env_layers,
                 result_state => \%results,
                 last_result  => $last_result,
                 stdin_mode   => 'null',
@@ -308,7 +332,7 @@ sub _run_child_command_streaming {
     my $stdin_spec = '<&STDIN';
     my $stdin_fh;
     if ( $stdin_mode eq 'null' ) {
-        open $stdin_fh, '<', File::Spec->devnull() or die "Unable to open " . File::Spec->devnull() . " for streaming skill hook stdin: $!";    # uncoverable branch true
+        open $stdin_fh, '<', File::Spec->devnull() or die "Unable to open " . File::Spec->devnull() . " for streaming skill hook stdin: $!";
         $stdin_spec = '<&' . fileno($stdin_fh);
     }
     my $stderr = gensym();
@@ -324,8 +348,9 @@ sub _run_child_command_streaming {
         else {
             Developer::Dashboard::Runtime::Result::clear_last_result();
         }
-        Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
         Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
+        Developer::Dashboard::EnvLoader->load_skill_cli_layers( skill_layers => \@skill_layers );
+        Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
         $pid = open3( $stdin_spec, $stdout, $stderr, @command, @argv );
     }
     close $stdin_fh if $stdin_fh;
@@ -347,11 +372,10 @@ sub _run_child_command_streaming {
                 next;
             }
 
-            if ( fileno($fh) == $stderr_fd ) {    # uncoverable branch false
-                print STDERR ${$chunk_ref};
-                $stderr_text .= ${$chunk_ref};
-                next;
-            }
+            # The selector only watches stdout and stderr, so anything that is
+            # not stdout is stderr.
+            print STDERR ${$chunk_ref};
+            $stderr_text .= ${$chunk_ref};
         }
     }
 
@@ -386,7 +410,7 @@ sub _exec_replacement {
     my ( $self, $command, $args ) = @_;
     my @command = @{ $self->_arrayref_or_empty($command) };
     my @args = @{ $self->_arrayref_or_empty($args) };
-    if ( !exec @command, @args ) {    # uncoverable branch false
+    if ( !exec @command, @args ) {
         my $error = "$!";
         return $error;
     }
@@ -480,7 +504,7 @@ sub get_skill_config {
         my $config_file = File::Spec->catfile( $skill_path, 'config', 'config.json' );
         next if !-f $config_file;
 
-        open( my $fh, '<', $config_file ) or return {};    # uncoverable branch true
+        open( my $fh, '<', $config_file ) or return {};
         my $json_text = do { local $/; <$fh> };
         close($fh);
 
@@ -500,7 +524,7 @@ sub config_fragment {
     my ( $self, $skill_name ) = @_;
     return {} if !$skill_name;
     my $config = $self->get_skill_config($skill_name);
-    return {} if ref($config) ne 'HASH' || !%{$config};    # uncoverable condition left
+    return {} if !%{$config};
     return { '_' . $skill_name => $config };
 }
 
@@ -550,13 +574,12 @@ sub command_hook_paths {
     return () if !$command_spec;
 
     my @hooks;
-    my $resolved_command = $command_spec->{command_name} || '';    # uncoverable condition right
-    return () if $resolved_command eq '';                          # uncoverable branch true
+    my $resolved_command = $command_spec->{command_name};
 
-    for my $layer_path ( @{ $command_spec->{skill_layers} || [] } ) {    # uncoverable branch true
+    for my $layer_path ( @{ $command_spec->{skill_layers} } ) {
         my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$resolved_command.d" );
         next if !-d $hooks_dir;
-        opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";    # uncoverable branch true
+        opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";
         for my $entry ( sorted_dir_entries($dh) ) {
             my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
             next unless is_runnable_file($hook_path);
@@ -635,7 +658,7 @@ sub all_skill_nav_pages {
     my ($self) = @_;
     my @pages;
     for my $skill_name ( $self->_all_installed_skill_names ) {
-        push @pages, @{ $self->skill_nav_pages($skill_name) || [] };    # uncoverable branch true
+        push @pages, @{ $self->skill_nav_pages($skill_name) };
     }
     return \@pages;
 }
@@ -653,12 +676,25 @@ sub _skill_page_response {
         );
     };
     return [ 404, 'text/plain; charset=utf-8', "Skill bookmark '$args{route_id}' not found\n" ] if !$page;
-    return [ 200, 'text/plain; charset=utf-8', $page->{meta}{raw_instruction} || $page->canonical_instruction ]
-      if !$args{app};    # uncoverable condition false
+    if ( $args{app} && ($page->{meta}{source_format} || '') eq 'raw-url' ) {
+        my $target = _merge_saved_url_query(
+            $page->{meta}{raw_url},
+            { %{ $args{query_params} || {} }, %{ $args{body_params} || {} } },
+        );
+        return [ 302, 'text/plain; charset=utf-8', "Redirecting\n", { Location => $target } ];
+    }
+    return [ 200, 'text/plain; charset=utf-8', $page->{meta}{raw_url} ]
+      if ($page->{meta}{source_format} || '') eq 'raw-url';
+    if ( !$args{app} ) {
+        my $instruction = $page->{meta}{raw_instruction};
+        $instruction = $page->canonical_instruction if !$instruction;
+        return [ 200, 'text/plain; charset=utf-8', $instruction ];
+    }
 
     my $app = $args{app};
     $page = $app->_decorate_skill_page_routes($page);
-    my $page_path = $args{path} || '/app/' . $page->{id};    # uncoverable condition false
+    my $page_path = $args{path};
+    $page_path = '/app/' . $page->{id} if !$page_path;
     $page = $app->_page_with_runtime_state(
         $page,
         query_params => $args{query_params} || {},
@@ -675,6 +711,31 @@ sub _skill_page_response {
     return $app->_page_response( $page, 'render' );
 }
 
+# _merge_saved_url_query($target, $params)
+# Merges request parameters into a saved skill bookmark URL, replacing matching
+# keys while preserving saved keys that were not supplied by the request.
+# Input: absolute or path URL string and flat request parameter hash reference.
+# Output: URL string with the merged, encoded query string.
+sub _merge_saved_url_query {
+    my ( $target, $params ) = @_;
+    my $uri = URI->new($target);
+    my %merged;
+    for my $pair ( split /&/, scalar( $uri->query // '' ) ) {
+        next if $pair eq '';
+        my ( $key, $value ) = split /=/, $pair, 2;
+        $merged{ uri_unescape($key) } = uri_unescape( defined $value ? $value : '' );
+    }
+    for my $key ( keys %{ $params || {} } ) {
+        next if $key eq 'splat';
+        my $value = $params->{$key};
+        $value = $value->[ -1 ] if ref($value) eq 'ARRAY';
+        $merged{$key} = defined $value ? $value : '';
+    }
+    $uri->query( join '&', map { uri_escape($_) . '=' . uri_escape( $merged{$_} ) } sort keys %merged )
+      if %merged;
+    return $uri->as_string;
+}
+
 # _load_skill_page(%args)
 # Loads one layered skill page document from dashboards/<id> and namespaces its
 # page id under /app/<skill>/...
@@ -685,15 +746,26 @@ sub _load_skill_page {
     my $skill_name = $args{skill_name} || die 'Missing skill name';
     my $route_id   = $args{route_id}   || die 'Missing route id';
     my ( $file, $skill_path ) = $self->_page_location( $skill_name, $route_id );
-    die "Skill bookmark '$route_id' not found" if !defined $file || !-f $file;    # uncoverable condition right
+    die "Skill bookmark '$route_id' not found" if !defined $file;
 
     require Developer::Dashboard::PageDocument;
-    open my $fh, '<', $file or die "Unable to read $file: $!";    # uncoverable branch true
+    open my $fh, '<', $file or die "Unable to read $file: $!";
     local $/;
     my $instruction = <$fh>;
     close $fh;
 
     my $page = eval { Developer::Dashboard::PageDocument->from_instruction($instruction) };
+    my $parse_error = $@;
+    my $raw_url = $instruction;
+    $raw_url =~ s/\A\s+|\s+\z//g;
+    if ( !$page && $raw_url =~ m{\A(?:https?:)?//[^\s]+\z} ) {
+        $page = Developer::Dashboard::PageDocument->new(
+            id     => $skill_name . ( $route_id eq 'index' ? '' : '/' . $route_id ),
+            title  => $route_id,
+            layout => { body => $raw_url },
+            meta   => { source_format => 'raw-url', raw_url => $raw_url },
+        );
+    }
     if ( !$page && $route_id =~ m{\Anav/.+\.tt\z} ) {
         $page = Developer::Dashboard::PageDocument->new(
             id     => $skill_name . '/' . $route_id,
@@ -702,13 +774,14 @@ sub _load_skill_page {
             meta   => { source_format => 'raw-nav-tt' },
         );
     }
-    die $@ if !$page;
+    die $parse_error if !$page;
 
     $page->{id} = $skill_name . ( $route_id eq 'index' ? '' : '/' . $route_id );
     $page->{meta}{source_kind}      = 'skill';
     $page->{meta}{skill_name}       = $skill_name;
     $page->{meta}{skill_route_id}   = $route_id;
     $page->{meta}{skill_path}       = $skill_path;
+    $page->{meta}{skill_layers}     = [ $self->_skill_layers($skill_name) ];
     $page->{meta}{raw_instruction}  = $instruction;
     return $page;
 }
@@ -723,18 +796,29 @@ sub _skill_env {
     my $local_root = File::Spec->catdir( $skill_path, 'perl5' );
     my $shared_root = File::Spec->catdir( $self->{manager}{paths}->home, 'perl5' );
     my @perl5lib_extra;
-    for my $shared_lib (
-        File::Spec->catdir( $shared_root, 'lib', 'perl5' ),
-        File::Spec->catdir( $shared_root, 'lib', 'perl5', $Config::Config{archname} ),
-    ) {
-        push @perl5lib_extra, $shared_lib if -d $shared_lib;
-    }
-    for my $layer_path ( reverse @{ $args{skill_layers} || [] } ) {
+    my %seen_perl5lib_extra;
+    my @skill_paths = ( $skill_path, reverse @{ $args{skill_layers} || [] } );
+    for my $layer_path (@skill_paths) {
+        next if !defined $layer_path || $layer_path eq '';
+        my $skill_lib = File::Spec->catdir( $layer_path, 'lib' );
+        if ( -d $skill_lib && !$seen_perl5lib_extra{$skill_lib}++ ) {
+            push @perl5lib_extra, $skill_lib;
+        }
         for my $local_lib (
             File::Spec->catdir( $layer_path, 'perl5', 'lib', 'perl5' ),
             File::Spec->catdir( $layer_path, 'perl5', 'lib', 'perl5', $Config::Config{archname} ),
         ) {
-            push @perl5lib_extra, $local_lib if -d $local_lib;
+            if ( -d $local_lib && !$seen_perl5lib_extra{$local_lib}++ ) {
+                push @perl5lib_extra, $local_lib;
+            }
+        }
+    }
+    for my $shared_lib (
+        File::Spec->catdir( $shared_root, 'lib', 'perl5' ),
+        File::Spec->catdir( $shared_root, 'lib', 'perl5', $Config::Config{archname} ),
+    ) {
+        if ( -d $shared_lib && !$seen_perl5lib_extra{$shared_lib}++ ) {
+            push @perl5lib_extra, $shared_lib;
         }
     }
 
@@ -752,6 +836,21 @@ sub _skill_env {
             extra => \@perl5lib_extra,
         ) },
     );
+}
+
+# _prepend_skill_lib_to_perl_argv($argv, $skill_path)
+# Makes the skill providing one Perl CLI script its first Perl module lookup
+# root, before the generic dashboard library injected by command_argv_for_path.
+# Input: mutable command argv array reference and skill directory path.
+# Output: same array reference, with a leading skill-lib -I pair for Perl argv.
+sub _prepend_skill_lib_to_perl_argv {
+    my ( $argv, $skill_path ) = @_;
+    return $argv if ref($argv) ne 'ARRAY' || @$argv < 3 || $argv->[0] ne $^X;
+    return $argv if !defined $skill_path || $skill_path eq '';
+    my $skill_lib = File::Spec->catdir( $skill_path, 'lib' );
+    return $argv if !-d $skill_lib;
+    splice @$argv, 1, 0, ( '-I', $skill_lib );
+    return $argv;
 }
 
 # _skill_layers($skill_name)
@@ -828,7 +927,8 @@ sub resolve_route_segments {
 # including nested skills/<repo>/cli command trees addressed through dotted
 # command tails such as foo.bar.
 # Input: skill repository name string and command name string.
-# Output: hash reference containing cmd_path, skill_path, skill_layers, and command_name.
+# Output: hash reference containing cmd_path, skill_path, command-provider
+# skill_layers, inherited env_skill_layers, and command_name.
 sub _command_spec {
     my ( $self, $skill_name, $command ) = @_;
     return if !$skill_name || !$command;
@@ -836,7 +936,13 @@ sub _command_spec {
     my @segments = grep { $_ ne '' } split /\./, $command;
     return if !@segments;
 
-    for my $command_root_spec ( $self->_command_root_specs( \@segments ) ) {
+    my @command_root_specs = $self->_command_root_specs( \@segments );
+
+    # Resolve every explicit command before considering any initializer. An
+    # initializer on an intermediate nested skill must not hide an explicit
+    # command (or the initializer) on a deeper nested skill.
+    for my $command_root_spec (@command_root_specs) {
+        next if $command_root_spec->{init_only};
         my @provider_layers = ();
         for my $skill_path ( $self->_skill_layers($skill_name) ) {
             my $provider_path = $skill_path;
@@ -851,11 +957,62 @@ sub _command_spec {
         for my $provider_path ( reverse @provider_layers ) {
             my $cmd_path = resolve_runnable_file( File::Spec->catfile( $provider_path, 'cli', $command_root_spec->{command_name} ) );
             next if !$cmd_path;
+            my @env_skill_layers;
+            my @env_frontier = $self->_skill_layers($skill_name);
+            push @env_skill_layers, @env_frontier;
+            for my $nested_segment ( @{ $command_root_spec->{nested_segments} } ) {
+                my @next_frontier;
+                for my $root_path (@env_frontier) {
+                    my $nested_path = $self->_nested_skill_path( $root_path, [$nested_segment] );
+                    push @next_frontier, $nested_path if -d $nested_path;
+                }
+                @env_frontier = @next_frontier;
+                push @env_skill_layers, @env_frontier;
+            }
             return {
                 cmd_path      => $cmd_path,
                 skill_path    => $provider_path,
                 skill_layers  => \@provider_layers,
+                env_skill_layers => \@env_skill_layers,
                 command_name  => $command_root_spec->{command_name},
+            };
+        }
+    }
+
+    # Search initializer fallbacks from the deepest provider back toward the
+    # root. This allows a dotted command tail to name a nested skill directly
+    # (foo.bar -> foo/skills/bar/cli/__init__) and ensures a deeper nested
+    # initializer wins over an ancestor's generic __init__.
+    for my $command_root_spec ( reverse @command_root_specs ) {
+        my @provider_layers = ();
+        for my $skill_path ( $self->_skill_layers($skill_name) ) {
+            my $provider_path = $self->_nested_skill_path( $skill_path, $command_root_spec->{nested_segments} );
+            next if @{ $command_root_spec->{nested_segments} } && !-d $provider_path;
+            push @provider_layers, $provider_path;
+        }
+        next if !@provider_layers;
+
+        for my $provider_path ( reverse @provider_layers ) {
+            my $cmd_path = resolve_runnable_file( File::Spec->catfile( $provider_path, 'cli', '__init__' ) );
+            next if !$cmd_path;
+            my @env_skill_layers;
+            my @env_frontier = $self->_skill_layers($skill_name);
+            push @env_skill_layers, @env_frontier;
+            for my $nested_segment ( @{ $command_root_spec->{nested_segments} } ) {
+                my @next_frontier;
+                for my $root_path (@env_frontier) {
+                    my $nested_path = $self->_nested_skill_path( $root_path, [$nested_segment] );
+                    push @next_frontier, $nested_path if -d $nested_path;
+                }
+                @env_frontier = @next_frontier;
+                push @env_skill_layers, @env_frontier;
+            }
+            return {
+                cmd_path      => $cmd_path,
+                skill_path    => $provider_path,
+                skill_layers  => \@provider_layers,
+                env_skill_layers => \@env_skill_layers,
+                command_name  => $command_root_spec->{init_only} ? '__init__' : $command_root_spec->{command_name},
             };
         }
     }
@@ -863,10 +1020,33 @@ sub _command_spec {
     return;
 }
 
+# _native_version_fallback($skill_name)
+# Answers `d2 <skill>.version` natively when the skill ships no cli/version
+# script of its own, by reading a raw VERSION= line from the skill's own
+# layered .env files (leaf-most layer first, same precedence order
+# _command_spec already uses for resolving a real command file).
+# Input: skill repository name string.
+# Output: hash reference with stdout, stderr, and exit_code (never an error -
+# a missing .env or a missing VERSION= key are reported in stdout, not failed).
+sub _native_version_fallback {
+    my ( $self, $skill_name ) = @_;
+    for my $skill_path ( reverse $self->_skill_layers($skill_name) ) {
+        my $env_file = File::Spec->catfile( $skill_path, '.env' );
+        next if !-f $env_file;
+        open my $fh, '<:raw', $env_file or next;
+        local $/;
+        my $body = <$fh>;
+        close $fh;
+        return { stdout => "$1\n", stderr => '', exit_code => 0 } if $body =~ /^\s*VERSION\s*=\s*(\S+)\s*$/m;
+    }
+    return { stdout => "no version number found\n", stderr => '', exit_code => 0 };
+}
+
 # _command_root_specs(\@segments)
 # Builds candidate nested-skill command roots from the dotted command tail.
 # Input: array reference of dotted command segments.
-# Output: ordered list of hash references with nested_segments and command_name.
+# Output: ordered explicit-command candidates, followed by a terminal nested
+# initializer candidate when the complete tail can name a nested skill.
 sub _command_root_specs {
     my ( $self, $segments ) = @_;
     my @segments = @{ $segments || [] };
@@ -880,9 +1060,21 @@ sub _command_root_specs {
     );
 
     for my $split_index ( 1 .. $#segments ) {
+        my @nested_segments = @segments[ 0 .. $split_index - 1 ];
+        my @validated_nested_segments = Developer::Dashboard::PathRegistry::validated_path_segments( join '/', @nested_segments );
+        next if @validated_nested_segments != @nested_segments;
         push @specs, {
-            nested_segments => [ @segments[ 0 .. $split_index - 1 ] ],
+            nested_segments => \@nested_segments,
             command_name    => join( '.', @segments[ $split_index .. $#segments ] ),
+        };
+    }
+
+    my @validated_terminal_segments = Developer::Dashboard::PathRegistry::validated_path_segments( join '/', @segments );
+    if ( @validated_terminal_segments == @segments ) {
+        push @specs, {
+            nested_segments => [@segments],
+            command_name    => '__init__',
+            init_only       => 1,
         };
     }
 
@@ -952,20 +1144,16 @@ sub resolve_custom_route_path {
     my ( $self, $path ) = @_;
     return if !defined $path || $path eq '';
     for my $spec ( reverse $self->_runtime_custom_route_specs ) {
-        return $spec if ( $spec->{path} || '' ) eq $path;    # uncoverable condition right
-        my $aliases = $spec->{aliases};
-        $aliases = [] if ref($aliases) ne 'ARRAY';    # uncoverable branch true
-        return $spec if grep { $_ eq $path } @{$aliases};
+        return $spec if $spec->{path} eq $path;
+        return $spec if grep { $_ eq $path } @{ $spec->{aliases} };
     }
     for my $skill_name ( $self->_all_installed_skill_names ) {
         for my $kind (qw(app ajax js css others)) {
             my $routes = $self->_skill_routes_for( $skill_name, $kind );
             for my $target ( sort keys %{$routes} ) {
                 my $spec = $routes->{$target};
-                return $spec if ( $spec->{path} || '' ) eq $path;    # uncoverable condition right
-                my $aliases = $spec->{aliases};
-                $aliases = [] if ref($aliases) ne 'ARRAY';    # uncoverable branch true
-                return $spec if grep { $_ eq $path } @{$aliases};
+                return $spec if $spec->{path} eq $path;
+                return $spec if grep { $_ eq $path } @{ $spec->{aliases} };
             }
         }
     }
@@ -988,7 +1176,7 @@ sub _runtime_custom_route_specs {
         next if !-f $routes_file;
         my $payload = $self->_load_skill_routes_file($routes_file);
         for my $kind (qw(app ajax js css others)) {
-            my $kind_routes = $payload->{$kind} || {};    # uncoverable condition right
+            my $kind_routes = $payload->{$kind};
             for my $target ( sort keys %{$kind_routes} ) {
                 push @specs, $self->_normalize_skill_route_spec(
                     kind        => $kind,
@@ -1028,7 +1216,7 @@ sub _skill_routes_for {
         my $routes_file = File::Spec->catfile( $skill_path, 'config', 'routes.json' );
         next if !-f $routes_file;
         my $payload = $self->_load_skill_routes_file($routes_file);
-        my $kind_routes = $payload->{$kind} || {};    # uncoverable condition right
+        my $kind_routes = $payload->{$kind};
         for my $target ( sort keys %{$kind_routes} ) {
             next if exists $routes{$target};
             my $spec = $self->_normalize_skill_route_spec(
@@ -1064,7 +1252,7 @@ sub _skill_ajax_routes_for {
 # Output: decoded hash reference.
 sub _load_skill_routes_file {
     my ( $self, $routes_file ) = @_;
-    open my $fh, '<', $routes_file or die "Unable to read $routes_file: $!";    # uncoverable branch true
+    open my $fh, '<', $routes_file or die "Unable to read $routes_file: $!";
     local $/;
     my $json_text = <$fh>;
     close $fh;
@@ -1128,8 +1316,8 @@ sub _expand_flat_skill_routes_payload {
         my ( $kind, $target ) = $to =~ m{\A/(ajax|app|js|css|others)/(.*)\z};
         die "$routes_file route path '$route_path' must map to /ajax/, /app/, /js/, /css/, or /others/"
           if !$kind;
-        die "$routes_file route path '$route_path' target must not be empty"    # uncoverable condition left
-          if !defined $target || $target eq '';
+        die "$routes_file route path '$route_path' target must not be empty"
+          if $target eq '';
         die "$routes_file route path '$route_path' type must be a scalar"
           if defined $type && ref($type);
         die "$routes_file route path '$route_path' type must not be empty"
@@ -1264,7 +1452,7 @@ sub _skill_bookmark_entries {
     for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
         my $dashboards_root = File::Spec->catdir( $skill_path, 'dashboards' );
         next if !-d $dashboards_root;
-        opendir( my $dh, $dashboards_root ) or die "Unable to read $dashboards_root: $!";    # uncoverable branch true
+        opendir( my $dh, $dashboards_root ) or die "Unable to read $dashboards_root: $!";
         for my $entry (
             grep {
                    $_ ne '.'
@@ -1295,7 +1483,7 @@ sub _skill_nav_route_ids {
         my $nav_root = File::Spec->catdir( $skill_path, 'dashboards', 'nav' );
         next if !-d $nav_root;
         for my $entry ( $self->_relative_files($nav_root) ) {
-            $routes{$entry} ||= 'nav/' . $entry;    # uncoverable condition false
+            $routes{$entry} = 'nav/' . $entry if !exists $routes{$entry};
         }
     }
     return %routes;
@@ -1312,7 +1500,7 @@ sub _all_installed_skill_names {
     my @names;
     for my $skill_root ( $self->{manager}{paths}->installed_skill_roots ) {
         my ($skill_name) = $skill_root =~ m{/([^/]+)\z};
-        next if !defined $skill_name || $skill_name eq '';    # uncoverable condition right
+        next if !defined $skill_name;
         push @names, $self->_descendant_skill_names( $skill_name, $skill_root );
     }
     return @names;
@@ -1331,7 +1519,7 @@ sub _descendant_skill_names {
     my $nested_root = File::Spec->catdir( $skill_root, 'skills' );
     return @names if !-d $nested_root;
 
-    opendir my $dh, $nested_root or die "Unable to read $nested_root: $!";    # uncoverable branch true
+    opendir my $dh, $nested_root or die "Unable to read $nested_root: $!";
     for my $entry (
         sort grep {
                $_ ne '.'
@@ -1359,7 +1547,7 @@ sub _relative_files {
     return () if !$root || !-d $root;
 
     my @relative_files;
-    opendir my $dh, $root or die "Unable to read $root: $!";    # uncoverable branch true
+    opendir my $dh, $root or die "Unable to read $root: $!";
     for my $entry ( sorted_dir_entries($dh) ) {
         my $path = File::Spec->catfile( $root, $entry );
         if ( -d $path ) {
@@ -1419,7 +1607,7 @@ Developer::Dashboard::SkillDispatcher - execute commands from installed skills
 
   use Developer::Dashboard::SkillDispatcher;
   my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
-  
+
   my $result = $dispatcher->dispatch('skill-name', 'cmd', 'arg1', 'arg2');
   my $hooks = $dispatcher->execute_hooks('skill-name', 'cmd');
   my $config = $dispatcher->get_skill_config('skill-name');
@@ -1451,7 +1639,7 @@ This module executes installed skill commands and serves skill bookmark routes. 
 
 =head1 WHY IT EXISTS
 
-It exists because the skill system needs a boundary between skill installation and skill execution. Dispatching commands, hook chaining, isolated environment variables, and bookmark routing all belong in one module instead of being hand-built in the web layer or CLI wrappers.
+It exists because the skill system needs a boundary between skill installation and skill execution. Dispatching commands, hook chaining, isolated environment variables, and bookmark routing all belong in one module instead of being hand-built in the web layer or CLI wrappers. It also answers C<E<lt>skillE<gt>.version> natively (DD-1043) by reading a raw C<VERSION=> line from the skill's own layered C<.env> when the skill ships no C<cli/version> script of its own, so no skill needs to hand-write one just to expose a version number.
 
 =head1 WHEN TO USE
 

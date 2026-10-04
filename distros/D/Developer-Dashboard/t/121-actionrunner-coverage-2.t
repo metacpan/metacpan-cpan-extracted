@@ -66,10 +66,11 @@ sub reap_supervisor {
 # lands before the command child has installed its handler, the child dies, the
 # escalation waitpid reaps it, and the forced-KILL side is never taken.
 #
-# This case removes that race in two ways. First, timeout_ms is 1500, so with
-# integer time() the deadline can only fire once time() has advanced twice --
-# i.e. at least a full second of wall clock after the fork, far longer than the
-# command child needs to boot. Second, the command child is a real script whose
+# This case removes that race in two ways. First, timeout_ms is 5000, so with
+# integer time() the deadline cannot fire before time() has advanced five times
+# -- at least four seconds of wall clock after the fork. This leaves ample room
+# for the command child to initialize even when Devel::Cover is inherited by the
+# nested interpreter. Second, the command child is a real script whose
 # TERM handler writes a marker file and then keeps running, so the assertions can
 # prove from the outside that SIGTERM was delivered *and* survived: the marker
 # only exists if the child was still alive when the escalation waitpid ran, which
@@ -108,7 +109,7 @@ CHILD
         cwd        => $home,
         env        => { DD_TEST_TERM_MARKER => $marker },
         background => 1,
-        timeout_ms => 1500,
+        timeout_ms => 5000,
     );
 
     ok( $result->{background}, 'background command action reports itself as backgrounded' );
@@ -131,15 +132,14 @@ CHILD
 # `exec sleep 60` makes the shell replace itself with the sleep, so the process
 # the supervisor signals is the process that dies -- there is no shell left
 # waiting on a foreground child and therefore no orphaned sleep afterwards. The
-# same 1500ms timeout keeps the deadline at least a full second away, so the
-# child is provably running when SIGTERM lands.
+# 5000ms timeout allows the instrumented child to finish startup before SIGTERM.
 # ---------------------------------------------------------------------------
 {
     my $result = $runner->run_command_action(
         command    => 'exec sleep 60',
         cwd        => $home,
         background => 1,
-        timeout_ms => 1500,
+        timeout_ms => 5000,
     );
 
     ok( $result->{pid} > 0, 'a SIGTERM-honouring background action returns a supervisor pid' );

@@ -19,6 +19,9 @@ WriteMakefile(
         'Unicode::Normalize' => 0,
         'parent'             => 0,
     },
+    BUILD_REQUIRES => {
+        'Test::More' => '0.98',
+    },
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources => {

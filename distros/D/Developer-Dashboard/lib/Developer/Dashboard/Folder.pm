@@ -3,7 +3,7 @@ package Developer::Dashboard::Folder;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Cwd qw(cwd);
 use File::Basename qw(dirname);
@@ -95,7 +95,7 @@ sub all {
 # Output: directory path string.
 sub postman {
     my $dir = File::Spec->catdir( configs(), 'postman' );
-    make_path($dir) if $dir ne '' && !-d $dir;    # uncoverable condition left
+    make_path($dir) if !-d $dir;
     return $dir;
 }
 
@@ -109,8 +109,8 @@ sub _paths_obj {
     return if $home eq '';
     $PATHS = Developer::Dashboard::PathRegistry->new(
         home            => $home,
-        workspace_roots => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],    # uncoverable branch false
-        project_roots   => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],    # uncoverable branch false
+        workspace_roots => [ grep { -d } map { "$home/$_" } qw(projects src work) ],
+        project_roots   => [ grep { -d } map { "$home/$_" } qw(projects src work) ],
     );
     _load_configured_aliases();
     return $PATHS;
@@ -154,7 +154,6 @@ sub cd {
     my $pwd = cwd();
     my $dir = $class->_resolve_path($where);
     return if !$dir || !-d $dir;
-    # uncoverable branch true
     chdir $dir or return;
     my $parent = dirname($dir);
     # DD-844: the callback runs under eval so a die does not skip the
@@ -185,7 +184,6 @@ sub ls {
     my ( $class, $where ) = @_;
     my $dir = $class->_resolve_path($where);
     return () if !$dir || !-d $dir;
-    # uncoverable branch true
     opendir my $dh, $dir or return ();
     my @items;
     while ( my $entry = readdir $dh ) {
@@ -199,7 +197,9 @@ sub ls {
         };
     }
     closedir $dh;
-    return sort { $b->{type} cmp $a->{type} || $a->{NAME} cmp $b->{NAME} } @items;    # uncoverable branch true
+    my @folders = sort { $a->{NAME} cmp $b->{NAME} } grep { $_->{type} eq 'folder' } @items;
+    my @files   = sort { $a->{NAME} cmp $b->{NAME} } grep { $_->{type} eq 'file' } @items;
+    return ( @folders, @files );
 }
 
 # locate(@parts)

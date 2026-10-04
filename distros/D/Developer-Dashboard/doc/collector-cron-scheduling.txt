@@ -1,0 +1,39 @@
+Collector Cron Scheduling
+========================
+
+Put a five-field crontab expression in the collector's `cron` property in
+`config/config.json`. An explicit `schedule` property may be set to `cron`;
+otherwise a non-empty `cron` property selects cron mode. A `schedule` value
+explicitly set to `interval` or `manual` takes precedence.
+
+    {
+      "collectors": [
+        {
+          "name": "weekday.report",
+          "command": "./report",
+          "cwd": "home",
+          "cron": "0 9 * * MON-FRI"
+        }
+      ]
+    }
+
+Fields, in order, are minute (0-59), hour (0-23), day of month (1-31), month
+(1-12 or JAN-DEC), and day of week (0-7 or SUN-SAT; 0 and 7 are Sunday).
+Each field accepts numbers, comma-separated lists, ranges, range steps, and
+`*/step`. Month and weekday names are case-insensitive. For example:
+
+    */10 8-18/2 1,15 JAN,MAR MON-FRI
+
+When both day-of-month and day-of-week are restricted, either field may match
+the date. If only one is restricted, that field controls the date. The
+scheduler evaluates local machine time once per second and stores the last
+matching minute so a collector runs only once in that minute.
+
+The expression must contain exactly five valid fields. Missing, empty,
+malformed, out-of-range, or overlong expressions do not become an always-due
+job; starting a cron collector with one fails with the collector name and a
+validation reason. Fix the `cron` property and restart the collector.
+
+Regression coverage lives in `t/103-collectorrunner-coverage.t` and exercises
+the config.json load, standard field syntax, day matching, once-per-minute
+deduplication, and invalid startup behavior.

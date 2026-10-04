@@ -1,0 +1,7 @@
+#  Test Hash Makefile
+
+README
+  echo "Read Me found"
+
+NoSuchFile
+  echo "This file doesn't exist"

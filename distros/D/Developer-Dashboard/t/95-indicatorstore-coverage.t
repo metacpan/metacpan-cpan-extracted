@@ -108,11 +108,21 @@ sub plant {
 
 # ---------------------------------------------------------------------------
 # Block C: set_indicator temp-write failure (open '>:raw' dies)
+#
+# DD-989: the staging path is no longer the fixed literal "status.json.pending"
+# - it is unpredictable per call (pid+time+counter, matching SessionStore's
+# _pending_session_file pattern) precisely so a pre-staged path can't be used
+# against it. To force the write-open failure this test exists to cover, pin
+# _pending_indicator_file to a known path for this one call, exactly as
+# t/67-sessionstore-coverage.t does for _pending_session_file.
 # ---------------------------------------------------------------------------
 {
     my $dir = $paths->indicator_dir('writefail');
-    my $pending = File::Spec->catfile( $dir, 'status.json.pending' );
+    my $pending = File::Spec->catfile( $dir, 'status.json.forced-write-fail.pending' );
     make_path($pending);    # make the pending path a directory so the write open fails
+    no warnings 'redefine';
+    local *Developer::Dashboard::IndicatorStore::_pending_indicator_file = sub { return $pending };
+    use warnings 'redefine';
     my $err = eval { $store->set_indicator( 'writefail', status => 'ok' ); 1 } ? '' : $@;
     like( $err, qr/Unable to write/, 'set_indicator dies when the pending temp file cannot be opened for write' );
 }

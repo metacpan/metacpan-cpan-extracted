@@ -34,8 +34,8 @@ dies_ok {
 
 # --- 2. task(): Argument Parsing Branches -----------------------------------
 # Test the elsif (@_ % 2 == 0) branch
-my $t = quietly { task(cmd => perl_cmd('exit 0'), 'dry.run' => 1) };
-is($t->{'dry.run'}, 1, 'task() successfully parses a flat key/value list');
+my $t = quietly { task(cmd => perl_cmd('exit 0'), 'dry_run' => 1) };
+is($t->{'dry_run'}, 1, 'task() successfully parses a flat key/value list');
 
 # Test the else (odd-length list) branch
 dies_ok {
@@ -43,21 +43,21 @@ dies_ok {
 } 'task() dies when given an odd-length flat list';
 
 # --- 3. task(): Invalid Reference Types for Files ---------------------------
-# input.files else { die ... } branch
+# input_files else { die ... } branch
 dies_ok {
-  quietly { task({ cmd => perl_cmd('exit 0'), 'input.files' => { bad => 'hash' } }) };
-} 'task() dies when input.files is an unsupported reference type (HASH)';
+  quietly { task({ cmd => perl_cmd('exit 0'), 'input_files' => { bad => 'hash' } }) };
+} 'task() dies when input_files is an unsupported reference type (HASH)';
 
-# output.files else { die ... } branch
+# output_files else { die ... } branch
 dies_ok {
-  quietly { task({ cmd => perl_cmd('exit 0'), 'output.files' => { bad => 'hash' } }) };
-} 'task() dies when output.files is an unsupported reference type (HASH)';
+  quietly { task({ cmd => perl_cmd('exit 0'), 'output_files' => { bad => 'hash' } }) };
+} 'task() dies when output_files is an unsupported reference type (HASH)';
 
 # --- 4. task(): Missing Scalar Input File -----------------------------------
 # (01.t covered the ARRAY branch for missing input files, this hits the scalar branch)
 dies_ok {
-  quietly { task({ cmd => perl_cmd('exit 0'), 'input.files' => 'definitely_does_not_exist.txt' }) };
-} 'task() dies when a scalar input.files does not exist';
+  quietly { task({ cmd => perl_cmd('exit 0'), 'input_files' => 'definitely_does_not_exist.txt' }) };
+} 'task() dies when a scalar input_files does not exist';
 
 # --- 5. task(): 0-Byte Output File Warning ----------------------------------
 my (undef, $empty_out) = tempfile(UNLINK => 1, SUFFIX => '.empty');
@@ -71,7 +71,7 @@ local $SIG{__WARN__} = sub {
 
 $t = quietly { task(# Touch a file without writing data to it
   cmd            => qq{$PERL -e "open(my \\\$fh, '>', '$empty_out'); close \\\$fh;"},
-  'output.files' => [$empty_out],
+  'output_files' => [$empty_out],
   overwrite      => 1,
   die            => 0
 ) };

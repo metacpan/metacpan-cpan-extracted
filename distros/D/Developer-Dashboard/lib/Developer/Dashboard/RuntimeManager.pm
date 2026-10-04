@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -42,6 +42,9 @@ use Developer::Dashboard::ProcessSupervision qw(
 
 our $SIGNAL_MANAGER;
 our $COLLECTOR_SUPERVISOR_MANAGER;
+# Root of the procfs tree probed by _procfs_available; tests point it at a
+# missing directory to reach the no-procfs fallback on a Linux host.
+our $PROCFS_ROOT = '/proc';
 
 # new(%args)
 # Constructs the runtime lifecycle manager.
@@ -57,7 +60,7 @@ sub new {
 
     return bless {
         app_builder => $app_builder,
-        collectors  => $args{collectors} || Developer::Dashboard::Collector->new( paths => $paths ),    # uncoverable condition false Collector->new always returns a blessed, truthy object
+        collectors  => $args{collectors} ? $args{collectors} : Developer::Dashboard::Collector->new( paths => $paths ),
         config      => $config,
         files       => $files,
         paths       => $paths,
@@ -109,16 +112,16 @@ sub start_web {
 
     $self->_cleanup_web_files;
 
-    pipe my $reader, my $writer or die "Unable to create startup pipe: $!";    # uncoverable branch true pipe(2) does not fail for a process under its descriptor limit
+    pipe my $reader, my $writer or die "Unable to create startup pipe: $!";
     my $pid = $self->_fork_process();
     die "Unable to fork dashboard web service: $!" if !defined $pid;
 
     if ($pid) {
-        close $writer;
+        CORE::close($writer);
         my $line = <$reader>;
         close $reader;
         $self->_reap_child_process($pid);
-        die "Unable to start dashboard web service\n" if !defined $line;    # uncoverable branch true the startup child always writes an ok/err line before exit, so the parent read never reaches EOF
+        die "Unable to start dashboard web service\n" if !defined $line;
         chomp $line;
         die "$line\n" if $line =~ /^err:/;
         my ( undef, $started_pid, $bound_host, $bound_port ) = split /\|/, $line, 4;
@@ -190,11 +193,11 @@ sub _start_web_windows_background {
         my $state = {
             %{$running},
             host         => $host,
-            pid          => $running->{pid} || $pid,
+            pid          => $running->{pid} ? $running->{pid} : $pid,
             port         => $port + 0,
             process_name => $running->{process_name},
             started_at   => $running->{started_at},
-            status       => 'running',    # uncoverable condition false the spawned Windows pid used by the pid fallback on this state is always a positive integer here
+            status       => 'running',
             workers      => $workers + 0,
             ssl          => $ssl + 0,
         };
@@ -581,7 +584,7 @@ sub start_collectors {
     my @started;
     for my $job (@jobs) {
         next if ref($job) ne 'HASH';
-        my $schedule = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );    # uncoverable condition false the nested schedule ternary always yields a truthy string
+        my $schedule = _job_schedule($job);
         my $name = $job->{name} || '(unnamed)';
         if (%wanted) {
             next if !$wanted{$name};
@@ -947,7 +950,7 @@ sub _collector_stop_fallback_names {
         opendir( my $dh, $collectors_root ) or die "Unable to read $collectors_root: $!";
         for my $entry ( grep { /\.pid\z/ } sorted_dir_entries($dh) ) {
             my ($name) = $entry =~ /\A(.*)\.pid\z/;
-            next if !defined $name || $name eq '' || $seen{$name}++;    # uncoverable condition left the readdir entries are pre-filtered to match /\.pid\z/, so the capture is always defined
+            next if $name eq '' || $seen{$name}++;
             push @names, $name;
         }
         closedir($dh);
@@ -1116,7 +1119,6 @@ sub restart_target {
           ? ( $self->start_named_collector( name => $names[0], progress => $args{progress} ) )
           : $self->start_collectors(
             progress => $args{progress},
-            ( @names ? ( names => \@names ) : () ),    # uncoverable branch true this start_collectors call is only reached when @names is empty
           );
         my %stopped = map { $_->{name} => $_ } @stopped;
         $result{collectors} = [
@@ -1198,7 +1200,7 @@ sub _stop_disabled_collectors {
     my %disabled;
     for my $job ( @{$jobs} ) {
         next if !$self->_collector_disabled($job);
-        my $name = ref($job) eq 'HASH' ? ( $job->{name} || '' ) : '';    # uncoverable branch false a non-hash job is never reported as disabled above, so this arm is only reached for hash jobs
+        my $name = $job->{name} || '';
         next if $name eq '';
         next if %{$wanted} && !$wanted->{$name};
         $disabled{$name} = 1;
@@ -1212,6 +1214,19 @@ sub _stop_disabled_collectors {
     return @names;
 }
 
+# _job_schedule($job)
+# Resolves the schedule name of one collector job hash: the explicit schedule
+# when present, otherwise cron, interval, or manual from the other fields.
+# Input: collector job hash reference.
+# Output: schedule name string (never empty).
+sub _job_schedule {
+    my ($job) = @_;
+    return $job->{schedule} if $job->{schedule};
+    return 'cron'     if $job->{cron};
+    return 'interval' if $job->{interval};
+    return 'manual';
+}
+
 # _loop_job_for_named_start($job)
 # Normalizes one collector job into a loopable schedule for explicit named starts.
 # Input: collector job hash reference.
@@ -1219,8 +1234,7 @@ sub _stop_disabled_collectors {
 sub _loop_job_for_named_start {
     my ( $self, $job ) = @_;
     my %loop_job = %{$job || {}};
-    my $schedule = $loop_job{schedule}
-      || ( $loop_job{cron} ? 'cron' : $loop_job{interval} ? 'interval' : 'manual' );    # uncoverable condition false the nested schedule ternary always yields a truthy string
+    my $schedule = _job_schedule( \%loop_job );
     if ( $schedule eq 'manual' ) {
         $loop_job{interval} = 30 if !defined $loop_job{interval} || $loop_job{interval} !~ /^\d+$/ || $loop_job{interval} < 1;
         $loop_job{schedule} = 'interval';
@@ -1455,7 +1469,7 @@ sub _collector_watchdog_window {
 # Output: true value.
 sub _mark_collector_watchdog_attention {
     my ( $self, $name, $message, %args ) = @_;
-    my $observed_at = $args{observed_at} || _now_iso8601( tz => "utc" );    # uncoverable condition false _now_iso8601 always returns a truthy timestamp string
+    my $observed_at = $args{observed_at} ? $args{observed_at} : _now_iso8601( tz => "utc" );
     my $observed_at_epoch = defined $args{observed_at_epoch} ? $args{observed_at_epoch} : time;
     $self->{collectors}->write_status(
         $name,
@@ -1482,7 +1496,7 @@ sub _mark_collector_watchdog_attention {
 # Output: true value.
 sub _log_collector_watchdog_event {
     my ( $self, $name, $message ) = @_;
-    chomp $message if defined $message;    # uncoverable branch false every caller passes a defined watchdog message
+    chomp $message;
     my $timestamp = _now_iso8601( tz => "utc" );
     $self->{files}->append( 'collector_log', sprintf "[%s][watchdog][%s] %s\n", $timestamp, $name, $message );
     $self->{collectors}->append_log_entry(
@@ -1565,7 +1579,7 @@ sub _start_collector_supervisor {
         my @command = $self->_windows_background_collector_supervisor_command;
         my $pid = $self->_spawn_windows_background_command(@command);
         $self->{paths}->secure_file_permissions( $self->_collector_supervisor_pidfile );
-        open my $fh, '>', $self->_collector_supervisor_pidfile or die "Unable to write " . $self->_collector_supervisor_pidfile . ": $!";    # uncoverable branch true the state root is created and secured immediately above, so this write cannot fail on the test host
+        open my $fh, '>', $self->_collector_supervisor_pidfile or die "Unable to write " . $self->_collector_supervisor_pidfile . ": $!";
         print {$fh} $pid;
         close $fh;
         $self->{paths}->secure_file_permissions( $self->_collector_supervisor_pidfile );
@@ -1583,9 +1597,9 @@ sub _start_collector_supervisor {
     }
 
     my $pid = fork();
-    die "Unable to fork collector supervisor: $!" if !defined $pid;    # uncoverable branch true fork(2) does not fail for a process under its limits on the test host
+    die "Unable to fork collector supervisor: $!" if !defined $pid;
     if ($pid) {
-        open my $fh, '>', $self->_collector_supervisor_pidfile or die "Unable to write " . $self->_collector_supervisor_pidfile . ": $!";    # uncoverable branch true the state root exists and is writable, so this pidfile write cannot fail on the test host
+        open my $fh, '>', $self->_collector_supervisor_pidfile or die "Unable to write " . $self->_collector_supervisor_pidfile . ": $!";
         print {$fh} $pid;
         close $fh;
         $self->{paths}->secure_file_permissions( $self->_collector_supervisor_pidfile );
@@ -1618,9 +1632,9 @@ sub _run_collector_supervisor_child {
         $self->_detach_web_process_session;
     }
     if ($redirect) {
-        open STDIN, '<', File::Spec->devnull() or die $!;    # uncoverable branch true reopening stdin on the null device does not fail on the test host
-        open STDOUT, '>>', $self->{files}->collector_log or die $!;    # uncoverable branch true the collector log directory exists and is writable on the test host
-        open STDERR, '>>', $self->{files}->collector_log or die $!;    # uncoverable branch true the collector log directory exists and is writable on the test host
+        open STDIN, '<', File::Spec->devnull() or die $!;
+        open STDOUT, '>>', $self->{files}->collector_log or die $!;
+        open STDERR, '>>', $self->{files}->collector_log or die $!;
         $self->_close_inherited_fds( close_ipc => 1 );
     }
 
@@ -1629,7 +1643,6 @@ sub _run_collector_supervisor_child {
     local $COLLECTOR_SUPERVISOR_MANAGER = $self;
     my $shutdown = sub { $self->_shutdown_collector_supervisor('stopped') };
     local $SIG{CHLD} = sub {
-        return if !$COLLECTOR_SUPERVISOR_MANAGER;    # uncoverable branch true the manager is localized to this supervisor for the lifetime of the handler binding
         $COLLECTOR_SUPERVISOR_MANAGER->_reap_any_child_processes;
         return;
     };
@@ -1826,7 +1839,7 @@ sub _write_collector_supervisor_state {
     my ( $self, $data ) = @_;
     my $file = $self->_collector_supervisor_statefile;
     my $tmp = $self->_pending_collector_supervisor_state_file($file);
-    open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";    # uncoverable branch true the state root exists and is writable, so the pending-file write cannot fail on the test host
+    open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";
     print {$fh} json_encode( $data || {} );
     close $fh;
     $self->{paths}->secure_file_permissions($tmp);
@@ -1973,7 +1986,7 @@ sub restart_progress_tasks {
         else {
             for my $job ( @{ $self->{config}->collectors } ) {
                 next if ref($job) ne 'HASH';
-                my $schedule = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );    # uncoverable condition false the nested schedule ternary always yields a truthy string
+                my $schedule = _job_schedule($job);
                 next if $schedule eq 'manual';
                 my $collector_name = $job->{name} || '(unnamed)';
                 push @collector_names, $collector_name;
@@ -2052,9 +2065,9 @@ sub _run_web_child {
         return 0 if $pid;
     }
     if ($redirect) {
-        open STDIN, '<', File::Spec->devnull() or die $!;    # uncoverable branch true reopening stdin on the null device does not fail on the test host
-        open STDOUT, '>>', $self->{files}->dashboard_log or die $!;    # uncoverable branch true the dashboard log directory exists and is writable on the test host
-        open STDERR, '>>', $self->{files}->dashboard_log or die $!;    # uncoverable branch true the dashboard log directory exists and is writable on the test host
+        open STDIN, '<', File::Spec->devnull() or die $!;
+        open STDOUT, '>>', $self->{files}->dashboard_log or die $!;
+        open STDERR, '>>', $self->{files}->dashboard_log or die $!;
     }
     $ENV{DEVELOPER_DASHBOARD_WEB_SERVICE} = 1;
     $ENV{DEVELOPER_DASHBOARD_WEB_HOST}    = $host;
@@ -2150,14 +2163,14 @@ sub _write_startup_pipe_message {
     my ( $self, $writer, $message ) = @_;
     $message = '' if !defined $message;
     my $fd = fileno($writer);
-    if ( !defined $fd || $fd < 0 ) {    # uncoverable condition left fileno never returns undef for an open handle
-        print {$writer} $message or die "Unable to write startup pipe: $!";    # uncoverable branch true printing to the in-memory startup handle does not fail on the test host
+    if ( !defined $fd || $fd < 0 ) {
+        print {$writer} $message or die "Unable to write startup pipe: $!";
     }
     else {
         my $offset = 0;
         while ( $offset < length $message ) {
             my $written = syswrite( $writer, $message, length($message) - $offset, $offset );
-            die "Unable to write startup pipe: $!" if !defined $written;    # uncoverable branch true syswrite to the valid startup descriptor returns a defined byte count on the test host
+            die "Unable to write startup pipe: $!" if !defined $written;
             $offset += $written;
         }
     }
@@ -2211,7 +2224,6 @@ sub web_log {
         open my $fh, '<', $file or die "Unable to read $file: $!";
         local $/;
         $log = <$fh>;
-        $log = '' if !defined $log;    # uncoverable branch true a successful slurp of a regular file returns a defined string even when empty
         $start_pos = tell($fh);
         close $fh;
     }
@@ -2238,7 +2250,7 @@ sub _tail_text {
     return '' if !defined $text || $text eq '';
     return $text if !defined $lines;
     my @parts = split /\n/, $text, -1;
-    my $had_trailing_newline = @parts && $parts[-1] eq '' ? 1 : 0;    # uncoverable condition left splitting a non-empty string always yields at least one part
+    my $had_trailing_newline = $parts[-1] eq '' ? 1 : 0;
     pop @parts if $had_trailing_newline;
     my $start = @parts - $lines;
     $start = 0 if $start < 0;
@@ -2248,7 +2260,8 @@ sub _tail_text {
 }
 
 # _follow_log_file(%args)
-# Streams appended content from one log file until interrupted.
+# Streams appended content from one log file until interrupted, installing
+# termination handlers before any filesystem setup so an early signal is clean.
 # Input: file path plus optional poll interval seconds and start byte offset.
 # Output: never returns under normal command use; prints new log chunks to STDOUT.
 sub _follow_log_file {
@@ -2256,26 +2269,26 @@ sub _follow_log_file {
     my $file = $args{file} || die 'Missing log file';
     my $interval = defined $args{interval} ? $args{interval} : 0.1;
     my $start_pos = $args{start_pos};
-    my $fh;
-    if ( !open( $fh, '<', $file ) ) {
-        open my $create_fh, '>>', $file or die "Unable to create $file: $!";    # uncoverable branch true the log's parent directory exists and is writable on the test host
-        close $create_fh;
-        $self->{paths}->secure_file_permissions($file);
-        open( $fh, '<', $file ) or die "Unable to read $file: $!";    # uncoverable branch true the file was just created above, so reopening it for reading cannot fail on the test host
-    }
-    if ( defined $start_pos ) {
-        seek $fh, $start_pos, 0 or die "Unable to seek $file: $!";    # uncoverable branch true seeking to a valid offset in the just-opened file does not fail on the test host
-    }
-    else {
-        seek $fh, 0, 2 or die "Unable to seek $file: $!";    # uncoverable branch true seeking to end of the just-opened file does not fail on the test host
-    }
     local $SIG{TERM} = sub { POSIX::_exit(0) };
     local $SIG{INT}  = sub { POSIX::_exit(0) };
     local $SIG{HUP}  = sub { POSIX::_exit(0) };
+    my $fh;
+    if ( !open( $fh, '<', $file ) ) {
+        open my $create_fh, '>>', $file or die "Unable to create $file: $!";
+        close $create_fh;
+        $self->{paths}->secure_file_permissions($file);
+        open( $fh, '<', $file ) or die "Unable to read $file: $!";
+    }
+    if ( defined $start_pos ) {
+        seek $fh, $start_pos, 0 or die "Unable to seek $file: $!";
+    }
+    else {
+        seek $fh, 0, 2 or die "Unable to seek $file: $!";
+    }
     while (1) {
         my $chunk = '';
         my $read = sysread( $fh, $chunk, 8192 );
-        if ( defined $read && $read > 0 ) {    # uncoverable condition left sysread on the open follow handle does not return undef on the test host
+        if ( defined $read && $read > 0 ) {
             print $chunk;
             next;
         }
@@ -2313,7 +2326,7 @@ sub _write_web_state {
     }
     my $file = $self->{files}->web_state;
     my $tmp = $self->_pending_web_state_file($file);
-    open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";    # uncoverable branch true the state root exists and is writable, so the pending-file write cannot fail on the test host
+    open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";
     print {$fh} json_encode($payload);
     close $fh;
     $self->{paths}->secure_file_permissions($tmp);
@@ -2656,9 +2669,7 @@ sub _looks_like_web_process {
     return 1 if $proc->{args} =~ m{^(?:\S+[\\/])?_dashboard-core\s+(?:serve|web-foreground)(?:\s+(?!logs(?:\s|$)|workers(?:\s|$)).*)?$};
     return 1 if $proc->{args} =~ m{^(?:\S+[\\/])?perl(?:\.exe)?(?:\s+-\S+)*\s+(?:\S+[\\/])?_dashboard-core\s+(?:serve|web-foreground)(?:\s+(?!logs(?:\s|$)|workers(?:\s|$)).*)?$}i;
     return 1 if $proc->{args} =~ m{^(?:\S+/env\s+)?perl(?:\s+-\S+)*\s+(?:\S+/)?dashboard\s+serve(?:\s+(?!logs(?:\s|$)|workers(?:\s|$)).*)?$};
-    return 1 if $proc->{args} =~ m{^(?:\S+/env\s+)?perl(?:\s+-\S+)*\s+bin/dashboard\s+serve(?:\s+(?!logs(?:\s|$)|workers(?:\s|$)).*)?$};    # uncoverable branch true any bin/dashboard serve command line already matched the broader (?:\S+/)?dashboard pattern above
     return 1 if $proc->{args} =~ m{^(?:\S+/)?dashboard\s+serve(?:\s+(?!logs(?:\s|$)|workers(?:\s|$)).*)?$};
-    return 1 if $proc->{args} =~ m{^bin/dashboard\s+serve(?:\s+(?!logs(?:\s|$)|workers(?:\s|$)).*)?$};    # uncoverable branch true a bin/dashboard serve command line already matched the broader (?:\S+/)?dashboard pattern above
     return 0;
 }
 
@@ -2869,7 +2880,7 @@ sub _listener_socket_inodes_for_port {
     my @inodes;
     for my $file ( $self->_listener_socket_table_paths ) {
         next if !-r $file;
-        open my $fh, '<', $file or next;    # uncoverable branch true the readability guard above already excluded unreadable table files
+        open my $fh, '<', $file or next;
         while ( my $line = <$fh> ) {
             next if $line !~ /\S/;
             my @fields = split ' ', $line;
@@ -2969,7 +2980,7 @@ sub _restart_web_with_retry {
     for my $attempt ( 1 .. $attempts ) {
         my $pid = eval { $self->start_web( host => $host, port => $port, workers => $workers, ssl => $ssl ) };
         my $error = $@;
-        if ( defined $pid && !$error ) {    # uncoverable condition right a defined pid means start_web returned without dying, so $error is empty here
+        if ( defined $pid ) {
             if ( $self->_web_runtime_ready( $pid, $port ) ) {
                 $self->_progress_emit(
                     $progress,
@@ -3076,7 +3087,7 @@ sub _web_runtime_ready {
                         listener_pid => $listener_pid,
                         state        => $running,
                     );
-                    $running->{pid} = $listener_pid if $running;    # uncoverable branch false this block is only reached when $matches_runtime is set, which requires a truthy $running
+                    $running->{pid} = $listener_pid;
                 }
             }
             $listening = 1 if !$listening && $matches_runtime && $self->_port_accepting_connections($listener_port);
@@ -3317,7 +3328,7 @@ sub _read_process_state {
 # Input: none.
 # Output: boolean true when /proc exists and process readers should prefer it.
 sub _procfs_available {
-    return -d '/proc' ? 1 : 0;    # uncoverable branch false the Linux test host always exposes a /proc filesystem
+    return -d $PROCFS_ROOT ? 1 : 0;
 }
 
 # _slurp_proc_file($path)
@@ -3328,7 +3339,7 @@ sub _slurp_proc_file {
     my ( $self, $path ) = @_;
     return if !defined $path || $path eq '';
     return if !-r $path;
-    open my $fh, '<', $path or return;    # uncoverable branch true the readability guard above already excluded unreadable proc files
+    open my $fh, '<', $path or return;
     local $/;
     return scalar <$fh>;
 }

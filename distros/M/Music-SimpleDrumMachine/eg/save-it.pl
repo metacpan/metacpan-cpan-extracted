@@ -19,13 +19,15 @@ my %primes = ( # for computing patterns
     to_7 => [ primes(7) ],
 );
 
+my $next_part = { part_A => 6, part_B => 3, part_C => 2 }; 
+
 my $mcr = Music::CreatingRhythms->new;
 
 my $dm = Music::SimpleDrumMachine->new(
     port_name => $name,
     bpm       => $bpm,
     chan      => $chan,
-    next_part => 'part_A',
+    next_part => $next_part,
     parts     => {
         part_A => \&part_A,
         part_B => \&part_B,
@@ -44,8 +46,7 @@ sub part_A {
         kick   => $mcr->euclid($q, $beats),
         snare  => $mcr->rotate_n($r, $mcr->euclid(2, $beats)),
     );
-    my $next = 'part_B';
-    return $next, \%patterns;
+    return $next_part, \%patterns;
 }
 
 sub part_B {
@@ -57,8 +58,7 @@ sub part_B {
         kick   => [qw(1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1)],
         snare  => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 1 0)],
     );
-    my $next = 'part_C';
-    return $next, \%patterns;
+    return $next_part, \%patterns;
 }
 
 sub part_C {
@@ -71,8 +71,7 @@ sub part_C {
         kick   => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
         snare  => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
     );
-    my $next = 'part_A';
-    return $next, \%patterns;
+    return $next_part, \%patterns;
 }
 
 sub primes_list($primes) {

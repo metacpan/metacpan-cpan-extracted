@@ -1,0 +1,62 @@
+CLI Help and Completion Contract
+===============================
+
+Every dashboard-managed built-in command supports --help and -h. Commands
+with actions also accept both `dashboard <command> <action> --help` and
+`dashboard <command> <action> help`. The global form is
+`dashboard help <command> [action ...]`, for example:
+
+    d2 api add --help
+    d2 api add help
+    d2 api --key helper-bot -o json
+    d2 version --help
+    d2 help docker development enable
+    d2 help version
+
+When a command has a default action, root-level help and option completion
+include that default action's options. For example, `api` defaults to `ls`, so
+the key filter and output-format flags work without spelling `ls`.
+
+Help is dispatched before the built-in operation runs, but after the public
+switchboard's established main and per-command hook gates. It prints usage,
+purpose, and the known actions/options without invoking the selected command
+body. Compatibility aliases resolve to the canonical command documentation.
+When a built-in command delegates a subcommand to another CLI, help belongs to
+that delegated CLI: `d2 of grep --help`, `d2 docker compose config --help`,
+and `d2 docker compose help` are passed through unchanged. This remains true
+when internal options or Docker Compose selectors precede the delegated
+command, such as `d2 of --print grep --help` or a Compose `exec` that invokes
+another program with `--help`. Once parsing enters the delegated command's
+argument vector, `help`, `-h`, and `--help` are not reinterpreted as Dashboard
+help. Unknown top-level executables already bypass the internal help catalog
+and retain their original arguments. Use
+`d2 docker compose --help` or `d2 help docker compose` for the Dashboard
+Compose wrapper synopsis.
+
+`Developer::Dashboard::CLI::Help` owns the command, action, alias, and option
+catalog. `Developer::Dashboard::CLI::Complete` uses that catalog for public
+action and option candidates. This keeps `dashboard complete`, Bash, and zsh
+completion aligned. Dynamic candidates (installed skills, workspace sessions,
+collectors, and skill path aliases) continue to come from their live providers.
+Workspace sessions are queried only for a positional name; a current word that
+starts with `-` completes option flags without invoking `tmux`.
+
+Bare `dashboard help`, `dashboard --help`, and `dashboard -h` print a concise
+index of all public built-ins and their purpose rather than dumping the entire
+module manual.
+
+Useful checks, run in the isolated Compose development service:
+
+    d2 docker compose --project-name problem25 run --rm --no-deps dev \
+      prove -l t/265-cli-help-completion-contract.t t/266-cli-help-dispatch.t
+    d2 docker compose --project-name problem25 run --rm --no-deps dev \
+      prove -lv t/05-cli-smoke.t
+
+The contract test compares the help catalog with registered internal helpers
+and dispatched actions, checks option candidates, aliases, and global-help TAB
+targets. The subprocess test verifies root/action help exits successfully and
+does not enter representative command operations, and checks native help after
+delegation boundaries with preceding wrapper options. The smoke test exercises the
+generated Bash completion function and verifies the zsh completion hook is
+registered. Interactive zsh completion requires a zsh binary, which is not
+present in the current Docker development image.

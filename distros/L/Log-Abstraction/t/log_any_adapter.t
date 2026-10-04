@@ -49,11 +49,11 @@ subtest 'warning level maps to warn' => sub {
 };
 
 # ---------------------------------------------------------------------------
-# 3. Level mapping: critical/alert/emergency all route to error
+# 3. Level mapping: critical/alert/emergency keep their own levels
 # ---------------------------------------------------------------------------
 
-subtest 'critical, alert, emergency all route to error' => sub {
-	plan tests => 6;
+subtest 'critical, alert, emergency keep their own levels' => sub {
+	plan tests => 8;
 
 	for my $la_level (qw(critical alert emergency)) {
 		my @msgs;
@@ -64,8 +64,15 @@ subtest 'critical, alert, emergency all route to error' => sub {
 		$log->$la_level("$la_level message");
 
 		is(scalar(@msgs), 1, "$la_level produced one message");
-		is($msgs[0]{level}, 'error', "$la_level stored as error");
+		is($msgs[0]{level}, $la_level, "$la_level stored as $la_level");
 	}
+
+	my $la = Log::Abstraction->new(logger => [], level => 'alert');
+	Log::Any::Adapter->set('Abstraction', instance => $la);
+	my $log = Log::Any->get_logger(category => 'Test_is_high');
+	ok(!$log->is_critical() && $log->is_alert() && $log->is_emergency(),
+		'is_critical/is_alert/is_emergency have distinct thresholds');
+	ok(!$log->is_error(), 'is_error false at alert');
 };
 
 # ---------------------------------------------------------------------------

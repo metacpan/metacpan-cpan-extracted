@@ -11,7 +11,9 @@ t/00-load.t
 t/10-compile.t
 t/20-new.t
 t/30-basics.t
+t/backend_options.t
 t/caller_depth.t
+t/changes.t
 t/code.t
 t/comment-spelling.t
 t/conf/is_debug.yml
@@ -24,21 +26,31 @@ t/eol.t
 t/error.t
 t/extended_tests.t
 t/function.t
+t/high_levels.t
 t/integration.t
+t/is_level.t
 t/journald.t
 t/json_format.t
+t/kwalitee.t
 t/locales.t
 t/log_any_adapter.t
 t/manifest.t
 t/mutant_killers.t
+t/namespace.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-synopsis.t
 t/pod.t
 t/regressions.t
+t/rotation.t
+t/rt_178070.t
+t/rt_180018.t
+t/rt_181461.t
 t/sendmail.t
+t/structured_fields.t
 t/subclass.t
 t/syslog.t
+t/timestamp.t
 t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

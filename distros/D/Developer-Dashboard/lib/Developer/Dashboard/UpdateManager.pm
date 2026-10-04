@@ -3,7 +3,7 @@ package Developer::Dashboard::UpdateManager;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -82,7 +82,7 @@ sub run {
         };
         my $output = $stdout . $stderr;
 
-        print $output if defined $output && $output ne ''; # uncoverable condition left
+        print $output if $output ne q{};
         print "\n>> Finished.\n\n";
 
         push @results, {

@@ -16,9 +16,18 @@ the workspace until you pick another:
   sandbox so an ask can never mutate the tree.
 - `--copilot` — shells out to the Copilot CLI (`copilot -p ... --allow-all-tools`).
 - `--gemini` — shells out to the Gemini CLI (`gemini -p ...`).
+- `--nova` — answers over Amazon Nova's own standalone REST endpoint
+  (`api.nova.amazon.com`), authenticated with a plain bearer token in
+  `NOVA_API_KEY` (not an AWS credential). Image attachments are not supported
+  with this backend.
 
 Each CLI backend is invoked non-interactively. If the selected CLI is not
 installed, `ask` reports which package to install rather than failing silently.
+
+Run `dashboard ask --help` at any time to see the full, current usage text -
+every backend flag and every option, generated from the same source the CLI
+itself uses so it can never drift out of sync with what `ask` actually
+supports.
 
 ## Key resolution (claude backend)
 

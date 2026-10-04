@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -83,7 +83,7 @@ sub set_indicator {
     my @preserve_existing = ref($preserve_fields) eq 'ARRAY' ? @{$preserve_fields} : ();
 
     open my $lock_fh, '>>', $lock or die "Unable to open $lock: $!";
-    flock( $lock_fh, LOCK_EX ) or die "Unable to lock $lock: $!";    # uncoverable branch true
+    flock( $lock_fh, LOCK_EX ) or die "Unable to lock $lock: $!";
     my $existing = $self->_read_indicator_file($file) || {};
 
     for my $field (@preserve_existing) {
@@ -94,16 +94,39 @@ sub set_indicator {
     $data{name}       = $name;
     $data{updated_at} = time if !exists $data{updated_at};
 
-    my $tmp = "$file.pending";
-    open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";
-    print {$fh} json_encode( \%data );
-    close $fh or die "Unable to close $tmp: $!";
-    $self->{paths}->secure_file_permissions($tmp);
-
-    rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
-    $self->{paths}->secure_file_permissions($file);
+    # DD-989: the staging path used to be the bare literal "$file.pending"
+    # (no uniquifier at all) and permissions were secured only AFTER the
+    # write, so a symlink pre-planted at that exact, fully predictable path
+    # let a local actor clobber an arbitrary victim file - open('>:raw', ...)
+    # follows the symlink and overwrites its target, and the subsequent
+    # rename then moved the symlink itself on top of the real status.json.
+    # atomic_write_secure (DD-610) closes both halves at once: it requires
+    # an unpredictable per-writer $tmp (built here the same way DD-850
+    # established for every other pending-file writer in this codebase -
+    # pid + wall-clock time + a per-process monotonic counter) and it
+    # secures that staging file's permissions BEFORE the rename, not after.
+    my $tmp = $self->_pending_indicator_file($file);
+    $self->{paths}->atomic_write_secure( $tmp, $file, json_encode( \%data ) );
 
     return \%data;
+}
+
+# _pending_indicator_file($file)
+# Builds the per-writer staging path set_indicator() writes to before the
+# atomic rename into $file. Its own sub (rather than an inline sprintf)
+# exists so a coverage test can override it to a fixed, predictable path
+# when it needs to pre-stage that exact location to force a write failure.
+# DD-989/DD-850: pid+wall-clock-second alone is NOT collision-safe - the
+# per-process monotonic counter below guarantees no two calls from one
+# process ever collide, whatever the timing; cross-process collision
+# remains prevented by pid uniqueness among live processes.
+# Input: final destination file path string.
+# Output: staging file path string.
+my $_pending_indicator_file_seq = 0;
+
+sub _pending_indicator_file {
+    my ( $self, $file ) = @_;
+    return sprintf '%s.%s.%s.%s.pending', $file, $$, time, ++$_pending_indicator_file_seq;
 }
 
 # get_indicator($name)
@@ -234,7 +257,7 @@ sub collector_indicator_candidate {
       if !defined $job->{name} || $job->{name} eq '';
 
     my $indicator = ref( $job->{indicator} ) eq 'HASH' ? $job->{indicator} : {};
-    my $name = $indicator->{name} || $job->{name};    # uncoverable condition false
+    my $name = $indicator->{name} ? $indicator->{name} : $job->{name};
     my $existing = ref( $opts{existing} ) eq 'HASH'
       ? $opts{existing}
       : eval { $self->get_indicator($name) } || {};
@@ -366,7 +389,8 @@ sub refresh_core_indicators {
     # return regardless of how many system() calls run inside.
     local $?;
     my $prompt_only = $args{prompt_only} ? 1 : 0;
-    my $cwd   = $args{cwd} || $self->{paths}->current_project_root || $self->{paths}->home;    # uncoverable condition false
+    my $cwd   = $args{cwd} || $self->{paths}->current_project_root;
+    $cwd = $self->{paths}->home if !$cwd;
     my $items = [];
 
     my $docker_ok = command_in_path('docker') ? 1 : 0;
@@ -545,8 +569,7 @@ sub _collector_sync_plan {
     my $effective_existing = $existing;
     my $healed_from_inherited = 0;
     if (
-        ref($local_existing) eq 'HASH'
-        && %{ $local_existing }
+        %{ $local_existing }
         && $self->_is_placeholder_missing_indicator($local_existing)
     ) {
         my $inherited = $self->_nearest_inherited_indicator($indicator_name);
@@ -567,7 +590,7 @@ sub _collector_sync_plan {
         existing => $effective_existing,
         status   => defined $effective_existing->{status} && $effective_existing->{status} ne '' ? $effective_existing->{status} : 'missing',
     );
-    my $comparison_existing = ref($local_existing) eq 'HASH' && %{ $local_existing }    # uncoverable condition left
+    my $comparison_existing = %{ $local_existing }
       ? $local_existing
       : $existing;
     my @preserve_existing = $healed_from_inherited ? () : qw(status updated_at stale);
@@ -664,7 +687,7 @@ sub _indicator_sort_cmp {
 sub _local_indicator {
     my ( $self, $name ) = @_;
     my ($file) = $self->_indicator_file_candidates($name);
-    return if !defined $file || $file eq '';    # uncoverable condition right
+    return if !defined $file;
     return $self->_read_indicator_file($file);
 }
 
@@ -768,7 +791,7 @@ This module persists prompt and browser status indicators. It stores indicator d
 
 =head1 WHY IT EXISTS
 
-It exists because indicators are shared state that multiple features read and write. Prompt rendering, collector status, and browser chrome all need one source of truth for icon, label, priority, prompt visibility, and current status.
+It exists because indicators are shared state that multiple features read and write. Prompt rendering, collector status, and browser chrome all need one source of truth for icon, label, priority, prompt visibility, and current status. C<set_indicator> persists that state through C<Developer::Dashboard::PathRegistry::atomic_write_secure> via an unpredictable per-writer staging path (DD-989), so a local actor cannot pre-plant a symlink at a known staging location and clobber an unrelated file.
 
 =head1 WHEN TO USE
 

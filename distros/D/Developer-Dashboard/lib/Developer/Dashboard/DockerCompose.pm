@@ -3,7 +3,7 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -12,6 +12,7 @@ use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp ();
+use YAML::XS ();
 
 use Developer::Dashboard::EnvLoader;
 use Developer::Dashboard::JSON qw(json_encode);
@@ -30,20 +31,34 @@ sub new {
     }, $class;
 }
 
+# _default_project_root(@candidates)
+# Picks the first true candidate project root, falling back to the current directory.
+# Input: zero or more candidate path values.
+# Output: project root directory path string.
+sub _default_project_root {
+    my ( $self, @candidates ) = @_;
+    for my $candidate (@candidates) {
+        return $candidate if $candidate;
+    }
+    return cwd();
+}
+
 # resolve(%args)
 # Resolves the effective docker compose context and overlay stack.
 # Input: optional project_root, addons, modes, services, and compose args.
 # Output: hash reference describing files, env, layers, precedence, and final command.
 sub resolve {
     my ( $self, %args ) = @_;
-    my $project_root = $args{project_root} || $self->{paths}->current_project_root || cwd();    # uncoverable condition false cwd never returns a false value
+    my $project_root = $self->_default_project_root( $args{project_root}, $self->{paths}->current_project_root );
+    my $compose_root = $self->_base_compose_root($project_root);
     my $docker_cfg  = $self->{config}->docker_config;
     my $docker_root = $self->_docker_config_root;
     my @passthrough = @{ $args{args} || [] };
     my @compose_files = ();
     my @layers;
 
-    my @base = $self->_discover_base_files($project_root);
+    my @base = $self->_discover_base_files($compose_root);
+    my $local_compose_services = @base ? $self->_local_compose_services(\@base) : undef;
     push @compose_files, @base;
     push @layers, { name => 'base', files => [@base] };
 
@@ -63,11 +78,19 @@ sub resolve {
     my %service_map = (
         %{ $docker_cfg->{services} || {} },
     );
-    my @services = $self->_resolve_effective_services(
-        requested    => $args{services} || [],
-        passthrough  => \@passthrough,
+    my @requested_services = @{ $args{services} || [] };
+    my @inferred_services = $self->_infer_services_from_args(
+        args         => \@passthrough,
         project_root => $project_root,
         service_map  => \%service_map,
+    );
+    my $has_explicit_services = @requested_services || @inferred_services;
+    my @services = $self->_resolve_effective_services(
+        requested             => \@requested_services,
+        inferred              => \@inferred_services,
+        project_root          => $project_root,
+        service_map           => \%service_map,
+        local_compose_services => $local_compose_services,
     );
 
     # DD-862: file-gathering must use every ENABLED service, not just the
@@ -79,10 +102,12 @@ sub resolve {
     # @services (the requested/effective set) still governs everything else
     # below - env resolution, the resolved "services" field - only the FILE
     # set widens here.
-    my @enabled_services = $self->_discover_enabled_services(
+    my @enabled_services = $has_explicit_services
+      ? $self->_discover_enabled_services(
         project_root => $project_root,
         service_map  => \%service_map,
-    );
+      )
+      : @services;
     my %file_gather_seen;
     my @file_gather_services = grep { !$file_gather_seen{$_}++ } ( @services, @enabled_services );
 
@@ -137,6 +162,7 @@ sub resolve {
 
     return {
         project_root => $project_root,
+        compose_root => $compose_root,
         addons       => \@addons,
         modes        => \@modes,
         services     => \@services,
@@ -153,23 +179,20 @@ sub resolve {
 # Determines the final service list: explicitly requested services, plus any
 # inferred from passthrough args, falling back to auto-discovered enabled
 # services when nothing else names any.
-# Input: requested (array ref), passthrough (array ref), project_root,
-# service_map (hash ref).
+# Input: requested and pre-inferred service arrays, local Compose service map,
+# project_root, and the service definition map.
 # Output: deduplicated list of service names.
 sub _resolve_effective_services {
     my ( $self, %args ) = @_;
     my @services = @{ $args{requested} };
-    my @inferred_services = $self->_infer_services_from_args(
-        args         => $args{passthrough},
-        project_root => $args{project_root},
-        service_map  => $args{service_map},
-    );
+    my @inferred_services = @{ $args{inferred} };
     my %service_seen;
     @services = grep { !$service_seen{$_}++ } ( @services, @inferred_services );
     if ( !@services ) {
         my @auto_services = $self->_discover_enabled_services(
-            project_root => $args{project_root},
-            service_map  => $args{service_map},
+            project_root           => $args{project_root},
+            service_map            => $args{service_map},
+            local_compose_services => $args{local_compose_services},
         );
         @services = grep { !$service_seen{$_}++ } @auto_services;
     }
@@ -324,13 +347,13 @@ sub _home_docker_config_root {
 }
 
 # _discover_service_files(%args)
-# Discovers the preferred old-style isolated compose file for a named service from repo-local and global docker config roots.
+# Discovers isolated compose files for a named service from all active docker config roots.
 # Input: service name and optional project_root.
-# Output: ordered list of discovered compose file paths, preferring development.compose.yml over compose.yml per folder.
+# Output: ordered file paths, with each compose.yml base followed by an opted-in development.compose.yml overlay.
 sub _discover_service_files {
     my ( $self, %args ) = @_;
     my $service      = $args{service} || return;
-    my $project_root = $args{project_root} || cwd();    # uncoverable condition false cwd never returns a false value
+    my $project_root = $self->_default_project_root( $args{project_root} );
     return if $self->_service_folder_is_disabled(
         project_root => $project_root,
         service      => $service,
@@ -342,20 +365,20 @@ sub _discover_service_files {
     );
 
     my @files;
-    my %seen;
+    my %seen_file;
+    my $development_enabled = $self->_service_folder_is_development(
+        project_root => $project_root,
+        service      => $service,
+    );
     for my $root (@roots) {
-        next if !defined $root;    # uncoverable branch true lookup roots are interpolated paths, never undef
         my $service_root = File::Spec->catdir( $root, $service );
-        next if !-d $service_root;    # uncoverable branch true lookup roots already filtered to existing service folders
-
-        my $development = File::Spec->catfile( $service_root, 'development.compose.yml' );
-        if ( -f $development ) {
-            push @files, $development if !$seen{$development}++;    # uncoverable branch false lookup roots are deduplicated so each development path is seen once
-            next;
-        }
 
         my $compose = File::Spec->catfile( $service_root, 'compose.yml' );
-        push @files, $compose if -f $compose && !$seen{$compose}++;    # uncoverable condition right lookup roots are deduplicated so each compose path is seen once
+        push @files, $compose if -f $compose && !$seen_file{$compose}++;
+
+        next if !$development_enabled;
+        my $development = File::Spec->catfile( $service_root, 'development.compose.yml' );
+        push @files, $development if -f $development && !$seen_file{$development}++;
     }
 
     return @files;
@@ -369,7 +392,8 @@ sub _discover_enabled_services {
     my ( $self, %args ) = @_;
     my @services = $self->_discover_service_names(%args);
     return grep {
-        !$self->_service_folder_is_disabled(
+        (!ref( $args{local_compose_services} ) || exists $args{local_compose_services}{$_})
+          && !$self->_service_folder_is_disabled(
             project_root => $args{project_root},
             service      => $_,
         )
@@ -383,7 +407,7 @@ sub _discover_enabled_services {
 # Output: hash reference with loaded env file list and env overlay hash.
 sub _resolve_skill_service_env {
     my ( $self, %args ) = @_;
-    my $project_root = $args{project_root} || cwd();    # uncoverable condition false cwd never returns a false value
+    my $project_root = $self->_default_project_root( $args{project_root} );
     my @services     = @{ $args{services} || [] };
     return { files => [], env => {} } if !@services;
 
@@ -431,7 +455,7 @@ sub _resolve_skill_service_env {
 sub _discover_service_skill_roots {
     my ( $self, %args ) = @_;
     my $service      = $args{service} || return;
-    my $project_root = $args{project_root} || cwd();    # uncoverable condition false cwd never returns a false value
+    my $project_root = $self->_default_project_root( $args{project_root} );
     return if $self->_service_folder_is_disabled(
         project_root => $project_root,
         service      => $service,
@@ -443,20 +467,14 @@ sub _discover_service_skill_roots {
     );
 
     my @skill_roots;
-    my %seen;
     for my $root (@roots) {
-        next if !defined $root;    # uncoverable branch true lookup roots are interpolated paths, never undef
         my $service_root = File::Spec->catdir( $root, $service );
-        next if !-d $service_root;    # uncoverable branch true lookup roots already filtered to existing service folders
 
         my $development = File::Spec->catfile( $service_root, 'development.compose.yml' );
         my $compose     = File::Spec->catfile( $service_root, 'compose.yml' );
         next if !-f $development && !-f $compose;
 
-        next if File::Spec->canonpath($root) !~ m{(?:^|/)config/docker\z};    # uncoverable branch true every lookup root ends in config/docker
         my $skill_root = dirname( dirname($root) );
-        next if !-d $skill_root;    # uncoverable branch true the config/docker parent directory always exists
-        next if $seen{$skill_root}++;    # uncoverable branch true distinct roots always map to distinct skill roots
         push @skill_roots, $skill_root;
     }
 
@@ -475,7 +493,6 @@ sub _skill_name_segments_from_root {
     my @segments;
     for my $index ( 0 .. $#parts - 1 ) {
         next if $parts[$index] ne 'skills';
-        next if !defined $parts[ $index + 1 ];    # uncoverable branch true the loop bound guarantees a defined following segment
         push @segments, $parts[ $index + 1 ];
     }
     return @segments;
@@ -518,7 +535,7 @@ sub _skill_docker_env_key {
 # Output: sorted list of service name strings.
 sub _discover_service_names {
     my ( $self, %args ) = @_;
-    my $project_root = $args{project_root} || cwd();    # uncoverable condition false cwd never returns a false value
+    my $project_root = $self->_default_project_root( $args{project_root} );
     my $service_map  = $args{service_map} || {};
     my %names = map { $_ => 1 } grep { $_ ne '' } keys %{$service_map};
 
@@ -539,23 +556,38 @@ sub _discover_service_names {
 # _service_folder_is_disabled(%args)
 # Checks whether an isolated service folder opts out of automatic compose inclusion.
 # Input: service name and optional project_root.
-# Output: boolean true when the service folder contains a disabled.yml marker.
+# Output: boolean true when any matching service layer contains disabled.yml.
 sub _service_folder_is_disabled {
     my ( $self, %args ) = @_;
     my $service      = $args{service} || return 0;
-    my $project_root = $args{project_root} || cwd();    # uncoverable condition false cwd never returns a false value
+    my $project_root = $self->_default_project_root( $args{project_root} );
     my @roots = $self->_service_lookup_roots(
         project_root => $project_root,
         service      => $service,
     );
-    return 0 if !@roots;
-    for my $root ( reverse @roots ) {
+    for my $root (@roots) {
         my $service_root = File::Spec->catdir( $root, $service );
-        next if !-d $service_root;
-        return 1 if -f File::Spec->catfile( $service_root, 'disabled.yml' );
-        return 0;
+        return 1 if -f File::Spec->catfile( $service_root, q{disabled.yml} );
     }
+    return 0;
+}
 
+# _service_folder_is_development(%args)
+# Checks whether the effective isolated service folder opts into its development compose overlay.
+# Input: service name and optional project_root.
+# Output: boolean true when any matching service layer contains develop.yml.
+sub _service_folder_is_development {
+    my ( $self, %args ) = @_;
+    my $service      = $args{service} || return 0;
+    my $project_root = $self->_default_project_root( $args{project_root} );
+    my @roots = $self->_service_lookup_roots(
+        project_root => $project_root,
+        service      => $service,
+    );
+    for my $root (@roots) {
+        my $service_root = File::Spec->catdir( $root, $service );
+        return 1 if -f File::Spec->catfile( $service_root, 'develop.yml' );
+    }
     return 0;
 }
 
@@ -567,7 +599,7 @@ sub _service_folder_is_disabled {
 sub _service_lookup_roots {
     my ( $self, %args ) = @_;
     my $service      = $args{service} || return;
-    my $project_root = $args{project_root} || cwd();    # uncoverable condition false cwd never returns a false value
+    my $project_root = $self->_default_project_root( $args{project_root} );
     my @roots;
     my %seen;
     for my $runtime_root ( $self->{paths}->runtime_layers ) {
@@ -577,8 +609,7 @@ sub _service_lookup_roots {
         push @candidates, $self->_installed_skill_docker_roots_for_runtime($runtime_root);
 
         for my $root (@candidates) {
-            next if !defined $root;    # uncoverable branch true candidate roots are interpolated paths, never undef
-            next if $seen{$root}++;    # uncoverable branch true candidate roots across runtime layers are already distinct
+            next if $seen{$root}++;
             if ( $service eq '__all__' ) {
                 push @roots, $root;
                 next;
@@ -605,14 +636,12 @@ sub _installed_skill_docker_roots_for_runtime {
 
     my @roots;
     my @queue = ($skills_root);
-    my %seen;
     while (@queue) {
         my $parent = shift @queue;
         opendir my $dh, $parent or next;
         for my $entry ( sorted_dir_entries($dh) ) {
             my $skill_root = File::Spec->catdir( $parent, $entry );
             next if !-d $skill_root;
-            next if $seen{$skill_root}++;    # uncoverable branch true the breadth-first walk visits each skill root once
             next if $self->_skill_root_chain_disabled($skill_root);
             push @roots, File::Spec->catdir( $skill_root, 'config', 'docker' );
             my $nested_root = File::Spec->catdir( $skill_root, 'skills' );
@@ -635,7 +664,6 @@ sub _skill_root_chain_disabled {
     my @parts = File::Spec->splitdir( File::Spec->canonpath($skill_root) );
     for my $index ( 0 .. $#parts - 1 ) {
         next if $parts[$index] ne 'skills';
-        next if !defined $parts[ $index + 1 ];    # uncoverable branch true the loop bound guarantees a defined following segment
         my $candidate = File::Spec->catdir( @parts[ 0 .. $index + 1 ] );
         return 1 if -f File::Spec->catfile( $candidate, '.disabled' );
     }
@@ -649,7 +677,7 @@ sub _skill_root_chain_disabled {
 sub _infer_services_from_args {
     my ( $self, %args ) = @_;
     my $argv         = $args{args} || [];
-    my $project_root = $args{project_root} || cwd();    # uncoverable condition false cwd never returns a false value
+    my $project_root = $self->_default_project_root( $args{project_root} );
     my $service_map  = $args{service_map} || {};
     my %known = map { $_ => 1 } $self->_discover_service_names(
         project_root => $project_root,
@@ -670,7 +698,7 @@ sub _infer_services_from_args {
 }
 
 # disable_service(%args)
-# Writes the isolated-service disabled marker into the deepest runtime docker root for one service.
+# Writes the isolated-service disabled marker into the selected home runtime docker root.
 # Input: service name and optional project_root.
 # Output: hash reference describing the toggled service and marker path.
 sub disable_service {
@@ -686,7 +714,7 @@ sub disable_service {
     make_path($dir) if !-d $dir;
     open my $fh, '>', $marker or die "Unable to write $marker: $!";
     print {$fh} "---\ndisabled: 1\n";
-    close $fh or die "Unable to close $marker: $!";    # uncoverable branch true the deferred write failure surfaces only on close, unreproducible on the test host
+    close $fh or die "Unable to close $marker: $!";
     return {
         action   => 'disable',
         disabled => 1,
@@ -696,7 +724,7 @@ sub disable_service {
 }
 
 # enable_service(%args)
-# Removes the isolated-service disabled marker from the deepest runtime docker root for one service.
+# Removes every active-layer disabled marker from one isolated service.
 # Input: service name and optional project_root.
 # Output: hash reference describing the toggled service and marker path.
 sub enable_service {
@@ -708,12 +736,70 @@ sub enable_service {
     );
     die "Refusing service name that escapes the docker config root: $service\n"
       if !defined $marker;
-    unlink $marker or die "Unable to remove $marker: $!" if -e $marker;
+    _remove_service_layer_markers(
+        $self,
+        project_root => $args{project_root},
+        service      => $service,
+        marker_name  => 'disabled.yml',
+    );
     return {
         action   => 'enable',
         disabled => 0,
         marker   => $marker,
         service  => $service,
+    };
+}
+
+# enable_service_development(%args)
+# Writes the opt-in marker in the selected home runtime for a service's development compose overlay.
+# Input: service name and optional project_root.
+# Output: hash reference describing the enabled development state and marker path.
+sub enable_service_development {
+    my ( $self, %args ) = @_;
+    my $service = $args{service} || die "Usage: dashboard docker development enable <service>\n";
+    my $marker = $self->_service_development_marker_path(
+        project_root => $args{project_root},
+        service      => $service,
+    );
+    die "Refusing service name that escapes the docker config root: $service\n"
+      if !defined $marker;
+    my ( undef, $dir ) = File::Spec->splitpath($marker);
+    make_path($dir) if !-d $dir;
+    open my $fh, '>', $marker or die "Unable to write $marker: $!";
+    print {$fh} "---\ndevelopment: 1\n";
+    close $fh or die "Unable to close $marker: $!";
+    return {
+        action      => 'development-enable',
+        development => 1,
+        marker      => $marker,
+        service     => $service,
+    };
+}
+
+# disable_service_development(%args)
+# Removes every active-layer marker that enables a service's development compose overlay.
+# Input: service name and optional project_root.
+# Output: hash reference describing the disabled development state and marker path.
+sub disable_service_development {
+    my ( $self, %args ) = @_;
+    my $service = $args{service} || die "Usage: dashboard docker development disable <service>\n";
+    my $marker = $self->_service_development_marker_path(
+        project_root => $args{project_root},
+        service      => $service,
+    );
+    die "Refusing service name that escapes the docker config root: $service\n"
+      if !defined $marker;
+    _remove_service_layer_markers(
+        $self,
+        project_root => $args{project_root},
+        service      => $service,
+        marker_name  => 'develop.yml',
+    );
+    return {
+        action      => 'development-disable',
+        development => 0,
+        marker      => $marker,
+        service     => $service,
     };
 }
 
@@ -723,7 +809,7 @@ sub enable_service {
 # Output: array reference of service state hash references in sorted service order.
 sub list_services {
     my ( $self, %args ) = @_;
-    my $project_root = $args{project_root} || cwd();    # uncoverable condition false cwd never returns a false value
+    my $project_root = $self->_default_project_root( $args{project_root} );
     my $filter = defined $args{filter} && $args{filter} ne '' ? $args{filter} : 'all';
     die "Usage: dashboard docker list [--enabled|--disabled]\n"
       if $filter !~ /\A(?:all|enabled|disabled)\z/;
@@ -772,14 +858,15 @@ sub run {
     return $resolved if $args{dry_run};
 
     my $old = cwd();
-    chdir $resolved->{project_root} or die "Unable to chdir to $resolved->{project_root}: $!";
-    local @ENV{ keys %{ $resolved->{env} } } = values %{ $resolved->{env} } if %{ $resolved->{env} };    # uncoverable branch false the resolved env always carries the DDDC key
+    my $compose_root = $resolved->{compose_root};
+    chdir $compose_root or die "Unable to chdir to $compose_root: $!";
+    local @ENV{ keys %{ $resolved->{env} } } = values %{ $resolved->{env} } if %{ $resolved->{env} };
     my $run_command = $self->_materialized_command($resolved);
     my ( $stdout, $stderr, $exit_code ) = capture {
         system @{$run_command};
         return $? >> 8;
     };
-    chdir $old or die "Unable to restore cwd to $old: $!";    # uncoverable branch true the saved cwd remains valid for the duration of the run
+    chdir $old or die "Unable to restore cwd to $old: $!";
 
     return {
         %$resolved,
@@ -832,9 +919,9 @@ sub _materialized_command {
 
     my $tmp_dir  = File::Temp::tempdir( CLEANUP => 1 );
     my $tmp_file = File::Spec->catfile( $tmp_dir, 'merged-compose.yml' );
-    open my $fh, '>', $tmp_file or die "Unable to write $tmp_file: $!";    # uncoverable branch true a fresh File::Temp::tempdir is always writable on the test host
+    open my $fh, '>', $tmp_file or die "Unable to write $tmp_file: $!";
     print {$fh} $merged;
-    close $fh or die "Unable to close $tmp_file: $!";    # uncoverable branch true the deferred write failure surfaces only on close, unreproducible on the test host
+    close $fh or die "Unable to close $tmp_file: $!";
 
     return [ 'docker', 'compose', '-f', $tmp_file, @passthrough ];
 }
@@ -847,6 +934,45 @@ sub _discover_base_files {
     my ( $self, $root ) = @_;
     my @candidates = qw(compose.yml compose.yaml docker-compose.yml docker-compose.yaml);
     return grep { -f $_ } map { File::Spec->catfile( $root, $_ ) } @candidates;
+}
+
+# _base_compose_root($project_root)
+# Prefers an invocation-directory Compose file so the caller's local project
+# defines the base stack; otherwise the discovered project root remains the
+# base directory.
+# Input: resolved project root directory.
+# Output: invocation directory when it contains a standard Compose file, else
+#         the supplied project root.
+sub _base_compose_root {
+    my ( $self, $project_root ) = @_;
+    my $invocation_root = cwd();
+    return $invocation_root if $self->_discover_base_files($invocation_root);
+    return $project_root;
+}
+
+# _local_compose_services($files)
+# Reads service names from local base Compose files to scope automatic runtime
+# overlays to services the local project actually declares.
+# Input: array reference of base Compose file paths.
+# Output: hash reference keyed by declared service names; malformed YAML or
+#         invalid services mappings die with the offending file named.
+sub _local_compose_services {
+    my ( $self, $files ) = @_;
+    die "Compose base files must be an array reference\n" if ref($files) ne 'ARRAY';
+
+    my %services;
+    for my $file ( @{$files} ) {
+        my $document = eval { YAML::XS::LoadFile($file) };
+        die "Unable to parse local Compose file '$file': $@" if $@;
+        die "Local Compose file '$file' must contain a mapping\n" if ref($document) ne 'HASH';
+        next if !exists $document->{services};
+        die "Local Compose file '$file' services must be a mapping\n" if ref( $document->{services} ) ne 'HASH';
+        for my $name ( keys %{ $document->{services} } ) {
+            die "Local Compose file '$file' has an invalid service name\n" if $name eq '';
+            $services{$name} = 1;
+        }
+    }
+    return \%services;
 }
 
 # _contained_service_path($root, $service)
@@ -878,7 +1004,7 @@ sub _contained_service_path {
 }
 
 # _service_disabled_marker_path(%args)
-# Resolves the disabled.yml marker path in the deepest runtime docker root for one isolated service.
+# Resolves the disabled.yml marker path in the selected home runtime docker root.
 # Input: service name and optional project_root.
 # Output: absolute disabled.yml marker file path string, or undef when the
 #         service name escapes the docker toggle root.
@@ -891,16 +1017,56 @@ sub _service_disabled_marker_path {
     return File::Spec->catfile( $dir, 'disabled.yml' );
 }
 
+# _service_development_marker_path(%args)
+# Resolves a contained service path for the development-mode marker file.
+# Input: service name and optional project_root.
+# Output: absolute develop.yml marker path string, or undef if the service escapes its root.
+sub _service_development_marker_path {
+    my ( $self, %args ) = @_;
+    my $service = $args{service} || die "Missing service\n";
+    my $root = $self->_service_toggle_root(%args);
+    my $service_root = _contained_service_path( $root, $service );
+    return if !defined $service_root;
+    return File::Spec->catfile( $service_root, 'develop.yml' );
+}
+
 # _service_toggle_root(%args)
-# Returns the deepest participating config/docker root where isolated-service
-# toggle markers should be written.
-# Input: optional project_root.
+# Returns the selected home config/docker root where toggle markers are written.
+# Input: optional project_root accepted for call-site symmetry; marker writes stay home-scoped.
 # Output: absolute docker root directory path string.
 sub _service_toggle_root {
     my ( $self, %args ) = @_;
-    my @layers = $self->{paths}->runtime_layers;
-    my $runtime_root = @layers ? $layers[-1] : $self->{paths}->home_runtime_root;    # uncoverable branch false runtime_layers always includes at least the home runtime root
-    return File::Spec->catdir( $runtime_root, 'config', 'docker' );
+    return File::Spec->catdir( $self->{paths}->home_runtime_root, 'config', 'docker' );
+}
+
+# _remove_service_layer_markers($self, %args)
+# Removes one supported marker from every existing runtime layer for a service.
+# Input: DockerCompose object, service name, optional project root, and the
+#        internal marker filename (disabled.yml or develop.yml).
+# Output: count of removed marker files; dies with the affected path on failure.
+sub _remove_service_layer_markers {
+    my ( $self, %args ) = @_;
+    my $service = $args{service} || die 'Missing service';
+    my $marker_name = $args{marker_name} || die 'Missing service marker name';
+    die "Unsupported service marker '$marker_name'\n"
+      if $marker_name ne 'disabled.yml' && $marker_name ne 'develop.yml';
+
+    my @roots = $self->_service_lookup_roots(
+        project_root => $args{project_root},
+        service      => $service,
+    );
+    my $removed = 0;
+    for my $root (@roots) {
+        my $service_root = _contained_service_path( $root, $service );
+        die "Refusing service name that escapes the docker config root: $service\n"
+          if !defined $service_root;
+        my $marker = File::Spec->catfile( $service_root, $marker_name );
+        next if !-e $marker && !-l $marker;
+        unlink $marker or die "Unable to remove $marker: $!";
+        $removed++;
+    }
+
+    return $removed;
 }
 
 1;
@@ -924,23 +1090,53 @@ Developer::Dashboard::DockerCompose - compose resolver and launcher
 This module resolves layered docker compose inputs into a final transparent
 docker compose command line and can optionally execute it.
 
+When a standard Compose file exists in the invocation directory, it is used as
+the local base and the command runs from that directory. Unscoped automatic
+runtime overlays are restricted to service names in that base file's
+C<services:> map. Explicit service selectors remain opt-in, while the absence
+of a local Compose file preserves ecosystem-wide service discovery. YAML
+syntax and service-map errors are reported with their source path.
+
 =head1 METHODS
 
 =head2 new, resolve, list_services, run
 
 Construct, resolve, list, and optionally execute compose operations.
+C<resolve> returns both the project discovery root and the effective Compose
+working root so nested invocation directories retain their local project file.
+
+=head2 enable_service_development, disable_service_development
+
+Create or remove the selected-home-runtime C<develop.yml> marker for one
+isolated service. A marker in any matching service folder across active runtime
+layers enables C<development.compose.yml> overlays for the service. Removing
+the marker removes every C<develop.yml> file for that service across those
+layers. New markers use C<~/.developer-dashboard> when it exists (or when
+neither runtime name exists), and C<~/.d2> only when that is the existing home
+runtime name.
+An existing C<compose.yml> remains the base and is loaded first. If development
+is enabled but its file is absent, resolution continues with the base file and
+does not report an error.
+
+  $docker->enable_service_development( service => 'web' );
+  $docker->disable_service_development( service => 'web' );
 
 =head2 disable_service, enable_service
 
 Write and remove the C<disabled.yml> marker for one isolated service, below the
-deepest runtime C<config/docker> root.
+selected home runtime C<config/docker> root.
+Any matching service layer containing C<disabled.yml> disables the service;
+enabling removes every such marker before reporting success. New markers use
+the same home runtime name selection as development markers.
 
 The service name reaches these methods straight from the command line and is
 therefore untrusted. It is resolved below the toggle root and any name that
 escapes that root is B<refused> - both methods die rather than fall back to the
 unchecked path. Resolution is lexical and never consults the filesystem, so the
 containment decision cannot change between the check and the write or unlink
-that follows it.
+that follows it. Marker removal walks only existing service folders discovered
+by the layered service resolver, and marker names are restricted to the two
+internal toggle files.
 
 The refusal protects two distinct sinks, and the second is the one usually
 underestimated: C<disable_service> creates directories and writes a file, while

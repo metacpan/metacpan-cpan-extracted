@@ -1,23 +1,20 @@
-# Uniform::HTTP Message Contract 0.02
+# Uniform::HTTP Message Contract 0.04
 
-Status: release contract for version 0.02.
+Status: message contract for Uniform-HTTP 0.04.
 
 ## Purpose
 
-The Uniform HTTP message contract gives application code one small semantic
-interface across HTTP clients, servers, gateways, frameworks, middleware, and
-test doubles.
-
-It describes HTTP messages. It does not describe a socket, connection,
-transaction, stream, framework context, parser, serializer, or retry operation.
+Uniform gives HTTP implementations a small common interface for request and
+response data. It covers initial control data, headers, an optional complete
+buffered body, trailers, and observable message state.
 
 The canonical `Uniform::HTTP::Request` and `Uniform::HTTP::Response` classes
-implement this contract. An adapter may implement it through delegation and is
-not required to inherit from a Uniform class.
+implement this contract. Adapters may use delegation without inheritance.
+No Uniform method sends data or changes a connection or framework lifecycle.
 
 ## Common methods
 
-Every message provides:
+Every 0.04 message provides these observations:
 
 ```perl
 $message->version
@@ -26,218 +23,317 @@ $message->header_values($name)
 $message->header_count
 $message->header_name($index)
 $message->header_value($index)
+$message->headers_are_lossless
 $message->body
 $message->has_buffered_body
+$message->trailer($name)
+$message->trailer_values($name)
+$message->trailer_count
+$message->trailer_name($index)
+$message->trailer_value($index)
+$message->has_trailers
+$message->trailers_are_lossless
 $message->is_complete
 $message->is_mutable
-$message->headers_are_lossless
+$message->initial_is_mutable
+$message->body_is_mutable
+$message->trailers_are_mutable
 ```
 
-A mutable message also provides these setter forms and mutators:
+These mutations are supported when the corresponding section is mutable:
+
+| Section capability | Mutations |
+| --- | --- |
+| `initial_is_mutable()` | `version($value)`, `header($name, $value)`, `add_header($name, $value)`, `remove_header($name)`, request and response metadata setters |
+| `body_is_mutable()` | `body($bytes)` |
+| `trailers_are_mutable()` | `trailer($name, $value)`, `add_trailer($name, $value)`, `remove_trailer($name)` |
+
+Every successful mutator returns the receiving message. A mutation on a
+nonmutable section must throw, without changing data, even if its argument
+would leave the value unchanged. Invalid arguments also throw.
+
+`is_mutable()` is the overall capability: true means at least one section is
+mutable, not necessarily all sections. False means no message data setter is
+allowed. All three section capabilities must be false in that case. They
+return booleans, not `undef`; an adapter unable to guarantee mutation must
+report false for that section. `is_complete()` is independent and may return
+true, false, or `undef` when unknown.
+
+This is an explicit refinement of 0.03's all-or-nothing mutation model.
+Existing canonical objects behave as before until a new section freeze is
+used. Code handling partial mutability must check the relevant section before
+writing. No 0.03 immutable object gains permission to mutate.
+
+## Canonical lifecycle helpers
+
+Canonical objects additionally provide:
 
 ```perl
-$message->version($version)
-$message->header($name, $value)
-$message->add_header($name, $value)
-$message->remove_header($name)
-$message->body($bytes)
+$message->freeze_initial
+$message->freeze_trailers
+$message->freeze
+$message->mark_incomplete
+$message->mark_complete
 ```
 
-Every successful mutator returns the receiving message. An adapter that reports
-false from `is_mutable()` must throw when any mutator is attempted.
+These chainable methods are local conveniences, not adapter requirements.
 
-## Request methods
+- `freeze_initial()` locks version, initial headers, all request metadata
+  (including `protocol`), and all response metadata. Body and trailers remain
+  independently editable.
+- `freeze_trailers()` locks the trailer fields, including an empty section.
+- `freeze()` locks all represented message values, including body and trailers.
+- All freezes are idempotent and irreversible through the public API. Applying
+  a section freeze after full freeze never reopens anything.
+- `mark_incomplete()` and `mark_complete()` change only completeness. Both
+  remain usable after any freeze, as in 0.03. Neither freezes nor thaws data.
 
-A request additionally provides:
+Canonical objects start complete and fully mutable, with empty header and
+trailer lists and no body buffer. This suits application-created values. A
+complete mutable object can still be edited; completeness does not describe
+whether data has been sent or whether an exchange is finished.
+
+An implementation assembling a received message can use:
+
+```perl
+my $message = Uniform::HTTP::Response->new(
+    status  => 200,
+    version => '3',
+    headers => [ [ 'Content-Type', 'application/octet-stream' ] ],
+)->mark_incomplete->freeze_initial;
+
+# The HTTP implementation handles streaming outside this object.
+# If it deliberately buffered the entire body, it can now install it:
+$message->body($complete_body_bytes);
+$message->add_trailer('Content-Digest', $digest_field_value);
+$message->mark_complete->freeze;
+```
+
+While receiving, `has_trailers()` reports fields currently represented, not a
+promise that no later fields will arrive. Mark complete only once the external
+implementation knows the whole message has arrived, including any trailers.
+If receipt fails, leave the object incomplete; error and cancellation details
+belong to the surrounding operation. The helpers do not validate wire event
+order. Freezing before expected trailers arrive deliberately prevents their
+later insertion; use `freeze_initial()` for that situation.
+
+| Canonical state | `is_mutable` | `initial_is_mutable` | `body_is_mutable` | `trailers_are_mutable` |
+| --- | --- | --- | --- | --- |
+| New | true | true | true | true |
+| After `freeze_initial` | true | false | true | true |
+| After both section freezes | true | false | true | false |
+| After `freeze` | false | false | false | false |
+
+Completeness is unchanged by every row transition. These states do not own
+stream callbacks, framework commitment, or I/O.
+
+## Request metadata
+
+A request provides getters and, when initial data is mutable, setters for:
 
 ```perl
 $request->method
 $request->target
-$request->target_is_exact
+$request->scheme
+$request->authority
+$request->protocol
 ```
 
-A mutable request provides:
+It also provides the read-only capability `target_is_exact()`.
 
-```perl
-$request->method($method)
-$request->target($target)
-```
+`method()` is the case-sensitive HTTP method token. `target()` is a nonempty
+request-target byte string, never a URI object. All target forms remain
+representable without parsing, decoding, normalization, or reconstruction:
 
-`method()` is the case-sensitive HTTP method token.
+| Source | `target()` |
+| --- | --- |
+| HTTP/1 origin-form | Exact path and query, such as `/items?x=1` |
+| HTTP/1 absolute-form | Exact target, such as `https://example.com/items?x=1` |
+| HTTP/1 authority-form | Exact host and port, such as `example.com:443` |
+| Asterisk-form | `*` |
+| HTTP/2 or HTTP/3 request with `:path` | Exact `:path` bytes |
+| Ordinary HTTP/2 or HTTP/3 CONNECT | Exact `:authority` bytes |
+| Extended CONNECT | Exact `:path` bytes, not the authority |
 
-`target()` is the request-target byte string used by HTTP semantics. It is not
-a URI object. Origin-form, absolute-form, authority-form, and asterisk-form are
-all representable.
+Ordinary CONNECT has no `:path` or `:scheme`. Copying its `:authority` directly
+into the authority-form target preserves the exact semantic target and is not
+reconstruction. `scheme()` and `protocol()` are `undef` for that case.
 
-`target_is_exact()` is true only when `target()` is the exact source value. An
-adapter that reconstructs the target from path, query, host, scheme, or routing
-state must return false.
+`scheme()` and `authority()` are optional metadata. Uniform does not derive
+them from `Host`, an absolute target, transport security, or each other. A
+scheme uses URI scheme syntax. Authority is a nonempty byte string rejecting
+controls, spaces, `/`, `?`, and `#`; it deliberately does not parse host syntax,
+ports, userinfo, IP literals, or percent escapes.
 
-## Response methods
+`protocol()` is the optional protocol-name token represented by Extended
+CONNECT's `:protocol`. It preserves the exact supplied spelling and accepts
+any nonempty HTTP token, including future names. It is not an Upgrade field
+list, a slash-separated protocol/version value, or the HTTP version. Passing
+`undef` clears it. There is no inference from `Upgrade`, no registry lookup,
+and no special behavior for particular tokens.
 
-A response additionally provides:
+These properties are separate from ordinary header fields. The canonical
+object validates individual value syntax, not combinations of method,
+protocol, scheme, authority, target, version, or status. Applications can
+assemble values in any setter order. A sender must check that the resulting
+combination is valid for its selected protocol before sending it.
 
-```perl
-$response->status
-$response->reason
-```
+`target_is_exact()` is true only when the exposed target is an untouched source
+semantic target. Reconstructing from separate path, query, host, scheme, or
+routing values requires false. Canonical objects return true for the bytes the
+caller supplied; copying a reconstructed target into one cannot recover lost
+source fidelity. An adapter needing to report such a loss must retain its own
+false capability rather than claiming a canonical copy restores it.
 
-A mutable response provides:
+## Response metadata
 
-```perl
-$response->status($status)
-$response->reason($reason)
-```
+A response provides `status()` and `reason()`, with setter forms when initial
+data is mutable. Status is an integer from 100 through 599. Reason is an
+optional byte string; Uniform never invents one from the status. Received
+HTTP/2 and HTTP/3 responses normally have `reason => undef`.
 
-`status()` is an integer from 100 through 599.
-
-`reason()` is a byte string or `undef`. Implementations must not synthesize a
-reason phrase merely because a status is known.
+Each informational response is a separate response object. For example,
+`Response->new(status => 103)` can describe a complete Early Hints message
+while the exchange still awaits its final response. Ordering 100, 103, and a
+final response belongs to the HTTP implementation. So do version-specific
+rules such as whether 101 can be sent, and body restrictions for HEAD, 1xx,
+204, 304, or successful CONNECT. Status representation alone does not certify
+a valid wire message.
 
 ## Version
 
-`version()` returns a numeric HTTP version without an `HTTP/` prefix, such as
-`1.0`, `1.1`, `2`, or `3`. It may return `undef` when the gateway or transport
-does not expose a meaningful version.
+`version()` is a numeric HTTP version string without `HTTP/`, for example
+`1.0`, `1.1`, `2`, or `3`. The canonical syntax also accepts decimal forms such
+as `2.0`; it does not normalize them.
 
-Implementations must not silently default an unknown version to `1.1`.
+Application-created messages may leave it `undef` and be used with any
+supported HTTP version. An adapter selecting a sending version must not need
+to stamp or unfreeze the application-owned object; that selection belongs to
+the sending operation. Explicit versions are represented metadata, not a
+negotiation command. The sender documents any constraints it applies.
 
-## Header representation
+Received messages should expose their actual HTTP version when known. Unknown
+versions remain `undef`, never a guessed `1.1`.
 
-HTTP field lookup is ASCII case-insensitive. `header($name)` returns the first
-matching occurrence. `header_values($name)` always returns an array reference,
-including an empty one when the field is absent.
+## Header and trailer fields
 
-Repeated values are never implicitly comma-joined. Joining is not generally
-lossless because HTTP fields differ in whether comma combination is valid.
+Headers and trailers are separate ordered lists. Each preserves duplicate
+occurrences, inter-field order, original name spelling, and value bytes.
+Lookup uses ASCII case-insensitive names. No fields are joined, comma-split,
+trimmed, unfolded, decoded, or moved between sections automatically.
 
-The indexed methods expose every field occurrence in message order:
+`header($name)` and `trailer($name)` return the first matching value, or
+`undef`. Their `_values` counterparts return a detached array reference of all
+matching values in order, including `[]` for a known absent field.
 
-```perl
-for my $index (0 .. $message->header_count - 1) {
-    my $name  = $message->header_name($index);
-    my $value = $message->header_value($index);
-}
-```
+The indexed methods enumerate occurrences from zero. Out-of-range indexes
+return `undef`; negative or noninteger indexes throw. Counts include repeated
+fields. Returned values and constructor inputs do not alias canonical storage.
 
-An index beyond the end returns `undef`. A negative or non-integer index is a
-programmer error.
+For either section, the two-argument setter replaces all matching occurrences
+with one at the first matching position, using the supplied name spelling.
+An absent name is appended. `add_header` / `add_trailer` always append one
+occurrence; `remove_header` / `remove_trailer` remove all matches.
 
-On mutation, `header($name, $value)` replaces every matching occurrence with
-one field. The replacement occupies the first matching position and uses the
-spelling supplied to the mutator. If no occurrence exists, it is appended.
-`add_header()` always appends one occurrence. `remove_header()` removes every
-matching occurrence.
+`headers_are_lossless()` and `trailers_are_lossless()` independently report
+fidelity of the represented source fields. Canonical lists return true.
+Adapters must report false for a section if fields were dropped, combined,
+reordered, renamed, or their value bytes changed. The source for HTTP/2 and
+HTTP/3 is the decoded field list; compressed wire bytes are not represented.
 
-`headers_are_lossless()` is true only when all three properties are preserved:
+`has_trailers()` means there is at least one currently represented trailer
+field. Omitted trailers and an explicit empty list both return false and count
+zero. The model does not record whether an empty wire trailer section existed.
+It also does not infer trailers from the initial `Trailer` announcement field.
 
-- duplicate field occurrences
-- inter-field order
-- original field-name spelling
+### Unavailable adapter trailers
 
-An adapter may still be useful when this returns false. The capability method
-makes the loss explicit to proxies, signing code, diagnostics, and tests.
+A framework can hide or discard trailers. In that case the adapter must not
+report a known empty section. It returns:
 
-## Body representation
-
-`body()` returns a scalar only when the complete body is already buffered in
-the message representation. It returns `undef` when no body buffer is present.
-An empty buffered body is represented by `body() eq ''` together with a true
-`has_buffered_body()`.
-
-Calling `body()` must never implicitly:
-
-- read a socket or filehandle
-- drain a PSGI or PAGI input source
-- invoke a streaming callback
-- wait on a Future or promise
-- decode content coding or character encoding
-- consume a body that another component must replay
-
-Incremental body transfer belongs to the surrounding transport or transaction.
-
-Canonical messages are complete detached values. For them, `is_complete()` is
-true even when the body argument was omitted. An adapter may return false while
-a native message is still being assembled, or `undef` when completeness cannot
-be determined.
-
-## Byte contract
-
-Methods operate on Perl byte strings. Implementations reject values containing
-characters outside the byte range instead of guessing an encoding.
-
-Header names and methods are HTTP tokens. Header values and reason phrases
-reject prohibited control bytes. Horizontal tab and bytes from 0x80 through
-0xff remain representable. Request targets are nonempty and reject spaces and
-control bytes.
-
-This contract does not decode text, normalize URIs, parse cookies, split field
-grammar, or apply content codings.
-
-## Canonical constructors
-
-```perl
-my $request = Uniform::HTTP::Request->new(
-    method  => 'POST',
-    target  => '/items?draft=1',
-    version => '1.1',
-    headers => [
-        [ 'Content-Type', 'application/json' ],
-        [ 'X-Trace',      'one' ],
-        [ 'X-Trace',      'two' ],
-    ],
-    body => $bytes,
-);
-
-my $response = Uniform::HTTP::Response->new(
-    status  => 201,
-    reason  => 'Created',
-    version => '1.1',
-    headers => [ [ 'Content-Type', 'application/json' ] ],
-    body    => $bytes,
-);
-```
-
-Requests require `method` and `target`. Responses require `status`. `version`,
-`reason`, `headers`, and `body` are optional where applicable. No protocol
-version, reason phrase, or response status is guessed.
-
-The `headers` argument is an array reference of two-element name/value array
-references. A hash is intentionally not accepted because it cannot represent
-duplicate occurrences and does not state a wire-derived order.
-
-Canonical objects report:
-
-| Capability | Result |
+| Method | Unavailable trailer data |
 | --- | --- |
-| `is_complete()` | true |
-| `is_mutable()` | true |
-| `headers_are_lossless()` | true |
-| request `target_is_exact()` | true |
+| `trailer_count`, `has_trailers` | `undef` |
+| `trailer`, `trailer_values`, `trailer_name`, `trailer_value` | `undef` |
+| `trailers_are_lossless`, `trailers_are_mutable` | false |
 
-## Authentication integration
+This includes the distinction between `trailer_values()` returning `undef`
+(unavailable) and `[]` (available, no matches). Argument validation still
+applies. If a source exposes a lossy field list, enumerate that list and return
+false from `trailers_are_lossless()` instead. If the source exposes live
+incremental trailers, counts describe its current list; `is_complete()` tells
+whether reception has finished. A complete message may still have unavailable
+trailers when its framework discarded them.
 
-`Uniform::HTTP::Auth->prepare_authentication()` may accept a `request` object
-implementing the request contract. It reads `method()` and `target()`. It reads
-`body()` only when `has_buffered_body()` is true.
+### Field legality
 
-Explicit `method`, `request_target`, and `entity_body` arguments override the
-corresponding request values. Authentication does not make a request replayable
-and does not own retry policy.
+Syntactic validity is not permission to send a field as a trailer. The sender
+must know the field definition permits trailer use, check the selected HTTP
+version and framing, and enforce context-specific restrictions. Uniform has
+no static allowlist or blacklist that would prevent future field definitions.
+It never makes late fields initial metadata or authentication input implicitly.
+`Trailer`, `TE`, `Priority`, `Capsule-Protocol`, and extension fields remain
+ordinary fields with interpretation owned by their consumers.
 
-## Explicit exclusions
+## Body and byte contract
 
-The contract does not include:
+`body()` returns the complete body only when already buffered as a scalar. It
+returns `undef` when absent. `body => ''` is a present empty buffer and makes
+`has_buffered_body()` true. Body buffering and whole-message completeness are
+independent: the body can be buffered while trailers are still outstanding.
 
-```text
-send write respond receive parse serialize
-socket connection transaction stream
-pause resume drain cancel retry redirect
-authentication retry request replayability
-TLS HTTP/1 framing HTTP/2 stream HTTP/3 stream
-event loop Future promise callback policy
-PSGI writer PAGI body callback framework context
+Calling `body()` never reads, waits, drains, invokes a streaming callback,
+decodes content, or consumes a replay source. Supply the whole buffer with
+`body($bytes)`; there is no partial-body append API. The surrounding HTTP
+implementation owns incremental transfer and tunnel data. Capsule or WebSocket
+bytes after a successful protocol switch are not automatically an HTTP body.
+
+Values are byte strings. A byte-valued Perl scalar may be copied and downgraded
+without changing its caller; values outside 0..255 are rejected instead of
+encoded. Field names, methods, and protocol names are HTTP tokens. Field
+values and reason phrases reject bytes 0..8, 10..31, and 127, while accepting
+HTAB and high bytes. Targets reject spaces and controls. Body bytes are opaque.
+No encoding, URI parsing, cookie parsing, or field-specific grammar is guessed.
+
+## Constructors
+
+```perl
+my $get = Uniform::HTTP::Request->new(
+    method => 'GET', target => '/items',
+    scheme => 'https', authority => 'example.com',
+);
+my $connect = Uniform::HTTP::Request->new(
+    method => 'CONNECT', target => 'example.com:443',
+    authority => 'example.com:443',
+);
+my $extended = Uniform::HTTP::Request->new(
+    method => 'CONNECT', protocol => 'websocket',
+    scheme => 'https', authority => 'example.com', target => '/chat',
+);
+my $response = Uniform::HTTP::Response->new(
+    status => 200,
+    headers => [ [ 'Content-Type', 'text/plain' ] ],
+    body => $bytes,
+    trailers => [ [ 'Content-Digest', $digest_field_value ] ],
+);
 ```
 
-An adapter can expose native operations through its own API, but those
-operations are not Uniform HTTP message methods.
+Request requires `method` and `target`. Response requires `status`. Optional
+common arguments are `version`, `headers`, `body`, and `trailers`; optional
+request arguments are `scheme`, `authority`, and `protocol`; response also
+accepts `reason`. Unknown options throw. `headers` and `trailers` must be arrays
+of two-element name/value arrays; hashes cannot express duplicate ordering.
+
+## Authentication and scope
+
+`Uniform::HTTP::Auth->prepare_authentication(request => $request, ...)` reads
+method, target, and an available complete buffered body. Explicit `method`,
+`request_target`, and `entity_body` arguments override those values. Trailer
+fields do not replace initial authentication fields or create replayability.
+
+Uniform owns no SETTINGS, GOAWAY, resets, stream IDs, flow control, HPACK,
+QPACK, QUIC, datagrams, capsules, scheduling, ALPN, TLS, server-push lifecycle,
+pooling, retry policy, redirects, or informational-response sequencing.
+Native operations can exist on an adapter's separate API without becoming
+portable Uniform methods. See [the standards audit](MODERN-HTTP-AUDIT.md) and
+[adapter guide](ADAPTERS.md) for implementation boundaries.

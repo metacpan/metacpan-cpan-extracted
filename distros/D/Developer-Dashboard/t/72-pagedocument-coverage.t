@@ -43,6 +43,7 @@ my $SEP = $Developer::Dashboard::PageDocument::LEGACY_SEP;
         'preamble before any header',
         '=== TITLE ===',    'Modern Title',
         '=== ICON ===',     'star',
+        '=== HEAD ===',     '<meta name="robots" content="noindex">',
         '=== HTML ===',     '<b>hi</b>',
         '=== BOOKMARK ===', 'bm-modern',
         '=== NOTE ===',     'a modern note',
@@ -51,6 +52,7 @@ my $SEP = $Developer::Dashboard::PageDocument::LEGACY_SEP;
     my $page = $PD->from_instruction($text);
     is( $page->{title},      'Modern Title', 'modern doc parses TITLE past the preamble line' );
     is( $page->{meta}{icon}, 'star',         'modern doc parses ICON section (exists-true)' );
+    is( $page->{meta}{head}, '<meta name="robots" content="noindex">', 'modern doc parses raw HEAD injection content' );
     is( $page->{state}{k},   'v',            'modern JSON STASH decodes' );
 }
 
@@ -70,6 +72,7 @@ my $SEP = $Developer::Dashboard::PageDocument::LEGACY_SEP;
     my $text = join "\n$SEP\n",
         'TITLE: Legacy Title',
         'CODE0: print "code";',
+        'HEAD: <meta name="robots" content="noindex">',
         'FOO: this key is unknown and is skipped',
         'ICON: L',
         'BOOKMARK: bm-legacy',
@@ -80,6 +83,7 @@ my $SEP = $Developer::Dashboard::PageDocument::LEGACY_SEP;
     is( $page->{title},                'Legacy Title', 'legacy doc parses TITLE' );
     is( $page->{state}{foo},           1,              'perl-ish legacy STASH decodes via eval path' );
     is( $page->{meta}{source_format},  'legacy',       'legacy source format is recorded' );
+    is( $page->{meta}{head}, '<meta name="robots" content="noindex">', 'legacy doc parses HEAD content' );
     ok( ( grep { $_->{id} eq 'CODE0' } @{ $page->{meta}{codes} } ), 'CODE0 section is captured' );
     ok( !$page->{id} || $page->{id} eq 'bm-legacy', 'unknown FOO key did not become the bookmark id' );
 }
@@ -105,17 +109,25 @@ my $SEP = $Developer::Dashboard::PageDocument::LEGACY_SEP;
         layout      => { body => '<p>hi</p>' },
         meta        => {
             icon  => 'star',
+            head  => '<script>window.bookmarkHead = true;</script>',
             codes => [ { id => 'CODE0', body => 'print 1' }, { id => 'CODE1' } ],
         },
     );
     my $out = $page->legacy_instruction;
     like( $out, qr/TITLE: T/,          'serializes TITLE' );
     like( $out, qr/ICON: star/,        'serializes ICON when set' );
+    like( $out, qr/^HEAD: <script>window\.bookmarkHead = true;<\/script>$/m, 'serializes HEAD when set' );
     like( $out, qr/BOOKMARK: bm1/,     'serializes BOOKMARK when id set' );
     like( $out, qr/NOTE: D/,           'serializes NOTE when description set' );
     like( $out, qr{HTML: <p>hi</p>},   'serializes HTML when body set' );
     like( $out, qr/CODE0: print 1/,    'serializes a code body' );
     like( $out, qr/^CODE1:/m,          'serializes a code with no body key as an empty body' );
+}
+
+# HEAD defined but empty (line 219: defined is true and the non-empty check is false).
+{
+    my $page = $PD->new( title => 'T', meta => { head => '' } );
+    unlike( $page->legacy_instruction, qr/^HEAD:/m, 'an empty HEAD section is omitted from legacy output' );
 }
 
 # Icon defined but empty string (line 192 left-true-right-false side).
@@ -160,10 +172,16 @@ my $SEP = $Developer::Dashboard::PageDocument::LEGACY_SEP;
 # render_html: body present vs absent (line 239 ternary both sides).
 # ---------------------------------------------------------------------------
 {
-    my $page = $PD->new( title => 'RT', description => 'RD', layout => { body => '<p>B</p>' } );
+    my $page = $PD->new(
+        title       => 'RT',
+        description => 'RD',
+        layout      => { body => '<p>B</p>' },
+        meta        => { head => '<meta name="x-bookmark" content="head-injected">' },
+    );
     my $html = $page->render_html;
     like( $html, qr{<p>B</p>},            'render_html includes the body when present' );
     like( $html, qr{<title>RT</title>},   'render_html includes the escaped title' );
+    like( $html, qr{<head>.*<meta name="x-bookmark" content="head-injected">.*</head>}s, 'render_html injects bookmark HEAD content inside the document head' );
     like( $html, qr{<p>RD</p>},           'render_html includes the description paragraph' );
 }
 {
@@ -280,7 +298,8 @@ t/72-pagedocument-coverage.t - branch and condition coverage for the page docume
 
 This test drives every decision path in the page document model that the broader
 suite leaves unexercised: the instruction parser's modern and legacy branches,
-the per-section serialization guards, the HTML renderer's runtime-chunk handling,
+the C<HEAD> section parse/serialize/render paths, the per-section serialization
+guards, the HTML renderer's runtime-chunk handling,
 and the private stash, template, trim, and escape helpers. It exists to hold the
 module at full branch and condition coverage without weakening any behavior.
 

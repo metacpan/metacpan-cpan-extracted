@@ -10,7 +10,7 @@ use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::Config;
 use Developer::Dashboard::JSON qw(json_decode);
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 our $AUTOLOAD;
 
@@ -21,7 +21,7 @@ our $AUTOLOAD;
 # Output: Developer::Dashboard::Handle object.
 sub new {
     my ( $class, %args ) = @_;
-    return bless { cwd => $args{cwd} // Cwd::cwd() }, $class;    # uncoverable condition false Cwd::cwd() cannot return undef
+    return bless { cwd => $args{cwd} // Cwd::cwd() }, $class;
 }
 
 # paths()
@@ -82,7 +82,7 @@ sub _registry {
     my ($self) = @_;
     return $self->{_registry} //= do {
         my $home  = $ENV{HOME} || '';
-        my @roots = grep { defined && -d } map { "$home/$_" } qw(projects src work);    # uncoverable branch false the interpolated map above always yields a defined string
+        my @roots = grep { -d } map { "$home/$_" } qw(projects src work);
         my $paths = Developer::Dashboard::PathRegistry->new(
             home            => $home,
             cwd             => $self->{cwd},
@@ -138,7 +138,12 @@ use warnings;
 # right to compare a stringifiable object. The risk fallback => 0 was reached for
 # is already gone: it only mattered while q{""} might be absent, and it is not.
 use overload
-  '&{}'    => sub { my $self = shift; return sub { return $self->_execute(@_) } },
+  '&{}'    => sub {
+      my $self = shift;
+      return sub {
+          return $self->_execute(@_);
+      };
+  },
   q{""}    => sub { my $self = shift; return 'd2 proxy: ' . join '.', @{ $self->{segments} } },
   '0+'     => sub { return 0 },
   'bool'   => sub { return 1 },
@@ -185,21 +190,14 @@ sub _begin {
 # held without one call mutating another's accumulated path.
 # Input: the method name, plus any arguments. Output: a new proxy.
 #
-# THERE IS DELIBERATELY NO `return if $name eq 'DESTROY'` GUARD HERE, and the
-# omission is load-bearing rather than an oversight. This package defines a real
-# DESTROY below, so perl calls that directly and AUTOLOAD can never receive the
-# name - the guard was unreachable, and Devel::Cover reported it as exactly that
-# (line 196, branch 50%, true side never taken). The Handle package above keeps
-# its identical guard because it defines NO DESTROY, so there the guard is live
-# and measured covered.
-#
-# THE COUPLING THIS CREATES: if DESTROY below is ever removed, this AUTOLOAD
-# starts treating destruction as a chain segment again. Remove one and you must
-# restore the other.
+# Proxy has no DESTROY of its own, so a chain that goes out of scope
+# un-terminated reaches AUTOLOAD with the name DESTROY; that must be inert and
+# never become a chain segment, hence the guard below.
 sub AUTOLOAD {
     my $self = shift;
     my $name = $AUTOLOAD;
     $name =~ s/.*:://;
+    return if $name eq 'DESTROY';
     return bless {
         handle   => $self->{handle},
         segments => [ @{ $self->{segments} }, _dispatch_name($name) ],
@@ -245,27 +243,6 @@ sub _cli_args {
     return @cli;
 }
 
-# DESTROY()
-# Explicitly does nothing. Without it the proxy's AUTOLOAD would receive
-# DESTROY as just another bareword segment when a chain goes out of scope
-# un-terminated, which is how an inert chain would come to invoke something.
-# NOT "UNREACHABLE" - MEASURED TO RUN, AND UNATTRIBUTABLE ANYWAY. Devel::Cover
-# does not credit destruction to this sub: it reports count 0 here whether the
-# body is one line or several, and whether the proxy is dropped in scope or left
-# to global destruction. That is an instrument limitation, not dead code, and it
-# was proved rather than assumed - wrapping this sub and dropping the last
-# reference shows perl calling it twice for a two-segment chain:
-#
-#     my $p = $h->collector->list; undef $p;   ->   DESTROY called count = 2
-#
-# The annotation therefore records a fact about the MEASUREMENT, not a claim
-# that the code cannot run. Removing this sub would be a real regression (see
-# the coupling noted on AUTOLOAD above), so it must not be deleted to reach 100.
-# One criterion per comment - two criteria on one line are honoured for neither.
-# uncoverable subroutine
-# uncoverable statement
-sub DESTROY { return }
-
 package Developer::Dashboard::Handle;
 
 1;
@@ -281,7 +258,7 @@ __END__
 Developer::Dashboard::Handle - in-process proxy for the dashboard/d2 CLI
 
 =head1 VERSION
-4.30
+5.34
 
 =head1 PURPOSE
 

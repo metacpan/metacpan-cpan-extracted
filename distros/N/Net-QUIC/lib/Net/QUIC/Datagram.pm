@@ -5,7 +5,7 @@ use warnings;
 
 use Net::QUIC ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub _new {
     my ($class, $data, $local, $peer, $ecn) = @_;

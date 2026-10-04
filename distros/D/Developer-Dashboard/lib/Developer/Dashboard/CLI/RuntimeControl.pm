@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::RuntimeControl;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Getopt::Long qw(GetOptionsFromArray);
 
@@ -250,6 +250,14 @@ sub _collector_known {
     return $collectors->collector_exists($name) ? 1 : 0;
 }
 
+# _stderr_is_tty()
+# Reports whether STDERR is attached to a terminal.
+# Input: none.
+# Output: true when STDERR is a controlling terminal, false otherwise.
+sub _stderr_is_tty {
+    return -t STDERR;
+}
+
 # _lifecycle_progress(%args)
 # Builds the optional progress board for dashboard restart and stop commands.
 # Input: title string and ordered task array reference.
@@ -257,22 +265,11 @@ sub _collector_known {
 sub _lifecycle_progress {
     my (%args) = @_;
     my $enabled = $ENV{DEVELOPER_DASHBOARD_PROGRESS} ? 1 : 0;
-    # STDERR is never a controlling terminal under prove/Devel::Cover/CI, so
-    # -t STDERR is always false and !-t STDERR is always true here - only
-    # DEVELOPER_DASHBOARD_PROGRESS can make $enabled true in this environment,
-    # so the right operand of this && never independently swings the result,
-    # and the guard can never see the "disabled and non-interactive" branch
-    # fail to return.
-    # uncoverable branch false
-    # uncoverable condition right
-    return if !$enabled && !-t STDERR;
-    # Computed once rather than repeated as two separate `-t STDERR ? 1 : 0`
-    # ternaries: STDERR is never a controlling terminal under prove/Devel::
-    # Cover/CI, so both call sites always saw the same false-branch value
-    # anyway, and Devel::Cover cannot resolve an uncoverable-branch annotation
-    # against two textually-identical ternaries folded onto one reported line
-    # inside a multi-line hash constructor.
-    my $interactive = -t STDERR ? 1 : 0;    # uncoverable branch true
+    # The terminal probe goes through _stderr_is_tty so tests can drive both
+    # the interactive and the non-interactive path deterministically.
+    my $tty = _stderr_is_tty();
+    return if !$enabled && !$tty;
+    my $interactive = $tty ? 1 : 0;
     return Developer::Dashboard::CLI::Progress->new(
         title   => $args{title} || 'dashboard progress',
         tasks   => $args{tasks} || [],

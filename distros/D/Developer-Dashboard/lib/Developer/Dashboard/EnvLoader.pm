@@ -3,7 +3,7 @@ package Developer::Dashboard::EnvLoader;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Cwd qw(cwd);
 use File::Basename qw(dirname);
@@ -38,6 +38,20 @@ sub load_skill_layers {
     return $class->_load_skill_layer_specs(
         specs => $class->_skill_layer_specs( @{ $args{skill_layers} || [] } ),
     );
+}
+
+# load_skill_cli_layers(%args)
+# Loads .env files that live directly under each participating skill's cli
+# directory after the skill root env files have loaded.
+# Input: hash with skill_layers => array reference of skill root paths.
+# Output: ordered array reference of the env files that were actually loaded.
+sub load_skill_cli_layers {
+    my ( $class, %args ) = @_;
+    my @files;
+    for my $spec ( @{ $class->_skill_layer_specs( @{ $args{skill_layers} || [] } ) } ) {
+        push @files, $class->_env_file_candidates( File::Spec->catdir( $spec->{root}, 'cli' ) );
+    }
+    return $class->load_files( files => \@files );
 }
 
 # load_skill_layers_into_hash(%args)
@@ -181,7 +195,7 @@ sub _plain_directory_layers {
         $stop_dir = $project_root;
     }
     else {
-        return ();
+        $stop_dir = $cwd;
     }
 
     my @layers;
@@ -190,7 +204,7 @@ sub _plain_directory_layers {
         push @layers, $dir;
         last if $class->_path_identity($dir) eq $class->_path_identity($stop_dir);
         my $parent = dirname($dir);
-        last if $parent eq $dir;    # uncoverable branch true dirname never returns undef/empty and the stop-dir match above always fires before the filesystem root is reached
+        last if $parent eq $dir;
         $dir = $parent;
     }
     return reverse @layers;
@@ -231,7 +245,6 @@ sub _load_skill_layer_specs {
         next if ref($spec) ne 'HASH';
         my $prefix = $spec->{prefix} || '';
         for my $file ( $class->_env_file_candidates( $spec->{root} ) ) {
-            next if !defined $file;    # uncoverable branch true _env_file_candidates always yields defined non-empty catfile paths
             my $identity = $class->_path_identity($file);
             next if $seen{$identity}++;
             next if !-f $file;
@@ -341,6 +354,11 @@ sub _load_env_file {
     while ( my $line = <$fh> ) {
         ++$line_no;
         $line =~ s/\r?\n\z//;
+        if ( my $spec = $class->_include_directive($line) ) {
+            require Developer::Dashboard::EnvInclude;
+            Developer::Dashboard::EnvInclude->include($spec);
+            next;
+        }
         $line = $class->_strip_env_comments(
             line             => $line,
             file             => $file,
@@ -361,14 +379,15 @@ sub _load_env_file {
         $ENV{$key} = $value;
         Developer::Dashboard::EnvAudit->record( $key, $value, $file );
     }
-    close $fh or die "Unable to close $file: $!";    # uncoverable branch true closing a read-only handle does not fail on the test host
+    close $fh or die "Unable to close $file: $!";
     die "Unterminated block comment in $file\n" if $in_block_comment;
     return 1;
 }
 
 # _load_env_pl_file($file)
-# Executes one .env.pl file and records every added or changed environment key
-# against that file in the shared audit inventory.
+# Executes one .env.pl file and records every added, changed, or explicitly
+# re-assigned environment key against that file in the shared audit
+# inventory.
 # Input: absolute .env.pl file path.
 # Output: true value.
 sub _load_env_pl_file {
@@ -376,20 +395,50 @@ sub _load_env_pl_file {
     my %before = %ENV;
     delete $INC{$file};
     require $file;
+
+    # DD-1044: a .env.pl that assigns $ENV{KEY} to the value it already had
+    # (inherited from the OS environment or an earlier layer) genuinely set
+    # that key, but a pre/post %ENV value-diff alone cannot see it - the
+    # value never changed. _env_pl_assigned_keys names every key this
+    # specific file's own source explicitly assigns, so it is unioned with
+    # the value-diff below rather than replacing it (a file can also touch
+    # %ENV through constructs this static scan cannot see, e.g. a loop over
+    # a computed key list - the diff still catches those).
+    my %assigned_by_file = map { $_ => 1 } $class->_env_pl_assigned_keys($file);
+
     my @changed = grep {
         $_ ne 'DEVELOPER_DASHBOARD_ENV_AUDIT'
           && (
-            !exists $before{$_}
+            $assigned_by_file{$_}
+            || !exists $before{$_}
             || ( defined $before{$_} && defined $ENV{$_} && $before{$_} ne $ENV{$_} )
-            || ( defined $before{$_} xor defined $ENV{$_} )
           )
     } sort keys %ENV;
     for my $key (@changed) {
-        # The grep above already selects only genuinely new or changed keys,
-        # so every key reaching this point is recorded without re-filtering.
+        # The grep above already selects only genuinely new, changed, or
+        # explicitly re-assigned keys, so every key reaching this point is
+        # recorded without re-filtering.
         Developer::Dashboard::EnvAudit->record( $key, $ENV{$key}, $file );
     }
     return 1;
+}
+
+# _env_pl_assigned_keys($file)
+# Statically scans one .env.pl file's own source text for literal
+# $ENV{KEY} = ... assignment targets, so a same-value re-assignment (which a
+# runtime %ENV diff cannot detect) is still attributed to this file.
+# Input: absolute .env.pl file path.
+# Output: list of environment key name strings (may be empty; duplicates
+# removed).
+sub _env_pl_assigned_keys {
+    my ( $class, $file ) = @_;
+    open my $fh, '<:raw', $file or return ();
+    local $/;
+    my $source = <$fh>;
+    close $fh;
+    return () if !defined $source;
+    my %seen;
+    return grep { !$seen{$_}++ } ( $source =~ /\$ENV\{\s*['"]?(\w+)['"]?\s*\}\s*=(?!=)/g );
 }
 
 # _path_identity($path)
@@ -414,6 +463,20 @@ sub _path_identity {
 sub _same_or_descendant_path {
     my ( $class, $path, $root ) = @_;
     return Developer::Dashboard::PathIdentity::_same_or_descendant_path( $path, $root, empty_fallback => 0 );
+}
+
+# _include_directive($line)
+# Recognizes a "# include <skill.path>" or "# include <skill.path.*>" line
+# before generic comment-stripping would otherwise silently discard it as an
+# ordinary whole-line comment.
+# Input: raw, not-yet-comment-stripped .env line string.
+# Output: the include spec string, or undef when the line is not a directive.
+sub _include_directive {
+    my ( $class, $line ) = @_;
+    my $trimmed = $line;    # the sole caller always passes a defined line read from an open filehandle
+    $trimmed =~ s/\A\s+//;
+    return undef if $trimmed !~ /\A#\s*include\s*<([^>]+)>\s*\z/;
+    return $1;
 }
 
 # _strip_env_comments(%args)

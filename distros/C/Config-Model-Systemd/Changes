@@ -1,3 +1,11 @@
+0.261.2 2026-10-03
+
+  Bug fix:
+    * fix test systemd-service.t test
+      Closes Debian: #1149748
+
+See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1149748
+
 0.261.1 2026-07-09
 
   Model update:
@@ -106,9 +114,9 @@
   * For system administrators:
     - systemd: applies to all system service:
       e.g. "cme edit systemd transmission.*"
-    - systemd-service: applies to one system service 
+    - systemd-service: applies to one system service
       e.g. "cme edit systemd transmission-daemon.service"
-    - systemd-timer: applies to one system timer 
+    - systemd-timer: applies to one system timer
     - systemd-socket: applies to one system socket
 
   * For service developers:
@@ -157,7 +165,7 @@
 
   Model update:
     * update parameters from systemd 244 source
-  
+
   Model generator (parse-man.pl) changes:
     * parse-man: put C<> around XML filename
     * parse-man: store systemd version
@@ -203,7 +211,7 @@
 
   Model update:
     * The script generating Systemd model from systemd documentation
-      was modified to generate Systemd model from scratch. 
+      was modified to generate Systemd model from scratch.
     * Old systemd parameters are migrated to the new ones:
       * OnFailureIsolate in unit
       * RebootArgument
@@ -270,7 +278,7 @@
 0.232.6 2017-01-15
 
   Documentation improvement:
-  
+
     * Respect paragraph format of original documentation. This
       improves a lot the readability of the documentation displayed in
       cme and on cpan website.
@@ -351,7 +359,7 @@
       (Require Config::Model::Itself 2.005)
     * fix linkage of generated class in root class (parse-man)
     * remove socket service file when needed
- 
+
 0.007 2016-06-05
 
   Bug fix:

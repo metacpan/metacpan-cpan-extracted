@@ -35,10 +35,10 @@ my $dump;
 {
     my $xp = Test::Log::Log4perl->expect(
         ignore_priority => "info",
-        [
-            'User',
-            warn =>  qr/Unexpected systemd parameter/
-        ]
+        # TODO: remove this test once Config::Model::Itself can accept
+        # new style of accept property
+        [ 'Model.Legacy' => (warn => qr/accept/) x 8 ] ,
+        [ User => warn =>  qr/Unexpected systemd parameter/]
     );
     $dump = $root->dump_tree (mode => 'full');
 }

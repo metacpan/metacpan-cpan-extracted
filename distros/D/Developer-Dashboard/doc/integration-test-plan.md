@@ -10,7 +10,7 @@ web application rather than as a checkout-local script.
 The goal is to prove that a new environment can:
 
 - build the CPAN distribution tarball on the host from the repo
-- install the built tarball with `cpanm --notest`
+- install and test the built tarball with `cpanm`
 - run the installed `dashboard` command successfully
 - initialize runtime state in a fake project
 - execute the major CLI surfaces through installed binaries against that fake project
@@ -26,9 +26,11 @@ The goal is to prove that a new environment can:
 The integration run covers these command families:
 
 - host packaging: `dzil build`
-- installation: `cpanm --notest <tarball>`
+- installation: `cpanm <tarball>` (runs the distribution test suite)
+- short entrypoint: `d2 version` must match the installed tarball version, `d2 of grep --help` must reach GNU grep, and `d2 docker compose config --help` / `d2 docker compose help` must preserve native Compose help arguments
 - bootstrap: `dashboard init`, user-provided `dashboard update`
 - help and prompt: `dashboard`, `dashboard help`, `dashboard ps1`, `dashboard shell bash`, `dashboard shell ps`
+- shell completion: root `d2` TAB candidates contain commands rather than path aliases, `workspace` completion offers configured/Folder.pm aliases and existing sessions, and `cdr` completion descends one directory level per entered term without recursive scans
 - helper staging: rerun a built-in helper command after install and verify the managed helper runtime converges on `~/.developer-dashboard/cli/dd/`; dashboard-managed flat helper files left directly under `~/.developer-dashboard/cli/` by older releases should be removed automatically on that staging pass
 - paths: `dashboard paths`, `dashboard path list`, `dashboard path resolve`, `dashboard path project-root`
 - encoding: `dashboard encode`, `dashboard decode`
@@ -42,6 +44,7 @@ The integration run covers these command families:
 - web lifecycle: `dashboard serve`, `dashboard restart`, `dashboard stop`
 - browser checks: headless Chromium editor, saved fake-project bookmark page, outsider bootstrap DOM verification, and helper-login DOM verification after helper-user enablement
 - ajax streaming: installed long-running `/ajax/<file>` route timing, early-chunk verification, refresh-safe singleton replacement, `fetch_value()` / `stream_value()` DOM helper coverage, and browser pagehide cleanup coverage in unit tests
+- skill Dancer2 extensions: load each installed `lib/Dashboard.pm` once while the PSGI app starts; verify `hook before` variables are visible to `/app/<skill>/...` and `/ajax/<skill>/...` CODE, and that hook-set headers override dashboard defaults unless the backend explicitly returns that header
 - windows verification assets: `integration/windows/run-strawberry-smoke.ps1` and `integration/windows/run-qemu-windows-smoke.sh`
 - when the Windows checkout bootstrap changes, `integration/windows/run-strawberry-smoke.ps1` must be rerun with `-UseInstallBootstrap` so the guest exercises `install.ps1` through the streamed `Invoke-Expression` path
 
@@ -72,17 +75,18 @@ The test container should be intentionally minimal:
 - no preinstalled Developer Dashboard
 - only generic build, browser, and HTTP tooling added
 - a temporary `HOME` so the installed app must bootstrap itself from scratch
+- Compose `init: true` so orphaned descendants from process-group tests are
+  reaped during the blank-container test run rather than remaining as zombies
 - no requirement that `ss` or other iproute2 tools exist inside the image
 
 The repo checkout is not mounted into the container as the app under test.
 Only the host-built tarball is mounted into the blank container.
-The normal `prove -lr t` and explicit `Devel::Cover` gates are where the
-Developer Dashboard distribution tests run in full. The later blank-container
-tarball install is now an installation-verification gate, so it uses
-`cpanm --notest` to verify packaged dependency resolution and installed
-runtime behavior without rerunning the same distribution test suite a second
-time. The Windows guest smoke follows the same rule for the tarball install
-step, and the optional bootstrap path passes the tarball through the literal
+The normal `prove -lr t` and explicit `Devel::Cover` gates validate the source
+tree. The blank-container tarball install is a second distribution-test gate:
+plain `cpanm` verifies packaged dependency resolution and runs the packaged
+test suite in a clean Perl environment. The Windows guest smoke follows its
+separate platform-specific policy for the tarball install step, and the
+optional bootstrap path passes the tarball through the literal
 `DD_INSTALL_CPAN_TARGET` environment variable so `install.ps1` still lets
 `cpanm --notest` resolve the exact target literally. Outside that override,
 the streamed Windows bootstrap defaults to cloning the GitHub `master`
@@ -110,7 +114,7 @@ The integration run creates:
 2. Run `prove -lv t/44-smart-router-two-stage.t` against that freshly built tarball so the extracted-dashboard smart-router contract is verified at the post-build stage. That guard retries one transient `cpanm` fetch or unpack failure inside its Docker container before treating the post-build install as a real repository regression.
 3. Start the blank container with only that host-built tarball mounted into it.
 4. Copy the mounted tarball to a versioned local path inside the container and
-   install that staged tarball with `cpanm --notest`. The staged filename must keep the
+   install and test that staged tarball with `cpanm`. The staged filename must keep the
    concrete `Developer-Dashboard-X.XX.tar.gz` version so `cpanm` cannot drift
    into a CPAN lookup because the bind-mounted filename is generic.
 5. Create the fake-project `./.developer-dashboard` tree only after that install step succeeds so the tarball's own tests still run against a clean runtime.
@@ -159,6 +163,9 @@ The integration run creates:
 - long-running skill dependency steps keep the main epic checklist visible while streaming a Docker-style rolling ten-line detail window under the active task, collapse those detail lines when the task succeeds, and leave the captured detail visible when the task fails
 - explicit `dashboard skills install --ddfile` runs process `ddfile` first into the active layered skills root and then `ddfile.local` into the current directory's nested `./skills/` tree
 - explicit `dashboard skills install <source> ...` runs can install one or more sources in command-line order, append each exact source to the home root `~/.developer-dashboard/ddfile` without duplicating existing non-comment entries, `dashboard skills uninstall <repo-name>` removes matching source lines from that same root `ddfile` while preserving comments and unrelated entries, and bare `dashboard skills install` uses that root `ddfile` to reinstall every registered skill as an update-all pass with a visible source-level progress rundown and a default before/after `.env` `VERSION` table summary
+- remote skill installs accept `-b <branch>`/`--branch`; a fresh install without it tries `master` and then `main`, while reinstall without it retains the named branch checked out in the installed skill directory, and an explicit branch overrides that retained branch
+- skill install progress reports an existing `ddfile` or `ddfile.local` as requiring no dependency installs when appropriate, and says a manifest is missing only when the corresponding file is absent
+- separator-based and modern bookmark `HEAD` sections survive parse/serialize and render as raw content inside the page document's `<head>`, while the editor highlights their content as HTML
 - when the home runtime already has `.gitignore` or compatibility `.gitiignore`, explicit skill installs append `skills/<repo-name>/` without duplicates so cloned skill trees stay ignored by runtime Git checkouts
 - `dashboard skill` is covered as the singular alias for `dashboard skills` management commands while installed command execution remains on the dotted `dashboard <skill>.<command>` path
 - streamed `install.sh` runs such as `curl ... | sh` succeed without a local checkout by falling back to embedded `aptfile`, `apkfile`, `dnfile`, and `brewfile` manifests, shipping `tmux` in those bootstrap package sets because `dashboard workspace` is a first-party tmux workflow, cloning the current GitHub `master` checkout into a temporary local tree when no explicit `DD_INSTALL_CPAN_TARGET` override is set, and Debian-family or Alpine hosts bootstrap `App::perlbrew` automatically when the package manager path did not already provide `perlbrew`
@@ -304,5 +311,5 @@ The run passes when:
 - the container exits `0`
 - the app under test comes only from the host-built tarball
 - the installed `dashboard` CLI completes the scripted fake-project flow from the mounted tarball install
-- Chromium verifies the editor, saved bookmark page, outsider disabled-access page, and helper login page
+- Chromium verifies the editor, saved bookmark page, outsider disabled-access page, and helper login page. Before a helper user exists, the remote request must remain a body-free 401; headless Chromium may render its generic `HTTP ERROR 401` page or report `net::ERR_HTTP_RESPONSE_CODE_FAILURE`, but neither outcome may expose bootstrap guidance or a login form.
 - the web lifecycle and helper browser flow behave as expected

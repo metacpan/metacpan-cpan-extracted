@@ -22,6 +22,10 @@ docker - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
+  dashboard docker --help
+  dashboard docker compose [options] <compose-args...>
+  dashboard docker list [--enabled|--disabled]
+  dashboard docker development {enable|disable} <service> [service...]
   dashboard docker ...
 
 =head1 DESCRIPTION
@@ -35,9 +39,11 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 This staged helper exposes C<dashboard docker compose>, C<dashboard docker list>,
 and the isolated service toggle commands C<dashboard docker enable> and
-C<dashboard docker disable>. It is the command surface for dashboard-specific
-Compose discovery, addon/mode handling, dry-run output, service-state
-reporting, and local C<disabled.yml> marker management.
+C<dashboard docker disable>, plus C<dashboard docker development
+{enable|disable}>. It is the command surface for dashboard-specific Compose
+discovery, addon/mode handling, dry-run output, service-state reporting, and
+local C<disabled.yml> and C<develop.yml> marker management. C<--help>, C<-h>,
+C<help>, or no subcommand prints the command reference without invoking Docker.
 
 =head1 WHY IT EXISTS
 
@@ -49,14 +55,19 @@ Use this file when changing docker helper CLI arguments or the handoff into the 
 
 =head1 HOW TO USE
 
-Users run C<dashboard docker compose ...>, C<dashboard docker list>, C<dashboard
-docker enable E<lt>serviceE<gt> [service...]>, or C<dashboard docker disable
-E<lt>serviceE<gt> [service...]>. The staged helper forwards the request into the
-private runtime, which either resolves and C<exec>s the final Docker command,
-reports the effective enabled or disabled state of isolated services, or creates
-or removes the deepest-layer C<disabled.yml> marker for one or more isolated
-services in a single invocation - a bad name among good ones does not stop the
-others from being toggled, and is reported per service.
+Users run C<dashboard docker compose ...>, C<dashboard docker list>,
+C<dashboard docker enable E<lt>serviceE<gt> [service...]>, C<dashboard docker
+disable E<lt>serviceE<gt> [service...]>, or C<dashboard docker development
+{enable|disable} E<lt>serviceE<gt> [service...]>. The staged helper forwards
+the request into the private runtime, which either resolves and C<exec>s the
+final Docker command, reports the effective enabled or disabled state of
+isolated services, or creates or removes the deepest-layer service marker for
+one or more services in one invocation. A bad name among good ones does not
+stop the others from being toggled, and is reported per service. C<disabled.yml>
+excludes a service; separate C<develop.yml> opts it into loading
+C<development.compose.yml> after its base C<compose.yml>. C<dashboard docker
+--help> prints the built-in command reference; shell completion lists all five
+Docker subcommands and offers C<enable>/C<disable> below C<development>.
 
 =head1 WHAT USES IT
 
@@ -83,9 +94,14 @@ Example 3:
   dashboard docker enable green
   dashboard docker disable green blue purple
   dashboard docker enable green blue purple
+  dashboard docker development enable green
+  dashboard docker development disable green
 
 Toggle one or more isolated services without manually creating or deleting the
 F<disabled.yml> marker file.
+
+The development command independently creates or removes F<develop.yml> to
+enable or disable the optional development compose overlay.
 
 Example 4:
 

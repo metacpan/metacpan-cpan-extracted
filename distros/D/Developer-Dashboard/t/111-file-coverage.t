@@ -88,6 +88,14 @@ use Developer::Dashboard::PathRegistry ();
     # Output: empty list.
     sub installed_skill_roots { return () }
 
+    # nested_skill_entries(%args)
+    # Reports no nested skill-depth entries (DD-1004) - this mock predates
+    # that discovery walker, and every top-level skill list it reports is
+    # already empty, so there is nothing to recurse into.
+    # Input: ignored.
+    # Output: empty list.
+    sub nested_skill_entries { return () }
+
     # secure_file_permissions($path)
     # Accepts permission hardening requests without touching the filesystem.
     # Input: file path string.

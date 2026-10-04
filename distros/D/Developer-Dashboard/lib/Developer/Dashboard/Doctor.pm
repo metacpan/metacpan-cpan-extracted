@@ -3,7 +3,7 @@ package Developer::Dashboard::Doctor;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use File::Find ();
 use File::Spec;
@@ -127,7 +127,7 @@ sub _audit_root {
                 return if !$issue;
                 if ($fix) {
                     chmod oct( $issue->{expected_mode} ), $entry
-                      or die sprintf 'Unable to chmod %s to %s: %s', $entry, $issue->{expected_mode}, $!;    # uncoverable branch true
+                      or die sprintf 'Unable to chmod %s to %s: %s', $entry, $issue->{expected_mode}, $!;
                     $issue->{fixed} = 1;
                     $issue->{current_mode} = $issue->{expected_mode};
                 }
@@ -240,7 +240,7 @@ sub _helper_issue_for_path {
     my $current = <$fh>;
     close $fh;
 
-    return undef if defined $current && $current eq $expected;    # uncoverable condition left
+    return undef if $current eq $expected;
 
     return {
         path          => $path,
@@ -358,7 +358,7 @@ sub _rewrite_bashrc_dashboard_lines {
 
     open my $write_fh, '>', $path or die "Unable to write $path: $!";
     print {$write_fh} $rewritten;
-    close $write_fh or die "Unable to close $path after writing: $!";    # uncoverable branch true
+    close $write_fh or die "Unable to close $path after writing: $!";
 }
 
 # _dashboard_bashrc_lines($text)
@@ -431,8 +431,8 @@ sub _slurp_text_file {
     open my $read_fh, '<', $path or die "Unable to read $path: $!";
     local $/;
     my $text = <$read_fh>;
-    close $read_fh or die "Unable to close $path after reading: $!";    # uncoverable branch true
-    return defined($text) ? $text : q{};    # uncoverable branch false
+    close $read_fh or die "Unable to close $path after reading: $!";
+    return $text;
 }
 
 # _config()
@@ -442,7 +442,8 @@ sub _slurp_text_file {
 # Output: Developer::Dashboard::Config object.
 sub _config {
     my ($self) = @_;
-    return $self->{config} ||= Developer::Dashboard::Config->for_paths( $self->{paths} );    # uncoverable condition false
+    $self->{config} = Developer::Dashboard::Config->for_paths( $self->{paths} ) if !$self->{config};
+    return $self->{config};
 }
 
 # _mode_octal($path)
@@ -471,7 +472,8 @@ sub _mode_octal {
 # Output: list of zero or one issue hashrefs.
 sub _ssl_certificate_issues {
     my ( $self, %args ) = @_;
-    my $now = $args{now} || time;    # uncoverable condition false
+    my $now = $args{now};
+    $now = time if !$now;
     my $warn_days =
       defined $args{warn_days} ? $args{warn_days} : $self->_config->ssl_warn_days;
 

@@ -37,6 +37,8 @@ while (<$fh>) {
     s/\s.*\z//;              # the trailing comment column
     next unless length;
     next if /^#/;
+    # the distdir MANIFEST gains META.json/META.yml, which the walk skips
+    next if skipped($_);
     $listed{$_} = 1;
 }
 close $fh;

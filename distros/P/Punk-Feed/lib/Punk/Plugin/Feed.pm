@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::Feed ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 1;
 
@@ -162,6 +162,44 @@ prose falls into by accident.
 Punk itself does not transcode, and being stricter here is deliberate. A page
 with one bad byte renders with one bad character; a feed with one bad byte is
 rejected whole.
+
+=head2 Characters XML cannot carry are dropped
+
+Being valid UTF-8 is not enough. XML 1.0 allows a document to hold only the
+characters in its C<Char> production, and three groups of what Perl can hold
+are outside it:
+
+=over 4
+
+=item * the C0 controls other than tab, newline and carriage return
+
+=item * the surrogates, C<U+D800> to C<U+DFFF>, which Perl will put in a
+string and encode, and which no Unicode text contains
+
+=item * C<U+FFFE>, C<U+FFFF>, and anything above C<U+10FFFF>
+
+=back
+
+Every emitted value is filtered for these and they are B<dropped>. Nothing
+else is touched: C<U+007F> stays, because C<Char> allows it, and so do the C1
+controls and every noncharacter outside the BMP.
+
+B<Escaping is not an alternative.> C<&#1;> and C<&#xD800;> are as forbidden as
+the raw characters, because a character reference may only name a character
+C<Char> already allows. There is nothing to turn them into, so the choice is
+between dropping them and emitting a document no reader will accept.
+
+This matters more in a feed than in a page, and for the usual reason: a feed
+is one document. A single such character in one entry makes the whole thing
+fatally ill-formed, so a conforming reader loses B<every> item rather than the
+offending one, and the broken bytes are cached and re-served for the whole
+C<ttl>. A feed also routinely carries text its operator never wrote - comments,
+submitted posts, forum threads, wiki edits, uploaded file names - so "do not
+put a control character in a title" is not a rule anyone is in a position to
+follow.
+
+A C<path> is held to a stricter rule still and is refused rather than filtered;
+see L</THE FEED KEYWORD>.
 
 =head2 A reader is a fetcher on a schedule
 

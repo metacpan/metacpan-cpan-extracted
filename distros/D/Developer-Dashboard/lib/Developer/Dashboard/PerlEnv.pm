@@ -3,7 +3,7 @@ package Developer::Dashboard::PerlEnv;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Config ();
 use Cwd qw(abs_path);
@@ -28,7 +28,8 @@ sub path_separator {
 sub current_perl_bin_dir {
     my $perl = $^X || '';
     return '' if $perl eq '';
-    my $resolved = abs_path($perl) || $perl;    # uncoverable condition false
+    my $resolved = abs_path($perl);
+    $resolved = $perl if !$resolved;
     my $dir = dirname($resolved);
     return -d $dir ? $dir : '';
 }
@@ -43,7 +44,8 @@ sub current_perl_bin_dir {
 sub current_shell_bin_dir {
     my $shell = $Config::Config{sh} || '';
     return '' if $shell eq '';
-    my $resolved = abs_path($shell) || $shell;    # uncoverable condition false
+    my $resolved = abs_path($shell);
+    $resolved = $shell if !$resolved;
     my $dir = dirname($resolved);
     return -d $dir ? $dir : '';
 }
@@ -110,7 +112,8 @@ sub dashboard_lib_roots {
 sub perl5lib_list {
     my ( $class, %args ) = @_;
     my $env = ref( $args{env} ) eq 'HASH' ? $args{env} : \%ENV;
-    my $path_sep = $args{path_sep} || path_separator();    # uncoverable condition false
+    my $path_sep = $args{path_sep};
+    $path_sep = path_separator() if !$path_sep;
 
     my @existing = ref( $args{existing} ) eq 'ARRAY'
       ? @{ $args{existing} }
@@ -145,7 +148,8 @@ sub perl5lib_list {
 # Output: scalar PERL5LIB string.
 sub perl5lib_env {
     my ( $class, %args ) = @_;
-    my $path_sep = $args{path_sep} || path_separator();    # uncoverable condition false
+    my $path_sep = $args{path_sep};
+    $path_sep = path_separator() if !$path_sep;
     return join( $path_sep, $class->perl5lib_list(%args) );
 }
 
@@ -159,7 +163,8 @@ sub perl5lib_env {
 sub path_with_current_perl {
     my ( $class, %args ) = @_;
     my $env = ref( $args{env} ) eq 'HASH' ? $args{env} : \%ENV;
-    my $path_sep = $args{path_sep} || path_separator();    # uncoverable condition false
+    my $path_sep = $args{path_sep};
+    $path_sep = path_separator() if !$path_sep;
     my @existing = grep { $_ ne '' } split /\Q$path_sep\E/, ( $env->{PATH} || '' );
     my @ordered;
     my %seen;

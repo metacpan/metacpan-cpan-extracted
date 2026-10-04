@@ -24,7 +24,7 @@ use Data::TagDB::WellKnown;
 use Data::TagDB::Cloudlet;
 use Data::URIID::Colour;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 my %_queries = (
     _default => {
@@ -477,6 +477,38 @@ sub in_transaction {
     croak $error if defined $error;
 }
 
+
+sub load_plugin {
+    my ($self, $plugins, @opts) = @_;
+    my $plugin_infos = $self->{plugin_infos} //= {};
+
+    require Data::TagDB::Interface::Plugin;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $plugins = [$plugins] unless ref $plugins;
+
+    foreach my $plugin_name (@{$plugins}) {
+        my $info = $plugin_infos->{$plugin_name};
+
+        unless (defined $info) {
+            unless (exists $Data::TagDB::Interface::Plugin::_known_plugins{$plugin_name}) {
+                my $fn = $plugin_name =~ s{::|'}{/}gr; # from parent.pm!
+                $fn .= '.pm';
+                require $fn;
+            }
+
+            unless (exists $Data::TagDB::Interface::Plugin::_known_plugins{$plugin_name}) {
+                croak 'Plugin not found: '.$plugin_name;
+            }
+
+            croak 'Not a valid plugin: '.$plugin_name unless $plugin_name->isa('Data::TagDB::Interface::Plugin');
+
+            $plugin_infos->{$plugin_name} = $info = $plugin_name->plugin_attach($self, undef);
+        }
+    }
+}
+
 # ---- Virtual methods ----
 
 # ---- Private helpers ----
@@ -512,6 +544,12 @@ sub tag_by_dbid {
 
         return $tag;
     }
+}
+
+sub _get_plugin_info {
+    my ($self, $plugin) = @_;
+    my $plugin_infos = $self->{plugin_infos} //= {};
+    return $plugin_infos->{$plugin};
 }
 
 sub _tag_by_ise_cached {
@@ -685,6 +723,20 @@ sub _build_query {
         push(@binds, $opts{data_raw});
     }
 
+    if (defined $opts{data_raw_nocase}) {
+        my $DBI_name = $self->_DBI_name;
+
+        if ($DBI_name eq 'Pg') {
+            push(@where, 'LOWER(data) = LOWER(?)');
+            push(@binds, $opts{data_raw_nocase});
+        } elsif ($DBI_name eq 'SQLite') {
+            push(@where, 'data = ? COLLATE NOCASE');
+            push(@binds, $opts{data_raw_nocase});
+        } else {
+            ...
+        }
+    }
+
     if (scalar(@where)) {
         $parts{WHERE} = join(' AND ', @where);
     }
@@ -831,7 +883,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 
@@ -1202,6 +1254,20 @@ transactions have been finished.
 
 B<Note:>
 This method is mutually exclusive with the use of L</begin_work> at this time.
+
+=head2 load_plugin
+
+    $db->load_plugin($plugin_name);
+    # e.g.:
+    $db->load_plugin('My::Plugin');
+
+(experimental since v0.14)
+
+Loads a plugin into the database object.
+The plugin is loaded (as per L<perlfunc/require>) if needed.
+
+The plugin may run startup code.
+So this method might take some time and/or die depending on the nature of the plugin.
 
 =head2 tag_by_hint
 

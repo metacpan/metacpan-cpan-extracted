@@ -1,5 +1,23 @@
 Revision history for Env-Assert
 
+0.018     2026-10-03 22:43:10+02:00 Europe/Stockholm
+            * Change naming in API, add metacommand var:required.
+            * Migrate to Test2::V1 t/env-assert.t.
+            * Make tidy t/env-assert.t.
+            * Improve Env::Assert::Functions::_interpret_opts.
+            * More examples to t/env-assert-private.t.
+            * Migrate to Test2::V1 t/env-assert-private.t.
+            * Make tidy t/env-assert-private.t.
+
+0.017     2026-10-03 12:41:48+02:00 Europe/Stockholm
+            * Bugfix: required var must be in env regardless of param exact value.
+            * Add DEFAULT_* constants.
+            * Add Perl::Tidy to DevelopSuggests and add tidy exceptions.
+            * Make tidy t/env-assert-public-assert.t.
+            * Allow cuddled-else in Perl Tidy.
+            * Tidy bin/envassert and improve --help flag.
+            * Rename variable var to env_var.
+
 0.016     2026-10-02 22:06:55+02:00 Europe/Stockholm
             * Add more badges to README.md.
             * Add GitHub::CreateRelease to Dist::Zilla build.

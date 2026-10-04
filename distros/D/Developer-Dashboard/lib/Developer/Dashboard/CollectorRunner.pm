@@ -3,7 +3,7 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -16,7 +16,9 @@ use Time::HiRes qw(sleep time);
 use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::FileSlurp qw(slurp_file);
 use Developer::Dashboard::JSON qw(json_encode json_decode);
+use Developer::Dashboard::Config;
 use Developer::Dashboard::PerlEnv ();
+use Developer::Dashboard::CommandRunner ();
 use Developer::Dashboard::TimeUtils qw(_now_iso8601);
 use Developer::Dashboard::Platform qw(command_in_path is_windows shell_command_argv);
 use Developer::Dashboard::ProcessSupervision qw(
@@ -79,7 +81,8 @@ my %RESOLVABLE_ACCESSOR = map { $_ => 1 } qw(
 );
 
 # run_once($job)
-# Executes a collector job a single time with cwd/env/timeout handling.
+# Executes a collector job a single time with cwd/env/timeout handling; cwd
+# may be a built-in accessor, configured path alias, or skill Folder.pm alias.
 # Input: collector job hash reference.
 # Output: result hash reference with stdout, stderr, exit_code, and timed_out.
 sub run_once {
@@ -88,10 +91,13 @@ sub run_once {
     my $name = $job->{name} || die 'Collector job missing name';
     my ( $mode, $source ) = $self->_collector_source($job);
 
-    # cwd() always returns a non-empty path
-    my $cwd = $job->{cwd} || cwd();    # uncoverable condition false
+    my $cwd = $job->{cwd};
+    $cwd = cwd() if !$cwd;
     if ( !File::Spec->file_name_is_absolute($cwd) && $RESOLVABLE_ACCESSOR{$cwd} ) {
         $cwd = $self->{paths}->$cwd();
+    }
+    elsif ( !File::Spec->file_name_is_absolute($cwd) ) {
+        $cwd = $self->_resolve_collector_cwd_alias($cwd);
     }
 
     die "Collector cwd '$cwd' does not exist" if !-d $cwd;
@@ -126,8 +132,7 @@ sub run_once {
         {
             enabled         => 1,
             last_started_at => $started_at,
-            # the schedule fallback ternary always yields a non-empty string
-            schedule        => $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' ),    # uncoverable condition false
+            schedule        => $self->_schedule_mode($job),
         }
     );
 
@@ -202,6 +207,34 @@ sub run_once {
         stderr    => $stderr,
         timed_out => $timed_out ? 1 : 0,
     };
+}
+
+# _resolve_collector_cwd_alias($name)
+# Resolves a relative collector cwd from configured aliases, then installed
+# skill Folder.pm aliases, without dispatching arbitrary registry methods.
+# Input: relative cwd or alias string.
+# Output: resolved path string, or the original string if no alias applies.
+sub _resolve_collector_cwd_alias {
+    my ( $self, $name ) = @_;
+    my $paths = $self->{paths};
+    return $name if !defined $name || ref($name);
+    return $name if !$paths->can('named_paths') || !$paths->can('resolve_dir');
+
+    my $config = Developer::Dashboard::Config->for_paths($paths);
+    $paths->register_named_paths( $config->path_aliases );
+    my $configured = $paths->named_paths;
+    return $paths->resolve_dir($name) if exists $configured->{$name};
+
+    if ( $name =~ /\A[A-Za-z0-9_.-]+\.[A-Za-z0-9_.-]+\z/ ) {
+        require Developer::Dashboard::CLI::Paths;
+        my $target = Developer::Dashboard::CLI::Paths::_skill_folder_alias_target(
+            paths => $paths,
+            name  => $name,
+        );
+        return $target if defined $target;
+    }
+
+    return $name;
 }
 
 # _normalize_timeout_ms($job)
@@ -328,9 +361,12 @@ sub start_loop {
     my $interval = $self->_effective_interval_seconds($job);
     my $configured_interval = defined $job->{interval} ? $job->{interval} : 30;
     my $name = $job->{name} || die 'Collector job missing name';
-    # the schedule fallback ternary always yields a non-empty string
-    my $schedule_mode = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );    # uncoverable condition false
+    my $schedule_mode = $self->_schedule_mode($job);
     die "Collector '$name' uses manual schedule and should be run on demand" if $schedule_mode eq 'manual';
+    if ( $schedule_mode eq 'cron' ) {
+        my ( undef, $cron_error ) = _parse_cron_expression( $job->{cron} );
+        die "Collector '$name' has invalid cron expression: $cron_error\n" if $cron_error;
+    }
 
     # DD-737: a collector with neither 'command' nor 'code' used to be forked
     # into a loop anyway, which then died on its very first tick inside
@@ -443,16 +479,33 @@ sub _adopt_existing_loop_if_running {
     # cleanup, a /tmp sweep - every start forked another loop that nothing could
     # see, stop or count, and each one went on spawning work every interval.
     #
-    # So if the record is missing, ask the process table before forking. A loop
-    # already running for this collector is adopted and its record rewritten,
-    # which is both the correct outcome and the repair of the missing file.
+    # So if the record is missing, ask the process table before forking, then
+    # consult the parent's state record if process-title matching has not caught
+    # a newly forked child yet. An existing loop is adopted and its record
+    # rewritten, which is both the correct outcome and the repair of the missing
+    # file.
     my $existing = -f $pidfile ? do { my $recorded = slurp_file($pidfile); chomp $recorded; $recorded } : undef;
-    $existing = $self->_find_running_loop($name) if !$existing;
+    if (!$existing) {
+        $existing = $self->_find_running_loop($name);
+        if (!$existing) {
+            # The parent records the forked pid and its intended title before
+            # returning from start_loop. A concurrent start can therefore see a
+            # valid state record while the child is still adopting that title,
+            # which makes process-table matching temporarily miss it. Consult
+            # that parent-written state before deciding to fork another loop.
+            my $state = $self->loop_state($name);
+            my $state_pid = ref($state) eq 'HASH' ? $state->{pid} : undef;
+            $existing = $state_pid
+              if defined $state_pid
+              && "$state_pid" =~ /\A[1-9][0-9]*\z/
+              && $self->_state_confirms_managed_loop( $name, $state_pid );
+        }
+    }
 
     # Truthy rather than merely defined, and that is the guarantee the line above
     # already gives: an empty or zero pidfile leaves $existing false, and that case
-    # is REPLACED by _find_running_loop, which returns a real pid or undef. So a
-    # false-but-defined $existing cannot arrive here.
+    # is replaced by process-table and state discovery, each of which returns a
+    # live pid or undef. So a false-but-defined $existing cannot arrive here.
     #
     # This read `defined $existing` with a further `$pid &&` inside, and that inner
     # test was the last genuinely uncovered condition in lib (DD-532): unreachable
@@ -492,8 +545,7 @@ sub _adopt_existing_loop_if_running {
             # raised "Bad file descriptor" and killed start_loop outright, which is
             # a far worse outcome than an unclosed handle.
             if ( !-f $pidfile ) {
-                # the state root was created by this same process moments earlier, so a write failure here means the disk vanished mid-call
-                open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";    # uncoverable branch true
+                open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
                 print {$fh} $pid;
                 close $fh;
                 $self->{paths}->secure_file_permissions($pidfile);
@@ -517,8 +569,8 @@ sub _start_windows_loop_process {
     my ( $self, %args ) = @_;
     my $job                 = $args{job}                 || die 'Missing collector job';
     my $name                = $args{name}                || die 'Missing collector name';
-    # _process_title always returns a non-empty title
-    my $title               = $args{title}               || $self->_process_title($name);    # uncoverable condition false
+    my $title               = $args{title};
+    $title = $self->_process_title($name) if !$title;
     my $interval            = defined $args{interval} ? $args{interval} : 30;
     my $configured_interval = defined $args{configured_interval} ? $args{configured_interval} : 30;
     my $schedule_mode       = $args{schedule_mode}       || 'interval';
@@ -568,8 +620,8 @@ sub _run_loop_child {
     my ( $self, %args ) = @_;
     my $job           = $args{job}           || die 'Missing collector job';
     my $name          = $args{name}          || die 'Missing collector name';
-    # _process_title always returns a non-empty title
-    my $title         = $args{title}         || $self->_process_title($name);    # uncoverable condition false
+    my $title         = $args{title};
+    $title = $self->_process_title($name) if !$title;
     my $interval      = defined $args{interval} ? $args{interval} : 30;
     my $schedule_mode = $args{schedule_mode} || 'interval';
     my $daemonize     = exists $args{daemonize} ? $args{daemonize} : 1;
@@ -579,11 +631,9 @@ sub _run_loop_child {
 
     if ($daemonize) {
         $self->_detach_process_session;
-        # opening the null device for reading never fails on the test host
-        open STDIN, '<', File::Spec->devnull() or die $!;    # uncoverable branch true
+        open STDIN, '<', File::Spec->devnull() or die $!;
         open STDOUT, '>>', $self->{files}->collector_log or die $!;
-        # STDOUT already opened the same collector-log path, so the STDERR reopen cannot fail independently
-        open STDERR, '>>', $self->{files}->collector_log or die $!;    # uncoverable branch true
+        open STDERR, '>>', $self->{files}->collector_log or die $!;
         $self->_close_inherited_fds( close_ipc => 1 );
     }
 
@@ -787,12 +837,11 @@ sub _run_loop_worker {
             error       => $error,
             source      => 'loop error',
         );
-        # the current pid is always truthy
-        my $state_pid      = $loop_pid || $$;    # uncoverable condition false
-        # _process_title always returns a non-empty title
-        my $state_title    = $title || $self->_process_title($name);    # uncoverable condition false
-        # the schedule fallback ternary always yields a non-empty string
-        my $state_schedule = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );    # uncoverable condition false
+        my $state_pid      = $loop_pid;
+        $state_pid = $$ if !$state_pid;
+        my $state_title    = $title;
+        $state_title = $self->_process_title($name) if !$state_title;
+            my $state_schedule = $self->_schedule_mode($job);
         $self->_write_loop_state(
             $name,
             {
@@ -881,8 +930,6 @@ sub _active_worker_pids {
     $active_workers ||= {};
     my @pids;
     for my $pid ( keys %{$active_workers} ) {
-        # hash keys are always defined strings
-        next if !defined $pid;    # uncoverable branch true
         next if $pid !~ /^\d+$/;
         next if $pid <= 0;
         push @pids, $pid;
@@ -920,11 +967,9 @@ sub _sleep_until_next_tick {
     my $active_workers = $args{active_workers} || {};
     my $slice = $remaining > 0.1 ? 0.1 : $remaining;
     while ( $remaining > 0 ) {
-        $slice = $remaining if $remaining < $slice || $slice <= 0;    # uncoverable condition right slice is always positive once remaining > 0
+        $slice = $remaining if $remaining < $slice;
         sleep $slice;
         $remaining -= $slice;
-        # remaining never underflows below zero after the clamped subtraction
-        $remaining = 0 if $remaining < 0;    # uncoverable branch true
         $self->_reap_finished_loop_workers($active_workers);
     }
     return 1;
@@ -1069,12 +1114,11 @@ sub loop_state {
     return if !-f $file;
     my $last_error = '';
     for ( 1 .. 3 ) {
-        # uncoverable branch true
         open my $fh, '<', $file or die "Unable to read $file: $!";
         local $/;
         my $payload = scalar <$fh>;
         close $fh;
-        if ( defined $payload && $payload ne '' ) {    # uncoverable condition left a readable state file always slurps to a defined string (an empty file reads as the empty string, not undef)
+        if ( $payload ne '' ) {
             my $decoded = eval { json_decode($payload) };
             return $decoded if $decoded;
             $last_error = $@ || 'Unable to decode loop state JSON';
@@ -1149,8 +1193,7 @@ sub _find_running_loop {
     my ( $self, $name ) = @_;
     return if !defined $name || $name eq '';
 
-    # /proc is mounted on every host this runs on, and without it no collector could be identified at all
-    opendir my $dh, '/proc' or return;    # uncoverable branch true
+    opendir my $dh, '/proc' or return;
     my @candidates = sort { $a <=> $b } grep { /\A[0-9]+\z/ } readdir $dh;
     closedir $dh;
 
@@ -1164,12 +1207,30 @@ sub _find_running_loop {
     my $title = $self->_process_title($name);
     for my $pid (@candidates) {
         next if $pid == $$;
+
+        # DD-1054: skip a candidate whose /proc/$pid/cmdline is READABLE but
+        # EMPTY before ever calling _read_process_title - that is the ordinary,
+        # permanent shape of a kernel thread (kworker, ksoftirqd, ...), never a
+        # race, and _read_process_title falls back to spawning a `ps` SUBPROCESS
+        # per pid when cmdline is empty. On a host with hundreds of kernel
+        # threads that made every collector start/check scan cost one subprocess
+        # spawn per thread - reproduced live: 943 empty-cmdline /proc entries on
+        # one host made `dashboard serve --foreground` hang 90+ seconds with zero
+        # output whenever any skill declared a collector. An empty cmdline can
+        # never equal $title (a non-empty string), so skipping it here costs
+        # nothing correct and removes the pathological cost entirely. Only a
+        # genuinely UNREADABLE cmdline (undef - the process vanished between
+        # readdir and this read) still falls through to the ps fallback below,
+        # which is the race _read_process_title's own fallback exists for.
+        my $cmdline = $self->_read_proc_file("/proc/$pid/cmdline");
+        next if defined $cmdline && $cmdline eq '';
+
         my $running = $self->_read_process_title($pid);
         next if !defined $running || $running ne $title;
         # A process carrying this collector's exact title while living in a
         # DIFFERENT pid namespace cannot be constructed from a test without a
         # container runtime.
-        return $pid if $self->_same_pid_namespace($pid);    # uncoverable branch false
+        return $pid if $self->_same_pid_namespace($pid);
     }
     return;
 }
@@ -1271,8 +1332,7 @@ sub _read_process_state {
 sub _read_proc_file {
     my ( $self, $file ) = @_;
     return if !-r $file;
-    # a readable procfs file always opens on the test host
-    open my $fh, '<', $file or return;    # uncoverable branch true
+    open my $fh, '<', $file or return;
     local $/;
     return scalar <$fh>;
 }
@@ -1311,7 +1371,6 @@ sub _write_loop_state {
         name => $name,
     );
     my $tmp = $self->_pending_loop_state_file($file);
-    # uncoverable branch true
     open my $fh, '>', $tmp or die "Unable to write $tmp: $!";
     print {$fh} json_encode( \%state );
     close $fh;
@@ -1498,14 +1557,26 @@ sub _coverage_instrumentation_active {
     return $perl5opt =~ /Devel::Cover/ ? 1 : 0;
 }
 
+# _schedule_mode($job)
+# Resolves the schedule mode of one collector job: an explicit schedule wins,
+# otherwise a cron expression, then an interval, and finally manual.
+# Input: collector job hash reference.
+# Output: schedule mode string (cron, interval, manual, or the explicit value).
+sub _schedule_mode {
+    my ( $self, $job ) = @_;
+    return $job->{schedule} if $job->{schedule};
+    return 'cron'           if $job->{cron};
+    return 'interval'       if $job->{interval};
+    return 'manual';
+}
+
 # _job_is_due($job, $name)
 # Decides whether the current loop tick should execute the collector job.
 # Input: collector job hash reference and collector name string.
 # Output: boolean due flag.
 sub _job_is_due {
     my ( $self, $job, $name ) = @_;
-    # the schedule fallback ternary always yields a non-empty string
-    my $mode = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );    # uncoverable condition false
+    my $mode = $self->_schedule_mode($job);
     return 0 if $mode eq 'manual';
     return 1 if $mode eq 'interval';
     return $self->_cron_due( $job->{cron}, $name );
@@ -1517,20 +1588,28 @@ sub _job_is_due {
 # Output: boolean due flag.
 sub _cron_due {
     my ( $self, $expr, $name ) = @_;
-    # A missing expression means "always due". A fully-wildcard "* * * * *" must
-    # NOT short-circuit here: it has to fall through to the per-minute
-    # last_cron_slot de-duplication below, otherwise it fires on every
-    # one-second cron scheduling tick (~60x/minute) instead of once per minute.
-    return 1 if !defined $expr || $expr eq '';
+    # A missing or malformed cron expression must not become an every-second
+    # schedule. A fully-wildcard "* * * * *" still reaches the per-minute
+    # last_cron_slot de-duplication below.
+    my ( $fields, $error ) = _parse_cron_expression($expr);
+    return 0 if $error;
     my @now = localtime();
-    my @parts = split /\s+/, $expr;
-    return 0 if @parts < 5;
-    my ( $min, $hour, $mday, $mon, $wday ) = @parts[ 0 .. 4 ];
-    return 0 if !_cron_match( $min,  $now[1] );
-    return 0 if !_cron_match( $hour, $now[2] );
-    return 0 if !_cron_match( $mday, $now[3] );
-    return 0 if !_cron_match( $mon,  $now[4] + 1 );
-    return 0 if !_cron_match( _cron_wday_normalize($wday), $now[6] );
+    return 0 if !$fields->[0]{ $now[1] };
+    return 0 if !$fields->[1]{ $now[2] };
+    return 0 if !$fields->[3]{ $now[4] + 1 };
+
+    my $day_of_month_matches = $fields->[2]{ $now[3] } ? 1 : 0;
+    my $day_of_week_matches  = $fields->[4]{ $now[6] } ? 1 : 0;
+    my $dom_is_wildcard = $fields->[2]{_wildcard} ? 1 : 0;
+    my $dow_is_wildcard = $fields->[4]{_wildcard} ? 1 : 0;
+    my $day_matches = $dom_is_wildcard && $dow_is_wildcard
+      ? 1
+      : $dom_is_wildcard
+        ? $day_of_week_matches
+        : $dow_is_wildcard
+          ? $day_of_month_matches
+          : $day_of_month_matches || $day_of_week_matches;
+    return 0 if !$day_matches;
 
     my $state = $self->loop_state($name) || {};
     my $stamp = strftime( '%Y-%m-%dT%H:%M%z', @now );
@@ -1539,282 +1618,133 @@ sub _cron_due {
     return 1;
 }
 
+# _parse_cron_expression($expr)
+# Validates a five-field crontab expression and expands each field into a set
+# of matching values, including standard names, lists, ranges and step values.
+# Input: cron expression string.
+# Output: array reference of five match-set hashes and an empty error string,
+# or undef and a visible validation message.
+sub _parse_cron_expression {
+    my ($expr) = @_;
+    return ( undef, 'expression is missing' ) if !defined $expr || $expr !~ /\S/;
+    return ( undef, 'expression is longer than 256 characters' ) if length($expr) > 256;
+    $expr =~ s/\A\s+|\s+\z//g;
+    my @specs = split /\s+/, $expr;
+    return ( undef, 'expected exactly five fields' ) if @specs != 5;
+
+    my @limits = ( [ 0, 59, {} ], [ 0, 23, {} ], [ 1, 31, {} ],
+        [ 1, 12, { JAN => 1, FEB => 2, MAR => 3, APR => 4, MAY => 5, JUN => 6, JUL => 7, AUG => 8, SEP => 9, OCT => 10, NOV => 11, DEC => 12 } ],
+        [ 0, 7, { SUN => 0, MON => 1, TUE => 2, WED => 3, THU => 4, FRI => 5, SAT => 6 } ], );
+    my @fields;
+    for my $index ( 0 .. 4 ) {
+        my ( $set, $error ) = _parse_cron_field( $specs[$index], @{$limits[$index]} );
+        return ( undef, sprintf( 'field %d (%s): %s', $index + 1, $specs[$index], $error ) ) if $error;
+        $set->{_wildcard} = $specs[$index] eq '*' ? 1 : 0;
+        if ( $index == 4 && delete $set->{7} ) {
+            $set->{0} = 1;
+        }
+        push @fields, $set;
+    }
+    return ( \@fields, '' );
+}
+
+# _parse_cron_field($spec, $minimum, $maximum, $names)
+# Parses one crontab field and returns its finite set of matching numeric values.
+# Input: field string, inclusive numeric bounds, and optional name-to-number map.
+# Output: hash reference and empty error string, or undef and validation message.
+sub _parse_cron_field {
+    my ( $spec, $minimum, $maximum, $names ) = @_;
+    return ( undef, 'field is empty' ) if !defined $spec || $spec eq '';
+    my %values;
+    for my $item ( split /,/, $spec, -1 ) {
+        return ( undef, 'empty list item' ) if $item eq '';
+        my ( $base, $step ) = split m{/}, $item, -1;
+        return ( undef, 'multiple step separators' ) if $item =~ m{/.*\/};
+        if ( defined $step ) {
+            return ( undef, 'step must be a positive integer' )
+              if length($step) > 4 || $step !~ /\A\d+\z/ || $step < 1;
+        }
+        else {
+            $step = 1;
+        }
+
+        my ( $start, $end );
+        if ( $base eq '*' ) {
+            ( $start, $end ) = ( $minimum, $maximum );
+        }
+        elsif ( $base =~ /\A([^,-]+)-([^,-]+)\z/ ) {
+            ( $start, $end ) = ( _cron_value( $1, $names ), _cron_value( $2, $names ) );
+            return ( undef, 'range endpoint is not a valid number or name' ) if !defined $start || !defined $end;
+            return ( undef, 'range start exceeds range end' ) if $start > $end;
+        }
+        else {
+            $start = _cron_value( $base, $names );
+            return ( undef, 'value is not a valid number or name' ) if !defined $start;
+            # Wildcards and ranges were handled above, so a slash remaining
+            # here can only be an invalid scalar step (for example, 5/2).
+            return ( undef, 'a step requires a wildcard or range' ) if $item =~ m{/};
+            $end = $start;
+        }
+
+        return ( undef, 'value is outside the field limits' ) if $start < $minimum || $end > $maximum;
+        for ( my $value = $start; $value <= $end; $value += $step ) {
+            $values{$value} = 1;
+        }
+    }
+    return ( \%values, '' );
+}
+
+# _cron_value($token, $names)
+# Resolves a numeric token or case-insensitive crontab name.
+# Input: field token and optional name-to-number hash reference.
+# Output: numeric value, or undef when the token is invalid.
+sub _cron_value {
+    my ( $token, $names ) = @_;
+    return 0 + $token if defined($token) && length($token) <= 3 && $token =~ /\A\d+\z/;
+    return undef if ref($names) ne 'HASH';
+    return $names->{ uc($token // '') };
+}
+
 # _cron_wday_normalize($spec)
-# Aliases the crontab(5) weekday token '7' to '0' - both mean Sunday, but
-# localtime's wday (used as _cron_due's match value) is always 0..6, so a
-# literal '7' can never equal it without this. Kept separate from the
-# generic _cron_match, which the other four cron fields also use and where
-# a bare '7' has no such alias.
-# Input: weekday field spec string (may be undef).
-# Output: normalized weekday field spec string (undef stays undef).
+# Aliases crontab's weekday value 7 to 0 (Sunday) in numeric lists.
+# Input: weekday field string, possibly undefined.
+# Output: weekday string with each bare 7 token normalized to 0.
 sub _cron_wday_normalize {
     my ($spec) = @_;
     return $spec if !defined $spec;
     return join( ',', map { $_ eq '7' ? '0' : $_ } split /,/, $spec );
 }
 
-# _cron_match($spec, $value)
-# Matches one cron field spec against a numeric value.
-# Input: cron field string and numeric value.
+# _cron_match($spec, $value, $minimum, $maximum, $names)
+# Matches one cron field by parsing its numeric, name, range or step syntax.
+# Input: field string, numeric value, optional inclusive bounds, and name map.
 # Output: boolean match flag.
 sub _cron_match {
-    my ( $spec, $value ) = @_;
-    return 1 if !defined $spec || $spec eq '*' || $spec eq '';
-    for my $part ( split /,/, $spec ) {
-        return 1 if $part =~ /^\d+$/ && $part == $value;
-        if ( $part =~ m{^\*/(\d+)$} ) {
-            return 1 if $1 && $value % $1 == 0;
-        }
-        if ( $part =~ /^(\d+)-(\d+)$/ ) {
-            return 1 if $value >= $1 && $value <= $2;
-        }
-    }
-    return 0;
+    my ( $spec, $value, $minimum, $maximum, $names ) = @_;
+    $minimum = 0 if !defined $minimum;
+    $maximum = 60 if !defined $maximum;
+    return 0 if !defined($value) || length($value) > 3 || $value !~ /\A\d+\z/ || $value < $minimum || $value > $maximum;
+    return 1 if !defined($spec) || $spec eq '' || $spec eq '*';
+    my ( $values, $error ) = _parse_cron_field( $spec, $minimum, $maximum, $names );
+    return 0 if $error;
+    return $values->{$value} ? 1 : 0;
 }
 
-# _run_command(%args)
-# Executes a collector command as an owned child process with captured
-# stdout/stderr, timeout handling, and complete subtree cleanup. POSIX hosts
-# interrupt the blocking wait with SIGALRM; Windows cannot dispatch that signal
-# while system() waits, so it spawns the command asynchronously and polls it.
-# Input: command string, cwd path, env hash, and timeout_ms.
-# Output: list of stdout, stderr, exit_code, and timed_out flag.
-sub _run_command {
-    my ( $self, %args ) = @_;
-
-    # DD-597: system() below mutates the caller's global $? as a side effect;
-    # without this guard that stays set in the caller's process after this
-    # sub returns, regardless of the exit code already captured in this sub's
-    # own return value.
-    local $?;
-    my $cmd        = $args{source};
-    my $cwd        = $args{cwd};
-    my $env        = ref( $args{env} ) eq 'HASH' ? $args{env} : {};
-    my $timeout_ms = $args{timeout_ms} || 30_000;
-
-    my $old = cwd();
-    chdir $cwd or die "Unable to chdir to $cwd: $!";
-    local @ENV{ keys %$env } = values %$env if %$env;
-    my %dashboard_env = %{ Developer::Dashboard::PerlEnv->dashboard_child_env() };
-    local @ENV{ keys %dashboard_env } = values %dashboard_env;
-    my $timed_out = 0;
-    my ( $pid_fh, $pidfile ) = tempfile( 'dashboard-collector-command-XXXXXX', TMPDIR => 1, UNLINK => 0 );
-    CORE::close $pid_fh or die "Unable to close collector command pid file $pidfile: $!";
-    my ( $stdout, $stderr, $exit_code ) = capture {
-        my @argv = shell_command_argv( $cmd, login => 0 );
-
-        local $SIG{TERM} = sub { $self->_forward_command_signal( $pidfile, 'TERM', 15 ) };
-        local $SIG{INT}  = sub { $self->_forward_command_signal( $pidfile, 'INT',  2 ) };
-        local $SIG{HUP}  = sub { $self->_forward_command_signal( $pidfile, 'HUP',  1 ) };
-        local $ENV{PERL5OPT} = $ENV{PERL5OPT};
-        local $ENV{HARNESS_PERL_SWITCHES} = $ENV{HARNESS_PERL_SWITCHES};
-        delete @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)};
-
-        if ( is_windows() ) {
-            my ( $windows_exit, $expired ) = $self->_await_windows_command( $pidfile, $timeout_ms, @argv );
-            $timed_out = $expired;
-            return $windows_exit;
-        }
-
-        my @launcher = $self->_command_launcher_argv( $pidfile, @argv );
-        local $SIG{ALRM} = sub { die "__COLLECTOR_TIMEOUT__\n" };
-        alarm( int( ( $timeout_ms + 999 ) / 1000 ) );
-        my $ok = eval {
-            system { $launcher[0] } @launcher;
-            return _exit_code_from_status($?);
-        };
-        if ($@) {
-            die $@ if $@ !~ /__COLLECTOR_TIMEOUT__/;
-            $timed_out = 1;
-            alarm(0);
-            $self->_terminate_command_process( $self->_await_command_pid($pidfile) );
-            return 124;
-        }
-        alarm(0);
-        return $ok;
-    };
-    alarm(0);
-    unlink $pidfile;
-    chdir $old or die "Unable to restore cwd to $old: $!";
-    return ( $stdout, $stderr, $exit_code, $timed_out );
-}
-
-# _await_windows_command($pidfile, $timeout_ms, @command_argv)
-# Runs one collector command on native Windows without ever blocking inside
-# system(). Windows dispatches Perl's alarm emulation only at operation
-# boundaries, so the SIGALRM timeout that guards the POSIX path never interrupts
-# a synchronous system() and a hung command outlives its timeout. The command
-# shell is therefore spawned asynchronously, published through the same pid file
-# the POSIX launcher writes so signal forwarding keeps one source of truth, and
-# polled against a deadline. Expiry terminates the whole command subtree.
-# Input: pid-file path, timeout in milliseconds, and the shell command argv.
-# Output: list of the collector exit code and the timed-out flag.
-sub _await_windows_command {
-    my ( $self, $pidfile, $timeout_ms, @argv ) = @_;
-
-    # DD-597: waitpid below reads $? into this sub's own return value, but
-    # without this guard the raw $? from that reap stays set in the caller's
-    # process after this sub returns.
-    local $?;
-    my $pid = $self->_spawn_windows_command(@argv);
-    die "Unable to spawn collector command '$argv[0]': $!\n" if $pid < 1;
-    $self->_record_command_pid( $pidfile, $pid );
-
-    my $deadline = time() + ( $timeout_ms / 1000 );
-    while (1) {
-        my $reaped = waitpid( $pid, 1 );
-        die "Unable to wait for collector command process $pid: $!\n" if $reaped < 0;
-        return ( _exit_code_from_status($?), 0 ) if $reaped > 0;
-        if ( time() >= $deadline ) {
-            $self->_terminate_command_process($pid);
-            return ( 124, 1 );
-        }
-        sleep 0.02;
-    }
-}
-
-# _spawn_windows_command(@command_argv)
-# Starts one collector command shell with the asynchronous form of system(),
-# which returns the new process designator immediately instead of waiting for
-# the command to exit. The command inherits the caller's already-redirected
-# stdout and stderr, so its output is still captured.
-# Input: shell command argv list.
-# Output: process designator integer, or a value below one when the spawn fails.
-sub _spawn_windows_command {
-    my ( $self, @argv ) = @_;
-    my $spawned = system 1, @argv;
-    return 0 + $spawned;
-}
-
-# _record_command_pid($pidfile, $pid)
-# Publishes an asynchronously spawned command pid through the same pid-file
-# contract the POSIX launcher writes for itself, so signal forwarding and
-# subtree termination read one source of truth on every platform.
-# Input: pid-file path and process id integer.
-# Output: true value.
-sub _record_command_pid {
-    my ( $self, $pidfile, $pid ) = @_;
-    open my $fh, '>', $pidfile or die "Unable to write collector command pid file $pidfile: $!";
-    print {$fh} $pid;
-    CORE::close($fh)
-      or die "Unable to close collector command pid file $pidfile: $!";
-    return 1;
-}
-
-# _command_launcher_argv($pidfile, @command_argv)
-# Builds a small uninstrumented Perl launcher that records its pid before
-# becoming the collector command. This preserves system()'s fast native spawn
-# path under Devel::Cover while making the command subtree addressable.
-# Input: pid-file path followed by the shell command argv.
-# Output: launcher argv list.
-sub _command_launcher_argv {
-    my ( $self, $pidfile, @argv ) = @_;
-    my $launcher = <<'PERL';
-use strict;
-use warnings;
-use POSIX ();
-my $pidfile = shift @ARGV;
-open my $pid_fh, '>', $pidfile or die "Unable to write collector command pid file $pidfile: $!";
-print {$pid_fh} $$;
-close $pid_fh or die "Unable to close collector command pid file $pidfile: $!";
-POSIX::setsid() if $^O ne 'MSWin32';
-exec { $ARGV[0] } @ARGV or die "Unable to exec collector command: $!";
-PERL
-    return ( $^X, '-e', $launcher, $pidfile, @argv );
-}
-
-# _command_pid_from_file($pidfile)
-# Reads and validates the direct command pid recorded by the launcher.
-# Input: pid-file path.
-# Output: positive pid integer or undef.
-sub _command_pid_from_file {
-    my ( $self, $pidfile ) = @_;
-    return if !defined $pidfile || $pidfile eq '' || !-f $pidfile;
-    # uncoverable branch true
-    open my $fh, '<', $pidfile or return;
-    my $pid = <$fh>;
-    close $fh;
-    return if !defined $pid || $pid !~ /^(\d+)$/ || $pid < 1;
-    return 0 + $pid;
-}
-
-# _await_command_pid($pidfile)
-# Waits briefly for the native-spawned launcher to record its pid. This closes
-# the startup race where an immediate timeout or stop signal could otherwise
-# arrive before the command subtree became addressable.
-# Input: pid-file path.
-# Output: positive pid integer or undef after a bounded wait.
-sub _await_command_pid {
-    my ( $self, $pidfile ) = @_;
-    for ( 1 .. 100 ) {
-        my $pid = $self->_command_pid_from_file($pidfile);
-        return $pid if defined $pid;
-        sleep 0.01;
-    }
-    return;
-}
-
-# _forward_command_signal($pidfile, $signal, $number)
-# Cleans up an executing command subtree before preserving the signal semantics
-# of the CollectorRunner process that received the external stop request.
-# Input: command pid-file path, signal name, and numeric POSIX signal value.
-# Output: never returns.
-sub _forward_command_signal {
-    my ( $self, $pidfile, $signal, $number ) = @_;
-    $self->_terminate_command_process( $self->_await_command_pid($pidfile) );
-    unlink $pidfile if defined $pidfile && $pidfile ne '';
-    if ( !is_windows() ) {
-        $SIG{$signal} = 'DEFAULT';
-        kill $signal, $$;
-    }
-    CORE::exit( 128 + $number );
-}
-
-# _terminate_command_process($pid)
-# Terminates and reaps one owned command process plus every descendant. POSIX
-# commands are isolated session leaders, while Windows uses taskkill's tree mode.
-# Input: direct command child pid integer.
-# Output: true value after bounded TERM/KILL cleanup.
-sub _terminate_command_process {
-    my ( $self, $pid ) = @_;
-    return 1 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
-
-    if (is_windows()) {
-        capture { system 'taskkill', '/PID', $pid, '/T', '/F' };
-        waitpid( $pid, 0 );
-        return 1;
-    }
-
-    kill 'TERM', -$pid;
-    kill 'TERM', $pid;
-    my $reaped = 0;
-    for ( 1 .. 20 ) {
-        my $waited = waitpid( $pid, 1 );
-        if ( $waited == $pid || $waited == -1 ) {
-            $reaped = 1;
-            last;
-        }
-        sleep 0.01;
-    }
-    kill 'KILL', -$pid;
-    kill 'KILL', $pid if !$reaped;
-    waitpid( $pid, 0 ) if !$reaped;
-    return 1;
-}
-
-# _exit_code_from_status($status)
-# Converts a raw child wait status into a collector exit code that stays
-# non-zero when the command was terminated by a signal, so a crashed or killed
-# run is never mistaken for a successful (exit 0) run.
-# Input: raw $? style wait status integer (or undef).
-# Output: non-negative exit code integer.
-sub _exit_code_from_status {
-    my ($status) = @_;
-    $status = 0 if !defined $status;
-    my $signal = $status & 127;
-    return 128 + $signal if $signal;
-    return $status >> 8;
-}
+# DD-947: this cluster (run_command through exit_code_from_status) was
+# extracted into Developer::Dashboard::CommandRunner - confirmed zero
+# instance-state ($self->{...}) dependency before the move. These are
+# thin one-line forwarders so every existing caller of $self->_run_command
+# etc. keeps working unchanged.
+sub _run_command                { my $self = shift; return Developer::Dashboard::CommandRunner::run_command(@_); }
+sub _await_windows_command      { my $self = shift; return Developer::Dashboard::CommandRunner::await_windows_command(@_); }
+sub _spawn_windows_command      { my $self = shift; return Developer::Dashboard::CommandRunner::spawn_windows_command(@_); }
+sub _record_command_pid         { my $self = shift; return Developer::Dashboard::CommandRunner::record_command_pid(@_); }
+sub _command_launcher_argv      { my $self = shift; return Developer::Dashboard::CommandRunner::command_launcher_argv(@_); }
+sub _command_pid_from_file      { my $self = shift; return Developer::Dashboard::CommandRunner::command_pid_from_file(@_); }
+sub _await_command_pid          { my $self = shift; return Developer::Dashboard::CommandRunner::await_command_pid(@_); }
+sub _forward_command_signal     { my $self = shift; return Developer::Dashboard::CommandRunner::forward_command_signal(@_); }
+sub _terminate_command_process  { my $self = shift; return Developer::Dashboard::CommandRunner::terminate_command_process(@_); }
+sub _exit_code_from_status      { return Developer::Dashboard::CommandRunner::exit_code_from_status(@_); }
 
 # _run_code(%args)
 # Executes Perl collector code with captured stdout/stderr and timeout handling.
@@ -1919,7 +1849,25 @@ Developer::Dashboard::CollectorRunner - collector execution and loop management
 This module runs collector jobs on demand and as managed background loops. It
 handles scheduling, timeout enforcement, process naming, persisted loop
 state, shell-command collectors, Perl-code collectors, and TT-backed
-collector indicator icon rendering from stdout JSON.
+collector indicator icon rendering from stdout JSON. Collector working
+directories resolve built-in accessors and configured path aliases, followed
+by skill-qualified aliases provided by installed C<lib/Folder.pm> modules.
+
+=head1 CRON SCHEDULING
+
+Managed loops infer cron mode from a non-empty C<cron> property or accept the
+explicit C<schedule =E<gt> 'cron'> setting. The expression must contain exactly
+five fields: minute, hour, day of month, month, and day of week. The parser
+supports numeric values, comma-separated lists, ranges, range steps,
+C<*/step>, and case-insensitive month and weekday names. Sunday may be 0 or 7.
+When both date fields are restricted, either a day-of-month or day-of-week
+match makes the date due. The loop evaluates machine-local time once per
+second and persists the last matching minute to prevent duplicate runs.
+
+Missing, empty, malformed, out-of-range, or overlong expressions are rejected
+before a loop process is spawned. This keeps a bad configuration from turning
+into an every-second job. See the user-facing dashboard documentation for the
+C<config/config.json> example and accepted syntax.
 
 =head1 METHODS
 
@@ -1939,11 +1887,17 @@ It exists because collector process control is more than a single C<system()> ca
 
 =head1 WHEN TO USE
 
-Use this file when changing collector process spawning, pid validation, restart semantics, background job cleanup, TT-backed indicator icon rendering, or the contract between collector execution and the persisted collector state.
+Use this file when changing collector process spawning, pid validation, restart semantics, background job cleanup, TT-backed indicator icon rendering, the contract between collector execution and persisted collector state, or how the collector's C<cwd> value resolves from path aliases.
 
 =head1 HOW TO USE
 
 Construct it with the path registry and collector store, then call the lifecycle methods for one collector name. Keep process-management behavior and TT-backed collector icon rendering here; the CLI wrappers should only parse arguments and print the returned state.
+
+For C<run_once>, a relative C<cwd> first checks built-in directory accessors,
+then configured aliases from merged dashboard config, then a qualified skill
+C<Folder.pm> method (for example C<collectorpaths.workspace>). If no alias
+applies, an existing relative directory remains valid. Config aliases win over
+skill methods with the same name; skill aliases are read-only.
 
 =head1 WHAT USES IT
 

@@ -6,9 +6,11 @@ requires 'Carp';
 requires 'Encode';
 requires 'Exporter';
 requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
+requires 'IO::Handle';
 requires 'List::Util', '1.33';   # Minimum version for any()
 requires 'Readonly::Values::Boolean';
 requires 'Scalar::Util';
+requires 'overload';
 requires 'strict';
 requires 'warnings';
 

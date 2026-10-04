@@ -1,5 +1,10 @@
 Changes file for Test::Differences
 
+0.73   2026-10-03
+
+    - Changes to tests only, to cope with changes to how line numbers
+      are reported in what will become perl 5.46 (thanks to Richard Leach)
+
 0.72   2025-07-07
 
     - Changes to tests only, so tests pass when you have a new perl that

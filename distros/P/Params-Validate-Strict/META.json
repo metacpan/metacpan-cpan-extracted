@@ -36,9 +36,11 @@
             "Encode" : "0",
             "Exporter" : "0",
             "ExtUtils::MakeMaker" : "6.64",
+            "IO::Handle" : "0",
             "List::Util" : "1.33",
             "Readonly::Values::Boolean" : "0",
             "Scalar::Util" : "0",
+            "overload" : "0",
             "perl" : "5.026",
             "strict" : "0",
             "warnings" : "0"
@@ -79,6 +81,6 @@
          "x_repository" : "https://github.com/nigelhorne/Params-Validate-Strict"
       }
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

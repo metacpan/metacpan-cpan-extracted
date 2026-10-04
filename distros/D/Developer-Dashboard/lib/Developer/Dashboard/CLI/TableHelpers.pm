@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::TableHelpers;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Cwd qw(cwd);
 use Exporter 'import';
@@ -135,8 +135,8 @@ every call site.
 
 C<_build_paths> was byte-identical in C<CLI/Files.pm> and C<CLI/Which.pm>,
 and functionally identical in C<CLI/Paths.pm> (which carried an extra
-C<defined &&> check that could never be false, annotated
-C<# uncoverable branch false>). C<_aliases_table>, C<_list_table>,
+C<defined &&> check that could never be false, and so could never be
+covered). C<_aliases_table>, C<_list_table>,
 C<_mutation_table> and C<_removal_table> were byte-identical between
 C<CLI/Files.pm> and C<CLI/Paths.pm>; C<_render_table> differed only by one
 trailing blank line (DD-773). A future change to how these tables render,

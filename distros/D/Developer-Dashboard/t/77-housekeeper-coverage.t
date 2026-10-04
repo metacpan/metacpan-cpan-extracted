@@ -390,7 +390,8 @@ my $is_root = ( $> == 0 );
 
 # ---------------------------------------------------------------------------
 # _state_root_has_live_collectors(): unreadable collectors directory and an
-# unreadable pidfile both surface explicit read failures. Non-root only.
+# unreadable pidfile both surface explicit read failures where the runtime
+# actually honors the permission mode.
 # ---------------------------------------------------------------------------
 {
     my $keeper = Developer::Dashboard::Housekeeper->new( paths => $paths );
@@ -405,17 +406,25 @@ my $is_root = ( $> == 0 );
     my $unreadable_pid = File::Spec->catfile( $open_collectors, 'locked.pid' );
     _write_file( $unreadable_pid, "12345\n" );
 
-    if ($is_root) {
-        pass('_state_root_has_live_collectors opendir failure branch is skipped under root');
-        pass('_state_root_has_live_collectors pidfile read failure branch is skipped under root');
+    chmod 0100, $opendir_collectors or die "Unable to chmod $opendir_collectors: $!";
+    if ( opendir my $probe, $opendir_collectors ) {
+        closedir $probe or die "Unable to close permission probe for $opendir_collectors: $!";
+        chmod 0700, $opendir_collectors or die "Unable to restore $opendir_collectors: $!";
+        pass('_state_root_has_live_collectors opendir failure path is skipped when mode bits do not block access');
     }
     else {
-        chmod 0100, $opendir_collectors or die "Unable to chmod $opendir_collectors: $!";
         my $opendir_error = _capture_die( sub { $keeper->_state_root_has_live_collectors($opendir_root) } );
         chmod 0700, $opendir_collectors or die "Unable to restore $opendir_collectors: $!";
         like( $opendir_error, qr/Unable to read .*collectors/, '_state_root_has_live_collectors dies when the collectors directory cannot be opened' );
+    }
 
-        chmod 0000, $unreadable_pid or die "Unable to chmod $unreadable_pid: $!";
+    chmod 0000, $unreadable_pid or die "Unable to chmod $unreadable_pid: $!";
+    if ( open my $probe, '<', $unreadable_pid ) {
+        close $probe or die "Unable to close permission probe for $unreadable_pid: $!";
+        chmod 0600, $unreadable_pid or die "Unable to restore $unreadable_pid: $!";
+        pass('_state_root_has_live_collectors pidfile failure path is skipped when mode bits do not block access');
+    }
+    else {
         my $open_error = _capture_die( sub { $keeper->_state_root_has_live_collectors($open_root) } );
         chmod 0600, $unreadable_pid or die "Unable to restore $unreadable_pid: $!";
         like( $open_error, qr/Unable to read .*locked\.pid/, '_state_root_has_live_collectors dies when a pidfile cannot be read' );

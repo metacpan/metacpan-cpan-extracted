@@ -82,9 +82,7 @@ t/model_tests.d/systemd-user-examples/basic-socket/gmail-imap-tunnel.socket
 t/model_tests.d/systemd-user-examples/delete-service/main-obex
 t/model_tests.d/systemd-user-examples/delete-service/user-obex
 t/model_tests.d/systemd-user-examples/duplicity/duplicity.service
-t/model_tests.d/systemd-user-examples/duplicity/duplicity.service~
 t/model_tests.d/systemd-user-examples/duplicity/duplicity.timer
-t/model_tests.d/systemd-user-examples/duplicity/duplicity.timer~
 t/model_tests.d/systemd-user-examples/override-service/main-obex
 t/model_tests.d/systemd-user-examples/override-service/user-obex
 t/model_tests.d/systemd-user-test-conf.pl

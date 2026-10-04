@@ -6,7 +6,7 @@
       "Brock Wilcox <awwaiid@thelackthereof.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -155,7 +155,7 @@
          "web" : "https://github.com/uperl/Devel-ebug"
       }
    },
-   "version" : "0.68",
+   "version" : "0.69",
    "x_contributors" : [
       "Leon Brocard <acme@astray.com>",
       "Graham Ollis <plicease@cpan.org>",

@@ -37,6 +37,7 @@
             "Carp" : "0",
             "IO::Async::Loop" : "0",
             "IO::Async::Timer::Periodic" : "0",
+            "List::Util::WeightedChoice" : "0",
             "MIDI::RtMidi::FFI::Device" : "0",
             "MIDI::Util" : "0",
             "Moo" : "2",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/ology/Music-SimpleDrumMachine"
       }
    },
-   "version" : "0.0602",
+   "version" : "0.0701",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

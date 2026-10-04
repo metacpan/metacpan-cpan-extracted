@@ -43,8 +43,13 @@ command explicitly.
 
 ## Skill env files
 
-Skill env files only load when a skill command or a skill hook is running.
-Non-skill commands do not load skill-local env files.
+Skill env files load while a skill command or a skill hook is running, while a
+skill dashboard page's CODE blocks are rendered, and while saved skill Ajax
+files execute. Non-skill commands and non-skill pages/Ajax handlers do not load
+skill-local env files. Dashboard CODE receives the skill values in a
+request-local environment overlay; saved Ajax handlers receive them in the
+child process environment. Neither path leaks values into the long-lived web
+worker or later requests.
 
 For a running skill, dashboard first loads the normal runtime env chain and
 then loads each participating skill root from the base skill layer to the
@@ -54,7 +59,9 @@ deepest matching child skill layer:
 2. `<skill-root>/.env.pl`
 
 That lets a nested skill override a shared runtime key only inside the skill
-execution path.
+execution path. For dashboard pages and saved Ajax handlers, the same
+root-to-leaf order applies, so code such as C<print $ENV{FOO}> can read a skill
+value while keeping it scoped to that page render or Ajax child process.
 
 Example `.env`:
 

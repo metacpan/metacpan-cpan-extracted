@@ -1,3 +1,13 @@
+0.004   2026-07-16  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix cases of a a & a z.
+
+
+0.003   2026-07-16  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix so non-numeric autoincrement also works.
+
+
 0.002   2021-07-17  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

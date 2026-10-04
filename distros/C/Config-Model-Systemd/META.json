@@ -68,9 +68,9 @@
          "web" : "http://github.com/dod38fr/config-model-systemd"
       }
    },
-   "version" : "0.261.1",
-   "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "version" : "0.261.2",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.51",
    "x_spdx_expression" : "LGPL-2.1"
 }
 

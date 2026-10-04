@@ -5,7 +5,7 @@ use warnings;
 
 use XSLoader ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -285,6 +285,7 @@ Net::QUIC also supports:
     server preferred addresses
     PMTU discovery
     ECN
+    QUIC DATAGRAM (RFC 9221)
 
 These features are documented in L<Net::QUIC::Connection>,
 L<Net::QUIC::Endpoint>, and the main README.

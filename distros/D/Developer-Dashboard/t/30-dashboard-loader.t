@@ -13,6 +13,7 @@ use Developer::Dashboard::PerlEnv;
 
 my $repo_root = getcwd();
 my $dashboard = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
+my $d2        = File::Spec->catfile( $repo_root, 'bin', 'd2' );
 my $source = _slurp($dashboard);
 
 like( $source, qr/\A#!\/usr\/bin\/env perl\b/, 'dashboard entrypoint uses /usr/bin/env perl' );
@@ -83,6 +84,23 @@ my $lazy_home = tempdir( CLEANUP => 1 );
     is( $init_exit, 0, 'dashboard init stages private helpers before the prompt lazy-load check' )
       or diag $init_output;
 }
+my $private_cli_root = File::Spec->catdir( $lazy_home, '.developer-dashboard', 'cli' );
+my $private_dd_root  = File::Spec->catdir( $private_cli_root, 'dd' );
+ok( -d $private_dd_root, 'dashboard init creates the private dd helper namespace' );
+ok( -f File::Spec->catfile( $private_dd_root, 'jq' ), 'dashboard init keeps built-in helpers inside cli/dd' );
+ok( !-e File::Spec->catfile( $private_cli_root, 'jq' ), 'dashboard init does not leak built-in helpers into the user CLI root' );
+ok( !-e File::Spec->catfile( $private_cli_root, '_dashboard-core' ), 'dashboard init does not leak the private core runtime into the user CLI root' );
+my $d2_home = tempdir( CLEANUP => 1 );
+{
+    local $ENV{HOME} = $d2_home;
+    my $init_output = qx{$^X -I$lib $d2 init 2>&1};
+    my $init_exit = $? >> 8;
+    is( $init_exit, 0, 'd2 init stages private helpers before returning' )
+      or diag $init_output;
+}
+my $d2_cli_root = File::Spec->catdir( $d2_home, '.developer-dashboard', 'cli' );
+ok( -f File::Spec->catfile( $d2_cli_root, 'dd', 'jq' ), 'd2 init keeps built-in helpers inside cli/dd' );
+ok( !-e File::Spec->catfile( $d2_cli_root, 'jq' ), 'd2 init does not leak built-in helpers into the user CLI root' );
 my $lazy_lib = tempdir( CLEANUP => 1 );
 my $lazy_cli_dir = File::Spec->catdir( $lazy_lib, 'Developer', 'Dashboard', 'CLI' );
 my $lazy_skill_dir = File::Spec->catdir( $lazy_lib, 'Developer', 'Dashboard' );
@@ -292,7 +310,6 @@ my @perl_scripts = (
       xmlq
       of
       open-file
-      ticket
       file
       files
       path

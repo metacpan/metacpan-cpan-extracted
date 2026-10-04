@@ -512,9 +512,8 @@ claim the tests were told not to check.
 
 =head1 WHAT USES IT
 
-C<script/coverage-gate>, the C<test>, C<release-cpan> and C<release-github>
-workflows, and C<t/107-all-metric-coverage-gate.t>, which is its acceptance
-contract.
+C<script/coverage-gate>, the C<test> and C<release-github> workflows, and
+C<t/107-all-metric-coverage-gate.t>, which is its acceptance contract.
 
 =head1 EXAMPLES
 

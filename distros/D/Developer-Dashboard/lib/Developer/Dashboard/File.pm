@@ -3,7 +3,7 @@ package Developer::Dashboard::File;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use File::Spec;
 use Scalar::Util qw(blessed);
@@ -63,7 +63,6 @@ sub read {
     my ( $class, $file ) = @_;
     my $path = $class->_resolve_file($file);
     return if !defined $path || !-f $path;
-    # uncoverable branch true
     open my $fh, '<', $path or die "Unable to read $path: $!";
     local $/;
     return <$fh>;
@@ -113,7 +112,7 @@ sub touch {
     my $path = $class->_resolve_file($file);
     die 'Missing file path' if !defined $path || $path eq '';
     open my $fh, '>>', $path or die "Unable to touch $path: $!";
-    close $fh or die "Unable to close $path: $!";    # uncoverable branch true closing an append handle with no buffered output cannot fail on the test host
+    close $fh or die "Unable to close $path: $!";
     my $files = _files_obj();
     $files->paths->secure_file_permissions($path) if $files && $files->can('paths');
     return $path;

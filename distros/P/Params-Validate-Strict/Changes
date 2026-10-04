@@ -1,5 +1,46 @@
 Revision history for Params-Validate-Strict
 
+0.41	Sat Oct  3 12:58:28 PM EDT 2026
+	[Enhancements]
+	- New types 'regex', 'handle', 'arraylike', 'hashlike', 'codelike', 'invocant'
+	  inspired by Params::Util.  'regex' validates a compiled qr// object.
+	  'handle' validates file handles (glob ref, IO::Handle subclass, or anything
+	  with a defined fileno).  '*like' variants are duck-typed: they accept both a
+	  raw ref and a blessed object that overloads the corresponding deref operator.
+	  'invocant' accepts either a blessed object or a syntactically valid class-name
+	  string.
+	- New semantic values 'identifier' and 'class_name': validate that a string
+	  value is a valid Perl bareword identifier ([A-Za-z_]\w*) or a valid package
+	  name (Foo::Bar form) respectively.
+	- New rule keys 'classisa', 'subclass', 'classdoes': class-name string variants
+	  of 'isa'/'does' that test ->isa / ->DOES on a string class name rather than a
+	  blessed object.  'subclass' additionally requires the value to differ from the
+	  base class itself.
+	- New rule key 'does' (instance): like 'isa' but tests ->DOES for role
+	  consumption.  Requires type => 'object'.
+	- New rule key 'driver': validates a class-name string, loads the module via
+	  require, and confirms ->isa of a given base class.
+	- New 'aliases' rule key: a named parameter can now be found under one or
+	  more alternative input-key names.  Aliased keys are never treated as
+	  unknown parameters.  The validated result always uses the canonical key.
+	  Only named (hashref) input supports aliases; positional input ignores them.
+	- New 'slurp' rule key (positional schemas only): collects all remaining
+	  positional arguments from 'position' onwards into an arrayref, enabling
+	  variadic positional signatures such as ($level, @messages).  The
+	  parameter is implicitly optional (yields an empty arrayref when no args
+	  remain); combine with min => 1 to require at least one element.
+	- New 'compile_schema' function (exported on request): captures a schema
+	  and optional keyword arguments into a reusable validator closure.
+	  Equivalent to validate_strict(schema => ..., input => ...) but avoids
+	  repeated argument-parsing overhead in hot paths.
+	[Tests]
+	- t/unit.t: 19 new subtests covering aliases (canonical key, alias
+	  accepted, canonical precedence, unknown-param exemption, missing-both
+	  croaks), slurp (basic collection, empty slice, min=1 enforcement, no-min
+	  pass), and compile_schema (return type, non-ref schema croak,
+	  validation, result identity, opts forwarding).
+	- t/unit.t: subtests covering all new types, semantics, and rule keys.
+
 0.40	Mon Sep 21 09:22:05 PM EDT 2026
 	[Bug Fixes]
 	- min/max constraints on string parameters now correctly count grapheme

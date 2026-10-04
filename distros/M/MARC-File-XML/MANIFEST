@@ -15,6 +15,7 @@ t/empty-record.t
 t/empty-record.xml
 t/encode.t
 t/end-of-stream.t
+t/end-of-stream.xml
 t/error-handling.t
 t/escape.mrc
 t/escape.t

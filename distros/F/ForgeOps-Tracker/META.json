@@ -32,11 +32,15 @@
       },
       "runtime" : {
          "requires" : {
+            "IO::Socket::SSL" : "1.42",
+            "Net::SSLeay" : "1.49",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
+            "HTTP::Message" : "6.0",
+            "Plack" : "1.0",
             "Test::More" : "0.98"
          }
       }
@@ -53,6 +57,6 @@
          "web" : "https://github.com/Luke-Popwell/forge-ops-tracker-perl"
       }
    },
-   "version" : "v0.12.1",
+   "version" : "v0.12.3",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

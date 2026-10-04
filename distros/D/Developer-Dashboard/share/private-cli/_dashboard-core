@@ -58,6 +58,18 @@ my %POWERSHELL_ENV_LIST_KEYS = map { $_ => 1 } qw(PATH PERL5LIB PERL_LOCAL_LIB_R
 my $cmd = shift @ARGV || die "Missing built-in dashboard command\n";
 $0 = join q{ }, 'developer-dashboard', $cmd, @ARGV;
 
+if ( Developer::Dashboard::InternalCLI::canonical_helper_name($cmd) ne '' ) {
+    require Developer::Dashboard::CLI::Help;
+    my @help_request = Developer::Dashboard::CLI::Help::help_request(
+        command => $cmd,
+        args    => \@ARGV,
+    );
+    if (@help_request) {
+        print Developer::Dashboard::CLI::Help::help_text(@help_request);
+        exit 0;
+    }
+}
+
 if ( $cmd eq 'complete' ) {
     require Developer::Dashboard::CLI::Complete;
     my $index = shift @ARGV;
@@ -167,6 +179,7 @@ my $runtime = Developer::Dashboard::RuntimeManager->new(
         );
         return Developer::Dashboard::Web::Server->new(
             app     => $app,
+            paths   => $paths,
             host    => $args{host},
             port    => $args{port},
             workers => $args{workers},
@@ -871,7 +884,28 @@ elsif ( $cmd eq 'action' ) {
 elsif ( $cmd eq 'docker' ) {
     _load_configured_path_aliases();
     my $sub = shift @ARGV || '';
-    if ( $sub eq 'compose' ) {
+    if ( $sub eq '' || $sub eq 'help' || $sub eq '-h' || $sub eq '--help' ) {
+        print <<'DOCKER_USAGE';
+Usage: dashboard docker <subcommand> [arguments]
+
+Docker Compose:
+  dashboard docker compose [--addon NAME] [--mode NAME] [--service NAME]
+                           [--project DIR] [--dry-run] <compose-args...>
+  Resolve layered Compose files and pass remaining arguments to Docker Compose.
+
+Service management:
+  dashboard docker list [--enabled|--disabled]
+  dashboard docker enable <service> [service...]
+  dashboard docker disable <service> [service...]
+  dashboard docker development enable <service> [service...]
+  dashboard docker development disable <service> [service...]
+
+Use 'dashboard docker compose --help' for Docker Compose options, or
+'dashboard help' for the complete command reference.
+DOCKER_USAGE
+        exit 0;
+    }
+    elsif ( $sub eq 'compose' ) {
         my @addons;
         my @modes;
         my @services;
@@ -902,6 +936,26 @@ elsif ( $cmd eq 'docker' ) {
         local @ENV{ keys %{ $result->{env} } } = values %{ $result->{env} } if %{ $result->{env} };
         exec @{ $result->{command} };
         die "Unable to exec docker compose: $!";
+    }
+    if ( $sub eq 'development' ) {
+        my $action = @ARGV ? shift @ARGV : '';
+        die "Usage: dashboard docker development {enable|disable} <service> [service...]\n"
+          if $action !~ /\A(?:enable|disable)\z/ || !@ARGV;
+        my $toggle = $action eq 'enable' ? 'enable_service_development' : 'disable_service_development';
+        my @results;
+        my $failed = 0;
+        for my $service (@ARGV) {
+            my $result = eval { $docker->$toggle( service => $service ) };
+            if ($@) {
+                ( my $message = $@ ) =~ s/\n\z//;
+                push @results, { service => $service, error => $message };
+                $failed = 1;
+                next;
+            }
+            push @results, $result;
+        }
+        print json_encode( @results == 1 ? $results[0] : \@results );
+        exit( $failed ? 2 : 0 );
     }
     if ( $sub eq 'disable' || $sub eq 'enable' ) {
         # DD-919: accepts one or more service names, toggling each independently
@@ -944,6 +998,7 @@ elsif ( $cmd eq 'docker' ) {
         );
         exit 0;
     }
+    die "Unknown docker subcommand '$sub'. Run 'dashboard docker --help' for usage.\n";
 }
 elsif ( $cmd eq 'serve' ) {
     _load_configured_path_aliases();
@@ -1569,17 +1624,17 @@ _dd_tmux_status_active() {
 _dd_apply_tmux_ticket_status() {
   _dd_default_status="$(tmux show-options -gqv @dd_ticket_status_default 2>/dev/null)"
   if [ -z "$_dd_default_status" ]; then
-    _dd_default_status="$(tmux show-options -gqv status-format[0] 2>/dev/null)"
+    _dd_default_status="$(tmux show-options -gqv 'status-format[0]' 2>/dev/null)"
     [ -n "$_dd_default_status" ] && tmux set-option -gq @dd_ticket_status_default "$_dd_default_status" >/dev/null 2>&1
   fi
   tmux set-option -q status-position bottom >/dev/null 2>&1
   tmux set-option -q status 2 >/dev/null 2>&1
   tmux set-option -q status-interval 15 >/dev/null 2>&1
-  tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
+  tmux set-option -q 'status-format[0]' "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
   if [ -n "$_dd_default_status" ]; then
-    tmux set-option -q status-format[1] "$_dd_default_status" >/dev/null 2>&1
+    tmux set-option -q 'status-format[1]' "$_dd_default_status" >/dev/null 2>&1
   fi
-  tmux set-option -uq status-format[2] >/dev/null 2>&1
+  tmux set-option -uq 'status-format[2]' >/dev/null 2>&1
 }
 _dd_update_prompt() {
   if [ -n "$TMUX" ] && _dd_tmux_status_active; then
@@ -1615,17 +1670,17 @@ _dd_apply_tmux_ticket_status() {
   local default_status
   default_status="$(tmux show-options -gqv @dd_ticket_status_default 2>/dev/null)"
   if [[ -z "$default_status" ]]; then
-    default_status="$(tmux show-options -gqv status-format[0] 2>/dev/null)"
+    default_status="$(tmux show-options -gqv 'status-format[0]' 2>/dev/null)"
     [[ -n "$default_status" ]] && tmux set-option -gq @dd_ticket_status_default "$default_status" >/dev/null 2>&1
   fi
   tmux set-option -q status-position bottom >/dev/null 2>&1
   tmux set-option -q status 2 >/dev/null 2>&1
   tmux set-option -q status-interval 15 >/dev/null 2>&1
-  tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
+  tmux set-option -q 'status-format[0]' "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
   if [[ -n "$default_status" ]]; then
-    tmux set-option -q status-format[1] "$default_status" >/dev/null 2>&1
+    tmux set-option -q 'status-format[1]' "$default_status" >/dev/null 2>&1
   fi
-  tmux set-option -uq status-format[2] >/dev/null 2>&1
+  tmux set-option -uq 'status-format[2]' >/dev/null 2>&1
 }
 _dd_update_prompt() {
   if _dd_tmux_status_active; then
@@ -1648,17 +1703,17 @@ _dd_tmux_status_active() {
 _dd_apply_tmux_ticket_status() {
   _dd_default_status="$(tmux show-options -gqv @dd_ticket_status_default 2>/dev/null)"
   if [ -z "$_dd_default_status" ]; then
-    _dd_default_status="$(tmux show-options -gqv status-format[0] 2>/dev/null)"
+    _dd_default_status="$(tmux show-options -gqv 'status-format[0]' 2>/dev/null)"
     [ -n "$_dd_default_status" ] && tmux set-option -gq @dd_ticket_status_default "$_dd_default_status" >/dev/null 2>&1
   fi
   tmux set-option -q status-position bottom >/dev/null 2>&1
   tmux set-option -q status 2 >/dev/null 2>&1
   tmux set-option -q status-interval 15 >/dev/null 2>&1
-  tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
+  tmux set-option -q 'status-format[0]' "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
   if [ -n "$_dd_default_status" ]; then
-    tmux set-option -q status-format[1] "$_dd_default_status" >/dev/null 2>&1
+    tmux set-option -q 'status-format[1]' "$_dd_default_status" >/dev/null 2>&1
   fi
-  tmux set-option -uq status-format[2] >/dev/null 2>&1
+  tmux set-option -uq 'status-format[2]' >/dev/null 2>&1
 }
 _dd_prompt_command() {
   if _dd_tmux_status_active; then
@@ -1850,6 +1905,23 @@ Use this file when changing built-in command dispatch after helper staging, shel
 
 Users do not call this file directly. C<dashboard init> or on-demand staging writes wrappers under F<~/.developer-dashboard/cli/dd/>, and those wrappers invoke C<_dashboard-core> with the built-in command name they represent.
 
+For Docker service overlays, the staged C<docker> helper dispatches
+C<dashboard docker development enable E<lt>serviceE<gt>> and
+C<dashboard docker development disable E<lt>serviceE<gt>> here. These commands
+write or remove the service folder's C<develop.yml> marker; the Compose
+resolver then loads C<compose.yml> first and an existing
+C<development.compose.yml> after it. The Docker helper's C<--help>, C<-h>,
+C<help>, and no-subcommand forms print its usage without starting Docker.
+Completion offers the Docker service subcommands and the nested development
+actions.
+
+Before dispatching a public built-in body, this runtime checks explicit
+C<--help>, C<-h>, and trailing C<help> requests against
+C<Developer::Dashboard::CLI::Help>. It exits with the matching command or
+action synopsis before running the requested operation. The shared
+C<dashboard complete> helper reads the same catalog for action and option TAB
+candidates, including targets after global C<dashboard help>.
+
 =head1 WHAT USES IT
 
 It is used by every staged dashboard-managed helper under F<~/.developer-dashboard/cli/dd/>, by shell bootstrap generation, and by tests that verify the private-helper runtime contract.
@@ -1879,6 +1951,15 @@ Example 4:
   prove -lr t
 
 Verify that the helper still behaves correctly inside the complete repository suite.
+
+Example 5:
+
+  dashboard docker development enable web
+  dashboard docker compose config web
+  dashboard docker development disable web
+
+Opt a service into its development Compose overlay, inspect the resolved config
+without starting containers, then turn the overlay back off.
 
 
 =for comment FULL-POD-DOC END

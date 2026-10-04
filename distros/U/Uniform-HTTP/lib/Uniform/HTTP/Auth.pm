@@ -8,7 +8,7 @@ use Uniform::HTTP::Auth::Basic ();
 use Uniform::HTTP::Auth::Bearer ();
 use Uniform::HTTP::Auth::Digest ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 my %SCHEME_CLASS = (
     basic  => 'Uniform::HTTP::Auth::Basic',
@@ -523,7 +523,7 @@ __END__
 
 =head1 NAME
 
-Uniform::HTTP::Auth - Framework-agnostic HTTP authentication for Perl
+Uniform::HTTP::Auth - HTTP authentication without an HTTP framework
 
 =head1 SYNOPSIS
 
@@ -540,53 +540,52 @@ Uniform::HTTP::Auth - Framework-agnostic HTTP authentication for Perl
     my $result = $auth->prepare_authentication(
         challenge_headers => [
             'Digest realm="Members", nonce="abc", qop="auth", algorithm=SHA-256',
-            'Basic realm="Members"',
         ],
         method         => 'GET',
         request_target => '/private',
     );
 
-    # $result->{value} is the complete field value, for example:
-    # Digest username="user", ...
-    #
-    # The caller decides whether it belongs in Authorization or
-    # Proxy-Authorization and whether the request should be retried.
+    my $value = $result->{value};
 
 =head1 DESCRIPTION
 
-C<Uniform::HTTP::Auth> implements HTTP authentication mechanics without
-requiring an HTTP client, server, framework, event loop, request object, or
-transaction abstraction.
+Uniform::HTTP::Auth prepares HTTP authentication field values.
 
-For ordinary applications, construct an auth object with an origin and a set of
-credentials.  The object remembers those credentials and uses them later when
-that origin presents a supported authentication challenge.
+It supports:
 
-For HTTP libraries or applications with dynamic credential stores,
-C<credentials> may instead be a callback that receives the authentication
-context and returns credentials for that protection space.
+=over 4
 
-The distribution implements Basic (RFC 7617), Bearer (RFC 6750), and Digest
-(RFC 7616).  Unknown schemes are parsed and preserved for introspection but are
-not automatically used in version 0.02.
+=item * Basic
 
-=head1 OWNERSHIP BOUNDARY
+=item * Bearer
 
-This module owns authentication mechanics: challenge parsing, scheme selection,
-credential lookup, Basic and Bearer construction, Digest calculation, and
-Digest nonce state.
+=item * Digest
 
-The calling HTTP implementation owns receiving 401 or 407 responses, request
-replay, retries, connections, proxy routing, and the choice between
-C<Authorization> and C<Proxy-Authorization>.
+=back
 
-C<prepare_authentication()> performs no network I/O. It only prepares the
-authentication field value that the caller may use for a subsequent HTTP
-request.
+It does not send requests, receive 401 responses, retry requests, manage
+connections, or choose an HTTP framework.
 
-=head1 CONSTRUCTOR
+The normal flow is:
 
-=head2 new
+    server challenge
+          |
+          v
+    Uniform::HTTP::Auth
+          |
+          v
+    authentication field value
+          |
+          v
+    your HTTP client or server
+
+The calling HTTP implementation decides whether the value belongs in
+C<Authorization> or C<Proxy-Authorization> and whether a request should be
+retried.
+
+=head1 SIMPLE USERNAME AND PASSWORD
+
+For one server, store credentials on the auth object:
 
     my $auth = Uniform::HTTP::Auth->new(
         origin => 'https://example.com:443',
@@ -596,144 +595,17 @@ request.
         },
     );
 
-Supported options are:
+The credentials are bound to that origin.
 
-=over 4
-
-=item origin
-
-A normalized origin such as C<https://example.com:443>.  When static
-credentials are supplied, C<origin> is required and binds those credentials to
-that origin.  Calls to C<prepare_authentication()> may then omit C<origin>.
-
-A callback-based credential source may omit C<origin> and supply it per
-C<prepare_authentication()> call instead.  If an origin is supplied at
-construction, it is also treated as a binding and a different per-call origin
-is rejected.
-
-=item credentials
-
-Usually a hash reference containing credentials to retain for later use.
-Basic and Digest use:
-
-    credentials => {
-        username => 'user',
-        password => 'secret',
-    }
-
-Bearer uses:
-
-    credentials => {
-        token => $token,
-    }
-
-A hash may contain both forms.  Uniform automatically skips a scheme when the
-stored credentials do not contain the fields that scheme needs.
-
-For dynamic lookup, C<credentials> may instead be a coderef.  See
-L</DYNAMIC CREDENTIAL LOOKUP>.
-
-=item schemes
-
-An array reference containing the enabled authentication schemes in preference
-order.  Scheme names are case-insensitive.  The default is:
-
-    [qw(digest bearer basic)]
-
-The order is a convenience policy, not a universal security ranking.  Supply an
-explicit order when an application has its own policy.
-
-=back
-
-Unknown constructor options are rejected.
-
-=head1 METHODS
-
-=head2 schemes
-
-    my $schemes = $auth->schemes;
-
-Returns a new array reference containing the configured normalized scheme names.
-
-=head2 parse_challenges
-
-    my $challenges = $auth->parse_challenges(@header_values);
-
-Parses one or more complete C<WWW-Authenticate> or C<Proxy-Authenticate> field
-values.  Multiple challenges on one field line and multiple field occurrences
-are supported.
-
-Returns an array reference in wire order.  Each element is a plain hash
-reference with these keys:
-
-    {
-        scheme    => 'digest',
-        raw       => 'Digest realm="Members", ...',
-        params    => { realm => 'Members', ... },
-        token68   => undef,
-        malformed => 0,
-        error     => undef,
-    }
-
-Scheme and parameter names are normalized to lowercase.  Unknown schemes are
-retained.  Malformed remote input is returned as data with C<malformed> true and
-C<error> set; malformed challenge input does not throw merely because it came
-from the network.
-
-=head2 select
-
-    my $challenge = $auth->select($challenges);
-
-Selects the best usable challenge according to the configured scheme order.
-The method does not obtain credentials.  It returns undef if no supported
-well-formed challenge can be used.
-
-When a field contains multiple Digest challenges, Digest-specific algorithm and
-qop selection remains the responsibility of L<Uniform::HTTP::Auth::Digest>.
-
-=head2 prepare_authentication
-
-For an object with a bound origin:
+When a challenge arrives:
 
     my $result = $auth->prepare_authentication(
-        challenge_headers => \@authenticate_values,
-        method            => 'GET',
-        request_target    => '/private?x=1',
-        entity_body       => $body,
+        challenge_headers => \@www_authenticate,
+        method         => 'GET',
+        request_target => '/private',
     );
 
-A callback-based object without a bound origin supplies one per call:
-
-    my $result = $auth->prepare_authentication(
-        challenge_headers => \@authenticate_values,
-        origin            => 'https://example.com:443',
-        method            => 'GET',
-        request_target    => '/private?x=1',
-    );
-
-Performs parsing, scheme selection, credential lookup, and authentication value
-construction.  It tries configured schemes in order and can fall through to a
-later scheme when suitable credentials are unavailable.  It does not send a
-request or otherwise perform network I/O.
-
-C<method> and C<request_target> are required only when Digest is selected.
-C<entity_body> is used only for Digest C<qop=auth-int> and must be a plain scalar
-when supplied.
-
-Instead of those three values, a caller may supply any object implementing the
-L<Uniform::HTTP::Request> contract:
-
-    my $result = $auth->prepare_authentication(
-        challenge_headers => \@authenticate_values,
-        request           => $request,
-    );
-
-Explicit C<method>, C<request_target>, or C<entity_body> arguments take
-precedence over values from C<request>. The body is read only when the request
-reports true from C<has_buffered_body()>; authentication never consumes an
-incremental body source.
-
-On success, the method returns:
+If a supported challenge can be satisfied, C<$result> contains:
 
     {
         scheme    => 'digest',
@@ -741,25 +613,19 @@ On success, the method returns:
         challenge => $challenge,
     }
 
-C<value> is the complete authentication field value without a header name.
-Returns undef when no supported challenge can be satisfied.
+Use C<$result-E<gt>{value}> as the complete authentication field value.
 
-=head1 STATIC CREDENTIALS
+The configured default preference is:
 
-Static credentials are the normal application API.  They are copied into the
-auth object at construction and bound to the configured origin.
+    digest
+    bearer
+    basic
 
-Username/password credentials can satisfy Basic or Digest challenges:
+You can choose another order with C<schemes>.
 
-    my $auth = Uniform::HTTP::Auth->new(
-        origin => 'https://example.com:443',
-        credentials => {
-            username => 'user',
-            password => 'secret',
-        },
-    );
+=head1 BEARER TOKENS
 
-A token can satisfy Bearer challenges:
+For Bearer authentication:
 
     my $auth = Uniform::HTTP::Auth->new(
         origin => 'https://api.example.com:443',
@@ -768,12 +634,123 @@ A token can satisfy Bearer challenges:
         },
     );
 
-Static credentials are never used for a different origin.  To manage many
-origins with one object, use dynamic credential lookup instead.
+The token is treated as opaque data. Uniform::HTTP::Auth does not obtain,
+refresh, decode, or validate OAuth tokens or JWTs.
+
+=head1 USING A REQUEST OBJECT
+
+C<prepare_authentication()> can read the request information from a
+L<Uniform::HTTP::Request> object:
+
+    my $result = $auth->prepare_authentication(
+        challenge_headers => \@www_authenticate,
+        request           => $request,
+    );
+
+It reads C<method()> and C<target()>.
+
+A body is read only when C<has_buffered_body()> is true. Authentication never
+drains a streaming body.
+
+Explicit C<method>, C<request_target>, and C<entity_body> arguments override
+values from the request object.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $auth = Uniform::HTTP::Auth->new(
+        origin      => $origin,
+        credentials => $credentials,
+        schemes     => [qw(digest basic)],
+    );
+
+=head3 origin
+
+A normalized origin such as:
+
+    https://example.com:443
+
+Static credentials require an origin and are never used for a different
+origin.
+
+=head3 credentials
+
+For Basic or Digest:
+
+    {
+        username => 'user',
+        password => 'secret',
+    }
+
+For Bearer:
+
+    {
+        token => $token,
+    }
+
+A hash may contain both forms.
+
+For applications with a credential store, C<credentials> may instead be a
+callback. See L</DYNAMIC CREDENTIAL LOOKUP>.
+
+=head3 schemes
+
+An optional array reference containing enabled schemes in preference order.
+
+The default is:
+
+    [qw(digest bearer basic)]
+
+=head1 MAIN METHODS
+
+=head2 prepare_authentication
+
+    my $result = $auth->prepare_authentication(
+        challenge_headers => \@values,
+        method            => 'GET',
+        request_target    => '/private',
+    );
+
+This is the main application method.
+
+It parses the challenges, chooses a supported scheme, finds credentials, and
+constructs the authentication value.
+
+It returns C<undef> when no challenge can be satisfied.
+
+Digest needs C<method> and C<request_target>. C<entity_body> is used only for
+Digest C<qop=auth-int>.
+
+This method performs no network I/O.
+
+=head2 parse_challenges
+
+    my $challenges = $auth->parse_challenges(@header_values);
+
+Parses complete C<WWW-Authenticate> or C<Proxy-Authenticate> values.
+
+It returns an array reference in wire order. Unknown schemes are preserved.
+Malformed remote challenges are returned as malformed data rather than causing
+an exception merely because the server sent bad input.
+
+=head2 select
+
+    my $challenge = $auth->select($challenges);
+
+Returns the best usable challenge according to the configured scheme order, or
+C<undef> when none is usable.
+
+This method only selects a challenge. It does not look up credentials.
+
+=head2 schemes
+
+Returns a new array reference containing the configured scheme names.
 
 =head1 DYNAMIC CREDENTIAL LOOKUP
 
-HTTP libraries and applications with credential stores can supply a callback:
+Reusable HTTP libraries and applications with a credential store can supply a
+callback:
 
     my $auth = Uniform::HTTP::Auth->new(
         credentials => sub {
@@ -787,7 +764,7 @@ HTTP libraries and applications with credential stores can supply a callback:
         },
     );
 
-The callback receives one plain hash reference:
+The callback receives:
 
     {
         scheme    => 'digest',
@@ -796,59 +773,94 @@ The callback receives one plain hash reference:
         challenge => $challenge,
     }
 
-Return undef when credentials are unavailable for that protection space.
-Return a hash reference otherwise.
+Return C<undef> when credentials are unavailable.
 
-Basic and Digest expect:
+For Basic and Digest return:
 
-    { username => 'user', password => 'secret' }
+    {
+        username => 'user',
+        password => 'secret',
+    }
 
-Bearer expects:
+For Bearer return:
 
-    { token => 'token-value' }
+    {
+        token => $token,
+    }
 
-The callback supplies credentials; it does not verify them.  Missing fields or
-invalid return types are programmer errors and throw exceptions.
+=head1 DIGEST SUPPORT
 
-=head1 ERROR MODEL
+Digest supports:
 
-Programmer errors, such as invalid constructor options, invalid argument types,
-or malformed credential callback results, throw exceptions with C<croak>.
+=over 4
 
-Malformed remote challenge data is represented in the returned challenge data
-and ignored by automatic selection.  A credential callback returning undef is
-not an error.
+=item * MD5 and MD5-sess
 
-=head1 SECURITY NOTES
+=item * SHA-256 and SHA-256-sess
 
-Static credentials are bound to one normalized origin.  This prevents an auth
-object created for one service from silently offering those credentials to a
-different origin.
+=item * SHA-512/256 and SHA-512/256-sess
 
-Basic credentials are only Base64 encoded and should normally be sent over a
-secure transport such as TLS.
+=item * C<qop=auth>
 
-Bearer tokens are treated as opaque credentials.  This distribution does not
-validate JWTs, refresh OAuth tokens, or determine token permissions.
+=item * C<qop=auth-int>
 
-Digest supports legacy MD5 for interoperability as well as SHA-256 and
-SHA-512/256 families.  Applications can restrict the enabled authentication
-schemes at construction time.
+=item * UTF-8
+
+=item * C<userhash>
+
+=item * stale nonces and nonce-count state
+
+=back
+
+MD5 remains available for compatibility with older servers.
+
+=head1 ERRORS
+
+Programmer mistakes throw exceptions. Examples include bad constructor
+arguments, invalid credential values, and invalid callback results.
+
+Bad challenge data received from a remote server is represented as malformed
+challenge data so callers can inspect it safely.
+
+=head1 SECURITY
+
+Basic authentication only encodes credentials with Base64. It should normally
+be used over TLS.
+
+Bearer tokens are credentials and should be protected accordingly.
+
+Digest is an authentication mechanism, not transport encryption. Legacy MD5
+Digest is supported for interoperability but should not be preferred when a
+stronger option is available.
+
+=head1 LOWER-LEVEL MODULES
+
+Most applications should use this module.
+
+The lower-level calculation modules are available when needed:
+
+=over 4
+
+=item * L<Uniform::HTTP::Auth::Basic>
+
+=item * L<Uniform::HTTP::Auth::Bearer>
+
+=item * L<Uniform::HTTP::Auth::Digest>
+
+=back
 
 =head1 SEE ALSO
 
-L<Uniform::HTTP::Auth::Basic>, L<Uniform::HTTP::Auth::Bearer>,
-L<Uniform::HTTP::Auth::Digest>, RFC 9110, RFC 7617, RFC 7616, RFC 6750.
+L<Uniform::HTTP>, L<Uniform::HTTP::Request>.
 
-The distribution also includes F<docs/AUTH-SPEC.md> with the version 0.02 Auth
-contract and F<docs/MESSAGE-SPEC.md> with the shared request contract.
+The detailed authentication contract is in F<docs/AUTH-SPEC.md>.
 
 =head1 AUTHOR
 
-Joshua S. Day, E<lt>HAX@cpan.orgE<gt>
+Joshua S. Day E<lt>HAX@cpan.orgE<gt>
 
 =head1 LICENSE
 
-This software is released under the MIT License.
+This software is available under the MIT License.
 
 =cut

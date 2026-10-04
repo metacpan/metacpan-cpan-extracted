@@ -220,22 +220,33 @@ Do not switch public wording from `OWASP-aligned` or `OWASP-gated` to blanket
 6. any GitHub-side settings needed for branch protection, review enforcement,
    signed releases, or equivalent governance proof are actually in place
 
-## Status As Of 2026-06-05
+## Status As Of 2026-09-30
 
 - repo-side OWASP gate wording exists and is tested
 - repo-side OWASP evidence matrix now exists and is shipped
 - the stronger blanket public claim is still not closed
+- current checkout full non-coverage suite passed in Docker: 204 files and
+  19,197 tests; the separate Problem 20 aggregate coverage gate remains paused
+  by user instruction
+- the required focused web, static-file, and SSL security suite passed in
+  Docker with 459 assertions
+- the required repository security searches were reviewed; matches were in
+  policy/test fixtures or intentional user-authored command/SQL support, not
+  forbidden production dependencies, hidden SQL, or a discovered credential
+- live Scorecard is 8.0/10 after pushed commit `93218224`; all checks except
+  Branch-Protection, CII-Best-Practices, Code-Review, Contributors, and
+  CI-Tests report 10/10; CI-Tests is unknown without a PR
+- read-only GitHub API access confirms six merged PRs and no approval reviews;
+  the available token receives HTTP 403 on branch-protection administration
 
 Current blockers outside the repo-only document-and-test gap include the live
-governance and release signals that still need full closure, including:
+governance signals that still need full closure:
 
 - `Branch-Protection`
 - `Code-Review`
 - `CII-Best-Practices`
 - `CI-Tests`
-- `Signed-Releases`
 - `Contributors`
-- `Maintained`
 
 That means the repo is now materially better aligned and documented, but the
 honest public statement is still `OWASP-aligned` or `OWASP-gated`, not an

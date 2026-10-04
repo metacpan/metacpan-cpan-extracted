@@ -10,7 +10,7 @@
 # evidence that a regression test tests anything. They therefore use no
 # argument that 0.15 did not already accept, so the file can be re-run against
 # an old checkout to check that they still catch what they were written for.
-# Blocks 12-16 cover options that are new in 0.16 (stale, input.file, quiet,
+# Blocks 12-16 cover options that are new in 0.16 (stale, input_file, quiet,
 # timeout) and cannot run against an older module at all.
 #
 # Block 17 is a regression test for a defect in 0.16 itself, reported by a CPAN
@@ -104,7 +104,7 @@ subtest 'die => 0 reports a non-zero exit as FAILED' => sub {
 	# STDERR directly rather than through warn and so used to print here
 	my (undef, $missing_err, $missing) = capture { task(
 		cmd            => perl_cmd('exit 0'),
-		'output.files' => $never_made,
+		'output_files' => $never_made,
 		die            => 0,
 	) };
 	like($missing_err, qr/should have been made but are missing/,
@@ -127,7 +127,7 @@ subtest 'log filehandle is autoflushed' => sub {
 	cmp_ok(-s $log_name, '>', 0, 'say2 output is on disk before the handle is closed');
 
 	my $before = -s $log_name;
-	quietly { task(cmd => perl_cmd('exit 0'), 'log.fh' => $log) };
+	quietly { task(cmd => perl_cmd('exit 0'), 'log_fh' => $log) };
 	cmp_ok(-s $log_name, '>', $before, 'the task record is on disk before the handle is closed');
 	close $log;
 };
@@ -140,25 +140,25 @@ subtest 'undefined and 0-length filenames are rejected by name' => sub {
 	my ($ifh, $real) = tempfile(DIR => $dir); print {$ifh} 'x'; close $ifh;
 
 	throws_ok {
-		quietly { task(cmd => perl_cmd('exit 0'), 'input.files' => [$real, undef]) };
+		quietly { task(cmd => perl_cmd('exit 0'), 'input_files' => [$real, undef]) };
 	} qr/undefined or 0-length filenames/,
-		'undef in an input.files array is an argument error, not an uninitialized-value crash';
+		'undef in an input_files array is an argument error, not an uninitialized-value crash';
 
 	# The 0-length input check used to be unreachable: '' fails -f, so
 	# it was reported as "missing or unreadable" instead of as a bad name.
 	throws_ok {
-		quietly { task(cmd => perl_cmd('exit 0'), 'input.files' => '') };
+		quietly { task(cmd => perl_cmd('exit 0'), 'input_files' => '') };
 	} qr/undefined or 0-length filenames/,
-		'a 0-length input.files name is reported as a 0-length name';
+		'a 0-length input_files name is reported as a 0-length name';
 
 	throws_ok {
-		quietly { task(cmd => perl_cmd('exit 0'), 'output.files' => [$real, '']) };
+		quietly { task(cmd => perl_cmd('exit 0'), 'output_files' => [$real, '']) };
 	} qr/undefined or 0-length filenames/,
-		'a 0-length output.files name is reported as a 0-length name';
+		'a 0-length output_files name is reported as a 0-length name';
 
 	# the message must point at the offending position
 	throws_ok {
-		quietly { task(cmd => perl_cmd('exit 0'), 'input.files' => [$real, '']) };
+		quietly { task(cmd => perl_cmd('exit 0'), 'input_files' => [$real, '']) };
 	} qr/index 1/, 'the message names the index of the bad filename';
 };
 
@@ -194,7 +194,7 @@ subtest 'cmd is validated' => sub {
 # --- 5. the 0-length output message has balanced parentheses ---------------
 subtest 'error messages are well formed' => sub {
 	my $err = '';
-	eval { quietly { task(cmd => perl_cmd('exit 0'), 'output.file' => '') } };
+	eval { quietly { task(cmd => perl_cmd('exit 0'), 'output_file' => '') } };
 	$err = $@;
 	# without this the counts would both be 0 and the test would pass even if
 	# the call had never died
@@ -214,8 +214,8 @@ subtest 'the result record has a uniform shape' => sub {
 	my ($ofh, $exists) = tempfile(DIR => $dir); print {$ofh} 'x'; close $ofh;
 	my %path = (
 		'a completed run' => quietly { task(cmd => perl_cmd('exit 0')) },
-		'a skipped run'   => quietly { task(cmd => perl_cmd('exit 0'), 'output.files' => $exists) },
-		'a dry run'       => quietly { task(cmd => perl_cmd('exit 0'), 'dry.run' => 1) },
+		'a skipped run'   => quietly { task(cmd => perl_cmd('exit 0'), 'output_files' => $exists) },
+		'a dry run'       => quietly { task(cmd => perl_cmd('exit 0'), 'dry_run' => 1) },
 	);
 	for my $what (sort keys %path) {
 		my $t = $path{$what};
@@ -239,7 +239,7 @@ SKIP: {
 	open my $ufh, '>', $unreadable or die; print {$ufh} 'x'; close $ufh;
 	chmod 0000, $unreadable;
 	my (undef, $unreadable_err, $t) = capture { task(cmd => qq{$PERL -e "print 1" > "$unreadable"},
-		'output.files' => $unreadable, die => 0) };
+		'output_files' => $unreadable, die => 0) };
 	isnt($t->{done}, 'before', 'an unreadable output file does not count as already done');
 	# the redirect cannot write the file, so the shell exits non-zero and
 	# die => 0 warns: captured, and checked, because a silent failure here
@@ -291,7 +291,7 @@ use warnings;
 use lib '$lib_dir';
 use SimpleFlow qw(task say2);
 open my \$log, '>', '$log_name' or die;
-task(cmd => qq{"\$^X" -e "print q{payload}"}, 'log.fh' => \$log);
+task(cmd => qq{"\$^X" -e "print q{payload}"}, 'log_fh' => \$log);
 say2('the line that must survive', \$log);
 kill 'KILL', \$\$;   # an OOM kill or a scheduler eviction looks like this
 PROBE
@@ -359,7 +359,7 @@ use warnings;
 use lib '$lib_dir';
 use SimpleFlow qw(task);
 open my \$log, '>', '$log_name' or die;
-my \$t = task(cmd => qq{"\$^X" -e "print q{x} x $bytes"}, 'log.fh' => \$log, die => 0);
+my \$t = task(cmd => qq{"\$^X" -e "print q{x} x $bytes"}, 'log_fh' => \$log, die => 0);
 close \$log;
 open my \$c, '>', '$capture_len' or die;
 print {\$c} length \$t->{stdout};
@@ -389,16 +389,16 @@ subtest 'stale => 1 re-runs when an input is newer than an output' => sub {
 
 	my $without = task(
 		cmd            => qq{$PERL -e "print q{regenerated}" > "$out"},
-		'input.files'  => $in,
-		'output.files' => $out,
+		'input_files'  => $in,
+		'output_files' => $out,
 		quiet          => 1,
 	);
 	is($without->{done}, 'before', 'without stale => 1 the existing output is accepted (unchanged default)');
 
 	my $with = task(
 		cmd            => qq{$PERL -e "print q{regenerated}" > "$out"},
-		'input.files'  => $in,
-		'output.files' => $out,
+		'input_files'  => $in,
+		'output_files' => $out,
 		stale          => 1,
 		quiet          => 1,
 	);
@@ -408,8 +408,8 @@ subtest 'stale => 1 re-runs when an input is newer than an output' => sub {
 	# now that the output is newer than the input, stale => 1 must skip again
 	my $fresh = task(
 		cmd            => qq{$PERL -e "print q{regenerated}" > "$out"},
-		'input.files'  => $in,
-		'output.files' => $out,
+		'input_files'  => $in,
+		'output_files' => $out,
 		stale          => 1,
 		quiet          => 1,
 	);
@@ -417,19 +417,19 @@ subtest 'stale => 1 re-runs when an input is newer than an output' => sub {
 	is($fresh->{'out.of.date'}, 0,        'and is not marked out of date');
 };
 
-# --- 13. input.file, the single-file convenience form ----------------------
-subtest 'input.file (single file)' => sub {
+# --- 13. input_file, the single-file convenience form ----------------------
+subtest 'input_file (single file)' => sub {
 	my ($ifh, $i1) = tempfile(DIR => $dir); print {$ifh} 'abc'; close $ifh; # 3 bytes
-	my $t = quietly { task(cmd => perl_cmd('exit 0'), 'input.file' => $i1) };
-	is_deeply($t->{'input.files'}, [$i1], 'input.file is folded into the input.files arrayref');
-	is($t->{'input.file.size'}{$i1}, 3,   'input.file.size reports the byte count');
+	my $t = quietly { task(cmd => perl_cmd('exit 0'), 'input_file' => $i1) };
+	is_deeply($t->{'input_files'}, [$i1], 'input_file is folded into the input_files arrayref');
+	is($t->{'input_file.size'}{$i1}, 3,   'input_file.size reports the byte count');
 
-	throws_ok { quietly { task(cmd => perl_cmd('exit 0'), 'input.file' => $i1, 'input.files' => $i1) } }
-		qr/cannot both be given/, 'input.file and input.files are mutually exclusive';
-	throws_ok { quietly { task(cmd => perl_cmd('exit 0'), 'input.file' => [$i1]) } }
-		qr/isn't allowed for "input\.file"/, 'input.file refuses a reference';
-	throws_ok { quietly { task(cmd => perl_cmd('exit 0'), 'input.file' => "$dir/definitely-not-here") } }
-		qr/missing or are not readable/, 'a missing input.file is still caught';
+	throws_ok { quietly { task(cmd => perl_cmd('exit 0'), 'input_file' => $i1, 'input_files' => $i1) } }
+		qr/cannot both be given/, 'input_file and input_files are mutually exclusive';
+	throws_ok { quietly { task(cmd => perl_cmd('exit 0'), 'input_file' => [$i1]) } }
+		qr/isn't allowed for "input_file"/, 'input_file refuses a reference';
+	throws_ok { quietly { task(cmd => perl_cmd('exit 0'), 'input_file' => "$dir/definitely-not-here") } }
+		qr/missing or are not readable/, 'a missing input_file is still caught';
 };
 
 # --- 14. quiet => 1 silences the terminal but not the log ------------------
@@ -469,7 +469,7 @@ subtest 'quiet => 1' => sub {
 			capture {
 				local *STDOUT;
 				open STDOUT, '>', \$captured{$quiet} or die;
-				my $t = task(cmd => perl_cmd('print uc q{hush}'), 'log.fh' => $log, quiet => $quiet);
+				my $t = task(cmd => perl_cmd('print uc q{hush}'), 'log_fh' => $log, quiet => $quiet);
 				$command_stdout{$quiet} = $t->{stdout};
 			};
 		}
@@ -617,7 +617,7 @@ use lib '$lib_dir';
 use lib '$stub_dir'; # ahead of the real Data::Printer in \@INC
 use SimpleFlow qw(task);
 open my \$log, '>', '$log_name' or die;
-my \$t = task(cmd => qq{"\$^X" -e "print q{x} x $bytes"}, 'log.fh' => \$log, die => 0);
+my \$t = task(cmd => qq{"\$^X" -e "print q{x} x $bytes"}, 'log_fh' => \$log, die => 0);
 close \$log;
 open my \$c, '>', '$capture_len' or die;
 print {\$c} length \$t->{stdout};

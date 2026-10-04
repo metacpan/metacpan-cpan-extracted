@@ -3,7 +3,7 @@ package Devel::ebug::Backend::Plugin::Output;
 use strict;
 use warnings;
 
-our $VERSION = '0.68'; # VERSION
+our $VERSION = '0.69'; # VERSION
 
 my $stdout = "";
 my $stderr = "";
@@ -46,7 +46,7 @@ Devel::ebug::Backend::Plugin::Output
 
 =head1 VERSION
 
-version 0.68
+version 0.69
 
 =head1 AUTHOR
 

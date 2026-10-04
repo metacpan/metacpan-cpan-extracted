@@ -252,6 +252,11 @@ _write_file(
 }
 EOF
 );
+my $nested_cli_dir = File::Spec->catdir( $nested_skill, 'cli' );
+make_path($nested_cli_dir);
+my $nested_bob = File::Spec->catfile( $nested_cli_dir, 'bob' );
+_write_file( $nested_bob, "#!/usr/bin/env perl\nprint qq(bob\\n);\n" );
+chmod 0755, $nested_bob or die "Unable to chmod $nested_bob: $!";
 _write_file(
     File::Spec->catfile( $leaf_skill, 'config', 'config.json' ),
     qq|{"indicator":{"icon":"leaf"},"collectors":[{"name":"alpha","interval":20}],"providers":[{"id":"main","title":"Leaf"}]}\n|,
@@ -299,6 +304,14 @@ my $paths = Local::SkillPaths->new(
 );
 my $manager = Local::SkillManager->new( paths => $paths );
 my $dispatcher = Developer::Dashboard::SkillDispatcher->new( manager => $manager );
+
+my $nested_command_spec = $dispatcher->command_spec( 'layered', 'child.bob' );
+is( $nested_command_spec->{cmd_path}, $nested_bob, 'nested skill command resolves its leaf executable' );
+is_deeply(
+    $nested_command_spec->{env_skill_layers},
+    [ $base_skill, $leaf_skill, File::Spec->catdir( $leaf_skill, 'skills', 'child' ) ],
+    'nested skill command inherits environment layers from the parent skill through the nested leaf',
+);
 
 is_deeply(
     $dispatcher->resolve_custom_route_path('/java'),

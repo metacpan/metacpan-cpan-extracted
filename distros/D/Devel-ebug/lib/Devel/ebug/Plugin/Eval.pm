@@ -5,7 +5,7 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(eval yaml);
 
-our $VERSION = '0.68'; # VERSION
+our $VERSION = '0.69'; # VERSION
 
 # eval
 sub eval {
@@ -42,7 +42,7 @@ Devel::ebug::Plugin::Eval
 
 =head1 VERSION
 
-version 0.68
+version 0.69
 
 =head1 AUTHOR
 

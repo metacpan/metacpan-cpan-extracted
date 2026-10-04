@@ -10,6 +10,7 @@ build_requires:
   Test2::Require: '0'
   Test2::Suite: '1.302200'
   Test2::Tools::GenTemp: '1.302200'
+  Test2::Tools::Subtest: '0'
   Test2::V0: '1.302200'
   Test2::V1: '1.302200'
   Test::Script: '1.28'
@@ -48,7 +49,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Env-Assert
   homepage: https://metacpan.org/dist/Env-Assert
   repository: git://github.com/mikkoi/env-assert.git
-version: '0.016'
+version: '0.018'
 x_contributors:
   - 'Ivan Bessarabov <ivan@bessarabov.ru>'
   - 'gregor herrmann <gregoa@debian.org>'

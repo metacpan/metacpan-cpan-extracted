@@ -1,7 +1,7 @@
 package OpenTelemetry::Instrumentation::DBI;
 # ABSTRACT: OpenTelemetry instrumentation for DBI
 
-our $VERSION = '0.037';
+our $VERSION = '0.039';
 
 use strict;
 use warnings;
@@ -17,6 +17,7 @@ use OpenTelemetry::Trace;
 use OpenTelemetry;
 use Scalar::Util 'blessed';
 use Syntax::Keyword::Dynamically;
+use Feature::Compat::Defer;
 
 use parent 'OpenTelemetry::Instrumentation';
 
@@ -90,6 +91,8 @@ sub install ( $class, %options ) {
             },
         );
 
+        defer { $span->end }
+
         dynamically OpenTelemetry::Context->current
             = OpenTelemetry::Trace->context_with_span($span);
 
@@ -127,8 +130,6 @@ sub install ( $class, %options ) {
             else {
                 $span->set_status( SPAN_STATUS_OK );
             }
-
-            $span->end;
         }
     };
 

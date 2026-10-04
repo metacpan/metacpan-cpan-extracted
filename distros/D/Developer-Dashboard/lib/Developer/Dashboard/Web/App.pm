@@ -3,10 +3,11 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Capture::Tiny qw(capture);
 use Digest::SHA qw(sha256_hex);
+use Errno qw(EACCES EPERM);
 use File::Basename qw(dirname);
 use File::ShareDir qw(dist_dir);
 use POSIX qw(strftime);
@@ -797,7 +798,8 @@ sub legacy_ajax_file_response {
 
 # skill_ajax_file_response(%args)
 # Executes one `/ajax/<skill>/<file>` route against a layered skill-local ajax file.
-# Input: skill name, ajax file name, and normalized request metadata.
+# Input: skill name, ajax file name, and normalized request metadata; the
+#       resolved skill layers provide the child process's environment files.
 # Output: response array reference.
 sub skill_ajax_file_response {
     my ( $self, %args ) = @_;
@@ -815,10 +817,14 @@ sub skill_ajax_file_response {
     if ( !exists $request_params{type} && ( $args{default_type} || '' ) ne '' ) {
         $request_params{type} = $args{default_type};
     }
+    my $dispatcher = $self->_skill_dispatcher;
+    my $skill_spec = $dispatcher->resolve_route_segments( [ grep { $_ ne '' } split m{/+}, $skill_name ] );
+    my $skill_layers = $skill_spec ? ( $skill_spec->{skill_layers} || [] ) : [];
     return _transient_url_forbidden_response() if !$self->_legacy_ajax_allowed( \%request_params );
     return $self->_legacy_ajax_response(
         params          => \%request_params,
         saved_ajax_path => $saved_ajax_path,
+        skill_layers    => $skill_layers,
     );
 }
 
@@ -868,8 +874,29 @@ sub jquery_js_response {
     open my $fh, '<:raw', $path or die "Unable to read $path: $!";
     local $/;
     my $content = <$fh>;
-    close $fh or die "Unable to close $path: $!";    # uncoverable branch true
+    close $fh or die "Unable to close $path: $!";
     return [ 200, 'application/javascript; charset=utf-8', $content ];
+}
+
+# _page_raw_instruction($page)
+# Returns the page's stored raw instruction text, falling back to the
+# canonical instruction when no raw text was recorded.
+# Input: page document object.
+# Output: instruction text string.
+sub _page_raw_instruction {
+    my ($page) = @_;
+    my $raw = $page->{meta}{raw_instruction};
+    return $raw ? $raw : $page->canonical_instruction;
+}
+
+# _file_is_readable($path)
+# Reports whether the current process may read one path. Kept as its own
+# helper so tests can model an unreadable file even when running as root.
+# Input: file path string.
+# Output: true when the path is readable.
+sub _file_is_readable {
+    my ($path) = @_;
+    return -r $path;
 }
 
 # _bundled_public_asset_path($type, $file)
@@ -882,7 +909,7 @@ sub _bundled_public_asset_path {
     die 'asset type is required' if !defined $type || $type eq '';
     die 'asset file is required' if !defined $file || $file eq '';
 
-    my $module_source = $MODULE_SOURCE_PATH || File::Spec->rel2abs( __FILE__, $ORIG_CWD );    # uncoverable condition false
+    my $module_source = $MODULE_SOURCE_PATH ? $MODULE_SOURCE_PATH : File::Spec->rel2abs( __FILE__, $ORIG_CWD );
     my $module_dir    = dirname($module_source);
     my @candidates;
 
@@ -1027,6 +1054,7 @@ sub legacy_app_response {
         id           => $args{id},
         query_params => $params,
         body_params  => $body_params,
+        raw_query    => $args{query},
         remote_addr  => $args{remote_addr},
         headers      => $args{headers} || {},
     );
@@ -1125,15 +1153,15 @@ sub page_source_response {
     my ( $params, $body_params ) = $self->_request_params(%args);
     my $page = $self->_load_editable_named_page( $args{id} );
     return [ 404, 'text/plain; charset=utf-8', "Not found\n" ] if !$page;
-    $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;    # uncoverable condition false
+    $page->{meta}{raw_instruction} = _page_raw_instruction($page);
     $page = $self->_page_with_runtime_state(
         $page,
         query_params => $params,
         body_params  => $body_params,
-        path         => $args{path} || '/app/' . $args{id} . '/source',
+        path         => $args{path} ? $args{path} : '/app/' . $args{id} . '/source',
         remote_addr  => $args{remote_addr},
         headers      => $args{headers} || {},
-    );    # uncoverable condition false
+    );
     $page = $self->{runtime}->prepare_page(
         page            => $page,
         source          => $page->{meta}{source_kind} || 'saved',
@@ -1174,7 +1202,7 @@ sub page_edit_post_response {
             }
         }
         my $mode = $params->{mode} || $body_params->{mode} || 'edit';
-        my $request_path = $args{path} || '/app/' . $args{id} . '/edit';    # uncoverable condition false
+        my $request_path = $args{path} ? $args{path} : '/app/' . $args{id} . '/edit';
         $request_path = '/app/' . $args{id} if $mode eq 'render' && $source_kind eq 'skill';
         $page = $self->_page_with_runtime_state(
             $page,
@@ -1204,15 +1232,15 @@ sub page_edit_response {
     my ( $params, $body_params ) = $self->_request_params(%args);
     my $page = $self->_load_editable_named_page( $args{id} );
     return $self->_missing_named_page_response( $args{id} ) if !$page;
-    $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;    # uncoverable condition false
+    $page->{meta}{raw_instruction} = _page_raw_instruction($page);
     $page = $self->_page_with_runtime_state(
         $page,
         query_params => $params,
         body_params  => $body_params,
-        path         => $args{path} || '/app/' . $args{id} . '/edit',
+        path         => $args{path} ? $args{path} : '/app/' . $args{id} . '/edit',
         remote_addr  => $args{remote_addr},
         headers      => $args{headers} || {},
-    );    # uncoverable condition false
+    );
     $page = $self->{runtime}->prepare_page(
         page            => $page,
         source          => $page->{meta}{source_kind} || 'saved',
@@ -1233,10 +1261,10 @@ sub page_action_response {
         $page,
         query_params => $params,
         body_params  => $body_params,
-        path         => $args{path} || '/app/' . $args{id} . '/action/' . $args{action_id},
+        path         => $args{path} ? $args{path} : '/app/' . $args{id} . '/action/' . $args{action_id},
         remote_addr  => $args{remote_addr},
         headers      => $args{headers} || {},
-    );    # uncoverable condition false
+    );
     $page = $self->{runtime}->prepare_page(
         page            => $page,
         source          => $page->{meta}{source_kind} || 'saved',
@@ -1317,7 +1345,7 @@ sub _load_skill_named_page {
             route_id   => $route_id,
         );
     };
-    return if !$page || $@;    # uncoverable condition right
+    return if !$page;
     return $self->_decorate_skill_page_routes($page);
 }
 
@@ -1377,7 +1405,7 @@ sub _page_route_urls {
 # Output: response array reference.
 sub _page_response {
     my ( $self, $page, $mode ) = @_;
-    my $source = $page->{meta}{raw_instruction} || $page->canonical_instruction;    # uncoverable condition false
+    my $source = _page_raw_instruction($page);
 
     if ( $mode eq 'source' ) {
         return _no_editor_response() if $self->_editor_disabled;
@@ -1397,14 +1425,14 @@ sub _page_response {
 # Output: HTML string.
 sub _edit_html {
     my ( $self, $page ) = @_;
-    my $raw_source = $page->{meta}{raw_instruction} || $page->canonical_instruction;    # uncoverable condition false
+    my $raw_source = _page_raw_instruction($page);
     my $source = $raw_source;
     $source =~ s/&/&amp;/g;
     $source =~ s/</&lt;/g;
     $source =~ s/>/&gt;/g;
 
     my $urls = $self->_page_route_urls($page);
-    my $form_action = $urls->{form_action} || '/';    # uncoverable condition right
+    my $form_action = $urls->{form_action};
 
     my $title = $page->as_hash->{title};
     $title =~ s/&/&amp;/g;
@@ -1589,7 +1617,7 @@ function ddHighlightLine(line, state) {
 function ddHighlightSectionText(text, state) {
   const section = state.section || '';
   if (/^CODE\d+$/.test(section)) return ddHighlightPerlLine(text);
-  if (section === 'HTML') return ddHighlightHtmlLine(text, state);
+  if (section === 'HEAD' || section === 'HTML') return ddHighlightHtmlLine(text, state);
   if (section === 'STASH' || section === 'NOTE') return ddHighlightNoteLine(text);
   return ddEscapeHtml(text);
 }
@@ -2048,7 +2076,7 @@ sub _highlight_section_text {
     my ( $self, $text, $state ) = @_;
     my $section = $state->{section} || '';
     return $self->_highlight_perl_text($text) if $section =~ /^CODE\d+$/;
-    return $self->_highlight_html_text( $text, $state ) if $section eq 'HTML';
+    return $self->_highlight_html_text( $text, $state ) if $section eq 'HEAD' || $section eq 'HTML';
     return $self->_highlight_note_text($text) if $section eq 'STASH' || $section eq 'NOTE';
     return _escape_html($text);
 }
@@ -2320,7 +2348,7 @@ sub _nav_items_html {
     my $current_page = $runtime_context->{current_page} || '';
     for my $nav_id (@nav_ids) {
         my $nav_page = eval { $self->_load_named_page($nav_id) };
-        next if !$nav_page || $@;    # uncoverable condition right
+        next if !$nav_page;
         $nav_page->{meta}{raw_instruction} = $nav_page->canonical_instruction;
         $nav_page = $self->{runtime}->prepare_page(
             page            => $self->_page_with_runtime_state(
@@ -2448,8 +2476,18 @@ sub _encoded_action_response {
 # Output: page document object.
 sub _load_named_page {
     my ( $self, $id ) = @_;
-    return $self->{resolver}->load_named_page($id) if $self->{resolver};
-    return $self->{pages}->load_saved_page($id);
+    my $page = eval {
+        $self->{resolver}
+          ? $self->{resolver}->load_named_page($id)
+          : $self->{pages}->load_saved_page($id);
+    };
+    return $page if defined $page;
+    # Legacy saved-url bookmarks are intentionally not instruction documents.
+    # Let the caller's raw-entry forwarding path handle them instead of leaking
+    # PageDocument's parser error to the user.
+    return if $@ =~ /Instruction document did not contain any sections/;
+    die $@ if $@;
+    return;
 }
 
 # _legacy_app_response(%args)
@@ -2478,20 +2516,48 @@ sub _legacy_app_response {
     }
 
     my $raw = eval { $self->{pages}->read_saved_entry($id) };
-    if ( !defined $raw || $@ ) {    # uncoverable condition right
+    if ( !defined $raw ) {
         my $skill_response = $self->_skill_app_fallback_response( id => $id, %args );
         return $skill_response if $skill_response;
         return $self->_missing_named_page_response($id);
     }
     my $target = _trim($raw);
     my $uri = URI->new($target);
+    # A scheme-relative //host/path target parses as URI::_generic, which has no
+    # host() or port(); read the authority from an http: copy of the same target.
+    my $scheme_relative = !defined $uri->scheme && $target =~ m{\A//};
+    my $authority_uri   = $scheme_relative ? URI->new("http:$target") : $uri;
+    my $has_external_authority = ( defined $uri->scheme && $uri->scheme ne '' )
+      || ( $scheme_relative && ( $authority_uri->host // '' ) ne '' );
+    if ($has_external_authority) {
+        my $scheme = lc( $uri->scheme || 'http' );
+        return [ 400, 'text/plain; charset=utf-8', "Unsupported bookmark URL scheme\n" ]
+          if $scheme ne 'http' && $scheme ne 'https';
+
+        my $port = defined $ENV{_PORT} ? $ENV{_PORT} : '';
+        my $is_local_token = $scheme eq 'http'
+          && ( $authority_uri->host || '' ) eq '127.0.0.1'
+          && $port ne ''
+          && defined $authority_uri->port
+          && $authority_uri->port eq $port
+          && ( $authority_uri->query || '' ) =~ /(?:^|&)token=/;
+        if ( !$is_local_token ) {
+            return $self->_legacy_external_redirect_response(
+                target    => $target,
+                raw_query => $args{raw_query},
+                params    => { %{ $args{query_params} || {} }, %{ $args{body_params} || {} } },
+            );
+        }
+    }
     my $path = $uri->path;
+    return [ 400, 'text/plain; charset=utf-8', "Invalid bookmark target\n" ] if !defined $path || $path eq '';
     my %bookmark_params = _parse_query( scalar( $uri->query // '' ) );
     my %forward_params = (
         %bookmark_params,
         %{ $args{query_params} || {} },
         %{ $args{body_params}  || {} },
     );
+    _resolve_legacy_selected_params(\%forward_params);
     my $query = _build_query( \%forward_params );
     return $self->dispatch_request(
         path        => $path,
@@ -2501,6 +2567,46 @@ sub _legacy_app_response {
         remote_addr => $args{remote_addr},
         headers     => $args{headers} || {},
     );
+}
+
+# _legacy_external_redirect_response(%args)
+# Redirects a saved bookmark whose target is an external HTTP(S) URL.
+# Input: target URL, optional raw incoming query, and parsed request params.
+# Output: HTTP 302 response with the saved URL and incoming query appended.
+sub _legacy_external_redirect_response {
+    my ( $self, %args ) = @_;
+    my $target = $args{target} || '';
+    return [ 400, 'text/plain; charset=utf-8', "Invalid bookmark target\n" ]
+      if $target =~ /[\x00-\x1f\x7f]/;
+    my $incoming = defined $args{raw_query} && $args{raw_query} ne ''
+      ? $args{raw_query}
+      : _build_query( $args{params} || {} );
+    return [ 400, 'text/plain; charset=utf-8', "Invalid bookmark query\n" ]
+      if $incoming =~ /[\x00-\x1f\x7f]/;
+    if ( $incoming ne '' ) {
+        $target .= ( $target =~ /\?/ ? '&' : '?' ) . $incoming;
+    }
+    return [ 302, 'text/plain; charset=utf-8', "Redirecting\n", { Location => $target } ];
+}
+
+# _resolve_legacy_selected_params($params)
+# Replaces legacy array-valued parameters with the element selected by their
+# companion `name.selected.pos` field before forwarding a saved bookmark.
+# Input: mutable hash reference of bookmark and request parameters.
+# Output: none; the hash is updated in place.
+sub _resolve_legacy_selected_params {
+    my ($params) = @_;
+    return if ref($params) ne 'HASH';
+    for my $key ( keys %{$params} ) {
+        next if $key !~ /\A(.+)\.selected\.pos\z/;
+        my $name = $1;
+        my $value = $params->{$name};
+        next if ref($value) ne 'ARRAY';
+        my $position = $params->{$key};
+        next if !defined $position || $position !~ /\A\d+\z/;
+        next if $position >= @{$value};
+        $params->{$name} = $value->[$position];
+    }
 }
 
 # _skill_app_fallback_response(%args)
@@ -2671,7 +2777,7 @@ sub _build_query {
 
 # _legacy_ajax_response(%args)
 # Decodes and executes an older /ajax token payload.
-# Input: request params and metadata.
+# Input: request params and metadata, including optional skill layer roots.
 # Output: response array reference.
 sub _legacy_ajax_response {
     my ( $self, %args ) = @_;
@@ -2717,6 +2823,7 @@ sub _legacy_ajax_response {
                         page          => $params->{page} || '',
                         type          => $type,
                         params        => $params,
+                        skill_layers  => $args{skill_layers},
                         stdout_writer => $writer,
                         stderr_writer => $writer,
                     );
@@ -2732,7 +2839,7 @@ sub _legacy_ajax_response {
                     stderr_writer   => $writer,
                     return_writer   => $writer,
                 );
-                $writer->( $result->{error} ) if defined $result->{error} && $result->{error} ne '';    # uncoverable condition left
+                $writer->( $result->{error} ) if $result->{error} ne '';
             },
         },
     ];
@@ -3028,7 +3135,7 @@ sub _top_context_html {
     my $ctx = $page->{meta}{request_context} || {};
     my $user = (
         ( $ctx->{tier} || '' ) eq 'helper' && ( $ctx->{username} || '' ) ne ''
-    ) ? $ctx->{username} : ( $ENV{USER} || eval { getpwuid($<) } || 'user' );    # uncoverable condition right count:2
+    ) ? $ctx->{username} : ( $ENV{USER} || eval { getpwuid($<) } || 'user' );
     my $host = $ctx->{host} || '';
     $host =~ s/^https?:\/\///;
     $host =~ s/\/.*$//;
@@ -3263,10 +3370,10 @@ sub _serve_static_file_from_roots {
     my $file_path = '';
     for my $public_dir (@public_roots) {
         my $candidate = File::Spec->catfile( $public_dir, $filename );
-        my $real_path = eval { File::Spec->rel2abs($candidate) } || '';    # uncoverable condition right
+        my $real_path = File::Spec->rel2abs($candidate);
         my $quoted_public = quotemeta($public_dir);
         next if $real_path !~ /^$quoted_public(?:\/|\z)/;
-        next if !-f $candidate || !-r $candidate;
+        next if !-f $candidate || !_file_is_readable($candidate);
         $file_path = $candidate;
         last;
     }
@@ -3375,7 +3482,8 @@ sub _static_path_contained {
 # _serve_static_file_at_path($type, $filename, $file_path, $default_type, $allowed_roots)
 # Serves one already-resolved static file path after the caller has chosen the
 # lookup source, refusing any resolved path that escapes the caller's allowed
-# public roots.
+# public roots. Missing, unreadable, or permission-denied paths return 404;
+# unexpected operating-system open failures remain visible as 500 responses.
 # Input: asset type string, request filename string, resolved file path string,
 # optional explicit mime type override, and array reference of allowed root
 # directories the resolved path must stay inside.
@@ -3383,16 +3491,32 @@ sub _static_path_contained {
 sub _serve_static_file_at_path {
     my ( $self, $type, $filename, $file_path, $default_type, $allowed_roots ) = @_;
     return [ 404, 'text/plain; charset=utf-8', "Not Found\n" ]
-      if !defined $file_path || $file_path eq '' || !-f $file_path || !-r $file_path;
+      if !defined $file_path || $file_path eq '' || !-f $file_path || !_file_is_readable($file_path);
     return [ 404, 'text/plain; charset=utf-8', "Not Found\n" ]
       if !_static_path_contained( $file_path, $allowed_roots );
     my $content_type = defined $default_type && $default_type ne ''
       ? _ajax_content_type($default_type)
       : $self->_get_content_type( $type, $filename );
-    open my $fh, '<', $file_path or return [ 500, 'text/plain; charset=utf-8', "Internal Server Error\n" ];    # uncoverable branch true
+    my ( $fh, $open_error ) = _open_static_file($file_path);
+    if ( !$fh ) {
+        return [ 404, 'text/plain; charset=utf-8', "Not Found\n" ]
+          if $open_error == EACCES || $open_error == EPERM;
+        return [ 500, 'text/plain; charset=utf-8', "Internal Server Error\n" ];
+    }
     my $content = do { local $/; <$fh> };
     close $fh;
     return [ 200, $content_type, $content ];
+}
+
+# _open_static_file($path)
+# Opens one already-validated static asset without converting operating-system
+# permission failures into a server error that reveals the file exists.
+# Input: absolute static-file path string.
+# Output: filehandle and zero on success, or undef and numeric errno on failure.
+sub _open_static_file {
+    my ($path) = @_;
+    open my $fh, '<', $path or return ( undef, 0 + $! );
+    return ( $fh, 0 );
 }
 
 # _get_content_type($type, $filename)
@@ -3505,6 +3629,19 @@ clients and browsers too old to send it working unchanged.
 =head2 new, handle
 
 Construct and dispatch the local web application.
+
+=head2 legacy_app_response
+
+Loads a saved C</app/E<lt>idE<gt>> bookmark. Structured bookmark documents
+render normally; raw local route bookmarks are forwarded internally with
+bookmark and request parameters merged, including legacy
+C<E<lt>nameE<gt>.selected.pos> array selection. Raw HTTP(S) URL bookmarks
+return a C<302> redirect with the request query appended. Unsupported URL
+schemes and malformed targets are rejected.
+
+Input: saved bookmark id and normalized request metadata.
+Output: response array reference of status, content type, body, and optional
+headers.
 
 =head2 _serve_static_file($type, $filename)
 

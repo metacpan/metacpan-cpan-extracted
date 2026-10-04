@@ -14,7 +14,11 @@ use Test::More;
 use version ();
 use Archive::Tar;
 
+plan skip_all => 'source-tree release metadata/citation gate; installed tarballs omit checkout-only files'
+    if !-e '.git';
+
 my $ROOT = abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
+my %tracked_repo_paths = _tracked_repo_paths();
 
 my $pm = _slurp( _repo_path('lib', 'Developer', 'Dashboard.pm') );
 my $readme = _slurp_optional( _repo_path('README.md') );
@@ -37,7 +41,9 @@ my $makefile = _slurp( _repo_path('Makefile.PL') );
 my $agents_override = _slurp_optional( _repo_path('AGENTS.override.md') );
 my $security_pod = _slurp_optional( _repo_path('SECURITY.pod') );
 my $contributing_pod = _slurp_optional( _repo_path('CONTRIBUTING.pod') );
-my @doc_paths = grep { -e $_ } (
+my @doc_paths = grep {
+    -e $_ && $tracked_repo_paths{ File::Spec->abs2rel( $_, $ROOT ) }
+} (
     _repo_path('README.md'),
     _repo_path('SKILL.md'),
     _repo_path('FIXED_BUGS.md'),
@@ -49,6 +55,7 @@ my @doc_paths = grep { -e $_ } (
     _repo_path('TEST_PLAN.md'),
     _repo_path( 'doc', 'architecture.md' ),
     _repo_path( 'doc', 'command-suggestions.md' ),
+    _repo_path( 'doc', 'docker-cli.md' ),
     _repo_path( 'doc', 'docker-service-toggle.md' ),
     _repo_path( 'doc', 'housekeeper-rotation.md' ),
     _repo_path( 'doc', 'install-bootstrap.md' ),
@@ -82,7 +89,8 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '4.45', 'repo version bumped at DD-942\'s distro-column gate per owner instruction 2026-09-16 (version bump now happens per-ticket in the distro column, not only at the epic-level VERSION GATE): DD-942 (close Ask.pm\'s pre-existing branch/condition coverage gap)' );
+my ($dist_version) = $dist =~ /^version = (\S+)$/m;
+is( $version, $dist_version, 'release version matches dist.ini, including the security fixes already released' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 {
     my @module_files;
@@ -110,7 +118,13 @@ like(
     'README.md is generated from the canonical POD source',
 ) if $readme ne '';
 like( $dist, qr/^\[Prereqs \/ ConfigureRequires\]$/m, 'dist.ini declares explicit configure prerequisites for packaged installs' );
+like(
+    $dist,
+    qr/^exclude_match = \^cover_db\(\?:_\[\^\/\]\+\)\?\(\?:\/\|\$\)/m,
+    'dist.ini excludes root coverage databases and their contents from the release tarball',
+);
 like( $dist, qr/^File::ShareDir::Install = 0$/m, 'dist.ini declares File::ShareDir::Install as a configure prerequisite so packaged installs refresh shipped helper assets' );
+like( $dist, qr/^\[UploadToCPAN\]$/m, 'dist.ini configures an explicit CPAN releaser for the deliberate release command' );
 like( $cpanfile, qr/on 'configure' => sub \{\s*requires 'File::ShareDir::Install';\s*\};/s, 'cpanfile declares File::ShareDir::Install during configure so local cpanm installs refresh shipped helper assets' );
 ok( -f $readme_sync_script, 'checkout README sync script is tracked' );
 if ( $readme ne '' ) {
@@ -134,6 +148,8 @@ is(
 );
 if ( $dist ne '' ) {
     like( $dist, qr/^version = \Q$version\E$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^prune_directory = \^\\\.developer-dashboard\$$/m,
+        'dist.ini prunes the local runtime tree before gathering files for a distribution build' );
     like( $dist, qr/^license = MIT$/m, 'dist.ini declares the canonical MIT distribution license' );
     {
         my $fixture = tempdir( CLEANUP => 1 );
@@ -166,7 +182,9 @@ if ( $dist ne '' ) {
     like( $dist, qr/^skip = \^Module::CPANTS::Analyse\$$/m, 'dist.ini skips release-only Module::CPANTS::Analyse from generated install-time prereqs' );
     like( $dist, qr/^skip = \^Module::CPANTS::Kwalitee\$$/m, 'dist.ini skips release-only Module::CPANTS::Kwalitee from generated install-time prereqs' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
-    like( $dist, qr/^exclude_match = \^cover_db\/$/m, 'dist.ini excludes cover_db so coverage artifacts do not leak into release tarballs' );
+    like( $dist, qr/^exclude_match = \^cover_db\(\?:_\[\^\/\]\+\)\?\(\?:\/\|\$\)$/m, 'dist.ini excludes root coverage databases and their contents from release tarballs' );
+    like( $dist, qr/^package = env$/m, 'dist.ini prevents the env helper package from being advertised as a standalone module' );
+    like( $dist, qr/^package = Developer::Dashboard::Handle::Proxy$/m, 'dist.ini prevents the nested handle proxy package from being advertised as a standalone module' );
     like( $dist, qr/^exclude_match = \^node_modules\/$/m, 'dist.ini excludes node_modules so JavaScript dependency trees do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^test_by_michael\/$/m, 'dist.ini excludes test_by_michael so private scratch fixtures do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^updates\/$/m, 'dist.ini excludes checkout-only update scripts so user-defined update remains the installed runtime contract' );
@@ -246,7 +264,7 @@ my %runtime_prereq_minimum = (
     'IO::Compress::Gzip'     => '2.220',
     'IO::Uncompress::Gunzip' => '2.220',
     'Cpanel::JSON::XS'       => '4.41',
-    'Dancer2'                => '0.206000',
+    'Dancer2'                => '2.2.0',
     'YAML'                   => '1.28',
     'Plack'                  => '1.0054',
     'Socket'                 => '2.041',
@@ -293,7 +311,7 @@ for my $uri_module (qw(URI URI::Escape)) {
         "the canonical runtime floor for $uri_module is at least 5.36, so the declared chain cannot permit CVE-2026-19953"
     ) or diag( "canonical floor for $uri_module is " . ( defined $declared ? "'$declared'" : 'undefined' ) );
 }
-for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket workspace path paths ps1 encode decode indicator collector config auth api ask init cpan page action docker serve stop restart shell doctor housekeeper skills which upgrade)) {
+for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file workspace path paths ps1 encode decode indicator collector config auth api ask init cpan page action docker serve stop restart shell doctor housekeeper skills which upgrade)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
 }
 ok( -f _repo_path( 'share', 'public', 'js', 'jquery-4.0.0.min.js' ), 'share/public/js/jquery-4.0.0.min.js is shipped as a bundled public asset' );
@@ -328,6 +346,19 @@ my @operator_local_files = qw(
 );
 {
     my $dist = _slurp( _repo_path('dist.ini') );
+    like(
+        $dist,
+        qr/^exclude_filename = nytprof\.out$/m,
+        'dist.ini excludes a stray nytprof.out profiling artifact from release tarballs (DD-950)',
+    );
+    my $gitignore = _slurp( _repo_path('.gitignore') );
+    for my $nytprof_pattern (qw(nytprof.out nytprof/)) {
+        like(
+            $gitignore,
+            qr/^\Q$nytprof_pattern\E$/m,
+            "$nytprof_pattern is git-ignored so a stray profiler run does not create an untracked leak candidate (DD-950)",
+        );
+    }
     for my $operator_file (@operator_local_files) {
         like(
             $dist,
@@ -359,6 +390,7 @@ my @operator_local_files = qw(
         logs/ft99.log
         Developer-Dashboard-9.99/lib/Developer/Dashboard.pm
         dogfood-output/screenshot.png
+        pax-output/d2
         .worktrees/dd-432/lib/Developer/Dashboard.pm
         .developer-dashboard/config/auth.json
         _developer-dashboard/config/auth.json
@@ -374,6 +406,14 @@ my @operator_local_files = qw(
         blogs/2026-release-notes.md
     );
     ok( $excluded->($_), "dist.ini exclusions actually match $_ so it cannot be gathered" ) for @must_be_excluded;
+
+    my @prune_directory = map { qr/$_/ } ( $dist_ini =~ /^prune_directory = (.+)$/mg );
+    my $pruned = sub {
+        my ($directory) = @_;
+        return scalar grep { $directory =~ $_ } @prune_directory;
+    };
+    ok( $pruned->($_), "dist.ini prunes excluded generated directory $_ before walking it" )
+      for qw(.worktrees node_modules test_by_michael);
 
     # DERIVE BOTH HALVES, NOT ONE. The patterns above are compiled out of
     # dist.ini, so a new exclusion is picked up automatically - but the sample
@@ -426,7 +466,6 @@ my @required_tarball_paths = (
     "Developer-Dashboard-$version/share/public/js/jquery-4.0.0.min.js",
     "Developer-Dashboard-$version/share/public/others/favicon.ico",
     "Developer-Dashboard-$version/doc/integration-test-plan.md",
-    "Developer-Dashboard-$version/doc/install-bootstrap.md",
     "Developer-Dashboard-$version/doc/testing.md",
     "Developer-Dashboard-$version/doc/windows-testing.md",
     "Developer-Dashboard-$version/integration/blank-env/run-integration.pl",
@@ -434,6 +473,8 @@ my @required_tarball_paths = (
     "Developer-Dashboard-$version/integration/windows/run-qemu-windows-smoke.sh",
     "Developer-Dashboard-$version/integration/windows/run-strawberry-smoke.ps1",
 );
+push @required_tarball_paths, "Developer-Dashboard-$version/doc/install-bootstrap.md"
+  if $tracked_repo_paths{'doc/install-bootstrap.md'};
 my $matching_tarball = _repo_path("Developer-Dashboard-$version.tar.gz");
 SKIP: {
     skip "matching release tarball $matching_tarball has not been built yet",
@@ -520,6 +561,14 @@ SKIP: {
             "release tarball carries no $leak_prefix/ member",
         );
     }
+    # DD-950: a stray NYTProf profiling artifact leaked into the 4.46 tarball
+    # because nothing named it - dist.ini gathers from disk (GatherDir), so an
+    # untracked, ungitignored file left behind by a local `perl -d:NYTProf` run
+    # ships exactly like a real source file. Same class of gap as the operator
+    # files above, different cause (a dev-tool artifact, not a rules file).
+    my @nytprof_leaked = grep { m{^Developer-Dashboard-\Q$version\E/nytprof(?:\.out|/)} } @files;
+    is( scalar @nytprof_leaked, 0, 'release tarball carries no nytprof.out or nytprof/ member' );
+
     my $meta_member = "Developer-Dashboard-$version/META.json";
     ok( $files{$meta_member}, 'matching release tarball ships META.json for packaged prerequisite assertions' );
     my $meta_content = $tar->get_content($meta_member);
@@ -649,13 +698,13 @@ for my $doc ( grep { defined && $_ ne '' } ( $skill_guide, $skills_pod ) ) {
 
 for my $path (@doc_paths) {
     my $doc = _slurp($path);
-    unlike( $doc, qr/\blegacy\b/i, "$path no longer mentions the retired internal wording" );
+    unlike( _strip_legacy_namespace_mentions($doc), qr/\blegacy\b/i, "$path no longer mentions the retired internal wording" );
     unlike( $doc, qr/`FORM\.TT:`|`FORM:`|\bFORM\.TT\b/, "$path no longer documents removed FORM bookmark directives" );
 }
 
 for my $path (@pod_paths) {
     my $pod = _extract_pod( _slurp($path) );
-    unlike( $pod, qr/\blegacy\b/i, "$path POD no longer mentions the retired internal wording" );
+    unlike( _strip_legacy_namespace_mentions($pod), qr/\blegacy\b/i, "$path POD no longer mentions the retired internal wording" );
     unlike( $pod, qr/C<FORM\.TT:>|C<FORM:>|\bFORM\.TT\b/, "$path POD no longer documents removed FORM bookmark directives" );
 }
 
@@ -786,27 +835,6 @@ unlike(
     'main module product manual avoids brittle private-module POD links and stays self-contained',
 );
 
-{
-    # DD-943: t/183-pax-cli-build-run-contract.t creates t/tmp-sow03/ as a
-    # deliberately minimal/POD-less fixture scratch directory and leaves it
-    # on disk after running (gitignored, cleaned only at t/183's own START,
-    # not its end). _perl_doc_paths() must exclude it the same way it
-    # excludes /lib/Developer/Dashboard/Pax and /t/fixtures/, or this test
-    # incorrectly fails whenever t/183 happens to run first in the same
-    # `prove` process.
-    my $stray_dir = _repo_path( 't', 'tmp-sow03', 'dd943-stray' );
-    make_path($stray_dir);
-    my $stray_file = File::Spec->catfile( $stray_dir, 'Fixture.pm' );
-    open my $fh, '>', $stray_file or die "Unable to write $stray_file: $!";
-    print {$fh} "package DD943::Fixture;\n1;\n";
-    close $fh;
-    my @paths = _perl_doc_paths();
-    my ($found) = grep { $_ eq $stray_file } @paths;
-    ok( !$found, 'DD-943: _perl_doc_paths() excludes a stray fixture under t/tmp-sow03/' );
-    require File::Path;
-    File::Path::remove_tree( _repo_path( 't', 'tmp-sow03' ) );
-}
-
 for my $path ( _perl_doc_paths() ) {
     my $content = _slurp($path);
     like( $content, qr/^__END__$/m, "$path keeps Perl POD after __END__" );
@@ -921,6 +949,30 @@ sub _repo_path {
     return File::Spec->catfile( $ROOT, @_ );
 }
 
+sub _tracked_repo_paths {
+    my ( $stdout, $stderr, $exit ) = capture {
+        system( 'git', '-C', $ROOT, 'ls-files', '-z' );
+    };
+    die "git ls-files failed while checking tracked release inputs: $stderr"
+      if $exit != 0 || $stderr ne '';
+    return map { $_ => 1 } grep { $_ ne '' } split /\0/, $stdout;
+}
+
+# DD-941 (owner decision, Q-179: widen the allow-list to the phrase, not just
+# the identifier): the retired-internal-wording gate below bans the bare word
+# "legacy" case-insensitively, but __PAX_RUNTIME_LEGACY_NAMESPACE__ is a real,
+# current, shipping identifier, and FIXED_BUGS.md's append-only entries also
+# describe it in prose as a "legacy-namespace alias" without the identifier
+# literally present on that line (e.g. the DD-931 4.37 entry). Both are the
+# same real technical term, not leftover retired wording, so both are exempt
+# here - everything else still trips the plain /\blegacy\b/i check.
+sub _strip_legacy_namespace_mentions {
+    my ($text) = @_;
+    $text =~ s/__PAX_RUNTIME_LEGACY_NAMESPACE__//gi;
+    $text =~ s/legacy-namespace//gi;
+    return $text;
+}
+
 sub _extract_pod {
     my ($content) = @_;
     return '' if $content !~ /\n__END__\n/s;
@@ -950,14 +1002,6 @@ sub _perl_doc_paths {
                 wanted   => sub {
                     return if !-f $_;
                     return if $_ =~ m{/OLD_CODE/};
-                    # DD-943: t/183-pax-cli-build-run-contract.t leaves its
-                    # own deliberately minimal/POD-less scratch fixtures on
-                    # disk under t/tmp-sow03/ after it runs - exclude them
-                    # the same way /lib/Developer/Dashboard/Pax and
-                    # /t/fixtures/ are already excluded elsewhere in this
-                    # file, or this sweep fails whenever t/183 happens to
-                    # run before t/15 in the same prove process.
-                    return if $_ =~ m{/t/tmp-sow03/};
                     return if $_ !~ /\.(?:pm|pl|t)\z/ && $_ !~ m{/share/private-cli/[^/]+\z};
                     push @paths, $File::Find::name;
                 },
@@ -983,6 +1027,11 @@ sub _test_citation_population {
                 wanted   => sub {
                     return if !-f $_;
                     return if $_ !~ /\.md\z/;
+                    # This locally ignored coverage work log is intentionally
+                    # outside the shipped/repository documentation set while
+                    # Problem 20 is paused; its historical PAX test references
+                    # describe tests removed with the retired subsystem.
+                    return if $File::Find::name eq _repo_path( 'doc', 'problem-20-report.md' );
                     push @paths, $File::Find::name;
                 },
             },
@@ -1098,16 +1147,7 @@ sub _repo_search_without_self {
     FILE:
     for my $path ( sort grep { !$seen{$_}++ } @files ) {
         next if $path eq $self;
-        # DD-882: the vendored PAX compiler (lib/Developer/Dashboard/Pax/*)
-        # and its own ported test fixtures/build-artifact scratch dirs carry
-        # third-party source whose own literal strings (e.g. PAX's own
-        # `api-dashboard.page` page-name pattern in an unrelated page-runtime
-        # regex) can coincidentally match this repo-history search without
-        # being a reference to THIS project's own extracted API/SQL
-        # dashboard feature - the thing this check actually exists to catch.
-        next if $path =~ m{/lib/Developer/Dashboard/Pax(?:/|\.pm\z)};
         next if $path =~ m{/t/fixtures/};
-        next if $path =~ m{/t/tmp-sow03/};
         my $content = _slurp($path);
         my @lines   = split /\n/, $content, -1;
         for my $index ( 0 .. $#lines ) {

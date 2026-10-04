@@ -334,7 +334,6 @@ my %NODE24_PIN_FLOOR = (
 
 my @ALL_WORKFLOWS = qw(
   .github/workflows/test.yml
-  .github/workflows/release-cpan.yml
   .github/workflows/codeql.yml
   .github/workflows/package-ghcr.yml
   .github/workflows/fuzz-js.yml
@@ -407,19 +406,9 @@ for my $workflow (@ALL_WORKFLOWS) {
     unlike( $text, qr/curl\s+-L\s+https:\/\/cpanmin\.us\s*\|\s*perl/, "$workflow does not install cpanm via curl pipe" );
 }
 
-my $release_cpan_workflow = _slurp('.github/workflows/release-cpan.yml');
-like( $release_cpan_workflow, qr/Developer-Dashboard-\*\.tar\.gz/, 'PAUSE release workflow locates dzil tarballs from the repo root instead of a nonexistent .build tree' );
-unlike( $release_cpan_workflow, qr/\.build\/\*\.tar\.gz/, 'PAUSE release workflow no longer looks for tarballs under a nonexistent .build directory' );
-like(
-    $release_cpan_workflow,
-    qr/script\/coverage-gate/,
-    'PAUSE release workflow enforces the same all-metric lib coverage gate as the main CI workflow',
-);
-
 for my $coverage_workflow (
     qw(
     .github/workflows/test.yml
-    .github/workflows/release-cpan.yml
     .github/workflows/release-github.yml
     )
   )

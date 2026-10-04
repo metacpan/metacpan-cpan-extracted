@@ -3,7 +3,7 @@ package Developer::Dashboard::Platform;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Exporter 'import';
 use File::Basename qw(basename dirname);
@@ -100,7 +100,7 @@ sub native_shell_name {
 sub normalize_shell_name {
     my ($shell) = @_;
     $shell = native_shell_name() if !defined $shell || $shell eq '';
-    $shell =~ s{.*[\\/]}{} if defined $shell;    # uncoverable branch false
+    $shell =~ s{.*[\\/]}{};
     $shell = lc( $shell || '' );
 
     return 'powershell' if $shell eq 'ps' || $shell eq 'powershell.exe';
@@ -117,7 +117,7 @@ sub shell_command_argv {
     my ( $command, %args ) = @_;
     die "Missing shell command\n" if !defined $command;
 
-    my $shell = normalize_shell_name( $args{shell} || native_shell_name() );    # uncoverable condition false
+    my $shell = normalize_shell_name( $args{shell} || native_shell_name() );
     my $login = $args{login} ? 1 : 0;
     return ( $shell, $login ? '-lc' : '-c', $command ) if $shell eq 'bash' || $shell eq 'zsh' || $shell eq 'sh';
     return ( $shell, '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', $command )
@@ -388,7 +388,7 @@ sub _cmd_binary {
 # Output: executable path or command name string.
 sub _posix_shell_binary {
     my ($preferred) = @_;
-    return command_in_path($preferred) || command_in_path('sh') || $preferred;    # uncoverable condition false
+    return command_in_path($preferred) || command_in_path('sh') || $preferred;
 }
 
 # _module_lib_root()
@@ -407,13 +407,49 @@ sub _module_lib_root {
 # source file's own directory> (Go 1.20+) so go.mod discovery starts at the
 # file's own skill layer instead of walking up from the caller's cwd - a
 # bare `go run <path>` silently misses a skill's own go.mod unless the
-# caller happens to already be inside that directory tree (DD-825).
+# caller happens to already be inside that directory tree (DD-825). When a
+# go.mod is found, GOMODCACHE/GOCACHE are also pointed at that layer's own
+# local/go-cache/ directory (DD-951) so two skills never share one global
+# module/build cache, mirroring DD-823's per-pom Maven build and DD-824's
+# per-skill venv. A skill with no go.mod is unaffected - the env vars are
+# only set when a real module file was found.
 # Input: Go source file path plus passthrough argv.
 # Output: does not return on success; dies when exec fails.
 sub _exec_go_source {
     my ( $path, @args ) = @_;
     die "Missing Go source path\n" if !defined $path || $path eq '';
-    $EXEC_LAUNCHER->( 'go', 'run', '-C', dirname($path), $path, @args ) or die "Unable to exec go run for $path: $!";
+    my $dir = dirname($path);
+    my $go_mod = _find_layer_go_mod($dir);
+    my ( $mod_cache, $build_cache );
+    if ( defined $go_mod ) {
+        my $cache_root = File::Spec->catdir( dirname($go_mod), 'local', 'go-cache' );
+        $mod_cache   = File::Spec->catdir( $cache_root, 'mod' );
+        $build_cache = File::Spec->catdir( $cache_root, 'build' );
+    }
+    local $ENV{GOMODCACHE} = $mod_cache   if defined $mod_cache;
+    local $ENV{GOCACHE}    = $build_cache if defined $build_cache;
+    $EXEC_LAUNCHER->( 'go', 'run', '-C', $dir, $path, @args ) or die "Unable to exec go run for $path: $!";
+}
+
+# _find_layer_go_mod($dir)
+# Walks up from a Go source file's own directory looking for a sibling
+# go.mod - the same per-layer walk pattern _find_layer_pom uses for
+# config/pom.xml (DD-823), reused here rather than inventing a second
+# convention. Unlike pom.xml, go.mod is Go's own idiomatic module root
+# marker, so it is looked for directly beside the source tree, not under
+# a config/ subdirectory.
+# Input: starting directory path.
+# Output: absolute go.mod path string, or undef when no layer has one.
+sub _find_layer_go_mod {
+    my ($dir) = @_;
+    while (1) {
+        my $go_mod = File::Spec->catfile( $dir, 'go.mod' );
+        return $go_mod if -f $go_mod;
+        my $parent = dirname($dir);
+        last if $parent eq $dir;    # reached filesystem root
+        $dir = $parent;
+    }
+    return undef;
 }
 
 # _find_layer_pom($path)
@@ -463,7 +499,7 @@ sub _exec_java_source {
     my $build_root = tempdir( CLEANUP => 1 );
     my $source_root = tempdir( CLEANUP => 1 );
     my $staged_source = File::Spec->catfile( $source_root, $simple_class . '.java' );
-    copy( $path, $staged_source ) or die "Unable to stage Java source $path as $staged_source: $!";    # uncoverable branch true
+    copy( $path, $staged_source ) or die "Unable to stage Java source $path as $staged_source: $!";
 
     $SYSTEM_LAUNCHER->( 'javac', '-d', $build_root, $staged_source );
     my $exit_code = $? >> 8;
@@ -499,7 +535,7 @@ sub _exec_java_source_via_mvn {
 
     open my $fh, '<', $cp_file or die "Unable to read resolved classpath $cp_file: $!";
 
-    my $dependency_classpath = do { local $/; <$fh> } // '';    # uncoverable condition right
+    my $dependency_classpath = do { local $/; <$fh> };
     close $fh;
     $dependency_classpath =~ s/\s+\z//;
 

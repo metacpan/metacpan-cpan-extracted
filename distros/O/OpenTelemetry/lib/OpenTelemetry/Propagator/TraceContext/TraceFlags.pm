@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Propagator::TraceContext::TraceFlags;
 
-our $VERSION = '0.037';
+our $VERSION = '0.039';
 
 class OpenTelemetry::Propagator::TraceContext::TraceFlags {
     use OpenTelemetry::Common ();
@@ -30,7 +30,7 @@ class OpenTelemetry::Propagator::TraceContext::TraceFlags {
             $flags = 0;
         }
 
-        ( flags => $flags );
+        ( flags => $flags + 0 );
     }
 
     method to_string () { sprintf '%02x', $flags }

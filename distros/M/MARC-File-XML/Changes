@@ -1,5 +1,13 @@
 Revision history for Perl extension MARC-XML
 
+1.0.6 Sat Oct  3 04:43:39 PM EDT 2026
+       - Update how XML::LibXML::Parser is initialized to
+         ensure that external entities are not loaded;
+         looks like we can't assume that expand_entities is
+         set to 1 on all platforms (Johann Rolschewski)
+       - Do not try to read from filehandle that has reached
+         EOF to avoid noisy warns. Issue pointed out by Mark Tompsett.
+
 1.0.5 Tue May 23 21:24:18 EDT 2017
        - adjust name of distribution to avoid colliding with
          MARC-XML, as PAUSE now enforces distribution name

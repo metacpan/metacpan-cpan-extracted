@@ -6,12 +6,11 @@ use warnings;
 
 use parent 'Log::Any::Adapter::Base';
 
-use Carp;
+use Carp ();
 use Log::Abstraction;
-use Readonly::Values::Syslog 0.04;
-use Scalar::Util 'blessed';
+use Scalar::Util ();
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 NAME
 
@@ -19,7 +18,7 @@ Log::Any::Adapter::Abstraction - Log::Any adapter backed by Log::Abstraction
 
 =head1 VERSION
 
-0.35
+0.36
 
 =head1 SYNOPSIS
 
@@ -49,7 +48,8 @@ automatically send their output there.
 
 =head2 Level mapping
 
-Log::Any has nine severity levels; Log::Abstraction has six.  The mapping is:
+Each of Log::Any's nine severity levels has a Log::Abstraction method of
+the same name, except C<warning>:
 
   Log::Any level   Log::Abstraction method
   ---------------  -----------------------
@@ -59,12 +59,12 @@ Log::Any has nine severity levels; Log::Abstraction has six.  The mapping is:
   notice           notice
   warning          warn
   error            error
-  critical         error
-  alert            error
-  emergency        error
+  critical         critical
+  alert            alert
+  emergency        emergency
 
-C<critical>, C<alert>, and C<emergency> all route to C<error()> because
-Log::Abstraction follows the syslog six-level model.
+Before version 0.36, C<critical>, C<alert> and C<emergency> were all sent
+to C<error()>.
 
 =head1 METHODS
 
@@ -100,7 +100,7 @@ instance when C<instance> is not supplied.
       file   => '/var/log/myapp.log',
   );
 
-=head3 API Specification
+=head3 API SPECIFICATION
 
 =head4 Input
 
@@ -137,9 +137,8 @@ instance when C<instance> is not supplied.
 =cut
 
 # ---------------------------------------------------------------------------
-# Map Log::Any level names to Log::Abstraction dispatch method names.
-# critical, alert, and emergency all collapse to error() -- Log::Abstraction
-# follows the syslog six-level model and has no distinct level above error.
+# Map Log::Any level names to Log::Abstraction method names, which are also
+# its level names (for the is_* threshold checks).  Only 'warning' differs.
 # ---------------------------------------------------------------------------
 my %LA_TO_METHOD = (
 	trace     => 'trace',
@@ -148,22 +147,9 @@ my %LA_TO_METHOD = (
 	notice    => 'notice',
 	warning   => 'warn',
 	error     => 'error',
-	critical  => 'error',
-	alert     => 'error',
-	emergency => 'error',
-);
-
-# Map Log::Any level names to Log::Abstraction level strings for threshold checks.
-my %LA_TO_LEVEL = (
-	trace     => 'trace',
-	debug     => 'debug',
-	info      => 'info',
-	notice    => 'notice',
-	warning   => 'warn',
-	error     => 'error',
-	critical  => 'error',
-	alert     => 'error',
-	emergency => 'error',
+	critical  => 'critical',
+	alert     => 'alert',
+	emergency => 'emergency',
 );
 
 # ---------------------------------------------------------------------------
@@ -184,7 +170,7 @@ sub init {
 	# Reuse a caller-supplied Log::Abstraction instance if one was provided;
 	# anything else is a mistake, not a request for a default logger
 	if(defined(my $inst = $self->{instance})) {
-		if(!blessed($inst) || !$inst->isa('Log::Abstraction')) {
+		if(!Scalar::Util::blessed($inst) || !$inst->isa('Log::Abstraction')) {
 			Carp::croak(__PACKAGE__, ': instance must be a Log::Abstraction object');
 		}
 		$self->{_logger} = $inst;
@@ -233,11 +219,42 @@ matching L<Log::Abstraction> method (see L</Level mapping>).  These methods
 are generated when the module loads.  A croak from Log::Abstraction (e.g.
 C<croak_on_error>) is turned into a C<Carp::carp>, so logging never dies.
 
-=head3 API Specification
+=head3 API SPECIFICATION
 
 =head4 Input
 
   { message => { type => 'string' } }
+
+=head4 Output
+
+  { type => 'undef' }
+
+=head2 structured
+
+  $adapter->structured($level, $category, @parts, \%fields);
+
+Called by L<Log::Any> in place of the logging methods, with the message
+parts and, when there are any, a final hashref of structured fields: the
+proxy's C<context> merged with a hashref passed as the last argument of the
+log call.  The parts are joined with a space and sent, with the fields, to
+the matching L<Log::Abstraction> method, so
+
+  $log->info('login', { user_id => 42 });
+
+reaches Log::Abstraction as C<info('login', { user_id =E<gt> 42 })>.  See
+L<Log::Abstraction/Structured fields> for where the fields go.  As with the
+logging methods, a croak is turned into a C<Carp::carp>.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+  {
+      level    => { type => 'string' },
+      category => { type => 'string' },
+      parts    => { type => 'array' },
+      fields   => { type => 'hashref', optional => 1 },
+  }
 
 =head4 Output
 
@@ -270,11 +287,11 @@ C<croak_on_error>) is turned into a C<Carp::carp>, so logging never dies.
   if($adapter->is_debug()) { ... }
 
 Return 1 if a message at that level would be logged by the wrapped
-L<Log::Abstraction> instance's level threshold, otherwise 0.  As in
-Log::Abstraction, C<is_trace> equals C<is_debug>, and C<is_critical>,
-C<is_alert> and C<is_emergency> equal C<is_error>.
+L<Log::Abstraction> instance's level threshold, otherwise 0.  Each calls the
+L<Log::Abstraction> method of the same name (C<is_warning> calls
+C<is_warn>).  As in Log::Abstraction, C<is_trace> equals C<is_debug>.
 
-=head3 API Specification
+=head3 API SPECIFICATION
 
 =head4 Input
 
@@ -303,16 +320,41 @@ for my $la_level (keys %LA_TO_METHOD) {
 }
 
 # ---------------------------------------------------------------------------
-# Build is_* detection methods for every Log::Any level name.
-# Returns 1 when the adapter's Log::Abstraction threshold is at or below the
-# requested level (i.e. messages at that level would not be dropped).
+# structured -- receive a log call with its structured fields from Log::Any
+#
+# Purpose:  Log::Any calls this instead of the per-level methods when the
+#           adapter can('structured'), passing the parts as given and the
+#           merged context and fields as a final hashref (only when there are
+#           any), so the fields reach Log::Abstraction as data, not text.
+# Entry:    $self     -- the adapter.
+#           $level    -- a Log::Any level name.
+#           $category -- the Log::Any category (unused).
+#           @parts    -- message parts, then optionally a hashref of fields.
+# Exit:     Returns nothing.
+# Side effects: Logs through the wrapped Log::Abstraction instance.
 # ---------------------------------------------------------------------------
-for my $la_level (keys %LA_TO_LEVEL) {
-	my $threshold = $syslog_values{ $LA_TO_LEVEL{$la_level} };
+sub structured {
+	my ($self, $level, $category, @parts) = @_;
+
+	my $fields = (@parts && (ref($parts[-1]) eq 'HASH')) ? pop(@parts) : undef;
+	my $msg = join(' ', grep { defined($_) && length($_) } @parts);
+	my $method = $LA_TO_METHOD{$level} or return;
+
+	eval { $self->{_logger}->$method($msg, ($fields ? $fields : ())); 1 } or Carp::carp($@);
+	return;
+}
+
+# ---------------------------------------------------------------------------
+# Build is_* detection methods for every Log::Any level name.
+# Each delegates to the matching Log::Abstraction is_* method (is_warning to
+# is_warn), which returns 1 when messages at that level would not be dropped.
+# ---------------------------------------------------------------------------
+for my $la_level (keys %LA_TO_METHOD) {
+	my $detector = "is_$LA_TO_METHOD{$la_level}";
 	no strict 'refs';
 	*{"is_$la_level"} = sub {
 		my $self = $_[0];
-		return ($self->{_logger}->level() >= $threshold) ? 1 : 0;
+		return $self->{_logger}->$detector();
 	};
 }
 
@@ -320,19 +362,16 @@ for my $la_level (keys %LA_TO_LEVEL) {
 
 =over 4
 
-=item B<Nine-to-six level collapse>
+=item B<Message parts are joined with a space>
 
-Log::Any has nine severity levels; Log::Abstraction has six.  C<critical>,
-C<alert>, and C<emergency> all map to C<error()>.  Applications that rely on
-distinguishing these three levels in downstream Log::Abstraction backends will
-lose that distinction.
+In structured mode Log::Any passes the message parts, including any
+C<prefix>, separately; L</structured> joins them with a single space, so
+a prefix is followed by a space.
 
-=item B<No structured field support>
+=item B<Filters disable structured fields>
 
-Log::Any's C<log_fields()> mechanism for structured fields is not forwarded
-to Log::Abstraction.  Only the final formatted string is dispatched; callers
-that need structured output should use the Log::Abstraction CODE-ref backend
-and access the formatted string via the C<message> key.
+Log::Any doesn't use L</structured> when the proxy has a C<filter>; the
+fields then arrive as text appended to the message, as Log::Any formats them.
 
 =item B<Logging never dies>
 

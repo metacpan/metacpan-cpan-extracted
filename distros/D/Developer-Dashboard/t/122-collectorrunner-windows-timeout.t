@@ -136,9 +136,9 @@ sub await_absent_pids {
     my $command_pid;
 
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
-    local *Developer::Dashboard::CollectorRunner::_spawn_windows_command = sub {
-        my ( undef, @argv ) = @_;
+    local *Developer::Dashboard::CommandRunner::is_windows = sub { return 1 };
+    local *Developer::Dashboard::CommandRunner::spawn_windows_command = sub {
+        my (@argv) = @_;
         push @spawned_argv, [@argv];
         $command_pid = spawn_marked_command_tree( $marker_file, 20 );
         return $command_pid;
@@ -201,7 +201,7 @@ sub await_absent_pids {
     }
 
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_spawn_windows_command = sub { return $child };
+    local *Developer::Dashboard::CommandRunner::spawn_windows_command = sub { return $child };
     use warnings 'redefine';
 
     my ( $exit_code, $timed_out ) =
@@ -220,7 +220,7 @@ sub await_absent_pids {
 {
     my $pidfile = File::Spec->catfile( $home, 'unspawnable-windows-command.pid' );
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_spawn_windows_command = sub { return -1 };
+    local *Developer::Dashboard::CommandRunner::spawn_windows_command = sub { return -1 };
     use warnings 'redefine';
 
     my $error = eval { $runner->_await_windows_command( $pidfile, 1000, 'dd389-unspawnable' ); 1 } ? '' : $@;
@@ -236,7 +236,7 @@ sub await_absent_pids {
 {
     my $pidfile = File::Spec->catfile( $home, 'unowned-windows-command.pid' );
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_spawn_windows_command = sub { return 999_999_999 };
+    local *Developer::Dashboard::CommandRunner::spawn_windows_command = sub { return 999_999_999 };
     use warnings 'redefine';
 
     my $error = eval { $runner->_await_windows_command( $pidfile, 30_000, 'dd389-unowned' ); 1 } ? '' : $@;
@@ -316,7 +316,7 @@ SKIP: {
     }
 
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_spawn_windows_command = sub { return $child };
+    local *Developer::Dashboard::CommandRunner::spawn_windows_command = sub { return $child };
     use warnings 'redefine';
 
     $? = 12 << 8;    ## no critic (Variables::RequireLocalizedPunctuationVars)

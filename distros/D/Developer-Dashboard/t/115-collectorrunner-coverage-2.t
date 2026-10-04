@@ -122,7 +122,7 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
 {
     no warnings 'redefine';
     local $SIG{PIPE} = 'IGNORE';
-    local *Developer::Dashboard::CollectorRunner::tempfile = sub {
+    local *Developer::Dashboard::CommandRunner::tempfile = sub {
         pipe my $read, my $write or die "Unable to create a pipe: $!";
         close $read or die "Unable to close the pipe read end: $!";
         print {$write} 'pending';    # buffered: the flush inside close hits EPIPE
@@ -141,11 +141,11 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
 {
     my $pidfile = File::Spec->catfile( $home, 'rethrown-command.pid' );
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::tempfile = sub {
+    local *Developer::Dashboard::CommandRunner::tempfile = sub {
         open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
         return ( $fh, $pidfile );
     };
-    local *Developer::Dashboard::CollectorRunner::_exit_code_from_status = sub {
+    local *Developer::Dashboard::CommandRunner::exit_code_from_status = sub {
         die "collector wait-status decode failed\n";
     };
     my $error = eval { $runner->_run_command( source => 'true', cwd => $home, timeout_ms => 60_000 ); 1 } ? '' : $@;
@@ -189,8 +189,8 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
     if ( !$child ) {
         my @forwarded;
         no warnings 'redefine';
-        local *Developer::Dashboard::CollectorRunner::_forward_command_signal = sub {
-            my ( undef, undef, $signal, $number ) = @_;
+        local *Developer::Dashboard::CommandRunner::forward_command_signal = sub {
+            my ( $pidfile, $signal, $number ) = @_;
             push @forwarded, "$signal:$number";
             return 1;
         };
@@ -228,12 +228,12 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
 {
     my @forwarded;
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_forward_command_signal = sub {
-        my ( undef, undef, $signal, $number ) = @_;
+    local *Developer::Dashboard::CommandRunner::forward_command_signal = sub {
+        my ( $pidfile, $signal, $number ) = @_;
         push @forwarded, "$signal:$number";
         return 1;
     };
-    local *Developer::Dashboard::CollectorRunner::_exit_code_from_status = sub {
+    local *Developer::Dashboard::CommandRunner::exit_code_from_status = sub {
         my $handler = $SIG{INT};
         $handler->('INT') if ref($handler) eq 'CODE';
         return 0;
@@ -309,8 +309,8 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
     if ( !$child ) {
         POSIX::sigprocmask( POSIX::SIG_BLOCK(), POSIX::SigSet->new( POSIX::SIGTERM() ) );
         no warnings 'redefine';
-        local *Developer::Dashboard::CollectorRunner::_await_command_pid          = sub { return undef };
-        local *Developer::Dashboard::CollectorRunner::_terminate_command_process = sub { return 1 };
+        local *Developer::Dashboard::CommandRunner::await_command_pid          = sub { return undef };
+        local *Developer::Dashboard::CommandRunner::terminate_command_process = sub { return 1 };
         $runner->_forward_command_signal( undef, 'TERM', 15 );
         POSIX::_exit(1);
     }
@@ -327,9 +327,9 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
     die "Unable to fork: $!" if !defined $child;
     if ( !$child ) {
         no warnings 'redefine';
-        local *Developer::Dashboard::CollectorRunner::is_windows                 = sub { return 1 };
-        local *Developer::Dashboard::CollectorRunner::_await_command_pid          = sub { return undef };
-        local *Developer::Dashboard::CollectorRunner::_terminate_command_process = sub { return 1 };
+        local *Developer::Dashboard::CommandRunner::is_windows                 = sub { return 1 };
+        local *Developer::Dashboard::CommandRunner::await_command_pid          = sub { return undef };
+        local *Developer::Dashboard::CommandRunner::terminate_command_process = sub { return 1 };
         $runner->_forward_command_signal( '', 'TERM', 15 );
         POSIX::_exit(1);
     }
@@ -348,9 +348,9 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
     die "Unable to fork: $!" if !defined $child;
     if ( !$child ) {
         no warnings 'redefine';
-        local *Developer::Dashboard::CollectorRunner::is_windows                 = sub { return 1 };
-        local *Developer::Dashboard::CollectorRunner::_await_command_pid          = sub { return undef };
-        local *Developer::Dashboard::CollectorRunner::_terminate_command_process = sub { return 1 };
+        local *Developer::Dashboard::CommandRunner::is_windows                 = sub { return 1 };
+        local *Developer::Dashboard::CommandRunner::await_command_pid          = sub { return undef };
+        local *Developer::Dashboard::CommandRunner::terminate_command_process = sub { return 1 };
         $runner->_forward_command_signal( $pidfile, 'HUP', 1 );
         POSIX::_exit(1);
     }

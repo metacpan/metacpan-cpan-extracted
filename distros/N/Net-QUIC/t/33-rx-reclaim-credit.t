@@ -167,4 +167,98 @@ is(
     'discarding unconsumed data from a dropped closed Stream restores connection credit',
 );
 
+undef $second_receiver;
+
+my $third_sender = $client->connection->open_uni_stream;
+my $third_payload = 'C' x 1024;
+$third_sender->send($third_payload);
+
+my $third_receiver;
+my $third_held = '';
+
+for (1 .. 1000) {
+    pump_pair();
+
+    $third_receiver ||= $accepted->next_stream;
+
+    if ($third_receiver) {
+        while (my $event = $third_receiver->next_data_chunk) {
+            $third_held .= $event->[0];
+        }
+    }
+
+    last if $third_held eq $third_payload;
+}
+
+isa_ok($third_receiver, ['Net::QUIC::Stream']);
+is(
+    $third_held,
+    $third_payload,
+    'third Stream data is delivered explicitly before FIN',
+);
+ok(
+    !$third_receiver->closed,
+    'third Stream remains open while explicit receive bytes are unconsumed',
+);
+
+my $third_state_before_drop = $accepted->_stream_state_count;
+undef $third_receiver;
+
+is(
+    $accepted->_stream_state_count,
+    $third_state_before_drop,
+    'dropping an open Stream leaves its native state until transport close',
+);
+
+$third_sender->finish;
+
+for (1 .. 1000) {
+    pump_pair();
+    last if $accepted->_stream_state_count < $third_state_before_drop;
+}
+
+cmp_ok(
+    $accepted->_stream_state_count,
+    '<',
+    $third_state_before_drop,
+    'native Stream is reclaimed after FIN arrives without a Perl Stream object',
+);
+
+for (1 .. 20) {
+    pump_pair();
+}
+
+my $fourth_sender = $client->connection->open_uni_stream;
+my $fourth_payload = 'D' x 1024;
+$fourth_sender->send($fourth_payload);
+$fourth_sender->finish;
+
+my $fourth_receiver;
+my $fourth_data = '';
+
+for (1 .. 1000) {
+    pump_pair();
+
+    while (my $stream = $accepted->next_stream) {
+        if ($stream->id == $fourth_sender->id) {
+            $fourth_receiver = $stream;
+        }
+    }
+
+    if ($fourth_receiver) {
+        while (defined(my $chunk = $fourth_receiver->next_data)) {
+            $fourth_data .= $chunk;
+        }
+    }
+
+    last if $fourth_data eq $fourth_payload;
+}
+
+isa_ok($fourth_receiver, ['Net::QUIC::Stream']);
+is(
+    $fourth_data,
+    $fourth_payload,
+    'deferred reclamation restores connection credit for the next Stream',
+);
+
 done_testing;

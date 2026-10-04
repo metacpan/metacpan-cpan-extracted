@@ -41,13 +41,14 @@ my %WriteMakefileArgs = (
     "Test2::Require" => 0,
     "Test2::Suite" => "1.302200",
     "Test2::Tools::GenTemp" => "1.302200",
+    "Test2::Tools::Subtest" => 0,
     "Test2::V0" => "1.302200",
     "Test2::V1" => "1.302200",
     "Test::Script" => "1.28",
     "base" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t t/three/*.t"
   }
@@ -70,6 +71,7 @@ my %FallbackPrereqs = (
   "Test2::Require" => 0,
   "Test2::Suite" => "1.302200",
   "Test2::Tools::GenTemp" => "1.302200",
+  "Test2::Tools::Subtest" => 0,
   "Test2::V0" => "1.302200",
   "Test2::V1" => "1.302200",
   "Test::Script" => "1.28",

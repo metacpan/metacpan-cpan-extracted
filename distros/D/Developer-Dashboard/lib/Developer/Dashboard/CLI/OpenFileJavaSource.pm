@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::OpenFileJavaSource;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Digest::MD5 qw(md5_hex);
@@ -118,7 +118,7 @@ sub _java_source_archive_roots {
     my $roots = $args{roots} || [];
     my %is_inc = map { $_ => 1 } @INC;
     my @candidates = (
-        ( grep { !$is_inc{$_} } @$roots ),
+        ( grep { defined($_) && !$is_inc{$_} } @$roots ),
         File::Spec->catdir( $paths->home, '.m2', 'repository' ),
         File::Spec->catdir( $paths->home, '.gradle', 'caches' ),
         grep { defined && $_ ne '' } ( $ENV{JAVA_HOME}, $ENV{JDK_HOME} ),
@@ -154,7 +154,7 @@ sub _extract_java_sources_from_archive {
         ) or next;
         my ( $volume, $directories ) = File::Spec->splitpath($target);
         make_path( File::Spec->catpath( $volume, $directories, '' ) );
-        open my $fh, '>', $target or die "Unable to write $target: $!";    # uncoverable branch true the target parent directory is created immediately above so the write cannot fail on the test host
+        open my $fh, '>', $target or die "Unable to write $target: $!";
 
         # contents() returns ($contents, $status) in list context, which print
         # imposes, so the member body must be taken in scalar context or the

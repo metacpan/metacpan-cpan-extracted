@@ -6,6 +6,7 @@ lib/Uniform/Exceptions.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+README.md
 t/00-load.t
 t/utils.t
 t/exceptions.t

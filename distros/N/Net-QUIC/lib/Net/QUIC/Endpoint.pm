@@ -9,7 +9,7 @@ use Net::QUIC ();
 use Net::QUIC::Connection ();
 use Net::QUIC::Datagram ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub _transport_config {
     my ($class, $value) = @_;
@@ -24,8 +24,9 @@ sub _transport_config {
         idle_timeout      => 30,
         connection_window => 1024 * 1024,
         stream_window     => 256 * 1024,
-        max_bidi_streams  => 100,
-        max_uni_streams   => 100,
+        max_bidi_streams        => 100,
+        max_uni_streams         => 100,
+        max_datagram_frame_size => 0,
     );
 
     my %known = map { $_ => 1 } keys %config;
@@ -56,12 +57,16 @@ sub _transport_config {
         stream_window
         max_bidi_streams
         max_uni_streams
+        max_datagram_frame_size
     )) {
         my $number = $config{$name};
 
         croak "$name must be a non-negative integer"
             if !defined($number)
             || $number !~ /\A\d+\z/;
+
+        croak "max_datagram_frame_size cannot exceed 65535"
+            if $name eq 'max_datagram_frame_size' && $number > 65535;
 
         $config{$name} = 0 + $number;
     }
@@ -73,6 +78,7 @@ sub _transport_config {
         $config{stream_window},
         $config{max_bidi_streams},
         $config{max_uni_streams},
+        $config{max_datagram_frame_size},
     ];
 }
 
@@ -330,7 +336,8 @@ sub _server_receive_datagram {
 
         $connection->_receive_datagram($bytes, $local, $peer, $ecn);
         $connection->_dispatch_stream_activity;
-    $connection->_dispatch_stream_availability;
+        $connection->_dispatch_stream_availability;
+        $connection->_dispatch_datagrams;
 
         $self->{routes}{$initial_dcid} = $connection;
         push @{$self->{connections}}, $connection;
@@ -342,7 +349,8 @@ sub _server_receive_datagram {
 
     $connection->_receive_datagram($bytes, $local, $peer, $ecn);
     $connection->_dispatch_stream_activity;
-        $connection->_dispatch_stream_availability;
+    $connection->_dispatch_stream_availability;
+    $connection->_dispatch_datagrams;
     $self->_sync_server_routes($connection);
     $self->_retire_server_connections;
     return;
@@ -450,6 +458,7 @@ sub receive_datagram {
     );
     $self->{connection}->_dispatch_stream_activity;
     $self->{connection}->_dispatch_stream_availability;
+    $self->{connection}->_dispatch_datagrams;
     return;
 }
 
@@ -645,12 +654,13 @@ version.
 Client and server both accept:
 
     transport => {
-        handshake_timeout => 10,
-        idle_timeout      => 30,
-        connection_window => 1024 * 1024,
-        stream_window     => 256 * 1024,
-        max_bidi_streams  => 100,
-        max_uni_streams   => 100,
+        handshake_timeout       => 10,
+        idle_timeout            => 30,
+        connection_window       => 1024 * 1024,
+        stream_window           => 256 * 1024,
+        max_bidi_streams        => 100,
+        max_uni_streams         => 100,
+        max_datagram_frame_size => 0,
     }
 
 These are the defaults.
@@ -668,7 +678,15 @@ C<stream_window> is the starting receive allowance for each Stream.
 C<max_bidi_streams> and C<max_uni_streams> are the initial numbers of
 peer-created streams that may exist at once.
 
-These are flow-control starting values, not lifetime byte or stream limits.
+C<max_datagram_frame_size> advertises this endpoint's RFC 9221 QUIC DATAGRAM
+receive limit. Zero disables QUIC DATAGRAM receive support. A value such as
+65535 enables it while the actual sendable payload is still limited by the
+peer and the current network path.
+
+See L<Net::QUIC::Connection/QUIC DATAGRAM>.
+
+The Stream values are flow-control starting values, not lifetime byte or
+stream limits.
 
 =head2 server
 

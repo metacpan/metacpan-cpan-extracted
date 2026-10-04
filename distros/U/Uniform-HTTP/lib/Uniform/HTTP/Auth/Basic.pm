@@ -7,7 +7,7 @@ use Encode qw(encode);
 use MIME::Base64 qw(encode_base64);
 use Unicode::Normalize qw(NFC);
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 sub validate_challenge {
     my ($class, $challenge) = @_;
@@ -145,7 +145,7 @@ When the challenge contains C<charset="UTF-8">, username and password are
 normalized to NFC and encoded as UTF-8 before Base64 encoding.
 
 RFC 7617 leaves the default encoding undefined when C<charset> is absent.
-Version 0.01 therefore accepts ASCII credentials only in that case rather than
+This implementation accepts ASCII credentials only in that case rather than
 silently guessing an encoding.
 
 =head1 SECURITY NOTES

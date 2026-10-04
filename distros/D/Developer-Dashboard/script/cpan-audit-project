@@ -251,6 +251,37 @@ if [ "$db_age_days" -gt "$db_age_limit" ]; then
   exit 4
 fi
 
+# CPANSA-podlators-2026-82560 affects Pod::Text. CPAN::Audit's installed scan
+# currently identifies the podlators distribution through its other primary
+# module, Pod::Man, whose independent module version can stay at 5.01_02 after
+# the distribution ships the fixed Pod::Text 6.1.1. The exact advisory is
+# dispositioned in cpan-audit-exclusions.txt only while this check proves that
+# the scanned root itself supplies the fixed Pod::Text. A vulnerable core copy
+# outside this root is not accepted as proof of the product version.
+pod_text_report="$(perl -I "$perl5_root" -MPod::Text -e '
+    use strict;
+    use warnings;
+    use version;
+
+    my ($root) = @ARGV;
+    my $module = $INC{"Pod/Text.pm"} // q{};
+    my $actual = eval { version->parse( $Pod::Text::VERSION // q{} ) };
+    my $minimum = version->parse("6.1.1");
+
+    die "Pod::Text security floor failed: module was not loaded from the audited root\n"
+        if index( $module, "$root/" ) != 0;
+    die "Pod::Text security floor failed: loaded version "
+        . ( $Pod::Text::VERSION // "(unknown)" )
+        . " is older than 6.1.1\n"
+        if !$actual || $actual < $minimum;
+
+    print "Pod::Text security floor: $Pod::Text::VERSION ($module)\n";
+' "$perl5_root" 2>&1)" || {
+  printf '%s\n' "$pod_text_report" >&2
+  exit 1
+}
+printf '%s\n' "$pod_text_report"
+
 set +e
 audit_output="$(cpan-audit installed "$perl5_root" --perl --exclude-file "$exclusions" 2>&1)"
 set -e
@@ -340,3 +371,89 @@ cpan-audit. Check that the interpreter and the tool come from the same install:
     perl -e 'print "\$]\n"'
 EOF
 exit 4
+
+__END__
+
+=head1 NAME
+
+cpan-audit-project - fail-closed audit of an isolated Developer Dashboard dependency root
+
+=head1 PURPOSE
+
+Audit the CPAN distributions installed into one isolated project library root,
+using the current CPANSA advisory database. The script distinguishes a confirmed
+distribution finding, an invalid disposition, a wrong scan target, a caller
+error, and an audit that could not produce a verdict.
+
+=head1 WHY IT EXISTS
+
+A scan of a shared developer library reports every project installed there and
+cannot attribute those findings to this distribution. This gate refuses shared
+roots and is run in CI against the fresh root populated by the dependency
+installer. It also verifies the vulnerable module itself where the advisory
+database currently identifies the containing distribution through a different
+module with an independent version.
+
+=head1 WHEN TO USE
+
+Run this script after populating an isolated Perl library root and before
+accepting a security or release verdict for its distributions. CI invokes it
+against the project dependency root after installing Developer Dashboard's
+prerequisites.
+
+=head1 HOW TO USE
+
+    cpanm --installdeps --notest -L local .
+    script/cpan-audit-project local/lib/perl5
+
+The root must be inside the checkout unless
+C<DD_CPAN_AUDIT_ALLOW_EXTERNAL_ROOT=1> explicitly confirms that an external
+root is genuinely isolated. C<cpan-audit> and its own modules must be available
+on C<PATH> and C<PERL5LIB>. The advisory database must be no more than 21 days
+old by default.
+
+=head1 INPUTS
+
+=over 4
+
+=item * One isolated Perl library root
+
+The directory containing the installed project distributions, such as
+C<local/lib/perl5>.
+
+=item * CPAN::Audit tooling
+
+C<cpan-audit> must be installed separately from the root under audit, with its
+own library directory exposed to its interpreter.
+
+=back
+
+=head1 OUTPUT
+
+The script names the audited root and advisory database. Exit status 0 means no
+in-scope distribution advisory was found; 1 means a reviewed disposition guard
+failed; 2 means invalid usage; 3 means the target is not an accepted isolated
+root; 4 means the audit could not establish a usable verdict; and 5 means an
+in-scope distribution advisory was found. Interpreter advisories are printed
+for context but do not decide this distribution-only gate.
+
+=head1 SECURITY NOTES
+
+The C<podlators> advisory CPANSA-podlators-2026-82560 is dispositioned only
+after Perl proves that C<Pod::Text> 6.1.1 or later is loaded from the audited
+root. The scanned root must not inherit an older core copy as evidence of its
+own dependency version. The exact advisory exclusion is retained because the
+installed scanner currently attributes the distribution through C<Pod::Man>'s
+independent module version.
+
+=head1 EXAMPLES
+
+Audit the CI-style in-checkout root:
+
+    script/cpan-audit-project local/lib/perl5
+
+Audit a deliberately isolated external root:
+
+    DD_CPAN_AUDIT_ALLOW_EXTERNAL_ROOT=1 script/cpan-audit-project /tmp/isolated/lib/perl5
+
+=cut

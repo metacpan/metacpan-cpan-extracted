@@ -6,7 +6,9 @@
 \bblib/
 \bpm_to_blib$
 \.tar\.gz$
-^\.git
+# anchored at any segment, not just the root: example/Blog/.gitignore is as
+# much not-a-distribution-file as a .git at the top
+(^|/)\.git
 ^ignore\.txt$
 # Feed.c is generated from Feed.xs; shipping a stale one is a distribution
 # that builds from the wrong source.

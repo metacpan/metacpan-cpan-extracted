@@ -3,7 +3,7 @@ package Developer::Dashboard::PageDocument;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Developer::Dashboard::TextUtils qw(_trim);
@@ -23,7 +23,7 @@ our @STASH_SAFE_OPS = qw(
 );
 
 our $LEGACY_SEP = ':--------------------------------------------------------------------------------:';
-our @LEGACY_KEYS = ( qw(TITLE ICON BOOKMARK STASH NOTE HTML), map { sprintf 'CODE%d', $_ } 0 .. 1000 );
+our @LEGACY_KEYS = ( qw(TITLE ICON BOOKMARK STASH NOTE HEAD HTML), map { sprintf 'CODE%d', $_ } 0 .. 1000 );
 
 # new(%args)
 # Constructs a page document from normalized field values.
@@ -107,6 +107,7 @@ sub from_instruction {
 
     my %meta = ();
     $meta{icon} = _trim( join( "\n", @{ $sections{ICON} } ) ) if exists $sections{ICON};
+    $meta{head} = _trim_trailing_newline( join( "\n", @{ $sections{HEAD} } ) ) if exists $sections{HEAD};
 
     my @codes;
 
@@ -215,6 +216,7 @@ sub legacy_instruction {
 
     push @sections, [ 'TITLE', $self->{title} // 'Untitled' ];
     push @sections, [ 'ICON', $self->{meta}{icon} ] if defined $self->{meta}{icon} && $self->{meta}{icon} ne '';
+    push @sections, [ 'HEAD', $self->{meta}{head} ] if defined $self->{meta}{head} && $self->{meta}{head} ne '';
     push @sections, [ 'BOOKMARK', $self->{id} ] if defined $self->{id} && $self->{id} ne '';
     push @sections, [ 'NOTE', $self->{description} ] if defined $self->{description} && $self->{description} ne '';
     push @sections, [ 'STASH', _legacy_stash_text( $self->{state} || {} ) ];
@@ -231,7 +233,6 @@ sub legacy_instruction {
 
     my @chunks = map {
         my ( $name, $body ) = @$_;
-        $body = '' if !defined $body;    # uncoverable branch true
         $body =~ s/\A\n+//;
         $body =~ s/\n+\z//;
         "$name: $body";
@@ -261,6 +262,7 @@ sub render_html {
 
     my $title = _html( $self->{title} );
     my $desc  = _html( $self->{description} );
+    my $head_html = defined $self->{meta}{head} ? $self->{meta}{head} : '';
     my $body_html = defined $self->{layout}{body} ? $self->{layout}{body} : '';
     my $chrome_html = defined $opts{chrome_html} ? $opts{chrome_html} : '';
     my $nav_html = defined $opts{nav_html} ? $opts{nav_html} : '';
@@ -277,6 +279,7 @@ sub render_html {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>$title</title>
+$head_html
 $style_block
 </head>
 <body>
@@ -757,7 +760,7 @@ Construct, mutate, serialize, and render page documents.
 
 =head1 PURPOSE
 
-This module parses and normalizes dashboard bookmark instruction documents. It understands the separator-based bookmark format, extracts fields such as C<TITLE>, C<BOOKMARK>, C<STASH>, C<HTML>, and C<CODE*> blocks, and preserves the raw instruction when callers need source-stable editing behavior.
+This module parses and normalizes dashboard bookmark instruction documents. It understands the separator-based bookmark format, extracts fields such as C<TITLE>, C<BOOKMARK>, C<STASH>, C<HEAD>, C<HTML>, and C<CODE*> blocks, and preserves the raw instruction when callers need source-stable editing behavior. C<HEAD> is trusted raw HTML inserted inside the rendered document head; never put untrusted text there.
 
 =head1 WHY IT EXISTS
 

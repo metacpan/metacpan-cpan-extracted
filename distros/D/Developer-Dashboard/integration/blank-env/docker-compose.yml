@@ -5,6 +5,7 @@ services:
         context: ../..
         dockerfile: integration/blank-env/Dockerfile
     working_dir: /opt/integration
+    init: true
     entrypoint:
       - perl
       - /opt/integration/run-integration.pl

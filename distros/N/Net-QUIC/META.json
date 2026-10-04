@@ -56,27 +56,27 @@
    "provides" : {
       "Net::QUIC" : {
          "file" : "lib/Net/QUIC.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Net::QUIC::Connection" : {
          "file" : "lib/Net/QUIC/Connection.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Net::QUIC::Datagram" : {
          "file" : "lib/Net/QUIC/Datagram.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Net::QUIC::Driver" : {
          "file" : "lib/Net/QUIC/Driver.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Net::QUIC::Endpoint" : {
          "file" : "lib/Net/QUIC/Endpoint.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Net::QUIC::Stream" : {
          "file" : "lib/Net/QUIC/Stream.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -91,6 +91,6 @@
          "web" : "https://github.com/haxmeister/perl-Net-QUIC"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

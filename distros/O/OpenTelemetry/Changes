@@ -1,5 +1,19 @@
 Revision history for OpenTelemetry
 
+0.039     2026-10-03 22:36:25 BST
+
+    * Fixed an issue in the tracecontext flags that could cause them
+      to be involuntarily recognied by some serialisers as being
+      strings rather than numbers.
+
+0.038     2026-10-03 21:35:35 BST
+
+    * Minor fixes to POD.
+    * Spans in DBI instrumentation are now ended in a 'defer' block,
+      which appears to help prevent some issues for Mojolicious
+      applications running under hypnotoad.
+    * Author email has changed, since cpan.org emails are now dead
+
 0.037     2026-08-26 17:31:25 BST
 
     * Dropped dependency of Bytes::Random::Secure in favour of

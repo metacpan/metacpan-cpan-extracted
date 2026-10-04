@@ -11,7 +11,7 @@ use File::Temp qw(tempdir tempfile);
 use POSIX qw(:sys_wait_h);
 use Test::More;
 use Time::HiRes qw(time);
-use URI::Escape qw(uri_escape);
+use URI::Escape qw(uri_escape uri_unescape);
 
 use lib 'lib';
 
@@ -98,6 +98,22 @@ my $cd_result = Developer::Dashboard::Folder->cd(
 is( $cd_result, $project, 'Folder cd yields the target directory to the callback' );
 my @folder_listing = Developer::Dashboard::Folder->ls('alias_demo');
 ok( @folder_listing >= 0, 'Folder ls returns entries for a real directory' );
+{
+    my $blocked = File::Spec->catdir( $home, 'permission-blocked-folder' );
+    mkdir $blocked or die "Unable to create $blocked: $!";
+    chmod 0000, $blocked or die "Unable to restrict $blocked: $!";
+    if ( opendir my $probe, $blocked ) {
+        closedir $probe or die "Unable to close permission probe for $blocked: $!";
+        chmod 0700, $blocked or die "Unable to restore $blocked: $!";
+        pass('Folder permission failure paths are not asserted when this runtime can still read a mode-0000 directory');
+        pass('Folder permission failure paths are not asserted when this runtime can still read a mode-0000 directory');
+    }
+    else {
+        ok( !defined Developer::Dashboard::Folder->cd( $blocked, sub { return 1 } ), 'Folder cd returns undef when chdir is denied' );
+        is_deeply( [ Developer::Dashboard::Folder->ls($blocked) ], [], 'Folder ls returns an empty list when opendir is denied' );
+    }
+    chmod 0700, $blocked or die "Unable to restore $blocked: $!";
+}
 ok( grep( { $_ eq $project } Developer::Dashboard::Folder->locate('demo') ), 'Folder locate finds matching workspace directories' );
 is( Developer::Dashboard::Folder->alias_demo, $project, 'Folder AUTOLOAD resolves configured aliases' );
 {
@@ -142,6 +158,21 @@ my ( $ajax_stdout, undef, $ajax_result ) = capture {
 };
 like( $ajax_stdout, qr/set_chain_value/, 'Ajax prints the legacy config-binding script' );
 is( $ajax_result, 'HIDE-THIS', 'Ajax returns the legacy hide marker' );
+my ( $templated_ajax_stdout, undef, $templated_ajax_result ) = capture {
+    return Ajax(
+        jvar => 'configs.coverage.template',
+        data => { args => 123 },
+        code => 'my $foobar = [% args %];',
+    );
+};
+my ($templated_ajax_token) = $templated_ajax_stdout =~ /[?&]token=([^&']+)/;
+ok( defined $templated_ajax_token, 'templated Ajax emits a transient payload token' );
+is(
+    unzip( uri_unescape($templated_ajax_token) ),
+    'my $foobar = 123;',
+    'Ajax templates its Perl code using data before encoding the transient URL payload',
+);
+is( $templated_ajax_result, 'HIDE-THIS', 'templated Ajax code still returns the legacy hide marker' );
 my ( $ajax_singleton_stdout, undef, $ajax_singleton_result ) = capture {
     return Ajax( jvar => 'configs.coverage.endpoint', code => 'print qq{{}};', singleton => 'TRANSIENT' );
 };

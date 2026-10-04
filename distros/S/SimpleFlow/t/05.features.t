@@ -2,10 +2,10 @@
 
 #
 # Tests for the options and record fields added in 0.19: retries, env, dir,
-# stdout.file and stderr.file, protect, output.dir(s), trace.fh, the CPU
+# stdout_file and stderr_file, protect, output_dir(s), trace_fh, the CPU
 # times, lock, %SimpleFlow::DEFAULTS, the stderr tail of a failure's message,
-# input.dir(s), stale.cmd, the on.success and on.failure hooks, and wrapper,
-# container, conda.env and executor. parallel() and report() are in
+# input_dir(s), stale_cmd, the on_success and on_failure hooks, and wrapper,
+# container, conda_env and executor. parallel() and report() are in
 # t/06.pipeline.t. These are features, not fixes, so
 # nothing here can run against an older module; the regression tests for the
 # 0.19 fixes are in t/04.fixes.t.
@@ -76,7 +76,7 @@ subtest 'retries: a step that fails once and then succeeds' => sub {
 		. q{open my $c, '>', $ARGV[0] or die; print $c $n + 1; close $c; }
 		. q{exit 1 if $n == 0; open my $f, '>', $ARGV[1] or die; print $f 'ok'};
 	my ($t, undef, $err) = run_task(cmd => [$^X, '-e', $flaky, $counter, $out],
-		'output.file' => $out, retries => 2, quiet => 1);
+		'output_file' => $out, retries => 2, quiet => 1);
 	is($t->{'will.do'}, 'done', 'the step succeeded in the end');
 	is($t->{attempts}, 2, 'on its second attempt');
 	is(slurp($counter), 2, 'and the command really ran twice');
@@ -90,14 +90,14 @@ subtest 'retries: a step that always fails stops after its last attempt' => sub 
 	my $retries = () = $err =~ /retrying/g;
 	is($retries, 2, 'two retries were announced');
 };
-subtest 'retries: retry.delay waits between attempts' => sub {
+subtest 'retries: retry_delay waits between attempts' => sub {
 	my $t0 = Time::HiRes::time();
-	my ($t) = run_task(cmd => [$^X, '-e', 'exit 1'], retries => 1, 'retry.delay' => 0.5,
+	my ($t) = run_task(cmd => [$^X, '-e', 'exit 1'], retries => 1, 'retry_delay' => 0.5,
 		die => 0, quiet => 1);
 	my $took = Time::HiRes::time() - $t0;
 	is($t->{attempts}, 2, 'there was a retry');
 	# two perl start-ups take ~0.1 s here; the delay is what makes it 0.5 s or more
-	cmp_ok($took, '>=', 0.5, 'and task() waited retry.delay before it');
+	cmp_ok($took, '>=', 0.5, 'and task() waited retry_delay before it');
 };
 subtest 'retries: the default is one attempt, and bad values are refused' => sub {
 	my ($t) = run_task(cmd => [$^X, '-e', 'exit 1'], die => 0, quiet => 1);
@@ -105,8 +105,8 @@ subtest 'retries: the default is one attempt, and bad values are refused' => sub
 	is($t->{retries}, 0, 'and the record says retries => 0');
 	my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', '1'], retries => 'twice');
 	like($error, qr/"retries" must be a whole number/, 'a non-number retries is refused');
-	(undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', '1'], 'retry.delay' => '-1');
-	like($error, qr/"retry.delay" must be a number of seconds/, 'a negative retry.delay is refused');
+	(undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', '1'], 'retry_delay' => '-1');
+	like($error, qr/"retry_delay" must be a number of seconds/, 'a negative retry_delay is refused');
 };
 
 # --- env ----------------------------------------------------------------------
@@ -135,7 +135,7 @@ subtest 'dir: the step runs in the directory, and the caller stays put' => sub {
 	my $work = File::Spec->catdir($dir, 'work' . ++$n);
 	mkdir $work or die "cannot make $work: $!";
 	my $before = Cwd::getcwd();
-	my ($t) = run_task(cmd => [$^X, '-e', $WRITE, 'here.txt'], 'output.file' => 'here.txt',
+	my ($t) = run_task(cmd => [$^X, '-e', $WRITE, 'here.txt'], 'output_file' => 'here.txt',
 		dir => $work, quiet => 1);
 	is($t->{'will.do'}, 'done', 'the relative output was found in "dir"');
 	ok(-f File::Spec->catfile($work, 'here.txt'), 'and was made there');
@@ -148,33 +148,33 @@ subtest 'dir: the step runs in the directory, and the caller stays put' => sub {
 	like($error, qr/"dir"/, 'a directory that does not exist is refused');
 };
 
-# --- stdout.file and stderr.file ---------------------------------------------
-subtest 'stdout.file and stderr.file receive the output instead of the record' => sub {
+# --- stdout_file and stderr_file ---------------------------------------------
+subtest 'stdout_file and stderr_file receive the output instead of the record' => sub {
 	my ($so, $se) = (fresh_path(), fresh_path());
 	spew($so, 'left from an earlier run');
 	my ($t) = run_task(cmd => [$^X, '-e', q{print 'to stdout'; print STDERR 'to stderr'}],
-		'stdout.file' => $so, 'stderr.file' => $se, quiet => 1);
+		'stdout_file' => $so, 'stderr_file' => $se, quiet => 1);
 	is(slurp($so), 'to stdout', 'stdout went to its file, which was emptied first');
 	is(slurp($se), 'to stderr', 'stderr went to its file');
 	is($t->{stdout}, '', 'and the record holds neither');
 	is($t->{stderr}, '', 'nor the other');
-	is($t->{'stdout.file'}, $so, 'the record names the file');
+	is($t->{'stdout_file'}, $so, 'the record names the file');
 };
 subtest 'one file for both, and every attempt kept' => sub {
 	my $both = fresh_path();
 	my ($t) = run_task(cmd => [$^X, '-e', q{$| = 1; print 'out;'; print STDERR 'err;'; exit 1}],
-		'stdout.file' => $both, 'stderr.file' => $both, retries => 1, die => 0, quiet => 1);
+		'stdout_file' => $both, 'stderr_file' => $both, retries => 1, die => 0, quiet => 1);
 	is($t->{attempts}, 2, 'there were two attempts');
 	is(slurp($both), 'out;err;out;err;', 'both streams of both attempts are in the one file, in order');
 };
-subtest 'a skipped step leaves its stdout.file alone' => sub {
+subtest 'a skipped step leaves its stdout_file alone' => sub {
 	my ($out, $so) = (fresh_path(), fresh_path());
 	spew($out, 'done already');
 	spew($so, 'the log of the run that made it');
-	my ($t) = run_task(cmd => [$^X, '-e', 'print 1'], 'output.file' => $out,
-		'stdout.file' => $so, quiet => 1);
+	my ($t) = run_task(cmd => [$^X, '-e', 'print 1'], 'output_file' => $out,
+		'stdout_file' => $so, quiet => 1);
 	is($t->{done}, 'before', 'the step was skipped');
-	is(slurp($so), 'the log of the run that made it', 'and its stdout.file was not emptied');
+	is(slurp($so), 'the log of the run that made it', 'and its stdout_file was not emptied');
 };
 
 # --- protect ------------------------------------------------------------------
@@ -182,19 +182,19 @@ SKIP: {
 	skip 'root can write to a read-only file, so protect proves nothing', 3 if $> == 0;
 	subtest 'protect: a successful output is made read-only' => sub {
 		my $out = fresh_path();
-		my ($t) = run_task(cmd => [$^X, '-e', $WRITE, $out], 'output.file' => $out,
+		my ($t) = run_task(cmd => [$^X, '-e', $WRITE, $out], 'output_file' => $out,
 			protect => 1, quiet => 1);
 		is($t->{'will.do'}, 'done', 'the step ran');
 		ok(-f $out, 'the output is there');
 		ok(!-w $out, 'and is no longer writable');
 		my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', $WRITE, $out],
-			'output.file' => $out, protect => 1, overwrite => 1, quiet => 1);
+			'output_file' => $out, protect => 1, overwrite => 1, quiet => 1);
 		like($error, qr/write-protected/, 'forcing a re-run over it is refused, and says why');
 		is(slurp($out), 'made', 'and the output is untouched');
 	};
 	subtest 'protect: a failed step\'s outputs are not protected' => sub {
 		my $out = fresh_path();
-		run_task(cmd => [$^X, '-e', "$WRITE; exit 1", $out], 'output.file' => $out,
+		run_task(cmd => [$^X, '-e', "$WRITE; exit 1", $out], 'output_file' => $out,
 			protect => 1, die => 0, quiet => 1);
 		ok(-f "$out.failed", 'the failed output was moved aside');
 		ok(-w "$out.failed", 'and is still writable');
@@ -203,44 +203,44 @@ SKIP: {
 		my $out = File::Spec->catdir($dir, 'protected' . ++$n);
 		my $inside = File::Spec->catfile($out, 'inside.txt');
 		run_task(cmd => [$^X, '-e', q{mkdir $ARGV[0] or die; open my $f, '>', $ARGV[1] or die}, $out, $inside],
-			'output.dir' => $out, protect => 1, quiet => 1);
+			'output_dir' => $out, protect => 1, quiet => 1);
 		ok(-f $inside, 'the file inside was made');
 		ok(!-w $inside, 'and is read-only');
 		chmod 0755, $out; chmod 0644, $inside; # so that tempdir's cleanup can remove them
 	};
 }
 
-# --- output.dir and output.dirs -----------------------------------------------
-subtest 'output.dir: a directory output is checked, skipped and moved aside' => sub {
+# --- output_dir and output_dirs -----------------------------------------------
+subtest 'output_dir: a directory output is checked, skipped and moved aside' => sub {
 	my $out = File::Spec->catdir($dir, 'outdir' . ++$n);
 	my $make = q{use File::Spec; mkdir $ARGV[0] or die; open my $f, '>', File::Spec->catfile($ARGV[0], 'x') or die; print $f 'x'};
-	my ($t) = run_task(cmd => [$^X, '-e', $make, $out], 'output.dir' => $out, quiet => 1);
+	my ($t) = run_task(cmd => [$^X, '-e', $make, $out], 'output_dir' => $out, quiet => 1);
 	is($t->{'will.do'}, 'done', 'the step that made the directory succeeded');
-	is_deeply($t->{'output.dirs'}, [$out], 'output.dir is folded into output.dirs');
-	my ($again) = run_task(cmd => [$^X, '-e', 'exit 1'], 'output.dirs' => [$out], quiet => 1);
+	is_deeply($t->{'output_dirs'}, [$out], 'output_dir is folded into output_dirs');
+	my ($again) = run_task(cmd => [$^X, '-e', 'exit 1'], 'output_dirs' => [$out], quiet => 1);
 	is($again->{done}, 'before', 'with the directory there, the step is skipped');
 	my $never = File::Spec->catdir($dir, 'never' . ++$n);
-	my ($missing, undef, $err) = run_task(cmd => [$^X, '-e', '1'], 'output.dir' => $never,
+	my ($missing, undef, $err) = run_task(cmd => [$^X, '-e', '1'], 'output_dir' => $never,
 		die => 0, quiet => 1);
 	is($missing->{'will.do'}, 'FAILED', 'a directory that was never made is FAILED');
 	like($err, qr/should have been made but are missing/, 'and is reported missing');
 	my $partial = File::Spec->catdir($dir, 'partial' . ++$n);
-	my ($failed) = run_task(cmd => [$^X, '-e', "$make; exit 1", $partial], 'output.dir' => $partial,
+	my ($failed) = run_task(cmd => [$^X, '-e', "$make; exit 1", $partial], 'output_dir' => $partial,
 		die => 0, quiet => 1);
 	ok(!-e $partial && -d "$partial.failed", 'a failed step\'s directory is moved aside');
 	is_deeply($failed->{'failed.outputs'}, ["$partial.failed"], 'and listed in failed.outputs');
 	my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', '1'],
-		'output.dir' => $out, 'output.dirs' => [$out]);
-	like($error, qr/cannot both be given/, 'output.dir and output.dirs are mutually exclusive');
+		'output_dir' => $out, 'output_dirs' => [$out]);
+	like($error, qr/cannot both be given/, 'output_dir and output_dirs are mutually exclusive');
 };
-subtest 'output.dir: an empty directory is warned about' => sub {
+subtest 'output_dir: an empty directory is warned about' => sub {
 	my $out = File::Spec->catdir($dir, 'empty' . ++$n);
 	my ($t, undef, $err) = run_task(cmd => [$^X, '-e', 'mkdir $ARGV[0] or die', $out],
-		'output.dir' => $out, quiet => 1);
+		'output_dir' => $out, quiet => 1);
 	is($t->{'will.do'}, 'done', 'an empty directory still counts as made');
 	like($err, qr/output directories are empty/, 'but is warned about');
 };
-subtest 'output.dir: stale looks at what is inside the directory' => sub {
+subtest 'output_dir: stale looks at what is inside the directory' => sub {
 	my $out = File::Spec->catdir($dir, 'stale' . ++$n);
 	my $in = fresh_path();
 	mkdir $out or die;
@@ -252,7 +252,7 @@ subtest 'output.dir: stale looks at what is inside the directory' => sub {
 	utime $now - 100, $now - 100, $inside, $out;
 	utime $now, $now, $in;
 	my ($t) = run_task(cmd => [$^X, '-e', "open my \$f, '>', \$ARGV[0] or die; print \$f 'new'", $inside],
-		'input.file' => $in, 'output.dir' => $out, stale => 1, quiet => 1);
+		'input_file' => $in, 'output_dir' => $out, stale => 1, quiet => 1);
 	is($t->{'out.of.date'}, 1, 'the directory is out of date');
 	is(slurp($inside), 'new', 'and was rebuilt');
 	# The other way round: the directory's own mtime is older than the input,
@@ -263,7 +263,7 @@ subtest 'output.dir: stale looks at what is inside the directory' => sub {
 	utime $now - 100, $now - 100, $in;
 	utime $now, $now, $inside;
 	my ($fresh) = run_task(cmd => [$^X, '-e', 'exit 1'],
-		'input.file' => $in, 'output.dir' => $out, stale => 1, quiet => 1);
+		'input_file' => $in, 'output_dir' => $out, stale => 1, quiet => 1);
 	is($fresh->{'out.of.date'}, 0, 'a directory whose contents are newer than the input is up to date');
 	is($fresh->{done}, 'before', 'and is skipped');
 };
@@ -283,15 +283,15 @@ SKIP: {
 	};
 }
 
-# --- trace.fh -----------------------------------------------------------------
-subtest 'trace.fh gets one JSON line per task, on every path' => sub {
+# --- trace_fh -----------------------------------------------------------------
+subtest 'trace_fh gets one JSON line per task, on every path' => sub {
 	my $trace_file = fresh_path();
 	open my $trace, '>', $trace_file or die "cannot write $trace_file: $!";
 	my $out = fresh_path();
-	run_task(cmd => [$^X, '-e', $WRITE, $out, "caf\x{e9}"], 'output.file' => $out,
-		'trace.fh' => $trace, note => "caf\x{e9}", quiet => 1);
-	run_task(cmd => [$^X, '-e', $WRITE, $out], 'output.file' => $out, 'trace.fh' => $trace, quiet => 1);
-	run_task(cmd => [$^X, '-e', 'exit 4'], 'trace.fh' => $trace, die => 0, quiet => 1);
+	run_task(cmd => [$^X, '-e', $WRITE, $out, "caf\x{e9}"], 'output_file' => $out,
+		'trace_fh' => $trace, note => "caf\x{e9}", quiet => 1);
+	run_task(cmd => [$^X, '-e', $WRITE, $out], 'output_file' => $out, 'trace_fh' => $trace, quiet => 1);
+	run_task(cmd => [$^X, '-e', 'exit 4'], 'trace_fh' => $trace, die => 0, quiet => 1);
 	close $trace;
 	my @lines = split /\n/, slurp($trace_file);
 	is(scalar @lines, 3, 'three tasks, three lines');
@@ -324,7 +324,7 @@ SKIP: {
 			open STDERR, '>', File::Spec->devnull;
 			no warnings 'exec';
 			exec($^X, "-I$lib_dir", '-MSimpleFlow', '-e',
-				'task(cmd => [$^X, q{-e}, $ARGV[0], $ARGV[1], $ARGV[2]], q{output.file} => $ARGV[2], lock => 1, quiet => 1, dir => $ARGV[3])',
+				'task(cmd => [$^X, q{-e}, $ARGV[0], $ARGV[1], $ARGV[2]], q{output_file} => $ARGV[2], lock => 1, quiet => 1, dir => $ARGV[3])',
 				$slow, $started, $out, $work)
 				or POSIX::_exit(127); # "or": a statement after exec drew "Statement unlikely to be reached" on a 5.16.3 smoker, "no warnings" notwithstanding
 		}
@@ -333,7 +333,7 @@ SKIP: {
 		foreach (1 .. 500) { last if -e $started; Time::HiRes::sleep(0.02) }
 		ok(-e $started, 'the first run started its command');
 		my ($t, undef, $err) = run_task(cmd => [$^X, '-e', $WRITE, $out, 'second'],
-			'output.file' => $out, lock => 1, quiet => 1, dir => $work);
+			'output_file' => $out, lock => 1, quiet => 1, dir => $work);
 		waitpid $first, 0;
 		is($t->{done}, 'before', 'the second run found the step done');
 		is(slurp($out), 'first', 'so the output is the first run\'s');
@@ -343,30 +343,30 @@ SKIP: {
 subtest 'lock: an unshared step runs as usual, and dry runs take no lock' => sub {
 	my $work = File::Spec->catdir($dir, 'lockplain' . ++$n);
 	mkdir $work or die;
-	my ($t) = run_task(cmd => [$^X, '-e', $WRITE, 'out'], 'output.file' => 'out', lock => 1,
+	my ($t) = run_task(cmd => [$^X, '-e', $WRITE, 'out'], 'output_file' => 'out', lock => 1,
 		dir => $work, quiet => 1);
 	is($t->{'will.do'}, 'done', 'the step ran');
 	is($t->{lock}, 1, 'with lock => 1 on the record');
 	ok(-d File::Spec->catdir($work, '.simpleflow'), 'the lock files live in .simpleflow');
 	my $dry_work = File::Spec->catdir($dir, 'lockdry' . ++$n);
 	mkdir $dry_work or die;
-	run_task(cmd => 'x', 'output.file' => 'out', lock => 1, 'dry.run' => 1, dir => $dry_work, quiet => 1);
+	run_task(cmd => 'x', 'output_file' => 'out', lock => 1, 'dry_run' => 1, dir => $dry_work, quiet => 1);
 	ok(!-e File::Spec->catdir($dry_work, '.simpleflow'), 'a dry run made no lock file');
 };
 
 # --- %SimpleFlow::DEFAULTS ---------------------------------------------------
 subtest '%DEFAULTS applies to every task that does not say otherwise' => sub {
-	local %SimpleFlow::DEFAULTS = ('dry.run' => 1, quiet => 1, env => { SF_DEFAULT => 'from defaults' });
+	local %SimpleFlow::DEFAULTS = ('dry_run' => 1, quiet => 1, env => { SF_DEFAULT => 'from defaults' });
 	my ($t, $out) = run_task(cmd => [$^X, '-e', '1']);
-	is($t->{'will.do'}, 'no: dry run', 'a default dry.run makes every step a dry run');
+	is($t->{'will.do'}, 'no: dry run', 'a default dry_run makes every step a dry run');
 	is($out, '', 'and a default quiet silences the terminal');
 	my ($ran) = run_task(cmd => [$^X, '-e', 'print $ENV{SF_DEFAULT}, q{|}, $ENV{SF_OWN}'],
-		'dry.run' => 0, env => { SF_OWN => 'from the task' });
+		'dry_run' => 0, env => { SF_OWN => 'from the task' });
 	is($ran->{'will.do'}, 'done', 'a task that sets the key itself wins');
 	is($ran->{stdout}, 'from defaults|from the task', 'and its env is merged with the default env');
 };
 subtest '%DEFAULTS refuses keys that name a particular step' => sub {
-	foreach my $key ('cmd', 'output.file', 'no.such.key') {
+	foreach my $key ('cmd', 'output_file', 'no.such.key') {
 		local %SimpleFlow::DEFAULTS = ($key => 'x');
 		my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', '1'], quiet => 1);
 		like($error, qr/%SimpleFlow::DEFAULTS.*\Q$key\E|\Q$key\E.*%SimpleFlow::DEFAULTS/s,
@@ -387,28 +387,28 @@ subtest "a failure's message ends with the last lines of stderr" => sub {
 	unlike($message, qr/line 4\b/, 'and nothing before them');
 	my $file = fresh_path();
 	@warned = ();
-	run_task(cmd => [$^X, '-e', $noisy], 'stderr.file' => $file, die => 0, quiet => 1);
-	like(join('', @warned), qr/stderr ended with:.*line 10/s, 'the tail is read back from stderr.file too');
+	run_task(cmd => [$^X, '-e', $noisy], 'stderr_file' => $file, die => 0, quiet => 1);
+	like(join('', @warned), qr/stderr ended with:.*line 10/s, 'the tail is read back from stderr_file too');
 	@warned = ();
 	run_task(cmd => [$^X, '-e', 'exit 1'], die => 0, quiet => 1);
 	unlike(join('', @warned), qr/stderr ended with/, 'a command that wrote no stderr gets no tail');
 };
 
-# --- input.dir and input.dirs -------------------------------------------------
-subtest 'input.dir: a directory input must exist, except in a dry run' => sub {
+# --- input_dir and input_dirs -------------------------------------------------
+subtest 'input_dir: a directory input must exist, except in a dry run' => sub {
 	my $missing = File::Spec->catdir($dir, 'nodir' . ++$n);
-	my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', '1'], 'input.dir' => $missing, quiet => 1);
+	my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', '1'], 'input_dir' => $missing, quiet => 1);
 	like($error, qr/missing or are not readable/, 'a missing input directory is refused');
-	my ($dry, $out) = run_task(cmd => [$^X, '-e', '1'], 'input.dir' => $missing, 'dry.run' => 1);
+	my ($dry, $out) = run_task(cmd => [$^X, '-e', '1'], 'input_dir' => $missing, 'dry_run' => 1);
 	is($dry->{'will.do'}, 'no: dry run', 'but a dry run carries on');
 	like($out, qr/do not exist yet.*\Q$missing\E/s, 'and lists it');
 	my $present = File::Spec->catdir($dir, 'indir' . ++$n);
 	mkdir $present or die;
-	my ($t) = run_task(cmd => [$^X, '-e', '1'], 'input.dirs' => [$present], quiet => 1);
+	my ($t) = run_task(cmd => [$^X, '-e', '1'], 'input_dirs' => [$present], quiet => 1);
 	is($t->{'will.do'}, 'done', 'a present input directory is accepted');
-	is_deeply($t->{'input.dirs'}, [$present], 'and recorded');
+	is_deeply($t->{'input_dirs'}, [$present], 'and recorded');
 };
-subtest 'input.dir: stale looks at what is inside an input directory' => sub {
+subtest 'input_dir: stale looks at what is inside an input directory' => sub {
 	my $in = File::Spec->catdir($dir, 'instale' . ++$n);
 	mkdir $in or die;
 	my $inside = File::Spec->catfile($in, 'x');
@@ -419,17 +419,17 @@ subtest 'input.dir: stale looks at what is inside an input directory' => sub {
 	utime $now - 200, $now - 200, $in;  # the directory itself is old
 	utime $now - 100, $now - 100, $out; # the output is newer than that
 	utime $now, $now, $inside;          # but a file in the input is newer still
-	my ($t) = run_task(cmd => [$^X, '-e', $WRITE, $out], 'input.dir' => $in, 'output.file' => $out,
+	my ($t) = run_task(cmd => [$^X, '-e', $WRITE, $out], 'input_dir' => $in, 'output_file' => $out,
 		stale => 1, quiet => 1);
 	is($t->{'out.of.date'}, 1, 'the output is out of date against the file inside');
 	is($t->{done}, 'now', 'and was rebuilt');
 };
 
-# --- stale.cmd ----------------------------------------------------------------
-subtest 'stale.cmd: a step whose command changed is run again' => sub {
+# --- stale_cmd ----------------------------------------------------------------
+subtest 'stale_cmd: a step whose command changed is run again' => sub {
 	my $work = File::Spec->catdir($dir, 'cmdstale' . ++$n);
 	mkdir $work or die;
-	my @common = ('output.file' => 'out', 'stale.cmd' => 1, dir => $work, quiet => 1);
+	my @common = ('output_file' => 'out', 'stale_cmd' => 1, dir => $work, quiet => 1);
 	my ($first) = run_task(cmd => [$^X, '-e', $WRITE, 'out', 'one'], @common);
 	is($first->{done}, 'now', 'the first run ran');
 	my ($same) = run_task(cmd => [$^X, '-e', $WRITE, 'out', 'one'], @common);
@@ -441,41 +441,41 @@ subtest 'stale.cmd: a step whose command changed is run again' => sub {
 	is(slurp(File::Spec->catfile($work, 'out')), 'two', 'making the new output');
 	my ($env) = run_task(cmd => [$^X, '-e', $WRITE, 'out', 'two'], @common, env => { SF_X => 1 });
 	is($env->{'cmd.changed'}, 1, 'so does a change of env');
-	my ($without) = run_task(cmd => [$^X, '-e', $WRITE, 'out', 'three'], 'output.file' => 'out',
+	my ($without) = run_task(cmd => [$^X, '-e', $WRITE, 'out', 'three'], 'output_file' => 'out',
 		dir => $work, quiet => 1);
-	is($without->{done}, 'before', 'without stale.cmd a changed command is still skipped, as before 0.19');
+	is($without->{done}, 'before', 'without stale_cmd a changed command is still skipped, as before 0.19');
 };
-subtest 'stale.cmd: outputs made without it are adopted, not re-run' => sub {
+subtest 'stale_cmd: outputs made without it are adopted, not re-run' => sub {
 	my $work = File::Spec->catdir($dir, 'adopt' . ++$n);
 	mkdir $work or die;
-	spew(File::Spec->catfile($work, 'out'), 'made before stale.cmd was used');
-	my @common = ('output.file' => 'out', 'stale.cmd' => 1, dir => $work, quiet => 1);
+	spew(File::Spec->catfile($work, 'out'), 'made before stale_cmd was used');
+	my @common = ('output_file' => 'out', 'stale_cmd' => 1, dir => $work, quiet => 1);
 	my ($t) = run_task(cmd => [$^X, '-e', $WRITE, 'out'], @common);
 	is($t->{done}, 'before', 'an output with no command on record is not re-run');
 	my ($changed) = run_task(cmd => [$^X, '-e', $WRITE, 'out', 'new'], @common);
 	is($changed->{'cmd.changed'}, 1, 'but its command was recorded, so the next change is seen');
 };
 
-# --- on.success and on.failure ------------------------------------------------
-subtest 'on.success and on.failure are called with the record' => sub {
+# --- on_success and on_failure ------------------------------------------------
+subtest 'on_success and on_failure are called with the record' => sub {
 	my (@success, @failure);
-	my %hooks = ('on.success' => sub { push @success, shift }, 'on.failure' => sub { push @failure, shift });
+	my %hooks = ('on_success' => sub { push @success, shift }, 'on_failure' => sub { push @failure, shift });
 	my $out = fresh_path();
-	run_task(cmd => [$^X, '-e', $WRITE, $out], 'output.file' => $out, %hooks, quiet => 1);
-	is(scalar @success, 1, 'on.success was called once');
+	run_task(cmd => [$^X, '-e', $WRITE, $out], 'output_file' => $out, %hooks, quiet => 1);
+	is(scalar @success, 1, 'on_success was called once');
 	is($success[0]{'will.do'}, 'done', 'with the record of the run');
-	is(scalar @failure, 0, 'on.failure was not called');
-	run_task(cmd => [$^X, '-e', '1'], 'output.file' => $out, %hooks, quiet => 1);
+	is(scalar @failure, 0, 'on_failure was not called');
+	run_task(cmd => [$^X, '-e', '1'], 'output_file' => $out, %hooks, quiet => 1);
 	is(scalar @success, 1, 'a skip calls neither');
 	my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', 'exit 6'], %hooks, quiet => 1);
-	is(scalar @failure, 1, 'a failure under die => 1 calls on.failure');
+	is(scalar @failure, 1, 'a failure under die => 1 calls on_failure');
 	is($failure[0]{'exit'}, 6, 'with the failed record');
 	like($error, qr/exited 6/, 'before task() dies as usual');
-	my (undef, undef, undef, $bad) = run_task(cmd => [$^X, '-e', '1'], 'on.success' => 'not code');
-	like($bad, qr/"on.success" must be a code ref/, 'a hook that is not code is refused');
+	my (undef, undef, undef, $bad) = run_task(cmd => [$^X, '-e', '1'], 'on_success' => 'not code');
+	like($bad, qr/"on_success" must be a code ref/, 'a hook that is not code is refused');
 };
 
-# --- wrapper, container, conda.env, executor ---------------------------------
+# --- wrapper, container, conda_env, executor ---------------------------------
 subtest 'wrapper: the command runs inside the wrapper' => sub {
 	# a wrapper that says it ran, and then runs what it was given. Not with
 	# exec: on MSWin32 that starts the command and ends the wrapper at once, so
@@ -493,26 +493,26 @@ subtest 'wrapper: the command runs inside the wrapper' => sub {
 		is($s->{stdout}, '12', 'a string command keeps its shell features inside the wrapper');
 	}
 };
-subtest 'container, conda.env and executor build the wrapped command' => sub {
+subtest 'container, conda_env and executor build the wrapped command' => sub {
 	my $cwd = Cwd::getcwd();
 	my ($docker) = run_task(cmd => ['samtools', 'index', 'x.bam'], container => 'biocontainers/samtools:1.19',
-		'dry.run' => 1, quiet => 1);
+		'dry_run' => 1, quiet => 1);
 	like($docker->{'wrapped.cmd'}, qr/\Adocker run --rm .*-v \Q$cwd:$cwd\E -w \Q$cwd\E .*biocontainers\/samtools:1\.19 samtools index x\.bam\z/,
 		'a container defaults to docker, with the working directory mounted');
 	my ($apptainer) = run_task(cmd => ['samtools', 'index', 'x.bam'], container => 'samtools.sif',
-		'container.engine' => 'apptainer', 'dry.run' => 1, quiet => 1);
+		'container_engine' => 'apptainer', 'dry_run' => 1, quiet => 1);
 	like($apptainer->{'wrapped.cmd'}, qr/\Aapptainer exec --bind \Q$cwd\E --pwd \Q$cwd\E samtools\.sif samtools index x\.bam\z/,
 		'apptainer and singularity use exec, with the working directory bound');
-	my ($conda) = run_task(cmd => ['python', 'x.py'], 'conda.env' => 'analysis', 'dry.run' => 1, quiet => 1);
+	my ($conda) = run_task(cmd => ['python', 'x.py'], 'conda_env' => 'analysis', 'dry_run' => 1, quiet => 1);
 	like($conda->{'wrapped.cmd'}, qr/\Aconda run --no-capture-output -n analysis python x\.py\z/,
-		'conda.env runs the command with conda run');
+		'conda_env runs the command with conda run');
 	my ($slurm) = run_task(cmd => ['bwa', 'mem', 'ref.fa'], executor => 'slurm', threads => 8, mem => '16G',
-		walltime => '2:00:00', 'executor.args' => ['--partition=short'], 'dry.run' => 1, quiet => 1);
+		walltime => '2:00:00', 'executor_args' => ['--partition=short'], 'dry_run' => 1, quiet => 1);
 	like($slurm->{'wrapped.cmd'}, qr/\Asrun --cpus-per-task=8 --mem=16G --time=2:00:00 --partition=short bwa mem ref\.fa\z/,
 		'executor => slurm runs it with srun, asking for the resources');
 	my ($local) = run_task(cmd => [$^X, '-e', 'print $ENV{SIMPLEFLOW_THREADS}'], threads => 3, quiet => 1);
 	is($local->{stdout}, 3, 'run locally, the command is told its threads in SIMPLEFLOW_THREADS');
-	foreach my $bad (['container.engine' => 'lxc', container => 'x'], [executor => 'pbs'], [threads => 0],
+	foreach my $bad (['container_engine' => 'lxc', container => 'x'], [executor => 'pbs'], [threads => 0],
 			[mem => 'lots'], [walltime => 'soon'], [wrapper => 'nice']) {
 		my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', '1'], @$bad);
 		like($error, qr/"\Q$bad->[0]\E"/, "a bad \"$bad->[0]\" is refused");
@@ -523,18 +523,18 @@ subtest 'container, conda.env and executor build the wrapped command' => sub {
 subtest 'the new fields are on the record on every path' => sub {
 	my $out = fresh_path();
 	my %t;
-	($t{'a run'})     = run_task(cmd => [$^X, '-e', $WRITE, $out], 'output.file' => $out, quiet => 1);
-	($t{'a skip'})    = run_task(cmd => [$^X, '-e', '1'], 'output.file' => $out, quiet => 1);
-	($t{'a dry run'}) = run_task(cmd => [$^X, '-e', '1'], 'dry.run' => 1, quiet => 1);
+	($t{'a run'})     = run_task(cmd => [$^X, '-e', $WRITE, $out], 'output_file' => $out, quiet => 1);
+	($t{'a skip'})    = run_task(cmd => [$^X, '-e', '1'], 'output_file' => $out, quiet => 1);
+	($t{'a dry run'}) = run_task(cmd => [$^X, '-e', '1'], 'dry_run' => 1, quiet => 1);
 	is($t{'a run'}{done}, 'now', 'the run ran');
 	is($t{'a skip'}{done}, 'before', 'the skip skipped');
 	is($t{'a dry run'}{'will.do'}, 'no: dry run', 'the dry run was one');
 	my %expected = (
 		attempts => undef, 'cpu.user' => undef, 'cpu.system' => undef, 'start.time' => undef,
-		env => {}, lock => 0, protect => 0, retries => 0, 'retry.delay' => 0,
-		'stdout.file' => '', 'stderr.file' => '', 'output.dirs' => [],
-		'input.dirs' => [], 'stale.cmd' => 0, 'cmd.changed' => 0, wrapper => [], container => '',
-		'container.engine' => '', 'conda.env' => '', executor => 'local', 'executor.args' => [],
+		env => {}, lock => 0, protect => 0, retries => 0, 'retry_delay' => 0,
+		'stdout_file' => '', 'stderr_file' => '', 'output_dirs' => [],
+		'input_dirs' => [], 'stale_cmd' => 0, 'cmd.changed' => 0, wrapper => [], container => '',
+		'container_engine' => '', 'conda_env' => '', executor => 'local', 'executor_args' => [],
 		threads => 0, mem => '', walltime => '', 'wrapped.cmd' => '',
 	);
 	foreach my $path (sort keys %t) {

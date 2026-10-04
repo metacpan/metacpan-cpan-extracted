@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0602';
+our $VERSION = '0.0701';
 
 use v5.36;
 use feature 'try';
@@ -14,6 +14,7 @@ use Carp qw(croak);
 # use Data::Dumper::Compact qw(ddc);
 use IO::Async::Loop ();
 use IO::Async::Timer::Periodic ();
+use List::Util::WeightedChoice qw(choose_weighted);
 use MIDI::RtMidi::FFI::Device ();
 use MIDI::Util qw(setup_score set_chan_patch);
 use Music::Duration::Partition ();
@@ -351,7 +352,8 @@ sub BUILD {
             if ($self->_ticks % $self->_nth == 0) {
                 my $phrase = $self->beats * $self->bars; # steps in a phrase
                 my $pos    = $self->_beat_count % $phrase;
-                if (($self->filling || (ref($self->next_part) && $self->next_part->[ $self->_part_inc % $self->next_part->@* ] =~ /fill/))
+                # ugly gymnastics - ugh
+                if (($self->filling || (ref($self->next_part) eq 'ARRAY' && $self->next_part->[ $self->_part_inc % $self->next_part->@* ] =~ /fill/))
                     && $self->bars > 1
                     && $pos == $phrase - $self->beats # the last bar of the phrase
                 ) {
@@ -419,6 +421,14 @@ sub _adjust_cymbals($self) {
     }
 }
 
+# resolve a part spec to a single part name
+sub _choose_part($self, $spec) {
+    return $spec unless ref $spec eq 'HASH';
+    my @names = sort { $a cmp $b } grep { $spec->{$_} > 0 } keys %$spec;
+    croak 'No positive weighted part to choose' unless @names;
+    return choose_weighted(\@names, [ $spec->@{@names} ]);
+}
+
 sub _adjust_drums($self, $fill_flag) {
     say 'Beats: ' . $self->_beat_count if $self->verbose;
     my ($next, $patterns, $part);
@@ -439,7 +449,10 @@ sub _adjust_drums($self, $fill_flag) {
         }
     }
     else {
-        $part ||= $self->parts->{ $self->next_part };
+        $part ||= do {
+            my $part_name = $self->_choose_part($self->next_part);
+            $self->parts->{$part_name} // croak "Unknown part: $part_name";
+        };
         ($next, $patterns) = $part->();
         if ($next) {
             $self->next_part($next);
@@ -549,7 +562,7 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0602
+version 0.0701
 
 =head1 SYNOPSIS
 
@@ -784,6 +797,25 @@ subsequently in a part.
 If this is an array-reference, the named parts or fills are played in
 succession.
 
+If this is a hash-reference of part names and weights, the next part
+is chosen at random with L<List::Util::WeightedChoice>, in proportion
+to its weight.
+
+Example:
+
+  { A => 6, B => 3, C => 1 }
+
+This plays part A 60% of the time, B 30%, and C 10%. The weights are
+relative, so they don't need to add up to anything in particular, and
+a weight of zero (or less) means the part is never chosen. A part may
+also return such a hash-reference as its "next" value:
+
+  sub part_A {
+      my %patterns = ( ... );
+      my $next = { part_A => 2, part_B => 1 }; # repeat A twice as often as B
+      return $next, \%patterns;
+  }
+
 Default: C<'_default_part'>
 
 =head2 parts
@@ -919,6 +951,8 @@ The F<eg/*.pl> programs in this distribution.
 L<IO::Async::Loop>
 
 L<IO::Async::Timer::Periodic>
+
+L<List::Util::WeightedChoice>
 
 L<MIDI::RtMidi::FFI::Device>
 

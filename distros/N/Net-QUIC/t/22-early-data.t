@@ -85,6 +85,9 @@ sub new_client {
         alpn        => $alpn,
         server_name => 'localhost',
         ca_file     => $cert_file,
+        transport   => {
+            max_datagram_frame_size => 65535,
+        },
     );
 
     $client_args{early_data} = $args{early_data}
@@ -99,12 +102,19 @@ sub new_server_connection {
     my $initial = $client->next_datagram;
     ok(defined($initial), 'client produces an Initial');
 
+    my $transport = Net::QUIC::Endpoint->_transport_config({
+        max_datagram_frame_size => 65535,
+    });
+
     my $server = Net::QUIC::Connection->_server_new(
         $initial->data,
         $server_local,
         $client_local,
         $alpn,
         $server_tls,
+        undef,
+        undef,
+        $transport,
     );
 
     $server->_receive_datagram(
@@ -162,6 +172,15 @@ isa_ok($early_stream, ['Net::QUIC::Stream']);
 $early_stream->send("zero-rtt\n");
 $early_stream->finish;
 
+ok(
+    $second_client->connection->can_send_datagram,
+    'saved 0-RTT transport state retains peer DATAGRAM support',
+);
+ok(
+    $second_client->connection->send_datagram('zero-rtt-datagram'),
+    'client queues DATAGRAM before handshake completion from saved 0-RTT state',
+);
+
 my $second_server = new_server_connection(
     $second_client,
     $second_local,
@@ -197,6 +216,19 @@ is(
     'server receives application bytes in 0-RTT',
 );
 
+my ($early_datagram, $early_datagram_flag) =
+    $second_server->next_received_datagram;
+is(
+    $early_datagram,
+    'zero-rtt-datagram',
+    'server receives QUIC DATAGRAM in 0-RTT',
+);
+is(
+    $early_datagram_flag,
+    1,
+    'received DATAGRAM retains its 0-RTT origin',
+);
+
 for (1 .. 500) {
     pump_pair($second_client, $second_server, $second_local);
     last if $second_client->connection->ready && $second_server->ready;
@@ -222,6 +254,11 @@ my $rejected_stream_id = $rejected_stream->id;
 $rejected_stream->send("must-not-survive\n");
 $rejected_stream->finish;
 
+ok(
+    $third_client->connection->send_datagram('must-not-survive-datagram'),
+    'replayed client can initially queue 0-RTT DATAGRAM from saved state',
+);
+
 my $third_server = new_server_connection(
     $third_client,
     $third_local,
@@ -239,6 +276,10 @@ while (my $datagram = $third_client->next_datagram) {
 ok(
     !defined($third_server->next_stream),
     'server does not expose replayed 0-RTT data',
+);
+ok(
+    !defined($third_server->next_received_datagram),
+    'server does not expose replayed 0-RTT DATAGRAM',
 );
 
 for (1 .. 500) {

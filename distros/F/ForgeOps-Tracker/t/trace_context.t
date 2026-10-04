@@ -296,59 +296,71 @@ subtest 'PSGI: continues the incoming trace, and an escaped error keeps it when 
     is(ForgeOps::Tracker::current_trace_id(), undef, 'nothing leaks past the request');
 };
 
+# Dancer2 is an optional integration, not something `cpanm ForgeOps::Tracker` installs to run these
+# tests, so its apps are compiled only when it is there and its subtests skip otherwise. A string
+# eval, since `use Dancer2` inside a plain package block would fail at compile time without it.
+my $have_dancer2 = eval { require Dancer2; 1 };
+
 # Loaded in both orders: Dancer2 runs the two plugins' on_route_exception hooks in load order, and
 # the report has to carry the request context either way.
-package ErrorsFirstApp {
-    use Dancer2;
-    use ForgeOps::Tracker::Integrations::Dancer2;
-    use ForgeOps::Tracker::Integrations::Dancer2Performance;
+if ($have_dancer2) {
+    eval <<'APPS' or die $@;
+    package ErrorsFirstApp {
+        use Dancer2;
+        use ForgeOps::Tracker::Integrations::Dancer2;
+        use ForgeOps::Tracker::Integrations::Dancer2Performance;
 
-    set apphandler => 'PSGI';
-    set startup_info => 0;
-    set logger => 'Null';
+        set apphandler => 'PSGI';
+        set startup_info => 0;
+        set logger => 'Null';
 
-    get '/orders/:id' => sub { ForgeOps::Tracker::report("handled\n"); return 'ok'; };
-    post '/checkout/:cart' => sub { die "route exploded\n"; };
+        get '/orders/:id' => sub { ForgeOps::Tracker::report("handled\n"); return 'ok'; };
+        post '/checkout/:cart' => sub { die "route exploded\n"; };
+    }
+
+    package PerformanceFirstApp {
+        use Dancer2;
+        use ForgeOps::Tracker::Integrations::Dancer2Performance;
+        use ForgeOps::Tracker::Integrations::Dancer2;
+
+        set apphandler => 'PSGI';
+        set startup_info => 0;
+        set logger => 'Null';
+
+        post '/checkout/:cart' => sub { die "route exploded\n"; };
+    }
+    1;
+APPS
 }
 
-package PerformanceFirstApp {
-    use Dancer2;
-    use ForgeOps::Tracker::Integrations::Dancer2Performance;
-    use ForgeOps::Tracker::Integrations::Dancer2;
+SKIP: {
+    skip 'Dancer2 is not installed (only the optional Dancer2 integration needs it)', 3 unless $have_dancer2;
 
-    set apphandler => 'PSGI';
-    set startup_info => 0;
-    set logger => 'Null';
-
-    post '/checkout/:cart' => sub { die "route exploded\n"; };
-}
-
-package main;
-
-subtest 'Dancer2: an error reported inside a route carries the continued trace and the route pattern' => sub {
-    init_tracker();
-    test_psgi(ErrorsFirstApp->to_app, sub { $_[0]->(GET '/orders/42', traceparent => $HEADER) });
-
-    is(reported()->[0]{trace_id}, $TRACE_ID);
-    is(reported()->[0]{transaction_name}, 'GET /orders/:id');
-    is(reported()->[0]{endpoint}, 'GET /orders/:id');
-    is(sent_traces()->[0]{spans}[0]{parent_span_id}, $PARENT_ID, 'fast, but errored: sent');
-};
-
-for my $app_class (qw(ErrorsFirstApp PerformanceFirstApp)) {
-    subtest "Dancer2 ($app_class): a route that dies is reported with its context and its trace is sent" => sub {
+    subtest 'Dancer2: an error reported inside a route carries the continued trace and the route pattern' => sub {
         init_tracker();
-        my $res;
-        test_psgi($app_class->to_app, sub { $res = $_[0]->(POST '/checkout/9', traceparent => $HEADER) });
+        test_psgi(ErrorsFirstApp->to_app, sub { $_[0]->(GET '/orders/42', traceparent => $HEADER) });
 
-        is($res->code, 500);
-        is(scalar(@{ reported() }), 1);
         is(reported()->[0]{trace_id}, $TRACE_ID);
-        is(reported()->[0]{endpoint}, 'POST /checkout/:cart');
-        is(scalar(@{ sent_traces() }), 1);
-        is(sent_traces()->[0]{spans}[0]{name}, 'POST /checkout/:cart');
-        is(ForgeOps::Tracker::current_trace_id(), undef, 'nothing leaks past the request');
+        is(reported()->[0]{transaction_name}, 'GET /orders/:id');
+        is(reported()->[0]{endpoint}, 'GET /orders/:id');
+        is(sent_traces()->[0]{spans}[0]{parent_span_id}, $PARENT_ID, 'fast, but errored: sent');
     };
+
+    for my $app_class (qw(ErrorsFirstApp PerformanceFirstApp)) {
+        subtest "Dancer2 ($app_class): a route that dies is reported with its context and its trace is sent" => sub {
+            init_tracker();
+            my $res;
+            test_psgi($app_class->to_app, sub { $res = $_[0]->(POST '/checkout/9', traceparent => $HEADER) });
+
+            is($res->code, 500);
+            is(scalar(@{ reported() }), 1);
+            is(reported()->[0]{trace_id}, $TRACE_ID);
+            is(reported()->[0]{endpoint}, 'POST /checkout/:cart');
+            is(scalar(@{ sent_traces() }), 1);
+            is(sent_traces()->[0]{spans}[0]{name}, 'POST /checkout/:cart');
+            is(ForgeOps::Tracker::current_trace_id(), undef, 'nothing leaks past the request');
+        };
+    }
 }
 
 done_testing;

@@ -25,6 +25,7 @@ BEGIN {
 
 use lib 'lib';
 
+use Capture::Tiny qw(capture_stderr);
 use Test::More;
 use File::Temp qw(tempdir);
 use File::Spec;
@@ -449,8 +450,12 @@ subtest 'transcript load and save edge cases' => sub {
 # ------------------------------------------------------------------
 subtest '_run_cli reports an unexecutable command distinctly' => sub {
     my $run = $M->can('_run_cli');
-    my ( $missing_out, $missing_err, $missing_exit ) = $run->( ['dd-ask-no-such-command-42'] );
+    my @missing;
+    my $teed = capture_stderr { @missing = $run->( ['dd-ask-no-such-command-42'] ) };
+    my ( $missing_out, $missing_err, $missing_exit ) = @missing;
     is( $missing_exit, -1, 'a command that cannot be executed reports -1' );
+    like( $missing_err, qr/Can't exec "dd-ask-no-such-command-42"/, 'the exec failure is reported in the captured standard error' );
+    like( $teed, qr/Can't exec "dd-ask-no-such-command-42"/, 'the live tee echoes the exec failure instead of leaking it into the test output' );
 
     my ( $stdout, $stderr, $exit ) = $run->( [ $^X, '-e', 'print "ran\n"' ] );
     is( $exit,   0,       'a real command reports its shifted exit status' );
@@ -475,6 +480,7 @@ subtest '_ask_claude API defaults and CLI fallback argv' => sub {
             claude_conf => {},
             env         => { ANTHROPIC_API_KEY => 'sk-defaults' },
             ua          => $ua,
+            paths       => $paths,
         ),
         'DEFAULTED ANSWER',
         'the API answer is returned when a key resolves',
@@ -498,6 +504,7 @@ subtest '_ask_claude API defaults and CLI fallback argv' => sub {
             history     => [],
             claude_conf => { base_url => 'http://127.0.0.1:1', max_tokens => 32 },
             env         => { ANTHROPIC_API_KEY => 'sk-configured' },
+            paths       => $paths,
         );
         1;
     } or $err = $@;

@@ -217,6 +217,7 @@ sub create_mock_app {
 # Test: skill_static_file_response serves skill-local assets
 {
     local $ENV{HOME} = tempdir(CLEANUP => 1);
+    _write_file( File::Spec->catfile( $ENV{HOME}, '.gitconfig' ), "[safe]\n\tdirectory = *\n" );
     my $paths = Developer::Dashboard::PathRegistry->new(home => $ENV{HOME});
     my $store = Developer::Dashboard::PageStore->new(paths => $paths);
     my $manager = Developer::Dashboard::SkillManager->new(paths => $paths);
@@ -239,6 +240,7 @@ sub create_mock_app {
 # Test: skill_static_file_response falls back to a nested global asset path
 {
     local $ENV{HOME} = tempdir(CLEANUP => 1);
+    _write_file( File::Spec->catfile( $ENV{HOME}, '.gitconfig' ), "[safe]\n\tdirectory = *\n" );
     my $paths = Developer::Dashboard::PathRegistry->new(home => $ENV{HOME});
     my $store = Developer::Dashboard::PageStore->new(paths => $paths);
     my $manager = Developer::Dashboard::SkillManager->new(paths => $paths);

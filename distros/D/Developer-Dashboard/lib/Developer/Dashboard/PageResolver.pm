@@ -3,7 +3,7 @@ package Developer::Dashboard::PageResolver;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Developer::Dashboard::PageDocument;
 
@@ -193,14 +193,16 @@ sub load_provider_page {
         $page = Developer::Dashboard::PageDocument->from_hash( $provider->{page} );
     }
     else {
+        my $title = $provider->{title};
+        $title = $provider->{id} if !$title;
         $page = Developer::Dashboard::PageDocument->new(
             id          => $provider->{id},
-            title       => $provider->{title} || $provider->{id},
+            title       => $title,
             description => $provider->{description} || 'Generated provider page.',
             layout      => { body => $provider->{body} || '' },
             actions     => $provider->{actions} || [],
             state       => $provider->{state} || {},
-        );    # uncoverable condition false count:1
+        );
     }
 
     $page->{meta}{source_kind} = 'provider';

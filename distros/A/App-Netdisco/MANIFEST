@@ -652,6 +652,14 @@ share/views/swagger-ui.tt
 xt/00-compile.t
 xt/01-local-pod.t
 xt/10-sort_port.t
+xt/100-expire-node-wireless.t
+xt/101-job-overrides-in-poller.t
+xt/102-config-overrides-need-admin.t
+xt/103-job-display-name.t
+xt/104-port-scope-unknown-role.t
+xt/105-workers-tasks-is-arithmetic.t
+xt/106-manager-action-is-literal.t
+xt/107-node-monitor-mail-headers.t
 xt/11-port-sortkey.t
 xt/12-port-order-helper.t
 xt/20-checkacl.t
@@ -719,6 +727,7 @@ xt/89-login-return-url.t
 xt/90-pseudodevice-ports-and-hash-cost.t
 xt/91-external-credentials-host.t
 xt/92-password-rehash-on-login.t
+xt/93-device-scope-acl.t
 xt/94-metrics-allow-empty.t
 xt/95-csv-routes-render-csv-templates.t
 xt/96-worker-action-is-literal.t

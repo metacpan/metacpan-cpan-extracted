@@ -143,7 +143,7 @@ SKIP: {
 }
 
 # --- 2. a dry run of a chain of steps ---------------------------------------
-# The inputs were checked before "dry.run" was looked at, so the second step
+# The inputs were checked before "dry_run" was looked at, so the second step
 # of any pipeline -- whose input is the first step's output, which a dry run
 # never makes -- died "the above files are missing or are not readable".
 # A dry run could not get past step 1.
@@ -151,9 +151,9 @@ subtest 'a dry run does not die on an input an earlier step would make' => sub {
 	my ($first, $second) = (fresh_path(), fresh_path());
 	my ($t1, $t2, $error);
 	my ($out) = capture {
-		$t1 = task(cmd => 'make a', 'output.file' => $first, 'dry.run' => 1);
-		$t2 = eval { task(cmd => 'make b from a', 'input.file' => $first,
-			'output.file' => $second, 'dry.run' => 1) };
+		$t1 = task(cmd => 'make a', 'output_file' => $first, 'dry_run' => 1);
+		$t2 = eval { task(cmd => 'make b from a', 'input_file' => $first,
+			'output_file' => $second, 'dry_run' => 1) };
 		$error = $@;
 	};
 	is($t1->{'will.do'}, 'no: dry run', 'step 1 is a dry run');
@@ -168,7 +168,7 @@ subtest 'a missing input still dies when it is not a dry run' => sub {
 	my $missing = fresh_path();
 	my ($lived, $error);
 	capture {
-		$lived = eval { task(cmd => [$^X, '-e', '1'], 'input.file' => $missing, quiet => 1); 1 };
+		$lived = eval { task(cmd => [$^X, '-e', '1'], 'input_file' => $missing, quiet => 1); 1 };
 		$error = $@;
 	};
 	ok(!$lived, 'task() died');
@@ -187,7 +187,7 @@ subtest 'a non-zero exit moves its output aside, and the re-run runs' => sub {
 	my $t;
 	capture {
 		$t = task(cmd => [$^X, '-e', writes_half_then('exit 3'), $out],
-			'output.file' => $out, die => 0, quiet => 1);
+			'output_file' => $out, die => 0, quiet => 1);
 	};
 	is($t->{'will.do'}, 'FAILED', 'the first run failed');
 	ok(!-e $out, 'its output is gone from the declared name (0.182: left in place)');
@@ -195,7 +195,7 @@ subtest 'a non-zero exit moves its output aside, and the re-run runs' => sub {
 	my $again;
 	capture {
 		$again = task(cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die; print $f 'full'}, $out],
-			'output.file' => $out, quiet => 1);
+			'output_file' => $out, quiet => 1);
 	};
 	is($again->{done}, 'now', 'the re-run ran (0.182: done => "before", skipped)');
 	is(slurp($out), 'full', 'and wrote the whole output');
@@ -205,7 +205,7 @@ subtest 'a non-zero exit under die => 1 moves its output aside before dying' => 
 	my $lived;
 	capture {
 		$lived = eval { task(cmd => [$^X, '-e', writes_half_then('exit 4'), $out],
-			'output.file' => $out, quiet => 1); 1 };
+			'output_file' => $out, quiet => 1); 1 };
 	};
 	ok(!$lived, 'task() died');
 	ok(!-e $out, 'the output is gone from the declared name (0.182: left in place)');
@@ -217,7 +217,7 @@ SKIP: {
 		my $out = fresh_path();
 		capture {
 			task(cmd => [$^X, '-e', writes_half_then('kill 9, $$'), $out],
-				'output.file' => $out, die => 0, quiet => 1);
+				'output_file' => $out, die => 0, quiet => 1);
 		};
 		ok(!-e $out, 'the output is gone from the declared name (0.182: left in place)');
 		is(slurp("$out.failed"), 'half', 'and is kept as <file>.failed');
@@ -234,7 +234,7 @@ SKIP: {
 		# exists long before the kill; the 30 s sleep is never reached.
 		capture {
 			$t = task(cmd => [$^X, '-e', writes_half_then('sleep 30'), $out],
-				'output.file' => $out, timeout => 1, die => 0, quiet => 1);
+				'output_file' => $out, timeout => 1, die => 0, quiet => 1);
 		};
 		is($t->{'timed.out'}, 1, 'the command was killed by its timeout');
 		ok(!-e $out, 'the output is gone from the declared name (0.182: left in place)');
@@ -251,7 +251,7 @@ subtest 'the outputs a step did make are moved aside when another is missing' =>
 	my $t;
 	capture {
 		$t = task(cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die; print $f 'half'}, $made],
-			'output.files' => [$made, $never], die => 0, quiet => 1);
+			'output_files' => [$made, $never], die => 0, quiet => 1);
 	};
 	is($t->{'will.do'}, 'FAILED', 'the step failed on its missing output');
 	ok(!-e $made, 'the output it made is gone from the declared name (0.182: left in place)');
@@ -260,35 +260,35 @@ subtest 'the outputs a step did make are moved aside when another is missing' =>
 };
 
 # --- 5. a dry run's record ---------------------------------------------------
-# A dry run returned before output.file.size was set, breaking the promise
+# A dry run returned before output_file.size was set, breaking the promise
 # that every field but the two input.* ones is present on every path, and it
-# never wrote its record to log.fh: the log held the command line alone.
+# never wrote its record to log_fh: the log held the command line alone.
 subtest 'a dry run returns the whole record, and logs it' => sub {
 	my $out = fresh_path();
 	my $log_file = fresh_path();
 	open my $log, '>', $log_file or die "cannot write $log_file: $!";
 	my $t;
 	capture {
-		$t = task(cmd => 'a command never run', 'output.file' => $out,
-			'dry.run' => 1, 'log.fh' => $log, quiet => 1);
+		$t = task(cmd => 'a command never run', 'output_file' => $out,
+			'dry_run' => 1, 'log_fh' => $log, quiet => 1);
 	};
 	close $log;
 	my $logged = slurp($log_file);
 	like($logged, qr/a command never run/, 'the command line was logged');
 	like($logged, qr/will\.do/, 'and so was the record (0.182: only the command line)');
-	ok(exists $t->{'output.file.size'}, 'output.file.size is in the record (0.182: absent)');
+	ok(exists $t->{'output_file.size'}, 'output_file.size is in the record (0.182: absent)');
 };
 
 # --- 6. a failed step's record is logged once --------------------------------
 # Under die => 0 the missing-output branch printed the record and then fell
 # through to the exit, timeout or final branch, which printed it again: two
-# records for one task, the first of them without output.file.size.
+# records for one task, the first of them without output_file.size.
 subtest 'a step with a missing output writes its record to the log once' => sub {
 	my $log_file = fresh_path();
 	open my $log, '>', $log_file or die "cannot write $log_file: $!";
 	capture {
-		task(cmd => [$^X, '-e', '1'], 'output.file' => fresh_path(),
-			die => 0, quiet => 1, 'log.fh' => $log);
+		task(cmd => [$^X, '-e', '1'], 'output_file' => fresh_path(),
+			die => 0, quiet => 1, 'log_fh' => $log);
 	};
 	close $log;
 	my $records = () = slurp($log_file) =~ /will\.do/g;
@@ -301,14 +301,14 @@ subtest 'a step with a missing output writes its record to the log once' => sub 
 # that was never made was reported twice: as missing, and as empty.
 subtest 'a missing output is not reported as having 0 size' => sub {
 	my (undef, $err) = capture {
-		task(cmd => [$^X, '-e', '1'], 'output.file' => fresh_path(), die => 0, quiet => 1);
+		task(cmd => [$^X, '-e', '1'], 'output_file' => fresh_path(), die => 0, quiet => 1);
 	};
 	like($err, qr/should have been made but are missing/, 'the missing output was reported');
 	unlike($err, qr/output files have 0 size/, 'and not as having 0 size as well (0.182: it was)');
 	my $empty = fresh_path();
 	my (undef, $empty_err) = capture {
 		task(cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die}, $empty],
-			'output.file' => $empty, quiet => 1);
+			'output_file' => $empty, quiet => 1);
 	};
 	like($empty_err, qr/output files have 0 size/, 'an output that exists and is empty still is');
 };
@@ -321,7 +321,7 @@ subtest 'a missing output is not reported as having 0 size' => sub {
 subtest 'the dumps explaining an error are on STDERR, not STDOUT' => sub {
 	my $missing = fresh_path();
 	my ($out, $err) = capture {
-		eval { task(cmd => [$^X, '-e', '1'], 'input.file' => $missing, quiet => 1) };
+		eval { task(cmd => [$^X, '-e', '1'], 'input_file' => $missing, quiet => 1) };
 	};
 	like($err, qr/missing or unreadable/, 'the missing-input error was reported on stderr');
 	like($err, qr/\Q$missing\E/, 'with the dump naming the file (0.182: that went to stdout)');
@@ -445,7 +445,7 @@ subtest '"stale" sees an input newer by less than a second' => sub {
 		my $t;
 		capture {
 			$t = task(cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die; print $f 'rebuilt'}, $out],
-				'input.file' => $in, 'output.file' => $out, stale => 1, quiet => 1);
+				'input_file' => $in, 'output_file' => $out, stale => 1, quiet => 1);
 		};
 		is($t->{'out.of.date'}, 1, 'the output is out of date (0.182: 0, same second)');
 		is(slurp($out), 'rebuilt', 'and was rebuilt (0.182: kept)');
@@ -459,7 +459,7 @@ subtest '"stale" sees an input newer by less than a second' => sub {
 subtest 'the message for a failure names each thing that went wrong' => sub {
 	my $error;
 	capture {
-		eval { task(cmd => [$^X, '-e', 'exit 3'], 'output.file' => fresh_path(), quiet => 1) };
+		eval { task(cmd => [$^X, '-e', 'exit 3'], 'output_file' => fresh_path(), quiet => 1) };
 		$error = $@;
 	};
 	like($error, qr/should have been made but are missing/, 'it names the missing output');
@@ -467,7 +467,7 @@ subtest 'the message for a failure names each thing that went wrong' => sub {
 	SKIP: {
 		skip 'timeout needs fork() and POSIX process groups', 2 if $^O eq 'MSWin32';
 		capture {
-			eval { task(cmd => [$^X, '-e', 'sleep 30'], 'output.file' => fresh_path(),
+			eval { task(cmd => [$^X, '-e', 'sleep 30'], 'output_file' => fresh_path(),
 				timeout => 1, quiet => 1) };
 			$error = $@;
 		};
@@ -549,20 +549,20 @@ subtest '"failed.outputs" lists where a failed step\'s outputs went' => sub {
 	my $t;
 	capture {
 		$t = task(cmd => [$^X, '-e', writes_half_then('exit 5'), $out],
-			'output.file' => $out, die => 0, quiet => 1);
+			'output_file' => $out, die => 0, quiet => 1);
 	};
 	is_deeply($t->{'failed.outputs'}, ["$out.failed"], 'the new name is recorded');
 	is(slurp("$out.failed"), 'half', 'and replaced the leftover from before');
-	is($t->{'output.file.size'}{$out}, 4, 'output.file.size is what the command wrote, before the move');
+	is($t->{'output_file.size'}{$out}, 4, 'output_file.size is what the command wrote, before the move');
 };
 subtest '"failed.outputs" is an empty list on every other path' => sub {
 	my $out = fresh_path();
 	my %t;
 	capture {
 		$t{'a success'} = task(cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die; print $f 'ok'}, $out],
-			'output.file' => $out, quiet => 1);
-		$t{'a skip'}    = task(cmd => [$^X, '-e', '1'], 'output.file' => $out, quiet => 1);
-		$t{'a dry run'} = task(cmd => [$^X, '-e', '1'], 'dry.run' => 1, quiet => 1);
+			'output_file' => $out, quiet => 1);
+		$t{'a skip'}    = task(cmd => [$^X, '-e', '1'], 'output_file' => $out, quiet => 1);
+		$t{'a dry run'} = task(cmd => [$^X, '-e', '1'], 'dry_run' => 1, quiet => 1);
 	};
 	# positive sentinel: each path was the one intended
 	is($t{'a success'}{done}, 'now',    'the success ran');

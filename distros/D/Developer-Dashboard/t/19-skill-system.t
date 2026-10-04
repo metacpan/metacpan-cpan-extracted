@@ -201,6 +201,16 @@ my $paths = Developer::Dashboard::PathRegistry->new( home => $ENV{HOME} );
 my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
 my $dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $paths );
 
+my $dep_beta_repo = _create_skill_repo( 'dep-beta', with_cpanfile => 0 );
+_write_file( File::Spec->catfile( $dep_beta_repo, '.env' ), "VERSION=1.00\n", 0644 );
+{
+    my $cwd = getcwd();
+    chdir $dep_beta_repo or die "Unable to chdir to $dep_beta_repo: $!";
+    _run_or_die(qw(git add .));
+    _run_or_die( 'git', 'commit', '-m', 'Add dependency version' );
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+}
+
 my $alpha_repo = _create_skill_repo(
     'alpha-skill',
     command_body => <<'PL',
@@ -216,7 +226,7 @@ use warnings;
 print "hook-alpha\n";
 PL
     ddfile_body => "dep-alpha\n",
-    ddfile_local_body => "dep-beta\n",
+    ddfile_local_body => "file://$dep_beta_repo\n",
     aptfile_body => "git\ncurl\n",
     apkfile_body => "procps-dev\n",
     dnfile_body => "git-core\njq\n",
@@ -264,15 +274,15 @@ open my $dependency_log_fh, '<', $dependency_log or die "Unable to read $depende
 my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependency_log_fh>;
 close $dependency_log_fh;
 is_deeply(
-    [ map { (/^(DDFILE_LOCAL|DDFILE|APT|BREW|NPM|PYTHON|CPANM):/)[0] } @dependency_steps ],
+    [ map { (/^(DDFILE|APT|BREW|NPM|PYTHON|CPANM):/)[0] } @dependency_steps ],
 
     # DD-824: requirements.txt now attempts venv creation (python -m venv)
     # before the pip install itself, so the PYTHON step now logs twice - the
     # venv-creation attempt, then the install (which falls back to the
     # previous global --user path here, since the python stub does not
     # actually create a real venv for the fallback check to find).
-    [ 'APT', 'NPM', 'PYTHON', 'PYTHON', 'CPANM', 'CPANM', 'DDFILE', 'DDFILE_LOCAL' ],
-    'skill install processes aptfile, package.json, requirements.txt, cpanfile, cpanfile.local, ddfile, and ddfile.local in policy order on Debian-like hosts while leaving apkfile, wingetfile, dnfile, and brewfile inactive',
+    [ 'APT', 'NPM', 'PYTHON', 'PYTHON', 'CPANM', 'CPANM', 'DDFILE' ],
+    'skill install processes aptfile, package.json, requirements.txt, cpanfile, cpanfile.local, and runtime-wide ddfile in policy order while ddfile.local dependencies stay private',
 );
 open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
 my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
@@ -312,7 +322,8 @@ open my $dashboard_log_fh, '<', $dashboard_log or die "Unable to read $dashboard
 my @dashboard_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dashboard_log_fh>;
 close $dashboard_log_fh;
 is( $dashboard_steps[0], 'skills install dep-alpha', 'deferred ddfile installs dependent skills through dashboard skills install' );
-is( $dashboard_steps[1], 'skills install dep-beta', 'deferred ddfile.local installs dependent skills through dashboard skills install at the current skill level' );
+is( scalar @dashboard_steps, 1, 'private ddfile.local dependencies do not invoke the runtime-wide dashboard installer' );
+ok( -d File::Spec->catdir( $install->{path}, 'skills', 'dep-beta' ), 'ddfile.local dependencies install beneath the owning skill' );
 {
     local $ENV{DD_TEST_OS} = 'MSWin32';
     unlink $winget_log;
@@ -652,11 +663,11 @@ PL
     is( $env_dispatch_payload->{skill_only}, 'home-skill', 'skill dispatch loads the base skill .env file' );
     is( $env_dispatch_payload->{skill_chain}, 'skill-home/from-skill-env', 'skill dispatch expands skill .env values from earlier keys in the same skill env file' );
     is( $env_dispatch_payload->{skill_pl_chain}, 'skill-home/from-skill-env/from-skill-pl', 'skill dispatch loads skill .env before skill .env.pl within the same skill layer' );
-    is( $env_dispatch_payload->{shared}, 'skill-child', 'skill-local env files override inherited runtime values for the running skill' );
+    is( $env_dispatch_payload->{shared}, 'runtime-child', 'the child runtime env overrides skill-local values for the running skill' );
     is(
         _portable_path( $env_dispatch_payload->{audit}{envfile} ),
-        _portable_path( File::Spec->catfile( $env_child_skill_root, '.env.pl' ) ),
-        'skill dispatch exposes env audit metadata for the effective deepest skill env source',
+        _portable_path( File::Spec->catfile( $env_child_root, '.env' ) ),
+        'skill dispatch exposes env audit metadata for the effective child runtime env source',
     );
 
     my ( $dotted_stdout, $dotted_stderr, $dotted_exit ) = capture {
@@ -664,7 +675,7 @@ PL
     };
     is( $dotted_exit >> 8, 0, 'dashboard <skill>.<command> loads runtime and skill env layers through the public dotted switchboard path' );
     my $dotted_payload = decode_json($dotted_stdout);
-    is( $dotted_payload->{shared}, 'skill-child', 'dashboard <skill>.<command> keeps the deepest skill env override through the public path' );
+    is( $dotted_payload->{shared}, 'runtime-child', 'dashboard <skill>.<command> keeps the child runtime env override through the public path' );
     chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
 }
 
@@ -1249,6 +1260,50 @@ ok( grep { $_ eq 'shared-skill' } @remaining_skills, 'uninstall preserves shared
     ok( -f File::Spec->catfile( $project, 'ddfile.local' ), 'the ddfile.local manifest itself survives its own traversal source' );
 }
 
+# ---------------------------------------------------------------------------
+# DD-1043: d2 <skill>.version natively reads VERSION= from the skill's own
+# .env when the skill ships no cli/version script of its own - no skill
+# should need to hand-write a version command just to answer this.
+# ---------------------------------------------------------------------------
+{
+    my $version_home = tempdir( CLEANUP => 1 );
+    make_path( File::Spec->catdir( $version_home, '.developer-dashboard' ) );
+    my $version_paths     = Developer::Dashboard::PathRegistry->new( home => $version_home );
+    my $version_manager   = Developer::Dashboard::SkillManager->new( paths => $version_paths );
+    my $version_dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $version_paths );
+
+    my $versioned_skill_root = File::Spec->catdir( $version_paths->skills_root, 'versioned-skill' );
+    make_path( File::Spec->catdir( $versioned_skill_root, 'cli' ) );
+    _write_file( File::Spec->catfile( $versioned_skill_root, '.env' ), "VERSION=5.187\n", 0644 );
+
+    my $version_dispatch = $version_dispatcher->dispatch( 'versioned-skill', 'version' );
+    is( $version_dispatch->{exit_code}, 0, 'd2 <skill>.version exits 0 when the skill .env carries VERSION=' );
+    like( $version_dispatch->{stdout}, qr/\A5\.187\n\z/, 'd2 <skill>.version prints the bare VERSION= value from the skill .env' );
+
+    my $versionless_skill_root = File::Spec->catdir( $version_paths->skills_root, 'versionless-skill' );
+    make_path( File::Spec->catdir( $versionless_skill_root, 'cli' ) );
+    _write_file( File::Spec->catfile( $versionless_skill_root, '.env' ), "SOME_OTHER_KEY=1\n", 0644 );
+
+    my $versionless_dispatch = $version_dispatcher->dispatch( 'versionless-skill', 'version' );
+    like( $versionless_dispatch->{stdout}, qr/no version number found/i, 'a skill .env with no VERSION= key reports no version number found' );
+
+    my $no_env_skill_root = File::Spec->catdir( $version_paths->skills_root, 'no-env-skill' );
+    make_path( File::Spec->catdir( $no_env_skill_root, 'cli' ) );
+    my $no_env_dispatch = $version_dispatcher->dispatch( 'no-env-skill', 'version' );
+    like( $no_env_dispatch->{stdout}, qr/no version number found/i, 'a skill with no .env at all also reports no version number found, not an error' );
+
+    my $own_script_skill_root = File::Spec->catdir( $version_paths->skills_root, 'own-version-script-skill' );
+    make_path( File::Spec->catdir( $own_script_skill_root, 'cli' ) );
+    _write_file( File::Spec->catfile( $own_script_skill_root, '.env' ), "VERSION=1.00\n", 0644 );
+    _write_file(
+        File::Spec->catfile( $own_script_skill_root, 'cli', 'version' ),
+        "#!/usr/bin/env perl\nprint \"custom-version-output\\n\";\n",
+        0755,
+    );
+    my $own_script_dispatch = $version_dispatcher->dispatch( 'own-version-script-skill', 'version' );
+    like( $own_script_dispatch->{stdout}, qr/custom-version-output/, 'a skill-provided cli/version script still wins over the native .env fallback' );
+}
+
 done_testing();
 
 # _write_file_at($path, $body, $mode): writes one file at an absolute path.
@@ -1286,7 +1341,8 @@ sub _create_skill_repo {
     }
     _write_file( File::Spec->catfile( 'config', 'config.json' ), $args{config_body} || qq|{"skill_name":"$name"}\n|, 0644 );
     _write_file( File::Spec->catfile( 'config', 'docker', 'postgres', 'compose.yml' ), "services: {}\n", 0644 );
-    _write_file( 'cpanfile', $args{cpanfile_body} || "requires 'JSON::XS';\n", 0644 );
+    _write_file( 'cpanfile', $args{cpanfile_body} || "requires 'JSON::XS';\n", 0644 )
+      if !exists $args{with_cpanfile} || $args{with_cpanfile};
     if ( defined $args{ddfile_body} ) {
         _write_file( 'ddfile', $args{ddfile_body}, 0644 );
     }

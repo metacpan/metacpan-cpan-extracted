@@ -817,9 +817,9 @@ subtest 'DESTROY — closelog not called twice on double-DESTROY' => sub {
 
 	my $closed = 0;
 	my $g_close = mock_scoped 'Sys::Syslog::closelog' => sub { $closed++ };
-	my $g_open  = mock_scoped 'Log::Abstraction::openlog' => sub { };
+	my $g_open  = mock_scoped 'Sys::Syslog::openlog' => sub { };
 	my $g_log   = mock_scoped 'Sys::Syslog::syslog'   => sub { };
-	my $g_sock  = mock_scoped 'Log::Abstraction::setlogsock' => sub { };
+	my $g_sock  = mock_scoped 'Sys::Syslog::setlogsock' => sub { };
 
 	my $logger = Log::Abstraction->new(
 		logger => { syslog => { facility => 'local0' } },

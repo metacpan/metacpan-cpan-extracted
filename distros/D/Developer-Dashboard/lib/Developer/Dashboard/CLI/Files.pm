@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Files;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Cwd qw(cwd);
 use Getopt::Long qw(GetOptionsFromArray);
@@ -19,6 +19,23 @@ use Developer::Dashboard::CLI::TableHelpers qw(
     removal_table
     render_table
 );
+
+# _parse_create_option($raw_value)
+# Validates and normalizes a "-c|--create[:s]" option's raw Getopt::Long
+# value into (create boolean, mode string-or-undef) for DD-1005's lazy-create
+# support - identical contract to CLI::Paths's own helper (see there for the
+# full rationale); duplicated rather than shared because the two CLI modules
+# deliberately have no runtime dependency on each other.
+# Input: the raw scalar Getopt::Long populated (undef, '', or a string).
+# Output: two-element list (create boolean, octal mode string or undef).
+sub _parse_create_option {
+    my ($raw_value) = @_;
+    return ( 0, undef ) if !defined $raw_value;
+    return ( 1, undef ) if $raw_value eq '';
+    die "Usage: --create/-c mode must be an octal string like 0777, got '$raw_value'\n"
+      if $raw_value !~ /\A0[0-7]+\z/;
+    return ( 1, $raw_value );
+}
 
 # run_files_command(%args)
 # Dispatches the lightweight dashboard file/files CLI behaviour without loading
@@ -36,11 +53,8 @@ sub run_files_command {
     my $paths = build_paths();
     my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
     my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
-    my $aliases_loaded = 0;
     my $load_configured_file_aliases = sub {
-        return 1 if $aliases_loaded;    # uncoverable branch true
         $files->register_named_files( $config->file_aliases );
-        $aliases_loaded = 1;
         return 1;
     };
 
@@ -94,13 +108,15 @@ sub run_files_command {
     }
     if ( $action eq 'add' ) {
         my $output = 'table';
-        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        die "Usage: dashboard file add <name> <path> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
+        my $create_raw;
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output, 'c|create:s' => \$create_raw );
+        die "Usage: dashboard file add <name> <path> [-c|--create[=MODE]] [-o json|table]\n" if $output ne 'json' && $output ne 'table';
+        my ( $create, $mode ) = _parse_create_option($create_raw);
         my $name = shift @argv || die "Usage: dashboard file add <name> <path>\n";
         my $path = shift @argv || die "Usage: dashboard file add <name> <path>\n";
-        my $saved = $config->save_global_file_alias( $name, $path );
-        $files->register_named_files( { $name => $saved->{path} } );
-        $saved->{resolved} = $files->resolve_file($name);
+        my $saved = $config->save_file_alias( $name, $path, ( $create ? ( create => 1, ( defined $mode ? ( mode => $mode ) : () ) ) : () ) );
+        $files->register_named_files( { $saved->{name} => ( $saved->{create} ? { path => $saved->{path}, create => 1, ( defined $saved->{mode} ? ( mode => $saved->{mode} ) : () ) } : $saved->{path} ) } );
+        $saved->{resolved} = $files->resolve_file( $saved->{name} );
         if ( $output eq 'json' ) {
             print json_encode($saved);
             return 1;
@@ -118,7 +134,7 @@ sub run_files_command {
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
         die "Usage: dashboard file del <name> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
         my $name = shift @argv || die "Usage: dashboard file del <name>\n";
-        my $deleted = $config->remove_global_file_alias($name);
+        my $deleted = $config->remove_file_alias($name);
         $files->unregister_named_file($name);
         if ( $output eq 'json' ) {
             print json_encode($deleted);
@@ -217,6 +233,7 @@ to file alias behavior without loading the full web/runtime stack.
   dashboard files
   dashboard file resolve global_config
   dashboard file add notes ~/notes.txt
+  dashboard file add scratch /tmp/scratch/notes.txt --create
   dashboard file locate notes txt
   dashboard file list
   dashboard file del notes

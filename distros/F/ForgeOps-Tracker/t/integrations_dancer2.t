@@ -3,6 +3,15 @@ use warnings;
 use Test::More;
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
+# Optional integration: skipped, not failed, where its framework isn't installed (a plain
+# `cpanm ForgeOps::Tracker` installs only what TEST_REQUIRES lists).
+BEGIN {
+    for my $module (qw(Plack::Test HTTP::Request::Common Dancer2)) {
+        (my $file = "$module.pm") =~ s{::}{/}g;
+        next if eval { require $file; 1 };
+        Test::More::plan(skip_all => "$module is not installed");
+    }
+}
 use Plack::Test;
 use HTTP::Request::Common qw(GET);
 use ForgeOps::Tracker;

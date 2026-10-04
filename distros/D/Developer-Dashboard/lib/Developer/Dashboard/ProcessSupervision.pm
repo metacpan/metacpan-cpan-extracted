@@ -3,7 +3,7 @@ package Developer::Dashboard::ProcessSupervision;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Exporter 'import';
 
@@ -175,9 +175,7 @@ sub _overwrite_state_file_in_place {
     print {$target_fh} $content
       or return ( 0, "Unable to write $target during in-place overwrite: $!" );
     close $target_fh;
-    if ( -e $source ) {    # uncoverable branch false the source pending file still exists when the overwrite path reaches this cleanup
-        $self->_unlink_path($source) or undef;
-    }
+    $self->_unlink_path($source);
     return ( 1, '' );
 }
 
@@ -191,8 +189,8 @@ sub _open_file_descriptors {
     my %seen;
     my @fds;
     for my $path ( glob('/proc/self/fd/*'), glob('/dev/fd/*') ) {
-        next if $path !~ m{(?:/proc/self/fd|/dev/fd)/(\d+)\z};    # uncoverable branch true the two globs only ever yield numeric descriptor entries under these directories
-        my $fd = $1 + 0;
+        my ($fd) = $path =~ m{(\d+)\z};
+        $fd += 0;
         next if $seen{$fd}++;
         push @fds, $fd;
     }
@@ -212,7 +210,7 @@ sub _descriptor_is_inherited_pipe {
     my $proc_target = readlink("/proc/self/fd/$fd");
     my $dev_target  = readlink("/dev/fd/$fd");
     my $target = defined $proc_target ? $proc_target : $dev_target;
-    return 0 if !defined $target || $target eq '';    # uncoverable condition right readlink returns a non-empty path or undef, never an empty string
+    return 0 if !defined $target;
     return 1 if $target =~ /^pipe:/;
     return 0 if !$args{close_ipc};
     return $target =~ /^(?:socket:|anon_inode:)/ ? 1 : 0;
@@ -278,13 +276,10 @@ sub _read_process_env_marker {
     my ( $self, $pid, $key ) = @_;
     my $proc = "/proc/$pid/environ";
     return if !-r $proc;
-    # The readability guard above already excluded an unreadable environ file,
-    # so open() failing here cannot be reached on this test host.
-    open my $fh, '<', $proc or return;    # uncoverable branch true
+    open my $fh, '<', $proc or return;
     local $/;
     my $env = scalar <$fh>;
-    # A readable environ file always slurps back a defined, non-empty string.
-    return if !defined $env || $env eq '';    # uncoverable condition left
+    return if !defined $env || $env eq '';
     for my $pair ( split /\0/, $env ) {
         next if $pair !~ /^([^=]+)=(.*)$/s;
         return $2 if $1 eq $key;
@@ -354,8 +349,7 @@ sub _helper_file_supports_internal_command {
     open my $fh, '<:raw', $path or return 0;
     local $/;
     my $content = <$fh>;
-    # closing a freshly read, read-only handle does not fail on the test host
-    CORE::close($fh) or return 0;    # uncoverable branch true
+    CORE::close($fh) or return 0;
     return $content =~ /\Q$command\E/ ? 1 : 0;
 }
 

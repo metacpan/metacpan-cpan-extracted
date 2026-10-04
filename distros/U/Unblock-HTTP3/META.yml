@@ -1,0 +1,78 @@
+---
+abstract: 'non-blocking HTTP/3 protocol engine for Perl'
+author:
+  - 'Joshua S. Day <haxmeister@hotmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  FindBin: '0'
+  IO::Select: '0'
+  IO::Socket::INET: '0'
+  Socket: '0'
+  Test2::V0: '0'
+configure_requires:
+  Alien::nghttp3: '0.01'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unblock-HTTP3
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Unblock::HTTP3::_Bytes
+    - Unblock::HTTP3::_Native
+provides:
+  Unblock::HTTP3:
+    file: lib/Unblock/HTTP3.pm
+    version: '0.01'
+  Unblock::HTTP3::Body::Reader:
+    file: lib/Unblock/HTTP3/Body/Reader.pm
+    version: '0.01'
+  Unblock::HTTP3::Body::Stream:
+    file: lib/Unblock/HTTP3/Body/Stream.pm
+    version: '0.01'
+  Unblock::HTTP3::Capsule:
+    file: lib/Unblock/HTTP3/Capsule.pm
+    version: '0.01'
+  Unblock::HTTP3::Capsule::Parser:
+    file: lib/Unblock/HTTP3/Capsule/Parser.pm
+    version: '0.01'
+  Unblock::HTTP3::Capsule::Stream:
+    file: lib/Unblock/HTTP3/Capsule/Stream.pm
+    version: '0.01'
+  Unblock::HTTP3::Connection:
+    file: lib/Unblock/HTTP3/Connection.pm
+    version: '0.01'
+  Unblock::HTTP3::Extension::Stream:
+    file: lib/Unblock/HTTP3/Extension/Stream.pm
+    version: '0.01'
+  Unblock::HTTP3::Request:
+    file: lib/Unblock/HTTP3/Request.pm
+    version: '0.01'
+  Unblock::HTTP3::Response:
+    file: lib/Unblock/HTTP3/Response.pm
+    version: '0.01'
+  Unblock::HTTP3::Transaction:
+    file: lib/Unblock/HTTP3/Transaction.pm
+    version: '0.01'
+requires:
+  Alien::nghttp3: '0.01'
+  Carp: '0'
+  Net::QUIC: '0.04'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  Uniform::HTTP: '0.04'
+  XSLoader: '0'
+  parent: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/haxmeister/perl-Unblock-HTTP3/issues
+  homepage: https://github.com/haxmeister/perl-Unblock-HTTP3
+  repository: https://github.com/haxmeister/perl-Unblock-HTTP3.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

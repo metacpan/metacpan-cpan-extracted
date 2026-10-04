@@ -462,7 +462,7 @@ PAGE
             '_effective_interval_seconds keeps dashboard subcommand collectors above the minimum interval unchanged',
         );
     }
-    ok( $runner->_cron_due( undef, $cron_name ), '_cron_due treats an empty cron expression as always due' );
+    ok( !$runner->_cron_due( undef, $cron_name ), '_cron_due rejects an empty cron expression instead of treating it as always due' );
     ok( !$runner->_cron_due( '* * * *', $cron_name ), '_cron_due rejects malformed cron expressions' );
     my @now = localtime();
     my $expr = sprintf '%d-%d %d %d %d %d', $now[1], $now[1], $now[2], $now[3], $now[4] + 1, $now[6];

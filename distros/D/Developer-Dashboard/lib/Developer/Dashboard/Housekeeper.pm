@@ -3,7 +3,7 @@ package Developer::Dashboard::Housekeeper;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use File::Path qw(remove_tree);
 use File::Spec;
@@ -117,7 +117,7 @@ sub _cleanup_state_roots {
         $self->{paths}->_state_root_for_layer($_) => 1
     } $self->{paths}->runtime_layers;
 
-    opendir my $dh, $base or die "Unable to read $base: $!";    # uncoverable branch true
+    opendir my $dh, $base or die "Unable to read $base: $!";
     my @removed;
     while ( my $entry = readdir $dh ) {
         next if $entry eq '.' || $entry eq '..';
@@ -143,11 +143,11 @@ sub _cleanup_temp_files {
         next if !-f $path;
         my ( undef, undef, $entry ) = File::Spec->splitpath($path);
         my ( $kind, $scan_key ) = $self->_temp_file_kind($entry);
-        next if !$kind;    # uncoverable branch true
+        next if !$kind;
         $args{scanned}{$scan_key}++;
         next if !$self->_path_is_old_enough( $path, $args{min_age_seconds} );
         if ( !$args{dry_run} && !unlink $path ) {
-            next if !-e $path;    # uncoverable branch true
+            next if !-e $path;
             my $label = $kind eq 'ajax-temp-file' ? 'Ajax temp file' : 'runtime result temp file';
             die "Unable to remove stale $label $path: $!";
         }
@@ -248,7 +248,7 @@ sub _state_root_has_live_collectors {
         next if !-f $pidfile;
         open my $fh, '<', $pidfile or die "Unable to read $pidfile: $!";
         my $pid = <$fh>;
-        close $fh or die "Unable to close $pidfile: $!";    # uncoverable branch true
+        close $fh or die "Unable to close $pidfile: $!";
         chomp $pid if defined $pid;
         next if !defined $pid || $pid !~ /\A\d+\z/;
         # DD-598: a bare kill(0,$pid) only proves SOME process holds this pid,
@@ -279,7 +279,7 @@ sub _read_state_metadata {
     open my $fh, '<', $file or die "Unable to read $file: $!";
     local $/;
     my $raw = <$fh>;
-    close $fh or die "Unable to close $file: $!";    # uncoverable branch true
+    close $fh or die "Unable to close $file: $!";
     my $data = eval { json_decode($raw) };
     return if !$data || ref($data) ne 'HASH';
     return $data;
@@ -336,7 +336,8 @@ sub _only_missing_tree_errors {
 # Output: Developer::Dashboard::Collector object.
 sub _collector_store {
     my ($self) = @_;
-    return $self->{collector_store} ||= Developer::Dashboard::Collector->new( paths => $self->{paths} );    # uncoverable condition false
+    $self->{collector_store} = Developer::Dashboard::Collector->new( paths => $self->{paths} ) if !$self->{collector_store};
+    return $self->{collector_store};
 }
 
 # _collector_runner()
@@ -347,11 +348,12 @@ sub _collector_store {
 # Output: Developer::Dashboard::CollectorRunner object.
 sub _collector_runner {
     my ($self) = @_;
-    return $self->{collector_runner} ||= Developer::Dashboard::CollectorRunner->new(
+    $self->{collector_runner} = Developer::Dashboard::CollectorRunner->new(
         paths      => $self->{paths},
         collectors => $self->_collector_store,
-        files      => Developer::Dashboard::FileRegistry->new( paths => $self->{paths} ),    # uncoverable condition false
-    );
+        files      => Developer::Dashboard::FileRegistry->new( paths => $self->{paths} ),
+    ) if !$self->{collector_runner};
+    return $self->{collector_runner};
 }
 
 # _config()
@@ -360,7 +362,8 @@ sub _collector_runner {
 # Output: Developer::Dashboard::Config object.
 sub _config {
     my ($self) = @_;
-    return $self->{config} ||= Developer::Dashboard::Config->for_paths( $self->{paths} );    # uncoverable condition false
+    $self->{config} = Developer::Dashboard::Config->for_paths( $self->{paths} ) if !$self->{config};
+    return $self->{config};
 }
 
 1;

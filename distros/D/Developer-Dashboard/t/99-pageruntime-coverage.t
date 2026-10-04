@@ -48,6 +48,42 @@ use Developer::Dashboard::RuntimeManager ();
     sub new { return bless {}, shift; }
 }
 
+{
+    package Local::RuntimePathsStub;
+    # new($class, $dashboard_roots, $runtime_roots)
+    # Builds a path provider with deliberately duplicated and empty roots.
+    # Input: class name and two optional root arrays.
+    # Output: stub object consumed by PageRuntime tests.
+    sub new { return bless { dashboards => $_[1] || [], runtimes => $_[2] || [] }, $_[0]; }
+
+    # dashboards_roots($self)
+    # Returns the fixture's configured bookmark roots.
+    # Input: stub object.
+    # Output: list of dashboard root paths.
+    sub dashboards_roots { return @{ $_[0]{dashboards} }; }
+
+    # runtime_roots($self)
+    # Returns the fixture's configured runtime roots.
+    # Input: stub object.
+    # Output: list of runtime root paths.
+    sub runtime_roots { return @{ $_[0]{runtimes} }; }
+}
+
+{
+    package Local::DashboardOnlyPathsStub;
+    # new($class, $dashboard_roots)
+    # Builds a provider without the optional runtime_roots capability.
+    # Input: class name and optional dashboard-root array.
+    # Output: stub object consumed by PageRuntime tests.
+    sub new { return bless { dashboards => $_[1] || [] }, $_[0]; }
+
+    # dashboards_roots($self)
+    # Returns the fixture's configured bookmark roots.
+    # Input: stub object.
+    # Output: list of dashboard root paths.
+    sub dashboards_roots { return @{ $_[0]{dashboards} }; }
+}
+
 # Hermetic runtime rooted in a throwaway home, with the deepest runtime layer
 # resolved from the current working directory.
 my $home = tempdir( CLEANUP => 1 );
@@ -62,6 +98,78 @@ my $runtime          = Developer::Dashboard::PageRuntime->new( paths => $paths, 
 my $runtime_no_paths = Developer::Dashboard::PageRuntime->new();
 ok( ref($runtime),          'runtime with truthy aliases constructs' );
 ok( ref($runtime_no_paths), 'runtime without paths or aliases constructs' );
+
+{
+    my $dedupe_root = File::Spec->catdir( $home, 'runtime-dedupe' );
+    my $skill_root  = File::Spec->catdir( $home, 'runtime-skill' );
+    my $skill_lib   = File::Spec->catdir( $skill_root, 'lib' );
+    my $parent_root = File::Spec->catdir( $home, 'runtime-parent' );
+    make_path( $dedupe_root, $skill_lib, File::Spec->catdir( $parent_root, 'lib' ) );
+    my $stub_paths = Local::RuntimePathsStub->new(
+        [ undef, '', $dedupe_root, $dedupe_root ],
+        [ $dedupe_root, $parent_root ],
+    );
+    my $root_runtime = Developer::Dashboard::PageRuntime->new(paths => $stub_paths);
+    is_deeply(
+        [ $root_runtime->_template_include_roots( { meta => { skill_path => $skill_root } } ) ],
+        [ File::Spec->catdir( $skill_root, 'dashboards' ), $dedupe_root, $parent_root ],
+        'template include roots skip empty values and deduplicate dashboard and runtime roots',
+    );
+    is_deeply( [ $runtime_no_paths->_template_include_roots(undef) ], ['.'],
+        'template include roots default to the current directory without configured roots' );
+    is_deeply( [ $runtime->_template_include_roots('not-a-page') ],
+        [ $paths->dashboards_roots, $paths->runtime_roots ],
+        'template include roots tolerate a non-reference page without skill metadata' );
+    is_deeply( [ $runtime->_template_include_roots({ meta => [] }) ],
+        [ $paths->dashboards_roots, $paths->runtime_roots ],
+        'template include roots ignore non-hash page metadata' );
+    my $dashboard_only_runtime = Developer::Dashboard::PageRuntime->new(
+        paths => Local::DashboardOnlyPathsStub->new( [$dedupe_root] ),
+    );
+    is_deeply( [ $dashboard_only_runtime->_template_include_roots({ meta => {} }) ], [$dedupe_root],
+        'template include roots work with a path provider that has no runtime-root method' );
+
+    is_deeply( [ $root_runtime->_code_inc_roots('not-a-page') ], [],
+        'CODE library roots are empty for a non-reference page' );
+    is_deeply( [ $root_runtime->_code_inc_roots({ meta => [] }) ], [],
+        'CODE library roots are empty for a page with invalid metadata' );
+    is_deeply(
+        [ $root_runtime->_code_inc_roots({ meta => { skill_path => $skill_root, skill_layers => [ $parent_root, $skill_root ] } }) ],
+        [ $skill_lib, File::Spec->catdir( $parent_root, 'lib' ) ],
+        'CODE library roots prioritize the owning skill and deduplicate inherited layers',
+    );
+    is_deeply(
+        [ $root_runtime->_code_inc_roots({ meta => { skill_path => File::Spec->catdir( $home, 'missing-skill' ), skill_layers => 'not-an-array' } }) ],
+        [],
+        'CODE library roots ignore a missing owner lib and malformed layer list',
+    );
+    is_deeply( $root_runtime->_skill_env_overlay([]), {},
+        'skill environment overlay is empty when no layers are supplied' );
+    is_deeply( $root_runtime->_skill_env_overlay('not-an-array'), {},
+        'skill environment overlay rejects malformed layer collections' );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::EnvLoader::load_skill_layers_into_hash = sub { return { env => 0 }; };
+    is_deeply( $root_runtime->_skill_env_overlay([$skill_root]), {},
+            'skill environment overlay defaults a false loader result to an empty hash' );
+    }
+    is_deeply( $root_runtime->_code_env_overlay('not-a-page'), {},
+        'CODE environment overlay is empty for a non-reference page' );
+    is_deeply( $root_runtime->_code_env_overlay({ meta => [] }), {},
+        'CODE environment overlay is empty when page metadata is not a hash' );
+    {
+        my $fallback_layers;
+        no warnings 'redefine';
+        local *Developer::Dashboard::EnvLoader::load_skill_layers_into_hash = sub {
+            my ( $class, %args ) = @_;
+            $fallback_layers = $args{skill_layers};
+            return { env => { fallback => 1 } };
+        };
+        is_deeply( $root_runtime->_code_env_overlay({ meta => { skill_path => $skill_root } }), { fallback => 1 },
+            'CODE environment overlay delegates to the page skill when no inherited layers are given' );
+        is_deeply( $fallback_layers, [$skill_root], 'CODE environment overlay passes its fallback skill as the layer' );
+    }
+}
 
 my $ajax_dir = File::Spec->catdir( $paths->dashboards_root, 'ajax' );
 make_path($ajax_dir);
@@ -750,8 +858,10 @@ is( $runtime->_system_context( runtime_context => {}, source => '' )->{cwd}, '.'
 
 # ---- _code_header (L895) ------------------------------------------------------
 {
-    is( $runtime->_code_header(undef), '', '_code_header returns empty for an undefined stash' );
-    is( $runtime->_code_header( {} ),  '', '_code_header returns empty for a stash without usable keys' );
+    like( $runtime->_code_header(undef), qr/^use Developer::Dashboard::DataHelper qw\(j je\);$/m,
+        '_code_header imports DataHelper for an undefined stash' );
+    like( $runtime->_code_header( {} ), qr/^use Developer::Dashboard::DataHelper qw\(j je\);$/m,
+        '_code_header imports DataHelper for a stash without usable keys' );
     like( $runtime->_code_header( { name => 1 } ), qr/\$name/, '_code_header emits lexical bindings for stash keys' );
 }
 
@@ -875,7 +985,8 @@ concrete and the failure modes reviewable.
 Use this file when changing bookmark code-block execution, Template Toolkit
 exposure, saved-Ajax subprocess launching or streaming, singleton handling, or
 any of the private helpers those flows rely on. Extend it whenever a new
-conditional edge is added to the page runtime.
+conditional edge is added to the page runtime. Include-root cases pin empty,
+duplicate, malformed, and skill-local library-root inputs.
 
 =head1 HOW TO USE
 

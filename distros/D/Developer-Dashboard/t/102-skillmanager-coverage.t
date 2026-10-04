@@ -348,6 +348,14 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
 {
     is( $manager->_clone_skill_source( '', 'x' )->{error}, 'Missing remote skill source', 'clone rejects a missing source' );
     is( $manager->_clone_skill_source( 'src', '' )->{error}, 'Missing remote skill target path', 'clone rejects a missing target' );
+    is( $manager->_clone_skill_branch( 'src', 'target', undef )->{error},
+        'Missing remote skill branch', 'single-branch clone rejects an undefined branch' );
+    is( $manager->_clone_skill_branch( 'src', 'target', '' )->{error},
+        'Missing remote skill branch', 'single-branch clone rejects an empty branch' );
+    is( $manager->_validate_skill_branch(undef)->{error},
+        'Missing remote skill branch', 'branch validation rejects an undefined branch' );
+    is( $manager->_validate_skill_branch('')->{error},
+        'Missing remote skill branch', 'branch validation rejects an empty branch' );
 
     # Silent-failing git stub so both stderr and stdout are empty.
     my $bin2 = tempdir( CLEANUP => 1 );
@@ -356,6 +364,75 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     local $ENV{PATH} = "$bin2:$ENV{PATH}";
     my $failed = $manager->_clone_skill_source( 'file:///nope', File::Spec->catdir( tempdir( CLEANUP => 1 ), 'c' ) );
     like( $failed->{error}, qr/git clone failed without output/, 'clone reports a fallback message when git is silent' );
+
+    my @branch_attempts;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillManager::_clone_skill_branch = sub {
+            my ( $self, $source, $target, $branch ) = @_;
+            push @branch_attempts, $branch;
+            return $branch eq 'main' ? { success => 1 } : { error => "branch '$branch' is absent" };
+        };
+        my $default = $manager->_clone_skill_source( 'remote', 'target' );
+        ok( $default->{success}, 'default branch selection succeeds after its fallback clone' );
+    }
+    is_deeply( \@branch_attempts, [qw(master main)], 'new clone attempts master first and main second' );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillManager::_clone_skill_branch = sub { return { error => 'branch failed' }; };
+        local *Developer::Dashboard::SkillManager::_remove_existing_skill_path = sub { return { error => 'cleanup failed' }; };
+        my $cleanup_failure = $manager->_clone_skill_source( 'remote', 'target' );
+        like( $cleanup_failure->{error}, qr/Unable to retry skill clone.*cleanup failed/,
+            'default branch retry surfaces a failed cleanup instead of hiding it' );
+    }
+
+    @branch_attempts = ();
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillManager::_clone_skill_branch = sub {
+            my ( $self, $source, $target, $branch ) = @_;
+            push @branch_attempts, $branch;
+            return { error => "branch '$branch' is absent" };
+        };
+        my $explicit = $manager->_clone_skill_source( 'remote', 'target', 'release-x' );
+        like( $explicit->{error}, qr/release-x/, 'an explicit branch reports its own clone failure' );
+    }
+    is_deeply( \@branch_attempts, ['release-x'], 'an explicit branch does not fall back to master or main' );
+}
+
+# install($source) result enrichment for optional gitignore registration data.
+# Input: a fake successful install and complete registration hash.
+# Output: result hash carrying only registration fields that were supplied.
+{
+    my $registration_manager = Developer::Dashboard::SkillManager->new( paths => $paths );
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::_install_to_skills_root = sub {
+        return { success => 1, repo_name => 'registered-skill' };
+    };
+    local *Developer::Dashboard::SkillManager::_register_home_gitignore_skill = sub {
+        return { gitignore => '/tmp/skills.gitignore', registered => 1 };
+    };
+    local $ENV{DEVELOPER_DASHBOARD_SKIP_SKILL_REGISTRY} = 1;
+    my $result = $registration_manager->install('registered-skill');
+    is( $result->{registered_gitignore}, '/tmp/skills.gitignore',
+        'install returns a provided home gitignore path' );
+    is( $result->{registered_gitignore_entry}, 1,
+        'install returns a provided gitignore registration flag' );
+    ok( !exists $result->{registered_ddfile},
+        'nested dependency installation skips root ddfile registration when explicitly requested' );
+}
+
+# _extract_repo_name($source) direct parser edge cases.
+# Input: empty source and an existing local directory.
+# Output: undef or the local directory basename.
+{
+    is( Developer::Dashboard::SkillManager::_extract_repo_name(undef), undef,
+        'repository-name extraction rejects an undefined source' );
+    is( Developer::Dashboard::SkillManager::_extract_repo_name(''), undef,
+        'repository-name extraction rejects an empty source' );
+    is( Developer::Dashboard::SkillManager::_extract_repo_name($home), File::Basename::basename($home),
+        'repository-name extraction uses the basename of an existing local directory' );
 }
 
 # ===========================================================================
@@ -526,13 +603,24 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     );
     is(
         $manager->_dependency_progress_label( 'install_ddfile', $skill, result => { skipped => 1 } ),
-        "Install ddfile dependencies (skipped: ddfile not present)",
-        'label reports a default skip reason',
+        'Install ddfile dependencies (skipped: no dependency installs needed)',
+        'label does not report a present ddfile as missing when no install was needed',
     );
     is(
         $manager->_dependency_progress_label( 'install_ddfile', $skill, result => { skipped => 1, skip_reason => '' } ),
-        "Install ddfile dependencies (skipped: ddfile not present)",
+        'Install ddfile dependencies (skipped: no dependency installs needed)',
         'label ignores an empty skip reason',
+    );
+    _spew( File::Spec->catfile( $skill, 'ddfile.local' ), "dep\n" );
+    is(
+        $manager->_dependency_progress_label( 'install_ddfile_local', $skill, result => { skipped => 1 } ),
+        'Install ddfile.local dependencies (skipped: no dependency installs needed)',
+        'label does not report a present ddfile.local as missing when no install was needed',
+    );
+    is(
+        $manager->_dependency_progress_label( 'install_ddfile', $absent, result => { skipped => 1 } ),
+        'Install ddfile dependencies (skipped: ddfile not present)',
+        'label reports a missing ddfile only when the file is actually absent',
     );
     like(
         $manager->_dependency_progress_label( 'install_ddfile', $skill, result => { error => 'boom' } ),
@@ -887,6 +975,130 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
 # uninstall using a real local git repository and offline clone.
 # ===========================================================================
 my $repos = tempdir( CLEANUP => 1 );
+
+# New installs prefer master, then main; an explicit branch is used directly.
+{
+    my $main_repo = _make_git_skill( 'branch-main-only', version => '1.00' );
+    _run_or_die( 'git', '-C', $main_repo, 'branch', '-m', 'main' );
+    my $main_target = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'main-clone' );
+    my $main_clone = $manager->_clone_skill_source( $main_repo, $main_target );
+    ok( $main_clone->{success}, 'clone falls back from master to main when main is the available branch' );
+    is( $manager->_current_installed_skill_branch($main_target), 'main', 'the fallback clone checks out main' );
+    is( $manager->_current_installed_skill_branch( tempdir( CLEANUP => 1 ) ), undef, 'branch lookup returns undef for a non-Git skill directory' );
+
+    my $head_target = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'head-clone' );
+    _run_or_die( 'git', 'clone', '--quiet', $main_repo, $head_target );
+    {
+        my $fake_git = tempdir( CLEANUP => 1 );
+        _spew( File::Spec->catfile( $fake_git, 'git' ), "#!/bin/sh\nprintf 'HEAD\\n'\n" );
+        chmod 0755, File::Spec->catfile( $fake_git, 'git' );
+        local $ENV{PATH} = "$fake_git:$ENV{PATH}";
+        is( $manager->_current_installed_skill_branch($head_target), undef,
+            'branch lookup treats a successful detached HEAD response as unnamed' );
+    }
+    for my $probe (
+        [ 'empty', "#!/bin/sh\nexit 0\n", 'successful empty branch output' ],
+        [ 'stdout', "#!/bin/sh\necho branch-stdout\nexit 1\n", 'branch failure with stdout only' ],
+        [ 'silent', "#!/bin/sh\nexit 1\n", 'silent branch failure' ],
+    ) {
+        my ( $label, $script, $description ) = @{$probe};
+        my $fake_git = tempdir( CLEANUP => 1 );
+        _spew( File::Spec->catfile( $fake_git, 'git' ), $script );
+        chmod 0755, File::Spec->catfile( $fake_git, 'git' );
+        local $ENV{PATH} = "$fake_git:$ENV{PATH}";
+        my $branch_result = $manager->_current_installed_skill_branch($head_target);
+        is( $branch_result, undef, "$description is handled without inventing a current branch ($label)" )
+          if $label eq 'empty';
+        like( $branch_result->{error}, qr/branch-stdout/,
+            "$description preserves the command's stdout diagnostic ($label)" )
+          if $label eq 'stdout';
+        like( $branch_result->{error}, qr/git could not report the current branch/,
+            "$description uses the explicit no-output diagnostic ($label)" )
+          if $label eq 'silent';
+    }
+
+    my $detached_target = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'detached-clone' );
+    my $detached_clone = $manager->_clone_skill_source( $main_repo, $detached_target );
+    ok( $detached_clone->{success}, 'clone can provide a checkout for detached-HEAD branch detection' );
+    _run_or_die( 'git', '-C', $detached_target, 'checkout', '--quiet', '--detach' );
+    is( $manager->_current_installed_skill_branch($detached_target), undef, 'branch lookup returns undef for a detached HEAD checkout' );
+
+    _run_or_die( 'git', '-C', $main_repo, 'branch', 'release-next' );
+    my $explicit_target = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'explicit-clone' );
+    my $explicit_clone = $manager->_clone_skill_source( $main_repo, $explicit_target, 'release-next' );
+    ok( $explicit_clone->{success}, 'clone accepts an explicitly selected branch' );
+    is( $manager->_current_installed_skill_branch($explicit_target), 'release-next', 'explicit clone checks out the requested branch' );
+    is( $manager->_validate_skill_branch('stable')->{success}, 1, 'git ref validation accepts a valid branch name' );
+    like( $manager->_validate_skill_branch('bad..branch')->{error}, qr/Invalid skill branch/, 'git ref validation rejects an invalid branch name' );
+
+    my $fake_git = tempdir( CLEANUP => 1 );
+    _spew( File::Spec->catfile( $fake_git, 'git' ), "#!/bin/sh\necho branch lookup failed >&2\nexit 1\n" );
+    chmod 0755, File::Spec->catfile( $fake_git, 'git' );
+    local $ENV{PATH} = "$fake_git:$ENV{PATH}";
+    like( $manager->_current_installed_skill_branch($main_target)->{error}, qr/Unable to detect current branch/, 'branch lookup reports git errors instead of silently changing branches' );
+
+    my $stdout_git = tempdir( CLEANUP => 1 );
+    _spew( File::Spec->catfile( $stdout_git, 'git' ), "#!/bin/sh\necho ref-check-stdout\nexit 1\n" );
+    chmod 0755, File::Spec->catfile( $stdout_git, 'git' );
+    local $ENV{PATH} = "$stdout_git:$ENV{PATH}";
+    like( $manager->_validate_skill_branch('invalid-test')->{error}, qr/ref-check-stdout/,
+        'ref validation includes a stdout-only git diagnostic' );
+
+    my $silent_git = tempdir( CLEANUP => 1 );
+    _spew( File::Spec->catfile( $silent_git, 'git' ), "#!/bin/sh\nexit 1\n" );
+    chmod 0755, File::Spec->catfile( $silent_git, 'git' );
+    local $ENV{PATH} = "$silent_git:$ENV{PATH}";
+    like( $manager->_validate_skill_branch('invalid-test')->{error}, qr/git rejected the branch name/,
+        'ref validation supplies a clear diagnostic when git is silent' );
+}
+
+# Reinstall without -b preserves the branch already checked out in the skill directory.
+{
+    my $branch_home = tempdir( CLEANUP => 1 );
+    my $branch_paths = Developer::Dashboard::PathRegistry->new( home => $branch_home );
+    my $branch_manager = Developer::Dashboard::SkillManager->new( paths => $branch_paths );
+    my $source_repo = _make_git_skill( 'sticky-branch', version => '1.00' );
+    my $installed = File::Spec->catdir( $branch_paths->skills_root, 'sticky-branch' );
+    _run_or_die( 'git', 'clone', '--quiet', $source_repo, $installed );
+    _run_or_die( 'git', '-C', $installed, 'checkout', '--quiet', '-b', 'feature-line' );
+    my $selected;
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::_clone_skill_source = sub {
+        my ( $self, $source, $target, $branch ) = @_;
+        $selected = $branch;
+        return { error => 'test clone interception' };
+    };
+    my $reinstall = $branch_manager->install('https://example.invalid/sticky-branch.git');
+    is( $selected, 'feature-line', 'reinstall reuses the installed checkout branch when -b is omitted' );
+    is( $reinstall->{error}, 'test clone interception', 'branch-preservation probe stops at the intercepted clone' );
+
+    my $override_manager = Developer::Dashboard::SkillManager->new( paths => $branch_paths, clone_branch => 'stable' );
+    _run_or_die( 'git', 'clone', '--quiet', $source_repo, $installed );
+    _run_or_die( 'git', '-C', $installed, 'checkout', '--quiet', '-b', 'feature-line' );
+    $override_manager->install('https://example.invalid/sticky-branch.git');
+    is( $selected, 'stable', 'explicit -b overrides the current installed checkout branch' );
+
+    my $local_dir = $installed;
+    make_path($local_dir);
+    _spew( File::Spec->catfile( $local_dir, 'canary' ), "keep\n" );
+    my $local_branch_manager = Developer::Dashboard::SkillManager->new( paths => $branch_paths, clone_branch => 'stable' );
+    is(
+        $local_branch_manager->install($source_repo)->{error},
+        'The -b/--branch option applies only to remote Git skill sources',
+        'explicit branch selection is rejected for local checked-out sources',
+    );
+    ok( -f File::Spec->catfile( $local_dir, 'canary' ), 'local branch rejection leaves the existing destination untouched' );
+
+    my $invalid_branch_manager = Developer::Dashboard::SkillManager->new( paths => $branch_paths, clone_branch => 'bad..branch' );
+    _spew( File::Spec->catfile( $installed, 'canary' ), "keep\n" );
+    like(
+        $invalid_branch_manager->install('https://example.invalid/sticky-branch.git')->{error},
+        qr/Invalid skill branch 'bad\.\.branch'/,
+        'invalid explicit branches are rejected before the existing install is replaced',
+    );
+    ok( -f File::Spec->catfile( $installed, 'canary' ), 'invalid branch rejection preserves installed skill files' );
+}
+
 {
     my $repo = _make_git_skill( 'rich-skill', version => '1.00', with_all => 1 );
 
@@ -1099,6 +1311,67 @@ my $repos = tempdir( CLEANUP => 1 );
     like( $manager->install_from_ddfiles(undef)->{error}, qr/No ddfile or ddfile\.local found/, 'install_from_ddfiles defaults to the current directory' );
 
     my $repo = _make_git_skill( 'ddfile-skill', version => '1.00' );
+
+    # An installed skill's ddfile.local installs private dependencies beneath
+    # that skill rather than at the runtime-wide skills root.
+    my $local_dependency = _make_git_skill( 'problem22-local-dep', version => '1.00' );
+    my $owner_skill      = _make_git_skill( 'problem22-owner',     version => '1.00' );
+    _write_skill_manifest_and_commit(
+        $owner_skill,
+        'ddfile.local',
+        "file://$local_dependency\n",
+    );
+    local $ENV{DEVELOPER_DASHBOARD_SKIP_SKILL_REGISTRY} = 1;
+    my $owner_install = $manager->install("file://$owner_skill");
+    ok( $owner_install->{success}, 'installing a skill with a local skill manifest succeeds' )
+      or diag $owner_install->{error};
+    ok(
+        -d File::Spec->catdir( $paths->home_runtime_root, 'skills', 'problem22-owner', 'skills', 'problem22-local-dep' ),
+        'an installed skill ddfile.local dependency is installed beneath its owning skill',
+    );
+    ok(
+        !-d File::Spec->catdir( $paths->home_runtime_root, 'skills', 'problem22-local-dep' ),
+        'an installed skill ddfile.local dependency is not leaked into the shared runtime skills root',
+    );
+    my $installed_owner = File::Spec->catdir( $paths->home_runtime_root, 'skills', 'problem22-owner' );
+    ok(
+        $manager->_install_skill_ddfile_local($installed_owner)->{skipped},
+        'reprocessing an installed local dependency is idempotent and reports the no-op',
+    );
+
+    my $unsafe_owner = File::Spec->catdir( $repos, 'problem22-unsafe-owner' );
+    make_path($unsafe_owner);
+    _spew( File::Spec->catfile( $unsafe_owner, 'ddfile.local' ), "owner/..\n" );
+    like(
+        $manager->_install_skill_ddfile_local($unsafe_owner)->{error},
+        qr/Unable to extract dependency skill name/,
+        'local dependency manifests reject unsafe repository names before joining paths',
+    );
+
+    my $outside_dependency_root = File::Spec->catdir( $repos, 'problem22-outside-dependency' );
+    my $symlink_owner = File::Spec->catdir( $repos, 'problem22-symlink-owner' );
+    make_path( $outside_dependency_root, File::Spec->catdir( $symlink_owner, 'skills' ) );
+    _spew( File::Spec->catfile( $symlink_owner, 'ddfile.local' ), "file://$local_dependency\n" );
+    my $unsafe_target = File::Spec->catdir( $symlink_owner, 'skills', 'problem22-local-dep' );
+    symlink $outside_dependency_root, $unsafe_target or die "Unable to create test symlink $unsafe_target: $!";
+    like(
+        $manager->_install_skill_ddfile_local($symlink_owner)->{error},
+        qr/Refusing to use dependency skill outside its owning skill/,
+        'local dependency manifests refuse an existing dependency symlink outside the skill',
+    );
+
+    my $root_symlink_owner = File::Spec->catdir( $repos, 'problem22-root-symlink-owner' );
+    my $external_skills_root = File::Spec->catdir( $repos, 'problem22-external-skills-root' );
+    make_path($root_symlink_owner);
+    _spew( File::Spec->catfile( $root_symlink_owner, 'ddfile.local' ), "file://$local_dependency\n" );
+    symlink $external_skills_root, File::Spec->catdir( $root_symlink_owner, 'skills' )
+      or die "Unable to create test skills-root symlink: $!";
+    like(
+        $manager->_install_skill_ddfile_local($root_symlink_owner)->{error},
+        qr/Refusing to use a symlinked skill-local skills root/,
+        'local dependency installation refuses an owning-skill skills/ symlink',
+    );
+    ok( !-e $external_skills_root, 'refusing a skill-local skills/ symlink leaves its external target untouched' );
 
     # A base with a ddfile (global manifest) installs into the home skills root.
     my $global_base = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'global-base' );
@@ -2235,6 +2508,21 @@ sub _make_git_skill {
     return $repo;
 }
 
+# _write_skill_manifest_and_commit($repo, $name, $content): adds one manifest
+# to a local skill repository and commits it so the installer can clone it.
+# Input: repository path, manifest basename, and complete manifest contents.
+# Output: true value after the Git commit succeeds.
+sub _write_skill_manifest_and_commit {
+    my ( $repo, $name, $content ) = @_;
+    my $cwd = getcwd();
+    chdir $repo or die "Unable to chdir to $repo: $!";
+    _spew( $name, $content );
+    _run_or_die(qw(git add -A));
+    _run_or_die( 'git', 'commit', '--quiet', '-m', "Add $name" );
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+    return 1;
+}
+
 # _bump_git_skill_version($repo, $version): rewrites .env and commits.
 sub _bump_git_skill_version {
     my ( $repo, $version ) = @_;
@@ -2299,6 +2587,10 @@ t/102-skillmanager-coverage.t> while iterating. The test builds a hermetic HOME,
 prepends a stub PATH so no real package managers run, and constructs the manager
 against a temporary L<Developer::Dashboard::PathRegistry>. Keep it green under
 C<prove -lr t> and under the Devel::Cover gate before release.
+The clone tests also assert the branch contract: new remote checkouts try
+C<master> then C<main>, explicit branches override, and reinstall without an
+override keeps the named branch already checked out in the installed skill
+directory.
 
 =head1 WHAT USES IT
 

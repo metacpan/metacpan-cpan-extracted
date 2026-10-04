@@ -95,8 +95,16 @@ eval {
         ],
         label => 'Chromium privacy interstitial check',
     );
-    like( $privacy->{stdout}, qr{<title>Privacy error</title>}, 'real browser reaches the HTTPS privacy interstitial instead of a reset connection' );
-    like( $privacy->{stdout}, qr{Your connection is not private|Privacy error}, 'privacy interstitial explains the untrusted local certificate to the user' );
+    like(
+        $privacy->{stdout} . $privacy->{stderr},
+        qr{<title>Privacy error</title>|ERR_CERT_AUTHORITY_INVALID|net_error -202},
+        'real browser reports the HTTPS certificate privacy interstitial rather than a reset connection',
+    );
+    like(
+        $privacy->{stdout} . $privacy->{stderr},
+        qr{Your connection is not private|Privacy error|ERR_CERT_AUTHORITY_INVALID|net_error -202},
+        'browser output identifies the untrusted local certificate whether Chromium emits interstitial HTML or a headless diagnostic',
+    );
 
     my $alias_privacy = _run_command(
         command => [
@@ -108,9 +116,17 @@ eval {
         ],
         label => 'Chromium alias-host privacy interstitial check',
     );
-    like( $alias_privacy->{stdout}, qr{<title>Privacy error</title>}, 'browser reaches the privacy interstitial when the dashboard is opened through one configured alias hostname' );
-    like( $alias_privacy->{stdout}, qr{ERR_CERT_AUTHORITY_INVALID}, 'alias-host browser warning is a trust failure rather than a hostname-mismatch failure' );
-    unlike( $alias_privacy->{stdout}, qr{ERR_CERT_COMMON_NAME_INVALID}, 'alias-host browser warning is not a certificate-name mismatch' );
+    like(
+        $alias_privacy->{stdout} . $alias_privacy->{stderr},
+        qr{<title>Privacy error</title>|ERR_CERT_AUTHORITY_INVALID|net_error -202},
+        'browser reports a privacy warning when opened through one configured alias hostname',
+    );
+    like(
+        $alias_privacy->{stdout} . $alias_privacy->{stderr},
+        qr{ERR_CERT_AUTHORITY_INVALID|net_error -202},
+        'alias-host browser warning is a trust failure rather than a hostname-mismatch failure',
+    );
+    unlike( $alias_privacy->{stdout} . $alias_privacy->{stderr}, qr{ERR_CERT_COMMON_NAME_INVALID|net_error -200}, 'alias-host browser warning is not a certificate-name mismatch' );
 
     my $trusted = _run_command(
         command => [
@@ -408,8 +424,11 @@ t/33-web-server-ssl-browser.t - real Chromium browser smoke for dashboard serve 
 
 This test exercises the public HTTPS browser path for C<dashboard serve --ssl>.
 It verifies that an untrusted browser reaches Chromium's privacy interstitial
-instead of a broken reset/blank failure, and that the real dashboard page loads
-once certificate trust is bypassed locally for the test browser process.
+or reports its certificate-authority failure in headless diagnostics, instead
+of a broken reset, and that the real dashboard page loads once certificate
+trust is bypassed locally for the test browser process. Chromium versions differ
+in whether C<--dump-dom> emits the interstitial markup or only reports
+C<ERR_CERT_AUTHORITY_INVALID> / C<net_error -202> on stderr.
 
 =for comment FULL-POD-DOC START
 

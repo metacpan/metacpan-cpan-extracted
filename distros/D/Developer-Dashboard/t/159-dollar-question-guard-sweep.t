@@ -35,19 +35,26 @@ my %BASELINE = map { $_ => 1 } ();
 # per-sub judgement DD-670 warns against skipping ("guarding everywhere makes
 # the next real instance unfindable"). Shrink this baseline, do not leave a
 # fixed entry stale in it, same discipline as %BASELINE above.
+#
+# DD-1019: 'Developer/Dashboard/CollectorRunner.pm::_terminate_command_process'
+# was removed from here - a refactor moved its real body into shared
+# Developer::Dashboard::CommandRunner::terminate_command_process, leaving the
+# CollectorRunner sub a thin delegating wrapper with no subprocess call of
+# its own, so the old entry stopped reproducing (a stale baseline entry, not
+# a fixed one). The new location was a genuine new unguarded instance and is
+# now guarded directly in lib/ rather than re-added here - see
+# CommandRunner.pm::terminate_command_process, fixed by this ticket.
 my %SETTER_BASELINE = map { $_ => 1 } (
     'Developer/Dashboard/ActionRunner.pm::run_command_action',
     'Developer/Dashboard/CLI/Ask.pm::_ask_claude',
     'Developer/Dashboard/CLI/Ask.pm::_missing_backend_message',
     'Developer/Dashboard/CLI/Ask.pm::_run_cli',
     'Developer/Dashboard/CollectorRunner.pm::_waitpid_nonblocking',
-    'Developer/Dashboard/CollectorRunner.pm::_terminate_command_process',
     'Developer/Dashboard/RuntimeManager.pm::_wait_for_any_child_process',
     'Developer/Dashboard/SkillDispatcher.pm::dispatch',
     'Developer/Dashboard/SkillDispatcher.pm::execute_hooks',
     'Developer/Dashboard/SkillManager.pm::update',
     'Developer/Dashboard/SkillManager.pm::_sync_local_skill_source',
-    'Developer/Dashboard/SkillManager.pm::_clone_skill_source',
     'Developer/Dashboard/SkillManager.pm::_terminate_streaming_command',
     'Developer/Dashboard/SkillManager.pm::_install_skill_dependency_manifest',
     'Developer/Dashboard/Web/Server.pm::_waitpid',
@@ -106,6 +113,7 @@ sub _strip_comments {
     my ($text) = @_;
     my $out = '';
     my $quote = '';    # '' | "'" | '"'
+    my @pending_heredocs;    # DD-1019: tags to strip once the current line ends
     my $i = 0;
     my $len = length $text;
     while ( $i < $len ) {
@@ -130,6 +138,34 @@ sub _strip_comments {
         if ( $ch eq '#' ) {
             $i++;
             $i++ while $i < $len && substr( $text, $i, 1 ) ne "\n";
+            next;
+        }
+        # DD-1019: a heredoc body is not "inside a string" the way the
+        # quote-tracking above understands strings, so <<'TAG'/<<"TAG" must
+        # be handled on its own - otherwise a documentation heredoc's own
+        # markdown backticks or "#" read straight through as real code (the
+        # exact shape that made CLI/Ask.pm::_docs_context a false positive).
+        if ( substr( $text, $i, 2 ) eq '<<'
+            && substr( $text, $i ) =~ m{\A<<(['"]?)([A-Za-z_]\w*)\1} ) {
+            my $matched = '<<' . $1 . $2 . $1;
+            $out .= $matched;
+            $i += length $matched;
+            push @pending_heredocs, $2;
+            next;
+        }
+        if ( $ch eq "\n" ) {
+            $out .= $ch;
+            $i++;
+            while (@pending_heredocs) {
+                my $tag = shift @pending_heredocs;
+                while ( $i < $len ) {
+                    my $nl = index( $text, "\n", $i );
+                    $nl = $len if $nl == -1;
+                    my $line = substr( $text, $i, $nl - $i );
+                    $i = ( $nl < $len ) ? $nl + 1 : $nl;
+                    last if $line eq $tag;
+                }
+            }
             next;
         }
         $out .= $ch;
@@ -212,6 +248,20 @@ is( _strip_comments(q{my $s = 'another # not a comment';} . "\n"),
 is( _strip_comments(q{my $s = "escaped \" quote # still inside the string"; # real comment} . "\n"),
     q{my $s = "escaped \" quote # still inside the string"; } . "\n",
     'a backslash-escaped quote inside a string does not end the string early, so a "#" before the real closing quote stays part of the string' );
+
+# DD-1019: a heredoc body is not "inside a string" the way the quote-tracker
+# above understands strings, so a documentation heredoc containing markdown
+# backticks (`dashboard`) or a literal "#" previously fell straight through
+# as ordinary code - the exact shape that made CLI/Ask.pm::_docs_context a
+# false positive for the setter sweep. _strip_comments must recognize a
+# <<'TAG' / <<"TAG" opener and discard every line up to and including the
+# line that is exactly TAG, leaving code that follows the heredoc intact.
+is( _strip_comments(qq{return <<'DOCS';\nSee \`dashboard\` and \# not a comment.\nDOCS\nmy \$after = 1;\n}),
+    qq{return <<'DOCS';\nmy \$after = 1;\n},
+    'a single-quoted heredoc body (markdown backticks and a literal "#") is stripped entirely, code after the terminator survives' );
+is( _strip_comments(qq{return <<"DOCS";\nSee \`dashboard\` and \# not a comment.\nDOCS\nmy \$after = 1;\n}),
+    qq{return <<"DOCS";\nmy \$after = 1;\n},
+    'a double-quoted heredoc body is stripped the same way' );
 
 my $lib_dir = _repo_path('lib');
 my $hits    = _unguarded_dollar_question_hits($lib_dir);

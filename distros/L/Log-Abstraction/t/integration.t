@@ -463,9 +463,9 @@ subtest 'syslog — openlog called on first high-priority message' => sub {
 	plan tests => 1;
 
 	my $opened = 0;
-	my $g_open = mock_scoped 'Log::Abstraction::openlog'  => sub { $opened++ };
+	my $g_open = mock_scoped 'Sys::Syslog::openlog'  => sub { $opened++ };
 	my $g_log  = mock_scoped 'Sys::Syslog::syslog'   => sub { };
-	my $g_sock = mock_scoped 'Log::Abstraction::setlogsock' => sub { };
+	my $g_sock = mock_scoped 'Sys::Syslog::setlogsock' => sub { };
 
 	my $logger = Log::Abstraction->new(
 		logger      => { syslog => { facility => 'local0' } },
@@ -482,9 +482,9 @@ subtest 'syslog — openlog called only once across multiple messages' => sub {
 
 	my $opened = 0;
 	my $logged = 0;
-	my $g_open = mock_scoped 'Log::Abstraction::openlog'  => sub { $opened++ };
+	my $g_open = mock_scoped 'Sys::Syslog::openlog'  => sub { $opened++ };
 	my $g_log  = mock_scoped 'Sys::Syslog::syslog'   => sub { $logged++ };
-	my $g_sock = mock_scoped 'Log::Abstraction::setlogsock' => sub { };
+	my $g_sock = mock_scoped 'Sys::Syslog::setlogsock' => sub { };
 
 	my $logger = Log::Abstraction->new(
 		logger      => { syslog => { facility => 'local0' } },
@@ -504,9 +504,9 @@ subtest 'syslog — closelog called by DESTROY' => sub {
 
 	my $closed = 0;
 	my $g_close = mock_scoped 'Sys::Syslog::closelog'  => sub { $closed++ };
-	my $g_open  = mock_scoped 'Log::Abstraction::openlog'   => sub { };
+	my $g_open  = mock_scoped 'Sys::Syslog::openlog'   => sub { };
 	my $g_log   = mock_scoped 'Sys::Syslog::syslog'    => sub { };
-	my $g_sock  = mock_scoped 'Log::Abstraction::setlogsock' => sub { };
+	my $g_sock  = mock_scoped 'Sys::Syslog::setlogsock' => sub { };
 
 	{
 		my $logger = Log::Abstraction->new(
@@ -524,9 +524,9 @@ subtest 'syslog — level filter honoured (notice not sent to syslog)' => sub {
 	plan tests => 1;
 
 	my $logged = 0;
-	my $g_open = mock_scoped 'Log::Abstraction::openlog'   => sub { };
+	my $g_open = mock_scoped 'Sys::Syslog::openlog'   => sub { };
 	my $g_log  = mock_scoped 'Sys::Syslog::syslog'    => sub { $logged++ };
-	my $g_sock = mock_scoped 'Log::Abstraction::setlogsock' => sub { };
+	my $g_sock = mock_scoped 'Sys::Syslog::setlogsock' => sub { };
 
 	my $logger = Log::Abstraction->new(
 		logger      => { syslog => { facility => 'local0', level => 4 } },
@@ -564,9 +564,8 @@ BEGIN {
 
 	package Email::Sender::Simple;
 	our $VERSION = '1.0';
-	# import() must actually install sendmail() into the caller's namespace,
-	# because _log does: Email::Sender::Simple->import('sendmail') then calls
-	# the bare sendmail() in Log::Abstraction's namespace.
+	# import() installs the requested functions into the caller, as the real
+	# Email::Sender::Simple does (Log::Abstraction no longer imports any)
 	sub import {
 		my ($class, @syms) = @_;
 		my $caller = caller(0);
@@ -576,6 +575,9 @@ BEGIN {
 		}
 	}
 	sub sendmail { }	# default no-op; overridden per-subtest via mock_scoped
+	# Log::Abstraction calls Email::Sender::Simple->send(); route it to
+	# sendmail(), which subtests replace with mock_scoped
+	sub send { my $class = shift; return sendmail(@_) }
 
 	package Email::Sender::Transport::SMTP;
 	our $VERSION = '1.0';

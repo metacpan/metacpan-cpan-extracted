@@ -44,6 +44,8 @@ chdir $home or die "Unable to chdir to $home: $!";
 
 my $repo = File::Spec->catdir( $home, 'projects', 'demo-app' );
 make_path( File::Spec->catdir( $repo, '.git' ) );
+my $auto_repo = File::Spec->catdir( $home, 'projects', 'auto-discovery' );
+make_path( File::Spec->catdir( $auto_repo, '.git' ) );
 open my $compose_fh, '>', File::Spec->catfile( $repo, 'compose.yaml' ) or die $!;
 print {$compose_fh} "services:\n  app:\n    image: perl:latest\n";
 close $compose_fh;
@@ -167,6 +169,16 @@ make_path($local_docker_green_root);
 open my $local_green_dev_fh, '>', File::Spec->catfile( $local_docker_green_root, 'development.compose.yml' ) or die $!;
 print {$local_green_dev_fh} "services:\n  green:\n    environment:\n      GREEN_DEV: local\n";
 close $local_green_dev_fh;
+open my $local_green_development_marker_fh, '>', File::Spec->catfile( $local_docker_green_root, 'develop.yml' ) or die $!;
+print {$local_green_development_marker_fh} "---\ndevelopment: 1\n";
+close $local_green_development_marker_fh;
+my $auto_green_root = File::Spec->catdir( $auto_repo, '.developer-dashboard', 'config', 'docker', 'green' );
+make_path($auto_green_root);
+open my $auto_green_dev_fh, '>', File::Spec->catfile( $auto_green_root, 'development.compose.yml' ) or die $!;
+print {$auto_green_dev_fh} "services:\n  green:\n    environment:\n      GREEN_DEV: local\n";
+close $auto_green_dev_fh;
+open my $auto_green_development_marker_fh, '>', File::Spec->catfile( $auto_green_root, 'develop.yml' ) or die $!;
+close $auto_green_development_marker_fh;
 
 my $paths = Developer::Dashboard::PathRegistry->new(
     home => $home,
@@ -379,6 +391,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     ok( grep( { /compose\.worker\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes service overlay' );
     ok( grep( { /compose\.dev\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes mode overlay' );
     ok( grep( { /compose\.mailhog\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes config addon overlay' );
+    ok( grep( { /green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes the isolated base file before its development overlays' );
     ok( grep( { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes isolated development compose files automatically for selected services' );
     ok( !grep( { /skills\/beta-skill\/config\/docker\/green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver excludes docker roots contributed by disabled skills' );
     is( $resolved->{env}{APP_MODE}, 'dev', 'docker compose resolver merges mode env' );
@@ -406,7 +419,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
 
 {
     my $old = Cwd::getcwd();
-    chdir $repo or die $!;
+    chdir $auto_repo or die $!;
     my $docker = Developer::Dashboard::DockerCompose->new(
         config  => $config,
         paths   => $paths,
@@ -420,7 +433,8 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     ok( grep( { $_ eq 'orange' } @{ $resolved->{services} } ), 'docker compose resolver auto-loads isolated services contributed by installed skills' );
     ok( grep( { $_ eq 'purple' } @{ $resolved->{services} } ), 'docker compose resolver auto-loads isolated services without requiring activation markers' );
     ok( !grep( { $_ eq 'blue' } @{ $resolved->{services} } ), 'docker compose resolver skips isolated services marked disabled' );
-    ok( grep( { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes isolated development compose files during plain docker compose passthrough' );
+    ok( grep( { /green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes the isolated base file during plain docker compose passthrough' );
+    ok( grep( { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes the opted-in development overlay during plain docker compose passthrough' );
     ok( !grep( { /skills\/beta-skill\/config\/docker\/green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose passthrough excludes compose roots contributed by disabled skills' );
     ok( grep( { /skills\/alpha-skill\/config\/docker\/orange\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes skill docker compose roots during plain docker compose passthrough' );
     ok( grep( { /purple\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes non-disabled isolated compose folders during plain docker compose passthrough' );
@@ -438,7 +452,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
 
 {
     my $old = Cwd::getcwd();
-    chdir $repo or die $!;
+    chdir $auto_repo or die $!;
     my $docker = Developer::Dashboard::DockerCompose->new(
         config  => $config,
         paths   => $paths,
@@ -448,13 +462,13 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     chdir $old or die $!;
     is_same_path(
         $disabled->{marker},
-        File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ),
-        'docker compose disable writes the project-local marker under config/docker',
+        File::Spec->catfile( $home, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ),
+        'docker compose disable writes the marker under the selected home config/docker root',
     );
     is_same_path(
         $enabled->{marker},
-        File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ),
-        'docker compose enable removes the project-local marker under config/docker',
+        File::Spec->catfile( $home, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ),
+        'docker compose enable reports the selected home marker path',
     );
     ok( !-f $enabled->{marker}, 'docker compose enable removes the project-local config/docker disabled marker' );
 }
@@ -508,11 +522,11 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     is( $disable->{disabled}, 1, 'disable_service reports the service as disabled' );
     is_same_path(
         $disable->{marker},
-        File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'purple', 'disabled.yml' ),
-        'disable_service writes the marker into the deepest runtime docker root',
+        File::Spec->catfile( $home, '.developer-dashboard', 'config', 'docker', 'purple', 'disabled.yml' ),
+        'disable_service writes the marker into the selected home runtime docker root',
     );
     ok( -f $disable->{marker}, 'disable_service creates the disabled.yml marker file' );
-    ok( $docker->_service_folder_is_disabled( project_root => $repo, service => 'purple' ), 'project-local marker disables an inherited home docker service' );
+    ok( $docker->_service_folder_is_disabled( project_root => $repo, service => 'purple' ), 'selected-home marker disables the matching service across runtime layers' );
 
     my $enable = $docker->enable_service(
         project_root => $repo,
@@ -522,11 +536,22 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     is( $enable->{disabled}, 0, 'enable_service reports the service as enabled' );
     is_same_path(
         $enable->{marker},
-        File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'purple', 'disabled.yml' ),
-        'enable_service reports the same local marker path it removed',
+        File::Spec->catfile( $home, '.developer-dashboard', 'config', 'docker', 'purple', 'disabled.yml' ),
+        'enable_service reports the selected home marker path it removed',
     );
-    ok( !-f $enable->{marker}, 'enable_service removes the local disabled.yml marker file' );
-    ok( !$docker->_service_folder_is_disabled( project_root => $repo, service => 'purple' ), 'enable_service re-enables the inherited home docker service' );
+    ok( !-f $enable->{marker}, 'enable_service removes the selected-home disabled.yml marker file' );
+    ok( !$docker->_service_folder_is_disabled( project_root => $repo, service => 'purple' ), 'enable_service re-enables the service across runtime layers' );
+
+    my $global_purple_disabled = File::Spec->catfile( $global_purple_root, 'disabled.yml' );
+    open my $global_purple_disabled_fh, '>', $global_purple_disabled or die $!;
+    close $global_purple_disabled_fh or die $!;
+    my $local_purple_disabled = File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'purple', 'disabled.yml' );
+    make_path( File::Spec->catdir( $repo, '.developer-dashboard', 'config', 'docker', 'purple' ) );
+    open my $local_purple_disabled_fh, '>', $local_purple_disabled or die $!;
+    close $local_purple_disabled_fh or die $!;
+    ok( -f $global_purple_disabled && -f $local_purple_disabled, 'Problem 31: disable markers can coexist in multiple service layers' );
+    my $enable_all = $docker->enable_service( project_root => $repo, service => 'purple' );
+    ok( !-e $global_purple_disabled && !-e $local_purple_disabled && !-e $enable_all->{marker}, 'Problem 31: enabling a service removes disabled.yml markers from every service layer' );
 
     my $all_services = $docker->list_services(
         project_root => $repo,
@@ -568,10 +593,127 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     is_deeply(
         [ map { $_->{service} } @{ $docker->list_services( project_root => $repo, filter => 'disabled' ) } ],
         [ qw(blue purple) ],
-        'list_services reflects newly disabled services from the deepest runtime layer',
+        'list_services reflects newly disabled services from the selected home runtime layer',
     );
 
     chdir $old or die $!;
+}
+
+{
+    my $old = Cwd::getcwd();
+    chdir $auto_repo or die $!;
+    my $docker = Developer::Dashboard::DockerCompose->new(
+        config => $config,
+        paths  => $paths,
+    );
+
+    my $local_blue_root = File::Spec->catdir( $auto_repo, '.developer-dashboard', 'config', 'docker', 'blue' );
+    make_path($local_blue_root);
+    ok(
+        $docker->_service_folder_is_disabled( project_root => $auto_repo, service => 'blue' ),
+        'Problem 31: disabled.yml in a shallower service config layer remains effective when a deeper service folder exists',
+    );
+    my $blue_resolved = $docker->resolve( project_root => $auto_repo, args => ['config'] );
+    ok(
+        !grep( { $_ eq 'blue' } @{ $blue_resolved->{services} } ),
+        'Problem 31: a shallower disabled.yml marker excludes the service from resolved Compose configuration',
+    );
+
+    my $auto_green_root = File::Spec->catdir( $auto_repo, '.developer-dashboard', 'config', 'docker', 'green' );
+    make_path($auto_green_root);
+    my $auto_green_develop = File::Spec->catfile( $auto_green_root, 'develop.yml' );
+    open my $auto_develop_fh, '>', $auto_green_develop or die $!;
+    close $auto_develop_fh or die $!;
+    my $global_green_develop = File::Spec->catfile( $global_docker_root, 'develop.yml' );
+    open my $global_develop_fh, '>', $global_green_develop or die $!;
+    close $global_develop_fh or die $!;
+    ok(
+        $docker->_service_folder_is_development( project_root => $auto_repo, service => 'green' ),
+        'Problem 31: develop.yml in a shallower service config layer remains effective when deeper service folders exist',
+    );
+    my $green_resolved = $docker->resolve( project_root => $auto_repo, args => ['config'] );
+    ok(
+        grep( { /green\/development\.compose\.yml$/ } @{ $green_resolved->{files} } ),
+        'Problem 31: a shallower develop.yml marker enables the development overlay stack-wide',
+    );
+    my $disabled_development = $docker->disable_service_development( project_root => $auto_repo, service => 'green' );
+    ok(
+        !-e $global_green_develop && !-e $disabled_development->{marker},
+        'Problem 31: disabling development removes develop.yml markers from every service layer',
+    );
+    ok(
+        !$docker->_service_folder_is_development( project_root => $auto_repo, service => 'green' ),
+        'Problem 31: removing all development markers disables the overlay stack-wide',
+    );
+    chdir $old or die $!;
+}
+
+{
+    my $alias_home = tempdir( CLEANUP => 1 );
+    make_path( File::Spec->catdir( $alias_home, '.d2' ) );
+    my $alias_paths = Developer::Dashboard::PathRegistry->new( home => $alias_home );
+    my $alias_docker = Developer::Dashboard::DockerCompose->new( config => $config, paths => $alias_paths );
+    my $created = $alias_docker->disable_service( service => 'short-runtime' );
+    is_same_path(
+        $created->{marker},
+        File::Spec->catfile( $alias_home, '.d2', 'config', 'docker', 'short-runtime', 'disabled.yml' ),
+        'Problem 31: marker creation uses the selected home .d2 runtime when only that name exists',
+    );
+    $alias_docker->enable_service( service => 'short-runtime' );
+    my $development_marker = $alias_docker->enable_service_development( service => 'short-runtime' );
+    is_same_path(
+        $development_marker->{marker},
+        File::Spec->catfile( $alias_home, '.d2', 'config', 'docker', 'short-runtime', 'develop.yml' ),
+        'Problem 31: development markers use the same selected home .d2 runtime',
+    );
+    $alias_docker->disable_service_development( service => 'short-runtime' );
+
+    my $fresh_home = tempdir( CLEANUP => 1 );
+    my $fresh_paths = Developer::Dashboard::PathRegistry->new( home => $fresh_home );
+    my $fresh_docker = Developer::Dashboard::DockerCompose->new( config => $config, paths => $fresh_paths );
+    my $fresh_marker = $fresh_docker->disable_service( service => 'new-runtime' );
+    is_same_path(
+        $fresh_marker->{marker},
+        File::Spec->catfile( $fresh_home, '.developer-dashboard', 'config', 'docker', 'new-runtime', 'disabled.yml' ),
+        'Problem 31: a fresh home without either runtime directory creates markers under .developer-dashboard',
+    );
+    $fresh_docker->enable_service( service => 'new-runtime' );
+
+    my $both_home = tempdir( CLEANUP => 1 );
+    make_path( File::Spec->catdir( $both_home, '.d2' ), File::Spec->catdir( $both_home, '.developer-dashboard' ) );
+    my $both_paths = Developer::Dashboard::PathRegistry->new( home => $both_home );
+    my $both_docker = Developer::Dashboard::DockerCompose->new( config => $config, paths => $both_paths );
+    my $long_name = $both_docker->disable_service( service => 'long-runtime' );
+    is_same_path(
+        $long_name->{marker},
+        File::Spec->catfile( $both_home, '.developer-dashboard', 'config', 'docker', 'long-runtime', 'disabled.yml' ),
+        'Problem 31: marker creation follows the selected home runtime when both names exist',
+    );
+    $both_docker->enable_service( service => 'long-runtime' );
+
+    my $short_service = File::Spec->catdir( $both_home, '.d2', 'config', 'docker', 'shared-runtime' );
+    my $long_service  = File::Spec->catdir( $both_home, '.developer-dashboard', 'config', 'docker', 'shared-runtime' );
+    make_path( $short_service, $long_service );
+    my $short_marker = File::Spec->catfile( $short_service, 'disabled.yml' );
+    my $long_marker  = File::Spec->catfile( $long_service, 'disabled.yml' );
+    open my $short_marker_fh, '>', $short_marker or die $!;
+    close $short_marker_fh or die $!;
+    open my $long_marker_fh, '>', $long_marker or die $!;
+    close $long_marker_fh or die $!;
+    ok(
+        $both_docker->_service_folder_is_disabled( service => 'shared-runtime' ),
+        'Problem 31: marker lookup includes both coexisting home runtime names',
+    );
+    $both_docker->enable_service( service => 'shared-runtime' );
+    ok(
+        !-e $short_marker && !-e $long_marker,
+        'Problem 31: enabling removes markers from both coexisting home runtime names',
+    );
+    like(
+        eval { Developer::Dashboard::DockerCompose::_remove_service_layer_markers( $both_docker, service => 'shared-runtime', marker_name => 'other.yml' ); 1 } ? '' : $@,
+        qr/Unsupported service marker 'other\.yml'/,
+        'Problem 31: layer cleanup rejects marker filenames outside the internal allowlist',
+    );
 }
 
 my $auth = Developer::Dashboard::Auth->new( files => $files, paths => $paths );
@@ -698,13 +840,16 @@ __END__
 =head1 DESCRIPTION
 
 This test verifies config-driven extensions, page actions, encoded action
-transport, and docker compose resolution behavior.
+transport, and docker compose resolution behavior, including the base compose
+file and its explicitly enabled development overlay. Problem 31 also pins
+cross-layer marker discovery, all-layer marker removal, and creation under the
+selected home runtime directory name.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This test is the executable regression contract for extension resolution, action transport, and Docker-aware runtime behavior. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+This test is the executable regression contract for extension resolution, action transport, and Docker-aware runtime behavior. Its Docker fixtures verify that `compose.yml` remains the service base while `development.compose.yml` is layered only when `develop.yml` is present. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
@@ -712,7 +857,7 @@ It exists because extension resolution, action transport, and Docker-aware runti
 
 =head1 WHEN TO USE
 
-Use this file when changing extension resolution, action transport, and Docker-aware runtime behavior, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
+Use this file when changing extension resolution, action transport, Docker-aware runtime behavior, service-file ordering, or development/disable marker state, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 

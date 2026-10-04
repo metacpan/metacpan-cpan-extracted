@@ -55,6 +55,6 @@
          "web" : "https://github.com/haxmeister/perl-Uniform"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

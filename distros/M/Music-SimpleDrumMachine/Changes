@@ -1,5 +1,12 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0701 2026-10-03 13:06:19
+    - Forgot to update the tests!
+
+0.0700 2026-10-03 11:50:36
+    - Make the `next_part` accept a hashref of weighted probabilities.
+    - Make the eg/save-it.pl program illustrate this.
+
 0.0602 2026-10-01 21:34:31
     - Make the number of bars before a change, definable.
 

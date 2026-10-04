@@ -3,10 +3,11 @@ package Developer::Dashboard::FileRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use File::Spec;
 use File::Find ();
+use File::Path ();
 use Developer::Dashboard::Config ();
 use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
 
@@ -38,7 +39,7 @@ sub register_named_files {
     my ( $self, $aliases ) = @_;
     return $self if ref($aliases) ne 'HASH';
     for my $name ( keys %{$aliases} ) {
-        next if !defined $name || $name eq '';    # uncoverable condition left
+        next if $name eq '';
         my $path = $aliases->{$name};
         next if !defined $path || $path eq '';
         $self->{named_files}{$name} = $path;
@@ -59,16 +60,27 @@ sub unregister_named_file {
 }
 
 # named_files()
-# Returns the registered named file aliases.
+# Returns the registered named file aliases as plain file-path strings for
+# display. DD-1005: a lazy-create file alias is stored internally as a
+# metadata hash ({path=>,create=>1,mode=>}); this accessor collapses it to
+# its bare "path" field, mirroring PathRegistry::named_paths' identical
+# treatment - resolve_file reads the raw hash directly, so the metadata is
+# never lost, only hidden from display consumers with no use for it.
 # Input: none.
 # Output: hash reference of alias names to file paths.
 sub named_files {
     my ($self) = @_;
     $self->_load_configured_named_files;
-    return {
-        %{ $self->{configured_named_files} || {} },    # uncoverable branch true
-        %{ $self->{named_files}            || {} },    # uncoverable branch true
-    };
+    my %raw = (
+        %{ $self->{configured_named_files} },
+        %{ $self->{named_files} },
+    );
+    my %plain;
+    for my $name ( keys %raw ) {
+        my $entry = $raw{$name};
+        $plain{$name} = ref($entry) eq 'HASH' ? $entry->{path} : $entry;
+    }
+    return \%plain;
 }
 
 # all_files()
@@ -158,15 +170,43 @@ my %RESOLVABLE_ACCESSOR = map { $_ => 1 } qw(
 
 # resolve_file($name)
 # Resolves a logical file name or absolute path to a concrete file path.
+# DD-1005 (Q-184, option A): when the registered alias carries lazy-create
+# metadata and the resolved file's PARENT directory does not exist, the
+# parent is created here (with its own parents, mkdir -p semantics) and
+# chmod'd to the stored mode if one was given - the file itself is left
+# absent, since "lazy create" for a FILE alias means the target is safe to
+# open/write, not that an empty file should be fabricated at the exact
+# path. This is the one place the logic lives, mirroring
+# PathRegistry::resolve_dir's identical single-resolver placement.
 # Input: logical file name or absolute path string.
 # Output: absolute or resolved file path string.
 sub resolve_file {
     my ( $self, $name ) = @_;
 
     return $name if File::Spec->file_name_is_absolute($name);
-    return $self->{named_files}{$name} if exists $self->{named_files}{$name};
-    $self->_load_configured_named_files;
-    return $self->{configured_named_files}{$name} if exists $self->{configured_named_files}{$name};
+
+    my $entry =
+        exists $self->{named_files}{$name}            ? $self->{named_files}{$name}
+      : do { $self->_load_configured_named_files; exists $self->{configured_named_files}{$name} ? $self->{configured_named_files}{$name} : undef };
+
+    if ( defined $entry ) {
+        my ( $path, $create, $mode ) =
+          ref($entry) eq 'HASH' ? ( $entry->{path}, $entry->{create}, $entry->{mode} ) : ( $entry, undef, undef );
+        if ($create) {
+            # File::Spec->splitpath's second return value is always a
+            # defined string (possibly empty), never undef, for any string
+            # input; $path itself is always a defined alias path by the
+            # time this runs, so "defined $parent" below can never
+            # observably be false.
+            my $parent = ( File::Spec->splitpath($path) )[1];
+            if ( $parent ne '' && !-d $parent ) {
+                File::Path::make_path($parent);
+                chmod( oct($mode), $parent ) if defined $mode && $mode ne '';
+            }
+        }
+        return $path;
+    }
+
     return $self->$name() if $RESOLVABLE_ACCESSOR{$name};
 
     die "Unknown file name '$name'";
@@ -192,7 +232,7 @@ sub read {
     my ( $self, $name ) = @_;
     my $file = $self->resolve_file($name);
     return if !-f $file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";    # uncoverable branch true this process (root, or granted read) cannot be denied read on an existing file it just confirmed with -f
+    open my $fh, '<', $file or die "Unable to read $file: $!";
     local $/;
     return <$fh>;
 }
@@ -348,6 +388,17 @@ Construct a registry bound to a path registry.
 =head2 resolve_file, read, write, append, touch, remove
 
 Resolve and manage named files.
+
+resolve_file() (DD-1005, Q-184 option A) additionally creates a registered
+file alias's PARENT directory (with its own parents) on first resolution
+when that alias was saved with C<create =E<gt> 1> (see
+C<Developer::Dashboard::Config>'s save_global_file_alias()'s C<%opts>),
+chmod'ing the parent to the alias's stored octal mode when one was given -
+the file itself is deliberately left absent, since lazy-create for a file
+alias means the target is safe to open/write, not that an empty file
+should be fabricated at the exact path. named_files() collapses such an
+alias back to a bare path string for display consumers, mirroring
+C<Developer::Dashboard::PathRegistry>'s named_paths().
 
 =head2 prompt_log, collector_log, dashboard_log, global_config, dashboard_index, auth_log, web_pid, web_state
 

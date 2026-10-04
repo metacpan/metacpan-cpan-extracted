@@ -26,7 +26,7 @@ BEGIN {
 
 # Quoted, not the bare number: a numeric version is stringified through %g,
 # so 0.20 would become "0.2" and compare as older than "0.15" on CPAN.
-our $VERSION = '0.192';
+our $VERSION = '0.193';
 
 use Cwd 'getcwd';
 use Digest::MD5 'md5_hex';
@@ -50,8 +50,8 @@ our @EXPORT = qw(say2 task);
 our @EXPORT_OK = (@EXPORT, 'parallel', 'report');
 
 # Defaults for every task() in the program, for any key the call itself leaves
-# undefined: local %SimpleFlow::DEFAULTS = ('dry.run' => 1) dry-runs a whole
-# pipeline from one line. "env" and "env.secret" are merged with a task's own
+# undefined: local %SimpleFlow::DEFAULTS = ('dry_run' => 1) dry-runs a whole
+# pipeline from one line. "env" and "env_secret" are merged with a task's own
 # rather than replaced by it. Keys that name one particular step are refused;
 # see @PER_STEP_KEYS in task().
 our %DEFAULTS;
@@ -231,8 +231,8 @@ sub _report {
 # option ("yes", say) is not a number, and is written as a string, so the line
 # is valid JSON whatever the caller passed.
 my %TRACE_NUMBER = map { $_ => 1 } qw(
-	attempts cpu.system cpu.user die dry.run duration exit lock out.of.date
-	overwrite protect quiet retries retry.delay signal source.line stale
+	attempts cpu.system cpu.user die dry_run duration exit lock out.of.date
+	overwrite protect quiet retries retry_delay signal source.line stale
 	start.time time timed.out timeout
 );
 my $JSON_NUMBER = qr/\A-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\z/;
@@ -283,21 +283,21 @@ sub _json_string {
 	return qq{"$string"};
 }
 
-# What "env.secret" puts in place of a value it hides.
+# What "env_secret" puts in place of a value it hides.
 my $SECRET_SHOWN = '(secret)';
 
-# The names "env.secret" holds, sorted and once each, as far as they can be
+# The names "env_secret" holds, sorted and once each, as far as they can be
 # read: this also runs on arguments not yet validated, for an error message.
 sub _secret_names {
 	my $args = shift;
-	my $names = $args->{'env.secret'};
+	my $names = $args->{'env_secret'};
 	return () if ref $names ne 'ARRAY';
 	my %seen;
 	return sort grep { (defined $_) && (ref $_ eq '') && (not $seen{$_}++) } @$names;
 }
 
 # A copy of the arguments, or of %DEFAULTS, that is safe to print: the "env"
-# values that "env.secret" names are hidden. Only "env" is copied deeply.
+# values that "env_secret" names are hidden. Only "env" is copied deeply.
 sub _shown_args {
 	my $args = shift;
 	my %shown = %$args;
@@ -391,7 +391,7 @@ sub _tree_mtime {
 	return $newest;
 }
 
-# Fold the "<kind>.file" (a single name) and "<kind>.files" (a name or an
+# Fold the "<kind>_file" (a single name) and "<kind>_files" (a name or an
 # array ref) forms into one list, and reject names that cannot meaningfully be
 # filetested. undef and '' are caught HERE, before any -f: "-f undef" is a
 # fatal warning under "warnings FATAL => 'all'" and "-f ''" is merely false,
@@ -401,7 +401,7 @@ sub _tree_mtime {
 sub _normalise_files {
 	my ($args, $kind, $noun) = @_; # $noun: 'file' (the default) or 'dir'
 	$noun //= 'file';
-	my ($single, $plural) = ("$kind.$noun", "$kind.${noun}s");
+	my ($single, $plural) = ("${kind}_$noun", "${kind}_${noun}s");
 	# The two forms are mutually exclusive: mixing them is almost always a
 	# mistake (which one holds the truth?), so refuse it outright.
 	if ((defined $args->{$single}) && (defined $args->{$plural})) {
@@ -956,7 +956,7 @@ sub _slurp_into {
 # landed there into $$stdout and $$stderr. Returns what $code returned.
 #
 # $to_file, if given, maps a descriptor (1 or 2) to a file the command's
-# output is appended to instead, for "stdout.file" and "stderr.file"; its
+# output is appended to instead, for "stdout_file" and "stderr_file"; its
 # scalar is then left empty, since the point of those options is not to hold
 # a large output in memory. One file named for both is opened once, so the
 # two streams interleave in it as they would on a terminal.
@@ -1107,8 +1107,8 @@ sub _run_once {
 	# decides what to do with it, since only it knows its own option for it
 	$ENV{SIMPLEFLOW_THREADS} = $r->{threads} if $r->{threads} > 0;
 	my %to_file;
-	$to_file{1} = $r->{'stdout.file'} if $r->{'stdout.file'} ne '';
-	$to_file{2} = $r->{'stderr.file'} if $r->{'stderr.file'} ne '';
+	$to_file{1} = $r->{'stdout_file'} if $r->{'stdout_file'} ne '';
+	$to_file{2} = $r->{'stderr_file'} if $r->{'stderr_file'} ne '';
 	my @cpu_before = times;
 	my $t0 = Time::HiRes::time();
 	$r->{'start.time'} = $t0;
@@ -1208,7 +1208,7 @@ sub _run_once {
 	# there is the next best thing, and the one place a caller under die => 0
 	# can read it.
 	$r->{stderr} = "cannot run \"$cmd_string\": $launch_error"
-		if ($launch_error ne '') && ($r->{stderr} eq '') && ($r->{'stderr.file'} eq '');
+		if ($launch_error ne '') && ($r->{stderr} eq '') && ($r->{'stderr_file'} eq '');
 	return ($interrupted, $launch_error);
 }
 
@@ -1238,17 +1238,17 @@ sub _wrapped_cmd {
 			(($r->{threads} > 0) ? "--cpus-per-task=$r->{threads}" : ()),
 			(($r->{mem} ne '')   ? "--mem=$r->{mem}"               : ()),
 			(($r->{walltime} ne '') ? "--time=$r->{walltime}"       : ()),
-			@{ $r->{'executor.args'} };
+			@{ $r->{'executor_args'} };
 	}
 	if ($r->{container} ne '') {
 		my $cwd = $r->{dir}; # the step's working directory, mounted at the same path
-		if (($r->{'container.engine'} eq 'docker') || ($r->{'container.engine'} eq 'podman')) {
-			push @layers, $r->{'container.engine'}, 'run', '--rm',
+		if (($r->{'container_engine'} eq 'docker') || ($r->{'container_engine'} eq 'podman')) {
+			push @layers, $r->{'container_engine'}, 'run', '--rm',
 				(($r->{stdin} eq 'inherit') ? '-i' : ()),
 				# docker runs as root unless told otherwise, and a file root
 				# makes in the mounted directory is root's; podman, rootless,
 				# maps the caller's own user already
-				(($r->{'container.engine'} eq 'docker') && ($^O ne 'MSWin32')
+				(($r->{'container_engine'} eq 'docker') && ($^O ne 'MSWin32')
 					? ('--user', $> . ':' . (split ' ', $))[0]) : ()),
 				'-v', "$cwd:$cwd", '-w', $cwd,
 				# the variables "env" and "threads" set, by name: the engine
@@ -1256,17 +1256,17 @@ sub _wrapped_cmd {
 				# command's
 				(map { ('-e', $_) } grep { defined $r->{env}{$_} } sort keys %{ $r->{env} }),
 				(($r->{threads} > 0) ? ('-e', 'SIMPLEFLOW_THREADS') : ()),
-				@{ $r->{'container.args'} }, $r->{container};
+				@{ $r->{'container_args'} }, $r->{container};
 		} else { # singularity and apptainer, which pass the environment through themselves
-			push @layers, $r->{'container.engine'}, 'exec', '--bind', $cwd, '--pwd', $cwd,
-				@{ $r->{'container.args'} }, $r->{container};
+			push @layers, $r->{'container_engine'}, 'exec', '--bind', $cwd, '--pwd', $cwd,
+				@{ $r->{'container_args'} }, $r->{container};
 		}
 	}
-	if ($r->{'conda.env'} ne '') {
+	if ($r->{'conda_env'} ne '') {
 		# --no-capture-output, or conda holds the command's output back until
 		# it ends; a path names a prefix, anything else an environment's name
 		push @layers, 'conda', 'run', '--no-capture-output',
-			(($r->{'conda.env'} =~ m{[/\\]}) ? '-p' : '-n'), $r->{'conda.env'};
+			(($r->{'conda_env'} =~ m{[/\\]}) ? '-p' : '-n'), $r->{'conda_env'};
 	}
 	push @layers, @{ $r->{wrapper} };
 	return undef if scalar @layers == 0;
@@ -1274,7 +1274,7 @@ sub _wrapped_cmd {
 	return [@layers, ($^O eq 'MSWin32') ? ('cmd.exe', '/c', $cmd) : ('/bin/sh', '-c', $cmd)];
 }
 
-# What "stale.cmd" compares: a digest of everything that decides what the
+# What "stale_cmd" compares: a digest of everything that decides what the
 # command does, other than its inputs -- the command, whether it went to a
 # shell, the environment it was given, and what it runs inside. Separated by
 # NUL, which cannot occur in a command's words or the environment, so that
@@ -1286,7 +1286,7 @@ sub _wrapped_cmd {
 # part -- are now added with their boundaries, but only when one of them holds
 # a space: without one, the space-joined form is already unambiguous, and
 # leaving the digest as it was keeps every digest 0.191 recorded valid, so an
-# upgrade does not re-run every "stale.cmd" step. Likewise "threads", which
+# upgrade does not re-run every "stale_cmd" step. Likewise "threads", which
 # reaches a local command only as SIMPLEFLOW_THREADS, is added only when it
 # is set; under SLURM it is in srun's --cpus-per-task already.
 sub _command_signature {
@@ -1318,7 +1318,7 @@ sub _read_signature {
 	my $file = shift;
 	# not through a symbolic link; see _metadata_dir
 	foreach my $dir ('.simpleflow', File::Spec->catdir('.simpleflow', 'cmd')) {
-		die "\"$dir\" in " . getcwd() . ' is a symbolic link, which is not followed for the command records of "stale.cmd"; make it a directory'
+		die "\"$dir\" in " . getcwd() . ' is a symbolic link, which is not followed for the command records of "stale_cmd"; make it a directory'
 			if -l $dir;
 	}
 	sysopen(my $fh, $file, Fcntl::O_RDONLY() | $O_NOFOLLOW) or return undef; # none on record
@@ -1333,8 +1333,8 @@ sub _write_signature {
 	my ($volume, $dirs) = File::Spec->splitpath($file);
 	# canonpath, to drop the trailing slash, through which -l would follow a link
 	my $dir = File::Spec->canonpath(File::Spec->catpath($volume, $dirs, ''));
-	_metadata_dir('.simpleflow', 'the command records of "stale.cmd"');
-	_metadata_dir($dir, 'the command records of "stale.cmd"');
+	_metadata_dir('.simpleflow', 'the command records of "stale_cmd"');
+	_metadata_dir($dir, 'the command records of "stale_cmd"');
 	# Written under another name and renamed into place, so that a run killed
 	# part-way through never leaves half a signature, which would read as a
 	# changed command. The other name is File::Temp's, made with O_EXCL: until
@@ -1347,7 +1347,7 @@ sub _write_signature {
 	if (not $ok) {
 		my $error = $!;
 		unlink $partial_name;
-		die "cannot record the command for \"stale.cmd\" in \"$file\": $error";
+		die "cannot record the command for \"stale_cmd\" in \"$file\": $error";
 	}
 	return;
 }
@@ -1360,16 +1360,16 @@ sub _write_signature {
 # traceback needs its last 4 for the failing frame and the exception; perl's
 # die, sort and R's stop() need 1 or 2. Each is clipped at 300 characters: the
 # longest line in those, a traceback's "File ..." line, was 130. Blank lines
-# are skipped. Read back from stderr.file when that is where stderr went, from
+# are skipped. Read back from stderr_file when that is where stderr went, from
 # its last 64 KiB, far more than 6 lines of 300 need.
 my $STDERR_TAIL_LINES = 6;
 my $STDERR_TAIL_WIDTH = 300;
 sub _stderr_tail {
 	my $r = shift;
 	my $text = $r->{stderr};
-	if ($r->{'stderr.file'} ne '') {
+	if ($r->{'stderr_file'} ne '') {
 		$text = '';
-		if (open my $fh, '<', $r->{'stderr.file'}) {
+		if (open my $fh, '<', $r->{'stderr_file'}) {
 			my $size = -s $fh;
 			seek $fh, (($size > 65536) ? $size - 65536 : 0), 0;
 			local $/;
@@ -1442,51 +1442,51 @@ sub task {
 		die 'the above args are necessary, but were not defined.';
 	}
 	my @defined_args = ( @reqd_args,
-		'conda.env',   # name or path of a conda environment to run the command in
+		'conda_env',   # name or path of a conda environment to run the command in
 		'container',   # container image to run the command in
-		'container.args',   # array ref: more arguments for the container engine, before the image
-		'container.engine', # 'docker' (the default), 'podman', 'singularity' or 'apptainer'
+		'container_args',   # array ref: more arguments for the container engine, before the image
+		'container_engine', # 'docker' (the default), 'podman', 'singularity' or 'apptainer'
 		'die',			# die if not successful; 0 or 1
 		'dir',         # directory to run the step in; its file names are relative to it
-		'dry.run',     # dry run or not
+		'dry_run',     # dry run or not
 		'env',         # hash ref: environment variables for the command; undef removes one
-		'env.secret',  # array ref: names in "env" whose values are never printed, logged or traced
+		'env_secret',  # array ref: names in "env" whose values are never printed, logged or traced
 		'executor',    # 'local' (the default) or 'slurm': where the command runs
-		'executor.args', # array ref: more arguments for the executor (srun)
-		'input.dir',   # a single input directory; the convenience form of "input.dirs"
-		'input.dirs',  # directories that must exist before running; SCALAR or ARRAY
-		'input.file',  # a single input file; the convenience form of "input.files"
-		'input.files', # check for input files; SCALAR or ARRAY
+		'executor_args', # array ref: more arguments for the executor (srun)
+		'input_dir',   # a single input directory; the convenience form of "input_dirs"
+		'input_dirs',  # directories that must exist before running; SCALAR or ARRAY
+		'input_file',  # a single input file; the convenience form of "input_files"
+		'input_files', # check for input files; SCALAR or ARRAY
 		'lock',        # bool; hold a lock on the outputs, so a second run waits for this one
-		'log.fh',
+		'log_fh',
 		'mem',         # memory to ask the executor for: a number, and K, M, G or T
 		'note',        # a note for the log
-		'on.failure',  # code ref, called with the record when the command ran and failed
-		'on.success',  # code ref, called with the record when the command ran and succeeded
-		'output.dir',  # a single output directory; the convenience form of "output.dirs"
-		'output.dirs', # directories the step makes; SCALAR or ARRAY
-		'output.file', # for a single file, gets pushed into output.files anyway
-		'output.files',# product files that need to be checked; can be scalar or array
+		'on_failure',  # code ref, called with the record when the command ran and failed
+		'on_success',  # code ref, called with the record when the command ran and succeeded
+		'output_dir',  # a single output directory; the convenience form of "output_dirs"
+		'output_dirs', # directories the step makes; SCALAR or ARRAY
+		'output_file', # for a single file, gets pushed into output_files anyway
+		'output_files',# product files that need to be checked; can be scalar or array
 		'overwrite',   # bool
 		'protect',     # bool; make the outputs read-only once the step succeeds
 		'quiet',       # bool; suppress the terminal record, but never the log or STDERR
 		'retries',     # whole number; run a FAILED step again up to this many times
-		'retry.delay', # seconds, may be fractional; the wait before each retry
+		'retry_delay', # seconds, may be fractional; the wait before each retry
 		'stale',       # bool; also re-run when an input is newer than an output
-		'stale.cmd',   # bool; also re-run when the command differs from the one that made the outputs
-		'stderr.file', # file to write the command's stderr to, instead of the record
+		'stale_cmd',   # bool; also re-run when the command differs from the one that made the outputs
+		'stderr_file', # file to write the command's stderr to, instead of the record
 		'stdin',       # 'devnull' (the default) or 'inherit'; what the command sees on fd 0
-		'stdout.file', # file to write the command's stdout to, instead of the record
+		'stdout_file', # file to write the command's stdout to, instead of the record
 		'threads',     # whole number: CPUs the command uses; told to it, and asked of the executor
 		'timeout',     # whole seconds of wall clock; 0 means no limit
-		'trace.fh',    # filehandle; one line of JSON per task is appended to it
+		'trace_fh',    # filehandle; one line of JSON per task is appended to it
 		'walltime',    # time to ask the executor for, as SLURM writes it: [days-]hours:minutes:seconds
 		'wrapper',     # array ref: a command the command is run inside, as its arguments
 	);
 	# Keys that name one particular step, and so make no sense in %DEFAULTS:
 	# every task would then run the same command, or claim the same files.
-	my @PER_STEP_KEYS = qw(cmd input.dir input.dirs input.file input.files output.dir
-		output.dirs output.file output.files stderr.file stdout.file);
+	my @PER_STEP_KEYS = qw(cmd input_dir input_dirs input_file input_files output_dir
+		output_dirs output_file output_files stderr_file stdout_file);
 	my @bad_args = grep { my $key = $_; not grep {$_ eq $key} @defined_args} keys %{ $given };
 	if (scalar @bad_args > 0) {
 		p @bad_args, array_max => scalar @bad_args, output => 'STDERR';
@@ -1514,10 +1514,10 @@ sub task {
 		$args->{env} = { %{ $DEFAULTS{env} }, %{ $given->{env} } }; # the task's own win
 	}
 	# and a secret of the pipeline's stays one in a task that names its own
-	if ((ref $DEFAULTS{'env.secret'} eq 'ARRAY') && (ref $given->{'env.secret'} eq 'ARRAY')) {
-		$args->{'env.secret'} = [@{ $DEFAULTS{'env.secret'} }, @{ $given->{'env.secret'} }];
+	if ((ref $DEFAULTS{'env_secret'} eq 'ARRAY') && (ref $given->{'env_secret'} eq 'ARRAY')) {
+		$args->{'env_secret'} = [@{ $DEFAULTS{'env_secret'} }, @{ $given->{'env_secret'} }];
 	}
-	foreach my $key ('log.fh', 'trace.fh') {
+	foreach my $key ('log_fh', 'trace_fh') {
 		if ((defined $args->{$key}) && (not openhandle($args->{$key}))) {
 			_dump_args($args);
 			die "the \"$key\" given to $current_sub isn't actually a filehandle";
@@ -1572,9 +1572,9 @@ sub task {
 		_dump_args($args);
 		die '"retries" must be a whole number (0 means no retries)';
 	}
-	if ((defined $args->{'retry.delay'}) && ($args->{'retry.delay'} !~ /\A[0-9]+(?:\.[0-9]+)?\z/)) {
+	if ((defined $args->{'retry_delay'}) && ($args->{'retry_delay'} !~ /\A[0-9]+(?:\.[0-9]+)?\z/)) {
 		_dump_args($args);
-		die '"retry.delay" must be a number of seconds, 0 or more';
+		die '"retry_delay" must be a number of seconds, 0 or more';
 	}
 	if (defined $args->{stdin}) {
 		if (($args->{stdin} ne 'devnull') && ($args->{stdin} ne 'inherit')) {
@@ -1597,20 +1597,20 @@ sub task {
 				. join(', ', map { "\"$_\"" } @bad_names, @bad_values);
 		}
 	}
-	if (defined $args->{'env.secret'}) {
-		my $names = $args->{'env.secret'};
+	if (defined $args->{'env_secret'}) {
+		my $names = $args->{'env_secret'};
 		if ((ref $names ne 'ARRAY') || (grep { (not defined $_) || (ref $_ ne '') || ($_ eq '') || /[=\0]/ } @$names)) {
 			_dump_args($args);
-			die '"env.secret" must be an array ref of the names of environment variables';
+			die '"env_secret" must be an array ref of the names of environment variables';
 		}
 	}
-	foreach my $key ('on.success', 'on.failure') {
+	foreach my $key ('on_success', 'on_failure') {
 		if ((defined $args->{$key}) && (ref $args->{$key} ne 'CODE')) {
 			_dump_args($args);
 			die "\"$key\" must be a code ref, which is called with the record";
 		}
 	}
-	foreach my $key ('wrapper', 'container.args', 'executor.args') {
+	foreach my $key ('wrapper', 'container_args', 'executor_args') {
 		next if not defined $args->{$key};
 		my $list = $args->{$key};
 		if ((ref $list ne 'ARRAY')
@@ -1627,9 +1627,9 @@ sub task {
 		mem        => [qr/\A[0-9]+[KMGT]?\z/, 'an amount of memory: a number, then K, M, G or T'],
 		walltime   => [qr/\A(?:[0-9]+-)?[0-9]+(?::[0-9]{1,2}){0,2}\z/, 'a time limit, [days-]hours:minutes:seconds or minutes'],
 		executor   => [qr/\A(?:local|slurm)\z/, '"local" or "slurm"'],
-		'container.engine' => [qr/\A(?:docker|podman|singularity|apptainer)\z/, '"docker", "podman", "singularity" or "apptainer"'],
+		'container_engine' => [qr/\A(?:docker|podman|singularity|apptainer)\z/, '"docker", "podman", "singularity" or "apptainer"'],
 		container  => [qr/\A\S+\z/, 'the name of an image'],
-		'conda.env' => [qr/\A\S+\z/, 'the name or path of a conda environment'],
+		'conda_env' => [qr/\A\S+\z/, 'the name or path of a conda environment'],
 	);
 	foreach my $key (sort keys %pattern) {
 		next if not defined $args->{$key};
@@ -1638,15 +1638,15 @@ sub task {
 			die "\"$key\" must be $pattern{$key}[1]";
 		}
 	}
-	if ((defined $args->{'executor.args'}) && (($args->{executor} // 'local') eq 'local')) {
+	if ((defined $args->{'executor_args'}) && (($args->{executor} // 'local') eq 'local')) {
 		_dump_args($args);
-		die '"executor.args" needs an executor other than "local" to be given to';
+		die '"executor_args" needs an executor other than "local" to be given to';
 	}
-	if ((defined $args->{'container.args'}) && (not defined $args->{container})) {
+	if ((defined $args->{'container_args'}) && (not defined $args->{container})) {
 		_dump_args($args);
-		die '"container.args" needs a "container" to be given to';
+		die '"container_args" needs a "container" to be given to';
 	}
-	foreach my $key ('dir', 'stdout.file', 'stderr.file') {
+	foreach my $key ('dir', 'stdout_file', 'stderr_file') {
 		next if not defined $args->{$key};
 		if ((ref $args->{$key} ne '') || (length $args->{$key} == 0)) {
 			_dump_args($args);
@@ -1682,54 +1682,54 @@ sub task {
 		dir				=> getcwd(),
 		'source.file'  => $c[1],
 		'source.line'  => $c[2],
-		'output.files' => [@output_files],
-		'output.dirs'  => [@output_dirs],
-		'input.dirs'   => [@input_dirs],
+		'output_files' => [@output_files],
+		'output_dirs'  => [@output_dirs],
+		'input_dirs'   => [@input_dirs],
 	);
 	$r{'die'}     = $args->{'die'}     // 1; # by default, true
-	$r{'dry.run'} = $args->{'dry.run'} // 0; # by default, false
+	$r{'dry_run'} = $args->{'dry_run'} // 0; # by default, false
 	# The environment the command is given; the record's "env" is this with
-	# the values "env.secret" names hidden, since the record is printed,
+	# the values "env_secret" names hidden, since the record is printed,
 	# logged and traced. Until 0.192 every value was written out in full.
 	my %command_env = %{ $args->{env} // {} }; # by default, no changes; a copy, not the caller's hash
-	$r{'env.secret'} = [_secret_names($args)]; # by default, none
-	$r{env}       = _shown_args({ env => \%command_env, 'env.secret' => $r{'env.secret'} })->{env};
+	$r{'env_secret'} = [_secret_names($args)]; # by default, none
+	$r{env}       = _shown_args({ env => \%command_env, 'env_secret' => $r{'env_secret'} })->{env};
 	$r{lock}      = ($args->{lock}    // 0) ? 1 : 0; # by default, false
 	$r{note}      = $args->{note}      // '';# by default, no note
 	$r{overwrite} = $args->{overwrite} // 0; # by default, false
 	$r{protect}   = ($args->{protect} // 0) ? 1 : 0; # by default, false
 	$r{quiet}     = $args->{quiet}     // 0; # by default, false
 	$r{retries}   = $args->{retries}   // 0; # by default, one attempt only
-	$r{'retry.delay'} = $args->{'retry.delay'} // 0; # by default, retry at once
+	$r{'retry_delay'} = $args->{'retry_delay'} // 0; # by default, retry at once
 	$r{stale}     = $args->{stale}     // 0; # by default, false
-	$r{'stderr.file'} = $args->{'stderr.file'} // ''; # '' = captured into the record's "stderr"
+	$r{'stderr_file'} = $args->{'stderr_file'} // ''; # '' = captured into the record's "stderr"
 	$r{stdin}     = $args->{stdin}     // 'devnull'; # by default, the null device
-	$r{'stdout.file'} = $args->{'stdout.file'} // ''; # '' = captured into the record's "stdout"
+	$r{'stdout_file'} = $args->{'stdout_file'} // ''; # '' = captured into the record's "stdout"
 	$r{timeout}   = $args->{timeout}   // 0; # by default, no limit
-	$r{'stale.cmd'} = ($args->{'stale.cmd'} // 0) ? 1 : 0; # by default, false
+	$r{'stale_cmd'} = ($args->{'stale_cmd'} // 0) ? 1 : 0; # by default, false
 	$r{wrapper}   = [@{ $args->{wrapper} // [] }]; # by default, none
 	$r{container} = $args->{container} // ''; # '' = no container
-	$r{'container.engine'} = $args->{'container.engine'} // (($r{container} ne '') ? 'docker' : ''); # '' = no container
-	$r{'container.args'} = [@{ $args->{'container.args'} // [] }];
-	$r{'conda.env'} = $args->{'conda.env'} // ''; # '' = no conda environment
+	$r{'container_engine'} = $args->{'container_engine'} // (($r{container} ne '') ? 'docker' : ''); # '' = no container
+	$r{'container_args'} = [@{ $args->{'container_args'} // [] }];
+	$r{'conda_env'} = $args->{'conda_env'} // ''; # '' = no conda environment
 	$r{executor}  = $args->{executor}  // 'local'; # by default, run here
-	$r{'executor.args'} = [@{ $args->{'executor.args'} // [] }];
+	$r{'executor_args'} = [@{ $args->{'executor_args'} // [] }];
 	$r{threads}   = $args->{threads}   // 0; # 0 = not said
 	$r{mem}       = $args->{mem}       // ''; # '' = not said
 	$r{walltime}  = $args->{walltime}  // ''; # '' = not said
 	# The hooks are the one kind of option not on the record: they are code,
 	# which neither the printed record, the log nor the trace can hold.
-	my %hook = ('on.success' => $args->{'on.success'}, 'on.failure' => $args->{'on.failure'});
+	my %hook = ('on_success' => $args->{'on_success'}, 'on_failure' => $args->{'on_failure'});
 	# the command that is actually run: "cmd" itself, or "cmd" inside the
 	# executor, container, conda environment and wrapper asked for
 	my $run_cmd = _wrapped_cmd(\%r, $args->{cmd});
 	$r{'wrapped.cmd'} = (defined $run_cmd) ? join(' ', @$run_cmd) : ''; # '' = run as it is
 	$run_cmd //= $args->{cmd};
 	my $run_cmd_ref = ref $run_cmd;
-	my $log_fh   = $args->{'log.fh'};
-	my $trace_fh = $args->{'trace.fh'};
+	my $log_fh   = $args->{'log_fh'};
+	my $trace_fh = $args->{'trace_fh'};
 
-	# Checked after "dry.run" is resolved, not before, as it was until 0.19:
+	# Checked after "dry_run" is resolved, not before, as it was until 0.19:
 	# a dry run makes nothing, so the input of a pipeline's second step --
 	# the first step's output -- is legitimately absent, and dying over it
 	# meant no dry run could get past step 2. A dry run reports the missing
@@ -1737,7 +1737,7 @@ sub task {
 	my %input_file_size;
 	my @missing_inputs = ((grep {not -f -r $_ } @input_files), (grep { not ((-d $_) && (-r $_)) } @input_dirs));
 	if (scalar @missing_inputs > 0) {
-		if (!$r{'dry.run'}) {
+		if (!$r{'dry_run'}) {
 			say STDERR 'this list of arguments:';
 			_dump_args($args);
 			say STDERR 'Cannot run because these files are either missing or unreadable in: ' . getcwd();
@@ -1762,12 +1762,12 @@ sub task {
 	$r{'cpu.system'} = 0;
 	$r{'start.time'} = 0; # epoch seconds when the last attempt started; 0 = none did
 	$r{'failed.outputs'} = []; # where a failed step's outputs were moved; see _move_aside
-	$r{'cmd.changed'} = 0; # 1 = stale.cmd found a different command on record for the outputs
+	$r{'cmd.changed'} = 0; # 1 = stale_cmd found a different command on record for the outputs
 	$r{'will.do'} = 'yes';
-	$r{'will.do'} = 'no: dry run'  if $r{'dry.run'};
+	$r{'will.do'} = 'no: dry run'  if $r{'dry_run'};
 	if (scalar @input_files > 0) {
-		$r{'input.files'}     = [@input_files];
-		$r{'input.file.size'} = \%input_file_size;
+		$r{'input_files'}     = [@input_files];
+		$r{'input_file.size'} = \%input_file_size;
 	}
 
 	my $msg = "\@ $c[1] line $c[2] The command is:\n" . colored(['blue on_bright_red'], $cmd_string);
@@ -1777,7 +1777,7 @@ sub task {
 	# Taken before the outputs are looked at, so that a run which waited for
 	# another to finish the step sees what that one made. A dry run touches
 	# nothing, and so takes no lock. Held until this call returns.
-	my @locks = ($r{lock} && !$r{'dry.run'}) ? _lock_outputs($cmd_string, @outputs) : ();
+	my @locks = ($r{lock} && !$r{'dry_run'}) ? _lock_outputs($cmd_string, @outputs) : ();
 
 	# The same test as the post-run check further down (-f -r, not a bare -f).
 	# A file that exists but cannot be read is not a usable result, and
@@ -1803,19 +1803,19 @@ sub task {
 	}
 	$r{'out.of.date'} = $is_stale;
 
-	# "stale.cmd": the outputs are out of date if the command on record for
+	# "stale_cmd": the outputs are out of date if the command on record for
 	# them is not this one; see _command_signature. Outputs with no command on
-	# record -- made before stale.cmd was used, or by hand -- are taken as
+	# record -- made before stale_cmd was used, or by hand -- are taken as
 	# made by this one, which is recorded, so that the next change is seen.
 	#
-	# A step run without stale.cmd still replaces the outputs, so when there
+	# A step run without stale_cmd still replaces the outputs, so when there
 	# is a command on record for them, this one's is written over it after a
 	# successful run, further down. Until 0.192 it was left, and a later
-	# stale.cmd run of the command on record took the other one's outputs as
+	# stale_cmd run of the command on record took the other one's outputs as
 	# its own. With nothing on record, nothing is written: a pipeline that
-	# never asks for stale.cmd gets no .simpleflow/ from it.
+	# never asks for stale_cmd gets no .simpleflow/ from it.
 	my ($signature, $signature_file, $recorded_signature);
-	if (($r{'stale.cmd'}) && (scalar @outputs > 0)) {
+	if (($r{'stale_cmd'}) && (scalar @outputs > 0)) {
 		$signature = _command_signature(\%r, $args->{cmd}, $run_cmd);
 		$signature_file = _signature_file(@outputs);
 		$recorded_signature = _read_signature($signature_file);
@@ -1835,9 +1835,9 @@ sub task {
 		$r{done} = 'before';
 		$r{'will.do'} = 'no';
 		say colored(['black on_green'], "\"$cmd_string\"\n") . ' has been done before' unless $r{quiet};
-		$r{'output.file.size'} = { map {$_ => -s $_} @output_files };
+		$r{'output_file.size'} = { map {$_ => -s $_} @output_files };
 		_write_signature($signature_file, $signature)
-			if $r{'stale.cmd'} && (defined $signature) && (not defined $recorded_signature) && (!$r{'dry.run'});
+			if $r{'stale_cmd'} && (defined $signature) && (not defined $recorded_signature) && (!$r{'dry_run'});
 		_report(\%r, $log_fh, $r{quiet}, $trace_fh);
 		return \%r;
 	} else {
@@ -1851,7 +1851,7 @@ sub task {
 		say colored(['red on_black'], "\"$cmd_string\"")
 			. ' is being re-run: its command has changed since its outputs were made' unless $r{quiet};
 	}
-	if ($r{'dry.run'}) {
+	if ($r{'dry_run'}) {
 		unless ($r{quiet}) {
 			say "\@ $c[1] line $c[2] in $r{dir} the command was going to be:";
 			say colored(['red on_black'], "\"$cmd_string\"");
@@ -1865,8 +1865,8 @@ sub task {
 			say {$log_fh} $missing if defined $log_fh;
 		}
 		# Until 0.19 a dry run returned with neither: its record lacked
-		# output.file.size, and the log held only the command line.
-		$r{'output.file.size'} = { map {$_ => -s $_} @output_files };
+		# output_file.size, and the log held only the command line.
+		$r{'output_file.size'} = { map {$_ => -s $_} @output_files };
 		_report(\%r, $log_fh, $r{quiet}, $trace_fh);
 		say '-------------' unless $r{quiet};
 		return \%r;
@@ -1882,9 +1882,9 @@ sub task {
 				. 'remove them, or make them writable, to run it again';
 		}
 	}
-	# "stdout.file" and "stderr.file" hold this call's output, from every
+	# "stdout_file" and "stderr_file" hold this call's output, from every
 	# attempt: emptied once, here, and appended to by each attempt.
-	foreach my $path (grep { $_ ne '' } $r{'stdout.file'}, $r{'stderr.file'}) {
+	foreach my $path (grep { $_ ne '' } $r{'stdout_file'}, $r{'stderr_file'}) {
 		open my $fh, '>', $path or die "cannot empty \"$path\" before running \"$cmd_string\": $!";
 		close $fh;
 	}
@@ -1913,23 +1913,23 @@ sub task {
 		# Measured before the move below, so the record says what the command
 		# wrote rather than that the declared names are now empty.
 		%output_file_size = map {$_ => -s $_} @output_files;
-		$r{'output.file.size'} = { %output_file_size };
+		$r{'output_file.size'} = { %output_file_size };
 		# Not retried: success, the last attempt, or an interrupt, which is
 		# the caller asking for the whole program to stop.
 		my $retrying = (($attempt < $attempts) && (not defined $interrupted)) ? 1 : 0;
 		if ($r{'will.do'} eq 'FAILED') {
-			# Read now, while the file is where stderr.file says: when it is
+			# Read now, while the file is where stderr_file says: when it is
 			# also an output it is about to be moved, and until 0.192 the
 			# message then went without it.
 			@stderr_tail = _stderr_tail(\%r);
-			# An output that is, or holds, stdout.file or stderr.file stays
+			# An output that is, or holds, stdout_file or stderr_file stays
 			# where it is until the last attempt, since those files are to
 			# hold every attempt, in order. Until 0.192 it was moved aside
 			# with the rest, and the retry began a new file -- or, inside a
 			# moved directory, could not open one.
 			my @to_move = @outputs;
 			if ($retrying) {
-				my @streams = map { _canonical($_) } grep { $_ ne '' } $r{'stdout.file'}, $r{'stderr.file'};
+				my @streams = map { _canonical($_) } grep { $_ ne '' } $r{'stdout_file'}, $r{'stderr_file'};
 				@to_move = grep {
 					my $output = _canonical($_);
 					not grep { ($_ eq $output) || _is_within($_, $output) } @streams;
@@ -1948,10 +1948,10 @@ sub task {
 		last if ($r{'will.do'} ne 'FAILED') || (not $retrying);
 		my $retry = "\"$cmd_string\" " . join('; ', _why_failed(\%r, $interrupted, $launch_error, @missing_outputs))
 			. "; attempt $attempt of $attempts, retrying"
-			. (($r{'retry.delay'} > 0) ? " in $r{'retry.delay'}s" : '');
+			. (($r{'retry_delay'} > 0) ? " in $r{'retry_delay'}s" : '');
 		say STDERR $retry;
 		say {$log_fh} $retry if defined $log_fh;
-		Time::HiRes::sleep($r{'retry.delay'}) if $r{'retry.delay'} > 0;
+		Time::HiRes::sleep($r{'retry_delay'}) if $r{'retry_delay'} > 0;
 	}
 	$r{done} = 'now';
 	if (scalar @missing_outputs > 0) {
@@ -1980,7 +1980,7 @@ sub task {
 		warn 'the above output directories are empty.';
 	}
 	_protect(@outputs) if $r{protect} && ($r{'will.do'} eq 'done');
-	# with or without stale.cmd; see where $signature is set
+	# with or without stale_cmd; see where $signature is set
 	_write_signature($signature_file, $signature) if (defined $signature) && ($r{'will.do'} eq 'done');
 	# The record is printed once, whatever happened. Until 0.19 each kind of
 	# failure had its own branch with its own _report, and the missing-output
@@ -1993,13 +1993,13 @@ sub task {
 	# task() in the way.
 	kill $interrupted, $$ if defined $interrupted;
 	# After the record is written, and before task() dies: a hook sees the
-	# step as the log does, and a pipeline's on.failure runs even under the
+	# step as the log does, and a pipeline's on_failure runs even under the
 	# default die => 1. An exception from a hook propagates as it is.
 	if ($r{'will.do'} ne 'FAILED') {
-		$hook{'on.success'}->(\%r) if defined $hook{'on.success'};
+		$hook{'on_success'}->(\%r) if defined $hook{'on_success'};
 		return \%r;
 	}
-	$hook{'on.failure'}->(\%r) if defined $hook{'on.failure'};
+	$hook{'on_failure'}->(\%r) if defined $hook{'on_failure'};
 	my $failure = "\"$cmd_string\" " . join('; ', _why_failed(\%r, $interrupted, $launch_error, @missing_outputs))
 		. (($r{attempts} > 1) ? " (after $r{attempts} attempts)" : '')
 		. ", from $c[1] line $c[2]";
@@ -2016,7 +2016,7 @@ sub task {
 # and hands the record back through a file, with Storable, so that a record of
 # any size never has to fit in a pipe. The first task to die stops any more
 # from starting; those already running are let finish, and then parallel()
-# dies with every failure. With "keep.going", every task runs regardless, and
+# dies with every failure. With "keep_going", every task runs regardless, and
 # parallel() dies at the end if any did. POSIX-only for jobs > 1, like
 # "timeout": perl's fork() on MSWin32 is an emulation with threads, and the
 # children would share one working directory and one %ENV.
@@ -2033,7 +2033,7 @@ sub parallel {
 	my %opt = @_;
 	my @accepted = (
 		'jobs',       # whole number, 1 or more: how many tasks may run at once
-		'keep.going', # bool; run every task even after one has failed
+		'keep_going', # bool; run every task even after one has failed
 		'tasks',      # array ref of hash refs, each the arguments of one task()
 	);
 	my @unknown = grep { my $key = $_; not grep { $_ eq $key } @accepted } sort keys %opt;
@@ -2054,7 +2054,7 @@ sub parallel {
 	if (($opt{jobs} > 1) && ($^O eq 'MSWin32')) {
 		die '"jobs" above 1 is not supported on MSWin32: it needs a real fork(), and perl emulates one there with threads';
 	}
-	my $keep_going = $opt{'keep.going'} ? 1 : 0;
+	my $keep_going = $opt{'keep_going'} ? 1 : 0;
 	# each task's source.file and source.line are the parallel() call's
 	local $CALLER = [$c[1], $c[2]];
 	my (@records, @failures); # @failures: [index, error]
@@ -2074,7 +2074,7 @@ sub parallel {
 	# Anything already written but still in a buffer is written now, before
 	# the fork, or each child would inherit a copy and write it again.
 	my %handles = map { ($_ => $_) } grep { defined openhandle($_) } \*STDOUT, \*STDERR,
-		map { ($_->{'log.fh'}, $_->{'trace.fh'}) } @tasks, \%DEFAULTS;
+		map { ($_->{'log_fh'}, $_->{'trace_fh'}) } @tasks, \%DEFAULTS;
 	_flush($_) foreach values %handles;
 	# An interrupt to parallel() goes to every running task, as TERM, which
 	# each passes to its command before it ends; see _run_forked. It is then
@@ -2170,7 +2170,7 @@ sub _parallel_failure {
 
 # An HTML page of a pipeline's trace: every task in the order it was
 # traced, with its status, command, timing and exit, a timeline of when each
-# ran, and a count of each status at the top. The trace is what "trace.fh"
+# ran, and a count of each status at the top. The trace is what "trace_fh"
 # wrote, one JSON object a line; the page is a single file, with no scripts
 # and nothing fetched, so that it can be mailed or archived as it is.
 # Returns how many tasks it read.
@@ -2187,7 +2187,7 @@ sub report {
 	my @accepted = (
 		'html',  # the file to write the page to
 		'title', # the page's title; by default, "SimpleFlow report"
-		'trace', # the trace file to read, as "trace.fh" wrote it
+		'trace', # the trace file to read, as "trace_fh" wrote it
 	);
 	my @unknown = grep { my $key = $_; not grep { $_ eq $key } @accepted } sort keys %opt;
 	die 'report() does not accept ' . join(', ', map { "\"$_\"" } @unknown) if scalar @unknown > 0;
@@ -2457,7 +2457,7 @@ SimpleFlow - easy, simple workflow manager (and logger); for keeping track of an
 
 =head1 VERSION
 
-version 0.192
+version 0.193
 
 =head1 DESCRIPTION
 
@@ -2508,7 +2508,7 @@ The simplest useful case: run a command and confirm it produced its output:
 
  my $t = task(
      cmd           => 'echo hello > hello.txt',
-     'output.file' => 'hello.txt',
+     'output_file' => 'hello.txt',
  );
 
 C<task> returns a hash reference describing exactly what happened, and prints
@@ -2518,51 +2518,51 @@ it (here from a script called C<example.pl>, run in C</home/you/project>):
      attempts           1,
      cmd                "echo hello > hello.txt",
      cmd.changed        0,
-     conda.env          "",
+     conda_env          "",
      container          "",
-     container.args     [],
-     container.engine   "",
+     container_args     [],
+     container_engine   "",
      cpu.system         0,
      cpu.user           0,
      die                1,
      dir                "/home/you/project",
      done               "now",
-     dry.run            0,
+     dry_run            0,
      duration           0.00192999839782715,
      env                {},
-     env.secret         [],
+     env_secret         [],
      executor           "local",
-     executor.args      [],
+     executor_args      [],
      exit               0,
      failed.outputs     [],
-     input.dirs         [],
+     input_dirs         [],
      lock               0,
      mem                "",
      note               "",
      out.of.date        0,
-     output.dirs        [],
-     output.file.size   {
+     output_dirs        [],
+     output_file.size   {
          hello.txt   6
      },
-     output.files       [
+     output_files       [
          [0] "hello.txt"
      ],
      overwrite          0,
      protect            0,
      quiet              0,
      retries            0,
-     retry.delay        0,
+     retry_delay        0,
      signal             0,
      source.file        "example.pl",
      source.line        3,
      stale              0,
-     stale.cmd          0,
+     stale_cmd          0,
      start.time         1790446630.13174,
      stderr             "",
-     stderr.file        "",
+     stderr_file        "",
      stdin              "devnull",
      stdout             "",
-     stdout.file        "",
+     stdout_file        "",
      threads            0,
      timed.out          0,
      timeout            0,
@@ -2611,7 +2611,7 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td><b>Required.</b> The command to run. A string is handed to the shell; an array ref is run without a shell.</td>
 </tr>
 <tr>
-  <td><code>conda.env</code></td>
+  <td><code>conda_env</code></td>
   <td>name or path</td>
   <td><code>undef</code></td>
   <td>Run the command in this conda environment. See Containers, conda and clusters.</td>
@@ -2623,13 +2623,13 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>Run the command in a container made from this image.</td>
 </tr>
 <tr>
-  <td><code>container.args</code></td>
+  <td><code>container_args</code></td>
   <td>array ref</td>
   <td><code>[]</code></td>
   <td>More arguments for the container engine, before the image.</td>
 </tr>
 <tr>
-  <td><code>container.engine</code></td>
+  <td><code>container_engine</code></td>
   <td>name</td>
   <td><code>'docker'</code></td>
   <td><code>'docker'</code>, <code>'podman'</code>, <code>'singularity'</code> or <code>'apptainer'</code>.</td>
@@ -2647,7 +2647,7 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>Run the step in this directory; every file it declares is relative to it. See Environment and directory.</td>
 </tr>
 <tr>
-  <td><code>dry.run</code></td>
+  <td><code>dry_run</code></td>
   <td>bool</td>
   <td><code>0</code></td>
   <td>Print the command (and log it) but do not execute it.</td>
@@ -2659,7 +2659,7 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>Environment variables for the command only; a value of <code>undef</code> removes one. See Environment and directory.</td>
 </tr>
 <tr>
-  <td><code>env.secret</code></td>
+  <td><code>env_secret</code></td>
   <td>array ref</td>
   <td><code>[]</code></td>
   <td>Names in <code>env</code> whose values are never printed, logged or traced. See Secrets.</td>
@@ -2671,70 +2671,70 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>Where the command runs: here, or as a SLURM job step through <code>srun</code>.</td>
 </tr>
 <tr>
-  <td><code>executor.args</code></td>
+  <td><code>executor_args</code></td>
   <td>array ref</td>
   <td><code>[]</code></td>
   <td>More arguments for the executor (<code>srun</code>).</td>
 </tr>
 <tr>
-  <td><code>input.dirs</code></td>
+  <td><code>input_dirs</code></td>
   <td>scalar or array</td>
   <td><code>undef</code></td>
-  <td>Directories that must exist before running, as <code>input.files</code> must.</td>
+  <td>Directories that must exist before running, as <code>input_files</code> must.</td>
 </tr>
 <tr>
-  <td><code>input.dir</code></td>
+  <td><code>input_dir</code></td>
   <td>scalar</td>
   <td><code>undef</code></td>
-  <td>Convenience form of <code>input.dirs</code> for a <b>single</b> directory.</td>
+  <td>Convenience form of <code>input_dirs</code> for a <b>single</b> directory.</td>
 </tr>
 <tr>
-  <td><code>input.files</code></td>
+  <td><code>input_files</code></td>
   <td>scalar or array</td>
   <td><code>undef</code></td>
   <td>File(s) that must exist and be readable <b>before</b> running; otherwise <code>task</code> dies (except in a dry run, which lists them instead).</td>
 </tr>
 <tr>
-  <td><code>input.file</code></td>
+  <td><code>input_file</code></td>
   <td>scalar</td>
   <td><code>undef</code></td>
-  <td>Convenience form of <code>input.files</code> for a <b>single</b> file. Must be a plain filename (not a reference). Cannot be combined with <code>input.files</code>.</td>
+  <td>Convenience form of <code>input_files</code> for a <b>single</b> file. Must be a plain filename (not a reference). Cannot be combined with <code>input_files</code>.</td>
 </tr>
 <tr>
-  <td><code>on.failure</code></td>
+  <td><code>on_failure</code></td>
   <td>code ref</td>
   <td><code>undef</code></td>
   <td>Called with the record when the command ran and failed, before <code>task</code> dies. See Hooks.</td>
 </tr>
 <tr>
-  <td><code>on.success</code></td>
+  <td><code>on_success</code></td>
   <td>code ref</td>
   <td><code>undef</code></td>
   <td>Called with the record when the command ran and succeeded.</td>
 </tr>
 <tr>
-  <td><code>output.dirs</code></td>
+  <td><code>output_dirs</code></td>
   <td>scalar or array</td>
   <td><code>undef</code></td>
-  <td>Directories the step makes, checked like <code>output.files</code>. See Directory outputs.</td>
+  <td>Directories the step makes, checked like <code>output_files</code>. See Directory outputs.</td>
 </tr>
 <tr>
-  <td><code>output.dir</code></td>
+  <td><code>output_dir</code></td>
   <td>scalar</td>
   <td><code>undef</code></td>
-  <td>Convenience form of <code>output.dirs</code> for a <b>single</b> directory. Cannot be combined with <code>output.dirs</code>.</td>
+  <td>Convenience form of <code>output_dirs</code> for a <b>single</b> directory. Cannot be combined with <code>output_dirs</code>.</td>
 </tr>
 <tr>
-  <td><code>output.files</code></td>
+  <td><code>output_files</code></td>
   <td>scalar or array</td>
   <td><code>undef</code></td>
   <td>File(s) expected to exist <b>after</b> running; used both for the missing-output check and for skip detection.</td>
 </tr>
 <tr>
-  <td><code>output.file</code></td>
+  <td><code>output_file</code></td>
   <td>scalar</td>
   <td><code>undef</code></td>
-  <td>Convenience form of <code>output.files</code> for a <b>single</b> file. Must be a plain filename (not a reference). Cannot be combined with <code>output.files</code>.</td>
+  <td>Convenience form of <code>output_files</code> for a <b>single</b> file. Must be a plain filename (not a reference). Cannot be combined with <code>output_files</code>.</td>
 </tr>
 <tr>
   <td><code>lock</code></td>
@@ -2743,7 +2743,7 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>Hold a lock on the outputs while the step runs, so that a second copy of the pipeline waits for this one. See Locking.</td>
 </tr>
 <tr>
-  <td><code>log.fh</code></td>
+  <td><code>log_fh</code></td>
   <td>open filehandle</td>
   <td><code>undef</code></td>
   <td>If given, the full result record is also written here. Must be a real, open filehandle; <code>task</code> switches it to autoflush.</td>
@@ -2764,7 +2764,7 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td><code>overwrite</code></td>
   <td>bool</td>
   <td><code>0</code></td>
-  <td>If false and all <code>output.files</code> already exist, the command is skipped. Set true to always run.</td>
+  <td>If false and all <code>output_files</code> already exist, the command is skipped. Set true to always run.</td>
 </tr>
 <tr>
   <td><code>protect</code></td>
@@ -2785,7 +2785,7 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>Run a failed step again, up to this many more times. See Retries.</td>
 </tr>
 <tr>
-  <td><code>retry.delay</code></td>
+  <td><code>retry_delay</code></td>
   <td>seconds</td>
   <td><code>0</code></td>
   <td>How long to wait before each retry; may be fractional.</td>
@@ -2797,13 +2797,13 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>Also re-run when an input file is newer than an output file. See Out-of-date outputs.</td>
 </tr>
 <tr>
-  <td><code>stale.cmd</code></td>
+  <td><code>stale_cmd</code></td>
   <td>bool</td>
   <td><code>0</code></td>
   <td>Also re-run when the command differs from the one that made the outputs. See Re-running a changed command.</td>
 </tr>
 <tr>
-  <td><code>stderr.file</code></td>
+  <td><code>stderr_file</code></td>
   <td>path</td>
   <td><code>undef</code></td>
   <td>Write the command's standard error to this file instead of the record. See Output to files.</td>
@@ -2815,7 +2815,7 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>What the command sees on its standard input. The default is the null device; <code>'inherit'</code> hands it the caller's own. See Standard input.</td>
 </tr>
 <tr>
-  <td><code>stdout.file</code></td>
+  <td><code>stdout_file</code></td>
   <td>path</td>
   <td><code>undef</code></td>
   <td>Write the command's standard output to this file instead of the record.</td>
@@ -2833,7 +2833,7 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>Kill the command if it runs longer than this. <code>0</code> means no limit. See Timeouts.</td>
 </tr>
 <tr>
-  <td><code>trace.fh</code></td>
+  <td><code>trace_fh</code></td>
   <td>open filehandle</td>
   <td><code>undef</code></td>
   <td>Append one line of JSON per task to this filehandle. See Tracing.</td>
@@ -2865,7 +2865,7 @@ Type: scalar or array; Default: C<undef>.
 
 B<Required.> The command to run. A string is handed to the shell; an array ref is run L<without a shell|/"Running without a shell">.
 
-=item C<conda.env>
+=item C<conda_env>
 
 Type: name or path; Default: C<undef>.
 
@@ -2877,13 +2877,13 @@ Type: image; Default: C<undef>.
 
 Run the command in a container made from this image.
 
-=item C<container.args>
+=item C<container_args>
 
 Type: array ref; Default: C<[]>.
 
 More arguments for the container engine, before the image.
 
-=item C<container.engine>
+=item C<container_engine>
 
 Type: name; Default: C<'docker'>.
 
@@ -2901,7 +2901,7 @@ Type: directory; Default: C<undef>.
 
 Run the step in this directory; every file it declares is relative to it. See L</"Environment and directory">.
 
-=item C<dry.run>
+=item C<dry_run>
 
 Type: bool; Default: C<0>.
 
@@ -2913,7 +2913,7 @@ Type: hash ref; Default: C<{}>.
 
 Environment variables for the command only; a value of C<undef> removes one. See L</"Environment and directory">.
 
-=item C<env.secret>
+=item C<env_secret>
 
 Type: array ref; Default: C<[]>.
 
@@ -2925,71 +2925,71 @@ Type: C<'local'>/C<'slurm'>; Default: C<'local'>.
 
 Where the command runs: here, or as a SLURM job step through C<srun>.
 
-=item C<executor.args>
+=item C<executor_args>
 
 Type: array ref; Default: C<[]>.
 
 More arguments for the executor (C<srun>).
 
-=item C<input.dirs>
+=item C<input_dirs>
 
 Type: scalar or array; Default: C<undef>.
 
-Directories that must exist before running, as C<input.files> must.
+Directories that must exist before running, as C<input_files> must.
 
-=item C<input.dir>
+=item C<input_dir>
 
 Type: scalar; Default: C<undef>.
 
-Convenience form of C<input.dirs> for a B<single> directory.
+Convenience form of C<input_dirs> for a B<single> directory.
 
-=item C<input.files>
+=item C<input_files>
 
 Type: scalar or array; Default: C<undef>.
 
 File(s) that must exist and be readable B<before> running; otherwise C<task> dies (except in a L<dry run|/"Dry runs">, which lists them instead).
 
-=item C<input.file>
+=item C<input_file>
 
 Type: scalar; Default: C<undef>.
 
-Convenience form of C<input.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<input.files>.
+Convenience form of C<input_files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<input_files>.
 
-=item C<on.failure>
+=item C<on_failure>
 
 Type: code ref; Default: C<undef>.
 
 Called with the record when the command ran and failed, before C<task> dies. See L</"Hooks">.
 
-=item C<on.success>
+=item C<on_success>
 
 Type: code ref; Default: C<undef>.
 
 Called with the record when the command ran and succeeded.
 
-=item C<output.dirs>
+=item C<output_dirs>
 
 Type: scalar or array; Default: C<undef>.
 
-Directories the step makes, checked like C<output.files>. See L</"Directory outputs">.
+Directories the step makes, checked like C<output_files>. See L</"Directory outputs">.
 
-=item C<output.dir>
+=item C<output_dir>
 
 Type: scalar; Default: C<undef>.
 
-Convenience form of C<output.dirs> for a B<single> directory. Cannot be combined with C<output.dirs>.
+Convenience form of C<output_dirs> for a B<single> directory. Cannot be combined with C<output_dirs>.
 
-=item C<output.files>
+=item C<output_files>
 
 Type: scalar or array; Default: C<undef>.
 
 File(s) expected to exist B<after> running; used both for the missing-output check and for L<skip detection|/"Skipping completed work">.
 
-=item C<output.file>
+=item C<output_file>
 
 Type: scalar; Default: C<undef>.
 
-Convenience form of C<output.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<output.files>.
+Convenience form of C<output_files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<output_files>.
 
 =item C<lock>
 
@@ -2997,7 +2997,7 @@ Type: bool; Default: C<0>.
 
 Hold a lock on the outputs while the step runs, so that a second copy of the pipeline waits for this one. See L</"Locking">.
 
-=item C<log.fh>
+=item C<log_fh>
 
 Type: open filehandle; Default: C<undef>.
 
@@ -3019,7 +3019,7 @@ Free-text note copied into the result and the log.
 
 Type: bool; Default: C<0>.
 
-If false and all C<output.files> already exist, the command is skipped. Set true to always run.
+If false and all C<output_files> already exist, the command is skipped. Set true to always run.
 
 =item C<protect>
 
@@ -3039,7 +3039,7 @@ Type: whole number; Default: C<0>.
 
 Run a failed step again, up to this many more times. See L</"Retries">.
 
-=item C<retry.delay>
+=item C<retry_delay>
 
 Type: seconds; Default: C<0>.
 
@@ -3051,13 +3051,13 @@ Type: bool; Default: C<0>.
 
 Also re-run when an input file is newer than an output file. See L</"Out-of-date outputs">.
 
-=item C<stale.cmd>
+=item C<stale_cmd>
 
 Type: bool; Default: C<0>.
 
 Also re-run when the command differs from the one that made the outputs. See L</"Re-running a changed command">.
 
-=item C<stderr.file>
+=item C<stderr_file>
 
 Type: path; Default: C<undef>.
 
@@ -3069,7 +3069,7 @@ Type: C<'devnull'>/C<'inherit'>; Default: C<'devnull'>.
 
 What the command sees on its standard input. The default is the null device; C<'inherit'> hands it the caller's own. See L</"Standard input">.
 
-=item C<stdout.file>
+=item C<stdout_file>
 
 Type: path; Default: C<undef>.
 
@@ -3087,7 +3087,7 @@ Type: whole seconds; Default: C<0>.
 
 Kill the command if it runs longer than this. C<0> means no limit. See L</"Timeouts">.
 
-=item C<trace.fh>
+=item C<trace_fh>
 
 Type: open filehandle; Default: C<undef>.
 
@@ -3119,7 +3119,7 @@ Type: scalar or array; Default: C<undef>.
 
 B<Required.> The command to run. A string is handed to the shell; an array ref is run L<without a shell|/"Running without a shell">.
 
-=item C<conda.env>
+=item C<conda_env>
 
 Type: name or path; Default: C<undef>.
 
@@ -3131,13 +3131,13 @@ Type: image; Default: C<undef>.
 
 Run the command in a container made from this image.
 
-=item C<container.args>
+=item C<container_args>
 
 Type: array ref; Default: C<[]>.
 
 More arguments for the container engine, before the image.
 
-=item C<container.engine>
+=item C<container_engine>
 
 Type: name; Default: C<'docker'>.
 
@@ -3155,7 +3155,7 @@ Type: directory; Default: C<undef>.
 
 Run the step in this directory; every file it declares is relative to it. See L</"Environment and directory">.
 
-=item C<dry.run>
+=item C<dry_run>
 
 Type: bool; Default: C<0>.
 
@@ -3167,7 +3167,7 @@ Type: hash ref; Default: C<{}>.
 
 Environment variables for the command only; a value of C<undef> removes one. See L</"Environment and directory">.
 
-=item C<env.secret>
+=item C<env_secret>
 
 Type: array ref; Default: C<[]>.
 
@@ -3179,71 +3179,71 @@ Type: C<'local'>/C<'slurm'>; Default: C<'local'>.
 
 Where the command runs: here, or as a SLURM job step through C<srun>.
 
-=item C<executor.args>
+=item C<executor_args>
 
 Type: array ref; Default: C<[]>.
 
 More arguments for the executor (C<srun>).
 
-=item C<input.dirs>
+=item C<input_dirs>
 
 Type: scalar or array; Default: C<undef>.
 
-Directories that must exist before running, as C<input.files> must.
+Directories that must exist before running, as C<input_files> must.
 
-=item C<input.dir>
+=item C<input_dir>
 
 Type: scalar; Default: C<undef>.
 
-Convenience form of C<input.dirs> for a B<single> directory.
+Convenience form of C<input_dirs> for a B<single> directory.
 
-=item C<input.files>
+=item C<input_files>
 
 Type: scalar or array; Default: C<undef>.
 
 File(s) that must exist and be readable B<before> running; otherwise C<task> dies (except in a L<dry run|/"Dry runs">, which lists them instead).
 
-=item C<input.file>
+=item C<input_file>
 
 Type: scalar; Default: C<undef>.
 
-Convenience form of C<input.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<input.files>.
+Convenience form of C<input_files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<input_files>.
 
-=item C<on.failure>
+=item C<on_failure>
 
 Type: code ref; Default: C<undef>.
 
 Called with the record when the command ran and failed, before C<task> dies. See L</"Hooks">.
 
-=item C<on.success>
+=item C<on_success>
 
 Type: code ref; Default: C<undef>.
 
 Called with the record when the command ran and succeeded.
 
-=item C<output.dirs>
+=item C<output_dirs>
 
 Type: scalar or array; Default: C<undef>.
 
-Directories the step makes, checked like C<output.files>. See L</"Directory outputs">.
+Directories the step makes, checked like C<output_files>. See L</"Directory outputs">.
 
-=item C<output.dir>
+=item C<output_dir>
 
 Type: scalar; Default: C<undef>.
 
-Convenience form of C<output.dirs> for a B<single> directory. Cannot be combined with C<output.dirs>.
+Convenience form of C<output_dirs> for a B<single> directory. Cannot be combined with C<output_dirs>.
 
-=item C<output.files>
+=item C<output_files>
 
 Type: scalar or array; Default: C<undef>.
 
 File(s) expected to exist B<after> running; used both for the missing-output check and for L<skip detection|/"Skipping completed work">.
 
-=item C<output.file>
+=item C<output_file>
 
 Type: scalar; Default: C<undef>.
 
-Convenience form of C<output.files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<output.files>.
+Convenience form of C<output_files> for a B<single> file. Must be a plain filename (not a reference). Cannot be combined with C<output_files>.
 
 =item C<lock>
 
@@ -3251,7 +3251,7 @@ Type: bool; Default: C<0>.
 
 Hold a lock on the outputs while the step runs, so that a second copy of the pipeline waits for this one. See L</"Locking">.
 
-=item C<log.fh>
+=item C<log_fh>
 
 Type: open filehandle; Default: C<undef>.
 
@@ -3273,7 +3273,7 @@ Free-text note copied into the result and the log.
 
 Type: bool; Default: C<0>.
 
-If false and all C<output.files> already exist, the command is skipped. Set true to always run.
+If false and all C<output_files> already exist, the command is skipped. Set true to always run.
 
 =item C<protect>
 
@@ -3293,7 +3293,7 @@ Type: whole number; Default: C<0>.
 
 Run a failed step again, up to this many more times. See L</"Retries">.
 
-=item C<retry.delay>
+=item C<retry_delay>
 
 Type: seconds; Default: C<0>.
 
@@ -3305,13 +3305,13 @@ Type: bool; Default: C<0>.
 
 Also re-run when an input file is newer than an output file. See L</"Out-of-date outputs">.
 
-=item C<stale.cmd>
+=item C<stale_cmd>
 
 Type: bool; Default: C<0>.
 
 Also re-run when the command differs from the one that made the outputs. See L</"Re-running a changed command">.
 
-=item C<stderr.file>
+=item C<stderr_file>
 
 Type: path; Default: C<undef>.
 
@@ -3323,7 +3323,7 @@ Type: C<'devnull'>/C<'inherit'>; Default: C<'devnull'>.
 
 What the command sees on its standard input. The default is the null device; C<'inherit'> hands it the caller's own. See L</"Standard input">.
 
-=item C<stdout.file>
+=item C<stdout_file>
 
 Type: path; Default: C<undef>.
 
@@ -3341,7 +3341,7 @@ Type: whole seconds; Default: C<0>.
 
 Kill the command if it runs longer than this. C<0> means no limit. See L</"Timeouts">.
 
-=item C<trace.fh>
+=item C<trace_fh>
 
 Type: open filehandle; Default: C<undef>.
 
@@ -3369,9 +3369,9 @@ Any key but those naming a particular step can also be given once for the whole
 program; see L</"Defaults for a whole pipeline">.
 
 Passing an unrecognised key, an undefined or empty filename, a C<cmd> that is
-neither a string nor an array ref, or a non-filehandle C<log.fh> causes C<task>
+neither a string nor an array ref, or a non-filehandle C<log_fh> causes C<task>
 to die: these are usually mistakes worth catching early. Giving both
-C<output.file> and C<output.files> (or both C<input.file> and C<input.files>), or a
+C<output_file> and C<output_files> (or both C<input_file> and C<input_files>), or a
 reference where a single filename is expected, dies for the same reason.
 
 =head2 Return value
@@ -3445,34 +3445,34 @@ C<0>, C<stdout> and C<stderr> are C<''>, C<duration> is C<0>).
 </tr>
 <tr>
   <td><code>stdout</code>, <code>stderr</code></td>
-  <td>Captured output, with trailing whitespace stripped; <code>''</code> for a stream sent to <code>stdout.file</code> or <code>stderr.file</code>. When the command could not be launched at all (<code>exit</code> is <code>-1</code>), <code>stderr</code> says why, e.g. <code>cannot run "x": No such file or directory</code>.</td>
+  <td>Captured output, with trailing whitespace stripped; <code>''</code> for a stream sent to <code>stdout_file</code> or <code>stderr_file</code>. When the command could not be launched at all (<code>exit</code> is <code>-1</code>), <code>stderr</code> says why, e.g. <code>cannot run "x": No such file or directory</code>.</td>
 </tr>
 <tr>
-  <td><code>conda.env</code>, <code>container</code>, <code>container.args</code>, <code>container.engine</code>, <code>die</code>, <code>dry.run</code>, <code>env</code>, <code>env.secret</code>, <code>executor</code>, <code>executor.args</code>, <code>lock</code>, <code>mem</code>, <code>note</code>, <code>overwrite</code>, <code>protect</code>, <code>quiet</code>, <code>retries</code>, <code>retry.delay</code>, <code>stale</code>, <code>stale.cmd</code>, <code>stderr.file</code>, <code>stdin</code>, <code>stdout.file</code>, <code>threads</code>, <code>timeout</code>, <code>walltime</code>, <code>wrapper</code></td>
-  <td>The (defaulted) argument values used. A string option not given is <code>''</code>, a list <code>[]</code>, <code>env</code> is <code>{}</code>, and <code>threads</code> is <code>0</code>. The values <code>env.secret</code> names are <code>(secret)</code> in <code>env</code>. The hooks are not recorded: they are code.</td>
+  <td><code>conda_env</code>, <code>container</code>, <code>container_args</code>, <code>container_engine</code>, <code>die</code>, <code>dry_run</code>, <code>env</code>, <code>env_secret</code>, <code>executor</code>, <code>executor_args</code>, <code>lock</code>, <code>mem</code>, <code>note</code>, <code>overwrite</code>, <code>protect</code>, <code>quiet</code>, <code>retries</code>, <code>retry_delay</code>, <code>stale</code>, <code>stale_cmd</code>, <code>stderr_file</code>, <code>stdin</code>, <code>stdout_file</code>, <code>threads</code>, <code>timeout</code>, <code>walltime</code>, <code>wrapper</code></td>
+  <td>The (defaulted) argument values used. A string option not given is <code>''</code>, a list <code>[]</code>, <code>env</code> is <code>{}</code>, and <code>threads</code> is <code>0</code>. The values <code>env_secret</code> names are <code>(secret)</code> in <code>env</code>. The hooks are not recorded: they are code.</td>
 </tr>
 <tr>
-  <td><code>output.files</code></td>
-  <td>Array ref of the output files (a scalar argument, or an <code>output.file</code>, is normalised to a one-element array).</td>
+  <td><code>output_files</code></td>
+  <td>Array ref of the output files (a scalar argument, or an <code>output_file</code>, is normalised to a one-element array).</td>
 </tr>
 <tr>
-  <td><code>output.dirs</code></td>
-  <td>Array ref of the output directories, normalised as <code>output.files</code> is.</td>
+  <td><code>output_dirs</code></td>
+  <td>Array ref of the output directories, normalised as <code>output_files</code> is.</td>
 </tr>
 <tr>
-  <td><code>input.dirs</code></td>
+  <td><code>input_dirs</code></td>
   <td>Array ref of the input directories, normalised the same way; <code>[]</code> if none.</td>
 </tr>
 <tr>
   <td><code>cmd.changed</code></td>
-  <td><code>1</code> if <code>stale.cmd</code> was set and the command on record for the outputs was a different one, else <code>0</code>.</td>
+  <td><code>1</code> if <code>stale_cmd</code> was set and the command on record for the outputs was a different one, else <code>0</code>.</td>
 </tr>
 <tr>
   <td><code>wrapped.cmd</code></td>
   <td>The command as actually run, inside its executor, container, conda environment and wrapper, space-joined; <code>''</code> if it ran as it is.</td>
 </tr>
 <tr>
-  <td><code>output.file.size</code></td>
+  <td><code>output_file.size</code></td>
   <td>Hash of <code>filename => size in bytes</code> for the outputs, as the command left them (measured before a failed step's outputs are moved aside).</td>
 </tr>
 <tr>
@@ -3480,12 +3480,12 @@ C<0>, C<stdout> and C<stderr> are C<''>, C<duration> is C<0>).
   <td>Array ref of the names a failed step's outputs were moved to, each the output's own name with <code>.failed</code> appended; <code>[]</code> on every other path.</td>
 </tr>
 <tr>
-  <td><code>input.files</code></td>
-  <td>Array ref of the input files, normalised the same way (present only if you passed <code>input.files</code> or <code>input.file</code>).</td>
+  <td><code>input_files</code></td>
+  <td>Array ref of the input files, normalised the same way (present only if you passed <code>input_files</code> or <code>input_file</code>).</td>
 </tr>
 <tr>
-  <td><code>input.file.size</code></td>
-  <td>Hash of <code>filename => size in bytes</code> for the inputs (present only if you passed <code>input.files</code> or <code>input.file</code>). In a dry run, an input that does not exist yet has <code>undef</code>.</td>
+  <td><code>input_file.size</code></td>
+  <td>Hash of <code>filename => size in bytes</code> for the inputs (present only if you passed <code>input_files</code> or <code>input_file</code>). In a dry run, an input that does not exist yet has <code>undef</code>.</td>
 </tr>
 <tr>
   <td><code>source.file</code>, <code>source.line</code></td>
@@ -3550,33 +3550,33 @@ C<1> if C<stale> was set and an input was newer than an output, else C<0>.
 
 =item C<stdout>, C<stderr>
 
-Captured output, with trailing whitespace stripped; C<''> for a stream sent to C<stdout.file> or C<stderr.file>. When the command could not be launched at all (C<exit> is C<-1>), C<stderr> says why, e.g. C<cannot run "x": No such file or directory>.
+Captured output, with trailing whitespace stripped; C<''> for a stream sent to C<stdout_file> or C<stderr_file>. When the command could not be launched at all (C<exit> is C<-1>), C<stderr> says why, e.g. C<cannot run "x": No such file or directory>.
 
-=item C<conda.env>, C<container>, C<container.args>, C<container.engine>, C<die>, C<dry.run>, C<env>, C<env.secret>, C<executor>, C<executor.args>, C<lock>, C<mem>, C<note>, C<overwrite>, C<protect>, C<quiet>, C<retries>, C<retry.delay>, C<stale>, C<stale.cmd>, C<stderr.file>, C<stdin>, C<stdout.file>, C<threads>, C<timeout>, C<walltime>, C<wrapper>
+=item C<conda_env>, C<container>, C<container_args>, C<container_engine>, C<die>, C<dry_run>, C<env>, C<env_secret>, C<executor>, C<executor_args>, C<lock>, C<mem>, C<note>, C<overwrite>, C<protect>, C<quiet>, C<retries>, C<retry_delay>, C<stale>, C<stale_cmd>, C<stderr_file>, C<stdin>, C<stdout_file>, C<threads>, C<timeout>, C<walltime>, C<wrapper>
 
-The (defaulted) argument values used. A string option not given is C<''>, a list C<[]>, C<env> is C<{}>, and C<threads> is C<0>. The values C<env.secret> names are C<(secret)> in C<env>. The hooks are not recorded: they are code.
+The (defaulted) argument values used. A string option not given is C<''>, a list C<[]>, C<env> is C<{}>, and C<threads> is C<0>. The values C<env_secret> names are C<(secret)> in C<env>. The hooks are not recorded: they are code.
 
-=item C<output.files>
+=item C<output_files>
 
-Array ref of the output files (a scalar argument, or an C<output.file>, is normalised to a one-element array).
+Array ref of the output files (a scalar argument, or an C<output_file>, is normalised to a one-element array).
 
-=item C<output.dirs>
+=item C<output_dirs>
 
-Array ref of the output directories, normalised as C<output.files> is.
+Array ref of the output directories, normalised as C<output_files> is.
 
-=item C<input.dirs>
+=item C<input_dirs>
 
 Array ref of the input directories, normalised the same way; C<[]> if none.
 
 =item C<cmd.changed>
 
-C<1> if C<stale.cmd> was set and the command on record for the outputs was a different one, else C<0>.
+C<1> if C<stale_cmd> was set and the command on record for the outputs was a different one, else C<0>.
 
 =item C<wrapped.cmd>
 
 The command as actually run, inside its executor, container, conda environment and wrapper, space-joined; C<''> if it ran as it is.
 
-=item C<output.file.size>
+=item C<output_file.size>
 
 Hash of C<filename =E<gt> size in bytes> for the outputs, as the command left them (measured before a failed step's outputs are moved aside).
 
@@ -3584,13 +3584,13 @@ Hash of C<filename =E<gt> size in bytes> for the outputs, as the command left th
 
 Array ref of the names a failed step's outputs were L<moved to|/"Failure behaviour">, each the output's own name with C<.failed> appended; C<[]> on every other path.
 
-=item C<input.files>
+=item C<input_files>
 
-Array ref of the input files, normalised the same way (present only if you passed C<input.files> or C<input.file>).
+Array ref of the input files, normalised the same way (present only if you passed C<input_files> or C<input_file>).
 
-=item C<input.file.size>
+=item C<input_file.size>
 
-Hash of C<filename =E<gt> size in bytes> for the inputs (present only if you passed C<input.files> or C<input.file>). In a dry run, an input that does not exist yet has C<undef>.
+Hash of C<filename =E<gt> size in bytes> for the inputs (present only if you passed C<input_files> or C<input_file>). In a dry run, an input that does not exist yet has C<undef>.
 
 =item C<source.file>, C<source.line>
 
@@ -3654,33 +3654,33 @@ C<1> if C<stale> was set and an input was newer than an output, else C<0>.
 
 =item C<stdout>, C<stderr>
 
-Captured output, with trailing whitespace stripped; C<''> for a stream sent to C<stdout.file> or C<stderr.file>. When the command could not be launched at all (C<exit> is C<-1>), C<stderr> says why, e.g. C<cannot run "x": No such file or directory>.
+Captured output, with trailing whitespace stripped; C<''> for a stream sent to C<stdout_file> or C<stderr_file>. When the command could not be launched at all (C<exit> is C<-1>), C<stderr> says why, e.g. C<cannot run "x": No such file or directory>.
 
-=item C<conda.env>, C<container>, C<container.args>, C<container.engine>, C<die>, C<dry.run>, C<env>, C<env.secret>, C<executor>, C<executor.args>, C<lock>, C<mem>, C<note>, C<overwrite>, C<protect>, C<quiet>, C<retries>, C<retry.delay>, C<stale>, C<stale.cmd>, C<stderr.file>, C<stdin>, C<stdout.file>, C<threads>, C<timeout>, C<walltime>, C<wrapper>
+=item C<conda_env>, C<container>, C<container_args>, C<container_engine>, C<die>, C<dry_run>, C<env>, C<env_secret>, C<executor>, C<executor_args>, C<lock>, C<mem>, C<note>, C<overwrite>, C<protect>, C<quiet>, C<retries>, C<retry_delay>, C<stale>, C<stale_cmd>, C<stderr_file>, C<stdin>, C<stdout_file>, C<threads>, C<timeout>, C<walltime>, C<wrapper>
 
-The (defaulted) argument values used. A string option not given is C<''>, a list C<[]>, C<env> is C<{}>, and C<threads> is C<0>. The values C<env.secret> names are C<(secret)> in C<env>. The hooks are not recorded: they are code.
+The (defaulted) argument values used. A string option not given is C<''>, a list C<[]>, C<env> is C<{}>, and C<threads> is C<0>. The values C<env_secret> names are C<(secret)> in C<env>. The hooks are not recorded: they are code.
 
-=item C<output.files>
+=item C<output_files>
 
-Array ref of the output files (a scalar argument, or an C<output.file>, is normalised to a one-element array).
+Array ref of the output files (a scalar argument, or an C<output_file>, is normalised to a one-element array).
 
-=item C<output.dirs>
+=item C<output_dirs>
 
-Array ref of the output directories, normalised as C<output.files> is.
+Array ref of the output directories, normalised as C<output_files> is.
 
-=item C<input.dirs>
+=item C<input_dirs>
 
 Array ref of the input directories, normalised the same way; C<[]> if none.
 
 =item C<cmd.changed>
 
-C<1> if C<stale.cmd> was set and the command on record for the outputs was a different one, else C<0>.
+C<1> if C<stale_cmd> was set and the command on record for the outputs was a different one, else C<0>.
 
 =item C<wrapped.cmd>
 
 The command as actually run, inside its executor, container, conda environment and wrapper, space-joined; C<''> if it ran as it is.
 
-=item C<output.file.size>
+=item C<output_file.size>
 
 Hash of C<filename =E<gt> size in bytes> for the outputs, as the command left them (measured before a failed step's outputs are moved aside).
 
@@ -3688,13 +3688,13 @@ Hash of C<filename =E<gt> size in bytes> for the outputs, as the command left th
 
 Array ref of the names a failed step's outputs were L<moved to|/"Failure behaviour">, each the output's own name with C<.failed> appended; C<[]> on every other path.
 
-=item C<input.files>
+=item C<input_files>
 
-Array ref of the input files, normalised the same way (present only if you passed C<input.files> or C<input.file>).
+Array ref of the input files, normalised the same way (present only if you passed C<input_files> or C<input_file>).
 
-=item C<input.file.size>
+=item C<input_file.size>
 
-Hash of C<filename =E<gt> size in bytes> for the inputs (present only if you passed C<input.files> or C<input.file>). In a dry run, an input that does not exist yet has C<undef>.
+Hash of C<filename =E<gt> size in bytes> for the inputs (present only if you passed C<input_files> or C<input_file>). In a dry run, an input that does not exist yet has C<undef>.
 
 =item C<source.file>, C<source.line>
 
@@ -3708,16 +3708,16 @@ Where in I<your> code the C<task> was called: handy when debugging a long pipeli
 
 =head2 Skipping completed work
 
-If C<overwrite> is false (the default) and every file in C<output.files> already
+If C<overwrite> is false (the default) and every file in C<output_files> already
 exists, C<task> does B<not> re-run the command. This makes pipelines
 restartable: re-running the script picks up where it left off.
 
  open my $log, '>', 'logfile.txt';
  my $t = task(
      cmd            => 'gmx grompp -f em.mdp -c box.gro -p topol.top -o em.tpr',
-     'input.files'  => ['em.mdp', 'box.gro', 'topol.top'],
-     'output.files' => 'em.tpr',
-     'log.fh'       => $log,
+     'input_files'  => ['em.mdp', 'box.gro', 'topol.top'],
+     'output_files' => 'em.tpr',
+     'log_fh'       => $log,
  );
  close $log;
 
@@ -3737,14 +3737,14 @@ output was built, the output is stale even though it is present, and by
 default C<task> will still skip the step, exactly as earlier versions did.
 
 Pass C<< stale =E<gt> 1 >> to get the rule C<make> and C<snakemake> use: re-run whenever
-the newest C<input.files> mtime is later than the oldest C<output.files> mtime.
+the newest C<input_files> mtime is later than the oldest C<output_files> mtime.
 The mtimes are compared to the sub-second, where the filesystem records that,
 so an input rewritten in the same second as its output still counts as newer.
 
  my $t = task(
      cmd            => 'gmx grompp -f em.mdp -c box.gro -p topol.top -o em.tpr',
-     'input.files'  => ['em.mdp', 'box.gro', 'topol.top'],
-     'output.files' => 'em.tpr',
+     'input_files'  => ['em.mdp', 'box.gro', 'topol.top'],
+     'output_files' => 'em.tpr',
      stale          => 1,
  );
 
@@ -3813,9 +3813,9 @@ a busy licence server, can be run again automatically:
 
  my $t = task(
      cmd           => 'fetch-data --to data.csv',
-     'output.file' => 'data.csv',
+     'output_file' => 'data.csv',
      retries       => 3,
-     'retry.delay' => 30,
+     'retry_delay' => 30,
  );
 
 A failed attempt, for any of the reasons in
@@ -3836,7 +3836,7 @@ in another directory:
      cmd           => 'make all',
      dir           => 'build',
      env           => { CFLAGS => '-O2', MAKEFLAGS => undef },
-     'output.file' => 'a.out',            # that is, build/a.out
+     'output_file' => 'a.out',            # that is, build/a.out
  );
 
 A value of C<undef> in C<env> removes the variable for the command. Your script's
@@ -3852,18 +3852,18 @@ absolute path the step ran in.
 
 The record holds the C<env> a step was given, and the record is printed, written
 to the log and written to the trace. A credential passed in C<env> would be
-written out with it. C<env.secret> names the variables whose values must not be:
+written out with it. C<env_secret> names the variables whose values must not be:
 
  my $t = task(
      cmd          => 'fetch-data --to data.csv',
      env          => { API_TOKEN => $token },
-     'env.secret' => ['API_TOKEN'],
+     'env_secret' => ['API_TOKEN'],
  );
 
 The command is given the real value; everywhere else, the record included, it
 is C<(secret)>, and so it is in the arguments printed with an error. A secret's
-value is not part of what L<stale.cmd|/"Re-running a changed command">
-compares, so a new token does not re-run every step. C<env.secret> in
+value is not part of what L<stalecmd|/"Re-running a changed command">
+compares, so a new token does not re-run every step. C<env_secret> in
 L<%SimpleFlow::DEFAULTS|/"Defaults for a whole pipeline"> is combined with a
 step's own, as C<env> is.
 
@@ -3878,8 +3878,8 @@ memory and printed in the record:
 
  my $t = task(
      cmd           => 'aligner --verbose reads.fq',
-     'stdout.file' => 'align.out',
-     'stderr.file' => 'align.log',
+     'stdout_file' => 'align.out',
+     'stderr_file' => 'align.log',
  );
 
 The files are emptied when the step starts and receive the output of every
@@ -3894,13 +3894,13 @@ Snakemake's C<log:> directive.
 
 =head2 Directory outputs
 
-A step whose result is a directory declares it with C<output.dir> (or a list,
-C<output.dirs>), as Snakemake's C<directory()> does:
+A step whose result is a directory declares it with C<output_dir> (or a list,
+C<output_dirs>), as Snakemake's C<directory()> does:
 
  my $t = task(
      cmd          => 'split-by-sample input.bam samples',
-     'input.file' => 'input.bam',
-     'output.dir' => 'samples',
+     'input_file' => 'input.bam',
+     'output_dir' => 'samples',
  );
 
 A declared directory counts as made if it exists, and the step is skipped when
@@ -3909,8 +3909,8 @@ exists but is empty is warned about, as an empty output file is. When the step
 fails, the directory is moved aside to C<samples.failed> like any other output.
 Under C<stale>, a directory is as new as the newest thing in it.
 
-A directory can be an input, too: C<input.dir> and C<input.dirs> must exist, and
-be readable, before the step runs, just as C<input.files> must, and under
+A directory can be an input, too: C<input_dir> and C<input_dirs> must exist, and
+be readable, before the step runs, just as C<input_files> must, and under
 C<stale> an output is out of date if anything in an input directory is newer
 than it.
 
@@ -3921,7 +3921,7 @@ directory output, everything in it, as Snakemake's C<protected()> does:
 
  my $t = task(
      cmd           => 'expensive-simulation > result.dat',
-     'output.file' => 'result.dat',
+     'output_file' => 'result.dat',
      protect       => 1,
  );
 
@@ -3933,12 +3933,12 @@ read-only file, so for C<root> this protects nothing.
 
 =head2 Tracing
 
-C<trace.fh> takes a filehandle and appends one line of JSON to it for every
+C<trace_fh> takes a filehandle and appends one line of JSON to it for every
 task, on every path (run, skipped, dry-run or failed), in the spirit of
 Nextflow's C<trace.txt>:
 
  open my $trace, '>>', 'trace.jsonl' or die $!;
- local %SimpleFlow::DEFAULTS = ('trace.fh' => $trace);
+ local %SimpleFlow::DEFAULTS = ('trace_fh' => $trace);
 
 Each line holds every field of the record except C<stdout> and C<stderr>, which
 can be any size, plus C<time>, when the line was written: the command line and
@@ -3954,7 +3954,7 @@ then finds the outputs made and skips the step:
 
  my $t = task(
      cmd           => 'long-step > out.txt',
-     'output.file' => 'out.txt',
+     'output_file' => 'out.txt',
      lock          => 1,
  );
 
@@ -3982,13 +3982,13 @@ make a working directory others can write to safe to run a pipeline in.
 =head2 Re-running a changed command
 
 By default a step whose outputs exist is skipped even if its command has been
-edited since they were made. C<< stale.cmd =E<gt> 1 >> re-runs it, as Snakemake's
+edited since they were made. C<< stale_cmd =E<gt> 1 >> re-runs it, as Snakemake's
 C<params> and C<code> rerun triggers do:
 
  my $t = task(
      cmd           => 'bwa mem -t 8 -k 19 ref.fa reads.fq > aln.sam',
-     'output.file' => 'aln.sam',
-     'stale.cmd'   => 1,
+     'output_file' => 'aln.sam',
+     'stale_cmd'   => 1,
  );
 
 Changing the command, its C<env>, its C<threads>, or what it runs inside (its
@@ -3996,25 +3996,25 @@ container, conda environment, executor or wrapper) makes C<cmd.changed> C<1> and
 the step run again. What made each set of outputs is kept, as a digest, in
 C<.simpleflow/cmd/> in the working directory, and written only after a
 successful run. Outputs that exist with nothing on record, made before
-C<stale.cmd> was used, or by hand, are not re-run: the command is recorded
+C<stale_cmd> was used, or by hand, are not re-run: the command is recorded
 against them, so that the next change is seen.
 
-A step run I<without> C<stale.cmd> over outputs that have a command on record
+A step run I<without> C<stale_cmd> over outputs that have a command on record
 still replaces them, so after it succeeds its own command is recorded in place
-of the old one, and a later C<stale.cmd> run of the old command runs again
+of the old one, and a later C<stale_cmd> run of the old command runs again
 rather than taking the other's outputs as its own. With nothing on record, a
-step without C<stale.cmd> records nothing.
+step without C<stale_cmd> records nothing.
 
 =head2 Hooks
 
-C<on.success> and C<on.failure> are called with the record once a command has
+C<on_success> and C<on_failure> are called with the record once a command has
 run, after the record is printed and logged:
 
  local %SimpleFlow::DEFAULTS = (
-     'on.failure' => sub { my $r = shift; notify("$r->{cmd} failed: exit $r->{exit}") },
+     'on_failure' => sub { my $r = shift; notify("$r->{cmd} failed: exit $r->{exit}") },
  );
 
-C<on.failure> runs before C<task> dies, so it runs under the default C<< die =E<gt> 1 >>
+C<on_failure> runs before C<task> dies, so it runs under the default C<< die =E<gt> 1 >>
 as well. Neither is called for a step that is skipped or dry-run. A hook that
 dies stops C<task> there, with its own exception. Set in C<%SimpleFlow::DEFAULTS>,
 they are the pipeline-wide C<onsuccess> and C<onerror> of Snakemake.
@@ -4030,7 +4030,7 @@ step, or any wrapper you name:
  );
  my $u = task(
      cmd         => 'python train.py',
-     'conda.env' => 'analysis',
+     'conda_env' => 'analysis',
      executor    => 'slurm',
      threads     => 8,
      mem         => '16G',
@@ -4040,16 +4040,16 @@ step, or any wrapper you name:
 C<container> runs C<docker run --rm> (or C<podman run>) with the working directory
 mounted at its own path and used as the container's working directory, and,
 for docker, with your own user and group, so that the files the command makes
-are yours. C<< container.engine =E<gt> 'singularity' >> or C<'apptainer'> runs
+are yours. C<< container_engine =E<gt> 'singularity' >> or C<'apptainer'> runs
 C<singularity exec> with the working directory bound instead. The variables
 C<env> sets are passed into a docker or podman container by name; singularity
 and apptainer pass the whole environment through themselves.
 
-C<conda.env> runs C<< conda run -n E<lt>nameE<gt> >>, or C<< -p E<lt>pathE<gt> >> for a path.
+C<conda_env> runs C<< conda run -n E<lt>nameE<gt> >>, or C<< -p E<lt>pathE<gt> >> for a path.
 
 C<< executor =E<gt> 'slurm' >> runs the command through C<srun>, which waits for the job
 step and passes its exit status back, asking for C<threads> CPUs, C<mem> memory
-and C<walltime> time; C<executor.args> adds any other C<srun> arguments. With
+and C<walltime> time; C<executor_args> adds any other C<srun> arguments. With
 L<parallel|/"Running steps in parallel">, several steps run on the cluster at
 once. C<threads> is also given to the command, wherever it runs, as
 C<SIMPLEFLOW_THREADS>, for it to pass to its own option for threads.
@@ -4068,7 +4068,7 @@ Giving C<cmd> an array ref runs the command directly, with no shell in between:
 
  my $t = task(
      cmd           => ['gzip', '-9', $file],   # $file needs no quoting
-     'output.file' => "$file.gz",
+     'output_file' => "$file.gz",
  );
 
 This is the form to reach for when an argument comes from data — a filename
@@ -4089,7 +4089,7 @@ that is a lot of scrollback, so C<< quiet =E<gt> 1 >> suppresses it:
 
  my $t = task(
      cmd      => 'one of very many steps',
-     'log.fh' => $log,
+     'log_fh' => $log,
      quiet    => 1,
  );
 
@@ -4136,8 +4136,8 @@ Useful for inspecting a pipeline without executing anything expensive:
 
  my $t = task(
      cmd       => 'a long-running, time-consuming command',
-     'dry.run' => 1,
-     'log.fh'  => $fh,
+     'dry_run' => 1,
+     'log_fh'  => $fh,
  );
 
 The command is printed (and logged) but not run; C<will.do> is C<"no: dry run">.
@@ -4145,13 +4145,13 @@ The record is printed and logged as for any other step.
 
 A dry run makes nothing, so a later step's input — an earlier step's output —
 is legitimately absent. A dry run therefore does not die over a missing
-C<input.files> entry, as a real run does; it lists it under "these input files
+C<input_files> entry, as a real run does; it lists it under "these input files
 do not exist yet", and the dry run of the whole pipeline carries on.
 
 =head2 Failure behaviour
 
 By default (C<< die =E<gt> 1 >>) C<task> dies if the command exits non-zero, is killed by
-a signal, exceeds its C<timeout>, or leaves any declared C<output.files> missing
+a signal, exceeds its C<timeout>, or leaves any declared C<output_files> missing
 afterwards, so a broken step stops the pipeline immediately. The message names
 every one of those that happened, for instance
 C<"make all" exited 2; these output files should have been made but are missing:
@@ -4165,7 +4165,7 @@ listed in the record's C<failed.outputs> and on C<STDERR>. A name declared twice
 is moved once; a file inside a declared directory moves with the directory,
 under its own name; and when one output is named like another's C<.failed>, as
 C<out> and C<out.failed> are, the longer name is moved first, so that neither is
-lost. When the message quotes standard error from a C<stderr.file> that was one
+lost. When the message quotes standard error from a C<stderr_file> that was one
 of the outputs, it is read before the file is moved. A command that fails
 part-way often leaves a truncated file behind; left under its own name, it would
 pass the L<skip test|/"Skipping completed work"> on the next run and become the
@@ -4185,16 +4185,16 @@ C<< will.do =E<gt> "FAILED" >>, letting you decide what to do:
 C<%SimpleFlow::DEFAULTS> gives a value to any key a C<task> call leaves undefined:
 
  local %SimpleFlow::DEFAULTS = (
-     'dry.run'  => 1,          # dry-run the whole pipeline
-     'log.fh'   => $log,
+     'dry_run'  => 1,          # dry-run the whole pipeline
+     'log_fh'   => $log,
      quiet      => 1,
      env        => { LC_ALL => 'C' },
  );
 
 A task that sets a key itself keeps its own value. C<env> is the one exception:
-a task's own C<env> is merged with the default one, its own entries winning, and its own C<env.secret> is added to the default one.
+a task's own C<env> is merged with the default one, its own entries winning, and its own C<env_secret> is added to the default one.
 Keys that name a particular step (C<cmd>, the C<input.*> and C<output.*> lists,
-C<stdout.file> and C<stderr.file>) are refused in C<%DEFAULTS>, since every step
+C<stdout_file> and C<stderr_file>) are refused in C<%DEFAULTS>, since every step
 would then run the same command or claim the same files, and so is any key
 C<task> does not accept.
 
@@ -4218,7 +4218,7 @@ and returns their records in the order given:
  my @records = parallel(
      jobs  => 4,
      tasks => [
-         map { { cmd => "gzip -9 $_", 'input.file' => $_, 'output.file' => "$_.gz" } } @samples
+         map { { cmd => "gzip -9 $_", 'input_file' => $_, 'output_file' => "$_.gz" } } @samples
      ],
  );
 
@@ -4232,7 +4232,7 @@ within a line.
 
 When a step fails, and C<task> would die, no further step is started; those
 already running are left to finish, and then C<parallel> dies with every
-failure. C<< 'keep.going' =E<gt> 1 >> runs every step regardless, and dies at the end if
+failure. C<< 'keep_going' =E<gt> 1 >> runs every step regardless, and dies at the end if
 any failed, as Snakemake's C<--keep-going> does. Under C<< die =E<gt> 0 >> a failed step
 is only a record with C<< will.do =E<gt> "FAILED" >>, and C<parallel> returns.
 
@@ -4300,4 +4300,4 @@ This software is free.  It is licensed under the same terms as Perl itself
 
 =head1 Thanks
 
-A lot of this work used Claude AI, which was paid for by the University of Idaho's IMCI
+A lot of this work used Claude AI, which was paid for by the University of Idaho's IMCI, and to Brett Estrade and Hexmeister for help.

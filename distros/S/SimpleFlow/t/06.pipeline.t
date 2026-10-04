@@ -97,8 +97,8 @@ SKIP: {
 		my ($slow_out, $never) = (fresh_path(), fresh_path());
 		my @tasks = (
 			{ cmd => [$^X, '-e', 'exit 5'], quiet => 1 },
-			{ cmd => [$^X, '-e', q{sleep 1; open my $f, '>', $ARGV[0] or die}, $slow_out], 'output.file' => $slow_out, quiet => 1 },
-			{ cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die}, $never], 'output.file' => $never, quiet => 1 },
+			{ cmd => [$^X, '-e', q{sleep 1; open my $f, '>', $ARGV[0] or die}, $slow_out], 'output_file' => $slow_out, quiet => 1 },
+			{ cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die}, $never], 'output_file' => $never, quiet => 1 },
 		);
 		my (undef, undef, undef, $error) = run_parallel(jobs => 2, tasks => \@tasks);
 		like($error, qr/exited 5/, 'parallel() died with the failure');
@@ -107,13 +107,13 @@ SKIP: {
 	};
 }
 
-subtest 'parallel: keep.going runs every step, and then dies' => sub {
+subtest 'parallel: keep_going runs every step, and then dies' => sub {
 	my $later = fresh_path();
 	my @tasks = (
 		{ cmd => [$^X, '-e', 'exit 5'], quiet => 1 },
-		{ cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die}, $later], 'output.file' => $later, quiet => 1 },
+		{ cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die}, $later], 'output_file' => $later, quiet => 1 },
 	);
-	my (undef, undef, undef, $error) = run_parallel(jobs => 1, tasks => \@tasks, 'keep.going' => 1);
+	my (undef, undef, undef, $error) = run_parallel(jobs => 1, tasks => \@tasks, 'keep_going' => 1);
 	ok(-e $later, 'the step after the failure still ran');
 	like($error, qr/exited 5/, 'and parallel() died with the failure at the end');
 	like($error, qr/1 of 2 tasks failed/, 'saying how many');
@@ -184,10 +184,10 @@ subtest 'report: an HTML page from a trace' => sub {
 	my $out = fresh_path();
 	capture {
 		# no double quote in the command, which MSWin32 would garble; the note has one
-		task(cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die}, $out, '<b>&'], 'output.file' => $out,
-			'trace.fh' => $trace, note => 'say "hi"', quiet => 1);
-		task(cmd => [$^X, '-e', '1'], 'output.file' => $out, 'trace.fh' => $trace, quiet => 1);
-		task(cmd => [$^X, '-e', 'exit 3'], 'trace.fh' => $trace, die => 0, quiet => 1);
+		task(cmd => [$^X, '-e', q{open my $f, '>', $ARGV[0] or die}, $out, '<b>&'], 'output_file' => $out,
+			'trace_fh' => $trace, note => 'say "hi"', quiet => 1);
+		task(cmd => [$^X, '-e', '1'], 'output_file' => $out, 'trace_fh' => $trace, quiet => 1);
+		task(cmd => [$^X, '-e', 'exit 3'], 'trace_fh' => $trace, die => 0, quiet => 1);
 	};
 	close $trace;
 	my $html_file = fresh_path() . '.html';

@@ -1,5 +1,14 @@
 # Update And Release
 
+## Current regression coverage
+
+The 4.91 change set includes regression tests for saved URL forwarding,
+skill-aware Template Toolkit includes, Ajax `code` templating, private helper
+staging under `cli/dd` for both init entrypoints, and nested skill CLI
+environment inheritance. The nested environment test verifies that the
+current DD-OOP runtime chain is loaded before parent-to-leaf skill `.env` and
+`.env.pl` files.
+
 ## Scorecard Gate
 
 `SCORECARD-GATEKEEPER` is a hard release rule for this repository.
@@ -72,7 +81,12 @@ be recovered, and it is not something the dispatch path is meant to bypass.
 The GitHub-hosted CPAN upload workflow is deliberately manual-only. Do not
 wire tag pushes to automatic PAUSE uploads here; ordinary `vX.XX` tags are for
 the signed GitHub release path, while CPAN publication stays an explicit
-`workflow_dispatch` or local `dashboard pause-release` operator action.
+`workflow_dispatch`, local `dashboard pause-release`, or local `dzil release`
+operator action. The repository configures `Dist::Zilla::Plugin::UploadToCPAN`
+as the real releaser for `dzil release`. Configure credentials only in
+`~/.dzil/config.ini` or `~/.pause`, never in tracked repository files. Run
+`dzil release` only after all release gates pass and an operator explicitly
+intends to upload to PAUSE.
 
 ## OWASP Gate
 
@@ -128,6 +142,48 @@ until the SOW closure criteria and the remaining governance gates are
 actually closed.
 
 ## Local Update
+
+## Next-Version Checklist
+
+When preparing the next release version, follow this order exactly:
+
+1. Run `dzil clean` to remove generated build artifacts from the previous
+   release.
+2. Bump `version` in `dist.ini` to the next unique `X.XX` value.
+3. Update every `our $VERSION` declaration in every Perl module under `lib/`
+   to the same value.
+4. Update the release/version POD in the Perl module files, especially
+   `lib/Developer/Dashboard.pm`.
+5. Add the release entry and changes to `Changes`.
+6. Regenerate `README.md` so it exactly matches the POD in
+   `lib/Developer/Dashboard.pm`:
+
+   ```bash
+   script/sync-readme-from-pod
+   ```
+
+7. Build the distribution:
+
+   ```bash
+   dzil build
+   ```
+
+8. Build the Docker image through the project wrapper:
+
+   ```bash
+   d2 docker.images.build
+   ```
+
+Do not skip the version alignment or README/POD synchronization steps. The
+release metadata tests are expected to fail if any module, POD, changelog, or
+generated manual still carries the previous version.
+
+`MetaNoIndex` lists the inline helper packages `env` and
+`Developer::Dashboard::Handle::Proxy`; both are implemented inside existing
+modules, not shipped as standalone modules. `GatherDir`'s `exclude_match`
+prevents files from being gathered but still traverses excluded trees, so
+release-only directories also use `prune_directory` to avoid scanning
+worktrees, runtime state, and local output.
 
 Run:
 
@@ -237,6 +293,14 @@ perl -Ilib bin/dashboard serve
 ```
 
 The root path now redirects to `/app/index` when a saved `index` bookmark exists, and otherwise opens the free-form bookmark editor directly. `/apps` still redirects to `/app/index`.
+Saved raw URL bookmarks retain the established forwarding contract: HTTP(S) targets
+return a 302 redirect with the incoming query string appended, while local
+dashboard routes are dispatched internally. Bookmark and request parameters
+are merged, and array parameters use `<name>.selected.pos` to select the
+forwarded value.
+Template Toolkit bookmark rendering also allow-lists the active skill
+dashboards root and runtime roots, so relative skill includes and explicit
+`skills/<name>/dashboards/<file>` includes resolve without filesystem escape.
 Unknown saved routes such as `/app/foobar` must now open the bookmark editor with a prefilled blank bookmark for `/app/foobar` instead of returning a plain 404 page.
 If the posted editor content includes `BOOKMARK: some-id`, that post now persists the bookmark document so `/app/some-id` works immediately after saving from `/`.
 Saved bookmark editor routes such as `/app/some-id/edit` must keep posting back to that named route and keep their Play links on `/app/some-id`, even when transient `token=` URLs are disabled by default.
@@ -375,7 +439,7 @@ The extension layer now includes:
 - user CLI hook directories under `~/.developer-dashboard/cli`
 - project-aware Docker Compose resolution through `dashboard docker compose`
 
-Compose setup can now stay isolated in service folders under `./.developer-dashboard/config/docker/<service>/compose.yml` for the current project, with `~/.developer-dashboard/config/docker/<service>/compose.yml` as the fallback. The wrapper infers service names from passthrough docker compose args such as `config green` before building the final `docker compose` command. When no service name is passed, the resolver scans isolated service folders and preloads every non-disabled folder. A folder containing `disabled.yml` is skipped. Each isolated folder contributes `development.compose.yml` when present, otherwise `compose.yml`. The compose runtime also exports `DDDC` as the runtime `config/docker` directory for the current runtime, and project-local isolated services are discovered from that same `./.developer-dashboard/config/docker/...` tree. Wrapper-only flags are consumed first and remaining docker compose flags such as `-d` and `--build` pass through untouched.
+Compose setup can stay isolated in service folders under `./.developer-dashboard/config/docker/<service>/compose.yml` for the current project, with home runtime service folders as fallback. The wrapper infers service names from passthrough docker compose args such as `config green` before building the final `docker compose` command. When no service name is passed, the resolver scans isolated service folders and preloads every service without a `disabled.yml` marker in any active config layer. Each enabled service contributes `compose.yml` as its base when present. Its `development.compose.yml` is loaded afterward when `develop.yml` exists in any active config layer; the overlay is skipped without error if its marker exists but the file does not. `dashboard docker enable <service>` removes all disable markers for that service, and `dashboard docker development disable <service>` removes all development markers. Newly created markers are written under the selected home runtime (`~/.developer-dashboard` when it exists, otherwise an existing `~/.d2`). The compose runtime also exports `DDDC` as the runtime `config/docker` directory for the current runtime. Wrapper-only flags are consumed first and remaining docker compose flags such as `-d` and `--build` pass through untouched.
 Without `--dry-run`, the wrapper now hands off with `exec`, so terminal users see the normal streaming output from `docker compose` itself instead of a dashboard JSON wrapper.
 Path aliases can now be managed from the CLI with `dashboard path add <name> <path>` and `dashboard path del <name>`. These commands persist user-defined aliases in the effective config root, using a project-local `./.developer-dashboard` tree first when it exists and otherwise the home runtime. Both repeated adds and repeated deletes are intentionally idempotent. When an added path lives under the current home directory, the stored config rewrites it to `$HOME/...` so a shared dashboard config directory does not hard-code one developer's absolute home path.
 Use `Developer::Dashboard::Folder` for runtime path helpers. It resolves the
@@ -387,11 +451,10 @@ on unscoped CPAN-global module names.
 
 ## Release To PAUSE
 
-The GitHub workflow:
-
-- `.github/workflows/release-cpan.yml`
-
-builds the release using Dist::Zilla:
+CPAN/PAUSE release happens only locally, via `dashboard pause-release` -
+there is no GitHub-triggered path (see
+`docs/cpan-release-is-local-only.md`). Build the release using
+Dist::Zilla:
 
 ```bash
 rm -rf Developer-Dashboard-* Developer-Dashboard-*.tar.gz
@@ -448,9 +511,10 @@ release job now proves the packaged tree rather than only the source checkout.
 The installed executable audit should also confirm that the built tarball
 exports only `dashboard` into the global PATH. Generic helper names such as
 `of`, `open-file`, `jq`, `yq`, `tomq`, `propq`, `iniq`, `csvq`, `xmlq`, and
-`ticket` must not appear as a repo-shipped top-level executable. If it is part
-of the dashboard toolchain, it must stay behind `dashboard ticket` and the
-private runtime helper staged under `~/.developer-dashboard/cli/dd/ticket`.
+`ticket` must not appear as a repo-shipped top-level executable or public
+dashboard alias. Use `dashboard workspace`; compatibility environment variables
+such as `TICKET_REF` may remain inside the workspace implementation for older
+tmux sessions.
 
 and uploads the resulting tarball to PAUSE using:
 

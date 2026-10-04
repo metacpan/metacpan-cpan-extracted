@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Progress;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 # new(%args)
 # Constructs a terminal progress renderer for restart/stop lifecycle commands.
@@ -17,9 +17,11 @@ sub new {
     my %task_lookup = map {
         my $task = $_;
         my $id   = $task->{id} || die 'Progress task missing id';
+        my $label = $task->{label};
+        $label = $id if !$label;
         $id => {
             id           => $id,
-            label        => $task->{label} || $id,    # uncoverable condition false
+            label        => $label,
             status       => 'pending',
             detail_lines => [],
         }
@@ -65,9 +67,11 @@ sub add_tasks {
         my $id = $task->{id} || next;
         next if $self->{tasks}{$id};
         push @{ $self->{order} }, $id;
+        my $label = $task->{label};
+        $label = $id if !$label;
         $self->{tasks}{$id} = {
             id           => $id,
-            label        => $task->{label} || $id,    # uncoverable condition false
+            label        => $label,
             status       => 'pending',
             detail_lines => [],
         };

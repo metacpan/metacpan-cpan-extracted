@@ -8,12 +8,13 @@ use Hash::Util::FieldHash qw(fieldhash);
 use Net::QUIC ();
 use Net::QUIC::Stream ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 fieldhash my %OUTPUT_CALLBACK;
 fieldhash my %STREAM_AVAILABLE_CALLBACK;
 fieldhash my %STREAM_ACTIVITY_CALLBACK;
 fieldhash my %STREAM_ACTIVITY_NOTIFIED;
+fieldhash my %DATAGRAM_CALLBACK;
 
 my $EARLY_DATA_MAGIC = "NQED";
 my $EARLY_DATA_VERSION = 1;
@@ -241,6 +242,87 @@ sub next_active_stream_id {
         if !defined($id) || !$self->_stream_activity_pending;
 
     return $id;
+}
+
+sub send_datagram {
+    my ($self, $bytes) = @_;
+
+    die "send_datagram requires bytes"
+        if !defined $bytes;
+
+    my $accepted = $self->_queue_datagram($bytes);
+    $self->_notify_output if $accepted;
+
+    return $accepted ? 1 : 0;
+}
+
+sub next_received_datagram {
+    my ($self) = @_;
+
+    my $datagram = $self->_take_received_datagram;
+    return if !defined $datagram;
+
+    return wantarray ? @$datagram : $datagram->[0];
+}
+
+sub on_datagram {
+    my ($self, $callback) = @_;
+
+    if (defined $callback) {
+        die "datagram callback must be a coderef"
+            if ref($callback) ne 'CODE';
+        $DATAGRAM_CALLBACK{$self} = $callback;
+    } else {
+        delete $DATAGRAM_CALLBACK{$self};
+    }
+
+    $self->_dispatch_datagrams;
+    return $self;
+}
+
+sub _dispatch_datagrams {
+    my ($self) = @_;
+
+    my $callback = $DATAGRAM_CALLBACK{$self};
+    return if !$callback;
+
+    while (my $datagram = $self->_take_received_datagram) {
+        $callback->($self, $datagram->[0], $datagram->[1]);
+    }
+
+    return;
+}
+
+sub can_send_datagram {
+    my ($self) = @_;
+
+    my $size = $self->_peer_max_datagram_frame_size;
+    return defined($size) && $size > 0 ? 1 : 0;
+}
+
+sub can_receive_datagram {
+    my ($self) = @_;
+    return $self->_local_max_datagram_frame_size > 0 ? 1 : 0;
+}
+
+sub max_datagram_payload_size {
+    my ($self) = @_;
+    return $self->_max_datagram_payload_size;
+}
+
+sub peer_max_datagram_frame_size {
+    my ($self) = @_;
+    return $self->_peer_max_datagram_frame_size;
+}
+
+sub local_max_datagram_frame_size {
+    my ($self) = @_;
+    return $self->_local_max_datagram_frame_size;
+}
+
+sub datagram_receive_drops {
+    my ($self) = @_;
+    return $self->_datagram_receive_drops;
 }
 
 sub send_buffer_limit {
@@ -649,6 +731,137 @@ Returns undef when the activity queue is empty.
 A protocol engine should normally drain this queue when L</on_stream_activity>
 wakes it. State such as received data, acknowledgement offsets, reset codes,
 and STOP_SENDING codes remains available on the corresponding Stream object.
+
+=head1 QUIC DATAGRAM
+
+RFC 9221 QUIC DATAGRAM carries unreliable application bytes inside a
+Connection.
+
+This is different from L<Net::QUIC::Datagram>. That class represents one UDP
+packet that the event-loop adapter must send. The methods in this section
+represent application DATAGRAM frames carried inside QUIC.
+
+DATAGRAM support is directional.
+
+This endpoint advertises its receive limit with the Endpoint transport option:
+
+    transport => {
+        max_datagram_frame_size => 65535,
+    }
+
+The default is zero, which disables receiving QUIC DATAGRAM.
+
+=head2 can_send_datagram
+
+    if ($connection->can_send_datagram) {
+        ...
+    }
+
+Returns true when the peer advertised a nonzero QUIC DATAGRAM receive limit.
+
+=head2 can_receive_datagram
+
+    if ($connection->can_receive_datagram) {
+        ...
+    }
+
+Returns true when this endpoint advertised a nonzero QUIC DATAGRAM receive
+limit.
+
+=head2 peer_max_datagram_frame_size
+
+    my $bytes = $connection->peer_max_datagram_frame_size;
+
+Returns the peer's advertised C<max_datagram_frame_size> transport parameter.
+
+It can be undef before peer transport parameters are available.
+
+=head2 local_max_datagram_frame_size
+
+    my $bytes = $connection->local_max_datagram_frame_size;
+
+Returns this endpoint's advertised C<max_datagram_frame_size>.
+
+=head2 max_datagram_payload_size
+
+    my $bytes = $connection->max_datagram_payload_size;
+
+Returns a conservative maximum application payload that can currently fit in
+one QUIC DATAGRAM on the active path.
+
+It accounts for both the peer's DATAGRAM frame limit and the current QUIC path
+UDP payload ceiling. The value can change after PMTU discovery or path
+migration.
+
+A protocol layered above QUIC must subtract its own framing bytes from this
+value.
+
+=head2 send_datagram
+
+    my $accepted = $connection->send_datagram($bytes);
+
+Queues one unreliable QUIC DATAGRAM.
+
+Returns true when Net::QUIC copied the payload into its bounded pending slot.
+Returns false when that one pending slot is already occupied.
+
+A true return value does not mean the peer received the DATAGRAM. Lost QUIC
+DATAGRAMs are not retransmitted.
+
+The method throws if the peer did not negotiate DATAGRAM receive support, the
+payload is too large, the Connection is closing, or the handshake is not ready
+and no saved 0-RTT state is active.
+
+A client using saved L</early_data_state> may send DATAGRAM in 0-RTT when the
+saved peer transport parameters permit it. 0-RTT data can be replayed, so only
+send operations that are safe to repeat and check L</early_data_status> after
+the handshake.
+
+=head2 next_received_datagram
+
+    my $bytes = $connection->next_received_datagram;
+
+or:
+
+    my ($bytes, $early_data) = $connection->next_received_datagram;
+
+Returns the next received QUIC DATAGRAM, or undef when none is waiting.
+
+In scalar context it returns only the payload bytes. In list context it also
+returns a boolean that is true when the DATAGRAM was received as 0-RTT early
+data.
+
+A zero-length DATAGRAM is returned as an empty string. Test the result with
+C<defined>, not truth.
+
+Received DATAGRAMs are kept in a bounded native fallback queue until pulled or
+dispatched. Additional unreliable DATAGRAMs are dropped when that queue is
+full.
+
+=head2 on_datagram
+
+    $connection->on_datagram(sub {
+        my ($connection, $bytes, $early_data) = @_;
+        ...
+    });
+
+Registers a callback for received QUIC DATAGRAM payloads.
+
+Callbacks run after native QUIC packet processing returns. They are not called
+from inside the ngtcp2 receive callback.
+
+The callback drains the same queue used by L</next_received_datagram>.
+
+Disable it with:
+
+    $connection->on_datagram(undef);
+
+=head2 datagram_receive_drops
+
+    my $count = $connection->datagram_receive_drops;
+
+Returns the number of received QUIC DATAGRAM payloads dropped because the
+bounded receive queue was full.
 
 =head1 BOUNDED TRANSMIT BUFFERING
 

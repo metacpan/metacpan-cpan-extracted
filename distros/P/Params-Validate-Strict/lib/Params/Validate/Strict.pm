@@ -3,6 +3,67 @@ package Params::Validate::Strict;
 use strict;
 use warnings;
 
+# TODO: test cases - check 1e20 and -1e20 are accepted as integers
+
+# TODOs inspired by Params::Smart (see SEE ALSO):
+#
+# TODO: named_only => 1 rule — marks a parameter as keyword-only; it may not
+#   be supplied by position even when the schema uses positional mode.  Mirrors
+#   the '+name' sigil in Params::Smart.  Useful for flags that would be
+#   dangerous or ambiguous if accidentally supplied by position (e.g. a boolean
+#   that happens to sit at the same index as a required string on a different
+#   call path).
+#
+# TODO: auto-detect positional vs named calling — allow a single schema to
+#   accept both f(1, 2, 3) and f(a=>1, b=>2, c=>3) by inspecting @_ at
+#   runtime and choosing the appropriate mode.  Params::Smart's heuristic
+#   checks whether the first element of @_ is a known parameter name; if so,
+#   named mode is assumed, otherwise positional.  Caveats: the heuristic can
+#   misfire when a positional value happens to be a string matching a param
+#   name — callers should be able to pass a hint (e.g. force_named => 1) to
+#   override.  The return value should include a '_named' key (as Params::Smart
+#   does) so the caller can diagnose which mode was used.
+#
+# TODO: needs => ['param1', 'param2'] per-parameter dependency shorthand —
+#   a convenience alternative to the schema-level 'relationships' system.
+#   Params::Smart uses { name => 'foo', needs => ['bar'] } directly in the
+#   parameter rule.  PVS already has the full dependency system via
+#   relationships => [{ type => 'dependency', ... }], but a per-parameter
+#   'needs' key would be more ergonomic for simple one-to-many dependencies
+#   without requiring a separate top-level 'relationships' entry.  Should be
+#   desugared to an equivalent dependency relationship before validation runs.
+#
+# TODO: '_named' diagnostic key in the return hashref — when auto-detect mode
+#   is active (see above), include a '_named' key in the returned args hashref
+#   that is true when named-parameter calling was inferred and false when
+#   positional calling was inferred.  Mirrors Params::Smart's behaviour.
+#   Even without full auto-detect, this key could be set unconditionally
+#   (true for hashref input, false for arrayref input) to let callers
+#   identify which mode was actually used.
+
+# Remaining TODOs from Params::Util gap analysis (see SEE ALSO):
+#
+# TODO: element_isa => 'ClassName' rule — validates that every element of an
+#   arrayref parameter is a blessed object that passes ->isa('ClassName').
+#   Covers Params::Util's _SET (min => 1) and _SET0 (no min) patterns, which
+#   are not expressible with the existing element_type => 'object' rule alone
+#   (that only checks blessedness, not the inheritance chain).  Implementation:
+#   new 'element_isa' rule key processed inside the arrayref branch of the
+#   rule-dispatch loop, iterating each element and calling ->isa.
+#
+# TODO: 'can' rule extended to non-object types — three variants needed,
+#   mirroring _CLASSCAN / _INSTANCECAN / _INVOCANTCAN from Params::Util
+#   1.105_001 (unreleased) / Params::SomeUtil (listed but not yet implemented).
+#   The motivation is to avoid the UNIVERSAL::can pitfall: always call
+#   $value->can($method) as a method (which respects an overridden can()),
+#   never UNIVERSAL::can($value, $method) as a function.  PVS's existing 'can'
+#   rule for type => 'object' already calls ->can correctly.  The remaining
+#   two variants to add are:
+#     - type => 'invocant' + can: value is an object OR class-name string that
+#       can do the method (_INVOCANTCAN).
+#     - type => 'string' (class-name) + classcan: string class-name that can
+#       do the method (_CLASSCAN); symmetric with classisa / classdoes.
+
 use Carp;
 use Exporter qw(import);	# Required for @EXPORT_OK
 use Encode qw(decode_utf8);
@@ -11,7 +72,7 @@ use Readonly::Values::Boolean;
 use Scalar::Util;
 
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(validate_strict);
+our @EXPORT_OK = qw(validate_strict compile_schema);
 
 =head1 NAME
 
@@ -19,11 +80,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.39
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 # Recursion depth counter — localised on every entry so it unwinds automatically.
 # Protects against mutations (or bugs) that turn the pipe-normalisation guard into
@@ -217,7 +278,7 @@ The schema can define the following rules for each parameter:
 =item * C<type>
 
 The data type of the parameter.
-Valid types are C<string>, C<integer>, C<number>, C<float> C<boolean>, C<scalar>, C<scalarref>, C<stringref>, C<hashref>, C<arrayref>, C<object>, C<coderef> and C<void>.
+Valid types are C<string>, C<integer>, C<number>, C<float>, C<boolean>, C<scalar>, C<scalarref>, C<stringref>, C<hashref>, C<arrayref>, C<object>, C<coderef>, C<regex>, C<handle>, C<arraylike>, C<hashlike>, C<codelike>, C<invocant> and C<void>.
 C<scalar> accepts any plain scalar value (string, number, boolean, etc.) but rejects references (arrayrefs, hashrefs, coderefs, objects).
 C<scalarref> accepts a reference to a scalar value (e.g. C<\$var>) but rejects plain scalars, arrayrefs, hashrefs, coderefs, and objects.
 C<stringref> accepts a reference to a scalar that contains a plain string (e.g. C<\$str>) and rejects plain scalars, references-to-references, arrayrefs, hashrefs, coderefs, and objects.
@@ -226,6 +287,12 @@ When C<void> is used the schema must contain exactly one parameter.
 The C<min>/C<max> constraints apply to the B<length> (in characters) of the referenced string.
 All other string rules (C<matches>, C<nomatch>, C<memberof>, etc.) operate on the dereferenced string value.
 The validated return value is the dereferenced plain string.
+C<regex> accepts a compiled regular expression (C<qr//> object); the value is returned unchanged.
+C<handle> accepts a file handle: a glob reference with a defined C<fileno>, an C<IO::Handle> subclass instance, or any value for which C<fileno> returns a defined value.
+C<arraylike> accepts an array reference or a blessed object that overloads C<@{}> array dereferencing.
+C<hashlike> accepts a hash reference or a blessed object that overloads C<%{}> hash dereferencing.
+C<codelike> accepts a code reference or a blessed object that overloads C<&{}> code dereferencing.
+C<invocant> accepts either a blessed object instance or a plain string that is a syntactically valid Perl class name (e.g. C<'MyApp::Widget'>).
 
 A type can be an arrayref when a parameter could have different types (e.g. a string or an object).
 
@@ -266,6 +333,44 @@ or an arrayref of a list of method names, all of which must be supported by the 
 =item * C<isa>
 
 The parameter must be an object of type C<isa>.
+Requires C<type =E<gt> 'object'>.
+
+=item * C<does>
+
+The parameter must be a blessed object that satisfies the role via C<-E<gt>DOES>.
+Requires C<type =E<gt> 'object'>.
+
+  handler => { type => 'object', does => 'My::Role::Printable' }
+
+=item * C<classisa>
+
+The parameter must be a string holding a syntactically valid Perl class name
+that passes C<-E<gt>isa('Base::Class')>.
+The class must already be loaded (its C<@ISA> must be reachable).
+Does not accept blessed object references; use C<isa> for those.
+
+  backend => { type => 'string', classisa => 'My::Backend::Base' }
+
+=item * C<subclass>
+
+Like C<classisa>, but requires a I<strict> subclass: the value must not equal
+the base class name itself.
+
+  plugin => { type => 'string', subclass => 'My::Plugin::Base' }
+
+=item * C<classdoes>
+
+Like C<classisa>, but tests C<-E<gt>DOES> (role consumption) instead of C<-E<gt>isa>.
+
+  consumer => { type => 'string', classdoes => 'My::Role::Loggable' }
+
+=item * C<driver>
+
+The parameter must be a valid class name that: (1) can be loaded via C<require>,
+and (2) passes C<-E<gt>isa('Base::Class')>.
+The module is actually loaded as a side effect of validation.
+
+  store => { type => 'string', driver => 'Cache::Store' }
 
 =item * C<memberof>
 
@@ -458,6 +563,45 @@ For routines and methods that take positional args,
 this integer value defines which position the argument will be in.
 If this is set for all arguments,
 C<validate_strict> will return a reference to an array, rather than a reference to a hash.
+
+=item * C<slurp>
+
+Valid only in positional-argument schemas (those where every parameter has a
+C<position> value).  When C<slurp =E<gt> 1> is set, this parameter collects
+I<all> remaining positional arguments starting from C<position> into an
+arrayref, rather than taking only the single element at that index.
+
+  # sub log_message($level, @messages)
+  my $schema = {
+    level    => { type => 'string',   position => 0 },
+    messages => { type => 'arrayref', position => 1, slurp => 1 },
+  };
+
+The slurp parameter is implicitly optional: if there are no arguments at or
+beyond C<position>, the value is an empty arrayref.  Combine with C<min =E<gt>
+1> to require at least one element:
+
+  messages => { type => 'arrayref', position => 1, slurp => 1, min => 1 }
+
+At most one slurp parameter may be defined per schema, and it must have the
+highest C<position> value.  The return value at that position is an arrayref.
+
+=item * C<aliases>
+
+An arrayref of alternative input-key names that are also accepted for this
+parameter.  When any alias is found in the input the parameter is stored
+under its canonical schema key; if both the canonical name and an alias are
+present the canonical name takes precedence.  Aliases are not treated as
+unknown parameters regardless of the C<unknown_parameter_handler> setting.
+
+  colour => {
+    type    => 'string',
+    aliases => ['color'],
+    memberof => ['red', 'green', 'blue'],
+  }
+
+Only named (hashref) input supports aliases; positional (arrayref) input
+ignores them.
 
 =item * C<regex>
 
@@ -862,13 +1006,23 @@ and are currently ignored.
 =item * C<semantic>
 
 A hint about the semantic meaning of the parameter value.
-Currently only C<unix_timestamp> is supported.
+Supported values: C<unix_timestamp>, C<identifier>, C<class_name>.
 
-  ts => { type => 'integer', semantic => 'unix_timestamp' }
+  ts     => { type => 'integer', semantic => 'unix_timestamp' }
+  func   => { type => 'string',  semantic => 'identifier' }
+  module => { type => 'string',  semantic => 'class_name' }
 
 When C<semantic> is C<unix_timestamp>, the value must be a non-negative integer no greater than
 C<2147483647> (i.e. a valid 32-bit Unix epoch timestamp).
 Values outside this range cause the function to C<croak>.
+
+When C<semantic> is C<identifier>, the value must match C</\A[A-Za-z_]\w*\z/>, a single
+valid Perl bareword identifier.  Package separators (C<::>) are not permitted; use
+C<class_name> for those.
+
+When C<semantic> is C<class_name>, the value must match
+C</\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/>, a syntactically valid Perl class name such
+as C<'Foo'> or C<'Foo::Bar::Baz'>.  The class does not need to be loaded.
 
 Unknown semantic values emit a warning but do not cause an error.
 
@@ -1108,9 +1262,18 @@ sub validate_strict
 	}
 
 	if(ref($args) eq 'HASH') {
-		# Named args
+		# Named args: build alias reverse-map first so aliased keys are not
+		# treated as unknown parameters.
+		my %_alias_to_canonical;
+		foreach my $canonical (keys %{$schema}) {
+			my $r = $schema->{$canonical};
+			if(ref($r) eq 'HASH' && ref($r->{'aliases'}) eq 'ARRAY') {
+				$_alias_to_canonical{$_} = $canonical for @{$r->{'aliases'}};
+			}
+		}
+
 		foreach my $key (keys %{$args}) {
-			if(!exists($schema->{$key})) {
+			if(!exists($schema->{$key}) && !exists($_alias_to_canonical{$key})) {
 				if($unknown_parameter_handler eq 'die') {
 					_error($logger, "$schema_description: Unknown parameter '$key'");
 				} elsif($unknown_parameter_handler eq 'warn') {
@@ -1133,6 +1296,9 @@ sub validate_strict
 	foreach my $key (keys %{$schema}) {
 		if(defined(my $rules = $schema->{$key})) {
 			if(ref($rules) eq 'HASH') {
+				if($rules->{'slurp'} && !defined($rules->{'position'})) {
+					_error($logger, "::validate_strict: slurp parameter '$key' requires a 'position'");
+				}
 				if(!defined($rules->{'position'})) {
 					if($are_positional_args == 1) {
 						_error($logger, "::validate_strict: $key is missing position value");
@@ -1155,14 +1321,34 @@ sub validate_strict
 	my %invalid_args;
 	foreach my $key (keys %{$schema}) {
 		my $rules = $schema->{$key};
+
+		# For named-arg schemas: resolve which input key provides this parameter.
+		# If the canonical name is absent, try each alias in order.
+		my $lookup_key = $key;
+		if($are_positional_args != 1 && ref($rules) eq 'HASH'
+		   && ref($rules->{'aliases'}) eq 'ARRAY'
+		   && !exists($args->{$key})) {
+			for my $alias (@{$rules->{'aliases'}}) {
+				if(exists($args->{$alias})) {
+					$lookup_key = $alias;
+					last;
+				}
+			}
+		}
+
 		my $value;
 		if($are_positional_args == 1) {
 			if(ref($args) ne 'ARRAY') {
 				_error($logger, "::validate_strict: position $rules->{position} given for '$key', but args isn't an array");
 			}
-			$value = $args->[$rules->{'position'}];
+			if(ref($rules) eq 'HASH' && $rules->{'slurp'}) {
+				my $pos = $rules->{'position'};
+				$value = [@{$args}[$pos .. $#$args]];
+			} else {
+				$value = $args->[$rules->{'position'}];
+			}
 		} else {
-			$value = $args->{$key};
+			$value = $args->{$lookup_key};
 		}
 
 		if(!defined($rules)) {	# Allow anything
@@ -1217,14 +1403,20 @@ sub validate_strict
 				$is_optional = $rules->{'nullable'};
 			} elsif(defined($rules->{'type'}) && !ref($rules->{'type'}) && lc($rules->{'type'}) eq 'void') {
 				$is_optional = 1;
+			} elsif($rules->{'slurp'}) {
+				$is_optional = 1;
 			}
 		}
 
 		# Handle optional parameters
 		if((ref($rules) eq 'HASH') && $is_optional) {
-			my $missing = ($are_positional_args == 1)
-				? !defined($args->[$rules->{position}])
-				: !exists($args->{$key});
+			my $missing;
+			if($are_positional_args == 1) {
+				# A slurp parameter is never missing: at worst it yields an empty arrayref.
+				$missing = $rules->{'slurp'} ? 0 : !defined($args->[$rules->{position}]);
+			} else {
+				$missing = !exists($args->{$lookup_key});
+			}
 			if($missing) {
 				if($are_positional_args == 1) {
 					if(scalar(@{$args}) < $rules->{'position'}) {
@@ -1247,7 +1439,7 @@ sub validate_strict
 					next;	# optional and missing
 				}
 			}
-		} elsif((ref($args) eq 'HASH') && !exists($args->{$key})) {
+		} elsif((ref($args) eq 'HASH') && !exists($args->{$lookup_key})) {
 			# The parameter is required
 			# Use exists rather than defined, so that an undefined value can be passed, but the key is there
 			_error($logger, "$rule_description: Required parameter $param_label is missing");
@@ -1394,6 +1586,57 @@ sub validate_strict
 						}
 						if(ref($value) ne 'CODE') {
 							_rule_error($logger, $rules, "$rule_description: Parameter $param_label must be a coderef, not a ref to " . ref($value));
+						}
+					} elsif($type eq 'regex') {
+						if(!defined($value)) {
+							next;
+						}
+						if(ref($value) ne 'Regexp') {
+							_rule_error($logger, $rules, "$rule_description: Parameter $param_label must be a compiled regex (qr//)" .
+								(ref($value) ? ", not a " . ref($value) . " reference" : ", not a plain scalar"));
+						}
+					} elsif($type eq 'handle') {
+						if(!defined($value)) {
+							next;
+						}
+						my $is_handle = 0;
+						if(ref($value) eq 'GLOB' && defined(fileno($value))) {
+							$is_handle = 1;
+						} elsif(Scalar::Util::blessed($value) && $value->isa('IO::Handle')) {
+							$is_handle = 1;
+						} else {
+							$is_handle = defined(eval { fileno($value) });
+						}
+						unless($is_handle) {
+							_rule_error($logger, $rules, "$rule_description: Parameter $param_label must be a file handle");
+						}
+					} elsif($type eq 'arraylike') {
+						if(!defined($value)) {
+							next;
+						}
+						unless(ref($value) eq 'ARRAY' || (Scalar::Util::blessed($value) && overload::Method($value, '@{}'))) {
+							_rule_error($logger, $rules, "$rule_description: Parameter $param_label must be an array reference or array-like object");
+						}
+					} elsif($type eq 'hashlike') {
+						if(!defined($value)) {
+							next;
+						}
+						unless(ref($value) eq 'HASH' || (Scalar::Util::blessed($value) && overload::Method($value, '%{}'))) {
+							_rule_error($logger, $rules, "$rule_description: Parameter $param_label must be a hash reference or hash-like object");
+						}
+					} elsif($type eq 'codelike') {
+						if(!defined($value)) {
+							next;
+						}
+						unless(ref($value) eq 'CODE' || (Scalar::Util::blessed($value) && overload::Method($value, '&{}'))) {
+							_rule_error($logger, $rules, "$rule_description: Parameter $param_label must be a code reference or code-like object");
+						}
+					} elsif($type eq 'invocant') {
+						if(!defined($value)) {
+							next;
+						}
+						unless(Scalar::Util::blessed($value) || (!ref($value) && $value =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/)) {
+							_rule_error($logger, $rules, "$rule_description: Parameter $param_label must be a blessed object or a class name");
 						}
 					} elsif($type eq 'object') {
 						if(!defined($value)) {
@@ -1676,6 +1919,64 @@ sub validate_strict
 					} else {
 						_error($logger, "$rule_description: Parameter $param_label has meaningless can value '$rule_value' for parameter type $rules->{type}");
 					}
+				} elsif($rule_name eq 'does') {
+					if(!defined($value)) {
+						next;	# Skip if object not given
+					}
+					if($rules->{'type'} eq 'object') {
+						unless(Scalar::Util::blessed($value) && $value->DOES($rule_value)) {
+							_error($logger, "$rule_description: Parameter $param_label must be an object that does '$rule_value'");
+							$invalid_args{$key} = 1;
+						}
+					} else {
+						_error($logger, "$rule_description: Parameter $param_label has meaningless does value '$rule_value' for parameter type $rules->{type}");
+					}
+				} elsif($rule_name eq 'classisa') {
+					if(!defined($value)) {
+						next;
+					}
+					unless(!ref($value) && $value =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/ && $value->isa($rule_value)) {
+						_error($logger, "$rule_description: Parameter $param_label ($value) must be a class that isa '$rule_value'");
+						$invalid_args{$key} = 1;
+					}
+				} elsif($rule_name eq 'subclass') {
+					if(!defined($value)) {
+						next;
+					}
+					unless(!ref($value) && $value =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/
+						&& $value ne $rule_value && $value->isa($rule_value)) {
+						_error($logger, "$rule_description: Parameter $param_label ($value) must be a strict subclass of '$rule_value'");
+						$invalid_args{$key} = 1;
+					}
+				} elsif($rule_name eq 'classdoes') {
+					if(!defined($value)) {
+						next;
+					}
+					unless(!ref($value) && $value =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/ && $value->DOES($rule_value)) {
+						_error($logger, "$rule_description: Parameter $param_label ($value) must be a class that does '$rule_value'");
+						$invalid_args{$key} = 1;
+					}
+				} elsif($rule_name eq 'driver') {
+					if(!defined($value)) {
+						next;
+					}
+					unless(!ref($value) && $value =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/) {
+						_error($logger, "$rule_description: Parameter $param_label must be a valid class name");
+						$invalid_args{$key} = 1;
+						next;
+					}
+					(my $file = $value) =~ s{::}{/}g;
+					$file .= '.pm';
+					eval { require $file };
+					if($@) {
+						_error($logger, "$rule_description: Parameter $param_label ($value) could not be loaded: $@");
+						$invalid_args{$key} = 1;
+						next;
+					}
+					unless($value->isa($rule_value)) {
+						_error($logger, "$rule_description: Parameter $param_label ($value) must be a class that isa '$rule_value'");
+						$invalid_args{$key} = 1;
+					}
 				} elsif($rule_name eq 'element_type') {
 					if(($rules->{'type'} eq 'arrayref') || ($rules->{'type'} eq 'ArrayRef')) {
 						my $type = $rule_value;
@@ -1739,6 +2040,14 @@ sub validate_strict
 					if($rule_value eq 'unix_timestamp') {
 						if($value < 0 || $value > 2147483647) {
 							_error($logger, "Invalid Unix timestamp: $value");
+						}
+					} elsif($rule_value eq 'identifier') {
+						if(defined($value) && $value !~ /\A[A-Za-z_]\w*\z/) {
+							_error($logger, "Invalid Perl identifier: $value");
+						}
+					} elsif($rule_value eq 'class_name') {
+						if(defined($value) && $value !~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/) {
+							_error($logger, "Invalid Perl class name: $value");
 						}
 					} else {
 						_warn($logger, "semantic type $rule_value is not yet supported");
@@ -1814,6 +2123,13 @@ sub validate_strict
 					if($rule_value =~ /\D/) {
 						_error($logger, "$rule_description: Parameter $param_label: 'position' must be a positive integer");
 					}
+				} elsif($rule_name eq 'slurp') {
+					if($rule_value && $are_positional_args != 1) {
+						_error($logger, "$rule_description: Parameter $param_label: 'slurp' is only valid in positional-argument schemas (all parameters need a 'position')");
+					}
+					# Pre-processed: value was already collected as arrayref of remaining positional args
+				} elsif($rule_name eq 'aliases') {
+					# Pre-processed: alternative input-key names resolved during value fetch
 				} else {
 					_error($logger, "$rule_description: Unknown rule '$rule_name'");
 				}
@@ -1901,6 +2217,63 @@ sub validate_strict
 		return \@rc;
 	}
 	return \%validated_args;
+}
+
+=head2 compile_schema
+
+  my $validator = compile_schema(\%schema);
+  my $result    = $validator->(\%input);
+
+  # with optional keyword args
+  my $validator = compile_schema(\%schema,
+      description            => 'User registration',
+      custom_types           => \%types,
+      unknown_parameter_handler => 'warn',
+  );
+
+Pre-captures a schema (and any optional keyword arguments accepted by
+C<validate_strict>) into a reusable validator closure.  Calling the returned
+coderef is equivalent to:
+
+  validate_strict(schema => \%schema, input => \%input, %opts);
+
+but avoids the overhead of argument parsing on every call - useful when the
+same schema is applied repeatedly in a hot path.
+
+=head3 Arguments
+
+=over 4
+
+=item * C<\%schema> (required)
+
+The validation schema as a hashref or arrayref, identical to the C<schema>
+argument of C<validate_strict>.
+
+=item * C<%opts> (optional)
+
+Any keyword arguments accepted by C<validate_strict> other than C<schema>
+and C<input>: C<description>, C<custom_types>,
+C<unknown_parameter_handler>, C<logger>, C<relationships>,
+C<cross_validation>, etc.
+
+=back
+
+=head3 Returns
+
+A code reference C<sub ($input) -E<gt> \%validated>.
+
+=cut
+
+sub compile_schema
+{
+	my ($schema, %opts) = @_;
+	unless(ref($schema) eq 'HASH' || ref($schema) eq 'ARRAY') {
+		Carp::croak('compile_schema: schema must be a hash or array reference');
+	}
+	return sub {
+		my $input = shift;
+		return validate_strict(schema => $schema, input => $input, %opts);
+	};
 }
 
 # _schema_from_arrayref($arrayref, $logger)
@@ -2232,7 +2605,10 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
     ValidationRule ::= SimpleType | ComplexRule | UnionType
 
-    SimpleType ::= string | integer | number | scalar | scalarref | stringref | arrayref | hashref | coderef | object
+    SimpleType ::= string | integer | number | float | boolean | scalar
+               | scalarref | stringref | arrayref | hashref | coderef
+               | object | void | regex | handle
+               | arraylike | hashlike | codelike | invocant
 
     UnionType ::= seq SimpleType    -- at least two members; written as type => ['a', 'b']
 
@@ -2244,13 +2620,25 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
         matches: REGEX;
         regex: REGEX;
         nomatch: REGEX;
-	memberof: seq VALUE;
+        memberof: seq VALUE;
         enum: seq VALUE;
         values: seq VALUE;
         notmemberof: seq VALUE;
         callback: FUNCTION;
         isa: TYPE_NAME;
-        can: METHOD_NAME
+        does: ROLE_NAME;
+        can: METHOD_NAME | seq METHOD_NAME;
+        classisa: TYPE_NAME;
+        subclass: TYPE_NAME;
+        classdoes: ROLE_NAME;
+        driver: TYPE_NAME;
+        semantic: 'unix_timestamp' | 'identifier' | 'class_name';
+        aliases: seq PARAM_NAME;
+        slurp: 𝔹;
+        position: ℕ₀;
+        default: VALUE;
+        transform: FUNCTION;
+        error_msg: STRING
     ]
 
     Schema == PARAM_NAME ⇸ ValidationRule
@@ -2355,6 +2743,16 @@ validated value in an HTTP response, HTML page, or structured log entry.
 =item * L<Params::Get>
 
 =item * L<Params::Smart>
+
+This is where the ideas for C<aliases>, C<slurp> and C<compile_schema> came from.
+
+=item * L<Params::Util>
+
+This is where the ideas for C<regex>, C<handle>, C<arraylike>, C<hashlike>, C<codelike>, C<invocant> came from.
+
+=item * L<Params::SomeUtil>
+
+A maintained fork of L<Params::Util> 1.07 with bug fixes.  The same type-predicate ideas apply.
 
 =item * L<Params::Validate>
 

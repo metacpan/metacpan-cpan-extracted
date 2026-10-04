@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::API;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Digest::SHA qw(sha256_hex);
 use Getopt::Long qw(GetOptionsFromArray);
@@ -124,8 +124,6 @@ sub _run_add_command {
             $changed = 1;
         }
     }
-
-    die "API key '$key' does not have a secret yet\n" if $next->{secret} eq '';    # uncoverable branch true
 
     $writable->{$key} = $next;
     my $file = $config->save_writable_api_registry($writable);

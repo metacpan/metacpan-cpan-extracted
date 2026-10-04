@@ -16,6 +16,19 @@ my $stderr = capture_error { system (
     '
 ) };
 ok(
+    $stderr eq # line number changes in perl 5.45.x
+'#   Failed test at -e line 3.
+# +----+-------------------+-------------------+
+# | Elt|Got                |Expected           |
+# +----+-------------------+-------------------+
+# |   0|sub {              |sub {              |
+# |   1|    use warnings;  |    use warnings;  |
+# |   2|    use strict;    |    use strict;    |
+# *   3|    1;             |    2;             *
+# |   4|}                  |}                  |
+# +----+-------------------+-------------------+
+# Looks like you failed 1 test of 1.
+' ||
     $stderr eq  # perl 5.16 onwards
 '#   Failed test at -e line 4.
 # +----+-------------------+-------------------+

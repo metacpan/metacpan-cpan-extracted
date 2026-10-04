@@ -56,6 +56,7 @@ t/32-bounded-tx.t
 t/33-rx-reclaim-credit.t
 t/34-protocol-engine-v2.t
 t/35-stream-index.t
+t/36-quic-datagram.t
 t/data/server-cert.pem
 t/data/server-key.pem
 xs/net_quic_connection.h

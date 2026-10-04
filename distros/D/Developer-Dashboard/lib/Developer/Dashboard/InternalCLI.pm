@@ -3,7 +3,7 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
@@ -22,7 +22,7 @@ sub helper_names {
       jq yq tomq propq iniq csvq xmlq
       of open-file workspace file files path paths ps1
       encode decode indicator collector config auth api ask init cpan page action docker serve stop restart log shell doctor housekeeper skills which upgrade
-      complete pax
+      complete
     );
 }
 
@@ -36,7 +36,6 @@ sub helper_aliases {
         pyq   => 'yq',
         ptomq => 'tomq',
         pjp   => 'propq',
-        ticket => 'workspace',
         skill => 'skills',
         logs  => 'log',
     };
@@ -87,11 +86,11 @@ sub dashboard_core_path {
 sub helper_content {
     my ($name) = @_;
     $name = $name eq '_dashboard-core' ? $name : canonical_helper_name($name);
-    die "Unsupported helper command '$name'" if !defined $name || $name eq '';    # uncoverable condition left
+    die "Unsupported helper command '$name'" if $name eq '';
     my $path = _helper_asset_path($name);
-    open my $fh, '<:raw', $path or die "Unable to read $path: $!";    # uncoverable branch true
+    open my $fh, '<:raw', $path or die "Unable to read $path: $!";
     my $content = do { local $/; <$fh> };
-    close $fh or die "Unable to close $path: $!";    # uncoverable branch true
+    close $fh or die "Unable to close $path: $!";
     return $content;
 }
 
@@ -180,9 +179,9 @@ sub ensure_helper {
 
     my $target = helper_path( paths => $paths, name => $name );
     if ( is_windows() && _helper_uses_dashboard_core($name) && -f $target ) {
-        open my $existing_fh, '<:raw', $target or die "Unable to read $target: $!";    # uncoverable branch true
+        open my $existing_fh, '<:raw', $target or die "Unable to read $target: $!";
         my $existing = do { local $/; <$existing_fh> };
-        close $existing_fh or die "Unable to close $target: $!";    # uncoverable branch true
+        close $existing_fh or die "Unable to close $target: $!";
         return \@written if _is_dashboard_managed_helper( $existing, $name );
     }
     if ( !_managed_helper_file_current( $target, $name ) ) {
@@ -219,9 +218,9 @@ sub _stage_managed_helper {
             _write_helper_atomically( $target, $content );
             return 1;
         }
-        open my $existing_fh, '<:raw', $target or die "Unable to read $target: $!";    # uncoverable branch true
+        open my $existing_fh, '<:raw', $target or die "Unable to read $target: $!";
         my $existing = do { local $/; <$existing_fh> };
-        close $existing_fh or die "Unable to close $target: $!";    # uncoverable branch true
+        close $existing_fh or die "Unable to close $target: $!";
         return 0 if !_is_dashboard_managed_helper( $existing, $name );
         require Developer::Dashboard::SeedSync;
         return 0 if Developer::Dashboard::SeedSync::same_content_md5( $existing, $content );
@@ -284,7 +283,7 @@ sub _write_helper_atomically {
     my $temp = $target . '.tmp.' . $$ . '.' . int( rand(1_000_000) );
     open my $fh, '>:raw', $temp or die "Unable to write $temp: $!";
     print {$fh} $content;
-    close $fh or die "Unable to close $temp: $!";    # uncoverable branch true
+    close $fh or die "Unable to close $temp: $!";
     _replace_helper_file( $temp, $target );
     return 1;
 }
@@ -344,11 +343,11 @@ sub _remove_retired_managed_helper {
     my $target = File::Spec->catfile( _helper_install_root($paths), $name );
     return 0 if !-e $target;
     return 0 if !-f $target;
-    open my $fh, '<:raw', $target or die "Unable to read $target: $!";    # uncoverable branch true
+    open my $fh, '<:raw', $target or die "Unable to read $target: $!";
     my $content = do { local $/; <$fh> };
-    close $fh or die "Unable to close $target: $!";    # uncoverable branch true
+    close $fh or die "Unable to close $target: $!";
     return 0 if !_is_dashboard_managed_helper( $content, $name );
-    unlink $target or die "Unable to remove retired helper $target: $!";    # uncoverable branch true
+    unlink $target or die "Unable to remove retired helper $target: $!";
     return 1;
 }
 
@@ -365,11 +364,11 @@ sub _remove_legacy_managed_flat_helpers {
     for my $name ( '_dashboard-core', helper_names() ) {
         my $target = File::Spec->catfile( $parent, $name );
         next if !-e $target || !-f $target;
-        open my $fh, '<:raw', $target or die "Unable to read $target: $!";    # uncoverable branch true
+        open my $fh, '<:raw', $target or die "Unable to read $target: $!";
         my $content = do { local $/; <$fh> };
-        close $fh or die "Unable to close $target: $!";    # uncoverable branch true
+        close $fh or die "Unable to close $target: $!";
         next if !_is_dashboard_managed_helper( $content, $name );
-        unlink $target or die "Unable to remove legacy managed helper $target: $!";    # uncoverable branch true
+        unlink $target or die "Unable to remove legacy managed helper $target: $!";
         push @removed, $target;
     }
     return \@removed;
@@ -539,9 +538,9 @@ sub _is_managed_helper_target {
 sub _managed_helper_file_current {
     my ( $path, $name ) = @_;
     return 0 if !defined $path || $path eq '' || !-f $path;
-    open my $fh, '<:raw', $path or die "Unable to read $path: $!";    # uncoverable branch true
+    open my $fh, '<:raw', $path or die "Unable to read $path: $!";
     my $content = do { local $/; <$fh> };
-    close $fh or die "Unable to close $path: $!";    # uncoverable branch true
+    close $fh or die "Unable to close $path: $!";
     return 0 if !_is_dashboard_managed_helper( $content, $name );
     return $content =~ /^\Q@{[ _managed_helper_version_marker() ]}\E$/m ? 1 : 0;
 }
@@ -619,7 +618,7 @@ sub _repo_private_cli_root_candidates {
 # Input: none.
 # Output: absolute or relative module source file path string.
 sub _module_source_path {
-    $MODULE_SOURCE_PATH ||= File::Spec->rel2abs(__FILE__);    # uncoverable condition false
+    $MODULE_SOURCE_PATH = File::Spec->rel2abs(__FILE__) if !$MODULE_SOURCE_PATH;
     return $MODULE_SOURCE_PATH;
 }
 
@@ -644,7 +643,9 @@ sub _abs_existing_path {
     my ($path) = @_;
     return '' if !defined $path || $path eq '';
     return $path if !-e $path;
-    return abs_path($path) || $path;    # uncoverable condition false
+    my $resolved = abs_path($path);
+    return $resolved if $resolved;
+    return $path;
 }
 
 # _shared_private_cli_root()
@@ -731,7 +732,7 @@ sub _looks_like_private_cli_root {
     my ($path) = @_;
     return 0 if !defined $path || $path eq '';
     my @parts = File::Spec->splitdir($path);
-    return 0 if !@parts || $parts[-1] ne 'private-cli';    # uncoverable condition left
+    return 0 if $parts[-1] ne 'private-cli';
     return _private_cli_root_has_dashboard_core($path);
 }
 

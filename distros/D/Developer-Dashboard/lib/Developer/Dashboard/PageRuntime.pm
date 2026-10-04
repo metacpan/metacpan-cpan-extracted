@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);
@@ -17,6 +17,7 @@ use Time::HiRes ();
 use Developer::Dashboard::PageRuntime::StreamHandle;
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PerlEnv ();
+use Developer::Dashboard::EnvLoader ();
 use Developer::Dashboard::Platform qw(command_argv_for_path command_in_path is_windows);
 use Developer::Dashboard::RuntimeManager ();
 use Developer::Dashboard::Folder ();
@@ -133,19 +134,17 @@ sub run_code_blocks {
                 $state = $page->{state};
             }
 
-            if ( ref( $result->{returns} ) eq 'ARRAY' ) {    # uncoverable branch false
-                for my $value ( @{ $result->{returns} } ) {
-                    if ( ref($value) eq 'HASH' ) {
-                        $page->merge_state($value);
-                        $state = $page->{state};
-                    }
-                    next if ref($value) ne 'HASH' && ref($value) ne 'ARRAY';
-                    push @outputs, $self->_runtime_value_text($value);
+            for my $value ( @{ $result->{returns} } ) {
+                if ( ref($value) eq 'HASH' ) {
+                    $page->merge_state($value);
+                    $state = $page->{state};
                 }
+                next if ref($value) ne 'HASH' && ref($value) ne 'ARRAY';
+                push @outputs, $self->_runtime_value_text($value);
             }
 
-            my $stdout = defined $result->{stdout} ? $result->{stdout} : '';    # uncoverable branch false
-            my $stderr = defined $result->{stderr} ? $result->{stderr} : '';    # uncoverable branch false
+            my $stdout = $result->{stdout};
+            my $stderr = $result->{stderr};
 
             push @outputs, $stdout if $stdout ne '';
             push @errors, $stderr if $stderr ne '';
@@ -184,7 +183,7 @@ sub _render_templates {
     my $request_context = $page->{meta}{request_context} || {};
     my $current_page = $args{runtime_context}{current_page} || $request_context->{path} || '';
     my %template_runtime = (
-        %{ $args{runtime_context} || {} },    # uncoverable branch true
+        %{ $args{runtime_context} },
         current_page => $current_page,
     );
     my %template_env = (
@@ -194,7 +193,7 @@ sub _render_templates {
     );
 
     my $system = $self->_system_context(%args);
-    my @tt_roots = $self->{paths} ? $self->{paths}->dashboards_roots : '.';
+    my @tt_roots = $self->_template_include_roots($page);
     my $tt = Template->new(
         {
             EVAL_PERL   => 1,
@@ -277,6 +276,96 @@ sub _render_templates {
     }
 }
 
+# _template_include_roots($page)
+# Builds the allow-listed Template Toolkit include roots for one bookmark.
+# Input: page document, optionally carrying the skill_path metadata stamped by
+# SkillDispatcher.
+# Output: ordered, de-duplicated directory paths for INCLUDE resolution.
+sub _template_include_roots {
+    my ( $self, $page ) = @_;
+    my @roots;
+    my %seen;
+    my $add = sub {
+        my ($root) = @_;
+        return if !defined $root || $root eq '' || $seen{$root}++;
+        push @roots, $root;
+    };
+    if ( $self->{paths} ) {
+        my $skill_path = ref($page) && ref( $page->{meta} ) eq 'HASH' ? $page->{meta}{skill_path} : undef;
+        $add->( File::Spec->catdir( $skill_path, 'dashboards' ) ) if defined $skill_path && $skill_path ne '';
+        $add->($_) for $self->{paths}->dashboards_roots;
+        # Runtime roots make the documented skills/<name>/dashboards/... form
+        # resolvable without permitting arbitrary filesystem paths.
+        if ( $self->{paths}->can('runtime_roots') ) {
+            $add->($_) for $self->{paths}->runtime_roots;
+        }
+    }
+    $add->('.') if !@roots;
+    return @roots;
+}
+
+# _code_inc_roots($page)
+# Builds the skill-local Perl library roots exposed to older CODE sections for
+# one skill page.
+# Input: optional page document carrying skill_layers or skill_path metadata.
+# Output: ordered list of existing lib directory paths, page-owning skill first
+# followed by inherited skill layers from leaf to home.
+sub _code_inc_roots {
+    my ( $self, $page ) = @_;
+    return () if !ref($page) || ref( $page->{meta} ) ne 'HASH';
+    my @layers = ref( $page->{meta}{skill_layers} ) eq 'ARRAY'
+      ? @{ $page->{meta}{skill_layers} }
+      : ();
+    my @roots;
+    my %seen;
+    my $page_skill_path = $page->{meta}{skill_path};
+    if ( defined $page_skill_path && $page_skill_path ne '' ) {
+        my $page_lib = File::Spec->catdir( $page_skill_path, 'lib' );
+        if ( -d $page_lib ) {
+            $seen{$page_lib}++;
+            push @roots, $page_lib;
+        }
+    }
+    for my $layer ( reverse @layers ) {
+        my $lib = File::Spec->catdir( $layer, 'lib' );
+        next if !-d $lib || $seen{$lib}++;
+        push @roots, $lib;
+    }
+    return @roots;
+}
+
+# _skill_env_overlay($skill_layers)
+# Loads ordered skill env files without changing the web worker's environment.
+# Input: array reference of skill roots in environment inheritance order.
+# Output: hash reference of environment keys added or overridden by skill files.
+sub _skill_env_overlay {
+    my ( $self, $skill_layers ) = @_;
+    return {} if ref($skill_layers) ne 'ARRAY' || !@$skill_layers;
+    my $loaded = Developer::Dashboard::EnvLoader->load_skill_layers_into_hash(
+        skill_layers => $skill_layers,
+        base_env     => \%ENV,
+    );
+    return $loaded->{env} || {};
+}
+
+# _code_env_overlay($page)
+# Loads the ordered skill environment for a dashboard page without changing the
+# web worker's process environment.
+# Input: page document carrying skill_layers or skill_path metadata.
+# Output: hash reference of environment keys added or overridden by skill env files.
+sub _code_env_overlay {
+    my ( $self, $page ) = @_;
+    return {} if !ref($page) || ref( $page->{meta} ) ne 'HASH';
+
+    my @layers = ref( $page->{meta}{skill_layers} ) eq 'ARRAY'
+      ? @{ $page->{meta}{skill_layers} }
+      : ();
+    if ( !@layers && defined $page->{meta}{skill_path} && $page->{meta}{skill_path} ne '' ) {
+        push @layers, $page->{meta}{skill_path};
+    }
+    return $self->_skill_env_overlay( \@layers );
+}
+
 # _system_context(%args)
 # Builds the generic SYSTEM hash exposed to bookmark Template Toolkit rendering.
 # Input: runtime context hash.
@@ -311,14 +400,15 @@ sub _run_single_block {
         paths   => $self->{paths},
         aliases => $self->{aliases},
     );
-    $sandpit ||= $self->_new_sandpit(    # uncoverable condition false
+    $sandpit = $self->_new_sandpit(
         state           => $state,
         runtime_context => $runtime,
-    );
+    ) if !$sandpit;
 
     my $package = $sandpit->{package} || die 'Missing sandpit package';
     my $wrapped_code = $self->_code_header($state) . $code;
     my @returns;
+    my $skill_env = $self->_code_env_overlay( $args{page} );
     local $Developer::Dashboard::Zipper::AJAX_CONTEXT = {
         allow_transient_urls => (
             defined $ENV{DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS}
@@ -346,14 +436,16 @@ sub _run_single_block {
         source       => $args{source} || '',
     };
     my ( $stdout, $stderr, $exit_code ) = capture {
+        local %ENV = ( %ENV, %{$skill_env} );
+        local @INC = ( $self->_code_inc_roots( $args{page} ), @INC );
         @returns = $package->__run_code($wrapped_code);
         return $?;
     };
     my @errors = $package->__errors();
     if (@errors) {
-        my $error = join '', grep { defined $_ && $_ ne '' } @errors;    # uncoverable branch false
+        my $error = join '', @errors;
         $self->_destroy_sandpit($sandpit) if $destroy_sandpit;
-        die $error if $error ne '';    # uncoverable branch false
+        die $error;
     }
 
     $self->_destroy_sandpit($sandpit) if $destroy_sandpit;
@@ -384,14 +476,15 @@ sub stream_code_block {
         paths   => $self->{paths},
         aliases => $self->{aliases},
     );
-    $sandpit ||= $self->_new_sandpit(    # uncoverable condition false
+    $sandpit = $self->_new_sandpit(
         state           => $state,
         runtime_context => $runtime,
-    );
+    ) if !$sandpit;
 
     my $package = $sandpit->{package} || die 'Missing sandpit package';
     my $wrapped_code = $self->_code_header($state) . $code;
     my @returns;
+    my $skill_env = $self->_code_env_overlay( $args{page} );
     local $Developer::Dashboard::Zipper::AJAX_CONTEXT = {
         allow_transient_urls => (
             defined $ENV{DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS}
@@ -409,12 +502,16 @@ sub stream_code_block {
     my $old_stderr = select STDERR;
     $| = 1;
     select $old_stderr;
-    @returns = $package->__run_code($wrapped_code);
+    {
+        local %ENV = ( %ENV, %{$skill_env} );
+        local @INC = ( $self->_code_inc_roots( $args{page} ), @INC );
+        @returns = $package->__run_code($wrapped_code);
+    }
     untie *STDOUT;
     untie *STDERR;
 
     my @errors = $package->__errors();
-    my $error = join '', grep { defined $_ && $_ ne '' } @errors;    # uncoverable branch false
+    my $error = join '', @errors;
 
     if ( ref( $args{return_writer} ) eq 'CODE' ) {
         for my $value (@returns) {
@@ -434,7 +531,8 @@ sub stream_code_block {
 
 # stream_saved_ajax_file(%args)
 # Executes one saved Ajax file as a real process and streams stdout/stderr chunks through callbacks.
-# Input: saved file path, request params hash, optional singleton name, page/source metadata, and writer callbacks.
+# Input: saved file path, request params hash, optional singleton name, skill
+#       layer roots, page/source metadata, and writer callbacks.
 # Output: hash reference with exit_code and process status word.
 sub stream_saved_ajax_file {
     my ( $self, %args ) = @_;
@@ -458,6 +556,7 @@ sub stream_saved_ajax_file {
         type      => $args{type} || '',
         params    => $params,
         singleton => $singleton,
+        skill_layers => $args{skill_layers},
     );
     my @temp_files = grep { defined $_ && $_ ne '' }
       @env{qw(DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE DEVELOPER_DASHBOARD_AJAX_QUERY_STRING_FILE)};
@@ -657,7 +756,7 @@ sub _drain_saved_ajax_ready_handle {
     }
     my $ready_fileno  = fileno($fh);
     my $stdout_fileno = fileno($stdout);
-    if ( defined $ready_fileno && defined $stdout_fileno && $ready_fileno == $stdout_fileno ) {    # uncoverable condition left
+    if ( defined $stdout_fileno && $ready_fileno == $stdout_fileno ) {
         my $continued = $stdout_writer->($chunk);
         return defined $continued ? $continued : 1;
     }
@@ -781,7 +880,8 @@ sub _saved_ajax_command {
 
 # _saved_ajax_env(%args)
 # Builds the environment variables exposed to one saved Ajax process run.
-# Input: saved file path, page id, type, optional singleton name, and request params hash.
+# Input: saved file path, page id, type, optional singleton name, request params
+#       hash, and skill layer roots whose env files apply to this worker.
 # Output: hash of environment key/value pairs.
 sub _saved_ajax_env {
     my ( $self, %args ) = @_;
@@ -819,6 +919,8 @@ sub _saved_ajax_env {
         my %runtime_env = $self->_runtime_local_perl_env;
         @env{ keys %runtime_env } = values %runtime_env;
     }
+    my $skill_env = $self->_skill_env_overlay( $args{skill_layers} );
+    @env{ keys %{$skill_env} } = values %{$skill_env};
     return %env;
 }
 
@@ -855,7 +957,7 @@ sub _saved_ajax_temp_file {
         SUFFIX => $args{suffix} || '',
     );
     print {$fh} defined $args{content} ? $args{content} : '';
-    close $fh or die "Unable to close saved ajax temp file $path: $!";    # uncoverable branch true
+    close $fh or die "Unable to close saved ajax temp file $path: $!";
     return $path;
 }
 
@@ -1011,13 +1113,18 @@ sub _exec_saved_ajax_command {
     die "Missing saved ajax command\n" if !@command;
     defined $SETPGID->()
       or die "Unable to isolate saved ajax process $$: $!\n";
-    exec { $command[0] } @command;
+    die "Unable to exec saved ajax command $command[0]: $!\n" if !$class->_exec_command(@command);
+}
 
-    # Devel::Cover cannot attribute a statement that follows a failed exec: the
-    # count lands on the exec line itself, so this line always reports zero even
-    # though the page-runtime coverage tests drive a failing exec through here and
-    # assert this message.
-    die "Unable to exec saved ajax command $command[0]: $!\n";    # uncoverable statement
+# _exec_command(@command)
+# Replaces this process with the command. Kept as its own sub because Devel::Cover
+# records nothing after a failed exec in the same sub, so the failure path in
+# _exec_saved_ajax_command can only be reached by stubbing this helper.
+# Input: the command and its arguments.
+# Output: false when the exec fails; never returns on success.
+sub _exec_command {
+    my ( $class, @command ) = @_;
+    return exec { $command[0] } @command;
 }
 
 # _run_saved_ajax_perl_file($path)
@@ -1045,9 +1152,10 @@ sub _code_header {
     $state ||= {};
 
     my @keys = grep { /^[A-Za-z_][A-Za-z0-9_]*$/ } sort keys %$state;
-    return '' if !@keys;
+    my $header = "use Developer::Dashboard::DataHelper qw(j je);\n";
+    return $header if !@keys;
 
-    my $header = sprintf 'my (%s) = @{ $stash }{qw(%s)};' . "\n",
+    $header .= sprintf 'my (%s) = @{ $stash }{qw(%s)};' . "\n",
       join( ', ', map { '$' . $_ } @keys ),
       join( ' ', @keys );
     $header .= sprintf 'my (%s) = map { \\$stash->{$_} } qw(%s);' . "\n",
@@ -1068,7 +1176,6 @@ sub _sandpit_package_source {
 package $package;
 use strict;
 use warnings;
-use Developer::Dashboard::DataHelper qw(j je);
 use Developer::Dashboard::Zipper qw(Ajax acmdx zip unzip);
 
 our \$stash = {};
@@ -1190,7 +1297,7 @@ sub _new_sandpit {
     $package =~ s/[^A-Za-z0-9:]/_/g;
 
     my $ok = eval _sandpit_package_source($package);
-    die "Unable to setup sandpit $@\n" if !$ok;    # uncoverable branch true
+    die "Unable to setup sandpit $@\n" if !$ok;
 
     $package->__initial_context(
         $args{state} || {},
@@ -1257,13 +1364,31 @@ Developer::Dashboard::PageRuntime - older bookmark renderer and CODE executor
 
 This module applies Template Toolkit rendering to bookmark HTML and executes
 older C<CODE*> blocks while capturing STDOUT and STDERR for in-page display.
+For skill pages, it loads the ordered skill C<.env> and C<.env.pl> files into
+a request-local environment overlay while CODE executes, without changing the
+web worker environment. Saved skill Ajax processes receive the same layered
+values through their child environment. Skill C<lib/> directories are also
+scoped into C<@INC>, with the page-providing skill first.
+Each CODE block imports C<j> and C<je> from
+C<Developer::Dashboard::DataHelper> automatically, so saved code does not need
+to repeat that import. Skill CODE can also read request-local Dancer2 app
+variables established by skill hooks by importing the existing app, for
+example C<use Dancer2 appname =E<gt> 'DeveloperDashboard'; print var('foo');>.
+The matching skill extension must register its hook with the Dancer2 form
+C<hook before =E<gt> sub { var foo =E<gt> 'bar' }>; a bare C<before =E<gt>
+sub { ... }> expression does not register a hook.
 
 =head1 METHODS
 
 =head2 new, prepare_page, run_code_blocks, stream_code_block, stream_saved_ajax_file
 
 Construct the runtime, render bookmark templates, execute in-process CODE
-blocks, and stream saved Ajax files as real child processes. On POSIX systems
+blocks, and stream saved Ajax files as real child processes. Skill page CODE
+receives the skill's layered env values and skill libraries for the duration
+of its execution only; saved skill Ajax workers receive the layered env values
+in their child process. Page and Ajax CODE runs execute within the active
+Dancer2 request context, so imported C<var()> can read values set by a skill's
+before hook. On POSIX systems
 each saved Ajax worker runs inside its own process group, and disconnect or
 stream-error cleanup signals that whole group so descendant processes forked by
 the worker terminate with it; Windows keeps direct child-process termination.
@@ -1271,6 +1396,17 @@ Cleanup sends SIGTERM first and then waits a bounded, elapsed-time grace window
 for the worker and its group to exit on their own, so a worker that installs a
 SIGTERM handler can reap its children, remove scratch files, and flush partial
 output before the SIGKILL escalation clears whatever is left.
+
+=head2 _template_include_roots
+
+Builds the safe Template Toolkit C<INCLUDE_PATH> for a bookmark. It includes
+the ordinary layered dashboard roots, the active skill's dashboards root, and
+the runtime roots so a skill template can explicitly include
+C<skills/foo/dashboards/fragment.tt>. Relative includes such as
+C<fragment.tt> continue to resolve from the current skill dashboard first.
+
+Input: page document, optionally carrying C<meta.skill_path>.
+Output: ordered list of include-root directory paths.
 
 =for comment FULL-POD-DOC START
 
@@ -1284,11 +1420,11 @@ It exists because bookmark execution is the heart of the product. Rendering, cod
 
 =head1 WHEN TO USE
 
-Use this file when changing bookmark rendering, Template Toolkit exposure, code-block execution, or Ajax helper generation.
+Use this file when changing bookmark rendering, Template Toolkit exposure, code-block execution, automatic DataHelper imports, or Ajax helper generation.
 
 =head1 HOW TO USE
 
-Construct it with the file and path registries plus any path aliases, then feed it a normalized page document. Let it return render fragments or runtime errors rather than building bookmark execution logic in routes or helper scripts.
+Construct it with the file and path registries plus any path aliases, then feed it a normalized page document. Every CODE block receives the standard C<Developer::Dashboard::DataHelper qw(j je)> import. For skill pages, the exact skill layer that supplied the page is the first scoped C<@INC> entry, followed by the other active skill layers, so module lookup respects the page provider before inherited skill libraries. Let the runtime return render fragments or errors rather than building bookmark execution logic in routes or helper scripts.
 
 =head1 WHAT USES IT
 

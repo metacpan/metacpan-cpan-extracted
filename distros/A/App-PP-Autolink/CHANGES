@@ -1,5 +1,10 @@
 Revision history for App::PP::Autolink
 
+2.15 20261004
+  - Set env var PAR_PACKING to true if not already in env.
+    This can be used by called code to conditionally load modules that are otherwise missed by PAR::Packer.
+  - Other miscellaneous changes.
+
 2.14 20251028
   - Early return if process_gdk_pixbuf_loaders cannot
     find any files to work on.

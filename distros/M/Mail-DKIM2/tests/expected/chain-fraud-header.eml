@@ -1,0 +1,22 @@
+DKIM2-Signature: i=1; m=2; t=1783372800; d=test1.dkim2.com;
+	mf=PGJvdW5jZUB0ZXN0MS5ka2ltMi5jb20+;
+	rt=PHVzZXJAdGVzdDMuZGtpbTIuY29tPg==;
+	s=sel1:rsa-sha256:D3noBUATl2/29iYk2nSS0Ezg/BBREAM4OiKFTqzKa3Fj4S
+	D3nAGjXyMZu19QzYJVO5MLcQiOnMZszOaXsyo6/y31LjmdhDJ80msSpHFxs3CsR3
+	OtB4jinWOBCKMHbh3lapF/zX7+7P5BKcq5U0RD4I3hndx1h/VXvjuKzaQwM3HnBP
+	w/KK34PGvXDp6DEw0d15UXanabLP6AFuyZpYp79q+fjt5Iel2xnCG40SGWmxc9hW
+	D8B6RpmvmeMCU5fNx1gRCGSNG+MhkTNiONcH/Du0asNKgmoWHQzJSNKO9/kc2P5c
+	KqSzDMY0bE6pjTIb67ntHK7LMalnL4/PiuMAUQpg==;
+Message-Instance: m=2;
+ h=sha256:6MdO712fcSXfWhpeIlPpAZBalze0nxTxS3TrEe7r+6s=:SZeYHENh/K932sMRQMMdUeQj+THa6uSq6iv/c0V99TE=; r=eyJoIjp7Imxpc3QtaWQiOltdfX0=;
+List-Id: <test.list.test1.dkim2.com>
+Reply-To: attacker@evil.example
+Message-Instance: m=1;
+ h=sha256:BacK9Eo0Q8hCN1vcrEz3dLzcT2BhwZ+tslkrLiBKJmk=:SZeYHENh/K932sMRQMMdUeQj+THa6uSq6iv/c0V99TE=;
+Date: Tue, 08 Jul 2026 10:00:00 +0000
+To: user@test3.dkim2.com
+From: alice@test1.dkim2.com
+Subject: chain-of-custody forgery test
+Message-Id: <orig.20260708@test1.dkim2.com>
+
+Please reply to me directly with your thoughts.

@@ -3,12 +3,12 @@ package Developer::Dashboard::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Exporter 'import';
 use JSON::XS ();
 
-our @EXPORT_OK = qw(json_encode json_decode json_decode_state);
+our @EXPORT_OK = qw(json_encode json_encode_with_options json_decode json_decode_state);
 
 # json_encode($value)
 # Serializes a Perl value into canonical pretty JSON.
@@ -16,6 +16,30 @@ our @EXPORT_OK = qw(json_encode json_decode json_decode_state);
 # Output: JSON text string.
 sub json_encode {
     return JSON::XS->new->utf8->canonical->pretty->encode( $_[0] );
+}
+
+# json_encode_with_options($value, %opts)
+# Serializes a Perl value with explicit, named JSON::XS option choices
+# (DD-1002) - the option-variant form this module's own POD describes for
+# call sites that legitimately need a different combination from
+# json_encode()'s fixed utf8+canonical+pretty defaults (e.g. ASCII-safe
+# output for embedding in a shell-generated source file, or a compact
+# canonical digest input that must never pretty-print so the hash stays
+# stable). "canonical" is always on, matching every call site this
+# centralizes - there is no known case in this codebase that needs
+# non-canonical key ordering. Every other option defaults OFF, matching
+# JSON::XS's own default, so a caller only names what it actually needs.
+# Input: scalar/array/hash reference, plus optional %opts: "ascii" (escape
+# non-ASCII to \uXXXX), "pretty" (indented multi-line output), "utf8"
+# (encode the result as UTF-8 bytes rather than a Perl character string).
+# Output: JSON text string.
+sub json_encode_with_options {
+    my ( $value, %opts ) = @_;
+    my $json = JSON::XS->new->canonical(1);
+    $json = $json->ascii(1)  if $opts{ascii};
+    $json = $json->pretty(1) if $opts{pretty};
+    $json = $json->utf8(1)   if $opts{utf8};
+    return $json->encode($value);
 }
 
 # json_decode($json)
@@ -65,6 +89,12 @@ single consistent JSON backend and output style.
 =head2 json_encode
 
 Encode a Perl value as canonical pretty JSON.
+
+=head2 json_encode_with_options
+
+Encode a Perl value as canonical JSON with explicit C<ascii>/C<pretty>/C<utf8>
+option choices (DD-1002), for call sites that need a different combination
+than C<json_encode>'s fixed defaults.
 
 =head2 json_decode
 

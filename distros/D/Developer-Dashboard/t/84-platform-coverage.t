@@ -262,6 +262,58 @@ ok( !$noresolve, 'command_argv_for_path dies when nothing resolves' );
 like( $@, qr/Unable to find runnable file/, 'unresolvable path error surfaced' );
 
 # ---------------------------------------------------------------------------
+# DD-958: resolve_runnable_file's is_windows()-true candidate-selection path
+# (lines 183-184) and command_argv_for_path's is_windows()-true fallback
+# (line 226's guard / line 227's return) are only reachable when is_windows()
+# answers true - force it with the project's established local $OS_NAME
+# override (see docs/forced-windows-unit-tests.md) rather than annotating
+# them uncoverable, since they ARE testable this way.
+# ---------------------------------------------------------------------------
+{
+    local $Developer::Dashboard::Platform::OS_NAME = $win;
+
+    my $winbat = File::Spec->catfile( $work, 'winscript.bat' );
+    write_file( $winbat, "echo win\n" );
+    is(
+        resolve_runnable_file( File::Spec->catfile( $work, 'winscript' ) ),
+        $winbat,
+        'resolve_runnable_file: under forced is_windows(), a .bat candidate is selected via _is_windows_runnable_candidate (line 183 false, line 184 true)',
+    );
+
+    my $windata = File::Spec->catfile( $work, 'plain.dat' );
+    write_file( $windata, "not runnable\n" );
+    is_deeply(
+        [ command_argv_for_path($windata) ],
+        [ $^X, $windata ],
+        'command_argv_for_path: under forced is_windows(), an unmatched extension falls through to the Windows fallback return (line 226 false, line 227 true)',
+    );
+}
+
+# The two counterpart natural-Linux (is_windows() false) states on the same
+# lines are ALSO gaps: Devel::Cover measures the true/false columns against
+# the literal written condition (!is_windows() on line 226; is_windows() as
+# the left operand of the && on lines 183/184), not the rewritten display
+# text it prints ("unless is_windows()") - so the forced-Windows block above
+# only closes half of each line's coverage. See docs/forced-windows-unit-tests.md.
+
+my $noexec = File::Spec->catfile( $work, 'notexec.sh' );
+write_file( $noexec, "echo x\n" );
+chmod 0644, $noexec;    # exists, but not executable
+is(
+    resolve_runnable_file( $noexec ),
+    undef,
+    'resolve_runnable_file: on Linux, a candidate that exists but is not executable is skipped (line 183 !is_windows()&&-x false side, line 184 is_windows() false side)',
+);
+
+my $plaindata = File::Spec->catfile( $work, 'plain-linux.dat' );
+write_file( $plaindata, "not runnable\n" );
+is_deeply(
+    [ command_argv_for_path($plaindata) ],
+    [$plaindata],
+    'command_argv_for_path: on Linux, an unmatched extension falls through to the plain-path return, no interpreter prefix (line 226 true side)',
+);
+
+# ---------------------------------------------------------------------------
 # DD-856: a .pl-suffixed file carrying a non-Perl shebang must run through
 # its OWN shebang interpreter, not be force-fed to perl by extension alone.
 # ---------------------------------------------------------------------------
@@ -452,12 +504,88 @@ ok( length $root_from_inc, '_module_lib_root resolves via %INC' );
     my @seen_argv;
     local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub { @seen_argv = @_; return 1 };
     my $go_path = File::Spec->catfile( $work, 'skill', 'cli', 'foo.go' );
+    local $ENV{GOMODCACHE} = 'sentinel-untouched-modcache';
+    local $ENV{GOCACHE}    = 'sentinel-untouched-gocache';
     eval { Developer::Dashboard::Platform::_exec_go_source($go_path); 1 };
     is_deeply(
         \@seen_argv,
         [ 'go', 'run', '-C', File::Spec->catdir( $work, 'skill', 'cli' ), $go_path ],
         '_exec_go_source passes -C <source dir> so go.mod discovery starts at the skill layer, not the caller cwd'
     );
+    is( $ENV{GOMODCACHE}, 'sentinel-untouched-modcache', 'DD-951: no go.mod means GOMODCACHE is left exactly as the caller set it' );
+    is( $ENV{GOCACHE},    'sentinel-untouched-gocache',  'DD-951: no go.mod means GOCACHE is left exactly as the caller set it' );
+}
+
+# DD-951: _find_layer_go_mod - the same per-layer walk pattern as
+# _find_layer_pom, reused directly for go.mod.
+{
+    ok(
+        !defined Developer::Dashboard::Platform::_find_layer_go_mod( File::Spec->catdir( $work, 'nogomodlayer', 'cli' ) ),
+        '_find_layer_go_mod returns undef when no ancestor layer has a go.mod'
+    );
+
+    my $skilldir = File::Spec->catdir( $work, 'goskill' );
+    my $clidir   = File::Spec->catdir( $skilldir, 'cli' );
+    make_path($clidir);
+    my $go_mod = write_file( File::Spec->catfile( $skilldir, 'go.mod' ), "module example.com/goskill\n\ngo 1.26\n" );
+    my $foo_go = write_file( File::Spec->catfile( $clidir, 'foo.go' ), "package main\nfunc main() {}\n" );
+    is(
+        Developer::Dashboard::Platform::_find_layer_go_mod($clidir),
+        $go_mod,
+        '_find_layer_go_mod finds the layer go.mod walking up from the source directory'
+    );
+}
+
+# DD-951: GOMODCACHE/GOCACHE are set to a per-layer local/go-cache/
+# directory when a go.mod IS found, mirroring DD-824's per-skill venv.
+{
+    my @seen_argv;
+    my ( $seen_modcache, $seen_gocache );
+    local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub {
+        @seen_argv     = @_;
+        $seen_modcache = $ENV{GOMODCACHE};
+        $seen_gocache  = $ENV{GOCACHE};
+        return 1;
+    };
+    my $skilldir = File::Spec->catdir( $work, 'goskill' );
+    my $go_path  = File::Spec->catfile( $skilldir, 'cli', 'foo.go' );
+    {
+        local $ENV{GOMODCACHE} = 'sentinel-before-call-modcache';
+        local $ENV{GOCACHE}    = 'sentinel-before-call-gocache';
+        eval { Developer::Dashboard::Platform::_exec_go_source($go_path); 1 };
+        is(
+            $seen_modcache,
+            File::Spec->catdir( $skilldir, 'local', 'go-cache', 'mod' ),
+            'DD-951: GOMODCACHE points at this layer\'s own local/go-cache/mod, not the global default'
+        );
+        is(
+            $seen_gocache,
+            File::Spec->catdir( $skilldir, 'local', 'go-cache', 'build' ),
+            'DD-951: GOCACHE points at this layer\'s own local/go-cache/build, not the global default'
+        );
+        is( $ENV{GOMODCACHE}, 'sentinel-before-call-modcache', 'DD-951: the env override does not leak past the call (local, restored on return)' );
+        is( $ENV{GOCACHE},    'sentinel-before-call-gocache',  'DD-951: same restoration for GOCACHE' );
+    }
+}
+
+# DD-951: a SECOND, sibling skill with its own go.mod resolves to its OWN
+# cache directory, independent of the first (AC-2 - no cross-contamination).
+{
+    my $skilldir2 = File::Spec->catdir( $work, 'goskill2' );
+    my $clidir2   = File::Spec->catdir( $skilldir2, 'cli' );
+    make_path($clidir2);
+    write_file( File::Spec->catfile( $skilldir2, 'go.mod' ), "module example.com/goskill2\n\ngo 1.26\n" );
+    my $foo_go2 = write_file( File::Spec->catfile( $clidir2, 'bar.go' ), "package main\nfunc main() {}\n" );
+
+    my ( $seen_modcache1, $seen_modcache2 );
+    local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub { $seen_modcache1 = $ENV{GOMODCACHE}; return 1; };
+    Developer::Dashboard::Platform::_exec_go_source( File::Spec->catfile( $work, 'goskill', 'cli', 'foo.go' ) );
+
+    local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub { $seen_modcache2 = $ENV{GOMODCACHE}; return 1; };
+    Developer::Dashboard::Platform::_exec_go_source($foo_go2);
+
+    isnt( $seen_modcache1, $seen_modcache2, 'DD-951: two sibling skills resolve to two distinct GOMODCACHE directories' );
+    is( $seen_modcache2, File::Spec->catdir( $skilldir2, 'local', 'go-cache', 'mod' ), 'DD-951: the second skill\'s own cache path is correct' );
 }
 
 # ---------------------------------------------------------------------------

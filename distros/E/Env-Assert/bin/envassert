@@ -9,9 +9,9 @@ use open ':std', IO => ':encoding(UTF-8)';
 
 # PODNAME: envassert
 
-our $VERSION = '0.016';
+our $VERSION = '0.018';
 
-use English qw( -no_match_vars ); # Avoids regex performance penalty in perl 5.18 and earlier
+use English      qw( -no_match_vars );                   # Avoids regex performance penalty in perl 5.18 and earlier
 use Getopt::Long qw( :config auto_version auto_help );
 use Carp;
 use Pod::Usage;
@@ -21,30 +21,30 @@ use Env::Assert::Functions qw( :all );
 local $OUTPUT_AUTOFLUSH = 1;
 
 use constant {
-    YEAR_START => 1900,
-    MONTH_START => 1,
+    YEAR_START        => 1900,
+    MONTH_START       => 1,
     ENV_DESC_FILENAME => '.envdesc',
-    INDENT => q{    },
+    INDENT            => q{    },
 };
 
-my $man = 0;
-my $break_at_first_error;
-my $env_desc_filename = ENV_DESC_FILENAME;
+my $man                  = 0;
+my $break_at_first_error = 0;
+my $env_desc_filename    = ENV_DESC_FILENAME;
 my $exact;
 my $stdin = 0;
 GetOptions(
-    'man' => \$man,
+    'man'                     => \$man,
     'break-at-first-error|b!' => \$break_at_first_error,
-    'env-description|e=s' => , \$env_desc_filename,
-    'exact|x!' => \$exact,
-    'stdin!' => \$stdin,
+    'env-description|e=s'     => \$env_desc_filename,
+    'exact|x!'                => \$exact,
+    'stdin!'                  => \$stdin,
 ) or pod2usage(2);
-pod2usage(-exitval => 0, -verbose => 2) if $man;
+pod2usage( -exitval => 0, -verbose => 2 ) if $man;
 
 sub main {
 
     my @env_desc_rows;
-    if( $stdin ) {
+    if ($stdin) {
         @env_desc_rows = <>;
     } else {
         open my $fh, q{<}, $env_desc_filename or croak "Cannot open file '$env_desc_filename'";
@@ -52,16 +52,16 @@ sub main {
         close $fh or croak "Cannot close file '$env_desc_filename'";
     }
 
-    my $desc = file_to_desc( @env_desc_rows );
+    my %desc = file_to_desc( $stdin ? q{STDIN} : $env_desc_filename, @env_desc_rows );
     my %parameters;
     $parameters{'break_at_first_error'} = $break_at_first_error
-        if defined $break_at_first_error;
-    $desc->{'options'}->{'exact'} = $exact
-        if defined $exact;
-    my $r = assert( \%ENV, $desc, \%parameters );
-    if( ! $r->{'success'} ) {
+      if $break_at_first_error;
+    $desc{'opts'}->{OPTION_ENV_EXACT} = $exact
+      if defined $exact;
+    my $r = assert( \%ENV, \%desc, \%parameters );
+    if ( !$r->{'success'} ) {
         print {*STDOUT} report_errors( $r->{'errors'} )
-            or croak 'Cannot print errors to STDOUT';
+          or croak 'Cannot print errors to STDOUT';
         return 1;
     }
     return 0;
@@ -84,13 +84,15 @@ envassert - Ensure that the environment variables match what you need, or abort.
 envassert [options]
 
 Options:
-    --help
-    --man
-    --version
-    --break-at-first-error, -b
-    --env-description, -e
-    --exact, -x
-    --stdin, -s
+
+    --help                      Print this message
+    --man                       Show man page
+    --version                   Print version
+
+    --break-at-first-error, -b  Report first error and break processing
+    --env-description, -e       Filepath to Environment Description file
+    --exact, -x                 Do not allow unknown variables
+    --stdin, -s                 Read Env Desc from STDIN, not from file
 
 
 =head1 OPTIONS
@@ -167,7 +169,7 @@ There are three kinds of errors:
 "Variable <var_name> is missing from description"
 
 This error will only be reported if you have set
-the special option B<exact>. See below.
+the special option B<env:exact>. See below.
 
 =back
 
@@ -180,11 +182,11 @@ similar to a F<.env> file.
 =head3 F<.envdesc> Format
 
 In F<.envdesc> file there is only environment variables, comments
-or empty rows.
+meta commands or empty rows.
 Example:
 
     # Required env
-    ## envassert (opts: exact=1)
+    ## envassert (opts: env:exact)
     FILENAME=^[[:word:]]{1,}$
 
 Env var name is followed by a regular expression. The regexp is
@@ -202,11 +204,26 @@ Supported options:
 
 =over 8
 
-=item exact
+=item env:exact, default: 0
 
-The option I<exact> means that all allowed env variables
+The option I<env:exact> means that all allowed env variables
 are described in this file. Any unknown env var causes an error
 when verifying.
+
+By default, this option if off (false).
+
+=item var:required, default: 1
+
+The option I<var:required> means that the next environment
+variable defined is required. This is the default assumption.
+If you set this to "0", the next var definition will became optional.
+If the variable is present in the current environment,
+its content will be checked. If it is not present, it will not be checked.
+
+This is also applies to situation when B<env:exact> is true.
+If the variable is missing, it is will not cause an error.
+
+By default, this option if on (true).
 
 =back
 

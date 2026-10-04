@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+#
+# Standalone DKIM2 verifier CLI (draft-ietf-dkim-dkim2-spec-06).
+#
+# Reads a message, verifies its DKIM2-Signature chain and Message-Instance
+# chain with Mail::DKIM2::Verifier, prints the result, and exits with the
+# verdict: 0 for pass, 75 (EX_TEMPFAIL) for temperror, 1 for anything else.
+# The counterpart of dkim2sign, and of python/dkim2verify.py and c/dkim2verify.
+#
+#   dkim2verify [--dns-json PATH] [--ignore-timestamps] [--ignore-prefix P]...
+#               [--allow-unsigned-mi] [MESSAGE|-]
+#
+# Keys come from DNS unless --dns-json names an interop dns.json, in which case
+# domains listed there are answered from the file and the rest still from DNS.
+
+use 5.020;
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use FindBin;
+use lib -d "$FindBin::Bin/../lib/Mail/DKIM2" ? "$FindBin::Bin/../lib" : ();   # running from a checkout
+
+use Mail::DKIM2::Common qw(parse_dkim_pubkey);
+use Mail::DKIM2::Verifier;
+
+my ($dns_json, $ignore_ts, $allow_unsigned, @prefixes);
+GetOptions(
+    'dns-json=s'         => \$dns_json,
+    'ignore-timestamps'  => \$ignore_ts,
+    'ignore-prefix=s'    => \@prefixes,
+    'allow-unsigned-mi'  => \$allow_unsigned,
+    'help|h'             => sub { print _usage(); exit 0 },
+) or die _usage();
+
+my $file = shift // '-';
+my $raw = $file eq '-'
+    ? do { local $/; binmode STDIN; <STDIN> }
+    : do { open my $fh, '<:raw', $file or die "$file: $!\n"; local $/; <$fh> };
+die "empty message\n" unless defined $raw && length $raw;
+
+my %opts = (
+    SkipTimestampCheck => $ignore_ts ? 1 : 0,
+    AllowUnsignedMI    => $allow_unsigned ? 1 : 0,
+    (@prefixes ? (IgnorePrefixes => \@prefixes) : ()),
+);
+
+if ($dns_json) {
+    require JSON;
+    my $dns = do {
+        open my $fh, '<', $dns_json or die "$dns_json: $!\n";
+        local $/; JSON::decode_json(<$fh>);
+    };
+    $opts{PubkeyCallback} = sub {
+        my ($sig, $idx, $verifier) = @_;
+        my ($sel, $dom) = ($sig->selector($idx), $sig->domain);
+        my $txt = $dns->{$dom}{"$sel._domainkey"}[0][1]
+            if $dom && $sel && $dns->{$dom};
+        return parse_dkim_pubkey($txt) if $txt;
+        return $verifier->fetch_public_key($sig, $idx);
+    };
+}
+
+my $v = Mail::DKIM2::Verifier->new(%opts)->load($raw);
+my $result = $v->result;
+say $v->result_detail;
+exit($result eq 'pass' ? 0 : $result eq 'temperror' ? 75 : 1);
+
+sub _usage {
+    return <<"USAGE";
+usage: $0 [options] [MESSAGE|-]
+
+      --dns-json PATH      answer key lookups for domains in this interop dns.json
+      --ignore-timestamps  do not fail a signature for its t= age
+      --ignore-prefix P    treat header fields starting with P as unhashed (repeatable)
+      --allow-unsigned-mi  permit a Message-Instance above the top signature
+  -h, --help
+
+Exit status: 0 pass, 75 temperror, 1 otherwise.
+USAGE
+}

@@ -6,6 +6,9 @@ use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
 
+plan skip_all => 'checkout-only workflow coverage validation; release tarballs exclude .github'
+    if !-f '.github/workflows/test.yml';
+
 my $gate  = File::Spec->catfile( 'script', 'check-all-metric-coverage' );
 my $entry = File::Spec->catfile( 'script', 'coverage-gate' );
 
@@ -237,7 +240,7 @@ sub read_repository_file {
 # inspected, then each invokes the canonical entrypoint and none of them
 # open-codes the three-command chain, because an open-coded chain is what lets
 # one command of it run without the library path the others had.
-for my $workflow_name (qw(test.yml release-cpan.yml release-github.yml)) {
+for my $workflow_name (qw(test.yml release-github.yml)) {
     my $body = read_repository_file( File::Spec->catfile( '.github', 'workflows', $workflow_name ) );
 
     like(

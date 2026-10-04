@@ -6,8 +6,16 @@ use warnings;
 
 # PODNAME: ebug_backend_perl
 # ABSTRACT: Backend for ebug
-our $VERSION = '0.68'; # VERSION
+our $VERSION = '0.69'; # VERSION
 
+
+# On Windows exec starts a new process and exits this one, so the frontend
+# would see the process it started die before the backend connects.  Wait
+# for the backend instead, and exit with its status.
+if ($^O eq 'MSWin32') {
+  system $^X, "-d:ebug::Backend", @ARGV;
+  exit($? == -1 ? 255 : $? >> 8);
+}
 
 exec $^X, "-d:ebug::Backend", @ARGV;
 
@@ -23,7 +31,7 @@ ebug_backend_perl - Backend for ebug
 
 =head1 VERSION
 
-version 0.68
+version 0.69
 
 =head1 SEE ALSO
 

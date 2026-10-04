@@ -255,10 +255,12 @@ sub main {
     #
     # File::Spec->case_tolerant() is FALSE on Linux, so this leaves the
     # behaviour on this host exactly as the specs already measure it.
-    my $diverged =
-      File::Spec->case_tolerant()
-      ? ( lc($caller_checkout) ne lc($repo_checkout) )
-      : ( $caller_checkout ne $repo_checkout );
+    my $diverged = 0;
+    if ( defined $caller_checkout && defined $repo_checkout ) {
+        $diverged = File::Spec->case_tolerant()
+          ? ( lc($caller_checkout) ne lc($repo_checkout) )
+          : ( $caller_checkout ne $repo_checkout );
+    }
 
     if ( defined $caller_checkout && defined $repo_checkout && $diverged ) {
         return _unusable(
@@ -368,6 +370,10 @@ sub main {
     return _judge( $checker, $database, $stdout . $stderr );
 }
 
+# Purpose: fingerprint Perl source and tests so the gate can refuse a result
+#          when the tree changes during a run.
+# Input:   none.
+# Output: a stable SHA-256 digest of source paths, sizes, and modification times.
 sub _grading_identity {
     my @facts;
     File::Find::find(
@@ -375,6 +381,7 @@ sub _grading_identity {
             no_chdir => 1,
             wanted   => sub {
                 my $path = $File::Find::name;
+                return if -d $path;
                 return if !-f $path;
                 my @stat = stat $path;
                 push @facts, join '|', $path, $stat[7], $stat[9];
@@ -765,9 +772,8 @@ Exit statuses are the interface:
 
 =head1 WHAT USES IT
 
-The C<test>, C<release-cpan> and C<release-github> workflows, the contributor
-testing guide, and C<t/148-coverage-gate-entrypoint.t>, which is its acceptance
-contract.
+The C<test> and C<release-github> workflows, the contributor testing guide,
+and C<t/148-coverage-gate-entrypoint.t>, which is its acceptance contract.
 
 =head1 EXAMPLES
 

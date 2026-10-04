@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+use 5.020; use strict; use warnings;
+use FindBin;
+use lib -d "$FindBin::Bin/../lib/Mail/DKIM2" ? "$FindBin::Bin/../lib" : ();   # running from a checkout
+use IO::Socket::INET;
+use Net::SMTP;
+use POSIX ':sys_wait_h';
+use Sys::Syslog qw(:standard :macros);
+use Mail::DKIM2::Split qw(plan_copies);
+
+# dkim2-split-lmtp: a Bcc-safe DKIM2 origination content filter.
+#
+# An LMTP server that Postfix delivers submitted mail to (after-queue content
+# filter). It fans one message out into copies -- disclosed recipients share a
+# copy, each Bcc recipient gets its own (Mail::DKIM2::Split) -- and re-injects
+# each copy to the DKIM2 signing listener, so the signer records only that
+# copy's recipients in rt= and Bcc never leaks.
+#
+# LMTP is used deliberately: it returns a status PER RECIPIENT after the final
+# ".", so each recipient is answered 250 (its copy re-injected) or 5xx (bounce)
+# individually -- which Postfix turns into a per-recipient delivery/bounce.
+#
+# Wiring (see deploy/SERVER.md "Bcc-safe origination"):
+#   submission smtpd:  -o content_filter=lmtp:[127.0.0.1]:10590  (no signing milter)
+#   this daemon:       listens on 10590, re-injects to 10589
+#   127.0.0.1:10589:   smtpd with the DKIM2 signing milter and content_filter= empty
+#
+# Config via env: DKIM2_SPLIT_PORT (10590), DKIM2_INJECT_HOST (127.0.0.1),
+# DKIM2_INJECT_PORT (10589).
+
+my $LISTEN_HOST = $ENV{DKIM2_SPLIT_HOST}  // '127.0.0.1';
+my $LISTEN_PORT = $ENV{DKIM2_SPLIT_PORT}  // 10590;
+my $INJECT_HOST = $ENV{DKIM2_INJECT_HOST} // '127.0.0.1';
+my $INJECT_PORT = $ENV{DKIM2_INJECT_PORT} // 10589;
+
+openlog('dkim2-split', 'pid', LOG_MAIL);
+sub logmsg { syslog(LOG_INFO, '%s', $_[0]); }
+
+# Re-inject one copy (a single SMTP transaction) to the signing listener.
+# Returns 1 on success, 0 on any failure.
+sub inject_copy {
+    my ($sender, $rcpts, $msg) = @_;
+    my $smtp = Net::SMTP->new($INJECT_HOST, Port => $INJECT_PORT, Timeout => 60);
+    return 0 unless $smtp;
+    my $ok = $smtp->mail(length $sender ? $sender : '<>');
+    $ok &&= $smtp->recipient(@$rcpts);
+    if ($ok) { $smtp->data; $smtp->datasend($msg); $ok = $smtp->dataend; }
+    $smtp->quit;
+    return $ok ? 1 : 0;
+}
+
+# Handle one LMTP transaction on an accepted connection.
+sub handle_conn {
+    my ($c) = @_;
+    $c->autoflush(1);
+    print $c "220 dkim2-split LMTP ready\r\n";
+    my ($sender, @rcpts);
+    while (my $line = <$c>) {
+        $line =~ s/\r?\n$//;
+        if ($line =~ /^LHLO\b/i) {
+            print $c "250 dkim2-split\r\n";
+        }
+        elsif ($line =~ /^MAIL\s+FROM:\s*(<[^>]*>|\S+)/i) {
+            $sender = $1; $sender =~ s/^<//; $sender =~ s/>$//;
+            @rcpts = ();
+            print $c "250 2.1.0 Ok\r\n";
+        }
+        elsif ($line =~ /^RCPT\s+TO:\s*(<[^>]*>|\S+)/i) {
+            push @rcpts, $1;
+            print $c "250 2.1.5 Ok\r\n";
+        }
+        elsif ($line =~ /^DATA\b/i) {
+            print $c "354 End data with <CR><LF>.<CR><LF>\r\n";
+            my $msg = '';
+            while (my $l = <$c>) {
+                last if $l eq ".\r\n" || $l eq ".\n";
+                $l =~ s/^\.//;            # dot-unstuffing
+                $msg .= $l;
+            }
+            # Plan copies and re-inject each; record success per copy.
+            my $copies = eval { plan_copies($msg, \@rcpts) };
+            if (!$copies) {
+                # couldn't parse/plan -> temp-fail every recipient (LMTP: one per rcpt)
+                print $c "451 4.3.0 split failed, try again later\r\n" for @rcpts;
+                logmsg("plan failed for sender=$sender rcpts=@rcpts: $@");
+                @rcpts = (); $sender = undef; next;
+            }
+            my %result;   # envelope-rcpt string -> 1 ok / 0 fail
+            for my $copy (@$copies) {
+                my $ok = inject_copy($sender, $copy->{rcpts}, $msg);
+                $result{$_} = $ok for @{$copy->{rcpts}};
+                logmsg(sprintf("copy rcpts=[%s] injected=%d", join(',', @{$copy->{rcpts}}), $ok));
+            }
+            # LMTP: one reply per recipient, in the order they were given.
+            for my $r (@rcpts) {
+                if ($result{$r}) { print $c "250 2.1.5 Ok (split+re-injected)\r\n"; }
+                else             { print $c "451 4.3.0 re-injection failed\r\n"; }
+            }
+            @rcpts = (); $sender = undef;
+        }
+        elsif ($line =~ /^RSET\b/i) {
+            @rcpts = (); $sender = undef;
+            print $c "250 2.0.0 Ok\r\n";
+        }
+        elsif ($line =~ /^(QUIT)\b/i) {
+            print $c "221 2.0.0 Bye\r\n";
+            last;
+        }
+        elsif ($line =~ /^(NOOP|VRFY|HELP)\b/i) {
+            print $c "250 2.0.0 Ok\r\n";
+        }
+        else {
+            print $c "500 5.5.2 Unrecognized command\r\n";
+        }
+    }
+    close $c;
+}
+
+# --- fork-per-connection server ---------------------------------------------
+$SIG{CHLD} = sub { while (waitpid(-1, WNOHANG) > 0) {} };
+my $srv = IO::Socket::INET->new(
+    LocalHost => $LISTEN_HOST, LocalPort => $LISTEN_PORT,
+    Listen => 20, ReuseAddr => 1, Proto => 'tcp',
+) or die "dkim2-split: cannot listen on $LISTEN_HOST:$LISTEN_PORT: $!\n";
+logmsg("listening on $LISTEN_HOST:$LISTEN_PORT, re-injecting to $INJECT_HOST:$INJECT_PORT");
+
+while (1) {
+    my $c = $srv->accept or next;
+    my $pid = fork;
+    if (!defined $pid) { print $c "421 4.3.0 fork failed\r\n"; close $c; next; }
+    if ($pid == 0) { $srv->close; handle_conn($c); exit 0; }
+    $c->close;
+}

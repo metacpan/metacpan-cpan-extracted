@@ -1,0 +1,12 @@
+^\.claude/
+^\.gitignore$
+^CLAUDE\.md$
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib
+^Mail-DKIM2-
+\.swp$
+\.bak$
+~$

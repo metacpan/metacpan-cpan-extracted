@@ -3,7 +3,7 @@ package Developer::Dashboard::Zipper;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Exporter 'import';
 use File::Basename qw(dirname);
@@ -11,6 +11,7 @@ use File::Path qw(make_path);
 use File::Spec;
 use Scalar::Util qw(blessed);
 use URI::Escape qw(uri_escape);
+use Template;
 
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
 use Developer::Dashboard::HtmlEscape qw(_escape_html _escape_html_attr);
@@ -59,15 +60,17 @@ sub acmdx {
         $query .= '&singleton=' . uri_escape( $args{singleton} );
     }
     my $url = $base ? $base . $query : $query;
+    my $app_url = $args{app};
+    $app_url = $url if !$app_url;
     return {
         token   => $token,
-        url     => { tokenised => $url, app => $args{app} || $url },
+        url     => { tokenised => $url, app => $app_url },
         forward => [ $path => { token => $token->{raw}, type => $type } ],
         html    => sprintf(
             q{<a href="%s" target="%s">%s</a>},
             _escape_html_attr($url),
             _escape_html_attr( $args{target} || '_blank' ),
-            _escape_html( $args{label} || 'Click Here' ),    # uncoverable condition false
+            _escape_html( $args{label} || 'Click Here' ),
         ),
     };
 }
@@ -88,6 +91,7 @@ sub Ajax {
     my %args = @_;
     die "jvar is required" if !$args{jvar};
     my $type = $args{type} || 'text';
+    my $code = _render_ajax_code_template( $args{code}, $args{data} );
     my $context = ref($AJAX_CONTEXT) eq 'HASH' ? $AJAX_CONTEXT : {};
     if ( ( ( $context->{source} || '' ) eq 'saved' || ( $context->{source} || '' ) eq 'skill' ) && ( $context->{page_id} || '' ) ne '' ) {
         my $file = $args{file} || '';
@@ -102,7 +106,7 @@ sub Ajax {
                 runtime_root => $context->{runtime_root} || '',
                 skill_name   => $context->{skill_name} || '',
                 type         => $type,
-                code         => $args{code},
+                code         => $code,
                 singleton    => $args{singleton},
                 base_url     => $args{base_url} || '',
               )
@@ -125,6 +129,7 @@ sub Ajax {
         }
     my $ajax = acmdx(
         %args,
+        code => $code,
         path => '/ajax',
         type => $type,
     );
@@ -133,6 +138,22 @@ sub Ajax {
     print sprintf qq{<script>set_chain_value(%s,'%s','%s')</script>}, $root,
       _js_single_quote($path), _js_single_quote( $ajax->{url}{tokenised} );
     return 'HIDE-THIS';
+}
+
+# _render_ajax_code_template($code, $data)
+# Renders an Ajax code string as a Template Toolkit template before it is
+# stored or encoded, allowing callers to inject values through data => {...}.
+# Input: optional code string and optional hash reference of template values.
+# Output: rendered code string, or the original code when no data is supplied.
+sub _render_ajax_code_template {
+    my ( $code, $data ) = @_;
+    return $code if !defined $code || ref($data) ne 'HASH';
+    my $template = Template->new( { EVAL_PERL => 0 } )
+      or die 'Unable to initialise Ajax code template renderer';
+    my $rendered = '';
+    $template->process( \$code, $data, \$rendered )
+      or die 'Unable to render Ajax code template: ' . $template->error;
+    return $rendered;
 }
 
 # _js_single_quote($text)
@@ -363,6 +384,10 @@ older bookmark code without carrying forward any project-specific logic.
 Encode and decode token payloads and generate older-style ajax links. Saved
 bookmark Ajax file handlers are stored under the dashboards ajax tree as
 executable files so the web runtime can run them as real processes.
+When callers supply C<data>, C<Ajax> renders its C<code> string with Template
+Toolkit before either storing a saved handler or encoding a transient token.
+This ordering ensures the encoded payload contains executable Perl rather than
+unrendered C<[% ... %]> directives.
 
 =for comment FULL-POD-DOC START
 

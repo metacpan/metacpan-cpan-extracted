@@ -1,5 +1,14 @@
 Revision history for Devel-ebug
 
+0.69      2026-10-03 11:56:42 -0600
+  - Fix a custom backend with backslashes in its path (such as
+    C:\Strawberry\perl\bin\perl.exe) failing to start on Windows
+    when args() is used (gh#74)
+  - Fix ebug_backend_perl on Windows, where the frontend saw it exit
+    before the debugger could connect (gh#74)
+  - Fix the NAME section of ebug_server's documentation, which
+    said ebug_client (gh#73)
+
 0.68      2026-10-02 01:44:26 -0600
   - Test fixes, no functional changes.  (gh#71, gh#72, richardleach++)
 

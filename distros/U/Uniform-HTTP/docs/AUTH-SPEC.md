@@ -1,6 +1,6 @@
-# Uniform::HTTP::Auth 0.02 API Specification
+# Uniform::HTTP::Auth API Specification
 
-Status: release contract for version 0.02. The 0.01 API remains supported.
+Status: authentication contract for Uniform-HTTP 0.04. The public API introduced in 0.01 and 0.02 remains supported.
 
 ## Purpose
 
@@ -39,7 +39,7 @@ authentication mechanics.
 
 ## Modules
 
-Version 0.02 contains:
+The distribution contains:
 
 ```text
 Uniform::HTTP::Auth
@@ -52,14 +52,14 @@ All are part of the `Uniform-HTTP` distribution.
 
 ## Supported schemes
 
-Version 0.02 implements:
+The authentication API implements:
 
 - Basic, RFC 7617
 - Bearer, RFC 6750
 - Digest, RFC 7616
 
 Unknown schemes are parsed and exposed but are not automatically used.
-There is no public custom-scheme plugin ABI in 0.02.
+There is no public custom-scheme plugin ABI.
 
 ## Construction
 
@@ -335,8 +335,8 @@ A Basic challenge requires `realm`. If `charset` is present, its only supported
 value is `UTF-8`, case-insensitively.
 
 With `charset=UTF-8`, username and password are normalized to NFC and encoded as
-UTF-8 before Base64 encoding. Without `charset`, version 0.02 accepts ASCII
-credentials only rather than guessing the RFC 7617 default encoding.
+UTF-8 before Base64 encoding. Without `charset`, ASCII credentials are accepted only rather than guessing
+the RFC 7617 default encoding.
 
 Usernames may not contain a colon. Username and password may not contain HTTP
 control characters.
@@ -367,7 +367,7 @@ Supported qop values:
 - `auth`
 - `auth-int`
 
-When both are offered, 0.02 prefers `auth`.
+When both are offered, `auth` is preferred.
 
 Digest state includes nonce count and cnonce. Through the root API, state is
 isolated by origin, realm, username, and nonce so identical opaque nonce strings
@@ -412,9 +412,9 @@ stack:
 The distribution does not depend on LWP, Mojolicious, PSGI, PAGI,
 Linux::Event, or another HTTP client/server framework.
 
-## Explicit non-goals for 0.02
+## Explicit non-goals
 
-Version 0.02 does not own:
+Uniform::HTTP::Auth does not own:
 
 - HTTP retries or request replay
 - connections or transaction state
@@ -432,7 +432,7 @@ Version 0.02 does not own:
 
 ## References
 
-The 0.02 implementation is governed primarily by:
+The implementation is governed primarily by:
 
 - RFC 9110, HTTP Semantics / HTTP Authentication Framework
 - RFC 7617, Basic HTTP Authentication

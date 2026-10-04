@@ -124,6 +124,7 @@ chdir $proj_dir or die $!;
 my $HOME = abs_path($tmp);
 my $PROJ = abs_path($proj_dir);
 local $ENV{HOME} = $HOME;
+write_file( File::Spec->catfile( $PROJ, '.env' ), "FOO=here\n" );
 
 my $home_skills = File::Spec->catdir( $HOME, '.developer-dashboard', 'skills' );
 my $proj_skills = File::Spec->catdir( $PROJ, '.developer-dashboard', 'skills' );
@@ -140,9 +141,20 @@ write_file( File::Spec->catfile( $home_runner, 'dashboards', 'nav', 'common.tt' 
 # --- project (deepest) layer of runner ---
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'greet' ), "#!/bin/sh\necho greet-out\n" );
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'solo' ),  "#!/bin/sh\necho solo-out\n" );
+write_exec( File::Spec->catfile( $proj_runner, 'cli', 'libcheck.pl' ), "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nuse RunnerLocal;\nprint RunnerLocal::value(), qq(\\n);\n" );
+write_exec( File::Spec->catfile( $proj_runner, 'cli', 'inc.pl' ), <<'SCRIPT' );
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print join( ',', @INC ), "\n";
+SCRIPT
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'exectest' ), "#!/bin/sh\necho exec-out\n" );
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'failcmd' ), "#!/bin/sh\necho failcmd-out\nexit 1\n" );
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'hookfail' ), "#!/bin/sh\necho hookfail-out\n" );
+# DD-1043: no cli/version script for 'runner', but a .env carrying VERSION= -
+# exercises _native_version_fallback via both dispatch() and exec_command().
+write_file( File::Spec->catfile( $proj_runner, '.env' ), "VERSION=9.99\nRUNNER_ENV=1\nFOO=runner\n" );
+write_file( File::Spec->catfile( $proj_runner, 'lib', 'RunnerLocal.pm' ), "package RunnerLocal;\nuse strict;\nuse warnings;\nsub value { return 'local-lib-ok' }\n1;\n" );
 # greet hooks: a non-runnable file (skipped) plus two runnable hooks, one of
 # which writes to both stdout and stderr.
 write_file( File::Spec->catfile( $proj_runner, 'cli', 'greet.d', '00-skip' ), "not runnable\n" );
@@ -163,6 +175,7 @@ Runner Index
 === HTML ===
 runner index body
 PAGE
+write_file( File::Spec->catfile( $proj_runner, 'dashboards', 'saved-url' ), "http://127.0.0.1:7890/app/ch/sql?abc=123&def=456\n" );
 write_file( File::Spec->catfile( $proj_runner, 'dashboards', 'welcome' ), <<'PAGE' );
 === TITLE ===
 Runner Welcome
@@ -180,9 +193,20 @@ write_file( File::Spec->catfile( $proj_runner, 'dashboards', 'public', 'js', 'ap
 
 # nested + disabled-nested skills under runner
 write_exec( File::Spec->catfile( $proj_runner, 'skills', 'child', 'cli', 'sub' ), "#!/bin/sh\necho child-sub\n" );
+write_file( File::Spec->catfile( $proj_runner, 'skills', 'child', '.env' ), "CHILD_ENV=1\nFOO=child\n" );
+write_file( File::Spec->catfile( $proj_runner, 'skills', 'child', 'cli', '.env' ), "CLI_ENV=1\n" );
+write_exec( File::Spec->catfile( $proj_runner, 'skills', 'child', 'cli', 'envcheck' ), "#!/bin/sh\nprintf '%s\\n' \"\$RUNNER_ENV\" \"\$CHILD_ENV\" \"\$CLI_ENV\" \"\$FOO\"\n" );
+write_exec( File::Spec->catfile( $proj_runner, 'skills', 'child', 'skills', 'grand', 'cli', 'deep' ), "#!/bin/sh\necho grand-deep\n" );
 write_file( File::Spec->catfile( $proj_runner, 'skills', 'child', 'dashboards', 'nav', 'n.tt' ), "child-nav\n" );
 mkd( File::Spec->catdir( $proj_runner, 'skills', 'disabledchild', 'cli' ) );
 write_file( File::Spec->catfile( $proj_runner, 'skills', 'disabledchild', '.disabled' ), "" );
+
+# DD-954: a nested skill with ONLY a cli/__init__ self-script, no explicit
+# cli/<command> file at all - the command token never resolves to a real
+# file, so this is exactly the case the __init__ fallback exists for.
+write_exec( File::Spec->catfile( $proj_runner, 'skills', 'initchild', 'cli', '__init__' ), "#!/bin/sh\necho initchild-self \"\$@\"\n" );
+write_exec( File::Spec->catfile( $proj_runner, 'skills', 'initchild', 'skills', 'grandinit', 'cli', '__init__' ), "#!/bin/sh\necho grandinit-self \"\$@\"\n" );
+write_exec( File::Spec->catfile( $proj_runner, 'skills', 'initchild', 'skills', 'grandinit', 'cli', 'task' ), "#!/bin/sh\necho grandinit-task \"\$@\"\n" );
 
 # secondary skills in the project layer
 mkd( File::Spec->catdir( $proj_skills, 'nocfg' ) );                       # exists, no config/dashboards
@@ -226,6 +250,22 @@ ok( exists $run->{hooks}{'01-run'}, 'dispatch returns the hook capture map' );
 my $run_solo = $disp->dispatch( 'runner', 'solo' );
 like( $run_solo->{stdout}, qr/solo-out/, 'dispatch runs a command that has no hooks (clears last_result)' );
 
+my $run_libcheck = $disp->dispatch( 'runner', 'libcheck' );
+is( $run_libcheck->{stdout}, "local-lib-ok\n", 'dispatch exposes skill lib directories through PERL5LIB' );
+my $run_inc_check = $disp->dispatch( 'runner', 'inc' );
+my ($first_cli_inc) = split /,/, $run_inc_check->{stdout}, 2;
+is(
+    $first_cli_inc,
+    File::Spec->catdir( $proj_runner, 'lib' ),
+    'the exact skill path providing a CLI script is the first entry in that child Perl process @INC',
+);
+
+my $run_envcheck = $disp->dispatch( 'runner', 'child.envcheck' );
+is( $run_envcheck->{stdout}, "1\n1\n1\nhere\n", 'dispatch loads skill, nested skill, skill cli, and cwd env files with cwd overriding skill values' );
+
+my $run_deep = $disp->dispatch( 'runner', 'child.grand.deep' );
+is( $run_deep->{stdout}, "grand-deep\n", 'dispatch resolves multi-level nested skill commands addressed through dotted names' );
+
 # DD-883: a genuinely-failing command must report its real shifted exit code
 # (1), never the raw wait-status Capture::Tiny's capture() hands back from a
 # bare `system(...)` as its own trailing return value (256 for exit 1).
@@ -262,6 +302,18 @@ ok( $disp->exec_command( 'disabledskill', 'greet' )->{error}, 'exec_command refu
     local $Local::ExecShim::FAIL_RE = qr{/exectest\z};
     my $exec_hooked = quietly( sub { $disp->exec_command( 'runner', 'exectest' ) } );
     like( $exec_hooked->{error}, qr/\AUnable to exec /, 'exec_command runs streaming hooks then reports the exec failure' );
+}
+
+# DD-1043: exec_command's native .version fallback - no cli/version script
+# exists for 'runner', so it reads VERSION=9.99 from the .env staged above
+# and hands it to _exec_replacement, going through the same shimmed exec()
+# every other exec_command path already uses.
+{
+    is( $disp->dispatch( 'runner', 'version' )->{stdout}, "9.99\n", 'dispatch native .version fallback prints the .env VERSION=' );
+
+    local $Local::ExecShim::FAIL_RE = qr/./s;
+    my $exec_version = $disp->exec_command( 'runner', 'version' );
+    like( $exec_version->{error}, qr/\AUnable to exec /, 'exec_command native .version fallback routes through the shimmed exec()' );
 }
 
 # ---------------------------------------------------------------------------
@@ -329,16 +381,57 @@ mkd( File::Spec->catdir( $proj_runner, 'perl5', 'lib', 'perl5' ) );
 my %env = $disp->_skill_env(
     skill_name   => 'runner',
     skill_path   => $proj_runner,
-    skill_layers => \@runner_layers,
+    skill_layers => [ undef, '', @runner_layers ],
     command      => 'greet',
 );
 is( $env{DEVELOPER_DASHBOARD_SKILL_NAME}, 'runner', '_skill_env exports the skill name' );
 like( $env{PERL5LIB}, qr/\Q$proj_runner\E/, '_skill_env prepends an existing skill-local perl5 lib' );
+my $perl5lib_sep = Developer::Dashboard::PerlEnv::path_separator();
+my ($first_skill_perl5lib) = split /\Q$perl5lib_sep\E/, $env{PERL5LIB}, 2;
+is(
+    $first_skill_perl5lib,
+    File::Spec->catdir( $proj_runner, 'lib' ),
+    '_skill_env puts the command-providing skill lib first in PERL5LIB before shared libraries',
+);
 my %env_min = $disp->_skill_env( skill_path => $proj_runner );
 ok( $env_min{PERL5LIB}, '_skill_env works without an explicit skill_layers list' );
 {
     my $died = !eval { $disp->_skill_env( skill_name => 'x' ); 1 };
     ok( $died, '_skill_env dies without a skill path' );
+}
+
+# _prepend_skill_lib_to_perl_argv($argv, $skill_path)
+# Adds a skill's lib directory ahead of generic runtime paths for a Perl CLI.
+# Input: an argv array reference and optional skill path.
+# Output: the same argv reference, updated only for valid Perl script commands.
+{
+    my $helper = \&Developer::Dashboard::SkillDispatcher::_prepend_skill_lib_to_perl_argv;
+    is( $helper->('not-an-array', $proj_runner), 'not-an-array',
+        'Perl lib prepending leaves non-array command values untouched' );
+    my $short = [$^X, 'script'];
+    is( $helper->( $short, $proj_runner ), $short,
+        'Perl lib prepending leaves an incomplete Perl argv untouched' );
+    my $other = ['not-perl', '-I', 'dashboard-lib', 'script'];
+    is( $helper->( $other, $proj_runner ), $other,
+        'Perl lib prepending leaves non-Perl command vectors untouched' );
+
+    my $perl_argv = [$^X, '-I', 'dashboard-lib', 'script'];
+    is( $helper->( $perl_argv, undef ), $perl_argv,
+        'Perl lib prepending leaves an undefined skill path untouched' );
+    is( $helper->( $perl_argv, '' ), $perl_argv,
+        'Perl lib prepending leaves an empty skill path untouched' );
+
+    my $without_lib = mkd( File::Spec->catdir( $tmp, 'skill-without-lib' ) );
+    is( $helper->( $perl_argv, $without_lib ), $perl_argv,
+        'Perl lib prepending leaves commands alone when the skill has no lib directory' );
+
+    my $skill_lib = File::Spec->catdir( $proj_runner, 'lib' );
+    mkd($skill_lib);
+    my $with_lib = [$^X, '-I', 'dashboard-lib', 'script'];
+    is( $helper->( $with_lib, $proj_runner ), $with_lib,
+        'Perl lib prepending returns the original argv reference' );
+    is_deeply( [ @{$with_lib}[ 0 .. 2 ] ], [ $^X, '-I', $skill_lib ],
+        'Perl lib directory is inserted immediately after the interpreter' );
 }
 
 # ---------------------------------------------------------------------------
@@ -373,6 +466,9 @@ is( $seg->{skill_name}, 'runner', 'resolve_route_segments finds the installed pr
 
 is_deeply( [ $disp->_command_root_specs(undef) ], [], '_command_root_specs guards an undef list' );
 is_deeply( [ $disp->_command_root_specs( [] ) ],  [], '_command_root_specs guards an empty list' );
+my @unsafe_nested_specs = $disp->_command_root_specs( [ 'initchild/..', 'grandinit' ] );
+ok( !grep( { $_->{init_only} || @{ $_->{nested_segments} } } @unsafe_nested_specs ),
+    '_command_root_specs does not treat path-traversal command segments as nested skill names' );
 
 # ---------------------------------------------------------------------------
 # _nested_skill_path() edge inputs.
@@ -389,7 +485,41 @@ is( $disp->command_spec( 'runner', '' ), undef, 'command_spec guards a missing c
 ok( $disp->command_spec( 'runner', 'greet' ), 'command_spec resolves a runnable command' );
 is( $disp->_command_spec( 'runner', '.' ), undef, '_command_spec guards a dotted command that splits to nothing' );
 ok( $disp->_command_spec( 'runner', 'child.sub' ), '_command_spec resolves a nested dotted command' );
+ok( $disp->_command_spec( 'runner', 'child.grand.deep' ), '_command_spec resolves a multi-level nested dotted command' );
 is( $disp->_command_spec( 'runner', 'missingchild.sub' ), undef, '_command_spec skips a missing nested provider path' );
+
+# DD-954: a nested skill's cli/<command> never exists, but its cli/__init__
+# does - _command_spec must fall back to __init__ rather than reporting no
+# match, once nothing more specific resolves.
+{
+    my $init_spec = $disp->_command_spec( 'runner', 'initchild.anything' );
+    ok( $init_spec, '_command_spec falls back to the nested skill\'s cli/__init__ when no explicit command file exists' );
+    like( $init_spec->{cmd_path}, qr{initchild.*cli.*__init__\z}, 'the resolved cmd_path is the __init__ script itself' );
+    is( $init_spec->{command_name}, 'anything', 'command_name still reports the token that was actually typed' );
+}
+{
+    my $nested_init_spec = $disp->_command_spec( 'runner', 'initchild' );
+    ok( $nested_init_spec, '_command_spec resolves a nested skill invoked by its own name to cli/__init__' );
+    like( $nested_init_spec->{cmd_path}, qr{initchild.*cli.*__init__\z}, 'a nested skill initializer resolves at its own level' );
+
+    my $deep_init_spec = $disp->_command_spec( 'runner', 'initchild.grandinit' );
+    ok( $deep_init_spec, '_command_spec resolves an initializer at a deeper nested-skill level' );
+    like( $deep_init_spec->{cmd_path}, qr{grandinit.*cli.*__init__\z}, 'the deepest nested initializer wins over its parent initializer' );
+
+    my $nested_init_result = $disp->dispatch( 'runner', 'initchild', 'one', 'two' );
+    is( $nested_init_result->{exit_code}, 0, 'direct invocation of nested __init__ exits successfully' );
+    like( $nested_init_result->{stdout}, qr/initchild-self one two/, 'direct invocation of nested __init__ receives arguments' );
+
+    my $deep_init_result = $disp->dispatch( 'runner', 'initchild.grandinit', 'three' );
+    is( $deep_init_result->{exit_code}, 0, 'direct invocation of deeply nested __init__ exits successfully' );
+    like( $deep_init_result->{stdout}, qr/grandinit-self three/, 'deepest nested __init__ executes instead of its parent initializer' );
+
+    my $deep_command_result = $disp->dispatch( 'runner', 'initchild.grandinit.task', 'four' );
+    is( $deep_command_result->{exit_code}, 0, 'an explicit deep nested command still executes successfully' );
+    like( $deep_command_result->{stdout}, qr/grandinit-task four/, 'explicit deep command takes precedence over every __init__ fallback' );
+}
+is( $disp->_command_spec( 'runner', 'missingchild.anything' ), undef,
+    '__init__ fallback still does not invent a provider path that does not exist at all' );
 is( $disp->command_path( 'runner', '' ), undef, 'command_path guards a missing command name' );
 ok( $disp->command_path( 'runner', 'greet' ), 'command_path returns the runnable path' );
 
@@ -437,12 +567,32 @@ ok( scalar @{ $disp->all_skill_nav_pages },       'all_skill_nav_pages aggregate
 
 my $raw = $disp->_skill_page_response( skill_name => 'runner', route_id => 'index' );
 is( $raw->[0], 200, '_skill_page_response returns a raw page without an app' );
+my $saved_url = $disp->_skill_page_response( skill_name => 'runner', route_id => 'saved-url' );
+is( $saved_url->[0], 200, '_skill_page_response loads a saved URL skill bookmark without parsing it as instructions' );
+is( $saved_url->[2], 'http://127.0.0.1:7890/app/ch/sql?abc=123&def=456', '_skill_page_response preserves the saved URL content' );
 my $zero = $disp->_skill_page_response( skill_name => 'runner', route_id => 'nav/zero.tt' );
 is( $zero->[0], 200, '_skill_page_response falls back to canonical_instruction for a false raw body' );
 my $missing = $disp->_skill_page_response( skill_name => 'runner', route_id => 'ghost' );
 is( $missing->[0], 404, '_skill_page_response returns 404 for a missing page' );
 
 my $app = Local::StubApp->new;
+my $saved_url_redirect = $disp->_skill_page_response(
+    skill_name   => 'runner',
+    route_id     => 'saved-url',
+    app          => $app,
+    query_params => { abc => 111, hij => 999 },
+);
+is( $saved_url_redirect->[0], 302, '_skill_page_response redirects a saved URL skill bookmark through the web app' );
+is( $saved_url_redirect->[3]{Location}, 'http://127.0.0.1:7890/app/ch/sql?abc=111&def=456&hij=999', 'saved URL skill bookmark merges request query values into its target' );
+my $saved_url_body_redirect = $disp->_skill_page_response(
+    skill_name => 'runner',
+    route_id   => 'saved-url',
+    app        => $app,
+    body_params => { abc => 'body-only' },
+);
+is( URI->new( $saved_url_body_redirect->[3]{Location} )->query,
+    'abc=body-only&def=456',
+    'saved URL bookmark redirect accepts body parameters when query parameters are absent' );
 my $with_app = $disp->_skill_page_response(
     skill_name   => 'runner',
     route_id     => 'index',
@@ -784,9 +934,11 @@ t/104-skilldispatcher-coverage.t - branch and condition coverage for the skill d
 
 This test drives C<Developer::Dashboard::SkillDispatcher> across every command,
 hook, bookmark, route, and configuration code path so the release coverage gate
-keeps the module at full branch and condition coverage. It builds a two-layer
-installed-skill tree on disk, actually executes skill commands and their sorted
-hook files, and pushes each helper through its guard clauses and error paths.
+can measure those paths. It builds a two-layer installed-skill tree on disk,
+actually executes skill commands and their sorted hook files, and pushes each
+helper through its guard clauses and error paths. Its nested-command fixtures
+cover both direct and multi-level C<cli/__init__> dispatch, explicit-command
+precedence, argument forwarding, and traversal rejection.
 
 =head1 WHY IT EXISTS
 
@@ -806,8 +958,11 @@ routes.json schema handling in the skill dispatcher.
 =head1 HOW TO USE
 
 Run C<prove -lv t/104-skilldispatcher-coverage.t> while iterating, and run it
-under C<HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t> to confirm the
-dispatcher stays at full coverage before release.
+under C<HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t> as part of the full
+coverage gate before release. The Docker development service can run the
+focused test with:
+
+  d2 docker compose exec dev prove -lv t/104-skilldispatcher-coverage.t
 
 =head1 WHAT USES IT
 
@@ -826,8 +981,10 @@ Run the dispatcher coverage regression by itself.
 
 Example 2:
 
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+  dashboard nest.child
 
-Re-check the module under the repository coverage gate.
+Invoke the nested skill's C<cli/__init__> at the matching dotted depth.
+
+The full repository coverage gate is separate from this focused regression.
 
 =cut

@@ -9,11 +9,21 @@ use utf8;
 # "fork failed" arms is to override the global fork op before the module under
 # test is compiled. The override stays transparent unless a test opts in.
 our $FORK_OVERRIDE;
+our $EXIT_OVERRIDE;
+our $KILL_OVERRIDE;
 
 BEGIN {
     *CORE::GLOBAL::fork = sub {
         return $main::FORK_OVERRIDE->() if $main::FORK_OVERRIDE;
         return CORE::fork();
+    };
+    *CORE::GLOBAL::exit = sub {
+        return $main::EXIT_OVERRIDE->(@_) if $main::EXIT_OVERRIDE;
+        return CORE::exit(@_);
+    };
+    *CORE::GLOBAL::kill = sub {
+        return $main::KILL_OVERRIDE->(@_) if $main::KILL_OVERRIDE;
+        return CORE::kill(@_);
     };
 }
 
@@ -130,6 +140,24 @@ ok( $paths->home_runtime_path, 'hermetic path registry resolves a home runtime p
     sub PRINT { return 1 }
 
     sub CLOSE { return 1 }
+}
+
+{
+    package Local::Runner;
+
+    sub new { return bless { parsed => undef, ran => undef }, shift }
+
+    sub parse_options {
+        my ( $self, @options ) = @_;
+        $self->{parsed} = \@options;
+        return 1;
+    }
+
+    sub run {
+        my ( $self, $app ) = @_;
+        $self->{ran} = $app;
+        return 1;
+    }
 }
 
 # _tied_handle($package)
@@ -1210,6 +1238,304 @@ my $ssl_daemon = Developer::Dashboard::Web::Server::Daemon->new(
     };
     ok( !$key_missing, 'certificate path lookup fails when the private key file is absent' );
     like( $@, qr/Key file not found/, 'certificate path lookup names the missing key file' );
+}
+
+# --- server entry points and SSL-only branches -----------------------------
+{
+    my $plain = Developer::Dashboard::Web::Server->new(
+        app                   => $app,
+        ssl                   => 0,
+        ssl_subject_alt_names => 'not-an-array',
+    );
+    is( $plain->{ssl}, 0, 'constructor accepts an explicit false SSL flag' );
+    is_deeply( $plain->{ssl_subject_alt_names}, [], 'constructor ignores non-array SAN input' );
+
+    my $https = bless { ssl => 1, workers => 1 }, 'Developer::Dashboard::Web::Server';
+    my $empty_daemon = Developer::Dashboard::Web::Server::Daemon->new( host => undef, port => undef );
+    my $http_url = $plain->listening_url($empty_daemon);
+    is( $http_url, 'http://localhost:7890/', 'HTTP URL defaults missing daemon host and port' );
+    is(
+        $https->listening_url($empty_daemon),
+        'https://localhost:7890/',
+        'HTTPS URL defaults missing daemon host and port',
+    );
+
+    my $plain_daemon = Developer::Dashboard::Web::Server::Daemon->new( host => '127.0.0.1', port => 17920 );
+    my $https_daemon = Developer::Dashboard::Web::Server::Daemon->new(
+        host => '127.0.0.1', port => 17921,
+        internal_host => '127.0.0.1', internal_port => 17922,
+    );
+    no warnings 'redefine';
+    local *Plack::Runner::new = sub { return Local::Runner->new };
+    local *Developer::Dashboard::Web::Server::get_ssl_cert_paths = sub { return ( 'server.crt', 'server.key' ) };
+
+    my $plain_runner = $plain->_build_runner($plain_daemon);
+    is_deeply(
+        $plain_runner->{parsed},
+        [ '--server', 'Starman', '--host', '127.0.0.1', '--port', 17920, '--env', 'deployment', '--workers', 1 ],
+        'runner uses the public listener and omits SSL options for a plain server',
+    );
+    my $ssl_runner = $https->_build_runner($https_daemon);
+    is_deeply(
+        $ssl_runner->{parsed},
+        [ '--server', 'Starman', '--host', '127.0.0.1', '--port', 17922, '--env', 'deployment', '--workers', 1,
+          '--ssl', 1, '--ssl-key', 'server.key', '--ssl-cert', 'server.crt' ],
+        'runner selects the internal SSL listener and adds the certificate options',
+    );
+
+    my $plain_app = sub { return [ 200, [], ['plain'] ] };
+    local *Developer::Dashboard::Web::Server::_build_runner = sub { return $plain_runner };
+    local *Developer::Dashboard::Web::Server::psgi_app = sub { return $plain_app };
+    my $served = $plain->serve_daemon($plain_daemon);
+    is( $served, 1, 'plain serve_daemon runs the PSGI app through Plack::Runner' );
+    is( $plain_runner->{ran}, $plain_app, 'plain runner receives the built PSGI app' );
+
+    my $ssl_served = 0;
+    local *Developer::Dashboard::Web::Server::_serve_ssl_frontend = sub { $ssl_served++; return 1 };
+    is( $https->serve_daemon($https_daemon), 1, 'SSL serve_daemon delegates to its public frontend' );
+    is( $ssl_served, 1, 'SSL frontend is called once' );
+}
+
+{
+    my $built_args;
+    my $inner = sub { return [ 200, [], ['inner'] ] };
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::DancerApp::build_psgi_app = sub {
+        my ( $class, %args ) = @_;
+        $built_args = \%args;
+        return $inner;
+    };
+    my $plain = bless { app => $app, ssl => 0, paths => $paths }, 'Developer::Dashboard::Web::Server';
+    is( $plain->psgi_app, $inner, 'plain PSGI app is returned without an SSL wrapper' );
+    is( $built_args->{paths}, $paths, 'PSGI construction receives the path registry' );
+    ok( $built_args->{default_headers}{'X-Content-Type-Options'}, 'PSGI construction receives default security headers' );
+
+    my $https = bless { app => $app, ssl => 1, paths => $paths }, 'Developer::Dashboard::Web::Server';
+    my $redirected = 0;
+    local *Developer::Dashboard::Web::Server::_ssl_redirect_response = sub { $redirected++; return ['redirect'] };
+    my $wrapped = $https->psgi_app;
+    is_deeply( $wrapped->({ 'psgi.url_scheme' => 'http' }), ['redirect'], 'SSL PSGI wrapper redirects plaintext requests' );
+    is( $redirected, 1, 'SSL redirect response is requested once' );
+    is_deeply( $wrapped->({ 'psgi.url_scheme' => 'https' }), [ 200, [], ['inner'] ], 'SSL PSGI wrapper passes HTTPS requests through' );
+}
+
+{
+    my $run_saw_proxy_flag;
+    my $runner = Local::Runner->new;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::Server::_build_runner = sub { return $runner };
+    local *Developer::Dashboard::Web::Server::psgi_app = sub { return sub { return [200, [], []] } };
+    local *Local::Runner::run = sub { $run_saw_proxy_flag = $ENV{DEVELOPER_DASHBOARD_SSL_PROXIED}; return 1 };
+    is( $ssl_server->_run_ssl_backend_process($ssl_daemon), 0, 'SSL backend process returns a successful runner status' );
+    is( $run_saw_proxy_flag, 1, 'SSL backend marks its worker tree as proxy-originated' );
+    ok( !exists $ENV{DEVELOPER_DASHBOARD_SSL_PROXIED}, 'proxy-origin marker is restored after the backend call' );
+}
+
+{
+    my $daemon = Developer::Dashboard::Web::Server::Daemon->new( host => '127.0.0.1', port => 17923 );
+    my $listener = Local::StubSocket->new( closeable => 1 );
+    no warnings 'redefine';
+    local *IO::Socket::INET::new = sub { return $listener };
+    is(
+        $ssl_server->_open_ssl_frontend_listener_or_die( daemon => $daemon, backend_pid => 1234, reaped_children => {} ),
+        $listener,
+        'SSL listener helper returns a successfully bound public listener',
+    );
+
+    my @stopped;
+    local *IO::Socket::INET::new = sub { return };
+    local *Developer::Dashboard::Web::Server::_stop_ssl_backend = sub { push @stopped, [@_]; return 1 };
+    my $ok = eval { $ssl_server->_open_ssl_frontend_listener_or_die( daemon => $daemon, backend_pid => 9876 ); 1 };
+    ok( !$ok, 'SSL listener helper fails when the public bind cannot be reserved' );
+    like( $@, qr/Unable to bind SSL frontend/, 'SSL listener bind failure is explicit' );
+    is( $stopped[0][0], 9876, 'failed public bind shuts down the backend process' );
+}
+
+{
+    socketpair( my $client, my $peer, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+      or die "Unable to build TLS peek fixture: $!";
+    syswrite( $peer, "\x16" ) == 1 or die "Unable to prime TLS peek fixture: $!";
+    my $backend = _tied_handle('Local::WorkingHandle');
+    my $proxied = 0;
+    no warnings 'redefine';
+    local *IO::Socket::INET::new = sub { return $backend };
+    local *Developer::Dashboard::Web::Server::_proxy_streams = sub { $proxied++; return 1 };
+    is(
+        $ssl_server->_handle_ssl_frontend_client( client => $client, daemon => $ssl_daemon ),
+        1,
+        'frontend routes a TLS handshake byte to the internal backend',
+    );
+    is( $proxied, 1, 'frontend proxies the TLS client stream exactly once' );
+    close $client or die "Unable to close TLS peek fixture client: $!";
+    close $peer or die "Unable to close TLS peek fixture peer: $!";
+}
+
+{
+    socketpair( my $client, my $peer, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+      or die "Unable to build HTTP redirect fixture: $!";
+    my $request = "GET /alpha?x=1 HTTP/1.1\r\nHost: localhost:7890\r\n\r\n";
+    syswrite( $peer, $request ) == length($request) or die "Unable to prime HTTP redirect fixture: $!";
+    my $daemon = Developer::Dashboard::Web::Server::Daemon->new( host => '127.0.0.1', port => 7890 );
+    is(
+        $ssl_server->_handle_ssl_frontend_client( client => $client, daemon => $daemon ),
+        1,
+        'frontend handles a plain HTTP request on the public SSL port',
+    );
+    my $response = '';
+    sysread( $peer, $response, 2048 );
+    like( $response, qr{Location: https://localhost:7890/alpha\?x=1}, 'plain HTTP response carries the safe HTTPS redirect' );
+    close $client or die "Unable to close HTTP redirect fixture client: $!";
+    close $peer or die "Unable to close HTTP redirect fixture peer: $!";
+}
+
+{
+    my $captured = '';
+    my $server = _redirect_server();
+    my $head = "POST /submit HTTP/1.1\r\nHost: localhost\r\n\r\nbody";
+    socketpair( my $client, my $peer, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+      or die "Unable to build complete request-head fixture: $!";
+    syswrite( $peer, $head ) == length($head) or die "Unable to prime complete request-head fixture: $!";
+    $captured = Developer::Dashboard::Web::Server::_read_http_request_head($client);
+    is( $captured, "POST /submit HTTP/1.1\r\nHost: localhost\r\n\r\n", 'request-head reader returns through the complete header terminator' );
+    close $client or die "Unable to close request-head fixture client: $!";
+    close $peer or die "Unable to close request-head fixture peer: $!";
+
+    is( Developer::Dashboard::Web::Server::_request_target_from_head("BROKEN\r\n"), '/', 'malformed request line defaults to the root target' );
+    is(
+        $server->_request_host_from_head(
+            "GET / HTTP/1.1\r\nHost: localhost:8443\r\n\r\n",
+            Developer::Dashboard::Web::Server::Daemon->new( host => '127.0.0.1', port => 7890 ),
+        ),
+        'localhost:8443',
+        'request-host helper preserves an allowlisted authority and custom public port',
+    );
+    like( Developer::Dashboard::Web::Server::_http_redirect_response(), qr{Location: https://127\.0\.0\.1/}, 'raw redirect response supplies both default authority and target' );
+}
+
+{
+    socketpair( my $client, my $client_peer, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+      or die "Unable to build proxy success client fixture: $!";
+    socketpair( my $backend, my $backend_peer, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+      or die "Unable to build proxy success backend fixture: $!";
+    my $request = 'client-to-backend';
+    my $reply = 'backend-to-client';
+    syswrite( $client_peer, $request ) == length($request) or die "Unable to prime proxy client payload: $!";
+    syswrite( $backend_peer, $reply ) == length($reply) or die "Unable to prime proxy backend payload: $!";
+    shutdown( $client_peer, 1 ) or die "Unable to half-close proxy client fixture: $!";
+    shutdown( $backend_peer, 1 ) or die "Unable to half-close proxy backend fixture: $!";
+    is( Developer::Dashboard::Web::Server::_proxy_streams( $client, $backend ), 1, 'proxy forwards each socket direction until both peers close' );
+    my ( $client_data, $backend_data ) = ( '', '' );
+    sysread( $client_peer, $client_data, 1024 );
+    sysread( $backend_peer, $backend_data, 1024 );
+    is( $client_data, $reply, 'backend bytes reach the public client' );
+    is( $backend_data, $request, 'client bytes reach the internal backend' );
+    close $_ or die "Unable to close proxy success fixture socket: $!" for ( $client, $client_peer, $backend, $backend_peer );
+}
+
+{
+    is( Developer::Dashboard::Web::Server::_request_is_https(undef), 0, 'HTTPS detector rejects non-hash PSGI environments' );
+    is( Developer::Dashboard::Web::Server::_request_is_https({ 'psgi.url_scheme' => 'http' }), 0, 'HTTPS detector rejects a plain HTTP scheme' );
+    is( Developer::Dashboard::Web::Server::_request_is_https({ 'psgi.url_scheme' => 'HTTPS' }), 1, 'HTTPS detector accepts a case-insensitive HTTPS scheme' );
+    is( Developer::Dashboard::Web::Server::_request_is_https({ HTTP_X_FORWARDED_PROTO => 'HTTPS' }), 1, 'HTTPS detector accepts trusted forwarded HTTPS' );
+    is( Developer::Dashboard::Web::Server::_request_is_https({}), 0, 'HTTPS detector handles absent scheme and forwarding headers' );
+
+    my $server = _redirect_server();
+    my $redirect = $server->_ssl_redirect_response({ SERVER_NAME => 'localhost', PATH_INFO => '/secure' });
+    is( $redirect->[0], 307, 'HTTPS enforcement returns temporary-redirect status' );
+    is( $redirect->[2][0], 'Redirecting to HTTPS', 'HTTPS enforcement includes a plain-text explanation' );
+    is( $server->_https_redirect_location({ SCRIPT_NAME => '/mount', PATH_INFO => '/page' }), 'https://127.0.0.1/mount/page', 'redirect URL preserves a defined PSGI script mount prefix' );
+}
+
+{
+    is( Developer::Dashboard::Web::Server::_stop_ssl_backend(4242), 1, 'backend stop helper signals a known backend and waits for it' );
+    my @signals;
+    local $main::KILL_OVERRIDE = sub { push @signals, [@_]; return 1 };
+    is( Developer::Dashboard::Web::Server::_signal_default_term(), 1, 'default TERM helper re-signals the current process through the signal adapter' );
+    is_deeply( $signals[0], [ 15, $$ ], 'default TERM helper targets the current process with TERM' );
+
+    my %already = ();
+    local *Developer::Dashboard::Web::Server::_waitpid = sub { return 4421 };
+    is( Developer::Dashboard::Web::Server::_wait_for_managed_child(4421), 1, 'managed wait accepts the requested child pid' );
+    local *Developer::Dashboard::Web::Server::_waitpid = sub { return -1 };
+    is( Developer::Dashboard::Web::Server::_wait_for_managed_child(4422), 1, 'managed wait accepts an already-vanished child' );
+    local *Developer::Dashboard::Web::Server::_waitpid = sub { return 0 };
+    is( Developer::Dashboard::Web::Server::_wait_for_managed_child(4423), 1, 'managed wait returns cleanly when waitpid reports no child yet' );
+
+    my %reaped;
+    my @wait_results = ( 501, 502, 0 );
+    local *Developer::Dashboard::Web::Server::_waitpid = sub { return shift @wait_results };
+    is( Developer::Dashboard::Web::Server::_reap_ssl_children(\%reaped), 1, 'SSL child reaper drains all completed children' );
+    is_deeply( \%reaped, { 501 => 1, 502 => 1 }, 'SSL child reaper records each collected pid' );
+
+    local $Developer::Dashboard::Web::Server::SSL_BACKEND_PID = 7744;
+    local %Developer::Dashboard::Web::Server::SSL_PREVIOUS_SIGNAL = ( TERM => sub { push @signals, ['old-term'] } );
+    local *Developer::Dashboard::Web::Server::_stop_ssl_backend = sub { push @signals, ['stop', $_[0]]; return 1 };
+    is( Developer::Dashboard::Web::Server::_ssl_term_handler(), 1, 'TERM cleanup stops backend then chains the prior callback' );
+    is( Developer::Dashboard::Web::Server::_ssl_int_handler(), 1, 'INT cleanup handles an absent prior signal action' );
+    is( Developer::Dashboard::Web::Server::_ssl_hup_handler(), 1, 'HUP cleanup handles an absent prior signal action' );
+    is( $signals[-1][0], 'stop', 'signal cleanup records the backend stop' );
+    is( Developer::Dashboard::Web::Server::_run_previous_signal('IGNORE'), 1, 'IGNORE signal action needs no further dispatch' );
+    my $previous_called = 0;
+    is( Developer::Dashboard::Web::Server::_run_previous_signal(sub { $previous_called++ }), 1, 'custom signal callback is invoked' );
+    is( $previous_called, 1, 'custom previous signal callback runs exactly once' );
+    local $main::KILL_OVERRIDE = sub { push @signals, ['default', @_]; return 1 };
+    is( Developer::Dashboard::Web::Server::_run_previous_signal('DEFAULT'), 1, 'DEFAULT signal action dispatches through the TERM helper' );
+}
+
+{
+    my $pid = CORE::fork();
+    die "Unable to isolate SSL child-handler test: $!" if !defined $pid;
+    if ( !$pid ) {
+        socketpair( my $client, my $peer, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+          or CORE::exit(30);
+        local @Local::ScriptedListener::ACCEPTS = ( sub { return $client } );
+        my $fork_count = 0;
+        local $main::FORK_OVERRIDE = sub { return ++$fork_count == 1 ? 991111 : 0 };
+        local $main::EXIT_OVERRIDE = sub { $Developer::Dashboard::Web::Server::SSL_SHUTDOWN_REQUESTED = 1; return 1 };
+        no warnings 'redefine';
+        local *IO::Socket::INET::new = sub { return Local::ScriptedListener->new };
+        local *Developer::Dashboard::Web::Server::_handle_ssl_frontend_client = sub { return 1 };
+        local *Developer::Dashboard::Web::Server::_stop_ssl_backend = sub { return 1 };
+        local *Developer::Dashboard::Web::Server::_wait_for_managed_child = sub { return 1 };
+        my $result = $ssl_server->_serve_ssl_frontend($ssl_daemon);
+        CORE::exit( $result == 1 ? 0 : 31 );
+    }
+    waitpid( $pid, 0 );
+    is( $? >> 8, 0, 'SSL frontend connection child handles the client, exits, and allows parent cleanup' );
+}
+
+{
+    my $reached = 0;
+    local @Local::ScriptedListener::ACCEPTS = ( sub { $Developer::Dashboard::Web::Server::SSL_SHUTDOWN_REQUESTED = 1; $! = EINTR; return } );
+    local $main::FORK_OVERRIDE = sub { return 991222 };
+    no warnings 'redefine';
+    local *IO::Socket::INET::new = sub { return Local::ScriptedListener->new };
+    local *Developer::Dashboard::Web::Server::_stop_ssl_backend = sub { $reached++; return 1 };
+    local *Developer::Dashboard::Web::Server::_wait_for_managed_child = sub { return 1 };
+    is( $ssl_server->_serve_ssl_frontend($ssl_daemon), 1, 'SSL accept loop exits on EINTR after shutdown has been requested' );
+    is( $reached, 1, 'SSL accept shutdown still stops its backend' );
+}
+
+{
+    my $profile = File::Spec->catfile( $home, 'legacy-profile.crt' );
+    _write_file( $profile, "placeholder certificate\n" );
+    my $calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::Server::capture = sub {
+        $calls++;
+        return (
+            "Basic Constraints: critical\n                CA:FALSE\n"
+              . "Extended Key Usage:\n                TLS Web Server Authentication\n"
+              . "Key Usage: critical\n                Digital Signature, Key Encipherment\n",
+            '', 0,
+        ) if $calls == 1;
+        return ( '', 'verify rejected the fixture', 1 );
+    };
+    is(
+        Developer::Dashboard::Web::Server::_ssl_cert_has_expected_profile($profile),
+        0,
+        'certificate profile rejects a failed openssl SAN verification command',
+    );
 }
 
 done_testing;

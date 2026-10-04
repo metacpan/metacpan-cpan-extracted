@@ -41,6 +41,20 @@
  * that is valid UTF-8 is taken as UTF-8, and anything else as latin-1 and
  * upgraded. Valid UTF-8 is not something latin-1 prose falls into by accident.
  *
+ * WHAT is_utf8_string ACCEPTS, and why that is still the right question here.
+ * It accepts perl's UTF-8, which is a superset of Unicode's: the surrogates
+ * and codepoints above U+10FFFF encode without complaint. Those are exactly
+ * the ones XML forbids, so this test is not and cannot be the guard against
+ * them - pfeed_xml_cat is, on the decoded codepoint, below.
+ *
+ * Tightening this to a strict test instead would be the wrong repair. The
+ * question being asked here is only "are these bytes UTF-8 or latin-1", and a
+ * strict test answers "latin-1" for a byte string that really does hold an
+ * encoded surrogate - so a document would carry three bytes of mojibake where
+ * dropping one unusable character was wanted. Judging encoding here and
+ * judging what XML can carry at emit time keeps each answer where its
+ * question is.
+ *
  * Punk itself does not transcode - it hands the SV to the server as it came -
  * and being stricter here is deliberate. An HTML page with one bad byte
  * renders with one bad character; a feed with one bad byte is not well-formed
@@ -66,6 +80,83 @@ static const char *pfeed_u8(pTHX_ SV *in, STRLEN *lp)
     }
 }
 
+/* One UTF-8 sequence to a codepoint, for deciding whether XML can carry it.
+ *
+ * PERL'S UTF-8 and not Unicode's, deliberately. The SV reaching here may hold
+ * a surrogate or a codepoint above U+10FFFF, because perl permits both in a
+ * string and SvPV hands back their encoded bytes. Decoding has to ACCEPT those
+ * forms in order to recognise them, since they are precisely the ones XML
+ * cannot carry: a decoder that refused them would report "malformed" and a
+ * decoder that never ran would emit them.
+ *
+ * Sequence length comes from the start byte alone, counting its leading ones,
+ * with perl's FF form as the one special case. Nothing above four bytes has
+ * its value accumulated: every such codepoint is already past U+10FFFF, so the
+ * value is not needed, and skipping the arithmetic is also how this avoids
+ * overflowing a UV on the thirteen-byte form.
+ *
+ * *len is the bytes to step over and is ALWAYS at least one, so no caller can
+ * fail to make progress. *ok is 0 for a malformed sequence, whose bytes the
+ * caller drops: pfeed_u8 above has already made the input UTF-8, so this is
+ * the belt to that braces, and emitting a byte we could not read is the one
+ * outcome worse than dropping it. */
+#define PFEED_CP_TOO_BIG ((UV)0x110000)   /* a value that is never XML Char */
+
+static UV pfeed_cp(const char *s, STRLEN avail, STRLEN *len, int *ok)
+{
+    const U8 *p = (const U8 *)s;
+    U8 c = p[0];
+    int n, i;
+    UV uv;
+
+    *ok = 1;
+    if (c < 0x80) { *len = 1; return (UV)c; }
+
+    /* `big` rather than a sentinel value in uv: a flag cannot be reached by
+     * accumulation, and reasoning about whether it could is not worth the
+     * line it would save. */
+    {
+        int big = 0;
+        if      (c >= 0xC0 && c <= 0xDF) { n = 2;  uv = (UV)(c & 0x1F); }
+        else if (c >= 0xE0 && c <= 0xEF) { n = 3;  uv = (UV)(c & 0x0F); }
+        else if (c >= 0xF0 && c <= 0xF7) { n = 4;  uv = (UV)(c & 0x07); }
+        else if (c >= 0xF8 && c <= 0xFB) { n = 5;  big = 1; uv = 0; }
+        else if (c >= 0xFC && c <= 0xFD) { n = 6;  big = 1; uv = 0; }
+        else if (c == 0xFE)              { n = 7;  big = 1; uv = 0; }
+        else if (c == 0xFF)              { n = 13; big = 1; uv = 0; }
+        else { *len = 1; *ok = 0; return 0; }  /* a continuation byte, alone */
+
+        if ((STRLEN)n > avail) { *len = avail ? avail : 1; *ok = 0; return 0; }
+        for (i = 1; i < n; i++) {
+            if ((p[i] & 0xC0) != 0x80) { *len = (STRLEN)i; *ok = 0; return 0; }
+            if (!big) uv = (uv << 6) | (UV)(p[i] & 0x3F);
+        }
+        *len = (STRLEN)n;
+        return big ? PFEED_CP_TOO_BIG : uv;
+    }
+}
+
+/* XML 1.0 section 2.2, the Char production, and nothing looser:
+ *
+ *   Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
+ *                                            | [#x10000-#x10FFFF]
+ *
+ * So: the C0 controls other than tab, newline and carriage return; the
+ * surrogates; U+FFFE and U+FFFF; and everything above U+10FFFF. Note what is
+ * NOT excluded - U+007F is a legal Char, and so are the noncharacters outside
+ * the BMP. This implements the production rather than a notion of "unsafe
+ * text", because the production is what a parser applies. */
+static int pfeed_xml_char(UV c)
+{
+    if (c == 0x09 || c == 0x0A || c == 0x0D) return 1;
+    if (c <  0x20)    return 0;
+    if (c <= 0xD7FF)  return 1;
+    if (c <  0xE000)  return 0;        /* surrogates */
+    if (c <= 0xFFFD)  return 1;        /* and so U+FFFE, U+FFFF are out */
+    if (c <  0x10000) return 0;
+    return c <= 0x10FFFF;
+}
+
 /* XML escaping, over every emitted value without exception.
  *
  * One unescaped '&' makes the document not well-formed, and a reader rejects
@@ -75,23 +166,66 @@ static const char *pfeed_u8(pTHX_ SV *in, STRLEN *lp)
  *
  * Both quote characters are escaped, which is what makes one function safe in
  * an attribute as well as in text and removes the chance of picking the wrong
- * one at a call site. */
+ * one at a call site.
+ *
+ * AND WHAT XML CANNOT CARRY IS DROPPED, which is the other half of the same
+ * job and was missing until 0.04. Escaping five characters is only enough if
+ * every other byte is one a document may hold, and it is not: a feed carries
+ * text its operator never wrote - comments, submitted posts, forum threads,
+ * uploaded file names - and one C0 control or one surrogate anywhere in any
+ * entry makes the whole document fatally ill-formed. Every subscriber then
+ * loses every item, not the one entry, and the bytes are cached and re-served
+ * for the whole ttl.
+ *
+ * DROPPED and not escaped, because escaping is not available: &#1; and
+ * &#xD800; are as forbidden as the raw character. A character reference may
+ * only name a character the Char production already allows, so there is
+ * nothing to turn these into. XML 1.1 would take some of them; a feed is 1.0.
+ *
+ * CODEPOINT-WISE and not byte-wise, because a byte-wise C0 filter closes only
+ * the nearer of the two routes in. The other is that the bytes may legitimately
+ * encode a surrogate or something past U+10FFFF, which no byte in the sequence
+ * looks wrong on its own. */
 static void pfeed_xml_cat(pTHX_ SV *out, const char *s, STRLEN l)
 {
-    STRLEN i, start = 0;
-    for (i = 0; i < l; i++) {
-        const char *rep;
-        switch (s[i]) {
-            case '&':  rep = "&amp;";  break;
-            case '<':  rep = "&lt;";   break;
-            case '>':  rep = "&gt;";   break;
-            case '"':  rep = "&quot;"; break;
-            case '\'': rep = "&apos;"; break;
-            default:   continue;
+    STRLEN i = 0, start = 0;
+
+    while (i < l) {
+        unsigned char c = (unsigned char)s[i];
+        const char *rep = NULL;
+        STRLEN n = 1;
+
+        /* Every path below either `continue`s - keeping these bytes in the
+         * run being accumulated - or falls through to the flush, where `rep`
+         * says whether an entity replaces the n bytes or nothing does. */
+        if (c < 0x80) {
+            switch (c) {
+                case '&':  rep = "&amp;";  break;
+                case '<':  rep = "&lt;";   break;
+                case '>':  rep = "&gt;";   break;
+                case '"':  rep = "&quot;"; break;
+                case '\'': rep = "&apos;"; break;
+                default:
+                    /* ASCII needs no decoding to be judged: tab, newline and
+                     * carriage return are Char, the rest of C0 is not, and
+                     * everything from 0x20 up is. */
+                    if (c >= 0x20 || c == 0x09 || c == 0x0A || c == 0x0D) {
+                        i++;
+                        continue;
+                    }
+                    break;                     /* a C0 control: dropped */
+            }
         }
+        else {
+            int ok;
+            UV uv = pfeed_cp(s + i, l - i, &n, &ok);
+            if (ok && pfeed_xml_char(uv)) { i += n; continue; }
+        }
+
         if (i > start) sv_catpvn(out, s + start, i - start);
-        sv_catpv(out, rep);
-        start = i + 1;
+        if (rep) sv_catpv(out, rep);
+        i += n;
+        start = i;
     }
     if (l > start) sv_catpvn(out, s + start, l - start);
 }

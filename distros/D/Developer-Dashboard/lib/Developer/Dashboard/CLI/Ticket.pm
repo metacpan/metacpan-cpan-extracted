@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Ticket;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -55,8 +55,7 @@ sub split_workspace_change_dir_args {
 }
 
 # registered_workspace_dir($name)
-# Resolves one workspace name through the same registered-paths inventory the
-# shell cdr helper uses: the path registry plus configured path aliases.
+# Resolves configured path aliases and skill Folder.pm methods like shell cdr.
 # Input: workspace name string.
 # Output: registered directory path string, or empty string when the name is
 # not registered.
@@ -76,7 +75,20 @@ sub registered_workspace_dir {
     my $files  = Developer::Dashboard::FileRegistry->new( paths => $paths );
     my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
     $paths->register_named_paths( $config->path_aliases );
+    # An unregistered name is the expected signal to try Folder.pm; all other
+    # PathRegistry failures must remain visible to the caller.
     my $target = eval { $paths->resolve_dir($name) };
+    my $resolve_error = $@;
+    die $resolve_error if $resolve_error ne '' && $resolve_error !~ /\AUnknown directory name /;
+    return $target if defined $target;
+
+    # Config aliases have first refusal. Resolve a skill Folder.pm method only
+    # after the normal registry lookup has no result.
+    require Developer::Dashboard::CLI::Paths;
+    $target = Developer::Dashboard::CLI::Paths::_skill_folder_alias_target(
+        paths => $paths,
+        name  => $name,
+    );
     return defined $target ? $target : '';
 }
 
@@ -191,32 +203,22 @@ sub exec_workspace_attach {
     # both safer and testable.
     my $argv = $args{args};
 
-    # Both sides of this guard ARE recorded, and the annotation that used to sit
-    # here claimed otherwise (DD-537, corrected under DD-532). It reasoned that
-    # passing the guard means reaching the exec below, which replaces the process
-    # image before Devel::Cover can write anything. That is true of the exec and
-    # false of the guard: a child that reaches the guard and is then replaced has
-    # already recorded this line, so the false side is covered - Devel::Cover
-    # flagged it as "marked uncoverable but covered", which is an error rather
-    # than a gap, and it was the whole of this file's missing branch coverage.
     die 'tmux args must be an array reference' if ref($argv) ne 'ARRAY';
 
-    # Neither line below can be recorded by Devel::Cover: exec replaces the
-    # process image, so the coverage database is never written from here, and a
-    # forked child that execs successfully takes its record with it. The guard
-    # above IS reachable and is tested; only the handoff itself is not.
-    # Shaped exactly like the handoffs in PageRuntime and SkillDispatcher, which
-    # both measure 100.0, because the wrapping `if` creates a branch Devel::Cover
-    # cannot measure: on a SUCCESSFUL exec the process is replaced before anything
-    # is recorded, and on a FAILING one the count lands on the exec line itself.
-    #
-    # The spec drives a failing exec (no tmux on PATH), so this statement IS
-    # executed and recorded. The die below is not: Devel::Cover cannot attribute a
-    # statement that follows a failed exec - the count lands on the exec - so it
-    # reports zero even though the test asserts its message. PageRuntime records
-    # exactly the same thing at its own handoff.
-    exec 'tmux', @{$argv};
-    die "Unable to exec tmux to attach the workspace session: $!\n";    # uncoverable statement
+    # The raw exec lives in _exec_tmux because Devel::Cover cannot attribute a
+    # statement that follows a failed exec in the same sub; tests replace
+    # _exec_tmux to reach the die below in-process.
+    _exec_tmux( @{$argv} );
+    die "Unable to exec tmux to attach the workspace session: $!\n";
+}
+
+# _exec_tmux(@args)
+# Performs the bare exec of tmux; returns only when the exec fails.
+# Input: tmux argument list.
+# Output: false when exec fails, never returns on success.
+sub _exec_tmux {
+    my (@args) = @_;
+    return exec 'tmux', @args;
 }
 
 # resolve_attach_runner(%args)
@@ -380,7 +382,8 @@ sub apply_ticket_status {
     my (%args) = @_;
     my $session = $args{session} || die 'Missing session name';
     my $tmux = $args{tmux} || \&tmux_command;
-    my $dashboard = $args{dashboard} || _dashboard_command_path();    # uncoverable condition false
+    my $dashboard = $args{dashboard};
+    $dashboard = _dashboard_command_path() if !$dashboard;
 
     my $default_status = _tmux_stdout(
         tmux => $tmux,
@@ -431,13 +434,13 @@ sub apply_ticket_status {
 # session_exists(%args)
 # Checks whether the requested tmux session already exists.
 # Input: session name and optional tmux runner coderef.
-# Output: 1 when the session exists, 0 when it does not, or dies on tmux errors.
+# Output: 1 when the normalized tmux session exists, 0 when it does not, or dies on tmux errors.
 sub session_exists {
     my (%args) = @_;
     my $session = $args{session} || die 'Missing session name';
     my $tmux = $args{tmux} || \&tmux_command;
     my $result = $tmux->(
-        args => [ 'has-session', '-t', $session ],
+        args => [ 'has-session', '-t', _tmux_session_name($session) ],
     );
 
     return 1 if $result->{exit_code} == 0;
@@ -446,6 +449,44 @@ sub session_exists {
       $session,
       ( $result->{stderr} || '' ),
       ( $result->{stdout} || '' );
+}
+
+# _tmux_session_name($workspace)
+# Converts the logical workspace reference to the tmux session identifier used
+# by tmux, which normalizes periods to underscores and treats a raw period as a
+# session/window target separator. Input: logical workspace name. Output: tmux
+# session name with periods mapped to underscores.
+sub _tmux_session_name {
+    my ($workspace) = @_;
+    die 'Missing session name' if !defined $workspace || $workspace eq '';
+    $workspace =~ s/\./_/g;
+    return $workspace;
+}
+
+# _verify_workspace_session_identity(%args)
+# Rejects reuse of a normalized tmux session already tagged for a different
+# logical workspace. Input: logical workspace, tmux-normalized session name,
+# and optional runner. Output: true if untagged or correctly tagged; dies on a
+# tmux query error or an identity collision.
+sub _verify_workspace_session_identity {
+    my (%args) = @_;
+    my $workspace = $args{workspace} || die 'Missing workspace name';
+    my $session = $args{tmux_session} || die 'Missing session name';
+    my $tmux = $args{tmux} || \&tmux_command;
+    my $result = $tmux->(
+        args => [ 'show-environment', '-t', $session, 'WORKSPACE_REF' ],
+    );
+    return 1 if $result->{exit_code} == 1;
+    die sprintf "Unable to verify tmux workspace session '%s': %s%s",
+      $session,
+      ( $result->{stderr} || '' ),
+      ( $result->{stdout} || '' )
+      if $result->{exit_code} != 0;
+
+    my ($owner) = ( $result->{stdout} || '' ) =~ /^WORKSPACE_REF=(.*)\r?$/m;
+    return 1 if !defined $owner || $owner eq '' || $owner eq $workspace;
+    die sprintf "Tmux session '%s' belongs to workspace '%s', not '%s'; tmux normalizes periods to underscores\n",
+      $session, $owner, $workspace;
 }
 
 # list_sessions(%args)
@@ -471,7 +512,7 @@ sub list_sessions {
 # build_workspace_plan(%args)
 # Builds the tmux create/attach plan for one workspace session request.
 # Input: args array reference, optional cwd/env_ticket/env_workspace values, and optional tmux runner coderef.
-# Output: hash reference describing the session, cwd, environment, and tmux argv lists.
+# Output: hash reference describing the logical workspace, normalized tmux session name, cwd, environment, and tmux argv lists.
 sub build_workspace_plan {
     my (%args) = @_;
     my $workspace = resolve_workspace_request(
@@ -483,6 +524,7 @@ sub build_workspace_plan {
     $plan_cwd = cwd() if !defined $plan_cwd || $plan_cwd eq '';
 
     my $env = workspace_environment( $workspace, cwd => $plan_cwd );
+    my $tmux_session = _tmux_session_name($workspace);
     my $exists = session_exists(
         session => $workspace,
         tmux    => $args{tmux},
@@ -495,6 +537,7 @@ sub build_workspace_plan {
 
     return {
         session     => $workspace,
+        tmux_session => $tmux_session,
         cwd         => $plan_cwd,
         env         => $env,
         exists      => $exists,
@@ -504,12 +547,12 @@ sub build_workspace_plan {
             '-d',
             @env_args,
             '-c', $plan_cwd,
-            '-s', $workspace,
+            '-s', $tmux_session,
             '-n', 'Code1',
         ],
         attach_argv => [
             'attach-session',
-            '-t', $workspace,
+            '-t', $tmux_session,
         ],
     };
 }
@@ -523,27 +566,36 @@ sub build_ticket_plan {
 }
 
 # run_workspace_command(%args)
-# Creates a tmux workspace session when needed and attaches to it.
-# Input: args array reference plus optional cwd/env_ticket/env_workspace values and optional tmux runner coderef.
+# Creates a tmux workspace session when needed and attaches to it; a registered
+# path alias also selects the starting directory when -c was not requested.
+# Input: args array reference plus optional cwd/env_ticket/env_workspace values
+# and optional tmux runner, attach runner, and directory resolver coderefs.
 # Output: plan hash reference after successful tmux create/attach operations.
 sub run_workspace_command {
     my (%args) = @_;
     my $tmux = $args{tmux} || \&tmux_command;
     my ( $workspace_args, $change_dir ) = split_workspace_change_dir_args( $args{args} || [] );
+    my $workspace = resolve_workspace_request(
+        args          => $workspace_args,
+        env_workspace => $args{env_workspace},
+        env_ticket    => $args{env_ticket},
+    );
+    my $resolver = $args{resolve_dir} || \&registered_workspace_dir;
+    my $target = $resolver->($workspace);
     if ($change_dir) {
-        my $workspace = resolve_workspace_request(
-            args          => $workspace_args,
-            env_workspace => $args{env_workspace},
-            env_ticket    => $args{env_ticket},
-        );
-        my $resolver = $args{resolve_dir} || \&registered_workspace_dir;
-        my $target = $resolver->($workspace);
         die "Workspace '$workspace' is not a registered dashboard path, so -c has no directory to change into\n"
           if !defined $target || $target eq '';
         die "Workspace '$workspace' resolves to '$target', which is not a directory\n"
           if !-d $target;
         chdir $target
           or die "Unable to change directory to '$target' for workspace '$workspace': $!\n";
+        $args{cwd} = $target;
+    }
+    elsif ( defined $target && $target ne '' ) {
+        die "Workspace path alias '$workspace' resolves to '$target', which is not a directory\n"
+          if !-d $target;
+        chdir $target
+          or die "Unable to change directory to '$target' for workspace path alias '$workspace': $!\n";
         $args{cwd} = $target;
     }
     my $plan = build_workspace_plan(
@@ -554,21 +606,51 @@ sub run_workspace_command {
 
     if ( $plan->{create} ) {
         my $created = $tmux->( args => $plan->{create_argv} );
-        die sprintf "Unable to create tmux ticket session '%s': %s%s",
-          $plan->{session},
-          ( $created->{stderr} || '' ),
-          ( $created->{stdout} || '' )
-          if $created->{exit_code} != 0;
+        if ( $created->{exit_code} != 0 ) {
+            my $create_detail = ( $created->{stderr} || '' ) . ( $created->{stdout} || '' );
+            if ( $create_detail =~ /duplicate session/i ) {
+                my ( $exists, $check_error );
+                my $checked = eval {
+                    $exists = session_exists(
+                        session => $plan->{session},
+                        tmux    => $tmux,
+                    );
+                    1;
+                };
+                $check_error = $@ if !$checked;
+                die sprintf "Unable to create tmux ticket session '%s': %sSession recheck failed: %s",
+                  $plan->{session}, $create_detail, $check_error
+                  if !$checked;
+                if ($exists) {
+                    $plan->{exists} = 1;
+                    $plan->{create} = 0;
+                }
+                else {
+                    die sprintf "Unable to create tmux ticket session '%s': %s",
+                      $plan->{session}, $create_detail;
+                }
+            }
+            else {
+                die sprintf "Unable to create tmux ticket session '%s': %s",
+                  $plan->{session}, $create_detail;
+            }
+        }
     }
 
+    _verify_workspace_session_identity(
+        workspace    => $plan->{session},
+        tmux_session => $plan->{tmux_session},
+        tmux         => $tmux,
+    ) if $plan->{exists};
+
     apply_workspace_environment(
-        session => $plan->{session},
+        session => $plan->{tmux_session},
         env     => $plan->{env},
         tmux    => $tmux,
     );
 
     apply_ticket_status(
-        session => $plan->{session},
+        session => $plan->{tmux_session},
         tmux    => $tmux,
     );
 
@@ -621,10 +703,15 @@ the dashboard toolchain without installing a public top-level executable.
 
 =head1 PURPOSE
 
-This module owns the ticket-session runtime behind C<dashboard ticket>. It
-resolves the requested ticket reference, builds the C<tmux> environment for
-that ticket, decides whether the session already exists, creates the session
-when needed, and attaches the terminal to the chosen ticket session.
+This module owns the workspace-session runtime behind C<dashboard workspace>.
+It resolves the requested workspace reference, builds the C<tmux> environment,
+decides whether the session already exists, creates the session when needed,
+and attaches the terminal to the chosen workspace session. Logical dotted names
+are mapped to tmux's underscore-normalized names because tmux parses a period as
+a session/window target separator. Existing tagged sessions are checked against
+C<WORKSPACE_REF> to avoid reusing a name collision for another workspace.
+If concurrent callers race to create the same session, a duplicate-session
+response is accepted only after a second tmux query confirms the session exists.
 
 =head1 WHY IT EXISTS
 
@@ -647,7 +734,24 @@ the seeded C<TICKET_REF>/C<B>/C<OB> environment set. Without an explicit
 argument, the module falls back to C<$ENV{TICKET_REF}> when present. If the
 session does not exist it creates a detached C<Code1> window in the current
 working directory before attaching; if the session already exists it skips
-creation and attaches directly.
+creation and attaches directly. Dotted workspace references use underscores in
+the tmux session name while their original dotted value remains in
+C<WORKSPACE_REF>. If a normalized name is tagged for another workspace, the
+command reports the collision instead of attaching to that unrelated session.
+If another caller creates the session between the initial check and create
+request, it rechecks the named session and attaches only after confirming the
+duplicate exists; unrelated create errors remain visible.
+
+The C<-c> option may appear before or after the workspace name. It resolves
+configured path aliases first, then skill-qualified methods from each installed
+skill's C<lib/Folder.pm> through the shared validated C<d2 paths>/C<cdr>
+loader. Dotted nested-skill names are supported at arbitrary installed depth,
+for example C<parent.child.work>. The session and its layered environment
+refresh both start in the resolved directory. If no alias resolves, C<-c>
+fails with an explicit error.
+If another command creates the session between the initial existence check and
+the create request, the helper rechecks the exact name and attaches only when
+that session is confirmed; other create errors remain visible.
 
 =head1 WHAT USES IT
 
@@ -662,6 +766,7 @@ create/attach error handling.
   dashboard ticket
   TICKET_REF=DD-123 dashboard ticket
   dashboard ticket feature-branch-42
+  dashboard workspace parent.child.work -c
   perl -Ilib -MDeveloper::Dashboard::CLI::Ticket=list_sessions -e 'print join qq(\n), list_sessions()'
 
 =for comment FULL-POD-DOC END

@@ -34,6 +34,7 @@ t/04-options.t
 t/10-atom.t
 t/11-rss.t
 t/12-encoding.t
+t/13-char.t
 t/20-plugin.t
 t/21-conditional.t
 t/22-host.t

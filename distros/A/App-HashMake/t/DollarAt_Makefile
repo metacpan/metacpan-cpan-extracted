@@ -1,0 +1,4 @@
+#  Test for $@
+
+foo bar
+    echo "Target is $@"

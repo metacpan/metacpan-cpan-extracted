@@ -37,7 +37,7 @@ caller did not ask for and could not predict from the documentation.
 
 ## What SimpleFlow trusts
 
-- **The working directory and the outputs.** `lock` and `stale.cmd` keep
+- **The working directory and the outputs.** `lock` and `stale_cmd` keep
   their files in `.simpleflow/` in the working directory, and `protect`
   changes the permissions of the outputs. SimpleFlow refuses a `.simpleflow/`
   that is a symbolic link, opens nothing in it through one, and changes a
@@ -49,7 +49,7 @@ caller did not ask for and could not predict from the documentation.
   deep or has fields of the wrong type, and escapes everything it puts in the
   page, but it sets no limit on a line's length.
 - **What is written out.** The record of every step -- printed, logged and
-  traced -- holds its command line, its `note` and its `env`. `env.secret`
+  traced -- holds its command line, its `note` and its `env`. `env_secret`
   hides the values of the variables it names; nothing else is hidden, so a
-  credential belongs in `env`, under `env.secret`, and never on the command
+  credential belongs in `env`, under `env_secret`, and never on the command
   line.

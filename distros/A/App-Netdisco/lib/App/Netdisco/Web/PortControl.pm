@@ -6,6 +6,8 @@ use Dancer::Plugin::DBIC;
 use Dancer::Plugin::Auth::Extensible;
 
 use App::Netdisco::JobQueue qw/jq_insert jq_userlog/;
+use App::Netdisco::Util::Port qw/device_acl_by_role_check sync_portctl_roles/;
+use App::Netdisco::Backend::Job;
 
 my %action_map = (
   'location' => 'location',
@@ -34,6 +36,14 @@ ajax '/ajax/portcontrol' => require_any_role [qw(admin port_control)] => sub {
       .' c_pvid, c_power, or a configured custom field.', 400)
       unless defined $action;
 
+    # the details view offers these controls only for a device the role ACL
+    # covers, and location, contact and the custom fields reach the queue
+    # without a worker check phase to scope them
+    sync_portctl_roles();
+    send_error('Forbidden', 403)
+      unless user_has_role('admin')
+          or device_acl_by_role_check( param('device'), logged_in_user );
+
     my $log = sprintf 'd:[%s] p:[%s] f:[%s]. a:[%s] v[%s]',
       param('device'), (param('port') || ''), param('field'),
       (param('action') || ''), (param('value') || '');
@@ -41,6 +51,12 @@ ajax '/ajax/portcontrol' => require_any_role [qw(admin port_control)] => sub {
     my $subaction = ($action =~ m/^(?:power|portcontrol)/
       ? (param('action') ."-other")
       : param('value'));
+
+    send_error('Configuration overrides in a port or value need the admin'
+      .' role. Send the port name and value on their own.', 403)
+      if not user_has_role('admin')
+         and App::Netdisco::Backend::Job->carries_config_overrides({
+           action => $action, port => param('port'), subaction => $subaction });
 
     schema(vars->{'tenant'})->txn_do(sub {
       if (param('port')) {

@@ -221,27 +221,70 @@ isa_ok( $auth, 'Developer::Dashboard::Auth', 'constructed auth manager' );
 }
 
 # get_user must surface an open failure on a record that exists but is
-# unreadable (running as a non-root owner, mode 0000 denies our own read).
+# unreadable. The test temporarily drops its effective uid to exercise the real
+# OS permission boundary even when the suite itself runs as root.
 {
     my $locked = $auth->_user_file('locked');
     open my $fh, '>', $locked or die "Unable to write $locked: $!";
     print {$fh} json_encode( { username => 'locked' } );
     close $fh;
-  SKIP: {
-        chmod 0000, $locked or skip 'chmod not honored on this filesystem', 1;
+    my $dashboard_directory = File::Spec->catdir( $home, '.developer-dashboard' );
+    my $config_directory = File::Spec->catdir( $dashboard_directory, 'config' );
+    my $auth_directory = File::Spec->catdir( $config_directory, 'auth' );
+    my $user_directory = File::Spec->catdir( $auth_directory, 'users' );
+    chmod 0755, $home, $dashboard_directory, $config_directory, $auth_directory, $user_directory
+      or die "Unable to make temporary auth fixture traversable: $!";
+    chmod 0000, $locked or die "Unable to lock $locked: $!";
 
-        # Probe by attempting the read, not with -r: filetest operators are
-        # mode-bit arithmetic and answer true for uid 0 whatever the mode.
-        if ( open my $probe, '<', $locked ) {
-            close $probe or die "Unable to close probe on $locked: $!";
-            skip 'this process can read a mode-0000 record, so the read failure cannot occur', 1;
-        }
+    SKIP: {
+        skip 'privilege-drop check requires root on a POSIX system', 1
+          if $> != 0 || $^O eq 'MSWin32';
 
-        my $read_fail = eval { $auth->get_user('locked'); 1 } ? '' : $@;
+        my $original_euid = $>;
+        $> = 65534;
+        die "Unable to become the unprivileged fixture uid: $!" if $> != 65534;
+        my $probe_fh;
+        my $can_read = open $probe_fh, '<', $locked;
+        close $probe_fh if $can_read;
+        $> = $original_euid;
+        die "Unable to restore the test process effective uid after the permission probe: $!" if $> != $original_euid;
+        skip 'filesystem does not enforce the locked auth-file permission', 1 if $can_read;
+
+        $> = 65534;
+        die "Unable to become the unprivileged fixture uid for the auth read: $!" if $> != 65534;
+        my $read_ok = eval { $auth->get_user('locked'); 1 };
+        my $read_fail = $read_ok ? 'record was unexpectedly readable' : $@;
+        $> = $original_euid;
+        die "Unable to restore the test process effective uid: $!" if $> != $original_euid;
         like( $read_fail, qr/Unable to read/, 'get_user dies when an existing record cannot be opened for reading' );
     }
 
-    chmod 0600, $locked;
+    chmod 0600, $locked or die "Unable to restore $locked: $!";
+}
+
+# A non-root run can reach the real unreadable-user-file path directly. The
+# root-only fixture above deliberately drops effective uid to nobody, while
+# this companion keeps the ordinary test identity and protects root-run suites
+# from claiming that a mode-0000 file was actually unreadable.
+{
+    my $locked = $auth->_user_file('nonroot-locked');
+    open my $fh, '>', $locked or die "Unable to write $locked: $!";
+    print {$fh} json_encode( { username => 'nonroot-locked' } );
+    close $fh or die "Unable to close $locked: $!";
+    SKIP: {
+        skip 'root runs exercise the equivalent failure through the explicit privilege-drop fixture', 1 if $> == 0;
+        chmod 0000, $locked or skip 'chmod not honored on this filesystem', 1;
+        if ( open my $probe, '<', $locked ) {
+            close $probe or die "Unable to close permission probe for $locked: $!";
+            chmod 0600, $locked or die "Unable to restore $locked: $!";
+            skip 'this process can read a mode-0000 user file, so the failure cannot occur', 1;
+        }
+        my $read_ok = eval { $auth->get_user('nonroot-locked'); 1 };
+        my $read_fail = $read_ok ? 'record was unexpectedly readable' : $@;
+        chmod 0600, $locked or die "Unable to restore $locked: $!";
+        like( $read_fail, qr/Unable to read/, 'get_user dies when a non-root process cannot open an existing user record' );
+    }
+    unlink $locked or die "Unable to remove $locked: $!";
 }
 
 # list_users: skip non-json directory entries and drop entries whose record
@@ -396,8 +439,10 @@ condition sides that ordinary CLI and web flows never reach: the constructor and
 add_user validation dies, the record write- and read-failure paths, the PBKDF2
 default-work-factor fallback, list_users entry filtering, host/IP
 canonicalisation edge cases, the loopback-admin trust rules, and the
-address-family handling inside hostname resolution. It exists to hold those
-paths at full branch and condition coverage.
+address-family handling inside hostname resolution. Its unreadable-record case
+temporarily changes its effective uid to an unprivileged identity, so the
+operating-system permission failure is exercised even when the suite runs as
+root.
 
 =head1 WHY IT EXISTS
 
@@ -420,7 +465,8 @@ side is covered from the start.
 Run C<perl -Ilib t/82-auth-coverage.t> or C<prove -lv t/82-auth-coverage.t>
 while iterating, and keep it green under C<prove -lr t> and the coverage gate
 before release. It is fully hermetic: it roots HOME in a temporary directory,
-chdirs into it, and stubs the resolver, so it needs no network or real users.
+chdirs into it, stubs the resolver, and uses only a temporary file for the
+privilege-drop check, so it needs no network or real users.
 
 =head1 WHAT USES IT
 

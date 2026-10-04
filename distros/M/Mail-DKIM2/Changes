@@ -1,0 +1,52 @@
+Revision history for Mail::DKIM2
+
+0.10    2026-10-02
+        API cleanup ahead of a CPAN release. Incompatible changes are marked *.
+        - New top-level Mail::DKIM2 module documenting the conventions every
+          module follows; every module now carries the distribution $VERSION.
+        - Constructor options are CamelCase and validated: an unknown option
+          croaks. Verifier options (SkipTimestampCheck, AllowUnsignedMI,
+          MidProcess, HeadersOnly, PubkeyCallback, Resolver, IgnorePrefixes)
+          can be given to new() and are no longer silently discarded.
+        - load($input): one-shot PRINT+CLOSE taking a string, scalar ref,
+          filehandle or Email::MIME, normalising LF to CRLF. TIEHANDLE lets a
+          Signer or Verifier be tied to a filehandle.
+        - Verifier->signatures and ->top_signature for Authentication-Results
+          writers.
+        * Ignore prefixes are per instance: Common::ignore_header_prefixes is
+          gone; pass IgnorePrefixes to Verifier->new and to
+          MessageInstance->calculate/verify/chain_verifies instead.
+          should_skip takes the prefixes as a second argument.
+        * Key fetching moves to the Verifier: Signature->fetch_public_key is
+          replaced by Verifier->fetch_public_key($signature, $idx), driven by
+          the Resolver option. Only NXDOMAIN/NOERROR/NODATA are permanent; any
+          other resolver error is temperror. The pubkey callback receives the
+          verifier as a third argument.
+        * Signer no longer dies from inside PRINT on a chain it cannot
+          extend: result() is 'fail' and details() says why. result() is
+          undef (not '?') before CLOSE. details() and result_detail() added.
+        * Signature: mail_from(), rcpt_to() and flags() are get/set like the
+          other tag accessors; set_rcpt_to is removed.
+        * Mail::DKIM2::DSN methods take CamelCase named arguments (Message,
+          Signer, To, ReportingMTA, Status, Reason, PubkeyCallback,
+          ForwarderDomain, SkipAuthentication, SkipTimestampCheck) instead of
+          a hashref. Validate::report takes PubkeyCallback, DnsPath,
+          SkipTimestampCheck.
+        * Command-line tools: dkim2sign (was dkim2sign.pl) and the new
+          dkim2verify are installed; verify-sig.pl, calculate-dkim2.pl and
+          the *-mailversion tools are removed.
+        - POD rewritten for spec-06 (the previous text described
+          draft-clayton-08 tags); Net::DNS declared as a prerequisite.
+        - dkim2-milter and dkim2-split-lmtp are installed programs (were
+          bin/*.pl, run from the checkout). X-DKIM2-Info sw= says
+          dkim2-milter.
+
+0.01    2026-03-08
+        - Initial release
+        - Implements draft-clayton-dkim2-spec-08
+        - Signer: streaming DKIM2-Signature generation with SMTP param recording
+        - Verifier: full chain verification (all signatures, not just outermost)
+        - MessageInstance: calculate, verify, and undo with header/body diff recipes
+        - Signature: tag-value parser with base64-encoded JSON tags
+        - HeaderParser: thin streaming base class replacing Mail::DKIM::Common
+        - Common: shared canonicalization, hashing, domain matching utilities

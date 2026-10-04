@@ -27,7 +27,7 @@ use constant {
     FEATURE_HYBRID               => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7',
 };
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 my %table_defs = (
     SQLite => {
@@ -219,28 +219,36 @@ sub include {
                         defined($identifier_sid) ? ($sid => $identifier_sid) : (),
                         ]);
             }
-        } elsif (($source =~ /::/ || $source =~ /^[A-Z]/) && $source->isa('Data::Identifier::Interface::Known')) {
-            my Data::TagDB::Tag $asi = $wk->also_shares_identifier(1);
-            my Data::TagDB::Tag $tagname = $wk->tagname(1);
-            my Data::TagDB::Tag $uuid = $wk->uuid(1);
-            my %types;
+        } elsif (($source =~ /::/ || $source =~ /^[A-Z]/) && $source !~ /=/) {
+            if ($source->isa('Data::Identifier::Interface::Known')) {
+                my Data::TagDB::Tag $asi = $wk->also_shares_identifier(1);
+                my Data::TagDB::Tag $tagname = $wk->tagname(1);
+                my Data::TagDB::Tag $uuid = $wk->uuid(1);
+                my %types;
 
-            foreach my Data::Identifier $identifier ($source->known(':all', as => 'Data::Identifier')) {
-                my $as_uuid = $identifier->uuid(default => undef);
-                my $type = $identifier->type;
-                my Data::TagDB::Tag $tag;
+                foreach my Data::Identifier $identifier ($source->known(':all', as => 'Data::Identifier')) {
+                    my $as_uuid = $identifier->uuid(default => undef);
+                    my $type = $identifier->type;
+                    my Data::TagDB::Tag $tag;
 
-                $types{$type->uuid} //= do { $db->create_tag($type) };
+                    $types{$type->uuid} //= do { $db->create_tag($type) };
 
-                if (defined $as_uuid) {
-                    $tag = $db->create_tag([$uuid => $as_uuid], $identifier);
-                } else {
-                    $tag = $db->create_tag($identifier);
+                    if (defined $as_uuid) {
+                        $tag = $db->create_tag([$uuid => $as_uuid], $identifier);
+                    } else {
+                        $tag = $db->create_tag($identifier);
+                    }
+
+                    foreach my $data ($identifier->tagname(default => [], no_defaults => 1, list => 1)) {
+                        $db->create_metadata(tag => $tag, relation => $asi, type => $tagname, data_raw => $data);
+                    }
                 }
-
-                foreach my $data ($identifier->tagname(default => [], no_defaults => 1, list => 1)) {
-                    $db->create_metadata(tag => $tag, relation => $asi, type => $tagname, data_raw => $data);
-                }
+            } elsif ($source->isa('Data::TagDB::Interface::Includeable')) {
+                $source->include($self);
+            } elsif ($source->isa('Data::TagDB::Interface::Plugin')) {
+                # no-op
+            } else {
+                croak 'Package ('.$source.') does not support loading tags from';
             }
         } elsif ($source eq 'file') {
             $self->_ingest_file($entry->{handle} // $entry->{filename}, %{$entry});
@@ -385,6 +393,19 @@ sub _create_indices {
 }
 
 sub _ingest_file {
+    my ($self, $from, %opts) = @_;
+    my $filetype = $opts{filetype} // 'valuefile';
+
+    if ($filetype eq 'valuefile') {
+        $self->_ingest_file_valuefile($from, %opts);
+    } elsif ($filetype eq 'translations-tsv') {
+        $self->_ingest_file_translations_tsv($from, %opts);
+    } else {
+        croak 'Invalid format';
+    }
+}
+
+sub _ingest_file_valuefile {
     require File::ValueFile::Simple::Reader;
     require Data::Identifier;
 
@@ -481,6 +502,50 @@ sub _ingest_file {
         });
 }
 
+sub _ingest_file_translations_tsv {
+    require Data::Identifier;
+    require Data::Identifier::Generate;
+
+    my ($self, $from, %opts) = @_;
+    my Data::TagDB $db = $self->db;
+    my Data::TagDB::WellKnown $wk = $db->wk;
+    my $conf_type = Data::Identifier->new(uuid => '368bd051-efc3-469a-ae56-f6122b173890');
+    my $conf_ns   = Data::Identifier->new(uuid => 'fef6ec61-6901-4d67-b93f-96ac92a90bb0');
+    my %types = (
+        'text-fragment' => $db->create_tag(Data::Identifier->new(uuid => '6085f87e-4797-4bb2-b23d-85ff7edc1da0')),
+        'text-tooltip'  => $db->create_tag(Data::Identifier->new(uuid => '4dbd526c-55c8-48de-bbd4-93a60dafe082')),
+    );
+    my %languages;
+    $types{text}    = $types{'text-fragment'}; # Alias
+    $types{tooltip} = $types{'text-tooltip'};  # Alias
+
+    if (!ref $from) {
+        open(my $fh, '<:utf8', $from) or die $!;
+        $from = $fh;
+    }
+
+    while (defined(my $line = $from->getline)) {
+        if ($line =~ /^\!type\s+([0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})\r?\n?\z/) {
+            $conf_type =  Data::Identifier->new(uuid => $1);
+        } elsif ($line =~ /^\!namespace\s+([0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})\r?\n?\z/) {
+            $conf_ns =  Data::Identifier->new(uuid => $1);
+        } else {
+            my ($key, $type, $language, $text) = $line =~ /^(\S+)\s+([0-9a-z-]+)\s+([0-9a-zA-Z-]+)\s+(.+)\r?\n?\z/ or next;
+
+            # Normalise input:
+            $key =~ tr/-/_/;
+            $_ = lc for $key, $type, $language;
+
+            $type = $types{$type};
+            $conf_type = $db->create_tag($conf_type) unless $conf_type->isa('Data::TagDB::Tag');
+            $key = $db->create_tag(Data::Identifier::Generate->generic(namespace => $conf_ns, input => $key), [$conf_type => $key]);
+            $language = $languages{$language} //= $db->create_tag(Data::Identifier::Generate->language($language));
+
+            $db->create_metadata(tag => $key, relation => $type, context => $language, data_raw => $text);
+        }
+    }
+}
+
 sub _ingest_directory {
     my ($self, $from, %opts) = @_;
 
@@ -493,10 +558,10 @@ sub _ingest_directory {
         next if $entry =~ /^\./;
 
         if (-d $full) {
-            next unless $entry =~ /^[0-9]{2}-/ || $entry =~ /\.d$/;
+            next unless $entry =~ /^[0-9]{2}-/ || $entry =~ /\.d\z/;
             $self->_ingest_directory($full, %opts);
         } else {
-            next unless $entry =~ /^[0-9]{2}-/ || $entry =~ /\.vf$/;
+            next unless $entry =~ /^[0-9]{2}-/ || $entry =~ /\.vf\z/ || $entry =~ /\.tsv\z/;
             $self->_ingest_file($full, %opts);
         }
     }
@@ -516,7 +581,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 
@@ -577,6 +642,7 @@ L<Data::TagDB::WellKnown>,
 L<Data::URIID>,
 L<Data::Identifier>,
 any package implementing L<Data::Identifier::Interface::Known>,
+any package implementing L<Data::TagDB::Interface::Plugin>,
 C<file>, and C<directory>.
 
 B<Note:>
@@ -596,6 +662,12 @@ If the source is C<file> the following options are supported:
 
 The name of the file to read.
 Required if C<handle> is not given.
+
+=item C<filetype>
+
+One of C<valuefile>, or C<translations-tsv>.
+
+As of v0.14 the default is C<valuefile>. Future versions may try to guess the type if it is not given.
 
 =item C<handle>
 

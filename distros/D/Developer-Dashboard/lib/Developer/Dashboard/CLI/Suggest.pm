@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Suggest;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use File::Basename qw(basename);
 use File::Spec;
@@ -19,12 +19,14 @@ use Developer::Dashboard::SkillManager;
 # Output: suggestion helper object.
 sub new {
     my ( $class, %args ) = @_;
-    my $paths = $args{paths} || Developer::Dashboard::PathRegistry->new(
+    my $paths = $args{paths};
+    $paths = Developer::Dashboard::PathRegistry->new(
         home            => $ENV{HOME},
-        workspace_roots => [],    # uncoverable condition false
+        workspace_roots => [],
         project_roots   => [],
-    );
-    my $manager = $args{manager} || Developer::Dashboard::SkillManager->new( paths => $paths );    # uncoverable condition false
+    ) if !$paths;
+    my $manager = $args{manager};
+    $manager = Developer::Dashboard::SkillManager->new( paths => $paths ) if !$manager;
     return bless {
         paths   => $paths,
         manager => $manager,
@@ -131,7 +133,8 @@ sub skill_command_suggestions {
 sub _top_level_candidates {
     my ($self) = @_;
     my %seen;
-    my @candidates = ();
+    my @candidates = ('version');
+    $seen{version} = 1;
 
     for my $name ( Developer::Dashboard::InternalCLI::helper_names() ) {
         next if $seen{$name}++;
@@ -200,7 +203,7 @@ sub _collect_skill_commands {
             my $logical = _logical_command_name($entry);
             next if !$logical;
             next if !is_runnable_file( File::Spec->catfile( $cli_root, $logical ) );
-            push @entries, { full => "$prefix.$logical" };
+            push @entries, { full => $logical eq '__init__' ? $prefix : "$prefix.$logical" };
         }
         closedir $dh;
     }
@@ -233,13 +236,23 @@ sub _rank_candidates {
         next if !defined $score;
         push @scored, { value => $candidate, score => $score };
     }
-    @scored = sort {
-             $a->{score} <=> $b->{score}
-          || length( $a->{value} ) <=> length( $b->{value} )
-          || $a->{value} cmp $b->{value}
-    } @scored;    # uncoverable branch true : candidates are de-duplicated, so the final cmp tiebreaker is never 0 and the comparator never returns 0
+    @scored = sort { _compare_ranked( $a, $b ) } @scored;
     splice @scored, 5 if @scored > 5;
     return @scored;
+}
+
+# _compare_ranked($left, $right)
+# Orders two scored candidates by score, then value length, then alphabetically.
+# Kept out of the sort block so each tiebreak stage is a measurable statement.
+# Input: two hash references carrying value and score.
+# Output: -1, 0, or 1 comparison result.
+sub _compare_ranked {
+    my ( $left, $right ) = @_;
+    my $by_score = $left->{score} <=> $right->{score};
+    return $by_score if $by_score;
+    my $by_length = length( $left->{value} ) <=> length( $right->{value} );
+    return $by_length if $by_length;
+    return $left->{value} cmp $right->{value};
 }
 
 # _candidate_score($query, $candidate)

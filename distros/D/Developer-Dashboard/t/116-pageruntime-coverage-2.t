@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Test::More;
+use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use POSIX ();
@@ -195,6 +196,77 @@ sub fail_first_template_new {
     );
 }
 
+{
+    my $skill_root = File::Spec->catdir( $home, 'skill-root' );
+    make_path( File::Spec->catdir( $skill_root, 'lib' ) );
+    open my $module_fh, '>', File::Spec->catfile( $skill_root, 'lib', 'SkillRuntimeLocal.pm' )
+      or die "Unable to write SkillRuntimeLocal.pm: $!";
+    print {$module_fh} "package SkillRuntimeLocal;\nuse strict;\nuse warnings;\nsub value { return 'skill-code-lib-ok' }\n1;\n";
+    close $module_fh or die "Unable to close SkillRuntimeLocal.pm: $!";
+
+    my $page = Developer::Dashboard::PageDocument->new(
+        id   => 'skill-code-lib',
+        meta => {
+            codes        => [ { body => "use SkillRuntimeLocal;\nprint SkillRuntimeLocal::value(), qq(\\n);\n" } ],
+            skill_path   => $skill_root,
+            skill_layers => [$skill_root],
+        },
+        layout => { body => 'body' },
+    );
+    my $result = $runtime->run_code_blocks( page => $page, source => 'skill' );
+    is_deeply( $result->{errors}, [], 'skill CODE sections can load modules from the skill lib directory' );
+    is_deeply( $result->{outputs}, ["skill-code-lib-ok\n"], 'skill CODE sections print output after loading a skill-local module' );
+}
+
+{
+    my $skill_root = File::Spec->catdir( $home, 'skill-env-root' );
+    local $ENV{FOO};
+    delete $ENV{FOO};
+    make_path( File::Spec->catdir( $skill_root, 'dashboards' ) );
+    open my $env_fh, '>', File::Spec->catfile( $skill_root, '.env' )
+      or die "Unable to write skill .env: $!";
+    print {$env_fh} "FOO=BAR\n";
+    close $env_fh or die "Unable to close skill .env: $!";
+
+    my $page = Developer::Dashboard::PageDocument->new(
+        id   => 'skill-code-env',
+        meta => {
+            codes        => [ { body => 'print ">> FOO: $ENV{FOO}";' } ],
+            skill_path   => $skill_root,
+            skill_layers => [$skill_root],
+        },
+        layout => { body => 'body' },
+    );
+    my $result = $runtime->run_code_blocks( page => $page, source => 'skill' );
+    is_deeply( $result->{errors}, [], 'skill dashboard CODE reads its skill .env without errors' );
+    is_deeply( $result->{outputs}, ['>> FOO: BAR'], 'skill dashboard CODE sees variables from the skill .env' );
+    ok( !exists $ENV{FOO}, 'skill dashboard environment values do not leak into later requests' );
+}
+
+{
+    my $page_skill_root = File::Spec->catdir( $home, 'skill-page-layer' );
+    my $newer_skill_root = File::Spec->catdir( $home, 'skill-newer-layer' );
+    make_path( File::Spec->catdir( $page_skill_root, 'lib' ) );
+    make_path( File::Spec->catdir( $newer_skill_root, 'lib' ) );
+    my $page = Developer::Dashboard::PageDocument->new(
+        id   => 'skill-code-lib-precedence',
+        meta => {
+            codes        => [ { body => 'print join ",", @INC;' } ],
+            skill_path   => $page_skill_root,
+            skill_layers => [ $page_skill_root, $newer_skill_root ],
+        },
+        layout => { body => 'body' },
+    );
+    my $result = $runtime->run_code_blocks( page => $page, source => 'skill' );
+    is_deeply( $result->{errors}, [], 'layered skill CODE sections can print the runtime @INC without errors' );
+    my ($first_inc) = split /,/, $result->{outputs}[0] || '', 2;
+    is(
+        $first_inc,
+        File::Spec->catdir( $page_skill_root, 'lib' ),
+        'the exact skill path serving the dashboard page is the first runtime @INC entry',
+    );
+}
+
 done_testing;
 
 __END__
@@ -210,6 +282,8 @@ C<Developer::Dashboard::PageRuntime> that the rest of the suite never reaches:
 the template-engine construction fallback chain, the process-group ownership
 condition used when cancelling a saved-Ajax worker, the wait loop that finds the
 worker already gone, and the launcher's failed-exec report.
+It also guards skill CODE execution against regressions in skill-local module
+lookup and request-scoped loading of skill C<.env> values.
 
 =head1 WHY IT EXISTS
 

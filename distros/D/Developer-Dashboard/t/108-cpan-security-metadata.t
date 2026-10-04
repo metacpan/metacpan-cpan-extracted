@@ -8,6 +8,11 @@ use File::Spec;
 use FindBin qw($RealBin);
 use Test::More;
 
+plan skip_all => 'checkout-only dependency/security metadata gate; release tarballs exclude .github and cpan-audit fixtures'
+    if !-f '.github/workflows/test.yml' || !-f 'SECURITY_CHECKS.md';
+plan skip_all => 'cpan-audit is not installed; advisory fixture checks require the audit tool'
+    if !-x '/usr/bin/cpan-audit' && !`command -v cpan-audit 2>/dev/null`;
+
 # Unbuffered, because this file forks a subprocess for almost every assertion.
 # Test::More's output is block-buffered when STDOUT is not a terminal, so each
 # backtick inherited a copy of the not-yet-flushed TAP buffer, the child flushed
@@ -36,7 +41,7 @@ my %secure_minimum = (
     'Capture::Tiny'          => '0.24',
     'Compress::Raw::Zlib'    => '2.220',
     'Cpanel::JSON::XS'       => '4.41',
-    'Dancer2'                => '0.206000',
+    'Dancer2'                => '2.2.0',
     'Digest::MD5'            => '2.25',
     'Digest::SHA'            => '5.96',
     'HTML::Parser'           => '3.84',
@@ -48,6 +53,7 @@ my %secure_minimum = (
     'LWP::Protocol::https'   => '6.07',
     'LWP::UserAgent'         => '6.83',
     'Plack'                  => '1.0054',
+    'Pod::Text'              => '6.1.1',
     'Socket'                 => '2.041',
     'Starman'                => '0.4018',
     'Storable'               => '3.41',
@@ -91,16 +97,19 @@ like( $audit, qr/--exclude-file/, 'audit gate consumes the reviewed advisory dis
 like( $audit, qr/Plack::Middleware::XSendfile/, 'audit gate guards against Plack XSendfile use before applying its disposition' );
 like( $audit, qr/File::Temp.*safe_level/s, 'audit gate guards activation of the vulnerable File::Temp safety checks before applying its disposition' );
 like( $audit, qr/Dancer2::Session/, 'audit gate guards activation of Dancer2 session handling before applying its disposition' );
+like( $audit, qr/Pod::Text.*6\.1\.1/s, 'audit gate verifies the fixed Pod::Text loaded from the isolated root before dispositioning podlators' );
 like( $audit, qr/\$repo_root\/app\.psgi/, 'audit gate scans the shipped PSGI activation surface' );
 
 my @exclusions = grep { /\S/ && !/^\s*#/ } split /\n/, $exclude;
 is_deeply(
     \@exclusions,
-    [ qw(CPANSA-Plack-2026-7381 CPANSA-File-Temp-2011-4116 CPANSA-Dancer2-2026-13577 CPANSA-String-Compare-ConstantTime-2024-13939) ],
-    'only exact reviewed no-fixed advisory IDs are excluded',
+    [ qw(CPANSA-Plack-2026-7381 CPANSA-File-Temp-2011-4116 CPANSA-Dancer2-2026-13577 CPANSA-String-Compare-ConstantTime-2024-13939 CPANSA-podlators-2026-82560) ],
+    'only exact reviewed advisory IDs with matching executable guards are excluded',
 );
 
 like( $workflow, qr/perl-version:\s*'5\.44'/, 'CI exercises the hardened Perl baseline' );
+like( $workflow, qr/name:\s*Audit isolated dependency root \(RELEASE GATE\)/,
+    'CI treats vulnerable distributions in the isolated project root as release blockers' );
 like( $workflow, qr/cpanm\s+--installdeps\s+--notest\s+-L\s+local\s+\./, 'CI installs project dependencies into an isolated local root' );
 like( $workflow, qr/script\/cpan-audit-project\s+local\/lib\/perl5/, 'CI executes the project audit gate against that isolated root' );
 like( $workflow, qr/script\/cpan-audit-declared-chain\s+local\/lib\/perl5/, 'CI audits the transitive closure of the declared chain, not only the modules cpanfile names' );
@@ -116,6 +125,20 @@ ok( -f File::Spec->catfile( $ROOT, 't', 'features', 'dd392-cve-remediation.featu
 
 # Executable proof: the gate refuses to run under a non-bash shell.
 my $gate = File::Spec->catfile( $ROOT, 'script', 'cpan-audit-project' );
+{
+    my $bad_pod_text_root = File::Spec->catdir( $ROOT, ".t107-bad-pod-text-root-$$" );
+    my $pod_text_file = File::Spec->catfile( $bad_pod_text_root, 'Pod', 'Text.pm' );
+    make_path( File::Spec->catdir( $bad_pod_text_root, 'Pod' ) );
+    _write_file( $pod_text_file, "package Pod::Text;\nour \$VERSION = '6.0.2';\n1;\n" );
+    my ( $bad_rc, $bad_out ) = _run_gate($bad_pod_text_root);
+    is( $bad_rc, 1, 'audit gate rejects the affected Pod::Text version as a disposition-guard failure' );
+    like( $bad_out, qr/Pod::Text security floor failed.*6\.0\.2.*6\.1\.1/s,
+        'the gate names both the loaded affected version and the required fixed floor' );
+    unlike( $bad_out, qr/Collecting all installed modules/,
+        'the gate refuses before the installed scan can mistake a core module for the audited dependency' );
+    remove_tree($bad_pod_text_root);
+}
+
 my $sh_rc = 0;
 {
     local $ENV{PATH} = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';
@@ -267,14 +290,18 @@ for my $case (
     my $fake_bin  = File::Spec->catdir( $ROOT, ".t517-fake-bin$$" );
     my $scan_root = File::Spec->catdir( $ROOT, ".t517-scan-root$$" );
     make_path($fake_bin);
-    make_path($scan_root);
+    make_path( File::Spec->catdir( $scan_root, 'Pod' ) );
+    _write_file(
+        File::Spec->catfile( $scan_root, 'Pod', 'Text.pm' ),
+        "package Pod::Text;\nour \$VERSION = '6.1.1';\n1;\n",
+    );
     my $stub = File::Spec->catfile( $fake_bin, 'cpan-audit' );
 
     # A tool that died before auditing: non-zero, a Perl diagnostic, no advisory.
     _write_file( $stub, "#!/bin/sh\nprintf '%s\\n' 'Perl API version v5.38.0 of encoding.c does not match v5.44.0' >&2\nexit 1\n" );
     chmod 0755, $stub or die "chmod $stub: $!";
     {
-        local $ENV{PATH} = join ':', $fake_bin, '/usr/local/bin', '/usr/bin', '/bin';
+        local $ENV{PATH} = join ':', $fake_bin, '/usr/bin', '/bin';
         my $out = `bash $gate $scan_root 2>&1`;
         my $rc  = ${^CHILD_ERROR_NATIVE} >> 8;
         is( $rc, 4, 'a crashed cpan-audit is reported UNUSABLE (4), not as a finding' );
@@ -318,7 +345,7 @@ for my $case (
     # - a test failing for a reason that had nothing to do with what it asserts.
     unlink $stub or die "unlink $stub: $!";
     {
-        local $ENV{PATH} = join ':', $fake_bin, '/usr/local/bin', '/usr/bin', '/bin';
+        local $ENV{PATH} = join ':', $fake_bin, '/usr/bin', '/bin';
         my $out = `bash $gate $scan_root 2>&1`;
         my $rc  = ${^CHILD_ERROR_NATIVE} >> 8;
         isnt( $rc, 0, 'a missing cpan-audit never reports the product clean' );
@@ -367,6 +394,16 @@ sub _version_prologue {
 
 sub _run_gate {
     my ($root) = @_;
+    # The production gate now requires an actual fixed Pod::Text from the
+    # isolated dependency root before applying the reviewed podlators advisory
+    # disposition. Give the unrelated advisory fixtures that same safe baseline;
+    # an explicit affected-version fixture already present in its root is kept.
+    my $pod_text_file = File::Spec->catfile( $root, 'Pod', 'Text.pm' );
+    if ( !-f $pod_text_file ) {
+        make_path( File::Spec->catdir( $root, 'Pod' ) );
+        _write_file( $pod_text_file, "package Pod::Text;\nour \$VERSION = '6.1.1';\n1;\n" );
+    }
+
     # The corpus guard (DD-790) is stood down for these cases, deliberately and
     # narrowly. Their subject is ATTRIBUTION - does a finding name the right
     # distribution and advisory id - and they read the host's real advisory
@@ -496,6 +533,13 @@ Dependency metadata is copied across Makefile.PL, cpanfile, dist.ini, the
 installer, and CI. A scanner-only test can miss drift or a gate that suppresses
 its own exit status, so this acceptance test checks both declarations and real
 shell execution.
+
+The podlators finding needs an additional executable check because the CVE
+affects C<Pod::Text>, while the installed scanner can attribute the distribution
+through C<Pod::Man>'s independent version. The isolated-root gate verifies the
+actual loaded C<Pod::Text> path and version before allowing the exact advisory
+disposition; this test proves that an affected C<6.0.2> copy is rejected before
+the installed scan runs.
 
 =head1 WHEN TO USE
 

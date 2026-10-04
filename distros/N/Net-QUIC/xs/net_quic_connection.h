@@ -68,6 +68,7 @@ net_quic_crypto_backend(void)
 typedef struct net_quic_connection net_quic_connection;
 typedef struct net_quic_stream_state net_quic_stream_state;
 typedef struct net_quic_cid_event net_quic_cid_event;
+typedef struct net_quic_application_datagram net_quic_application_datagram;
 typedef struct net_quic_server_tls net_quic_server_tls;
 
 struct net_quic_cid_event {
@@ -75,6 +76,21 @@ struct net_quic_cid_event {
     ngtcp2_cid cid;
     net_quic_cid_event *next;
 };
+
+struct net_quic_application_datagram {
+    uint8_t *data;
+    size_t len;
+    uint8_t early_data;
+    net_quic_application_datagram *next;
+};
+
+#define NET_QUIC_DATAGRAM_RX_BUFFER_LIMIT (256u * 1024u)
+#define NET_QUIC_DATAGRAM_RX_COUNT_LIMIT 1024u
+#define NET_QUIC_1RTT_AEAD_OVERHEAD 16u
+#define NET_QUIC_MAX_PKT_NUMLEN 4u
+#define NET_QUIC_0RTT_LONG_HEADER_OVERHEAD \
+    (1u + 4u + 1u + NGTCP2_MAX_CIDLEN + 1u + NGTCP2_MAX_CIDLEN + 8u + \
+     NET_QUIC_MAX_PKT_NUMLEN + NET_QUIC_1RTT_AEAD_OVERHEAD)
 
 #define NET_QUIC_STREAM_AVAILABLE_BIDI 0x01u
 #define NET_QUIC_STREAM_AVAILABLE_UNI  0x02u
@@ -162,6 +178,13 @@ struct net_quic_connection {
     uint8_t txbuf[NET_QUIC_TX_BUFSIZE];
     int tx_batch_active;
 
+    net_quic_application_datagram *datagram_tx_pending;
+    net_quic_application_datagram *datagram_rx_head;
+    net_quic_application_datagram *datagram_rx_tail;
+    size_t datagram_rx_buffered_bytes;
+    size_t datagram_rx_count;
+    uint64_t datagram_rx_dropped;
+
     net_quic_stream_state *streams;
     net_quic_stream_state *streams_tail;
     net_quic_stream_state **stream_index;
@@ -183,6 +206,196 @@ struct net_quic_connection {
     ptls_openssl_verify_certificate_t picotls_verify_cert;
     int picotls_verify_cert_ready;
 };
+
+static net_quic_application_datagram *
+net_quic_application_datagram_new(const uint8_t *data, size_t datalen)
+{
+    net_quic_application_datagram *datagram = NULL;
+
+    Newxz(datagram, 1, net_quic_application_datagram);
+    if (datagram == NULL) {
+        return NULL;
+    }
+
+    if (datalen != 0) {
+        Newx(datagram->data, datalen, uint8_t);
+        if (datagram->data == NULL) {
+            Safefree(datagram);
+            return NULL;
+        }
+
+        memcpy(datagram->data, data, datalen);
+    }
+
+    datagram->len = datalen;
+    return datagram;
+}
+
+static void
+net_quic_application_datagram_free(net_quic_application_datagram *datagram)
+{
+    if (datagram == NULL) {
+        return;
+    }
+
+    Safefree(datagram->data);
+    Safefree(datagram);
+}
+
+static void
+net_quic_application_datagrams_free(net_quic_connection *ep)
+{
+    net_quic_application_datagram *datagram;
+    net_quic_application_datagram *next;
+
+    datagram = ep->datagram_rx_head;
+    while (datagram != NULL) {
+        next = datagram->next;
+        net_quic_application_datagram_free(datagram);
+        datagram = next;
+    }
+
+    ep->datagram_rx_head = NULL;
+    ep->datagram_rx_tail = NULL;
+    ep->datagram_rx_buffered_bytes = 0;
+    ep->datagram_rx_count = 0;
+
+    net_quic_application_datagram_free(ep->datagram_tx_pending);
+    ep->datagram_tx_pending = NULL;
+}
+
+static size_t
+net_quic_varint_len(uint64_t value)
+{
+    if (value < 64) {
+        return 1;
+    }
+    if (value < 16384) {
+        return 2;
+    }
+    if (value < 1073741824) {
+        return 4;
+    }
+    return 8;
+}
+
+static int
+net_quic_datagram_payload_fits(uint64_t max_frame_size, size_t datalen)
+{
+    uint64_t payload;
+    uint64_t overhead;
+
+    payload = (uint64_t)datalen;
+    if (payload > NGTCP2_MAX_VARINT) {
+        return 0;
+    }
+
+    overhead = 1u + (uint64_t)net_quic_varint_len(payload);
+    if (overhead > max_frame_size) {
+        return 0;
+    }
+
+    return payload <= max_frame_size - overhead;
+}
+
+static size_t
+net_quic_max_datagram_payload_size(net_quic_connection *ep)
+{
+    const ngtcp2_transport_params *params;
+    const ngtcp2_cid *dcid;
+    uint64_t path_max;
+    uint64_t packet_overhead;
+    uint64_t frame_limit;
+    uint64_t candidate;
+
+    params = ngtcp2_conn_get_remote_transport_params2(ep->conn);
+    if (params == NULL || params->max_datagram_frame_size == 0) {
+        return 0;
+    }
+
+    dcid = ngtcp2_conn_get_dcid(ep->conn);
+    path_max = ngtcp2_conn_get_path_max_tx_udp_payload_size2(ep->conn);
+
+    if (!ep->ready && ep->early_data_attempted) {
+        packet_overhead = NET_QUIC_0RTT_LONG_HEADER_OVERHEAD;
+    } else {
+        packet_overhead =
+            1u +
+            (uint64_t)dcid->datalen +
+            NET_QUIC_MAX_PKT_NUMLEN +
+            NET_QUIC_1RTT_AEAD_OVERHEAD;
+    }
+
+    if (path_max <= packet_overhead) {
+        return 0;
+    }
+
+    frame_limit = path_max - packet_overhead;
+    candidate = params->max_datagram_frame_size < frame_limit
+        ? params->max_datagram_frame_size
+        : frame_limit;
+
+    if (candidate > (uint64_t)SIZE_MAX) {
+        candidate = (uint64_t)SIZE_MAX;
+    }
+
+    while (candidate != 0 &&
+           (!net_quic_datagram_payload_fits(
+                params->max_datagram_frame_size,
+                (size_t)candidate
+            ) ||
+            !net_quic_datagram_payload_fits(
+                frame_limit,
+                (size_t)candidate
+            ))) {
+        --candidate;
+    }
+
+    return (size_t)candidate;
+}
+
+static int
+net_quic_recv_datagram_cb(
+    ngtcp2_conn *conn,
+    uint32_t flags,
+    const uint8_t *data,
+    size_t datalen,
+    void *user_data
+)
+{
+    net_quic_connection *ep = (net_quic_connection *)user_data;
+    net_quic_application_datagram *datagram;
+
+    (void)conn;
+
+    if (ep->datagram_rx_count >= NET_QUIC_DATAGRAM_RX_COUNT_LIMIT ||
+        datalen > NET_QUIC_DATAGRAM_RX_BUFFER_LIMIT ||
+        ep->datagram_rx_buffered_bytes >
+            NET_QUIC_DATAGRAM_RX_BUFFER_LIMIT - datalen) {
+        ++ep->datagram_rx_dropped;
+        return 0;
+    }
+
+    datagram = net_quic_application_datagram_new(data, datalen);
+    if (datagram == NULL) {
+        ++ep->datagram_rx_dropped;
+        return 0;
+    }
+
+    datagram->early_data =
+        (flags & NGTCP2_DATAGRAM_FLAG_0RTT) != 0 ? 1 : 0;
+
+    if (ep->datagram_rx_tail == NULL) {
+        ep->datagram_rx_head = datagram;
+    } else {
+        ep->datagram_rx_tail->next = datagram;
+    }
+    ep->datagram_rx_tail = datagram;
+    ep->datagram_rx_buffered_bytes += datalen;
+    ++ep->datagram_rx_count;
+
+    return 0;
+}
 
 static int
 net_quic_extend_max_local_streams_bidi_cb(
@@ -997,6 +1210,7 @@ net_quic_connection_free(pTHX_ net_quic_connection *ep)
         ep->server_tls_owner = NULL;
     }
 
+    net_quic_application_datagrams_free(ep);
     net_quic_streams_free(aTHX_ ep);
     net_quic_cid_events_free(aTHX_ ep);
 

@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/uperl/Devel-ebug/issues
   homepage: https://metacpan.org/pod/Devel::ebug
   repository: git://github.com/uperl/Devel-ebug.git
-version: '0.68'
+version: '0.69'
 x_contributors:
   - 'Leon Brocard <acme@astray.com>'
   - 'Graham Ollis <plicease@cpan.org>'

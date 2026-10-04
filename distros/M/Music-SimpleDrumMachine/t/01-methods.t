@@ -174,4 +174,63 @@ subtest bars => sub {
     }
 };
 
+subtest weighted_parts => sub {
+    my $obj = new_obj(port_name => 'test');
+
+    is $obj->_choose_part('part_A'), 'part_A', 'a plain name passes through';
+    is $obj->_choose_part({ only => 5 }), 'only', 'a single weighted entry is always chosen';
+
+    my %seen;
+    $seen{ $obj->_choose_part({ A => 1, B => 1, C => 0, D => -1 }) }++ for 1 .. 200;
+    is [ sort keys %seen ], [qw(A B)], 'zero and negative weights are never chosen';
+
+    %seen = ();
+    $seen{ $obj->_choose_part({ heavy => 99, light => 1 }) }++ for 1 .. 1000;
+    ok +( $seen{heavy} // 0 ) > ( $seen{light} // 0 ), 'a heavier weight is chosen more often';
+
+    like dies { $obj->_choose_part({ A => 0, B => -2 }) },
+        qr/positive weight/, 'dies when no part has a positive weight';
+
+    # Drive the timer by hand: one bar is 96 ticks and bars => 1 means
+    # a part is chosen every bar, so 4 measures choose a part 4 times.
+    my $pats = sub { +{ kick => [ (1) x 16 ] } };
+    my $play = sub {
+        my ($next_part, $returns) = @_;
+        my %count;
+        local @Test::FakeLoop::ADDED = ();
+        new_obj(
+            port_name => 'test',
+            bars      => 1,
+            filling   => 0,
+            next_part => $next_part,
+            parts     => {
+                map { my $n = $_; $n => sub { $count{$n}++; return $returns->{$n}, $pats->() } } qw(a b)
+            },
+            _midi_out => Test::FakeMidi->new,
+        );
+        my ($timer) = @Test::FakeLoop::ADDED;
+        $timer->invoke_event('on_tick') for 1 .. 4 * 96;
+        return \%count;
+    };
+
+    my $stay_on_a = { a => 1, b => 0 };
+    is $play->( $stay_on_a, { a => $stay_on_a, b => $stay_on_a } ), { a => 4 },
+        'a weighted hash as next_part only ever plays the part with weight';
+
+    is $play->( 'a', { a => { b => 1 }, b => { b => 1 } } ), { a => 1, b => 3 },
+        'a part can return a weighted hash as its next part';
+
+    local @Test::FakeLoop::ADDED = ();
+    new_obj(
+        port_name => 'test',
+        bars      => 1,
+        filling   => 0,
+        next_part => 'nope',
+        _midi_out => Test::FakeMidi->new,
+    );
+    my ($timer) = @Test::FakeLoop::ADDED;
+    like dies { $timer->invoke_event('on_tick') for 1 .. 6 },
+        qr/Unknown part: nope/, 'an unknown part name dies with a clear message';
+};
+
 done_testing;

@@ -4,20 +4,24 @@ Log::Abstraction - Logging Abstraction Layer
 
 ## Version
 
-0.35
+0.36
 
 ## Synopsis
 
 ```perl
 use Log::Abstraction;
 
-my $logger = Log::Abstraction->new(logger => 'logfile.log');
+# The default level is 'warning'; 'trace' lets every example through
+my $logger = Log::Abstraction->new(logger => 'logfile.log', level => 'trace');
 
 $logger->debug('This is a debug message');
 $logger->info('This is an info message');
 $logger->notice('This is a notice message');
 $logger->trace('This is a trace message');
 $logger->warn({ warning => 'This is a warning message' });
+
+# Structured fields
+$logger->info('User logged in', { user_id => 42 });
 ```
 
 ## Description
@@ -33,6 +37,109 @@ fd and scalar-path backends write character strings as UTF-8 (unless an
 `fd` handle already has a `:utf8` or `:encoding` layer, in which case the
 handle does the encoding), and `format => 'json'` output is UTF-8 too.
 journald fields are sent as UTF-8.  Byte strings are written unchanged.
+
+### Structured Fields
+
+Every logging method accepts a hash reference of structured fields after
+the message:
+
+```perl
+$logger->info('User logged in', { user_id => 42, ip => $ip });
+$logger->warn('Slow query', { ms => 1250 });
+```
+
+A hash reference is taken as fields only when it is the last of two or more
+arguments, so `warn({ warning => ... })` keeps its meaning, and a lone
+hash reference is still a message.  An empty hash reference is ignored.  The
+fields are copied, so changing the hash afterwards doesn't change what was
+logged.  They are kept out of the message and go to each backend as follows:
+
+- ["messages"](#messages), `array` and an ARRAY `logger` -- a `fields` key in
+the entry, alongside `level` and `message`.
+- a CODE `logger` -- a `fields` key in the hashref it is called with.
+- `format => 'json'` -- a nested `fields` object.  Objects are
+stringified; other references are kept as JSON data.
+- `journald` -- journal fields.  Each name is upper-cased, characters
+other than `A-Z`, `0-9` and `_` become `_`, leading underscores are
+removed and it is cut to 64 characters; a field left with no name is
+dropped.  Fields override the extra keys in the `journald` hash, but never
+`MESSAGE`, `PRIORITY` or `SYSLOG_IDENTIFIER`.
+- text formats (`file`, `fd`, a scalar `logger`), `syslog`,
+`sendmail` and object loggers -- appended to the message as logfmt-style
+`key=value` pairs in key order, e.g. `User logged in ip=10.0.0.1 user_id=42`.
+Characters other than `[\w.-]` in a key become `_`.  A value that is empty
+or contains white space, `"`, `=` or `\` is double-quoted, with `"` and
+`\` escaped and control characters written as `\n`, `\r`, `\t` or
+`\xNN`.  Objects are stringified and other references written as JSON.  An
+object logger is passed the pairs as an extra argument after the message.
+
+When logging through [Log::Any](https://metacpan.org/pod/Log%3A%3AAny), a hash reference at the end of the call,
+together with the proxy's `context`, arrives here as fields; see
+["structured" in Log::Any::Adapter::Abstraction](https://metacpan.org/pod/Log%3A%3AAny%3A%3AAdapter%3A%3AAbstraction#structured).
+
+### Per-Backend Level and Format
+
+Every backend can have its own `level` and `format`, as well as the
+logger's.  `syslog`, `journald` and `sendmail` are hashes already, so
+they take them as keys.  `file`, `fd` and `array`, inside a `logger` hash
+or at the top level, may be given as a hash holding the destination under
+the backend's own name:
+
+```perl
+my $log = Log::Abstraction->new(
+    level  => 'debug',
+    logger => {
+        file   => { file => '/var/log/myapp.log', format => 'json' },
+        fd     => { fd => \*STDERR, level => 'warning' },
+        array  => { array => \@recent, level => 'info' },
+        syslog => { level => 'error', format => '%level%: %message%' },
+    },
+);
+```
+
+- `level` -- the backend only gets messages at this level or more
+severe.  A level name or a syslog number (0-7).  The logger's `level` is
+applied first, so a backend's level can only narrow it: set the logger's
+`level` to the most verbose any backend wants.
+- `format` -- a format string, or `json`, as for the logger's
+["format"](#format), which it overrides.  For `file` and `fd` it is the line
+written.  For the others, which by default get the message as it is, it
+replaces the message: the `array` entry's `message`, the text sent to
+syslog, the journal's `MESSAGE` field and the email body.
+
+The plain forms (`file => $path`, `fd => $handle`,
+`array => \@array`) still work and have no level or format of their
+own.  A blessed handle object is a destination, not the hash form.
+
+### File Rotation
+
+Log files written by path (a scalar `logger`, a `file` key in a `logger`
+hash, and the top-level `file`) can be rotated by size, by time, or both:
+
+```perl
+my $log = Log::Abstraction->new(
+    file            => '/var/log/myapp.log',
+    rotate_size     => '10M',
+    rotate_interval => 'daily',
+    rotate_keep     => 7,
+);
+```
+
+Before each write the file is checked, and if it is due it is renamed to
+`myapp.log.1`, the old `.1` to `.2` and so on, the oldest beyond
+`rotate_keep` being deleted; the line then goes to a new `myapp.log`.  A
+rotation that fails (e.g. for lack of permission) is ignored, and the line is
+still written.  File handles passed as `fd` aren't rotated.
+
+Rotation isn't coordinated between processes: if several processes log to the
+same file, use **logrotate** instead.
+
+#### Logrotate
+
+The file is opened, appended to and closed for every message, never held
+open, so **logrotate**'s default (rename the file and let the application
+create a new one) works without `copytruncate`, and without sending the
+process a `SIGHUP`: the next message is written to the new file.
 
 ## Methods
 
@@ -81,14 +188,19 @@ called on an object.  It may also be called as a plain function,
 
 - `format`
 
-    Format string for file/fd backends.  Tokens expanded at log time:
+    Format string for the file, fd and scalar-path backends; a backend's own
+    `format` (see ["Per-backend level and format"](#per-backend-level-and-format)) overrides it for that
+    backend.  Unset or an empty string means the default,
+    `%level%> [%timestamp%] %class% %callstack% %message%`.  Tokens expanded
+    at log time:
 
     ```
     %callstack%   caller file and line number
     %class%       blessed class of the logger object
     %level%       upper-cased level name
     %message%     the joined log message
-    %timestamp%   YYYY-MM-DD HH:MM:SS (local time)
+    %timestamp%   the time of the call; YYYY-MM-DD HH:MM:SS local time by
+                  default (see timestamp_format, timestamp_precision and utc)
     %env_FOO%     value of $ENV{FOO}, or empty string if unset
     ```
 
@@ -105,10 +217,13 @@ called on an object.  It may also be called as a plain function,
 
     This format is compatible with log aggregators such as journald, Loki,
     Elasticsearch, and Splunk.  `class` is included when the logger is a subclass
-    of `Log::Abstraction`.  Keys are emitted in sorted order.
+    of `Log::Abstraction`, and `fields` when the call has ["Structured fields"](#structured-fields).
+    Keys are emitted in sorted order.
 
-    **Security note:** because `format` may contain `%env_*%` tokens, avoid
-    granting untrusted sources write access to config files that set this key.
+    **Security note:** because a format may contain `%env_*%` tokens, which
+    expand to environment variables, avoid granting untrusted sources write
+    access to config files that set `format` or any backend's `format` (see
+    ["Per-backend level and format"](#per-backend-level-and-format)).
 
 - `level`
 
@@ -116,39 +231,47 @@ called on an object.  It may also be called as a plain function,
     Valid values (case-insensitive): `trace`, `debug`, `info`/`informational`,
     `notice`, `warn`/`warning`, `error`/`err`, `crit`/`critical`/`fatal`,
     `alert`, `emerg`/`emergency`/`panic`.  `trace` and `debug` are the same
-    threshold (see ["LIMITATIONS"](#limitations)).
+    threshold (see ["LIMITATIONS"](#limitations)).  It may also be an array reference, whose
+    first element is used, as some configuration-file formats produce.
 
 - `max_messages`
 
     The most entries to keep in the in-memory history returned by
     ["messages"](#messages); when it is full, the oldest entry is discarded.  Must be a
-    non-negative integer.  Unlimited by default, which in a long-running process
+    non-negative integer; `0` keeps no history at all.  Unlimited by default, which in a long-running process
     means the history grows without bound.
 
 - `logger`
 
     One of:
 
-    - A code reference -- called with a hashref `{ class, file, line, level, message, ctx }`
+    - A code reference -- called with a hashref `{ class, file, line, level, message, ctx, fields }`
+    (`ctx` and `fields` only when there are any)
     - An object -- method matching the level name is called on it
-    - A hash reference -- may contain `file`, `array`, `fd`, `syslog`, `journald`, and/or `sendmail` keys
-    - An array reference -- `{ level, message }` hashrefs are pushed onto it
+    - A hash reference -- may contain `file`, `array`, `fd`, `syslog`, `journald`, and/or `sendmail` keys,
+    each of which may have its own `level` and `format` (see ["Per-backend level and format"](#per-backend-level-and-format))
+    - An array reference -- `{ level, message }` hashrefs are pushed onto it, with a
+    `fields` key when the call has ["Structured fields"](#structured-fields)
     - A scalar string -- treated as a file path to append to
 
     When not supplied, [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) is initialised as the default backend.
 
     The `sendmail` sub-hash supports:
-    `host`, `port`, `to`, `from`, `subject`, `level`, `min_interval`.
-    `to` is required.  `level` may be a level name or a syslog number (0-7);
+    `host`, `port`, `to`, `from`, `subject`, `level`, `format`,
+    `min_interval`.  `to` is required.  With `format`, the email body is the
+    formatted line rather than the message.  `level` may be a level name or a syslog number (0-7);
     without it, every message is emailed.
     At most one email is sent per `min_interval` seconds per instance.  If
     delivery fails, `Carp::carp` is called and the other backends still receive
     the message.
 
-    The `syslog` sub-hash supports:
+    The `syslog` sub-hash supports the keys below.  The message is passed to
+    `syslog()` through a `%s` format, so `%` sequences in it, such as `%m`,
+    are logged literally.
 
     - `facility` -- the syslog facility (default: `local0`)
     - `level` -- only messages at this level or more severe are sent; a level name or a syslog number (0-7)
+    - `format` -- format the message with this (see ["format"](#format)) before sending it; by default the message is sent as it is
     - `host` (or its alias `server`), and any other ["setlogsock" in Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog#setlogsock) option -- passed to `setlogsock()`
 
     The `journald` sub-hash sends each message as a single datagram to the
@@ -156,6 +279,8 @@ called on an object.  It may also be called as a plain function,
 
     - `socket` -- path to the journald socket (default: `/run/systemd/journal/socket`)
     - `identifier` -- value for the `SYSLOG_IDENTIFIER` field (default: basename of `$0`)
+    - `level` -- only messages at this level or more severe are sent; a level name or a syslog number (0-7)
+    - `format` -- the `MESSAGE` field is the message formatted with this (see ["format"](#format)); by default it is the message as it is
     - any other key -- included verbatim as an uppercase journald field name.
     The upper-cased name must contain only `A-Z`, `0-9` and `_`, and must not
     start with `_`; `new()` croaks otherwise.
@@ -167,9 +292,68 @@ called on an object.  It may also be called as a plain function,
     after a later send has succeeded); the application is never crashed by a
     journald error.
 
+- `rotate_interval`
+
+    Rotate log files by time: `hourly`, `daily`, `weekly` (weeks start on
+    Monday) or `monthly`, case-insensitive.  Before each write, a file whose
+    last-modified time is in an earlier period than now (in local time, or UTC
+    with `utc`) is rotated, so a file not written to for a while rotates on the
+    next write.  See ["File rotation"](#file-rotation).
+
+- `rotate_keep`
+
+    How many rotated files to keep, `FILE.1` to `FILE._n_` (default 5).  With
+    `0`, a file due for rotation is deleted instead.
+
+- `rotate_size`
+
+    Rotate log files that have reached this size: a number of bytes, optionally
+    followed by `K`, `M` or `G` (powers of 1024), e.g. `10M`.  See
+    ["File rotation"](#file-rotation).
+
 - `script_name`
 
     Script name reported to syslog.  Auto-detected from `$0` if not supplied.
+
+- `timestamp_format`
+
+    How `%timestamp%`, and the `timestamp` key of `format => 'json'`,
+    are written.  Either a ["strftime" in POSIX](https://metacpan.org/pod/POSIX#strftime) pattern (default
+    `%Y-%m-%d %H:%M:%S`) or one of these names (case-insensitive):
+
+    ```
+    iso8601, rfc3339   2026-10-03T20:14:23-04:00, or 2026-10-04T00:14:23Z with utc
+    ```
+
+    The pattern may also use:
+
+    ```
+    %N        fractional seconds, 9 digits (nanoseconds)
+    %3N       fractional seconds, 3 digits (milliseconds); any width 1-9
+    %z        UTC offset as +hhmm (on every platform, unlike some strftimes)
+    %:z       UTC offset as +hh:mm, as RFC 3339 needs
+    %Z        the time-zone name; "UTC" when utc is set
+    %%        a literal %
+    ```
+
+    Fractional seconds come from [Time::HiRes](https://metacpan.org/pod/Time%3A%3AHiRes) and are truncated, not rounded;
+    digits beyond the system clock's resolution (usually microseconds) are
+    noise.  The timestamp is taken once per message, so every backend shows the
+    same time.
+
+- `timestamp_precision`
+
+    The number of fractional-second digits, 0-9 (default 0), added after the
+    seconds (each `%S`) of whichever `timestamp_format` is in use:
+
+    ```perl
+    Log::Abstraction->new(timestamp_format => 'rfc3339', timestamp_precision => 3, utc => 1);
+    # 2026-10-04T00:14:24.094Z
+    ```
+
+- `utc`
+
+    If true, timestamps are in UTC rather than local time.
 
 - `verbose`
 
@@ -184,7 +368,8 @@ A blessed `Log::Abstraction` object.
 
 Loads `File::Basename` if `syslog` is configured (either at the top level
 or in a `logger` hash) and `script_name` is not supplied.  Loads
-`Log::Log4perl` if no logger backend is specified.
+`Log::Log4perl` if no backend (`logger`, `file`, `fd` or `array`) is
+specified.
 
 #### Example
 
@@ -197,7 +382,7 @@ my $logger = Log::Abstraction->new(
 my $clone = $logger->new(level => 'info');
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -211,7 +396,13 @@ my $clone = $logger->new(level => 'info');
     level          => { type => 'string',  regex => qr/^(trace|debug|info(?:rmational)?|notice|warn(?:ing)?|err(?:or)?|crit(?:ical)?|fatal|alert|emerg(?:ency)?|panic)$/i, optional => 1 },
     logger         => { optional => 1 },
     max_messages   => { type => 'integer', min => 0, optional => 1 },
+    rotate_interval => { type => 'string', regex => qr/^(hourly|daily|weekly|monthly)$/i, optional => 1 },
+    rotate_keep    => { type => 'integer', min => 0, optional => 1 },
+    rotate_size    => { type => 'string',  regex => qr/^\s*[1-9]\d*\s*[kmg]?b?\s*$/i, optional => 1 },
     script_name    => { type => 'string',  optional => 1 },
+    timestamp_format    => { type => 'string', min => 1, optional => 1 },
+    timestamp_precision => { type => 'integer', min => 0, max => 9, optional => 1 },
+    utc            => { type => 'boolean', optional => 1 },
     verbose        => { type => 'boolean', optional => 1 },
 }
 ```
@@ -241,10 +432,27 @@ Error                                     Meaning / Action
                                           warn/warning/error.
 "<class>: max_messages must be a          max_messages is negative or not a number.
   non-negative integer, not '<v>'"
-"<class>: invalid sendmail level '<l>'"   The sendmail sub-hash 'level' is neither
-                                          a level name nor 0-7.  (A bad syslog
-                                          sub-hash 'level' gives "invalid syslog
-                                          level", as above.)
+"<class>: rotate_size must be a           rotate_size is not, e.g., 1048576, 512K,
+  positive number of bytes, optionally    10M or 1G.
+  with K, M or G, not '<v>'"
+"<class>: rotate_interval must be         rotate_interval is not one of those names.
+  hourly, daily, weekly or monthly,
+  not '<v>'"
+"<class>: rotate_keep must be a           rotate_keep is negative or not a number.
+  non-negative integer, not '<v>'"
+"<class>: timestamp_format must be a      timestamp_format is undef, empty or a
+  non-empty string"                       reference.
+"<class>: timestamp_precision must be     timestamp_precision is not a whole
+  an integer from 0 to 9, not '<v>'"      number of digits from 0 to 9.
+"<class>: invalid <backend> level '<l>'"  A backend's 'level' (file, fd, array,
+                                          sendmail, journald) is neither a level
+                                          name nor 0-7.  (A bad syslog 'level'
+                                          gives "invalid syslog level", as above.)
+"<class>: the <backend> format must be   A backend's 'format' is undef, empty or
+  a non-empty string"                     a reference.
+"<class>: the <backend> hash needs a      The hash form of file, fd or array has
+  '<backend>' key"                        no destination (e.g. file => { level =>
+                                          'info' } without a 'file' key).
 "<class>: the sendmail backend needs      The sendmail sub-hash has no 'to' key.
   a 'to' address"
 "<class>: invalid journald field name     An extra journald key, upper-cased, is not
@@ -252,7 +460,8 @@ Error                                     Meaning / Action
 ```
 
 The following are not raised by `new()` but later, by the logging methods
-(`trace`, `debug`, `info`, `notice`, `warn`, `error`, `fatal`), when
+(`trace`, `debug`, `info`, `notice`, `warn`, `error`, `fatal`,
+`critical`, `alert`, `emergency`), when
 a message that passes the level threshold reaches the backend concerned.
 Croaks are configuration errors; delivery failures only carp, because a
 logging failure must never crash the application.
@@ -302,6 +511,9 @@ FUNCTION new(class_or_obj, args...)
     Restore caller-supplied array ref that config merge would have dropped
 
   IF called on a blessed instance (clone form):
+    CROAK on an invalid timestamp_format or timestamp_precision
+    CROAK on an invalid rotate_size, rotate_interval or rotate_keep, and
+      normalise rotate_size to bytes
     shallow-clone self merged with override args
     validate and store new level integer if level given in args
     copy message history list
@@ -316,7 +528,7 @@ FUNCTION new(class_or_obj, args...)
   IF logger arg is a Log::Abstraction object:
     CROAK (would create a needless forwarding loop)
 
-  IF no logger AND no file AND no array:
+  IF no logger AND no file AND no fd AND no array:
     load Log::Log4perl, easy_init at DEBUG or ERROR per verbose flag
     store Log4perl logger as the backend
 
@@ -327,10 +539,19 @@ FUNCTION new(class_or_obj, args...)
     default to $DEFAULT_LEVEL if not supplied
 
   CROAK if max_messages is given and is not a non-negative integer
+  CROAK if timestamp_format is empty or not a string, or
+    timestamp_precision is not an integer 0-9
+  CROAK if rotate_size is not a positive size, rotate_interval is not
+    hourly/daily/weekly/monthly, or rotate_keep is not a non-negative
+    integer; normalise rotate_size to bytes
+
+  FOR each backend (top-level file/fd/array, and the logger hash's
+  file/fd/array/syslog/sendmail/journald) given as a hash:
+    CROAK if a file/fd/array hash lacks its destination key (its own name)
+    CROAK if its 'level' is not a level name or 0-7
+    CROAK if its 'format' is undef, empty or not a string
 
   IF logger is a hash:
-    CROAK if the syslog or sendmail sub-hash 'level' is not a level
-      name or 0-7
     CROAK if a sendmail sub-hash has no 'to' address
     CROAK if an extra journald key is not a valid journald field name
 
@@ -361,7 +582,10 @@ integer (per the syslog numeric scale; lower numbers are higher priority).
 
 In getter mode: an integer in the range 0 (emergency) to 7 (debug/trace).
 
-In setter mode: `$self` (to allow chaining).
+In setter mode: `$self` (to allow chaining), or `undef`, after a
+`Carp::carp`, if the level name is not recognised; the level is then
+unchanged.  A false argument (`undef`, `''` or `0`) is a get, not a set,
+so levels are set by name.
 
 #### Side Effects
 
@@ -377,7 +601,7 @@ my $n = $logger->level();   # e.g. 7
 $logger->level('info')->info('Now at info level');
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -419,15 +643,28 @@ FUNCTION level(self, level?)
 END FUNCTION
 ```
 
-### Is\_Debug
+### Level Detection Methods
+
+- is\_trace
+- is\_debug
+- is\_info
+- is\_notice
+- is\_warn
+- is\_error
+- is\_critical
+- is\_alert
+- is\_emergency
 
 ```
 if($logger->is_debug()) { ... }
 ```
 
-Returns a true value when the logger is configured at `debug` level or
-below (i.e. debug messages will actually be emitted).  Provided for
-compatibility with [Log::Any](https://metacpan.org/pod/Log%3A%3AAny).
+Each returns a true value when a message logged with the method of the same
+name (`is_warn` for `warn()`) would pass the logger's level threshold, so
+that expensive message-building can be skipped.  They follow the current
+threshold, including changes made with ["level"](#level).  As with the levels
+themselves, `is_trace` equals `is_debug`.  Provided for compatibility with
+[Log::Any](https://metacpan.org/pod/Log%3A%3AAny).
 
 #### Arguments
 
@@ -435,8 +672,7 @@ None.
 
 #### Returns
 
-`1` if the current level threshold includes debug (or trace) messages;
-`0` otherwise.
+`1` if messages at that level would be emitted; `0` otherwise.
 
 #### Example
 
@@ -444,9 +680,13 @@ None.
 if($logger->is_debug()) {
     $logger->debug('Expensive diagnostic: ' . Dumper(\%state));
 }
+
+$logger->level('warning');
+$logger->is_warn();    # 1
+$logger->is_info();    # 0
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -476,7 +716,8 @@ None.
 #### Returns
 
 An array reference of hashrefs, each with keys `level` (string) and
-`message` (string).
+`message` (string), and `fields` (hashref) when the message was logged with
+["Structured fields"](#structured-fields).
 
 #### Side Effects
 
@@ -491,7 +732,7 @@ my $msgs = $logger->messages();
 # $msgs->[0] = { level => 'info', message => 'hello' }
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -502,7 +743,7 @@ my $msgs = $logger->messages();
 ##### Output
 
 ```perl
-{ type => 'arrayref', element_type => { level => 'string', message => 'string' } }
+{ type => 'arrayref', element_type => { level => 'string', message => 'string', fields => 'hashref?' } }
 ```
 
 ### Trace
@@ -522,7 +763,8 @@ message is dropped silently when the configured level is above `debug`.
 - `@messages`
 
     One or more strings, or a single array reference.  All elements are joined
-    without a separator before storage.
+    without a separator before storage.  May be followed by a hashref of
+    ["Structured fields"](#structured-fields).
 
 #### Returns
 
@@ -541,7 +783,7 @@ $logger->trace('entering sub foo, args=', join(',', @args));
 $logger->trace('start')->debug('details')->info('summary');
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -573,7 +815,8 @@ Logs a message at `debug` level.
 
 - `@messages`
 
-    One or more strings, or a single array reference.
+    One or more strings, or a single array reference, optionally followed by
+    a hashref of ["Structured fields"](#structured-fields).
 
 #### Returns
 
@@ -589,7 +832,7 @@ Appends to the internal message history and dispatches to configured backends.
 $logger->debug('Query took ', $elapsed, 'ms');
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -621,7 +864,8 @@ Logs a message at `info` level.
 
 - `@messages`
 
-    One or more strings, or a single array reference.
+    One or more strings, or a single array reference, optionally followed by
+    a hashref of ["Structured fields"](#structured-fields).
 
 #### Returns
 
@@ -637,7 +881,7 @@ Appends to the internal message history and dispatches to configured backends.
 $logger->info('Server started on port ', $port);
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -670,7 +914,8 @@ Logs a message at `notice` level (higher priority than `info`, lower than
 
 - `@messages`
 
-    One or more strings, or a single array reference.
+    One or more strings, or a single array reference, optionally followed by
+    a hashref of ["Structured fields"](#structured-fields).
 
 #### Returns
 
@@ -686,7 +931,7 @@ Appends to the internal message history and dispatches to configured backends.
 $logger->notice('Configuration reloaded');
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -713,6 +958,7 @@ $logger->warn(\@messages);
 $logger->warn(warning => $text);
 $logger->warn({ warning => $text });
 $logger->warn(warning => \@parts);
+$logger->warn($text, \%fields);
 ```
 
 Logs a warning message.  Also dispatches to syslog and/or email backends
@@ -732,6 +978,8 @@ A `warn()` call with an empty or all-undef argument list is a silent no-op.
 
     A plain list of strings joined without separator, **or** a named `warning`
     parameter whose value may be a string or an array reference of strings.
+    Either form may be followed by a hashref of ["Structured fields"](#structured-fields), e.g.
+    `warn('Slow query', { ms => 1250 })`.
 
 #### Returns
 
@@ -750,7 +998,7 @@ $logger->warn(warning => 'Connection reset', ' retrying');
 $logger->warn({ warning => ['Part A', 'Part B'] });
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -785,6 +1033,7 @@ in the second table under ["new"](#new)'s MESSAGES.
 ```perl
 $logger->error(@messages);
 $logger->error(warning => $text);
+$logger->error($text, \%fields);
 ```
 
 Logs an error-level message.  Behaves identically to `warn()` but at the
@@ -811,7 +1060,7 @@ Same as `warn()` plus optional `Carp::croak` escalation.
 $logger->error('Fatal: database unavailable');
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -868,7 +1117,74 @@ Same as `error()`.
 $logger->fatal('Unrecoverable state; aborting');
 ```
 
-#### API Specification
+#### Api Specification
+
+##### Input
+
+```perl
+{ warning => { type => [ 'scalar', 'arrayref' ], optional => 1 } }
+```
+
+##### Output
+
+```perl
+{ type => 'object', class => 'Log::Abstraction' }
+```
+
+#### Messages
+
+Same as `error()`.
+
+### Methods Above Error
+
+- critical
+- alert
+- emergency
+
+```perl
+$logger->critical(@messages);
+$logger->alert(warning => $text);
+$logger->emergency($text, \%fields);
+```
+
+Log a message at a level more severe than `error`:
+
+```
+Method      Level       syslog   Priority
+----------  ----------  -------  --------
+critical    critical    crit     2
+alert       alert       alert    1
+emergency   emergency   emerg    0
+```
+
+#### Arguments
+
+`critical`, `alert` and `emergency` take the same argument forms as
+`warn()`.
+
+#### Returns
+
+`$self`, to allow method chaining (unless they croak; see below).
+
+#### Side Effects
+
+These behave like `error()`, at a more severe level: `croak_on_error`, or
+having no backend, makes them `Carp::croak`, and `carp_on_warn` makes them
+`Carp::carp`.  The level string passed to backends is the method name
+(`critical`, `alert` or `emergency`, upper-cased in text formats); syslog
+gets `crit`, `alert` or `emerg`, and journald `PRIORITY` 2, 1 or 0.  An
+object logger without the method (such as [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl)) is called with
+`fatal`, or `error` if it has no `fatal` either.
+
+#### Example
+
+```perl
+$logger->critical('Disk 95% full', { mount => '/var' });
+$logger->alert('Primary database unreachable');
+$logger->emergency('Data corruption detected; shutting down');
+```
+
+#### Api Specification
 
 ##### Input
 
@@ -994,7 +1310,7 @@ callback as described above.
 - **Syslog hash mutation**
 
     The `syslog` sub-hash passed to `new()` is mutated in-place on the first
-    log call: `facility` and `level` are temporarily removed before
+    log call: `facility`, `level` and `format` are temporarily removed before
     `setlogsock()` is called, then restored; `server` is permanently renamed
     to `host`.  Sharing a syslog hashref between two `Log::Abstraction`
     instances is not supported and produces undefined behaviour on the second
@@ -1018,11 +1334,12 @@ callback as described above.
     logging to syslog shares one connection, opened with the `script_name` of
     the first.  It is closed when the last such instance is destroyed.
 
-- **No structured log fields**
+- **Structured fields are text in most backends**
 
-    All backends except the CODE-ref backend reduce the message to a flat string.
-    To log structured key/value pairs, use a CODE-ref backend that formats the
-    data itself.
+    Only the history, array, CODE-ref, JSON and journald backends keep
+    ["Structured fields"](#structured-fields) as data.  Text formats, syslog, email and object
+    loggers get them as `key=value` text appended to the message, and a custom
+    `format` has no token for them on their own.
 
 - **Single-threaded email throttle**
 
@@ -1039,10 +1356,9 @@ callback as described above.
 
 - **Log::Log4perl is a de-facto required dependency**
 
-    When no `logger`, `file`, or `array` backend is configured, `new()`
-    loads [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) and uses it as the default backend.  Although listed
-    as an optional runtime dependency, it is required in that default-backend
-    path.
+    When no `logger`, `file`, `fd` or `array` backend is configured, `new()`
+    loads [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) and uses it as the default backend, so it is a
+    required dependency even for applications that never use it.
 
 ## Author
 
@@ -1096,10 +1412,19 @@ You can also look for information at:
 ### New
 
 ```
+FIELDS == STRING ⇸ VALUE          structured fields (see Structured fields)
+ENTRY  == { level : STRING; message : STRING; fields : FIELDS }
+
+entry(l, m, f) == {level ↦ l, message ↦ m} ∪ (if f = ∅ then ∅ else {fields ↦ f})
+
 ┌─ LogState ──────────────────────────────────────────────────
-│ level    : ℤ
-│ messages : seq { level : STRING; message : STRING }
-│ logger   : LOGGER
+│ level        : ℤ
+│ messages     : seq ENTRY
+│ max_messages : ℕ ∪ {∞}
+│ logger       : LOGGER
+├─────────────────────────────────────────────────────────────
+│ 0 ≤ level ≤ 7
+│ #messages ≤ max_messages
 └─────────────────────────────────────────────────────────────
 
 ┌─ New ───────────────────────────────────────────────────────
@@ -1108,8 +1433,9 @@ You can also look for information at:
 ├─────────────────────────────────────────────────────────────
 │ result!.level = syslog_values(args?.level ∨ 'warning')
 │ result!.messages = ⟨⟩
+│ result!.max_messages = args?.max_messages ∨ ∞
 │ args?.logger ≠ ∅ ⟹ result!.logger = args?.logger
-│ args?.logger = ∅ ∧ args?.file = ∅ ∧ args?.array = ∅
+│ args?.logger = ∅ ∧ args?.file = ∅ ∧ args?.fd = ∅ ∧ args?.array = ∅
 │   ⟹ result!.logger = Log4perl
 └─────────────────────────────────────────────────────────────
 
@@ -1143,17 +1469,32 @@ Clone operation (called on an existing object):
 │ new_level? ∈ dom(syslog_values)
 │ level' = syslog_values(new_level?)
 └─────────────────────────────────────────────────────────────
-```
 
-### Is\_Debug
-
-```
-┌─ IsDebug ──────────────────────────────────────────────────
+┌─ LevelSetInvalid ──────────────────────────────────────────
 │ ΞLogState
+│ new_level? : STRING
+│ result! : undef
+├─────────────────────────────────────────────────────────────
+│ new_level? ≠ ''
+│ new_level? ∉ dom(syslog_values)
+│ carp("invalid syslog level")
+└─────────────────────────────────────────────────────────────
+
+level(new_level?) ≡ LevelSet ∨ LevelSetInvalid
+```
+
+### Is\_Trace, Is\_Debug, Is\_Info, Is\_Notice, Is\_Warn, Is\_Error, Is\_Critical, Is\_Alert, Is\_Emergency
+
+```
+┌─ IsLevel ──────────────────────────────────────────────────
+│ ΞLogState
+│ lvl? : LEVEL
 │ result! : BOOLEAN
 ├─────────────────────────────────────────────────────────────
-│ result! = (level ≥ syslog_values('debug'))
+│ result! = (level ≥ syslog_values(lvl?))
 └─────────────────────────────────────────────────────────────
+
+is_<lvl> ≡ IsLevel[lvl? := lvl]
 ```
 
 ### Messages
@@ -1161,7 +1502,7 @@ Clone operation (called on an existing object):
 ```
 ┌─ Messages ─────────────────────────────────────────────────
 │ ΞLogState
-│ result! : seq { level : STRING; message : STRING }
+│ result! : seq ENTRY
 ├─────────────────────────────────────────────────────────────
 │ result! = messages
 └─────────────────────────────────────────────────────────────
@@ -1173,9 +1514,10 @@ Clone operation (called on an existing object):
 ┌─ Trace ────────────────────────────────────────────────────
 │ ΔLogState
 │ msg? : seq STRING
+│ fields? : FIELDS
 ├─────────────────────────────────────────────────────────────
 │ syslog_values('trace') ≤ level
-│ messages' = messages ⌢ ⟨{level ↦ 'trace', message ↦ ⊕(msg?)}⟩
+│ messages' = messages ⌢ ⟨entry('trace', ⊕(msg?), fields?)⟩
 └─────────────────────────────────────────────────────────────
 ```
 
@@ -1185,9 +1527,10 @@ Clone operation (called on an existing object):
 ┌─ Debug ────────────────────────────────────────────────────
 │ ΔLogState
 │ msg? : seq STRING
+│ fields? : FIELDS
 ├─────────────────────────────────────────────────────────────
 │ syslog_values('debug') ≤ level
-│ messages' = messages ⌢ ⟨{level ↦ 'debug', message ↦ ⊕(msg?)}⟩
+│ messages' = messages ⌢ ⟨entry('debug', ⊕(msg?), fields?)⟩
 └─────────────────────────────────────────────────────────────
 ```
 
@@ -1197,9 +1540,10 @@ Clone operation (called on an existing object):
 ┌─ Info ─────────────────────────────────────────────────────
 │ ΔLogState
 │ msg? : seq STRING
+│ fields? : FIELDS
 ├─────────────────────────────────────────────────────────────
 │ syslog_values('info') ≤ level
-│ messages' = messages ⌢ ⟨{level ↦ 'info', message ↦ ⊕(msg?)}⟩
+│ messages' = messages ⌢ ⟨entry('info', ⊕(msg?), fields?)⟩
 └─────────────────────────────────────────────────────────────
 ```
 
@@ -1209,9 +1553,10 @@ Clone operation (called on an existing object):
 ┌─ Notice ───────────────────────────────────────────────────
 │ ΔLogState
 │ msg? : seq STRING
+│ fields? : FIELDS
 ├─────────────────────────────────────────────────────────────
 │ syslog_values('notice') ≤ level
-│ messages' = messages ⌢ ⟨{level ↦ 'notice', message ↦ ⊕(msg?)}⟩
+│ messages' = messages ⌢ ⟨entry('notice', ⊕(msg?), fields?)⟩
 └─────────────────────────────────────────────────────────────
 ```
 
@@ -1221,10 +1566,11 @@ Clone operation (called on an existing object):
 ┌─ Warn ─────────────────────────────────────────────────────
 │ ΔLogState
 │ msg? : seq STRING | { warning : STRING | seq STRING }
+│ fields? : FIELDS
 ├─────────────────────────────────────────────────────────────
 │ msg? ≠ ∅ ∧ join(msg?) ≠ ''
 │ syslog_values('warn') ≤ level
-│ messages' = messages ⌢ ⟨{level ↦ 'warn', message ↦ join(msg?)}⟩
+│ messages' = messages ⌢ ⟨entry('warn', join(msg?), fields?)⟩
 │ (carp_on_warn ∨ no_backend) ⟹ carp(join(msg?))
 └─────────────────────────────────────────────────────────────
 
@@ -1240,10 +1586,11 @@ messages is not touched.
 ┌─ Error ────────────────────────────────────────────────────
 │ ΔLogState
 │ msg? : seq STRING | { warning : STRING | seq STRING }
+│ fields? : FIELDS
 ├─────────────────────────────────────────────────────────────
 │ msg? ≠ ∅ ∧ join(msg?) ≠ ''
 │ syslog_values('error') ≤ level
-│ messages' = messages ⌢ ⟨{level ↦ 'error', message ↦ join(msg?)}⟩
+│ messages' = messages ⌢ ⟨entry('error', join(msg?), fields?)⟩
 │ (croak_on_error ∨ no_backend) ⟹ execution_continues = false
 └─────────────────────────────────────────────────────────────
 
@@ -1254,6 +1601,18 @@ Called as a class method (no LogState): croak(join(msg?)).
 
 ```
 fatal ≡ error   (identical operation schema)
+```
+
+### Critical, Alert, Emergency
+
+```
+The Error schema, with 'error' replaced by 'critical', 'alert' or
+'emergency' respectively.
+
+In every logging schema, when #messages' would exceed max_messages
+the oldest entries are dropped: messages' = the last max_messages
+entries.  fields? is a hashref given after the message (see
+Structured fields); fields? = ∅ when there is none.
 ```
 
 ## Copyright and License

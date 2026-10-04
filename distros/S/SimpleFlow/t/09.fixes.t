@@ -13,7 +13,7 @@
 # 4ec5053) before the fix went in, on perl 5.44.0 and 5.10.1, with two
 # exceptions that their comments explain: block 4 is a race, and block 11
 # fails on 5.44.0 only. They use no argument 0.191 did not accept. Blocks
-# 26-29 test "env.secret", the option added for S03, and cannot run against
+# 26-29 test "env_secret", the option added for S03, and cannot run against
 # 0.191 at all.
 #
 # Each block works in a directory of its own, given to task() as "dir", so
@@ -54,7 +54,7 @@ sub slurp {
 	return $text;
 }
 
-# 1. F01. Two copies of one name in "output.files": the first was moved to
+# 1. F01. Two copies of one name in "output_files": the first was moved to
 # out.failed, and the second pass then deleted that .failed as "left from
 # before" and found nothing to move. Both names were gone, and failed.outputs
 # still listed out.failed.
@@ -63,7 +63,7 @@ subtest 'a name declared twice keeps its partial output in .failed (0.191 delete
 	my $t;
 	capture {
 		$t = task(cmd => [$^X, '-e', q{open my $f, q{>}, q{out} or die; print {$f} q{partial}; close $f; exit 1}],
-			'output.files' => ['out', 'out'], dir => $d, die => 0, quiet => 1);
+			'output_files' => ['out', 'out'], dir => $d, die => 0, quiet => 1);
 	};
 	is($t->{'will.do'}, 'FAILED', 'the step failed, as it should');
 	is(slurp(File::Spec->catfile($d, 'out.failed')), 'partial', 'out.failed holds what the command wrote (0.191: it was deleted)');
@@ -78,7 +78,7 @@ subtest 'an output named <other>.failed is not destroyed by moving the other asi
 	spew(File::Spec->catfile($d, 'out.failed'), 'second');
 	my $t;
 	capture {
-		$t = task(cmd => [$^X, '-e', 'exit 1'], 'output.files' => ['out', 'out.failed'],
+		$t = task(cmd => [$^X, '-e', 'exit 1'], 'output_files' => ['out', 'out.failed'],
 			overwrite => 1, dir => $d, die => 0, quiet => 1);
 	};
 	my @contents = sort grep { defined } map { slurp(File::Spec->catfile($d, $_)) } qw(out out.failed out.failed.failed);
@@ -96,8 +96,8 @@ subtest 'a file inside a directory output moves with the directory (0.191 report
 	spew(File::Spec->catfile($d, 'out', 'item'), 'contents');
 	my $t;
 	capture {
-		$t = task(cmd => [$^X, '-e', 'exit 1'], 'output.file' => File::Spec->catfile('out', 'item'),
-			'output.dir' => 'out', overwrite => 1, dir => $d, die => 0, quiet => 1);
+		$t = task(cmd => [$^X, '-e', 'exit 1'], 'output_file' => File::Spec->catfile('out', 'item'),
+			'output_dir' => 'out', overwrite => 1, dir => $d, die => 0, quiet => 1);
 	};
 	cmp_ok(scalar @{ $t->{'failed.outputs'} }, '>', 0, 'something was moved aside');
 	my @absent = grep { not -e File::Spec->catfile($d, $_) } @{ $t->{'failed.outputs'} };
@@ -122,7 +122,7 @@ SKIP: {
 		capture {
 			@records = parallel(jobs => 8, tasks => [map { {
 				cmd => [$^X, '-e', 'select undef, undef, undef, 0.2'], quiet => 1, dir => $d,
-				note => ("worker$_-" x 12000), 'trace.fh' => $trace,
+				note => ("worker$_-" x 12000), 'trace_fh' => $trace,
 			} } 1 .. 16]);
 		};
 		close $trace;
@@ -142,18 +142,18 @@ SKIP: {
 	};
 }
 
-# 5. F03. A run without "stale.cmd" that replaced the outputs left the
-# signature of the command before it on record, so a later stale.cmd run of
+# 5. F03. A run without "stale_cmd" that replaced the outputs left the
+# signature of the command before it on record, so a later stale_cmd run of
 # that earlier command took the other command's output as its own.
-subtest 'a run without stale.cmd updates the command on record (0.191 left the old one, and skipped)' => sub {
+subtest 'a run without stale_cmd updates the command on record (0.191 left the old one, and skipped)' => sub {
 	my $d = fresh_dir();
 	my $code = q{open my $f, q{>}, q{out} or die; print {$f} $ARGV[0]};
-	my @common = ('output.file' => 'out', dir => $d, quiet => 1);
+	my @common = ('output_file' => 'out', dir => $d, quiet => 1);
 	my $t;
 	capture {
-		task(@common, cmd => [$^X, '-e', $code, 'A'], 'stale.cmd' => 1);
+		task(@common, cmd => [$^X, '-e', $code, 'A'], 'stale_cmd' => 1);
 		task(@common, cmd => [$^X, '-e', $code, 'B'], overwrite => 1);
-		$t = task(@common, cmd => [$^X, '-e', $code, 'A'], 'stale.cmd' => 1);
+		$t = task(@common, cmd => [$^X, '-e', $code, 'A'], 'stale_cmd' => 1);
 	};
 	is(slurp(File::Spec->catfile($d, 'out')), 'A', 'the output is A\'s (0.191: B\'s)');
 	is($t->{done}, 'now', 'A was run again (0.191: done before)');
@@ -161,11 +161,11 @@ subtest 'a run without stale.cmd updates the command on record (0.191 left the o
 };
 
 # 6. F04. The signature hashed the wrapped command space-joined, so a wrapper
-# given one word "a b" and one given "a" and "b" looked the same to stale.cmd.
-subtest 'stale.cmd tells apart wrapper words that join to the same string (0.191 did not)' => sub {
+# given one word "a b" and one given "a" and "b" looked the same to stale_cmd.
+subtest 'stale_cmd tells apart wrapper words that join to the same string (0.191 did not)' => sub {
 	my $d = fresh_dir();
 	my $code = q{open my $f, q{>}, q{out} or die; print {$f} join q{|}, @ARGV};
-	my @common = (cmd => ['tail'], 'output.file' => 'out', 'stale.cmd' => 1, dir => $d, quiet => 1);
+	my @common = (cmd => ['tail'], 'output_file' => 'out', 'stale_cmd' => 1, dir => $d, quiet => 1);
 	my $t;
 	capture {
 		task(@common, wrapper => [$^X, '-e', $code, 'a b']);
@@ -176,14 +176,14 @@ subtest 'stale.cmd tells apart wrapper words that join to the same string (0.191
 };
 
 # 7. F05. "threads" reaches the command as SIMPLEFLOW_THREADS, but was not in
-# the signature, so changing it did not re-run a stale.cmd step.
-subtest 'stale.cmd re-runs a step whose threads changed (0.191 did not)' => sub {
+# the signature, so changing it did not re-run a stale_cmd step.
+subtest 'stale_cmd re-runs a step whose threads changed (0.191 did not)' => sub {
 	my $d = fresh_dir();
 	my $cmd = [$^X, '-e', q{open my $f, q{>}, q{out} or die; print {$f} $ENV{SIMPLEFLOW_THREADS}}];
 	my $t;
 	capture {
-		task(cmd => $cmd, threads => 1, 'output.file' => 'out', 'stale.cmd' => 1, dir => $d, quiet => 1);
-		$t = task(cmd => $cmd, threads => 2, 'output.file' => 'out', 'stale.cmd' => 1, dir => $d, quiet => 1);
+		task(cmd => $cmd, threads => 1, 'output_file' => 'out', 'stale_cmd' => 1, dir => $d, quiet => 1);
+		$t = task(cmd => $cmd, threads => 2, 'output_file' => 'out', 'stale_cmd' => 1, dir => $d, quiet => 1);
 	};
 	is(slurp(File::Spec->catfile($d, 'out')), '2', 'the command saw threads => 2 (0.191: kept the output of 1)');
 	is($t->{'cmd.changed'}, 1, 'cmd.changed is 1');
@@ -198,21 +198,21 @@ subtest 'lock accepts an output name with a wide character (0.191 died)' => sub 
 	spew(File::Spec->catfile($d, $name), 'data');
 	my $t;
 	capture {
-		$t = eval { task(cmd => [$^X, '-e', 'exit 0'], 'output.file' => $name, lock => 1, dir => $d, quiet => 1) };
+		$t = eval { task(cmd => [$^X, '-e', 'exit 0'], 'output_file' => $name, lock => 1, dir => $d, quiet => 1) };
 	};
 	is($@, '', 'task() did not die (0.191: Wide character in subroutine entry)');
 	is($t->{done}, 'before', 'the existing output was found');
 };
 
-# 9. F07. With "stdout.file" also declared as an output, a failed attempt
+# 9. F07. With "stdout_file" also declared as an output, a failed attempt
 # moved the file aside, so the retry began a new one: the documented "every
 # attempt, in order" held only the last.
-subtest 'stdout.file keeps every attempt even when it is also an output (0.191 kept only the last)' => sub {
+subtest 'stdout_file keeps every attempt even when it is also an output (0.191 kept only the last)' => sub {
 	my $d = fresh_dir();
 	my $code = q{my $again = -e q{attempt}; open my $f, q{>}, q{attempt} or die; close $f; print $again ? qq{second\n} : qq{first\n}; exit($again ? 0 : 1)};
 	my $t;
 	capture {
-		$t = task(cmd => [$^X, '-e', $code], 'stdout.file' => 'out', 'output.file' => 'out',
+		$t = task(cmd => [$^X, '-e', $code], 'stdout_file' => 'out', 'output_file' => 'out',
 			retries => 1, dir => $d, quiet => 1);
 	};
 	is($t->{attempts}, 2, 'it took two attempts');
@@ -220,16 +220,16 @@ subtest 'stdout.file keeps every attempt even when it is also an output (0.191 k
 	ok(not(-e File::Spec->catfile($d, 'out.failed')), 'nothing was moved aside');
 };
 
-# 10. F08. With "stderr.file" also declared as an output, the failed step's
+# 10. F08. With "stderr_file" also declared as an output, the failed step's
 # file was moved aside before the message was built, and the message's
 # "stderr ended with" was quietly left out. The line is built at run time so
 # that it cannot reach the message through the command itself.
-subtest 'the failure message quotes stderr.file even when it was moved aside (0.191 left it out)' => sub {
+subtest 'the failure message quotes stderr_file even when it was moved aside (0.191 left it out)' => sub {
 	my $d = fresh_dir();
 	my $error;
 	capture {
 		eval { task(cmd => [$^X, '-e', q{print STDERR join(q{-}, qw(fixture diagnostic)), qq{\n}; exit 7}],
-			'stderr.file' => 'err', 'output.file' => 'err', dir => $d, quiet => 1) };
+			'stderr_file' => 'err', 'output_file' => 'err', dir => $d, quiet => 1) };
 		$error = $@;
 	};
 	like($error, qr/exited 7/, 'task() died for the exit');
@@ -396,7 +396,7 @@ SKIP: {
 	subtest 'lock refuses a .simpleflow that is a symbolic link (0.191 followed it)' => sub {
 		my $error;
 		capture {
-			eval { task(cmd => [$^X, '-e', 'exit 0'], 'output.file' => 'out', lock => 1, dir => $d, quiet => 1) };
+			eval { task(cmd => [$^X, '-e', 'exit 0'], 'output_file' => 'out', lock => 1, dir => $d, quiet => 1) };
 			$error = $@;
 		};
 		like($error, qr/is a symbolic link/, 'task() refused it (0.191: no)');
@@ -406,17 +406,17 @@ SKIP: {
 	};
 }
 
-# 19. S01. The same for the command records of "stale.cmd", in ".simpleflow/cmd".
+# 19. S01. The same for the command records of "stale_cmd", in ".simpleflow/cmd".
 SKIP: {
 	my $d = fresh_dir();
 	mkdir File::Spec->catdir($d, $_) or die $! foreach 'elsewhere', '.simpleflow';
 	skip 'cannot make a symbolic link here', 1
 		if not make_symlink(File::Spec->catdir(File::Spec->updir, 'elsewhere'), File::Spec->catfile($d, '.simpleflow', 'cmd'));
-	subtest 'stale.cmd refuses a .simpleflow/cmd that is a symbolic link (0.191 followed it)' => sub {
+	subtest 'stale_cmd refuses a .simpleflow/cmd that is a symbolic link (0.191 followed it)' => sub {
 		my $error;
 		capture {
-			eval { task(cmd => [$^X, '-e', q{open my $f, q{>}, q{out} or die}], 'output.file' => 'out',
-				'stale.cmd' => 1, dir => $d, quiet => 1) };
+			eval { task(cmd => [$^X, '-e', q{open my $f, q{>}, q{out} or die}], 'output_file' => 'out',
+				'stale_cmd' => 1, dir => $d, quiet => 1) };
 			$error = $@;
 		};
 		like($error, qr/is a symbolic link/, 'task() refused it (0.191: no)');
@@ -442,8 +442,8 @@ SKIP: {
 	skip 'cannot make a symbolic link here', 1 if not make_symlink($victim, "$record.$$");
 	subtest 'a link at the old temporary name of a command record is not followed (0.191 overwrote its target)' => sub {
 		capture {
-			task(cmd => [$^X, '-e', q{open my $f, q{>}, q{out} or die}], 'output.file' => 'out',
-				'stale.cmd' => 1, dir => $d, quiet => 1);
+			task(cmd => [$^X, '-e', q{open my $f, q{>}, q{out} or die}], 'output_file' => 'out',
+				'stale_cmd' => 1, dir => $d, quiet => 1);
 		};
 		ok(-e $record, 'the record was written'); # the sentinel
 		is(slurp($victim), 'precious', 'and the link\'s target is untouched (0.191: it held the record)');
@@ -483,12 +483,12 @@ SKIP: {
 		my $d = fresh_dir();
 		mkdir File::Spec->catdir($d, 'sub') or die $!;
 		my $child = hold_lock($d, cmd => [$^X, '-e', $STARTED_THEN . q{open my $f, q{>}, q{out} or die; print {$f} q{first}}],
-			'output.file' => 'out');
+			'output_file' => 'out');
 		ok(-e File::Spec->catfile($d, 'started'), 'the first run started'); # the sentinel
 		my $t;
 		my (undef, $err) = capture {
 			$t = task(cmd => [$^X, '-e', q{open my $f, q{>}, q{out} or die; print {$f} q{second}}],
-				'output.file' => File::Spec->catfile('sub', File::Spec->updir, 'out'), lock => 1, dir => $d, quiet => 1);
+				'output_file' => File::Spec->catfile('sub', File::Spec->updir, 'out'), lock => 1, dir => $d, quiet => 1);
 		};
 		waitpid $child, 0;
 		like($err, qr/waiting for another run/, 'the second run waited (0.191: no)');
@@ -504,12 +504,12 @@ SKIP: {
 	subtest 'a file output waits for a run that holds its directory (0.191 did not)' => sub {
 		my $d = fresh_dir();
 		my $child = hold_lock($d, cmd => [$^X, '-e', q{mkdir q{res}; } . $STARTED_THEN
-			. q{open my $f, q{>}, q{res/f} or die; print {$f} q{first}}], 'output.dir' => 'res');
+			. q{open my $f, q{>}, q{res/f} or die; print {$f} q{first}}], 'output_dir' => 'res');
 		ok(-e File::Spec->catfile($d, 'started'), 'the first run started'); # the sentinel
 		my $t;
 		my (undef, $err) = capture {
 			$t = task(cmd => [$^X, '-e', q{open my $f, q{>}, q{res/f} or die; print {$f} q{second}}],
-				'output.file' => File::Spec->catfile('res', 'f'), lock => 1, dir => $d, quiet => 1);
+				'output_file' => File::Spec->catfile('res', 'f'), lock => 1, dir => $d, quiet => 1);
 		};
 		waitpid $child, 0;
 		like($err, qr/waiting for another run/, 'the second run waited (0.191: no)');
@@ -518,7 +518,7 @@ SKIP: {
 }
 
 # Write $line to a trace of its own, run report() over it, and return the
-# error, or '' if it succeeded. Lines are bytes, as "trace.fh" writes them.
+# error, or '' if it succeeded. Lines are bytes, as "trace_fh" writes them.
 sub report_on {
 	my $line = shift;
 	my $d = fresh_dir();
@@ -566,12 +566,12 @@ subtest 'report() writes a UTF-8 byte-string title once (0.191 encoded it twice)
 
 #
 # The tests above are of defects, and use only arguments 0.191 accepted. Those
-# below are of "env.secret", new in 0.192, and cannot run against 0.191.
+# below are of "env_secret", new in 0.192, and cannot run against 0.191.
 #
 
 # 26. S03. Every "env" value went into the record, and so to the terminal,
 # the log and the trace, credentials included.
-subtest 'env.secret hides a value everywhere it would be printed, but the command still has it' => sub {
+subtest 'env_secret hides a value everywhere it would be printed, but the command still has it' => sub {
 	my $d = fresh_dir();
 	my $log = File::Spec->catfile($d, 'log');
 	my $trace = File::Spec->catfile($d, 'trace.jsonl');
@@ -583,14 +583,14 @@ subtest 'env.secret hides a value everywhere it would be printed, but the comman
 		# put it in the record's stdout
 		$t = task(cmd => [$^X, '-e', q{print length $ENV{TOKEN}}],
 			env => { TOKEN => 'hunter2', PLAIN => 'shown' },
-			'env.secret' => ['TOKEN'], 'log.fh' => $log_fh, 'trace.fh' => $trace_fh);
+			'env_secret' => ['TOKEN'], 'log_fh' => $log_fh, 'trace_fh' => $trace_fh);
 	};
 	close $log_fh;
 	close $trace_fh;
 	is($t->{stdout}, '7', 'the command was given the value'); # the sentinel
 	is($t->{env}{TOKEN}, '(secret)', 'the record hides it');
 	is($t->{env}{PLAIN}, 'shown', 'and not the variable it was not asked to');
-	is_deeply($t->{'env.secret'}, ['TOKEN'], 'the record says which are hidden');
+	is_deeply($t->{'env_secret'}, ['TOKEN'], 'the record says which are hidden');
 	my $trace_text = slurp($trace);
 	like($trace_text, qr/"PLAIN":"shown"/, 'the trace has the env'); # the sentinel
 	unlike($trace_text, qr/"TOKEN":"hunter2"/, 'but not the secret');
@@ -604,7 +604,7 @@ subtest 'env.secret hides a value everywhere it would be printed, but the comman
 subtest 'an argument error does not print a secret' => sub {
 	my $error;
 	my (undef, $err) = capture {
-		eval { task(cmd => 'true', env => { TOKEN => 'hunter2' }, 'env.secret' => ['TOKEN'], timeout => 'soon') };
+		eval { task(cmd => 'true', env => { TOKEN => 'hunter2' }, 'env_secret' => ['TOKEN'], timeout => 'soon') };
 		$error = $@;
 	};
 	like($error, qr/"timeout" must be a whole number/, 'task() refused the call'); # the sentinel
@@ -612,32 +612,32 @@ subtest 'an argument error does not print a secret' => sub {
 	unlike($err, qr/hunter2/, 'without the secret');
 };
 
-# 28. S03. What env.secret accepts, and how it combines with %DEFAULTS.
-subtest 'env.secret is checked, and merged with the default one' => sub {
+# 28. S03. What env_secret accepts, and how it combines with %DEFAULTS.
+subtest 'env_secret is checked, and merged with the default one' => sub {
 	my $t;
 	capture {
-		local %SimpleFlow::DEFAULTS = ('env.secret' => ['A']);
-		$t = task(cmd => [$^X, '-e', 'exit 0'], env => { A => 'a', B => 'b', C => 'c' }, 'env.secret' => ['B'], quiet => 1);
+		local %SimpleFlow::DEFAULTS = ('env_secret' => ['A']);
+		$t = task(cmd => [$^X, '-e', 'exit 0'], env => { A => 'a', B => 'b', C => 'c' }, 'env_secret' => ['B'], quiet => 1);
 	};
-	is_deeply($t->{'env.secret'}, ['A', 'B'], "the default's names and the task's");
+	is_deeply($t->{'env_secret'}, ['A', 'B'], "the default's names and the task's");
 	is_deeply($t->{env}, { A => '(secret)', B => '(secret)', C => 'c' }, 'both hidden');
 	capture {
 		$t = task(cmd => [$^X, '-e', 'exit 0'], quiet => 1);
 	};
-	is_deeply($t->{'env.secret'}, [], 'none by default');
+	is_deeply($t->{'env_secret'}, [], 'none by default');
 	foreach my $bad ('TOKEN', [undef], [''], ['A=B'], [['A']]) {
 		my $error;
-		capture { eval { task(cmd => [$^X, '-e', 'exit 0'], 'env.secret' => $bad, quiet => 1) }; $error = $@ };
-		like($error, qr/"env\.secret" must be an array ref of the names/, 'a bad "env.secret" is refused');
+		capture { eval { task(cmd => [$^X, '-e', 'exit 0'], 'env_secret' => $bad, quiet => 1) }; $error = $@ };
+		like($error, qr/"env_secret" must be an array ref of the names/, 'a bad "env_secret" is refused');
 	}
 };
 
-# 29. S03. A secret's value is not in the "stale.cmd" digest: it would be
+# 29. S03. A secret's value is not in the "stale_cmd" digest: it would be
 # kept on disk, and a rotated credential would re-run every step.
-subtest 'stale.cmd does not re-run a step whose secret changed' => sub {
+subtest 'stale_cmd does not re-run a step whose secret changed' => sub {
 	my $d = fresh_dir();
-	my @common = (cmd => [$^X, '-e', q{open my $f, q{>}, q{out} or die}], 'output.file' => 'out',
-		'stale.cmd' => 1, 'env.secret' => ['TOKEN'], dir => $d, quiet => 1);
+	my @common = (cmd => [$^X, '-e', q{open my $f, q{>}, q{out} or die}], 'output_file' => 'out',
+		'stale_cmd' => 1, 'env_secret' => ['TOKEN'], dir => $d, quiet => 1);
 	my ($first, $second);
 	capture {
 		$first  = task(@common, env => { TOKEN => 'old' });

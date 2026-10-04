@@ -476,6 +476,36 @@ is( $cmdp[1], 'text', '_cmdp returns the payload type as its trailing tuple valu
     like( $out, qr/dashboard_ajax_singleton_cleanup\('sg'\)/, 'Ajax emits singleton cleanup for a saved bookmark with a singleton' );
 }
 
+# Saved Ajax code is a Template Toolkit template when data is supplied.
+{
+    local $Developer::Dashboard::Zipper::AJAX_CONTEXT = {
+        source       => 'saved',
+        page_id      => 'p-data',
+        runtime_root => $rt,
+    };
+    my ( undef, $err ) = ajax_run(
+        jvar => 'root.data',
+        file => 'h-data',
+        code => 'print [% args %];',
+        data => { args => 123 },
+    );
+    is( $err, undef, 'Ajax accepts data for code-template rendering' );
+    is( Developer::Dashboard::Zipper::load_saved_ajax_code( runtime_root => $rt, file => 'h-data' ), 'print 123;', 'Ajax renders data values into stored code before execution' );
+
+    my $perl_literal = q{['sep', 'instruction', {'display_url' => 'https://example.test'}]};
+    ( undef, $err ) = ajax_run(
+        jvar => 'root.literal',
+        file => 'h-data-literal',
+        code => 'my ($SQLS_SEP, $INSTRUCTION_SEP, $app) = @{[% args %]};',
+        data => { args => $perl_literal },
+    );
+    is( $err, undef, 'Ajax renders a structured Perl literal supplied through data' );
+    my $expected_literal = 'my ($SQLS_SEP, $INSTRUCTION_SEP, $app) = @{['
+      . "'sep', 'instruction', {'display_url' => 'https://example.test'}"
+      . ']};';
+    is( Developer::Dashboard::Zipper::load_saved_ajax_code( runtime_root => $rt, file => 'h-data-literal' ), $expected_literal, 'Ajax preserves the rendered data literal in executable code' );
+}
+
 # Saved-bookmark path, skill source, code present, no singleton, dotless jvar.
 {
     local $Developer::Dashboard::Zipper::AJAX_CONTEXT = {

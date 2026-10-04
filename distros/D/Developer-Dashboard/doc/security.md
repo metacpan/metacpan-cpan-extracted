@@ -174,6 +174,15 @@ module at a genuinely affected version and requires `script/cpan-audit-project`
 to report that exact advisory identifier. A floor that drifted to a version with
 no real advisory behind it would fail that proof.
 
+The CLI uses `Pod::Usage` to render its help text, which loads `Pod::Text` from
+the `podlators` distribution. `Pod::Text` before 6.1.1 is vulnerable to
+CPU/memory exhaustion while formatting sufficiently deep `=over` nesting
+(CVE-2026-82560). The runtime floor is 6.1.1 in all three dependency manifests;
+`t/181-podlators-security-floor.t` and the secure-minimum map in
+`t/108-cpan-security-metadata.t` guard it. The isolated CI audit must resolve
+the fixed distribution instead of classifying this installed package as
+environmental.
+
 When raising a floor, audit the newly resolved chain rather than assuming it is
 safe: a higher floor can pull in additional distributions, and a floor set above
 a module's newest release would make the distribution uninstallable.

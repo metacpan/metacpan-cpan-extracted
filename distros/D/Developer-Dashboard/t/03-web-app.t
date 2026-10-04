@@ -100,6 +100,7 @@ my $page = Developer::Dashboard::PageDocument->new(
     id     => 'welcome',
     title  => 'Welcome',
     layout => { body => 'hello from app [% stash.name %]' },
+    meta   => { head => '<meta name="x-bookmark" content="head-injected">' },
 );
 $store->save_page($page);
 
@@ -107,6 +108,8 @@ my $legacy_page = Developer::Dashboard::PageDocument->from_instruction(<<'PAGE')
 TITLE: Legacy Welcome
 :--------------------------------------------------------------------------------:
 BOOKMARK: legacy-welcome
+:--------------------------------------------------------------------------------:
+HEAD: <meta name="x-bookmark" content="legacy-head-injected">
 :--------------------------------------------------------------------------------:
 STASH:
   name => 'World'
@@ -141,6 +144,7 @@ like($body1, qr/ddForm\.addEventListener\('focusout', function\(\) \{/s, 'root r
 like($body1, qr/function ddApplyDirectiveAssist\(editor\)/, 'root route editor script includes directive assist helper for one editor block');
 like($body1, qr/function ddSplitInstruction\(\w+\)/, 'root route editor script can split bookmark source into visible blocks');
 like($body1, qr/function ddComposeInstruction\(\)/, 'root route editor script recomposes visible blocks back into the hidden bookmark source');
+like($body1, qr/section === 'HEAD' \|\| section === 'HTML'/, 'editor syntax highlighter treats HEAD content as HTML');
 like($body1, qr/if \(priorDirective === 'TITLE'\) \{\s*if \(!directives\.BOOKMARK\) return 'BOOKMARK: ';\s*return directives\.HTML \? '' : 'HTML: ';/s, 'directive assist offers BOOKMARK before HTML when TITLE is the current block');
 like($body1, qr/if \(priorDirective === 'HTML' \|\| \/\^CODE\\d\+\$\/\.test\(priorDirective\)\) \{\s*return 'CODE' \+ \(ddHighestCodeDirective\(fullText\) \+ 1\) \+ ': ';/s, 'directive assist advances CODE directives from HTML and CODE sections');
 like($body1, qr/if \(event\.key !== 'Tab' \|\| event\.shiftKey \|\| event\.ctrlKey \|\| event\.altKey \|\| event\.metaKey\) return;/s, 'split editor reserves plain Tab to start a new section block');
@@ -596,6 +600,11 @@ like($demo_overlay, qr/<span class="tok-directive">HTML:<\/span>/, 'editor overl
 like($demo_overlay, qr/<span class="tok-tag">&lt;style<\/span>/, 'editor overlay highlights HTML tag names');
 like($demo_overlay, qr/<span class="tok-js">const<\/span> run = 1;/, 'editor overlay highlights JavaScript keywords');
 like($demo_overlay, qr/<span class="tok-note">\[% stash\.name %\]<\/span>/, 'editor overlay highlights TT placeholders inside HTML sections');
+like(
+    $app->_editor_overlay_html("HEAD: <script>const ready = true;</script>\n"),
+    qr/<span class="tok-js">const<\/span> ready = true;/,
+    'server-side editor overlay highlights JavaScript inside HEAD sections',
+);
 
 my $broken_editor_source = <<'BOOKMARK';
 BOOKMARK: test
@@ -670,6 +679,7 @@ is($code2, 200, 'saved page route ok');
 like($body2, qr/Welcome/, 'saved page rendered');
 unlike($body2, qr{<h1>\s*Welcome\s*</h1>}, 'page title is not injected into the page body');
 like($body2, qr{<title>Welcome</title>}, 'page title is still rendered in the head title element');
+like($body2, qr{<head>.*<meta name="x-bookmark" content="head-injected">.*</head>}s, 'saved bookmark HEAD content is injected inside the rendered document head');
 unlike($body2, qr/id="logout-url"/, 'admin route does not render logout link');
 
 my ($code2b, undef, $body2b) = @{ $app->handle(path => '/app/welcome', query => 'name=Michael', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
@@ -699,6 +709,7 @@ like($body3, qr/^TITLE:\s+Welcome/m, 'source mode returns canonical legacy instr
 my ($code4, $type4, $body4) = @{ $app->handle(path => '/app/legacy-welcome', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
 is($code4, 200, 'legacy saved page route ok');
 like($body4, qr/Hello World/, 'legacy placeholders render from stash state');
+like($body4, qr{<head>.*<meta name="x-bookmark" content="legacy-head-injected">.*</head>}s, 'legacy bookmark-file HEAD content reaches the rendered document head');
 like($body4, qr/Runtime/, 'trusted legacy code output is rendered on saved pages');
 like($body4, qr/Right Click Copy &amp; Share or Bookmark This Page/, 'legacy render includes top chrome share link');
 unlike($body4, qr/\{legacy-welcome:[^}]+\}/, 'top chrome does not dump shell prompt project context');
@@ -982,10 +993,81 @@ like($stream_data_body, qr{set_chain_value\(foo,'bar','/ajax/foobar\?type=text&s
     print {$fh} '/ajax/demo.json?type=text';
     close $fh;
 }
+my $raw_named_page = eval { $app->_load_named_page('legacy-forward') };
+ok(!defined($raw_named_page) && !$@, 'saved URL entries do not leak PageDocument section errors through named-page loading');
 my ($code8, $type8, $body8) = @{ $app->handle(path => '/app/legacy-forward', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
 is($code8, 200, 'legacy /app saved-url forwarding works');
 like($type8, qr/text\/plain/, 'forwarded saved-url bookmark preserves content type');
 like(drain_stream_body($body8), qr/"ok"\s*:\s*1/, 'forwarded saved-url bookmark reaches ajax payload through the stream response');
+
+{
+    open my $fh, '>', $store->page_file('legacy-external-forward') or die $!;
+    print {$fh} 'https://example.test/bookmark?from=saved';
+    close $fh;
+}
+my ($external_code, $external_type, $external_body, $external_headers) = @{ $app->handle(
+    path        => '/app/legacy-external-forward',
+    query       => 'from=request',
+    remote_addr => '127.0.0.1',
+    headers     => { host => '127.0.0.1' },
+) };
+is($external_code, 302, 'legacy external URL bookmark redirects');
+like($external_type, qr/text\/plain/, 'external URL redirect uses a plain response');
+is($external_headers->{Location}, 'https://example.test/bookmark?from=saved&from=request', 'external URL redirect appends the incoming query');
+is($external_body, "Redirecting\n", 'external URL redirect has a concise body');
+
+my $selected_forward = $app->_legacy_app_response(
+    id            => 'legacy-forward',
+    query_params  => { choice => [qw(first second)], 'choice.selected.pos' => 1 },
+    body_params   => {},
+    remote_addr   => '127.0.0.1',
+    headers       => { host => '127.0.0.1' },
+);
+ok($selected_forward->[0], 'legacy URL forwarding resolves selected array parameters');
+my %selected_params = ( choice => [qw(first second)], 'choice.selected.pos' => 1 );
+Developer::Dashboard::Web::App::_resolve_legacy_selected_params(\%selected_params);
+is($selected_params{choice}, 'second', 'legacy selected.pos forwards the selected array value');
+
+for my $case (
+    [ 'legacy-unsupported-scheme', 'ftp://example.test/file', 400, 'Unsupported bookmark URL scheme' ],
+    [ 'legacy-empty-target', '', 400, 'Invalid bookmark target' ],
+) {
+    open my $fh, '>', $store->page_file($case->[0]) or die $!;
+    print {$fh} $case->[1];
+    close $fh;
+    my ( $status, undef, $body ) = @{ $app->handle(
+        path        => '/app/' . $case->[0],
+        query       => '',
+        remote_addr => '127.0.0.1',
+        headers     => { host => '127.0.0.1' },
+    ) };
+    is($status, $case->[2], "$case->[0] is rejected");
+    like($body, qr/\Q$case->[3]\E/, "$case->[0] explains the rejection");
+}
+my ( $fallback_redirect_status, undef, $fallback_redirect_body, $fallback_redirect_headers ) =
+  @{ $app->_legacy_external_redirect_response( target => 'https://example.test/fallback', params => { a => '1' } ) };
+is($fallback_redirect_status, 302, 'external redirect can build a query from parsed parameters');
+is($fallback_redirect_headers->{Location}, 'https://example.test/fallback?a=1', 'parsed parameters are appended when raw query is absent');
+is($fallback_redirect_body, "Redirecting\n", 'parsed-parameter redirect uses the standard body');
+my ($control_query_status) =
+  @{ $app->_legacy_external_redirect_response( target => 'https://example.test/fallback', raw_query => "bad\nquery" ) };
+is($control_query_status, 400, 'external redirect rejects control characters in the incoming query');
+my %not_a_hash;
+is(Developer::Dashboard::Web::App::_resolve_legacy_selected_params(undef), undef, 'selected parameter helper ignores an undefined input');
+Developer::Dashboard::Web::App::_resolve_legacy_selected_params(\%not_a_hash);
+is_deeply(\%not_a_hash, {}, 'selected parameter helper leaves an empty hash unchanged');
+my %invalid_selection = (
+    plain => 'value',
+    scalar => 'value',
+    'scalar.selected.pos' => 0,
+    array => [qw(one)],
+    'array.selected.pos' => 'not-a-number',
+    out_of_range => [qw(one)],
+    'out_of_range.selected.pos' => 2,
+);
+Developer::Dashboard::Web::App::_resolve_legacy_selected_params(\%invalid_selection);
+is($invalid_selection{array}[0], 'one', 'invalid selected.pos leaves array parameters unchanged');
+is_deeply($invalid_selection{out_of_range}, ['one'], 'out-of-range selected.pos leaves array parameters unchanged');
 
 {
     open my $fh, '>', $store->page_file('legacy-forward-override') or die $!;
@@ -1164,7 +1246,9 @@ __END__
 
 =head1 DESCRIPTION
 
-This test verifies the local web app home, page, and transient source routes.
+This test verifies the local web app home, saved bookmark rendering (including
+raw C<HEAD> content in the document head), editor syntax highlighting, and
+transient source routes.
 
 =for comment FULL-POD-DOC START
 

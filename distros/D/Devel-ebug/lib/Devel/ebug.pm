@@ -16,7 +16,7 @@ use Module::Pluggable require => 1;
 use base qw(Class::Accessor::Chained::Fast);
 
 # ABSTRACT: A simple, extensible Perl debugger
-our $VERSION = '0.68'; # VERSION
+our $VERSION = '0.69'; # VERSION
 
 __PACKAGE__->mk_accessors(qw(
     backend
@@ -61,7 +61,7 @@ sub load {
   # verbatim instead of being split and interpolated by the shell.
   my @command;
   if (my $args = $self->args) {
-    my @backend = $self->backend ? shellwords($self->backend) : ($^X, '-d:ebug::Backend');
+    my @backend = $self->backend ? _backend_words($self->backend) : ($^X, '-d:ebug::Backend');
     @command = (@backend, $program, @$args);
   } else {
     my $backend = $self->backend || "$^X -d:ebug::Backend";
@@ -80,6 +80,15 @@ sub load {
   close $listener;
 
   $self->_handshake($secret);
+}
+
+# Split a backend command line into words.  On Windows a backslash is a
+# path separator rather than an escape, so keep it from being eaten (as in
+# "C:\Strawberry\perl\bin\perl.exe bin/ebug_backend_perl").
+sub _backend_words {
+  my($backend) = @_;
+  $backend =~ s/\\/\\\\/g if $^O eq 'MSWin32';
+  return shellwords($backend);
 }
 
 # Wait for the backend we just started to connect back.  It announces
@@ -250,7 +259,7 @@ Devel::ebug - A simple, extensible Perl debugger
 
 =head1 VERSION
 
-version 0.68
+version 0.69
 
 =head1 SYNOPSIS
 

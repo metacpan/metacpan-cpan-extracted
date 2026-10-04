@@ -156,6 +156,7 @@ chdir $test_cwd or die "Unable to chdir to $test_cwd: $!";
 
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
+local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = File::Spec->catdir( $home, 'state' );
 local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
 local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
 local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
@@ -1157,6 +1158,40 @@ is( $manager->web_log, '', 'web_log returns an empty string when the dashboard l
     }
 }
 {
+    my $race_follow = "$home/signal-handler-install-race.log";
+    unlink $race_follow if -f $race_follow;
+    pipe( my $ready_reader, my $ready_writer ) or die "pipe failed: $!";
+    pipe( my $release_reader, my $release_writer ) or die "pipe failed: $!";
+    my $race_pid = fork();
+    die "fork failed: $!" if !defined $race_pid;
+    if ( !$race_pid ) {
+        close $ready_reader;
+        close $release_writer;
+        $SIG{HUP} = 'DEFAULT';
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::secure_file_permissions = sub {
+            syswrite( $ready_writer, "permissions-started\n" ) or die "ready notification failed: $!";
+            my $release;
+            sysread( $release_reader, $release, 1 );
+            return 1;
+        };
+        $manager->_follow_log_file( file => $race_follow, interval => 0.05 );
+        POSIX::_exit(0);
+    }
+    close $ready_writer;
+    close $release_reader;
+    my $ready = <$ready_reader>;
+    is( $ready, "permissions-started\n", '_follow_log_file reaches file permission setup before signal handler installation race check' );
+    my $race_signalled = kill 'HUP', $race_pid;
+    is( $race_signalled, 1, '_follow_log_file child receives HUP while file setup is in progress' );
+    close $release_writer;
+    my $race_reaped = waitpid( $race_pid, 0 );
+    is( $race_reaped, $race_pid, '_follow_log_file child is reaped after HUP during file setup' );
+    my $race_status = $?;
+    is( $race_status & 127, 0, '_follow_log_file installs its HUP handler before file setup begins' );
+    is( $race_status >> 8, 0, '_follow_log_file exits cleanly when HUP arrives during file setup' );
+}
+{
     my $missing_follow_tail = "$home/missing-follow-tail.log";
     unlink $missing_follow_tail if -f $missing_follow_tail;
     my $exit_calls = 0;
@@ -1992,6 +2027,16 @@ END {
 
 {
     no warnings 'redefine';
+
+    # DD-1021: _listener_pids_for_port checks command_in_path('ss') BEFORE
+    # ever reaching the mocked capture() below - on a host/container with no
+    # real ss binary, that check alone routes it to the lsof/proc fallback
+    # and the capture() mock is never called at all. Stub the gate too, or
+    # this test's correctness depends on the runner's own tool inventory.
+    local *Developer::Dashboard::RuntimeManager::command_in_path = sub {
+        return 1 if $_[0] eq 'ss';
+        return Developer::Dashboard::Platform::command_in_path(@_);
+    };
     local *Developer::Dashboard::RuntimeManager::capture = sub (&) {
         return ( "State Recv-Q Send-Q Local Address:Port Peer Address:Port Process\nLISTEN 0 1024 127.0.0.1:7906 0.0.0.0:* users:((\"starman worker \",pid=123,fd=4),(\"starman master \",pid=456,fd=4))\n", '', 0 );
     };

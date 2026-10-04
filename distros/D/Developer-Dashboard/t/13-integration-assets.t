@@ -47,7 +47,7 @@ if ($has_source_tree_docs) {
     close $plan_fh;
     like( $plan, qr/dzil build/, 'integration plan covers host dzil build' );
     like( $plan, qr/cpanm/, 'integration plan covers cpanm install' );
-    like( $plan, qr/installation: `cpanm --notest <tarball>`/, 'integration plan keeps the blank-environment tarball install on cpanm --notest after the source-tree test gate' );
+    like( $plan, qr/installation: `cpanm <tarball>`/, 'integration plan installs the blank-environment tarball with cpanm test phase enabled' );
     unlike( $plan, qr/Windows-only cpanm --notest exception|Windows guest currently installs the tarball with\s+`cpanm --notest`/s, 'integration plan no longer treats cpanm --notest as a Windows-only exception' );
     like( $plan, qr/dashboard serve/, 'integration plan covers installed web lifecycle' );
     like( $plan, qr/helper logout/i, 'integration plan covers helper logout cleanup' );
@@ -123,13 +123,16 @@ if ($has_integration_assets) {
     like( $runner, qr/tar -xzf/, 'integration runner extracts the tarball inside the container' );
     like( $runner, qr/_versioned_install_tarball_path/, 'integration runner derives a versioned cpanm install tarball path from the extracted distribution version' );
     like( $runner, qr/_copy_file\( \$tarball, \$install_tarball \)/, 'integration runner stages the mounted tarball into a versioned local copy before cpanm install' );
-    like( $runner, qr/cpanm install host-built tarball.*--notest.*\$install_tarball/s, 'integration runner installs the versioned local tarball copy with cpanm --notest' );
+    like( $runner, qr/cpanm install host-built tarball.*'cpanm '.*\$install_tarball/s, 'integration runner installs the versioned local tarball copy with cpanm test phase enabled' );
     unlike( $runner, qr/cpanm install host-built tarball.*\$tarball/s, 'integration runner does not hand the generic mounted tarball path directly to cpanm' );
     like( $runner, qr/dashboard update/, 'integration runner exercises dashboard update' );
+    like( $runner, qr/d2 version/, 'integration runner verifies the installed short d2 entrypoint version' );
+    like( $runner, qr/d2 of grep --help/, 'integration runner verifies d2 delegates grep help after tarball installation' );
+    like( $runner, qr/d2 docker compose config --help/, 'integration runner verifies d2 delegates Docker Compose help after tarball installation' );
     like( $runner, qr/Runtime::Result/, 'integration runner exercises Runtime::Result-aware hook chaining' );
     like( $runner, qr/dashboard docker compose --project .* --dry-run config/, 'integration runner exercises docker compose dry-run' );
     like( $runner, qr/dashboard auth add-user helper_login helper-login-pass-123/, 'integration runner exercises helper login path' );
-    like( $runner, qr/cpanm --notest/, 'integration runner installs the tarball with cpanm --notest after the source-tree test gate' );
+    unlike( $runner, qr/cpanm --notest.*\$install_tarball/s, 'integration runner does not disable tests while installing the tarball' );
     like( $runner, qr/broken\.collector/, 'integration runner provisions a broken config collector regression case' );
     like( $runner, qr/healthy\.collector/, 'integration runner provisions a healthy config collector regression case' );
     like( $runner, qr/dashboard indicator list after restart/, 'integration runner checks indicator isolation after restart' );
@@ -157,6 +160,8 @@ if ($has_integration_assets) {
     open my $compose_fh, '<', 'integration/blank-env/docker-compose.yml' or die $!;
     my $compose = do { local $/; <$compose_fh> };
     close $compose_fh;
+    like( $compose, qr/^\s*init:\s*true\s*$/m,
+        'blank-environment service uses an init reaper for orphaned child processes during cpanm tests' );
     like( $compose, qr/DASHBOARD_TARBALL/, 'integration compose file mounts the host-built tarball into the container' );
     unlike( $compose, qr/\.\.\/\.\.:\/workspace/, 'integration compose file does not mount the repo source into the container' );
 

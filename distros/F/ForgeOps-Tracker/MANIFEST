@@ -29,8 +29,10 @@ t/client.t
 t/configuration.t
 t/database_span.t
 t/delivery_queue.t
+t/environment_warning.t
 t/event_builder.t
 t/histogram_bucketer.t
+t/https_warning.t
 t/integrations_dancer2.t
 t/integrations_dancer2_performance.t
 t/integrations_psgi.t

@@ -7,6 +7,9 @@ use File::Spec;
 use FindBin qw($RealBin);
 use Test::More;
 
+plan skip_all => 'checkout-only OWASP repository gate; release tarballs exclude SECURITY_CHECKS.md'
+    if !-f 'SECURITY_CHECKS.md';
+
 my $ROOT = abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
 
 my $security_checks = _slurp_repo('SECURITY_CHECKS.md');

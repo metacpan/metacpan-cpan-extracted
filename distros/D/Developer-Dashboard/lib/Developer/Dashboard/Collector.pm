@@ -3,7 +3,7 @@ package Developer::Dashboard::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(readfile);
@@ -812,7 +812,13 @@ and stays parsable by the next rotation pass.
 
 =head1 METHODS
 
+The following methods manage collector definitions, execution records, output,
+and retained log entries.
+
 =head2 new, collector_paths, write_job, read_job, write_result, write_status, read_status, read_output, collector_exists, append_log_entry, rotate_log, read_log, inspect_collector, list_collectors
+
+These object methods construct the store, resolve collector paths, and manage
+definitions, status, results, output, and bounded log transcripts.
 
 =head2 readfile
 

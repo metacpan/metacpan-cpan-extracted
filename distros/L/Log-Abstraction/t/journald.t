@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 use Test::Most;
-use Socket qw(AF_UNIX SOCK_DGRAM sockaddr_un);
+use Socket qw(AF_UNIX SOCK_DGRAM sockaddr_un MSG_DONTWAIT);
 use File::Temp qw(tempdir);
 
 # Unix-domain datagram sockets are not available on all platforms (notably
@@ -46,8 +46,10 @@ sub with_receiver {
 
 	$code->();
 
+	# The datagram, if sent, is already queued.  Don't block: if the send
+	# failed, the test must fail rather than hang (RT#181461)
 	my $data = '';
-	recv($recv, $data, 65536, 0);
+	recv($recv, $data, 65536, MSG_DONTWAIT);
 	close $recv;
 	unlink $SOCKPATH;
 	return $data;

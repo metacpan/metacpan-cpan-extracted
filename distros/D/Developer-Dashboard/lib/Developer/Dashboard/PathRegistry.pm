@@ -3,7 +3,7 @@ package Developer::Dashboard::PathRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Digest::MD5 qw(md5_hex);
 use Cwd qw(getcwd);
@@ -88,7 +88,7 @@ sub register_named_paths {
     my ( $self, $paths ) = @_;
     return $self if ref($paths) ne 'HASH';
     for my $name ( keys %$paths ) {
-        next if !defined $name || $name eq '';    # uncoverable condition left
+        next if $name eq '';
         $self->{named_paths}{$name} = $paths->{$name};
     }
     return $self;
@@ -106,12 +106,25 @@ sub unregister_named_path {
 }
 
 # named_paths()
-# Returns the currently registered logical path aliases.
+# Returns the currently registered logical path aliases as plain path
+# strings for display (e.g. "dashboard path list"). DD-1005: a lazy-create
+# alias is stored internally as a metadata hash ({path=>,create=>1,mode=>});
+# this accessor collapses it to its bare "path" field so callers that only
+# ever expected a path string (aliases_table, prefix-matching completion)
+# see one, matching every alias registered before this feature existed.
+# resolve_dir reads the raw internal hash directly rather than through this
+# accessor, so the create/mode metadata is never lost - only hidden from
+# display consumers that have no use for it.
 # Input: none.
 # Output: hash reference of alias-to-path mappings.
 sub named_paths {
     my ($self) = @_;
-    return { %{ $self->{named_paths} || {} } };    # uncoverable branch true
+    my %plain;
+    for my $name ( keys %{ $self->{named_paths} || {} } ) {
+        my $entry = $self->{named_paths}{$name};
+        $plain{$name} = ref($entry) eq 'HASH' ? $entry->{path} : $entry;
+    }
+    return \%plain;
 }
 
 # all_paths() and all_path_aliases()
@@ -156,8 +169,21 @@ sub _layer_dir_for {
     return $primary;
 }
 
+# _existing_layer_dirs_for($parent)
+# Returns both existing runtime directory names at one filesystem level in
+# canonical-first order; runtime_layers preserves alias-before-canonical
+# lookup order so the canonical directory remains the effective write target.
+# Input: parent directory path string.
+# Output: existing .developer-dashboard and/or .d2 directory paths.
+sub _existing_layer_dirs_for {
+    my ( $self, $parent ) = @_;
+    my $primary = File::Spec->catdir( $parent, '.developer-dashboard' );
+    my $alias   = File::Spec->catdir( $parent, '.d2' );
+    return grep { -d $_ } ( $primary, $alias );
+}
+
 # home_runtime_path()
-# Returns the canonical home-backed runtime root path without creating it.
+# Returns the selected home-backed runtime root path without creating it.
 # Input: none.
 # Output: home runtime directory path string.
 sub home_runtime_path {
@@ -202,13 +228,13 @@ sub alias_cache_key {
     my ($paths) = @_;
     return '' if !$paths || !blessed($paths);
     my $project_root  = eval { $paths->current_project_root } || '';
-    my @runtime_roots = eval { $paths->runtime_roots } || ();    # uncoverable condition right
+    my @runtime_roots = eval { $paths->runtime_roots };
     return join "\n", $project_root, @runtime_roots;
 }
 
 # runtime_layers()
 # Returns the effective runtime roots in inheritance order from home to the
-# current working directory layer.
+# current working directory, including both sibling names when both exist.
 # Input: none.
 # Output: ordered list of runtime root directory path strings from home to deepest layer.
 sub runtime_layers {
@@ -219,8 +245,10 @@ sub runtime_layers {
             $cache_key => sub {
                 my @roots;
                 my %seen;
-                for my $root ( $self->_runtime_layers_from_env, $self->home_runtime_root, $self->_ancestor_runtime_layers ) {
-                    next if $root eq '';    # uncoverable branch true
+                my @home_layers = $self->_existing_layer_dirs_for( $self->home );
+                @home_layers = reverse @home_layers;
+                for my $root ( $self->_runtime_layers_from_env, @home_layers, $self->home_runtime_root, $self->_ancestor_runtime_layers ) {
+                    next if $root eq '';
                     my $identity = $self->_path_identity($root);
                     next if $seen{$identity}++;
                     push @roots, $root;
@@ -518,7 +546,7 @@ sub installed_skill_roots {
     my %seen_names;
     for my $skills_root ( $self->skills_roots ) {
         next if !-d $skills_root;
-        opendir my $dh, $skills_root or die "Unable to read $skills_root: $!";    # uncoverable branch true
+        opendir my $dh, $skills_root or die "Unable to read $skills_root: $!";
         for my $entry (
             sort grep {
                    $_ ne '.'
@@ -536,6 +564,114 @@ sub installed_skill_roots {
         closedir $dh;
     }
     return @roots;
+}
+
+# nested_skill_dir_chain(\@segments)
+# Resolves a skill-depth path (DD-1004) - one or more dotted alias-name
+# segments such as ["foo","bar"] from "foo.bar.something" - to the chain of
+# on-disk skill directories it names, recursing into each skill's own nested
+# skills/ subdirectory arbitrarily deep: skills/foo, then
+# skills/foo/skills/bar, and so on. The first segment is resolved the normal
+# layered way (skill_layers, deepest participating layer wins, same as every
+# other flat skill lookup); every subsequent segment is a single directory
+# lookup inside the previous segment's own "skills" subdirectory, because a
+# nested skill-in-skill is not itself independently layered across DD-OOP
+# roots - it lives wherever its parent skill's tree put it.
+# Input: array reference of one or more skill-name segments.
+# Output: ordered list of directory path strings, chain[0] the first
+# segment's skill root through chain[-1] the deepest segment's directory, in
+# the same order as the input segments; empty list when the array reference
+# is missing/empty or any segment fails to resolve to an installed directory.
+sub nested_skill_dir_chain {
+    my ( $self, $segments ) = @_;
+    return () if ref($segments) ne 'ARRAY' || !@{$segments};
+    my @segs = @{$segments};
+
+    my $first = shift @segs;
+    my @first_layers = $self->skill_layers( $first, include_disabled => 1 );
+    return () if !@first_layers;
+    my $dir = $first_layers[-1];    # deepest participating layer for the first segment
+    my @chain = ($dir);
+
+    for my $seg (@segs) {
+        my @seg_ok = validated_path_segments($seg);
+        return () if @seg_ok != 1;
+        my $candidate = File::Spec->catdir( $dir, 'skills', $seg );
+        return () if !-d $candidate;
+        $dir = $candidate;
+        push @chain, $dir;
+    }
+
+    return @chain;
+}
+
+# nested_skill_entries(%args)
+# Recursively discovers every installed skill directory reachable by walking
+# into "skills/" subdirectories arbitrarily deep, starting from each
+# top-level installed_skill_roots() entry (DD-1004 read-side counterpart to
+# nested_skill_dir_chain, shared so discovery never drifts from resolution).
+# Input: optional include_disabled flag.
+# Output: ordered list of hash refs {segments => arrayref of skill-name
+# segments from the top down, dir => that skill's directory path string}
+# covering every depth, shallowest first.
+sub nested_skill_entries {
+    my ( $self, %args ) = @_;
+    my @entries;
+    my @queue = map { { segments => [ ( $_ =~ m{/([^/]+)\z} )[0] ], dir => $_ } } $self->installed_skill_roots(%args);
+    while ( my $node = shift @queue ) {
+        push @entries, $node;
+        my $nested_root = File::Spec->catdir( $node->{dir}, 'skills' );
+        next if !-d $nested_root;
+        opendir my $dh, $nested_root or next;
+        for my $child ( sort grep { $_ ne '.' && $_ ne '..' && -d File::Spec->catdir( $nested_root, $_ ) } readdir $dh ) {
+            my $child_dir = File::Spec->catdir( $nested_root, $child );
+            my $disabled = -f File::Spec->catfile( $child_dir, '.disabled' ) ? 1 : 0;
+            next if !$args{include_disabled} && $disabled;
+            push @queue, { segments => [ @{ $node->{segments} }, $child ], dir => $child_dir };
+        }
+        closedir $dh;
+    }
+    return @entries;
+}
+
+# skill_config_write_location(\@segments)
+# Resolves WHERE the config for a skill-depth path may safely be written
+# (DD-1004). Owner's rule, given unconditionally (Q-182, generalising the
+# original .git-only framing): a skill's OWN config.json is NEVER the write
+# target, at any depth, regardless of whether that skill itself carries a
+# .git - "if the alias already exists in the skill's own config.json, do not
+# change it; save to the non-.git PARENT instead, and that overrides the
+# skill's own value at read time, while the skill's file stays untouched."
+# So the walk always starts one level ABOVE the deepest resolved segment
+# (the target's parent), looking for the nearest ancestor with no .git of
+# its own, continuing past any ancestor that itself carries a .git exactly
+# as the original git-preservation rule described; a depth-1 target has no
+# parent skill at all, so it falls straight through to the global config
+# fallback unconditionally. Falls all the way through to the global config
+# root when every ancestor (or there simply are none, for depth-1) carries a
+# .git or does not exist.
+# Input: array reference of one or more skill-name segments.
+# Output: hash reference - either {kind => 'skill', dir => stopping skill
+# directory (always a PARENT of the target, never the target itself),
+# remaining => arrayref of the segments BELOW that directory (the nesting
+# still owed inside its config.json)}, or {kind => 'global', remaining =>
+# arrayref of the FULL segment list} when no git-free parent ancestor exists
+# (including the depth-1 case, which has none by construction); undef when
+# the segments do not resolve to an installed skill chain at all.
+sub skill_config_write_location {
+    my ( $self, $segments ) = @_;
+    return if ref($segments) ne 'ARRAY' || !@{$segments};
+    my @chain = $self->nested_skill_dir_chain($segments);
+    return if !@chain;
+
+    for ( my $i = $#chain - 1; $i >= 0; $i-- ) {
+        my $dir = $chain[$i];
+        next if -d File::Spec->catdir( $dir, '.git' );
+        my @remaining = @{$segments}[ $i + 1 .. $#{$segments} ];
+        return { kind => 'skill', dir => $dir, remaining => \@remaining };
+    }
+
+    return { kind => 'global', remaining => [ @{$segments} ] };
 }
 
 # installed_skill_docker_roots()
@@ -557,10 +693,7 @@ sub installed_skill_docker_roots_for_runtime {
     my $skills_root = File::Spec->catdir( $runtime_root, 'skills' );
     my $prefix = $skills_root . '/';
     return map { File::Spec->catdir( $_, 'config', 'docker' ) }
-      grep {
-            my $path = $_;
-            $path eq $skills_root || index( $path, $prefix ) == 0;    # uncoverable branch false
-      } $self->installed_skill_roots(%args);
+      grep { index( $_, $prefix ) == 0 } $self->installed_skill_roots(%args);
 }
 
 # collectors_root()
@@ -630,7 +763,7 @@ sub sessions_roots {
 sub _state_root_key {
     my ( $self, $runtime_root ) = @_;
     my $identity = $self->_path_identity($runtime_root);
-    return md5_hex( defined $identity ? $identity : '' );    # uncoverable branch false
+    return md5_hex($identity);
 }
 
 # _state_root_user()
@@ -676,14 +809,14 @@ sub _write_state_metadata {
     return '' if !defined $runtime_root || $runtime_root eq '';
     $self->_ensure_state_dir($dir);
     my $file = File::Spec->catfile( $dir, 'runtime.json' );
-    open my $fh, '>:raw', $file or die "Unable to write $file: $!";    # uncoverable branch true
+    open my $fh, '>:raw', $file or die "Unable to write $file: $!";
     print {$fh} json_encode(
         {
             runtime_root => $runtime_root,
             app_name     => $self->app_name,
         }
     );
-    close $fh or die "Unable to close $file: $!";    # uncoverable branch true
+    close $fh or die "Unable to close $file: $!";
     $self->secure_file_permissions($file);
     return $file;
 }
@@ -835,7 +968,7 @@ sub project_root_for {
         return $dir if -d File::Spec->catdir( $dir, '.git' );
 
         my $parent = dirname($dir);
-        last if !$parent || $parent eq $dir;    # uncoverable condition left
+        last if $parent eq $dir;
         $dir = $parent;
     }
 
@@ -877,7 +1010,16 @@ my %RESOLVABLE_ACCESSOR = map { $_ => 1 } qw(
 );
 
 # resolve_dir($name)
-# Resolves a logical directory name or absolute path.
+# Resolves a logical directory name or absolute path. DD-1005: when the
+# registered alias carries lazy-create metadata (a hash, not a bare path
+# string - see Config::save_global_path_alias) and the resolved target does
+# not exist on disk, it is created here (with parents, mkdir -p semantics)
+# and chmod'd to the stored mode if one was given, before being returned.
+# This is the ONE place that logic lives, so cdr, workspace routes, and
+# every direct Perl caller of resolve_dir all get it for free with no
+# per-call-site duplication. A non-create-marked alias (a bare string, or a
+# hash with no "create" key) behaves exactly as before this feature existed
+# - resolve_dir has never itself checked existence, only returned the path.
 # Input: logical directory name or absolute path.
 # Output: resolved directory path string.
 sub resolve_dir {
@@ -890,8 +1032,14 @@ sub resolve_dir {
     return $self->$name() if $RESOLVABLE_ACCESSOR{$name};
 
     if ( exists $self->{named_paths}{$name} ) {
-        my $path = $self->{named_paths}{$name};
+        my $entry = $self->{named_paths}{$name};
+        my ( $path, $create, $mode ) =
+          ref($entry) eq 'HASH' ? ( $entry->{path}, $entry->{create}, $entry->{mode} ) : ( $entry, undef, undef );
         $path = $self->_expand_home($path);
+        if ( $create && !-d $path ) {
+            make_path($path);
+            chmod( oct($mode), $path ) if defined $mode && $mode ne '';
+        }
         return $path;
     }
 
@@ -921,7 +1069,7 @@ sub ls {
     my $dir = $self->resolve_dir($name);
     return if !-d $dir;
 
-    opendir my $dh, $dir or die "Unable to open $dir: $!";    # uncoverable branch true
+    opendir my $dh, $dir or die "Unable to open $dir: $!";
     my @items;
     while ( my $entry = readdir $dh ) {
         next if $entry eq '.' || $entry eq '..';
@@ -940,10 +1088,10 @@ sub with_dir {
     my ( $self, $name, $code ) = @_;
     my $dir = $self->resolve_dir($name);
     my $old = getcwd();
-    chdir $dir or die "Unable to chdir to $dir: $!";    # uncoverable branch true
+    chdir $dir or die "Unable to chdir to $dir: $!";
     my @result = eval { $code->($dir) };
     my $error = $@;
-    chdir $old or die "Unable to restore cwd to $old: $!";    # uncoverable branch true
+    chdir $old or die "Unable to restore cwd to $old: $!";
     die $error if $error;
     return wantarray ? @result : $result[0];
 }
@@ -960,7 +1108,7 @@ sub locate_projects {
     my %seen;
 
     for my $root (@roots) {
-        opendir my $dh, $root or next;    # uncoverable branch true
+        opendir my $dh, $root or next;
         while ( my $entry = readdir $dh ) {
             next if $entry =~ /^\./;
             my $path = File::Spec->catdir( $root, $entry );
@@ -1002,13 +1150,10 @@ sub locate_dirs_under {
 
     while (@pending) {
         my $path = shift @pending;
-        next if !-d $path;    # uncoverable branch true
-
         my $path_id = $self->_path_identity($path);
-        next if $path_id eq '' || $seen{$path_id}++;    # uncoverable condition left
+        next if $seen{$path_id}++;
 
         my $relative = $path_id eq $root_id ? '.' : File::Spec->abs2rel( $path_id, $root_id );
-        $relative = '.' if $relative eq '';    # uncoverable branch true
         $relative =~ s{\\}{/}g;
         $relative = $relative eq '.' ? '.' : './' . $relative;
 
@@ -1022,7 +1167,7 @@ sub locate_dirs_under {
 
         push @found, $path_id if $matches;
 
-        opendir( my $dh, $path ) or next;    # uncoverable branch true
+        opendir( my $dh, $path ) or next;
         while ( my $entry = readdir($dh) ) {
             next if $entry eq '.' || $entry eq '..';
             my $child = File::Spec->catdir( $path, $entry );
@@ -1079,11 +1224,15 @@ sub ensure_dir {
 # is_home_runtime_path($path)
 # Checks whether one path lives under the home runtime tree.
 # Input: file or directory path string.
-# Output: boolean true when the path is inside ~/.developer-dashboard.
+# Output: boolean true when the path is inside either home runtime directory.
 sub is_home_runtime_path {
     my ( $self, $path ) = @_;
     return 0 if !defined $path || $path eq '';
-    return $self->_same_or_descendant_path( $path, $self->home_runtime_path ) ? 1 : 0;
+    my @roots = ( $self->_existing_layer_dirs_for( $self->home ), $self->home_runtime_path );
+    for my $root (@roots) {
+        return 1 if $self->_same_or_descendant_path( $path, $root );
+    }
+    return 0;
 }
 
 # runtime_layer_root_for($path)
@@ -1112,19 +1261,19 @@ sub is_home_runtime_path {
 # recursion that hangs any process touching a runtime path. Measured: the
 # config suite went from under a second to a hard timeout the moment this used
 # the ensuring accessor. Build the candidate list from the non-creating sources
-# instead: home_runtime_PATH is a pure path computation, and the env and
-# ancestor layer helpers create nothing.
+# instead: home_runtime_PATH and _existing_layer_dirs_for are pure path
+# computations, and the env and ancestor layer helpers create nothing.
 sub runtime_layer_root_for {
     my ( $self, $path ) = @_;
     return '' if !defined $path || $path eq '';
-    for my $root ( $self->_runtime_layers_from_env, $self->home_runtime_path, $self->_ancestor_runtime_layers ) {
+    my @home_layers = reverse $self->_existing_layer_dirs_for( $self->home );
+    push @home_layers, $self->home_runtime_path;
+    for my $root ( $self->_runtime_layers_from_env, @home_layers, $self->_ancestor_runtime_layers ) {
         # None of the three sources above can yield undef or empty in
         # production - the env reader filters blanks itself, home_runtime_path
         # is a pure File::Spec->catdir on an always-set home, and the ancestor
-        # walker only ever pushes real existing-directory paths. Annotating
-        # this as uncoverable held branch at 100.0 but never closed condition
-        # (stuck at 99.9 across five independent attempts at the comment
-        # syntax), so per Q-150 it is exercised directly instead: t/93 stubs
+        # walker only ever pushes real existing-directory paths. The guard is
+        # exercised directly instead of being annotated: t/93 stubs
         # _runtime_layers_from_env to inject an undef entry and an empty-string
         # entry ahead of a real root, which drives both operands of this OR
         # true independently while a normal run still drives it false.
@@ -1162,7 +1311,7 @@ sub secure_dir_permissions {
 
     my $path = $layer_root;
     if ( -d $path ) {
-        chmod 0700, $path or die "Unable to chmod $path to 0700: $!";    # uncoverable branch true
+        chmod 0700, $path or die "Unable to chmod $path to 0700: $!";
     }
     return $dir if $dir eq $layer_root;
 
@@ -1171,7 +1320,7 @@ sub secure_dir_permissions {
     for my $part ( grep { $_ ne '' } File::Spec->splitdir($suffix) ) {
         $path = File::Spec->catdir( $path, $part );
         next if !-d $path;
-        chmod 0700, $path or die "Unable to chmod $path to 0700: $!";    # uncoverable branch true
+        chmod 0700, $path or die "Unable to chmod $path to 0700: $!";
     }
 
     return $dir;
@@ -1192,7 +1341,7 @@ sub secure_file_permissions {
     return $file if !$self->is_runtime_layer_path($file) && !$self->_is_state_path($file);
     return $file if !-e $file;
     my $mode = $args{executable} ? 0700 : 0600;
-    chmod $mode, $file or die sprintf 'Unable to chmod %s to %04o: %s', $file, $mode, $!;    # uncoverable branch true
+    chmod $mode, $file or die sprintf 'Unable to chmod %s to %04o: %s', $file, $mode, $!;
     return $file;
 }
 
@@ -1252,7 +1401,7 @@ sub atomic_write_secure {
 # Output: staging file path string.
 sub _chmod_pending {
     my ( $self, $tmp, $mode ) = @_;
-    chmod $mode, $tmp or die sprintf 'Unable to chmod %s to %04o: %s', $tmp, $mode, $!;    # uncoverable branch true
+    chmod $mode, $tmp or die sprintf 'Unable to chmod %s to %04o: %s', $tmp, $mode, $!;
     return $tmp;
 }
 
@@ -1300,7 +1449,7 @@ sub _ensure_state_dir {
         make_path( $dir, { mode => 0700 } );
     }
     else {
-        chmod 0700, $dir or die sprintf 'Unable to chmod %s to 0700: %s', $dir, $!;    # uncoverable branch true
+        chmod 0700, $dir or die sprintf 'Unable to chmod %s to 0700: %s', $dir, $!;
     }
     return $dir;
 }
@@ -1318,18 +1467,19 @@ sub _expand_home {
 }
 
 # _ancestor_runtime_layers()
-# Discovers every existing .developer-dashboard layer between the current
-# working directory and the configured home directory, excluding the home
-# runtime root itself.
+# Discovers every existing .developer-dashboard and .d2 runtime directory
+# between the current working directory and the configured home directory,
+# excluding both home-level runtime roots.
 # Input: none.
-# Output: ordered list of runtime root directory path strings from parentmost
-# child layer to the deepest current layer.
+# Output: ordered list of runtime root paths from home toward the deepest
+# current layer; .d2 precedes .developer-dashboard at the same depth.
 sub _ancestor_runtime_layers {
     my ($self) = @_;
     my $cwd = $self->current_working_directory;
     return () if !defined $cwd || $cwd eq '';
     my $home = $self->home;
-    my $home_runtime = $self->home_runtime_path;
+    my %home_runtime = map { $self->_path_identity($_) => 1 }
+      ( $self->home_runtime_path, $self->_existing_layer_dirs_for($home) );
     my $project_root = eval { $self->current_project_root } || '';
     my $stop_dir = '';
     if ( $self->_same_or_descendant_path( $cwd, $home ) ) {
@@ -1345,15 +1495,17 @@ sub _ancestor_runtime_layers {
     my @layers;
     my $dir = $cwd;
     while ($dir) {
-        my $candidate = $self->_layer_dir_for($dir);
-        my $visible_candidate = $self->_display_path($candidate);
-        push @layers, $visible_candidate if -d $candidate && $self->_path_identity($candidate) ne $self->_path_identity($home_runtime);
+        for my $candidate ( $self->_existing_layer_dirs_for($dir) ) {
+            next if $home_runtime{ $self->_path_identity($candidate) };
+            my $visible_candidate = $self->_display_path($candidate);
+            unshift @layers, $visible_candidate;
+        }
         last if $self->_path_identity($dir) eq $self->_path_identity($stop_dir);
         my $parent = dirname($dir);
         last if $parent eq $dir;
         $dir = $parent;
     }
-    return reverse @layers;
+    return @layers;
 }
 
 # _path_identity($path)
@@ -1381,7 +1533,6 @@ sub _prefer_reference_style {
 
     my $path_id = $self->_path_identity($path);
     my $ref_id  = $self->_path_identity($reference);
-    return $path if $path_id eq '';    # uncoverable branch true
 
     my $prefix = $ref_id;
     $prefix .= '/' if $prefix !~ m{/$};
@@ -1408,7 +1559,6 @@ sub _display_path {
         next if index( $path, $alias_prefix ) != 0;
         my $short_prefix = substr( $alias_prefix, length('/private') );
         my $candidate = $short_prefix . substr( $path, length($alias_prefix) );
-        next if $candidate eq '';    # uncoverable branch true
         next if $self->_path_identity($candidate) ne $self->_path_identity($path);
         return $candidate;
     }
@@ -1482,6 +1632,16 @@ Construct the path registry.
 
 Resolve and discover project-related directories.
 
+resolve_dir() (DD-1005) additionally creates a registered alias's target
+directory (with parents) on first resolution when that alias was saved with
+C<create =E<gt> 1> (see C<Developer::Dashboard::Config>'s
+save_global_path_alias()/save_skill_path_alias() C<%opts>), chmod'ing it to
+the alias's stored octal mode when one was given. named_paths() collapses
+such an alias back to a bare path string for display consumers
+(C<dashboard path list>, prefix completion) that have no use for the
+metadata; resolve_dir() itself always reads the raw internal registration,
+so the create/mode metadata is never lost between the two.
+
 =head2 current_working_directory, cwd
 
 Report the effective working directory: the explicit constructor C<cwd> when one was supplied, otherwise a live in-process C<getcwd> lookup that follows later C<chdir> calls without forking an external C<pwd> process (undef when the directory is unavailable). C<cwd> is the public compatibility alias consumed by the file registry.
@@ -1500,7 +1660,7 @@ every skill-namespaced route, ajax, and static asset path.
 
 =head2 runtime_root, cache_root, home_runtime_root, home_cache_root
 
-Report the layered runtime directories. C<runtime_root> and C<cache_root> follow the deepest discovered layer, which is the write target for layered runtime state. C<home_runtime_root> and C<home_cache_root> stay pinned to the home layer, for per-user artifacts that a fixed external consumer reads from one well-known path - the generated shell-startup caches a login profile dot-sources are the motivating case, because a project-layer copy of those would be a cache no refresh ever rewrites.
+Report the layered runtime directories. C<runtime_root> and C<cache_root> follow the deepest discovered layer, which is the write target for layered runtime state. At each depth, both existing C<.d2/> and C<.developer-dashboard/> roots are independently discoverable; C<.developer-dashboard/> wins same-depth lookup precedence and remains the write target when both exist. C<home_runtime_root> and C<home_cache_root> stay pinned to the selected home write root, for per-user artifacts that a fixed external consumer reads from one well-known path.
 
 =for comment FULL-POD-DOC START
 
@@ -1515,11 +1675,11 @@ its own identical copy of the computation.
 
 =head1 PURPOSE
 
-This module is the authoritative path model for the runtime. It discovers the layered runtime roots from home to the current project, resolves standard runtime directories, manages named path aliases, and performs project and directory searches such as the regex-based narrowing used by C<cdr>.
+This module is the authoritative path model for the runtime. It discovers both supported runtime directory names from home to the current project, resolves standard runtime directories, manages named path aliases, and performs project and directory searches such as the regex-based narrowing used by C<cdr>.
 
 =head1 WHY IT EXISTS
 
-It exists because C<DD-OOP-LAYERS> is a cross-runtime contract, not a convenience helper. One path registry has to own how home and project runtimes participate, which layer is writable, and how named paths and directory searches behave on top of that model.
+It exists because C<DD-OOP-LAYERS> is a cross-runtime contract, not a convenience helper. One path registry has to own how home and project runtimes participate, how parallel C<.d2/> and C<.developer-dashboard/> roots are ordered, which layer is writable, and how named paths and directory searches behave on top of that model.
 
 =head1 WHEN TO USE
 

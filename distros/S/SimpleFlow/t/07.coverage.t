@@ -86,15 +86,15 @@ subtest 'say2: an undefined message is printed as an empty one' => sub {
 # --- argument checks ----------------------------------------------------------
 subtest 'task: the checks that pair and shape the newer options' => sub {
 	my @cases = (
-		[['executor.args' => ['--partition=short']], qr/"executor\.args" needs an executor/],
-		[['executor.args' => ['--partition=short'], executor => 'local'], qr/"executor\.args" needs an executor/],
-		[['container.args' => ['--gpus', 'all']], qr/"container\.args" needs a "container"/],
-		[['container.args' => '--gpus', container => 'img'], qr/"container\.args" must be an array ref of words(?!, at least one)/],
+		[['executor_args' => ['--partition=short']], qr/"executor_args" needs an executor/],
+		[['executor_args' => ['--partition=short'], executor => 'local'], qr/"executor_args" needs an executor/],
+		[['container_args' => ['--gpus', 'all']], qr/"container_args" needs a "container"/],
+		[['container_args' => '--gpus', container => 'img'], qr/"container_args" must be an array ref of words(?!, at least one)/],
 		[[wrapper => [undef]], qr/"wrapper" must be an array ref of words, at least one/],
 		[[wrapper => [['nice']]], qr/"wrapper" must be an array ref of words, at least one/],
 		[[dir => ''], qr/"dir" must be a path, not the empty string/],
-		[['stdout.file' => []], qr/"stdout\.file" must be a path, not a reference/],
-		[['stderr.file' => ''], qr/"stderr\.file" must be a path, not the empty string/],
+		[['stdout_file' => []], qr/"stdout_file" must be a path, not a reference/],
+		[['stderr_file' => ''], qr/"stderr_file" must be a path, not the empty string/],
 	);
 	foreach my $case (@cases) {
 		my ($args, $expect) = @$case;
@@ -103,30 +103,30 @@ subtest 'task: the checks that pair and shape the newer options' => sub {
 		like($err, qr/\S/, 'after dumping the arguments to STDERR');
 	}
 };
-subtest 'task: a stdout.file that cannot be created is named in the error' => sub {
+subtest 'task: a stdout_file that cannot be created is named in the error' => sub {
 	my $nowhere = File::Spec->catfile($dir, 'no-such-dir' . ++$n, 'out.txt');
-	my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', 'print 1'], 'stdout.file' => $nowhere, quiet => 1);
+	my (undef, undef, undef, $error) = run_task(cmd => [$^X, '-e', 'print 1'], 'stdout_file' => $nowhere, quiet => 1);
 	like($error, qr/cannot empty "\Q$nowhere\E"/, 'task() died naming the file');
 };
 
 # --- the wrapped command ------------------------------------------------------
 subtest 'wrapped command: the less common layers' => sub {
 	my $cwd = Cwd::getcwd();
-	my ($podman) = run_task(cmd => ['prog'], container => 'img', 'container.engine' => 'podman',
+	my ($podman) = run_task(cmd => ['prog'], container => 'img', 'container_engine' => 'podman',
 		stdin => 'inherit', env => { KEEP => 'x', DROP => undef }, threads => 2,
-		'container.args' => ['--gpus', 'all'], 'dry.run' => 1, quiet => 1);
+		'container_args' => ['--gpus', 'all'], 'dry_run' => 1, quiet => 1);
 	# podman is rootless and maps the caller's user already, so no --user;
 	# a variable "env" removes is not passed in, and one it sets is, by name
 	is($podman->{'wrapped.cmd'},
 		"podman run --rm -i -v $cwd:$cwd -w $cwd -e KEEP -e SIMPLEFLOW_THREADS --gpus all img prog",
-		'podman: -i for stdin, each variable by name, and container.args before the image');
-	my ($srun) = run_task(cmd => ['prog'], executor => 'slurm', 'dry.run' => 1, quiet => 1);
+		'podman: -i for stdin, each variable by name, and container_args before the image');
+	my ($srun) = run_task(cmd => ['prog'], executor => 'slurm', 'dry_run' => 1, quiet => 1);
 	is($srun->{'wrapped.cmd'}, 'srun prog', 'slurm asks for no resources that were not given');
 	my $prefix = File::Spec->catdir('envs', 'analysis');
-	my ($conda) = run_task(cmd => ['prog'], 'conda.env' => $prefix, 'dry.run' => 1, quiet => 1);
+	my ($conda) = run_task(cmd => ['prog'], 'conda_env' => $prefix, 'dry_run' => 1, quiet => 1);
 	is($conda->{'wrapped.cmd'}, "conda run --no-capture-output -p $prefix prog",
-		'a conda.env with a directory separator is a prefix, given with -p');
-	my ($string) = run_task(cmd => 'prog one two', wrapper => ['nice'], 'dry.run' => 1, quiet => 1);
+		'a conda_env with a directory separator is a prefix, given with -p');
+	my ($string) = run_task(cmd => 'prog one two', wrapper => ['nice'], 'dry_run' => 1, quiet => 1);
 	is($string->{'wrapped.cmd'},
 		($^O eq 'MSWin32') ? 'nice cmd.exe /c prog one two' : 'nice /bin/sh -c prog one two',
 		'a string command goes to the platform shell inside the wrapper');
@@ -137,8 +137,8 @@ subtest 'a dry run that is not quiet shows the wrapped command and the missing i
 	my $log = fresh_path();
 	open my $log_fh, '>', $log or die;
 	my $missing = fresh_path();
-	my ($t, $out) = run_task(cmd => ['prog'], wrapper => ['nice'], 'input.file' => $missing,
-		'log.fh' => $log_fh, 'dry.run' => 1);
+	my ($t, $out) = run_task(cmd => ['prog'], wrapper => ['nice'], 'input_file' => $missing,
+		'log_fh' => $log_fh, 'dry_run' => 1);
 	close $log_fh;
 	is($t->{'will.do'}, 'no: dry run', 'it was a dry run');
 	like($out, qr/^run as: nice prog$/m, 'the terminal shows what would really be run');
@@ -151,20 +151,20 @@ subtest 'stale: the reason for a re-run is printed, and a step with no inputs is
 	spew($made, 'old');
 	my $past = time - 100;
 	utime $past, $past, $made or die "cannot set the time of $made: $!";
-	my ($t, $out) = run_task(cmd => [$^X, '-e', $WRITE, $made, 'new'], 'input.file' => $in,
-		'output.file' => $made, stale => 1);
+	my ($t, $out) = run_task(cmd => [$^X, '-e', $WRITE, $made, 'new'], 'input_file' => $in,
+		'output_file' => $made, stale => 1);
 	is($t->{'out.of.date'}, 1, 'the output was older than the input');
 	like($out, qr/is being re-run: an input file is newer than an output file/, 'and the terminal says why it ran');
 	is(slurp($made), 'new', 'and it did run');
 	utime $past, $past, $made or die "cannot set the time of $made: $!";
-	my ($none) = run_task(cmd => [$^X, '-e', $WRITE, $made, 'newer'], 'output.file' => $made, stale => 1, quiet => 1);
+	my ($none) = run_task(cmd => [$^X, '-e', $WRITE, $made, 'newer'], 'output_file' => $made, stale => 1, quiet => 1);
 	is($none->{done}, 'before', 'with no inputs, stale has nothing to compare, so the step was done before');
 	is(slurp($made), 'new', 'and was not run again');
 };
-subtest 'stale.cmd: the reason for a re-run is printed' => sub {
+subtest 'stale_cmd: the reason for a re-run is printed' => sub {
 	my $made = fresh_path();
-	run_task(cmd => [$^X, '-e', $WRITE, $made, 'one'], 'output.file' => $made, 'stale.cmd' => 1, quiet => 1);
-	my ($t, $out) = run_task(cmd => [$^X, '-e', $WRITE, $made, 'two'], 'output.file' => $made, 'stale.cmd' => 1);
+	run_task(cmd => [$^X, '-e', $WRITE, $made, 'one'], 'output_file' => $made, 'stale_cmd' => 1, quiet => 1);
+	my ($t, $out) = run_task(cmd => [$^X, '-e', $WRITE, $made, 'two'], 'output_file' => $made, 'stale_cmd' => 1);
 	is($t->{'cmd.changed'}, 1, 'the command had changed');
 	like($out, qr/is being re-run: its command has changed since its outputs were made/, 'and the terminal says so');
 };
@@ -174,9 +174,9 @@ subtest 'a failed directory output replaces the .failed directory of an earlier 
 	my $made = File::Spec->catdir($dir, 'dir' . ++$n);
 	# makes the directory $ARGV[0], writes $ARGV[1] into a file there, and fails
 	my $fail = q{use File::Spec; mkdir $ARGV[0] or die; open my $f, '>', File::Spec->catfile($ARGV[0], 'content') or die; print $f $ARGV[1]; exit 1};
-	my ($first) = run_task(cmd => [$^X, '-e', $fail, $made, 'first'], 'output.dir' => $made, die => 0, quiet => 1);
+	my ($first) = run_task(cmd => [$^X, '-e', $fail, $made, 'first'], 'output_dir' => $made, die => 0, quiet => 1);
 	is_deeply($first->{'failed.outputs'}, ["$made.failed"], 'the first failure moved the directory aside');
-	my ($second) = run_task(cmd => [$^X, '-e', $fail, $made, 'second'], 'output.dir' => $made, die => 0, quiet => 1);
+	my ($second) = run_task(cmd => [$^X, '-e', $fail, $made, 'second'], 'output_dir' => $made, die => 0, quiet => 1);
 	is_deeply($second->{'failed.outputs'}, ["$made.failed"], 'and so did the second, over the first');
 	is(slurp(File::Spec->catfile("$made.failed", 'content')), 'second', 'which now holds the second run\'s output');
 	ok(!-e $made, 'and the declared name is free for the next run');
@@ -240,7 +240,7 @@ subtest 'parallel: with jobs => 1, a failure stops the steps after it' => sub {
 	my (undef, undef, undef, $error) = run_captured(sub {
 		parallel(jobs => 1, tasks => [
 			{ cmd => [$^X, '-e', 'exit 5'], quiet => 1 },
-			{ cmd => [$^X, '-e', $WRITE, $never], 'output.file' => $never, quiet => 1 },
+			{ cmd => [$^X, '-e', $WRITE, $never], 'output_file' => $never, quiet => 1 },
 		]);
 	});
 	like($error, qr/1 of 2 tasks failed/, 'parallel() died with the failure');

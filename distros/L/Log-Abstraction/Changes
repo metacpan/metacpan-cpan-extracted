@@ -1,6 +1,73 @@
 Revision history for Log-Abstraction
 
-0.35	Wed Sep 30 09:44:46 PM EDT 2026
+0.36	Sat Oct  3 09:35:44 PM EDT 2026
+	[ Enhancements ]
+	- Structured fields: every logging method accepts a hashref of
+	  fields after the message, e.g. $log->info('login', { user_id => 42 }).
+	  They are kept as data in the history, array and CODE-ref backends,
+	  as a nested "fields" object in format => 'json', and as journal
+	  fields in journald; other backends get them appended as logfmt
+	  key=value text.
+	- The Log::Any adapter implements structured(), so a trailing hashref
+	  and the Log::Any context reach Log::Abstraction as fields.
+	- New critical(), alert() and emergency() methods, logged at their own
+	  levels (syslog crit/alert/emerg, journald PRIORITY 2/1/0).  They
+	  behave like error(): croak_on_error, or having no backend, croaks.
+	  An object logger without the method, such as Log::Log4perl, is
+	  called with fatal(), or error() if it has no fatal().
+	- New is_trace, is_info, is_notice, is_warn, is_error, is_critical,
+	  is_alert and is_emergency methods alongside is_debug.  The Log::Any
+	  adapter's detection methods now call them.
+	- New timestamp options: timestamp_format (a strftime pattern, or
+	  'iso8601'/'rfc3339'), utc, and timestamp_precision (0-9 digits of
+	  fractional seconds, from Time::HiRes).  Patterns may also use %N,
+	  %3N etc., and %z/%:z, which now give a numeric offset on every
+	  platform.  They apply to %timestamp% and the JSON timestamp.  The
+	  time is now read once per message, so all backends show the same
+	  time.  Time::HiRes and Time::Local (both core) are new dependencies.
+	- File rotation for the path backends: rotate_size (bytes, or with
+	  K/M/G), rotate_interval (hourly, daily, weekly, monthly) and
+	  rotate_keep (default 5).  Files are rotated to FILE.1, FILE.2 ...
+	  before the write that is due.  Since the file is opened for every
+	  message, logrotate's default rename-and-create works without
+	  copytruncate or SIGHUP; this is now documented and tested.
+	- Every backend can have its own 'level' and 'format'.  syslog,
+	  journald and sendmail take them as keys; file, fd and array (in a
+	  logger hash or at the top level) may be given as a hash, e.g.
+	  file => { file => $path, level => 'info', format => 'json' }.  A
+	  format replaces the message for array, syslog, journald and email.
+	  Invalid values croak in new().
+	[ Incompatible Changes ]
+	- The Log::Any adapter no longer collapses critical, alert and
+	  emergency into error; they go to the new methods, so backends now
+	  see the levels 'critical', 'alert' and 'emergency' (CODE callbacks
+	  testing for 'error' miss them, and syslog priorities change), and
+	  is_critical, is_alert and is_emergency have their own thresholds.
+	- A hashref as the last of two or more arguments to a logging method
+	  is now taken as structured fields.  It used to be joined into the
+	  message as "HASH(0x...)".
+	- When a call has structured fields, an object logger (such as the
+	  default Log::Log4perl) is passed them as an extra " key=value ..."
+	  argument after the message.
+	- Log::Abstraction no longer imports Carp, POSIX, Scalar::Util,
+	  Sys::Syslog or Email::Sender::Simple functions, so they can no longer
+	  be called as methods on a logger ($log->carp, $log->syslog,
+	  $log->strftime ...).  Code mocking Log::Abstraction::openlog or
+	  ::setlogsock should mock Sys::Syslog::openlog/setlogsock instead.
+	- 'level' and 'format' in the journald hash are now that backend's
+	  level and format; they were sent to the journal as LEVEL and FORMAT
+	  fields.
+	[ Bug Fixes ]
+	- A top-level 'fd' now counts as a backend in new(), as 'file' and
+	  'array' do: Log::Abstraction->new(fd => $fh) no longer also sets up
+	  Log::Log4perl and sends every message there too.
+	- The release dates in this file are now in ISO-8601 (W3CDTF) form,
+	  as CPAN::Changes expects.
+	- t/journald.t no longer hangs if a journald send fails: its receiver
+	  now reads with MSG_DONTWAIT, so the test fails instead.  This was the
+	  hang in RT#181461.
+
+0.35	2026-09-30T21:44:46-04:00
 	[ Enhancements ]
 	- New max_messages option caps the in-memory message history.
 
@@ -81,11 +148,11 @@ Revision history for Log-Abstraction
 	  Log::Any::Adapter::Abstraction is now skipped when
 	  Log::Any::Adapter::Base cannot be loaded.
 
-0.34	Sat Sep 26 08:47:01 PM EDT 2026
+0.34	2026-09-26T20:47:01-04:00
 	[ Bug Fixes ]
 	- Bump minimum versions
 
-0.33	Fri Jul 10 11:03:49 EDT 2026
+0.33	2026-07-10T11:03:49-04:00
 	[ Architecture ]
 	- Added Sub::Private (enforce mode) to mark _log, _high_priority,
 	  _validate_file_path, _format_message, _journald_send, and
@@ -151,14 +218,14 @@ Revision history for Log-Abstraction
 	  PRIORITY mapping, extra fields, coexistence with other sub-backends, and
 	  silent failure on an unreachable socket path.
 
-0.32	Tue Jun  9 19:34:45 EDT 2026
+0.32	2026-06-09T19:34:45-04:00
 	[ Bug Fixes ]
 	- Fixed SMTP host/port validation in sendmail backend: croak calls were
 	  inside the eval{} that catches delivery failures, so bad config was
 	  silently swallowed instead of propagating. Validation now runs before
 	  the eval so misconfigured host/port croaks immediately to the caller.
 
-0.31	Jun  8 20:55:28 EDT 2026
+0.31	2026-06-08T20:55:28-04:00
 	[ Architecture ]
 	- Added use autodie qw(:all); file writes wrapped in eval{} to keep
 	  logging failures silent (app must not crash when log file is unavailable)
@@ -230,7 +297,7 @@ Revision history for Log-Abstraction
 	- Simplified $parse_line regex in integration.t: removed dead |"$ alternation
 	  subsumed by "(?:,|$)
 
-0.30	Wed May 27 13:09:35 EDT 2026
+0.30	2026-05-27T13:09:35-04:00
 
 	[ Enhancements ]
 	- Added EXAMPLES POD section: CSV file logging for BI import (code-ref
@@ -242,7 +309,7 @@ Revision history for Log-Abstraction
 	  false at trace level on older installations
 	  Fixes https://www.cpantesters.org/cpan/report/32b653da-59c4-11f1-ba50-8ade6d8775ea
 
-0.29	Tue May 26 20:36:13 EDT 2026
+0.29	2026-05-26T20:36:13-04:00
 
 	[ Enhancements ]
 	- Added min_interval throttle to sendmail backend: at most one email per
@@ -251,7 +318,7 @@ Revision history for Log-Abstraction
 
 	- Bump minimum Test::Mockingbird version to fix https://www.cpantesters.org/cpan/report/f148a3e6-50a2-11f1-8224-a122dd379578
 
-0.28 Fri May 15 20:28:07 EDT 2026
+0.28	2026-05-15T20:28:07-04:00
 
 	[ Enhancements ]
 	- Added context (ctx) to code ref logger callbacks
@@ -277,15 +344,15 @@ Revision history for Log-Abstraction
 
 	- Removed spurious Carp::croak/carp fallback when array backend is defined
 
-0.27	Sun Jan 11 09:52:54 EST 2026
+0.27	2026-01-11T09:52:54-05:00
 	Easier to read tests
 	Added fatal as a synonym for error
 
-0.26	Wed Oct 15 17:03:58 EDT 2025
+0.26	2025-10-15T17:03:58-04:00
 	Added testing dashboard on GitHub Pages
 	Added croak_on_error
 
-0.25	Sun Aug 17 20:41:38 EDT 2025
+0.25	2025-08-17T20:41:38-04:00
 	Added is_debug for consistency with Log::Any
 	Use Return::Set to assert return values within specification
 	Sanitize the e-mail headers
@@ -293,7 +360,7 @@ Revision history for Log-Abstraction
 	Don't close fd that were passed in
 	Only load the mail modules when needed
 
-0.24	Sat Jul 19 16:52:41 EDT 2025
+0.24	2025-07-19T16:52:41-04:00
 	Added the ability to send an email for higher priority messages
 	Only load Log::Log4perl when needed
 	Deep-clone the messages array during cloning
@@ -301,37 +368,37 @@ Revision history for Log-Abstraction
 	Syslog facility is now configurable (default is still local0)
 	Connections to the syslog are now persistent
 
-0.23	Thu Jul 17 14:45:54 EDT 2025
+0.23	2025-07-17T14:45:54-04:00
 	Better error message when we don't know what to do
 	Allow the syslog config to say 'server' instead of 'host' for consistency with CHI
 
-0.22	Thu Jul 17 08:22:16 EDT 2025
+0.22	2025-07-17T08:22:16-04:00
 	Error() now sends to syslog like warn()
 	Ensure undef isn't passed in the messages array to coderefs
 
-0.21	Wed Jul 16 16:21:25 EDT 2025
+0.21	2025-07-16T16:21:25-04:00
 	Added error()
 
-0.20	Sun Jun 15 21:19:03 EDT 2025
+0.20	2025-06-15T21:19:03-04:00
 	Fix GitHub#2
 
-0.19	Tue Jun 10 08:32:28 EDT 2025
+0.19	2025-06-10T08:32:28-04:00
 	Bump minimum version of Sys::Syslog
 	More untaint checking
 
-0.18	Fri Jun  6 15:52:27 EDT 2025
+0.18	2025-06-06T15:52:27-04:00
 	Fix level testing
 
-0.17	Thu May 22 14:21:14 EDT 2025
+0.17	2025-05-22T14:21:14-04:00
 	Added the messages() method
 
-0.16	Thu May 22 07:40:24 EDT 2025
+0.16	2025-05-22T07:40:24-04:00
 	Handle upper case levels, such as 'INFO'
 
-0.15	Tue May 20 21:10:23 EDT 2025
+0.15	2025-05-20T21:10:23-04:00
 	No need to create a Log::Log4perl when sending output to a file
 
-0.14	Tue May 20 07:44:19 EDT 2025
+0.14	2025-05-20T07:44:19-04:00
 	Adjusted minimum version of Config::Abstraction.
 		It should be 0.19 in terms of testing but it's best to use the fixes in 0.25
 		RT#165420 - ANDK
@@ -340,52 +407,52 @@ Revision history for Log-Abstraction
 	Fixed where to log bugs
 	Check and untaint the filename
 
-0.13	Wed May 14 08:30:53 EDT 2025
+0.13	2025-05-14T08:30:53-04:00
 	Use '>' after level rather than ':' to files, like lower level loggers
 	Try not to put the name of this package in the logfiles,
 		it adds nothing apart from disc usage
 	Block setting logger => Log::Abstraction in new()
 	Croak if we don't know how to handle a message
 
-0.12	Fri May  9 07:42:35 EDT 2025
+0.12	2025-05-09T07:42:35-04:00
 	Added the file parameter, so that both file and syslog can now be given,
 		and file can be read in from a configuration file
 	Added the fd descriptor - a file descriptor to log to
 	Added separators between fields in file output
 
-0.11	Wed May  7 15:37:37 EDT 2025
+0.11	2025-05-07T15:37:37-04:00
 	Fixed calling can() on an unblessed variable
 	Honour carp_on_warn when syslog is set
 
-0.10	Tue May  6 20:43:48 EDT 2025
+0.10	2025-05-06T20:43:48-04:00
 	Added carp_on_warn
 
-0.09	Tue May  6 08:15:36 EDT 2025
+0.09	2025-05-06T08:15:36-04:00
 	If no logger is given, use Log4perl
 
-0.08	Mon May  5 11:39:58 EDT 2025
+0.08	2025-05-05T11:39:58-04:00
 	Use Config::Abstraction instead of Config::Auto
 	Guess the value if script_name if it's not given
 
-0.07	Mon Mar 24 08:36:01 EDT 2025
+0.07	2025-03-24T08:36:01-04:00
 	Handle "Socket operation on non-socket" on Solaris
 	Calling new on an object now returns a clone rather than setting the defaults in the new object
 
-0.06	Wed Mar 12 13:23:24 EDT 2025
+0.06	2025-03-12T13:23:24-04:00
 	Don't put spaces between elements of an array
 
-0.05	Tue Mar 11 14:10:10 EDT 2025
+0.05	2025-03-11T14:10:10-04:00
 	Handle being passed a reference to an array
 
-0.04	Mon Mar 10 09:39:46 EDT 2025
+0.04	2025-03-10T09:39:46-04:00
 	Renamed from Log-YetAnother to Log-Abstraction
 	Added config_file argument to new()
 
-0.03	Sat Mar  8 08:40:00 EST 2025
+0.03	2025-03-08T08:40:00-05:00
 	Fix passing an array to warn()
 
-0.02	Thu Mar  6 17:09:32 EST 2025
+0.02	2025-03-06T17:09:32-05:00
 	Improved argument checking to new()
 
-0.01	Thu Mar  6 15:42:04 EST 2025
+0.01	2025-03-06T15:42:04-05:00
         First draft

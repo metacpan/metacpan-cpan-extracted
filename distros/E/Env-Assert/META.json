@@ -60,7 +60,8 @@
             "Dist::Zilla::App::Command::cover" : "0",
             "Dist::Zilla::App::Command::podpreview" : "0.004",
             "Perl::Critic" : "0",
-            "Perl::Critic::Bangs" : "0"
+            "Perl::Critic::Bangs" : "0",
+            "Perl::Tidy" : "20260826"
          }
       },
       "runtime" : {
@@ -89,6 +90,7 @@
             "Test2::Require" : "0",
             "Test2::Suite" : "1.302200",
             "Test2::Tools::GenTemp" : "1.302200",
+            "Test2::Tools::Subtest" : "0",
             "Test2::V0" : "1.302200",
             "Test2::V1" : "1.302200",
             "Test::Script" : "1.28",
@@ -111,7 +113,7 @@
          "web" : "https://github.com/mikkoi/env-assert"
       }
    },
-   "version" : "0.016",
+   "version" : "0.018",
    "x_contributors" : [
       "Ivan Bessarabov <ivan@bessarabov.ru>",
       "gregor herrmann <gregoa@debian.org>",

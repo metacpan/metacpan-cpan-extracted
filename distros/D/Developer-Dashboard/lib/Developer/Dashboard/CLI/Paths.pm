@@ -3,10 +3,11 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
-use Cwd qw(cwd);
+use Cwd qw(abs_path cwd);
 use File::Basename qw(basename);
+use File::Spec;
 use Getopt::Long qw(GetOptionsFromArray);
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
@@ -37,17 +38,23 @@ sub run_paths_command {
     my $paths = build_paths();
     my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
     my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
-    my $aliases_loaded = 0;
     my $load_configured_path_aliases = sub {
-        return 1 if $aliases_loaded;    # uncoverable branch true every dispatch arm below loads the aliases at most once before returning, so the memoized re-entry never happens
         $paths->register_named_paths( $config->path_aliases );
-        $aliases_loaded = 1;
+        return 1;
+    };
+    my $load_skill_folder_aliases = sub {
+        $load_configured_path_aliases->();
+        my $configured = $paths->named_paths;
+        my $folder_aliases = _skill_folder_path_aliases( paths => $paths );
+        my %extra = map { exists $configured->{$_} ? () : ( $_ => $folder_aliases->{$_} ) } keys %{$folder_aliases};
+        $paths->register_named_paths( \%extra );
         return 1;
     };
     my %ctx = (
-        paths       => $paths,
-        config      => $config,
-        load_paths  => $load_configured_path_aliases,
+        paths           => $paths,
+        config          => $config,
+        load_paths      => $load_configured_path_aliases,
+        load_folder_paths => $load_skill_folder_aliases,
     );
 
     if ( $command eq 'paths' ) {
@@ -75,12 +82,12 @@ sub run_paths_command {
 # Output: prints the full path inventory as JSON or a summary table; returns 1.
 sub _paths_action_paths {
     my (%args) = @_;
-    my ( $paths, $load_paths, $argv ) = @args{qw(paths load_paths argv)};
+    my ( $paths, $load_folder_paths, $argv ) = @args{qw(paths load_folder_paths argv)};
     my @argv = @{$argv};
     my $output = 'table';
     GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
     die "Usage: dashboard paths [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
-    $load_paths->();
+    $load_folder_paths->();
     if ( $output eq 'json' ) {
         print json_encode( $paths->all_paths );
         return 1;
@@ -99,7 +106,8 @@ sub _paths_action_resolve {
     my ( $paths, $load_paths, $argv ) = @args{qw(paths load_paths argv)};
     $load_paths->();
     my $name = shift( @{$argv} ) || die "Usage: dashboard path resolve <name>\n";
-    print $paths->resolve_dir($name), "\n";
+    my $target = _resolve_path_alias( paths => $paths, name => $name );
+    print $target, "\n";
     return 1;
 }
 
@@ -133,7 +141,13 @@ sub _paths_action_cdr {
     my (%args) = @_;
     my ( $paths, $load_paths, $argv ) = @args{qw(paths load_paths argv)};
     $load_paths->();
-    print json_encode( _cdr_payload( paths => $paths, args => $argv ) );
+    print json_encode(
+        _cdr_payload(
+            paths                => $paths,
+            args                 => $argv,
+            folder_alias_resolver => sub { _skill_folder_alias_target( paths => $paths, name => $_[0] ) },
+        )
+    );
     return 1;
 }
 
@@ -144,16 +158,39 @@ sub _paths_action_cdr {
 # Output: prints newline-separated shell-completion candidates; returns 1.
 sub _paths_action_complete_cdr {
     my (%args) = @_;
-    my ( $paths, $load_paths, $argv ) = @args{qw(paths load_paths argv)};
-    $load_paths->();
+    my ( $paths, $load_folder_paths, $argv ) = @args{qw(paths load_folder_paths argv)};
+    $load_folder_paths->();
     my $index = shift( @{$argv} );
     $index = 0 if !defined $index || $index eq '';
     print join( "\n", _cdr_completion( paths => $paths, words => $argv, index => $index ) ), "\n";
     return 1;
 }
 
+# _parse_create_option($raw_value)
+# Validates and normalizes a "-c|--create[:s]" option's raw Getopt::Long
+# value into (create boolean, mode string-or-undef) for DD-1005's lazy-create
+# support. Getopt::Long's ":s" optional-argument spec leaves $raw_value
+# undef when the flag was not given at all, '' when given bare
+# (--create/-c with no value), or the literal argument text otherwise -
+# covering all four required syntax forms (bare, "--create 0777",
+# "--create=0777", "-c 0777") because ":s" consumes the next argv token as
+# the value unless that token itself looks like another option.
+# Input: the raw scalar Getopt::Long populated (undef, '', or a string).
+# Output: two-element list (create boolean, octal mode string or undef). A
+# non-empty value that is not a valid octal digit string (a leading 0
+# followed by digits 0-7) dies with a usage message rather than being
+# silently misread as decimal, per the ticket's explicit requirement.
+sub _parse_create_option {
+    my ($raw_value) = @_;
+    return ( 0, undef ) if !defined $raw_value;
+    return ( 1, undef ) if $raw_value eq '';
+    die "Usage: --create/-c mode must be an octal string like 0777, got '$raw_value'\n"
+      if $raw_value !~ /\A0[0-7]+\z/;
+    return ( 1, $raw_value );
+}
+
 # _paths_action_add(%args)
-# Implements "dashboard path add <name> <path> [-o json|table]".
+# Implements "dashboard path add <name> <path> [-c|--create[=MODE]] [-o json|table]".
 # Input: paths registry, config, and argv under "paths", "config", and "argv".
 # Output: prints the saved alias as JSON or a mutation summary table;
 # returns 1.
@@ -162,12 +199,14 @@ sub _paths_action_add {
     my ( $paths, $config, $argv ) = @args{qw(paths config argv)};
     my @argv = @{$argv};
     my $output = 'table';
-    GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-    die "Usage: dashboard path add <name> <path> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
+    my $create_raw;
+    GetOptionsFromArray( \@argv, 'o|output=s' => \$output, 'c|create:s' => \$create_raw );
+    die "Usage: dashboard path add <name> <path> [-c|--create[=MODE]] [-o json|table]\n" if $output ne 'json' && $output ne 'table';
+    my ( $create, $mode ) = _parse_create_option($create_raw);
     my ( $name, $path ) = _normalize_add_arguments(@argv);
-    my $saved = $config->save_global_path_alias( $name, $path );
-    $paths->register_named_paths( { $name => $path } );
-    $saved->{resolved} = $paths->resolve_dir($name);
+    my $saved = $config->save_path_alias( $name, $path, ( $create ? ( create => 1, ( defined $mode ? ( mode => $mode ) : () ) ) : () ) );
+    $paths->register_named_paths( { $saved->{name} => ( $saved->{create} ? { path => $saved->{path}, create => 1, ( defined $saved->{mode} ? ( mode => $saved->{mode} ) : () ) } : $saved->{path} ) } );
+    $saved->{resolved} = $paths->resolve_dir( $saved->{name} );
     if ( $output eq 'json' ) {
         print json_encode($saved);
         return 1;
@@ -198,7 +237,7 @@ sub _paths_action_del {
         config => $config,
         name   => shift(@argv),
     );
-    my $deleted = $config->remove_global_path_alias($name);
+    my $deleted = $config->remove_path_alias($name);
     $paths->unregister_named_path($name);
     if ( $output eq 'json' ) {
         print json_encode($deleted);
@@ -232,12 +271,12 @@ sub _paths_action_project_root {
 # returns 1.
 sub _paths_action_list {
     my (%args) = @_;
-    my ( $paths, $load_paths, $argv ) = @args{qw(paths load_paths argv)};
+    my ( $paths, $load_folder_paths, $argv ) = @args{qw(paths load_folder_paths argv)};
     my @argv = @{$argv};
     my $output = 'table';
     GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
     die "Usage: dashboard path list [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
-    $load_paths->();
+    $load_folder_paths->();
     if ( $output eq 'json' ) {
         print json_encode( $paths->all_path_aliases );
         return 1;
@@ -299,6 +338,155 @@ sub _normalize_delete_argument {
     return basename($cwd);
 }
 
+# _resolve_path_alias(%args)
+# Resolves a configured path alias first, then consults the matching installed
+# skill's lib/Folder.pm method when no config alias exists.
+# Input: path registry under "paths" and one qualified alias under "name".
+# Output: expanded path string, or the registry's unknown-alias error.
+sub _resolve_path_alias {
+    my (%args) = @_;
+    my $paths = $args{paths} || die "Missing paths registry\n";
+    my $name  = $args{name};
+    die 'Missing path name' if !defined $name || $name eq '';
+
+    my $configured = $paths->named_paths || {};
+    return $paths->resolve_dir($name) if exists $configured->{$name};
+
+    my $target = _skill_folder_alias_target( paths => $paths, name => $name );
+    return $paths->_expand_home($target) if defined $target;
+    return $paths->resolve_dir($name);
+}
+
+# _skill_folder_path_aliases(%args)
+# Reads listed path aliases from every installed skill Folder.pm without
+# changing config files; configured aliases remain authoritative on collision.
+# Input: path registry under "paths".
+# Output: hash reference of skill-qualified alias names to returned paths.
+sub _skill_folder_path_aliases {
+    my (%args) = @_;
+    my $paths = $args{paths} || die "Missing paths registry\n";
+    my $skill_name = $args{skill_name};
+    my %aliases;
+
+    for my $entry ( _skill_folder_entries($paths) ) {
+        next if defined $skill_name && $entry->{name} ne $skill_name;
+        next if !_load_skill_folder_module($entry);
+        my $list = Folder->can('__list__') or next;
+        my @names = $list->('Folder');
+        die "Folder->__list__ in '$entry->{file}' must return a list of alias names, not an array reference\n"
+          if @names == 1 && ref($names[0]) eq 'ARRAY';
+        for my $name (@names) {
+            die "Folder->__list__ in '$entry->{file}' returned an invalid alias name\n"
+              if !_valid_folder_method_name($name) || $name eq '__list__';
+            my $method = Folder->can($name)
+              or die "Folder->__list__ in '$entry->{file}' listed '$name' but Folder->$name is not available\n";
+            my $target = $method->('Folder');
+            die "Folder->$name in '$entry->{file}' must return a non-empty path string\n"
+              if !defined $target || ref($target) || $target eq '';
+            $aliases{ $entry->{name} . '.' . $name } = $paths->_expand_home($target);
+        }
+    }
+
+    return \%aliases;
+}
+
+# _skill_folder_alias_target(%args)
+# Loads one installed skill Folder.pm on demand and calls the method named by a
+# qualified alias, after config aliases have already had first refusal.
+# Input: path registry under "paths" and one dotted alias under "name".
+# Output: returned path string, or undef when no matching skill method exists.
+sub _skill_folder_alias_target {
+    my (%args) = @_;
+    my $paths = $args{paths} || die "Missing paths registry\n";
+    my $name  = $args{name};
+    return if !defined $name || ref($name) || $name =~ /[\x00-\x1F\x7F]/;
+
+    my @parts = split /\./, $name, -1;
+    return if @parts < 2 || grep { $_ eq '' } @parts;
+    my $method_name = pop @parts;
+    return if !_valid_folder_method_name($method_name) || $method_name eq '__list__';
+    my $skill_name = join '.', @parts;
+    my ($entry) = grep { $_->{name} eq $skill_name } _skill_folder_entries($paths);
+    return if !$entry || !_load_skill_folder_module($entry);
+
+    my $method = Folder->can($method_name) or return;
+    my $target = $method->('Folder');
+    die "Folder->$method_name in '$entry->{file}' must return a non-empty path string\n"
+      if !defined $target || ref($target) || $target eq '';
+    return $paths->_expand_home($target);
+}
+
+# _skill_folder_entries($paths)
+# Enumerates installed top-level and nested skill roots with their dotted names
+# and optional Folder.pm file locations.
+# Input: path registry object.
+# Output: list of hash references containing name, dir, and file.
+sub _skill_folder_entries {
+    my ($paths) = @_;
+    die "Missing paths registry\n" if !$paths;
+    return map {
+        my $dir = $_->{dir};
+        my $lib = File::Spec->catdir( $dir, 'lib' );
+        {
+            name => join( '.', @{ $_->{segments} || [] } ),
+            dir  => $dir,
+            file => File::Spec->catfile( $lib, 'Folder.pm' ),
+            lib  => $lib,
+        }
+    } $paths->nested_skill_entries;
+}
+
+# _load_skill_folder_module($entry)
+# Loads one skill's Folder.pm with its lib directory first in @INC and clears
+# the reserved Folder package between skills so identical method names from
+# separate skills cannot bleed into one another.
+# Input: skill entry hash reference from _skill_folder_entries.
+# Output: true if a module was loaded, false when Folder.pm is absent.
+sub _load_skill_folder_module {
+    my ($entry) = @_;
+    die "Missing skill Folder entry\n" if ref($entry) ne 'HASH';
+    my $file = $entry->{file} || die "Missing skill Folder.pm path\n";
+    return 0 if !-f $file;
+
+    my $real_skill = abs_path( $entry->{dir} );
+    my $real_lib   = abs_path( $entry->{lib} );
+    my $real_file  = abs_path($file);
+    die "Unable to resolve skill Folder.pm '$file'\n"
+      if !defined $real_skill || !defined $real_lib || !defined $real_file;
+    my @lib_parts = File::Spec->splitdir( File::Spec->abs2rel( $real_lib, $real_skill ) );
+    die "Skill Folder.pm lib directory '$entry->{lib}' resolves outside its skill root\n"
+      if $lib_parts[0] eq File::Spec->updir();
+    my @relative_parts = File::Spec->splitdir( File::Spec->abs2rel( $real_file, $real_lib ) );
+    die "Skill Folder.pm '$file' resolves outside its skill lib directory\n"
+      if $relative_parts[0] eq File::Spec->updir();
+
+    {
+        no strict 'refs';
+        %Folder:: = ();
+    }
+    local @INC = ( $entry->{lib}, @INC );
+    my $loaded = do $file;
+    if ( !defined $loaded ) {
+        die "Unable to load skill Folder.pm '$file': $@" if $@;
+        die "Unable to load skill Folder.pm '$file': $!\n" if $!;
+        die "Skill Folder.pm '$file' did not return a true value\n";
+    }
+    die "Skill Folder.pm '$file' did not return a true value\n" if !$loaded;
+    return 1;
+}
+
+# _valid_folder_method_name($name)
+# Accepts a plain Perl identifier for a Folder.pm method while excluding
+# inherited UNIVERSAL methods that are not path aliases.
+# Input: candidate alias/method name.
+# Output: boolean true when it is a safe method identifier.
+sub _valid_folder_method_name {
+    my ($name) = @_;
+    return 0 if !defined $name || ref($name) || $name !~ /\A[A-Za-z_]\w*\z/;
+    return 0 if $name =~ /\A(?:can|isa|DOES|VERSION|DESTROY)\z/;
+    return 1;
+}
+
 # _cdr_payload(%args)
 # Resolves the shell helper target for cdr/which_dir without pushing fuzzy
 # search logic into shell code.
@@ -315,7 +503,11 @@ sub _cdr_payload {
     return { target => '', matches => [] } if !@terms;
 
     my $first = $terms[0];
+    my $configured_aliases = $paths->named_paths || {};
     my $alias_target = eval { $paths->resolve_dir($first) };
+    if ( !defined $alias_target && !exists $configured_aliases->{$first} && ref( $args{folder_alias_resolver} ) eq 'CODE' ) {
+        $alias_target = $args{folder_alias_resolver}->($first);
+    }
     if ( defined $alias_target && $alias_target ne '' ) {
         shift @terms;
         return { target => $alias_target, matches => [] } if !@terms;
@@ -376,10 +568,10 @@ sub _cdr_completion {
 
 # _cdr_initial_candidates(%args)
 # Builds first-argument completion candidates for cdr-family shell helpers from
-# saved aliases and directories beneath the current working directory.
+# saved aliases and direct child directories beneath the current directory.
 # Input: hash containing the path registry under "paths", one current-token
 # prefix under "prefix", and an array reference of roots under "include".
-# Output: ordered list of alias or directory candidate strings.
+# Output: ordered list of alias or direct-child directory candidate strings.
 sub _cdr_initial_candidates {
     my (%args) = @_;
     my $paths  = $args{paths}   || die "Missing paths registry\n";
@@ -388,23 +580,30 @@ sub _cdr_initial_candidates {
     die "cdr completion include roots must be an array reference\n" if ref($roots) ne 'ARRAY';
 
     my @candidates = grep { index( $_, $prefix ) == 0 } keys %{ $paths->named_paths || {} };
-    push @candidates, _cdr_directory_candidates(
-        paths  => $paths,
-        root   => $_,
-        terms  => [],
-        prefix => $prefix,
-    ) for grep { defined && $_ ne '' && -d $_ } @{$roots};
+    for my $root ( grep { defined && $_ ne '' && -d $_ } @{$roots} ) {
+        my $dh = _open_completion_directory($root);
+        next if !$dh;
+        while ( my $entry = readdir $dh ) {
+            next if $entry eq '.' || $entry eq '..';
+            next if index( $entry, $prefix ) != 0;
+            my $path = File::Spec->catdir( $root, $entry );
+            next if !-d $path;
+            push @candidates, $entry;
+        }
+        _close_completion_directory( $dh, $root );
+    }
 
     my %seen;
-    return sort grep { defined && $_ ne '' && !$seen{$_}++ } @candidates;    # uncoverable condition left candidates only ever come from hash keys and basenames, so an undefined entry cannot occur
+    return sort grep { $_ ne '' && !$seen{$_}++ } @candidates;
 }
 
 # _cdr_directory_candidates(%args)
-# Builds unique directory-basename candidates beneath one root for cdr-family
-# shell completion without exposing unreadable-subtree failures to the shell.
+# Builds unique directory-basename candidates beneath one root without
+# recursively searching unrelated subtrees during shell completion.
 # Input: hash containing the path registry under "paths", one search root under
 # "root", an array reference of already-accepted narrowing terms under "terms",
-# and the current token prefix under "prefix".
+# and the current token prefix under "prefix". Each accepted term narrows one
+# directory level before the next level is inspected.
 # Output: ordered list of directory basename strings.
 sub _cdr_directory_candidates {
     my (%args) = @_;
@@ -414,19 +613,64 @@ sub _cdr_directory_candidates {
     my $prefix = defined $args{prefix} ? $args{prefix} : '';
     die "cdr completion terms must be an array reference\n" if ref($terms) ne 'ARRAY';
 
-    my @matches = $paths->locate_dirs_under( $root, @{$terms} );
+    my @parents = ($root);
+    for my $term ( grep { defined && $_ ne '' } @{$terms} ) {
+        my $regex = eval { qr/$term/i };
+        die "Invalid regex '$term': $@\n" if !$regex;
+        my @next;
+        for my $parent (@parents) {
+            my $dh = _open_completion_directory($parent);
+            next if !$dh;
+            while ( my $entry = readdir $dh ) {
+                next if $entry eq '.' || $entry eq '..';
+                next if $entry !~ $regex;
+                my $path = File::Spec->catdir( $parent, $entry );
+                push @next, $path if -d $path;
+            }
+            _close_completion_directory( $dh, $parent );
+        }
+        @parents = @next;
+        last if !@parents;
+    }
+
     my %seen;
     my @candidates;
-    for my $path (@matches) {
-        next if !defined $path || $path eq '' || $path eq $root;
-        my $name = basename($path);
-        next if $name eq '';    # uncoverable branch true basename never returns an empty string for the non-empty paths this loop reaches
-        next if $prefix ne '' && index( $name, $prefix ) != 0;
-        next if $seen{$name}++;
-        push @candidates, $name;
+    for my $parent (@parents) {
+        my $dh = _open_completion_directory($parent);
+        next if !$dh;
+        while ( my $entry = readdir $dh ) {
+            next if $entry eq '.' || $entry eq '..';
+            next if $prefix ne '' && index( $entry, $prefix ) != 0;
+            my $path = File::Spec->catdir( $parent, $entry );
+            next if !-d $path;
+            next if $seen{$entry}++;
+            push @candidates, $entry;
+        }
+        _close_completion_directory( $dh, $parent );
     }
 
     return sort @candidates;
+}
+
+# _open_completion_directory($path)
+# Opens one directory for bounded cdr completion, returning no handle when the
+# directory disappeared or cannot be read during completion.
+# Input: directory path string.
+# Output: open directory handle, or undef when opendir fails.
+sub _open_completion_directory {
+    my ($path) = @_;
+    opendir my $dh, $path or return;
+    return $dh;
+}
+
+# _close_completion_directory($handle, $path)
+# Closes one directory opened for cdr completion and reports a close failure.
+# Input: open directory handle and its path for diagnostics.
+# Output: true on success; dies naming the path when closedir fails.
+sub _close_completion_directory {
+    my ( $dh, $path ) = @_;
+    closedir $dh or die "Unable to close directory $path: $!";
+    return 1;
 }
 
 # _paths_table($paths_hash)
@@ -459,6 +703,9 @@ the public entrypoint can hand off path-related work to an extracted helper
 script under F<~/.developer-dashboard/cli/>. That includes the shared
 target-selection logic used by shell helpers such as C<cdr> and
 C<which_dir>.
+Installed skills may also expose path methods from C<lib/Folder.pm>: config
+aliases take precedence, while a skill's optional C<Folder-E<gt>__list__>
+provides additional aliases for lookup, completion, and path inventories.
 
 =head1 FUNCTIONS
 
@@ -498,6 +745,18 @@ C<dashboard path complete-cdr>, pass the shell completion index followed by the
 raw shell words, for example C<cdr foobar alp>; the helper returns newline
 delimited completion candidates for aliases or matching directory basenames.
 
+An installed skill can define C<lib/Folder.pm> with C<package Folder;> and
+methods that return path strings. C<cdr E<lt>skillE<gt>.E<lt>aliasE<gt>> and
+C<dashboard path resolve> consult the effective C<config/config.json> path
+alias first, then call the matching method from C<Folder.pm>. If the module
+implements C<__list__>, its list-context alias names are called and merged
+into C<dashboard paths>, C<dashboard path list>, and completion output. This
+is a read-only merge: C<dashboard path add> continues to write aliases only
+to config, where a configured value overrides a same-named module method. C<cdr>
+completion includes aliases and only direct child directories; each entered
+term narrows one level before the next candidates are listed. It avoids
+recursive walks of unrelated checkout and dependency trees on every TAB.
+
 =head1 WHAT USES IT
 
 It is used by the staged path helpers, by the shell bootstrap generated from
@@ -510,9 +769,13 @@ output.
   dashboard paths
   dashboard path resolve bookmarks
   dashboard path cdr project alpha ".*service"
+  cdr ch.workspace
+  d2 paths -o json
   dashboard path complete-cdr 2 cdr project alp
   dashboard path add work ~/projects/work
   dashboard path add .
+  dashboard path add scratch /tmp/scratch --create
+  dashboard path add scratch /tmp/scratch --create 0777
   dashboard path rm work
   dashboard path list
 

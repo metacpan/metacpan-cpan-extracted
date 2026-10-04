@@ -4,13 +4,18 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Encode qw(encode);
 use File::Basename qw(basename dirname);
 use File::Temp qw(tempfile);
 use Fcntl qw(F_GETFD F_SETFD FD_CLOEXEC SEEK_SET);
 use JSON::XS qw(decode_json encode_json);
+
+# Directory whose numeric entries name this process's open descriptors; a
+# package variable so a test can point it somewhere absent and exercise the
+# /proc/self/fd fallback.
+our $DEV_FD_DIR = '/dev/fd';
 
 my %CHANNEL_FILE_HANDLE;
 my %CHANNEL_FILE_PATH;
@@ -21,7 +26,7 @@ my %CHANNEL_FILE_PATH;
 # Output: hash reference keyed by hook filename.
 sub current {
     my $json = _channel_json( 'RESULT', 'RESULT_FILE' );
-    return {} if !defined $json || $json eq '';    # uncoverable condition left
+    return {} if $json eq '';
     my $data = decode_json($json);
     die 'RESULT must decode to a hash' if ref($data) ne 'HASH';
     return $data;
@@ -55,7 +60,7 @@ sub clear_current {
 sub last_result {
     shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;
     my $json = _channel_json( 'LAST_RESULT', 'LAST_RESULT_FILE' );
-    return if !defined $json || $json eq '';    # uncoverable condition left
+    return if $json eq '';
     my $data = decode_json($json);
     die 'LAST_RESULT must decode to a hash' if ref($data) ne 'HASH';
     return $data;
@@ -188,7 +193,7 @@ sub last_entry {
 # Input: optional command name override.
 # Output: UTF-8 encoded formatted multi-line report string.
 sub report {
-    shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;    # uncoverable condition right
+    shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;
     my (%args) = @_;
     my @names = names();
     return '' if !@names;
@@ -252,15 +257,15 @@ sub _open_channel_file {
     # wrong when a platform or File::Temp version behaves differently than
     # assumed. The RESULT channel can carry hook stdout/stderr, so an
     # unexpectedly permissive mode would be a real exposure.
-    chmod 0600, $fh or die "Unable to chmod RESULT tempfile $path to 0600: $!";    # uncoverable branch true
+    chmod 0600, $fh or die "Unable to chmod RESULT tempfile $path to 0600: $!";
 
     my $flags = fcntl( $fh, F_GETFD, 0 );
-    die "Unable to inspect RESULT file descriptor flags: $!" if !defined $flags;    # uncoverable branch true
-    fcntl( $fh, F_SETFD, $flags & ~FD_CLOEXEC )    # uncoverable branch true
+    die "Unable to inspect RESULT file descriptor flags: $!" if !defined $flags;
+    fcntl( $fh, F_SETFD, $flags & ~FD_CLOEXEC )
       or die "Unable to clear close-on-exec for RESULT file descriptor: $!";
 
     my $fd = fileno($fh);
-    my $fd_path = -e "/dev/fd/$fd" ? "/dev/fd/$fd" : "/proc/self/fd/$fd";    # uncoverable branch false
+    my $fd_path = -e "$DEV_FD_DIR/$fd" ? "$DEV_FD_DIR/$fd" : "/proc/self/fd/$fd";
     return ( $fh, $fd_path );
 }
 
@@ -278,8 +283,8 @@ sub _channel_json {
     open my $fh, '<:raw', $path or die "Unable to read $env_name file $path: $!";
     local $/;
     my $file_json = <$fh>;
-    close $fh or die "Unable to close $env_name file $path: $!";    # uncoverable branch true
-    return defined $file_json ? $file_json : '';    # uncoverable branch false
+    close $fh or die "Unable to close $env_name file $path: $!";
+    return $file_json;
 }
 
 # _set_channel($env_name, $file_env_name, $data, %args)
@@ -298,8 +303,8 @@ sub _set_channel {
 
     my ( $fh, $path ) = _open_channel_file();
     print {$fh} $json;
-    truncate( $fh, tell($fh) ) or die "Unable to truncate $env_name file $path: $!";    # uncoverable branch true
-    seek( $fh, 0, SEEK_SET ) or die "Unable to rewind $env_name file $path: $!";    # uncoverable branch true
+    truncate( $fh, tell($fh) ) or die "Unable to truncate $env_name file $path: $!";
+    seek( $fh, 0, SEEK_SET ) or die "Unable to rewind $env_name file $path: $!";
 
     _clear_channel_file($file_env_name);
     $CHANNEL_FILE_HANDLE{$file_env_name} = $fh;
@@ -328,7 +333,7 @@ sub _clear_channel {
 sub _clear_channel_file {
     my ($file_env_name) = @_;
     return if !$CHANNEL_FILE_HANDLE{$file_env_name};
-    close $CHANNEL_FILE_HANDLE{$file_env_name}    # uncoverable branch true
+    close $CHANNEL_FILE_HANDLE{$file_env_name}
       or die "Unable to close result file handle for $CHANNEL_FILE_PATH{$file_env_name}: $!";
     delete $CHANNEL_FILE_HANDLE{$file_env_name};
     delete $CHANNEL_FILE_PATH{$file_env_name};
@@ -360,9 +365,9 @@ sub _command_name {
     return $base if $base ne 'run';
 
     # dirname can still resolve to a root, so basename here may be a bare
-    # separator ('/', '\\') or, on Windows drive roots, empty.
+    # separator ('/', '\\'); dirname never returns an empty string.
     my $parent = basename( dirname($normalized) );
-    return $parent if $parent ne '' && $parent ne '/' && $parent ne '\\';    # uncoverable condition left
+    return $parent if $parent ne '/' && $parent ne '\\';
 
     my $name = $ENV{DEVELOPER_DASHBOARD_COMMAND} || '';
     return $name if $name ne '';

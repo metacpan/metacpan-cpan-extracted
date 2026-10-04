@@ -103,7 +103,11 @@ SHIM
 sub _seed {
     my ($dir) = @_;
     my $root = File::Spec->catdir( $dir, 'local', 'lib', 'perl5' );
-    make_path($root);
+    make_path( File::Spec->catdir( $root, 'Pod' ) );
+    my $module = File::Spec->catfile( $root, 'Pod', 'Text.pm' );
+    open my $fh, '>', $module or die "cannot write fixed Pod::Text fixture: $!";
+    print {$fh} "package Pod::Text;\nour \$VERSION = '6.1.1';\n1;\n";
+    close $fh or die "cannot close $module: $!";
     return $root;
 }
 
@@ -227,6 +231,9 @@ CPAN audit gate
 Assert that C<script/cpan-audit-project> judges the distributions installed in the
 isolated library root it is given, and that an advisory against the Perl
 interpreter itself is reported but does not decide its exit status.
+Each fixture includes the fixed C<Pod::Text> 6.1.1 module under its scan root,
+so these interpreter-scope cases reach the advisory logic after the new direct
+podlators security guard.
 
 =head1 WHY IT EXISTS
 
@@ -261,7 +268,7 @@ result.
 =head1 WHAT USES IT
 
 The suite, through C<prove -lr t>. It exercises C<script/cpan-audit-project>,
-which CI runs as the "Audit isolated dependency root" step of the Test
+which CI runs as the "Audit isolated dependency root (RELEASE GATE)" step of the Test
 workflow.
 
 =head1 EXAMPLES

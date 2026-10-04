@@ -13,7 +13,7 @@ use IO::File;
 use Carp qw( croak );
 use Encode ();
 
-$VERSION = '1.0.5';
+$VERSION = '1.0.6';
 
 our $parser;
 
@@ -396,7 +396,7 @@ sub _next {
     return if $xml =~ m!</([^:]+:){0,1}collection>$!;
 
     ## do we have enough?
-    $xml .= <$fh> if $xml !~ m!</([^:]+:){0,1}record>$!;
+    $xml .= <$fh> if $xml !~ m!</([^:]+:){0,1}record>$! && !eof($fh);
     ## trim stuff before the start record element 
     $xml =~ s/.*?<(([^:]+:){0,1})record.*?>/<$1record>/s;
 
@@ -414,6 +414,7 @@ sub _next {
 
 sub _parser {
     $parser ||= XML::LibXML->new(
+        expand_entities => 1,
         ext_ent_handler => sub {
             die "External entities are not supported\n";
         }

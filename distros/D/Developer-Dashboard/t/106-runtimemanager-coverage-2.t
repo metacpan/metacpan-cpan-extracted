@@ -20,9 +20,25 @@ use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::RuntimeManager;
 
 BEGIN {
-    no warnings 'redefine';
+    # DD-993: both 'redefine' AND 'prototype' must be silenced here, not just
+    # 'redefine'. RuntimeManager.pm imports its "sleep" from Time::HiRes, so
+    # this permanent (non-local) glob assignment replaces a sub that already
+    # carries WHATEVER prototype that Perl's bundled Time::HiRes gives
+    # sleep() - "(;$)" on the Perl 5.44 GitHub Actions uses (run 35292793810,
+    # master@e959eac), "(;@)" on the Perl 5.40.1 this project's own Docker
+    # image bundles. A non-local `*glob = sub {...}` assignment onto a slot
+    # that already holds a prototyped sub triggers Perl's separate
+    # 'prototype' warning category regardless of whether the NEW sub has a
+    # prototype of its own (even a bare, unprototyped sub mismatches "(;$) vs
+    # none") - `no warnings 'redefine'` alone never covered it, it only ever
+    # suppressed the unrelated "Subroutine redefined" warning. This project's
+    # CI runs under `use warnings FATAL => 'all'`, so that mismatch was a
+    # genuine, if Perl/Time::HiRes-version-dependent, build failure. See
+    # t/203 for a deterministic, version-independent reproduction of the
+    # mechanism.
+    no warnings qw(redefine prototype);
     # Make every internal poll loop instant and hermetic.
-    *Developer::Dashboard::RuntimeManager::sleep = sub (;@) { return 0 };
+    *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
 }
 
 my $RM = 'Developer::Dashboard::RuntimeManager';

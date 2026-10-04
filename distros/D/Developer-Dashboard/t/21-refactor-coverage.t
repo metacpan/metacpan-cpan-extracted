@@ -223,7 +223,7 @@ like(
         is_deeply(
             [ $docker->_discover_service_files( service => 'redis', project_root => $compose_only_root ) ],
             [$compose_only_file],
-            'DockerCompose falls back to compose.yml when a service folder has no development.compose.yml',
+            'DockerCompose loads the compose.yml base when no develop.yml marker opts into a development overlay',
         );
     }
 
@@ -274,7 +274,6 @@ is_deeply(
         pyq    => 'yq',
         ptomq  => 'tomq',
         pjp    => 'propq',
-        ticket => 'workspace',
         skill  => 'skills',
         logs   => 'log',
     },
@@ -283,7 +282,7 @@ is_deeply(
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('pjq'), 'jq', 'legacy helper alias normalizes to jq' );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('skill'), 'skills', 'singular skill helper alias normalizes to skills' );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('xmlq'), 'xmlq', 'current helper name stays unchanged' );
-is( Developer::Dashboard::InternalCLI::canonical_helper_name('ticket'), 'workspace', 'ticket helper name now aliases to workspace' );
+is( Developer::Dashboard::InternalCLI::canonical_helper_name('ticket'), '', 'ticket helper name is no longer a workspace alias' );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('workspace'), 'workspace', 'workspace helper name stays unchanged' );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('paths'), 'paths', 'paths helper name stays unchanged' );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('bogus'), '', 'unsupported helper names normalize to empty string' );
@@ -603,13 +602,6 @@ for my $helper ( Developer::Dashboard::InternalCLI::helper_names() ) {
             'helper_content renders the shipped upgrade wrapper body',
         );
     }
-    elsif ( $helper eq 'pax' ) {
-        like(
-            $content,
-            qr/\QDeveloper::Dashboard::Pax::CLI->run(\E\@ARGV\Q)\E/,
-            'helper_content renders the shipped pax dispatch body',
-        );
-    }
     else {
         like(
             $content,
@@ -776,6 +768,18 @@ ok(
     like( $stdout, qr/status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'the staged shell helper bootstrap includes the tmux ticket status format wiring' );
     like( $stdout, qr/status-interval 15/, 'the staged shell helper bootstrap slows the tmux status refresh cadence to avoid hot-looping' );
     like( $stdout, qr/ps1 --jobs \\j --mode compact --no-indicators/, 'the staged shell helper bootstrap suppresses prompt indicators when tmux owns the status line' );
+}
+{
+    my $shell_helper = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'dd', 'shell' );
+    for my $shell (qw(zsh sh ps powershell pwsh)) {
+        my ( $stdout, $stderr, $exit ) = capture {
+            system $^X, $shell_helper, $shell;
+            return $? >> 8;
+        };
+        is( $exit, 0, "the staged shell helper generates the $shell bootstrap" );
+        is( $stderr, '', "the $shell bootstrap generator writes no stderr" );
+        like( $stdout, qr/ps1[^\n]*--mode compact/, "$shell prompt delegates to the shared dashboard ps1 renderer" );
+    }
 }
 {
     my $legacy_flat_core = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', '_dashboard-core' );
@@ -1437,8 +1441,8 @@ like( $paths_output, qr/home_runtime_root/, 'CLI::Paths default table includes t
     is( $stderr, '', 'CLI::Paths complete-cdr writes no stderr for alias-root completion candidates' );
     is_deeply(
         [ grep { length } split /\n/, $stdout ],
-        [qw(team-alpha team-alpha-red)],
-        'CLI::Paths complete-cdr suggests alias-root directory basenames that match the current prefix',
+        [qw(team-alpha)],
+        'CLI::Paths complete-cdr suggests only direct alias-root children matching the current prefix',
     );
 
     ( $stdout, $stderr ) = capture {
@@ -1480,8 +1484,8 @@ like( $paths_output, qr/home_runtime_root/, 'CLI::Paths default table includes t
     is( $stderr, '', 'CLI::Paths complete-cdr writes no stderr for current-directory completion candidates' );
     is_deeply(
         [ grep { length } split /\n/, $stdout ],
-        [qw(docs-alpha docs-alpha-red)],
-        'CLI::Paths complete-cdr suggests current-directory basenames that match the current prefix',
+        ['docs-alpha'],
+        'CLI::Paths complete-cdr lists direct current-directory children without recursively suggesting nested descendants',
     );
 
     ( $stdout, $stderr ) = capture {
@@ -2811,8 +2815,8 @@ is_deeply(
             $label_skill,
             result => { success => 1, skipped => 1 },
         ),
-        'Install package.json dependencies (skipped: package.json not present)',
-        '_dependency_progress_label makes skipped package.json work explicit in the progress board',
+        'Install package.json dependencies (skipped: no dependency installs needed)',
+        '_dependency_progress_label does not call a present package.json manifest missing',
     );
     is(
         $manager->_dependency_progress_label(
@@ -2836,8 +2840,8 @@ is_deeply(
             $label_skill,
             result => { success => 1, skipped => 1 },
         ),
-        'Install requirements.txt dependencies (skipped: requirements.txt not present)',
-        '_dependency_progress_label makes skipped requirements.txt work explicit in the progress board',
+        'Install requirements.txt dependencies (skipped: no dependency installs needed)',
+        '_dependency_progress_label does not call a present requirements.txt manifest missing',
     );
     is(
         $manager->_dependency_progress_label(
@@ -3091,6 +3095,20 @@ my $dep_repo = _create_skill_repo(
     with_requirements_txt => 1,
     with_cpanfile_local => 1,
 );
+my $local_dependency_repo = _create_skill_repo( $test_repos, 'shared-local-skill', with_cpanfile => 0 );
+_write_file( File::Spec->catfile( $local_dependency_repo, '.env' ), "VERSION=1.00\n" );
+_write_file( File::Spec->catfile( $dep_repo, 'ddfile.local' ), "file://$local_dependency_repo\n" );
+{
+    my $cwd = getcwd();
+    chdir $local_dependency_repo or die "Unable to chdir to $local_dependency_repo: $!";
+    _run_or_die(qw(git add -A));
+    _run_or_die( 'git', 'commit', '-m', 'Add local dependency version' );
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+    chdir $dep_repo or die "Unable to chdir to $dep_repo: $!";
+    _run_or_die(qw(git add -A));
+    _run_or_die( 'git', 'commit', '-m', 'Use local dependency repository' );
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+}
 my $install = $manager->install( 'file://' . $dep_repo );
 ok( !$install->{error}, 'skill manager installs a skill with a cpanfile' ) or diag $install->{error};
 my $dep_skill_root = $manager->get_skill_path('dep-skill');
@@ -3128,9 +3146,13 @@ close $dependency_log_fh;
 # before the pip install itself, so the PYTHON step logs twice - widen the
 # trailing slice by one and expect the extra PYTHON entry.
 is_deeply(
-    [ map { (/^(DDFILE_LOCAL|DDFILE|DOCKER|APT|BREW|NPM|PYTHON|CPANM|MAKE):/)[0] } @dependency_steps[-13 .. -1] ],
-    [ 'APT', 'NPM', 'PYTHON', 'PYTHON', 'CPANM', 'CPANM', 'MAKE', 'MAKE', 'MAKE', 'MAKE', 'DOCKER', 'DDFILE', 'DDFILE_LOCAL' ],
-    '_install_skill_dependencies follows the documented aptfile -> apkfile -> dnfile -> brewfile -> package.json -> requirements.txt -> cpanfile -> cpanfile.local -> Makefile -> dockerfile -> ddfile -> ddfile.local order on Debian-like hosts while leaving apkfile, dnfile, and brewfile inactive',
+    [ map { (/^(DDFILE|DOCKER|APT|BREW|NPM|PYTHON|CPANM|MAKE):/)[0] } @dependency_steps[-12 .. -1] ],
+    [ 'APT', 'NPM', 'PYTHON', 'PYTHON', 'CPANM', 'CPANM', 'MAKE', 'MAKE', 'MAKE', 'MAKE', 'DOCKER', 'DDFILE' ],
+    '_install_skill_dependencies follows the documented aptfile -> apkfile -> dnfile -> brewfile -> package.json -> requirements.txt -> cpanfile -> cpanfile.local -> Makefile -> dockerfile -> ddfile -> ddfile.local order on Debian-like hosts while keeping ddfile.local installs private',
+);
+ok(
+    -d File::Spec->catdir( $dep_skill_root, 'skills', 'shared-local-skill' ),
+    'skill ddfile.local dependencies are installed into the owning skill private skills tree',
 );
 open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
 my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
@@ -3686,22 +3708,16 @@ SH
 }
 {
     my $local_repo = File::Spec->catdir( $test_repos, 'stacked-dd-local-skill' );
-    my $skills_root = File::Spec->catdir( $test_repos, 'stacked-dd-local-root', 'skills' );
-    make_path($skills_root);
+    my $local_dependency = _create_skill_repo( $test_repos, 'fresh-local-skill', with_cpanfile => 0 );
     make_path($local_repo);
-    _write_file( File::Spec->catfile( $local_repo, 'ddfile.local' ), "fresh-local-skill\n" );
+    _write_file( File::Spec->catfile( $local_repo, 'ddfile.local' ), "file://$local_dependency\n" );
 
-    unlink $dashboard_log;
-    my $cwd = getcwd();
-    chdir $skills_root or die "Unable to chdir to $skills_root: $!";
     my $local_install = $manager->_install_skill_ddfile_local($local_repo);
-    chdir $cwd or die "Unable to chdir back to $cwd: $!";
-    ok( !$local_install->{error}, '_install_skill_ddfile_local installs dependencies at the current skills root level' ) or diag $local_install->{error};
-
-    open my $local_dashboard_log_fh, '<', $dashboard_log or die "Unable to read $dashboard_log after ddfile.local install: $!";
-    my @local_dashboard_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$local_dashboard_log_fh>;
-    close $local_dashboard_log_fh;
-    is_deeply( \@local_dashboard_steps, ['skills install fresh-local-skill'], '_install_skill_ddfile_local invokes dashboard install for local-only dependencies' );
+    ok( !$local_install->{error}, '_install_skill_ddfile_local installs dependencies successfully' ) or diag $local_install->{error};
+    ok(
+        -d File::Spec->catdir( $local_repo, 'skills', 'fresh-local-skill' ),
+        '_install_skill_ddfile_local installs local dependencies beneath the owning skill',
+    );
 }
 {
     my $manifest_root = File::Spec->catdir( $test_repos, 'manifest-ddfile-root' );
@@ -5295,8 +5311,11 @@ __END__
 
 =head1 DESCRIPTION
 
-This test closes direct branch coverage for the private helper packaging,
-query parsing, runtime result, path registry, and isolated skill modules.
+This test closes direct branch coverage for private helper packaging, query
+parsing, runtime results, path registries, isolated skills, and cross-shell
+prompt bootstrap delegation to the common C<dashboard ps1> renderer. Its path
+completion checks also ensure cdr suggestions advance one directory level at
+a time rather than recursively scanning alias targets.
 
 =for comment FULL-POD-DOC START
 
@@ -5310,7 +5329,11 @@ It exists because the hard-to-hit branches that keep library coverage honest has
 
 =head1 WHEN TO USE
 
-Use this file when changing the hard-to-hit branches that keep library coverage honest, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
+Use this file when changing helper packaging, query parsing, path registries
+and cdr completion, skill dispatch, or the generated Bash, Zsh, sh, and
+PowerShell prompt adapters.
+The shell bootstrap assertions verify the shell-specific hook delegates to the
+same C<dashboard ps1> output path.
 
 =head1 HOW TO USE
 
@@ -5339,6 +5362,13 @@ Example 3:
   prove -lr t
 
 Put the focused fix back through the whole repository suite before calling the work finished.
+
+Example 4:
+
+  d2 docker compose exec dev prove -lv t/21-refactor-coverage.t
+
+Run the focused helper and shell-bootstrap assertions in the project dev
+container.
 
 =for comment FULL-POD-DOC END
 

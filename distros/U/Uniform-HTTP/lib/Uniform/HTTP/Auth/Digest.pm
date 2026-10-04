@@ -8,7 +8,7 @@ use Digest::SHA ();
 use Encode qw(encode);
 use Unicode::Normalize qw(NFC);
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 my %ALGORITHM = map { $_ => 1 } qw(
     md5 md5-sess
@@ -402,7 +402,7 @@ state key so identical nonce strings from unrelated HTTP protection spaces do
 not share nonce counts or cnonces.  Direct users that omit C<origin> should keep
 a Digest object scoped appropriately for their endpoint.
 
-If a challenge lists both C<auth> and C<auth-int>, version 0.02 prefers C<auth>.
+If a challenge lists both C<auth> and C<auth-int>, C<auth> is preferred.
 If no supported qop can be satisfied, the method returns undef so a caller can
 try another challenge or authentication scheme.
 
@@ -423,8 +423,8 @@ When C<charset=UTF-8> is present, username and password are normalized to NFC
 and encoded as UTF-8 for the Digest calculation.  C<userhash=true> and
 C<username*> are supported as defined by RFC 7616.
 
-Without a charset indication, version 0.02 accepts ASCII username/password
-credentials only rather than guessing an encoding.
+Without a charset indication, ASCII username/password credentials are
+accepted rather than guessing an encoding.
 
 =head1 LEGACY INTEROPERABILITY
 

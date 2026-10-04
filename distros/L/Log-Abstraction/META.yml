@@ -3,10 +3,13 @@ abstract: 'Logging Abstraction Layer'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  Config: '0'
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
+  File::Path: '0'
   File::Spec: '0'
   File::Temp: '0'
+  IPC::Open3: '0'
   POSIX: '0'
   Test::DescribeMe: '0'
   Test::Mockingbird: '0.1'
@@ -49,11 +52,13 @@ requires:
   Socket: '0'
   Sub::Private: '0.05'
   Sys::Syslog: '0.28'
+  Time::HiRes: '0'
+  Time::Local: '0'
   autodie: '0'
   perl: '5.014'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction
   homepage: https://metacpan.org/pod/Log::Abstraction
   repository: git://github.com/nigelhorne/Log-Abstraction.git
-version: 0.35
+version: '0.36'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -3,15 +3,19 @@ package Developer::Dashboard::Web::DancerApp;
 use strict;
 use warnings;
 
-our $VERSION = '4.45';
+our $VERSION = '5.51';
 
 use Dancer2 appname => 'DeveloperDashboard';
+use Dancer2::Core::Hook ();
+use Cwd qw(abs_path);
+use File::Spec;
+use Scalar::Util qw(refaddr);
 
 our $BACKEND_APP;
 
 # build_psgi_app(%args)
 # Builds the Dancer2 PSGI application around the dashboard service routes.
-# Input: backend web app object plus optional default header hash reference.
+# Input: backend web app object, optional default header hash, and path registry.
 # Output: PSGI application code reference.
 sub build_psgi_app {
     my ( $class, %args ) = @_;
@@ -21,7 +25,107 @@ sub build_psgi_app {
         app             => $app,
         default_headers => { %{$default_headers} },
     };
+    _load_skill_dashboard_modules( $args{paths} );
     return __PACKAGE__->to_app;
+}
+
+# _load_skill_dashboard_modules($paths)
+# Loads each active skill's lib/Dashboard.pm into the shared Dancer2 app before
+# the PSGI application is built, allowing skills to register routes/settings.
+# Input: optional path registry implementing nested_skill_entries().
+# Output: array reference of successfully loaded absolute module paths.
+sub _load_skill_dashboard_modules {
+    my ($paths) = @_;
+    return [] if !ref($paths) || !$paths->can('nested_skill_entries');
+
+    my ($dancer_app) = grep { $_->name eq 'DeveloperDashboard' } @{ Dancer2->runner->apps };
+    die "Unable to find the DeveloperDashboard Dancer2 application for skill routes\n" if !$dancer_app;
+    my %routes_before = map { $_ => [ @{ $dancer_app->routes->{$_} || [] } ] } keys %{ $dancer_app->routes };
+
+    my @loaded;
+    for my $entry ( $paths->nested_skill_entries ) {
+        next if ref($entry) ne 'HASH' || !defined $entry->{dir} || $entry->{dir} eq '';
+        my $lib = File::Spec->catdir( $entry->{dir}, 'lib' );
+        my $module = File::Spec->catfile( $lib, 'Dashboard.pm' );
+        next if !-f $module;
+
+        my $real_lib = abs_path($lib);
+        my $real_module = abs_path($module);
+        die "Unable to resolve skill Dashboard module '$module'\n"
+          if !defined $real_lib || !defined $real_module;
+        my $relative_module = File::Spec->abs2rel( $real_module, $real_lib );
+        die "Skill Dashboard module '$module' resolves outside its skill lib directory\n"
+          if File::Spec->file_name_is_absolute($relative_module)
+          || $relative_module eq '..'
+          || $relative_module =~ m{\A\.\.(?:[\\/]|\z)};
+
+        my $loaded = eval {
+            local @INC = ( $real_lib, @INC );
+            require $real_module;
+            1;
+        };
+        die "Unable to load skill Dashboard module '$real_module': $@" if !$loaded;
+        push @loaded, $real_module;
+    }
+
+    my @skill_routes;
+    for my $method ( keys %{ $dancer_app->routes } ) {
+        my %builtin = map { refaddr($_) => 1 } @{ $routes_before{$method} || [] };
+        my @added = grep { !$builtin{ refaddr($_) } } @{ $dancer_app->routes->{$method} || [] };
+        next if !@added;
+        push @skill_routes, @added;
+
+        my @original = @{ $routes_before{$method} || [] };
+        my $fallback = ( $method eq 'get' || $method eq 'post' ) ? pop @original : undef;
+        $dancer_app->routes->{$method} = [ @original, @added, ( defined $fallback ? ($fallback) : () ) ];
+    }
+
+    if (@skill_routes) {
+        $dancer_app->add_hook(
+            Dancer2::Core::Hook->new(
+                name => 'core.app.before_request',
+                code => sub { _authorize_skill_dashboard_routes( \@skill_routes, @_ ) },
+            )
+        );
+    }
+
+    return \@loaded;
+}
+
+# _authorize_skill_dashboard_routes($routes, $dancer_app)
+# Applies the dashboard's standard request authorization before a loaded skill
+# route can execute; non-skill requests pass through unchanged.
+# Input: array reference of skill route objects and active Dancer2 app context.
+# Output: undef when the request is unrelated or authorized; halts the app with
+# the authorization response when access is refused.
+sub _authorize_skill_dashboard_routes {
+    my ( $routes, $dancer_context ) = @_;
+    die 'Missing skill route list' if ref($routes) ne 'ARRAY';
+    die 'Missing Dancer2 request context' if !ref($dancer_context) || !$dancer_context->can('request');
+
+    my $request = $dancer_context->request;
+    my $method = lc( $request->method // '' );
+    return if !grep {
+        $_->method eq $method && $_->match($request)
+    } @{$routes};
+
+    my $backend = _current_backend();
+    my $web_app = $backend->{app};
+    die 'Backend app does not implement authorize_request for skill routes'
+      if !$web_app->can('authorize_request');
+    my $refusal = $web_app->authorize_request( %{ _request_args() } );
+    return if !defined $refusal;
+
+    my ( $status_code, $content_type, $body, $headers ) = @{$refusal};
+    my $response = $dancer_context->response;
+    $response->status($status_code);
+    $response->content_type($content_type);
+    $response->content( defined $body ? $body : '' );
+    if ( ref($headers) eq 'HASH' ) {
+        $response->push_header( $_ => $headers->{$_} ) for sort keys %{$headers};
+    }
+    $dancer_context->halt;
+    return;
 }
 
 # _current_backend()
@@ -93,16 +197,39 @@ sub _capture {
     return $parts[$index];
 }
 
+# _response_header_overrides($default_headers)
+# Reads response headers already set in the active Dancer2 request that match
+# configured defaults, preserving settings from skill before hooks.
+# Input: hash reference of default response headers.
+# Output: hash reference of existing headers whose names occur in defaults.
+sub _response_header_overrides {
+    my ($default_headers) = @_;
+    return {} if ref($default_headers) ne 'HASH' || !keys %{$default_headers};
+
+    my $headers = response->headers;
+    my %overrides;
+    for my $name ( keys %{$default_headers} ) {
+        my $value = $headers->header($name);
+        $overrides{$name} = $value if defined $value;
+    }
+    return \%overrides;
+}
+
 # _response_from_result($result)
 # Applies one backend response onto the active Dancer2 response object.
 # Input: backend response array reference.
-# Output: plain body or delayed streaming response suitable for Dancer2.
+# Output: plain body or delayed streaming response suitable for Dancer2;
+# existing before-hook headers override defaults and backend response headers
+# override both.
 sub _response_from_result {
     my ($result) = @_;
     my ( $code, $type, $body, $headers ) = @{$result};
     my $backend = _current_backend();
+    my $default_headers = $backend->{default_headers} || {};
+    my $hook_headers = _response_header_overrides($default_headers);
     my %merged_headers = (
-        %{ $backend->{default_headers} || {} },
+        %{$default_headers},
+        %{$hook_headers},
         %{ $headers || {} },
     );
 
@@ -297,14 +424,39 @@ Developer::Dashboard::Web::DancerApp - Dancer2 route layer for Developer Dashboa
   my $psgi_app = Developer::Dashboard::Web::DancerApp->build_psgi_app(
       app             => $web_app,
       default_headers => \%headers,
+      paths           => $paths,
   );
 
 =head1 DESCRIPTION
 
 This module owns the HTTP route table for the dashboard web UI under Dancer2.
-It normalizes each request, enforces authorization for protected routes, and
+It loads active skill Dancer2 extensions before constructing the shared app,
+normalizes each request, enforces authorization for dashboard and skill routes, and
 delegates the page and action work to C<Developer::Dashboard::Web::App>. The
-route adapter intentionally hands the namespaced C</app>, C</ajax>, C</js>,
+skill C<lib/Dashboard.pm> modules load while the PSGI app is constructed at
+server startup, not once per request; their registered hooks still execute for
+each matching request. A C<hook before =E<gt> sub { ... }> may set Dancer2 app
+variables or response headers. The page CODE runtime can read a hook variable
+when it imports C<Dancer2 appname =E<gt> 'DeveloperDashboard'>. When a hook
+sets a header also present in the dashboard defaults, that existing hook value
+wins; an explicit header returned by the backend wins over both.
+
+For example, a skill extension can set a request-scoped value and a response
+policy:
+
+  use Dancer2 appname => 'DeveloperDashboard';
+  hook before => sub {
+      var foo => 'bar';
+      response_header 'Content-Security-Policy'
+          => "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
+  };
+
+Skill bookmark CODE that needs the variable imports that same app:
+
+  use Dancer2 appname => 'DeveloperDashboard';
+  print var('foo');
+
+The route adapter intentionally hands the namespaced C</app>, C</ajax>, C</js>,
 C</css>, and C</others> surfaces back to the backend dispatcher so the
 installed PSGI server stays in lock-step with the backend smart router. The
 C</favicon.ico> route is deliberately registered without the authorization
@@ -321,7 +473,7 @@ on the cookie-less loopback-admin tier.
 
 =head1 METHODS
 
-=head2 build_psgi_app, _current_backend, _request_headers, _request_args, _response_from_result, _run_backend, _run_authorized
+=head2 build_psgi_app, _load_skill_dashboard_modules, _authorize_skill_dashboard_routes, _current_backend, _request_headers, _request_args, _response_header_overrides, _response_from_result, _run_backend, _run_authorized
 
 Build and serve the Dancer2 application around the dashboard route handlers.
 
@@ -341,7 +493,7 @@ Use this file when changing PSGI wrapping, response translation, or the way the 
 
 =head1 HOW TO USE
 
-Call C<build_psgi_app> with the backend app object and default headers, then pass the returned coderef to a PSGI server. Route behavior and auth logic should stay in C<Developer::Dashboard::Web::App>, including the smart namespaced route resolution for installed skill-local pages, Ajax handlers, and public assets.
+Call C<build_psgi_app> with the backend app object, default headers, and path registry, then pass the returned coderef to a PSGI server. Active installed skills are scanned recursively; each C<lib/Dashboard.pm> is loaded with its own C<lib/> first in C<@INC> so it can add routes or settings using C<use Dancer2 appname =E<gt> 'DeveloperDashboard'>. Skill routes are inserted before the final catch-all and are checked through the dashboard authorization handler. These are trusted local Perl extensions; load failures stop startup with an explicit error. Route behavior and core auth logic should stay in C<Developer::Dashboard::Web::App>, including the smart namespaced route resolution for installed skill-local pages, Ajax handlers, and public assets.
 
 =head1 WHAT USES IT
 

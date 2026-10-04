@@ -1,92 +1,121 @@
-$EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local $EVAL_ERROR = undef;/;"	v	line:72	file:
-$EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local $EVAL_ERROR = undef;/;"	v	line:97	file:
-$EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local $EVAL_ERROR = undef;/;"	v	line:119	file:
-$EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local $EVAL_ERROR = undef;/;"	v	line:149	file:
-$EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local $EVAL_ERROR = undef;/;"	v	line:156	file:
+$EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local $EVAL_ERROR = undef;/;"	v	line:69	file:
+$EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local $EVAL_ERROR = undef;/;"	v	line:94	file:
+$EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local $EVAL_ERROR = undef;/;"	v	line:117	file:
 $OUTPUT_AUTOFLUSH	/home/mikkoi/other/own_github/env-assert/bin/envassert	/local $OUTPUT_AUTOFLUSH = 1;/;"	v	line:21	file:
-$OUTPUT_AUTOFLUSH	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/local $OUTPUT_AUTOFLUSH = 1;/;"	v	line:105	file:	class:Env::Assert
+$OUTPUT_AUTOFLUSH	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/local $OUTPUT_AUTOFLUSH = 1;/;"	v	line:103	file:	class:Env::Assert
 $VERSION	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/CI/GitHubCI.pm	/our $VERSION = '0.000160';/;"	v	line:7	file:	class:Test2::Deny::Platform::CI::GitHubCI
 $VERSION	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/OS/DOSOrDerivative.pm	/our $VERSION = '0.000160';/;"	v	line:7	file:	class:Test2::Deny::Platform::OS::DOSOrDerivative
 $VERSION	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/CI/GitHubCI.pm	/our $VERSION = '0.000160';/;"	v	line:7	file:	class:Test2::Require::Platform::CI::GitHubCI
 $VERSION	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/DOSOrDerivative.pm	/our $VERSION = '0.000160';/;"	v	line:7	file:	class:Test2::Require::Platform::OS::DOSOrDerivative
 $VERSION	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/Unix.pm	/our $VERSION = '0.000160';/;"	v	line:7	file:	class:Test2::Require::Platform::OS::Unix
-$VERSION	/home/mikkoi/other/own_github/env-assert/bin/envassert	/our $VERSION = '0.016';/;"	v	line:12	file:
-$VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our $VERSION = '0.016';/;"	v	line:11	file:	class:Env::Assert::Functions
-$VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/our $VERSION = '0.016';/;"	v	line:10	file:	class:Env::Assert
-$args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my ($class, $cmd, $args) = @_;/;"	v	line:32	file:	class:Env::Assert
-$break_at_first_error	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $break_at_first_error;/;"	v	line:31	file:
-$break_at_first_error	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $break_at_first_error = $args{'break_at_first_error'}\/\/0;/;"	v	line:107	file:	class:Env::Assert
+$VERSION	/home/mikkoi/other/own_github/env-assert/bin/envassert	/our $VERSION = '0.018';/;"	v	line:12	file:
+$VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our $VERSION = '0.018';/;"	v	line:11	file:	class:Env::Assert::Functions
+$VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/our $VERSION = '0.018';/;"	v	line:10	file:	class:Env::Assert
+$args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my ( $class, $cmd, $args ) = @_;/;"	v	line:30	file:	class:Env::Assert
+$break_at_first_error	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $break_at_first_error = 0;/;"	v	line:31	file:
+$break_at_first_error	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $break_at_first_error = $args{'break_at_first_error'} \/\/ 0;/;"	v	line:105	file:	class:Env::Assert
 $class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/CI/GitHubCI.pm	/my $class = shift;/;"	v	line:14	file:	class:Test2::Deny::Platform::CI::GitHubCI
 $class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/OS/DOSOrDerivative.pm	/my $class = shift;/;"	v	line:14	file:	class:Test2::Deny::Platform::OS::DOSOrDerivative
 $class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/CI/GitHubCI.pm	/my $class = shift;/;"	v	line:19	file:	class:Test2::Require::Platform::CI::GitHubCI
 $class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/DOSOrDerivative.pm	/my $class = shift;/;"	v	line:24	file:	class:Test2::Require::Platform::OS::DOSOrDerivative
 $class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/Unix.pm	/my $class = shift;/;"	v	line:39	file:	class:Test2::Require::Platform::OS::Unix
-$class	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my ($class, $cmd, $args) = @_;/;"	v	line:32	file:	class:Env::Assert
-$cmd	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my ($class, $cmd, $args) = @_;/;"	v	line:32	file:	class:Env::Assert
-$code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $code = <<'EOF';/;"	v	line:73	file:
-$code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $code = <<'EOF';/;"	v	line:98	file:
-$code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $code = <<'EOF';/;"	v	line:120	file:
-$code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $code = <<"EOF";/;"	v	line:150	file:
-$content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ($dirs, $fn, $content) = @_;/;"	v	line:26	file:
-$content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $content = <<'EOF';/;"	v	line:43	file:
-$content	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $content = $args{'envdesc'};/;"	v	line:112	file:	class:Env::Assert
-$desc	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $desc = file_to_desc( @env_desc_rows );/;"	v	line:55	file:
-$desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $desc = file_to_desc( @env_desc_rows );/;"	v	line:124	file:	class:Env::Assert
-$dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $dir = File::Temp->newdir(/;"	v	line:27	file:
-$dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $dir_path = abs_path( $dir->dirname );/;"	v	line:32	file:
-$dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ($temp_dir, $dir_path) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:56	file:
-$dirs	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ($dirs, $fn, $content) = @_;/;"	v	line:26	file:
-$env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ($env, $want, $params) = @_;/;"	v	line:134	file:	class:Env::Assert::Functions
-$env_desc_filename	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $env_desc_filename = ENV_DESC_FILENAME;/;"	v	line:32	file:
-$env_desc_filename	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $env_desc_filename = $args{'envdesc_file'}\/\/ENV_DESC_FILENAME;/;"	v	line:118	file:	class:Env::Assert
-$errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ($errors) = @_;/;"	v	line:190	file:	class:Env::Assert::Functions
+$class	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my ( $class, $cmd, $args ) = @_;/;"	v	line:30	file:	class:Env::Assert
+$cmd	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my ( $class, $cmd, $args ) = @_;/;"	v	line:30	file:	class:Env::Assert
+$code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $code = <<'EOF';/;"	v	line:70	file:
+$code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $code = <<'EOF';/;"	v	line:95	file:
+$code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $code = <<'EOF';/;"	v	line:118	file:
+$content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my $content = <<'EOF';/;"	v	line:11
+$content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my $content = <<'EOF';/;"	v	line:42
+$content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my $content = <<'EOF';/;"	v	line:74
+$content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my $content = <<'EOF';/;"	v	line:94
+$content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ( $dirs, $fn, $content ) = @_;/;"	v	line:21	file:
+$content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $content = <<'EOF';/;"	v	line:38	file:
+$content	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $content = $args{'envdesc'};/;"	v	line:110	file:	class:Env::Assert
+$dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $dir = File::Temp->newdir(/;"	v	line:22	file:
+$dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $dir_path = abs_path( $dir->dirname );/;"	v	line:27	file:
+$dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ( $temp_dir, $dir_path ) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:51	file:
+$dirs	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ( $dirs, $fn, $content ) = @_;/;"	v	line:21	file:
+$env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $env, $want, $params ) = @_;/;"	v	line:155	file:	class:Env::Assert::Functions
+$env_desc_filename	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $env_desc_filename    = ENV_DESC_FILENAME;/;"	v	line:32	file:
+$env_desc_filename	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $env_desc_filename = $args{'envdesc_file'} \/\/ ENV_DESC_FILENAME;/;"	v	line:116	file:	class:Env::Assert
+$env_var	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $env_var  = $vars->{$var_name};/;"	v	line:167	file:	class:Env::Assert::Functions
+$err	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $err = "Unknown $prg option: '$key'";/;"	v	line:260	file:	class:Env::Assert::Functions
+$err	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $err, $line, $filepath ) = @_;/;"	v	line:317	file:	class:Env::Assert::Functions
+$errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ($errors) = @_;/;"	v	line:214	file:	class:Env::Assert::Functions
 $exact	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $exact;/;"	v	line:33	file:
-$exact	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $exact = $args{'exact'}\/\/0;/;"	v	line:108	file:	class:Env::Assert
+$exact	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $exact                = $args{'exact'}                \/\/ 0;/;"	v	line:106	file:	class:Env::Assert
 $expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/my $expected = <<'END_OF_TEXT';/;"	v	line:19	file:
 $expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/my $expected = <<'END_OF_TEXT';/;"	v	line:41	file:
 $expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/my $expected = <<'END_OF_TEXT';/;"	v	line:54	file:
-$fh	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $fh = FileHandle->new( File::Spec->catfile( $dir_path, @{ $dirs }, $fn ), 'w' );/;"	v	line:35	file:
-$fn	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ($dirs, $fn, $content) = @_;/;"	v	line:26	file:
-$key	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ($key, $val) = split qr\/=\/msx;/;"	v	line:265	file:	class:Env::Assert::Functions
+$fh	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $fh = FileHandle->new( File::Spec->catfile( $dir_path, @{$dirs}, $fn ), 'w' );/;"	v	line:30	file:
+$filepath	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $err, $line, $filepath ) = @_;/;"	v	line:317	file:	class:Env::Assert::Functions
+$fn	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ( $dirs, $fn, $content ) = @_;/;"	v	line:21	file:
+$fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:23
+$fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:57
+$fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:79
+$fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:103
+$fp	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $fp, @rows ) = @_;/;"	v	line:233	file:	class:Env::Assert::Functions
+$key	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $key, $val ) = split qr{/;"	v	line:304	file:	class:Env::Assert::Functions
 $lib_path	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my $lib_path;/;"	v	line:12
 $lib_path	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/my $lib_path;/;"	v	line:9
 $lib_path	/home/mikkoi/other/own_github/env-assert/t/envassert-script.t	/my $lib_path;/;"	v	line:10
-$lib_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $lib_path;/;"	v	line:9	file:
-$man	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $man = 0;/;"	v	line:30	file:
-$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:14
-$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:23
-$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:32
-$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:41
-$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:50
-$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:60
-$opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $opts = $want->{'options'};/;"	v	line:144	file:	class:Env::Assert::Functions
-$opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $opts = _interpret_opts( $LAST_PAREN_MATCH{opts} );/;"	v	line:223	file:	class:Env::Assert::Functions
-$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=1';/;"	v	line:13
-$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=0';/;"	v	line:22
-$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=123';/;"	v	line:31
-$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=1.234';/;"	v	line:40
-$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=1,234';/;"	v	line:49
-$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'key_1=1,key_2=234, key_3=text , key_4=more text, key_5=';/;"	v	line:59
-$opts_str	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ($opts_str) = @_;/;"	v	line:258	file:	class:Env::Assert::Functions
+$line	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $err, $line, $filepath ) = @_;/;"	v	line:317	file:	class:Env::Assert::Functions
+$man	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $man                  = 0;/;"	v	line:30	file:
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:15
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:22
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:29
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:36
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:43
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:50
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:57
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:67
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:79
+$opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:89
+$opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $opts = $want->{'options'}   ? $want->{'options'}   : $want->{'opts'};/;"	v	line:165	file:	class:Env::Assert::Functions
+$opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $opts = _interpret_opts( $LAST_PAREN_MATCH{opts} );/;"	v	line:253	file:	class:Env::Assert::Functions
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = q{};/;"	v	line:14
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact';/;"	v	line:21
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=1';/;"	v	line:28
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=0';/;"	v	line:35
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=123';/;"	v	line:42
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=1.234';/;"	v	line:49
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=1,234';/;"	v	line:56
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact=1, some_true, other_true, other_false = 0';/;"	v	line:66
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'exact = 0, words_and_space = one two three_go';/;"	v	line:78
+$opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my $opts_str = 'key_1=1,key_2=234, key_3 =text , key_4= more text, key_5= ';/;"	v	line:88
+$opts_str	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ($opts_str) = @_;/;"	v	line:298	file:	class:Env::Assert::Functions
 $out	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/my $out = report_errors( \\%errors );/;"	v	line:24	file:
 $out	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/my $out = report_errors( \\%errors );/;"	v	line:47	file:
 $out	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/my $out = report_errors( \\%errors );/;"	v	line:57	file:
-$out	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $out = q{};/;"	v	line:191	file:	class:Env::Assert::Functions
-$params	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ($env, $want, $params) = @_;/;"	v	line:134	file:	class:Env::Assert::Functions
+$out	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $out = q{};/;"	v	line:215	file:	class:Env::Assert::Functions
+$params	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $env, $want, $params ) = @_;/;"	v	line:155	file:	class:Env::Assert::Functions
 $path1	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my $path1 = File::Spec->rel2abs(File::Spec->catfile(File::Spec->curdir(), 't', 'three'));/;"	v	line:24
-$r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $r = eval $code;/;"	v	line:77	file:
-$r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $r = eval $code;/;"	v	line:102	file:
-$r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $r = eval $code;/;"	v	line:129	file:
-$r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $r = eval $code;/;"	v	line:157	file:
+$prg	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $prg     = 'envassert';/;"	v	line:240	file:	class:Env::Assert::Functions
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $r = eval $code;/;"	v	line:74	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $r = eval $code;/;"	v	line:99	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $r = eval $code;/;"	v	line:127	file:
 $r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:23	file:
-$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:44	file:
-$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:65	file:
-$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:85	file:
-$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:116	file:
-$r	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $r = assert( \\%ENV, $desc, \\%parameters );/;"	v	line:61	file:
-$r	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $r = assert( \\%ENV, $desc, \\%parameters );/;"	v	line:130	file:	class:Env::Assert
-$regexp	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $regexp = $var->{'regexp'}\/\/q{.*};/;"	v	line:148	file:	class:Env::Assert::Functions
-$required	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $required = $var->{'required'}\/\/1;/;"	v	line:147	file:	class:Env::Assert::Functions
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:41	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:63	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:80	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:108	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:140	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:162	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:183	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:207	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:228	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:252	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:287	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:293	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:328	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:344	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:382	file:
+$r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:400	file:
+$r	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $r = assert( \\%ENV, \\%desc, \\%parameters );/;"	v	line:61	file:
+$r	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my $r = assert( \\%ENV, \\%desc, \\%parameters );/;"	v	line:128	file:	class:Env::Assert
+$regexp	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $regexp   = $env_var->{ OPTION_VAR_REGEXP() }   \/\/ DEFAULT_REGEXP_ANY;/;"	v	line:169	file:	class:Env::Assert::Functions
+$required	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $required = $env_var->{ OPTION_VAR_REQUIRED() } \/\/ DEFAULT_OPTION_VAR_REQUIRED();/;"	v	line:168	file:	class:Env::Assert::Functions
+$row_num	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $row_num = 1;/;"	v	line:241	file:	class:Env::Assert::Functions
 $stderr	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my ($stdout, $stderr);/;"	v	line:61
 $stderr	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my ($stdout, $stderr);/;"	v	line:82
 $stdin	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/my $stdin = <<'EOF';/;"	v	line:23
@@ -95,91 +124,127 @@ $stdout	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my 
 $stdout	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my ($stdout, $stderr);/;"	v	line:82
 $stdout	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/my $stdout;/;"	v	line:22
 $stdout	/home/mikkoi/other/own_github/env-assert/t/envassert-script.t	/my $stdout;/;"	v	line:31
-$subdir_filepath	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $subdir_filepath = File::Spec->catfile( $RealBin, 'env-assert', 'another-envdesc' );/;"	v	line:140	file:
-$subdir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $subdir_path = File::Spec->catdir( $dir_path );/;"	v	line:61	file:
-$success	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $success = 1;/;"	v	line:141	file:	class:Env::Assert::Functions
-$temp_dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ($temp_dir, $dir_path) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:56	file:
-$this	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $this = getcwd;/;"	v	line:59	file:
-$val	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ($key, $val) = split qr\/=\/msx;/;"	v	line:265	file:	class:Env::Assert::Functions
-$var	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $var = $vars->{$var_name};/;"	v	line:146	file:	class:Env::Assert::Functions
-$vars	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $vars = $want->{'variables'};/;"	v	line:143	file:	class:Env::Assert::Functions
-$want	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ($env, $want, $params) = @_;/;"	v	line:134	file:	class:Env::Assert::Functions
+$subdir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $subdir_path = File::Spec->catdir($dir_path);/;"	v	line:57	file:
+$success	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $success = 1;/;"	v	line:162	file:	class:Env::Assert::Functions
+$temp_dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my ( $temp_dir, $dir_path ) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:51	file:
+$this	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $this = getcwd;/;"	v	line:55	file:
+$val	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $key, $val ) = split qr{/;"	v	line:304	file:	class:Env::Assert::Functions
+$vars	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my $vars = $want->{'variables'} ? $want->{'variables'} : $want->{'vars'};/;"	v	line:164	file:	class:Env::Assert::Functions
+$want	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $env, $want, $params ) = @_;/;"	v	line:155	file:	class:Env::Assert::Functions
 %ENV	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/local %ENV = (/;"	v	line:75
 %ENV	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/local %ENV = ( 'NUMERIC_VAR' => '123', 'TIME_VAR' => '01:02:03' );/;"	v	line:28
-%ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local %ENV = %new_env;/;"	v	line:71	file:
-%ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local %ENV = %new_env;/;"	v	line:95	file:
-%ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local %ENV = %new_env;/;"	v	line:117	file:
-%ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local %ENV = %new_env;/;"	v	line:147	file:
-%EXPORT_TAGS	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our %EXPORT_TAGS = (/;"	v	line:30	file:	class:Env::Assert::Functions
+%ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local %ENV        = %new_env;/;"	v	line:68	file:
+%ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local %ENV = %new_env;/;"	v	line:92	file:
+%ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/local %ENV = %new_env;/;"	v	line:115	file:
+%ENVASSERT_OPTIONS	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %ENVASSERT_OPTIONS = map { $_ => 1 } ( OPTION_ENV_EXACT(), OPTION_VAR_REQUIRED() );/;"	v	line:87	file:	class:Env::Assert::Functions
+%EXPORT_TAGS	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our %EXPORT_TAGS = (/;"	v	line:33	file:	class:Env::Assert::Functions
 %PLATFORMS	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/DOSOrDerivative.pm	/my %PLATFORMS = (/;"	v	line:11	file:	class:Test2::Require::Platform::OS::DOSOrDerivative
 %PLATFORMS	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/Unix.pm	/my %PLATFORMS = (/;"	v	line:11	file:	class:Test2::Require::Platform::OS::Unix
-%args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my (%args) = @_;/;"	v	line:104	file:	class:Env::Assert
-%desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %desc = ( 'options' => {}, 'variables' => {}, );/;"	v	line:211	file:	class:Env::Assert::Functions
-%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env = (/;"	v	line:11	file:
-%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env = (/;"	v	line:31	file:
-%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env = (/;"	v	line:52	file:
-%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env = (/;"	v	line:73	file:
-%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env = (/;"	v	line:98	file:
+%args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my (%args) = @_;/;"	v	line:102	file:	class:Env::Assert
+%desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:24
+%desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:58
+%desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:80
+%desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:104
+%desc	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my %desc = file_to_desc( $stdin ? q{STDIN} : $env_desc_filename, @env_desc_rows );/;"	v	line:55	file:
+%desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my %desc = file_to_desc(@env_desc_rows);/;"	v	line:122	file:	class:Env::Assert
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env  = ( USER => 'random_user', );/;"	v	line:14	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env  = ( USER => 'random_user', );/;"	v	line:30	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env  = ( USER => 'random_user', );/;"	v	line:52	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env  = ( USER => 'random_user', );/;"	v	line:70	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env = (/;"	v	line:92	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env = (/;"	v	line:118	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env;/;"	v	line:152	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env;/;"	v	line:173	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env;/;"	v	line:197	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env  = ( ANYTHING => q{}, OTHER_THING => q{123}, );/;"	v	line:218	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env  = ( ANYTHING => q{}, OTHER_THING => q{123}, );/;"	v	line:242	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env  = ( DECLARED_REQUIRED => q{123}, DECLARED_OPTIONAL => q{name}, NOT_DECLARED => undef, );/;"	v	line:277	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env  = ( DECLARED_REQUIRED => q{ABC_123}, DECLARED_OPTIONAL => q{white space}, NOT_DECLARED => undef, );/;"	v	line:318	file:
+%env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %env  = ( NOT_DECLARED => undef, );/;"	v	line:372	file:
+%env_options	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %env_options =/;"	v	line:234	file:	class:Env::Assert::Functions
 %errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/my %errors = (/;"	v	line:11	file:
 %errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/my %errors = (/;"	v	line:29	file:
 %errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/my %errors = (/;"	v	line:52	file:
-%errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %errors;/;"	v	line:142	file:	class:Env::Assert::Functions
-%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:15
-%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:24
-%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:33
-%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:42
-%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:51
-%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:61
-%new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my %new_env = (/;"	v	line:65	file:
-%new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my %new_env = (/;"	v	line:88	file:
-%new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my %new_env = (/;"	v	line:111	file:
-%new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my %new_env = (/;"	v	line:141	file:
+%errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %errors;/;"	v	line:163	file:	class:Env::Assert::Functions
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected;/;"	v	line:16
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = ( exact => 1, );/;"	v	line:23
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = ( exact => 1, );/;"	v	line:30
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = ( exact => 0, );/;"	v	line:37
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = ( exact => 123, );/;"	v	line:44
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = ( exact => 1.234, );/;"	v	line:51
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:58
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:68
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:80
+%expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/my %expected = (/;"	v	line:90
+%new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my %new_env = (/;"	v	line:61	file:
+%new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my %new_env = (/;"	v	line:85	file:
+%new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my %new_env = (/;"	v	line:109	file:
 %opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ();/;"	v	line:21	file:
-%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ();/;"	v	line:42	file:
-%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ();/;"	v	line:63	file:
-%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0,);/;"	v	line:83	file:
-%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = (/;"	v	line:113	file:
-%opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %opts;/;"	v	line:263	file:	class:Env::Assert::Functions
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ();/;"	v	line:39	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ();/;"	v	line:61	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:78	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:107	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:139	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:161	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:182	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:206	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:227	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:251	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:285	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:326	file:
+%opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %opts = ( break_at_first_error => 0, );/;"	v	line:380	file:
+%opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %opts;/;"	v	line:302	file:	class:Env::Assert::Functions
 %parameters	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my %parameters;/;"	v	line:56	file:
-%parameters	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my %parameters;/;"	v	line:125	file:	class:Env::Assert
-%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:14	file:
-%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:34	file:
-%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:55	file:
-%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:76	file:
-%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:103	file:
+%parameters	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my %parameters;/;"	v	line:123	file:	class:Env::Assert
+%var_options	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %var_options =/;"	v	line:236	file:	class:Env::Assert::Functions
+%variables	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %variables;/;"	v	line:239	file:	class:Env::Assert::Functions
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:15	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:31	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:53	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:71	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:97	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:126	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:153	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:174	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:198	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:219	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:243	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:278	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:319	file:
+%want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/my %want = (/;"	v	line:373	file:
+%wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my %wanted = (/;"	v	line:25
+%wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my %wanted = (/;"	v	line:59
+%wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my %wanted = (/;"	v	line:81
+%wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/my %wanted = (/;"	v	line:105
 @EXPORT_OK	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our @EXPORT_OK = qw(/;"	v	line:22	file:	class:Env::Assert::Functions
 @env_desc_rows	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my @env_desc_rows;/;"	v	line:46	file:
-@env_desc_rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my @env_desc_rows;/;"	v	line:110	file:	class:Env::Assert
-@opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my @opts = split qr{/;"	v	line:259	file:	class:Env::Assert::Functions
-@rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my @rows = @_;/;"	v	line:210	file:	class:Env::Assert::Functions
+@env_desc_rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/my @env_desc_rows;/;"	v	line:108	file:	class:Env::Assert
+@opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my @opts = split qr{/;"	v	line:299	file:	class:Env::Assert::Functions
+@rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my ( $fp, @rows ) = @_;/;"	v	line:233	file:	class:Env::Assert::Functions
 ENV	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/    local %ENV = (/;"	v	line:75
 ENV	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/    local %ENV = (/;"	v	line:75
 ENV	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/    local %ENV = ( 'NUMERIC_VAR' => '123', 'TIME_VAR' => '01:02:03' );/;"	v	line:28
 ENV	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/    local %ENV = ( 'NUMERIC_VAR' => '123', 'TIME_VAR' => '01:02:03' );/;"	v	line:28
-ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:71	file:
-ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:95	file:
-ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:117	file:
-ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:147	file:
-ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:71	file:
-ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:95	file:
-ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:117	file:
-ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:147	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:72	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:97	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:119	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:149	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:156	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:72	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:97	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:119	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:149	file:
-EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:156	file:
-EXIT	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    EXIT:/;"	l	line:179	class:Env::Assert::Functions
-EXIT	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    EXIT:/;"	l	line:179	class:Env::Assert::Functions
+ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV        = %new_env;/;"	v	line:68	file:
+ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:92	file:
+ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:115	file:
+ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV        = %new_env;/;"	v	line:68	file:
+ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:92	file:
+ENV	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local %ENV = %new_env;/;"	v	line:115	file:
+ENVASSERT_OPTIONS	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %ENVASSERT_OPTIONS = map { $_ => 1 } ( OPTION_ENV_EXACT(), OPTION_VAR_REQUIRED() );/;"	v	line:87	file:	class:Env::Assert::Functions
+ENVASSERT_OPTIONS	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/my %ENVASSERT_OPTIONS = map { $_ => 1 } ( OPTION_ENV_EXACT(), OPTION_VAR_REQUIRED() );/;"	v	line:87	file:	class:Env::Assert::Functions
+EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:69	file:
+EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:94	file:
+EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:117	file:
+EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:69	file:
+EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:94	file:
+EVAL_ERROR	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    local $EVAL_ERROR = undef;/;"	v	line:117	file:
+EXIT	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/  EXIT:/;"	l	line:203	class:Env::Assert::Functions
+EXIT	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/  EXIT:/;"	l	line:203	class:Env::Assert::Functions
 EXPORT_OK	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our @EXPORT_OK = qw(/;"	v	line:22	file:	class:Env::Assert::Functions
 EXPORT_OK	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our @EXPORT_OK = qw(/;"	v	line:22	file:	class:Env::Assert::Functions
-EXPORT_TAGS	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our %EXPORT_TAGS = (/;"	v	line:30	file:	class:Env::Assert::Functions
-EXPORT_TAGS	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our %EXPORT_TAGS = (/;"	v	line:30	file:	class:Env::Assert::Functions
+EXPORT_TAGS	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our %EXPORT_TAGS = (/;"	v	line:33	file:	class:Env::Assert::Functions
+EXPORT_TAGS	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our %EXPORT_TAGS = (/;"	v	line:33	file:	class:Env::Assert::Functions
 Env::Assert	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/package Env::Assert;/;"	p	line:3	class:Env::Assert
 Env::Assert	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/package Env::Assert;/;"	p	line:3	class:Env::Assert
 Env::Assert	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/package Env::Assert;/;"	p	line:3	class:Env::Assert
@@ -199,8 +264,8 @@ NEEDLESS_1	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_e
 NEEDLESS_1	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/        NEEDLESS_1: Variable NEEDLESS_1 is missing from definition/;"	l	line:44
 OUTPUT_AUTOFLUSH	/home/mikkoi/other/own_github/env-assert/bin/envassert	/local $OUTPUT_AUTOFLUSH = 1;/;"	v	line:21
 OUTPUT_AUTOFLUSH	/home/mikkoi/other/own_github/env-assert/bin/envassert	/local $OUTPUT_AUTOFLUSH = 1;/;"	v	line:21	file:
-OUTPUT_AUTOFLUSH	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    local $OUTPUT_AUTOFLUSH = 1;/;"	v	line:105	file:	class:Env::Assert
-OUTPUT_AUTOFLUSH	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    local $OUTPUT_AUTOFLUSH = 1;/;"	v	line:105	file:	class:Env::Assert
+OUTPUT_AUTOFLUSH	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    local $OUTPUT_AUTOFLUSH = 1;/;"	v	line:103	file:	class:Env::Assert
+OUTPUT_AUTOFLUSH	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    local $OUTPUT_AUTOFLUSH = 1;/;"	v	line:103	file:	class:Env::Assert
 PLATFORMS	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/DOSOrDerivative.pm	/my %PLATFORMS = (/;"	v	line:11	file:	class:Test2::Require::Platform::OS::DOSOrDerivative
 PLATFORMS	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/DOSOrDerivative.pm	/my %PLATFORMS = (/;"	v	line:11	file:	class:Test2::Require::Platform::OS::DOSOrDerivative
 PLATFORMS	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/Unix.pm	/my %PLATFORMS = (/;"	v	line:11	file:	class:Test2::Require::Platform::OS::Unix
@@ -234,29 +299,32 @@ VERSION	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS
 VERSION	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/DOSOrDerivative.pm	/our $VERSION = '0.000160';/;"	v	line:7	file:	class:Test2::Require::Platform::OS::DOSOrDerivative
 VERSION	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/Unix.pm	/our $VERSION = '0.000160';/;"	v	line:7	file:	class:Test2::Require::Platform::OS::Unix
 VERSION	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/Unix.pm	/our $VERSION = '0.000160';/;"	v	line:7	file:	class:Test2::Require::Platform::OS::Unix
-VERSION	/home/mikkoi/other/own_github/env-assert/bin/envassert	/our $VERSION = '0.016';/;"	v	line:12
-VERSION	/home/mikkoi/other/own_github/env-assert/bin/envassert	/our $VERSION = '0.016';/;"	v	line:12	file:
-VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our $VERSION = '0.016';/;"	v	line:11	file:	class:Env::Assert::Functions
-VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our $VERSION = '0.016';/;"	v	line:11	file:	class:Env::Assert::Functions
-VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/our $VERSION = '0.016';/;"	v	line:10	file:	class:Env::Assert
-VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/our $VERSION = '0.016';/;"	v	line:10	file:	class:Env::Assert
-_interpret_opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub _interpret_opts {/;"	s	line:257	class:Env::Assert::Functions
-_interpret_opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub _interpret_opts {/;"	s	line:257	class:Env::Assert::Functions
-_interpret_opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub _interpret_opts {/;"	s	line:257	class:
-args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ($class, $cmd, $args) = @_;/;"	v	line:32	file:	class:Env::Assert
-args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my (%args) = @_;/;"	v	line:104	file:	class:Env::Assert
-args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ($class, $cmd, $args) = @_;/;"	v	line:32	file:	class:Env::Assert
-args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my (%args) = @_;/;"	v	line:104	file:	class:Env::Assert
-assert	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub assert {/;"	s	line:133	class:Env::Assert::Functions
-assert	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub assert {/;"	s	line:133	class:Env::Assert::Functions
-assert	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub assert {/;"	s	line:133	class:
-assert_env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/sub assert_env {/;"	s	line:103	class:Env::Assert
-assert_env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/sub assert_env {/;"	s	line:103	class:Env::Assert
-assert_env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/sub assert_env {/;"	s	line:103	class:
-break_at_first_error	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $break_at_first_error;/;"	v	line:31
-break_at_first_error	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $break_at_first_error;/;"	v	line:31	file:
-break_at_first_error	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $break_at_first_error = $args{'break_at_first_error'}\/\/0;/;"	v	line:107	file:	class:Env::Assert
-break_at_first_error	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $break_at_first_error = $args{'break_at_first_error'}\/\/0;/;"	v	line:107	file:	class:Env::Assert
+VERSION	/home/mikkoi/other/own_github/env-assert/bin/envassert	/our $VERSION = '0.018';/;"	v	line:12
+VERSION	/home/mikkoi/other/own_github/env-assert/bin/envassert	/our $VERSION = '0.018';/;"	v	line:12	file:
+VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our $VERSION = '0.018';/;"	v	line:11	file:	class:Env::Assert::Functions
+VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/our $VERSION = '0.018';/;"	v	line:11	file:	class:Env::Assert::Functions
+VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/our $VERSION = '0.018';/;"	v	line:10	file:	class:Env::Assert
+VERSION	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/our $VERSION = '0.018';/;"	v	line:10	file:	class:Env::Assert
+_create_error_msg	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub _create_error_msg {/;"	s	line:316	class:Env::Assert::Functions
+_create_error_msg	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub _create_error_msg {/;"	s	line:316	class:Env::Assert::Functions
+_create_error_msg	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub _create_error_msg {/;"	s	line:316	class:
+_interpret_opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub _interpret_opts {/;"	s	line:297	class:Env::Assert::Functions
+_interpret_opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub _interpret_opts {/;"	s	line:297	class:Env::Assert::Functions
+_interpret_opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub _interpret_opts {/;"	s	line:297	class:
+args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ( $class, $cmd, $args ) = @_;/;"	v	line:30	file:	class:Env::Assert
+args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my (%args) = @_;/;"	v	line:102	file:	class:Env::Assert
+args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ( $class, $cmd, $args ) = @_;/;"	v	line:30	file:	class:Env::Assert
+args	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my (%args) = @_;/;"	v	line:102	file:	class:Env::Assert
+assert	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub assert {/;"	s	line:154	class:Env::Assert::Functions
+assert	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub assert {/;"	s	line:154	class:Env::Assert::Functions
+assert	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub assert {/;"	s	line:154	class:
+assert_env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/sub assert_env {/;"	s	line:101	class:Env::Assert
+assert_env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/sub assert_env {/;"	s	line:101	class:Env::Assert
+assert_env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/sub assert_env {/;"	s	line:101	class:
+break_at_first_error	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $break_at_first_error = 0;/;"	v	line:31
+break_at_first_error	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $break_at_first_error = 0;/;"	v	line:31	file:
+break_at_first_error	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $break_at_first_error = $args{'break_at_first_error'} \/\/ 0;/;"	v	line:105	file:	class:Env::Assert
+break_at_first_error	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $break_at_first_error = $args{'break_at_first_error'} \/\/ 0;/;"	v	line:105	file:	class:Env::Assert
 class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/CI/GitHubCI.pm	/    my $class = shift;/;"	v	line:14	file:	class:Test2::Deny::Platform::CI::GitHubCI
 class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/CI/GitHubCI.pm	/    my $class = shift;/;"	v	line:14	file:	class:Test2::Deny::Platform::CI::GitHubCI
 class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/OS/DOSOrDerivative.pm	/    my $class = shift;/;"	v	line:14	file:	class:Test2::Deny::Platform::OS::DOSOrDerivative
@@ -267,224 +335,340 @@ class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/D
 class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/DOSOrDerivative.pm	/    my $class = shift;/;"	v	line:24	file:	class:Test2::Require::Platform::OS::DOSOrDerivative
 class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/Unix.pm	/    my $class = shift;/;"	v	line:39	file:	class:Test2::Require::Platform::OS::Unix
 class	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Require/Platform/OS/Unix.pm	/    my $class = shift;/;"	v	line:39	file:	class:Test2::Require::Platform::OS::Unix
-class	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ($class, $cmd, $args) = @_;/;"	v	line:32	file:	class:Env::Assert
-class	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ($class, $cmd, $args) = @_;/;"	v	line:32	file:	class:Env::Assert
-cmd	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ($class, $cmd, $args) = @_;/;"	v	line:32	file:	class:Env::Assert
-cmd	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ($class, $cmd, $args) = @_;/;"	v	line:32	file:	class:Env::Assert
-code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:73	file:
-code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:98	file:
-code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:120	file:
-code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<"EOF";/;"	v	line:150	file:
-code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:73	file:
-code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:98	file:
-code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:120	file:
-code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<"EOF";/;"	v	line:150	file:
-content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($dirs, $fn, $content) = @_;/;"	v	line:26	file:
-content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $content = <<'EOF';/;"	v	line:43	file:
-content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($dirs, $fn, $content) = @_;/;"	v	line:26	file:
-content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $content = <<'EOF';/;"	v	line:43	file:
-content	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my $content = $args{'envdesc'};/;"	v	line:112	file:	class:Env::Assert
-content	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my $content = $args{'envdesc'};/;"	v	line:112	file:	class:Env::Assert
-create_test_file	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/sub create_test_file {/;"	s	line:25	file:
-create_test_file	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/sub create_test_file {/;"	s	line:25	file:
-create_test_file	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/sub create_test_file {/;"	s	line:25	file:
-desc	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my $desc = file_to_desc( @env_desc_rows );/;"	v	line:55	file:
-desc	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my $desc = file_to_desc( @env_desc_rows );/;"	v	line:55	file:
-desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %desc = ( 'options' => {}, 'variables' => {}, );/;"	v	line:211	file:	class:Env::Assert::Functions
-desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %desc = ( 'options' => {}, 'variables' => {}, );/;"	v	line:211	file:	class:Env::Assert::Functions
-desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $desc = file_to_desc( @env_desc_rows );/;"	v	line:124	file:	class:Env::Assert
-desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $desc = file_to_desc( @env_desc_rows );/;"	v	line:124	file:	class:Env::Assert
-dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $dir = File::Temp->newdir(/;"	v	line:27	file:
-dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $dir = File::Temp->newdir(/;"	v	line:27	file:
-dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $dir_path = abs_path( $dir->dirname );/;"	v	line:32	file:
-dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($temp_dir, $dir_path) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:56	file:
-dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $dir_path = abs_path( $dir->dirname );/;"	v	line:32	file:
-dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($temp_dir, $dir_path) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:56	file:
-dirs	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($dirs, $fn, $content) = @_;/;"	v	line:26	file:
-dirs	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($dirs, $fn, $content) = @_;/;"	v	line:26	file:
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:11
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:31
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:52
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:73
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:98
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:11
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:31	file:
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:52	file:
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:73	file:
-env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env = (/;"	v	line:98	file:
-env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($env, $want, $params) = @_;/;"	v	line:134	file:	class:Env::Assert::Functions
-env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($env, $want, $params) = @_;/;"	v	line:134	file:	class:Env::Assert::Functions
-env_desc_filename	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $env_desc_filename = ENV_DESC_FILENAME;/;"	v	line:32
-env_desc_filename	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $env_desc_filename = ENV_DESC_FILENAME;/;"	v	line:32	file:
-env_desc_filename	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my $env_desc_filename = $args{'envdesc_file'}\/\/ENV_DESC_FILENAME;/;"	v	line:118	file:	class:Env::Assert
-env_desc_filename	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my $env_desc_filename = $args{'envdesc_file'}\/\/ENV_DESC_FILENAME;/;"	v	line:118	file:	class:Env::Assert
+class	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ( $class, $cmd, $args ) = @_;/;"	v	line:30	file:	class:Env::Assert
+class	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ( $class, $cmd, $args ) = @_;/;"	v	line:30	file:	class:Env::Assert
+cmd	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ( $class, $cmd, $args ) = @_;/;"	v	line:30	file:	class:Env::Assert
+cmd	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my ( $class, $cmd, $args ) = @_;/;"	v	line:30	file:	class:Env::Assert
+code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:70	file:
+code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:95	file:
+code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:118	file:
+code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:70	file:
+code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:95	file:
+code	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $code = <<'EOF';/;"	v	line:118	file:
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $content = <<'EOF';/;"	v	line:11
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $content = <<'EOF';/;"	v	line:42
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $content = <<'EOF';/;"	v	line:74
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $content = <<'EOF';/;"	v	line:94
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $content = <<'EOF';/;"	v	line:11
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $content = <<'EOF';/;"	v	line:42
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $content = <<'EOF';/;"	v	line:74
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $content = <<'EOF';/;"	v	line:94
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $dirs, $fn, $content ) = @_;/;"	v	line:21	file:
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $content = <<'EOF';/;"	v	line:38	file:
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $dirs, $fn, $content ) = @_;/;"	v	line:21	file:
+content	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $content = <<'EOF';/;"	v	line:38	file:
+content	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my $content = $args{'envdesc'};/;"	v	line:110	file:	class:Env::Assert
+content	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my $content = $args{'envdesc'};/;"	v	line:110	file:	class:Env::Assert
+create_test_file	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/sub create_test_file {/;"	s	line:20	file:
+create_test_file	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/sub create_test_file {/;"	s	line:20	file:
+create_test_file	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/sub create_test_file {/;"	s	line:20	file:
+desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:24
+desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:58
+desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:80
+desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:104
+desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:24
+desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:58
+desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:80
+desc	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %desc   = file_to_desc( $fp, ( split qr{\\n}msx, $content ) );/;"	v	line:104
+desc	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my %desc = file_to_desc( $stdin ? q{STDIN} : $env_desc_filename, @env_desc_rows );/;"	v	line:55	file:
+desc	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my %desc = file_to_desc( $stdin ? q{STDIN} : $env_desc_filename, @env_desc_rows );/;"	v	line:55	file:
+desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my %desc = file_to_desc(@env_desc_rows);/;"	v	line:122	file:	class:Env::Assert
+desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my %desc = file_to_desc(@env_desc_rows);/;"	v	line:122	file:	class:Env::Assert
+dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $dir = File::Temp->newdir(/;"	v	line:22	file:
+dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $dir = File::Temp->newdir(/;"	v	line:22	file:
+dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $dir_path = abs_path( $dir->dirname );/;"	v	line:27	file:
+dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $temp_dir, $dir_path ) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:51	file:
+dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $dir_path = abs_path( $dir->dirname );/;"	v	line:27	file:
+dir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $temp_dir, $dir_path ) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:51	file:
+dirs	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $dirs, $fn, $content ) = @_;/;"	v	line:21	file:
+dirs	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $dirs, $fn, $content ) = @_;/;"	v	line:21	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env  = ( USER => 'random_user', );/;"	v	line:14
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env  = ( USER => 'random_user', );/;"	v	line:30
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env  = ( USER => 'random_user', );/;"	v	line:52
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env  = ( USER => 'random_user', );/;"	v	line:70
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env = (/;"	v	line:92
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env = (/;"	v	line:118
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env;/;"	v	line:152
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env;/;"	v	line:173
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env;/;"	v	line:197
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( ANYTHING => q{}, OTHER_THING => q{123}, );    # In Perl %ENV, ANYTHING= becomes empty string./;"	v	line:218
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( ANYTHING => q{}, OTHER_THING => q{123}, );    # In Perl %ENV, ANYTHING= becomes empty string./;"	v	line:242
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( DECLARED_REQUIRED => q{123}, DECLARED_OPTIONAL => q{name}, NOT_DECLARED => undef, );/;"	v	line:277
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( DECLARED_REQUIRED => q{ABC_123}, DECLARED_OPTIONAL => q{white space}, NOT_DECLARED => undef, );/;"	v	line:318
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( NOT_DECLARED => undef, );/;"	v	line:372
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env  = ( USER => 'random_user', );/;"	v	line:14
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env  = ( USER => 'random_user', );/;"	v	line:30	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env  = ( USER => 'random_user', );/;"	v	line:52	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %env  = ( USER => 'random_user', );/;"	v	line:70	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env = (/;"	v	line:92	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env = (/;"	v	line:118	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env;/;"	v	line:152	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env;/;"	v	line:173	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env;/;"	v	line:197	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( ANYTHING => q{}, OTHER_THING => q{123}, );    # In Perl %ENV, ANYTHING= becomes empty string./;"	v	line:218	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( ANYTHING => q{}, OTHER_THING => q{123}, );    # In Perl %ENV, ANYTHING= becomes empty string./;"	v	line:242	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( DECLARED_REQUIRED => q{123}, DECLARED_OPTIONAL => q{name}, NOT_DECLARED => undef, );/;"	v	line:277	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( DECLARED_REQUIRED => q{ABC_123}, DECLARED_OPTIONAL => q{white space}, NOT_DECLARED => undef, );/;"	v	line:318	file:
+env	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %env  = ( NOT_DECLARED => undef, );/;"	v	line:372	file:
+env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $env, $want, $params ) = @_;/;"	v	line:155	file:	class:Env::Assert::Functions
+env	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $env, $want, $params ) = @_;/;"	v	line:155	file:	class:Env::Assert::Functions
+env_desc_filename	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $env_desc_filename    = ENV_DESC_FILENAME;/;"	v	line:32
+env_desc_filename	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $env_desc_filename    = ENV_DESC_FILENAME;/;"	v	line:32	file:
+env_desc_filename	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my $env_desc_filename = $args{'envdesc_file'} \/\/ ENV_DESC_FILENAME;/;"	v	line:116	file:	class:Env::Assert
+env_desc_filename	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/        my $env_desc_filename = $args{'envdesc_file'} \/\/ ENV_DESC_FILENAME;/;"	v	line:116	file:	class:Env::Assert
 env_desc_rows	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my @env_desc_rows;/;"	v	line:46	file:
 env_desc_rows	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my @env_desc_rows;/;"	v	line:46	file:
-env_desc_rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my @env_desc_rows;/;"	v	line:110	file:	class:Env::Assert
-env_desc_rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my @env_desc_rows;/;"	v	line:110	file:	class:Env::Assert
-errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        is( keys %{ $r->{'errors'} }, 1, 'has errors' );/;"	Has	line:25	file:
-errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        is( keys %{ $r->{'errors'} }, 1, 'has errors' );/;"	Has	line:46	file:
-errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        is( keys %{ $r->{'errors'} }, 1, 'has errors' );/;"	Has	line:67	file:
-errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        is( scalar keys %{ $r->{'errors'}->{'variables'} }, 2, 'has errors' );/;"	Has	line:87	file:
+env_desc_rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my @env_desc_rows;/;"	v	line:108	file:	class:Env::Assert
+env_desc_rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my @env_desc_rows;/;"	v	line:108	file:	class:Env::Assert
+env_options	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %env_options =/;"	v	line:234	file:	class:Env::Assert::Functions
+env_options	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %env_options =/;"	v	line:234	file:	class:Env::Assert::Functions
+env_var	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $env_var  = $vars->{$var_name};/;"	v	line:167	file:	class:Env::Assert::Functions
+env_var	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $env_var  = $vars->{$var_name};/;"	v	line:167	file:	class:Env::Assert::Functions
+err	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/                    my $err = "Unknown $prg option: '$key'";/;"	v	line:260	file:	class:Env::Assert::Functions
+err	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $err, $line, $filepath ) = @_;/;"	v	line:317	file:	class:Env::Assert::Functions
+err	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/                    my $err = "Unknown $prg option: '$key'";/;"	v	line:260	file:	class:Env::Assert::Functions
+err	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $err, $line, $filepath ) = @_;/;"	v	line:317	file:	class:Env::Assert::Functions
+errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        T2->is( scalar keys %{ $r->{'errors'} },                   1,                                  'has errors' );/;"	Has	line:25	file:
+errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        T2->is( scalar keys %{ $r->{'errors'} }, 1, 'has errors' );/;"	Has	line:43	file:
+errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        T2->is( scalar keys %{ $r->{'errors'} },                     1,                                   'has errors' );/;"	Has	line:65	file:
+errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        T2->is( scalar keys %{ $r->{'errors'}->{'variables'} },      2,                                   'has errors' );/;"	Has	line:82	file:
 errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my %errors = (/;"	v	line:11
 errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my %errors = (/;"	v	line:29
 errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my %errors = (/;"	v	line:52
 errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my %errors = (/;"	v	line:11
 errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my %errors = (/;"	v	line:29	file:
 errors	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my %errors = (/;"	v	line:52	file:
-errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %errors;/;"	v	line:142	file:	class:Env::Assert::Functions
-errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($errors) = @_;/;"	v	line:190	file:	class:Env::Assert::Functions
-errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %errors;/;"	v	line:142	file:	class:Env::Assert::Functions
-errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($errors) = @_;/;"	v	line:190	file:	class:Env::Assert::Functions
+errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %errors;/;"	v	line:163	file:	class:Env::Assert::Functions
+errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($errors) = @_;/;"	v	line:214	file:	class:Env::Assert::Functions
+errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %errors;/;"	v	line:163	file:	class:Env::Assert::Functions
+errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($errors) = @_;/;"	v	line:214	file:	class:Env::Assert::Functions
 exact	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $exact;/;"	v	line:33
 exact	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $exact;/;"	v	line:33	file:
-exact	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $exact = $args{'exact'}\/\/0;/;"	v	line:108	file:	class:Env::Assert
-exact	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $exact = $args{'exact'}\/\/0;/;"	v	line:108	file:	class:Env::Assert
+exact	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $exact                = $args{'exact'}                \/\/ 0;/;"	v	line:106	file:	class:Env::Assert
+exact	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $exact                = $args{'exact'}                \/\/ 0;/;"	v	line:106	file:	class:Env::Assert
 expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $expected = <<'END_OF_TEXT';/;"	v	line:19
 expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $expected = <<'END_OF_TEXT';/;"	v	line:41
 expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $expected = <<'END_OF_TEXT';/;"	v	line:54
 expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $expected = <<'END_OF_TEXT';/;"	v	line:19	file:
 expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $expected = <<'END_OF_TEXT';/;"	v	line:41	file:
 expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $expected = <<'END_OF_TEXT';/;"	v	line:54	file:
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:15
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:24
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:33
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:42
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:51
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:61
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:15
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:24
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:33
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:42
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:51
-expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:61
-fh	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $fh = FileHandle->new( File::Spec->catfile( $dir_path, @{ $dirs }, $fn ), 'w' );/;"	v	line:35	file:
-fh	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $fh = FileHandle->new( File::Spec->catfile( $dir_path, @{ $dirs }, $fn ), 'w' );/;"	v	line:35	file:
-file_to_desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub file_to_desc {/;"	s	line:209	class:Env::Assert::Functions
-file_to_desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub file_to_desc {/;"	s	line:209	class:Env::Assert::Functions
-file_to_desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub file_to_desc {/;"	s	line:209	class:
-fn	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($dirs, $fn, $content) = @_;/;"	v	line:26	file:
-fn	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($dirs, $fn, $content) = @_;/;"	v	line:26	file:
-import	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    sub import {/;"	s	line:31	class:Env::Assert
-import	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    sub import {/;"	s	line:31	class:Env::Assert
-import	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/sub import {/;"	s	line:31	class:Env::Assert
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected;/;"	v	line:16
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 1, );/;"	v	line:23
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 1, );/;"	v	line:30
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 0, );/;"	v	line:37
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 123, );/;"	v	line:44
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 1.234, );/;"	v	line:51
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:58
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:68
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:80
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:90
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected;/;"	v	line:16
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 1, );/;"	v	line:23
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 1, );/;"	v	line:30
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 0, );/;"	v	line:37
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 123, );/;"	v	line:44
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = ( exact => 1.234, );/;"	v	line:51
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:58
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:68
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:80
+expected	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my %expected = (/;"	v	line:90
+fh	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $fh = FileHandle->new( File::Spec->catfile( $dir_path, @{$dirs}, $fn ), 'w' );/;"	v	line:30	file:
+fh	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $fh = FileHandle->new( File::Spec->catfile( $dir_path, @{$dirs}, $fn ), 'w' );/;"	v	line:30	file:
+file_to_desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub file_to_desc {/;"	s	line:232	class:Env::Assert::Functions
+file_to_desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub file_to_desc {/;"	s	line:232	class:Env::Assert::Functions
+file_to_desc	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub file_to_desc {/;"	s	line:232	class:
+filepath	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $err, $line, $filepath ) = @_;/;"	v	line:317	file:	class:Env::Assert::Functions
+filepath	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $err, $line, $filepath ) = @_;/;"	v	line:317	file:	class:Env::Assert::Functions
+fn	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $dirs, $fn, $content ) = @_;/;"	v	line:21	file:
+fn	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $dirs, $fn, $content ) = @_;/;"	v	line:21	file:
+fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:23
+fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:57
+fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:79
+fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:103
+fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:23
+fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:57
+fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:79
+fp	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my $fp     = 'made\/up\/filepath\/.envdesc';/;"	v	line:103
+fp	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $fp, @rows ) = @_;/;"	v	line:233	file:	class:Env::Assert::Functions
+fp	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $fp, @rows ) = @_;/;"	v	line:233	file:	class:Env::Assert::Functions
+import	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    sub import {/;"	s	line:29	class:Env::Assert
+import	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    sub import {/;"	s	line:29	class:Env::Assert
+import	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/sub import {/;"	s	line:29	class:Env::Assert
 invalid	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/          message => 'Variable USER has invalid content',/;"	Has	line:15	file:
 invalid	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/        USER: Variable USER has invalid content/;"	Has	line:22	file:
-invalid	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/                message => "Variable $var_name has invalid content",/;"	Has	line:161	class:Env::Assert::Functions
-key	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my ($key, $val) = split qr\/=\/msx;/;"	v	line:265	file:	class:Env::Assert::Functions
-key	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my ($key, $val) = split qr\/=\/msx;/;"	v	line:265	file:	class:Env::Assert::Functions
+invalid	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/                message => "Variable $var_name has invalid content",/;"	Has	line:185	class:Env::Assert::Functions
+key	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my ( $key, $val ) = split qr{/;"	v	line:304	file:	class:Env::Assert::Functions
+key	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my ( $key, $val ) = split qr{/;"	v	line:304	file:	class:Env::Assert::Functions
 lib_path	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my $lib_path;/;"	v	line:12
 lib_path	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my $lib_path;/;"	v	line:12
 lib_path	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/my $lib_path;/;"	v	line:9
 lib_path	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/my $lib_path;/;"	v	line:9
 lib_path	/home/mikkoi/other/own_github/env-assert/t/envassert-script.t	/my $lib_path;/;"	v	line:10
 lib_path	/home/mikkoi/other/own_github/env-assert/t/envassert-script.t	/my $lib_path;/;"	v	line:10
-lib_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $lib_path;/;"	v	line:9
-lib_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/my $lib_path;/;"	v	line:9	file:
+line	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $err, $line, $filepath ) = @_;/;"	v	line:317	file:	class:Env::Assert::Functions
+line	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $err, $line, $filepath ) = @_;/;"	v	line:317	file:	class:Env::Assert::Functions
 main	/home/mikkoi/other/own_github/env-assert/bin/envassert	/sub main {/;"	s	line:44	file:
 main	/home/mikkoi/other/own_github/env-assert/bin/envassert	/sub main {/;"	s	line:44	file:
 main	/home/mikkoi/other/own_github/env-assert/bin/envassert	/sub main {/;"	s	line:44	file:
-man	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $man = 0;/;"	v	line:30
-man	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $man = 0;/;"	v	line:30	file:
-new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:65	file:
-new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:88	file:
-new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:111	file:
-new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:141	file:
-new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:65	file:
-new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:88	file:
-new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:111	file:
-new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:141	file:
+man	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $man                  = 0;/;"	v	line:30
+man	/home/mikkoi/other/own_github/env-assert/bin/envassert	/my $man                  = 0;/;"	v	line:30	file:
+new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:61	file:
+new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:85	file:
+new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:109	file:
+new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:61	file:
+new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:85	file:
+new_env	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my %new_env = (/;"	v	line:109	file:
 opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:21
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:42
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:63
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ( break_at_first_error => 0,);/;"	v	line:83
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = (/;"	v	line:113
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:39
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:61
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ( break_at_first_error => 0, );/;"	v	line:78
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:107
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:139
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:161
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:182
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:206
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:227
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:251
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:285
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:326
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:380
 opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:21
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:42	file:
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:63	file:
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ( break_at_first_error => 0,);/;"	v	line:83	file:
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = (/;"	v	line:113	file:
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:14
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:23
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:32
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:41
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:50
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:60
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:14
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:23
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:32
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:41
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:50
-opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts = Env::Assert::Functions::_interpret_opts( $opts_str );/;"	v	line:60
-opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $opts = $want->{'options'};/;"	v	line:144	file:	class:Env::Assert::Functions
-opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/            my $opts = _interpret_opts( $LAST_PAREN_MATCH{opts} );/;"	v	line:223	file:	class:Env::Assert::Functions
-opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my @opts = split qr{/;"	v	line:259	file:	class:Env::Assert::Functions
-opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %opts;/;"	v	line:263	file:	class:Env::Assert::Functions
-opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $opts = $want->{'options'};/;"	v	line:144	file:	class:Env::Assert::Functions
-opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/            my $opts = _interpret_opts( $LAST_PAREN_MATCH{opts} );/;"	v	line:223	file:	class:Env::Assert::Functions
-opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my @opts = split qr{/;"	v	line:259	file:	class:Env::Assert::Functions
-opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %opts;/;"	v	line:263	file:	class:Env::Assert::Functions
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1';/;"	v	line:13
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=0';/;"	v	line:22
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=123';/;"	v	line:31
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1.234';/;"	v	line:40
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1,234';/;"	v	line:49
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'key_1=1,key_2=234, key_3=text , key_4=more text, key_5=';/;"	v	line:59
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1';/;"	v	line:13
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=0';/;"	v	line:22
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=123';/;"	v	line:31
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1.234';/;"	v	line:40
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1,234';/;"	v	line:49
-opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'key_1=1,key_2=234, key_3=text , key_4=more text, key_5=';/;"	v	line:59
-opts_str	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($opts_str) = @_;/;"	v	line:258	file:	class:Env::Assert::Functions
-opts_str	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($opts_str) = @_;/;"	v	line:258	file:	class:Env::Assert::Functions
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:39	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ();/;"	v	line:61	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %opts = ( break_at_first_error => 0, );/;"	v	line:78	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:107	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:139	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:161	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:182	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:206	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:227	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:251	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:285	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:326	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %opts = ( break_at_first_error => 0, );/;"	v	line:380	file:
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:15
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:22
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:29
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:36
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:43
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:50
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:57
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:67
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:79
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:89
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:15
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:22
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:29
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:36
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:43
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:50
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:57
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:67
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:79
+opts	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts     = Env::Assert::Functions::_interpret_opts($opts_str);/;"	v	line:89
+opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $opts = $want->{'options'}   ? $want->{'options'}   : $want->{'opts'};/;"	v	line:165	file:	class:Env::Assert::Functions
+opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/            my $opts = _interpret_opts( $LAST_PAREN_MATCH{opts} );/;"	v	line:253	file:	class:Env::Assert::Functions
+opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my @opts = split qr{/;"	v	line:299	file:	class:Env::Assert::Functions
+opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %opts;/;"	v	line:302	file:	class:Env::Assert::Functions
+opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $opts = $want->{'options'}   ? $want->{'options'}   : $want->{'opts'};/;"	v	line:165	file:	class:Env::Assert::Functions
+opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/            my $opts = _interpret_opts( $LAST_PAREN_MATCH{opts} );/;"	v	line:253	file:	class:Env::Assert::Functions
+opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my @opts = split qr{/;"	v	line:299	file:	class:Env::Assert::Functions
+opts	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %opts;/;"	v	line:302	file:	class:Env::Assert::Functions
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = q{};/;"	v	line:14
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact';/;"	v	line:21
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1';/;"	v	line:28
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=0';/;"	v	line:35
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=123';/;"	v	line:42
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1.234';/;"	v	line:49
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1,234';/;"	v	line:56
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1, some_true, other_true, other_false = 0';/;"	v	line:66
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact = 0, words_and_space = one two three_go';/;"	v	line:78
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'key_1=1,key_2=234, key_3 =text , key_4= more text, key_5= ';/;"	v	line:88
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = q{};/;"	v	line:14
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact';/;"	v	line:21
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1';/;"	v	line:28
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=0';/;"	v	line:35
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=123';/;"	v	line:42
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1.234';/;"	v	line:49
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1,234';/;"	v	line:56
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact=1, some_true, other_true, other_false = 0';/;"	v	line:66
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'exact = 0, words_and_space = one two three_go';/;"	v	line:78
+opts_str	/home/mikkoi/other/own_github/env-assert/t/env-assert-private.t	/        my $opts_str = 'key_1=1,key_2=234, key_3 =text , key_4= more text, key_5= ';/;"	v	line:88
+opts_str	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($opts_str) = @_;/;"	v	line:298	file:	class:Env::Assert::Functions
+opts_str	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($opts_str) = @_;/;"	v	line:298	file:	class:Env::Assert::Functions
 out	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $out = report_errors( \\%errors );/;"	v	line:24
 out	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $out = report_errors( \\%errors );/;"	v	line:47
 out	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $out = report_errors( \\%errors );/;"	v	line:57
 out	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $out = report_errors( \\%errors );/;"	v	line:24	file:
 out	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $out = report_errors( \\%errors );/;"	v	line:47	file:
 out	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    my $out = report_errors( \\%errors );/;"	v	line:57	file:
-out	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $out = q{};/;"	v	line:191	file:	class:Env::Assert::Functions
-out	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $out = q{};/;"	v	line:191	file:	class:Env::Assert::Functions
+out	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $out = q{};/;"	v	line:215	file:	class:Env::Assert::Functions
+out	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $out = q{};/;"	v	line:215	file:	class:Env::Assert::Functions
 parameters	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my %parameters;/;"	v	line:56	file:
 parameters	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my %parameters;/;"	v	line:56	file:
-parameters	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my %parameters;/;"	v	line:125	file:	class:Env::Assert
-parameters	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my %parameters;/;"	v	line:125	file:	class:Env::Assert
-params	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($env, $want, $params) = @_;/;"	v	line:134	file:	class:Env::Assert::Functions
-params	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($env, $want, $params) = @_;/;"	v	line:134	file:	class:Env::Assert::Functions
+parameters	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my %parameters;/;"	v	line:123	file:	class:Env::Assert
+parameters	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my %parameters;/;"	v	line:123	file:	class:Env::Assert
+params	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $env, $want, $params ) = @_;/;"	v	line:155	file:	class:Env::Assert::Functions
+params	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $env, $want, $params ) = @_;/;"	v	line:155	file:	class:Env::Assert::Functions
 path1	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my $path1 = File::Spec->rel2abs(File::Spec->catfile(File::Spec->curdir(), 't', 'three'));/;"	v	line:24
 path1	/home/mikkoi/other/own_github/env-assert/t/three/envassert-script.t	/my $path1 = File::Spec->rel2abs(File::Spec->catfile(File::Spec->curdir(), 't', 'three'));/;"	v	line:24
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:77	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:102	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:129	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:157	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:77	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:102	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:129	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:157	file:
+prg	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $prg     = 'envassert';/;"	v	line:240	file:	class:Env::Assert::Functions
+prg	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $prg     = 'envassert';/;"	v	line:240	file:	class:Env::Assert::Functions
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:74	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:99	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:127	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:74	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:99	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $r = eval $code;/;"	v	line:127	file:
 r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:23
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:44
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:65
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:85
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:116
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:41
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:63
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:80
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:108
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:140
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:162
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:183
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:207
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:228
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:252
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:287
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:293
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:328
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:344
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:382
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:400
 r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:23
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:44	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:65	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:85	file:
-r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:116	file:
-r	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my $r = assert( \\%ENV, $desc, \\%parameters );/;"	v	line:61	file:
-r	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my $r = assert( \\%ENV, $desc, \\%parameters );/;"	v	line:61	file:
-r	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $r = assert( \\%ENV, $desc, \\%parameters );/;"	v	line:130	file:	class:Env::Assert
-r	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $r = assert( \\%ENV, $desc, \\%parameters );/;"	v	line:130	file:	class:Env::Assert
-regexp	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $regexp = $var->{'regexp'}\/\/q{.*};/;"	v	line:148	file:	class:Env::Assert::Functions
-regexp	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $regexp = $var->{'regexp'}\/\/q{.*};/;"	v	line:148	file:	class:Env::Assert::Functions
-report_errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub report_errors {/;"	s	line:189	class:Env::Assert::Functions
-report_errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub report_errors {/;"	s	line:189	class:Env::Assert::Functions
-report_errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub report_errors {/;"	s	line:189	class:
-required	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $required = $var->{'required'}\/\/1;/;"	v	line:147	file:	class:Env::Assert::Functions
-required	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $required = $var->{'required'}\/\/1;/;"	v	line:147	file:	class:Env::Assert::Functions
-rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my @rows = @_;/;"	v	line:210	file:	class:Env::Assert::Functions
-rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my @rows = @_;/;"	v	line:210	file:	class:Env::Assert::Functions
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:41	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:63	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:80	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:108	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:140	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:162	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:183	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:207	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:228	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my $r    = assert( \\%env, \\%want, \\%opts );/;"	v	line:252	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:287	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:293	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:328	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:344	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:382	file:
+r	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my $r = assert( \\%env, \\%want, \\%opts );/;"	v	line:400	file:
+r	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my $r = assert( \\%ENV, \\%desc, \\%parameters );/;"	v	line:61	file:
+r	/home/mikkoi/other/own_github/env-assert/bin/envassert	/    my $r = assert( \\%ENV, \\%desc, \\%parameters );/;"	v	line:61	file:
+r	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $r = assert( \\%ENV, \\%desc, \\%parameters );/;"	v	line:128	file:	class:Env::Assert
+r	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/    my $r = assert( \\%ENV, \\%desc, \\%parameters );/;"	v	line:128	file:	class:Env::Assert
+regexp	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $regexp   = $env_var->{ OPTION_VAR_REGEXP() }   \/\/ DEFAULT_REGEXP_ANY;/;"	v	line:169	file:	class:Env::Assert::Functions
+regexp	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $regexp   = $env_var->{ OPTION_VAR_REGEXP() }   \/\/ DEFAULT_REGEXP_ANY;/;"	v	line:169	file:	class:Env::Assert::Functions
+report_errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub report_errors {/;"	s	line:213	class:Env::Assert::Functions
+report_errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub report_errors {/;"	s	line:213	class:Env::Assert::Functions
+report_errors	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/sub report_errors {/;"	s	line:213	class:
+required	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $required = $env_var->{ OPTION_VAR_REQUIRED() } \/\/ DEFAULT_OPTION_VAR_REQUIRED();/;"	v	line:168	file:	class:Env::Assert::Functions
+required	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $required = $env_var->{ OPTION_VAR_REQUIRED() } \/\/ DEFAULT_OPTION_VAR_REQUIRED();/;"	v	line:168	file:	class:Env::Assert::Functions
+row_num	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $row_num = 1;/;"	v	line:241	file:	class:Env::Assert::Functions
+row_num	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $row_num = 1;/;"	v	line:241	file:	class:Env::Assert::Functions
+rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $fp, @rows ) = @_;/;"	v	line:233	file:	class:Env::Assert::Functions
+rows	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $fp, @rows ) = @_;/;"	v	line:233	file:	class:Env::Assert::Functions
 skip	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/CI/GitHubCI.pm	/sub skip {/;"	s	line:13	class:Test2::Deny::Platform::CI::GitHubCI
 skip	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/CI/GitHubCI.pm	/sub skip {/;"	s	line:13	class:Test2::Deny::Platform::CI::GitHubCI
 skip	/home/mikkoi/other/own_github/env-assert/t/lib/Test2/Deny/Platform/CI/GitHubCI.pm	/sub skip {/;"	s	line:13	class:
@@ -516,43 +700,71 @@ stdout	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/    
 stdout	/home/mikkoi/other/own_github/env-assert/t/envassert-script-stdin.t	/    my $stdout;/;"	v	line:22
 stdout	/home/mikkoi/other/own_github/env-assert/t/envassert-script.t	/    my $stdout;/;"	v	line:31
 stdout	/home/mikkoi/other/own_github/env-assert/t/envassert-script.t	/    my $stdout;/;"	v	line:31
-subdir_filepath	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $subdir_filepath = File::Spec->catfile( $RealBin, 'env-assert', 'another-envdesc' );/;"	v	line:140	file:
-subdir_filepath	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $subdir_filepath = File::Spec->catfile( $RealBin, 'env-assert', 'another-envdesc' );/;"	v	line:140	file:
-subdir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $subdir_path = File::Spec->catdir( $dir_path );/;"	v	line:61	file:
-subdir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $subdir_path = File::Spec->catdir( $dir_path );/;"	v	line:61	file:
-success	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $success = 1;/;"	v	line:141	file:	class:Env::Assert::Functions
-success	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $success = 1;/;"	v	line:141	file:	class:Env::Assert::Functions
-temp_dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($temp_dir, $dir_path) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:56	file:
-temp_dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ($temp_dir, $dir_path) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:56	file:
-this	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $this = getcwd;/;"	v	line:59	file:
-this	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $this = getcwd;/;"	v	line:59	file:
-val	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my ($key, $val) = split qr\/=\/msx;/;"	v	line:265	file:	class:Env::Assert::Functions
-val	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my ($key, $val) = split qr\/=\/msx;/;"	v	line:265	file:	class:Env::Assert::Functions
-var	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $var = $vars->{$var_name};/;"	v	line:146	file:	class:Env::Assert::Functions
-var	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my $var = $vars->{$var_name};/;"	v	line:146	file:	class:Env::Assert::Functions
+subdir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $subdir_path = File::Spec->catdir($dir_path);/;"	v	line:57	file:
+subdir_path	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $subdir_path = File::Spec->catdir($dir_path);/;"	v	line:57	file:
+success	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $success = 1;/;"	v	line:162	file:	class:Env::Assert::Functions
+success	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $success = 1;/;"	v	line:162	file:	class:Env::Assert::Functions
+temp_dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $temp_dir, $dir_path ) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:51	file:
+temp_dir	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my ( $temp_dir, $dir_path ) = create_test_file( [], q{.envdesc}, $content );/;"	v	line:51	file:
+this	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $this = getcwd;/;"	v	line:55	file:
+this	/home/mikkoi/other/own_github/env-assert/t/env-assert.t	/    my $this = getcwd;/;"	v	line:55	file:
+val	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my ( $key, $val ) = split qr{/;"	v	line:304	file:	class:Env::Assert::Functions
+val	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/        my ( $key, $val ) = split qr{/;"	v	line:304	file:	class:Env::Assert::Functions
+var_options	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %var_options =/;"	v	line:236	file:	class:Env::Assert::Functions
+var_options	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %var_options =/;"	v	line:236	file:	class:Env::Assert::Functions
 variables	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    variables:/;"	l	line:21
 variables	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    variables:/;"	l	line:43
 variables	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    variables:/;"	l	line:21
 variables	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-report_errors.t	/    variables:/;"	l	line:43
-vars	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $vars = $want->{'variables'};/;"	v	line:143	file:	class:Env::Assert::Functions
-vars	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $vars = $want->{'variables'};/;"	v	line:143	file:	class:Env::Assert::Functions
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:14
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:34
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:55
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:76
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:103
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:14
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:34	file:
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:55	file:
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:76	file:
-want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:103	file:
-want	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($env, $want, $params) = @_;/;"	v	line:134	file:	class:Env::Assert::Functions
-want	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ($env, $want, $params) = @_;/;"	v	line:134	file:	class:Env::Assert::Functions
+variables	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %variables;/;"	v	line:239	file:	class:Env::Assert::Functions
+variables	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my %variables;/;"	v	line:239	file:	class:Env::Assert::Functions
+vars	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $vars = $want->{'variables'} ? $want->{'variables'} : $want->{'vars'};/;"	v	line:164	file:	class:Env::Assert::Functions
+vars	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my $vars = $want->{'variables'} ? $want->{'variables'} : $want->{'vars'};/;"	v	line:164	file:	class:Env::Assert::Functions
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:15
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:31
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:53
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:71
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:97
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:126
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:153
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:174
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:198
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:219
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:243
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:278
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:319
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:373
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:15
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:31	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:53	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/        my %want = (/;"	v	line:71	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:97	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:126	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:153	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:174	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:198	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:219	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:243	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:278	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:319	file:
+want	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-assert.t	/    my %want = (/;"	v	line:373	file:
+want	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $env, $want, $params ) = @_;/;"	v	line:155	file:	class:Env::Assert::Functions
+want	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/    my ( $env, $want, $params ) = @_;/;"	v	line:155	file:	class:Env::Assert::Functions
+wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %wanted = (/;"	v	line:25
+wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %wanted = (/;"	v	line:59
+wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %wanted = (/;"	v	line:81
+wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %wanted = (/;"	v	line:105
+wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %wanted = (/;"	v	line:25
+wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %wanted = (/;"	v	line:59
+wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %wanted = (/;"	v	line:81
+wanted	/home/mikkoi/other/own_github/env-assert/t/env-assert-public-file_to_desc.t	/    my %wanted = (/;"	v	line:105
 {	/home/mikkoi/other/own_github/env-assert/bin/envassert	/use constant {/;"	c	line:23
 {	/home/mikkoi/other/own_github/env-assert/bin/envassert	/use constant {/;"	c	line:23
-{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant  {/;"	c	line:57	class:Env::Assert::Functions
-{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant  {/;"	c	line:63	class:Env::Assert::Functions
-{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant  {/;"	c	line:57	class:Env::Assert::Functions
-{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant  {/;"	c	line:63	class:Env::Assert::Functions
-{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/use constant {/;"	c	line:23	class:Env::Assert
-{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/use constant {/;"	c	line:23	class:Env::Assert
+{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant {/;"	c	line:66	class:Env::Assert::Functions
+{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant {/;"	c	line:72	class:Env::Assert::Functions
+{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant {/;"	c	line:79	class:Env::Assert::Functions
+{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant {/;"	c	line:66	class:Env::Assert::Functions
+{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant {/;"	c	line:72	class:Env::Assert::Functions
+{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert/Functions.pm	/use constant {/;"	c	line:79	class:Env::Assert::Functions
+{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/use constant { ENV_DESC_FILENAME => '.envdesc', };/;"	c	line:23	class:Env::Assert
+{	/home/mikkoi/other/own_github/env-assert/lib/Env/Assert.pm	/use constant { ENV_DESC_FILENAME => '.envdesc', };/;"	c	line:23	class:Env::Assert
