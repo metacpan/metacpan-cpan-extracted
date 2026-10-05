@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# read_table's na.strings / na_values / undef.val option: field texts that mean
+# read_table's na_strings / na_values / undef_val option: field texts that mean
 # "missing". One option under three names -- R's, pandas', and write_table's.
 #
 # Provenance of every expected value below.
@@ -82,7 +82,7 @@ sub tmpfile {
 	return $name;
 }
 
-# The default is unchanged: with no na.strings, a literal "NA" is real data.
+# The default is unchanged: with no na_strings, a literal "NA" is real data.
 #
 # This is what t/read_table.t already pins ("a literal 'NA' is preserved
 # verbatim"), restated here so that turning the default on later cannot pass
@@ -92,8 +92,8 @@ sub tmpfile {
 {
 	my $f = tmpfile("a,b\nNA,1\n2,NaN\n");
 	my $rows = read_table($f);
-	is( $rows->[0]{a}, 'NA',  'no na.strings: a literal "NA" stays a string' );
-	is( $rows->[1]{b}, 'NaN', 'no na.strings: a literal "NaN" stays a string' );
+	is( $rows->[0]{a}, 'NA',  'no na_strings: a literal "NA" stays a string' );
+	is( $rows->[1]{b}, 'NaN', 'no na_strings: a literal "NaN" stays a string' );
 }
 
 # R reg-tests-1a.R:1911-1918 -- na.strings="foo".
@@ -103,7 +103,7 @@ sub tmpfile {
 # listed token maps, and an unlisted "NA" does not.
 {
 	my $f = tmpfile("V1 V2\n1 foo\n2 NA\n", '.txt');
-	for my $opt ('na.strings', 'na_values', 'undef.val') {
+	for my $opt ('na_strings', 'na_values', 'undef_val') {
 		my $rows = read_table($f, sep => ' ', $opt => 'foo');
 		ok( !defined $rows->[0]{V2}, "$opt => 'foo' makes \"foo\" missing" );
 		is( $rows->[1]{V2}, 'NA',
@@ -114,9 +114,9 @@ sub tmpfile {
 # R reg-tests-1a.R:2899-2901 (PR#6781) -- na.strings="-" over c("abc","-").
 {
 	my $f = tmpfile("x\nabc\n-\n");
-	my $rows = read_table($f, 'na.strings' => '-');
+	my $rows = read_table($f, 'na_strings' => '-');
 	is( $rows->[0]{x}, 'abc', 'PR#6781: "abc" is untouched' );
-	ok( !defined $rows->[1]{x}, 'PR#6781: "-" is missing under na.strings => "-"' );
+	ok( !defined $rows->[1]{x}, 'PR#6781: "-" is missing under na_strings => "-"' );
 }
 
 # pandas test_detect_string_na:46 -- "NA", "NaN" and "nan" all missing.
@@ -136,8 +136,8 @@ sub tmpfile {
 # option, since read_table has always mapped '' to undef.
 {
 	my $data = "A,B,C\na,b,c\nd,,f\n,g,h\n";
-	for my $args ( [], [ 'na.strings' => 'NA' ] ) {
-		my $label = @$args ? 'with na.strings' : 'without na.strings';
+	for my $args ( [], [ 'na_strings' => 'NA' ] ) {
+		my $label = @$args ? 'with na_strings' : 'without na_strings';
 		my $rows  = read_table( tmpfile($data), @$args );
 		ok( !defined $rows->[1]{B}, "test_string_nas: empty middle field is missing, $label" );
 		ok( !defined $rows->[2]{A}, "test_string_nas: empty leading field is missing, $label" );
@@ -156,7 +156,7 @@ sub tmpfile {
 	my $data = "A,B,C\n1,NA,3\n-1.#IND,5,baz\n7,8,NaN\n";
 	for my $na ( 'baz', ['baz'] ) {
 		my $label = ref $na ? 'arrayref' : 'scalar';
-		my $rows  = read_table( tmpfile($data), 'na.strings' => $na );
+		my $rows  = read_table( tmpfile($data), 'na_strings' => $na );
 		ok( !defined $rows->[1]{C}, "test_custom_na_values: \"baz\" is missing ($label)" );
 		is( $rows->[0]{B}, 'NA',
 			"test_custom_na_values: unlisted \"NA\" survives ($label) -- R semantics, not pandas'" );
@@ -176,7 +176,7 @@ sub tmpfile {
 # is.na only for the "-999" cell. This module matches R.
 {
 	my $f = tmpfile("A,B\n-999,1.200\n2,-999.000\n3,4.500\n");
-	my $rows = read_table($f, 'na.strings' => [ '-999.0', '-999' ]);
+	my $rows = read_table($f, 'na_strings' => [ '-999.0', '-999' ]);
 	ok( !defined $rows->[0]{A}, 'gh-3611: the exact text "-999" is missing' );
 	is( $rows->[1]{B}, '-999.000',
 		'gh-3611: "-999.000" is NOT missing -- exact text match, as in R' );
@@ -207,8 +207,8 @@ sub tmpfile {
 # that a bare number is accepted and compared as its text.
 {
 	my $f = tmpfile("a,b\n1,2\n2,1\n");
-	my $rows = read_table($f, 'na.strings' => 1);
-	ok( !defined $rows->[0]{a}, 'gh-12224: numeric na.strings => 1 matches "1" in column a' );
+	my $rows = read_table($f, 'na_strings' => 1);
+	ok( !defined $rows->[0]{a}, 'gh-12224: numeric na_strings => 1 matches "1" in column a' );
 	is( $rows->[0]{b}, '2',    'gh-12224: "2" is untouched' );
 	is( $rows->[1]{a}, '2',    'gh-12224: "2" is untouched in column a' );
 	ok( !defined $rows->[1]{b}, 'gh-12224: and "1" in column b' );
@@ -228,38 +228,38 @@ sub tmpfile {
 #
 # DIVERGENCE (pandas): pandas pads a short row with NaN. read_table has always
 # refused a ragged file with an alignment error naming the row, and that is not
-# changed by na.strings; the test is here so the divergence is deliberate
+# changed by na_strings; the test is here so the divergence is deliberate
 # rather than discovered.
 {
 	my $f = tmpfile("Date,Currency,Symbol,Type,Units,UnitPrice,Cost,Tax\n"
 	              . "2012-03-14,USD,AAPL,BUY,1000\n");
-	throws_ok { read_table($f, 'na.strings' => 'NA') }
+	throws_ok { read_table($f, 'na_strings' => 'NA') }
 		qr/Alignment error on .* data row 1 \(5 fields vs 8 headers\)/,
 		'test_na_trailing_columns: a short row is still an alignment error, not NA padding';
 }
 
 # The bug this option exists for: write_table's own output could not be read
-# back. write_table renders undef with 'undef.val' (documented as "does not
-# round-trip back to undef"), and na.strings is the inverse it lacked.
+# back. write_table renders undef with 'undef_val' (documented as "does not
+# round-trip back to undef"), and na_strings is the inverse it lacked.
 #
-# 'undef.val' is accepted here as a third name for the same option precisely so
+# 'undef_val' is accepted here as a third name for the same option precisely so
 # that the round trip can be written with one spelling on both halves, which is
 # what the third pass below does.
 {
 	my ($fh, $file) = tempfile( SUFFIX => '.csv', UNLINK => 1 );
 	close $fh;
 	my $rows = [ { id => 1, v => 10 }, { id => 2, v => undef } ];
-	quiet_write($rows, $file, 'row.names' => 0, 'undef.val' => 'NA');
+	quiet_write($rows, $file, 'row_names' => 0, 'undef_val' => 'NA');
 
 	my $naive = read_table($file);
 	is( $naive->[1]{v}, 'NA',
-		'round trip: without na.strings, undef.val comes back as the string' );
+		'round trip: without na_strings, undef_val comes back as the string' );
 
-	for my $opt ('na.strings', 'na_values', 'undef.val') {
+	for my $opt ('na_strings', 'na_values', 'undef_val') {
 		my $back = read_table($file, $opt => 'NA');
 		is( $back->[0]{v}, '10', "round trip ($opt): a real value is unchanged" );
 		ok( !defined $back->[1]{v},
-			"round trip ($opt): undef.val => \"NA\" reads back as undef" );
+			"round trip ($opt): undef_val => \"NA\" reads back as undef" );
 	}
 }
 
@@ -278,30 +278,30 @@ sub tmpfile {
 {
 	my $f = tmpfile("v\n8\n4\n2\n1\nNA\n");
 
-	my $unmapped = read_table($f, 'output.type' => 'hoa');
+	my $unmapped = read_table($f, 'output_type' => 'hoa');
 	my $err = do { local $@; eval { mean( $unmapped->{v} ) }; $@ };
 	like( $err, qr/^mean: non-numeric value at array ref index 4/,
 		'an unmapped literal "NA" makes mean() croak, naming the cell' );
 
-	my $mapped = read_table($f, 'na.strings' => 'NA', 'output.type' => 'hoa');
+	my $mapped = read_table($f, 'na_strings' => 'NA', 'output_type' => 'hoa');
 	my @defined = grep { defined } @{ $mapped->{v} };
-	is( scalar @defined, 4, 'na.strings leaves 4 defined values of 5' );
+	is( scalar @defined, 4, 'na_strings leaves 4 defined values of 5' );
 	is( mean(\@defined), 3.75, 'and their mean is 3.75, as R and pandas give' );
 }
 
-# Every output.type sees the mapping.
+# Every output_type sees the mapping.
 {
 	my $data = "id,v\nr1,NA\nr2,7\n";
-	my $aoh = read_table( tmpfile($data), 'output.type' => 'aoh', 'na.strings' => 'NA' );
+	my $aoh = read_table( tmpfile($data), 'output_type' => 'aoh', 'na_strings' => 'NA' );
 	ok( !defined $aoh->[0]{v}, 'aoh: mapped' );
 	is( $aoh->[1]{v}, '7',     'aoh: untouched neighbour' );
 
-	my $hoa = read_table( tmpfile($data), 'output.type' => 'hoa', 'na.strings' => 'NA' );
+	my $hoa = read_table( tmpfile($data), 'output_type' => 'hoa', 'na_strings' => 'NA' );
 	ok( !defined $hoa->{v}[0], 'hoa: mapped' );
 	is( $hoa->{v}[1], '7',     'hoa: untouched neighbour' );
 	is( scalar @{ $hoa->{v} }, 2, 'hoa: the column keeps its length' );
 
-	my $hoh = read_table( tmpfile($data), 'output.type' => 'hoh', 'na.strings' => 'NA' );
+	my $hoh = read_table( tmpfile($data), 'output_type' => 'hoh', 'na_strings' => 'NA' );
 	ok( !defined $hoh->{r1}{v}, 'hoh: mapped' );
 	is( $hoh->{r2}{v}, '7',     'hoh: untouched neighbour' );
 }
@@ -309,7 +309,7 @@ sub tmpfile {
 # A mapped row-name column is a missing row name, and dies as one.
 {
 	my $f = tmpfile("id,v\nNA,1\nr2,2\n");
-	throws_ok { read_table($f, 'output.type' => 'hoh', 'na.strings' => 'NA') }
+	throws_ok { read_table($f, 'output_type' => 'hoh', 'na_strings' => 'NA') }
 		qr/read_table: undefined row name \(column 'id'\)/,
 		'a row name mapped to undef is refused, like an empty one';
 }
@@ -317,7 +317,7 @@ sub tmpfile {
 # The header is never mapped: a column may legitimately be called "NA".
 {
 	my $f = tmpfile("a,NA\n1,NA\n");
-	my $rows = read_table($f, 'na.strings' => 'NA');
+	my $rows = read_table($f, 'na_strings' => 'NA');
 	ok( exists $rows->[0]{'NA'}, 'a column literally named "NA" keeps its name' );
 	ok( !defined $rows->[0]{'NA'}, 'while its cell is mapped' );
 }
@@ -326,14 +326,14 @@ sub tmpfile {
 {
 	my $f = tmpfile("a,b\nNA,1\n5,2\n");
 	my @seen;
-	my $rows = read_table($f, 'na.strings' => 'NA',
+	my $rows = read_table($f, 'na_strings' => 'NA',
 		filter => { a => sub { push @seen, defined $_ ? $_ : '(undef)'; 1 } });
 	is_deeply( \@seen, [ '(undef)', '5' ],
 		'a filter sees the mapped undef, not the "NA" text' );
 	is( scalar @$rows, 2, 'and nothing was dropped' );
 
 	# Filtering *out* the missing rows is then a defined() test.
-	my $kept = read_table($f, 'na.strings' => 'NA',
+	my $kept = read_table($f, 'na_strings' => 'NA',
 		filter => { a => sub { defined $_ } });
 	is( scalar @$kept, 1, 'filter => { a => sub { defined $_ } } drops the missing row' );
 	is( $kept->[0]{a}, '5', 'and keeps the other' );
@@ -343,21 +343,21 @@ sub tmpfile {
 # header (t/read_table.comments.t covers that recovery on its own).
 {
 	my $f = tmpfile("a\tb\n1\t-\n", '.tsv');
-	my $rows = read_table($f, 'na.strings' => '-');
-	ok( !defined $rows->[0]{b}, 'na.strings works with a .tsv default separator' );
+	my $rows = read_table($f, 'na_strings' => '-');
+	ok( !defined $rows->[0]{b}, 'na_strings works with a .tsv default separator' );
 
 	my $c = tmpfile("# a,b\n1,-\n");
-	my $crows = read_table($c, 'na.strings' => '-');
-	ok( !defined $crows->[0]{b}, 'na.strings works under a commented-out header' );
+	my $crows = read_table($c, 'na_strings' => '-');
+	ok( !defined $crows->[0]{b}, 'na_strings works under a commented-out header' );
 	is( $crows->[0]{a}, '1', 'and the recovered header still names the columns' );
 }
 
 # Turning it off, both ways.
 {
 	my $data = "a\nNA\n";
-	for my $off ( [ 'na.strings' => undef ], [ 'na.strings' => [] ],
+	for my $off ( [ 'na_strings' => undef ], [ 'na_strings' => [] ],
 	              [ na_values   => undef ], [ na_values   => [] ],
-	              [ 'undef.val' => undef ], [ 'undef.val' => [] ] ) {
+	              [ 'undef_val' => undef ], [ 'undef_val' => [] ] ) {
 		my $label = "$off->[0] => " . ( defined $off->[1] ? '[]' : 'undef' );
 		my $rows  = read_table( tmpfile($data), @$off );
 		is( $rows->[0]{a}, 'NA', "$label leaves the default behaviour alone" );
@@ -372,38 +372,38 @@ sub tmpfile {
 	# are, and the message names them in a fixed order whichever way round
 	# they were passed.
 	my @pairs = (
-		[ 'na.strings' => 'NA', 'na_values'  => 'NA' ],
-		[ 'na_values'  => 'NA', 'na.strings' => 'NA' ],
-		[ 'na.strings' => 'NA', 'undef.val'  => 'NA' ],
-		[ 'undef.val'  => 'NA', 'na.strings' => 'NA' ],
-		[ 'na_values'  => 'NA', 'undef.val'  => 'NA' ],
-		[ 'undef.val'  => 'NA', 'na_values'  => 'NA' ],
+		[ 'na_strings' => 'NA', 'na_values'  => 'NA' ],
+		[ 'na_values'  => 'NA', 'na_strings' => 'NA' ],
+		[ 'na_strings' => 'NA', 'undef_val'  => 'NA' ],
+		[ 'undef_val'  => 'NA', 'na_strings' => 'NA' ],
+		[ 'na_values'  => 'NA', 'undef_val'  => 'NA' ],
+		[ 'undef_val'  => 'NA', 'na_values'  => 'NA' ],
 	);
 	for my $pair (@pairs) {
 		my ($a, $b) = ( $pair->[0], $pair->[2] );
 		throws_ok { read_table($f, @$pair) }
-			qr/^read_table: pass only one of 'na\.strings', 'na_values' or 'undef\.val'; got '[^']+', '[^']+'$/m,
+			qr/^read_table: pass only one of 'na_strings', 'na_values' or 'undef_val'; got '[^']+', '[^']+'$/m,
 			"$a and $b together are refused";
 	}
 
-	throws_ok { read_table($f, 'na.strings' => 'NA', na_values => 'NA', 'undef.val' => 'NA') }
-		qr/^read_table: pass only one of 'na\.strings', 'na_values' or 'undef\.val'; got 'na\.strings', 'na_values', 'undef\.val'$/m,
+	throws_ok { read_table($f, 'na_strings' => 'NA', na_values => 'NA', 'undef_val' => 'NA') }
+		qr/^read_table: pass only one of 'na_strings', 'na_values' or 'undef_val'; got 'na_strings', 'na_values', 'undef_val'$/m,
 		'all three together are refused, and the message lists them in a fixed order';
 
-	throws_ok { read_table($f, 'na.strings' => {}) }
-		qr/^read_table: 'na\.strings' must be a string or an ARRAY reference, not a HASH reference$/m,
+	throws_ok { read_table($f, 'na_strings' => {}) }
+		qr/^read_table: 'na_strings' must be a string or an ARRAY reference, not a HASH reference$/m,
 		'a hashref is refused (pandas takes a dict here; this module does not)';
 
 	throws_ok { read_table($f, na_values => sub { 1 }) }
-		qr/^read_table: 'na\.strings' must be a string or an ARRAY reference, not a CODE reference$/m,
+		qr/^read_table: 'na_strings' must be a string or an ARRAY reference, not a CODE reference$/m,
 		'a coderef is refused, and reports under the canonical option name';
 
-	throws_ok { read_table($f, 'undef.val' => \'NA') }
-		qr/^read_table: 'na\.strings' must be a string or an ARRAY reference, not a SCALAR reference$/m,
-		'undef.val is validated the same way, and also reports as na.strings';
+	throws_ok { read_table($f, 'undef_val' => \'NA') }
+		qr/^read_table: 'na_strings' must be a string or an ARRAY reference, not a SCALAR reference$/m,
+		'undef_val is validated the same way, and also reports as na_strings';
 
-	throws_ok { read_table($f, 'na.strings' => [ 'NA', undef ]) }
-		qr/^read_table: 'na\.strings' may not contain an undefined value$/m,
+	throws_ok { read_table($f, 'na_strings' => [ 'NA', undef ]) }
+		qr/^read_table: 'na_strings' may not contain an undefined value$/m,
 		'an undef inside the list is refused rather than silently matching nothing';
 
 	throws_ok { read_table($f, 'na_string' => 'NA') }
@@ -415,7 +415,7 @@ sub tmpfile {
 # both harmless -- the empty field rule already covers ''.
 {
 	my $f = tmpfile("a,b\nNA,\n");
-	my $rows = read_table($f, 'na.strings' => [ 'NA', 'NA', '' ]);
+	my $rows = read_table($f, 'na_strings' => [ 'NA', 'NA', '' ]);
 	ok( !defined $rows->[0]{a}, 'a duplicated token is harmless' );
 	ok( !defined $rows->[0]{b}, "and '' in the list agrees with the empty-field rule" );
 }
@@ -425,12 +425,12 @@ sub tmpfile {
 # both. Asserted so the choice is on the record.
 {
 	my $f = tmpfile("a,b\n NA,NA \n");
-	my $rows = read_table($f, 'na.strings' => 'NA');
+	my $rows = read_table($f, 'na_strings' => 'NA');
 	is( $rows->[0]{a}, ' NA', 'no leading whitespace is stripped before matching' );
 	is( $rows->[0]{b}, 'NA ', 'nor trailing' );
 
 	my $both = read_table( tmpfile("a,b\n NA,NA \n"),
-		'na.strings' => [ 'NA', ' NA', 'NA ' ] );
+		'na_strings' => [ 'NA', ' NA', 'NA ' ] );
 	ok( !defined $both->[0]{a}, 'listing the padded form maps it (a)' );
 	ok( !defined $both->[0]{b}, 'listing the padded form maps it (b)' );
 }
@@ -441,7 +441,7 @@ sub tmpfile {
 	my ($fh, $file) = tempfile( SUFFIX => '.xlsx', UNLINK => 1 );
 	close $fh;
 	quiet_write( [ { id => 1, v => 10 }, { id => 2, v => undef } ],
-		$file, 'row.names' => 0, 'undef.val' => 'NA' );
+		$file, 'row_names' => 0, 'undef_val' => 'NA' );
 	my $back = read_table($file, na_values => 'NA');
 	is( $back->[0]{v}, '10', 'xlsx: a real value is unchanged' );
 	ok( !defined $back->[1]{v}, 'xlsx: a shared-string "NA" maps to undef' );

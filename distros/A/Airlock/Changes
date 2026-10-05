@@ -1,0 +1,31 @@
+Revision history for Airlock
+
+0.001     2026-10-04 18:07:00Z
+    - Airlock::Upstream::Authentik turns an authentik login into an Airlock
+      subject and builds the matching Airlock::Factor::Upstream. authentik
+      reports the second factor with nothing configured: a password login
+      carries amr=pwd, a login with TOTP amr=pwd,mfa. Its one acr value says
+      nothing, and max_age=0 is the one value authentik discards, so its
+      reauth_params sends prompt=login; the POD says what was measured
+    - t/91-live-authentik.t drives the whole chain against a real authentik:
+      a device flow through Airlock::Client, a browser login with and without
+      TOTP, an approval through the Airlock core, and the upstream policy
+      holding only for the login with the second factor. t/authentik/ has the
+      fixtures and what was observed, including authentik's rate limit on the
+      device authorization endpoint, which answers slow_down to the request
+      that starts a flow and not just to a client polling too fast
+    - Airlock::Factor::Upstream: clock_skew, needs_proof and verify have POD,
+      and max_age says what it did not before -- it needs an auth_time, so
+      against a provider that omits one the factor never holds, and the skew
+      widens only the future edge of the window. No behaviour changed
+    - Airlock::QR: QR codes as SVG, terminal blocks and data URI, in pure Perl
+    - Airlock::Code: user codes, secrets, hashing and constant-time comparison
+    - Airlock::Store::Memory and Airlock::Test::Store: the four-sub store contract and its test suite
+    - Airlock::Factor role with Callback, TOTP (RFC 6238) and Upstream; Airlock::Policy for step-up rules
+    - Airlock: open, inspect, requirements, approve, deny, redeem; opaque tokens with verify_token and revoke_token; events
+    - Device and token endpoint as PSGI (to_app), for HTTP::Request (Airlock::HTTPMessage) and framework-neutral (respond)
+    - Airlock::Client: RFC 8628 device flow client with discovery and terminal QR code
+    - Examples: Plack and Mojolicious host apps, store on DBI and DBIO, device CLI
+    - Airlock::Upstream::Keycloak: Keycloak token claims as Airlock subject; live test behind TEST_AIRLOCK_KEYCLOAK_URL
+    - Store contract: a reference to a number in update changes is added to the column
+    - Factors verify first and commit once all hold; a TOTP code is only used up then

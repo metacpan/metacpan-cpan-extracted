@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 use Mail::DKIM2::Common ();
 use Mail::DKIM2::MessageInstance;

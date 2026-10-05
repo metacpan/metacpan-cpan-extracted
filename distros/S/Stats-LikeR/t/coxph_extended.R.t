@@ -809,13 +809,13 @@ sub check_fit {
 	for my $j (@idx) {
 		close_to($f->{coef}[$j], $e->{coef}[$j], $tol, "$label: coef $j");
 		close_to($f->{se}[$j], $e->{se}[$j], $tol, "$label: se $j");
-		close_to($f->{'naive.se'}[$j], $e->{naive_se}[$j], $tol, "$label: naive se $j") if $e->{naive_se};
+		close_to($f->{'naive_se'}[$j], $e->{naive_se}[$j], $tol, "$label: naive se $j") if $e->{naive_se};
 	}
 	close_to($f->{loglik}, $e->{loglik}, $tol, "$label: loglik");
-	close_to($f->{'loglik.null'}, $e->{loglik0}, $tol, "$label: null loglik");
-	close_to($f->{'score.test'}{statistic}, $e->{score}, $tol, "$label: score test");
-	close_to($f->{'wald.test'}{statistic}, $e->{wald}, $tol, "$label: Wald test");
-	close_to($f->{'robust.score.test'}{statistic}, $e->{rscore}, $tol, "$label: robust score test") if defined $e->{rscore};
+	close_to($f->{'loglik_null'}, $e->{loglik0}, $tol, "$label: null loglik");
+	close_to($f->{'score_test'}{statistic}, $e->{score}, $tol, "$label: score test");
+	close_to($f->{'wald_test'}{statistic}, $e->{wald}, $tol, "$label: Wald test");
+	close_to($f->{'robust_score_test'}{statistic}, $e->{rscore}, $tol, "$label: robust score test") if defined $e->{rscore};
 	is($f->{n}, $e->{n}, "$label: n");
 	is($f->{nevent}, $e->{nevent}, "$label: nevent");
 	is($f->{robust}, $e->{naive_se} ? 1 : 0, "$label: robust flag");
@@ -876,7 +876,7 @@ for my $tie (qw(efron breslow)) {
 	              data => $B, cluster => 'id', ties => 'breslow');
 	check_fit('bladder WLW', $w, $EXPECT{bladder_wlw});
 	is_deeply($w->{strata}, [qw(1 2 3 4)], 'bladder WLW: the strata');
-	is($w->{'n.clusters'}, 85, 'bladder WLW: 85 patients');
+	is($w->{'n_clusters'}, 85, 'bladder WLW: 85 patients');
 	my $B2 = read_csv('bladder2.csv');
 	check_fit('bladder2 Andersen-Gill', coxph(formula => 'Surv(start, stop, event) ~ rx + size + number', data => $B2,
 	                                         cluster => 'id', ties => 'breslow'), $EXPECT{bladder2_ag});
@@ -961,7 +961,7 @@ for my $f (qw(20_1 50_2 100_5 1000_10)) {
 	}
 	like($w[0] // '', qr/cluster specified with robust = FALSE, cluster ignored/, 'robust = 0 drops the cluster, with survival\'s warning');
 	my $one = coxph(formula => 'Surv(t1, e) ~ x + cluster(id)', data => \%d);
-	is($one->{'n.clusters'}, 3, 'cluster() in the formula');
+	is($one->{'n_clusters'}, 3, 'cluster() in the formula');
 	my $s = coxph([1, 2, 3, 4, 5, 6], [2, 1, 2, 2, 1, 2], [1, 3, 2, 5, 4, 6]);
 	is($s->{nevent}, 4, 'a 1/2 status is Surv()\'s 1 = censored, 2 = event');
 }

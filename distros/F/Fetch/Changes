@@ -1,5 +1,11 @@
 Revision history for Fetch
 
+0.29    2026-10-05
+        - A oneshot timer the backend delivers before its deadline is
+          re-armed for the remainder instead of fired: NetBSD's kqueue
+          timed a 300ms request out at 246ms (CPAN Testers).
+        - kqueue arms timers in whole milliseconds rounded up, not down.
+
 0.28    2026-09-24
         - Tear a connection down at global destruction without disarming it
           through a loop perl may already have freed.

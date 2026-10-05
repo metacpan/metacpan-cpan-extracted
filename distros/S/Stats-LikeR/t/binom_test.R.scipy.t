@@ -495,21 +495,21 @@ my @P_CORPUS = (
 for my $c (@P_CORPUS) {
 	my ($x, $n, $p, $alt, $exp) = @$c;
 	my $r = binom_test($x, $n, p => $p, alternative => $alt);
-	close_to($r->{'p.value'}, $exp, "C1 x=$x n=$n p=$p $alt p-value");
+	close_to($r->{'p_value'}, $exp, "C1 x=$x n=$n p=$p $alt p-value");
 }
 
 # 2. R's Clopper-Pearson interval.
 #
-# The interval does not depend on p, only on (x, n, conf.level, alternative),
+# The interval does not depend on p, only on (x, n, conf_level, alternative),
 # so this is a separate grid rather than another column on @P_CORPUS: ten values
 # of n, each at x = 0, 1, 2, n/2, n-1, n, crossed with five confidence levels
 # and all three alternatives.  x = 0 and x = n are the no-solution branches that
 # return a hard 0 or 1 instead of inverting anything; the one-sided forms pin
-# the other end at 0 or 1 the same way.  conf.level = 0.5 and 0.999 are included
-# because the level reaches qbeta() only through 1 - conf.level, which is where
+# the other end at 0 or 1 the same way.  conf_level = 0.5 and 0.999 are included
+# because the level reaches qbeta() only through 1 - conf_level, which is where
 # a mis-halved alpha would show.
 #
-# [ x, n, conf.level, alternative, lower, upper ]
+# [ x, n, conf_level, alternative, lower, upper ]
 my @CI_CORPUS = (
 	[ 0, 1, 0.5, 'two.sided', 0, 0.75 ],
 	[ 0, 1, 0.5, 'less', 0, 0.5 ],
@@ -1297,9 +1297,9 @@ for my $c (@CI_CORPUS) {
 	my ($x, $n, $conf, $alt, $lo, $hi) = @$c;
 	my $r = binom_test($x, $n, conf_level => $conf, alternative => $alt);
 	my $lbl = "C2 x=$x n=$n conf=$conf $alt";
-	close_to($r->{'conf.int'}[0], $lo, "$lbl CI lower", $TOL_CI);
-	close_to($r->{'conf.int'}[1], $hi, "$lbl CI upper", $TOL_CI);
-	is($r->{'conf.level'}, $conf, "$lbl conf_level echoed");
+	close_to($r->{'conf_int'}[0], $lo, "$lbl CI lower", $TOL_CI);
+	close_to($r->{'conf_int'}[1], $hi, "$lbl CI upper", $TOL_CI);
+	is($r->{'conf_level'}, $conf, "$lbl conf_level echoed");
 }
 
 # 3. REGRESSION GUARD: p-values near the centre of a large-n distribution.
@@ -1349,7 +1349,7 @@ my @BIG_CORPUS = (
 for my $c (@BIG_CORPUS) {
 	my ($x, $n, $p, $alt, $exp) = @$c;
 	my $r = binom_test($x, $n, p => $p, alternative => $alt);
-	close_to($r->{'p.value'}, $exp, "C3 x=$x n=$n p=$p $alt p-value (large n)");
+	close_to($r->{'p_value'}, $exp, "C3 x=$x n=$n p=$p $alt p-value (large n)");
 }
 
 # 4. The n = 2.1e7 cases from SciPy's test_two_sided_pvalues1 -- the exact ones
@@ -1369,7 +1369,7 @@ SKIP: {
 	for my $c (@SLOW_CORPUS) {
 		my ($x, $n, $p, $alt, $exp) = @$c;
 		my $r = binom_test($x, $n, p => $p, alternative => $alt);
-		close_to($r->{'p.value'}, $exp, "C4 x=$x n=$n p=$p $alt p-value (n=2.1e7)");
+		close_to($r->{'p_value'}, $exp, "C4 x=$x n=$n p=$p $alt p-value (n=2.1e7)");
 		close_to($r->{estimate}, $x / $n, "C4 x=$x n=$n estimate");
 	}
 }
@@ -1394,7 +1394,7 @@ SKIP: {
 # R to 1e-15 in every case -- so these are R's numbers being right, not merely
 # R's numbers being pinned.
 #
-# [ x, n, conf.level, alternative, bound ]  ('greater' => lower, 'less' => upper)
+# [ x, n, conf_level, alternative, bound ]  ('greater' => lower, 'less' => upper)
 my @TINY_CI = (
 	[ 1, 100000, 0.95, 'greater', 5.1293281232542583e-07 ],
 	[ 1, 100000, 0.95, 'less', 4.743775717386051e-05 ],
@@ -1430,11 +1430,11 @@ for my $c (@TINY_CI) {
 	my ($x, $n, $conf, $alt, $exp) = @$c;
 	my $r = binom_test($x, $n, conf_level => $conf, alternative => $alt);
 	if ($alt eq 'greater') {
-		close_to($r->{'conf.int'}[0], $exp, "C5 x=$x n=$n conf=$conf lower bound", $TOL_CI);
-		is($r->{'conf.int'}[1], 1, "C5 x=$x n=$n conf=$conf greater upper is 1");
+		close_to($r->{'conf_int'}[0], $exp, "C5 x=$x n=$n conf=$conf lower bound", $TOL_CI);
+		is($r->{'conf_int'}[1], 1, "C5 x=$x n=$n conf=$conf greater upper is 1");
 	} else {
-		close_to($r->{'conf.int'}[1], $exp, "C5 x=$x n=$n conf=$conf upper bound", $TOL_CI_TINY);
-		is($r->{'conf.int'}[0], 0, "C5 x=$x n=$n conf=$conf less lower is 0");
+		close_to($r->{'conf_int'}[1], $exp, "C5 x=$x n=$n conf=$conf upper bound", $TOL_CI_TINY);
+		is($r->{'conf_int'}[0], 0, "C5 x=$x n=$n conf=$conf less lower is 0");
 	}
 }
 
@@ -1494,11 +1494,11 @@ for my $c (@SCIPY) {
 	push @args, (conf_level => $conf) if defined $conf;
 	my $r   = binom_test(@args);
 	my $lbl = "C6 SciPy x=$x n=$n p=$p $alt";
-	close_to($r->{'p.value'}, $pv, "$lbl p-value", $rtol);
+	close_to($r->{'p_value'}, $pv, "$lbl p-value", $rtol);
 	close_to($r->{estimate}, $x / $n, "$lbl estimate (SciPy's statistic)", 1e-12);
 	next unless defined $lo;
-	close_to($r->{'conf.int'}[0], $lo, "$lbl CI lower", $rtol);
-	close_to($r->{'conf.int'}[1], $hi, "$lbl CI upper", $rtol);
+	close_to($r->{'conf_int'}[0], $lo, "$lbl CI lower", $rtol);
+	close_to($r->{'conf_int'}[1], $hi, "$lbl CI upper", $rtol);
 }
 
 # 7. R's own suite and man page.
@@ -1519,11 +1519,11 @@ for my $c (@SCIPY) {
 	is($r->{parameter}, 925, 'C7 Conover trials');
 	is($r->{method}, 'Exact binomial test', 'C7 Conover method');
 	is($r->{alternative}, 'two.sided', 'C7 Conover alternative');
-	close_to($r->{'p.value'},     0.38249155957485204,  'C7 Conover p-value');
-	close_to($r->{'conf.int'}[0], 0.70766826407903904,  'C7 Conover CI lower', $TOL_CI);
-	close_to($r->{'conf.int'}[1], 0.76540655824152526,  'C7 Conover CI upper', $TOL_CI);
+	close_to($r->{'p_value'},     0.38249155957485204,  'C7 Conover p-value');
+	close_to($r->{'conf_int'}[0], 0.70766826407903904,  'C7 Conover CI lower', $TOL_CI);
+	close_to($r->{'conf_int'}[1], 0.76540655824152526,  'C7 Conover CI upper', $TOL_CI);
 	close_to($r->{estimate},    0.73729729729729732,  'C7 Conover estimate', 1e-15);
-	close_to($r->{'null.value'},  0.75,                 'C7 Conover null value', 1e-15);
+	close_to($r->{'null_value'},  0.75,                 'C7 Conover null value', 1e-15);
 
 	# "binom.test(682, 682 + 243, p = 3/4)   # The same."  -- the man page says
 	# the two forms agree, so check that rather than restating the numbers.
@@ -1534,11 +1534,11 @@ for my $c (@SCIPY) {
 	# tests/reg-tests-2.R: binom.test(c(800,10))  # p-value < epsilon
 	my $r = binom_test([800, 10]);
 	is($r->{parameter}, 810, 'C7 reg-tests-2 trials');
-	cmp_ok($r->{'p.value'}, '<', 2.220446049250313e-16, 'C7 reg-tests-2 p-value < epsilon');
-	cmp_ok($r->{'p.value'}, '>', 0,                     'C7 reg-tests-2 p-value did not underflow');
-	close_to($r->{'p.value'},     9.3982575750083291e-222, 'C7 reg-tests-2 p-value');
-	close_to($r->{'conf.int'}[0], 0.97741337575556753,     'C7 reg-tests-2 CI lower', $TOL_CI);
-	close_to($r->{'conf.int'}[1], 0.99406432490532004,     'C7 reg-tests-2 CI upper', $TOL_CI);
+	cmp_ok($r->{'p_value'}, '<', 2.220446049250313e-16, 'C7 reg-tests-2 p-value < epsilon');
+	cmp_ok($r->{'p_value'}, '>', 0,                     'C7 reg-tests-2 p-value did not underflow');
+	close_to($r->{'p_value'},     9.3982575750083291e-222, 'C7 reg-tests-2 p-value');
+	close_to($r->{'conf_int'}[0], 0.97741337575556753,     'C7 reg-tests-2 CI lower', $TOL_CI);
+	close_to($r->{'conf_int'}[1], 0.99406432490532004,     'C7 reg-tests-2 CI upper', $TOL_CI);
 }
 
 # 8. Identities that need no reference values at all.
@@ -1563,8 +1563,8 @@ sub perl_dbinom {
 for my $n (1, 2, 5, 10, 20, 37) {
 	for my $p (0.5, 0.25, 0.7, 0.03) {
 		for my $x (0 .. $n) {
-			my $lo = binom_test($x, $n, p => $p, alternative => 'less')->{'p.value'};
-			my $hi = binom_test($x, $n, p => $p, alternative => 'greater')->{'p.value'};
+			my $lo = binom_test($x, $n, p => $p, alternative => 'less')->{'p_value'};
+			my $hi = binom_test($x, $n, p => $p, alternative => 'greater')->{'p_value'};
 			close_to($lo + $hi, 1 + perl_dbinom($x, $n, $p),
 			         "C8 x=$x n=$n p=$p  less + greater == 1 + dbinom", 1e-11);
 		}
@@ -1578,9 +1578,9 @@ for my $n (11, 30, 101) {
 	for my $p (0.5, 0.2, 0.85) {
 		my ($prev_lo, $prev_hi) = (-1, 2);
 		for my $x (0 .. $n) {
-			my $lo = binom_test($x, $n, p => $p, alternative => 'less')->{'p.value'};
-			my $hi = binom_test($x, $n, p => $p, alternative => 'greater')->{'p.value'};
-			my $ts = binom_test($x, $n, p => $p)->{'p.value'};
+			my $lo = binom_test($x, $n, p => $p, alternative => 'less')->{'p_value'};
+			my $hi = binom_test($x, $n, p => $p, alternative => 'greater')->{'p_value'};
+			my $ts = binom_test($x, $n, p => $p)->{'p_value'};
 			cmp_ok($lo, '>=', $prev_lo, "C8 x=$x n=$n p=$p 'less' nondecreasing in x");
 			cmp_ok($hi, '<=', $prev_hi, "C8 x=$x n=$n p=$p 'greater' nonincreasing in x");
 			ok($ts >= 0 && $ts <= 1,    "C8 x=$x n=$n p=$p two-sided in [0,1]");
@@ -1593,10 +1593,10 @@ for my $n (11, 30, 101) {
 # one-sided forms are the two halves of the two-sided one at twice the alpha.
 for my $n (7, 40, 500) {
 	for my $x (0, 1, int($n / 3), $n - 1, $n) {
-		my $two  = binom_test($x, $n, conf_level => 0.9)->{'conf.int'};
-		my $wide = binom_test($x, $n, conf_level => 0.99)->{'conf.int'};
-		my $up   = binom_test($x, $n, conf_level => 0.95, alternative => 'less')->{'conf.int'};
-		my $down = binom_test($x, $n, conf_level => 0.95, alternative => 'greater')->{'conf.int'};
+		my $two  = binom_test($x, $n, conf_level => 0.9)->{'conf_int'};
+		my $wide = binom_test($x, $n, conf_level => 0.99)->{'conf_int'};
+		my $up   = binom_test($x, $n, conf_level => 0.95, alternative => 'less')->{'conf_int'};
+		my $down = binom_test($x, $n, conf_level => 0.95, alternative => 'greater')->{'conf_int'};
 		my $lbl  = "C8 x=$x n=$n";
 		cmp_ok($two->[0], '<=', $x / $n, "$lbl CI lower <= estimate");
 		cmp_ok($two->[1], '>=', $x / $n, "$lbl estimate <= CI upper");
@@ -1640,7 +1640,7 @@ for my $n (7, 40, 500) {
 #     faithful answer at ~1e-301030 and a denormal is not, but it is recorded
 #     here rather than left as an accident nobody noticed.
 for my $x (1, 5, 999999) {
-	my $p = binom_test($x, 1000000, p => 0.5)->{'p.value'};
+	my $p = binom_test($x, 1000000, p => 0.5)->{'p_value'};
 	is($p, 0, "C9 x=$x n=1e6 two-sided underflows to exactly 0 (R: 2.96e-323)");
 }
 

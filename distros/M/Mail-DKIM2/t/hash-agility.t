@@ -118,8 +118,8 @@ is($folded_mid->[0][2], 'BBB', 'FWS stripped from the middle of a body hash');
 
 # --- CLI: bin/dkim2sign --hash ------------------------------------------
 
-my $keyfile  = '../keys/sel1._domainkey.test1.dkim2.com.pem';
-plan skip_all => 'shared ../keys not available' unless -e $keyfile;
+my $keyfile  = 't/data/keys/sel1._domainkey.test1.dkim2.com.pem';
+plan skip_all => 't/data/keys not available' unless -e $keyfile;
 
 my $dir = tempdir(CLEANUP => 1);
 my $src = path($dir)->child('base.eml');
@@ -220,9 +220,9 @@ sub _unfolded_mi {
 # CRITICAL fix-round-1 regression, end to end: --hash sha512 (the signer
 # added in this same task) must produce a message that actually verifies,
 # and must not crash when re-signed unmodified at a second hop.
-my $keyfile2 = '../keys/sel1._domainkey.test2.dkim2.com.pem';
+my $keyfile2 = 't/data/keys/sel1._domainkey.test2.dkim2.com.pem';
 unless (-e $keyfile2) {
-    ok(1, 'shared ../keys/...test2... not available -- sha512/donotmodify e2e checks skipped');
+    ok(1, 't/data/keys/...test2... not available -- sha512/donotmodify e2e checks skipped');
     done_testing();
     exit 0;
 }

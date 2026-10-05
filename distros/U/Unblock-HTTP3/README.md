@@ -3,7 +3,7 @@
 [![CPAN version](https://badge.fury.io/pl/Unblock-HTTP3.svg)](https://metacpan.org/dist/Unblock-HTTP3)
 [![CPANTS Kwalitee](https://cpants.cpanauthors.org/dist/Unblock-HTTP3.svg)](https://cpants.cpanauthors.org/dist/Unblock-HTTP3)
 [![CI](https://github.com/haxmeister/perl-Unblock-HTTP3/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/haxmeister/perl-Unblock-HTTP3/actions/workflows/test.yml)
-[![Public HTTP/3 interop](https://github.com/haxmeister/perl-Unblock-HTTP3/actions/workflows/interop.yml/badge.svg?branch=main)](https://github.com/haxmeister/perl-Unblock-HTTP3/actions/workflows/interop.yml)
+[![HTTP/3 interop](https://github.com/haxmeister/perl-Unblock-HTTP3/actions/workflows/interop.yml/badge.svg?branch=main)](https://github.com/haxmeister/perl-Unblock-HTTP3/actions/workflows/interop.yml)
 [![License](https://img.shields.io/cpan/l/Unblock-HTTP3.svg)](https://github.com/haxmeister/perl-Unblock-HTTP3/blob/main/LICENSE)
 [![Perl](https://img.shields.io/badge/perl-5.20%2B-blue.svg)](https://www.perl.org/)
 [![nghttp3](https://img.shields.io/badge/nghttp3-1.18.0-blue.svg)](https://github.com/ngtcp2/nghttp3)
@@ -41,13 +41,13 @@ From CPAN:
 cpanm Unblock::HTTP3
 ```
 
-Unblock::HTTP3 0.01 requires:
+Unblock::HTTP3 0.03 requires:
 
 ```text
 Perl            5.20+
 Alien::nghttp3  0.01+
 Net::QUIC       0.04+
-Uniform::HTTP   0.04+
+Uniform::HTTP   0.06+
 ```
 
 ## Start here
@@ -58,8 +58,9 @@ Most code works with three things:
 - `Unblock::HTTP3::Transaction` - one request and its response
 - `Uniform::HTTP::Request` and `Uniform::HTTP::Response` - HTTP messages
 
-`Unblock::HTTP3::Request` and `Unblock::HTTP3::Response` are optional thin
-subclasses with a few HTTP/3-specific helpers.
+Unblock::HTTP3 uses the canonical Uniform message classes directly. HTTP/3
+priority, reset, and STOP_SENDING state live on the Transaction rather than on
+the message object.
 
 An HTTP/3 Connection wraps an existing `Net::QUIC::Connection`:
 
@@ -75,6 +76,20 @@ $h3->start;
 
 Your event-loop adapter continues to drive Net::QUIC. Unblock::HTTP3 never
 blocks waiting for network activity.
+
+## Native consumers
+
+XS event frameworks and HTTP libraries can use the optional
+`Unblock::HTTP3::NativeABI` interface.
+
+It provides a versioned C operations table for the common Connection and
+Transaction path while keeping normal `Unblock::HTTP3::Connection`,
+`Unblock::HTTP3::Transaction`, and canonical `Uniform::HTTP` objects.
+
+The native consumer ABI does not expose libnghttp3 internals and does not
+replace Net::QUIC's transport responsibilities.
+
+See `docs/NATIVE-ABI.md`.
 
 ## Sending a request
 
@@ -185,7 +200,7 @@ Servers can also send 1xx informational responses before the final response:
 
 ```perl
 $tx->send_informational(
-    Unblock::HTTP3::Response->new(
+    Uniform::HTTP::Response->new(
         status => 103,
     ),
 );
@@ -248,24 +263,47 @@ The Transaction also provides `next_datagram`, `on_datagram`, and
 
 The higher-level protocol still decides what the Datagram payload means.
 
-## Request priority
+## ORIGIN
 
-RFC 9218 priority can be set on a request:
+Servers can advertise the RFC 9412 Origin Set extension:
 
 ```perl
-my $request = Unblock::HTTP3::Request->new(
+my $h3 = Unblock::HTTP3::Connection->server(
+    quic => $quic,
+    origins => [
+        'https://example.com',
+        'https://www.example.com',
+    ],
+);
+```
+
+A client can read the advertised entries with:
+
+```perl
+my $origins = $h3->peer_origins;
+```
+
+Before a complete ORIGIN frame arrives this returns `undef`. An explicit empty
+ORIGIN frame returns an empty array reference. Invalid received origin entries
+are ignored.
+
+## Request priority
+
+RFC 9218 priority can be supplied through the normal Uniform Priority header:
+
+```perl
+my $request = Uniform::HTTP::Request->new(
     method    => 'GET',
     target    => '/',
     scheme    => 'https',
     authority => 'example.com',
-    priority  => {
-        urgency     => 1,
-        incremental => 1,
-    },
+    headers   => [
+        [ Priority => 'u=1, i' ],
+    ],
 );
 ```
 
-It can also be changed on a live Transaction:
+It can be inspected or changed on a live Transaction:
 
 ```perl
 $tx->priority(
@@ -303,6 +341,12 @@ my $tx = $h3->request(
 0-RTT can be replayed. Unblock::HTTP3 does not automatically retry an early
 request if QUIC rejects it.
 
+On the server, early request bytes can be parsed before the handshake finishes,
+but the Transaction is not exposed to application code until the QUIC
+handshake completes and the early data has not been rejected. Early HTTP
+Datagrams are bounded and held with the Transaction until that point. This is
+the safe default required by the HTTP early-data replay rules.
+
 See `Unblock::HTTP3::Connection` and `docs/ARCHITECTURE.md` for the complete
 SETTINGS persistence rules.
 
@@ -326,6 +370,9 @@ queues, field sections, QPACK, and HTTP Datagram queues.
 Protocol errors are kept at the narrowest correct scope when possible. A bad
 request stream does not automatically destroy unrelated multiplexed requests.
 
+The normative coverage audit and native-library boundaries are documented in
+`docs/RFC-COMPLIANCE.md`.
+
 ## Extensions
 
 The engine provides generic extension hooks without assigning application
@@ -333,6 +380,7 @@ semantics to them:
 
 - extension SETTINGS
 - extension unidirectional streams
+- RFC 9412 ORIGIN
 - Extended CONNECT protocol names
 - Capsules
 - HTTP Datagrams
@@ -366,7 +414,9 @@ The normal test suite uses real kernel UDP sockets, TLS, QUIC, and HTTP/3.
 CI tests released CPAN dependencies on Perl 5.20, 5.28, 5.36, and 5.44 and
 also validates the built distribution.
 
-Public interoperability tests talk to independent HTTP/3 servers but stay
+Interoperability CI covers both directions: the Unblock::HTTP3 client talks to
+independent public HTTP/3 servers, and a pinned quic-go client drives an
+Unblock::HTTP3 server over real loopback UDP/TLS/QUIC/HTTP/3. These tests stay
 outside normal CPAN installation tests.
 
 ## More documentation
@@ -377,7 +427,10 @@ outside normal CPAN installation tests.
 - `Unblock::HTTP3::Body::Reader` - incoming streaming bodies
 - `Unblock::HTTP3::Capsule` - RFC 9297 Capsules
 - `Unblock::HTTP3::Extension::Stream` - generic extension streams
+- `Unblock::HTTP3::NativeABI` - optional native consumer ABI
+- `docs/NATIVE-ABI.md` - C ABI discovery, ownership, and integration rules
 - `docs/ARCHITECTURE.md` - protocol ownership and internal data flow
+- `docs/RFC-COMPLIANCE.md` - standards coverage and native-library limits
 
 ## License
 

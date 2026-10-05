@@ -173,9 +173,9 @@ my $xlsx = build_xlsx();
 		'all four columns present' );
 }
 
-# output.type => aoa: the header row, then each row padded to the sheet's width
+# output_type => aoa: the header row, then each row padded to the sheet's width
 {
-	my $a = read_table($xlsx, sheet => 'Data', 'output.type' => 'aoa');
+	my $a = read_table($xlsx, sheet => 'Data', 'output_type' => 'aoa');
 	is_deeply( $a, [
 		[ 'name', 'mpg', 'cyl', 'note' ],
 		[ 'Mazda RX4', '21', '6', 'A & B <ok>' ],
@@ -183,19 +183,19 @@ my $xlsx = build_xlsx();
 		[ 'Hornet', '21.4', undef, 'q"x' ],
 		[ 'Valiant', '18.1', '6', 'tab&end' ],
 	], 'aoa: header first, sparse and trailing empty cells undef, in column order' );
-	is_deeply( read_table($xlsx, sheet => 'Data', 'output.type' => 'aoa',
+	is_deeply( read_table($xlsx, sheet => 'Data', 'output_type' => 'aoa',
 			filter => { 0 => sub { 1 } }), $a,
 		'aoa: the closure path gives the same table' );
-	my $book = read_table($xlsx, 'output.type' => 'aoa');
+	my $book = read_table($xlsx, 'output_type' => 'aoa');
 	is_deeply( $book->{Second}, [ [qw(x y)], [ '1', '2' ] ],
 		'aoa: a multi-sheet workbook gives one aoa per sheet' );
 }
 
-# output.type => hoh
+# output_type => hoh
 {
-	my $h = read_table($xlsx, sheet => 'Data', 'output.type' => 'hoh', 'row.names' => 'name');
-	is( $h->{'Mazda RX4'}{mpg}, '21', 'hoh keyed by the row.names column' );
-	ok( !exists $h->{'Mazda RX4'}{name}, 'row.names column is not duplicated inside the row' );
+	my $h = read_table($xlsx, sheet => 'Data', 'output_type' => 'hoh', 'row_names' => 'name');
+	is( $h->{'Mazda RX4'}{mpg}, '21', 'hoh keyed by the row_names column' );
+	ok( !exists $h->{'Mazda RX4'}{name}, 'row_names column is not duplicated inside the row' );
 	is( $h->{'Hornet'}{cyl}, undef, 'hoh preserves undef for a sparse cell' );
 }
 

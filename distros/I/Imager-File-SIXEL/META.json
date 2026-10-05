@@ -1,0 +1,72 @@
+{
+   "abstract" : "read and write SIXEL images with Imager",
+   "author" : [
+      "davenonymous <dave@davenonymous.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Imager-File-SIXEL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "tools",
+         "images"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "Imager" : "1.013"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Pod::Markdown" : "0",
+            "Test::Pod" : "1.00"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "1.013",
+            "Scalar::Util" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.024"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davenonymous/perl-imager-sixel/issues"
+      },
+      "homepage" : "https://github.com/davenonymous/perl-imager-sixel",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davenonymous/perl-imager-sixel.git",
+         "web" : "https://github.com/davenonymous/perl-imager-sixel"
+      }
+   },
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

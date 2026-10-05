@@ -9,7 +9,7 @@ use Unblock::HTTP3 ();
 use Unblock::HTTP3::Capsule ();
 use Unblock::HTTP3::_Bytes ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub _decimal_mod {
     my ($value, $divisor) = @_;

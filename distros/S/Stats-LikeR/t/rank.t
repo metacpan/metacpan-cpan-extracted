@@ -29,27 +29,27 @@ sub is_approx {
 	}
 }
 
-# ties.method: distinct + every tie rule
+# ties_method: distinct + every tie rule
 is_deeply( [rank(3, 1, 4, 2, 5)],                             [3, 1, 4, 2, 5],          'distinct (average)' );
 is_deeply( [rank(3, 1, 4, 1, 5)],                             [3, 1.5, 4, 1.5, 5],      'average, ties' );
-is_deeply( [rank(3, 1, 4, 1, 5, 'ties.method', 'min')],       [3, 1, 4, 1, 5],          'min, ties' );
-is_deeply( [rank(3, 1, 4, 1, 5, 'ties.method', 'max')],       [3, 2, 4, 2, 5],          'max, ties' );
-is_deeply( [rank(3, 1, 4, 1, 5, 'ties.method', 'first')],     [3, 1, 4, 2, 5],          'first, ties' );
-is_deeply( [rank(3, 1, 4, 1, 5, 'ties.method', 'last')],      [3, 2, 4, 1, 5],          'last, ties' );
+is_deeply( [rank(3, 1, 4, 1, 5, 'ties_method', 'min')],       [3, 1, 4, 1, 5],          'min, ties' );
+is_deeply( [rank(3, 1, 4, 1, 5, 'ties_method', 'max')],       [3, 2, 4, 2, 5],          'max, ties' );
+is_deeply( [rank(3, 1, 4, 1, 5, 'ties_method', 'first')],     [3, 1, 4, 2, 5],          'first, ties' );
+is_deeply( [rank(3, 1, 4, 1, 5, 'ties_method', 'last')],      [3, 2, 4, 1, 5],          'last, ties' );
 is_approx( (rank(1, 1, 1))[0], 2, 'average of a 3-way tie is 2' );
 
-# na.last handling (undef = NA), average ties
-is_deeply( [rank(5, undef, 3, undef, 1)],                             [3, 4, 2, 5, 1], 'na.last true (default)' );
-is_deeply( [rank(5, undef, 3, undef, 1, 'na.last', 'false')],         [5, 1, 4, 2, 3], 'na.last false' );
-is_deeply( [rank(5, undef, 3, undef, 1, 'na.last', 'keep')],          [3, undef, 2, undef, 1], 'na.last keep' );
-is_deeply( [rank(5, undef, 3, undef, 1, 'na.last', 'na')],            [3, 2, 1],       'na.last na (drop)' );
-is_deeply( [rank(5, undef, 3, undef, 1, 'na.last', undef)],           [3, 2, 1],       'na.last undef == drop' );
-is_deeply( [rank(10, undef, 10, 'ties.method', 'min', 'na.last', 'false')], [2, 1, 2], 'min + na.last false shift' );
+# na_last handling (undef = NA), average ties
+is_deeply( [rank(5, undef, 3, undef, 1)],                             [3, 4, 2, 5, 1], 'na_last true (default)' );
+is_deeply( [rank(5, undef, 3, undef, 1, 'na_last', 'false')],         [5, 1, 4, 2, 3], 'na_last false' );
+is_deeply( [rank(5, undef, 3, undef, 1, 'na_last', 'keep')],          [3, undef, 2, undef, 1], 'na_last keep' );
+is_deeply( [rank(5, undef, 3, undef, 1, 'na_last', 'na')],            [3, 2, 1],       'na_last na (drop)' );
+is_deeply( [rank(5, undef, 3, undef, 1, 'na_last', undef)],           [3, 2, 1],       'na_last undef == drop' );
+is_deeply( [rank(10, undef, 10, 'ties_method', 'min', 'na_last', 'false')], [2, 1, 2], 'min + na_last false shift' );
 
 # all-NA and single-element edge cases
 is_deeply( [rank(undef, undef)],                        [1, 2],         'all NA, default' );
-is_deeply( [rank(undef, undef, 'na.last', 'keep')],     [undef, undef], 'all NA, keep' );
-is_deeply( [rank(undef, undef, 'na.last', 'na')],       [],             'all NA, drop -> empty' );
+is_deeply( [rank(undef, undef, 'na_last', 'keep')],     [undef, undef], 'all NA, keep' );
+is_deeply( [rank(undef, undef, 'na_last', 'na')],       [],             'all NA, drop -> empty' );
 is_deeply( [rank(undef)],                               [1],            'single undef' );
 is_deeply( [rank()],                                    [],             'no args -> empty' );
 is_deeply( [rank(42)],                                  [1],            'single value' );
@@ -61,14 +61,14 @@ is_deeply( [rank(-2.5, 0, -2.5, 7)],                    [1.5, 3, 1.5, 4],    'ne
 is_deeply( [rank(1, 9 ** 9 ** 9, -9 ** 9 ** 9)],        [2, 3, 1],           '+/- infinity ordered' );
 {
 	my $nan = 9 ** 9 ** 9; $nan -= $nan;
-	is_deeply( [rank(2, $nan, 1, 'na.last', 'keep')],   [2, undef, 1],       'NaN treated as NA' );
+	is_deeply( [rank(2, $nan, 1, 'na_last', 'keep')],   [2, undef, 1],       'NaN treated as NA' );
 }
 
 # random: a permutation of 1..n with non-tied values fixed
 {
 	srand(20240607);
 	my @x = (5, 2, 2, 2, 9, 1);          # three 2s tie over ranks 2,3,4
-	my @r = rank(@x, 'ties.method', 'random');
+	my @r = rank(@x, 'ties_method', 'random');
 	is( $r[0], 5, 'random: untied value 5 keeps its rank' );
 	is( $r[4], 6, 'random: untied value 9 keeps its rank' );
 	is( $r[5], 1, 'random: untied value 1 keeps its rank' );
@@ -76,25 +76,25 @@ is_deeply( [rank(1, 9 ** 9 ** 9, -9 ** 9 ** 9)],        [2, 3, 1],           '+/
 }
 
 # error handling
-throws_ok { rank(1, 2, 'ties.method', 'bogus') } qr/rank: unknown ties.method/, 'bad ties.method dies';
-throws_ok { rank(1, 2, 'na.last', 'bogus') }     qr/rank: unknown na.last/,     'bad na.last dies';
-throws_ok { rank([1, 2], 'na.last') }            qr/rank: named options must be key => value pairs/, 'odd option list dies';
+throws_ok { rank(1, 2, 'ties_method', 'bogus') } qr/rank: unknown ties_method/, 'bad ties_method dies';
+throws_ok { rank(1, 2, 'na_last', 'bogus') }     qr/rank: unknown na_last/,     'bad na_last dies';
+throws_ok { rank([1, 2], 'na_last') }            qr/rank: named options must be key => value pairs/, 'odd option list dies';
 
 # leak checks (real calls hoisted out of the closures)
 unless ($INC{'Devel/Cover.pm'}) {
 	my @warm;
 	@warm = rank(3, 1, 4, 1, 5);
-	@warm = rank(5, undef, 3, undef, 1, 'na.last', 'keep');
-	@warm = rank(5, undef, 3, undef, 1, 'na.last', 'false');
-	@warm = rank([3, 1, 4, 1, 5], 'ties.method', 'max');
-	@warm = rank(1, 2, 'ties.method', 'random');
+	@warm = rank(5, undef, 3, undef, 1, 'na_last', 'keep');
+	@warm = rank(5, undef, 3, undef, 1, 'na_last', 'false');
+	@warm = rank([3, 1, 4, 1, 5], 'ties_method', 'max');
+	@warm = rank(1, 2, 'ties_method', 'random');
 	@warm = rank();
 
 	no_leaks_ok { my @r = rank(3, 1, 4, 1, 5) }                        'average: no leaks';
-	no_leaks_ok { my @r = rank(5, undef, 3, undef, 1, 'na.last', 'keep') }  'keep: no leaks';
-	no_leaks_ok { my @r = rank(5, undef, 3, undef, 1, 'na.last', 'false') } 'false: no leaks';
-	no_leaks_ok { my @r = rank([3, 1, 4, 1, 5], 'ties.method', 'max') }     'max/ref: no leaks';
-	no_leaks_ok { my @r = rank(1, 2, 'ties.method', 'random') }        'random: no leaks';
+	no_leaks_ok { my @r = rank(5, undef, 3, undef, 1, 'na_last', 'keep') }  'keep: no leaks';
+	no_leaks_ok { my @r = rank(5, undef, 3, undef, 1, 'na_last', 'false') } 'false: no leaks';
+	no_leaks_ok { my @r = rank([3, 1, 4, 1, 5], 'ties_method', 'max') }     'max/ref: no leaks';
+	no_leaks_ok { my @r = rank(1, 2, 'ties_method', 'random') }        'random: no leaks';
 	no_leaks_ok { my @r = rank() }                                     'empty: no leaks';
 }
 

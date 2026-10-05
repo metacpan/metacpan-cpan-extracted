@@ -30,6 +30,7 @@ t/high_levels.t
 t/integration.t
 t/is_level.t
 t/journald.t
+t/journald_emsgsize.t
 t/json_format.t
 t/kwalitee.t
 t/locales.t

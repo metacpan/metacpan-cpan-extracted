@@ -11,8 +11,7 @@ use Unblock::HTTP3::Capsule::Parser;
 use Unblock::HTTP3::Capsule::Stream;
 use Unblock::HTTP3::Connection;
 use Unblock::HTTP3::Extension::Stream;
-use Unblock::HTTP3::Request;
-use Unblock::HTTP3::Response;
+use Unblock::HTTP3::NativeABI;
 use Unblock::HTTP3::Transaction;
 use Unblock::HTTP3::_Bytes;
 use Unblock::HTTP3::_Native;
@@ -28,15 +27,14 @@ my @versioned_modules = (
     [ 'Unblock::HTTP3::Capsule::Stream', $Unblock::HTTP3::Capsule::Stream::VERSION ],
     [ 'Unblock::HTTP3::Connection',   $Unblock::HTTP3::Connection::VERSION ],
     [ 'Unblock::HTTP3::Extension::Stream', $Unblock::HTTP3::Extension::Stream::VERSION ],
-    [ 'Unblock::HTTP3::Request',      $Unblock::HTTP3::Request::VERSION ],
-    [ 'Unblock::HTTP3::Response',     $Unblock::HTTP3::Response::VERSION ],
+    [ 'Unblock::HTTP3::NativeABI', $Unblock::HTTP3::NativeABI::VERSION ],
     [ 'Unblock::HTTP3::Transaction',  $Unblock::HTTP3::Transaction::VERSION ],
     [ 'Unblock::HTTP3::_Bytes',       $Unblock::HTTP3::_Bytes::VERSION ],
     [ 'Unblock::HTTP3::_Native',      $Unblock::HTTP3::_Native::VERSION ],
 );
 
 for my $module (@versioned_modules) {
-    is($module->[1], '0.01', "$module->[0] version matches distribution");
+    is($module->[1], '0.03', "$module->[0] version matches distribution");
 }
 
 done_testing;

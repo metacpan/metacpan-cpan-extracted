@@ -97,9 +97,9 @@ sub check {
 	ok(rel($r->{W}, $w_want) <= $TOL_W,
 		sprintf('%s: W = %.17g (R: %.17g, rel %.2g)', $label, $r->{W}, $w_want,
 			rel($r->{W}, $w_want)));
-	ok(rel($r->{'p.value'}, $p_want) <= $tol_p,
-		sprintf('%s: p = %.17g (R: %.17g, rel %.2g)', $label, $r->{'p.value'},
-			$p_want, rel($r->{'p.value'}, $p_want)));
+	ok(rel($r->{'p_value'}, $p_want) <= $tol_p,
+		sprintf('%s: p = %.17g (R: %.17g, rel %.2g)', $label, $r->{'p_value'},
+			$p_want, rel($r->{'p_value'}, $p_want)));
 	return $r;
 }
 
@@ -307,7 +307,7 @@ for my $c (@SCIPY) {
 	my ($label, $data, $w, $p) = @$c;
 	my $r = shapiro_test($data);
 	ok(rel($r->{W}, $w) <= $TOL_SCIPY, "SciPy TestShapiro $label: W");
-	ok(rel($r->{'p.value'}, $p) <= $TOL_SCIPY * 1e3, "SciPy TestShapiro $label: p");
+	ok(rel($r->{'p_value'}, $p) <= $TOL_SCIPY * 1e3, "SciPy TestShapiro $label: p");
 }
 
 # C1. R's tests/reg-tests-1b.R, in full:
@@ -323,8 +323,8 @@ for my $c (@SCIPY) {
 # is 4e-16 in absolute terms and only visible where the true p-value is 0.
 {
 	my $r = shapiro_test([ 0, 0, 1 ]);
-	ok($r->{'p.value'} >= 0, 'C1 reg-tests-1b.R: p.value >= 0 at the n = 3 floor');
-	ok($r->{'p.value'} < 1e-12, 'C1 and it is 0 to within a rounding of pi/3');
+	ok($r->{'p_value'} >= 0, 'C1 reg-tests-1b.R: p_value >= 0 at the n = 3 floor');
+	ok($r->{'p_value'} < 1e-12, 'C1 and it is 0 to within a rounding of pi/3');
 	ok(abs($r->{W} - 0.75) < 1e-15, 'C1 W sits on its exact n = 3 floor of 3/4');
 }
 
@@ -372,7 +372,7 @@ for my $c (@SCIPY) {
 {
 	my $r = shapiro_test([ 1, 2, 3 ]);
 	ok(abs($r->{W} - 1) < 1e-15, 'D n=3 evenly spaced: W = 1');
-	ok($r->{'p.value'} > 1 - 1e-12 && $r->{'p.value'} <= 1,
+	ok($r->{'p_value'} > 1 - 1e-12 && $r->{'p_value'} <= 1,
 		'D n=3 evenly spaced: p = 1 (R: 0.99999999999999334)');
 }
 
@@ -381,7 +381,7 @@ for my $c (@SCIPY) {
 {
 	my @w;
 	for my $n (11, 12) {
-		push @w, shapiro_test(sw_normalish($n))->{'p.value'};
+		push @w, shapiro_test(sw_normalish($n))->{'p_value'};
 	}
 	ok($w[0] > 0 && $w[0] < 1 && $w[1] > 0 && $w[1] < 1,
 		'D both p-value branches return an interior probability');
@@ -397,7 +397,7 @@ for my $case (
 ) {
 	my ($label, $data) = @$case;
 	my $r = shapiro_test($data);
-	ok($r->{'p.value'} >= 0 && $r->{'p.value'} <= 1, "D $label: p in [0, 1]");
+	ok($r->{'p_value'} >= 0 && $r->{'p_value'} <= 1, "D $label: p in [0, 1]");
 	ok($r->{W} > 0 && $r->{W} <= 1,              "D $label: W in (0, 1]");
 }
 
@@ -418,10 +418,10 @@ for my $case (
 {
 	my $r = shapiro_test(sw_normalish(5000));
 	ok(rel($r->{W}, 0.99981218462658794) <= $TOL_W, 'D n = 5000 W (R)');
-	ok(rel($r->{'p.value'}, 0.96184260472691174) <= $TOL_P, 'D n = 5000 p (R)');
+	ok(rel($r->{'p_value'}, 0.96184260472691174) <= $TOL_P, 'D n = 5000 p (R)');
 }
 
-# E. The Perl-side surface: missing values, both key spellings, and every
+# E. The Perl-side surface: missing values, the keys returned, and every
 # croak.  R's shapiro.test() drops the incomplete cases before it counts, and
 # complete.cases() calls NaN missing, so undef and NaN behave the same way.
 {
@@ -436,16 +436,17 @@ for my $case (
 		my $r = shapiro_test($data);
 		my $c = shapiro_test($clean);
 		is($r->{W}, $c->{W}, "E $label dropped, exactly as complete.cases() would");
-		is($r->{'p.value'}, $c->{'p.value'}, "E $label: p unchanged too");
+		is($r->{'p_value'}, $c->{'p_value'}, "E $label: p unchanged too");
 	}
 }
 
-{	# both documented spellings of both fields are the same number
+{	# W and statistic are both documented and are the same number; the p-value
+	# is returned as p_value only, and R's dotted p.value is not a key
 	my $r = shapiro_test(sw_normalish(30));
 	is($r->{W}, $r->{statistic}, 'E W and statistic are the same value');
-	is($r->{'p.value'}, $r->{'p.value'}, 'E p_value and p.value are the same value');
-	is(scalar(grep { defined $r->{$_} } qw(W statistic p.value p.value)), 4,
-		'E all four documented keys are present');
+	ok(!exists $r->{'p.value'}, "E R's dotted 'p.value' is not returned");
+	is(scalar(grep { defined $r->{$_} } qw(W statistic p_value)), 3,
+		'E all three documented keys are present');
 }
 
 {	# argument validation

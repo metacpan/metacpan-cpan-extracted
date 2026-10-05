@@ -16,7 +16,7 @@ my $body = "From: x\@a.test\r\nSubject: hi\r\n\r\nhello\r\n";
 my $outfile = "/tmp/vcgi.$$.out";
 {
     local $ENV{CONTENT_LENGTH} = length($body);
-    local $ENV{DKIM2_DNS_JSON} = '../dns.json';
+    local $ENV{DKIM2_DNS_JSON} = 't/data/dns.json';
     open my $fh, '|-', "perl -Ilib bin/validate.cgi > $outfile" or die "spawn: $!";
     print $fh $body;
     close $fh;

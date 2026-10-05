@@ -5,7 +5,7 @@
 #
 # PROVENANCE
 #
-# Block 1 pins z with P(-z < Z < z) = conf.level against two references:
+# Block 1 pins z with P(-z < Z < z) = conf_level against two references:
 #
 #   R 4.6.1  qnorm(1 - (1 - cl)/2), printed at options(digits=17) by
 #            Rscript -e 'options(digits=17);
@@ -25,8 +25,8 @@
 # the expected value on its own.  t/std_qnorm.mpmath.py is the arbiter: it
 # bisects the defining equation erfc(-z/sqrt(2))/2 = p at mp.dps = 60 -- not a
 # third library inverse, per CLAUDE.md -- at the *exact double* the C
-# expression 1 - (1 - conf.level)/2 forms, and scores all three.  Its verdict,
-# as worst relative error over these six conf.levels:
+# expression 1 - (1 - conf_level)/2 forms, and scores all three.  Its verdict,
+# as worst relative error over these six conf_levels:
 #
 #   Moro alone, i.e. Stats::LikeR <= 0.302   1.769e-9   (7968628 ulp)
 #   R 4.6.1 qnorm                            4.768e-16  (2.1 ulp)
@@ -112,12 +112,12 @@ sub rel_ok {
 
 # ---- the frozen table ------------------------------------------------------
 #
-# conf.level, then z, then what inverse_normal_cdf() alone returns for the same
+# conf_level, then z, then what inverse_normal_cdf() alone returns for the same
 # p -- kept so this file can assert that 0.303 moved the answer, and by how
 # much.  All three as exact doubles; the R and SciPy columns are the decimals
 # those projects print, which is all the precision they offer.
-# p is frozen as well as conf.level, and block 1 asks qnorm for that p rather
-# than for 1 - (1 - conf.level)/2.  The reason is not pedantry: at conf.level
+# p is frozen as well as conf_level, and block 1 asks qnorm for that p rather
+# than for 1 - (1 - conf_level)/2.  The reason is not pedantry: at conf_level
 # 0.999 the subtraction 1 - 0.0005 has to round, and it rounds to a different
 # number in double than in long double.  Both builds then answer correctly, for
 # questions 5e-20 apart -- but the normal density at that quantile is 0.00175,
@@ -125,7 +125,7 @@ sub rel_ok {
 # relative while both are right.  Freezing p makes every build answer the same
 # question, which is the only way a shared literal can be an expected value.
 my @CRIT = (
-	# conf.level             p = 1 - (1 - cl)/2       z (Stats::LikeR)         Moro alone (<= 0.302)    R 4.6.1 qnorm            SciPy 1.18.0 norm.ppf
+	# conf_level             p = 1 - (1 - cl)/2       z (Stats::LikeR)         Moro alone (<= 0.302)    R 4.6.1 qnorm            SciPy 1.18.0 norm.ppf
 	[ '3602879701896397/2^52', '8106479329266893/2^53', '5771595153042739/2^52', '5771595142830531/2^52', '1442898788260685/2^50', '2885797576521369/2^51' ],
 	[ '8106479329266893/2^53', '4278419646001971/2^52', '7407762181417659/2^52', '7407762181623911/2^52', '925970272677207/2^49',  '7407762181417659/2^52' ],
 	[ '4278419646001971/2^52', '8782019273372467/2^53', '8826893070434179/2^52', '8826893070338885/2^52', '4413446535217089/2^51', '2206723267608545/2^50' ],
@@ -145,7 +145,7 @@ my @CRIT = (
 my $CRIT_TOL = 1e-15;
 
 # 1e-15 = 4.5 double ulp.  The worst disagreement between a reference column
-# and the frozen z is 4.05e-16, R's at conf.level 0.9; both sides are exact
+# and the frozen z is 4.05e-16, R's at conf_level 0.9; both sides are exact
 # doubles rebuilt by dyad(), so that figure is not an artefact of parsing and
 # does not move with NV width either.  2.5x headroom, which is enough to
 # survive a reference's own last-digit change and still catch a regression in
@@ -161,9 +161,9 @@ for my $row (@CRIT) {
 	rel_ok( qnorm($p), $z, $CRIT_TOL, 'qnorm',
 		sprintf 'qnorm at the %.17g critical point is the frozen value', $cl );
 	rel_ok( dyad($r_d), $z, $REF_TOL, 'R qnorm',
-		sprintf "and R 4.6.1's qnorm agrees at conf.level %.17g", $cl );
+		sprintf "and R 4.6.1's qnorm agrees at conf_level %.17g", $cl );
 	rel_ok( dyad($scipy_d), $z, $REF_TOL, 'SciPy norm.ppf',
-		sprintf "and SciPy 1.18.0's norm.ppf agrees at conf.level %.17g", $cl );
+		sprintf "and SciPy 1.18.0's norm.ppf agrees at conf_level %.17g", $cl );
 
 	# The point of the change: Moro's own answer is nowhere near this
 	# tolerance, so block 2 below is testing new behaviour and not a rename.
@@ -174,8 +174,8 @@ for my $row (@CRIT) {
 			$moro_rel, $CRIT_TOL );
 
 	# qnorm's two spellings of the same critical value.  prop_test forms
-	# (1 + conf.level)/2 where the other eight sites form
-	# 1 - (1 - conf.level)/2, and block 2 compares prop_test against the same
+	# (1 + conf_level)/2 where the other eight sites form
+	# 1 - (1 - conf_level)/2, and block 2 compares prop_test against the same
 	# expected z as the rest, which is only allowed if the two agree.  Both
 	# sides are computed by this build -- comparing either against the frozen
 	# double would be the mistake the note above @CRIT describes -- and it is
@@ -183,7 +183,7 @@ for my $row (@CRIT) {
 	# and there is no reason they must round the same way.
 	rel_ok( qnorm( ( 1 + $cl ) / 2 ), qnorm( 1 - ( 1 - $cl ) / 2 ),
 		$CRIT_TOL, 'qnorm spellings',
-		sprintf '(1 + cl)/2 and 1 - (1 - cl)/2 agree at conf.level %.17g',
+		sprintf '(1 + cl)/2 and 1 - (1 - cl)/2 agree at conf_level %.17g',
 			$cl );
 
 	# Symmetry, which is what makes a two-sided interval two-sided -- and the
@@ -191,11 +191,11 @@ for my $row (@CRIT) {
 	# tail probability is 1 - $p and not (1 - $cl)/2 on purpose: for $p >= 0.5
 	# Sterbenz's lemma makes 1 - $p exact, so this compares the function at two
 	# points that really are each other's mirror.  (1 - $cl)/2 would not be:
-	# at conf.level 0.9999 it and 1 - (1 - (1 - $cl)/2) differ by 2e-12
+	# at conf_level 0.9999 it and 1 - (1 - (1 - $cl)/2) differ by 2e-12
 	# relative, because 1 - 0.99995 cancels where 1 - 0.99995... does not, and
 	# the test would be measuring that rounding instead of this module.
 	rel_ok( -qnorm( 1 - $p ), $z, $CRIT_TOL, 'qnorm',
-		sprintf 'and -qnorm(1 - p) is the same value at conf.level %.17g',
+		sprintf 'and -qnorm(1 - p) is the same value at conf_level %.17g',
 			$cl );
 }
 
@@ -205,14 +205,14 @@ for my $row (@CRIT) {
 # on the default double build (5.44.0):
 #
 #   recovery                     measured   tolerance
-#   glm conf.int                  0.8 ulp    32 ulp
-#   coxph conf.int                3.6 ulp    32 ulp
-#   roc auc.ci                    1.6 ulp    32 ulp
-#   epi_2x2 odds.ratio.ci         1.0 ulp    32 ulp
-#   epi_2x2 risk.diff.ci          0.5 ulp    32 ulp
-#   prop_test conf.int            0.5 ulp    32 ulp
+#   glm conf_int                  0.8 ulp    32 ulp
+#   coxph conf_int                3.6 ulp    32 ulp
+#   roc auc_ci                    1.6 ulp    32 ulp
+#   epi_2x2 odds_ratio_ci         1.0 ulp    32 ulp
+#   epi_2x2 risk_diff_ci          0.5 ulp    32 ulp
+#   prop_test conf_int            0.5 ulp    32 ulp
 #   survfit lower/upper           1.6 ulp    32 ulp
-#   cor_test conf.int            11.8 ulp   128 ulp
+#   cor_test conf_int            11.8 ulp   128 ulp
 #
 # 32 ulp is ~9x headroom over the worst of the direct est +/- z*se recoveries.
 # cor_test gets its own because its interval is tanh(atanh(r) +/- q*se): the
@@ -225,7 +225,7 @@ my $ATANH_TOL = 128 * NV_EPS();
 
 my @LEVELS = map { dyad( $_->[0] ) } @CRIT;
 
-# glm: conf.int is estimate +/- z * `Std. Error`, and both are reported.
+# glm: conf_int is estimate +/- z * `Std. Error`, and both are reported.
 {
 	my %d = (
 		y => [ 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1 ],
@@ -233,16 +233,16 @@ my @LEVELS = map { dyad( $_->[0] ) } @CRIT;
 	);
 	for my $cl (@LEVELS) {
 		my $m = glm( data => \%d, formula => 'y ~ x', family => 'binomial',
-			'conf.level' => $cl );
+			'conf_level' => $cl );
 		my $se = $m->{summary}{x}{'Std. Error'};
-		my $ci = $m->{'conf.int'}{x};
+		my $ci = $m->{'conf_int'}{x};
 		rel_ok( ( $ci->[1] - $ci->[0] ) / ( 2 * $se ),
 			qnorm( 1 - ( 1 - $cl ) / 2 ), $CI_TOL, 'glm',
-			sprintf 'glm conf.int implies qnorm at conf.level %.17g', $cl );
+			sprintf 'glm conf_int implies qnorm at conf_level %.17g', $cl );
 	}
 }
 
-# cor_test: conf.int is tanh(atanh(r) +/- q / sqrt(n - 3)), so the recovery
+# cor_test: conf_int is tanh(atanh(r) +/- q / sqrt(n - 3)), so the recovery
 # undoes the tanh.  atanh by hand: 5.10 has no Math::Trig import here.
 {
 	my @x = ( 1 .. 10 );
@@ -250,15 +250,15 @@ my @LEVELS = map { dyad( $_->[0] ) } @CRIT;
 	my $atanh = sub { 0.5 * log( ( 1 + $_[0] ) / ( 1 - $_[0] ) ) };
 	my $se = 1 / sqrt( @x - 3 );
 	for my $cl (@LEVELS) {
-		my $c  = cor_test( \@x, \@y, 'conf.level' => $cl );
-		my $ci = $c->{'conf.int'};
+		my $c  = cor_test( \@x, \@y, 'conf_level' => $cl );
+		my $ci = $c->{'conf_int'};
 		rel_ok( ( $atanh->( $ci->[1] ) - $atanh->( $ci->[0] ) ) / ( 2 * $se ),
 			qnorm( 1 - ( 1 - $cl ) / 2 ), $ATANH_TOL, 'cor_test',
-			sprintf 'cor_test conf.int implies qnorm at conf.level %.17g', $cl );
+			sprintf 'cor_test conf_int implies qnorm at conf_level %.17g', $cl );
 	}
 }
 
-# coxph: conf.int is on the hazard ratio, exp(coef +/- z * se), so the recovery
+# coxph: conf_int is on the hazard ratio, exp(coef +/- z * se), so the recovery
 # takes logs.  Both covariates, because the critical value is shared and a
 # per-coefficient mistake would show on only one.
 {
@@ -270,37 +270,37 @@ my @LEVELS = map { dyad( $_->[0] ) } @CRIT;
 		my $cx = coxph( \@time, \@status, [ \@trt, \@age ],
 			conf_level => $cl, names => [ 'trt', 'age' ] );
 		for my $k ( 0, 1 ) {
-			my ( $lo, $hi ) = @{ $cx->{'conf.int'}[$k] };
+			my ( $lo, $hi ) = @{ $cx->{'conf_int'}[$k] };
 			rel_ok( ( log($hi) - log($lo) ) / ( 2 * $cx->{se}[$k] ),
 				qnorm( 1 - ( 1 - $cl ) / 2 ), $CI_TOL, 'coxph',
-				sprintf 'coxph conf.int[%s] implies qnorm at conf.level %.17g',
+				sprintf 'coxph conf_int[%s] implies qnorm at conf_level %.17g',
 					$cx->{names}[$k], $cl );
 		}
 	}
 }
 
-# roc: auc.ci is auc +/- z * auc.se, clamped into [0, 1].  40 observations and
-# an AUC near 0.5 keep the upper limit inside 1 even at conf.level 0.9999, so
+# roc: auc_ci is auc +/- z * auc_se, clamped into [0, 1].  40 observations and
+# an AUC near 0.5 keep the upper limit inside 1 even at conf_level 0.9999, so
 # the recovery is never reading a clamp instead of a critical value.
 {
 	my @score = map { $_ / 40 } 1 .. 40;
 	my @label = map { ( $_ % 3 == 0 ) ? 1 : 0 } 1 .. 40;
 	for my $cl (@LEVELS) {
 		my $r = roc( \@score, \@label, conf_level => $cl );
-		my ( $lo, $hi ) = @{ $r->{'auc.ci'} };
+		my ( $lo, $hi ) = @{ $r->{'auc_ci'} };
 		# Guard the guard: if this ever clamps, say so instead of silently
 		# testing the clamp.
 		cmp_ok( $hi, '<', 1,
-			sprintf 'roc auc.ci is unclamped at conf.level %.17g', $cl );
-		rel_ok( ( $hi - $lo ) / ( 2 * $r->{'auc.se'} ),
+			sprintf 'roc auc_ci is unclamped at conf_level %.17g', $cl );
+		rel_ok( ( $hi - $lo ) / ( 2 * $r->{'auc_se'} ),
 			qnorm( 1 - ( 1 - $cl ) / 2 ), $CI_TOL, 'roc',
-			sprintf 'roc auc.ci implies qnorm at conf.level %.17g', $cl );
+			sprintf 'roc auc_ci implies qnorm at conf_level %.17g', $cl );
 	}
 }
 
-# epi_2x2: two different recoveries out of one call.  odds.ratio.ci is
+# epi_2x2: two different recoveries out of one call.  odds_ratio_ci is
 # multiplicative, or * exp(+/- z * sqrt(1/a + 1/b + 1/c + 1/d)), and
-# risk.diff.ci is additive; the shared critical value has to come back out of
+# risk_diff_ci is additive; the shared critical value has to come back out of
 # both.  No zero cell, so no Haldane-Anscombe shift -- asserted, because the
 # variance below is computed from the raw counts.
 {
@@ -312,22 +312,22 @@ my @LEVELS = map { dyad( $_->[0] ) } @CRIT;
 	for my $cl (@LEVELS) {
 		my $e = epi_2x2( $a, $b, $c, $d, conf_level => $cl );
 		is( $e->{correction}, 0, 'epi_2x2 applied no continuity correction' );
-		my ( $olo, $ohi ) = @{ $e->{'odds.ratio.ci'} };
+		my ( $olo, $ohi ) = @{ $e->{'odds_ratio_ci'} };
 		rel_ok( ( log($ohi) - log($olo) ) / ( 2 * $se_lor ),
 			qnorm( 1 - ( 1 - $cl ) / 2 ), $CI_TOL, 'epi_2x2',
-			sprintf 'epi_2x2 odds.ratio.ci implies qnorm at conf.level %.17g',
+			sprintf 'epi_2x2 odds_ratio_ci implies qnorm at conf_level %.17g',
 				$cl );
-		my ( $dlo, $dhi ) = @{ $e->{'risk.diff.ci'} };
+		my ( $dlo, $dhi ) = @{ $e->{'risk_diff_ci'} };
 		rel_ok( ( $dhi - $dlo ) / ( 2 * $se_rd ),
 			qnorm( 1 - ( 1 - $cl ) / 2 ), $CI_TOL, 'epi_2x2',
-			sprintf 'epi_2x2 risk.diff.ci implies qnorm at conf.level %.17g',
+			sprintf 'epi_2x2 risk_diff_ci implies qnorm at conf_level %.17g',
 				$cl );
 	}
 }
 
 # prop_test: correct => 0, because the Yates term is added to the half-width
 # and would be indistinguishable from the critical value here.  This is the one
-# site that spells its argument (1 + conf.level)/2; block 1 checked that
+# site that spells its argument (1 + conf_level)/2; block 1 checked that
 # spelling gives the same double.
 {
 	my @x = ( 36, 30 );
@@ -337,18 +337,18 @@ my @LEVELS = map { dyad( $_->[0] ) } @CRIT;
 		my @est = @{ $pt->{estimate} };
 		my $se  = sqrt( $est[0] * ( 1 - $est[0] ) / $n[0]
 		              + $est[1] * ( 1 - $est[1] ) / $n[1] );
-		my ( $lo, $hi ) = @{ $pt->{'conf.int'} };
+		my ( $lo, $hi ) = @{ $pt->{'conf_int'} };
 		cmp_ok( $hi, '<', 1,
-			sprintf 'prop_test conf.int is unclamped at conf.level %.17g', $cl );
+			sprintf 'prop_test conf_int is unclamped at conf_level %.17g', $cl );
 		rel_ok( ( $hi - $lo ) / ( 2 * $se ), qnorm( ( 1 + $cl ) / 2 ),
 			$CI_TOL, 'prop_test',
-			sprintf 'prop_test conf.int implies qnorm at conf.level %.17g',
+			sprintf 'prop_test conf_int implies qnorm at conf_level %.17g',
 				$cl );
 	}
 }
 
 # survfit: lower/upper are S * exp(-/+ z * sqrt(vterm)) on the log scale, and
-# std.err is S * sqrt(vterm), so sqrt(vterm) is std.err/S.  Only the risk-set
+# std_err is S * sqrt(vterm), so sqrt(vterm) is std_err/S.  Only the risk-set
 # points where the upper limit is inside 1 and the survival is still positive
 # can say anything; the count is asserted so this cannot quietly test nothing.
 {
@@ -364,17 +364,17 @@ my @LEVELS = map { dyad( $_->[0] ) } @CRIT;
 			next unless $s->{surv}[$i] > 0
 				&& $s->{upper}[$i] < 1
 				&& $s->{lower}[$i] > 0;
-			my $sq = $s->{'std.err'}[$i] / $s->{surv}[$i];
+			my $sq = $s->{'std_err'}[$i] / $s->{surv}[$i];
 			next unless $sq > 0;
 			$checked++;
 			rel_ok(
 				( log( $s->{upper}[$i] ) - log( $s->{lower}[$i] ) )
 					/ ( 2 * $sq ),
 				qnorm( 1 - ( 1 - $cl ) / 2 ), $CI_TOL, 'survfit',
-				sprintf 'survfit t = %s implies qnorm at conf.level %.17g',
+				sprintf 'survfit t = %s implies qnorm at conf_level %.17g',
 					$s->{time}[$i], $cl );
 		}
-		# At conf.level 0.9999 the log-scale upper limit clears 1 at every
+		# At conf_level 0.9999 the log-scale upper limit clears 1 at every
 		# risk-set point on this curve (0.585 * exp(3.89 * 0.38) is about 2.5,
 		# so nothing is borderline at any NV width) and the clamp leaves
 		# nothing to recover.  Asserting which levels are usable, rather than
@@ -382,10 +382,10 @@ my @LEVELS = map { dyad( $_->[0] ) } @CRIT;
 		# testing nothing if the clamp ever widened.
 		if ( $cl > 0.999 ) {
 			is( $checked, 0, sprintf 'survfit upper limits all clamp to 1 at '
-				. 'conf.level %.17g', $cl );
+				. 'conf_level %.17g', $cl );
 		} else {
 			cmp_ok( $checked, '>', 0,
-				sprintf 'survfit had usable risk-set points at conf.level %.17g',
+				sprintf 'survfit had usable risk-set points at conf_level %.17g',
 					$cl );
 		}
 	}

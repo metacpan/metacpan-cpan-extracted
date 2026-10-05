@@ -60,8 +60,8 @@ for my $r (@R) {
 	my $ex = ks_test($x, 'pnorm', exact => 1);
 	my $as = ks_test($x, 'pnorm', exact => 0);
 	near($ex->{statistic}, $d,  "n=$n: statistic matches R");
-	near($ex->{'p.value'}, $pe, "n=$n: exact p matches R");
-	near($as->{'p.value'}, $pa, "n=$n: asymptotic p matches R");
+	near($ex->{'p_value'}, $pe, "n=$n: exact p matches R");
+	near($as->{'p_value'}, $pa, "n=$n: asymptotic p matches R");
 	like($ex->{method}, qr/exact/,     "n=$n: exact => 1 took the exact branch");
 	unlike($as->{method}, qr/exact/,   "n=$n: exact => 0 took the asymptotic branch");
 }
@@ -93,7 +93,7 @@ for my $r (@R) {
 	   'a forced exact run that is too large warns') or diag("warnings: @warnings");
 	unlike($r->{method}, qr/exact/,
 	       'and falls back to the asymptotic branch, as the two-sample one does');
-	ok(defined $r->{'p.value'} && $r->{'p.value'} >= 0 && $r->{'p.value'} <= 1,
+	ok(defined $r->{'p_value'} && $r->{'p_value'} >= 0 && $r->{'p_value'} <= 1,
 	   'the fallback still returns a probability');
 }
 

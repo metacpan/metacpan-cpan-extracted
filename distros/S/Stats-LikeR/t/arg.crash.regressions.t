@@ -58,6 +58,22 @@
 #    with the old answer either: cor() croaks on the same input and
 #    cor_test()'s own kendall branch already returned NaN.
 #
+# 11. predict() segfaulted on HoH newdata with a row that was not a hash-ref:
+#     the shape came from the first row hv_iternext() reached and every other
+#     value was dereferenced as an HV, so the crash moved with hash order.
+#
+# 12. csort(), prcomp() and sample() segfaulted on a restricted (Hash::Util::lock_keys)
+#     hash with a deleted key. Both sized their key buffers by hv_iterinit()'s
+#     count, which includes the placeholder a delete leaves behind, so the
+#     walk filled one slot fewer than the loops after it read -- a sort over
+#     an uninitialised pointer. sample() shuffled over the same count and drew
+#     unset slots.
+#
+# 13. merge() segfaulted on a suffixes array with a hole in it
+#     (my @s; $s[1] = '.y'): the two elements were dereferenced straight out
+#     of av_fetch(), which returns NULL for a hole.  A hole is now the undef it
+#     prints as, as an explicit undef element already was.
+#
 # Provenance for every R behaviour quoted here: R 4.6.1 (2026-06-24).
 #   * cor.test(c(1,1,1,1), c(1,2,3,4), method = m) for m in
 #     pearson / kendall / spearman -> estimate NA, statistic NA, p-value NA;
@@ -188,14 +204,14 @@ sub child_result {
 			or diag explain \%seen;
 	}
 	# The HoA branch reached the same crash by a different route: column names
-	# are copied with savepv() and looked up again with strlen(), so a name
-	# holding a NUL byte truncates, hv_fetch() misses, and the NULL it returns
-	# was dereferenced.
-	is(child_result(q{prcomp({ "a\0b" => [1,2,3], c => [4,5,7] })}), 'croak',
-	   'prcomp: a NUL in a HoA column name croaks rather than segfaulting');
-	like(do { local $@; eval { prcomp({ "a\0b" => [1,2,3], c => [4,5,7] }) }; $@ },
-	     qr/cannot be looked up by name/,
-	     'prcomp: and says why');
+	# were copied with savepv() and looked up again with strlen(), so a name
+	# holding a NUL byte truncated, hv_fetch() missed, and the NULL it returned
+	# was dereferenced. 0.315 made that a croak; 0.3213 keeps the names as SVs,
+	# so the column is simply found.
+	is(child_result(q{prcomp({ "a\0b" => [1,2,3], c => [4,5,7] })}), 'ok',
+	   'prcomp: a NUL in a HoA column name is no signal, and no croak');
+	is_deeply(prcomp({ "a\0b" => [1,2,3], c => [4,5,7] })->{varnames}, [ "a\0b", 'c' ],
+	     'prcomp: and the name comes back whole');
 	# An ordinary HoH still decomposes.
 	my $ok = prcomp({ r1 => {a=>1, b=>2}, r2 => {a=>3, b=>5},
 	                  r3 => {a=>4, b=>4}, r4 => {a=>7, b=>9} });
@@ -348,7 +364,7 @@ sub child_result {
 		for my $alt (qw(two.sided less greater)) {
 			my $r = cor_test([1,1,1,1], [1,2,3,4],
 			                 method => $method, alternative => $alt);
-			for my $f (qw(estimate statistic), 'p.value') {
+			for my $f (qw(estimate statistic), 'p_value') {
 				ok($r->{$f} != $r->{$f},
 				   "cor_test $method/$alt: $f is NaN, as R reports NA");
 			}
@@ -356,8 +372,8 @@ sub child_result {
 	}
 	my $p = cor_test([1,1,1,1], [1,2,3,4]);
 	is($p->{parameter}, 2, 'cor_test pearson: df is still 2, as R reports');
-	ok($p->{'conf.int'}[0] != $p->{'conf.int'}[0]
-	   && $p->{'conf.int'}[1] != $p->{'conf.int'}[1],
+	ok($p->{'conf_int'}[0] != $p->{'conf_int'}[0]
+	   && $p->{'conf_int'}[1] != $p->{'conf_int'}[1],
 	   'cor_test pearson: the interval is NaN too');
 	# Either column, or both.
 	for my $case ([[1,2,3,4], [5,5,5,5]], [[2,2,2,2], [5,5,5,5]]) {
@@ -392,6 +408,42 @@ sub child_result {
 		       'hist: the first break tracks the data, not DBL_MAX');
 		is($h->{counts}[0] > 0, 1, 'hist: the first bin is not empty');
 	}
+}
+
+# --- 11. predict: every HoH newdata row is checked ------------------------
+{
+	# Which row hv_iternext() reaches first decides the message (a plain value
+	# first reads as a flat row missing its column), so the loop gives both
+	# orders a chance; neither may be a signal.
+	my %seen;
+	my $call = q{my $f = lm(formula => "y ~ x", data => { y => [1,2,3,5], x => [1,2,3,4] });}
+	         . q{ predict($f, { r1 => { x => 1 }, r2 => 5, r3 => { x => 2 }, r4 => { x => 3 } })};
+	$seen{ child_result($call) }++ for 1 .. 10;
+	is_deeply([ keys %seen ], ['croak'], 'predict: a non-hash HoH newdata row croaks, never a signal');
+}
+
+# --- 12. a deleted key in a locked hash -----------------------------------
+{
+	is(child_result(q{use Hash::Util "lock_keys"; my %h = (r1 => { id => 2 }, r2 => { id => 1 }, r3 => { id => 3 });}
+	              . q{ lock_keys(%h, qw(r1 r2 r3 r4)); delete $h{r3}; my $r = csort(\%h, "id");}
+	              . q{ die "wrong rows" unless join(",", map { $_->{id} } @$r) eq "1,2"}), 'ok',
+	   'csort: a locked HoH with a deleted key sorts the rows that are there');
+	is(child_result(q{use Hash::Util "lock_keys"; my %h = (a => [1,2,3,4], b => [2,1,4,3], c => [9,9,9,9]);}
+	              . q{ lock_keys(%h, qw(a b c d)); delete $h{c}; my $p = prcomp(\%h);}
+	              . q{ die "wrong columns" unless join(",", @{ $p->{varnames} }) eq "a,b"}), 'ok',
+	   'prcomp: a locked HoA with a deleted key uses the columns that are there');
+	is(child_result(q{use Hash::Util "lock_keys"; my %h = (a => 1, b => 2, c => 3, d => 4);}
+	              . q{ lock_keys(%h, qw(a b c d e f)); delete $h{c};}
+	              . q{ for (1 .. 50) { my $r = sample(\%h, 3); die "wrong keys" if keys %$r != 3 || exists $r->{c} }}), 'ok',
+	   'sample: a locked hash with a deleted key draws only keys that are there');
+}
+
+# --- 13. merge: a hole in suffixes -----------------------------------------
+{
+	is(child_result(q{my @s; $s[1] = ".y";}
+	              . q{ my $r = merge([{ k => 1, v => 1 }], [{ k => 1, v => 2 }], on => "k", suffixes => \@s);}
+	              . q{ die "wrong columns" unless join(",", sort keys %{ $r->[0] }) eq "k,v,v.y"}), 'ok',
+	   'merge: a hole in suffixes reads as undef, not a SIGSEGV');
 }
 
 done_testing();

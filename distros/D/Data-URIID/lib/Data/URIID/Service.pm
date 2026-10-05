@@ -22,7 +22,7 @@ use Data::Identifier::Generate v0.25;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.24;
+our $VERSION = v0.25;
 
 use parent 'Data::URIID::Base';
 
@@ -141,6 +141,7 @@ my $config_factgrid = {
     idmap => {
         P76  => 'gnd-identifier',
         P378 => 'viaf-identifier',
+        P826 => 'wikidata-identifier',
         P980 => 'iconclass-identifier',
     },
     endpoint => {
@@ -385,6 +386,8 @@ sub _own_well_known {
             af => {attributes => {displayname => {'*' => 'Afrikaans'}}},
             ar => {attributes => {displayname => {'*' => 'Arabic'}}},
             sw => {attributes => {displayname => {'*' => 'Swahili'}}},
+            fr => {attributes => {displayname => {'*' => 'French'}}},
+            ru => {attributes => {displayname => {'*' => 'Russian'}}},
         },
         'small-identifier' => {
             map {$_->{sid} => {
@@ -568,6 +571,8 @@ sub _own_well_known {
                 {uuid => '999e546d-8dfe-5961-aa5f-bf5cbd0a7037', sid => 238, name => 'application/ld+json'},
                 {uuid => 'c9e61b78-a0bd-5939-9aaa-8f0d08e5a4dc', sid => 239, name => 'application/json'},
                 # More assigned: 240 - ...
+                {uuid => 'c9b228e0-7440-548f-976f-ad5d73be0d5e', sid => 244, name => 'French'},
+                {uuid => '636b9d36-a7b9-52fc-98c5-822569ba7a70', sid => 247, name => 'Russian'},
             ),
         },
         'sirtx-numerical-identifier' => {
@@ -601,6 +606,18 @@ sub _own_well_known {
                 {uuid => 'ba4e7f37-467c-5a36-910c-b32974642fa8', sni => 199, name => 'image/vnd.wap.wbmp'},
                 {uuid => '7e7750e4-ab50-50ba-8c9c-b3158e1f47e0', sni => 209, name => 'image/bmp'},
             ),
+        },
+        'wikifunctions-identifier' => {
+            Z41   => {ids => {uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5'}},
+            Z42   => {ids => {uuid => '6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1'}},
+            Z1001 => {ids => {'language-tag-identifier' => 'ar'}},
+            Z1002 => {ids => {'language-tag-identifier' => 'en'}},
+            Z1003 => {ids => {'language-tag-identifier' => 'es'}},
+            Z1004 => {ids => {'language-tag-identifier' => 'fr'}},
+            Z1005 => {ids => {'language-tag-identifier' => 'ru'}},
+            Z1006 => {ids => {'language-tag-identifier' => 'zh'}},
+            Z1430 => {ids => {'language-tag-identifier' => 'de'}},
+            Z1157 => {ids => {'language-tag-identifier' => 'nl'}},
         },
         'uuid' => {
             map {$_->{uuid} => {
@@ -1161,7 +1178,18 @@ sub _online_lookup__wikibase__stage_1 {
 
     $data = $data->{entities}{$id};
 
-    $attr{displayname} = {map {$_ => $data->{labels}{$_}{value}}       keys %{$data->{labels}}};
+    if (defined $data->{labels}) {
+        $attr{displayname} = {map {$_ => $data->{labels}{$_}{value}}       keys %{$data->{labels}}};
+    } elsif (defined $data->{lemmas}) {
+        my @keys;
+
+        $attr{displayname} = {map {$_ => $data->{lemmas}{$_}{value}}       keys %{$data->{lemmas}}};
+
+        @keys = keys %{$attr{displayname}};
+        if (scalar(@keys) == 1) {
+            $attr{displayname}{'*'} = $attr{displayname}{$keys[0]};
+        }
+    }
     $attr{description} = {map {$_ => $data->{descriptions}{$_}{value}} keys %{$data->{descriptions}}};
 
     $res{wikidata_sitelinks} = $data->{sitelinks};
@@ -1648,7 +1676,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.24
+version v0.25
 
 =head1 SYNOPSIS
 

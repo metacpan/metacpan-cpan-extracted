@@ -37,7 +37,7 @@ use Stats::LikeR qw(friedman_test mcnemar_test prop_test cmh_test);
 #       "p = 0.047"), and UCBAdmissions (2x2x6).
 #
 # Each is crossed over its own switches (correct, exact, alternative, p,
-# conf.level) and over the edges the references themselves cover: all-ties,
+# conf_level) and over the edges the references themselves cover: all-ties,
 # k = 2, b == c, 3x3 and 4x4 tables, 0 and n successes, both extremes at once.
 #
 # TOLERANCE
@@ -98,16 +98,16 @@ my @DOC3 = map { acbd_to_abcd(@$_) } ([10,5,3,12], [20,8,6,15], [7,9,4,11]);
 #
 # label => a closure returning the numbers in the table's own order.
 #
-# htest3 order is (statistic, parameter, p.value); prop and mh append the
+# htest3 order is (statistic, parameter, p_value); prop and mh append the
 # estimate(s) and then the interval, exactly as the generator emits them.
 #
-sub htest3 { my $r = shift; [ $r->{statistic}, $r->{parameter}, $r->{'p.value'} ] }
+sub htest3 { my $r = shift; [ $r->{statistic}, $r->{parameter}, $r->{'p_value'} ] }
 
 sub with_est {
 	my $r = shift;
 	my @est = ref $r->{estimate} ? @{ $r->{estimate} } : ($r->{estimate});
-	return [ $r->{statistic}, $r->{parameter}, $r->{'p.value'}, @est,
-	         @{ $r->{'conf.int'} || [] } ];
+	return [ $r->{statistic}, $r->{parameter}, $r->{'p_value'}, @est,
+	         @{ $r->{'conf_int'} || [] } ];
 }
 
 my %CASE = (
@@ -124,7 +124,7 @@ my %CASE = (
 	'mcnemar.perf.nocorr'  => sub { htest3(mcnemar_test([[794,86],[150,570]], correct => 0)) },
 	'mcnemar.small.corr'   => sub { htest3(mcnemar_test([[10,8],[2,12]])) },
 	'mcnemar.small.nocorr' => sub { htest3(mcnemar_test([[10,8],[2,12]], correct => 0)) },
-	'mcnemar.small.exact'  => sub { [ mcnemar_test([[10,8],[2,12]], exact => 1)->{'p.value'} ] },
+	'mcnemar.small.exact'  => sub { [ mcnemar_test([[10,8],[2,12]], exact => 1)->{'p_value'} ] },
 	'mcnemar.equal.corr'   => sub { htest3(mcnemar_test([[10,5],[5,10]])) },
 	'mcnemar.equal.nocorr' => sub { htest3(mcnemar_test([[10,5],[5,10]], correct => 0)) },
 	'mcnemar.3x3'          => sub { htest3(mcnemar_test([[10,5,2],[3,12,4],[1,6,15]])) },
@@ -135,8 +135,8 @@ my %CASE = (
 	# ---- prop_test ----
 	'prop.1s.83.100.corr'   => sub { with_est(prop_test(83, 100)) },
 	'prop.1s.83.100.nocorr' => sub { with_est(prop_test(83, 100, correct => 0)) },
-	'prop.1s.cl90'          => sub { with_est(prop_test(83, 100, 'conf.level' => 0.9)) },
-	'prop.1s.cl99'          => sub { with_est(prop_test(83, 100, 'conf.level' => 0.99)) },
+	'prop.1s.cl90'          => sub { with_est(prop_test(83, 100, 'conf_level' => 0.9)) },
+	'prop.1s.cl99'          => sub { with_est(prop_test(83, 100, 'conf_level' => 0.99)) },
 	'prop.fleiss4'          => sub { with_est(prop_test([83,90,129,70], [86,93,136,82])) },
 	'prop.1s.0.10'          => sub { with_est(prop_test(0, 10)) },
 	'prop.1s.10.10'         => sub { with_est(prop_test(10, 10)) },
@@ -148,7 +148,7 @@ my %CASE = (
 	'mh.rabbits.nocorr' => sub { with_est(cmh_test(\@RABBITS, correct => 0)) },
 	'mh.ucb.corr'       => sub { with_est(cmh_test(\@UCB)) },
 	'mh.ucb.nocorr'     => sub { with_est(cmh_test(\@UCB, correct => 0)) },
-	'mh.ucb.cl90'       => sub { with_est(cmh_test(\@UCB, 'conf.level' => 0.9)) },
+	'mh.ucb.cl90'       => sub { with_est(cmh_test(\@UCB, 'conf_level' => 0.9)) },
 	'mh.doc3.corr'      => sub { with_est(cmh_test(\@DOC3)) },
 	'mh.doc3.nocorr'    => sub { with_est(cmh_test(\@DOC3, correct => 0)) },
 );
@@ -225,15 +225,15 @@ is(scalar(keys %CASE), $rows, 'every registered case has a row in the table');
 	my $m = mcnemar_test([[2, 3], [2, 3]]);
 	is($v->{statistic}, $m->{statistic},
 		'mcnemar: the paired-vector form matches the cross-tabulated matrix');
-	is($v->{'p.value'}, $m->{'p.value'}, '...and so does its p-value');
+	is($v->{'p_value'}, $m->{'p_value'}, '...and so does its p-value');
 
 	# prop.test's k-sample form has no confidence interval, which is R's own
 	# behaviour and is what distinguishes it from the 1- and 2-group forms.
 	my $k = prop_test([83, 90, 129, 70], [86, 93, 136, 82]);
-	ok(!defined $k->{'conf.int'}, 'prop_test: no interval for k > 2 groups, as in R');
+	ok(!defined $k->{'conf_int'}, 'prop_test: no interval for k > 2 groups, as in R');
 	is($k->{parameter}, 3, 'prop_test: df is k-1 for the k-sample chi-square');
 	my $two = prop_test([83, 90], [100, 100]);
-	ok(ref $two->{'conf.int'} eq 'ARRAY', 'prop_test: two groups do get an interval');
+	ok(ref $two->{'conf_int'} eq 'ARRAY', 'prop_test: two groups do get an interval');
 	is($two->{parameter}, 1, '...on 1 df');
 
 	# cmh_test reports how many strata it pooled, which R does not, and R

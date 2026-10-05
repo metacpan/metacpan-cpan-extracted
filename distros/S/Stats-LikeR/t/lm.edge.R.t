@@ -162,7 +162,7 @@ for my $key (sort keys %CASE) {
 	my $r = lm(formula => $formula, data => $data);
 	is_deeply($r->{terms}, $e->{names}, "$key: terms");
 	is($r->{rank}, $e->{rank}, "$key: rank");
-	is($r->{'df.residual'}, $e->{df}, "$key: df.residual");
+	is($r->{'df_residual'}, $e->{df}, "$key: df_residual");
 	for my $j (0 .. $#{ $e->{names} }) {
 		my $n = $e->{names}[$j];
 		my $s = $r->{summary}{$n};
@@ -171,8 +171,8 @@ for my $key (sort keys %CASE) {
 		near($s->{'t value'},        $e->{t}[$j],        "$key: $n t value");
 		near($s->{'Pr(>|t|)'},       $e->{p}[$j],        "$key: $n Pr(>|t|)");
 	}
-	near($r->{'r.squared'},     $e->{r2},  "$key: r.squared");
-	near($r->{'adj.r.squared'}, $e->{adj}, "$key: adj.r.squared");
+	near($r->{'r_squared'},     $e->{r2},  "$key: r_squared");
+	near($r->{'adj_r_squared'}, $e->{adj}, "$key: adj_r_squared");
 	near($r->{rss},             $e->{rss}, "$key: rss");
 	if (defined $e->{fstat}) {
 		near($r->{fstatistic}[0], $e->{fstat}, "$key: F");
@@ -198,7 +198,7 @@ throws_ok { lm(formula => 'y ~ I(x^-1)', data => { y => [1, 2, 3, 4], x => [1, 0
 # NaN is missing, not infinite: its row is dropped, as na.omit drops it
 {
 	my $r = lm(formula => 'y ~ x', data => { y => [1, 2, 'NaN', 4, 6], x => [1, 2, 3, 4, 5] });
-	is($r->{'df.residual'}, 2, 'NaN in y drops its row');
+	is($r->{'df_residual'}, 2, 'NaN in y drops its row');
 }
 
 # Zero residual degrees of freedom is still refused, with the rank as the test
@@ -224,9 +224,9 @@ for my $c (['exact_inf',     [0, 0, 2, 2],     [undef, $INF],  [undef, 0]],
 		}
 	}
 	is($r->{rss}, 0, "$key: rss is exactly 0");
-	is($r->{'r.squared'}, 1, "$key: R^2 is 1");
+	is($r->{'r_squared'}, 1, "$key: R^2 is 1");
 	is($r->{fstatistic}[0], $INF, "$key: F is Inf");
-	is($r->{'f.pvalue'}, 0, "$key: F's p is 0");
+	is($r->{'f_pvalue'}, 0, "$key: F's p is 0");
 }
 
 # The croaks above run after every allocation is made; none may leak

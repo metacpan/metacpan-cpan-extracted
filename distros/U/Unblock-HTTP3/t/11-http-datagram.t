@@ -10,7 +10,7 @@ use Time::HiRes qw(time);
 use Net::QUIC;
 use Net::QUIC::Driver;
 use Unblock::HTTP3::Connection;
-use Unblock::HTTP3::Request;
+use Uniform::HTTP::Request;
 
 is($Net::QUIC::VERSION, '0.04', 'HTTP Datagrams use released Net::QUIC 0.04');
 
@@ -217,7 +217,7 @@ ok($server_h3->can_receive_http_datagrams,
 is($server_h3->datagram_receive_drops, 0,
     'HTTP Datagram receive drop counter starts at zero');
 
-my $request = Unblock::HTTP3::Request->new(
+my $request = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     protocol  => 'datagram-test',
     scheme    => 'https',
@@ -353,7 +353,7 @@ is($server_tx->next_datagram, undef,
 is($server_h3->datagram_receive_drops, 1,
     'HTTP Datagram queue overflow is observable');
 
-my $unsupported_request = Unblock::HTTP3::Request->new(
+my $unsupported_request = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     protocol  => 'not-datagram-enabled',
     scheme    => 'https',

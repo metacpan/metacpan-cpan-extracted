@@ -33,7 +33,7 @@ my @ev_upper = (1.00000000,1.00000000,1.00000000,0.99915760,0.94558496,0.8752606
 
 my (@t,@s,@lo,@hi);
 for my $i (0 .. $#{$m->{time}}) {
-	next unless $m->{'n.event'}[$i] > 0;
+	next unless $m->{'n_event'}[$i] > 0;
 	push @t,  $m->{time}[$i];  push @s,  $m->{surv}[$i];
 	push @lo, $m->{lower}[$i]; push @hi, $m->{upper}[$i];
 }
@@ -56,7 +56,7 @@ ok($mono, 'KM survival curve is non-increasing');
 my $lr = logrank_test(\@time, \@status, \@grp);
 is_approx($lr->{statistic},  3.39638870, 'log-rank chi-squared');
 is($lr->{parameter}, 1,                  'log-rank df = groups-1');
-is_approx($lr->{'p.value'},    0.06533932, 'log-rank p-value');
+is_approx($lr->{'p_value'},    0.06533932, 'log-rank p-value');
 is_approx($lr->{observed}[0], 7,          'observed events group 0');
 is_approx($lr->{expected}[0], 10.689336, 'expected events group 0');
 is_approx($lr->{expected}[1],  7.310664, 'expected events group 1');
@@ -66,16 +66,16 @@ is_approx($lr->{expected}[1],  7.310664, 'expected events group 1');
 my @x = map { $_ eq 'Maintained' ? 1 : 0 } @grp;
 my $cx = coxph(\@time, \@status, \@x, names => ['maintained']);
 is_approx($cx->{coef}[0],      -0.91553258, 'Cox coefficient');
-is_approx($cx->{'exp.coef'}[0],   0.40030338, 'Cox hazard ratio');
+is_approx($cx->{'exp_coef'}[0],   0.40030338, 'Cox hazard ratio');
 is_approx($cx->{se}[0],         0.51193428, 'Cox standard error');
 is_approx($cx->{z}[0],         -1.78837913, 'Cox Wald z');
-is_approx($cx->{'p.value'}[0],    0.07371486, 'Cox Wald p-value');
-is_approx($cx->{'conf.int'}[0][0],0.14676754, 'Cox HR CI lower');
-is_approx($cx->{'conf.int'}[0][1],1.09181360, 'Cox HR CI upper');
+is_approx($cx->{'p_value'}[0],    0.07371486, 'Cox Wald p-value');
+is_approx($cx->{'conf_int'}[0][0],0.14676754, 'Cox HR CI lower');
+is_approx($cx->{'conf_int'}[0][1],1.09181360, 'Cox HR CI upper');
 is_approx($cx->{loglik},      -41.032616,   'Cox log-likelihood');
-is_approx($cx->{'loglik.null'}, -42.724839,   'Cox null log-likelihood');
-is_approx($cx->{'lr.stat'},       3.384447,   'Cox likelihood-ratio statistic');
-is_approx($cx->{'lr.p.value'},    0.06581424, 'Cox LR p-value');
+is_approx($cx->{'loglik_null'}, -42.724839,   'Cox null log-likelihood');
+is_approx($cx->{'lr_stat'},       3.384447,   'Cox likelihood-ratio statistic');
+is_approx($cx->{'lr_p_value'},    0.06581424, 'Cox LR p-value');
 is($cx->{names}[0], 'maintained', 'Cox covariate name passthrough');
 ok($cx->{converged}, 'Cox model converged');
 is($cx->{nevent}, 18, 'Cox event count');
@@ -98,8 +98,8 @@ unless ($INC{'Devel/Cover.pm'}) {
 # ---------------------------------------------------------------------------
 # The curve reaching zero.
 #
-# Greenwood's next variance term is d / (n.risk * (n.risk - d)), and the last
-# event takes every remaining subject, so n.risk == d and the variance of S(t)
+# Greenwood's next variance term is d / (n_risk * (n_risk - d)), and the last
+# event takes every remaining subject, so n_risk == d and the variance of S(t)
 # is not defined from that point on.  R's survfit() reports std.err as Inf
 # there -- s$std.err * s$surv, the standard error of S itself, is NaN -- and
 # both confidence limits as NA.  Through 0.311 all three came back 0, which is
@@ -119,19 +119,19 @@ unless ($INC{'Devel/Cover.pm'}) {
 	is($s->{surv}[12], 0, 'the curve reaches exactly zero at the last time');
 
 	# the row before: still defined, and equal to R's
-	is_approx($s->{'std.err'}[11], 0.10452809445658001, 'std.err at t = 12');
+	is_approx($s->{'std_err'}[11], 0.10452809445658001, 'std_err at t = 12');
 	is_approx($s->{lower}[11],     0.023139826547207372, 'lower at t = 12');
 	is_approx($s->{upper}[11],     0.65135682814734119,  'upper at t = 12');
 
 	# the row at zero: undef, where R gives NaN for the error and NA for both
 	# limits.  Perl has one spelling for "no value", so all three are undef.
-	ok(!defined $s->{'std.err'}[12], 'std.err is undef once S(t) is 0, as R gives NaN');
+	ok(!defined $s->{'std_err'}[12], 'std_err is undef once S(t) is 0, as R gives NaN');
 	ok(!defined $s->{lower}[12],     'lower is undef there, as R gives NA');
 	ok(!defined $s->{upper}[12],     'upper is undef there, as R gives NA');
 
 	# the estimate itself is still reported, and so is everything counting
-	is($s->{'n.risk'}[12],  1, 'n.risk is still reported at that time');
-	is($s->{'n.event'}[12], 1, 'and n.event');
+	is($s->{'n_risk'}[12],  1, 'n_risk is still reported at that time');
+	is($s->{'n_event'}[12], 1, 'and n_event');
 	is($s->{events}, 14, 'total events unaffected: sum(status)');
 }
 

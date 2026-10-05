@@ -189,10 +189,10 @@ no_leaks_ok {
 	like $b[2], qr/^1\b/, 'second data row is labelled 1';
 	like $b[3], qr/^2\b/, 'third data row is labelled 2';
 
-	# an explicit integer row.names still overrides the auto 0-based label
+	# an explicit integer row_names still overrides the auto 0-based label
 	my $lab = [ [10, 'x'], [20, 'y'] ];
-	my @c = _body(view($lab, 'row.names' => 0, return_only => 1, color => 0));
-	like $c[1], qr/^10\b/, 'row.names => 0 uses column 0 as the label, not the index';
+	my @c = _body(view($lab, 'row_names' => 0, return_only => 1, color => 0));
+	like $c[1], qr/^10\b/, 'row_names => 0 uses column 0 as the label, not the index';
 	like $c[2], qr/^20\b/, 'second explicit label taken from the named column';
 
 	no_leaks_ok {

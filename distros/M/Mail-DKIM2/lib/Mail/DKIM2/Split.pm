@@ -2,7 +2,7 @@ package Mail::DKIM2::Split;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 use Email::MIME;
 use Exporter 'import';

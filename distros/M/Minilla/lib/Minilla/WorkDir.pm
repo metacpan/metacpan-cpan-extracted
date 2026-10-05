@@ -12,8 +12,10 @@ use File::Basename qw(dirname);
 use File::Path qw(mkpath);
 use File::Copy qw(copy);
 use Config;
+use CPAN::Meta;
 
 use Minilla::Logger;
+use Minilla::Changes;
 use Minilla::Util qw(randstr cmd cmd_perl slurp slurp_raw spew spew_raw pod_escape);
 use Minilla::FileGatherer;
 use Minilla::ReleaseTest;
@@ -44,6 +46,11 @@ has [qw(prereq_specs)] => (
 has 'cleanup' => (
     is => 'ro',
     default => sub { $Minilla::DEBUG ? 0 : 1 },
+);
+
+has 'skip_prepare' => (
+    is => 'ro',
+    default => sub { 0 },
 );
 
 has changes_time => (
@@ -129,13 +136,17 @@ sub build {
 
     # Generate meta file
     {
-        my $meta = $self->project->cpan_meta();
+        my $meta = $self->skip_prepare
+            ? CPAN::Meta->load_file('META.json', { lazy_validation => 0 })
+            : $self->project->cpan_meta();
         $meta->save('META.yml', {
-            version => 1.4,
+            version => '1.4',
         });
-        $meta->save('META.json', {
-            version => 2.0,
-        });
+        unless ($self->skip_prepare) {
+            $meta->save('META.json', {
+                version => '2',
+            });
+        }
     }
 
     {
@@ -143,8 +154,8 @@ sub build {
         spew('MANIFEST', join("\n", @{$self->manifest_files}));
     }
 
-    $self->project->regenerate_files();
-    $self->_rewrite_changes();
+    $self->project->regenerate_files() unless $self->skip_prepare;
+    $self->_rewrite_changes() if $self->project->manage_changes;
     $self->_rewrite_pod();
 
     unless ($ENV{MINILLA_DISABLE_WRITE_RELEASE_TEST}) { # DO NOT USE THIS ENVIRONMENT VARIABLE.
@@ -166,9 +177,17 @@ sub _rewrite_changes {
     my $self = shift;
 
     my $orig = slurp_raw('Changes');
-    $orig =~ s!\{\{\$NEXT\}\}!
-        $self->project->version . ' ' . $self->changes_time->strftime('%Y-%m-%dT%H:%M:%SZ')
-    !e;
+    my $version = $self->project->version;
+    if (Minilla::Changes::is_prepared($orig, $version)) {
+        $orig =~ s!
+            ^\{\{\$NEXT\}\}\h*\R(?:\h*\R)*
+            (?=\Q$version\E(?:\h|\R|\z))
+        !!mx;
+    } else {
+        $orig =~ s!\{\{\$NEXT\}\}!
+            $version . ' ' . $self->changes_time->strftime('%Y-%m-%dT%H:%M:%SZ')
+        !e;
+    }
     spew_raw('Changes', $orig);
 }
 

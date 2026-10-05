@@ -50,20 +50,20 @@ for my $c (@$cases) {
 
 	is_close($r->{bedroc}, $c->{bedroc}, "$tag: bedroc");
 	is($r->{n},        $c->{n},        "$tag: n");
-	is($r->{'n.active'}, $c->{n_active}, "$tag: n_active");
+	is($r->{'n_active'}, $c->{n_active}, "$tag: n_active");
 
 	if (exists $c->{rie}) {          # binary cases also pin the RIE internals
 		is_close($r->{rie},     $c->{rie},     "$tag: rie");
-		is_close($r->{'rie.min'}, $c->{rie_min}, "$tag: rie_min");
-		is_close($r->{'rie.max'}, $c->{rie_max}, "$tag: rie_max");
+		is_close($r->{'rie_min'}, $c->{rie_min}, "$tag: rie_min");
+		is_close($r->{'rie_max'}, $c->{rie_max}, "$tag: rie_max");
 		is_close($r->{ra},      $c->{ra},      "$tag: ra");
 		# the Python (RIE - RIE_min)/(RIE_max - RIE_min) normalisation must
 		# equal the XS's RIE * factor1 + factor2 form
-		is_close(($r->{rie} - $r->{'rie.min'}) / ($r->{'rie.max'} - $r->{'rie.min'}),
+		is_close(($r->{rie} - $r->{'rie_min'}) / ($r->{'rie_max'} - $r->{'rie_min'}),
 		         $c->{bedroc}, "$tag: (rie-min)/(max-min) == python bedroc");
 	}
 	if (exists $c->{ef}) {           # top => enrichment vs ef_at_frac()
-		is_close($r->{enrichment}{'enrichment.factor'}, $c->{ef}, "$tag: EF top=$opt{top}");
+		is_close($r->{enrichment}{'enrichment_factor'}, $c->{ef}, "$tag: EF top=$opt{top}");
 	}
 	$c->{python_fn} eq '_bedroc' ? $n_reg++ : $n_bin++;
 }

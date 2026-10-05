@@ -34,7 +34,7 @@ use Stats::LikeR qw(pf pt qf t_test);
 #    LikeR.xs, both from re-forming 1-x by subtraction inside incbeta() when
 #    the caller already had the complement exactly:
 #
-#      pf(1e-12, 1, 1e6, lower.tail => 0)  returned 1        (truth 0.99999920211563864)
+#      pf(1e-12, 1, 1e6, lower_tail => 0)  returned 1        (truth 0.99999920211563864)
 #      pt(1e-6, 1e6)                       returned 0.5      (truth 0.50000039894218068)
 #
 #    Both are now within 1 ulp.  The named cases below would catch either
@@ -130,11 +130,11 @@ for my $key (sort keys %$M) {
 	my %got;
 	if ($kind eq 'pf') {
 		$got{lower} = pf($arg, $df1, $df2);
-		$got{upper} = pf($arg, $df1, $df2, 'lower.tail' => 0);
+		$got{upper} = pf($arg, $df1, $df2, 'lower_tail' => 0);
 	}
 	elsif ($kind eq 'pt') {
 		$got{lower} = pt($arg, $df1);
-		$got{upper} = pt($arg, $df1, 'lower.tail' => 0);
+		$got{upper} = pt($arg, $df1, 'lower_tail' => 0);
 	}
 	else {
 		$got{lower} = qf($arg, $df1, $df2);
@@ -169,10 +169,10 @@ for my $which (sort keys %TOL) {
 {
 	# mpmath: 1 - pf(1e-12, 1, 1e6) = 0.999999202115638638...  The old code
 	# returned exactly 1, because incbeta() formed 1.0 - x with 1-x = 1e-18.
-	my $up = pf(1e-12, 1, 1e6, 'lower.tail' => 0);
+	my $up = pf(1e-12, 1, 1e6, 'lower_tail' => 0);
 	ok($up < 1, 'pf upper tail near 1 is not flattened to exactly 1');
 	cmp_ok(abs($up - 0.99999920211563864) / 0.99999920211563864, '<', 1e-12,
-		'pf(1e-12, 1, 1e6, lower.tail => 0) matches mpmath');
+		'pf(1e-12, 1, 1e6, lower_tail => 0) matches mpmath');
 
 	# The two tails must also still add to 1 to within rounding.  Before the
 	# fix they summed to 1 + 7.98e-7 here, which is what first showed the bug.
@@ -202,7 +202,7 @@ for my $which (sort keys %TOL) {
 	my @y = (0) x 2001;
 	$y[0] = 1e-6;
 	my $r = t_test(\@x, \@y, var_equal => 1);
-	ok($r->{'p.value'} < 1,
+	ok($r->{'p_value'} < 1,
 		'a t_test p-value just below 1 is not rounded up to exactly 1');
 }
 

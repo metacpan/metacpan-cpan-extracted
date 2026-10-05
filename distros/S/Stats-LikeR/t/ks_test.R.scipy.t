@@ -431,7 +431,7 @@ sub run_row {
 	my ($res, $warns) = call_ks($x, $y, alternative => $alt, exact => $exact);
 	d_ok($res->{statistic}, $d_want, $label);
 	# 'E1' is the 1 - K2x() path; see $TOL_P_ABS.
-	p_ok($res->{'p.value'}, $p_want, $p_tol, $label,
+	p_ok($res->{'p_value'}, $p_want, $p_tol, $label,
 		$kind eq 'E1' ? $TOL_P_ABS : 0);
 	is($res->{method}, $METHOD{$kind}, "$label: method");
 	is($res->{alternative}, $alt, "$label: alternative echoed");
@@ -645,11 +645,11 @@ run_row($_, $TOL_MP) for @MP_TWO;
 {
 	my ($r) = call_ks(\@HW_X, \@HW_Y);
 	d_ok($r->{statistic}, 0.6, 'reg-tests-1a: PR#1004 exact D');
-	p_ok($r->{'p.value'}, 15 / 286, 1e-15, 'reg-tests-1a: PR#1004 exact p = 15/286');
+	p_ok($r->{'p_value'}, 15 / 286, 1e-15, 'reg-tests-1a: PR#1004 exact p = 15/286');
 	is($r->{method}, $METHOD{E2}, 'reg-tests-1a: auto-gate chose exact');
 
 	my ($k5) = call_ks(\@KS5_X, \@KS5_Y);
-	p_ok($k5->{'p.value'}, 20 / 21, 1e-15, 'reg-tests-1b: ks5 p = 20/21');
+	p_ok($k5->{'p_value'}, 20 / 21, 1e-15, 'reg-tests-1b: ks5 p = 20/21');
 }
 
 # ?ks.test's and ?qqplot's printed output, to the digits R prints.  The Ozone
@@ -660,7 +660,7 @@ run_row($_, $TOL_MP) for @MP_TWO;
 	is(sprintf('%.5f', $oz->{statistic}), '0.53846', 'ks.test.Rd: Ozone D = 0.53846');
 
 	my ($qq) = call_ks(\@QQ_X, \@QQ_Y);
-	is(sprintf('%.7f', $qq->{'p.value'}), '0.1123852', 'qqplot.Rd: p = 0.1123852');
+	is(sprintf('%.7f', $qq->{'p_value'}), '0.1123852', 'qqplot.Rd: p = 0.1123852');
 }
 
 # Corpus 2: SciPy's own hardcoded expectations, reproduced verbatim.
@@ -726,7 +726,7 @@ for my $row (@SCIPY_TWO) {
 	my ($label, $x, $y, $alt, $d_want, $p_want, $tol) = @$row;
 	my ($r, $warns) = call_ks($x, $y, alternative => $alt, exact => 1);
 	d_ok($r->{statistic}, $d_want, $label);
-	p_ok($r->{'p.value'}, $p_want, $tol, $label);
+	p_ok($r->{'p_value'}, $p_want, $tol, $label);
 	is(scalar(@$warns), 0, "$label: no warnings") or diag("warnings: @$warns");
 }
 
@@ -751,7 +751,7 @@ for my $row (@SCIPY_ONE) {
 	# exact => 1 is the 1 - K2x() cancellation path; see $TOL_P_ABS.  None of
 	# these three actually need the floor on a double build (worst is 6.5e-15
 	# relative), but a wider NV drifts from SciPy absolutely, not relatively.
-	p_ok($r->{'p.value'}, $p_want, $TOL_SCIPY, $label,
+	p_ok($r->{'p_value'}, $p_want, $TOL_SCIPY, $label,
 		$exact ? $TOL_P_ABS : 0);
 	is(scalar(@$warns), 0, "$label: no warnings") or diag("warnings: @$warns");
 }
@@ -767,8 +767,8 @@ for my $row (@SCIPY_ONE) {
 	my ($lo) = call_ks(\@a, \@b99);
 	is($hi->{method}, $METHOD{A2}, 'auto-gate: n.x*n.y = 10000 is asymptotic');
 	is($lo->{method}, $METHOD{E2}, 'auto-gate: n.x*n.y =  9900 is exact');
-	p_ok($hi->{'p.value'}, 1, $TOL_P, 'auto-gate 10000');   # R: 1
-	p_ok($lo->{'p.value'}, 1, $TOL_P, 'auto-gate 9900');    # R: 1
+	p_ok($hi->{'p_value'}, 1, $TOL_P, 'auto-gate 10000');   # R: 1
+	p_ok($lo->{'p_value'}, 1, $TOL_P, 'auto-gate 9900');    # R: 1
 
 	# One-sample: R's auto-exact values for these two, generated alongside the
 	# corpus.  The statistic is the same; only the p-value path changes.
@@ -787,18 +787,18 @@ for my $row (@SCIPY_ONE) {
 	# width.  Asserted against R's value on the absolute floor, and separately
 	# bounded, because a *relative* assertion here would be a lie.  See
 	# $TOL_P_ABS.
-	p_ok($e1->{'p.value'}, 1.9984014443252818e-15, $TOL_P, 'auto-gate n=99',
+	p_ok($e1->{'p_value'}, 1.9984014443252818e-15, $TOL_P, 'auto-gate n=99',
 		$TOL_P_ABS);
-	cmp_ok($e1->{'p.value'}, '<', 1e-13,
+	cmp_ok($e1->{'p_value'}, '<', 1e-13,
 		'auto-gate n=99: 1 - K2x() is only absolutely accurate, but still tiny');
 	# n=100 uses K2l()'s direct upper-tail series, so this one really is
 	# relatively accurate.
-	p_ok($a1->{'p.value'}, 1.7314599783659416e-22, $TOL_P, 'auto-gate n=100');
+	p_ok($a1->{'p_value'}, 1.7314599783659416e-22, $TOL_P, 'auto-gate n=100');
 
 	# exact => undef is documented to mean "auto", i.e. the same as omitting it.
 	my ($u) = call_ks(\@a, \@b99, exact => undef);
 	is($u->{method}, $METHOD{E2}, 'exact => undef means auto');
-	p_ok($u->{'p.value'}, $lo->{'p.value'}, 0, 'exact => undef matches auto exactly');
+	p_ok($u->{'p_value'}, $lo->{'p_value'}, 0, 'exact => undef matches auto exactly');
 }
 
 # A forced exact run past KS_EXACT_MAX_PRODUCT (1e7) must warn and degrade to
@@ -828,30 +828,30 @@ for my $row (@SCIPY_ONE) {
 	# R: ks.test(c(1,2,3), c(5,6,7,8)) -> D = 1, p = 0.057142857142857141
 	my ($r) = call_ks([1, 2, $NAN, 3], [5, 6, 7, 8]);
 	d_ok($r->{statistic}, 1, 'NaN dropped from x (two-sample)');
-	p_ok($r->{'p.value'}, 0.057142857142857141, $TOL_P, 'NaN dropped from x (two-sample)');
+	p_ok($r->{'p_value'}, 0.057142857142857141, $TOL_P, 'NaN dropped from x (two-sample)');
 
 	my ($r2) = call_ks([1, 2, 3], [5, $NAN, 6, 7, 8]);
 	d_ok($r2->{statistic}, 1, 'NaN dropped from y (two-sample)');
-	p_ok($r2->{'p.value'}, 0.057142857142857141, $TOL_P, 'NaN dropped from y (two-sample)');
+	p_ok($r2->{'p_value'}, 0.057142857142857141, $TOL_P, 'NaN dropped from y (two-sample)');
 
 	# R: ks.test(c(1,2,3), "pnorm") -> D = 0.84134474606854293,
 	#                                  p = 0.0079871781486594573
 	my ($r3) = call_ks([1, 2, $NAN, 3], 'pnorm');
 	d_ok($r3->{statistic}, 0.84134474606854293, 'NaN dropped from x (one-sample)');
-	p_ok($r3->{'p.value'}, 0.0079871781486594573, $TOL_P, 'NaN dropped from x (one-sample)');
+	p_ok($r3->{'p_value'}, 0.0079871781486594573, $TOL_P, 'NaN dropped from x (one-sample)');
 
 	# undef and non-numeric strings are dropped the same way; this is the same
 	# 3-vs-4 comparison as above, reached from a 5-element x.
 	my ($r4) = call_ks([1, undef, 2, 'not a number', 3], [5, 6, 7, 8]);
 	d_ok($r4->{statistic}, 1, 'undef and non-numeric dropped');
-	p_ok($r4->{'p.value'}, 0.057142857142857141, $TOL_P, 'undef and non-numeric dropped');
+	p_ok($r4->{'p_value'}, 0.057142857142857141, $TOL_P, 'undef and non-numeric dropped');
 
 	# Strings that *do* look like numbers are kept, and take the
 	# looks_like_number() branch rather than the SvNIOK shortcut.  Same
 	# 4-vs-4 comparison as ks_test([1,2,3,4],[5,6,7,8]) in R.
 	my ($r5) = call_ks(['1', ' 2 ', '3e0', '4.0'], ['5', '6', '7', '8']);
 	d_ok($r5->{statistic}, 1, 'numeric strings are parsed, not dropped');
-	p_ok($r5->{'p.value'}, 0.028571428571428571, $TOL_P,
+	p_ok($r5->{'p_value'}, 0.028571428571428571, $TOL_P,
 		'numeric strings are parsed, not dropped');
 
 	# R also warns "p-value will be approximate in the presence of ties" when
@@ -877,7 +877,7 @@ for my $row (@SCIPY_ONE) {
 		'call form: explicit default alternative agrees with positional');
 	# R: ks.test(c(1,2,3,4), c(5,6,7,8)) -> D = 1, p = 0.028571428571428571
 	d_ok($pos->{statistic}, 1, 'fully separated 4 vs 4');
-	p_ok($pos->{'p.value'}, 0.028571428571428571, $TOL_P, 'fully separated 4 vs 4');
+	p_ok($pos->{'p_value'}, 0.028571428571428571, $TOL_P, 'fully separated 4 vs 4');
 
 	# One-sample, both ways.
 	my ($p1) = call_ks([-1, 0, 1], 'pnorm');
@@ -885,17 +885,17 @@ for my $row (@SCIPY_ONE) {
 		'call form: named y => pnorm agrees with positional');
 	# R: ks.test(c(-1,0,1), "pnorm") -> D = 0.1746780794018763, p = 0.99997531867011236
 	d_ok($p1->{statistic}, 0.1746780794018763, 'one-sample pnorm');
-	p_ok($p1->{'p.value'}, 0.99997531867011236, $TOL_P, 'one-sample pnorm');
+	p_ok($p1->{'p_value'}, 0.99997531867011236, $TOL_P, 'one-sample pnorm');
 
 	# The trailing-string heuristic: a bare 'pnorm' is only taken as y when
 	# doing so leaves an even number of named arguments behind it, so
 	# ks_test(\@x, 'pnorm', exact => 0) is one-sample, not a parse error.
 	my ($p2) = call_ks([-1, 0, 1], 'pnorm', exact => 0);
 	is($p2->{method}, $METHOD{A1}, 'one-sample with exact => 0 parses');
-	p_ok($p2->{'p.value'}, 0.99998838403246959, $TOL_P, 'one-sample asymptotic pnorm');
+	p_ok($p2->{'p_value'}, 0.99998838403246959, $TOL_P, 'one-sample asymptotic pnorm');
 
 	# All four return keys are present and nothing else is.
-	is_deeply([sort keys %$pos], [qw(alternative method p.value statistic)],
+	is_deeply([sort keys %$pos], [qw(alternative method p_value statistic)],
 		'return hash has exactly the four documented keys');
 }
 
@@ -1043,7 +1043,7 @@ for my $row (@DIVERGE) {
 	my ($r, $warns) = call_ks($x, $y, alternative => $alt, exact => $exact);
 
 	d_ok($r->{statistic}, $d_want, "diverge $label");
-	p_ok($r->{'p.value'}, $p_ours, $TOL_P, "diverge $label (ks_test's own value)");
+	p_ok($r->{'p_value'}, $p_ours, $TOL_P, "diverge $label (ks_test's own value)");
 
 	# The warning is the contract: it is how a caller learns the p-value is
 	# not the exact one it asked for.
@@ -1061,17 +1061,17 @@ for my $row (@DIVERGE) {
 	# distribution gives p = 1 -- and those are asserted as agreeing.
 	if (!defined $p_ref) {
 		# R returned NaN; there is nothing to compare to, only to record.
-		ok($r->{'p.value'} == $r->{'p.value'},
+		ok($r->{'p_value'} == $r->{'p_value'},
 			"diverge $label: $ref returns NaN, ks_test returns a number");
 	}
 	elsif (abs($p_ref - $p_ours) <= $TOL_P * abs($p_ref)) {
-		p_ok($r->{'p.value'}, $p_ref, $TOL_P,
+		p_ok($r->{'p_value'}, $p_ref, $TOL_P,
 			"diverge $label: agrees with $ref at this D anyway");
 	}
 	else {
-		ok(abs($r->{'p.value'} - $p_ref) > $TOL_P * abs($p_ref),
+		ok(abs($r->{'p_value'} - $p_ref) > $TOL_P * abs($p_ref),
 			sprintf('diverge %s: still differs from %s (%.17g vs %.17g)',
-				$label, $ref, $r->{'p.value'}, $p_ref));
+				$label, $ref, $r->{'p_value'}, $p_ref));
 	}
 }
 
@@ -1093,15 +1093,15 @@ for my $row (@DIVERGE) {
 	# Another 1 - K2x() value, so it carries the absolute floor: K2x returns
 	# 0.999968 here and the subtraction leaves only ~11 significant digits, a
 	# 3e-12 relative error that a wider NV build would not make.
-	p_ok($auto->{'p.value'}, 3.1897507389189172e-05, $TOL_P,
+	p_ok($auto->{'p_value'}, 3.1897507389189172e-05, $TOL_P,
 		'diverge 1-sample tied auto-gate: matches R exact=TRUE', $TOL_P_ABS);
-	p_ok($forced->{'p.value'}, $auto->{'p.value'}, 0,
+	p_ok($forced->{'p_value'}, $auto->{'p_value'}, 0,
 		'diverge 1-sample tied auto-gate: auto == forced exact');
 	# R: ks.test(c(1,1,2,2,3,3), "pnorm")               -> 0.00040924989417562329
 	# which is R's exact=FALSE value, i.e. what ks_test() gives only on request.
-	p_ok($asymp->{'p.value'}, 0.00040924989417562329, $TOL_P,
+	p_ok($asymp->{'p_value'}, 0.00040924989417562329, $TOL_P,
 		"diverge 1-sample tied auto-gate: R's auto value is ks_test's exact => 0");
-	isnt(sprintf('%.17g', $auto->{'p.value'}), sprintf('%.17g', $asymp->{'p.value'}),
+	isnt(sprintf('%.17g', $auto->{'p_value'}), sprintf('%.17g', $asymp->{'p_value'}),
 		'diverge 1-sample tied auto-gate: the two branches really differ');
 }
 
@@ -1116,9 +1116,9 @@ for my $row (@DIVERGE) {
 	# mpmath at mp.dps = 80: exp(-2*n*q^2) = 1.3703741090800991e-24.  ks_test lands
 	# 9e-15 relative away, which is nv_exp() at an argument of -54.9, not the
 	# formula.
-	p_ok($r->{'p.value'}, 1.3703741090800991e-24, 1e-13,
+	p_ok($r->{'p_value'}, 1.3703741090800991e-24, 1e-13,
 		'diverge R one-sided underflow: ks_test keeps the value');
-	cmp_ok($r->{'p.value'}, '>', 0,
+	cmp_ok($r->{'p_value'}, '>', 0,
 		'diverge R one-sided underflow: R returns exactly 0 here, ks_test does not');
 }
 
@@ -1131,9 +1131,9 @@ for my $row (@DIVERGE) {
 {
 	my ($r) = call_ks(\@LG_X, \@LG_Y, alternative => 'two.sided', exact => 1);
 	d_ok($r->{statistic}, 55275.0 / 110000, 'diverge SciPy exact two-sided floor');
-	p_ok($r->{'p.value'}, 6.2634656622608498e-26, $TOL_P,
+	p_ok($r->{'p_value'}, 6.2634656622608498e-26, $TOL_P,
 		'diverge SciPy exact two-sided floor: ks_test matches R');
-	cmp_ok($r->{'p.value'}, '<', 1e-20,
+	cmp_ok($r->{'p_value'}, '<', 1e-20,
 		'diverge SciPy exact two-sided floor: SciPy stops at 4.2e-15');
 }
 
@@ -1172,12 +1172,12 @@ for my $row (@SCIPY_TIED) {
 	# Where the true D is 0 every method agrees on p = 1; elsewhere all three
 	# differ, and that is the point being recorded.
 	if ($d_want == 0) {
-		p_ok($r->{'p.value'}, 1, $TOL_P, "diverge $label: D = 0 so p = 1 everywhere");
+		p_ok($r->{'p_value'}, 1, $TOL_P, "diverge $label: D = 0 so p = 1 everywhere");
 	}
 	else {
-		ok($r->{'p.value'} != $p_scipy && $r->{'p.value'} != $p_r,
+		ok($r->{'p_value'} != $p_scipy && $r->{'p_value'} != $p_r,
 			sprintf('diverge %s: ks_test %.17g, SciPy %.17g, R %.17g',
-				$label, $r->{'p.value'}, $p_scipy, $p_r));
+				$label, $r->{'p_value'}, $p_scipy, $p_r));
 	}
 }
 
@@ -1189,20 +1189,20 @@ for my $row (@SCIPY_TIED) {
 {
 	my ($st) = call_ks(\@ST_X, \@ST_Y);
 	d_ok($st->{statistic}, 3 / 7, 'ks.test.Rd: Schroeer & Trenkler D = 3/7');
-	ok(abs($st->{'p.value'} - 8 / 33) > 1e-6,
+	ok(abs($st->{'p_value'} - 8 / 33) > 1e-6,
 		sprintf('ks.test.Rd: exact p = 8/33 not yet reachable (got %.17g)',
-			$st->{'p.value'}));
+			$st->{'p_value'}));
 
 	my ($sw) = call_ks(\@SW_F, \@SW_M);
 	d_ok($sw->{statistic}, 0.225, 'qqplot.Rd: Switzer knee-angle D = 0.225');
-	ok(abs($sw->{'p.value'} - 0.21198990394624936) > 1e-6,
+	ok(abs($sw->{'p_value'} - 0.21198990394624936) > 1e-6,
 		sprintf('qqplot.Rd: exact p = 0.212 not yet reachable (got %.17g)',
-			$sw->{'p.value'}));
+			$sw->{'p_value'}));
 
 	# ?ks.test prints "D = 0.53846, p-value = 0.0006919" for the Ozone
 	# columns; the statistic is asserted above, the p-value is not reachable.
 	my ($oz) = call_ks(\@OZ5, \@OZ8);
-	is(sprintf('%.7f', $oz->{'p.value'}), '0.0010644',
+	is(sprintf('%.7f', $oz->{'p_value'}), '0.0010644',
 		'ks.test.Rd: Ozone p-value is the asymptotic 0.0010644, not R\'s 0.0006919');
 }
 

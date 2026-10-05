@@ -67,10 +67,10 @@ EOF
 		'strict default croaks on R col.names=TRUE output';
 }
 
-# 2) auto.row.names => 1 : leading field becomes row_name, rest align
+# 2) auto_row_names => 1 : leading field becomes row_name, rest align
 {
 	my $f	= write_tmp_tsv($r_default);
-	my $aoh = read_table($f, 'auto.row.names' => 1);
+	my $aoh = read_table($f, 'auto_row_names' => 1);
 	is(scalar @$aoh, 3, 'auto: all 3 rows read');
 	is($aoh->[0]{row_name}, 'Mazda RX4', 'auto: row_name holds the model name');
 	is($aoh->[0]{mpg}, 21, 'auto: mpg aligned to its column');
@@ -78,10 +78,10 @@ EOF
 	is($aoh->[0]{disp}, 160, 'auto: final column aligned');
 }
 
-# 3) auto.row.names => 'model' : custom name for the synthesized column
+# 3) auto_row_names => 'model' : custom name for the synthesized column
 {
 	my $f	= write_tmp_tsv($r_default);
-	my $aoh = read_table($f, 'auto.row.names' => 'model');
+	my $aoh = read_table($f, 'auto_row_names' => 'model');
 	is($aoh->[2]{model}, 'Valiant', 'auto: custom column name used');
 	ok(!exists $aoh->[2]{row_name}, 'auto: default name absent when custom given');
 }
@@ -89,7 +89,7 @@ EOF
 # 4) auto + hoh : key defaults to the synthesized first column (the model)
 {
 	my $f	= write_tmp_tsv($r_default);
-	my $hoh = read_table($f, 'output.type' => 'hoh', 'auto.row.names' => 1);
+	my $hoh = read_table($f, 'output_type' => 'hoh', 'auto_row_names' => 1);
 	is($hoh->{'Datsun 710'}{cyl}, 4, 'auto + hoh: keyed by model name');
 	ok(!exists $hoh->{'Datsun 710'}{row_name}, 'auto + hoh: key not duplicated as a field');
 }
@@ -97,7 +97,7 @@ EOF
 # 5) auto + hoa : synthesized column present and columns aligned
 {
 	my $f	= write_tmp_tsv($r_default);
-	my $hoa = read_table($f, 'output.type' => 'hoa', 'auto.row.names' => 1);
+	my $hoa = read_table($f, 'output_type' => 'hoa', 'auto_row_names' => 1);
 	is_deeply($hoa->{row_name}, ['Mazda RX4', 'Datsun 710', 'Valiant'],
 		'auto + hoa: row_name column collected');
 	is_deeply($hoa->{cyl}, [6, 4, 6], 'auto + hoa: data column aligned');
@@ -106,7 +106,7 @@ EOF
 # 6) flag ON but the file is already aligned: no synthesis, reads normally
 {
 	my $f = write_tmp_tsv("a\tb\n1\t2\n3\t4\n");
-	my $aoh = read_table($f, 'auto.row.names' => 1);
+	my $aoh = read_table($f, 'auto_row_names' => 1);
 	is_deeply($aoh, [ { a => 1, b => 2 }, { a => 3, b => 4 } ],
 		'auto: aligned file untouched (only a one-field-short header triggers)');
 }
@@ -122,7 +122,7 @@ EOF
 # 8) a genuinely ragged row (two extra fields) still croaks even with the flag
 {
 	my $f = write_tmp_tsv("a\tb\n1\t2\t3\t4\n");
-	throws_ok { read_table($f, 'auto.row.names' => 1) }
+	throws_ok { read_table($f, 'auto_row_names' => 1) }
 		qr/Alignment error/,
 		'auto: a 2-extra-field row still croaks (only +1 is special)';
 }

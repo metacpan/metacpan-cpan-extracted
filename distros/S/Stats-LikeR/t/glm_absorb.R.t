@@ -832,7 +832,7 @@ for my $key (sort keys %EXPECT) {
 		}
 		close_to($f->{deviance}, $e->{deviance}, $tol, $class, "$key ($how): deviance");
 		close_to($f->{loglik}, $e->{loglik}, $tol, $class, "$key ($how): loglik");
-		is($f->{'df.residual'}, $e->{df}, "$key ($how): df.residual counts the absorbed levels");
+		is($f->{'df_residual'}, $e->{df}, "$key ($how): df_residual counts the absorbed levels");
 		ok(!exists $f->{coefficients}{Intercept}, "$key ($how): no intercept beside a factor") if @fe;
 		ok($f->{theta} > 1e5, "$key ($how): theta is enormous, as glm.nb's is") if $fam eq 'negbin';
 	}
@@ -869,13 +869,13 @@ close_to(glm(formula => 'y ~ x1 | species + fe_2', data => $base)->{coefficients
 		push @{ $B{ $c[$_] } }, $v[$_] + 0 for 0 .. $#c;
 	}
 	my $g = glm(formula => 'y ~ x1 | id + period', data => \%B, family => 'poisson');
-	is($g->{'fe.removed'}, $DID{removed}, 'base_did: the ten all-zero ids are removed');
+	is($g->{'fe_removed'}, $DID{removed}, 'base_did: the ten all-zero ids are removed');
 	is($g->{nobs}, $DID{nobs}, 'base_did: nobs, as fepois(fixef.rm = "infinite")');
 	close_to($g->{coefficients}{x1}, $DID{fixest}, 1e-8, 'fixest', 'base_did: x1 against fepois');
 	close_to($g->{coefficients}{x1}, $DID{glm}, 1e-9, 'glm', 'base_did: x1 against glm on the kept rows');
 	close_to($g->{summary}{x1}{'Std. Error'}, $DID{glm_se}, 1e-9, 'glm', 'base_did: se against glm');
 	close_to($g->{deviance}, $DID{deviance}, 1e-9, 'glm', 'base_did: deviance against glm');
-	is($g->{'df.residual'}, $DID{df}, 'base_did: df.residual, two factors less their shared level');
+	is($g->{'df_residual'}, $DID{df}, 'base_did: df_residual, two factors less their shared level');
 	is_deeply($g->{absorb}, { id => 98, period => 10 }, 'absorb records the levels kept per factor');
 }
 
@@ -900,8 +900,8 @@ close_to(glm(formula => 'y ~ x1 | species + fe_2', data => $base)->{coefficients
 	           family => 'poisson') };
 	like($@, qr/some positive counts|every group of the absorbed factor/, 'all-zero outcome croaks');
 	my $p = glm(formula => 'y ~ x | g', data => \%z, family => 'poisson');
-	is($p->{'fe.removed'}, 2, 'an all-zero group is removed before fitting');
-	ok(!exists $p->{'fitted.values'}{1} && exists $p->{'fitted.values'}{3},
+	is($p->{'fe_removed'}, 2, 'an all-zero group is removed before fitting');
+	ok(!exists $p->{'fitted_values'}{1} && exists $p->{'fitted_values'}{3},
 	   'and its rows have no fitted value');
 }
 

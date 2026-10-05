@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed weaken);
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Bytes ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub _new {
     my ($class, %args) = @_;

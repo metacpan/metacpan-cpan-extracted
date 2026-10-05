@@ -1,0 +1,56 @@
+Revision history for Unblock-HTTP1
+
+0.10  2026-10-04
+    - Harmonize the public API vocabulary with Unblock::HTTP2 and
+      Unblock::HTTP3 while keeping HTTP/1-specific behavior natural.
+    - Add Transaction->error() to complete the common lifecycle vocabulary:
+      state(), error(), is_complete(), is_cancelled(), is_error(), and
+      is_terminal().
+    - Normalize NativeABI discovery with definition(), native_include_dir(),
+      header_path(), and c_header().
+    - Report NativeABI struct_size so native consumers can validate both ABI
+      version and structure size before dereferencing operations.
+    - Install a public unblock_http1_native_abi.h header and compile the XS
+      implementation against that same header instead of duplicating the C ABI
+      declaration.
+    - Keep the HTTP/1 native ABI focused on borrowed input rather than adding
+      protocol-irrelevant HTTP/2 output operations for symmetry.
+    - Make the Client, Server, Transaction, callback, streaming, lifecycle, and
+      native-integration documentation intentionally parallel with the other
+      Unblock HTTP engines.
+    - Jump from 0.03 to 0.10 to mark the intentional early API harmonization.
+      No compatibility aliases are provided.
+
+0.03  2026-10-04
+    - Add a versioned, transport-neutral borrowed native input ABI for XS
+      transports while preserving the ordinary input() interface.
+    - Require Uniform::HTTP 0.06 and use its native FastPath header to construct
+      canonical requests and responses directly from validated parser byte spans.
+    - Apply the native construction path to both server request receipt and
+      client response receipt, including informational and switched responses.
+    - Report exact consumed prefixes so incomplete heads and post-switch bytes
+      remain owned by the host transport.
+    - Keep protocol parsing and lifecycle state in Unblock rather than
+      duplicating HTTP/1 logic in event-framework adapters.
+
+0.02  2026-10-04
+    - Use the Uniform::HTTP 0.05 FastPath ABI for trusted receive
+      construction and canonical request/response serialization.
+    - Adopt parser-produced header storage without repeating Uniform field
+      validation or deep-copying headers.
+    - Preserve the portable Uniform contract for subclasses and adapters.
+
+0.01  2026-10-04
+    - First release.
+    - Portable HTTP/1.0 and HTTP/1.1 client/server protocol engine.
+    - Event-loop, transport, and operating-system neutral byte interface.
+    - Uniform::HTTP 0.04 request and response objects.
+    - Content-Length, chunked, close-delimited, and transfer-coding framing.
+    - Streaming request and response bodies with cooperative backpressure.
+    - Ordered headers and trailers with strict framing validation.
+    - Persistent connection, Expect, informational response, Upgrade, and
+      CONNECT semantics.
+    - Request-smuggling protections and configurable parser/resource limits.
+    - Exact post-HTTP protocol-switch byte preservation.
+    - Native picohttpparser backend with portable Perl-facing API.
+    - Cross-platform CI on Linux, macOS, and Windows, including Perl 5.16.

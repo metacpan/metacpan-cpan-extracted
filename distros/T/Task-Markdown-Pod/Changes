@@ -1,5 +1,15 @@
 Revision history for Task-Markdown-Pod
 
+0.003  2026-10-04
+
+    - Refresh the installation bundle after the documentation publishing
+      toolchain updates.
+
+0.002  2026-10-04
+
+    - Refresh the bundle against the latest releases of the Markdown/POD
+      processor, DocBook converter, and MakeMaker integration.
+
 0.001  2026-09-27
 
     - First release.

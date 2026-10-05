@@ -114,4 +114,29 @@ ok(length $loop->backend, 'backend selected: ' . $loop->backend);
     is(scalar($f->get), 'pumped', 'get on a pending future pumps the loop');
 }
 
+# ---- a timer never fires before its deadline -----------------------------
+# The kernel's timer is not the deadline. NetBSD's kqueue schedules
+# EVFILT_TIMER in scheduler ticks and, in a VM, delivered a 300ms timer at
+# 246ms; the loop re-arms an early oneshot for the remainder of its own
+# deadline, measured on the same monotonic clock as here. Every backend this
+# build has gets the same pin; within a millisecond is the backends' rounding.
+{
+    my $now = eval {
+        my $clk = Time::HiRes::CLOCK_MONOTONIC();
+        Time::HiRes::clock_gettime($clk);
+        sub { Time::HiRes::clock_gettime($clk) };
+    } || \&Time::HiRes::time;
+    for my $name (qw(kqueue epoll io_uring poll)) {
+      SKIP: {
+            my $l = eval { Hyperman::Loop->new($name) };
+            skip "no $name backend in this build", 1 unless $l;
+            my $t0 = $now->();
+            my $f  = $l->timer_f(0.05);
+            $l->run_until($f);
+            cmp_ok($now->() - $t0, '>=', 0.05 - 1e-3,
+                   "$name: a 50ms timer did not fire early");
+        }
+    }
+}
+
 done_testing;

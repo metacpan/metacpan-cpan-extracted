@@ -2,7 +2,7 @@ package Mail::DKIM2::HeaderParser;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 # Thin base class for streaming message parsing.
 # Replaces the deep Mail::DKIM::Common → Mail::DKIM::MessageParser

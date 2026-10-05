@@ -83,18 +83,18 @@ throws_ok { gaussian('y ~ I(x-1)', \%d) }
 # predict() already documented and returned.
 
 {
-	my %named = (%d, 'row.names' => [map { "obs$_" } 1 .. 10]);
+	my %named = (%d, 'row_names' => [map { "obs$_" } 1 .. 10]);
 	my @want = map { "obs$_" } 1 .. 10;
 
 	for my $fn (['lm', \&linear], ['glm', \&gaussian]) {
 		my $r = $fn->[1]->('y ~ x', \%named);
-		is_deeply([sort keys %{ $r->{'fitted.values'} }], [sort @want],
-			"$fn->[0]: fitted.values keys come from the row.names column");
+		is_deeply([sort keys %{ $r->{'fitted_values'} }], [sort @want],
+			"$fn->[0]: fitted_values keys come from the row_names column");
 	}
 
 	my $l = lm(formula => 'y ~ x', data => \%named);
 	is_deeply([sort keys %{ $l->{residuals} }], [sort @want],
-		'lm: residuals key on the same names as fitted.values');
+		'lm: residuals key on the same names as fitted_values');
 	is_deeply([sort keys %{ predict($l) }], [sort @want],
 		'lm: predict with no newdata keys on the same names');
 
@@ -102,7 +102,7 @@ throws_ok { gaussian('y ~ I(x-1)', \%d) }
 	for my $fn (['lm', \&linear], ['glm', \&gaussian]) {
 		my $r = $fn->[1]->('y ~ .', \%named);
 		is_deeply([sort @{ $r->{terms} }], [sort qw(Intercept x z)],
-			"$fn->[0]: '.' skips the row.names column");
+			"$fn->[0]: '.' skips the row_names column");
 	}
 }
 
@@ -111,7 +111,7 @@ for my $key (qw(_row rownames .rownames)) {
 	my %named = (%d, $key => [map { "r$_" } 1 .. 10]);
 	for my $fn (['lm', \&linear], ['glm', \&gaussian]) {
 		my $r = $fn->[1]->('y ~ x', \%named);
-		is_deeply([sort keys %{ $r->{'fitted.values'} }], [sort map { "r$_" } 1 .. 10],
+		is_deeply([sort keys %{ $r->{'fitted_values'} }], [sort map { "r$_" } 1 .. 10],
 			"$fn->[0]: HoA row names from '$key'");
 	}
 }
@@ -120,14 +120,14 @@ for my $key (qw(_row rownames .rownames)) {
 	my @aoh = map { { _row => "s$_", y => $_, x => ($_ * 3) % 7 } } 1 .. 10;
 	for my $fn (['lm', \&linear], ['glm', \&gaussian]) {
 		my $r = $fn->[1]->('y ~ x', \@aoh);
-		is_deeply([sort keys %{ $r->{'fitted.values'} }], [sort map { "s$_" } 1 .. 10],
+		is_deeply([sort keys %{ $r->{'fitted_values'} }], [sort map { "s$_" } 1 .. 10],
 			"$fn->[0]: AoH row names from a per-row _row key");
 	}
 
 	my %hoh = map { ("k$_" => { y => $_, x => ($_ * 3) % 7 }) } 1 .. 10;
 	for my $fn (['lm', \&linear], ['glm', \&gaussian]) {
 		my $r = $fn->[1]->('y ~ x', \%hoh);
-		is_deeply([sort keys %{ $r->{'fitted.values'} }], [sort map { "k$_" } 1 .. 10],
+		is_deeply([sort keys %{ $r->{'fitted_values'} }], [sort map { "k$_" } 1 .. 10],
 			"$fn->[0]: HoH rows keep their outer keys as names");
 	}
 }
@@ -136,7 +136,7 @@ for my $key (qw(_row rownames .rownames)) {
 # row-name column is labelled exactly as before.
 {
 	my $l = lm(formula => 'y ~ x', data => \%d);
-	is_deeply([sort keys %{ $l->{'fitted.values'} }], [sort 1 .. 10],
+	is_deeply([sort keys %{ $l->{'fitted_values'} }], [sort 1 .. 10],
 		'lm: no row-name column still means 1-based integer labels');
 }
 

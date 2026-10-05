@@ -42,13 +42,13 @@ sub cmp_t {
 	$eps_ci   = 1e-7  unless defined $eps_ci;
 	is_approx( $got->{statistic}, $exp->{t},  "$lbl: statistic", $eps_stat );
 	is_approx( $got->{df},        $exp->{df}, "$lbl: df",        $eps_stat );
-	is_approx( $got->{'p.value'},   $exp->{p},  "$lbl: p_value",   $eps_stat );
+	is_approx( $got->{'p_value'},   $exp->{p},  "$lbl: p_value",   $eps_stat );
 	foreach my $j (0, 1) {
 		my $want = $exp->{conf_int}[$j];
 		if ($want == 9**9**9 || $want == -9**9**9) {
-			is( $got->{'conf.int'}[$j], $want, "$lbl: conf_int[$j] is infinite" );
+			is( $got->{'conf_int'}[$j], $want, "$lbl: conf_int[$j] is infinite" );
 		} else {
-			is_approx( $got->{'conf.int'}[$j], $want, "$lbl: conf_int[$j]", $eps_ci );
+			is_approx( $got->{'conf_int'}[$j], $want, "$lbl: conf_int[$j]", $eps_ci );
 		}
 	}
 }
@@ -86,11 +86,11 @@ cmp_t( 'scipy X1 mu=1 greater', t_test(\@X1, mu => 1, alternative => 'greater'),
 	t => -1.73205080756888, df => 2, p => 0.887298334620742,
 	conf_int => [-1.68585446084705, $INF] });
 
-is_approx( t_test(\@X1, mu => 1, alternative => 'less')->{'p.value'},
-           t_test(\@X1, mu => 1)->{'p.value'} / 2,
+is_approx( t_test(\@X1, mu => 1, alternative => 'less')->{'p_value'},
+           t_test(\@X1, mu => 1)->{'p_value'} / 2,
            'one-sided p is half the two-sided p (t < 0)', 1e-14 );
-is_approx( t_test(\@X1, mu => 1, alternative => 'greater')->{'p.value'},
-           1 - t_test(\@X1, mu => 1)->{'p.value'} / 2,
+is_approx( t_test(\@X1, mu => 1, alternative => 'greater')->{'p_value'},
+           1 - t_test(\@X1, mu => 1)->{'p_value'} / 2,
            'other-sided p is 1 - half the two-sided p', 1e-14 );
 
 # scipy test_1samp_ci_1d -- one-sample CI at a NON-default conf_level for all
@@ -159,9 +159,9 @@ cmp_t( 'paired mu=-2 greater',
 {
 	my $r0 = t_test(\@a, \@b);
 	my $r1 = t_test(\@a, \@b, mu => -2);
-	is_approx( $r0->{'conf.int'}[$_], $r1->{'conf.int'}[$_],
+	is_approx( $r0->{'conf_int'}[$_], $r1->{'conf_int'}[$_],
 		"two-sample conf_int[$_] is independent of mu", 1e-12 ) for 0, 1;
-	is_approx( $r1->{statistic}, $r0->{statistic} + 2 / (($r0->{'estimate.x'} - $r0->{'estimate.y'}) / $r0->{statistic}),
+	is_approx( $r1->{statistic}, $r0->{statistic} + 2 / (($r0->{'estimate_x'} - $r0->{'estimate_y'}) / $r0->{statistic}),
 		'two-sample statistic shifts by mu/stderr', 1e-9 );
 }
 
@@ -192,11 +192,11 @@ cmp_t( 'R t.test(1:28)', t_test([1..28]), {
 	my $r  = t_test(\@o, mu => 0);
 	my $rg = t_test(\@o, mu => 0, alternative => 'greater');
 	my $rl = t_test(\@o, mu => 0, alternative => 'less');
-	cmp_ok( $r->{'p.value'},  '>', 0, 'huge t: two-sided p does not underflow to 0' );
-	cmp_ok( $r->{'p.value'},  '<', 1e-100, 'huge t: two-sided p is astronomically small' );
-	is_approx( $rg->{'p.value'}, $r->{'p.value'} / 2, 'huge t: greater p is half two-sided', 1e-300 );
-	is( $rl->{'p.value'}, 1, 'huge t: wrong-tail p is exactly 1' );
-	cmp_ok( $rl->{'p.value'}, '<=', 1, 'p_value never exceeds 1' );
+	cmp_ok( $r->{'p_value'},  '>', 0, 'huge t: two-sided p does not underflow to 0' );
+	cmp_ok( $r->{'p_value'},  '<', 1e-100, 'huge t: two-sided p is astronomically small' );
+	is_approx( $rg->{'p_value'}, $r->{'p_value'} / 2, 'huge t: greater p is half two-sided', 1e-300 );
+	is( $rl->{'p_value'}, 1, 'huge t: wrong-tail p is exactly 1' );
+	cmp_ok( $rl->{'p_value'}, '<=', 1, 'p_value never exceeds 1' );
 }
 
 # scipy test_pvalue_ci -- the duality between a one-sided p-value and the
@@ -204,11 +204,11 @@ cmp_t( 'R t.test(1:28)', t_test([1..28]), {
 # confidence c, then testing mu = L one-sided must return p = 1 - c.
 foreach my $c (0.6, 0.8, 0.9, 0.95, 0.99) {
 	my $g = t_test(\@sx, mu => 0, alternative => 'greater', conf_level => $c);
-	my $p = t_test(\@sx, mu => $g->{'conf.int'}[0], alternative => 'greater')->{'p.value'};
+	my $p = t_test(\@sx, mu => $g->{'conf_int'}[0], alternative => 'greater')->{'p_value'};
 	is_approx( $p, 1 - $c, "greater: p at the CI lower bound is 1 - $c", 1e-8 );
 
 	my $l = t_test(\@sx, mu => 0, alternative => 'less', conf_level => $c);
-	my $q = t_test(\@sx, mu => $l->{'conf.int'}[1], alternative => 'less')->{'p.value'};
+	my $q = t_test(\@sx, mu => $l->{'conf_int'}[1], alternative => 'less')->{'p_value'};
 	is_approx( $q, 1 - $c, "less: p at the CI upper bound is 1 - $c", 1e-8 );
 }
 
@@ -232,10 +232,50 @@ throws_ok { t_test([1..5], 'y' => [1..5], 'bogus' => 1) }
 	qr/unknown argument 'bogus'/, 'unknown named argument dies';
 throws_ok { t_test([5]) }
 	qr/needs at least 2 elements/, 'single-element x dies';
-throws_ok { t_test([1..5], conf_level => 0) }
-	qr/'conf_level' must be between 0 and 1/, 'conf_level = 0 dies';
-throws_ok { t_test([1..5], conf_level => 1) }
-	qr/'conf_level' must be between 0 and 1/, 'conf_level = 1 dies';
+# conf_level 0 and 1 are inside R's range (t.test.R stops only on
+# conf.level < 0 || conf.level > 1).  Expected intervals from R 4.6.1,
+#   for (cl in c(0,1)) for (a in c("two.sided","less","greater"))
+#     print(t.test(1:5, conf.level = cl, alternative = a)$conf.int)
+# and t.test(c(1,2,4), c(3,5,9,11), var.equal = TRUE, conf.level = 0)$conf.int
+# = c(-4.666666666666667, -4.666666666666667).  1 - 1e-20 is 1.0 on a double.
+{
+	my $inf = 9**9**9;
+	my %want = (
+		'0 two.sided' => [3, 3],         '1 two.sided' => [-$inf, $inf],
+		'0 less'      => [-$inf, -$inf], '1 less'      => [-$inf, $inf],
+		'0 greater'   => [$inf, $inf],   '1 greater'   => [-$inf, $inf],
+	);
+	for my $cl (0, 1) {
+		for my $alt (qw(two.sided less greater)) {
+			my $r = t_test([1..5], conf_level => $cl, alternative => $alt);
+			my $w = $want{"$cl $alt"};
+			for my $k (0, 1) {
+				if (abs($w->[$k]) == $inf) {
+					is($r->{'conf_int'}[$k], $w->[$k], "conf_level = $cl $alt: conf_int[$k]");
+				} else {
+					is_approx($r->{'conf_int'}[$k], $w->[$k], "conf_level = $cl $alt: conf_int[$k]", 1e-14);
+				}
+			}
+		}
+	}
+	my $r = t_test([1, 2, 4], [3, 5, 9, 11], var_equal => 1, conf_level => 0);
+	is_approx($r->{'conf_int'}[$_], -4.666666666666667, "var_equal conf_level = 0: conf_int[$_]", 1e-14)
+		for 0, 1;
+	# 1 - 1e-20 rounds to 1 on a double or x87 long double, and is the
+	# infinite interval; __float128 holds it, and it must not croak there either.
+	my $cl = 1 - 1e-20;
+	$r = t_test([1..5], conf_level => $cl);
+	if ($cl == 1) {
+		is_deeply($r->{'conf_int'}, [-$inf, $inf], 'conf_level = 1 - 1e-20 rounds to 1: (-Inf, Inf)');
+	} else {
+		ok($r->{'conf_int'}[0] > -$inf && $r->{'conf_int'}[1] < $inf,
+		   'conf_level = 1 - 1e-20 below 1 at this NV width: a finite interval');
+	}
+}
+throws_ok { t_test([1..5], conf_level => -0.1) }
+	qr/'conf_level' must be between 0 and 1/, 'conf_level < 0 dies';
+throws_ok { t_test([1..5], conf_level => 1.1) }
+	qr/'conf_level' must be between 0 and 1/, 'conf_level > 1 dies';
 throws_ok { t_test('x' => 'not a ref') }
 	qr/must be an ARRAY reference/, 'non-reference x dies';
 
@@ -244,8 +284,8 @@ throws_ok { t_test('x' => 'not a ref') }
 	my $pos = t_test(\@a, \@b, var_equal => 1, conf_level => 0.9, alternative => 'less');
 	my $nam = t_test('x' => \@a, 'y' => \@b, var_equal => 1, conf_level => 0.9, alternative => 'less');
 	is_approx( $pos->{$_}, $nam->{$_}, "positional == named: $_", 0 )
-		for qw(statistic df p.value estimate.x estimate.y);
-	is( $pos->{'conf.int'}[$_], $nam->{'conf.int'}[$_], "positional == named: conf_int[$_]" )
+		for qw(statistic df p_value estimate_x estimate_y);
+	is( $pos->{'conf_int'}[$_], $nam->{'conf_int'}[$_], "positional == named: conf_int[$_]" )
 		for 0, 1;
 }
 
@@ -253,13 +293,13 @@ throws_ok { t_test('x' => 'not a ref') }
 {
 	my $one = t_test([1..10], mu => 3);
 	ok(  exists $one->{estimate},   'one-sample returns estimate' );
-	ok( !exists $one->{'estimate.x'}, 'one-sample has no estimate_x' );
+	ok( !exists $one->{'estimate_x'}, 'one-sample has no estimate_x' );
 	my $two = t_test(\@a, \@b);
-	ok(  exists $two->{'estimate.x'} && exists $two->{'estimate.y'}, 'two-sample returns estimate_x/estimate_y' );
+	ok(  exists $two->{'estimate_x'} && exists $two->{'estimate_y'}, 'two-sample returns estimate_x/estimate_y' );
 	ok( !exists $two->{estimate},   'two-sample has no estimate' );
 	my $par = t_test(\@a, \@b, paired => 1);
 	ok(  exists $par->{estimate},   'paired returns estimate (the mean difference)' );
-	is_approx( $par->{estimate}, $two->{'estimate.x'} - $two->{'estimate.y'},
+	is_approx( $par->{estimate}, $two->{'estimate_x'} - $two->{'estimate_y'},
 		'paired estimate equals the difference of the means', 1e-12 );
 }
 
@@ -299,7 +339,7 @@ throws_ok { t_test('x' => 'not a ref') }
 # A sample of one.  From R's own regression suite, reg-tests-1a.R:4530,
 # "t.test with one group of size one":
 #   x <- 1:10; t.test(y=x[1], x=x[-1], var.equal=TRUE)
-# With var.equal the pooled variance skips the n=1 group -- it contributes no
+# With var_equal the pooled variance skips the n=1 group -- it contributes no
 # sum of squares -- so the test is well defined.  Welch needs a variance from
 # each side and R refuses.
 cmp_t( 'R reg-test: var_equal, ny=1', t_test([2..10], [1], var_equal => 1), {
@@ -334,8 +374,8 @@ throws_ok { t_test([1..10], alternative => '') }
 
 # scipy spells it "two-sided" and R spells it "two.sided"; both are accepted
 foreach my $spelling (qw(two.sided two-sided two_sided)) {
-	is_approx( t_test([1..10], alternative => $spelling)->{'p.value'},
-		t_test([1..10])->{'p.value'}, "alternative => '$spelling' is two-sided", 0 );
+	is_approx( t_test([1..10], alternative => $spelling)->{'p_value'},
+		t_test([1..10])->{'p_value'}, "alternative => '$spelling' is two-sided", 0 );
 }
 
 # One-sided intervals at conf_level < 0.5 need a NEGATIVE t quantile, which a
@@ -351,7 +391,7 @@ cmp_t( 'conf_level=0.3 greater', t_test([1..10], mu => 5, conf_level => 0.3, alt
 # at conf_level exactly 0.5 the one-sided bound sits on the estimate
 {
 	my $h = t_test([1..10], conf_level => 0.5, alternative => 'greater');
-	is_approx( $h->{'conf.int'}[0], 5.5, 'conf_level=0.5: bound is the estimate', 1e-12 );
+	is_approx( $h->{'conf_int'}[0], 5.5, 'conf_level=0.5: bound is the estimate', 1e-12 );
 }
 
 # "Essentially constant" is relative to the data's magnitude, as in R:
@@ -416,10 +456,10 @@ dies_ok { t_test([1e10, 1e10, 1e10, 1e10 + 1e-5], [2e10, 2e10, 2e10]) }
 		my $r   = t_test([1, 3], conf_level => $c->{conf_level});
 		is_approx( $r->{statistic}, 2, "$lbl: statistic", 1e-12 );
 		is_approx( $r->{df},        1, "$lbl: df",        1e-12 );
-		is_approx( $r->{'p.value'},   0.295167235300866, "$lbl: p_value", 1e-12 );
+		is_approx( $r->{'p_value'},   0.295167235300866, "$lbl: p_value", 1e-12 );
 		# mean is 2 and std_err is 1 for [1, 3], so the bounds are 2 -/+ qt
-		$rel_ci_ok->($r->{'conf.int'}[0], 2 - $c->{qt}, "$lbl: conf_int[0]", $c->{tol});
-		$rel_ci_ok->($r->{'conf.int'}[1], 2 + $c->{qt}, "$lbl: conf_int[1]", $c->{tol});
+		$rel_ci_ok->($r->{'conf_int'}[0], 2 - $c->{qt}, "$lbl: conf_int[0]", $c->{tol});
+		$rel_ci_ok->($r->{'conf_int'}[1], 2 + $c->{qt}, "$lbl: conf_int[1]", $c->{tol});
 	}
 
 	# The point of the two cases: the quantile must not saturate. A 100x smaller
@@ -430,7 +470,7 @@ dies_ok { t_test([1e10, 1e10, 1e10, 1e10 + 1e-5], [2e10, 2e10, 2e10]) }
 	# both and still rejects saturation by five orders of magnitude.
 	my $narrow = t_test([1, 3], conf_level => 0.99999999);
 	my $wide   = t_test([1, 3], conf_level => 0.9999999999);
-	my $ratio  = ($wide->{'conf.int'}[1] - 2) / ($narrow->{'conf.int'}[1] - 2);
+	my $ratio  = ($wide->{'conf_int'}[1] - 2) / ($narrow->{'conf_int'}[1] - 2);
 	is_approx( $ratio, 100, 'a 100x smaller tail widens the interval 100x', 1e-3 );
 }
 
@@ -438,9 +478,9 @@ dies_ok { t_test([1e10, 1e10, 1e10, 1e10 + 1e-5], [2e10, 2e10, 2e10]) }
 # R: t.test((1:10)*s) -> (3.3341494103318308*s, 7.6658505896681692*s)
 foreach my $s (1, 1e3, 1e6, 1e9) {
 	my $r = t_test([map { $_ * $s } 1 .. 10]);
-	is_approx( $r->{'conf.int'}[0] / $s, 3.3341494103318308,
+	is_approx( $r->{'conf_int'}[0] / $s, 3.3341494103318308,
 		"conf_int lower bound is scale-free at scale $s", 1e-13 );
-	is_approx( $r->{'conf.int'}[1] / $s, 7.6658505896681692,
+	is_approx( $r->{'conf_int'}[1] / $s, 7.6658505896681692,
 		"conf_int upper bound is scale-free at scale $s", 1e-13 );
 }
 
@@ -451,7 +491,7 @@ throws_ok { t_test([1..10], 'y' => { a => 1 }) }
 	qr/'y' must be an ARRAY reference/, 'a hash ref y dies';
 
 # an explicit undef y is R's default y = NULL: a one-sample test
-is_approx( t_test([1..10], 'y' => undef)->{'p.value'}, t_test([1..10])->{'p.value'},
+is_approx( t_test([1..10], 'y' => undef)->{'p_value'}, t_test([1..10])->{'p_value'},
 	'y => undef means a one-sample test', 0 );
 
 done_testing();

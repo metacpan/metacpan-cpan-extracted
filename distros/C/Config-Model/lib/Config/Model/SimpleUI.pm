@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SimpleUI 2.167;
+package Config::Model::SimpleUI 2.168;
 
 use Carp;
 use v5.020;
@@ -358,7 +358,7 @@ Config::Model::SimpleUI - Simple interface for Config::Model
 
 =head1 VERSION
 
-version 2.167
+version 2.168
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Minilla:
     file: lib/Minilla.pm
-    version: v3.1.29
+    version: v3.2.0
   Minilla::CLI:
     file: lib/Minilla/CLI.pm
   Minilla::CLI::Build:
@@ -50,12 +50,16 @@ provides:
     file: lib/Minilla/CLI/Migrate.pm
   Minilla::CLI::New:
     file: lib/Minilla/CLI/New.pm
+  Minilla::CLI::Prepare:
+    file: lib/Minilla/CLI/Prepare.pm
   Minilla::CLI::Release:
     file: lib/Minilla/CLI/Release.pm
   Minilla::CLI::Run:
     file: lib/Minilla/CLI/Run.pm
   Minilla::CLI::Test:
     file: lib/Minilla/CLI/Test.pm
+  Minilla::Changes:
+    file: lib/Minilla/Changes.pm
   Minilla::Error::CommandExit:
     file: lib/Minilla/Errors.pm
   Minilla::Errors:
@@ -171,7 +175,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/Minilla/issues
   homepage: https://github.com/tokuhirom/Minilla
   repository: https://github.com/tokuhirom/Minilla.git
-version: v3.1.29
+version: v3.2.0
 x_contributors:
   - 'Alex Kapranoff <alex@kapranoff.ru>'
   - 'Alex Kapranoff <kappa@yandex.ru>'

@@ -1,3 +1,11 @@
+v0.25  2026-10-04Z
+    - Added support for urn:-URIs as a service for easier usage
+    - Added support for unicode-code-point (type)
+    - Updated some regex
+    - Added support for Wikidata and FactGrid lexemes
+    - Added basic support for wikifunctions
+    - Added more well known languages
+
 v0.24  2026-09-03Z
     - Added support to convert to and from Convert::Color
     - Improved handling of unknown types in lookups

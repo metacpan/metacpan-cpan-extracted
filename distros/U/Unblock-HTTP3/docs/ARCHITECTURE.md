@@ -19,6 +19,7 @@ It owns:
 - generic RFC 9297 Capsule Protocol streams
 - RFC 9297 HTTP Datagrams over QUIC DATAGRAM
 - generic HTTP/3 extension unidirectional streams
+- RFC 9412 ORIGIN frames
 - RFC 9218 request priority
 - HTTP message validation
 - HTTP/3 stream lifecycle and errors
@@ -54,14 +55,14 @@ ngtcp2 and TLS remain below Net::QUIC.
 
 ## HTTP message objects
 
-Uniform::HTTP 0.04 is the runtime HTTP message layer.
+Uniform::HTTP 0.06 is the runtime HTTP message layer.
 
-`Unblock::HTTP3::Request` is a thin subclass of `Uniform::HTTP::Request`.
-`Unblock::HTTP3::Response` is a thin subclass of
-`Uniform::HTTP::Response`. They inherit the common message implementation
-instead of copying it.
+Unblock::HTTP3 uses exact canonical `Uniform::HTTP::Request` and
+`Uniform::HTTP::Response` objects directly. HTTP/3-specific lifecycle and
+priority state belongs to `Unblock::HTTP3::Transaction`, not to HTTP message
+subclasses.
 
-A client may also submit a plain `Uniform::HTTP::Request` directly.
+A client submits a canonical `Uniform::HTTP::Request` directly.
 Unblock::HTTP3 validates the request for HTTP/3 when it is sent. This keeps
 Uniform neutral: it can represent temporarily incomplete or cross-field-invalid
 message combinations while the selected protocol engine remains responsible
@@ -81,9 +82,27 @@ Uniform owns:
 - header and trailer fidelity
 - section mutability and whole-message completeness
 
-Unblock::HTTP3 adds only protocol-engine concerns. Its Request convenience
-subclass adds RFC 9218 priority helpers and stream-abort diagnostics. Its
-Response convenience subclass adds stream-abort diagnostics.
+Uniform::HTTP 0.06 also supplies the header-only native FastPath used by
+Unblock::HTTP3's XS layer. Outgoing canonical messages are inspected directly
+in XS. On receive, decoded nghttp3 header blocks stay in native connection
+state until Unblock::HTTP3 has applied HTTP/3 semantic checks, then XS builds
+the exact canonical Uniform object directly from validated native byte spans.
+
+The native path does not create a second HTTP object model. Uniform still owns
+the final Perl Request and Response objects and their normal lifecycle.
+
+Unblock::HTTP3 also exposes an optional outward native consumer ABI for XS
+HTTP libraries and event-framework adapters. That ABI operates on the normal
+Connection and Transaction objects and returns the same canonical Uniform
+messages. It is separate from the inward Uniform native FastPath used by
+Unblock::HTTP3 itself.
+
+The consumer ABI deliberately does not expose libnghttp3 or replace the QUIC
+transport boundary. Net::QUIC remains responsible for QUIC and TLS.
+
+Unblock::HTTP3 adds only protocol-engine concerns. HTTP/3 priority, reset,
+STOP_SENDING, completion, body-stream, Datagram, and Capsule state belongs to
+`Unblock::HTTP3::Transaction`, not to the canonical Uniform message objects.
 
 ## Transactions
 
@@ -189,6 +208,16 @@ a mismatch uses QPACK_DECODER_STREAM_ERROR.
 replay-safety boundary: Unblock::HTTP3 never resends an early request
 automatically.
 
+On the server, Unblock::HTTP3 may parse early HTTP/3 streams while the handshake
+is pending, but it does not publish those Transactions to application code
+until the QUIC handshake is complete and the early data has not been rejected.
+A configured `datagram_request` callback is also deferred until that point.
+HTTP Datagrams that arrive with an early Transaction are retained only within
+the normal bounded Datagram limits and are delivered after the replay-safety
+gate opens. This
+implements the RFC 8470 safe default without requiring every application to
+reimplement anti-replay gating.
+
 If QUIC rejects early data, the early Transaction is marked as an error. The
 early request, control, and QPACK streams are discarded, a fresh libnghttp3
 connection is created, new 1-RTT control and QPACK streams are bound, and the
@@ -201,13 +230,19 @@ Buffered request and response bodies are supported.
 Incremental outgoing request and response bodies are supported through
 Unblock::HTTP3::Body::Stream.
 
-The producer follows the same basic backpressure convention as
-Linux::Event::HTTP:
+Outgoing streaming bodies use explicit backpressure:
 
     my $can_continue = $body->write($bytes);
 
 A false return means the bytes were accepted but production should pause until
 `on_drain` runs.
+
+Outgoing body chunks are retained in native state as dedicated Perl scalars.
+The native chunk owns that scalar until the corresponding bytes are
+acknowledged or discarded, and libnghttp3 reads directly from its stable byte
+storage. This avoids allocating and copying a second C buffer for every body
+chunk. The retained scalar is separate from the caller's scalar, so later
+caller mutation cannot change bytes already accepted by Body::Stream.
 
 Incremental incoming bodies are supported through Unblock::HTTP3::Body::Reader.
 
@@ -243,14 +278,21 @@ For Extended CONNECT:
 - the Transaction exposes the protocol identifier
 - Unblock::HTTP3 does not assign application semantics to the identifier
 
-A malformed received request is rejected as a stream error using
-H3_MESSAGE_ERROR. The HTTP/3 connection and unrelated multiplexed requests
-remain alive.
+Malformed request semantics detected by Unblock::HTTP3 are rejected on the
+affected request stream with H3_MESSAGE_ERROR, leaving unrelated multiplexed
+requests alive.
+
+Some malformed HTTP cases are detected inside libnghttp3 before Unblock::HTTP3
+can apply stream-local handling. The libnghttp3 read API documents those errors
+as connection-fatal. See `docs/RFC-COMPLIANCE.md` for that native-library
+limitation.
 
 ## Content-Length
 
 libnghttp3 validates received Content-Length values and checks them against the
-sum of received DATA frame lengths.
+sum of received DATA frame lengths. A Content-Length failure detected inside
+libnghttp3 is subject to the native malformed-message scope limitation described
+in `docs/RFC-COMPLIANCE.md`.
 
 Unblock::HTTP3 validates the outgoing side before bytes are submitted:
 
@@ -335,6 +377,22 @@ callback handles the bytes.
 Unblock::HTTP3 does not expose a generic raw extension-frame writer on request or
 control streams. Those streams remain owned by libnghttp3.
 
+## ORIGIN
+
+RFC 9412 ORIGIN frames remain on the HTTP/3 control stream and are owned by
+libnghttp3.
+
+A server can configure an origin list when the HTTP/3 Connection is created.
+Unblock::HTTP3 serializes the RFC 6454 ASCII origins into the length-prefixed
+payload expected by libnghttp3. An explicitly empty list sends an empty ORIGIN
+frame; omitting the option sends no ORIGIN frame.
+
+On the client, libnghttp3 reports each origin entry and the end of each ORIGIN
+frame. Unblock::HTTP3 ignores entries that are not valid RFC 6454 ASCII origin
+serializations and exposes the cumulative advertised entries through
+`peer_origins`. It does not make connection-coalescing policy decisions for the
+application.
+
 ## Request priority
 
 Unblock::HTTP3 uses libnghttp3's RFC 9218 priority machinery.
@@ -382,7 +440,7 @@ values when the caller uses type-dispatch handlers.
 
 Request and response trailers are supported.
 
-They are stored separately from normal headers by Uniform::HTTP 0.04.
+They are stored separately from normal headers by Uniform::HTTP 0.06.
 Incoming initial fields are frozen when their HEADERS section completes while
 trailers remain independently writable until the trailing section ends.
 
@@ -402,9 +460,9 @@ The defaults remain conservative.
 
 RESET_STREAM and STOP_SENDING are passed between Net::QUIC and libnghttp3.
 
-The Unblock Request and Response convenience subclasses record stream-abort
-diagnostics without changing Uniform's generic message contract. Transaction
-state remains the authoritative HTTP/3 lifecycle.
+Transaction records HTTP/3 stream-abort diagnostics directly. Local and remote
+RESET_STREAM and STOP_SENDING codes remain transport state and never modify the
+canonical Uniform message objects.
 
 Cancelled streaming body buffers are released without losing later QUIC ACK
 accounting.
@@ -420,8 +478,10 @@ code that should close QUIC.
 After a fatal libnghttp3 read error, Unblock::HTTP3 stops calling into that native
 HTTP/3 connection and closes the underlying Net::QUIC connection.
 
-Malformed received messages, including Content-Length mismatches, are handled
-by libnghttp3 using HTTP/3 message errors.
+Malformed HTTP semantics rejected by Unblock::HTTP3 use H3_MESSAGE_ERROR at
+request-stream scope when possible. Malformed cases detected internally by
+libnghttp3 can require connection closure because its read API declares further
+use of the native connection undefined after a negative return.
 
 ## Resource limits
 
@@ -455,7 +515,7 @@ shutdown.
 
 ## Scope
 
-The first release is focused on the core HTTP/3 engine.
+The current release is focused on the core HTTP/3 engine.
 
 HTTP Datagrams and the current generic HTTP/3 extension surface are implemented.
 
@@ -478,7 +538,7 @@ The current baseline is:
 
 - Alien::nghttp3 0.01
 - Net::QUIC 0.04
-- Uniform::HTTP 0.04 as the runtime HTTP message layer
+- Uniform::HTTP 0.06 as the runtime HTTP message layer
 
 Unblock::HTTP3 integration tests do not install Net::QUIC from GitHub.
 
@@ -518,8 +578,8 @@ The real loopback suite currently proves:
 28. outgoing Content-Length validation
 29. completed stream and native-body cleanup
 30. persistent HTTP/3 peer SETTINGS state
-31. accepted 0-RTT request delivery
-32. 0-RTT HTTP Datagram routing
+31. replay-gated accepted 0-RTT request delivery
+32. replay-gated 0-RTT HTTP Datagram routing
 33. rejected 0-RTT rollback and clean 1-RTT retry
 
 A separate public-network suite verifies multiplexed streaming requests against

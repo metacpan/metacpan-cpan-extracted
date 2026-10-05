@@ -41,7 +41,7 @@ sub is_approx {
 	my $h = hosmer_lemeshow(\@y, \@pr, g => 5);
 	is_approx($h->{statistic}, 3.25860820, 'HL statistic (g=5)', 1e-6);
 	is($h->{parameter}, 3, 'HL df = g-2');
-	is_approx($h->{'p.value'}, 0.35344529, 'HL p-value', 1e-6);
+	is_approx($h->{'p_value'}, 0.35344529, 'HL p-value', 1e-6);
 	is($h->{groups}, 5, 'HL used 5 groups');
 	is(scalar(@{$h->{table}}), 5, 'HL returns per-group table');
 }

@@ -10,6 +10,8 @@ use JSON;
 # name only installed programs and no checkout.
 
 my $ex = "$FindBin::Bin/../../deploy/examples";
+plan skip_all => 'deploy/examples/ is in the interop repository, not in this distribution'
+    unless -d $ex;
 sub slurp { my $f = shift; open my $fh, '<', $f or die "$f: $!"; local $/; <$fh> }
 
 ok(-f "$ex/$_", "$_ exists") for qw(dkim2-milter-inbound.service dkim2-milter-outbound.service

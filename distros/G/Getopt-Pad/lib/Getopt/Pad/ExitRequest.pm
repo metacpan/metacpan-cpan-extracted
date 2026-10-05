@@ -2,7 +2,7 @@ use v5.26;
 use Object::Pad;
 
 class Getopt::Pad::ExitRequest {
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	field $output :param :reader;
 }

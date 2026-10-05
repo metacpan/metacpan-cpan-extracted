@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99044 Oct 05 2026 Robert Rothenberg 
+    - Fix CVE-2026-19954 by correctly encoding unicode domain names
+
 2.99043 Mar 18 2026 Oleg Gavrin
     - Fix whois server for .in.net
 

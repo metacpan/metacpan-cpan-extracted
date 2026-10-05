@@ -35,6 +35,7 @@ on 'test' => sub {
 	requires 'IPC::Open3';
 	requires 'POSIX';
 	requires 'Test::DescribeMe';
+	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird', '0.10';
 	requires 'Test::Most';
 	requires 'Test::Needs';
@@ -46,10 +47,10 @@ on 'develop' => sub {
 	requires 'Devel::Cover';
 	requires 'Perl::Critic';
 	requires 'Pod::Coverage', '0.18';
+	requires 'Test::CPAN::Changes', '0.4';
 	requires 'Test::Carp';
 	requires 'Test::CheckManifest', '0.9';
 	requires 'Test::Compile';
-	requires 'Test::CPAN::Changes', '0.4';
 	requires 'Test::EOF';
 	requires 'Test::EOL';
 	requires 'Test::Kwalitee';

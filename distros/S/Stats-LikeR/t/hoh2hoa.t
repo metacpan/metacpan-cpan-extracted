@@ -10,7 +10,7 @@ use Test::LeakTrace 'no_leaks_ok';
 # hash of arrays (key = column, array = that column's values down the rows).
 # Rows are emitted in sorted outer-key order, the columns are the union of every
 # inner key, and a missing key or undef cell becomes the fill value (undef by
-# default, overridable with undef.val).
+# default, overridable with undef_val).
 
 # 1. hoh2hoa is defined and returns a hash of arrays.
 ok( defined &Stats::LikeR::hoh2hoa, 'hoh2hoa is defined in Stats::LikeR' );
@@ -39,33 +39,33 @@ ok( !defined $rg->{'c'}[0], 'c missing in r1 defaults to undef' );
 is( $rg->{'c'}[1], 9, 'c is present for r2' );
 is( scalar( @{ $rg->{'a'} } ), scalar( @{ $rg->{'c'} } ), 'every column has one entry per row' );
 
-# 5. undef.val overrides the fill for both missing keys and explicit undef cells.
+# 5. undef_val overrides the fill for both missing keys and explicit undef cells.
 my %withundef = ( 'r1' => { 'a' => 1, 'b' => undef }, 'r2' => { 'a' => 2, 'b' => 5 } );
-my $na = hoh2hoa( \%withundef, 'undef.val' => 'NA' );
-is( $na->{'b'}[0], 'NA', 'an explicit undef cell is filled by undef.val' );
+my $na = hoh2hoa( \%withundef, 'undef_val' => 'NA' );
+is( $na->{'b'}[0], 'NA', 'an explicit undef cell is filled by undef_val' );
 is( $na->{'b'}[1], 5, 'a defined cell is preserved' );
-my $rg2 = hoh2hoa( \%ragged, 'undef.val' => 'NA' );
-is( $rg2->{'b'}[1], 'NA', 'a missing key is filled by undef.val' );
-is( $rg2->{'c'}[0], 'NA', 'a missing key is filled by undef.val' );
+my $rg2 = hoh2hoa( \%ragged, 'undef_val' => 'NA' );
+is( $rg2->{'b'}[1], 'NA', 'a missing key is filled by undef_val' );
+is( $rg2->{'c'}[0], 'NA', 'a missing key is filled by undef_val' );
 # 0 and the empty string are real fill values, not "no value".
-is( hoh2hoa( \%ragged, 'undef.val' => 0 )->{'b'}[1], 0, 'undef.val => 0 fills with 0' );
-is( hoh2hoa( \%ragged, 'undef.val' => '' )->{'b'}[1], '', q{undef.val => '' fills with the empty string} );
-# undef.val => undef is the same as the default.
-ok( !defined hoh2hoa( \%ragged, 'undef.val' => undef )->{'b'}[1], 'undef.val => undef keeps the undef default' );
+is( hoh2hoa( \%ragged, 'undef_val' => 0 )->{'b'}[1], 0, 'undef_val => 0 fills with 0' );
+is( hoh2hoa( \%ragged, 'undef_val' => '' )->{'b'}[1], '', q{undef_val => '' fills with the empty string} );
+# undef_val => undef is the same as the default.
+ok( !defined hoh2hoa( \%ragged, 'undef_val' => undef )->{'b'}[1], 'undef_val => undef keeps the undef default' );
 
 # 6. The default leaves an explicit undef as undef.
 ok( !defined hoh2hoa( \%withundef )->{'b'}[0], 'explicit undef stays undef under the default fill' );
 
-# 7. row.names adds a column of the sorted row labels, aligned with the data.
+# 7. row_names adds a column of the sorted row labels, aligned with the data.
 my %labelled = ( 'beta' => { 'v' => 2 }, 'alpha' => { 'v' => 1 } );
-my $rn = hoh2hoa( \%labelled, 'row.names' => 'id' );
-is_deeply( $rn->{'id'}, [ 'alpha', 'beta' ], 'row.names column holds the sorted labels' );
+my $rn = hoh2hoa( \%labelled, 'row_names' => 'id' );
+is_deeply( $rn->{'id'}, [ 'alpha', 'beta' ], 'row_names column holds the sorted labels' );
 is_deeply( $rn->{'v'}, [ 1, 2 ], 'data columns follow the same sorted-row order' );
-is_deeply( [ sort keys %$rn ], [ 'id', 'v' ], 'row.names adds exactly one extra column' );
+is_deeply( [ sort keys %$rn ], [ 'id', 'v' ], 'row_names adds exactly one extra column' );
 
 # 8. Empty input is not an error: it yields an empty hash of arrays.
 is_deeply( hoh2hoa( {} ), {}, 'empty hash of hashes yields an empty hash of arrays' );
-is_deeply( hoh2hoa( {}, 'row.names' => 'id' ), { 'id' => [] }, 'empty input with row.names gives an empty label column' );
+is_deeply( hoh2hoa( {}, 'row_names' => 'id' ), { 'id' => [] }, 'empty input with row_names gives an empty label column' );
 
 # 9. An empty inner hash is a valid (all-gaps) row.
 my $sparse = hoh2hoa( { 'r1' => { 'a' => 1 }, 'r2' => {} } );
@@ -77,13 +77,13 @@ dies_ok { hoh2hoa() } 'no data dies';
 dies_ok { hoh2hoa( 42 ) } 'non-reference data dies';
 dies_ok { hoh2hoa( [ 1, 2, 3 ] ) } 'array ref (not a hash of hashes) dies';
 dies_ok { hoh2hoa( { 'r1' => [ 1, 2 ] } ) } 'hash of arrays (values not hash refs) dies';
-dies_ok { hoh2hoa( { 'r1' => { 'a' => 1 } }, 'undef.val' ) } 'an option without a value dies (odd args)';
+dies_ok { hoh2hoa( { 'r1' => { 'a' => 1 } }, 'undef_val' ) } 'an option without a value dies (odd args)';
 dies_ok { hoh2hoa( { 'r1' => { 'a' => 1 } }, 'bogus' => 1 ) } 'unknown option dies';
-dies_ok { hoh2hoa( { 'r1' => { 'a' => 1 } }, 'row.names' => [ 1 ] ) } 'row.names must be a string, not a ref';
-dies_ok { hoh2hoa( { 'r1' => { 'a' => 1, 'id' => 5 } }, 'row.names' => 'a' ) } 'row.names colliding with a real column dies';
+dies_ok { hoh2hoa( { 'r1' => { 'a' => 1 } }, 'row_names' => [ 1 ] ) } 'row_names must be a string, not a ref';
+dies_ok { hoh2hoa( { 'r1' => { 'a' => 1, 'id' => 5 } }, 'row_names' => 'a' ) } 'row_names colliding with a real column dies';
 
 # 11. No memory leaks across the conversion, fill, and row-names paths.
 no_leaks_ok { hoh2hoa( \%ragged ) } 'no leaks: basic conversion' unless $INC{'Devel/Cover.pm'};
-no_leaks_ok { hoh2hoa( \%ragged, 'undef.val' => 'NA' ) } 'no leaks: undef.val fill' unless $INC{'Devel/Cover.pm'};
-no_leaks_ok { hoh2hoa( \%labelled, 'row.names' => 'id' ) } 'no leaks: row.names column' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { hoh2hoa( \%ragged, 'undef_val' => 'NA' ) } 'no leaks: undef_val fill' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { hoh2hoa( \%labelled, 'row_names' => 'id' ) } 'no leaks: row_names column' unless $INC{'Devel/Cover.pm'};
 done_testing();

@@ -1,5 +1,22 @@
 Revision history for Robots-Validate:
 
+v0.4.7    2026-10-04 18:19:49+01:00 Europe/London
+  [Enhancements]
+  - Added or updated the robot rules for the following:
+    - ApocsysBot
+    - BitSightBot
+    - ClueWeb-Crawler
+    - EmailSherlock
+    - HubSpot Crawler
+    - Hydrozen
+    - IsonSearchBot
+    - MeistackBot
+    - SiteGraphBot
+    - Spletni Arhiv NUK
+    - SyntoraDataBot
+    - UptimeBot
+    - vuhuvBot
+
 v0.4.6    2026-09-25 17:00:01+01:00 Europe/London
   [Enhancements]
   - Added or updated the robot rules for the following:

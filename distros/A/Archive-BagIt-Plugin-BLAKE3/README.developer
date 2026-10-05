@@ -1,0 +1,7 @@
+This repository uses Dist::Zilla. Please read the POD.
+
+To build:
+
+$> dzil clean
+$> dzil test
+$> dzil build --trial

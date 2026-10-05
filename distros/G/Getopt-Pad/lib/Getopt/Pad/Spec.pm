@@ -12,7 +12,7 @@ use Getopt::Pad::Completion;
 class Getopt::Pad::Spec :strict(params) {
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	use constant CONFIG_OPTION => 'config';
 

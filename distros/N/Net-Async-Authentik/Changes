@@ -1,0 +1,32 @@
+Revision history for Net-Async-Authentik
+
+0.001     2026-10-04 18:06:26Z
+    - Net::Async::Authentik, the asynchronous twin of WWW::Authentik: a Moo
+      class on IO::Async::Notifier with Net::Async::HTTP as a child notifier,
+      every public method of the synchronous client with an _f suffix
+      returning a Future
+    - Net::Async::Authentik::OIDC: discovery, JWKS, token verification,
+      userinfo, introspection, revocation, the client credentials,
+      authorization code, refresh and device grants, and authorization_url_f.
+      Callers waiting on the discovery document or the keys share one fetch,
+      and cancelling one of them does not take it down
+    - Net::Async::Authentik::API: the REST API v3 with paginating list
+      methods, the basic operations, and the ensure_*_f methods returning
+      { object, changed }
+    - Everything without I/O comes from WWW::Authentik and is not copied:
+      build_request and read_response, the Diff behind every ensure, and the
+      table that decides what counts as an identifier rather than a name
+    - Errors are also the matching WWW::Authentik::Error class, so code
+      written for the synchronous client catches them unchanged; nothing is
+      thrown, a wrong argument fails the future
+    - Every async method checks the shape of its argument list before it
+      builds a hash from it: on Future::AsyncAwait 0.71 a suspended frame
+      holding a reference corrupts the heap at exit, and an odd-sized list
+      was the easiest way in. docs/future-asyncawait-0.71-crash.pl has the
+      eight lines that reproduce that defect without this distribution
+    - Live tests against a real authentik behind AUTHENTIK_LIVE_TEST, with a
+      throwaway instance in t/authentik/
+    - The live suite names the device authorization endpoint's own throttle
+      (429 slow_down, 20/hour per client IP in authentik 2026.8.3) instead of
+      dying on an opaque OAuth error; the throwaway docker-compose raises it,
+      the same as in the synchronous twin

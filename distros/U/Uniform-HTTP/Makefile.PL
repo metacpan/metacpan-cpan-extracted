@@ -1,6 +1,15 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use File::Find ();
+
+my %install_files;
+File::Find::find(sub {
+    return unless /\.(?:pm|h)\z/ && -f $_;
+    my $path = $File::Find::name;
+    (my $installed = $path) =~ s{^lib/}{};
+    $install_files{$path} = '$(INST_LIB)/' . $installed;
+}, 'lib');
 
 WriteMakefile(
     NAME         => 'Uniform::HTTP',
@@ -9,6 +18,9 @@ WriteMakefile(
     AUTHOR       => 'Joshua S. Day <HAX@cpan.org>',
     LICENSE      => 'mit',
     MIN_PERL_VERSION => '5.016',
+    PM => \%install_files,
+    XS => {},
+    C  => [],
     PREREQ_PM => {
         'Carp'               => 0,
         'Crypt::SysRandom'   => '0.006',

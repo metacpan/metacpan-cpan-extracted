@@ -80,7 +80,7 @@ sub tmpcsv {
 		'every repeated name is listed, not just the first' );
 }
 
-# Bug 3 (Perl): in 'hoh' output, two rows sharing a row.names value silently
+# Bug 3 (Perl): in 'hoh' output, two rows sharing a row_names value silently
 # overwrote each other. read_table now warns (and last value still wins).
 {
 	my $f = tmpcsv("id,v\nx,1\nx,2\ny,3\n");
@@ -88,7 +88,7 @@ sub tmpcsv {
 	my $h;
 	{
 		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
-		$h = read_table($f, 'output.type' => 'hoh', 'row.names' => 'id');
+		$h = read_table($f, 'output_type' => 'hoh', 'row_names' => 'id');
 	}
 	ok( scalar( grep { /duplicate row name/i } @warnings ),
 		'duplicate hoh row name now emits a warning' )
@@ -130,14 +130,14 @@ sub tmpcsv {
 # hoa: the undef lands inside the column's array.
 {
 	my $f = tmpcsv("a,b,c\n1,,3\n");
-	my $h = read_table($f, 'output.type' => 'hoa');
+	my $h = read_table($f, 'output_type' => 'hoa');
 	ok( !defined $h->{b}[0], 'hoa: the empty field is undef inside the column array' );
 	is( $h->{a}[0], 1, 'hoa: a non-empty field is preserved' );
 }
 # hoh: the undef lands in the per-row hash.
 {
 	my $f = tmpcsv("id,b,c\nr1,,3\n");
-	my $h = read_table($f, 'output.type' => 'hoh', 'row.names' => 'id');
+	my $h = read_table($f, 'output_type' => 'hoh', 'row_names' => 'id');
 	ok( exists $h->{r1}{b}, 'hoh: the empty field still produces its key' );
 	ok( !defined $h->{r1}{b}, 'hoh: the empty field is undef' );
 	is( $h->{r1}{c}, 3, 'hoh: a non-empty field is preserved' );
@@ -211,14 +211,14 @@ my $snow = "\xE2\x98\x83";	# U+2603 SNOWMAN
 # hoa: a column of non-ASCII byte values is preserved in order.
 {
 	my $f = tmpcsv("a,b\n$snow,2\n$cafe,4\n");
-	my $h = read_table($f, 'output.type' => 'hoa');
+	my $h = read_table($f, 'output_type' => 'hoa');
 	is_deeply( $h->{a}, [ $snow, $cafe ],
 		'utf8: hoa preserves a column of multibyte values in order' );
 }
 # hoh: a non-ASCII row-name VALUE becomes the outer key.
 {
 	my $f = tmpcsv("id,v\n$snow,1\n");
-	my $h = read_table($f, 'output.type' => 'hoh', 'row.names' => 'id');
+	my $h = read_table($f, 'output_type' => 'hoh', 'row_names' => 'id');
 	ok( exists $h->{$snow}, 'utf8: a non-ASCII row-name value becomes the outer hoh key' );
 	is( $h->{$snow}{v}, 1,  'utf8: the value under a non-ASCII row key is read' );
 }

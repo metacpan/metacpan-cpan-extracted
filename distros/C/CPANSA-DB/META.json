@@ -54,6 +54,6 @@
          "web" : "https://github.com/briandfoy/cpan-security-advisory"
       }
    },
-   "version" : "20261002.009",
+   "version" : "20261004.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

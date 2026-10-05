@@ -12,6 +12,8 @@ build_requires:
 configure_requires:
   Alien::nghttp3: '0.01'
   ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  Uniform::HTTP: '0.06'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: mit
@@ -29,44 +31,43 @@ no_index:
 provides:
   Unblock::HTTP3:
     file: lib/Unblock/HTTP3.pm
-    version: '0.01'
+    version: '0.03'
   Unblock::HTTP3::Body::Reader:
     file: lib/Unblock/HTTP3/Body/Reader.pm
-    version: '0.01'
+    version: '0.03'
   Unblock::HTTP3::Body::Stream:
     file: lib/Unblock/HTTP3/Body/Stream.pm
-    version: '0.01'
+    version: '0.03'
   Unblock::HTTP3::Capsule:
     file: lib/Unblock/HTTP3/Capsule.pm
-    version: '0.01'
+    version: '0.03'
   Unblock::HTTP3::Capsule::Parser:
     file: lib/Unblock/HTTP3/Capsule/Parser.pm
-    version: '0.01'
+    version: '0.03'
   Unblock::HTTP3::Capsule::Stream:
     file: lib/Unblock/HTTP3/Capsule/Stream.pm
-    version: '0.01'
+    version: '0.03'
   Unblock::HTTP3::Connection:
     file: lib/Unblock/HTTP3/Connection.pm
-    version: '0.01'
+    version: '0.03'
   Unblock::HTTP3::Extension::Stream:
     file: lib/Unblock/HTTP3/Extension/Stream.pm
-    version: '0.01'
-  Unblock::HTTP3::Request:
-    file: lib/Unblock/HTTP3/Request.pm
-    version: '0.01'
-  Unblock::HTTP3::Response:
-    file: lib/Unblock/HTTP3/Response.pm
-    version: '0.01'
+    version: '0.03'
+  Unblock::HTTP3::NativeABI:
+    file: lib/Unblock/HTTP3/NativeABI.pm
+    version: '0.03'
   Unblock::HTTP3::Transaction:
     file: lib/Unblock/HTTP3/Transaction.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   Alien::nghttp3: '0.01'
   Carp: '0'
+  File::Basename: '0'
+  File::Spec: '0'
   Net::QUIC: '0.04'
   Scalar::Util: '0'
   Time::HiRes: '0'
-  Uniform::HTTP: '0.04'
+  Uniform::HTTP: '0.06'
   XSLoader: '0'
   parent: '0'
   perl: '5.020'
@@ -74,5 +75,5 @@ resources:
   bugtracker: https://github.com/haxmeister/perl-Unblock-HTTP3/issues
   homepage: https://github.com/haxmeister/perl-Unblock-HTTP3
   repository: https://github.com/haxmeister/perl-Unblock-HTTP3.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

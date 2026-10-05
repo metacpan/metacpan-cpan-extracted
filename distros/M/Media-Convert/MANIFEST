@@ -28,6 +28,7 @@ t/aac_channels.t
 t/accurate.t
 t/av1.t
 t/avsync.t
+t/class_progress.t
 t/codecs.t
 t/concat.t
 t/convert.t
@@ -39,6 +40,7 @@ t/probe.t
 t/profiles.t
 t/reporting.t
 t/script.t
+t/start_time_correct.t
 t/testvids/bbb.mp4
 t/testvids/m-c.png
 t/testvids/m-c.svg

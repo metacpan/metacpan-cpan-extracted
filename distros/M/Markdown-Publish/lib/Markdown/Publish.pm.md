@@ -31,11 +31,15 @@ MakeMaker targets.
 
 An existing `doc/` directory is the default publication boundary. When it is
 assembled, Markdown beneath `lib/` and `bin/` is mirrored under those paths in
-the temporary site documents. A guide can link to `lib/Example/Module.pm.md`.
+the temporary site documents. Write links relative to the authored document;
+for example, `doc/guide.md` can link to `../lib/Example/Module.pm.md`.
+Assembly rebases existing sidecar links to their mirrored paths, while existing
+publication-root links such as `lib/Example/Module.pm.md` remain supported.
 Mirrored pages are available through links but are not added to generated
 navigation. When `doc/` is absent, sidecars become the default source pages.
-Set `sources` explicitly to include other directories. Source files are never rewritten;
-assembly and engine-specific Markdown adjustments happen in temporary trees.
+Set `sources` explicitly to include other directories. Source files are never
+rewritten; assembly and engine-specific Markdown adjustments happen in
+temporary trees.
 Nested Markdown under `doc/` remains available for links but does not appear
 in generated navigation. When no `index.md` was authored, the first top-level
 page becomes the home page in each engine; its original URL remains available.

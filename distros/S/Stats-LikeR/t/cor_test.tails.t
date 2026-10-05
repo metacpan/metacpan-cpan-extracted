@@ -12,7 +12,7 @@
 # References: R 4.6.1 cor.test(x, y, method = ..., alternative = ...,
 # exact = FALSE), p.value and estimate. Kendall's statistic is the z itself and
 # is checked too; Spearman's `statistic` differs by definition (R reports S,
-# this module reports the z), so only estimate and p.value are compared there.
+# this module reports the z), so only estimate and p_value are compared there.
 #
 # Tolerances are derived, not chosen: d(log p)/d(log z) for the normal tail is
 # about z^2, so a p-value this far out multiplies any last-digit difference in z
@@ -404,7 +404,7 @@ for my $b (@BLOCKS) {
 			method => $r->{method}, alternative => $r->{alternative}, exact => 0);
 
 		rel_ok($g->{estimate}, $r->{estimate}, "$lbl: estimate", 1e-12);
-		rel_ok($g->{'p.value'}, $r->{p}, "$lbl: p.value vs R", $r->{tol});
+		rel_ok($g->{'p_value'}, $r->{p}, "$lbl: p_value vs R", $r->{tol});
 		rel_ok($g->{statistic}, $r->{statistic}, "$lbl: z vs R", 1e-12)
 			if exists $r->{statistic};
 
@@ -412,7 +412,7 @@ for my $b (@BLOCKS) {
 		# and the subtractive form could only ever have returned 0 for it
 		if ($r->{p} > 0 && $r->{p} < 1e-16) {
 			$ndeep++;
-			cmp_ok $g->{'p.value'}, '>', 0, "$lbl: p-value did not underflow to 0";
+			cmp_ok $g->{'p_value'}, '>', 0, "$lbl: p-value did not underflow to 0";
 		}
 	}
 }

@@ -99,11 +99,11 @@ my $hoh_df = { r1 => { age => 20 }, r2 => { age => 17 }, r3 => { age => 25 } };
 my $hoh_keep = filter($hoh_df, col('age') >= 18);
 is_deeply([ sort keys %$hoh_keep ], ['r1', 'r3'], 'filter HoH: matching keys preserved');
 
-# output.type (new): convert the result shape while filtering
-my $as_hoa = filter($df, col('age') >= 18, 'output.type' => 'hoa');
-is_deeply([ sort { $a <=> $b } @{ $as_hoa->{age} } ], [20, 25], 'filter: output.type => hoa');
-my $as_aoh = filter($hoa_df, col('age') < 20, 'output.type' => 'aoh');
-is_deeply([ map { $_->{id} } @$as_aoh ], [2], 'filter: HoA input -> output.type => aoh');
+# output_type (new): convert the result shape while filtering
+my $as_hoa = filter($df, col('age') >= 18, 'output_type' => 'hoa');
+is_deeply([ sort { $a <=> $b } @{ $as_hoa->{age} } ], [20, 25], 'filter: output_type => hoa');
+my $as_aoh = filter($hoa_df, col('age') < 20, 'output_type' => 'aoh');
+is_deeply([ map { $_->{id} } @$as_aoh ], [2], 'filter: HoA input -> output_type => aoh');
 
 no_leaks_ok { filter($df, col('age') >= 18) } 'filter(): no memory leaks' unless $INC{'Devel/Cover.pm'};
 
@@ -155,8 +155,8 @@ is(scalar @$aoh, 3, 'read_table AoH: read 3 rows');
 is($aoh->[0]{name}, 'Alice', 'read_table AoH: parsed field correctly');
 is($aoh->[1]{val}, undef, 'read_table AoH: empty field parsed as undef');
 
-# HoH reading with row.names
-my $hoh = read_table($fh->filename, 'output.type' => 'hoh', 'row.names' => 'id');
+# HoH reading with row_names
+my $hoh = read_table($fh->filename, 'output_type' => 'hoh', 'row_names' => 'id');
 is($hoh->{1}{name}, 'Alice', 'read_table HoH: row name mapping correct');
 
 # Reading with inline filter
@@ -175,7 +175,7 @@ is_deeply($hoa->{b}, [2, undef], 'aoh2hoa: ragged column b padded with undef');
 
 # hoh2hoa
 $hoh = { r1 => { a => 1, b => 2 }, r2 => { a => 3, c => 9 } };
-my $hoa_from_h = hoh2hoa($hoh, 'undef.val' => 'NA');
+my $hoa_from_h = hoh2hoa($hoh, 'undef_val' => 'NA');
 is_deeply($hoa_from_h->{a}, [1, 3], 'hoh2hoa: dense column');
 is_deeply($hoa_from_h->{b}, [2, 'NA'], 'hoh2hoa: fill applied to missing cell');
 
@@ -195,7 +195,7 @@ is_deeply($chi_1d->{'expected'}, [20, 20, 20], 'chisq_test 1D: Expected values c
 my $fish_matrix = [ [10, 2], [3, 15] ];
 my $fish_res = fisher_test($fish_matrix);
 is($fish_res->{'method'}, "Fisher's Exact Test for Count Data", 'fisher_test: Method name');
-ok(exists $fish_res->{'p.value'}, 'fisher_test: Returned a p-value');
+ok(exists $fish_res->{'p_value'}, 'fisher_test: Returned a p-value');
 
 # dnorm
 my $dnorm_val = dnorm(0, mean => 0, sd => 1, log => 0);
@@ -211,7 +211,7 @@ my %data = (
   z => [1, 1, 1, 1]
 );
 
-my $res = col2col(\%data, 'cor', undef, 'skip.errors' => 1);
+my $res = col2col(\%data, 'cor', undef, 'skip_errors' => 1);
 
 # Should calculate perfect correlation
 is_approx($res->{x}{y}, 1.0, 'col2col: cor(x,y) = 1.0');

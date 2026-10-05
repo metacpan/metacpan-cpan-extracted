@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.1.29");
+use version; our $VERSION = version->declare("v3.2.0");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -13,7 +13,7 @@ sub auto_install { $AUTO_INSTALL }
 1;
 __END__
 
-=for stopwords MINILLA .mailmap mimick XSUtil travis XSUtil.needs_compiler_cpp XSUtil.generate_xshelper_h XSUtil.cc_warnings DarkPAN minilla untracked UploadToCPAN circleci appveyor codecov gitter metacpan MBTiny kritika gitlab-pipeline gitlab-coverage
+=for stopwords MINILLA .mailmap mimick XSUtil travis XSUtil.needs_compiler_cpp XSUtil.generate_xshelper_h XSUtil.cc_warnings DarkPAN minilla untracked UploadToCPAN circleci appveyor codecov gitter metacpan MBTiny kritika gitlab-pipeline gitlab-coverage subcommand notest
 
 =encoding utf8
 
@@ -25,10 +25,73 @@ Minilla - CPAN module authoring tool
 
     minil new     - Create a new dist
     minil test    - Run test cases
+    minil prepare - Prepare the source tree for release
     minil dist    - Make your dist tarball
     minil install - Install your dist
     minil release - Release your dist to CPAN
     minil run     - Run arbitrary commands against build dir
+
+=head1 GLOBAL OPTIONS
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Show the main help page. A subcommand name may be supplied to show its help,
+for example C<minil --help release>.
+
+=item B<--color>, B<--no-color>
+
+Enable or disable colored log output. Color is enabled by default when standard
+output is connected to a terminal.
+
+=item B<--debug>
+
+Enable debug logging and preserve temporary work directories.
+
+=item B<--auto-install>, B<--no-auto-install>
+
+Enable or disable automatic installation of project dependencies, including
+development dependencies. Automatic installation is enabled by default.
+
+=item B<--version>
+
+Print the installed Minilla version and exit.
+
+=back
+
+=head1 COMMAND OPTIONS
+
+Run C<minil help COMMAND> for the full documentation of a subcommand.
+
+=over 4
+
+=item C<minil new>
+
+C<--username NAME>, C<--email ADDRESS>, C<-p PROFILE>, C<--profile PROFILE>
+
+=item C<minil test>
+
+C<--release>, C<--automated>, C<--all>, C<--no-author>
+
+=item C<minil dist>
+
+C<--no-test> (also C<--notest>), C<--skip-prepare>
+
+=item C<minil install>
+
+C<--no-test> (also C<--notest>)
+
+=item C<minil release>
+
+C<--no-test> (also C<--notest>), C<--trial>, C<--dry-run>,
+C<--skip-prepare>, C<--pause-config FILE>
+
+=item C<minil clean>
+
+C<-y>
+
+=back
 
 =head1 DESCRIPTION
 
@@ -50,7 +113,7 @@ As stated above, Minilla is opinionated. Minilla has a bold assumption and conve
 
 =item Your module has a static list of prerequisites that can be described in L<cpanfile>
 
-=item Your module has a Changes file
+=item Your module has a Changes file unless C<manage_changes = false> is configured
 
 =item Your module requires at least perl 5.6.
 
@@ -101,6 +164,30 @@ Minilla is built on only few small libraries. You can install Minilla without a 
 
 Minilla's release process is the following.
 
+=head2 Preparing a release
+
+C<minil prepare> performs the source-tree updates used by the release process:
+it selects the next version, updates version declarations, regenerates
+F<META.json>, F<README.md>, and F<Build.PL> or F<Makefile.PL>, and prepares
+F<Changes> when Minilla manages it.
+
+The version can be selected interactively or supplied as an argument:
+
+    % minil prepare
+    % minil prepare v1.2.3
+
+The command does not commit, tag, build a distribution archive, upload, or
+push.
+
+=head2 Building from prepared source
+
+C<minil dist --skip-prepare> and C<minil release --skip-prepare> build a
+distribution from an already prepared source tree without regenerating
+F<META.json>, F<README.md>, or F<Build.PL> or F<Makefile.PL>. Packaging files
+such as F<META.yml> and F<MANIFEST> are still generated. Distribution tests
+run by default and can be disabled with C<--no-test>. The release command uses
+the prepared version without prompting for or updating it.
+
 =head2 CheckUntrackedFiles
 
 Checking git's untracked files. If there's untracked files, minilla will abort.
@@ -124,6 +211,8 @@ After that, minilla rewrites version numbers in **/*.pm, **/*.pl, and a script f
 You need to write Changes file. Your module's users need to know the difference between versions.
 
 Minilla's Changes file includes `{{$NEXT}}` next version indicator. You should put update informations after that.
+If the release version is already recorded below an empty C<{{$NEXT}}> section,
+Minilla treats the Changes file as prepared for that release.
 
 =head2 RegenerateFiles
 
@@ -150,6 +239,8 @@ Upload your module to CPAN.
 Rewrite Changes file.
 Minilla replaces C<{{$NEXT}}> with released version number and current date & time.
 And put C<{{$NEXT}}> on the first line.
+If the release version is already recorded below an empty C<{{$NEXT}}> section,
+Minilla leaves the file unchanged.
 
 =head2 Commit
 
@@ -226,6 +317,15 @@ It affects to L<Module::Build> 0.4005+ only.
 
 Minilla sets bugtracker to github/GitLab's issue tracker by default. But if you
 want to use RT, you can set this variable.
+
+=item manage_changes
+
+    manage_changes = false
+
+Minilla manages the F<Changes> file by default. Set this option to false to
+allow projects without F<Changes> or C<{{$NEXT}}> and to prevent C<minil dist>
+and C<minil release> from rewriting it. A separately maintained F<Changes> or
+F<CHANGELOG.md> file tracked by Git is still included in the distribution.
 
 =item no_index
 

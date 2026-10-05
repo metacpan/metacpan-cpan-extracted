@@ -421,10 +421,10 @@ for my $d (qw(poisson negbin geometric)) {
 	rel_ok($z->{loglik}, $COUNTREG{"zt_$d"}{ll}, 1e-8, 'pkg ll', "crab zerotrunc $d: loglik against countreg's tinytest");
 	if ($d eq 'negbin') {
 		rel_ok($z->{theta}, $e->{theta}, 1e-7, 'exact se', 'crab zerotrunc negbin: theta');
-		rel_ok($z->{'SE.logtheta'}, $e->{sel}, 1e-6, 'exact se', 'crab zerotrunc negbin: SE.logtheta');
+		rel_ok($z->{'SE_logtheta'}, $e->{sel}, 1e-6, 'exact se', 'crab zerotrunc negbin: SE_logtheta');
 		rel_ok($z->{theta}, $COUNTREG{zt_negbin}{theta}, 5e-3, 'pkg se', 'crab zerotrunc negbin: theta, tinytest');
-		rel_ok($z->{'SE.logtheta'}, $COUNTREG{zt_negbin}{sel}, 5e-3, 'pkg se', 'crab zerotrunc negbin: SE.logtheta, tinytest');
-		is($z->{'df.residual'}, 111 - 4, 'crab zerotrunc negbin: df.residual counts theta');
+		rel_ok($z->{'SE_logtheta'}, $COUNTREG{zt_negbin}{sel}, 5e-3, 'pkg se', 'crab zerotrunc negbin: SE_logtheta, tinytest');
+		is($z->{'df_residual'}, 111 - 4, 'crab zerotrunc negbin: df_residual counts theta');
 	} elsif ($d eq 'geometric') {
 		is($z->{theta}, 1, 'geometric: theta is 1');
 	}
@@ -434,7 +434,7 @@ for my $d (qw(poisson negbin geometric)) {
 	             + $z->{coefficients}{colorn} * $pos{colorn}[0]);
 	my $p0 = $d eq 'poisson' ? exp(-$mu)
 	       : ($z->{theta} / ($z->{theta} + $mu)) ** $z->{theta};
-	rel_ok($z->{'fitted.values'}{1}, $mu / (1 - $p0), 1e-12, 'identity', "crab zerotrunc $d: fitted = mu/(1 - f(0))");
+	rel_ok($z->{'fitted_values'}{1}, $mu / (1 - $p0), 1e-12, 'identity', "crab zerotrunc $d: fitted = mu/(1 - f(0))");
 }
 {
 	# a supplied theta: Inf is Poisson, 1 is the geometric (countreg's rule)
@@ -447,7 +447,7 @@ for my $d (qw(poisson negbin geometric)) {
 	my $f = zerotrunc(formula => 'satellites ~ width + colorn', data => \%pos, theta => $nb->{theta});
 	rel_ok($f->{loglik}, $nb->{loglik}, 1e-12, 'identity', 'theta fixed at the MLE gives the same likelihood');
 	rel_ok($f->{coefficients}{width}, $nb->{coefficients}{width}, 1e-8, 'identity', 'and the same coefficients');
-	ok(!exists $f->{'SE.logtheta'}, 'a fixed theta has no standard error');
+	ok(!exists $f->{'SE_logtheta'}, 'a fixed theta has no standard error');
 }
 
 # --------------------------------------------------- hurdle, CrabSatellites
@@ -455,7 +455,7 @@ for my $cd (qw(poisson negbin geometric)) {
 	for my $zd (qw(binomial poisson geometric negbin)) {
 		my $e = $EXACT{"crab_h_${cd}_$zd"};
 		my $h = hurdle(formula => 'satellites ~ width + colorn | width + colorn', data => \%CRAB,
-		               dist => $cd, 'zero.dist' => $zd);
+		               dist => $cd, 'zero_dist' => $zd);
 		my $tag = "crab hurdle $cd/$zd";
 		ok($h->{converged}, "$tag: converged");
 		for my $j (0 .. 2) {
@@ -474,7 +474,7 @@ for my $cd (qw(poisson negbin geometric)) {
 		cmp_ok($h->{loglik}, '>=', $PKG{"crab_h_${cd}_$zd"}{ll} - 1e-12 * abs($h->{loglik}),
 		       "$tag: at or above countreg's maximum");
 		rel_ok($h->{theta}, $e->{theta}, 1e-6, 'exact se', "$tag: theta") if $cd eq 'negbin';
-		rel_ok($h->{'theta.zero'}, $e->{theta_zero}, 1e-6, 'exact se', "$tag: zero theta") if $zd eq 'negbin';
+		rel_ok($h->{'theta_zero'}, $e->{theta_zero}, 1e-6, 'exact se', "$tag: zero theta") if $zd eq 'negbin';
 	}
 }
 {
@@ -483,7 +483,7 @@ for my $cd (qw(poisson negbin geometric)) {
 		my ($cd, $zd, $k) = @$pair;
 		my $c = $COUNTREG{$k};
 		my $h = hurdle(formula => 'satellites ~ width + color | width + color', data => \%CRAB,
-		               dist => $cd, 'zero.dist' => $zd);
+		               dist => $cd, 'zero_dist' => $zd);
 		rel_ok($h->{loglik}, $c->{ll}, ($zd eq 'negbin' ? 5e-7 : 1e-8), 'pkg ll', "countreg tinytest $k: loglik");
 		cmp_ok($h->{loglik}, '>=', $c->{ll} - 1e-12 * abs($c->{ll}), "countreg tinytest $k: at or above countreg's maximum");
 		coef_ok($h->{coefficients}{count}{width}, $c->{count_width}, $c->{count_width_se}, 5e-3, 'pkg coef', "countreg tinytest $k: count width");
@@ -501,7 +501,7 @@ for my $cd (qw(poisson negbin geometric)) {
 			# binomial is tending to the Poisson, and countreg's 8608 is
 			# where BFGS gave up.  So theta runs off toward infinity here,
 			# with a log-likelihood above countreg's (checked above).
-			cmp_ok($h->{'theta.zero'}, '>', 1e6, "countreg tinytest $k: the zero theta runs past countreg's 8608 toward infinity");
+			cmp_ok($h->{'theta_zero'}, '>', 1e6, "countreg tinytest $k: the zero theta runs past countreg's 8608 toward infinity");
 		}
 	}
 }
@@ -531,10 +531,10 @@ for my $cd (qw(poisson negbin geometric)) {
 		is($z->{nobs}, 3237, "docvis zerotrunc $d: Stata's N");
 		if ($d eq 'negbin') {
 			rel_ok(-log($z->{theta}), $STATA{tnbreg}{lnalpha}, 1e-6, 'Stata', 'Stata tnbreg: ln(alpha) = -ln(theta)');
-			rel_ok($z->{'SE.logtheta'}, $STATA{tnbreg}{lnalpha_se}, 1e-6, 'Stata', 'Stata tnbreg: se of ln(alpha)');
+			rel_ok($z->{'SE_logtheta'}, $STATA{tnbreg}{lnalpha_se}, 1e-6, 'Stata', 'Stata tnbreg: se of ln(alpha)');
 		}
 	}
-	my $h = hurdle(formula => 'docvis ~ aget + totchr', data => $dv, 'zero.dist' => 'poisson');
+	my $h = hurdle(formula => 'docvis ~ aget + totchr', data => $dv, 'zero_dist' => 'poisson');
 	my $e = $EXACT{docvis_h_poisson_poisson};
 	my @RN = qw(Intercept aget totchr);
 	for my $j (0 .. 2) {
@@ -550,7 +550,7 @@ for my $cd (qw(poisson negbin geometric)) {
 		       "statsmodels' pscl hurdle_poisson: zero se $RN[$j]");
 	}
 	rel_ok($h->{loglik}, $PSCL_DOCVIS{loglik}, 1e-8, 'pkg ll', "statsmodels' pscl hurdle_poisson: loglik");
-	is($h->{'df.residual'}, 3623, 'docvis hurdle: df.residual, as pscl');
+	is($h->{'df_residual'}, 3623, 'docvis hurdle: df_residual, as pscl');
 }
 
 # --------------------------------------------------- bioChemists
@@ -571,7 +571,7 @@ for my $cd (qw(poisson negbin geometric)) {
 	rel_ok($h->{loglik}, $e->{ll}, 1e-10, 'exact ll', 'bioChemists: loglik');
 	rel_ok($h->{loglik}, $k->{ll}, 1e-8, 'pkg ll', 'bioChemists: loglik, pscl');
 	rel_ok($h->{theta}, $e->{theta}, 1e-6, 'exact se', 'bioChemists: theta');
-	rel_ok($h->{'SE.logtheta'}, $e->{sel}, 1e-6, 'exact se', 'bioChemists: SE.logtheta');
+	rel_ok($h->{'SE_logtheta'}, $e->{sel}, 1e-6, 'exact se', 'bioChemists: SE_logtheta');
 	rel_ok($h->{theta}, $k->{theta}, 5e-3, 'pkg se', 'bioChemists: theta, pscl');
 	# the hurdle mean on row 1
 	my %r = map { ($_ => $bc->{$_}[0]) } keys %$bc;
@@ -585,7 +585,7 @@ for my $cd (qw(poisson negbin geometric)) {
 	       + $h->{coefficients}{zero}{ment} * $r{ment};
 	my ($mu, $th) = (exp($ec), $h->{theta});
 	my $want = (1 / (1 + exp(-$ez))) * $mu / (1 - ($th / ($th + $mu)) ** $th);
-	rel_ok($h->{'fitted.values'}{1}, $want, 1e-12, 'identity', 'bioChemists: fitted = P(y > 0) mu/(1 - f(0))');
+	rel_ok($h->{'fitted_values'}{1}, $want, 1e-12, 'identity', 'bioChemists: fitted = P(y > 0) mu/(1 - f(0))');
 
 	my $o = hurdle(formula => 'art ~ fem + mar + kid5 + phd + ment | fem + kid5', data => $bc,
 	               dist => 'poisson', offset => 'log(expo)', weights => 'wt');
@@ -624,8 +624,8 @@ for my $cd (qw(poisson negbin geometric)) {
 	like($@, qr/no zero counts/, 'hurdle: no zeros croaks');
 	eval { hurdle(formula => 'y ~ x', data => { y => [0, 0, 0], x => [1, 2, 3] }) };
 	like($@, qr/no positive counts/, 'hurdle: no positive counts croaks');
-	eval { hurdle(formula => 'y ~ x', data => \%d, 'zero.dist' => 'gamma') };
-	like($@, qr/zero.dist must be/, 'hurdle: unknown zero.dist');
+	eval { hurdle(formula => 'y ~ x', data => \%d, 'zero_dist' => 'gamma') };
+	like($@, qr/zero_dist must be/, 'hurdle: unknown zero_dist');
 	eval { hurdle(formula => 'y ~ x', data => \%d, link => 'probit') };
 	like($@, qr/only link = 'logit'/, 'hurdle: only the logit link');
 	eval { hurdle(formula => 'y ~ x', data => { y => [0, 1, -2], x => [1, 2, 3] }) };
@@ -638,7 +638,7 @@ SKIP: {
 		zerotrunc(formula => 'satellites ~ width + colorn', data => \%pos, dist => 'negbin');
 	}, 'no leaks: zerotrunc');
 	Test::LeakTrace::no_leaks_ok(sub {
-		hurdle(formula => 'satellites ~ width + colorn | width', data => \%CRAB, dist => 'negbin', 'zero.dist' => 'negbin');
+		hurdle(formula => 'satellites ~ width + colorn | width', data => \%CRAB, dist => 'negbin', 'zero_dist' => 'negbin');
 	}, 'no leaks: hurdle');
 	Test::LeakTrace::no_leaks_ok(sub {
 		eval { zerotrunc(formula => 'y ~ x', data => { y => [0, 1, 2], x => [1, 2, 3] }) };

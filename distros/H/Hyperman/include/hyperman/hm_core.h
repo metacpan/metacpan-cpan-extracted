@@ -185,7 +185,14 @@ typedef struct {
     hm_loop *loop;
     hm_abi_timer_cb c_cb;   /* HM_TW_C only */
     void           *c_ud;
+    double          due;    /* oneshot deadline, monotonic seconds; 0 = none */
 } hm_tw;
+
+/* The deadline a oneshot is armed for, on the clock hm_dispatch checks it
+ * against. The backend's own timer is a wake-up hint, not the deadline:
+ * kqueue's EVFILT_TIMER on NetBSD is a callout in scheduler ticks, and in a
+ * VM those ticks run ahead of CLOCK_MONOTONIC. */
+#define hm_tw_due(secs) ((double)hm_now_ns() / 1e9 + (secs))
 
 typedef struct { int fd; UV id; } hm_again;
 
@@ -3150,6 +3157,7 @@ static void hm_on_signal(pTHX_ hm_loop *loop) {
         loop->hardstop_tw = (hm_tw *)hm_xcalloc(1, sizeof(hm_tw));
         loop->hardstop_tw->kind = HM_TW_HARDSTOP;
         loop->hardstop_tw->loop = loop;
+        loop->hardstop_tw->due  = hm_tw_due(loop->shutdown_grace);
         loop->be->add_timer(loop->be, loop->shutdown_grace, 1, loop->hardstop_tw);
     }
 }
@@ -3202,6 +3210,19 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
         hm_tw *tw = (hm_tw *)ev->udata;
         if (!tw) return;
         if (tw->kind == HM_TW_SWEEP) { hm_sweep(aTHX_ loop); return; }
+        /* A oneshot delivered before its deadline (NetBSD's kqueue timed a
+         * 300ms Fetch request out at 246ms on a smoker) is re-armed for the
+         * remainder and not fired. The backend has already dropped it, so the
+         * same watcher is free to re-add; each re-arm is shorter, so a
+         * backend that is always early still converges. Within a
+         * millisecond is the backends' own rounding. */
+        if (tw->due > 0) {
+            double left = tw->due - (double)hm_now_ns() / 1e9;
+            if (left > 1e-3) {
+                loop->be->add_timer(loop->be, left, 1, tw);
+                return;
+            }
+        }
         if (tw->kind == HM_TW_HARDSTOP) { loop->stop = 1; return; }
         if (tw->kind == HM_TW_C) {          /* ABI timer: no Perl frame */
             hm_abi_timer_cb cb = tw->c_cb;
@@ -3571,6 +3592,7 @@ static void hm_add_timer_watch(pTHX_ hm_loop *loop, double secs, SV *sv, int kin
     tw->kind = kind;
     tw->sv   = SvREFCNT_inc(sv);
     tw->loop = loop;
+    tw->due  = hm_tw_due(secs);
     if (!HM_LOOP_INHERITED(loop))
         loop->be->add_timer(loop->be, secs, 1, tw);
 }
@@ -3631,6 +3653,7 @@ static hm_tw *hm_add_timer_watch_c(hm_loop *loop, double secs,
     tw->loop = loop;
     tw->c_cb = cb;
     tw->c_ud = ud;
+    tw->due  = hm_tw_due(secs);
     loop->be->add_timer(loop->be, secs, 1, tw);
     return tw;
 }

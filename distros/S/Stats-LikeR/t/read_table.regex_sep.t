@@ -33,7 +33,7 @@
 #
 #   * where pandas infers an index because the header is one field short
 #     (test_whitespace_regex_separator's first case, test_usecols_regex_sep),
-#     the index is read with 'auto.row.names', which exists for exactly that
+#     the index is read with 'auto_row_names', which exists for exactly that
 #     shape, and usecols=("a", "b") becomes a look at columns a and b;
 #   * test_skiprows_lineterminator skips its first line and supplies the
 #     column names with names=; here that line is replaced by a header holding
@@ -89,7 +89,7 @@ my $ws = qr/\s+/;
 
 # --- pandas: whitespace-delimited (sep=r"\s+") -----------------------------
 
-is_deeply read_table(fixture(<<'END'), sep => $ws, 'auto.row.names' => 1),
+is_deeply read_table(fixture(<<'END'), sep => $ws, 'auto_row_names' => 1),
    A   B   C   D
 a   1   2   3   4
 b   1   2   3   4
@@ -128,7 +128,7 @@ is_deeply read_table(fixture("a,b\n1,2\n3,4\n    "), sep => $ws),
 {
 	my $got = read_table(
 		fixture("a  b  c\n4  apple  bat  5.7\n8  orange  cow  10"),
-		sep => $ws, 'auto.row.names' => 1);
+		sep => $ws, 'auto_row_names' => 1);
 	is_deeply [ map { [ @$_{qw(row_name a b)} ] } @$got ],
 		[ [ 4, 'apple', 'bat' ], [ 8, 'orange', 'cow' ] ],
 		'test_usecols_regex_sep';
@@ -246,10 +246,13 @@ is_deeply read_table(fixture("a;b\n1\r;2\n"), sep => qr/;/),
 
 is_deeply read_table(fixture("\xEF\xBB\xBFid  v\n1  2\n"), sep => $ws),
 	[ { id => 1, v => 2 } ], 'a UTF-8 byte-order mark is dropped';
-# The leading comment has three words to the data's two fields: one with two
-# would be taken for a commented-out header, as the next case shows.
 is_deeply read_table(fixture("# three word note\nid v\n\n# more\n1 2\n"), sep => $ws),
 	[ { id => 1, v => 2 } ], 'comment and blank lines are skipped';
+# Up to 0.3213 a comment with as many words as the header has fields was taken
+# for a commented-out header, and the header for a data row. It is now the
+# header only when the line after it has a number in it, as the next case does.
+is_deeply read_table(fixture("# two words\nid v\n1 2\n"), sep => $ws),
+	[ { id => 1, v => 2 } ], 'a comment as wide as the header is skipped';
 is_deeply read_table(fixture("# PDB   score\n1a2b   10\n3c4d   20\n"), sep => $ws),
 	[ { PDB => '1a2b', score => 10 }, { PDB => '3c4d', score => 20 } ],
 	'a commented-out header is found with a regex separator';
@@ -257,17 +260,17 @@ is_deeply read_table(fixture("% id v\n1 2\n"), sep => $ws, comment => '%'),
 	[ { id => 1, v => 2 } ], "'comment' is honoured";
 {
 	my $f = fixture("id v\n1 NA\n2 3\n3 -\n");
-	is_deeply read_table($f, sep => $ws, 'na.strings' => [ 'NA', '-' ]),
+	is_deeply read_table($f, sep => $ws, 'na_strings' => [ 'NA', '-' ]),
 		[ { id => 1, v => undef }, { id => 2, v => 3 }, { id => 3, v => undef } ],
-		"'na.strings'";
-	is_deeply read_table($f, sep => $ws, 'output.type' => 'hoa'),
-		{ id => [ 1, 2, 3 ], v => [ 'NA', 3, '-' ] }, "'output.type' => 'hoa'";
-	is_deeply read_table($f, sep => $ws, 'output.type' => 'hoh'),
+		"'na_strings'";
+	is_deeply read_table($f, sep => $ws, 'output_type' => 'hoa'),
+		{ id => [ 1, 2, 3 ], v => [ 'NA', 3, '-' ] }, "'output_type' => 'hoa'";
+	is_deeply read_table($f, sep => $ws, 'output_type' => 'hoh'),
 		{ 1 => { v => 'NA' }, 2 => { v => 3 }, 3 => { v => '-' } },
-		"'output.type' => 'hoh'";
-	is_deeply read_table($f, sep => $ws, 'output.type' => 'hoh', 'row.names' => 'v'),
+		"'output_type' => 'hoh'";
+	is_deeply read_table($f, sep => $ws, 'output_type' => 'hoh', 'row_names' => 'v'),
 		{ NA => { id => 1 }, 3 => { id => 2 }, '-' => { id => 3 } },
-		"'row.names'";
+		"'row_names'";
 	is_deeply read_table($f, sep => $ws, filter => { id => sub { $_ > 1 } }),
 		[ { id => 2, v => 3 }, { id => 3, v => '-' } ], "'filter'";
 	local $/;
@@ -277,7 +280,7 @@ is_deeply read_table(fixture("% id v\n1 2\n"), sep => $ws, comment => '%'),
 }
 {
 	my $f = File::Spec->catfile($dir, 'book.xlsx');
-	write_table([ { a => 'x,y', b => 2 } ], $f, 'row.names' => 0);
+	write_table([ { a => 'x,y', b => 2 } ], $f, 'row_names' => 0);
 	is_deeply read_table($f, sep => qr/,/), read_table($f),
 		'an .xlsx ignores a regex sep, as it ignores a literal one';
 }
@@ -349,7 +352,7 @@ is_deeply read_table(fixture(qq{# a::b\n1::2\n}), sep => qr/(:)\1/),
 		my $re  = qr/\Q$sep\E/;
 		for my $otype (qw(aoh hoa hoh)) {
 			for my $arn (0, 1) {
-				my @opt = ('output.type' => $otype, $arn ? ('auto.row.names' => 1) : ());
+				my @opt = ('output_type' => $otype, $arn ? ('auto_row_names' => 1) : ());
 				my (@warn_lit, @warn_re);
 				my $lit = do {
 					local $SIG{__WARN__} = sub { push @warn_lit, @_ };
@@ -362,7 +365,7 @@ is_deeply read_table(fixture(qq{# a::b\n1::2\n}), sep => qr/(:)\1/),
 					defined $r ? $r : "died: $@";
 				};
 				is_deeply [ $rx, \@warn_re ], [ $lit, \@warn_lit ],
-					"$f, $otype, auto.row.names=$arn: the same as the literal";
+					"$f, $otype, auto_row_names=$arn: the same as the literal";
 			}
 		}
 	}

@@ -1,0 +1,112 @@
+{
+   "abstract" : "The main module to handle bags.",
+   "author" : [
+      "Andreas Romeyke <cpan@andreas.romeyke.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Archive-BagIt-Plugin-BLAKE3",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::DistManifest" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::BagIt::Role::Algorithm" : "0",
+            "Archive::BagIt::Role::Manifest" : "0",
+            "Carp" : "0",
+            "Digest::BLAKE3" : "0",
+            "Moo" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Exception" : "0",
+            "Test::File" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0",
+            "lib" : "0",
+            "open" : "0",
+            "perl" : "5.008",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Archive::BagIt::Plugin::Algorithm::BLAKE3" : {
+         "file" : "lib/Archive/BagIt/Plugin/Algorithm/BLAKE3.pm",
+         "version" : "0.002"
+      },
+      "Archive::BagIt::Plugin::BLAKE3" : {
+         "file" : "lib/Archive/BagIt/Plugin/BLAKE3.pm",
+         "version" : "0.002"
+      },
+      "Archive::BagIt::Plugin::Manifest::BLAKE3" : {
+         "file" : "lib/Archive/BagIt/Plugin/Manifest/BLAKE3.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {},
+      "repository" : {
+         "web" : "http://andreas-romeyke.de/software.html"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

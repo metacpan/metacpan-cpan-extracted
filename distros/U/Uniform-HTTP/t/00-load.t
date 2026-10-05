@@ -6,6 +6,7 @@ use_ok 'Uniform::HTTP';
 use_ok 'Uniform::HTTP::Message';
 use_ok 'Uniform::HTTP::Request';
 use_ok 'Uniform::HTTP::Response';
+use_ok 'Uniform::HTTP::FastPath';
 use_ok 'Uniform::HTTP::Auth';
 use_ok 'Uniform::HTTP::Auth::Basic';
 use_ok 'Uniform::HTTP::Auth::Bearer';

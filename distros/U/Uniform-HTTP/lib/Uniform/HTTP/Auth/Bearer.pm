@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub validate_challenge {
     my ($class, $challenge) = @_;

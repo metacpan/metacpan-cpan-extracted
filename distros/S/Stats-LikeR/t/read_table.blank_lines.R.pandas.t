@@ -62,7 +62,7 @@ my @cases = (
 	[ 'test_empty_lines ,', "A,B,C\n1,2.,4.\n\n\n5.,NaN,10.0\n\n-70,.4,1\n", ',', undef,
 		[ { A => '1', B => '2.', C => '4.' }, { A => '5.', B => 'NaN', C => '10.0' },
 		  { A => '-70', B => '.4', C => '1' } ] ],
-	# pandas reads the "NaN" as missing under dtype=str; na.strings is off by
+	# pandas reads the "NaN" as missing under dtype=str; na_strings is off by
 	# default here, and R's default "NA" does not match it either, so it is
 	# R's "NaN" string that is pinned (above and below)
 	[ 'test_empty_lines \s+', "A  B  C\n1  2.  4.\n\n\n5.  NaN  10.0\n\n-70  .4  1\n", $ws, $ws,
@@ -101,7 +101,7 @@ for my $c (@cases) {
 		is_deeply read_table($f, sep => $s, filter => { 0 => sub { 1 } }), $want,
 			"$label ($how, through a filter)";
 		# an aoa is the shape that shows a dropped row most plainly
-		my $aoa = read_table($f, sep => $s, 'output.type' => 'aoa');
+		my $aoa = read_table($f, sep => $s, 'output_type' => 'aoa');
 		is scalar(@$aoa) - 1, scalar(@$want), "$label ($how, aoa): the row count";
 	}
 }
@@ -124,7 +124,7 @@ for my $c (@cases) {
 # header => 0: the row of separators is data like any other.
 {
 	my $f = fixture("1\t2\n\t\n3\t4\n");
-	is_deeply read_table($f, header => 0, sep => "\t", 'output.type' => 'aoa'),
+	is_deeply read_table($f, header => 0, sep => "\t", 'output_type' => 'aoa'),
 		[ [qw(V1 V2)], [1, 2], [undef, undef], [3, 4] ],
 		'header => 0: a row of separators is a row';
 }

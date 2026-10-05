@@ -2,6 +2,7 @@ use v5.40;
 use blib;
 use Test2::V0 '!subtest', -no_srand => 1;
 use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
+use Test2::Require::AuthorTesting;
 use Path::Tiny qw[path];
 use File::Temp qw[tempdir];
 use Alien::Xrepo;
@@ -11,8 +12,8 @@ use experimental 'class';
 my $tmp  = path( tempdir( CLEANUP => 1 ) );
 my $repo = Alien::Xrepo->new( root => $tmp, verbose => 0 );
 #
-subtest cmake => sub {
-    my $TODO  = q[this ain't *that* important if we pass everything else...];
+my $TODO = q[cmake might not build but that ain't *that* important if we pass everything else...];
+eval {
     my $cmake = $repo->install('cmake');
     skip_all 'cmake could not be installed from the xrepo registry' unless $cmake;
     is $cmake->kind, 'binary', '->kind is binary';

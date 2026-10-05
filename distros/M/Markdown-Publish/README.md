@@ -48,9 +48,13 @@ markdown-publish cloudflare --config doc/project.json
 An existing `doc/` directory is the default publication boundary. During site
 assembly, Markdown under `lib/` and `bin/` is copied into temporary `lib/` and
 `bin/` directories beside the guide, preserving its relative path and filename.
-For example, a guide can link to `lib/Example/Module.pm.md`. Nothing is copied
-into the repository's `doc/` directory. Mirrored pages are available through
-links but are not added to generated navigation. When `doc/` is absent,
+Write links relative to the authored document so they also work when browsing
+the repository; for example, `doc/guide.md` can link to
+`../lib/Example/Module.pm.md` or `../bin/example.md`. Assembly rebases existing
+sidecar links to their mirrored paths. Existing publication-root links such as
+`lib/Example/Module.pm.md` continue to work. Nothing is copied into the
+repository's `doc/` directory. Mirrored pages are available through links but
+are not added to generated navigation. When `doc/` is absent,
 sidecars become the default source pages; an explicit source list can also
 select them using the existing `modules/` and `utilities/` layout. Guides
 with multiple top-level headings are split into stable ID-based pages.

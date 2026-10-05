@@ -25,12 +25,12 @@ sub spit {
 		[ { a=>1, b=>2, c=>3 }, { a=>4, b=>5, c=>6 } ],
 		'basic CSV -> aoh' );
 
-	my $hoa = read_table($f, 'output.type' => 'hoa');
+	my $hoa = read_table($f, 'output_type' => 'hoa');
 	is_deeply( $hoa, { a=>[1,4], b=>[2,5], c=>[3,6] }, 'basic CSV -> hoa' );
 
-	my $hoh = read_table($f, 'output.type' => 'hoh', 'row.names' => 'a');
+	my $hoh = read_table($f, 'output_type' => 'hoh', 'row_names' => 'a');
 	is_deeply( $hoh, { 1 => { b=>2, c=>3 }, 4 => { b=>5, c=>6 } },
-		'basic CSV -> hoh with explicit row.names' );
+		'basic CSV -> hoh with explicit row_names' );
 }
 
 # .tsv extension selects tab
@@ -94,7 +94,7 @@ sub spit {
 		{ s=>'plain', q=>'has"quote', m=>"two\nlines", c=>'a,b', r=>"x\ry", e=>undef },
 	];
 	my $f = "$dir/round.csv";
-	write_table($aoh, $f, 'row.names' => 0);
+	write_table($aoh, $f, 'row_names' => 0);
 	my $back = read_table($f);
 	is_deeply( $back, $aoh, 'write_table -> read_table round-trip (quote, newline, sep, \r, undef)' );
 }
@@ -102,16 +102,16 @@ sub spit {
 # header edge cases
 {
 	my $f = spit(",a,b\nr1,1,2\n");
-	my $hoh = read_table($f, 'output.type' => 'hoh');
+	my $hoh = read_table($f, 'output_type' => 'hoh');
 	is_deeply( $hoh, { r1 => { a=>1, b=>2 } },
-		'leading blank header -> row_name; hoh defaults row.names to it' );
+		'leading blank header -> row_name; hoh defaults row_names to it' );
 }
 {
 	# duplicate column names: warn once; hoa columns stay rectangular (FIX)
 	my $f = spit("a,b,a\n1,2,3\n4,5,6\n");
 	my @w;
 	local $SIG{__WARN__} = sub { push @w, @_ };
-	my $hoa = read_table($f, 'output.type' => 'hoa');
+	my $hoa = read_table($f, 'output_type' => 'hoa');
 	is( scalar @w, 1, 'duplicate column warns once' );
 	like( $w[0], qr/duplicate column name/, 'warning mentions duplicate columns' );
 	is_deeply( $hoa, { a=>[3,6], b=>[2,5] },
@@ -158,8 +158,8 @@ sub spit {
 	my $good = spit("a,b\n1,2\n");
 	throws_ok { read_table("$dir/definitely-missing.csv") } qr/is not a file/,
 		'missing file dies in the wrapper';
-	throws_ok { read_table($good, 'output.type' => 'xxx') } qr/isn't allowed/,
-		'bad output.type dies';
+	throws_ok { read_table($good, 'output_type' => 'xxx') } qr/isn't allowed/,
+		'bad output_type dies';
 	throws_ok { read_table($good, bogus => 1) } qr/\bbogus\b/,
 		'unknown argument dies and names the argument';
 	throws_ok { read_table($good, sep => ',', delim => ',') } qr/not both/,
@@ -170,15 +170,15 @@ sub spit {
 	qr/Filter column 'nope' not found/,	'unknown filter column dies';
 	throws_ok { read_table($good, filter => { 5 => sub { 1 } }) }
 		qr/exceeds the 2 columns/, 'numeric filter key past last column dies';
-	throws_ok { read_table($good, 'output.type' => 'hoh', 'row.names' => 'zz') }
-		qr/isn't in the header/, 'row.names not in header dies';
+	throws_ok { read_table($good, 'output_type' => 'hoh', 'row_names' => 'zz') }
+		qr/isn't in the header/, 'row_names not in header dies';
 
 	my $ragged = spit("a,b\n1,2\n1,2,3\n");
 	throws_ok { read_table($ragged) } qr/Alignment error .* data row 2 \(3 fields vs 2 headers\)/,
 		'alignment error reports the offending data row';
 
 	my $undefrn = spit("id,v\n,9\n");
-	throws_ok { read_table($undefrn, 'output.type' => 'hoh') }
+	throws_ok { read_table($undefrn, 'output_type' => 'hoh') }
 		qr/undefined row name .* data row 1/,
 		'hoh with an undef row-name cell dies instead of keying on ""';
 

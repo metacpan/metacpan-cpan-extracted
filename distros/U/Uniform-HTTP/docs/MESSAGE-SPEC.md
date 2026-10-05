@@ -1,6 +1,6 @@
-# Uniform::HTTP Message Contract 0.04
+# Uniform::HTTP Message Contract 0.06
 
-Status: message contract for Uniform-HTTP 0.04.
+Status: message contract for Uniform-HTTP 0.06.
 
 ## Purpose
 
@@ -14,7 +14,7 @@ No Uniform method sends data or changes a connection or framework lifecycle.
 
 ## Common methods
 
-Every 0.04 message provides these observations:
+Every 0.06 message provides these observations:
 
 ```perl
 $message->version

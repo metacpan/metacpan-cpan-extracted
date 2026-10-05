@@ -87,14 +87,15 @@ make publish_serve</screen>
     ├── example-client
     └── example-client.md</programlisting>
 
-    <para>If there is no <filename>doc/</filename>, the publisher falls back to the sidecars beneath <filename>lib/</filename> and <filename>bin/</filename> and will. An explicit
+    <para>If there is no <filename>doc/</filename>, the publisher falls back to the sidecars beneath <filename>lib/</filename> and <filename>bin/</filename>. An explicit
     <literal>sources</literal> list replaces these conventions; it is exact rather than additive. Source files and directories named as sources must exist.</para>
 
     <para>A top-level article containing several level-one Markdown headings is split into sections, one per heading. Links to anchors that move into another page are repaired during assembly.
     If no <filename>index.md</filename> exists, then the first top-level page also becomes the home page while its original URL remains available.</para>
 
-    <para>You can link to markdown documentation for modules and scripts using the convention <filename>lib/Examples/Client.pm.md</filename> - markdown sidecars will be assembled until the
-    <filename>doc/</filename> as a root directory when publishing (i.e. You don't need to specify the document as <filename>../</filename>)</para>
+    <para>Write links to module and script sidecars relative to the authored document so they work when browsing the repository. For example, <filename>doc/example-client.md</filename> can
+    link to <filename>../lib/Example/Client.pm.md</filename> or <filename>../bin/example-client.md</filename>. During site assembly, existing sidecar links are rebased to the mirrored
+    <filename>lib/</filename> and <filename>bin/</filename> paths. Existing publication-root links such as <filename>lib/Example/Client.pm.md</filename> remain supported.</para>
   </section>
 
   <section xml:id="makemaker-setup">

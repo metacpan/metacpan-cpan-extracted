@@ -10,7 +10,7 @@ use Carp ();
 use Log::Abstraction;
 use Scalar::Util ();
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Log::Any::Adapter::Abstraction - Log::Any adapter backed by Log::Abstraction
 
 =head1 VERSION
 
-0.36
+0.37
 
 =head1 SYNOPSIS
 
@@ -314,6 +314,8 @@ for my $la_level (keys %LA_TO_METHOD) {
 	no strict 'refs';
 	*{$la_level} = sub {
 		my ($self, $msg) = @_;
+		# The eval would otherwise reset the calling module's $@
+		local ($@, $!);
 		eval { $self->{_logger}->$method($msg); 1 } or Carp::carp($@);
 		return;
 	};
@@ -340,6 +342,8 @@ sub structured {
 	my $msg = join(' ', grep { defined($_) && length($_) } @parts);
 	my $method = $LA_TO_METHOD{$level} or return;
 
+	# The eval would otherwise reset the calling module's $@
+	local ($@, $!);
 	eval { $self->{_logger}->$method($msg, ($fields ? $fields : ())); 1 } or Carp::carp($@);
 	return;
 }

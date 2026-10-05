@@ -31,10 +31,10 @@ use constant {
     METATYPE_DIGEST => 'digest',
 };
 
-use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
-use constant RE_UINT => qr/^[1-9][0-9]*$/;
+use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}\z/;
+use constant RE_UINT => qr/^[1-9][0-9]*\z/;
 
-our $VERSION = v0.24;
+our $VERSION = v0.25;
 
 use parent 'Data::URIID::Base';
 
@@ -200,6 +200,7 @@ my %url_templates = (
     'wikidata' => [
         ['wikidata-identifier' => 'https://www.wikidata.org/wiki/%s'                    => qr/^Q/  => [qw(documentation info edit)]],
         ['wikidata-identifier' => 'https://www.wikidata.org/wiki/Property:%s'           => qr/^P/  => [qw(documentation info edit)]],
+        ['wikidata-identifier' => 'https://www.wikidata.org/wiki/Lexeme:%s'             => qr/^L/  => [qw(documentation info edit)]],
         ['wikidata-identifier' => 'https://www.wikidata.org/wiki/Special:EntityData/%s' => undef() => [qw(metadata)]],
     ],
     'wikimedia-commons' => [
@@ -283,6 +284,7 @@ my %url_templates = (
     'factgrid' => [
         ['factgrid-identifier' => 'https://database.factgrid.de/wiki/Item:%s'               => qr/^Q/  => [qw(documentation info edit)]],
         ['factgrid-identifier' => 'https://database.factgrid.de/wiki/Property:%s'           => qr/^P/  => [qw(documentation info edit)]],
+        ['factgrid-identifier' => 'https://database.factgrid.de/wiki/Lexeme:%s'             => qr/^L/  => [qw(documentation info edit)]],
         ['factgrid-identifier' => 'https://database.factgrid.de/wiki/Special:EntityData/%s' => undef() => [qw(metadata)]],
     ],
     'grove-art-online' => [
@@ -340,6 +342,10 @@ my %url_templates = (
     'ibbco' => [
         ['ibbco-identifier' => 'https://ibb.co/%s', undef, [qw(info render)]],
     ],
+    'wikifunctions' => [
+        ['wikifunctions-identifier' => 'https://www.wikifunctions.org/wiki/%s', undef, [qw(info render manage documentation)]],
+        ['wikifunctions-identifier' => 'https://www.wikifunctions.org/w/index.php?title=%s&action=raw', undef, [qw(metadata)]],
+    ],
 );
 my %digest_url_templates = (
     'e621' => [
@@ -359,17 +365,17 @@ my $re_uuid = qr/[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}/;
 my %url_parser = (
     urn => [
         {
-            path => qr/^uuid:($re_uuid)$/,
+            path => qr/^uuid:($re_uuid)\z/,
             type => 'uuid',
             id => \1,
         },
         {
-            path => qr/^oid:([1-3](?:\.(?:0|[1-9][0-9]*))+)$/,
+            path => qr/^oid:([1-3](?:\.(?:0|[1-9][0-9]*))+)\z/,
             type => 'oid',
             id => \1,
         },
         {
-            path => qr/^isbn:([0-9]{13})$/,
+            path => qr/^isbn:([0-9]{13})\z/,
             type => 'gtin',
             id => \1,
         },
@@ -415,7 +421,7 @@ my %url_parser = (
     https => [
         {
             host => 'www.wikidata.org',
-            path => qr#^/entity/(?:Property:)?([QP][1-9][0-9]*)$#,
+            path => qr#^/entity/(?:Property:|Lexeme:)?([QPL][1-9][0-9]*)\z#,
             source => 'wikidata',
             type => 'wikidata-identifier',
             id => \1,
@@ -423,7 +429,7 @@ my %url_parser = (
         },
         {
             host => 'www.wikidata.org',
-            path => qr#^/wiki/(?:Property:)?([QP][1-9][0-9]*)$#,
+            path => qr#^/wiki/(?:Property:|Lexeme:)?([QPL][1-9][0-9]*)\z#,
             source => 'wikidata',
             type => 'wikidata-identifier',
             id => \1,
@@ -432,7 +438,7 @@ my %url_parser = (
         },
         {
             host => 'www.wikidata.org',
-            path => qr#^/wiki/Special:EntityData/([QP][1-9][0-9]*)(?:\.[a-z]+)?$#,
+            path => qr#^/wiki/Special:EntityData/([QPL][1-9][0-9]*)(?:\.[a-z]+)?\z#,
             source => 'wikidata',
             type => 'wikidata-identifier',
             id => \1,
@@ -616,7 +622,7 @@ my %url_parser = (
         },
         {
             host => 'database.factgrid.de',
-            path => qr#^/entity/(?:Property:)?([QP][1-9][0-9]*)$#,
+            path => qr#^/entity/(?:Property:|Lexeme:)?([QPL][1-9][0-9]*)$#,
             source => 'factgrid',
             type => 'factgrid-identifier',
             id => \1,
@@ -624,7 +630,7 @@ my %url_parser = (
         },
         {
             host => 'database.factgrid.de',
-            path => qr#^/wiki/(?:Item|Property):([QP][1-9][0-9]*)$#,
+            path => qr#^/wiki/(?:Item|Property|Lexeme):([QPL][1-9][0-9]*)$#,
             source => 'factgrid',
             type => 'factgrid-identifier',
             id => \1,
@@ -633,7 +639,7 @@ my %url_parser = (
         },
         {
             host => 'database.factgrid.de',
-            path => qr#^/wiki/Special:EntityData/([QP][1-9][0-9]*)(?:\.[a-z]+)?$#,
+            path => qr#^/wiki/Special:EntityData/([QPL][1-9][0-9]*)(?:\.[a-z]+)?$#,
             source => 'factgrid',
             type => 'factgrid-identifier',
             id => \1,
@@ -858,44 +864,55 @@ my %url_parser = (
             action => 'info',
             id => \1,
         },
+        {
+            # https://www.wikifunctions.org/wiki/Z44182
+            host => 'www.wikifunctions.org',
+            path => qr#^/wiki/(Z[1-9][0-9]*)\z#,
+            source => 'wikifunctions',
+            type => 'wikifunctions-identifier',
+            action => 'info',
+            id => \1,
+        },
     ],
 );
 
 my %syntax = (
     'uuid'                          => RE_UUID,
-    'oid'                           => qr/^[1-3](?:\.(?:0|[1-9][0-9]*))+$/,
+    'oid'                           => qr/^[1-3](?:\.(?:0|[1-9][0-9]*))+\z/,
     'uri'                           => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+:/,
     'tagname'                       => qr/./,
-    'wikidata-identifier'           => qr/^[QP][1-9][0-9]*$/,
-    'factgrid-identifier'           => qr/^[QP][1-9][0-9]*$/,
-    'wikimedia-commons-identifier'  => qr/^File:.*$/,
+    'wikidata-identifier'           => qr/^[QPL][1-9][0-9]*\z/,
+    'factgrid-identifier'           => qr/^[QPL][1-9][0-9]*\z/,
+    'wikifunctions-identifier'      => qr/^Z[1-9][0-9]*\z/,
+    'wikimedia-commons-identifier'  => qr/^File:.*\z/,
     'musicbrainz-identifier'        => RE_UUID,
-    'british-museum-term'           => qr/^[A-Z]+[1-9][0-9]{0,5}$/, # TODO: Find good reference; See also: https://www.wikidata.org/wiki/Property:P1711#P1793
-    'gnd-identifier'                => qr/^1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X]$/, # https://www.wikidata.org/wiki/Property:P227#P1793
-    'fellig-box-number'             => qr/^[1-9][0-9]{3}$/,
-    'fellig-identifier'             => qr/^[A-Z]+[1-9][0-9]*$/,
-    'youtube-video-identifier'      => qr/^.{11}$/,
+    'british-museum-term'           => qr/^[A-Z]+[1-9][0-9]{0,5}\z/, # TODO: Find good reference; See also: https://www.wikidata.org/wiki/Property:P1711#P1793
+    'gnd-identifier'                => qr/^1[012]?\d{7}[0-9X]|[47]\d{6}-\d|[1-9]\d{0,7}-[0-9X]|3\d{7}[0-9X]\z/, # https://www.wikidata.org/wiki/Property:P227#P1793
+    'fellig-box-number'             => qr/^[1-9][0-9]{3}\z/,
+    'fellig-identifier'             => qr/^[A-Z]+[1-9][0-9]*\z/,
+    'youtube-video-identifier'      => qr/^.{11}\z/,
     'e621tagtype'                   => qr/./,
     'e621tag'                       => qr/./,
-    'amc-artist-identifier'         => qr/^[a-z]+(-[a-z]+)+$/,
-    'tww-artist-identifier'         => qr/^[\p{L}\d]+(-[\p{L}\d]+)*$/,
-    'grove-art-online-identifier'   => qr/^T(?:0|20|22)\d{5}$/,
-    'wikitree-person-identifier'    => qr/^\D+-[1-9][0-9]*$/,
-    'doi'                           => qr/^10\.[0-9]{4,9}\/.+$/,
-    'iconclass-identifier'          => qr/^[0-9].*$/,
-    'media-subtype-identifier'      => qr/^[a-z0-9\.\-\+]+\/[a-z0-9\.\-\+]+$/,
-    'europeana-entity-identifier'   => qr/^(?:place|agent|concept|organisation)\/base\/[1-9][0-9]+$/,
-    'open-library-identifier'       => qr/^(?:(?:person|place|time):)?[^:\n]+$/,
-    'viaf-identifier'               => qr/^[1-9][0-9]+$/,
-    'isni'                          => qr/^[0]{4} [0-9]{4} [0-9]{4} [0-9]{3}[0-9X]$/,
-    'aev-identifier'                => qr/^[\w\/\d]+$/,
-    'unesco-thesaurus-identifier'   => qr/^concept[0-9]+$/,
-    'gtin'                          => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
-    'language-tag-identifier'       => qr/^[0-9a-zA-Z-]+$/,
-    'imgur-post-identifier'         => qr/^[0-9a-zA-Z]{7}$/,
-    'fefe-blog-post-identifier'     => qr/^[0-9a-f]{8}$/,
+    'amc-artist-identifier'         => qr/^[a-z]+(-[a-z]+)+\z/,
+    'tww-artist-identifier'         => qr/^[\p{L}\d]+(-[\p{L}\d]+)*\z/,
+    'grove-art-online-identifier'   => qr/^T(?:0|20|22)\d{5}\z/,
+    'wikitree-person-identifier'    => qr/^\D+-[1-9][0-9]*\z/,
+    'doi'                           => qr/^10\.[0-9]{4,9}\/.+\z/,
+    'iconclass-identifier'          => qr/^[0-9].*\z/,
+    'media-subtype-identifier'      => qr/^[a-z0-9\.\-\+]+\/[a-z0-9\.\-\+]+\z/,
+    'europeana-entity-identifier'   => qr/^(?:place|agent|concept|organisation)\/base\/[1-9][0-9]+\z/,
+    'open-library-identifier'       => qr/^(?:(?:person|place|time):)?[^:\n]+\z/,
+    'viaf-identifier'               => qr/^[1-9][0-9]+\z/,
+    'isni'                          => qr/^[0]{4} [0-9]{4} [0-9]{4} [0-9]{3}[0-9X]\z/,
+    'aev-identifier'                => qr/^[\w\/\d]+\z/,
+    'unesco-thesaurus-identifier'   => qr/^concept[0-9]+\z/,
+    'gtin'                          => qr/^[0-9]{8}(?:[0-9]{4,6})?\z/,
+    'language-tag-identifier'       => qr/^[0-9a-zA-Z-]+\z/,
+    'imgur-post-identifier'         => qr/^[0-9a-zA-Z]{7}\z/,
+    'fefe-blog-post-identifier'     => qr/^[0-9a-f]{8}\z/,
     'danbooru2chanjp-tag'           => qr/./,
     'ibbco-identifier'              => qr/^[a-zA-Z0-9]+\z/,
+    'unicode-code-point'            => qr/^U\+[0-9A-F]{4,6}\z/,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
     (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier sirtx-numerical-identifier furaffinity-post-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier denkxweb-hessen-identifier)),
 );
@@ -1771,6 +1788,19 @@ sub url {
         }
     }
 
+    # Try urn:
+    if ($service eq 'scheme-urn' && defined($opts{action}) && $opts{action} eq 'info') {
+        if (defined(my $uri = eval { $self->id('uri') } )) {
+            return URI->new($uri) if $uri =~ /^urn:/;
+        }
+
+        foreach my $type (qw(uuid oid)) {
+            if (defined(my $id = eval { $self->id($type) } )) {
+                return URI->new(sprintf('urn:%s:%s', $type, $id));
+            }
+        }
+    }
+
     if (defined($self->{url_overrides}) && defined($self->{url_overrides}{$service})) {
         if (defined(my $action = $opts{action})) {
             if (defined(my $url = $self->{url_overrides}{$service}{$action})) {
@@ -1947,7 +1977,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.24
+version v0.25
 
 =head1 SYNOPSIS
 

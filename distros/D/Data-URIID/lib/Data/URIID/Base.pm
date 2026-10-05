@@ -16,7 +16,7 @@ use Data::Identifier v0.25;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.24;
+our $VERSION = v0.25;
 
 
 
@@ -122,7 +122,7 @@ Data::URIID::Base - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.24
+version v0.25
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,31 @@
+Revision history for WWW-Authentik
+
+0.001     2026-10-04 18:04:50Z
+    - Facade WWW::Authentik for an instance and, optionally, one application
+    - WWW::Authentik::OIDC: discovery, JWKS, token verification, userinfo,
+      introspection, revocation, the client credentials, authorization code,
+      refresh and device grants, and authorization_url
+    - WWW::Authentik::API: the REST API v3 with paginating list methods, the
+      basic operations for applications, OAuth2 providers, scope mappings,
+      users, groups, tokens, flows, stages, bindings, brands, certificates and
+      blueprints, and repeatable ensure_* methods returning { object, changed }
+    - Name resolution per field, with <field>_name and <field>_slug to force a
+      lookup, so a provider named 123 is still reachable
+    - WWW::Authentik::Diff: comparison without I/O, lists as sets, the defaults
+      authentik fills in
+    - WWW::Authentik::Error with ::Validation, ::Network and ::API, mapping
+      authentik's four error shapes; a duplicate is 400 with a field error and
+      a refused token is 403
+    - The default user agent sets send_te to 0: authentik 2026.8.3 does not
+      answer every second request that announces the TE connection token.
+      WWW::Authentik->default_ua throws on an LWP too old to take the option
+    - verify_token checks the audience, and refuses to verify without one
+      when the provider issues under a shared issuer (issuer_mode: global),
+      where nothing else separates two applications of one instance. Give
+      client_id to the client and it is checked by itself
+    - Live tests against a real authentik behind AUTHENTIK_LIVE_TEST, with a
+      throwaway instance in t/authentik/
+    - The live suite now names the device authorization endpoint's own
+      throttle (429 slow_down, 20/hour per client IP in authentik 2026.8.3)
+      instead of dying on an opaque OAuth error; the throwaway docker-compose
+      raises it to 2000/hour

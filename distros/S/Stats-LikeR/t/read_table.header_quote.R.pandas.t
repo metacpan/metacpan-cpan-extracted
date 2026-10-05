@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# read_table's header => 0, col.names and quote => ''.
+# read_table's header => 0, col_names and quote => ''.
 #
 # Up to 0.320 read_table always took the first line as the header, and a '"'
 # anywhere in an unquoted field always opened a quoted one. A file with no
@@ -8,7 +8,7 @@
 # fullnamelineage.dmp has a name ending in 'Beach rock 4+5"' -- swallowed
 # every line up to the next '"', about 950,000 of them, without an error.
 #
-# header => 0 is R's header = FALSE and pandas' header=None; col.names is
+# header => 0 is R's header = FALSE and pandas' header=None; col_names is
 # R's col.names and pandas' names=; quote => '' is R's quote = "" and
 # pandas' quoting=csv.QUOTE_NONE.
 #
@@ -60,7 +60,7 @@
 #   * An empty file gives [] here, as every empty read_table does; R gives a
 #     0-row data frame with columns A to D.
 #   * A header one field short of the data is R's automatic row names and
-#     pandas' implicit index; here it is 'auto.row.names', which exists for
+#     pandas' implicit index; here it is 'auto_row_names', which exists for
 #     that shape (foo3, test_dialect). R's warning for foo3 with
 #     letters[1:4], "header and 'col.names' are of different lengths", is
 #     given here too; R then fails in scan(), and read_table on the ragged row.
@@ -119,28 +119,28 @@ my $ws = qr/\s+/;
 
 # --- R: tests/reg-IO2.R -------------------------------------------------------
 
-is_deeply read_table(fixture(''), header => 0, 'col.names' => [ 'A' .. 'D' ]),
-	[], 'reg-IO2 foo1: an empty file with col.names';
+is_deeply read_table(fixture(''), header => 0, 'col_names' => [ 'A' .. 'D' ]),
+	[], 'reg-IO2 foo1: an empty file with col_names';
 
 is_deeply read_table(fixture("head\n"), header => 0, sep => $ws),
 	frame(V1 => ['head']), 'reg-IO2 foo2: one line, no header';
 is_deeply read_table(fixture("head\n"), header => 0, sep => $ws,
-		'output.type' => 'hoa'),
+		'output_type' => 'hoa'),
 	{ V1 => ['head'] }, 'reg-IO2 foo2, as a hoa';
 
 {
 	my $foo3 = fixture("head\n 1 2 \n 3 4 \n");
-	is_deeply read_table($foo3, sep => $ws, 'col.names' => ['V1'],
-			'auto.row.names' => 1),
+	is_deeply read_table($foo3, sep => $ws, 'col_names' => ['V1'],
+			'auto_row_names' => 1),
 		[ { row_name => 1, V1 => 2 }, { row_name => 3, V1 => 4 } ],
-		'reg-IO2 foo3: col.names renames a header, row names 1 and 3';
+		'reg-IO2 foo3: col_names renames a header, row names 1 and 3';
 	my @warn;
 	my $err = do {
 		local $SIG{__WARN__} = sub { push @warn, @_ };
-		error_of(sub { read_table($foo3, sep => $ws, 'col.names' => [ 'a' .. 'd' ]) });
+		error_of(sub { read_table($foo3, sep => $ws, 'col_names' => [ 'a' .. 'd' ]) });
 	};
 	is_deeply \@warn,
-		[ "read_table: header and 'col.names' are of different lengths (1 and 4) in $foo3\n" ],
+		[ "read_table: header and 'col_names' are of different lengths (1 and 4) in $foo3\n" ],
 		'reg-IO2 foo3, letters[1:4]: R\'s warning';
 	like $err, qr/^Alignment error on \Q$foo3\E data row 1 \(2 fields vs 4 headers\)\.$/,
 		'reg-IO2 foo3, letters[1:4]: and then an error, as R\'s scan() gives one';
@@ -220,7 +220,7 @@ is_deeply read_table(fixture("HO5''\tH\n"), header => 0, sep => $ws),
 	frame(V1 => ["HO5''"], V2 => ['H']), "reg-tests-1d: HO5'' keeps its quotes";
 
 is_deeply read_table(fixture("1 foo \n 2 NA \n"), header => 0, sep => $ws,
-		'na.strings' => 'foo'),
+		'na_strings' => 'foo'),
 	frame(V1 => [ '1', '2' ], V2 => [ undef, 'NA' ]),
 	'reg-tests-1a: na.strings = "foo" on a header-less file';
 
@@ -240,13 +240,13 @@ is_deeply read_table(fixture("field1\tfield2\n 1\ta\n 2\tb"), header => 0, sep =
 	is_deeply read_table($f, header => 0), $named->(map { "V$_" } 1 .. 5),
 		'test_no_header: default names (R\'s V1.., where pandas has 0..)';
 	is_deeply read_table($f, header => 0,
-			'col.names' => [qw(foo bar baz quux panda)]),
+			'col_names' => [qw(foo bar baz quux panda)]),
 		$named->(qw(foo bar baz quux panda)), 'test_no_header: names=';
 }
 
-is_deeply read_table(fixture('1,2,"foo"'), header => 0, 'col.names' => [qw(a b c)]),
+is_deeply read_table(fixture('1,2,"foo"'), header => 0, 'col_names' => [qw(a b c)]),
 	[ { a => 1, b => 2, c => 'foo' } ], 'test_quoting_various: default';
-is_deeply read_table(fixture('1,2,"foo"'), header => 0, 'col.names' => [qw(a b c)],
+is_deeply read_table(fixture('1,2,"foo"'), header => 0, 'col_names' => [qw(a b c)],
 		quote => ''),
 	[ { a => 1, b => 2, c => '"foo"' } ], 'test_quoting_various: QUOTE_NONE';
 is_deeply read_table(fixture("a,b,c\n1,2,3"), quote => ''),
@@ -254,7 +254,7 @@ is_deeply read_table(fixture("a,b,c\n1,2,3"), quote => ''),
 is_deeply read_table(fixture(qq{a,b\n3,"4 "" 5"})),
 	[ { a => 3, b => '4 " 5' } ], 'test_double_quote: doublequote=True';
 is_deeply read_table(fixture(qq{label1,label2,label3\nindex1,"a,c,e\nindex2,b,d,f\n}),
-		quote => '', 'auto.row.names' => 1),
+		quote => '', 'auto_row_names' => 1),
 	[ { row_name => 'index1', label1 => '"a', label2 => 'c', label3 => 'e' },
 	  { row_name => 'index2', label1 => 'b',  label2 => 'd', label3 => 'f' } ],
 	'test_dialect: QUOTE_NONE leaves a lone quote as text';
@@ -263,7 +263,7 @@ like error_of(sub { read_table(fixture(qq{a,,b\n1,,a\n2,,"2,,b"}), sep => qr/,,/
 	qr/^Alignment error on \S+ data row 2 \(3 fields vs 2 headers\)\.$/,
 	'test_multi_char_sep_quotes: QUOTE_NONE, the quoted ",," separates';
 like error_of(sub { read_table(fixture("x,1\ny,2,5\nz,3\n"), header => 0,
-		'col.names' => [qw(a b)]) }),
+		'col_names' => [qw(a b)]) }),
 	qr/^Alignment error on \S+ data row 2 \(3 fields vs 2 headers\)\.$/,
 	'test_header_none_and_implicit_index_in_second_row';
 {
@@ -276,7 +276,7 @@ like error_of(sub { read_table(fixture("x,1\ny,2,5\nz,3\n"), header => 0,
 		join ',', map { $_ == $i ? $na[$i] : '' } 0 .. $nv - 1;
 	} 0 .. $nv - 1;
 	my $got = read_table(fixture($data), header => 0, comment => '',
-		'na.strings' => \@na);
+		'na_strings' => \@na);
 	is scalar @$got, $nv, 'test_default_na_values: one row per token';
 	is scalar(grep { defined } map { values %$_ } @$got), 0,
 		'test_default_na_values: every cell is missing';
@@ -293,25 +293,25 @@ like error_of(sub { read_table(fixture("x,1\ny,2,5\nz,3\n"), header => 0,
 	is_deeply read_table($f, header => 0), $aoh, 'aoh, fast path';
 	is_deeply read_table($f, header => 0, filter => sub { 1 }), $aoh, 'aoh, closure';
 	my $hoa = { V1 => [ 1 .. 4 ], V2 => [qw(a b c d)] };
-	is_deeply read_table($f, header => 0, 'output.type' => 'hoa'), $hoa, 'hoa';
-	is_deeply read_table($f, header => 0, 'output.type' => 'hoa', filter => sub { 1 }),
+	is_deeply read_table($f, header => 0, 'output_type' => 'hoa'), $hoa, 'hoa';
+	is_deeply read_table($f, header => 0, 'output_type' => 'hoa', filter => sub { 1 }),
 		$hoa, 'hoa, closure';
 	my $hoh = { 1 => { V2 => 'a' }, 2 => { V2 => 'b' }, 3 => { V2 => 'c' },
 		4 => { V2 => 'd' } };
-	is_deeply read_table($f, header => 0, 'output.type' => 'hoh'), $hoh,
+	is_deeply read_table($f, header => 0, 'output_type' => 'hoh'), $hoh,
 		'hoh: the row names default to V1';
-	is_deeply read_table($f, header => 0, 'output.type' => 'hoh', filter => sub { 1 }),
+	is_deeply read_table($f, header => 0, 'output_type' => 'hoh', filter => sub { 1 }),
 		$hoh, 'hoh, closure';
-	is_deeply read_table($f, header => 0, 'output.type' => 'hoh', 'row.names' => 'V2'),
+	is_deeply read_table($f, header => 0, 'output_type' => 'hoh', 'row_names' => 'V2'),
 		{ a => { V1 => 1 }, b => { V1 => 2 }, c => { V1 => 3 }, d => { V1 => 4 } },
-		"'row.names' names a V column";
+		"'row_names' names a V column";
 	is_deeply read_table($f, header => 0, filter => { V1 => sub { $_ > 2 } }),
 		[ { V1 => 3, V2 => 'c' }, { V1 => 4, V2 => 'd' } ], 'a filter on V1';
 	is_deeply read_table($f, header => 0, filter => { 2 => sub { $_ eq 'a' } }),
 		[ { V1 => 1, V2 => 'a' } ], 'a numeric filter key';
-	is_deeply read_table($f, header => 0, 'col.names' => [qw(n s)],
+	is_deeply read_table($f, header => 0, 'col_names' => [qw(n s)],
 			filter => { s => sub { $_ eq 'b' } }),
-		[ { n => 2, s => 'b' } ], 'a filter on a col.names name';
+		[ { n => 2, s => 'b' } ], 'a filter on a col_names name';
 	is_deeply read_table($f, header => 0, sep => qr/,/), $aoh, 'the regex parser';
 	is_deeply read_table($f, header => 1), [ map { { 1 => $_->{V1}, a => $_->{V2} } }
 		@$aoh[ 1 .. 3 ] ], 'header => 1 is the default';
@@ -331,17 +331,17 @@ is_deeply read_table(fixture("# PDB score\n1a2b 10\n"), header => 0, sep => $ws)
 is_deeply read_table(fixture("\xEF\xBB\xBF1,2\n"), header => 0),
 	[ { V1 => 1, V2 => 2 } ], 'a byte-order mark is dropped';
 is_deeply read_table(fixture("r1,1,2\nr2,3,4\n"), header => 0,
-		'col.names' => [qw(a b)], 'auto.row.names' => 1),
+		'col_names' => [qw(a b)], 'auto_row_names' => 1),
 	[ { row_name => 'r1', a => 1, b => 2 }, { row_name => 'r2', a => 3, b => 4 } ],
-	'auto.row.names with col.names one short';
+	'auto_row_names with col_names one short';
 {
 	my $f = File::Spec->catfile($dir, 'book.xlsx');
-	write_table([ { a => 1, b => 'x' } ], $f, 'row.names' => 0);
+	write_table([ { a => 1, b => 'x' } ], $f, 'row_names' => 0);
 	is_deeply read_table($f, header => 0),
 		[ { V1 => 'a', V2 => 'b' }, { V1 => 1, V2 => 'x' } ],
 		'an .xlsx with header => 0 reads its header row as data';
-	is_deeply read_table($f, 'col.names' => [qw(p q)]), [ { p => 1, q => 'x' } ],
-		'and col.names renames an .xlsx header';
+	is_deeply read_table($f, 'col_names' => [qw(p q)]), [ { p => 1, q => 'x' } ],
+		'and col_names renames an .xlsx header';
 }
 
 # --- quote => '' --------------------------------------------------------------
@@ -354,7 +354,7 @@ is_deeply read_table(fixture("r1,1,2\nr2,3,4\n"), header => 0,
 		"2730760\t|\tExapion sp. ZFMK TIS 3529\t|\tcellular organisms; ",
 		"298141\t|\tExapion sp. \"malvae\"\t|\tcellular organisms; ");
 	my @opt = (sep => qr/\t\|\t?/, header => 0, quote => '',
-		'col.names' => [qw(tax_id tax_name lineage end)]);
+		'col_names' => [qw(tax_id tax_name lineage end)]);
 	my $got = read_table($f, @opt);
 	is_deeply [ map { [ $_->{tax_id}, $_->{tax_name} ] } @$got ],
 		[ [ 2727884, "Pleurocapsales cyanobacterium 'Beach rock 4'" ],
@@ -365,7 +365,7 @@ is_deeply read_table(fixture("r1,1,2\nr2,3,4\n"), header => 0,
 	# a literal "\t|\t" leaves each line's closing "\t|" on the last field,
 	# so there are three columns, not four
 	is_deeply [ map { $_->{tax_name} } @{ read_table($f, sep => "\t|\t",
-			header => 0, quote => '', 'col.names' => [qw(tax_id tax_name lineage)]) } ],
+			header => 0, quote => '', 'col_names' => [qw(tax_id tax_name lineage)]) } ],
 		[ map { $_->{tax_name} } @$got ],
 		'the same names with a literal separator';
 }
@@ -379,7 +379,7 @@ is_deeply read_table(fixture(qq{a"b"c\n1"2"3\n}), sep => '"', quote => ''),
 is_deeply read_table(fixture(qq{a,b\n"1",2\n}), quote => '"'),
 	[ { a => 1, b => 2 } ], "quote => '\"' is the default";
 is_deeply read_table(fixture(qq{a b\n"1 2" 3\n}), sep => $ws, quote => '',
-		'auto.row.names' => 1),
+		'auto_row_names' => 1),
 	[ { row_name => '"1', a => '2"', b => 3 } ],
 	'quote => \'\' through the regex parser';
 
@@ -395,14 +395,14 @@ is_deeply read_table(fixture(qq{a b\n"1 2" 3\n}), sep => $ws, quote => '',
 			qr/^read_table: 'header' must be 0 or 1$/, "header => $bad->[1] is refused";
 	}
 	for my $bad ([ 'a', 'a string' ], [ [], 'an empty ARRAY' ], [ {}, 'a HASH' ]) {
-		like error_of(sub { read_table($f, 'col.names' => $bad->[0]) }),
-			qr/^read_table: 'col.names' must be an ARRAY reference of names$/,
-			"col.names => $bad->[1] is refused";
+		like error_of(sub { read_table($f, 'col_names' => $bad->[0]) }),
+			qr/^read_table: 'col_names' must be an ARRAY reference of names$/,
+			"col_names => $bad->[1] is refused";
 	}
 	for my $bad ([ [ 'a', undef ], 'an undef name' ], [ [ 'a', [] ], 'a reference' ]) {
-		like error_of(sub { read_table($f, 'col.names' => $bad->[0]) }),
-			qr/^read_table: 'col.names' may only hold defined, plain strings$/,
-			"col.names with $bad->[1] is refused";
+		like error_of(sub { read_table($f, 'col_names' => $bad->[0]) }),
+			qr/^read_table: 'col_names' may only hold defined, plain strings$/,
+			"col_names with $bad->[1] is refused";
 	}
 	for my $bad ([ "'", q{"'"} ], [ undef, 'undef' ], [ ['"'], 'an ARRAY' ], [ '""', q{'""'} ]) {
 		like error_of(sub { read_table($f, quote => $bad->[0]) }),

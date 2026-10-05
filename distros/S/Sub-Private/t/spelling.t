@@ -19,3 +19,5 @@ if($@) {
 
 __END__
 Makholm
+schemas
+MetaCPAN

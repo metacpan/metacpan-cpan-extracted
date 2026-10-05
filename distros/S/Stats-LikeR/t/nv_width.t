@@ -67,7 +67,7 @@ is(mean(1 .. 5), 3, 'mean(1..5) is exactly 3');
 #    separates the two cleanly on any wide build.
 {
 	my $res = fisher_test([[3, 1], [1, 3]]);
-	my $p = ref $res ? ($res->{'p.value'} // $res->{p}) : $res;
+	my $p = ref $res ? ($res->{'p_value'} // $res->{p}) : $res;
 	my $exact = 17 / 35;
 	my $rel = abs($p - $exact) / $exact;
 	# On a double perl the module is *expected* to land near 1.5e-16; there is

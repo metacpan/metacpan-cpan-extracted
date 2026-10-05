@@ -39,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/dkim2wg/interop/issues
   repository: https://github.com/dkim2wg/interop.git
-version: '0.10'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

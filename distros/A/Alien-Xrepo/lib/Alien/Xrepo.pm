@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo v1.0.1 {
+class Alien::Xrepo v1.0.2 {
     use Alien::Xmake;
     use JSON::PP;
     use Digest::SHA qw[sha1_hex];
@@ -48,7 +48,7 @@ class Alien::Xrepo v1.0.1 {
         return;
     }
     #
-    class Alien::Xrepo::PackageInfo v1.0.1 {
+    class Alien::Xrepo::PackageInfo v1.0.2 {
         use Path::Tiny;
         field $includedirs : param : reader;
         field $libfiles    : param : reader;
@@ -144,7 +144,17 @@ class Alien::Xrepo v1.0.1 {
         my @install_cmd = $self->_argv( 'install', \@args, $full_spec );
         $self->_debug_cmd(@install_cmd);
         $self->blah("Running: @install_cmd");
-        system(@install_cmd) == 0 or die "xrepo install failed for $full_spec";
+        eval { system @install_cmd };
+        if ( my $spawn_err = $@ ) {
+            chomp $spawn_err;
+            die "xrepo install failed for $full_spec\n" .
+                "  command: @install_cmd\n" .
+                ( $^O eq 'MSWin32' ? "  win32:   $^E\n" : () ) .
+                "  error:   $spawn_err\n";
+        }
+        if ( $? != 0 ) {
+            die "xrepo install failed for $full_spec\n" . "  command: @install_cmd\n" . "  exit:    " . ( $? >> 8 ) . "\n";
+        }
         say "[*] xrepo: fetching paths..." if $verbose;
         my $fresh = $self->_require_fetch( $full_spec, \%opts, $err );
         if ( $meta && defined $key ) {

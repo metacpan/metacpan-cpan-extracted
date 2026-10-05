@@ -4,7 +4,7 @@
       "Wouter Verhelst <w@uter.be>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -33,9 +33,11 @@
       "runtime" : {
          "requires" : {
             "Alien::ffmpeg" : "0",
+            "DateTime::Format::ISO8601" : "0",
             "IPC::System::Simple" : "0",
             "JSON::MaybeXS" : "0",
             "Moose" : "0",
+            "MooseX::ClassAttribute" : "0",
             "MooseX::Singleton" : "0",
             "SemVer" : "0"
          }
@@ -54,6 +56,6 @@
          "web" : "https://salsa.debian.org/wouter/media-convert"
       }
    },
-   "version" : "v1.5.2",
+   "version" : "v1.6.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

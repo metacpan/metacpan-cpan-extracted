@@ -6,13 +6,82 @@ use warnings;
 use Carp qw(croak);
 use Scalar::Util qw(blessed weaken);
 
-use Uniform::HTTP::Request 0.04 ();
-use Unblock::HTTP3 ();
-use Unblock::HTTP3::Request ();
+use Uniform::HTTP::Request 0.06 ();
+use Uniform::HTTP::Response 0.06 ();
 
-our $VERSION = '0.01';
+use Unblock::HTTP3 ();
+use Unblock::HTTP3::_Native ();
+
+our $VERSION = '0.03';
 
 my %TERMINAL = map { $_ => 1 } qw(complete cancelled error);
+my $BUFFERED_BODY_RETAIN_BYTES = 16_384;
+
+sub _priority_from_args {
+    my ($current, @args) = @_;
+    croak 'priority() requires named arguments' if @args % 2;
+
+    my %priority = (
+        urgency     => 3,
+        incremental => 0,
+        %{ $current || {} },
+    );
+
+    while (@args) {
+        my $name = shift @args;
+        my $value = shift @args;
+
+        croak "unknown priority option: $name"
+            if $name ne 'urgency' && $name ne 'incremental';
+
+        if ($name eq 'urgency') {
+            croak 'priority urgency must be an integer from 0 through 7'
+                if !defined($value)
+                    || ref($value)
+                    || "$value" !~ /\A[0-7]\z/;
+            $priority{urgency} = 0 + $value;
+            next;
+        }
+
+        croak 'priority incremental must be 0 or 1'
+            if !defined($value)
+                || ref($value)
+                || "$value" !~ /\A[01]\z/;
+        $priority{incremental} = $value ? 1 : 0;
+    }
+
+    return \%priority;
+}
+
+sub _priority_field {
+    my ($priority) = @_;
+    my $value = 'u=' . $priority->{urgency};
+    $value .= ', i' if $priority->{incremental};
+    return $value;
+}
+
+sub _parse_priority_field {
+    my ($value) = @_;
+
+    return {
+        urgency     => 3,
+        incremental => 0,
+    } unless defined $value;
+
+    my $parsed = eval {
+        Unblock::HTTP3::_Native->parse_priority($value);
+    };
+
+    return {
+        urgency     => 3,
+        incremental => 0,
+    } unless defined $parsed;
+
+    return {
+        urgency     => 0 + $parsed->[0],
+        incremental => $parsed->[1] ? 1 : 0,
+    };
+}
 
 sub _new {
     my ($class, %args) = @_;
@@ -31,13 +100,11 @@ sub _new {
         unless defined($stream_id)
             && !ref($stream_id)
             && $stream_id =~ /\A[0-9]+\z/;
-    croak 'Transaction requires a Uniform::HTTP::Request'
-        unless blessed($request)
-            && $request->isa('Uniform::HTTP::Request');
-    croak 'Transaction response must be a Unblock::HTTP3::Response'
+    croak 'Transaction requires a canonical Uniform::HTTP::Request'
+        unless ref($request) eq 'Uniform::HTTP::Request';
+    croak 'Transaction response must be a canonical Uniform::HTTP::Response'
         if defined($response)
-            && (!blessed($response)
-                || !$response->isa('Unblock::HTTP3::Response'));
+            && ref($response) ne 'Uniform::HTTP::Response';
     croak 'unknown Transaction option: ' . join(', ', sort keys %args)
         if %args;
 
@@ -57,17 +124,25 @@ sub _new {
         early_data                => $early_data,
         response_streaming        => 0,
         request_buffered_body     => '',
+        request_buffered_chunks   => [],
+        request_buffered_bytes    => 0,
         request_buffered_seen     => 0,
         response_buffered_body    => '',
+        response_buffered_chunks  => [],
+        response_buffered_bytes   => 0,
         response_buffered_seen    => 0,
         response_output_started  => 0,
         capsule_stream           => undef,
         datagrams_enabled        => 0,
         datagram_queue           => [],
         datagram_callback        => undef,
-        priority                 => Unblock::HTTP3::Request::_parse_priority_field(
+        priority                 => _parse_priority_field(
             $request->header('priority'),
         ),
+        local_reset_code          => undef,
+        remote_reset_code         => undef,
+        local_stop_sending_code   => undef,
+        remote_stop_sending_code  => undef,
         state                    => 'active',
         error                   => undef,
     }, $class;
@@ -113,6 +188,66 @@ sub response {
     return $self->{response};
 }
 
+sub local_reset_code {
+    my ($self, @args) = @_;
+    croak 'local_reset_code() does not accept arguments' if @args;
+    return $self->{local_reset_code};
+}
+
+sub remote_reset_code {
+    my ($self, @args) = @_;
+    croak 'remote_reset_code() does not accept arguments' if @args;
+    return $self->{remote_reset_code};
+}
+
+sub local_stop_sending_code {
+    my ($self, @args) = @_;
+    croak 'local_stop_sending_code() does not accept arguments' if @args;
+    return $self->{local_stop_sending_code};
+}
+
+sub remote_stop_sending_code {
+    my ($self, @args) = @_;
+    croak 'remote_stop_sending_code() does not accept arguments' if @args;
+    return $self->{remote_stop_sending_code};
+}
+
+sub is_aborted {
+    my ($self, @args) = @_;
+    croak 'is_aborted() does not accept arguments' if @args;
+
+    return defined($self->{local_reset_code})
+        || defined($self->{remote_reset_code})
+        || defined($self->{local_stop_sending_code})
+        || defined($self->{remote_stop_sending_code})
+        ? 1
+        : 0;
+}
+
+sub _mark_local_reset {
+    my ($self, $code) = @_;
+    $self->{local_reset_code} = 0 + $code;
+    return $self;
+}
+
+sub _mark_remote_reset {
+    my ($self, $code) = @_;
+    $self->{remote_reset_code} = 0 + $code;
+    return $self;
+}
+
+sub _mark_local_stop_sending {
+    my ($self, $code) = @_;
+    $self->{local_stop_sending_code} = 0 + $code;
+    return $self;
+}
+
+sub _mark_remote_stop_sending {
+    my ($self, $code) = @_;
+    $self->{remote_stop_sending_code} = 0 + $code;
+    return $self;
+}
+
 sub priority {
     my ($self, @args) = @_;
 
@@ -135,7 +270,7 @@ sub priority {
         or croak 'priority(): Transaction no longer has a connection';
 
     my $current = $connection->_transaction_priority($self);
-    my $priority = Unblock::HTTP3::Request::_priority_from_args(
+    my $priority = _priority_from_args(
         $current,
         @args,
     );
@@ -325,9 +460,8 @@ sub send_informational {
 
     croak 'send_informational(): Transaction is already terminal'
         if $self->is_terminal;
-    croak 'send_informational(): response must be a Unblock::HTTP3::Response'
-        unless blessed($response)
-            && $response->isa('Unblock::HTTP3::Response');
+    croak 'send_informational(): response must be a canonical Uniform::HTTP::Response'
+        unless ref($response) eq 'Uniform::HTTP::Response';
     croak 'send_informational(): status must be 100 through 199, excluding 101'
         unless $response->status >= 100
             && $response->status <= 199
@@ -665,9 +799,10 @@ sub _buffered_body_bytes {
     croak "unsupported buffered body kind '$kind'"
         if $kind ne 'request' && $kind ne 'response';
 
-    return $self->{ $kind . '_buffered_seen' }
-        ? length($self->{ $kind . '_buffered_body' })
-        : 0;
+    return 0 unless $self->{ $kind . '_buffered_seen' };
+
+    return $self->{ $kind . '_buffered_bytes' }
+        + length($self->{ $kind . '_buffered_body' });
 }
 
 sub _append_buffered_body {
@@ -676,7 +811,28 @@ sub _append_buffered_body {
         if $kind ne 'request' && $kind ne 'response';
 
     $self->{ $kind . '_buffered_seen' } = 1;
-    $self->{ $kind . '_buffered_body' } .= $bytes;
+
+    my $length = length($bytes);
+
+    if ($length < $BUFFERED_BODY_RETAIN_BYTES) {
+        $self->{ $kind . '_buffered_body' } .= $bytes;
+        return;
+    }
+
+    my $body_name = $kind . '_buffered_body';
+    my $chunks = $self->{ $kind . '_buffered_chunks' };
+    my $bytes_name = $kind . '_buffered_bytes';
+
+    if (length($self->{$body_name})) {
+        my $tail = $self->{$body_name};
+
+        push @$chunks, $tail;
+        $self->{$bytes_name} += length($tail);
+        $self->{$body_name} = '';
+    }
+
+    push @$chunks, $bytes;
+    $self->{$bytes_name} += $length;
     return;
 }
 
@@ -695,11 +851,33 @@ sub _finish_received_message {
         $self->{ $kind . '_receive_mode' } eq 'buffered'
         && $self->{ $kind . '_buffered_seen' }
     ) {
-        $message->body($self->{ $kind . '_buffered_body' });
-    }
+        my $body_name = $kind . '_buffered_body';
+        my $chunks = $self->{ $kind . '_buffered_chunks' };
+        my $body;
 
-    $self->{ $kind . '_buffered_body' } = '';
-    $self->{ $kind . '_buffered_seen' } = 0;
+        if (@$chunks) {
+            push @$chunks, $self->{$body_name}
+                if length($self->{$body_name});
+
+            $body = @$chunks == 1
+                ? $chunks->[0]
+                : join('', @$chunks);
+        } else {
+            $body = $self->{$body_name};
+        }
+
+        $self->{$body_name} = '';
+        $self->{ $kind . '_buffered_chunks' } = [];
+        $self->{ $kind . '_buffered_bytes' } = 0;
+        $self->{ $kind . '_buffered_seen' } = 0;
+
+        $message->body($body);
+    } else {
+        $self->{ $kind . '_buffered_body' } = '';
+        $self->{ $kind . '_buffered_chunks' } = [];
+        $self->{ $kind . '_buffered_bytes' } = 0;
+        $self->{ $kind . '_buffered_seen' } = 0;
+    }
 
     $message->freeze_trailers;
     $message->freeze;
@@ -712,6 +890,8 @@ sub _discard_received_body_buffers {
 
     for my $kind (qw(request response)) {
         $self->{ $kind . '_buffered_body' } = '';
+        $self->{ $kind . '_buffered_chunks' } = [];
+        $self->{ $kind . '_buffered_bytes' } = 0;
         $self->{ $kind . '_buffered_seen' } = 0;
     }
 
@@ -751,9 +931,8 @@ sub _cancel_body_producers {
 sub _push_informational {
     my ($self, $response) = @_;
 
-    croak 'informational response must be a Unblock::HTTP3::Response'
-        unless blessed($response)
-            && $response->isa('Unblock::HTTP3::Response');
+    croak 'informational response must be a canonical Uniform::HTTP::Response'
+        unless ref($response) eq 'Uniform::HTTP::Response';
 
     push @{ $self->{informational} }, $response;
     return $response;
@@ -766,9 +945,8 @@ sub _set_response {
         if $self->is_terminal;
     croak 'Transaction already has a response'
         if defined $self->{response};
-    croak 'Transaction response must be a Unblock::HTTP3::Response'
-        unless blessed($response)
-            && $response->isa('Unblock::HTTP3::Response');
+    croak 'Transaction response must be a canonical Uniform::HTTP::Response'
+        unless ref($response) eq 'Uniform::HTTP::Response';
 
     $self->{response} = $response;
     return $response;
@@ -850,10 +1028,42 @@ Returns the L<Uniform::HTTP::Request> associated with this Transaction.
 
 =head2 response
 
-Returns the final L<Unblock::HTTP3::Response> when one is available.
+Returns the final L<Uniform::HTTP::Response> when one is available.
 
 On a server, the Transaction receives a mutable Response when the request is
 created.
+
+=head2 local_reset_code
+
+Returns the RESET_STREAM application error code explicitly requested by the
+local HTTP/3 layer for this request stream, or undef when none was requested.
+
+A peer STOP_SENDING can cause QUIC itself to send the required RESET_STREAM.
+That transport-generated response is not reported here. The peer request is
+reported by L</remote_stop_sending_code>.
+
+=head2 remote_reset_code
+
+Returns the RESET_STREAM application error code received from the peer for this
+request stream, or undef when none has been received.
+
+=head2 local_stop_sending_code
+
+Returns the STOP_SENDING application error code sent locally for this request
+stream, or undef when none has been sent.
+
+=head2 remote_stop_sending_code
+
+Returns the STOP_SENDING application error code received from the peer for this
+request stream, or undef when none has been received.
+
+=head2 is_aborted
+
+True when any local or remote RESET_STREAM or STOP_SENDING code has been
+recorded for the Transaction.
+
+These are HTTP/3 transport diagnostics. They are intentionally kept on the
+Transaction instead of the canonical Uniform Request or Response objects.
 
 =head2 protocol
 
@@ -913,7 +1123,7 @@ For a streaming response body, use C<response_body> instead.
 =head2 send_informational
 
     $tx->send_informational(
-        Unblock::HTTP3::Response->new(
+        Uniform::HTTP::Response->new(
             status => 103,
         ),
     );
@@ -1004,8 +1214,8 @@ True when the Transaction is complete, cancelled, or in error.
 
 =head1 SEE ALSO
 
-L<Unblock::HTTP3::Connection>, L<Unblock::HTTP3::Request>,
-L<Unblock::HTTP3::Response>, L<Unblock::HTTP3::Body::Stream>,
+L<Unblock::HTTP3::Connection>, L<Uniform::HTTP::Request>,
+L<Uniform::HTTP::Response>, L<Unblock::HTTP3::Body::Stream>,
 L<Unblock::HTTP3::Body::Reader>, L<Unblock::HTTP3::Capsule::Stream>
 
 =head1 AUTHOR

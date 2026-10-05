@@ -6,7 +6,7 @@ class Getopt::Pad::Completion :strict(params) {
 	use File::Basename qw(basename);
 	use List::Util     qw(min);
 
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	use constant SHELLS         => ['bash', 'zsh'];
 	use constant SHELL_VARIABLE => 'GETOPT_PAD_COMPLETE';

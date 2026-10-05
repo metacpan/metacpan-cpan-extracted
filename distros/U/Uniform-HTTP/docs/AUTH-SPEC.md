@@ -1,6 +1,6 @@
 # Uniform::HTTP::Auth API Specification
 
-Status: authentication contract for Uniform-HTTP 0.04. The public API introduced in 0.01 and 0.02 remains supported.
+Status: authentication contract for Uniform-HTTP 0.06. The public API introduced in 0.01 and 0.02 remains supported.
 
 ## Purpose
 

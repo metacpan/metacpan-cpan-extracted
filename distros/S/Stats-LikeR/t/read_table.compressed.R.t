@@ -13,7 +13,7 @@
 #     datasets' data/morley.tab through gzfile() and bzfile(), and
 #     stopifnot(identical(read.table(tf), morley)) for each. Here the same
 #     files must read exactly as t/morley.tab does, the plain copy, with
-#     auto.row.names standing in for read.table's rule that a header one
+#     auto_row_names standing in for read.table's rule that a header one
 #     field short names the rows. The two rows pinned below are R's
 #     print(morley[c(1, 100), ]): 001 is 1 1 850, 100 is 5 20 870.
 #   * "tests of append mode on compressed connections": 1:50 written through
@@ -132,7 +132,7 @@ sub bz {
 	return $out;
 }
 
-my %morley = (sep => qr/\s+/, 'auto.row.names' => 1);
+my %morley = (sep => qr/\s+/, 'auto_row_names' => 1);
 my $plain  = t_file('morley.tab');
 
 # R's identical(read.table(tf), morley), for each compressed copy and output
@@ -146,12 +146,12 @@ my $plain  = t_file('morley.tab');
 		is substr(slurp($f), 0, length $magic{$name}), $magic{$name},
 			"$name is compressed";
 		for my $otype (qw(aoh aoa hoa)) {
-			is_deeply read_table($f, %morley, 'output.type' => $otype),
-				read_table($plain, %morley, 'output.type' => $otype),
+			is_deeply read_table($f, %morley, 'output_type' => $otype),
+				read_table($plain, %morley, 'output_type' => $otype),
 				"$name reads as morley.tab does ($otype)";
 		}
-		my $hoh = read_table($f, %morley, 'output.type' => 'hoh',
-			'row.names' => 'row_name');
+		my $hoh = read_table($f, %morley, 'output_type' => 'hoh',
+			'row_names' => 'row_name');
 		is scalar(keys %$hoh), 100, "$name: 100 rows, as dim(morley)";
 		is_deeply [ @{ $hoh->{'001'} }{qw(Expt Run Speed)} ], [ 1, 1, 850 ],
 			"$name: morley['001', ] is 1 1 850";
@@ -169,7 +169,7 @@ my $plain  = t_file('morley.tab');
 	my @want = ([ 'V1' ], map { [ $_ ] } 1 .. 70);
 	for my $name (qw(append70.gz append70.bz2)) {
 		my $f = t_file($name);
-		is_deeply read_table($f, header => 0, 'output.type' => 'aoa'), \@want,
+		is_deeply read_table($f, header => 0, 'output_type' => 'aoa'), \@want,
 			"$name: both members are read, 70 lines as readLines() gives";
 	}
 	# Cut where the first member ends, the file is a whole gzip file of one
@@ -181,7 +181,7 @@ my $plain  = t_file('morley.tab');
 	$first->inflate($rest, $out) == Compress::Raw::Zlib::Z_STREAM_END()
 		or die "append70.gz: the first member does not end\n";
 	my $f = fixture('first50.gz', substr($bytes, 0, length($bytes) - length $rest));
-	is_deeply read_table($f, header => 0, 'output.type' => 'aoa'),
+	is_deeply read_table($f, header => 0, 'output_type' => 'aoa'),
 		[ [ 'V1' ], map { [ $_ ] } 1 .. 50 ],
 		'append70.gz cut at the member boundary: the first 50 lines';
 }
@@ -269,7 +269,7 @@ my $plain  = t_file('morley.tab');
 {
 	is_deeply read_table(fixture('empty.csv.gz', gz(''))), [],
 		'an empty gzip member reads as an empty file';
-	is_deeply read_table(fixture('hdronly.csv.gz', gz("a,b\n")), 'output.type' => 'hoa'),
+	is_deeply read_table(fixture('hdronly.csv.gz', gz("a,b\n")), 'output_type' => 'hoa'),
 		{}, 'a header and no rows, compressed';
 	{
 		is_deeply read_table(fixture('empty.csv.bz2', bz(''))), [],

@@ -1,5 +1,823 @@
 Revision history for Stats-LikeR
 
+0.3213 2026-10-01 CDT
+
+ [Every name is spelled with _ instead of .]
+
+ - Every option name and result key that followed R in spelling itself
+   with a dot now uses an underscore: p_value, conf_int, conf_level,
+   statistic_name, null_value, fitted_values, df_residual, r_squared,
+   row_names, col_names, output_type, na_strings, undef_val, Res_Df,
+   CI_lower, SE_theta and the rest, 112 names in all. Perl parses
+   $r->{p.value} as "p" . "value", so every dotted key had to be quoted;
+   $r->{p_value} needs no quotes.
+
+ - The dotted spellings are gone rather than kept as aliases: conf.level,
+   output.type, row.names and the rest are now refused as unknown
+   arguments, where many functions used to accept both. density()'s
+   give.Rkern becomes give_rkern, the underscore spelling it already took.
+
+ - rank(), cohen_d(), age_standardize() and TukeyHSD() never checked their
+   option names, so an old dotted name would have been ignored without a
+   word, and rank() would have ranked 'ties.method' as data. All four now
+   refuse names they do not know.
+
+ - Only names change. Option values keep R's spelling (alternative =>
+   'two.sided', type => 'one.sample', family => 'negative.binomial'), and
+   so do names built from the data: merge()'s default suffixes .x and .y,
+   pivot_table()'s sep, the .1 and .2 that make a repeated name unique,
+   read_table()'s exploded VCF columns such as NA00001.GT, and R's table
+   headers Std. Error and Resid. Df.
+
+ [assign(): consistent context, shape detection, no half-applied calls]
+
+ - A per-row coderef was called in list context for the first row, to
+   tell a whole-column return apart, and in scalar context for every other
+   row, so anything that answers differently in the two gave the first row
+   a different kind of value: sub { $_->{s} =~ /(\d+)/ } stored the digits
+   in row 0 and 1 in every other row, and a failed match was undef in row
+   0 and '' elsewhere. Every row is now called in list context; a later
+   row that returns more than one value dies instead of storing a count.
+
+ - A hash frame was classified as HoA or HoH by whichever value values()
+   returned first, so a HoA holding a scalar or undef entry worked or died
+   from one run to the next with hash order (167 of 200 runs died on a
+   frame with five such entries). Every value is now looked at; a hash of
+   both arrays and hashes, or of plain scalars only, dies with a message
+   that says so.
+
+ - Rows, value types, arrayref lengths and map_cell targets are all
+   checked before the first write, so a bad last row or a bad later pair
+   no longer leaves the earlier rows or pairs applied.
+
+ - An empty hash takes its row count from its first arrayref value, so
+   assign({}, x => [1, 2, 3]) makes a column where it used to die.
+
+ - On a HoA the row loop is now C (_hoa_assign), and the row view
+   aliases the frame: one hash for the whole call, whose values are the
+   current row's own cells rather than copies. A write through $_->{col}
+   therefore reaches the frame, as it always has for an AoH or HoH, and
+   map_cell's $_ is the cell itself. Building a fresh hash of copies per
+   row was 73% of the call, and C alone would have cut that by only a
+   quarter. A per-row coderef on 200000 rows x 16 columns went from 0.41s
+   to 0.062s, and on 1000000 x 64 from 6.6s to 0.94s; map_cell from 0.23s
+   to 0.055s and from 4.1s to 0.93s. A key the block adds to the view is
+   gone on the next row, and a block that keeps $_ keeps that one view. A
+   tied frame or column keeps the perl loop and its copies.
+
+ - A whole-column result on a HoA is installed without a second copy of
+   the list, which takes 1.5 MB off the call's peak on 200000 rows.
+
+ [vals(), avals(): a column no row has is an error]
+
+ - On an AoH or HoH, asking for a column that no row has returned one
+   undef per row, so a misspelt name went unnoticed until something
+   downstream choked on the undefs. Both now die with 'vals: no column
+   named "Method"' (or 'avals: ...'), as a HoA already did, and a HoA's
+   missing column says the same thing rather than "not found or is not an
+   array-ref". A column that some rows lack, or that holds only undef, is
+   still read as before, and an empty frame still gives an empty result.
+
+ [read_table(): a comment as wide as the header]
+
+ - A leading comment that split into as many fields as the next line was
+   taken for a commented-out header, and the file's real header then read
+   as the first data row, with no warning: "# written by foo, v2" before
+   "id,val" named the columns "written by foo" and " v2". A commented line
+   is now the header only when the line after it looks like data -- a
+   number or an na_strings token in one of its fields, or nothing but
+   empty fields; otherwise it is a comment, as in R and pandas. Over rows
+   of text alone a commented-out header cannot be told from a comment, and
+   the first row is read as the header.
+
+ [read_table(): VCF files]
+
+ - A VCF could not be read. Its "##" meta lines have the marker hugging
+   the text ("##fileformat=VCFv4.2"), which the parser passes on as a
+   possible commented-out header, and the first such line was taken for
+   the header on the spot: the file was one column named
+   "fileformat=VCFv4.2", and the "#CHROM" line an alignment error. That
+   happened with comment => '##' and with '#' alike. A run of these lines
+   before the header is now a run of candidates; the last, the one next to
+   the data, is tried under the rule above, and if it fails the next line
+   is the header. R's tests/reg-IO2.R test.dat ("#comment", "#another",
+   "#", then a C1 C2 C3 header) now reads with header = TRUE as R reads it,
+   where it was an alignment error.
+
+ - A file named .vcf, .vcf.gz or .vcf.bgz is read with a tab sep, a "##"
+   comment marker and the "#" taken off "#CHROM", so read_table('x.vcf.gz')
+   needs no options. The cases are htslib 1.21's own test VCFs, with
+   bcftools 1.21's reading of them as the expected values.
+
+ - Each sample column of a VCF is split on ':' into one column per FORMAT
+   key, named "<sample>.<key>", and the records come back as a hoh keyed by
+   CHROM:POS:REF:ALT. FORMAT may change from record to record, so the keys
+   are those of every record read; a key a record lacks, or a value a
+   sample drops off the end, is undef. Values stay text. 'output_type' still
+   gives the other shapes, 'row_names' another key, and the new explode => 0
+   the file's own columns. A filter sees the file's own columns, since it
+   runs while the file is read. The cases are bcftools 1.21's test VCFs,
+   with each value as bcftools query prints it. The split is done in C: on
+   a 3,499,678-record single-sample .vcf.gz it adds 2.6 s to the 9.1 s a
+   plain hoh takes, where the first version, in perl, added 12.6 s.
+
+ [read_table(): CR line ends]
+
+ - A file whose lines end in a bare CR, as classic Mac OS wrote them, was
+   read as one line with every CR dropped, and came back as []. One whose
+   start has a CR and no LF is now split on CR, as R's scan() and pandas'
+   C tokenizer split it. A stray CR in an LF or CRLF file is still dropped.
+   The cases are pandas 3.0.4's test_cr_delimited and
+   test_tokenize_CR_with_quoting, and R's PR#2469.
+
+ [read_table(): repeated row names]
+
+ - A hoh warned once for every row that repeated an earlier row's name:
+   40,820 warnings for a 300,000-row file of random names. It now warns
+   once for the file, with the count and the first repeated name and row.
+   A single repeat keeps the words it has always had.
+
+ [read_table(): speed]
+
+ - The CSV parser stores into its own arrays without going through
+   av_push(), finds the next special byte with one table lookup instead of
+   three tests, hands its row buffer over as an aoa's output row instead of
+   copying it, and looks a hoh's row name up once instead of twice. On a
+   300,000 x 10 CSV, best of seven: aoa 0.147 s to 0.117 s, hoa 0.204 s to
+   0.178 s, aoh 0.179 s to 0.165 s, and a 300,000-row hoh 0.357 s to
+   0.339 s.
+
+ [read_table(): fixes from a review]
+
+ - VCF explode aborted ("realloc(): invalid pointer") when two output
+   columns had one name and the shape was hoa: a sample name repeated in
+   the header, as merged files have, or sample "X" with key "Y.Z" beside
+   sample "X.Y" with key "Z". The second column's array replaced the first's
+   while rows were still pushed into the first. An aoh or hoh kept the later
+   column without a word. Every shape but aoa now keeps the later column
+   and warns as the plain read does about a repeated name.
+
+ - A commented-out header ("# id,val") was cut by a perl split(), which
+   ignored quoting and cut before the marker came off: '# "x,y",z' gave
+   three names and "#<TAB>a<TAB>b" gave ('', 'a', 'b'). The widths then
+   failed to match the data, so the first data row became the header and
+   was lost, silently. The line is now cut by the parser itself.
+
+ - In an .xlsx, a first cell starting with '#' was taken for a commented-out
+   header, though 'comment' does not apply to an .xlsx: a column "#id" with
+   values "#a1" came back as [], and "# of items" lost its "# ".
+
+ - A filter field named by two keys, its number and its name, ran only one
+   of the two, and which one followed hash order, so the rows kept changed
+   between runs. Both now run, in key order. A key that is a column's name
+   is that column before it is a field number, so a column named "2021" can
+   be filtered on; 0 is still the whole row. Under a repeated column name,
+   a filter on an earlier field now sees that field's own value, and its
+   write-back no longer replaces the value the row keeps for the name.
+
+ - 'sheet' takes a name before an index. Of sheets "2024" and "2023",
+   neither could be asked for by the name the whole-book read returns it
+   under, and with sheets "2" and "1", sheet => '1' returned "2".
+
+ - An .xlsx whose elements carry a namespace prefix (<x:row>, as the Open
+   XML SDK writes them) read as [] without a warning; it is now read. A
+   cell written open and empty (<c s="2"></c>, <c><v></v></c>) past a
+   row's last value no longer adds an unnamed column, as the self-closing
+   <c s="2"/> already did not.
+
+ - Text passed in as characters, under `use utf8` or decoded, is compared
+   with the file as UTF-8 bytes. A qr// sep holding a character past 0xFF
+   never matched, nor did such an na_strings token, filter key, row_names
+   or sheet name, while a literal sep did. A UTF-8 qr// sep now matches
+   each line as UTF-8 and refuses a line that is not.
+
+ - row_names with an aoh or hoa, and sheet on anything but an .xlsx, were
+   ignored; both are now errors, as row_names with an aoa already was. An
+   xz, LZMA, zstd or lzop file is refused by name, from R's magic numbers,
+   where it was read as text and reported as an alignment error.
+
+ [t_test(): tied input]
+
+ - A sample's length came from av_len(), which is FETCHSIZE on a tied
+   array, but its elements were read straight out of the array's own
+   storage, which a tied array does not use. A tied array that still held
+   real elements from before the tie was read past their end and
+   segfaulted; a freshly tied one read as empty and croaked "'x' needs at
+   least 2 elements". Elements are now read through FETCH on a tied array.
+
+ - Get magic was not run before testing whether an element or argument was
+   defined, so a tied element read as missing and was dropped, and a tied
+   scalar holding the array reference was refused with "Usage: ...". Both
+   now work, and each element is fetched once.
+
+ - A sample's buffer was sized from one call to FETCHSIZE and filled up to
+   a second. A tied array whose FETCHSIZE grew in between was written past
+   the end of the buffer and segfaulted. The length the buffer was sized
+   from is now the one read.
+
+ [t_test(): far-tail p-values]
+
+ - The p-value squared the t statistic itself, so for |t| above
+   sqrt(DBL_MAX), about 1.34e154, it came back as exactly 0 where R's is a
+   positive number. That tail is still far above underflow at df <= 2:
+   t_test([1e-160, 2e-160], mu => 1) gave 0 for R's 3.18e-161. It now goes
+   through the same tail code as pt(), which has R's asymptotic branch.
+   R's own check for this, pt(-a, df = 1) == pcauchy(-a) out to a = 1e300
+   (tests/d-p-q-r-tst-2.R), is now in t/t_test.tails.R.t.
+
+ [t_test(): the variance]
+
+ - Welford's update was replaced with R's two-pass variance. It lost
+   digits on data with a large offset: four values 1e-4 apart at 1e10 gave
+   t = 1.54414e14 for an exact 1.55003e14, and a 1e6 +- 1e-6 sample's
+   standard error was 6e-5 out against R's 7e-9.
+
+ - It goes past R in two ways. The squared deviations have
+   (sum of deviations)^2 / n subtracted, the Chan-Golub-LeVeque
+   correction, and the same sum is carried into t as the part of the mean
+   no double holds. On a sample whose spread is a few dozen ulps of its
+   mean, R's t is out in the third digit and this one is within 2e-16 of
+   exact rational arithmetic.
+
+ - The data are scaled by a power of two before squaring, so squares past
+   DBL_MAX no longer overflow. t_test([1e154, -1e154, 3e153],
+   [2e154, -1e153, 5e153]) returned t = -0 and df = NaN. Its Welch df and
+   standard error are now formed from ratios and are finite, where R's
+   df, written in stderr^4, is NaN.
+
+ [t_test(): arguments]
+
+ - A NaN conf_level passed the range check and gave an interval of
+   (-Inf, Inf); a NaN mu gave a NaN t. Both now croak, as R stops on both.
+
+ - An undef mu or conf_level, R's NULL, was read as 0, and a reference was
+   read as its address. Both croak "'mu' must be a single number", as R
+   does; an object that overloads numification is still accepted.
+
+ - The result carries stderr, the standard error the statistic divides
+   by, which R's t.test() has returned since 3.6.0.
+
+ - conf_level 0 and 1 were refused; R accepts both, as the ends of its
+   range. 1 now gives (-Inf, Inf) and 0 a point at the estimate, as in R.
+   This also stops a conf_level within an ulp of 1, such as 1 - 1e-20,
+   which is 1.0 on a double, from croaking.
+
+ [t_test(): memory]
+
+ - A two-sample test copied x and y into separate buffers at once. x is
+   now reduced to its moments before y is read into the same buffer, so
+   the extra memory peaks at max(nx, ny) values instead of nx + ny: 800 MB
+   less on a double build for two groups of 1e8.
+
+ [qt(): Newton instead of bisection]
+
+ - qt_tail(), the t quantile behind qt(), t_test()'s confidence interval,
+   power_t_test(), svyglm(), ivreg() and lmer(), bisected all the way to
+   adjacent doubles. That took 40 to 55 evaluations of the t tail, about
+   twice as many on quadmath, and was most of t_test()'s time on samples
+   under about a thousand values. It is now Newton on the log tail against
+   log t, kept inside the same bracket and falling back to the midpoint
+   when a step would leave it. qt(0.975, df) takes 2 to 9 us instead of 11
+   to 33. Results agree with the old ones to 7e-15 relative except near
+   p = 0.5, where both are limited by the tail's own rounding and, where
+   checked against mpmath, the new ones are the closer.
+
+ [Incomplete beta: a NaN argument hung __float128 builds]
+
+ - The continued fraction behind pt(), pf() and the binomial tails cast
+   its iteration cap to long, and a NaN shape parameter reached the cast.
+   That is undefined behaviour. A double build got LONG_MIN and skipped
+   the loop; a quadmath build got a count it never finished, so t_test()
+   on a sample holding an infinity, whose Welch df is NaN as R's is, hung.
+   incbeta_xy() now returns NaN for a NaN argument, and the cap check
+   sends a NaN to the ceiling instead of the cast.
+
+ [Tests: every t.test() call in R]
+
+ - t/t_test.R.scipy.t now carries every t.test() call in R's sources and
+   tests: the examples of ?t.test, ?sleep, ?ks.test (drawn under R CMD
+   check's set.seed(1)), ?array2DF and ?pairwise.t.test, R-intro, the
+   tcltk demo, and reg-tests-1a, -1e and -2. Each is crossed over every
+   alternative, var_equal, mu and conf_level, and the examples are also
+   checked against R's pinned .Rout.save output at the digits R printed.
+   PR#18901's stopifnot() is reproduced in full, where the test had only
+   checked that the call did not crash.
+
+ - The documentation said x needs 2 values even under var_equal, where
+   either sample may have 1. It now says so.
+
+ [logrank_test(): a group with no expected events]
+
+ - A group never at risk at an event time -- one whose subjects are all
+   censored before the first event -- has no expected events and a zero
+   row and column in the variance matrix. Every group was kept in the test
+   and the last one dropped, so that matrix was singular, the solve
+   failed, and the statistic was left at 0 with no warning: p = 1, on a df
+   that counted the empty group. survival's own tests/difftest.R adds such
+   a group of seven early censorings to aml and expects aml's answer back,
+   3.396 on 1 df, p = 0.065; this gave 0 on 2 df, p = 1. Such groups are
+   now left out of the test, as survdiff() leaves them out. With only one
+   group left the statistic is 0 on 0 df with p = 1, as in survdiff(); with
+   no events at all it is NaN on 0 df, where survdiff() gives df = -1. A
+   variance matrix that is still singular -- every event time empties the
+   risk set -- croaks, as survdiff() stops, instead of reporting p = 1.
+
+ - An event time with one subject at risk was skipped outright, to keep
+   the variance term's n - 1 divisor away from zero, so the last subject
+   dying went uncounted in observed and expected alike. The statistic was
+   right, the two cancelling, but the group's observed and expected
+   events were each one too few. Only the variance term is skipped now.
+
+ [survfit(): the median on a flat stretch at 0.5]
+
+ - When S(t) steps onto exactly 0.5, survival:::survmean() puts the median
+   halfway between that time and the next drop. survfit() took the start
+   of the flat stretch instead, so 4 deaths among 8 at t = 5 with the next
+   at t = 6 gave a median of 5 where R gives 5.5. It now follows R's rule,
+   to R's tolerance of 2^-26 for "is 0.5".
+
+ [Tests: survival]
+
+ - t/survival.R.t pins logrank_test() and survfit() to R 4.6.1 with
+   survival 3.8-12 at full precision, on aml and aml3 from
+   tests/difftest.R, test1 from tests/quantile.R, and data built to reach
+   each new branch. t/survival.t had covered aml alone. The generator is
+   t/survival.R.R.
+
+ [agg(): the split moves to XS]
+
+ - Grouping is now done in C: one pass hashes each row's `by` cells into
+   its group, a second drops each aggregated cell straight into its
+   group's array. The perl split copied every needed column, built a row
+   index per group and sliced a second copy out of the columns for each.
+   On 1e6 AoH rows in 1000 groups agg() goes from 0.59 s to 0.14 s, and
+   from 157 MB above the frame to 31 MB; ungrouped, from 0.56 s and
+   162 MB to 0.10 s and 30 MB. Plain-number cells that only the numeric
+   reducers read are shared, not copied, and nothing is written back to
+   the caller's scalars: keying on a numeric column no longer leaves a
+   cached string on every cell, as "v$v" did.
+
+ [agg(): fixes]
+
+ - A coderef aggregator ran in list context, so one returning an empty
+   list or several values shifted every later column of the row:
+   { a => sub { grep { .. } @{ $_[0] } }, b => 'sum' } put b's sum under a.
+   It now runs in scalar context.
+
+ - Output names collided silently. Aggregating a `by` column
+   (by => 'g', agg => { g => 'count' }) overwrote the group's key, and in
+   hoa output left that column twice as long as the others; two coderefs
+   on one column were both "fn", so only the second survived. A `by`
+   column now aggregates to "<col>_<func>", several coderefs are fn1,
+   fn2, .., and any name still generated twice dies, except under
+   output_type aoa, whose columns are positional.
+
+ - Groups sorted wrong whenever any key was undef or any `by` column held
+   strings: one numeric-or-string decision covered every key column, and
+   an undef made it "string", so 10 sorted before 2. Each column is now
+   compared on its own terms, undef last and NaN after the numbers. A
+   NaN key used to die inside sort under the module's FATAL warnings.
+   pivot_table() shares the sort, and gets the same fix.
+
+ - Keys with several columns were joined with a bare "\x1e", so
+   ("p\x1evq", "r") and ("p", "q\x1evr") were one group. Cells are now
+   length-prefixed, as drop_duplicates() and merge() key them.
+
+ - skipna => 0 did not reach min and max, which pandas' skipna=False
+   does. It now covers mean, median, sum, sd, var, min, max and mode.
+
+ - A column in no row -- a misspelled name -- came back as a column of
+   undef; it now dies, as pandas' KeyError does. An undef `by` column, a
+   non-integer AoA position, a non-array HoA column and a defined row
+   that is not a reference now die with a message saying so, rather than
+   on a perl warning. A non-numeric cell now names the reducer, column
+   and group. An unknown aggregator is caught before any group is
+   reduced, so an empty frame no longer lets one through.
+
+ - An empty frame aggregated without `by` gave no rows; it is now one
+   row, as pandas' df.agg gives, with count and n 0.
+
+ [Tests: agg()]
+
+ - t/agg.R.pandas.t pins agg() to R 4.6.1's aggregate() -- every
+   aggregate.Rd example that is a data frame, and the reg-tests-1a/1c/1d
+   cases including PR#15004's 21 grouping columns -- and to pandas
+   3.0.4's own groupby tests, among them every float64 row of GH#15675's
+   skipna parametrisations. Every case runs through all four input
+   shapes. The generators are t/agg.R.pandas.R and t/agg.R.pandas.py.
+
+ [anova(): the model R fits]
+
+ - anova(\%data, formula) had a formula parser of its own, and it fitted
+   models R does not. Every factor in an interaction was coded by
+   contrasts, ignoring R's margin rule: y ~ a + a:b (b nested in a) gave
+   a:b 2 df on warpbreaks where R gives 4, y ~ a:b gave 2 where R gives
+   5, and y ~ g + g:x did not fit a slope per group. Because that coding
+   depended on which level came first, y ~ a:b gave a sum of squares of
+   5.40 or 22.08 on the same rows in a different order. Terms were taken
+   in formula order rather than R's (main effects, then two-way
+   interactions, ..), so y ~ a + b:a + b attributed b after the
+   interaction. y ~ 0 + x was fitted with an intercept; y ~ x - 1 read
+   "x - 1" as a column name and died on "fewer than 2 complete
+   observations"; y ~ ., offset(), y ~ 1 and a*b:x with b a factor all
+   died the same way or another; and y ~ a:b + b:a fitted the
+   interaction twice. anova() now reads the formula with lm()'s parser
+   and builds the design with lm()'s, and all of these match R 4.6.1.
+
+ - A column is aliased by R's rule, when what the earlier columns leave
+   of it has a norm below 1e-7 of its own (lm.fit's tol, dqrdc2.f). The
+   test was 1e-10 on the largest absolute entry.
+
+ - Data is read as lm() reads it, so a hash of hashes is accepted and a
+   hash of arrays whose columns differ in length dies, rather than
+   fitting on the response's length.
+
+ [anova(): model comparison]
+
+ - A list of formulas whose responses differ was compared on RSSs of
+   different responses: 'y ~ a' against 'log(y) ~ a + b' gave F = 91.4.
+   As anova.lmlist() does, a model whose response is not the first
+   model's is now dropped with a warning, and if one model is left its
+   own table is returned.
+
+ - F follows stat.anova(). A step with Df > 0 and a negative Sum of Sq
+   (models that are not nested) gave F < 0 and a p-value of 1; F and
+   Pr(>F) are now left out, R's NA. A step with Df < 0 -- models listed
+   largest first, as anova.lm.Rd's "unconventional order" example does
+   -- had no F; it is now tested on abs(Df), as R tests it.
+
+ [anova(): speed and memory]
+
+ - The fit held the whole n-by-p design, one allocation per row, plus a
+   dense copy of every factor's indicator columns, and reduced it by
+   Householder QR with loops that walked each column down those rows. It
+   now rotates one row at a time into a p-by-p triangle (Gentleman's
+   Givens rotations, AS 274, as R's biglm does) and keeps nothing that
+   grows with n. y ~ g*h + x on 1e5 rows with a 50-level g (201 design
+   columns) went from 47.5 s and 196 MB to 1.6 s and under 1 MB (R's
+   anova(lm()) takes 3.1 s); with a 200-level g (801 columns), from
+   638 s and 768 MB to 23 s and 2 MB.
+
+ - Factor levels are found with a hash rather than a linear search per
+   row. This is lm()'s design builder, so lm(), glm() and every model
+   built on it gain it too.
+
+ [lm(), glm(): a:b and b:a]
+
+ - The term list dropped a repeated term only when it was spelled the
+   same way, so y ~ a:b + b:a carried the interaction twice, the second
+   copy aliased. a:b and b:a are now one term, as in R.
+
+ [Tests: anova()]
+
+ - t/anova.R.t pins anova() to R 4.6.1's anova.lm() and anova.lmlist():
+   anova.lm.Rd's LifeCycleSavings tables, including the unconventional
+   order that stats-Ex.Rout.save pins; warpbreaks.Rd's model and the same
+   data nested, alone, out of order and without an intercept; npk.Rd's
+   confounded design; ToothGrowth with a slope per supplement;
+   reg-tests-2.R's offset (PR#8049) and 0-rank models. The generator is
+   t/anova.R.R. t/anova.t gains leak checks for the paths that croak
+   after the designs are built.
+
+ [aov(): the model R fits]
+
+ - aov() had a formula parser and a Householder QR of its own. It now
+   reads the formula with lm()'s parser and fits it as anova() does,
+   which fixes the models below.
+
+ - Groups whose names look like numbers were fitted as one slope.
+   aov({1 => [..], 2 => [..], 3 => [..]}), the documented no-formula
+   form, gave Group 1 df where R's stack() makes a three-level factor
+   with 2: F = 26.43 for R's 12.04 on the same data. The stacked Group is
+   now a factor whatever its labels are.
+
+ - a*b*c crossed only its first `*`, and offset() was read as a column
+   name, so both died with a misleading "0 degrees of freedom".
+
+ - Every factor in an interaction was coded by contrasts, so y ~ a:b,
+   y ~ a + a:b and y ~ g + g:x died with "requires its main effects", and
+   y ~ g - 1 lost a level of g. Factors are now coded by R's margin rule.
+
+ - Terms were taken in the order written, so y ~ a + b:a + b died the
+   same way and a:b + b:a was two terms. They are now in R's order, by
+   degree, and named as R names them.
+
+ - A column was aliased when its largest remaining entry fell below 1e-10
+   of its largest entry. It is now R's lm.fit rule: aliased when the part
+   the earlier columns leave has a norm below 1e-7 of its own.
+
+ - The table now follows anova(): a 0-df term has no Mean Sq, and no
+   term has an F test when there are no residual df or the fit is exact,
+   where they used to be 0 and NaN. Two complete rows are enough, as in
+   R; "0 degrees of freedom" used to stop any fit with no residual df.
+
+ - fitted_values include the offsets, as R's do, and are keyed by a
+   row_names column when there is one, as lm()'s are.
+
+ [aov(): group_stats]
+
+ - With a formula, group_stats held the mean and count of every column of
+   the data, over every row: the response's overall mean, and NaN for each
+   factor. It now holds the response's mean and count in each level of
+   each factor of the model, over the rows fitted. With one factor it is
+   keyed by level, as the stacked form and oneway_test() key it; with
+   several, by factor and then level. The stacked form's values are
+   unchanged.
+
+ [aov(): speed and memory]
+
+ - The design was held twice, n by p each, and every level of every
+   factor in every row was a string copy. The fit now keeps a p-by-p
+   triangle and re-reads the rows for fitted_values. y ~ g*h + x over 1e5
+   rows with a 50-level g went from 40.9 s and 367 MB to 1.8 s and 52 MB;
+   anova() takes 1.6 s.
+
+ [lm(), glm(), anova(): interaction coefficient names]
+
+ - An interaction's coefficients were named in the order its variables
+   were written, so y ~ w + t + t:w named them tL:wB where R has wB:tL.
+   A term's variables now follow their first appearance in the formula,
+   as R's terms() orders them, which also gives the columns of the term
+   R's order.
+
+ [Tests: aov()]
+
+ - t/aov.R.t pins aov()'s table, coefficients, fitted values and
+   group_stats to R 4.6.1: aov.Rd's npk models, warpbreaks.Rd,
+   reg-tests-1b's warpbreaks with NA rows, reg-tests-3's oats (PR#7829),
+   ToothGrowth with a slope per supplement and with an offset,
+   reg-tests-2's PR#16437 with and without an intercept, and PlantGrowth
+   stacked, under its own group names and under "1", "10" and "2". The
+   generator is t/aov.R.R. One divergence is recorded there: R drops a
+   factor level whose rows were all dropped for NA, and lm()'s design
+   builder keeps it as an aliased column.
+
+ [each() survives every XS function]
+
+ - Every XS function that walked a hash it was handed reset that hash's
+   iterator, the one each(), keys() and values() share, so a caller part
+   way through while (my ($k, $v) = each %$df) started again and saw keys
+   twice: filter, csort, col2col, lm, glm, predict, aov, merge,
+   write_table, value_counts, group_by, p_adjust, prcomp, transpose, the
+   hoa2*/hoh2*/aoh2* converters and the rest, 40 functions in all, on the
+   table, on its rows, and on other hash arguments such as a model's
+   coefficients. Each walk now saves the iterator first and puts it back
+   afterwards, including when it croaks part-way. agg, select_cols,
+   drop_cols, rename_cols, drop_duplicates and assign still reset it: their
+   perl side calls keys() itself, as perl's own keys() always does.
+   t/iter.keep.t checks each function.
+
+ [Crashes]
+
+ - predict() segfaulted on HoH newdata with a row that was not a hash
+   ref: the shape came from whichever row the hash handed over first, and
+   every other value was dereferenced as a hash, so the crash came and
+   went with hash order. Every row is now checked, and the walk is bounded
+   by its buffers, which a tied hash (reporting no keys) would have
+   overrun.
+
+ - csort(), prcomp() and sample() segfaulted on a locked hash
+   (Hash::Util) with a deleted key. Each sized its work by a count that
+   includes the placeholder a delete leaves behind, so the walk filled one
+   slot fewer than the loops after it read. Each now uses the count the
+   walk saw.
+
+ [csort(): HoH input is no longer quadratic]
+
+ - Folding a HoH into rows sorted the row names with an insertion sort:
+   82 s for 200000 rows, all of it there. It is now qsort() with the same
+   bytewise order, 0.61 s, and the output is unchanged (checked against
+   0.3212 in all three output shapes, under three hash seeds, with tied
+   sort keys and UTF-8 row names).
+
+ [Leaks on croak]
+
+ - hoh2hoa leaked its result and scratch tables on a non-hash row or a
+   row_names collision; kruskal_test leaked its observations and labels
+   when reading a label died (38 KB over 200 calls under valgrind);
+   col2col leaked its row table when a tied row could not be walked; and
+   prcomp freed by hand only on its own croaks. All four now leave their
+   tables to perl -- mortal, or on the save stack -- so nothing leaks
+   however the call ends. t/croak.leaks.t covers each.
+
+ [Tied hashes]
+
+ - A tied hash -- the frame itself, a row of a HoH or AoH, or another hash
+   argument -- keeps nothing where the XS looked: an iterated entry has no
+   value until it is fetched, a fetched value is a placeholder until its
+   get magic runs, two fetches share one entry, and every key count reads
+   0. csort, value_counts, kruskal_test, merge, agg and drop_duplicates
+   segfaulted on one; lm, glm, predict, aov, oneway_test, p_adjust,
+   chisq_test, fisher_test, sample, group_by, col2col, hoa2aoh, hoa2hoh,
+   hoh2hoa and the HoH paths of select_cols, drop_cols and rename_cols
+   refused it as empty or malformed; vals and avals returned an empty list
+   without a word, and ljoin and add_data joined nothing from it or into
+   it. Each now gives the answer it gives for the same data untied, which
+   t/tied.hashes.t checks for every one of them.
+
+ - merge() takes a HoH frame's rows in row-name order rather than hash
+   order, so the same merge gives the same rows in the same order on every
+   run, and the same as a tied copy of the frame. Hash order differs
+   between runs, so nothing could have depended on it; on 200000 rows the
+   sorted merge also ran faster (0.18 s against 0.36 s).
+
+ - group_by()'s filter left an extra reference on every filtered value,
+   plain data included, so those values could never be freed.
+   value_counts() leaked its result when reading a value died.
+
+ - chisq_test() and fisher_test() reported a key missing from a tied row,
+   or from a tied 'p', as an undef cell ("cell {r2}{b} is undef"), because
+   a tied hash's fetch hands back an entry whether or not the key is
+   there. They now ask first and say the key is missing, as they do for a
+   plain hash.
+
+ - A tied value was FETCHed more than once per call by most of the frame
+   functions: every pass over a tied frame (the shape probe, a key count, a
+   key union, the read itself) fetched each row or column again, and a
+   tied column read once to match or test on and again to copy out had
+   every cell fetched twice. lm() and glm() fetched a tied frame's column
+   once per row of the fit; select_cols, drop_cols, rename_cols, hoh2hoa
+   and group_by fetched each row of a tied HoH three times. The answers
+   were right, but a tie whose FETCH does real work paid for each one. A
+   function that reads a tied frame now takes a plain copy of it first, one
+   FETCH per value, and works on that; where it builds its result afresh it
+   copies the frame's tied rows or columns too. Nothing is copied for a
+   frame with nothing tied in it. rename_cols() in void context still
+   renames the tied frame itself. t/tied.fetch.once.t counts the FETCHes of
+   50 calls.
+
+ [Tied arrays]
+
+ - sample() on a tied array segfaulted: it read AvARRAY(), which a tied
+   array leaves empty. It now fetches each drawn element, and with the
+   same seed draws what it draws from a plain copy of the array.
+
+ - vals() and avals() returned one undef per row for a tied HoA column,
+   and croaked "AoH row 0 is undef" on a tied AoH. col2col() croaked "no
+   usable columns found" on a tied AoH. chisq_test() and fisher_test()
+   croaked "cell [0][0] is undef" on an AoA whose rows are tied, and
+   chisq_test() on a tied vector. Each read a tied array's storage
+   directly, or tested a fetched value before its get magic had run; each
+   now gives the untied answer, which t/tied.frames.t checks.
+
+ - More of them tested a fetched cell or row before its get magic had run.
+   group_by() returned {} for a HoA with tied columns. kruskal_test(),
+   aov() and oneway_test() croaked on tied groups ("all groups must
+   contain data", "fewer than 2 complete observations", "observation 0 is
+   undefined or non-numeric"), and lm() and glm() on tied HoA columns
+   ("0 degrees of freedom"). hoa2hoh() croaked on a tied key column,
+   binom_test() on a tied vector ("successes is undef"), and epi_2x2(),
+   cmh_test(), survfit(), logrank_test() and coxph() on tied vectors
+   ("... at index 0 is undef"). fisher_test() refused a tied outer AoA
+   with "each row must be an array ref". Each now copies the tied columns
+   or rows first, or runs the cell's magic before testing it, and gives
+   the untied answer; t/tied.frames.t checks them.
+
+ [vals(), avals(): HoH input is no longer quadratic]
+
+ - The row keys of a HoH were put in order with an insertion sort: 5.25 s
+   for 50000 rows. It is now qsort() with the same sv_cmp() order, 0.05 s
+   for vals and avals together, and the output is unchanged.
+
+ [prcomp(): column names and tied input]
+
+ - Column names were copied as C strings and looked up again by their
+   strlen(), which lost a UTF-8 name's flag and cut a name at an embedded
+   NUL. A HoA with a column named "\x{263a}" croaked "cannot be looked up
+   by name", an AoH or HoH with one read every cell as missing and croaked
+   "0 valid observations", and varnames came back without the flag. The
+   names are now the keys themselves, as SVs, and come back intact; a name
+   holding a NUL, which used to croak, now simply works. Their order is
+   sv_cmp(), which get_all_columns() already uses, and is unchanged for
+   ASCII names (checked against 0.3212 to 15 digits).
+
+ - A tied frame hash read as empty, and a tied row, row hash or column
+   cell was tested before its value was fetched, so it read as undef and
+   the row was dropped without a word: an AoA with one tied row of four
+   was decomposed on three. Every shape now gives the untied answer.
+
+ [filter(): tied frames]
+
+ - A tied HoA or HoH died as "hash data frame must be a hash of arrays
+   (HoA) or a hash of hashes (HoH)", because the shape test read a value
+   a tied hash only fetches on request, and a tied HoA would then have had
+   no columns, its count read where a tied hash reports 0. Both work now.
+
+ [cfilter(): crashes, leaks and memory]
+
+ - A predicate that replaced a row or column of the data it was filtering,
+   as in cfilter(\@aoh, keep => sub { $aoh[1] = 5; 1 }), segfaulted: the
+   output was rebuilt from the caller's data on the assumption that it
+   still had the shape checked before the predicate ran. It is now checked
+   again, and such a call dies with the same message as bad input would.
+   Predicate columns are built from the rows as they were when cfilter was
+   called, so a predicate that edits the data cannot misalign a later
+   column against the one named by against.
+
+ - Every croak after the scratch tables were made leaked them: an unknown
+   column name, an unknown against column, a bad AoH element, and a
+   predicate that dies, which leaked a full copy of the table. They are
+   now mortal and are freed by the croak.
+
+ - Selecting from an AoH or HoH kept two short-lived SVs per cell alive
+   until the caller's statement ended, one for each key it looked at. On a
+   20000 x 50 AoH, keeping one column raised the peak by 101 MB for a
+   result that is 4.7 MB in pure perl; it is now 6.7 MB, and the call
+   takes 0.072s instead of 0.111s.
+
+ - A predicate no longer works on a second copy of the whole table made up
+   front. Each column is copied just before its call and freed just after
+   it, which halves the peak on a 20000 x 50 HoA (62 MB to 31 MB, the size
+   of the result) and takes 196 MB to 72 MB on the same AoH.
+
+ - A tied hash died with "hash values must be array refs", because the
+   value was tested before the tie had fetched it. Tied hashes and arrays
+   now work at every level: the table, a row, a column.
+
+ - An each() loop the caller was part-way through, on the table or on any
+   of its rows, started again after cfilter, because every walk of a hash
+   reset the iterator that each() shares; a croak in mid-walk left the
+   next each() starting part-way in. cfilter now saves the iterator and
+   puts it back on the way out, croaks included. If the predicate deletes
+   the entry that each() was on, perl has freed it, and the iterator is
+   left reset as before rather than pointed at freed memory.
+
+ - The documentation said the predicate is given only the defined cells.
+   By default it is given every cell, undef included; na => 'omit' and
+   against are what drop them, and both are now documented.
+
+ [Strings outside ASCII: one string, one key]
+
+ - Several functions used a string as a hash key, or compared two, by its
+   bytes alone and dropped its UTF-8 flag, so the two spellings perl has
+   for one string ("caf\xe9" and its upgraded copy) were two keys, two
+   strings with one spelling ("caf\xc3\xa9" and the upgraded "caf\xe9")
+   were one, and a name outside Latin-1 was looked up by its bytes and not
+   found. Each now keys a string as a perl hash would, and
+   t/utf8.keys.regressions.t has a case for every one.
+
+ - filter() named a HoA column it built after its name's bytes and, looking
+   the cells up by those bytes too, filled it with undef: AoH, HoH and HoA
+   into HoA and HoA into AoH, with a code block or a col() expression. A
+   HoH's row keys lost the flag the same way.
+
+ - csort() said "column not found" for a column named outside ASCII, in an
+   AoH or a HoA, and value_counts() counted nothing for one.
+
+ - merge() would not join the two spellings of one key and did join two
+   keys with one spelling; drop_duplicates() and mode() erred the same
+   ways. group_by(), agg() and uniq() were already right, and merge() and
+   drop_duplicates() now share their code.
+
+ - survfit() and logrank_test() split a group label by spelling and
+   returned one outside Latin-1, as a stratum name and in 'groups', as its
+   bytes. A label also ended at its first NUL. coxph() split a strata =>
+   \@labels level by spelling.
+
+ - csort() rethrew a comparator's die as a string, so an exception object
+   came back as "HASH(0x...) at ..." and a UTF-8 message as its bytes. $@
+   itself is now rethrown. col2col() kept the flag off a callback's error.
+
+ [read_table(): filters run in the parser]
+
+ - A filter kept every row of a read in read_table's perl closure, which
+   built each row's hash and called the subs from there. The parser now
+   calls them itself, with the same $_, %_, arguments and write-back. On a
+   300,000 x 5 CSV a filtered read took 0.58 s to 1.07 s, by shape and
+   filter, and takes 0.23 s to 0.37 s; 0.08 s to 0.18 s unfiltered.
+   t/read_table.filter.t reads every case both ways and requires the same
+   result, the same values seen by each filter and the same warnings.
+
+ - A filter that is not a code reference is refused before the file is
+   read, where it died on the first row that reached it.
+
+ [read_table(): colClasses]
+
+ - New option, R's colClasses: 'numeric' (or 'double', 'real') stores a
+   column as numbers, 'integer' as integers, and 'character' or undef as
+   read, given as a hash by name, a list by position (recycled when short)
+   or one class for all. A field that is not a number of the kind declared
+   is an error naming the column, the row and the text. What is accepted is
+   what R's scan() accepts, except that an integer may be any IV, hex is
+   refused and an exponent needs digits. On that CSV with three of five
+   columns declared, a hoa took 74 MB instead of 116 MB, and the read
+   0.095 s instead of 0.086 s. The cases are R's PR#16478 and reg-IO2.R
+   and pandas 3.0.4's test_dtypes_basic.py.
+
+ [merge(): a hole in suffixes]
+
+ - suffixes => \@s segfaulted when @s had a hole (my @s; $s[1] = '.y').
+   A hole is now the undef it prints as, as an undef element already was.
+
+ [xs.check.pl]
+
+ - Its output is one line per finding, and it exits 1 while any remain;
+   each finding used to be a five-line stack trace, 196 of them in 1177
+   lines. XS::Check's type checks read one declaration per variable name
+   for the whole file, so 41 of its 43 were about another function's
+   variable; xs.check.pl now checks the declaration in scope. SvPV() calls
+   whose encoding has been checked are listed in it, with the reason.
+
 0.3212 2026-09-28 CDT
 
  [write_table(): a warning for a header cell with no name]

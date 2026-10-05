@@ -14,10 +14,10 @@ use Path::Tiny;
 use File::Temp qw(tempdir);
 use File::Spec;
 
-my $keyfile = '../keys/sel1._domainkey.test1.dkim2.com.pem';
-plan skip_all => 'shared ../keys not available' unless -e $keyfile;
-my $keyfile2 = '../keys/sel1._domainkey.test2.dkim2.com.pem';
-plan skip_all => 'shared ../keys not available' unless -e $keyfile2;
+my $keyfile = 't/data/keys/sel1._domainkey.test1.dkim2.com.pem';
+plan skip_all => 't/data/keys not available' unless -e $keyfile;
+my $keyfile2 = 't/data/keys/sel1._domainkey.test2.dkim2.com.pem';
+plan skip_all => 't/data/keys not available' unless -e $keyfile2;
 
 my $dir = tempdir(CLEANUP => 1);
 my $src = path($dir)->child('base.eml');

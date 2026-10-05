@@ -54,7 +54,7 @@
 # negative-binomial fits alternate an IRLS with MASS's theta.ml(), whose own
 # stopping rule is an absolute 2^-13 on the Newton step, so theta (and
 # everything downstream of it) is only as reproducible as that rule: 1e-7
-# relative, against an observed worst of 1.6e-9 (SE.theta: 1e-6, observed
+# relative, against an observed worst of 1.6e-9 (SE_theta: 1e-6, observed
 # 6.7e-9, because it is the inverse information at the theta BEFORE the last
 # Newton step, which moves with that step).  Stata stops its Newton-Raphson on
 # its own criterion, which leaves its coefficients about 1e-6 from the MLE --
@@ -437,11 +437,11 @@ sub check_fit {
 		close_to($fit->{summary}{ $nm[$k] }{'Std. Error'}, $e->{se}[$k], $tol, $class, "$label: se $nm[$k]");
 	}
 	close_to($fit->{deviance}, $e->{deviance}, $tol, $class, "$label: deviance");
-	close_to($fit->{'null.deviance'}, $e->{null}, $tol, $class, "$label: null deviance") if defined $e->{null};
+	close_to($fit->{'null_deviance'}, $e->{null}, $tol, $class, "$label: null deviance") if defined $e->{null};
 	close_to($fit->{aic}, $e->{aic}, $tol, $class, "$label: aic") if defined $e->{aic};
 	close_to($fit->{loglik}, $e->{loglik}, $tol, $class, "$label: loglik") if defined $e->{loglik};
-	is($fit->{'df.residual'}, $e->{df},     "$label: df.residual") if defined $e->{df};
-	is($fit->{'df.null'},     $e->{dfnull}, "$label: df.null")     if defined $e->{dfnull};
+	is($fit->{'df_residual'}, $e->{df},     "$label: df_residual") if defined $e->{df};
+	is($fit->{'df_null'},     $e->{dfnull}, "$label: df_null")     if defined $e->{dfnull};
 }
 
 # --------------------------------------------------------------- offsets
@@ -455,8 +455,8 @@ sub check_fit {
 	         'lindsey: offset(y2) gives the coefficient of y1 - y2');
 	close_to($g2->{deviance}, $g1->{deviance}, 1e-12, 'identity', 'lindsey: same deviance');
 	my $maxr = 0;
-	for my $r (keys %{ $g1->{'deviance.resid'} }) {
-		my $d = abs($g1->{'deviance.resid'}{$r} - $g2->{'deviance.resid'}{$r});
+	for my $r (keys %{ $g1->{'deviance_resid'} }) {
+		my $d = abs($g1->{'deviance_resid'}{$r} - $g2->{'deviance_resid'}{$r});
 		$maxr = $d if $d > $maxr;
 	}
 	cmp_ok($maxr, '<=', 1e-12, 'lindsey: same residuals');
@@ -487,7 +487,7 @@ check_fit('anorexia', glm(formula => 'Postwt ~ Prewt + Treat + offset(Prewt)',
 			         "connelly $how: predict link row " . ($i + 1));
 			close_to($rp->{ $i + 1 }, $EXPECT{connelly_term}{resp}[$i], 1e-9, 'fit',
 			         "connelly $how: predict response row " . ($i + 1));
-			close_to($rp->{ $i + 1 }, $f->{'fitted.values'}{ $i + 1 }, 1e-12, 'identity',
+			close_to($rp->{ $i + 1 }, $f->{'fitted_values'}{ $i + 1 }, 1e-12, 'identity',
 			         "connelly $how: predict(newdata = data) is the fitted value, row " . ($i + 1));
 		}
 	}
@@ -520,7 +520,7 @@ check_fit('pr6656 two offsets', glm(formula => 'y ~ offset(x) + offset(log(x)) +
 		# the intercept-only negbin has no rank beyond the intercept
 		check_fit($k, $f, $e, 1e-7, 'negbin');
 		close_to($f->{theta},     $e->{theta},     1e-7, 'negbin', "$k: theta");
-		close_to($f->{'SE.theta'}, $e->{se_theta}, 1e-6, 'se.theta', "$k: SE.theta");
+		close_to($f->{'SE_theta'}, $e->{se_theta}, 1e-6, 'se.theta', "$k: SE_theta");
 		close_to($f->{twologlik}, $e->{twologlik}, 1e-7, 'negbin', "$k: twologlik");
 	}
 	# MASS: all.equal(deviance(yeast2.fit), deviance(yeast3.fit)) and theta
@@ -602,7 +602,7 @@ check_fit('hills', glm(formula => 'time ~ 0 + dist + climb', weights => 'w', dat
 	         w => [1, 1, 1, 'NA', 1, 1]);
 	my $a = glm(formula => 'y ~ x + offset(log(t))', data => \%m, weights => 'w');
 	is($a->{nobs}, 4, 'rows with a missing offset or weight are left out');
-	ok(!exists $a->{'fitted.values'}{3} && !exists $a->{'fitted.values'}{4},
+	ok(!exists $a->{'fitted_values'}{3} && !exists $a->{'fitted_values'}{4},
 	   'and have no fitted value');
 }
 {

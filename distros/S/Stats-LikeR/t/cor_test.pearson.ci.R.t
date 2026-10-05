@@ -58,7 +58,7 @@ sub rel_ok {
 	ok($err <= $TOL, $name) or diag("got $got, expected $want, rel $err");
 }
 
-# [name, x, y, alternative, conf.level, statistic, p.value, estimate, ci_lo, ci_hi]
+# [name, x, y, alternative, conf_level, statistic, p_value, estimate, ci_lo, ci_hi]
 my @R_ROWS = (
 	["strong10", "1,2,3,4,5,6,7,8,9,10", "2,1,4,3,7,5,9,6,10,8", "two.sided", 0.9, 4.9135381491199519, 0.0011735381801554663, 0.86666666666666659, 0.60299013238426746, 0.95963101948776641],
 	["strong10", "1,2,3,4,5,6,7,8,9,10", "2,1,4,3,7,5,9,6,10,8", "two.sided", 0.95, 4.9135381491199519, 0.0011735381801554663, 0.86666666666666659, 0.52174314485124273, 0.96805077138380369],
@@ -126,28 +126,26 @@ for my $r (@R_ROWS) {
 	                   alternative => $alt, conf_level => $cl);
 	my $id  = "$nm alt=$alt cl=$cl";
 	rel_ok($got->{statistic}, $stat, "$id: statistic");
-	rel_ok($got->{'p.value'}, $p,    "$id: p.value");
+	rel_ok($got->{'p_value'}, $p,    "$id: p_value");
 	rel_ok($got->{estimate},  $est,  "$id: estimate");
-	my $ci = $got->{'conf.int'};
-	rel_ok($ci->[0], $lo, "$id: conf.int lower");
-	rel_ok($ci->[1], $hi, "$id: conf.int upper");
+	my $ci = $got->{'conf_int'};
+	rel_ok($ci->[0], $lo, "$id: conf_int lower");
+	rel_ok($ci->[1], $hi, "$id: conf_int upper");
 }
 
-# conf.level spelled R's way as well as Perl's
+# R's dotted spelling conf.level is refused: the option is conf_level
 {
 	my @x = (1 .. 10);
 	my @y = (2,1,4,3,7,5,9,6,10,8);
-	my $a = cor_test(\@x, \@y, 'conf.level' => 0.9);
-	my $b = cor_test(\@x, \@y, conf_level   => 0.9);
-	is_deeply($a->{'conf.int'}, $b->{'conf.int'},
-	          "'conf.level' and conf_level name the same option");
+	ok(!eval { cor_test(\@x, \@y, 'conf.level' => 0.9); 1 }
+		&& $@ =~ /unknown argument 'conf\.level'/, "the dotted 'conf.level' is refused");
 }
 
 # n = 3: R computes no interval at all, and neither does this
 {
 	my $r = cor_test([1,2,3], [2,1,3]);
-	ok(!exists $r->{'conf.int'}, 'n = 3 returns no conf.int, as R does');
-	ok(defined $r->{'p.value'}, '... but still returns a p-value');
+	ok(!exists $r->{'conf_int'}, 'n = 3 returns no conf_int, as R does');
+	ok(defined $r->{'p_value'}, '... but still returns a p-value');
 	ok(defined $r->{estimate},  '... and an estimate');
 }
 

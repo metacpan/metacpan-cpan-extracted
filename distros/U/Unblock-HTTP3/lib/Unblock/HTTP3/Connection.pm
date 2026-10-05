@@ -3,21 +3,22 @@ package Unblock::HTTP3::Connection;
 use strict;
 use warnings;
 use Carp qw(croak);
-use Uniform::HTTP::Request 0.04 ();
+use Uniform::HTTP::Request 0.06 ();
+use Uniform::HTTP::Response 0.06 ();
 use Scalar::Util qw(blessed weaken);
 use Time::HiRes ();
 
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Native ();
-use Unblock::HTTP3::Request ();
-use Unblock::HTTP3::Response ();
 use Unblock::HTTP3::Transaction ();
 use Net::QUIC::Connection ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 my $H3_DATAGRAM_ERROR = 0x33;
+my $H3_CLOSED_CRITICAL_STREAM = 0x0104;
 my $H3_EXCESSIVE_LOAD = 0x0107;
+my $H3_ID_ERROR = 0x0108;
 my $H3_SETTINGS_ERROR = 0x0109;
 my $QPACK_DECODER_STREAM_ERROR = 0x0202;
 my $H3_REQUEST_CANCELLED = 0x010c;
@@ -38,6 +39,13 @@ my %SETTING_DEFAULT = (
 my %CORE_SETTING_ID = map { $_ => 1 } qw(1 6 7 8 51);
 my %RESERVED_SETTING_ID = map { $_ => 1 } qw(0 2 3 4 5);
 my %CORE_STREAM_TYPE = map { $_ => 1 } qw(0 1 2 3);
+my %CONNECTION_SPECIFIC_FIELD = map { $_ => 1 } qw(
+    connection
+    keep-alive
+    proxy-connection
+    transfer-encoding
+    upgrade
+);
 
 sub _decimal_mod {
     my ($value, $divisor) = @_;
@@ -601,8 +609,36 @@ sub _inspect_peer_settings_bytes {
 
             substr($state->{buffer}, 0, $length, '');
             $state->{remaining} -= $length;
-            $state->{settings}{ $state->{setting_id} } = $value;
-            delete $state->{setting_id};
+
+            my $setting_id = delete $state->{setting_id};
+
+            if (exists $state->{settings}{$setting_id}) {
+                $state->{stage} = 'ignore';
+                $state->{buffer} = '';
+
+                $self->_fail_connection(
+                    $H3_SETTINGS_ERROR,
+                    "peer sent duplicate HTTP/3 setting $setting_id",
+                );
+                return;
+            }
+
+            if (
+                ($setting_id eq '8' || $setting_id eq '51')
+                && $value ne '0'
+                && $value ne '1'
+            ) {
+                $state->{stage} = 'ignore';
+                $state->{buffer} = '';
+
+                $self->_fail_connection(
+                    $H3_SETTINGS_ERROR,
+                    "peer HTTP/3 setting $setting_id must be 0 or 1",
+                );
+                return;
+            }
+
+            $state->{settings}{$setting_id} = $value;
             $state->{stage} = 'setting_id';
             next;
         }
@@ -804,6 +840,68 @@ sub _assert_request_semantics {
     return;
 }
 
+sub _valid_origin_serialization {
+    my ($value) = @_;
+
+    return 0 unless defined($value) && !ref($value);
+    return 0 if $value =~ /[^\x00-\x7f]/;
+    return 0 if $value =~ /[\x00-\x20\x7f]/;
+    return 0 if length($value) > 65_535;
+    return 1 if $value eq 'null';
+
+    my $scheme = qr/[A-Za-z][A-Za-z0-9+.-]*/;
+    my $reg_name =
+        qr/(?:[A-Za-z0-9._~-]|%[0-9A-Fa-f]{2}|[!\$&'()*+,;=])+/;
+    my $ip_literal =
+        qr/\[(?:[0-9A-Fa-f:.]+|[vV][0-9A-Fa-f]+\.[A-Za-z0-9._~!\$&'()*+,;=:-]+)\]/;
+
+    return $value =~ m{\A$scheme://(?:$ip_literal|$reg_name)(?::[0-9]+)?\z}
+        ? 1
+        : 0;
+}
+
+sub _normalize_origins {
+    my ($origins) = @_;
+
+    return undef unless defined $origins;
+
+    croak 'origins must be an array reference'
+        unless ref($origins) eq 'ARRAY';
+
+    my @normalized;
+
+    for my $origin (@$origins) {
+        croak 'each origin must be a defined scalar'
+            if !defined($origin) || ref($origin);
+
+        my $value = "$origin";
+
+        croak 'origin exceeds the RFC 9412 16-bit length limit'
+            if length($value) > 65_535;
+        croak 'origin must be an RFC 6454 ASCII serialization'
+            unless _valid_origin_serialization($value);
+
+        push @normalized, $value;
+    }
+
+    return \@normalized;
+}
+
+sub _serialize_origins {
+    my ($origins) = @_;
+
+    return undef unless defined $origins;
+
+    my $payload = '';
+
+    for my $origin (@$origins) {
+        $payload .= pack('n', length($origin));
+        $payload .= $origin;
+    }
+
+    return $payload;
+}
+
 sub client {
     my ($class, %args) = @_;
     return $class->_new('client', %args);
@@ -845,6 +943,7 @@ sub _new {
     my $enable_http_datagrams = exists $args{enable_http_datagrams}
         ? delete $args{enable_http_datagrams}
         : 0;
+    my $origins = _normalize_origins(delete $args{origins});
     my $datagram_request = delete $args{datagram_request};
     my $max_buffered_datagram_bytes =
         exists $args{max_buffered_datagram_bytes}
@@ -907,6 +1006,8 @@ sub _new {
         if defined($datagram_request) && ref($datagram_request) ne 'CODE';
     croak 'datagram_request is only valid for a server connection'
         if $role ne 'server' && defined($datagram_request);
+    croak 'origins is only valid for a server connection'
+        if $role ne 'server' && defined($origins);
 
     croak 'quic_max_bidi_streams must be a non-negative integer'
         if !defined($quic_max_bidi_streams)
@@ -985,6 +1086,8 @@ sub _new {
     @local_settings{keys %$extension_settings}
         = values %$extension_settings;
 
+    my $origin_list = _serialize_origins($origins);
+
     if (defined $remembered_local_settings) {
         my $compatibility_error = _settings_compatibility_error(
             $remembered_local_settings,
@@ -1003,6 +1106,7 @@ sub _new {
             $qpack_blocked_streams,
             $enable_extended_connect,
             $enable_http_datagrams,
+            $origin_list,
         )
         : Unblock::HTTP3::_Native->client(
             $max_field_section_size,
@@ -1040,6 +1144,9 @@ sub _new {
             && _effective_setting($remembered_peer_settings, 8) eq '1'
             ? 1 : 0,
         enable_http_datagrams       => $enable_http_datagrams ? 1 : 0,
+        origins                     => $origins,
+        peer_origins                => undef,
+        peer_origin_pending         => [],
         peer_h3_datagram            => defined($remembered_peer_settings)
             && _effective_setting($remembered_peer_settings, 51) eq '1'
             ? 1 : 0,
@@ -1090,6 +1197,8 @@ sub _new {
         building          => {},
         transactions      => {},
         ready_transactions => [],
+        pending_early_transactions => [],
+        pending_early_datagrams    => {},
         ready_informational => [],
         output_finished   => {},
         response_sent     => {},
@@ -1257,6 +1366,14 @@ sub peer_settings_received {
     return $self->{peer_settings_received} ? 1 : 0;
 }
 
+sub peer_origins {
+    my ($self, @args) = @_;
+    croak 'peer_origins() does not accept arguments' if @args;
+
+    return undef unless defined $self->{peer_origins};
+    return [ @{ $self->{peer_origins} } ];
+}
+
 sub extended_connect_enabled {
     my ($self, @args) = @_;
     croak 'extended_connect_enabled() does not accept arguments' if @args;
@@ -1412,9 +1529,8 @@ sub request {
 
     croak 'request() is only available on a client HTTP/3 connection'
         unless $self->{role} eq 'client';
-    croak 'request() requires a Uniform::HTTP::Request object'
-        unless blessed($request)
-            && $request->isa('Uniform::HTTP::Request');
+    croak 'request() requires a canonical Uniform::HTTP::Request'
+        unless ref($request) eq 'Uniform::HTTP::Request';
 
     _assert_http3_version($request, 'request()');
 
@@ -1567,6 +1683,7 @@ sub next_transaction {
     my ($self, @args) = @_;
 
     croak 'next_transaction() does not accept arguments' if @args;
+    $self->_service if $self->{started} && !$self->{failed};
     return shift @{ $self->{ready_transactions} };
 }
 
@@ -1574,6 +1691,7 @@ sub next_informational {
     my ($self, @args) = @_;
 
     croak 'next_informational() does not accept arguments' if @args;
+    $self->_service if $self->{started} && !$self->{failed};
     return shift @{ $self->{ready_informational} };
 }
 
@@ -1754,26 +1872,54 @@ sub _send_informational_response {
         $response,
         'send_informational()',
     );
-
-    my @fields = (
-        [ ':status', "" . $response->status ],
-        @{ _wire_headers($response, 'response') },
-    );
-
-    $self->_assert_peer_field_section_size(
-        \@fields,
+    _assert_capsule_protocol_response(
+        $response,
         'send_informational()',
     );
 
-    $self->{native}->submit_info(
+    $self->_assert_peer_field_section_size_value(
+        $self->{native}->uniform_response_field_section_size($response),
+        'send_informational()',
+    );
+
+    $self->{native}->submit_uniform_info(
         $transaction->stream_id,
-        \@fields,
+        $response,
     );
 
     $response->freeze;
 
     $self->_drain_output;
     return $response;
+}
+
+sub _capsule_protocol_response_error {
+    my ($status, $headers) = @_;
+
+    my $present = 0;
+
+    for my $field (@$headers) {
+        my $name = lc($field->[0]);
+        if ($name eq 'capsule-protocol') {
+            $present = 1;
+            last;
+        }
+    }
+
+    return unless $present;
+    return if $status >= 200 && $status < 300;
+
+    return 'Capsule-Protocol is only valid on a successful HTTP/3 response';
+}
+
+sub _assert_capsule_protocol_response {
+    my ($response, $operation) = @_;
+
+    my $values = $response->header_values('capsule-protocol');
+    return unless @$values;
+    return if $response->status >= 200 && $response->status < 300;
+
+    croak "$operation: Capsule-Protocol is only valid on a successful HTTP/3 response";
 }
 
 sub _response_content_forbidden_reason {
@@ -1851,6 +1997,10 @@ sub _send_transaction_response {
     );
     $self->_assert_response_content_length(
         $transaction,
+        $response,
+        'send_response()',
+    );
+    _assert_capsule_protocol_response(
         $response,
         'send_response()',
     );
@@ -2028,23 +2178,17 @@ sub _cancel_transaction {
         if ($stream->can_receive && !$stream->remote_finished) {
             $self->{native}->shutdown_stream_read($id);
             $stream->stop_sending($H3_REQUEST_CANCELLED);
+            $transaction->_mark_local_stop_sending($H3_REQUEST_CANCELLED);
         }
 
         if ($stream->can_send && !defined($stream->local_reset_code)) {
             $self->{native}->shutdown_stream_write($id);
             $stream->reset($H3_REQUEST_CANCELLED);
+            $transaction->_mark_local_reset($H3_REQUEST_CANCELLED);
         }
     }
 
     $self->{native}->discard_body($id);
-
-    $transaction->request->_mark_stop_sending($H3_REQUEST_CANCELLED)
-        if $self->{role} eq 'client'
-            && $transaction->request->can('_mark_stop_sending');
-
-    my $response = $transaction->response;
-    $response->_mark_reset($H3_REQUEST_CANCELLED)
-        if defined($response) && $response->can('_mark_reset');
 
     $transaction->_mark_cancelled;
     return $transaction;
@@ -2090,7 +2234,7 @@ sub _set_transaction_priority {
     my $stream_id = $transaction->stream_id;
 
     if ($self->{role} eq 'client') {
-        my $field = Unblock::HTTP3::Request::_priority_field(
+        my $field = Unblock::HTTP3::Transaction::_priority_field(
             $priority,
         );
 
@@ -2212,11 +2356,13 @@ sub _reject_datagram_stream {
         if ($stream->can_receive && !$stream->remote_finished) {
             $self->{native}->shutdown_stream_read($id);
             $stream->stop_sending($H3_DATAGRAM_ERROR);
+            $transaction->_mark_local_stop_sending($H3_DATAGRAM_ERROR);
         }
 
         if ($stream->can_send && !$self->{output_finished}{$id}) {
             $self->{native}->shutdown_stream_write($id);
             $stream->reset($H3_DATAGRAM_ERROR);
+            $transaction->_mark_local_reset($H3_DATAGRAM_ERROR);
         }
     }
 
@@ -2299,6 +2445,30 @@ sub _receive_quic_datagram {
     return if $stream->remote_finished;
     return if defined $stream->remote_reset_code;
 
+    if (
+        $transaction->early_data
+        && $self->{role} eq 'server'
+        && !$self->{quic}->ready
+    ) {
+        my $payload = substr($bytes, $prefix_length);
+        my $length = length($payload);
+
+        if (
+            $self->{datagram_buffered_count}
+                >= $self->{max_buffered_datagrams}
+            || $self->{datagram_buffered_bytes} + $length
+                > $self->{max_buffered_datagram_bytes}
+        ) {
+            ++$self->{datagram_receive_drops};
+            return;
+        }
+
+        ++$self->{datagram_buffered_count};
+        $self->{datagram_buffered_bytes} += $length;
+        push @{ $self->{pending_early_datagrams}{$id} }, $payload;
+        return;
+    }
+
     if (!$transaction->datagrams_enabled) {
         $self->_reject_datagram_stream(
             $transaction,
@@ -2344,20 +2514,26 @@ sub _reject_message_stream {
     $self->{rejected_streams}{$id} = "$reason";
 
     my $stream = $self->{streams}{$id};
+    my $transaction = $self->{transactions}{$id};
 
     if (defined $stream) {
         if ($stream->can_receive && !$stream->remote_finished) {
             $self->{native}->shutdown_stream_read($id);
             $stream->stop_sending($H3_MESSAGE_ERROR);
+            $transaction->_mark_local_stop_sending($H3_MESSAGE_ERROR)
+                if defined $transaction;
         }
 
         if ($stream->can_send && !defined($stream->local_reset_code)) {
             $self->{native}->shutdown_stream_write($id);
             $stream->reset($H3_MESSAGE_ERROR);
+            $transaction->_mark_local_reset($H3_MESSAGE_ERROR)
+                if defined $transaction;
         }
     }
 
     $self->{native}->discard_body($id);
+    $self->{native}->discard_header_block($id);
     return;
 }
 
@@ -2395,7 +2571,6 @@ sub _cleanup_stream_if_done {
     delete $self->{messages}{$id};
     delete $self->{outgoing}{$id};
     delete $self->{stream_lifecycle}{$id};
-    delete $self->{building}{$id};
     delete $self->{trailer_field_section_size}{$id};
     delete $self->{output_finished}{$id};
     delete $self->{response_sent}{$id};
@@ -2421,7 +2596,6 @@ sub _maybe_complete_transaction {
         my $response = $transaction->response;
         return unless defined $response;
         return unless $response->is_complete;
-        return if $response->can('is_aborted') && $response->is_aborted;
 
         my $reader = $transaction->_incoming_body_reader('response');
         return if defined($reader) && !$reader->is_complete;
@@ -2438,17 +2612,11 @@ sub _maybe_complete_transaction {
 
     my $request = $transaction->request;
     return unless $request->is_complete;
-    return if $request->can('is_aborted') && $request->is_aborted;
 
     my $reader = $transaction->_incoming_body_reader('request');
     return if defined($reader) && !$reader->is_complete;
 
     return unless $self->{output_finished}{$id};
-
-    my $response = $transaction->response;
-    return if defined($response)
-        && $response->can('is_aborted')
-        && $response->is_aborted;
 
     $transaction->_mark_complete;
     $self->_cleanup_stream_if_done($id);
@@ -2650,12 +2818,13 @@ sub _rollback_rejected_early_data {
 
     $self->{transactions} = {};
     $self->{ready_transactions} = [];
+    $self->{pending_early_transactions} = [];
+    $self->{pending_early_datagrams} = {};
     $self->{ready_informational} = [];
     $self->{streams} = {};
     $self->{messages} = {};
     $self->{outgoing} = {};
     $self->{stream_lifecycle} = {};
-    $self->{building} = {};
     $self->{trailer_field_section_size} = {};
     $self->{output_finished} = {};
     $self->{response_sent} = {};
@@ -2691,6 +2860,93 @@ sub _rollback_rejected_early_data {
     return 1;
 }
 
+sub _discard_pending_early_datagrams {
+    my ($self, $id) = @_;
+
+    my $pending = delete $self->{pending_early_datagrams}{$id};
+    return unless defined $pending;
+
+    for my $bytes (@$pending) {
+        $self->_datagram_dequeued(length($bytes));
+    }
+
+    return;
+}
+
+sub _promote_accepted_early_transactions {
+    my ($self) = @_;
+
+    return unless $self->{role} eq 'server';
+    return unless $self->{quic}->ready;
+    return if $self->{quic}->early_data_status eq 'rejected';
+    return unless @{ $self->{pending_early_transactions} };
+
+    my @pending =
+        splice @{ $self->{pending_early_transactions} };
+
+    for my $transaction (@pending) {
+        next if $transaction->is_terminal;
+
+        my $datagrams = 0;
+        if (defined $self->{datagram_request}) {
+            $datagrams =
+                $self->{datagram_request}->(
+                    $self,
+                    $transaction->request,
+                ) ? 1 : 0;
+        }
+
+        $transaction->_enable_datagrams if $datagrams;
+
+        my $id = $transaction->stream_id;
+        my $queued = delete $self->{pending_early_datagrams}{$id};
+
+        if (defined $queued && @$queued) {
+            if (!$datagrams) {
+                for my $bytes (@$queued) {
+                    $self->_datagram_dequeued(length($bytes));
+                }
+
+                $self->_reject_datagram_stream(
+                    $transaction,
+                    'received HTTP Datagram for a request without datagram semantics',
+                );
+                next;
+            }
+
+            for my $bytes (@$queued) {
+                $self->_datagram_dequeued(length($bytes));
+                $transaction->_receive_datagram($bytes);
+            }
+        }
+
+        push @{ $self->{ready_transactions} }, $transaction;
+    }
+
+    return 1;
+}
+
+sub _reject_pending_early_transactions {
+    my ($self) = @_;
+
+    return unless $self->{role} eq 'server';
+    return unless @{ $self->{pending_early_transactions} };
+
+    my @pending =
+        splice @{ $self->{pending_early_transactions} };
+
+    for my $transaction (@pending) {
+        my $id = $transaction->stream_id;
+        $self->_discard_pending_early_datagrams($id);
+
+        $transaction->_mark_error(
+            'QUIC rejected 0-RTT before HTTP request processing',
+        ) unless $transaction->is_terminal;
+    }
+
+    return 1;
+}
+
 sub _sync_early_data_status {
     my ($self) = @_;
 
@@ -2704,6 +2960,14 @@ sub _sync_early_data_status {
         && $status eq 'rejected'
     ) {
         return $self->_rollback_rejected_early_data;
+    }
+
+    if ($self->{role} eq 'server') {
+        if ($status eq 'rejected') {
+            $self->_reject_pending_early_transactions;
+        } elsif ($self->{quic}->ready) {
+            $self->_promote_accepted_early_transactions;
+        }
     }
 
     return 0;
@@ -2843,6 +3107,20 @@ sub _classify_peer_uni_stream {
             _decode_http3_varint($state->{buffer}, 0);
 
         if (defined $type) {
+            if ($self->{role} eq 'client' && $type eq '1') {
+                $stream->consume(length($state->{buffer}))
+                    if length($state->{buffer});
+
+                delete $self->{peer_uni_probe}{$id};
+
+                $self->_fail_connection(
+                    $H3_ID_ERROR,
+                    'peer opened a push stream without advertised push capacity',
+                );
+
+                return 'failed';
+            }
+
             if ($CORE_STREAM_TYPE{$type}) {
                 my $bytes = $state->{buffer};
                 my $fin = $state->{fin};
@@ -2851,6 +3129,7 @@ sub _classify_peer_uni_stream {
                 $self->{core_uni_streams}{$id} = 1;
 
                 $self->_inspect_peer_settings_bytes($id, $bytes);
+                return 'failed' if $self->{failed};
 
                 my $result = $self->{native}->read_stream(
                     $id,
@@ -2955,6 +3234,22 @@ sub _classify_peer_uni_stream {
     }
 }
 
+sub _is_local_critical_stream {
+    my ($self, $id) = @_;
+
+    return 1
+        if defined($self->{control_stream_id})
+            && $id == $self->{control_stream_id};
+    return 1
+        if defined($self->{qpack_encoder_stream_id})
+            && $id == $self->{qpack_encoder_stream_id};
+    return 1
+        if defined($self->{qpack_decoder_stream_id})
+            && $id == $self->{qpack_decoder_stream_id};
+
+    return 0;
+}
+
 sub _service_stream {
     my ($self, $id) = @_;
 
@@ -3029,8 +3324,7 @@ sub _service_stream {
             $self->{native}->discard_body($id);
             delete $self->{streams}{$id};
             delete $self->{stream_lifecycle}{$id};
-            delete $self->{building}{$id};
-            delete $self->{rejected_streams}{$id};
+                    delete $self->{rejected_streams}{$id};
         }
 
         return;
@@ -3044,6 +3338,7 @@ sub _service_stream {
             my ($bytes, $fin) = @$chunk;
 
             $self->_inspect_peer_settings_bytes($id, $bytes);
+            return if $self->{failed};
 
             my $result = $self->{native}->read_stream(
                 $id,
@@ -3102,15 +3397,22 @@ sub _service_stream {
         $lifecycle->{remote_reset_seen} = 1;
         $lifecycle->{remote_reset_code} = 0 + $remote_reset;
 
+        if ($self->{core_uni_streams}{$id}) {
+            $self->_fail_connection(
+                $H3_CLOSED_CRITICAL_STREAM,
+                'peer reset a critical HTTP/3 stream',
+            );
+            return;
+        }
+
         $self->{native}->shutdown_stream_read($id);
 
-        my $message = $self->{messages}{$id};
-        $message->_mark_reset($remote_reset)
-            if defined($message) && $message->can('_mark_reset');
-
         my $transaction = $self->{transactions}{$id};
-        $transaction->_mark_cancelled
-            if defined($transaction) && !$transaction->is_terminal;
+        if (defined $transaction) {
+            $transaction->_mark_remote_reset($remote_reset);
+            $transaction->_mark_cancelled
+                unless $transaction->is_terminal;
+        }
     }
 
     my $remote_stop = $stream->remote_stop_sending_code;
@@ -3118,20 +3420,35 @@ sub _service_stream {
         $lifecycle->{remote_stop_seen} = 1;
         $lifecycle->{remote_stop_sending_code} = 0 + $remote_stop;
 
+        if ($self->_is_local_critical_stream($id)) {
+            $self->_fail_connection(
+                $H3_CLOSED_CRITICAL_STREAM,
+                'peer requested closure of a critical HTTP/3 stream',
+            );
+            return;
+        }
+
         $self->{native}->shutdown_stream_write($id);
         $self->{native}->discard_body($id);
 
-        my $message = $self->{outgoing}{$id};
-        $message->_mark_stop_sending($remote_stop)
-            if defined($message) && $message->can('_mark_stop_sending');
-
         my $transaction = $self->{transactions}{$id};
-        $transaction->_mark_cancelled
-            if defined($transaction) && !$transaction->is_terminal;
+        if (defined $transaction) {
+            $transaction->_mark_remote_stop_sending($remote_stop);
+            $transaction->_mark_cancelled
+                unless $transaction->is_terminal;
+        }
     }
 
     if ($stream->closed && !$lifecycle->{closed_seen}) {
         $lifecycle->{closed_seen} = 1;
+
+        if ($self->{core_uni_streams}{$id}) {
+            $self->_fail_connection(
+                $H3_CLOSED_CRITICAL_STREAM,
+                'peer closed a critical HTTP/3 stream',
+            );
+            return;
+        }
 
         $self->_release_peer_bidi_stream_credit(
             $id,
@@ -3164,6 +3481,23 @@ sub _drain_events {
             next;
         }
 
+        if ($type eq 'origin') {
+            push @{ $self->{peer_origin_pending} }, $args[0]
+                if _valid_origin_serialization($args[0]);
+            next;
+        }
+
+        if ($type eq 'end_origin') {
+            $self->{peer_origins} = []
+                unless defined $self->{peer_origins};
+
+            push @{ $self->{peer_origins} },
+                @{ $self->{peer_origin_pending} };
+
+            $self->{peer_origin_pending} = [];
+            next;
+        }
+
         if ($self->{rejected_streams}{$id}) {
             if ($type eq 'data') {
                 my $stream = $self->{streams}{$id};
@@ -3177,25 +3511,11 @@ sub _drain_events {
             next;
         }
 
-        if ($type eq 'begin_headers') {
-            $self->{building}{$id} = {
-                pseudo             => {},
-                headers            => [],
-                field_section_size => 0,
-            };
-            next;
-        }
-
-        if ($type eq 'header') {
-            my ($name, $value) = @args;
-            my $building = $self->{building}{$id}
-                or croak "received HTTP/3 header without a header section";
-
-            $building->{field_section_size}
-                += length($name) + length($value) + 32;
+        if ($type eq 'headers') {
+            my ($field_section_size, $fin) = @args;
 
             if (
-                $building->{field_section_size}
+                $field_section_size
                 > $self->{max_field_section_size}
             ) {
                 $self->_fail_connection(
@@ -3205,17 +3525,10 @@ sub _drain_events {
                 next;
             }
 
-            if (substr($name, 0, 1) eq ':') {
-                $building->{pseudo}{$name} = $value;
-            } else {
-                push @{ $building->{headers} }, [ $name, $value ];
-            }
-
-            next;
-        }
-
-        if ($type eq 'end_headers') {
-            $self->_finish_headers($id, $args[0] ? 1 : 0);
+            $self->_finish_headers(
+                $id,
+                $fin ? 1 : 0,
+            );
             next;
         }
 
@@ -3245,7 +3558,7 @@ sub _drain_events {
                     next;
                 }
 
-                $reader->_push($bytes);
+                $reader->_push_owned($bytes);
                 next;
             }
 
@@ -3306,12 +3619,20 @@ sub _drain_events {
 
         if ($type eq 'stop_sending') {
             my $stream = $self->{streams}{$id};
-            $stream->stop_sending($args[0])
-                if defined($stream) && $stream->can_receive;
+            if (defined($stream) && $stream->can_receive) {
+                $stream->stop_sending($args[0]);
+                my $transaction = $self->{transactions}{$id};
+                $transaction->_mark_local_stop_sending($args[0])
+                    if defined $transaction;
+            }
             next;
         }
 
         if ($type eq 'reset_stream') {
+            my $transaction = $self->{transactions}{$id};
+            $transaction->_mark_local_reset($args[0])
+                if defined $transaction;
+
             my $stream = $self->{streams}{$id};
             $stream->reset($args[0])
                 if defined($stream) && $stream->can_send;
@@ -3354,7 +3675,12 @@ sub _drain_events {
         if ($type eq 'end_trailers') {
             delete $self->{trailer_field_section_size}{$id};
             my $message = $self->{messages}{$id};
-            $message->freeze_trailers if defined $message;
+
+            if (defined $message) {
+                _coalesce_trailer_cookie_fields($message);
+                $message->freeze_trailers;
+            }
+
             next;
         }
 
@@ -3373,56 +3699,64 @@ sub _drain_events {
     return;
 }
 
+sub _coalesce_trailer_cookie_fields {
+    my ($message) = @_;
+
+    my $values = $message->trailer_values('cookie');
+    return unless @$values > 1;
+
+    $message->trailer(
+        'cookie',
+        join('; ', @$values),
+    );
+
+    return 1;
+}
+
 sub _finish_headers {
     my ($self, $id, $fin) = @_;
 
-    my $building = delete $self->{building}{$id}
-        or croak 'HTTP/3 header section ended without beginning';
-
-    my $pseudo = $building->{pseudo};
     my $message;
 
     if ($self->{role} eq 'server') {
-        croak 'HTTP/3 request is missing :method'
-            unless defined $pseudo->{':method'};
+        my $method = $self->{native}->header_pseudo($id, ':method');
 
-        my $is_connect = $pseudo->{':method'} eq 'CONNECT' ? 1 : 0;
-        my $protocol = exists($pseudo->{':protocol'})
-            ? $pseudo->{':protocol'}
-            : undef;
+        croak 'HTTP/3 request is missing :method'
+            unless defined $method;
+
+        my $scheme = $self->{native}->header_pseudo($id, ':scheme');
+        my $authority = $self->{native}->header_pseudo($id, ':authority');
+        my $path = $self->{native}->header_pseudo($id, ':path');
+        my $protocol = $self->{native}->header_pseudo($id, ':protocol');
+        my $is_connect = $method eq 'CONNECT' ? 1 : 0;
         my $is_extended_connect =
             $is_connect && defined($protocol) ? 1 : 0;
-        my %args;
+        my $target;
+        my $host_values = $self->{native}->header_values($id, 'host');
 
         if ($is_connect && !$is_extended_connect) {
             croak 'HTTP/3 CONNECT request is missing :authority'
-                unless defined $pseudo->{':authority'};
+                unless defined $authority;
             croak 'HTTP/3 CONNECT request must not contain :scheme'
-                if exists $pseudo->{':scheme'};
+                if defined $scheme;
             croak 'HTTP/3 CONNECT request must not contain :path'
-                if exists $pseudo->{':path'};
+                if defined $path;
+
+            $target = $authority;
 
             my $semantic_error = _request_semantic_error(
                 method      => 'CONNECT',
                 scheme      => undef,
-                authority   => $pseudo->{':authority'},
-                target      => $pseudo->{':authority'},
+                authority   => $authority,
+                target      => $target,
                 protocol    => undef,
-                host_values => _request_host_values($building->{headers}),
+                host_values => $host_values,
             );
 
             if (defined $semantic_error) {
                 $self->_reject_message_stream($id, $semantic_error);
                 return;
             }
-
-            %args = (
-                method    => 'CONNECT',
-                target    => $pseudo->{':authority'},
-                authority => $pseudo->{':authority'},
-                version   => '3',
-                headers   => $building->{headers},
-            );
         } else {
             if ($is_extended_connect && !$self->{enable_extended_connect}) {
                 $self->_reject_message_stream(
@@ -3432,7 +3766,7 @@ sub _finish_headers {
                 return;
             }
 
-            if ($is_extended_connect && !defined $pseudo->{':path'}) {
+            if ($is_extended_connect && !defined $path) {
                 $self->_reject_message_stream(
                     $id,
                     'Extended CONNECT requires :path',
@@ -3441,28 +3775,15 @@ sub _finish_headers {
             }
 
             croak 'HTTP/3 request is missing :path'
-                unless defined $pseudo->{':path'};
+                unless defined $path;
 
-            %args = (
-                method  => $pseudo->{':method'},
-                target  => $pseudo->{':path'},
-                version => '3',
-                headers => $building->{headers},
-            );
+            $target = $path;
 
-            $args{scheme} = $pseudo->{':scheme'}
-                if exists $pseudo->{':scheme'};
-            $args{authority} = $pseudo->{':authority'}
-                if exists $pseudo->{':authority'};
-            $args{protocol} = $protocol
-                if defined $protocol;
-
-            my $host_values = _request_host_values($building->{headers});
             my $semantic_error = _request_semantic_error(
-                method      => $pseudo->{':method'},
-                scheme      => $pseudo->{':scheme'},
-                authority   => $pseudo->{':authority'},
-                target      => $pseudo->{':path'},
+                method      => $method,
+                scheme      => $scheme,
+                authority   => $authority,
+                target      => $target,
                 protocol    => $protocol,
                 host_values => $host_values,
             );
@@ -3472,28 +3793,25 @@ sub _finish_headers {
                 return;
             }
 
-            if (!exists($args{authority}) && @$host_values == 1) {
-                $args{authority} = $host_values->[0];
+            if (!defined($authority) && @$host_values == 1) {
+                $authority = $host_values->[0];
             }
         }
 
-        $message = Unblock::HTTP3::Request->new(%args);
-        if ($fin) {
-            $message->freeze;
-        } else {
-            $message->mark_incomplete;
-            $message->freeze_initial;
-        }
+        $message = $self->{native}->receive_uniform_request(
+            $id,
+            $method,
+            $target,
+            $scheme,
+            $authority,
+            $protocol,
+            $fin,
+        );
 
-        my $response = Unblock::HTTP3::Response->new(
+        my $response = Uniform::HTTP::Response->new(
             status  => 200,
             version => '3',
         );
-
-        my $datagrams = 0;
-        if (defined $self->{datagram_request}) {
-            $datagrams = $self->{datagram_request}->($self, $message) ? 1 : 0;
-        }
 
         my $stream = $self->{streams}{$id};
         my $stream_is_early = defined($stream) && $stream->early_data ? 1 : 0;
@@ -3514,8 +3832,6 @@ sub _finish_headers {
             early_data => $stream_is_early,
         );
 
-        $transaction->_enable_datagrams if $datagrams;
-
         my $request_receive_mode = $is_connect
             ? 'stream'
             : $self->{receive_body_mode};
@@ -3530,23 +3846,43 @@ sub _finish_headers {
 
         $self->{transactions}{$id} = $transaction;
 
-        push @{ $self->{ready_transactions} }, $transaction;
-    } else {
-        croak 'HTTP/3 response is missing :status'
-            unless defined $pseudo->{':status'};
-
-        $message = Unblock::HTTP3::Response->new(
-            status  => $pseudo->{':status'},
-            version => '3',
-            headers => $building->{headers},
-        );
-
-        if ($fin) {
-            $message->freeze;
+        if (
+            $stream_is_early
+            && !$self->{quic}->ready
+        ) {
+            push @{ $self->{pending_early_transactions} }, $transaction;
         } else {
-            $message->mark_incomplete;
-            $message->freeze_initial;
+            my $datagrams = 0;
+            if (defined $self->{datagram_request}) {
+                $datagrams =
+                    $self->{datagram_request}->($self, $message) ? 1 : 0;
+            }
+
+            $transaction->_enable_datagrams if $datagrams;
+            push @{ $self->{ready_transactions} }, $transaction;
         }
+    } else {
+        my $status = $self->{native}->header_pseudo($id, ':status');
+
+        croak 'HTTP/3 response is missing :status'
+            unless defined $status;
+
+        if (
+            $self->{native}->has_header($id, 'capsule-protocol')
+            && !(0 + $status >= 200 && 0 + $status < 300)
+        ) {
+            $self->_reject_message_stream(
+                $id,
+                'Capsule-Protocol is only valid on a successful HTTP/3 response',
+            );
+            return;
+        }
+
+        $message = $self->{native}->receive_uniform_response(
+            $id,
+            0 + $status,
+            $fin,
+        );
 
         my $transaction = $self->{transactions}{$id}
             or croak "received HTTP/3 response for unknown Transaction";
@@ -3582,11 +3918,24 @@ sub _finish_headers {
 
     my $lifecycle = $self->{stream_lifecycle}{$id};
 
-    if (
-        defined($lifecycle)
-        && defined($lifecycle->{remote_reset_code})
-    ) {
-        $message->_mark_reset($lifecycle->{remote_reset_code});
+    my $transaction = $self->{transactions}{$id};
+
+    if (defined($lifecycle) && defined($transaction)) {
+        if (defined $lifecycle->{remote_reset_code}) {
+            $transaction->_mark_remote_reset(
+                $lifecycle->{remote_reset_code},
+            );
+            $transaction->_mark_cancelled
+                unless $transaction->is_terminal;
+        }
+
+        if (defined $lifecycle->{remote_stop_sending_code}) {
+            $transaction->_mark_remote_stop_sending(
+                $lifecycle->{remote_stop_sending_code},
+            );
+            $transaction->_mark_cancelled
+                unless $transaction->is_terminal;
+        }
     }
 
     $self->{messages}{$id} = $message;
@@ -3596,16 +3945,8 @@ sub _finish_headers {
 sub _validate_wire_field {
     my ($context, $name, $value) = @_;
 
-    my %forbidden = map { $_ => 1 } qw(
-        connection
-        keep-alive
-        proxy-connection
-        transfer-encoding
-        upgrade
-    );
-
     croak "HTTP/3 does not allow connection-specific field '$name'"
-        if $forbidden{$name};
+        if $CONNECTION_SPECIFIC_FIELD{$name};
 
     if ($name eq 'te') {
         croak "HTTP/3 TE is only allowed in request headers"
@@ -3651,10 +3992,9 @@ sub _field_section_size {
     return $size;
 }
 
-sub _assert_peer_field_section_size {
-    my ($self, $fields, $operation) = @_;
+sub _assert_peer_field_section_size_value {
+    my ($self, $size, $operation) = @_;
 
-    my $size = _field_section_size($fields);
     my $limit = $self->{peer_max_field_section_size};
 
     croak "$operation: field section size $size exceeds peer "
@@ -3664,17 +4004,27 @@ sub _assert_peer_field_section_size {
     return $size;
 }
 
+sub _assert_peer_field_section_size {
+    my ($self, $fields, $operation) = @_;
+
+    return _assert_peer_field_section_size_value(
+        $self,
+        _field_section_size($fields),
+        $operation,
+    );
+}
+
 sub _wire_headers {
-    my ($message, $context) = @_;
+    my ($source, $context) = @_;
 
     croak 'internal HTTP/3 header context must be request or response'
         if $context ne 'request' && $context ne 'response';
 
     my @headers;
 
-    for my $index (0 .. $message->header_count - 1) {
-        my $name = $message->header_name($index);
-        my $value = $message->header_value($index);
+    for my $field (@$source) {
+        my $name = $field->[0];
+        my $value = $field->[1];
 
         $name =~ tr/A-Z/a-z/;
 
@@ -3686,13 +4036,13 @@ sub _wire_headers {
 }
 
 sub _wire_trailers {
-    my ($message) = @_;
+    my ($source) = @_;
 
     my @trailers;
 
-    for my $index (0 .. $message->trailer_count - 1) {
-        my $name = $message->trailer_name($index);
-        my $value = $message->trailer_value($index);
+    for my $field (@$source) {
+        my $name = $field->[0];
+        my $value = $field->[1];
 
         $name =~ tr/A-Z/a-z/;
 
@@ -3718,70 +4068,25 @@ sub _submit_request {
         unless $self->{role} eq 'client';
     croak 'HTTP/3 connection has not been started'
         unless $self->{started};
-    croak 'request must be a Uniform::HTTP::Request object'
-        unless blessed($request)
-            && $request->isa('Uniform::HTTP::Request');
-    my $is_connect = $request->method eq 'CONNECT' ? 1 : 0;
-    my $is_extended_connect =
-        $is_connect && defined($request->protocol) ? 1 : 0;
-
-    if ($is_connect) {
-        croak 'HTTP/3 CONNECT request requires authority'
-            unless defined $request->authority;
-        croak 'HTTP/3 peer did not enable Extended CONNECT'
-            if $is_extended_connect
-                && !$self->{peer_enable_connect_protocol};
-    } else {
-        croak 'HTTP/3 request requires scheme'
-            unless defined $request->scheme;
-        croak 'HTTP/3 request requires authority'
-            unless defined $request->authority;
-    }
+    croak 'request must be a canonical Uniform::HTTP::Request'
+        unless ref($request) eq 'Uniform::HTTP::Request';
     croak 'HTTP/3 peer has begun graceful shutdown'
         if defined $self->{remote_shutdown_id};
     croak 'HTTP/3 connection is shutting down'
         if $self->{shutdown_notice_sent} || $self->{shutdown_started};
 
-    my @fields;
-
-    if ($is_extended_connect) {
-        @fields = (
-            [ ':method',    'CONNECT' ],
-            [ ':protocol',  $request->protocol ],
-            [ ':scheme',    $request->scheme ],
-            [ ':authority', $request->authority ],
-            [ ':path',      $request->target ],
-            @{ _wire_headers($request, 'request') },
-        );
-    } elsif ($is_connect) {
-        @fields = (
-            [ ':method',    'CONNECT' ],
-            [ ':authority', $request->authority ],
-            @{ _wire_headers($request, 'request') },
-        );
-    } else {
-        @fields = (
-            [ ':method',    $request->method ],
-            [ ':scheme',    $request->scheme ],
-            [ ':authority', $request->authority ],
-            [ ':path',      $request->target ],
-            @{ _wire_headers($request, 'request') },
-        );
-    }
-
-    $self->_assert_peer_field_section_size(
-        \@fields,
+    $self->_assert_peer_field_section_size_value(
+        $self->{native}->uniform_request_field_section_size($request),
         'request()',
     );
 
-    my $wire_trailers = $request->has_trailers
-        ? _wire_trailers($request)
-        : undef;
+    my $trailer_size =
+        $self->{native}->uniform_trailer_field_section_size($request);
 
-    $self->_assert_peer_field_section_size(
-        $wire_trailers,
+    $self->_assert_peer_field_section_size_value(
+        $trailer_size,
         'request trailers',
-    ) if defined $wire_trailers;
+    ) if $trailer_size;
 
     my $stream = $self->{quic}->open_bidi_stream;
     return unless defined $stream;
@@ -3790,36 +4095,15 @@ sub _submit_request {
     $self->{streams}{$id} = $stream;
 
     $streaming = $streaming ? 1 : 0;
-    my $wire_body = $request->has_buffered_body
-        ? $request->body
-        : (!$streaming && $request->has_trailers ? '' : undef);
 
-    $self->{native}->submit_request(
+    $self->{native}->submit_uniform_request(
         $id,
-        \@fields,
-        $wire_body,
+        $request,
         $streaming,
     );
 
-    if (defined $wire_trailers) {
-        $self->{native}->submit_trailers(
-            $id,
-            $wire_trailers,
-        );
-    }
-
     $request->freeze;
     $self->{outgoing}{$id} = $request;
-
-    my $lifecycle = $self->{stream_lifecycle}{$id};
-    if (
-        defined($lifecycle)
-        && defined($lifecycle->{remote_stop_sending_code})
-    ) {
-        $request->_mark_stop_sending(
-            $lifecycle->{remote_stop_sending_code},
-        ) if $request->can('_mark_stop_sending');
-    }
 
     $self->_drain_output;
 
@@ -3833,69 +4117,39 @@ sub _submit_response {
         unless $self->{role} eq 'server';
     croak 'HTTP/3 connection has not been started'
         unless $self->{started};
-    croak 'response must be a Unblock::HTTP3::Response object'
-        unless blessed($response)
-            && $response->isa('Unblock::HTTP3::Response');
+    croak 'response must be a canonical Uniform::HTTP::Response'
+        unless ref($response) eq 'Uniform::HTTP::Response';
     croak 'unknown HTTP/3 request stream'
         unless defined $self->{streams}{$stream_id};
 
-    my @fields = (
-        [ ':status', "" . $response->status ],
-        @{ _wire_headers($response, 'response') },
-    );
-
-    $self->_assert_peer_field_section_size(
-        \@fields,
+    $self->_assert_peer_field_section_size_value(
+        $self->{native}->uniform_response_field_section_size($response),
         'send_response()',
     );
 
-    my $wire_trailers = $response->has_trailers
-        ? _wire_trailers($response)
-        : undef;
+    my $trailer_size =
+        $self->{native}->uniform_trailer_field_section_size($response);
 
-    $self->_assert_peer_field_section_size(
-        $wire_trailers,
+    $self->_assert_peer_field_section_size_value(
+        $trailer_size,
         'response trailers',
-    ) if defined $wire_trailers;
+    ) if $trailer_size;
 
     my $transaction = $self->{transactions}{$stream_id};
     my $streaming = defined($transaction)
         && $transaction->_response_is_streaming
         ? 1
         : 0;
-    my $wire_body = $response->has_buffered_body
-        ? $response->body
-        : (!$streaming && $response->has_trailers ? '' : undef);
 
-    $self->{native}->submit_response(
+    $self->{native}->submit_uniform_response(
         $stream_id,
-        \@fields,
-        $wire_body,
+        $response,
         $streaming,
     );
 
-    if (defined $wire_trailers) {
-        $self->{native}->submit_trailers(
-            $stream_id,
-            $wire_trailers,
-        );
-    }
-
     $response->freeze;
-    $self->{outgoing}{$stream_id} = $response;
-
-    my $lifecycle = $self->{stream_lifecycle}{$stream_id};
-    if (
-        defined($lifecycle)
-        && defined($lifecycle->{remote_stop_sending_code})
-    ) {
-        $response->_mark_stop_sending(
-            $lifecycle->{remote_stop_sending_code},
-        ) if $response->can('_mark_stop_sending');
-    }
 
     $self->_drain_output;
-
     return $response;
 }
 
@@ -4094,6 +4348,12 @@ Server only. Advertises Extended CONNECT support.
 Advertises RFC 9297 HTTP Datagram support. The Net::QUIC connection must also
 have QUIC DATAGRAM receive support.
 
+=item C<origins>
+
+Server only. Array reference of RFC 6454 ASCII origin serializations to send in
+the RFC 9412 ORIGIN frame. An empty array sends an explicit empty ORIGIN frame.
+Omit the option to send no ORIGIN frame.
+
 =item C<datagram_request>
 
 Server-only callback used to decide whether an incoming request uses HTTP
@@ -4148,7 +4408,11 @@ Starts HTTP/3 processing and creates the required control and QPACK streams.
 
 Normally QUIC is already ready. A returning client with remembered peer
 SETTINGS may start while QUIC early data is pending. A server with remembered
-local SETTINGS may start early to parse accepted 0-RTT requests.
+local SETTINGS may start early and parse 0-RTT request bytes internally.
+
+Server 0-RTT Transactions are not returned by C<next_transaction> and the
+C<datagram_request> application callback is not run until the QUIC handshake
+has completed and the early data has not been rejected.
 
 Returns the Connection.
 
@@ -4156,8 +4420,8 @@ Returns the Connection.
 
     my $tx = $h3->request($request);
 
-Client only. Submits a L<Uniform::HTTP::Request> or
-L<Unblock::HTTP3::Request> and returns a L<Unblock::HTTP3::Transaction>.
+Client only. Submits a canonical L<Uniform::HTTP::Request> and returns a
+L<Unblock::HTTP3::Transaction>.
 
 Useful per-request options are:
 
@@ -4180,7 +4444,9 @@ automatically if QUIC rejects it.
 
 Returns the next ready Transaction, or undef when none is queued.
 
-On a server this is a newly received request.
+On a server this is a newly received request. A request received in 0-RTT is
+withheld until the QUIC handshake completes and the early data has not been
+rejected.
 
 On a client this is an existing Transaction whose final response headers have
 arrived.
@@ -4300,6 +4566,15 @@ the new server SETTINGS frame arrives.
 
 True after the peer SETTINGS frame has been accepted.
 
+=head2 peer_origins
+
+Returns undef until a complete RFC 9412 ORIGIN frame has been received.
+
+After that, returns a copy of the cumulative valid origin entries advertised by
+the server. An explicit empty ORIGIN frame therefore returns an empty array
+reference rather than undef. Invalid origin entries are ignored as required by
+RFC 8336.
+
 =head2 early_data_status
 
 Returns Net::QUIC's early-data status:
@@ -4399,7 +4674,7 @@ release does not implement it.
 =head1 SEE ALSO
 
 L<Unblock::HTTP3>, L<Unblock::HTTP3::Transaction>,
-L<Unblock::HTTP3::Request>, L<Unblock::HTTP3::Response>, L<Net::QUIC>,
+L<Uniform::HTTP::Request>, L<Uniform::HTTP::Response>, L<Net::QUIC>,
 L<Uniform::HTTP>
 
 =head1 AUTHOR

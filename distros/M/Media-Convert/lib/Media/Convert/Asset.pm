@@ -8,6 +8,7 @@ our $VERSION;
 
 use Media::Convert;
 use Carp;
+use DateTime::Format::ISO8601;
 
 use autodie qw/:all/;
 
@@ -172,6 +173,26 @@ has 'canonical_duration' => (
 	isa => 'Str',
 	default => 'container',
 );
+
+=head2 creation_time
+
+The time at which this asset was created, as parsed from the C<creation_time>
+tag, if that is set.
+
+has 'creation_time' => (
+        is => 'ro',
+        isa => 'Maybe[DateTime]',
+        builder => '_probe_creation_time',
+        lazy => 1,
+);
+
+sub _probe_creation_time {
+        my $self = shift;
+        if($self->has_reference) {
+                return $self->reference->creation_time;
+        }
+        return DateTime::Format::ISO8601->parse_datetime($self->_get_probedata->{format}{tags}{creation_time});
+}
 
 =head2 duration
 

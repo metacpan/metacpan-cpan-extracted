@@ -6,13 +6,13 @@ use Stats::LikeR;
 use Test::Exception;
 use Test::LeakTrace 'no_leaks_ok';
 
-# NOTE: row.names defaults OFF, in every format, for every shape but a hash of
+# NOTE: row_names defaults OFF, in every format, for every shape but a hash of
 # hashes. A call that omits it writes the data columns and nothing else.
-# row.names => 1 opts in and prepends a leading empty header cell plus a
-# per-row label column (1..n); row.names => 'col' promotes an existing column
+# row_names => 1 opts in and prepends a leading empty header cell plus a
+# per-row label column (1..n); row_names => 'col' promotes an existing column
 # to the labels, headed with its own name. A HoH defaults it ON, because its
-# outer keys are the row identifiers and exist nowhere else: row.names => 0
-# turns them off, and row.names => 'name' writes 'name' as the key column's
+# outer keys are the row identifiers and exist nowhere else: row_names => 0
+# turns them off, and row_names => 'name' writes 'name' as the key column's
 # header.
 
 # Every temporary file this test writes goes inside this one directory, which
@@ -33,7 +33,7 @@ my %data = (
 	'Row_B' => { 'Col1' => 30, 'Col3' => 40 },
 );
 my $tmp_file = "$dir/test.tsv";
-write_table(\%data, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
+write_table(\%data, $tmp_file, sep => "\t", 'row_names' => 1, 'undef_val' => 'NA');
 my $str = file2string($tmp_file);
 my $expected = "\tCol1\tCol2\tCol3\nRow_A\t10\t20\tNA\nRow_B\t30\tNA\t40\n";
 if (is($str, $expected, 'write_table successfully wrote a tab-delimited file')) {
@@ -43,9 +43,9 @@ if (is($str, $expected, 'write_table successfully wrote a tab-delimited file')) 
 }
 no_leaks_ok {
 	eval {
-		write_table(\%data, $tmp_file, sep => "\t", 'row.names' => 1);
+		write_table(\%data, $tmp_file, sep => "\t", 'row_names' => 1);
 	};
-} 'write_table: no memory leaks with row.names = true' unless $INC{'Devel/Cover.pm'};
+} 'write_table: no memory leaks with row_names = true' unless $INC{'Devel/Cover.pm'};
 # TEST 1: HASH OF HASHES (positional)
 # Demonstrates: HoH, sorted rows/columns, "NA" for missing values,
 #               quoting when separator ("\t") or " appears inside data
@@ -58,7 +58,7 @@ my %data_hoh = (
 	'r3' => { 'c2' => "tab\tin", 'c4' => undef },
 );
 
-write_table(\%data_hoh, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
+write_table(\%data_hoh, $tmp_file, sep => "\t", 'row_names' => 1, 'undef_val' => 'NA');
 $str = file2string($tmp_file);
 $expected = "\tc1\tc2\tc3\tc4\nr1\t42\thello,world\tNA\tNA\nr2\t99\tNA\t\"quote\"\"here\"\tNA\nr3\tNA\t\"tab\tin\"\tNA\tNA\n";
 if (is($str, $expected, 'write_table successfully wrote a tab-delimited file (Hash of Hashes)')) {
@@ -68,7 +68,7 @@ if (is($str, $expected, 'write_table successfully wrote a tab-delimited file (Ha
 }
 no_leaks_ok {
 	eval {
-		write_table(\%data_hoh, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
+		write_table(\%data_hoh, $tmp_file, sep => "\t", 'row_names' => 1, 'undef_val' => 'NA');
 	};
 } 'write_table: no memory leaks with hash-of-hash input' unless $INC{'Devel/Cover.pm'};
 # TEST 2: HASH OF ARRAYS (positional)
@@ -81,7 +81,7 @@ my %data_hoa = (
 	'r3' => [undef, "tab\tin", undef, undef],
 );
 
-write_table(\%data_hoa, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
+write_table(\%data_hoa, $tmp_file, sep => "\t", 'row_names' => 1, 'undef_val' => 'NA');
 $str = file2string($tmp_file);
 $expected = "\tr1\tr2\tr3\n1\t42\t99\tNA\n2\thello,world\tNA\t\"tab\tin\"\n3\tNA\t\"quote\"\"here\"\tNA\n4\tNA\tNA\tNA\n";
 if (is($str, $expected, 'write_table successfully wrote a tab-delimited file (Hash of Arrays)')) {
@@ -91,12 +91,12 @@ if (is($str, $expected, 'write_table successfully wrote a tab-delimited file (Ha
 }
 no_leaks_ok {
 	eval {
-		write_table(\%data_hoa, $tmp_file, sep => "\t", 'row.names' => 1);
+		write_table(\%data_hoa, $tmp_file, sep => "\t", 'row_names' => 1);
 	};
 } 'write_table: no memory leaks with hash-of-hash input' unless $INC{'Devel/Cover.pm'};
-# No row.names passed: the default is OFF, so there is no label column and no
-# leading empty header cell. undef.val still fills the gaps.
-write_table(\%data_hoa, "$dir/undef.val.tsv", sep => "\t", 'undef.val' => 'nan');
+# No row_names passed: the default is OFF, so there is no label column and no
+# leading empty header cell. undef_val still fills the gaps.
+write_table(\%data_hoa, "$dir/undef.val.tsv", sep => "\t", 'undef_val' => 'nan');
 $str = file2string("$dir/undef.val.tsv");
 $expected = "r1\tr2\tr3\n42\t99\tnan\nhello,world\tnan\t\"tab\tin\"\nnan\t\"quote\"\"here\"\tnan\nnan\tnan\tnan\n";
 is($str, $expected, 'undefined values are switched to nan (no row labels by default)');
@@ -129,8 +129,8 @@ $fh = File::Temp->new(DIR => $dir, SUFFIX => '.tsv', UNLINK => 1);
 close $fh;
 write_table(
 	\%hoa, $fh->filename,
-	'col.names' => [qw(a b)],
-	'row.names' => 0, 'undef.val' => 'NA'
+	'col_names' => [qw(a b)],
+	'row_names' => 0, 'undef_val' => 'NA'
 );
 $str = file2string($fh->filename);
 if ($str eq 'a	b
@@ -150,10 +150,10 @@ my $flat_hash = {
  A => 1, B => 2
 };
 
-# Test 1: Flat hash with row.names = 0
+# Test 1: Flat hash with row_names = 0
 # The output should exactly match: A,B \n 1,2
 my ($fh1, $file1) = tempfile(DIR => $dir, SUFFIX => '.csv', UNLINK => 1);
-write_table($flat_hash, $file1, sep => ',', 'row.names' => 0);
+write_table($flat_hash, $file1, sep => ',', 'row_names' => 0);
 
 open my $in1, '<', $file1 or die "Could not open $file1: $!";
 my @lines1 = <$in1>;
@@ -163,12 +163,12 @@ chomp @lines1;
 like($lines1[0], qr/^(?:""|'')?A(?:""|'')?,(?:""|'')?B(?:""|'')?$/, "Flat hash (rownames=0) Headers are keys");
 like($lines1[1], qr/^(?:""|'')?1(?:""|'')?,(?:""|'')?2(?:""|'')?$/, "Flat hash (rownames=0) Values are on row 1");
 
-# Test 2: Flat hash with row.names => 1 (explicit; also the default now)
+# Test 2: Flat hash with row_names => 1 (explicit; also the default now)
 # Output gracefully prepends the implicit "1" row identifier:
 # "",A,B
 # "1",1,2
 my ($fh2, $file2) = tempfile(DIR => $dir, SUFFIX => '.csv', UNLINK => 1);
-write_table($flat_hash, $file2, sep => ',', 'row.names' => 1);
+write_table($flat_hash, $file2, sep => ',', 'row_names' => 1);
 
 open my $in2, '<', $file2 or die "Could not open temp file: $!";
 my @lines2 = <$in2>;
@@ -194,40 +194,40 @@ my %hoh  = ( 'r1' => { 'a' => 1, 'b' => 2 }, 'r2' => { 'a' => 3, 'b' => 4 } );
 my @aoh  = ( { 'x' => 1, 'y' => 2 }, { 'x' => 3, 'y' => 4 } );
 my %flat = ( 'a' => 1, 'b' => 2, 'c' => 3 );
 
-# 0. Default row.names is OFF, for every shape but a HoH and in every format.
+# 0. Default row_names is OFF, for every shape but a HoH and in every format.
 #    Omitting it writes the data columns and nothing else -- no label column,
-#    and no empty leading header cell. row.names => 1 opts in; the labels are
+#    and no empty leading header cell. row_names => 1 opts in; the labels are
 #    1..n. An explicit 0 is the default. A HoH keeps its outer keys unless
-#    told row.names => 0 (see section 2a).
+#    told row_names => 0 (see section 2a).
 wrote_ok( "age,name\n30,Alice\n25,Bob\n",
-	'default row.names off (HoA): no label column', \%hoa, 'undef.val' => 'NA' );
+	'default row_names off (HoA): no label column', \%hoa, 'undef_val' => 'NA' );
 wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n",
-	'default row.names on (HoH): the outer key is the label', \%hoh, 'undef.val' => 'NA' );
+	'default row_names on (HoH): the outer key is the label', \%hoh, 'undef_val' => 'NA' );
 wrote_ok( "x,y\n1,2\n3,4\n",
-	'default row.names off (AoH): no label column', \@aoh, 'undef.val' => 'NA' );
+	'default row_names off (AoH): no label column', \@aoh, 'undef_val' => 'NA' );
 wrote_ok( "a,b,c\n1,2,3\n",
-	'default row.names off (flat hash): no label column', \%flat );
+	'default row_names off (flat hash): no label column', \%flat );
 wrote_ok( "k,v\nx,1\ny,2\n",
-	'default row.names off (AoA): no label column', [ [qw(k v)], [ 'x', 1 ], [ 'y', 2 ] ] );
+	'default row_names off (AoA): no label column', [ [qw(k v)], [ 'x', 1 ], [ 'y', 2 ] ] );
 # The opt-in restores the label column, and the empty header cell it needs.
 wrote_ok( ",a,b,c\n1,1,2,3\n",
-	'row.names => 1 opts in (flat hash)', \%flat, 'row.names' => 1 );
+	'row_names => 1 opts in (flat hash)', \%flat, 'row_names' => 1 );
 wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n",
-	'row.names => 1 opts in (HoH): outer key as label', \%hoh, 'row.names' => 1, 'undef.val' => 'NA' );
+	'row_names => 1 opts in (HoH): outer key as label', \%hoh, 'row_names' => 1, 'undef_val' => 'NA' );
 wrote_ok( ",k,v\n1,x,1\n2,y,2\n",
-	'row.names => 1 opts in (AoA): numeric labels', [ [qw(k v)], [ 'x', 1 ], [ 'y', 2 ] ],
-	'row.names' => 1 );
+	'row_names => 1 opts in (AoA): numeric labels', [ [qw(k v)], [ 'x', 1 ], [ 'y', 2 ] ],
+	'row_names' => 1 );
 # An explicit 0 says exactly what the default already does.
 wrote_ok( "a,b,c\n1,2,3\n",
-	'row.names => 0 matches the default (flat hash)', \%flat, 'row.names' => 0 );
+	'row_names => 0 matches the default (flat hash)', \%flat, 'row_names' => 0 );
 wrote_ok( "age,name\n30,Alice\n25,Bob\n",
-	'row.names => 0 matches the default (HoA)', \%hoa, 'row.names' => 0, 'undef.val' => 'NA' );
+	'row_names => 0 matches the default (HoA)', \%hoa, 'row_names' => 0, 'undef_val' => 'NA' );
 
 # 1. Hash of arrays: columns sorted, numeric row names by default.
-wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n", 'HoA: sorted cols + numeric row names', \%hoa, 'row.names' => 1, 'undef.val' => 'NA' );
+wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n", 'HoA: sorted cols + numeric row names', \%hoa, 'row_names' => 1, 'undef_val' => 'NA' );
 # 2. Hash of hashes: rows sorted, columns sorted, outer key as the row label.
-wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n", 'HoH: sorted rows and columns', \%hoh, 'row.names' => 1, 'undef.val' => 'NA' );
-# 2a. HoH row.names: the outer keys are data, so they are written unless turned
+wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n", 'HoH: sorted rows and columns', \%hoh, 'row_names' => 1, 'undef_val' => 'NA' );
+# 2a. HoH row_names: the outer keys are data, so they are written unless turned
 #     off, and a name for them becomes the key column's header.
 my %taxa = (
 	'9606'  => { species => 'Homo sapiens', genus => 'Homo' },
@@ -236,23 +236,23 @@ my %taxa = (
 wrote_ok( "\tgenus\tspecies\n10090\t\tMus musculus\n9606\tHomo\tHomo sapiens\n",
 	'HoH default: the taxid keys lead each row under an empty header', \%taxa, sep => "\t" );
 wrote_ok( "genus\tspecies\n\tMus musculus\nHomo\tHomo sapiens\n",
-	'HoH row.names => 0: the keys are dropped', \%taxa, sep => "\t", 'row.names' => 0 );
+	'HoH row_names => 0: the keys are dropped', \%taxa, sep => "\t", 'row_names' => 0 );
 wrote_ok( "taxid\tgenus\tspecies\n10090\t\tMus musculus\n9606\tHomo\tHomo sapiens\n",
-	"HoH row.names => 'taxid': the key column is headed taxid", \%taxa, sep => "\t", 'row.names' => 'taxid' );
+	"HoH row_names => 'taxid': the key column is headed taxid", \%taxa, sep => "\t", 'row_names' => 'taxid' );
 wrote_ok( "taxid,species\n10090,Mus musculus\n9606,Homo sapiens\n",
-	"HoH row.names => 'taxid' with col.names", \%taxa, 'row.names' => 'taxid', 'col.names' => ['species'] );
+	"HoH row_names => 'taxid' with col_names", \%taxa, 'row_names' => 'taxid', 'col_names' => ['species'] );
 wrote_ok( "genus,species\n10090,Mus musculus\n9606,Homo sapiens\n",
-	'HoH row.names naming a column that col.names leaves out is no clash',
-	\%taxa, 'row.names' => 'genus', 'col.names' => ['species'] );
+	'HoH row_names naming a column that col_names leaves out is no clash',
+	\%taxa, 'row_names' => 'genus', 'col_names' => ['species'] );
 # slurp() reads bytes, so the header is U+7A2E's UTF-8 encoding.
-wrote_ok( "\xE7\xA8\xAE,a,b\nr1,1,2\nr2,3,4\n", 'HoH row.names => a wide-character name',
-	\%hoh, 'row.names' => "\x{7a2e}" );
+wrote_ok( "\xE7\xA8\xAE,a,b\nr1,1,2\nr2,3,4\n", 'HoH row_names => a wide-character name',
+	\%hoh, 'row_names' => "\x{7a2e}" );
 {
 	my $f = path();
-	write_table( \%taxa, $f, 'row.names' => 'taxid', quiet => 1 );
+	write_table( \%taxa, $f, 'row_names' => 'taxid', quiet => 1 );
 	my $back = read_table( $f );
 	is_deeply( [ map { $_->{taxid} } @$back ], [ '10090', '9606' ],
-		'HoH row.names => name: read_table reads the keys back as a named column' );
+		'HoH row_names => name: read_table reads the keys back as a named column' );
 	is( $back->[1]{species}, 'Homo sapiens', '... aligned with their rows' );
 }
 # A name that is also a column being written would give the file two columns
@@ -262,53 +262,53 @@ wrote_ok( "\xE7\xA8\xAE,a,b\nr1,1,2\nr2,3,4\n", 'HoH row.names => a wide-charact
 	open my $fh, '>', $f or die "cannot write $f: $!";
 	print {$fh} "keep\n";
 	close $fh;
-	throws_ok { write_table( \%taxa, $f, 'row.names' => 'genus' ) }
-		qr/^write_table: row\.names 'genus' collides with an existing column/,
-		'HoH row.names naming an inner key croaks';
-	throws_ok { write_table( \%taxa, $f, 'row.names' => 'species', 'col.names' => ['species'] ) }
-		qr/^write_table: row\.names 'species' collides with an existing column/,
-		'HoH row.names naming a col.names entry croaks';
+	throws_ok { write_table( \%taxa, $f, 'row_names' => 'genus' ) }
+		qr/^write_table: row_names 'genus' collides with an existing column/,
+		'HoH row_names naming an inner key croaks';
+	throws_ok { write_table( \%taxa, $f, 'row_names' => 'species', 'col_names' => ['species'] ) }
+		qr/^write_table: row_names 'species' collides with an existing column/,
+		'HoH row_names naming a col_names entry croaks';
 	is( slurp($f), "keep\n", 'a refused write leaves the existing file untouched' );
 }
 no_leaks_ok {
 	my $f = path();
-	write_table( \%taxa, $f, 'row.names' => 'taxid', quiet => 1 );
-} "write_table: no memory leaks with a HoH row.names name" unless $INC{'Devel/Cover.pm'};
+	write_table( \%taxa, $f, 'row_names' => 'taxid', quiet => 1 );
+} "write_table: no memory leaks with a HoH row_names name" unless $INC{'Devel/Cover.pm'};
 no_leaks_ok {
-	eval { write_table( \%taxa, path(), 'row.names' => 'genus', quiet => 1 ) };
-} 'write_table: no memory leaks on the HoH row.names collision croak' unless $INC{'Devel/Cover.pm'};
+	eval { write_table( \%taxa, path(), 'row_names' => 'genus', quiet => 1 ) };
+} 'write_table: no memory leaks on the HoH row_names collision croak' unless $INC{'Devel/Cover.pm'};
 # 3. Array of hashes: union of keys sorted, numeric row names.
-wrote_ok( ",x,y\n1,1,2\n2,3,4\n", 'AoH: union of keys, numeric row names', \@aoh, 'row.names' => 1, 'undef.val' => 'NA' );
+wrote_ok( ",x,y\n1,1,2\n2,3,4\n", 'AoH: union of keys, numeric row names', \@aoh, 'row_names' => 1, 'undef_val' => 'NA' );
 # 4. Flat hash: one row, columns sorted, no label column by default.
 wrote_ok( "a,b,c\n1,2,3\n", 'flat hash: single row, unlabelled by default', \%flat );
-# 5. col.names selects/orders columns.
-wrote_ok( "name\nAlice\nBob\n", 'col.names selects a subset in order', \%hoa, 'col.names' => [ 'name' ], 'undef.val' => 'NA' );
-# 6. row.names => 0 turns off the row-name column.
-wrote_ok( "age,name\n30,Alice\n25,Bob\n", 'row.names => 0 omits the label column', \%hoa, 'row.names' => 0, 'undef.val' => 'NA' );
-# 7. row.names => 'col' uses that column as the labels, drops it from headers,
+# 5. col_names selects/orders columns.
+wrote_ok( "name\nAlice\nBob\n", 'col_names selects a subset in order', \%hoa, 'col_names' => [ 'name' ], 'undef_val' => 'NA' );
+# 6. row_names => 0 turns off the row-name column.
+wrote_ok( "age,name\n30,Alice\n25,Bob\n", 'row_names => 0 omits the label column', \%hoa, 'row_names' => 0, 'undef_val' => 'NA' );
+# 7. row_names => 'col' uses that column as the labels, drops it from headers,
 #    and heads the label column with its name.  Up to 0.3212 that header cell
 #    was left empty, so the name was lost and read_table() read the column back
 #    as row_name.  pandas writes an index's name over it the same way: pandas
 #    3.0.4 tests/io/formats/test_to_csv.py, test_to_csv_single_level_multi_index
 #    (gh-19589), pins "x,data\n1.0,1\n" for an index named x.
-wrote_ok( "name,age\nAlice,30\nBob,25\n", "row.names => 'name' uses that column as labels", \%hoa, 'row.names' => 'name', 'undef.val' => 'NA' );
+wrote_ok( "name,age\nAlice,30\nBob,25\n", "row_names => 'name' uses that column as labels", \%hoa, 'row_names' => 'name', 'undef_val' => 'NA' );
 #    ... including a column name outside Latin-1, which up to 0.319 croaked
 #    "Wide character" in the XS digit check before it was ever looked up.  The
 #    name is written as its UTF-8 bytes, as every other header is.
-wrote_ok( "\xe5\x90\x8d,age\nAlice,30\nBob,25\n", 'row.names => a wide-character column name',
+wrote_ok( "\xe5\x90\x8d,age\nAlice,30\nBob,25\n", 'row_names => a wide-character column name',
 	{ "\x{540d}" => [ 'Alice', 'Bob' ], 'age' => [ 30, 25 ] },
-	'row.names' => "\x{540d}", 'undef.val' => 'NA' );
+	'row_names' => "\x{540d}", 'undef_val' => 'NA' );
 # 8. Explicit separator.
-wrote_ok( "a;b;c\n1;2;3\n", 'sep => ";" is honored', \%flat, 'sep' => ';', 'undef.val' => 'NA' );
+wrote_ok( "a;b;c\n1;2;3\n", 'sep => ";" is honored', \%flat, 'sep' => ';', 'undef_val' => 'NA' );
 # 9. delim is an alias for sep.
-wrote_ok( "a|b|c\n1|2|3\n", 'delim => "|" is honored', \%flat, 'delim' => '|', 'undef.val' => 'NA' );
-# 10. undef.val fills missing cells (jagged hash of arrays).
+wrote_ok( "a|b|c\n1|2|3\n", 'delim => "|" is honored', \%flat, 'delim' => '|', 'undef_val' => 'NA' );
+# 10. undef_val fills missing cells (jagged hash of arrays).
 my %jag = ( 'a' => [ 1, 2 ], 'b' => [ 10 ] );
-wrote_ok( "a,b\n1,10\n2,NA\n", 'missing cells default to NA', \%jag, 'undef.val' => 'NA' );
-wrote_ok( "a,b\n1,10\n2,NULL\n", 'undef.val overrides the fill', \%jag, 'undef.val' => 'NULL' );
+wrote_ok( "a,b\n1,10\n2,NA\n", 'missing cells default to NA', \%jag, 'undef_val' => 'NA' );
+wrote_ok( "a,b\n1,10\n2,NULL\n", 'undef_val overrides the fill', \%jag, 'undef_val' => 'NULL' );
 # 11. CSV quoting: separators, quotes and newlines are quoted; quotes are doubled.
 my %quote = ( 'a' => [ 'x,y' ], 'b' => [ 'p"q' ], 'c' => [ "line1\nline2" ]);
-wrote_ok( qq{a,b,c\n"x,y","p""q","line1\nline2"\n}, 'quoting: comma, quote, newline', \%quote, 'undef.val' => 'NA' );
+wrote_ok( qq{a,b,c\n"x,y","p""q","line1\nline2"\n}, 'quoting: comma, quote, newline', \%quote, 'undef_val' => 'NA' );
 # 12. Auto-detect tab separator from a .tsv extension.
 {
 	my $f = "$dir/auto.tsv";
@@ -342,68 +342,68 @@ dies_ok { write_table( { 'r1' => { 'a' => 1 }, 'r2' => [ 1 ] }, path() ) } 'mixe
 dies_ok { write_table( { 'r1' => { 'a' => [ 1 ] } }, path() ) } 'nested reference cell dies';
 dies_ok { write_table( \%hoa, path(), 'sep' ) } 'odd argument count dies';
 dies_ok { write_table( \%hoa, path(), 'bogus' => 1 ) } 'unknown option dies';
-dies_ok { write_table( \%hoa, path(), 'col.names' => 'x' ) } 'col.names must be an array ref';
-# 17. Empty col.names must NOT hang (regression: size_t vs av_len == -1).
-lives_ok { write_table( \%flat, path(), 'col.names' => [], 'row.names' => 0 ) } 'empty col.names does not loop forever';
+dies_ok { write_table( \%hoa, path(), 'col_names' => 'x' ) } 'col_names must be an array ref';
+# 17. Empty col_names must NOT hang (regression: size_t vs av_len == -1).
+lives_ok { write_table( \%flat, path(), 'col_names' => [], 'row_names' => 0 ) } 'empty col_names does not loop forever';
 # 18+. Expanded coverage targeting bugs found in the write_table XS.
 # These tests assume the updated XS: undef cells render as EMPTY fields by
-# default (a,,c), 'undef.val' still overrides, and print_string_row emits
+# default (a,,c), 'undef_val' still overrides, and print_string_row emits
 # zero-length fields bare (never '' or "").
 
-# 18. Default undef rendering is an empty field (no 'undef.val' supplied).
+# 18. Default undef rendering is an empty field (no 'undef_val' supplied).
 my %u_jag = ( 'a' => [ 1, 2 ], 'b' => [ 10 ] );
 wrote_ok( "a,b\n1,10\n2,\n", 'default undef renders as an empty field', \%u_jag );
 
-# 19. 'undef.val' => undef must behave like the default and emit NO
+# 19. 'undef_val' => undef must behave like the default and emit NO
 #     "uninitialized value" warning (regression: SvPV_nolen on PL_sv_undef).
 {
 	my @warnings;
 	local $SIG{__WARN__} = sub { push @warnings, @_ };
 	my $f = path();
-	write_table( \%u_jag, $f, 'undef.val' => undef );
-	is( slurp($f), "a,b\n1,10\n2,\n", "undef.val => undef behaves like the default" );
-	is( scalar @warnings, 0, "undef.val => undef emits no warnings" )
+	write_table( \%u_jag, $f, 'undef_val' => undef );
+	is( slurp($f), "a,b\n1,10\n2,\n", "undef_val => undef behaves like the default" );
+	is( scalar @warnings, 0, "undef_val => undef emits no warnings" )
 		or diag( join '', @warnings );
 	$f = path();
-	write_table( \%u_jag, $f, 'undef.val' => '' );
-	is( slurp($f), "a,b\n1,10\n2,\n", "undef.val => '' is identical to the default" );
+	write_table( \%u_jag, $f, 'undef_val' => '' );
+	is( slurp($f), "a,b\n1,10\n2,\n", "undef_val => '' is identical to the default" );
 }
 
-# 20. Empty col.names per input shape. A HANG on any of these is the
+# 20. Empty col_names per input shape. A HANG on any of these is the
 #     size_t-index vs av_len() == -1 regression (test 17 covers flat hash).
 {
 	# HoH: degenerate but defined output - only the row-label column survives.
 	my %hoh2 = ( 'r1' => { 'a' => 1 }, 'r2' => { 'a' => 2 } );
 	my $f = path();
-	lives_ok { write_table( \%hoh2, $f, 'col.names' => [], 'row.names' => 1 ) }
-		'HoH: empty col.names terminates';
-	is( slurp($f), "\nr1\nr2\n", 'HoH: empty col.names leaves only sorted row labels' );
+	lives_ok { write_table( \%hoh2, $f, 'col_names' => [], 'row_names' => 1 ) }
+		'HoH: empty col_names terminates';
+	is( slurp($f), "\nr1\nr2\n", 'HoH: empty col_names leaves only sorted row labels' );
 
 	# AoH: numeric row labels survive.
 	my @aoh2 = ( { 'x' => 1 }, { 'x' => 2 } );
 	$f = path();
-	lives_ok { write_table( \@aoh2, $f, 'col.names' => [], 'row.names' => 1 ) }
-		'AoH: empty col.names terminates';
-	is( slurp($f), "\n1\n2\n", 'AoH: empty col.names leaves only numeric row labels' );
+	lives_ok { write_table( \@aoh2, $f, 'col_names' => [], 'row_names' => 1 ) }
+		'AoH: empty col_names terminates';
+	is( slurp($f), "\n1\n2\n", 'AoH: empty col_names leaves only numeric row labels' );
 
 	# HoA croaks ("Could not get headers") - and that croak path must close
 	# the already-open filehandle and free headers_av (regression: both leaked).
 	my %hoa2 = ( 'a' => [ 1, 2 ] );
-	throws_ok { write_table( \%hoa2, path(), 'col.names' => [] ) }
-		qr/Could not get headers/, 'HoA: empty col.names croaks cleanly';
+	throws_ok { write_table( \%hoa2, path(), 'col_names' => [] ) }
+		qr/Could not get headers/, 'HoA: empty col_names croaks cleanly';
 
 	no_leaks_ok {
-		eval { write_table( \%hoa2, path(), 'col.names' => [] ) };
+		eval { write_table( \%hoa2, path(), 'col_names' => [] ) };
 	} 'HoA: no leaks (fh, headers_av) on the empty-header croak' unless $INC{'Devel/Cover.pm'};
 }
 
-# 21. Empty col.names combined with a named row.names column exercises the
+# 21. Empty col_names combined with a named row_names column exercises the
 #     filtered-headers loop over an EMPTY headers array (second size_t site).
 {
 	my @aoh3 = ( { 'x' => 'p' }, { 'x' => 'q' } );
 	my $f = path();
-	lives_ok { write_table( \@aoh3, $f, 'col.names' => [], 'row.names' => 'x' ) }
-		"AoH: empty col.names + row.names => 'x' terminates (filtered-header loop)";
+	lives_ok { write_table( \@aoh3, $f, 'col_names' => [], 'row_names' => 'x' ) }
+		"AoH: empty col_names + row_names => 'x' terminates (filtered-header loop)";
 	is( slurp($f), "x\np\nq\n", 'AoH: row labels taken from x, under its name; no data columns' );
 }
 
@@ -412,7 +412,7 @@ wrote_ok( "a,b\n1,10\n2,\n", 'default undef renders as an empty field', \%u_jag 
 {
 	my @many = map { { 'v' => $_ * 10 } } 1 .. 12;
 	my $expected = ",v\n" . join( '', map { "$_," . ( $_ * 10 ) . "\n" } 1 .. 12 );
-	wrote_ok( $expected, 'numeric row labels 1..12 correct in sequence', \@many, 'row.names' => 1 );
+	wrote_ok( $expected, 'numeric row labels 1..12 correct in sequence', \@many, 'row_names' => 1 );
 }
 
 # 23. Unopenable output path: must die, and must not leak the pre-gathered
@@ -431,30 +431,30 @@ wrote_ok( "a,b\n1,10\n2,\n", 'default undef renders as an empty field', \%u_jag 
 wrote_ok( qq{a\n"x\ry"\n}, 'embedded \r is quoted', { 'a' => [ "x\ry" ] } );
 # A column NAME containing the separator is quoted in the header row.
 wrote_ok( qq{"a,b"\n1\n}, 'column name containing the separator is quoted',
-	{ 'a,b' => [ 1 ] }, 'row.names' => 0 );
+	{ 'a,b' => [ 1 ] }, 'row_names' => 0 );
 # Multi-character separator: only a full separator match triggers quoting.
 wrote_ok( qq{a::b\n"x::y"::x:y\n}, 'multi-char separator: full match quotes, partial stays bare',
-	{ 'a' => [ 'x::y' ], 'b' => [ 'x:y' ] }, 'sep' => '::', 'row.names' => 0 );
+	{ 'a' => [ 'x::y' ], 'b' => [ 'x:y' ] }, 'sep' => '::', 'row_names' => 0 );
 
-# 25. undef entries inside col.names are skipped, order otherwise preserved.
-wrote_ok( "b,a\n2,1\n", 'undef entries in col.names are skipped',
-	{ 'a' => [ 1 ], 'b' => [ 2 ] }, 'col.names' => [ 'b', undef, 'a' ] );
+# 25. undef entries inside col_names are skipped, order otherwise preserved.
+wrote_ok( "b,a\n2,1\n", 'undef entries in col_names are skipped',
+	{ 'a' => [ 1 ], 'b' => [ 2 ] }, 'col_names' => [ 'b', undef, 'a' ] );
 
-# 26. col.names naming a column absent from the data pads with undef.val
+# 26. col_names naming a column absent from the data pads with undef_val
 #     (or empty by default).
-wrote_ok( "a,ghost\n1,NA\n2,NA\n", 'missing col.names column pads with undef.val',
-	{ 'a' => [ 1, 2 ] }, 'col.names' => [ 'a', 'ghost' ], 'row.names' => 0, 'undef.val' => 'NA' );
-wrote_ok( "a,ghost\n1,\n2,\n", 'missing col.names column pads empty by default',
-	{ 'a' => [ 1, 2 ] }, 'col.names' => [ 'a', 'ghost' ], 'row.names' => 0 );
+wrote_ok( "a,ghost\n1,NA\n2,NA\n", 'missing col_names column pads with undef_val',
+	{ 'a' => [ 1, 2 ] }, 'col_names' => [ 'a', 'ghost' ], 'row_names' => 0, 'undef_val' => 'NA' );
+wrote_ok( "a,ghost\n1,\n2,\n", 'missing col_names column pads empty by default',
+	{ 'a' => [ 1, 2 ] }, 'col_names' => [ 'a', 'ghost' ], 'row_names' => 0 );
 
 # 27. Empty data is a table with no rows, and is written as one.  Up to 0.3212
 #     it returned before a file was opened, so nothing was written and nothing
 #     said, and a script that went on to read the file found it missing.  The
-#     header is whatever col.names and row.names give: pandas 3.0.4
+#     header is whatever col_names and row_names give: pandas 3.0.4
 #     tests/io/formats/test_to_csv.py, test_empty_dataframe, pins ",A\n" for
 #     DataFrame({"A": []}).to_csv(), whose index gives the leading empty cell
-#     row.names => 1 gives here.  With no columns at all the header is a lone
-#     empty record, which is also what a flat hash with col.names => [] writes.
+#     row_names => 1 gives here.  With no columns at all the header is a lone
+#     empty record, which is also what a flat hash with col_names => [] writes.
 {
 	my $f = path();
 	my @r = write_table( {}, $f, quiet => 1 );
@@ -464,11 +464,11 @@ wrote_ok( "a,ghost\n1,\n2,\n", 'missing col.names column pads empty by default',
 	@r = write_table( [], $f, quiet => 1 );
 	is( scalar @r, 0, 'empty array returns an empty list' );
 	is( slurp($f), "\n", 'empty array writes a file holding one empty header record' );
-	wrote_ok( ",A\n", 'empty data with col.names and row.names => 1: pandas test_empty_dataframe',
-		[], 'col.names' => ['A'], 'row.names' => 1, quiet => 1 );
-	wrote_ok( "A,B\n", 'empty data with col.names: the header alone', {}, 'col.names' => [qw(A B)], quiet => 1 );
-	wrote_ok( "id,A\n", "empty data with row.names => 'id': the label column is named", [],
-		'col.names' => ['A'], 'row.names' => 'id', quiet => 1 );
+	wrote_ok( ",A\n", 'empty data with col_names and row_names => 1: pandas test_empty_dataframe',
+		[], 'col_names' => ['A'], 'row_names' => 1, quiet => 1 );
+	wrote_ok( "A,B\n", 'empty data with col_names: the header alone', {}, 'col_names' => [qw(A B)], quiet => 1 );
+	wrote_ok( "id,A\n", "empty data with row_names => 'id': the label column is named", [],
+		'col_names' => ['A'], 'row_names' => 'id', quiet => 1 );
 }
 
 # 28. Documented limitation: a positional filename equal to an option key is
@@ -478,7 +478,7 @@ dies_ok { write_table( { 'a' => 1 }, 'sep' ) }
 
 # 29. Header loop index width: >65535 columns must terminate (regression:
 #     'unsigned short' loop index wrapped and never finished). Gated because
-#     it builds a 70k-key hash. Default row.names on -> a leading label cell.
+#     it builds a 70k-key hash. Default row_names on -> a leading label cell.
 SKIP: {
 	skip 'set EXTENDED_TESTING=1 for the 70k-column header test', 2
 		unless $ENV{EXTENDED_TESTING};
@@ -501,7 +501,7 @@ SKIP: {
 
 	my $row = "zeile\x{263a}";
 	$f = path();
-	write_table( { $row => { 'a' => 9 } }, $f, 'row.names' => 1 );
+	write_table( { $row => { 'a' => 9 } }, $f, 'row_names' => 1 );
 	is( slurp($f), ",a\nzeile\x{e2}\x{98}\x{ba},9\n",
 		'wide-character HoH row key sorts and fetches correctly (UTF-8 bytes on disk)' );
 }
@@ -522,7 +522,7 @@ my $utf8_snow = "\xE2\x98\x83";	# U+2603 SNOWMAN
 
 # 31. A non-ASCII byte value is written verbatim (flat hash, no quoting needed).
 wrote_ok( "greeting\n$utf8_cafe\n", 'UTF-8 bytes in a value are written verbatim',
-	{ 'greeting' => $utf8_cafe }, 'row.names' => 0 );
+	{ 'greeting' => $utf8_cafe }, 'row_names' => 0 );
 
 # 32. A non-ASCII value that also contains the separator is quoted, bytes intact.
 wrote_ok( qq{a\n"$utf8_cafe,$utf8_ole"\n},
@@ -531,10 +531,10 @@ wrote_ok( qq{a\n"$utf8_cafe,$utf8_ole"\n},
 
 # 33. A wide-character (UTF-8-flagged, code point > 0xFF) VALUE is written as
 #     its UTF-8 bytes -- the value-side analogue of test 30's key check. Asked
-#     for with row.names => 1 so the outer key 'r1' is exercised as a label too.
+#     for with row_names => 1 so the outer key 'r1' is exercised as a label too.
 {
 	my $f = path();
-	write_table( { 'r1' => { 'a' => "\x{263a}" } }, $f, 'row.names' => 1 );
+	write_table( { 'r1' => { 'a' => "\x{263a}" } }, $f, 'row_names' => 1 );
 	is( slurp($f), ",a\nr1,\x{e2}\x{98}\x{ba}\n",
 		'a wide-character value is written as its UTF-8 bytes on disk' );
 }
@@ -544,7 +544,7 @@ wrote_ok( qq{a\n"$utf8_cafe,$utf8_ole"\n},
 {
 	my @warnings;
 	local $SIG{__WARN__} = sub { push @warnings, @_ };
-	write_table( { 'r1' => { 'a' => "\x{263a}" } }, path(), 'row.names' => 'id' );
+	write_table( { 'r1' => { 'a' => "\x{263a}" } }, path(), 'row_names' => 'id' );
 	is( scalar @warnings, 0, 'writing a wide-character value emits no warnings' )
 		or diag "warnings seen: @warnings";
 }
@@ -557,7 +557,7 @@ no_leaks_ok {
 #     the bytes must survive identically.
 {
 	my $f = path();
-	write_table( [ { $utf8_cafe => $utf8_ole, 'city' => $utf8_snow } ], $f, 'row.names' => 0 );
+	write_table( [ { $utf8_cafe => $utf8_ole, 'city' => $utf8_snow } ], $f, 'row_names' => 0 );
 	ok( index( slurp($f), $utf8_ole )  >= 0, 'round trip: UTF-8 value bytes reached the disk' );
 	ok( index( slurp($f), $utf8_cafe ) >= 0, 'round trip: UTF-8 column-name bytes reached the disk' );
 
@@ -565,7 +565,7 @@ no_leaks_ok {
 	is( $aoh->[0]{$utf8_cafe}, $utf8_ole,  'round trip (aoh): value under a non-ASCII column name is byte-identical' );
 	is( $aoh->[0]{'city'},     $utf8_snow, 'round trip (aoh): a non-ASCII value is byte-identical' );
 
-	my $hoa = read_table( $f, 'output.type' => 'hoa' );
+	my $hoa = read_table( $f, 'output_type' => 'hoa' );
 	is( $hoa->{$utf8_cafe}[0], $utf8_ole,  'round trip (hoa): value under a non-ASCII column key is byte-identical' );
 	is( $hoa->{'city'}[0],     $utf8_snow, 'round trip (hoa): a non-ASCII column value is byte-identical' );
 }
@@ -573,8 +573,8 @@ no_leaks_ok {
 # 36. Round trip through the hoh shape with a non-ASCII row key and value.
 {
 	my $f = path();
-	write_table( [ { 'id' => $utf8_snow, 'val' => $utf8_cafe } ], $f, 'row.names' => 0 );
-	my $hoh = read_table( $f, 'output.type' => 'hoh', 'row.names' => 'id' );
+	write_table( [ { 'id' => $utf8_snow, 'val' => $utf8_cafe } ], $f, 'row_names' => 0 );
+	my $hoh = read_table( $f, 'output_type' => 'hoh', 'row_names' => 'id' );
 	ok( exists $hoh->{$utf8_snow}, 'round trip (hoh): a non-ASCII row key survives' );
 	is( $hoh->{$utf8_snow}{'val'}, $utf8_cafe,
 		'round trip (hoh): the value under a non-ASCII row key is byte-identical' );
@@ -582,14 +582,14 @@ no_leaks_ok {
 no_leaks_ok {
 	eval {
 		my $f = path();
-		write_table( [ { $utf8_cafe => $utf8_ole, 'city' => $utf8_snow } ], $f, 'row.names' => 0 );
+		write_table( [ { $utf8_cafe => $utf8_ole, 'city' => $utf8_snow } ], $f, 'row_names' => 0 );
 		read_table( $f );
 	};
 } 'write_table/read_table: no memory leaks on a UTF-8 round trip' unless $INC{'Devel/Cover.pm'};
 
 # 36. A header cell with no name is warned about. For a HoH the empty cell is the
-#     key column's, which row.names can name, so the warning says how; the
-#     other shapes write that cell empty only when row.names => 1 asked for it,
+#     key column's, which row_names can name, so the warning says how; the
+#     other shapes write that cell empty only when row_names => 1 asked for it,
 #     by R's convention, and nothing can name it, so they stay quiet. A data
 #     column with an empty name is warned about in every shape.
 {
@@ -601,40 +601,40 @@ no_leaks_ok {
 		return \@w;
 	};
 	my %hoh = ( 'r1' => { 'a' => 1 }, 'r2' => { 'a' => 2 } );
-	my $rn_re = qr/^write_table: the row-name column \(column 1\) of '[^']*' has no name in the header; name it with row\.names => 'name', or drop it with row\.names => 0$/;
+	my $rn_re = qr/^write_table: the row-name column \(column 1\) of '[^']*' has no name in the header; name it with row_names => 'name', or drop it with row_names => 0$/;
 	my $f = path();
 	my $w = $warns->( sub { write_table( \%hoh, $f ) } );
-	is( scalar @$w, 1, 'HoH, default row.names: one warning' );
-	like( $w->[0], $rn_re, 'HoH, default row.names: the warning names row.names' );
-	like( $w->[0], qr/\Q$f\E/, 'HoH, default row.names: the warning names the file' );
-	is( slurp($f), ",a\nr1,1\nr2,2\n", 'HoH, default row.names: the output is unchanged' );
-	$w = $warns->( sub { write_table( \%hoh, path(), 'row.names' => 1 ) } );
-	is( scalar @$w, 1, 'HoH, row.names => 1: one warning' );
-	like( $w->[0], $rn_re, 'HoH, row.names => 1: the warning names row.names' );
+	is( scalar @$w, 1, 'HoH, default row_names: one warning' );
+	like( $w->[0], $rn_re, 'HoH, default row_names: the warning names row_names' );
+	like( $w->[0], qr/\Q$f\E/, 'HoH, default row_names: the warning names the file' );
+	is( slurp($f), ",a\nr1,1\nr2,2\n", 'HoH, default row_names: the output is unchanged' );
+	$w = $warns->( sub { write_table( \%hoh, path(), 'row_names' => 1 ) } );
+	is( scalar @$w, 1, 'HoH, row_names => 1: one warning' );
+	like( $w->[0], $rn_re, 'HoH, row_names => 1: the warning names row_names' );
 	$f = path();
-	$w = $warns->( sub { write_table( \%hoh, $f, 'row.names' => 'id' ) } );
-	is( scalar @$w, 0, 'HoH, row.names => name: no warning' ) or diag "@$w";
-	is( slurp($f), "id,a\nr1,1\nr2,2\n", 'HoH, row.names => name: the key column is named' );
-	$w = $warns->( sub { write_table( \%hoh, path(), 'row.names' => 0 ) } );
-	is( scalar @$w, 0, 'HoH, row.names => 0: no warning' ) or diag "@$w";
+	$w = $warns->( sub { write_table( \%hoh, $f, 'row_names' => 'id' ) } );
+	is( scalar @$w, 0, 'HoH, row_names => name: no warning' ) or diag "@$w";
+	is( slurp($f), "id,a\nr1,1\nr2,2\n", 'HoH, row_names => name: the key column is named' );
+	$w = $warns->( sub { write_table( \%hoh, path(), 'row_names' => 0 ) } );
+	is( scalar @$w, 0, 'HoH, row_names => 0: no warning' ) or diag "@$w";
 	$w = $warns->( sub { write_table( \%hoh, path('t.tex'), quiet => 1 ) } );
-	is( scalar @$w, 1, 'HoH to LaTeX, default row.names: one warning' );
+	is( scalar @$w, 1, 'HoH to LaTeX, default row_names: one warning' );
 	like( $w->[0], $rn_re, 'HoH to LaTeX: the same warning' );
 	$w = $warns->( sub { write_table( \%hoh, path('t.xlsx'), quiet => 1 ) } );
-	is( scalar @$w, 1, 'HoH to .xlsx, default row.names: one warning' );
+	is( scalar @$w, 1, 'HoH to .xlsx, default row_names: one warning' );
 	like( $w->[0], $rn_re, 'HoH to .xlsx: the same warning' );
 
 	my @aoh = ( { 'a' => 1 }, { 'a' => 2 } );
 	$f = path();
-	$w = $warns->( sub { write_table( \@aoh, $f, 'row.names' => 1 ) } );
-	is( scalar @$w, 0, 'AoH, row.names => 1: no warning for the R-style label cell' ) or diag "@$w";
-	is( slurp($f), ",a\n1,1\n2,2\n", 'AoH, row.names => 1: the label cell is still empty' );
-	$w = $warns->( sub { write_table( { 'a' => [1], 'b' => [2] }, path(), 'row.names' => 1 ) } );
-	is( scalar @$w, 0, 'HoA, row.names => 1: no warning' ) or diag "@$w";
-	$w = $warns->( sub { write_table( { 'a' => 1 }, path(), 'row.names' => 1 ) } );
-	is( scalar @$w, 0, 'flat hash, row.names => 1: no warning' ) or diag "@$w";
-	$w = $warns->( sub { write_table( [ ['a'], [1] ], path(), 'row.names' => 1 ) } );
-	is( scalar @$w, 0, 'AoA, row.names => 1: no warning' ) or diag "@$w";
+	$w = $warns->( sub { write_table( \@aoh, $f, 'row_names' => 1 ) } );
+	is( scalar @$w, 0, 'AoH, row_names => 1: no warning for the R-style label cell' ) or diag "@$w";
+	is( slurp($f), ",a\n1,1\n2,2\n", 'AoH, row_names => 1: the label cell is still empty' );
+	$w = $warns->( sub { write_table( { 'a' => [1], 'b' => [2] }, path(), 'row_names' => 1 ) } );
+	is( scalar @$w, 0, 'HoA, row_names => 1: no warning' ) or diag "@$w";
+	$w = $warns->( sub { write_table( { 'a' => 1 }, path(), 'row_names' => 1 ) } );
+	is( scalar @$w, 0, 'flat hash, row_names => 1: no warning' ) or diag "@$w";
+	$w = $warns->( sub { write_table( [ ['a'], [1] ], path(), 'row_names' => 1 ) } );
+	is( scalar @$w, 0, 'AoA, row_names => 1: no warning' ) or diag "@$w";
 
 	$f = path();
 	$w = $warns->( sub { write_table( [ [ '', 'b', undef ], [ 1, 2, 3 ] ], $f ) } );
@@ -643,16 +643,16 @@ no_leaks_ok {
 		'AoA: the warning counts the unnamed columns and gives the first' );
 	is( slurp($f), ",b,\n1,2,3\n", 'AoA with unnamed header cells: the output is unchanged' );
 	$f = path();
-	$w = $warns->( sub { write_table( \@aoh, $f, 'col.names' => [ 'a', '' ], 'row.names' => 1 ) } );
-	is( scalar @$w, 1, 'AoH, an empty col.names entry: one warning' );
+	$w = $warns->( sub { write_table( \@aoh, $f, 'col_names' => [ 'a', '' ], 'row_names' => 1 ) } );
+	is( scalar @$w, 1, 'AoH, an empty col_names entry: one warning' );
 	like( $w->[0], qr/^write_table: 1 column of '\Q$f\E' has no name in the header \(the first is column 3\)$/,
 		'AoH: the column number counts the label column' );
-	$w = $warns->( sub { write_table( \%hoh, path(), 'col.names' => [''] ) } );
-	is( scalar @$w, 2, 'HoH, default row.names and an empty col.names entry: both warnings' );
+	$w = $warns->( sub { write_table( \%hoh, path(), 'col_names' => [''] ) } );
+	is( scalar @$w, 2, 'HoH, default row_names and an empty col_names entry: both warnings' );
 }
 no_leaks_ok {
 	local $SIG{__WARN__} = sub {};
-	write_table( { 'r1' => { 'a' => 1 } }, path(), 'col.names' => [ 'a', '' ] );
+	write_table( { 'r1' => { 'a' => 1 } }, path(), 'col_names' => [ 'a', '' ] );
 } 'write_table: no memory leaks when warning about unnamed columns' unless $INC{'Devel/Cover.pm'};
 # The warnings are given after the file is written and every buffer released,
 # so a __WARN__ handler that dies loses nothing and leaks nothing.
@@ -667,7 +667,7 @@ no_leaks_ok {
 }
 no_leaks_ok {
 	local $SIG{__WARN__} = sub { die @_ };
-	eval { write_table( { 'r1' => { 'a' => 1 } }, path(), 'col.names' => [ 'a', '' ], quiet => 1 ) };
+	eval { write_table( { 'r1' => { 'a' => 1 } }, path(), 'col_names' => [ 'a', '' ], quiet => 1 ) };
 } 'write_table: no memory leaks when a __WARN__ handler dies' unless $INC{'Devel/Cover.pm'};
 
 # 37. What 0.3212 fixed, one block apiece.
@@ -743,7 +743,7 @@ no_leaks_ok {
 		is( slurp($f), $expect, "tied data is written: $what" );
 		my $x = path('tied.xlsx');
 		write_table( $data, $x, quiet => 1 );
-		is_deeply( read_table($x, 'output.type' => 'aoh'), read_table($f, 'output.type' => 'aoh'), "tied data is written: $what, .xlsx" );
+		is_deeply( read_table($x, 'output_type' => 'aoh'), read_table($f, 'output_type' => 'aoh'), "tied data is written: $what, .xlsx" );
 	}
 	# A FETCH that dies is a croak like any other: the handle is closed and
 	# nothing leaks.
@@ -780,40 +780,40 @@ no_leaks_ok {
 	like( $w->[0], qr/^write_table: 1 data row of '\Q$f\E' has more cells than the header's 2 \(the first is row 1, with 3\)/,
 		'AoA: the warning counts the long rows and gives the first' );
 	$f = path();
-	$w = $capture->( sub { write_table( [ [ 1, 2, 3 ], [ 4, 5, 6 ] ], $f, 'col.names' => [qw(a b)], quiet => 1 ) } );
-	is( slurp($f), "a,b,\n1,2,3\n4,5,6\n", 'AoA with col.names: a long row widens the header too' );
-	like( $w->[0], qr/^write_table: 2 data rows of '\Q$f\E' have more cells than the header's 2/, 'AoA with col.names: warned' );
+	$w = $capture->( sub { write_table( [ [ 1, 2, 3 ], [ 4, 5, 6 ] ], $f, 'col_names' => [qw(a b)], quiet => 1 ) } );
+	is( slurp($f), "a,b,\n1,2,3\n4,5,6\n", 'AoA with col_names: a long row widens the header too' );
+	like( $w->[0], qr/^write_table: 2 data rows of '\Q$f\E' have more cells than the header's 2/, 'AoA with col_names: warned' );
 	$f = path();
 	$w = $capture->( sub { write_table( [ [ '', 'b' ], [ 1, 2, 3 ] ], $f, quiet => 1 ) } );
 	is( scalar @$w, 2, 'AoA: a long row and an unnamed column are two warnings' );
 	like( $w->[0], qr/1 column of '\Q$f\E' has no name in the header \(the first is column 1\)/,
 		'AoA: the unnamed-column warning counts only the columns the data named' );
 
-	# A HoA's row count comes from the columns written.  col.names leaving out a
+	# A HoA's row count comes from the columns written.  col_names leaving out a
 	# longer array used to add rows of nothing but separators.
 	wrote_ok( "a,b\n1,3\n2,4\n", 'HoA: rows run out with the columns written, not with every array',
-		{ a => [ 1, 2 ], b => [ 3, 4 ], c => [ 1 .. 6 ] }, 'col.names' => [qw(a b)], quiet => 1 );
+		{ a => [ 1, 2 ], b => [ 3, 4 ], c => [ 1 .. 6 ] }, 'col_names' => [qw(a b)], quiet => 1 );
 	wrote_ok( "c,a\n1,1\n2,2\n3,\n", 'HoA: the label column counts toward the rows',
-		{ a => [ 1, 2 ], c => [ 1, 2, 3 ] }, 'col.names' => ['a'], 'row.names' => 'c', quiet => 1 );
+		{ a => [ 1, 2 ], c => [ 1, 2, 3 ] }, 'col_names' => ['a'], 'row_names' => 'c', quiet => 1 );
 
-	# A HoA col.names naming no column is refused before the file is opened,
+	# A HoA col_names naming no column is refused before the file is opened,
 	# so an existing file of that name survives.  It used to be emptied first.
 	$f = path();
 	open my $keep, '>', $f or die "cannot write $f: $!";
 	print {$keep} "precious\n";
 	close $keep;
-	throws_ok { write_table( { a => [1] }, $f, 'col.names' => [] ) } qr/Could not get headers/,
-		'HoA: an empty col.names still croaks';
-	is( slurp($f), "precious\n", 'HoA: an empty col.names leaves an existing file intact' );
-	throws_ok { write_table( { a => [1] }, $f, 'col.names' => [undef] ) } qr/Could not get headers/,
-		'HoA: a col.names of nothing but undef croaks the same way';
+	throws_ok { write_table( { a => [1] }, $f, 'col_names' => [] ) } qr/Could not get headers/,
+		'HoA: an empty col_names still croaks';
+	is( slurp($f), "precious\n", 'HoA: an empty col_names leaves an existing file intact' );
+	throws_ok { write_table( { a => [1] }, $f, 'col_names' => [undef] ) } qr/Could not get headers/,
+		'HoA: a col_names of nothing but undef croaks the same way';
 
 	# A cell holding a NUL is written whole, raw and unquoted -- what CPython
 	# 3.14.2's csv.writer and pandas 3.0.4's to_csv() both write (run, not pinned
 	# by either suite).  It used to be cut at the NUL.
 	wrote_ok( "a,b\nx\0y,2\n", 'a NUL in a cell is written whole', [ { a => "x\0y", b => 2 } ], quiet => 1 );
 	wrote_ok( "a\0b\n1\n", 'a NUL in a header is written whole', [ { "a\0b" => 1 } ], quiet => 1 );
-	wrote_ok( "a\nNA\0NA\n", 'a NUL in undef.val is written whole', [ { a => undef } ], 'undef.val' => "NA\0NA", quiet => 1 );
+	wrote_ok( "a\nNA\0NA\n", 'a NUL in undef_val is written whole', [ { a => undef } ], 'undef_val' => "NA\0NA", quiet => 1 );
 
 	# A LaTeX table with no columns is "Missing # inserted in alignment
 	# preamble" to LaTeX.  It is refused before the file is opened.

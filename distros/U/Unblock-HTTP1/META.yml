@@ -1,0 +1,39 @@
+---
+abstract: 'Portable non-blocking HTTP/1 protocol engine'
+author:
+  - 'Joshua S. Day <HAX@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  Uniform::HTTP: '0.06'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unblock-HTTP1
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Config: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
+  Uniform::HTTP: '0.06'
+  XSLoader: '0'
+  parent: '0'
+  perl: '5.016'
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/haxmeister/perl-Unblock-HTTP1/issues
+  homepage: https://github.com/haxmeister/perl-Unblock-HTTP1
+  repository: https://github.com/haxmeister/perl-Unblock-HTTP1.git
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

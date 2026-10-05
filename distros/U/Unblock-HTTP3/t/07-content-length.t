@@ -5,8 +5,8 @@ use Socket qw(inet_aton pack_sockaddr_in);
 use Test2::V0;
 
 use Unblock::HTTP3::Connection;
-use Unblock::HTTP3::Request;
-use Unblock::HTTP3::Response;
+use Uniform::HTTP::Request;
+use Uniform::HTTP::Response;
 use Unblock::HTTP3::Transaction;
 use Net::QUIC::Endpoint;
 
@@ -34,7 +34,7 @@ for my $case (
 ) {
     my ($value, $error) = @$case;
 
-    my $request = Unblock::HTTP3::Request->new(
+    my $request = Uniform::HTTP::Request->new(
         method    => 'POST',
         target    => '/',
         scheme    => 'https',
@@ -52,7 +52,7 @@ for my $case (
     );
 }
 
-my $duplicate = Unblock::HTTP3::Request->new(
+my $duplicate = Uniform::HTTP::Request->new(
     method    => 'POST',
     target    => '/',
     scheme    => 'https',
@@ -70,7 +70,7 @@ like(
     'request rejects duplicate Content-Length fields',
 );
 
-my $mismatch = Unblock::HTTP3::Request->new(
+my $mismatch = Uniform::HTTP::Request->new(
     method    => 'POST',
     target    => '/',
     scheme    => 'https',
@@ -87,7 +87,7 @@ like(
     'buffered request body must match Content-Length',
 );
 
-my $connect_length = Unblock::HTTP3::Request->new(
+my $connect_length = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     target    => 'example.com:443',
     authority => 'example.com:443',
@@ -113,7 +113,7 @@ sub make_tx {
     my $headers = delete $args{headers} || [];
     my $body = delete $args{body};
 
-    my $request = Unblock::HTTP3::Request->new(
+    my $request = Uniform::HTTP::Request->new(
         method => $method,
         target => $method eq 'CONNECT' ? 'example.com:443' : '/',
     );
@@ -125,7 +125,7 @@ sub make_tx {
     push @response_args, body => $body
         if defined $body;
 
-    my $response = Unblock::HTTP3::Response->new(@response_args);
+    my $response = Uniform::HTTP::Response->new(@response_args);
 
     my $id = $next_id;
     $next_id += 4;

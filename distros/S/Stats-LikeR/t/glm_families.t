@@ -32,7 +32,7 @@ sub is_approx {
 	is_approx($p->{coefficients}{x},           0.7804336270, 'poisson x');
 	is_approx($p->{coefficients}{gB},          0.0387865642, 'poisson gB');
 	is_approx($p->{deviance},                  5.7236550499, 'poisson deviance');
-	is_approx($p->{'null.deviance'},          41.0738580500, 'poisson null deviance');
+	is_approx($p->{'null_deviance'},          41.0738580500, 'poisson null deviance');
 	is_approx($p->{aic},                      67.1471337804, 'poisson AIC', 1e-5);
 	# SEs come from the normal-equations (X'WX) solve rather than R's QR, so
 	# they agree with R to ~6 significant figures rather than to machine eps.
@@ -45,10 +45,10 @@ sub is_approx {
 
 	# exp(beta) = rate ratio with Wald CI (confint.default)
 	is_approx($p->{exp}{x}{estimate},  2.1824184158, 'poisson x rate ratio', 1e-5);
-	is_approx($p->{exp}{x}{'conf.low'},  1.6651865738, 'poisson x RR CI lower', 1e-5);
-	is_approx($p->{exp}{x}{'conf.high'}, 2.8603101999, 'poisson x RR CI upper', 1e-4);
-	is_approx($p->{'conf.int'}{x}[0], log(1.6651865738), 'poisson conf.int lower (link scale)', 1e-5);
-	is_approx($p->{'conf.level'}, 0.95, 'default conf.level 0.95', 1e-9);
+	is_approx($p->{exp}{x}{'conf_low'},  1.6651865738, 'poisson x RR CI lower', 1e-5);
+	is_approx($p->{exp}{x}{'conf_high'}, 2.8603101999, 'poisson x RR CI upper', 1e-4);
+	is_approx($p->{'conf_int'}{x}[0], log(1.6651865738), 'poisson conf_int lower (link scale)', 1e-5);
+	is_approx($p->{'conf_level'}, 0.95, 'default conf_level 0.95', 1e-9);
 }
 
 # Negative-binomial with ML-estimated theta.  Reference values from R:
@@ -70,7 +70,7 @@ sub is_approx {
 	is_approx($nb->{coefficients}{xc},        0.5644350743713713, 'negbin xc',        1e-11);
 	is_approx($nb->{theta},                   0.37259793467405294, 'negbin theta (ML)', 1e-9);
 	is_approx($nb->{deviance},               26.903131638251899, 'negbin deviance',   1e-8);
-	is_approx($nb->{'null.deviance'},        27.408935175506617, 'negbin null deviance', 1e-8);
+	is_approx($nb->{'null_deviance'},        27.408935175506617, 'negbin null deviance', 1e-8);
 	is_approx($nb->{aic},                   151.38797261447414,  'negbin AIC',        1e-10);
 	is_approx($nb->{summary}{Intercept}{'Std. Error'}, 0.59768001301775331,
 		'negbin SE intercept', 1e-9);

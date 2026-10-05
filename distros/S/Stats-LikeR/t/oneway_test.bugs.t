@@ -88,10 +88,10 @@ my %ok_groups = (
 	is_approx $res->{Residuals}{Df},    9.81767348326473, 'residual Df is fractional (Welch)', 1e-3;
 	ok        $res->{Group}{'Pr(>F)'} < 1e-3,             'p-value is tiny';
 
-	is_approx $res->{'group.stats'}{mean}{yield}, 5.03333333333333, 'group mean (yield)';
-	is_approx $res->{'group.stats'}{mean}{ctrl},  0.5,              'group mean (ctrl)';
-	is $res->{'group.stats'}{size}{yield}, 6, 'group size (yield)';
-	is $res->{'group.stats'}{size}{ctrl},  6, 'group size (ctrl)';
+	is_approx $res->{'group_stats'}{mean}{yield}, 5.03333333333333, 'group mean (yield)';
+	is_approx $res->{'group_stats'}{mean}{ctrl},  0.5,              'group mean (ctrl)';
+	is $res->{'group_stats'}{size}{yield}, 6, 'group size (yield)';
+	is $res->{'group_stats'}{size}{ctrl},  6, 'group size (ctrl)';
 }
 
 # Leak guards. Test::LeakTrace tracks Perl SV leaks; a successful call and a

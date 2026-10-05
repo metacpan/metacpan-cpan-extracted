@@ -8,7 +8,7 @@ use warnings;
 use Net::Whois::Raw;
 use Getopt::Long;
 use Encode;
-use Net::IDN::Punycode qw( :all );
+use Net::IDN::Encode qw( domain_to_ascii );
 use utf8;
 
 my $help;
@@ -200,9 +200,7 @@ sub to_punycode {
 
     return $dname  if $dname =~ /^[a-z0-9.\-]*$/;
 
-    return join '.', 
-           map { /^[a-z0-9.-]*$/ ? $_ : 'xn--' . Net::IDN::Punycode::encode_punycode( $_ ) }
-           split /[.]/, $dname;
+    return domain_to_ascii($dname);
 }
 
 sub validate_domain_name {
@@ -238,7 +236,7 @@ pwhois - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99043
+version 2.99044
 
 =head1 SYNOPSIS
 

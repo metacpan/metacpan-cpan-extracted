@@ -8,7 +8,7 @@ use Mail::DKIM2::Common qw(parse_dkim_pubkey);
 use Path::Tiny;
 use JSON;
 
-my $dns = decode_json(path('../dns.json')->slurp);
+my $dns = decode_json(path('t/data/dns.json')->slurp);
 
 sub find_key {
     my ($sig, $idx) = @_;

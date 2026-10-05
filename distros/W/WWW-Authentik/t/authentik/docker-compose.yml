@@ -1,0 +1,82 @@
+# Throwaway authentik for the live tests of WWW::Authentik / Net::Async::Authentik.
+#
+#   cp env.example .env        # then fill in the four secrets
+#   docker compose up -d
+#   curl -s http://127.0.0.1:9000/-/health/ready/   # 200 once ready (about two minutes)
+#   AUTHENTIK_LIVE_TEST=1 AUTHENTIK_URL=http://127.0.0.1:9000 AUTHENTIK_TOKEN=$AUTHENTIK_BOOTSTRAP_TOKEN prove -lr t
+#
+# All ports bind to 127.0.0.1 only. Compared with the upstream compose file there is no
+# docker.sock mount, no root worker, no HTTPS port and no certs/templates volumes;
+# nothing the tests need wants them. The image tag is pinned; the design spec names it.
+services:
+  postgresql:
+    image: docker.io/library/postgres:16-alpine
+    environment:
+      POSTGRES_DB: authentik
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${PG_PASS:?database password required}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      retries: 5
+      start_period: 20s
+      timeout: 5s
+    restart: unless-stopped
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  server:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2026.8.3}
+    command: server
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+      AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
+      AUTHENTIK_DISABLE_STARTUP_ANALYTICS: "true"
+      # the device authorization endpoint is throttled to 20/hour per client IP
+      # by default and answers 429 slow_down above that; the live suite starts
+      # more device flows than that in an hour
+      AUTHENTIK_THROTTLE__PROVIDERS__OAUTH2__DEVICE: "2000/hour"
+    ports:
+      - "127.0.0.1:${AUTHENTIK_PORT:-9000}:9000"
+    restart: unless-stopped
+    shm_size: 512mb
+    volumes:
+      - media:/media
+
+  worker:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2026.8.3}
+    command: worker
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+      AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
+      AUTHENTIK_DISABLE_STARTUP_ANALYTICS: "true"
+      # the device authorization endpoint is throttled to 20/hour per client IP
+      # by default and answers 429 slow_down above that; the live suite starts
+      # more device flows than that in an hour
+      AUTHENTIK_THROTTLE__PROVIDERS__OAUTH2__DEVICE: "2000/hour"
+    restart: unless-stopped
+    shm_size: 512mb
+    volumes:
+      - media:/media
+
+volumes:
+  database:
+  media:

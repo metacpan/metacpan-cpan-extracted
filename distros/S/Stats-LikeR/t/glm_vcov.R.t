@@ -309,11 +309,11 @@ for my $tp (qw(HC0 HC1 HC2 HC3)) {
 {
 	# a cluster alone asks for vcovCL()'s own default for a glm, HC0
 	my $f = glm(formula => 'yb ~ x', data => \%PET, family => 'binomial', cluster => 'firm');
-	is($f->{'vcov.type'}, 'HC0', 'cluster without vcov => is HC0, vcovCL()\'s glm default');
-	is($f->{'n.clusters'}, 500, 'n.clusters: 500 firms');
+	is($f->{'vcov_type'}, 'HC0', 'cluster without vcov => is HC0, vcovCL()\'s glm default');
+	is($f->{'n_clusters'}, 500, 'n_clusters: 500 firms');
 	check_vcov('Petersen logit, firm, default type', $f, $EXPECT{pet_b_firm_HC0}, 1e-9);
 	my $two = glm(formula => 'y ~ x', data => \%PET, cluster => 'firm+year');
-	is_deeply($two->{'n.clusters'}, [500, 10], 'multiway n.clusters lists each clustering');
+	is_deeply($two->{'n_clusters'}, [500, 10], 'multiway n_clusters lists each clustering');
 	# the same clustering given by value
 	my $v = glm(formula => 'yb ~ x', data => \%PET, family => 'binomial', cluster => [ @{ $PET{firm} } ]);
 	check_vcov('Petersen logit, firm by value', $v, $EXPECT{pet_b_firm_HC0}, 1e-9);
@@ -409,7 +409,7 @@ check_vcov("vcovOPG example, $_", glm(formula => 'y ~ x', data => $DATA{opg}, fa
 		ok($w <= 1e-7, "ships $k: matches Stata (statsmodels results_count_robust_cluster.py)")
 			or diag("worst relative disagreement $w");
 	}
-	is($f{clu}{'n.clusters'}, 5, 'ships: five clusters, as Stata\'s N_clust');
+	is($f{clu}{'n_clusters'}, 5, 'ships: five clusters, as Stata\'s N_clust');
 }
 
 # ------------------------------------------------------------ modified Poisson
@@ -424,14 +424,14 @@ check_vcov("vcovOPG example, $_", glm(formula => 'y ~ x', data => $DATA{opg}, fa
 	my $b = $EXPECT{infert_HC0}{coef}[1];
 	my $z = 1.959963984540054;
 	cmp_ok(abs($f->{exp}{spontaneous}{estimate} - exp($b)), '<=', 1e-12 * exp($b), 'modified Poisson: RR');
-	cmp_ok(abs($f->{exp}{spontaneous}{'conf.low'} - exp($b - $z * $se)), '<=', 1e-9 * exp($b), 'modified Poisson: RR lower limit');
-	cmp_ok(abs($f->{exp}{spontaneous}{'conf.high'} - exp($b + $z * $se)), '<=', 1e-9 * exp($b), 'modified Poisson: RR upper limit');
+	cmp_ok(abs($f->{exp}{spontaneous}{'conf_low'} - exp($b - $z * $se)), '<=', 1e-9 * exp($b), 'modified Poisson: RR lower limit');
+	cmp_ok(abs($f->{exp}{spontaneous}{'conf_high'} - exp($b + $z * $se)), '<=', 1e-9 * exp($b), 'modified Poisson: RR upper limit');
 	ok(exists $f->{summary}{spontaneous}{'z value'}, 'robust summaries report z');
 	my $g = glm(formula => 'y ~ x', data => \%PET, vcov => 'HC1');
 	ok(exists $g->{summary}{x}{'z value'} && exists $g->{summary}{x}{'Pr(>|z|)'},
 	   'a robust gaussian fit reports z too, as lmtest::coeftest() does for a glm');
-	is($g->{'vcov.type'}, 'HC1', 'vcov.type records the estimator');
-	is(glm(formula => 'y ~ x', data => \%PET)->{'vcov.type'}, 'model', 'vcov.type is model by default');
+	is($g->{'vcov_type'}, 'HC1', 'vcov_type records the estimator');
+	is(glm(formula => 'y ~ x', data => \%PET)->{'vcov_type'}, 'model', 'vcov_type is model by default');
 }
 
 # ------------------------------------------------------------ errors

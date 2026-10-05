@@ -169,7 +169,7 @@ my $wide = [
 	is_deeply(\@L2, \@L, "'columns' is an alias for 'cols'");
 }
 
-# row labels: auto row_name, explicit row.names, and precedence
+# row labels: auto row_name, explicit row_names, and precedence
 {
 	my $aoh = [ { row_name => 'r1', v => 10 }, { row_name => 'r2', v => 20 } ];
 	my @L = _lines(view($aoh, return_only => 1, color => 0));
@@ -178,12 +178,12 @@ my $wide = [
 	like($L[2], qr/\b10\b/,	   'the row_name column is not also shown as data twice');
 
 	my $aoh2 = [ { k => 'A', v => 1 } ];
-	my @L2 = _lines(view($aoh2, 'row.names' => 'k', return_only => 1, color => 0));
-	like($L2[1], qr/^k\b/, "row.names => 'k' uses k as the label column");
+	my @L2 = _lines(view($aoh2, 'row_names' => 'k', return_only => 1, color => 0));
+	like($L2[1], qr/^k\b/, "row_names => 'k' uses k as the label column");
 	like($L2[2], qr/^A\b/, 'label value taken from k');
 
-	my @L3 = _lines(view($aoh2, 'row.names' => 'k', row_names => 'v', return_only => 1, color => 0));
-	is_deeply(\@L3, \@L2, 'row.names takes precedence over row_names');
+	throws_ok { view($aoh2, 'row.names' => 'k', return_only => 1, color => 0) }
+		qr/unknown argument\(s\): row\.names/, "the dotted 'row.names' is refused";
 }
 
 # max_width truncation is char-aware, with a configurable ellipsis

@@ -69,10 +69,10 @@ use Stats::LikeR qw(csort oneway_test prop_test p_adjust drop_duplicates);
 # --- 1b. %zu: a group label returned to the caller -----------------------
 {
 	my $o = oneway_test([[1,2,3], [4,5,7], [8,9,11]]);
-	is_deeply([sort keys %{ $o->{'group.stats'}{size} }],
+	is_deeply([sort keys %{ $o->{'group_stats'}{size} }],
 	          ['Index 0', 'Index 1', 'Index 2'],
 	          'oneway_test: group labels number themselves');
-	is($o->{'group.stats'}{size}{'Index 0'}, 3, 'oneway_test: group 0 size');
+	is($o->{'group_stats'}{size}{'Index 0'}, 3, 'oneway_test: group 0 size');
 }
 
 # --- 1c. %zu: counts inside croak text -----------------------------------

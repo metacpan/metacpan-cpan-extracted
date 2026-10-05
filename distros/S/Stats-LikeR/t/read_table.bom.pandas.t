@@ -99,9 +99,9 @@ is_deeply read_table(fixture("a,b\n${BOM}1,2\n")),
 		hoh => { x => { v => 1 }, y => { v => 2 } },
 	);
 	for my $otype (qw(aoh hoa hoh)) {
-		is_deeply read_table($f, 'output.type' => $otype), $want{$otype},
+		is_deeply read_table($f, 'output_type' => $otype), $want{$otype},
 			"$otype, fast path";
-		is_deeply read_table($f, 'output.type' => $otype,
+		is_deeply read_table($f, 'output_type' => $otype,
 				filter => { 0 => sub { 1 } }),
 			$want{$otype}, "$otype, per-row closure";
 	}

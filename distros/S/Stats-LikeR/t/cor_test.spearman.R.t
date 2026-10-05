@@ -62,7 +62,7 @@
 #     329.99999999999994.  @PERFECT asserts the exact values and quotes R's.
 #
 # Tolerance.  1e-10 relative on both fields, against a worst observed
-# disagreement over the 333 clean rows of 1.123e-12 for p.value (n = 9,
+# disagreement over the 333 clean rows of 1.123e-12 for p_value (n = 9,
 # two.sided) and 4.530e-14 for statistic (n = 24) on the double build.  That
 # is ~90x headroom, which the wider NV builds need: the AS 89 branch is a
 # degree-6 polynomial in x^2 plus approx_pnorm(), and its last bits move with
@@ -428,7 +428,7 @@ my @R_ROWS = (
 	[24, "2,1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24", "less", "0", 2.0000000000000906, 1],
 );
 
-# [n, direction, alternative, exact, exact S, exact p.value] -- see (a)
+# [n, direction, alternative, exact, exact S, exact p_value] -- see (a)
 my @PERFECT = (
 	[9, "asc", "two.sided", "d", 0, 5.5114638448650055e-06],
 	[9, "asc", "two.sided", "1", 0, 5.5114638448650055e-06],
@@ -486,7 +486,7 @@ my @PERFECT = (
 	[24, "desc", "less", "0", 4600, 0],
 );
 
-# [n, y, alternative, exact, S, p.value].  Tied data, where S = (n^3-n)(1-rho)/6
+# [n, y, alternative, exact, S, p_value].  Tied data, where S = (n^3-n)(1-rho)/6
 # and sum((rank(x)-rank(y))^2) are different numbers -- 0.312 reports the first,
 # as R does.  Both tied datasets the generator emits are here, across all three
 # alternatives and all three `exact` settings; ties force the approximation on
@@ -528,7 +528,7 @@ for my $r (@R_ROWS) {
 	my ($n, $ys, $alt, $ex, $S, $p) = @$r;
 	my $got = call($n, [split /,/, $ys], $alt, $ex);
 	rel_ok($got->{statistic}, $S, "n=$n alt=$alt exact=$ex: S");
-	rel_ok($got->{'p.value'}, $p, "n=$n alt=$alt exact=$ex: p.value");
+	rel_ok($got->{'p_value'}, $p, "n=$n alt=$alt exact=$ex: p_value");
 }
 
 for my $r (@PERFECT) {
@@ -536,14 +536,14 @@ for my $r (@PERFECT) {
 	my @y = $dir eq 'asc' ? (1 .. $n) : reverse(1 .. $n);
 	my $got = call($n, \@y, $alt, $ex);
 	rel_ok($got->{statistic}, $S, "perfect $dir n=$n alt=$alt exact=$ex: S");
-	rel_ok($got->{'p.value'}, $p, "perfect $dir n=$n alt=$alt exact=$ex: p.value");
+	rel_ok($got->{'p_value'}, $p, "perfect $dir n=$n alt=$alt exact=$ex: p_value");
 }
 
 for my $r (@TIES) {
 	my ($n, $ys, $alt, $ex, $S, $p) = @$r;
 	my $got = call($n, [split /,/, $ys], $alt, $ex);
 	rel_ok($got->{statistic}, $S, "ties n=$n alt=$alt exact=$ex: S");
-	rel_ok($got->{'p.value'}, $p, "ties n=$n alt=$alt exact=$ex: p.value");
+	rel_ok($got->{'p_value'}, $p, "ties n=$n alt=$alt exact=$ex: p_value");
 }
 
 # The hang.  A clock is the only thing that distinguishes "capped at n = 9 and
@@ -570,7 +570,7 @@ for my $r (@TIES) {
 		my @y = (1 .. $n);
 		@y[0, 1] = @y[1, 0];              # S = 2, no ties, strongly correlated
 		my $r = call($n, \@y, 'two.sided', 1);
-		ok(defined $r->{'p.value'}, "exact => 1 at n=$n returns");
+		ok(defined $r->{'p_value'}, "exact => 1 at n=$n returns");
 	}
 	my @t1 = times;
 	my $cpu = ($t1[0] - $t0[0]) + ($t1[1] - $t0[1]);   # self user + system
@@ -587,7 +587,7 @@ for my $r (@TIES) {
 	         27,25,28,26,31,29,32,30);
 	my $d = call(32, \@y, 'two.sided', 'd');
 	my $f = call(32, \@y, 'two.sided', 0);
-	cmp_ok(abs($d->{'p.value'} - $f->{'p.value'}) / $f->{'p.value'}, '>', 0.1,
+	cmp_ok(abs($d->{'p_value'} - $f->{'p_value'}) / $f->{'p_value'}, '>', 0.1,
 	       'exact defaults to TRUE at n = 32 (AS 89, not the asymptotic t)');
 	rel_ok($d->{statistic}, $f->{statistic},
 	       'statistic is S on both branches, so it does not change meaning');

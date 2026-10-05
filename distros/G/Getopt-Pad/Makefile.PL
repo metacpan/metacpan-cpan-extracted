@@ -53,7 +53,7 @@ WriteMakefile(
 		'Test2::V0' => '0',
 	},
 	PREREQ_PM => {
-		'Object::Pad'          => '0.800',
+		'Object::Pad'          => '0.818',
 		'Getopt::Long'         => '2.50',
 		'Feature::Compat::Try' => '0',
 		'JSON::PP'             => '0',

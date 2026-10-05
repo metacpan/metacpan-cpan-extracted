@@ -38,12 +38,12 @@ my $titanic = {
 	survived => [	0,	  1,	 1,		1,	  0,   0,	0,	  1,	 1,		1,	  0,   0,	 1,	   0,	 1,	  0,   0,	1,	  0,   1 ],
 };
 
-# round-trip: predicting on the training data reproduces fitted.values (lm)
+# round-trip: predicting on the training data reproduces fitted_values (lm)
 {
 	my $data = { x => [1, 2, 3, 4], 'y' => [3, 5, 7, 9] };   # y = 1 + 2x exactly
 	my $fit	 = lm(formula => 'y ~ x', data => $data);
 	my $pred = predict($fit, $data);
-	my $fv	 = $fit->{'fitted.values'};
+	my $fv	 = $fit->{'fitted_values'};
 	is(scalar keys %$pred, scalar keys %$fv, 'lm round-trip: one prediction per fitted value');
 	is_approx($pred->{$_}, $fv->{$_}, "lm round-trip row $_") for sort keys %$fv;
 }
@@ -68,12 +68,12 @@ my $titanic = {
 	my $data = { x => [1, 2, 3, 4, 5], z => [2, 1, 4, 3, 5], 'y' => [5, 9, 8, 7, 3] };
 	my $fit	 = lm(formula => 'y ~ x * z', data => $data);	  # x, z, x:z
 	my $pred = predict($fit, $data);
-	my $fv	 = $fit->{'fitted.values'};
+	my $fv	 = $fit->{'fitted_values'};
 	is_approx($pred->{$_}, $fv->{$_}, "interaction round-trip row $_") for sort keys %$fv;
 
 	my $fit2  = lm(formula => 'y ~ x + I(x^2)', data => $data);
 	my $pred2 = predict($fit2, $data);
-	my $fv2	  = $fit2->{'fitted.values'};
+	my $fv2	  = $fit2->{'fitted_values'};
 	is_approx($pred2->{$_}, $fv2->{$_}, "I(x^2) round-trip row $_") for sort keys %$fv2;
 }
 
@@ -84,18 +84,18 @@ my $titanic = {
 	my $aliased = grep { looks_like_number($_) && $_ != $_ } values %{ $fit->{coefficients} };
 	ok($aliased >= 1, 'collinear fit produced an aliased (NaN) coefficient');
 	my $pred = predict($fit, $data);
-	my $fv	 = $fit->{'fitted.values'};
+	my $fv	 = $fit->{'fitted_values'};
 	is_approx($pred->{$_}, $fv->{$_}, "aliased-skip round-trip row $_") for sort keys %$fv;
 }
 
-# glm binomial: response reproduces fitted.values; response = logistic(link)
+# glm binomial: response reproduces fitted_values; response = logistic(link)
 {
 	my $data = { success => [0, 0, 1, 1], predictor => [0.1, 0.2, 0.9, 0.8] };
 	my $fit	 = glm(formula => 'success ~ predictor', data => $data, family => 'binomial');
 	ok($fit->{converged}, 'logistic fit converged');
 	my $resp = predict($fit, $data);					   # type=response (default)
 	my $link = predict($fit, $data, type => 'link');
-	my $fv	 = $fit->{'fitted.values'};					   # mu
+	my $fv	 = $fit->{'fitted_values'};					   # mu
 	for my $k (sort keys %$fv) {
 		is_approx($resp->{$k}, $fv->{$k}, "glm response round-trip row $k");
 		is_approx($resp->{$k}, 1 / (1 + exp(-$link->{$k})), "glm response = logistic(link) row $k");
@@ -119,12 +119,12 @@ my $titanic = {
 	ok(defined predict($fit, { age => 30, class => '1st', gender => 'female' })->{1},
 		'reference factor levels predict without dying');
 
-	# round-trip with factors reproduces fitted.values
+	# round-trip with factors reproduces fitted_values
 	my $pred = predict($fit, $titanic);
-	my $fv	 = $fit->{'fitted.values'};
+	my $fv	 = $fit->{'fitted_values'};
 	my $ok = 1;
 	$ok = 0 for grep { abs($pred->{$_} - $fv->{$_}) > 1e-7 } keys %$fv;
-	ok($ok, 'glm factor round-trip reproduces fitted.values');
+	ok($ok, 'glm factor round-trip reproduces fitted_values');
 }
 
 # clean deaths: unseen factor level, missing factor column, missing column
@@ -148,7 +148,7 @@ my $titanic = {
 # no newdata returns the model's fitted values
 {
 	my $fit = lm(formula => 'y ~ x', data => { x => [1, 2, 3], y => [2, 4, 6] });
-	is_deeply(predict($fit), $fit->{'fitted.values'}, 'no newdata -> fitted.values');
+	is_deeply(predict($fit), $fit->{'fitted_values'}, 'no newdata -> fitted_values');
 }
 
 # AoH and HoH input round-trip
@@ -156,13 +156,13 @@ my $titanic = {
 	my $aoh = [ { x => 1, y => 3 }, { x => 2, y => 5 }, { x => 3, y => 7 } ];
 	my $fit = lm(formula => 'y ~ x', data => $aoh);
 	my $p	= predict($fit, $aoh);
-	my $fv	= $fit->{'fitted.values'};
+	my $fv	= $fit->{'fitted_values'};
 	is_approx($p->{$_}, $fv->{$_}, "AoH round-trip row $_") for sort keys %$fv;
 
 	my $hoh = { a => { x => 1, y => 3 }, b => { x => 2, y => 5 }, c => { x => 3, y => 7 } };
 	my $fitH = lm(formula => 'y ~ x', data => $hoh);
 	my $pH	 = predict($fitH, $hoh);
-	my $fvH	 = $fitH->{'fitted.values'};
+	my $fvH	 = $fitH->{'fitted_values'};
 	is_approx($pH->{$_}, $fvH->{$_}, "HoH round-trip row $_") for sort keys %$fvH;
 }
 
@@ -191,7 +191,7 @@ no_leaks_ok {
 
 no_leaks_ok {
 	my $p = predict($LEAK_FIT);
-} 'predict: no memory leaks returning fitted.values' unless $INC{'Devel/Cover.pm'};
+} 'predict: no memory leaks returning fitted_values' unless $INC{'Devel/Cover.pm'};
 
 no_leaks_ok {
 	eval { predict({}, { x => [1] }) };
@@ -217,8 +217,8 @@ no_leaks_ok {
 		my $fit  = lm(formula => $f, data => \%tooth);
 		my $pred = predict($fit, \%tooth);
 		my $worst = 0;
-		for my $row (keys %{ $fit->{'fitted.values'} }) {
-			my ($got, $want) = ($pred->{$row}, $fit->{'fitted.values'}{$row});
+		for my $row (keys %{ $fit->{'fitted_values'} }) {
+			my ($got, $want) = ($pred->{$row}, $fit->{'fitted_values'}{$row});
 			unless (defined $got) { $worst = 9e99; last }
 			my $scale = abs($want) > 1 ? abs($want) : 1;
 			my $rel = abs($got - $want) / $scale;

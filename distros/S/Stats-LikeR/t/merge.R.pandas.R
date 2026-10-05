@@ -140,7 +140,7 @@ four_xy <- function(name, ln, rn, by.x, by.y, shapes = NULL, ...) {
                                              by.x = by.x, by.y = by.y),
                                         ALLS[[how]], list(...)))
         emit(sprintf("%s [%s]", name, how), ln, rn,
-             sprintf("'how' => '%s', 'left.on' => %s, 'right.on' => %s",
+             sprintf("'how' => '%s', 'left_on' => %s, 'right_on' => %s",
                      how, pon(by.x), pon(by.y)),
              want, shapes)
     }

@@ -5,8 +5,8 @@ use Socket qw(inet_aton pack_sockaddr_in);
 use Test2::V0;
 
 use Unblock::HTTP3::Connection;
-use Unblock::HTTP3::Request;
-use Unblock::HTTP3::Response;
+use Uniform::HTTP::Request;
+use Uniform::HTTP::Response;
 use Unblock::HTTP3::Transaction;
 use Net::QUIC::Endpoint;
 
@@ -29,12 +29,12 @@ sub make_tx {
     my $method = delete $args{method};
     my $status = delete $args{status};
 
-    my $request = Unblock::HTTP3::Request->new(
+    my $request = Uniform::HTTP::Request->new(
         method => $method,
         target => '/',
     );
 
-    my $response = Unblock::HTTP3::Response->new(
+    my $response = Uniform::HTTP::Response->new(
         status => $status,
     );
 

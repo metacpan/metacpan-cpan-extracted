@@ -160,7 +160,7 @@ def four_xy(name, ln, rn, left_on, right_on, shapes=None):
         pl = ("'%s'" % left_on)  if isinstance(left_on, str)  else pname(left_on)
         pr = ("'%s'" % right_on) if isinstance(right_on, str) else pname(right_on)
         emit('%s [%s]' % (name, how), ln, rn,
-             "'how' => '%s', 'left.on' => %s, 'right.on' => %s, "
+             "'how' => '%s', 'left_on' => %s, 'right_on' => %s, "
              "'suffixes' => ['_x','_y']" % (how, pl, pr), want, shapes)
 
 # --------------------------------------------------------------------- corpus

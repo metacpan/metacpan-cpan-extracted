@@ -19,7 +19,7 @@ name: String-Increment-Parts
 provides:
   String::Increment::Parts:
     file: lib/String/Increment/Parts.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=String-Increment-Parts
   homepage: https://metacpan.org/release/String-Increment-Parts
   repository: git://github.com/perlancar/perl-String-Increment-Parts.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

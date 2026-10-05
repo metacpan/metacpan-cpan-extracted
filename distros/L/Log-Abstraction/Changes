@@ -1,5 +1,29 @@
 Revision history for Log-Abstraction
 
+0.37	Sun Oct  4 09:43:19 PM EDT 2026
+	[ Bug Fixes ]
+	- journald: a datagram bigger than the system's Unix-socket send
+	  buffer failed with "Message too long" (EMSGSIZE) and the message
+	  was lost.  The send buffer is now raised where the kernel allows,
+	  and on EMSGSIZE the message is truncated to half the size and the
+	  send retried, down to 4,096 bytes.  Found by a CPAN smoker whose
+	  buffer was under 200,000 bytes, failing t/regressions.t:
+	  https://matrix.perl-magpie.org/results/3720262e-c005-11f1-a083-8730a1ea2842
+	- Logging no longer changes the caller's $@ or $!, so code such as
+	  eval { ... }; if($@) { $log->debug('failed'); die $@ } rethrows the
+	  real error rather than an empty one.  The same applies to the
+	  Log::Any adapter and to DESTROY.
+	- A file path ending in a newline (e.g. "app.log\n") is now rejected
+	  like any other control character; before, the newline was silently
+	  dropped and a different file written.
+	[ Tests ]
+	- t/function.t covers every internal helper directly, and checks for
+	  memory cycles and that logging leaves $_, $@ and $! alone.
+	- New t/journald_emsgsize.t fakes a small send buffer by overriding
+	  send().  The override records the datagram rather than sending it,
+	  so the test doesn't hit the system's own limit (it failed on macOS,
+	  which caps Unix datagrams at 2KB, with ENOBUFS).
+
 0.36	Sat Oct  3 09:35:44 PM EDT 2026
 	[ Enhancements ]
 	- Structured fields: every logging method accepts a hashref of

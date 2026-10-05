@@ -14,5 +14,5 @@
 ^CONTRIBUTING\.md$
 ^SECURITY\.md$
 ^MISSING_FEATURES\.md$
-^docs/(?:INTEROPERABILITY|RELEASE-0\.01)\.md$
+^docs/(?:INTEROPERABILITY|RELEASE-.*)\.md$
 ^xt(?:/|$)

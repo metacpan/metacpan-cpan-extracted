@@ -59,7 +59,7 @@ sub no_warning { my ($name) = @_; my @w = took(); is(scalar @w, 0, $name) or dia
 	my $d = density(\@X);
 	is(ref $d, 'HASH', 'returns a hash reference');
 	is_deeply([sort keys %$d],
-	          [sort qw(x y bw n kernel old.coords has.na)],
+	          [sort qw(x y bw n kernel old_coords has_na)],
 	          'returns exactly the documented fields');
 	is(ref $d->{x}, 'ARRAY', 'x is an array reference');
 	is(ref $d->{y}, 'ARRAY', 'y is an array reference');
@@ -67,8 +67,8 @@ sub no_warning { my ($name) = @_; my @w = took(); is(scalar @w, 0, $name) or dia
 	is(scalar @{ $d->{y} }, 512, 'y has n = 512 points by default');
 	is($d->{n}, scalar @X, 'n is the sample size');
 	is($d->{kernel}, 'gaussian', 'kernel defaults to gaussian');
-	is($d->{'old.coords'}, 0, 'old_coords is off by default');
-	is($d->{'has.na'}, 0, 'has_na is always 0');
+	is($d->{'old_coords'}, 0, 'old_coords is off by default');
+	is($d->{'has_na'}, 0, 'has_na is always 0');
 	cmp_ok($d->{bw}, '>', 0, 'bw is positive');
 
 	# The grid is seq(from, to, length.out = n), from = min(x) - 3*bw.
@@ -184,8 +184,9 @@ for my $k (@KERNELS) {
 	ok(!ref $r, 'give_rkern returns a plain number, not a reference');
 	cmp_ok(abs($r - 1 / (2 * sqrt(4 * atan2(1, 1)))), '<', 1e-15,
 	       'give_rkern gaussian is 1/(2*sqrt(pi))');
-	# and the dotted spelling R uses
-	is(density(kernel => 'gaussian', 'give.Rkern' => 1), $r, 'give.Rkern is accepted too');
+	# R's dotted spelling is refused
+	ok(!defined eval { density(kernel => 'gaussian', 'give.Rkern' => 1); 1 }, "R's dotted 'give.Rkern' is refused");
+	like($@, qr/unknown argument 'give\.Rkern'/, '... as an unknown argument');
 	# no x is needed, and any x is ignored
 	is(density([1, 2, 3], kernel => 'gaussian', give_rkern => 1), $r, 'give_rkern ignores x');
 	no_warning('give_rkern warns about nothing');
@@ -216,9 +217,9 @@ for my $k (@KERNELS) {
 		is($d->{n}, scalar @X, 'na_rm drops it and reports the reduced n');
 		is_deeply($d->{y}, density(\@X)->{y}, 'na_rm gives the same estimate');
 	}
-	# the dotted spelling
-	my $d = density([@X, undef], 'na.rm' => 1);
-	is($d->{n}, scalar @X, 'na.rm is accepted too');
+	# R's dotted spelling is refused
+	ok(!defined eval { density([@X, undef], 'na.rm' => 1); 1 }, "R's dotted 'na.rm' is refused");
+	like($@, qr/unknown argument 'na\.rm'/, '... as an unknown argument');
 	no_warning('NA handling warns about nothing');
 }
 
@@ -267,14 +268,15 @@ for my $k (@KERNELS) {
 {
 	my $new = density(\@X);
 	my $old = density(\@X, old_coords => 1);
-	is($old->{'old.coords'}, 1, 'old_coords is echoed back');
+	is($old->{'old_coords'}, 1, 'old_coords is echoed back');
 	is_deeply($new->{x}, $old->{x}, 'old_coords does not move the grid');
 	# pre-4.4.0 values are larger by about 1 + 1/(2n-2)
 	my $r = $old->{y}[256] / $new->{y}[256];
 	cmp_ok($r, '>', 1, 'old_coords gives larger values');
 	cmp_ok(abs($r - (1 + 1 / (2 * 512 - 2))), '<', 5e-3,
 	       'old_coords is larger by about 1 + 1/(2n-2)');
-	is(density(\@X, 'old.coords' => 1)->{'old.coords'}, 1, 'old.coords is accepted too');
+	ok(!defined eval { density(\@X, 'old.coords' => 1); 1 }, "R's dotted 'old.coords' is refused");
+	like($@, qr/unknown argument 'old\.coords'/, '... as an unknown argument');
 	no_warning('old_coords warns about nothing');
 }
 

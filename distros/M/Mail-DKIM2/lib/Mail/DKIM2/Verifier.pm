@@ -2,7 +2,7 @@ package Mail::DKIM2::Verifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 use base 'Mail::DKIM2::HeaderParser';
 use Crypt::Digest::SHA256 qw(sha256);
@@ -11,6 +11,7 @@ use Carp;
 use POSIX qw();
 
 use Mail::DKIM2::Common qw(
+    parse_mime
     dkim2_canonicalize_header
     decode_tag_json
     encode_tag_json
@@ -377,7 +378,7 @@ sub _verify_top_mi_headers {
     my ($self) = @_;
 
     my $raw = join('', @{$self->{headers}}) . "\r\n";
-    my $msg = Email::MIME->new($raw);
+    my $msg = parse_mime($raw);
     my %by_v = map { (extract_mi_version($_) // 0) => $_ } $msg->header_raw('Message-Instance');
     return 1 unless %by_v;
     my $num = (sort { $b <=> $a } keys %by_v)[0];
@@ -406,7 +407,7 @@ sub _verify_mi_chain {
     my ($self) = @_;
 
     my $raw = join('', @{$self->{headers}}) . "\r\n" . ($self->{_buf} // '');
-    my $msg = Email::MIME->new($raw);
+    my $msg = parse_mime($raw);
 
     while (1) {
         my @mi = $msg->header_raw('Message-Instance');

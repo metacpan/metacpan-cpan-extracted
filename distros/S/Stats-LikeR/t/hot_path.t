@@ -92,7 +92,7 @@ sub with_timeout {
 	# power_t_test() carried the same counter.  It takes named pairs, so this
 	# is a sanity call rather than a 65k-argument one.
 	my $pt = with_timeout( 30, 'power_t_test', sub {
-		Stats::LikeR::power_t_test( n => 30, delta => 0.5, sd => 1, 'sig.level' => 0.05 ) } );
+		Stats::LikeR::power_t_test( n => 30, delta => 0.5, sd => 1, 'sig_level' => 0.05 ) } );
 	ok( ref $pt, 'power_t_test still returns after its counter was widened' );
 }
 

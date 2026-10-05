@@ -2,12 +2,12 @@
 #
 # Row names that are not ASCII come back as the keys the caller used.
 #
-# fitted.values, residuals and the like are hashes keyed by row name.  Up to
+# fitted_values, residuals and the like are hashes keyed by row name.  Up to
 # 0.3211 every model function copied a row name into a plain char * and stored
 # it back with a positive length, which loses the UTF-8 flag: a name such as
 # "\x{65e5}\x{672c}" came back as its six UTF-8 bytes, and the caller's own key
 # did not find it.  A HoH key that fits in Latin-1 happened to survive, because
-# perl stores it downgraded, but the same name given as a row.names or _row
+# perl stores it downgraded, but the same name given as a row_names or _row
 # value did not.  The names are now held as UTF-8 throughout (rowname_dup() in
 # LikeR.xs) and stored as UTF-8 keys, which perl downgrades where it can.
 #
@@ -41,18 +41,18 @@ for my $i (0 .. $#names) {
 	$hoh{ $names[$i] } = {%r};
 	push @aoh, { %r, _row => $names[$i] };
 }
-$hoa{'row.names'} = [@names];
-my @shapes = (['HoA row.names', \%hoa], ['HoH', \%hoh], ['AoH _row', \@aoh]);
+$hoa{'row_names'} = [@names];
+my @shapes = (['HoA row_names', \%hoa], ['HoH', \%hoh], ['AoH _row', \@aoh]);
 
 # Each function, and the row-keyed hashes it returns
 my @calls = (
-	['lm',        [qw(fitted.values residuals)],     sub { lm(formula => 'y ~ x + w', data => $_[0]) }],
-	['glm',       [qw(fitted.values deviance.resid)], sub { glm(formula => 'b ~ x', family => 'binomial', data => $_[0]) }],
-	['zerotrunc', [qw(fitted.values residuals)],     sub { zerotrunc(formula => 'kp ~ x', data => $_[0]) }],
-	['hurdle',    [qw(fitted.values)],               sub { hurdle(formula => 'k ~ x | x', data => $_[0]) }],
-	['svyglm',    [qw(fitted.values)],               sub { svyglm(formula => 'y ~ x', data => $_[0], weights => 'pw') }],
-	['ivreg',     [qw(fitted.values residuals)],     sub { ivreg(formula => 'y ~ x | w', data => $_[0]) }],
-	['lmer',      [qw(fitted.values)],               sub { lmer(formula => 'y ~ x + (1 | s)', data => $_[0]) }],
+	['lm',        [qw(fitted_values residuals)],     sub { lm(formula => 'y ~ x + w', data => $_[0]) }],
+	['glm',       [qw(fitted_values deviance_resid)], sub { glm(formula => 'b ~ x', family => 'binomial', data => $_[0]) }],
+	['zerotrunc', [qw(fitted_values residuals)],     sub { zerotrunc(formula => 'kp ~ x', data => $_[0]) }],
+	['hurdle',    [qw(fitted_values)],               sub { hurdle(formula => 'k ~ x | x', data => $_[0]) }],
+	['svyglm',    [qw(fitted_values)],               sub { svyglm(formula => 'y ~ x', data => $_[0], weights => 'pw') }],
+	['ivreg',     [qw(fitted_values residuals)],     sub { ivreg(formula => 'y ~ x | w', data => $_[0]) }],
+	['lmer',      [qw(fitted_values)],               sub { lmer(formula => 'y ~ x + (1 | s)', data => $_[0]) }],
 );
 my @want = sort @names;
 for my $c (@calls) {
@@ -68,7 +68,7 @@ for my $c (@calls) {
 # aov() names rows only from a HoH; a HoA or AoH is numbered
 {
 	my $r = aov(\%hoh, 'y ~ g');
-	is_deeply([sort keys %{ $r->{'fitted.values'} }], \@want, "aov, HoH: fitted.values is keyed by the caller's names");
+	is_deeply([sort keys %{ $r->{'fitted_values'} }], \@want, "aov, HoH: fitted_values is keyed by the caller's names");
 }
 
 # predict() reads its newdata's row names with its own reader

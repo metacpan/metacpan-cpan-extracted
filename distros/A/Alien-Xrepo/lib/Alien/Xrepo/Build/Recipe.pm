@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Build::Recipe v1.0.1 {
+class Alien::Xrepo::Build::Recipe v1.0.2 {
     use JSON::PP qw[decode_json];
     use Path::Tiny;
     use Scalar::Util qw[looks_like_number];

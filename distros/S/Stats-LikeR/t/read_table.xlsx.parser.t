@@ -25,7 +25,15 @@ use Stats::LikeR 'read_table';
 #   * the fast path (aoh/hoa/hoh, assembled in XS) and the callback path (a
 #     filter) agreeing cell for cell -- the same rows reach both
 #   * a self-closing cell with no value (a formatted blank) past the last
-#     value, which must not widen the table
+#     value, which must not widen the table, and since 0.3213 an empty cell
+#     written open (<c s="2"></c>, <c><v></v></c>), which must not either
+#   * since 0.3213: cells starting with the comment marker, which 'comment'
+#     does not touch in an .xlsx; elements under a namespace prefix, as the
+#     Open XML SDK writes them; and 'sheet' taking a name before a number
+#
+# The 0.3213 cases are regressions found by reading the parser and confirmed by
+# running each against 0.3212; they have no counterpart in R's or pandas'
+# suites to take them from, being this reader's own handling of the format.
 #
 # Fixtures are built here with core IO::Compress::Zip, as t/read_table.xlsx.t
 # builds its own, so the test needs no binary fixture and no CPAN reader.
@@ -49,10 +57,17 @@ my $seq = 0;
 # Wrap a <sheetData> body (and an optional list of <si> elements) into a
 # minimal workbook, and return its path. $names, the worksheets' name=
 # attributes as they are written in the XML, defaults to a single 'Data'; each
-# sheet named gets the same <sheetData>.
+# sheet named gets the same <sheetData>, or, when $sheetdata is an ARRAY
+# reference, the one at its own position. $pfx, when given, is the namespace
+# prefix every element is written with ('x:' for <x:worksheet xmlns:x=...>),
+# as the Open XML SDK writes them; the bodies passed in carry it themselves.
 sub mk {
-	my ($sheetdata, $shared, $names) = @_;
+	my ($sheetdata, $shared, $names, $pfx) = @_;
 	$names ||= ['Data'];
+	$pfx //= '';
+	my $xmlns = $pfx eq '' ? 'xmlns' : 'xmlns:' . substr($pfx, 0, -1);
+	# the relationships prefix is a writer's choice too: 'rel' rather than 'r'
+	my $rid   = $pfx eq '' ? 'r' : 'rel';
 	my $path = "$dir/x" . $seq++ . '.xlsx';
 	my $ns   = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
 	my $rns  = 'http://schemas.openxmlformats.org/package/2006/relationships';
@@ -63,28 +78,29 @@ sub mk {
 			. '<Default Extension="xml" ContentType="application/xml"/>'
 			. '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
 			. '</Types>',
-		'_rels/.rels' => qq{<?xml version="1.0"?><Relationships xmlns="$rns">}
-			. qq{<Relationship Id="rId1" Type="$ons/officeDocument" Target="xl/workbook.xml"/>}
-			. '</Relationships>',
-		'xl/workbook.xml' => qq{<?xml version="1.0"?><workbook xmlns="$ns" xmlns:r="$ons"><sheets>}
-			. join('', map { qq{<sheet name="$names->[$_ - 1]" sheetId="$_" r:id="rId$_"/>} }
+		'_rels/.rels' => qq{<?xml version="1.0"?><${pfx}Relationships $xmlns="$rns">}
+			. qq{<${pfx}Relationship Id="rId1" Type="$ons/officeDocument" Target="xl/workbook.xml"/>}
+			. "</${pfx}Relationships>",
+		'xl/workbook.xml' => qq{<?xml version="1.0"?><${pfx}workbook $xmlns="$ns" xmlns:$rid="$ons"><${pfx}sheets>}
+			. join('', map { qq{<${pfx}sheet name="$names->[$_ - 1]" sheetId="$_" $rid:id="rId$_"/>} }
 			           1 .. @$names)
-			. '</sheets></workbook>',
-		'xl/_rels/workbook.xml.rels' => qq{<?xml version="1.0"?><Relationships xmlns="$rns">}
-			. join('', map { qq{<Relationship Id="rId$_" Type="$ons/worksheet" Target="worksheets/sheet$_.xml"/>} }
+			. "</${pfx}sheets></${pfx}workbook>",
+		'xl/_rels/workbook.xml.rels' => qq{<?xml version="1.0"?><${pfx}Relationships $xmlns="$rns">}
+			. join('', map { qq{<${pfx}Relationship Id="rId$_" Type="$ons/worksheet" Target="worksheets/sheet$_.xml"/>} }
 			           1 .. @$names)
-			. '</Relationships>',
+			. "</${pfx}Relationships>",
 	);
 	my @order = ('[Content_Types].xml', '_rels/.rels', 'xl/workbook.xml',
 	             'xl/_rels/workbook.xml.rels');
 	for my $i (1 .. @$names) {
-		$part{"xl/worksheets/sheet$i.xml"} = qq{<?xml version="1.0"?><worksheet xmlns="$ns">}
-			. "<sheetData>$sheetdata</sheetData></worksheet>";
+		my $body = ref $sheetdata ? $sheetdata->[$i - 1] : $sheetdata;
+		$part{"xl/worksheets/sheet$i.xml"} = qq{<?xml version="1.0"?><${pfx}worksheet $xmlns="$ns">}
+			. "<${pfx}sheetData>$body</${pfx}sheetData></${pfx}worksheet>";
 		push @order, "xl/worksheets/sheet$i.xml";
 	}
 	if (defined $shared) {
 		$part{'xl/sharedStrings.xml'} =
-			qq{<?xml version="1.0"?><sst xmlns="$ns">$shared</sst>};
+			qq{<?xml version="1.0"?><${pfx}sst $xmlns="$ns">$shared</${pfx}sst>};
 		push @order, 'xl/sharedStrings.xml';
 	}
 	my $first = 1;
@@ -382,7 +398,7 @@ sub mk {
 	# empty array per column, which is what it did before the parser moved into
 	# XS. (A header-only CSV does keep the columns; the two have never agreed,
 	# and making them agree is a change to read_table, not to this parser.)
-	is_deeply( read_table($hdr, 'output.type' => 'hoa'), {},
+	is_deeply( read_table($hdr, 'output_type' => 'hoa'), {},
 		'a header with no data rows is an empty hash as a hoa' );
 }
 
@@ -420,22 +436,22 @@ sub mk {
 		[ { name => 'alpha', n => '1', tag => undef },
 		  { name => 'beta',  n => '2', tag => 'alpha' } ],
 		'aoh through the XS fast path' );
-	is_deeply( read_table($f, 'output.type' => 'hoa'),
+	is_deeply( read_table($f, 'output_type' => 'hoa'),
 		{ name => ['alpha','beta'], n => ['1','2'], tag => [undef,'alpha'] },
 		'hoa through the XS fast path' );
 	is_deeply( read_table($f, filter => { 0 => sub { 1 } }), $aoh,
 		'a filter keeps every row through the perl callback path' );
 	my $hoh = { alpha => { n => '1', tag => undef },
 	            beta  => { n => '2', tag => 'alpha' } };
-	is_deeply( read_table($f, 'output.type' => 'hoh', 'row.names' => 'name'),
+	is_deeply( read_table($f, 'output_type' => 'hoh', 'row_names' => 'name'),
 		$hoh, 'hoh through the XS fast path' );
-	is_deeply( read_table($f, 'output.type' => 'hoh', 'row.names' => 'name',
+	is_deeply( read_table($f, 'output_type' => 'hoh', 'row_names' => 'name',
 			filter => { 0 => sub { 1 } }),
 		$hoh, 'hoh through the perl callback path' );
-	is_deeply( read_table($f, 'na.strings' => 'alpha'),
+	is_deeply( read_table($f, 'na_strings' => 'alpha'),
 		[ { name => undef, n => '1', tag => undef },
 		  { name => 'beta', n => '2', tag => undef } ],
-		'na.strings is applied by the fast path too' );
+		'na_strings is applied by the fast path too' );
 }
 
 # A gap in a row is undef once the fast path builds the rows -- made as undef
@@ -446,15 +462,149 @@ sub mk {
 	         . '<row r="2"><c r="A2"><v>1</v></c><c r="C2"><v>3</v></c></row>'
 	         . '<row r="3"><c r="B3"><v>5</v></c></row>',
 	           '<si><t>a</t></si><si><t>b</t></si><si><t>c</t></si>');
-	is_deeply( read_table($f, 'output.type' => 'aoa'),
+	is_deeply( read_table($f, 'output_type' => 'aoa'),
 		[ [qw(a b c)], [1, undef, 3], [undef, 5, undef] ],
 		'a gap is undef in an aoa' );
-	is_deeply( read_table($f, 'output.type' => 'hoa'),
+	is_deeply( read_table($f, 'output_type' => 'hoa'),
 		{ a => [1, undef], b => [undef, 5], c => [3, undef] },
 		'a gap is undef in a hoa' );
 	my @seen;
 	read_table($f, filter => { 0 => sub { push @seen, [ @{ $_[0] } ]; 1 } });
 	is_deeply( \@seen, [ [1, '', 3], ['', 5, ''] ], 'a filter sees a gap as the empty string' );
+}
+
+# Inline-string cells, one row per array, A1 onwards: what write_table would
+# write for an aoa, without needing write_table here.
+sub inline_rows {
+	my ($pfx, @rows) = @_;
+	$pfx //= '';
+	my $r = 0;
+	return join '', map {
+		my $row = $_;
+		$r++;
+		my $c = 0;
+		"<${pfx}row r=\"$r\">" . join('', map {
+			my $ref = chr(ord('A') + $c++) . $r;
+			qq{<${pfx}c r="$ref" t="inlineStr"><${pfx}is><${pfx}t>$_</${pfx}t></${pfx}is></${pfx}c>}
+		} @$row) . "</${pfx}row>"
+	} @rows;
+}
+
+# 'comment' does not apply to an .xlsx, as README.md says. Up to 0.3213 the
+# commented-out-header check in read_table's callback ran on worksheet rows as
+# well: a first cell "#id" was taken for a commented header, every later row
+# starting with '#' replaced it, and the table came back as [] -- and a header
+# cell "# of items" lost its "# ".
+{
+	my $f = mk(inline_rows(undef, ['#id', 'name'], ['#a1', 'x'], ['b2', 'y']));
+	is_deeply( read_table($f), [ { '#id' => '#a1', name => 'x' }, { '#id' => 'b2', name => 'y' } ],
+		'a first cell that starts with the comment marker is a cell' );
+	is_deeply( read_table($f, filter => { 0 => sub { 1 } }),
+		[ { '#id' => '#a1', name => 'x' }, { '#id' => 'b2', name => 'y' } ],
+		'... and the same through the callback path' );
+	$f = mk(inline_rows(undef, ['# of items', 'name'], [5, 'x'], [6, 'y']));
+	is_deeply( read_table($f), [ { '# of items' => 5, name => 'x' }, { '# of items' => 6, name => 'y' } ],
+		'a header cell "# of items" keeps its "# "' );
+	is_deeply( read_table($f, comment => '#'), read_table($f, comment => ''),
+		'comment => "#" and comment => "" read an .xlsx the same' );
+	$f = mk(inline_rows(undef, ['#', 'name'], [1, 'x']));
+	is_deeply( read_table($f), [ { '#' => 1, name => 'x' } ], 'a header cell "#" is a column named "#"' );
+}
+
+# A namespace prefix on every element, as the Open XML SDK writes a workbook:
+# <x:worksheet xmlns:x="...">, <x:row>, <x:c>, <x:v>, <x:is><x:t>, <x:si>,
+# and the relationship id under a prefix other than 'r'. Up to 0.3213 no <row>
+# matched and the sheet read as [] without a word; openpyxl and readxl read it.
+{
+	my $plain = mk('<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="inlineStr"><is><t>b</t></is></c></row>'
+	             . '<row r="2"><c r="A2"><v>1.5</v></c><c r="B2" t="s"><v>1</v></c></row>'
+	             . '<row r="3"><c r="A3"/><c r="B3" t="inlineStr"><is><t>x &amp; y</t></is></c></row>',
+	               '<si><t>a</t></si><si><r><t>r</t></r><r><t>ich</t></r></si>');
+	my $pref  = mk('<x:row r="1"><x:c r="A1" t="s"><x:v>0</x:v></x:c><x:c r="B1" t="inlineStr"><x:is><x:t>b</x:t></x:is></x:c></x:row>'
+	             . '<x:row r="2"><x:c r="A2"><x:v>1.5</x:v></x:c><x:c r="B2" t="s"><x:v>1</x:v></x:c></x:row>'
+	             . '<x:row r="3"><x:c r="A3"/><x:c r="B3" t="inlineStr"><x:is><x:t>x &amp; y</x:t></x:is></x:c></x:row>',
+	               '<x:si><x:t>a</x:t></x:si><x:si><x:r><x:t>r</x:t></x:r><x:r><x:t>ich</x:t></x:r></x:si>',
+	               undef, 'x:');
+	my $want = [ { a => '1.5', b => 'rich' }, { a => undef, b => 'x & y' } ];
+	is_deeply( read_table($plain), $want, 'the unprefixed workbook, for comparison' );
+	is_deeply( read_table($pref),  $want, 'a workbook whose elements carry a namespace prefix' );
+	for my $otype (qw(aoa hoa)) {
+		is_deeply( read_table($pref, 'output_type' => $otype),
+			read_table($plain, 'output_type' => $otype), "... and as $otype" );
+	}
+	is_deeply( read_table($pref, 'output_type' => 'hoh', 'row_names' => 'b'),
+		{ rich => { a => '1.5' }, 'x & y' => { a => undef } }, '... and as hoh' );
+	is_deeply( read_table($pref, filter => { 0 => sub { 1 } }), $want, '... and through the callback path' );
+	is_deeply( Stats::LikeR::_xlsx_sheets($pref),
+		[ { name => 'Data', path => 'xl/worksheets/sheet1.xml' } ],
+		'its sheet list, through prefixed <x:sheet> and <x:Relationship>' );
+	# an end tag may hold blanks before its '>'
+	my $ws = mk('<row r="1"><c r="A1" t="inlineStr"><is><t>h</t ></is></c ></row >'
+	          . '<row r="2"><c r="A2"><v>7</v ></c></row>');
+	is_deeply( read_table($ws), [ { h => 7 } ], 'end tags with blanks before the ">"' );
+}
+
+# A cell written open and empty -- <c s="2"></c>, or <c><v></v></c> -- has no
+# value, and like the self-closing <c s="2"/> it no longer widens the table.
+# Up to 0.3213 either one past the last value added an unnamed '' column.
+{
+	my $f = mk('<row r="1"><c r="A1" t="inlineStr"><is><t>a</t></is></c><c r="B1" s="2"></c></row>'
+	         . '<row r="2"><c r="A2"><v>1</v></c><c r="B2"><v></v></c><c r="C2" s="1"></c></row>'
+	         . '<row r="3"><c r="A3"><v>2</v></c><c r="B3" t="s"><v>0</v></c>'
+	         .   '<c r="C3" t="inlineStr"><is><t></t></is></c></row>',
+	           '<si><t></t></si>');
+	is_deeply( read_table($f), [ { a => 1 }, { a => 2 } ],
+		'empty open cells past the last value add no column' );
+	is_deeply( read_table($f, 'output_type' => 'aoa'), [ ['a'], [1], [2] ],
+		'... as an aoa' );
+	is_deeply( read_table($f, filter => { 0 => sub { 1 } }), [ { a => 1 }, { a => 2 } ],
+		'... and through the callback path' );
+	# an empty open cell inside the width is a gap, as it always was
+	my $g = mk('<row r="1"><c r="A1" t="inlineStr"><is><t>a</t></is></c><c r="B1" t="inlineStr"><is><t>b</t></is></c>'
+	         .   '<c r="C1" t="inlineStr"><is><t>c</t></is></c></row>'
+	         . '<row r="2"><c r="A2"><v>1</v></c><c r="B2" s="3"></c><c r="C2"><v>3</v></c></row>');
+	is_deeply( read_table($g), [ { a => 1, b => undef, c => 3 } ],
+		'an empty open cell between values is an undef' );
+	# a row of nothing but empty open cells is a blank row, and dropped
+	my $b = mk('<row r="1"><c r="A1" t="inlineStr"><is><t>a</t></is></c></row>'
+	         . '<row r="2"><c r="A2" s="1"></c><c r="B2"><v></v></c></row>'
+	         . '<row r="3"><c r="A3"><v>9</v></c></row>');
+	is_deeply( read_table($b), [ { a => 9 } ], 'a row of empty open cells is dropped' );
+}
+
+# 'sheet' takes a name before a number. A workbook read whole comes back keyed
+# by sheet name, and up to 0.3213 an all-digit 'sheet' was always an index, so
+# neither key of a book with sheets "2024" and "2023" could be asked for again,
+# and with sheets "2" and "1", sheet => '1' returned the sheet named "2". The
+# whole-book read had the same swap waiting for it, since it picked each sheet
+# with sheet => its position.
+{
+	my @body = map { inline_rows(undef, ['s'], [$_]) } qw(first second);
+	my $f = mk(\@body, undef, [ '2024', '2023' ]);
+	is_deeply( read_table($f, sheet => '2023'), [ { s => 'second' } ], 'sheet => "2023" is the sheet named 2023' );
+	is_deeply( read_table($f, sheet => 2024),   [ { s => 'first' } ],  'sheet => 2024, a number, is still a name first' );
+	is_deeply( read_table($f, sheet => 2),      [ { s => 'second' } ], 'sheet => 2 is an index when no sheet is named 2' );
+	is_deeply( read_table($f), { 2024 => [ { s => 'first' } ], 2023 => [ { s => 'second' } ] },
+		'the whole book, keyed by those names' );
+	throws_ok { read_table($f, sheet => 3) }
+		qr/^read_table: sheet index 3 is out of range \(1\.\.2\), and no sheet is named '3', in \Q$f\E$/,
+		'an index past the end, named by no sheet';
+	$f = mk(\@body, undef, [ '2', '1' ]);
+	is_deeply( read_table($f, sheet => '1'), [ { s => 'second' } ], 'sheets "2" and "1": sheet => "1" is the one named 1' );
+	is_deeply( read_table($f, sheet => 2),   [ { s => 'first' } ],  '... and sheet => 2 the one named 2' );
+	is_deeply( read_table($f), { 2 => [ { s => 'first' } ], 1 => [ { s => 'second' } ] },
+		'the whole book does not swap them' );
+	# A name the caller holds as characters is compared as the UTF-8 bytes the
+	# workbook's name was read as (up to 0.3213 it was never found, and the
+	# message printed it as Latin-1).
+	$f = mk(\@body, undef, [ "Donn\xc3\xa9es", 'Other' ]);
+	my $chars = "Donn\x{e9}es";
+	utf8::upgrade($chars);
+	is_deeply( read_table($f, sheet => $chars), [ { s => 'first' } ], 'a sheet name given as characters' );
+	is_deeply( read_table($f, sheet => "Donn\xc3\xa9es"), [ { s => 'first' } ], '... and as UTF-8 bytes' );
+	throws_ok { read_table($f, sheet => 'Nope') }
+		qr/^read_table: sheet 'Nope' not found in \Q$f\E \(have: 'Donn\xc3\xa9es', 'Other'\)$/,
+		'an unknown sheet name lists the ones there are';
 }
 
 SKIP: {
@@ -508,11 +658,11 @@ SKIP: {
 	# The filter is a plain sub, and no qr// is evaluated inside these blocks:
 	# 5.10.0's pp_qr() leaks an SV every time one is, and CPAN smokers run it.
 	no_leaks_ok { read_table($f) }                               'no leaks: aoh fast path';
-	no_leaks_ok { read_table($f, 'output.type' => 'hoa') }       'no leaks: hoa fast path';
+	no_leaks_ok { read_table($f, 'output_type' => 'hoa') }       'no leaks: hoa fast path';
 	no_leaks_ok { read_table($f, filter => { 0 => sub { 1 } }) } 'no leaks: callback path';
 	no_leaks_ok { read_table($dup) }                             'no leaks: repeated column reference';
-	no_leaks_ok { read_table($f, 'output.type' => 'hoh') }       'no leaks: hoh fast path';
-	no_leaks_ok { read_table($f, 'output.type' => 'aoa') }       'no leaks: aoa fast path, gaps included';
+	no_leaks_ok { read_table($f, 'output_type' => 'hoh') }       'no leaks: hoh fast path';
+	no_leaks_ok { read_table($f, 'output_type' => 'aoa') }       'no leaks: aoa fast path, gaps included';
 }
 
 done_testing;

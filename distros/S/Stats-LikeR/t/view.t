@@ -71,11 +71,11 @@ is( $@, '', 'all documented args accepted' );
 	like( $s, qr/^# \w+: 0 rows x 0 cols/, 'empty hash -> 0x0 banner' );
 }
 
-# row_names alias drives the HoH label header
+# row_names drives the HoH label header
 {
 	my $hoh2 = { a => { v => 1 }, b => { v => 2 } };
 	my @lines = split /\n/, view($hoh2, row_names => 'id', return_only => 1);
-	like( $lines[1], qr/^id\b/, 'HoH: row_names alias sets the label header' );
+	like( $lines[1], qr/^id\b/, 'HoH: row_names sets the label header' );
 }
 
 # core behavior preserved (banner uses a TAB before "(showing ...)")
@@ -144,10 +144,10 @@ is( $@, '', 'all documented args accepted' );
 	is( scalar @lines, 3, 'flat hash n=0: banner + header + footer' );
 	like( $lines[1], qr/a\s+b$/, 'flat hash n=0: header still lists columns' );
 
-	# row.names names a key to use as the label
-	@lines = split /\n/, view({ id => 'x', v => 9 }, 'row.names' => 'id', return_only => 1);
-	like( $lines[1], qr/^id\s+v$/, 'flat hash: row.names header' );
-	like( $lines[2], qr/^x\s+9$/, 'flat hash: row.names value becomes the label' );
+	# row_names names a key to use as the label
+	@lines = split /\n/, view({ id => 'x', v => 9 }, 'row_names' => 'id', return_only => 1);
+	like( $lines[1], qr/^id\s+v$/, 'flat hash: row_names header' );
+	like( $lines[2], qr/^x\s+9$/, 'flat hash: row_names value becomes the label' );
 }
 
 # NEW: 'width' argument + R-style column chunking

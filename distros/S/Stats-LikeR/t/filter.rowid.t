@@ -86,7 +86,7 @@ my $grps = '1cka|1d4t';
 # HoH filtered by row name, projected to AoH output
 {
 	my $aoh = filter( $score, sub { defined($_[1]) && $_[1] =~ m/^(?:$grps)$/ },
-	                  'output.type' => 'aoh' );
+	                  'output_type' => 'aoh' );
 	is( ref($aoh), 'ARRAY', 'HoH->aoh by row name: result is an AoH ref' );
 	is( scalar(@$aoh), 2,    'HoH->aoh by row name: two rows kept' );
 	is_deeply( aoh_col($aoh, 'anomaly_rank'), [53, 162],
@@ -154,7 +154,7 @@ no_leaks_ok {
 		my $a = filter( $aoh_in, sub { defined($_[1]) && $_[1] == 0 } );
 		my $o = filter( $hoa_in, sub { defined($_[1]) && $_[1] != 1 } );
 		my $p = filter( $score,  sub { defined($_[1]) && $_[1] =~ /^1/ },
-		                'output.type' => 'aoh' );
+		                'output_type' => 'aoh' );
 	}
 } 'filter(): no memory leaks' unless $INC{'Devel/Cover.pm'};
 

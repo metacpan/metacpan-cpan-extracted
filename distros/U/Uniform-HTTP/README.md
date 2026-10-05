@@ -32,7 +32,8 @@ From CPAN:
 cpanm Uniform::HTTP
 ```
 
-Uniform::HTTP requires Perl 5.16 or newer.
+Uniform::HTTP requires Perl 5.16 or newer. It is a pure-Perl distribution;
+no C compiler is required to install it.
 
 ## Start here
 
@@ -271,6 +272,23 @@ Most applications should use `Uniform::HTTP::Auth` directly. The
 `Basic`, `Bearer`, and `Digest` submodules are also available for code that
 only wants the lower-level calculations.
 
+## Native fast path
+
+Native-backed HTTP engines can optionally use `Uniform::HTTP::FastPath` to
+read a canonical message in one operation or build one from data they have
+already validated.
+
+Normal application code does not need it. Adapters and subclasses continue to
+use the portable message API.
+
+XS consumers can also compile the optional `uniform_http_fastpath.h` header
+as part of their own distribution. It constructs and inspects the same canonical
+objects directly. Uniform::HTTP itself still compiles nothing, and its Perl API
+remains the public object interface.
+
+See `Uniform::HTTP::FastPath` and `docs/NATIVE-FASTPATH.md` for the version checks,
+trusted-input boundary, and ownership rules.
+
 ## What Uniform::HTTP does not do
 
 Uniform::HTTP deliberately does not own:
@@ -295,6 +313,7 @@ The distribution contains:
 - `Uniform::HTTP::Message` - shared message behavior
 - `Uniform::HTTP::Request` - HTTP requests
 - `Uniform::HTTP::Response` - HTTP responses
+- `Uniform::HTTP::FastPath` - optional versioned bulk access for native engines
 - `Uniform::HTTP::Auth` - HTTP authentication
 - `Uniform::HTTP::Auth::Basic`
 - `Uniform::HTTP::Auth::Bearer`

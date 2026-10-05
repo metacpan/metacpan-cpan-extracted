@@ -1,0 +1,7 @@
+Revision history for Net-Async-Keycloak
+
+0.001     2026-10-04 18:03:50Z
+    - Net::Async::Keycloak::Auth: admin token as a future, shared by callers waiting at the same time
+    - Net::Async::Keycloak facade on IO::Async::Notifier with OIDC and the Admin REST API, every method as _f, ensure_*_f with WWW::Keycloak::Diff
+    - Live tests against a real Keycloak behind KEYCLOAK_LIVE_TEST
+    - Concurrency: a cancelled caller never cancels a shared login or fetch; discovery and key fetches are shared; tokens refused together cause one new login

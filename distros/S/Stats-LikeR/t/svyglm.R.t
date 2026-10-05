@@ -214,10 +214,10 @@ sub check {
 		close_to($s->{'Std. Error'}, $e->{se}[$j], "$key: se $nm");
 		close_to($s->{'t value'}, $e->{t}[$j], "$key: t $nm");
 		close_to($s->{'Pr(>|t|)'}, $e->{p}[$j], "$key: p $nm");
-		close_to($fit->{'conf.int'}{$nm}[0], $e->{ci}[2 * $j], "$key: lower limit $nm");
-		close_to($fit->{'conf.int'}{$nm}[1], $e->{ci}[2 * $j + 1], "$key: upper limit $nm");
+		close_to($fit->{'conf_int'}{$nm}[0], $e->{ci}[2 * $j], "$key: lower limit $nm");
+		close_to($fit->{'conf_int'}{$nm}[1], $e->{ci}[2 * $j + 1], "$key: upper limit $nm");
 	}
-	is($fit->{'df.residual'}, $e->{df}, "$key: df.residual = degf + 1 - rank");
+	is($fit->{'df_residual'}, $e->{df}, "$key: df_residual = degf + 1 - rank");
 	close_to($fit->{dispersion}, $e->{dispersion}, "$key: dispersion");
 	close_to($fit->{deviance}, $e->{deviance}, "$key: deviance");
 }
@@ -259,8 +259,8 @@ check('strat_factor',  svyglm(formula => 'api00 ~ stype + ell', %strat));
 	check('strat_api00', svyglm(formula => 'api00 ~ ell + meals + mobility', data => \%d, strata => 'stype',
 	                            weights => 'pw', fpc => 'frac'));
 	my $b = svyglm(formula => 'api00 ~ ell', %strat);
-	is($b->{'n.strata'}, 3, 'three strata');
-	is($b->{'n.psu'}, 200, 'no cluster: every school is its own PSU');
+	is($b->{'n_strata'}, 3, 'three strata');
+	is($b->{'n_psu'}, 200, 'no cluster: every school is its own PSU');
 	is($b->{degf}, 197, 'degf = PSUs - strata');
 }
 # ------------------------------------------------------------ errors

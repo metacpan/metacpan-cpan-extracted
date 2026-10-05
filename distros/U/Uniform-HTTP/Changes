@@ -1,5 +1,32 @@
 Revision history for Uniform-HTTP
 
+0.06  2026-10-04
+    - Ship a versioned, header-only native FastPath for XS consumers while
+      keeping Uniform::HTTP pure Perl with no compiler needed for installation.
+    - Construct exact canonical Message, Request, and Response objects directly
+      from validated native byte spans, copying final storage without a Perl
+      FastPath view or constructor call.
+    - Add borrowed native inspection, per-interpreter ABI/layout negotiation,
+      explicit trusted-input rules, and installed-header discovery.
+    - Preserve all portable APIs and the existing Perl FastPath ABI 1 semantics.
+    - Add compiler-free installation checks, optional native conformance tests,
+      and focused construction/inspection benchmarks in the repository.
+
+0.05  2026-10-04
+    - Add Uniform::HTTP::FastPath ABI version 1 for native-backed HTTP engines.
+    - Add one-operation fixed-layout views of exact canonical Message, Request,
+      and Response objects with explicit kind, state, fidelity, and body flags.
+    - Borrow canonical header and trailer storage for immediate native
+      consumption without exposing the object's internal hash layout as ABI.
+    - Add trusted Request and Response construction for protocol engines that
+      already validated Uniform semantics, avoiding duplicate public validation
+      and per-field construction calls.
+    - Keep the normal constructors, adapters, subclasses, parsing, I/O, and
+      protocol behavior unchanged; unsupported objects fall back to the portable
+      Uniform message API.
+    - Simplify the FastPath documentation while keeping the ABI, ownership,
+      fallback, and trusted-construction rules explicit.
+
 0.04  2026-10-04
     - Add separate ordered trailer fields to Message, Request, and Response,
       preserving duplicate fields, spelling, order, and bytes.

@@ -10,11 +10,10 @@ use Time::HiRes qw(time);
 
 use Unblock::HTTP3::Capsule;
 use Unblock::HTTP3::Connection;
-use Unblock::HTTP3::Request;
-use Unblock::HTTP3::Response;
 use Net::QUIC;
 use Net::QUIC::Driver;
 use Uniform::HTTP::Request;
+use Uniform::HTTP::Response;
 
 is($Net::QUIC::VERSION, '0.04', 'vertical slice uses CPAN Net::QUIC 0.04');
 
@@ -404,7 +403,7 @@ ok(
 my $stream_count_before_large_headers =
     scalar keys %{ $client_h3->{streams} };
 
-my $oversized_headers_request = Unblock::HTTP3::Request->new(
+my $oversized_headers_request = Uniform::HTTP::Request->new(
     method    => 'GET',
     target    => '/too-many-headers',
     scheme    => 'https',
@@ -426,15 +425,18 @@ is(
     'oversized field section is rejected before opening a request stream',
 );
 
-my $outgoing_request = Unblock::HTTP3::Request->new(
+my $outgoing_request = Uniform::HTTP::Request->new(
     method    => 'GET',
     target    => '/',
     scheme    => 'https',
     authority => 'localhost',
-    priority  => {
-        urgency     => 5,
-        incremental => 1,
-    },
+    headers   => [
+        [ Priority   => 'u=5, i' ],
+        [ cookie     => 'a=1' ],
+        [ 'x-middle' => 'preserved' ],
+        [ cookie     => 'b=2' ],
+        [ cookie     => 'c=3; d=4' ],
+    ],
 );
 
 my $client_transaction = $client_h3->request($outgoing_request);
@@ -459,7 +461,9 @@ isa_ok($server_transaction, ['Unblock::HTTP3::Transaction']);
 
 my $incoming_request = $server_transaction->request;
 
-isa_ok($incoming_request, ['Unblock::HTTP3::Request']);
+isa_ok($incoming_request, ['Uniform::HTTP::Request']);
+is(ref($incoming_request), 'Uniform::HTTP::Request',
+    'received request is the exact canonical Uniform class');
 is($incoming_request->method, 'GET', 'server receives request method');
 is($incoming_request->target, '/', 'server receives request target');
 is($incoming_request->scheme, 'https', 'server receives request scheme');
@@ -467,6 +471,27 @@ is(
     $incoming_request->authority,
     'localhost',
     'server receives request authority',
+);
+is(
+    $incoming_request->header_values('cookie'),
+    [ 'a=1; b=2; c=3; d=4' ],
+    'native receive path coalesces Cookie field lines',
+);
+is(
+    [
+        map {
+            [
+                $incoming_request->header_name($_),
+                $incoming_request->header_value($_),
+            ]
+        } 0 .. $incoming_request->header_count - 1
+    ],
+    [
+        [ 'priority', 'u=5, i' ],
+        [ 'cookie', 'a=1; b=2; c=3; d=4' ],
+        [ 'x-middle', 'preserved' ],
+    ],
+    'native receive path preserves field order around coalesced Cookie',
 );
 
 is(
@@ -524,7 +549,7 @@ is(
     'server can override stream priority for local scheduling',
 );
 
-my $early_hints = Unblock::HTTP3::Response->new(
+my $early_hints = Uniform::HTTP::Response->new(
     status  => 103,
     headers => [
         [ 'link', '</style.css>; rel=preload; as=style' ],
@@ -551,7 +576,9 @@ is(
 
 my $received_early_hints = $client_transaction->next_informational;
 
-isa_ok($received_early_hints, ['Unblock::HTTP3::Response']);
+isa_ok($received_early_hints, ['Uniform::HTTP::Response']);
+is(ref($received_early_hints), 'Uniform::HTTP::Response',
+    'received informational response is exact canonical Uniform');
 is($received_early_hints->status, 103,
     'client receives 103 Early Hints status');
 is(
@@ -565,9 +592,12 @@ ok(
 );
 
 my $outgoing_response = $server_transaction->response;
-isa_ok($outgoing_response, ['Unblock::HTTP3::Response']);
+isa_ok($outgoing_response, ['Uniform::HTTP::Response']);
 
 $outgoing_response->status(200);
+$outgoing_response->add_header(cookie => 'response-one=1');
+$outgoing_response->add_header('x-response' => 'preserved');
+$outgoing_response->add_header(cookie => 'response-two=2');
 $server_transaction->send_response;
 
 my $incoming_response;
@@ -580,8 +610,30 @@ ok(
     'client Transaction receives HTTP/3 response',
 );
 
-isa_ok($incoming_response, ['Unblock::HTTP3::Response']);
+isa_ok($incoming_response, ['Uniform::HTTP::Response']);
+is(ref($incoming_response), 'Uniform::HTTP::Response',
+    'received final response is the exact canonical Uniform class');
 is($incoming_response->status, 200, 'client receives response status');
+is(
+    $incoming_response->header_values('cookie'),
+    [ 'response-one=1; response-two=2' ],
+    'native response receive path coalesces Cookie field lines',
+);
+is(
+    [
+        map {
+            [
+                $incoming_response->header_name($_),
+                $incoming_response->header_value($_),
+            ]
+        } 0 .. $incoming_response->header_count - 1
+    ],
+    [
+        [ 'cookie', 'response-one=1; response-two=2' ],
+        [ 'x-response', 'preserved' ],
+    ],
+    'native response receive path preserves field order around Cookie',
+);
 
 my $ready_client_transaction = $client_h3->next_transaction;
 is(
@@ -617,7 +669,7 @@ is(
 );
 
 my $request_body = "hello over HTTP/3";
-my $body_request = Unblock::HTTP3::Request->new(
+my $body_request = Uniform::HTTP::Request->new(
     method    => 'POST',
     target    => '/echo',
     scheme    => 'https',
@@ -687,7 +739,7 @@ ok(
     'body Transactions finish cleanly',
 );
 
-my $stream_request = Unblock::HTTP3::Request->new(
+my $stream_request = Uniform::HTTP::Request->new(
     method    => 'POST',
     target    => '/stream-request',
     scheme    => 'https',
@@ -748,7 +800,7 @@ ok(
     'incremental request Transaction finishes cleanly',
 );
 
-my $stream_response_request = Unblock::HTTP3::Request->new(
+my $stream_response_request = Uniform::HTTP::Request->new(
     method    => 'GET',
     target    => '/stream-response',
     scheme    => 'https',
@@ -864,7 +916,7 @@ ok(
 
 $server_h3->receive_body_mode('stream');
 
-my $receive_stream_request = Unblock::HTTP3::Request->new(
+my $receive_stream_request = Uniform::HTTP::Request->new(
     method    => 'POST',
     target    => '/receive-stream',
     scheme    => 'https',
@@ -937,7 +989,7 @@ ok(
 
 $server_h3->receive_body_mode('buffered');
 
-my $stream_trailer_request = Unblock::HTTP3::Request->new(
+my $stream_trailer_request = Uniform::HTTP::Request->new(
     method    => 'POST',
     target    => '/stream-trailers',
     scheme    => 'https',
@@ -1031,7 +1083,7 @@ ok(
     'streaming body and trailer Transactions finish cleanly',
 );
 
-my $trailer_request = Unblock::HTTP3::Request->new(
+my $trailer_request = Uniform::HTTP::Request->new(
     method    => 'POST',
     target    => '/trailers',
     scheme    => 'https',
@@ -1107,7 +1159,7 @@ ok(
 my @multi_client_tx;
 
 for my $index (1 .. 4) {
-    my $request = Unblock::HTTP3::Request->new(
+    my $request = Uniform::HTTP::Request->new(
         method    => 'GET',
         target    => "/multi/$index",
         scheme    => 'https',
@@ -1269,7 +1321,7 @@ ok(
     'streaming plain Uniform request completes cleanly',
 );
 
-my $unnegotiated_extended = Unblock::HTTP3::Request->new(
+my $unnegotiated_extended = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     protocol  => 'test-protocol',
     scheme    => 'https',
@@ -1292,7 +1344,7 @@ ok($unnegotiated_extended->is_complete,
 
 $client_h3->{peer_enable_connect_protocol} = 1;
 
-my $extended_request = Unblock::HTTP3::Request->new(
+my $extended_request = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     protocol  => 'test-protocol',
     scheme    => 'https',
@@ -1397,7 +1449,7 @@ ok(
     'Extended CONNECT completes after both DATA directions close',
 );
 
-my $unsupported_extended = Unblock::HTTP3::Request->new(
+my $unsupported_extended = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     protocol  => 'unsupported-protocol',
     scheme    => 'https',
@@ -1435,7 +1487,7 @@ ok(
     'application can reject an unsupported Extended CONNECT protocol with 501',
 );
 
-my $capsule_request = Unblock::HTTP3::Request->new(
+my $capsule_request = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     protocol  => 'capsule-test',
     scheme    => 'https',
@@ -1558,7 +1610,7 @@ is($after_half_close_capsule->type, '8',
 is($after_half_close_capsule->value, 'after-client-half-close',
     'post-half-close Capsule value is preserved');
 
-my $malformed_capsule_request = Unblock::HTTP3::Request->new(
+my $malformed_capsule_request = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     protocol  => 'capsule-test',
     scheme    => 'https',
@@ -1612,7 +1664,7 @@ ok(
 
         return $malformed_capsule_server_tx->state eq 'error'
             && defined($response)
-            && defined($response->reset_code);
+            && defined($malformed_capsule_client_tx->remote_reset_code);
     }),
     'truncated Capsule aborts only its HTTP/3 request stream',
 );
@@ -1624,15 +1676,15 @@ like(
 );
 
 is(
-    $malformed_capsule_client_tx->response->reset_code,
+    $malformed_capsule_client_tx->remote_reset_code,
     0x010e,
-    'truncated Capsule uses H3_MESSAGE_ERROR',
+    'truncated Capsule records remote H3_MESSAGE_ERROR on Transaction',
 );
 
 ok(!$server_h3->failed,
     'malformed Capsule does not fail the HTTP/3 connection');
 
-my $connect_request = Unblock::HTTP3::Request->new(
+my $connect_request = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     target    => 'example.test:443',
     authority => 'example.test:443',
@@ -1737,7 +1789,7 @@ ok(
     'CONNECT Transaction completes after both tunnel directions end',
 );
 
-my $rejected_connect = Unblock::HTTP3::Request->new(
+my $rejected_connect = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     target    => 'reject.test:443',
     authority => 'reject.test:443',
@@ -1770,7 +1822,7 @@ ok(
     'failed CONNECT closes unused client tunnel side and completes normally',
 );
 
-my $cancel_request = Unblock::HTTP3::Request->new(
+my $cancel_request = Uniform::HTTP::Request->new(
     method    => 'GET',
     target    => '/cancel',
     scheme    => 'https',
@@ -1823,7 +1875,8 @@ $cancel_client_tx->cancel;
 
 ok(
     run_until(sub {
-        return defined($large_response->stop_sending_code)
+        return defined($cancel_server_tx->remote_stop_sending_code)
+            && defined($cancel_client_tx->remote_reset_code)
             && $cancel_server_tx->is_cancelled
             && $cancel_response_producer->is_cancelled
             && $server_h3->{native}->streaming_retained_bytes == 0;
@@ -1838,19 +1891,32 @@ is(
 );
 
 is(
-    $large_response->stop_sending_code,
+    $cancel_client_tx->local_stop_sending_code,
     0x10c,
-    'outgoing response records H3_REQUEST_CANCELLED',
+    'client Transaction records local STOP_SENDING H3_REQUEST_CANCELLED',
 );
 
 is(
-    $received_cancel_response->reset_code,
+    $cancel_server_tx->remote_stop_sending_code,
     0x10c,
-    'incoming response records cancellation code',
+    'server Transaction records remote STOP_SENDING H3_REQUEST_CANCELLED',
 );
 
-ok($large_response->is_aborted, 'outgoing response is marked aborted');
-ok($received_cancel_response->is_aborted, 'incoming response is marked aborted');
+ok(
+    !defined($cancel_server_tx->local_reset_code),
+    'server Transaction does not mislabel peer STOP_SENDING as an explicit local reset',
+);
+
+is(
+    $cancel_client_tx->remote_reset_code,
+    0x10c,
+    'client Transaction records remote RESET_STREAM H3_REQUEST_CANCELLED',
+);
+
+ok($cancel_client_tx->is_aborted,
+    'client Transaction records request-stream abort state');
+ok($cancel_server_tx->is_aborted,
+    'server Transaction records request-stream abort state');
 ok($cancel_client_tx->is_cancelled, 'client Transaction is cancelled');
 ok($cancel_server_tx->is_cancelled, 'server Transaction is cancelled');
 ok(!$received_cancel_response->is_complete,
@@ -1905,7 +1971,7 @@ is(
     'malformed request is not exposed as an application Transaction',
 );
 
-my $after_malformed_request = Unblock::HTTP3::Request->new(
+my $after_malformed_request = Uniform::HTTP::Request->new(
     method    => 'GET',
     target    => '/after-malformed',
     scheme    => 'https',
@@ -1934,7 +2000,7 @@ ok(
     'connection remains usable after H3_MESSAGE_ERROR stream reset',
 );
 
-my $oversized_request = Unblock::HTTP3::Request->new(
+my $oversized_request = Uniform::HTTP::Request->new(
     method    => 'POST',
     target    => '/too-large',
     scheme    => 'https',

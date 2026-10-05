@@ -34,9 +34,9 @@ plan skip_all => 'Sendmail::PMilter 1.28 or later not installed (1.27 never answ
 
 my $SCRIPT   = "$FindBin::Bin/../bin/dkim2-milter";
 my $LIB      = "$FindBin::Bin/../lib";
-my $DNS_JSON = path("$FindBin::Bin/../../dns.json");
-my $KEYS     = path("$FindBin::Bin/../../keys");
-plan skip_all => 'shared ../keys and ../dns.json not available'
+my $DNS_JSON = path("$FindBin::Bin/data/dns.json");
+my $KEYS     = path("$FindBin::Bin/data/keys");
+plan skip_all => 't/data keys and dns.json not available'
     unless $DNS_JSON->exists && $KEYS->child('sel1._domainkey.test2.dkim2.com.pem')->exists;
 
 my $EOL = "\015\012";

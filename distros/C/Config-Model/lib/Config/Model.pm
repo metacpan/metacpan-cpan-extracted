@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.167;
+package Config::Model 2.168;
 
 use 5.20.0;
 use strict ;
@@ -227,13 +227,12 @@ sub show_legacy_issue {
 
     my @msg = ref $ref ? @$ref : $ref;
     unshift @msg, "Model ";
-    if ( $behavior eq 'die' ) {
-        die @msg, "\n";
-    }
-    elsif ( $behavior eq 'warn' ) {
+    if ( $behavior eq 'warn' ) {
         $legacy_logger->warn(@msg);
-    } elsif ( $behavior eq 'note' ) {
+    } elsif ( $behavior eq 'note' or $behavior eq 'info') {
         $legacy_logger->info( @msg);
+    } else {
+        die @msg, "\n";
     }
     return;
 }
@@ -693,7 +692,8 @@ sub translate_legacy_accept_info ($self, $config_class_name, $accept_info) {
     $self->show_legacy_issue(
         "$config_class_name class: accept attribute should be a list of hash "
         ."with 'pattern' key. I.e. something like [ { pattern => 'xyz.*', info}, ...] instead "
-        ."of [ 'xyz.*' => {info}, ... ]"
+        ."of [ 'xyz.*' => {info}, ... ]",
+        "note"
     );
 
     my @new;
@@ -2112,7 +2112,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.167
+version 2.168
 
 =head1 SYNOPSIS
 

@@ -29,7 +29,34 @@ use Stats::LikeR 't_test';
 #   tests/reg-tests-2.R:3199
 #       print(t.test(1:28), digits = 3)
 #   tests/reg-tests-1e.R:1985
-#       t.test(<Inf>...), PR#18901 -- these errored in R <= 4.5.1
+#       t.test(<Inf>...), PR#18901 -- these errored in R <= 4.5.1; its
+#       stopifnot() is reproduced below the table
+#   doc/manual/R-intro.R:371, :375
+#       t.test(A, B) and the same with var.equal = TRUE, on Michelson's data
+#   src/library/datasets/man/sleep.Rd:39
+#       the paired test in long format
+#   src/library/stats/man/ks.test.Rd:165
+#       t.test(x, x2, alternative = "g"), with x and x2 drawn as R CMD check
+#       draws them: share/R/examples-header.R's cleanEx() runs set.seed(1)
+#       before every example
+#   src/library/base/man/array2DF.Rd:103
+#       t.test(x) on each of ToothGrowth's six dose-by-supp cells
+#   src/library/stats/man/pairwise.t.test.Rd:52
+#       pairwise.t.test(Ozone, Month, pool.sd = FALSE), which is t.test(xi, xj)
+#       on each of the ten pairs of months (stats/R/pairwise.R:54), with the
+#       Ozone NA; tcltk/demo/tkttest.R:86 is its 5-against-8 pair
+#
+# That is every t.test() call in R's sources and tests outside power.t.test()
+# and pairwise.t.test()'s pooled path, which do not reach t.test().  The NEWS
+# entries for t.test() bugs are covered by the same cases: length-2 input
+# (NEWS.1), a group of size one (NEWS.2, reg-tests-1a.R), infinite values
+# (NEWS.Rd, PR#18901), and the stderr component (NEWS.3.Rd:615), which
+# t/t_test.tails.R.t checks.
+#
+# R's saved output for the examples, from tests/R-intro.Rout.save and
+# tests/Examples/{stats,datasets}-Ex.Rout.save, is checked as well, at the
+# digits R printed -- so this file is held to the text R CMD check compares
+# against, not only to a table its own generator wrote.
 #
 # SciPy 1.18.0, scipy/stats/tests/test_stats.py, reproduced at SciPy's own
 # values and tolerances:
@@ -51,7 +78,7 @@ use Stats::LikeR 't_test';
 #                                    obtained from R
 #
 # Every documented case is then crossed over the whole argument space --
-# alternative x var_equal x mu x conf.level x paired -- because a reference case
+# alternative x var_equal x mu x conf_level x paired -- because a reference case
 # exercised only at its defaults pins one code path out of dozens.  That is what
 # takes two dozen upstream cases to the 273 comparisons in the table.
 #
@@ -60,21 +87,30 @@ use Stats::LikeR 't_test';
 # t_test() accepted only the underscored 'conf_level' and 'var_equal', so the
 # 'conf.level' its own documentation lists -- and the 'var.equal' R spells it
 # with -- were a croak rather than an argument, even though every sibling in the
-# module (var_test, wilcox_test, prop_test, glm, ...) already took both.  Fixed
-# in LikeR.xs; the section near the end keeps both spellings tested.
+# module (var_test, wilcox_test, prop_test, glm, ...) already took both.  That
+# was fixed in LikeR.xs; since 0.3213 every field is underscored and the dotted
+# spellings are refused everywhere, which the section near the end tests.
 #
 # TOLERANCES
 # ----------
 # $TOL_R applies to everything joined against the R table, whose values carry
 # 17 significant digits.  Worst disagreements actually measured over the
-# 2400-odd comparisons here, on each NV width in the local matrix:
+# 4000-odd comparisons here, on each NV width in the local matrix:
 #
 #                    double     long double / __float128
-#   statistic        1.83e-15   1.85e-12
-#   p.value          6.46e-15   2.06e-12
-#   estimate         6.51e-16   2.08e-12
-#   conf.int         2.34e-13   1.55e-12
-#   df               8.61e-16   5.63e-16
+#   statistic        1.01e-13   1.85e-12
+#   p_value          7.94e-13   2.06e-12
+#   estimate         4.55e-15   2.08e-12
+#   conf_int         2.34e-13   1.55e-12
+#   df               5.97e-16   3.14e-14
+#
+# The double column's worst statistic and p-value are R's error, not this
+# module's: R-intro's Michelson data, A against B, has means 80.0208 and
+# 79.9788 whose difference cancels, and R's t is 1.0e-13 from exact rational
+# arithmetic on the input doubles (3.2498673805552234 against an exact
+# 3.249867380555551) while t_test()'s, which carries the part of each mean no
+# double holds, is within 1e-16 of it.  Before that change the double column
+# read 1.83e-15 and 6.46e-15 there.
 #
 # The wider widths are the worse ones here, and that is expected rather than a
 # defect: the linspace inputs below are not dyadic, so on a long-double or
@@ -83,7 +119,7 @@ use Stats::LikeR 't_test';
 # is the input that differs, not the arithmetic -- the same tables on the same
 # integer-valued inputs (sleep, mtcars, 1:10) agree to 1 ulp on every width.
 #
-# The limit is set from the widest width's worst case with two orders of
+# The limit is set from the widest width's worst case with about fifty times
 # headroom, since neither Windows' nor a BSD's long double can be measured
 # here.  Do not widen it to make a failure go away.
 #
@@ -132,6 +168,92 @@ my @CI_B = (0.93455277, 0.42680603, 0.49751939, 0.14152846, 0.711435,
             0.77669667, 0.20507578, 0.78702772, 0.94691855, 0.32464958,
             0.3873582, 0.35187468, 0.21731811);
 
+# doc/manual/R-intro.R:362 -- Michelson's latent heats, as R-intro scans them.
+my @MICHELSON_A = (79.98, 80.04, 80.02, 80.04, 80.03, 80.03, 80.04, 79.97,
+                   80.05, 80.03, 80.02, 80, 80.02);
+my @MICHELSON_B = (80.02, 79.94, 79.98, 79.97, 79.97, 80.03, 79.95, 79.97);
+
+# stats/man/ks.test.Rd's rnorm(50) and rnorm(50, -1) under R CMD check's
+# set.seed(1), printed at 17 digits by t/t_test.R.R.
+my @KS_X = (-0.62645381074233242, 0.18364332422208224,
+               -0.83562861241004716, 1.5952808021377916, 0.32950777181536051,
+               -0.82046838411801526, 0.48742905242848528, 0.73832470512921733,
+               0.57578135165349231, -0.30538838715635602, 1.511781168450848,
+               0.38984323641143109, -0.62124058054180376, -2.2146998871774999,
+               1.1249309181431082, -0.044933609015230851,
+               -0.016190263098946087, 0.94383621068529922,
+               0.82122119509808855, 0.59390132121750883, 0.91897737160821824,
+               0.7821363007310671, 0.074564983365190601, -1.9893516958633728,
+               0.61982574789471023, -0.056128739529000785,
+               -0.1557955067053293, -1.4707523838992744, -0.47815005510862035,
+               0.41794156019970241, 1.358679551529044, -0.10278772734299552,
+               0.38767161155936913, -0.053805040582905118,
+               -1.3770595568286066, -0.41499456329967976,
+               -0.39428995371034931, -0.059313396711185663,
+               1.1000253719838831, 0.76317574845754421, -0.1645235962535869,
+               -0.25336168013650756, 0.69696337540473741, 0.55666319867365732,
+               -0.6887556945495199, -0.70749515696211962, 0.36458196213683031,
+               0.76853292451541577, -0.11234621215022805, 0.88110772645421476);
+my @KS_X2 = (-0.81120770048565705, -2.804958628891038, 0.46555486156288595,
+                -0.84674666178810232, 1.1726116703621527,
+                -0.52449047110033753, -1.7099464309218146,
+                -0.38927364651094509, -1.9340976316442515,
+                -2.2536334002391021, -0.70855376448253715, -1.443291873218433,
+                -0.99889464836837583, -0.92565867584833594,
+                -1.5895209461880719, -1.5686687328185021, -1.1351786151238321,
+                0.17808699657320437, -2.5235668004297622,
+                -0.40605381237157845, -0.66704962878648177,
+                0.063099837276362702, -1.3041839236343007,
+                -0.62998119008371178, -0.73290120922776891,
+                -1.5425200309916502, 0.20786780598317223, 0.16040261569495162,
+                -0.2997863504850018, 0.58683345454084557,
+                -0.44151357443469608, -2.2765922084580366,
+                -1.5732654142368863, -2.2246126148983558, -1.4734006364393115,
+                -1.6203666772241241, -0.95788412685576474,
+                -1.9109216485524456, -0.84197122759592502,
+                -1.6545846439188177, 0.76728726937264602,
+                -0.28329252398279425, -0.089825770504772806,
+                -0.61581464217365545, 0.68217608051941836,
+                -1.6357364539489772, -1.461644730360566, 0.43228223854166292,
+                -1.6506963533103667, -1.2073807436019655);
+
+# datasets::ToothGrowth$len by dose and supp, for base/man/array2DF.Rd.
+my %TOOTH = (
+	'0.5.OJ' => [15.2, 21.5, 17.6, 9.7, 14.5, 10, 8.2, 9.4, 16.5, 9.7],
+	'0.5.VC' => [4.2, 11.5, 7.3, 5.8, 6.4, 10, 11.2, 11.2, 5.2, 7],
+	'1.OJ' => [19.7, 23.3, 23.6, 26.4, 20, 25.2, 25.8, 21.2, 14.5, 27.3],
+	'1.VC' => [16.5, 16.5, 15.2, 17.3, 22.5, 17.3, 13.6, 14.5, 18.8, 15.5],
+	'2.OJ' => [25.5, 26.4, 22.4, 24.5, 24.8, 30.9, 26.4, 27.3, 29.4, 23],
+	'2.VC' => [23.6, 18.5, 33.9, 25.5, 26.4, 32.5, 26.7, 21.5, 23.3, 29.5],
+);
+
+# datasets::airquality$Ozone and $Month, NA as undef, for
+# stats/man/pairwise.t.test.Rd and tcltk/demo/tkttest.R.
+my @OZONE = (41, 36, 12, 18, undef, 28, 23, 19, 8, undef, 7, 16, 11, 14, 18,
+              14, 34, 6, 30, 11, 1, 11, 4, 32, undef, undef, undef, 23, 45,
+              115, 37, undef, undef, undef, undef, undef, undef, 29, undef,
+              71, 39, undef, undef, 23, undef, undef, 21, 37, 20, 12, 13,
+              undef, undef, undef, undef, undef, undef, undef, undef, undef,
+              undef, 135, 49, 32, undef, 64, 40, 77, 97, 97, 85, undef, 10,
+              27, undef, 7, 48, 35, 61, 79, 63, 16, undef, undef, 80, 108, 20,
+              52, 82, 50, 64, 59, 39, 9, 16, 78, 35, 66, 122, 89, 110, undef,
+              undef, 44, 28, 65, undef, 22, 59, 23, 31, 44, 21, 9, undef, 45,
+              168, 73, undef, 76, 118, 84, 85, 96, 78, 73, 91, 47, 32, 20, 23,
+              21, 24, 44, 21, 28, 9, 13, 46, 18, 13, 24, 16, 13, 23, 36, 7,
+              14, 30, undef, 14, 18, 20);
+my @MONTH = (5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+              5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+              6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7,
+              7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+              7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+              8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9,
+              9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+              9, 9, 9, 9, 9, 9);
+sub ozone_in {
+	my ($m) = @_;
+	return [ map { $OZONE[$_] } grep { $MONTH[$_] == $m } 0 .. $#OZONE ];
+}
+
 # tag => [x] or [x, y]
 my %INPUT = (
 	'man.1to10.7to20'          => [ [1 .. 10], [7 .. 20] ],
@@ -158,6 +280,12 @@ my %INPUT = (
 	'scipy.ind.linspace'       => [ linspace(5, 105, 100), linspace(1, 100, 100) ],
 	'scipy.ind.linspace.uneqn' => [ linspace(5, 105, 100), linspace(1, 100, 25) ],
 	'scipy.ci.11v13'           => [ \@CI_A, \@CI_B ],
+	'rintro.AB'                => [ \@MICHELSON_A, \@MICHELSON_B ],
+	'sleepRd.paired'           => [ \@SLEEP1, \@SLEEP2 ],
+	'ksRd.x.x2'                => [ \@KS_X, \@KS_X2 ],
+	(map { ("array2DF.tooth.$_" => [ $TOOTH{$_} ]) } keys %TOOTH),
+	(map { my $i = $_; map { ("pairwise.ozone.${i}v$_" => [ ozone_in($i), ozone_in($_) ]) }
+	       $i + 1 .. 9 } 5 .. 8),
 );
 
 my $INF = 9**9**9;
@@ -201,7 +329,7 @@ sub options_from {
 	my %opt;
 	for my $p (@part) {
 		if    ($p =~ /\Amu=(\S+)\z/) { $opt{mu}           = $1 + 0 }
-		elsif ($p =~ /\Acl=(\S+)\z/) { $opt{'conf.level'} = $1 + 0 }
+		elsif ($p =~ /\Acl=(\S+)\z/) { $opt{'conf_level'} = $1 + 0 }
 		elsif ($p =~ /\Ave=(\d)\z/)  { $opt{var_equal}    = $1 + 0 }
 		elsif ($p =~ /\Ap=(\d)\z/)   { $opt{paired}       = $1 + 0 }
 		else                         { $opt{alternative}  = $p }
@@ -218,15 +346,15 @@ sub run_r_case {
 	if ($@) { fail("R $label: t_test died: $@"); return }
 
 	my ($stat, $param, $pval, $est, $lo, $hi) = @$exp;
-	for my $f (['statistic', $stat], ['df', $param], ['p.value', $pval]) {
+	for my $f (['statistic', $stat], ['df', $param], ['p_value', $pval]) {
 		my (undef, $e) = close_to($r->{ $f->[0] }, $f->[1], "R $label: $f->[0]", $TOL_R);
 		note_worst($f->[0], $e);
 	}
 	# One-sample and paired tests return a single 'estimate'; the two-sample
-	# test returns 'estimate.x' and 'estimate.y', matching R's own
+	# test returns 'estimate_x' and 'estimate_y', matching R's own
 	# names(estimate) for that case ("mean of x", "mean of y").
 	my @est_exp = split /,/, $est;
-	my @est_got = @est_exp > 1 ? ($r->{'estimate.x'}, $r->{'estimate.y'})
+	my @est_got = @est_exp > 1 ? ($r->{'estimate_x'}, $r->{'estimate_y'})
 	                           : ($r->{estimate});
 	is(scalar(grep { defined } @est_got), scalar @est_exp, "R $label: estimate count");
 	for my $i (0 .. $#est_exp) {
@@ -235,12 +363,12 @@ sub run_r_case {
 		note_worst('estimate', $e);
 	}
 	return if $lo eq '-';
-	my $ci = $r->{'conf.int'};
-	ok(ref $ci eq 'ARRAY', "R $label: conf.int present") or return;
+	my $ci = $r->{'conf_int'};
+	ok(ref $ci eq 'ARRAY', "R $label: conf_int present") or return;
 	for my $i (0, 1) {
 		my (undef, $e) = close_to($ci->[$i], ($i ? $hi : $lo),
-			"R $label: conf.int[$i]", $TOL_R);
-		note_worst('conf.int', $e);
+			"R $label: conf_int[$i]", $TOL_R);
+		note_worst('conf_int', $e);
 	}
 }
 
@@ -257,10 +385,10 @@ sub run_scipy_case {
 	close_to($r->{statistic}, $stat, "scipy $what: statistic", $TOL_SCIPY);
 	close_to($r->{df},        $df,   "scipy $what: df",        $TOL_SCIPY)
 		unless $df eq '-';
-	close_to($r->{'p.value'}, $p,    "scipy $what: p.value",   $TOL_SCIPY);
+	close_to($r->{'p_value'}, $p,    "scipy $what: p_value",   $TOL_SCIPY);
 	return if !defined $lo || $lo eq '-';
-	close_to($r->{'conf.int'}[0], $lo, "scipy $what: conf.int lo", $TOL_SCIPY);
-	close_to($r->{'conf.int'}[1], $hi, "scipy $what: conf.int hi", $TOL_SCIPY);
+	close_to($r->{'conf_int'}[0], $lo, "scipy $what: conf_int lo", $TOL_SCIPY);
+	close_to($r->{'conf_int'}[1], $hi, "scipy $what: conf_int hi", $TOL_SCIPY);
 }
 
 my ($rows_R, $rows_scipy, $section) = (0, 0, 'R');
@@ -311,35 +439,107 @@ cmp_ok($rows_scipy, '>',   8, "SciPy reference cases exercised ($rows_scipy)");
 	$r = eval { t_test([2, 3, 5], [1.5], var_equal => 1) };
 	ok(ref $r, 'the same call with var_equal => 1 succeeds, as in R');
 
-	# t.test(<Inf>...) -- reg-tests-1e.R:1985, PR#18901.  R returns estimate
-	# Inf with an NA p-value and NA conf.int rather than erroring, and these
-	# calls errored in R <= 4.5.1.  The two references disagree on the details,
-	# so all that is asserted is that a non-finite observation does not take
-	# the process down.
-	$r = eval { t_test([1 .. 6, $INF]) };
-	ok(1, 'a non-finite observation does not crash the process');
+	# t.test(<Inf>...) -- reg-tests-1e.R:1985, PR#18901, which errored in
+	# R <= 4.5.1.  R's own stopifnot() there: the p-value and both interval
+	# ends are NA, the one-sample estimate is Inf, and with yN = c(-Inf, 1:20)
+	# the estimates are c(Inf, -Inf).  The two-sample calls have a NaN Welch
+	# df, which hung a quadmath perl in the incomplete beta until that was made
+	# NaN-safe; this block is that regression test too.
+	my @x  = (1 .. 6, $INF);
+	my @y  = (1 .. 20, $INF);
+	my @yN = (-$INF, 1 .. 20);
+	my $isnan = sub { my $v = shift; defined $v && $v != $v };
+	my $tt1  = t_test(\@x);
+	my $tt2  = t_test(\@x, \@y);
+	my $tt2N = t_test(\@x, \@yN);
+	for my $c (['tt1', $tt1], ['tt2.', $tt2], ['tt2N', $tt2N]) {
+		my ($name, $t) = @$c;
+		ok($isnan->($t->{'p_value'}), "PR#18901 $name: p_value is NA");
+		ok($isnan->($t->{'conf_int'}[0]) && $isnan->($t->{'conf_int'}[1]),
+			"PR#18901 $name: conf_int is NA");
+	}
+	is($tt1->{estimate},     $INF,  'PR#18901 tt1: estimate is Inf');
+	is($tt2N->{'estimate_x'}, $INF,  'PR#18901 tt2N: estimate_x is Inf');
+	is($tt2N->{'estimate_y'}, -$INF, 'PR#18901 tt2N: estimate_y is -Inf');
 }
 
 #
-# Both spellings of the two dotted R argument names.  'conf.level' is what this
-# function's own documentation lists and was a croak until the fix noted above;
-# 'var.equal' is R's spelling, which every sibling already accepted.
+# R's own saved output.  These are the t.test() results R CMD check compares
+# against on every build of R, as printed there -- so this half checks t_test()
+# against R's pinned text directly, not against a table this file's generator
+# produced.  Each value is compared at the digits R printed: it must round to
+# the printed string.
+#
+#   tests/R-intro.Rout.save:581, :609             (doc/manual/R-intro.R:371, :375)
+#   tests/Examples/datasets-Ex.Rout.save:3292     (datasets/man/sleep.Rd:39)
+#   tests/Examples/stats-Ex.Rout.save:9232        (stats/man/ks.test.Rd:165)
+#   tests/Examples/stats-Ex.Rout.save:17819-17913 (stats/man/t.test.Rd:103-125)
+#
+# The formula-interface calls on the same pages print the same numbers as the
+# traditional calls beside them and are not repeated.
+#
+sub rounds_to {
+	my ($got, $printed, $name) = @_;
+	my $want = $printed + 0;
+	if ($printed eq 'Inf') { return ok($got == $INF, "$name is Inf") }
+	(my $mant = $printed) =~ s/[eE].*//;
+	$mant =~ s/^-?0*\.?0*//;	# leading zeros carry no significance
+	(my $digits = $mant) =~ s/\.//;
+	my $sig = length $digits;
+	my $half = 0.5 * 10**(int(POSIX::floor(log(abs $want) / log 10)) - $sig + 1);
+	ok(abs($got - $want) <= $half * (1 + 1e-9), $name)
+		or diag(sprintf '%.17g does not round to %s (half-unit %g)', $got, $printed, $half);
+}
+{
+	require POSIX;
+	my @pinned = (
+		# name, t_test arguments, statistic, df, p_value, ci lo, ci hi
+		['R-intro t.test(A, B)', [\@MICHELSON_A, \@MICHELSON_B],
+			'3.25', '12', '0.0069', '0.013855', '0.070183'],
+		['R-intro t.test(A, B, var.equal=TRUE)', [\@MICHELSON_A, \@MICHELSON_B, var_equal => 1],
+			'3.47', '19', '0.0026', '0.016691', '0.067348'],
+		['sleep.Rd paired', [\@SLEEP1, \@SLEEP2, paired => 1],
+			'-4.0621', '9', '0.002833', '-2.4598858', '-0.7001142'],
+		['ks.test.Rd t.test(x, x2, alternative = "g")', [\@KS_X, \@KS_X2, alternative => 'greater'],
+			'5.6742', '96.85', '7.242e-08', '0.7069751', 'Inf'],
+		['t.test.Rd t.test(1:10, y = c(7:20))', [[1 .. 10], [7 .. 20]],
+			'-5.4349', '21.982', '1.855e-05', '-11.052802', '-4.947198'],
+		['t.test.Rd t.test(1:10, y = c(7:20, 200))', [[1 .. 10], [7 .. 20, 200]],
+			'-1.6329', '14.165', '0.1245', '-47.242900', '6.376233'],
+		['t.test.Rd mtcars mpg by am', [\@MTCARS_AM0, \@MTCARS_AM1],
+			'-3.7671', '18.332', '0.001374', '-11.280194', '-3.209684'],
+		['t.test.Rd t.test(sleep$extra)', [[@SLEEP1, @SLEEP2]],
+			'3.413', '19', '0.002918', '0.5955845', '2.4844155'],
+		['t.test.Rd sleep2 paired', [\@SLEEP1, \@SLEEP2, paired => 1],
+			'-4.0621', '9', '0.002833', '-2.4598858', '-0.7001142'],
+	);
+	for my $c (@pinned) {
+		my ($name, $args, @want) = @$c;
+		my $r = t_test(@$args);
+		my @got = (@$r{qw(statistic df p_value)}, @{ $r->{'conf_int'} });
+		my @what = ('statistic', 'df', 'p_value', 'conf_int[0]', 'conf_int[1]');
+		rounds_to($got[$_], $want[$_], "Rout.save $name: $what[$_]") for 0 .. 4;
+	}
+}
+
+#
+# R's two dotted argument names, conf.level and var.equal, are spelled
+# conf_level and var_equal here, as every field of this module is since
+# 0.3213.  The dotted spellings are refused, not silently ignored.
 #
 {
-	my $u = t_test([1 .. 10], [7 .. 20], conf_level => 0.99, var_equal => 1);
-	my $d = t_test([1 .. 10], [7 .. 20], 'conf.level' => 0.99, 'var.equal' => 1);
-	is($d->{'p.value'},     $u->{'p.value'},     "'var.equal' == 'var_equal'");
-	is($d->{'conf.int'}[0], $u->{'conf.int'}[0], "'conf.level' == 'conf_level' (lower)");
-	is($d->{'conf.int'}[1], $u->{'conf.int'}[1], "'conf.level' == 'conf_level' (upper)");
+	for my $dotted ('conf.level', 'var.equal') {
+		ok(!eval { t_test([1 .. 10], [7 .. 20], $dotted => 1); 1 }
+			&& $@ =~ /unknown argument '\Q$dotted\E'/, "the dotted '$dotted' is refused");
+	}
 
 	# The level must actually be used, so that accepting the argument cannot be
-	# mistaken for ignoring it -- which is the other way the croak could have
-	# been made to go away.
-	my $narrow = t_test([1 .. 10], [7 .. 20], 'conf.level' => 0.90);
-	my $wide   = t_test([1 .. 10], [7 .. 20], 'conf.level' => 0.999);
-	cmp_ok($wide->{'conf.int'}[0], '<', $narrow->{'conf.int'}[0],
-		'a higher conf.level really widens the interval');
-	cmp_ok($wide->{'conf.int'}[1], '>', $narrow->{'conf.int'}[1],
+	# mistaken for ignoring it.
+	my $narrow = t_test([1 .. 10], [7 .. 20], 'conf_level' => 0.90);
+	my $wide   = t_test([1 .. 10], [7 .. 20], 'conf_level' => 0.999);
+	cmp_ok($wide->{'conf_int'}[0], '<', $narrow->{'conf_int'}[0],
+		'a higher conf_level really widens the interval');
+	cmp_ok($wide->{'conf_int'}[1], '>', $narrow->{'conf_int'}[1],
 		'...on both sides');
 }
 
@@ -352,8 +552,8 @@ cmp_ok($rows_scipy, '>',   8, "SciPy reference cases exercised ($rows_scipy)");
 	my $a = t_test([1, 2, 3], mu => 0, alternative => 'two.sided');
 	my $b = t_test([1, 2, 3], mu => 0, alternative => 'two-sided');
 	my $c = t_test([1, 2, 3], mu => 0, alternative => 'two_sided');
-	is($a->{'p.value'}, $b->{'p.value'}, "SciPy's 'two-sided' spelling agrees");
-	is($a->{'p.value'}, $c->{'p.value'}, "the 'two_sided' spelling agrees");
+	is($a->{'p_value'}, $b->{'p_value'}, "SciPy's 'two-sided' spelling agrees");
+	is($a->{'p_value'}, $c->{'p_value'}, "the 'two_sided' spelling agrees");
 }
 
 diag(sprintf 'worst relative error vs R: %s',
@@ -363,6 +563,7 @@ done_testing();
 __DATA__
 # ---- R 4.6.1, generated by t/t_test.R.R ----
 # label  n_est  statistic  df  p.value  estimate(s)  ci_lo  ci_hi   (tab separated)
+# t.test(1:10, y = c(7:20))  -- man page says P = .00001855
 man.1to10.7to20|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-5.4349297638940595	21.982212340188994	1.8552818325118112e-05	5.5,13.5	-11.052801725158162	-4.9471982748418393
 man.1to10.7to20|2s|two.sided|ve=0|mu=0|cl=0.9|p=0	2	-5.4349297638940595	21.982212340188994	1.8552818325118112e-05	5.5,13.5	-10.527657910657886	-5.4723420893421153
 man.1to10.7to20|2s|two.sided|ve=0|mu=1.5|cl=0.95|p=0	2	-6.4539790946241951	21.982212340188994	1.7180173372534759e-06	5.5,13.5	-11.05280172515816	-4.9471982748418393
@@ -387,6 +588,7 @@ man.1to10.7to20|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-5.1472928473046853	22	0.9999
 man.1to10.7to20|2s|greater|ve=1|mu=0|cl=0.9|p=0	2	-5.1472928473046853	22	0.9999815471139204	5.5,13.5	-10.053486025851761	Inf
 man.1to10.7to20|2s|greater|ve=1|mu=1.5|cl=0.95|p=0	2	-6.1124102561743134	22	0.99999812379138076	5.5,13.5	-10.668811626335817	Inf
 man.1to10.7to20|2s|greater|ve=1|mu=1.5|cl=0.9|p=0	2	-6.1124102561743134	22	0.99999812379138076	5.5,13.5	-10.053486025851761	Inf
+# t.test(1:10, y = c(7:20, 200)) -- man page says P = .1245, not significant
 man.1to10.outlier|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-1.6329026332012053	14.164598953012469	0.12451349808974535	5.5,25.933333333333334	-47.24289988710192	6.3762332204352523
 man.1to10.outlier|2s|two.sided|ve=0|mu=0|cl=0.9|p=0	2	-1.6329026332012053	14.164598953012469	0.12451349808974535	5.5,25.933333333333334	-42.455411390389457	1.5887447237227912
 man.1to10.outlier|2s|two.sided|ve=0|mu=1.5|cl=0.95|p=0	2	-1.7527731364541486	14.164598953012469	0.1012481273283508	5.5,25.933333333333334	-47.24289988710192	6.3762332204352532
@@ -411,6 +613,8 @@ man.1to10.outlier|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-1.3259214390481338	23	0.90
 man.1to10.outlier|2s|greater|ve=1|mu=0|cl=0.9|p=0	2	-1.3259214390481338	23	0.90105788693468103	5.5,25.933333333333334	-40.767095278987213	Inf
 man.1to10.outlier|2s|greater|ve=1|mu=1.5|cl=0.95|p=0	2	-1.4232566180973443	23	0.91595707678719163	5.5,25.933333333333334	-46.845236169828134	Inf
 man.1to10.outlier|2s|greater|ve=1|mu=1.5|cl=0.9|p=0	2	-1.4232566180973443	23	0.91595707678719163	5.5,25.933333333333334	-40.767095278987213	Inf
+# mtcars mpg am==0: 21.4,18.7,18.1,14.3,24.4,22.8,19.2,17.8,16.4,17.3,15.2,10.4,10.4,14.7,21.5,15.5,15.2,13.3,19.2
+# mtcars mpg am==1: 21,21,22.8,32.4,30.4,33.9,27.3,26,30.4,15.8,19.7,15,21.4
 man.mtcars.am|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-3.7671231451449252	18.332251638400461	0.0013736383330710284	17.147368421052633,24.392307692307693	-11.280194355040161	-3.2096841874699598
 man.mtcars.am|2s|two.sided|ve=0|mu=0|cl=0.9|p=0	2	-3.7671231451449252	18.332251638400461	0.0013736383330710284	17.147368421052633,24.392307692307693	-10.576622725562062	-3.9132558169480571
 man.mtcars.am|2s|two.sided|ve=0|mu=1.5|cl=0.95|p=0	2	-4.5470723629578309	18.332251638400461	0.00023931282378420333	17.147368421052633,24.392307692307693	-11.280194355040161	-3.2096841874699598
@@ -435,6 +639,8 @@ man.mtcars.am|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-4.1061269831006904	30	0.999857
 man.mtcars.am|2s|greater|ve=1|mu=0|cl=0.9|p=0	2	-4.1061269831006904	30	0.99985748962803245	17.147368421052633,24.392307692307693	-9.5570638884853913	Inf
 man.mtcars.am|2s|greater|ve=1|mu=1.5|cl=0.95|p=0	2	-4.9562639192497855	30	0.99998682084702728	17.147368421052633,24.392307692307693	-10.239623094102681	Inf
 man.mtcars.am|2s|greater|ve=1|mu=1.5|cl=0.9|p=0	2	-4.9562639192497855	30	0.99998682084702728	17.147368421052633,24.392307692307693	-9.5570638884853913	Inf
+# sleep extra group 1: 0.7,-1.6,-0.2,-1.2,-0.1,3.4,3.7,0.8,0,2
+# sleep extra group 2: 1.9,0.8,1.1,0.1,-0.1,4.4,5.5,1.6,4.6,3.4
 man.sleep.all|1s|two.sided|mu=0|cl=0.95	1	3.4129649952701091	19	0.0029176204041541161	1.54	0.59558449961960391	2.484415500380396
 man.sleep.all|1s|two.sided|mu=0|cl=0.9	1	3.4129649952701091	19	0.0029176204041541161	1.54	0.75977971252759258	2.3202202874724072
 man.sleep.all|1s|two.sided|mu=0|cl=0.99	1	3.4129649952701091	19	0.0029176204041541161	1.54	0.24908746498661924	2.8309125350133812
@@ -612,12 +818,15 @@ scipy.X1|1s|greater|mu=2|cl=0.95	1	-3.4641016151377548	2	0.96291004988627571	0	-
 scipy.X2|1s|two.sided|mu=0|cl=0.95	1	1.7320508075688774	2	0.22540333075851657	1	-1.4841377117503296	3.4841377117503298
 scipy.X2|1s|less|mu=0|cl=0.95	1	1.7320508075688774	2	0.8872983346207417	1	-Inf	2.685854460847048
 scipy.X2|1s|greater|mu=0|cl=0.95	1	1.7320508075688774	2	0.11270166537925828	1	-0.68585446084704793	Inf
+# linspace(1.01, 99.989, 100) = 1.01,2.0097878787878787,3.0095757575757576,4.009363636363636,5.0091515151515154,6.0089393939393938,7.0087272727272723,8.0085151515151516,9.0083030303030309,10.008090909090908,11.007878787878788,12.007666666666667,13.007454545454545,14.007242424242424,15.007030303030303,16.006818181818183,17.00660606060606,18.006393939393941,19.006181818181819,20.0059696969697,21.005757575757578,22.005545454545455,23.005333333333336,24.005121212121214,25.004909090909091,26.004696969696973,27.00448484848485,28.004272727272728,29.004060606060609,30.003848484848486,31.003636363636364,32.003424242424245,33.003212121212123,34.003,35.002787878787878,36.002575757575755,37.002363636363633,38.00215151515151,39.001939393939395,40.001727272727273,41.00151515151515,42.001303030303028,43.001090909090905,44.000878787878783,45.000666666666667,46.000454545454545,47.000242424242423,48.0000303030303,48.999818181818178,49.999606060606055,50.99939393939394,51.999181818181818,52.998969696969695,53.998757575757573,54.99854545454545,55.998333333333328,56.998121212121212,57.99790909090909,58.997696969696968,59.997484848484845,60.997272727272723,61.9970606060606,62.996848484848485,63.996636363636362,64.99642424242424,65.996212121212125,66.996000000000009,67.99578787878788,68.995575757575764,69.995363636363635,70.99515151515152,71.994939393939404,72.994727272727275,73.994515151515159,74.99430303030303,75.994090909090914,76.993878787878799,77.99366666666667,78.993454545454554,79.993242424242425,80.993030303030309,81.99281818181818,82.992606060606064,83.992393939393949,84.99218181818182,85.991969696969704,86.991757575757575,87.991545454545459,88.991333333333344,89.991121212121215,90.990909090909099,91.99069696969697,92.990484848484854,93.990272727272725,94.990060606060609,95.989848484848494,96.989636363636365,97.989424242424249,98.98921212121212,99.989000000000004
 scipy.rel.linspace|2s|two.sided|ve=0|mu=0|cl=0.95|p=1	1	0.81248591389165703	99	0.41846234511362157	0.00049999999999896124	-0.00072107775510836319	0.0017210777551062858
 scipy.rel.linspace|2s|two.sided|ve=1|mu=0|cl=0.95|p=1	1	0.81248591389165703	99	0.41846234511362157	0.00049999999999896124	-0.00072107775510836319	0.0017210777551062858
 scipy.rel.linspace|2s|less|ve=0|mu=0|cl=0.95|p=1	1	0.81248591389165703	99	0.79076882744318922	0.00049999999999896124	-Inf	0.0015217968875662639
 scipy.rel.linspace|2s|less|ve=1|mu=0|cl=0.95|p=1	1	0.81248591389165703	99	0.79076882744318922	0.00049999999999896124	-Inf	0.0015217968875662639
 scipy.rel.linspace|2s|greater|ve=0|mu=0|cl=0.95|p=1	1	0.81248591389165703	99	0.20923117255681078	0.00049999999999896124	-0.00052179688756834135	Inf
 scipy.rel.linspace|2s|greater|ve=1|mu=0|cl=0.95|p=1	1	0.81248591389165703	99	0.20923117255681078	0.00049999999999896124	-0.00052179688756834135	Inf
+# linspace(1,100,25) = 1,5.125,9.25,13.375,17.5,21.625,25.75,29.875,34,38.125,42.25,46.375,50.5,54.625,58.75,62.875,67,71.125,75.25,79.375,83.5,87.625,91.75,95.875,100
+# linspace(5,105,100) = 5,6.0101010101010104,7.0202020202020208,8.0303030303030312,9.0404040404040416,10.050505050505052,11.060606060606061,12.070707070707071,13.080808080808081,14.090909090909092,15.101010101010102,16.111111111111114,17.121212121212121,18.131313131313131,19.141414141414142,20.151515151515152,21.161616161616163,22.171717171717173,23.181818181818183,24.191919191919194,25.202020202020204,26.212121212121215,27.222222222222225,28.232323232323235,29.242424242424242,30.252525252525253,31.262626262626263,32.272727272727273,33.282828282828284,34.292929292929294,35.303030303030305,36.313131313131315,37.323232323232325,38.333333333333336,39.343434343434346,40.353535353535356,41.363636363636367,42.373737373737377,43.383838383838388,44.393939393939398,45.404040404040408,46.414141414141419,47.424242424242429,48.43434343434344,49.44444444444445,50.45454545454546,51.464646464646471,52.474747474747481,53.484848484848484,54.494949494949495,55.505050505050505,56.515151515151516,57.525252525252526,58.535353535353536,59.545454545454547,60.555555555555557,61.565656565656568,62.575757575757578,63.585858585858588,64.595959595959599,65.606060606060609,66.616161616161619,67.62626262626263,68.63636363636364,69.646464646464651,70.656565656565661,71.666666666666671,72.676767676767682,73.686868686868692,74.696969696969703,75.707070707070713,76.717171717171723,77.727272727272734,78.737373737373744,79.747474747474755,80.757575757575765,81.767676767676775,82.777777777777786,83.787878787878796,84.797979797979806,85.808080808080817,86.818181818181827,87.828282828282838,88.838383838383848,89.848484848484858,90.858585858585869,91.868686868686879,92.87878787878789,93.8888888888889,94.89898989898991,95.909090909090921,96.919191919191931,97.929292929292941,98.939393939393952,99.949494949494962,100.95959595959597,101.96969696969697,102.97979797979798,103.98989898989899,105
 scipy.ind.linspace|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	1.091274689792725	197.98000353474157	0.27647831993021538	55.000000000000007,50.5	-3.6318519019452054	12.63185190194522
 scipy.ind.linspace|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	1.0912746897927252	198	0.27647818616352016	55.000000000000007,50.5	-3.6318468514549171	12.631846851454933
 scipy.ind.linspace|2s|less|ve=0|mu=0|cl=0.95|p=0	2	1.091274689792725	197.98000353474157	0.86176084003489228	55.000000000000007,50.5	-Inf	11.314635789478031
@@ -636,8 +845,202 @@ scipy.ci.11v13|2s|less|ve=0|mu=0|cl=0.9|p=0	2	-0.23146070834839971	19.8944348268
 scipy.ci.11v13|2s|less|ve=1|mu=0|cl=0.9|p=0	2	-0.23456253225550058	22	0.40835879528219082	0.4868133581818182,0.51605853384615386	-Inf	0.13548616582957473
 scipy.ci.11v13|2s|greater|ve=0|mu=0|cl=0.9|p=0	2	-0.23146070834839971	19.894434826822256	0.59033954717371151	0.4868133581818182,0.51605853384615386	-0.19673299821478377	Inf
 scipy.ci.11v13|2s|greater|ve=1|mu=0|cl=0.9|p=0	2	-0.23456253225550058	22	0.59164120471780923	0.4868133581818182,0.51605853384615386	-0.19397651715824601	Inf
-# ---- SciPy 1.18.0, scipy/stats/tests/test_stats.py, at SciPy's own values ----
-# tag|form|alternative|ve=..|..   statistic  df  p.value  [ci_lo  ci_hi]
+rintro.AB|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	3.2498673805552234	12.027108494518243	0.0069393266144479352	80.020769230769233,79.978750000000005	0.013855263726624241	0.070183197811830828
+rintro.AB|2s|two.sided|ve=0|mu=0|cl=0.9|p=0	2	3.2498673805552234	12.027108494518243	0.0069393266144479352	80.020769230769233,79.978750000000005	0.018979432073938773	0.065059029464516291
+rintro.AB|2s|two.sided|ve=0|mu=1.5|cl=0.95|p=0	2	-112.76370501456009	12.027108494518243	1.4604751841296015e-19	80.020769230769233,79.978750000000005	0.013855263726624267	0.0701831978118308
+rintro.AB|2s|two.sided|ve=0|mu=1.5|cl=0.9|p=0	2	-112.76370501456009	12.027108494518243	1.4604751841296015e-19	80.020769230769233,79.978750000000005	0.018979432073938707	0.06505902946451636
+rintro.AB|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	3.472244847093795	19	0.0025510042141109568	80.020769230769233,79.978750000000005	0.016690584714403024	0.06734787682405205
+rintro.AB|2s|two.sided|ve=1|mu=0|cl=0.9|p=0	2	3.472244847093795	19	0.0025510042141109568	80.020769230769233,79.978750000000005	0.021094199892222405	0.062944261646232666
+rintro.AB|2s|two.sided|ve=1|mu=1.5|cl=0.95|p=0	2	-120.4797451178201	19	7.2862481705810158e-29	80.020769230769233,79.978750000000005	0.01669058471440299	0.067347876824051855
+rintro.AB|2s|two.sided|ve=1|mu=1.5|cl=0.9|p=0	2	-120.4797451178201	19	7.2862481705810158e-29	80.020769230769233,79.978750000000005	0.021094199892222498	0.062944261646232569
+rintro.AB|2s|less|ve=0|mu=0|cl=0.95|p=0	2	3.2498673805552234	12.027108494518243	0.99653033669277602	80.020769230769233,79.978750000000005	-Inf	0.065059029464516291
+rintro.AB|2s|less|ve=0|mu=0|cl=0.9|p=0	2	3.2498673805552234	12.027108494518243	0.99653033669277602	80.020769230769233,79.978750000000005	-Inf	0.059552172023825928
+rintro.AB|2s|less|ve=0|mu=1.5|cl=0.95|p=0	2	-112.76370501456009	12.027108494518243	7.3023759206480074e-20	80.020769230769233,79.978750000000005	-Inf	0.06505902946451636
+rintro.AB|2s|less|ve=0|mu=1.5|cl=0.9|p=0	2	-112.76370501456009	12.027108494518243	7.3023759206480074e-20	80.020769230769233,79.978750000000005	-Inf	0.0595521720238259
+rintro.AB|2s|less|ve=1|mu=0|cl=0.95|p=0	2	3.472244847093795	19	0.9987244978929446	80.020769230769233,79.978750000000005	-Inf	0.062944261646232666
+rintro.AB|2s|less|ve=1|mu=0|cl=0.9|p=0	2	3.472244847093795	19	0.9987244978929446	80.020769230769233,79.978750000000005	-Inf	0.05808668006232838
+rintro.AB|2s|less|ve=1|mu=1.5|cl=0.95|p=0	2	-120.4797451178201	19	3.6431240852905079e-29	80.020769230769233,79.978750000000005	-Inf	0.062944261646232569
+rintro.AB|2s|less|ve=1|mu=1.5|cl=0.9|p=0	2	-120.4797451178201	19	3.6431240852905079e-29	80.020769230769233,79.978750000000005	-Inf	0.058086680062328311
+rintro.AB|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	3.2498673805552234	12.027108494518243	0.0034696633072239676	80.020769230769233,79.978750000000005	0.018979432073938773	Inf
+rintro.AB|2s|greater|ve=0|mu=0|cl=0.9|p=0	2	3.2498673805552234	12.027108494518243	0.0034696633072239676	80.020769230769233,79.978750000000005	0.024486289514629132	Inf
+rintro.AB|2s|greater|ve=0|mu=1.5|cl=0.95|p=0	2	-112.76370501456009	12.027108494518243	1	80.020769230769233,79.978750000000005	0.018979432073938707	Inf
+rintro.AB|2s|greater|ve=0|mu=1.5|cl=0.9|p=0	2	-112.76370501456009	12.027108494518243	1	80.020769230769233,79.978750000000005	0.024486289514629167	Inf
+rintro.AB|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	3.472244847093795	19	0.0012755021070554784	80.020769230769233,79.978750000000005	0.021094199892222405	Inf
+rintro.AB|2s|greater|ve=1|mu=0|cl=0.9|p=0	2	3.472244847093795	19	0.0012755021070554784	80.020769230769233,79.978750000000005	0.025951781476126697	Inf
+rintro.AB|2s|greater|ve=1|mu=1.5|cl=0.95|p=0	2	-120.4797451178201	19	1	80.020769230769233,79.978750000000005	0.021094199892222498	Inf
+rintro.AB|2s|greater|ve=1|mu=1.5|cl=0.9|p=0	2	-120.4797451178201	19	1	80.020769230769233,79.978750000000005	0.025951781476126534	Inf
+sleepRd.paired|2s|two.sided|ve=0|mu=0|cl=0.95|p=1	1	-4.0621276833820366	9	0.0028328901973842702	-1.5800000000000001	-2.4598857632769824	-0.70011423672301754
+sleepRd.paired|2s|two.sided|ve=1|mu=0|cl=0.95|p=1	1	-4.0621276833820366	9	0.0028328901973842702	-1.5800000000000001	-2.4598857632769824	-0.70011423672301754
+sleepRd.paired|2s|less|ve=0|mu=0|cl=0.95|p=1	1	-4.0621276833820366	9	0.0014164450986921351	-1.5800000000000001	-Inf	-0.8669947329707165
+sleepRd.paired|2s|less|ve=1|mu=0|cl=0.95|p=1	1	-4.0621276833820366	9	0.0014164450986921351	-1.5800000000000001	-Inf	-0.8669947329707165
+sleepRd.paired|2s|greater|ve=0|mu=0|cl=0.95|p=1	1	-4.0621276833820366	9	0.99858355490130779	-1.5800000000000001	-2.2930052670292835	Inf
+sleepRd.paired|2s|greater|ve=1|mu=0|cl=0.95|p=1	1	-4.0621276833820366	9	0.99858355490130779	-1.5800000000000001	-2.2930052670292835	Inf
+# ks.test.Rd x  = -0.62645381074233242,0.18364332422208224,-0.83562861241004716,1.5952808021377916,0.32950777181536051,-0.82046838411801526,0.48742905242848528,0.73832470512921733,0.57578135165349231,-0.30538838715635602,1.511781168450848,0.38984323641143109,-0.62124058054180376,-2.2146998871774999,1.1249309181431082,-0.044933609015230851,-0.016190263098946087,0.94383621068529922,0.82122119509808855,0.59390132121750883,0.91897737160821824,0.7821363007310671,0.074564983365190601,-1.9893516958633728,0.61982574789471023,-0.056128739529000785,-0.1557955067053293,-1.4707523838992744,-0.47815005510862035,0.41794156019970241,1.358679551529044,-0.10278772734299552,0.38767161155936913,-0.053805040582905118,-1.3770595568286066,-0.41499456329967976,-0.39428995371034931,-0.059313396711185663,1.1000253719838831,0.76317574845754421,-0.1645235962535869,-0.25336168013650756,0.69696337540473741,0.55666319867365732,-0.6887556945495199,-0.70749515696211962,0.36458196213683031,0.76853292451541577,-0.11234621215022805,0.88110772645421476
+# ks.test.Rd x2 = -0.81120770048565705,-2.804958628891038,0.46555486156288595,-0.84674666178810232,1.1726116703621527,-0.52449047110033753,-1.7099464309218146,-0.38927364651094509,-1.9340976316442515,-2.2536334002391021,-0.70855376448253715,-1.443291873218433,-0.99889464836837583,-0.92565867584833594,-1.5895209461880719,-1.5686687328185021,-1.1351786151238321,0.17808699657320437,-2.5235668004297622,-0.40605381237157845,-0.66704962878648177,0.063099837276362702,-1.3041839236343007,-0.62998119008371178,-0.73290120922776891,-1.5425200309916502,0.20786780598317223,0.16040261569495162,-0.2997863504850018,0.58683345454084557,-0.44151357443469608,-2.2765922084580366,-1.5732654142368863,-2.2246126148983558,-1.4734006364393115,-1.6203666772241241,-0.95788412685576474,-1.9109216485524456,-0.84197122759592502,-1.6545846439188177,0.76728726937264602,-0.28329252398279425,-0.089825770504772806,-0.61581464217365545,0.68217608051941836,-1.6357364539489772,-1.461644730360566,0.43228223854166292,-1.6506963533103667,-1.2073807436019655
+ksRd.x.x2|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	5.6741771508244812	96.850226626707354	1.4484637080599252e-07	0.1004482799602557,-0.89906931867419504	0.64989783113513655	1.3491373661337651
+ksRd.x.x2|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	5.6741771508244812	98	1.4158165862979497e-07	0.1004482799602557,-0.89906931867419504	0.64994970676658304	1.3490854905023189
+ksRd.x.x2|2s|less|ve=0|mu=0|cl=0.95|p=0	2	5.6741771508244812	96.850226626707354	0.99999992757681455	0.1004482799602557,-0.89906931867419504	-Inf	1.2920601450357603
+ksRd.x.x2|2s|less|ve=1|mu=0|cl=0.95|p=0	2	5.6741771508244812	98	0.99999992920917069	0.1004482799602557,-0.89906931867419504	-Inf	1.2920270005747636
+ksRd.x.x2|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	5.6741771508244812	96.850226626707354	7.2423185402996262e-08	0.1004482799602557,-0.89906931867419504	0.70697505223314139	Inf
+ksRd.x.x2|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	5.6741771508244812	98	7.0790829314897485e-08	0.1004482799602557,-0.89906931867419504	0.70700819669413817	Inf
+# ToothGrowth len dose=0.5 supp=OJ: 15.2,21.5,17.6,9.7,14.5,10,8.2,9.4,16.5,9.7
+array2DF.tooth.0.5.OJ|1s|two.sided|mu=0|cl=0.95	1	9.3810914646285095	9	6.074068481533964e-06	13.23	10.03971671828749	16.420283281712511
+array2DF.tooth.0.5.OJ|1s|two.sided|mu=0|cl=0.99	1	9.3810914646285095	9	6.074068481533964e-06	13.23	8.6468100399214674	17.813189960078535
+array2DF.tooth.0.5.OJ|1s|two.sided|mu=10|cl=0.95	1	2.2903193825207926	9	0.047749700769117782	13.23	10.03971671828749	16.420283281712511
+array2DF.tooth.0.5.OJ|1s|two.sided|mu=10|cl=0.99	1	2.2903193825207926	9	0.047749700769117782	13.23	8.6468100399214656	17.813189960078535
+array2DF.tooth.0.5.OJ|1s|less|mu=0|cl=0.95	1	9.3810914646285095	9	0.99999696296575924	13.23	-Inf	15.815209214778976
+array2DF.tooth.0.5.OJ|1s|less|mu=0|cl=0.99	1	9.3810914646285095	9	0.99999696296575924	13.23	-Inf	17.209027801704693
+array2DF.tooth.0.5.OJ|1s|less|mu=10|cl=0.95	1	2.2903193825207926	9	0.97612514961544106	13.23	-Inf	15.815209214778974
+array2DF.tooth.0.5.OJ|1s|less|mu=10|cl=0.99	1	2.2903193825207926	9	0.97612514961544106	13.23	-Inf	17.209027801704693
+array2DF.tooth.0.5.OJ|1s|greater|mu=0|cl=0.95	1	9.3810914646285095	9	3.037034240766982e-06	13.23	10.644790785221026	Inf
+array2DF.tooth.0.5.OJ|1s|greater|mu=0|cl=0.99	1	9.3810914646285095	9	3.037034240766982e-06	13.23	9.2509721982953081	Inf
+array2DF.tooth.0.5.OJ|1s|greater|mu=10|cl=0.95	1	2.2903193825207926	9	0.023874850384558891	13.23	10.644790785221026	Inf
+array2DF.tooth.0.5.OJ|1s|greater|mu=10|cl=0.99	1	2.2903193825207926	9	0.023874850384558891	13.23	9.2509721982953081	Inf
+# ToothGrowth len dose=0.5 supp=VC: 4.2,11.5,7.3,5.8,6.4,10,11.2,11.2,5.2,7
+array2DF.tooth.0.5.VC|1s|two.sided|mu=0|cl=0.95	1	9.1875994162171555	9	7.2099025900137987e-06	7.9799999999999995	6.0151761824458925	9.9448238175541075
+array2DF.tooth.0.5.VC|1s|two.sided|mu=0|cl=0.99	1	9.1875994162171555	9	7.2099025900137987e-06	7.9799999999999995	5.1573162447494987	10.802683755250502
+array2DF.tooth.0.5.VC|1s|two.sided|mu=10|cl=0.95	1	-2.3256830602454457	9	0.045064548640406918	7.9799999999999995	6.0151761824458925	9.9448238175541057
+array2DF.tooth.0.5.VC|1s|two.sided|mu=10|cl=0.99	1	-2.3256830602454457	9	0.045064548640406918	7.9799999999999995	5.1573162447494978	10.802683755250502
+array2DF.tooth.0.5.VC|1s|less|mu=0|cl=0.95	1	9.1875994162171555	9	0.99999639504870497	7.9799999999999995	-Inf	9.5721722900517694
+array2DF.tooth.0.5.VC|1s|less|mu=0|cl=0.99	1	9.1875994162171555	9	0.99999639504870497	7.9799999999999995	-Inf	10.430593851748071
+array2DF.tooth.0.5.VC|1s|less|mu=10|cl=0.95	1	-2.3256830602454457	9	0.022532274320203459	7.9799999999999995	-Inf	9.5721722900517694
+array2DF.tooth.0.5.VC|1s|less|mu=10|cl=0.99	1	-2.3256830602454457	9	0.022532274320203459	7.9799999999999995	-Inf	10.430593851748073
+array2DF.tooth.0.5.VC|1s|greater|mu=0|cl=0.95	1	9.1875994162171555	9	3.6049512950068993e-06	7.9799999999999995	6.3878277099482306	Inf
+array2DF.tooth.0.5.VC|1s|greater|mu=0|cl=0.99	1	9.1875994162171555	9	3.6049512950068993e-06	7.9799999999999995	5.529406148251927	Inf
+array2DF.tooth.0.5.VC|1s|greater|mu=10|cl=0.95	1	-2.3256830602454457	9	0.97746772567979656	7.9799999999999995	6.3878277099482306	Inf
+array2DF.tooth.0.5.VC|1s|greater|mu=10|cl=0.99	1	-2.3256830602454457	9	0.97746772567979656	7.9799999999999995	5.529406148251927	Inf
+# ToothGrowth len dose=1 supp=OJ: 19.7,23.3,23.6,26.4,20,25.2,25.8,21.2,14.5,27.3
+array2DF.tooth.1.OJ|1s|two.sided|mu=0|cl=0.95	1	18.35452835999169	9	1.9334479338413171e-08	22.699999999999999	19.902272562478281	25.497727437521714
+array2DF.tooth.1.OJ|1s|two.sided|mu=0|cl=0.99	1	18.35452835999169	9	1.9334479338413171e-08	22.699999999999999	18.680759333759603	26.719240666240395
+array2DF.tooth.1.OJ|1s|two.sided|mu=10|cl=0.95	1	10.268833047220021	9	2.8680383711851524e-06	22.699999999999999	19.902272562478281	25.497727437521718
+array2DF.tooth.1.OJ|1s|two.sided|mu=10|cl=0.99	1	10.268833047220021	9	2.8680383711851524e-06	22.699999999999999	18.680759333759603	26.719240666240395
+array2DF.tooth.1.OJ|1s|less|mu=0|cl=0.95	1	18.35452835999169	9	0.99999999033276032	22.699999999999999	-Inf	24.967106119817252
+array2DF.tooth.1.OJ|1s|less|mu=0|cl=0.99	1	18.35452835999169	9	0.99999999033276032	22.699999999999999	-Inf	26.189419049180884
+array2DF.tooth.1.OJ|1s|less|mu=10|cl=0.95	1	10.268833047220021	9	0.99999856598081438	22.699999999999999	-Inf	24.967106119817256
+array2DF.tooth.1.OJ|1s|less|mu=10|cl=0.99	1	10.268833047220021	9	0.99999856598081438	22.699999999999999	-Inf	26.189419049180888
+array2DF.tooth.1.OJ|1s|greater|mu=0|cl=0.95	1	18.35452835999169	9	9.6672396692065855e-09	22.699999999999999	20.432893880182743	Inf
+array2DF.tooth.1.OJ|1s|greater|mu=0|cl=0.99	1	18.35452835999169	9	9.6672396692065855e-09	22.699999999999999	19.210580950819111	Inf
+array2DF.tooth.1.OJ|1s|greater|mu=10|cl=0.95	1	10.268833047220021	9	1.4340191855925762e-06	22.699999999999999	20.432893880182743	Inf
+array2DF.tooth.1.OJ|1s|greater|mu=10|cl=0.99	1	10.268833047220021	9	1.4340191855925762e-06	22.699999999999999	19.210580950819114	Inf
+# ToothGrowth len dose=1 supp=VC: 16.5,16.5,15.2,17.3,22.5,17.3,13.6,14.5,18.8,15.5
+array2DF.tooth.1.VC|1s|two.sided|mu=0|cl=0.95	1	21.083454563686129	9	5.6987199630564946e-09	16.77	14.970656561972202	18.569343438027797
+array2DF.tooth.1.VC|1s|two.sided|mu=0|cl=0.99	1	21.083454563686129	9	5.6987199630564946e-09	16.77	14.185046862084469	19.35495313791553
+array2DF.tooth.1.VC|1s|two.sided|mu=10|cl=0.95	1	8.5113290039448461	9	1.3448320039905878e-05	16.77	14.970656561972199	18.569343438027801
+array2DF.tooth.1.VC|1s|two.sided|mu=10|cl=0.99	1	8.5113290039448461	9	1.3448320039905878e-05	16.77	14.185046862084469	19.35495313791553
+array2DF.tooth.1.VC|1s|less|mu=0|cl=0.95	1	21.083454563686129	9	0.99999999715064003	16.77	-Inf	18.228077175530501
+array2DF.tooth.1.VC|1s|less|mu=0|cl=0.99	1	21.083454563686129	9	0.99999999715064003	16.77	-Inf	19.014201198610898
+array2DF.tooth.1.VC|1s|less|mu=10|cl=0.95	1	8.5113290039448461	9	0.9999932758399801	16.77	-Inf	18.228077175530498
+array2DF.tooth.1.VC|1s|less|mu=10|cl=0.99	1	8.5113290039448461	9	0.9999932758399801	16.77	-Inf	19.014201198610895
+array2DF.tooth.1.VC|1s|greater|mu=0|cl=0.95	1	21.083454563686129	9	2.8493599815282473e-09	16.77	15.3119228244695	Inf
+array2DF.tooth.1.VC|1s|greater|mu=0|cl=0.99	1	21.083454563686129	9	2.8493599815282473e-09	16.77	14.525798801389103	Inf
+array2DF.tooth.1.VC|1s|greater|mu=10|cl=0.95	1	8.5113290039448461	9	6.724160019952939e-06	16.77	15.3119228244695	Inf
+array2DF.tooth.1.VC|1s|greater|mu=10|cl=0.99	1	8.5113290039448461	9	6.724160019952939e-06	16.77	14.525798801389103	Inf
+# ToothGrowth len dose=2 supp=OJ: 25.5,26.4,22.4,24.5,24.8,30.9,26.4,27.3,29.4,23
+array2DF.tooth.2.OJ|1s|two.sided|mu=0|cl=0.95	1	31.038475912150076	9	1.8333513012247283e-10	26.059999999999999	24.160685876800915	27.959314123199082
+array2DF.tooth.2.OJ|1s|two.sided|mu=0|cl=0.99	1	31.038475912150076	9	1.8333513012247283e-10	26.059999999999999	23.331428067099825	28.788571932900172
+array2DF.tooth.2.OJ|1s|two.sided|mu=10|cl=0.95	1	19.128086076328866	9	1.344765077214984e-08	26.059999999999999	24.160685876800919	27.959314123199082
+array2DF.tooth.2.OJ|1s|two.sided|mu=10|cl=0.99	1	19.128086076328866	9	1.344765077214984e-08	26.059999999999999	23.331428067099829	28.788571932900172
+array2DF.tooth.2.OJ|1s|less|mu=0|cl=0.95	1	31.038475912150076	9	0.99999999990833244	26.059999999999999	-Inf	27.599087265761053
+array2DF.tooth.2.OJ|1s|less|mu=0|cl=0.99	1	31.038475912150076	9	0.99999999990833244	26.059999999999999	-Inf	28.428887974212362
+array2DF.tooth.2.OJ|1s|less|mu=10|cl=0.95	1	19.128086076328866	9	0.99999999327617461	26.059999999999999	-Inf	27.59908726576106
+array2DF.tooth.2.OJ|1s|less|mu=10|cl=0.99	1	19.128086076328866	9	0.99999999327617461	26.059999999999999	-Inf	28.428887974212369
+array2DF.tooth.2.OJ|1s|greater|mu=0|cl=0.95	1	31.038475912150076	9	9.1667565061236415e-11	26.059999999999999	24.520912734238941	Inf
+array2DF.tooth.2.OJ|1s|greater|mu=0|cl=0.99	1	31.038475912150076	9	9.1667565061236415e-11	26.059999999999999	23.691112025787632	Inf
+array2DF.tooth.2.OJ|1s|greater|mu=10|cl=0.95	1	19.128086076328866	9	6.7238253860749199e-09	26.059999999999999	24.520912734238941	Inf
+array2DF.tooth.2.OJ|1s|greater|mu=10|cl=0.99	1	19.128086076328866	9	6.7238253860749199e-09	26.059999999999999	23.691112025787632	Inf
+# ToothGrowth len dose=2 supp=VC: 23.6,18.5,33.9,25.5,26.4,32.5,26.7,21.5,23.3,29.5
+array2DF.tooth.2.VC|1s|two.sided|mu=0|cl=0.95	1	17.229381760153633	9	3.3679667375665959e-08	26.140000000000001	22.707910035384938	29.57208996461506
+array2DF.tooth.2.VC|1s|two.sided|mu=0|cl=0.99	1	17.229381760153633	9	3.3679667375665959e-08	26.140000000000001	21.209428361400438	31.070571638599571
+array2DF.tooth.2.VC|1s|two.sided|mu=10|cl=0.95	1	10.638187513729136	9	2.1332195897182543e-06	26.140000000000001	22.707910035384938	29.572089964615063
+array2DF.tooth.2.VC|1s|two.sided|mu=10|cl=0.99	1	10.638187513729136	9	2.1332195897182543e-06	26.140000000000001	21.209428361400434	31.070571638599564
+array2DF.tooth.2.VC|1s|less|mu=0|cl=0.95	1	17.229381760153633	9	0.99999998316016625	26.140000000000001	-Inf	28.921154467797155
+array2DF.tooth.2.VC|1s|less|mu=0|cl=0.99	1	17.229381760153633	9	0.99999998316016625	26.140000000000001	-Inf	30.420617168210974
+array2DF.tooth.2.VC|1s|less|mu=10|cl=0.95	1	10.638187513729136	9	0.99999893339020507	26.140000000000001	-Inf	28.921154467797152
+array2DF.tooth.2.VC|1s|less|mu=10|cl=0.99	1	10.638187513729136	9	0.99999893339020507	26.140000000000001	-Inf	30.420617168210974
+array2DF.tooth.2.VC|1s|greater|mu=0|cl=0.95	1	17.229381760153633	9	1.6839833687832979e-08	26.140000000000001	23.358845532202849	Inf
+array2DF.tooth.2.VC|1s|greater|mu=0|cl=0.99	1	17.229381760153633	9	1.6839833687832979e-08	26.140000000000001	21.859382831789027	Inf
+array2DF.tooth.2.VC|1s|greater|mu=10|cl=0.95	1	10.638187513729136	9	1.0666097948591271e-06	26.140000000000001	23.358845532202849	Inf
+array2DF.tooth.2.VC|1s|greater|mu=10|cl=0.99	1	10.638187513729136	9	1.0666097948591271e-06	26.140000000000001	21.859382831789027	Inf
+# airquality Ozone = 41,36,12,18,NA,28,23,19,8,NA,7,16,11,14,18,14,34,6,30,11,1,11,4,32,NA,NA,NA,23,45,115,37,NA,NA,NA,NA,NA,NA,29,NA,71,39,NA,NA,23,NA,NA,21,37,20,12,13,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,135,49,32,NA,64,40,77,97,97,85,NA,10,27,NA,7,48,35,61,79,63,16,NA,NA,80,108,20,52,82,50,64,59,39,9,16,78,35,66,122,89,110,NA,NA,44,28,65,NA,22,59,23,31,44,21,9,NA,45,168,73,NA,76,118,84,85,96,78,73,91,47,32,20,23,21,24,44,21,28,9,13,46,18,13,24,16,13,23,36,7,14,30,NA,14,18,20
+# airquality Month = 5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9
+pairwise.ozone.5v6|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-0.78010089673751948	16.937642904935199	0.44609675713669772	23.615384615384617,29.444444444444443	-21.59841890048207	9.9402992423624195
+pairwise.ozone.5v6|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	-0.70693309855441466	33	0.48457038699705113	23.615384615384617,29.444444444444443	-22.604779364925914	10.946659706806262
+pairwise.ozone.5v6|2s|less|ve=0|mu=0|cl=0.95|p=0	2	-0.78010089673751948	16.937642904935199	0.22304837856834886	23.615384615384617,29.444444444444443	-Inf	7.1723608452890444
+pairwise.ozone.5v6|2s|less|ve=1|mu=0|cl=0.95|p=0	2	-0.70693309855441466	33	0.24228519349852556	23.615384615384617,29.444444444444443	-Inf	8.125399954809982
+pairwise.ozone.5v6|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	-0.78010089673751948	16.937642904935199	0.7769516214316512	23.615384615384617,29.444444444444443	-18.830480503408698	Inf
+pairwise.ozone.5v6|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-0.70693309855441466	33	0.75771480650147449	23.615384615384617,29.444444444444443	-19.783519612929638	Inf
+pairwise.ozone.5v7|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-4.6819892342728355	44.842961180637666	2.6466786037185096e-05	23.615384615384617,59.115384615384613	-50.772906105683333	-20.22709389431666
+pairwise.ozone.5v7|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	-4.6819892342728355	50	2.2068191709405437e-05	23.615384615384617,59.115384615384613	-50.729391805863742	-20.270608194136251
+pairwise.ozone.5v7|2s|less|ve=0|mu=0|cl=0.95|p=0	2	-4.6819892342728355	44.842961180637666	1.3233393018592548e-05	23.615384615384617,59.115384615384613	-Inf	-22.765228965925598
+pairwise.ozone.5v7|2s|less|ve=1|mu=0|cl=0.95|p=0	2	-4.6819892342728355	50	1.1034095854702718e-05	23.615384615384617,59.115384615384613	-Inf	-22.792873730298076
+pairwise.ozone.5v7|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	-4.6819892342728355	44.842961180637666	0.99998676660698138	23.615384615384617,59.115384615384613	-48.234771034074399	Inf
+pairwise.ozone.5v7|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-4.6819892342728355	50	0.99998896590414532	23.615384615384617,59.115384615384613	-48.207126269701916	Inf
+pairwise.ozone.5v8|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-4.0748796622107628	39.279159302765954	0.00021685655919242294	23.615384615384617,59.96153846153846	-54.383578186011725	-18.308729506295954
+pairwise.ozone.5v8|2s|two.sided|ve=0|mu=0|cl=0.9|p=0	2	-4.0748796622107628	39.279159302765954	0.00021685655919242294	23.615384615384617,59.96153846153846	-51.371909019487674	-21.320398672820009
+pairwise.ozone.5v8|2s|two.sided|ve=0|mu=1.5|cl=0.95|p=0	2	-4.2430492990639053	39.279159302765954	0.0001302171439845008	23.615384615384617,59.96153846153846	-54.383578186011732	-18.308729506295951
+pairwise.ozone.5v8|2s|two.sided|ve=0|mu=1.5|cl=0.9|p=0	2	-4.2430492990639053	39.279159302765954	0.0001302171439845008	23.615384615384617,59.96153846153846	-51.371909019487674	-21.320398672820005
+pairwise.ozone.5v8|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	-4.0748796622107628	50	0.0001645159796257118	23.615384615384617,59.96153846153846	-54.261627320013815	-18.430680372293867
+pairwise.ozone.5v8|2s|two.sided|ve=1|mu=0|cl=0.9|p=0	2	-4.0748796622107628	50	0.0001645159796257118	23.615384615384617,59.96153846153846	-51.294497582781638	-21.397810109526048
+pairwise.ozone.5v8|2s|two.sided|ve=1|mu=1.5|cl=0.95|p=0	2	-4.2430492990639053	50	9.529389490957003e-05	23.615384615384617,59.96153846153846	-54.261627320013815	-18.430680372293867
+pairwise.ozone.5v8|2s|two.sided|ve=1|mu=1.5|cl=0.9|p=0	2	-4.2430492990639053	50	9.529389490957003e-05	23.615384615384617,59.96153846153846	-51.294497582781631	-21.397810109526045
+pairwise.ozone.5v8|2s|less|ve=0|mu=0|cl=0.95|p=0	2	-4.0748796622107628	39.279159302765954	0.00010842827959621147	23.615384615384617,59.96153846153846	-Inf	-21.320398672820009
+pairwise.ozone.5v8|2s|less|ve=0|mu=0|cl=0.9|p=0	2	-4.0748796622107628	39.279159302765954	0.00010842827959621147	23.615384615384617,59.96153846153846	-Inf	-24.719689085611723
+pairwise.ozone.5v8|2s|less|ve=0|mu=1.5|cl=0.95|p=0	2	-4.2430492990639053	39.279159302765954	6.5108571992250399e-05	23.615384615384617,59.96153846153846	-Inf	-21.320398672820005
+pairwise.ozone.5v8|2s|less|ve=0|mu=1.5|cl=0.9|p=0	2	-4.2430492990639053	39.279159302765954	6.5108571992250399e-05	23.615384615384617,59.96153846153846	-Inf	-24.719689085611723
+pairwise.ozone.5v8|2s|less|ve=1|mu=0|cl=0.95|p=0	2	-4.0748796622107628	50	8.22579898128559e-05	23.615384615384617,59.96153846153846	-Inf	-21.397810109526048
+pairwise.ozone.5v8|2s|less|ve=1|mu=0|cl=0.9|p=0	2	-4.0748796622107628	50	8.22579898128559e-05	23.615384615384617,59.96153846153846	-Inf	-24.762192687972803
+pairwise.ozone.5v8|2s|less|ve=1|mu=1.5|cl=0.95|p=0	2	-4.2430492990639053	50	4.7646947454785015e-05	23.615384615384617,59.96153846153846	-Inf	-21.397810109526045
+pairwise.ozone.5v8|2s|less|ve=1|mu=1.5|cl=0.9|p=0	2	-4.2430492990639053	50	4.7646947454785015e-05	23.615384615384617,59.96153846153846	-Inf	-24.762192687972799
+pairwise.ozone.5v8|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	-4.0748796622107628	39.279159302765954	0.99989157172040377	23.615384615384617,59.96153846153846	-51.371909019487674	Inf
+pairwise.ozone.5v8|2s|greater|ve=0|mu=0|cl=0.9|p=0	2	-4.0748796622107628	39.279159302765954	0.99989157172040377	23.615384615384617,59.96153846153846	-47.97261860669596	Inf
+pairwise.ozone.5v8|2s|greater|ve=0|mu=1.5|cl=0.95|p=0	2	-4.2430492990639053	39.279159302765954	0.99993489142800773	23.615384615384617,59.96153846153846	-51.371909019487674	Inf
+pairwise.ozone.5v8|2s|greater|ve=0|mu=1.5|cl=0.9|p=0	2	-4.2430492990639053	39.279159302765954	0.99993489142800773	23.615384615384617,59.96153846153846	-47.97261860669596	Inf
+pairwise.ozone.5v8|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-4.0748796622107628	50	0.99991774201018713	23.615384615384617,59.96153846153846	-51.294497582781638	Inf
+pairwise.ozone.5v8|2s|greater|ve=1|mu=0|cl=0.9|p=0	2	-4.0748796622107628	50	0.99991774201018713	23.615384615384617,59.96153846153846	-47.930115004334887	Inf
+pairwise.ozone.5v8|2s|greater|ve=1|mu=1.5|cl=0.95|p=0	2	-4.2430492990639053	50	0.99995235305254515	23.615384615384617,59.96153846153846	-51.294497582781631	Inf
+pairwise.ozone.5v8|2s|greater|ve=1|mu=1.5|cl=0.9|p=0	2	-4.2430492990639053	50	0.99995235305254515	23.615384615384617,59.96153846153846	-47.930115004334873	Inf
+pairwise.ozone.5v9|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-1.2527469709286825	52.9569740418154	0.21580155372038204	23.615384615384617,31.448275862068964	-20.374201338096771	4.7084188447280741
+pairwise.ozone.5v9|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	-1.2470123803727797	53	0.21787566802268291	23.615384615384617,31.448275862068964	-20.431635651371781	4.7658531580030878
+pairwise.ozone.5v9|2s|less|ve=0|mu=0|cl=0.95|p=0	2	-1.2527469709286825	52.9569740418154	0.10790077686019102	23.615384615384617,31.448275862068964	-Inf	2.6347931724836759
+pairwise.ozone.5v9|2s|less|ve=1|mu=0|cl=0.95|p=0	2	-1.2470123803727797	53	0.10893783401134145	23.615384615384617,31.448275862068964	-Inf	2.6827785436058083
+pairwise.ozone.5v9|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	-1.2527469709286825	52.9569740418154	0.89209922313980905	23.615384615384617,31.448275862068964	-18.300575665852371	Inf
+pairwise.ozone.5v9|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-1.2470123803727797	53	0.89106216598865862	23.615384615384617,31.448275862068964	-18.348561036974502	Inf
+pairwise.ozone.6v7|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-3.4185984607269617	24.792265862146078	0.0021816849959111558	29.444444444444443,59.115384615384613	-47.553829614640215	-11.788050727240119
+pairwise.ozone.6v7|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	-2.6493237652144468	33	0.012281704785588606	29.444444444444443,59.115384615384613	-52.456370347533024	-6.8855099943473146
+pairwise.ozone.6v7|2s|less|ve=0|mu=0|cl=0.95|p=0	2	-3.4185984607269617	24.792265862146078	0.0010908424979555779	29.444444444444443,59.115384615384613	-Inf	-14.840746134685348
+pairwise.ozone.6v7|2s|less|ve=1|mu=0|cl=0.95|p=0	2	-2.6493237652144468	33	0.0061408523927943028	29.444444444444443,59.115384615384613	-Inf	-10.717453950712708
+pairwise.ozone.6v7|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	-3.4185984607269617	24.792265862146078	0.99890915750204434	29.444444444444443,59.115384615384613	-44.501134207194994	Inf
+pairwise.ozone.6v7|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-2.6493237652144468	33	0.99385914760720562	29.444444444444443,59.115384615384613	-48.624426391167631	Inf
+pairwise.ozone.6v8|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-3.0922057344815421	29.989449338042505	0.0042693182825209895	29.444444444444443,59.96153846153846	-50.672654603099765	-10.361533431088265
+pairwise.ozone.6v8|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	-2.2113657663714918	33	0.034048157912876714	29.444444444444443,59.96153846153846	-58.593631854320925	-2.4405561798671145
+pairwise.ozone.6v8|2s|less|ve=0|mu=0|cl=0.95|p=0	2	-3.0922057344815421	29.989449338042505	0.0021346591412604947	29.444444444444443,59.96153846153846	-Inf	-13.766575163334778
+pairwise.ozone.6v8|2s|less|ve=1|mu=0|cl=0.95|p=0	2	-2.2113657663714918	33	0.017024078956438357	29.444444444444443,59.96153846153846	-Inf	-7.1623331508171395
+pairwise.ozone.6v8|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	-3.0922057344815421	29.989449338042505	0.99786534085873946	29.444444444444443,59.96153846153846	-47.267612870853256	Inf
+pairwise.ozone.6v8|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-2.2113657663714918	33	0.98297592104356157	29.444444444444443,59.96153846153846	-53.871854883370894	Inf
+pairwise.ozone.6v9|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-0.26556792957911368	17.612809686282038	0.79365548285268539	29.444444444444443,31.448275862068964	-17.88126511864662	13.873602283397579
+pairwise.ozone.6v9|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	-0.2287658839205382	36	0.82034549295716142	29.444444444444443,31.448275862068964	-19.76853657126561	15.760873736016569
+pairwise.ozone.6v9|2s|less|ve=0|mu=0|cl=0.95|p=0	2	-0.26556792957911368	17.612809686282038	0.39682774142634269	29.444444444444443,31.448275862068964	-Inf	11.096071914733683
+pairwise.ozone.6v9|2s|less|ve=1|mu=0|cl=0.95|p=0	2	-0.2287658839205382	36	0.41017274647858071	29.444444444444443,31.448275862068964	-Inf	12.784492539919972
+pairwise.ozone.6v9|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	-0.26556792957911368	17.612809686282038	0.60317225857365731	29.444444444444443,31.448275862068964	-15.103734749982728	Inf
+pairwise.ozone.6v9|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-0.2287658839205382	36	0.58982725352141929	29.444444444444443,31.448275862068964	-16.792155375169017	Inf
+pairwise.ozone.7v8|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	-0.08501813732216372	47.635640600876563	0.93260329252848828	59.115384615384613,59.96153846153846	-20.861207488918055	19.168899796610361
+pairwise.ozone.7v8|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	-0.08501813732216372	50	0.93258648768218955	59.115384615384613,59.96153846153846	-20.836594374052257	19.144286681744564
+pairwise.ozone.7v8|2s|less|ve=0|mu=0|cl=0.95|p=0	2	-0.08501813732216372	47.635640600876563	0.46630164626424414	59.115384615384613,59.96153846153846	-Inf	15.849146635383233
+pairwise.ozone.7v8|2s|less|ve=1|mu=0|cl=0.95|p=0	2	-0.08501813732216372	50	0.46629324384109477	59.115384615384613,59.96153846153846	-Inf	15.833504489063886
+pairwise.ozone.7v8|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	-0.08501813732216372	47.635640600876563	0.5336983537357558	59.115384615384613,59.96153846153846	-17.541454327690925	Inf
+pairwise.ozone.7v8|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	-0.08501813732216372	50	0.53370675615890528	59.115384615384613,59.96153846153846	-17.525812181371577	Inf
+pairwise.ozone.7v9|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	3.6145064310503416	46.582473225514562	0.00073610319564772935	59.115384615384613,31.448275862068964	12.264669508205062	43.069547998426238
+pairwise.ozone.7v9|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	3.667935724540178	53	0.0005677279734447872	59.115384615384613,31.448275862068964	12.537838026810871	42.79637947982043
+pairwise.ozone.7v9|2s|less|ve=0|mu=0|cl=0.95|p=0	2	3.6145064310503416	46.582473225514562	0.99963194840217606	59.115384615384613,31.448275862068964	-Inf	40.513053088442639
+pairwise.ozone.7v9|2s|less|ve=1|mu=0|cl=0.95|p=0	2	3.667935724540178	53	0.99971613601327758	59.115384615384613,31.448275862068964	-Inf	40.294908001995978
+pairwise.ozone.7v9|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	3.6145064310503416	46.582473225514562	0.00036805159782386468	59.115384615384613,31.448275862068964	14.821164418188655	Inf
+pairwise.ozone.7v9|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	3.667935724540178	53	0.0002838639867223936	59.115384615384613,31.448275862068964	15.03930950463532	Inf
+pairwise.ozone.8v9|2s|two.sided|ve=0|mu=0|cl=0.95|p=0	2	3.1748305077265169	40.375771629421202	0.0028682899210320718	59.96153846153846,31.448275862068964	10.367175441255325	46.659349757683671
+pairwise.ozone.8v9|2s|two.sided|ve=1|mu=0|cl=0.95|p=0	2	3.2570426237444225	53	0.0019664679127726413	59.96153846153846,31.448275862068964	10.954277692301027	46.072247506637964
+pairwise.ozone.8v9|2s|less|ve=0|mu=0|cl=0.95|p=0	2	3.1748305077265169	40.375771629421202	0.99856585503948403	59.96153846153846,31.448275862068964	-Inf	43.632651108892127
+pairwise.ozone.8v9|2s|less|ve=1|mu=0|cl=0.95|p=0	2	3.2570426237444225	53	0.99901676604361367	59.96153846153846,31.448275862068964	-Inf	43.16904743051775
+pairwise.ozone.8v9|2s|greater|ve=0|mu=0|cl=0.95|p=0	2	3.1748305077265169	40.375771629421202	0.0014341449605160359	59.96153846153846,31.448275862068964	13.393874090046861	Inf
+pairwise.ozone.8v9|2s|greater|ve=1|mu=0|cl=0.95|p=0	2	3.2570426237444225	53	0.00098323395638632064	59.96153846153846,31.448275862068964	13.857477768421235	Inf
 SCIPY-SECTION
 scipy.uneqvar.a|2s|two.sided|ve=0	-0.686495127355726265	-	0.53619490753126686	-	-
 scipy.uneqvar.b|2s|two.sided|ve=0	-0.210866331595072315	-	0.84354139131608252	-	-

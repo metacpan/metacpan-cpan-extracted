@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# read_table(..., 'output.type' => 'aoa'): the header row, then one array per
+# read_table(..., 'output_type' => 'aoa'): the header row, then one array per
 # data row, every row in file column order.
 #
 # There is no R or SciPy suite to take these from. R's read.table always gives
@@ -53,7 +53,7 @@ sub slurp_text {
 	my @csv = sort grep { -s $_ } glob('t/*.csv');
 	my $compared = 0;
 	for my $f (@csv) {
-		my $aoa = read_table($f, 'output.type' => 'aoa');
+		my $aoa = read_table($f, 'output_type' => 'aoa');
 		my @hdr = @{ $aoa->[0] };
 		my %seen;
 		next if grep { $seen{$_}++ } @hdr;
@@ -72,21 +72,21 @@ sub slurp_text {
 # The header row is the header read_table settles on, whatever made it.
 {
 	my $f = fixture("1,2\n3,4\n");
-	is_deeply( read_table($f, 'output.type' => 'aoa', header => 0),
+	is_deeply( read_table($f, 'output_type' => 'aoa', header => 0),
 		[ [qw(V1 V2)], [1, 2], [3, 4] ],
 		'header => 0: the columns are named V1, V2, as in R' );
-	is_deeply( read_table($f, 'output.type' => 'aoa', header => 0, 'col.names' => [qw(p q)]),
+	is_deeply( read_table($f, 'output_type' => 'aoa', header => 0, 'col_names' => [qw(p q)]),
 		[ [qw(p q)], [1, 2], [3, 4] ],
-		'header => 0 with col.names: those names head the table' );
+		'header => 0 with col_names: those names head the table' );
 	my $r = fixture("x,y\nA,1,2\nB,3,4\n");
-	is_deeply( read_table($r, 'output.type' => 'aoa', 'auto.row.names' => 1),
+	is_deeply( read_table($r, 'output_type' => 'aoa', 'auto_row_names' => 1),
 		[ [qw(row_name x y)], [qw(A 1 2)], [qw(B 3 4)] ],
-		'auto.row.names: the synthesized name leads the header' );
+		'auto_row_names: the synthesized name leads the header' );
 	my $e = fixture(",x\nA,1\n");
-	is_deeply( read_table($e, 'output.type' => 'aoa'), [ [qw(row_name x)], [qw(A 1)] ],
+	is_deeply( read_table($e, 'output_type' => 'aoa'), [ [qw(row_name x)], [qw(A 1)] ],
 		'an empty first header cell is named row_name, as in every other shape' );
 	my $c = fixture("# a\tb\n1\t2\n", '.tsv');
-	is_deeply( read_table($c, 'output.type' => 'aoa'), [ [qw(a b)], [1, 2] ],
+	is_deeply( read_table($c, 'output_type' => 'aoa'), [ [qw(a b)], [1, 2] ],
 		'a commented-out header is recovered' );
 }
 
@@ -94,7 +94,7 @@ sub slurp_text {
 # the aoa.
 {
 	my $f = fixture("id,v\na,1\nb,2\nc,3\n");
-	is_deeply( read_table($f, 'output.type' => 'aoa',
+	is_deeply( read_table($f, 'output_type' => 'aoa',
 			filter => { v => sub { $_ *= 10; $_ != 20 } }),
 		[ [qw(id v)], [ 'a', 10 ], [ 'c', 30 ] ],
 		'filter: rows it rejects are dropped and its rewrites are kept' );
@@ -103,7 +103,7 @@ sub slurp_text {
 # Empty input.
 {
 	my $f = fixture('');
-	is_deeply( read_table($f, 'output.type' => 'aoa'), [],
+	is_deeply( read_table($f, 'output_type' => 'aoa'), [],
 		'an empty file is an empty aoa, as it is an empty aoh' );
 }
 
@@ -116,24 +116,24 @@ sub slurp_text {
 		my ($ext, $text) = @$case;
 		my $in  = fixture($text, $ext);
 		my $out = File::Spec->catfile($dir, 'out' . $seq++ . $ext);
-		write_table(read_table($in, 'output.type' => 'aoa'), $out, quiet => 1);
+		write_table(read_table($in, 'output_type' => 'aoa'), $out, quiet => 1);
 		is( slurp_text($out), $text, "$ext round trip through an aoa is line for line" );
 	}
 	my @aoa = ([qw(taxid species)], [ '9606', 'Homo sapiens' ], [ '10090', undef ]);
 	my $x = File::Spec->catfile($dir, 'rt.xlsx');
 	write_table(\@aoa, $x, quiet => 1);
-	is_deeply( read_table($x, 'output.type' => 'aoa'), \@aoa, '.xlsx round trip through an aoa' );
+	is_deeply( read_table($x, 'output_type' => 'aoa'), \@aoa, '.xlsx round trip through an aoa' );
 }
 
 # Argument checking.
 {
 	my $f = fixture("a,b\n1,2\n");
-	throws_ok { read_table($f, 'output.type' => 'aoa', 'row.names' => 'a') }
-		qr/^read_table: 'row\.names' has no meaning for output\.type "aoa"; the row names column is read as an ordinary column$/,
-		'row.names with aoa dies';
-	throws_ok { read_table($f, 'output.type' => 'matrix') }
-		qr/^read_table: output\.type "matrix" isn't allowed \(aoa, aoh, hoa, hoh\)$/,
-		'an unknown output.type lists aoa among the allowed ones';
+	throws_ok { read_table($f, 'output_type' => 'aoa', 'row_names' => 'a') }
+		qr/^read_table: 'row_names' has no meaning for output_type "aoa"; the row names column is read as an ordinary column$/,
+		'row_names with aoa dies';
+	throws_ok { read_table($f, 'output_type' => 'matrix') }
+		qr/^read_table: output_type "matrix" isn't allowed \(aoa, aoh, hoa, hoh\)$/,
+		'an unknown output_type lists aoa among the allowed ones';
 }
 
 done_testing;

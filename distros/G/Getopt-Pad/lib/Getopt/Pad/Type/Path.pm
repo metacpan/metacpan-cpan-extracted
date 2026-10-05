@@ -6,7 +6,7 @@ use Getopt::Pad::Type;
 class Getopt::Pad::Type::Path :isa(Getopt::Pad::Type) :abstract {
 	use constant SPEC_KEYS => ['mustExist', 'createPathIfMissing'];
 
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	field $mustExist           :param :reader = 0;
 	field $createPathIfMissing :param :reader = 0;

@@ -2197,6 +2197,11 @@ network=[
   "98.87.95.44",
 ]
 
+[apocsys]
+## See-Also: https://apcosys.net
+agents="ApcosysBot"
+domain=".apcosys.cc"
+
 [applebot]
 ## Date: 2026-09-25
 ## About: https://support.apple.com/en-gb/119829
@@ -2246,6 +2251,11 @@ network=[
   "204.62.246.0/23",
   "204.62.248.0/23",
 ]
+
+[archive-si]
+## About: http://arhiv.nuk.uni-lj.si/kontakt
+agents="arhiv.nuk.uni-lj.si"
+domain=".nuk.uni-lj.si"
 
 [archivo-pt]
 agents="Arquivo-web-crawler"
@@ -2348,6 +2358,11 @@ network=[
   "67.199.248.0/24",
   "199.91.151.0/24",
 ]
+
+[bitsightbot]
+## About: https://www.bitsight.com
+agents="BitSightBot"
+network="85.117.225.0/24"
 
 [brightbot]
 ## Date: 2026-08-14
@@ -2741,6 +2756,11 @@ network=[
   "18.225.238.228/32",
   "18.227.226.255/32",
 ]
+
+[clueweb]
+## About: https://boston.lti.cs.cmu.edu/CMU-ClueWeb-Crawler/
+agents="ClueWeb-Crawler"
+domain=".lti.cs.cmu.edu"
 
 [coccocbot]
 ## About: https://help.coccoc.com/search-engine
@@ -3805,6 +3825,15 @@ network=[
   "74.179.232.116/32",
   "74.242.194.48/32",
   "98.70.219.37/32",
+]
+
+[emailsherlock]
+## About: https://www.hostsherlock.com/bot
+agents=[ "EmailSherlock", "HostSherlock" ]
+domain=".emailsherlock.com"
+network=[
+  "188.34.187.171",
+  "188.245.164.12"
 ]
 
 [embedly]
@@ -6090,6 +6119,25 @@ network=[
 agents="ev-crawler"
 domain=".headline.com"
 
+[hubspot]
+## See-Also: https://www.hubspot.com
+agents="HubSpot Crawler"
+domain=".hubspot.com"
+network=[ "216.157.40.0/21" ]
+
+[hydrozen]
+## Date: 2026-09-28
+## About: https://docs.hydrozen.io/overview/misc/user-agent-and-ip-list
+## Network: https://hydrozen.io/config/iplist.json
+
+agents="Hydrozen.io"
+network=[
+  "69.197.187.216/32",
+  "3.109.154.148/32",
+  "34.229.178.9/32"
+]
+
+
 [ibou]
 ## Date: 2026-09-25
 ## About: See https://ibou.io/iboubot.html
@@ -6237,6 +6285,17 @@ network=[
 
 agents="IonCrawl"
 domain=".1and1.org"
+
+[isonsearchbot]
+## Date: 2026-10-01
+## About: https://search.isonai.com/bot
+## Network: https://search.isonai.com/bot/ips.json
+
+agents="IsonSearchBot"
+network=[
+  "103.121.17.220/32",
+  "103.156.115.103/32"
+]
 
 [justsearchuk]
 ## Date: 2026-09-16
@@ -6392,6 +6451,11 @@ domain=".medllysupplies.org"
 network=[
   "138.197.114.6",
 ]
+
+[meistackbot]
+## About: https://meiwood.com/bot/
+agents="MeistackBot"
+domain=".meiwood.com"
 
 [metajob]
 ## Date: 2026-09-04
@@ -7774,6 +7838,11 @@ network=[
 agents="Shap-User"
 network=[]
 
+[sitegraphbot]
+## About: https://sitegraph.tech/bot
+agents="SiteGraphBot"
+domain=".anantatools.com"
+
 [siteimprove]
 ## Date: 2026-08-23
 ## About: https://help.siteimprove.com/support/solutions/articles/80000448553-what-ip-addresses-and-user-agents-are-used-by-siteimprove-
@@ -7854,6 +7923,13 @@ network=[
 agents="StractBot"
 domain=".stract.com"
 
+[syntoradatabot]
+## Date: 2026-09-28
+## About: https://syntoradata.com/bot
+agents="SyntoraDataBot"
+domain=".syntoradata.com"
+network=[ "162.55.129.55" ]
+
 [taktikal]
 ## About: https://taktikal.fasttvltd.com/bot
 
@@ -7909,6 +7985,18 @@ network=[
 agents="UmaiBot"
 domain=".entelijan.com"
 
+[uptimebot]
+## Date: 2026-09-28
+## About: https://uptime.bot/hello/
+## Seel-Also: https://uptimebot.zendesk.com/hc/en-us/articles/360007447957-What-are-UptimeBot-IPs
+
+agents="UptimeBot"
+network=[
+  "18.233.58.241",
+  "52.47.146.163",
+  "52.77.36.31"
+]
+
 [vexel]
 ## About: https://vexel.cc/bot-info
 
@@ -7956,6 +8044,11 @@ network=[
   "100.49.117.77",
   "100.50.17.159",
 ]
+
+[vuhuvbot]
+## About: https://vuhuv.com/bot.html
+agents=[ "vuhuvBot", "vuhuvRBT" ]
+domain=[ ".vuhuv.com", ".vuhuv.net" ]
 
 [webarchiv-cz]
 ## About: http://webarchiv.cz/kontakty
@@ -8107,4 +8200,3 @@ domain=".search.you.com"
 network=[
   "68.67.112.0/24",
 ]
-

@@ -5,6 +5,7 @@ use Test2::V0;
 
 use Unblock::HTTP3::Capsule;
 use Unblock::HTTP3::Capsule::Parser;
+use Unblock::HTTP3::Connection;
 
 my $capsule = Unblock::HTTP3::Capsule->new(
     type  => 42,
@@ -182,6 +183,34 @@ is($large_parsed->type, '16384',
 is($large_parsed->value, 'x',
     'Capsule value follows a fragmented type and length');
 
+
 $split_header->finish;
+
+is(
+    Unblock::HTTP3::Connection::_capsule_protocol_response_error(
+        200,
+        [ [ 'capsule-protocol', '?1' ] ],
+    ),
+    undef,
+    'Capsule-Protocol is valid on a successful response',
+);
+
+like(
+    Unblock::HTTP3::Connection::_capsule_protocol_response_error(
+        404,
+        [ [ 'Capsule-Protocol', '?1' ] ],
+    ),
+    qr/only valid on a successful HTTP\/3 response/,
+    'Capsule-Protocol is rejected on a non-successful HTTP/3 response',
+);
+
+is(
+    Unblock::HTTP3::Connection::_capsule_protocol_response_error(
+        404,
+        [ [ 'x-test', 'value' ] ],
+    ),
+    undef,
+    'ordinary non-successful responses are unaffected',
+);
 
 done_testing;

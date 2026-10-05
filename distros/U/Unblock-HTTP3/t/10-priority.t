@@ -3,7 +3,8 @@ use warnings;
 
 use Test2::V0;
 
-use Unblock::HTTP3::Request;
+use Uniform::HTTP::Request;
+use Unblock::HTTP3::Transaction;
 use Unblock::HTTP3::_Native;
 
 is(
@@ -18,98 +19,28 @@ is(
     'empty Priority value uses RFC 9218 defaults',
 );
 
-my $default = Unblock::HTTP3::Request->new(
-    method    => 'GET',
-    target    => '/',
-    scheme    => 'https',
-    authority => 'example.com',
-);
-
 is(
-    $default->priority,
+    Unblock::HTTP3::Transaction::_parse_priority_field(undef),
     {
         urgency     => 3,
         incremental => 0,
     },
-    'Request priority defaults to urgency 3 and non-incremental',
-);
-
-is($default->header('priority'), undef,
-    'default priority does not invent a Priority field');
-
-my $request = Unblock::HTTP3::Request->new(
-    method    => 'GET',
-    target    => '/priority',
-    scheme    => 'https',
-    authority => 'example.com',
-    priority  => {
-        urgency     => 1,
-        incremental => 1,
-    },
-);
-
-is($request->header('priority'), 'u=1, i',
-    'Request priority constructor writes normal Priority field');
-
-is(
-    $request->priority,
-    {
-        urgency     => 1,
-        incremental => 1,
-    },
-    'Request priority reads the field through libnghttp3',
-);
-
-$request->priority(urgency => 6);
-
-is(
-    $request->priority,
-    {
-        urgency     => 6,
-        incremental => 1,
-    },
-    'partial Request priority update preserves other value',
-);
-
-is($request->header('priority'), 'u=6, i',
-    'partial Request priority update rewrites canonical field');
-
-$request->priority(incremental => 0);
-
-is($request->header('priority'), 'u=6',
-    'false incremental flag is omitted from canonical field');
-
-my $raw = Unblock::HTTP3::Request->new(
-    method    => 'GET',
-    target    => '/raw',
-    scheme    => 'https',
-    authority => 'example.com',
-    headers   => [
-        [ Priority => 'u=5, i' ],
-    ],
+    'missing Priority field uses RFC 9218 defaults',
 );
 
 is(
-    $raw->priority,
+    Unblock::HTTP3::Transaction::_parse_priority_field('u=5, i'),
     {
         urgency     => 5,
         incremental => 1,
     },
-    'Request priority inspects a manually supplied Priority field',
-);
-
-my $malformed = Unblock::HTTP3::Request->new(
-    method    => 'GET',
-    target    => '/malformed',
-    scheme    => 'https',
-    authority => 'example.com',
-    headers   => [
-        [ Priority => 'not a structured priority value' ],
-    ],
+    'Transaction parses a normal Uniform Priority field',
 );
 
 is(
-    $malformed->priority,
+    Unblock::HTTP3::Transaction::_parse_priority_field(
+        'not a structured priority value',
+    ),
     {
         urgency     => 3,
         incremental => 0,
@@ -117,37 +48,84 @@ is(
     'malformed Priority field falls back to RFC defaults',
 );
 
+is(
+    Unblock::HTTP3::Transaction::_priority_field({
+        urgency     => 1,
+        incremental => 1,
+    }),
+    'u=1, i',
+    'Transaction formats incremental priority for PRIORITY_UPDATE',
+);
+
+is(
+    Unblock::HTTP3::Transaction::_priority_field({
+        urgency     => 6,
+        incremental => 0,
+    }),
+    'u=6',
+    'Transaction omits false incremental flag',
+);
+
+is(
+    Unblock::HTTP3::Transaction::_priority_from_args(
+        {
+            urgency     => 1,
+            incremental => 1,
+        },
+        urgency => 6,
+    ),
+    {
+        urgency     => 6,
+        incremental => 1,
+    },
+    'partial Transaction priority update preserves the other value',
+);
+
 like(
-    dies { $request->priority(urgency => 8) },
+    dies {
+        Unblock::HTTP3::Transaction::_priority_from_args(
+            {},
+            urgency => 8,
+        );
+    },
     qr/urgency must be an integer from 0 through 7/,
     'urgency above 7 is rejected',
 );
 
 like(
-    dies { $request->priority(incremental => 2) },
+    dies {
+        Unblock::HTTP3::Transaction::_priority_from_args(
+            {},
+            incremental => 2,
+        );
+    },
     qr/incremental must be 0 or 1/,
     'incremental value must be boolean',
 );
 
 like(
-    dies { $request->priority(weight => 10) },
+    dies {
+        Unblock::HTTP3::Transaction::_priority_from_args(
+            {},
+            weight => 10,
+        );
+    },
     qr/unknown priority option: weight/,
     'unknown priority option is rejected',
 );
 
-like(
-    dies {
-        Unblock::HTTP3::Request->new(
-            method    => 'GET',
-            target    => '/bad-priority',
-            scheme    => 'https',
-            authority => 'example.com',
-            priority  => 'high',
-        );
-    },
-    qr/priority must be a hash reference/,
-    'constructor priority must be a hash reference',
+my $request = Uniform::HTTP::Request->new(
+    method    => 'GET',
+    target    => '/priority',
+    scheme    => 'https',
+    authority => 'example.com',
+    headers   => [
+        [ Priority => 'u=1, i' ],
+    ],
 );
+
+is($request->header('priority'), 'u=1, i',
+    'initial priority is represented by the canonical Uniform header');
 
 my $native_client = Unblock::HTTP3::_Native->client;
 my $native_server = Unblock::HTTP3::_Native->server;

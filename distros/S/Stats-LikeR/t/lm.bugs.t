@@ -78,7 +78,7 @@ my %line = (x => [1, 2, 3, 4], 'y' => [3, 5, 7, 9]);
 		'long column name does not truncate / collapse the model';
 	ok exists $res->{coefficients}{$long}, 'long-named term survived in coefficients';
 	is_approx $res->{coefficients}{$long}, 2.0, 'long-named coefficient is correct', 1e-6;
-	is_approx $res->{'r.squared'}, 1.0, 'perfect fit on the long-named predictor', 1e-9;
+	is_approx $res->{'r_squared'}, 1.0, 'perfect fit on the long-named predictor', 1e-9;
 }
 
 # BUG: the `.`-expansion buffer (2048) silently dropped expanded terms. With
@@ -108,7 +108,7 @@ my %line = (x => [1, 2, 3, 4], 'y' => [3, 5, 7, 9]);
 	is ref($res), 'HASH', 'lm returns a hash ref';
 	is_approx $res->{coefficients}{Intercept}, 1.0, 'intercept', 1e-9;
 	is_approx $res->{coefficients}{x},         2.0, 'slope',     1e-9;
-	is_approx $res->{'r.squared'},             1.0, 'R^2 = 1 for an exact line', 1e-9;
+	is_approx $res->{'r_squared'},             1.0, 'R^2 = 1 for an exact line', 1e-9;
 }
 
 # Leak guards (SV-level; see the oneway_test note about C-buffer leaks).

@@ -54,9 +54,9 @@ unlike($@, qr/invalid JSON/,
 # --- deep in parse() but never reaching the caller (cf. the C            --
 # --- duplicate-h= lesson in commit 66bd3e6).                             --
 
-my $keyfile1 = '../keys/sel1._domainkey.test1.dkim2.com.pem';
-my $keyfile2 = '../keys/sel1._domainkey.test2.dkim2.com.pem';
-plan skip_all => 'shared ../keys not available' unless -e $keyfile1 && -e $keyfile2;
+my $keyfile1 = 't/data/keys/sel1._domainkey.test1.dkim2.com.pem';
+my $keyfile2 = 't/data/keys/sel1._domainkey.test2.dkim2.com.pem';
+plan skip_all => 't/data/keys not available' unless -e $keyfile1 && -e $keyfile2;
 
 my $orig = "From: sender\@test1.dkim2.com\r\n"
          . "To: rcpt\@test2.dkim2.com\r\n"

@@ -5,7 +5,7 @@ use Socket qw(inet_aton pack_sockaddr_in);
 use Test2::V0;
 
 use Unblock::HTTP3::Connection;
-use Unblock::HTTP3::Request;
+use Uniform::HTTP::Request;
 use Unblock::HTTP3::_Native;
 use Net::QUIC;
 use Net::QUIC::Endpoint;
@@ -94,7 +94,7 @@ like(
     'native constructor also guards HTTP/3 setting bounds',
 );
 
-my $connect = Unblock::HTTP3::Request->new(
+my $connect = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     target    => 'example.com:443',
     authority => 'example.com:443',

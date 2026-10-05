@@ -13,7 +13,7 @@ use vars qw($AUTHORITY $VERSION);
 use warnings;
 
 $AUTHORITY='cpan:ASPEER';
-$VERSION='0.001';
+$VERSION='0.003';
 
 1;
 

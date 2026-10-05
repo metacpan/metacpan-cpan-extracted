@@ -37,7 +37,7 @@ use Markdown::Publish::Constant;
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='1.004';
+$VERSION='1.005';
 
 
 #  Supported publication actions
@@ -379,6 +379,106 @@ sub copy_markdown_tree {
 }
 
 
+sub rewrite_source_url {
+
+    my ($self, $source_fn, $target_fn, $url)=@_;
+    return $url unless $url=~m{^\.\./};
+    my ($path, $suffix)=$url=~/^([^?#]+)(.*)$/;
+    return $url unless defined($path) && $path=~/\.md$/;
+
+    my (undef, $source_dn)=File::Spec->splitpath($source_fn);
+    my $candidate_fn=File::Spec->catfile($source_dn, split(m{/}, $path));
+    return $url if -l $candidate_fn || !-f $candidate_fn;
+    my $repository_dn=abs_path('.');
+    my $resolved_fn=abs_path($candidate_fn);
+    return $url unless defined($resolved_fn);
+    my $relative_fn=File::Spec->abs2rel($resolved_fn, $repository_dn);
+    $relative_fn=~s{\\}{/}g;
+    return $url unless $relative_fn=~m{^(?:lib|bin)/};
+
+    my (undef, $target_dn)=File::Spec->splitpath($target_fn);
+    $target_dn='.' unless length($target_dn);
+    my $rewritten=File::Spec->abs2rel($relative_fn, $target_dn);
+    $rewritten=~s{\\}{/}g;
+    return $rewritten.$suffix;
+
+}
+
+
+sub rewrite_link_segment {
+
+    my ($self, $source_fn, $target_fn, $text)=@_;
+    $text=~s{
+        (\]\(\s*<?)
+        (\.\./[^\s)>]+)
+        (>?)
+        (?=\s|\))
+    }{
+        my ($prefix, $url, $close)=($1, $2, $3);
+        $prefix.$self->rewrite_source_url($source_fn, $target_fn, $url).$close;
+    }egx;
+    $text=~s{
+        (^\ {0,3}\[[^\]\n]+\]:\s*<?)
+        (\.\./[^\s>]+)
+        (>?)
+        (?=\s|$)
+    }{
+        my ($prefix, $url, $close)=($1, $2, $3);
+        $prefix.$self->rewrite_source_url($source_fn, $target_fn, $url).$close;
+    }egmx;
+    return $text;
+
+}
+
+
+sub rewrite_link_line {
+
+    my ($self, $source_fn, $target_fn, $line)=@_;
+    my ($output, $offset)=('', 0);
+    while (1) {
+        pos($line)=$offset;
+        last unless $line=~/(`+)/g;
+        my ($marker, $start, $after)=($1, $-[0], $+[0]);
+        my $end=index($line, $marker, $after);
+        last if $end < 0;
+        $output.=$self->rewrite_link_segment($source_fn, $target_fn,
+            substr($line, $offset, $start - $offset));
+        my $length=$end + length($marker) - $start;
+        $output.=substr($line, $start, $length);
+        $offset=$start + $length;
+    }
+    $output.=$self->rewrite_link_segment($source_fn, $target_fn,
+        substr($line, $offset));
+    return $output;
+
+}
+
+
+sub rewrite_source_links {
+
+    #  Source-relative links remain useful while browsing the repository. Rebase
+    #  only mirrored lib/bin Markdown targets for the disposable document tree.
+    #
+    my ($self, $source_fn, $target_fn, $markdown)=@_;
+    my ($output, $fence, $length)=('', '', 0);
+    foreach my $line (split(/(?<=\n)/, $markdown)) {
+        if (!$fence && $line=~/^ {0,3}(`{3,}|~{3,})/) {
+            $fence=substr($1, 0, 1);
+            $length=length($1);
+        }
+        elsif ($fence && $line=~/^ {0,3}\Q$fence\E{$length,}\s*$/) {
+            $fence='';
+        }
+        elsif (!$fence) {
+            $line=$self->rewrite_link_line($source_fn, $target_fn, $line);
+        }
+        $output.=$line;
+    }
+    return $output;
+
+}
+
+
 sub promote_home {
 
     #  Keep the first page's original path available for authored links.
@@ -431,20 +531,26 @@ sub prepare_docs {
                 my $navigation_page=$source_dn eq 'lib' || $source_dn eq 'bin' ||
                     $target_fn!~m{[/\\]};
 
-                if ($source_dn eq 'doc' && $navigation_page) {
+                if ($source_dn eq 'doc') {
                     open(my $input_fh, '<', $fn) || die "unable to read $fn: $!\n";
                     local $/=undef;
                     my $markdown=<$input_fh>;
                     close($input_fh) || die "unable to close $fn: $!\n";
-                    my $split_hr=$self->split($target_fn, $markdown);
-                    if (keys(%{$split_hr}) > 1) {
-                        foreach my $page (@{$self->{'page_order'}}) {
-                            my $page_fn=File::Spec->catfile($docs_dn, $page);
-                            $self->write_file($page_fn, $split_hr->{$page});
-                            push(@pages, $page);
+                    $markdown=$self->rewrite_source_links($fn, $target_fn, $markdown);
+                    if ($navigation_page) {
+                        my $split_hr=$self->split($target_fn, $markdown);
+                        if (keys(%{$split_hr}) > 1) {
+                            foreach my $page (@{$self->{'page_order'}}) {
+                                my $page_fn=File::Spec->catfile($docs_dn, $page);
+                                $self->write_file($page_fn, $split_hr->{$page});
+                                push(@pages, $page);
+                            }
+                            return;
                         }
-                        return;
                     }
+                    $self->write_file($output_fn, $markdown);
+                    push(@pages, $target_fn) if $navigation_page;
+                    return;
                 }
                 copy($fn, $output_fn) || die "unable to copy $fn: $!\n";
                 push(@pages, $target_fn) if $navigation_page;
@@ -971,11 +1077,15 @@ MakeMaker targets.
 
 An existing `doc/` directory is the default publication boundary. When it is
 assembled, Markdown beneath `lib/` and `bin/` is mirrored under those paths in
-the temporary site documents. A guide can link to `lib/Example/Module.pm.md`.
+the temporary site documents. Write links relative to the authored document;
+for example, `doc/guide.md` can link to `../lib/Example/Module.pm.md`.
+Assembly rebases existing sidecar links to their mirrored paths, while existing
+publication-root links such as `lib/Example/Module.pm.md` remain supported.
 Mirrored pages are available through links but are not added to generated
 navigation. When `doc/` is absent, sidecars become the default source pages.
-Set `sources` explicitly to include other directories. Source files are never rewritten;
-assembly and engine-specific Markdown adjustments happen in temporary trees.
+Set `sources` explicitly to include other directories. Source files are never
+rewritten; assembly and engine-specific Markdown adjustments happen in
+temporary trees.
 Nested Markdown under `doc/` remains available for links but does not appear
 in generated navigation. When no `index.md` was authored, the first top-level
 page becomes the home page in each engine; its original URL remains available.
@@ -1174,11 +1284,15 @@ MakeMaker targets.
 
 An existing C<doc/> directory is the default publication boundary. When it is
 assembled, Markdown beneath C<lib/> and C<bin/> is mirrored under those paths in
-the temporary site documents. A guide can link to C<lib/Example/Module.pm.md>.
+the temporary site documents. Write links relative to the authored document;
+for example, C<doc/guide.md> can link to C<../lib/Example/Module.pm.md>.
+Assembly rebases existing sidecar links to their mirrored paths, while existing
+publication-root links such as C<lib/Example/Module.pm.md> remain supported.
 Mirrored pages are available through links but are not added to generated
 navigation. When C<doc/> is absent, sidecars become the default source pages.
-Set C<sources> explicitly to include other directories. Source files are never rewritten;
-assembly and engine-specific Markdown adjustments happen in temporary trees.
+Set C<sources> explicitly to include other directories. Source files are never
+rewritten; assembly and engine-specific Markdown adjustments happen in
+temporary trees.
 Nested Markdown under C<doc/> remains available for links but does not appear
 in generated navigation. When no C<index.md> was authored, the first top-level
 page becomes the home page in each engine; its original URL remains available.

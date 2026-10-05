@@ -1,0 +1,521 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Imager::File::SIXEL::Examples - examples for reading and writing SIXEL
+images with Imager
+
+=head1 DESCRIPTION
+
+Task-oriented examples for L<Imager::File::SIXEL>, with figures that
+show what each write option does to the image. The reference
+documentation of every option is in L<Imager::File::SIXEL>; how the
+SIXEL format is read and written in detail is in
+L<Imager::File::SIXEL::Format>. Complete programs are listed in
+L<Imager::File::SIXEL/EXAMPLE PROGRAMS>.
+
+The snippets on this page assume that these lines come first:
+
+    use Imager;
+    use Imager::File::SIXEL;
+
+C<$img> stands for any Imager image, for example one read with
+C<< Imager->new(file => 'photo.png') >>. Each snippet starts with a
+fresh C<$img>: the C<sixel_> options of one snippet stay on the image
+and would apply to the next one, see
+L</Write the same image again with other settings (options are remembered)>.
+
+The figures show what each setting does. They use two test pictures: a
+sunset, and for transparency a picture with transparent areas. The
+panel labeled C<original> shows the test picture as it is. Every other
+panel shows the test picture written with the options in its label and
+read back, which are the pixels a terminal receives; the label also
+gives the size of the SIXEL data. A list in square brackets in a label
+describes the colors passed, instead of quoting them. The figure for
+the pixel aspect ratio differs; its section explains how. The panels
+are enlarged to twice their size without smoothing, so that single
+pixels are visible. The script F<tools/make-images> in the distribution
+creates the figures.
+
+The figures appear in the HTML versions of this documentation, such
+as on MetaCPAN and GitHub. In a terminal, C<perldoc> shows the name of
+the figure file instead; the files are in the F<images> directory of
+the distribution.
+
+=head1 SHOWING AND SAVING IMAGES
+
+=head2 Show an image in the terminal
+
+    use Imager;
+    use Imager::File::SIXEL;
+
+    my $img = Imager->new(file => 'photo.jpg')
+      or die Imager->errstr;
+
+    # Shrink large images to at most 800 x 600 pixels,
+    # keeping the aspect ratio.
+    if ($img->getwidth > 800 || $img->getheight > 600) {
+      $img = $img->scale(xpixels => 800, ypixels => 600, type => 'min');
+    }
+
+    $img->write(fh => \*STDOUT, type => 'sixel')
+      or die $img->errstr;
+    print "\n";
+
+The terminal draws the image at the cursor position. The final
+C<print "\n"> makes sure that the next output, such as the shell
+prompt, starts on the line below the image. With C<fh>, Imager
+writes through the handle's I/O layers and buffer, like C<print>, so
+text printed before the image appears before it. See
+L<Imager::File::SIXEL/DISPLAYING IMAGES IN A TERMINAL> for more.
+
+=head2 Encode into a string
+
+    my $sixel = '';
+    $img->write(data => \$sixel, type => 'sixel')
+      or die $img->errstr;
+
+    binmode STDOUT, ':raw';    # see DISPLAYING IMAGES IN A TERMINAL in Imager::File::SIXEL
+    print $sixel;
+
+C<$sixel> holds plain ASCII text. Encoding into a string is useful to
+send the data somewhere else, to cache it, or to print it at a chosen
+moment, as in L<Imager::File::SIXEL/ANIMATION>.
+
+To hand the data to your own code piece by piece instead, use a
+C<callback>. Your callback receives each chunk and must return true;
+a false return makes the write fail:
+
+    $img->write(type => 'sixel', callback => sub {
+      my ($chunk) = @_;
+      $socket->print($chunk);    # any output of your choice
+    }) or die $img->errstr;
+
+=head2 Save a SIXEL file and read it back
+
+    $img->write(file => 'picture.six')
+      or die $img->errstr;
+
+    my $copy = Imager->new(file => 'picture.six')
+      or die Imager->errstr;
+
+Neither call needs a C<type> option: the extension F<.six> (or
+F<.sixel>) selects SIXEL for writing, and the content is recognized
+when reading. To show the file later, print it to the terminal, for
+example with C<cat picture.six>.
+
+=head2 Convert a SIXEL file to PNG
+
+    my $img = Imager->new(file => 'picture.six')
+      or die Imager->errstr;
+    $img->write(file => 'picture.png')
+      or die $img->errstr;
+
+The PNG has the same pixels as the SIXEL image. If the SIXEL image has
+a transparent background, the PNG has an alpha channel. See
+L<Imager::File::SIXEL::Format/The decoded image>.
+
+=head2 Write several images into one file (C<write_multi>)
+
+    Imager->write_multi({ file => 'slides.six', type => 'sixel' }, @images)
+      or die Imager->errstr;
+
+The images are written one after another, each as a complete SIXEL
+image, and nothing is written between them. Printing the file shows
+them below one another. Reading the file with C<read_multi()> returns
+the images again.
+
+The palette is not shared between the images: each image gets its own
+palette, computed from that image, unless you pass
+L<C<colors>|Imager::File::SIXEL/colors> or C<< sixel_palette =>
+'webmap' >>, which give all images the same one. How the options apply
+to the individual images is described in L<Imager::File::SIXEL/Write
+options are stored on the image>.
+
+=head1 READING SIXEL DATA
+
+=head2 Read SIXEL data from a string or a pipe
+
+    # From a string: without a type, the data must start with ESC P.
+    my $img = Imager->new(data => $sixel)
+      or die Imager->errstr;
+
+    # From standard input, for example: img2sixel photo.png | perl show.pl
+    my $piped = Imager->new(fh => \*STDIN, type => 'sixel')
+      or die Imager->errstr;
+
+Pass C<< type => 'sixel' >> whenever the data may start with something
+other than C<ESC P>, for example with text; see
+L<Imager::File::SIXEL/Loading the module>.
+
+=head2 Read one image of a file that holds several
+
+    my $third = Imager->new(file => 'recording.six', type => 'sixel', page => 2)
+      or die Imager->errstr;
+
+L<C<page>|Imager::File::SIXEL/page> counts from 0, so C<< page => 2 >>
+reads the third SIXEL image. Text and other terminal control sequences
+between the images are skipped. If the data holds fewer than three
+images, the read fails with C<SIXEL page 2 not found>.
+
+=head2 Read every image of a file
+
+    my @images = Imager->read_multi(file => 'recording.six', type => 'sixel')
+      or die Imager->errstr;
+
+    for my $n (0 .. $#images) {
+      $images[$n]->write(file => sprintf('frame-%03d.png', $n))
+        or die $images[$n]->errstr;
+    }
+
+C<read_multi()> returns the images in the order in which they appear.
+It fails as a whole, returning an empty list, if any image cannot be
+decoded.
+
+=head2 Read data that is cut off (truncated)
+
+    my $img = Imager->new(file => 'partial.six', type => 'sixel',
+                          allow_incomplete => 1)
+      or die Imager->errstr;
+
+    if ($img->tags(name => 'i_incomplete')) {
+      warn "The image is incomplete.\n";
+    }
+
+Without L<C<allow_incomplete>|Imager::File::SIXEL/allow_incomplete>, an
+image that ends before its terminating C<ESC \> makes the read fail
+with C<premature end of SIXEL data>. With it, you get the part that was
+transferred, and the tag C<i_incomplete> is set to 1.
+
+=head2 Read untrusted data safely (limit memory and time)
+
+    Imager->set_file_limits(width => 4096, height => 4096,
+                            bytes => 64 * 1024 * 1024);
+
+    my $file = shift;    # a file from an untrusted source
+    die "Input too large\n" if -s $file > 10 * 1024 * 1024;
+    my $img = Imager->new(file => $file, type => 'sixel')
+      or die Imager->errstr;
+
+A few bytes of SIXEL data can describe a very large image, and the same
+pixels can be painted over many times. Before you decode data from
+untrusted sources, limit the image size with
+C<< Imager->set_file_limits >>, and check the size of the input
+yourself. See L<Imager::File::SIXEL::Format/Resource limits>.
+
+=head1 CHANGING THE LOOK OF THE OUTPUT
+
+=head2 Make the SIXEL data smaller
+
+The size of the SIXEL data decides how long the terminal takes to
+receive and draw an image. Ways to make it smaller:
+
+=over
+
+=item *
+
+Scale the image down to the size at which it should appear, with
+C<< $img->scale(...) >>; see L</Show an image in the terminal>. The
+data shrinks roughly with the number of pixels.
+
+=item *
+
+Use fewer colors with
+L<C<sixel_max_colors>|Imager::File::SIXEL/sixel_max_colors>.
+
+=item *
+
+Turn dithering off with C<< sixel_dither => 'none' >>, at the cost of
+visible bands in gradients; see
+L<C<sixel_dither>|Imager::File::SIXEL/sixel_dither>.
+
+=item *
+
+Combine C<< sixel_dither => 'none' >> with the webmap palette,
+C<< sixel_palette => 'webmap' >>. On the test picture this gives
+about a fifth of the SIXEL data of the default settings, but it
+changes the colors more than the other settings; see
+L<C<sixel_palette>|Imager::File::SIXEL/sixel_palette>.
+
+=back
+
+How much each setting saves depends on the image. The labels of the
+figures in the next sections give the data size for the test picture,
+and L<Imager::File::SIXEL/PERFORMANCE> gives sizes for a photograph.
+
+=head2 Reduce the number of colors (C<sixel_max_colors>)
+
+    $img->write(file => 'small.six', sixel_max_colors => 16)
+      or die $img->errstr;
+
+L<C<sixel_max_colors>|Imager::File::SIXEL/sixel_max_colors> limits the
+palette that the encoder computes for the image. Fewer colors give
+smaller SIXEL data and faster drawing, and let the image display
+correctly on terminals with few color registers, at the cost of
+quality:
+
+=for text Figure: images/sixel-max-colors.png in the distribution.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-imager-sixel/v1.001/images/sixel-max-colors.png" alt="The test picture, a sunset with a sky gradient, a glowing sun, hills and a rainbow strip, and the same picture written with sixel_max_colors 256, 64, 16 and 4. With 256 colors it looks like the original. With 64 colors the gradients show fine dots. With 16 colors the gradients become grainy dot patterns with stray red, green and cyan dots, and the rainbow strip keeps about eight hues. With 4 colors only dark blue, purple, sand and green remain."></p>
+
+=end html
+
+=head2 Choose how colors are approximated (C<sixel_dither>)
+
+    $img->write(file => 'ordered.six', sixel_dither => 'ordered')
+      or die $img->errstr;
+
+L<C<sixel_dither>|Imager::File::SIXEL/sixel_dither> decides what
+happens to colors that are not in the palette. The figure uses a
+palette of 16 colors (C<< sixel_max_colors => 16 >>), which makes the
+differences easy to see:
+
+=for text Figure: images/sixel-dither.png in the distribution.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-imager-sixel/v1.001/images/sixel-dither.png" alt="The original test picture and three versions with 16 colors. diffusion: smooth-looking gradients made of irregular dots, with some stray red, green and cyan dots. ordered: gradients made of a regular cross-hatch pattern. none: no dots, but the gradients turn into wide flat bands. The SIXEL data of none is the smallest, that of ordered the largest."></p>
+
+=end html
+
+=over
+
+=item *
+
+C<'diffusion'> (the default) gives the best still images.
+
+=item *
+
+C<'ordered'> gives a regular pattern. With a fixed palette (webmap or
+L<C<colors>|Imager::File::SIXEL/colors>), the pattern of an area stays
+the same as long as that area does not change, which suits animations.
+Its SIXEL data can be larger or smaller than that of C<'diffusion'>,
+depending on the image; see the table in
+L<Imager::File::SIXEL/PERFORMANCE>.
+
+=item *
+
+C<'none'> usually gives the smallest SIXEL data of the three,
+especially with a fixed palette, but gradients turn into visible
+bands.
+
+=back
+
+=head2 Use the fixed webmap palette (C<sixel_palette>)
+
+    $img->write(file => 'web.six', sixel_palette => 'webmap')
+      or die $img->errstr;
+
+C<< sixel_palette => 'webmap' >> uses the same 216 colors for every
+image instead of computing a palette from the image. That saves the
+time of computing a palette and keeps the colors stable from one
+animation frame to the next, but it fits most images worse than a
+computed palette. With the default dithering its SIXEL data can even
+be larger than with a computed palette:
+
+=for text Figure: images/sixel-palette.png in the distribution.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-imager-sixel/v1.001/images/sixel-palette.png" alt="The original test picture; the adaptive palette, which looks like the original; the webmap palette, with visible dot patterns in the sky and the hills and slightly more SIXEL data than adaptive; and the webmap palette without dithering, where the gradients turn into a few wide flat bands and the SIXEL data is about a fifth as large."></p>
+
+=end html
+
+=head2 Use your own (custom) palette (C<colors>)
+
+    # The eight colors of a basic terminal, in the different
+    # notations that the colors option accepts.
+    my @palette = (
+      '#000000', '#FF0000', [0, 255, 0], 'yellow',
+      Imager::Color->new(0, 0, 255), '#FF00FF', '#00FFFF', '#FFFFFF',
+    );
+    $img->write(file => 'basic.six', colors => \@palette)
+      or die $img->errstr;
+
+L<C<colors>|Imager::File::SIXEL/colors> sets the palette to exactly the
+colors you list, 1 to 256 of them. Every pixel is written in one of
+these colors, approximated as set by
+L<C<sixel_dither>|Imager::File::SIXEL/sixel_dither>:
+
+=for text Figure: images/colors.png in the distribution.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-imager-sixel/v1.001/images/colors.png" alt="The original test picture and the picture written with four palettes passed with colors. Eight colors picked by hand from the picture: recognizable, but with coarse dots, and only five hues left in the rainbow strip. The eight basic terminal colors: a busy pattern of saturated dots. Four grays: a gray picture. Black and white: a pattern of black and white dots."></p>
+
+=end html
+
+A fixed palette is also the best choice for animations: compute it
+once from a few sample frames and pass it with every frame, see
+L<Imager::File::SIXEL/ANIMATION>.
+
+=head2 Use the palette of a paletted image
+
+    my $paletted = $img->to_paletted(
+      make_colors => 'mediancut',
+      max_colors  => 32,
+      translate   => 'errdiff',
+    ) or die $img->errstr;
+
+    $paletted->write(file => 'mine.six')
+      or die $paletted->errstr;
+
+If the image is a paletted image whose color table has at most
+L<C<sixel_max_colors>|Imager::File::SIXEL/sixel_max_colors> entries,
+the encoder uses that color table as the palette, unchanged apart from
+the rounding to SIXEL percentages, and does not dither: color register
+I<n> gets color table entry I<n>. An entry that rounds to the same
+color as an earlier entry uses the earlier entry's register instead.
+This lets you control the colors with
+any of Imager's methods, see L<Imager::ImageTypes/to_paletted()>.
+Images read from SIXEL data are paletted when they have at most 256
+colors (see L<Imager::File::SIXEL::Format/Image type>); images read
+from GIF files are usually paletted too. L<Imager::File::SIXEL/How the
+palette is chosen> lists all rules.
+
+=head2 Images with transparency (C<sixel_alpha_threshold>)
+
+    my $logo = Imager->new(file => 'logo.png')    # has an alpha channel
+      or die Imager->errstr;
+    $logo->write(fh => \*STDOUT, type => 'sixel', sixel_alpha_threshold => 64)
+      or die $logo->errstr;
+
+SIXEL has no partial transparency. A pixel is either painted in its
+color or not painted at all, in which case the terminal background
+shows through. For images with an alpha channel,
+L<C<sixel_alpha_threshold>|Imager::File::SIXEL/sixel_alpha_threshold>
+decides: pixels whose alpha value is below the threshold are not
+painted. The checkerboard in the figure marks the pixels that are not
+painted:
+
+=for text Figure: images/sixel-alpha-threshold.png in the distribution.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-imager-sixel/v1.001/images/sixel-alpha-threshold.png" alt="A red disc that fades out towards its edge and a blue disc inside a thin ring, on a transparent background shown as a gray checkerboard. With threshold 0 every pixel is painted: the transparent background becomes black and the faded red area a large solid red disc. With threshold 1 the background stays transparent, the faded red area becomes a large solid red disc, and the anti-aliased ring gets thicker. With 128, the default, a medium-sized red disc remains. With 224 only a small red dot remains and the thin ring breaks up into dots."></p>
+
+=end html
+
+Painted pixels always get their full color: the encoder does not blend
+a semi-transparent pixel with any background, because it cannot know
+the terminal's background color. To get soft edges against a known
+background, compose the image onto that background first:
+
+    my $background = Imager->new(xsize => $logo->getwidth,
+                                 ysize => $logo->getheight);
+    $background->box(filled => 1, color => '#1E1E1E');
+    $background->rubthrough(src => $logo);
+    $background->write(fh => \*STDOUT, type => 'sixel')
+      or die $background->errstr;
+
+=head2 Non-square pixels (C<sixel_pan>, C<sixel_pad>)
+
+    $img->write(file => 'tall.six', sixel_pan => 2, sixel_pad => 1)
+      or die $img->errstr;
+
+L<C<sixel_pan>|Imager::File::SIXEL/sixel_pan> and
+L<C<sixel_pad>|Imager::File::SIXEL/sixel_pad> set the pixel aspect
+ratio written into the image: each pixel is C<sixel_pan / sixel_pad>
+times as high as it is wide. Terminals that honor the ratio stretch the
+image when they draw it; terminals that ignore it draw square pixels.
+To find out what your terminal does, write an image with C<< sixel_pan
+=> 2 >> and look at it. The right panel shows how a terminal that
+honors the ratio draws an image written with C<< sixel_pan => 2 >>; the
+pixel data of both panels is identical:
+
+=for text Figure: images/sixel-pan-pad.png in the distribution.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/davenonymous/perl-imager-sixel/v1.001/images/sixel-pan-pad.png" alt="Left: the test picture with square pixels. Right: the same pixel data drawn twice as high, as a terminal that honors sixel_pan 2 shows it. Both SIXEL data sizes are the same."></p>
+
+=end html
+
+When reading, the decoder does not stretch the image. It reports the
+ratio in the tags C<sixel_pan> and C<sixel_pad>, and you can stretch
+the image yourself:
+
+    my $img = Imager->new(file => 'old-vt340.six')
+      or die Imager->errstr;
+    my $pan = $img->tags(name => 'sixel_pan');
+    my $pad = $img->tags(name => 'sixel_pad');
+    if ($pan != $pad) {
+      $img = $img->scale(
+        xpixels => $img->getwidth,
+        ypixels => int($img->getheight * $pan / $pad + 0.5),
+        type    => 'nonprop',
+      );
+    }
+
+C<scale()> does not copy tags, so the stretched image has no
+C<sixel_pan> and C<sixel_pad> tags and is written with square pixels
+again.
+
+=head1 OPTIONS, ERRORS AND ANIMATION
+
+=head2 Write the same image again with other settings (options are remembered)
+
+    $img->write(file => 'a.six', sixel_dither => 'none')
+      or die $img->errstr;
+
+    # Still writes with sixel_dither => 'none': the option was stored
+    # on the image as the tag sixel_dither.
+    $img->write(file => 'b.six')
+      or die $img->errstr;
+
+    # Remove the stored setting to get the default again, either
+    # with deltag() or by passing undef.
+    $img->deltag(name => 'sixel_dither');
+    $img->write(file => 'c.six')
+      or die $img->errstr;
+    $img->write(file => 'd.six', sixel_dither => undef)
+      or die $img->errstr;
+
+Options whose names start with C<sixel_> stay on the image after a
+write and are used again by the next write. See
+L<Imager::File::SIXEL/Write options are stored on the image>.
+
+=head2 Handle errors
+
+    my $sixel = '';
+    unless ($img->write(data => \$sixel, type => 'sixel', sixel_dither => 'random')) {
+      # dies with: Cannot encode: unknown sixel_dither value 'random'
+      die 'Cannot encode: ', $img->errstr, "\n";
+    }
+
+    my $in = Imager->new(file => 'broken.six')
+      or die 'Cannot decode: ', Imager->errstr, "\n";
+
+Like all Imager methods, C<read()> and C<write()> return false on
+failure and leave the message in C<< $img->errstr >>. Methods called on
+the class, such as C<< Imager->new(file => ...) >>, C<<
+Imager->read_multi(...) >> and C<< Imager->write_multi(...) >>, leave
+it in C<< Imager->errstr >>. Invalid options are detected before any
+SIXEL data is written; with C<file>, the file has already been created
+or emptied by then. L<Imager::File::SIXEL/DIAGNOSTICS> lists the
+messages.
+
+=head2 Play an animation
+
+See L<Imager::File::SIXEL/ANIMATION> for a complete loop that draws
+frames at a fixed position and frame rate.
+
+=head1 SEE ALSO
+
+L<Imager::File::SIXEL>, L<Imager::File::SIXEL::Format>,
+L<Imager::File::SIXEL/EXAMPLE PROGRAMS>, L<Imager>.
+
+=head1 AUTHOR
+
+davenonymous E<lt>dave@davenonymous.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 davenonymous.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

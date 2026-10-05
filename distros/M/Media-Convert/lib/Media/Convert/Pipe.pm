@@ -3,6 +3,7 @@ package Media::Convert::Pipe;
 use JSON::MaybeXS qw(decode_json);
 use Moose;
 use Carp;
+use MooseX::ClassAttribute;
 
 use autodie qw/:all/;
 
@@ -150,6 +151,8 @@ video (i.e., that it should skip handling of any video). This is implied
 if the output container does not support video streams (e.g., the .wav
 format), but is required if it does.
 
+Defaults to off (i.e., do not skip video)
+
 =cut
 
 has 'vskip' => (
@@ -162,9 +165,40 @@ has 'vskip' => (
 
 The same as C<vskip>, but for audio rather than video.
 
+Defaults to off (i.e., do not skip audio)
+
 =cut
 
 has 'askip' => (
+	isa => 'Bool',
+	is => 'rw',
+	default => 0,
+);
+
+=head2 dskip
+
+The same as C<vskip>, but for data streams.
+
+Defaults to on (i.e., I<do> skip data streams), as some containers do not
+support data streams.
+
+=cut
+
+has 'dskip' => (
+	isa => 'Bool',
+	is => 'rw',
+	default => 1,
+);
+
+=head2 sskip
+
+The same as C<vskip>, but for subtitle streams.
+
+Defaults to off (i.e., I<do> skip subtitle streams).
+
+=cut
+
+has 'sskip' => (
 	isa => 'Bool',
 	is => 'rw',
 	default => 0,
@@ -207,8 +241,39 @@ If this attribute is set to a coderef, then the following happens:
 
 has 'progress' => (
 	isa => 'CodeRef',
-	is => 'ro',
-	predicate => 'has_progress',
+	is => 'rw',
+	predicate => '_has_progress',
+	lazy => 1,
+	builder => '_build_progress',
+);
+
+sub has_progress {
+	my $self = shift;
+	return $self->_has_progress || __PACKAGE__->has_class_progress;
+}
+
+sub _build_progress {
+	my $self = shift;
+	if(__PACKAGE__->has_class_progress) {
+		return __PACKAGE__->class_progress;
+	}
+}
+
+=head2 class_progress
+
+The same as C<progress>, but as a class attribute. If set, then every object
+created after this attribute was set will have C<progress> set to the same
+value by default.
+
+To remove this again, use C<clear_class_progress>
+
+=cut
+
+class_has class_progress => (
+	isa => 'CodeRef',
+	is => 'rw',
+	predicate => 'has_class_progress',
+	clearer => 'clear_class_progress',
 );
 
 has 'has_run' => (
@@ -232,11 +297,13 @@ sub run_progress {
 	my $old_perc = -1;
 	my %vals;
 
-	my $length = $self->output->duration * 1000000;
-	if($length == 0) {
+	my $length;
+	if(defined($self->output->duration)) {
+		$length = $self->output->duration * 1000000;
+	} else {
 		foreach my $input(@{$self->inputs}) {
 			my $dur = $input->duration * 1000000;
-			if($length == 0) {
+			if(!defined($length)) {
 				$length = $dur;
 				next;
 			}
@@ -250,8 +317,8 @@ sub run_progress {
 		/^(\w+)=(.*)$/;
 		$vals{$1} = $2;
 		if($1 eq 'progress') {
-                        next if $vals{out_time_ms} eq "N/A";
-                        next if $length eq "N/A";
+			next if $vals{out_time_ms} eq "N/A";
+			next if $length eq "N/A";
 			my $perc = int($vals{out_time_ms} / $length * 100);
 			if($vals{progress} eq 'end') {
 				$perc = 100;
@@ -347,6 +414,12 @@ sub run {
 		}
 		if($self->askip) {
 			push @command, ('-an');
+		}
+		if($self->dskip) {
+			push @command, ('-dn');
+		}
+		if($self->sskip) {
+			push @command, ('-sn');
 		}
 		if($self->vcopy || $self->acopy) {
 			push @command, ('-fflags', '+genpts');

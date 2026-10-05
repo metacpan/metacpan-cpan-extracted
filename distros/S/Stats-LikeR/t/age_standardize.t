@@ -25,17 +25,17 @@ my @stdpop = (2000, 3000, 3000, 2000);
 	my $r = age_standardize(\@count, \@pop, \@stdpop);
 	is_approx($r->{crude_rate}, 0.0140000000, 'crude rate');
 	is_approx($r->{adj_rate},   0.0131250000, 'directly standardized rate');
-	is_approx($r->{'conf.int'}[0], 0.0109781852, 'gamma CI lower');
-	is_approx($r->{'conf.int'}[1], 0.0156960916, 'gamma CI upper');
-	is_approx($r->{'conf.level'}, 0.95, 'default conf.level', 1e-9);
+	is_approx($r->{'conf_int'}[0], 0.0109781852, 'gamma CI lower');
+	is_approx($r->{'conf_int'}[1], 0.0156960916, 'gamma CI upper');
+	is_approx($r->{'conf_level'}, 0.95, 'default conf_level', 1e-9);
 }
 
 # per-100,000 scaling
 {
 	my $r = age_standardize(\@count, \@pop, \@stdpop, per => 100_000);
 	is_approx($r->{adj_rate},      1312.5000, 'adj rate per 100k', 1e-3);
-	is_approx($r->{'conf.int'}[0], 1097.8185, 'CI lower per 100k', 1e-3);
-	is_approx($r->{'conf.int'}[1], 1569.6092, 'CI upper per 100k', 1e-3);
+	is_approx($r->{'conf_int'}[0], 1097.8185, 'CI lower per 100k', 1e-3);
+	is_approx($r->{'conf_int'}[1], 1569.6092, 'CI upper per 100k', 1e-3);
 }
 
 # named-argument form and rate input give the same answer
@@ -55,8 +55,8 @@ my @stdpop = (2000, 3000, 3000, 2000);
 # to avoid: below a lower tail of about NV_EPSILON the difference can only be a
 # multiple of NV_EPSILON, so every candidate the bisection tried compared equal
 # and it converged on noise.  age_standardize() asks for the alpha/2 quantile,
-# so it is the LOWER limit at a high conf.level that was affected -- at
-# conf.level => 1-1e-8 the tail is 5e-9, thirty million times smaller than the
+# so it is the LOWER limit at a high conf_level that was affected -- at
+# conf_level => 1-1e-8 the tail is 5e-9, thirty million times smaller than the
 # 0.025 the default asks for.
 #
 # Reference values from R 4.6.1 at options(digits=17), computed the way
@@ -78,14 +78,14 @@ my @stdpop = (2000, 3000, 3000, 2000);
 	for my $c (@CL) {
 		my ($cl, $lo, $hi) = @$c;
 		my $r = age_standardize(\@count, \@pop, \@stdpop, conf_level => $cl);
-		is_approx($r->{'conf.int'}[0], $lo, "conf.level $cl: gamma CI lower matches R",
+		is_approx($r->{'conf_int'}[0], $lo, "conf_level $cl: gamma CI lower matches R",
 		          1e-9 * $lo);
-		is_approx($r->{'conf.int'}[1], $hi, "conf.level $cl: gamma CI upper matches R",
+		is_approx($r->{'conf_int'}[1], $hi, "conf_level $cl: gamma CI upper matches R",
 		          1e-9 * $hi);
 	}
 	# and the limits widen monotonically with the confidence level
 	my @lo = map { age_standardize(\@count, \@pop, \@stdpop,
-	                               conf_level => $_)->{'conf.int'}[0] }
+	                               conf_level => $_)->{'conf_int'}[0] }
 	         map { $_->[0] } @CL;
 	my $mono = 1;
 	for my $i (1 .. $#lo) { $mono = 0 if $lo[$i] >= $lo[$i - 1] }
@@ -93,7 +93,7 @@ my @stdpop = (2000, 3000, 3000, 2000);
 		or diag("limits: @lo");
 }
 
-# The primitive the fix turns on, checked directly: `conf.level` cannot reach
+# The primitive the fix turns on, checked directly: `conf_level` cannot reach
 # far enough into the tail to separate the two forms on its own, because
 # 1 - 2e-17 is already 1 in a double, so the rows above pass either way.  What
 # distinguishes them is the lower incomplete gamma itself.
@@ -148,7 +148,7 @@ my @stdpop = (2000, 3000, 3000, 2000);
 # error handling
 throws_ok { age_standardize(\@count, [1,2,3], \@stdpop) } qr/length/, 'pop length mismatch rejected';
 throws_ok { age_standardize(pop => \@pop, stdpop => \@stdpop) } qr/count.*or.*rate/, 'needs count or rate';
-throws_ok { age_standardize(\@count, \@pop, \@stdpop, conf_level => 1.5) } qr/conf.level/, 'bad conf.level rejected';
+throws_ok { age_standardize(\@count, \@pop, \@stdpop, conf_level => 1.5) } qr/conf_level/, 'bad conf_level rejected';
 
 # Devel::Cover's own per-line counters are allocated inside whatever block is
 # running and are reported as leaks, so the check is skipped under it.

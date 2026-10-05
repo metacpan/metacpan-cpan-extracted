@@ -39,7 +39,7 @@ sub member {
 		{ name => 'Hornet',     mpg => 21.4, cyl => undef, note => q{q"x}       },
 	);
 	my $f = xlsx_path();
-	lives_ok { write_table(\@aoh, $f, 'row.names' => 0) }
+	lives_ok { write_table(\@aoh, $f, 'row_names' => 0) }
 		'write_table writes an .xlsx from an AoH';
 	ok( -s $f, 'the .xlsx file exists and is non-empty' );
 
@@ -54,18 +54,18 @@ sub member {
 	is( $back->[2]{note}, 'q"x',       'embedded double quote round-trips' );
 }
 
-# HoH: the outer keys are written by default, under the row.names name if given
+# HoH: the outer keys are written by default, under the row_names name if given
 {
 	my %taxa = (
 		'9606'  => { species => 'Homo sapiens' },
 		'10090' => { species => 'Mus musculus' },
 	);
 	my $f = xlsx_path();
-	write_table(\%taxa, $f, 'row.names' => 'taxid', quiet => 1);
+	write_table(\%taxa, $f, 'row_names' => 'taxid', quiet => 1);
 	my $back = read_table($f);
 	is_deeply( [ map { $_->{taxid} } @$back ], [ '10090', '9606' ],
-		"HoH + row.names=>'taxid': the keys come back as a taxid column" );
-	is( $back->[1]{species}, 'Homo sapiens', 'HoH + row.names: keys stay aligned with their rows' );
+		"HoH + row_names=>'taxid': the keys come back as a taxid column" );
+	is( $back->[1]{species}, 'Homo sapiens', 'HoH + row_names: keys stay aligned with their rows' );
 
 	my $d = xlsx_path();
 	write_table(\%taxa, $d, quiet => 1);
@@ -80,7 +80,7 @@ sub member {
 		{ id => '007', sci => '1e3', bad => 'Inf', plain => 42 },
 	);
 	my $f = xlsx_path();
-	write_table(\@aoh, $f, 'row.names' => 0);
+	write_table(\@aoh, $f, 'row_names' => 0);
 	my $r = read_table($f)->[0];
 	is( $r->{id},    '007', 'leading-zero string is preserved (written as text)' );
 	is( $r->{sci},   '1e3', 'scientific-notation numeric string round-trips' );
@@ -92,7 +92,7 @@ sub member {
 {
 	my %hoa = ( x => [1, 2, 3], y => [4, 5, 6] );
 	my $f = "$dir/forced.dat";
-	lives_ok { write_table(\%hoa, $f, xlsx => 1, 'row.names' => 0) }
+	lives_ok { write_table(\%hoa, $f, xlsx => 1, 'row_names' => 0) }
 		'xlsx => 1 forces .xlsx output for a non-.xlsx file name';
 	# read_table keys off the .xlsx extension, so this .dat file can't be routed
 	# through the xlsx reader by name; confirm instead that it is a real .xlsx
@@ -109,18 +109,18 @@ SKIP: {
 	skip 'IO::Uncompress::Unzip (core) not available', 4 unless $have_unzip;
 
 	my $f = xlsx_path();
-	write_table([{ a => 1, b => 2 }], $f, 'row.names' => 0,
-		'xlsx.sheet' => 'Results', 'xlsx.comment' => 'batch 9');
+	write_table([{ a => 1, b => 2 }], $f, 'row_names' => 0,
+		'xlsx_sheet' => 'Results', 'xlsx_comment' => 'batch 9');
 
 	my $core = member($f, 'docProps/core.xml');
 	ok( defined $core, 'docProps/core.xml is present' );
 	like( $core, qr{<dc:description>written by }s,
 		'the provenance line is stored as the document comments (dc:description)' );
 	like( $core, qr{batch 9}s,
-		'a user-supplied xlsx.comment is appended after the provenance' );
+		'a user-supplied xlsx_comment is appended after the provenance' );
 
 	my $wb = member($f, 'xl/workbook.xml');
-	like( $wb, qr{name="Results"}, 'xlsx.sheet sets the worksheet name' );
+	like( $wb, qr{name="Results"}, 'xlsx_sheet sets the worksheet name' );
 }
 
 # freeze panes
@@ -131,7 +131,7 @@ SKIP: {
 
 	# freezing the top row: xSplit absent, ySplit=1, anchor A2
 	my $f1 = xlsx_path();
-	write_table(\@aoh, $f1, 'row.names' => 0, 'xlsx.freeze.rows' => 1);
+	write_table(\@aoh, $f1, 'row_names' => 0, 'xlsx_freeze_rows' => 1);
 	my $ws1 = member($f1, 'xl/worksheets/sheet1.xml');
 	like( $ws1, qr{<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>},
 		'freeze.rows => 1 writes a top-row frozen pane anchored at A2' );
@@ -139,30 +139,30 @@ SKIP: {
 
 	# freezing rows and columns: xSplit=2, ySplit=1, anchor C2, bottomRight
 	my $f2 = xlsx_path();
-	write_table(\@aoh, $f2, 'row.names' => 0,
-		'xlsx.freeze.rows' => 1, 'xlsx.freeze.cols' => 2);
+	write_table(\@aoh, $f2, 'row_names' => 0,
+		'xlsx_freeze_rows' => 1, 'xlsx_freeze_cols' => 2);
 	like( member($f2, 'xl/worksheets/sheet1.xml'),
 		qr{<pane xSplit="2" ySplit="1" topLeftCell="C2" activePane="bottomRight" state="frozen"/>},
 		'freeze.rows + freeze.cols writes a bottomRight pane anchored at C2' );
 
 	# freezing only columns: xSplit=1, ySplit absent, anchor B1, topRight
 	my $f3 = xlsx_path();
-	write_table(\@aoh, $f3, 'row.names' => 0, 'xlsx.freeze.cols' => 1);
+	write_table(\@aoh, $f3, 'row_names' => 0, 'xlsx_freeze_cols' => 1);
 	like( member($f3, 'xl/worksheets/sheet1.xml'),
 		qr{<pane xSplit="1" topLeftCell="B1" activePane="topRight" state="frozen"/>},
 		'freeze.cols => 1 writes a left-column frozen pane anchored at B1' );
 
 	# no freeze options: no <sheetViews> block at all
 	my $f0 = xlsx_path();
-	write_table(\@aoh, $f0, 'row.names' => 0);
+	write_table(\@aoh, $f0, 'row_names' => 0);
 	unlike( member($f0, 'xl/worksheets/sheet1.xml'), qr{<sheetViews>},
 		'no freeze options leaves the worksheet without a <sheetViews> block' );
 
-	throws_ok { write_table(\@aoh, xlsx_path(), 'xlsx.freeze.rows' => -1) }
-		qr/'xlsx\.freeze\.rows' must be a non-negative integer/,
+	throws_ok { write_table(\@aoh, xlsx_path(), 'xlsx_freeze_rows' => -1) }
+		qr/'xlsx_freeze_rows' must be a non-negative integer/,
 		'a negative freeze count dies with a clear message';
-	throws_ok { write_table(\@aoh, xlsx_path(), 'xlsx.freeze.cols' => -3) }
-		qr/'xlsx\.freeze\.cols' must be a non-negative integer/,
+	throws_ok { write_table(\@aoh, xlsx_path(), 'xlsx_freeze_cols' => -3) }
+		qr/'xlsx_freeze_cols' must be a non-negative integer/,
 		'a negative freeze column count dies too';
 }
 
@@ -175,11 +175,11 @@ SKIP: {
 	open my $keep, '>', $f or die "cannot write $f: $!";
 	print {$keep} "precious\n";
 	close $keep;
-	throws_ok { write_table([{ a => 1 }], $f, 'xlsx.sheet' => '') }
-		qr/^write_table: 'xlsx\.sheet' must have at least one character/, 'an empty sheet name dies';
+	throws_ok { write_table([{ a => 1 }], $f, 'xlsx_sheet' => '') }
+		qr/^write_table: 'xlsx_sheet' must have at least one character/, 'an empty sheet name dies';
 	foreach my $c ('\\', '*', '?', ':', '/', '[', ']') {
-		throws_ok { write_table([{ a => 1 }], $f, 'xlsx.sheet' => "a${c}b") }
-			qr/^write_table: 'xlsx\.sheet' may not contain '\Q$c\E'/, "a sheet name holding '$c' dies";
+		throws_ok { write_table([{ a => 1 }], $f, 'xlsx_sheet' => "a${c}b") }
+			qr/^write_table: 'xlsx_sheet' may not contain '\Q$c\E'/, "a sheet name holding '$c' dies";
 	}
 	open $keep, '<', $f or die "cannot read $f: $!";
 	is( scalar <$keep>, "precious\n", 'a refused sheet name leaves an existing file intact' );
@@ -187,16 +187,16 @@ SKIP: {
 	my @w;
 	{
 		local $SIG{__WARN__} = sub { push @w, @_ };
-		write_table([{ a => 1 }], xlsx_path(), 'xlsx.sheet' => 'x' x 31, quiet => 1);
+		write_table([{ a => 1 }], xlsx_path(), 'xlsx_sheet' => 'x' x 31, quiet => 1);
 	}
 	is( scalar @w, 0, 'a 31-character sheet name is fine' );
 	{
 		local $SIG{__WARN__} = sub { push @w, @_ };
-		write_table([{ a => 1 }], xlsx_path(), 'xlsx.sheet' => 'x' x 32, quiet => 1);
-		write_table([{ a => 1 }], xlsx_path(), 'xlsx.sheet' => "\x{394}" x 31, quiet => 1);
+		write_table([{ a => 1 }], xlsx_path(), 'xlsx_sheet' => 'x' x 32, quiet => 1);
+		write_table([{ a => 1 }], xlsx_path(), 'xlsx_sheet' => "\x{394}" x 31, quiet => 1);
 	}
 	is( scalar @w, 1, 'a 32-character name warns; 31 wide characters do not' );
-	like( $w[0], qr/^write_table: 'xlsx\.sheet' is more than 31 characters/, 'the warning says why' );
+	like( $w[0], qr/^write_table: 'xlsx_sheet' is more than 31 characters/, 'the warning says why' );
 }
 
 # The worksheet is streamed, a chunk at a time, and its local header patched
@@ -208,7 +208,7 @@ SKIP: {
 	my $f = xlsx_path();
 	write_table(\@rows, $f, quiet => 1);
 	cmp_ok( -s $f, '>', 4 * 65536, 'the table spans several of the chunks it is streamed in' );
-	my $back = read_table($f, 'output.type' => 'aoh');
+	my $back = read_table($f, 'output_type' => 'aoh');
 	is( scalar @$back, 6000, 'a streamed workbook reads back every row' );
 	is( $back->[5999]{name}, 'row 6000 & <more>', 'a streamed workbook reads back the last row whole' );
 	SKIP: {
@@ -244,7 +244,7 @@ SKIP: {
 SKIP: {
 	skip 'IO::Uncompress::Unzip (core) not available', 2 unless $have_unzip;
 	my $f = xlsx_path();
-	write_table([{ a => "x\0y" }], $f, quiet => 1, 'xlsx.sheet' => "R\xe9sum\xe9");
+	write_table([{ a => "x\0y" }], $f, quiet => 1, 'xlsx_sheet' => "R\xe9sum\xe9");
 	like( member($f, 'xl/worksheets/sheet1.xml'), qr{<t xml:space="preserve">xy</t>}, 'a NUL is dropped from an .xlsx cell' );
 	like( member($f, 'xl/workbook.xml'), qr{name="R\xc3\xa9sum\xc3\xa9"}, 'a Latin-1 sheet name is written as UTF-8' );
 }
@@ -252,9 +252,9 @@ SKIP: {
 # An empty table writes a workbook too: its header row alone, or no cells.
 {
 	my $f = xlsx_path();
-	write_table([], $f, 'col.names' => [qw(a b)], quiet => 1);
+	write_table([], $f, 'col_names' => [qw(a b)], quiet => 1);
 	ok( -s $f, 'an empty table writes its workbook' );
-	is_deeply( read_table($f, 'output.type' => 'aoh'), [], 'an empty table reads back as no rows' );
+	is_deeply( read_table($f, 'output_type' => 'aoh'), [], 'an empty table reads back as no rows' );
 }
 
 # tex and xlsx are mutually exclusive

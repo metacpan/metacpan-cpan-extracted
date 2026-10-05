@@ -7,7 +7,7 @@ use Encode qw(encode);
 use MIME::Base64 qw(encode_base64);
 use Unicode::Normalize qw(NFC);
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub validate_challenge {
     my ($class, $challenge) = @_;

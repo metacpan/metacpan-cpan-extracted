@@ -66,25 +66,25 @@ for my $x (0.3, 1, 1.96, 4) {
 	is_approx( pnorm(-$x), 1 - pnorm($x), "symmetry: pnorm(-$x) == 1 - pnorm($x)");
 }
 
-# lower.tail = 0  (upper tail)
+# lower_tail = 0  (upper tail)
 is_approx( pnorm(1.96, lower => 0), 0.024997895148220428, 'lower=>0: upper tail value');
 is_approx( pnorm(1.96, lower => 0), 1 - pnorm(1.96),      'lower=>0 == 1 - lower tail');
 is_approx( pnorm(1.96, lower => 0), pnorm(-1.96),         'lower=>0 == pnorm(-x)');
-is_approx( pnorm(2, 'lower.tail' => 0), pnorm(2, lower => 0),
-	"'lower.tail' alias matches 'lower'");
+is_approx( pnorm(2, 'lower_tail' => 0), pnorm(2, lower => 0),
+	"'lower_tail' alias matches 'lower'");
 
-# log.p
+# log_p
 is_approx( pnorm(1.96, log => 1), log(pnorm(1.96)),  'log=>1 == log(lower tail)');
 is_approx( pnorm(-1,   log => 1), log(pnorm(-1)),    'log=>1 for a left-tail value');
 is_approx( pnorm(6,    log => 1), log(pnorm(6)),     'log=>1 for a right value');
-is_approx( pnorm(2, 'log.p' => 1), pnorm(2, log => 1),
-	"'log.p' alias matches 'log'");
+is_approx( pnorm(2, 'log_p' => 1), pnorm(2, log => 1),
+	"'log_p' alias matches 'log'");
 # deep left tail: underflows to 0 without log, finite with log
 is_approx( pnorm(-40, log => 1), -804.6084420, 'log=>1 deep tail stays finite', 1e-4);
 ok( pnorm(-40) == 0,             'without log the deep tail underflows to 0');
 ok( pnorm(-40, log => 1) < -800, 'with log the deep tail is a large negative number');
 
-# lower.tail = 0 combined with log.p
+# lower_tail = 0 combined with log_p
 is_approx( pnorm(6, lower => 0, log => 1), log(pnorm(6, lower => 0)),
 	'lower=>0, log=>1 == log(upper tail)');
 is_approx( pnorm(6, lower => 0, log => 1), -20.736768949974707,

@@ -981,12 +981,12 @@ for my $c (@CASES) {
 	}
 	elsif ($c->{kind} eq 'lm') {
 		my $res = lm(formula => $c->{formula}, data => \%d);
-		undeflow_ok($res->{'f.pvalue'}, $c->{expected_p}, "$n/lm");
-		rel_ok($res->{'f.pvalue'},     $c->{expected_p}, "$n/lm: f.pvalue == f.sf(own F)",
+		undeflow_ok($res->{'f_pvalue'}, $c->{expected_p}, "$n/lm");
+		rel_ok($res->{'f_pvalue'},     $c->{expected_p}, "$n/lm: f_pvalue == f.sf(own F)",
 			f_tail_tol($c->{df2}, $c->{cond}));
 		rel_ok($res->{fstatistic}[0],  $c->{r_stat},     "$n/lm: fstatistic vs R",
 			1e-9 + stat_budget($c->{cond}));
-		rel_ok($res->{'f.pvalue'},     $c->{r_p},        "$n/lm: f.pvalue vs R",
+		rel_ok($res->{'f_pvalue'},     $c->{r_p},        "$n/lm: f_pvalue vs R",
 			1e-8 + f_tail_tol($c->{df2}, $c->{cond}));
 	}
 	elsif ($c->{kind} eq 'glm_bin') {
@@ -1008,7 +1008,7 @@ for my $c (@CASES) {
 		my $c = $_;
 		my %d = map { $_ => $c->{$_} }
 			grep { ref $c->{$_} eq 'ARRAY' && $_ ne 'formulas' } keys %$c;
-		  $c->{kind} eq 'lm'        ? lm(formula => $c->{formula}, data => \%d)->{'f.pvalue'}
+		  $c->{kind} eq 'lm'        ? lm(formula => $c->{formula}, data => \%d)->{'f_pvalue'}
 		: $c->{kind} eq 'aov1'      ? aov(\%d, $c->{formula})->{g}{'Pr(>F)'}
 		: $c->{kind} eq 'anova2'    ? anova(\%d, $c->{formula})->{x2}{'Pr(>F)'}
 		: $c->{kind} eq 'anova_cmp' ? anova(\%d, @{ $c->{formulas} })->[1]{'Pr(>F)'}

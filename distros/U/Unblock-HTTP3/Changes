@@ -1,5 +1,73 @@
 Revision history for Unblock-HTTP3
 
+0.03  2026-10-04
+    - Require Uniform::HTTP 0.06 for its header-only native FastPath ABI.
+    - Inspect canonical outgoing Request and Response objects directly in XS,
+      avoiding Perl FastPath views and temporary HTTP/3 wire-field arrays.
+    - Retain decoded nghttp3 header blocks in native connection state and build
+      exact canonical Uniform messages directly from validated native byte spans.
+    - Preserve HTTP/3 semantic validation, Cookie coalescing, field-section
+      limits, message lifecycle state, and canonical Uniform object ownership.
+    - Add native-path loopback coverage and HTTP-layer microbenchmarks.
+    - Add a public versioned native consumer ABI for XS event frameworks and
+      HTTP libraries, with an installed C header and persistent Connection
+      context.
+    - Expose native service, request, Transaction polling, canonical Uniform
+      message access, response sending, and failure-state inspection without
+      exposing libnghttp3 or private storage.
+
+0.02  2026-10-04
+    - Require Uniform::HTTP 0.05 and use exact canonical Uniform::HTTP::Request
+      and Uniform::HTTP::Response objects throughout the public HTTP message API.
+    - Remove the Unblock::HTTP3 Request and Response subclasses; HTTP/3
+      priority and stream-abort state now belong to Transaction.
+    - Use Uniform::HTTP::FastPath ABI 1 for outgoing wire-field access and
+      trusted construction of already-validated received HTTP/3 messages.
+    - Record local and remote RESET_STREAM and STOP_SENDING codes explicitly
+      on Transaction without adding transport state to Uniform message objects.
+    - Add RFC 9412 ORIGIN support through libnghttp3.
+    - Add server origins configuration and client peer_origins inspection.
+    - Add independent quic-go client interoperability against an
+      Unblock::HTTP3 server.
+    - Expand interoperability documentation to cover both client and server
+      directions.
+    - Add repeatable real UDP/TLS/QUIC/HTTP/3 loopback performance benchmarks.
+    - Add split-process benchmarks to separate client/server event-driving cost.
+    - Add HTTP/3-layer microbenchmarks for Uniform message construction,
+      wire-field preparation, field-section accounting, native nghttp3
+      submission, and streaming body-copy cost.
+    - Avoid rebuilding the connection-specific header lookup for every field,
+      reducing representative HTTP/3 wire-field preparation cost.
+    - Retain outgoing body chunks as dedicated Perl scalar storage in native
+      state instead of allocating and copying a second C byte buffer, while
+      preserving caller-mutation isolation and ACK-driven release.
+    - Add incoming-body microbenchmarks for native DATA events, buffered
+      accumulation, streaming delivery, and complete buffered construction.
+    - Retain owned incoming DATA scalars directly in streaming Body::Reader,
+      removing a second Perl string copy while preserving receive-credit and
+      backpressure semantics.
+    - Keep small buffered DATA chunks on the compact scalar path and retain
+      owned chunks of 16 KiB or larger until one final message-body coalescing,
+      reducing repeated large-body copies.
+    - Add a normative RFC conformance audit suite for malformed control,
+      QPACK, priority, push, and stream-lifecycle input.
+    - Treat peer closure, reset, or STOP_SENDING of critical HTTP/3 streams
+      as H3_CLOSED_CRITICAL_STREAM.
+    - Reject duplicate peer SETTINGS with H3_SETTINGS_ERROR so extension and
+      remembered 0-RTT state cannot become ambiguous.
+    - Reject unauthorized server push with H3_ID_ERROR when no push capacity
+      has been advertised.
+    - Coalesce decompressed Cookie field lines before exposing canonical
+      Uniform HTTP messages.
+    - Defer server application delivery of 0-RTT Transactions and Datagrams
+      until the QUIC handshake completes and the early data has not been
+      rejected.
+    - Enforce the 0-or-1 value rules for Extended CONNECT and HTTP Datagram
+      SETTINGS in the HTTP/3 SETTINGS inspector.
+    - Enforce the RFC 9297 Capsule-Protocol response-status restriction.
+    - Document the remaining libnghttp3 limitations for malformed-message
+      stream scope and RFC 9218 invalid-parameter preservation.
+
 0.01  2026-10-04
     - Start Unblock::HTTP3.
     - Require released Net::QUIC 0.04 for QUIC transport and RFC 9221 DATAGRAM.

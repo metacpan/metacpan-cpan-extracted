@@ -7,10 +7,65 @@ Minilla - CPAN module authoring tool
 
     minil new     - Create a new dist
     minil test    - Run test cases
+    minil prepare - Prepare the source tree for release
     minil dist    - Make your dist tarball
     minil install - Install your dist
     minil release - Release your dist to CPAN
     minil run     - Run arbitrary commands against build dir
+
+# GLOBAL OPTIONS
+
+- **-h**, **--help**
+
+    Show the main help page. A subcommand name may be supplied to show its help,
+    for example `minil --help release`.
+
+- **--color**, **--no-color**
+
+    Enable or disable colored log output. Color is enabled by default when standard
+    output is connected to a terminal.
+
+- **--debug**
+
+    Enable debug logging and preserve temporary work directories.
+
+- **--auto-install**, **--no-auto-install**
+
+    Enable or disable automatic installation of project dependencies, including
+    development dependencies. Automatic installation is enabled by default.
+
+- **--version**
+
+    Print the installed Minilla version and exit.
+
+# COMMAND OPTIONS
+
+Run `minil help COMMAND` for the full documentation of a subcommand.
+
+- `minil new`
+
+    `--username NAME`, `--email ADDRESS`, `-p PROFILE`, `--profile PROFILE`
+
+- `minil test`
+
+    `--release`, `--automated`, `--all`, `--no-author`
+
+- `minil dist`
+
+    `--no-test` (also `--notest`), `--skip-prepare`
+
+- `minil install`
+
+    `--no-test` (also `--notest`)
+
+- `minil release`
+
+    `--no-test` (also `--notest`), `--trial`, `--dry-run`,
+    `--skip-prepare`, `--pause-config FILE`
+
+- `minil clean`
+
+    `-y`
 
 # DESCRIPTION
 
@@ -26,7 +81,7 @@ As stated above, Minilla is opinionated. Minilla has a bold assumption and conve
 - Your executable files are in _script/_ directory, if any
 - Your module is maintained with **Git**, `git ls-files` matches with what you will release and your remote is named _origin_
 - Your module has a static list of prerequisites that can be described in [cpanfile](https://metacpan.org/pod/cpanfile)
-- Your module has a Changes file
+- Your module has a Changes file unless `manage_changes = false` is configured
 - Your module requires at least perl 5.6.
 
 # GETTING STARTED
@@ -74,6 +129,30 @@ Minilla is built on only few small libraries. You can install Minilla without a 
 
 Minilla's release process is the following.
 
+## Preparing a release
+
+`minil prepare` performs the source-tree updates used by the release process:
+it selects the next version, updates version declarations, regenerates
+`META.json`, `README.md`, and `Build.PL` or `Makefile.PL`, and prepares
+`Changes` when Minilla manages it.
+
+The version can be selected interactively or supplied as an argument:
+
+    % minil prepare
+    % minil prepare v1.2.3
+
+The command does not commit, tag, build a distribution archive, upload, or
+push.
+
+## Building from prepared source
+
+`minil dist --skip-prepare` and `minil release --skip-prepare` build a
+distribution from an already prepared source tree without regenerating
+`META.json`, `README.md`, or `Build.PL` or `Makefile.PL`. Packaging files
+such as `META.yml` and `MANIFEST` are still generated. Distribution tests
+run by default and can be disabled with `--no-test`. The release command uses
+the prepared version without prompting for or updating it.
+
 ## CheckUntrackedFiles
 
 Checking git's untracked files. If there's untracked files, minilla will abort.
@@ -97,6 +176,8 @@ After that, minilla rewrites version numbers in \*\*/\*.pm, \*\*/\*.pl, and a sc
 You need to write Changes file. Your module's users need to know the difference between versions.
 
 Minilla's Changes file includes \`{{$NEXT}}\` next version indicator. You should put update informations after that.
+If the release version is already recorded below an empty `{{$NEXT}}` section,
+Minilla treats the Changes file as prepared for that release.
 
 ## RegenerateFiles
 
@@ -123,6 +204,8 @@ Upload your module to CPAN.
 Rewrite Changes file.
 Minilla replaces `{{$NEXT}}` with released version number and current date & time.
 And put `{{$NEXT}}` on the first line.
+If the release version is already recorded below an empty `{{$NEXT}}` section,
+Minilla leaves the file unchanged.
 
 ## Commit
 
@@ -197,6 +280,15 @@ But, you can write configurations to _minil.toml_ file in [TOML](https://github.
 
     Minilla sets bugtracker to github/GitLab's issue tracker by default. But if you
     want to use RT, you can set this variable.
+
+- manage\_changes
+
+        manage_changes = false
+
+    Minilla manages the `Changes` file by default. Set this option to false to
+    allow projects without `Changes` or `{{$NEXT}}` and to prevent `minil dist`
+    and `minil release` from rewriting it. A separately maintained `Changes` or
+    `CHANGELOG.md` file tracked by Git is still included in the distribution.
 
 - no\_index
 

@@ -35,9 +35,9 @@ is_approx(qtukey(0.95, 2, 1e9), 2.771808, 1e-3, 'qtukey(0.95, 2, Inf) == sqrt(2)
 is_approx(ptukey(qtukey(0.95, 3, 27), 3, 27), 0.95, 1e-4, 'ptukey o qtukey round-trip');
 
 # upper tail and lower_tail => complementary
-is_approx(ptukey(3.5, 3, 27, 'lower.tail' => 0),
+is_approx(ptukey(3.5, 3, 27, 'lower_tail' => 0),
 	1 - ptukey(3.5, 3, 27), 1e-12, 'ptukey upper tail == 1 - lower tail');
-is_approx(qtukey(0.05, 3, 27, 'lower.tail' => 0),
+is_approx(qtukey(0.05, 3, 27, 'lower_tail' => 0),
 	qtukey(0.95, 3, 27), 1e-9, 'qtukey upper tail matches complementary lower tail');
 
 #
@@ -63,7 +63,7 @@ my $fit = aov(\%pg, 'weight ~ group');
 my $hsd = TukeyHSD($fit, data => \%pg, formula => 'weight ~ group');
 
 is(scalar(@{ $hsd->{group} }), 3, 'aov: three pairwise comparisons');
-is_approx($hsd->{'conf.level'}, 0.95, 1e-12, 'aov: conf.level attribute');
+is_approx($hsd->{'conf_level'}, 0.95, 1e-12, 'aov: conf_level attribute');
 is($hsd->{ordered}, 0, 'aov: ordered attribute false by default');
 
 for my $row (@{ $hsd->{group} }) {

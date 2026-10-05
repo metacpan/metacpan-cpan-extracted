@@ -67,7 +67,7 @@
 # the inversion distribution, and it is now exact too.
 #
 # Tolerance.  1e-11 relative, against a worst observed disagreement over the
-# 396 rows of 1.59e-13 (p.value, n = 60, exact => 1) once that divergence is
+# 396 rows of 1.59e-13 (p_value, n = 60, exact => 1) once that divergence is
 # taken out -- 63x headroom.  The tie-corrected var_S is a sum of four terms of
 # very different sizes and the exact branch is an O(n^3) DP, so the last bits
 # of both move with NV width.  A p-value of exactly 0 or 1 is compared
@@ -97,7 +97,7 @@ my %PERFECT10_EXACT = (
 	'two.sided' => 5.511463844797178e-07,
 );
 
-# [name, x, y, alternative, exact, continuity, statistic, p.value, estimate]
+# [name, x, y, alternative, exact, continuity, statistic, p_value, estimate]
 my @R_ROWS = (
 	["perm4", "1,2,3,4", "2,4,3,1", "two.sided", "d", 0, 2, 0.75, -0.33333333333333337],
 	["perm4", "1,2,3,4", "2,4,3,1", "two.sided", "d", 1, 2, 0.75, -0.33333333333333337],
@@ -543,7 +543,7 @@ for my $r (@R_ROWS) {
 	my $want_p = ($nm eq 'perfect10' && $ex ne '0' && $PERFECT10_EXACT{$alt})
 	           ? $PERFECT10_EXACT{$alt} : $p;
 	rel_ok($got->{statistic},  $stat,   "$id: statistic");
-	rel_ok($got->{'p.value'},  $want_p, "$id: p.value");
+	rel_ok($got->{'p_value'},  $want_p, "$id: p_value");
 	rel_ok($got->{estimate},   $est,    "$id: estimate");
 }
 
@@ -580,7 +580,7 @@ for my $r (@COV_ROWS) {
 	my $elapsed = time - $t0;
 	is($ct->{estimate}, cor(\@x, \@y, 'kendall'),
 	   'n = 20000 with ties: cor_test tau-b == cor tau-b');
-	ok(defined $ct->{'p.value'} && $ct->{'p.value'} >= 0 && $ct->{'p.value'} <= 1,
+	ok(defined $ct->{'p_value'} && $ct->{'p_value'} >= 0 && $ct->{'p_value'} <= 1,
 	   'n = 20000 with ties: p-value is a probability');
 	# The old double loop was 14.7 s at n = 64000, so about 1.4 s here and
 	# rising as n^2; 20 s is a bound no O(n log n) run approaches and no

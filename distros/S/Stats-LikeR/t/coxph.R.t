@@ -162,7 +162,7 @@ for my $c (@expect) {
         close_to( $fit->{se}[$j],   $c->{se}[$j],   "$c->{name}: se[$j]" );
     }
     close_to( $fit->{loglik}, $c->{loglik}, "$c->{name}: loglik" );
-    close_to( $fit->{'loglik.null'}, $c->{loglik0}, "$c->{name}: loglik null" )
+    close_to( $fit->{'loglik_null'}, $c->{loglik0}, "$c->{name}: loglik null" )
         if defined $c->{loglik0};
     is( $fit->{n}, scalar @{ $d->{time} }, "$c->{name}: n" );
     ok( $fit->{converged}, "$c->{name}: converged" );

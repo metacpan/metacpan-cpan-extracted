@@ -362,7 +362,7 @@ for my $c (@PROBS) {
 
 {	# NaN cannot be placed by any comparison sort -- R refuses the input
 	# outright ("missing values and NaN's not allowed if 'na.rm' is FALSE")
-	# and this build has no na.rm, so what it returns is unspecified.  What
+	# and this build has no na_rm, so what it returns is unspecified.  What
 	# is pinned here is that it is still a well-formed answer: the sort keeps
 	# the sample a permutation of itself and stays inside its own buffer, so
 	# the call neither dies nor corrupts anything.  Fuzzed under ASan/UBSan

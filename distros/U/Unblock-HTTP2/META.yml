@@ -1,0 +1,59 @@
+---
+abstract: 'non-blocking HTTP/2 protocol engine for Perl'
+author:
+  - 'Joshua S. Day <hax@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::nghttp2: '0.003'
+  ExtUtils::MakeMaker: '6.64'
+  File::Find: '0'
+  Uniform::HTTP: '0.06'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unblock-HTTP2
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Unblock::HTTP2::_Connection
+    - Unblock::HTTP2::_Headers
+    - Unblock::HTTP2::_nghttp2
+    - Unblock::HTTP2::_nghttp2::Session
+    - Unblock::HTTP2::_nghttp2::NativeDriver
+provides:
+  Unblock::HTTP2:
+    file: lib/Unblock/HTTP2.pm
+    version: '0.10'
+  Unblock::HTTP2::Client:
+    file: lib/Unblock/HTTP2/Client.pm
+    version: '0.10'
+  Unblock::HTTP2::NativeABI:
+    file: lib/Unblock/HTTP2/NativeABI.pm
+    version: '0.10'
+  Unblock::HTTP2::Server:
+    file: lib/Unblock/HTTP2/Server.pm
+    version: '0.10'
+  Unblock::HTTP2::Transaction:
+    file: lib/Unblock/HTTP2/Transaction.pm
+    version: '0.10'
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
+  Uniform::HTTP: '0.06'
+  XSLoader: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/haxmeister/perl-Unblock-HTTP2/issues
+  homepage: https://github.com/haxmeister/perl-Unblock-HTTP2
+  repository: https://github.com/haxmeister/perl-Unblock-HTTP2.git
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

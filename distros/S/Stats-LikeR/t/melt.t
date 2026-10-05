@@ -11,7 +11,7 @@ use Test::LeakTrace 'no_leaks_ok';
 #   * output row order is column-major: all rows for value_vars[0], then
 #     value_vars[1], .. preserving input row order within each block
 #   * column ids are names (AoH/HoA/HoH) or 0-based positions (AoA)
-#   * 'output.type' defaults to the input family; hoh resets labels to 0..N-1
+#   * 'output_type' defaults to the input family; hoh resets labels to 0..N-1
 
 # AoH, the classic pandas example (default output family = AoH)
 {
@@ -93,19 +93,19 @@ use Test::LeakTrace 'no_leaks_ok';
 	], 'AoA melt: positional variable holds source index');
 }
 
-# output.type overrides: AoH in -> HoA / AoA / HoH out
+# output_type overrides: AoH in -> HoA / AoA / HoH out
 {
 	my $df = [ { A => 'a', B => 1 }, { A => 'b', B => 2 } ];
-	is_deeply(melt($df, id_vars => 'A', 'output.type' => 'hoa'), {
+	is_deeply(melt($df, id_vars => 'A', 'output_type' => 'hoa'), {
 		A => [ 'a', 'b' ], variable => [ 'B', 'B' ], value => [ 1, 2 ],
-	}, 'output.type hoa');
-	is_deeply(melt($df, id_vars => 'A', 'output.type' => 'aoa'), [
+	}, 'output_type hoa');
+	is_deeply(melt($df, id_vars => 'A', 'output_type' => 'aoa'), [
 		[ 'a', 'B', 1 ], [ 'b', 'B', 2 ],
-	], 'output.type aoa (id, variable, value positional)');
-	is_deeply(melt($df, id_vars => 'A', 'output.type' => 'hoh'), {
+	], 'output_type aoa (id, variable, value positional)');
+	is_deeply(melt($df, id_vars => 'A', 'output_type' => 'hoh'), {
 		0 => { A => 'a', variable => 'B', value => 1 },
 		1 => { A => 'b', variable => 'B', value => 2 },
-	}, 'output.type hoh');
+	}, 'output_type hoh');
 }
 
 # NA cells pass through as undef
@@ -122,8 +122,8 @@ throws_ok { melt([ { A => 1 } ], 'oddarg') }
 	qr/name => value pairs/, 'odd trailing args die';
 throws_ok { melt([ { A => 1 } ], bogus => 1) }
 	qr/unknown argument/, 'unknown argument dies';
-throws_ok { melt([ { A => 1 } ], id_vars => 'A', 'output.type' => 'xxx') }
-	qr/output\.type/, 'bad output.type dies';
+throws_ok { melt([ { A => 1 } ], id_vars => 'A', 'output_type' => 'xxx') }
+	qr/output_type/, 'bad output_type dies';
 throws_ok { melt([ { A => 1 } ], value_vars => 'Z') }
 	qr/column 'Z' not found/, 'unknown column dies';
 throws_ok { melt([ { A => 1, v => 2 } ], id_vars => 'A', var_name => 'x', value_name => 'x') }

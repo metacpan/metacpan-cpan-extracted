@@ -76,10 +76,10 @@ for my $p (@preds) {
 	both_ways($hoa, $pred, "HoA $name");
 	both_ways($aoh, $pred, "AoH $name");
 	both_ways($hoh, $pred, "HoH $name");
-	both_ways($hoa, $pred, "HoA->AoH $name", 'output.type' => 'aoh');
-	both_ways($aoh, $pred, "AoH->HoA $name", 'output.type' => 'hoa');
-	both_ways($hoh, $pred, "HoH->AoH $name", 'output.type' => 'aoh');
-	both_ways($hoh, $pred, "HoH->HoA $name", 'output.type' => 'hoa');
+	both_ways($hoa, $pred, "HoA->AoH $name", 'output_type' => 'aoh');
+	both_ways($aoh, $pred, "AoH->HoA $name", 'output_type' => 'hoa');
+	both_ways($hoh, $pred, "HoH->AoH $name", 'output_type' => 'aoh');
+	both_ways($hoh, $pred, "HoH->HoA $name", 'output_type' => 'hoa');
 }
 
 # a couple of answers spelled out, so the two paths agreeing on a wrong one
@@ -133,7 +133,7 @@ is_deeply(filter($hoa, col('nope') > 0)->{n}, [], 'a column the frame does not h
 	$out->{b}[0] = 'zz';
 	is_deeply($in, { a => [ 1, 2, 3 ], b => [ 'p', 'q', 'r' ] }, 'HoA output is a copy of the input');
 
-	my $o2 = filter($in, col('a') >= 2, 'output.type' => 'aoh');
+	my $o2 = filter($in, col('a') >= 2, 'output_type' => 'aoh');
 	$o2->[0]{a} = 99;
 	is_deeply($in->{a}, [ 1, 2, 3 ], 'HoA -> AoH output is a copy too');
 }
@@ -167,7 +167,7 @@ is_deeply(filter($hoa, col('nope') > 0)->{n}, [], 'a column the frame does not h
 	# HoA -> AoH: the rows handed back must be distinct from each other and from
 	# anything the predicate kept
 	my @saw;
-	my $a = filter($f, sub { push @saw, $_[0]; 1 }, 'output.type' => 'aoh');
+	my $a = filter($f, sub { push @saw, $_[0]; 1 }, 'output_type' => 'aoh');
 	is_deeply($a, [ map { +{ id => $_ + 1, w => (qw(a b c d))[$_] } } 0 .. 3 ],
 		'HoA -> AoH gives one row hash per kept row');
 	is_deeply(\@saw, $a, 'and the predicate saw those same rows');
@@ -188,11 +188,11 @@ unless ($INC{'Devel/Cover.pm'}) {
 	my $LA	= [ { x => 1, y => 'p' }, { x => 2, y => 'q' } ];
 	my $LH	= { a => { x => 1 }, b => { x => 2 } };
 	no_leaks_ok { filter($LHA, col('x') > 1) }							'no leak: compiled HoA';
-	no_leaks_ok { filter($LHA, col('x') > 1, 'output.type' => 'aoh') }	'no leak: compiled HoA -> aoh';
+	no_leaks_ok { filter($LHA, col('x') > 1, 'output_type' => 'aoh') }	'no leak: compiled HoA -> aoh';
 	no_leaks_ok { filter($LA,  (col('x') > 1) & (col('y') eq 'q')) }	'no leak: compiled AoH, two columns';
-	no_leaks_ok { filter($LA,  col('x') > 1, 'output.type' => 'hoa') }	'no leak: compiled AoH -> hoa';
+	no_leaks_ok { filter($LA,  col('x') > 1, 'output_type' => 'hoa') }	'no leak: compiled AoH -> hoa';
 	no_leaks_ok { filter($LH,  col('x') > 1) }							'no leak: compiled HoH';
-	no_leaks_ok { filter($LH,  col('x') > 1, 'output.type' => 'hoa') }	'no leak: compiled HoH -> hoa';
+	no_leaks_ok { filter($LH,  col('x') > 1, 'output_type' => 'hoa') }	'no leak: compiled HoH -> hoa';
 	no_leaks_ok { filter($LHA, sub { $_->{x} > 1 }) }					'no leak: reused row buffer';
 	no_leaks_ok { my @k; filter($LHA, sub { push @k, $_[0]; 1 }) }		'no leak: row buffer kept by the predicate';
 	no_leaks_ok { eval { filter($LHA, sub { die "x\n" }) } }			'no leak: row buffer, dying predicate';

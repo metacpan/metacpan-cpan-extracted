@@ -6,10 +6,17 @@ use Path::Tiny;
 use JSON qw(decode_json);
 use Mail::DKIM2::Common qw(load_private_key parse_dkim_pubkey);
 
-# Locate the shared keys/ and dns.json relative to this file's installation
-# point. Tests are run from the brong/ directory, so ../keys/ is correct.
-my $KEYS_DIR = path(__FILE__)->absolute->parent->parent->parent->parent->child('keys');
-my $DNS_JSON = path(__FILE__)->absolute->parent->parent->parent->parent->child('dns.json');
+# The test keys and dns.json ship with the distribution under t/data/, so
+# the suite runs from an unpacked tarball with nothing else around it. In the
+# interop repository they are copies of ../keys/ and ../dns.json, which the
+# other implementations' tests share; t/data-in-sync.t keeps them identical.
+my $DATA     = path(__FILE__)->absolute->parent->parent->child('data');
+my $KEYS_DIR = $DATA->child('keys');
+my $DNS_JSON = $DATA->child('dns.json');
+
+# Paths for tests that hand them to a CLI or a config, as strings.
+sub keys_dir { return "$KEYS_DIR" }
+sub dns_json { return "$DNS_JSON" }
 
 my %_key_cache;
 

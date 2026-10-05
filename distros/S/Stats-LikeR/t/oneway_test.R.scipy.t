@@ -688,9 +688,9 @@ for my $c (@CASES) {
 		for my $n (@names) {
 			my @obs  = @{ $hash{$n} };
 			my $mean = 0; $mean += $_ for @obs; $mean /= @obs;
-			rel_ok($got{hash}{'group.stats'}{mean}{$n}, $mean,
+			rel_ok($got{hash}{'group_stats'}{mean}{$n}, $mean,
 				"$c->{name}/$branch: mean($n)", 1e-13);
-			is($got{hash}{'group.stats'}{size}{$n}, scalar @obs,
+			is($got{hash}{'group_stats'}{size}{$n}, scalar @obs,
 				"$c->{name}/$branch: size($n)");
 		}
 
@@ -747,7 +747,7 @@ for my $c (@CASES) {
 		my $o = oneway_test({ a => \@a, b => \@b }, var_equal => $ve);
 		my $t = t_test(\@a, \@b, var_equal => $ve);
 		rel_ok($o->{Group}{'F value'}, $t->{statistic} ** 2, "k=2 $lbl: F == t^2", 1e-13);
-		rel_ok($o->{Group}{'Pr(>F)'},  $t->{'p.value'},        "k=2 $lbl: p == t-test p", 1e-13);
+		rel_ok($o->{Group}{'Pr(>F)'},  $t->{'p_value'},        "k=2 $lbl: p == t-test p", 1e-13);
 		rel_ok($o->{Residuals}{Df},    $t->{df},             "k=2 $lbl: denom Df == t df", 1e-13);
 	}
 }
@@ -792,9 +792,9 @@ for my $c (@CASES) {
 	my $mixed = oneway_test(
 		{ y => [1, 2, 3, 9, 8, 7], g => [0, '0', 0, 1, '1', 1] },
 		formula => 'y ~ g');
-	is(scalar keys %{ $mixed->{'group.stats'}{size} }, 2,
+	is(scalar keys %{ $mixed->{'group_stats'}{size} }, 2,
 		'numeric and string labels with the same string form are one group');
-	is($mixed->{'group.stats'}{size}{0}, 3, 'group "0" has 3 observations');
+	is($mixed->{'group_stats'}{size}{0}, 3, 'group "0" has 3 observations');
 }
 
 done_testing;

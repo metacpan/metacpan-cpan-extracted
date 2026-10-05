@@ -5,7 +5,7 @@ use warnings;
 use Carp qw(croak);
 use parent 'Uniform::HTTP::Message';
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub new {
     my ($class, @args) = @_;

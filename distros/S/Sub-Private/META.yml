@@ -4,9 +4,8 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  IPC::System::Simple: '0'
-  Moo: '0'
-  Moose: '0'
+  File::Spec: '0'
+  File::Temp: '0'
   Test::DescribeMe: '0'
   Test::Memory::Cycle: '0'
   Test::Most: '0'
@@ -15,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,16 +26,18 @@ no_index:
     - inc
 requires:
   Attribute::Handlers: '0'
+  B::Hooks::EndOfScope: '0'
   Carp: '0'
+  IPC::System::Simple: '0'
   Params::Validate::Strict: '0.33'
   Readonly: '0'
   Return::Set: '0'
   Sub::Identify: '0'
   namespace::clean: '0'
-  perl: '5.008'
+  perl: '5.014'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Private
   homepage: https://metacpan.org/pod/Sub::Private
-  repository: git://github.com/nigelhorne/Sub-Private.git
-version: '0.05'
+  repository: https://github.com/nigelhorne/Sub-Private.git
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

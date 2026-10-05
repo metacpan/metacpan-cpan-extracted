@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 use Carp ();
 use MIME::Base64 qw(encode_base64 decode_base64);
@@ -12,9 +12,13 @@ use Crypt::PK::RSA;
 use Crypt::PK::Ed25519;
 use Crypt::Digest::SHA256 qw(sha256 sha256_b64 sha256_hex);
 
+use Email::MIME;
+use Email::MIME::ContentType ();
+
 use Exporter 'import';
 our @EXPORT_OK = qw(
     should_skip
+    parse_mime
     check_ignore_prefixes
     dkim2_canonicalize_header
     dkim2_canonicalize_sig_header
@@ -48,7 +52,7 @@ our @EXPORT_OK = qw(
 # emit, not only on a spec bump. See ../spec/draft-gondwana-dkim2-debug-header.
 use constant DKIM2_DRAFT => 'ietf-dkim-dkim2-spec-06';
 use constant DKIM2_REPO  => 'github.com/dkim2wg/interop';
-use constant DKIM2_DATE  => '2026-10-02';
+use constant DKIM2_DATE  => '2026-10-04';
 
 # Local policy, not spec-06: a message carrying more Message-Instance or
 # DKIM2-Signature fields than this is a PERMERROR, found before any key is
@@ -199,6 +203,21 @@ sub decode_tag_json {
 # Output: folded with "\r\n\t" continuation lines
 # Tab = 8 chars visually, so continuation lines get 64 chars of content.
 # First line target: 72 chars.  Continuation: 64 content + 8 tab = 72.
+# Parse a message with Email::MIME for the verifier's and the Message-Instance
+# code's purposes: raw header fields and the raw body. DKIM2 never reads MIME
+# parameters, so a sender's broken Content-Type -- `text/plain; Windows-1252`
+# and worse, as 2003 spam and some list software emit -- must not stop a
+# message from being verified. Email::MIME::ContentType croaks on such a
+# parameter by default; relax that for the duration of the parse only (it is
+# a package variable, and the host application's own parsing keeps its
+# setting). Found 2026-10-04 replaying the SpamAssassin corpus through a list.
+sub parse_mime {
+    my ($raw) = @_;
+    local $Email::MIME::ContentType::STRICT_PARAMS = 0;
+    local $SIG{__WARN__} = sub { };   # the relaxed parser warns instead
+    return Email::MIME->new($raw);
+}
+
 sub fold_header {
     my ($line, $margin, %opts) = @_;
     $margin //= 72;
@@ -654,6 +673,14 @@ True if C<$domain> is C<$parent> or a subdomain of it, case-insensitively.
 Only for a header this code is creating. A header read from anywhere else
 is never refolded: a fold where there was no whitespace changes its
 canonical form and breaks every signature over it.
+
+=head2 parse_mime($raw)
+
+Parse C<$raw> into an L<Email::MIME> for the library's own use (raw header
+fields, raw body), with L<Email::MIME::ContentType>'s parameter check relaxed
+for the duration of the parse. DKIM2 never reads a MIME parameter, so a
+sender's broken C<Content-Type> must not stop a message from being verified or
+make every verification warn. The package variable is restored afterwards.
 
 =head2 fold_header($line, [$margin], %opts)
 

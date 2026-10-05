@@ -56,7 +56,7 @@ sub check_shape {
 	my ($name, $data, $exp_rows, $exp_cols) = @_;
 	subtest $name => sub {
 		my $file = "$dir/$name.tex";
-		write_table($data, $file, 'row.names' => 0, 'tex.longtable' => 1);
+		write_table($data, $file, 'row_names' => 0, 'tex_longtable' => 1);
 		my $c = read_tex($file);
 
 		unlike($c, qr/\\begin\{tabular\}/, 'no \begin{tabular}');
@@ -110,13 +110,13 @@ check_shape('aoa', [
 	[3, 4],
 ], 2, 2);
 
-# Equivalence: tex.longtable output differs from a full tabular only in the
+# Equivalence: tex_longtable output differs from a full tabular only in the
 # environment wrapper and rules. The header and data rows are byte-identical.
 my %data = ( x => [1, 2, 3], y => [4, 5, 6] );
 my $full = "$dir/full.tex";
 my $long = "$dir/long.tex";
-write_table(\%data, $full, 'row.names' => 0, tex => 1);
-write_table(\%data, $long, 'row.names' => 0, 'tex.longtable' => 1);
+write_table(\%data, $full, 'row_names' => 0, tex => 1);
+write_table(\%data, $long, 'row_names' => 0, 'tex_longtable' => 1);
 my $cf = read_tex($full);
 my $cl = read_tex($long);
 
@@ -126,27 +126,27 @@ unlike($cl, qr/\\begin\{tabular\}/, 'longtable form does not');
 is(header_of($cl), header_of($cf), 'identical header row');
 is_deeply([data_rows_of($cl)], [data_rows_of($cf)], 'identical data rows');
 
-# tex.longtable implies LaTeX even when the file name / tex flag say otherwise.
+# tex_longtable implies LaTeX even when the file name / tex flag say otherwise.
 my %flat = ( a => 1, b => 2 );
 
 my $txt = "$dir/nodotex.txt"; # not a .tex name
-write_table(\%flat, $txt, 'row.names' => 0, 'tex.longtable' => 1);
+write_table(\%flat, $txt, 'row_names' => 0, 'tex_longtable' => 1);
 my $c1 = read_tex($txt);
 like($c1, qr/\\textbf\{/, 'non-.tex name still rendered as LaTeX');
 unlike($c1, qr/\\begin\{tabular\}/, 'and still body-only');
 
 my $off = "$dir/texoff.txt";
-write_table(\%flat, $off, 'row.names' => 0, tex => 0, 'tex.longtable' => 1);
+write_table(\%flat, $off, 'row_names' => 0, tex => 0, 'tex_longtable' => 1);
 my $c2 = read_tex($off);
-like($c2, qr/\\textbf\{/, 'tex => 0 is overridden by tex.longtable');
+like($c2, qr/\\textbf\{/, 'tex => 0 is overridden by tex_longtable');
 
-# tex.col.align shows up only in the copy-paste hint; the rendered header and
+# tex_col_align shows up only in the copy-paste hint; the rendered header and
 # data rows are alignment-independent.
 %flat = ( a => 1, b => 2, c => 3 );
 my $l = "$dir/align_l.tex";
 my $r = "$dir/align_r.tex";
-write_table(\%flat, $l, 'row.names' => 0, 'tex.longtable' => 1, 'tex.col.align' => 'l');
-write_table(\%flat, $r, 'row.names' => 0, 'tex.longtable' => 1, 'tex.col.align' => 'r');
+write_table(\%flat, $l, 'row_names' => 0, 'tex_longtable' => 1, 'tex_col_align' => 'l');
+write_table(\%flat, $r, 'row_names' => 0, 'tex_longtable' => 1, 'tex_col_align' => 'r');
 $cl = read_tex($l);
 my $cr = read_tex($r);
 
@@ -158,17 +158,17 @@ is_deeply([data_rows_of($cl)], [data_rows_of($cr)], 'identical data rows');
 
 # ...and the full tabular still honours alignment in its column spec.
 $full = "$dir/align_full.tex";
-write_table(\%flat, $full, 'row.names' => 0, tex => 1, 'tex.col.align' => 'l');
+write_table(\%flat, $full, 'row_names' => 0, tex => 1, 'tex_col_align' => 'l');
 like(read_tex($full), qr/\{\|l\|l\|l\|\}/, 'full tabular still emits {|l|l|l|}');
 
 # The other tex.* knobs still apply in longtable mode.
 %flat = ( a => 1, b => 2 );
 my $file = "$dir/knobs.tex";
 write_table(\%flat, $file,
-	'row.names'     => 0,
-	'tex.longtable' => 1,
-	'tex.size'      => '\small',
-	'tex.comment'   => ['first note', 'second note'],
+	'row_names'     => 0,
+	'tex_longtable' => 1,
+	'tex_size'      => '\small',
+	'tex_comment'   => ['first note', 'second note'],
 );
 my $c = read_tex($file);
 like($c, qr/^\\small$/m,       'size directive emitted');
@@ -177,87 +177,87 @@ like($c, qr/^% second note$/m, 'second comment emitted');
 
 $file = "$dir/comment_str.tex";
 write_table({ a => 1 }, $file,
-	'row.names' => 0, 'tex.longtable' => 1, 'tex.comment' => 'solo');
+	'row_names' => 0, 'tex_longtable' => 1, 'tex_comment' => 'solo');
 like(read_tex($file), qr/^% solo$/m, 'scalar comment emitted');
 
 $file = "$dir/fmt.tex";
 write_table({ v => 3.14159265 }, $file,
-	'row.names' => 0, 'tex.longtable' => 1, 'tex.format' => 1);
+	'row_names' => 0, 'tex_longtable' => 1, 'tex_format' => 1);
 like(read_tex($file), qr/3\.142/, 'numeric cell formatted with %.4g');
 
 my @aoa = (['c1', 'c2'], ['x', 1], ['y', 2]);
 my $on  = "$dir/bold_on.tex";
 $off = "$dir/bold_off.tex";
-write_table(\@aoa, $on,  'row.names' => 0, 'tex.longtable' => 1); # default on
-write_table(\@aoa, $off, 'row.names' => 0, 'tex.longtable' => 1, 'tex.bold.1st.col' => 0);
+write_table(\@aoa, $on,  'row_names' => 0, 'tex_longtable' => 1); # default on
+write_table(\@aoa, $off, 'row_names' => 0, 'tex_longtable' => 1, 'tex_bold_1st_col' => 0);
 
 my ($r_on)  = data_rows_of(read_tex($on));
 my ($r_off) = data_rows_of(read_tex($off));
 like($r_on,  qr/\\textbf\{x\}/, 'first cell bolded by default');
 like($r_off, qr/^x & 1/,        'first cell not bolded when disabled');
 
-# Row-name handling: a HoH keeps its outer keys unless row.names => 0, longtable
+# Row-name handling: a HoH keeps its outer keys unless row_names => 0, longtable
 # included; the keys are the row identifiers and exist nowhere else.
 my %hoh = (
 	r1 => { c1 => 'a', c2 => 'b' },
 	r2 => { c1 => 'c', c2 => 'd' },
 );
 $file = "$dir/rownames.off.tex";
-write_table(\%hoh, $file, 'tex.longtable' => 1, 'row.names' => 0);
+write_table(\%hoh, $file, 'tex_longtable' => 1, 'row_names' => 0);
 $c = read_tex($file);
 my $h = header_of($c);
-unlike($h, qr/^\\textbf\{\} & /, 'row.names => 0: no empty label cell in the header');
-is(ncols($h), 2, 'row.names => 0: c1 and c2 alone');
-unlike($c, qr/\\textbf\{r1\} & a & b/, 'row.names => 0: the outer key is not emitted as a label');
+unlike($h, qr/^\\textbf\{\} & /, 'row_names => 0: no empty label cell in the header');
+is(ncols($h), 2, 'row_names => 0: c1 and c2 alone');
+unlike($c, qr/\\textbf\{r1\} & a & b/, 'row_names => 0: the outer key is not emitted as a label');
 
 $file = "$dir/rownames.tex";
-write_table(\%hoh, $file, 'tex.longtable' => 1); # no row.names arg
+write_table(\%hoh, $file, 'tex_longtable' => 1); # no row_names arg
 $c = read_tex($file);
 $h = header_of($c);
 like($h, qr/^\\textbf\{\} & /, 'default: header leads with an empty label cell');
 is(ncols($h), 3, 'default: label column plus c1, c2');
 like($c, qr/\\textbf\{r1\} & a & b/, 'default: r1 row carries its (bolded) label');
 
-# ... and row.names => 1 is the same thing said explicitly.
+# ... and row_names => 1 is the same thing said explicitly.
 $file = "$dir/rownames.on.tex";
-write_table(\%hoh, $file, 'tex.longtable' => 1, 'row.names' => 1);
+write_table(\%hoh, $file, 'tex_longtable' => 1, 'row_names' => 1);
 $c = read_tex($file);
 $h = header_of($c);
-like($h, qr/^\\textbf\{\} & /, 'row.names => 1: header leads with an empty label cell');
-is(ncols($h), 3, 'row.names => 1: label column plus c1, c2');
-like($c, qr/\\textbf\{r1\} & a & b/, 'row.names => 1: r1 row carries its (bolded) label');
+like($h, qr/^\\textbf\{\} & /, 'row_names => 1: header leads with an empty label cell');
+is(ncols($h), 3, 'row_names => 1: label column plus c1, c2');
+like($c, qr/\\textbf\{r1\} & a & b/, 'row_names => 1: r1 row carries its (bolded) label');
 
 # Escaping and Greek mapping still run through the shared cell escaper.
 $file = "$dir/escape.tex";
-write_table({ 'a_b' => 1 }, $file, 'row.names' => 0, 'tex.longtable' => 1);
+write_table({ 'a_b' => 1 }, $file, 'row_names' => 0, 'tex_longtable' => 1);
 like(read_tex($file), qr/a\\_b/, 'underscore escaped in header');
 
 $file = "$dir/greek.tex";
-write_table({ "\x{0394}" => 1 }, $file, 'row.names' => 0, 'tex.longtable' => 1);
+write_table({ "\x{0394}" => 1 }, $file, 'row_names' => 0, 'tex_longtable' => 1);
 like(read_tex($file), qr/\\textDelta\{\}/, 'U+0394 -> \textDelta{}');
 
-# tex.longtable.head: the header goes inside longtable's repeat machinery, so
-# the header frozen at every page break is generated from col.names rather than
+# tex_longtable_head: the header goes inside longtable's repeat machinery, so
+# the header frozen at every page break is generated from col_names rather than
 # hand-written by the caller.
 my @aoh = ({ feature => 'a_b', n => 1 }, { feature => 'c', n => 2 });
 my @order = ('feature', 'n');
 $file = "$dir/head.tex";
-write_table(\@aoh, $file, 'col.names' => \@order, 'tex.longtable.head' => 1);
+write_table(\@aoh, $file, 'col_names' => \@order, 'tex_longtable_head' => 1);
 $c = read_tex($file);
-like($c, qr/\\endfirsthead/, 'tex.longtable.head emits \endfirsthead');
-like($c, qr/\\endhead/,      'tex.longtable.head emits \endhead');
-like($c, qr/\\endfoot/,      'tex.longtable.head emits \endfoot');
-unlike($c, qr/\\begin\{tabular\}/, 'tex.longtable.head implies the body-only form');
+like($c, qr/\\endfirsthead/, 'tex_longtable_head emits \endfirsthead');
+like($c, qr/\\endhead/,      'tex_longtable_head emits \endhead');
+like($c, qr/\\endfoot/,      'tex_longtable_head emits \endfoot');
+unlike($c, qr/\\begin\{tabular\}/, 'tex_longtable_head implies the body-only form');
 # \hline is \noalign, and TeX has begun a row by the time it expands the
 # caller's \input, so a rule as the first token is a "Misplaced \noalign".
 is((body_lines($c))[0], '\textbf{feature} & \textbf{n} \\\\ \hline',
 	'file opens on the header row, not on a rule');
-# Both copies of the header must exist and follow col.names, not hash order.
+# Both copies of the header must exist and follow col_names, not hash order.
 my @heads = grep { /\\textbf\{feature\}/ } split /\n/, $c;
 is(scalar @heads, 2, 'header written once for \endfirsthead and once for \endhead');
 is($heads[0], $heads[1], 'the two frozen headers are identical');
 like($heads[0], qr/^\\textbf\{feature\} & \\textbf\{n\} \\\\ \\hline$/,
-	'frozen header follows col.names order');
+	'frozen header follows col_names order');
 # ... and the header is no longer duplicated as a body row.
 is(scalar(grep { /\\textbf\{a\\_b\}/ } data_rows_of($c)), 1, 'data rows unaffected');
 unlike($c, qr/\\endhead\n\\hline\n\\endfoot\n\\textbf\{feature\}/,
@@ -265,8 +265,8 @@ unlike($c, qr/\\endhead\n\\hline\n\\endfoot\n\\textbf\{feature\}/,
 
 # A non-numeric value is the continuation caption, passed through verbatim.
 $file = "$dir/head.caption.tex";
-write_table(\@aoh, $file, 'col.names' => \@order,
-	'tex.longtable.head' => '220 \textDelta{}G (continued)');
+write_table(\@aoh, $file, 'col_names' => \@order,
+	'tex_longtable_head' => '220 \textDelta{}G (continued)');
 $c = read_tex($file);
 like($c, qr/\\endfirsthead\n\\caption\[\]\{220 \\textDelta\{\}G \(continued\)\}\\\\\n/,
 	'continuation caption sits at the top of the \endhead block, unescaped');
@@ -278,26 +278,26 @@ unlike($c, qr/\\endfirsthead\n\\caption[^\n]*\n[^\n]*\\endfirsthead/,
 # written; the caption is passed through as the SV's UTF-8 bytes.
 $file = "$dir/head.caption.wide.tex";
 lives_ok {
-	write_table(\@aoh, $file, 'col.names' => \@order,
-		'tex.longtable.head' => "\x{3b1} (continued)");
+	write_table(\@aoh, $file, 'col_names' => \@order,
+		'tex_longtable_head' => "\x{3b1} (continued)");
 } 'a caption with a wide character does not croak';
 like(read_tex($file), qr/\\caption\[\]\{\xce\xb1 \(continued\)\}\\\\\n/,
 	'wide caption is written as its UTF-8 bytes');
 
 # A true-but-numeric value asks for the machinery with no continuation caption.
 $file = "$dir/head.nocaption.tex";
-write_table(\@aoh, $file, 'col.names' => \@order, 'tex.longtable.head' => 1);
+write_table(\@aoh, $file, 'col_names' => \@order, 'tex_longtable_head' => 1);
 unlike(read_tex($file), qr/\\caption/, 'no caption emitted for a numeric value');
 
-# Off by default: plain tex.longtable keeps the old plain-header body.
+# Off by default: plain tex_longtable keeps the old plain-header body.
 $file = "$dir/head.off.tex";
-write_table(\@aoh, $file, 'col.names' => \@order, 'tex.longtable' => 1);
+write_table(\@aoh, $file, 'col_names' => \@order, 'tex_longtable' => 1);
 unlike(read_tex($file), qr/\\endfirsthead|\\endhead|\\endfoot/,
-	'tex.longtable alone emits no repeat machinery');
+	'tex_longtable alone emits no repeat machinery');
 
 # Error paths still fire with longtable on.
 dies_ok {
-	write_table({ 'x' => { 'y' => [1, 2] } }, "$dir/bad.tex", 'tex.longtable' => 1);
+	write_table({ 'x' => { 'y' => [1, 2] } }, "$dir/bad.tex", 'tex_longtable' => 1);
 } 'nested reference cell croaks in longtable mode';
 
 # No leaks.
@@ -306,9 +306,9 @@ no_leaks_ok {
 	eval {
 		write_table(
 			{ x => [1, 2, 3], 'y' => [4, 5, 6] },
-			$leak, 'row.names' => 0, 'tex.longtable' => 1,
+			$leak, 'row_names' => 0, 'tex_longtable' => 1,
 		);
 	}
-} 'write_table tex.longtable: no memory leaks' unless $INC{'Devel/Cover.pm'};
+} 'write_table tex_longtable: no memory leaks' unless $INC{'Devel/Cover.pm'};
 
 done_testing();

@@ -15,9 +15,9 @@ my $data = {
 };
 
 my $res = glm(formula => 'y ~ x -1 ', data => $data, family => 'gaussian');
-is($res->{'df.null'}, 3, 'Null degrees of freedom is valid_n when has_intercept is false');
+is($res->{'df_null'}, 3, 'Null degrees of freedom is valid_n when has_intercept is false');
 # R null deviance with no intercept = sum(y^2) = 4 + 16 + 36 = 56
-is($res->{'null.deviance'}, 56, 'Null deviance tracks R convention for intercept-free formulas');
+is($res->{'null_deviance'}, 56, 'Null deviance tracks R convention for intercept-free formulas');
 
 no_leaks_ok {
 	eval { glm(formula => 'y ~ x -1 ', data => $data, family => 'gaussian') }
@@ -34,7 +34,7 @@ is($res->{family}, 'binomial', 'Family parameter tracked properly');
 
 # Test Case 3: Car Names Mapping (Row Names)
 my $mtcars = {
-  'row.names' => ['Mazda RX4', 'Mazda RX4 Wag', 'Datsun 710'],
+  'row_names' => ['Mazda RX4', 'Mazda RX4 Wag', 'Datsun 710'],
   'am'        => [1, 1, 1],
   'wt'        => [2.620, 2.875, 2.320],
   'hp'        => [110, 110, 93]
@@ -42,8 +42,8 @@ my $mtcars = {
     
 $res = glm(formula => 'am ~ wt + hp', data => $mtcars, family => 'gaussian');
 
-ok(exists $res->{'deviance.resid'}{'Mazda RX4'}, 'Residual keys map to car names, not integers');
-ok(exists $res->{'fitted.values'}{'Datsun 710'}, 'Fitted value keys map to car names, not integers');
+ok(exists $res->{'deviance_resid'}{'Mazda RX4'}, 'Residual keys map to car names, not integers');
+ok(exists $res->{'fitted_values'}{'Datsun 710'}, 'Fitted value keys map to car names, not integers');
 #=c
 # Test Case 4: Exception Handling & Leak Avoidance
 my $invalid_binomial_data = {
@@ -124,7 +124,7 @@ no_leaks_ok {
 	is_deeply([ sort @{ $gi->{terms} } ],
 		[ sort qw(Intercept dose suppVC dose:suppVC) ],
 		'glm: a numeric x factor interaction expands as R does');
-	is($gi->{'df.residual'}, 56, 'glm: interaction df.residual matches R');
+	is($gi->{'df_residual'}, 56, 'glm: interaction df_residual matches R');
 	my %gi_want = (
 		Intercept     => [ 11.549999999999999,   1.5813942722761327 ],
 		dose          => [  7.8114285714285723,  1.1954217054813172 ],
@@ -147,7 +147,7 @@ no_leaks_ok {
 	my $gn = glm(formula => 'len ~ supp - 1', data => $tooth, family => 'gaussian');
 	is_deeply([ sort @{ $gn->{terms} } ], [qw(suppOJ suppVC)],
 		'glm: a factor with no intercept keeps every level, as R does');
-	is($gn->{'df.residual'}, 58, 'glm: no-intercept factor df.residual matches R');
+	is($gn->{'df_residual'}, 58, 'glm: no-intercept factor df_residual matches R');
 	cmp_ok(abs($gn->{coefficients}{suppOJ} - 20.663333333333334), '<', 1e-9,
 		'glm: suppOJ is the OJ group mean');
 	cmp_ok(abs($gn->{coefficients}{suppVC} - 16.963333333333306), '<', 1e-9,
@@ -161,7 +161,7 @@ no_leaks_ok {
 	is_deeply([ sort @{ $pi->{terms} } ],
 		[ sort qw(Intercept woolB tensionL tensionM woolB:tensionL woolB:tensionM) ],
 		'glm: a factor x factor interaction expands as R does');
-	is($pi->{'df.residual'}, 48, 'glm: poisson interaction df.residual matches R');
+	is($pi->{'df_residual'}, 48, 'glm: poisson interaction df_residual matches R');
 	my %pi_want = (
 		Intercept        => [  3.2009381241905026,    0.067267136953331322 ],
 		woolB            => [ -0.26826398660364542,   0.10218623673839214  ],
@@ -193,7 +193,7 @@ no_leaks_ok {
 	my $pn = glm(formula => 'breaks ~ wool + tension - 1', data => $warp, family => 'poisson');
 	is_deeply([ sort @{ $pn->{terms} } ], [qw(tensionL tensionM woolA woolB)],
 		'glm: with no intercept only the first factor is coded in full');
-	is($pn->{'df.residual'}, 50, 'glm: no-intercept poisson df.residual matches R');
+	is($pn->{'df_residual'}, 50, 'glm: no-intercept poisson df_residual matches R');
 	my %pn_want = (
 		woolA    => [ 3.1734746484364513,  0.05567331237245942  ],
 		woolB    => [ 2.9674862057875893,  0.058073053866257801 ],
@@ -347,7 +347,7 @@ no_leaks_ok {
 	my %e = map { $_ => [ @{ $d{$_} }[3 .. 11] ] } keys %d;
 	my $f = glm(formula => 'y ~ x | id', data => \%d, family => 'poisson', weights => 'w');
 	my $g = glm(formula => 'y ~ x | id', data => \%e, family => 'poisson', weights => 'w');
-	is($f->{'fe.removed'}, 3, 'glm absorb: a group whose weighted rows are all zero is removed');
+	is($f->{'fe_removed'}, 3, 'glm absorb: a group whose weighted rows are all zero is removed');
 	is_deeply($f->{absorb}, { id => 3 }, 'glm absorb: three groups are kept');
 	# the same fit on the same rows, so only rounding separates them
 	cmp_ok(abs($f->{coefficients}{x} - $g->{coefficients}{x}), '<', 1e-12,

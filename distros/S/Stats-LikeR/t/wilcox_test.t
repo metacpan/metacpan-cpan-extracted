@@ -40,15 +40,15 @@ my @y = (0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29);
 # ranks (Streitberg-Roehmel) and so do we.
 my $rs = wilcox_test(\@x, \@y);
 is_approx( $rs->{statistic}, 58,                  'wilcox_test: two-sample W statistic = 58', 0 );
-is_approx( $rs->{'p.value'},   0.1299053887289181,  'wilcox_test: two-sample p matches R', 1e-14 );
+is_approx( $rs->{'p_value'},   0.1299053887289181,  'wilcox_test: two-sample p matches R', 1e-14 );
 is( $rs->{method}, 'Wilcoxon rank sum exact test',
 	'wilcox_test: two-sample method string' );
 is( $rs->{alternative}, 'two.sided', 'wilcox_test: alternative echoed' );
-is( $rs->{'statistic.name'}, 'W', 'wilcox_test: two-sample statistic is named W' );
+is( $rs->{'statistic_name'}, 'W', 'wilcox_test: two-sample statistic is named W' );
 
 # The normal approximation is still what exact => 0 asks for.
 my $rs_approx = wilcox_test(\@x, \@y, exact => 0);
-is_approx( $rs_approx->{'p.value'}, 0.13291945818531881,
+is_approx( $rs_approx->{'p_value'}, 0.13291945818531881,
 	'wilcox_test: two-sample approximate p matches R', 1e-14 );
 is( $rs_approx->{method}, 'Wilcoxon rank sum test with continuity correction',
 	'wilcox_test: exact => 0 method string' );
@@ -56,13 +56,13 @@ is( $rs_approx->{method}, 'Wilcoxon rank sum test with continuity correction',
 # Two-sample exact (no ties, fully separated): p = 2/70.
 my $ex = wilcox_test([1,2,3,4], [5,6,7,8]);
 is_approx( $ex->{statistic}, 0,          'wilcox_test: separated exact W = 0', 0 );
-is_approx( $ex->{'p.value'},   0.02857143, 'wilcox_test: separated exact p = 2/70', 1e-7 );
+is_approx( $ex->{'p_value'},   0.02857143, 'wilcox_test: separated exact p = 2/70', 1e-7 );
 is( $ex->{method}, 'Wilcoxon rank sum exact test', 'wilcox_test: exact method selected' );
 
 # Paired signed-rank, one-sided greater (exact): V = 40, p = 10/512.
 my $pr = wilcox_test(\@x, \@y, paired => 1, alternative => 'greater');
 is_approx( $pr->{statistic}, 40,         'wilcox_test: paired V statistic = 40', 0 );
-is_approx( $pr->{'p.value'},   0.01953125, 'wilcox_test: paired exact p = 10/512', 1e-9 );
+is_approx( $pr->{'p_value'},   0.01953125, 'wilcox_test: paired exact p = 10/512', 1e-9 );
 is( $pr->{method}, 'Wilcoxon signed rank exact test', 'wilcox_test: signed-rank exact method' );
 is( $pr->{alternative}, 'greater', 'wilcox_test: paired alternative echoed' );
 
@@ -72,7 +72,7 @@ my $shifted_mu = wilcox_test([1..11], mu => 6);
 my $shifted_in = wilcox_test(\@shift);
 is_approx( $shifted_mu->{statistic}, $shifted_in->{statistic},
 	'wilcox_test: mu shift matches pre-shifted data (V)', 0 );
-is_approx( $shifted_mu->{'p.value'}, $shifted_in->{'p.value'},
+is_approx( $shifted_mu->{'p_value'}, $shifted_in->{'p_value'},
 	'wilcox_test: mu shift matches pre-shifted data (p)', 1e-12 );
 
 #		wilcox_test: options
@@ -80,9 +80,9 @@ is_approx( $shifted_mu->{'p.value'}, $shifted_in->{'p.value'},
 # (It only applies to the approximation, so exact => 0 has to be in play.)
 my $corr_on  = wilcox_test(\@x, \@y, exact => 0, correct => 1);
 my $corr_off = wilcox_test(\@x, \@y, exact => 0, correct => 0);
-ok( abs($corr_on->{'p.value'} - $corr_off->{'p.value'}) > 1e-9,
+ok( abs($corr_on->{'p_value'} - $corr_off->{'p_value'}) > 1e-9,
 	'wilcox_test: correct=>0 differs from correct=>1' );
-is_approx( $corr_off->{'p.value'}, 0.12189099149676097,
+is_approx( $corr_off->{'p_value'}, 0.12189099149676097,
 	'wilcox_test: correct=>0 matches R', 1e-14 );
 is( $corr_off->{method}, 'Wilcoxon rank sum test',
 	'wilcox_test: correct=>0 drops continuity correction' );
@@ -99,7 +99,7 @@ is( $forced_off->{method}, 'Wilcoxon rank sum test with continuity correction',
 	local $SIG{__WARN__} = sub { push @w, $_[0] };
 	my $forced_on = wilcox_test([1,2,2,3], [4,5,5,6], exact => 1);
 	is( scalar(@w), 0, 'wilcox_test: exact=>1 with ties no longer warns' );
-	is_approx( $forced_on->{'p.value'}, 0.028571428571428571,
+	is_approx( $forced_on->{'p_value'}, 0.028571428571428571,
 		'wilcox_test: exact=>1 with ties matches R', 1e-14 );
 	is( $forced_on->{method}, 'Wilcoxon rank sum exact test',
 		'wilcox_test: exact=>1 with ties stays exact' );
@@ -113,7 +113,7 @@ is_approx( $named->{statistic}, $rs->{statistic},
 # Non-numeric and undefined cells are dropped before ranking.
 my $dirty = wilcox_test([1,2,undef,3,'NA',4], [5,'x',6,7,8,undef]);
 is_approx( $dirty->{statistic}, $ex->{statistic}, 'wilcox_test: NA/undef dropped (W)', 0 );
-is_approx( $dirty->{'p.value'},   $ex->{'p.value'},   'wilcox_test: NA/undef dropped (p)', 1e-12 );
+is_approx( $dirty->{'p_value'},   $ex->{'p_value'},   'wilcox_test: NA/undef dropped (p)', 1e-12 );
 
 # wilcox_test: regressions
 # All values identical. The exact path handles this without a special case:
@@ -123,7 +123,7 @@ is_approx( $dirty->{'p.value'},   $ex->{'p.value'},   'wilcox_test: NA/undef dro
 	local $SIG{__WARN__} = sub { push @w, $_[0] };
 	my $flat = wilcox_test([5,5,5], [5,5,5]);
 	is_approx( $flat->{statistic}, 4.5, 'wilcox_test: identical samples give W = 4.5', 0 );
-	is_approx( $flat->{'p.value'},   1,   'wilcox_test: identical samples give p = 1', 0 );
+	is_approx( $flat->{'p_value'},   1,   'wilcox_test: identical samples give p = 1', 0 );
 	is( scalar(@w), 0, 'wilcox_test: identical samples do not warn on the exact path' );
 }
 # The approximation still has nothing to divide by, and says so rather than
@@ -132,14 +132,14 @@ is_approx( $dirty->{'p.value'},   $ex->{'p.value'},   'wilcox_test: NA/undef dro
 	my @w;
 	local $SIG{__WARN__} = sub { push @w, $_[0] };
 	my $flat = wilcox_test([5,5,5], [5,5,5], exact => 0);
-	is_approx( $flat->{'p.value'}, 1, 'wilcox_test: zero variance gives p = 1 (not 0/NaN)', 0 );
-	ok( $flat->{'p.value'} == $flat->{'p.value'}, 'wilcox_test: zero-variance p is not NaN' );
+	is_approx( $flat->{'p_value'}, 1, 'wilcox_test: zero variance gives p = 1 (not 0/NaN)', 0 );
+	ok( $flat->{'p_value'} == $flat->{'p_value'}, 'wilcox_test: zero-variance p is not NaN' );
 	ok( scalar(@w) >= 1, 'wilcox_test: zero-variance case warns' );
 }
 
 # Statistic exactly on its mean: two-sided correction must be 0 (R uses sign(z)*0.5).
 my $at_mean = wilcox_test([1,4], [2,3], exact => 0);
-is_approx( $at_mean->{'p.value'}, 1, 'wilcox_test: statistic at mean gives p = 1', 1e-12 );
+is_approx( $at_mean->{'p_value'}, 1, 'wilcox_test: statistic at mean gives p = 1', 1e-12 );
 
 # An invalid alternative is rejected instead of silently running two-sided.
 eval { wilcox_test(\@x, \@y, alternative => 'twosided') };
@@ -161,8 +161,8 @@ dies_ok { wilcox_test([1,2,3], [1,2], paired => 1) } 'wilcox_test: paired length
 #		wilcox_test: output shape
 my $shape = wilcox_test(\@x, \@y);
 is( ref $shape, 'HASH', 'wilcox_test: returns a hashref' );
-foreach my $k (qw(statistic statistic.name p.value method alternative
-				  null.value null.value.name)) {
+foreach my $k (qw(statistic statistic_name p_value method alternative
+				  null_value null_value_name)) {
 	ok( exists $shape->{$k}, "wilcox_test: output has '$k'" );
 }
 
@@ -216,9 +216,9 @@ throws_ok { wilcox_test([1, 2, 3], [1, 2], paired => 1) } qr/^wilcox_test: 'x' a
 	local $SIG{__WARN__} = sub { push @w, $_[0] };
 	my $r = wilcox_test([$inf, $inf], [$inf], conf_int => 1);
 	ok( scalar(grep { /every difference is Inf - Inf/ } @w), 'wilcox_test: all-NaN differences warn' );
-	ok( $r->{'conf.int'}[0] != $r->{'conf.int'}[0] && $r->{'conf.int'}[1] != $r->{'conf.int'}[1],
+	ok( $r->{'conf_int'}[0] != $r->{'conf_int'}[0] && $r->{'conf_int'}[1] != $r->{'conf_int'}[1],
 		'wilcox_test: all-NaN differences give a NaN interval' );
-	is( $r->{'conf.level'}, 0, 'wilcox_test: all-NaN differences give level 0' );
+	is( $r->{'conf_level'}, 0, 'wilcox_test: all-NaN differences give level 0' );
 	ok( $r->{estimate} != $r->{estimate}, 'wilcox_test: all-NaN differences give a NaN estimate' );
 }
 

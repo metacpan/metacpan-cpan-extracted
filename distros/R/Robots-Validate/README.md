@@ -22,27 +22,23 @@ This module allows one to validate a robot user-agent string against the IP addr
 
 # RECENT CHANGES
 
-Changes for version v0.4.6 (2026-09-25)
+Changes for version v0.4.7 (2026-10-04)
 
 - Enhancements
     - Added or updated the robot rules for the following:
-        - Applebot
-        - BanquiseBot
-        - domainprintbot
-        - DomainStatsBot
-        - DuckAssistBot
-        - DuckDuckBot
-        - GPTbot
-        - GPT-User
-        - Googlebot
-        - Lycos
-        - MedllyBot
-        - OAI-SearchBot
-        - QwantBot
-        - UmaiBot
-        - webarchiv.cz
-        - WebtelemetryBot
-        - Yeti
+        - ApocsysBot
+        - BitSightBot
+        - ClueWeb-Crawler
+        - EmailSherlock
+        - HubSpot Crawler
+        - Hydrozen
+        - IsonSearchBot
+        - MeistackBot
+        - SiteGraphBot
+        - Spletni Arhiv NUK
+        - SyntoraDataBot
+        - UptimeBot
+        - vuhuvBot
 
 See the `Changes` file for more details.
 

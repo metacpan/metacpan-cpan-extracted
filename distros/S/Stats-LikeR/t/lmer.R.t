@@ -1055,7 +1055,7 @@ for my $k (0 .. 11) {
 	is($f->{nobs}, 180, '180 observations');
 	ok(!$f->{singular}, 'sleepstudy is not a singular fit');
 	my $sum = 0;
-	$sum += $f->{'fitted.values'}{$_} for keys %{ $f->{'fitted.values'} };
+	$sum += $f->{'fitted_values'}{$_} for keys %{ $f->{'fitted_values'} };
 	my $ysum = 0;
 	$ysum += $_ for @{ $S->{Reaction} };
 	# the conditional modes shrink toward the fixed effects, and with an

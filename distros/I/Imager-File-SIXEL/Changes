@@ -1,0 +1,19 @@
+Revision history for Imager::File::SIXEL
+
+1.001  2026-10-04
+    - The figures in Imager::File::SIXEL::Examples show on MetaCPAN
+      instead of gray placeholders: the pod loads them from the
+      release's tag on GitHub.
+
+1.000  2026-10-04
+    - First release.
+    - Reads SIXEL images: 7-bit and 8-bit control strings, RGB and HLS
+      colour definitions, raster attributes, transparent backgrounds,
+      registers redefined while painting, several images per stream,
+      and truncated data on request.
+    - Writes SIXEL images with adaptive (histogram splitting refined by
+      k-means), web-safe or caller supplied palettes, Floyd-Steinberg,
+      ordered or no dithering, and transparency.
+    - Encodes 640 x 480 frames in 3 to 16 milliseconds on a current
+      desktop CPU, fast enough for animations at 60 frames per second,
+      with output typically smaller than libsixel's for the same pixels.

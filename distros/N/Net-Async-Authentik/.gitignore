@@ -1,0 +1,41 @@
+Net-Async-Authentik-*
+*.bak
+*.old
+*.swp
+*~
+
+/.build/
+/_build/
+/cover_db/
+/blib/
+/pm_to_blib
+/Makefile
+/Makefile.old
+/MANIFEST*
+!MANIFEST.SKIP
+/META.*
+/MYMETA.*
+/resume
+/AGENTS.md
+
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+# karr materialized task view -- never commit
+tasks/
+config.yml
+.karr
+
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore
+.envrc.local
+
+# authentik test instance secrets
+.env

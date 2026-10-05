@@ -74,6 +74,11 @@ has contributors => (
     is => 'lazy',
 );
 
+has skip_prepare => (
+    is      => 'ro',
+    default => sub { 0 },
+);
+
 has work_dir => (
     is => 'lazy',
 );
@@ -117,6 +122,15 @@ no Moo;
 sub allow_pureperl {
     my $self = shift;
     $self->config->{allow_pureperl} ? 1 : 0;
+}
+
+sub manage_changes {
+    my $self = shift;
+    return 1 unless exists $self->config->{manage_changes};
+
+    my $manage_changes = $self->config->{manage_changes};
+    return 0 if !$manage_changes || $manage_changes eq 'false';
+    return 1;
 }
 
 sub version {
@@ -605,7 +619,7 @@ sub regenerate_meta_json {
 
     my $meta = $self->cpan_meta('unstable');
     $meta->save(File::Spec->catfile($self->dir, 'META.json'), {
-        version => '2.0'
+        version => '2'
     });
 }
 
@@ -769,7 +783,8 @@ sub _build_contributors {
 sub _build_work_dir {
     my $self = shift;
     Minilla::WorkDir->new(
-        project  => $self,
+        project      => $self,
+        skip_prepare => $self->skip_prepare,
     );
 }
 

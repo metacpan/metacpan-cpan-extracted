@@ -14,7 +14,7 @@ use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
 
 # Load DNS keys
-my $dns = decode_json(path('../dns.json')->slurp);
+my $dns = decode_json(path('t/data/dns.json')->slurp);
 
 sub find_key {
     my ($signature, $idx) = @_;
@@ -43,6 +43,11 @@ my @impl_dirs = (
     ['../python/tests/expected', 'python'],
     ['../hs',                    'hs'],
 );
+
+# The other implementations live in the interop repository, not in this
+# distribution; an unpacked tarball has nothing to cross-check.
+plan skip_all => "other implementations' fixtures not available (not in the interop repository)"
+    unless grep { -d $_->[0] } @impl_dirs;
 
 for my $impl (@impl_dirs) {
     my ($dir, $name) = @$impl;

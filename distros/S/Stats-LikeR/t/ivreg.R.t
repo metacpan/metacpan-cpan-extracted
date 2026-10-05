@@ -326,7 +326,7 @@ sub p_close {
 	return close_to($got, $want, $name, $class, $tol) if !defined $got || $want >= 1e-3 || $got <= 0;
 	return close_to(log($got), log($want), "$name (log scale)", $class, $tol);
 }
-my %DIAG_KEY = ('Weak instruments' => 'weak', 'Wu-Hausman' => 'wu.hausman', 'Sargan' => 'sargan');
+my %DIAG_KEY = ('Weak instruments' => 'weak', 'Wu-Hausman' => 'wu_hausman', 'Sargan' => 'sargan');
 sub check {
 	my ($key, $fit) = @_;
 	my $e = $EXPECT{$key};
@@ -337,15 +337,15 @@ sub check {
 		close_to($s->{'Std. Error'}, $e->{se}[$j], "$key: se $nm");
 		close_to($s->{'t value'}, $e->{t}[$j], "$key: t $nm");
 		p_close($s->{'Pr(>|t|)'}, $e->{p}[$j], "$key: p $nm");
-		close_to($fit->{'conf.int'}{$nm}[0], $e->{ci}[2 * $j], "$key: lower $nm");
-		close_to($fit->{'conf.int'}{$nm}[1], $e->{ci}[2 * $j + 1], "$key: upper $nm");
+		close_to($fit->{'conf_int'}{$nm}[0], $e->{ci}[2 * $j], "$key: lower $nm");
+		close_to($fit->{'conf_int'}{$nm}[1], $e->{ci}[2 * $j + 1], "$key: upper $nm");
 	}
 	close_to($fit->{sigma}, $e->{sigma}, "$key: sigma");
-	is($fit->{'df.residual'}, $e->{df}, "$key: df.residual");
-	close_to($fit->{'r.squared'}, $e->{r2}, "$key: R-squared");
-	close_to($fit->{'adj.r.squared'}, $e->{adj}, "$key: adjusted R-squared");
+	is($fit->{'df_residual'}, $e->{df}, "$key: df_residual");
+	close_to($fit->{'r_squared'}, $e->{r2}, "$key: R-squared");
+	close_to($fit->{'adj_r_squared'}, $e->{adj}, "$key: adjusted R-squared");
 	close_to($fit->{waldtest}{statistic}, $e->{wald}, "$key: Wald test");
-	p_close($fit->{waldtest}{'p.value'}, $e->{wald_p}, "$key: Wald p-value");
+	p_close($fit->{waldtest}{'p_value'}, $e->{wald_p}, "$key: Wald p-value");
 	return unless $e->{diag_rows};
 	for my $r (0 .. $#{ $e->{diag_rows} }) {
 		my $row = $e->{diag_rows}[$r];
@@ -361,7 +361,7 @@ sub check {
 			next;
 		}
 		close_to($d->{statistic}, $e->{diag_stat}[$r], "$key: $row statistic");
-		p_close($d->{'p.value'}, $e->{diag_p}[$r], "$key: $row p-value");
+		p_close($d->{'p_value'}, $e->{diag_p}[$r], "$key: $row p-value");
 		is($d->{df1} // $d->{df}, $e->{diag_df1}[$r], "$key: $row df1");
 		is($d->{df2}, $e->{diag_df2}[$r], "$key: $row df2") if defined $e->{diag_df2}[$r];
 	}
@@ -389,7 +389,7 @@ check('school',     ivreg(formula => 'log(wage) ~ education + experience + I(exp
 	my $f = 'log(packs) ~ log(rprice) + log(rincome) + year | log(rincome) + year + tdiff + rtax';
 	my $a = ivreg(formula => $f, data => \%cs, cluster => 'state');
 	check('cigsw_cluster', $a);
-	is($a->{'n.clusters'}, 48, 'cigsw: 48 states');
+	is($a->{'n_clusters'}, 48, 'cigsw: 48 states');
 	check('cigsw_cluster1', ivreg(formula => $f, data => \%cs, cluster => 'state', vcov => 'HC1'));
 }
 {
@@ -408,21 +408,21 @@ check('school',     ivreg(formula => 'log(wage) ~ education + experience + I(exp
 			close_to($fit->{coefficients}{$nm}, $s->{coef}[$j], "Stata ivreg2 $k: coef $nm", 'Stata');
 			close_to($fit->{summary}{$nm}{'Std. Error'}, $s->{se}[$j], "Stata ivreg2 $k: se $nm", 'Stata');
 		}
-		close_to($fit->{'r.squared'}, $s->{r2}, "Stata ivreg2 $k: r2", 'Stata');
-		close_to($fit->{'adj.r.squared'}, $s->{r2_a}, "Stata ivreg2 $k: r2_a", 'Stata');
+		close_to($fit->{'r_squared'}, $s->{r2}, "Stata ivreg2 $k: r2", 'Stata');
+		close_to($fit->{'adj_r_squared'}, $s->{r2_a}, "Stata ivreg2 $k: r2_a", 'Stata');
 		close_to($fit->{sigma}, $s->{rmse}, "Stata ivreg2 $k: rmse", 'Stata');
 		close_to($fit->{rss}, $s->{rss}, "Stata ivreg2 $k: rss", 'Stata');
 		close_to($fit->{waldtest}{statistic}, $s->{F}, "Stata ivreg2 $k: F", 'Stata');
 		# Stata prints this p-value to eleven figures
-		p_close($fit->{waldtest}{'p.value'}, $s->{Fp}, "Stata ivreg2 $k: Fp", 'Stata');
+		p_close($fit->{waldtest}{'p_value'}, $s->{Fp}, "Stata ivreg2 $k: Fp", 'Stata');
 		if (defined $s->{sargan}) {
 			close_to($fit->{diagnostics}{sargan}{statistic}, $s->{sargan}, "Stata ivreg2 $k: Sargan", 'Stata');
-			p_close($fit->{diagnostics}{sargan}{'p.value'}, $s->{sarganp}, "Stata ivreg2 $k: Sargan p", 'Stata');
+			p_close($fit->{diagnostics}{sargan}{'p_value'}, $s->{sarganp}, "Stata ivreg2 $k: Sargan p", 'Stata');
 		}
 	}
-	close_to($m->{diagnostics}{'wu.hausman'}{statistic}, $STATA{hausman}{WHF}, 'Stata ivendog: Wu-Hausman F', 'Stata');
-	p_close($m->{diagnostics}{'wu.hausman'}{'p.value'}, $STATA{hausman}{WHFp}, 'Stata ivendog: Wu-Hausman p', 'Stata');
-	is($m->{diagnostics}{'wu.hausman'}{df2}, $STATA{hausman}{df_r}, 'Stata ivendog: Wu-Hausman df');
+	close_to($m->{diagnostics}{'wu_hausman'}{statistic}, $STATA{hausman}{WHF}, 'Stata ivendog: Wu-Hausman F', 'Stata');
+	p_close($m->{diagnostics}{'wu_hausman'}{'p_value'}, $STATA{hausman}{WHFp}, 'Stata ivendog: Wu-Hausman p', 'Stata');
+	is($m->{diagnostics}{'wu_hausman'}{df2}, $STATA{hausman}{df_r}, 'Stata ivendog: Wu-Hausman df');
 }
 # ------------------------------------------------------------ errors
 {

@@ -402,7 +402,7 @@ is($r_live, 'REAL_DNS_KEY', '... and returns the real-DNS key, not a dns.json va
 
 my $ovr = FakeSig->new('sel1', 'test1.dkim2.com');   # a domain present in dns.json
 my $ovr_v = FakeVerifier->new;
-my $cb_ovr = Mail::DKIM2::Validate::_default_cb('../dns.json');
+my $cb_ovr = Mail::DKIM2::Validate::_default_cb('t/data/dns.json');
 my $r_ovr = $cb_ovr->($ovr, 0, $ovr_v);
 is($ovr_v->{called}, 0, 'dns.json override (explicit path) short-circuits real DNS — test-only affordance');
 ok(defined $r_ovr, '... and returns a parsed key from the override');

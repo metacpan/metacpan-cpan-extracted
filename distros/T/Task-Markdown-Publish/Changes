@@ -1,5 +1,16 @@
 Revision history for Task-Markdown-Publish
 
+0.003  2026-10-04
+
+    - Require Task::Markdown::Pod 0.003 and Markdown::Publish 1.005, including
+      source-relative links from authored documents to mirrored sidecars.
+    - Refresh the complete documentation publishing installation bundle.
+
+0.002  2026-10-04
+
+    - Require the latest Task::Markdown::Pod, Markdown::Publish, and
+      MakeMaker publication integration releases.
+
 0.001  2026-09-27
 
     - First release.

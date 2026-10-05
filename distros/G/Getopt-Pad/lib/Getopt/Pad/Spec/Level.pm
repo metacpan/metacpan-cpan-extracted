@@ -7,7 +7,7 @@ use Getopt::Pad::Spec::Arg;
 class Getopt::Pad::Spec::Level :strict(params) {
 	use Getopt::Pad::Util qw(specError isValidName);
 
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	field $raw  :param;
 	field $path :param :reader = '';

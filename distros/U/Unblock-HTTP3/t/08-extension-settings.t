@@ -170,6 +170,38 @@ ok(
     }
 }
 
+for my $case (
+    [ 8,  2, 'SETTINGS_ENABLE_CONNECT_PROTOCOL' ],
+    [ 51, 2, 'SETTINGS_H3_DATAGRAM' ],
+) {
+    my ($id, $value, $name) = @$case;
+    my $payload =
+          Unblock::HTTP3::Connection::_encode_http3_varint($id)
+        . Unblock::HTTP3::Connection::_encode_http3_varint($value);
+    my $wire =
+          Unblock::HTTP3::Connection::_encode_http3_varint(0)
+        . Unblock::HTTP3::Connection::_encode_http3_varint(4)
+        . Unblock::HTTP3::Connection::_encode_http3_varint(length($payload))
+        . $payload;
+
+    my $quic = Local::HTTP3SettingsQUIC->new;
+    my $strict = bless {
+        peer_settings_parser => {},
+        transactions         => {},
+        quic                 => $quic,
+        failed               => 0,
+    }, 'Unblock::HTTP3::Connection';
+
+    $strict->_inspect_peer_settings_bytes(2, $wire);
+
+    ok($strict->failed,
+        "$name outside 0 or 1 fails the HTTP/3 connection");
+    is($strict->error_code, 0x0109,
+        "$name invalid value uses H3_SETTINGS_ERROR");
+    is($quic->{closed_with}, 0x0109,
+        "$name invalid value closes QUIC with H3_SETTINGS_ERROR");
+}
+
 my $fake_quic = Local::HTTP3SettingsQUIC->new;
 
 my $validator = bless {

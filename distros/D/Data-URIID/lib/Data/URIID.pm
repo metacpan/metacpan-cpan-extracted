@@ -21,7 +21,7 @@ use Data::URIID::Service;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.24;
+our $VERSION = v0.25;
 
 my %names = (
     service => {
@@ -73,10 +73,12 @@ my %names = (
         'sirtxkeepcoolorg'  => '0d7be696-accc-4d52-9cea-9c2362a57d62', # sirtx.keep-cool.org
         'denkxweb-hessen'   => '05bbc5d4-b77f-48bb-b458-97ddc16ab48f', # denkxweb.denkmalpflege-hessen.de
         'ibbco'             => '39b7c20f-5521-49ec-9292-5794131e4291', # ibb.co
+        'wikifunctions'     => 'd98d0c76-e970-4303-bb63-13df8edc51fb', # www.wikifunctions.org
 
         # schemes using namespace 0883381d-1d01-4aa2-bd15-e8bb7ac7673d
         'scheme-ni'         => '0293c674-7576-572e-ab19-81d8e1ce0300',
         'scheme-geo'        => '711fdb97-4a86-5e05-aaf0-f817bbd32b4e',
+        'scheme-urn'        => 'c6a6fc54-8629-58fe-953a-877365ec902d',
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -84,6 +86,7 @@ my %names = (
         'uri'                           => 'a8d1637d-af19-49e9-9ef8-6bc1fbcf6439',
         'tagname'                       => 'bfae7574-3dae-425d-89b1-9c087c140c23',
         'wikidata-identifier'           => 'ce7aae1e-a210-4214-926a-0ebca56d77e3',
+        'wikifunctions-identifier'      => 'cf3be2a5-3a95-41a0-99d7-cea6caf7d455', # AKA ZID
         'musicbrainz-identifier'        => '95bd826b-bd3e-4b40-b16a-aa20c9f673e4', # P434, P435, P436, P966, P982, P1004, P1330, P1407, P4404, P5813, P6423, and P8052
         'british-museum-term'           => '310776dc-1433-4623-9ffa-42d038d400a4', # P1711 (special)!
         'gnd-identifier'                => '893a7d5c-124c-4ad6-9a56-0ea8be50b536', # P227
@@ -135,6 +138,7 @@ my %names = (
         'danbooru2chanjp-tag'           => 'c5632c60-5da2-41af-8b60-75810b622756',
         'denkxweb-hessen-identifier'    => '3b215e80-0df1-4b77-aa25-69df66db7b3b', # P1769
         'ibbco-identifier'              => '308d4b1c-6007-42d0-8d83-c13c92c03426',
+        'unicode-code-point'            => '5f167223-cc9c-4b2f-9928-9fe1b253b560',
     },
     action => {
         #What about: search/lookup? list? content?
@@ -561,7 +565,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.24
+version v0.25
 
 =head1 SYNOPSIS
 

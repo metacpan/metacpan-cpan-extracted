@@ -38,28 +38,28 @@ sub fresh_hoh {
 	};
 }
 
-# HoH -> AoH (default output) preserves the row name under 'row.name'
+# HoH -> AoH (default output) preserves the row name under 'row_name'
 {
 	my $hoh = fresh_hoh();
 	my $aoh = csort($hoh, 'id');	# ascending by id -> alpha, beta, gamma
 	is( ref $aoh, 'ARRAY', 'HoH defaults to AoH output' );
 	is( scalar @$aoh, 3, 'all rows returned' );
-	is( $aoh->[0]{'row.name'}, 'alpha', 'row 0 carries its outer key' );
-	is( $aoh->[1]{'row.name'}, 'beta',  'row 1 carries its outer key' );
-	is( $aoh->[2]{'row.name'}, 'gamma', 'row 2 carries its outer key' );
+	is( $aoh->[0]{'row_name'}, 'alpha', 'row 0 carries its outer key' );
+	is( $aoh->[1]{'row_name'}, 'beta',  'row 1 carries its outer key' );
+	is( $aoh->[2]{'row_name'}, 'gamma', 'row 2 carries its outer key' );
 	# the ordinary columns still travel alongside the name
 	is( $aoh->[0]{id},  1,  'row 0 id intact' );
 	is( $aoh->[2]{tag}, 'A','row 2 tag intact' );
 }
 
-# HoH -> HoA gives an aligned 'row.name' column
+# HoH -> HoA gives an aligned 'row_name' column
 {
 	my $hoh = fresh_hoh();
 	no warnings 'once';
 	my $hoa = csort($hoh, sub { $b->{id} <=> $a->{id} }, 'hoa');	# desc id
 	is( ref $hoa, 'HASH', 'coderef sort of HoH -> HoA' );
-	is_deeply( $hoa->{'row.name'}, [qw/gamma beta alpha/],
-		'row.name column aligns with the descending sort' );
+	is_deeply( $hoa->{'row_name'}, [qw/gamma beta alpha/],
+		'row_name column aligns with the descending sort' );
 	is_deeply( $hoa->{id},  [3, 2, 1],       'id column follows the same order' );
 	is_deeply( $hoa->{val}, [10, 20, 30],    'val column stays row-aligned' );
 	is_deeply( $hoa->{tag}, [qw/A B C/],     'tag column stays row-aligned' );
@@ -70,7 +70,7 @@ sub fresh_hoh {
 	my $hoh = fresh_hoh();
 	my $aoh = csort($hoh, 'id', 'aoh', 'sample');
 	is( $aoh->[0]{sample}, 'alpha', 'custom row-name column is honored' );
-	ok( !exists $aoh->[0]{'row.name'}, 'default row-name column absent when overridden' );
+	ok( !exists $aoh->[0]{'row_name'}, 'default row-name column absent when overridden' );
 
 	my $hoa = csort($hoh, 'id', 'hoa', 'sample');
 	is_deeply( $hoa->{sample}, [qw/alpha beta gamma/],
@@ -80,8 +80,8 @@ sub fresh_hoh {
 # sorting BY the row-name column works once it exists
 {
 	my $hoh = fresh_hoh();
-	my $aoh = csort($hoh, 'row.name');
-	is_deeply( [ map { $_->{'row.name'} } @$aoh ], [qw/alpha beta gamma/],
+	my $aoh = csort($hoh, 'row_name');
+	is_deeply( [ map { $_->{'row_name'} } @$aoh ], [qw/alpha beta gamma/],
 		'can sort by the injected row-name column' );
 }
 
@@ -90,7 +90,7 @@ sub fresh_hoh {
 	my $hoh = fresh_hoh();
 	csort($hoh, 'id');
 	csort($hoh, 'id', 'aoh', 'sample');
-	ok( !exists $hoh->{alpha}{'row.name'}, 'source row not polluted with row.name' );
+	ok( !exists $hoh->{alpha}{'row_name'}, 'source row not polluted with row_name' );
 	ok( !exists $hoh->{alpha}{sample},     'source row not polluted with custom name' );
 	is( scalar keys %{ $hoh->{alpha} }, 3, 'source row still has exactly its 3 columns' );
 }

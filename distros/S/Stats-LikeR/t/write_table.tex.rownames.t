@@ -34,8 +34,8 @@ my %hoh = (
 );
 
 # HoH: the outer keys are the row identifiers and exist nowhere else, so a HoH
-# keeps them by default, in every format; row.names => 0 drops them. Every
-# other shape defaults row.names off (the HoA block below).
+# keeps them by default, in every format; row_names => 0 drops them. Every
+# other shape defaults row_names off (the HoA block below).
 {
 	my $tmp = File::Temp->new(SUFFIX => '.tex');
 	write_table(\%hoh, "$tmp");
@@ -52,71 +52,71 @@ my %hoh = (
 		'HoH tex: the outer keys lead their rows by default');
 }
 
-# row.names => 'name' heads the key column with that name
+# row_names => 'name' heads the key column with that name
 {
 	my $tmp = File::Temp->new(SUFFIX => '.tex');
-	write_table(\%hoh, "$tmp", 'row.names' => 'pdb_id');
+	write_table(\%hoh, "$tmp", 'row_names' => 'pdb_id');
 	my @l = slurp_lines("$tmp");
 
 	my ($preamble) = grep { /\\begin\{tabular\}/ } @l;
 	is(tabular_cols($preamble), 3,
-		"HoH tex + row.names=>'pdb_id': key column plus 2 data cols");
+		"HoH tex + row_names=>'pdb_id': key column plus 2 data cols");
 	my ($header) = grep { /\\hline$/ && /&/ } @l;
 	like($header, qr/^\\textbf\{pdb\\_id\} & \\textbf\{b\\_factor\}/,
-		"HoH tex + row.names=>'pdb_id': the key column is headed pdb_id");
+		"HoH tex + row_names=>'pdb_id': the key column is headed pdb_id");
 	ok(scalar(grep { /^\\textbf\{1cka\} & 674 & Kd\\\\$/ } @l),
-		"HoH tex + row.names=>'pdb_id': the keys lead their rows");
+		"HoH tex + row_names=>'pdb_id': the keys lead their rows");
 }
 
-# row.names => 1 says the default out loud: the leading label column is the outer key
+# row_names => 1 says the default out loud: the leading label column is the outer key
 {
 	my $tmp = File::Temp->new(SUFFIX => '.tex');
-	write_table(\%hoh, "$tmp", 'row.names' => 1);
+	write_table(\%hoh, "$tmp", 'row_names' => 1);
 	my @l = slurp_lines("$tmp");
 
 	my ($preamble) = grep { /\\begin\{tabular\}/ } @l;
 	is(tabular_cols($preamble), 3,
-		'HoH tex + row.names=>1: row-name column added (2 data cols + 1 label col)');
+		'HoH tex + row_names=>1: row-name column added (2 data cols + 1 label col)');
 
 	my ($header) = grep { /\\hline$/ && /&/ } @l;
 	like($header, qr/^\\textbf\{\} &/,
-		'HoH tex + row.names=>1: leading header cell is empty (label column header)');
+		'HoH tex + row_names=>1: leading header cell is empty (label column header)');
 
 	# Data rows: keys are sorted, so 1cka is first and leads its row (bold).
 	my ($first_data) = grep { /^\\textbf\{1cka\}/ } @l;
 	ok(defined $first_data,
-		'HoH tex + row.names=>1: first data row leads with row name 1cka');
+		'HoH tex + row_names=>1: first data row leads with row name 1cka');
 	like($first_data, qr/^\\textbf\{1cka\} & 674 & Kd\\\\$/,
-		'HoH tex + row.names=>1: row name is column 0; data columns follow');
+		'HoH tex + row_names=>1: row name is column 0; data columns follow');
 
 	# Every key must appear as a leading (bold) first cell.
 	for my $k (sort keys %hoh) {
 		ok(scalar(grep { /^\Q\textbf{$k}\E &/ } @l),
-			"HoH tex + row.names=>1: '$k' present as the first item of its row");
+			"HoH tex + row_names=>1: '$k' present as the first item of its row");
 	}
 }
 
-# row.names => 0 drops the keys
+# row_names => 0 drops the keys
 {
 	my $tmp = File::Temp->new(SUFFIX => '.tex');
-	write_table(\%hoh, "$tmp", 'row.names' => 0);
+	write_table(\%hoh, "$tmp", 'row_names' => 0);
 	my @l = slurp_lines("$tmp");
 
 	my ($preamble) = grep { /\\begin\{tabular\}/ } @l;
 	is(tabular_cols($preamble), 2,
-		'HoH tex + row.names=>0: no row-name column (2 data cols only)');
+		'HoH tex + row_names=>0: no row-name column (2 data cols only)');
 
 	my ($header) = grep { /\\hline$/ && /&/ } @l;
 	unlike($header, qr/^\\textbf\{\} &/,
-		'HoH tex + row.names=>0: header does not start with an empty cell');
+		'HoH tex + row_names=>0: header does not start with an empty cell');
 	like($header, qr/^\\textbf\{b\\_factor\}/,
-		'HoH tex + row.names=>0: first header is a real data column');
+		'HoH tex + row_names=>0: first header is a real data column');
 
 	ok(!scalar(grep { /^\\textbf\{1cka\}/ } @l),
-		'HoH tex + row.names=>0: row names are not emitted');
+		'HoH tex + row_names=>0: row names are not emitted');
 }
 
-# HoA: numeric row labels (1..N) only when row.names is asked for
+# HoA: numeric row labels (1..N) only when row_names is asked for
 {
 	my %hoa = (x => [10, 20], 'y' => [30, 40]);
 
@@ -130,17 +130,17 @@ my %hoh = (
 		'HoA tex: first data row starts with real data, not a label');
 
 	my $tmp = File::Temp->new(SUFFIX => '.tex');
-	write_table(\%hoa, "$tmp", 'row.names' => 1);
+	write_table(\%hoa, "$tmp", 'row_names' => 1);
 	my @l = slurp_lines("$tmp");
 
 	my ($preamble) = grep { /\\begin\{tabular\}/ } @l;
 	is(tabular_cols($preamble), 3,
-		'HoA tex + row.names=>1: numeric row-label column added');
+		'HoA tex + row_names=>1: numeric row-label column added');
 
 	ok(scalar(grep { /^\\textbf\{1\} & 10 & 30\\\\$/ } @l),
-		'HoA tex + row.names=>1: first data row leads with numeric label 1');
+		'HoA tex + row_names=>1: first data row leads with numeric label 1');
 	ok(scalar(grep { /^\\textbf\{2\} & 20 & 40\\\\$/ } @l),
-		'HoA tex + row.names=>1: second data row leads with numeric label 2');
+		'HoA tex + row_names=>1: second data row leads with numeric label 2');
 }
 
 # Delimited output agrees with LaTeX: on by default for a HoH, off when asked
@@ -153,17 +153,17 @@ my %hoh = (
 	is($l[1], '1cka,674,Kd', 'CSV: first data row leads with its key by default');
 
 	my $off = File::Temp->new(SUFFIX => '.csv');
-	write_table(\%hoh, "$off", 'row.names' => 0);
+	write_table(\%hoh, "$off", 'row_names' => 0);
 	my @f = slurp_lines("$off");
-	is($f[0], 'b_factor,binding', 'CSV + row.names=>0: no leading row-name column');
-	is($f[1], '674,Kd', 'CSV + row.names=>0: first data row has no leading row name');
+	is($f[0], 'b_factor,binding', 'CSV + row_names=>0: no leading row-name column');
+	is($f[1], '674,Kd', 'CSV + row_names=>0: first data row has no leading row name');
 
 	my $on = File::Temp->new(SUFFIX => '.csv');
-	write_table(\%hoh, "$on", 'row.names' => 1);
+	write_table(\%hoh, "$on", 'row_names' => 1);
 	my @o = slurp_lines("$on");
 	is($o[0], ',b_factor,binding',
-		'CSV + row.names=>1: leading empty header cell');
-	is($o[1], '1cka,674,Kd', 'CSV + row.names=>1: outer key leads the row');
+		'CSV + row_names=>1: leading empty header cell');
+	is($o[1], '1cka,674,Kd', 'CSV + row_names=>1: outer key leads the row');
 }
 
 # Nested reference in a cell still croaks (unchanged error path)

@@ -1,0 +1,101 @@
+# Default CI for a pure-Perl [@Author::GETTY] distribution.
+# Goes to .github/workflows/ci.yml in the dist repo.
+#
+# The repetitive Dist::Zilla mechanics (install dzil, authordeps,
+# listdeps --author, dzil test) live ONCE in the shared composite action below
+# — including the `--author` flag that installs author-test deps like Test::Pod.
+# Do NOT fake Test::Pod into the cpanfile's `on test`; the bundle's
+# [PodSyntaxTests] registers it as a develop prereq and the action installs it.
+#
+# Alien / XS dists: add your `apt-get`/`brew` system-library step(s) before the
+# action, and a second `share-build` job passing `install-type: share`.
+# See an existing Alien dist for the full pattern.
+name: ci
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.36'
+          - '5.38'
+          - '5.40'
+    container:
+      image: perl:${{ matrix.perl-version }}-bookworm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: perl -V
+        run: perl -V
+      - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+
+  live:
+    # a real authentik, started here and thrown away again
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out the synchronous distribution
+        uses: actions/checkout@v4
+        with:
+          repository: Getty/p5-www-authentik
+          path: p5-www-authentik
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Write the secrets for the throwaway instance
+        working-directory: t/authentik
+        run: |
+          {
+            echo "AUTHENTIK_TAG=2026.8.3"
+            echo "AUTHENTIK_PORT=9000"
+            echo "PG_PASS=$(openssl rand -hex 24)"
+            echo "AUTHENTIK_SECRET_KEY=$(openssl rand -base64 60 | tr -d '\n')"
+            echo "AUTHENTIK_BOOTSTRAP_PASSWORD=$(openssl rand -hex 20)"
+            echo "AUTHENTIK_BOOTSTRAP_TOKEN=$(openssl rand -hex 32)"
+            echo "AUTHENTIK_BOOTSTRAP_EMAIL=akadmin@example.org"
+          } > .env
+      - name: Start authentik
+        working-directory: t/authentik
+        run: docker compose up -d
+      - name: Wait for it to be ready
+        run: |
+          for i in $(seq 1 60); do
+            if [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:9000/-/health/ready/)" = 200 ]; then
+              echo "ready after $((i * 5))s"; exit 0
+            fi
+            sleep 5
+          done
+          echo "authentik did not come up"; docker compose -f t/authentik/docker-compose.yml logs --tail 50; exit 1
+      - name: Install the dependencies
+        run: |
+          curl -sL https://cpanmin.us | perl - --sudo --notest App::cpanminus
+          sudo cpanm --notest --installdeps ./p5-www-authentik
+          # WWW::Authentik comes from the checkout next door, not from CPAN
+          grep -v "'WWW::Authentik'" cpanfile > "$RUNNER_TEMP/cpanfile"
+          sudo cpanm --notest --cpanfile "$RUNNER_TEMP/cpanfile" --installdeps .
+      - name: Run the live suite
+        run: |
+          set -a; . t/authentik/.env; set +a
+          PERL5LIB="$GITHUB_WORKSPACE/p5-www-authentik/lib" \
+          AUTHENTIK_LIVE_TEST=1 \
+          AUTHENTIK_URL=http://127.0.0.1:9000 \
+          AUTHENTIK_TOKEN="$AUTHENTIK_BOOTSTRAP_TOKEN" \
+          prove -lvr t/90-live-authentik.t
+      - name: authentik's logs, when something went wrong
+        if: failure()
+        working-directory: t/authentik
+        run: docker compose logs --tail 200
+      - name: Throw it away
+        if: always()
+        working-directory: t/authentik
+        run: docker compose down -v

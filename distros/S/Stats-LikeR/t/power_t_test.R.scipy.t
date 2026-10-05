@@ -289,7 +289,7 @@ for my $c (@cases) {
 	$args{$_} = $c->{$_} for grep { defined $c->{$_} } qw(n delta sd sig_level power);
 	$args{ $c->{solve} } = undef;   # the one parameter being solved for
 
-	my $key = $c->{solve} eq 'sig_level' ? 'sig.level' : $c->{solve};
+	my $key = $c->{solve} eq 'sig_level' ? 'sig_level' : $c->{solve};
 	my $got = power_t_test(%args);
 	my $label = join ' ', "solve=$c->{solve}", $c->{type}, $c->{alternative},
 		($c->{strict} ? 'strict' : ()),
@@ -555,13 +555,13 @@ throws_ok { power_t_test(power => 0.99, n => 40, delta => 0.5, sd => 1, sig_leve
 	qr/no 'sig_level' in \(0, 1\) gives a power of 0\.99/,
 	'a sig_level above 1 croaks rather than being reported';
 
-# sig.level and sig_level are the same argument, and the result
-# key is R's spelling
+# R's dotted sig.level is refused, and the result key is sig_level too
 {
-	my $a = power_t_test(n => 30, delta => 0.5, 'sig.level' => 0.01, power => undef);
-	my $b = power_t_test(n => 30, delta => 0.5, sig_level    => 0.01, power => undef);
-	is_rel($a->{power}, $b->{power}, 1e-15, "'sig.level' and 'sig_level' agree");
-	is($a->{'sig.level'}, 0.01, "result key is 'sig.level', as in R");
+	throws_ok { power_t_test(n => 30, delta => 0.5, 'sig.level' => 0.01, power => undef) }
+		qr/unknown argument 'sig\.level'/, "the dotted 'sig.level' is refused";
+	my $a = power_t_test(n => 30, delta => 0.5, sig_level => 0.01, power => undef);
+	is($a->{'sig_level'}, 0.01, "result key is 'sig_level'");
+	ok(!exists $a->{'sig.level'}, "no dotted 'sig.level' key");
 }
 
 # round trip: every solved parameter reproduces its power
@@ -574,7 +574,7 @@ for my $solve (qw(n delta sd sig_level)) {
 			my $solved = power_t_test(%base, power => $want, $solve => undef);
 			# feed the solved value back in and ask for the power
 			my %back = (%base, %{{ map { $_ => $solved->{$_} } qw(n delta sd) }},
-				sig_level => $solved->{'sig.level'}, power => undef);
+				sig_level => $solved->{'sig_level'}, power => undef);
 			is_rel(power_t_test(%back)->{power}, $want, 1e-9,
 				"round trip: $solve, $type, $alt");
 		}

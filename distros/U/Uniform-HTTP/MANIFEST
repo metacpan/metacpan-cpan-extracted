@@ -8,8 +8,11 @@ docs/ADAPTERS.md
 docs/AUTH-SPEC.md
 docs/MESSAGE-SPEC.md
 docs/MODERN-HTTP-AUDIT.md
+docs/NATIVE-FASTPATH.md
 lib/Uniform/HTTP.pm
 lib/Uniform/HTTP/Message.pm
+lib/Uniform/HTTP/FastPath.pm
+lib/Uniform/HTTP/FastPath/uniform_http_fastpath.h
 lib/Uniform/HTTP/Request.pm
 lib/Uniform/HTTP/Response.pm
 lib/Uniform/HTTP/Auth.pm
@@ -35,5 +38,7 @@ t/15-trailers.t
 t/16-section-lifecycle.t
 t/17-modern-requests.t
 t/18-adapter-capabilities.t
+t/19-fast-path.t
+t/20-native-contract.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

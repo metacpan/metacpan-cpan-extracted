@@ -57,10 +57,10 @@ sub is_result_hash {
     my ($r, $label) = @_;
     ok(ref($r) eq 'HASH', "$label: returns hashref")
         or return 0;
-    ok(exists $r->{statistic} && exists $r->{'p.value'}
+    ok(exists $r->{statistic} && exists $r->{'p_value'}
         && exists $r->{method} && exists $r->{alternative},
         "$label: has statistic/p_value/method/alternative");
-    ok($r->{'p.value'} >= 0 && $r->{'p.value'} <= 1, "$label: p_value in [0,1]");
+    ok($r->{'p_value'} >= 0 && $r->{'p_value'} <= 1, "$label: p_value in [0,1]");
     return 1;
 }
 
@@ -75,7 +75,7 @@ my ($r, $err) = run(sub { ks_test(\@SEP_X, \@SEP_Y) });
 is($err, undef, "separated 2-sample: no exception");
 is_result_hash($r, "separated 2-sample");
 cmp_ok(abs($r->{statistic} - 1.0), '<', 1e-9, "separated 2-sample: D == 1");
-cmp_ok($r->{'p.value'}, '<', 0.05, "separated 2-sample: small p-value");
+cmp_ok($r->{'p_value'}, '<', 0.05, "separated 2-sample: small p-value");
 like($r->{method}, qr/Two-sample/, "separated 2-sample: method labelled");
 
 # Bug #3: input is sorted internally; unsorted input must give the same D.
@@ -174,7 +174,7 @@ like($err, qr/missing a value/,
  my ($r, $err) = run(sub { ks_test(\@a, \@a) });
  is($err, undef, "#5 aliased x/y: no exception");
  cmp_ok(abs($r->{statistic} - 0.0), '<', 1e-9, "#5 aliased x/y: D == 0");
- cmp_ok($r->{'p.value'}, '>', 0.99, "#5 aliased x/y: p ~ 1");
+ cmp_ok($r->{'p_value'}, '>', 0.99, "#5 aliased x/y: p ~ 1");
 }
 
 # Ties handling — exact path must warn and fall back to asymptotic.

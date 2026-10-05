@@ -7,7 +7,7 @@ use Getopt::Pad::Result;
 class Getopt::Pad::Spec::Arg :strict(params) {
 	use Getopt::Pad::Util qw(camelize specError isValidName);
 
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	field $raw :param;
 

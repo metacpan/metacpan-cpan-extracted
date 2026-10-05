@@ -1,0 +1,409 @@
+#!/usr/bin/env perl
+# Renders the example images shown in the documentation of
+# Imager::File::SIXEL into images/ and points the image URLs in the pod
+# to the tag of the current release.
+#
+# Each image compares write options side by side. Every panel is the
+# test picture encoded as SIXEL with the panel's options and decoded
+# again, so it shows exactly the pixels a terminal receives, enlarged
+# two times without smoothing so that single pixels stay visible.
+#
+# Copyright (C) 2026 davenonymous.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+use v5.24;
+use warnings;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+use File::Spec;
+use Getopt::Long qw(GetOptions);
+use Imager;
+use Imager::File::SIXEL;
+use Imager::Fill;
+use Imager::Fountain;
+use Pod::Usage qw(pod2usage);
+
+use constant {
+	PICTURE_WIDTH  => 160,
+	PICTURE_HEIGHT => 120,
+	ZOOM           => 2,
+	GAP            => 16,
+	COLUMNS        => 2,
+	FONT_SIZE      => 13,
+	LINE_HEIGHT    => 17,
+	CHECKER_SIZE   => 8,
+};
+
+# MetaCPAN shows images in the pod only with absolute URLs, so the pod
+# points to the raw files in the repository, at the tag of the release.
+use constant IMAGE_URL_BASE => 'https://raw.githubusercontent.com/davenonymous/perl-imager-sixel';
+
+my %options = (output => 'images');
+GetOptions(\%options, 'output=s', 'check', 'help')
+	or pod2usage(2);
+pod2usage(1) if $options{help};
+
+# Eight colors picked by hand from the test picture, the eight colors
+# of a basic terminal and four shades of gray.
+my @picked = ('#0B1D51', '#4A2F86', '#9A5A8E', '#F6A04D', '#FFF4D6', '#2E6B4F', '#0E2A22', '#E63946');
+my @basic  = ('#000000', '#FF0000', '#00FF00', '#FFFF00', '#0000FF', '#FF00FF', '#00FFFF', '#FFFFFF');
+my @grays  = ('#000000', '#555555', '#AAAAAA', '#FFFFFF');
+
+# Each figure is one image file, its panels arranged in rows of
+# COLUMNS. A panel is [label, write options, display]. A panel without
+# write options shows the original picture. The display 'aspect' draws
+# the image as a terminal that honors the pixel aspect ratio does.
+# Labels name every option the panel is written with.
+my @figures = (
+	{
+		name   => 'sixel-dither',
+		source => 'scene',
+		panels => [
+			['original'],
+			["sixel_max_colors => 16,\nsixel_dither => 'diffusion'", { sixel_max_colors => 16, sixel_dither => 'diffusion' }],
+			["sixel_max_colors => 16,\nsixel_dither => 'ordered'",   { sixel_max_colors => 16, sixel_dither => 'ordered' }],
+			["sixel_max_colors => 16,\nsixel_dither => 'none'",      { sixel_max_colors => 16, sixel_dither => 'none' }],
+		],
+	},
+	{
+		name   => 'sixel-max-colors',
+		source => 'scene',
+		panels => [
+			['original'],
+			['sixel_max_colors => 256', { sixel_max_colors => 256 }],
+			['sixel_max_colors => 64',  { sixel_max_colors => 64 }],
+			['sixel_max_colors => 16',  { sixel_max_colors => 16 }],
+			['sixel_max_colors => 4',   { sixel_max_colors => 4 }],
+		],
+	},
+	{
+		name   => 'sixel-palette',
+		source => 'scene',
+		panels => [
+			['original'],
+			["sixel_palette => 'adaptive'", { sixel_palette => 'adaptive' }],
+			["sixel_palette => 'webmap'",   { sixel_palette => 'webmap' }],
+			["sixel_palette => 'webmap',\nsixel_dither => 'none'", { sixel_palette => 'webmap', sixel_dither => 'none' }],
+		],
+	},
+	{
+		name   => 'colors',
+		source => 'scene',
+		panels => [
+			['original'],
+			["colors => [8 colors picked by hand\nfrom the picture]", { colors => \@picked }],
+			['colors => [8 basic colors]',   { colors => \@basic }],
+			['colors => [4 grays]',          { colors => \@grays }],
+			["colors => ['black', 'white']", { colors => ['black', 'white'] }],
+		],
+	},
+	{
+		name   => 'sixel-alpha-threshold',
+		source => 'alpha',
+		panels => [
+			['original'],
+			['sixel_alpha_threshold => 0',   { sixel_alpha_threshold => 0 }],
+			['sixel_alpha_threshold => 1',   { sixel_alpha_threshold => 1 }],
+			['sixel_alpha_threshold => 128', { sixel_alpha_threshold => 128 }],
+			['sixel_alpha_threshold => 224', { sixel_alpha_threshold => 224 }],
+		],
+	},
+	{
+		name   => 'sixel-pan-pad',
+		source => 'scene',
+		panels => [
+			['sixel_pan => 1, sixel_pad => 1', { sixel_pan => 1, sixel_pad => 1 }, 'aspect'],
+			['sixel_pan => 2, sixel_pad => 1', { sixel_pan => 2, sixel_pad => 1 }, 'aspect'],
+		],
+	},
+);
+
+my $outdated = updatePodPictures([glob('lib/Imager/File/SIXEL.pm lib/Imager/File/SIXEL/*.pod')], "v$Imager::File::SIXEL::VERSION", $options{check}, map { $_->{name} } @figures);
+
+my $font = labelFont();
+my %sources = (scene => scenePicture(), alpha => alphaPicture());
+foreach my $figure (@figures) {
+	my $image = renderFigure($figure, $sources{ $figure->{source} }, $font);
+	my $file = File::Spec->catfile($options{output}, "$figure->{name}.png");
+	$outdated += storeImage($image, $file, $options{check});
+}
+exit($options{check} && $outdated ? 1 : 0);
+
+# Dies unless the pod files together show exactly the pictures this
+# script renders, each through an
+# <img src="IMAGE_URL_BASE/TAG/images/NAME.png"> tag, then points every
+# such tag to $tag. Returns the number of pod files that were (or, with
+# $checkOnly, would be) changed. tools/pod2markdown turns the URLs into
+# those of the master branch for the Markdown files.
+sub updatePodPictures($podFiles, $tag, $checkOnly, @names) {
+	my $imageUrl = qr{<img src="\Q@{[IMAGE_URL_BASE]}\E/[^"/]+/images/([^"/]+)\.png"};
+	my (%shown, %updatedPods);
+	foreach my $podFile ($podFiles->@*) {
+		my $pod = readFile($podFile);
+		my @imageTags = $pod =~ m{(<img\b[^>]*>)}g;
+		my @badTags = grep { !/^$imageUrl/ } @imageTags;
+		die map {"$podFile: $_ does not start with <img src=\"@{[IMAGE_URL_BASE]}/TAG/images/NAME.png\"\n"} @badTags if @badTags;
+		$shown{$_} = 1 foreach $pod =~ m{$imageUrl}g;
+		(my $updated = $pod) =~ s{(<img src="\Q@{[IMAGE_URL_BASE]}\E/)[^"/]+/}{$1$tag/}g;
+		$updatedPods{$podFile} = $updated if $updated ne $pod;
+	}
+	my %rendered = map { $_ => 1 } @names;
+	my @problems = (
+		(map {"the pod shows images/$_.png, which this script does not render\n"} grep { !$rendered{$_} } sort keys %shown),
+		(map {"no pod shows images/$_.png\n"} grep { !$shown{$_} } @names),
+	);
+	die @problems if @problems;
+
+	storeFile($_, $updatedPods{$_}, $checkOnly) foreach sort keys %updatedPods;
+	return scalar keys %updatedPods;
+}
+
+sub labelFont() {
+	die "Imager was built without FreeType support; it is needed for the labels\n"
+		unless $Imager::formats{ft2};
+	open(my $match, '-|', 'fc-match', '--format=%{file}', 'DejaVu Sans:style=Book')
+		or die "cannot run fc-match: $!\n";
+	my $file = <$match>;
+	close($match);
+	die "fc-match found no font\n" unless defined $file && -f $file;
+	return Imager::Font->new(file => $file, size => FONT_SIZE, color => '#202020', aa => 1)
+		// die Imager->errstr, "\n";
+}
+
+# A sunset: smooth gradients that show banding, a hue ramp that shows
+# the limits of a palette, and single pixel stars that show fine detail.
+sub scenePicture() {
+	my ($width, $height) = (PICTURE_WIDTH, PICTURE_HEIGHT);
+	my $picture = Imager->new(xsize => $width, ysize => $height);
+
+	$picture->box(fill => Imager::Fill->new(
+		fountain => 'linear',
+		xa       => 0, ya => 0,
+		xb       => 0, yb => 90,
+		segments => Imager::Fountain->simple(
+			positions => [0, 0.55, 1],
+			colors    => [map { Imager::Color->new($_) } '#0B1D51', '#7A3E9D', '#F6A04D'],
+		),
+	));
+	$picture->box(fill => Imager::Fill->new(
+		fountain => 'radial',
+		combine  => 'normal',
+		xa       => 112, ya => 70,
+		xb       => 150, yb => 70,
+		segments => Imager::Fountain->simple(
+			positions => [0, 1],
+			colors    => [Imager::Color->new(255, 233, 168, 220), Imager::Color->new(255, 233, 168, 0)],
+		),
+	));
+	$picture->circle(x => 112, y => 70, r => 14, color => '#FFD98A', aa => 1);
+	foreach my $star ([12, 8], [30, 20], [52, 6], [70, 28], [90, 12], [128, 18], [146, 6], [20, 40]) {
+		$picture->setpixel(x => $star->[0], y => $star->[1], color => '#FFFFFF');
+	}
+	$picture->polygon(
+		points => [[0, 80], [30, 66], [62, 78], [96, 70], [130, 84], [160, 74], [160, 108], [0, 108]],
+		fill   => Imager::Fill->new(
+			fountain => 'linear',
+			xa       => 0, ya => 66,
+			xb       => 0, yb => 108,
+			segments => Imager::Fountain->simple(
+				positions => [0, 1],
+				colors    => [map { Imager::Color->new($_) } '#2E6B4F', '#0E2A22'],
+			),
+		),
+		aa => 1,
+	);
+	foreach my $x (0 .. $width - 1) {
+		my $hue = 360 * $x / $width;
+		$picture->line(x1 => $x, y1 => 108, x2 => $x, y2 => $height - 1,
+		               color => Imager::Color->new(hue => $hue, saturation => 1, value => 1));
+	}
+	return $picture;
+}
+
+# A picture with an alpha channel: a disc that fades out towards its
+# edge and a solid ring, on a transparent background.
+sub alphaPicture() {
+	my ($width, $height) = (PICTURE_WIDTH, PICTURE_HEIGHT);
+	my $picture = Imager->new(xsize => $width, ysize => $height, channels => 4);
+
+	$picture->box(fill => Imager::Fill->new(
+		fountain => 'radial',
+		combine  => 'normal',
+		xa       => 64, ya => 60,
+		xb       => 114, yb => 60,
+		segments => Imager::Fountain->simple(
+			positions => [0, 1],
+			colors    => [Imager::Color->new(230, 57, 70, 255), Imager::Color->new(230, 57, 70, 0)],
+		),
+	));
+	$picture->circle(x => 118, y => 60, r => 30, color => '#1D3557', aa => 1, filled => 0);
+	$picture->circle(x => 118, y => 60, r => 22, color => '#457B9D', aa => 1);
+	return $picture;
+}
+
+# Arranges the panels in rows of COLUMNS. Every cell is as large as the
+# largest panel, so that the pictures of a row line up.
+sub renderFigure($figure, $source, $font) {
+	my @panels = map { renderPanel($_, $source, $font) } $figure->{panels}->@*;
+	my ($cellWidth, $cellHeight) = (0, 0);
+	foreach my $panel (@panels) {
+		$cellWidth  = $panel->getwidth  if $panel->getwidth > $cellWidth;
+		$cellHeight = $panel->getheight if $panel->getheight > $cellHeight;
+	}
+	my $columns = @panels < COLUMNS ? @panels : COLUMNS;
+	my $rows = int((@panels + COLUMNS - 1) / COLUMNS);
+
+	my $image = Imager->new(
+		xsize    => GAP + $columns * ($cellWidth + GAP),
+		ysize    => GAP + $rows * ($cellHeight + GAP),
+		channels => 3,
+	);
+	$image->box(filled => 1, color => '#FFFFFF');
+	foreach my $index (0 .. $#panels) {
+		$image->paste(
+			src  => $panels[$index],
+			left => GAP + ($index % COLUMNS) * ($cellWidth + GAP),
+			top  => GAP + int($index / COLUMNS) * ($cellHeight + GAP),
+		);
+	}
+	return $image;
+}
+
+# One picture with its label below it. The label names the options and
+# the size of the SIXEL data.
+sub renderPanel($panel, $source, $font) {
+	my ($label, $writeOptions, $display) = $panel->@*;
+	my $shown = $source;
+	if ($writeOptions) {
+		my $sixel = encode($source, $writeOptions);
+		$shown = Imager->new(data => $sixel, type => 'sixel') // die Imager->errstr, "\n";
+		$label .= sprintf "\n%.1f KiB of SIXEL data", length($sixel) / 1024;
+	}
+	$shown = $shown->scale(xscalefactor => ZOOM, yscalefactor => ZOOM, qtype => 'preview');
+	$shown = stretchToAspect($shown, $writeOptions) if ($display // '') eq 'aspect';
+	$shown = onCheckerboard($shown) if $shown->getchannels == 4;
+
+	my @lines = split /\n/, $label;
+	my $panelImage = Imager->new(xsize => $shown->getwidth, ysize => $shown->getheight + 4 + LINE_HEIGHT * @lines);
+	$panelImage->box(filled => 1, color => '#FFFFFF');
+	$panelImage->paste(src => $shown);
+	my $baseline = $shown->getheight + LINE_HEIGHT;
+	foreach my $line (@lines) {
+		$panelImage->string(font => $font, text => $line, x => 0, y => $baseline, aa => 1);
+		$baseline += LINE_HEIGHT;
+	}
+	return $panelImage;
+}
+
+# Encodes a copy of the picture, so that the options stored as tags do
+# not reach the next panel.
+sub encode($source, $writeOptions) {
+	my $sixel = '';
+	my $copy = $source->copy;
+	$copy->write(data => \$sixel, type => 'sixel', $writeOptions->%*)
+		or die $copy->errstr, "\n";
+	return $sixel;
+}
+
+# Draws the picture as a terminal that honors the pixel aspect ratio
+# does: every pixel sixel_pan / sixel_pad times as high as it is wide.
+sub stretchToAspect($picture, $writeOptions) {
+	my $ratio = $writeOptions->{sixel_pan} / $writeOptions->{sixel_pad};
+	return $picture if $ratio == 1;
+	return $picture->scale(xscalefactor => 1, yscalefactor => $ratio, qtype => 'preview');
+}
+
+# Shows transparent pixels as the usual gray checkerboard.
+sub onCheckerboard($picture) {
+	my $board = Imager->new(xsize => $picture->getwidth, ysize => $picture->getheight);
+	$board->box(filled => 1, color => '#FFFFFF');
+	for (my $y = 0; $y < $board->getheight; $y += CHECKER_SIZE) {
+		for (my $x = ($y / CHECKER_SIZE % 2) * CHECKER_SIZE; $x < $board->getwidth; $x += 2 * CHECKER_SIZE) {
+			$board->box(xmin => $x, ymin => $y, xmax => $x + CHECKER_SIZE - 1, ymax => $y + CHECKER_SIZE - 1,
+			            filled => 1, color => '#D0D0D0');
+		}
+	}
+	$board->rubthrough(src => $picture);
+	return $board;
+}
+
+# Writes the image unless the file already holds the same PNG data.
+# Returns 1 when the file was (or, with --check, would be) changed.
+sub storeImage($image, $file, $checkOnly) {
+	my $png = '';
+	$image->write(data => \$png, type => 'png') or die $image->errstr, "\n";
+	my $current = -e $file ? readFile($file) : '';
+	return 0 if $current eq $png;
+
+	storeFile($file, $png, $checkOnly);
+	return 1;
+}
+
+sub readFile($file) {
+	open(my $in, '<:raw', $file) or die "cannot read $file: $!\n";
+	local $/;
+	my $content = <$in>;
+	close($in);
+	return $content;
+}
+
+# Writes $content to $file, or with $checkOnly reports it as out of date.
+sub storeFile($file, $content, $checkOnly) {
+	if ($checkOnly) {
+		say "out of date: $file";
+		return;
+	}
+	open(my $out, '>:raw', $file) or die "cannot write $file: $!\n";
+	print {$out} $content;
+	close($out) or die "cannot write $file: $!\n";
+	say "wrote $file";
+}
+
+__END__
+
+=head1 NAME
+
+make-images - render the images shown in the Imager::File::SIXEL documentation
+
+=head1 SYNOPSIS
+
+  perl -Mblib tools/make-images [--output DIRECTORY] [--check]
+
+=head1 DESCRIPTION
+
+Encodes a generated test picture with the write options each image
+compares, decodes the SIXEL data again and writes the comparison as
+PNG files into F<images/>. Files whose content would not change are
+left alone. Run it from the top directory of the distribution.
+
+Before rendering anything, it checks that the pod files
+F<lib/Imager/File/SIXEL.pm> and F<lib/Imager/File/SIXEL/*.pod>
+together show exactly the pictures it renders, each with a tag like
+C<< <img src="https://raw.githubusercontent.com/davenonymous/perl-imager-sixel/v1.000/images/NAME.png"> >>,
+and stops with an error otherwise. It then points every such tag to
+the tag C<vVERSION> of the current C<$Imager::File::SIXEL::VERSION>,
+so that MetaCPAN shows each release with its own pictures. MetaCPAN
+shows images in the pod only with absolute URLs; the pictures appear
+once the tag is pushed to GitHub.
+
+Needs Imager with PNG and FreeType support and fontconfig's
+C<fc-match> to find the DejaVu Sans font for the labels.
+
+=head1 OPTIONS
+
+=over
+
+=item --output DIRECTORY
+
+Where to write the images, F<images> by default.
+
+=item --check
+
+Write nothing; list the images and pod files that are out of date and
+exit with status 1 if there are any.
+
+=back
+
+=cut

@@ -72,7 +72,10 @@ package Log::Abstraction;
 #   - Keep file handles open (re-open on inode change) instead of
 #     open/print/close for every message.  logrotate then needs the file
 #     reopened: add a reopen() method (and document hooking it to SIGHUP),
-#     and have _rotate close the handle before renaming.
+#     and have _rotate close the handle before renaming.  Not every log
+#     rotation tool sends SIGHUP, so also close and reopen on a write when more
+#     than a configurable time (default 5 minutes) has passed since the
+#     last reopen.  Not needed while files are opened per message.
 #   - Reuse the journald socket rather than creating one per message.
 #   - Optional asynchronous/non-blocking delivery for the sendmail backend;
 #     a blocking SMTP conversation inside a log call is a latency hazard.
@@ -181,8 +184,9 @@ Readonly::Hash my %LEVEL_TO_SYSLOG_PRIORITY => (
 	emergency => 'emerg',
 );
 
-# Regex: characters forbidden in a log-file path (prevents command injection)
-Readonly::Scalar my $RE_SAFE_PATH => qr/^([^<>|*?;!`\$"\x00-\x1F]+)$/;
+# Regex: characters forbidden in a log-file path (prevents command injection).
+# Anchored with \z, not $, which would accept a trailing newline
+Readonly::Scalar my $RE_SAFE_PATH => qr/^([^<>|*?;!`\$"\x00-\x1F]+)\z/;
 
 # Regex: path component that would escape the intended directory
 Readonly::Scalar my $RE_DOTDOT => qr/\.\./;
@@ -201,8 +205,11 @@ Readonly::Scalar my $DEFAULT_JOURNALD_SOCKET => '/run/systemd/journal/socket';
 Readonly::Scalar my $RE_JOURNALD_FIELD => qr/^[A-Z0-9][A-Z0-9_]*$/;
 
 # Largest journald datagram sent; the default socket send buffer is ~212KB
-# and bigger datagrams fail, so longer messages are truncated to fit
+# on most Linux systems and bigger datagrams fail, so longer messages are
+# truncated to fit.  Some systems have smaller buffers, so on EMSGSIZE the
+# limit is halved and the send retried, down to $JOURNALD_MIN_PAYLOAD
 Readonly::Scalar my $JOURNALD_MAX_PAYLOAD => 200_000;
+Readonly::Scalar my $JOURNALD_MIN_PAYLOAD => 4_096;
 
 # Longest journald field name; journald ignores fields with longer names
 Readonly::Scalar my $JOURNALD_MAX_FIELD_NAME => 64;
@@ -224,11 +231,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.36
+0.37
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 SYNOPSIS
 
@@ -1406,7 +1413,10 @@ sub _validate_file_path :Private {
 #               (field-name NL uint64-LE-length value NL) as specified by
 #               https://systemd.io/JOURNAL_NATIVE_PROTOCOL/.
 #               Values without newlines or NULs use the simpler FIELD=VALUE NL
-#               text format.
+#               text format.  The send buffer, and so the largest datagram,
+#               varies between systems: a send failing with EMSGSIZE is
+#               retried with MESSAGE truncated to half the size, down to
+#               $JOURNALD_MIN_PAYLOAD.
 # ---------------------------------------------------------------------------
 sub _journald_send :Private {
 	my ($self, $socket_path, %fields) = @_;
@@ -1438,26 +1448,49 @@ sub _journald_send :Private {
 		}
 		return $payload;
 	};
-	my $payload = $build->();
+	my $full = $build->();
+	my $message = $fields{'MESSAGE'};
 
 	# A datagram bigger than the socket send buffer fails outright, so
-	# truncate MESSAGE to fit.  The extra 8 bytes allow for the message
-	# switching from text to binary framing.
-	my $excess = length($payload) - $JOURNALD_MAX_PAYLOAD;
-	if(($excess > 0) && defined($fields{'MESSAGE'})) {
-		my $keep = length($fields{'MESSAGE'}) - $excess - length($TRUNCATED_MARKER) - 8;
-		my $message = substr($fields{'MESSAGE'}, 0, ($keep > 0) ? $keep : 0);
+	# truncate MESSAGE to fit in $limit bytes.  The extra 8 bytes allow for
+	# the message switching from text to binary framing.
+	my $fit = sub {
+		my $limit = shift;
+		my $excess = length($full) - $limit;
+		return $full if(($excess <= 0) || !defined($message));
+		my $keep = length($message) - $excess - length($TRUNCATED_MARKER) - 8;
+		my $cut = substr($message, 0, ($keep > 0) ? $keep : 0);
 		# Don't leave a partial UTF-8 sequence at the cut
-		$message =~ s/[\xC0-\xFF][\x80-\xBF]*\z//;
-		$fields{'MESSAGE'} = $message . $TRUNCATED_MARKER;
-		$payload = $build->();
-	}
+		$cut =~ s/[\xC0-\xFF][\x80-\xBF]*\z//;
+		$fields{'MESSAGE'} = $cut . $TRUNCATED_MARKER;
+		return $build->();
+	};
 
 	# Open a Unix-domain datagram socket, send, and close
 	require Socket;
 	socket(my $sock, Socket::AF_UNIX(), Socket::SOCK_DGRAM(), 0);
 	my $dest = Socket::sockaddr_un($socket_path);
-	send($sock, $payload, 0, $dest);
+
+	{
+		# send() is checked by hand: EMSGSIZE means retry smaller
+		no autodie qw(send setsockopt);
+
+		# Ask for a send buffer big enough for the largest datagram; the
+		# kernel may cap it (net.core.wmem_max), which the retry handles
+		setsockopt($sock, Socket::SOL_SOCKET(), Socket::SO_SNDBUF(), $JOURNALD_MAX_PAYLOAD + 1024);
+
+		my $limit = $JOURNALD_MAX_PAYLOAD;
+		while(1) {
+			last if(defined(send($sock, $fit->($limit), 0, $dest)));
+			my $err = $!;
+			if(($err == POSIX::EMSGSIZE()) && ($limit > $JOURNALD_MIN_PAYLOAD)) {
+				$limit = int($limit / 2);
+				next;
+			}
+			close $sock;
+			Carp::croak("Can't send to $socket_path: $err");
+		}
+	}
 	close $sock;
 }
 
@@ -1693,6 +1726,11 @@ sub _log :Private {
 	if(!(caller)[0]->isa(__PACKAGE__)) {
 		Carp::croak('Illegal Operation: _log is a private method');
 	}
+
+	# Logging must not disturb the caller's error state: code such as
+	# eval { ... }; if($@) { $log->debug(...); die $@ } relies on it, and
+	# the backends' own evals and I/O would otherwise reset $@ and $!
+	local ($@, $!);
 
 	# Sanity-check the level (should not be reachable in normal use)
 	if(!defined($syslog_values{$level})) {
@@ -2089,6 +2127,10 @@ sub _log :Private {
 sub _high_priority :Private {
 	my $self  = shift;
 	my $level = shift;    # 'warn', 'error', 'critical', 'alert' or 'emergency'
+
+	# Preserve the caller's $@ and $! (see _log); a croak from here still
+	# reaches the caller, as die sets $@ after the stack has unwound
+	local ($@, $!);
 
 	# Nothing to log if no arguments supplied
 	return if(scalar(@_) == 0);
@@ -2877,6 +2919,10 @@ sub emergency {
 # ---------------------------------------------------------------------------
 sub DESTROY {
 	my $self = $_[0];
+
+	# Destructors run at unpredictable times, e.g. while an exception is
+	# propagating, so don't let closelog() change the error variables
+	local ($@, $!, $?);
 
 	# openlog/closelog are process-global, so only close the connection
 	# when the last instance using it goes away

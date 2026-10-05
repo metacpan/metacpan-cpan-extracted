@@ -1,4 +1,4 @@
-requires 'Alien::Xmake', 'v1.0.0';
+requires 'Alien::Xmake', 'v1.0.3';
 requires 'Capture::Tiny';
 requires 'ExtUtils::MakeMaker';
 requires 'File::ShareDir';
@@ -12,7 +12,7 @@ on configure => sub {
     requires 'perl', 'v5.40.0';
 };
 on build => sub {
-    requires 'Alien::Xmake', 'v1.0.0';
+    requires 'Alien::Xmake', 'v1.0.3';
     requires 'Module::Build::Tiny';
     requires 'perl', 'v5.40.0';
 };

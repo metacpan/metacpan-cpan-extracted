@@ -91,13 +91,17 @@ is_deeply($sorted, [1, 2, 3], 'vals(HoH) sorts keys as strings (a < ab < b)');
 	lives_ok { $r->[1] = 5 } 'vals: a missing/undef slot is a writable scalar';
 }
 
-# leniency vs strictness for an entirely-absent column
-is_deeply(vals([ { id => 1 }, { id => 2 } ], 'val'), [undef, undef],
-	'vals(AoH) absent column -> all undef (per-row, lenient)');
-is_deeply(vals({ a => { id => 1 }, b => { id => 2 } }, 'val'), [undef, undef],
-	'vals(HoH) absent column -> all undef (per-row, lenient)');
-dies_ok { vals({ id => [1, 2], tag => ['A', 'B'] }, 'val') }
-	'vals(HoA) absent column -> dies (column is structural)';
+# a column that no row has dies in every shape; a column only some rows have is NA elsewhere
+throws_ok { vals([ { id => 1 }, { id => 2 } ], 'val') } qr/^vals: no column named "val" at /,
+	'vals(AoH) absent column -> dies';
+throws_ok { vals({ a => { id => 1 }, b => { id => 2 } }, 'val') } qr/^vals: no column named "val" at /,
+	'vals(HoH) absent column -> dies';
+throws_ok { vals({ id => [1, 2], tag => ['A', 'B'] }, 'val') } qr/^vals: no column named "val" at /,
+	'vals(HoA) absent column -> dies';
+is_deeply(vals([ { id => 1 }, { id => 2, val => undef } ], 'val'), [undef, undef],
+	'vals(AoH) a column held only as an undef cell exists');
+is_deeply(vals({ a => { id => 1 }, b => { val => 3 } }, 'val'), [undef, 3],
+	'vals(HoH) a column only one row has exists');
 
 # malformed AoH element (not a hashref) yields undef, not a crash
 #is_deeply(vals([ { val => 1 }, 5, { val => 3 } ], 'val'), [1, undef, 3],

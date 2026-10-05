@@ -27,12 +27,12 @@ sub is_approx {
 	}
 }
 
-# predict() on the training predictors must reproduce the stored fitted.values
+# predict() on the training predictors must reproduce the stored fitted_values
 sub predict_matches_fit {
 	my ($model, $newdata, $test_name, $epsilon) = @_;
 	$epsilon = 1e-7 if not defined $epsilon;
 	my $pred = predict($model, $newdata);
-	my $fit  = $model->{'fitted.values'};
+	my $fit  = $model->{'fitted_values'};
 	my $ok = 1;
 	foreach my $k (sort keys %$fit) {
 		if (not defined $pred->{$k} or abs($pred->{$k} - $fit->{$k}) > $epsilon) {
@@ -70,7 +70,7 @@ my $m_two    = aov(\%twoway, 'y~A*B');
 my $m_fxc    = aov(\%fxc,    'y~g*x');
 my $m_cxc    = aov(\%cxc,    'y~x*z');
 
-# round-trips: predict(training) == fitted.values
+# round-trips: predict(training) == fitted_values
 predict_matches_fit($m_oneway, \%oneway, 'round-trip: one-way factor');
 predict_matches_fit($m_reg,    \%reg,    'round-trip: simple regression');
 predict_matches_fit($m_two,    \%twoway, 'round-trip: factor x factor interaction', 1e-6);
@@ -124,11 +124,11 @@ predict_matches_fit($m_cxc,    \%cxc,    'round-trip: continuous x continuous in
 	is_approx($flat->{1}, 1, 'flat single row');
 }
 
-# no newdata -> stored fitted.values returned
+# no newdata -> stored fitted_values returned
 {
 	my $p = predict($m_reg);
-	my $f = $m_reg->{'fitted.values'};
-	is_approx($p->{$_}, $f->{$_}, "no-newdata returns fitted.values [$_]") for sort keys %$f;
+	my $f = $m_reg->{'fitted_values'};
+	is_approx($p->{$_}, $f->{$_}, "no-newdata returns fitted_values [$_]") for sort keys %$f;
 }
 
 # binomial family: link vs response (hand-built model)

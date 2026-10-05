@@ -16,6 +16,13 @@
 #       both orientations, var.equal = TRUE.
 #   tests/reg-tests-2.R:3199         -- print(t.test(1:28), digits = 3).
 #   tests/reg-tests-1e.R:1985        -- t.test(<Inf>...), PR#18901.
+#   doc/manual/R-intro.R:371/375     -- Michelson's A and B, Welch and pooled.
+#   datasets/man/sleep.Rd:39         -- the paired test in long format.
+#   stats/man/ks.test.Rd:165         -- t.test(x, x2, alternative = "g").
+#   base/man/array2DF.Rd:103         -- t.test() on each ToothGrowth cell.
+#   stats/man/pairwise.t.test.Rd:52  -- pool.sd = FALSE: t.test() on each pair
+#       of months of airquality's Ozone, NA included; tcltk/demo/tkttest.R:86
+#       is the 5 v 8 pair.
 #
 # Each documented case is then crossed over the whole argument space R exposes
 # (alternative x var.equal x paired x mu x conf.level), because a reference
@@ -146,3 +153,52 @@ ci_b <- c(0.93455277, 0.42680603, 0.49751939, 0.14152846, 0.711435,
 for (alt in c("two.sided", "less", "greater")) for (ve in c(FALSE, TRUE))
 	emit(sprintf("scipy.ci.11v13|2s|%s|ve=%d|mu=0|cl=0.9|p=0", alt, as.integer(ve)),
 	     t.test(ci_a, ci_b, alternative = alt, var.equal = ve, conf.level = 0.9))
+
+## ---- doc/manual/R-intro.R:371/375 -- Michelson's two sets of latent heats ----
+## (pinned in tests/R-intro.Rout.save:581 and :609)
+A <- c(79.98, 80.04, 80.02, 80.04, 80.03, 80.03, 80.04, 79.97,
+       80.05, 80.03, 80.02, 80, 80.02)
+B <- c(80.02, 79.94, 79.98, 79.97, 79.97, 80.03, 79.95, 79.97)
+sweep_two("rintro.AB", A, B)
+
+## ---- datasets/man/sleep.Rd:39 -- the paired test in long format ----
+## (pinned in tests/Examples/datasets-Ex.Rout.save:3292).  The same numbers as
+## t.test.Rd's wide-format test, but a separate example, so a separate tag.
+with(sleep, sweep_two("sleepRd.paired", extra[group == 1], extra[group == 2],
+                      mus = c(0), cls = c(0.95), paired = TRUE))
+
+## ---- stats/man/ks.test.Rd:165 -- t.test(x, x2, alternative = "g") ----
+## R CMD check runs each example after set.seed(1) (cleanEx() in
+## share/R/examples-header.R), and nothing between that and x2 draws, so these
+## are the vectors of tests/Examples/stats-Ex.Rout.save:9232, whose printed
+## t = 5.6742, df = 96.85, p-value = 7.242e-08 this reproduces.  The .t file
+## carries them at the 17 digits printed here.
+set.seed(1)
+ks_x <- rnorm(50)
+ks_y <- runif(30)
+ks_x2 <- rnorm(50, -1)
+cat(sprintf("# ks.test.Rd x  = %s\n", paste(sprintf("%.17g", ks_x), collapse = ",")))
+cat(sprintf("# ks.test.Rd x2 = %s\n", paste(sprintf("%.17g", ks_x2), collapse = ",")))
+sweep_two("ksRd.x.x2", ks_x, ks_x2, mus = c(0), cls = c(0.95))
+
+## ---- base/man/array2DF.Rd:103 -- t.test(x) on each ToothGrowth cell ----
+for (d in c(0.5, 1, 2)) for (s in c("OJ", "VC")) {
+	v <- with(ToothGrowth, len[dose == d & supp == s])
+	cat(sprintf("# ToothGrowth len dose=%g supp=%s: %s\n", d, s, paste(v, collapse = ",")))
+	sweep_one(sprintf("array2DF.tooth.%g.%s", d, s), v, mus = c(0, 10), cls = c(0.95, 0.99))
+}
+
+## ---- stats/man/pairwise.t.test.Rd:52 -- pairwise.t.test(Ozone, Month,
+## pool.sd = FALSE), which is t.test(xi, xj) on every pair of months
+## (stats/R/pairwise.R:54); Ozone has 37 NA, so this is the NA-dropping path on
+## real data.  tcltk/demo/tkttest.R:86 runs Ozone[Month == 5] against
+## Ozone[Month == 8] from a dialog -- the 5 v 8 pair below, which is why its
+## sweep is the full one.
+oz <- airquality$Ozone; mo <- airquality$Month
+cat(sprintf("# airquality Ozone = %s\n", paste(ifelse(is.na(oz), "NA", oz), collapse = ",")))
+cat(sprintf("# airquality Month = %s\n", paste(mo, collapse = ",")))
+for (i in 5:8) for (j in (i + 1):9) {
+	if (i == 5 && j == 8) sweep_two("pairwise.ozone.5v8", oz[mo == i], oz[mo == j])
+	else sweep_two(sprintf("pairwise.ozone.%dv%d", i, j), oz[mo == i], oz[mo == j],
+	               mus = c(0), cls = c(0.95))
+}

@@ -173,7 +173,7 @@ my $INF = 9**9**9;
 	# the rectangular cases still fit
 	my %ok = (y => [1, 2, 3, 4, 5, 7], x => [1, 2, 3, 4, 5, 6]);
 	my $fit = lm(formula => 'y ~ x', data => \%ok);
-	is($fit->{'df.residual'}, 4, 'a rectangular frame fits on all its rows');
+	is($fit->{'df_residual'}, 4, 'a rectangular frame fits on all its rows');
 	my $p = prcomp({ a => [1, 2, 3, 4], b => [2, 1, 4, 3] });
 	is(scalar @{ $p->{sdev} }, 2, 'and prcomp decomposes a rectangular one');
 }

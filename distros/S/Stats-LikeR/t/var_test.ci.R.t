@@ -15,7 +15,7 @@
 #
 # 1. The interval.  var_test divided by a private qf_bisection() whose stop
 #    was an ABSOLUTE `high - low < 1e-12`.  The F quantile it divides by is
-#    not O(1) -- at conf.level = 0.999999 on 9 and 9 degrees of freedom it is
+#    not O(1) -- at conf_level = 0.999999 on 9 and 9 degrees of freedom it is
 #    about 0.016 -- so an absolute stop is a relative error that grows as the
 #    quantile shrinks.  The interval came out
 #        [16085387951.278957, 62168223924585.172]
@@ -49,8 +49,8 @@
 #    later is a deliberate act too.
 #
 # Tolerance.  1e-11 relative on all four fields.  Worst observed on the double
-# build: 2.314e-16 (estimate) and 2.129e-14 (conf.int) against R, 1.854e-14
-# (p.value) against mpmath -- roughly 500x headroom, which the wider NV builds
+# build: 2.314e-16 (estimate) and 2.129e-14 (conf_int) against R, 1.854e-14
+# (p_value) against mpmath -- roughly 500x headroom, which the wider NV builds
 # need because d_qf() and pf_upper() both bisect and their last bits move with
 # NV width.
 
@@ -72,9 +72,9 @@ my @YS = ([2,4,1,8,3,9,5,7,6,10],
           [5,5,6,6,7,7,8,8,9,9,10,10],
           [1,3,7,15,31,63,127]);
 
-# conf.level must be DYADIC, and is written as the arithmetic rather than as a
+# conf_level must be DYADIC, and is written as the arithmetic rather than as a
 # decimal, because it is read as an NV.  0.999999 is a different number on a
-# double build than on a long-double one, and beta = (1 - conf.level)/2 turns
+# double build than on a long-double one, and beta = (1 - conf_level)/2 turns
 # that 5.5e-17 gap into a relative 5.5e-11 in a quantity of size 1e-6, which
 # then lands in the interval: the first version of this file froze R's double
 # reading of 0.999999 and failed on perl-5.12.5 and the quadmath build at a
@@ -95,8 +95,8 @@ sub rel_ok {
 		or diag(sprintf "got %.17g, expected %.17g, rel %.3e", $got, $exp, $rel);
 }
 
-# [x index, y index, y scale, conf.level index (into @CLS), alternative,
-#  R estimate, mpmath p.value, R conf.int lower, R conf.int upper]
+# [x index, y index, y scale, conf_level index (into @CLS), alternative,
+#  R estimate, mpmath p_value, R conf.int lower, R conf.int upper]
 my @ROWS = (
 	[1, 1, 1, 1, "two.sided", 1, 1.0, 0.62857513086895433, 1.590899720479843],
 	[1, 1, 1, 1, "less", 1, 0.5, 0, 1],
@@ -970,12 +970,12 @@ for my $r (@ROWS) {
 	my ($xi, $yi, $sc, $ci, $alt, $est, $p, $lo, $hi) = @$r;
 	my @y = map { $_ * $sc } @{ $YS[$yi - 1] };
 	my $g = var_test($XS[$xi - 1], \@y,
-	                 'conf.level' => $CLS[$ci - 1], alternative => $alt);
+	                 'conf_level' => $CLS[$ci - 1], alternative => $alt);
 	my $tag = "x$xi y$yi sc=$sc cl#$ci $alt";
 	rel_ok($g->{estimate},       $est, "$tag: estimate");
-	rel_ok($g->{'p.value'},      $p,   "$tag: p.value");
-	rel_ok($g->{'conf.int'}[0],  $lo,  "$tag: conf.int lower");
-	rel_ok($g->{'conf.int'}[1],  $hi,  "$tag: conf.int upper");
+	rel_ok($g->{'p_value'},      $p,   "$tag: p_value");
+	rel_ok($g->{'conf_int'}[0],  $lo,  "$tag: conf_int lower");
+	rel_ok($g->{'conf_int'}[1],  $hi,  "$tag: conf_int upper");
 }
 
 # The subtractive form reached a flat 0 here; the direct one does not.  This
@@ -983,16 +983,16 @@ for my $r (@ROWS) {
 {
 	my @y = map { $_ / 1048576 } (1, 2, 4, 8, 16, 32, 64);
 	my $g = var_test([3,1,4,1,5,9,2,6,5,3,5], \@y, alternative => 'greater');
-	cmp_ok($g->{'p.value'}, '>', 0,
+	cmp_ok($g->{'p_value'}, '>', 0,
 	       'var_test: a far-tail upper p-value is not a flat 0');
-	cmp_ok($g->{'p.value'}, '<', 1e-16,
+	cmp_ok($g->{'p_value'}, '<', 1e-16,
 	       'var_test: and it is past where 1 - pf(F) could have represented it');
 }
 
-# The interval must still bracket the estimate, at every conf.level.
+# The interval must still bracket the estimate, at every conf_level.
 {
 	my $g = var_test([1,2,3,4,5,6,7,8,9,10], [2,4,1,8,3,9,5,7,6,10],
-	                 'conf.level' => 1 - 2**-20);
-	cmp_ok($g->{'conf.int'}[0], '<', $g->{estimate}, 'conf.int brackets below');
-	cmp_ok($g->{'conf.int'}[1], '>', $g->{estimate}, 'conf.int brackets above');
+	                 'conf_level' => 1 - 2**-20);
+	cmp_ok($g->{'conf_int'}[0], '<', $g->{estimate}, 'conf_int brackets below');
+	cmp_ok($g->{'conf_int'}[1], '>', $g->{estimate}, 'conf_int brackets above');
 }

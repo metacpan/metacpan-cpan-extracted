@@ -22,6 +22,7 @@ debug
 DGRAM
 dT
 emerg
+EMSGSIZE
 ENV
 env
 falsy

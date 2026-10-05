@@ -1,0 +1,71 @@
+# Throwaway Keycloak for t/90-live-keycloak.t. No persistence: start-dev with
+# the embedded database, realm imported from the ConfigMap at start.
+#
+#   kubectl create namespace airlock-test
+#   kubectl -n airlock-test create configmap airlock-realm --from-file=realm.json=t/keycloak/realm.json
+#   kubectl -n airlock-test apply -f t/keycloak/k8s.yaml
+#   perl t/keycloak/setup.pl http://<node>:<nodeport>     (again after every pod restart)
+#   ...
+#   kubectl delete namespace airlock-test
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:26.8.0
+          args: ["start-dev", "--import-realm"]
+          env:
+            - name: KC_BOOTSTRAP_ADMIN_USERNAME
+              value: admin
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+              value: admin
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /realms/airlock-test
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            failureThreshold: 60
+          resources:
+            requests:
+              cpu: 250m
+              memory: 768Mi
+            limits:
+              memory: 2Gi
+          volumeMounts:
+            - name: realm
+              mountPath: /opt/keycloak/data/import
+              readOnly: true
+      volumes:
+        - name: realm
+          configMap:
+            name: airlock-realm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+spec:
+  type: NodePort
+  selector:
+    app: keycloak
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

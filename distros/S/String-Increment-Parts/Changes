@@ -1,3 +1,9 @@
+0.002   2026-07-22  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add some command-line short options: -f for filename, -s for
+          string, and -i for inc.
+
+
 0.001   2026-07-22  Released-By: PERLANCAR
 
         - First release.

@@ -30,34 +30,34 @@ my @g = ((('A') x 5), (('B') x 5), (('C') x 5));
 	is_approx($ab->{Z}, -2.760182, 'A-B Z');
 	is_approx($ac->{Z}, -0.212322, 'A-C Z');
 	is_approx($bc->{Z},  2.547860, 'B-C Z');
-	is_approx($ab->{'p.value'}, 0.005777, 'A-B raw p');
-	is_approx($bc->{'p.value'}, 0.010839, 'B-C raw p');
+	is_approx($ab->{'p_value'}, 0.005777, 'A-B raw p');
+	is_approx($bc->{'p_value'}, 0.010839, 'B-C raw p');
 	# Holm-adjusted
-	is_approx($ab->{'p.adjust'}, 0.017331, 'A-B holm');
-	is_approx($ac->{'p.adjust'}, 0.831856, 'A-C holm');
-	is_approx($bc->{'p.adjust'}, 0.021677, 'B-C holm');
+	is_approx($ab->{'p_adjust'}, 0.017331, 'A-B holm');
+	is_approx($ac->{'p_adjust'}, 0.831856, 'A-C holm');
+	is_approx($bc->{'p_adjust'}, 0.021677, 'B-C holm');
 }
 
 # Benjamini-Hochberg
 {
 	my $r  = dunn_test(\@x, \@g, method => 'bh');
-	is_approx(by_comp($r,'A - B')->{'p.adjust'}, 0.016258, 'A-B BH');
-	is_approx(by_comp($r,'B - C')->{'p.adjust'}, 0.016258, 'B-C BH');
+	is_approx(by_comp($r,'A - B')->{'p_adjust'}, 0.016258, 'A-B BH');
+	is_approx(by_comp($r,'B - C')->{'p_adjust'}, 0.016258, 'B-C BH');
 }
 
 # Bonferroni
 {
 	my $r  = dunn_test(\@x, \@g, method => 'bonferroni');
-	is_approx(by_comp($r,'A - B')->{'p.adjust'}, 0.017331, 'A-B bonferroni');
-	is_approx(by_comp($r,'A - C')->{'p.adjust'}, 1.0,      'A-C bonferroni capped at 1');
-	is_approx(by_comp($r,'B - C')->{'p.adjust'}, 0.032516, 'B-C bonferroni');
+	is_approx(by_comp($r,'A - B')->{'p_adjust'}, 0.017331, 'A-B bonferroni');
+	is_approx(by_comp($r,'A - C')->{'p_adjust'}, 1.0,      'A-C bonferroni capped at 1');
+	is_approx(by_comp($r,'B - C')->{'p_adjust'}, 0.032516, 'B-C bonferroni');
 }
 
 # 'none' leaves raw p-values unchanged
 {
 	my $r = dunn_test(\@x, \@g, method => 'none');
 	my $ab = by_comp($r, 'A - B');
-	is_approx($ab->{'p.adjust'}, $ab->{'p.value'}, "method 'none' equals raw p");
+	is_approx($ab->{'p_adjust'}, $ab->{'p_value'}, "method 'none' equals raw p");
 }
 
 # error handling

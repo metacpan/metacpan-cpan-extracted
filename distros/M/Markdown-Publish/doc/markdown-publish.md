@@ -52,11 +52,11 @@ Example-Client/
     └── example-client.md
 ```
 
-If there is no `doc/`, the publisher falls back to the sidecars beneath `lib/` and `bin/` and will. An explicit `sources` list replaces these conventions; it is exact rather than additive. Source files and directories named as sources must exist.
+If there is no `doc/`, the publisher falls back to the sidecars beneath `lib/` and `bin/`. An explicit `sources` list replaces these conventions; it is exact rather than additive. Source files and directories named as sources must exist.
 
 A top-level article containing several level-one Markdown headings is split into sections, one per heading. Links to anchors that move into another page are repaired during assembly. If no `index.md` exists, then the first top-level page also becomes the home page while its original URL remains available.
 
-You can link to markdown documentation for modules and scripts using the convention `lib/Examples/Client.pm.md` - markdown sidecars will be assembled until the `doc/` as a root directory when publishing (i.e. You don't need to specify the document as `../`)
+Write links to module and script sidecars relative to the authored document so they work when browsing the repository. For example, `doc/example-client.md` can link to `../lib/Example/Client.pm.md` or `../bin/example-client.md`. During site assembly, existing sidecar links are rebased to the mirrored `lib/` and `bin/` paths. Existing publication-root links such as `lib/Example/Client.pm.md` remain supported.
 
 # MakeMaker targets {#makemaker-setup}
 

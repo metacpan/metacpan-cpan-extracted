@@ -7,7 +7,7 @@ use Getopt::Pad::Config::Format;
 class Getopt::Pad::Spec::Config :strict(params) {
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	field $raw :param;
 

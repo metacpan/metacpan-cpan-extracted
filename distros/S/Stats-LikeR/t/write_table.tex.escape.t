@@ -72,7 +72,7 @@ my @greek = (
 	my $tex = texfile();
 	my @rows = (['g']);                       # first inner array = header
 	push @rows, [chr($_->[0])] for @greek;
-	write_table(\@rows, $tex, 'row.names' => 0);
+	write_table(\@rows, $tex, 'row_names' => 0);
 	my $body = body_after_provenance(slurp($tex));
 	for my $g (@greek) {
 		my ($cp, $macro) = @$g;
@@ -87,7 +87,7 @@ my @greek = (
 {
 	my $tex = texfile();
 	my $cell = chr(0x0394) . '_' . chr(0x03B1) . '>' . '&';
-	write_table([['h'], [$cell]], $tex, 'tex.bold.1st.col' => 0, 'row.names' => 0);
+	write_table([['h'], [$cell]], $tex, 'tex_bold_1st_col' => 0, 'row_names' => 0);
 	has(body_after_provenance(slurp($tex)),
 		'\textDelta{}\_\textalpha{}\textgreater{}\&',
 		'ASCII # _ % & > are escaped alongside Greek in a UTF-8 cell');
@@ -97,7 +97,7 @@ my @greek = (
 {
 	my $tex = texfile();
 	write_table([['h'], [chr(0x0394) . 'G']], $tex,
-		'tex.bold.1st.col' => 0, 'row.names' => 0);
+		'tex_bold_1st_col' => 0, 'row_names' => 0);
 	my $body = body_after_provenance(slurp($tex));
 	has($body,  '\textDelta{}G', 'Greek + letter: {} terminates the control word');
 	lacks($body, '\textDeltaG',  'Greek + letter: not glued into \textDeltaG');
@@ -106,7 +106,7 @@ my @greek = (
 # the header call site maps Greek too (not just data cells)
 {
 	my $tex = texfile();
-	write_table([[chr(0x03A9) . '-total'], ['x']], $tex, 'row.names' => 0);
+	write_table([[chr(0x03A9) . '-total'], ['x']], $tex, 'row_names' => 0);
 	has(body_after_provenance(slurp($tex)), '\textbf{\textOmega{}-total}',
 		'Greek in a header cell is mapped and bold');
 }
@@ -115,7 +115,7 @@ my @greek = (
 {
 	my $tex = texfile();
 	write_table([['h'], [chr(0x03C2)], [chr(0x03C3)]], $tex,
-		'tex.bold.1st.col' => 0, 'row.names' => 0);
+		'tex_bold_1st_col' => 0, 'row_names' => 0);
 	my $body = body_after_provenance(slurp($tex));
 	has($body, '\textvarsigma{}', 'U+03C2 -> \textvarsigma (final sigma)');
 	has($body, '\textsigma{}',    'U+03C3 -> \textsigma (medial sigma)');
@@ -127,7 +127,7 @@ my @greek = (
 	# U+2206 INCREMENT looks like a triangle but is NOT Greek Delta;
 	# U+00E9 is an accented Latin letter. Both are UTF-8, neither is mapped.
 	my $cell = chr(0x2206) . chr(0x00E9);
-	write_table([['h'], [$cell]], $tex, 'tex.bold.1st.col' => 0, 'row.names' => 0);
+	write_table([['h'], [$cell]], $tex, 'tex_bold_1st_col' => 0, 'row_names' => 0);
 	my $body = body_after_provenance(slurp($tex));
 	has($body, utf8_bytes(chr(0x2206)), 'U+2206 passes through as raw UTF-8');
 	has($body, utf8_bytes(chr(0x00E9)), 'U+00E9 passes through as raw UTF-8');
@@ -138,7 +138,7 @@ my @greek = (
 {
 	my $tex = texfile();
 	write_table([['v'], ['a_b>c#d%e&f']], $tex,
-		'tex.bold.1st.col' => 0, 'row.names' => 0);
+		'tex_bold_1st_col' => 0, 'row_names' => 0);
 	has(body_after_provenance(slurp($tex)),
 		'a\_b\textgreater{}c\#d\%e\&f',
 		'pure-ASCII cell: byte path escapes # _ % & >');
@@ -148,7 +148,7 @@ my @greek = (
 {
 	my $tex = texfile();
 	write_table([['fig'], ['\includesvg{a_b.svg}']], $tex,
-		'tex.bold.1st.col' => 0, 'row.names' => 0);
+		'tex_bold_1st_col' => 0, 'row_names' => 0);
 	my $body = body_after_provenance(slurp($tex));
 	has($body, '\includesvg{a_b.svg}', 'includesvg cell passes through verbatim');
 	lacks($body, 'a\_b.svg', 'includesvg: underscore inside is NOT escaped');
@@ -160,14 +160,14 @@ no_leaks_ok {
 	my $tex = texfile();
 	my @rows = (['g']);
 	push @rows, [chr($_->[0])] for @greek;
-	eval { write_table(\@rows, $tex, 'row.names' => 0) }
+	eval { write_table(\@rows, $tex, 'row_names' => 0) }
 } 'write_table(tex): no leaks writing every Greek code point' unless $INC{'Devel/Cover.pm'};
 
 no_leaks_ok {
 	my $tex = texfile();
 	eval {
 		write_table([['h'], [chr(0x0394) . '_' . chr(0x03B1) . '>']], $tex,
-			'tex.bold.1st.col' => 0, 'row.names' => 0)
+			'tex_bold_1st_col' => 0, 'row_names' => 0)
 	}
 } 'write_table(tex): no leaks on a mixed Greek/ASCII UTF-8 cell' unless $INC{'Devel/Cover.pm'};
 

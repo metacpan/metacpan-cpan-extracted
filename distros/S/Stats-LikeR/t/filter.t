@@ -60,27 +60,27 @@ sub is_approx {
 	is(scalar keys %$hoh, 3, 'HoH: the input frame is not modified');
 }
 
-# output.type converts between shapes (rows/keys order may differ for HoH)
+# output_type converts between shapes (rows/keys order may differ for HoH)
 {
 	my $aoh = [ { id => 1, grp => 'a' }, { id => 2, grp => 'b' } ];
 	my $hoa = { id => [1, 2], grp => ['a', 'b'] };
 	my $hoh = { r1 => { id => 1, grp => 'a' }, r2 => { id => 2, grp => 'b' } };
 	my $all = sub { 1 };
 
-	my $a2h = filter($aoh, $all, 'output.type' => 'hoa');
+	my $a2h = filter($aoh, $all, 'output_type' => 'hoa');
 	is(ref $a2h, 'HASH', 'AoH -> hoa: hash out');
 	is_deeply($a2h->{id},  [1, 2],	   'AoH -> hoa: id column, row order preserved');
 	is_deeply($a2h->{grp}, ['a', 'b'], 'AoH -> hoa: grp column');
 
-	my $h2a = filter($hoa, $all, 'output.type' => 'aoh');
+	my $h2a = filter($hoa, $all, 'output_type' => 'aoh');
 	is(ref $h2a, 'ARRAY', 'HoA -> aoh: array out');
 	is_deeply([ map { $_->{id} } @$h2a ], [1, 2], 'HoA -> aoh: rows, order preserved');
 
-	my $hh2a = filter($hoh, $all, 'output.type' => 'aoh');
+	my $hh2a = filter($hoh, $all, 'output_type' => 'aoh');
 	is(ref $hh2a, 'ARRAY', 'HoH -> aoh: array out');
 	is_deeply([ sort map { $_->{id} } @$hh2a ], [1, 2], 'HoH -> aoh: inner rows kept');
 
-	my $hh2h = filter($hoh, $all, 'output.type' => 'hoa');
+	my $hh2h = filter($hoh, $all, 'output_type' => 'hoa');
 	is(ref $hh2h, 'HASH', 'HoH -> hoa: hash out');
 	is_deeply([ sort { $a <=> $b } @{ $hh2h->{id} } ], [1, 2], 'HoH -> hoa: id column');
 }
@@ -89,7 +89,7 @@ sub is_approx {
 {
 	my $aoh = [ { x => 1 }, { x => 2 } ];
 	is(ref filter($aoh, sub { 1 }, 'hoa'),		  'HASH', 'bare positional output type');
-	is(ref filter($aoh, sub { 1 }, out => 'hoa'), 'HASH', "'out' alias for output.type");
+	is(ref filter($aoh, sub { 1 }, out => 'hoa'), 'HASH', "'out' alias for output_type");
 }
 
 # the predicate sees the row as both $_ and $_[0]
@@ -116,7 +116,7 @@ sub is_approx {
 {
 	is_deeply(filter([], sub { 1 }), [], 'empty AoH stays []');
 	is_deeply(filter({}, sub { 1 }), {}, 'empty hash stays {}');
-	is_deeply(filter({}, sub { 1 }, 'output.type' => 'aoh'), [], 'empty hash -> aoh gives []');
+	is_deeply(filter({}, sub { 1 }, 'output_type' => 'aoh'), [], 'empty hash -> aoh gives []');
 }
 
 # col() predicate: operators, operand order, combinators, undef rule
@@ -132,8 +132,8 @@ sub is_approx {
 	is_deeply([ map { $_->{id} } @{ filter($df, (col("grp") eq "a") & (col("age") > 18)) } ], [1, 3], "col: & (and)");
 	is_deeply([ sort { $a <=> $b } map { $_->{id} } @{ filter($df, (col("age") < 18) | (col("id") == 3)) } ], [2, 3], "col: | (or)");
 	is_deeply([ map { $_->{id} } @{ filter($df, !(col("age") > 18)) } ], [2], "col: ! (not)");
-	my $h = filter($df, col("age") >= 18, "output.type" => "hoa");
-	is_deeply([ sort { $a <=> $b } @{ $h->{age} } ], [20, 25], "col honours output.type => hoa");
+	my $h = filter($df, col("age") >= 18, "output_type" => "hoa");
+	is_deeply([ sort { $a <=> $b } @{ $h->{age} } ], [20, 25], "col honours output_type => hoa");
 	my $hoh = { r1 => { age => 20 }, r2 => { age => 10 } };
 	is_deeply([ keys %{ filter($hoh, col("age") > 15) } ], ["r1"], "col on HoH input");
 	my $u = [ { x => 5 }, { x => undef }, { x => 1 } ];
@@ -145,7 +145,7 @@ sub is_approx {
 throws_ok { filter('x', sub { 1 }) }					   qr/data frame/,			  'non-ref data frame dies';
 throws_ok { filter([], "x") } qr/CODE reference or a col/, "non-predicate (neither CODE nor col) dies";
 throws_ok { filter([ { x => 1 } ], col("x")) } qr/incomplete col/, "a bare col() predicate dies";
-throws_ok { filter([], sub { 1 }, 'output.type' => 'hoh') } qr/output\.type must be/, 'output.type hoh is rejected';
+throws_ok { filter([], sub { 1 }, 'output_type' => 'hoh') } qr/output_type must be/, 'output_type hoh is rejected';
 throws_ok { filter([ {}, 'x' ], sub { 1 }) }			   qr/element 1 is not a HASH/, 'AoH non-hash element dies';
 throws_ok { filter({ c => 'x' }, sub { 1 }) }			   qr/hash of arrays.*hash of hashes/, 'scalar-valued hash dies';
 # NB: shape is auto-detected by peeking the first value, and hash order is
@@ -162,12 +162,33 @@ my $LA	= [ { x => 1 }, { x => 2 } ];
 my $LHA = { x => [1, 2], y => ['p', 'q'] };
 my $LH	= { a => { x => 1 }, b => { x => 2 } };
 no_leaks_ok { filter($LA,  sub { $_->{x} > 1 }) }						 'no leak: AoH -> AoH'	unless $INC{'Devel/Cover.pm'};
-no_leaks_ok { filter($LA,  sub { $_->{x} > 1 }, 'output.type' => 'hoa') } 'no leak: AoH -> hoa'	 unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { filter($LA,  sub { $_->{x} > 1 }, 'output_type' => 'hoa') } 'no leak: AoH -> hoa'	 unless $INC{'Devel/Cover.pm'};
 no_leaks_ok { filter($LHA, sub { $_->{x} > 1 }) }						 'no leak: HoA -> HoA'	unless $INC{'Devel/Cover.pm'};
-no_leaks_ok { filter($LHA, sub { $_->{x} > 1 }, 'output.type' => 'aoh') } 'no leak: HoA -> aoh'	 unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { filter($LHA, sub { $_->{x} > 1 }, 'output_type' => 'aoh') } 'no leak: HoA -> aoh'	 unless $INC{'Devel/Cover.pm'};
 no_leaks_ok { filter($LH,  sub { $_->{x} > 0 }) }						 'no leak: HoH -> HoH'	unless $INC{'Devel/Cover.pm'};
-no_leaks_ok { filter($LH,  sub { $_->{x} > 0 }, 'output.type' => 'hoa') } 'no leak: HoH -> hoa'	 unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { filter($LH,  sub { $_->{x} > 0 }, 'output_type' => 'hoa') } 'no leak: HoH -> hoa'	 unless $INC{'Devel/Cover.pm'};
 no_leaks_ok { filter($LA, col('x') > 1) } 'no leak: col predicate' unless $INC{'Devel/Cover.pm'};
 no_leaks_ok { eval { filter($LA, sub { die "x\n" }) } }					 'no leak: dying predicate' unless $INC{'Devel/Cover.pm'};
+
+# Tied frames. Up to 0.3212 any tied HoA or HoH died with "hash data frame must
+# be a hash of arrays (HoA) or a hash of hashes (HoH)": the shape test read
+# HeVAL(), which a tied hash's iterator never fills in, and the HoA column count
+# came from hv_iterinit(), which is 0 for a tied hash. A tied row of an AoH
+# already worked; it is here so all three shapes are pinned.
+{
+	require Tie::Hash;
+	tie my %th, 'Tie::StdHash';
+	%th = ( 'x' => [ 1, 2, 3 ], 'y' => [ 4, 5, 6 ] );
+	is_deeply( filter( \%th, col('x') > 1 ), { 'x' => [ 2, 3 ], 'y' => [ 5, 6 ] }, 'tied HoA: compiled predicate' );
+	is_deeply( filter( \%th, sub { $_->{'x'} > 1 } ), { 'x' => [ 2, 3 ], 'y' => [ 5, 6 ] }, 'tied HoA: code predicate' );
+	tie my %thh, 'Tie::StdHash';
+	%thh = ( 'r1' => { 'x' => 1 }, 'r2' => { 'x' => 3 } );
+	is_deeply( filter( \%thh, col('x') > 1 ), { 'r2' => { 'x' => 3 } }, 'tied HoH: compiled predicate' );
+	is_deeply( filter( \%thh, sub { $_->{'x'} > 1 } ), { 'r2' => { 'x' => 3 } }, 'tied HoH: code predicate' );
+	tie my %trow, 'Tie::StdHash';
+	%trow = ( 'x' => 5 );
+	is_deeply( filter( [ \%trow, { 'x' => 0 } ], col('x') > 1 ), [ { 'x' => 5 } ], 'tied AoH row: compiled predicate' );
+	no_leaks_ok { filter( \%th, col('x') > 1 ); filter( \%thh, sub { $_->{'x'} > 1 } ) } 'no leak: tied HoA and HoH' unless $INC{'Devel/Cover.pm'};
+}
 
 done_testing;

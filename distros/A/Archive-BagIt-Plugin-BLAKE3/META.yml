@@ -1,0 +1,61 @@
+---
+abstract: 'The main module to handle bags.'
+author:
+  - 'Andreas Romeyke <cpan@andreas.romeyke.de>'
+build_requires:
+  File::Copy: '0'
+  File::Path: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0'
+  Test::File: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+  lib: '0'
+  open: '0'
+  perl: '5.008'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-BagIt-Plugin-BLAKE3
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+provides:
+  Archive::BagIt::Plugin::Algorithm::BLAKE3:
+    file: lib/Archive/BagIt/Plugin/Algorithm/BLAKE3.pm
+    version: '0.002'
+  Archive::BagIt::Plugin::BLAKE3:
+    file: lib/Archive/BagIt/Plugin/BLAKE3.pm
+    version: '0.002'
+  Archive::BagIt::Plugin::Manifest::BLAKE3:
+    file: lib/Archive/BagIt/Plugin/Manifest/BLAKE3.pm
+    version: '0.002'
+requires:
+  Archive::BagIt::Role::Algorithm: '0'
+  Archive::BagIt::Role::Manifest: '0'
+  Carp: '0'
+  Digest::BLAKE3: '0'
+  Moo: '0'
+  namespace::autoclean: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: http://andreas-romeyke.de/software.html
+version: '0.002'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

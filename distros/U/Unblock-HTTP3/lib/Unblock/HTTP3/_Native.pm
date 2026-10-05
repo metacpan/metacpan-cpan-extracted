@@ -5,7 +5,7 @@ use warnings;
 
 use Unblock::HTTP3 ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub nghttp3_version {
     return _nghttp3_version();
@@ -54,6 +54,7 @@ sub server {
         $qpack_blocked_streams,
         $enable_connect_protocol,
         $h3_datagram,
+        $origin_list,
     ) = @_;
 
     $max_field_section_size = 65_536
@@ -73,6 +74,7 @@ sub server {
         $qpack_blocked_streams,
         $enable_connect_protocol ? 1 : 0,
         $h3_datagram ? 1 : 0,
+        $origin_list,
     );
 }
 

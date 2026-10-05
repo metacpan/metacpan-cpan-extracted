@@ -79,12 +79,13 @@ my $res1 = read_table($fh1->filename, sep => ',');
 is($res1->[0]{colA}, 'val1_stray', 'Stray \r outside quotes is dropped (lenient)');
 
 #
-# 6. Classic-Mac (\r-only) line endings are unsupported BY DESIGN, and that is
-#    the direct consequence of test 5: a lone \r is dropped rather than treated
-#    as a record terminator, and sv_gets() splits on \n only. So a \r-only file
-#    is read as one line, its \r's removed and fields merged -> no data rows.
-#    Asserting the real behavior so it can't drift silently. (Universal-newline
-#    handling would flip test 5: a lone \r can't be both noise and terminator.)
+# 6. Classic-Mac (\r-only) line endings. Up to 0.3213 they were unsupported:
+#    sv_gets() split on \n only, so the file was one line with its \r's dropped
+#    as in test 5, and came back with no data rows. read_table now looks at the
+#    start of the file, and one with a \r and no \n at all is split on \r
+#    (_eol_is_cr() in LikeR.pm), as R's scan() and pandas' C tokenizer split it.
+#    Test 5 is unaffected: a \r in a file that has \n line ends is still noise.
+#    The reference cases are in t/read_table.cr_eol.R.pandas.t.
 #
 my $mac = "colA,colB\rval1,val2\rval3,val4";
 my $fh2 = File::Temp->new(UNLINK => 1);
@@ -92,6 +93,7 @@ binmode $fh2;
 print $fh2 $mac;
 close $fh2;
 my $res2 = read_table($fh2->filename, sep => ',');
-is(scalar @$res2, 0, 'Classic-Mac \r-only file: unsupported by design, yields no data rows');
+is_deeply($res2, [ { colA => 'val1', colB => 'val2' }, { colA => 'val3', colB => 'val4' } ],
+	'Classic-Mac \r-only file: split on \r');
 
 done_testing();

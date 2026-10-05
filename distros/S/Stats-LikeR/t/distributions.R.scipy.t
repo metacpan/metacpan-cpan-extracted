@@ -68,7 +68,7 @@
 # number R reports. Four of SciPy's six log references land in that second case;
 # log_or_zero() below accepts either the 0 a double gives or the resolved value
 # a long-double or __float128 build gives, and prints which happened, so that
-# changing this is a deliberate act on every width. The q* functions take log.p
+# changing this is a deliberate act on every width. The q* functions take log_p
 # properly: the argument is exponentiated, which is exact and lets them reach
 # quantiles the linear scale cannot name.
 
@@ -523,12 +523,12 @@ is( scalar keys %COUNT, 8, 'the frozen table covered all eight functions' );
 		'qnorm: positional mean/sd == named' );
 }
 
-# lower / lower.tail and log / log.p are aliases, as in pnorm.
+# lower / lower_tail and log / log_p are aliases, as in pnorm.
 {
-	is( pt( 1.5, 5, lower => 0 ), pt( 1.5, 5, 'lower.tail' => 0 ),
-		'lower.tail is a synonym for lower' );
-	is( pchisq( 2, 3, log => 1 ), pchisq( 2, 3, 'log.p' => 1 ),
-		'log.p is a synonym for log' );
+	is( pt( 1.5, 5, lower => 0 ), pt( 1.5, 5, 'lower_tail' => 0 ),
+		'lower_tail is a synonym for lower' );
+	is( pchisq( 2, 3, log => 1 ), pchisq( 2, 3, 'log_p' => 1 ),
+		'log_p is a synonym for log' );
 }
 
 # An array reference in, an array reference out, same length, same order.
@@ -618,20 +618,20 @@ is( scalar keys %COUNT, 8, 'the frozen table covered all eight functions' );
 	ok( do { my $v = pt(1, $nan); $v != $v }, 'a NaN parameter is NaN too' );
 }
 
-# log.p on the q* functions is the inverse of log on the p*, and reaches
+# log_p on the q* functions is the inverse of log on the p*, and reaches
 # quantiles the linear scale cannot name: exp(-800) is 0 as a double, so
-# qnorm(-800, log.p = TRUE) is the only way to ask for that quantile.
+# qnorm(-800, log_p = TRUE) is the only way to ask for that quantile.
 {
 	my $z = qnorm( log(0.25), log => 1 );
-	rel_ok( $z, qnorm(0.25), 1e-15, 'log.p', 'qnorm(log(p), log = 1) == qnorm(p)' );
-	ok( qnorm( -800, 'log.p' => 1 ) < -39,
-		'qnorm(-800, log.p = TRUE) reaches a quantile exp(-800) cannot express' );
+	rel_ok( $z, qnorm(0.25), 1e-15, 'log_p', 'qnorm(log(p), log = 1) == qnorm(p)' );
+	ok( qnorm( -800, 'log_p' => 1 ) < -39,
+		'qnorm(-800, log_p = TRUE) reaches a quantile exp(-800) cannot express' );
 	is( qnorm( 0, log => 1 ), 9 ** 9 ** 9, 'a log probability of 0 is p = 1' );
-	rel_ok( qt( log(0.25), 5, log => 1 ), qt(0.25, 5), 1e-15, 'log.p',
+	rel_ok( qt( log(0.25), 5, log => 1 ), qt(0.25, 5), 1e-15, 'log_p',
 		'qt(log(p), log = 1) == qt(p)' );
-	rel_ok( qchisq( log(0.25), 5, log => 1 ), qchisq(0.25, 5), 1e-15, 'log.p',
+	rel_ok( qchisq( log(0.25), 5, log => 1 ), qchisq(0.25, 5), 1e-15, 'log_p',
 		'qchisq(log(p), log = 1) == qchisq(p)' );
-	rel_ok( qf( log(0.25), 2, 5, log => 1 ), qf(0.25, 2, 5), 1e-15, 'log.p',
+	rel_ok( qf( log(0.25), 2, 5, log => 1 ), qf(0.25, 2, 5), 1e-15, 'log_p',
 		'qf(log(p), log = 1) == qf(p)' );
 }
 
@@ -676,9 +676,9 @@ is( scalar keys %COUNT, 8, 'the frozen table covered all eight functions' );
 	# leaves room for that on every NV width without admitting anything Moro
 	# would have.
 	my $wald_tol = 8 * NV_EPS();
-	rel_ok( $est - $z * $se, $m->{'conf.int'}{x}[0], $wald_tol, 'glm agreement',
-		'a Wald lower bound from qnorm matches glm conf.int' );
-	rel_ok( $est + $z * $se, $m->{'conf.int'}{x}[1], $wald_tol, 'glm agreement',
+	rel_ok( $est - $z * $se, $m->{'conf_int'}{x}[0], $wald_tol, 'glm agreement',
+		'a Wald lower bound from qnorm matches glm conf_int' );
+	rel_ok( $est + $z * $se, $m->{'conf_int'}{x}[1], $wald_tol, 'glm agreement',
 		'and so does the upper bound' );
 	# The same for the p-value glm reports: 2 * pnorm(-|z|), which is now
 	# expressible from outside the module.
@@ -692,8 +692,8 @@ is( scalar keys %COUNT, 8, 'the frozen table covered all eight functions' );
 {
 	my $r = chisq_test( [ [ 762, 327, 468 ], [ 484, 239, 477 ] ] );
 	rel_ok( pchisq( $r->{statistic}{'X-squared'}, $r->{parameter}{df}, lower => 0 ),
-		$r->{'p.value'}, 1e-12, 'chisq_test agreement',
-		'pchisq(upper) reproduces chisq_test p.value' );
+		$r->{'p_value'}, 1e-12, 'chisq_test agreement',
+		'pchisq(upper) reproduces chisq_test p_value' );
 }
 
 diag 'worst relative error by block:';

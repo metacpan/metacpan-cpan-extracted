@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Role::Grab 2.167;
+package Config::Model::Role::Grab 2.168;
 
 # ABSTRACT: Role to grab data from elsewhere in the tree
 
@@ -387,7 +387,7 @@ Config::Model::Role::Grab - Role to grab data from elsewhere in the tree
 
 =head1 VERSION
 
-version 2.167
+version 2.168
 
 =head1 SYNOPSIS
 

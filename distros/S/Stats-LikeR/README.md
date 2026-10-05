@@ -144,7 +144,7 @@ events. Validated numerically against R.
 
     my $r = age_standardize(\@count, \@pop, \@stdpop, per => 100_000);
     printf "age-adjusted rate = %.1f per 100k (95%% CI %.1f-%.1f)\n",
-        $r->{adj_rate}, $r->{'conf.int'}[0], $r->{'conf.int'}[1];
+        $r->{adj_rate}, $r->{'conf_int'}[0], $r->{'conf_int'}[1];
 
 Arguments may be positional (`count`, `pop`, `stdpop`) or named; pass `rate`
 instead of `count` if you already have stratum-specific rates.
@@ -157,7 +157,7 @@ instead of `count` if you already have stratum-specific rates.
 | `rate` | `ArrayRef` | *(count or rate required)* | Stratum-specific rate (alternative to `count`). | `\@rate` |
 | `pop` | `ArrayRef` | *None (Required)* | Population / person-time per stratum. | `\@pop` |
 | `stdpop` | `ArrayRef` | *None (Required)* | Standard-population weight per stratum. | `\@stdpop` |
-| `conf.level` | `Number` | `0.95` | Confidence level for the gamma interval. | `0.90` |
+| `conf_level` | `Number` | `0.95` | Confidence level for the gamma interval. | `0.90` |
 | `per` | `Number` | `1` | Scale factor applied to every reported rate. | `100_000` |
 
 ### Output variables
@@ -166,9 +166,9 @@ instead of `count` if you already have stratum-specific rates.
 | --- | --- | --- | --- |
 | `crude_rate` | `Double` | Unadjusted overall rate (× `per`). | `1400.0` |
 | `adj_rate` | `Double` | Directly standardized rate (× `per`). | `1312.5` |
-| `conf.int` | `ArrayRef` | Fay-Feuer gamma `[lower, upper]` (× `per`). | `[1097.8, 1569.6]` |
+| `conf_int` | `ArrayRef` | Fay-Feuer gamma `[lower, upper]` (× `per`). | `[1097.8, 1569.6]` |
 | `se` | `Double` | Standard error of the standardized rate (× `per`). | |
-| `conf.level` | `Double` | Confidence level used. | `0.95` |
+| `conf_level` | `Double` | Confidence level used. | `0.95` |
 | `per` | `Number` | The scale factor applied. | `100000` |
 
 ## agg
@@ -188,8 +188,19 @@ it was given:
     HoH  { r => { .. }, .. }     hash of hashrefs     (named rows)
 
 For AoA the column identifiers in `by` and in the `agg` spec are integer
-positions; for the other three shapes they are column names. The original frame
-is never modified.
+positions (a negative one counts from the end, as `$row->[-1]` does); for the
+other three shapes they are column names. A column that no row has is an error,
+so a misspelled name dies rather than coming back as a column of undef. An undef
+row of an AoA or AoH is skipped. The original frame is never modified, down to
+its scalars: a numeric cell is not given a cached string, nor a string cell a
+cached number.
+
+The split is done in C, in one pass that hashes each row's `by` cells into its
+group and a second that drops each aggregated cell straight into its group's
+array, sharing the frame's own scalars wherever only the numeric aggregators
+read them. On a million-row AoH in a thousand groups it takes about a quarter of
+the time the pure-Perl split it replaced did, in about a fifth of the extra
+memory.
 
 ### Usage
 
@@ -211,7 +222,7 @@ is never modified.
     my $out = agg($df,
         by            => [ 'a', 'b' ],
         agg           => { v => 'sum' },
-        'output.type' => 'hoh',
+        'output_type' => 'hoh',
     );
 
 ### Arguments
@@ -225,12 +236,15 @@ is never modified.
   aggregate the entire frame into one row.
 - **skipna** — `1` (default) drops undef cells before a numeric aggregator
   runs. `0` makes any undef in a group poison the numeric result for that group
-  (the cell comes back undef), matching pandas `skipna=False`. `count`, `n`,
+  (the cell comes back undef), matching pandas `skipna=False`; that covers
+  `mean`, `median`, `sum`, `sd`, `var`, `min`, `max` and `mode`. `count`, `n`,
   `nunique`, `first`, and `last` ignore this flag.
-- **sort** — `1` (default) sorts the output groups by key (numerically when
-  every key looks like a number, otherwise as strings); `0` keeps first-seen
-  order.
-- **output.type** — `aoa`, `aoh`, `hoa`, or `hoh`. Defaults to the same family
+- **sort** — `1` (default) sorts the output groups by key; `0` keeps first-seen
+  order. Each `by` column is compared on its own terms: numerically when every
+  value in it looks like a number, otherwise as strings. Within a column an
+  undef key sorts last (where pandas puts its NaN group) and a NaN sorts after
+  every number.
+- **output_type** — `aoa`, `aoh`, `hoa`, or `hoh`. Defaults to the same family
   as the input frame.
 
 ### Aggregators
@@ -260,7 +274,9 @@ the smallest number, or the lowest string when the values are not numeric.
 
 A **coderef** may be supplied instead of a name for full control. It is called
 once per group as `$code->(\@cells)`, where `@cells` are every cell for that
-column in the group **including undef**, and must return a single scalar:
+column in the group **including undef**, and must return a single scalar. It
+is called in scalar context, so `sub { grep { .. } @{ $_[0] } }` returns a
+count. The cells are copies; changing them does not change the frame:
 
     # count the missing values in each group
     my $out = agg($df, by => 'sex', agg => {
@@ -278,7 +294,11 @@ columns, otherwise as strings), each expanded over its aggregator list in the
 order supplied.
 
 A column reduced by a **single** aggregator keeps its own name; reduced by
-**two or more** it becomes `<col>_<func>`:
+**two or more** it becomes `<col>_<func>`. A coderef's `<func>` is `fn`, or
+`fn1`, `fn2`, .. when a column has more than one. A column that is also a `by`
+column is always named `<col>_<func>`, so `by => 'g', agg => { g => 'count' }`
+gives `g` and `g_count`. Any name that would still be generated twice is an
+error, except under `output_type => 'aoa'`, whose columns are positional:
 
     my $df = [
         { sex => 'M', wt => 70, age => 30    },
@@ -319,6 +339,9 @@ Without `by`, the frame collapses to one row:
 
     # [ { wt => 66.25, age => 3 } ]
 
+That holds for a frame with no rows too, as for pandas `df.agg`: `count` and `n`
+are 0 and the numeric aggregators undef. A grouped empty frame has no groups.
+
 ### Array of Arrays (AoA)
 
 Columns are integer positions. Grouping on column 0 and reducing column 1:
@@ -334,11 +357,11 @@ column in the plan order.
 
 ### Hash of Hashes (HoH) output
 
-With `output.type => 'hoh'` the row label is the group value; multiple `by`
+With `output_type => 'hoh'` the row label is the group value; multiple `by`
 columns are joined with a dot, an ungrouped result is keyed `all`, and a
 collision is made unique with a `.N` suffix.
 
-    my $out = agg($df, by => 'sex', agg => { wt => 'mean' }, 'output.type' => 'hoh');
+    my $out = agg($df, by => 'sex', agg => { wt => 'mean' }, 'output_type' => 'hoh');
 
     # {
     #     F => { sex => 'F', wt => 57.5 },
@@ -351,7 +374,7 @@ By default (`skipna => 1`) undef cells are removed before a numeric aggregator
 runs, so a group of `(60, 55)` with a third undef still yields the mean of the
 two defined values. `count` reports only defined cells while `n` counts undef
 too. With `skipna => 0`, a group containing any undef returns undef for the
-numeric aggregators (`mean median sum sd var mode`); the counting and
+numeric aggregators (`mean median sum sd var min max mode`); the counting and
 positional aggregators are unaffected.
 
 A group without enough data yields undef rather than an error: `sd` and `var`
@@ -366,9 +389,17 @@ one.
 - no `agg` spec is given, or it is not a non-empty hashref;
 - an unknown option is passed;
 - an aggregator name is not recognized;
-- an aggregator list for a column is empty;
-- `output.type` is not one of `aoa`, `aoh`, `hoa`, `hoh`;
-- the trailing arguments are not `name => value` pairs.
+- an aggregator list for a column is empty, or holds something that is
+  neither a name nor a coderef;
+- `output_type` is not one of `aoa`, `aoh`, `hoa`, `hoh`;
+- the trailing arguments are not `name => value` pairs;
+- a column in `by` or in the spec is undef, is in no row, is not an integer
+  position (AoA), or is not an arrayref (HoA);
+- a row of an AoA or AoH is defined but not an ARRAY or HASH ref;
+- two output columns would get the same name (see above);
+- a numeric aggregator meets a cell that is not a number. The message names
+  the aggregator, the column and the group, as in
+  `agg: mean of column 'v' over group (g = 'F'): mean: non-numeric value ..`.
 
 ### See also
 
@@ -379,8 +410,10 @@ one.
 
 Sequential (Type-I) ANOVA table for a linear model, in the same shape `aov`
 returns. `anova` fits `response ~ terms`, then decomposes the model sum of
-squares one term at a time, **in formula order**, and F-tests each term
-against the residual mean square.
+squares one term at a time, **in R's term order** -- main effects first, then
+two-way interactions, and so on, each group in formula order -- and F-tests
+each term against the residual mean square. The formula is read by the same
+parser `lm` and `glm` use.
 
     anova(
     {
@@ -406,30 +439,71 @@ returns
         }
     }
 
+Each term's `Sum Sq` is what it adds to the terms before it in the formula,
+not what it would explain alone. When the regressors are correlated, as in
+`anova.lm`'s own example on R's `LifeCycleSavings`, reversing the formula
+moves sum of squares from one term to another and changes their p-values. The
+total of the terms and the `Residuals` row do not move. In a balanced design
+such as `warpbreaks` the terms are orthogonal, so the order changes nothing.
+
+![anova term order: the Sum Sq of sr ~ pop15 + pop75 + dpi + ddpi and of the reversed formula as stacked bars that differ term by term but share one total and one Residuals, beside breaks ~ wool + tension and tension + wool, which are identical](https://raw.githubusercontent.com/hhg7/stats/main/img/anova.order.png)
+
 Two-way (and higher) models use the `*` operator, which implicitly evaluates
 the main effects alongside the interaction (`a * b` expands to `a + b + a:b`;
 `a * b * c` to the full factorial `a + b + c + a:b + a:c + b:c + a:b:c`):
 
     my $res_2way = anova($data_2way, 'len ~ supp * dose');
 
-Bare string columns are treated as factors and treatment-coded (first level =
-reference); numeric columns and `I(x^2)` enter as single regressors. It is
-robust against rank deficiency: collinear terms gracefully receive 0 degrees
-of freedom and 0 sum of squares, matching R's behavior.
+Bare string columns are treated as factors; numeric columns, `I(x^2)` and
+`log(x)` enter as single regressors. A factor is coded by treatment contrasts
+or by a full set of indicators exactly as R decides it (its "margin rule"), so
+nested and per-group-slope models come out as in R: `y ~ a + a:b` gives `a:b`
+`levels(a) * (levels(b) - 1)` degrees of freedom, and `y ~ g + g:x` fits a
+separate slope of `x` in each group. `- 1`, `+ 0` and `0 +` remove the
+intercept, `.` stands for every other column (taken in sorted order, since a
+hash has no column order), `offset(z)` is subtracted from the response, and
+`a:b` and `b:a` are the same term. A term with no estimable column -- one that
+is collinear with the terms before it -- is kept with 0 degrees of freedom and
+0 sum of squares, where R leaves it out of the table. A column is judged
+collinear by R's own rule: when what the earlier columns leave of it has a
+norm below `1e-7` of its own.
+
+The fit keeps memory independent of the number of rows: it rotates one row at
+a time into a `p`-by-`p` triangular factor (`p` the number of design columns),
+so a 100,000-row model with 801 columns needs about 2.5 MB rather than a
+640 MB design matrix.
 
 Given two or more formulas, `anova` compares nested models instead and returns
 an **array ref** of rows, one per model in the order supplied — R's
-`anova(m1, m2, ...)`. Each row carries `Res.Df`, `RSS` and `formula`; every row
-after the first adds `Df`, `Sum of Sq`, `F` and `Pr(>F)`:
+`anova(m1, m2, ...)`. Each row carries `Res_Df`, `RSS` and `formula`; every row
+after the first adds `Df` and `Sum of Sq`, the drops from the row before it,
+and `F` and `Pr(>F)`:
 
-    my $tab = anova($data, 'y ~ x1', 'y ~ x1 + x2');
-    printf "adding x2: F = %.4g, p = %.4g\n", $tab->[1]{F}, $tab->[1]{'Pr(>F)'};
+    my $tab = anova($data, 'y ~ 1', 'y ~ x1', 'y ~ x1 + x2');
+    printf "adding x2: F = %.4g, p = %.4g\n", $tab->[2]{F}, $tab->[2]{'Pr(>F)'};
+
+`F` is the `Sum of Sq` per `Df` over the residual mean square of the model with
+the fewest residual degrees of freedom, and its p-value is taken on the
+absolute `Df`, so models listed largest first are tested too. As in R's
+`stat.anova`, `F` and `Pr(>F)` are left out where `Df` is 0 or `F` would be
+negative (models that are not nested), and also where that residual mean
+square is 0. Every model is fitted on the same rows: those complete for all of
+them. As R's `anova.lmlist` does, a model whose response differs from the
+first model's is dropped with a warning, and if only one model is left, its
+single-model table is returned.
+
+Below, `warpbreaks` is fitted as four nested formulas, each adding one term.
+Each row's `Sum of Sq` is the drop in `RSS` from the row before it. Because
+every `F` is taken over the largest model's residual mean square, the chain
+gives the same F values as the single-model table of the largest formula.
+
+![anova of nested formulas on warpbreaks: the RSS of breaks ~ 1, + wool, + tension and + wool:tension as bars, each drop labelled as that row's Sum of Sq and Df, and each drop per Df over the largest model's RSS / Res_Df giving an F equal to the one-model anova table's](https://raw.githubusercontent.com/hhg7/stats/main/img/anova.compare.png)
 
 Given two or more **fitted models** instead -- `lm` or `glm` fits (or
 `negbin` `glm` fits) of the same response on the same rows -- `anova` compares
 them as R's `anova(m0, m1, ...)` does, and also returns an array ref of rows
 in the order supplied. For `lm` fits it is `anova.lmlist`'s F test, on the
-largest model's residual mean square (`Res.Df`, `RSS`, `Df`, `Sum of Sq`, `F`,
+largest model's residual mean square (`Res_Df`, `RSS`, `Df`, `Sum of Sq`, `F`,
 `Pr(>F)`). For `glm` fits it is `anova.glmlist`'s table (`Resid. Df`,
 `Resid. Dev`, `Df`, `Deviance`) with a test chosen as R chooses it: a
 likelihood-ratio `Pr(>Chi)` for the families with a known dispersion, an F on
@@ -454,15 +528,15 @@ than as `1 - pf(F, df1, df2)`; see
 ### Input Parameters
 | Parameter | Type | Default | Description | Example |
 | --- | --- | --- | --- | --- |
-| `data_sv` | `HashRef` or `ArrayRef` | *(Required)* | The dataset. A Hash of Arrays (HoA, columns) or Array of Hashes (AoH, rows) — the same forms `aov`/`lm` accept. |
-| `formula_sv` | `String` | *(Required)* | Symbolic model `'response ~ rhs'`, with `+`, `:` and `*`. Unlike `aov`, `anova` does **not** auto-stack, so a formula is mandatory. | `'yield ~ N * P'` |
+| `data_sv` | `HashRef` or `ArrayRef` | *(Required)* | The dataset. A Hash of Arrays (HoA, columns, all the same length), Hash of Hashes (HoH) or Array of Hashes (AoH, rows) — the forms `lm` accepts. |
+| `formula_sv` | `String` | *(Required)* | Symbolic model `'response ~ rhs'`, with `+`, `:`, `*`, `.`, `- 1`/`0 +` and `offset()`, as `lm` reads it. Unlike `aov`, `anova` does **not** auto-stack, so a formula is mandatory. Give two or more to compare models. | `'yield ~ N * P'` |
 
 ### Output Variables
 A single `HashRef`; keys are the parsed term names, so the structure varies
 with the formula.
 | Parameter | Type | Description | Example |
 | --- | --- | --- | --- |
-| *(Term Name)* | `HashRef` | ANOVA-table stats for each term (`'ctrl'`, `'N:P'`, …). `'Mean Sq'`, `'F value'` and `'Pr(>F)'` are omitted for 0-df (aliased) terms. | `{'Df'=>1,'Sum Sq'=>14.2,'Mean Sq'=>14.2,'F value'=>25.81,'Pr(>F)'=>0.0004}` |
+| *(Term Name)* | `HashRef` | ANOVA-table stats for each term (`'ctrl'`, `'N:P'`, …), named as R names them: an interaction's variables in the order they first appear in the formula. `'Mean Sq'`, `'F value'` and `'Pr(>F)'` are omitted for 0-df (aliased) terms. | `{'Df'=>1,'Sum Sq'=>14.2,'Mean Sq'=>14.2,'F value'=>25.81,'Pr(>F)'=>0.0004}` |
 | `Residuals` | `HashRef` | Residual (error) statistics; never carries an F test. | `{'Df'=>10,'Sum Sq'=>5.5,'Mean Sq'=>0.55}` |
 
 ### `anova` vs `aov` — what's the difference?
@@ -476,7 +550,7 @@ above exactly). The difference is one of role, not arithmetic:
   toward factors and balanced designs, and in this module it adds two
   conveniences `anova` deliberately leaves out: it can **auto-stack** a named
   list when you omit the formula (R's `stack()` + `Value ~ Group`), and it
-  returns a `group.stats` block of per-group means and counts alongside the
+  returns a `group_stats` block of per-group means and counts alongside the
   table. Reach for `aov` when your question is "do these treatment groups
   differ, and what do the groups look like?"
 
@@ -487,9 +561,11 @@ above exactly). The difference is one of role, not arithmetic:
 
 In short: same numbers for one model; `aov` is the richer "fit + describe"
 call (and the only one that stacks), `anova` is the minimal "give me the
-table" call. Note that both are **Type-I / sequential**, so term order in the
-formula matters, and both share this module's `pf`, so p-values agree with
-`oneway_test` and the rest of Stats::LikeR.
+table" call. Note that both are **Type-I / sequential**, so the order of terms
+of the same degree matters, and both share this module's `pf`, so p-values
+agree with `oneway_test` and the rest of Stats::LikeR. Both read the formula
+with `lm`'s parser and fit it the same way, so any formula one accepts the
+other fits identically.
 
 Comparing nested models -- `anova(m1, m2)` in R -- is done by giving `anova`
 two or more formulas, or two or more fitted models; see above.
@@ -707,11 +783,42 @@ which returns
        }
     }
 
+With one factor, the table is built like this. The factor's `Sum Sq` is how
+far its group means lie from the grand mean, and the `Residuals` `Sum Sq` is
+how far the observations lie from their own group's mean, each squared and
+summed. Each is divided by its `Df` to
+give its `Mean Sq`. `F value` is the term's `Mean Sq` over the residual one,
+and `Pr(>F)` is the area of the F distribution on those two `Df` beyond it.
+Below, R's `PlantGrowth` is given as a named list of three groups, which `aov`
+stacks into `Value ~ Group`. The vertical lines on the left are the two kinds
+of deviation: blue for each group's mean from the grand mean, grey for each
+observation from its group's mean. The right-hand panel magnifies the tail
+that `Pr(>F)` measures, which is too thin to see at full scale.
+
+![aov on PlantGrowth: the stacked observations with their group means and the grand mean, the Sum Sq split into Group and Residuals and divided by Df into Mean Sq and F, and Pr(>F) as the tail of F(2, 27) beyond F = 4.846, also shown magnified](https://raw.githubusercontent.com/hhg7/stats/main/img/aov.what.png)
+
 You can also perform Two-Way ANOVA with categorical interactions using the `*` operator. The parser will implicitly evaluate the main effects alongside the interaction:
 
     my $res_2way = aov($data_2way, 'len ~ supp * dose');
 
-It is robust against rank deficiency; collinear terms will gracefully receive 0 degrees of freedom and 0 sum of squares, matching R's behavior.
+The formula is read by `lm`'s parser, the same one `anova` uses, so it
+accepts everything `lm` does: `+`, `:`, `*` (`a*b*c` is every main effect and
+interaction), `.`, `- 1`/`0 +` and `offset()`. Factors are coded by R's margin
+rule, so an interaction need not have its main effects: `y ~ a:b` spans every
+cell, `y ~ a + a:b` nests b in a, and `y ~ g + g:x` fits a slope per group.
+Terms are taken in R's order (main effects, then two-way interactions, …),
+and `a:b` and `b:a` are one term, named as R names it. A column of strings is
+a factor with its levels sorted; a column of numbers is a covariate.
+
+It is robust against rank deficiency: a column is aliased when what the
+earlier columns leave of it has a norm below 1e-7 of its own, R's `lm.fit`
+rule, and a term left with no columns stays in the table with 0 degrees of
+freedom and 0 sum of squares. R's `anova()` leaves such a term out.
+
+The fit is Gentleman's Givens rotations, one row at a time, as `anova` and
+R's `biglm` fit, so memory does not grow with the number of rows beyond the
+row names that `fitted_values` is keyed by. `y ~ g*h + x` over 100,000 rows
+with a 50-level `g` takes 1.8 s and 52 MB.
 
 `Pr(>F)` is evaluated in the upper tail of the F distribution rather than as
 `1 - pf(F, df1, df2)`, so a highly significant term reports its actual p-value
@@ -722,7 +829,7 @@ instead of a flat `0`; see [F and z tail p-values](#f-and-z-tail-p-values).
 | Parameter | Type | Default | Description | Example |
 | --- | --- | --- | --- | --- |
 | `data_sv` | `HashRef` or `ArrayRef` | *(Required)* | The dataset to analyze. Accepts a Hash of Arrays (HoA) or Array of Hashes (AoH). If no formula is provided, it must be an HoA to allow automatic stacking (mimicking R's `stack()` on a named list). |
-| `formula_sv` | `String` | `undef` | A symbolic description of the model to be fitted. If omitted, the formula automatically defaults to `'Value ~ Group'` and the input data is stacked. | `'yield ~ N * P'` |
+| `formula_sv` | `String` | `undef` | A symbolic description of the model to be fitted. If omitted, the formula automatically defaults to `'Value ~ Group'` and the input data is stacked, with `Group` a factor whatever its names look like. | `'yield ~ N * P'` |
 
 ### Output Variables
 
@@ -730,9 +837,29 @@ The function returns a single `HashRef` containing the evaluated statistical res
 
 | Parameter | Type | Default | Description | Example |
 | --- | --- | --- | --- | --- |
-| *(Term Name)* | `HashRef` | `undef` | A nested hash for each independent term in the formula (e.g., `'Group'`, `'N:P'`), containing its ANOVA table statistics. | `{'Df' => 1, 'Sum Sq' => 14.2, 'Mean Sq' => 14.2, 'F value' => 25.81, 'Pr(>F)' => 0.0004}` |
-| `Residuals` | `HashRef` | `undef` | A nested hash containing the residual (error) statistics for the fitted model. | `{'Df' => 10, 'Sum Sq' => 5.5, 'Mean Sq' => 0.55}` |
-| `group.stats` | `HashRef` | `undef` | A nested hash containing descriptive statistics (`mean` and `size` / count) for every column evaluated in the original unstacked data structure. | `{'mean' => {'A' => 2.1, 'B' => 5.4}, 'size' => {'A' => 10, 'B' => 10}}` |
+| *(Term Name)* | `HashRef` | `undef` | A nested hash for each term of the model (e.g., `'Group'`, `'N:P'`), containing its ANOVA table statistics. `'Mean Sq'` is omitted for a 0-df (aliased) term, and `'F value'` and `'Pr(>F)'` wherever there are no residual degrees of freedom or the fit is exact (R's `NA`). | `{'Df' => 1, 'Sum Sq' => 14.2, 'Mean Sq' => 14.2, 'F value' => 25.81, 'Pr(>F)' => 0.0004}` |
+| `Residuals` | `HashRef` | `undef` | A nested hash containing the residual (error) statistics for the fitted model. `'Mean Sq'` is omitted when there are no residual degrees of freedom. | `{'Df' => 10, 'Sum Sq' => 5.5, 'Mean Sq' => 0.55}` |
+| `group_stats` | `HashRef` | `undef` | The response's mean and count in each level of each factor of the model, over the rows the model was fitted on. With one factor -- the stacked form's `Group`, or `y ~ g` -- `mean` and `size` are keyed by level, the shape `oneway_test` returns; with several, by factor and then level. A model with no factor has none, and both are empty. A stacked group with no usable value has size 0 and a `NaN` mean. | `{'mean' => {'A' => 2.1, 'B' => 5.4}, 'size' => {'A' => 10, 'B' => 10}}`, or `{'mean' => {'wool' => {'A' => 31.04, 'B' => 25.26}, 'tension' => {...}}, ...}` |
+| `coefficients` | `HashRef` | `undef` | The coefficients, under treatment contrasts and with R's names (`Intercept`, `woolB`, `woolB:tensionL`). An aliased one is `NaN`, R's `NA`. | `{'Intercept' => 2, 'gB' => 3}` |
+| `fitted_values` | `HashRef` | `undef` | Fitted values, offsets included, keyed by row name: the HoH key, a `row_names` column, or 1..n. Rows dropped for a missing value have none. | `{'1' => 2, '2' => 2}` |
+| `xlevels` | `HashRef` | `undef` | Each factor's levels, sorted, the reference level first; with `family` (`'gaussian'`), what `predict` reads. | `{'g' => ['A', 'B', 'C']}` |
+
+The coefficients are steps away from one reference cell, which is the first
+level of each factor in `xlevels`. Because the levels are sorted, R's
+`warpbreaks` under `breaks ~ wool * tension` has tension `H` as its reference,
+not `L`. `Intercept` is that cell's mean. Every other cell adds a main effect
+for each of its non-reference levels and an interaction for each
+non-reference pair, and the sum is the cell's fitted value. In a full
+factorial such as this one, that fitted value is the cell mean.
+
+![aov coefficients on warpbreaks: for each of the six wool-by-tension cells, a staircase of Intercept, tension, wool and interaction coefficients that ends on that cell's fitted value](https://raw.githubusercontent.com/hhg7/stats/main/img/aov.coefficients.png)
+
+`group_stats` is something else again. It holds each factor's own means, each
+averaged over the other factors, so the cell means above are not among them.
+The table has one row per term in R's order, followed by `Residuals`, which
+has no F test of its own.
+
+![aov group_stats and table on warpbreaks: the marginal mean and size of each wool and tension level against the grand mean, and the Sum Sq, Df, Mean Sq, F value and Pr(>F) of wool, tension, wool:tension and Residuals](https://raw.githubusercontent.com/hhg7/stats/main/img/aov.outputs.png)
 
 ### omitting formula
 
@@ -780,13 +907,14 @@ Add new columns to a data frame, computed from the columns already there — or 
 It changes `$df` in place and also returns it (handy for chaining).
 
 ### Coderef values
-A coderef is classified by what it returns in list context:
+A coderef is called in list context, on every row, and is classified by what it returns for the first row:
 
 - **One scalar → per-row.** The sub is called once per row and that scalar is the cell.
   - `$_` (and `$_[0]`) is the current row as a hashref, so you read other columns with `$_->{colname}`.
   - `$_[1]` is the row's index (0-based).
   - `$_[2]` is the row key — **HoH only**.
   - A single arrayref return is stored *as the cell*, so `sub { [split /,/, $_->{tags}] }` gives an arrayref-valued column.
+  - List context holds for every row, not just the first: `sub { $_->{id} =~ /(\d+)/ }` stores the captured digits in each row, and a match that fails returns the empty list, so its cell is `undef`. A later row that returns more than one value dies.
 - **A list of more than one value → whole column.** The list becomes the entire column, distributed positionally. This is the natural fit for column functions like `rank`:
 
         assign($df, 'ΔG rank' => sub { rank( vals($df, 'dG_kcal_mol') ) });
@@ -805,7 +933,7 @@ A plain coderef stores its **return value**, so an in-place transform of an exis
     # awkward: copy to $v, edit $v, return $v
     assign($df, 'Res.' => sub { (my $v = $_->{'Res.'}) =~ s/^[A-Z]://; $v });
 
-`map_cell { ... }` removes the ceremony. Inside the block, **`$_` is the named column's current cell** (not the whole row), the block's return value is **ignored**, and the modified `$_` is stored back:
+`map_cell { ... }` removes the ceremony. Inside the block, **`$_` is the named column's current cell** (not the whole row), the block's return value is **ignored**, and the modified `$_` is stored back -- for a HoA, `$_` aliases the cell itself, so the edit is made where the cell lies:
 
     use Stats::LikeR;   # exports map_cell alongside assign
 
@@ -824,6 +952,8 @@ Notes:
 ### Ordering and length
 - **AoH** distributes by array order; **HoH** by **sorted key order** — so any list you compute or hand in must be in `sort keys %$df` order.
 - Whole-column and arrayref values must have exactly one entry per row; a length mismatch dies.
+- A **HoA** may also hold plain scalar (or `undef`) entries; each row view carries them through unchanged. An empty hash is an empty HoA, and its first arrayref value sets the row count, so `assign({}, x => [1, 2, 3], y => sub { $_->{x} * 2 })` builds a frame from nothing.
+- Rows, value types, arrayref lengths and `map_cell` targets are all checked before anything is written, so a call that dies on one of those leaves `$df` as it found it. A coderef that dies part-way through does not roll back the rows already written.
 
 ### Example
 
@@ -845,6 +975,11 @@ Notes:
         );
 
 - **Same recipe, all shapes.** The same per-row `sub { $_->{weight} / ... }` works for AoH, HoA, and HoH; you always read the row through `$_`.
+- **`$_` is the real row, in every shape.** For an AoH or HoH it is the row hash itself. For a HoA it is a view: one hash for the whole call, whose values *are* the frame's cells for the current row, not copies of them. Either way, a write through `$_->{col}` changes the frame:
+
+        assign($hoa, z => sub { $_->{x} *= 10; $_->{x} + 1 });   # x is now 10 times bigger too
+
+  For a HoA, that one view is re-pointed at each row in turn. A key the block adds to it is gone on the next row and never reaches the frame; a key it deletes comes back, and the column stays. Writing to a cell past the end of a short column is dropped rather than growing the column. A block that *keeps* `$_` (pushes it somewhere, or returns it) keeps that one view, which shows whichever row was visited last. A tied HoA, or one with a tied column, is the exception: its view is a fresh hash of copies on every row.
 - **It modifies your data frame.** If you need to keep the original, pass a copy: `assign(clone($df), ...)`.
 - Reusing a column name **overwrites** that column.
 
@@ -971,16 +1106,16 @@ machine precision in a single line.
 ### Result keys
 
 * **`bedroc`** — the BEDROC score in `[0, 1]`.
-* **`rie`**, **`rie.min`**, **`rie.max`** — the underlying Robust Initial
+* **`rie`**, **`rie_min`**, **`rie_max`** — the underlying Robust Initial
   Enhancement and its bounds for this `alpha` and active fraction; BEDROC is
   `rie` rescaled onto `[0, 1]`.
-* **`n`**, **`n.active`**, **`n.inactive`** — counts.
-* **`ra`** — the active fraction `n.active / n`.
+* **`n`**, **`n_active`**, **`n_inactive`** — counts.
+* **`ra`** — the active fraction `n_active / n`.
 * **`alpha`**, **`direction`**, **`method`** — the settings used, echoed back.
 * **`enrichment`** — present only when `top` was given; a hashref with
-  `fraction`, `n.top` (compounds in the top slice, `ceil(top * n)`),
-  `active.count` (actives found there), `expected` (actives expected by chance,
-  `ra * n.top`), and `enrichment.factor` (`(active.count / n.top) / ra`).
+  `fraction`, `n_top` (compounds in the top slice, `ceil(top * n)`),
+  `active_count` (actives found there), `expected` (actives expected by chance,
+  `ra * n_top`), and `enrichment_factor` (`(active_count / n_top) / ra`).
 
 ### Examples
 
@@ -990,7 +1125,7 @@ machine precision in a single line.
         cutoff => 6.5,
         top    => 0.05);
     print $r->{bedroc};
-    print $r->{enrichment}{enrichment.factor};   # e.g. 2.0 => 2x over random
+    print $r->{enrichment}{'enrichment_factor'}; # e.g. 2.0 => 2x over random
 
     # fraction-defined actives straight from a raw ΔG column: the strongest-
     # binding 10% (lowest ΔG) are the actives, best predictions rank first.
@@ -1069,7 +1204,7 @@ You play 10 rounds and the toddler gets 6 right. Real skill, or just luck?
 
     my $r = binom_test(6, 10, p => 0.5); # 6 wins, 10 rounds, guessing rate 0.5
 
-    print $r->{p.value};                 # 0.7539
+    print $r->{'p_value'};               # 0.7539
 
 The full result is a hashref:
 
@@ -1077,10 +1212,10 @@ The full result is a hashref:
         statistic   => 6,            # times the toddler was right
         parameter   => 10,           # rounds played
         estimate    => 0.6,          # observed rate, 6/10
-        null.value  => 0.5,          # the "pure guessing" rate we test against
-        p.value     => 0.7539,
-        conf.int    => [0.262, 0.878],
-        conf.level  => 0.95,
+        null_value  => 0.5,          # the "pure guessing" rate we test against
+        p_value     => 0.7539,
+        conf_int    => [0.262, 0.878],
+        conf_level  => 0.95,
         alternative => 'two.sided',
         method      => 'Exact binomial test',
     }
@@ -1098,14 +1233,14 @@ Suppose the toddler had gone 9 for 10 instead:
 
     my $r = binom_test(9, 10, p => 0.5);
 
-    print $r->{p.value};                   # 0.0215
+    print $r->{'p_value'};                 # 0.0215
 
 Now `p = 0.02`, under `0.05`. A pure guesser almost never does that well, so
 this **is** good evidence the toddler can actually tell the cards apart.
 
 ### The confidence interval
 
-`conf.int` is the plausible range for the toddler's true success rate. For
+`conf_int` is the plausible range for the toddler's true success rate. For
 6/10 it runs from about `0.26` to `0.88` — wide, and it comfortably includes
 `0.5`. That overlap with the guessing rate is another way of seeing that luck
 cannot be ruled out. For 9/10 the interval would sit well above `0.5`.
@@ -1116,7 +1251,7 @@ cannot be ruled out. For 9/10 the interval would sit well above `0.5`.
   - `alternative` is `'two.sided'` (default), `'less'`, or `'greater'`. Use
     `'greater'` when you only care whether the toddler beats guessing, not
     whether they do worse.
-  - `conf.level` sets the interval width (default `0.95`).
+  - `conf_level` sets the interval width (default `0.95`).
 
 You can also pass the counts as `binom_test([6, 4])` — 6 right, 4 wrong — when
 you have wins and losses instead of wins and a total.
@@ -1135,7 +1270,10 @@ or the outer key of a **hash of arrays**:
 `cfilter` takes exactly one of `keep` or `remove`. `keep` returns only the
 matching columns; `remove` returns everything except them. The result is the
 same shape as the input (HoH → HoH, HoA → HoA, AoH → AoH), with cell values
-copied and the original structure left untouched.
+copied and the original structure left untouched. That includes the position
+of an `each` loop you are part-way through on the data or on one of its rows,
+which carries on where it was. Tied hashes and arrays are accepted anywhere in
+the data.
 
 The selector — the value of `keep` or `remove` — can be given three ways:
 
@@ -1176,10 +1314,23 @@ function name — evaluated once per column. It is called as
 
     $predicate->($column_values, $column_name)
 
-where `$column_values` is an array ref of the column's **defined** cells (undef
-and missing cells are dropped, so functions like `sd` get clean input).
+where `$column_values` is an array ref of a copy of **every** cell in the
+column, in row order, with undef standing in for an undef or missing cell.
 With `keep`, columns for which the predicate is true are kept; with `remove`,
 those columns are dropped.
+
+Two options change what the predicate is given, for functions that cannot take
+undef:
+
+- `na => 'omit'` drops the undef and missing cells, so a one-column function
+  such as `sd` gets clean input. `na => 'keep'` is the default described above.
+- `against => 'col'` compares every column with the column named `col`. The
+  predicate is called with three arguments,
+  `$predicate->($column_values, $col_values, $column_name)`, and both arrays
+  hold only the rows where **both** columns are defined (pairwise complete),
+  so a two-column function such as `cor` can take them directly.
+
+`na` and `against` cannot be given together.
 
     # Keep only the constant columns (standard deviation zero):
     my $const = cfilter(\%hoa, keep => sub { sd($_[0]) == 0 });   # { z => [0,0,0] }
@@ -1187,6 +1338,10 @@ those columns are dropped.
     my $varying = cfilter(\%hoa, remove => sub { sd($_[0]) == 0 }); # { x=>..., y=>... }
     # A bare function name resolves in Stats::LikeR:: (use a package for your own):
     cfilter(\%hoa, keep => 'some_predicate');
+    # Drop the constant columns of data with gaps: sd() gets only defined cells
+    cfilter(\%gappy, remove => sub { sd($_[0]) == 0 }, na => 'omit');
+    # Keep the columns strongly correlated with y (y itself included)
+    cfilter(\%hoa, keep => sub { abs(cor($_[0], $_[1])) > 0.9 }, against => 'y');
 
 A bare string is always treated as a **function name**, not a single column
 name, so to keep one column by name use an array ref: `keep => ['x']`.
@@ -1200,7 +1355,10 @@ name, so to keep one column by name use an array ref: `keep => ['x']`.
 - the selector is not an array ref, a `qr//` regex, or a code ref / function
   name, or the function name cannot be resolved,
 - `na` or `against` is given with a by-name or regex selector (they apply only
-  to a value predicate),
+  to a value predicate), both are given, `na` is not `'keep'` or `'omit'`, or
+  the `against` column is not present in the data,
+- the predicate itself dies, or replaces a row or column of the data with
+  something of the wrong shape while `cfilter` is running,
 - an unknown option is given, or the options are not `name => value` pairs,
 - the data is not a hash/array reference of the expected shape (a hash of hash
   refs or array refs, or an array of hash refs).
@@ -1217,7 +1375,7 @@ For 2x2 matrices, Yates' Continuity Correction is applied automatically.
     my $res = chisq_test($data, correct     => 0);          # 2x2: no Yates' correction
     my $res = chisq_test($data, p           => $probs);     # goodness of fit against $probs
     my $res = chisq_test($data, p           => $weights,
-                                'rescale.p' => 1);          # ... rescaled to sum to 1
+                                'rescale_p' => 1);          # ... rescaled to sum to 1
 
 ### Accepted Inputs
 
@@ -1239,8 +1397,8 @@ As in R, a warning is issued when any expected count falls below 5, the usual ru
 | Option | Default | Description |
 | --- | --- | --- |
 | **correct** | `1` | Apply Yates' continuity correction. Only ever affects a 2x2 table, and is R's `correct`. Set to `0` for the uncorrected Pearson statistic. |
-| **p** | uniform | Null probabilities for the goodness-of-fit test. An array ref, in the order of the data, when the data is an array ref; a hash ref keyed the same as the data when the data is a hash ref. They must sum to 1 unless `rescale.p` says otherwise, and it is an error to pass them with a contingency table. |
-| **rescale.p** | `0` | Divide `p` by its own sum first, so counts, weights or percentages can be passed instead of probabilities. Also spelled `rescale_p`. |
+| **p** | uniform | Null probabilities for the goodness-of-fit test. An array ref, in the order of the data, when the data is an array ref; a hash ref keyed the same as the data when the data is a hash ref. They must sum to 1 unless `rescale_p` says otherwise, and it is an error to pass them with a contingency table. |
+| **rescale_p** | `0` | Divide `p` by its own sum first, so counts, weights or percentages can be passed instead of probabilities. R's dotted `rescale.p` is refused as an unknown argument. |
 
     # goodness of fit against a non-uniform null
     my $res = chisq_test([89, 37, 30, 28, 2],
@@ -1249,7 +1407,7 @@ As in R, a warning is issued when any expected count falls below 5, the usual ru
 
     # the same, from unnormalised weights
     my $res = chisq_test([89, 37, 30, 28, 2],
-                         p => [40, 20, 20, 19, 1], 'rescale.p' => 1);
+                         p => [40, 20, 20, 19, 1], 'rescale_p' => 1);
 
     # keyed data takes keyed probabilities
     my $res = chisq_test({ A => 10, B => 20, C => 30 },
@@ -1261,11 +1419,11 @@ The function returns a single Hash Reference containing the following key-value 
 
 | Key | Data Type | Description |
 | --- | --- | --- |
-| **data.name** | String | Identifies the input type (e.g., `"Perl ArrayRef"` or `"Perl HashRef"`). |
+| **data_name** | String | Identifies the input type (e.g., `"Perl ArrayRef"` or `"Perl HashRef"`). |
 | **expected** | Array/Hash Ref | The expected frequencies, matching the geometry of the input. |
 | **method** | String | The specific statistical test applied. |
 | **observed** | Array/Hash Ref | The original data passed to the function. |
-| **p.value** | Float | The calculated p-value of the test. |
+| **p_value** | Float | The calculated p-value of the test. |
 | **parameter** | Hash Ref | Contains the degrees of freedom (`df`). |
 | **statistic** | Hash Ref | Contains the test statistic (`X-squared`). |
 
@@ -1282,7 +1440,7 @@ Passing an Array of Arrays (AoA) triggers a standard Pearson's Chi-squared test.
 **Output:**
 
     {
-        'data.name' => 'Perl ArrayRef',
+        'data_name' => 'Perl ArrayRef',
         'expected'  => [
             [ 703.671381936888, 319.645266594124, 533.683351468988 ],
             [ 542.328618063112, 246.354733405876, 411.316648531012 ]
@@ -1292,7 +1450,7 @@ Passing an Array of Arrays (AoA) triggers a standard Pearson's Chi-squared test.
             [ 762, 327, 468 ],
             [ 484, 239, 477 ]
         ],
-        'p.value'   => 2.95358918321176e-07,
+        'p_value'   => 2.95358918321176e-07,
         'parameter' => { 'df' => 2 },
         'statistic' => { 'X-squared' => 30.0701490957547 }
     }
@@ -1308,11 +1466,11 @@ Passing a flat Array Reference triggers a Goodness of Fit test, assuming equal e
 **Output:**
 
     {
-        'data.name' => 'Perl ArrayRef',
+        'data_name' => 'Perl ArrayRef',
         'expected'  => [ 20, 20, 20 ],
         'method'    => 'Chi-squared test for given probabilities',
         'observed'  => [ 10, 20, 30 ],
-        'p.value'   => 0.00673794699908547,
+        'p_value'   => 0.00673794699908547,
         'parameter' => { 'df' => 2 },
         'statistic' => { 'X-squared' => 10 }
     }
@@ -1331,7 +1489,7 @@ Passing a Hash of Hashes (HoH) applies the exact same logic as a 2D Array, but p
 **Output:**
 
     {
-        'data.name' => 'Perl HashRef',
+        'data_name' => 'Perl HashRef',
         'expected'  => {
         'GroupA' => { 'Failure' => 10, 'Success' => 15 },
         'GroupB' => { 'Failure' => 10, 'Success' => 15 }
@@ -1341,7 +1499,7 @@ Passing a Hash of Hashes (HoH) applies the exact same logic as a 2D Array, but p
         'GroupA' => { 'Failure' => 15, 'Success' => 10 },
         'GroupB' => { 'Failure' => 5,  'Success' => 20 }
         },
-        'p.value'   => 0.00937475878430379,
+        'p_value'   => 0.00937475878430379,
         'parameter' => { 'df' => 1 },
         'statistic' => { 'X-squared' => 6.75 }
     }
@@ -1440,12 +1598,12 @@ e.g. an exposure/outcome odds ratio adjusted for study site. Same as R's
                        [20,6,8,15],     # stratum 2
                        [ 7,4,9,11] ]);  # stratum 3
 
-    print $r->{p.value};    # combined test across strata
+    print $r->{'p_value'};  # combined test across strata
     print $r->{estimate};   # Mantel–Haenszel common odds ratio
 
 Each 2×2 uses the same layout as [`epi_2x2`](#epi_2x2). Options: `correct`
-(continuity correction, default `1`) and `conf.level` (default `0.95`). The
-result also has `statistic` (chi-squared), `parameter` (df = 1), `conf.int` (for
+(continuity correction, default `1`) and `conf_level` (default `0.95`). The
+result also has `statistic` (chi-squared), `parameter` (df = 1), `conf_int` (for
 the common OR), and `k` (number of strata).
 
 ## cohen_d
@@ -1455,9 +1613,9 @@ the pooled standard deviation. It also returns the Hedges' *g* small-sample
 correction and a large-sample (normal-approximation) confidence interval.
 Validated numerically against R.
 
-    my $d = cohen_d(\@treatment, \@control);           # or conf.level => 0.90
+    my $d = cohen_d(\@treatment, \@control);           # or conf_level => 0.90
     printf "d = %.2f (95%% CI %.2f–%.2f), Hedges g = %.2f\n",
-        $d->{estimate}, $d->{'conf.int'}[0], $d->{'conf.int'}[1], $d->{hedges_g};
+        $d->{estimate}, $d->{'conf_int'}[0], $d->{'conf_int'}[1], $d->{hedges_g};
 
 Compare with [smd](#smd), which standardizes by the simple (unweighted) average
 of the group variances and is the convention for covariate-balance tables.
@@ -1470,8 +1628,8 @@ of the group variances and is the convention for covariate-balance tables.
 | `hedges_g` | `Double` | Hedges' *g* (bias-corrected *d*). | `2.1668` |
 | `pooled_sd` | `Double` | Pooled standard deviation. | `1.2344` |
 | `se` | `Double` | Approximate standard error of *d*. | `0.6907` |
-| `conf.int` | `ArrayRef` | `[lower, upper]` normal-approximation CI for *d*. | `[0.96, 3.67]` |
-| `conf.level` | `Double` | Confidence level used. | `0.95` |
+| `conf_int` | `ArrayRef` | `[lower, upper]` normal-approximation CI for *d*. | `[0.96, 3.67]` |
+| `conf_level` | `Double` | Confidence level used. | `0.95` |
 | `n1`, `n2` | `Integer` | Group sizes. | `7`, `7` |
 
 ## col2col
@@ -1509,7 +1667,7 @@ back every column compared against every other column.
 | 1        | `$data`     | Your table, as a reference (see **Data shapes** below). |
 | 2        | `$command`  | A code block **or** the name of a two-column function. |
 | 3        | `$cols`     | *(optional)* Which columns to use as the "from" side. Omit for all. |
-| 4+       | `%options`  | *(optional)* `na`, `skip.errors`, … (see **Options**). |
+| 4+       | `%options`  | *(optional)* `na`, `skip_errors`, … (see **Options**). |
 
 ---
 
@@ -1595,8 +1753,8 @@ The "to" side is always every other column; `$cols` only limits the outer keys.
 
 Options can be given two ways:
 
-    col2col(\%data, 'cor', $cols, 'skip.errors' => 0);   # after $cols
-    col2col(\%data, 'cor', { 'skip.errors' => 0 });      # hash ref, no $cols needed
+    col2col(\%data, 'cor', $cols, 'skip_errors' => 0);   # after $cols
+    col2col(\%data, 'cor', { 'skip_errors' => 0 });      # hash ref, no $cols needed
 
 The hash-ref form is convenient when you have **no** column restriction — it saves
 you from passing a placeholder. (A hash ref *replaces* `$cols`, so you can't use
@@ -1618,10 +1776,11 @@ Real data has gaps. `na` decides what the function sees.
     col2col(\%data, 't_test', undef, na => 'omit');
     col2col(\%data, 't_test', { na => 'omit' });        # same, no placeholder
 
-`rm.undef` / `rm.na` remain as boolean aliases for backward compatibility:
+`rm_undef` / `rm_na` remain as boolean aliases for backward compatibility:
 `true` means `'pairwise'`, `false` means `'keep'`. Don't combine them with `na`.
+The old dotted spellings `rm.undef` and `rm.na` are refused as unknown options.
 
-#### `skip.errors` — keep going when a pair fails *(default: true)*
+#### `skip_errors` — keep going when a pair fails *(default: true)*
 
 Some functions croak on degenerate input — for example `cor` dies if a column has
 zero variance. By default `col2col` **traps** that croak per pair: instead of
@@ -1635,8 +1794,8 @@ computed normally.
 
 To restore the old "die on the first error" behaviour, turn it off:
 
-    col2col(\%data, 'cor', undef, 'skip.errors' => 0);
-    col2col(\%data, 'cor', { 'skip.errors' => 0 });
+    col2col(\%data, 'cor', undef, 'skip_errors' => 0);
+    col2col(\%data, 'cor', { 'skip_errors' => 0 });
 
 Only errors from **your function** are trapped. Mistakes in the call itself
 (unknown column, bad data, unknown function name, unknown option) always die.
@@ -1680,7 +1839,7 @@ Only errors from **your function** are trapped. Mistakes in the call itself
   a name. Unpack with `my ($x, $y) = @_;`.
 - **`'pairwise'` can still hit a constant *subset*.** A column with overall
   variance can be flat on just the rows it shares with one partner, so `cor` may
-  still croak for that pair. With the default `skip.errors`, that shows up as a
+  still croak for that pair. With the default `skip_errors`, that shows up as a
   message in the single offending cell rather than killing the run.
 - **`col2col` does not modify your data.** It reads the table and returns a new
   hash of hashes.
@@ -1870,13 +2029,13 @@ If you provide an array of arrays (a matrix), `cor` will compute the correlation
 
 For the `spearman` and `kendall` methods, `cor_test` falls back to a
 large-sample normal approximation when *n* is large or the data contain ties
-(and always when you pass `exact => 0`). That approximation's `p.value` is
+(and always when you pass `exact => 0`). That approximation's `p_value` is
 evaluated on the tail it belongs to, so a strong rank correlation reports its
 actual p-value instead of a flat `0`; see
 [F and z tail p-values](#f-and-z-tail-p-values). Checked against R's
 `cor.test(..., exact = FALSE)` over 54 Spearman and Kendall cases spanning
 *n* = 60 to 500 and all three alternatives: `estimate` agrees to `3e-15`,
-Kendall's `statistic` to `2e-15`, and `p.value` to `1.7e-12` — the worst of
+Kendall's `statistic` to `2e-15`, and `p_value` to `1.7e-12` — the worst of
 those at a p-value of `2.2e-297`.
 
 ### Spearman: which method, and what `statistic` holds
@@ -1907,7 +2066,7 @@ is used instead), so the correction is never idle. The counts behind it come
 from Knight's O(*n* log *n*) algorithm, the same one [`cor`](#cor) uses, which
 is why a Kendall `cor_test` on 64 000 points takes 0.014 s rather than 15.
 
-`pearson` reports a `conf.int`, and it follows `alternative`: a one-sided test
+`pearson` reports a `conf_int`, and it follows `alternative`: a one-sided test
 gets a one-sided interval, with the open end at exactly −1 or 1, as R's does.
 There is no interval below *n* = 4, again as in R — Fisher's *z* has
 1/√(n−3) for its standard error, so there is nothing to report. `spearman` and
@@ -1939,8 +2098,8 @@ Give times, an event flag (1 = event, 0 = censored), and one or more covariates
     my $fit = coxph(\@time, \@status, [\@age, \@sex],
                     names => ['age', 'sex']);
 
-    print $fit->{exp.coef}[0];    # hazard ratio for age
-    print $fit->{p.value}[0];     # its p-value
+    print $fit->{'exp_coef'}[0];  # hazard ratio for age
+    print $fit->{'p_value'}[0];   # its p-value
 
 Or name the columns of a data set in a formula, as `survival::coxph` does. The
 response is `Surv(time, status)`, or `Surv(start, stop, status)` for
@@ -1964,7 +2123,7 @@ own baseline hazard, with the covariate effects shared.
 **Robust variance.** With a cluster (`cluster(id)`, or `cluster => \@id` or a
 column name), `se` is the grouped-jackknife (dfbeta) robust standard error that
 `coxph(..., cluster = id)` reports, and the model-based one moves to
-`naive.se`. `robust => 1` without a cluster makes each row its own cluster,
+`naive_se`. `robust => 1` without a cluster makes each row its own cluster,
 which `(start, stop]` data does not allow: a subject's intervals have to be
 grouped by a cluster.
 `weights` are case weights and `offset` a term with coefficient fixed at 1.
@@ -1991,8 +2150,8 @@ step function of `c` and the usual regularity conditions do not hold.
 | --- | --- | --- |
 | `names` | `x1`, `x2`, ... | Covariate names in the positional form. |
 | `ties` | `'efron'` | `'efron'` or `'breslow'`. |
-| `conf.level` | `0.95` | Level of `conf.int`. |
-| `maxit` | `20` | Newton iteration limit (`iter.max`). |
+| `conf_level` | `0.95` | Level of `conf_int`. |
+| `maxit` | `20` | Newton iteration limit (R's `iter.max`, also accepted as `iter_max`; the dotted spelling is refused). |
 | `eps` | `1e-9` | Convergence tolerance on the relative log-likelihood change, `coxph.control(eps = )`. |
 | `start` | *none* | Positional form: interval start times, for `(start, stop]` data. |
 | `strata` | *none* | Positional form: one stratum label per row. |
@@ -2003,14 +2162,14 @@ step function of `c` and the usual regularity conditions do not hold.
 
 ### Result
 
-Parallel per-covariate arrays `coef` (log-HR), `exp.coef` (HR), `se`, `z`,
-`p.value` and `conf.int` (HR scale), with `names`; `coefficients` by name;
+Parallel per-covariate arrays `coef` (log-HR), `exp_coef` (HR), `se`, `z`,
+`p_value` and `conf_int` (HR scale), with `names`; `coefficients` by name;
 `var` (a matrix) and `vcov` (a hash of hashes by name), the covariance the standard errors
-come from; model-level `loglik` (at the fit) and `loglik.null`,
-`lr.stat`/`lr.df`/`lr.p.value` (likelihood-ratio test), `score.test` and
-`wald.test`, `n`, `nevent`, `iterations` and `converged`. With a robust
-variance it adds `naive.se` and `naive.var`, `robust.score.test`, and
-`n.clusters`; with strata, `strata` lists their labels. See
+come from; model-level `loglik` (at the fit) and `loglik_null`,
+`lr_stat`/`lr_df`/`lr_p_value` (likelihood-ratio test), `score_test` and
+`wald_test`, `n`, `nevent`, `iterations` and `converged`. With a robust
+variance it adds `naive_se` and `naive_var`, `robust_score_test`, and
+`n_clusters`; with strata, `strata` lists their labels. See
 [`survfit`](#survfit) and [`logrank_test`](#logrank_test).
 
 ## cramers_v
@@ -2044,7 +2203,7 @@ Sort a data frame by a column or a custom comparator, returning a new
 
     my $sorted = csort($data, $by);
     my $sorted = csort($data, $by, $output_shape);
-    my $sorted = csort($hoh,  $by, 'aoh', 'row.name');   # HoH only
+    my $sorted = csort($hoh,  $by, 'aoh', 'row_name');   # HoH only
 
 `$data` may be any of four shapes:
 
@@ -2134,9 +2293,9 @@ The optional third argument picks the returned shape, one of `'aoh'`,
 `'hoa'`, or `'aoa'` (case-insensitive). It defaults to the input shape
 (HoH defaults to AoH). Any shape can be converted to any other:
 
-    csort($aoa, 0)               # AoA -> AoA (default)
-    csort($aoa, 0, 'hoa')        # AoA -> HoA
-    csort($aoh, 'No.', 'aoa')    # AoH -> AoA
+    csort($aoa, 0)            # AoA -> AoA (default)
+    csort($aoa, 0, 'hoa')     # AoA -> HoA
+    csort($aoh, 'No.', 'aoa') # AoH -> AoA
 
 When the target is AoH or HoA, an AoA's columns are keyed by their
 stringified index (`'0'`, `'1'`, ...). When the target is AoA, the
@@ -2152,10 +2311,10 @@ what makes keyed-to-AoA conversions reproducible from run to run.
 ### Sorting a HoH
 
 For a HoH, each outer key is the row name. It is folded into a real
-column so it survives into the output; the column is named `row.name` by
+column so it survives into the output; the column is named `row_name` by
 default, overridable with a fourth argument:
 
-    my $s = csort($hoh, 'score', 'aoh');           # row name in 'row.name'
+    my $s = csort($hoh, 'score', 'aoh');           # row name in 'row_name'
     my $s = csort($hoh, 'score', 'aoh', 'sample'); # ... named 'sample' instead
 
 ## density
@@ -2180,10 +2339,10 @@ bars and one as a curve.
 
 ![density() is the sum of one kernel per observation, and the smooth counterpart of a histogram](https://raw.githubusercontent.com/hhg7/stats/main/img/density.what.png)
 
-Arguments may be given positionally (the sample first) or by name, and R's
-dotted argument names are accepted alongside the underscored ones
-(`na.rm` as well as `na_rm`, `old.coords` as well as `old_coords`,
-`give.Rkern` as well as `give_rkern`, `warnWbw` as well as `warn_wbw`).
+Arguments may be given positionally (the sample first) or by name. Names use
+underscores where R's use a dot (`na_rm`, `old_coords`, `give_rkern`); R's
+dotted spellings (`na.rm`, `old.coords`, `give.Rkern`) are refused as unknown
+arguments. R's `warnWbw` is accepted as well as `warn_wbw`.
 
     my $d = density(x => \@x, bw => 'SJ', kernel => 'epanechnikov', n => 1024);
 
@@ -2292,8 +2451,8 @@ A hash reference:
   observations still count.
 - **`kernel`** — the kernel that was used, spelled out in full, so an
   abbreviation comes back resolved.
-- **`old.coords`**, **`has.na`** — echoes of the corresponding R fields;
-  `has.na` is always 0.
+- **`old_coords`**, **`has_na`** — echoes of the corresponding R fields;
+  `has_na` is always 0.
 
     my $d = density(\@x, bw => 'SJ');
     printf "bandwidth %.4f over %d observations\n", $d->{bw}, $d->{n};
@@ -2383,8 +2542,10 @@ spellings:
 
 | option | meaning |
 | --- | --- |
-| `lower` / `lower.tail` | `1` (default) for the lower tail, `0` for the upper |
-| `log` / `log.p` | on a `p*` function, return the log of the probability; on a `q*` function, the probability *argument* is a log |
+| `lower` / `lower_tail` | `1` (default) for the lower tail, `0` for the upper |
+| `log` / `log_p` | on a `p*` function, return the log of the probability; on a `q*` function, the probability *argument* is a log |
+
+R's dotted `lower.tail` and `log.p` are refused as unknown arguments.
 
 The first argument may be a single number or an array reference, and an array
 reference comes back the same length and in the same order — again as `pnorm`
@@ -2449,7 +2610,7 @@ one-liner instead of a table lookup:
 
     # a likelihood-ratio test between two nested glm fits
     my $lr = $small->{deviance} - $big->{deviance};
-    my $p  = pchisq($lr, $small->{'df.residual'} - $big->{'df.residual'},
+    my $p  = pchisq($lr, $small->{'df_residual'} - $big->{'df_residual'},
                     lower => 0);
 
 ### The tail you ask for is the tail that gets computed
@@ -2469,9 +2630,9 @@ places. The reflection is free rather than a trade: for `p >= 0.5` the two
 operands of `1 - p` lie within a factor of two of each other, so Sterbenz's
 lemma makes that subtraction exact, and nothing is given up in exchange for
 what it removes. Measured against `mpmath` at 60 digits, at the `p` that
-`1 - (1 - conf.level) / 2` actually forms:
+`1 - (1 - conf_level) / 2` actually forms:
 
-| conf.level | z, unreflected | z, reflected |
+| conf_level | z, unreflected | z, reflected |
 |---|---|---|
 | 0.95 | 0.4 ulp | 0.1 ulp |
 | 0.99 | 3.0 ulp | 0.1 ulp |
@@ -2493,7 +2654,7 @@ by hand lands on the bound the function reports:
     my $m  = glm(data => \%d, formula => 'y ~ x', family => 'binomial');
     my $se = $m->{summary}{x}{'Std. Error'};
     my $z  = qnorm(1 - (1 - 0.95) / 2);
-    $m->{summary}{x}{'Estimate'} - $z * $se;   # is $m->{'conf.int'}{x}[0]
+    $m->{summary}{x}{'Estimate'} - $z * $se;   # is $m->{'conf_int'}{x}[0]
 
 bit for bit on a `double` build. On the wider NVs the only thing that can
 separate them is the compiler's freedom to contract `est - z * se` into a
@@ -2502,7 +2663,7 @@ single FMA where perl rounds twice, which is one ulp.
 `t/qnorm.crit.R.scipy.t` asserts that, and goes the other way as well: it
 recovers the critical value back out of each function's *reported* interval —
 undoing the `exp` for `coxph` and `epi_2x2`'s odds ratio, the `tanh` for
-`cor_test` — and requires it to be the one `qnorm` returns, at conf.level 0.8
+`cor_test` — and requires it to be the one `qnorm` returns, at conf_level 0.8
 through 0.9999. `cmh_test` is the one site not covered, because recovering its
 `z` would mean reimplementing the Robins-Breslow-Greenland variance it does not
 report, which would test the reimplementation.
@@ -2536,9 +2697,9 @@ Two things are deliberately not R:
     to `0` therefore logs to `-Inf`, and a tail that rounded to `1` logs to `0`
     rather than to the tiny negative number R reports. R's `pt`/`pchisq`/`pf`
     carry `log_p` through and can do better; `pnorm` here does too, because R's
-    Cody algorithm was ported whole. The `q*` functions take `log.p` properly:
+    Cody algorithm was ported whole. The `q*` functions take `log_p` properly:
     the argument is exponentiated, which is exact, and lets you name quantiles
-    the linear scale cannot — `qnorm(-800, log.p => 1)` is reachable where
+    the linear scale cannot — `qnorm(-800, log_p => 1)` is reachable where
     `exp(-800)` is just `0`.
   - **`qf` disagrees with R in the far tail of *F*, and is right.** At
     `qf(2^-20, 1, 10)` R is 9.9e-4 away from the 60-digit value and this module
@@ -2578,11 +2739,11 @@ Return a new data frame with the named columns removed and the rest kept —
 `select_cols`.
 
     my $hoa = { a => [1,4], b => [2,5], c => [3,6] };
-    drop_cols($hoa, 'b');
+    $aoa = drop_cols($hoa, 'b');
     # { a => [1,4], c => [3,6] }
 
     my $aoa = [ [1,2,3], [4,5,6] ];
-    drop_cols($aoa, 1);          # result is re-indexed 0,1
+    $aoa = drop_cols($aoa, 1); # result is re-indexed 0,1
     # [ [1,3], [4,6] ]
 
 Unlike `select_cols`, `drop_cols` touches only the keys a row actually has,
@@ -2731,7 +2892,7 @@ numerically against the canonical formula computed in base R.
     my $res = dunn_test(\@values, \@group, method => 'bh');
     for my $c (@$res) {
         printf "%-9s  Z=%+.3f  p=%.4f  (adj %.4f)\n",
-            $c->{comparison}, $c->{Z}, $c->{p.value}, $c->{p_adjust};
+            $c->{comparison}, $c->{Z}, $c->{'p_value'}, $c->{'p_adjust'};
     }
 
 Values and groups are given as two parallel arrays; observations with a missing
@@ -2755,7 +2916,7 @@ group order), each containing:
 | `comparison` | `String` | `"group1 - group2"`. | `"A - B"` |
 | `group1`, `group2` | `String` | The two groups being compared. | `"A"`, `"B"` |
 | `Z` | `Double` | Dunn's z statistic for the rank-mean difference. | `-2.7602` |
-| `p.value` | `Double` | Unadjusted two-sided p-value. | `0.005777` |
+| `p_value` | `Double` | Unadjusted two-sided p-value. | `0.005777` |
 | `p_adjust` | `Double` | p-value after the chosen adjustment. | `0.017331` |
 
 ## epi_2x2
@@ -2773,12 +2934,12 @@ Pass the four counts (or a `[a,b,c,d]` / `[[a,b],[c,d]]` array ref):
     use Stats::LikeR 'epi_2x2';
 
     my $r = epi_2x2(30, 70, 20, 80);
-    print $r->{odds.ratio};             # 1.714
-    print "@{ $r->{odds.ratio.ci} }";   # 0.895 3.285
+    print $r->{'odds_ratio'};           # 1.714
+    print "@{ $r->{'odds_ratio_ci'} }"; # 0.895 3.285
 
-Options: `conf.level` (default `0.95`) and `correct` (add 0.5 to every cell,
-done automatically when a cell is 0). Result keys: `odds.ratio`, `risk.ratio`,
-`risk.diff` (each with a matching `*_ci`), `risk.exposed`, `risk.unexposed`, and
+Options: `conf_level` (default `0.95`) and `correct` (add 0.5 to every cell,
+done automatically when a cell is 0). Result keys: `odds_ratio`, `risk_ratio`,
+`risk_diff` (each with a matching `*_ci`), `risk_exposed`, `risk_unexposed`, and
 `nnt`. For a significance test use [`fisher_test`](#fisher_test) or
 [`chisq_test`](#chisq_test); to adjust across strata use [`cmh_test`](#cmh_test).
 
@@ -2898,9 +3059,9 @@ Both `filter` and `col` are exported by default.
 
 | Position | Name | Description |
 | --- | --- | --- |
-| 1 | `$df` | The data frame: an **array of hashes** (AoH, the default `read_table` output), a **hash of arrays** (HoA), or a **hash of hashes** (HoH, e.g. `read_table` with `'output.type' => 'hoh'`). |
+| 1 | `$df` | The data frame: an **array of hashes** (AoH, the default `read_table` output), a **hash of arrays** (HoA), or a **hash of hashes** (HoH, e.g. `read_table` with `'output_type' => 'hoh'`). |
 | 2 | predicate | A `col()` comparison object **or** a `CODE` reference. A coderef receives the row as `$_` / `$_[0]` and the row identifier as `$_[1]` (see below). |
-| 3 + | `'output.type' => 'aoh'\|'hoa'` | *Optional.* The shape of the returned frame. Omit it to keep the input's own shape. `'out'` and `'output_type'` are accepted aliases, and a bare `filter($df, $pred, 'aoh')` also works. |
+| 3 + | `'output_type' => 'aoh'\|'hoa'` | *Optional.* The shape of the returned frame. Omit it to keep the input's own shape. `'out'` is an accepted alias (the dotted `'output.type'` is refused as an unknown argument), and a bare `filter($df, $pred, 'aoh')` also works. |
 
 ### The `col()` form
 
@@ -2963,10 +3124,10 @@ For an AoH or HoA, `$_[1]` is the 0-based row index:
 
 ### Choosing the output shape
 
-By default `filter` returns a frame of the **same shape** as the input (AoH → AoH, HoA → HoA, HoH → HoH). Pass `output.type` to convert while filtering:
+By default `filter` returns a frame of the **same shape** as the input (AoH → AoH, HoA → HoA, HoH → HoH). Pass `output_type` to convert while filtering:
 
     my $aoh = read_table('patients.csv');                          # array of hashes
-    my $hoa = filter($aoh, col('Age') >= 18, 'output.type' => 'hoa');
+    my $hoa = filter($aoh, col('Age') >= 18, 'output_type' => 'hoa');
     # $hoa->{Age}, $hoa->{Sex}, ... are all the same length and row-aligned
 
 The two selectable output types are `'aoh'` and `'hoa'`. `'hoh'` is **not** selectable, because producing a hash of hashes would require choosing which column becomes the row key; an HoH input keeps its keys only when the output shape is left at the default (HoH → HoH).
@@ -2981,11 +3142,11 @@ The two selectable output types are `'aoh'` and `'hoa'`. `'hoh'` is **not** sele
     my $flagged = filter($df, sub { $_->{ALT} > 40 || $_->{AST} > 40 });  # coderef
 
     # hash of arrays in -> hash of arrays out (columns filtered in parallel)
-    my $hoa = read_table('patients.csv', 'output.type' => 'hoa');
+    my $hoa = read_table('patients.csv', 'output_type' => 'hoa');
     my $sub = filter($hoa, col('Age') > 32);
 
     # hash of hashes in -> the same row keys, fewer of them
-    my $hoh = read_table('patients.csv', 'output.type' => 'hoh');
+    my $hoh = read_table('patients.csv', 'output_type' => 'hoh');
     my $keep = filter($hoh, col('Age') > 32);
 
     # hash of hashes: filter on the row name (the outer key) via $_[1]
@@ -2993,7 +3154,7 @@ The two selectable output types are `'aoh'` and `'hoa'`. `'hoh'` is **not** sele
     my $by_name = filter($hoh, sub { $_[1] =~ m/^(?:$grps)$/ });
 
     # convert shape while filtering
-    my $as_hoa = filter($df, col('Age') > 32, 'output.type' => 'hoa');
+    my $as_hoa = filter($df, col('Age') > 32, 'output_type' => 'hoa');
 
 ### Behavior and notes
 
@@ -3023,16 +3184,16 @@ which returns a hash reference:
 
     {
     alternative   "two.sided",
-    conf.int      [
+    conf_int      [
         [0] 2.75343836564204,
         [1] 300.682787419401
     ],
-    conf.level    0.95,
+    conf_level    0.95,
     estimate      {
         "odds ratio"   21.3053312750168
     },
     method        "Fisher's Exact Test for Count Data",
-    p.value       0.000536724119143435
+    p_value       0.000536724119143435
     }
 
 ### hash reference entry
@@ -3060,15 +3221,15 @@ For tables larger than 2x2 the p-value is computed by exact enumeration of
 every contingency table sharing the observed row and column margins (the
 multivariate hypergeometric distribution), and matches R's `fisher.test` to
 full precision. Only the two-sided test is defined in this case, so
-`alternative` is ignored and the returned hash reference omits `conf.int` and
+`alternative` is ignored and the returned hash reference omits `conf_int` and
 `estimate` (the conditional-MLE odds ratio and its confidence interval are
 reported for 2x2 tables only):
 
     {
     alternative   "two.sided",
-    conf.level    0.95,
+    conf_level    0.95,
     method        "Fisher's Exact Test for Count Data",
-    p.value       0.0540892411303451
+    p_value       0.0540892411303451
     }
 
 As with the 2x2 case, a hash-of-hashes input orders rows by their sorted keys
@@ -3108,7 +3269,7 @@ non-numeric value are dropped, mirroring R's `complete.cases`.
         [9, 10,  9],   # subject 3
         [8,  8,  6],   # subject 4
     ]);
-    printf "chi2=%.3f  df=%d  p=%.4g\n", $r->{statistic}, $r->{parameter}, $r->{p.value};
+    printf "chi2=%.3f  df=%d  p=%.4g\n", $r->{statistic}, $r->{parameter}, $r->{'p_value'};
 
 A significant result says the conditions differ overall; follow up with pairwise
 comparisons (for example [dunn_test](#dunn_test) on the paired differences, or
@@ -3120,7 +3281,7 @@ Wilcoxon signed-rank tests with a multiple-comparison adjustment).
 | --- | --- | --- | --- |
 | `statistic` | `Double` | Friedman chi-squared statistic (tie-corrected). | `4.0952` |
 | `parameter` | `Integer` | Degrees of freedom, `k - 1` (number of treatments minus one). | `2` |
-| `p.value` | `Double` | The p-value from the chi-squared approximation. | `0.129` |
+| `p_value` | `Double` | The p-value from the chi-squared approximation. | `0.129` |
 | `n` | `Integer` | Number of complete blocks actually used. | `7` |
 | `method` | `String` | `"Friedman rank sum test"`. | |
 
@@ -3175,11 +3336,11 @@ Count outcomes are handled by the `poisson` family (log link, for rate ratios) a
     my $nb   = glm(formula => 'cases ~ age + sex', data => \%d, family => 'negbin');
     my $nb2  = glm(formula => 'cases ~ age + sex', data => \%d, family => 'negbin', theta => 1.7);
 
-For every non-gaussian family, `glm` also returns the exponentiated coefficients with their Wald confidence intervals (`confint.default`): odds ratios for `binomial`, and rate / incidence-rate ratios for `poisson` and `negbin`. The interval width is set by the `conf.level` argument (default `0.95`). Validated numerically against R's `glm`, `MASS::glm.nb`, and `confint.default`.
+For every non-gaussian family, `glm` also returns the exponentiated coefficients with their Wald confidence intervals (`confint.default`): odds ratios for `binomial`, and rate / incidence-rate ratios for `poisson` and `negbin`. The interval width is set by the `conf_level` argument (default `0.95`). Validated numerically against R's `glm`, `MASS::glm.nb`, and `confint.default`.
 
     my $nb = glm(formula => 'cases ~ age + sex', data => \%d, family => 'negbin');
     printf "IRR(age) = %.2f (%.2f–%.2f)\n",
-        $nb->{exp}{age}{estimate}, $nb->{exp}{age}{'conf.low'}, $nb->{exp}{age}{'conf.high'};
+        $nb->{exp}{age}{estimate}, $nb->{exp}{age}{'conf_low'}, $nb->{exp}{age}{'conf_high'};
 
 For the families that report a Wald `z` (everything but `gaussian`),
 `Pr(>|z|)` is computed as `2 * pnorm(-|z|)` rather than
@@ -3223,7 +3384,7 @@ would. A `poisson` fit on a 0/1 outcome with `vcov => 'HC0'` is the
 
     my $rr = glm(formula => 'readmit ~ hours + age', data => \%d,
                  family => 'poisson', vcov => 'HC0', cluster => 'child_id');
-    printf "RR = %.3f (%.3f-%.3f)\n", @{ $rr->{exp}{hours} }{qw(estimate conf.low conf.high)};
+    printf "RR = %.3f (%.3f-%.3f)\n", @{ $rr->{exp}{hours} }{qw(estimate conf_low conf_high)};
 
 A factor with thousands of levels (a within-subject comparison) can be
 **absorbed** instead of expanded into dummy columns: put it after a `|` in the
@@ -3232,7 +3393,7 @@ groups (weighted, by alternating projections for more than one factor) and
 reports only the remaining coefficients, which equal those of the
 full-dummy fit. As `fixest::feglm()` does, a group whose outcome is constant at
 a boundary (all zeros for `poisson`/`negbin`, all 0 or all 1 for `binomial`)
-carries no information and is dropped; `fe.removed` counts the rows that goes
+carries no information and is dropped; `fe_removed` counts the rows that goes
 with. HC2/HC3 are not available with absorbed factors.
 
     my $fe = glm(formula => 'visits ~ hours | child_id + year', data => \%d,
@@ -3256,7 +3417,7 @@ errors are right as they stand.
 | `data` | `HashRef` or `ArrayRef` | *None (Required)* | The dataset containing the variables used in the formula. Accepts a Hash of Arrays (HoA), a Hash of Hashes (HoH) or an Array of Hashes (AoH). Rows are named as described under [`lm`](#lm). | `\%mtcars`, `[{x => 1, y => 2}, ...]` |
 | `family` | `String` | `'gaussian'` | The error distribution / link function: `'gaussian'` (identity link), `'binomial'` (logit link), `'poisson'` (log link) or `'negbin'` (negative binomial, log link). | `'poisson'` |
 | `theta` | `Number` | *estimated by ML* | Negative-binomial dispersion. When omitted (with `family => 'negbin'`) it is estimated by maximum likelihood as in `MASS::glm.nb`; supply a value to hold it fixed. | `1.7` |
-| `conf.level` | `Number` | `0.95` | Confidence level for the Wald coefficient / exponentiated-coefficient intervals. | `0.90` |
+| `conf_level` | `Number` | `0.95` | Confidence level for the Wald coefficient / exponentiated-coefficient intervals. | `0.90` |
 | `offset` | `String` or `ArrayRef` | *none* | A column, an expression over columns such as `'log(t)'`, or one value per row, added to the linear predictor with coefficient 1. Adds to any `offset()` terms in the formula. | `'log(persontime)'` |
 | `weights` | `String` or `ArrayRef` | *none* | Prior weights, R's `glm(weights = )`: a column name, or one value per row. Must be non-negative. | `'w'` |
 | `vcov` | `String` | `'model'` | `'model'`, or a sandwich: `'HC0'`, `'HC1'`, `'HC2'` or `'HC3'` (`sandwich::vcovHC`). Also accepted as `vcov_type`. | `'HC0'` |
@@ -3274,31 +3435,31 @@ errors are right as they stand.
 | `coefficients` | `HashRef` | A hash mapping the expanded model term names to their estimated coefficient values. | `{'Intercept' => 1.5, 'wt' => -0.5}` |
 | `converged` | `Integer (Boolean)` | `1` if the Iteratively Reweighted Least Squares (IRLS) algorithm converged within the maximum iterations, `0` otherwise. | `1` |
 | `deviance` | `Double` | The residual deviance of the fitted model. | `15.2` |
-| `deviance.resid` | `HashRef` | A hash mapping data row names to their computed deviance residuals. | `{'Mazda RX4' => 0.12}` |
-| `df.null` | `Integer` | The residual degrees of freedom for the null model. | `31` |
-| `df.residual` | `Integer` | The residual degrees of freedom for the fitted model. | `30` |
+| `deviance_resid` | `HashRef` | A hash mapping data row names to their computed deviance residuals. | `{'Mazda RX4' => 0.12}` |
+| `df_null` | `Integer` | The residual degrees of freedom for the null model. | `31` |
+| `df_residual` | `Integer` | The residual degrees of freedom for the fitted model. | `30` |
 | `family` | `String` | The statistical family used to fit the model. | `"gaussian"` |
-| `fitted.values` | `HashRef` | A hash mapping data row names to the fitted mean values (the model's predictions on the scale of the response). | `{'Mazda RX4' => 0.85}` |
+| `fitted_values` | `HashRef` | A hash mapping data row names to the fitted mean values (the model's predictions on the scale of the response). | `{'Mazda RX4' => 0.85}` |
 | `iter` | `Integer` | The number of IRLS iterations performed before convergence or hitting the iteration limit. | `4` |
-| `null.deviance` | `Double` | The deviance for the null model (a baseline model containing only an intercept, or an offset of 0 if the intercept is removed). | `43.5` |
+| `null_deviance` | `Double` | The deviance for the null model (a baseline model containing only an intercept, or an offset of 0 if the intercept is removed). | `43.5` |
 | `rank` | `Integer` | The numeric rank of the fitted linear model (the number of estimated, non-aliased parameters). | `2` |
-| `summary` | `HashRef` | A nested hash mapping each term to its detailed summary statistics, including `Estimate`, `Std. Error`, `t value` / `z value`, `Pr(> t )` / `Pr(> z )`, and the Wald `CI.lower` / `CI.upper` (link scale). Aliased parameters return `"NaN"`. | `{'wt' => {'Estimate' => -0.5, 'Std. Error' => 0.1, ...}}` |
+| `summary` | `HashRef` | A nested hash mapping each term to its detailed summary statistics, including `Estimate`, `Std. Error`, `t value` / `z value`, `Pr(> t )` / `Pr(> z )`, and the Wald `CI_lower` / `CI_upper` (link scale). Aliased parameters return `"NaN"`. | `{'wt' => {'Estimate' => -0.5, 'Std. Error' => 0.1, ...}}` |
 | `terms` | `ArrayRef` | An ordered list of the expanded term names included in the model matrix. | `['Intercept', 'wt', 'hp']` |
-| `conf.int` | `HashRef` | Wald confidence interval for each coefficient on the **link** scale, as `[lower, upper]`. | `{'wt' => [-0.9, -0.1]}` |
-| `conf.level` | `Double` | The confidence level used for `conf.int` and `exp`. | `0.95` |
-| `exp` | `HashRef` | Non-gaussian families only: exponentiated coefficient (odds ratio for `binomial`; rate / incidence-rate ratio for `poisson` / `negbin`) with its confidence interval, as `{estimate, 'conf.low', 'conf.high'}`. | `{'wt' => {estimate => 0.6, 'conf.low' => 0.4, 'conf.high' => 0.9}}` |
+| `conf_int` | `HashRef` | Wald confidence interval for each coefficient on the **link** scale, as `[lower, upper]`. | `{'wt' => [-0.9, -0.1]}` |
+| `conf_level` | `Double` | The confidence level used for `conf_int` and `exp`. | `0.95` |
+| `exp` | `HashRef` | Non-gaussian families only: exponentiated coefficient (odds ratio for `binomial`; rate / incidence-rate ratio for `poisson` / `negbin`) with its confidence interval, as `{estimate, 'conf_low', 'conf_high'}`. | `{'wt' => {estimate => 0.6, 'conf_low' => 0.4, 'conf_high' => 0.9}}` |
 | `theta` | `Double` | `negbin` family only: the negative-binomial dispersion parameter (ML estimate, or the fixed value supplied). | `1.73` |
 | `loglik` | `Double` | The log-likelihood, as R's `logLik()`. | `-120.3` |
 | `dispersion` | `Double` | The dispersion the standard errors use: estimated (Pearson) for `gaussian`, 1 for the other families. | `1` |
 | `nobs` | `Integer` | Rows in the fit (non-missing, non-zero weight, and not dropped with an absorbed group). | `98` |
-| `vcov` | `HashRef` | The coefficient covariance, model-based or robust as `vcov.type` says, as a hash of hashes by term. | `{'wt' => {'wt' => 0.01, ...}}` |
-| `vcov.type` | `String` | `'model'`, `'HC0'`, `'HC1'`, `'HC2'` or `'HC3'`. | `'HC0'` |
-| `n.clusters` | `Integer` or `ArrayRef` | With `cluster`: the number of clusters, or one count per variable when clustering several ways. | `120` |
+| `vcov` | `HashRef` | The coefficient covariance, model-based or robust as `vcov_type` says, as a hash of hashes by term. | `{'wt' => {'wt' => 0.01, ...}}` |
+| `vcov_type` | `String` | `'model'`, `'HC0'`, `'HC1'`, `'HC2'` or `'HC3'`. | `'HC0'` |
+| `n_clusters` | `Integer` or `ArrayRef` | With `cluster`: the number of clusters, or one count per variable when clustering several ways. | `120` |
 | `absorb` | `HashRef` | With absorbed factors: each factor's number of groups in the fit. | `{'child_id' => 812}` |
-| `fe.removed` | `Integer` | With absorbed factors: rows dropped because their group's outcome was constant at a boundary. | `14` |
-| `offset.terms` | `ArrayRef` | With an offset: the expressions it is made of, which [`predict`](#predict) re-evaluates on new data. | `['log(persontime)']` |
+| `fe_removed` | `Integer` | With absorbed factors: rows dropped because their group's outcome was constant at a boundary. | `14` |
+| `offset_terms` | `ArrayRef` | With an offset: the expressions it is made of, which [`predict`](#predict) re-evaluates on new data. | `['log(persontime)']` |
 | `twologlik` | `Double` | `negbin` only: twice the log-likelihood, as `MASS::glm.nb`. | `-240.6` |
-| `SE.theta` | `Double` | `negbin` with `theta` estimated: its standard error. | `0.41` |
+| `SE_theta` | `Double` | `negbin` with `theta` estimated: its standard error. | `0.41` |
 
 ## group_by
 
@@ -3584,7 +3745,7 @@ which returns
   is used for every column, so the arrays stay aligned and the result is
   reproducible regardless of hash ordering.
 - **Gaps** — a missing inner key, or a cell whose value is `undef` — are filled
-  with the fill value (see `undef.val` below). Every column therefore has
+  with the fill value (see `undef_val` below). Every column therefore has
   exactly one entry per row.
 - Values are **copied** into the result; the original structure is left
   untouched.
@@ -3597,15 +3758,15 @@ Options are passed as trailing `name => value` pairs.
 
 | Option | Default | Meaning |
 | --- | --- | --- |
-| `undef.val` | `undef` | Value used to fill a missing key or an `undef` cell. Any defined scalar works, including `0` and `''`. Passing `undef` keeps the default. |
-| `row.names` | *(none)* | If set to a string, an extra column of that name is added holding the sorted row labels, aligned with the data. Dies if the name collides with an existing column. |
+| `undef_val` | `undef` | Value used to fill a missing key or an `undef` cell. Any defined scalar works, including `0` and `''`. Passing `undef` keeps the default. |
+| `row_names` | *(none)* | If set to a string, an extra column of that name is added holding the sorted row labels, aligned with the data. Dies if the name collides with an existing column. |
 
     # Ragged input with an explicit fill string:
     my %ragged = (
         'r1' => { 'a' => 1, 'b' => 2 },
         'r2' => { 'a' => 3, 'c' => 9 },
     );
-    my $hoa = hoh2hoa(\%ragged, 'undef.val' => 'NA');
+    my $hoa = hoh2hoa(\%ragged, 'undef_val' => 'NA');
     # {
     #   a => [1,    3   ],
     #   b => [2,    'NA'],
@@ -3613,7 +3774,7 @@ Options are passed as trailing `name => value` pairs.
     # }
     
     # Keep the row labels as a column:
-    my $with_ids = hoh2hoa(\%ragged, 'row.names' => 'id');
+    my $with_ids = hoh2hoa(\%ragged, 'row_names' => 'id');
     # {
     #   id => ['r1', 'r2'],
     #   a  => [1,    3   ],
@@ -3628,7 +3789,7 @@ Options are passed as trailing `name => value` pairs.
 - the argument is not a hash reference,
 - any value in the hash is not itself a hash reference,
 - an unknown option is given, or the options are not `name => value` pairs,
-- `row.names` is not a plain string, or it names an already-present column.
+- `row_names` is not a plain string, or it names an already-present column.
 
 ## hist
 
@@ -3659,12 +3820,12 @@ expected event counts. A large p-value indicates the model fits adequately. The
 grouping and statistic follow R's `ResourceSelection::hoslem.test`, against which
 it was validated numerically.
 
-    # $fit is a binomial glm(); align observed outcomes with fitted.values
+    # $fit is a binomial glm(); align observed outcomes with fitted_values
     my @obs  = map { $data{$_}{outcome} } @ids;
-    my @prob = map { $fit->{'fitted.values'}{$_} } @ids;
+    my @prob = map { $fit->{'fitted_values'}{$_} } @ids;
 
     my $hl = hosmer_lemeshow(\@obs, \@prob, g => 10);
-    printf "HL chi2=%.2f df=%d p=%.3f\n", $hl->{statistic}, $hl->{parameter}, $hl->{p.value};
+    printf "HL chi2=%.2f df=%d p=%.3f\n", $hl->{statistic}, $hl->{parameter}, $hl->{'p_value'};
 
 ### Input Parameters
 
@@ -3680,7 +3841,7 @@ it was validated numerically.
 | --- | --- | --- | --- |
 | `statistic` | `Double` | Hosmer-Lemeshow chi-squared statistic. | `4.3456` |
 | `parameter` | `Integer` | Degrees of freedom, `g - 2`. | `8` |
-| `p.value` | `Double` | Goodness-of-fit p-value (large = good fit). | `0.825` |
+| `p_value` | `Double` | Goodness-of-fit p-value (large = good fit). | `0.825` |
 | `groups` | `Integer` | Number of non-empty groups used. | `10` |
 | `table` | `ArrayRef` | Per-group `{n, observed, expected}` event summaries. | |
 
@@ -3708,18 +3869,18 @@ separately, as both packages do by default.
 | `formula` | *(required)* | `'y ~ count regressors'` or `'y ~ count regressors \| zero regressors'`; `offset()` terms are allowed in either part. |
 | `data` | *(required)* | HoA, AoH or HoH. |
 | `dist` | `'poisson'` | The count part: `'poisson'`, `'negbin'` or `'geometric'`. |
-| `zero.dist` | `'binomial'` | The zero part: `'binomial'` (a logit), or a count distribution censored at 1, `'poisson'`, `'negbin'` or `'geometric'`. |
+| `zero_dist` | `'binomial'` | The zero part: `'binomial'` (a logit), or a count distribution censored at 1, `'poisson'`, `'negbin'` or `'geometric'`. |
 | `link` | `'logit'` | The binomial zero part's link; only `'logit'` is implemented. |
 | `offset` | *none* | A column, an expression or an array ref, added to the count part only, as `pscl`'s `offset = ` is; an `offset()` term in the zero part's formula offsets that part. |
 | `weights` | *none* | Case weights. |
-| `conf.level` | `0.95` | Level of the Wald intervals in `summary`. |
+| `conf_level` | `0.95` | Level of the Wald intervals in `summary`. |
 
 The result holds `coefficients`, `summary` (with `Estimate`, `Std. Error`,
-`z value`, `Pr(>|z|)`, `CI.lower`, `CI.upper`), `vcov` and `terms`, each split
-into `count` and `zero` halves; `loglik` and its two parts `loglik.count` and
-`loglik.zero`, `aic`, `df.residual`, `nobs`, `converged`, `iter` and
-`iter.zero`; `theta` and `SE.logtheta` for a `negbin` count part, and
-`theta.zero`/`SE.logtheta.zero` for a `negbin` zero part; and `fitted.values`,
+`z value`, `Pr(>|z|)`, `CI_lower`, `CI_upper`), `vcov` and `terms`, each split
+into `count` and `zero` halves; `loglik` and its two parts `loglik_count` and
+`loglik_zero`, `aic`, `df_residual`, `nobs`, `converged`, `iter` and
+`iter_zero`; `theta` and `SE_logtheta` for a `negbin` count part, and
+`theta_zero`/`SE_logtheta_zero` for a `negbin` zero part; and `fitted_values`,
 the fitted mean `P(y > 0) mu / (1 - f(0))`. Validated against `pscl` and
 `countreg` on their documented examples, with a third opinion from `mpmath`.
 
@@ -3959,22 +4120,22 @@ running the two stages as separate `lm` fits.
 | `weights` | *none* | Weights, as `ivreg(weights = )`. |
 | `vcov` | `'model'` | `'model'`, `'HC0'` or `'HC1'`; the diagnostics use the same covariance, as when `summary.ivreg` is given `vcov. = `. |
 | `cluster` | *none* | A cluster variable (column name or array ref) for `sandwich::vcovCL`; implies `'HC0'`. |
-| `conf.level` | `0.95` | Level of `conf.int`. |
+| `conf_level` | `0.95` | Level of `conf_int`. |
 
 The result holds `coefficients`, `summary` (per term `Estimate`,
-`Std. Error`, `t value`, `Pr(>|t|)`), `vcov`, `vcov.type`, `conf.int`,
+`Std. Error`, `t value`, `Pr(>|t|)`), `vcov`, `vcov_type`, `conf_int`,
 `terms`, `endogenous` and `instruments` (the terms each role was given),
-`fitted.values`, `residuals`, `sigma`, `rss`, `r.squared`, `adj.r.squared`,
-`df.residual`, `rank`, `nobs`, `n.clusters` with a cluster, and `waldtest`, the
+`fitted_values`, `residuals`, `sigma`, `rss`, `r_squared`, `adj_r_squared`,
+`df_residual`, `rank`, `nobs`, `n_clusters` with a cluster, and `waldtest`, the
 F test of every coefficient but the intercept. `diagnostics` has
 
 - `weak`: per endogenous regressor, the first-stage F test of the excluded
-  instruments (`statistic`, `df1`, `df2`, `p.value`);
-- `wu.hausman`: the test of whether the endogenous regressors are in fact
+  instruments (`statistic`, `df1`, `df2`, `p_value`);
+- `wu_hausman`: the test of whether the endogenous regressors are in fact
   exogenous: an F test of the first-stage residuals added to the
   structural regression;
 - `sargan`: with more instruments than endogenous regressors, the test of
-  overidentifying restrictions (`statistic`, `df`, `p.value`).
+  overidentifying restrictions (`statistic`, `df`, `p_value`).
 
 Validated against `ivreg`'s tests and documented examples, and against Stata
 `ivreg2` output that `statsmodels` pins. For a count outcome, see the
@@ -4026,13 +4187,13 @@ the groups that do have data under a `df` that counts one that does not is not
 a test of anything. (SciPy takes the other side of this and returns `NaN`.)
 
 A sample with no variation at all gives a tie correction of exactly zero, so
-the statistic is `0/0`: like R, `statistic` and `p.value` come back as `NaN`.
+the statistic is `0/0`: like R, `statistic` and `p_value` come back as `NaN`.
 
 ### returned fields
 
 `statistic`, `parameter` (the degrees of freedom) and `method` are R's `htest`
-fields; the p-value is available as both `p.value` and `p.value`. On top of
-those, `group.stats` holds `size` and `mean` sub-hashes keyed by your own group
+fields; the p-value is `p_value` (R's dotted `p.value` is not a key). On top of
+those, `group_stats` holds `size` and `mean` sub-hashes keyed by your own group
 labels, computed over the same observations the statistic used.
 
 ## ks_test
@@ -4092,7 +4253,7 @@ the asymptotic one, so it always names the p-value you actually got.
   D⁻. It is the maximum distance between the two ECDFs (or, for the one-sample
   test, between the ECDF and the reference CDF), always in the range [0, 1].
   Larger values mean the distributions are further apart.
-- **`p.value`** — the probability, under the null hypothesis that the samples
+- **`p_value`** — the probability, under the null hypothesis that the samples
   share a distribution, of observing a statistic at least this large. It is
   clamped to [0, 1]; a small value (e.g. < 0.05) is evidence against the null.
 - **`method`** — a human-readable description of exactly what was run, handy
@@ -4108,9 +4269,9 @@ the asymptotic one, so it always names the p-value you actually got.
 For example:
 
     my $ks = ks_test(\@x, \@y);
-    if ($ks->{p.value} < 0.05) {
+    if ($ks->{'p_value'} < 0.05) {
         printf "reject H0: D=%.4f, p=%.4g (%s)\n",
-            $ks->{statistic}, $ks->{p.value}, $ks->{method};
+            $ks->{statistic}, $ks->{'p_value'}, $ks->{method};
     }
 
 ## kurtosis
@@ -4288,15 +4449,15 @@ the dot operator also works:
 everything above holds for both, and a fit's `terms` are the terms the other
 function would have produced from the same string.
 
-Rows are labelled from a `row.names`, `_row`, `rownames` or `.rownames` column if
+Rows are labelled from a `row_names`, `_row`, `rownames` or `.rownames` column if
 the data has one (a HoH labels rows with its outer keys, which needs no such
 column), and 1-based integers otherwise. Those labels are the keys of
-`fitted.values` and `residuals`, and the row names `predict` returns. A row-name
+`fitted_values` and `residuals`, and the row names `predict` returns. A row-name
 column is a label rather than a measurement, so `y ~ .` leaves it out of the
 predictors.
 
 The overall model F test is returned as `fstatistic` (an array ref of `F`,
-numerator df, denominator df) and `f.pvalue`. `f.pvalue` is evaluated in the
+numerator df, denominator df) and `f_pvalue`. `f_pvalue` is evaluated in the
 upper tail of the F distribution rather than as `1 - pf(F, df1, df2)`, so a
 strongly significant model reports its actual p-value instead of a flat `0`;
 see [F and z tail p-values](#f-and-z-tail-p-values). The per-coefficient
@@ -4328,11 +4489,11 @@ The fixed part is expanded as for [`lm`](#lm).
 | `formula` | *(required)* | Fixed effects plus one or more `( terms \| group )` random-effects terms. |
 | `data` | *(required)* | HoA, AoH or HoH. |
 | `REML` | `1` | `0` for a maximum-likelihood fit (needed to compare fixed effects by likelihood ratio). |
-| `conf.level` | `0.95` | Level of `conf.int`, from the Satterthwaite t. |
+| `conf_level` | `0.95` | Level of `conf_int`, from the Satterthwaite t. |
 
 The result holds `coefficients`, `summary` (per term `Estimate`,
-`Std. Error`, `df`, `t value`, `Pr(>|t|)`), `vcov`, `conf.int`, `terms`,
-`fitted.values` (including the predicted random effects), `sigma` (residual
+`Std. Error`, `df`, `t value`, `Pr(>|t|)`), `vcov`, `conf_int`, `terms`,
+`fitted_values` (including the predicted random effects), `sigma` (residual
 sd), `theta` (`lme4`'s relative covariance factor, `getME(fit, "theta")`),
 `REML` or `deviance` (the criterion minimised), `loglik`, `AIC`, `BIC`,
 `nobs`, `reml`, `converged` and `singular` (a variance component on its
@@ -4356,10 +4517,10 @@ Give times, an event flag (1 = event, 0 = censored), and a group label per row:
     use Stats::LikeR 'logrank_test';
 
     my $r = logrank_test(\@time, \@status, \@group);
-    print $r->{p.value};
+    print $r->{'p_value'};
 
 Result keys: `statistic` (chi-squared), `parameter` (df = groups − 1),
-`p.value`, `observed` and `expected` events per group, and `groups`. See
+`p_value`, `observed` and `expected` events per group, and `groups`. See
 [`survfit`](#survfit) for the curves and [`coxph`](#coxph) to adjust for
 covariates.
 
@@ -4421,7 +4582,7 @@ numerically against R.
 
     # counts as a square matrix: [[a, b], [c, d]]
     my $r = mcnemar_test([[794, 86], [150, 570]]);
-    printf "chi2=%.2f df=%d p=%.4g\n", $r->{statistic}, $r->{parameter}, $r->{p.value};
+    printf "chi2=%.2f df=%d p=%.4g\n", $r->{statistic}, $r->{parameter}, $r->{'p_value'};
 
     # small samples: exact binomial test on the discordant pairs
     my $e = mcnemar_test([[794, 86], [150, 570]], exact => 1);
@@ -4448,7 +4609,7 @@ cross-tabulated over their sorted union of levels.
 | --- | --- | --- | --- |
 | `statistic` | `Double` | McNemar's chi-squared (or, for `exact`, the discordant success count *b*). | `16.8178` |
 | `parameter` | `Integer` | Degrees of freedom, `k(k-1)/2` (absent for `exact`). | `1` |
-| `p.value` | `Double` | The p-value. | `4.1e-05` |
+| `p_value` | `Double` | The p-value. | `4.1e-05` |
 | `method` | `String` | Description of the test performed. | `"McNemar's Chi-squared test with continuity correction"` |
 
 ## mean
@@ -4485,7 +4646,7 @@ selected column (`value_vars`) is unpivoted into a `variable`/`value` pair.
         value_vars   => 'C' | [ 'C', 'D' ],   # unpivoted (default: all non-id cols)
         var_name     => 'variable',           # name of the column-name column
         value_name   => 'value',              # name of the value column
-        'output.type' => 'aoh',               # aoa|aoh|hoa|hoh (default: input family)
+        'output_type' => 'aoh',               # aoa|aoh|hoa|hoh (default: input family)
     );
 
 Column identifiers are names for AoH/HoA/HoH frames and 0-based integer
@@ -4514,7 +4675,7 @@ NA cells (undef, or a missing hash key) melt through to `value => undef`.
 ### Errors
 
 Dies on: undefined data; an odd trailing argument list; an unknown argument; an
-unknown `output.type`; a `value_vars`/`id_vars` column that does not exist;
+unknown `output_type`; a `value_vars`/`id_vars` column that does not exist;
 `var_name` equal to `value_name`; or `var_name`/`value_name` colliding with an
 `id_vars` column name.
 
@@ -4537,7 +4698,7 @@ A full relational join of two data frames, in the spirit of R's `merge` and pand
 ### Choosing the keys
 
 - `on => 'col'` or `on => ['c1', 'c2']` — join on one or more columns present under the same name in both frames. `by` is an accepted synonym (R spelling).
-- `'left.on' => .., 'right.on' => ..` — keys with different names on each side (each a name or an array reference of equal length). `by.x`/`by.y` and `left_on`/`right_on` are accepted synonyms. The result carries a single key column under the **left** name.
+- `'left_on' => .., 'right_on' => ..` — keys with different names on each side (each a name or an array reference of equal length). `by_x`/`by_y` are accepted synonyms; the dotted spellings (`left.on`, `right.on`, `by.x`, `by.y`) are refused as unknown arguments. The result carries a single key column under the **left** name.
 - If neither is given, `merge` performs a **natural join** on the sorted intersection of the two frames' column names (it dies if that intersection is empty).
 
 Keys are matched on the **stringified** cell value. A row whose key cell is `undef` (or absent) never matches, so such a row is dropped by an inner/right join and appears only as a left- or right-only row in a left/outer/right join. This is SQL's rule for `NULL` keys, and R's `merge(..., incomparables = NA)`; note that it is *not* what either reference does by default — R's default (`incomparables = NULL`) and pandas both match a missing key to a missing key.
@@ -4546,11 +4707,11 @@ Keys are matched on the **stringified** cell value. A row whose key cell is `und
 
 A non-key column that appears in **both** frames would collide, so each copy is renamed by appending a suffix: `.x` to the left copy and `.y` to the right by default (R's convention). Override with `suffixes => ['_left', '_right']`.
 
-Under `left.on`/`right.on` the same applies to a right-hand non-key column named after the **left key**, since the single output key column carries the left name: it is suffixed too, as R does with `no.dups = TRUE`. If the suffixes still leave two output columns sharing a name, `merge` dies rather than return a frame with a column missing.
+Under `left_on`/`right_on` the same applies to a right-hand non-key column named after the **left key**, since the single output key column carries the left name: it is suffixed too, as R does with `no.dups = TRUE`. If the suffixes still leave two output columns sharing a name, `merge` dies rather than return a frame with a column missing.
 
 ### Output shape
 
-By default the result matches the shape of `$left` (a HoH left frame yields an AoH, since a joined frame has no single row-name key). Force it with `'output.type' => 'aoh'` or `'output.type' => 'hoa'`.
+By default the result matches the shape of `$left` (a HoH left frame yields an AoH, since a joined frame has no single row-name key). Force it with `'output_type' => 'aoh'` or `'output_type' => 'hoa'`.
 
 ### Example
 
@@ -4701,7 +4862,7 @@ usually fractional. Pass `var_equal => 1` for the classic equal-variance form.
 
 | Option | Default | Meaning |
 |--------|---------|---------|
-| `var_equal` (alias `var.equal`) | `0` (false) | `0` → Welch's test (unequal variances). `1` → pooled-variance test. |
+| `var_equal` | `0` (false) | `0` → Welch's test (unequal variances). `1` → pooled-variance test. The dotted `var.equal` is refused as an unknown argument. |
 | `formula` | *none* | `'response ~ factor'`. Only valid with a **hash** input; an error with an array of arrays. |
 
 ### Data validation
@@ -4730,7 +4891,7 @@ A hash reference with three top-level keys:
 |-----|-------|
 | *factor name* (`Group`, or the formula's factor, e.g. `supp`) | the between-groups row: `Df`, `Sum Sq`, `Mean Sq`, `F value`, `Pr(>F)` |
 | `Residuals` | the within-groups row: `Df`, `Sum Sq`, `Mean Sq` (`Df` is fractional under Welch) |
-| `group.stats` | `{ mean => { group => mean, … }, size => { group => n, … } }` |
+| `group_stats` | `{ mean => { group => mean, … }, size => { group => n, … } }` |
 
 ### Examples
 
@@ -4754,7 +4915,7 @@ A hash reference with three top-level keys:
             "Sum Sq"  => 3.47333333333333,
             "Mean Sq" => 0.353783749200256,
         },
-        group.stats => {
+        group_stats => {
             mean => { ctrl => 0.5, yield => 5.03333333333333 },
             size => { ctrl => 6,   yield => 6 },
         },
@@ -4767,9 +4928,9 @@ A hash reference with three top-level keys:
         [1,   1,   1,   0,   0,   0  ],
     ]);
 
-Identical to the hash form, except `group.stats` is keyed by position:
+Identical to the hash form, except `group_stats` is keyed by position:
 
-    group.stats => {
+    group_stats => {
         mean => { "Index 0" => 5.03333333333333, "Index 1" => 0.5 },
         size => { "Index 0" => 6,                "Index 1" => 6   },
     }
@@ -4787,11 +4948,11 @@ the factor's *name* becomes the top-level key:
         },
         formula => 'len ~ supp',
     );
-    # $res->{supp}, $res->{Residuals}, $res->{group.stats} ...
+    # $res->{supp}, $res->{Residuals}, $res->{'group_stats'} ...
 
 ### Classic equal-variance form
 
-    my $res = oneway_test(\%groups, var_equal => 1);   # or 'var.equal' => 1
+    my $res = oneway_test(\%groups, var_equal => 1);   # 'var.equal' is refused
 
 ### Accuracy
 
@@ -4850,7 +5011,7 @@ a finite number came back.
   arrays is an error.
 - Group order in the output is not guaranteed for hash inputs (it follows hash
   iteration order); read results by name, not position.
-- Avoid naming a factor `Residuals` or `group.stats` in a formula, since those
+- Avoid naming a factor `Residuals` or `group_stats` in a formula, since those
   are reserved top-level keys in the result.
 
 ## p_adjust
@@ -4944,7 +5105,7 @@ key, and reduced with `aggfunc`.
         fill_value  => 0,        # substitute for NA result cells (default: leave undef)
         sort        => 1,        # 0 -> keep first-seen row/column order
         sep         => '.',      # joins pieces of generated column names
-        'output.type' => 'aoh',  # aoa|aoh|hoa|hoh (default: input family)
+        'output_type' => 'aoh',  # aoa|aoh|hoa|hoh (default: input family)
     );
 
 `columns` is required. `values` defaults to every column that is neither
@@ -4984,8 +5145,10 @@ rename inputs.
         aggfunc => [ 'count', 'sum' ]);
     # names: count.2020 count.2021 sum.2020 sum.2021
 
-Rows and columns are sorted by default (numeric if every key is numeric, else
-string); `sort => 0` keeps first-seen order. HoH output labels come from the
+Rows and columns are sorted by default, the same way `agg` sorts its groups:
+each key column numerically when every value in it is numeric, else as strings,
+with undef last and NaN after every number; `sort => 0` keeps first-seen
+order. HoH output labels come from the
 `index` values (`'all'` with no index) and are uniquified with a numeric
 suffix if two joined labels collide. Returns a NEW frame; the input is never
 modified.
@@ -4994,7 +5157,7 @@ modified.
 
 Dies on: undefined data; an odd trailing argument list; an unknown argument; a
 missing `columns`; an `index`/`columns`/`values` column that does not exist; an
-unknown `aggfunc` string; an empty `aggfunc` list; an unknown `output.type`; or
+unknown `aggfunc` string; an empty `aggfunc` list; an unknown `output_type`; or
 a generated duplicate column name.
 
 ## power_t_test
@@ -5016,16 +5179,16 @@ omitting it entirely is how you ask for the power.
 | `n` | Float | `undef` | Number of observations (per group for two-sample, pairs for paired). Must be at least 2. |
 | `delta` | Float | `undef` | True difference in means. Used as `abs(delta)` when the test is two-sided. |
 | `sd` | Float | 1.0 | Standard deviation. |
-| `sig_level` | Float | 0.05 | Significance level (Type I error probability), in `[0, 1]`. Also accepts `sig.level`. |
+| `sig_level` | Float | 0.05 | Significance level (Type I error probability), in `[0, 1]`. R's dotted `sig.level` is refused as an unknown argument. |
 | `power` | Float | `undef` | Power of test (1 minus Type II error probability), in `[0, 1]`. |
 | `type` | String | `"two.sample"` | Type of t-test: `"two.sample"`, `"one.sample"`, or `"paired"`. |
 | `alternative` | String | `"two.sided"` | One- or two-sided test: `"two.sided"`, `"one.sided"`, `"greater"`, or `"less"`. |
 | `strict` | Boolean | 0 (False) | Use strict interpretation of two-sided power calculations. |
 | `tol` | Float | `1e-12` | Relative tolerance on the root when solving for `n`, `delta`, `sd` or `sig_level`. |
 
-The result is a hashref carrying `n`, `delta`, `sd`, `sig.level`, `power`,
-`alternative`, `method`, and -- for `two.sample` and `paired` -- `note`, the same
-fields R's `power.t.test` returns.
+The result is a hashref carrying `n`, `delta`, `sd`, `sig_level`, `power`,
+`alternative`, `method`, and -- for `two.sample` and `paired` -- `note`, the
+fields R's `power.t.test` returns, with `sig.level` spelled `sig_level`.
 
 ### Accuracy
 
@@ -5093,8 +5256,8 @@ That is, take the integral from negative infinity to the point that you want.
 | 1 | `x` | — | A number, or an array reference of numbers. |
 | 2 + | `mean` | `0` | Mean of the distribution. |
 | | `sd` | `1` | Standard deviation. |
-| | `lower` | `1` (true) | `1` = lower tail `P(X <= x)`; `0` = upper tail `P(X > x)`. `'lower.tail'` is an accepted alias. |
-| | `log` | `0` (false) | If true, return the log of the probability. `'log.p'` is an accepted alias. |
+| | `lower` | `1` (true) | `1` = lower tail `P(X <= x)`; `0` = upper tail `P(X > x)`. `'lower_tail'` is an accepted alias; R's dotted `'lower.tail'` is refused. |
+| | `log` | `0` (false) | If true, return the log of the probability. `'log_p'` is an accepted alias; R's dotted `'log.p'` is refused. |
 
 ### Examples
 
@@ -5232,12 +5395,12 @@ the inverse link.
     my $yhat = predict($fit, $newdata);              # predictions on new rows
     my $resp = predict($logit_fit, $newdata);        # glm: response scale (default)
     my $eta  = predict($logit_fit, $newdata, type => 'link');   # linear predictor
-    my $fitted = predict($fit);                      # no newdata -> stored fitted.values
+    my $fitted = predict($fit);                      # no newdata -> stored fitted_values
 
 - **`$model`** — a fitted `lm`/`glm` hashref. `predict` reads its `coefficients`
   (and, for `glm`, its `family`).
 - **`$newdata`** — a HoA, AoH, or HoH of new observations. Omit it (or pass
-  `undef`) to get the model's own `fitted.values` back.
+  `undef`) to get the model's own `fitted_values` back.
 - **`type`** — `'response'` (default) returns predictions on the response scale
   (the inverse link applied — logistic for binomial); `'link'` returns the linear
   predictor. For `lm` and gaussian `glm` the link is the identity, so the two are
@@ -5254,7 +5417,7 @@ fits are put on the response scale with `exp`.
 ### What it returns
 
 A hashref keyed by row name → prediction, exactly like `lm`/`glm` key
-`fitted.values`: a `row.names` column (or HoH key) if present, otherwise 1-based
+`fitted_values`: a `row_names` column (or HoH key) if present, otherwise 1-based
 integer labels.
 
     my $m = lm(formula => 'y ~ x + I(x^2)', data => $train);
@@ -5275,7 +5438,7 @@ with `family => 'binomial'` and `type => 'response'`, `eta` is passed through th
 logistic function `1 / (1 + exp(-eta))`; otherwise `eta` is returned as is.
 
 A consequence worth noting: predicting on the *training* data reproduces the
-model's `fitted.values` for any model built from continuous terms, interactions,
+model's `fitted_values` for any model built from continuous terms, interactions,
 or `I()` transforms.
 
 ### Good to know
@@ -5302,7 +5465,7 @@ Validated numerically against R.
     # one sample vs a target probability (default 0.5)
     my $r = prop_test(83, 100);              # 83 successes in 100 trials
     printf "p-hat=%.2f  95%% CI %.3f–%.3f  p=%.4g\n",
-        $r->{estimate}[0], $r->{'conf.int'}[0], $r->{'conf.int'}[1], $r->{p.value};
+        $r->{estimate}[0], $r->{'conf_int'}[0], $r->{'conf_int'}[1], $r->{'p_value'};
 
     # two groups: difference in proportions + CI
     my $two = prop_test([83, 90], [100, 100]);
@@ -5324,7 +5487,7 @@ group) or as two scalars for a single sample.
 | *trials* | `ArrayRef` or `Number` | *None (Required)* | Count of trials per group (positional arg 2); same length as *successes*. | `[100, 100]`, `100` |
 | `p` | `Number` or `ArrayRef` | `0.5` (one sample) / pooled | Null probability. A single value or one per group; when omitted with ≥2 groups, equality of proportions is tested against the pooled rate. | `0.7`, `[0.5, 0.6]` |
 | `alternative` | `String` | `'two.sided'` | `'two.sided'`, `'less'`, or `'greater'`. Forced two-sided for `k > 2` groups or two groups tested against a given `p`. | `'greater'` |
-| `conf.level` | `Number` | `0.95` | Confidence level for the interval (one or two groups). | `0.99` |
+| `conf_level` | `Number` | `0.95` | Confidence level for the interval (one or two groups). | `0.99` |
 | `correct` | `Boolean` | `1` | Apply the Yates continuity correction (`k ≤ 2` only). | `0` |
 
 ### Output variables
@@ -5333,11 +5496,11 @@ group) or as two scalars for a single sample.
 | --- | --- | --- | --- |
 | `statistic` | `Double` | Pearson chi-square statistic (X-squared). | `1.5414` |
 | `parameter` | `Integer` | Degrees of freedom. | `1` |
-| `p.value` | `Double` | The p-value. | `0.2144` |
+| `p_value` | `Double` | The p-value. | `0.2144` |
 | `estimate` | `ArrayRef` | Sample proportion(s), one per group. | `[0.83, 0.90]` |
-| `conf.int` | `ArrayRef` | For one group, a Wilson score interval for the proportion; for two groups, a Wald interval for the difference `p1 - p2`. Absent for `k > 2`. | `[-0.174, 0.034]` |
+| `conf_int` | `ArrayRef` | For one group, a Wilson score interval for the proportion; for two groups, a Wald interval for the difference `p1 - p2`. Absent for `k > 2`. | `[-0.174, 0.034]` |
 | `alternative` | `String` | The alternative hypothesis used. | `'two.sided'` |
-| `conf.level` | `Double` | The confidence level used. | `0.95` |
+| `conf_level` | `Double` | The confidence level used. | `0.95` |
 | `method` | `String` | Human-readable description of the test performed. | `'2-sample test for equality of proportions with continuity correction'` |
 
 ## qcut
@@ -5564,14 +5727,14 @@ error. `undef` values in `x` are dropped.
 
 ## rank
 
-Rank values like R's `rank()`. Takes flat scalars and/or array refs (like `min`), with optional trailing `ties.method` / `na.last` options. Returns the list of ranks in input order.
+Rank values like R's `rank()`. Takes flat scalars and/or array refs (like `min`), with optional trailing `ties_method` / `na_last` options. Returns the list of ranks in input order.
 
     my @r = rank(3, 1, 4, 1, 5);                           # 3, 1.5, 4, 1.5, 5
-    my @r = rank([3, 1, 4, 1, 5], 'ties.method' => 'min'); # 3, 1, 4, 1, 5
+    my @r = rank([3, 1, 4, 1, 5], 'ties_method' => 'min'); # 3, 1, 4, 1, 5
 
 Ranks are 1-based; `average` may return half-ranks. `undef` and NaN are treated as NA.
 
-### ties.method
+### ties_method
 
 How tied values share ranks (default `average`):
 
@@ -5584,7 +5747,7 @@ How tied values share ranks (default `average`):
 | `last`    | ties keep reverse input order  | 3, 2, 4, 1, 5         |
 | `random`  | ties broken randomly (srand-aware) | varies            |
 
-### na.last
+### na_last
 
 How `undef`/NaN elements are placed (default `true`):
 
@@ -5629,29 +5792,31 @@ minimal example:
 ### options
 | Option | Description | Example |
 | -------- | ------- | ------- |
-|`comment` | Comment character, by default `#`; lines beginning with it are skipped | `comment => '%'` |
-|`output.type`| data type for output: array of hash (the default), array of array, hash of array, or hash of hash | `'output.type' => 'aoh'`|
-|`filter`| Only take in rows matching a filter | `filter => { Sex => sub {$_ eq 'f'} }`|
-|`row.names` | include row names in retrieved data; off by default | |
-|`auto.row.names` | read R's default `write.table` output, where the header is one field short of every data row because R writes no label for the row-names column: the leading field of each row becomes a row-names column. `1` names it `row_name`, a string names it whatever you pass. Off by default, so a genuinely ragged file is still an error | `'auto.row.names' => 1` |
+|`comment` | Comment marker, by default `#` (`##` for a VCF); lines beginning with it are skipped. It may be more than one character | `comment => '%'` |
+|`output_type`| data type for output: array of hash (the default; hash of hash for a VCF), array of array, hash of array, or hash of hash | `'output_type' => 'aoh'`|
+|`filter`| Only take in rows matching a filter; see below for how a key picks its column | `filter => { Sex => sub {$_ eq 'f'} }`|
+|`row_names` | `hoh` only: the column whose values key the rows (default: the first column). An error with any other `output_type`, where the column is read as an ordinary one | `'row_names' => 'id'` |
+|`auto_row_names` | read R's default `write.table` output, where the header is one field short of every data row because R writes no label for the row-names column: the leading field of each row becomes a row-names column. `1` names it `row_name`, a string names it whatever you pass. Off by default, so a genuinely ragged file is still an error | `'auto_row_names' => 1` |
 |`sep` | field separator: a literal string, or a `qr//` regex (see below); synonym with `delim`| `sep => "\t"`, `sep => qr/\s+/` |
 | `delim`| field separator: a literal string, or a `qr//` regex; synonym with `sep`| `delim => "\t"` |
 | `header` | `1` (the default): the first line holds the column names. `0`, or perl's false `''`: the first line is data, as R's `header = FALSE` and pandas' `header=None` | `header => 0` |
-| `col.names` | an array reference of column names. With `header => 0` it names the columns, which are otherwise `V1`, `V2`, … as in R; with a header it replaces the header's names | `'col.names' => ['id', 'name']` |
+| `col_names` | an array reference of column names. With `header => 0` it names the columns, which are otherwise `V1`, `V2`, … as in R; with a header it replaces the header's names | `'col_names' => ['id', 'name']` |
 | `quote` | `'"'` (the default): a double quote starts a quoted field. `''`: quotes are ordinary text, as R's `quote = ""` and pandas' `quoting=csv.QUOTE_NONE` | `quote => ''` |
-| `sheet`| which worksheet to read from an `.xlsx` file: a 1-based index or a sheet name (default: first sheet). Ignored for text files | `sheet => 'Sheet2'` |
-| `na.strings` | field texts that mean "missing"; a string or an array reference of strings, mapped to `undef`. Off by default | `'na.strings' => 'NA'` |
-| `na_values` | pandas' spelling of `na.strings` | `na_values => ['NA', 'N/A']` |
-| `undef.val` | `write_table`'s spelling of `na.strings`, so a round trip can use one name on both halves | `'undef.val' => 'NA'` |
+| `sheet`| which worksheet to read from an `.xlsx` file: a sheet name, or a 1-based index when no sheet has that name (default: first sheet). An error for any other file | `sheet => 'Sheet2'` |
+| `na_strings` | field texts that mean "missing"; a string or an array reference of strings, mapped to `undef`. Off by default | `'na_strings' => 'NA'` |
+| `na_values` | pandas' spelling of `na_strings` | `na_values => ['NA', 'N/A']` |
+| `undef_val` | `write_table`'s spelling of `na_strings`, so a round trip can use one name on both halves | `'undef_val' => 'NA'` |
+| `explode` | VCF only. `1` (the default): split each sample column into one column per `FORMAT` key, and return a hoh keyed by `CHROM:POS:REF:ALT`; `0`: the file's own columns. See [VCF files](#vcf-files) | `explode => 0` |
+| `colClasses` | R's: store the columns you name as numbers rather than text, which takes about a third of the memory. A hash by column name, a list by position, or one class for every column. See [numeric columns](#numeric-columns-colclasses) | `colClasses => { age => 'integer', bmi => 'numeric' }` |
 output types can be AOH (aoh), AOA (aoa), HOA (hoa), HOH (hoh)
 
-    read_table($filename, 'output.type' => 'aoh');
-    read_table($filename, 'output.type' => 'aoa');
-    read_table($filename, 'output.type' => 'hoa');
+    read_table($filename, 'output_type' => 'aoh');
+    read_table($filename, 'output_type' => 'aoa');
+    read_table($filename, 'output_type' => 'hoa');
 
-An AoA's first row is the header, then one array per data row, every row in file column order. That is the shape `write_table` reads an AoA as, so the two round-trip. It is also the only output type that keeps every field when the header repeats a name, so it does not give the "later values win" warning. Nothing labels an AoA's rows, so `row.names` is an error with it; a row-names column is read as an ordinary column.
+An AoA's first row is the header, then one array per data row, every row in file column order. That is the shape `write_table` reads an AoA as, so the two round-trip. It is also the only output type that keeps every field when the header repeats a name, so it does not give the "later values win" warning. Nothing labels an AoA's rows, so `row_names` is an error with it; a row-names column is read as an ordinary column.
 
-    read_table('taxa.tsv', 'output.type' => 'aoa');
+    read_table('taxa.tsv', 'output_type' => 'aoa');
     # [ ['taxid', 'genus', 'species'], ['10090', undef, 'Mus musculus'], ['9606', 'Homo', 'Homo sapiens'] ]
 and, like Text::CSV_XS, filters can be applied in order to save RAM on big files:
 
@@ -5660,17 +5825,55 @@ and, like Text::CSV_XS, filters can be applied in order to save RAM on big files
         filter => {
             Sex => sub {$_ eq 'f'} # where "Sex" is the column name, and "$_" is the value for that column
         },
-        'output.type' => 'aoh'
+        'output_type' => 'aoh'
     );
+
+A key of `filter` picks its column this way:
+
+  - `0` is the whole row: `$_` is the array of the row's fields.
+  - A column's name is that column. When the header repeats a name, it is the
+    last column with it, the one whose value the row keeps.
+  - Any other number is a field, counting from 1, as in Text::CSV_XS. A name
+    is tried first, so a column called `2021` is filtered on as
+    `filter => { 2021 => ... }` whatever its position.
+  - Two keys for the same column, such as `1` and its name, both run, in the
+    order of their keys sorted as strings. A row is kept only if every filter
+    returns true.
+
+Each filter is also passed the row's fields and a hash of the row by name, as
+`$_[0]` and `$_[1]`, and a change it makes to `$_` is written back into the
+row. Inside a filter `%_` is that same hash.
+
+The filters are called from the parser itself, so a filtered read costs little
+more than the filter calls: a 300,000-row, 5-column CSV read as an array of
+hashes takes about 0.25 s with one filter and 0.13 s with none. Up to 0.3212
+the same filtered read took 0.63 s.
 the default delimiter is `,`
-Suffixes `.csv` and `.tsv` are automatically detected from file names, but if specified, are overridden by `delim` and/or `sep`. `sep` is given priority.
+Suffixes `.csv`, `.tsv` and `.vcf` are automatically detected from file names, but if specified, are overridden by `delim` and/or `sep`. `sep` is given priority. A `.vcf` also changes the default `comment`; see [VCF files](#vcf-files).
 
 A UTF-8 byte-order mark at the start of a text file, which Excel's "CSV UTF-8"
 export writes, is dropped rather than read as part of the first column's name,
-as pandas' `read_csv` drops it. Lines always end at a newline whatever `$/` is
+as pandas' `read_csv` drops it.
+
+A file is read as bytes and its fields come back as bytes; nothing is decoded.
+Text you pass in to be compared with a field — a `sep`, a `comment` marker, an
+`na_strings` token, a `filter` key, `row_names` or a `sheet` name — is
+compared as UTF-8 bytes when perl holds it as characters, as it does under
+`use utf8` or for a string you have decoded. So `'na_strings' => '—'` under
+`use utf8` matches an em dash in a UTF-8 file. A `qr//` separator holding such
+characters matches each line as UTF-8 instead, and a line that is not valid
+UTF-8 is then an error rather than misread. Lines always end at a newline whatever `$/` is
 set to, so a `local $/;` in the calling code does not change what is read.
-With `'output.type' => 'hoh'` a file whose only column is the row name gives
+Lines may end in LF or CRLF, and a file whose lines end in a bare CR, as
+classic Mac OS wrote them, is read as R and pandas read it. The start of the
+file is read 64 KB at a time, up to 1 MB, until a CR turns up; if no LF has by
+then, the file is split on CR. In any other file a lone CR outside quotes is
+dropped.
+With `'output_type' => 'hoh'` a file whose only column is the row name gives
 one empty hash per row, as R's `read.table` gives a data frame of zero columns.
+Rows that repeat an earlier row's name overwrite it, later values winning, and
+`read_table` warns once for the file, with how many rows did it and the first
+of them.
 ### regular-expression separators
 A string `sep` is always a literal: `sep => '\s+'` splits on the three
 characters backslash, `s` and plus. Pass a `qr//` to split on a pattern instead:
@@ -5682,7 +5885,7 @@ characters backslash, `s` and plus. Pass a `qr//` to split on a pattern instead:
 Everything else reads as it does with a literal separator: quoted fields
 (a separator inside quotes is text, `""` is one quote, a quoted field may run
 over lines), comments and commented-out headers, blank lines, a byte-order
-mark, CRLF line ends, `filter`, `row.names`, `auto.row.names`, `na.strings` and
+mark, CRLF and CR line ends, `filter`, `row_names`, `auto_row_names`, `na_strings` and
 all four output types. Details worth knowing:
 
 - **`qr/\s+/` is whitespace-delimited**, as `sep=r"\s+"` is in pandas and
@@ -5698,24 +5901,24 @@ all four output types. Details worth knowing:
 - A pattern that can match the empty string, such as `qr/\s*/`, is refused,
   since it would cut between every character.
 - In a whitespace-delimited file, a comment line with as many words as the data
-  has columns will be taken for a commented-out header, since that is how one
-  is recognised; see *commented-out headers* below.
+  has columns can be taken for a commented-out header, since that is how one
+  is recognised; see *commented-out headers* below for when it is.
 - An `.xlsx` file ignores `sep` and `quote`, whether a string or a pattern.
 - The separators are found by perl's regex engine, called from the same C
   parser a literal separator uses, so a regex read costs little more than a
   literal one: on a 300,000 x 5 CSV, `qr/,/` takes 0.17 s and `','` 0.14 s. A
   string is still the faster choice for a fixed separator, and a pattern that
   has to backtrack, such as `qr/\s*,\s*/` (0.34 s), costs more.
-### files with no header, and files with stray quotes (`header`, `col.names`, `quote`)
+### files with no header, and files with stray quotes (`header`, `col_names`, `quote`)
 `header => 0` reads the first line as data. The columns are named by
-`col.names`, or else `V1`, `V2`, … as R names them, counted from the first row:
+`col_names`, or else `V1`, `V2`, … as R names them, counted from the first row:
 
     my $d = read_table('pairs.csv', header => 0);                 # V1, V2, ...
-    my $d = read_table('pairs.csv', header => 0, 'col.names' => ['id', 'score']);
+    my $d = read_table('pairs.csv', header => 0, 'col_names' => ['id', 'score']);
 
-`col.names` with a header (the default) renames the header's columns instead;
+`col_names` with a header (the default) renames the header's columns instead;
 if the two differ in length, `read_table` warns, as R does, and uses
-`col.names`. With `header => 0`, a line starting with the comment marker is
+`col_names`. With `header => 0`, a line starting with the comment marker is
 always a comment, even `#text` with no space after the marker, as in R; with a
 header, such a line can be a commented-out header, as described below.
 
@@ -5747,8 +5950,8 @@ Formats that never quote, such as NCBI's taxonomy dumps, want both options:
     # NCBI fullnamelineage.dmp: "id\t|\tname\t|\tlineage\t|", no header
     my $lineage = read_table('fullnamelineage.dmp',
         sep => qr/\t\|\t?/, header => 0, quote => '',
-        'col.names' => [qw(tax_id tax_name lineage end)],   # 'end' is the empty field after the last "\t|"
-        'output.type' => 'hoa');
+        'col_names' => [qw(tax_id tax_name lineage end)],   # 'end' is the empty field after the last "\t|"
+        'output_type' => 'hoa');
 
 On that 3,015,956-line, 900 MB file this takes 2.6 s. A literal
 `sep => "\t|\t"` takes 1.6 s, but leaves each line's closing `"\t|"` on the
@@ -5776,12 +5979,108 @@ option to set:
     checksum, or anything but NUL padding after the last member dies naming
     the file.
   - Both need only core modules (`Compress::Raw::Zlib` and
-    `Compress::Raw::Bzip2`). xz, zstd and `.zip` are not read (an `.xlsx`,
-    which is a zip archive, is).
+    `Compress::Raw::Bzip2`). xz, LZMA, zstd and lzop files are recognised by
+    their first bytes, as R recognises them, and refused with a message that
+    names the format, rather than read as text. `.zip` is not read either (an
+    `.xlsx`, which is a zip archive, is).
   - [`write_table`](#write_table) writes `.gz` and `.bz2` files that read
     back through this.
 
-### missing values (`na.strings` / `na_values` / `undef.val`)
+### VCF files
+A file named `.vcf`, `.vcf.gz` or `.vcf.bgz`, in any case, is read as a VCF
+with no options. Each sample's column is split ("exploded") into one column per
+`FORMAT` key, and the records come back as a hash of hashes keyed by
+`CHROM:POS:REF:ALT`:
+
+    my $variants = read_table('calls.vcf.gz');
+    # { '20:14370:G:A' => {
+    #       CHROM => '20', POS => '14370', ID => 'rs6054257', REF => 'G', ALT => 'A',
+    #       QUAL => '29.1', FILTER => '.', INFO => 'NS=3;DP=14;AF=0.5;HOMSEQ;DB',
+    #       'NA00001.GT' => '0|0', 'NA00001.GQ' => '48', 'NA00001.DP' => '1',
+    #       'NA00001.HQ' => '25,30', 'NA00001.CNL' => '10,20',
+    #       'NA00002.GT' => '1|0', ...  },
+    #   '20:17330:T:A' => { ..., 'NA00001.CNL' => undef, ... },   # no CNL in this record's FORMAT
+    #   ... }
+
+  - **Defaults.** `sep` is a tab and `comment` is `##`, so the `##`
+    meta-information lines are skipped and the `#CHROM POS ID ...` line is the
+    header. The `#` comes off `#CHROM`, so the first column is `CHROM`.
+  - **The columns.** The eight fixed columns come first, then
+    `<sample>.<key>` for every sample and every key. `FORMAT` can differ from
+    record to record (GATK writes `GT:AD:DP:GQ:PL` on most and
+    `GT:AD:DP:GQ:PGT:PID:PL` on phased ones), so the keys are those of every
+    record read, in the order each first appears. A key missing from a
+    record's `FORMAT` is `undef`, and so is a value a sample leaves off the end,
+    which the VCF spec allows (`./.` under `GT:AD:DP` is `GT` alone). `FORMAT`
+    and the unsplit sample columns are not returned. A sample with *more*
+    values than its `FORMAT` has keys is an error.
+  - **Values are text.** `0/1`, `34,7` and `73,0,1043` are returned as
+    written: `AD`, `PL` and `INFO` are not split further, and `.` is not
+    missing unless you pass `'na_strings' => '.'`, which then applies to the
+    split values as well as to whole fields.
+  - **The key.** `CHROM:POS:REF:ALT` identifies a record in practice; `ID` is
+    usually `.`. A key that repeats is warned about once, later records
+    winning, as with any hoh. `'row_names' => 'POS'`, or any other column
+    including an exploded one, keys the hash by that column instead.
+  - **Other shapes.** `'output_type'` still gives an aoa, aoh or hoa of the
+    same columns. An aoa is the one to hand to `write_table`.
+  - **`filter` runs before the split**, while the file is read, so it sees the
+    file's own columns: `FORMAT` and each sample's text whole
+    (`filter => { FORMAT => sub { /PGT/ } }`), not `NA00001.GT`. The columns
+    are the keys of the records it kept.
+  - **`col_names`** renames the file's columns before the split, so a
+    renamed sample names its exploded columns.
+  - **`explode => 0`** returns the file's own columns instead, an aoh by
+    default, with `FORMAT` and the samples unsplit. `header => 0` reads the
+    file that way too, having no `FORMAT` column to split by, and its
+    `#CHROM` line is the first data row, `#` and all. `explode` is refused for
+    a file not named as a VCF.
+
+Passing `sep` or `comment` overrides the VCF default, and `comment => '#'`
+reads the same table. Under any other name, such as `.tsv` or `.txt`, the file
+is not a VCF to `read_table`: with `comment => '##'` the meta lines are still
+skipped, but the first column is `#CHROM` and nothing is split.
+
+The split is done in C. On a 3,499,678-record single-sample GATK `.vcf.gz`,
+the exploded hoh takes 11.7 s, against 9.1 s for the file's own columns as a
+hoh, and an exploded aoa 8.4 s, against 7.0 s for the plain one.
+
+### numeric columns (`colClasses`)
+Every field is read as text unless you say otherwise. On a 64-bit perl a
+short number held as text costs about 70 bytes, and held as a number about
+24. `colClasses` takes R's
+spelling and R's meaning: name the columns that are numbers, and they are
+stored as numbers as the file is read.
+
+    my $d = read_table('cohort.csv', colClasses => { age => 'integer', bmi => 'numeric' });
+    my $d = read_table('cohort.csv', colClasses => [ 'character', 'integer', 'numeric' ]);
+    my $d = read_table('counts.tsv', colClasses => 'integer');
+
+| class | stored as | accepts |
+| --- | --- | --- |
+| `numeric` (also `double`, `real`) | a floating-point number | a decimal number with an optional sign and exponent, or `Inf`, `Infinity` or `NaN` in any case, with blanks either side allowed |
+| `integer` | an integer | an optional sign and digits, a leading blank allowed and nothing after them, within perl's integer range |
+| `character`, or `undef` | the text | anything (the default) |
+
+- A hash names columns; one the file does not have is warned about, as R
+  warns about it, and otherwise ignored. A list goes by position and is
+  recycled when it is short, as R recycles it; a single class applies to every
+  column. In a hoh the row-name column counts, and a declared one keys each row
+  by its number, so `004` becomes the row named `4`.
+- An empty field and an `na_strings` token are `undef` in any column. `NA` is
+  missing only when `na_strings` names it.
+- A field that is not a number of the kind declared is an error naming the
+  column, the data row and the text, rather than a silent `0` or `undef`.
+- A `filter` still sees each field's text; the rows it keeps are converted.
+- Where it differs from R: an integer may be anything that fits perl's integer
+  (64 bits on most perls), where R's stops at 2147483647; a hexadecimal
+  number such as `0x1A` is refused, where R reads it; and an exponent must
+  have digits, where R reads `1e` as `1`.
+
+On a 300,000-row CSV with three of its five columns declared, the table took
+74 MB instead of 116 MB, and the read 0.095 s instead of 0.086 s.
+
+### missing values (`na_strings` / `na_values` / `undef_val`)
 An empty field is always read as `undef`. Any *other* text that a file uses to
 mean "missing" — `NA`, `N/A`, `NULL`, `-`, `-999` — has to be named. It is one
 option under three names, so you can spell it whichever way the rest of your
@@ -5789,31 +6088,31 @@ code already does:
 
 | spelling | whose | use it when |
 | --- | --- | --- |
-| `na.strings` | R's `read.table` | porting R, or with no reason to prefer another |
+| `na_strings` | R's `read.table` | porting R, or with no reason to prefer another |
 | `na_values` | pandas' `read_csv` | porting Python |
-| `undef.val` | this module's `write_table` | reading back a file this module wrote |
+| `undef_val` | this module's `write_table` | reading back a file this module wrote |
 
 All three take a string or an array reference of strings, all three mean
 exactly the same thing, and passing more than one is an error, exactly as `sep`
 and `delim` together are:
 
-    my $d = read_table('cohort.csv', 'na.strings' => 'NA');
+    my $d = read_table('cohort.csv', 'na_strings' => 'NA');
     my $d = read_table('cohort.csv', na_values    => ['NA', 'N/A', 'NULL', '-']);
-    my $d = read_table('cohort.csv', 'undef.val'  => 'NA');
+    my $d = read_table('cohort.csv', 'undef_val'  => 'NA');
 
 This matters because the tokens are otherwise ordinary strings, and Perl
 numifies a string to `0`: an unnamed `NA` in a numeric column does not stop
 `mean` or `sd`, it silently drags the answer toward zero (with a warning, which
 is fatal under `warnings FATAL => 'all'` and easy to miss otherwise). It also
-gives [`write_table`](#write_table)'s `undef.val` an inverse, so a file this
+gives [`write_table`](#write_table)'s `undef_val` an inverse, so a file this
 module wrote can be read back with its missing cells intact — which is what the
 third spelling is for, letting both halves of the round trip name the token the
 same way:
 
-    write_table($rows, 'out.csv', 'undef.val' => 'NA');
-    my $back = read_table('out.csv', 'undef.val' => 'NA');   # undef again
+    write_table($rows, 'out.csv', 'undef_val' => 'NA');
+    my $back = read_table('out.csv', 'undef_val' => 'NA');   # undef again
 
-Note that `write_table`'s `undef.val` is one token, being what it writes, while
+Note that `write_table`'s `undef_val` is one token, being what it writes, while
 `read_table`'s accepts a list, being every token it should recognise.
 
 Details worth knowing:
@@ -5823,7 +6122,7 @@ Details worth knowing:
     the empty field unless you ask, so a literal `NA` stays a string in code
     that predates this option.
   - **Your list replaces the set, it does not extend one** — R's behaviour.
-    `'na.strings' => 'baz'` maps `baz` and leaves `NA` and `NaN` alone.
+    `'na_strings' => 'baz'` maps `baz` and leaves `NA` and `NaN` alone.
     pandas would map all three.
   - **The match is on the exact field text**, case-sensitively and with no
     whitespace stripped, which is also R's rule: `' NA'` is not `'NA'`, and
@@ -5832,7 +6131,7 @@ Details worth knowing:
   - The header is never mapped, so a column may legitimately be named `NA`.
   - A `filter` runs *after* the mapping, so it sees `undef` rather than the
     token; select the present rows with `sub { defined $_ }`.
-  - It applies to `.xlsx` reads too, and to all three `output.type` shapes. For
+  - It applies to `.xlsx` reads too, and to all three `output_type` shapes. For
     `hoh`, a mapped row-name cell is a missing row name and is refused the same
     way an empty one is.
 
@@ -5843,10 +6142,45 @@ A header that is itself commented out is detected and used automatically, so
     1a2b	10
     3c4d	20
 reads as though the header were `PDB, score` (the comment marker and any
-following whitespace are stripped from the first column). A commented line is
-only taken as the header when its field count matches the data, so ordinary
-leading comments are never mistaken for one. You may name such a column in a
-`filter` either as it appears in the file or by its clean name:
+following whitespace are stripped from the first column). A commented first
+line is only taken as the header when its field count matches the line after
+it, and that line looks like data: a number or an `na_strings` token in one of
+its fields, or nothing but empty fields. So
+
+    # written by foo, v2
+    id,val
+    1,2
+
+reads with the header `id, val`, as R and pandas read it: the comment is as
+wide as the header, but `id,val` has no number in it, so it is the header and
+the comment is a comment. The rule cannot tell a commented-out header over rows
+with no numbers in them from a comment, and reads the first of those rows as
+the header.
+
+When several comment lines come before the header, it is the last of them,
+the one next to the data, that is tried as the header, and the rest are
+comments:
+
+    #written by foo
+    #id,val
+    1,2
+
+reads with the header `id, val`. If the last one fails the test above, the
+line after the comments is the header, so R's own
+
+    #comment
+    #another
+    C1	C2	C3
+    "Panel"	"Area Examined"	"# Blemishes"
+
+reads with the header `C1, C2, C3`, as `read.table(header = TRUE)` reads it.
+Only lines before the header are looked at this way: a line starting with the
+comment marker *after* the header, if the marker hugs its text (`#3,4`), is a
+data row, while one with a blank after the marker (`# note`) is a comment
+wherever it is.
+
+You may name a commented-out header's column in a `filter` either
+as it appears in the file or by its clean name:
 
     read_table('ranks.tabular.tsv', filter => { '# PDB' => sub { $_ == 2 } });
 
@@ -5855,17 +6189,21 @@ A file whose name ends in `.xlsx` is read directly, with **no extra
 dependencies** — the core `IO::Uncompress::Unzip` module pulls the parts out of
 the (zipped) workbook and the worksheet XML is parsed in XS, through the same
 fast path a delimited file takes: `read_table` reads the header in Perl and the
-rows are assembled in C. All `output.type`, `filter`, and `row.names` options
+rows are assembled in C. All `output_type`, `filter`, and `row_names` options
 work exactly as they do for text files:
 
     my $data = read_table('samples.xlsx');
     my $data = read_table('samples.xlsx', sheet => 'Results');   # by name
     my $data = read_table('samples.xlsx', sheet => 2);           # 1-based index
 
+A `sheet` is looked up as a name first and as a number only when no sheet has
+that name. So in a workbook whose sheets are `2024` and `2023`,
+`sheet => 2023` is the sheet named `2023`, and `sheet => 2` is the second.
+
 **Multiple worksheets.** If the workbook has more than one worksheet and no
 `sheet` is given, `read_table` returns a **hashref keyed by worksheet name**,
 each value being that sheet parsed just as a single table would be (honouring
-`output.type`, `filter`, etc.):
+`output_type`, `filter`, etc.):
 
     my $book = read_table('report.xlsx');   # { Sheet1 => [...], Sheet2 => [...] }
     my $rows = $book->{Results};
@@ -5876,13 +6214,16 @@ returns that one table directly (not wrapped in a hash).
 Limitations: dates and times are returned as their raw Excel serial numbers
 (cell number formats are not applied); shared-string rich-text runs are
 concatenated into a single value; a cell that has formatting but no value is a
-blank, and blanks past a row's last value do not add columns (readxl and pandas
-leave them out too); and two things the format does not allow are
+blank, whether it is written `<c s="2"/>`, `<c s="2"></c>` or with an empty
+`<v></v>`, and blanks past a row's last value do not add columns (readxl and
+pandas leave them out too); and two things the format does not allow are
 read as if they were not there — a cell reference past `XFD`, the last of the
 16,384 columns a worksheet has, places the cell in the next column instead, and
 a numeric character reference above `&#x7FFFFFFF;` is left in the text rather
 than decoded. The `sep`, `delim`, and `comment` options do not
-apply to `.xlsx` files. Tested in `t/read_table.xlsx.t` and
+apply to `.xlsx` files, so a cell such as `#id` is read as it is. A workbook
+whose elements carry a namespace prefix (`<x:row>`, as the Open XML SDK writes
+them) is read like any other. Tested in `t/read_table.xlsx.t` and
 `t/read_table.xlsx.parser.t`.
 
 ## rename_cols
@@ -5970,13 +6311,13 @@ well a score separates cases from non-cases.
 
     my $r = roc(\@scores, \@labels);
     print $r->{auc};                 # 0.848
-    print "@{ $r->{auc.ci} }";       # 0.649 1.000
+    print "@{ $r->{'auc_ci'} }";     # 0.649 1.000
     my $cut = $r->{youden};          # best operating point
     print "$cut->{threshold}: sens=$cut->{sensitivity} spec=$cut->{specificity}";
 
 Options: `positive` (positive-class label, default `1`), `direction` (`'>'`
-default, or `'<'`), `conf.level` (default `0.95`). Result keys: `auc`, `auc.se`,
-`auc.ci`, `n.pos`, `n.neg`, `youden`, and `curve` (one point per threshold). For
+default, or `'<'`), `conf_level` (default `0.95`). Result keys: `auc`, `auc_se`,
+`auc_ci`, `n_pos`, `n_neg`, `youden`, and `curve` (one point per threshold). For
 just the number, use [`auc`](#auc).
 
 ## rownames
@@ -6255,8 +6596,7 @@ tests to see if an array reference is normally distributed, returns a p-value an
 and returns the hash reference:
 
     {
-    p.value     0.96717393596804,
-    p.value     0.96717393596804,
+    p_value     0.96717393596804,
     statistic   0.986762155447719,
     W           0.986762155447719
     }
@@ -6443,8 +6783,8 @@ curve per group:
     print $s->{median};                 # median survival time
     print "@{ $s->{surv} }";            # S(t) at each time
 
-Option `conf.level` (default `0.95`). Each stratum has arrays `time`, `n.risk`,
-`n.event`, `n.censor`, `surv`, `std.err`, `lower`, `upper`, plus `median`, `n`,
+Option `conf_level` (default `0.95`). Each stratum has arrays `time`, `n_risk`,
+`n_event`, `n_censor`, `surv`, `std_err`, `lower`, `upper`, plus `median`, `n`,
 and `events`. Compare curves with [`logrank_test`](#logrank_test); model
 covariate effects with [`coxph`](#coxph).
 
@@ -6475,13 +6815,13 @@ errors that are wrong for a complex sample.
 | `fpc` | *none* | Finite population correction: the population size of the stratum, or the sampling fraction (a value at most 1), as `svydesign(fpc = )` reads it. |
 | `nest` | `0` | `svydesign(nest = TRUE)`: PSU labels are only unique within a stratum. |
 | `offset` | *none* | A column, an expression or an array ref. |
-| `conf.level` | `0.95` | Level of `conf.int`. |
+| `conf_level` | `0.95` | Level of `conf_int`. |
 
 The result holds `coefficients`, `summary` (per term `Estimate`, `Std. Error`,
-`t value`, `Pr(>|t|)`), `vcov`, `conf.int`, `terms`, `fitted.values`,
-`deviance`, `dispersion` (`summary.svyglm`'s), `df.residual`, `degf` (the
+`t value`, `Pr(>|t|)`), `vcov`, `conf_int`, `terms`, `fitted_values`,
+`deviance`, `dispersion` (`summary.svyglm`'s), `df_residual`, `degf` (the
 design degrees of freedom, PSUs minus strata, which the t tests use), `rank`,
-`nobs`, `n.psu`, `n.strata`, `converged` and `iter`. Only single-stage designs
+`nobs`, `n_psu`, `n_strata`, `converged` and `iter`. Only single-stage designs
 are implemented (the first stage's PSUs and strata, as `survey` uses by
 default). Validated against `survey`'s own tests on the `api` data.
 
@@ -6501,7 +6841,7 @@ and the test follows: t-test / ANOVA for continuous (Wilcoxon / Kruskal with
 `nonparametric => 1`), chi-squared for categorical. Options: `by`, `vars`
 (which columns), `types` (override a column's type), `nonparametric`, `digits`,
 `pct_digits`. Each returned row has `variable`, `level`, one column per group,
-`Overall`, and — on a variable's row — `p.value` and `test`.
+`Overall`, and — on a variable's row — `p_value` and `test`.
 
 ## t_test
 
@@ -6518,12 +6858,12 @@ or 2-sample:
 
 returns a hash reference, which looks like:
 
-    conf.int     => [
+    conf_int     => [
         -0.06672889, 0.25672889
     ],
     df        => 5,
     estimate  => 0.095,
-    p.value   => 0.19143688433660,
+    p_value   => 0.19143688433660,
     statistic => 1.50996688705414
 
 the two groups compared can be specified, though not necessarily, as `x` and `y`, just like in R:
@@ -6544,7 +6884,7 @@ standard errors:
     statistic = (estimate - mu) / SE
 
 `df` says which t distribution that statistic would follow if the null were
-true, and `p.value` is the area of that distribution further out than the
+true, and `p_value` is the area of that distribution further out than the
 statistic — the chance of landing this far from `mu`, or further, when `mu` is
 right. Below, R's `sleep` data as a paired test: ten patients, each measured on
 two drugs, so the ten paired differences are one sample and `mu = 0` is "the two
@@ -6557,32 +6897,32 @@ one of its two tails, magnified until it can be seen.
 
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `x` | Array Reference | Required | The first vector of data. Must have at least 2 non-missing elements (1 is enough for the `y` of a `var_equal` test). |
+| `x` | Array Reference | Required | The first vector of data. Must have at least 2 non-missing elements, except in a `var_equal` test, where either `x` or `y` may have 1. |
 | `y` | Array Reference | `undef` | The second vector of data. Required for two-sample or paired tests. An explicit `undef` means "absent", as R's `y = NULL` does; anything else that is not an array reference is a fatal error rather than a silently ignored argument. |
-| `mu` | Float | 0.0 | The true value of the mean (or difference in means) for the null hypothesis. Shifts `statistic` and `p.value`; `conf.int` is centred on the estimate and does not move. |
+| `mu` | Float | 0.0 | The true value of the mean (or difference in means) for the null hypothesis. Shifts `statistic` and `p_value`; `conf_int` is centred on the estimate and does not move. |
 | `paired` | Boolean | `FALSE` | If true, performs a paired t-test. `x` and `y` must be the same length. |
-| `var_equal` (alias `var.equal`) | Boolean | `FALSE` | If true, assumes equal variances (standard two-sample). If false, performs Welch's t-test with unequal variances. |
-| `conf.level` (alias `conf_level`) | Float | 0.95 | Confidence level for the returned confidence interval. Must be strictly between 0 and 1 (R also accepts the degenerate 0 and 1). See [Extreme `conf.level`](#extreme-conf.level) for the precision limit past about `0.9999`. |
+| `var_equal` | Boolean | `FALSE` | If true, assumes equal variances (standard two-sample). If false, performs Welch's t-test with unequal variances. The dotted `var.equal` is refused as an unknown argument. |
+| `conf_level` | Float | 0.95 | Confidence level for the returned confidence interval, from 0 to 1 inclusive, as in R: 1 gives `(-Inf, Inf)` and 0 a point at the estimate (or an infinite point for a one-sided test). The dotted `conf.level` is refused as an unknown argument. See [Extreme `conf_level`](#extreme-conf_level) for the precision limit past about `0.9999`. |
 | `alternative` | String | `"two.sided"` | Direction of the alternative hypothesis: `"two.sided"`, `"less"`, or `"greater"`. `"two-sided"` and `"two_sided"` are accepted as `scipy`'s spelling of the same thing. Anything else is a fatal error — an unrecognised value must not quietly become a two-sided test. |
 
-### `conf.int`
+### `conf_int`
 
-`conf.int` is the estimate plus and minus a multiple of the same standard error
-the statistic divides by, and `conf.level` picks the multiple — the t quantile
+`conf_int` is the estimate plus and minus a multiple of the same standard error
+the statistic divides by, and `conf_level` picks the multiple — the t quantile
 at that level and `df`. Nothing else goes into it. On the left below, the whole
 interval taken apart: for the paired `sleep` test, `2.26216 * 0.38896 = 0.87989`
 either side of `-1.58`. On the right, the same interval at six confidence
-levels. A wider `conf.level` needs a bigger quantile and so gives a wider
+levels. A wider `conf_level` needs a bigger quantile and so gives a wider
 interval, and the level at which the interval first reaches `mu` is exactly
-`1 - p.value` — the second panel from the bottom, whose upper bound lands on
+`1 - p_value` — the second panel from the bottom, whose upper bound lands on
 zero.
 
-![conf.int is the estimate plus or minus a t quantile times the standard error, and conf.level sets the quantile](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.conf.int.png)
+![conf_int is the estimate plus or minus a t quantile times the standard error, and conf_level sets the quantile](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.conf.int.png)
 
 ### `alternative`
 
 `alternative` decides which part of the null distribution counts against the
-null, and therefore both `p.value` and `conf.int`. `"two.sided"` counts both
+null, and therefore both `p_value` and `conf_int`. `"two.sided"` counts both
 tails beyond `|statistic|`, `"less"` counts only what lies below the statistic,
 and `"greater"` only what lies above; the two one-sided p-values always add to
 1, and each is half the two-sided one when it is the smaller. The interval
@@ -6592,43 +6932,43 @@ twenty numbers as above, but unpaired.
 
 ![the three alternatives, the region of the null distribution each one counts, and the interval that goes with it](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.alternative.png)
 
-### `mu`, `p.value` and `conf.int` say one thing
+### `mu`, `p_value` and `conf_int` say one thing
 
-`conf.int` is the set of `mu` the test would not reject. Sweep `mu` across the
+`conf_int` is the set of `mu` the test would not reject. Sweep `mu` across the
 line and re-run the test at each value: the p-value peaks at 1 where `mu` equals
-the estimate, and falls through `1 - conf.level` at precisely the two bounds of
-`conf.int`. That is what "the interval excludes zero" and "p is below 0.05" both
+the estimate, and falls through `1 - conf_level` at precisely the two bounds of
+`conf_int`. That is what "the interval excludes zero" and "p is below 0.05" both
 mean — they are one statement, not two pieces of evidence.
 
-Which is also why `mu` never moves `conf.int`. Changing `mu` changes which
-hypothesis is being tested, so `statistic` and `p.value` move with it; the
+Which is also why `mu` never moves `conf_int`. Changing `mu` changes which
+hypothesis is being tested, so `statistic` and `p_value` move with it; the
 interval is built around the estimate and stays where it is.
 
-![p.value as a function of mu, crossing 1 - conf.level exactly at the two bounds of conf.int](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.duality.png)
+![p_value as a function of mu, crossing 1 - conf_level exactly at the two bounds of conf_int](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.duality.png)
 
 ### What a falling p-value looks like
 
 The same thing seen from the data's side: two samples drawn from two different
 distributions, pulled steadily apart. Each column below is one `t_test` of the
 `sleep` groups with drug 1 shifted — the top panel is the two distributions, by
-this module's own [`density`](#density), and the bottom panel is the `conf.int`
+this module's own [`density`](#density), and the bottom panel is the `conf_int`
 that comes back. The columns are four p-values five orders of magnitude apart.
 
-![two distributions separating, and the conf.int retreating from mu as the p-value falls](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.p.and.ci.png)
+![two distributions separating, and the conf_int retreating from mu as the p-value falls](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.p.and.ci.png)
 
 Only one thing about the interval changes: where it sits. `df` stays at
 `17.7765` and its width stays at `3.5710` down the whole row, because shifting a
 sample changes neither the spread nor `n`, and those are all the standard error
 is made of. What moves is the distance from `mu` — and the second column is the
-hinge: at `p.value = 0.05` the interval's upper bound is `0.0000`, sitting
+hinge: at `p_value = 0.05` the interval's upper bound is `0.0000`, sitting
 exactly on `mu`, because "p below 0.05" and "the 95% interval clear of `mu`" are
 the same event.
 
-Reading the two together is the point. `p.value` reports the distance from `mu`
+Reading the two together is the point. `p_value` reports the distance from `mu`
 in standard errors and nothing else, so it says how surely the difference is not
-zero, never how big it is; `conf.int` reports the difference itself, in hours of
+zero, never how big it is; `conf_int` reports the difference itself, in hours of
 sleep. The other route to a small p is a smaller standard error — more
-observations, or less spread — and that one drives `p.value` down by narrowing
+observations, or less spread — and that one drives `p_value` down by narrowing
 the interval around an estimate that has not moved at all.
 
 ### `paired` and `var_equal`
@@ -6651,16 +6991,16 @@ edge.
 
 ![paired, var_equal and Welch on the same data, and the Welch degrees of freedom as the two spreads separate](https://raw.githubusercontent.com/hhg7/stats/main/img/t.test.designs.png)
 
-### Extreme `conf.level`
+### Extreme `conf_level`
 
-`conf.int` is exact to the last few digits at ordinary confidence levels, and the
+`conf_int` is exact to the last few digits at ordinary confidence levels, and the
 t quantile behind it neither saturates nor loses accuracy as the data's scale
-grows. Past about `conf.level => 0.9999`, though, the interval's accuracy is
+grows. Past about `conf_level => 0.9999`, though, the interval's accuracy is
 capped by the *argument*, not by the quantile — and no implementation can do
 better, R's included.
 
-The reason is that `conf.level` arrives as a float, so the tail has to be
-recovered as `(1 - conf.level) / 2`, and that subtraction discards most of the
+The reason is that `conf_level` arrives as a float, so the tail has to be
+recovered as `(1 - conf_level) / 2`, and that subtraction discards most of the
 tail it is trying to express. The nearest double to `0.99999999` puts the tail at
 `5.0000000251e-9` rather than `5e-9` — a relative error of `5.0e-9` — and for
 `0.9999999999` the error is `8.3e-8`. Since `qt(p, 1) ~ 1/(pi * p)`, the
@@ -6677,7 +7017,7 @@ so recovers the tail correctly, while an ordinary `double` build cannot:
     #   qt(5e-9, 1, lower.tail = FALSE) in R  = 63661977.2367581
 
 If you need a tail that small exactly, compute it yourself and work from the
-quantile rather than passing a `conf.level` that cannot hold it.
+quantile rather than passing a `conf_level` that cannot hold it.
 
 ### Missing values
 
@@ -6692,7 +7032,9 @@ is missing the pair goes whole, keeping the differences aligned.
 Dies if:
 - `x` is missing or is not an array reference, or `y` is defined but is not one
 - `alternative` is not one of the values above
-- `conf.level` is not strictly between 0 and 1
+- `conf_level` is below 0, above 1, or `NaN`
+- `mu` or `conf_level` is `undef` or a reference (R's "must be a single
+  number"), or `mu` is `NaN`; an object that overloads numification is a number
 - `paired` is set without a `y`, or with an `x` and `y` of different lengths
 - fewer than 2 observations survive: 2 in `x` for a one-sample test, 2 complete
   pairs when `paired`, and for two samples R's own thresholds — a Welch test
@@ -6710,15 +7052,37 @@ Dies if:
 | :--- | :--- |
 | `statistic` | The computed t-statistic. |
 | `df` | Degrees of freedom for the test. |
-| `p.value` | The calculated p-value based on the test directionality. |
-| `conf.int` | An Array Reference containing two elements: `[lower_bound, upper_bound]`. |
+| `p_value` | The calculated p-value based on the test directionality. |
+| `conf_int` | An Array Reference containing two elements: `[lower_bound, upper_bound]`. |
 | `estimate` | The estimated mean of `x` (one-sample) OR the mean of the differences (paired). |
-| `estimate.x` | The estimated mean of the `x` vector (only returned in two-sample tests). |
-| `estimate.y` | The estimated mean of the `y` vector (only returned in two-sample tests). |
+| `estimate_x` | The estimated mean of the `x` vector (only returned in two-sample tests). |
+| `estimate_y` | The estimated mean of the `y` vector (only returned in two-sample tests). |
+| `stderr` | The standard error `statistic` divides by, as R has returned it since 3.6.0. |
 
-Validated against R 4.x's `stats::t.test` and against `scipy.stats` — cases
-lifted from R's own regression suite and from SciPy's `TestTTest_1samp`,
-`TestTTest_ind` and confidence-interval tests — by `t/t_test.t`.
+### Accuracy
+
+The variance is R's: a mean, a correction by the mean of the residuals, then
+the squared deviations about it. Two things go beyond R. The deviations are
+also summed and their square taken back out (the Chan–Golub–LeVeque
+correction), and that same sum is carried into `statistic` as the part of the
+mean no double can hold. That keeps `statistic` accurate on a sample whose
+spread is a few dozen ulps of its mean, where R's is out in the third digit.
+The data are also scaled by a power of two before squaring, so a sample whose
+squares pass `DBL_MAX` still gets a finite variance and Welch `df`, where R's
+Welch `df` is `NaN`. On ordinary data the two agree to about 1e-13.
+
+Tied arrays, tied elements and tied scalars holding the array reference are
+all read through their `FETCH`, once each.
+
+Validated against R 4.6.1's `stats::t.test` and against `scipy.stats`, by
+`t/t_test.R.scipy.t` and `t/t_test.tails.R.t`. The R cases are every `t.test()`
+call in R's own sources: the examples of `?t.test`, `?sleep`, `?ks.test`,
+`?array2DF` and `?pairwise.t.test`, R-intro, the tcltk demo, and
+`reg-tests-1a.R`, `reg-tests-1e.R` and `reg-tests-2.R`. Each is checked against
+R's pinned `.Rout.save` output and crossed over every alternative,
+`var_equal`, `mu` and `conf_level`. The far tails are checked against
+`d-p-q-r-tst-2.R`'s `pt()` cases. The SciPy cases come from `TestTTest_1samp`,
+`TestTTestIndMore`, `TestTTestRel` and `TestTTestCI`.
 
 The figures above are drawn by `t.test.plots.pl` in the repository, from the
 two examples in R's `?t.test`: the `sleep` data (`t = -1.8608`, `df = 17.776`,
@@ -6854,8 +7218,8 @@ Extract a single column from a data frame as a flat array reference, similar to 
 ### Behavior and notes
 
 - **The result is a copy.** Every value is duplicated, so mutating the returned array never touches `$df`, and `undef` slots are ordinary writable scalars.
-- **A missing cell is `undef`.** For AoH and HoH, a row that lacks the column (or isn't a hashref) yields `undef` for that row.
-- **An absent column is strict only for HoA.** Because a HoA column *is* the structure, asking for a column the hash doesn't have dies. For AoH/HoH the column is per-row, so an entirely-absent column simply yields all-`undef` (it is not an error). This asymmetry is deliberate; pass the column name carefully for AoH/HoH, since a typo returns `undef`s rather than dying.
+- **A missing cell is `undef`.** For AoH and HoH, a row that lacks the column yields `undef` for that row, as long as at least one row has it. A row that isn't a hashref dies, naming the row.
+- **An absent column dies, in every shape.** When no row of an AoH or HoH has the column, or a HoA has no such key, `vals` dies with `vals: no column named "Method"` (and `avals` with `avals: no column named "Method"`) instead of returning a column of `undef`s, which almost always meant a misspelt name. A column that exists but holds only `undef` is not absent, and neither is a HoA column whose value is not an arrayref, which dies with its own message.
 - **Empty frames return `[]`** -- an empty AoH or an empty hash both give a clean empty arrayref.
 - UTF-8 column names and HoH keys are handled correctly (lookups use the key SV; HoH keys sort by Perl string order).
 
@@ -6864,10 +7228,10 @@ Extract a single column from a data frame as a flat array reference, similar to 
     my $aoh = read_table('patients.csv');                 # array of hashes
     my $age = vals($aoh, 'Age');                           # [ 34, 51, ... ]
 
-    my $hoa = read_table('patients.csv', 'output.type' => 'hoa');
+    my $hoa = read_table('patients.csv', 'output_type' => 'hoa');
     my $sex = vals($hoa, 'Sex');                           # copy of the Sex column
 
-    my $hoh = read_table('patients.csv', 'output.type' => 'hoh');
+    my $hoh = read_table('patients.csv', 'output_type' => 'hoh');
     my $age2 = vals($hoh, 'Age');                          # values in sorted row-key order
 
     # feed straight into the numeric routines
@@ -6971,7 +7335,7 @@ As described by R: Performs an F test to compare the variances of two samples fr
 
     my $vt = var_test(\@x, \@y);
 
-also, conf.level can be set:
+also, conf_level can be set:
 
     $vt = var_test(\@x, \@y, conf_level => 0.99);
 
@@ -6995,12 +7359,12 @@ right-justified, string columns left-justified, and undefined cells shown as
 
 ### Synopsis
 
-    my $aoh = read_table('all.data.tsv', 'output.type' => 'aoh');
+    my $aoh = read_table('all.data.tsv', 'output_type' => 'aoh');
 
     view($aoh);                       # first 6 rows, like head()
     view($aoh, n => 20);              # first 20 rows
     view($aoh, cols => [qw(id age tt)]);   # force a column order
-    view($aoh, 'row.names' => 'id');  # use column 'id' as the row label
+    view($aoh, 'row_names' => 'id');  # use column 'id' as the row label
     view($aoh, na => '.', max_width => 30);
 
     my $txt = view($aoh, return_only => 1);  # capture the string, print nothing
@@ -7030,7 +7394,7 @@ All arguments after the data reference are optional name/value pairs.
 | `n`             | `6`     | Number of rows to show. `n` greater than the table shows everything.    |
 | `rows`          | `6`     | Number of rows to show. `n` greater than the table shows everything  (synonymous with `n`)|
 | `cols` / `columns` | —    | Array ref pinning column order (and which columns appear).              |
-| `row.names`     | —       | Column to use as the row label (for `aoh`/`hoa`). See ordering note.    |
+| `row_names`     | —       | Column to use as the row label (for `aoh`/`hoa`). See ordering note.    |
 | `na`            | `'NA'`  | Token printed for undefined cells |
 | `max_width`     | `80`    | Truncate any cell wider than this (column names are never truncated)   |
 | `ellipsis`      | `'...'` | Marker appended to truncated cells |
@@ -7067,7 +7431,7 @@ R prints row names for an unnamed data frame.
 
 The behavior above is covered by `view.t` (run with `prove view.t`): the three
 structure types, `n` boundaries, alignment, `NA` rendering, truncation,
-`row.names`/`cols` handling, control-character escaping, the `return_only` and
+`row_names`/`cols` handling, control-character escaping, the `return_only` and
 `to` output paths, empty structures, and the error cases.
 
 ## vif
@@ -7111,7 +7475,7 @@ The first one or two array-ref arguments are taken positionally as `x` and `y`; 
     # with a confidence interval and point estimate
     wilcox_test(\@x, \@y, conf_int => 1, conf_level => 0.99);
 
-Arguments that R spells with a dot are accepted with either spelling: `conf.int` and `conf.int`, `conf.level` and `conf.level`, `digits.rank` and `digits_rank`, `tol.root` and `tol_root`.
+Arguments that R spells with a dot take an underscore here: `conf_int`, `conf_level`, `digits_rank` and `tol_root`. R's dotted spellings (`conf.int`, `conf.level`, `digits.rank`, `tol.root`) are refused as unknown arguments.
 
 ### Input parameters
 
@@ -7125,10 +7489,10 @@ Arguments that R spells with a dot are accepted with either spelling: `conf.int`
 | `mu`          | number          | `0.0`        | Null-hypothesis location shift. Subtracted from `x` (two-sample) or from each difference (one-sample / paired). Must be finite. |
 | `exact`       | boolean / undef | `undef` (auto) | Tri-state. `undef` (or absent) selects exact automatically: when both group sizes are `< 50` (two-sample), or `n < 50` (signed-rank). A true value forces the exact test, a false value forces the approximation. Ties and zero differences no longer disable it. |
 | `alternative` | string          | `"two.sided"` | One of `"two.sided"`, `"less"`, or `"greater"`. Selects the tail(s) used for the p-value. |
-| `conf.int`    | boolean         | `0` (false)  | Also compute a point estimate and confidence interval for the location (one-sample) or location shift (two-sample / paired). |
-| `conf.level`  | number in (0,1) | `0.95`       | Requested confidence level. The level a rank test can actually deliver is discrete, so the level achieved is reported back in `conf.level` and is generally not the one asked for. |
-| `digits.rank` | number / undef  | `undef` (Inf) | Round each value to this many significant digits before ranking, so that ties are decided on the rounded values. R's `digits.rank`, and worth reaching for when the data are the result of arithmetic and two values that ought to tie differ in the last bit. `undef` means no rounding. |
-| `tol.root`    | number > 0      | `1e-4`       | Convergence tolerance for the root search behind the *asymptotic* confidence interval. The exact interval is made of order statistics and does not use it. |
+| `conf_int`    | boolean         | `0` (false)  | Also compute a point estimate and confidence interval for the location (one-sample) or location shift (two-sample / paired). |
+| `conf_level`  | number in (0,1) | `0.95`       | Requested confidence level. The level a rank test can actually deliver is discrete, so the level achieved is reported back in `conf_level` and is generally not the one asked for. |
+| `digits_rank` | number / undef  | `undef` (Inf) | Round each value to this many significant digits before ranking, so that ties are decided on the rounded values. R's `digits.rank`, and worth reaching for when the data are the result of arithmetic and two values that ought to tie differ in the last bit. `undef` means no rounding. |
+| `tol_root`    | number > 0      | `1e-4`       | Convergence tolerance for the root search behind the *asymptotic* confidence interval. The exact interval is made of order statistics and does not use it. |
 
 ### Output
 
@@ -7137,15 +7501,15 @@ Returns a hash ref with the following keys:
 | Key               | Type   | Description |
 |-------------------|--------|-------------|
 | `statistic`       | number | The test statistic. For the two-sample test this is the Mann-Whitney **W** (the `x` rank sum minus `nx*(nx+1)/2`). For the signed-rank test it is **V**, the sum of the ranks assigned to the positive differences. |
-| `statistic.name`  | string | `"W"` or `"V"`, matching what R prints. |
-| `p.value`         | number | The p-value for the chosen `alternative`, capped at `1.0`. Two-sided p-values are `2 * min(p_less, p_greater)`. |
+| `statistic_name`  | string | `"W"` or `"V"`, matching what R prints. |
+| `p_value`         | number | The p-value for the chosen `alternative`, capped at `1.0`. Two-sided p-values are `2 * min(p_less, p_greater)`. |
 | `method`          | string | A human-readable description of the exact test variant that was run (see below). |
 | `alternative`     | string | Echoes the `alternative` actually used (`"two.sided"`, `"less"`, or `"greater"`). |
-| `null.value`      | number | Echoes `mu`. |
-| `null.value.name` | string | `"location shift"` for the two-sample and paired tests, `"location"` for the one-sample test. |
-| `estimate`        | number | *(only with `conf.int`)* The Hodges-Lehmann estimator: the median of the Walsh averages `(x[i] + x[j]) / 2` in the one-sample case, or of the pairwise differences `x[i] - y[j]` in the two-sample case. On the asymptotic path it is instead the shift at which the standardised statistic is zero, as in R. |
-| `conf.int`        | ARRAY ref | *(only with `conf.int`)* Two elements, the lower and upper limits. A one-sided alternative gives an unbounded end (`-Inf` or `Inf`). |
-| `conf.level`      | number | *(only with `conf.int`)* The confidence level actually achieved, which for the exact interval is a step function of the data and rarely equals `conf.level`. |
+| `null_value`      | number | Echoes `mu`. |
+| `null_value_name` | string | `"location shift"` for the two-sample and paired tests, `"location"` for the one-sample test. |
+| `estimate`        | number | *(only with `conf_int`)* The Hodges-Lehmann estimator: the median of the Walsh averages `(x[i] + x[j]) / 2` in the one-sample case, or of the pairwise differences `x[i] - y[j]` in the two-sample case. On the asymptotic path it is instead the shift at which the standardised statistic is zero, as in R. |
+| `conf_int`        | ARRAY ref | *(only with `conf_int`)* Two elements, the lower and upper limits. A one-sided alternative gives an unbounded end (`-Inf` or `Inf`). |
+| `conf_level`      | number | *(only with `conf_int`)* The confidence level actually achieved, which for the exact interval is a step function of the data and rarely equals `conf_level`. |
 
 The `method` string reports which path executed:
 
@@ -7184,32 +7548,32 @@ Everything else is checked against R's and SciPy's own test suites in `t/wilcox_
 ## write_table
 mimics R's `write.table`, with data as first argument to subroutine, and output file as second
 
-    write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
-`write_table` accepts every data-frame shape: a flat hash (one row), a hash of arrays (HoA), a hash of hashes (HoH), an array of hashes (AoH), and an array of arrays (AoA). For an AoA the first inner array is taken as the header row unless `col.names` is given, in which case every inner array is treated as data:
+    write_table(\@data_aoh, $tmp_file, sep => "\t", 'row_names' => 1);
+`write_table` accepts every data-frame shape: a flat hash (one row), a hash of arrays (HoA), a hash of hashes (HoH), an array of hashes (AoH), and an array of arrays (AoA). For an AoA the first inner array is taken as the header row unless `col_names` is given, in which case every inner array is treated as data:
 
-    write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row.names' => 0);
-    write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col.names' => [qw(gene score)]);
+    write_table([[qw(gene score)], ['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'row_names' => 0);
+    write_table([['TP53', 0.9], ['BRCA1', 0.7]], $tmp_file, 'col_names' => [qw(gene score)]);
 A data row longer than the header is not cut short: the header is widened with empty cells over the extra columns, the shape pandas gives `DataFrame([[1, 2], [4, 5, 6]])`, and `write_table` warns, naming the first long row.
 
-You can also precisely filter and reorder which columns are written by passing an array reference to `col.names`:
+You can also precisely filter and reorder which columns are written by passing an array reference to `col_names`:
 
-    write_table(\@data, $tmp_file, sep => "\t", 'col.names' => ['c', 'a']);
-undefined values are written as empty fields by default, but can be set as you wish using `undef.val`
+    write_table(\@data, $tmp_file, sep => "\t", 'col_names' => ['c', 'a']);
+undefined values are written as empty fields by default, but can be set as you wish using `undef_val`
 
-    write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
-A hash of hashes keeps its outer keys as a leading column by default, since that is the only place they exist. Name that column with `row.names`, or drop it with `row.names => 0`:
+    write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef_val' => 'nan')
+A hash of hashes keeps its outer keys as a leading column by default, since that is the only place they exist. Name that column with `row_names`, or drop it with `row_names => 0`:
 
     my %taxa = (9606 => { species => 'Homo sapiens' }, 10090 => { species => 'Mus musculus' });
-    write_table(\%taxa, 'taxa.tsv', 'row.names' => 'taxid');   # taxid  species
-Leaving that column unnamed writes an empty first header cell, and every reader then has to invent a name for it (`read_table` calls it `row_name`, pandas `Unnamed: 0`). `write_table` therefore warns and suggests `row.names`. It also warns when any data column has an empty name, whatever the shape. The empty label cell that `row.names => 1` writes for the other shapes is R's own layout, and nothing can name it, so that one is not warned about.
+    write_table(\%taxa, 'taxa.tsv', 'row_names' => 'taxid');   # taxid  species
+Leaving that column unnamed writes an empty first header cell, and every reader then has to invent a name for it (`read_table` calls it `row_name`, pandas `Unnamed: 0`). `write_table` therefore warns and suggests `row_names`. It also warns when any data column has an empty name, whatever the shape. The empty label cell that `row_names => 1` writes for the other shapes is R's own layout, and nothing can name it, so that one is not warned about.
 
-For a hash of arrays or an array of hashes, `row.names => 'col'` takes the labels from column `col` and heads the label column `col`, as pandas heads an index with its name:
+For a hash of arrays or an array of hashes, `row_names => 'col'` takes the labels from column `col` and heads the label column `col`, as pandas heads an index with its name:
 
-    write_table(\%hoa, 'out.csv', 'row.names' => 'gene');   # gene,score / TP53,0.9 / ...
+    write_table(\%hoa, 'out.csv', 'row_names' => 'gene');   # gene,score / TP53,0.9 / ...
 
-A hash of arrays has as many rows as the longest of the arrays it writes; an array that `col.names` leaves out does not add rows.
+A hash of arrays has as many rows as the longest of the arrays it writes; an array that `col_names` leaves out does not add rows.
 
-An empty `{}` or `[]` is a table with no rows, and is written as one: the header `col.names` and `row.names` give, if any, and otherwise a single empty record. `write_table([], 'out.csv', 'col.names' => ['A'], 'row.names' => 1)` writes `,A`, as pandas writes `DataFrame({"A": []}).to_csv()`.
+An empty `{}` or `[]` is a table with no rows, and is written as one: the header `col_names` and `row_names` give, if any, and otherwise a single empty record. `write_table([], 'out.csv', 'col_names' => ['A'], 'row_names' => 1)` writes `,A`, as pandas writes `DataFrame({"A": []}).to_csv()`.
 
 Every cell of delimited output is written whole, including one holding a NUL byte, and a cell of a tied hash or array (such as `Tie::IxHash`) is read through its `FETCH`. A number is formatted the way perl formats it, but in a copy, so writing a table does not add a string buffer to every numeric scalar in it.
 
@@ -7260,18 +7624,18 @@ The colour is unconditional; it is not suppressed when standard output is a pipe
 
     write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
     write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
-The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. As with every other format, `row.names` is **off** unless you ask for it, except for a HoH: pass `row.names => 1` to prepend a label column of 1-based indices. A HoH writes its outer keys as that column by default, and `row.names => 0` drops them. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. A table with no columns at all is an error, since LaTeX rejects one, and it is refused before the file is opened. The `tex.*` options tune the output:
+The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. As with every other format, `row_names` is **off** unless you ask for it, except for a HoH: pass `row_names => 1` to prepend a label column of 1-based indices. A HoH writes its outer keys as that column by default, and `row_names => 0` drops them. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. A table with no columns at all is an error, since LaTeX rejects one, and it is refused before the file is opened. The `tex_*` options tune the output:
 
     write_table(\@rows, 'table.tex',
-        'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
-        'tex.bold.1st.col' => 0,                     # default 1: bold the first column
-        'tex.format'       => 1,                     # %.4g-format numeric cells
-        'tex.size'         => '\small',              # size directive after \begin{tabular}
-        'tex.comment'      => ['run 3', 'q < 0.05'], # % comment line(s): string or array ref
+        'tex_col_align'    => 'l',                   # 'c' (default), 'l', or 'r'
+        'tex_bold_1st_col' => 0,                     # default 1: bold the first column
+        'tex_format'       => 1,                     # %.4g-format numeric cells
+        'tex_size'         => '\small',              # size directive after \begin{tabular}
+        'tex_comment'      => ['run 3', 'q < 0.05'], # % comment line(s): string or array ref
     );
-For a table that must span page breaks, `tex.longtable => 1` writes only the table *body* — the bold header row and the data rows, ruled with `\hline` — but no `\begin{tabular}`/`\end{tabular}` and no column spec, so you can `\input{}` it into a `longtable` environment you write yourself. Setting `tex.longtable` implies `tex => 1`, so it applies to any file name (and overrides `tex => 0`). After the provenance comment (and any `tex.comment` lines) the file emits a `% \begin{longtable}{...}` hint with one `tex.col.align` character per column, so you can copy a column spec with the right count. In this mode `tex.col.align` affects only that hint — the real alignment lives on your own `\begin{longtable}`; the other `tex.*` options (`tex.bold.1st.col`, `tex.format`, `tex.size`, `tex.comment`) still apply:
+For a table that must span page breaks, `tex_longtable => 1` writes only the table *body* — the bold header row and the data rows, ruled with `\hline` — but no `\begin{tabular}`/`\end{tabular}` and no column spec, so you can `\input{}` it into a `longtable` environment you write yourself. Setting `tex_longtable` implies `tex => 1`, so it applies to any file name (and overrides `tex => 0`). After the provenance comment (and any `tex_comment` lines) the file emits a `% \begin{longtable}{...}` hint with one `tex_col_align` character per column, so you can copy a column spec with the right count. In this mode `tex_col_align` affects only that hint — the real alignment lives on your own `\begin{longtable}`; the other `tex_*` options (`tex_bold_1st_col`, `tex_format`, `tex_size`, `tex_comment`) still apply:
 
-    write_table(\@rows, 'output.file.tex', 'tex.longtable' => 1);
+    write_table(\@rows, 'output.file.tex', 'tex_longtable' => 1);
 writes a body-only file such as
 
     %written by /home/con/Scripts/stats/make_table.pl
@@ -7287,11 +7651,11 @@ which you wrap yourself:
     \caption{}
     \label{}
     \end{longtable}
-In that plain form the header is an ordinary first row, which is *not* the header LaTeX freezes at the top of each page: a `longtable` repeats only what sits inside `\endfirsthead` / `\endhead`. Hand-writing those blocks means retyping the column labels, and they then silently stop matching `col.names` the first time the column order changes — the frozen header says one thing while the columns underneath say another, and the generated header shows up a second time as the first body row. `tex.longtable.head` closes that gap by generating the repeat machinery from the same header record as the body:
+In that plain form the header is an ordinary first row, which is *not* the header LaTeX freezes at the top of each page: a `longtable` repeats only what sits inside `\endfirsthead` / `\endhead`. Hand-writing those blocks means retyping the column labels, and they then silently stop matching `col_names` the first time the column order changes — the frozen header says one thing while the columns underneath say another, and the generated header shows up a second time as the first body row. `tex_longtable_head` closes that gap by generating the repeat machinery from the same header record as the body:
 
     write_table(\@rows, 'output.file.tex',
-        'col.names'          => ['a', 'b', 'c'],
-        'tex.longtable.head' => '(continued)', # or just 1 for no continuation caption
+        'col_names'          => ['a', 'b', 'c'],
+        'tex_longtable_head' => '(continued)', # or just 1 for no continuation caption
     );
     %written by /home/con/Scripts/stats/make_table.pl
     % \begin{longtable}{ccc}
@@ -7304,7 +7668,7 @@ In that plain form the header is an ordinary first row, which is *not* the heade
     \hline
     \endfoot
     1 & 2 & 3\\
-Setting `tex.longtable.head` implies `tex.longtable` (and so `tex => 1`). A true-but-numeric value emits the machinery with no continuation caption; any other true value is the caption text for every page after the first, written verbatim so LaTeX macros survive, with an empty `\caption[]` optional argument so the continuation stays out of the List of Tables. `\endfoot` carries the closing `\hline` and no `\endlastfoot` is emitted, so every page — the last one included — gets a bottom rule. The wrapper then holds nothing that has to track the data:
+Setting `tex_longtable_head` implies `tex_longtable` (and so `tex => 1`). A true-but-numeric value emits the machinery with no continuation caption; any other true value is the caption text for every page after the first, written verbatim so LaTeX macros survive, with an empty `\caption[]` optional argument so the continuation stays out of the List of Tables. `\endfoot` carries the closing `\hline` and no `\endlastfoot` is emitted, so every page — the last one included — gets a bottom rule. The wrapper then holds nothing that has to track the data:
 
     \begin{longtable}{ccc}
     \caption{}\label{}\\ \hline
@@ -7336,20 +7700,20 @@ Mirroring `Excel::Writer::XLSX`'s
 `$workbook->set_properties(comments => comments())`, the same
 `written by <cwd>/<script>` provenance line the LaTeX writer emits is stored in
 the workbook's document **comments** property (`dc:description` in
-`docProps/core.xml`); a `xlsx.comment` string (or array ref of strings) is
-appended after it. `xlsx.sheet` sets the worksheet name (default `Sheet1`). As
+`docProps/core.xml`); a `xlsx_comment` string (or array ref of strings) is
+appended after it. `xlsx_sheet` sets the worksheet name (default `Sheet1`). As
 in openpyxl, a name that is empty or holds any of `\ * ? : / [ ]` is an error, and
 one longer than 31 characters draws a warning, since Excel cannot read it:
 
     write_table(\@rows, 'report.xlsx',
-        'xlsx.sheet'   => 'Results',
-        'xlsx.comment' => 'batch 9',
+        'xlsx_sheet'   => 'Results',
+        'xlsx_comment' => 'batch 9',
     );
 
-`xlsx.freeze.rows` and `xlsx.freeze.cols` freeze that many leading rows/columns in place (Excel's *freeze panes*), so they stay visible while scrolling — most often used to pin the header row:
+`xlsx_freeze_rows` and `xlsx_freeze_cols` freeze that many leading rows/columns in place (Excel's *freeze panes*), so they stay visible while scrolling — most often used to pin the header row:
 
-    write_table(\@rows, 'report.xlsx', 'xlsx.freeze.rows' => 1);                        # pin the header row
-    write_table(\@rows, 'report.xlsx', 'xlsx.freeze.rows' => 1, 'xlsx.freeze.cols' => 2); # pin header + first two columns
+    write_table(\@rows, 'report.xlsx', 'xlsx_freeze_rows' => 1);                        # pin the header row
+    write_table(\@rows, 'report.xlsx', 'xlsx_freeze_rows' => 1, 'xlsx_freeze_cols' => 2); # pin header + first two columns
 
 `tex` and `xlsx` are mutually exclusive. Note: dates/times are written as their
 raw values (no cell number formats), matching the round-trip behaviour of
@@ -7361,22 +7725,22 @@ raw values (no cell number formats), matching the round-trip behaviour of
 | `data` (1st positional, or `data =>`) | *required* | both | the table: flat hash, HoA, HoH, AoH, or AoA |
 | `file` (2nd positional, or `file =>`) | *required* | both | output path; written as a delimited table, or as LaTeX when `tex` is on |
 | `sep` / `delim` | from extension (`,` for `.csv`, tab for `.tsv`), else `,` | delimited | field separator; the two are aliases |
-| `row.names` | `0` (off); `1` (on) for a HoH | both | true prepends a label column (numeric 1-based index, or the outer key for a HoH); `0` omits it. Off by default in **every** format — delimited, LaTeX and `.xlsx` alike — for every shape but a HoH. (R's `write.table` defaults it on and this once followed suit for LaTeX; it no longer does.) A HoH defaults it on, because its outer keys are the row identifiers and exist nowhere else. For a HoA/AoH a non-numeric *column name* uses that column's values as the labels and drops it from the body. For a HoH a non-numeric string *names* the key column, so `row.names => 'taxid'` heads it `taxid` instead of leaving the header cell empty; it dies if that name is also a column being written |
-| `col.names` | all columns, sorted | both | array ref selecting and ordering columns; for an AoA it also supplies the column names |
-| `undef.val` | `''` (empty field) | both | text written for an undefined/missing cell, e.g. `'NA'` |
+| `row_names` | `0` (off); `1` (on) for a HoH | both | true prepends a label column (numeric 1-based index, or the outer key for a HoH); `0` omits it. Off by default in **every** format — delimited, LaTeX and `.xlsx` alike — for every shape but a HoH. (R's `write.table` defaults it on and this once followed suit for LaTeX; it no longer does.) A HoH defaults it on, because its outer keys are the row identifiers and exist nowhere else. For a HoA/AoH a non-numeric *column name* uses that column's values as the labels and drops it from the body. For a HoH a non-numeric string *names* the key column, so `row_names => 'taxid'` heads it `taxid` instead of leaving the header cell empty; it dies if that name is also a column being written |
+| `col_names` | all columns, sorted | both | array ref selecting and ordering columns; for an AoA it also supplies the column names |
+| `undef_val` | `''` (empty field) | both | text written for an undefined/missing cell, e.g. `'NA'` |
 | `tex` | auto: `1` when `file` ends in `.tex`, else `0` | LaTeX | write the output file as a LaTeX `tabular` instead of a delimited table; `tex => 0` forces delimited even for a `.tex` name |
-| `tex.col.align` | `'c'` | LaTeX | per-column alignment: `'c'`, `'l'`, or `'r'`; with `tex.longtable` on it sets only the `% \begin{longtable}{...}` hint |
-| `tex.bold.1st.col` | `1` (on) | LaTeX | bold the first column of each data row |
-| `tex.format` | `0` (off) | LaTeX | render numeric cells with `%.4g` |
-| `tex.size` | *(none)* | LaTeX | size directive emitted after `\begin{tabular}`, e.g. `\small` |
-| `tex.comment` | *(none)* | LaTeX | `%` comment line(s) at the top of the LaTeX file: a string, or an array ref of strings |
-| `tex.longtable` | `0` (off) | LaTeX | write only the table body (header + data rows + `\hline`, no `\begin{tabular}`/`\end{tabular}` or column spec) for `\input{}` into a caller-supplied `longtable`; implies `tex => 1`, and emits a `% \begin{longtable}{...}` hint with one `tex.col.align` char per column |
-| `tex.longtable.head` | `0` (off) | LaTeX | generate `longtable`'s repeat-header machinery (`\endfirsthead` / `\endhead` / `\endfoot`) from the table's own header, so the header frozen at every page break tracks `col.names` instead of being hand-written; a non-numeric value is the continuation caption. Implies `tex.longtable`. Put the first page's top rule on your own `\caption` line (`\\ \hline`) — a leading `\hline` in an `\input`ed file is a `Misplaced \noalign` error |
+| `tex_col_align` | `'c'` | LaTeX | per-column alignment: `'c'`, `'l'`, or `'r'`; with `tex_longtable` on it sets only the `% \begin{longtable}{...}` hint |
+| `tex_bold_1st_col` | `1` (on) | LaTeX | bold the first column of each data row |
+| `tex_format` | `0` (off) | LaTeX | render numeric cells with `%.4g` |
+| `tex_size` | *(none)* | LaTeX | size directive emitted after `\begin{tabular}`, e.g. `\small` |
+| `tex_comment` | *(none)* | LaTeX | `%` comment line(s) at the top of the LaTeX file: a string, or an array ref of strings |
+| `tex_longtable` | `0` (off) | LaTeX | write only the table body (header + data rows + `\hline`, no `\begin{tabular}`/`\end{tabular}` or column spec) for `\input{}` into a caller-supplied `longtable`; implies `tex => 1`, and emits a `% \begin{longtable}{...}` hint with one `tex_col_align` char per column |
+| `tex_longtable_head` | `0` (off) | LaTeX | generate `longtable`'s repeat-header machinery (`\endfirsthead` / `\endhead` / `\endfoot`) from the table's own header, so the header frozen at every page break tracks `col_names` instead of being hand-written; a non-numeric value is the continuation caption. Implies `tex_longtable`. Put the first page's top rule on your own `\caption` line (`\\ \hline`) — a leading `\hline` in an `\input`ed file is a `Misplaced \noalign` error |
 | `xlsx` | auto: `1` when `file` ends in `.xlsx`, else `0` | Excel | write a real `.xlsx` workbook (dependency-free, built in XS) instead of a delimited table; `xlsx => 0` forces delimited even for a `.xlsx` name. Mutually exclusive with `tex` |
-| `xlsx.sheet` | `'Sheet1'` | Excel | worksheet name |
-| `xlsx.comment` | *(none)* | Excel | extra line(s) appended after the provenance in the workbook's document *comments* property (`dc:description`): a string, or an array ref of strings |
-| `xlsx.freeze.rows` | `0` (none) | Excel | number of leading rows to freeze in place (freeze panes), e.g. `1` to pin the header row |
-| `xlsx.freeze.cols` | `0` (none) | Excel | number of leading columns to freeze in place (freeze panes) |
+| `xlsx_sheet` | `'Sheet1'` | Excel | worksheet name |
+| `xlsx_comment` | *(none)* | Excel | extra line(s) appended after the provenance in the workbook's document *comments* property (`dc:description`): a string, or an array ref of strings |
+| `xlsx_freeze_rows` | `0` (none) | Excel | number of leading rows to freeze in place (freeze panes), e.g. `1` to pin the header row |
+| `xlsx_freeze_cols` | `0` (none) | Excel | number of leading columns to freeze in place (freeze panes) |
 
 # Numerical accuracy
 
@@ -7402,12 +7766,12 @@ be seen.
 | `theta` | *estimated* | For `negbin`, a fixed dispersion instead of an estimated one, as `countreg`'s `theta = `. |
 | `offset` | *none* | A column, an expression, or an array ref. |
 | `weights` | *none* | Case weights. |
-| `conf.level` | `0.95` | Level of the Wald intervals in `summary`. |
+| `conf_level` | `0.95` | Level of the Wald intervals in `summary`. |
 
 The result holds `coefficients`, `summary` (per term `Estimate`, `Std. Error`,
-`z value`, `Pr(>|z|)`, `CI.lower`, `CI.upper`), `vcov`, `terms`, `loglik`,
-`aic`, `df.residual`, `df.null`, `nobs`, `converged` and `iter`; `theta` and
-`SE.logtheta` for `negbin`, as `countreg` reports them; `fitted.values`, the
+`z value`, `Pr(>|z|)`, `CI_lower`, `CI_upper`), `vcov`, `terms`, `loglik`,
+`aic`, `df_residual`, `df_null`, `nobs`, `converged` and `iter`; `theta` and
+`SE_logtheta` for `negbin`, as `countreg` reports them; `fitted_values`, the
 truncated mean `mu / (1 - f(0))`, and Pearson-style `residuals`. The fit is a
 damped Newton iteration on the exact likelihood and its analytic Hessian.
 Validated against `countreg` and against `mpmath` at 60 digits.
@@ -7425,7 +7789,7 @@ Every F and z p-value in `Stats::LikeR` is therefore evaluated in the tail
 itself:
 
 - **F tests** (`oneway_test`, `aov`, `anova` in both its forms, `lm`'s
-  `f.pvalue`, and `var_test`) use the regularized-incomplete-beta symmetry
+  `f_pvalue`, and `var_test`) use the regularized-incomplete-beta symmetry
   `1 - I_x(a, b) = I_{1-x}(b, a)`. With `x = df1·F / (df1·F + df2)`, the
   complement `1 - x` is just `df2 / (df1·F + df2)`, which is formed without any
   subtraction, so the tail keeps full relative precision.
@@ -7450,7 +7814,7 @@ and `dunn_test` (the two-sided per-comparison p-values that `p_adjust` then
 corrects).
 
 The practical difference: `lm` on a near-noiseless fit reports
-`f.pvalue = 7.0165242049e-220` where the subtractive form returned `0`, and
+`f_pvalue = 7.0165242049e-220` where the subtractive form returned `0`, and
 `anova`'s sequential table reports `1.1543232446e-171` for the same reason.
 Where the true value underflows a double even when computed correctly — a Wald
 z beyond about 38.5 — the result is `0`, and R and SciPy return `0` there too.

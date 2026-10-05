@@ -69,18 +69,18 @@ my %oneway = (
 	is_approx($r->{coefficients}{gB},         3, 'gB = mean(B)-mean(A)');
 	is_approx($r->{coefficients}{gC},         6, 'gC = mean(C)-mean(A)');
 
-	is(ref $r->{'fitted.values'}, 'HASH', 'fitted.values is a hashref');
-	is(scalar keys %{$r->{'fitted.values'}}, 9, 'fitted.values has one entry per obs');
-	is_approx($r->{'fitted.values'}{1}, 2, 'fitted[1] = group A mean');
-	is_approx($r->{'fitted.values'}{4}, 5, 'fitted[4] = group B mean');
-	is_approx($r->{'fitted.values'}{7}, 8, 'fitted[7] = group C mean');
+	is(ref $r->{'fitted_values'}, 'HASH', 'fitted_values is a hashref');
+	is(scalar keys %{$r->{'fitted_values'}}, 9, 'fitted_values has one entry per obs');
+	is_approx($r->{'fitted_values'}{1}, 2, 'fitted[1] = group A mean');
+	is_approx($r->{'fitted_values'}{4}, 5, 'fitted[4] = group B mean');
+	is_approx($r->{'fitted_values'}{7}, 8, 'fitted[7] = group C mean');
 
 	is(ref $r->{xlevels}, 'HASH', 'xlevels is a hashref');
 	is_deeply($r->{xlevels}{g}, [qw(A B C)], 'xlevels{g} sorted, reference first');
 
-	is(ref $r->{'group.stats'}, 'HASH', 'group_stats present');
-	is_approx($r->{'group.stats'}{mean}{y}, 5, 'group_stats mean of y');
-	is($r->{'group.stats'}{size}{y}, 9, 'group_stats size of y');
+	is(ref $r->{'group_stats'}, 'HASH', 'group_stats present');
+	is_deeply($r->{'group_stats'}{mean}, { A => 2, B => 5, C => 8 }, 'group_stats: the response mean in each level of g');
+	is_deeply($r->{'group_stats'}{size}, { A => 3, B => 3, C => 3 }, 'group_stats: rows fitted in each level of g');
 }
 
 # same data via HoH and AoH -> identical table & coefficients
@@ -116,8 +116,8 @@ my %oneway = (
 	my $r = aov(\%d, 'y~x');
 	is_approx($r->{coefficients}{Intercept}, 1, 'reg Intercept');
 	is_approx($r->{coefficients}{x},         2, 'reg slope x');
-	is_approx($r->{'fitted.values'}{1}, 1, 'reg fitted[1]');
-	is_approx($r->{'fitted.values'}{3}, 5, 'reg fitted[3]');
+	is_approx($r->{'fitted_values'}{1}, 1, 'reg fitted[1]');
+	is_approx($r->{'fitted_values'}{3}, 5, 'reg fitted[3]');
 	is($r->{x}{Df}, 1, 'reg x Df = 1');
 }
 
@@ -137,7 +137,7 @@ my %oneway = (
 	my $r = aov(\%d, 'y~x-1');
 	ok(!exists $r->{coefficients}{Intercept}, 'no-intercept: Intercept absent');
 	is_approx($r->{coefficients}{x}, 2, 'no-intercept: slope x');
-	is_approx($r->{'fitted.values'}{2}, 4, 'no-intercept: fitted[2]');
+	is_approx($r->{'fitted_values'}{2}, 4, 'no-intercept: fitted[2]');
 }
 
 # two-way with interaction  y ~ A*B (balanced, zero residual)
@@ -172,7 +172,7 @@ my %twoway = (
 {
 	my %d = (y => [1, 2, $nan, 4], g => [qw(A A B B)]);
 	my $r = aov(\%d, 'y~g');
-	is(scalar keys %{$r->{'fitted.values'}}, 3, 'NaN row dropped -> 3 fitted values');
+	is(scalar keys %{$r->{'fitted_values'}}, 3, 'NaN row dropped -> 3 fitted values');
 	is($r->{Residuals}{Df}, 1, 'NaN: Residuals Df = 1');
 	is_approx($r->{coefficients}{Intercept}, 1.5, 'NaN: Intercept = mean(A)');
 	is_approx($r->{coefficients}{gB},        2.5, 'NaN: gB = 4 - 1.5');
@@ -184,10 +184,17 @@ throws_ok { aov({}, 'y~x') } qr/empty/i, 'empty data hash croaks';
 throws_ok { aov({ y => [1, 2], x => [3, 4] }, 'y x') } qr/missing '~'/, 'formula without ~ croaks';
 throws_ok { aov([1, 2, 3], 'y~x') } qr/HashRefs/, 'AoH of non-hashrefs croaks';
 throws_ok { aov({ a => 1 }) } qr/ArrayRefs/, 'no-formula non-HoA croaks';
-throws_ok {
-	aov({ y => [1, 2, 3, 4], a => [qw(p q p q)], b => [qw(r r s s)] }, 'y~a:b');
-} qr/main effects/, 'interaction without main effects croaks';
-throws_ok { aov({ y => [1, 2], g => [qw(A B)] }, 'y~g') } qr/degrees of freedom/, '0 df croaks';
+throws_ok { aov({ y => [1, undef, undef], g => [qw(A B C)] }, 'y~g') }
+	qr/aov: fewer than 2 complete observations/, 'one complete row croaks';
+throws_ok { aov({ y => [1, 2] }, \'y~g') } qr/aov: formula must be a string/, 'formula reference croaks';
+# R fits both of these; the old parser refused the first and croaked on the second.
+{
+	my $r = aov({ y => [1, 2, 3, 4], a => [qw(p q p q)], b => [qw(r r s s)] }, 'y~a:b');
+	is($r->{'a:b'}{Df}, 3, 'a:b without main effects spans all four cells, as in R');
+	$r = aov({ y => [1, 2], g => [qw(A B)] }, 'y~g');
+	is($r->{Residuals}{Df}, 0, '0 residual df: fitted, as in R');
+	ok(!exists $r->{g}{'F value'}, '0 residual df: no F test');
+}
 
 # leak checks
 no_leaks_ok {
@@ -199,5 +206,14 @@ no_leaks_ok {
 no_leaks_ok {
 	eval { aov({}, 'y~x') }
 } 'aov croak path: no leaks' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok {
+	eval { aov({ y => [1, undef, undef], g => [qw(A B C)] }, 'y~g') }
+} 'aov croak after the design is built: no leaks' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok {
+	eval { aov({ A => [1, 2, 3], B => [4, 5, 6], C => [7, 8, 9] }) }
+} 'aov stacked form: no leaks' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok {
+	eval { aov({ A => [1, 2, 3], B => 4 }) }
+} 'aov stacked form croak: no leaks' unless $INC{'Devel/Cover.pm'};
 
 done_testing();

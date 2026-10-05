@@ -9,3 +9,6 @@
 \.bak$
 \.tmp$
 ~$
+^author/
+^bench/
+^handoff\.md$

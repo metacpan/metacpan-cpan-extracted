@@ -8,9 +8,10 @@ use Email::MIME;
 use Mail::DKIM2::MessageInstance;
 
 # undo rebuilds the previous version from this one, so a Recipe may only copy
-# lines that are here, and never the same line twice. Anything else describes
-# nothing a real hop did, and without the check a few bytes of header could
-# make undo build a list of billions of lines.
+# lines that are here, never the same line twice, and only in ascending
+# order. Anything else describes nothing a real hop did, and without the
+# check a few bytes of header could make undo build a list of billions of
+# lines.
 
 my $orig = join("\r\n",
     'From: a@example.com',
@@ -75,13 +76,14 @@ for my $case (@bogus) {
     ok(!$ok, "... and so does chain_verifies");
 }
 
-# Ranges may come in any order, as long as they do not overlap.
+# Ranges must ascend (spec-06 §5.1): a Recipe that copies a later line before
+# an earlier one describes a reordering, which a hop records literally.
 {
-    my $cur = Email::MIME->new(with_body_recipe([[3, 3], [1, 2]]));
-    my $prev = eval { Mail::DKIM2::MessageInstance->undo($cur) };
-    ok($prev, 'ranges out of order but apart are applied') or diag($@);
-    is($prev && $prev->body_raw, "footer\r\nline one\r\nline two\r\n",
-        '... in the order the Recipe gives');
+    my $text = with_body_recipe([[3, 3], [1, 2]]);
+    like(undo_error($text), qr/^body Recipe copies lines 1-2 out of order$/,
+        'undo refuses ranges out of order even when apart');
+    my ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($text);
+    ok(!$ok, '... and so does chain_verifies');
 }
 
 # The same rules for a header Recipe, counted per field name.

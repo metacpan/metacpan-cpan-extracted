@@ -21,7 +21,19 @@ sub init {
 sub run {
     my ($self, $project, $opts) = @_;
 
-    if (my $ver = prompt("Next Release?", $self->default_new_version($project))) {
+    if ($opts->{skip_prepare}) {
+        my $ver = $project->version;
+        if (!$opts->{dry_run} && exists_tag($project->format_tag($ver))) {
+            errorf("Sorry, version '%s' is already tagged.  Stopping.\n", $ver);
+        }
+        return;
+    }
+
+    my $ver = defined $opts->{version}
+        ? $opts->{version}
+        : prompt("Next Release?", $self->default_new_version($project));
+
+    if ($ver) {
         # Do not use is_strict. is_strict rejects '5.00_01' style.
         if (!version::is_lax($ver)) {
             errorf("Sorry, version '%s' is invalid.  Stopping.\n", $ver);

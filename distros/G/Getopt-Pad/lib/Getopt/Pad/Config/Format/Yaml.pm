@@ -8,7 +8,7 @@ class Getopt::Pad::Config::Format::Yaml :isa(Getopt::Pad::Config::Format) :stric
 	use Feature::Compat::Try;
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	use constant NAMES => ['yaml', 'yml'];
 

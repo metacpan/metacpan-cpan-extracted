@@ -45,7 +45,8 @@
 # Tolerance.  1e-12 relative, against a worst observed disagreement of
 # 9.844e-14 (pt, at df = 100) and 9.553e-14 (qt, at df = 1) on the double
 # build -- about 10x headroom, which is what the long-double and __float128
-# builds need: qt_tail() is a bisection, so its last bits move with NV width.
+# builds need: qt_tail() stops where pt_upper()'s rounding does, so its last
+# bits move with NV width.
 #
 # Why the table stops at 1e-290.  The generator drops any expected value
 # smaller than that, and both reasons are about the table rather than about

@@ -5,7 +5,7 @@ use warnings;
 
 use XSLoader ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -53,6 +53,17 @@ L<Unblock::HTTP3::Transaction>. Streaming bodies, Capsules, HTTP Datagrams,
 Extended CONNECT, extension SETTINGS, extension streams, priorities, graceful
 shutdown, and replay-aware 0-RTT are built around those objects.
 
+=head1 STANDARDS
+
+Unblock::HTTP3 implements the HTTP/3 protocol defined by RFC 9114 with QPACK
+from RFC 9204. It also supports RFC 9218 priorities, RFC 9220 Extended CONNECT,
+RFC 9297 HTTP Datagrams and Capsules, and RFC 9412 ORIGIN.
+
+QUIC transport behavior remains the responsibility of L<Net::QUIC>.
+
+Detailed conformance notes and native-library limitations are recorded in
+C<docs/RFC-COMPLIANCE.md> in the distribution.
+
 =head1 MODULES
 
 =over 4
@@ -65,13 +76,13 @@ One HTTP/3 connection over one Net::QUIC connection.
 
 One HTTP/3 request stream and its response.
 
-=item L<Unblock::HTTP3::Request>
+=item L<Unblock::HTTP3::NativeABI>
 
-Optional thin subclass of L<Uniform::HTTP::Request> with HTTP/3 helpers.
+Optional versioned native consumer ABI for XS integrations.
 
-=item L<Unblock::HTTP3::Response>
+=item L<Uniform::HTTP::Request> and L<Uniform::HTTP::Response>
 
-Optional thin subclass of L<Uniform::HTTP::Response> with HTTP/3 diagnostics.
+Canonical HTTP message objects used directly by Unblock::HTTP3.
 
 =item L<Unblock::HTTP3::Body::Stream>
 
@@ -85,7 +96,7 @@ Readable incoming body stream.
 
 =head1 SEE ALSO
 
-L<Net::QUIC>, L<Uniform::HTTP>, L<Alien::nghttp3>
+L<Net::QUIC>, L<Uniform::HTTP>, L<Alien::nghttp3>, L<Unblock::HTTP3::NativeABI>
 
 =head1 AUTHOR
 

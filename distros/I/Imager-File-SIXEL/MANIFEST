@@ -1,0 +1,44 @@
+Changes
+cpanfile
+docs/Examples.md
+docs/Format.md
+examples/sixel-animate.pl
+examples/sixel-bench.pl
+examples/sixel-cat.pl
+images/colors.png
+images/sixel-alpha-threshold.png
+images/sixel-dither.png
+images/sixel-max-colors.png
+images/sixel-palette.png
+images/sixel-pan-pad.png
+imsixel.h
+lib/Imager/File/SIXEL.pm
+lib/Imager/File/SIXEL/Examples.pod
+lib/Imager/File/SIXEL/Format.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+SIXEL.xs
+sixel_quant.c
+sixel_quant.h
+sixel_read.c
+sixel_write.c
+t/00-load.t
+t/05-autoload.t
+t/06-autoload-write.t
+t/10-read.t
+t/20-write.t
+t/30-interop.t
+t/data/libsixel-default.ppm
+t/data/libsixel-default.six
+t/data/libsixel-fixed.ppm
+t/data/libsixel-fixed.six
+t/data/libsixel-p16.ppm
+t/data/libsixel-p16.six
+tools/make-images
+tools/pod2markdown
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

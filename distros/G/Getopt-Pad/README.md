@@ -156,7 +156,7 @@ make test
 make install
 ```
 
-Requires Perl 5.26 or later, Object::Pad 0.800 or later, Getopt::Long
+Requires Perl 5.26 or later, Object::Pad 0.818 or later, Getopt::Long
 2.50 or later, Feature::Compat::Try and JSON::PP.
 
 Optional: YAML::XS for YAML config files, and Term::ReadKey for wrapping

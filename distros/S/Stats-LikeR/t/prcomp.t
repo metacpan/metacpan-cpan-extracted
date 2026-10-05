@@ -337,4 +337,50 @@ if ($x_rows == 2) {
 is_approx($pca_na->{sdev}[0], 3.16227766, 'prcomp (NA): math adjusts dynamically for new N-1', 1e-7);
 is_approx($pca_na->{sdev}[1], 0.0, 'prcomp (NA): collinear matrix component is zero', 1e-7);
 
+# Column names are the keys themselves. Up to 0.3212 they were copied with
+# savepv() and looked up again by strlen(), so a UTF-8 name could not be found
+# (a HoA croaked "cannot be looked up by name", an AoH or HoH read every cell
+# as missing and croaked "0 valid observations") and varnames lost the flag.
+# "\x{263a}" (a character no single byte holds, so the key is stored as UTF-8)
+# sorts after the ASCII names under sv_cmp, the order the module uses.
+{
+	my @x = ( 1, 2, 3, 5, 4, 6 );
+	my @y = ( 2, 1, 4, 3, 6, 5 );
+	my @z = ( 9, 7, 8, 6, 5, 4 );
+	my %hoa = ( "\x{263a}" => [@x], 'b' => [@y], 'z' => [@z] );
+	my @aoh = map { +{ "\x{263a}" => $x[$_], 'b' => $y[$_], 'z' => $z[$_] } } 0 .. 5;
+	my %hoh = map { ( "r$_" => $aoh[$_] ) } 0 .. 5;
+	my @aoa = map { [ $y[$_], $z[$_], $x[$_] ] } 0 .. 5;	# the same columns, in varnames order
+	my $want = prcomp( \@aoa )->{sdev};
+	for my $case ( [ 'HoA', \%hoa ], [ 'AoH', \@aoh ], [ 'HoH', \%hoh ] ) {
+		my ( $shape, $data ) = @$case;
+		my $p = prcomp($data);
+		is_deeply( $p->{varnames}, [ 'b', 'z', "\x{263a}" ], "prcomp ($shape): a UTF-8 column name is found and returned" );
+		ok( utf8::is_utf8( $p->{varnames}[2] ), "prcomp ($shape): ... with its UTF-8 flag" );
+		is_approx( $p->{sdev}[$_], $want->[$_], "prcomp ($shape): sdev $_ matches the unnamed matrix", 1e-12 ) for 0 .. 2;
+	}
+
+	# Tied input, every shape. Up to 0.3212 a tied frame hash read as empty, and
+	# a tied row or cell was tested before its value was fetched, so it read as
+	# undef and the row was dropped without a word.
+	require Tie::Hash;
+	require Tie::Array;
+	my $tie_h = sub { tie my %t, 'Tie::StdHash'; %t = %{ $_[0] }; \%t };
+	my $tie_a = sub { tie my @t, 'Tie::StdArray'; @t = @{ $_[0] }; \@t };
+	my %tied = (
+		'tied HoA'             => $tie_h->( \%hoa ),
+		'tied HoH'             => $tie_h->( \%hoh ),
+		'HoH of tied rows'     => { map { ( $_ => $tie_h->( $hoh{$_} ) ) } keys %hoh },
+		'AoH of tied rows'     => [ map { $tie_h->($_) } @aoh ],
+		'AoA of tied rows'     => [ map { $tie_a->($_) } @aoa ],
+		'tied AoA'             => $tie_a->( \@aoa ),
+		'HoA of tied columns'  => { map { ( $_ => $tie_a->( $hoa{$_} ) ) } keys %hoa },
+	);
+	for my $name ( sort keys %tied ) {
+		my $p = prcomp( $tied{$name} );
+		is_approx( $p->{sdev}[$_], $want->[$_], "prcomp ($name): sdev $_ matches the untied data", 1e-12 ) for 0 .. 2;
+	}
+	no_leaks_ok { prcomp( \%hoa ); prcomp( $tied{'tied HoH'} ) } 'prcomp: no leaks with UTF-8 names and tied input' unless $INC{'Devel/Cover.pm'};
+}
+
 done_testing();

@@ -129,18 +129,22 @@ throws_ok { my @x = avals([ { a => 1 }, [1] ], 'a') }
 	eval { my @x = avals($bad, 'v') };  $e_avals = $@;
 	s/ at \S+ line \d+\.?\n?\z// for $e_vals, $e_avals;
 	like($e_avals,
-		qr/^avals: (?:HoH value for key 'row_c' is not a hash-ref|column 'v' not found or is not an array-ref)$/,
+		qr/^avals: (?:HoH value for key 'row_c' is not a hash-ref|no column named "v")$/,
 		'avals croaks on a HoH holding a non-hashref row');
 	$e_vals =~ s/^vals:/avals:/;
 	is($e_avals, $e_vals, '... with exactly the message vals() gives');
 }
 dies_ok { my @x = avals($aoh) } 'avals croaks when the column argument is missing';
 
-# an entirely absent column is not an error for AoH/HoH, only for HoA
-is_deeply([ avals($aoh, 'no_such_col') ], [undef, undef, undef],
-	'an absent AoH column yields all-undef rather than dying');
-is_deeply([ avals($hoh, 'no_such_col') ], [undef, undef, undef, undef],
-	'an absent HoH column yields all-undef rather than dying');
+# a column that no row has dies in every shape, rather than giving all-undef
+throws_ok { my @x = avals($aoh, 'Method') } qr/^avals: no column named "Method" at /,
+	'an absent AoH column dies';
+throws_ok { my @x = avals($hoh, 'Method') } qr/^avals: no column named "Method" at /,
+	'an absent HoH column dies';
+throws_ok { my @x = avals($hoa, 'Method') } qr/^avals: no column named "Method" at /,
+	'an absent HoA column dies';
+is_deeply([ avals([ {}, { Method => 'x' } ], 'Method') ], [undef, 'x'],
+	'a column that only one AoH row has yields undef for the others');
 
 # UTF-8 column names and HoH keys
 {

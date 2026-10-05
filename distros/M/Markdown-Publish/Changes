@@ -1,5 +1,12 @@
 Revision history for Markdown-Publish
 
+1.005  2026-10-04
+
+    - Rebase source-relative links from documents under doc/ to mirrored
+      Markdown sidecars beneath lib/ and bin/ during site assembly.
+    - Preserve existing publication-root links and leave authored Markdown,
+      missing targets, unrelated paths, and code examples unchanged.
+
 1.004  2026-09-29
 
     - Discover wrangler.jsonc or wrangler.json in the project root when

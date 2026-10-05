@@ -1,12 +1,13 @@
 package Sub::Private;
 
-# Minimum Perl version: 5.8 (Attribute::Handlers became core in 5.8)
-use 5.008;
+# Minimum Perl version: 5.14 (${^GLOBAL_PHASE}, needed to protect subs in
+# packages loaded after CHECK)
+use 5.014;
 use strict;
 use warnings;
-use autodie qw(:all);
 
 use Attribute::Handlers;
+use B::Hooks::EndOfScope qw();
 use Carp              qw(croak carp);
 use Readonly;
 use Params::Validate::Strict 0.33 qw(validate_strict);
@@ -22,11 +23,11 @@ Sub::Private - Private subroutines and methods
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # ---------------------------------------------------------------------------
 # Mode-name constants.  Using Readonly prevents accidental overwriting.
@@ -101,6 +102,33 @@ Enable before declaring your first private sub:
 
 =back
 
+=head2 Behaviour of wrapped subs (enforce mode)
+
+=over 4
+
+=item * The wrapper hands over with C<goto &sub>, so it does not appear
+on the call stack: C<caller> inside a private sub sees its real caller.
+
+=item * Arguments, C<@_> aliasing and calling context (list, scalar or
+void) are passed through unchanged.
+
+=item * C<$_> is left untouched, whether the call is allowed or blocked.
+
+=item * A blocked call croaks; it does not fall through to C<AUTOLOAD>.
+
+=item * Works with L<Moo> and L<Moose> classes; use the declarative form
+after C<use Moo> or C<use Moose>.
+
+=back
+
+=head2 Loading at run time
+
+Packages that use C<Sub::Private> may be loaded at run time (C<require>,
+a plugin loader, a string C<eval>), and C<Sub::Private> itself may be
+loaded for the first time that way.  The private subs are then wrapped
+(or removed, in C<namespace> mode) when the enclosing scope, normally the
+rest of the file, has been compiled.
+
 =head2 Bypass for testing
 
 Either condition alone (OR logic) disables all access checks in enforce
@@ -130,32 +158,6 @@ The C<HARNESS_ACTIVE> bypass can be disabled:
 
     bar() is a private subroutine of Foo and cannot be called from Bar
 
-=head1 PUBLIC VARIABLES
-
-=head2 C<$BYPASS>
-
-Set to a true value to disable all access checks (enforce mode only).
-Use C<local> in tests; see L</Bypass for testing>.
-
-=head2 C<%config>
-
-Module-level configuration hash.  Supported keys:
-
-=over 4
-
-=item C<mode>
-
-C<'namespace'> (default) or C<'enforce'>.  Must be set in a C<BEGIN>
-block before C<use Sub::Private> to take effect at C<CHECK> time.
-
-=item C<harness_bypass>
-
-When true (default), access checks are skipped whenever
-C<$ENV{HARNESS_ACTIVE}> is set.  Set to 0 to test enforcement under
-C<prove>.
-
-=back
-
 =cut
 
 # Public bypass flag.  Use C<local $Sub::Private::BYPASS = 1> in test code.
@@ -171,8 +173,10 @@ $config{$KEY_HARNESS_BYPASS} //= 1;
 # Populated by import(); consumed and cleared by the CHECK block.
 my @_pending;
 
-# Set to 1 once the CHECK block fires so import() can wrap immediately.
-my $_post_check = 0;
+# True once CHECK has run, so wrapping must happen without it.  Set by our
+# own CHECK block, or here when this module is first loaded after CHECK
+# (run-time require, plugin loader, string eval).
+my $_post_check = (${^GLOBAL_PHASE} ne 'START') ? 1 : 0;
 
 # -------------------------------------------------------------------
 # ATTRIBUTE HANDLER
@@ -181,8 +185,26 @@ my $_post_check = 0;
 # Install :Private in UNIVERSAL so every package can use it after a
 # single "use Sub::Private", with no per-package setup required.
 # ATTR(CODE,CHECK) fires at CHECK time, after all subs are compiled.
-sub UNIVERSAL::Private :ATTR(CODE,CHECK) {
-	my ($package, $symbol, $referent, $attr, $data) = @_;
+# The BEGIN phase covers code compiled after CHECK, when the CHECK-phase
+# call never comes.
+sub UNIVERSAL::Private :ATTR(CODE,BEGIN,CHECK) {
+	my ($package, $symbol, $referent, $attr, $data, $phase) = @_;
+
+	if ($phase eq 'BEGIN') {
+		# Before CHECK, the CHECK-phase call does the work.
+		return unless $_post_check;
+
+		# After CHECK the sub is still being compiled and may have no name
+		# yet, so finish the job when the enclosing scope is compiled.
+		# on_scope_end works here because the user's code is compiling.
+		B::Hooks::EndOfScope::on_scope_end(sub {
+			my ($pkg, $name) = get_code_info($referent);
+			no strict 'refs';	## no critic (ProhibitNoStrict)
+			UNIVERSAL::Private($pkg, \*{"${pkg}::$name"}, $referent, $attr, $data, 'CHECK');
+		});
+		return;
+	}
+
 	my $sub_name = *{$symbol}{NAME};
 
 	# Reject unrecognised mode values early rather than silently misbehaving.
@@ -221,8 +243,11 @@ via C<UNIVERSAL>.  No other action is taken.
 
 With B<one or more sub names>: registers those named subs in the calling
 package for access-enforcement wrapping at C<CHECK> time.  If C<CHECK>
-has already fired (e.g., when calling from a test), wrapping is applied
-immediately.  Requires C<$Sub::Private::config{mode}> to equal
+has already fired (for example the package is loaded with C<require> at
+run time), the subs are wrapped as soon as the enclosing scope (normally
+the rest of the file) has been compiled, so the C<use> line can still
+come before the subs it names.  A direct C<< Sub::Private->import(...) >>
+call at run time wraps immediately.  Requires C<$Sub::Private::config{mode}> to equal
 C<'enforce'>; croaks otherwise.
 
 =head3 Arguments
@@ -248,8 +273,11 @@ The class name (C<'Sub::Private'>) as a plain string in all cases.
 =item * Pre-CHECK: appends C<[$owner_pkg, $sub_name]> pairs to the
 internal C<@_pending> list.
 
-=item * Post-CHECK: installs wrapper closures directly in the calling
-package's stash.
+=item * Post-CHECK, during compilation: installs wrapper closures in the
+calling package's stash when the enclosing scope has been compiled.
+
+=item * Post-CHECK, at run time: installs wrapper closures directly in the
+calling package's stash.
 
 =back
 
@@ -264,7 +292,7 @@ package's stash.
     sub _init   { ... }    # wrapped at CHECK time
     sub run     { my $s = shift; $s->_helper; $s->_init }
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 Input
 
@@ -302,7 +330,10 @@ package's stash.
 
     "Sub::Private: PKG::NAME is not defined"             The named sub was not found in the stash at
                                                          wrap time.  Define the sub before import()
-                                                         runs, or before CHECK fires.
+                                                         runs, before CHECK fires, or (after CHECK)
+                                                         before the end of the enclosing scope.
+                                                         After CHECK, the location reported is the
+                                                         "use Sub::Private" line.
 
 =cut
 
@@ -330,9 +361,23 @@ sub import {
 	}
 
 	# Schedule or immediately apply wrapping depending on compile phase.
-	my $owner_pkg = caller;
+	my ($owner_pkg, $file, $line) = caller;
 	if ($_post_check) {
-		_process_one($owner_pkg, $_) for @subs;
+		if (defined $^S) {
+			# Called at run time: the subs already exist, wrap them now.
+			_process_one($owner_pkg, $_) for @subs;
+		} else {
+			# "use" after CHECK (e.g. a run-time require): the subs below the
+			# "use" line are not compiled yet, so wrap them when the
+			# enclosing scope has been compiled.
+			B::Hooks::EndOfScope::on_scope_end(sub {
+				# Report errors at the "use" line, not inside the hook.
+				eval { _process_one($owner_pkg, $_) for @subs; 1 } or do {
+					(my $err = $@) =~ s/ at .+? line \d+\.?\n\z//s;
+					die "$err at $file line $line.\n";
+				};
+			});
+		}
 	} else {
 		push @_pending, [ $owner_pkg, $_ ] for @subs;
 	}
@@ -345,11 +390,16 @@ sub import {
 # -------------------------------------------------------------------
 
 # Process all declarative wraps queued during import().
-# After this fires, $_post_check=1 so future import() calls wrap immediately.
-CHECK {
-	$_post_check = 1;
-	_process_one(@$_) for @_pending;
-	@_pending = ();
+# After this fires, $_post_check=1 so future import() calls wrap without it.
+# When this module is loaded after CHECK the block cannot run, which is
+# expected; silence "Too late to run CHECK block".
+{
+	no warnings 'void';
+	CHECK {
+		$_post_check = 1;
+		_process_one(@$_) for @_pending;
+		@_pending = ();
+	}
 }
 
 # -------------------------------------------------------------------
@@ -382,7 +432,7 @@ sub _process_one {
 	_assert_private_caller('_process_one')
 		unless $BYPASS || ($config{$KEY_HARNESS_BYPASS} && $ENV{HARNESS_ACTIVE});
 
-	no strict 'refs';
+	no strict 'refs';	## no critic (ProhibitNoStrict)
 
 	# Ensure the target sub exists in the stash before wrapping.
 	croak "$SELF: ${owner_pkg}::${sub_name} is not defined"
@@ -485,6 +535,32 @@ sub _assert_private_caller {
 
 __END__
 
+=head1 PUBLIC VARIABLES
+
+=head2 C<$BYPASS>
+
+Set to a true value to disable all access checks (enforce mode only).
+Use C<local> in tests; see L</Bypass for testing>.
+
+=head2 C<%config>
+
+Module-level configuration hash.  Supported keys:
+
+=over 4
+
+=item C<mode>
+
+C<'namespace'> (default) or C<'enforce'>.  Must be set in a C<BEGIN>
+block before C<use Sub::Private> to take effect at C<CHECK> time.
+
+=item C<harness_bypass>
+
+When true (default), access checks are skipped whenever
+C<$ENV{HARNESS_ACTIVE}> is set.  Set to 0 to test enforcement under
+C<prove>.
+
+=back
+
 =head1 KNOWN LIMITATIONS
 
 =over 4
@@ -502,13 +578,16 @@ Checks are runtime only; there is no compile-time enforcement.
 =item C<enforce> mode: raw coderef bypass
 
 A raw code reference obtained B<before> wrapping (via C<can()> or
-C<\&Foo::_helper>) bypasses the check.  The attribute form prevents this
-because wrapping happens at CHECK time.
+C<\&Foo::_helper>) bypasses the check.  The attribute form makes this
+hard because wrapping happens at CHECK time.  When the package is loaded
+after CHECK, wrapping happens at the end of the enclosing scope, so a
+C<BEGIN> block earlier in the same file could still take a reference to
+the unwrapped sub.
 
 =item C<enforce> mode: C<can()> leaks private method existence
 
 In C<enforce> mode the original sub is replaced by a wrapper closure, so
-C<< ->can('_helper') >> returns the wrapper (truthy) even to callers outside
+C<< ->can('_helper') >> returns the wrapper (a true value) even to callers outside
 the owner package.  In C<namespace> mode the stash entry is deleted entirely,
 so C<< ->can >> correctly returns C<undef>.  A future release may inject a
 caller-aware C<can()> override into each class that uses C<enforce> mode,
@@ -525,8 +604,10 @@ introduce C<UNIVERSAL::Private> into the global namespace.
 
 =head1 DEPENDENCIES
 
+Perl 5.14 or later,
 L<Carp> (core),
-L<Attribute::Handlers> (core since 5.8),
+L<Attribute::Handlers> (core),
+L<B::Hooks::EndOfScope>,
 L<Readonly>,
 L<Params::Validate::Strict>,
 L<Return::Set>,
@@ -543,14 +624,20 @@ L<Sub::Identify>.
 
 Sister module enforcing protected (owner + subclass) rather than strictly private access
 
+=item * L<Sub::Abstract>
+
+Sister module enforcing abstract (virtual) methods
+
 =item * L<namespace::clean>
 
 =back
 
-=head2 FORMAL SPECIFICATION
+=head1 FORMAL SPECIFICATION
 
 The following Z-notation schemas formally specify the C<CheckAccess>
-operation.
+operation and C<import>.
+
+=head2 C<CheckAccess>
 
     -- Type abbreviations
     Package  == seq CHAR     -- a non-empty Perl package name string
@@ -605,6 +692,55 @@ operation.
     -- vs Sub::Protected:
     --   permitted(caller, owner) <=> owner in anc(caller)   (ISA chain)
 
+=head2 import
+
+    -- Valid identifier predicate
+    valid_id : SubName -> BOOL
+    valid_id(n) <=> n =~ /\A[_a-zA-Z]\w*\z/
+
+    -- Compile phase: CHECK has run, and code is still being compiled
+    post_check  : BOOL
+    compiling   : BOOL       -- true while $^S is undefined
+
+    -- Pre-condition (declarative form)
+    +-ImportPre-----------------------------------------+
+    | config.mode = 'enforce'                           |
+    | forall n in subs . valid_id(n)                    |
+    +---------------------------------------------------+
+
+    -- Post-condition (before CHECK): queue for the CHECK block
+    +-ImportPost_PreCheck-------------------------------+
+    | not post_check                                    |
+    |---------------------------------------------------|
+    | pending' = pending ++ < (caller, n) | n in subs > |
+    +---------------------------------------------------+
+
+    -- Post-condition (after CHECK, at run time): wrap now
+    +-ImportPost_RunTime--------------------------------+
+    | post_check and not compiling                      |
+    | forall n in subs . defined(caller, n)             |
+    |---------------------------------------------------|
+    | forall n in subs .                                |
+    |   stash'(caller, n) = wrapper(caller, n)          |
+    +---------------------------------------------------+
+
+    -- Post-condition (after CHECK, while compiling): wrap at the
+    -- end of the enclosing scope S
+    +-ImportPost_Deferred-------------------------------+
+    | post_check and compiling                          |
+    |---------------------------------------------------|
+    | at end_of_scope(S) :                              |
+    |   (forall n in subs . defined(caller, n)) =>      |
+    |     forall n in subs .                            |
+    |       stash'(caller, n) = wrapper(caller, n)      |
+    |   (exists n in subs . not defined(caller, n)) =>  |
+    |     croak at the "use" line                       |
+    +---------------------------------------------------+
+
+    -- In every case, a sub that is not defined when wrapping is
+    -- attempted croaks:
+    --   "Sub::Private: " ++ caller ++ "::" ++ n ++ " is not defined"
+
 =head1 AUTHOR
 
 Original Author:
@@ -629,41 +765,11 @@ L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sub-Private>.
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Sub-Private>
 
-=item * Search CPAN
+=item * MetaCPAN
 
-L<https://search.cpan.org/dist/Sub-Private>
+L<https://metacpan.org/dist/Sub-Private>
 
 =back
-
-=head2 FORMAL SPECIFICATION
-
-=head3 import
-
-    -- Type abbreviations
-    SubName == seq CHAR      -- non-empty Perl identifier string
-
-    -- Valid identifier predicate
-    valid_id : SubName -> BOOL
-    valid_id(n) <=> n =~ /\A[_a-zA-Z]\w*\z/
-
-    -- Pre-condition (declarative form)
-    +-ImportPre-----------------------------------------+
-    | config.mode = 'enforce'                           |
-    | forall n in subs . valid_id(n)                    |
-    | forall n in subs . defined(&{caller + '::' + n})  |
-    +---------------------------------------------------+
-
-    -- Post-condition (pre-CHECK path)
-    +-ImportPost_PreCheck-------------------------------+
-    | @_pending' = @_pending                            |
-    |            union { (caller, n) | n in subs }      |
-    +---------------------------------------------------+
-
-    -- Post-condition (post-CHECK path)
-    +-ImportPost_PostCheck------------------------------+
-    | forall n in subs .                                |
-    |   stash(caller, n) = wrapper_closure(caller, n)   |
-    +---------------------------------------------------+
 
 =head1 COPYRIGHT & LICENSE
 

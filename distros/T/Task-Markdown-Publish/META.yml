@@ -21,11 +21,11 @@ no_index:
     - inc
 requires:
   ASPEER::MakeMaker::Markdown::Pod: '1.014'
-  ASPEER::MakeMaker::Markdown::Publish: '1.003'
+  ASPEER::MakeMaker::Markdown::Publish: '1.004'
   Docbook::Convert: '1.012'
   Markdown::Pod::Embed: '1.013'
-  Markdown::Publish: '1.003'
-  Task::Markdown::Pod: '0.001'
+  Markdown::Publish: '1.005'
+  Task::Markdown::Pod: '0.003'
   perl: '5.010'
   strict: '0'
   vars: '0'
@@ -34,6 +34,6 @@ resources:
   bugtracker: https://github.com/aspeer/pm-Task-Markdown-Publish/issues
   homepage: https://github.com/aspeer/pm-Task-Markdown-Publish
   repository: https://github.com/aspeer/pm-Task-Markdown-Publish.git
-version: '0.001'
+version: '0.003'
 x_authority: cpan:ASPEER
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

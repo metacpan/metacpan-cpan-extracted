@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.167;
+package Config::Model::AnyId 2.168;
 
 use 5.020;
 
@@ -1090,7 +1090,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.167
+version 2.168
 
 =head1 SYNOPSIS
 
@@ -1248,7 +1248,7 @@ passed to the cargo object. See L<Config::Model::Node> when C<<
 cargo->type >> is C<node>. See L<Config::Model::Value> when C<<
 cargo->type >> is C<leaf>.
 
-Default parameters are forbidden because they don't make sence: who
+Default parameters are forbidden because they don't make sense: who
 needs a list of identical values ?
 
 =back

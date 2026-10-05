@@ -1,5 +1,9 @@
 Revision history for Getopt::Pad
 
+0.05    2026-10-05
+        - Require Object::Pad 0.818: class methods with a signature fail
+          on older versions (GitHub issue #1)
+
 0.04    2026-09-26
         - Config files set the options of every command level: the
           commands key of a level's section holds one section per

@@ -1,0 +1,69 @@
+{
+   "abstract" : "Portable non-blocking HTTP/1 protocol engine",
+   "author" : [
+      "Joshua S. Day <HAX@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Unblock-HTTP1",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "Uniform::HTTP" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Scalar::Util" : "0",
+            "Uniform::HTTP" : "0.06",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.016",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haxmeister/perl-Unblock-HTTP1/issues"
+      },
+      "homepage" : "https://github.com/haxmeister/perl-Unblock-HTTP1",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haxmeister/perl-Unblock-HTTP1.git",
+         "web" : "https://github.com/haxmeister/perl-Unblock-HTTP1"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

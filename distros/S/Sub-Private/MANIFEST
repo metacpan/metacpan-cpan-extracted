@@ -6,7 +6,6 @@ lib/Sub/Private.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-META.json
 README.md
 t/00-load.t
 t/01-private.t
@@ -34,6 +33,7 @@ t/pod-coverage.t
 t/pod-synopsis.t
 t/pod.t
 t/port.t
+t/runtime.t
 t/snippets.t
 t/spelling.t
 t/strict.t
@@ -41,3 +41,4 @@ t/unit.t
 t/unused.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

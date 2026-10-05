@@ -29,7 +29,7 @@ sub run_cli {
 }
 
 {
-    my ($rc, $out) = run_cli("$good", '--dns-json', '../dns.json', '--ignore-timestamps');
+    my ($rc, $out) = run_cli("$good", '--dns-json', 't/data/dns.json', '--ignore-timestamps');
     is($rc, 0, 'a good two-hop chain exits 0');
     like($out, qr/^pass\b/, '  ... and prints the result');
 }
@@ -37,25 +37,25 @@ sub run_cli {
 {
     (my $text = $good->slurp_raw) =~ s/^Subject: /Subject: tampered /m;
     my $tmp = Path::Tiny->tempfile; $tmp->spew_raw($text);
-    my ($rc, $out) = run_cli("$tmp", '--dns-json', '../dns.json', '--ignore-timestamps');
+    my ($rc, $out) = run_cli("$tmp", '--dns-json', 't/data/dns.json', '--ignore-timestamps');
     is($rc, 1, 'a tampered message exits 1');
     like($out, qr/^fail\b/, '  ... and says fail');
 }
 
 {
     my $text = $good->slurp_raw;
-    my ($rc, $out) = run_cli(\$text, '--dns-json', '../dns.json', '--ignore-timestamps');
+    my ($rc, $out) = run_cli(\$text, '--dns-json', 't/data/dns.json', '--ignore-timestamps');
     is($rc, 0, 'the message can come on stdin');
 }
 
 {
-    my ($rc, $out) = run_cli("$good", '--dns-json', '../dns.json');
+    my ($rc, $out) = run_cli("$good", '--dns-json', 't/data/dns.json');
     is($rc, 1, 'without --ignore-timestamps a 2026 fixture is stale');
     like($out, qr/timestamp|expired|old/i, '  ... for that reason');
 }
 
 {
-    my ($rc, $out) = run_cli(\"Subject: x\r\n\r\nbody\r\n", '--dns-json', '../dns.json');
+    my ($rc, $out) = run_cli(\"Subject: x\r\n\r\nbody\r\n", '--dns-json', 't/data/dns.json');
     is($rc, 1, 'an unsigned message exits 1');
     like($out, qr/^none\b/, '  ... and says none');
 }

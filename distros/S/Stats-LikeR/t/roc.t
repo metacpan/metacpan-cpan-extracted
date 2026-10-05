@@ -24,11 +24,11 @@ my @l = (0,  0,  1,   1,  1,  0,  0,  1,  0,   1,   0,  1,   1,   1,  0);
 
 my $r = roc(\@s, \@l);
 is_approx($r->{auc},       0.8482142857, 'AUC matches Mann-Whitney concordance');
-is_approx($r->{'auc.se'},    0.1016521083, 'DeLong standard error');
-is_approx($r->{'auc.ci'}[0], 0.6489798145, 'AUC CI lower');
-is_approx($r->{'auc.ci'}[1], 1.0000000000, 'AUC CI upper (clamped to 1)');
-is($r->{'n.pos'}, 8, 'positive count');
-is($r->{'n.neg'}, 7, 'negative count');
+is_approx($r->{'auc_se'},    0.1016521083, 'DeLong standard error');
+is_approx($r->{'auc_ci'}[0], 0.6489798145, 'AUC CI lower');
+is_approx($r->{'auc_ci'}[1], 1.0000000000, 'AUC CI upper (clamped to 1)');
+is($r->{'n_pos'}, 8, 'positive count');
+is($r->{'n_neg'}, 7, 'negative count');
 
 # auc() convenience function agrees with roc()->{auc}
 is_approx(auc(\@s, \@l), $r->{auc}, 'auc() scalar matches roc AUC');

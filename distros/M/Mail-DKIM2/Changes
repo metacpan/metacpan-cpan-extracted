@@ -1,5 +1,69 @@
 Revision history for Mail::DKIM2
 
+0.13    2026-10-04
+        - The header Recipe builder treated "no instances" and "one empty
+          instance" of a field as the same, so removing an empty header
+          (a bare "Bcc:", which Sympa's egress now removes) went unrecorded
+          and the Message-Instance did not verify. (t/recipe-empty-header.t)
+
+0.12    2026-10-04
+        - undo() rebuilt a base64 or quoted-printable body encoded twice:
+          Recipes work on wire lines, so the rebuilt body is already in its
+          transfer encoding, and Email::MIME->body_set encoded it again.
+          Every such message a list re-encoded (footer appended, body
+          re-wrapped) failed "m=1 does not match content" and the milter
+          refused to sign it -- 17 of 88 charset-corpus samples through
+          Mailman, while the Python undo rebuilt them byte for byte. The
+          body is now set as raw octets. (t/undo-encoded-body.t)
+        - DKIM2_DATE is 2026-10-04: the Message-Instance headers this
+          library emits changed shape in 0.11 ("b" literals, integer copy
+          ranges), and the X-DKIM2-Info date stamp follows emitted-header
+          changes.
+
+0.11    2026-10-04
+        Fixes found by replaying public-archive mail in assorted charsets
+        (ISO-2022-JP, GB2312/GB18030, Big5, EUC-KR, Latin-1, raw 8-bit
+        headers) through the signers, verifiers and list managers
+        (interop util/charset-corpus.sh).
+        - Recipe literals carrying any octet >= 0x80 are emitted as a new
+          {"b": [base64, ...]} step instead of {"d": [...]}. A literal is
+          the raw octets of a header value or body line; JSON text is
+          UTF-8, so the old encoder wrote ISO-2022-JP, GB18030, Big5 and
+          Latin-1 octets into the JSON as they were, which no strict JSON
+          parser reads back. The decoder rejects a "b" item that is not
+          RFC 4648 base64 or decodes to something containing CR or LF.
+          Agreed extension to spec-06 §5, proposed to the WG.
+          (t/recipe-base64.t)
+        - Recipe copy ranges must ascend (spec-06 §5.1): each "c" step
+          starts after the one before it ends. undo() used to sort the
+          ranges and reject only overlap; it now rejects an out-of-order
+          range too, for body and header Recipes alike. The header Recipe
+          builder in calculate() no longer emits one: a header instance a
+          hop moved above one it left alone is recorded literally.
+          (t/recipe-order.t, t/undo-bounds.t)
+        - Two more Recipe schema rules the other verifiers already hold, so
+          every implementation gives the same verdict: a "c" bound must be
+          a JSON integer (a string such as "2" is malformed; told apart by
+          the scalar's flags, not its text), an empty "d" or "b" array is
+          malformed (minItems 1), and so is a "d" string containing CR or
+          LF (§5.1/§5.2 MUST NOT). (t/recipe-order.t, t/recipe-base64.t)
+        - Recipe copy ranges are emitted as JSON integers. An index used as
+          a hash key while de-duplicating header copies was stringified in
+          place, so every Sympa Message-Instance carried {"c":["2","2"]},
+          which the spec-06 schema forbids and strict verifiers reject.
+          (t/recipe-integers.t)
+        - A broken Content-Type (`text/plain; Windows-1252`) no longer makes
+          every verification print Email::MIME's "Illegal parameter" warning:
+          the library parses with parameter checking relaxed, for the parse
+          only, since DKIM2 never reads a MIME parameter.
+          (t/malformed-content-type.t)
+        - The test suite is self-contained: the test keys and dns.json ship
+          under t/data/ (t/data-in-sync.t keeps them equal to the interop
+          repository's shared copies), bin/validate.pl takes --dns-json and
+          defaults to that copy, and the tests that cross-check the other
+          implementations or the deployment templates skip outside the
+          repository. 0.10's tests could not run from the tarball.
+
 0.10    2026-10-02
         API cleanup ahead of a CPAN release. Incompatible changes are marked *.
         - New top-level Mail::DKIM2 module documenting the conventions every

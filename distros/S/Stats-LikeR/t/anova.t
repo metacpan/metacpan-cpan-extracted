@@ -158,7 +158,7 @@ dies_ok { anova(\%{{ y => [undef, undef], x => [1, 2] }}, 'y ~ x') }
 	is( scalar(@$cmp), 2, 'one row per model' );
 
 	# row 0 (base model) carries residuals only, no comparison stats
-	ok(  exists $cmp->[0]{'Res.Df'}, 'row 0: has Res.Df' );
+	ok(  exists $cmp->[0]{'Res_Df'}, 'row 0: has Res_Df' );
 	ok(  exists $cmp->[0]{'RSS'},    'row 0: has RSS' );
 	ok( !exists $cmp->[0]{'Df'},        'row 0: no Df' );
 	ok( !exists $cmp->[0]{'Sum of Sq'}, 'row 0: no Sum of Sq' );
@@ -173,10 +173,10 @@ dies_ok { anova(\%{{ y => [undef, undef], x => [1, 2] }}, 'y ~ x') }
 	ok( looks_like_number($cmp->[1]{'F'}), 'row 1: F is numeric' );
 
 	# residual df telescopes through the term dfs of the full model
-	is( $cmp->[1]{'Res.Df'}, $full->{Residuals}{Df},
-		'row 1 Res.Df == full-model residual Df' );
-	is( $cmp->[0]{'Res.Df'}, $full->{Residuals}{Df} + $full->{b}{Df},
-		'row 0 Res.Df == residual Df + df(b)' );
+	is( $cmp->[1]{'Res_Df'}, $full->{Residuals}{Df},
+		'row 1 Res_Df == full-model residual Df' );
+	is( $cmp->[0]{'Res_Df'}, $full->{Residuals}{Df} + $full->{b}{Df},
+		'row 0 Res_Df == residual Df + df(b)' );
 
 	# RSS telescopes through the term SS of the full model
 	is_approx( $cmp->[1]{'RSS'}, $full->{Residuals}{'Sum Sq'},
@@ -222,8 +222,8 @@ dies_ok { anova(\%{{ y => [undef, undef], x => [1, 2] }}, 'y ~ x') }
 	# monotone non-increasing RSS and non-increasing residual Df down the chain
 	ok( $cmp->[0]{'RSS'} >= $cmp->[1]{'RSS'} - 1e-9
 	 && $cmp->[1]{'RSS'} >= $cmp->[2]{'RSS'} - 1e-9, 'RSS is non-increasing' );
-	ok( $cmp->[0]{'Res.Df'} > $cmp->[1]{'Res.Df'}
-	 && $cmp->[1]{'Res.Df'} > $cmp->[2]{'Res.Df'}, 'Res.Df is decreasing' );
+	ok( $cmp->[0]{'Res_Df'} > $cmp->[1]{'Res_Df'}
+	 && $cmp->[1]{'Res_Df'} > $cmp->[2]{'Res_Df'}, 'Res_Df is decreasing' );
 
 	# row 1 <-> term b, row 2 <-> term c of the full (largest) model
 	is( $cmp->[1]{'Df'}, $full->{b}{Df}, 'row 1 Df == df(b)' );
@@ -237,7 +237,7 @@ dies_ok { anova(\%{{ y => [undef, undef], x => [1, 2] }}, 'y ~ x') }
 	is_approx( $cmp->[2]{'Pr(>F)'},    $full->{c}{'Pr(>F)'},  'row 2 Pr(>F) == Pr(>F)(c)', 1e-6 );
 
 	# last row's residuals match the full model exactly
-	is( $cmp->[2]{'Res.Df'}, $full->{Residuals}{Df}, 'last row Res.Df == full residual Df' );
+	is( $cmp->[2]{'Res_Df'}, $full->{Residuals}{Df}, 'last row Res_Df == full residual Df' );
 	is_approx( $cmp->[2]{'RSS'}, $full->{Residuals}{'Sum Sq'}, 'last row RSS == full residual SS' );
 }
 
@@ -282,8 +282,8 @@ dies_ok { anova(\%{{ y => [undef, undef], x => [1, 2] }}, 'y ~ x') }
 		'AoH comparison Sum of Sq matches HoA' );
 	is_approx( $ca->[1]{'F'}, $ch->[1]{'F'},
 		'AoH comparison F matches HoA' );
-	is( $ca->[1]{'Res.Df'}, $ch->[1]{'Res.Df'},
-		'AoH comparison Res.Df matches HoA' );
+	is( $ca->[1]{'Res_Df'}, $ch->[1]{'Res_Df'},
+		'AoH comparison Res_Df matches HoA' );
 }
 
 # union NA handling: all models are fit on ONE shared complete-case set,
@@ -304,8 +304,8 @@ dies_ok { anova(\%{{ y => [undef, undef], x => [1, 2] }}, 'y ~ x') }
 	my $cn = anova(\%na,    'y ~ a', 'y ~ a + b');
 	my $cc = anova(\%clean, 'y ~ a', 'y ~ a + b');
 
-	is( $cn->[0]{'Res.Df'}, $cc->[0]{'Res.Df'},
-		'union listwise: base-model Res.Df matches the pre-cleaned data' );
+	is( $cn->[0]{'Res_Df'}, $cc->[0]{'Res_Df'},
+		'union listwise: base-model Res_Df matches the pre-cleaned data' );
 	is_approx( $cn->[1]{'Sum of Sq'}, $cc->[1]{'Sum of Sq'},
 		'union listwise: Sum of Sq matches the pre-cleaned data' );
 	is_approx( $cn->[1]{'F'}, $cc->[1]{'F'},
@@ -352,5 +352,28 @@ no_leaks_ok {
 no_leaks_ok {
 	eval { anova('bad', 'y ~ a', 'y ~ a + b') }
 } 'anova() comparison error path: no memory leaks' unless $INC{'Devel/Cover.pm'};
+
+# The croaks below come after every model's design is built; all of it is on
+# the save stack, and these check that nothing outlives it.
+no_leaks_ok {
+	eval { anova({ y => [1, undef, undef], A => [qw/a b a/] }, 'y ~ A', 'y ~ A + 1') }
+} 'anova() too few complete rows after the designs are built: no memory leaks'
+	unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	eval { anova({ y => [1, 2, 3], x => [1, 2] }, 'y ~ x') }
+} 'anova() ragged columns: no memory leaks' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	eval { anova({ y => [5, 7, 6, 9, 8, 11], z => [1, 2, 3, 4, 5, 6] },
+	             'y ~ 1 + offset(z)', 'y ~ z + offset(z)') }
+} 'anova() with offset(): no memory leaks' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	local $SIG{__WARN__} = sub {};
+	eval { anova({ y => [5, 7, 6, 9, 8, 11], A => [qw/a b a b a b/] },
+	             'y ~ A', 'log(y) ~ A', 'y ~ 0 + A') }
+} 'anova() dropping a model with another response: no memory leaks'
+	unless $INC{'Devel/Cover.pm'};
 
 done_testing();

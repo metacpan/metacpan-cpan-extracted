@@ -1,0 +1,7 @@
+{
+  "enabledPlugins": {
+    "briefing@getty": true,
+    "superpowers@claude-plugins-official": true,
+    "ruler@getty": true
+  }
+}

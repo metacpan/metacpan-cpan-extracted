@@ -6,7 +6,7 @@ use Getopt::Pad::Config::Format;
 class Getopt::Pad::Config::Format::Json :isa(Getopt::Pad::Config::Format) :strict(params) {
 	use JSON::PP ();
 
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	use constant NAMES => ['json'];
 

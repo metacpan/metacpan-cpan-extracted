@@ -21,7 +21,7 @@ sub is_approx {
 	my $r = mcnemar_test([[794, 86], [150, 570]]);
 	is_approx($r->{statistic}, 16.81779661, '2x2 cc statistic', 1e-7);
 	is($r->{parameter}, 1, '2x2 df');
-	is_approx($r->{'p.value'}, 4.115e-05, '2x2 cc p-value', 1e-8);
+	is_approx($r->{'p_value'}, 4.115e-05, '2x2 cc p-value', 1e-8);
 	like($r->{method}, qr/continuity correction/, '2x2 cc method label');
 }
 
@@ -37,13 +37,13 @@ sub is_approx {
 	my $r = mcnemar_test([[20, 10, 5], [3, 30, 7], [8, 4, 25]]);
 	is_approx($r->{statistic}, 5.27972028, '3x3 statistic', 1e-7);
 	is($r->{parameter}, 3, '3x3 df');
-	is_approx($r->{'p.value'}, 0.15242374, '3x3 p-value', 1e-7);
+	is_approx($r->{'p_value'}, 0.15242374, '3x3 p-value', 1e-7);
 }
 
 # exact binomial (2x2 only)
 {
 	my $r = mcnemar_test([[794, 86], [150, 570]], exact => 1);
-	is_approx($r->{'p.value'}, 3.716e-05, 'exact p-value', 1e-8);
+	is_approx($r->{'p_value'}, 3.716e-05, 'exact p-value', 1e-8);
 	like($r->{method}, qr/exact/, 'exact method label');
 	ok(!exists $r->{parameter}, 'exact has no df');
 }
@@ -54,7 +54,7 @@ sub is_approx {
 	my @y = ((('pos') x 18), (('neg') x 7), (('pos') x 4), (('neg') x 21));
 	my $r = mcnemar_test(\@x, \@y);
 	is_approx($r->{statistic}, 0.10256410, 'vector-form statistic', 1e-7);
-	is_approx($r->{'p.value'},   0.74877404, 'vector-form p-value', 1e-7);
+	is_approx($r->{'p_value'},   0.74877404, 'vector-form p-value', 1e-7);
 }
 
 # error handling

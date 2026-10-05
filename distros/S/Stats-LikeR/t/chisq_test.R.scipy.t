@@ -91,7 +91,7 @@ sub check {
 	my ($name, $res, $want) = @_;
 	my $ok = 1;
 	$ok &&= near($res->{statistic}{'X-squared'}, $want->{stat}, $want->{stat_tol} || $TOL_STAT, "$name: statistic");
-	$ok &&= near($res->{'p.value'},              $want->{p},    $want->{p_tol}    || $TOL_P,    "$name: p-value");
+	$ok &&= near($res->{'p_value'},              $want->{p},    $want->{p_tol}    || $TOL_P,    "$name: p-value");
 	if ($res->{parameter}{df} != $want->{df}) {
 		fail("$name: df");
 		diag("         got: $res->{parameter}{df}\n    expected: $want->{df}");
@@ -215,21 +215,20 @@ my $GOF     = 'Chi-squared test for given probabilities';
 	# ... and against the same probabilities given as unnormalised weights.
 	# R: chisq.test(x, p = c(40,20,20,15,5), rescale.p = TRUE)
 	#    X-squared = 9.9901433691756267, df = 4, p-value = 0.040594043344781221
-	my $rres = chisq_test($x, p => [40, 20, 20, 15, 5], 'rescale.p' => 1);
-	check('?chisq.test rescale.p', $rres, {
+	my $rres = chisq_test($x, p => [40, 20, 20, 15, 5], 'rescale_p' => 1);
+	check('?chisq.test rescale_p', $rres, {
 		stat => 9.9901433691756267, df => 4, p => 0.040594043344781221,
 		method => $GOF,
 	});
-	# the underscore spelling is the same option
-	my $ures = chisq_test($x, p => [40, 20, 20, 15, 5], rescale_p => 1);
-	is($ures->{statistic}{'X-squared'}, $rres->{statistic}{'X-squared'},
-		'rescale_p is an alias for rescale.p');
+	# R's dotted spelling is not accepted: only rescale_p is
+	ok(!eval { chisq_test($x, p => [40, 20, 20, 15, 5], 'rescale.p' => 1); 1 }
+		&& $@ =~ /unknown argument 'rescale\.p'/, "R's dotted 'rescale.p' is refused");
 
 	# R errors rather than rescaling silently:
 	#   chisq.test(x, p = c(40,20,20,15,5))
 	#   Error: probabilities must sum to 1.
 	my $err = !eval { chisq_test($x, p => [40, 20, 20, 15, 5]); 1 };
-	ok($err, 'probabilities that do not sum to 1 are fatal without rescale.p');
+	ok($err, 'probabilities that do not sum to 1 are fatal without rescale_p');
 	like($@, qr/probabilities must sum to 1/, '... with R\'s message');
 
 	# uniform p is the default, and stating it changes nothing.
@@ -307,7 +306,7 @@ my $GOF     = 'Chi-squared test for given probabilities';
 		stat => 0, df => 1, p => 1, method => $YATES,
 		stat_tol => $TOL_ZERO_STAT, p_tol => $TOL_UNIT_P,
 	});
-	cmp_ok(abs($res->{'p.value'} - 1), '<', 1e-12, 'SciPy gh-13875: p is 1 to rtol 1e-12');
+	cmp_ok(abs($res->{'p_value'} - 1), '<', 1e-12, 'SciPy gh-13875: p is 1 to rtol 1e-12');
 }
 
 # test_contingency.py::test_exact_permutation, whose reference statistic is the
@@ -397,7 +396,7 @@ my $GOF     = 'Chi-squared test for given probabilities';
 	});
 	# f_exp is a vector of counts summing to n, i.e. p = f_exp / n
 	check('SciPy power_divergence f_exp',
-		chisq_test([4, 8, 12, 8], p => [2, 16, 12, 2], 'rescale.p' => 1), {
+		chisq_test([4, 8, 12, 8], p => [2, 16, 12, 2], 'rescale_p' => 1), {
 		stat => 24, df => 3, p => 2.4979977724652009e-05, method => $GOF,
 	});
 	# the same probabilities pre-normalised
@@ -407,7 +406,7 @@ my $GOF     = 'Chi-squared test for given probabilities';
 	});
 	# f_obs == f_exp, so every term of the sum is 0
 	check('SciPy power_divergence zero statistic',
-		chisq_test([3, 5, 7, 9], p => [3, 5, 7, 9], 'rescale.p' => 1), {
+		chisq_test([3, 5, 7, 9], p => [3, 5, 7, 9], 'rescale_p' => 1), {
 		stat => 0, df => 3, p => 1, method => $GOF,
 	});
 }
@@ -417,11 +416,11 @@ my $GOF     = 'Chi-squared test for given probabilities';
 # 2.66666667, with p-values 0.01682741 and 0.10247043.
 {
 	check('SciPy gh-12282 column 1',
-		chisq_test([10, 30], p => [5, 35], 'rescale.p' => 1), {
+		chisq_test([10, 30], p => [5, 35], 'rescale_p' => 1), {
 		stat => 5.7142857142857144, df => 1, p => 0.016827409482756819, method => $GOF,
 	});
 	check('SciPy gh-12282 column 2',
-		chisq_test([20, 20], p => [15, 25], 'rescale.p' => 1), {
+		chisq_test([20, 20], p => [15, 25], 'rescale_p' => 1), {
 		stat => 2.666666666666667, df => 1, p => 0.1024704348597493, method => $GOF,
 	});
 }
@@ -436,7 +435,7 @@ my $GOF     = 'Chi-squared test for given probabilities';
 	my $big = chisq_test([1000000, 0], p => [0.5, 0.5]);
 	near($big->{statistic}{'X-squared'}, 1000000, 1e-13, 'SciPy gh-18368 int32: statistic')
 		and pass('SciPy gh-18368 int32: statistic');
-	is($big->{'p.value'}, 0, 'SciPy gh-18368 int32: p underflows to 0, as in R');
+	is($big->{'p_value'}, 0, 'SciPy gh-18368 int32: p underflows to 0, as in R');
 }
 
 # chisquare() docstring: [16,18,16,14,12,12] uniform -> 2.0 / 0.84914503608461,
@@ -446,7 +445,7 @@ my $GOF     = 'Chi-squared test for given probabilities';
 		stat => 2, df => 5, p => 0.84914503608460967, method => $GOF,
 	});
 	check('SciPy chisquare docstring, f_exp',
-		chisq_test([16, 18, 16, 14, 12, 12], p => [16, 16, 16, 16, 16, 8], 'rescale.p' => 1), {
+		chisq_test([16, 18, 16, 14, 12, 12], p => [16, 16, 16, 16, 16, 8], 'rescale_p' => 1), {
 		stat => 3.5, df => 5, p => 0.6233876277495819, method => $GOF,
 	});
 	# the same counts flattened out of a 6x2 matrix, SciPy's axis=None case:
@@ -588,7 +587,7 @@ my $GOF     = 'Chi-squared test for given probabilities';
 	my $res = chisq_test([ [0, 0], [10, 20] ]);
 	ok($res->{statistic}{'X-squared'} != $res->{statistic}{'X-squared'},
 		'zero row gives a NaN statistic, as in R (SciPy raises)');
-	ok($res->{'p.value'} != $res->{'p.value'}, '... and a NaN p-value');
+	ok($res->{'p_value'} != $res->{'p_value'}, '... and a NaN p-value');
 	is($res->{parameter}{df}, 1, '... with df still 1');
 	is($res->{method}, $PEARSON, '... reported as a plain Pearson test');
 	is_deeply($res->{expected}, [[0, 0], [10, 20]], '... expected counts as R computes them');

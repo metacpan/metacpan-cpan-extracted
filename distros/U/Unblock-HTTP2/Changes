@@ -1,0 +1,99 @@
+Revision history for Unblock-HTTP2
+
+0.10  2026-10-04
+    - Make a deliberate breaking API harmonization pass across Unblock::HTTP2.
+    - Rename Transaction->inform() to Transaction->send_informational().
+      No compatibility alias is provided.
+    - Add Transaction->is_error() so the common transaction lifecycle
+      vocabulary includes state(), error(), is_complete(), is_cancelled(),
+      is_error(), and is_terminal().
+    - Normalize NativeABI discovery with definition(), native_include_dir(),
+      header_path(), and c_header().
+    - Install the public HTTP/2 native ABI header and report struct_size in the
+      Perl discovery definition.
+    - Build the XS native transport implementation against that same public
+      header so the installed declaration and compiled layout stay in sync.
+    - Review README, public POD, and docs for the 0.10 API, including callback
+      signatures, NativeABI discovery, and an explicit upgrade note.
+    - Add a staged-install regression test that builds the generated
+      distribution, loads NativeABI from the installed copy, verifies the
+      installed header and discovery values, and compiles an external C
+      consumer against that header.
+    - Jump from 0.04 to 0.10 to make the intentional public API break obvious.
+
+0.04  2026-10-04
+    - Add Unblock::HTTP2::NativeABI for XS-backed transports.
+    - Accept borrowed native input buffers directly on both Client and Server,
+      avoiding the transport-side Perl byte-scalar materialization.
+    - Add native output draining so libnghttp2 output can be copied directly
+      into a transport-owned native queue without an intermediate Perl string.
+    - Support native output pause-after-accept semantics for transport
+      backpressure while keeping the portable input()/output() API unchanged.
+    - Require Uniform::HTTP 0.06 for its header-only native C ABI.
+    - Inspect exact canonical outgoing Request and Response objects directly
+      from XS without allocating a Perl FastPath view.
+    - Keep received initial HTTP/2 header fields native through validation and
+      construct the final canonical Uniform object directly from native spans.
+    - Remove per-field Perl receive callbacks for initial headers and trailers;
+      trailers now cross the XS boundary once per completed header block.
+    - Keep Uniform subclasses and adapters on the portable Perl contract.
+    - Preserve HTTP/2 validation, header-list limits, informational responses,
+      Extended CONNECT, trailers, and lifecycle semantics on the native path.
+    - In the seven-sample CI comparison against the 0.03 baseline, median
+      canonical submit rate improved 73.5% and full in-memory loopback improved
+      173.6%.
+    - Add a diagnostic native-transport benchmark. The native transport ABI is
+      intended to remove Perl buffer materialization at an XS transport
+      boundary; an in-process peer bridge is not used as a throughput claim.
+
+0.03  2026-10-04
+    - Rename the public per-request object from Stream to Transaction so
+      Unblock::HTTP1, Unblock::HTTP2, and Unblock::HTTP3 share the same
+      application-facing concept.
+    - Rename the related public API: id() becomes stream_id(), stream_count()
+      becomes transaction_count(), stream_for_id() becomes
+      transaction_for_stream_id(), can_open_stream() becomes
+      can_open_transaction(), and max_active_streams becomes
+      max_active_transactions.
+    - Do not provide compatibility aliases for the old Stream API. This is an
+      intentional early-version API cleanup.
+    - Keep HTTP/2 stream terminology for protocol-level concepts such as stream
+      IDs, flow control, RST_STREAM, GOAWAY boundaries, and SETTINGS.
+
+0.02  2026-10-04
+    - Require Uniform::HTTP 0.05 and use its FastPath ABI for exact canonical
+      Request and Response objects.
+    - Map canonical outgoing headers directly to nghttp2_nv in XS, avoiding
+      per-field Perl method dispatch and intermediate HTTP/2 header arrays.
+    - Lowercase canonical field names and enforce HTTP/2 field restrictions in
+      the native fast path while preserving the existing portable fallback.
+    - Build received canonical Request and Response objects through trusted
+      FastPath construction after Unblock has validated their HTTP/2 semantics.
+    - Keep subclasses and framework adapters on the normal Uniform contract.
+    - Add repeatable FastPath performance comparison tooling under xt/ and CI.
+      The small-message benchmark shows large gains in native submission and
+      full in-memory request/response throughput.
+
+0.01  2026-10-04
+    - Initial release of a standalone, event-loop and operating-system neutral
+      HTTP/2 protocol engine.
+    - Use Uniform::HTTP 0.04 Request and Response objects directly.
+    - Provide byte-in/byte-out Client and Server engines with multiplexed Stream
+      objects and no socket, TLS, or event-loop ownership.
+    - Use a small private XS binding to libnghttp2 through Alien::nghttp2.
+    - Support buffered and streaming request and response bodies, cooperative
+      backpressure, trailers, informational responses, and half-close state.
+    - Support ordinary CONNECT and generic Extended CONNECT.
+    - Support SETTINGS inspection and updates, PING, GOAWAY, graceful draining,
+      stream resets, standard HTTP/2 error codes, and preserved reset details.
+    - Support application-controlled receive flow control while keeping
+      connection-level credit independent from slow streams.
+    - Support RFC 9218 extensible priorities and deliberately omit the
+      deprecated RFC 7540 dependency-tree priority API.
+    - Advertise SETTINGS_ENABLE_PUSH = 0; Server Push is not exposed.
+    - Preserve fatal session errors, invalid-frame observations, unknown
+      extension-frame safety, and GOAWAY details for higher-layer policy.
+    - Add in-memory protocol tests, packaged-distribution distcheck/disttest,
+      and bidirectional interoperability tests against stock nghttp2 tools.
+    - Test Perl 5.16 on Linux, current Perl on Linux and macOS, and Strawberry
+      Perl on Windows.

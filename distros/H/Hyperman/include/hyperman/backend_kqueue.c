@@ -47,7 +47,10 @@ static int kq_remove_io(hm_backend *be, int fd, int mask) {
 static int kq_add_timer(hm_backend *be, double secs, int oneshot, void *udata) {
     hm_kq_state *st = (hm_kq_state *)be->state;
     struct kevent kev;
+    /* whole milliseconds, rounded UP: a timer must never come due before
+     * the deadline it was armed for */
     long ms = (long)(secs * 1000);
+    if ((double)ms < secs * 1000) ms++;
     if (ms < 1) ms = 1;
     EV_SET(&kev, (uintptr_t)udata, EVFILT_TIMER,
            EV_ADD | (oneshot ? EV_ONESHOT : 0), 0, ms, udata);

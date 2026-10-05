@@ -111,15 +111,15 @@ same( merge($emp, $dept, how => 'inner'),
 		'multi-key inner join matches on the (k1,k2) tuple' );
 }
 
-# left.on / right.on with differently-named keys
+# left_on / right_on with differently-named keys
 {
 	my $orders = [ {oid=>1, cust=>'c1'}, {oid=>2, cust=>'c2'}, {oid=>3, cust=>'c9'} ];
 	my $cust   = [ {cid=>'c1', city=>'NYC'}, {cid=>'c2', city=>'LA'} ];
-	same( merge($orders, $cust, how => 'left', 'left.on' => 'cust', 'right.on' => 'cid'),
+	same( merge($orders, $cust, how => 'left', 'left_on' => 'cust', 'right_on' => 'cid'),
 		[ { cust=>'c1', oid=>1, city=>'NYC'   },
 		  { cust=>'c2', oid=>2, city=>'LA'    },
 		  { cust=>'c9', oid=>3, city=>undef   } ],
-		'left.on/right.on: single output key column keeps the left name' );
+		'left_on/right_on: single output key column keeps the left name' );
 }
 
 # many-to-many
@@ -141,8 +141,8 @@ same( merge($emp, $dept, on => 'dept', how => 'inner', suffixes => ['_emp','_dep
 {
 	my $L = { id => [1,2,3], grp => ['a','b','a'] };
 	my $R = { grp => ['a','b'], score => [100,200] };
-	my $got = merge($L, $R, on => 'grp', how => 'left', 'output.type' => 'hoa');
-	is ref $got, 'HASH', 'output.type => hoa returns a hash of arrays';
+	my $got = merge($L, $R, on => 'grp', how => 'left', 'output_type' => 'hoa');
+	is ref $got, 'HASH', 'output_type => hoa returns a hash of arrays';
 	same( $got,
 		[ { grp=>'a', id=>1, score=>100 },
 		  { grp=>'b', id=>2, score=>200 },
@@ -160,7 +160,7 @@ same( merge($emp, $dept, on => 'dept', how => 'inner', suffixes => ['_emp','_dep
 
 	my $HL = { a => [1], x => ['L'] };
 	my $HR = { a => [1], x => ['R'] };
-	merge($HL, $HR, on => 'a', 'output.type' => 'hoa');
+	merge($HL, $HR, on => 'a', 'output_type' => 'hoa');
 	is_deeply $HL, { a => [1], x => ['L'] }, 'left HoA frame is untouched';
 	is_deeply $HR, { a => [1], x => ['R'] }, 'right HoA frame is untouched';
 }
@@ -272,7 +272,7 @@ same( merge($emp, $dept, on => 'dept', how => 'inner', suffixes => ['_emp','_dep
 				for my $oshape (qw(aoh hoa)) {
 					my $got = merge($lshape eq 'aoh' ? $L : to_hoa($L, \@lcols),
 					                $rshape eq 'aoh' ? $R : to_hoa($R, \@rcols),
-					                @args, 'output.type' => $oshape);
+					                @args, 'output_type' => $oshape);
 					$cases++;
 					next if sig($got) eq sig($want);
 					$mismatch = "trial $trial: how=$how on=[@$keys] "
@@ -316,7 +316,7 @@ same( merge($emp, $dept, on => 'dept', how => 'inner', suffixes => ['_emp','_dep
 	# {'' , 0, '0', '0.0'} x {'', 0, '0', '0.0'}: 1 + 2*2 + 1.
 	my $got = merge({ k => ['', 0, '0', '0.0', undef] },
 	                { k => ['', 0, '0', '0.0'], w => [1 .. 4] },
-	                on => 'k', 'output.type' => 'hoa');
+	                on => 'k', 'output_type' => 'hoa');
 	is scalar @{ $got->{k} }, 6,
 		"0 and '0' are one key, '0.0' is another, '' is a key, undef is not";
 
@@ -341,7 +341,7 @@ same( merge($emp, $dept, on => 'dept', how => 'inner', suffixes => ['_emp','_dep
 	my $inf = 9**9**9;
 	is scalar @{ merge({ k => [ $inf, -$inf, $inf - $inf ] },
 	                   { k => [ $inf, -$inf, $inf - $inf ], w => [ 1 .. 3 ] },
-	                   on => 'k', 'output.type' => 'hoa')->{k} }, 3,
+	                   on => 'k', 'output_type' => 'hoa')->{k} }, 3,
 		'Inf, -Inf and NaN are three distinct keys, each matching itself';
 
 	# blessed frames: merge() looks at the underlying array or hash
@@ -354,7 +354,7 @@ same( merge($emp, $dept, on => 'dept', how => 'inner', suffixes => ['_emp','_dep
 throws_ok { merge([{a=>1}], [{a=>1}], how => 'bogus') } qr/merge: how must be/, 'bad how dies';
 throws_ok { merge([{a=>1}], [{b=>1}], on => 'a') } qr/right frame has no join column/, 'missing key dies';
 throws_ok { merge([{a=>1}], [{b=>1}]) } qr/no common columns/, 'no common columns dies';
-throws_ok { merge([{a=>1}], [{a=>1}], on => 'a', 'left.on' => 'a') } qr/not both/, 'on + left.on dies';
+throws_ok { merge([{a=>1}], [{a=>1}], on => 'a', 'left_on' => 'a') } qr/not both/, 'on + left_on dies';
 throws_ok { merge([{a=>1}], [{a=>1}], how => 'cross', on => 'a') } qr/cross join takes no join keys/, 'cross + on dies';
 throws_ok { merge([[1,2]], [{a=>1}], on => 'a') } qr/array-of-arrays/, 'AoA input dies';
 
@@ -368,7 +368,7 @@ SKIP: {
 		merge($emp, $dept, how => 'right', on => 'dept');
 		merge($emp, $dept, how => 'outer', on => 'dept');
 		merge($emp, $dept, how => 'cross');
-		merge($emp, $dept, on => 'dept', 'output.type' => 'hoa');
+		merge($emp, $dept, on => 'dept', 'output_type' => 'hoa');
 	} 'merge does not leak across all join types';
 }
 

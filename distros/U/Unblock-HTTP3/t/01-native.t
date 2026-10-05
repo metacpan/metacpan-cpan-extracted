@@ -170,4 +170,106 @@ like(
     'native connection rejects API use after fatal parse error',
 );
 
+my $retained_client = Unblock::HTTP3::_Native->client;
+my $retained_server = Unblock::HTTP3::_Native->server;
+
+$retained_client->bind_streams(2, 6, 10);
+$retained_server->bind_streams(3, 7, 11);
+$retained_server->set_max_client_streams_bidi(100);
+
+$retained_client->submit_request(
+    0,
+    [
+        [ ':method',    'POST' ],
+        [ ':scheme',    'https' ],
+        [ ':authority', 'example.test' ],
+        [ ':path',      '/retained-body' ],
+    ],
+    undef,
+    1,
+);
+
+my %retained_offset;
+my $retained_timestamp = 10;
+
+my $transfer_retained = sub {
+    while (my $out = $retained_client->next_write) {
+        my ($stream_id, $bytes, $fin) = @$out;
+
+        my $read = $retained_server->read_stream(
+            $stream_id,
+            $bytes,
+            $fin ? 1 : 0,
+            $retained_timestamp++,
+        );
+
+        is(
+            scalar(@$read),
+            1,
+            "retained-body peer accepts stream $stream_id",
+        );
+
+        ok(
+            $read->[0] >= 0
+                && $read->[0] <= length($bytes),
+            "retained-body peer accepts immediate or deferred stream consumption",
+        );
+
+        $retained_offset{$stream_id} += length($bytes);
+
+        $retained_client->add_write_offset(
+            $stream_id,
+            length($bytes),
+        );
+    }
+
+    return;
+};
+
+$transfer_retained->();
+
+my $retained_body = 'original-retained-body';
+is(
+    $retained_client->append_body(
+        0,
+        $retained_body,
+        0,
+    ),
+    length('original-retained-body'),
+    'native streaming append retains the complete chunk',
+);
+
+$retained_body = 'mutated-after-append';
+
+$transfer_retained->();
+
+$retained_client->update_ack_offset(
+    0,
+    $retained_offset{0},
+);
+
+is(
+    $retained_client->streaming_retained_bytes,
+    0,
+    'ACK releases retained Perl body storage',
+);
+
+my $retained_received = '';
+
+while (my $event = $retained_server->next_event) {
+    next unless $event->[0] eq 'data';
+    next unless $event->[1] == 0;
+    $retained_received .= $event->[2];
+}
+
+is(
+    $retained_received,
+    'original-retained-body',
+    'caller mutation after append does not change retained body bytes',
+);
+
+$retained_client->append_body(0, '', 1);
+$transfer_retained->();
+$retained_client->close_stream(0);
+
 done_testing;

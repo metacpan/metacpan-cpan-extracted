@@ -13,11 +13,12 @@ use Test::LeakTrace 'no_leaks_ok';
 #   * a single value + single aggfunc names each output column after the
 #     columns-tuple alone; multiple values and/or funcs prefix value / func
 #     (aggfunc-major ordering), joined with 'sep' (default '.')
-#   * rows/columns are sorted by default (numeric-if-all-numeric else string);
-#     sort => 0 keeps first-seen order
+#   * rows/columns are sorted by default, each key column numerically if all
+#     its values are numbers, else as strings, undef last; sort => 0 keeps
+#     first-seen order
 #   * skipna => 0 makes a numeric reducer return NA if the bucket has any NA
 #   * fill_value substitutes NA result cells
-#   * 'output.type' defaults to the input family
+#   * 'output_type' defaults to the input family
 
 # floating-point scalar comparison (per project convention)
 sub is_approx {
@@ -158,16 +159,16 @@ is_deeply(
 {
 	my $d = [ { k => 'B', v => 1 }, { k => 'A', v => 2 } ];
 	is_deeply(
-		pivot_table($d, columns => 'k', values => 'v', aggfunc => 'sum', sort => 0, 'output.type' => 'aoa'),
+		pivot_table($d, columns => 'k', values => 'v', aggfunc => 'sum', sort => 0, 'output_type' => 'aoa'),
 		[ [ 1, 2 ] ], 'sort=0: first-seen column order B,A');
 	is_deeply(
-		pivot_table($d, columns => 'k', values => 'v', aggfunc => 'sum', 'output.type' => 'aoa'),
+		pivot_table($d, columns => 'k', values => 'v', aggfunc => 'sum', 'output_type' => 'aoa'),
 		[ [ 2, 1 ] ], 'sort=1 (default): sorted column order A,B');
 }
 
 # no index -> single 'all' row
 is_deeply(
-	pivot_table($wide, columns => 'year', values => 'temp', aggfunc => 'sum', 'output.type' => 'hoh'),
+	pivot_table($wide, columns => 'year', values => 'temp', aggfunc => 'sum', 'output_type' => 'hoh'),
 	{ all => { 2020 => 70, 2021 => 80 } },
 	'no index -> single all row');
 
@@ -192,27 +193,27 @@ is_deeply(
 		'custom sep applied to generated names');
 }
 
-# output.type overrides
+# output_type overrides
 {
 	# hoh: label from index join
 	is_deeply(
 		pivot_table($wide, index => 'city', columns => 'year', values => 'temp',
-			aggfunc => 'sum', 'output.type' => 'hoh'),
+			aggfunc => 'sum', 'output_type' => 'hoh'),
 		{ NY => { city => 'NY', 2020 => 30, 2021 => 30 },
 		  LA => { city => 'LA', 2020 => 40, 2021 => 50 } },
-		'output.type hoh: index-value labels');
+		'output_type hoh: index-value labels');
 	# hoa
 	is_deeply(
 		pivot_table($wide, index => 'city', columns => 'year', values => 'temp',
-			aggfunc => 'sum', 'output.type' => 'hoa'),
+			aggfunc => 'sum', 'output_type' => 'hoa'),
 		{ city => [ 'LA', 'NY' ], 2020 => [ 40, 30 ], 2021 => [ 50, 30 ] },
-		'output.type hoa');
+		'output_type hoa');
 	# aoa
 	is_deeply(
 		pivot_table($wide, index => 'city', columns => 'year', values => 'temp',
-			aggfunc => 'sum', 'output.type' => 'aoa'),
+			aggfunc => 'sum', 'output_type' => 'aoa'),
 		[ [ 'LA', 40, 50 ], [ 'NY', 30, 30 ] ],
-		'output.type aoa: [index, cols...]');
+		'output_type aoa: [index, cols...]');
 }
 
 # hoh label uniquification when index join collides
@@ -221,7 +222,7 @@ is_deeply(
 	my $d = [ { a => '1',   b => '2.3', k => 'X', v => 1 },
 	          { a => '1.2', b => '3',   k => 'X', v => 2 } ];
 	my $got = pivot_table($d, index => [ 'a', 'b' ], columns => 'k', values => 'v',
-		aggfunc => 'sum', 'output.type' => 'hoh');
+		aggfunc => 'sum', 'output_type' => 'hoh');
 	is(scalar keys %$got, 2, 'hoh: colliding labels both kept (uniquified)');
 	ok(exists $got->{'1.2.3'} && exists $got->{'1.2.3.1'},
 		'hoh: second colliding label suffixed');
@@ -241,12 +242,28 @@ throws_ok { pivot_table([ { k => 1, v => 2 } ], columns => 'k', values => 'v', a
 	qr/unknown aggfunc/, 'unknown aggfunc dies';
 throws_ok { pivot_table([ { k => 1, v => 2 } ], columns => 'k', values => 'v', aggfunc => []) }
 	qr/empty aggfunc list/, 'empty aggfunc list dies';
-throws_ok { pivot_table([ { k => 1, v => 2 } ], columns => 'k', values => 'v', 'output.type' => 'xxx') }
-	qr/output\.type/, 'bad output.type dies';
+throws_ok { pivot_table([ { k => 1, v => 2 } ], columns => 'k', values => 'v', 'output_type' => 'xxx') }
+	qr/output_type/, 'bad output_type dies';
 throws_ok {
 	pivot_table([ { a => 1, b => 23, v => 1 }, { a => 12, b => 3, v => 1 } ],
 		index => undef, columns => [ 'a', 'b' ], values => 'v', aggfunc => 'sum', sep => '')
 } qr/duplicate column name/, 'generated duplicate names die';
+
+# Row and column order share agg()'s per-column rule.  Up to 0.3212 one undef
+# index value, or a string index column alongside, sorted numbers as strings
+# (10 before 2), and an undef index sorted first as ''.
+{
+	my $df = [ map { { i => $_->[0], s => 'a', c => 'x', v => $_->[1] } }
+	           [ 10, 1 ], [ 2, 2 ], [ undef, 3 ], [ 9, 4 ] ];
+	my $p = pivot_table($df, index => 'i', columns => 'c', values => 'v',
+	                    aggfunc => 'sum', 'output_type' => 'aoa');
+	is_deeply([ map { $_->[0] } @$p ], [ 2, 9, 10, undef ],
+		'pivot_table: numeric index sorts numerically, undef last');
+	$p = pivot_table($df, index => [ 's', 'i' ], columns => 'c', values => 'v',
+	                 aggfunc => 'sum', 'output_type' => 'aoa');
+	is_deeply([ map { $_->[1] } @$p ], [ 2, 9, 10, undef ],
+		'pivot_table: a numeric index column beside a string one still sorts numerically');
+}
 
 # memory
 no_leaks_ok {

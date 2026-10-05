@@ -52,7 +52,7 @@
 #     `incomparables = NA` (merge.Rd: "DBMSes do not match NULL records").  The
 #     frozen answers follow Stats::LikeR's rule; the references' default answers
 #     are pinned in the divergence section.
-#   * Two key columns vs one.  Under left.on/right.on pandas keeps both key
+#   * Two key columns vs one.  Under left_on/right_on pandas keeps both key
 #     columns; R and Stats::LikeR keep one, under the left name, filled from
 #     whichever side has the row.
 #   * Suffixes.  pandas suffixes colliding non-key columns _x/_y, R and
@@ -156,7 +156,7 @@ sub check_case {
 				my $got = eval {
 					merge(build($ls, $L->{cols}, $L->{rows}),
 					      build($rs, $R->{cols}, $R->{rows}),
-					      @{ $c->{args} }, 'output.type' => $os);
+					      @{ $c->{args} }, 'output_type' => $os);
 				};
 				if (!defined $got) {
 					$bad = "$ls + $rs -> $os died: $@";
@@ -173,7 +173,7 @@ sub check_case {
 
 	my $hoa = merge(build($shapes[0], $L->{cols}, $L->{rows}),
 	                build($shapes[0], $R->{cols}, $R->{rows}),
-	                @{ $c->{args} }, 'output.type' => 'hoa');
+	                @{ $c->{args} }, 'output_type' => 'hoa');
 	is_deeply [ sort keys %$hoa ], [ sort @{ $c->{want_cols} } ],
 		"$c->{name}: output columns";
 }
@@ -478,7 +478,7 @@ my @R_CASES = (
 	},
 	{ name  => 'merge.Rd m1: merge(authors, books, by.x = \'surname\', by.y = \'name\') [inner]',
 	  left  => 'authors', right => 'books',
-	  args  => [ 'how' => 'inner', 'left.on' => 'surname', 'right.on' => 'name' ],
+	  args  => [ 'how' => 'inner', 'left_on' => 'surname', 'right_on' => 'name' ],
 	  want_cols => ['surname', 'nationality', 'deceased', 'title', 'other.author'],
 	  want_rows => [ ['McNeil', 'Australia', 'no', 'Interactive Data Analysis', undef],
 	                 ['Ripley', 'UK', 'no', 'Spatial Statistics', undef],
@@ -490,7 +490,7 @@ my @R_CASES = (
 	},
 	{ name  => 'merge.Rd m1: merge(authors, books, by.x = \'surname\', by.y = \'name\') [left]',
 	  left  => 'authors', right => 'books',
-	  args  => [ 'how' => 'left', 'left.on' => 'surname', 'right.on' => 'name' ],
+	  args  => [ 'how' => 'left', 'left_on' => 'surname', 'right_on' => 'name' ],
 	  want_cols => ['surname', 'nationality', 'deceased', 'title', 'other.author'],
 	  want_rows => [ ['McNeil', 'Australia', 'no', 'Interactive Data Analysis', undef],
 	                 ['Ripley', 'UK', 'no', 'Spatial Statistics', undef],
@@ -502,7 +502,7 @@ my @R_CASES = (
 	},
 	{ name  => 'merge.Rd m1: merge(authors, books, by.x = \'surname\', by.y = \'name\') [right]',
 	  left  => 'authors', right => 'books',
-	  args  => [ 'how' => 'right', 'left.on' => 'surname', 'right.on' => 'name' ],
+	  args  => [ 'how' => 'right', 'left_on' => 'surname', 'right_on' => 'name' ],
 	  want_cols => ['surname', 'nationality', 'deceased', 'title', 'other.author'],
 	  want_rows => [ ['McNeil', 'Australia', 'no', 'Interactive Data Analysis', undef],
 	                 ['R Core', undef, undef, 'An Introduction to R', 'Venables & Smith'],
@@ -515,7 +515,7 @@ my @R_CASES = (
 	},
 	{ name  => 'merge.Rd m1: merge(authors, books, by.x = \'surname\', by.y = \'name\') [outer]',
 	  left  => 'authors', right => 'books',
-	  args  => [ 'how' => 'outer', 'left.on' => 'surname', 'right.on' => 'name' ],
+	  args  => [ 'how' => 'outer', 'left_on' => 'surname', 'right_on' => 'name' ],
 	  want_cols => ['surname', 'nationality', 'deceased', 'title', 'other.author'],
 	  want_rows => [ ['McNeil', 'Australia', 'no', 'Interactive Data Analysis', undef],
 	                 ['R Core', undef, undef, 'An Introduction to R', 'Venables & Smith'],
@@ -528,7 +528,7 @@ my @R_CASES = (
 	},
 	{ name  => 'merge.Rd m2: merge(books, authors, by.x = \'name\', by.y = \'surname\') [inner]',
 	  left  => 'books', right => 'authors',
-	  args  => [ 'how' => 'inner', 'left.on' => 'name', 'right.on' => 'surname' ],
+	  args  => [ 'how' => 'inner', 'left_on' => 'name', 'right_on' => 'surname' ],
 	  want_cols => ['name', 'title', 'other.author', 'nationality', 'deceased'],
 	  want_rows => [ ['McNeil', 'Interactive Data Analysis', undef, 'Australia', 'no'],
 	                 ['Ripley', 'Spatial Statistics', undef, 'UK', 'no'],
@@ -540,7 +540,7 @@ my @R_CASES = (
 	},
 	{ name  => 'merge.Rd m2: merge(books, authors, by.x = \'name\', by.y = \'surname\') [left]',
 	  left  => 'books', right => 'authors',
-	  args  => [ 'how' => 'left', 'left.on' => 'name', 'right.on' => 'surname' ],
+	  args  => [ 'how' => 'left', 'left_on' => 'name', 'right_on' => 'surname' ],
 	  want_cols => ['name', 'title', 'other.author', 'nationality', 'deceased'],
 	  want_rows => [ ['McNeil', 'Interactive Data Analysis', undef, 'Australia', 'no'],
 	                 ['R Core', 'An Introduction to R', 'Venables & Smith', undef, undef],
@@ -553,7 +553,7 @@ my @R_CASES = (
 	},
 	{ name  => 'merge.Rd m2: merge(books, authors, by.x = \'name\', by.y = \'surname\') [right]',
 	  left  => 'books', right => 'authors',
-	  args  => [ 'how' => 'right', 'left.on' => 'name', 'right.on' => 'surname' ],
+	  args  => [ 'how' => 'right', 'left_on' => 'name', 'right_on' => 'surname' ],
 	  want_cols => ['name', 'title', 'other.author', 'nationality', 'deceased'],
 	  want_rows => [ ['McNeil', 'Interactive Data Analysis', undef, 'Australia', 'no'],
 	                 ['Ripley', 'Spatial Statistics', undef, 'UK', 'no'],
@@ -565,7 +565,7 @@ my @R_CASES = (
 	},
 	{ name  => 'merge.Rd m2: merge(books, authors, by.x = \'name\', by.y = \'surname\') [outer]',
 	  left  => 'books', right => 'authors',
-	  args  => [ 'how' => 'outer', 'left.on' => 'name', 'right.on' => 'surname' ],
+	  args  => [ 'how' => 'outer', 'left_on' => 'name', 'right_on' => 'surname' ],
 	  want_cols => ['name', 'title', 'other.author', 'nationality', 'deceased'],
 	  want_rows => [ ['McNeil', 'Interactive Data Analysis', undef, 'Australia', 'no'],
 	                 ['R Core', 'An Introduction to R', 'Venables & Smith', undef, undef],
@@ -706,7 +706,7 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1d.R: by.x = \'name\', by.y = \'parent\' (right \'name\' collides) [inner]',
 	  left  => 'parents', right => 'children',
-	  args  => [ 'how' => 'inner', 'left.on' => 'name', 'right.on' => 'parent' ],
+	  args  => [ 'how' => 'inner', 'left_on' => 'name', 'right_on' => 'parent' ],
 	  want_cols => ['name', 'sex.x', 'age.x', 'name.y', 'sex.y', 'age.y'],
 	  want_rows => [ ['Max', 'M', 43, 'Sebastian', 'M', 8],
 	                 ['Qin', 'F', 36, 'Kai-lee', 'F', 7],
@@ -715,7 +715,7 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1d.R: by.x = \'name\', by.y = \'parent\' (right \'name\' collides) [left]',
 	  left  => 'parents', right => 'children',
-	  args  => [ 'how' => 'left', 'left.on' => 'name', 'right.on' => 'parent' ],
+	  args  => [ 'how' => 'left', 'left_on' => 'name', 'right_on' => 'parent' ],
 	  want_cols => ['name', 'sex.x', 'age.x', 'name.y', 'sex.y', 'age.y'],
 	  want_rows => [ ['Lex', 'M', 51, undef, undef, undef],
 	                 ['Max', 'M', 43, 'Sebastian', 'M', 8],
@@ -725,7 +725,7 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1d.R: by.x = \'name\', by.y = \'parent\' (right \'name\' collides) [right]',
 	  left  => 'parents', right => 'children',
-	  args  => [ 'how' => 'right', 'left.on' => 'name', 'right.on' => 'parent' ],
+	  args  => [ 'how' => 'right', 'left_on' => 'name', 'right_on' => 'parent' ],
 	  want_cols => ['name', 'sex.x', 'age.x', 'name.y', 'sex.y', 'age.y'],
 	  want_rows => [ ['Max', 'M', 43, 'Sebastian', 'M', 8],
 	                 ['Qin', 'F', 36, 'Kai-lee', 'F', 7],
@@ -734,7 +734,7 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1d.R: by.x = \'name\', by.y = \'parent\' (right \'name\' collides) [outer]',
 	  left  => 'parents', right => 'children',
-	  args  => [ 'how' => 'outer', 'left.on' => 'name', 'right.on' => 'parent' ],
+	  args  => [ 'how' => 'outer', 'left_on' => 'name', 'right_on' => 'parent' ],
 	  want_cols => ['name', 'sex.x', 'age.x', 'name.y', 'sex.y', 'age.y'],
 	  want_rows => [ ['Lex', 'M', 51, undef, undef, undef],
 	                 ['Max', 'M', 43, 'Sebastian', 'M', 8],
@@ -814,7 +814,7 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1a.R PR#1510: by.x = c(\'x\',\'n\'), by.y = c(\'z\',\'m\') [inner]',
 	  left  => 'pr1510_df2', right => 'pr1510_df1',
-	  args  => [ 'how' => 'inner', 'left.on' => ['x', 'n'], 'right.on' => ['z', 'm'] ],
+	  args  => [ 'how' => 'inner', 'left_on' => ['x', 'n'], 'right_on' => ['z', 'm'] ],
 	  want_cols => ['x', 'n', 'y', 'w'],
 	  want_rows => [ ['1', 'a', 201, 101],
 	                 ['1', 'a', 201, 102],
@@ -825,7 +825,7 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1a.R PR#1510: by.x = c(\'x\',\'n\'), by.y = c(\'z\',\'m\') [left]',
 	  left  => 'pr1510_df2', right => 'pr1510_df1',
-	  args  => [ 'how' => 'left', 'left.on' => ['x', 'n'], 'right.on' => ['z', 'm'] ],
+	  args  => [ 'how' => 'left', 'left_on' => ['x', 'n'], 'right_on' => ['z', 'm'] ],
 	  want_cols => ['x', 'n', 'y', 'w'],
 	  want_rows => [ ['1', 'a', 201, 101],
 	                 ['1', 'a', 201, 102],
@@ -837,7 +837,7 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1a.R PR#1510: by.x = c(\'x\',\'n\'), by.y = c(\'z\',\'m\') [right]',
 	  left  => 'pr1510_df2', right => 'pr1510_df1',
-	  args  => [ 'how' => 'right', 'left.on' => ['x', 'n'], 'right.on' => ['z', 'm'] ],
+	  args  => [ 'how' => 'right', 'left_on' => ['x', 'n'], 'right_on' => ['z', 'm'] ],
 	  want_cols => ['x', 'n', 'y', 'w'],
 	  want_rows => [ ['1', 'a', 201, 101],
 	                 ['1', 'a', 201, 102],
@@ -849,7 +849,7 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1a.R PR#1510: by.x = c(\'x\',\'n\'), by.y = c(\'z\',\'m\') [outer]',
 	  left  => 'pr1510_df2', right => 'pr1510_df1',
-	  args  => [ 'how' => 'outer', 'left.on' => ['x', 'n'], 'right.on' => ['z', 'm'] ],
+	  args  => [ 'how' => 'outer', 'left_on' => ['x', 'n'], 'right_on' => ['z', 'm'] ],
 	  want_cols => ['x', 'n', 'y', 'w'],
 	  want_rows => [ ['1', 'a', 201, 101],
 	                 ['1', 'a', 201, 102],
@@ -1109,14 +1109,14 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1a.R: merge on a zero-row right frame, by.x = by.y = \'x\' [inner]',
 	  left  => 'zr_d', right => 'zr_e',
-	  args  => [ 'how' => 'inner', 'left.on' => 'x', 'right.on' => 'x' ],
+	  args  => [ 'how' => 'inner', 'left_on' => 'x', 'right_on' => 'x' ],
 	  shapes => 'hoa',
 	  want_cols => ['x', 'y.x', 'fac.x', 'y.y', 'fac.y'],
 	  want_rows => [],
 	},
 	{ name  => 'reg-tests-1a.R: merge on a zero-row right frame, by.x = by.y = \'x\' [left]',
 	  left  => 'zr_d', right => 'zr_e',
-	  args  => [ 'how' => 'left', 'left.on' => 'x', 'right.on' => 'x' ],
+	  args  => [ 'how' => 'left', 'left_on' => 'x', 'right_on' => 'x' ],
 	  shapes => 'hoa',
 	  want_cols => ['x', 'y.x', 'fac.x', 'y.y', 'fac.y'],
 	  want_rows => [ ['1', 1, 'B', undef, undef],
@@ -1124,14 +1124,14 @@ my @R_CASES = (
 	},
 	{ name  => 'reg-tests-1a.R: merge on a zero-row right frame, by.x = by.y = \'x\' [right]',
 	  left  => 'zr_d', right => 'zr_e',
-	  args  => [ 'how' => 'right', 'left.on' => 'x', 'right.on' => 'x' ],
+	  args  => [ 'how' => 'right', 'left_on' => 'x', 'right_on' => 'x' ],
 	  shapes => 'hoa',
 	  want_cols => ['x', 'y.x', 'fac.x', 'y.y', 'fac.y'],
 	  want_rows => [],
 	},
 	{ name  => 'reg-tests-1a.R: merge on a zero-row right frame, by.x = by.y = \'x\' [outer]',
 	  left  => 'zr_d', right => 'zr_e',
-	  args  => [ 'how' => 'outer', 'left.on' => 'x', 'right.on' => 'x' ],
+	  args  => [ 'how' => 'outer', 'left_on' => 'x', 'right_on' => 'x' ],
 	  shapes => 'hoa',
 	  want_cols => ['x', 'y.x', 'fac.x', 'y.y', 'fac.y'],
 	  want_rows => [ ['1', 1, 'B', undef, undef],
@@ -1768,7 +1768,7 @@ my @PD_CASES = (
 	},
 	{ name  => 'test_merge_different_column_key_names [inner]',
 	  left  => 'dckn_l', right => 'dckn_r',
-	  args  => [ 'how' => 'inner', 'left.on' => 'lkey', 'right.on' => 'rkey', 'suffixes' => ['_x','_y'] ],
+	  args  => [ 'how' => 'inner', 'left_on' => 'lkey', 'right_on' => 'rkey', 'suffixes' => ['_x','_y'] ],
 	  want_cols => ['lkey', 'value_x', 'value_y'],
 	  want_rows => [ ['foo', 1, 5],
 	                 ['foo', 1, 8],
@@ -1779,7 +1779,7 @@ my @PD_CASES = (
 	},
 	{ name  => 'test_merge_different_column_key_names [left]',
 	  left  => 'dckn_l', right => 'dckn_r',
-	  args  => [ 'how' => 'left', 'left.on' => 'lkey', 'right.on' => 'rkey', 'suffixes' => ['_x','_y'] ],
+	  args  => [ 'how' => 'left', 'left_on' => 'lkey', 'right_on' => 'rkey', 'suffixes' => ['_x','_y'] ],
 	  want_cols => ['lkey', 'value_x', 'value_y'],
 	  want_rows => [ ['foo', 1, 5],
 	                 ['foo', 1, 8],
@@ -1791,7 +1791,7 @@ my @PD_CASES = (
 	},
 	{ name  => 'test_merge_different_column_key_names [right]',
 	  left  => 'dckn_l', right => 'dckn_r',
-	  args  => [ 'how' => 'right', 'left.on' => 'lkey', 'right.on' => 'rkey', 'suffixes' => ['_x','_y'] ],
+	  args  => [ 'how' => 'right', 'left_on' => 'lkey', 'right_on' => 'rkey', 'suffixes' => ['_x','_y'] ],
 	  want_cols => ['lkey', 'value_x', 'value_y'],
 	  want_rows => [ ['foo', 1, 5],
 	                 ['foo', 4, 5],
@@ -1803,7 +1803,7 @@ my @PD_CASES = (
 	},
 	{ name  => 'test_merge_different_column_key_names [outer]',
 	  left  => 'dckn_l', right => 'dckn_r',
-	  args  => [ 'how' => 'outer', 'left.on' => 'lkey', 'right.on' => 'rkey', 'suffixes' => ['_x','_y'] ],
+	  args  => [ 'how' => 'outer', 'left_on' => 'lkey', 'right_on' => 'rkey', 'suffixes' => ['_x','_y'] ],
 	  want_cols => ['lkey', 'value_x', 'value_y'],
 	  want_rows => [ ['bar', 2, 6],
 	                 ['baz', 3, undef],
@@ -2245,15 +2245,14 @@ check_case(\%PD_FRAMES, $_) for @PD_CASES;
 
 # --------------------------------------------------- R's own argument spelling
 #
-# The same joins written the way R writes them, and the way pandas does: `by`,
-# `by.x` and `by.y` are documented synonyms for `on`, `left.on` and `right.on`,
-# and so are pandas' `left_on` and `right_on`, so a case taken from a reference
-# suite has to give the same answer through either spelling.
+# The same joins written the way R names the arguments: `by`, `by_x` and
+# `by_y` (R's by, by.x and by.y, with the dot made an underscore as everywhere
+# in this module) are documented synonyms for `on`, `left_on` and `right_on`,
+# pandas' names, so a case taken from either reference suite has to give the
+# same answer through either spelling.  The dotted spellings are refused.
 {
-	my %R_SPELLING  = ('on' => 'by', 'left.on' => 'by.x', 'right.on' => 'by.y');
-	my %PD_SPELLING = ('left.on' => 'left_on', 'right.on' => 'right_on');
-	for my $s ([ 'R (by/by.x/by.y)', \%R_SPELLING ],
-	           [ 'pandas (left_on/right_on)', \%PD_SPELLING ]) {
+	my %R_SPELLING = ('on' => 'by', 'left_on' => 'by_x', 'right_on' => 'by_y');
+	for my $s ([ 'R (by/by_x/by_y)', \%R_SPELLING ]) {
 		my ($who, $alias) = @$s;
 		my $bad  = '';
 		my $seen = 0;
@@ -2281,12 +2280,17 @@ check_case(\%PD_FRAMES, $_) for @PD_CASES;
 		}
 		is $bad, '', "the $who spelling names the same call ($seen cases)";
 	}
-	# and the output.type spellings, which have three accepted forms
+	# and the output_type spellings, which have two accepted forms
 	my $L = { a => [ 1, 2 ], v => [ 'x', 'y' ] };
 	my $R = { a => [ 2, 3 ], w => [ 'p', 'q' ] };
-	for my $spelling (qw(output.type output_type out)) {
+	for my $spelling (qw(output_type out)) {
 		is ref merge($L, $R, on => 'a', $spelling => 'hoa'), 'HASH',
 			"$spelling => 'hoa' asks for a hash of arrays";
+	}
+	# R's dotted spellings are refused rather than taken as synonyms
+	for my $dotted (qw(left.on right.on by.x by.y output.type)) {
+		ok !eval { merge($L, $R, on => 'a', $dotted => 'a'); 1 }
+			&& $@ =~ /unknown option '\Q$dotted\E'/, "the dotted '$dotted' is refused";
 	}
 	# `full` is documented as an alias for `outer`, which is R's all = TRUE
 	is sig(merge($L, $R, how => 'full',  on => 'a')),
@@ -2356,11 +2360,11 @@ check_case(\%PD_FRAMES, $_) for @PD_CASES;
 		'an empty AoH has no columns, so a natural join has no keys';
 	# an empty HoA keeps them, so the same joins go through
 	is_deeply merge({ a => [], v => [] }, [ { a => 1, w => 2 } ],
-	                on => 'a', how => 'right', 'output.type' => 'hoa'),
+	                on => 'a', how => 'right', 'output_type' => 'hoa'),
 		{ a => [1], v => [undef], w => [2] },
 		'an empty HoA keeps its columns, and a right join keeps the right row';
 	# a cross join reads no keys at all, so an empty AoH is simply no rows
-	is_deeply merge([], [ { a => 1 } ], how => 'cross', 'output.type' => 'hoa'),
+	is_deeply merge([], [ { a => 1 } ], how => 'cross', 'output_type' => 'hoa'),
 		{ a => [] }, 'cross join with an empty AoH is empty (test_merge_empty)';
 }
 
@@ -2424,20 +2428,20 @@ check_case(\%PD_FRAMES, $_) for @PD_CASES;
 		qr/cross join takes no join keys/, 'test_merge_cross_error_reporting: on';
 	throws_ok {
 		merge([ { a => 1 } ], [ { b => 1 } ], how => 'cross',
-		      'left.on' => 'a', 'right.on' => 'b')
+		      'left_on' => 'a', 'right_on' => 'b')
 	} qr/cross join takes no join keys/,
-		'test_merge_cross_error_reporting: left.on/right.on';
+		'test_merge_cross_error_reporting: left_on/right_on';
 
 	# pandas test_merge.py::test_merge_join_cols_error_reporting_duplicates and
 	# _missing: half a key specification, and a key the frame does not have.
-	throws_ok { merge([ { a => 1 } ], [ { a => 1 } ], 'left.on' => 'a') }
-		qr/'left\.on' and 'right\.on' must be given together/,
+	throws_ok { merge([ { a => 1 } ], [ { a => 1 } ], 'left_on' => 'a') }
+		qr/'left_on' and 'right_on' must be given together/,
 		'test_merge_join_cols_error_reporting: left_on without right_on';
 	throws_ok {
 		merge([ { a => 1, b => 1 } ], [ { c => 1 } ],
-		      'left.on' => [ 'a', 'b' ], 'right.on' => ['c'])
+		      'left_on' => [ 'a', 'b' ], 'right_on' => ['c'])
 	} qr/must name the same number of columns/,
-		'left.on and right.on must be the same length';
+		'left_on and right_on must be the same length';
 	throws_ok { merge([ { a => 1 } ], [ { a => 1 } ], on => [ 'a', 'a' ]) }
 		qr/duplicate join column 'a'/, 'a key named twice is refused';
 }
@@ -2471,22 +2475,22 @@ check_case(\%PD_FRAMES, $_) for @PD_CASES;
 	           data => [1 .. 5] };
 	my $ky = { k1 => [undef, 2, undef, 4, 5], k2 => [undef, undef, 3, 4, 5],
 	           data => [1 .. 5] };
-	my $two = merge($kx, $ky, on => [ 'k1', 'k2' ], 'output.type' => 'hoa');
+	my $two = merge($kx, $ky, on => [ 'k1', 'k2' ], 'output_type' => 'hoa');
 	is scalar @{ $two->{k1} }, 2,
 		'undef keys do not match: 2 rows where R and pandas give 3';
 	is_deeply [ sort @{ $two->{k1} } ], [ 4, 5 ],
 		'the surviving rows are the two with no undef in either key';
-	my $one = merge($kx, $ky, on => 'k1', 'output.type' => 'hoa');
+	my $one = merge($kx, $ky, on => 'k1', 'output_type' => 'hoa');
 	is scalar @{ $one->{k1} }, 2,
 		'single-column key: 2 rows where R and pandas give 6';
 	# an undef key row is still a row: it comes out of a left join unmatched
 	my $left = merge($kx, $ky, on => [ 'k1', 'k2' ], how => 'left',
-	                 'output.type' => 'hoa');
+	                 'output_type' => 'hoa');
 	is scalar @{ $left->{'data.x'} }, 5,
 		'a left join keeps all five left rows, matched or not';
 }
 
-# 2. Under left.on/right.on there is one key column, not two.
+# 2. Under left_on/right_on there is one key column, not two.
 #
 # pandas keeps both: test_merge_different_column_key_names ends with a frame
 # carrying lkey *and* rkey.  R keeps one, under the by.x name, and so does
@@ -2495,9 +2499,9 @@ check_case(\%PD_FRAMES, $_) for @PD_CASES;
 {
 	my $L = [ { lkey => 'foo', value => 1 }, { lkey => 'baz', value => 3 } ];
 	my $R = [ { rkey => 'foo', value => 5 }, { rkey => 'qux', value => 7 } ];
-	my $got = merge($L, $R, how => 'outer', 'left.on' => 'lkey',
-	                'right.on' => 'rkey', suffixes => ['_x', '_y'],
-	                'output.type' => 'hoa');
+	my $got = merge($L, $R, how => 'outer', 'left_on' => 'lkey',
+	                'right_on' => 'rkey', suffixes => ['_x', '_y'],
+	                'output_type' => 'hoa');
 	is_deeply [ sort keys %$got ], [ 'lkey', 'value_x', 'value_y' ],
 		'one key column under the left name, where pandas keeps lkey and rkey';
 	is_deeply [ sort map { defined $_ ? $_ : 'UNDEF' } @{ $got->{lkey} } ],
@@ -2552,7 +2556,7 @@ check_case(\%PD_FRAMES, $_) for @PD_CASES;
 	my $nums = { k => [ 0.5, 0.25, 2.5, -1.5, 3 ],   v => [ 1 .. 5 ] };
 	my $strs = { k => [ '0.5', '0.25', '2.5', '-1.5', '3' ], w => [ 1 .. 5 ] };
 	my $got = merge($nums, $strs, on => 'k', how => 'inner',
-	                'output.type' => 'hoa');
+	                'output_type' => 'hoa');
 	is scalar @{ $got->{k} }, 5,
 		'dyadic double keys match the same values written as strings';
 	is_deeply [ map { $got->{v}[$_] . ':' . $got->{w}[$_] } 0 .. 4 ],
@@ -2562,13 +2566,13 @@ check_case(\%PD_FRAMES, $_) for @PD_CASES;
 	# test_merge_on_ints_floats: an integer key column against a float one
 	is scalar @{ merge({ X => [ 1, 2, 3 ] },
 	                   { X => [ 1.0, 2.0, 3.0 ], Y => [ 1, 2, 3 ] },
-	                   on => 'X', 'output.type' => 'hoa')->{X} }, 3,
+	                   on => 'X', 'output_type' => 'hoa')->{X} }, 3,
 		'test_merge_on_ints_floats: 1 and 1.0 are the same key';
 	# ...but 1 and "1.0" are not: the stringified cells differ.  This is the
 	# documented rule and the same one drop_duplicates() and value_counts()
 	# use, so it is checked rather than assumed.
 	is scalar @{ merge({ X => [ 1, 2, 3 ] }, { X => [ '1.0', '2.0', '3.0' ] },
-	                   on => 'X', 'output.type' => 'hoa')->{X} }, 0,
+	                   on => 'X', 'output_type' => 'hoa')->{X} }, 0,
 		'1 and "1.0" are different keys, as documented';
 }
 
@@ -2586,12 +2590,12 @@ SKIP: {
 	my $H = { r1 => { k1 => 1, k2 => 'a', v => 9 } };
 	no_leaks_ok {
 		for my $how (qw(inner left right outer)) {
-			merge($L, $R, how => $how, 'left.on' => [ 'k1', 'k2' ],
-			      'right.on' => [ 'j1', 'j2' ], suffixes => [ '_l', '_r' ]);
-			merge($H, $R, how => $how, 'left.on' => 'k1', 'right.on' => 'j1',
-			      'output.type' => 'hoa');
+			merge($L, $R, how => $how, 'left_on' => [ 'k1', 'k2' ],
+			      'right_on' => [ 'j1', 'j2' ], suffixes => [ '_l', '_r' ]);
+			merge($H, $R, how => $how, 'left_on' => 'k1', 'right_on' => 'j1',
+			      'output_type' => 'hoa');
 			merge($L, { j1 => [], v => [] }, how => $how,
-			      'left.on' => 'k1', 'right.on' => 'j1');
+			      'left_on' => 'k1', 'right_on' => 'j1');
 		}
 	} 'no leaks over undef keys, custom suffixes, HoH input and empty answers';
 }

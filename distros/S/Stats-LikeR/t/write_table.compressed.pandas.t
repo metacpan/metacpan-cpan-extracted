@@ -24,7 +24,7 @@
 #       prints row by row
 #
 # pandas writes the index as a column, which write_table does as
-# 'row.names'; its read_csv(index_col=0) is read_table's 'hoh' on that column.
+# 'row_names'; its read_csv(index_col=0) is read_table's 'hoh' on that column.
 # pandas compares frames of numbers; write_table writes the strings perl makes
 # of them, so each frame is compared here with what the same call writes to a
 # plain file -- the compressed file must hold exactly those bytes -- and with
@@ -112,8 +112,8 @@ sub same_as_plain {
 		my ($got, $rest) = $c->[1]->(slurp($f));
 		is $got, $text, "$what, .$c->[0]: the text is the plain file's";
 		is $rest, 0, "$what, .$c->[0]: one member, nothing after it";
-		my %rt = $opt{'row.names'}
-			? ('output.type' => 'hoh', 'row.names' => $opt{'row.names'}) : ();
+		my %rt = $opt{'row_names'}
+			? ('output_type' => 'hoh', 'row_names' => $opt{'row_names'}) : ();
 		is_deeply read_table($f, %rt), read_table($plain, %rt),
 			"$what, .$c->[0]: read_table reads it as the plain file";
 	}
@@ -127,7 +127,7 @@ same_as_plain('GH22004',
 # test_to_csv_compression (gh-15008): the index is written, and read back
 {
 	my $text = same_as_plain('gh-15008', { 0 => { A => 1 } }, 'gh15008.csv',
-		'row.names' => 'idx');
+		'row_names' => 'idx');
 	is $text, nl("idx,A\n0,1\n"),'gh-15008: the index is a column';
 }
 
@@ -137,7 +137,7 @@ same_as_plain('GH22004',
 	for my $i (0 .. 29) {
 		$df{"i-$i"} = { map { (qw(A B C D))[$_] => 1.1 * (4 * $i + $_) } 0 .. 3 };
 	}
-	same_as_plain('GH 38714', \%df, 'gh38714.csv', 'row.names' => 'index');
+	same_as_plain('GH 38714', \%df, 'gh38714.csv', 'row_names' => 'index');
 }
 
 # test_compression_size: smaller compressed than plain

@@ -129,34 +129,42 @@ sign_msg($msg,
 # (m=1/i=1, d=unstable.email) after Mailman on mail.dkim2.com has tagged the
 # subject, added List-* fields and a footer, and recorded the change as an
 # UNSIGNED Message-Instance m=2 -- exactly what the outbound milter is handed
-# to sign. Captured 2026-09-10, the first day Fastmail signed: the milter's
-# pre-sign verify ran WITHOUT the opt-out, reported this PERMERROR, and every
-# list post with a signed upstream left unsigned (bin/dkim2-milter; see
-# t/milter-script.t for the end-to-end guard). unstable.email's fm3 key is
-# pinned here so the fixture does not depend on live DNS or key rotation.
+# to sign. The first capture (2026-09-10, the first day Fastmail signed)
+# showed the milter's pre-sign verify running WITHOUT the opt-out, reporting
+# this PERMERROR, and every list post with a signed upstream leaving
+# unsigned (bin/dkim2-milter; see t/milter-script.t for the end-to-end
+# guard). That capture also carried a folded Content-Type, CRLF included,
+# inside a "d" literal, which spec-06 §5.1 forbids and every verifier now
+# rejects, so Bron posted again on 2026-10-04 through
+# dkim2test@mailman.dkim2.com with the fixed Mailman, and the file is that
+# capture with the local-delivery trace and the outbound milter's own i=2
+# signature and X-DKIM2-Info removed: Mailman's output as the milter received
+# it. unstable.email's fm1 key (Fastmail's DKIM2 selector today; fm3 signed the
+# first capture) is pinned here so the fixture does not depend on live DNS or
+# key rotation.
 {
     my $raw = path("$FindBin::Bin/../tests/emails/mailman-m2-unsigned.eml")->slurp_raw;
-    my $fm3 = 'v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvNUm+tvS0U30of4pAM4H6vX4Y9JK3H6om8lTIVZdl8MnbOvyn6xu5NPocIdwlQYZso4yFvNkSzbeCglvk3cCJHT8Xze1GNgUVSAJ7U8NjZKBD038pHeKtKQ6/3tEI0TgXZB2E+S8BL4v0w7xnq9lZMktqPbf7tZC7+5Tgyl/67lDN6j7ZQQMOkGCVhMsq58YIggcTrTrABIpoQmZ5Murj5EvTC6AulupdGJRblS8kUxU8caP+TiRPpgAIRY0J9rcJWQL767l6chVEFEdXbTiSW1gsaH7MYlYFomEJzJqVZVoJbL4ezPWoAELzDztlLCAs1SxHsEAbJuFs+HX8zKFtQIDAQAB';
+    my $fm1 = 'v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt47+YjZU86ZMZINh2BYbL+EQJsxJeoL9qFyCTVBTsXdwYHiTS+paWjWr12GytPw8iah+hT134uy4G8jRe60XtXPTK29H/zNQ9T8lVa3ujt8rFUWW6k1A0hL7Jerw3YGXD5WoAwGnNE5xyuRkBLd4rSEM/Fw1614/O2DqFXqC8fy2RxS1XmstreR5RzImgLkmC9uTGMGliio+NsC6UjEqP80ps5CxdhgoWXlcYDaGadNsfRhKYduqTBejxZHiGaHXstNf1B6i+N8A1ZEJciCbSlTFr1S3UNFRnGEYTOtLEtllHGIZ+9kX9/7sGvyJtaI8jJARKQf9BplqCBu8leL6kwIDAQAB';
     my $pinned = sub {
         my ($sig, $idx) = @_;
-        return unless $sig->domain eq 'unstable.email' && $sig->selector($idx // 0) eq 'fm3';
-        return parse_dkim_pubkey($fm3);
+        return unless $sig->domain eq 'unstable.email' && $sig->selector($idx // 0) eq 'fm1';
+        return parse_dkim_pubkey($fm1);
     };
     my $run = sub {
-        my ($allow) = @_;
+        my ($text, $allow) = @_;
         my $v = Mail::DKIM2::Verifier->new;
         $v->allow_unsigned_mi($allow);
         $v->skip_timestamp_check(1);
         $v->set_pubkey_callback($pinned);
-        $v->PRINT($raw); $v->CLOSE;
+        $v->PRINT($text); $v->CLOSE;
         return $v;
     };
 
-    my $wire = $run->(0);
+    my $wire = $run->($raw, 0);
     is($wire->result, 'permerror', 'captured list post: as a receiver, the unsigned m=2 is PERMERROR');
     like($wire->result_detail, qr/m=2 is not signed/, 'captured list post: spec wording');
 
-    my $signer = $run->(1);
+    my $signer = $run->($raw, 1);
     is($signer->result, 'pass', 'captured list post: as the signer of m=2, the upstream chain passes')
         or diag($signer->result_detail);
     like($signer->result_detail, qr/i=1\.\.1 verified/, 'captured list post: i=1 verified');

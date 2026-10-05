@@ -1,34 +1,36 @@
-# NAME
+## Name
 
 Sub::Private - Private subroutines and methods
 
-# VERSION
+## Version
 
-Version 0.05
+Version 0.06
 
-# SYNOPSIS
+## Synopsis
 
-    package Foo;
-    use Sub::Private;
+```perl
+package Foo;
+use Sub::Private;
 
-    sub foo { return 42 }
+sub foo { return 42 }
 
-    sub bar :Private {
-        return foo() + 1;
-    }
+sub bar :Private {
+    return foo() + 1;
+}
 
-    sub baz {
-        return bar() + 1;
-    }
+sub baz {
+    return bar() + 1;
+}
+```
 
-# DESCRIPTION
+## Description
 
 Enforces strictly private access on subroutines.  A subroutine decorated
 with `:Private` (or named in `use Sub::Private qw(...)` when in enforce
 mode) may only be called from within its defining package.  Subclasses do
 not inherit access: private means _this package only_.
 
-## Two enforcement modes
+### Two Enforcement Modes
 
 - `namespace` mode (default, backward-compatible)
 
@@ -48,12 +50,33 @@ not inherit access: private means _this package only_.
 
     Enable before declaring your first private sub:
 
-        BEGIN { $Sub::Private::config{mode} = 'enforce' }
-        package MyClass;
-        use Sub::Private;
-        sub _helper :Private { ... }
+    ```perl
+    BEGIN { $Sub::Private::config{mode} = 'enforce' }
+    package MyClass;
+    use Sub::Private;
+    sub _helper :Private { ... }
+    ```
 
-## Bypass for testing
+### Behaviour of Wrapped Subs (Enforce Mode)
+
+- The wrapper hands over with `goto &sub`, so it does not appear
+on the call stack: `caller` inside a private sub sees its real caller.
+- Arguments, `@_` aliasing and calling context (list, scalar or
+void) are passed through unchanged.
+- `$_` is left untouched, whether the call is allowed or blocked.
+- A blocked call croaks; it does not fall through to `AUTOLOAD`.
+- Works with [Moo](https://metacpan.org/pod/Moo) and [Moose](https://metacpan.org/pod/Moose) classes; use the declarative form
+after `use Moo` or `use Moose`.
+
+### Loading at Run Time
+
+Packages that use `Sub::Private` may be loaded at run time (`require`,
+a plugin loader, a string `eval`), and `Sub::Private` itself may be
+loaded for the first time that way.  The private subs are then wrapped
+(or removed, in `namespace` mode) when the enclosing scope, normally the
+rest of the file, has been compiled.
+
+### Bypass for Testing
 
 Either condition alone (OR logic) disables all access checks in enforce
 mode:
@@ -66,25 +89,139 @@ tests.
 `$Sub::Private::BYPASS` is the recommended form for new test code.
 The `HARNESS_ACTIVE` bypass can be disabled:
 
-    $Sub::Private::config{harness_bypass} = 0;
+```
+$Sub::Private::config{harness_bypass} = 0;
+```
 
-## Configuration
+### Configuration
 
-    $Sub::Private::config{mode}            -- 'namespace' (default) or 'enforce'
-    $Sub::Private::config{harness_bypass}  -- 1 (default); set to 0 to test enforcement
+```
+$Sub::Private::config{mode}            -- 'namespace' (default) or 'enforce'
+$Sub::Private::config{harness_bypass}  -- 1 (default); set to 0 to test enforcement
+```
 
-## Error message format (enforce mode)
+### Error Message Format (Enforce Mode)
 
-    bar() is a private subroutine of Foo and cannot be called from Bar
+```
+bar() is a private subroutine of Foo and cannot be called from Bar
+```
 
-# PUBLIC VARIABLES
+## Public Interface
 
-## `$BYPASS`
+### Import
+
+```perl
+use Sub::Private;                    # attribute form -- no arguments
+use Sub::Private qw(_a _b _c);      # declarative form (enforce mode only)
+```
+
+#### Purpose
+
+Called automatically by `use Sub::Private`.
+
+With **no arguments**: makes the `:Private` attribute globally available
+via `UNIVERSAL`.  No other action is taken.
+
+With **one or more sub names**: registers those named subs in the calling
+package for access-enforcement wrapping at `CHECK` time.  If `CHECK`
+has already fired (for example the package is loaded with `require` at
+run time), the subs are wrapped as soon as the enclosing scope (normally
+the rest of the file) has been compiled, so the `use` line can still
+come before the subs it names.  A direct `Sub::Private->import(...)`
+call at run time wraps immediately.  Requires `$Sub::Private::config{mode}` to equal
+`'enforce'`; croaks otherwise.
+
+#### Arguments
+
+- `@subs` (optional)
+
+    Zero or more Perl sub names.  Each must be a defined, non-reference scalar
+    matching `/\A[_a-zA-Z]\w*\z/`.  `undef`, references, empty strings, and
+    names starting with a digit or containing hyphens are all rejected.
+
+#### Returns
+
+The class name (`'Sub::Private'`) as a plain string in all cases.
+
+#### Side Effects
+
+- Pre-CHECK: appends `[$owner_pkg, $sub_name]` pairs to the
+internal `@_pending` list.
+- Post-CHECK, during compilation: installs wrapper closures in the
+calling package's stash when the enclosing scope has been compiled.
+- Post-CHECK, at run time: installs wrapper closures directly in the
+calling package's stash.
+
+#### Example
+
+```perl
+BEGIN { $Sub::Private::config{mode} = 'enforce' }
+package MyClass;
+use Sub::Private qw(_helper _init);
+
+sub new     { bless {}, shift }
+sub _helper { ... }    # wrapped at CHECK time
+sub _init   { ... }    # wrapped at CHECK time
+sub run     { my $s = shift; $s->_helper; $s->_init }
+```
+
+#### Api Specification
+
+##### Input
+
+```perl
+# No-argument form: always valid.
+Sub::Private->import();
+
+# Declarative form (enforce mode only):
+{
+    subs => {
+        type     => 'array',
+        optional => 1,
+        element  => {
+            type  => 'string',
+            regex => qr/\A[_a-zA-Z]\w*\z/,
+        },
+    }
+}
+```
+
+##### Output
+
+```perl
+{ type => 'string' }    # returns the class name 'Sub::Private'
+```
+
+#### Messages
+
+```perl
+Message                                              Meaning / Action
+---------------------------------------------------  -----------------------------------------------
+"Sub::Private->import: declarative form requires     use Sub::Private qw(...) was called while
+ mode => 'enforce'"                                  $config{mode} is not 'enforce'.  Set
+                                                     $config{mode} = 'enforce' in a BEGIN block
+                                                     before "use Sub::Private".
+
+"Sub::Private->import: 'NAME' is not a valid         The sub name failed the identifier regex.
+ Perl identifier"                                    Check for typos, hyphens, leading digits,
+                                                     undef, or reference values in the import list.
+
+"Sub::Private: PKG::NAME is not defined"             The named sub was not found in the stash at
+                                                     wrap time.  Define the sub before import()
+                                                     runs, before CHECK fires, or (after CHECK)
+                                                     before the end of the enclosing scope.
+                                                     After CHECK, the location reported is the
+                                                     "use Sub::Private" line.
+```
+
+## Public Variables
+
+### `$Bypass`
 
 Set to a true value to disable all access checks (enforce mode only).
 Use `local` in tests; see ["Bypass for testing"](#bypass-for-testing).
 
-## `%config`
+### `%Config`
 
 Module-level configuration hash.  Supported keys:
 
@@ -99,97 +236,7 @@ Module-level configuration hash.  Supported keys:
     `$ENV{HARNESS_ACTIVE}` is set.  Set to 0 to test enforcement under
     `prove`.
 
-# PUBLIC INTERFACE
-
-## import
-
-    use Sub::Private;                    # attribute form -- no arguments
-    use Sub::Private qw(_a _b _c);      # declarative form (enforce mode only)
-
-### Purpose
-
-Called automatically by `use Sub::Private`.
-
-With **no arguments**: makes the `:Private` attribute globally available
-via `UNIVERSAL`.  No other action is taken.
-
-With **one or more sub names**: registers those named subs in the calling
-package for access-enforcement wrapping at `CHECK` time.  If `CHECK`
-has already fired (e.g., when calling from a test), wrapping is applied
-immediately.  Requires `$Sub::Private::config{mode}` to equal
-`'enforce'`; croaks otherwise.
-
-### Arguments
-
-- `@subs` (optional)
-
-    Zero or more Perl sub names.  Each must be a defined, non-reference scalar
-    matching `/\A[_a-zA-Z]\w*\z/`.  `undef`, references, empty strings, and
-    names starting with a digit or containing hyphens are all rejected.
-
-### Returns
-
-The class name (`'Sub::Private'`) as a plain string in all cases.
-
-### Side effects
-
-- Pre-CHECK: appends `[$owner_pkg, $sub_name]` pairs to the
-internal `@_pending` list.
-- Post-CHECK: installs wrapper closures directly in the calling
-package's stash.
-
-### Example
-
-    BEGIN { $Sub::Private::config{mode} = 'enforce' }
-    package MyClass;
-    use Sub::Private qw(_helper _init);
-
-    sub new     { bless {}, shift }
-    sub _helper { ... }    # wrapped at CHECK time
-    sub _init   { ... }    # wrapped at CHECK time
-    sub run     { my $s = shift; $s->_helper; $s->_init }
-
-### API specification
-
-#### Input
-
-    # No-argument form: always valid.
-    Sub::Private->import();
-
-    # Declarative form (enforce mode only):
-    {
-        subs => {
-            type     => 'array',
-            optional => 1,
-            element  => {
-                type  => 'string',
-                regex => qr/\A[_a-zA-Z]\w*\z/,
-            },
-        }
-    }
-
-#### Output
-
-    { type => 'string' }    # returns the class name 'Sub::Private'
-
-### MESSAGES
-
-    Message                                              Meaning / Action
-    ---------------------------------------------------  -----------------------------------------------
-    "Sub::Private->import: declarative form requires     use Sub::Private qw(...) was called while
-     mode => 'enforce'"                                  $config{mode} is not 'enforce'.  Set
-                                                         $config{mode} = 'enforce' in a BEGIN block
-                                                         before "use Sub::Private".
-
-    "Sub::Private->import: 'NAME' is not a valid         The sub name failed the identifier regex.
-     Perl identifier"                                    Check for typos, hyphens, leading digits,
-                                                         undef, or reference values in the import list.
-
-    "Sub::Private: PKG::NAME is not defined"             The named sub was not found in the stash at
-                                                         wrap time.  Define the sub before import()
-                                                         runs, or before CHECK fires.
-
-# KNOWN LIMITATIONS
+## Known Limitations
 
 - `namespace` mode: OO dispatch fails for private subs
 
@@ -204,13 +251,16 @@ package's stash.
 - `enforce` mode: raw coderef bypass
 
     A raw code reference obtained **before** wrapping (via `can()` or
-    `\&Foo::_helper`) bypasses the check.  The attribute form prevents this
-    because wrapping happens at CHECK time.
+    `\&Foo::_helper`) bypasses the check.  The attribute form makes this
+    hard because wrapping happens at CHECK time.  When the package is loaded
+    after CHECK, wrapping happens at the end of the enclosing scope, so a
+    `BEGIN` block earlier in the same file could still take a reference to
+    the unwrapped sub.
 
 - `enforce` mode: `can()` leaks private method existence
 
     In `enforce` mode the original sub is replaced by a wrapper closure, so
-    `->can('_helper')` returns the wrapper (truthy) even to callers outside
+    `->can('_helper')` returns the wrapper (a true value) even to callers outside
     the owner package.  In `namespace` mode the stash entry is deleted entirely,
     so `->can` correctly returns `undef`.  A future release may inject a
     caller-aware `can()` override into each class that uses `enforce` mode,
@@ -223,84 +273,145 @@ package's stash.
     intentional (any package can use it after a single `use`), but it does
     introduce `UNIVERSAL::Private` into the global namespace.
 
-# DEPENDENCIES
+## Dependencies
 
+Perl 5.14 or later,
 [Carp](https://metacpan.org/pod/Carp) (core),
-[Attribute::Handlers](https://metacpan.org/pod/Attribute%3A%3AHandlers) (core since 5.8),
+[Attribute::Handlers](https://metacpan.org/pod/Attribute%3A%3AHandlers) (core),
+[B::Hooks::EndOfScope](https://metacpan.org/pod/B%3A%3AHooks%3A%3AEndOfScope),
 [Readonly](https://metacpan.org/pod/Readonly),
 [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict),
 [Return::Set](https://metacpan.org/pod/Return%3A%3ASet),
 [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean),
 [Sub::Identify](https://metacpan.org/pod/Sub%3A%3AIdentify).
 
-# SEE ALSO
+## See Also
 
 - [Test Dashboard](https://nigelhorne.github.io/Sub-Private/coverage/)
 - [Sub::Protected](https://metacpan.org/pod/Sub%3A%3AProtected)
 
     Sister module enforcing protected (owner + subclass) rather than strictly private access
 
+- [Sub::Abstract](https://metacpan.org/pod/Sub%3A%3AAbstract)
+
+    Sister module enforcing abstract (virtual) methods
+
 - [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean)
 
-## FORMAL SPECIFICATION
+## Formal Specification
 
 The following Z-notation schemas formally specify the `CheckAccess`
-operation.
+operation and `import`.
 
-    -- Type abbreviations
-    Package  == seq CHAR     -- a non-empty Perl package name string
-    SubName  == seq CHAR     -- a Perl identifier string
+### `CheckAccess`
 
-    -- Private-access predicate (strictly owner only -- no isa expansion)
-    permitted : Package x Package -> BOOL
-    forall caller, owner : Package .
-        permitted(caller, owner) <=> caller = owner
+```perl
+-- Type abbreviations
+Package  == seq CHAR     -- a non-empty Perl package name string
+SubName  == seq CHAR     -- a Perl identifier string
 
-    -- System state
-    +-Registry-------------------------------------------+
-    | private   : P (Package x SubName)                  |
-    | bypass    : BOOL                                    |
-    | config    : { mode : seq CHAR,                      |
-    |               harness_bypass : BOOL }               |
-    +----------------------------------------------------+
+-- Private-access predicate (strictly owner only -- no isa expansion)
+permitted : Package x Package -> BOOL
+forall caller, owner : Package .
+    permitted(caller, owner) <=> caller = owner
 
-    -- Initial state
-    +-InitRegistry---------------------------------------+
-    | Registry                                           |
-    |----------------------------------------------------|
-    | private   = {}                                     |
-    | bypass    = false                                  |
-    | config    = { mode |-> 'namespace',                 |
-    |               harness_bypass |-> true }             |
-    +----------------------------------------------------+
+-- System state
++-Registry-------------------------------------------+
+| private   : P (Package x SubName)                  |
+| bypass    : BOOL                                    |
+| config    : { mode : seq CHAR,                      |
+|               harness_bypass : BOOL }               |
++----------------------------------------------------+
 
-    -- Bypass predicate
-    bypass_active(R) <=>
-        R.bypass or (R.config.harness_bypass and HARNESS_ACTIVE)
+-- Initial state
++-InitRegistry---------------------------------------+
+| Registry                                           |
+|----------------------------------------------------|
+| private   = {}                                     |
+| bypass    = false                                  |
+| config    = { mode |-> 'namespace',                 |
+|               harness_bypass |-> true }             |
++----------------------------------------------------+
 
-    -- Access check: no state change
-    +-CheckAccess----------------------------------------+
-    | Xi-Registry                                        |
-    | caller? : Package                                  |
-    | owner?  : Package                                  |
-    | name?   : SubName                                  |
-    | ok!     : BOOL                                     |
-    |----------------------------------------------------|
-    | (owner?, name?) in private                         |
-    | ok! <=> bypass_active or permitted(caller?, owner?)|
-    +----------------------------------------------------+
+-- Bypass predicate
+bypass_active(R) <=>
+    R.bypass or (R.config.harness_bypass and HARNESS_ACTIVE)
 
-    -- Violation (croak case):
-    --   not ok! =>
-    --   croak("name?()" ++ " is a private subroutine of " ++ owner?
-    --         ++ " and cannot be called from " ++ caller?)
+-- Access check: no state change
++-CheckAccess----------------------------------------+
+| Xi-Registry                                        |
+| caller? : Package                                  |
+| owner?  : Package                                  |
+| name?   : SubName                                  |
+| ok!     : BOOL                                     |
+|----------------------------------------------------|
+| (owner?, name?) in private                         |
+| ok! <=> bypass_active or permitted(caller?, owner?)|
++----------------------------------------------------+
 
-    -- Key difference from Sub::Protected:
-    --   permitted(caller, owner) <=> caller = owner   (identity only)
-    -- vs Sub::Protected:
-    --   permitted(caller, owner) <=> owner in anc(caller)   (ISA chain)
+-- Violation (croak case):
+--   not ok! =>
+--   croak("name?()" ++ " is a private subroutine of " ++ owner?
+--         ++ " and cannot be called from " ++ caller?)
 
-# AUTHOR
+-- Key difference from Sub::Protected:
+--   permitted(caller, owner) <=> caller = owner   (identity only)
+-- vs Sub::Protected:
+--   permitted(caller, owner) <=> owner in anc(caller)   (ISA chain)
+```
+
+### Import
+
+```perl
+-- Valid identifier predicate
+valid_id : SubName -> BOOL
+valid_id(n) <=> n =~ /\A[_a-zA-Z]\w*\z/
+
+-- Compile phase: CHECK has run, and code is still being compiled
+post_check  : BOOL
+compiling   : BOOL       -- true while $^S is undefined
+
+-- Pre-condition (declarative form)
++-ImportPre-----------------------------------------+
+| config.mode = 'enforce'                           |
+| forall n in subs . valid_id(n)                    |
++---------------------------------------------------+
+
+-- Post-condition (before CHECK): queue for the CHECK block
++-ImportPost_PreCheck-------------------------------+
+| not post_check                                    |
+|---------------------------------------------------|
+| pending' = pending ++ < (caller, n) | n in subs > |
++---------------------------------------------------+
+
+-- Post-condition (after CHECK, at run time): wrap now
++-ImportPost_RunTime--------------------------------+
+| post_check and not compiling                      |
+| forall n in subs . defined(caller, n)             |
+|---------------------------------------------------|
+| forall n in subs .                                |
+|   stash'(caller, n) = wrapper(caller, n)          |
++---------------------------------------------------+
+
+-- Post-condition (after CHECK, while compiling): wrap at the
+-- end of the enclosing scope S
++-ImportPost_Deferred-------------------------------+
+| post_check and compiling                          |
+|---------------------------------------------------|
+| at end_of_scope(S) :                              |
+|   (forall n in subs . defined(caller, n)) =>      |
+|     forall n in subs .                            |
+|       stash'(caller, n) = wrapper(caller, n)      |
+|   (exists n in subs . not defined(caller, n)) =>  |
+|     croak at the "use" line                       |
++---------------------------------------------------+
+
+-- In every case, a sub that is not defined when wrapping is
+-- attempted croaks:
+--   "Sub::Private: " ++ caller ++ "::" ++ n ++ " is not defined"
+```
+
+## Author
 
 Original Author:
 Peter Makholm, `<peter at makholm.net>`
@@ -308,55 +419,27 @@ Peter Makholm, `<peter at makholm.net>`
 Current maintainer:
 Nigel Horne, `<njh at nigelhorne.com>`
 
-# BUGS
+## Bugs
 
 Please report any bugs or feature requests to `bug-sub-private at rt.cpan.org`,
 or through the web interface at
 [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sub-Private](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sub-Private).
 
-# SUPPORT
+## Support
 
-    perldoc Sub::Private
+```
+perldoc Sub::Private
+```
 
 - RT: CPAN's request tracker
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Sub-Private](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Sub-Private)
 
-- Search CPAN
+- MetaCPAN
 
-    [https://search.cpan.org/dist/Sub-Private](https://search.cpan.org/dist/Sub-Private)
+    [https://metacpan.org/dist/Sub-Private](https://metacpan.org/dist/Sub-Private)
 
-## FORMAL SPECIFICATION
-
-### import
-
-    -- Type abbreviations
-    SubName == seq CHAR      -- non-empty Perl identifier string
-
-    -- Valid identifier predicate
-    valid_id : SubName -> BOOL
-    valid_id(n) <=> n =~ /\A[_a-zA-Z]\w*\z/
-
-    -- Pre-condition (declarative form)
-    +-ImportPre-----------------------------------------+
-    | config.mode = 'enforce'                           |
-    | forall n in subs . valid_id(n)                    |
-    | forall n in subs . defined(&{caller + '::' + n})  |
-    +---------------------------------------------------+
-
-    -- Post-condition (pre-CHECK path)
-    +-ImportPost_PreCheck-------------------------------+
-    | @_pending' = @_pending                            |
-    |            union { (caller, n) | n in subs }      |
-    +---------------------------------------------------+
-
-    -- Post-condition (post-CHECK path)
-    +-ImportPost_PostCheck------------------------------+
-    | forall n in subs .                                |
-    |   stash(caller, n) = wrapper_closure(caller, n)   |
-    +---------------------------------------------------+
-
-# COPYRIGHT & LICENSE
+## Copyright & License
 
 Copyright 2009 Peter Makholm, all rights reserved.
 Portions copyright 2024-2026 Nigel Horne.

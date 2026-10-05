@@ -1,0 +1,65 @@
+# Throwaway Keycloak for t/90-live-keycloak.t (the same manifest as in WWW::Keycloak). No persistence: start-dev with
+# the embedded database. The test makes and removes its own realm.
+#
+#   kubectl create namespace keycloak-test
+#   kubectl -n keycloak-test apply -f t/keycloak/k8s.yaml
+#   kubectl -n keycloak-test rollout status deploy/keycloak
+#   kubectl -n keycloak-test get svc keycloak        # the NodePort is the port of KEYCLOAK_URL
+#   kubectl delete namespace keycloak-test
+#
+# The image needs a CPU with x86-64-v2; on a VM with a generic CPU model the
+# pod dies with "Fatal glibc error: CPU does not support x86-64-v2".
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:26.8.0
+          args: ["start-dev"]
+          env:
+            - name: KC_BOOTSTRAP_ADMIN_USERNAME
+              value: admin
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+              value: admin
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /realms/master
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            failureThreshold: 60
+          resources:
+            requests:
+              cpu: 250m
+              memory: 768Mi
+            limits:
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+spec:
+  type: NodePort
+  selector:
+    app: keycloak
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

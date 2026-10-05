@@ -2,71 +2,84 @@ use strict;
 use warnings;
 
 use Test2::V0;
-use Uniform::HTTP 0.04;
+use Uniform::HTTP 0.06;
+use Uniform::HTTP::FastPath;
 use Uniform::HTTP::Request;
 use Uniform::HTTP::Response;
 
-use Unblock::HTTP3::Request;
-use Unblock::HTTP3::Response;
+is($Uniform::HTTP::VERSION, '0.06',
+    'Unblock HTTP3 contract tests use Uniform HTTP 0.06');
 
-is($Uniform::HTTP::VERSION, '0.04',
-    'Unblock HTTP3 contract tests use Uniform HTTP 0.04');
-
-my $request = Unblock::HTTP3::Request->new(
+my $request = Uniform::HTTP::Request->new(
     method    => 'CONNECT',
     target    => '/chat',
     scheme    => 'https',
     authority => 'example.com',
     protocol  => 'webtransport',
     headers   => [
-        [ 'X-First', 'one' ],
-        [ 'X-Test',  'one' ],
-        [ 'x-test',  'two' ],
+        [ 'X-First',  'one' ],
+        [ 'X-Test',   'one' ],
+        [ 'x-test',   'two' ],
+        [ 'Priority', 'u=2, i' ],
     ],
     trailers => [
         [ 'X-Trailer', 'one' ],
         [ 'x-trailer', 'two' ],
     ],
-    priority => {
-        urgency     => 2,
-        incremental => 1,
-    },
 );
 
-isa_ok($request, ['Unblock::HTTP3::Request']);
+is(ref($request), 'Uniform::HTTP::Request',
+    'request is the exact canonical Uniform request class');
 isa_ok($request, ['Uniform::HTTP::Request']);
 isa_ok($request, ['Uniform::HTTP::Message']);
 
-is($request->method, 'CONNECT', 'Uniform method is inherited');
-is($request->target, '/chat', 'Uniform target is inherited');
-is($request->scheme, 'https', 'Uniform scheme is inherited');
-is($request->authority, 'example.com', 'Uniform authority is inherited');
+is($request->method, 'CONNECT', 'Uniform method is directly available');
+is($request->target, '/chat', 'Uniform target is directly available');
+is($request->scheme, 'https', 'Uniform scheme is directly available');
+is($request->authority, 'example.com', 'Uniform authority is directly available');
 is($request->protocol, 'webtransport',
-    'Uniform Extended CONNECT protocol metadata is inherited');
+    'Uniform Extended CONNECT protocol metadata is directly available');
 ok($request->target_is_exact, 'canonical target remains exact');
 
 is($request->header_values('x-test'), ['one', 'two'],
-    'Uniform duplicate header behavior is inherited');
+    'Uniform duplicate header behavior is preserved');
 is(
     [ map { $request->header_name($_) } 0 .. $request->header_count - 1 ],
     [ 'X-First', 'X-Test', 'x-test', 'Priority' ],
-    'Uniform header order and spelling are preserved with Priority convenience',
+    'Uniform header order and spelling are preserved',
 );
+is($request->header('priority'), 'u=2, i',
+    'RFC 9218 priority remains an ordinary Uniform header');
 ok($request->headers_are_lossless, 'request headers are lossless');
 
 is($request->trailer_values('X-TRAILER'), ['one', 'two'],
-    'Uniform trailer behavior is inherited');
-is($request->trailer_count, 2, 'Uniform trailer count is inherited');
-ok($request->has_trailers, 'Uniform trailer presence is inherited');
+    'Uniform trailer behavior is preserved');
+is($request->trailer_count, 2, 'Uniform trailer count is preserved');
+ok($request->has_trailers, 'Uniform trailer presence is preserved');
 ok($request->trailers_are_lossless, 'request trailers are lossless');
 
+ok(Uniform::HTTP::FastPath::can_view($request),
+    'canonical request is eligible for FastPath');
+my $request_view = Uniform::HTTP::FastPath::view($request);
 is(
-    $request->priority,
-    {
-        urgency     => 2,
-        incremental => 1,
-    },
-    'Unblock priority helper is layered over the Uniform Priority field',
+    $request_view->[Uniform::HTTP::FastPath::SLOT_KIND()],
+    Uniform::HTTP::FastPath::KIND_REQUEST(),
+    'FastPath identifies canonical request kind',
+);
+is(
+    $request_view->[Uniform::HTTP::FastPath::SLOT_HEADERS()],
+    [
+        [ 'X-First',  'one' ],
+        [ 'X-Test',   'one' ],
+        [ 'x-test',   'two' ],
+        [ 'Priority', 'u=2, i' ],
+    ],
+    'FastPath exposes ordered request headers',
+);
+ok(
+    $request_view->[Uniform::HTTP::FastPath::SLOT_FLAGS()]
+        & Uniform::HTTP::FastPath::FLAG_TARGET_EXACT(),
+    'FastPath records exact request-target fidelity',
 );
 
 $request->mark_incomplete;
@@ -104,19 +117,34 @@ $request->mark_complete;
 ok($request->is_complete,
     'Uniform completeness can advance after section freezes');
 
-my $neutral = Unblock::HTTP3::Request->new(
-    method   => 'GET',
-    target   => '/',
-    protocol => 'future-protocol',
-);
+my $trusted_request = Uniform::HTTP::FastPath::request_from_validated([
+    Uniform::HTTP::FastPath::ABI_VERSION(),
+    Uniform::HTTP::FastPath::KIND_REQUEST(),
+    Uniform::HTTP::FastPath::FLAG_COMPLETE()
+        | Uniform::HTTP::FastPath::FLAG_HEADERS_LOSSLESS()
+        | Uniform::HTTP::FastPath::FLAG_TRAILERS_LOSSLESS()
+        | Uniform::HTTP::FastPath::FLAG_TARGET_EXACT(),
+    '3',
+    'GET',
+    '/trusted',
+    'https',
+    'example.com',
+    undef,
+    undef,
+    undef,
+    [ [ 'x-fast', 'yes' ] ],
+    [],
+    undef,
+]);
 
-is($neutral->protocol, 'future-protocol',
-    'Uniform keeps protocol metadata neutral until an HTTP sender validates it');
-is($neutral->method('CONNECT'), $neutral,
-    'Uniform request fields remain independently editable before commitment');
-is($neutral->method, 'CONNECT', 'method mutation is inherited from Uniform');
+is(ref($trusted_request), 'Uniform::HTTP::Request',
+    'trusted construction returns exact canonical request');
+is($trusted_request->header('x-fast'), 'yes',
+    'trusted request adopts validated header storage');
+ok($trusted_request->is_complete, 'trusted complete request remains complete');
+ok(!$trusted_request->is_mutable, 'trusted immutable request remains immutable');
 
-my $response = Unblock::HTTP3::Response->new(
+my $response = Uniform::HTTP::Response->new(
     status  => 200,
     headers => [ [ 'X-Test', 'yes' ] ],
     trailers => [
@@ -124,14 +152,46 @@ my $response = Unblock::HTTP3::Response->new(
     ],
 );
 
-isa_ok($response, ['Unblock::HTTP3::Response']);
-isa_ok($response, ['Uniform::HTTP::Response']);
+is(ref($response), 'Uniform::HTTP::Response',
+    'response is the exact canonical Uniform response class');
 isa_ok($response, ['Uniform::HTTP::Message']);
-is($response->status, 200, 'Uniform response status is inherited');
+is($response->status, 200, 'Uniform response status is directly available');
 is($response->reason, undef,
     'HTTP3 response does not invent a reason phrase');
 is($response->trailer('content-digest'), 'sha-256=:abc:',
     'Uniform response trailers are directly available');
+ok(Uniform::HTTP::FastPath::can_view($response),
+    'canonical response is eligible for FastPath');
+
+my $trusted_response = Uniform::HTTP::FastPath::response_from_validated([
+    Uniform::HTTP::FastPath::ABI_VERSION(),
+    Uniform::HTTP::FastPath::KIND_RESPONSE(),
+    Uniform::HTTP::FastPath::FLAG_MUTABLE()
+        | Uniform::HTTP::FastPath::FLAG_BODY_MUTABLE()
+        | Uniform::HTTP::FastPath::FLAG_TRAILERS_MUTABLE()
+        | Uniform::HTTP::FastPath::FLAG_HEADERS_LOSSLESS()
+        | Uniform::HTTP::FastPath::FLAG_TRAILERS_LOSSLESS(),
+    '3',
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    204,
+    undef,
+    [ [ 'x-received', 'yes' ] ],
+    [],
+    undef,
+]);
+
+is(ref($trusted_response), 'Uniform::HTTP::Response',
+    'trusted construction returns exact canonical response');
+ok(!$trusted_response->is_complete,
+    'trusted in-progress response remains incomplete');
+ok(!$trusted_response->initial_is_mutable,
+    'trusted received initial response fields are frozen');
+ok($trusted_response->trailers_are_mutable,
+    'trusted received response trailers remain mutable');
 
 $response->freeze;
 ok(!$response->is_mutable, 'full Uniform freeze makes response immutable');
@@ -140,29 +200,5 @@ like(
     qr/message is immutable/,
     'Uniform response mutation fails after full freeze',
 );
-
-my $aborted = Unblock::HTTP3::Response->new(status => 200);
-$aborted->_mark_reset(0x10c);
-is($aborted->reset_code, 0x10c,
-    'Unblock response retains HTTP3 reset diagnostics');
-ok($aborted->is_aborted, 'HTTP3 reset marks response aborted');
-ok(!$aborted->is_complete,
-    'aborted HTTP3 response is incomplete under Uniform completeness');
-ok(!$aborted->is_mutable,
-    'aborted HTTP3 response is frozen');
-
-for my $class (qw(Unblock::HTTP3::Request Unblock::HTTP3::Response)) {
-    for my $method (qw(
-        version header header_values header_count header_name header_value
-        add_header remove_header trailer trailer_values trailer_count
-        trailer_name trailer_value add_trailer remove_trailer has_trailers
-        body has_buffered_body is_complete is_mutable initial_is_mutable
-        body_is_mutable trailers_are_mutable headers_are_lossless
-        trailers_are_lossless freeze freeze_initial freeze_trailers
-        mark_incomplete mark_complete
-    )) {
-        ok($class->can($method), "$class inherits Uniform method $method");
-    }
-}
 
 done_testing;

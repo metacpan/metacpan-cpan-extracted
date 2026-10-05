@@ -18,6 +18,12 @@ See the Mail::DKIM2 module documentation for the conventions and STATUS.
 
 INSTALLATION
 
+From CPAN:
+
+    cpanm Mail::DKIM2
+
+From this directory:
+
     perl Makefile.PL
     make
     make test

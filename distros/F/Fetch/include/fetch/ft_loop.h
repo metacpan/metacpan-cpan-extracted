@@ -282,8 +282,27 @@ static void hm_loop_run(pTHX_ struct hm_loop *l, SV *until) {
             if (e->kind & HM_EV_TIMER) {
                 ft_timer *t = ft_timer_of_token(l, e->udata);
                 if (t && t->cb) {
-                    SV *cb  = SvREFCNT_inc(t->cb);
+                    SV *cb;
                     int one = t->oneshot;
+                    /* The backend's clock is not the deadline. kqueue's
+                     * EVFILT_TIMER on NetBSD is a callout in scheduler
+                     * ticks, and in a VM those ticks run ahead of
+                     * CLOCK_MONOTONIC: a 300 ms request timeout fired at
+                     * 246 ms on a smoker. The deadline is `due` on the clock
+                     * the request was timed on; a oneshot that arrives early
+                     * is re-armed for the remainder (the backend has already
+                     * dropped it, so the same token is free to re-add) and
+                     * not reported. Each re-arm is for a shorter interval, so
+                     * a backend that is always early still converges. Within
+                     * a millisecond is the backends' own rounding. */
+                    if (one) {
+                        double left = t->due - ft_loop_now();
+                        if (left > 1e-3) {
+                            be->add_timer(be, left, 1, ft_timer_token(t->id));
+                            continue;
+                        }
+                    }
+                    cb = SvREFCNT_inc(t->cb);
                     if (one) ft_timer_unlink(aTHX_ l, t);  /* backend already dropped it */
                     ft_call0(aTHX_ cb);
                     SvREFCNT_dec(cb);

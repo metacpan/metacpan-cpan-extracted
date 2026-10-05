@@ -289,10 +289,10 @@ my @paths = ( [ 'fast', [] ], [ 'perl', [ filter => { 0 => sub { 1 } } ] ] );
 # Every output shape reaches the same message through the fast path.
 for my $otype (qw(aoa hoa hoh)) {
 	my $f   = fixture(qq{k,v\nr1,1\n"r2,2\n});
-	my $got = attempt($f, 'output.type' => $otype);
+	my $got = attempt($f, 'output_type' => $otype);
 	like $got->{err},
 		qr/\AAlignment error on \Q$f\E data row 2 \(1 fields vs 2 headers\); ${\ note_re(3, 0) }\.\n\z/,
-		"output.type $otype: the alignment error carries the account";
+		"output_type $otype: the alignment error carries the account";
 }
 
 # The regex branch sees a mid-field quote too.
@@ -357,7 +357,7 @@ for my $otype (qw(aoa hoa hoh)) {
 # An .xlsx has no quoting to switch off, so quote => '' is not checked there.
 {
 	my $x = File::Spec->catfile($dir, 'quoted.xlsx');
-	write_table([ { '"a"' => '"1"' } ], $x, 'row.names' => 0);
+	write_table([ { '"a"' => '"1"' } ], $x, 'row_names' => 0);
 	my $got = attempt($x, quote => '');
 	is_deeply $got->{r}, [ { '"a"' => '"1"' } ], 'xlsx with quoted cells';
 	is_deeply $got->{warn}, [], "... and quote => '': no warning";

@@ -27,12 +27,12 @@ my @l = (0,  0,  1,   1,  1,  0,  0,  1,  0,   1,   0,  1,   1,   1,  0);
 my $r = bedroc(\@s, \@l, alpha => 20);
 is_approx($r->{bedroc},  0.998882221734, 'BEDROC alpha=20');
 is_approx($r->{rie},     1.872860699222, 'RIE alpha=20');
-is_approx($r->{'rie.min'}, 0.000165796739, 'RIE min alpha=20');
-is_approx($r->{'rie.max'}, 1.874956299300, 'RIE max alpha=20');
+is_approx($r->{'rie_min'}, 0.000165796739, 'RIE min alpha=20');
+is_approx($r->{'rie_max'}, 1.874956299300, 'RIE max alpha=20');
 is_approx($r->{ra},      8/15,           'R_a = n_active / n');
 is($r->{n},          15, 'n total');
-is($r->{'n.active'},    8, 'n_active');
-is($r->{'n.inactive'},  7, 'n_inactive');
+is($r->{'n_active'},    8, 'n_active');
+is($r->{'n_inactive'},  7, 'n_inactive');
 is($r->{alpha},      20, 'alpha echoed');
 is($r->{direction}, '>', 'direction defaults to >');
 
@@ -60,15 +60,15 @@ my @sc = (10,9,8,7,6,5,4,3,2,1);
 my @v  = ( 9,8,7,2,1,6,3,10,5,6.5);   # values >= 6.5 are active (5 of them)
 my $c = bedroc(\@sc, \@v, alpha => 20, cutoff => 6.5, top => 0.3);
 is_approx($c->{bedroc}, 0.997567159019, 'BEDROC with cutoff-defined actives');
-is($c->{'n.active'},   5, 'cutoff => selects 5 actives');
-is($c->{'n.inactive'}, 5, 'cutoff => leaves 5 inactives');
+is($c->{'n_active'},   5, 'cutoff => selects 5 actives');
+is($c->{'n_inactive'}, 5, 'cutoff => leaves 5 inactives');
 
 # top => : enrichment in the top fraction of the ranking
 my $e = $c->{enrichment};
-is($e->{'n.top'},         3,   'top 0.3 of 10 => 3 compounds (ceil)');
-is($e->{'active.count'},  3,   'all 3 top-ranked are active');
+is($e->{'n_top'},         3,   'top 0.3 of 10 => 3 compounds (ceil)');
+is($e->{'active_count'},  3,   'all 3 top-ranked are active');
 is_approx($e->{expected},          1.5, 'expected hits = ra * n_top');
-is_approx($e->{'enrichment.factor'}, 2.0, 'enrichment factor = (hits/n_top)/ra');
+is_approx($e->{'enrichment_factor'}, 2.0, 'enrichment factor = (hits/n_top)/ra');
 is_approx($e->{fraction},          0.3, 'top fraction echoed');
 
 # active_frac => : binarize the second array by taking a fraction as active.
@@ -76,12 +76,12 @@ is_approx($e->{fraction},          0.3, 'top fraction echoed');
 # 6), so active_frac => 0.5 high must reproduce the cutoff => 6.5 BEDROC above.
 my $fh = bedroc(\@sc, \@v, alpha => 20, active_frac => 0.5, active_side => 'high');
 is_approx($fh->{bedroc}, 0.997567159019, 'active_frac high == cutoff on this data');
-is($fh->{'n.active'},   5, 'active_frac 0.5 of 10 => 5 actives (ceil)');
-is($fh->{'n.inactive'}, 5, 'active_frac 0.5 => 5 inactives');
+is($fh->{'n_active'},   5, 'active_frac 0.5 of 10 => 5 actives (ceil)');
+is($fh->{'n_inactive'}, 5, 'active_frac 0.5 => 5 inactives');
 
 # active_side defaults to 'high'; 'low' takes the small tail (the complement here)
 my $fl = bedroc(\@sc, \@v, alpha => 20, active_frac => 0.5, active_side => 'low');
-is($fl->{'n.active'}, 5, "active_side 'low' selects the low tail");
+is($fl->{'n_active'}, 5, "active_side 'low' selects the low tail");
 
 # perfect / worst with fraction-defined actives (self-contained, exact bounds)
 is_approx(bedroc([1,2,3,4,5,6,7,8], [1,2,3,4,10,11,12,13],
@@ -94,8 +94,8 @@ is_approx(bedroc([1,2,3,4,5,6,7,8], [1,2,3,4,10,11,12,13],
           0.0, 'active_frac high + direction < : high-value actives on bottom => 0');
 
 # n_a is clamped to [1, N-1] so both classes always exist
-is(bedroc(\@sc, \@v, active_frac => 0.001)->{'n.active'}, 1, 'tiny active_frac => 1 active');
-is(bedroc(\@sc, \@v, active_frac => 0.99 )->{'n.inactive'}, 1, 'huge active_frac => 1 inactive');
+is(bedroc(\@sc, \@v, active_frac => 0.001)->{'n_active'}, 1, 'tiny active_frac => 1 active');
+is(bedroc(\@sc, \@v, active_frac => 0.99 )->{'n_inactive'}, 1, 'huge active_frac => 1 inactive');
 
 # the whole point: a raw numeric column that would otherwise leave one class
 # empty no longer dies -- active_frac guarantees a usable split

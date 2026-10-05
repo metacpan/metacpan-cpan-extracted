@@ -1,0 +1,11 @@
+Revision history for WWW-Keycloak
+
+0.001     2026-10-04 18:01:17Z
+    - WWW::Keycloak::Diff: compare a representation with the wanted state, without I/O
+    - WWW::Keycloak::Auth: admin token by password, service account or fixed token, renewed before expiry
+    - WWW::Keycloak facade with OIDC (discovery, verify_token, all grants, device flow steps) and the Admin REST API for realms, clients, client scopes, protocol mappers, users and authentication flows
+    - ensure_realm, ensure_client, ensure_client_scope, ensure_protocol_mapper, ensure_user, ensure_execution_config: repeatable setup that writes only what differs
+    - Live tests against a real Keycloak behind KEYCLOAK_LIVE_TEST
+    - verify_token: optional typ check, keys fetched again only for an unknown key and at most once a minute
+    - Role::HTTP: build_request and read_response split from send_request, error classes overridable, for Net::Async::Keycloak
+    - Role::HTTP: an answer with a Content-Encoding is decoded; it used to be read as no data at all

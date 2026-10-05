@@ -291,20 +291,20 @@ sub write_tmp {
 }
 {	# hoa output
 	my $fh = write_tmp("a,b\n1,2\n3,4\n");
-	my $hoa = read_table("$fh", 'output.type' => 'hoa');
+	my $hoa = read_table("$fh", 'output_type' => 'hoa');
 	is_deeply($hoa->{a}, [1, 3], 'read_table: hoa column a');
 	is_deeply($hoa->{b}, [2, 4], 'read_table: hoa column b');
 }
 {	# hoh output (first column is row name by default)
 	my $fh = write_tmp("id,val\nr1,10\nr2,20\n");
-	my $hoh = read_table("$fh", 'output.type' => 'hoh');
+	my $hoh = read_table("$fh", 'output_type' => 'hoh');
 	is($hoh->{r1}{val}, 10, 'read_table: hoh row r1');
 	is($hoh->{r2}{val}, 20, 'read_table: hoh row r2');
 }
-{	# explicit row.names for hoh
+{	# explicit row_names for hoh
 	my $fh = write_tmp("x,id\n1,k1\n2,k2\n");
-	my $hoh = read_table("$fh", 'output.type' => 'hoh', 'row.names' => 'id');
-	is($hoh->{k1}{x}, 1, 'read_table: hoh with explicit row.names');
+	my $hoh = read_table("$fh", 'output_type' => 'hoh', 'row_names' => 'id');
+	is($hoh->{k1}{x}, 1, 'read_table: hoh with explicit row_names');
 }
 {	# empty cell becomes undef
 	my $fh = write_tmp("a,b\n1,\n");
@@ -322,11 +322,11 @@ sub write_tmp {
 	is(scalar @$aoh, 1, 'read_table: HASH filter by column name');
 	is($aoh->[0]{a}, 5, 'read_table: HASH filter kept correct row');
 }
-{	# auto.row.names: header one field short
+{	# auto_row_names: header one field short
 	my $fh = write_tmp("a,b\nr1,1,2\nr2,3,4\n");
-	my $aoh = read_table("$fh", 'auto.row.names' => 1);
-	is($aoh->[0]{row_name}, 'r1', 'read_table: auto.row.names synthesizes row_name');
-	is($aoh->[0]{a}, 1, 'read_table: auto.row.names aligns remaining columns');
+	my $aoh = read_table("$fh", 'auto_row_names' => 1);
+	is($aoh->[0]{row_name}, 'r1', 'read_table: auto_row_names synthesizes row_name');
+	is($aoh->[0]{a}, 1, 'read_table: auto_row_names aligns remaining columns');
 }
 
 #read_table errors
@@ -335,7 +335,7 @@ dies_ok { read_table('/no/such/file/xyz') } 'read_table: dies on missing file';
 	my $fh = write_tmp("a,b\n1,2\n");
 	dies_ok { read_table("$fh", sep => ',', delim => ',') } 'read_table: dies on sep+delim together';
 	dies_ok { read_table("$fh", bogus => 1) } 'read_table: dies on unknown arg';
-	dies_ok { read_table("$fh", 'output.type' => 'zzz') } 'read_table: dies on bad output.type';
+	dies_ok { read_table("$fh", 'output_type' => 'zzz') } 'read_table: dies on bad output_type';
 	dies_ok { read_table("$fh", filter => [1, 2]) } 'read_table: dies on non-CODE/HASH filter';
 }
 {	# ragged data row
@@ -344,7 +344,7 @@ dies_ok { read_table('/no/such/file/xyz') } 'read_table: dies on missing file';
 }
 {	# undef row name for hoh
 	my $fh = write_tmp("id,v\n,5\n");
-	dies_ok { read_table("$fh", 'output.type' => 'hoh', 'row.names' => 'id') }
+	dies_ok { read_table("$fh", 'output_type' => 'hoh', 'row_names' => 'id') }
 		'read_table: hoh dies on undefined row name';
 }
 {	# filter column not in header

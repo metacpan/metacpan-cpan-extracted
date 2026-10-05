@@ -51,10 +51,12 @@ my $constant_fn=abs_path($INC{'Markdown/Publish/Constant.pm'});
 my $temporary_dn=tempdir(CLEANUP => 1);
 chdir($temporary_dn) || die "unable to chdir $temporary_dn: $!";
 make_path('doc/mkdocs', 'doc/reference', 'lib/Sample', 'bin/nested', 'config');
-blurp('doc/guide.md', "# Start {#start}\n\n[Module](lib/Sample/Module.pm.md)\n\n[Utility](bin/nested/example.md)\n\n[Next](#next)\n\n# Next {#next}\n\nDone.\n");
-blurp('doc/reference/child.md', "# Child\n\nLinked reference.\n\n# Detail\n\nMore detail.\n");
+my $guide="# Start {#start}\n\n[Module](../lib/Sample/Module.pm.md#details)\n\n[Utility][utility]\n\n[Legacy module](lib/Sample/Module.pm.md)\n\n[Legacy utility](bin/nested/example.md)\n\n[Unrelated](../README.md)\n\n[Missing](../bin/missing.md)\n\n`[Code](../bin/nested/example.md)`\n\n```text\n[Fenced](../bin/nested/example.md)\n```\n\n[Next](#next)\n\n[utility]: ../bin/nested/example.md?raw=1#usage\n\n# Next {#next}\n\nDone.\n";
+blurp('doc/guide.md', $guide);
+blurp('doc/reference/child.md', "# Child\n\n[Utility](../../bin/nested/example.md)\n\n# Detail\n\nMore detail.\n");
 blurp('lib/Sample/Module.pm.md', "# Sample::Module\n\n## Details\n\nModule documentation.\n");
 blurp('bin/nested/example.md', "# example\n\nUtility documentation.\n");
+blurp('README.md', "# Distribution\n");
 
 
 #  doc is the default publication boundary when present
@@ -79,12 +81,35 @@ is(slurp("$docs_dn/lib/Sample/Module.pm.md"), slurp('lib/Sample/Module.pm.md'),
 is(slurp("$docs_dn/bin/nested/example.md"), slurp('bin/nested/example.md'),
     'nested executable Markdown is mirrored with its path intact');
 ok(!-e 'doc/lib' && !-e 'doc/bin', 'assembly leaves authored doc directory untouched');
-is(slurp("$docs_dn/reference/child.md"), slurp('doc/reference/child.md'),
-    'nested Markdown remains linkable without chapter splitting');
+like(slurp("$docs_dn/reference/child.md"),
+    qr{\[Utility\]\(\.\./bin/nested/example\.md\)},
+    'nested Markdown link is rebased from its authored source location');
 ok(!-e "$docs_dn/reference/child--child.md",
     'nested Markdown is not split into navigation sections');
-like(slurp("$docs_dn/guide--start.md"), qr/\[Module\]\(lib\/Sample\/Module\.pm\.md\)/,
-    'chapter link to mirrored module is preserved');
+is(slurp('doc/guide.md'), $guide, 'assembly leaves authored Markdown unchanged');
+like(slurp("$docs_dn/guide--start.md"),
+    qr{\[Module\]\(lib/Sample/Module\.pm\.md#details\)},
+    'source-relative module link is rebased to its mirrored path');
+like(slurp("$docs_dn/guide--start.md"),
+    qr{\[utility\]: bin/nested/example\.md\?raw=1#usage},
+    'reference link keeps its query and fragment when rebased');
+like(slurp("$docs_dn/guide--start.md"),
+    qr{\[Legacy module\]\(lib/Sample/Module\.pm\.md\)},
+    'existing publication-root module link remains unchanged');
+like(slurp("$docs_dn/guide--start.md"),
+    qr{\[Legacy utility\]\(bin/nested/example\.md\)},
+    'existing publication-root utility link remains unchanged');
+like(slurp("$docs_dn/guide--start.md"), qr{\[Unrelated\]\(\.\./README\.md\)},
+    'source-relative link outside lib and bin remains unchanged');
+like(slurp("$docs_dn/guide--start.md"),
+    qr{\[Missing\]\(\.\./bin/missing\.md\)},
+    'missing source-relative link remains unchanged');
+like(slurp("$docs_dn/guide--start.md"),
+    qr{`\[Code\]\(\.\./bin/nested/example\.md\)`},
+    'inline code containing a link is unchanged');
+like(slurp("$docs_dn/guide--start.md"),
+    qr{```text\n\[Fenced\]\(\.\./bin/nested/example\.md\)\n```},
+    'fenced code containing a link is unchanged');
 like(slurp("$docs_dn/guide--start.md"), qr/\[Next\]\(guide--next\.md\)/,
     'chapter links use the split page without a redundant heading fragment');
 is_deeply($pages_ar, ['guide--start.md', 'guide--next.md'],

@@ -2,7 +2,7 @@ package Mail::DKIM2::MessageInstance;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 
 use Crypt::Digest::SHA256;
@@ -16,9 +16,11 @@ use MIME::Base64 qw(encode_base64 decode_base64);
 # that only sign and verify -- which is all three Fastmail paths -- need
 # not install it at all.
 use List::Util qw(max);
+use B ();
 use Carp;
 
 use Mail::DKIM2::Common qw(
+    parse_mime
     should_skip
     dkim2_canonicalize_header
     digest64
@@ -196,26 +198,41 @@ sub as_string {
 
 # Convert internal Recipe list to wire format
 # Internal: [from,to] arrays for copy ranges, strings for literal content
-# Wire: {"c": [from,to]} for copy, {"d": ["val1",...]} for data
+# Wire: {"c": [from,to]} for copy, {"d": ["val1",...]} for ASCII literals,
+# {"b": ["base64",...]} for literals carrying any octet >= 0x80.
+#
+# A literal is the raw octets of a header value or body line. Pure ASCII
+# goes in a "d" step as JSON text. Anything with a high bit set goes in a
+# "b" step, base64 (RFC 4648 section 4) of the octets: JSON text is UTF-8,
+# and most such literals are not (ISO-2022-JP, GB18030, Big5, Latin-1 ...),
+# so the only way to carry them in JSON unchanged is to encode them.
+# Consecutive literals of the same kind share one step.
 sub _encode_recipe_list {
     my ($list) = @_;
     my @encoded;
-    my @pending_strings;
+    my $pending_kind = '';
+    my @pending;
+    my $flush = sub {
+        return unless @pending;
+        push @encoded, { $pending_kind => [@pending] };
+        @pending = ();
+    };
     for my $item (@$list) {
         if (ref $item eq 'ARRAY') {
-            # Flush any pending strings as a {"d": [...]} step
-            if (@pending_strings) {
-                push @encoded, { d => [@pending_strings] };
-                @pending_strings = ();
-            }
-            push @encoded, { c => $item };
+            $flush->();
+            # Force numeric: an index that was used as a hash key upstream
+            # (de-duplicating copies) is stringified in place, and the JSON
+            # encoder would then emit {"c":["2","2"]} -- strings, which the
+            # spec-06 §5 schema forbids and Go rejects as invalid JSON.
+            push @encoded, { c => [ map { 0 + $_ } @$item ] };
         } else {
-            push @pending_strings, $item;
+            my $kind = ($item =~ /[^\x00-\x7F]/) ? 'b' : 'd';
+            $flush->() if $kind ne $pending_kind;
+            $pending_kind = $kind;
+            push @pending, $kind eq 'b' ? encode_base64($item, '') : $item;
         }
     }
-    if (@pending_strings) {
-        push @encoded, { d => [@pending_strings] };
-    }
+    $flush->();
     return \@encoded;
 }
 
@@ -290,7 +307,7 @@ sub parse {
         # cannot be recreated — distinct from an absent field (no change).
         if (exists $recipe_data->{b}) {
             if (defined $recipe_data->{b} && ref($recipe_data->{b}) eq 'ARRAY') {
-                $self->{bits}{rb} = _decode_recipe_list($recipe_data->{b});
+                $self->{bits}{rb} = _decode_recipe_list($recipe_data->{b}, $tags{m});
             } else {
                 $self->{bits}{rb_null} = 1;
             }
@@ -299,7 +316,7 @@ sub parse {
             if (defined $recipe_data->{h} && ref($recipe_data->{h}) eq 'HASH' && keys %{$recipe_data->{h}}) {
                 my %rh;
                 for my $h (keys %{$recipe_data->{h}}) {
-                    $rh{$h} = _decode_recipe_list($recipe_data->{h}{$h});
+                    $rh{$h} = _decode_recipe_list($recipe_data->{h}{$h}, $tags{m});
                 }
                 $self->{bits}{rh} = \%rh;
             } else {
@@ -314,17 +331,49 @@ sub parse {
 }
 
 # Convert wire format Recipe list to internal format
-# Wire: {"c": [from,to]} for copy, {"d": ["val1",...]} for data
+# Wire: {"c": [from,to]} for copy, {"d": ["val1",...]} for text literals,
+# {"b": ["base64",...]} for base64 literals
 # Internal: [from,to] arrays for copy ranges, strings for literal content
+#
+# A "b" item is decoded here, so the rest of the module sees one kind of
+# literal: a plain byte string. decode_base64() is lenient (it drops
+# characters it does not know), so the alphabet and padding are checked
+# first; and no literal, "d" text or decoded "b" octets, may contain CR or
+# LF (§5.1/§5.2), since a literal is exactly one header value or one body
+# line. Each of these is a malformed Recipe: $m is the instance number for
+# the PERMERROR text.
 sub _decode_recipe_list {
-    my ($list) = @_;
+    my ($list, $m) = @_;
+    $m //= '?';
     my @decoded;
     for my $item (@$list) {
         if (ref $item eq 'HASH') {
             if (exists $item->{c}) {
                 push @decoded, $item->{c};
             } elsif (exists $item->{d}) {
+                # schema: "d" is an array of at least one string
+                die "PERMERROR Message-Instance m=$m Recipe has an empty literal step\n"
+                    unless ref $item->{d} eq 'ARRAY' && @{$item->{d}};
+                # §5.1/§5.2: the text strings MUST NOT contain CR or LF
+                for my $text (@{$item->{d}}) {
+                    die "PERMERROR Message-Instance m=$m Recipe literal contains CR or LF\n"
+                        if !defined $text || ref $text || $text =~ /[\r\n]/;
+                }
                 push @decoded, @{$item->{d}};
+            } elsif (exists $item->{b}) {
+                die "PERMERROR Message-Instance m=$m Recipe has a malformed base64 literal\n"
+                    unless ref $item->{b} eq 'ARRAY';
+                die "PERMERROR Message-Instance m=$m Recipe has an empty literal step\n"
+                    unless @{$item->{b}};
+                for my $b64 (@{$item->{b}}) {
+                    die "PERMERROR Message-Instance m=$m Recipe has a malformed base64 literal\n"
+                        unless defined $b64 && !ref $b64
+                            && $b64 =~ m{\A(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\z};
+                    my $octets = decode_base64($b64);
+                    die "PERMERROR Message-Instance m=$m Recipe literal contains CR or LF\n"
+                        if $octets =~ /[\r\n]/;
+                    push @decoded, $octets;
+                }
             }
             # {"z": true} is ignored — spec-04 removed it from the JSON schema
             # but §11 still uses it for truncated-body DSNs (spec inconsistency;
@@ -701,7 +750,7 @@ sub calculate {
     $self->{algs} = ($opts{Algs} && @{$opts{Algs}}) ? [ @{$opts{Algs}} ] : ['sha256'];
 
     unless (ref($current) && $current->isa('Email::MIME')) {
-        $current = Email::MIME->new($current);
+        $current = parse_mime($current);
     }
 
     # $rb_recipe is determined before hash computation because epilogue
@@ -711,7 +760,7 @@ sub calculate {
 
     if ($previous) {
         unless (ref($previous) && $previous->isa('Email::MIME')) {
-            $previous = Email::MIME->new($previous);
+            $previous = parse_mime($previous);
         }
 
         my @mi_cur = $current->header_raw('Message-Instance');
@@ -778,19 +827,24 @@ sub calculate {
         next if should_skip($h, $prefixes);
         my @cur  = reverse $current->header_raw($h);
         my @prev = reverse $previous->header_raw($h);
-        next if join("\n", map { dkim2_canonicalize_header($_) } @cur)
+        # Same number of instances AND the same values: zero instances and
+        # one empty instance both join to "", and removing an empty field
+        # (a bare "Bcc:") is still a change the Recipe must record.
+        next if @cur == @prev
+             && join("\n", map { dkim2_canonicalize_header($_) } @cur)
              eq join("\n", map { dkim2_canonicalize_header($_) } @prev);
         # headers are indexed from 1 from the bottom up
-        my %known = map {
-            dkim2_canonicalize_header($cur[$_]) => $_ + 1
-        } reverse 0..$#cur;
-        # Recipe: reconstruct @prev from @cur. Copy ranges may not overlap,
-        # so each line of @cur is copied at most once; a repeat goes in
-        # literally.
-        my %used;
+        my %known;
+        push @{ $known{dkim2_canonicalize_header($cur[$_])} }, $_ + 1 for 0..$#cur;
+        # Recipe: reconstruct @prev from @cur. Copy ranges must ascend (each
+        # starts after the last one ends, spec-06 §5.1), so each field of
+        # @cur is copied at most once and never out of turn: a repeat, or a
+        # field the hop moved above one it left alone, goes in literally.
+        my $last_end = 0;
         my @res = map {
-            my $idx = $known{dkim2_canonicalize_header($_)};
-            ($idx && !$used{$idx}++) ? [$idx, $idx] : $_
+            my $canon = dkim2_canonicalize_header($_);
+            my ($idx) = grep { $_ > $last_end } @{ $known{$canon} || [] };
+            $idx ? [$idx, $last_end = $idx] : $_
         } @prev;
         # combine adjacent ranges
         for (1..$#res) {
@@ -821,7 +875,7 @@ sub verify {
     check_ignore_prefixes($opts{IgnorePrefixes});
 
     unless (ref($msg) && $msg->isa('Email::MIME')) {
-        $msg = Email::MIME->new($msg);
+        $msg = parse_mime($msg);
     }
 
     if (my $error = _chain_error($msg)) {
@@ -875,29 +929,46 @@ sub verify {
 
 # Rebuild the previous lines from @$old by a Recipe of [from, to] copy ranges
 # (1-based, inclusive) and literal lines. Each range must lie within @$old,
-# and no two may overlap: the previous version is rebuilt from this one, and
-# a hop's change never needs a line of it twice. Without the check a few bytes
-# of header could name a copy of billions of lines. Everything is checked
-# before anything is copied.
+# and the ranges must ascend: each must start after the one before it ends
+# (spec-06 §5.1, and the same rule for the body). The previous version is
+# rebuilt from this one, and a hop's change never needs a line of it twice
+# or in a different order -- a reordering is recorded literally. Without the
+# check a few bytes of header could name a copy of billions of lines.
+# Everything is checked before anything is copied.
+#
+# A bound must be a JSON integer (spec-06 §5 schema): {"c":["1","2"]} is
+# malformed, and every verifier in the interop set rejects it. The JSON
+# decoder gives a number an IV and a string a PV, so the distinction is
+# read off the scalar's flags -- before anything stringifies it, which
+# would set POK on a genuine number too.
+sub _is_json_integer {
+    my ($v) = @_;
+    return 0 unless defined $v && !ref $v;
+    my $flags = B::svref_2object(\$v)->FLAGS;
+    return ($flags & B::SVf_IOK) && !($flags & (B::SVf_POK | B::SVf_NOK)) ? 1 : 0;
+}
+
 sub _apply_recipe {
     my ($what, $recipe, $old) = @_;
     my $lines = @$old;
-    my @ranges;
+    my $prev;
     for my $cmd (grep { ref($_) eq 'ARRAY' } @$recipe) {
         my ($from, $to) = @$cmd;
         die "$what Recipe has a malformed copy range\n"
             unless @$cmd == 2
-                && defined $from && $from =~ /\A[0-9]+\z/
-                && defined $to   && $to   =~ /\A[0-9]+\z/;
+                && _is_json_integer($from) && $from >= 0
+                && _is_json_integer($to)   && $to   >= 0;
         die "$what Recipe copies lines $from-$to of $lines\n"
             unless 1 <= $from && $from <= $to && $to <= $lines;
-        push @ranges, [$from, $to];
-    }
-    my @sorted = sort { $a->[0] <=> $b->[0] } @ranges;
-    for my $i (1 .. $#sorted) {
-        my ($prev, $this) = @sorted[$i - 1, $i];
-        die "$what Recipe copies lines $this->[0]-$prev->[1] twice\n"
-            if $this->[0] <= $prev->[1];
+        if ($prev && $from <= $prev->[1]) {
+            if ($to >= $prev->[0]) {
+                my $lo = $from > $prev->[0] ? $from : $prev->[0];
+                my $hi = $to   < $prev->[1] ? $to   : $prev->[1];
+                die "$what Recipe copies lines $lo-$hi twice\n";
+            }
+            die "$what Recipe copies lines $from-$to out of order\n";
+        }
+        $prev = [$from, $to];
     }
 
     return map {
@@ -905,12 +976,26 @@ sub _apply_recipe {
     } @$recipe;
 }
 
+# Set a message's body to exactly these octets. Email::MIME->body_set encodes
+# what it is given according to the Content-Transfer-Encoding header, so on a
+# base64 or quoted-printable part the rebuilt previous body -- already in its
+# wire encoding, since Recipes work on wire lines -- came back encoded twice,
+# and every base64/QP message a list re-encoded failed its m=1 hash on undo
+# (2026-10-04: 17 of 88 corpus samples through Mailman; the milter refused to
+# sign them). This is Email::MIME::body_set without the encoding step.
+sub _body_raw_set {
+    my ($msg, $raw) = @_;
+    $msg->{body_raw} = $raw;
+    $msg->Email::Simple::body_set($raw);
+    return;
+}
+
 sub undo {
     my ($class, $msg) = @_;
     croak "need a message" unless $msg;
 
     unless (ref($msg) && $msg->isa('Email::MIME')) {
-        $msg = Email::MIME->new($msg);
+        $msg = parse_mime($msg);
     }
 
     if (my $error = _chain_error($msg)) {
@@ -931,7 +1016,7 @@ sub undo {
     if ($rb) {
         my @old = split /\r?\n/, $msg->body_raw;
         my @new = _apply_recipe('body', $rb, \@old);
-        $msg->body_set(join("\r\n", @new, ''));
+        _body_raw_set($msg, join("\r\n", @new, ''));
     }
 
     if ($rh) {
@@ -957,7 +1042,7 @@ sub chain_verifies {
     my ($class, $msg, %opts) = @_;
     check_ignore_prefixes($opts{IgnorePrefixes});
     unless (ref($msg) && $msg->isa('Email::MIME')) {
-        $msg = Email::MIME->new("$msg");
+        $msg = parse_mime("$msg");
     }
     if (my $error = _chain_error($msg)) {
         return (0, $error);
@@ -1031,7 +1116,15 @@ where C<m=> numbers the instance from 1, C<h=> carries one hash set per
 algorithm the signer chose (section 7.3: C<sha256>, C<sha512>, or both;
 this module emits C<sha256> unless told otherwise and verifies every set it
 implements), and C<r=> is the Recipe: C<"b"> for the body and C<"h"> for
-header fields, each a list of copy ranges and literal lines (section 5).
+header fields, each a list of steps (section 5): C<{"c":[start,end]}>
+copies lines or field instances of this version, C<{"d":[...]}> gives
+ASCII literals as JSON text, and C<{"b":[...]}> gives literals whose raw
+octets are not ASCII (a Latin-1 or ISO-2022-JP line, say) as base64. Copy
+ranges must ascend: each starts after the one before it ends. The C<"b">
+step and the ascending rule for body Recipes are an agreed extension to
+spec-06 that is being proposed to the working group; this module emits
+C<"b"> for every non-ASCII literal and rejects a Recipe that breaks either
+rule.
 
 Messages are accepted as L<Email::MIME> objects or as strings, which are
 parsed. C<verify>, C<undo> and C<chain_verifies> look at the highest
@@ -1097,7 +1190,8 @@ scalar context and C<(0, $reason)> in list context. Never dies.
 Applies the top instance's Recipes and removes that instance, returning
 the L<Email::MIME> of the previous form of the message; undef if there is
 no instance. Dies if the Recipe is malformed (a copy range outside the
-message, or overlapping another) or the instances do not form a chain.
+message, overlapping another or out of order, or a C<"b"> literal that is
+not base64 or decodes to a CR or LF) or the instances do not form a chain.
 
 =head2 chain_verifies($msg, %options)
 

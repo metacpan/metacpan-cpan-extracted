@@ -80,7 +80,7 @@
 #     bigscale, whose kappa(X'X) of 1.1e20 formally guarantees nothing at all,
 #     still agrees with R to 4.4e-12, and on a p-value at that: its estimates
 #     agree better still.
-#   * The special functions behind Pr(>|t|) and f.pvalue.  lm()'s incomplete beta
+#   * The special functions behind Pr(>|t|) and f_pvalue.  lm()'s incomplete beta
 #     and R's pt/pf agree only to a few ulp of each other, and that difference is
 #     independent of the design matrix.  It is why several well-conditioned cases
 #     (tooth_two, iris_factor, wide_dot) sit above their eps * kappa figure: the
@@ -841,7 +841,7 @@ END_NASFAC
 # the distribution already ships rather than inlined here.
 for my $path ('t/bodyfat.csv', 'bodyfat.csv') {
 	next unless -e $path;
-	$DATA{bodyfat} = read_table($path, 'output.type' => 'hoa');
+	$DATA{bodyfat} = read_table($path, 'output_type' => 'hoa');
 	last;
 }
 
@@ -1943,7 +1943,7 @@ my @CASES = (
     data    => 'ToothGrowth',
     formula => 'len ~ supp - 1',
     ref     => 'R',
-    # ref is R alone for r.squared / adj.r.squared / f.pvalue:
+    # ref is R alone for r_squared / adj_r_squared / f_pvalue:
     # statsmodels calls this model's dummy columns an implicit
     # intercept and centres the total sum of squares. Coefficients,
     # standard errors, t values and p-values agree with both.
@@ -1981,7 +1981,7 @@ my @CASES = (
     data    => 'ToothGrowth',
     formula => 'len ~ dose + supp - 1',
     ref     => 'R',
-    # ref is R alone for r.squared / adj.r.squared / f.pvalue:
+    # ref is R alone for r_squared / adj_r_squared / f_pvalue:
     # statsmodels calls this model's dummy columns an implicit
     # intercept and centres the total sum of squares. Coefficients,
     # standard errors, t values and p-values agree with both.
@@ -2091,7 +2091,7 @@ my @CASES = (
     data    => 'warpbreaks',
     formula => 'breaks ~ wool + tension - 1',
     ref     => 'R',
-    # ref is R alone for r.squared / adj.r.squared / f.pvalue:
+    # ref is R alone for r_squared / adj_r_squared / f_pvalue:
     # statsmodels calls this model's dummy columns an implicit
     # intercept and centres the total sum of squares. Coefficients,
     # standard errors, t values and p-values agree with both.
@@ -2290,7 +2290,7 @@ my @CASES = (
     data    => 'threeway',
     formula => 'y ~ a * b - 1',
     ref     => 'R',
-    # ref is R alone for r.squared / adj.r.squared / f.pvalue:
+    # ref is R alone for r_squared / adj_r_squared / f_pvalue:
     # statsmodels calls this model's dummy columns an implicit
     # intercept and centres the total sum of squares. Coefficients,
     # standard errors, t values and p-values agree with both.
@@ -2415,17 +2415,17 @@ for my $c (@CASES) {
 	ok(ref($fit) eq 'HASH', "$label: returns a hashref") or next;
 
 	is($fit->{rank},          $c->{rank},        "$label: rank");
-	is($fit->{'df.residual'}, $c->{df_residual}, "$label: df.residual");
+	is($fit->{'df_residual'}, $c->{df_residual}, "$label: df_residual");
 	is(scalar keys %{ $fit->{residuals} }, $c->{n_used},
 		"$label: rows kept (a row with an NA anywhere in the model is dropped)");
-	is(scalar keys %{ $fit->{'fitted.values'} }, $c->{n_used},
-		"$label: fitted.values has one entry per kept row");
+	is(scalar keys %{ $fit->{'fitted_values'} }, $c->{n_used},
+		"$label: fitted_values has one entry per kept row");
 
 	is_close($fit->{rss}, $c->{rss}, $tol, "$label: rss") unless $skip{rss};
-	is_close($fit->{'r.squared'},     $c->{r_squared},     $tol,
-		"$label: r.squared");
-	is_close($fit->{'adj.r.squared'}, $c->{adj_r_squared}, $tol,
-		"$label: adj.r.squared");
+	is_close($fit->{'r_squared'},     $c->{r_squared},     $tol,
+		"$label: r_squared");
+	is_close($fit->{'adj_r_squared'}, $c->{adj_r_squared}, $tol,
+		"$label: adj_r_squared");
 
 	# the overall F test
 	unless ($skip{fstatistic}) {
@@ -2437,8 +2437,8 @@ for my $c (@CASES) {
 					"$label: F numerator df");
 				is($fit->{fstatistic}[2], $c->{fstatistic}[2],
 					"$label: F denominator df");
-				is_close($fit->{'f.pvalue'}, $c->{f_pvalue}, $tol,
-					"$label: f.pvalue");
+				is_close($fit->{'f_pvalue'}, $c->{f_pvalue}, $tol,
+					"$label: f_pvalue");
 			} else {
 				fail("$label: fstatistic is an arrayref");
 			}
@@ -2472,8 +2472,8 @@ for my $c (@CASES) {
 	# for every data set used here.
 	for my $row (sort keys %{ $c->{fitted} }) {
 		my ($f, $e) = @{ $c->{fitted}{$row} };
-		is_close($fit->{'fitted.values'}{$row}, $f, $tol,
-			"$label: fitted.values row $row");
+		is_close($fit->{'fitted_values'}{$row}, $f, $tol,
+			"$label: fitted_values row $row");
 		next if $skip{residuals};
 		is_close($fit->{residuals}{$row}, $e, $tol,
 			"$label: residuals row $row", $atol);
@@ -2500,12 +2500,12 @@ for my $c (@CASES) {
 	# to test against the intercept-only null.
 	my $only = lm(formula => 'mpg ~ 1', data => $mt);
 	is($only->{rank}, 1, 'intercept-only: rank 1');
-	is($only->{'df.residual'}, 31, 'intercept-only: df.residual 31');
+	is($only->{'df_residual'}, 31, 'intercept-only: df_residual 31');
 	is_close($only->{rss}, 1126.0471874999998, 1e-11,
 		'intercept-only: rss equals R (n-1) * var(mpg)');
 	ok(!defined $only->{fstatistic},
 		'intercept-only: no fstatistic, as in summary.lm');
-	is_close($only->{'r.squared'}, 0, 1e-11, 'intercept-only: r.squared 0');
+	is_close($only->{'r_squared'}, 0, 1e-11, 'intercept-only: r_squared 0');
 }
 
 # A term crossed with itself.  R's formula algebra collapses a:a to a, so
@@ -2552,8 +2552,8 @@ for my $c (@CASES) {
 				1e-12, "$shape input: coefficient $t matches the HoA fit");
 		}
 		is($fit->{rank}, $ref_fit->{rank}, "$shape input: same rank");
-		is($fit->{'df.residual'}, $ref_fit->{'df.residual'},
-			"$shape input: same df.residual");
+		is($fit->{'df_residual'}, $ref_fit->{'df_residual'},
+			"$shape input: same df_residual");
 		is_close($fit->{rss}, $ref_fit->{rss}, 1e-12, "$shape input: same rss");
 	}
 }
@@ -2596,7 +2596,7 @@ for my $c (@CASES) {
 	my %const = (y => [ 1 .. 6 ], x => [ 1 .. 6 ], k => [ 7, 7, 7, 7, 7, 7 ]);
 	my $fit = lm(formula => 'y ~ x + k', data => \%const);
 	is($fit->{rank}, 2, 'constant predictor: rank excludes the aliased column');
-	is($fit->{'df.residual'}, 4, 'constant predictor: df.residual is n - rank');
+	is($fit->{'df_residual'}, 4, 'constant predictor: df_residual is n - rank');
 	ok(is_nanish($fit->{coefficients}{k}),
 		'constant predictor: aliased coefficient is NaN, where R reports NA');
 	is($fit->{summary}{k}{Estimate}, 'NaN',
@@ -2618,8 +2618,8 @@ for my $c (@CASES) {
 	my $without = lm(formula => 'y ~ x',     data => $DATA{onelevel});
 	is($with->{rank}, $without->{rank},
 		'single-level factor: contributes no column, so rank matches y ~ x');
-	is($with->{'df.residual'}, $without->{'df.residual'},
-		'single-level factor: df.residual matches y ~ x');
+	is($with->{'df_residual'}, $without->{'df_residual'},
+		'single-level factor: df_residual matches y ~ x');
 	is_close($with->{rss}, $without->{rss}, 1e-12,
 		'single-level factor: rss matches y ~ x');
 	is_close($with->{coefficients}{x}, $without->{coefficients}{x}, 1e-12,
@@ -2727,7 +2727,7 @@ for my $c (@CASES) {
 			'coding: a bare a:b codes both components in full');
 		is($bare->{rank}, 6,
 			'coding: the full cross plus an intercept is rank deficient by one');
-		is($bare->{'df.residual'}, 48, 'coding: bare interaction df.residual');
+		is($bare->{'df_residual'}, 48, 'coding: bare interaction df_residual');
 		# The sweep pivots left to right, as R's pivoted QR does, so the column
 		# that ends up aliased is the last one -- woolB:tensionM here.
 		ok(is_nanish($bare->{coefficients}{'woolB:tensionM'}),
@@ -2778,7 +2778,7 @@ for my $c (@CASES) {
 		my $fit = lm(formula => 'y ~ x * g', data => $DATA{nasfac});
 		is(scalar keys %{ $fit->{residuals} }, 8,
 			'NA handling: rows with an NA in the factor are dropped too');
-		is($fit->{'df.residual'}, 4, 'NA handling: df.residual counts kept rows');
+		is($fit->{'df_residual'}, 4, 'NA handling: df_residual counts kept rows');
 	}
 
 	# xlevels has to describe every factor the model used, including one that
@@ -2799,9 +2799,9 @@ for my $c (@CASES) {
 		my $fit  = lm(formula => $f, data => $tg);
 		my $pred = predict($fit, $tg);
 		my $ok   = 1;
-		for my $row (keys %{ $fit->{'fitted.values'} }) {
+		for my $row (keys %{ $fit->{'fitted_values'} }) {
 			$ok = 0, last
-				unless close_enough($pred->{$row}, $fit->{'fitted.values'}{$row}, 1e-9);
+				unless close_enough($pred->{$row}, $fit->{'fitted_values'}{$row}, 1e-9);
 		}
 		ok($ok, "predict: '$f' reproduces lm's own fitted values");
 	}

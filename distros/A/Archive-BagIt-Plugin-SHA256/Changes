@@ -1,0 +1,29 @@
+==================================================
+Changes from 2025-10-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2026-10-04 22:15:17 +0000
+------------------------------------------
+
+  Change: 4276149754217503cb1637f4477fda75d1bb62be
+  Author: art1@andreas-romeyke.de <art1@andreas-romeyke.de>
+  Date : 2026-10-04 23:58:16 +0000
+
+    - use autoprereqs 
+
+  Change: cc40472e3d15864055a755d935f561da241f4824
+  Author: art1@andreas-romeyke.de <art1@andreas-romeyke.de>
+  Date : 2026-10-04 23:58:00 +0000
+
+    - init, dummy 
+
+  Change: b44e3240a145e93a8c5dcd089571f7febb334499
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-22 09:42:41 +0000
+
+    - minor, whitespace 
+
+================================================
+Plus 3 releases after 2025-10-04 00:00:00 +0000.
+================================================

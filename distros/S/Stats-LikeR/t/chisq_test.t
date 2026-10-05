@@ -63,14 +63,14 @@ dies_ok { chisq_test(undef) } 'Croaks with undefined arg';
 my $data = [10, 20, 30];
 my $res = chisq_test($data);
 is(ref($res), 'HASH', 'Returns a hashref');
-is($res->{'data.name'}, 'Perl ArrayRef', 'Correct data.name');
+is($res->{'data_name'}, 'Perl ArrayRef', 'Correct data_name');
 is($res->{method}, 'Chi-squared test for given probabilities', 'Correct method detected');
 
 # Expected: (10-20)^2/20 + (20-20)^2/20 + (30-20)^2/20 = 10
 is_approx($res->{statistic}{'X-squared'}, 10.0, 'Calculates correct X-squared statistic', 1e-13);
 is_approx($res->{parameter}{df}, 2, 'Calculates correct degrees of freedom', 1e-13);
-is_approx( $res->{'p.value'}, 0.00673794699908547, 'chisq_test: p-value with 1D array', 1e-13);
-ok(looks_like_number($res->{'p.value'}), 'p.value is a number');
+is_approx( $res->{'p_value'}, 0.00673794699908547, 'chisq_test: p-value with 1D array', 1e-13);
+ok(looks_like_number($res->{'p_value'}), 'p_value is a number');
 
 is(ref($res->{expected}), 'ARRAY', 'Expected frequencies is an array ref');
 is_approx($res->{expected}[0], 20.0, 'Expected frequency [0] is correct');
@@ -89,7 +89,7 @@ is($res->{method}, "Pearson's Chi-squared test with Yates' continuity correction
 # R calculation equivalent for [[10, 15], [20, 5]] yields X-squared = 6.75
 is_approx($res->{statistic}{'X-squared'}, 6.75, 'Calculates correct X-squared statistic with Yates', 1e-13);
 is_approx($res->{parameter}{df}, 1, 'Calculates correct degrees of freedom', 1e-13);
-is_approx($res->{'p.value'}, 0.00937476845943488, 'chisq_test: 2x2 p-value', 1e-13);
+is_approx($res->{'p_value'}, 0.00937476845943488, 'chisq_test: 2x2 p-value', 1e-13);
 # 2D Array Test (> 3x2 Matrix)
 # R Code: 
 #   chisq.test(rbind(c(10, 10, 20), c(20, 20, 20)))
@@ -102,7 +102,7 @@ $res = chisq_test($data);
     
 is($res->{method}, "Pearson's Chi-squared test", 'Standard Pearson applied (no Yates)');
 is_approx($res->{parameter}{df}, 2, 'Calculates correct degrees of freedom', 1e-13);
-is_approx($res->{'p.value'}, 0.249352208777296, 'chisq_test: 3x2 matrix, p-value correct', 1e-13);
+is_approx($res->{'p_value'}, 0.249352208777296, 'chisq_test: 3x2 matrix, p-value correct', 1e-13);
 # 1D Hash Test
 # R Code: 
 #   chisq.test(c(A=10, B=20, C=30))
@@ -113,13 +113,13 @@ is_approx($res->{'p.value'}, 0.249352208777296, 'chisq_test: 3x2 matrix, p-value
 $data = { A => 10, B => 20, C => 30 };
 $res = chisq_test($data);
 
-is($res->{'data.name'}, 'Perl HashRef', 'Correct data.name');
+is($res->{'data_name'}, 'Perl HashRef', 'Correct data_name');
 is_approx($res->{statistic}{'X-squared'}, 10.0, 'Calculates correct X-squared from Hash keys', 1e-13);
 is_approx($res->{parameter}{df}, 2, 'Calculates correct degrees of freedom', 1e-13);
 
 is(ref($res->{expected}), 'HASH', 'Expected frequencies is a hash ref');
 is_approx($res->{expected}{A}, 20.0, 'Expected frequency for key A is correct', 1e-13);
-is_approx($res->{'p.value'}, 0.00673794699908547, 'chisq_test: p-value for 1D hash', 1e-13);
+is_approx($res->{'p_value'}, 0.00673794699908547, 'chisq_test: p-value for 1D hash', 1e-13);
 #
 # 2D Hash Test
 # R Code: 
@@ -138,7 +138,7 @@ $res = chisq_test($data);
 is($res->{method}, "Pearson's Chi-squared test with Yates' continuity correction", 'Yates correction triggered for 2x2 HoH');
 is_approx($res->{statistic}{'X-squared'}, 6.75, 'Calculates correct X-squared from 2D Hash');
 is_approx($res->{parameter}{df}, 1, 'Calculates correct degrees of freedom', 1e-13);
-is_approx($res->{'p.value'}, 0.00937476845943488, 'chisq_test: 2x2 p-value', 1e-13);
+is_approx($res->{'p_value'}, 0.00937476845943488, 'chisq_test: 2x2 p-value', 1e-13);
 #
 # Memory Leak Validations
 #
@@ -261,20 +261,19 @@ throws_ok { chisq_test([10, 20, 30], banana => 1) } qr/unknown argument 'banana'
 	is_approx($res->{statistic}{'X-squared'}, 0.55555555555555558, 'p => statistic', 1e-13);
 	is_deeply($res->{expected}, [12, 18, 30], 'p => expected frequencies');
 
-	# unnormalised weights need rescale.p, exactly as in R
+	# unnormalised weights need rescale_p, exactly as in R
 	throws_ok { chisq_test([10, 20, 30], p => [2, 3, 5]) }
 		qr/probabilities must sum to 1/, 'Croaks when p does not sum to 1';
-	my $r2 = chisq_test([10, 20, 30], p => [2, 3, 5], 'rescale.p' => 1);
-	is_approx($r2->{statistic}{'X-squared'}, 0.55555555555555558, 'rescale.p rescales', 1e-13);
-	is_approx(chisq_test([10, 20, 30], p => [2, 3, 5], rescale_p => 1)
-			->{statistic}{'X-squared'},
-		0.55555555555555558, 'rescale_p is an alias', 1e-13);
+	my $r2 = chisq_test([10, 20, 30], p => [2, 3, 5], 'rescale_p' => 1);
+	is_approx($r2->{statistic}{'X-squared'}, 0.55555555555555558, 'rescale_p rescales', 1e-13);
+	throws_ok { chisq_test([10, 20, 30], p => [2, 3, 5], 'rescale.p' => 1) }
+		qr/unknown argument 'rescale\.p'/, "the dotted 'rescale.p' is refused";
 
 	throws_ok { chisq_test([10, 20, 30], p => [0.5, 0.5]) }
 		qr/same number of elements/, 'Croaks when p is the wrong length';
 	throws_ok { chisq_test([10, 20, 30], p => [-0.5, 1.0, 0.5]) }
 		qr/probabilities must be non-negative/, 'Croaks on a negative probability';
-	throws_ok { chisq_test([10, 20, 30], p => [0, 0, 0], 'rescale.p' => 1) }
+	throws_ok { chisq_test([10, 20, 30], p => [0, 0, 0], 'rescale_p' => 1) }
 		qr/positive value to be rescaled/, 'Croaks when p sums to zero';
 	throws_ok { chisq_test([[10, 15], [20, 5]], p => [0.25, 0.25, 0.25, 0.25]) }
 		qr/goodness-of-fit test only/, 'Croaks when p is given for a contingency table';

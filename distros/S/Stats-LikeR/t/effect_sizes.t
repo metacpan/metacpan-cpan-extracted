@@ -25,8 +25,8 @@ sub is_approx {
 	is_approx($d->{pooled_sd},  1.23442680, 'cohen pooled sd');
 	is_approx($d->{hedges_g},   2.16681300, 'hedges g');
 	is_approx($d->{se},         0.69068141, 'cohen d se');
-	is_approx($d->{'conf.int'}[0], 0.96083955, 'cohen d CI lower');
-	is_approx($d->{'conf.int'}[1], 3.66826095, 'cohen d CI upper');
+	is_approx($d->{'conf_int'}[0], 0.96083955, 'cohen d CI lower');
+	is_approx($d->{'conf_int'}[1], 3.66826095, 'cohen d CI upper');
 	is($d->{n1}, 7, 'n1'); is($d->{n2}, 7, 'n2');
 }
 

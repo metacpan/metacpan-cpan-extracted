@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2026-07-22'; # DATE
 our $DIST = 'String-Increment-Parts'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(
@@ -39,10 +39,12 @@ MARKDOWN
             req => 1,
             pos => 0,
             tags => ['category:input'],
+            cmdline_aliases => {s=>{}},
         },
         inc => {
             schema => 'int*',
             default => 1,
+            cmdline_aliases => {i=>{}},
         },
         indexes => {
             schema => ['array*', of=>'int*'],
@@ -54,6 +56,7 @@ MARKDOWN
         filename => {
             summary => 'Treat string as filename and do not include the extension as parts',
             schema => 'bool*',
+            cmdline_aliases => {f=>{}},
         },
         n => {
             summary => 'How many times to repeat the increment and return the result',
@@ -176,7 +179,7 @@ String::Increment::Parts - Increment string parts (numbers or letter sequences)
 
 =head1 VERSION
 
-This document describes version 0.001 of String::Increment::Parts (from Perl distribution String-Increment-Parts), released on 2026-07-22.
+This document describes version 0.002 of String::Increment::Parts (from Perl distribution String-Increment-Parts), released on 2026-07-22.
 
 =head1 DESCRIPTION
 

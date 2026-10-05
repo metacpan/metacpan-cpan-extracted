@@ -225,9 +225,9 @@ for my $c (@CORPUS) {
 		my $r = $call->();
 		close_to($r->{statistic}, $H, $TOL_H, "$label [$form]: statistic");
 		is($r->{parameter}, $df, "$label [$form]: parameter (df)");
-		close_to($r->{'p.value'}, $P, $TOL_P, "$label [$form]: p_value");
-		# p.value is documented alongside p_value, for callers porting R code.
-		close_to($r->{'p.value'}, $P, $TOL_P, "$label [$form]: p.value");
+		close_to($r->{'p_value'}, $P, $TOL_P, "$label [$form]: p_value");
+		# R's dotted p.value is not a result key: the field is p_value only.
+		ok(!exists $r->{'p.value'}, "$label [$form]: no dotted 'p.value' key");
 		is($r->{method}, 'Kruskal-Wallis rank sum test', "$label [$form]: method");
 	}
 }
@@ -242,7 +242,7 @@ for my $c (@CORPUS) {
 	         'obs. airway disease' => [3.8, 2.7, 4.0, 2.4],
 	         'asbestosis'          => [2.8, 3.4, 3.7, 2.2, 2.0]);
 	my $r  = kruskal_test(\%h);
-	my $gs = $r->{'group.stats'};
+	my $gs = $r->{'group_stats'};
 	ok(defined $gs, 'group_stats is defined');
 	is_deeply([sort keys %$gs], ['mean', 'size'], 'group_stats has mean and size');
 	is_deeply([sort keys %{ $gs->{size} }], [sort keys %h], 'group_stats keys are the caller labels');
@@ -257,12 +257,12 @@ for my $c (@CORPUS) {
 	# sizes too, not just from the ranking.
 	my $r2 = kruskal_test({ a => [1, 2, undef, 'NaN', 'not a number', 3],
 	                        b => [10, 20, 30] });
-	is($r2->{'group.stats'}{size}{a}, 3, 'group_stats size skips undef/NaN/non-numeric');
-	close_to($r2->{'group.stats'}{mean}{a}, 2, $TOL_H, 'group_stats mean skips undef/NaN/non-numeric');
+	is($r2->{'group_stats'}{size}{a}, 3, 'group_stats size skips undef/NaN/non-numeric');
+	close_to($r2->{'group_stats'}{mean}{a}, 2, $TOL_H, 'group_stats mean skips undef/NaN/non-numeric');
 	# +-Inf is kept, so the mean of a group holding one is infinite.
 	my $r3 = kruskal_test({ a => [1, 2, 'Inf'], b => [10, 20, 30] });
-	is($r3->{'group.stats'}{size}{a}, 3, 'group_stats size keeps Inf');
-	is($r3->{'group.stats'}{mean}{a}, 9**9**9, 'group_stats mean is Inf when the group holds one');
+	is($r3->{'group_stats'}{size}{a}, 3, 'group_stats size keeps Inf');
+	is($r3->{'group_stats'}{mean}{a}, 9**9**9, 'group_stats mean is Inf when the group holds one');
 }
 
 # @NUL_LABELS: regression guard.  The x/g path read the group label with
@@ -277,12 +277,12 @@ for my $c (@CORPUS) {
 	my @g = ("a\0X", "a\0X", "a\0Y", "a\0Y", "b", "b");
 	my $r = kruskal_test(\@x, \@g);
 	is($r->{parameter}, 2, 'NUL in a group label: three distinct groups, df = 2');
-	is_deeply([sort keys %{ $r->{'group.stats'}{size} }], ["a\0X", "a\0Y", 'b'],
+	is_deeply([sort keys %{ $r->{'group_stats'}{size} }], ["a\0X", "a\0Y", 'b'],
 	          'NUL in a group label: labels round-trip whole');
 	# R, given the same three levels, agrees on the statistic and the p-value:
 	# kruskal.test(list(c(1,2), c(3,4), c(5,6))) in R 4.6.1 at digits=17.
 	close_to($r->{statistic}, 4.571428571428573,  $TOL_H, 'NUL in a group label: statistic');
-	close_to($r->{'p.value'},   0.10170139230422676, $TOL_P, 'NUL in a group label: p_value');
+	close_to($r->{'p_value'},   0.10170139230422676, $TOL_P, 'NUL in a group label: p_value');
 }
 
 # @UTF8_LABELS: regression guard.  Both input paths copied the label's bytes
@@ -295,11 +295,11 @@ for my $c (@CORPUS) {
 	my $wide   = "\x{1f600}\x{4e2d}";  # outside latin-1: must stay wide
 	for my $label ($latin1, $wide) {
 		my $r = kruskal_test({ $label => [1, 2, 3], other => [4, 5, 6] });
-		ok(exists $r->{'group.stats'}{size}{$label},
+		ok(exists $r->{'group_stats'}{size}{$label},
 		   sprintf('hashref path: label U+%04X... round-trips', ord $label));
 		my $r2 = kruskal_test([1, 2, 3, 4, 5, 6],
 		                      [$label, $label, $label, 'other', 'other', 'other']);
-		ok(exists $r2->{'group.stats'}{size}{$label},
+		ok(exists $r2->{'group_stats'}{size}{$label},
 		   sprintf('x/g path: label U+%04X... round-trips', ord $label));
 		is($r2->{parameter}, 1, sprintf('x/g path: label U+%04X... is one group', ord $label));
 	}
@@ -447,8 +447,8 @@ for my $k (2, 8, 9, 16, 17, 33, 64) {
 	my $r = kruskal_test(\@x, \@g);
 	is($r->{parameter}, $k - 1, "k = $k groups of one: df");
 	close_to($r->{statistic}, $k - 1, $TOL_H, "k = $k groups of one: statistic");
-	is(scalar keys %{ $r->{'group.stats'}{size} }, $k, "k = $k groups of one: all labels kept");
-	is($r->{'group.stats'}{size}{"group.$k"}, 1, "k = $k groups of one: last label kept");
+	is(scalar keys %{ $r->{'group_stats'}{size} }, $k, "k = $k groups of one: all labels kept");
+	is($r->{'group_stats'}{size}{"group.$k"}, 1, "k = $k groups of one: last label kept");
 }
 
 # Group labels are compared as perl strings, so numeric and string forms of
@@ -456,7 +456,7 @@ for my $k (2, 8, 9, 16, 17, 33, 64) {
 {
 	my $r = kruskal_test([1,2,3,4,5,6], [1, '1', 1.0, 2, '2', 2.0]);
 	is($r->{parameter}, 1, 'numeric and string group labels are the same group');
-	is_deeply([sort keys %{ $r->{'group.stats'}{size} }], ['1', '2'],
+	is_deeply([sort keys %{ $r->{'group_stats'}{size} }], ['1', '2'],
 	          'numeric group labels stringify');
 }
 
@@ -492,7 +492,7 @@ for my $n (250000, 300000, 500000) {
 	my @x = map { 1 } 1 .. $n;
 	my @g = map { 'g' . ($_ % 3) } 0 .. $n - 1;
 	my $r = kruskal_test(\@x, \@g);
-	my ($H, $P) = ($r->{statistic}, $r->{'p.value'});
+	my ($H, $P) = ($r->{statistic}, $r->{'p_value'});
 	if ($H != $H) {                       # NaN statistic -> NaN p-value
 		ok($P != $P, "all-equal n = $n: NaN statistic gives NaN p-value");
 	} elsif ($H == $INF) {                # the whole mass is below +Inf

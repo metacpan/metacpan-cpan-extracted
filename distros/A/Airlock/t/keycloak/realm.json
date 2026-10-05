@@ -1,0 +1,66 @@
+{
+  "realm": "airlock-test",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "airlock-test-cli",
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "attributes": {
+        "oauth2.device.authorization.grant.enabled": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "amr",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-amr-mapper",
+          "consentRequired": false,
+          "config": {
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "plain",
+      "enabled": true,
+      "email": "plain@example.org",
+      "emailVerified": true,
+      "firstName": "Plain",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "plain-password",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "otp",
+      "enabled": true,
+      "email": "otp@example.org",
+      "emailVerified": true,
+      "firstName": "Otp",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "otp-password",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "secretData": "{\"value\":\"12345678901234567890\"}",
+          "credentialData": "{\"subType\":\"totp\",\"digits\":6,\"counter\":0,\"period\":30,\"algorithm\":\"HmacSHA1\"}"
+        }
+      ]
+    }
+  ]
+}

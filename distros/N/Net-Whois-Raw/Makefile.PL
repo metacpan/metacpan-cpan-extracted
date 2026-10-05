@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "HTTP::Request" => 0,
     "IO::Socket::IP" => 0,
     "LWP::UserAgent" => 0,
-    "Net::IDN::Punycode" => 0,
+    "Net::IDN::Encode" => 0,
     "Regexp::IPv6" => 0,
     "URI::URL" => 0,
     "strict" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "2.99043",
+  "VERSION" => "2.99044",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,7 +59,7 @@ my %FallbackPrereqs = (
   "HTTP::Request" => 0,
   "IO::Socket::IP" => 0,
   "LWP::UserAgent" => 0,
-  "Net::IDN::Punycode" => 0,
+  "Net::IDN::Encode" => 0,
   "Regexp::IPv6" => 0,
   "Socket" => 0,
   "Test::More" => 0,

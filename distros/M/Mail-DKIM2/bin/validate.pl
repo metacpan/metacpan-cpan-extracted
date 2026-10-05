@@ -12,8 +12,14 @@ use JSON;
 use Getopt::Long qw(GetOptions);
 
 my $ignore_ts = 0;
-GetOptions('ignore-timestamps' => \$ignore_ts)
-  or die "usage: $0 [--ignore-timestamps] <file>\n";
+my $dns_json;
+GetOptions('ignore-timestamps' => \$ignore_ts, 'dns-json=s' => \$dns_json)
+  or die "usage: $0 [--ignore-timestamps] [--dns-json FILE] <file>\n";
+# Keys come from a dns.json (interop test fixture), never live DNS: this is the
+# cross-implementation checker, not the production verifier. Default to the
+# copy shipped with the tests, then the interop repository's shared file.
+$dns_json //= $ENV{DKIM2_DNS_JSON}
+         // (-e 't/data/dns.json' ? 't/data/dns.json' : '../dns.json');
 
 my $f1 = shift;
 my $data = path($f1)->slurp;
@@ -21,7 +27,7 @@ $data =~ s/\r//gs;
 $data =~ s/\n/\r\n/gs;
 my $msg1 = Email::MIME->new($data);
 
-my $dns = decode_json(path('../dns.json')->slurp);
+my $dns = decode_json(path($dns_json)->slurp);
 
 my %map = map { _geti($_) => $_ } $msg1->header('DKIM2-Signature');
 my $num = %map ? max(keys %map) : 0;

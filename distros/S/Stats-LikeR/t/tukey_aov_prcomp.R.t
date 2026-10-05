@@ -211,7 +211,7 @@ my $AOV_CW = aov(\%CW, 'weight ~ feed');
 my %HSD_PG = map {
 	my $cl = $_;
 	($cl => TukeyHSD($AOV_PG, data => \%PG, formula => 'weight ~ group',
-	                 'conf.level' => $cl))
+	                 'conf_level' => $cl))
 } (0.95, 0.9, 0.99);
 my $HSD_CW = TukeyHSD($AOV_CW, data => \%CW, formula => 'weight ~ feed');
 my $ANOVA_MT = anova(\%MTCARS, 'mpg ~ wt + hp + disp');
@@ -255,11 +255,11 @@ while (my $line = <DATA>) {
 	}
 	elsif ($label eq 'ptukey.upper|3|3|27') {
 		cmp_val('ptukey', 'ptukey(3, 3, 27, upper)',
-			ptukey(3, 3, 27, 'lower.tail' => 0), $exp[0]);
+			ptukey(3, 3, 27, 'lower_tail' => 0), $exp[0]);
 	}
 	elsif ($label eq 'qtukey.upper|0.05|3|27') {
 		cmp_val('qtukey', 'qtukey(0.05, 3, 27, upper)',
-			qtukey(0.05, 3, 27, 'lower.tail' => 0), $exp[0]);
+			qtukey(0.05, 3, 27, 'lower_tail' => 0), $exp[0]);
 	}
 	elsif ($label eq 'qtukey.inf2') {
 		cmp_val('qtukey', 'qtukey(0.95, 2, 1e9)', qtukey(0.95, 2, 1e9), $exp[0]);
@@ -319,8 +319,8 @@ while (my $line = <DATA>) {
 			$LM_MT->{coefficients}{ $nm[$_] }, $exp[$_]) for 0 .. $#exp;
 	}
 	elsif ($label eq 'lm.mt.fit') {
-		cmp_val('anova', 'lm r.squared',     $LM_MT->{'r.squared'},     $exp[0]);
-		cmp_val('anova', 'lm adj.r.squared', $LM_MT->{'adj.r.squared'}, $exp[1]);
+		cmp_val('anova', 'lm r_squared',     $LM_MT->{'r_squared'},     $exp[0]);
+		cmp_val('anova', 'lm adj_r_squared', $LM_MT->{'adj_r_squared'}, $exp[1]);
 	}
 	elsif ($label eq 'vif.mt') {
 		my $v = vif(\%MTCARS, [qw(wt hp disp)]);
@@ -415,7 +415,7 @@ cmp_ok($checks, '>', 750,  "values compared ($checks)");
 
 	# The two tails must sum to 1.
 	for my $q (1, 3, 5) {
-		my $s = ptukey($q, 3, 27) + ptukey($q, 3, 27, 'lower.tail' => 0);
+		my $s = ptukey($q, 3, 27) + ptukey($q, 3, 27, 'lower_tail' => 0);
 		cmp_ok(abs($s - 1), '<', 1e-14, "ptukey($q, 3, 27): the two tails sum to 1");
 	}
 
@@ -428,7 +428,7 @@ cmp_ok($checks, '>', 750,  "values compared ($checks)");
 	}
 	is($bad, 0, 'chickwts: every Tukey interval contains its own difference');
 
-	# A wider conf.level must widen every interval and leave every p adj and
+	# A wider conf_level must widen every interval and leave every p adj and
 	# every difference alone -- the adjusted p-value does not depend on the
 	# level, which is a detail R gets right and an implementation can miss.
 	for my $c (@{ $HSD_PG{0.95}{group} }) {
@@ -436,7 +436,7 @@ cmp_ok($checks, '>', 750,  "values compared ($checks)");
 		cmp_ok($w->{lwr}, '<', $c->{lwr}, "$c->{comparison}: 99% lwr below 95%");
 		cmp_ok($w->{upr}, '>', $c->{upr}, "$c->{comparison}: 99% upr above 95%");
 		cmp_ok(abs($w->{'p adj'} - $c->{'p adj'}), '<', 1e-14,
-			"$c->{comparison}: p adj does not depend on conf.level");
+			"$c->{comparison}: p adj does not depend on conf_level");
 	}
 
 	# prcomp: the eigenvalues must account for the total variance.  With

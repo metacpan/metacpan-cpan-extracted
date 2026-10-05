@@ -8,7 +8,7 @@ class Getopt::Pad::Type::File :isa(Getopt::Pad::Type::Path) :strict(params) {
 	use File::Basename ();
 	use File::Path     ();
 
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 
 	method label() { return 'File Path' }
 

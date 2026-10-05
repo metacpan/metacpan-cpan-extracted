@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed weaken);
 use Unblock::HTTP3 ();
 use Unblock::HTTP3::_Bytes ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub _new {
     my ($class, $transaction, $kind, %option) = @_;
@@ -153,6 +153,14 @@ sub _push {
         'received body',
         $bytes,
     );
+
+    return $self->_push_owned($bytes);
+}
+
+sub _push_owned {
+    my ($self, $bytes) = @_;
+
+    return if $self->{cancelled};
 
     if (length $bytes) {
         push @{ $self->{queue} }, $bytes;
