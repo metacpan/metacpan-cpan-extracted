@@ -94,35 +94,83 @@ is(inspect('{% x %}')->{is_wrapper}, 0, 'no content, no wrapper');
     # Take the best of several rounds rather than an average, too: timing
     # noise is one-sided, so the minimum is the closest thing to the real
     # cost that a shared machine will ever show us.
-    sub time_compile {
-        my ($tmpl, $n) = @_;
+    #
+    # Size the iteration count against the clock, not by hand. A fixed
+    # count times a round that may be shorter than the clock can resolve,
+    # and then the ratio is a quotient of two rounding errors: a FreeBSD
+    # smoker timed the small template at 0.06us, which is 15 bytes of
+    # template parsed per nanosecond, and reported 59.3x for 10x input off
+    # the back of it. Grow the count until a round spans enough ticks that
+    # the quantisation is far below the margin we are asserting on. 5ms is
+    # some thousands of ticks on a microsecond clock; the 200-tick rule
+    # covers a coarser one, and the 100ms ceiling keeps a millisecond clock
+    # from turning this into a ten-second test.
+    my $tick = do {
         my $best;
-        for my $round (1 .. 5) {
+        for (1 .. 20) {
+            my $t0 = Time::HiRes::time();
+            my $d;
+            1 while (($d = Time::HiRes::time() - $t0) <= 0);
+            $best = $d if !defined $best || $d < $best;
+        }
+        $best;
+    };
+    my $floor = $tick * 200;
+    $floor = 0.005 if $floor < 0.005;
+    $floor = 0.100 if $floor > 0.100;
+
+    # (us per compile, whether a round ever cleared the floor, count used)
+    sub time_compile {
+        my ($tmpl, $floor) = @_;
+        my $n = 32;
+        my $elapsed;
+        while (1) {
             my $t0 = Time::HiRes::time();
             for (1 .. $n) {
                 Template::Stencil::_free_handle(
                     Template::Stencil::_compile_handle($tmpl));
             }
-            my $us = (Time::HiRes::time() - $t0) / $n * 1e6;
-            $best = $us if !defined $best || $us < $best;
+            $elapsed = Time::HiRes::time() - $t0;
+            last if $elapsed >= $floor;
+            # jump straight to the count the floor asks for, with headroom
+            my $want = $elapsed > 0
+                     ? int($n * $floor / $elapsed * 1.3) + 1 : $n * 8;
+            last if $want > 1_000_000;   # a clock this broken gets a skip
+            $n = $want;
         }
-        return $best;
+        my $best = $elapsed;
+        for (1 .. 2) {
+            my $t0 = Time::HiRes::time();
+            for (1 .. $n) {
+                Template::Stencil::_free_handle(
+                    Template::Stencil::_compile_handle($tmpl));
+            }
+            my $e = Time::HiRes::time() - $t0;
+            $best = $e if $e < $best;
+        }
+        return ($best / $n * 1e6, $elapsed >= $floor, $n);
     }
 
     my $small = ($unit x 20)  . $tail;
     my $big   = ($unit x 200) . $tail;
-    my $us_small = time_compile($small, 2000);
-    my $us_big   = time_compile($big,   200);
-    my $ratio    = $us_big / ($us_small || 1e-9);
+    my ($us_small, $small_ok, $n_small) = time_compile($small, $floor);
+    my ($us_big,   $big_ok,   $n_big)   = time_compile($big,   $floor);
+    my $ratio = $us_big / ($us_small || 1e-9);
 
-    diag(sprintf 'cold compile: %d bytes %.2f us, %d bytes %.2f us '
-               . '(%.1fx for 10x input)',
-         length $small, $us_small, length $big, $us_big, $ratio);
+    diag(sprintf 'cold compile: %d bytes %.3f us (n=%d), %d bytes %.3f us '
+               . '(n=%d), %.1fx for 10x input, clock tick %.3f us',
+         length $small, $us_small, $n_small,
+         length $big,   $us_big,   $n_big, $ratio, $tick * 1e6);
 
     # 10x the input for <=40x the time. Linear lands near 10x - in practice
-    # nearer 6x, since the fixed tail amortises - and anything quadratic
-    # lands near 100x and trips this on any machine.
-    cmp_ok($ratio, '<', 40, 'compile time scales linearly with input');
+    # nearer 5x, since the fixed tail amortises and interning folds the
+    # repeated unit - and anything quadratic lands near 100x and trips this
+    # on any machine.
+    SKIP: {
+        skip 'clock too coarse to time the compiler on this box', 1
+            unless $small_ok && $big_ok;
+        cmp_ok($ratio, '<', 40, 'compile time scales linearly with input');
+    }
 
     # The absolute budget is a real number worth defending, but only on
     # hardware we control - it says nothing on a random smoker.

@@ -7,6 +7,7 @@ use lib "t/lib";
 use Util;
 use File::Spec::Functions qw(catfile);
 use Archive::Tar;
+use Fcntl qw(:mode);
 
 use Minilla::Profile::Default;
 use Minilla::Project;
@@ -31,15 +32,20 @@ subtest 'copy' => sub {
     write_minil_toml('Acme-Foo');
 
     git_init_add_commit();
+    chmod(0600, 'bin/foo') or die "chmod: $!";
 
     my $work_dir = Minilla::Project->new()->work_dir;
     ok($work_dir);
     ok -f catfile($work_dir->dir, 'bin/foo');
     SKIP: {
-        skip "-x test is not portable", 1 if $^O eq 'MSWin32';
+        skip "File permissions are not portable", 2 if $^O eq 'MSWin32';
         ok -x catfile($work_dir->dir, 'bin/foo');
+        is(
+            (stat(catfile($work_dir->dir, 'bin/foo')))[2] & (S_IRWXU | S_IRWXG | S_IRWXO),
+            0755,
+            'Git index mode is applied to the copied file',
+        );
     }
 };
 
 done_testing;
-

@@ -316,11 +316,29 @@ pdfmake_trapped_t pdfmake_meta_get_trapped(pdfmake_doc_t *doc) {
  * knob, and a document that fails to render because an environment
  * variable had a typo would be a worse failure than a timestamp.
  */
+static pdfmake_source_date_hook_t source_date_hook = NULL;
+
+void pdfmake_set_source_date_hook(pdfmake_source_date_hook_t hook) {
+    source_date_hook = hook;
+}
+
 int pdfmake_source_date(time_t *out) {
-    const char *s = getenv("SOURCE_DATE_EPOCH");
+    const char *s;
     char *end;
     long long v;
 
+    /* An embedding host may keep the variable somewhere getenv() cannot see;
+     * see the hook's comment in pdfmake_meta.h. */
+    if (source_date_hook) {
+        time_t t;
+        if (source_date_hook(&t)) {
+            if (out) *out = t;
+            return 1;
+        }
+        return 0;
+    }
+
+    s = getenv("SOURCE_DATE_EPOCH");
     if (!s || !*s) return 0;
     errno = 0;
     v = strtoll(s, &end, 10);

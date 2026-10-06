@@ -1,5 +1,11 @@
 Revision history for Package-Stash-XS
 
+0.32      2026-10-05 20:06:40Z
+      - no runtime changes since 0.31-TRIAL
+
+0.31      2026-09-22 22:59:10Z (TRIAL RELEASE)
+      - potential patch for perl issue #24845
+
 0.30      2022-06-12 20:00:39Z
       - misc tooling updates
       - fixed redundant argument in sprintf in tests (RT#143205)
@@ -7,7 +13,7 @@ Revision history for Package-Stash-XS
 0.29      2018-12-31 03:26:01Z
       - quiet compiler warning (Jacques Germishuys, PR #2)
       - canonical repository moved to
-        https://github.com/moose/Package-Stash=XS
+        https://github.com/moose/Package-Stash-XS
 
 0.28  2013-07-16
       - fix test issue (Graham Knop)

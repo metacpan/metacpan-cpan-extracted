@@ -46,6 +46,13 @@ my @c_src  = ('Make.c', sort glob('src/pdfmake*.c'));
 my @h_files = sort glob('include/pdfmake*.h');
 my @obj     = map { (my $o = $_) =~ s/\.c$/\$(OBJ_EXT)/; $o } @c_src;
 
+# Make.xs is a shell of INCLUDE: directives; every XSUB actually lives in
+# xs/*.xs. EUMM only makes Make.c depend on Make.xs and the typemaps, so
+# without this an edit to xs/page.xs or xs/canvas.xs compiles and links
+# cleanly while changing nothing at all - the new method is simply missing
+# at runtime.
+my @xs_inc = sort glob('xs/*.xs');
+
 # ── Read exported symbol list ─────────────────────────────
 
 sub _read_funclist {
@@ -92,6 +99,7 @@ my %WriteMakefileArgs = (
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
     clean => { FILES => 'PDF-Make-* Make.c Make.bs Install/' },
+    depend => { 'Make.c' => join(' ', @xs_inc) },
 
     %platform_args,
     %dep_vars,

@@ -1,5 +1,11 @@
 Revision history for Font-Metrics
 
+1.01    2026-10-05
+	- Install fm.h beside Install/Files.pm, the directory ExtUtils::Depends
+	  adds -I for, and record no -I paths for dependents; the paths recorded
+	  by 0.03 were this distribution's build tree, so dependent XS modules
+	  failed to find fm.h once a CPAN client removed it.
+
 0.03    2026-07-24
 	- Build and install libfm$(LIB_EXT) static archive alongside the shared
 	  object so downstream XS modules (e.g. Layout::Flex) can link fm_*

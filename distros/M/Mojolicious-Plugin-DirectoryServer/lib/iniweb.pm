@@ -12,7 +12,7 @@ sub import {
 		root       => $ENV{PERL_MINIWEB_ROOT},
 		dir_index  => [ split ':', $ENV{PERL_MINIWEB_DIR_INDEX} ],
 	);
-	a->plugin( DirectoryServer => %opts )->start;
+	plugin( DirectoryServer => %opts )->start;
 
 	exit( 0 );
 }

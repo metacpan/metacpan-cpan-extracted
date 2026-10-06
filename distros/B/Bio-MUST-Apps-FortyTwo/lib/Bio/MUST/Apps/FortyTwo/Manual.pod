@@ -56,7 +56,7 @@ FortyTwo::Manual - User Guide for Forty-Two
 
 =head1 VERSION
 
-version 0.213470
+version 0.262780
 
 =encoding UTF-8
 
@@ -218,7 +218,7 @@ the best hit in the C<ref_org> is recorded. However, when bit scores of
 subsequent hits are nearly equal to the bit score of the best hit, the
 corresponding sequences are interpreted as closely related in-paralogues and
 also added to the list of B<best hits>. This behaviour can be tweaked using the
-C<bitscore_mul> parameter of the C<config> file.
+C<ref_score_mul> parameter of the C<config> file.
 
 As a consequence, several best hits can be recorded for a single
 C<query_seq>/C<ref_org> pair, either because several sequences are available for

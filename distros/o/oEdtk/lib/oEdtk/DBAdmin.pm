@@ -7,6 +7,8 @@ use POSIX			qw(strftime);
 use Scalar::Util 	qw(looks_like_number);
 use strict;
 use Text::CSV;
+use File::Temp	qw(tempfile);
+use Encode		qw(encode find_encoding);
 use warnings;
 use Data::Dumper qw(Dumper);
 
@@ -19,7 +21,7 @@ use Data::Dumper qw(Dumper);
 # SHOW CREATE DATABASE oEdtk;
 
 use Exporter;
-our $VERSION		= 2.1071; #version lc Mysql / PG / Oracle / SQLite
+our $VERSION		= 2.1101; #version lc Mysql / PG / Oracle / SQLite
 our $VERSION_TXT 	= $VERSION =~ s/\./_/gr;
 our @ISA			= qw(Exporter);
 our @EXPORT_OK		= qw(
@@ -220,6 +222,139 @@ sub _load_csv_mysql_local_infile ($$$$) {
 #		&logger (3, "$count-ERROR LOAD INFILE-$@ $!".$dbh::errstr);
 		return (-1, &logger (3, "$count-ERROR LOAD INFILE-$@ $!".($dbh::errstr || "")));
 	}
+
+	&logger(4, $count." lines inserted into $tablename");
+	return ($count, " lines inserted");
+}
+
+
+# ============================================================
+# PRIVATE : serialize one CSV field (RFC4180 style).
+#   undef    => unquoted empty field => read as NULL by COPY (NULL '')
+#   ''       => force-quoted ""      => read as empty string (clean_val parity)
+#   otherwise=> quoted only when needed (sep, quote, CR or LF inside)
+# ============================================================
+sub _pg_csv_field {
+	my ($val, $sep, $quo) = @_;
+	return '' unless defined $val;
+	return $val unless $val eq ''
+		|| index($val, $sep) >= 0
+		|| index($val, $quo) >= 0
+		|| $val =~ /[\r\n]/;
+	(my $esc = $val) =~ s/\Q$quo\E/$quo$quo/g;
+	return $quo . $esc . $quo;
+}
+
+# Map a PostgreSQL client_encoding name to an Encode name.
+# Text::CSV (binary=>1) returns decoded characters, so values must be
+# re-encoded to the session client_encoding before COPY reads the bytes.
+sub _pg_encoding_name {
+	my ($pg) = @_;
+	my $n = uc($pg // '');
+	$n =~ s/[^A-Z0-9]//g;
+	my %map = (
+		UTF8   => 'UTF-8',      UNICODE => 'UTF-8',
+		LATIN1 => 'ISO-8859-1',  LATIN2 => 'ISO-8859-2',
+		LATIN3 => 'ISO-8859-3',  LATIN4 => 'ISO-8859-4',
+		LATIN5 => 'ISO-8859-9',  LATIN6 => 'ISO-8859-10',
+		LATIN7 => 'ISO-8859-13', LATIN8 => 'ISO-8859-14',
+		LATIN9 => 'ISO-8859-15', LATIN10 => 'ISO-8859-16',
+	);
+	return $map{$n} if exists $map{$n};
+	return "CP$1" if $n =~ /^WIN(\d+)$/;
+	return $n if $n ne '' && defined find_encoding($n);
+	return 'UTF-8';
+}
+
+# ============================================================
+# PRIVATE : bulk load a CSV file into a PostgreSQL table with
+# COPY ... FROM STDIN (native equivalent of LOAD DATA LOCAL INFILE).
+# The CSV is cleaned through clean_val into a temp file first, so
+# truncation and '' => NULL (numeric/date) match the row-by-row path.
+# $norm_id comes from _norm_identifiers (PostgreSQL identifiers are lowercase).
+# Returns ($count, " lines inserted") on success, (-1, "...") on failure.
+# ============================================================
+sub _load_csv_pg_copy ($$$$$) {
+	my ($dbh, $tablename, $fi, $params, $norm_id) = @_;
+
+	my $sep = $params->{'sep_char'};
+	my $quo = $params->{'quote_char'};
+
+	# COPY reads the bytes in the session client_encoding; encode rows to
+	# match what the row-by-row DBI path would send.
+	my $enc = _pg_encoding_name(eval { $dbh->selectrow_array('SHOW client_encoding') });
+	&logger(7, "_load_csv_pg_copy: client_encoding=".($enc // 'raw'));
+
+	my $csv = Text::CSV->new({ binary     => 1,
+	                           sep_char   => $sep,
+	                           quote_char => $quo });
+
+	# Read the header record for column names and insertion order.
+	# getline (not parse) so a quoted field may span several physical lines.
+	open(my $fh, '<', $fi) or die "ERROR: Cannot open file \"$fi\": $!\n";
+	my $hdr = $csv->getline($fh);
+	unless ($hdr) {
+		close($fh);
+		return (-1, &logger(3, "_load_csv_pg_copy: cannot read header of \"$fi\""));
+	}
+	my @cols = map { $norm_id->($_) } @$hdr;
+
+	# Same metadata and cleaner as the row-by-row path.
+	my $col_meta  = _get_col_meta($dbh, $tablename, $norm_id);
+	my $clean_val = _make_clean_val($col_meta);
+
+	# Build a cleaned copy of the CSV in a temp file.
+	my ($tmpfh, $tmpname) = tempfile('edtk_csv_XXXXXX', SUFFIX => '.csv', UNLINK => 1);
+	binmode($tmpfh);
+	&logger(7, "_load_csv_pg_copy: cleaned temp file $tmpname");
+	my ($count, $rv) = (0, undef);
+	while (1) {
+		my $data = $csv->getline($fh);
+		if (!defined $data) {
+			last if $csv->eof;
+			$rv = "CSV parse error near line ".($count + 1).": ".($csv->error_diag // 'unknown');
+			last;
+		}
+		my @clean = map { $clean_val->($cols[$_], $data->[$_]) } 0..$#cols;
+		my $row = join($sep, map { _pg_csv_field($_, $sep, $quo) } @clean);
+		$row = encode($enc, $row) if defined $enc;
+		print $tmpfh $row, "\n";
+		$count++;
+	}
+	close($fh);
+	if ($rv) {
+		close($tmpfh);
+		return (-1, &logger(3, "_load_csv_pg_copy: $rv in \"$fi\""));
+	}
+	seek($tmpfh, 0, 0) or do {
+		close($tmpfh);
+		return (-1, &logger(3, "_load_csv_pg_copy: cannot rewind temp file: $!"));
+	};
+
+	# COPY ... FROM STDIN : NULL '' makes an unquoted empty field a NULL.
+	my $sql = "COPY $tablename (" . join(',', @cols) . ")"
+	        . " FROM STDIN WITH (FORMAT csv, DELIMITER '" . $sep . "',"
+	        . " QUOTE '" . $quo . "', NULL '')";
+	&logger(7, $sql);
+
+	my $emsg;
+	eval {
+		$dbh->do($sql);
+		while (my $line = <$tmpfh>) {
+			defined $dbh->pg_putcopydata($line)
+				or die ($dbh->errstr || "pg_putcopydata failed");
+		}
+		$dbh->pg_putcopyend();
+		1;
+	} or $emsg = $@;
+	$emsg ||= ($dbh->err ? $dbh->errstr : '');
+	if ($emsg) {
+		eval { $dbh->pg_putcopyend() };  # best-effort abort if left in COPY state
+		close($tmpfh);
+		chomp($emsg);
+		return (-1, &logger(3, "_load_csv_pg_copy: COPY into $tablename failed: $emsg"));
+	}
+	close($tmpfh);
 
 	&logger(4, $count." lines inserted into $tablename");
 	return ($count, " lines inserted");
@@ -826,6 +961,14 @@ sub csv_import ($$$;$) {
       && $dbh->{'Name'}            =~ m/mysql_local_infile\=true/i ) {
         &logger(7, "'mysql_local_infile=true' detected in DSN by csv_import, trying local infile");
         return _load_csv_mysql_local_infile($dbh, $norm_table, $in, $params);
+    }
+
+    # PostgreSQL: COPY ... FROM STDIN is the native equivalent of LOAD DATA LOCAL INFILE.
+    # Enabled automatically for the Pg driver (merge mode keeps the row-by-row path).
+    if ( $params->{'mode'} !~ /merge/i
+      && _db_check_driver_name($dbh) eq "PostgreSQL" ) {
+        &logger(7, "PostgreSQL driver detected by csv_import, trying COPY FROM STDIN");
+        return _load_csv_pg_copy($dbh, $norm_table, $in, $params, $norm_id);
     }
 
     open(my $fh, '<', $in) or die "ERROR: Cannot open index file \"$in\": $!\n";

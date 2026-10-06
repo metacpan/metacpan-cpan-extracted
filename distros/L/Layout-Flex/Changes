@@ -1,5 +1,12 @@
 Revision history for Layout-Flex
 
+0.06    2026-10-05
+	- Find the installed fm.h under @INC rather than trusting the -I paths
+	  ExtUtils::Depends carries over from Font::Metrics, which name that
+	  distribution's deleted build tree; fixes "fm.h: No such file or
+	  directory" at compile time.
+	- Die at configure time, naming fm.h, when the header is missing.
+
 0.05    2026-07-24
 	- Link Font::Metrics libfm.a static archive into Flex.so via LDFROM;
 	  should hopefully fix undefined symbol fm_* errors on Linux at load time.

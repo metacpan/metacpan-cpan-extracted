@@ -7,7 +7,9 @@ use lib "t/lib";
 use Util;
 use Archive::Tar;
 use CPAN::Meta;
+use Digest::SHA qw(sha256_hex);
 use JSON;
+use Test::Output qw(stdout_from);
 
 use Minilla::CLI::Dist;
 use Minilla::Profile::Default;
@@ -25,7 +27,10 @@ my $profile = Minilla::Profile::Default->new(
     email   => 'tokuhirom@example.com',
 );
 $profile->generate();
-write_minil_toml('Acme-Foo');
+write_minil_toml({
+    name           => 'Acme-Foo',
+    manage_changes => 0,
+});
 
 git_init();
 git_config(qw(user.name tokuhirom));
@@ -39,13 +44,32 @@ $meta->{abstract} = 'Prepared abstract';
 $meta->{x_prepared} = 'kept';
 my $meta_json = JSON->new->canonical->pretty->encode($meta);
 my $readme = "# Prepared README\n";
-spew('Build.PL', $build_pl);
-spew('META.json', $meta_json);
-spew('README.md', $readme);
+spew_raw('Build.PL', $build_pl);
+spew_raw('META.json', $meta_json);
+spew_raw('README.md', $readme);
 git_add('.');
 git_commit('-m', 'prepared release');
 
+local $ENV{SOURCE_DATE_EPOCH} = 1700000000;
+my $stdout = stdout_from(sub { Minilla::CLI::Dist->run('--skip-prepare', '--no-test') });
+is_deeply(
+    decode_json((split /\n/, $stdout)[-1]),
+    { dist => 'Acme-Foo-0.01.tar.gz' },
+    'minil dist --skip-prepare logs the relative archive path',
+);
+my $first_dist = slurp_raw('Acme-Foo-0.01.tar.gz');
+
+chmod(0777, 'Build.PL') or die "chmod: $!";
+chmod(0600, 'README.md') or die "chmod: $!";
+utime(1800000000, 1800000000, 'Build.PL', 'README.md');
 Minilla::CLI::Dist->run('--skip-prepare', '--no-test');
+my $second_dist = slurp_raw('Acme-Foo-0.01.tar.gz');
+
+is(
+    sha256_hex($second_dist),
+    sha256_hex($first_dist),
+    'minil dist --skip-prepare creates a reproducible tarball',
+);
 
 my $tar = Archive::Tar->new('Acme-Foo-0.01.tar.gz');
 is(

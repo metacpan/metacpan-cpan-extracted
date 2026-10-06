@@ -1,95 +1,326 @@
-***************************************************************************
-***************************************************************************
-			- oEdtk -
-***************************************************************************
-***************************************************************************
+Revision history for oEdtk
 
-Release 1.5xxx
+2.1071      2026-07-01
+    - oEdtk::DBAdmin: _get_col_meta now distinguishes text types (varchar, character varying, char, bpchar, text) from numeric and date/time types. The truncation size is only used for text columns; numeric and date/time columns get a new blank_to_null flag. This fixes erroneous truncation of values on PostgreSQL (e.g. a date 2026-07-09 was being truncated to 2026 because column_info returns the internal storage size for non-text types).
+    - oEdtk::DBAdmin: _make_clean_val — empty-string → undef conversion now applies to both numeric AND date/time columns (blank_to_null), fixing PostgreSQL "invalid input syntax for type date" errors.
+    - oEdtk.pm: version bump to 2.1071.
+    - Makefile.PL / README.md: copyright year updated 2024 → 2026.
+    - META.json / META.yml: version bump only.
 
-- Config.pm
-Change the load lookup order for oedtk.ini file : looks prg directory, then in perl mod directory. 
-No change in the config file identification
+2.1065      2026-06-05
+    - oEdtk.pm: version bump to 2.1065; copyright year in the POD LICENCE section updated 2024 → 2026.
+    - META.json / META.yml: version bump only.
 
-- DBAdmin.pm
-Use logger to track warning if set in config file oedtk.in
-Add insert_tData to insert tracking data from outside
-If mysql_local_infile detected, csv_import will automaticaly use to insert csv file directly
-Tracking table - Change : ed_singl_id 17=>25
-Tracking table - Add    : ED_OBJ_TYP (V3), ED_PARENT_ID (V32), ED_CHILD_ID (V32), ED_CHILD_TYP (V3)
-Lots table  - Change : ED_CPDEST (V8=>V10), ED_LOTNAME (V16=>V64)
-Index Table - Change : ED_CPDEST (V8=>V10), ED_LOTNAME (V16=>V64), ED_REFIDDOC (V25), ED_IDLDOC (V25)
-Index Table - Add : ED_WORKFLOW (V32), ED_CHANEL_OUT (V32), ED_COUNTRY (V5), ED_IDCONTRACT (V16), ED_IDPRODUCT (V8)
-Index Table - add ED_IDJOB into primary key
+2.1064      2026-06-04
+    - oEdtk::DBAdmin: $VERSION = 2.1063; new $VERSION_TXT (version with dots replaced by underscores, used in index names). admin_check_db renamed to acheck_db_admin_on_connect; private _drop_table renamed to public db_drop_table (new export).
+    - oEdtk::DBAdmin: massive SQL rewrite to lowercase keywords and identifiers throughout (all maintenance queries, purges, rotations, table creation) for portability across MySQL / PostgreSQL / Oracle / SQLite. _sql_fixup gained a third $mysqlCasse argument: for MySQL the whole SQL is uppercased (except INSERT/REPLACE statements); for PostgreSQL empty strings '' are converted to NULL in VALUES/SET clauses; VARCHAR2→VARCHAR conversion is now case-insensitive.
+    - oEdtk::DBAdmin: insert_tData rewritten — driver-aware identifier case normalization (_norm_identifiers, uc for MySQL/MariaDB, lc otherwise), column metadata lookup (_get_col_meta via DBI column_info, with a SELECT * WHERE 1=0 fallback for drivers like SQLite), and value cleaning (_make_clean_val: empty string → undef for numeric columns, truncation to declared column size). Old implementations kept as insert_tData_deprecated_1 / insert_tData_deprecated_2.
+    - oEdtk::DBAdmin: csv_import rewritten with the same metadata/cleaning pipeline; old versions kept as csv_import_deprecated_1/2/3; new private helpers _norm_identifiers, _get_col_meta, _make_clean_val.
+    - oEdtk::DBAdmin: db_connect — FetchHashKeyName is now configurable via EDTK_DB_FetchHashKeyName (default NAME_uc); the TRACKING table is auto-created on connect if missing (_table_exists); the auto DB check now only runs when EDTK_DB_CHECK_AUTO is explicitly YES (previously defaulted to YES when unset); calls acheck_db_admin_on_connect instead of admin_check_db.
+    - oEdtk::DBAdmin: new _table_exists helper (DBI table_info); new acheck_db_admin2 (on-demand maintenance job) built on new _db_maintenance and _db_with_lock (locking via an edtk_admin insert).
+    - oEdtk::DBAdmin: _db_check_driver_name hardened (returns "NC" for an invalid/unconnected $dbh); old version kept as _db_check_driver_name_deprecated.
+    - oEdtk::DBAdmin: admin_optimize_db rewritten — driver detected per connection, no-op select 1 for NC/Oracle, REPAIR TABLE/OPTIMIZE TABLE for MySQL, VACUUM FULL for PostgreSQL; old version kept as admin_optimize_db_deprecated.
+    - oEdtk::DBAdmin: index names changed from ix.$VERSION.$table (dot-separated) to ix_${table}_${VERSION_TXT} (underscore-separated, portable) and use create index if not exists. create_lot_sequence now issues create sequence if not exists edtk_idlot minvalue 0 maxvalue 999 cycle through _sql_fixup.
+    - oEdtk::DBAdmin: all column-definition arrays (@TRACKER_COLS, @DISTRIB_COLS, @AGREGE_COLS, @INDEX_COLS) converted to lowercase column names. create_table_OUTMNGR: ed_ididx no longer NOT NULL; ed_nbdocpli and ed_numpgpli no longer NOT NULL. move_table, db_backup_agent, schema_Upgrade, schema_Create: lowercase SQL and _sql_fixup(..., 'casse').
+    - lib/oEdtk/logger2.pm: package renamed from oEdtk::logger2 to oEdtk::logger (the file is still logger2.pm); $VERSION = 1.9062. New exported subs set_logger_level($) and set_warn_to_logger(). Letter-based level normalization: new %hLETTER_LEVEL maps letters (H, F, C, E, S, X, W, A, I, P, L, D, U) to numeric levels; logger() now accepts a letter as the level or as the modifier argument. _DEBUG_ and _CONTXT_ constants swapped: _DEBUG_ = 7, _CONTXT_ = 8 (previously reversed). Log line format changed to >%date| %-7s|FH-%07d|PID-%s|last RC: %0.3d| %s|last RC: %0.3d-%s. logger() return value changed: scalar context returns $rcLogger[0] (or the joined string for FAIL level); list context returns @rcLogger. usage_logger renamed to logger_help; logger_help now takes an optional argument controlling whether logger_rc_list is printed.
+    - oEdtk::Tracking: track sub — the table name is now uppercased when the driver is MySQL (identifier case fix); stats_week, stats_iddest, stats_month: SQL converted to lowercase.
+    - oEdtk::Config: use oEdtk::logger now explicitly imports qw(logger $LOGGERLEVEL $WARN2LOGGER).
+    - oEdtk::TexDoc / oEdtk::TexTag: trivial — trailing newline at end of file removed (no functional change).
+    - oEdtk.pm: version bump only.
 
-- Tracking.pm
-Change WARN and DIE behaviour if requested in oedtk.ini to report events into tracking database
-Add track for entity account obj_typ child_typ child_id parent_id
+1.9013      2024-01-03
+    - oEdtk::DBAdmin: create_table_INDEX renamed to create_table_OUTMNGR; exports updated (added create_table_TRACKING, create_table_OUTMNGR, create_table_DISTRIB, removed create_table_INDEX). All CREATE TABLE statements changed to CREATE TABLE if not exists (idempotent schema creation).
+    - oEdtk::DBAdmin: create_table_TRACKING — added ENGINE=MyISAM for MySQL; added an index on ED_TSTAMP (skipped for SQLite). This fixes a bug creating the Tracking table in SQLite.
+    - oEdtk::DBAdmin: create_table_DISTRIB — PRIMARY KEY removed and replaced by a composite index ix.$VERSION.$table on (ED_IDLDOC, ED_SEQDOC, ED_IDSEQPG, ED_IDJOB, ED_CHANEL_OUT, ED_DTLOT); ENGINE=MyISAM for MySQL.
+    - oEdtk::DBAdmin: create_table_AGREGE — PRIMARY KEY removed, replaced by a composite index; @AGREGE_COLS gains a new ED_TSTAMP VARCHAR2(14) NOT NULL column; ED_CNTD_IDLDOC type changed from VARCHAR2(25) to INTEGER; ED_IDJOB column moved after ED_IDLOT.
+    - oEdtk::DBAdmin: create_table_OUTMNGR (ex-INDEX) — the three separate indexes (ED_DTEDTION, ED_SEQLOT, ED_TYPPROD) replaced by a single composite index; ENGINE=MyISAM for MySQL. create_table_ID: index renamed to ix.$VERSION.ED_ID_DATE; ENGINE=MyISAM for MySQL. create_table_ACQUIT: ENGINE=MyISAM for MySQL.
+    - oEdtk::DBAdmin: schema_Create — signature simplified to a single $dbh argument (dropped $table/$maxkeys); no longer creates the TRACKING table; calls create_table_OUTMNGR.
+    - oEdtk::DBAdmin: admin_optimize_db — signature changed from ($dbh) to hash-based (CFG => $cfg); now runs a REPAIR then an OPTIMIZE pass per table, connecting/disconnecting for each table; MySQL uses REPAIR TABLE + OPTIMIZE TABLE, other drivers a no-op SELECT * ... LIMIT 1.
+    - oEdtk::DBAdmin: the EDTK_AGREGE rotation INSERT ... SELECT now writes a new ED_TSTAMP stamp column and adds ED_IDJOB to the GROUP BY. acheck_db_admin/admin_check_db: EDTK_DB_MAX_DAYS_AGREGED now falls back to EDTK_DB_MAX_DAYS_TRACKED when not configured.
+    - oEdtk::DBAdmin: bug fix — error messages "..." . $DBI::errstr || "undefined" had an operator-precedence bug; fixed to ($DBI::errstr || "not defined"). Added &logger(7, $sql) debug logging to most SQL statements.
+    - oEdtk::Main: END block — _restore_sys_date; uncommented — the system date is now actually restored at program exit (previously commented out). oe_define_TeX_output re-indented only (no functional change).
+    - oEdtk::Outmngr: create_table_INDEX → create_table_OUTMNGR rename in the use oEdtk::DBAdmin import and in the SQLite table-creation call.
+    - lib/oEdtk/iniEdtk/tplate.edtk.ini: [ENVDESC] — EDTK_DIR_BASE now defaults to $EDTK_PRGPATH; added EDTK_DIR_DB, EDTK_DIR_DOCLIB, EDTK_DIR_EDOCMNGR; EDTK_TYPE_ENV default changed Production → Dev; EDTK_BIN_PERL now /usr/bin/perl (Linux default). New [EDTK_DB] section: full database configuration (SQLite default DSN, tracking keys, retention days, EDTK_DB_CHECK_AUTO=NO). New [EDTK_STATS] section: stats DSN/table aliases, CSV header definitions, stats SQL queries. [MAIL]: added EDTK_MAIL_TST. [COMPO]: EDTK_BIN_COMPO and EDTK_COMPO_LIB now use $EDTK_DIR_BASE / $EDTK_DIR_CONFIG (Linux paths). [COMSET] section removed entirely; old [EDTK_DB]/[EDTK_STATS] sections replaced by the new ones.
+    - lib/oEdtk/lib/db_Schema_init.pl: create_SCHEMA → schema_Create (function renamed).
+    - lib/oEdtk/COPYING: license text changed from GNU GPL v2 to GNU GPL v3.
+    - lib/oEdtk/README: added copyright line, updated version, removed the whole TODO list and the AUTHORS section.
 
-- Logger.pm
-Organise level as follow : 8 => '8-USER-', 7 => '7-DEBUG', 6 => '6-INFO-' , 5 => '5-PARSE' , 4 => '4-WARN-' , 3 => '3-ALERT' , 2 => '2-ALERT' , 1 => '1-ALERT' , 0 => '0-CRITC' , -1 => '-1 ERROR'
+1.9012      2024-01-02
+    - oEdtk::DBAdmin: revert of the 1.8122/1.8123 changes — create_table_OUTMNGR renamed back to create_table_INDEX; the EDTK_DB_CHECK_AUTO bug fix reverted (back to the default-YES test); $VERSION 1.8101 → 1.8097.
+    - lib/oEdtk/iniEdtk/tplate.edtk.ini: [EDTK_DB] section removed; Windows/Compuset configuration restored (EDTK_DIR_BASE=C:/editique, EDTK_TYPE_ENV=Production, EDTK_BIN_PERL=C:/Sources/Perl/bin).
+    - lib/oEdtk/COPYING: license text back to GNU GPL v2.
+    - oEdtk.pm: $VERSION 1.8123 → 1.9012, $YEAR 2025 → 2024; copyright 2005-2024.
+    - Config.pm, Main.pm, Outmngr.pm, TexDoc.pm, TexTag.pm, db_Schema_init.pl, README: reverted to the pre-1.8122 state.
 
+1.8123      2023-12-03
+    - oEdtk::DBAdmin: bug fix — the EDTK_DB_CHECK_AUTO test now checks `defined $cfg->{EDTK_DB_CHECK_AUTO} && $cfg->{EDTK_DB_CHECK_AUTO} !~ /NO/i` instead of `($cfg->{EDTK_DB_CHECK_AUTO}||"YES")!~/NO/i` (the value is defined by default to YES). $VERSION 1.8111 → 1.8123.
+    - oEdtk.pm: $VERSION 1.8122 → 1.8123, $YEAR 2024 → 2025.
+    - README.md: copyright year updated to 2025.
+    - META.json / META.yml: version bump only.
 
+1.8122      2023-12-02
+    - New module lib/oEdtk/logger2.pm.
+    - README renamed to README.md.
+    - lib/oEdtk/COPYING: license text changed from GNU GPL v2 to GNU GPL v3.
+    - oEdtk::DBAdmin: major rewrite — new subs admin_check_db, acheck_db_admin, agrege_idJob, schema_Create, schema_Upgrade, create_table_ADMIN, create_table_ID, create_table_AGREGE, create_table_OUTMNGR (renamed from create_table_INDEX); _drop_table_TRACKING → _drop_table; create_SCHEMA → schema_Create; new _load_csv_mysql_infile.
+    - lib/oEdtk/iniEdtk/tplate.edtk.ini: new [EDTK_DB] and [EDTK_STATS] sections; [COMSET] removed; Linux paths ($EDTK_PRGPATH, /usr/bin/perl, Dev env).
+    - New dependencies: Image::Size, Log::Log4perl, PDF::Create.
+    - oEdtk.pm: $VERSION 1.5093 → 1.8122, $YEAR 2024.
 
+1.5093      2020-09-03
+    - New CHANGES file added.
+    - Makefile.PL: MIN_PERL_VERSION => 5.010, LICENSE => 'perl'.
+    - DBD::Oracle and DBD::Pg removed from META.yml/META.json and commented out in Makefile.PL.
+    - oEdtk.pm: use strict; use warnings; added; version bump 1.5091 → 1.5093.
 
-HISTORY
-***************************************************************************
-Release 0.612x
-	contrôle d'exécution sur cgi
-	dictionnaire iso des codes pays
-	controle retour d'acquittement au façonnier pour vérification
-	foliotage technique dans le lotissement 	
+1.5091      2020-09-01
+    - oEdtk.pm: require 5.10.0 (Perl 5.10.0 minimum); $VERSION 0.8052 → 1.5091.
+    - New dependencies: YAML, CPAN::DistnameInfo, DBD::Excel, DBD::Oracle, DBD::Pg, DBD::SQLite, JSON, XML::Simple.
+    - oEdtk::Config: config file lookup order changed — edtk.ini is now looked for in the program directory ($Bin) first, then in the perl module directory.
+    - oEdtk::DBAdmin: new sub insert_tData (insert tracking data from outside); new sub _load_csv_mysql_local_infile (csv_import uses MySQL LOAD DATA LOCAL INFILE when mysql_local_infile is detected in the DSN); new @TRACKER_COLS and @DISTRIB_COLS column-definition arrays; tracking table gains ED_ACCOUNT column.
+    - oEdtk::Tracking: track() now accepts entity/account/obj_typ/child_typ/child_id/parent_id parameters.
+    - oEdtk::logger: WARN and DIE behaviour configurable via $WARN2LOGGER to report events into the tracking database.
+    - oEdtk::trackEdtk: event levels extended — Job (default), Spool, Document, Line, Warning, Error, Halt (critic), Reject, Track; Halt events now logged via logger.
 
-Release 0.6115
-	SGBD connexion retry (3 times)
-	correcting bug in FIFO configuration	
+0.8052      2013-05-02
+    - New file META.json.
+    - lib/oEdtk/lib/html templates (edtk_ged.html, edtk_inged.html, index.html): hardcoded application/corporation names replaced with placeholder values (APP_1, APP_2, CORP_1, CORP_2, ...).
+    - oEdtk.pm: $VERSION 0.8035 → 0.8052; $YEAR 2013; authors updated (G Ballin added, 2005-2013).
+    - oEdtk::Tracking: version bump only.
+    - META.yml: version bump.
 
-Release 0.6000
-	ajout ed_host dans check ini
-	ALTER table edtk_index modify ED_SEQLOT VARCHAR2(7); => modifier les seqlot pour rajouter l'année '391123' => '1391123'
-	intégrer les contraintes de lotissement (ed_cpdest => ed_constraint (ex de val : "ED_CODRUPT = 'NOUVEL_ER'" ou "ED_CPDEST like '75%' and ED_CODRUPT = 'NOUVEL_ER'" ou "ED_HOST ='SRVPROD'" ))
-	nettoyer Main.pm => oEUser.pm
-	passer CodRupt sur 8 caractères 
-	regrouper les .tar dans le même repertoire de mep
-	reprise prévisu en fin de runEdtk.pl
-	gestion des arrondis oEdtk::Main::oe_round		
+0.8035      2013-03-05
+    - oEdtk::Config: new sub get_ini_path() (returns the path of the ini file actually loaded); exported in @EXPORT_OK. $VERSION 0.8031 → 0.8034.
+    - oEdtk::EDMS: EDMS_package signature changed from ($$$@) to ($$@) — the path argument removed; files are now added with their basename. $VERSION 0.8033 → 0.8035.
+    - lib/oEdtk/lib/check_oEdtk_ini.pl: now uses get_ini_path() (warns "STARTING CHECK, loading config from ...").
+    - oEdtk.pm: version bump 0.8034 → 0.8035.
+    - META.yml: version bump.
 
-Release 0.5000
-	LaTeX integration
-	Output management integration
-	Electronic Documents Management and Sharing integration
+0.8034      2013-03-04
+    - oEdtk::EDMS: new sub EDMS_package($$$@) — packages several documents along with one index in a zip archive for later processing (writes $EDTK_DIR_EDOCMNGR/$app.$idldoc.out.zip); the existing package sub refactored (returns 1, prints the zipfile name). $VERSION 0.8031 → 0.8033.
+    - libXls.pm: comment-only change.
+    - oEdtk.pm: version bump 0.8032 → 0.8034.
+    - META.yml: version bump.
 
-Release 0.400
-	File configuration for developpements
-	Developpement application launcher
-	Integration of DSC Compuset launcher
-	Beta text user interface for developpements
-	Records methods for production
-	Excel file spliting
-	tracking module
-	Documentation
+0.8032.M.25.12.16      2025-12-16
+    - Production fork (MNT) based on the 0.8032 codebase — a divergent branch, not a mainline
+      release. It drops the whole Compuset/C7 subsystem and the tracking API, and adds ECM
+      (Alfresco), REST emailing, Keycloak authentication, IBAN/BIC validation, QR codes and
+      LaTeX index handling. The version string is not a valid CPAN version (kept as-is for
+      traceability).
+    - New modules: oEdtk::Utils (date/price parsing, tracking helpers, index formatting, string
+      cleaning), oEdtk::FixIdx (even page counts in .idx files), oEdtk::LaTeX (latin-9 escaping,
+      \gdef tags, index generation), oEdtk::Emailing (REST email via the nws_emailing service,
+      requires Perl 5.028), oEdtk::Keycloak (OAuth2 client_credentials token, requires Perl
+      5.020), oEdtk::Infinite (COBOL Infinite flow parsing), oEdtk::IBAN (IBAN/BIC validation),
+      oEdtk::Constants (ECM document typology), oEdtk::Restitution (path-based value extraction),
+      oEdtk::DisseminationPlan (REST dissemination plan), oEdtk::XML::DTD / oEdtk::XML::XSD /
+      oEdtk::XML::DTD::Utils (XML validation against DTD/XSD).
+    - oEdtk::Main: oe_ID_LDOC now generates a Data::UUID string instead of the numeric
+      YWWWDHHMMSSPPPP.r format; new job-handling subs (oe_options, oe_params, oe_simple_job,
+      oe_new_job_input_file, oe_new_job_output_file, oe_print_to_output_file,
+      oe_get_handle_to_input_file, oe_typ_prod, oe_watermark, oe_backgrounds_apps,
+      oe_config_compo, oe_clean_addr, oe_new_ID_LDOC); all Compuset/C7 functions removed
+      (c7Flux, toC7date, fmt_address, fmt_address_sender, fmt_monetary, date2time,
+      oe_CAP_sans_accents, oe_cdata_table_build, oe_close_fo, oe_compo_set_value,
+      oe_csv2data_handles, oe_define_Compuset_output, oe_env_var_completion, oe_fmt_date,
+      oe_outmngr_compo_run, oe_outmngr_full_run, oe_outmngr_output_run, oe_round, recEdtk_*,
+      prodEdtk_*, oe_rec_output, oe_unique_data_name).
+    - oEdtk::Run: new oe_background_pdf, update_idx, listing_depository (bpdf backgrounds via
+      PDF::Tk + EDMS_BIN_PDFTK); oe_outmngr_output_run_tex handles recto-verso filières with
+      make_docs_even_numbered and writes LOTPDF.txt in UTF-8; oe_after_compo honors
+      EDTK_KEEP_OUT_FILE, supports the bpdf option, keeps the index file and checks the PDF
+      exists; oe_status_to_msg returns '(status is zero)' for status 0.
+    - oEdtk::EDMS: rewritten for Perl 5.20+ (signatures, IPC::Run3); 36-column index CSV with
+      optional Alfresco header (EDMS_ACTIVATE_HEADER_ALFRESCO / EDMS_IDX_HEADER); new subs
+      _log, my_system, preprend_alfresco_header_if_needed, EDMS_merge_docs; EDMS_import returns 0.
+    - oEdtk::DBAdmin: new acquit processing (_acquit_API via oEUser::ECM, _acquit_table_INDEX,
+      create_table_ACQMGENTECH, get_columns_names); csv_import does acquit processing + email
+      report (EDTK_MAIL_ACQ) + uppercasing + ref_col; copy_table adds Oracle hints
+      (PARALLEL 4 COMPRESS NOLOGGING PCTFREE 0); @INDEX_COLS gains 4 ECM columns; removed
+      create_table_PARA, create_table_DATAGROUPS, _drop_table_TRACKING.
+    - oEdtk::Config: use utf8; new read_hash sub; tie with -fallback => 'DEFAULT'; the hostname
+      section is no longer merged last (mainline behavior).
+    - oEdtk::RecordParser: denormalized handling split into set_denormalized_option_record /
+      set_denormalized_on_record; byte cleaning via oEdtk::Utils::kill_non_latin_1_9_chars_in_place.
+    - oEdtk::TexDoc: new append_qr_code, hhline_content, is_in_list (QR codes via Text::QRCode).
+    - oEdtk::trackEdtk: tracking API removed (init_Tracking, track_Obj, define_Mod_Ed,
+      define_Job_Evt, define_Job_User, define_Track_Key, open_Tracking_Env, test_exist_table,
+      create_Track_Table, drop_Track_Table).
+    - oEdtk::libDev: removed delSp, IdUniqueSur6, IdUniqueSur7, lastLong; run_Edtk_dev is
+      LaTeX-only (no Compuset branch); bug fix in tree_Directory_Completion (numeric comparison).
+    - oEdtk::libXls: removed prod_Xls_Add_Sheet. oEdtk::Spool: removed emit. oEdtk::Record:
+      bind() semantics changed; bind_all/bind_all_c7 removed. oEdtk::Doc: $LINE_CUTOFF = 1
+      (one TeX command per line).
+    - New scripts lib/db_move.pl, lib/edms_runner.pl; acq_Load.pl removed.
+    - New tests t/IBAN.pm.t, t/Utils.pm.t, t/FixIdx.pm.t.
+    - cpanfile rewritten (replaces the Makefile.PL PREREQ_PM list); new dependencies Text::CSV_XS,
+      XML::Simple, XML::Parser, XML::Encoding, Mail::Sender, Barcode::DataMatrix, PDF::API2,
+      Hash::Merge::Simple, Hash::Flatten, MIME::Lite, Email::Valid, YAML::Tiny, Text::QRCode,
+      Regexp::Common, PDF::Tk, Locale::PO, XML::LibXSLT, Text::Unaccent::PurePerl.
+    - iniEdtk/edtk.ini added (mainline only ships tplate.edtk.ini): new [ENVDESC] keys
+      (EDTK_XML_CATALOG_FILES, EDTK_DIR_FORMS, EDTK_DIR_BACKGROUNDS, ...), enriched [MAIL]
+      section, [COMPO] lualatex switch (EDTK_COMPO_ASYNC), [EDOCMNGR] Alfresco keys,
+      [EDTK_DB] and [EDTK_STATS] sections.
 
-Release 0.30
-	Optimized for production version.
+0.8032      2013-03-02
+    - DBD::Oracle removed from META.yml and commented out in Makefile.PL (no longer a hard prerequisite).
+    - Version bump only in lib/oEdtk.pm.
 
-Release 0.21
-	Production test version.
+0.8031      2013-03-01
+    - oEdtk::EDMS: archives may now contain .xls or .doc documents in addition to .pdf; non-PDF documents are no longer page-burst but moved to a Docubase-compatible filename via the new _docubase_file_name helper; EDMS_FILENAME derived from the ED_DOCLIB extension; EDMS_idx_process now captures the ED_DOCLIB value.
+    - oEdtk::Tracking: application-name extraction regex now accepts hyphens and underscores; long application names truncated to the last 20 characters; new Reject (R) job event added to _validate_event.
+    - oEdtk::Config: added a warning message when reading the template ini file (tplate.edtk.ini).
+    - lib/oEdtk/lib/check_oEdtk_ini.pl: fixed the -h check to guard against an undefined $ARGV[0]; shebang changed to /usr/bin/perl.
+    - New module lib/oEdtk/OmgrIdxDoc.pm (subclass of oEdtk::Doc) that builds an index CSV row from @INDEX_COLS tags (mktag/reset/dump).
+    - New dependency DBD::Oracle added to META.yml and Makefile.PL.
+    - README: authors updated (G Ballin added); install notes updated.
 
-Release 0.10
-	Functionnal version.
+0.8022      2013-02-02
+    - oEdtk::DBAdmin: new sub copy_table (copies data from a source table into a target table; with -create it creates the target table first via CREATE TABLE AS SELECT; aborts with a warning if the source table is empty); move_table is now deprecated and delegates to copy_table; historicize_table now uses copy_table; new sub db_backup_agent backs up and purges old rows from the EDTK_DBI_TRACKING, EDTK_DBI_OUTMNGR and EDTK_DBI_ACQUIT tables based on the new EDTK_ENTIRE_YEARS_KEPT config.
+    - oEdtk::Outmngr: encart (insert) validity — ED_DEBVALID equal to '99999999' is now treated as "no start date"; omgr_purge_fs now calls db_backup_agent before purging; doclibs referenced in the last EDTK_DCLIB_PURGE_WEEKS_KEPT weeks are now kept.
+    - lib/oEdtk/lib/index_Purge_DCLIB.pl: fixed the -h check to guard against an undefined $ARGV[0].
+    - New script lib/oEdtk/lib/db_copy.pl (CLI wrapper around copy_table: db_copy.pl table_source table_cible [-create]).
+    - Removed script lib/oEdtk/lib/db_move.pl (replaced by db_copy.pl).
 
-Release 0.01
-	Original beta version.
+0.8021      2013-02-01
+    - oEdtk::Tracking: new() — the source parameter now defaults to the command line ($ARGV[1] || $ARGV[0]) when not provided; if the value starts with '-' (an option), it falls back to $ARGV[0]. The tracking source is thus auto-detected from the command line.
 
+0.8014      2013-01-04
+    - oEdtk::Config: the Compuset-specific block that stripped environment-type extensions (EDTK_FTYP_TEST/HOMOL/PROD) from program names is now commented out as deprecated — the behavior is disabled.
+    - oEdtk::DBAdmin: EDTK_LOTS table creation now includes a new column ED_CONSIGNE VARCHAR2(250).
+    - oEdtk::Outmngr: omgr_export — the job CSV export now includes the new ED_CONSIGNE field; ED_LISTEREFIMP is now defaulted to "" when empty. omgr_stats — return format changed: the returned arrayref now starts with a printf format string and a header row; column order changed to put CORP first (then LOT, then ID_SEQLOT for idlot queries). Callers must now shift off the format/header.
+    - oEdtk::Run: bug fix — intermediate-file cleanup after zipping is now skipped only for Dev/Debug environments ($type_env !~ /^De/i instead of !~ /D/); previously any environment whose name contained the letter "D" (e.g. PROD) was wrongly affected.
+    - oEdtk::Tracking: job tracking now records the full command line (join(' ', @ARGV)) in the message zone of the Job event; the tracking insert now includes the ED_SOURCE field.
+    - lib/oEdtk/lib/index_Block_refs.pl: removed the dependency on oEdtk::Outmngr; new feature — block/unblock by partial idldoc with a % wildcard (4-15 digits + %), using LIKE; bug fix — the STOP filter now filters on ED_STATUS instead of ED_SEQLOT; SQL refactored so the WHERE clause is shared between the SELECT and the UPDATE.
+    - lib/oEdtk/lib/index_Run_lot.pl, index_Statistics.pl: adapted to the new omgr_stats return format (shift format string and header from the rows arrayref).
+    - New dependency Roman added to META.yml and Makefile.PL.
+    - README: installation instructions updated (XML-LibXML setup, dmake on Windows).
+    - Main.pm: usage message reworded. Messenger.pm, TexDoc.pm, EDMS.pm: comment-only changes.
 
-COPYRIGHT AND LICENCE
-***************************************************************************
-These modules are under GNU GENERAL PUBLIC LICENSE (see COPYING file)
- Everyone is permitted to copy and distribute verbatim copies
- of this license document, but changing it is not allowed.
-You can use these modules as you want without any warranty.
+0.7125      2012-12-05
+    - Version bump only (0.7121 → 0.7125); whitespace-only changes in the POD examples.
 
-You can contact us at edtk at free.fr 	
-reference site is cpan.org
+0.7121      2012-12-01
+    - oEdtk::Main: new --noinputfiles command-line option — allows treatments without an input data file. Argument parsing reworked: defaults are merged into params earlier, help/usage handling moved into a conditional block, and the input file is only opened when an input file is actually provided; the IN handle is not closed when noinputfiles is set. Version bump 0.7007 → 0.7125.
+    - oEdtk::Outmngr: omgr_check_acquit — postal code (CP) field is now truncated to 10 characters (first 4 + last 6) when longer than 10; job ticket file now includes ED_PRIORITE, ED_REFIDDOC, and ED_REFENC fields (fields reordered); added commented-out TODO for ED_REFENC/lot handling in the lot-matching UPDATE. Version bump 0.7031 → 0.7121.
+    - oEdtk::Run: oe_outmngr_output_run_tex — the [MTD] type check is commented out, so lotissement is no longer suspended for non-Mass/Debug/Test types; deletion of intermediate files is now controlled by the EDTK_TYPE_ENV config value instead of the $type parameter. Version bump 0.7006 → 0.7111.
+    - oEdtk::DBAdmin: EDTK_LOTS schema — ED_REFENC widened VARCHAR2(20) → VARCHAR2(32); EDTK_INDEX schema — ED_REFIMP widened VARCHAR2(8) → VARCHAR2(16); ED_IDLOT widened VARCHAR2(6) → VARCHAR2(8). Version bump 0.7031 → 0.7111.
+    - oEdtk (main module): version bump 0.7029 → 0.7121; copyright year updated to 2013.
+    - Documentation: README added XML-LibXML installation instructions (PPM on Windows, distribution package installer on Linux).
 
+0.7029      2012-02-09
+    - oEdtk::TexDoc: renamed $_DICO_CHAR → $_DICO_TEX_CHAR and enabled the LATEX dictionary substitution in escape() (the substitue() call was previously commented out). Version bump 0.03 → 0.7004.
+    - oEdtk::RecordParser: new set_motif_to_denormalized_split() method (sets the denormalized split motif). Version bump 0.7005 → 0.7006.
+    - oEdtk::Dict: substitue() no longer decodes chr(\d+) keys into their character (feature removed). Version bump 0.11 → 0.7012.
+    - oEdtk::Main: trivial comment whitespace change only.
+    - Packaging: META.yml version bump; generated_by MakeMaker 6.55_02; META.json removed (Only in 0.7028); MANIFEST reverted to not list it; Makefile.PL, all lib scripts, iniEdtk files, and t/test_fixe_oEdtk.pl: line-ending changes only (LF → CRLF this time), no functional change.
 
+0.7028      2012-02-08
+    - oEdtk::Outmngr: lot matching now uses the ED_REFIDDOC column instead of ED_IDAPPDOC in the SELECT, the UPDATE WHERE clause, and the INSERT (column renamed). Version bump 0.7005 → 0.7031.
+    - oEdtk::DBAdmin: EDTK_LOTS table schema — ED_IDAPPDOC is no longer NOT NULL; a new ED_REFIDDOC VARCHAR2(20) NOT NULL column is added (consistent with the Outmngr rename). Version bump 0.27 → 0.7031.
+    - oEdtk::Main: cleanup of commented-out address-normalization code (no behavior change). Version bump 0.7006 → 0.7007.
+    - Packaging: META.yml version bump; generated_by MakeMaker 6.56; new file META.json (Only in 0.7028); MANIFEST updated to list it; Makefile.PL, all lib scripts, iniEdtk files, and t/test_fixe_oEdtk.pl: line-ending changes only (CRLF → LF), no functional change.
 
+0.7027      2012-02-07
+    - oEdtk::Record: new seek_key attribute (default "LIGNE.{153}(.{10})") and new set_seek_key() method to override it; parse() no longer slices off the first fields_offset characters before unpacking (that logic is commented out); the full line is now unpacked; template building no longer inserts a space between fields (commented out). Version bump 0.04 → 0.7005.
+    - oEdtk::RecordParser: new dumper() method (a Data::Dumper wrapper); new Data::Dumper dependency; new() now builds a seek_keys hash from each record's seek_key; undef records are ignored; parsing loop rewritten — instead of matching mute_record/line_record with a fixed key_offset/key_size, it now tries each registered seek_key regex (SEEK block); unknown records are now warned and ignored instead of dying with "Unexpected record identifier". Version bump 0.04 → 0.7005.
+    - oEdtk (main module): version bump 0.7025 → 0.7027.
+    - Packaging: META.yml and Makefile.PL added Data::Dumper prerequisite; lib/oEdtk/README added TODO items (embed fonts in PDF flows rather than vectorizing, optimize continuous flows (omgr), flatten PDFs so they are not a frame assembly).
+
+0.7025      2012-02-05
+    - oEdtk::Outmngr: omgr_stats_referent and omgr_stats now use config_read('EDTK_STATS') and $cfg->{'EDTK_STATS_OUTMNGR'} instead of hardcoded EDTK_INDEX / EDTK_DBI_OUTMNGR table names.
+    - lib scripts (db_historicize_ALL.pl, db_historicize_index.pl, db_historicize_tracking.pl): wait time now 30*EDTK_WAITRUN || 600; pressing N/S aborts the run; clearer messages.
+    - lib/oEdtk/lib/params_Import.pl: new optional INI_SECTION argument to load params in a specific environment (uses EDTK_DBI_DSN when a section is given).
+    - acq_Load.pl, check_oEdtk_ini.pl, cob2pm.pl, db_move.pl: add use oEdtk.
+    - check_oEdtk_ini.pl: COMSET option marked deprecated.
+    - index_Block_refs.pl: usage() now warns + exit 1 instead of die.
+    - Most lib scripts: added -h/usage help handling (most now warn + exit 1 instead of die).
+    - Removed script lib/oEdtk/lib/edms_runner.pl (also removed from MANIFEST).
+    - META.yml, oEdtk.pm version bumps; oEdtk_release adds a leading newline. Config.pm: whitespace only. DBAdmin.pm: comment only. README: TODO list updated.
+
+0.7023      2012-02-03
+    - oEdtk::RecordParser: denormalized-record split regex changed from (?:motif)+ (collapsing consecutive separators) to (?:motif) (each separator now produces a split).
+    - META.yml, oEdtk.pm version bumps.
+
+0.7021      2012-02-01
+    - oEdtk::Run: oe_after_compo now always unlinks $app.aux (previously only when EDTK_TYPE_ENV ne 'Test').
+    - oEdtk::Tracking: track() uses $val = $data[$i] || "" to avoid undef warnings when a data value is undefined.
+    - META.yml, oEdtk.pm version bumps. Main.pm: whitespace/formatting only.
+
+0.7017      2012-01-07
+    - oEdtk::Doc: removes use oEdtk::Dict and the char_xlate method (moved out); adds an abstract escape method that dies "unimplemented" (to be implemented by subclasses).
+    - oEdtk::TexDoc: new escape method (moved from TexTag): escapes LaTeX special characters ({, }, \, %, &, $, _, #), replaces \"{} and \" by \textquotestraightdblbase{}; loads the LATEX dictionary statically via oEdtk::Dict.
+    - oEdtk::TexTag: digit-in-tag-name warning now emitted only once (flag $_FLAG_DIGITS); escape() renamed to escape_0() and now delegates to oEdtk::TexDoc::escape; static LATEX dictionary loaded.
+    - oEdtk::Outmngr: new sub omgr_track_no_omgr (stub returning 1, with commented-out SQL for tracking docs without omgr); omgr_check_acquit SQL: condition between the date check and status check changed from AND to OR.
+    - oEdtk::Run: oe_cmd_run now dies instead of warns when a command fails.
+    - oEdtk::Tracking: new() defaults $source to ""; track() allows one extra data value (@usercols + 1) for the new message column.
+    - oEdtk::Dict: substitue() refactored (parameter renamed, logic restructured; chr(N) key handling kept).
+    - oEdtk::Main: export list reordered (prodEdtk_* functions moved); oe_char_xlate indentation only.
+    - lib scripts: index_Check_tracked_docs.pl — YWWD (year-week-weekday) value computed and shown in usage; index_Block_refs.pl — abort message changed from die "ERROR:" to die "INFO :".
+    - META.yml, oEdtk.pm version bumps. EDMS.pm: message text "pages" → "docs".
+
+0.7014      2012-01-04
+    - oEdtk.pm: oEdtk_version() renamed to oEdtk_release(); the END block now prints oEdtk_release() (banner text changed to include daunay@cpan.org).
+    - oEdtk::Main: new exported subs oe_CAP_sans_accents, oe_char_xlate, oe_list_encodings; oe_oe_uc_sans_accents removed (renamed to oe_CAP_sans_accents). New sub oe_char_xlate($;$) translates characters in a string using the EDTK_DICO_XLAT dictionary (section parameter, default DEFAULT), memoized in a static $_DICO_CHAR. New sub oe_list_encodings lists encodings available on the machine via Encode->encodings(). oe_clean_addr_line: hardcoded punctuation/special-char replacements are commented out and replaced by a call to oe_char_xlate($$rLine, 'ADDRESS') — character cleaning is now dictionary-driven. oe_new_job: new --input_code option; input file opened with encoding layer <:encoding(...); output file opened with >:encoding(...) using new config key EDTK_OUT_ENCODING (default utf8); outfile now derived from $params->{'outfile'}. oe_app_usage: usage text updated (documents --input_code); now calls oe_list_encodings(). One system() error check changed from $? to $@. END block no longer prints the version banner.
+    - oEdtk::Dict: substitue_char renamed to substitue; now iterates the dictionary and converts keys matching chr(N) into the actual character before substitution — dictionary keys can now be written as chr(123) to target special characters.
+    - oEdtk::Doc: new method char_xlate($$) translates characters using the EDTK_DICO_XLAT dictionary (section passed as argument), memoized in a static $_DICO_CHAR.
+    - oEdtk::TexTag: now warns (INFO) when a tag name contains digits (previously a commented-out die); escape() now calls oEdtk::Doc::char_xlate($new, "LATEX") for special-character translation; adds replacement of \"{} by \textquotestraightdblbase{}.
+    - oEdtk::TexDoc: only version bump and added trailing 1;.
+    - oEdtk::Record: new fields_offset attribute (default 10) and set_fields_offset method; parse() now uses the configurable offset instead of a hardcoded 8-character prefix.
+    - oEdtk::RecordParser: new() dies if the filehandle is undefined; parser is now fully configurable: new attributes skip_line ('FLUX'), mute_record ('ENTETE'), mute_id ('ENT'), line_record ('LIGNE'), key_offset (153), key_size (10), denormalized ('OPTION'), denormalized_split_motif, with setter methods; next() uses these configurable values; line-record parsing now captures the key and data separately (key whitespace-stripped); current line stored in $self->{'line'}.
+    - oEdtk::Tracking: new BEGIN block installs $SIG{'__WARN__'} and $SIG{'__DIE__'} handlers that call track('Warn'/'Halt', 1, $msg) when signal tracking is active; new() enables signal tracking if config EDTK_TRACK_SIG is set (and not 'no'); track() — new ED_MESSAGE column handling (data values concatenated into the message); ED_SOURCE now also set for Halt events; user key columns (ED_K{i}_NAME/VAL) are only filled when more than one data value is passed (a single value goes to the message column).
+    - oEdtk::DBAdmin: tracking table schema — new ED_MESSAGE VARCHAR2(256) column added; lots table schema — ED_REFENC column moved (no functional change); error messages prefixed with ERROR:; one WARN level changed to INFO.
+    - oEdtk::Outmngr: omgr_check_acquit SQL — ORDER BY now includes STATUS; report format string adjusted. omgr_stats SQL — table name now from $cfg->{'EDTK_STATS_OUTMNGR'} instead of hardcoded EDTK_INDEX. Several WARN messages downgraded to INFO; END banner commented out.
+    - oEdtk::EDMS: zip-creation sub now returns 1; error messages prefixed with ERROR:.
+    - oEdtk::Run: several subs now return 1 explicitly; one WARN downgraded to INFO.
+    - oEdtk::C7Tag / oEdtk::SignedField / oEdtk::trackEdtk: only WARN → INFO message-level changes.
+    - lib scripts: cob2pm.pl — usage() now exits; identifier regex allows names longer than 31 chars; strips first-column comments; replaces _ with -; strips trailing whitespace; more detailed error messages. index_Run_lot.pl — mail subject no longer prefixed with EDTK_TYPE_ENV. check_oEdtk_ini.pl, db_historicize_*.pl, db_move.pl — print → warn, WARN → INFO. index_Block_refs.pl — WARN → INFO; abort message changed to die "ERROR: abort request". index_Statistics.pl, params_Export.pl, params_Import.pl — error messages prefixed with ERROR:. libDev.pm — message prefixes standardized (INFO :/ERROR:); one error check changed from $? to $@.
+    - MANIFEST, MANIFEST.SKIP, README: trailing-space changes only. META.yml: version bump only.
+
+0.6122      2011-12-02
+    - execution control on cgi
+    - ISO dictionary of country codes
+    - control of acknowledgement return to the finisher for verification
+    - technical folio numbering in the lotissement
+
+0.6115      2011-11-05
+    - SGBD connexion retry (3 times)
+    - correcting bug in FIFO configuration
+
+0.6000      2011-06-01
+    - added ed_host in check ini
+    - ALTER table edtk_index modify ED_SEQLOT VARCHAR2(7); => modify the seqlots to add the year '391123' => '1391123'
+    - integrate the lotissement constraints (ed_cpdest => ed_constraint (e.g. values: "ED_CODRUPT = 'NOUVEL_ER'" or "ED_CPDEST like '75%' and ED_CODRUPT = 'NOUVEL_ER'" or "ED_HOST ='SRVPROD'" ))
+    - clean up Main.pm => oEUser.pm
+    - move CodRupt to 8 characters
+    - group the .tar files in the same deployment directory
+    - preview resume at the end of runEdtk.pl
+    - rounding management oEdtk::Main::oe_round
+
+0.5000      2010-01-01
+    - LaTeX integration
+    - Output management integration
+    - Electronic Documents Management and Sharing integration
+
+0.400       2009-01-01
+    - File configuration for developpements
+    - Developpement application launcher
+    - Integration of DSC Compuset launcher
+    - Beta text user interface for developpements
+    - Records methods for production
+    - Excel file spliting
+    - tracking module
+    - Documentation
+
+0.30        2008-01-01
+    - Optimized for production version.
+
+0.21        2007-01-01
+    - Production test version.
+
+0.10        2006-01-01
+    - Functionnal version.
+
+0.01        2005-01-01
+    - Original beta version.

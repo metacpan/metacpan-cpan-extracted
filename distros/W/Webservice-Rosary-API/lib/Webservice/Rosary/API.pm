@@ -9,7 +9,7 @@ use HTTP::Tiny qw//;
 use JSON qw/decode_json/;
 use Scalar::Util qw/reftype/;
 
-our $VERSION = "0.1.8";
+our $VERSION = "0.1.9";
 
 use constant {
   BASEURL  => "https://the-rosary-api.vercel.app/v1",
@@ -466,16 +466,18 @@ The general prayer form is:
 
 C<--pray> streams the selected Rosary prayer by prayer.
 
-C<--unceasingly> continuously repeats the same selected Rosary until the user
-stops it. It implies C<--pray>, so these are both valid:
+C<--unceasingly> continuously prays until the user stops it. It implies
+C<--pray>, so these are both valid:
 
   avemaria --unceasingly
   avemaria --pray --unceasingly
 
-Using both is intentionally redundant rather than an error. A completed Rosary
-starts again with its prayer and decade counters reset. The already loaded API
-data is reused rather than being unnecessarily fetched again, and live speed
-changes are retained between cycles.
+Using both is intentionally redundant rather than an error. When no day or
+Mystery is supplied explicitly, the calendar day is checked at the boundary
+between complete Rosaries. If midnight has passed, the next Rosary uses the
+Mysteries for the new day. An explicitly selected day or Mystery remains fixed
+for every cycle. Live speed changes are retained between cycles, and API/cache
+data is reused except when a calendar-day change requires the next day's data.
 
 =head2 Mystery and Intention Presentation
 
@@ -659,17 +661,18 @@ Pause after each decade description:
 
   avemaria Friday --pray --fully -t
 
-Repeat today's Rosary continuously until stopped:
+Pray continuously, following the calendar when no day/Mystery is explicit:
 
   avemaria --unceasingly --scroll --color
 
 =head2 Option Composition
 
 The options are intended to compose rather than define unrelated modes.
-C<--unceasingly> controls repetition and implies prayer mode; C<--scroll> only
-changes screen presentation; C<--fully> controls meditation detail; the timing
-options control pacing; and the color options control styling. Consequently a
-command such as:
+C<--unceasingly> controls repetition and implies prayer mode. Without an
+explicit day/Mystery it follows calendar changes between complete Rosaries;
+with an explicit selection it remains fixed. C<--scroll> only changes screen
+presentation; C<--fully> controls meditation detail; the timing options control
+pacing; and the color options control styling. Consequently a command such as:
 
   avemaria Luminous --unceasingly --scroll --fully --color --light --speed=1.25
 

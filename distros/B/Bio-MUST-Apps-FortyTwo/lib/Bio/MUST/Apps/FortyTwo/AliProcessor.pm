@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::AliProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::AliProcessor::VERSION = '0.213470';
+$Bio::MUST::Apps::FortyTwo::AliProcessor::VERSION = '0.262780';
 use Moose;
 use namespace::autoclean;
 
@@ -165,6 +165,13 @@ sub _build_para_blastdb {
 
     my $parafile = change_suffix($self->ali->filename, '.para');
     return unless -e $parafile;
+
+    # TODO: handle empty PARA files (but existing)
+#     pour le bug dans forty-two... si fichier para vide mais avec des :
+#     # built by filtered_ali
+#     # built by filtered_ali
+#     # built by filtered_ali
+#     ça crashe sur un makeblastdb
 
     #### [ALI] PARA file in use: $parafile
     return Bio::MUST::Drivers::Blast::Database::Temporary->new(
@@ -634,6 +641,7 @@ sub BUILD {
         #### [ALI] best hits: display( map { $_->all_ids } $self->all_best_hits )
 
         $self->check_brh_among_best_hits;
+        # TODO: abort if no ref_org at all!
     }
 
     for my $org ($rp->all_orgs) {
@@ -651,6 +659,7 @@ sub BUILD {
         #### [ALI] Making delayed indels...
         $self->integrator->make_indels;
 
+        # TODO: make this optional? as this can introduce micro-indels...
         #### [ALI] Merging sequence chunks...
         $self->merge_chunks;
 
@@ -711,7 +720,7 @@ Bio::MUST::Apps::FortyTwo::AliProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.213470
+version 0.262780
 
 =head1 AUTHOR
 

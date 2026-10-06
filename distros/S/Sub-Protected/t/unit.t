@@ -1,47 +1,54 @@
 #!/usr/bin/perl
 # t/unit.t -- black-box unit tests for Sub::Protected's public API
 #
-# Every test is derived strictly from the POD documentation.
-# No private functions are called directly; only the documented public
-# interface is exercised: import(), the :Protected attribute, $BYPASS,
-# and %config.
+# Every test is derived strictly from the POD.  Only the documented public
+# interface is exercised: import(), the :Protected attribute, $BYPASS and
+# %config.  No private function is called directly.
 #
 # Mocks are used to:
-#   * control the environment ($ENV{HARNESS_ACTIVE})
+#   * force validation and argument-normalisation branches in import()
 #   * verify that documented external dependencies are invoked
-#   * force specific error paths by replacing validation behaviour
+#
+# A ledger lists every documented message and return state.  Each is
+# deleted when a test triggers it, and the script fails if any remain.
 
 use strict;
 use warnings;
 
 # Untaint $HOME so prove -lt is happy with the local lib paths
 BEGIN {
-	my ($home) = ($ENV{HOME} =~ /\A(.+)\z/ms);
-	unshift @INC, 'lib',
-		"$home/src/njh/Test-Mockingbird/lib",
-		"$home/src/njh/Test-Returns/lib";
+	# HOME is often unset on Windows
+	if(defined($ENV{HOME}) && (my ($home) = ($ENV{HOME} =~ /\A(.+)\z/ms))) {
+		unshift @INC,
+			"$home/src/njh/Test-Mockingbird/lib",
+			"$home/src/njh/Test-Returns/lib";
+	}
+	unshift @INC, 'lib';
 }
 
 use Test::Most;
-use Test::Mockingbird;
+
+# Test::Mockingbird needs Perl 5.16.3, so it is an optional test dependency
+BEGIN {
+	eval { require Test::Mockingbird; Test::Mockingbird->import(); 1 }
+		or plan(skip_all => 'Test::Mockingbird not installed');
+}
 use Test::Returns;
 use Readonly;
-use Scalar::Util qw(reftype);
 
-# Loading the module fires CHECK, wrapping all :Protected and declarative
-# subs defined in this file's package blocks (see fixtures below).
+# Loading the module before CHECK means the :Protected and declarative
+# fixtures below are wrapped at CHECK time, exactly as documented.
 use Sub::Protected;
 
 # -------------------------------------------------------------------
 # Constants and configuration -- no magic strings
 # -------------------------------------------------------------------
 
-Readonly::Scalar my $SP          => 'Sub::Protected';
-Readonly::Scalar my $ATTR_OWNER  => 'UT::AttrOwner';
-Readonly::Scalar my $DECL_OWNER  => 'UT::DeclOwner';
-Readonly::Scalar my $PC_OWNER    => 'UT::PostCheck';
+Readonly::Scalar my $SP         => 'Sub::Protected';
+Readonly::Scalar my $ATTR_OWNER => 'UT::AttrOwner';
+Readonly::Scalar my $PC_OWNER   => 'UT::PostCheck';
+Readonly::Scalar my $ALARM_SECS => 60;
 
-# Test configuration (Object::Configure-compatible layout)
 my %config = (
 	attr_result    => 'attr_secret',
 	decl_result    => 'decl_secret',
@@ -49,27 +56,66 @@ my %config = (
 	invalid_digit  => '123bad',
 	invalid_hyphen => 'has-hyphen',
 	invalid_empty  => q{},
+	nonexistent    => '_no_such_sub_xyz',
+	errno_sentinel => 2,
+	eval_sentinel  => "earlier error\n",
+	topic_sentinel => 'topic sentinel',
 );
 
 # -------------------------------------------------------------------
-# Package fixtures -- defined at compile time so :Protected and
-# declarative wrapping happen at CHECK time, exactly as documented.
+# API ledger: every message and return state documented in the POD.
 # -------------------------------------------------------------------
 
-# Attribute form: sub _attr_secret :Protected is wrapped at CHECK.
+my %ledger = (
+	'msg: import invalid identifier'             => q{Sub::Protected->import: 'NAME' is not a valid Perl identifier},
+	'msg: import invalid identifier (undef/ref)' => q{NAME is shown as '' when undef or a reference},
+	'msg: import sub not defined'                => q{Sub::Protected: PKG::NAME is not defined},
+	'msg: protected access violation'            => q{NAME() is a protected method of OWNER and cannot be called from CALLER},
+	'ret: import() with no names returns $class' => 'Returns $class',
+	'ret: import() with names returns $class'    => 'Returns $class',
+);
+
+# Mark a ledger entry as exercised
+sub covered {
+	my $key = shift;
+	die "Unknown ledger entry '$key'" unless exists $ledger{$key};
+	delete $ledger{$key};
+	diag "ledger: covered '$key'" if $ENV{TEST_VERBOSE};
+	return;
+}
+
+# Build the exact documented access-violation message
+sub violation_re {
+	my ($name, $owner, $caller) = @_;
+	return qr/\A\Q$name\E\(\) is a protected method of \Q$owner\E and cannot be called from \Q$caller\E at /;
+}
+
+# Build the exact documented invalid-identifier message
+sub invalid_re {
+	my $name = shift;
+	return qr/\A\Q$SP\E->import: '\Q$name\E' is not a valid Perl identifier at /;
+}
+
+# -------------------------------------------------------------------
+# Package fixtures -- defined at compile time so wrapping happens at
+# CHECK time, as documented.
+# -------------------------------------------------------------------
+
+# Attribute form
 {
 	package UT::AttrOwner;
 	use Sub::Protected;
 
 	sub new          { bless {}, shift }
 	sub _attr_secret :Protected { 'attr_secret' }
-	sub call_secret  { (shift)->_attr_secret }    # owner-context entry point
+	sub call_secret  { (shift)->_attr_secret }
 }
 
 {
 	package UT::AttrChild;
 	our @ISA = ('UT::AttrOwner');
 	sub new { bless {}, shift }
+	sub child_call { (shift)->_attr_secret }
 }
 
 {
@@ -78,7 +124,7 @@ my %config = (
 	sub probe { UT::AttrOwner->new->_attr_secret }
 }
 
-# Declarative form: _decl_secret is scheduled pre-CHECK via import().
+# Declarative form, scheduled before CHECK
 {
 	package UT::DeclOwner;
 	use Sub::Protected qw(_decl_secret);
@@ -92,6 +138,7 @@ my %config = (
 	package UT::DeclChild;
 	our @ISA = ('UT::DeclOwner');
 	sub new { bless {}, shift }
+	sub child_call { (shift)->_decl_secret }
 }
 
 {
@@ -100,10 +147,9 @@ my %config = (
 	sub probe { UT::DeclOwner->new->_decl_secret }
 }
 
-# Package for post-CHECK wrapping tests; _pc_secret is NOT yet wrapped here.
+# Not wrapped until a test calls import() after CHECK
 {
 	package UT::PostCheck;
-
 	sub new        { bless {}, shift }
 	sub _pc_secret { 'pc_secret' }
 	sub call_pc    { (shift)->_pc_secret }
@@ -115,176 +161,272 @@ my %config = (
 	sub probe { UT::PostCheck->new->_pc_secret }
 }
 
-# Package for multiple-names declarative test
+# Several names in one import()
 {
 	package UT::MultiDecl;
 	use Sub::Protected qw(_alpha _beta);
 
-	sub new    { bless {}, shift }
-	sub _alpha { 'alpha' }
-	sub _beta  { 'beta'  }
+	sub new       { bless {}, shift }
+	sub _alpha    { 'alpha' }
+	sub _beta     { 'beta'  }
 	sub get_alpha { (shift)->_alpha }
 	sub get_beta  { (shift)->_beta  }
 }
 
 {
 	package UT::MultiStranger;
-	sub new      { bless {}, shift }
+	sub new       { bless {}, shift }
 	sub try_alpha { UT::MultiDecl->new->_alpha }
 	sub try_beta  { UT::MultiDecl->new->_beta  }
+}
+
+# One package per documented argument style, each wrapped after CHECK
+{
+	package UT::StyleList;
+	sub _s1 { 'list' }
+	sub _s2 { 'list' }
+	sub _s3 { 'list' }
+	sub _s4 { 'list' }
+	sub _s5 { 'list' }
+}
+{
+	package UT::StyleArray;
+	sub _s1 { 'array' }
+	sub _s2 { 'array' }
+}
+{
+	package UT::StyleHash;
+	sub _s1 { 'hash' }
+	sub _s2 { 'hash' }
+}
+{
+	# A sub literally called "subs" must be protectable like any other
+	package UT::StyleSubs;
+	sub subs { 'subs' }
+	sub _x   { 'x' }
 }
 
 diag "Black-box unit tests for $SP" if $ENV{TEST_VERBOSE};
 
 # ===================================================================
-# SECTION 1: import() with no arguments
+# SECTION 1: import() return value
 #
-# POD: "With no arguments: does nothing beyond making the :Protected
-#       attribute globally available.  Returns $class."
+# POD: "Returns: $class (the importing class name)", with or without names.
 # ===================================================================
 
-subtest 'import(): no-args returns the class name' => sub {
+subtest 'import(): no names returns the class name' => sub {
 	plan tests => 2;
 
-	# The return value must be the class name as a string (supports chaining)
 	my $result = Sub::Protected->import();
-	is $result, $SP, 'import() returns the class name';
-	returns_ok($result, { type => 'string' }, 'return value satisfies string schema');
+	is $result, $SP, 'returns the class name';
+	returns_ok($result, { type => 'string' }, 'return value satisfies the documented schema');
+
+	covered('ret: import() with no names returns $class');
 };
 
-subtest 'import(): no-args return value is backed by set_return' => sub {
+subtest 'import(): with names returns the class name' => sub {
 	plan tests => 2;
 
-	# Spy on the imported set_return alias to confirm it is invoked.
-	# (use return::Set qw(set_return) installs an alias in Sub::Protected's namespace)
-	my $spy = spy 'Sub::Protected::set_return';
-
-	my $result = Sub::Protected->import();
-
-	my @calls = $spy->();
-	is scalar(@calls), 1, 'set_return called exactly once for no-args';
-	is $calls[0][1], $SP, 'set_return receives the class name as first value arg';
-
-	restore_all();
-};
-
-subtest 'import(): no-args does not wrap any existing sub' => sub {
-	plan tests => 1;
-
-	# A sub defined after a plain "use Sub::Protected" must NOT be wrapped.
-	# UT::AttrOwner::call_secret is a regular (non-protected) sub; calling it
-	# from an unrelated package must succeed regardless of access controls.
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
-
+	{
+		package UT::ReturnPkg;
+		sub _any { 1 }
+	}
 	my $result;
-	lives_ok { $result = UT::AttrOwner->new->call_secret }
-		'public method on owner package is unaffected by no-args import()';
+	{
+		package UT::ReturnPkg;
+		$result = Sub::Protected->import('_any');
+	}
+	is $result, $SP, 'returns the class name';
+	returns_ok($result, { type => 'string' }, 'return value satisfies the documented schema');
+
+	covered('ret: import() with names returns $class');
+};
+
+subtest 'import(): return value is produced by Return::Set' => sub {
+	plan tests => 2;
+
+	# The API SPECIFICATION names Return::Set for the output schema
+	my $spy = spy 'Sub::Protected::set_return';
+	Sub::Protected->import();
+	my @calls = $spy->();
+	restore_all();
+
+	is scalar(@calls), 1, 'set_return called exactly once';
+	is $calls[0][1], $SP, 'set_return is given the class name';
 };
 
 # ===================================================================
 # SECTION 2: import() identifier validation
 #
-# POD MESSAGES table: "Sub::Protected->import: 'NAME' is not a valid
-#   Perl identifier" -- croaks when the name fails /\A[_a-zA-Z]\w*\z/.
+# POD MESSAGES: "Sub::Protected->import: 'NAME' is not a valid Perl
+# identifier"; NAME is '' for undef or a reference.
 # ===================================================================
 
-subtest 'import(): rejects identifier starting with a digit' => sub {
+subtest 'import(): invalid identifiers croak with the exact documented message' => sub {
+	plan tests => 3;
+
+	# One example of each way the documented regex can fail
+	for my $bad (@config{qw(invalid_digit invalid_hyphen invalid_empty)}) {
+		throws_ok { Sub::Protected->import($bad) } invalid_re($bad),
+			"'$bad' is rejected";
+	}
+	covered('msg: import invalid identifier');
+};
+
+subtest 'import(): undef and reference names are reported as empty' => sub {
 	plan tests => 2;
 
-	my $bad = $config{invalid_digit};
-	throws_ok {
-		Sub::Protected->import($bad)
-	} qr/\Q$SP\E->import: '\Q$bad\E' is not a valid Perl identifier/,
-		'digit-start identifier croaks with exact documented message';
+	throws_ok { Sub::Protected->import(undef) } invalid_re(q{}),
+		'undef is rejected and shown as an empty name';
 
-	# Verify the regex anchor in the error -- the name is quoted as-is
-	my $err;
-	eval { Sub::Protected->import($bad) };
-	$err = $@;
-	like $err, qr/is not a valid Perl identifier/, 'error contains required phrase';
+	# A reference inside the list (the list itself may be an arrayref)
+	throws_ok { Sub::Protected->import(['_ok', {}]) } invalid_re(q{}),
+		'a reference is rejected and shown as an empty name';
+
+	covered('msg: import invalid identifier (undef/ref)');
 };
 
-subtest 'import(): rejects identifier containing a hyphen' => sub {
+subtest 'import(): any validation failure produces the documented message' => sub {
 	plan tests => 1;
 
-	my $bad = $config{invalid_hyphen};
-	throws_ok {
-		Sub::Protected->import($bad)
-	} qr/\Q$SP\E->import: '\Q$bad\E' is not a valid Perl identifier/,
-		'hyphen-containing identifier croaks with exact documented message';
-};
+	# Force the validator to fail so the croak path is taken even for a
+	# well-formed name: import() must report it the documented way
+	my $guard = mock_scoped 'Sub::Protected::validate_strict' => sub { die "forced failure\n" };
 
-subtest 'import(): rejects empty-string identifier' => sub {
-	plan tests => 1;
-
-	throws_ok {
-		Sub::Protected->import($config{invalid_empty})
-	} qr/is not a valid Perl identifier/,
-		'empty-string identifier croaks';
-};
-
-subtest 'import(): validate_strict failure triggers the documented croak' => sub {
-	plan tests => 1;
-
-	# Mock validate_strict to throw unconditionally, simulating any
-	# schema mismatch.  The documented behaviour is that import() then
-	# croaks with "is not a valid Perl identifier".
-	my $g = mock_scoped 'Sub::Protected::validate_strict' =>
-		sub { die "forced validation failure\n" };
-
-	# Even a syntactically valid name must be rejected when validation fails
 	throws_ok {
 		package UT::AttrOwner;
 		Sub::Protected->import('_looks_valid');
-	} qr/is not a valid Perl identifier/,
-		'import() re-croaks the documented message on any validate_strict failure';
+	} invalid_re('_looks_valid'), 'validator failure is reported as an invalid identifier';
+};
+
+subtest 'import(): leading underscores and mixed case are valid' => sub {
+	plan tests => 1;
+
+	# The documented regex allows [_a-zA-Z] then \w*
+	lives_ok {
+		package UT::LeadingUnderscore;
+		sub _Valid_Name2 { 1 }
+		Sub::Protected->import('_Valid_Name2');
+	} 'a name matching the documented regex is accepted';
 };
 
 # ===================================================================
-# SECTION 3: import() with a non-existent sub
+# SECTION 3: import() with a sub that does not exist
 #
-# POD MESSAGES table: "Sub::Protected: PKG::NAME is not defined"
+# POD MESSAGES: "Sub::Protected: PKG::NAME is not defined".  This must work
+# with no bypass in effect -- it is a public API error, not a test aid.
 # ===================================================================
 
-subtest 'import(): croaks with documented message for non-existent sub' => sub {
-	plan tests => 2;
+subtest 'import(): croaks with the documented message for a missing sub' => sub {
+	plan tests => 1;
 
-	local $Sub::Protected::BYPASS = 1;    # bypass the private-caller guard
-
-	my $nonexistent = '_no_such_sub_xyz';
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
 
 	throws_ok {
 		package UT::AttrOwner;
-		Sub::Protected->import($nonexistent);
-	} qr/\Q$SP\E: \Q$ATTR_OWNER\E::\Q$nonexistent\E is not defined/,
-		'non-existent sub croaks with exact documented message';
+		Sub::Protected->import($config{nonexistent});
+	} qr/\A\Q$SP\E: \Q$ATTR_OWNER\E::\Q$config{nonexistent}\E is not defined at /,
+		'missing sub croaks with the exact documented message';
 
-	my $err;
-	{
-		local $Sub::Protected::BYPASS = 1;
-		eval {
-			package UT::AttrOwner;
-			Sub::Protected->import($nonexistent);
-		};
-		$err = $@;
-	}
-	like $err, qr/is not defined/, 'error contains "is not defined"';
+	covered('msg: import sub not defined');
 };
 
 # ===================================================================
-# SECTION 4: import() with valid sub names (post-CHECK wrapping)
+# SECTION 4: import() argument styles
 #
-# POD: "If the module has already passed CHECK ... wrapping occurs
-#       immediately."
+# POD Arguments: a plain list, an arrayref and { subs => [...] } are
+# equivalent.  A plain list is always a list of names, so qw(subs _x)
+# protects both; only a single arrayref or hashref goes to Params::Get.
 # ===================================================================
 
-subtest 'import(): post-CHECK wrapping enforces access control' => sub {
+subtest 'import(): every documented argument style protects the subs' => sub {
+	plan tests => 3;
+
+	{
+		package UT::StyleList;
+		Sub::Protected->import(qw(_s1 _s2));
+	}
+	{
+		package UT::StyleArray;
+		Sub::Protected->import([ qw(_s1 _s2) ]);
+	}
+	{
+		package UT::StyleHash;
+		Sub::Protected->import({ subs => [ qw(_s1 _s2) ] });
+	}
+
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	for my $pkg (qw(UT::StyleList UT::StyleArray UT::StyleHash)) {
+		no strict 'refs';
+		throws_ok { &{"${pkg}::_s2"}() } violation_re('_s2', $pkg, 'main'),
+			"$pkg: every listed name is protected";
+	}
+};
+
+subtest 'import(): only a single reference is passed to Params::Get' => sub {
 	plan tests => 4;
 
-	# Wrap _pc_secret in UT::PostCheck now (post-CHECK, immediate wrapping).
-	# The import() call must come from within UT::PostCheck so that caller()
-	# inside import() returns UT::PostCheck as the owner package.
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	# A plain list must never be reinterpreted as named arguments
+	my $spy = spy 'Sub::Protected::get_params';
+	{
+		package UT::StyleList;
+		Sub::Protected->import('_s3');
+	}
+	my @calls = $spy->();
+	restore_all();
+	is scalar(@calls), 0, 'a plain list is not passed to Params::Get';
+
+	# Force both shapes Params::Get may return for a reference: a list of
+	# names and a single name
+	{
+		my $guard = mock_scoped 'Sub::Protected::get_params' => sub { { subs => [ '_s4' ] } };
+		package UT::StyleList;
+		Sub::Protected->import([ '_ignored' ]);
+	}
+	{
+		my $guard = mock_scoped 'Sub::Protected::get_params' => sub { { subs => '_s5' } };
+		package UT::StyleList;
+		Sub::Protected->import({ subs => '_ignored' });
+	}
+	throws_ok { UT::StyleList::_s3() } violation_re('_s3', 'UT::StyleList', 'main'),
+		'a single plain name is protected';
+	throws_ok { UT::StyleList::_s4() } violation_re('_s4', 'UT::StyleList', 'main'),
+		'a list of names from Params::Get is honoured';
+	throws_ok { UT::StyleList::_s5() } violation_re('_s5', 'UT::StyleList', 'main'),
+		'a single name from Params::Get is honoured';
+};
+
+subtest 'import(): a sub called "subs" is an ordinary name' => sub {
+	plan tests => 2;
+
+	{
+		package UT::StyleSubs;
+		Sub::Protected->import(qw(subs _x));
+	}
+
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	# qw(subs _x) must not be read as subs => '_x'
+	throws_ok { UT::StyleSubs::subs() } violation_re('subs', 'UT::StyleSubs', 'main'),
+		'qw(subs _x) protects subs()';
+	throws_ok { UT::StyleSubs::_x() } violation_re('_x', 'UT::StyleSubs', 'main'),
+		'qw(subs _x) protects _x';
+};
+
+# ===================================================================
+# SECTION 5: import() after CHECK wraps immediately
+# ===================================================================
+
+subtest 'import(): after CHECK the sub is protected immediately' => sub {
+	plan tests => 2;
+
 	{
 		package UT::PostCheck;
 		Sub::Protected->import('_pc_secret');
@@ -293,317 +435,173 @@ subtest 'import(): post-CHECK wrapping enforces access control' => sub {
 	local $ENV{HARNESS_ACTIVE}    = 0;
 	local $Sub::Protected::BYPASS = 0;
 
-	# Owner context: must be allowed
-	my $result;
-	lives_ok {
-		$result = UT::PostCheck->new->call_pc;
-	} 'import post-CHECK: owner can call wrapped sub';
-	is $result, $config{pc_result}, 'wrapped sub returns correct value';
-
-	# Subclass: must be allowed (UT::PCStranger has no ISA, so use AttrChild)
-	lives_ok {
-		UT::AttrChild->new->call_secret;
-	} 'subclass can still call parent attribute-form protected sub';
-
-	# Stranger: must be blocked
-	throws_ok { UT::PCStranger->new->probe }
-		qr/protected method/,
-		'import post-CHECK: stranger is blocked';
-};
-
-subtest 'import(): post-CHECK returns the class name' => sub {
-	plan tests => 2;
-
-	{
-		package UT::AnotherPkg;
-		sub _any { 1 }
-	}
-
-	my $result;
-	{
-		package UT::AnotherPkg;
-		$result = Sub::Protected->import('_any');
-	}
-
-	is $result, $SP, 'import() returns class name when given sub names';
-	returns_ok($result, { type => 'string' }, 'return satisfies string schema');
+	is(UT::PostCheck->new->call_pc, $config{pc_result}, 'owner can call the sub');
+	throws_ok { UT::PCStranger->new->probe } violation_re('_pc_secret', $PC_OWNER, 'UT::PCStranger'),
+		'unrelated package is blocked with the exact message';
 };
 
 # ===================================================================
-# SECTION 5: :Protected attribute form (compile-time wrapping)
+# SECTION 6: the two usage forms
 #
-# POD: "The sub is wrapped at CHECK time."
+# POD: owner and subclasses may call; anyone else croaks with
+#   "NAME() is a protected method of OWNER and cannot be called from CALLER"
 # ===================================================================
 
-subtest 'attribute form: owner can call a protected sub' => sub {
-	plan tests => 2;
+for my $form (
+	[ 'attribute',   'UT::AttrOwner', 'UT::AttrChild', 'UT::AttrStranger', '_attr_secret', $config{attr_result} ],
+	[ 'declarative', 'UT::DeclOwner', 'UT::DeclChild', 'UT::DeclStranger', '_decl_secret', $config{decl_result} ],
+) {
+	my ($label, $owner, $child, $stranger, $name, $value) = @{$form};
 
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
+	subtest "$label form: owner and subclass allowed, others blocked" => sub {
+		plan tests => 3;
 
-	my $result;
-	lives_ok { $result = UT::AttrOwner->new->call_secret }
-		'attribute form: owner allowed';
-	is $result, $config{attr_result}, 'correct return value';
-};
+		local $ENV{HARNESS_ACTIVE}    = 0;
+		local $Sub::Protected::BYPASS = 0;
 
-subtest 'attribute form: subclass can call inherited protected sub' => sub {
-	plan tests => 1;
+		is($owner->new->call_secret, $value, 'owner can call the protected sub');
+		is($child->new->child_call, $value, 'subclass can call the protected sub');
+		throws_ok { $stranger->new->probe } violation_re($name, $owner, $stranger),
+			'unrelated package croaks with the exact documented message';
+	};
+}
+covered('msg: protected access violation');
 
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
-
-	# UT::AttrChild isa UT::AttrOwner -- access must be granted
-	lives_ok { UT::AttrChild->new->call_secret }
-		'attribute form: subclass allowed';
-};
-
-subtest 'attribute form: unrelated package is blocked' => sub {
-	plan tests => 1;
-
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
-
-	throws_ok { UT::AttrStranger->new->probe }
-		qr/protected method/,
-		'attribute form: stranger blocked';
-};
-
-# ===================================================================
-# SECTION 6: Declarative form (compile-time, pre-CHECK wrapping)
-#
-# POD: "Each named sub is looked up in the caller's stash and wrapped
-#       at CHECK time."
-# ===================================================================
-
-subtest 'declarative form: owner can call a protected sub' => sub {
-	plan tests => 2;
-
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
-
-	my $result;
-	lives_ok { $result = UT::DeclOwner->new->call_secret }
-		'declarative form: owner allowed';
-	is $result, $config{decl_result}, 'correct return value';
-};
-
-subtest 'declarative form: subclass can call inherited protected sub' => sub {
-	plan tests => 1;
-
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
-
-	lives_ok { UT::DeclChild->new->call_secret }
-		'declarative form: subclass allowed';
-};
-
-subtest 'declarative form: unrelated package is blocked' => sub {
-	plan tests => 1;
-
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
-
-	throws_ok { UT::DeclStranger->new->probe }
-		qr/protected method/,
-		'declarative form: stranger blocked';
-};
-
-subtest 'declarative form: multiple sub names wrapped in one import()' => sub {
+subtest 'declarative form: several names in one import()' => sub {
 	plan tests => 4;
 
 	local $ENV{HARNESS_ACTIVE}    = 0;
 	local $Sub::Protected::BYPASS = 0;
 
-	# UT::MultiDecl has _alpha and _beta both declared protected
-	my ($ra, $rb);
-	lives_ok { $ra = UT::MultiDecl->new->get_alpha } 'owner: _alpha accessible';
-	lives_ok { $rb = UT::MultiDecl->new->get_beta  } 'owner: _beta accessible';
-
-	# Both must be independently blocked from outside
-	throws_ok { UT::MultiStranger->new->try_alpha }
-		qr/protected method/, 'stranger: _alpha blocked';
-	throws_ok { UT::MultiStranger->new->try_beta  }
-		qr/protected method/, 'stranger: _beta blocked';
+	is(UT::MultiDecl->new->get_alpha, 'alpha', 'owner: _alpha callable');
+	is(UT::MultiDecl->new->get_beta,  'beta',  'owner: _beta callable');
+	throws_ok { UT::MultiStranger->new->try_alpha } violation_re('_alpha', 'UT::MultiDecl', 'UT::MultiStranger'),
+		'stranger: _alpha blocked';
+	throws_ok { UT::MultiStranger->new->try_beta } violation_re('_beta', 'UT::MultiDecl', 'UT::MultiStranger'),
+		'stranger: _beta blocked';
 };
 
 # ===================================================================
-# SECTION 7: Error message format
+# SECTION 7: bypass and %config
 #
-# POD says the format is:
-#   "_helper() is a protected method of Foo and cannot be called from Bar"
+# POD: $BYPASS true OR ($ENV{HARNESS_ACTIVE} and harness_bypass) disables
+# all checks; harness_bypass defaults to 1; $BYPASS defaults to false.
 # ===================================================================
 
-subtest 'error message matches the documented format exactly' => sub {
-	plan tests => 3;
-
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
-
-	my $err;
-	eval { UT::AttrStranger->new->probe };
-	$err = $@;
-
-	# Verify each required component of the documented error format
-	like $err, qr/_attr_secret\(\)/,
-		'error contains sub name followed by ()';
-	like $err, qr/is a protected method of \Q$ATTR_OWNER\E/,
-		'error contains "is a protected method of" + owner package';
-	like $err, qr/and cannot be called from UT::AttrStranger/,
-		'error contains "and cannot be called from" + caller package';
-
-	diag "Actual error message: $err" if $ENV{TEST_VERBOSE};
-};
-
-# ===================================================================
-# SECTION 8: $BYPASS public variable
-#
-# POD: "Either condition alone (OR logic) disables all access checks:
-#       * $Sub::Protected::BYPASS set to a true value."
-# ===================================================================
-
-subtest '$BYPASS=1 allows call from any package' => sub {
+subtest 'documented defaults' => sub {
 	plan tests => 2;
 
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 1;
-
-	my $result;
-	lives_ok { $result = UT::AttrStranger->new->probe }
-		'$BYPASS=1: stranger is allowed';
-	is $result, $config{attr_result}, 'correct value returned under BYPASS';
+	ok !$Sub::Protected::BYPASS, '$BYPASS is false by default';
+	is $Sub::Protected::config{harness_bypass}, 1, 'harness_bypass defaults to 1';
 };
 
-subtest '$BYPASS is restored after local scope exits' => sub {
+subtest 'bypass truth table' => sub {
+	plan tests => 8;
+
+	# Every combination of the three controls; access is allowed exactly
+	# when BYPASS is true or both HARNESS_ACTIVE and harness_bypass are
+	for my $bypass (0, 1) {
+		for my $harness (0, 1) {
+			for my $hb (0, 1) {
+				local $Sub::Protected::BYPASS                 = $bypass;
+				local $ENV{HARNESS_ACTIVE}                    = $harness;
+				local $Sub::Protected::config{harness_bypass} = $hb;
+
+				my $expect_allowed = ($bypass || ($harness && $hb)) ? 1 : 0;
+				my $allowed = eval { UT::AttrStranger->new->probe; 1 } ? 1 : 0;
+				is $allowed, $expect_allowed,
+					"BYPASS=$bypass HARNESS_ACTIVE=$harness harness_bypass=$hb";
+			}
+		}
+	}
+};
+
+subtest '$BYPASS set with local is restored at scope exit' => sub {
 	plan tests => 2;
 
 	local $ENV{HARNESS_ACTIVE} = 0;
-
 	{
 		local $Sub::Protected::BYPASS = 1;
-		lives_ok { UT::AttrStranger->new->probe }
-			'$BYPASS=1 active inside scope';
+		is(UT::AttrStranger->new->probe, $config{attr_result}, 'allowed inside the scope');
 	}
-
-	# After the scope exits, BYPASS must be 0 again
-	throws_ok { UT::AttrStranger->new->probe }
-		qr/protected method/,
-		'$BYPASS restored to 0 after scope exits';
+	throws_ok { UT::AttrStranger->new->probe } violation_re('_attr_secret', $ATTR_OWNER, 'UT::AttrStranger'),
+		'blocked again after the scope exits';
 };
 
 # ===================================================================
-# SECTION 9: $ENV{HARNESS_ACTIVE} and %config{harness_bypass}
+# SECTION 8: global state integrity
 #
-# POD: "$ENV{HARNESS_ACTIVE} set (the convention used by Test::Harness)
-#       ... The HARNESS_ACTIVE bypass can be disabled by setting:
-#       $Sub::Protected::config{harness_bypass} = 0;"
+# POD Side effects: $@, $!, $_ and alarm() timers are left unchanged.
 # ===================================================================
 
-subtest 'HARNESS_ACTIVE=1 allows call from any package (default behaviour)' => sub {
-	plan tests => 1;
+# Run $code with sentinels in place; report what the globals hold after
+sub globals_after {
+	my $code = shift;
 
-	local $ENV{HARNESS_ACTIVE}    = 1;
-	local $Sub::Protected::BYPASS = 0;
+	local $@ = $config{eval_sentinel};
+	local $! = $config{errno_sentinel};
+	local $_ = $config{topic_sentinel};
+	local $SIG{ALRM} = sub { die "alarm fired\n" };
+	alarm $ALARM_SECS;
 
-	# harness_bypass is 1 by default, so HARNESS_ACTIVE should bypass checks
-	lives_ok { UT::AttrStranger->new->probe }
-		'HARNESS_ACTIVE=1 bypasses access checks by default';
-};
+	$code->();
 
-subtest 'config{harness_bypass}=0 disables the HARNESS_ACTIVE shortcut' => sub {
-	plan tests => 1;
+	# Read $! first: alarm() itself may set it
+	my %after = (
+		errno => $! + 0,
+		eval  => $@,
+		topic => $_,
+	);
+	$after{alarm} = alarm(0);
+	return \%after;
+}
 
-	local $ENV{HARNESS_ACTIVE}              = 1;
-	local $Sub::Protected::BYPASS           = 0;
-	local $Sub::Protected::config{harness_bypass} = 0;
+for my $case (
+	[ 'import() with no names', sub { Sub::Protected->import() } ],
+	[ 'import() with names', sub {
+		package UT::GlobalPkg;
+		sub _g { 1 }
+		Sub::Protected->import('_g');
+	} ],
+	[ 'calling a protected sub from its owner', sub {
+		local $ENV{HARNESS_ACTIVE}    = 0;
+		local $Sub::Protected::BYPASS = 0;
+		UT::AttrOwner->new->call_secret;
+	} ],
+) {
+	my ($label, $code) = @{$case};
 
-	# With harness_bypass disabled, even HARNESS_ACTIVE=1 must not bypass
-	throws_ok { UT::AttrStranger->new->probe }
-		qr/protected method/,
-		'harness_bypass=0: HARNESS_ACTIVE no longer bypasses checks';
-};
+	subtest "global state: $label" => sub {
+		plan tests => 4;
 
-subtest 'config{harness_bypass} defaults to 1' => sub {
-	plan tests => 1;
+		my $after = globals_after($code);
+		diag "globals after $label: " . join(', ', map { "$_=" . ($after->{$_} // 'undef') } sort keys %{$after})
+			if $ENV{TEST_VERBOSE};
 
-	is $Sub::Protected::config{harness_bypass}, 1,
-		'%config{harness_bypass} default is 1 as documented';
-};
+		is $after->{eval}, $config{eval_sentinel}, '$@ unchanged';
+		is $after->{errno}, $config{errno_sentinel}, '$! unchanged';
+		is $after->{topic}, $config{topic_sentinel}, '$_ unchanged';
+		SKIP: {
+			# Windows emulates alarm(), and its alarm() always returns 0
+			# rather than the seconds left, so the timer cannot be read back
+			skip 'alarm() does not report the time left on Windows', 1 if $^O eq 'MSWin32';
+			ok $after->{alarm} > 0 && $after->{alarm} <= $ALARM_SECS, 'pending alarm left running';
+		}
+	};
+}
 
 # ===================================================================
-# SECTION 10: POD/code consistency
-#
-# Cross-reference documented behaviour against actual behaviour.
-# Any discrepancy discovered here should be treated as a documentation
-# bug (fix the POD) or a code bug (fix the code), not a test error.
+# Ledger: every documented message and return state must be exercised
 # ===================================================================
 
-subtest 'POD/code: $BYPASS default value matches documentation' => sub {
+subtest 'API ledger is empty' => sub {
 	plan tests => 1;
 
-	# POD says BYPASS starts false; code initialises it to 0.
-	is $Sub::Protected::BYPASS, 0, '$BYPASS starts at 0 as documented';
-};
-
-subtest 'POD/code: error message format matches documented template' => sub {
-	plan tests => 1;
-
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
-
-	# The documented template is:
-	#   "NAME() is a protected method of PKG and cannot be called from CALLER"
-	throws_ok { UT::AttrStranger->new->probe }
-		qr/\w+\(\) is a protected method of \w[\w:]* and cannot be called from \w[\w:]*/,
-		'error message structure matches the documented template';
-};
-
-subtest 'POD/code: import() accepts leading-underscore identifiers' => sub {
-	plan tests => 1;
-
-	# The POD documents the regex /\A[_a-zA-Z]\w*\z/, which allows a leading
-	# underscore.  Confirm that _-prefixed names are accepted (not rejected).
-	lives_ok {
-		package UT::LeadingUnderscore;
-		sub _valid_name { 1 }
-		Sub::Protected->import('_valid_name');
-	} 'identifier starting with _ is accepted by import()';
-};
-
-subtest 'POD/code: documented identity of BYPASS or HARNESS_ACTIVE (OR logic)' => sub {
-	plan tests => 2;
-
-	local $ENV{HARNESS_ACTIVE}    = 0;
-	local $Sub::Protected::BYPASS = 0;
-
-	# Confirm stranger IS blocked when both are off (the base case)
-	throws_ok { UT::AttrStranger->new->probe }
-		qr/protected method/,
-		'both bypass mechanisms off: access enforced';
-
-	# Either one alone must be sufficient to bypass
-	{
-		local $Sub::Protected::BYPASS = 1;
-		lives_ok { UT::AttrStranger->new->probe }
-			'BYPASS alone (HARNESS_ACTIVE=0) is sufficient to bypass';
+	if(%ledger) {
+		fail('untested POD conditions: ' . join('; ', sort keys %ledger));
+	} else {
+		pass('every documented message and return state was exercised');
 	}
-};
-
-# ===================================================================
-# SECTION 11: import() with undef sub name
-#
-# Regression test for the bug where undef bypassed validate_strict and
-# reached _process_one, producing "is not defined" instead of the
-# documented "is not a valid Perl identifier" message.
-# ===================================================================
-
-subtest 'import(): undef sub name is rejected with documented error' => sub {
-	plan tests => 1;
-
-	# Must croak with the identifier-validation message, not a downstream error.
-	throws_ok { Sub::Protected->import(undef) }
-		qr/is not a valid Perl identifier/,
-		'import(undef) croaks with "not a valid Perl identifier"';
 };
 
 done_testing;

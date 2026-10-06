@@ -22,6 +22,7 @@ t/06.pipeline.t
 t/07.coverage.t
 t/08.fixes.t
 t/09.fixes.t
+t/10.ignored.signals.t
 t/lib/CaptureStd.pm
 t/lib/NoDoubleQuote.pm
 t/more.coverage.t

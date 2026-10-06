@@ -37,6 +37,7 @@ sub _resolve_font {
             family      => $overrides->{family}       // $base->family,
             bold        => $overrides->{bold}         // $base->bold,
             italic      => $overrides->{italic}       // $base->italic,
+            registry    => $base->registry,
         );
         my $lh = PDF::Make::Builder::Font->resolve_line_height($base, $overrides);
         $init{line_height} = $lh if defined $lh;
@@ -122,6 +123,7 @@ sub _resolve_runs {
             bold        => $run->{bold}        // $base->bold,
             italic      => $run->{italic}      // $base->italic,
             line_height => $run->{line_height} // $base->effective_line_height,
+            registry    => $base->registry,
         );
         my $key = join "\0", map { defined $spec{$_} ? $spec{$_} : '' }
                              qw(colour size family bold italic line_height);
@@ -296,11 +298,12 @@ sub add {
             }
         }
 
+        my $show = $font->show_op;
         $canvas->BT
                ->rg($cr, $cg, $cb)
                ->Tf($res_name, $font_size)
                ->Tm(1, 0, 0, 1, $tx, $baseline_y)
-               ->Tj($line_text)
+               ->$show($font->encode($line_text))
                ->ET;
 
         $cy -= $lh;
@@ -410,10 +413,11 @@ sub _add_runs {
             my $key  = "$font";
             my $res  = $ensured{$key} ||= $font->ensure_loaded($page->xs_page);
             my ($r, $g, $b) = $font->hex_to_rgb($font->colour);
+            my $show = $font->show_op;
             $canvas->rg($r, $g, $b)
                    ->Tf($res, $font->size)
                    ->Tm(1, 0, 0, 1, $tx, $baseline_y)
-                   ->Tj($seg->{text});
+                   ->$show($font->encode($seg->{text}));
             $tx += $seg->{w};
         }
         $canvas->ET;

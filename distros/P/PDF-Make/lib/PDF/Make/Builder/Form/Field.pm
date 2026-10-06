@@ -83,11 +83,12 @@ sub add {
             my ($lr, $lg, $lb) = $bfont->hex_to_rgb(label_colour $self);
             $bfont->ensure_loaded($page->xs_page);
             my $res = $bfont->resource_name;
+            my $tj = $bfont->show_op;
             $canvas->BT
                 ->Tf($res, $lsize)
                 ->rg($lr, $lg, $lb)
                 ->Td($fx + $fw + 8, $fy + ($fh - $lsize) / 2 + 1)
-                ->Tj($lbl)
+                ->$tj($bfont->encode($lbl))
                 ->ET;
         }
 
@@ -114,11 +115,12 @@ sub add {
             my $res = $bfont->resource_name;
             my $req_marker = ($self->required) ? ' *' : '';
             my $label_y = $page->cursor_y - $lsize;
+            my $tj = $bfont->show_op;
             $canvas->BT
                 ->Tf($res, $lsize)
                 ->rg($lr, $lg, $lb)
                 ->Td($fx, $label_y)
-                ->Tj($lbl . $req_marker)
+                ->$tj($bfont->encode($lbl . $req_marker))
                 ->ET;
             $page->advance_y($lsize + 3);
         }

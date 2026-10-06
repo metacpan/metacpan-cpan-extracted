@@ -55,7 +55,9 @@ use IO::Prompter [
 #    black     => [qw< charcoal ebon ebony jet obsidian onyx raven sable slate >],
 #    white     => [qw< alabaster ash chalk ivory milk pearl silver argent >],
 
-# TODO: check whether IF/ELSE directives are needed in template pour tax_ args
+# TODO: check whether all IF/ELSE directives are needed in template pour tax_ args
+# TODO: check if ali_* options are needed when aligner_mode=off
+# TODO: check tax_* options that should be present when megan etc is on
 
 # define config file template
 my $tt_str = <<'EOT';
@@ -604,6 +606,9 @@ if ( $ARGV{'--wizard'} ) {
                 $tax_filter = prompt "\nIs a taxonomic filter needed?", -menu => { Yes => 1, no => 0 };
 
                 if ($tax_filter) {
+
+                    $ARGV{'--tax_dir'} = prompt4dir("\nEnter path to taxdump directory: ");
+
                     $tf_auto = prompt "\nSet tax filter input: ",
                         -menu =>  { 'from org mapper file' => 0,
                                     "from NCBI's taxonomy - auto + prompt for missing" => 1,
@@ -629,7 +634,9 @@ if ( $ARGV{'--wizard'} ) {
         if ($ARGV{'--run_mode'} eq 'metagenomic' || $tax_filter) {
 
             # TAX DIR
-            $ARGV{'--tax_dir'} = prompt4dir("\nEnter path to taxdump directory: ");
+            unless ( $ARGV{'--tax_dir'} ) {
+                $ARGV{'--tax_dir'} = prompt4dir("\nEnter path to taxdump directory: ");
+            }
 
             my $tax_aff = prompt "\nChoose taxonomic affiliation mode: ",
                 -menu => { 'megan-like' => '--megan_like', 'best-hit' => '--best_hit' },
@@ -850,8 +857,8 @@ sub build_org_n_tax_filter_for {
                             if $tf_auto;
 
         $org_for{$bank} = $org;
-        $tax_filter_for{$bank} = "tax_filter: [ $tax_filters ] # $lineage"
-            if defined $tax_filters;
+        $tax_filter_for{$bank} = "tax_filter: [ $tax_filters ]"
+            . ( $lineage ? " # $lineage" : q{} ) if defined $tax_filters;
     }
 
     return \%org_for, \%tax_filter_for;
@@ -975,7 +982,7 @@ yaml-generator-42.pl - Interactive or batch generator for 42 YAML config files
 
 =head1 VERSION
 
-version 0.213470
+version 0.262780
 
 =head1 USAGE
 

@@ -1,13 +1,13 @@
 %PDF-2.0
 %‚„œ”
 1 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
 endobj
 2 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
 endobj
 3 0 obj
-<</Length 475>>
+<</Length 448>>
 stream
 BT
 0 0 0 rg
@@ -32,7 +32,7 @@ q
 20 641 200 24 re
 f
 0.75 w
-0.666666666666666 0.666666666666666 0.666666666666666 RG
+0.666667 0.666667 0.666667 RG
 20.25 641.25 199.5 23.5 re
 S
 Q
@@ -46,7 +46,7 @@ ET
 endstream
 endobj
 4 0 obj
-<</Length 626>>
+<</Length 599>>
 stream
 BT
 0 0 0 rg
@@ -71,7 +71,7 @@ q
 20 641 200 24 re
 f
 0.75 w
-0.666666666666666 0.666666666666666 0.666666666666666 RG
+0.666667 0.666667 0.666667 RG
 20.25 641.25 199.5 23.5 re
 S
 Q
@@ -96,7 +96,7 @@ Q
 endstream
 endobj
 5 0 obj
-<</Length 816>>
+<</Length 789>>
 stream
 BT
 0 0 0 rg
@@ -121,7 +121,7 @@ q
 20 641 200 24 re
 f
 0.75 w
-0.666666666666666 0.666666666666666 0.666666666666666 RG
+0.666667 0.666667 0.666667 RG
 20.25 641.25 199.5 23.5 re
 S
 Q
@@ -166,22 +166,22 @@ endobj
 <</Type /Catalog/Pages 6 0 R>>
 endobj
 9 0 obj
-<</Producer (PDF-Make/0.01)/CreationDate (D:20260422083817Z)/ModDate (D:20260422083817Z)>>
+<</Producer (PDF-Make/0.13)/CreationDate (D:20261005214532Z)/ModDate (D:20261005214532Z)>>
 endobj
 xref
 0 10
 0000000000 65535 f 
 0000000015 00000 n 
-0000000083 00000 n 
-0000000151 00000 n 
-0000000675 00000 n 
-0000001350 00000 n 
-0000002215 00000 n 
-0000002268 00000 n 
-0000002400 00000 n 
-0000002446 00000 n 
+0000000081 00000 n 
+0000000147 00000 n 
+0000000644 00000 n 
+0000001292 00000 n 
+0000002130 00000 n 
+0000002183 00000 n 
+0000002315 00000 n 
+0000002361 00000 n 
 trailer
-<</Size 10/Root 8 0 R/Info 9 0 R/ID[<DF1A98A4F9B24C2F7C3CCA83DE5D5CD2><DF1A98A4F9B24C2F7C3CCA83DE5D5CD2>]>>
+<</Size 10/Root 8 0 R/Info 9 0 R/ID[<A68971ECEF85B00B853F82E1E6BEB5EC><A68971ECEF85B00B853F82E1E6BEB5EC>]>>
 startxref
-2552
+2467
 %%EOF

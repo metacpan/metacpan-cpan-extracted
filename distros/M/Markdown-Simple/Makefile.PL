@@ -168,6 +168,13 @@ print "OPTIMIZE: $OPTIMIZE_FLAGS\n";
 my $EXTRA_LDDLFLAGS = defined $ENV{MDS_PGO_LDFLAGS} ? $ENV{MDS_PGO_LDFLAGS} : '';
 print "LDDLFLAGS extras: $EXTRA_LDDLFLAGS\n" if length $EXTRA_LDDLFLAGS;
 
+# Simple.xs lives at the top of the dist, not under lib/, and the build is the
+# plain single-extension one MakeMaker defaults to. An XSMULTI build from
+# lib/Markdown/Simple.xs writes its linker export list to
+# lib/Markdown/Simple.def, while the import-library rule Strawberry adds for
+# MinGW reads $(EXPORT_LIST), which is always $(BASEEXT).def in the top
+# directory - the two names never met and dlltool failed the build after a
+# clean compile and link (CPAN Testers, 5.42 Strawberry).
 my $pkg = ExtUtils::Depends->new('Markdown::Simple', 'Eshu');
 $pkg->set_inc('-Isrc -Iinclude');
 # The runtime C ABI consumers resolve through Markdown::Simple::_abi_ptr.
@@ -177,7 +184,7 @@ $pkg->install('include/mds_abi.h');
 mkdir 'Install' unless -d 'Install';
 $pkg->save_config('Install/Files.pm');
 my %dep_vars = $pkg->get_makefile_vars;
-delete $dep_vars{LDFROM};  # XSMULTI computes LDFROM per-target; don't override
+delete $dep_vars{LDFROM};  # empty, and would clobber MakeMaker's default
 $dep_vars{PM}{'lib/Markdown/Simple.pm'} = '$(INST_LIB)/Markdown/Simple.pm';
 
 my %WriteMakefileArgs = (
@@ -189,7 +196,6 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Markdown/Simple.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
-    XSMULTI => 1,
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
@@ -204,23 +210,19 @@ my %WriteMakefileArgs = (
 	'Eshu'		      => '0.10' 
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Markdown-Simple-* Install/Files.pm' },
+    clean => { FILES => 'Markdown-Simple-* Simple.c Simple.bs Install/Files.pm' },
     # The engine is a unity build: Simple.xs #includes every src/*.c, so the
     # only compilation unit MakeMaker knows about is Simple.xs itself and it
     # never rescans those includes. Without this an edit to src/ leaves the
     # old object in place and `make` reports success having rebuilt nothing.
     depend => {
-        'lib/Markdown/Simple$(OBJ_EXT)' => join(' ',
+        'Simple$(OBJ_EXT)' => join(' ',
             sort(glob('src/*.c'), glob('src/*.h'),
                  glob('src/simd/*.c'), glob('src/simd/*.h'),
                  glob('include/*.h'))),
     },
     %dep_vars,
 );
-# ExtUtils::Depends sets PM explicitly, which causes init_PM to return early
-# without running its File::Find scan — that scan is where XSMULTI discovers
-# XS files under lib/. Supply the mapping directly so EUMM doesn't need to.
-$WriteMakefileArgs{XS} = { 'lib/Markdown/Simple.xs' => 'lib/Markdown/Simple.c' };
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {

@@ -338,6 +338,21 @@ void pdfmake_ttf_mark_glyph(pdfmake_ttf_t *ttf, uint16_t glyph_id);
 pdfmake_err_t pdfmake_ttf_subset(const pdfmake_ttf_t *ttf,
                                   pdfmake_buf_t *out_buf);
 
+/*
+ * Build the /CIDToGIDMap stream for the subset pdfmake_ttf_subset() writes.
+ * CIDs are glyph ids in the original font; the subset renumbers them, so an
+ * embedded subset needs this map rather than /Identity.
+ */
+pdfmake_err_t pdfmake_ttf_subset_cidtogid(const pdfmake_ttf_t *ttf,
+                                          pdfmake_buf_t *out_buf);
+
+/*
+ * PostScript name from the name table (nameID 6), arena-allocated.
+ * Returns NULL if the font has no usable one.
+ */
+const char *pdfmake_ttf_postscript_name(const pdfmake_ttf_t *ttf,
+                                        pdfmake_arena_t *arena);
+
 /*============================================================================
  * API - ToUnicode CMap
  *==========================================================================*/

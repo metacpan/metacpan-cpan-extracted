@@ -47,7 +47,7 @@ use PDF::Make::Signature;
 use PDF::Make::Structure;
 use PDF::Make::Watermark;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 BEGIN {
     Object::Proto::define('PDF::Make::Builder',
@@ -76,6 +76,7 @@ BEGIN {
         '_sanitize_pending:Bool:default(0)',
         '_finalised:Bool:default(0)',
         '_signed_cache:Any',
+        '_ttf_fonts:HashRef:default({})',
     );
     Object::Proto::import_accessors('PDF::Make::Builder');
 }
@@ -93,6 +94,7 @@ sub BUILD {
         family => $font_args->{family} // 'Helvetica',
     );
     $font_init{line_height} = $font_args->{line_height} if defined $font_args->{line_height};
+    $font_init{registry} = _ttf_fonts $self;
     font $self, PDF::Make::Builder::Font->new(%font_init);
 
     # Store header/footer config for new pages
@@ -291,6 +293,7 @@ sub remove_page_header_and_footer {
 
 sub load_font {
     my ($self, %args) = @_;
+    $args{registry} = _ttf_fonts $self unless exists $args{registry};
     font $self, PDF::Make::Builder::Font->new(%args);
     return $self;
 }
@@ -872,12 +875,13 @@ sub mark_redaction {
         my $tx = $x0 + ($w - $tw) / 2;
         $tx = $x0 + 4 if $tw > $w - 4;
         my $ty = $y0 + ($h - $size) / 2 + 1;
+        my $show = $font->show_op;
         $canvas->q
                ->BT
                ->rg($tr, $tg, $tb)
                ->Tf($res, $size)
                ->Tm(1, 0, 0, 1, $tx, $ty)
-               ->Tj($text)
+               ->$show($font->encode($text))
                ->ET
                ->Q;
     }
@@ -935,12 +939,13 @@ sub _rewrite_redacted_canvas_bytes {
         my $tx = $x0 + ($w - $tw) / 2;
         $tx = $x0 + 4 if $tw > $w - 4;
         my $ty = $y0 + ($h - $size) / 2 + 1;
+        my $show = $font->show_op;
         $overlay_canvas->q
                        ->BT
                        ->rg($tr, $tg, $tb)
                        ->Tf($res, $size)
                        ->Tm(1, 0, 0, 1, $tx, $ty)
-                       ->Tj($text)
+                       ->$show($font->encode($text))
                        ->ET
                        ->Q;
     }
@@ -1168,6 +1173,10 @@ sub _finalise_once {
             : $bp->canvas->to_bytes;
         $bp->xs_page->set_content($bytes);
     }
+
+    # Every content stream is committed, so the set of glyphs each loaded TTF
+    # has to embed is now final.
+    $self->_finalise_embedded_fonts;
 
     if (_sanitize_pending $self) {
         PDF::Make::Redaction->sanitize(doc $self);
@@ -1524,17 +1533,50 @@ sub rotate_page {
 
 sub load_ttf {
     my ($self, $path, %args) = @_;
-    my $font_obj = PDF::Make::Font->from_file($path);
-    my $doc = doc $self;
-    my $obj_num = $font_obj->write_to_doc($doc);
+    die "PDF::Make::Builder::load_ttf: '$path' not found" unless -f $path;
 
-    my $name = $args{name} // 'TT' . $obj_num;
-    my $cur = page $self;
-    if ($cur) {
-        $cur->xs_page->add_font($name, $font_obj->base_font);
+    my $font_obj = PDF::Make::Font->from_file($path);
+
+    # The family name callers select the font by. Defaults to the font's own
+    # PostScript name so load_ttf($path) alone is usable.
+    my $name = $args{name} // $args{family} // $font_obj->base_font;
+    die "PDF::Make::Builder::load_ttf: cannot name the font in '$path', "
+      . "pass name => '...'" unless defined $name && length $name;
+
+    my $reg = _ttf_fonts $self;
+    if (my $have = $reg->{$name}) {
+        return $self if $have->{path} eq $path;
+        die "PDF::Make::Builder::load_ttf: '$name' is already loaded from "
+          . "'$have->{path}'";
     }
 
+    # Deliberately not written to the document here. The embedded font is a
+    # subset of the glyphs actually drawn, and none have been drawn yet;
+    # _finalise_embedded_fonts writes it once the content streams are done.
+    $reg->{$name} = { font => $font_obj, path => $path, pages => [], obj => 0 };
+    _ttf_fonts $self, $reg;
+
     return $self;
+}
+
+# Write each loaded TTF to the document and attach it to every page that used
+# it. Runs during _finalise, after all text is drawn, because the subset is
+# built from the glyphs the content streams actually reference.
+sub _finalise_embedded_fonts {
+    my ($self) = @_;
+    my $reg = _ttf_fonts $self;
+    return unless $reg && %$reg;
+    my $doc = doc $self;
+
+    for my $name (sort keys %$reg) {
+        my $entry = $reg->{$name};
+        next unless @{ $entry->{pages} };     # loaded but never drawn with
+        $entry->{obj} ||= $entry->{font}->write_to_doc($doc);
+        for my $xs_page (@{ $entry->{pages} }) {
+            $xs_page->add_font_ref("F_$name", $entry->{obj});
+        }
+    }
+    return;
 }
 
 1;
@@ -1772,9 +1814,31 @@ Set the default font for subsequent text operations.
 
 =head3 load_ttf($path, %args)
 
-    $b->load_ttf('fonts/MyFont.ttf', name => 'MF1');
+    $b->load_ttf('fonts/MyFont.ttf', name => 'MyFont');
+    $b->add_text(text => 'Set in MyFont', font => { family => 'MyFont' });
 
-Load a TrueType font file and register it in the document.
+Load a TrueType font file and make it available as a font family, alongside
+the Standard 14 ones. C<name> is the family name you then pass as
+C<< font => { family => ... } >>; it defaults to the font's own PostScript
+name, so C<< $b->load_ttf($path) >> on its own is usable.
+
+The font is embedded in the saved document as a subset: only the glyphs
+actually drawn with it are included, and a C</ToUnicode> map is written so the
+text still extracts and searches as text. Measurement uses the font's own
+C<hmtx> advances, so wrapping and alignment match what is drawn.
+
+One file is one face. A loaded family has no bold or italic variants to
+synthesise, so C<< bold => 1 >> against it draws the face as supplied; load
+the bold file under its own name if you need both.
+
+Loading the same name twice from the same path is a no-op; from a different
+path it is an error.
+
+=head3 Embedded fonts and save()
+
+Nothing is written to the document until C<save()> (or C<to_bytes>), because
+the subset is built from the glyphs the finished content streams reference. A
+font that is loaded but never drawn with is not embedded at all.
 
 =head2 Table of Contents
 

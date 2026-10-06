@@ -10,14 +10,14 @@ local $ENV{HARNESS_ACTIVE}    = 0;
 local $Sub::Protected::BYPASS = 0;
 
 {
-    package CIFoo;
-    use Sub::Protected;
+	package CIFoo;
+	use Sub::Protected;
 
-    my @captured;
-    sub new            { bless {}, shift }
-    sub _capture       :Protected { @captured = (caller(0))[0..2]; 1 }
-    sub invoke_capture { (shift)->_capture }
-    sub get_captured   { @captured }
+	my @captured;
+	sub new            { bless {}, shift }
+	sub _capture       :Protected { @captured = (caller(0))[0..2]; 1 }
+	sub invoke_capture { (shift)->_capture }
+	sub get_captured   { @captured }
 }
 
 my $obj = CIFoo->new;

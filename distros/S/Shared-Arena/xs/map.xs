@@ -179,7 +179,12 @@ sam_exists(self, key)
     OUTPUT:
         RETVAL
 
-int
+# 1 if the key was there and is now gone, 0 if it was not there, and UNDEF if
+# another process held the stripe through the whole wait - which is "try
+# again", not "it was not there". A caller that deletes in order to rely on the
+# key being gone has to tell those apart; one that deletes speculatively can go
+# on ignoring the answer, since 0 and undef are both false.
+SV *
 sam_delete(self, key)
         SV *self
         SV *key
@@ -187,11 +192,14 @@ sam_delete(self, key)
         sa_hash *m;
         const char *k;
         STRLEN klen;
+        int rc;
     CODE:
         m = SA_SELF(sa_hash, self);
         if (!m) croak("Shared::Arena::Map: this map is released");
         k = SvPV(key, klen);
-        RETVAL = sa_hash_delete(m, k, (uint32_t)klen);
+        rc = sa_hash_delete(m, k, (uint32_t)klen);
+        if (rc == SA_H_WBUSY) XSRETURN_UNDEF;
+        RETVAL = newSViv((IV)rc);
     OUTPUT:
         RETVAL
 

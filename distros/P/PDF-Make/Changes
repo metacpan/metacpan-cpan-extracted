@@ -1,5 +1,29 @@
 Revision history for PDF::Make
 
+0.15  2026-10-06
+     - Fix: SOURCE_DATE_EPOCH was ignored on Windows. 
+
+0.14  2026-10-05
+     - Fix: Font rendering incorrect family
+     - Fix: pdfmake_font_write was a stub, a TTF carried no /BaseFont, and
+       pdfmake_page_add_font rejects anything but a Standard 14 name.
+       TrueType fonts now embed as a subsetted /Type0 font with Identity-H
+       encoding, a /CIDToGIDMap stream and a /ToUnicode CMap, and a loaded
+       font is usable as a font family. Reported by ULIBUCK.
+     - Fix: PDF::Make::Font->from_file and from_bytes kept a pointer into a
+       buffer they then released. Every cmap lookup, advance and subset read
+       freed memory; it returned correct answers until the allocator reused
+       the block, then glyph 0 for everything.
+     - Fix: a single-column page with a large heading could be split by a
+       phantom column gutter, reordering and splitting extracted words.
+       A gutter now has to have text on both sides of it on more than one
+       line.
+     - Fix: Make.c did not depend on the xs/*.xs files Make.xs includes, so
+       an edit to an XSUB rebuilt and relinked without taking effect.
+     - New: PDF::Make::Page->add_font_ref, to name an existing font object
+       in a page's resources.
+     - New: PDF::Make::Canvas->Tj_hex, for composite-font glyph strings.
+
 0.13  2026-08-31
      - Fix: the backward scan for startxref compared the keyword from
        positions where fewer than nine bytes remained, reading past the end

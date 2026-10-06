@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::OrgProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::OrgProcessor::VERSION = '0.213470';
+$Bio::MUST::Apps::FortyTwo::OrgProcessor::VERSION = '0.262780';
 use Moose;
 use namespace::autoclean;
 
@@ -389,8 +389,9 @@ sub _build_aligned_seqs {               ## no critic (ProhibitExcessComplexity)
 
             # fetch template full_id
             my $template_id = SeqId->new(
-                full_id => $blastdb->long_id_for($template->def)
-            );
+                full_id => $blastdb->long_id_for( $template->def )
+                        // $blastdb->long_id_for( $template->id  )
+            );          # workaround to accommodate change in BLAST XML report
 
             # optionally skip template if from same org as the orthologue
             if ($rp->ali_skip_self eq 'on') {
@@ -642,8 +643,8 @@ sub _fetch_tax_line_for_transcript {
     }
 
     # check for contamination if tol_check in use
-    if ($rp->tol_blastdb ) {
-        my  $tol_score = $self->tol_score_for($transcript_acc)  // 0;
+    if ($rp->tol_blastdb) {
+        my  $tol_score = $self->tol_score_for($transcript_acc) // 0;
         if ($tol_score  > $temp_score) {
             ###### [ORG] rejected due to TOL check: "$tol_score > $temp_score"
             return;
@@ -655,9 +656,10 @@ sub _fetch_tax_line_for_transcript {
     #        ... and for assessing template taxonomy (all)
     my $blastdb = $self->ali_proc->blastdb;
     my @templates = $orthologue->all_hits;
-    my @template_ids = map {
-        SeqId->new( full_id => $blastdb->long_id_for( $_->def ) )
-    } @templates;
+    my @template_ids = map { SeqId->new(
+        full_id => $blastdb->long_id_for( $_->def )
+                // $blastdb->long_id_for( $_->id  )
+    ) } @templates;     # workaround to accommodate change in BLAST XML report
 
     # set family to first template family (if any)
     my $family = $template_ids[0]->family // q{};
@@ -871,7 +873,7 @@ Bio::MUST::Apps::FortyTwo::OrgProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.213470
+version 0.262780
 
 =head1 AUTHOR
 

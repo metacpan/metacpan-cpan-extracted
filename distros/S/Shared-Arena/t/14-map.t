@@ -70,8 +70,14 @@ my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
     my %s = $map->stats;
     is($s{used}, 10, 'ten entries');
 
+    # 1 deleted, 0 was-not-there, and undef refused - three answers, because a
+    # caller that deletes in order to RELY on the key being gone has to tell a
+    # refusal from an absence. Both falsehoods, so a speculative delete can go
+    # on ignoring the answer; `defined` is what separates them.
     is($map->delete('k5'), 1, 'deleted one from the middle');
-    is($map->delete('k5'), 0, 'and deleting it again says nothing was there');
+    my $again = $map->delete('k5');
+    ok(defined $again, 'a second delete answered rather than being refused');
+    is($again, 0, 'and deleting it again says nothing was there');
     is_deeply([$map->fetch('k5')], [], 'it is gone');
 
     # Every other key must still be findable. If a delete had left a hole in a
@@ -160,15 +166,42 @@ SKIP: {
             $map->store("child$kid", $seen);
             # Every child counts the same key. If the counter were not atomic
             # across processes, the total would come out short.
-            $map->incr('total') for 1 .. $EACH;
-            POSIX::_exit(0);
+            #
+            # AND AN INCREMENT THAT WAS REFUSED IS NOT ONE THAT LANDED. incr
+            # answers undef when it could not write, and a test that throws
+            # that away cannot tell "the counter lost an update" from "the
+            # counter was never asked". An Alpine smoker read 999 of these
+            # thousand: four children on one stripe, a holder descheduled, and
+            # the waiter abandoning its write after burning its spin budget.
+            #
+            # SO IT RETRIES, rather than asserting that no refusal happened.
+            # "Nothing was refused" is a claim about the scheduler, and this
+            # file has no business making one: a box running a dozen builds can
+            # park the holder for longer than any wait worth having, and a test
+            # that calls that a bug reports the smoker rather than the map.
+            # Retrying makes the total exact on any box, and a refusal that
+            # outlasts the retries still shows up - in the exit status, and in
+            # a total that cannot then add up.
+            my $retried = 0;
+            for (1 .. $EACH) {
+                my $try = 0;
+                $retried++, $try++ while !defined($map->incr('total'))
+                                     && $try < 1000;
+            }
+            POSIX::_exit($retried > 254 ? 254 : $retried);
         }
         push @pids, $pid;
     }
-    waitpid $_, 0 for @pids;
+    my $retried = 0;
+    for (@pids) { waitpid $_, 0; $retried += ($? >> 8) }
 
     is(($map->fetch("child$_"))[0], 'before the fork',
        "child $_ read what the parent stored") for 1 .. $KIDS;
+
+    note "increments that had to be retried: $retried" if $retried;
+
+    my %s = $map->stats;
+    is($s{full}, 0, 'nothing was refused as "full": the table had room');
 
     is($map->counter('total'), $KIDS * $EACH,
        "every one of the @{[ $KIDS * $EACH ]} increments from $KIDS processes "

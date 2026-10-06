@@ -5,7 +5,7 @@ requires 'perl', '5.10.0';
 requires 'Carp';
 requires 'Config::Auto';
 requires 'Config::IniFiles';
-requires 'CryptX';
+requires 'CryptX', '0.062';   # 0.049 fixed GCM encrypt failures (empty string; no AAD); 0.062 fixed GCM tag verification
 requires 'File::Basename';
 requires 'File::Slurp';
 requires 'File::Spec';
@@ -38,10 +38,12 @@ on 'test' => sub {
 	requires 'Test::Mockingbird', '0.12';
 	requires 'Test::Most';
 	requires 'Test::Needs';
+	requires 'Test::Permissions';
 	requires 'Test::Returns', '0.03';
 	requires 'Test::TempDir::Tiny';
 	requires 'Test::Without::Module';
 	requires 'autodie';
+	recommends 'Test::Permissions';   # probes whether chmod can revoke read access; t/extended_tests.t falls back to -r
 };
 
 on 'develop' => sub {

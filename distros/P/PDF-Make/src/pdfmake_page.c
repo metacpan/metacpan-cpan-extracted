@@ -3,6 +3,7 @@
  */
 
 #include "pdfmake_page.h"
+#include "pdfmake_font.h"
 #include "pdfmake_ocg.h"
 #include "pdfmake_attach.h"
 #include "pdfmake_tag.h"
@@ -33,6 +34,29 @@ static const char *std14_names[] = {
     "Symbol",
     "ZapfDingbats"
 };
+
+/* std14_names is indexed by pdfmake_std14_font_t (pdfmake_page.h), while the XS
+ * layer hands Perl the parallel pdfmake_std14_id_t (pdfmake_font.h). Two enums
+ * over one table: if they ever disagree, a caller naming one font gets another
+ * and nothing complains. Fail the build on the spot instead. */
+typedef char pdfmake_std14_enums_agree[
+    (PDFMAKE_STD14_HELVETICA          == (int)PDFMAKE_FONT_HELVETICA &&
+     PDFMAKE_STD14_HELVETICA_BOLD     == (int)PDFMAKE_FONT_HELVETICA_BOLD &&
+     PDFMAKE_STD14_HELVETICA_OBLIQUE  == (int)PDFMAKE_FONT_HELVETICA_OBLIQUE &&
+     PDFMAKE_STD14_HELVETICA_BOLDOBLIQUE == (int)PDFMAKE_FONT_HELVETICA_BOLD_OBLIQUE &&
+     PDFMAKE_STD14_TIMES_ROMAN        == (int)PDFMAKE_FONT_TIMES_ROMAN &&
+     PDFMAKE_STD14_TIMES_BOLD         == (int)PDFMAKE_FONT_TIMES_BOLD &&
+     PDFMAKE_STD14_TIMES_ITALIC       == (int)PDFMAKE_FONT_TIMES_ITALIC &&
+     PDFMAKE_STD14_TIMES_BOLDITALIC   == (int)PDFMAKE_FONT_TIMES_BOLD_ITALIC &&
+     PDFMAKE_STD14_COURIER            == (int)PDFMAKE_FONT_COURIER &&
+     PDFMAKE_STD14_COURIER_BOLD       == (int)PDFMAKE_FONT_COURIER_BOLD &&
+     PDFMAKE_STD14_COURIER_OBLIQUE    == (int)PDFMAKE_FONT_COURIER_OBLIQUE &&
+     PDFMAKE_STD14_COURIER_BOLDOBLIQUE == (int)PDFMAKE_FONT_COURIER_BOLD_OBLIQUE &&
+     PDFMAKE_STD14_SYMBOL             == (int)PDFMAKE_FONT_SYMBOL &&
+     PDFMAKE_STD14_ZAPFDINGBATS       == (int)PDFMAKE_FONT_ZAPF_DINGBATS &&
+     PDFMAKE_STD14_COUNT              == (int)PDFMAKE_FONT_COUNT &&
+     (int)PDFMAKE_FONT_COUNT == (int)(sizeof(std14_names) / sizeof(std14_names[0])))
+    ? 1 : -1];
 
 const char *pdfmake_std14_name(pdfmake_std14_font_t font) {
     if (font < 0 || font >= PDFMAKE_FONT_COUNT) return NULL;
@@ -168,6 +192,34 @@ uint32_t pdfmake_page_add_std14_font(pdfmake_page_t *page,
     const char *base_font = pdfmake_std14_name(font);
     if (!base_font) return 0;
     return pdfmake_page_add_font(page, name, base_font);
+}
+
+uint32_t pdfmake_page_add_font_ref(pdfmake_page_t *page,
+                                   const char *name,
+                                   uint32_t font_obj_num) {
+    pdfmake_font_entry_t *entry;
+    size_t i;
+
+    if (!page || !name || font_obj_num == 0) return 0;
+
+    /* Re-pointing a name that is already on the page is how a font written
+     * once and used on several pages gets registered; adding a second entry
+     * would emit a duplicate key. */
+    for (i = 0; i < page->font_count; i++) {
+        if (strcmp(page->fonts[i].name, name) == 0) {
+            page->fonts[i].font_num = font_obj_num;
+            return font_obj_num;
+        }
+    }
+
+    if (page->font_count >= PDFMAKE_MAX_PAGE_FONTS) return 0;
+
+    entry = &page->fonts[page->font_count++];
+    strncpy(entry->name, name, sizeof(entry->name) - 1);
+    entry->name[sizeof(entry->name) - 1] = '\0';
+    entry->font_num = font_obj_num;
+
+    return font_obj_num;
 }
 
 int pdfmake_page_add_extgstate(pdfmake_page_t *page,

@@ -10,6 +10,7 @@ input: undef
 output:
   type: string
   min: 2
+  optional: true
 
 config:
   test_undef: no

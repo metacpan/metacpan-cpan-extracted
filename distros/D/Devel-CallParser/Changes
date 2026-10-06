@@ -1,3 +1,6 @@
+version 0.006 2026-10-05
+  * Fix MANIFEST
+
 version 0.005 2026-09-21
   * restore the pad name list as well as the pad when a keyword is declined
     on ithreads perls: the first "my" of a block opened right after a declined

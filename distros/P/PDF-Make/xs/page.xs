@@ -25,6 +25,18 @@ add_std14_font(self, name, font_id)
     OUTPUT:
         RETVAL
 
+UV
+add_font_ref(self, name, font_obj_num)
+    pdfmake_page_t *self
+    const char *name
+    UV font_obj_num
+    CODE:
+        RETVAL = pdfmake_page_add_font_ref(self, name, (uint32_t)font_obj_num);
+        if (RETVAL == 0)
+            croak("PDF::Make::Page::add_font_ref: failed to add font reference");
+    OUTPUT:
+        RETVAL
+
 void
 set_content(self, content)
     pdfmake_page_t *self

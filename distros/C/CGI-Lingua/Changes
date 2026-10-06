@@ -1,5 +1,14 @@
 Revision history for CGI-Lingua
 
+0.86	Mon Oct  5 02:32:02 PM EDT 2026
+	[ Bug Fixes ]
+	- t/mutant_killers.t: time_zone() local-mode test failed on FreeBSD, which has
+	  no /etc/timezone and whose /etc/localtime is usually a copied file (or
+	  absent), so DateTime::TimeZone::Local could not determine the zone with TZ
+	  cleared; the test now sets TZ and skips when neither /etc/timezone nor
+	  DateTime::TimeZone is available
+	  https://www.cpantesters.org/cpan/report/85ba554c-c0bf-11f1-950c-e24a3782e095
+
 0.85	Thu Aug 27 11:35:33 AM EDT 2026
 	[ Bug Fixes ]
 	- Data::Validate::IP and NetAddr::IP moved from required to recommended;

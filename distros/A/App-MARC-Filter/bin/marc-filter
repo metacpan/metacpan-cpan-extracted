@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::Filter;
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 # Run.
 exit App::MARC::Filter->new->run;
@@ -151,7 +151,7 @@ L<https://github.com/michal-josef-spacek/App-MARC-Filter>
 
 =head1 AUTHOR
 
-Michal Josef Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:michal.josef.spacek@gmail.com>
 
 L<http://skim.cz>
 
@@ -170,6 +170,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

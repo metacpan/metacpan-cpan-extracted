@@ -37,29 +37,13 @@ my $contract = '';
     }
 }
 
-my $fpmath = '';
-if ($Config{cc} !~ /\bcl(?:\.exe)?\z/i) {
-    my $dir = File::Temp::tempdir(CLEANUP => 1);
-    my $src = File::Spec->catfile($dir, 'eval.c');
-    my $obj = File::Spec->catfile($dir, 'eval.o');
-    my $exe = File::Spec->catfile($dir, "eval$Config{_exe}");
-    open my $fh, '>', $src or die "$src: $!";
-    print {$fh} <<'C';
-#include <float.h>
-#if defined(FLT_EVAL_METHOD) && FLT_EVAL_METHOD != 0
-#error a double is evaluated wider than a double
-#endif
-int main(void) { volatile double a = 1.5, b = 2; return a * b == 3 ? 0 : 1; }
-C
-    close $fh;
-    my $null = File::Spec->devnull;
-    my $sse = ' -mfpmath=sse -msse2';
-    if (system("$Config{cc} -c -o $obj $src >$null 2>&1") != 0
-        && system("$Config{cc}$sse -o $exe $src >$null 2>&1") == 0
-        && system("$exe >$null 2>&1") == 0) {
-        $fpmath = $sse;
-    }
-}
+# No -mfpmath=sse -msse2 here, though it would give an x87 build the honest
+# doubles the recorded fixtures want. Balls.c includes perl.h and hands NVs to
+# and from libperl, and on a 32-bit perl whose NV is __float128 those flags
+# change how a 16-byte float is passed; libperl is built without them, so the
+# two sides of newSVnv disagree and the process dies. A build that evaluates
+# wider than a double reports it through float_eval_method instead, and the
+# tests that compare against recorded doubles skip on anything but 0.
 
 my %WriteMakefileArgs = (
     NAME             => 'Physics::Balls',
@@ -86,7 +70,7 @@ my %WriteMakefileArgs = (
     C      => [ 'Balls.c', 'pb_engine.c' ],
     OBJECT => 'Balls$(OBJ_EXT) pb_engine$(OBJ_EXT)',
     INC    => '-I. -Iinclude',
-    CCFLAGS => "$Config{ccflags}$contract$fpmath",
+    CCFLAGS => "$Config{ccflags}$contract",
     depend => {
         'Balls$(OBJ_EXT)'     => 'include/pb_abi.h',
         'pb_engine$(OBJ_EXT)' => 'include/pb_abi.h',

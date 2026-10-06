@@ -375,6 +375,8 @@ t/89-annot-extract.t
 t/90-vertical-writing.t
 t/91-tables.t
 t/92-diff-report.t
+t/93-std14-basefont.t
+t/94-ttf-embed.t
 t/99-leaks.t
 t/fixtures/README.md
 t/fixtures/attachments.pdf

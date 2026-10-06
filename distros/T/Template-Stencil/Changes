@@ -1,5 +1,17 @@
 Revision history for Template-Stencil
 
+0.13    2026-10-06
+        - NetBSD never compiled: <strings.h> declares popcount64(), so the
+          static helper of that name in src/stencil_escape.c was a static
+          declaration following a non-static one. Renamed
+          stencil_popcount64.
+        - t/11 sized its timing rounds by a fixed iteration count, which on
+          a FreeBSD smoker left the small round below what the clock could
+          resolve and turned the quotient of two rounding errors into a
+          59.3x scaling failure. Both rounds now grow until they span
+          enough ticks to be worth dividing, and skip if the clock cannot
+          get there.
+
 0.12    2026-08-24
         - Windows. MSVC never linked: the src/ objects were compiled with
           -o, which cl ignores (it writes x.obj into the top directory), so

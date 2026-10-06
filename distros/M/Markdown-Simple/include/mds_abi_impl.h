@@ -2,7 +2,7 @@
 #define MDS_ABI_IMPL_H
 
 /* Markdown::Simple-side implementation of the shared C ABI (mds_abi.h).
- * Included by Markdown/Simple.xs AFTER mds_session_mg_vtbl, mds_flags_from_hv
+ * Included by Simple.xs AFTER mds_session_mg_vtbl, mds_flags_from_hv
  * and strip_markdown_except_lists_tables are in scope, since the session hangs
  * off the object as ext magic and the wrappers below reach the parser through
  * those file-statics. The engine is a unity build, so everything here shares a

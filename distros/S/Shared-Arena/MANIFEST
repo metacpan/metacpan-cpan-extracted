@@ -102,6 +102,7 @@ xs/scoreboard.xs
 xs/xop.xs
 xt/boilerplate.t
 xt/implicit-sys.t
+xt/map-contention.t
 xt/rate-pool.t
 xt/typedef-guards.t
 xt/win32-fork.t

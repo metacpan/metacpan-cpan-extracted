@@ -84,6 +84,46 @@ subtest '_build_args configs boolean rendering' => sub {
     my ($flag_vec) = grep {/^--configs=/} @vec;
     is $flag_vec, '--configs=legacy=1,mode=debug', 'non-boolean config values pass through unchanged';
 };
+subtest '_package_file is only generated for a system install' => sub {
+
+    # Without `system`, an install must stay on the bare-spec path: xrepo's shim forces
+    # system=false there, which is what keeps an isolated/pinned install inside its own store.
+    ok !scalar $repo->_package_file( 'zlib', {} ), 'no package file without system';
+
+    # With it, the install is driven through a package file so our own add_requires decides system.
+    my $file = $repo->_package_file( 'libsdl3_ttf 3.2.2', { system => 1, kind => 'shared' } );
+    ok defined $file && -f $file, 'package file is created';
+    like $file, qr/xrepo\.lua$/, 'package file has a .lua name (the shim keys off the suffix)';
+    my $body = path($file)->slurp_utf8;
+    like $body, qr/^add_requires\("libsdl3_ttf 3\.2\.2"\)$/m,                              'add_requires carries the versioned spec verbatim';
+    like $body, qr/^add_requireconfs\("libsdl3_ttf", \{configs = \{shared = true\}\}\)$/m, 'kind folds into configs';
+
+    # The whole point: no `system` option. `system = true` means system-only in xmake and would
+    # fail outright instead of falling back to a source build; leaving it unset means "prefer the
+    # system, else build", which is what makes add_extsources() reachable again.
+    unlike $body, qr/system/, 'no system option at all: prefer-system-then-build, not system-only';
+
+    # configs and kind both land in add_requireconfs rather than --configs, which the shim ignores
+    # once it has a package file.
+    my $f2 = $repo->_package_file( 'zlib', { system => 1, kind => 'shared', configs => { vs_runtime => 'MD', wsa => false, plain => 1 }, } );
+    my $b2 = path($f2)->slurp_utf8;
+    like $b2, qr/shared = true/,     'shared from kind';
+    like $b2, qr/vs_runtime = "MD"/, 'string config is quoted as a Lua string';
+    like $b2, qr/wsa = false/,       'built-in false renders as Lua false';
+    like $b2, qr/plain = 1/,         'numeric 1 config renders as a Lua number, like --configs does';
+    my $f3 = $repo->_package_file( 'zlib', { system => 1, kind => 'static' } );
+    like path($f3)->slurp_utf8, qr/shared = false/, 'kind => static pins shared = false';
+
+    # no_kind suppresses the shared choice, as it does for -k.
+    my $f4 = $repo->_package_file( 'zlib', { system => 1, kind => 'shared', no_kind => 1 } );
+    unlike path($f4)->slurp_utf8, qr/shared/, 'no_kind omits the shared config entirely';
+};
+subtest '_cache_key separates system from private installs' => sub {
+    my $plain = $repo->_cache_key( 'zlib', { kind => 'shared' } );
+    my $sys   = $repo->_cache_key( 'zlib', { kind => 'shared', system => 1 } );
+    isnt $sys,                                                         $plain, 'a system install never reuses a private-install entry';
+    is $repo->_cache_key( 'zlib', { kind => 'shared', system => 0 } ), $plain, 'system => 0 stays on the private identity';
+};
 subtest '_build_args includes uses the OS path separator' => sub {
 
     # xrepo's install.lua splits `--includes` with path.splitenv and rejoins with

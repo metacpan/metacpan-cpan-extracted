@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Spec;
 
 # Phase-00 guardrail: sv_catpvf is banned in Simple.xs.
 # It is at least 20x slower than sv_catpvn for the same byte work
@@ -9,8 +8,11 @@ use File::Spec;
 # scalar hot spot in the legacy parser. If a future change reintroduces
 # it the suite must fail.
 
-my $xs = File::Spec->catfile('lib', 'Markdown', 'Simple.xs');
-plan skip_all => "$xs not found" unless -f $xs;
+my $xs = 'Simple.xs';
+# The XS is shipped in the MANIFEST, so a missing file is a packaging bug,
+# not a reason to pass: skipping here is how this guardrail would go green
+# the day the file moves again.
+BAIL_OUT("$xs not found") unless -f $xs;
 
 open my $fh, '<', $xs or die "open $xs: $!";
 my @offenders;

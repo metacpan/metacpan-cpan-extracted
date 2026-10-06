@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.5.2 - 2026-10-06
+
+### Fixes
+
+- Raise a database answer missing what the call returns as server_error ([`4013055`](https://github.com/vpndetection-io/sdk-perl/commit/40130559d6313d9582149e5e12e308c3d1c6c4fb))
+
 ## 3.5.1 - 2026-10-04
 
 ### Fixes

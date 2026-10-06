@@ -21,6 +21,7 @@ CLI
 Choroba
 Config
 Copilot
+Dave
 Document
 ExportInspector
 Include
@@ -43,8 +44,10 @@ Peter
 Raspass
 Rodríguez
 Role
+Rolsky
 Sandbox
 Sorter
+autarch
 choroba
 dependabot
 dump

@@ -69,6 +69,7 @@ t/bumpversion.t
 t/changes.t
 t/cli/build.t
 t/cli/clean.t
+t/cli/dist_reproducible.t
 t/cli/dist_skip_prepare.t
 t/cli/prepare.t
 t/cli/regenerate_BuildPL.t
@@ -86,6 +87,7 @@ t/filegatherer.t
 t/filegatherer/submodules-recursive.t
 t/gitignore.t
 t/lib/Util.pm
+t/logger.t
 t/manage_changes.t
 t/migrate/changes.t
 t/migrate/dzil.t
@@ -135,6 +137,7 @@ t/work_dir/_rewrite_pod.t
 t/work_dir/copy.t
 t/work_dir/dist.t
 t/work_dir/release_test.t
+t/work_dir/reproducible_dist.t
 t/work_dir/rewrite_changes.t
 xt/02_perlcritic.t
 META.yml

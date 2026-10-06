@@ -23,5 +23,5 @@ requires:
   ExtUtils::Depends: '0.404'
   XSLoader: '0'
   perl: '5.010000'
-version: '0.05'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

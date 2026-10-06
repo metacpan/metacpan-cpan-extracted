@@ -284,7 +284,7 @@ sub compute_percentage {
 
 # for testing:
 # perl -Ilib bin/debrief-42.pl --indir=xtest/tax_reports/ \
-#   --in-strip=-42-camera-megan99-tf --taxdir=../Bio-MUST-Core/test/taxdump
+#   --in-strip=-42-camera-megan99-tf --taxdir=../Bio-MUST-Core/test/taxdump \
 #   --seq_labeling=xtest/seq-labels.idl --contam_labeling=xtest/contam-labels.idl \
 #   --outdir=dbout
 
@@ -298,7 +298,7 @@ debrief-42.pl - Summarize the results of a 42 metagenomic run
 
 =head1 VERSION
 
-version 0.213470
+version 0.262780
 
 =head1 USAGE
 

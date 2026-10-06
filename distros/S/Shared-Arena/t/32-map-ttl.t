@@ -195,38 +195,82 @@ my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
 # exactly forty, and not forty plus whatever came before.
 
 SKIP: {
-    skip 'fork is POSIX-only here', 2 if $^O eq 'MSWin32';
+    skip 'fork is POSIX-only here', 3 if $^O eq 'MSWin32';
     my $m = $arena->map('pool-win', slots => 64, slot_size => 128);
 
+    # A key per attempt, for the reason the `live` helper gives: these bursts
+    # INCREMENT, so a retry that reused the key would add to what the last
+    # attempt left behind and read as a wrong answer rather than a retry.
+    # A HIT THAT WAS REFUSED IS NOT A HIT, so each one is retried rather than
+    # lost: incr answers undef when another process held the key through the
+    # whole wait, and a burst that discarded that answer would count short on a
+    # loaded box and blame the deadline for it.
     my $burst = sub {
-        my ($n) = @_;
+        my ($key, $n) = @_;
         my @kids;
         for (1 .. 4) {
             my $pid = fork;
             die "fork: $!" unless defined $pid;
-            if (!$pid) { $m->incr('pw', 1, ttl_ms => 100) for 1 .. $n; exit 0 }
+            if (!$pid) {
+                for (1 .. $n) {
+                    my $try = 0;
+                    $try++ while !defined($m->incr($key, 1, ttl_ms => 100))
+                              && $try < 1000;
+                }
+                exit 0;
+            }
             push @kids, $pid;
         }
         waitpid $_, 0 for @kids;
     };
 
-    my $before;
+    # BOTH BURSTS ARE WINDOWS, AND A WINDOW THAT OVERRAN SAYS NOTHING. The
+    # second one used to run unmeasured, and that is what the FreeBSD smoker
+    # caught: forking four children and landing forty hits has to finish inside
+    # the 100ms ttl the hits are being counted inside, or the counter lapses
+    # MID-BURST, resets to one, and the total comes out short by however many
+    # hits preceded the reset. The box read 38 of 40 - a reset two hits in -
+    # and the map was correct every time. So the whole of each burst is timed,
+    # and only a run that fitted is allowed to assert.
+    my ($before, $after, $pre_ok, $post_ok);
     for my $try (1 .. 5) {
-        my $t0 = Time::HiRes::time();
-        $m->delete('pw');
-        $burst->(25);
-        $before = $m->counter('pw');
-        my $took = (Time::HiRes::time() - $t0) * 1000;
-        last if $took < 100;
-        note sprintf 'the pre-deadline burst took %.0fms against a 100ms ttl '
-                   . '(try %d): again', $took, $try;
-    }
-    is($before, 100, 'four children put a hundred hits into the window');
+        my $k = "pw$try";
 
-    select undef, undef, undef, 0.15;
-    $burst->(10);
-    is($m->counter('pw'), 40,
+        my $t0 = Time::HiRes::time();
+        $burst->($k, 25);
+        $before = $m->counter($k);
+        $pre_ok = (Time::HiRes::time() - $t0) * 1000 < 100;
+
+        select undef, undef, undef, 0.15;   # past the deadline: all 100 lapse
+
+        my $t1 = Time::HiRes::time();
+        $burst->($k, 10);
+        $after = $m->counter($k);
+        $post_ok = (Time::HiRes::time() - $t1) * 1000 < 100;
+
+        last if $pre_ok && $post_ok;
+        note sprintf 'a burst overran the 100ms ttl it counts inside '
+                   . '(try %d: pre %s, post %s): it says nothing, so again',
+                   $try, $pre_ok ? 'ok' : 'late', $post_ok ? 'ok' : 'late';
+    }
+    diag 'five bursts in a row overran the ttl; these counts ran late'
+        unless $pre_ok && $post_ok;
+
+    is($before, 100, 'four children put a hundred hits into the window');
+    is($after, 40,
        'after the deadline the count is exactly the forty hits that followed it');
+
+    # AND A REFUSED WRITE IS NOT A WRONG COUNT. Before 0.14 a writer that lost
+    # its stripe for the whole wait dropped the write and answered "full", so a
+    # short total had two possible causes and the stats could not tell them
+    # apart. `busy` counts the refusals now, so a future regression names
+    # itself here instead of arriving as an off-by-two.
+    # This one holds whatever the clock did: five keys in sixty-four slots is
+    # never a full table, so a `full` here would be a refusal wearing the wrong
+    # name again.
+    my %s = $m->stats;
+    is($s{full}, 0, 'nothing was refused for a full table: there was room');
+    note "writes refused for a held stripe: $s{busy}" if $s{busy};
 }
 
 # ---- shared across a pre-forked pool ---------------------------------------

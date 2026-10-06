@@ -188,6 +188,22 @@ void pdfmake_meta_auto_fill(pdfmake_doc_t *doc);
  */
 int pdfmake_source_date(time_t *out);
 
+/*
+ * Override how SOURCE_DATE_EPOCH is resolved.
+ *
+ * The engine is plain C and reads it with getenv(). That is the process
+ * environment, which is not where an embedding host necessarily keeps the
+ * variable: under PERL_IMPLICIT_SYS (every Strawberry perl) the interpreter
+ * has its own environment table, so a perl that sets SOURCE_DATE_EPOCH leaves
+ * the C runtime's getenv() returning NULL and every timestamp falls back to
+ * the wall clock.
+ *
+ * The hook returns 1 and writes the epoch when it resolves one, 0 otherwise;
+ * it is consulted before getenv(). Pass NULL to go back to getenv() alone.
+ */
+typedef int (*pdfmake_source_date_hook_t)(time_t *out);
+void pdfmake_set_source_date_hook(pdfmake_source_date_hook_t hook);
+
 #ifdef __cplusplus
 }
 #endif

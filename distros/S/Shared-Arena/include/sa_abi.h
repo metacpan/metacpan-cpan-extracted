@@ -109,11 +109,20 @@
 #define SA_READ_PENDING 1
 #define SA_READ_LAPPED  2
 
-/* `map_store`, `map_store_ttl`, `map_incr`, `map_incr_ttl`: */
+/* `map_store`, `map_store_ttl`, `map_incr`, `map_incr_ttl`, `map_incr_at`,
+ * and - since 0.14 - `map_delete`, which answers 1 deleted, 0 absent, or BUSY:
+ */
 #define SA_MAP_STORE_OK      1
 #define SA_MAP_STORE_FULL    0
 #define SA_MAP_STORE_TOOBIG (-1)
 #define SA_MAP_STORE_NOTNUM (-2)
+/* NEW IN 0.14, and the table did not change, so this is still version 5: a
+ * write refused because another process held the stripe through an escalating
+ * wait. Before 0.14 it arrived as SA_MAP_STORE_FULL, which told a caller to
+ * stop when the right answer was to try again. A consumer that tested only for
+ * OK is unaffected; one that treated FULL as "the table is too small" was
+ * being told that about a transient. */
+#define SA_MAP_STORE_BUSY   (-3)
 
 /* `cache_set`: */
 #define SA_CACHE_OK      1

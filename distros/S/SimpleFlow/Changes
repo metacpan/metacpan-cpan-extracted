@@ -1,6 +1,43 @@
 Revision history for SimpleFlow
 
 
+0.194 2026-10-05 (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - **`parallel()` did not pass an interrupt on to its steps when the caller
+     ignored TERM.** An interrupt sent to `parallel()`'s process was passed to
+     every running step as TERM, and the steps, like their commands, had
+     inherited TERM ignored. So an INT or a HUP sent to that process alone,
+     by `kill` or a batch scheduler, reached no step: each ran on to its
+     end, and only then was the interrupt re-raised. A Ctrl-C at the
+     terminal was not affected, because it reaches the steps directly. Each
+     step is now passed the signal that `parallel()` received, which it
+     cannot be ignoring. A step stopped by an INT or a QUIT that way now
+     returns its record, or its error, saying its command was killed by that
+     signal; it used to die of the TERM itself, and `parallel()` reported
+     only that it "ended before it could return a record".
+     `t/10.ignored.signals.t` tests this; against 0.193 each of its two
+     cases took 30 s, the whole of the steps' sleep.
+
+ [Tests]
+
+ - **The suite no longer fails when it is run with signals ignored,** as it
+     is under a background job: `( cpanm SimpleFlow & )` in a script starts
+     cpanm with SIGINT and SIGQUIT ignored, and every test inherits that.
+     0.193 could not be installed that way: `t/04.fixes.t` test 15 failed
+     "the calling program was ended by the interrupt" (got 0, expected 2).
+     The module was right to leave an ignored signal ignored, as `system()`
+     does; four tests, in `t/01.t`, `t/04.fixes.t` and `t/06.pipeline.t`,
+     relied on a signal's default action without setting it, and with TERM
+     ignored those four failed too. Each now sets the default itself; this
+     fix is to the tests alone.
+ - `t/10.ignored.signals.t` checks that a signal the caller ignores stays
+     ignored by perl and by the command, under `task()` with and without
+     `timeout` and under `parallel()`, and re-runs every other test file with
+     HUP, INT, QUIT, TERM and TSTP inherited ignored. It fails against
+     0.193's tests, and roughly doubles the time the suite takes.
+
 0.193 2026-10-03 (Claude Opus 5.5 helped)
 
  [Changed]

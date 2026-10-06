@@ -22,6 +22,11 @@ class    #
     field $action : param  //= 'build';
     field $target_config = 'lib/Alien/Xmake/ConfigData.pm';
 
+    # Oldest xmake release we are willing to work with. A floor, not "whatever is newest today": a system install or a
+    # private install from a previous build that clears it is good enough and we leave it alone rather than building a
+    # redundant copy.
+    field $minimum_version : param //= 'v3.1.1';
+
     # GitHub release discovery
     field $owner         = 'xmake-io';
     field $repo          = 'xmake';
@@ -53,8 +58,7 @@ class    #
         say 'Pure perl Alien? Ha! You wish.' if $pureperl;
         say sprintf 'Creating new Build script for %s %s', $meta->name, $meta->version;
 
-        # We must capture the current INC to ensure the builder finds itself
-        # when running the generated script.
+        # We must capture the current INC to ensure the builder finds itself when running the generated script.
         my $inc_str = join( ' ', map {"-I$_"} @INC );
         $self->write_file( 'Build', sprintf <<'', $^X, $inc_str, __PACKAGE__, __PACKAGE__ );
 #!%s %s
@@ -93,11 +97,12 @@ use %s;
         # Alien Logic: Check or Install Xmake
         my $config_data = $self->_resolve_xmake();
 
-        # Stage the bundled xmake into the standard sharedir location so the
-        # regular install step ships it and tests find it via @INC. This is the
-        # Module::Build::Tiny 'dist_shared' model: build copies share/ into
-        # blib/lib/auto/share/dist/<Name>/ and install just moves blib/lib.
-        $self->_stage_sharedir();
+        # Stage the bundled xmake into the standard sharedir location so the regular install step ships it and tests
+        # find it via @INC. This is the Module::Build::Tiny 'dist_shared' model: build copies share/ into
+        # blib/lib/auto/share/dist/<Name>/ and install just moves blib/lib. A 'system' resolution points at the user's
+        # own xmake, so there is no bundle to ship: staging it anyway would install a second, unused xmake (and leave
+        # the runtime free to find the wrong one).
+        $self->_stage_sharedir if $config_data->{install_type} ne 'system';
 
         # Generate ConfigData.pm
         $self->_write_config_data($config_data);
@@ -239,6 +244,14 @@ use %s;
         return $resolved_version;
     }
 
+    # What an xmake we did *not* build ourselves has to satisfy: the pin when the user gave us one ("this version or
+    # better"), else the floor. A blank target_version means newest github release, which is what we install, not what
+    # we demand of the user's xmake, so keep the two apart.
+    method _required_version () {
+        return $self->target_version if length $self->target_version;
+        $minimum_version;
+    }
+
     # Locate a release asset by name pattern. Returns the asset hashref.
     method _find_asset ($re) {
         my $assets = $self->_github_release->{assets} // [];
@@ -249,34 +262,36 @@ use %s;
     }
 
     method _resolve_xmake ( ) {    # Check for system install
+        my $required = $self->_required_version;
         unless ($force) {
             my $sys_path = $self->_find_system_xmake();
             if ($sys_path) {
                 my $ver = $self->_get_xmake_version($sys_path);
-                if ( $self->_version_cmp( $ver, $self->_desired_version ) >= 0 ) {
+                if ( $self->_version_cmp( $ver, $required ) >= 0 ) {
                     say "Found suitable system Xmake: $sys_path ($ver)";
                     return { install_type => 'system', version => $ver, bin => "$sys_path" };
                 }
-                say "System Xmake found ($ver) but is older than required (" . $self->_desired_version . ').';
+                say "System Xmake found ($ver) but is older than required ($required).";
             }
         }
 
         # Check build dir (idempotency)
         my $install_dir = path('share')->absolute;
-        $install_dir->mkpath;
-        my $bin_name = ( $^O eq 'MSWin32' ) ? 'xmake.exe' : 'xmake';
-        my $blib_bin = $install_dir->child( 'bin', $bin_name );
+        my $bin_name    = ( $^O eq 'MSWin32' ) ? 'xmake.exe' : 'xmake';
+        my $blib_bin    = $install_dir->child( 'bin', $bin_name );
         unless ( -x $blib_bin ) {
             my $fallback = $install_dir->child($bin_name);
             $blib_bin = $fallback if -x $fallback;
         }
         if ( -x $blib_bin ) {
             my $ver = $self->_get_xmake_version($blib_bin);
-            if ( $self->_version_cmp( $ver, $self->_desired_version ) >= 0 ) {
+            if ( $self->_version_cmp( $ver, $required ) >= 0 ) {
                 say "Alien-Xmake build up-to-date ($ver).";
                 return $self->_generate_share_config( $blib_bin, $ver );
             }
+            say "Alien-Xmake build ($ver) is older than required ($required); reinstalling.";
         }
+        $install_dir->mkpath;
 
         # Check existing shared installation for upgrading
         my $existing = $self->_check_existing_share();

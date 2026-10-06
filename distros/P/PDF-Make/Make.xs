@@ -3,6 +3,9 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include <errno.h>
+#include <stdlib.h>
+
 #include "pdfmake.h"
 #include "pdfmake_buf.h"
 #include "pdfmake_writer.h"
@@ -184,6 +187,28 @@ static char *pdfmake_xs_strndup(pTHX_ const char *s, size_t n)
     memcpy(p, s, i);
     p[i] = '\0';
     return p;
+}
+
+/* SOURCE_DATE_EPOCH as perl sees it. Installed as the engine's resolver hook
+ * at BOOT; see the comment there and in pdfmake_meta.h.
+ *
+ * dTHX rather than pTHX_ because the hook's signature is fixed by the plain-C
+ * engine. getenv() here is PerlEnv_getenv under PERL_IMPLICIT_SYS, which is
+ * the whole point: that reads the interpreter's environment, and the CRT
+ * getenv() the engine would otherwise call does not. */
+static int pdfmake_xs_source_date(time_t *out)
+{
+    dTHX;
+    const char *s = getenv("SOURCE_DATE_EPOCH");
+    char *end;
+    long long v;
+
+    if (!s || !*s) return 0;
+    errno = 0;
+    v = strtoll(s, &end, 10);
+    if (errno || end == s || *end || v < 0) return 0;
+    if (out) *out = (time_t)v;
+    return 1;
 }
 
 /* Shared helper for markup.xs: the C node tree as a plain Perl structure.
@@ -959,6 +984,19 @@ version()
 
 BOOT:
 {
+    /* Resolve SOURCE_DATE_EPOCH through perl rather than the C runtime.
+     *
+     * The engine is plain C and calls getenv(), which is the process
+     * environment. This file includes XSUB.h, so under PERL_IMPLICIT_SYS -
+     * which is every Strawberry perl - the same getenv() below expands to
+     * PerlEnv_getenv and reads the interpreter's own environment, where
+     * $ENV{SOURCE_DATE_EPOCH} actually lives.
+     *
+     * Without this, setting $ENV{SOURCE_DATE_EPOCH} in perl on Windows
+     * changed nothing: every CreationDate was the wall clock and /ID kept the
+     * ASLR-dependent inputs, so two renders of one document differed. */
+    pdfmake_set_source_date_hook(pdfmake_xs_source_date);
+
     /* Register custom op XOPs */
     PDFMAKE_REGISTER_XOP(pdfmake_chain_xop, pp_pdfmake_chain,
                          "pdfmake_chain", "PDF::Make chainable method");

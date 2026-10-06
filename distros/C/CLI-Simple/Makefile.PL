@@ -32,6 +32,7 @@ WriteMakefile(
       'File::Which' => '1.27',
       'IO::Interactive' => '1.027',
       'JSON' => '4.10',
+      'List::Util' => '1.33',
       'Readonly' => '2.05',
       'Role::Tiny' => '2.002005',
       'YAML::Tiny' => '1.76'
@@ -66,11 +67,11 @@ WriteMakefile(
       'provides'=>{
                       'CLI::Simple'=>{
                                          'file'=>'lib/CLI/Simple.pm',
-                                         'version'=>'2.2.4'
+                                         'version'=>'2.2.5'
                                        },
                       'CLI::Simple::Constants'=>{
                                                     'file'=>'lib/CLI/Simple/Constants.pm',
-                                                    'version'=>'2.2.4'
+                                                    'version'=>'2.2.5'
                                                   },
                       'CLI::Simple::DumpSpec'=>{
                                                    'file'=>'lib/CLI/Simple/DumpSpec.pm',
@@ -98,7 +99,7 @@ WriteMakefile(
                                               },
                       'CLI::Simple::Utils'=>{
                                                 'file'=>'lib/CLI/Simple/Utils.pm',
-                                                'version'=>'2.2.4'
+                                                'version'=>'2.2.5'
                                               }
                     },
       'resources'=>{

@@ -11,47 +11,47 @@ local $Sub::Protected::BYPASS = 0;
 # --- Packages for tests 3, 4, 14 ---
 
 {
-    package Animal;
-    use Sub::Protected;
-    sub new     { bless {}, shift }
-    sub _breathe :Protected { 'animal breathe' }
-    sub live    { (shift)->_breathe }
+	package Animal;
+	use Sub::Protected;
+	sub new     { bless {}, shift }
+	sub _breathe :Protected { 'animal breathe' }
+	sub live    { (shift)->_breathe }
 }
 
 {
-    package Dog;
-    our @ISA = ('Animal');
-    sub new   { bless {}, shift }
-    # Test 3: direct subclass calling inherited protected sub
-    sub bark  { Animal::_breathe(shift) }
+	package Dog;
+	our @ISA = ('Animal');
+	sub new   { bless {}, shift }
+	# Test 3: direct subclass calling inherited protected sub
+	sub bark  { Animal::_breathe(shift) }
 }
 
 {
-    package Cat;
-    our @ISA = ('Animal');
-    sub new { bless {}, shift }
-    # Test 4: override protected sub and call SUPER::
-    sub _breathe :Protected {
-        my $self = shift;
-        'cat: ' . $self->SUPER::_breathe()
-    }
-    sub live { (shift)->_breathe }
+	package Cat;
+	our @ISA = ('Animal');
+	sub new { bless {}, shift }
+	# Test 4: override protected sub and call SUPER::
+	sub _breathe :Protected {
+		my $self = shift;
+		'cat: ' . $self->SUPER::_breathe()
+	}
+	sub live { (shift)->_breathe }
 }
 
 {
-    package Kitten;
-    our @ISA = ('Cat');
-    sub new  { bless {}, shift }
-    # Test 14: two-hop subclass — Kitten isa Cat isa Animal
-    sub play { Animal::_breathe(shift) }
+	package Kitten;
+	our @ISA = ('Cat');
+	sub new  { bless {}, shift }
+	# Test 14: two-hop subclass -- Kitten isa Cat isa Animal
+	sub play { Animal::_breathe(shift) }
 }
 
 # --- Packages for test 15 ---
 
 {
-    package AnimalWrong;   # same prefix "Animal" but NOT a subclass
-    sub new  { bless {}, shift }
-    sub probe { Animal->new->_breathe }
+	package AnimalWrong;   # same prefix "Animal" but NOT a subclass
+	sub new  { bless {}, shift }
+	sub probe { Animal->new->_breathe }
 }
 
 # Test 3: direct subclass can call inherited protected sub
@@ -69,7 +69,7 @@ is $r14, 'animal breathe',            'two-hop subclass (C isa B isa A) can call
 
 # Test 15: package with same prefix but no inheritance is blocked
 throws_ok { AnimalWrong::probe() }
-    qr/\Q_breathe() is a protected method of Animal and cannot be called from AnimalWrong\E/,
-    'package with same name prefix but no isa relation is blocked';
+	qr/\Q_breathe() is a protected method of Animal and cannot be called from AnimalWrong\E/,
+	'package with same name prefix but no isa relation is blocked';
 
 done_testing;

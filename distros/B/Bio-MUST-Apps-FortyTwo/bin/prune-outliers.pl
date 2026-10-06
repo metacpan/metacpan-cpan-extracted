@@ -42,6 +42,7 @@ for my $indir (@ARGV_indirs) {
         # (but autodetection won't work because query is just a filename)
         my $query = $db->filename;
         my $pgm   = $db->type eq 'nucl' ? 'blastn' : 'blastp';
+        # TODO: support --tblastx option? (see elsewhere)
 
         my $parser = $db->$pgm($query, {
             -evalue => $ARGV_evalue,
@@ -96,11 +97,11 @@ prune-outliers.pl - Identify and discard outliers based on all-versus-all BLAST 
 
 =head1 VERSION
 
-version 0.213470
+version 0.262780
 
 =head1 USAGE
 
-	prune-outliers.pl <indirs> [options]
+    prune-outliers.pl <indirs> [options]
 
 =head1 REQUIRED ARGUMENTS
 

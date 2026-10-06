@@ -6,7 +6,7 @@ use lib "$FindBin::Bin/lib";
 use MDTest;
 
 # Document the BUG: ordered list digits 1..9 work, but 10+ silently drops out
-# of list parsing. See lib/Markdown/Simple.xs:277 — `*p >= '1' && *p <= '9'`.
+# of list parsing. See Simple.xs:277 — `*p >= '1' && *p <= '9'`.
 
 md_like( "1. one\n2. two", qr|<ol>.*<li>one</li>.*<li>two</li>.*</ol>|s,
     'single-digit ordered list (sanity)' );

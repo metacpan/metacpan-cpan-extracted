@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::RunProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::RunProcessor::VERSION = '0.213470';
+$Bio::MUST::Apps::FortyTwo::RunProcessor::VERSION = '0.262780';
 use Moose;
 use namespace::autoclean;
 
@@ -361,7 +361,7 @@ Bio::MUST::Apps::FortyTwo::RunProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.213470
+version 0.262780
 
 =head1 AUTHOR
 

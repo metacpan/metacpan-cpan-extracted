@@ -5,6 +5,16 @@ All notable changes to Alien::Xmake will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.4] - 2026-10-05
+
+### Changed
+
+- A system Xmake is now used when it meets this dist's minimum supported version (currently `v3.1.1`) instead of having to be the newest release on GitHub, so a distro-packaged Xmake is picked up rather than triggering a redundant private build. As a side effect, a suitable system install no longer needs a GitHub API round-trip to be detected, so it (might) work offline.
+
+### Fixed
+
+- System installs of xmake prevent us from staging a share dir which was causing the installer to shipping a second, unused Xmake.
+
 ## [v1.0.3] - 2026-09-20
 
 ### Fixed
@@ -197,7 +207,8 @@ The docs have been greatly expanded since January but the stars of this release 
 
 - It exists.
 
-[Unreleased]: https://github.com/sanko/Alien-Xmake/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/sanko/Alien-Xmake/compare/v1.0.4...HEAD
+[v1.0.4]: https://github.com/sanko/Alien-Xmake/compare/v1.0.3...v1.0.4
 [v1.0.3]: https://github.com/sanko/Alien-Xmake/compare/v1.0.2...v1.0.3
 [v1.0.2]: https://github.com/sanko/Alien-Xmake/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/sanko/Alien-Xmake/compare/v1.0.0...v1.0.1

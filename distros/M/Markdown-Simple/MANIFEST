@@ -3,12 +3,12 @@ ignore.txt
 include/mds_abi.h
 include/mds_abi_impl.h
 lib/Markdown/Simple.pm
-lib/Markdown/Simple.xs
 Makefile.PL
 MANIFEST			This list of files
 META.json			Module JSON meta-data (added by MakeMaker)
 META.yml			Module YAML meta-data (added by MakeMaker)
 README
+Simple.xs
 src/mds.c
 src/mds.h
 src/mds_arena.c

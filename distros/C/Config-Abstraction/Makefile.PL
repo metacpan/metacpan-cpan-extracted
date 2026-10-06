@@ -28,6 +28,7 @@ WriteMakefile(
 		'Carp' => 0,
 		'Config::Auto' => 0,
 		'Config::IniFiles' => 0,
+		'CryptX' => '0.062',	# 0.049 fixed GCM encrypt failures (empty string; no AAD); 0.062 fixed GCM tag verification
 		# 'Data::Reuse' => 0,	# Fails installation tests on recent Perls, RT#100461
 		'File::Basename' => 0,
 		'File::Slurp' => 0,
@@ -68,10 +69,16 @@ WriteMakefile(
 				# web => 'https://github.com/nigelhorne/Config-Abstraction/issues'
 				# url => 'https://github.com/nigelhorne/Config-Abstraction/issues',
 			}
+		}, prereqs => {
+			test => {
+				recommends => {
+					'Test::Permissions' => 0,	# probes whether chmod can revoke read access; t/extended_tests.t falls back to -r
+				},
+			},
 		}, optional_features => {
 			encryption => {
 				description => 'AES-256-GCM encryption of config values via ENC[] tokens',
-				prereqs => { runtime => { requires => { 'CryptX' => 0 } } },
+				prereqs => { runtime => { requires => { 'CryptX' => '0.062' } } },
 			},
 		},
 	}, TEST_REQUIRES => {
@@ -85,6 +92,7 @@ WriteMakefile(
 		'Test::Mockingbird' => 0.12,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
+		'Test::Permissions' => 0,
 		'Test::Returns' => 0.03,
 		'Test::TempDir::Tiny' => 0,
 		'Test::Without::Module' => 0,

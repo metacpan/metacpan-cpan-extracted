@@ -164,6 +164,25 @@ for my $shape (qw(aoh hoa hoh aoa)) {
 	like($@, qr/has '$under' there/, 'integer: one past IV_MIN is refused');
 }
 
+# --- a separator that could continue the number -----------------------------------
+# A field the parser cuts from the line is converted in place, and up to 0.3213
+# Atof() read on past its end into the separator and the next field: with sep
+# '.' the field "1" of "1.2" became 1.2, with sep 'E' the "1" of "1E2" became
+# 100. The closure converts the field as an SV of its own, which is what the
+# parser must agree with; R's read.table refuses a sep that is its dec, so
+# there is no reference beyond that. The long number takes the copy past the
+# 64-byte stack buffer onto the heap.
+{
+	my $long = '1.' . ('0' x 100) . '1';
+	for my $c (['.', "1.2\n3.25\n", [1, 3]], ['E', "1E2\n-7E0\n", [1, -7]], ['e', "1e3\n2e+4\n", [1, 2]],
+	           ['5', "152\n-0.25\n", [1, -0.2]], ['E', "${long}E9\n", [$long + 0]]) {
+		my ($sep, $data, $want) = @$c;
+		my $g = both(fixture("a${sep}b\n$data"), sep => $sep, 'output_type' => 'hoa', colClasses => { a => 'numeric' });
+		same($g, "sep '$sep': $data");
+		is_deeply($g->{parser}{r}{a}, $want, "sep '$sep': the number stops where its field does");
+	}
+}
+
 # --- missing values ---------------------------------------------------------------
 {
 	my $f = fixture("x,y\n,NA\nNA,\n.,1\n");
@@ -223,8 +242,8 @@ for my $shape (qw(aoh hoa hoh aoa)) {
 
 # --- no leaks -----------------------------------------------------------------------
 SKIP: {
-	skip 'Test::LeakTrace is not installed', 4 unless eval { require Test::LeakTrace; 1 };
-	skip 'under Devel::Cover', 4 if $INC{'Devel/Cover.pm'};
+	skip 'Test::LeakTrace is not installed', 8 unless eval { require Test::LeakTrace; 1 };
+	skip 'under Devel::Cover', 8 if $INC{'Devel/Cover.pm'};
 	my $bad = fixture("a,b\n1,2\n3,x\n");
 	for my $shape (qw(aoh hoa hoh aoa)) {
 		Test::LeakTrace::no_leaks_ok(sub {
@@ -232,6 +251,21 @@ SKIP: {
 			eval { read_table($bad, 'output_type' => $shape, colClasses => 'integer') };
 			eval { read_table($bad, 'output_type' => $shape, colClasses => 'integer', filter => { a => sub { 1 } }) };
 		}, "$shape: a read with colClasses, and one that croaks on a bad cell, leak nothing");
+	}
+	# An .xlsx's cells are converted by S_fast_row(), where a CSV's are
+	# converted as they are cut; up to 0.3213 an aoh's row hash was made before
+	# that conversion and leaked when it croaked.
+	my $xbad = File::Spec->catfile($dir, 'bad.xlsx');
+	{
+		local *STDOUT;
+		open STDOUT, '>', File::Spec->devnull or die;
+		write_table([ { a => '1', b => 'x' }, { a => 'zz', b => 'y' } ], $xbad);
+	}
+	for my $shape (qw(aoh hoa hoh aoa)) {
+		Test::LeakTrace::no_leaks_ok(sub {
+			eval { read_table($xbad, 'output_type' => $shape, colClasses => { a => 'integer' },
+			                  ($shape eq 'hoh' ? ('row_names' => 'b') : ())) };
+		}, "xlsx $shape: a read that croaks on a bad cell leaks nothing");
 	}
 }
 

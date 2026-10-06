@@ -24,6 +24,28 @@ subtest 'inline defs normalize like Base pkg_name' => sub {
     is $recipe->version_for('zstd'),    undef,    'no version for plain entry';
     is $recipe->version_for('libsdl3'), '3.4.12', 'per-package version';
 };
+subtest 'system is accepted as a recipe default and a per-package def' => sub {
+    my $recipe = Alien::Xrepo::Build::Recipe->new( packages => [ 'zstd', { name => 'libsdl3', system => 0 } ],
+        defaults => { system => 1, kind => 'shared' } );
+
+    # opts_for takes the defaults as ambient opts, the way Build.pm passes the profile.
+    is $recipe->defaults->{system}, 1, 'system accepted in defaults';
+    my %zstd = $recipe->opts_for( 'zstd', %{ $recipe->defaults } );
+    is $zstd{system}, 1,        'defaults flow to a package with no def of its own';
+    is $zstd{kind},   'shared', 'other defaults still merge';
+    my %sdl = $recipe->opts_for( 'libsdl3', %{ $recipe->defaults } );
+    is $sdl{system},                             0, 'per-package system overrides the default';
+    is $recipe->package_defs->{libsdl3}{system}, 0, 'per-package system captured in the def';
+
+    # A recipe that leaves system alone must stay on the private-build path: undefined means
+    # xrepo's shim keeps forcing system=false for it.
+    my $off = Alien::Xrepo::Build::Recipe->new( packages => ['zstd'] );
+    ok !defined $off->defaults->{system}, 'system stays undefined by default';
+    my %off = $off->opts_for('zstd');
+    ok !defined $off{system}, 'and reaches opts_for undefined';
+    like dies { Alien::Xrepo::Build::Recipe->new( packages => ['zstd'], defaults => { systemm => 1 } ) }, qr[unknown key 'systemm'],
+        'a typo is still rejected';
+};
 subtest 'opts_for merges defs over ambient opts' => sub {
     my $recipe = Alien::Xrepo::Build::Recipe->new( packages => [ 'zstd', { name => 'libsdl3', kind => 'shared', configs => { wayland => 1 } }, ], );
     my %zstd   = $recipe->opts_for( 'zstd', kind => 'static', configs => { wayland => 0 } );

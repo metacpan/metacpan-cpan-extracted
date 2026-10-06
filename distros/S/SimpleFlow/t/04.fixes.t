@@ -65,6 +65,13 @@ sub interrupt_probe {
 	if ($child == 0) {
 		open STDOUT, '>', File::Spec->devnull;
 		open STDERR, '>', File::Spec->devnull;
+		# The probe needs INT and TERM to end the child perl, but this file
+		# may have inherited them ignored -- a background job of a
+		# non-interactive shell starts with INT and QUIT ignored -- and task()
+		# rightly leaves an ignored signal ignored. A default disposition
+		# survives exec. Until 0.194 it was inherited, and 0.193 failed to
+		# install from a cpanm run in the background.
+		$SIG{$_} = 'DEFAULT' foreach qw(HUP INT QUIT TERM);
 		no warnings 'exec';
 		exec($^X, "-I$lib_dir", '-e', $INTERRUPTED, $pid_file, $timeout)
 			or POSIX::_exit(127); # "or": a statement after exec drew "Statement unlikely to be reached" on a 5.16.3 smoker, "no warnings" notwithstanding
@@ -134,7 +141,10 @@ SKIP: {
 	subtest 'a command killed by a signal dies under the default die => 1' => sub {
 		my ($lived, $error);
 		capture {
-			$lived = eval { task(cmd => [$^X, '-e', q{kill 'TERM', $$}], quiet => 1); 1 };
+			# TERM set to its default first: the command inherits this
+			# file's dispositions, which may have TERM ignored (see
+			# interrupt_probe)
+			$lived = eval { task(cmd => [$^X, '-e', q{$SIG{TERM} = q{DEFAULT}; kill 'TERM', $$}], quiet => 1); 1 };
 			$error = $@;
 		};
 		ok(!$lived, 'task() died (0.182: returned "done")');

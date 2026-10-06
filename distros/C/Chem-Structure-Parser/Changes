@@ -1,6 +1,15 @@
 Revision history for Chem-Structure-Parser
 
 
+0.038 2026-10-05 CDT
+
+ - structure_rmsd() keeps each row of its RMSD and count matrices as it
+   makes it, rather than fetching it back out of the matrix to fill it in.
+   Nothing it returns changes; it just no longer relies on a fetch it never
+   checked.
+ - The documentation now says what a residue's rsa is: its relative
+   solvent accessibility, its surface as a fraction of its maximum.
+
 0.037 2026-10-01 CDT
 
  - bzip2 files are read as gzip files are: a .bz2 is unpacked as it is

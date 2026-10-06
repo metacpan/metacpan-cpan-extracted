@@ -1,28 +1,28 @@
 %PDF-2.0
 %‚„œ”
 1 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
 endobj
 2 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
 endobj
 3 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Bold>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica-Bold>>
 endobj
 4 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Bold>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica-Bold>>
 endobj
 5 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Bold>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica-Bold>>
 endobj
 6 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
 endobj
 7 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Italic>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica-Oblique>>
 endobj
 8 0 obj
-<</Length 1397>>
+<</Length 1092>>
 stream
 BT
 0 0 0 rg
@@ -43,51 +43,51 @@ BT
 (Below are examples of stamp-like elements created with boxes and positioned text.) Tj
 ET
 q
-0.862745098039215 0.988235294117647 0.905882352941176 rg
+0.862745 0.988235 0.905882 rg
 72 580 200 50 re
 f
 Q
 BT
-0.086274509803921 0.639215686274509 0.290196078431372 rg
+0.086275 0.639216 0.290196 rg
 /F_Helvetica_bold 24 Tf
-1 0 0 1 104.656000000000005 596.840000000000031 Tm
+1 0 0 1 104.656006 596.84 Tm
 (APPROVED) Tj
 ET
 q
-0.996078431372549 0.952941176470588 0.780392156862745 rg
+0.996078 0.952941 0.780392 rg
 72 480 200 50 re
 f
 Q
 BT
-0.850980392156862 0.466666666666666 0.023529411764705 rg
+0.85098 0.466667 0.023529 rg
 /F_Helvetica_bold 24 Tf
-1 0 0 1 131.343999999999994 496.840000000000031 Tm
+1 0 0 1 131.343998 496.84 Tm
 (DRAFT) Tj
 ET
 q
-0.996078431372549 0.886274509803921 0.886274509803921 rg
+0.996078 0.886275 0.886275 rg
 72 380 428 40 re
 f
 Q
 BT
-0.862745098039215 0.149019607843137 0.149019607843137 rg
+0.862745 0.14902 0.14902 rg
 /F_Helvetica_bold 20 Tf
-1 0 0 1 211.560000000000002 393.199999999999988 Tm
+1 0 0 1 211.559998 393.2 Tm
 (CONFIDENTIAL) Tj
 ET
 q
-1 0.984313725490195 0.92156862745098 rg
+1 0.984314 0.921569 rg
 72 280 300 70 re
 f
 Q
 BT
-0.572549019607843 0.250980392156862 0.054901960784313 rg
+0.572549 0.25098 0.054902 rg
 /F_Helvetica_normal 10 Tf
 1 0 0 1 84 318 Tm
 (Note: Review section 3.2 before final sign-off.) Tj
 ET
 BT
-0.705882352941176 0.325490196078431 0.035294117647058 rg
+0.705882 0.32549 0.035294 rg
 /F_Helvetica_italic 9 Tf
 1 0 0 1 84 305 Tm
 (-- QA Team, 2026-04-21) Tj
@@ -105,25 +105,25 @@ endobj
 <</Type /Catalog/Pages 9 0 R>>
 endobj
 12 0 obj
-<</Producer (PDF-Make/0.01)/CreationDate (D:20260422090118Z)/ModDate (D:20260422090118Z)>>
+<</Producer (PDF-Make/0.13)/CreationDate (D:20261005214532Z)/ModDate (D:20261005214532Z)>>
 endobj
 xref
 0 13
 0000000000 65535 f 
 0000000015 00000 n 
-0000000083 00000 n 
-0000000151 00000 n 
+0000000081 00000 n 
+0000000147 00000 n 
 0000000218 00000 n 
-0000000285 00000 n 
-0000000352 00000 n 
-0000000420 00000 n 
-0000000489 00000 n 
-0000001936 00000 n 
-0000001990 00000 n 
-0000002171 00000 n 
-0000002218 00000 n 
+0000000289 00000 n 
+0000000360 00000 n 
+0000000426 00000 n 
+0000000500 00000 n 
+0000001642 00000 n 
+0000001696 00000 n 
+0000001877 00000 n 
+0000001924 00000 n 
 trailer
-<</Size 13/Root 11 0 R/Info 12 0 R/ID[<92CD07CF51ACBACC718318C448E5BFAD><92CD07CF51ACBACC718318C448E5BFAD>]>>
+<</Size 13/Root 11 0 R/Info 12 0 R/ID[<74472446304550DED725F2664B9A403B><74472446304550DED725F2664B9A403B>]>>
 startxref
-2325
+2031
 %%EOF

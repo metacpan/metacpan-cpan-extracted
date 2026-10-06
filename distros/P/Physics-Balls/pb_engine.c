@@ -758,7 +758,11 @@ static struct pb_outcome *run(const struct pb_world *W, int n, const struct pb_b
                 S.vy0[i] = vyr * 1e-5;
             }
             if (shot && S.ids[i] == shot->ball) { cue = i; }
-            if (kind != 0 && (kind < 0 || kind >= W->nk)) { badkind = 1; }
+            /* a kind the world does not declare is refused after the loop,
+               and until then it must not index the world's arrays: a negative
+               one read a double below each of them. Carrying it to nk takes
+               the defaults, which is what a kind past the end already did. */
+            if (kind != 0 && (kind < 0 || kind >= W->nk)) { badkind = 1; kind = W->nk; }
             S.curve[i] = kind < W->nk ? W->kcurve[kind] : 0;
             S.follow[i] = kind < W->nk ? W->kfollow[kind] : 1;
             S.rad[i] = kind < W->nk ? W->kr[kind] : W->R;

@@ -820,12 +820,14 @@ list_all_symbols(self, vartype=VAR_NONE)
     SV *self
     vartype_t vartype
   PPCODE:
+    PUTBACK;
     if (vartype == VAR_NONE) {
         HV *namespace;
         HE *entry;
         int keys;
 
         namespace = _get_namespace(self);
+        SPAGAIN;
         keys = hv_iterinit(namespace);
         EXTEND(SP, keys);
         while ((entry = hv_iternext(namespace))) {
@@ -847,6 +849,7 @@ list_all_symbols(self, vartype=VAR_NONE)
         I32 len;
 
         namespace = _get_namespace(self);
+        SPAGAIN;
         hv_iterinit(namespace);
         while ((val = hv_iternextsv(namespace, &key, &len))) {
             GV *gv = (GV*)val;
@@ -895,7 +898,9 @@ get_all_symbols(self, vartype=VAR_NONE)
     HV *namespace, *ret;
     HE *entry;
   PPCODE:
+    PUTBACK;
     namespace = _get_namespace(self);
+    SPAGAIN;
     ret = newHV();
 
     hv_iterinit(namespace);

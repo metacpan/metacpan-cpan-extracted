@@ -1,5 +1,22 @@
 Revision history for Shared::Arena
 
+0.14	2026-10-05
+        - FIXES a map write dropped under contention: a store, incr or delete
+          whose stripe was held burned 100k test-and-sets and gave up. A
+          FreeBSD smoker counted 38 of 40 and an Alpine one 999 of 1000, in a
+          table of 64 slots holding six keys.
+        - The write path's wait escalates, 50us to 2ms over ~10ms, as the carve
+          path's has since 0.13. Shorter than the carve path's two seconds on
+          purpose: a store is on a per-request path.
+        - A write refused for a held stripe answers SA_MAP_STORE_BUSY (-3) and
+          counts `busy`. It answered SA_MAP_STORE_FULL before, and incremented
+          no statistic at all, so `stats` showed a clean map while writes went
+          missing: full means stop, busy means try again.
+        - Map->delete returns undef for a refused stripe, 0 for a key that was
+          not there. Both false, so a speculative delete is unaffected.
+        - FIXES t/32-map-ttl.t asserting a count from an unmeasured window: the
+          burst after the deadline has to fit inside the ttl it counts inside.
+
 0.13	2026-09-22
         - FIXES two carves refused in four thousand on a loaded FreeBSD 15
           smoker, with room in the arena for all of them. 

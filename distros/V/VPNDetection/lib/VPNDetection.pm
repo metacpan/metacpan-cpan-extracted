@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.5.1';
+our $VERSION = '3.5.2';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -394,9 +394,13 @@ sub _retry_delay {
     return BACKOFF_BASE * 2**($tries < 6 ? $tries : 6);
 }
 
-# $timeout is the call's own bound, or undef for the client's.
+# $timeout is the call's own bound, or undef for the client's. $member, when
+# given, is the one member of the answer the call returns, a reference of type
+# $type: an object without it is no answer at all, so it fails inside the attempt
+# as a retried server_error, like any other 2xx that cannot be read, rather than
+# reaching the caller as undef.
 sub _json_p {
-    my ($self, $url, $body, $timeout) = @_;
+    my ($self, $url, $body, $timeout, $member, $type) = @_;
     my $sent = defined $body ? $self->_post_p($url, $body, $timeout) : $self->_get_p($url, $timeout);
     return $sent->then(sub {
         my $res = shift->res;
@@ -407,7 +411,12 @@ sub _json_p {
             kind => 'server_error', status => $res->code,
             message => 'the API did not answer with a JSON object',
         ) unless ref $decoded eq 'HASH';
-        return $decoded;
+        return $decoded unless defined $member;
+        return $decoded->{$member} if ref $decoded->{$member} eq $type;
+        die VPNDetection::Error->new(
+            kind => 'server_error', status => $res->code,
+            message => "the API answered with no $member",
+        );
     });
 }
 

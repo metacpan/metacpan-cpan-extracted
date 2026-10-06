@@ -3,10 +3,10 @@
    "author" : [
       "Nigel Horne <njh@nigelhorne.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,30 +27,41 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
             "Attribute::Handlers" : "0",
+            "B::Hooks::EndOfScope" : "0",
             "Carp" : "0",
             "Params::Get" : "0",
             "Params::Validate::Strict" : "0.33",
             "Readonly" : "0",
             "Return::Set" : "0",
-            "perl" : "5.008"
+            "Sub::Identify" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
+         "recommends" : {
+            "Moo" : "0",
+            "Test::Mockingbird" : "0"
+         },
          "requires" : {
             "IPC::System::Simple" : "0",
-            "Moo" : "0",
-            "Test::Exception" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Memory::Cycle" : "0",
-            "Test::Mockingbird" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::Returns" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Sub::Protected" : {
+         "file" : "lib/Sub/Protected.pm",
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -67,6 +78,6 @@
          "web" : "https://github.com/nigelhorne/Sub-Protected"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

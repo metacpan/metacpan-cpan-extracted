@@ -3,7 +3,7 @@ package PDF::Make::Page;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 # Load the XS code from PDF::Make
 use PDF::Make ();
@@ -14,22 +14,28 @@ use PDF::Make ();
 #   set_content($bytes)            - set page content stream
 #   DESTROY()                      - cleanup (page owned by document)
 
-# Standard 14 font constants
+# Standard 14 font constants.
+#
+# These are indices into the C std14 table, so they are taken from the C enum
+# rather than written out here. Hand-written numbers had Times at 0-3 and
+# Helvetica at 4-7, the reverse of the C order, so every add_std14_font call
+# naming one family got the other: Helvetica drew as Times-Roman and
+# Helvetica-Bold as Times-Bold. Courier upwards agreed by luck and looked fine.
 use constant {
-    TIMES_ROMAN           => 0,
-    TIMES_BOLD            => 1,
-    TIMES_ITALIC          => 2,
-    TIMES_BOLDITALIC      => 3,
-    HELVETICA             => 4,
-    HELVETICA_BOLD        => 5,
-    HELVETICA_OBLIQUE     => 6,
-    HELVETICA_BOLDOBLIQUE => 7,
-    COURIER               => 8,
-    COURIER_BOLD          => 9,
-    COURIER_OBLIQUE       => 10,
-    COURIER_BOLDOBLIQUE   => 11,
-    SYMBOL                => 12,
-    ZAPFDINGBATS          => 13,
+    HELVETICA             => PDF::Make::Font::Std14::HELVETICA(),
+    HELVETICA_BOLD        => PDF::Make::Font::Std14::HELVETICA_BOLD(),
+    HELVETICA_OBLIQUE     => PDF::Make::Font::Std14::HELVETICA_OBLIQUE(),
+    HELVETICA_BOLDOBLIQUE => PDF::Make::Font::Std14::HELVETICA_BOLDOBLIQUE(),
+    TIMES_ROMAN           => PDF::Make::Font::Std14::TIMES_ROMAN(),
+    TIMES_BOLD            => PDF::Make::Font::Std14::TIMES_BOLD(),
+    TIMES_ITALIC          => PDF::Make::Font::Std14::TIMES_ITALIC(),
+    TIMES_BOLDITALIC      => PDF::Make::Font::Std14::TIMES_BOLDITALIC(),
+    COURIER               => PDF::Make::Font::Std14::COURIER(),
+    COURIER_BOLD          => PDF::Make::Font::Std14::COURIER_BOLD(),
+    COURIER_OBLIQUE       => PDF::Make::Font::Std14::COURIER_OBLIQUE(),
+    COURIER_BOLDOBLIQUE   => PDF::Make::Font::Std14::COURIER_BOLDOBLIQUE(),
+    SYMBOL                => PDF::Make::Font::Std14::SYMBOL(),
+    ZAPFDINGBATS          => PDF::Make::Font::Std14::ZAPFDINGBATS(),
 };
 
 use Exporter 'import';
@@ -104,6 +110,16 @@ used in content streams, and C<$base_font> is the font name.
 
 Add one of the PDF standard 14 fonts to the page. These fonts are guaranteed
 to be available in all PDF readers without embedding.
+
+=head2 add_font_ref
+
+    $page->add_font_ref($name, $font_obj_num);
+
+Reference an existing font object in the page's resources under C<$name>.
+C<add_font> builds a new Standard 14 dictionary and rejects any other font, so
+this is how an embedded font - the object number returned by
+C<< PDF::Make::Font->write_to_doc >> - is attached to a page. Re-using a name
+already on the page re-points it rather than adding a duplicate.
 
 =head2 set_content
 

@@ -28,6 +28,17 @@ sub _mystery_heading {
   return uc sprintf q{%s - The %s Mysteries}, ucfirst($day), $group;
 }
 
+sub _today_day {
+  my @days_of_week = qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
+  return lc $days_of_week[(localtime())[6]];
+}
+
+sub _next_cycle_day {
+  my ($follow_calendar, $current_day, $today) = @_;
+  $today = _today_day() if not defined $today;
+  return $follow_calendar ? $today : $current_day;
+}
+
 sub _prayer_role {
   my $prayer = shift // q{};
   return q{hail_mary}   if $prayer =~ m/^hail__mary/;
@@ -428,9 +439,9 @@ Usage - to Pray the Rosary in the commandline:
   Prayer mode:
 
   --pray          : stream the selected Rosary prayer by prayer.
-  --unceasingly   : continuously repeat the selected Rosary until stopped;
-                    implies --pray. Using both --pray and --unceasingly is valid
-                    but redundant. The same selected day/Mystery is repeated.
+  --unceasingly   : continuously pray until stopped; implies --pray. With no
+                    explicit day/Mystery, the calendar day is re-evaluated at
+                    each Rosary boundary. An explicit day/Mystery stays fixed.
 
   Presentation:
 
@@ -507,9 +518,11 @@ Example 6,
 
   > avemaria --unceasingly --scroll --color
 
-  --unceasingly composes with the ordinary prayer options. It implies --pray,
-  preserves the selected day or Mystery between cycles, and retains live speed
-  changes between cycles. In --scroll mode the overall heading is shown again
+  --unceasingly composes with the ordinary prayer options. It implies --pray
+  and retains live speed changes between cycles. With no explicit day/Mystery,
+  the day is checked again at each complete-Rosary boundary so a prayer running
+  across midnight moves to the new day's Mysteries. An explicitly selected day
+  or Mystery remains fixed. In --scroll mode the overall heading is shown again
   at the beginning of each new Rosary, while ordinary prayer lines remain
   uncluttered.
 
@@ -562,11 +575,45 @@ sub _prompt_continue {
   return $next;
 }
 
+sub _load_rosary_data {
+  my ($Rosary, $day) = @_;
+
+  my $Mystery = $Rosary->day($day);
+  die "Rosary API returned no Mystery for $day\n" if not $Mystery;
+
+  # Detailed Mystery data supplies each decade title and Fruit of the Mystery.
+  # If that secondary endpoint is temporarily unavailable, retain the basic
+  # recitation rather than making the whole Rosary unusable.
+  my $Details = eval { $Rosary->details(lc $Mystery->group_by) };
+  if ($@) {
+    my $error = $@;
+    chomp $error;
+    warn "avemaria: could not load Mystery details: $error\n";
+    $Details = undef;
+  }
+
+  my $Name = _mystery_heading($day, $Mystery->group_by);
+  my $MysteryRole = _mystery_role($Mystery->group_by, 0);
+  my $MysteryTitleRole = _mystery_role($Mystery->group_by, 1);
+
+  # Add the local response/closing presentation fields used by the CLI.
+  $Mystery = tr4h2o o2d $Mystery;
+  $Mystery->{pray_for_us_most_holy_mother_of_god} = <<'EOF';
+V. Pray for us, Oh Holy Mother of God
+R. That we may be made worth of the promises of Christ.
+EOF
+  $Mystery->{oremus} = "V. Let us Pray.";
+  $Mystery->{most_holy_rosary} = "";
+  $Mystery->{in_the_name_2} = sprintf "The Most Holy Rosary.\n%s", $Mystery->{in_the_name_2};
+  h2o $Mystery;
+
+  return ($Mystery, $Details, $Name, $MysteryRole, $MysteryTitleRole);
+}
+
 sub PrayTheRosary {
   my ($Rosary, $subcommand, $ARGV) = xshift_and_deref @_;
-  my @days_of_week = qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
-  my ($sec, $min, $hour, $mday, $mon, $year, $wday) = localtime();
-  $subcommand ||= lc $days_of_week[$wday];
+  my $follow_calendar = ! defined($subcommand) || ! length($subcommand);
+  $subcommand = _today_day() if $follow_calendar;
 
   my $o = Getopt2h2o $ARGV,
     {
@@ -593,21 +640,9 @@ sub PrayTheRosary {
   # so it naturally implies --pray even with an explicit day or Mystery.
   my $praying = $o->pray || $o->unceasingly;
 
-  my $Mystery = $Rosary->day($subcommand, $ARGV);
-  die "Rosary API returned no Mystery for $subcommand\n" if not $Mystery;
+  my ($Mystery, $Details, $Name, $MysteryRole, $MysteryTitleRole) =
+    _load_rosary_data($Rosary, $subcommand);
 
-  # Detailed Mystery data supplies each decade title and Fruit of the Mystery.
-  # If that secondary endpoint is temporarily unavailable, retain the basic
-  # recitation rather than making the whole Rosary unusable.
-  my $Details = eval { $Rosary->details(lc $Mystery->group_by) };
-  if ($@) {
-    my $error = $@;
-    chomp $error;
-    warn "avemaria: could not load Mystery details: $error\n";
-    $Details = undef;
-  }
-
-  my $Name = _mystery_heading($subcommand, $Mystery->group_by);
   unless ($praying) {
     say $Name;
     exit EXIT_SUCCESS;
@@ -626,8 +661,6 @@ sub PrayTheRosary {
   # --color defaults to the dark-background profile unless --light is explicit.
   my $profile = $o->light ? q{light} : q{dark};
   my $Palette = _color_enabled($o) ? _color_palette($profile) : undef;
-  my $MysteryRole = _mystery_role($Mystery->group_by, 0);
-  my $MysteryTitleRole = _mystery_role($Mystery->group_by, 1);
 
   # Do not leave an interactive terminal in cbreak mode if prayer is stopped
   # with Ctrl-C or terminated by the shell.
@@ -660,24 +693,20 @@ sub PrayTheRosary {
   }
   push @Prayers, qw/Holy_Queen Pray_For_Us_Most_Holy_Mother_of_God Oremus Final_Prayer Most_Holy_Rosary In_The_Name_2/;
 
-  $Mystery = tr4h2o o2d $Mystery;
-  $Mystery->{pray_for_us_most_holy_mother_of_god} = <<EOF;
-V. Pray for us, Oh Holy Mother of God
-R. That we may be made worth of the promises of Christ.
-EOF
-  $Mystery->{oremus} = "V. Let us Pray.";
-  $Mystery->{most_holy_rosary} = "";
-  $Mystery->{in_the_name_2} = sprintf "The Most Holy Rosary.\n%s", $Mystery->{in_the_name_2};
-  h2o $Mystery;
-
   my $total = scalar @Prayers;
   my $cycle = 0;
 
   ROSARY: while (1) {
-    # A new cycle is a new Rosary, but it deliberately reuses the same API
-    # response, Stream object, live speed, color profile, and selected Mystery.
-    # This keeps --unceasingly continuous without generating network traffic
-    # on every repetition.
+    # When no day or Mystery was supplied explicitly, --unceasingly follows
+    # the calendar. Re-evaluate the day only between complete Rosaries; an
+    # explicit day/Mystery remains fixed until the process exits.
+    my $cycle_day = _next_cycle_day($follow_calendar, $subcommand);
+    if ($cycle_day ne $subcommand) {
+      $subcommand = $cycle_day;
+      ($Mystery, $Details, $Name, $MysteryRole, $MysteryTitleRole) =
+        _load_rosary_data($Rosary, $subcommand);
+    }
+
     $Stream->wait($o->between) if $cycle;
     print "\n\n" if $cycle and $o->scroll;
     ++$cycle;

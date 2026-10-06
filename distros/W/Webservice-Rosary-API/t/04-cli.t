@@ -86,6 +86,15 @@ for my $about (qw/-a --about/) {
   ok !$implicit, 'explicit day remains explicit with --unceasingly';
 }
 
+
+# --unceasingly follows the calendar only when the day was implicit.
+is local::bin::avemaria::_next_cycle_day(1, 'monday', 'tuesday'), 'tuesday',
+  'implicit unceasing prayer advances to the new calendar day between Rosaries';
+is local::bin::avemaria::_next_cycle_day(0, 'monday', 'tuesday'), 'monday',
+  'explicit day remains fixed across unceasing Rosaries';
+is local::bin::avemaria::_next_cycle_day(0, 'friday', 'saturday'), 'friday',
+  'explicit Mystery mapped to a day remains fixed across midnight';
+
 # Presentation helpers are intentionally pure so the UX can be regression-tested
 # without making live API calls.
 is local::bin::avemaria::_mystery_heading('friday', 'Sorrowful'),

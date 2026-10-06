@@ -1,5 +1,9 @@
 Revision history for Markdown-Simple
 
+0.23    2026-10-05
+        - Fixed the Windows build. Simple.xs moved to the top of the dist
+          and remove XSMULTI
+
 0.22    2026-08-14
         - Fixed a build failure on compilers older than GCC 4.3
         - The SSE2 backend is no longer selected on x86_64 CPUs without

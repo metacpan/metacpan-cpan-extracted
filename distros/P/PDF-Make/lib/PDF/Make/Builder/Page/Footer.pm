@@ -64,11 +64,12 @@ sub render {
         } else {
             $tx = $pad;
         }
+        my $tj = $font->show_op;
         $canvas->BT
                ->rg($r, $g, $b)
                ->Tf($res, $font_size)
                ->Tm(1, 0, 0, 1, $tx, $pad + 4)
-               ->Tj($text)
+               ->$tj($font->encode($text))
                ->ET;
     }
 }

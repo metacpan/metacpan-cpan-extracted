@@ -169,9 +169,9 @@ subtest 'snapshot autodetect keys to the Alien-<tail> share dir' => sub {
     like $cand[0], qr/Alien-Xrepo-Runtime-Nope[\\\/]xrepo-snapshot\.json$/, 'candidate keys to Alien-<tail> share dir';
 };
 subtest 'snapshot autodetect keys to the Exotic-<tail> share dir too' => sub {
-    my @cand = Alien::Xrepo::Runtime->_snapshot_candidates_for('Exotic::Zlib');
+    my @cand = Alien::Xrepo::Runtime->_snapshot_candidates_for('Exotic::ZrepoNope');
     is scalar(@cand), 1, 'one candidate when no installed share dir';
-    like $cand[0], qr/Exotic-Zlib[\\\/]xrepo-snapshot\.json$/, 'candidate keys to Exotic-<tail> share dir';
+    like $cand[0], qr/Exotic-ZrepoNope[\\\/]xrepo-snapshot\.json$/, 'candidate keys to Exotic-<tail> share dir';
 };
 subtest 'snapshot autodetect never invents an Alien- prefix' => sub {
     my @cand = Alien::Xrepo::Runtime->_snapshot_candidates_for('Sanko::Thing');

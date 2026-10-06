@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
 use Perl6::Slurp qw(slurp);
-use Test::More 'tests' => 38;
+use Test::More 'tests' => 41;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -85,7 +85,55 @@ stderr_is(
 		return;
 	},
 	$right_ret,
-	'Run help (-e and -r combination).',
+	'Run help (-e and -r and field combination).',
+);
+
+# Test.
+@ARGV = (
+	'-e',
+	$data_dir->file('ex1.xml')->s,
+	'leader',
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help (-e and leader combination).',
+);
+
+# Test.
+@ARGV = (
+	'-e',
+	$data_dir->file('ex1.xml')->s,
+	'material_type',
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help (-e and material_type combination).',
+);
+
+# Test.
+@ARGV = (
+	'-e',
+	$data_dir->file('ex1.xml')->s,
+	'008.foo',
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help (-e and field 008 method combination).',
 );
 
 # Test.

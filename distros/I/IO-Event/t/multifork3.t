@@ -1,12 +1,14 @@
 #!/usr/bin/perl -I.
 
-eval { require AnyEvent::Impl::Perl; require AnyEvent; };
+use strict;
+use warnings;
+
+eval { require AnyEvent::Impl::Perl; require AnyEvent; };  ## no critic (Community::DiscouragedModules)
 if ($@) {
-	print "1..0 # Skip AnyEvent not installed\n";
-	exit 0;
+    print "1..0 # Skip AnyEvent not installed\n";
+    exit 0;
 }
-use FindBin;
 use IO::Event;
-import IO::Event 'AnyEvent';
-require "$FindBin::Bin/multifork.tt";
+IO::Event->import('AnyEvent');
+require './t/multifork.tt';
 

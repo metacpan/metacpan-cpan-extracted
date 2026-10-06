@@ -342,6 +342,103 @@ uint16_t pdfmake_ttf_glyph_advance(const pdfmake_ttf_t *ttf, uint16_t glyph_id) 
 }
 
 /*============================================================================
+ * PostScript name (name table, nameID 6)
+ *
+ * The /BaseFont of an embedded font. Windows records it UTF-16BE and Mac
+ * ASCII; either way the PostScript name is restricted to printable ASCII
+ * minus the ten PostScript delimiters, so the high byte of a Windows record
+ * is dropped and anything outside that set is rejected rather than copied
+ * into a /Name where it would need escaping.
+ *==========================================================================*/
+
+#define TTF_PS_NAME_MAX 63
+
+static int ps_name_char_ok(uint8_t c) {
+    if (c < 33 || c > 126) return 0;
+    switch (c) {
+        case '(': case ')': case '<': case '>': case '[': case ']':
+        case '{': case '}': case '/': case '%': case '#':
+            return 0;
+        default:
+            return 1;
+    }
+}
+
+const char *pdfmake_ttf_postscript_name(const pdfmake_ttf_t *ttf,
+                                        pdfmake_arena_t *arena) {
+    const uint8_t *tbl;
+    const uint8_t *recs;
+    uint16_t count;
+    uint16_t string_off;
+    uint16_t i;
+    char buf[TTF_PS_NAME_MAX + 1];
+    char best[TTF_PS_NAME_MAX + 1];
+    int best_score = -1;
+
+    if (!ttf || !arena || !ttf->data) return NULL;
+    if (ttf->name.length < 6) return NULL;
+    if (ttf->name.offset > ttf->data_len) return NULL;
+    if (ttf->name.length > ttf->data_len - ttf->name.offset) return NULL;
+
+    tbl        = ttf->data + ttf->name.offset;
+    count      = pdfmake_read_be16(tbl + 2);
+    string_off = pdfmake_read_be16(tbl + 4);
+    recs       = tbl + 6;
+
+    /* Each record is 12 bytes; stop short rather than walk off the table. */
+    if ((size_t)count * 12 + 6 > ttf->name.length) {
+        count = (uint16_t)((ttf->name.length - 6) / 12);
+    }
+
+    for (i = 0; i < count; i++) {
+        const uint8_t *r = recs + (size_t)i * 12;
+        uint16_t platform = pdfmake_read_be16(r);
+        uint16_t name_id  = pdfmake_read_be16(r + 6);
+        uint16_t len      = pdfmake_read_be16(r + 8);
+        uint16_t off      = pdfmake_read_be16(r + 10);
+        const uint8_t *s;
+        int wide;
+        int score;
+        size_t step;
+        size_t n;
+        size_t out;
+
+        if (name_id != 6) continue;
+        /* 3 = Windows (UTF-16BE), 0 = Unicode (UTF-16BE), 1 = Mac (ASCII) */
+        if (platform == 3)      { wide = 1; score = 2; }
+        else if (platform == 1) { wide = 0; score = 1; }
+        else if (platform == 0) { wide = 1; score = 0; }
+        else continue;
+        if (score <= best_score) continue;
+
+        /* Offsets are relative to the table's string storage. */
+        if ((size_t)string_off + off + len > ttf->name.length) continue;
+        s = tbl + string_off + off;
+
+        step = wide ? 2 : 1;
+        if (len < step) continue;
+        n = len / step;
+        if (n > TTF_PS_NAME_MAX) n = TTF_PS_NAME_MAX;
+
+        for (out = 0; out < n; out++) {
+            const uint8_t *cp = s + out * step;
+            if (wide && cp[0] != 0) break;      /* not Latin-1: give up */
+            if (!ps_name_char_ok(cp[wide])) break;
+            buf[out] = (char)cp[wide];
+        }
+        if (out == 0 || out != n) continue;     /* partial name is no name */
+
+        buf[out] = '\0';
+        memcpy(best, buf, out + 1);
+        best_score = score;
+        if (score == 2) break;                  /* Windows record wins */
+    }
+
+    if (best_score < 0) return NULL;
+    return pdfmake_arena_strdup(arena, best);
+}
+
+/*============================================================================
  * Mark glyph as used (for subsetting)
  *==========================================================================*/
 

@@ -1,4 +1,20 @@
-Revision history for Perl module IO::Event
+Revision history for IO-Event
+
+0.814     2026-10-06 03:20:11 -0600
+  - use List::SomeUtils instead of List::MoreUtils (works around a
+    broken dep in List::MoreUtils) (gh#10)
+  - fixed a pod formatting goof
+  - fixed the repository line in the Makefile.PL
+  - migrated to Dist::Zilla
+  - treat EWOULDBLOCK like EAGAIN, so non-blocking sockets work on
+    Windows (rt#84473)
+  - fixed test suite hangs on Windows (rt#84473)
+  - Event backend now uses high resolution timers; previously
+    timers had one second granularity unless the caller did
+    `use Event`
+  - Made the forked test inactivity timer more robust (rt#125351)
+  - fixed race in t/forked2.t that caused failures under heavy load
+    (rt#92200, Debian #730908; patch by Niko Tyni)
 
 0.813 2013/09/17
 

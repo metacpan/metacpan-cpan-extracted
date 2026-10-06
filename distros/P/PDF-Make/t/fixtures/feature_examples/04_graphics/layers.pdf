@@ -1,10 +1,10 @@
 %PDF-2.0
 %‚„œ”
 1 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
 endobj
 2 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
 endobj
 3 0 obj
 <</Type /OCG/Name (Visible Layer)/Intent /View>>
@@ -13,13 +13,13 @@ endobj
 <</Type /OCG/Name (Hidden Layer)/Intent /View>>
 endobj
 5 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
 endobj
 6 0 obj
-<</Type /Font/Subtype /Type1/BaseFont /Times-Roman>>
+<</Type /Font/Subtype /Type1/BaseFont /Helvetica>>
 endobj
 7 0 obj
-<</Length 782>>
+<</Length 727>>
 stream
 BT
 0 0 0 rg
@@ -42,7 +42,7 @@ ET
 /OC /MC0 BDC
 q
 1 w
-0.145098039215686 0.388235294117647 0.92156862745098 RG
+0.145098 0.388235 0.921569 RG
 36 614 m
 576 614 l
 S
@@ -63,7 +63,7 @@ ET
 /OC /MC1 BDC
 q
 1 w
-0.862745098039215 0.149019607843137 0.149019607843137 RG
+0.862745 0.14902 0.14902 RG
 [6 3] 0 d
 36 545 m
 576 545 l
@@ -89,24 +89,24 @@ endobj
 <</Type /Catalog/Pages 8 0 R/OCProperties <</OCGs [3 0 R 4 0 R]/D <</Name (Default)/BaseState /ON/OFF [4 0 R]/Order [3 0 R 4 0 R]>>>>>>
 endobj
 11 0 obj
-<</Producer (PDF-Make/0.01)/CreationDate (D:20260421183820Z)/ModDate (D:20260421183820Z)>>
+<</Producer (PDF-Make/0.13)/CreationDate (D:20261005214532Z)/ModDate (D:20261005214532Z)>>
 endobj
 xref
 0 12
 0000000000 65535 f 
 0000000015 00000 n 
-0000000083 00000 n 
-0000000151 00000 n 
-0000000215 00000 n 
-0000000278 00000 n 
-0000000346 00000 n 
-0000000414 00000 n 
-0000001245 00000 n 
-0000001298 00000 n 
-0000001466 00000 n 
-0000001618 00000 n 
+0000000081 00000 n 
+0000000147 00000 n 
+0000000211 00000 n 
+0000000274 00000 n 
+0000000340 00000 n 
+0000000406 00000 n 
+0000001182 00000 n 
+0000001235 00000 n 
+0000001403 00000 n 
+0000001555 00000 n 
 trailer
-<</Size 12/Root 10 0 R/Info 11 0 R/ID[<5117281DAF50820972611728B8177D28><5117281DAF50820972611728B8177D28>]>>
+<</Size 12/Root 10 0 R/Info 11 0 R/ID[<8AA83DAE45BC294E695E4EA33CF52E2F><8AA83DAE45BC294E695E4EA33CF52E2F>]>>
 startxref
-1725
+1662
 %%EOF

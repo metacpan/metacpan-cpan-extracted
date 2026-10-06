@@ -11,7 +11,7 @@ use Mac::PropertyList;
 use Math::BigInt;
 use POSIX             qw(SEEK_END SEEK_SET);
 
-our $VERSION = '1.603_02';
+our $VERSION = '1.607';
 
 my $Debug = $ENV{PLIST_DEBUG} || 0;
 
@@ -231,7 +231,7 @@ my $type_readers = {
 				$b -= Math::BigInt->new(2)->bpow(128);
 				}
 
-			@values = ( $b );
+			@values = ( $b->bstr );
 			}
 
 		return Mac::PropertyList::integer->new( $values[0] );

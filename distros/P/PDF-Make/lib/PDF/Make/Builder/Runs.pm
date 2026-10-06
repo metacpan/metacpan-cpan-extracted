@@ -2,7 +2,7 @@ package PDF::Make::Builder::Runs;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 # Line breaking across styled runs.
 #

@@ -67,3 +67,10 @@
 	- when --color is enabled, alternate Hail Marys between Marian blue and
 	  a neutral foreground; each introductory group and decade starts blue
 	  (soft white alternate on --dark, charcoal alternate on --light)
+
+0.1.9	Tue Oct 6 02:55:00 AM CDT 2026
+	- --unceasingly now follows calendar day changes at complete-Rosary
+	  boundaries when no day/Mystery was explicitly selected; explicit
+	  selections remain fixed across cycles
+	- i.e., the Mystery changes as the calendar day changes unless it has
+	  been explicitly set

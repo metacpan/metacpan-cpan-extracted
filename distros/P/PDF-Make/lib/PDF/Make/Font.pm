@@ -2,7 +2,7 @@ package PDF::Make::Font;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 # Load the XS via PDF::Make
 require PDF::Make;
@@ -187,7 +187,19 @@ Also marks used glyphs for later subsetting.
 =head2 write_to_doc($doc)
 
 Writes the font to a PDF document and returns the object number.
-For TrueType fonts, this performs subsetting based on used glyphs.
+
+A Standard 14 font becomes a simple C</Type1> dictionary. A TrueType font is
+subsetted to the glyphs marked used - which is what C<encode_utf8> marks as it
+encodes - and written as a C</Type0> font with C<Identity-H> encoding over a
+C</CIDFontType2> descendant, with the font program in C</FontFile2>, a
+C</CIDToGIDMap> stream and a C</ToUnicode> CMap.
+
+Call it after the content streams that use the font are built, or the subset
+will not contain their glyphs. Writing the same font twice returns the same
+object number rather than embedding it again.
+
+The object number is not attached to any page by itself: pass it to
+C<< PDF::Make::Page->add_font_ref >> to make it usable from a content stream.
 
 =head1 SEE ALSO
 

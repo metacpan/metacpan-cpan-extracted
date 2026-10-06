@@ -237,15 +237,16 @@ SKIP: {
 	}
 }
 
-# A NUL cannot appear in XML 1.0 at all, so a cell holding one loses it in the
-# worksheet (it used to lose everything after it, at a strlen()); and a sheet
-# name given as Latin-1 bytes is written as UTF-8, where its bytes used to go
-# into workbook.xml as they were.
+# A NUL cannot appear in XML 1.0 at all, so a cell holding one has it written
+# as Excel's escape, _x0000_ (it used to lose everything after it, at a
+# strlen(), and then to be dropped; t/write_table.xlsx.escape.t has the rest);
+# and a sheet name given as Latin-1 bytes is written as UTF-8, where its bytes
+# used to go into workbook.xml as they were.
 SKIP: {
 	skip 'IO::Uncompress::Unzip (core) not available', 2 unless $have_unzip;
 	my $f = xlsx_path();
 	write_table([{ a => "x\0y" }], $f, quiet => 1, 'xlsx_sheet' => "R\xe9sum\xe9");
-	like( member($f, 'xl/worksheets/sheet1.xml'), qr{<t xml:space="preserve">xy</t>}, 'a NUL is dropped from an .xlsx cell' );
+	like( member($f, 'xl/worksheets/sheet1.xml'), qr{<t xml:space="preserve">x_x0000_y</t>}, 'a NUL in an .xlsx cell is written as _x0000_' );
 	like( member($f, 'xl/workbook.xml'), qr{name="R\xc3\xa9sum\xc3\xa9"}, 'a Latin-1 sheet name is written as UTF-8' );
 }
 

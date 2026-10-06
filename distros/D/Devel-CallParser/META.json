@@ -58,7 +58,7 @@
    "provides" : {
       "Devel::CallParser" : {
          "file" : "lib/Devel/CallParser.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -67,6 +67,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

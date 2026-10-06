@@ -49,7 +49,7 @@ STENCIL_INLINE uint64_t special_mask8(uint64_t v)
          | STENCIL_HASZERO(v ^ STENCIL_BCAST('>'));
 }
 
-STENCIL_INLINE unsigned popcount64(uint64_t m)
+STENCIL_INLINE unsigned stencil_popcount64(uint64_t m)
 {
 #if defined(__GNUC__) || defined(__clang__)
     return (unsigned)__builtin_popcountll(m);
@@ -68,7 +68,7 @@ size_t stencil_count_specials(const char *src, size_t n)
     while ((size_t)(end - p) >= 8) {
         uint64_t v;
         memcpy(&v, p, 8);
-        count += popcount64(special_mask8(v));
+        count += stencil_popcount64(special_mask8(v));
         p += 8;
     }
     for (; p < end; p++)

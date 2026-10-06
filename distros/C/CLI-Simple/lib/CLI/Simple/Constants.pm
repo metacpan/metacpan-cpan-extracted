@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Exporter);
 
-our $VERSION = '2.2.4';
+our $VERSION = '2.2.5';
 
 use Readonly;
 

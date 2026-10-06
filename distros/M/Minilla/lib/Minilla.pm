@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.2.0");
+use version; our $VERSION = version->declare("v3.3.0");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -13,7 +13,7 @@ sub auto_install { $AUTO_INSTALL }
 1;
 __END__
 
-=for stopwords MINILLA .mailmap mimick XSUtil travis XSUtil.needs_compiler_cpp XSUtil.generate_xshelper_h XSUtil.cc_warnings DarkPAN minilla untracked UploadToCPAN circleci appveyor codecov gitter metacpan MBTiny kritika gitlab-pipeline gitlab-coverage subcommand notest
+=for stopwords MINILLA .mailmap mimick XSUtil travis XSUtil.needs_compiler_cpp XSUtil.generate_xshelper_h XSUtil.cc_warnings DarkPAN minilla untracked UploadToCPAN circleci appveyor codecov gitter metacpan MBTiny kritika gitlab-pipeline gitlab-coverage subcommand notest newlines canonicalized
 
 =encoding utf8
 
@@ -43,7 +43,8 @@ for example C<minil --help release>.
 =item B<--color>, B<--no-color>
 
 Enable or disable colored log output. Color is enabled by default when standard
-output is connected to a terminal.
+error is connected to a terminal. Log output is written to standard error so
+standard output remains available for command output and pipelines.
 
 =item B<--debug>
 

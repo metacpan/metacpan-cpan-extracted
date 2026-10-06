@@ -1,7 +1,7 @@
 package Heap::PQ;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '1.00';
 require XSLoader;
 XSLoader::load('Heap::PQ', $VERSION);
 1;

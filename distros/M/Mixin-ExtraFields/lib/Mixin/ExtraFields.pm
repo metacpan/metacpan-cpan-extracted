@@ -1,10 +1,11 @@
 use strict;
 use warnings;
 
-package Mixin::ExtraFields 0.140003;
+package Mixin::ExtraFields 0.140004;
 # ABSTRACT: add extra stashes of data to your objects
 
 use Carp ();
+use Params::SomeUtil ();
 use String::RewritePrefix;
 
 #pod =head1 SYNOPSIS
@@ -377,12 +378,12 @@ sub default_driver_arg {
 sub build_driver {
   my ($self, $arg) = @_;
 
-  return $arg if Params::Util::_INSTANCE($arg, $self->driver_base_class);
+  return $arg if Params::SomeUtil::_INSTANCE($arg, $self->driver_base_class);
 
   my ($driver_class, $driver_args) = $self->_driver_class_and_args($arg);
 
   Carp::croak("invalid class name for driver: $driver_class")
-    unless Params::Util::_CLASS($driver_class);
+    unless Params::SomeUtil::_CLASS($driver_class);
 
   eval "require $driver_class; 1" or Carp::croak $@;
 
@@ -445,7 +446,7 @@ Mixin::ExtraFields - add extra stashes of data to your objects
 
 =head1 VERSION
 
-version 0.140003
+version 0.140004
 
 =head1 SYNOPSIS
 
@@ -495,13 +496,13 @@ storage mechanisms.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 MIXING IN
 
@@ -750,7 +751,7 @@ Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo Signes.
+This software is copyright (c) 2026 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

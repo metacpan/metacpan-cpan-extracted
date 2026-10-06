@@ -10,6 +10,7 @@ use autodie qw(:all);
 
 use Test::Most;
 use Test::Needs;
+use Test::Permissions;
 use Test::Without::Module;
 use Readonly;
 use Scalar::Util qw(blessed reftype);
@@ -89,6 +90,20 @@ sub _silenced
 	return @result;
 }
 
+# Run $code while $path is unreadable, restoring its mode afterwards even if
+# $code dies.  Returns undef when $code ran, or a skip reason when chmod cannot
+# take read access away here (root, CAP_DAC_OVERRIDE, fakeroot, Windows, FAT...).
+# Uses Test::Permissions, which probes for real
+sub _with_unreadable
+{
+	my ($dir, $path, $code) = @_;
+
+	if(my $reason = Test::Permissions::why_not('read', $dir)) {
+		return $reason;
+	}
+	Test::Permissions::with_revoked(read => $path, $code);
+}
+
 # ---------------------------------------------------------------------------
 use_ok($MODULE) or BAIL_OUT("$MODULE failed to load");
 
@@ -135,14 +150,15 @@ subtest '_load_config() - unreadable base file skipped silently' => sub {
 		if $^O eq 'MSWin32';
 	my $dir = tempdir(CLEANUP => 1);
 	my $path = _write_file($dir, 'base.yaml', "secret: value\n");
-	chmod(0000, $path);    # make unreadable
 
-	my $cfg = Config::Abstraction->new(
-		data        => { fallback => 'yes' },
-		config_dirs => [$dir],
-	);
-	# Restore permissions so tempdir cleanup works
-	chmod(0644, $path);
+	my $cfg;
+	my $skip = _with_unreadable($dir, $path, sub {
+		$cfg = Config::Abstraction->new(
+			data        => { fallback => 'yes' },
+			config_dirs => [$dir],
+		);
+	});
+	plan skip_all => $skip if defined($skip);
 
 	ok(defined($cfg), 'object created despite unreadable base file');
 	ok(!defined($cfg->get('secret')), 'unreadable base file value not loaded');
@@ -191,14 +207,16 @@ subtest '_load_config() - unreadable config_file skipped (line 609 right-false)'
 		if $^O eq 'MSWin32';
 	my $dir = tempdir(CLEANUP => 1);
 	my $path = _write_file($dir, 'secret.yaml', "secret: value\n");
-	chmod(0000, $path);    # make unreadable
 
-	my $cfg = Config::Abstraction->new(
-		config_file => 'secret.yaml',
-		config_dirs => [$dir],
-		data        => { fallback => 'yes' },
-	);
-	chmod(0644, $path);    # restore for cleanup
+	my $cfg;
+	my $skip = _with_unreadable($dir, $path, sub {
+		$cfg = Config::Abstraction->new(
+			config_file => 'secret.yaml',
+			config_dirs => [$dir],
+			data        => { fallback => 'yes' },
+		);
+	});
+	plan skip_all => $skip if defined($skip);
 
 	ok(defined($cfg), 'object created despite unreadable config_file');
 	ok(!defined($cfg->get('secret')), 'unreadable config_file value not loaded');

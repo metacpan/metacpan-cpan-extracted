@@ -26,7 +26,7 @@ BEGIN {
 
 # Quoted, not the bare number: a numeric version is stringified through %g,
 # so 0.20 would become "0.2" and compare as older than "0.15" on CPAN.
-our $VERSION = '0.193';
+our $VERSION = '0.194';
 
 use Cwd 'getcwd';
 use Digest::MD5 'md5_hex';
@@ -2076,10 +2076,16 @@ sub parallel {
 	my %handles = map { ($_ => $_) } grep { defined openhandle($_) } \*STDOUT, \*STDERR,
 		map { ($_->{'log_fh'}, $_->{'trace_fh'}) } @tasks, \%DEFAULTS;
 	_flush($_) foreach values %handles;
-	# An interrupt to parallel() goes to every running task, as TERM, which
-	# each passes to its command before it ends; see _run_forked. It is then
-	# re-raised here once every child is gone. One the caller ignores stays
-	# ignored.
+	# An interrupt to parallel() goes to every running task, which passes it
+	# to its command before it ends; see _run_forked. It is then re-raised here
+	# once every child is gone. One the caller ignores stays ignored.
+	#
+	# Each task is sent the signal parallel() received, which its child cannot
+	# be ignoring: the child sets every signal in @interrupts back to the
+	# caller's own disposition. Until 0.194 it was sent TERM, which a caller
+	# that ignored TERM had left ignored in the child and the command alike, so
+	# an INT or a HUP sent to parallel()'s process alone reached no task, and
+	# each ran on to its end before the interrupt was re-raised.
 	my %running; # pid => [index, the File::Temp its record comes back in]
 	my $report_lock = File::Temp->new; # see $REPORT_LOCK
 	my $interrupted;
@@ -2087,8 +2093,9 @@ sub parallel {
 	my %caller_sig = map { $_ => $SIG{$_} } @interrupts;
 	{
 		local @SIG{@interrupts} = (sub {
-			$interrupted //= shift;
-			kill 'TERM', keys %running;
+			my $signal = shift;
+			$interrupted //= $signal;
+			kill $signal, keys %running;
 		}) x @interrupts;
 		my $next = 0;
 		while (1) {
@@ -2457,7 +2464,7 @@ SimpleFlow - easy, simple workflow manager (and logger); for keeping track of an
 
 =head1 VERSION
 
-version 0.193
+version 0.194
 
 =head1 DESCRIPTION
 
@@ -4237,8 +4244,9 @@ any failed, as Snakemake's C<--keep-going> does. Under C<< die =E<gt> 0 >> a fai
 is only a record with C<< will.do =E<gt> "FAILED" >>, and C<parallel> returns.
 
 A C<TERM>, C<HUP>, C<INT> or C<QUIT> sent to your script while C<parallel> runs is
-passed to every running step as C<TERM>, which each passes to its command; once
-they have ended, the signal is passed on to your script.
+passed to every running step, which passes it to its command; once they have
+ended, the signal is passed on to your script. A signal your script ignores
+stays ignored, by C<parallel> and by the commands.
 
 C<jobs> above 1 needs a real C<fork()>, so it is refused on C<MSWin32>, where perl
 emulates one with threads. C<< jobs =E<gt> 1 >> runs the steps one after another, and

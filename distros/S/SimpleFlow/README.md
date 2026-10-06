@@ -747,8 +747,9 @@ any failed, as Snakemake's `--keep-going` does. Under `die => 0` a failed step
 is only a record with `will.do => "FAILED"`, and `parallel` returns.
 
 A `TERM`, `HUP`, `INT` or `QUIT` sent to your script while `parallel` runs is
-passed to every running step as `TERM`, which each passes to its command; once
-they have ended, the signal is passed on to your script.
+passed to every running step, which passes it to its command; once they have
+ended, the signal is passed on to your script. A signal your script ignores
+stays ignored, by `parallel` and by the commands.
 
 `jobs` above 1 needs a real `fork()`, so it is refused on `MSWin32`, where perl
 emulates one with threads. `jobs => 1` runs the steps one after another, and

@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
-# Just like euclidean.pl but with a save attribute
+# Just like euclidean.pl but with a save attribute and weighted next
+# part probability.
 
 use v5.36;
 use Math::Prime::XS qw(primes);
@@ -10,7 +11,7 @@ use Music::SimpleDrumMachine ();
 my $name = shift || 'usb';
 my $bpm  = shift || 120;
 my $chan = shift // 9;
-my $file = shift || 'drums.mid';
+my $file = shift || "$0.mid";
 
 my $beats  = 16;
 my %primes = ( # for computing patterns

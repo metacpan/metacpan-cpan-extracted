@@ -1079,12 +1079,19 @@ subtest 'time_zone: local path reads /etc/timezone or DateTime::TimeZone (COND_I
 	# Kill COND_INV_1484: if(CORE::open(..., /etc/timezone)) → if file readable, read it.
 	# Mutant (unless): reads it only when NOT readable (wrong branch).
 	# Without REMOTE_ADDR, time_zone() takes the local path.
-	local %ENV = ();
+	# Set TZ so the DateTime::TimeZone::Local fallback is deterministic on
+	# systems without /etc/timezone (e.g. FreeBSD, where /etc/localtime is
+	# often a copied file or absent, so the zone name cannot be divined).
+	local %ENV = (TZ => 'Europe/London');
 	delete local $ENV{REMOTE_ADDR};
-	my $l = _obj([$LANG_EN]);
-	my $tz = eval { $l->time_zone() };
-	ok(defined($tz), 'time_zone() returns defined value in local mode (COND_INV_1484)')
-		or diag("tz error: $@");
+	SKIP: {
+		skip 'neither /etc/timezone nor DateTime::TimeZone::Local available', 1
+			unless -r '/etc/timezone' || eval { require DateTime::TimeZone::Local; 1 };
+		my $l = _obj([$LANG_EN]);
+		my $tz = eval { $l->time_zone() };
+		ok(defined($tz), 'time_zone() returns defined value in local mode (COND_INV_1484)')
+			or diag("tz error: $@");
+	}
 };
 
 subtest 'time_zone: warns and returns undef when tz undetermined (COND_INV_1493_2, BOOL_NEGATE_1496_2)' => sub {

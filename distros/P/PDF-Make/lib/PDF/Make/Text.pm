@@ -7,7 +7,7 @@ package PDF::Make::Text;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 use PDF::Make::Extract;
 use PDF::Make::Extract::Result;

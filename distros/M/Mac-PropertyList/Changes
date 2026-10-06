@@ -1,5 +1,11 @@
 Revision history for Perl module Mac::PropertyList
 
+1.607 2026-10-05T16:54:59Z
+	* promote to user version (#38)
+
+1.606_01 2026-09-28T12:59:48Z
+	* try fix for Math::BigInt from David B. Evans (macports)
+
 1.606 2026-01-20T16:50:39Z
 	* remove import from XML::Entities, which does not export.
 	v5.44 will make this either fatal, or a warning.

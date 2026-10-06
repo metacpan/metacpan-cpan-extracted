@@ -27,10 +27,13 @@ use warnings;
 
 # Untaint HOME so that prove -lt does not reject the lib paths
 BEGIN {
-	my ($home) = ($ENV{HOME} =~ /\A(.+)\z/ms);
-	unshift @INC, 'lib',
-		"$home/src/njh/Test-Mockingbird/lib",
-		"$home/src/njh/Test-Returns/lib";
+	# HOME is often unset on Windows
+	if(defined($ENV{HOME}) && (my ($home) = ($ENV{HOME} =~ /\A(.+)\z/ms))) {
+		unshift @INC,
+			"$home/src/njh/Test-Mockingbird/lib",
+			"$home/src/njh/Test-Returns/lib";
+	}
+	unshift @INC, 'lib';
 }
 
 use Test::Most;

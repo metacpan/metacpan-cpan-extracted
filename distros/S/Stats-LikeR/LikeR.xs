@@ -5255,7 +5255,18 @@ typedef struct {
 	bool seekable; // the local header is patched in place once the size is known
 } WtXlsx;
 
-static void wt_xlsx_row(pTHX_ WtXlsx *restrict X, const char *const *restrict fields, const STRLEN *restrict lens, size_t n);
+/*One record's fields as they are gathered for print_string_row(), with a
+scratch SV for each field.  The arrays are on the save stack and the scratch
+SVs in a mortal AV, so a croak from anywhere in a row leaks none of them.*/
+typedef struct {
+	const char **f;
+	STRLEN *len;
+	bool *num;	// the field is a number the caller held as one, not as a string: see wt_cell()
+	SV **scr;
+	size_t n;	// fields filled so far in this record
+} WtRow;
+
+static void wt_xlsx_row(pTHX_ WtXlsx *restrict X, const WtRow *restrict R);
 
 /*Where write_table()'s records go.  Exactly one of fh, collect and xlsx is set.*/
 typedef struct {
@@ -5266,20 +5277,53 @@ typedef struct {
 	STRLEN sep_len;
 } WtSink;
 
+/*Does a delimited field need quotes?  It does for a quote, a line break or the
+separator, as csv.writer's QUOTE_MINIMAL decides, and in two places where
+read_table() would otherwise not see the record at all:
+
+- A record of one field that is empty, or holds nothing but spaces and tabs,
+  is a blank line, and blank lines are skipped (as R's read.table and pandas
+  skip them).  csv.writer quotes a lone empty field for the same reason --
+  CPython 3.14.2 Lib/test/test_csv.py, test_write_empty_fields: [''] and
+  [None] are written '""' -- and this extends it to blanks, which the
+  parser's blank-line rule (S_blank_run()) also skips.
+- A record whose first field starts with '#' would be read as a comment:
+  read_table()'s default comment marker is '#', a marker followed by a blank
+  or the end of the line is skipped, and with header => 0 any line starting
+  with one is.  Quoted, the line starts with '"' instead.  csv.writer has no
+  comment character to guard, so this one is read_table()'s alone.*/
+static bool wt_needs_quotes(const char *restrict f, STRLEN len, size_t i, size_t n,
+	const char *restrict sep, STRLEN sep_len) {
+	if (n == 1) {
+		bool blank = TRUE;
+		for (STRLEN k = 0; k < len && blank; k++)
+			if (f[k] != ' ' && f[k] != '\t') blank = FALSE;
+		if (blank) return TRUE;
+	}
+	if (i == 0 && len && f[0] == '#') return TRUE;
+	for (STRLEN k = 0; k < len; k++) {
+		const char c = f[k];
+		if (c == '"' || c == '\n' || c == '\r'
+				|| (sep_len && c == sep[0] && len - k >= sep_len && memEQ(f + k, sep, sep_len)))
+			return TRUE;
+	}
+	return FALSE;
+}
+
 /*Emit one record.  Every field is a byte string with an explicit length, so a
 cell holding a NUL is written whole: it used to pass through strlen(), and
 "x\0y" came out as x.  Delimited text writes the bytes raw, as csv.writer and
-pandas' to_csv() do, and quotes a field only for a quote, a line break or the
-separator.
+pandas' to_csv() do, and quotes a field only where wt_needs_quotes() says.
 
-A field is scanned once for all of those, where there used to be one strchr()
-per character sought, a strstr() for the separator and a strlen() on top, and
-a quoted field is written a run at a time between the quotes it doubles
-rather than one PerlIO_putc() per byte.*/
-static void print_string_row(pTHX_ WtSink *restrict S, const char *const *restrict fields,
-                             const STRLEN *restrict lens, size_t n)
+A quoted field is written a run at a time between the quotes it doubles
+rather than one PerlIO_putc() per byte.  Writing each record into one buffer
+and that with a single PerlIO_write() was tried, and was no faster on a
+200000 x 20 table (0.158s against 0.153s): PerlIO's own buffer already
+gathers these writes.*/
+static void print_string_row(pTHX_ WtSink *restrict S, const WtRow *restrict R)
 {
-	if (S->xlsx) { wt_xlsx_row(aTHX_ S->xlsx, fields, lens, n); return; }
+	const size_t n = R->n;
+	if (S->xlsx) { wt_xlsx_row(aTHX_ S->xlsx, R); return; }
 	if (S->collect) {
 /*The LaTeX renderer wants the records back as SVs, so each field is copied
 into one.  Taking the bytes out of the cell dropped its UTF-8 flag; it is put
@@ -5289,8 +5333,8 @@ no flag, and invalid or Latin-1 bytes stay bytes.*/
 		AV *crow = newAV();
 		av_push(S->collect, newRV_noinc((SV*)crow));	// owned by collect from here, in case of a croak
 		for (size_t i = 0; i < n; i++) {
-			const char *f = fields[i] ? fields[i] : "";
-			const STRLEN flen = fields[i] ? lens[i] : 0;
+			const char *f = R->f[i] ? R->f[i] : "";
+			const STRLEN flen = R->f[i] ? R->len[i] : 0;
 			SV *fsv = newSVpvn(f, flen);
 			bool high = 0;
 			for (STRLEN k = 0; k < flen; k++) if ((U8)f[k] >= 0x80) { high = TRUE; break; }
@@ -5304,20 +5348,10 @@ no flag, and invalid or Latin-1 bytes stay bytes.*/
 	const STRLEN sep_len = S->sep_len;
 	for (size_t i = 0; i < n; i++) {
 		if (i && sep_len) PerlIO_write(fh, sep, sep_len);
-		const char *f = fields[i];
-		const STRLEN len = f ? lens[i] : 0;
-		if (!len) continue; //undef/empty -> print nothing
-		bool need_quotes = 0;
-		for (STRLEN k = 0; k < len; k++) {
-			const char c = f[k];
-			if (c == '"' || c == '\n' || c == '\r'
-					|| (sep_len && c == sep[0] && len - k >= sep_len && memEQ(f + k, sep, sep_len))) {
-				need_quotes = TRUE;
-				break;
-			}
-		}
-		if (!need_quotes) {
-			PerlIO_write(fh, f, len);
+		const char *f = R->f[i] ? R->f[i] : "";
+		const STRLEN len = R->f[i] ? R->len[i] : 0;
+		if (!wt_needs_quotes(f, len, i, n, sep, sep_len)) {
+			if (len) PerlIO_write(fh, f, len);	//undef/empty -> print nothing
 			continue;
 		}
 		PerlIO_putc(fh, '"');
@@ -5334,22 +5368,14 @@ no flag, and invalid or Latin-1 bytes stay bytes.*/
 	PerlIO_putc(fh, '\n');
 }
 
-/*One record's fields as they are gathered for print_string_row(), with a
-scratch SV for each field.  The arrays are on the save stack and the scratch
-SVs in a mortal AV, so a croak from anywhere in a row leaks none of them.*/
-typedef struct {
-	const char **f;
-	STRLEN *len;
-	SV **scr;
-	size_t n;	// fields filled so far in this record
-} WtRow;
-
 static void wt_row_init(pTHX_ WtRow *restrict R, size_t width) {
 	if (width == 0) width = 1;
 	Newx(R->f, width, const char *);
 	SAVEFREEPV(R->f);
 	Newx(R->len, width, STRLEN);
 	SAVEFREEPV(R->len);
+	Newx(R->num, width, bool);
+	SAVEFREEPV(R->num);
 	AV *scr_av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(scr_av, (SSize_t)width - 1);
 	for (size_t i = 0; i < width; i++) av_push(scr_av, newSV(0));
@@ -5361,6 +5387,7 @@ static void wt_row_init(pTHX_ WtRow *restrict R, size_t width) {
 static void wt_field(WtRow *restrict R, const char *s, STRLEN len) {
 	R->f[R->n] = s;
 	R->len[R->n] = len;
+	R->num[R->n] = FALSE;
 	R->n++;
 }
 
@@ -5374,18 +5401,40 @@ A cell that holds only a number is formatted in this field's scratch SV, not
 in the cell.  SvPV() caches the text it makes in the SV it is given, upgrading
 it to carry a string buffer: a 1e6-number HoA used to weigh 96 MB after a call
 to write_table where it had weighed 32 MB before, and stayed that way.  The
-copy is formatted by the same sv_2pv_flags(), so the text is the same.*/
+copy is formatted by the same sv_2pv_flags(), so the text is the same.
+
+Such a cell is marked as a number, which only the .xlsx writer reads: there a
+number is a number cell whatever its text, where a string is one only when its
+text is a plain decimal (xlsx_number_text()).  SvPOK() is what tells the two
+apart.  From perl 5.36 on, formatting a number for print or interpolation sets
+only the private POK flag, so a number stays a number however often it has
+been printed; before that it gains SvPOK the first time, and is then taken
+for the string it was printed as.*/
 static void wt_cell(pTHX_ WtRow *restrict R, SV *cell, const char *undef_val, STRLEN undef_len) {
 	if (cell) SvGETMAGIC(cell);	// no restrict on cell: it is the caller's, or a proxy perl made
 	if (!cell || !SvOK(cell)) { wt_field(R, undef_val, undef_len); return; }
 	if (SvROK(cell)) croak("write_table: Cannot write nested reference types to table\n");
 	const size_t i = R->n++;
 	if (SvPOK(cell)) {
+		R->num[i] = FALSE;
 		R->f[i] = SvPV_nomg(cell, R->len[i]);
 		return;
 	}
+	R->num[i] = TRUE;
 	sv_setsv_nomg(R->scr[i], cell);
 	R->f[i] = SvPV_nomg(R->scr[i], R->len[i]);
+}
+
+/*A cell's entry in one of the caller's hashes, or NULL when it has no such key.
+A restricted hash (Hash::Util's lock_keys()) croaks "Attempt to access
+disallowed key" at a fetch of a key it does not allow, as $h{key} does in
+perl, so an AoH whose locked rows did not all have every column died partway
+through the file.  For one of those, exists is asked first; for any other hash
+the fetch alone says the same.  hv is the caller's hash, perl-managed: no
+restrict.*/
+static HE *wt_fetch(pTHX_ HV *hv, SV *key) {
+	if (SvREADONLY((SV*)hv) && !hv_exists_ent(hv, key, 0)) return NULL;
+	return hv_fetch_ent(hv, key, 0, 0);
 }
 
 /*A value from one of the caller's containers, with its get magic run: what
@@ -5471,14 +5520,25 @@ static void wt_close_on_unwind(pTHX_ void *slot) {
 write_table() offers col_names on every shape it accepts and reads it the
 same way for each, so the five branches share this rather than carrying a
 copy apiece. The argument has already been checked for ARRAY-ness at the top
-of the XSUB; an element that is undef is skipped, not emitted as an empty
-header, which is the behaviour every branch had.*/
-static void wt_headers_given(pTHX_ AV *headers_av, SV *col_names_sv) {
+of the XSUB.  An element that is undef names no column: a keyed shape (HoA,
+HoH, AoH, flat hash) skips it, since there is no key to look up, but an AoA's
+columns are positional, so there it is kept as an empty header cell.  Skipping
+it there moved every later name one column left: col_names => ['a', undef,
+'c'] over [1, 2, 3] wrote "a,c," and headed the 2 with 'c'.
+
+A reference is refused as a data cell is (wt_cell()): it used to be written as
+its address, ARRAY(0x...), and for a keyed shape it then named a column no
+key could match.*/
+static void wt_headers_given(pTHX_ AV *headers_av, SV *col_names_sv, bool positional) {
 	AV *c_av = (AV*)SvRV(col_names_sv);
 	for (SSize_t i = 0; i <= av_len(c_av); i++) {
 		SV **c = av_fetch(c_av, i, 0);
 		SV *cv = c ? wt_got(aTHX_ *c) : NULL;
-		if (!cv || !SvOK(cv)) continue;
+		if (!cv || !SvOK(cv)) {
+			if (positional) av_push(headers_av, newSVpvs(""));
+			continue;
+		}
+		if (SvROK(cv)) croak("write_table: Cannot write nested reference types to table\n");
 		SV *copy = newSV(0);
 		sv_setsv_nomg(copy, cv);
 		av_push(headers_av, copy);
@@ -5494,6 +5554,58 @@ static bool wt_col_names_any(pTHX_ SV *col_names_sv) {
 		if (cv && SvOK(cv)) return 1;
 	}
 	return 0;
+}
+
+/*Add every key of one row's hash to col_map, the set an AoH's or a HoH's
+columns are found in.
+
+A plain hash is read straight out of its buckets.  Iterating it instead gives
+it an iterator, which perl allocates on first use and never frees, so the
+caller's rows came out of write_table heavier than they went in: 22.9 MB for a
+200000-row AoH of 20 columns, by Devel::Size.  Skipping the iterator also took
+that AoH's write from 0.354s to 0.258s (string cells, best of three, one
+process per variant).  A tied or otherwise magical hash keeps nothing in its
+buckets, and goes through hv_iternext() as before; ITER_KEEP restores the
+iterator it already had.
+
+Each key's hash is passed on, since every hash in the interpreter is hashed
+with the same function and seed -- except from a hash that perl has rehashed
+with its private seed (HvREHASH, perls before 5.18, after a run of collisions),
+whose stored hashes would be wrong for col_map.  A key stored as UTF-8, or
+downgraded from it (WASUTF8), goes in through an SV that says so, so that the
+header keeps the flag hv_iterkeysv() would have given it.  Placeholders, the
+deleted keys a restricted hash keeps, are skipped, as hv_iternext() skips
+them.
+
+col_map and hv are perl's own hashes, reached only through perl's API, so
+neither carries restrict.*/
+static void wt_collect_keys(pTHX_ HV *col_map, HV *hv) {
+	if (SvRMAGICAL((SV*)hv)) {
+		ITER_KEEP_BEGIN(hv);
+		hv_iterinit(hv);
+		HE *entry;
+		while ((entry = hv_iternext(hv)))
+			(void)hv_fetch_ent(col_map, hv_iterkeysv(entry), 1, 0);
+		ITER_KEEP_END;
+		return;
+	}
+	HE **arr = HvARRAY(hv);	// no restrict: the hash's own bucket array
+	if (!arr) return;
+	bool keep_hash = TRUE;	// FALSE when the stored hashes are not col_map's
+#ifdef HvREHASH
+	if (HvREHASH(hv)) keep_hash = FALSE;
+#endif
+	for (size_t b = 0; b <= (size_t)HvMAX(hv); b++) {
+		for (HE *he = arr[b]; he; he = HeNEXT(he)) {
+			if (HeVAL(he) == &PL_sv_placeholder) continue;
+			HEK *k = HeKEY_hek(he);
+			if (HEK_UTF8(k) || HEK_WASUTF8(k))
+				(void)hv_fetch_ent(col_map, sv_2mortal(newSVhek(k)), 1, 0);
+			else
+				(void)hv_common_key_len(col_map, HEK_KEY(k), HEK_LEN(k),
+					HV_FETCH_LVALUE | HV_FETCH_JUST_SV, NULL, keep_hash ? HEK_HASH(k) : 0);
+		}
+	}
 }
 
 /*Emit the header record -- the optional leading row-label cell, then one
@@ -5522,7 +5634,7 @@ static size_t wt_emit_header(pTHX_ WtSink *restrict S, AV *headers_av,
 		if (!hl && (*unnamed)++ == 0) *first_unnamed = R.n + 1;
 		wt_field(&R, hs, hl);
 	}
-	print_string_row(aTHX_ S, R.f, R.len, R.n);
+	print_string_row(aTHX_ S, &R);
 	return num_headers;
 }
 
@@ -5601,14 +5713,36 @@ static const char *tex_greek_macro(UV cp) {
 	}
 }
 
-/*Escape one cell into 'out' (reset first): the LaTeX-active characters #
-_ % & gain a leading backslash and '>' becomes \textgreater. When the
-source SV is UTF-8, Greek letters are turned into their textgreek macros
-(e.g. U+0394 Greek Delta -> \textDelta{}; the trailing {} keeps a following letter
-from being swallowed into the control word). With do_format set, a numeric
-cell is first rendered with %.4g (mirrors the original 'format' option).
-The cell is len bytes and may hold a NUL, which passes through like any other
-byte.*/
+/*What one ASCII byte of cell text becomes in LaTeX, or NULL to keep it as it
+is.  # _ % & gain a leading backslash.  < and > print as an upside-down ! and
+? in LaTeX's default OT1 font encoding, so they become \textless{} and
+\textgreater{}: a cell "p<0.05" came out as "p" followed by an inverted
+exclamation mark.
+
+That is the whole of the documented escaping, and the rest of LaTeX's specials
+are left alone on purpose: \ $ { } ^ ~ pass through, so that a cell can carry
+LaTeX of its own -- inline math such as $p^2$, a macro such as \textit{x},
+an \includesvg{} figure -- which escaping them would make impossible.  A cell
+that means them literally writes them escaped, as \$ or \{.*/
+static const char *tex_ascii_rep(char c) {
+	switch (c) {
+	case '#': return "\\#";
+	case '_': return "\\_";
+	case '%': return "\\%";
+	case '&': return "\\&";
+	case '<': return "\\textless{}";
+	case '>': return "\\textgreater{}";
+	default:  return NULL;
+	}
+}
+
+/*Escape one cell into 'out' (reset first), byte by byte as tex_ascii_rep()
+says.  When the source SV is UTF-8, Greek letters are turned into their
+textgreek macros (e.g. U+0394 Greek Delta -> \textDelta{}; the trailing {}
+keeps a following letter from being swallowed into the control word). With
+do_format set, a numeric cell is first rendered with %.4g (mirrors the
+original 'format' option).  The cell is len bytes and may hold a NUL, which
+passes through like any other byte; what is kept is copied a run at a time.*/
 static void tex_escape_sv(pTHX_ SV *out, const char *s, STRLEN len,
 	bool is_utf8, bool do_format)
 {
@@ -5631,45 +5765,30 @@ static void tex_escape_sv(pTHX_ SV *out, const char *s, STRLEN len,
 		}
 	}
 	if (tex_is_includesvg(s, len)) { sv_catpvn(out, s, len); return; }
-	if (is_utf8) {
-/* Walk one Unicode code point at a time so multi-byte letters can be
- remapped. utf8n_to_uvchr (not the _buf form) keeps this on 5.10.*/
-		const U8 *p   = (const U8*)s;
-		const U8 *end = p + len;
-		while (p < end) {
-			STRLEN clen;
-			UV cp = utf8n_to_uvchr(p, (STRLEN)(end - p), &clen, 0);
+	STRLEN start = 0;	// the first byte not yet copied
+	for (STRLEN i = 0; i < len; ) {
+		const U8 c = (U8)s[i];
+		STRLEN clen = 1;	// bytes of the character at i
+		const char *rep;
+		bool greek = FALSE;
+		if (c < 0x80) rep = tex_ascii_rep((char)c);
+		else if (is_utf8) {
+/* A multi-byte character is decoded so a Greek letter can be remapped.
+ utf8n_to_uvchr (not the _buf form) keeps this on 5.10.*/
+			const UV cp = utf8n_to_uvchr((const U8*)s + i, len - i, &clen, 0);
 			if (clen == 0) clen = 1; // never stall on malformed input
-			if (cp < 0x80) {
-				const char c = (char)cp;
-				if (c == '#' || c == '_' || c == '%' || c == '&') {
-					sv_catpvn(out, "\\", 1);
-					sv_catpvn(out, (const char*)p, 1);
-				} else if (c == '>') {
-					sv_catpvn(out, "\\textgreater{}", 14);
-				} else {
-					sv_catpvn(out, (const char*)p, 1);
-				}
-			} else {
-				const char *mac = tex_greek_macro(cp);
-				if (mac) { sv_catpv(out, mac); sv_catpvn(out, "{}", 2); }
-				else sv_catpvn(out, (const char*)p, clen); // pass through
-			}
-			p += clen;
+			rep = tex_greek_macro(cp);
+			greek = TRUE;
 		}
-		return;
+		else rep = NULL;
+		if (!rep) { i += clen; continue; }
+		if (i > start) sv_catpvn(out, s + start, i - start);
+		sv_catpv(out, rep);
+		if (greek) sv_catpvs(out, "{}");
+		i += clen;
+		start = i;
 	}
-	for (const char *p = s; p < s + len; p++) {
-		const char c = *p;
-		if (c == '#' || c == '_' || c == '%' || c == '&') {
-			sv_catpvn(out, "\\", 1);
-			sv_catpvn(out, p, 1);
-		} else if (c == '>') {
-			sv_catpvn(out, "\\textgreater{}", 14);
-		} else {
-			sv_catpvn(out, p, 1);
-		}
-	}
+	if (len > start) sv_catpvn(out, s + start, len - start);
 }
 
 /* Build the provenance path "<cwd>/<RealScript>" as a mortal SV, mirroring the
@@ -5759,12 +5878,52 @@ static void tex_put_header_row(pTHX_ PerlIO *fh, AV *header, size_t ncols, SV *s
 	}
 }
 
+/*How a tex_comment or xlsx_comment argument is read: 0 = absent, 1 = one
+string, 2 = an array of lines.  An object is a string -- stringified, so one
+that overloads "" says what it overloads; it used to be dropped without a word
+-- and an unblessed reference to anything but an array is refused, before any
+file is opened.*/
+static unsigned short int wt_comment_kind(pTHX_ SV *c, const char *opt) {
+	if (!c || !SvOK(c)) return 0;
+	if (!SvROK(c) || sv_isobject(c)) return 1;
+	if (SvTYPE(SvRV(c)) == SVt_PVAV) return 2;
+	croak("write_table: '%s' must be a string or an ARRAY reference\n", opt);
+	return 0;	// not reached: croak() does not return
+}
+
+/*Write s as LaTeX comment lines: lead, then s, with "% " opening every line
+after a break in it.  A tex_comment holding a newline used to end its comment
+there, and the rest of it was typeset (a stray macro in it stopped the
+document).  CR, LF and CRLF each count as a break: a lone CR is TeX's
+end-of-line character, so even where it does not end the input line it ends
+what TeX reads of it.  A break at the very end of s opens no further line.*/
+static void tex_put_comment(pTHX_ PerlIO *fh, const char *lead, const char *s, STRLEN len) {
+	PerlIO_write(fh, lead, strlen(lead));
+	bool at_eol = FALSE;	// the last byte written ended a line
+	STRLEN start = 0;	// the first byte of s not yet written
+	for (STRLEN i = 0; i < len; i++) {
+		if (s[i] != '\n' && s[i] != '\r') continue;
+		PerlIO_write(fh, s + start, i - start);
+		if (s[i] == '\r' && i + 1 < len && s[i + 1] == '\n') i++;
+		PerlIO_putc(fh, '\n');
+		at_eol = TRUE;
+		start = i + 1;
+		if (start < len) { TEX_PUTS(fh, "% "); at_eol = FALSE; }
+	}
+	if (len > start) PerlIO_write(fh, s + start, len - start);
+	if (!at_eol) PerlIO_putc(fh, '\n');
+}
+
 /*Write the full LaTeX tabular. 'rows' is the collected table: element 0 is
-the header record, the rest are data records (each an AV of SVs).*/
+the header record, the rest are data records (each an AV of SVs).  *slot is
+write_table()'s save-stack slot for its open handle: the file is opened into
+it, so a croak between the open and the close closes it, as it does for every
+other format.  It used to be a local here, and a croak in between left one
+handle open per call.*/
 static void write_tex_tabular(pTHX_ AV *rows, const char *file,
 	const char *col_align, bool bold_first_col, bool do_format,
 	const char *size, SV *comment, bool longtable,
-	SV *longtable_head)
+	SV *longtable_head, PerlIO **slot)
 {
 	SV **h0 = av_fetch(rows, 0, 0);
 	AV *header = (h0 && *h0 && SvROK(*h0)) ? (AV*)SvRV(*h0) : NULL;
@@ -5777,29 +5936,29 @@ static void write_tex_tabular(pTHX_ AV *rows, const char *file,
 	PerlIO *fh = PerlIO_open(file, "w");
 	if (!fh)
 		wt_open_failed(aTHX_ file);
+	*slot = fh;
 	SV *scratch = sv_2mortal(newSVpvs(""));
 // Provenance banner (see tex_written_by); fall back to a generic line.
 	SV *prov = tex_written_by(aTHX);
 	if (prov) {
 		STRLEN pl; const char *ps = SvPV(prov, pl);
-		PerlIO_write(fh, ps, pl); PerlIO_putc(fh, '\n');
+		tex_put_comment(aTHX_ fh, "", ps, pl);
 	} else {
 		TEX_PUTS(fh, "%written by Stats::LikeR write_table\n");
 	}
-	if (comment && SvOK(comment)) {
-		if (SvROK(comment) && SvTYPE(SvRV(comment)) == SVt_PVAV) {
-			AV *ca = (AV*)SvRV(comment);
-			for (SSize_t i = 0; i <= av_len(ca); i++) {
-				SV **c = av_fetch(ca, i, 0);
-				if (c && *c && SvOK(*c)) {
-					STRLEN l; const char *cs = SvPV(*c, l);
-					TEX_PUTS(fh, "% "); PerlIO_write(fh, cs, l); PerlIO_putc(fh, '\n');
-				}
+	const unsigned short int comment_kind = wt_comment_kind(aTHX_ comment, "tex_comment");
+	if (comment_kind == 2) {
+		AV *ca = (AV*)SvRV(comment);
+		for (SSize_t i = 0; i <= av_len(ca); i++) {
+			SV **c = av_fetch(ca, i, 0);
+			if (c && *c && SvOK(wt_got(aTHX_ *c))) {
+				STRLEN l; const char *cs = SvPV(*c, l);
+				tex_put_comment(aTHX_ fh, "% ", cs, l);
 			}
-		} else if (!SvROK(comment)) {
-			STRLEN l; const char *cs = SvPV(comment, l);
-			TEX_PUTS(fh, "% "); PerlIO_write(fh, cs, l); PerlIO_putc(fh, '\n');
 		}
+	} else if (comment_kind == 1) {
+		STRLEN l; const char *cs = SvPV(comment, l);
+		tex_put_comment(aTHX_ fh, "% ", cs, l);
 	}
 /* With 'tex_longtable' the caller writes the surrounding
  \begin{longtable}{...} ... \end{longtable} (and any \caption / \label)
@@ -5889,6 +6048,7 @@ static void write_tex_tabular(pTHX_ AV *rows, const char *file,
 	}
 	/* A write that fails -- a full disk -- only shows once the buffer goes out,
 	  which is at the close; see wt_close_checked(). */
+	*slot = NULL;	// closed here, whatever happens
 	wt_close_checked(aTHX_ fh, file);
 }
 
@@ -5907,22 +6067,62 @@ every other non-empty cell as an inline string. read_table reads it back.*/
 /*CRC-32/IEEE (each stored ZIP member needs its checksum), continued over more
 bytes: crc is the CRC of everything before data, 0 for nothing -- zlib's
 crc32() convention -- which is what lets the worksheet be checksummed a chunk
-at a time as it streams.*/
-static uint32_t xlsx_crc32(uint32_t crc, const unsigned char *data, size_t len) {
-	/*The 256-entry lookup table is data-independent, so build it once and
-	reuse it across the many calls per workbook.  A concurrent first call
-	on another thread merely recomputes the identical constants — benign.*/
-	static uint32_t table[256];
-	static bool table_ready = 0;
-	if (!table_ready) {
-		for (uint32_t i = 0; i < 256; i++) {
-			uint32_t c = i;
-			for (unsigned short k = 0; k < 8; k++)
-				c = (c & 1u) ? (0xEDB88320u ^ (c >> 1)) : (c >> 1);
-			table[i] = c;
-		}
-		table_ready = 1;
-	}
+at a time as it streams.
+
+The table is zlib's crc_table for the reflected polynomial 0xEDB88320, written
+out rather than built on the first call: built lazily, it was a static array
+and a "ready" flag that two threads could see out of order on a weakly ordered
+CPU.  Generated by
+
+  perl -e 'for my $i (0..255) { my $c = $i; $c = $c & 1 ? 0xEDB88320 ^ ($c >> 1) : $c >> 1 for 1..8; printf "0x%08Xu,%s", $c, $i % 6 == 5 ? "\n" : " " }'
+
+and checked by the CRC-32 check value: "123456789" gives 0xCBF43926.*/
+static uint32_t xlsx_crc32(uint32_t crc, const unsigned char *restrict data, size_t len) {
+	static const uint32_t table[256] = {
+	0x00000000u, 0x77073096u, 0xEE0E612Cu, 0x990951BAu, 0x076DC419u, 0x706AF48Fu,
+	0xE963A535u, 0x9E6495A3u, 0x0EDB8832u, 0x79DCB8A4u, 0xE0D5E91Eu, 0x97D2D988u,
+	0x09B64C2Bu, 0x7EB17CBDu, 0xE7B82D07u, 0x90BF1D91u, 0x1DB71064u, 0x6AB020F2u,
+	0xF3B97148u, 0x84BE41DEu, 0x1ADAD47Du, 0x6DDDE4EBu, 0xF4D4B551u, 0x83D385C7u,
+	0x136C9856u, 0x646BA8C0u, 0xFD62F97Au, 0x8A65C9ECu, 0x14015C4Fu, 0x63066CD9u,
+	0xFA0F3D63u, 0x8D080DF5u, 0x3B6E20C8u, 0x4C69105Eu, 0xD56041E4u, 0xA2677172u,
+	0x3C03E4D1u, 0x4B04D447u, 0xD20D85FDu, 0xA50AB56Bu, 0x35B5A8FAu, 0x42B2986Cu,
+	0xDBBBC9D6u, 0xACBCF940u, 0x32D86CE3u, 0x45DF5C75u, 0xDCD60DCFu, 0xABD13D59u,
+	0x26D930ACu, 0x51DE003Au, 0xC8D75180u, 0xBFD06116u, 0x21B4F4B5u, 0x56B3C423u,
+	0xCFBA9599u, 0xB8BDA50Fu, 0x2802B89Eu, 0x5F058808u, 0xC60CD9B2u, 0xB10BE924u,
+	0x2F6F7C87u, 0x58684C11u, 0xC1611DABu, 0xB6662D3Du, 0x76DC4190u, 0x01DB7106u,
+	0x98D220BCu, 0xEFD5102Au, 0x71B18589u, 0x06B6B51Fu, 0x9FBFE4A5u, 0xE8B8D433u,
+	0x7807C9A2u, 0x0F00F934u, 0x9609A88Eu, 0xE10E9818u, 0x7F6A0DBBu, 0x086D3D2Du,
+	0x91646C97u, 0xE6635C01u, 0x6B6B51F4u, 0x1C6C6162u, 0x856530D8u, 0xF262004Eu,
+	0x6C0695EDu, 0x1B01A57Bu, 0x8208F4C1u, 0xF50FC457u, 0x65B0D9C6u, 0x12B7E950u,
+	0x8BBEB8EAu, 0xFCB9887Cu, 0x62DD1DDFu, 0x15DA2D49u, 0x8CD37CF3u, 0xFBD44C65u,
+	0x4DB26158u, 0x3AB551CEu, 0xA3BC0074u, 0xD4BB30E2u, 0x4ADFA541u, 0x3DD895D7u,
+	0xA4D1C46Du, 0xD3D6F4FBu, 0x4369E96Au, 0x346ED9FCu, 0xAD678846u, 0xDA60B8D0u,
+	0x44042D73u, 0x33031DE5u, 0xAA0A4C5Fu, 0xDD0D7CC9u, 0x5005713Cu, 0x270241AAu,
+	0xBE0B1010u, 0xC90C2086u, 0x5768B525u, 0x206F85B3u, 0xB966D409u, 0xCE61E49Fu,
+	0x5EDEF90Eu, 0x29D9C998u, 0xB0D09822u, 0xC7D7A8B4u, 0x59B33D17u, 0x2EB40D81u,
+	0xB7BD5C3Bu, 0xC0BA6CADu, 0xEDB88320u, 0x9ABFB3B6u, 0x03B6E20Cu, 0x74B1D29Au,
+	0xEAD54739u, 0x9DD277AFu, 0x04DB2615u, 0x73DC1683u, 0xE3630B12u, 0x94643B84u,
+	0x0D6D6A3Eu, 0x7A6A5AA8u, 0xE40ECF0Bu, 0x9309FF9Du, 0x0A00AE27u, 0x7D079EB1u,
+	0xF00F9344u, 0x8708A3D2u, 0x1E01F268u, 0x6906C2FEu, 0xF762575Du, 0x806567CBu,
+	0x196C3671u, 0x6E6B06E7u, 0xFED41B76u, 0x89D32BE0u, 0x10DA7A5Au, 0x67DD4ACCu,
+	0xF9B9DF6Fu, 0x8EBEEFF9u, 0x17B7BE43u, 0x60B08ED5u, 0xD6D6A3E8u, 0xA1D1937Eu,
+	0x38D8C2C4u, 0x4FDFF252u, 0xD1BB67F1u, 0xA6BC5767u, 0x3FB506DDu, 0x48B2364Bu,
+	0xD80D2BDAu, 0xAF0A1B4Cu, 0x36034AF6u, 0x41047A60u, 0xDF60EFC3u, 0xA867DF55u,
+	0x316E8EEFu, 0x4669BE79u, 0xCB61B38Cu, 0xBC66831Au, 0x256FD2A0u, 0x5268E236u,
+	0xCC0C7795u, 0xBB0B4703u, 0x220216B9u, 0x5505262Fu, 0xC5BA3BBEu, 0xB2BD0B28u,
+	0x2BB45A92u, 0x5CB36A04u, 0xC2D7FFA7u, 0xB5D0CF31u, 0x2CD99E8Bu, 0x5BDEAE1Du,
+	0x9B64C2B0u, 0xEC63F226u, 0x756AA39Cu, 0x026D930Au, 0x9C0906A9u, 0xEB0E363Fu,
+	0x72076785u, 0x05005713u, 0x95BF4A82u, 0xE2B87A14u, 0x7BB12BAEu, 0x0CB61B38u,
+	0x92D28E9Bu, 0xE5D5BE0Du, 0x7CDCEFB7u, 0x0BDBDF21u, 0x86D3D2D4u, 0xF1D4E242u,
+	0x68DDB3F8u, 0x1FDA836Eu, 0x81BE16CDu, 0xF6B9265Bu, 0x6FB077E1u, 0x18B74777u,
+	0x88085AE6u, 0xFF0F6A70u, 0x66063BCAu, 0x11010B5Cu, 0x8F659EFFu, 0xF862AE69u,
+	0x616BFFD3u, 0x166CCF45u, 0xA00AE278u, 0xD70DD2EEu, 0x4E048354u, 0x3903B3C2u,
+	0xA7672661u, 0xD06016F7u, 0x4969474Du, 0x3E6E77DBu, 0xAED16A4Au, 0xD9D65ADCu,
+	0x40DF0B66u, 0x37D83BF0u, 0xA9BCAE53u, 0xDEBB9EC5u, 0x47B2CF7Fu, 0x30B5FFE9u,
+	0xBDBDF21Cu, 0xCABAC28Au, 0x53B39330u, 0x24B4A3A6u, 0xBAD03605u, 0xCDD70693u,
+	0x54DE5729u, 0x23D967BFu, 0xB3667A2Eu, 0xC4614AB8u, 0x5D681B02u, 0x2A6F2B94u,
+	0xB40BBE37u, 0xC30C8EA1u, 0x5A05DF1Bu, 0x2D02EF8Du
+	};
 	crc ^= 0xFFFFFFFFu;
 	for (size_t i = 0; i < len; i++)
 		crc = table[(crc ^ data[i]) & 0xFFu] ^ (crc >> 8);
@@ -5940,33 +6140,137 @@ static void zip_le32(pTHX_ SV *b, uint32_t v) {
 	sv_catpvn(b, (char*)x, 4);
 }
 
-// Append an unsignedeger's decimal text to an SV
-static void xlsx_cat_uint(pTHX_ SV *b, unsigned long v) {
-	char tmp[24];
-	int n = snprintf(tmp, sizeof(tmp), "%lu", v);
+/*Append an unsigned integer's decimal text to an SV, formatted by perl's
+my_snprintf() with its own UVuf: a C "%lu" is 32 bits wide on Windows.*/
+static void xlsx_cat_uint(pTHX_ SV *b, UV v) {
+	char tmp[TYPE_DIGITS(UV) + 1];
+	const int n = my_snprintf(tmp, sizeof(tmp), "%" UVuf, v);
 	if (n > 0) sv_catpvn(b, tmp, (STRLEN)n);
 }
 
-/*Append s (UTF-8 bytes) to out, escaping XML metacharacters and dropping the
-control characters XML 1.0 forbids (all but tab / newline / carriage-return).
-The bytes between two of those go in as one run, not one sv_catpvn() apiece.*/
-static void xlsx_xml_cat(pTHX_ SV *out, const char *s, STRLEN len) {
+/*Excel's worksheet limits, from Microsoft's "Excel specifications and limits":
+1048576 rows, 16384 columns (A to XFD), 32767 characters in a cell.  XlsxWriter
+1.3.9 (worksheet.py, Worksheet.__init__) carries the same three as xls_rowmax,
+xls_colmax and xls_strmax, and pandas 3.0.4 (pandas/io/formats/excel.py,
+ExcelFormatter.max_rows/max_cols, 2**20 and 2**14) refuses a frame past the
+first two, "This sheet is too large!".*/
+#define XLSX_MAX_ROWS  ((size_t)1048576)
+#define XLSX_MAX_COLS  ((size_t)16384)
+#define XLSX_MAX_CHARS ((STRLEN)32767)
+
+/*The bytes of the character at s that cell text writes as Excel's own escape,
+_xHHHH_, with *unit the UTF-16 code unit it carries; 0 for a character written
+as it is.  rem is the bytes left from s, which is valid UTF-8 (wt_xlsx_row()
+upgrades anything else from Latin-1), so the multi-byte forms are recognised by
+their bytes: U+FFFE and U+FFFF are EF BF BE and EF BF BF, and a surrogate is
+ED A0..BF xx.  The set is XML 1.0's refusals (section 2.2, Char): the C0
+controls but tab and newline, which takes in CR -- XML parsers turn a literal
+CR into a newline -- and U+FFFE and U+FFFF, which is XlsxWriter 1.3.9's set
+(sharedstrings.py, _write_si()); and the surrogates U+D800 to U+DFFF, which
+perl strings can hold and XML cannot.*/
+static STRLEN xlsx_escaped_char(const char *restrict s, STRLEN rem, UV *restrict unit) {
+	const U8 c = (U8)s[0];
+	if (c < 0x20) {
+		if (c == '\t' || c == '\n') return 0;
+		*unit = c;
+		return 1;
+	}
+	if (c == 0xEF && rem >= 3 && (U8)s[1] == 0xBF && (U8)s[2] >= 0xBE) {
+		*unit = (U8)s[2] == 0xBE ? 0xFFFE : 0xFFFF;
+		return 3;
+	}
+	if (c == 0xED && rem >= 3 && (U8)s[1] >= 0xA0) {
+		*unit = ((UV)(c & 0x0F) << 12) | ((UV)((U8)s[1] & 0x3F) << 6) | ((U8)s[2] & 0x3F);
+		return 3;
+	}
+	return 0;
+}
+
+/*Would the '_' at s, written as it is, begin something a reader decodes as an
+escape?  That is _x, four hex digits of either case, and a closing '_' -- the
+pattern Excel, LibreOffice and read_table's xlsx_xstring_unescape() decode;
+none of them takes an upper-case X.  rem is the bytes left from s.
+
+The closing '_' need not be in s: the character after the four digits may be
+one this writer escapes, and the escape it is written as starts with '_'.  A
+literal "_x0041" followed by a NUL is written "_x0041" "_x0000_", which reads
+"A" "x0000_" unless the first underscore is escaped too.*/
+static bool xlsx_opens_xescape(const char *restrict s, STRLEN rem) {
+	if (rem < 7 || s[0] != '_' || s[1] != 'x') return FALSE;
+	for (unsigned short int k = 2; k < 6; k++) {
+		const char c = s[k];	// not isXDIGIT(): perl 5.10 can map it to isxdigit(), undefined for a negative char
+		if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) return FALSE;
+	}
+	UV unit;	// unused: only whether the character is escaped matters
+	return s[6] == '_' || xlsx_escaped_char(s + 6, rem - 6, &unit) > 0;
+}
+
+/*Append s (UTF-8 bytes) to out as XML character data, escaping the XML
+metacharacters.
+
+What XML 1.0 cannot hold at all (xlsx_escaped_char()) depends on where the
+text goes.  In a cell (xstring) it is written as Excel's own escape, _xHHHH_
+with the UTF-16 code unit in hex, which Excel and LibreOffice turn back into
+the character.  Up to 0.3213 the controls were dropped and the others written
+as they were, which made the workbook unreadable: openpyxl 3.1.5 refuses it as
+"not well-formed".
+
+Because _xHHHH_ now means a character, a literal "_x0041_" in a cell would
+come back from Excel as "A", so its underscore is itself escaped, as _x005F_.
+This departs from XlsxWriter, which escapes with s/(_x[0-9a-fA-F]{4}_)/_x005F$1/g:
+those matches cannot overlap, so of a literal "_x005F_x0041_" it escapes only
+the first, and writes "_x005F_x005F_x0041_", which a reader decoding left to
+right -- Excel, LibreOffice 24.2, read_table -- takes back as "_x005FA".  Here
+every '_' that would open an escape is escaped, the equivalent of
+s/_(?=x[0-9a-fA-F]{4}_)/_x005F_/g with the lookahead also seeing the '_' an
+escaped character is written with (xlsx_opens_xescape()): "_x005F_x0041_" is
+written "_x005F_x005F_x005F_x0041_", and each escape a reader decodes then
+stands for exactly one character of the cell.
+
+A high and a low surrogate, each escaped on its own, are read back as the one
+character the pair stands for in UTF-16 -- which is how Excel holds text, so
+no workbook can keep them apart.
+
+Outside a cell -- the sheet name and the workbook's description -- no reader
+decodes _xHHHH_; those characters are dropped instead, and a CR is kept.
+
+A code point above U+10FFFF, which perl allows and no Unicode encoding does,
+is refused: nothing in an .xlsx file can stand for it.  Its lead byte is F4
+with a second byte of 90 or more, or F5 and above.*/
+static void xlsx_xml_cat(pTHX_ SV *out, const char *s, STRLEN len, bool xstring) {
 	STRLEN start = 0;	// the first byte not yet copied
+	char esc[8];	// "_xHHHH_" and its NUL
 	for (STRLEN i = 0; i < len; i++) {
 		const unsigned char c = (unsigned char)s[i];
-		const char *rep;
-		switch (c) {
-		case '&':  rep = "&amp;";  break;
-		case '<':  rep = "&lt;";   break;
-		case '>':  rep = "&gt;";   break;
-		case '"':  rep = "&quot;"; break;
-		case '\'': rep = "&apos;"; break;
-		default:
-			if (c >= 0x20 || c == '\t' || c == '\n' || c == '\r') continue;
-			rep = "";	// dropped
+		if (c >= 0xF5 || (c == 0xF4 && len - i >= 2 && (U8)s[i + 1] >= 0x90))
+			croak("write_table: a cell holds a code point above U+10FFFF, which an .xlsx file cannot hold\n");
+		UV unit = 0;	// the UTF-16 unit an escape writes
+		const STRLEN skip = (!xstring && c == '\r') ? 0 : xlsx_escaped_char(s + i, len - i, &unit);
+		if (!skip) {
+			const char *rep;	// an XML entity, or _x005F_
+			switch (c) {
+			case '&':  rep = "&amp;";  break;
+			case '<':  rep = "&lt;";   break;
+			case '>':  rep = "&gt;";   break;
+			case '"':  rep = "&quot;"; break;
+			case '\'': rep = "&apos;"; break;
+			case '_':
+				if (!xstring || !xlsx_opens_xescape(s + i, len - i)) continue;
+				rep = "_x005F_";	// followed by the "x0041_" that is copied as it stands
+				break;
+			default: continue;
+			}
+			if (i > start) sv_catpvn(out, s + start, i - start);
+			sv_catpv(out, rep);
+			start = i + 1;
+			continue;
 		}
 		if (i > start) sv_catpvn(out, s + start, i - start);
-		sv_catpv(out, rep);
+		if (xstring) {
+			const int n = my_snprintf(esc, sizeof(esc), "_x%04" UVXf "_", unit);
+			sv_catpvn(out, esc, (STRLEN)n);
+		}
+		i += skip - 1;
 		start = i + 1;
 	}
 	if (len > start) sv_catpvn(out, s + start, len - start);
@@ -5985,18 +6289,80 @@ static void xlsx_col_letters(pTHX_ SV *b, size_t idx) {
 	while (n > 0) { char c = tmp[--n]; sv_catpvn(b, &c, 1); }
 }
 
-/*True when a cell's text should be written as an xlsx number: made only of the
-characters a plain or scientific decimal uses, so "Inf", "NaN" and space-padded
-values fall back to text and never produce an invalid <v>, and a number to
-grok_number(), which is all looks_like_number() asks of a string.*/
-static bool xlsx_plain_number(pTHX_ const char *s, STRLEN l) {
-	if (l == 0) return 0;
-	for (STRLEN i = 0; i < l; i++) {
-		char c = s[i];
-		if (!((c >= '0' && c <= '9') || c == '.' || c == 'e' || c == 'E'
-				|| c == '+' || c == '-')) return 0;
+/*Is a cell's text written as an Excel number, a <v>, rather than as text?
+
+The text must be a plain decimal -- an optional '-', digits with at most one
+'.', and an optional exponent -- which is what Excel and XML Schema's double
+read without complaint, so "Inf", "NaN", "0x1A", "+5" and space-padded values
+stay text and never produce an invalid <v>.  Its value must be one Excel can
+hold, from about 1E-307 to 9.99999999999999E+307 in magnitude (zero aside):
+"1e400" used to be written as a number, which is infinite.
+
+A string (held is FALSE) must also be one that a number does not change, since
+Excel shows a number cell as its value, not as the text it came from:
+
+- no leading zeros but the one before a point: "007" and "-00.5" are labels,
+  ZIP codes and the like, and Excel showed them as 7 and -0.5;
+- at most 15 significant digits, all Excel keeps: a 20-digit accession number
+  became 1.23456789012346E+19.
+
+pandas' to_excel() writes a str as a string and only a number as a number
+(openpyxl 3.1.5 cell/cell.py, Cell._bind_value()); a cell here is often a
+number read in as text, so text is weighed by what Excel would make of it.
+
+A number the caller held as one (held is TRUE: see wt_cell()) is a number
+whatever its digits, as it is in pandas: those two rules exist to keep a
+string's text, and a number's text is perl's own formatting of it.  Inf and
+NaN format as text that is not a decimal, and stay text.*/
+static bool xlsx_number_text(const char *restrict s, STRLEN l, bool held) {
+	STRLEN i = 0;
+	if (i < l && s[i] == '-') i++;
+	const STRLEN int_at = i;
+	while (i < l && isDIGIT(s[i])) i++;
+	const STRLEN int_len = i - int_at;
+	STRLEN frac_at = i, frac_len = 0;
+	if (i < l && s[i] == '.') {
+		frac_at = ++i;
+		while (i < l && isDIGIT(s[i])) i++;
+		frac_len = i - frac_at;
 	}
-	return grok_number(s, l, NULL) != 0;
+	if (int_len + frac_len == 0) return FALSE;
+	IV exp10 = 0;	// the exponent written, saturated well past any double's
+	if (i < l && (s[i] == 'e' || s[i] == 'E')) {
+		i++;
+		bool neg = FALSE;
+		if (i < l && (s[i] == '+' || s[i] == '-')) neg = s[i++] == '-';
+		const STRLEN exp_at = i;
+		while (i < l && isDIGIT(s[i])) {
+			if (exp10 < 100000) exp10 = exp10 * 10 + (s[i] - '0');	// 100000: far past +-308, and far from IV_MAX on a 32-bit IV
+			i++;
+		}
+		if (i == exp_at) return FALSE;
+		if (neg) exp10 = -exp10;
+	}
+	if (i != l) return FALSE;
+	if (!held && int_len > 1 && s[int_at] == '0') return FALSE;
+/* The significant digits run from the first non-zero digit to the last digit
+ written; lead is the power of ten of the first, before the exponent. */
+	size_t sig = 0;
+	IV lead = 0;
+	for (STRLEN k = 0; k < int_len; k++) {
+		if (!sig && s[int_at + k] == '0') continue;
+		if (!sig) lead = (IV)(int_len - k) - 1;
+		sig++;
+	}
+	for (STRLEN k = 0; k < frac_len; k++) {
+		if (!sig && s[frac_at + k] == '0') continue;
+		if (!sig) lead = -(IV)k - 1;
+		sig++;
+	}
+	if (!sig) return TRUE;	// zero
+	if (!held && sig > 15) return FALSE;
+/* Excel's own range: 9.99999999999999E+307 the largest magnitude and
+ 2.2250738585072E-308 the smallest, so a lead digit at 10^-308 is in range
+ only for some mantissas; it is refused outright rather than weighed. */
+	const IV pow10 = lead + exp10;
+	return pow10 >= -307 && pow10 <= 307;
 }
 
 #define ZIP_LOCAL_FIXED   30	// a local header before its name: signature, version, flags, method, time, date, CRC, two sizes, two lengths
@@ -6102,7 +6468,7 @@ such as a pipe, gets the whole worksheet gathered in memory and written behind
 a finished header, which is what every workbook used to cost.  Either way the
 bytes are the ones a single pass over the finished worksheet writes.*/
 static void wt_xlsx_begin(pTHX_ WtXlsx *restrict X, PerlIO **slot, const char *file,
-	SV *sheet_name, SV *comment, unsigned freeze_rows, unsigned freeze_cols){
+	SV *sheet_name, SV *comment, size_t freeze_rows, size_t freeze_cols){
 	// document properties: provenance goes in the "comments" field
 	SV *core = sv_2mortal(newSVpvs(
 		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
@@ -6117,7 +6483,7 @@ static void wt_xlsx_begin(pTHX_ WtXlsx *restrict X, PerlIO **slot, const char *f
 		"<dc:description>"));
 	if (comment && SvOK(comment)) {
 		STRLEN dl; const char *ds = SvPVutf8(comment, dl);
-		xlsx_xml_cat(aTHX_ core, ds, dl);
+		xlsx_xml_cat(aTHX_ core, ds, dl, FALSE);
 	}
 	SV_CATLIT(core, "</dc:description></cp:coreProperties>");
 
@@ -6148,7 +6514,7 @@ static void wt_xlsx_begin(pTHX_ WtXlsx *restrict X, PerlIO **slot, const char *f
 		"<sheets><sheet name=\""));
 	{
 		STRLEN snl; const char *sn = SvPVutf8(sheet_name, snl);
-		xlsx_xml_cat(aTHX_ workbook, sn, snl);
+		xlsx_xml_cat(aTHX_ workbook, sn, snl, FALSE);
 	}
 	SV_CATLIT(workbook, "\" sheetId=\"1\" r:id=\"rId1\"/></sheets></workbook>");
 
@@ -6188,19 +6554,19 @@ static void wt_xlsx_begin(pTHX_ WtXlsx *restrict X, PerlIO **slot, const char *f
 	if (freeze_rows || freeze_cols) {
 		SV *tl = sv_2mortal(newSVpvs(""));
 		xlsx_col_letters(aTHX_ tl, (size_t)freeze_cols);
-		xlsx_cat_uint(aTHX_ tl, (unsigned long)freeze_rows + 1);
+		xlsx_cat_uint(aTHX_ tl, (UV)freeze_rows + 1);
 		STRLEN tll; const char *tls = SvPV(tl, tll);
 		const char *ap = (freeze_rows && freeze_cols) ? "bottomRight"
 			: freeze_cols ? "topRight" : "bottomLeft";
 		SV_CATLIT(sheet, "<sheetViews><sheetView workbookViewId=\"0\"><pane ");
 		if (freeze_cols) {
 			SV_CATLIT(sheet, "xSplit=\"");
-			xlsx_cat_uint(aTHX_ sheet, (unsigned long)freeze_cols);
+			xlsx_cat_uint(aTHX_ sheet, (UV)freeze_cols);
 			SV_CATLIT(sheet, "\" ");
 		}
 		if (freeze_rows) {
 			SV_CATLIT(sheet, "ySplit=\"");
-			xlsx_cat_uint(aTHX_ sheet, (unsigned long)freeze_rows);
+			xlsx_cat_uint(aTHX_ sheet, (UV)freeze_rows);
 			SV_CATLIT(sheet, "\" ");
 		}
 		SV_CATLIT(sheet, "topLeftCell=\"");
@@ -6218,25 +6584,37 @@ static void wt_xlsx_begin(pTHX_ WtXlsx *restrict X, PerlIO **slot, const char *f
 	SV_CATLIT(sheet, "<sheetData>");
 }
 
-/*One record as a worksheet <row>.  A numeric-looking cell is written as a
-number and every other non-empty one as an inline string; an empty one (an
-undef too, with the default undef_val) is left out.  The text is UTF-8 as it
-stands when it is valid UTF-8, and read as Latin-1 when it is not -- the same
-reading the LaTeX path gives it.*/
-static void wt_xlsx_row(pTHX_ WtXlsx *restrict X, const char *const *restrict fields,
-  const STRLEN *restrict lens, size_t n) {
+/*One record as a worksheet <row>.  A cell whose text xlsx_number_text() takes
+is written as a number and every other non-empty one as an inline string; an
+empty one (an undef too, with the default undef_val) is left out.  The text is
+UTF-8 as it stands when it is valid UTF-8, and read as Latin-1 when it is not
+-- the same reading the LaTeX path gives it.
+
+Excel's limits are checked here, as the rows go out, and a table past them is
+refused rather than written as a workbook Excel cannot open: a 16385th column
+used to come out as XFE, past Excel's last column, XFD.  write_table() checks
+the row count up front where the shape tells it, so that most tables that are
+too long are refused before the file is opened.*/
+static void wt_xlsx_row(pTHX_ WtXlsx *restrict X, const WtRow *restrict R) {
+	const size_t n = R->n;
+	if (n > XLSX_MAX_COLS)
+		croak("write_table: '%s' would have %" UVuf " columns, more than the %" UVuf
+			" an Excel worksheet holds\n", X->file, (UV)n, (UV)XLSX_MAX_COLS);
+	if (X->row > XLSX_MAX_ROWS)
+		croak("write_table: '%s' would have more than the %" UVuf " rows an Excel "
+			"worksheet holds, header included\n", X->file, (UV)XLSX_MAX_ROWS);
 	SV *b = X->buf;
 	SV_CATLIT(b, "<row r=\"");
-	xlsx_cat_uint(aTHX_ b, (unsigned long)X->row);
+	xlsx_cat_uint(aTHX_ b, (UV)X->row);
 	SV_CATLIT(b, "\">");
 	for (size_t c = 0; c < n; c++) {
-		const char *f = fields[c];
-		const STRLEN l = f ? lens[c] : 0;
+		const char *f = R->f[c];
+		const STRLEN l = f ? R->len[c] : 0;
 		if (!l) continue;	//empty -> omit cell
 		SV_CATLIT(b, "<c r=\"");
 		xlsx_col_letters(aTHX_ b, c);
-		xlsx_cat_uint(aTHX_ b, (unsigned long)X->row);
-		if (xlsx_plain_number(aTHX_ f, l)) {
+		xlsx_cat_uint(aTHX_ b, (UV)X->row);
+		if (xlsx_number_text(f, l, R->num[c])) {
 			SV_CATLIT(b, "\"><v>");
 			sv_catpvn(b, f, l);
 			SV_CATLIT(b, "</v></c>");
@@ -6252,8 +6630,13 @@ static void wt_xlsx_row(pTHX_ WtXlsx *restrict X, const char *const *restrict fi
 			sv_utf8_upgrade(X->cell);
 			u = SvPV(X->cell, ul);
 		}
+/* Characters, as XlsxWriter counts them (len() of a str, against xls_strmax);
+ a cell of no more bytes than the limit cannot have more characters. */
+		if (ul > XLSX_MAX_CHARS && utf8_length((const U8*)u, (const U8*)u + ul) > XLSX_MAX_CHARS)
+			croak("write_table: a cell in row %" UVuf " of '%s' has more than the %" UVuf
+				" characters an Excel cell holds\n", (UV)X->row, X->file, (UV)XLSX_MAX_CHARS);
 		SV_CATLIT(b, "\" t=\"inlineStr\"><is><t xml:space=\"preserve\">");
-		xlsx_xml_cat(aTHX_ b, u, ul);
+		xlsx_xml_cat(aTHX_ b, u, ul, TRUE);
 		SV_CATLIT(b, "</t></is></c>");
 	}
 	SV_CATLIT(b, "</row>");
@@ -9771,6 +10154,53 @@ static bool S_csv_rx_find(pTHX_ REGEXP *restrict rx, SV *line_sv, char *line,
 	return TRUE;
 }
 
+/*\s of a byte string under the default rules, on the running perl: [\t\n\f\r ],
+and \v as well from 5.18.  isSPACE() alone is not that, because ppport.h gives
+every perl before 5.20 the newer isSPACE(), \v included.*/
+#if PERL_BCDVERSION < 0x5018000
+#  define CSV_RX_SPACE(c)	(isSPACE(c) && (c) != '\v')
+#else
+#  define CSV_RX_SPACE(c)	isSPACE(c)
+#endif
+
+/*Does rx's \s match exactly the bytes CSV_RX_SPACE() does, on a line that is
+not UTF-8?  Under the default rules, and under /a and /aa, it does.  Under /u
+it also matches 0x85 and 0xA0, and under /l -- or `use locale` before 5.14,
+which has no charset modifiers -- whatever the locale says, so those are left
+to the regex engine.  _parse_csv_file() splits qr/\s+/ in C only when this
+holds.*/
+static bool S_rx_space_is_isspace(pTHX_ REGEXP *rx){	//not restrict: perl's
+#ifdef RXf_PMf_CHARSET
+	const regex_charset cs = get_regex_charset(RX_EXTFLAGS(rx));
+	return cs == REGEX_DEPENDS_CHARSET || cs == REGEX_ASCII_RESTRICTED_CHARSET
+	    || cs == REGEX_ASCII_MORE_RESTRICTED_CHARSET;
+#else
+	return !(RX_EXTFLAGS(rx) & RXf_PMf_LOCALE);
+#endif
+}
+
+/*Does rx read characters rather than bytes: /u, /a or /aa?  Each of those
+applies Unicode's definitions to code points 0x80-0xFF -- \s and [[:space:]]
+under /u match 0x85 and 0xA0, \h and \p{Zs} match 0xA0 under any of them
+(and \p{} or \N{U+...} turns /d into /u at compile time) -- and on a line
+matched as bytes those are the trailing bytes of UTF-8 characters: the 0xA0 of
+"a with grave" (C3 A0) or of Cyrillic Er (D0 A0).  `use v5.12` and later, or
+`use feature 'unicode_strings'`, make every qr// in their scope /u.  /d and /l
+are left as bytes: under /d a pattern written as UTF-8's bytes
+(qr/\xe2\x80\x94/) is matched as those bytes, which is what such a pattern
+means, and /l is whatever the locale says.  Before 5.14 there are no charset
+modifiers, and every pattern reads bytes.*/
+static bool S_rx_reads_chars(pTHX_ REGEXP *rx){	//not restrict: perl's
+#ifdef RXf_PMf_CHARSET
+	const regex_charset cs = get_regex_charset(RX_EXTFLAGS(rx));
+	return cs == REGEX_UNICODE_CHARSET || cs == REGEX_ASCII_RESTRICTED_CHARSET
+	    || cs == REGEX_ASCII_MORE_RESTRICTED_CHARSET;
+#else
+	PERL_UNUSED_ARG(rx);
+	return FALSE;
+#endif
+}
+
 /*What went wrong with a quote, for read_table's messages.
 
 A '"' that opens a quoted field and is still open at the end of the line takes
@@ -9824,44 +10254,15 @@ PERL_STATIC_INLINE void S_av_push_own(pTHX_ AV *restrict av, SV *restrict sv){
 		av_push(av, sv);
 }
 
-/*Append one finished field to the row.
-
-A field that is a single unquoted run -- the common case, and every field of a
-file with no quotes in it -- is still sitting in the line buffer, so it is
-copied from there straight into its own SV.  Only a field that the parser had
-to assemble (a quoted one, one with a doubled quote, one spanning lines, one
-with a stray CR dropped out of it) goes through the accumulator, which then
-has 'run' appended and is copied out.  The first route saves a sv_catpvn()
-and a second memcpy() per cell; with the shared keys in S_plan_init() it took
-an aoh read of a 300,000 x 5 CSV from 0.120 s to 0.096 s.
-
-undef_empty is csv_plan's 'undef_empty': once S_fast_row() is building the
-rows, an empty field is pushed as the bodyless undef it is going to become,
-instead of as an empty string that S_fast_row() would free and replace.  On a 300,000 x 10
-CSV with nine cells in ten empty that took an aoh read from 0.185 s to 0.106 s,
-a hoa from 0.164 s to 0.097 s and an aoa from 0.152 s to 0.073 s (best of nine
-runs each), and a file with no empty cell by no more than 1 ms.  Before then
-the row goes to the perl callback, and with a filter it goes to S_filter_row():
-a filter has always been handed '' for an empty field.
-
-restrict holds: 'run' points into the line buffer or at a literal, never into
-the accumulator.*/
-static void S_push_field(pTHX_ AV *restrict row, SV *restrict field,
-	const char *restrict run, size_t n, bool undef_empty){
-	if (SvCUR(field) == 0) {
-		S_av_push_own(aTHX_ row, (n || !undef_empty) ? newSVpvn(run, n) : newSV(0));
-		return;
-	}
-	if (n) sv_catpvn(field, run, n);
-	S_av_push_own(aTHX_ row, newSVpvn(SvPVX_const(field), SvCUR(field)));
-	sv_setpvs(field, "");
-}
-
 /*Hand a finished row to the callback (streaming) or to @$data (slurp), and
 start a fresh one.  For a row that a quoted field ran across lines in, the
 callback is also passed S_quote_note(q_line, mid, to) after the row; q_line = 0
 means there was none.  The note is made inside this call's SAVETMPS, so a file
-of many multi-line cells does not pile them up until the parse ends.
+of many multi-line cells does not pile them up until the parse ends.  When the
+row's first field opened with a '"' (first_q), a true value follows the note,
+or follows undef in its place: that field's text was quoted, so a comment
+marker at its start is text -- "#a" is a column named #a, as R's read.table
+reads it, not a commented-out header named a.
 
 Ownership: the row AV's single reference is transferred to a MORTAL RV
 (newRV_noinc + sv_2mortal). On the normal path the inner FREETMPS releases
@@ -9872,7 +10273,7 @@ leak and minus one SvREFCNT_dec per row.  *rowp is csv_plan's 'row', which
 S_plan_free() releases on an unwind, so it is NULL for exactly as long as the
 callback owns the row.*/
 static void S_emit_row(pTHX_ AV **rowp, bool use_cb, SV *callback, AV *data,
-	size_t q_line, bool mid, size_t to){
+	size_t q_line, bool mid, size_t to, bool first_q){
 	AV *row = *rowp;
 	*rowp = NULL;	//ownership leaves this function NOW
 	if (use_cb) {
@@ -9883,6 +10284,10 @@ static void S_emit_row(pTHX_ AV **rowp, bool use_cb, SV *callback, AV *data,
 		XPUSHs(sv_2mortal(newRV_noinc((SV*)row)));
 		if (q_line)	//read_table adds it to an alignment message
 			XPUSHs(S_quote_note(aTHX_ q_line, mid, to));
+		else if (first_q)
+			XPUSHs(&PL_sv_undef);
+		if (first_q)
+			XPUSHs(&PL_sv_yes);
 		PUTBACK;
 		call_sv(callback, G_DISCARD);	//may die: nothing left to leak
 		FREETMPS;
@@ -9971,6 +10376,7 @@ typedef struct {
 	bool span_mid;	//that quote came after text in its field
 	bool active;	//has the callback filled the plan in yet
 	bool undef_empty;	//active and no filter: an empty field is made undef as it is cut
+	bool cut_final;	//the CSV parser with undef_empty: S_push_cell() made every cell final, so S_fast_row() stores them as they are
 } csv_plan;
 
 /*One required plan key, or a croak.  install_plan() is the only thing that
@@ -10294,16 +10700,32 @@ static SV *S_class_text(pTHX_ const char *s, STRLEN n, unsigned char code, bool 
 			} else
 				nd = 0;	//R reads "1e" as 1; this refuses it
 		}
+		const char *const ne = t;	//one past the number's last byte
 		while (t < e && isSPACE(*t)) t++;
 		if (!nd || t != e) {
 			*bad = TRUE;
 			return NULL;
 		}
 		{
-			/*Atof() stops at the first byte that is not part of the number,
-			which the scan above has shown is a blank or the end; the buffer
-			is a PV's, so it is NUL-terminated.*/
-			const NV x = Atof(q);
+			/*Atof() is handed a NUL-terminated copy of the number alone.  s is
+not always a PV of its own: S_push_cell() passes a field still sitting in the
+line buffer, where the next byte is the separator, and Atof() read on into it
+whenever the separator could continue a number -- with sep '.' the field "1" of
+"1.2" became 1.2, and with sep 'E' the "1" of "1E2" became 100.  my_atof3(),
+which takes a length, is 5.28's.  64 bytes holds any number a program writes at
+full precision -- __float128's 36 significant digits with a sign, a point and a
+five-digit exponent -- and a longer one is copied to the heap.*/
+			char buf[64];
+			const size_t m = (size_t)(ne - q);
+			char *restrict c = m < sizeof(buf) ? buf : savepvn(q, m);	//savepvn() terminates its copy
+			NV x;
+			if (c == buf) {
+				Copy(q, buf, m, char);
+				buf[m] = '\0';
+			}
+			x = Atof(c);
+			if (c != buf)
+				Safefree(c);
 			return newSVnv(neg ? -x : x);
 		}
 	}
@@ -10364,9 +10786,11 @@ static void S_cell_class_in(pTHX_ const csv_plan *restrict p, size_t f, SV **slo
 
 /*An empty field, and a field listed in na_strings, become undef, which is the
 same rule the perl path applies and the same one that has always made an empty
-cell undef rather than "".  A cell is either a PV or, once S_push_field() is
-making them for the fast path, an empty field already undef; so !SvPOK() and
-SvCUR() are the whole of the "is it empty" test.
+cell undef rather than "".  A cell asked about here is a PV, or the undef
+xlsx_ws_row_end() makes of an empty .xlsx cell on the fast path; so !SvPOK()
+and SvCUR() are the whole of the "is it empty" test.  A CSV's cells on the
+fast path are never asked: S_push_cell() has already tested their text with
+S_bytes_is_na().
 
 The na_strings test is a length check and a memcmp() over a few borrowed keys
 rather than hv_exists_ent(), which hashed every non-empty cell.  With
@@ -10395,7 +10819,7 @@ PERL_STATIC_INLINE SV *S_cell_value(pTHX_ const csv_plan *restrict p, SV *restri
 	if (!v)
 		return newSV(0);
 	if (!SvOK(v))
-		return v;	//already the undef S_push_field() made for an empty field
+		return v;	//already the undef xlsx_ws_row_end() made for an empty cell
 	if (S_cell_is_na(aTHX_ p, v)) {
 		SvREFCNT_dec(v);
 		return newSV(0);
@@ -10404,8 +10828,9 @@ PERL_STATIC_INLINE SV *S_cell_value(pTHX_ const csv_plan *restrict p, SV *restri
 }
 
 /*S_cell_is_na() for a value still in its text, before it has an SV: a VCF
-sample's, or a field S_push_cell() is converting.  Empty, or one of the
-na_strings.*/
+sample's, or a field S_push_cell() is cutting.  Empty, or one of the
+na_strings.  A text longer than I32_MAX cannot be a hash key, and its length
+would turn negative -- the UTF-8 flag, to hv_exists() -- if it were passed.*/
 PERL_STATIC_INLINE bool S_bytes_is_na(pTHX_ const csv_plan *restrict p,
 	const char *restrict s, STRLEN n){
 	if (n == 0)
@@ -10416,49 +10841,83 @@ PERL_STATIC_INLINE bool S_bytes_is_na(pTHX_ const csv_plan *restrict p,
 				return TRUE;
 		return FALSE;
 	}
-	return p->na && hv_exists(p->na, s, (I32)n);
+	return p->na && n <= (STRLEN)I32_MAX && hv_exists(p->na, s, (I32)n);
 }
 
-/*Field f's cell as it is stored, in place: S_cell_value(), then colClasses.  A
-cell S_push_cell() has already converted -- a number, or the undef of a
-missing value, so not a PV -- is stored as it is.*/
+/*Field f's cell as it is stored, in place: S_cell_value(), then colClasses.
+Only for cells that were not made final as they were cut (csv_plan's
+cut_final): an .xlsx's.*/
 PERL_STATIC_INLINE void S_cell_store_in(pTHX_ const csv_plan *restrict p, size_t f, SV **slot){	//slot: in perl's AV
-	if (p->cls && f < p->ncol && p->cls[f] && *slot && !SvPOK(*slot))
-		return;
 	*slot = S_cell_value(aTHX_ p, *slot);
 	S_cell_class_in(aTHX_ p, f, slot);
 }
 
-/*S_push_field(), but a field whose column colClasses declares is made the
-number straight from the parser's text, with no PV made and freed for it:
-that took a hoa read of a 300,000 x 5 CSV with three declared columns from
-0.118 s to 0.095 s, against 0.086 s with none declared (best of three).  Only on the fast path without a filter (undef_empty), since a
-filter, and the perl callback, are handed the text.  The row number in a
-croak is the one S_fast_row() is about to give this row.*/
+/*Append one finished field to the row.
+
+A field that is a single unquoted run -- the common case, and every field of a
+file with no quotes in it -- is still sitting in the line buffer, so it is
+taken from there straight into its own SV.  Only a field that the parser had
+to assemble (a quoted one, one with a doubled quote, one spanning lines, one
+with a stray CR dropped out of it) goes through the accumulator, which then
+has 'run' appended and is taken from.  The first route saves a sv_catpvn()
+and a second memcpy() per cell; with the shared keys in S_plan_init() it took
+an aoh read of a 300,000 x 5 CSV from 0.120 s to 0.096 s.
+
+Once S_fast_row() is building the rows without a filter (undef_empty), the
+field is pushed as the value it will be stored as, and S_fast_row() has
+nothing left to do to it (csv_plan's cut_final): an empty field or an
+na_strings token as a bodyless undef, and a field whose column colClasses
+declares as its number, with no PV made for S_fast_row() to free and replace.
+Measured, best of several runs each:
+
+  empty     a 300,000 x 10 CSV with nine cells in ten empty: an aoh read from
+            0.185 s to 0.106 s, a hoa from 0.164 s to 0.097 s and an aoa from
+            0.152 s to 0.073 s, and a file with no empty cell by no more than
+            1 ms
+  colClasses  a hoa read of a 300,000 x 5 CSV with three declared columns from
+            0.118 s to 0.095 s, against 0.086 s with none declared
+  na_strings  a 300,000 x 10 CSV with half its cells ".", read with
+            na_strings => ['.', 'NA']: an aoa from 0.218 s to 0.153 s, an aoh
+            from 0.285 s to 0.215 s, a hoa from 0.208 s to 0.147 s (best of
+            five, one process each); and with no "." in the file, or no
+            na_strings at all, each 3-6% faster for the second pass over the
+            cells that S_fast_row() no longer makes
+
+Before then the row goes to the perl callback, and with a filter it goes to
+S_filter_row(): both are handed the text, an empty field as '', as a filter
+always has been.  The row number in a colClasses croak is the one S_fast_row()
+is about to give this row.
+
+restrict holds: 'run' points into the line buffer or at a literal, never into
+the accumulator.*/
 static void S_push_cell(pTHX_ csv_plan *restrict p, SV *restrict field,
 	const char *restrict run, size_t n){
-	const size_t f = (size_t)(AvFILLp(p->row) + 1);
-	if (p->undef_empty && p->cls && f < p->ncol && p->cls[f]) {
-		const char *s = run;
-		STRLEN len = n;
-		SV *v;
-		bool bad = FALSE;
-		if (SvCUR(field)) {	//assembled: the accumulator holds it
-			if (n) sv_catpvn(field, run, n);
-			s   = SvPVX_const(field);
-			len = SvCUR(field);
-		}
-		if (S_bytes_is_na(aTHX_ p, s, len))
-			v = newSV(0);
-		else if (!(v = S_class_text(aTHX_ s, len, p->cls[f], &bad)))
-			S_class_croak(aTHX_ p->file, (UV)(p->row_n + 1), p->fname[f], (UV)(f + 1),
-			              p->cls[f], sv_2mortal(newSVpvn(s, len)));
-		S_av_push_own(aTHX_ p->row, v);
-		if (SvCUR(field))
-			sv_setpvs(field, "");
-		return;
+	const bool built = SvCUR(field) != 0;	//the accumulator holds the field's start
+	const char *s = run;
+	STRLEN len = n;
+	SV *v;
+	if (built) {
+		if (n) sv_catpvn(field, run, n);
+		s   = SvPVX_const(field);
+		len = SvCUR(field);
 	}
-	S_push_field(aTHX_ p->row, field, run, n, p->undef_empty);
+	if (!p->undef_empty)
+		v = newSVpvn(s, len);
+	else if (S_bytes_is_na(aTHX_ p, s, len))
+		v = newSV(0);
+	else {
+		const size_t f = (size_t)(AvFILLp(p->row) + 1);
+		if (p->cls && f < p->ncol && p->cls[f]) {
+			bool bad = FALSE;
+			if (!(v = S_class_text(aTHX_ s, len, p->cls[f], &bad)))
+				S_class_croak(aTHX_ p->file, (UV)(p->row_n + 1), p->fname[f], (UV)(f + 1),
+				              p->cls[f], sv_2mortal(newSVpvn(s, len)));
+		} else
+			v = newSVpvn(s, len);
+	}
+	S_av_push_own(aTHX_ p->row, v);
+	if (built)
+		sv_setpvs(field, "");
 }
 
 /*One data row, straight from the parser's field list into the output shape.
@@ -10534,18 +10993,26 @@ static void S_fast_row(pTHX_ csv_plan *restrict p, AV **restrict rowp){
 	ary = AvARRAY(row);
 	if (p->mode == 3) {	//aoa: the row buffer itself becomes the output row
 		AV *fresh;
-		for (size_t j = 0; j < w; j++)
-			S_cell_store_in(aTHX_ p, j, &ary[j]);
+		if (!p->cut_final)
+			for (size_t j = 0; j < w; j++)
+				S_cell_store_in(aTHX_ p, j, &ary[j]);
 		fresh = newAV();
 		av_extend(fresh, w ? (SSize_t)w - 1 : 0);
 		*rowp = fresh;
 		S_av_push_own(aTHX_ p->out, newRV_noinc((SV*)row));
 		return;
 	}
-	if (p->mode == 2) {
-		/*stored in place, so a declared row name keys the row as its number;
-		the row still owns it, and the loop below frees it*/
-		S_cell_store_in(aTHX_ p, p->idx[p->rn], &ary[p->idx[p->rn]]);
+/*Every cell is made what it will be stored as before anything is made to hold
+it, in place in the row, which owns them if this croaks.  A colClasses croak
+used to come from inside the loop below, after an aoh's row hash had been made
+and before it was anywhere, and the hash leaked: one HV per failed .xlsx read.
+A CSV's cells are final already (S_push_cell()).  idx names each field at most
+once, so no cell is converted twice; a hoh's row name is converted here too, so
+that a declared one keys the row as its number.*/
+	if (!p->cut_final)
+		for (size_t j = 0; j < p->nout; j++)
+			S_cell_store_in(aTHX_ p, p->idx[j], &ary[p->idx[j]]);
+	if (p->mode == 2) {	//the row still owns rn, and the loop at the end frees it
 		rn = ary[p->idx[p->rn]];
 		if (!SvOK(rn))
 			croak("read_table: undefined row name (column '%" SVf "') in %s data row %" UVuf "\n",
@@ -10559,7 +11026,6 @@ static void S_fast_row(pTHX_ csv_plan *restrict p, AV **restrict rowp){
 		SV *v;
 		const size_t f = p->idx[j];
 		if (p->mode == 2 && j == p->rn) continue;	//left for the loop below
-		S_cell_store_in(aTHX_ p, f, &ary[f]);	//in the row, which owns it if this croaks
 		v = ary[f];
 		ary[f] = NULL;	//ownership leaves the row here
 		if (p->mode == 1) {
@@ -11340,6 +11806,26 @@ static const char *xlsx_find(const char *restrict p, const char *restrict end,
 	return NULL;
 }
 
+/*Just past an XML comment or CDATA section, from the '!' after its '<'.
+
+A comment may hold markup, so a scanner that reads it tag by tag takes
+"<!-- <row>...</row> -->" for a row of data, as every scanner here did up to
+0.3213; and a CDATA section may hold '<', '&' and even "</t>" as plain text.
+Both are stepped over whole, and one left unterminated runs to the end of the
+span, as an unclosed element does.  Any other "<!" -- a DOCTYPE -- is not
+stepped over, and p comes back unchanged.*/
+static const char *xlsx_skip_bang(const char *restrict p, const char *restrict end){
+	if ((size_t)(end - p) >= 3 && p[1] == '-' && p[2] == '-') {
+		const char *e = xlsx_find(p + 3, end, "-->", 3);
+		return e ? e + 3 : end;
+	}
+	if ((size_t)(end - p) >= 8 && memcmp(p, "![CDATA[", 8) == 0) {
+		const char *e = xlsx_find(p + 8, end, "]]>", 3);
+		return e ? e + 3 : end;
+	}
+	return p;
+}
+
 /*The namespace prefix the part's elements carry, with its colon -- "x:" for
 <x:worksheet xmlns:x="...">, and *plen = 0 for none.  Excel, LibreOffice and
 openpyxl make SpreadsheetML the default namespace and write bare <row> and <c>;
@@ -11360,7 +11846,11 @@ static const char *xlsx_ns_prefix(const char *restrict xml, const char *restrict
 		const char *n;	//read after the loop: where the root element's name stopped
 		if (!lt || lt + 1 >= end) break;
 		p = lt + 1;
-		if (*p == '?' || *p == '!') continue;
+		if (*p == '!') {	//a comment is stepped over whole: it may hold a '<'
+			p = xlsx_skip_bang(p, end);
+			continue;
+		}
+		if (*p == '?') continue;
 		for (n = p; n < end && *n != ':' && *n != '>' && *n != '/' && !xlsx_is_ws(*n); n++)
 			;
 		if (n < end && *n == ':')
@@ -11392,7 +11882,7 @@ PERL_STATIC_INLINE bool xlsx_is_name(const char *restrict p, const char *restric
 
 /*The '<' of the first end tag </pfx name> at or after p, with *after just past
 its '>', or NULL when there is none.  Blanks before the '>' are allowed, as XML
-allows them.*/
+allows them, and one inside a comment or a CDATA section is text, not a tag.*/
 static const char *xlsx_find_end(const char *restrict p, const char *restrict end,
 	const char *restrict pfx, STRLEN plen, const char *restrict name, STRLEN nlen,
 	const char **restrict after){
@@ -11401,6 +11891,10 @@ static const char *xlsx_find_end(const char *restrict p, const char *restrict en
 		const char *q;
 		if (!lt) return NULL;
 		q = lt + 1;
+		if (q < end && *q == '!') {	//"</t>" inside a comment or CDATA ends nothing
+			p = xlsx_skip_bang(q, end);
+			continue;
+		}
 		if (q < end && *q == '/' && xlsx_is_name(q + 1, end, pfx, plen, name, nlen)) {
 			q += 1 + plen + nlen;
 			while (q < end && xlsx_is_ws(*q)) q++;
@@ -11512,12 +12006,41 @@ static size_t xlsx_ref_col(const char *restrict r, STRLEN len){
 	return idx - 1;
 }
 
+/*Append n bytes of literal XML text to out with its line ends normalised, as
+an XML processor does before it parses anything (XML 1.0, 5th edition, section
+2.11): CR LF, and a CR on its own, each become LF.  A CR written as a reference,
+&#13;, is not literal text and does not come through here, so it stays a CR --
+which is the point of writing it that way.  openpyxl reads through expat, which
+does the same, and up to 0.3213 a CR LF in a cell came back as both bytes.*/
+static void xlsx_eol_cat(pTHX_ SV *restrict out, const char *restrict s, STRLEN n){
+	while (n) {
+		const char *cr = (const char*)memchr(s, '\r', n);
+		STRLEN run = cr ? (STRLEN)(cr - s) : n;
+		if (run) sv_catpvn(out, s, run);
+		if (!cr) return;
+		sv_catpvn(out, "\n", 1);
+		run++;	//the CR
+		if (run < n && s[run] == '\n') run++;	//... and the LF it pairs with
+		s += run;
+		n -= run;
+	}
+}
+
+/*XML 1.0's Char production (section 2.2), the characters a numeric reference
+may name: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF].
+Everything else -- NUL and the other C0 controls, a UTF-16 surrogate, U+FFFE,
+U+FFFF, and anything past U+10FFFF -- is not a character a document can hold.*/
+#define XLSX_IS_XML_CHAR(c) ((c) == 0x9 || (c) == 0xA || (c) == 0xD \
+	|| ((c) >= 0x20 && (c) <= 0xD7FF) || ((c) >= 0xE000 && (c) <= 0xFFFD) \
+	|| ((c) >= 0x10000 && (c) <= 0x10FFFF))
+
 /*Append s (raw XML text) to out with the five predefined entities and numeric
-character references decoded.  A numeric reference becomes UTF-8 bytes, through
-perl's own uvchr_to_utf8() so that it agrees with what utf8::encode() produced
-in the perl parser: the result stays byte-consistent with the rest of the part,
-which read_table reads and hands back as raw UTF-8 bytes rather than as decoded
-characters.
+character references decoded, and the line ends of the literal text between
+them normalised (xlsx_eol_cat()).  A numeric reference becomes UTF-8 bytes,
+through perl's own uvchr_to_utf8() so that it agrees with what utf8::encode()
+produced in the perl parser: the result stays byte-consistent with the rest of
+the part, which read_table reads and hands back as raw UTF-8 bytes rather than
+as decoded characters.
 
 One left-to-right pass is also what makes "&amp;lt;" come back as "&lt;" and
 not "<" -- each reference is decoded once and its replacement is never rescanned.
@@ -11525,8 +12048,9 @@ The perl version got to the same place from the other side, by running the &amp;
 substitution last.
 
 Anything else that starts with '&' is copied through verbatim, including an
-entity this does not know (&nbsp;) and a bare '&', which is what the perl
-version did with them.*/
+entity this does not know (&nbsp;), a bare '&', and a numeric reference to
+something that is not an XML character (XLSX_IS_XML_CHAR()), which is what the
+perl version did with the first two.*/
 static void xlsx_xml_uncat(pTHX_ SV *restrict out, const char *restrict s, STRLEN len){
 	STRLEN i = 0;
 	while (i < len) {
@@ -11534,7 +12058,7 @@ static void xlsx_xml_uncat(pTHX_ SV *restrict out, const char *restrict s, STRLE
 		const char *ent, *semi_p, *next_amp;
 		STRLEN run, semi, elen, restlen;
 		run = amp ? (STRLEN)(amp - (s + i)) : (len - i);
-		if (run) sv_catpvn(out, s + i, run);
+		if (run) xlsx_eol_cat(aTHX_ out, s + i, run);
 		i += run;
 		if (!amp) break;
 /*The reference ends at the first ';'.  A '&' before that one means this is not
@@ -11572,29 +12096,210 @@ global substitutions did with it.*/
 				else if (hex && c >= 'a' && c <= 'f') d = (UV)(c - 'a' + 10);
 				else if (hex && c >= 'A' && c <= 'F') d = (UV)(c - 'A' + 10);
 				else { ok = FALSE; break; }
-/*Stop before the multiply can wrap.  0x7FFFFFFF is perl's own ceiling for
-chr(), and it fits a UV on a 32-bit build as well as a 64-bit one; past it the
-reference is left in the text verbatim, which is the only answer that is the
-same on every perl in the matrix.  The perl version handed the number to chr()
-unguarded, and that was not: "&#999999999999;" came back as thirteen bytes of
-perl's extended UTF-8 on an ivsize=8 build and died outright on 5.44.0-i686
-with "Use of code point 0xFFFFFFFF is not allowed".  XML 1.0 does not allow a
-character reference above #x10FFFF at all, so nothing legal is lost.*/
-				if (cp > (UV)0x7FFFFFFF / (hex ? 16 : 10)) { ok = FALSE; break; }
 				cp = cp * (hex ? 16 : 10) + d;
+/*Stop as soon as the number is past U+10FFFF, the last code point XML allows,
+which also keeps the multiply from wrapping: cp is at most 0x10FFFF going into
+it, and 0x10FFFF * 16 + 15 fits a 32-bit UV.  The perl version handed the
+number to chr() unguarded: "&#999999999999;" came back as thirteen bytes of
+perl's extended UTF-8 on an ivsize=8 build and died outright on 5.44.0-i686
+with "Use of code point 0xFFFFFFFF is not allowed".  Up to 0.3213 this stopped
+at chr()'s own ceiling of 0x7FFFFFFF instead, and a reference between the two
+came back as four to six bytes that are not UTF-8.*/
+				if (cp > 0x10FFFF) { ok = FALSE; break; }
 			}
-			if (k == first) ok = FALSE;	//"&#;" or "&#x;"
+			if (k == first || !XLSX_IS_XML_CHAR(cp)) ok = FALSE;	//"&#;", "&#x;", or not a Char
 			if (ok) {
 				char buf[UTF8_MAXBYTES + 1];
-				U8 *e = uvchr_to_utf8((U8*)buf, cp);
+/*UNICODE_ALLOW_ANY, not the 0 that plain uvchr_to_utf8() passes: before 5.14, 0
+meant "warn", and a noncharacter that XML allows (U+FDD0, U+1FFFE, U+10FFFF)
+raised "Unicode character 0x10ffff is illegal" -- fatal under the caller's
+`use warnings FATAL => 'all'`.  Since 5.14 the macro is 0 and nothing warns.*/
+				U8 *e = uvchr_to_utf8_flags((U8*)buf, cp, UNICODE_ALLOW_ANY);
 				sv_catpvn(out, buf, (STRLEN)((char*)e - buf));
 			} else {
-				sv_catpvn(out, s + i, semi + 1 - i);
+				xlsx_eol_cat(aTHX_ out, s + i, semi + 1 - i);
 			}
 		} else {
-			sv_catpvn(out, s + i, semi + 1 - i);
+			xlsx_eol_cat(aTHX_ out, s + i, semi + 1 - i);
 		}
 		i = semi + 1;
+	}
+}
+
+/*One piece of a text node's raw bytes, the first in [*pp, end), for
+xlsx_text_cat() and xlsx_text_nonempty() to agree on.  *kind says what it is,
+and [*ps, *ps + *pn) is the text it contributes:
+  0  literal text, its references and line ends still to decode (xlsx_xml_uncat())
+  1  a CDATA section's content: line ends only, since '&' and '<' are text there
+  2  a comment, which contributes nothing
+A '<' that opens neither of the last two is literal text, as it has always
+been taken to be.  FALSE once the span is used up; *pp is moved past the piece.*/
+static bool xlsx_text_piece(const char **restrict pp, const char *restrict end,
+	const char **restrict ps, STRLEN *restrict pn, unsigned short int *restrict kind){
+	const char *p = *pp;
+	if (p >= end)
+		return FALSE;
+	if (*p == '<' && end - p >= 2 && p[1] == '!') {
+		const char *q = xlsx_skip_bang(p + 1, end);
+		if (q != p + 1) {
+			if (p[2] == '-') {
+				*kind = 2;
+				*ps   = p;
+				*pn   = 0;
+			} else {	//"<![CDATA[" is 9 bytes, and "]]>" 3 more when it was closed
+				const char *body = p + 9;
+				const char *stop = (q - body >= 3 && memcmp(q - 3, "]]>", 3) == 0) ? q - 3 : q;
+				*kind = 1;
+				*ps   = body;
+				*pn   = (STRLEN)(stop - body);
+			}
+			*pp = q;
+			return TRUE;
+		}
+	}
+	{
+		const char *lt = (const char*)memchr(p + 1, '<', (size_t)(end - p - 1));
+		const char *stop = lt ? lt : end;
+		*kind = 0;
+		*ps   = p;
+		*pn   = (STRLEN)(stop - p);
+		*pp   = stop;
+	}
+	return TRUE;
+}
+
+/*Does a byte of s need decoding?  '&' starts a reference, a CR is a line end
+to normalise, and '<' can only be a comment or CDATA section inside a <t> or a
+<v>.  Most cells have none of them, and are copied as they stand.*/
+PERL_STATIC_INLINE bool xlsx_text_plain(const char *restrict s, STRLEN len){
+	for (STRLEN k = 0; k < len; k++) {
+		const char c = s[k];
+		if (c == '&' || c == '\r' || c == '<')
+			return FALSE;
+	}
+	return TRUE;
+}
+
+/*Append the text of a <t> or <v> -- its raw bytes [s, s + len) -- to out, as
+an XML processor would hand it over: references decoded, line ends normalised,
+CDATA sections unwrapped to their literal content and comments dropped.  Up to
+0.3213 a CDATA section came back with its "<![CDATA[" and "]]>" still on.*/
+static void xlsx_text_cat(pTHX_ SV *restrict out, const char *restrict s, STRLEN len){
+	const char *p = s;
+	const char *const end = s + len;
+	const char *ps;
+	STRLEN pn;
+	unsigned short int kind;	// 0 = literal, 1 = CDATA content, 2 = comment
+	if (xlsx_text_plain(s, len)) {
+		sv_catpvn(out, s, len);
+		return;
+	}
+	while (xlsx_text_piece(&p, end, &ps, &pn, &kind)) {
+		if (kind == 0)
+			xlsx_xml_uncat(aTHX_ out, ps, pn);
+		else if (kind == 1)
+			xlsx_eol_cat(aTHX_ out, ps, pn);
+	}
+}
+
+/*TRUE exactly when xlsx_text_cat() would append at least one byte for the same
+text.  Every piece but a comment and an empty CDATA section does: a reference
+decodes to one byte or more, or is copied whole, and a line end stays a byte.*/
+static bool xlsx_text_nonempty(const char *restrict s, STRLEN len){
+	const char *p = s;
+	const char *const end = s + len;
+	const char *ps;
+	STRLEN pn;
+	unsigned short int kind;	// 0 = literal, 1 = CDATA content, 2 = comment
+	while (xlsx_text_piece(&p, end, &ps, &pn, &kind))
+		if (kind != 2 && pn)
+			return TRUE;
+	return FALSE;
+}
+
+/*The four hex digits of an _xHHHH_ escape at h, as *cp; FALSE if they are not
+four hex digits.*/
+PERL_STATIC_INLINE bool xlsx_hex4(const char *restrict h, UV *restrict cp){
+	UV v = 0;
+	for (unsigned short int k = 0; k < 4; k++) {
+		const char c = h[k];
+		UV d;
+		if      (c >= '0' && c <= '9') d = (UV)(c - '0');
+		else if (c >= 'a' && c <= 'f') d = (UV)(c - 'a' + 10);
+		else if (c >= 'A' && c <= 'F') d = (UV)(c - 'A' + 10);
+		else return FALSE;
+		v = v * 16 + d;
+	}
+	*cp = v;
+	return TRUE;
+}
+
+/*Decode Excel's own escape, ST_Xstring's _xHHHH_, in the bytes of sv from
+byte 'from' on, in place.
+
+XML cannot hold most C0 controls at all, so Excel writes a character it cannot
+put in a <t> as _x followed by four hex digits and _ -- "\0" as _x0000_, a CR as
+_x000D_ -- and writes a literal "_x0000_" in a cell as _x005F_x0000_, escaping
+its underscore.  XlsxWriter 1.3.9 (sharedstrings.py, _write_si()) and
+Excel::Writer::XLSX 1.15 (Package/XMLwriter.pm, _escape_control_characters())
+write it, and so does write_table.  LibreOffice 24.2.7.2 decodes it, and every
+case in t/read_table.xlsx.xml.t reads there as it does here.  openpyxl 3.1.5
+does not: reader/strings.py strips "x005F_" from a shared string and decodes
+nothing else, and an inline string not at all.  Up to 0.3213 read_table returned it as it stood, so neither a
+write_table round trip nor a workbook with a control character in it read back
+as written.
+
+It runs on a <t>'s text once its references are decoded and its CDATA
+unwrapped, which is when Excel sees the escape, and one <t> at a time.  Each
+escape is decoded left to right and the scan resumes after its closing '_', so
+in _x005F_x0041_ the first escape gives '_' and what is left, x0041_, has no
+underscore of its own to start a second: it reads "_x0041_", which is what
+was written.  The character goes in as UTF-8 bytes, as a numeric reference's
+does, and through the same UNICODE_ALLOW_ANY: the escape exists to carry
+characters XML refuses, a lone surrogate among them, so none is refused here.
+A high surrogate escaped straight before a low one is the one character the
+pair stands for in UTF-16, which is what Excel and LibreOffice hold a string
+as: LibreOffice 24.2.7.2 reads _xD83D__xDE00_ as U+1F600, and so does this.
+
+Every escape is seven bytes and decodes to one to three, and a pair is fourteen
+and decodes to four, so the string only shrinks, and the bytes are moved down
+over the gap a run at a time.  A string with no '_' after 'from' is one
+memchr().*/
+static void xlsx_xstring_unescape(pTHX_ SV *restrict sv, STRLEN from){
+	char *const s = SvPVX(sv);
+	const char *const end = s + SvCUR(sv);
+	char *w = s + from;	//where the next kept byte goes
+	char *r = s + from;	//the first byte not yet moved down to w
+	char *q = s + from;	//where the search for the next '_' resumes
+	while (q < end) {
+		char *const u = (char*)memchr(q, '_', (size_t)(end - q));
+		UV cp;
+		if (!u)
+			break;
+		if (end - u >= 7 && u[1] == 'x' && u[6] == '_' && xlsx_hex4(u + 2, &cp)) {
+			U8 buf[UTF8_MAXBYTES + 1];
+			STRLEN used = 7;	//bytes of escape consumed: 14 for a surrogate pair
+			STRLEN n;
+			UV lo;
+			if (cp >= 0xD800 && cp <= 0xDBFF && end - u >= 14 && u[7] == '_' && u[8] == 'x'
+			    && u[13] == '_' && xlsx_hex4(u + 9, &lo) && lo >= 0xDC00 && lo <= 0xDFFF) {
+				cp   = 0x10000 + ((cp - 0xD800) << 10) + (lo - 0xDC00);
+				used = 14;
+			}
+			n = (STRLEN)(uvchr_to_utf8_flags(buf, cp, UNICODE_ALLOW_ANY) - buf);
+			if (u != r) Move(r, w, (size_t)(u - r), char);
+			w += u - r;
+			Copy(buf, w, n, char);	//n <= 4 < used: never past the escape it replaces
+			w += n;
+			r = q = u + used;
+		} else
+			q = u + 1;
+	}
+	if (w != r) {
+		Move(r, w, (size_t)(end - r), char);
+		w += end - r;
+		*w = '\0';
+		SvCUR_set(sv, (STRLEN)(w - s));
 	}
 }
 
@@ -11616,6 +12321,10 @@ static const char *xlsx_child(const char *restrict p, const char *restrict end,
 		bool self;
 		if (!lt) return NULL;
 		p = lt + 1;
+		if (p < end && *p == '!') {	//a commented-out <v> is no value
+			p = xlsx_skip_bang(p, end);
+			continue;
+		}
 		if (!xlsx_is_name(p, end, pfx, plen, name, nlen)) continue;
 		p = xlsx_tag_end(p + plen + nlen, end, &a, &alen, &self);
 		if (self) { *len_out = 0; *after = p; return p; }
@@ -11624,6 +12333,54 @@ static const char *xlsx_child(const char *restrict p, const char *restrict end,
 		*len_out = (STRLEN)((ce ? ce : end) - txt);
 		*after   = ce ? ce_after : end;
 		return txt;
+	}
+	return NULL;
+}
+
+/*xlsx_child() for the <t> runs of a string -- a shared string's <si> or an
+inline cell's <is> -- passing over any phonetic run, <rPh>, whole.
+
+An <rPh> holds the furigana that Japanese Excel records for text typed through
+the input method editor: <si><t>漢字</t><rPh sb="0" eb="2"><t>カンジ</t></rPh></si>
+is the string 漢字, annotated with its reading.  Its <t> is the annotation, not
+part of the string, and openpyxl and xlrd both leave it out.  Up to 0.3213 it
+was concatenated with the runs, so that cell read 漢字カンジ; the comment that
+excused it said no writer emits <rPh>, and Excel does, for every string typed
+in Japanese.*/
+static const char *xlsx_run(const char *restrict p, const char *restrict end,
+	const char *restrict pfx, STRLEN plen, STRLEN *restrict len_out,
+	const char **restrict after){
+	while (p < end) {
+		const char *lt = (const char*)memchr(p, '<', (size_t)(end - p));
+		if (!lt) return NULL;
+		p = lt + 1;
+		if (p < end && *p == '!') {
+			p = xlsx_skip_bang(p, end);
+			continue;
+		}
+		if (xlsx_is_name(p, end, pfx, plen, "rPh", 3)) {
+			const char *a, *r_after;
+			STRLEN alen;
+			bool self;
+			p = xlsx_tag_end(p + plen + 3, end, &a, &alen, &self);
+			if (!self) {
+				const char *re = xlsx_find_end(p, end, pfx, plen, "rPh", 3, &r_after);
+				p = re ? r_after : end;
+			}
+			continue;
+		}
+		if (xlsx_is_name(p, end, pfx, plen, "t", 1)) {	//xlsx_child()'s reading of it
+			const char *a, *txt, *ce, *ce_after;
+			STRLEN alen;
+			bool self;
+			p = xlsx_tag_end(p + plen + 1, end, &a, &alen, &self);
+			if (self) { *len_out = 0; *after = p; return p; }
+			txt = p;
+			ce  = xlsx_find_end(p, end, pfx, plen, "t", 1, &ce_after);
+			*len_out = (STRLEN)((ce ? ce : end) - txt);
+			*after   = ce ? ce_after : end;
+			return txt;
+		}
 	}
 	return NULL;
 }
@@ -11709,7 +12466,7 @@ branch av_extend() took.*/
 		AvFILLp(w->row) = (SSize_t)(w->width - 1);
 	}
 	ary = AvARRAY(w->row);
-	for (size_t j = 0; j < w->width; j++)	//undef on the fast path, as S_push_field() does
+	for (size_t j = 0; j < w->width; j++)	//undef on the fast path, as S_push_cell() does
 		if (XLSX_IS_HOLE(ary[j]))
 			ary[j] = w->plan->undef_empty ? newSV(0) : newSVpvs("");
 	w->maxc = 0;
@@ -11755,13 +12512,20 @@ static SV *xlsx_cell_value(pTHX_ const xlsx_ws *restrict w, const char *restrict
 	else if (tv && tvlen == 9 && memcmp(tv, "inlineStr", 9) == 0) t = 2;
 	if (t == 2) {
 		const char *q = body;
-		SV *v = newSVpvs("");
-		while ((txt = xlsx_child(q, body + blen, w->pfx, w->plen, "t", 1,
-		                         &tlen, &after)) != NULL) {
-			xlsx_xml_uncat(aTHX_ v, txt, tlen);
+		SV *v = NULL;	//made from the first run: one run with nothing to decode is the common case
+		while ((txt = xlsx_run(q, body + blen, w->pfx, w->plen, &tlen, &after)) != NULL) {
+			STRLEN from = 0;	//where this run's text starts in v
+			if (!v && xlsx_text_plain(txt, tlen))
+				v = newSVpvn(txt, tlen);
+			else {
+				if (!v) v = newSVpvs("");
+				from = SvCUR(v);
+				xlsx_text_cat(aTHX_ v, txt, tlen);
+			}
+			xlsx_xstring_unescape(aTHX_ v, from);
 			q = after;
 		}
-		return v;
+		return v ? v : newSVpvs("");
 	}
 	txt = xlsx_child(body, body + blen, w->pfx, w->plen, "v", 1, &tlen, &after);
 	if (!txt)
@@ -11771,22 +12535,13 @@ static SV *xlsx_cell_value(pTHX_ const xlsx_ws *restrict w, const char *restrict
 in there -- and an index past the end of the table -- reads as an empty cell,
 which is what the perl parser's /^\d+\z/ test and its // '' did with it.
 
-Copying the shared string rather than building a fresh buffer is what makes this
-cheap, but only if the copy is allowed to be a copy-on-write one, and from XS it
-is not by default: sv.h defines SV_DO_COW_SVSETSV -- which is what sv_setsv()
-and newSVsv() pass -- to the real flags only under PERL_CORE, and to 0 otherwise,
-because "XS code on CPAN may not be" safe for it.  Asking for it explicitly is
-safe here: nothing in this file ever writes through SvPVX of a cell, and the
-value is handed straight to perl, which drops the sharing on the first write.
-Without the flag every cell allocated its own buffer.
-
-SV_COW_SHARED_HASH_KEYS is the flag on every perl back to 5.9.5, and ppport.h
-defines it away to 0 below that, which just returns the ordinary copy.  Perl
-5.20 is where it started covering plain strings and not only shared hash keys,
-so on 5.10 and 5.12 this is an ordinary copy again.  Sharing also stops at 256
-cells per string, which is where the one-byte COW refcount saturates and perl
-falls back to copying; a table of many distinct strings -- 117,870 of them for
-688,268 string cells in the workbook above -- stays well inside that.*/
+The shared string is a shared hash key (xlsx_sst_parse()), and copying it with
+SV_COW_SHARED_HASH_KEYS shares the key rather than its bytes.  The flag has to
+be asked for: sv.h defines SV_DO_COW_SVSETSV -- which is what sv_setsv() and
+newSVsv() pass -- to the real flags only under PERL_CORE, and to 0 otherwise,
+because "XS code on CPAN may not be" safe for it.  Asking for it is safe here:
+nothing in this file ever writes through SvPVX of a cell, and the value is
+handed straight to perl, which unshares it on the first write.*/
 		size_t ix = 0;
 		bool ok = tlen > 0;
 		for (STRLEN k = 0; k < tlen; k++) {
@@ -11801,12 +12556,12 @@ falls back to copying; a table of many distinct strings -- 117,870 of them for
 		}
 		return newSVpvs("");
 	}
-	if (memchr(txt, '&', tlen)) {
+	if (!xlsx_text_plain(txt, tlen)) {
 		SV *v = newSVpvs("");
-		xlsx_xml_uncat(aTHX_ v, txt, tlen);
+		xlsx_text_cat(aTHX_ v, txt, tlen);
 		return v;
 	}
-	return newSVpvn(txt, tlen);	//the common case: no entities
+	return newSVpvn(txt, tlen);	//the common case: nothing to decode
 }
 
 /*Pass 1's answer to whether a cell has a value, made without building it, and
@@ -11815,10 +12570,14 @@ reading of the same elements.  The two must agree, or not in the direction
 that loses data: pass 2 drops a cell past the width pass 1 found.
 
 The first test is the cheap one.  Every value is the text of a <v> or <t>, after
-that element's '>', so a body with no '>' followed by anything but '<' has none.
-Only a body that has text is looked at as pass 2 would.  An inline run with any
-text decodes to at least one byte -- an entity this does not know is copied
-whole, a numeric one is one character or more -- and so does a literal <v>.*/
+that element's '>', so a body in which every '>' is followed straight away by
+an end tag, "</", has none.  Anything else after a '>' may be text: a byte that
+is not '<', a CDATA section or comment ("<!"), or a stray '<' that the cell's
+text keeps as it is.  Up to 0.3213 this tested for "anything but '<'", and a
+cell whose text began with "<![CDATA[" was measured as empty and then dropped
+from a row that pass 1 had not widened for it.  Only a body that may have text
+is looked at as pass 2 would, and its text is asked about through
+xlsx_text_nonempty(), which reads it as xlsx_text_cat() does.*/
 static bool xlsx_cell_has_value(const xlsx_ws *restrict w, const char *restrict a,
 	STRLEN alen, const char *restrict body, STRLEN blen){
 	const char *tv, *txt, *after;
@@ -11828,7 +12587,7 @@ static bool xlsx_cell_has_value(const xlsx_ws *restrict w, const char *restrict 
 		const char *gt = (const char*)memchr(p, '>', (size_t)(body + blen - p));
 		if (!gt || gt + 1 >= body + blen)
 			break;
-		if (gt[1] != '<') {
+		if (gt[1] != '<' || (gt + 2 < body + blen && gt[2] != '/')) {
 			text = TRUE;
 			break;
 		}
@@ -11839,9 +12598,8 @@ static bool xlsx_cell_has_value(const xlsx_ws *restrict w, const char *restrict 
 	tv = xlsx_attr(a, alen, "t", 1, &tvlen);
 	if (tv && tvlen == 9 && memcmp(tv, "inlineStr", 9) == 0) {
 		const char *q = body;
-		while ((txt = xlsx_child(q, body + blen, w->pfx, w->plen, "t", 1,
-		                         &tlen, &after)) != NULL) {
-			if (tlen)
+		while ((txt = xlsx_run(q, body + blen, w->pfx, w->plen, &tlen, &after)) != NULL) {
+			if (xlsx_text_nonempty(txt, tlen))
 				return TRUE;
 			q = after;
 		}
@@ -11859,7 +12617,7 @@ static bool xlsx_cell_has_value(const xlsx_ws *restrict w, const char *restrict 
 		}
 		return ix < w->nsst && w->sst[ix] && SvPOK(w->sst[ix]) && SvCUR(w->sst[ix]) > 0;
 	}
-	return TRUE;
+	return xlsx_text_nonempty(txt, tlen);
 }
 
 /*One pass over the worksheet XML.  measure = TRUE finds every cell but builds
@@ -11884,6 +12642,10 @@ static void xlsx_ws_scan(pTHX_ xlsx_ws *restrict w, bool measure){
 		if (!lt) break;
 		p = lt + 1;
 		if (p >= end) break;
+		if (*p == '!') {	//a commented-out row is not data; both passes skip it
+			p = xlsx_skip_bang(p, end);
+			continue;
+		}
 		if (*p == '/') {
 /*Only </row> matters; every other end tag falls through to the next '<'.*/
 			if (xlsx_is_name(p + 1, end, pfx, plen, "row", 3)) {
@@ -11995,15 +12757,45 @@ shared-string id.
 
 Each <si> holds one <t> run, or several when the string is rich text, and the
 runs are concatenated -- so a string that Excel split across two formatting runs
-comes back whole, without its formatting.  The perl loop this replaces cost
+comes back whole, without its formatting.  A phonetic run, <rPh>, is not part of
+the string and is left out (xlsx_run()).  The perl loop this replaces cost
 0.205 s on an 8 MB table of 117,870 strings, most of it the two nested regexes
 and a sub call per run.
 
-<t> elements inside a phonetic-guide <rPh> are picked up along with the real
-runs, as they were by the perl version; a furigana annotation is the only thing
-that puts one there and no writer this reads emits them.*/
+Each string is stored as a shared hash key, newSVpvn_share(), and that is what
+lets every cell that refers to it share its buffer: xlsx_cell_value() copies it
+with SV_COW_SHARED_HASH_KEYS, which for a shared key takes a reference on the
+key rather than copying the bytes, on every perl back to 5.10 and with no limit
+on how many cells share one string.  Up to 0.3213 the strings were plain SVs,
+and the copy-on-write sharing xlsx_cell_value() relied on did not happen: perl 5.20
+and later decline to share a buffer less than half full, and every string under
+eight bytes sits in a 16-byte one, so the short codes a column of categories is
+made of were copied into a buffer of their own per cell -- and a longer string
+stopped sharing at 255 cells anyway.  Read as an aoa on perl 5.44.0, best of three
+in a fresh process each: a 500,000-row sheet of four columns drawn from three
+categories took 0.61 s and left 249 MB, and takes 0.57 s and 188 MB; a 200,000 x
+20 sheet with 2,000,000 string cells over 5,020 distinct strings took 1.08 s
+and 364 MB, and takes 1.04 s and 304 MB.
+
+Before 5.18 a shared key is marked READONLY and FAKE rather than IsCOW, so on
+those perls Internals::SvREADONLY() is true of such a cell.  Every write perl
+makes unshares it first, as it does for a copy of a hash key in perl code, and
+hoa_assign_loop() already copies a read-only cell before aliasing $_ to it.
+
+The length is passed positive, so the key is the bytes as they are.  A negative
+one would mean "UTF-8", and newSVpvn_share() would then downgrade the key to
+Latin-1 where it could and flag the SV, changing both the bytes and the flag
+every cell has always been handed.  A string too long for the I32 the call
+takes -- past 2 GB, where Excel stops at 32,767 characters -- is an ordinary SV.*/
+static SV *xlsx_sst_entry(pTHX_ SV *restrict buf){
+	if (SvCUR(buf) > (STRLEN)I32_MAX)
+		return newSVpvn(SvPVX_const(buf), SvCUR(buf));
+	return newSVpvn_share(SvPVX_const(buf), (I32)SvCUR(buf), 0);
+}
+
 static AV *xlsx_sst_parse(pTHX_ const char *restrict xml, STRLEN xlen){
 	AV *sst = newAV();
+	SV *const buf = sv_2mortal(newSVpvs(""));	//one string's text, reused for each <si>
 	const char *p = xml;
 	const char *const end = xml + xlen;
 	STRLEN plen;
@@ -12013,28 +12805,31 @@ static AV *xlsx_sst_parse(pTHX_ const char *restrict xml, STRLEN xlen){
 		const char *a, *si_end, *si_after, *body, *txt, *after;
 		STRLEN alen, tlen;
 		bool self;
-		SV *v;
 		if (!lt) break;
 		p = lt + 1;
+		if (p < end && *p == '!') {	//a commented-out <si> is not a string
+			p = xlsx_skip_bang(p, end);
+			continue;
+		}
 		if (!xlsx_is_name(p, end, pfx, plen, "si", 2))
 			continue;
 		p = xlsx_tag_end(p + plen + 2, end, &a, &alen, &self);
-		if (self) { av_push(sst, newSVpvs("")); continue; }
+		SvCUR_set(buf, 0);
+		if (self) { av_push(sst, xlsx_sst_entry(aTHX_ buf)); continue; }
 		body   = p;
 		si_end = xlsx_find_end(p, end, pfx, plen, "si", 2, &si_after);
 		p      = si_end ? si_after : end;
-		v      = newSVpvs("");
 		{
 			const char *q = body;
 			const char *const b_end = si_end ? si_end : end;
-			while ((txt = xlsx_child(q, b_end, pfx, plen, "t", 1,
-			                         &tlen, &after)) != NULL) {
-				if (memchr(txt, '&', tlen)) xlsx_xml_uncat(aTHX_ v, txt, tlen);
-				else                        sv_catpvn(v, txt, tlen);
+			while ((txt = xlsx_run(q, b_end, pfx, plen, &tlen, &after)) != NULL) {
+				const STRLEN from = SvCUR(buf);	//where this run's text starts
+				xlsx_text_cat(aTHX_ buf, txt, tlen);
+				xlsx_xstring_unescape(aTHX_ buf, from);
 				q = after;
 			}
 		}
-		av_push(sst, v);
+		av_push(sst, xlsx_sst_entry(aTHX_ buf));
 	}
 	return sst;
 }
@@ -22555,6 +23350,7 @@ PPCODE:
 		}
 	}
 	const char *sep = ",";
+	STRLEN sep_len = 1;
 	bool explicit_sep = 0; // Track if delimiter was manually specified
 /* default undef cells to a true empty value ("") instead of NULL.
   With print_string_row emitting zero-length fields bare (no quotes), an
@@ -22607,7 +23403,12 @@ PPCODE:
 		else if (strEQ(key, "row_names")) row_names_sv = val;
 		// Check for either "sep" or "delim" and mark as explicitly provided
 		else if (strEQ(key, "sep") || strEQ(key, "delim")) {
-			sep = SvPV_nolen(val);
+/* The separator is written as its bytes, as the cells are; see wt_cell() for
+  the get magic run once and the _nomg read after it. */
+			SvGETMAGIC(val);
+			if (!SvOK(val) || SvROK(val))
+				croak("write_table: '%s' must be a string\n", key);
+			sep = SvPV_nomg(val, sep_len);
 			explicit_sep = 1;
 		}
 		else if (strEQ(key, "undef_val")) {
@@ -22625,18 +23426,26 @@ PPCODE:
 		else if (strEQ(key, "xlsx"))             xlsx_opt    = SvTRUE(val) ? 1 : 0;
 		else if (strEQ(key, "xlsx_sheet"))     { if (SvOK(val)) xlsx_sheet_sv = val; }
 		else if (strEQ(key, "xlsx_comment"))     xlsx_comment = SvOK(val) ? val : NULL;
+/* A pane frozen at the sheet's last row or column leaves nothing to scroll,
+  and one past it names a cell that does not exist: 1048575 rows and 16383
+  columns are the most a frozen pane can hold (XLSX_MAX_ROWS, XLSX_MAX_COLS).
+  The value was cast to unsigned, so 2**32 + 1 froze a single row.  SvIV()
+  saturates at IV_MAX rather than wrapping, so a huge value is refused here
+  on a 32-bit IV too. */
 		else if (strEQ(key, "xlsx_freeze_rows")) {
 			if (SvOK(val)) {
 				xlsx_freeze_rows = SvIV(val);
-				if (xlsx_freeze_rows < 0)
-					croak("write_table: 'xlsx_freeze_rows' must be a non-negative integer\n");
+				if (xlsx_freeze_rows < 0 || xlsx_freeze_rows > (IV)(XLSX_MAX_ROWS - 1))
+					croak("write_table: 'xlsx_freeze_rows' must be a non-negative integer "
+						"no larger than %" UVuf "\n", (UV)(XLSX_MAX_ROWS - 1));
 			}
 		}
 		else if (strEQ(key, "xlsx_freeze_cols")) {
 			if (SvOK(val)) {
 				xlsx_freeze_cols = SvIV(val);
-				if (xlsx_freeze_cols < 0)
-					croak("write_table: 'xlsx_freeze_cols' must be a non-negative integer\n");
+				if (xlsx_freeze_cols < 0 || xlsx_freeze_cols > (IV)(XLSX_MAX_COLS - 1))
+					croak("write_table: 'xlsx_freeze_cols' must be a non-negative integer "
+						"no larger than %" UVuf "\n", (UV)(XLSX_MAX_COLS - 1));
 			}
 		}
 		else if (strEQ(key, "quiet"))            quiet = SvTRUE(val) ? 1 : 0;
@@ -22651,7 +23460,39 @@ PPCODE:
 		croak("write_table: 'data' must be a HASH or ARRAY reference\n");
 	}
 	if (!file_sv || !SvOK(file_sv)) croak("write_table: file name missing\n");
-	const char *file = SvPV_nolen(file_sv);
+	STRLEN file_len;
+	const char *file = SvPV(file_sv, file_len);
+/* The name reaches the OS as a C string, which ends at the first NUL:
+  "out.csv\0.tex" used to write out.csv.  perl's own open() refuses such a
+  name ("Invalid \0 character in pathname"), and so does this. */
+	if (memchr(file, '\0', file_len))
+		croak("write_table: the file name contains a NUL character\n");
+/* The separator is checked once it is known.  An empty one ran the fields
+  together; a NUL is no better; and one holding the quote character, a CR or
+  a LF makes a file no reader can split again, since those are what quoting
+  and the end of a record are made of.  CPython 3.14.2's csv.writer refuses
+  the empty one ("delimiter" must be a unicode character, not a string of
+  length 0) and the quote ("bad delimiter or quotechar value"). */
+	if (explicit_sep) {
+		if (sep_len == 0)
+			croak("write_table: 'sep' must not be empty\n");
+		for (STRLEN i = 0; i < sep_len; i++) {
+			if (sep[i] == '\0' || sep[i] == '"' || sep[i] == '\r' || sep[i] == '\n')
+				croak("write_table: 'sep' may not contain %s\n",
+					sep[i] == '\0' ? "a NUL" : sep[i] == '"' ? "'\"'" : sep[i] == '\r' ? "a CR" : "a LF");
+		}
+	}
+	if (row_names_sv && SvROK(row_names_sv))
+		croak("write_table: 'row_names' must be 0, 1 or a column name, not a reference\n");
+/* row_names as a name rather than a flag: true, with a non-digit in it.  A
+  HoA or an AoH takes its labels from the column of that name; every other
+  shape writes it over its label column (a HoH's keys, 1..n for the rest).
+  NULL when row_names is a flag or absent. */
+	STRLEN rn_name_len = 0;
+	const char *rn_name = row_names_sv && SvTRUE(row_names_sv) && contains_nondigit(aTHX_ row_names_sv)
+		? SvPV(row_names_sv, rn_name_len) : NULL;
+	(void)wt_comment_kind(aTHX_ tex_comment, "tex_comment");
+	(void)wt_comment_kind(aTHX_ xlsx_comment, "xlsx_comment");
 /* A name ending .gz or .bz2 is written compressed (see write_table's layers
   near the end of LikeR.pm), and whatever else the name decides -- LaTeX,
   .xlsx, the default sep -- is read from the part before that suffix, so
@@ -22725,7 +23566,6 @@ PPCODE:
 			croak("write_table: 'col_names' must be an ARRAY reference\n");
 		}
 	}
-	const STRLEN sep_len = strlen(sep);
 /* The worksheet name, checked as openpyxl 3.1.5 checks one (the title setter in
   openpyxl/workbook/child.py): an empty name, or one holding any of \ * ? : / [ ],
   is refused, and one longer than 31 characters is warned about -- "Some
@@ -22806,7 +23646,7 @@ PPCODE:
   a key of any inner hash -- since the file would then hold two columns of
   that name, which read_table() cannot tell apart. Checked here, before the
   output file is opened, so a refused call leaves an existing file intact.*/
-				rn_named = row_names_sv && SvTRUE(row_names_sv) && contains_nondigit(aTHX_ row_names_sv);
+				rn_named = rn_name != NULL;
 				if (rn_named) {
 					bool clash = 0;
 					if (col_names_sv && SvOK(col_names_sv)) {
@@ -22886,6 +23726,50 @@ PPCODE:
   already emptied any existing file of that name. */
 	if (is_hoa && col_names_sv && SvOK(col_names_sv) && !wt_col_names_any(aTHX_ col_names_sv))
 		croak("write_table: Could not get headers: 'col_names' names no column\n");
+/* A HoA's row_names => 'col' takes its labels from the array 'col', and one
+  the hash does not have used to give every row an empty label without a
+  word.  Refused here, before the file is opened. */
+	if (is_hoa && rn_name && !hv_exists_ent((HV*)data_ref, row_names_sv, 0))
+		croak("write_table: row_names '%" SVf "' names no column of the hash of arrays\n",
+			SVfARG(row_names_sv));
+/* An AoA and a flat hash have no column to take labels from, so a name heads
+  their 1..n label column, as it heads a HoH's key column; it used to be
+  ignored, leaving that header cell empty.  As for a HoH, it is refused when a
+  column being written already has the name -- in col_names if given, else the
+  AoA's header row or the flat hash's keys -- since read_table() could not
+  tell the two apart. */
+	if ((is_aoa || is_flat_hash) && rn_name) {
+		bool clash = FALSE;
+		AV *names = NULL;	// the header row the name is compared with; NULL for a flat hash's keys
+		if (col_names_sv && SvOK(col_names_sv)) names = (AV*)SvRV(col_names_sv);
+		else if (is_aoa) {	// row 0 was checked to be an ARRAY reference above
+			SV **h0 = av_fetch((AV*)data_ref, 0, 0);
+			if (h0) names = (AV*)SvRV(wt_got(aTHX_ *h0));
+		}
+		if (names) {
+			for (SSize_t i = 0; !clash && i <= av_len(names); i++) {
+				SV **c = av_fetch(names, i, 0);
+				SV *cv = c ? wt_got(aTHX_ *c) : NULL;
+				if (cv && SvOK(cv) && !SvROK(cv) && sv_eq(cv, row_names_sv)) clash = TRUE;
+			}
+		} else clash = hv_exists_ent((HV*)data_ref, row_names_sv, 0);
+		if (clash)
+			croak("write_table: row_names '%" SVf "' collides with an existing column\n", SVfARG(row_names_sv));
+	}
+/* An .xlsx worksheet holds 1048576 rows, header included (XLSX_MAX_ROWS).
+  Every shape but a HoA knows its row count already, and a table past it is
+  refused here, before the file is opened; a HoA's is the longest of the
+  arrays it writes, and is counted as the rows go out, in wt_xlsx_row(). */
+	if (xlsx) {
+		size_t rows = 0;	// header included; 0 = not known yet (a HoA, or no rows)
+		if (is_aoa)
+			rows = (size_t)(av_len((AV*)data_ref) + 1) + (col_names_sv && SvOK(col_names_sv) ? 1 : 0);
+		else if (is_aoh) rows = (size_t)(av_len((AV*)data_ref) + 1) + 1;
+		else if (is_hoh) rows = (size_t)(av_len(rows_av) + 1) + 1;
+		if (rows > XLSX_MAX_ROWS)
+			croak("write_table: '%s' would have more than the %" UVuf " rows an Excel "
+				"worksheet holds, header included\n", file, (UV)XLSX_MAX_ROWS);
+	}
 /* The one output handle write_table() holds open at a time -- the delimited
   file, or the .xlsx archive -- lives in *fhp, which the save stack closes if
   anything below croaks.  Everything else below is mortal or on the save stack
@@ -22908,19 +23792,18 @@ PPCODE:
 /* The provenance line goes into the workbook's document "comments" property
   (dc:description), with any user-supplied xlsx_comment line(s) appended after it.*/
 		SV *prov = xlsx_written_by(aTHX);
-		if (xlsx_comment && SvOK(xlsx_comment)) {
-			if (SvROK(xlsx_comment) && SvTYPE(SvRV(xlsx_comment)) == SVt_PVAV) {
-				AV *ca = (AV*)SvRV(xlsx_comment);
-				for (SSize_t i = 0; i <= av_len(ca); i++) {
-					SV **c = av_fetch(ca, i, 0);
-					if (c && *c && SvOK(*c)) { SV_CATLIT(prov, "\n"); sv_catsv(prov, *c); }
-				}
-			} else if (!SvROK(xlsx_comment)) {
-				SV_CATLIT(prov, "\n"); sv_catsv(prov, xlsx_comment);
+		const unsigned short int comment_kind = wt_comment_kind(aTHX_ xlsx_comment, "xlsx_comment");
+		if (comment_kind == 2) {
+			AV *ca = (AV*)SvRV(xlsx_comment);
+			for (SSize_t i = 0; i <= av_len(ca); i++) {
+				SV **c = av_fetch(ca, i, 0);
+				if (c && *c && SvOK(wt_got(aTHX_ *c))) { SV_CATLIT(prov, "\n"); sv_catsv_nomg(prov, *c); }
 			}
+		} else if (comment_kind == 1) {
+			SV_CATLIT(prov, "\n"); sv_catsv(prov, xlsx_comment);
 		}
 		wt_xlsx_begin(aTHX_ &X, fhp, file, sheet_name, prov,
-			(unsigned)xlsx_freeze_rows, (unsigned)xlsx_freeze_cols);
+			(size_t)xlsx_freeze_rows, (size_t)xlsx_freeze_cols);	// bounded when read
 		S.xlsx = &X;
 	} else if (collect) {
 		collect_av = (AV*)sv_2mortal((SV*)newAV());
@@ -22983,10 +23866,11 @@ PPCODE:
 	size_t n_unnamed = 0;	// data columns whose header cell is empty, set by wt_emit_header()
 	size_t first_unnamed = 0;	// 1-based file column of the first of them; 0 = none
 	size_t n_long = 0;	// AoA data rows longer than the header, for the warning at the end
+	size_t n_no_label = 0;	// AoH rows with no row_names column, for the warning at the end
 	size_t first_long = 0, first_long_width = 0, header_width = 0;	// the first of them, its cells, the header's
 	if (is_hoh) {// ----- Hash of Hashes -----
 		if (col_names_sv && SvOK(col_names_sv)) {
-			wt_headers_given(aTHX_ headers_av, col_names_sv);
+			wt_headers_given(aTHX_ headers_av, col_names_sv, FALSE);
 		} else {
 			HV *col_map = (HV*)sv_2mortal((SV*)newHV());
 			ITER_KEEP_BEGIN((HV*)data_ref);
@@ -22994,19 +23878,14 @@ PPCODE:
 			HE *entry;
 			while ((entry = hv_iternext((HV*)data_ref))) {
 				HV *inner = (HV*)SvRV(wt_got(aTHX_ hv_iterval((HV*)data_ref, entry)));
-				ITER_KEEP_BEGIN(inner);
-				hv_iterinit(inner);
-				HE *inner_entry;
-/* hv_iterkeysv() makes a mortal copy of every key, and nothing frees a mortal
-  until the call returns: one SV per cell of the table, 212 MB over the data's
-  own for a 200000 x 20 HoH.  The scope frees them a row at a time, and
-  hv_fetch_ent()'s lvalue fetch makes a column's entry only when it is new,
-  where hv_store_ent() made and freed a value for every cell. */
+/* The keys of a tied or UTF-8 row are taken through mortal SVs, and nothing
+  frees a mortal until the call returns: one SV per cell of the table, 212 MB
+  over the data's own for a 200000 x 20 HoH, when every key went that way.
+  The scope frees them a row at a time, and the lvalue fetch in
+  wt_collect_keys() makes a column's entry only when it is new. */
 				ENTER; SAVETMPS;
-				while ((inner_entry = hv_iternext(inner)))
-					(void)hv_fetch_ent(col_map, hv_iterkeysv(inner_entry), 1, 0);
+				wt_collect_keys(aTHX_ col_map, inner);
 				FREETMPS; LEAVE;
-				ITER_KEEP_END;
 			}
 			ITER_KEEP_END;
 			hv_iterinit(col_map);
@@ -23018,9 +23897,9 @@ PPCODE:
 				sortsv(AvARRAY(headers_av), num_cols, Perl_sv_cmp);
 		}
 // NULL = no key column, "" = unnamed, else the name checked above
-		STRLEN rn_len = 0;
-		const char *rn_header = !inc_rownames ? NULL : rn_named ? SvPV(row_names_sv, rn_len) : "";
-		const size_t num_headers = wt_emit_header(aTHX_ &S, headers_av, rn_header, rn_len, &n_unnamed, &first_unnamed);
+		const char *rn_header = !inc_rownames ? NULL : rn_named ? rn_name : "";
+		const size_t num_headers = wt_emit_header(aTHX_ &S, headers_av, rn_header,
+			rn_header == rn_name ? rn_name_len : 0, &n_unnamed, &first_unnamed);
 		const size_t num_rows = (size_t)(av_len(rows_av) + 1);
 		sortsv(AvARRAY(rows_av), num_rows, Perl_sv_cmp);
 		HV *data_hv = (HV*)data_ref;
@@ -23042,16 +23921,16 @@ PPCODE:
 				SV **h_ptr = av_fetch(headers_av, (SSize_t)j, 0);
 				SV *h_sv = (h_ptr && SvOK(*h_ptr)) ? *h_ptr : NULL;
 				// FIX (UTF-8/NUL safety): fetch by SV, not by raw bytes
-				HE *cell_he = (inner_hv && h_sv) ? hv_fetch_ent(inner_hv, h_sv, 0, 0) : NULL;
+				HE *cell_he = (inner_hv && h_sv) ? wt_fetch(aTHX_ inner_hv, h_sv) : NULL;
 				wt_cell(aTHX_ &R, cell_he ? HeVAL(cell_he) : NULL, undef_val, undef_len);
 			}
-			print_string_row(aTHX_ &S, R.f, R.len, R.n);
+			print_string_row(aTHX_ &S, &R);
 			FREETMPS; LEAVE;
 		}
 	} else if (is_flat_hash) {// Flat Hash
 		HV *data_hv = (HV*)data_ref;
 		if (col_names_sv && SvOK(col_names_sv)) {
-			wt_headers_given(aTHX_ headers_av, col_names_sv);
+			wt_headers_given(aTHX_ headers_av, col_names_sv, FALSE);
 		} else {
 /* UTF-8 safety: keep the key SVs (flags intact) and sort
   them with sv_cmp instead of round-tripping through char*.*/
@@ -23065,7 +23944,9 @@ PPCODE:
 			if (num_cols > 1)
 				sortsv(AvARRAY(headers_av), num_cols, Perl_sv_cmp);
 		}
-		const size_t num_headers = wt_emit_header(aTHX_ &S, headers_av, inc_rownames ? "" : NULL, 0, &n_unnamed, &first_unnamed);
+		const size_t num_headers = wt_emit_header(aTHX_ &S, headers_av,
+			!inc_rownames ? NULL : rn_name ? rn_name : "", rn_name ? rn_name_len : 0,	// a name heads the 1..n labels
+			&n_unnamed, &first_unnamed);
 		WtRow R;
 		wt_row_init(aTHX_ &R, num_headers + 1);
 // Give the single row a default numeric identifier if row names are on
@@ -23073,14 +23954,14 @@ PPCODE:
 		for (size_t j = 0; j < num_headers; j++) {
 			SV **h_ptr = av_fetch(headers_av, (SSize_t)j, 0);
 			SV *h_sv = (h_ptr && SvOK(*h_ptr)) ? *h_ptr : NULL;
-			HE *val_he = h_sv ? hv_fetch_ent(data_hv, h_sv, 0, 0) : NULL;
+			HE *val_he = h_sv ? wt_fetch(aTHX_ data_hv, h_sv) : NULL;
 			wt_cell(aTHX_ &R, val_he ? HeVAL(val_he) : NULL, undef_val, undef_len);
 		}
-		print_string_row(aTHX_ &S, R.f, R.len, R.n);
+		print_string_row(aTHX_ &S, &R);
 	} else if (is_hoa) {// Hash of Arrays
 		HV *data_hv = (HV*)data_ref;
 		if (col_names_sv && SvOK(col_names_sv)) {
-			wt_headers_given(aTHX_ headers_av, col_names_sv);
+			wt_headers_given(aTHX_ headers_av, col_names_sv, FALSE);
 		} else {
 			ITER_KEEP_BEGIN(data_hv);
 			hv_iterinit(data_hv);
@@ -23092,8 +23973,9 @@ PPCODE:
 			if (num_cols > 1)
 				sortsv(AvARRAY(headers_av), num_cols, Perl_sv_cmp);
 		}
-		if (inc_rownames && contains_nondigit(aTHX_ row_names_sv)) {
-			rownames_col = SvPV(row_names_sv, rownames_len);
+		if (inc_rownames && rn_name) {
+			rownames_col = rn_name;
+			rownames_len = rn_name_len;
 			AV *filtered_headers = (AV*)sv_2mortal((SV*)newAV());
 			for (SSize_t i = 0; i <= av_len(headers_av); i++) {
 				SV **h_ptr = av_fetch(headers_av, i, 0);
@@ -23121,7 +24003,7 @@ PPCODE:
 		for (size_t j = 0; j < num_headers; j++) {
 			SV **h_ptr = av_fetch(headers_av, (SSize_t)j, 0);
 			SV *h_sv = (h_ptr && SvOK(*h_ptr)) ? *h_ptr : NULL;
-			HE *arr_he = h_sv ? hv_fetch_ent(data_hv, h_sv, 0, 0) : NULL;
+			HE *arr_he = h_sv ? wt_fetch(aTHX_ data_hv, h_sv) : NULL;
 			SV *arr_sv = arr_he ? wt_got(aTHX_ HeVAL(arr_he)) : NULL;
 			col_avs[j] = (arr_sv && SvROK(arr_sv)) ? (AV*)SvRV(arr_sv) : NULL;
 			const size_t len = col_avs[j] ? (size_t)(av_len(col_avs[j]) + 1) : 0;
@@ -23137,7 +24019,7 @@ PPCODE:
 		}
 		WtRow R;
 		wt_row_init(aTHX_ &R, num_headers + 1);
-		char rn_buf[32];
+		char rn_buf[TYPE_DIGITS(UV) + 1];
 		for (size_t i = 0; i < max_rows; i++) {
 			ENTER; SAVETMPS;	// a tied column's proxies, freed a row at a time
 			R.n = 0;
@@ -23146,7 +24028,7 @@ PPCODE:
 					SV **rn_val_ptr = rn_av ? av_fetch(rn_av, (SSize_t)i, 0) : NULL;
 					wt_cell(aTHX_ &R, rn_val_ptr ? *rn_val_ptr : NULL, undef_val, undef_len);
 				} else {
-					int k = snprintf(rn_buf, sizeof(rn_buf), "%lu", (unsigned long)(i + 1));
+					const int k = my_snprintf(rn_buf, sizeof(rn_buf), "%" UVuf, (UV)(i + 1));
 					wt_field(&R, rn_buf, (STRLEN)k);
 				}
 			}
@@ -23154,29 +24036,22 @@ PPCODE:
 				SV **cell_ptr = col_avs[j] ? av_fetch(col_avs[j], (SSize_t)i, 0) : NULL;
 				wt_cell(aTHX_ &R, cell_ptr ? *cell_ptr : NULL, undef_val, undef_len);
 			}
-			print_string_row(aTHX_ &S, R.f, R.len, R.n);
+			print_string_row(aTHX_ &S, &R);
 			FREETMPS; LEAVE;
 		}
 	} else if (is_aoh) { // Array of Hashes
 		AV *data_av = (AV*)data_ref;
 		size_t num_rows = (size_t)(av_len(data_av) + 1);
 		if (col_names_sv && SvOK(col_names_sv)) {
-			wt_headers_given(aTHX_ headers_av, col_names_sv);
+			wt_headers_given(aTHX_ headers_av, col_names_sv, FALSE);
 		} else {
 			HV *col_map = (HV*)sv_2mortal((SV*)newHV());
 			for (size_t i = 0; i < num_rows; i++) {
-				ENTER; SAVETMPS;	// the key copies hv_iterkeysv() makes: see the HoH branch
+				ENTER; SAVETMPS;	// the key copies wt_collect_keys() can make: see the HoH branch
 				SV **row_ptr = av_fetch(data_av, (SSize_t)i, 0);
 				SV *row_sv = row_ptr ? wt_got(aTHX_ *row_ptr) : NULL;
-				if (row_sv && SvROK(row_sv)) {
-					HV *row_hv = (HV*)SvRV(row_sv);
-					ITER_KEEP_BEGIN(row_hv);
-					hv_iterinit(row_hv);
-					HE *entry;
-					while ((entry = hv_iternext(row_hv)))
-						(void)hv_fetch_ent(col_map, hv_iterkeysv(entry), 1, 0);
-					ITER_KEEP_END;
-				}
+				if (row_sv && SvROK(row_sv))
+					wt_collect_keys(aTHX_ col_map, (HV*)SvRV(row_sv));
 				FREETMPS; LEAVE;
 			}
 /* UTF-8 safety: keep the key SVs (flags intact) and sort
@@ -23189,8 +24064,9 @@ PPCODE:
 			if (num_cols > 1)
 				sortsv(AvARRAY(headers_av), num_cols, Perl_sv_cmp);
 		}
-		if (inc_rownames && contains_nondigit(aTHX_ row_names_sv)) {
-			rownames_col = SvPV(row_names_sv, rownames_len);
+		if (inc_rownames && rn_name) {
+			rownames_col = rn_name;
+			rownames_len = rn_name_len;
 			AV *filtered_headers = (AV*)sv_2mortal((SV*)newAV());
 			for (SSize_t i = 0; i <= av_len(headers_av); i++) {
 				SV **h_ptr = av_fetch(headers_av, i, 0);
@@ -23207,7 +24083,7 @@ PPCODE:
 			&n_unnamed, &first_unnamed);
 		WtRow R;
 		wt_row_init(aTHX_ &R, num_headers + 1);
-		char rn_buf[32];
+		char rn_buf[TYPE_DIGITS(UV) + 1];
 		for (size_t i = 0; i < num_rows; i++) {
 			ENTER; SAVETMPS;	// a tied row's proxies, freed a row at a time
 			R.n = 0;
@@ -23216,20 +24092,21 @@ PPCODE:
 			HV *row_hv = (row_sv && SvROK(row_sv)) ? (HV*)SvRV(row_sv) : NULL;
 			if (inc_rownames) {
 				if (rownames_col) {
-					HE *rn_he = row_hv ? hv_fetch_ent(row_hv, row_names_sv, 0, 0) : NULL;
+					HE *rn_he = row_hv ? wt_fetch(aTHX_ row_hv, row_names_sv) : NULL;
+					if (!rn_he) n_no_label++;
 					wt_cell(aTHX_ &R, rn_he ? HeVAL(rn_he) : NULL, undef_val, undef_len);
 				} else {
-					int k = snprintf(rn_buf, sizeof(rn_buf), "%lu", (unsigned long)(i + 1));
+					const int k = my_snprintf(rn_buf, sizeof(rn_buf), "%" UVuf, (UV)(i + 1));
 					wt_field(&R, rn_buf, (STRLEN)k);
 				}
 			}
 			for (size_t j = 0; j < num_headers; j++) {
 				SV **h_ptr = av_fetch(headers_av, (SSize_t)j, 0);
 				SV *h_sv = (h_ptr && SvOK(*h_ptr)) ? *h_ptr : NULL;
-				HE *cell_he = (row_hv && h_sv) ? hv_fetch_ent(row_hv, h_sv, 0, 0) : NULL;
+				HE *cell_he = (row_hv && h_sv) ? wt_fetch(aTHX_ row_hv, h_sv) : NULL;
 				wt_cell(aTHX_ &R, cell_he ? HeVAL(cell_he) : NULL, undef_val, undef_len);
 			}
-			print_string_row(aTHX_ &S, R.f, R.len, R.n);
+			print_string_row(aTHX_ &S, &R);
 			FREETMPS; LEAVE;
 		}
 	} else if (is_aoa) {// ----- Array of Arrays
@@ -23239,7 +24116,7 @@ PPCODE:
 /* Headers: explicit col_names, else the first inner array (which is
   then consumed as the header rather than emitted as data).*/
 		if (col_names_sv && SvOK(col_names_sv)) {
-			wt_headers_given(aTHX_ headers_av, col_names_sv);
+			wt_headers_given(aTHX_ headers_av, col_names_sv, TRUE);	// positional: an undef keeps its column
 		} else {
 			SV **h0 = av_fetch(data_av, 0, 0);
 			SV *h0_sv = h0 ? wt_got(aTHX_ *h0) : NULL;
@@ -23248,6 +24125,8 @@ PPCODE:
 				for (SSize_t i = 0; i <= av_len(h_av); i++) {
 					SV **c = av_fetch(h_av, i, 0);
 					SV *cv = c ? wt_got(aTHX_ *c) : NULL;
+					if (cv && SvROK(cv))	// refused as a data cell is: it was written as its address
+						croak("write_table: Cannot write nested reference types to table\n");
 					SV *copy = newSVpvs("");
 					if (cv && SvOK(cv)) sv_setsv_nomg(copy, cv);
 					av_push(headers_av, copy);
@@ -23277,17 +24156,19 @@ PPCODE:
 			if (w > widest) widest = w;
 		}
 		for (size_t k = header_width; k < widest; k++) av_push(headers_av, newSVpvs(""));
-		const size_t num_headers = wt_emit_header(aTHX_ &S, headers_av, inc_rownames ? "" : NULL, 0, &n_unnamed, &first_unnamed);
+		const size_t num_headers = wt_emit_header(aTHX_ &S, headers_av,
+			!inc_rownames ? NULL : rn_name ? rn_name : "", rn_name ? rn_name_len : 0,	// a name heads the 1..n labels
+			&n_unnamed, &first_unnamed);
 		n_unnamed -= widest - header_width;	// the widened cells, warned about as long rows instead
 		WtRow R;
 		wt_row_init(aTHX_ &R, num_headers + 1);
-		char rn_buf[32]; // numeric row labels, printed before reuse (see HoA)
-		unsigned long rn = 0;
+		char rn_buf[TYPE_DIGITS(UV) + 1]; // numeric row labels, printed before reuse (see HoA)
+		size_t rn = 0;	// the last row label written
 		for (SSize_t r = data_start; r <= last; r++) {
 			ENTER; SAVETMPS;	// a tied row's proxies, freed a row at a time
 			R.n = 0;
 			if (inc_rownames) {
-				int k = snprintf(rn_buf, sizeof(rn_buf), "%lu", ++rn);
+				const int k = my_snprintf(rn_buf, sizeof(rn_buf), "%" UVuf, (UV)++rn);
 				wt_field(&R, rn_buf, (STRLEN)k);
 			}
 			SV **row_ptr = av_fetch(data_av, r, 0);
@@ -23297,16 +24178,15 @@ PPCODE:
 				SV **cell_ptr = row_av ? av_fetch(row_av, (SSize_t)j, 0) : NULL;
 				wt_cell(aTHX_ &R, cell_ptr ? *cell_ptr : NULL, undef_val, undef_len);
 			}
-			print_string_row(aTHX_ &S, R.f, R.len, R.n);
+			print_string_row(aTHX_ &S, &R);
 			FREETMPS; LEAVE;
 		}
 	} else if (is_empty) {// ----- no rows: the header alone
 		if (col_names_sv && SvOK(col_names_sv))
-			wt_headers_given(aTHX_ headers_av, col_names_sv);
-		STRLEN rn_len = 0;
-		const char *rn_header = !inc_rownames ? NULL
-			: contains_nondigit(aTHX_ row_names_sv) ? SvPV(row_names_sv, rn_len) : "";
-		(void)wt_emit_header(aTHX_ &S, headers_av, rn_header, rn_len, &n_unnamed, &first_unnamed);
+			wt_headers_given(aTHX_ headers_av, col_names_sv, FALSE);
+		const char *rn_header = !inc_rownames ? NULL : rn_name ? rn_name : "";
+		(void)wt_emit_header(aTHX_ &S, headers_av, rn_header,
+			rn_header == rn_name ? rn_name_len : 0, &n_unnamed, &first_unnamed);
 	}
 /* A compressed file is finished by popping the buffer (:perlio, or :crlf) and
   then the via layer while the file is still open: the layer's POPPED writes
@@ -23356,7 +24236,7 @@ PPCODE:
 	if (tex) {
 		write_tex_tabular(aTHX_ collect_av, file, tex_align,
 			tex_bold1, tex_format, tex_size, tex_comment, tex_longtable,
-			tex_longtable_head);
+			tex_longtable_head, fhp);
 		if (!quiet) write_table_announce(aTHX_ file);
 	}
 /* An empty header cell is warned about, because the file then gives that column
@@ -23386,6 +24266,13 @@ PPCODE:
 	if (sheet_long)
 		warn("write_table: 'xlsx_sheet' is more than 31 characters, which some "
 			"applications, Excel among them, cannot read\n");
+/* An AoH row without the row_names column has no label, and is written with
+  undef_val in its place; one warning for the file, not one per row. */
+	if (n_no_label)
+		warn("write_table: %" UVuf " row%s of '%s' ha%s no '%" SVf "' (row_names); "
+			"%s label is written as undef_val\n", (UV)n_no_label,
+			n_no_label == 1 ? "" : "s", file, n_no_label == 1 ? "s" : "ve",
+			SVfARG(row_names_sv), n_no_label == 1 ? "its" : "their");
 	XSRETURN_EMPTY;
 }
 
@@ -23407,10 +24294,13 @@ PREINIT:
 	size_t span_line = 0;	//0 = the row so far is on one line; else q_line of the quote that ran it across
 	bool span_mid = FALSE;	//q_mid of that quote
 	bool warned_mid = FALSE;	//the mid-field warning is given once per file
+	bool first_q = FALSE;	//the row's first field opened with a '"' at its start; see S_emit_row()
 	char sep0 = 0;
 	unsigned char stop_at[256];	//1 = a byte the literal scan has to stop at
 	REGEXP *rx = NULL;	//a qr// sep; NULL = sep_str is the literal separator
 	bool rx_utf8 = FALSE;	//rx is a UTF-8 pattern: lines are matched as UTF-8, see S_csv_rx_find()
+	bool ws_c = FALSE;	//sep_ws, with the separator found in C rather than by rx; see S_rx_space_is_isspace()
+	bool rx_chars = FALSE;	//rx is not UTF-8 but reads characters: a valid UTF-8 line is matched as UTF-8; see S_rx_reads_chars()
 CODE:
 	if (SvOK(callback)) {
 		if (SvROK(callback) && SvTYPE(SvRV(callback)) == SVt_PVCV)
@@ -23438,6 +24328,8 @@ as pandas reads sep=r"\s+": leading and trailing whitespace make no field.*/
 		if (!rx)
 			croak("_parse_csv_file: sep_rx must be a qr// regex");
 		rx_utf8 = cBOOL(RX_UTF8(rx));
+		ws_c    = sep_ws && !rx_utf8 && S_rx_space_is_isspace(aTHX_ rx);
+		rx_chars = !rx_utf8 && S_rx_reads_chars(aTHX_ rx);
 	}
 	sep_len = (sep_str && !rx) ? strlen(sep_str) : 0;
 	comment_len = comment_str ? strlen(comment_str) : 0;
@@ -23493,6 +24385,7 @@ rows came back as one long header and the table as [].*/
 	if (!use_cb)	//mortal, so a croak below cannot leak it
 		data = (AV*)sv_2mortal((SV*)newAV());
 	plan->row = newAV();
+	int read_errno = 0;	//read after the loop: errno from the sv_gets() that ended it, 0 = none set
 	for (;;) {
 		SV *const rs_user = PL_rs;
 		const char *tail = "";	//an unquoted run that ends the line, not yet copied
@@ -23500,10 +24393,13 @@ rows came back as one long header and the table as [].*/
 		char *line;
 		size_t len;
 		PL_rs = rs_nl;
+		errno = 0;	//so that what is left in it after a NULL is that read's own
 		line = sv_gets(line_sv, fp, 0);
 		PL_rs = rs_user;
-		if (!line)
+		if (!line) {
+			read_errno = errno;
 			break;
+		}
 		lineno++;
 		line = SvPVX(line_sv);
 		len  = SvCUR(line_sv);
@@ -23532,6 +24428,21 @@ misread, so such a line is refused here rather than matched.*/
 			croak("read_table: the sep regex %" SVf " holds characters beyond "
 			      "ASCII, so each line is matched as UTF-8, and line %" UVuf
 			      " of %s is not valid UTF-8\n", SVfARG(sep_rx), (UV)lineno, file);
+/*A pattern that reads characters (rx_chars) is shown a line as UTF-8 when the
+line is valid UTF-8 with a byte >= 0x80 in it, so that it meets the characters
+the file holds.  Matched as bytes, as up to 0.3213, qr/\s+/u took the 0xA0
+that ends "voil\xC3\xA0" for a no-break space and cut the character in two,
+leaving the field "voil\xC3", and could never match a U+2003 between fields.
+A line of ASCII alone reads the same either way and stays bytes; one that is
+not valid UTF-8 -- Latin-1, say -- is matched as bytes as before.  Either way
+the cells are the line's own bytes, as every cell is.*/
+		bool line_utf8 = rx_utf8;	//this line is matched as UTF-8
+		if (rx_chars) {
+			size_t h = 0;	//the first byte >= 0x80
+			while (h < len && !((U8)line[h] & 0x80))
+				h++;
+			line_utf8 = h < len && is_utf8_string((const U8*)line + h, (STRLEN)(len - h));
+		}
 		size_t i0 = 0;	//where the line's first field starts
 		bool trail = FALSE;	//read after the loop: the line ended on a separator
 		size_t stop = 0;	//regex sep: the next '"' or CR at or after i
@@ -23547,7 +24458,7 @@ up to 0.320 it was dropped.  qr/\s+/ is exempt, since leading and trailing
 whitespace there make no field at all.*/
 			if (k == len && !sep_ws && len) {
 				size_t ms, me;
-				if (rx ? (S_csv_rx_find(aTHX_ rx, line_sv, line, 0, len, &ms, &me, rx_utf8) && me > ms)
+				if (rx ? (S_csv_rx_find(aTHX_ rx, line_sv, line, 0, len, &ms, &me, line_utf8) && me > ms)
 				       : (sep_len && xlsx_find(line, line + len, sep_str, sep_len)))
 					k = 0;	//not blank: read it as a row
 			}
@@ -23566,10 +24477,22 @@ whitespace there make no field at all.*/
 				continue;
 /*qr/\s+/ is whitespace-delimited: leading whitespace is not a separator, so
 it is stepped over rather than cut, as $line =~ s/\A\s+// would.  isSPACE()
-is the \s of a byte string on the running perl.*/
-			if (sep_ws)
+is that \s on a byte string, except that before 5.18 it steps over a leading
+\v too, which \s did not match then (see CSV_RX_SPACE()).  The regex finds
+what else a qr/\s+/u counts as whitespace -- a leading no-break space, 0xA0
+in Latin-1 or U+00A0 in UTF-8 -- which up to 0.3213 made an empty first
+field.  Every such character starts with a byte >= 0x80, so a line whose first
+non-blank byte is ASCII is not shown to the regex at all: asking it of every
+line cost an ASCII file read with qr/\s+/u 4%.*/
+			if (sep_ws) {
+				size_t ms, me;
 				while (i0 < len && isSPACE(line[i0]))
 					i0++;
+				if (!ws_c && i0 < len && ((U8)line[i0] & 0x80)
+						&& S_csv_rx_find(aTHX_ rx, line_sv, line, i0, len, &ms, &me, line_utf8)
+						&& ms == i0)
+					i0 = me;
+			}
 		}
 		for (size_t i = i0; i < len; ) {
 			if (in_quotes) {
@@ -23593,6 +24516,45 @@ is the \s of a byte string on the running perl.*/
 					i += 1;
 				}
 				trail = FALSE;
+			} else if (ws_c) {
+/*qr/\s+/ without the regex engine.  The outcomes are the regex branch's below,
+in its order: the first blank at or after i is where a separator starts unless
+a '"' (with quoting on) or a CR comes first, and a CR is itself a blank, so
+when the run would start at one the CR is dropped as a stray, as there; a run
+that starts before a CR takes the CR into the separator, as \s+ does.  A
+pregexec() per field cost a 300,000 x 10 whitespace-separated file 0.35 s to
+read as an aoa, against 0.19 s for the same file with sep => ' '; this reads it
+in 0.18 s, and an aoh in 0.24 s rather than 0.41 s (best of five, one process
+each).  t/read_table.ws_sep.t pins it to the regex branch's answers.*/
+				size_t j = i;	//the first byte the regex branch would stop at
+				while (j < len && !CSV_RX_SPACE((U8)line[j]) && !(line[j] == '"' && quote))
+					j++;
+				if (j == len) {
+					tail     = line + i;	//the line's last field, pushed below
+					tail_len = len - i;
+					break;
+				}
+				if (line[j] == '"' || line[j] == '\r') {
+					if (j > i)
+						sv_catpvn(field, line + i, j - i);
+					if (line[j] == '"' && !post_quote) {
+						in_quotes = TRUE;
+						q_line    = lineno;
+						q_mid     = !S_blank_run(SvPVX(field), SvCUR(field));
+						if (!q_mid && AvFILLp(plan->row) < 0)
+							first_q = TRUE;
+					}
+					i     = j + 1;	//a quote after a closing quote, or a stray CR, is dropped
+					trail = FALSE;
+				} else {
+					size_t me = j + 1;	//one past the run of blanks
+					while (me < len && CSV_RX_SPACE((U8)line[me]))
+						me++;
+					S_push_cell(aTHX_ plan, field, line + i, j - i);
+					post_quote = FALSE;
+					i     = me;
+					trail = (i == len);
+				}
 			} else if (rx) {
 /*The same three outcomes as the literal scan below -- a separator, a '"' or
 CR, the end of the line -- but with the separator found by the regex engine,
@@ -23608,7 +24570,7 @@ the search resumes after it.*/
 						stop++;
 					have_stop = TRUE;
 				}
-				hit = S_csv_rx_find(aTHX_ rx, line_sv, line, i, len, &ms, &me, rx_utf8);
+				hit = S_csv_rx_find(aTHX_ rx, line_sv, line, i, len, &ms, &me, line_utf8);
 				if (hit && (ms < stop || stop == len)) {	//stop == len: an empty match at the very end counts too
 					if (ms == me)	//it would cut between every character from here on
 						croak("read_table: the sep regex %" SVf " matched an empty "
@@ -23625,6 +24587,8 @@ the search resumes after it.*/
 						in_quotes = TRUE;
 						q_line    = lineno;
 						q_mid     = !S_blank_run(SvPVX(field), SvCUR(field));
+						if (!q_mid && AvFILLp(plan->row) < 0)
+							first_q = TRUE;
 					}
 					i     = stop + 1;	//a quote after a closing quote, or a stray CR, is dropped
 					trail = FALSE;
@@ -23657,6 +24621,8 @@ the search resumes after it.*/
 						in_quotes = TRUE;
 						q_line    = lineno;
 						q_mid     = !S_blank_run(SvPVX(field), SvCUR(field));
+						if (!q_mid && AvFILLp(plan->row) < 0)
+							first_q = TRUE;
 					}
 					i++;	//a quote after a closing quote, or a stray CR, is dropped
 				} else {
@@ -23684,12 +24650,14 @@ the search resumes after it.*/
 				S_fast_row(aTHX_ plan, &plan->row);
 			} else {
 				S_emit_row(aTHX_ &plan->row, use_cb, callback, data,
-					span_line, span_mid, lineno);
+					span_line, span_mid, lineno, first_q);
 				/*The callback fills the plan in on the row that fixes
 the header, so this is looked at once per row until it does -- twice in
 practice, and never again afterwards.*/
-				if (plan_hv && hv_exists(plan_hv, "out", 3))
+				if (plan_hv && hv_exists(plan_hv, "out", 3)) {
 					S_plan_init(aTHX_ plan, plan_hv);
+					plan->cut_final = plan->undef_empty;	//see S_push_cell()
+				}
 			}
 /*A quoted field that starts at the start of its field and runs across lines is
 a CSV cell with a line break in it.  One that starts after text -- 5'10" -- is
@@ -23703,12 +24671,23 @@ already died above with the same words, so this is for the row it did not.*/
 				     SVfARG(S_quote_note(aTHX_ span_line, TRUE, lineno)));
 			}
 			span_line = 0;
+			first_q   = FALSE;
 		}
 	}
 /*sv_gets() answers NULL for a read error as well as for end of file, so without
-this a failing disk or a dropped network mount handed back a truncated table.*/
-	if (PerlIO_error(fp))
-		croak("Error reading file '%s': %s", file, Strerror(errno));
+this a failing disk or a dropped network mount handed back a truncated table.
+The reason is read through $! (wt_errno_text()), not from libc's strerror(),
+which reentr.h rewrites for perl's core and not for XS, so on a threaded perl
+it would not be the function $! calls.  It is given only when the read that
+ended the loop left one in errno: the error flag can have been set by an
+earlier read, and errno is not defined to say anything after a call that did
+not fail, so up to 0.3213 a stale value could be reported as the cause.*/
+	if (PerlIO_error(fp)) {
+		if (read_errno)
+			croak("Error reading file '%s': %" SVf, file,
+			      SVfARG(wt_errno_text(aTHX_ read_errno)));
+		croak("Error reading file '%s'", file);
+	}
 /*R's scan() warns "EOF within quoted string" here (src/main/scan.c, R 4.6.1)
 and keeps what it read; pandas' C engine raises "EOF inside string starting at
 row N".  This keeps the row, as R does, but says where the quote opened: up to
@@ -23724,7 +24703,7 @@ cell.*/
 			plan->span_to   = 0;
 			S_fast_row(aTHX_ plan, &plan->row);
 		} else
-			S_emit_row(aTHX_ &plan->row, use_cb, callback, data, q_line, q_mid, 0);
+			S_emit_row(aTHX_ &plan->row, use_cb, callback, data, q_line, q_mid, 0, first_q);
 	}
 	S_plan_report(aTHX_ plan, plan_hv);
 	LEAVE;

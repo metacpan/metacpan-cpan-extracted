@@ -287,6 +287,11 @@ pdfmake_err_t pdfmake_text_Tj(pdfmake_content_t *c,
 /* Tj - Show text string (null-terminated convenience) */
 pdfmake_err_t pdfmake_text_Tj_cstr(pdfmake_content_t *c, const char *str);
 
+/* Tj - Show text with the operand written as a hex string. For composite
+ * fonts, whose operands are 2-byte glyph ids rather than characters. */
+pdfmake_err_t pdfmake_text_Tj_hex(pdfmake_content_t *c,
+                                  const uint8_t *str, size_t len);
+
 /* TJ - Show text with positioning array (mixed strings and numbers).
  * Each element is either:
  *   - A string (type PDFMAKE_STRING)

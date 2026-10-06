@@ -31,7 +31,8 @@ typedef char sa_abi_assert_read[
 typedef char sa_abi_assert_store[
     (SA_MAP_STORE_OK == SA_H_OK && SA_MAP_STORE_FULL == SA_H_FULL
   && SA_MAP_STORE_TOOBIG == SA_H_TOOBIG
-  && SA_MAP_STORE_NOTNUM == SA_H_NOTNUM) ? 1 : -1];
+  && SA_MAP_STORE_NOTNUM == SA_H_NOTNUM
+  && SA_MAP_STORE_BUSY   == SA_H_WBUSY) ? 1 : -1];
 typedef char sa_abi_assert_cache[
     (SA_CACHE_OK == SA_C_OK && SA_CACHE_TOOBIG == SA_C_TOOBIG) ? 1 : -1];
 typedef char sa_abi_assert_err[

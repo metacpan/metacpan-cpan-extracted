@@ -64,7 +64,7 @@ use strict;
 
 use Devel::CallChecker 0.001 ();
 
-our $VERSION = "0.005";
+our $VERSION = "0.006";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(callparser0_h callparser1_h callparser_linkable);

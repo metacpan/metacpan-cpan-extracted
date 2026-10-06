@@ -1,10 +1,10 @@
-package Package::Stash::XS; # git description: v0.29-21-gea0807b
+package Package::Stash::XS; # git description: v0.31-4-g05e65ce
 use strict;
 use warnings;
 use 5.008001;
 # ABSTRACT: Faster and more correct implementation of the Package::Stash API
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -21,7 +21,10 @@ Package::Stash::XS - Faster and more correct implementation of the Package::Stas
 
 =head1 VERSION
 
-version 0.30
+version 0.32
+
+I use a linearly-increasing version numbering scheme. No meaning should be
+presumed or inferred from the version being less than 1.0.
 
 =head1 SYNOPSIS
 
@@ -52,6 +55,14 @@ namespace
 new
 remove_glob
 remove_symbol
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/Package-Stash-XS>
+and a star in L<GitHub|https://github.com/moose/Package-Stash-XS>.
 
 =head1 SUPPORT
 
@@ -102,7 +113,7 @@ Tim Bunce <Tim.Bunce@pobox.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Jesse Luehrs.
+This software is copyright (c) 2026 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

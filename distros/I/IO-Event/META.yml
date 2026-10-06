@@ -2,28 +2,46 @@
 abstract: 'Tied Filehandles for Nonblocking IO with Object Callbacks'
 author:
   - 'David Muir Sharnoff <cpan@dave.sharnoff.org>'
+  - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  AnyEvent: 0
-  Event: 0
-  Test::Simple: 0
-  diagnostics: 0
+  AnyEvent: '0'
+  Event: '0'
+  Sys::Hostname: '0'
+  Test::More: '0.98'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IO-Event
-no_index:
-  directory:
-    - t
-    - inc
+recommends:
+  AnyEvent: '0'
+  EV: '0'
+  Event: '0'
 requires:
-  IO::Handle: 0
-  List::MoreUtils: 0
-  Time::HiRes: 0
+  Carp: '0'
+  IO::Handle: '0'
+  IO::Socket::INET: '0'
+  IO::Socket::UNIX: '0'
+  List::SomeUtils: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Symbol: '0'
+  Time::HiRes: '0'
+  parent: '0'
+  perl: '5.006'
 resources:
-  repository: http://github.com/muir/File-Flock
-version: 0.813
+  bugtracker: https://github.com/uperl/IO-Event/issues
+  homepage: https://metacpan.org/pod/IO::Event
+  repository: git://github.com/uperl/IO-Event.git
+version: '0.814'
+x_generated_by_perl: v5.42.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

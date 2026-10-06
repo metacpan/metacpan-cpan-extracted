@@ -878,7 +878,9 @@ $p->xmake->project(kind => 'compile_commands');   # reuse any IDE generator
 
 Windows simply downloads an installer but elsewhere, you gotta have make and a C compiler installed to build and
 install Xmake. You **do not need to** (Alien::Xmake will install a local version) but, if you'd like Alien::Xmake to use
-a pre-built or system install of Xmake, install it yourself first with one of the following:
+a pre-built or system install of Xmake, install it yourself first with one of the following. Any install at or above
+the minimum version will be used as-is; to insist on a specific version or better, build with `./Build -target_version
+vX.Y.Z`.
 
 - Built from source
 

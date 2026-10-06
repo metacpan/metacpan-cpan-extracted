@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-DirectoryServer
 
+1.007 2026-10-05T23:24:11Z
+	* JosÃ© JoaquÃ­n Atria made everything work properly without before_dispatch (#4)
+	* the change means only GET works, which was always the assumption
+
 1.006 2026-09-27T00:50:08Z
 	* Update my email address; no code changes
 

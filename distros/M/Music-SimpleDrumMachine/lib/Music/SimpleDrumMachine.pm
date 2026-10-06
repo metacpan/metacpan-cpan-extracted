@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0701';
+our $VERSION = '0.0702';
 
 use v5.36;
 use feature 'try';
@@ -87,7 +87,7 @@ sub _build_drums {
         hi_tom       => { num => 48, chan => $self->chan < 0 ? 11 : $self->chan, pat => [] },
         mid_tom      => { num => 47, chan => $self->chan < 0 ? 12 : $self->chan, pat => [] },
         low_tom      => { num => 45, chan => $self->chan < 0 ? 13 : $self->chan, pat => [] },
-        conga        => { num => 45, chan => $self->chan < 0 ? 14 : $self->chan, pat => [] },
+        conga        => { num => 63, chan => $self->chan < 0 ? 14 : $self->chan, pat => [] },
         kick2        => { num => 35, chan => $self->chan < 0 ? 15 : $self->chan, pat => [] },
         snare2       => { num => 40, chan => $self->chan < 0 ? 16 : $self->chan, pat => [] }, # Bogus channels now.
         pedal        => { num => 44, chan => $self->chan < 0 ? 19 : $self->chan, pat => [] }, # If multi-timbral:
@@ -108,7 +108,7 @@ sub _build_drums {
         hi_timbale   => { num => 65, chan => $self->chan < 0 ? 32 : $self->chan, pat => [] },
         low_timbale  => { num => 66, chan => $self->chan < 0 ? 33 : $self->chan, pat => [] },
         hi_agogo     => { num => 67, chan => $self->chan < 0 ? 34 : $self->chan, pat => [] },
-        low_agogo    => { num => 67, chan => $self->chan < 0 ? 35 : $self->chan, pat => [] },
+        low_agogo    => { num => 68, chan => $self->chan < 0 ? 35 : $self->chan, pat => [] },
         cabasa       => { num => 69, chan => $self->chan < 0 ? 36 : $self->chan, pat => [] },
         whistle      => { num => 71, chan => $self->chan < 0 ? 37 : $self->chan, pat => [] },
         long_whistle => { num => 72, chan => $self->chan < 0 ? 38 : $self->chan, pat => [] },
@@ -438,7 +438,7 @@ sub _adjust_drums($self, $fill_flag) {
         $part = $self->parts->{$name};
     }
     # play a fill or a part
-    if (($self->filling || $name =~ 'fill') && $fill_flag) {
+    if (($self->filling || $name =~ /fill/) && $fill_flag) {
         $part ||= $self->fills->{ $self->next_fill };
         ($next, $patterns) = $part->();
         if ($next) {
@@ -562,7 +562,7 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0701
+version 0.0702
 
 =head1 SYNOPSIS
 
@@ -633,7 +633,7 @@ the open MIDI ports on the system.
 
 =head2 add_drums
 
-  add_drums => \%drums,
+  add_drums => \@drums,
 
 Add an array-ref of hash-refs of the form
 C<[{ drum =E<gt> 'name', num =E<gt> midi_num, chan =E<gt> channel }]>

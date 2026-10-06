@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '1.01';
 
 # Export our C symbols (fm_*) into the global namespace so downstream XS
 # modules (e.g. Layout::Flex) can link against them at load time rather than
@@ -26,7 +26,7 @@ Font::Metrics - advance widths, kerning and metrics for Standard 14 and TrueType
 
 =head1 VERSION
 
-Version 0.01
+Version 1.01
 
 =head1 SYNOPSIS
 

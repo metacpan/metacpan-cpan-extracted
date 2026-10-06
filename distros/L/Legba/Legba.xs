@@ -80,6 +80,18 @@ typedef SV PADNAME;
 #  define cv_set_call_checker(cv, checker, ckobj) /* no-op on pre-5.14 */
 #endif
 
+/* op_contextualize - 5.13.8+. Only ever called from the call checkers, and
+ * those are never installed below 5.14 because cv_set_call_checker is a
+ * no-op there, so the fallback just has to compile. */
+#if !PERL_VERSION_GE(5,13,8)
+#  define op_contextualize(o, ctx) legba_compat_contextualize(aTHX_ (o), (ctx))
+static OP* legba_compat_contextualize(pTHX_ OP *o, I32 ctx) {
+    PERL_UNUSED_CONTEXT;
+    PERL_UNUSED_ARG(ctx);
+    return o;
+}
+#endif
+
 /* XOP API - 5.14+ */
 #if PERL_VERSION_GE(5,14,0)
 #  define LEGBA_HAS_XOP 1

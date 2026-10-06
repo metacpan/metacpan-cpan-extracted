@@ -560,3 +560,52 @@ pdfmake_err_t pdfmake_ttf_subset(const pdfmake_ttf_t *ttf, pdfmake_buf_t *out_bu
     
     #undef ALIGN4
 }
+
+/*============================================================================
+ * CIDToGIDMap for an embedded subset
+ *
+ * The subsetter compacts the used glyphs to 0..n-1, so a glyph the content
+ * stream names by its id in the ORIGINAL font is at a different id in the
+ * embedded one. Writing /CIDToGIDMap /Identity against a renumbered subset
+ * draws the wrong glyphs; this is the stream that maps one to the other.
+ *
+ * CIDs are original glyph ids, so the map is 2 bytes per CID up to the
+ * highest one in use. It is nearly all zeroes and flate-compresses to
+ * almost nothing. Built from build_glyph_map so it cannot disagree with the
+ * numbering the subset itself was written with.
+ *==========================================================================*/
+
+pdfmake_err_t pdfmake_ttf_subset_cidtogid(const pdfmake_ttf_t *ttf,
+                                          pdfmake_buf_t *out_buf) {
+    glyph_map_t *map;
+    uint16_t highest;
+    int i;
+    uint8_t pair[2];
+
+    if (!ttf || !out_buf) return PDFMAKE_EINVAL;
+
+    map = build_glyph_map((pdfmake_ttf_t *)ttf);
+    if (!map) return PDFMAKE_ENOMEM;
+
+    highest = 0;
+    for (i = 1; i < ttf->num_glyphs; i++) {
+        size_t byte = i / 8;
+        uint8_t bit = 1 << (i % 8);
+        if (ttf->used_glyphs && (ttf->used_glyphs[byte] & bit))
+            highest = (uint16_t)i;
+    }
+
+    for (i = 0; i <= (int)highest; i++) {
+        uint16_t new_gid = map->old_to_new[i];
+        /* old_to_new is zero for unused glyphs, which is .notdef — correct. */
+        pair[0] = (uint8_t)((new_gid >> 8) & 0xFF);
+        pair[1] = (uint8_t)(new_gid & 0xFF);
+        if (pdfmake_buf_append(out_buf, pair, 2) != PDFMAKE_OK) {
+            free_glyph_map(map);
+            return PDFMAKE_ENOMEM;
+        }
+    }
+
+    free_glyph_map(map);
+    return PDFMAKE_OK;
+}

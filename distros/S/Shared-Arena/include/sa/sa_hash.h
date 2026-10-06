@@ -92,6 +92,26 @@
 #define SA_H_FULL     0
 #define SA_H_TOOBIG (-1)
 #define SA_H_NOTNUM (-2)   /* incr on an entry that is not a counter */
+#define SA_H_WBUSY  (-3)   /* the stripe stayed held: try again        */
+
+/* FULL MEANS STOP AND BUSY MEANS TRY AGAIN, and a writer refused for a held
+ * stripe is the second one. Until 0.14 it answered SA_H_FULL, so "the table
+ * has no room for this key" and "somebody else was mid-write on this stripe
+ * and I gave up" arrived as the same value. A caller cannot act on that: the
+ * first says the table is too small, the second says do it again.
+ *
+ * AND IT WAS COUNTED NOWHERE. `full` is incremented where the probe finds no
+ * slot, which this refusal never reached, so `stats` showed a clean map while
+ * writes went missing. The only evidence was a total that came up short, which
+ * is how both of these were found and neither was diagnosed from the stats: a
+ * FreeBSD smoker read 38 where it asked for 40, an Alpine one 999 of a
+ * thousand, in a table of 64 slots holding six keys. Nothing was full, and
+ * nothing said so.
+ *
+ * `incr` returns the new value or undef, so a refusal there is a count that
+ * did not happen. It is reported now - the return value, and `busy` - because
+ * a bounded wait can always be beaten by enough contenders, and a library that
+ * cannot promise "never refused" must promise "never silently". */
 
 /* How many times a reader retries a slot whose writer is mid-update before it
  * gives up and counts a busy. A writer holds a slot odd for one memcpy, so
@@ -116,7 +136,8 @@ typedef struct {
     uint64_t          slots_off;  /* from the MAP's base                    */
     volatile uint64_t used;       /* live entries                           */
     volatile uint64_t tombstones;
-    volatile uint64_t busy;       /* reads that gave up mid-update          */
+    volatile uint64_t busy;       /* gave up: a read mid-update, or a write
+                                   * whose stripe stayed held                */
     volatile uint64_t full;       /* stores refused for want of room        */
     volatile uint64_t expired;    /* entries collected because they lapsed  */
     uint32_t          serialise;  /* values are Struct::Codec's encoding    */
@@ -397,6 +418,47 @@ static int sa_hash_fetch(sa_hash *m, const char *key, uint32_t klen,
 
 /* ---- writing, under a stripe lock ------------------------------------------ */
 
+/* A WRITE PATH'S WAIT IS A GUESS ABOUT THE SCHEDULER TOO, and sa_at_lock's
+ * hundred thousand test-and-sets is the same guess sa_arena.h's sa_lock_wait
+ * was written to stop making. It burns about five milliseconds on a cache line
+ * whose owner is NOT RUNNING, then refuses - so a writer loses its write for
+ * being unlucky, not for anything being full. On a box running a dozen builds,
+ * not being scheduled for five milliseconds is ordinary.
+ *
+ * So the wait escalates, exactly as the carve path's does: a spin first,
+ * because the usual holder really is about to finish its one memcpy, then
+ * sleeps doubling from 50us. The retries after the first are a single
+ * test-and-set and never another spin - hammering the lock byte from several
+ * waiters is what keeps the HOLDER from reaching its own unlock.
+ *
+ * MUCH SHORTER THAN THE CARVE PATH'S TWO SECONDS, and deliberately. A carve is
+ * a rare operation whose caller can afford to wait; a store or an incr is on a
+ * per-request path, and a rate limiter that stalls two seconds behind a
+ * descheduled holder has done more damage than the lost count it prevented.
+ * About ten milliseconds covers an ordinary preemption, which is all that was
+ * ever wrong here, and still bounded because a process that died holding the
+ * stripe must not wedge everybody after it. That refusal is SA_H_WBUSY, so a
+ * caller that does want to insist can, and knows it is worth insisting. */
+#define SA_HW_ROUNDS    12
+#define SA_HW_STALL_US  50
+#define SA_HW_STALL_MAX 2000
+
+static int sa_hash_wait(volatile unsigned char *locks, uint64_t h) {
+    int round;
+    uint32_t us = SA_HW_STALL_US;
+
+    if (sa_at_lock(locks, h)) return 1;
+    for (round = 0; round < SA_HW_ROUNDS; round++) {
+        sa_stall(us);
+        if (sa_at_trylock(locks, h)) return 1;
+        if (us < SA_HW_STALL_MAX) {
+            us *= 2;
+            if (us > SA_HW_STALL_MAX) us = SA_HW_STALL_MAX;
+        }
+    }
+    return 0;
+}
+
 static int sa_hash_store_ttl(sa_hash *m, const char *key, uint32_t klen,
                              const char *val, uint32_t vlen, uint64_t ttl_ms)
 {
@@ -415,7 +477,10 @@ static int sa_hash_store_ttl(sa_hash *m, const char *key, uint32_t klen,
     exp = ttl_ms ? sa_now_ms() + ttl_ms : 0;
 
     tag = sa_at_fnv(key, klen);
-    if (!sa_at_lock(h->locks, tag)) return SA_H_FULL;
+    if (!sa_hash_wait(h->locks, tag)) {
+        sa_at_fetch_add64(&h->busy, 1);
+        return SA_H_WBUSY;
+    }
 
     /* now = 0: store overwrites the value and sets the new deadline whether the
      * old entry was current or expired, so it need not tell the two apart -
@@ -474,7 +539,14 @@ static int sa_hash_delete(sa_hash *m, const char *key, uint32_t klen)
 
     if (!klen) return 0;
     tag = sa_at_fnv(key, klen);
-    if (!sa_at_lock(h->locks, tag)) return 0;
+    /* NOT 0: that is what "the key was not there" answers, and a caller that
+     * deletes in order to rely on the key being gone - resetting a window
+     * counter before a fresh burst, say - would read a refusal as success and
+     * then count the old window's hits into the new one. */
+    if (!sa_hash_wait(h->locks, tag)) {
+        sa_at_fetch_add64(&h->busy, 1);
+        return SA_H_WBUSY;
+    }
 
     /* now = 0: delete removes the entry whether current or expired, so it need
      * not read the clock to classify it. */
@@ -532,7 +604,10 @@ static int sa_hash_incr_at(sa_hash *m, const char *key, uint32_t klen,
     if ((uint64_t)klen + 8 > m->pair_max) return SA_H_TOOBIG;
 
     tag = sa_at_fnv(key, klen);
-    if (!sa_at_lock(h->locks, tag)) return SA_H_FULL;
+    if (!sa_hash_wait(h->locks, tag)) {
+        sa_at_fetch_add64(&h->busy, 1);
+        return SA_H_WBUSY;
+    }
 
     /* now = 0: find any live match, then check its own deadline below. Reading
      * the clock only for a match that actually carries one keeps a counter

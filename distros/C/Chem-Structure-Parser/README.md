@@ -771,7 +771,7 @@ already are:
     $info->{chains}{A}{isoelectric_point};             # 5.49     and where it is zero
     $info->{chains}{A}{ss_fraction};                   # { H => 0.72, E => 0, C => 0.28 }
     $info->{chains}{A}{residues}{54}{sasa};            # 24.62    one residue's surface
-    $info->{chains}{A}{residues}{54}{rsa};             # 0.103    ... as a fraction of its maximum
+    $info->{chains}{A}{residues}{54}{rsa};             # 0.103    ... relative solvent accessibility as a fraction of its maximum
     $info->{chains}{A}{residues}{54}{atoms}{CZ}{sasa}; # one atom's
 
     $info->{chains}{A}{buried};                        # 1445.0   what it buries

@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Roles::OrgProcable;
 # ABSTRACT: Attributes and methods common to OrgProcessor objects
-$Bio::MUST::Apps::Roles::OrgProcable::VERSION = '0.213470';
+$Bio::MUST::Apps::Roles::OrgProcable::VERSION = '0.262780';
 use Moose::Role;
 
 use autodie;
@@ -8,7 +8,7 @@ use feature qw(say);
 
 use Smart::Comments -ENV;
 
-use List::AllUtils qw(each_array);
+use List::AllUtils qw(each_array nsort_by);
 use Number::Interval;
 
 use Bio::MUST::Core;
@@ -104,9 +104,9 @@ sub _fetch_and_trim_hits {                  ## no critic (RequireArgUnpacking)
             my $seed = $mask->[0]->min;
 
             # then sort ranges in ascending order
-            my @ranges = sort { $a->min <=> $b->min } @{$mask};
+            my @ranges = nsort_by { $_->min } @{$mask};
 
-            # merge successive ranges not farther away than hit_max_shift
+            # merge successive ranges not farther away than trim_max_shift
             my $range1 = shift @ranges;
             while (my $range2 = shift @ranges) {
 
@@ -142,6 +142,7 @@ sub _fetch_and_trim_hits {                  ## no critic (RequireArgUnpacking)
         while ( my ($key, $chunks) = each %chunks_for ) {
             push @entries, map {
                 (defined $hit_for ? $hit_for->{$key} : $key) . q{ }
+                    # TODO: check why max is not enough to prevent some crashes with non-null trim_extra_margin
                     . List::AllUtils::max(1, $_->min - $rp->trim_extra_margin)
                     . q{-} .                ($_->max + $rp->trim_extra_margin)
             } @{$chunks};
@@ -212,7 +213,7 @@ Bio::MUST::Apps::Roles::OrgProcable - Attributes and methods common to OrgProces
 
 =head1 VERSION
 
-version 0.213470
+version 0.262780
 
 =head1 SYNOPSIS
 

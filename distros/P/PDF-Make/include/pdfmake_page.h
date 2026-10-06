@@ -185,6 +185,17 @@ uint32_t pdfmake_page_add_std14_font(pdfmake_page_t *page,
                                       const char *name,
                                       pdfmake_std14_font_t font);
 
+/*
+ * Reference a font object that already exists in the document under the
+ * resource name `name`. This is how an embedded font reaches a page:
+ * pdfmake_page_add_font() builds a new Standard 14 dictionary and rejects
+ * anything else, so it cannot name the /Type0 that pdfmake_font_write()
+ * produced. Returns `font_obj_num`, or 0 on error.
+ */
+uint32_t pdfmake_page_add_font_ref(pdfmake_page_t *page,
+                                   const char *name,
+                                   uint32_t font_obj_num);
+
 /*----------------------------------------------------------------------------
  * Content stream
  *--------------------------------------------------------------------------*/

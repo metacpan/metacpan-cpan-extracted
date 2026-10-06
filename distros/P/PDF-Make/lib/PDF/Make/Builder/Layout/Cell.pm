@@ -80,6 +80,7 @@ sub _resolve_item_font {
         family      => $item->{family}      // $base_font->family,
         bold        => $item->{bold}        // $base_font->bold,
         italic      => $item->{italic}      // $base_font->italic,
+        registry    => $base_font->registry,
     );
     my $lh = PDF::Make::Builder::Font->resolve_line_height($base_font, $item);
     $init{line_height} = $lh if defined $lh;
@@ -176,10 +177,11 @@ sub _render_runs {
             my $f   = $seg->{font};
             my $res = $ensured{"$f"} ||= $f->ensure_loaded($page->xs_page);
             my ($r, $g, $b) = $f->hex_to_rgb($f->colour);
+            my $show = $f->show_op;
             $canvas->rg($r, $g, $b)
                    ->Tf($res, $f->size)
                    ->Tm(1, 0, 0, 1, $tx, $baseline)
-                   ->Tj($seg->{text});
+                   ->$show($f->encode($seg->{text}));
             $tx += $seg->{w};
         }
         $canvas->ET;
@@ -205,6 +207,7 @@ sub _resolve_runs {
             family      => $run->{family}      // $base->family,
             bold        => $run->{bold}        // $base->bold,
             italic      => $run->{italic}      // $base->italic,
+            registry    => $base->registry,
         );
         my $rlh = PDF::Make::Builder::Font->resolve_line_height($base, $run);
         $spec{line_height} = $rlh if defined $rlh;
@@ -247,6 +250,7 @@ sub render_content {
         my $colour = $item->{colour} // $item_font->colour;
         my ($r, $g, $b) = $item_font->hex_to_rgb($colour);
         my $res = $item_font->ensure_loaded($page->xs_page);
+        my $show = $item_font->show_op;
 
         my @words = split /\s+/, $item->{text};
         my $line = '';
@@ -267,7 +271,7 @@ sub render_content {
                     $tx = $cx + $cw - $line_w;
                 }
                 $canvas->BT->Tf($res, $sz)->rg($r, $g, $b)
-                    ->Td($tx, $baseline)->Tj($line)->ET;
+                    ->Td($tx, $baseline)->$show($item_font->encode($line))->ET;
                 $text_y -= $lh;
                 $line = $word;
                 $line_w = $item_font->measure_text($line);
@@ -287,7 +291,7 @@ sub render_content {
                     $tx = $cx + $cw - $line_w;
                 }
                 $canvas->BT->Tf($res, $sz)->rg($r, $g, $b)
-                    ->Td($tx, $baseline)->Tj($line)->ET;
+                    ->Td($tx, $baseline)->$show($item_font->encode($line))->ET;
             }
             $text_y -= $lh;
         }

@@ -2,19 +2,23 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo v1.0.2 {
+class Alien::Xrepo v1.0.3 {
     use Alien::Xmake;
     use JSON::PP;
     use Digest::SHA qw[sha1_hex];
     use File::Copy  qw[move];
+    use File::Temp  ();
     use Path::Tiny;
     use Config;
     use Capture::Tiny qw[capture capture_merged];
     use Cwd           ();
     #
-    field $verbose : param //= 0;
-    field $root    : param //= undef;
-    field $theme   : param //= 'plain';
+    # Guards for the throwaway package files written for `system` installs; each File::Temp::Dir removes its
+    # directory on DESTROY, so they are parked here for the life of the object.
+    field $pkgfile_guards : param //= [];
+    field $verbose        : param //= 0;
+    field $root           : param //= undef;
+    field $theme          : param //= 'plain';
 
     # Auto-confirm interactive xrepo/xmake prompts (e.g. -y / --confirm=yes). Useful when output is captured so a
     # prompting install never hangs waiting on stdin.
@@ -48,7 +52,7 @@ class Alien::Xrepo v1.0.2 {
         return;
     }
     #
-    class Alien::Xrepo::PackageInfo v1.0.2 {
+    class Alien::Xrepo::PackageInfo v1.0.3 {
         use Path::Tiny;
         field $includedirs : param : reader;
         field $libfiles    : param : reader;
@@ -106,9 +110,12 @@ class Alien::Xrepo v1.0.2 {
         local $ENV{XMAKE_PKG_INSTALLDIR} = $self->_store_dir(%opts) if defined $self->_store_dir(%opts);
         local $ENV{XMAKE_PKG_CACHEDIR}   = $opts{cachedir}          if defined $opts{cachedir};
 
-        # Common arguments for install and fetch. The mutating install gets an implicit -y unless the caller opted out;
-        # fetch is query-only, so no confirm.
-        my @args = ( $self->_confirm_args( \%opts ), $self->_build_args( \%opts ) );
+        # An install that wants system packages is driven through a generated package file instead of a bare spec,
+        # because xrepo's shim decides `system` for us otherwise (see _package_file). The common arguments for
+        # install and fetch: the mutating install gets an implicit -y unless the caller opted out; fetch is query-only,
+        # so no confirm. configs ride along in the package file when there is one, since the shim drops --extra there.
+        my $pkgfile = $self->_package_file( $full_spec, \%opts );
+        my @args    = ( $self->_confirm_args( \%opts ), $self->_build_args( defined $pkgfile ? { %opts, configs => undef } : \%opts ) );
         say "[*] xrepo: ensuring $full_spec is installed..." if $verbose;
 
         # Warm path: a prior successful install+fetch is replayed straight from disk, so a repeat launch (eg/webui.pl)
@@ -141,7 +148,7 @@ class Alien::Xrepo v1.0.2 {
         }
 
         # Cold path: install, then fetch (which must succeed, since it tells us where things land).
-        my @install_cmd = $self->_argv( 'install', \@args, $full_spec );
+        my @install_cmd = $self->_argv( 'install', \@args, defined $pkgfile ? $pkgfile : $full_spec );
         $self->_debug_cmd(@install_cmd);
         $self->blah("Running: @install_cmd");
         eval { system @install_cmd };
@@ -186,6 +193,10 @@ class Alien::Xrepo v1.0.2 {
     # stringifier as the CLI, so built-in true/false produce a stable key.
     method _cache_key ( $full_spec, $opts ) {
         my @parts = ( $full_spec, $opts->{kind} // '', $opts->{plat} // '', $opts->{arch} // '', $opts->{mode} // '' );
+
+        # The private-build path and the system path can resolve a different package layout (one lands in this store,
+        # the other may be satisfied from outside it), so they must not share a cache entry.
+        push @parts, 'system' if $opts->{system};
         if ( my $c = $opts->{configs} ) {
             my $str = ref $c eq 'HASH' ? join( ',', map { "$_=" . Alien::Xmake::_bool_str( $c->{$_} ) } sort keys %$c ) : "$c";
             push @parts, $str;
@@ -437,6 +448,59 @@ class Alien::Xrepo v1.0.2 {
         my @cmd = $self->_argv( 'update-repo', ['-y'], $name );
         system @cmd;
     }
+
+    # xrepo's install shim (xmake/modules/private/xrepo/action/install.lua) always re-execs
+    method _package_file ( $full_spec, $opts ) {
+        return () unless $opts->{system};
+        my ($name) = split( /\s+/, $full_spec );
+        my $dir = File::Temp->newdir( 'alien-xrepo-XXXXXXXX', TMPDIR => 1 );
+        push @$pkgfile_guards, $dir;    # File::Temp::Dir deletes itself on DESTROY, so hold it for the object's life
+        my $file = path("$dir")->child('xrepo.lua');
+
+        # configs move out of the command line and into add_requireconfs, since with a package file the shim
+        # ignores --configs anyway. `kind` is not a config on the shim's path (it only feeds the dropped --extra),
+        # so fold the shared/static choice in explicitly.
+        my %configs = ref $opts->{configs} eq 'HASH' ? %{ $opts->{configs} } : ();
+        my $kind    = defined $opts->{kind} && length $opts->{kind} ? $opts->{kind} : $kind;
+        $configs{shared} = $kind eq 'static' ? false : true if !exists $opts->{no_kind} && defined $kind && length $kind;
+
+        # NOTE: no `system` option at all. In xmake, `system = true` means system packages ONLY (it errors out
+        # rather than building from source when none is found), while leaving it unset means "prefer the system,
+        # fall back to building". Only the latter can restore add_extsources() without turning a source fallback
+        # into a hard failure, so a bare add_requires() is what we want here.
+        my @lines = ( 'add_requires(' . $self->_lua_str($full_spec) . ')' );
+        push @lines,
+            'add_requireconfs(' .
+            $self->_lua_str($name) .
+            ', {configs = {' .
+            join( ',', map { $self->_lua_key($_) . ' = ' . $self->_lua_value( $configs{$_} ) } sort keys %configs ) . '}})'
+            if %configs;
+        $file->spew_utf8( join( "\n", @lines ) . "\n" );
+        say '[*] xrepo: system packages requested, driving install via a package file...' if $verbose;
+        return $file->stringify;
+    }
+
+    # Lua string literal for a package spec or name.
+    method _lua_str ($s) {
+        my $q = $s;
+        $q =~ s{(["\\])}{\\$1}g;
+        return qq{"$q"};
+    }
+
+    # Render a configs value as Lua. Perl's v5.40 built-in true/false are refs, so compare against the same
+    # _bool_str the command line uses and never emit 1 / "".
+    method _lua_value ($v) {
+
+        # A JSON::PP::Boolean (including false, which is falsey but a ref) renders through the same
+        # _bool_str the command line uses, so built-in true/false never leak out as 1 / "".
+        return Alien::Xmake::_bool_str($v) if ref $v;
+        my $b = Alien::Xmake::_bool_str($v);
+        return 'false' if $b eq '' || $b eq 'false';
+        return 'true'  if $b eq 'true';
+        return $b      if $b =~ /\A-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?\z/;    # 0/1 stay numbers, as --configs renders them
+        return $self->_lua_str($b);
+    }
+    method _lua_key ($k) { $k =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/ ? $k : $self->_lua_str($k) }
     #
     method _build_args ( $opts, $extra //= [] ) {
         my @args;
@@ -710,6 +774,32 @@ class Alien::Xrepo v1.0.2 {
         return $decoded;
     }
 
+    # Recover the library artifacts xrepo failed to list. A port that ships only static archives (a vcpkg zlib, say)
+    # can come back with an install tree but an empty `libfiles`, which used to drop the package into the header-only
+    # branch below and hand consumers an undef libpath for a package that plainly ships a library. Scans the linkdirs
+    # xrepo did report, then the conventional lib/lib64 under the install root, and returns ( libfiles, linkdirs ) so a
+    # directory that actually yielded something joins linkdirs and the -L flags agree with libfiles. Both come back
+    # untouched for a genuinely header-only package.
+    method _scan_libfiles ( $installdir, $linkdirs ) {
+        my $ext  = $^O eq 'MSWin32' ? qr/\.(?:dll|lib)\z/i : qr/\.(?:dylib|a|so(?:\.[\d.]+)?)\z/i;
+        my @dirs = @$linkdirs;
+        push @dirs, map { path($installdir)->child($_)->stringify } qw[lib lib64] if defined $installdir && length $installdir;
+        my ( @libfiles, %found_in );
+        for my $dir (@dirs) {
+            next unless -d $dir;
+            my @found = map { $_->stringify } grep { $_->is_file && $_->basename =~ $ext } path($dir)->children;
+            next unless @found;
+            push @libfiles, @found;
+            $found_in{$dir} = 1;
+        }
+        return ( [], $linkdirs ) if !@libfiles;
+        my @all = @$linkdirs;
+        for my $dir (@dirs) {
+            push @all, $dir if $found_in{$dir} && !grep { $_ eq $dir } @all;
+        }
+        return ( \@libfiles, \@all );
+    }
+
     method _process_info ($info) {
         $info = $info->[0] if ref $info eq 'ARRAY';
         return () unless ref $info eq 'HASH';
@@ -737,6 +827,10 @@ class Alien::Xrepo v1.0.2 {
         unless (@$bindirs) {
             $bindirs = [ path( $installdir, 'bin' )->stringify ] if $installdir && -d path( $installdir, 'bin' );
         }
+
+        # An install tree that plainly holds libraries but was reported without any is not header-only; fill the list
+        # in before `kind` is inferred so the package is still classified as a library below.
+        ( $libfiles, $linkdirs ) = $self->_scan_libfiles( $installdir, $linkdirs ) if !@$libfiles;
 
         # A package that ships neither libraries nor headers but has an install root is a binary tool (ninja, cmake,
         # node, ...); anything else is a library (or header-only). xrepo only reports `kind` for the former.

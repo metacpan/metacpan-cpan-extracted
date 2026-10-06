@@ -373,18 +373,21 @@ wrote_ok( "a,b\n1,10\n2,\n", 'default undef renders as an empty field', \%u_jag 
 #     size_t-index vs av_len() == -1 regression (test 17 covers flat hash).
 {
 	# HoH: degenerate but defined output - only the row-label column survives.
+	# Its header is one empty field, written "" as csv.writer writes [''] (see
+	# t/write_table.quoting.t): a bare blank line there was skipped on reading,
+	# and r1 was then taken for the header.
 	my %hoh2 = ( 'r1' => { 'a' => 1 }, 'r2' => { 'a' => 2 } );
 	my $f = path();
 	lives_ok { write_table( \%hoh2, $f, 'col_names' => [], 'row_names' => 1 ) }
 		'HoH: empty col_names terminates';
-	is( slurp($f), "\nr1\nr2\n", 'HoH: empty col_names leaves only sorted row labels' );
+	is( slurp($f), "\"\"\nr1\nr2\n", 'HoH: empty col_names leaves only sorted row labels' );
 
 	# AoH: numeric row labels survive.
 	my @aoh2 = ( { 'x' => 1 }, { 'x' => 2 } );
 	$f = path();
 	lives_ok { write_table( \@aoh2, $f, 'col_names' => [], 'row_names' => 1 ) }
 		'AoH: empty col_names terminates';
-	is( slurp($f), "\n1\n2\n", 'AoH: empty col_names leaves only numeric row labels' );
+	is( slurp($f), "\"\"\n1\n2\n", 'AoH: empty col_names leaves only numeric row labels' );
 
 	# HoA croaks ("Could not get headers") - and that croak path must close
 	# the already-open filehandle and free headers_av (regression: both leaked).

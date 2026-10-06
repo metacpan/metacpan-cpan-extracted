@@ -1,7 +1,7 @@
 ---
 abstract: 'Tool to filter records in MARC dataset.'
 author:
-  - 'Michal Josef Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <michal.josef.spacek@gmail.com>'
 build_requires:
   English: 0
   Error::Pure::Utils: 0
@@ -50,4 +50,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-MARC-Filter
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-MARC-Filter
-version: '0.12'
+version: '0.13'

@@ -1,3 +1,12 @@
+0.003   2026-07-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add arguments: number_indexes (N), letter_indexes (L).
+
+        - Remove argument: all_indexes (almost always useless).
+
+        - [bugfix] Fix filename extension handling.
+
+
 0.002   2026-07-22  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add some command-line short options: -f for filename, -s for

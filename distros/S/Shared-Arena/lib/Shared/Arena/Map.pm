@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 require Shared::Arena;
 
@@ -173,6 +173,15 @@ On a serialised map the structure comes back decoded, a fresh copy each call.
 
     my $was_there = $map->delete($key);
 
+Returns 1 if the key was there and is now gone, 0 if it was not there, and
+C<undef> if another writer held the key for long enough that this call gave up.
+Both of the last two are false, so a delete whose answer you ignore behaves as
+it always did; C<defined> is what separates "it was not there" from "ask again".
+
+The difference matters to a caller that deletes in order to B<rely> on the key
+being gone - clearing a window counter before a fresh burst, say. Reading a
+refusal as success there carries the old window's state into the new one.
+
 =head2 incr
 
     my $now = $map->incr($key);
@@ -181,8 +190,15 @@ On a serialised map the structure comes back decoded, a fresh copy each call.
     my $now = $map->incr($key, $by, ttl_ms => 60_000);  # milliseconds
 
 Adds to a counter, creating it at C<$by> when the key is absent, and returns the
-new value. C<$by> may be negative. Returns C<undef> when the table is full, or
-when the key holds something that is not a counter.
+new value. C<$by> may be negative. Returns C<undef> when the table is full, when
+the key holds something that is not a counter, or when another writer held the
+key for long enough that this call gave up.
+
+B<A C<undef> is a count that did not happen.> The last of those three is
+transient and worth retrying; the other two will answer the same way next time.
+C<stats> tells them apart - a refused write counts C<busy>, a full table counts
+C<full> - and a caller that needs every hit recorded should check the return
+rather than call C<incr> in void context.
 
 A C<ttl> gives the counter a deadline B<when this call creates it, or resets
 one that has lapsed>, and never otherwise: a live counter keeps the deadline it
@@ -194,8 +210,14 @@ shaped to make impossible.
 
 This is the one operation that does not go through the version at all: a counter
 is a single machine word, so the addition is one atomic instruction and cannot
-be seen half-done. Two hundred processes incrementing one key lose nothing, and
-a shared rate limit costs about what incrementing a variable costs.
+be seen half-done. A shared rate limit costs about what incrementing a variable
+costs.
+
+Two hundred processes incrementing one key all land, as long as each of them
+waits for its turn - which is what the return value is for. The write waits out
+an ordinary preemption by the process holding the key and then refuses rather
+than waiting for ever, because a writer that died holding it must not wedge
+everybody after it.
 
 A key holding a value that is not a counter is refused rather than
 reinterpreted. Storing a string and then counting on it is a bug, and quietly
@@ -236,6 +258,13 @@ is being written.
 
     my %s = $map->stats;
     # used, capacity, tombstones, busy, full, expired
+
+C<busy> counts the operations that gave up waiting: a read that kept losing the
+race with a writer, and a write whose key was held by another process for the
+whole wait. C<full> counts only writes refused for want of a slot. The two are
+separate because they call for opposite responses - C<busy> says try again,
+C<full> says the table is too small - and a C<busy> that keeps climbing on a
+write-heavy map is many processes queueing on one key.
 
 =head2 max_pair, capacity
 

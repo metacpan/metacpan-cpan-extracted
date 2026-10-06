@@ -33,14 +33,23 @@ subtest 'plutil' => sub {
     plan skip_all => 'Test requires plutil' unless $HAS_PLUTIL;
 
     my( $temp_fh, $temp_filename ) = tempfile();
+    $temp_fh->autoflush(1);
     binmode $temp_fh;
     print { $temp_fh } $BINARY_PLIST;
+
+	my $ds = eval { slurp_plutil($temp_filename) };
+	unless( defined $ds ) {
+		diag sprintf "Temp file exists: <%s>", -e $temp_filename ? 1 : 0;
+		diag sprintf "Temp file is readable: <%s>", -r $temp_filename ? 1 : 0;
+		diag sprintf "Temp file is %s bytes", -s $temp_filename;
+		fail("Could not parse binary plist! $@");
+		return;
+		}
 
     is_deeply(
         parse_plist( slurp_plutil($temp_filename) ),
         $ORIGINAL_PLIST,
         'Round-trip via Mac::PropertyList and plutil' );
-
 
     seek $temp_fh, 0, 0;
     binmode $temp_fh, ':encoding(utf-8)';

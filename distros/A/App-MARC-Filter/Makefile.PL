@@ -6,7 +6,7 @@ use inc::Module::Install;
 
 # Definition.
 abstract 'Tool to filter records in MARC dataset.';
-author 'Michal Josef Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <michal.josef.spacek@gmail.com>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.05;
 author_requires 'Test::More' => 0;
@@ -46,7 +46,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 test_requires 'Test::Warn' => 0.31;
 tests_recursive;
-version '0.12';
+version '0.13';
 
 # Run.
 WriteAll();

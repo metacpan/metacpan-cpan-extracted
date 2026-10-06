@@ -1,85 +1,91 @@
-# NAME
+## Name
 
 Config::Abstraction - Merge and manage configuration data from different sources
 
-# VERSION
+## Version
 
-Version 0.40
+Version 0.41
 
-# SYNOPSIS
+## Synopsis
 
-## Pattern 1: Environment overrides file overrides in-code defaults
+### Pattern 1: Environment Overrides File Overrides In-Code Defaults
 
 The most common pattern for twelve-factor-style apps.
 The `data` argument supplies defaults, a YAML file supplies site configuration,
 and environment variables allow per-deployment overrides without touching any file.
 
-    # config/base.yaml
-    #   database:
-    #     host: db.example.com
-    #     port: 5432
-    #     user: app
+```perl
+# config/base.yaml
+#   database:
+#     host: db.example.com
+#     port: 5432
+#     user: app
 
-    use Config::Abstraction;
+use Config::Abstraction;
 
-    my $config = Config::Abstraction->new(
-        data        => { database => { host => 'localhost', port => 5432 } },
-        config_dirs => ['config'],
-        env_prefix  => 'APP_',
-    );
+my $config = Config::Abstraction->new(
+    data        => { database => { host => 'localhost', port => 5432 } },
+    config_dirs => ['config'],
+    env_prefix  => 'APP_',
+);
 
-    # In production, set APP_DATABASE__HOST=db.prod.example.com in the environment.
-    # That silently overrides the file value, which in turn overrides the default.
-    my $host = $config->get('database.host');
-    my $port = $config->get('database.port');
+# In production, set APP_DATABASE__HOST=db.prod.example.com in the environment.
+# That silently overrides the file value, which in turn overrides the default.
+my $host = $config->get('database.host');
+my $port = $config->get('database.port');
+```
 
-## Pattern 2: Command-line arguments override everything
+### Pattern 2: Command-Line Arguments Override Everything
 
 Useful for CLI tools where operator flags must win over every other source.
 
-    # Run as: myscript.pl --APP_LOGLEVEL=debug --APP_DATABASE__HOST=localhost
+```perl
+# Run as: myscript.pl --APP_LOGLEVEL=debug --APP_DATABASE__HOST=localhost
 
-    use Config::Abstraction;
+use Config::Abstraction;
 
-    my $config = Config::Abstraction->new(
-        config_dirs => ['config'],
-        env_prefix  => 'APP_',
-    );
+my $config = Config::Abstraction->new(
+    config_dirs => ['config'],
+    env_prefix  => 'APP_',
+);
 
-    # @ARGV is consumed and stripped during new(); the resulting config already
-    # has cli-layer values at the highest precedence.
-    my $loglevel = $config->get('loglevel');       # 'debug'  (from --APP_LOGLEVEL)
-    my $db_host  = $config->get('database.host');  # 'localhost' (from --APP_DATABASE__HOST)
+# @ARGV is consumed and stripped during new(); the resulting config already
+# has cli-layer values at the highest precedence.
+my $loglevel = $config->get('loglevel');       # 'debug'  (from --APP_LOGLEVEL)
+my $db_host  = $config->get('database.host');  # 'localhost' (from --APP_DATABASE__HOST)
+```
 
-## Pattern 3: Multi-file layering (base + local override)
+### Pattern 3: Multi-File Layering (Base + Local Override)
 
 Separates shared defaults from machine-specific tweaks.
 Every developer has a `base.yaml`; only the production server has `local.yaml`.
 
-    # config/base.yaml   -- checked into version control
-    #   database:
-    #     host: localhost
-    #     user: dev
-    #
-    # config/local.yaml  -- NOT checked in; production only
-    #   database:
-    #     host: db.prod.example.com
-    #     user: produser
-    #     password: s3cr3t
+```perl
+# config/base.yaml   -- checked into version control
+#   database:
+#     host: localhost
+#     user: dev
+#
+# config/local.yaml  -- NOT checked in; production only
+#   database:
+#     host: db.prod.example.com
+#     user: produser
+#     password: s3cr3t
 
-    use Config::Abstraction;
+use Config::Abstraction;
 
-    my $config = Config::Abstraction->new(
-        config_dirs => ['config'],   # loads base.yaml then local.yaml
-        env_prefix  => 'APP_',
-    );
+my $config = Config::Abstraction->new(
+    config_dirs => ['config'],   # loads base.yaml then local.yaml
+    env_prefix  => 'APP_',
+);
 
-    # On a dev machine (no local.yaml): host='localhost', user='dev'
-    # On the prod server:               host='db.prod.example.com', user='produser'
-    my $db = $config->get('database.host');
-    my $user = $config->get('database.user');
+# On a dev machine (no local.yaml): host='localhost', user='dev'
+# On the prod server:               host='db.prod.example.com', user='produser'
+my $db = $config->get('database.host');
+my $user = $config->get('database.user');
+```
 
-# DESCRIPTION
+## Description
 
 `Config::Abstraction` is a flexible configuration management layer that sits above `Config::*` modules.
 It provides a simple way to layer multiple configuration sources with predictable merge order.
@@ -102,23 +108,25 @@ This module is designed to help developers manage layered configurations that ca
 offering a modern, robust and dynamic approach
 to configuration management.
 
-## Merge Precedence
+### Merge Precedence
 
 Sources are applied in the order shown below.  Each row wins over every row
 above it.  When the same key appears in multiple sources, the highest-priority
 source always determines the final value - including when that value is `undef`.
 
-    Priority   Source                         Set with
-    --------   ------                         --------
-       1 (lo)  data constructor argument      data => { key => 'default' }
-       2        base.*  config files          config/base.yaml, base.json, ...
-       3        base.{env}.* config files     config/base.prod.yaml, ...
-       4        local.* config files          config/local.yaml, local.json, ...
-       5        local.{env}.* config files    config/local.prod.yaml, ...
-       6        default / script-name files   config/default.yaml, myapp.yaml, ...
-       7        config_file / config_files    config_file => '/etc/myapp.yaml'
-       8        Environment variables         APP_DATABASE__HOST=db.prod.example.com
-       9 (hi)  CLI arguments (@ARGV)          --APP_DATABASE__HOST=db.prod.example.com
+```perl
+Priority   Source                         Set with
+--------   ------                         --------
+   1 (lo)  data constructor argument      data => { key => 'default' }
+   2        base.*  config files          config/base.yaml, base.json, ...
+   3        base.{env}.* config files     config/base.prod.yaml, ...
+   4        local.* config files          config/local.yaml, local.json, ...
+   5        local.{env}.* config files    config/local.prod.yaml, ...
+   6        default / script-name files   config/default.yaml, myapp.yaml, ...
+   7        config_file / config_files    config_file => '/etc/myapp.yaml'
+   8        Environment variables         APP_DATABASE__HOST=db.prod.example.com
+   9 (hi)  CLI arguments (@ARGV)          --APP_DATABASE__HOST=db.prod.example.com
+```
 
 The active environment is set by the `environment` constructor option, or
 auto-detected from `{env_prefix}ENV` (e.g. `APP_ENV`), `PLACK_ENV`, or
@@ -130,16 +138,18 @@ key in an earlier file, even when the later value is `undef` (YAML `~`).
 Nested hashes are merged recursively, so a `local.yaml` that only sets
 `database.host` will not erase `database.port` from `base.yaml`.
 
-    Example - what wins for the key C<database.host> when APP_ENV=prod:
+```perl
+Example - what wins for the key C<database.host> when APP_ENV=prod:
 
-    data              =>  'localhost'              (overridden by base.yaml)
-    base.yaml         =>  'db.example.com'         (overridden by base.prod.yaml)
-    base.prod.yaml    =>  'db.prod.example.com'    (overridden by local.yaml)
-    local.yaml        =>  'db.local.example.com'   (overridden by local.prod.yaml)
-    local.prod.yaml   =>  'db.prod-local.example.com'  (overridden by $APP_DATABASE__HOST)
-    $APP_DATABASE__HOST  =>  'db.override.example.com'    <-- this wins
+data              =>  'localhost'              (overridden by base.yaml)
+base.yaml         =>  'db.example.com'         (overridden by base.prod.yaml)
+base.prod.yaml    =>  'db.prod.example.com'    (overridden by local.yaml)
+local.yaml        =>  'db.local.example.com'   (overridden by local.prod.yaml)
+local.prod.yaml   =>  'db.prod-local.example.com'  (overridden by $APP_DATABASE__HOST)
+$APP_DATABASE__HOST  =>  'db.override.example.com'    <-- this wins
+```
 
-## KEY FEATURES
+### Key Features
 
 - Multi-Format Support
 
@@ -189,7 +199,7 @@ Nested hashes are merged recursively, so a `local.yaml` that only sets
     Supports remote configuration management files,
     so that configuration on remote machines can be centrally managed.
 
-## SUPPORTED FILE FORMATS
+### Supported File Formats
 
 - YAML (`*.yaml`, `*.yml`)
 
@@ -214,15 +224,17 @@ Nested hashes are merged recursively, so a `local.yaml` that only sets
     are typed, strings must be quoted, and nesting uses `[section]` headers or
     dotted keys rather than indentation.
 
-        # Example: config/base.toml
-        [database]
-        host   = "db.example.com"
-        port   = 5432
-        user   = "app"
+    ```
+    # Example: config/base.toml
+    [database]
+    host   = "db.example.com"
+    port   = 5432
+    user   = "app"
 
-        [cache]
-        ttl    = 300
-        debug  = false
+    [cache]
+    ttl    = 300
+    debug  = false
+    ```
 
     `base.toml` and `local.toml` are discovered automatically in `config_dirs`;
     `local.toml` has higher precedence than `base.toml`, following the same
@@ -232,21 +244,25 @@ Nested hashes are merged recursively, so a `local.yaml` that only sets
     If `TOML::Tiny` is not installed, TOML files are silently skipped with a
     `carp` warning.
 
-## ENVIRONMENT VARIABLE HANDLING
+### Environment Variable Handling
 
 Configuration values can be overridden via environment variables. Environment variables use double underscores (\_\_) to denote nested configuration keys and single underscores remain as part of the key name under the prefix namespace.
 
 For example:
 
-    APP_DATABASE__USER becomes database.user (nested structure)
+```
+APP_DATABASE__USER becomes database.user (nested structure)
 
-      $ export APP_DATABASE__USER="env_user"
+  $ export APP_DATABASE__USER="env_user"
+```
 
 will override any value set for \`database.user\` in the configuration files.
 
-    APP_LOGLEVEL becomes APP.loglevel (flat under prefix namespace)
+```
+APP_LOGLEVEL becomes APP.loglevel (flat under prefix namespace)
 
-    APP_API__RATE_LIMIT becomes api.rate_limit (mixed usage)
+APP_API__RATE_LIMIT becomes api.rate_limit (mixed usage)
+```
 
 This allows you to override both top-level and nested configuration values using environment variables.
 
@@ -255,7 +271,7 @@ For instance, if you have a key in the configuration such as `database.user`,
 you can override it by adding `"--APP_DATABASE__USER=other_user_name"` to the command line arguments.
 This will override any value set for `database.user` in the configuration files.
 
-## EXAMPLE CONFIGURATION FLOW
+### Example Configuration Flow
 
 - 1. Data Argument
 
@@ -297,9 +313,9 @@ This will override any value set for `database.user` in the configuration files.
     Values in the configuration can be accessed using a dotted notation
     (e.g., `'database.user'`), regardless of the file format used.
 
-# METHODS
+## Methods
 
-## new
+### New
 
 Constructor for creating a new configuration object.
 
@@ -333,12 +349,14 @@ Options:
     other sources and can be overridden by later sources or by explicitly passing
     options directly to `new`.
 
-        $config = Config::Abstraction->new(
-            data => {
-                log_level => 'info',
-                retries => 3,
-            }
-        );
+    ```perl
+    $config = Config::Abstraction->new(
+        data => {
+            log_level => 'info',
+            retries => 3,
+        }
+    );
+    ```
 
 - `defaults`
 
@@ -388,10 +406,12 @@ Options:
     equivalents, and `local.{env}.*` files are loaded immediately after `local.*` files,
     giving two additional override tiers at no cost to the base configuration.
 
-        my $cfg = Config::Abstraction->new(
-            config_dirs => ['config'],
-            environment => 'prod',          # loads base.prod.yaml, local.prod.yaml, ...
-        );
+    ```perl
+    my $cfg = Config::Abstraction->new(
+        config_dirs => ['config'],
+        environment => 'prod',          # loads base.prod.yaml, local.prod.yaml, ...
+    );
+    ```
 
     If `environment` is not given, the value is auto-detected in this order:
 
@@ -449,14 +469,16 @@ Options:
 
     - A type name string
 
-            validators => {
-                'database.port' => 'integer',
-                'app.name'      => 'string',
-                'price'         => 'number',
-                'enabled'       => 'boolean',
-                'tags'          => 'array',
-                'settings'      => 'hash',
-            }
+        ```perl
+        validators => {
+            'database.port' => 'integer',
+            'app.name'      => 'string',
+            'price'         => 'number',
+            'enabled'       => 'boolean',
+            'tags'          => 'array',
+            'settings'      => 'hash',
+        }
+        ```
 
         Supported types: `integer` (matches `/^-?\d+$/` -- no decimal point),
         `number` or `float` (`Scalar::Util::looks_like_number`), `boolean`
@@ -466,36 +488,42 @@ Options:
 
     - A compiled regular expression
 
-            validators => {
-                'log.level' => qr/^(?:debug|info|warn|error|fatal)$/i,
-                'app.name'  => qr/^\w[\w\-]{1,63}$/,
-            }
+        ```perl
+        validators => {
+            'log.level' => qr/^(?:debug|info|warn|error|fatal)$/i,
+            'app.name'  => qr/^\w[\w\-]{1,63}$/,
+        }
+        ```
 
         The value must be defined and must match the regex.
 
     - A coderef
 
-            validators => {
-                'database.port' => sub { my $v = shift; defined($v) && $v >= 1 && $v <= 65535 },
-            }
+        ```perl
+        validators => {
+            'database.port' => sub { my $v = shift; defined($v) && $v >= 1 && $v <= 65535 },
+        }
+        ```
 
         Called with the value as its only argument.  Must return a true value; otherwise the
         constructor croaks.
 
     - A hashref combining multiple constraints
 
-            validators => {
-                'database.port' => {
-                    type     => 'integer',
-                    min      => 1,
-                    max      => 65535,
-                    required => 1,
-                },
-                'api.key' => {
-                    pattern  => qr/^[A-Za-z0-9]{32}$/,
-                    required => 1,
-                },
-            }
+        ```perl
+        validators => {
+            'database.port' => {
+                type     => 'integer',
+                min      => 1,
+                max      => 65535,
+                required => 1,
+            },
+            'api.key' => {
+                pattern  => qr/^[A-Za-z0-9]{32}$/,
+                required => 1,
+            },
+        }
+        ```
 
         Keys: `type` (type-name string as above), `pattern` (compiled regex), `min` (numeric
         lower bound, inclusive), `max` (numeric upper bound, inclusive), `required` (if true,
@@ -515,15 +543,17 @@ Options:
     (`{...}`), and quantity specifiers (`?`: optional, `+`: one or more, `*`: zero or
     more):
 
-        my $config = Config::Abstraction->new(
-            config_dirs => ['config'],
-            checker     => <<'END_PROTOTYPE',
-        database:
-          host: hostname of the database server[HOSTNAME]
-          port: '?<5432>port number[INTEGER]'
-          user: database username
-        END_PROTOTYPE
-        );
+    ```perl
+    my $config = Config::Abstraction->new(
+        config_dirs => ['config'],
+        checker     => <<'END_PROTOTYPE',
+    database:
+      host: hostname of the database server[HOSTNAME]
+      port: '?<5432>port number[INTEGER]'
+      user: database username
+    END_PROTOTYPE
+    );
+    ```
 
     See [Config::Checker](https://metacpan.org/pod/Config%3A%3AChecker) for the full prototype syntax.
 
@@ -546,13 +576,15 @@ Options:
         not find out until the first accessor call - which may be deep inside your business
         logic, far from where the object was created.
 
-            # Problem: the typo in config_dirs goes unnoticed until runtime
-            my $cfg = Config::Abstraction->new(
-                config_dirs => ['/etc/myapp/conifg'],   # typo - directory does not exist
-                lazy => 1,
-            );
-            # ... many lines later ...
-            my $host = $cfg->get('database.host');      # silently returns undef here
+        ```perl
+        # Problem: the typo in config_dirs goes unnoticed until runtime
+        my $cfg = Config::Abstraction->new(
+            config_dirs => ['/etc/myapp/conifg'],   # typo - directory does not exist
+            lazy => 1,
+        );
+        # ... many lines later ...
+        my $host = $cfg->get('database.host');      # silently returns undef here
+        ```
 
     - 2. Schema validation errors appear at the wrong place in the call stack.
 
@@ -597,84 +629,102 @@ Options:
 
 If just one argument is given, it is assumed to be the name of a file.
 
-## get(key)
+### Get(key)
 
 Retrieve a configuration value using dotted key notation (e.g.,
 `'database.user'`). Returns `undef` if the key doesn't exist or if
 `key` is `undef`.
 
-### EXAMPLE
+#### Example
 
-    my $cfg = Config::Abstraction->new(
-        data        => { database => { host => 'localhost', port => 5432 } },
-        config_dirs => [],
-    );
+```perl
+my $cfg = Config::Abstraction->new(
+    data        => { database => { host => 'localhost', port => 5432 } },
+    config_dirs => [],
+);
 
-    my $host = $cfg->get('database.host');   # 'localhost'
-    my $port = $cfg->get('database.port');   # 5432
-    my $miss = $cfg->get('database.user');   # undef  -- key absent
+my $host = $cfg->get('database.host');   # 'localhost'
+my $port = $cfg->get('database.port');   # 5432
+my $miss = $cfg->get('database.user');   # undef  -- key absent
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    key  -- SCALAR  -- dotted key path (e.g. 'database.host').
-                       C<undef> is allowed and returns C<undef> silently.
+```
+key  -- SCALAR  -- dotted key path (e.g. 'database.host').
+                   C<undef> is allowed and returns C<undef> silently.
+```
 
-#### Output
+##### Output
 
-    SCALAR or reference -- the value stored under C<key>, or C<undef> if absent.
+```
+SCALAR or reference -- the value stored under C<key>, or C<undef> if absent.
+```
 
-### MESSAGES
+#### Messages
 
-    (none) -- missing keys return undef, no warning is raised.
+```
+(none) -- missing keys return undef, no warning is raised.
+```
 
-### PSEUDOCODE
+#### Pseudocode
 
-    if key is undef: return undef
-    call _ensure_loaded
-    if flatten mode: return config[key] (direct lookup)
-    parts = split sep_char from key
-    ref = config hashref
-    for each part:
-      if ref is not a HASH: return undef
-      if part not in ref:   return undef
-      ref = ref[part]
-    return ref
+```
+if key is undef: return undef
+call _ensure_loaded
+if flatten mode: return config[key] (direct lookup)
+parts = split sep_char from key
+ref = config hashref
+for each part:
+  if ref is not a HASH: return undef
+  if part not in ref:   return undef
+  ref = ref[part]
+return ref
+```
 
-## exists(key)
+### Exists(key)
 
 Test whether a configuration key is present, using dotted key notation
 (e.g., `'database.user'`).  Returns `1` when the key exists (even if its
 value is `undef`), `0` otherwise.  Returns `0` when `key` is `undef`.
 
-### EXAMPLE
+#### Example
 
-    my $cfg = Config::Abstraction->new(
-        data        => { timeout => undef, retries => 3 },
-        config_dirs => [],
-    );
+```perl
+my $cfg = Config::Abstraction->new(
+    data        => { timeout => undef, retries => 3 },
+    config_dirs => [],
+);
 
-    $cfg->exists('timeout');   # 1 -- key present even though value is undef
-    $cfg->exists('retries');   # 1
-    $cfg->exists('missing');   # 0
-    $cfg->exists(undef);       # 0
+$cfg->exists('timeout');   # 1 -- key present even though value is undef
+$cfg->exists('retries');   # 1
+$cfg->exists('missing');   # 0
+$cfg->exists(undef);       # 0
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    key  -- SCALAR  -- dotted key path.  C<undef> returns C<0>.
+```
+key  -- SCALAR  -- dotted key path.  C<undef> returns C<0>.
+```
 
-#### Output
+##### Output
 
-    boolean
+```
+boolean
+```
 
-### MESSAGES
+#### Messages
 
-    (none)
+```
+(none)
+```
 
-## all()
+### All()
 
 Returns the entire merged configuration as a hashref, or `undef` when no
 configuration data was found.  When `flatten => 1` was given to the
@@ -684,32 +734,40 @@ the hash is nested.
 The special key `config_path` within the returned hashref is an arrayref
 listing every file that was loaded, in load order.
 
-### EXAMPLE
+#### Example
 
-    my $cfg = Config::Abstraction->new(
-        data        => { host => 'localhost', port => 5432 },
-        config_dirs => [],
-    );
+```perl
+my $cfg = Config::Abstraction->new(
+    data        => { host => 'localhost', port => 5432 },
+    config_dirs => [],
+);
 
-    my $all = $cfg->all();
-    # { host => 'localhost', port => 5432, config_path => [] }
+my $all = $cfg->all();
+# { host => 'localhost', port => 5432, config_path => [] }
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    (none)
+```
+(none)
+```
 
-#### Output
+##### Output
 
-    HASHREF  -- the full merged config (includes C<config_path> key).
-    undef    -- when the merged config is empty and no data was supplied.
+```
+HASHREF  -- the full merged config (includes C<config_path> key).
+undef    -- when the merged config is empty and no data was supplied.
+```
 
-### MESSAGES
+#### Messages
 
-    (none) -- returns undef silently when empty.
+```
+(none) -- returns undef silently when empty.
+```
 
-## explain\_sources()
+### Explain\_Sources()
 
 Returns a hashref describing where each configuration key came from and in
 what order the sources that set it were applied.
@@ -737,103 +795,119 @@ Keys set by exactly one source have a single-element `sources` list.
 Keys whose value was never overridden will show the same `value` in both the
 top-level field and the sole `sources` entry.
 
-### USAGE EXAMPLE
+#### Usage Example
 
-    use Config::Abstraction;
+```perl
+use Config::Abstraction;
 
-    local $ENV{APP_HOST} = 'prod.example.com';
+local $ENV{APP_HOST} = 'prod.example.com';
 
-    my $cfg = Config::Abstraction->new(
-        data        => { host => 'localhost', port => 5432 },
-        config_dirs => ['/etc/myapp'],
-    );
+my $cfg = Config::Abstraction->new(
+    data        => { host => 'localhost', port => 5432 },
+    config_dirs => ['/etc/myapp'],
+);
 
-    use Data::Dumper;
-    print Dumper( $cfg->explain_sources() );
-    # {
-    #   'host' => {
-    #     value   => 'prod.example.com',
-    #     sources => [
-    #       { type => 'data', label => 'constructor data argument', value => 'localhost' },
-    #       { type => 'env',  label => 'APP_HOST',                  value => 'prod.example.com' },
-    #     ],
-    #   },
-    #   'port' => {
-    #     value   => 5432,
-    #     sources => [
-    #       { type => 'data', label => 'constructor data argument', value => 5432 },
-    #     ],
-    #   },
-    # }
+use Data::Dumper;
+print Dumper( $cfg->explain_sources() );
+# {
+#   'host' => {
+#     value   => 'prod.example.com',
+#     sources => [
+#       { type => 'data', label => 'constructor data argument', value => 'localhost' },
+#       { type => 'env',  label => 'APP_HOST',                  value => 'prod.example.com' },
+#     ],
+#   },
+#   'port' => {
+#     value   => 5432,
+#     sources => [
+#       { type => 'data', label => 'constructor data argument', value => 5432 },
+#     ],
+#   },
+# }
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
 None (instance method; takes no arguments beyond `$self`).
 
-#### Output
+##### Output
 
 HASHREF where each key is a dotted config key and each value is:
 
-    {
-        value   => SCALAR,
-        sources => [
-            {
-                type  => 'data'|'file'|'env'|'argv',
-                label => SCALAR,
-                value => SCALAR,
-            },
-            ...
-        ],
-    }
+```perl
+{
+    value   => SCALAR,
+    sources => [
+        {
+            type  => 'data'|'file'|'env'|'argv',
+            label => SCALAR,
+            value => SCALAR,
+        },
+        ...
+    ],
+}
+```
 
-## prefer\_env(key)
+### Prefer\_Env(key)
 
 Return the value that an environment variable provided for `key`, bypassing
 any later sources (e.g. CLI arguments) that may have overridden it.
 Falls back to the normal merged value from `get(key)` when no environment
 variable contributed to `key`.
 
-### EXAMPLE
+#### Example
 
-    local $ENV{APP_DATABASE__HOST} = 'env-host';
-    my $host = $cfg->prefer_env('database.host');
-    # Returns 'env-host' even if --APP_DATABASE__HOST=cli-host was also passed.
+```perl
+local $ENV{APP_DATABASE__HOST} = 'env-host';
+my $host = $cfg->prefer_env('database.host');
+# Returns 'env-host' even if --APP_DATABASE__HOST=cli-host was also passed.
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    key -- SCALAR -- dotted key path.
+```
+key -- SCALAR -- dotted key path.
+```
 
-#### Output
+##### Output
 
-    SCALAR  -- the env-layer value, or C<get(key)> when no env var set it.
+```
+SCALAR  -- the env-layer value, or C<get(key)> when no env var set it.
+```
 
-## prefer\_file(key)
+### Prefer\_File(key)
 
 Return the value that a configuration file provided for `key`, bypassing
 environment variables and CLI arguments that may have overridden it.
 Falls back to the normal merged value from `get(key)` when no file
 contributed to `key`.
 
-### EXAMPLE
+#### Example
 
-    my $host = $cfg->prefer_file('database.host');
-    # Returns the file-sourced value even if APP_DATABASE__HOST is set.
+```perl
+my $host = $cfg->prefer_file('database.host');
+# Returns the file-sourced value even if APP_DATABASE__HOST is set.
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    key -- SCALAR -- dotted key path.
+```
+key -- SCALAR -- dotted key path.
+```
 
-#### Output
+##### Output
 
-    SCALAR  -- the file-layer value, or C<get(key)> when no file set it.
+```
+SCALAR  -- the file-layer value, or C<get(key)> when no file set it.
+```
 
-## prefer\_data(key)
+### Prefer\_Data(key)
 
 Return the value that the `data` constructor argument provided for `key`,
 bypassing files, environment variables, and CLI arguments that may have
@@ -841,25 +915,31 @@ overridden it.
 Falls back to the normal merged value from `get(key)` when `data` did not
 contribute to `key`.
 
-### EXAMPLE
+#### Example
 
-    my $cfg = Config::Abstraction->new(
-        data        => { timeout => 30 },
-        config_dirs => ['/etc/myapp'],
-    );
-    my $t = $cfg->prefer_data('timeout');   # always 30, regardless of files/env
+```perl
+my $cfg = Config::Abstraction->new(
+    data        => { timeout => 30 },
+    config_dirs => ['/etc/myapp'],
+);
+my $t = $cfg->prefer_data('timeout');   # always 30, regardless of files/env
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    key -- SCALAR -- dotted key path.
+```
+key -- SCALAR -- dotted key path.
+```
 
-#### Output
+##### Output
 
-    SCALAR  -- the data-layer value, or C<get(key)> when C<data> did not set it.
+```
+SCALAR  -- the data-layer value, or C<get(key)> when C<data> did not set it.
+```
 
-## prefer\_argv(key)
+### Prefer\_Argv(key)
 
 Return the value that a CLI argument provided for `key`.
 Falls back to the normal merged value from `get(key)` when no CLI argument
@@ -869,23 +949,29 @@ Because CLI arguments are the highest-precedence source, this method is
 primarily useful for writing self-documenting code or for detecting whether
 a key was explicitly supplied on the command line.
 
-### EXAMPLE
+#### Example
 
-    my $level = $cfg->prefer_argv('log.level');
-    # Equivalent to $cfg->get('log.level') unless you specifically need to
-    # confirm the value came from @ARGV.
+```perl
+my $level = $cfg->prefer_argv('log.level');
+# Equivalent to $cfg->get('log.level') unless you specifically need to
+# confirm the value came from @ARGV.
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    key -- SCALAR -- dotted key path.
+```
+key -- SCALAR -- dotted key path.
+```
 
-#### Output
+##### Output
 
-    SCALAR  -- the argv-layer value, or C<get(key)> when no CLI arg set it.
+```
+SCALAR  -- the argv-layer value, or C<get(key)> when no CLI arg set it.
+```
 
-## encrypt\_value($plaintext)
+### Encrypt\_Value($Plaintext)
 
 Encrypt a plaintext string using the configured AES-256-GCM key and return an
 `ENC[AES256GCM,...]` token suitable for storing in a configuration file.
@@ -896,67 +982,80 @@ modification causes decryption to croak.
 
 Requires [CryptX](https://metacpan.org/pod/CryptX) (`Crypt::AuthEnc::GCM`, `Crypt::PRNG`).
 
-### EXAMPLE
+#### Example
 
-    # Generate a token to paste into base.yaml:
-    my $cfg = Config::Abstraction->new(
-        encryption_key => $hex_key,
-        config_dirs    => [],
-        lazy           => 1,
-    );
-    my $token = $cfg->encrypt_value('s3cr3t_password');
-    # ENC[AES256GCM,QkJCQkJCQkJCQkJCO6Gfb0o5jwqB1R...]
+```perl
+# Generate a token to paste into base.yaml:
+my $cfg = Config::Abstraction->new(
+    encryption_key => $hex_key,
+    config_dirs    => [],
+    lazy           => 1,
+);
+my $token = $cfg->encrypt_value('s3cr3t_password');
+# ENC[AES256GCM,QkJCQkJCQkJCQkJCO6Gfb0o5jwqB1R...]
 
-    # Or use config-dump from the command line:
-    #   config-dump --encrypt-value 's3cr3t_password' --encryption-key $KEY
+# Or use config-dump from the command line:
+#   config-dump --encrypt-value 's3cr3t_password' --encryption-key $KEY
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    plaintext  -- SCALAR  -- the string to encrypt.  May be empty.
+```
+plaintext  -- SCALAR  -- the string to encrypt.  May be empty.
+```
 
-#### Output
+##### Output
 
-    SCALAR  -- the ENC[AES256GCM,...] token (always a printable ASCII string).
+```
+SCALAR  -- the ENC[AES256GCM,...] token (always a printable ASCII string).
+```
 
-### MESSAGES
+#### Messages
 
-    "<class>: no encryption key configured ..." -- croak when no key is available.
-    "<class>: CryptX (Crypt::AuthEnc::GCM) is required ..." -- croak when CryptX absent.
+```
+"<class>: no encryption key configured ..." -- croak when no key is available.
+"<class>: CryptX (Crypt::AuthEnc::GCM) is required ..." -- croak when CryptX absent.
+```
 
-### PSEUDOCODE
+#### Pseudocode
 
-    call _ensure_loaded
-    key = _get_encryption_key() -- croak if undef
-    load Crypt::AuthEnc::GCM and Crypt::PRNG -- croak if absent
-    nonce = 12 random bytes
-    gcm = new GCM('AES', key)
-    gcm.iv_add(nonce)
-    ciphertext = gcm.encrypt_add(plaintext)
-    tag = gcm.encrypt_done()
-    return "ENC[AES256GCM," + base64url(nonce + ciphertext + tag) + "]"
+```
+call _ensure_loaded
+key = _get_encryption_key() -- croak if undef
+load Crypt::AuthEnc::GCM and Crypt::PRNG -- croak if absent
+nonce = 12 random bytes
+gcm = new GCM('AES', key)
+gcm.iv_add(nonce)
+gcm.adata_add('')  -- ends the IV phase (required by CryptX < 0.049)
+ciphertext = gcm.encrypt_add(plaintext)
+tag = gcm.encrypt_done()
+return "ENC[AES256GCM," + base64url(nonce + ciphertext + tag) + "]"
+```
 
-## merge\_defaults
+### Merge\_Defaults
 
 Merge the configuration hash into the given hash.
 
-    package MyPackage;
-    use Params::Get;
-    use Config::Abstraction;
+```perl
+package MyPackage;
+use Params::Get;
+use Config::Abstraction;
 
-    sub new
-    {
-      my $class = shift;
+sub new
+{
+  my $class = shift;
 
-      my $params = Params::Get::get_params(undef, \@_) || {};
+  my $params = Params::Get::get_params(undef, \@_) || {};
 
-      if(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
-        $params = $config->merge_defaults(defaults => $params, merge => 1, section => $class);
-      }
+  if(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
+    $params = $config->merge_defaults(defaults => $params, merge => 1, section => $class);
+  }
 
-      return bless $params, $class;
-    }
+  return bless $params, $class;
+}
+```
 
 Options:
 
@@ -975,12 +1074,14 @@ Options:
 
     Try harder to merge all configurations from the global section of the configuration file.
 
-## Remote configuration directories (Newcastle Connection)
+### Remote Configuration Directories (Newcastle Connection)
 
 Any entry in `config_dirs` whose path begins with `/../` is treated as a
 remote specification rather than a local directory:
 
-    /../hostname/path/to/dir
+```
+/../hostname/path/to/dir
+```
 
 The hostname and directory are extracted, and the same standard files searched
 locally (`base.yaml`, `local.yaml`, `base.json`, etc.) are fetched from
@@ -994,19 +1095,23 @@ normal local file pipeline instead.  No SSH connection is made.  This means a
 configuration written for a shared remote host degrades gracefully when run on
 that host itself:
 
-    # On any other machine: fetches /etc/myapp over SSH
-    # On cfg-server itself: reads /etc/myapp from disk directly
-    config_dirs => ['/../cfg-server/etc/myapp']
+```perl
+# On any other machine: fetches /etc/myapp over SSH
+# On cfg-server itself: reads /etc/myapp from disk directly
+config_dirs => ['/../cfg-server/etc/myapp']
+```
 
 Remote directories participate in the normal merge pipeline and can be freely
 mixed with local ones:
 
-    my $cfg = Config::Abstraction->new(
-        config_dirs => [
-            '/etc/myapp',                        # local
-            '/../deploy@cfg-server/etc/myapp',   # remote via SSH (local on cfg-server)
-        ],
-    );
+```perl
+my $cfg = Config::Abstraction->new(
+    config_dirs => [
+        '/etc/myapp',                        # local
+        '/../deploy@cfg-server/etc/myapp',   # remote via SSH (local on cfg-server)
+    ],
+);
+```
 
 SSH authentication is handled by the system SSH client.
 No extra constructor options are required; use your SSH agent or
@@ -1015,7 +1120,7 @@ No extra constructor options are required; use your SSH agent or
 [File::Slurp::Remote](https://metacpan.org/pod/File%3A%3ASlurp%3A%3ARemote) must be installed for remote directories to work.
 If it is absent the directory is silently skipped and a warning is emitted.
 
-### Why `/../` (the Newcastle Connection convention)
+#### Why `/../` (The Newcastle Connection Convention)
 
 Several syntaxes were considered for marking a `config_dirs` entry as remote.
 Each alternative was rejected for a concrete reason:
@@ -1066,77 +1171,91 @@ The Newcastle Connection prefix is therefore the only choice that is:
 - detectable with a single `m{^\Q/../\E}` regex, no URI parser needed
 - transport-neutral (the hostname is passed to whatever remote driver is installed)
 
-## AUTOLOAD
+### Autoload
 
 This module supports dynamic access to configuration keys via AUTOLOAD.
 Nested keys are accessible using the separator,
 so `$config->database_user()` resolves to `$config->{database}->{user}`,
 when `sep_char` is set to '\_'.
 
-    $config = Config::Abstraction->new(
-        data => {
-            database => {
-                user => 'alice',
-                pass => 'secret'
-            },
-            log_level => 'debug'
+```perl
+$config = Config::Abstraction->new(
+    data => {
+        database => {
+            user => 'alice',
+            pass => 'secret'
         },
-        flatten => 1,
-        sep_char => '_'
-    );
+        log_level => 'debug'
+    },
+    flatten => 1,
+    sep_char => '_'
+);
 
-    my $user = $config->database_user();        # returns 'alice'
+my $user = $config->database_user();        # returns 'alice'
 
-    # or
-    $user = $config->database()->{'user'};      # returns 'alice'
+# or
+$user = $config->database()->{'user'};      # returns 'alice'
 
-    # Attempting to call a nonexistent key
-    my $foo = $config->nonexistent_key();       # dies with error
+# Attempting to call a nonexistent key
+my $foo = $config->nonexistent_key();       # dies with error
+```
 
-# ENCRYPTED VALUES
+## Encrypted Values
 
 Config::Abstraction supports transparent AES-256-GCM encryption of individual
 configuration values.  This lets you store secrets (passwords, API keys, tokens)
 in config files without exposing them as plaintext, even when those files are
 committed to version control.
 
-## Quick start
+### Quick Start
 
 **Step 1 -- generate a key:**
 
-    # 32 random bytes, encoded as 64 hex chars
-    perl -e 'use Crypt::PRNG qw(random_bytes); use MIME::Base64 qw(encode_base64url);
-             print encode_base64url(random_bytes(32)), "\n"'
+```perl
+# 32 random bytes, encoded as 64 hex chars
+perl -e 'use Crypt::PRNG qw(random_bytes); use MIME::Base64 qw(encode_base64url);
+         print encode_base64url(random_bytes(32)), "\n"'
+```
 
 Store the result in an environment variable or a key file (outside version control):
 
-    export ENCRYPTION_KEY=<the 44-char base64url output>
+```
+export ENCRYPTION_KEY=<the 44-char base64url output>
+```
 
 **Step 2 -- encrypt a secret value:**
 
-    perl -MConfig::Abstraction -e '
-      my $cfg = Config::Abstraction->new(data => {});
-      print $cfg->encrypt_value("my_secret_password"), "\n";
-    '
+```perl
+perl -MConfig::Abstraction -e '
+  my $cfg = Config::Abstraction->new(data => {});
+  print $cfg->encrypt_value("my_secret_password"), "\n";
+'
+```
 
 This prints something like:
 
-    ENC[AES256GCM,QkJCQkJCQkJCQkJCO6Gfb0o5...]
+```
+ENC[AES256GCM,QkJCQkJCQkJCQkJCO6Gfb0o5...]
+```
 
 **Step 3 -- paste the token into your config file:**
 
-    # config/base.yaml
-    database:
-      host: db.example.com
-      user: myapp
-      password: 'ENC[AES256GCM,QkJCQkJCQkJCQkJCO6Gfb0o5...]'
+```
+# config/base.yaml
+database:
+  host: db.example.com
+  user: myapp
+  password: 'ENC[AES256GCM,QkJCQkJCQkJCQkJCO6Gfb0o5...]'
+```
 
 **Step 4 -- load and use normally:**
 
-    my $cfg = Config::Abstraction->new(config_dirs => ['config']);
-    # $cfg->get('database.password') returns 'my_secret_password' -- already decrypted
+```perl
+my $cfg = Config::Abstraction->new(config_dirs => ['config']);
+# $cfg->get('database.password') returns 'my_secret_password' -- already decrypted
+```
 
-## Key configuration
+### Key Configuration
 
 The encryption key is resolved in this order (first match wins):
 
@@ -1150,113 +1269,131 @@ The encryption key is resolved in this order (first match wins):
 The key file should contain the key on its first line in any supported format.
 **Never commit the key to version control.**
 
-## Token format
+### Token Format
 
-    ENC[AES256GCM,<base64url(nonce || ciphertext || tag)>]
+```
+ENC[AES256GCM,<base64url(nonce || ciphertext || tag)>]
+```
 
 - `AES256GCM` -- AES-256 in GCM mode (authenticated encryption)
 - Nonce -- 12 random bytes (fresh per encryption, never reused)
 - GCM authentication tag -- 16 bytes; any modification causes decryption to croak
 - Base64url encoding -- URL-safe alphabet, no padding ambiguity
 
-## Behaviour when no key is configured
+### Behaviour When No Key Is Configured
 
 If no key is found, `ENC[...]` tokens are left as literal strings.  This means
 the feature is purely opt-in: existing deployments without a key configured are
 unaffected.
 
-## Requirements
+### Requirements
 
 [CryptX](https://metacpan.org/pod/CryptX) (`Crypt::AuthEnc::GCM`, `Crypt::PRNG`) must be installed:
 
-    cpanm CryptX
+```
+cpanm CryptX
+```
 
-# COMMON PITFALLS
+## Common Pitfalls
 
-## 1. new() returns undef when no configuration is found
+### 1. New() Returns Undef When No Configuration Is Found
 
 `new()` returns `undef`, not a blessed object, when no configuration data is
 found and no `data` argument was supplied.  Every caller must check the return value.
 
-    my $cfg = Config::Abstraction->new(config_dirs => ['/etc/myapp']);
-    die "No configuration found" unless defined $cfg;
-    my $host = $cfg->get('database.host');   # safe
+```perl
+my $cfg = Config::Abstraction->new(config_dirs => ['/etc/myapp']);
+die "No configuration found" unless defined $cfg;
+my $host = $cfg->get('database.host');   # safe
+```
 
 Forgetting the check leads to a cryptic "Can't call method on undef" error later,
 with a stack trace that points to `get()` rather than to the missing config file.
 
-## 2. merge\_defaults() requires a named argument, not a bare hashref
+### 2. Merge\_Defaults() Requires a Named Argument, Not a Bare Hashref
 
-    # WRONG -- Params::Get fast-path returns the whole config unchanged
-    my $merged = $cfg->merge_defaults(\%my_defaults);
+```perl
+# WRONG -- Params::Get fast-path returns the whole config unchanged
+my $merged = $cfg->merge_defaults(\%my_defaults);
 
-    # RIGHT
-    my $merged = $cfg->merge_defaults(defaults => \%my_defaults);
+# RIGHT
+my $merged = $cfg->merge_defaults(defaults => \%my_defaults);
+```
 
 With the first form, `Params::Get` treats the single hashref as the entire
 parameter bag and returns the full config without merging anything.
 
-## 3. Shallow merge in merge\_defaults() silently drops nested keys from defaults
+### 3. Shallow Merge in Merge\_Defaults() Silently Drops Nested Keys From Defaults
 
 Without `merge => 1`, `merge_defaults()` uses a plain Perl hash merge
 (`{ %defaults, %config }`) at the top level.  If the config contains a nested hash
 for a key, it entirely replaces the corresponding nested hash in your defaults - any
 keys that exist only in the defaults' nested hash are silently discarded.
 
-    my $cfg = Config::Abstraction->new(
-        data        => { db => { host => 'localhost', port => 5432 } },
-        config_dirs => [],
-    );
+```perl
+my $cfg = Config::Abstraction->new(
+    data        => { db => { host => 'localhost', port => 5432 } },
+    config_dirs => [],
+);
 
-    my $merged = $cfg->merge_defaults(defaults => { db => { user => 'guest' } });
-    # $merged->{db}{user} is UNDEF -- the whole 'db' hash was replaced by the config's version
+my $merged = $cfg->merge_defaults(defaults => { db => { user => 'guest' } });
+# $merged->{db}{user} is UNDEF -- the whole 'db' hash was replaced by the config's version
 
-    # To combine nested keys from both sides, pass merge => 1:
-    my $merged = $cfg->merge_defaults(defaults => { db => { user => 'guest' } }, merge => 1);
-    # $merged->{db}{user} is 'guest', $merged->{db}{host} is 'localhost'
+# To combine nested keys from both sides, pass merge => 1:
+my $merged = $cfg->merge_defaults(defaults => { db => { user => 'guest' } }, merge => 1);
+# $merged->{db}{user} is 'guest', $merged->{db}{host} is 'localhost'
+```
 
-## 4. undef from a higher-priority source permanently wins
+### 4. Undef From a Higher-Priority Source Permanently Wins
 
 `Hash::Merge` LEFT\_PRECEDENT means that an explicit `undef` (YAML `~`) in a
 higher-priority source overrides a real value in a lower-priority source, including
 when the lower-priority value is defined.
 
-    # base.yaml:  timeout: 30
-    # local.yaml: timeout: ~
+```perl
+# base.yaml:  timeout: 30
+# local.yaml: timeout: ~
 
-    my $t = $cfg->get('timeout');   # undef -- local.yaml's null wins over base.yaml
+my $t = $cfg->get('timeout');   # undef -- local.yaml's null wins over base.yaml
+```
 
 This is intentional: it lets a local config deliberately unset a value.  If you
 want to detect whether a key was explicitly nulled versus simply absent, use
 `explain_sources()` and inspect the `sources` list.
 
-## 5. Double underscore vs. single underscore in environment variable names
+### 5. Double Underscore vs. Single Underscore in Environment Variable Names
 
 Single underscores are part of the key name; double underscores create a nesting level.
 
-    APP_LOG_LEVEL=debug       => key 'log_level'   (single underscore, flat key)
-    APP_DATABASE__HOST=db     => key 'database.host' (double underscore, nested)
-    APP_API__RATE_LIMIT=100   => key 'api.rate_limit' (double underscore + single)
+```perl
+APP_LOG_LEVEL=debug       => key 'log_level'   (single underscore, flat key)
+APP_DATABASE__HOST=db     => key 'database.host' (double underscore, nested)
+APP_API__RATE_LIMIT=100   => key 'api.rate_limit' (double underscore + single)
+```
 
 A common mistake is using single underscores expecting nested keys:
 
-    APP_DATABASE_HOST=db   # produces key 'database_host', NOT 'database.host'
+```
+APP_DATABASE_HOST=db   # produces key 'database_host', NOT 'database.host'
+```
 
-## 6. Using AUTOLOAD requires sep\_char set to '\_'
+### 6. Using AUTOLOAD Requires Sep\_Char Set to '\_'
 
 AUTOLOAD translates method names to config keys using `sep_char`.  The default
 `sep_char` is `'.'`, but method names cannot contain dots.  Set `sep_char => '_'`
 to use AUTOLOAD, and be aware that this makes single underscores into hierarchy separators.
 
-    my $cfg = Config::Abstraction->new(
-        data    => { database => { host => 'localhost' } },
-        sep_char => '_',
-        config_dirs => [],
-    );
-    my $host = $cfg->database_host();   # works
-    my $bad  = $cfg->no_such_key();    # dies: No such config key 'no_such_key'
+```perl
+my $cfg = Config::Abstraction->new(
+    data    => { database => { host => 'localhost' } },
+    sep_char => '_',
+    config_dirs => [],
+);
+my $host = $cfg->database_host();   # works
+my $bad  = $cfg->no_such_key();    # dies: No such config key 'no_such_key'
+```
 
-## 7. Absolute config\_file paths require an empty or omitted config\_dirs
+### 7. Absolute Config\_File Paths Require an Empty or Omitted Config\_Dirs
 
 On Unix, `File::Spec->catfile('/etc', '/absolute/path.yaml')` concatenates the
 two strings instead of letting the absolute path take over, producing a wrong path.
@@ -1264,16 +1401,18 @@ When `config_file` is an absolute path, either omit `config_dirs` entirely
 (the constructor sets it to `['']` automatically) or pass `config_dirs => ['']`
 explicitly.
 
-    # WRONG on Unix -- produces '/etc/etc/myapp/app.yaml'
-    Config::Abstraction->new(
-        config_file => '/etc/myapp/app.yaml',
-        config_dirs => ['/etc'],
-    );
+```perl
+# WRONG on Unix -- produces '/etc/etc/myapp/app.yaml'
+Config::Abstraction->new(
+    config_file => '/etc/myapp/app.yaml',
+    config_dirs => ['/etc'],
+);
 
-    # RIGHT
-    Config::Abstraction->new( config_file => '/etc/myapp/app.yaml' );
+# RIGHT
+Config::Abstraction->new( config_file => '/etc/myapp/app.yaml' );
+```
 
-## 8. Tests must isolate from the developer's real config files
+### 8. Tests Must Isolate From the Developer's Real Config Files
 
 A call to `new()` without `config_dirs` will scan `/etc`, `~/.conf`,
 `~/.config`, and other default locations and load any `base.yaml` or
@@ -1282,19 +1421,21 @@ configuration into your test object, causing non-deterministic failures.
 
 Always pass `config_dirs => []` in tests that use only in-memory `data`:
 
-    my $cfg = Config::Abstraction->new(
-        data        => { key => 'value' },
-        config_dirs => [],              # do not scan the filesystem
-    );
+```perl
+my $cfg = Config::Abstraction->new(
+    data        => { key => 'value' },
+    config_dirs => [],              # do not scan the filesystem
+);
+```
 
-## 9. lazy => 1 defers errors until the first accessor call
+### 9. Lazy => 1 Defers Errors Until the First Accessor Call
 
 With `lazy => 1`, `new()` always returns a blessed object - it cannot return
 `undef` for a missing config, and any schema validation errors surface at the first
 `get()` or `all()` call rather than at construction time.  See the `lazy`
 option documentation in ["new"](#new) for the full list of debugging implications.
 
-# VERSION HISTORY
+## Version History
 
 Notable changes by release.  Full details are in the `Changes` file.
 
@@ -1373,7 +1514,7 @@ Notable changes by release.  Full details are in the `Changes` file.
 
     First release.
 
-# LIMITATIONS
+## Limitations
 
 - **No separator escaping**
 
@@ -1406,18 +1547,18 @@ Notable changes by release.  Full details are in the `Changes` file.
     `File::Slurp::Remote` module is installed.  Without it, remote directories are
     skipped entirely regardless of file format.
 
-# BUGS
+## Bugs
 
 It should be possible to escape the separator character either with backslashes or quotes.
 
 Due to the case-insensitive nature of environment variables on Windows,
 it may be challenging to override values using environment variables on that platform.
 
-# REPOSITORY
+## Repository
 
 [https://github.com/nigelhorne/Config-Abstraction](https://github.com/nigelhorne/Config-Abstraction)
 
-# SUPPORT
+## Support
 
 This module is provided as-is without any warranty.
 
@@ -1429,14 +1570,18 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Config::Abstraction
+```
+perldoc Config::Abstraction
+```
 
-# SEE ALSO
+## See Also
 
 - [File::Slurp::Remote](https://metacpan.org/pod/File%3A%3ASlurp%3A%3ARemote)
 
-        Used to fetch configuration from remote hosts when C<config_dirs> contains
-        Newcastle Connection paths (C</../hostname/path>).
+    ```
+    Used to fetch configuration from remote hosts when C<config_dirs> contains
+    Newcastle Connection paths (C</../hostname/path>).
+    ```
 
 - [Config::Any](https://metacpan.org/pod/Config%3A%3AAny)
 - [Config::Auto](https://metacpan.org/pod/Config%3A%3AAuto)
@@ -1449,44 +1594,52 @@ You can find documentation for this module with the perldoc command.
 - [Test Dashboard](https://nigelhorne.github.io/Config-Abstraction/coverage/)
 - Development version on GitHub [https://github.com/nigelhorne/Config-Abstraction](https://github.com/nigelhorne/Config-Abstraction)
 
-# AUTHOR
+## Author
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
-# FORMAL SPECIFICATION
+## Formal Specification
 
-## get
+### Get
 
-    get : Config x Key → Value ∪ {⊥}
-    get(c, k) ≜ if k = ⊥ then ⊥
-                else lookup(c.config, split(c.sep_char, k))
-    lookup(h, [])      ≜ h
-    lookup(h, p:rest)  ≜ if p ∉ dom(h) then ⊥
-                          else lookup(h[p], rest)
+```
+get : Config x Key → Value ∪ {⊥}
+get(c, k) ≜ if k = ⊥ then ⊥
+            else lookup(c.config, split(c.sep_char, k))
+lookup(h, [])      ≜ h
+lookup(h, p:rest)  ≜ if p ∉ dom(h) then ⊥
+                      else lookup(h[p], rest)
+```
 
-## encrypt\_value
+### Encrypt\_Value
 
-    encrypt_value : Config x Plaintext → Token
-    encrypt_value(c, p) ≜
-      let k  = resolve_key(c)  where k ≠ ⊥
-      let n  ~ Uniform(Bytes^12)            -- fresh random nonce
-      let ct = AES256GCM_enc(k, n, p)
-      let t  = GCM_tag(k, n, p)
-      in "ENC[AES256GCM," || base64url(n || ct || t) || "]"
+```
+encrypt_value : Config x Plaintext → Token
+encrypt_value(c, p) ≜
+  let k  = resolve_key(c)  where k ≠ ⊥
+  let n  ~ Uniform(Bytes^12)            -- fresh random nonce
+  let ct = AES256GCM_enc(k, n, p)
+  let t  = GCM_tag(k, n, p)
+  in "ENC[AES256GCM," || base64url(n || ct || t) || "]"
+```
 
-## exists
+### Exists
 
-    exists : Config x Key → {0, 1}
-    exists(c, k) ≜ if k = ⊥ then 0
-                   else 1 if lookup(c.config, split(c.sep_char, k)) ≠ ⊥
-                   else 0
+```
+exists : Config x Key → {0, 1}
+exists(c, k) ≜ if k = ⊥ then 0
+               else 1 if lookup(c.config, split(c.sep_char, k)) ≠ ⊥
+               else 0
+```
 
-## all
+### All
 
-    all : Config → HashRef ∪ {⊥}
-    all(c) ≜ if |dom(c.config)| = 0 then ⊥ else c.config
+```
+all : Config → HashRef ∪ {⊥}
+all(c) ≜ if |dom(c.config)| = 0 then ⊥ else c.config
+```
 
-# LICENCE AND COPYRIGHT
+## Licence and Copyright
 
 Copyright 2025-2026 Nigel Horne.
 

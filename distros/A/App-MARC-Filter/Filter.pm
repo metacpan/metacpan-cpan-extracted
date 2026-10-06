@@ -16,7 +16,7 @@ use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Leader;
 use MARC::Leader::Utils 0.02 qw(check_material_type  material_type);
 use Readonly;
-use Unicode::UTF8 qw(encode_utf8 decode_utf8);
+use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
 Readonly::Array our @OUTPUT_FORMATS => qw(ascii xml);
 Readonly::Array our @CONTROL_FIELDS => qw(001 003 005 006 007 008);
@@ -25,7 +25,7 @@ Readonly::Array our @FIELD_008_METHODS => qw(cataloging_source date1 date2
 	type_of_date);
 Readonly::Array our @FIELD_008_DATE_METHODS => qw(date1 date2);
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 $| = 1;
 
@@ -126,18 +126,15 @@ sub run {
 		}
 		return 1;
 	}
-	my ($marc_batch, $stream);
+	my $stream;
 	if ($self->{'_marc_file'} =~ m/\.xml/ms) {
 		$stream = 'XML';
-		$marc_batch = eval {
-			MARC::Batch->new('XML', $fh);
-		};
 	} else {
 		$stream = 'USMARC';
-		$marc_batch = eval {
-			MARC::Batch->new('USMARC', $fh);
-		};
 	}
+	my $marc_batch = eval {
+		MARC::Batch->new($stream, $fh);
+	};
 	if ($EVAL_ERROR) {
 		print STDERR "Cannot open MARC $stream stream.\n";
 		print STDERR "\tError: $EVAL_ERROR\n";
@@ -789,7 +786,7 @@ L<https://github.com/michal-josef-spacek/App-MARC-Filter>
 
 =head1 AUTHOR
 
-Michal Josef Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:michal.josef.spacek@gmail.com>
 
 L<http://skim.cz>
 
@@ -808,6 +805,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

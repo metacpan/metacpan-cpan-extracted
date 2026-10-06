@@ -89,7 +89,10 @@ subtest 'mark 2: one tick against the closed forms; the frictionless drift; ROLL
 	ok abs(($x_end - 0.5) - (1.0 * $dt - $dec * $dt * $dt / 2)) < 1e-12, 'one tick moves it v dt - mu g dt^2 / 2, to 1e-12';
 	ok abs($v_end - (1.0 - $dec * $dt)) < 1e-12, 'one tick slows it by mu g dt, to 1e-12';
 	is $out->{state}[0][5], 2, 'ROLLING at the cut';
-	is $out->{t}, 0.02, 'the outcome ends at the horizon';
+	# the double the engine divided, against the double 0.02 rounds to: `is`
+	# on the numbers would compare an NV wider than a double against the
+	# engine's, and a long double spells the horizon with four more digits
+	is hexof($out->{t}), hexof($dt), 'the outcome ends at the horizon';
 	my @row = (9, 50000, 100000, 0, 5000, 0);
 	for (1 .. 100) {
 		my $o = $frictionless->engine->advance([ [@row] ], { t => 20000 });
@@ -109,23 +112,41 @@ subtest 'mark 2: one tick against the closed forms; the frictionless drift; ROLL
 subtest 'mark 3: an event at exactly the horizon belongs to the next call' => sub {
 	plan tests => 3;
 	# a dyadic world: radius 1/16, a wall at 1, a horizon of half a second, a
-	# speed and a distance whose products with 1e-5 are exact, so the root is
-	# the same double as the horizon; on the rink itself every such root lands
-	# a few ulps under 0.02 (plan_air_hockey/01, Results 7)
+	# speed and a distance chosen so the root is the same double as the
+	# horizon; on the rink itself every such root lands a few ulps under 0.02
+	# (plan_air_hockey/01, Results 7).
+	#
+	# Which pair that is, the ENGINE says: the root is a double it divides out
+	# of row * 1e-5, and 1e-5 is not dyadic, so predicting the pair in Perl
+	# predicts it in the NV this perl was built with. A long double rounds
+	# 81250 * 1e-5 to 0.8125 where a double does not, picks that pair, and
+	# then the engine's own root is four ulps under the horizon and the first
+	# call rightly takes the event. So run each candidate past the wall, under
+	# a horizon long enough that the contact is strictly inside, and keep the
+	# one the engine times at exactly half a second. 500000 / 1e6 is 0.5 in
+	# every precision, and the engine's doubles reach an NV unchanged, so the
+	# pair is the same pair on every build.
 	my ($found, $horizon) = (undef, 500000 / 1e6);
+	my $dyadic = sub {
+		my ($r) = @_;
+		return Physics::Balls::World->new(L => 2, W => 1, R => $r, g => 9.81, mu => { s => 0, r => 0, sp => 0.044 },
+			e => { bb => 0.9, c => 0.85, cf => 0, rc => 1 }, vmax => 8, kinds => [ { r => $r, m => 1, mu => 1, follow => 0 } ],
+			walls => [ [1, 0, 1, 2] ], noses => [], gates => []);
+	};
 	for my $r (0.0625, 0.125, 0.25) {
 		for my $v (25000, 50000, 100000, 200000) {
-			my $dist = $v / 2;
-			my $cx = 100000 - int($r * 1e5 + 0.5) - $dist;
-			next unless $v * 1e-5 == $v / 1e5 && $cx * 1e-5 == $cx / 1e5;
-			my $s0 = -1 * ($cx * 1e-5 - 1.0) + 0 * (1.0 - 0) - $r;
-			$found = { r => $r, v => $v, cx => $cx } if $s0 / ($v * 1e-5) == $horizon && !$found;
+			last if $found;
+			my $ru = int($r * 1e5 + 0.5);
+			my $cx = 100000 - $ru - int($v / 2);
+			next if $cx <= $ru;
+			my $w = $dyadic->($r);
+			my $o = $w->engine->advance([ [9, $cx, 100000, 0, $v, 0] ], { t => 1000000 });
+			my ($ev) = grep { $_->[1] eq 'wall' } @{ $o->{events} };
+			$found = { r => $r, v => $v, cx => $cx, world => $w } if $ev && $ev->[0] == $horizon;
 		}
 	}
 	ok $found, 'a dyadic pair meets the wall at exactly the horizon' or return;
-	my $dw = Physics::Balls::World->new(L => 2, W => 1, R => $found->{r}, g => 9.81, mu => { s => 0, r => 0, sp => 0.044 },
-		e => { bb => 0.9, c => 0.85, cf => 0, rc => 1 }, vmax => 8, kinds => [ { r => $found->{r}, m => 1, mu => 1, follow => 0 } ],
-		walls => [ [1, 0, 1, 2] ], noses => [], gates => []);
+	my $dw = $found->{world};
 	my $o1 = $dw->engine->advance([ [9, $found->{cx}, 100000, 0, $found->{v}, 0] ], { t => 500000 });
 	my $o2 = $dw->engine->advance([ [9, $o1->{state}[0][1], $o1->{state}[0][2], 0, $o1->{state}[0][3], $o1->{state}[0][4]] ], { t => 500000 });
 	ok !(grep { $_->[1] eq 'wall' } @{ $o1->{events} }), 'the call ending at the horizon does not take the event';

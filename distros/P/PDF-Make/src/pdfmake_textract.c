@@ -958,6 +958,37 @@ static int cmp_glyph_position(const void *a, const void *b) {
 /* Histogram bin size for column-gutter detection, in user-space points */
 #define COLUMN_BIN_SIZE 5.0
 
+/* Distinct baselines among glyphs lying within [x_from, x_to], capped — the
+ * caller only ever asks "more than one?".
+ *
+ * The occupancy threshold below counts a bin as empty unless two glyphs cover
+ * it, so on a sparse page the letters of one big heading read as whitespace and
+ * a 20pt stretch between two of them looks like a gutter. A real gutter has
+ * text on both sides of it on several lines; one heading's worth of glyphs
+ * spans a single baseline, which is what tells the two apart. */
+#define COLUMN_BASELINE_TOL 1.0
+#define COLUMN_BASELINE_MAX 8
+
+static int count_baselines(const pdfmake_text_glyph_t *glyphs, size_t n,
+                           double x_from, double x_to)
+{
+    double seen[COLUMN_BASELINE_MAX];
+    int count = 0;
+    size_t i;
+    int j;
+
+    for (i = 0; i < n; i++) {
+        const pdfmake_text_glyph_t *g = &glyphs[i];
+        if (g->x0 < x_from || g->x1 > x_to) continue;
+        for (j = 0; j < count; j++)
+            if (fabs(seen[j] - g->y0) <= COLUMN_BASELINE_TOL) break;
+        if (j < count) continue;
+        if (count >= COLUMN_BASELINE_MAX) return count;
+        seen[count++] = g->y0;
+    }
+    return count;
+}
+
 static void detect_column_splits_in_range(
     const pdfmake_text_glyph_t *glyphs, size_t n,
     double x_lo, double x_hi,
@@ -978,6 +1009,8 @@ static void detect_column_splits_in_range(
     size_t min_gutter_bins;
     size_t active_left;
     size_t active_right;
+    double gutter_lo;
+    double gutter_hi;
     if (*out_count >= max_count) return;
     if (x_hi - x_lo < 100) return;
 
@@ -1056,7 +1089,13 @@ static void detect_column_splits_in_range(
             if (hist[i] >= empty_thr) active_left++;
         for (i = best_start + best_run; i < n_bins; i++)
             if (hist[i] >= empty_thr) active_right++;
-        if (active_left >= 4 && active_right >= 4) {
+
+        gutter_lo = x_lo + best_start * COLUMN_BIN_SIZE;
+        gutter_hi = x_lo + (best_start + best_run) * COLUMN_BIN_SIZE;
+
+        if (active_left >= 4 && active_right >= 4 &&
+            count_baselines(glyphs, n, x_lo, gutter_lo) >= 2 &&
+            count_baselines(glyphs, n, gutter_hi, x_hi) >= 2) {
             double mid_x = x_lo + (best_start + best_run / 2.0) * COLUMN_BIN_SIZE;
 
             int pos = *out_count;

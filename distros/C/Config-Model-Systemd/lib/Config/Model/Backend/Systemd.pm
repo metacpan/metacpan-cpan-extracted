@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd ;
-$Config::Model::Backend::Systemd::VERSION = '0.261.2';
+$Config::Model::Backend::Systemd::VERSION = '0.261.3';
 use strict;
 use warnings;
 use 5.020;
@@ -233,7 +233,7 @@ Config::Model::Backend::Systemd - R/W backend for systemd configurations files
 
 =head1 VERSION
 
-version 0.261.2
+version 0.261.3
 
 =head1 SYNOPSIS
 

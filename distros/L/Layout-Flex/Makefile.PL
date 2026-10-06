@@ -4,17 +4,31 @@ use warnings;
 use Config;
 use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
-use File::Path qw(make_path);
-
-make_path('lib/Font/Metrics/Install');
 
 my $dep  = ExtUtils::Depends->new('Layout::Flex', 'Font::Metrics');
 my %deps = $dep->get_makefile_vars;
 
-# Find Font::Metrics' static archive so Linux's ld can resolve fm_* symbols
-# at link time (macOS uses -undefined dynamic_lookup; Linux does not).
+# Locate the INSTALLED Font::Metrics header and static archive. The -I paths
+# ExtUtils::Depends carries over from Font::Metrics 0.03 point at that
+# distribution's own build tree, which a CPAN client has usually deleted by
+# the time this builds, so fm.h has to be found under @INC instead: beside
+# Install/Files.pm from 1.00 on, under Font/Metrics/include in 0.03.
+my $fm_inc;
+for my $inc (@INC) {
+    next if ref $inc;
+    for my $rel ('Font/Metrics/Install', 'Font/Metrics/include') {
+        if (-f "$inc/$rel/fm.h") { $fm_inc = "$inc/$rel"; last; }
+    }
+    last if $fm_inc;
+}
+die "Cannot find the Font::Metrics header (fm.h) under \@INC.\n"
+  . "Install Font::Metrics >= 0.03 first.\n" unless $fm_inc;
+
+# The static archive lets Linux's ld resolve fm_* symbols at link time
+# (macOS uses -undefined dynamic_lookup; Linux does not).
 my $fm_lib;
 for my $inc (@INC) {
+    next if ref $inc;
     my $p = "$inc/auto/Font/Metrics/libfm$Config{_a}";
     if (-f $p) { $fm_lib = $p; last; }
 }
@@ -28,17 +42,17 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Layout/Flex.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.008003',
-    INC              => join(' ', '-I. -Iinclude', $deps{INC} // ()),
+    INC              => join(' ', '-I. -Iinclude', "-I$fm_inc", $deps{INC} // ()),
     LDFROM           => "Flex\$(OBJ_EXT) $fm_lib",
     XS               => { 'Flex.xs' => 'Flex.c' },
     macro            => { TARFLAGS => '--format=ustar -c -v -f' },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0',
-        'Font::Metrics' => '0.03',
+        'Font::Metrics' => '1.01',
     },
     PREREQ_PM => {
-        'Font::Metrics' => '0.03',
+        'Font::Metrics' => '1.01',
     },
     TEST_REQUIRES => {
         'Test::More'               => '0',

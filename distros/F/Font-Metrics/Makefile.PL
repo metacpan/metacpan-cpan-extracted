@@ -4,15 +4,18 @@ use warnings;
 use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
 use File::Path qw(make_path);
-use Cwd qw(abs_path);
 use Config;
 
 make_path('lib/Font/Metrics/Install');
 
 my @c_src = sort glob('fm_*.c');
 
+# Record no -I paths for dependents: anything absolute here is this build
+# tree, which is gone by the time a dependent compiles. fm.h is installed
+# beside Install/Files.pm instead, and ExtUtils::Depends adds -I for that
+# directory automatically.
 my $pkg = ExtUtils::Depends->new('Font::Metrics');
-$pkg->set_inc(join ' ', map { "-I$_" } abs_path('.'), abs_path('include'));
+$pkg->set_inc('');
 $pkg->set_libs('');
 $pkg->add_c(@c_src);
 $pkg->save_config('lib/Font/Metrics/Install/Files.pm');
@@ -29,7 +32,7 @@ my %WriteMakefileArgs = (
     macro            => { TARFLAGS => '--format=ustar -c -v -f' },
     CCFLAGS          => "$Config{ccflags}",
     XS               => { 'Metrics.xs' => 'Metrics.c' },
-    INC              => $deps{INC},
+    INC              => '-I. -Iinclude',
     C                => ['Metrics.c', @c_src],
     OBJECT           => join(' ', 'Metrics$(OBJ_EXT)',
                                   map { (my $o = $_) =~ s/\.c$/\$(OBJ_EXT)/; $o }
@@ -46,7 +49,7 @@ my %WriteMakefileArgs = (
     PM    => {
         'lib/Font/Metrics.pm'               => '$(INST_LIB)/Font/Metrics.pm',
         'lib/Font/Metrics/Install/Files.pm' => '$(INST_LIB)/Font/Metrics/Install/Files.pm',
-        'include/fm.h'                      => '$(INST_LIB)/Font/Metrics/include/fm.h',
+        'include/fm.h'                      => '$(INST_LIB)/Font/Metrics/Install/fm.h',
         'fm_metrics.c'                      => '$(INST_LIB)/Font/Metrics/src/fm_metrics.c',
         'fm_std14.c'                        => '$(INST_LIB)/Font/Metrics/src/fm_std14.c',
         'fm_truetype.c'                     => '$(INST_LIB)/Font/Metrics/src/fm_truetype.c',

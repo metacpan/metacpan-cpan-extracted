@@ -826,6 +826,35 @@ pdfmake_err_t pdfmake_text_Tj_cstr(pdfmake_content_t *c, const char *str)
     return pdfmake_text_Tj(c, (const uint8_t *)str, strlen(str));
 }
 
+/* Tj with the operand written as a hex string.
+ *
+ * A composite font under Identity-H is shown two bytes per glyph, and those
+ * bytes are glyph ids, not text: half of them are NUL for any Latin subset.
+ * A literal string can carry them, but it puts raw NULs and escapes into a
+ * content stream that other passes here read and rewrite. Hex keeps the
+ * stream printable at the cost of one byte per nibble. */
+pdfmake_err_t pdfmake_text_Tj_hex(pdfmake_content_t *c,
+                                  const uint8_t *str, size_t len)
+{
+    static const char hexdig[] = "0123456789ABCDEF";
+    pdfmake_buf_t *buf;
+    size_t i;
+
+    if (!c || !str) return PDFMAKE_EINVAL;
+    buf = &c->buf;
+
+    if (pdfmake_buf_append_byte(buf, '<') != PDFMAKE_OK) return PDFMAKE_EINVAL;
+    for (i = 0; i < len; i++) {
+        if (pdfmake_buf_append_byte(buf, hexdig[str[i] >> 4]) != PDFMAKE_OK)
+            return PDFMAKE_EINVAL;
+        if (pdfmake_buf_append_byte(buf, hexdig[str[i] & 0x0F]) != PDFMAKE_OK)
+            return PDFMAKE_EINVAL;
+    }
+    if (pdfmake_buf_append_byte(buf, '>') != PDFMAKE_OK) return PDFMAKE_EINVAL;
+    if (append_space(buf) != PDFMAKE_OK) return PDFMAKE_EINVAL;
+    return append_op(buf, "Tj");
+}
+
 pdfmake_err_t pdfmake_text_TJ(pdfmake_content_t *c, pdfmake_obj_t *array)
 {
     pdfmake_buf_t *buf;

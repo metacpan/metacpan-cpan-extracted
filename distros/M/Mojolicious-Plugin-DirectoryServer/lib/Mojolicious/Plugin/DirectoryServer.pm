@@ -2,11 +2,12 @@ use v5.32;
 
 package Mojolicious::Plugin::DirectoryServer;
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 use Cwd ();
 use Encode ();
 use DirHandle;
+use Mojo::Path;
 use Mojo::Base qw( Mojolicious::Plugin -signatures );
 use Mojo::JSON qw(encode_json);
 use Mojolicious::Types;
@@ -57,40 +58,50 @@ sub register {
     my $index      = $args->{dir_index};
     my $auto_index = $args->{auto_index} // 1;
     my $json       = $args->{json};
+    my $router     = $args->{router} // $app->routes;
     $dir_page = $args->{dir_page} if ( $args->{dir_page} );
 
-    $app->hook(
-        before_dispatch => sub {
-            my $c = shift;
-            return render_file( $c, $root, $handler ) if ( -f $root->to_string() );
-
-			if( $c->req->url->path =~ m"\Q/..\E(/|\z)"n ) {
-				$c->reply->not_found;
-				return;
+    $router->get(
+        '/*filepath' => { filepath => '/' } => sub ($c) {
+            if ( -f $root->to_string ) {
+                return render_file( $c, $root, $handler );
             }
 
-            my $path = $root->rel_file( Mojo::Util::url_unescape( $c->req->url->path ) );
-            if ( -f $path ) {
-                render_file( $c, $path, $handler );
+            my $path = Mojo::Path
+                ->new( Mojo::Util::url_unescape( $c->param('filepath') ) )
+                ->canonicalize;
+
+            if ( $path =~ m"^\Q..\E(/|\z)"n ) {
+                $c->reply->not_found;
+                return;
             }
-            elsif ( -d $path ) {
-                if ( $index && ( my $index_path = locate_index( $index, $path ) ) ) {
+
+            my $full_path = $root->child($path);
+
+            if ( -f $full_path ) {
+                render_file( $c, $full_path, $handler );
+                return;
+            }
+            elsif ( -d $full_path ) {
+                if ( $index && ( my $index_path = locate_index( $index, $full_path ) ) ) {
                     return render_file( $c, $index_path, $handler );
                 }
 
-                if ( $c->req->url->path ne '/' && ! $c->req->url->path->trailing_slash ) {
+                if ( $path ne '/' && ! $c->req->url->path->trailing_slash ) {
                     $c->redirect_to($c->req->url->path->trailing_slash(1));
                     return;
                 }
 
                 if( $auto_index ) {
-                    render_indexes( $c, $path, $json );
-                } else {
-                    $c->reply->not_found;
+                    render_indexes( $c, $full_path, $json );
+                    return;
                 }
             }
+
+            return $c->reply->not_found;
         },
     );
+
     return $app;
 }
 
@@ -180,7 +191,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::DirectoryServer - Serve static files from document root with directory index
+Mojolicious::Plugin::DirectoryServer - Serve static files from arbitrary paths with directory index
 
 =head1 SYNOPSIS
 
@@ -201,9 +212,22 @@ Mojolicious::Plugin::DirectoryServer - Serve static files from document root wit
       }
   })->start;
 
+  # more than once
+  use Mojolicious::Lite;
+
+  plugin 'DirectoryServer',
+      router => app->routes->under('docs'),
+      root   => "/path/to/htdocs";
+
+  plugin 'DirectoryServer',
+      router => app->routes->under('images'),
+      root   => "/path/to/images";
+
+  app->start;
+
 or
 
-  > perl -Mojo -E 'a->plugin("DirectoryServer", root => "/path/to/htdocs")->start' daemon
+  > perl -Mojo -E 'plugin("DirectoryServer", root => "/path/to/htdocs")->start' daemon
 
 or
 
@@ -283,6 +307,16 @@ If not rendered in CODEREF, serve as static file.
   plugin DirectoryServer => { json => 1 };
 
 Enable json response.
+
+=item * C<router>
+
+  # Mojolicious::Lite
+  plugin DirectoryServer => { router => app->routes->under('browse') };
+
+Specify the router under which the directory will be served.
+
+Defaults to the root router, which means the directory will be served
+from C</>.
 
 =back
 

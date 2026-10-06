@@ -14,7 +14,7 @@ eg/grooves.pl
 eg/list_devices.pl
 eg/no-fills.pl
 eg/odd-meter.pl
-eg/save-it.pl
+eg/save-it-weighted.pl
 eg/user-defined.pl
 lib/Music/SimpleDrumMachine.pm
 t/00-compile.t

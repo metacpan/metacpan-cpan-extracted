@@ -55,6 +55,7 @@ sub _font {
         bold        => $override->{bold}        // $base->bold,
         italic      => $override->{italic}      // $base->italic,
         line_height => $override->{line_height} // $base->effective_line_height,
+        registry    => $base->registry,
     );
 }
 
@@ -93,11 +94,12 @@ sub text {
     my $y = $args{y};
     $y = $self->_default_baseline_y($size) unless defined $y;
 
+    my $tj = $font->show_op;
     $self->canvas->BT
           ->rg($r, $g, $b)
           ->Tf($res, $size)
           ->Tm(1, 0, 0, 1, $x, $y)
-          ->Tj($txt)
+          ->$tj($font->encode($txt))
           ->ET;
     return $self;
 }

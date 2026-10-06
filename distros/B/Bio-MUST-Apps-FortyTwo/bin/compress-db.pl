@@ -130,7 +130,7 @@ compress-db.pl - Post-process assembler for transcript enrichment using 42
 
 =head1 VERSION
 
-version 0.213470
+version 0.262780
 
 =head1 USAGE
 
@@ -155,6 +155,8 @@ Path to input tax-report files.
 =back
 
 =head1 OPTIONAL ARGUMENTS
+
+=over
 
 =item --cap3-o=<n>
 

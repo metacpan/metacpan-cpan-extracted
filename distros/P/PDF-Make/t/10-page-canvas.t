@@ -7,9 +7,11 @@ use Test::More tests => 20;
 use_ok('PDF::Make::Page', ':fonts');
 use_ok('PDF::Make::Canvas', ':all');
 
-# Test Page font constants
-is(TIMES_ROMAN(),   0, 'TIMES_ROMAN constant');
-is(HELVETICA(),     4, 'HELVETICA constant');
+# Test Page font constants. These are indices into the C std14 table, so the
+# only assertion worth making is that they match it; a hand-written number
+# here is what put Helvetica at 4 and drew it as Times-Roman.
+is(HELVETICA(),     0, 'HELVETICA constant');
+is(TIMES_ROMAN(),   4, 'TIMES_ROMAN constant');
 is(COURIER(),       8, 'COURIER constant');
 is(SYMBOL(),        12, 'SYMBOL constant');
 is(ZAPFDINGBATS(),  13, 'ZAPFDINGBATS constant');

@@ -6,7 +6,7 @@ SimpleFlow - easy, simple workflow manager (and logger); for keeping track of an
 
 =head1 VERSION
 
-version 0.193
+version 0.194
 
 =head1 DESCRIPTION
 
@@ -1786,8 +1786,9 @@ any failed, as Snakemake's C<--keep-going> does. Under C<< die =E<gt> 0 >> a fai
 is only a record with C<< will.do =E<gt> "FAILED" >>, and C<parallel> returns.
 
 A C<TERM>, C<HUP>, C<INT> or C<QUIT> sent to your script while C<parallel> runs is
-passed to every running step as C<TERM>, which each passes to its command; once
-they have ended, the signal is passed on to your script.
+passed to every running step, which passes it to its command; once they have
+ended, the signal is passed on to your script. A signal your script ignores
+stays ignored, by C<parallel> and by the commands.
 
 C<jobs> above 1 needs a real C<fork()>, so it is refused on C<MSWin32>, where perl
 emulates one with threads. C<< jobs =E<gt> 1 >> runs the steps one after another, and

@@ -1,20 +1,19 @@
 package Sub::Protected;
 
-# Minimum Perl version: 5.8 (Attribute::Handlers became core in 5.8)
-use 5.008;
+# Minimum Perl version: 5.10 (the // operator; several dependencies need it).
+# Loading after CHECK (require, string eval) also needs 5.14: see LIMITATIONS.
+use 5.010;
 use strict;
 use warnings;
-use autodie qw(:all);
 
-use Carp              qw(croak carp);
+use Carp              qw(croak);
 use Attribute::Handlers;
 use Readonly;
-use Scalar::Util      qw(blessed);
 use Params::Get       qw(get_params);
 use Params::Validate::Strict 0.33 qw(validate_strict);
 use Return::Set       qw(set_return);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # Public bypass flag.  Set to a true value to disable all access checks.
 # Use C<local $Sub::Protected::BYPASS = 1> in test code; see BYPASS section.
@@ -46,18 +45,50 @@ my @_pending;
 
 # Set to 1 when the CHECK block fires.  Import() uses this to decide
 # whether to schedule wrapping (pre-CHECK) or wrap immediately (post-CHECK).
-my $_post_check = 0;
+# If this module is itself loaded after CHECK (run-time require, plugin
+# loader, string eval) our CHECK block never runs, so start from the global
+# phase.  ${^GLOBAL_PHASE} exists from Perl 5.14; on older Perls it is undef
+# and the flag starts at 0, so the module must be loaded at compile time.
+my $_post_check = (defined(${^GLOBAL_PHASE}) && ${^GLOBAL_PHASE} ne 'START') ? 1 : 0;
 
 # -------------------------------------------------------------------
 # ATTRIBUTE HANDLER
 # -------------------------------------------------------------------
 
+# Another module may already own UNIVERSAL::Protected (a :Protected attribute
+# of its own).  Redefining it would silently change that module's behaviour,
+# so say so loudly.  This runs before the sub below is compiled.
+BEGIN {
+	Carp::carp(__PACKAGE__ . ": UNIVERSAL::Protected is already defined; another module's :Protected attribute will be replaced")
+		if defined &UNIVERSAL::Protected;
+}
+
 # Install the :Protected attribute in UNIVERSAL so every package can use it
 # the moment this module is loaded, with no per-package setup needed.
 # Attribute::Handlers calls this sub at CHECK phase for each decorated symbol.
+# It is also called at BEGIN phase: before CHECK that call does nothing (the
+# CHECK-phase call does the work), but after CHECK the CHECK-phase call never
+# happens, so the BEGIN-phase call wraps the sub instead.  The sub is still
+# being compiled at that point and may have no name yet, so the wrapping is
+# deferred to the end of the scope (normally the file) being compiled.
+# on_scope_end() works here because a BEGIN-phase handler runs while the
+# user's file is being compiled; it does NOT work from a CHECK-phase callback.
 # The unused parameters ($attr, $data) are required by the protocol.
-sub UNIVERSAL::Protected : ATTR(CODE,CHECK) {
+sub UNIVERSAL::Protected : ATTR(CODE,BEGIN,CHECK) {
 	my ($package, $symbol, $referent, $attr, $data, $phase) = @_;
+
+	if($phase eq 'BEGIN') {
+		return unless($_post_check);	# CHECK will do it
+		require B::Hooks::EndOfScope;
+		require Sub::Identify;
+		B::Hooks::EndOfScope::on_scope_end(sub {
+			my ($pkg, $name) = Sub::Identify::get_code_info($referent);
+			no strict 'refs';
+			UNIVERSAL::Protected($pkg, \*{"${pkg}::$name"}, $referent, $attr, $data, 'CHECK');
+		});
+		return;
+	}
+
 	my $sub_name = *{$symbol}{NAME};
 	no warnings 'redefine';
 	*{$symbol} = _wrap($package, $sub_name, $referent);  # function call, not method call
@@ -74,7 +105,7 @@ Sub::Protected - Enforce protected subroutine access (Java/C++ semantics)
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 SYNOPSIS
 
@@ -120,7 +151,8 @@ message.
 The C<:Protected> attribute is registered in C<UNIVERSAL> via
 L<Attribute::Handlers> when C<Sub::Protected> is loaded, so every package
 has access to it without any further C<use> or inheritance.  The sub is
-wrapped at C<CHECK> time.  This form is preferred because the protection
+wrapped at C<CHECK> time, or, if the module is loaded after C<CHECK> (Perl
+5.14 or later), at the end of the file being compiled.  This form is preferred because the protection
 declaration sits next to the definition and wrapping happens at compile time
 (making pre-wrap raw-coderef captures impossible).
 
@@ -175,6 +207,36 @@ scenarios.
 
     _helper() is a protected method of Foo and cannot be called from Bar
 
+The error is raised with L<Carp/croak>, so it reports the file and line of
+the offending call, not a line inside Sub::Protected.
+
+=head2 How access is decided
+
+=over 4
+
+=item * Only the immediate caller counts
+
+The decision is made on the package of the code that called the protected
+sub.  If C<Bar::run> calls C<Foo::public>, which calls C<Foo::_helper>, the
+call is allowed: the immediate caller is C<Foo>.  If C<Foo::public> instead
+calls a C<Bar> method that calls C<Foo::_helper>, it is blocked, however
+deep the chain.
+
+=item * Subclasses are allowed
+
+A caller whose package C<isa> the owner is allowed, so calls through
+C<SUPER::>, C<< $self->can('_helper') >> and ordinary inherited method
+calls all work from a subclass.
+
+=item * The wrapper is invisible
+
+The wrapper hands over with C<goto &sub>, so inside the protected sub
+C<caller()> reports the real caller, not Sub::Protected.  Arguments
+(including aliasing of C<@_>), calling context (list, scalar or void) and
+return values, including false ones, pass through unchanged.
+
+=back
+
 =head1 PUBLIC INTERFACE
 
 =head2 import
@@ -190,10 +252,16 @@ With B<no arguments>: does nothing beyond making the C<:Protected> attribute
 globally available (which happens when the module is first loaded).
 
 With B<one or more sub names>: registers those subs in the calling
-package for wrapping at C<CHECK> time.  If the module has already passed
-C<CHECK> (e.g. loaded via runtime C<require>), wrapping occurs immediately.
+package for wrapping at C<CHECK> time.  If C<CHECK> has already fired
+(e.g. the module was loaded via runtime C<require>, a plugin loader or a
+string C<eval>), wrapping is applied immediately.
 Each named sub must be defined before C<CHECK> fires (for pre-CHECK loads)
-or before C<import> is called (for post-CHECK loads).
+or before C<import> is called (for post-CHECK loads), so a module loaded at
+run time should call C<< Sub::Protected->import(...) >> at the end of the
+file, after its subs are defined.
+
+Run-time loading needs Perl 5.14 or later.  On older Perls the module must
+be loaded at compile time (C<use>, or C<require> inside C<BEGIN>).
 
 =head3 Arguments
 
@@ -208,6 +276,16 @@ Must be a non-empty string.
 
 Zero or more sub names to protect in the calling package.  Each must be a
 valid Perl identifier: matching C</\A[_a-zA-Z]\w*\z/>.
+
+These calls are equivalent:
+
+    Sub::Protected->import(qw(_a _b));
+    Sub::Protected->import([ qw(_a _b) ]);
+    Sub::Protected->import({ subs => [ qw(_a _b) ] });
+
+A plain list is always a list of names, so C<qw(subs _x)> protects both
+C<subs> and C<_x>.  A single arrayref or hashref is normalised by
+L<Params::Get>.
 
 =back
 
@@ -229,6 +307,11 @@ or wrapped immediately (if post-CHECK).
 =item *
 
 The pending list is consumed and cleared when the CHECK block fires.
+
+=item *
+
+C<$@>, C<$!> and C<$_> are left unchanged, as are any pending C<alarm()>
+timers.
 
 =back
 
@@ -274,6 +357,8 @@ The following table lists every error or warning this method can produce.
     "Sub::Protected->import: 'NAME' is not a    A sub name passed to import() failed
      valid Perl identifier"                      the identifier regex.  Use a name
                                                  matching /\A[_a-zA-Z]\w*\z/.
+                                                 NAME is shown as '' when the
+                                                 name was undef or a reference.
 
     "Sub::Protected: PKG::NAME is not defined"  The named sub was not found in the
                                                  package stash at wrap time.  For
@@ -282,28 +367,65 @@ The following table lists every error or warning this method can produce.
                                                  post-CHECK/runtime loads, ensure
                                                  the sub is defined before import().
 
+Calling a protected sub from outside its package or subclasses croaks
+with the message shown in L</Error message format>.
+
+=encoding utf8
+
+=head3 FORMAL SPECIFICATION
+
+    ValidName ≙ { n : seq CHAR | n matches /\A[_a-zA-Z]\w*\z/ }
+
+    ┌─ Import ──────────────────────────────────────────
+    │ ΔRegistry
+    │ class? : Package ; caller? : Package
+    │ names? : seq SubName ; postCheck : 𝔹
+    │ result! : Package
+    ├───────────────────────────────────────────────────
+    │ ∀ n ∈ ran names? • n ∈ ValidName
+    │ postCheck ⇒ (∀ n ∈ ran names? • defined(caller?, n))
+    │ postCheck ⇒ protected′ = protected ∪ { n : ran names? • (caller?, n) }
+    │ ¬postCheck ⇒ pending′ = pending ⁀ ⟨ n : names? • (caller?, n) ⟩
+    │ result! = class?
+    └───────────────────────────────────────────────────
+
+    -- Failure cases (croak, Registry unchanged):
+    --   ∃ n ∈ ran names? • n ∉ ValidName
+    --     ⇒ "Sub::Protected->import: 'n' is not a valid Perl identifier"
+    --   postCheck ∧ ∃ n ∈ ran names? • ¬defined(caller?, n)
+    --     ⇒ "Sub::Protected: caller?::n is not defined"
+
 =cut
 
 sub import {
 	my ($class, @subs) = @_;
 
 	# No sub names: the :Protected attribute is always active via UNIVERSAL.
-	return set_return($class, { type => 'string' }) unless @subs;
+	return _return_class($class) unless @subs;
 
-	# Normalise the argument list to support positional and hash-ref styles.
-	my $args = get_params('subs', \@subs);
-	my @names = ref($args->{subs}) eq 'ARRAY'
-		? @{$args->{subs}}
-		: ($args->{subs});
+	# A plain list is always a list of names.  Only a single arrayref or
+	# hashref goes through Params::Get: passing a plain list to it would read
+	# qw(subs _x) as subs => '_x', silently leaving a sub called subs open.
+	my @names = @subs;
+	if (@subs == 1 && ref($subs[0]) && ref($subs[0]) ne 'CODE') {
+		my $args = get_params('subs', \@subs);
+		@names = ref($args->{subs}) eq 'ARRAY'
+			? @{$args->{subs}}
+			: ($args->{subs});
+	}
 
 	# Validate each name against the schema; validate_strict croaks on failure.
 	# Params::Validate::Strict silently accepts undef for type => 'string', so
 	# we coerce undef and references to '' so the regex check fires for them.
+	# local $@ so a successful eval does not clear the caller's $@.
 	for my $sub_name (@names) {
 		my $check = (defined $sub_name && !ref $sub_name) ? $sub_name : q{};
-		eval { validate_strict(schema => $SUB_NAME_SCHEMA, input => { name => $check }) };
+		my $valid = do {
+			local $@;
+			eval { validate_strict(schema => $SUB_NAME_SCHEMA, input => { name => $check }); 1 };
+		};
 		croak "$SELF->import: '$check' is not a valid Perl identifier"
-			if $@;
+			unless $valid;
 	}
 
 	# Schedule or immediately apply wrapping depending on compilation phase.
@@ -316,7 +438,7 @@ sub import {
 		push @_pending, [ $owner_pkg, $_ ] for @names;
 	}
 
-	return set_return($class, { type => 'string' });
+	return _return_class($class);
 }
 
 # -------------------------------------------------------------------
@@ -325,17 +447,35 @@ sub import {
 
 # Process all pending declarative wraps registered during import().
 # After processing, set the post_check flag so runtime imports wrap directly.
-CHECK {
-	$_post_check = 1;
+# The bare block silences "Too late to run CHECK block" when this module is
+# loaded after CHECK; $_post_check is already 1 in that case.
+{
+	no warnings 'void';	# "Too late to run CHECK block"
+	CHECK {
+		$_post_check = 1;
 
-	# Wrap every pending (package, sub) pair.
-	_process_one(@$_) for @_pending;
-	@_pending = ();
+		# Wrap every pending (package, sub) pair.
+		_process_one(@$_) for @_pending;
+		@_pending = ();
+	}
 }
 
 # -------------------------------------------------------------------
 # PRIVATE SUBROUTINES
 # -------------------------------------------------------------------
+
+# _return_class
+# Purpose:    Validate and return import()'s return value.
+# Entry:      ($class) -- the importing class name.
+# Exit:       Returns $class, checked against the documented string schema.
+# Notes:      Return::Set::set_return clears $@ even when it succeeds, and
+#             import() promises to leave $@ alone, so it is localised here.
+sub _return_class {
+	my ($class) = @_;
+
+	local $@;
+	return set_return($class, { type => 'string' });
+}
 
 # _process_one
 # Purpose:    Look up a named sub in a package's stash and wrap it.
@@ -485,16 +625,28 @@ Method modifiers applied after Sub::Protected has wrapped a sub will wrap
 the wrapper.  Apply Sub::Protected last, or use the declarative form in a
 C<CHECK> block after the class is fully built.
 
+=item Run-time loading on Perl < 5.14
+
+On Perls older than 5.14, loading this module (or a package that uses it)
+at run time -- via C<require>, a plugin loader or a string C<eval> -- leaves
+the subs unprotected, because C<CHECK> has already fired.  Load it at
+compile time instead.
+
 =item UNIVERSAL namespace pollution
 
 The C<:Protected> attribute is installed in C<UNIVERSAL>, which is
 intentional (any package can use it after a single C<use>), but it does
-introduce C<UNIVERSAL::Protected> into the global namespace.
+introduce C<UNIVERSAL::Protected> into the global namespace.  If another
+module has already defined C<UNIVERSAL::Protected>, loading Sub::Protected
+warns that it is being replaced.
 
 =item Thread safety
 
-C<@_pending> and C<$BYPASS> are unguarded package globals.  Do not use
-concurrent C<use Sub::Protected qw(...)> calls across threads.
+C<@_pending> and C<$BYPASS> are unguarded package globals.  Subs are
+normally wrapped before any thread is started, which is safe.  Calling
+C<< Sub::Protected->import(...) >> or loading a package that uses
+Sub::Protected from more than one thread at once is not supported.
+C<$BYPASS> is per-thread, as with any C<our> variable under ithreads.
 
 =back
 
@@ -502,20 +654,35 @@ concurrent C<use Sub::Protected qw(...)> calls across threads.
 
 L<Carp> (core),
 L<Attribute::Handlers> (core since 5.8),
+L<B::Hooks::EndOfScope>,
 L<Readonly>,
-L<Scalar::Util> (core),
+L<Sub::Identify>,
 L<Params::Get>,
 L<Params::Validate::Strict>,
 L<Return::Set>.
 
 =head1 SEE ALSO
 
+=over 4
+
+=item * L<Test Dashboard|https://nigelhorne.github.io/Sub-Protected/coverage/>
+
+=item * L<Sub::Abstract>
+
+Sister module enforcing abstract (virtual) methods
+
+=item * L<Sub::Private>
+
+Sister module enforcing strictly private (owner-only) access.
+
+=back
+
 L<Attribute::Handlers>, L<Carp>, L<Readonly>, L<Params::Get>,
 L<Params::Validate::Strict>, L<Return::Set>.
 
-=head2 FORMAL SPECIFICATION
+=head1 FORMAL SPECIFICATION
 
-=head3 import
+=head2 import
 
 The following Z-notation schemas formally specify the state and operations
 of Sub::Protected.  Unicode mathematical symbols are used in this section

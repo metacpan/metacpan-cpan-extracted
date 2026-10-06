@@ -3,7 +3,7 @@ package PDF::Make::Canvas;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 # Load the XS code from PDF::Make
 use PDF::Make ();
@@ -480,6 +480,14 @@ Move to the start of the next line.
     $canvas->Tj($text);
 
 Show text.
+
+=head2 Tj_hex
+
+    $canvas->Tj_hex($bytes);
+
+Show text, writing the operand as a hex string. For composite fonts, whose
+operands are two-byte glyph ids rather than characters - see
+C<< PDF::Make::Builder->load_ttf >>.
 
 =head2 TJ
 

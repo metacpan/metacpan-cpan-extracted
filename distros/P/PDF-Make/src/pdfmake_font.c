@@ -140,10 +140,25 @@ pdfmake_font_t *pdfmake_font_from_ttf(pdfmake_arena_t *arena,
     pdfmake_font_t *font;
     int upm;
     pdfmake_font_metrics_t *m;
+    uint8_t *copy;
 
     if (!arena || !ttf_bytes || len == 0) return NULL;
 
-    ttf = pdfmake_ttf_parse(arena, ttf_bytes, len);
+    /* pdfmake_ttf_parse keeps the buffer rather than copying it, and every
+     * later read - cmap lookup, hmtx advance, the subsetter - goes back to
+     * it. Callers that parse a FontFile2 out of a document hold that buffer
+     * open, but a font loaded from a file or a scalar does not: both XS entry
+     * points hand over memory they release immediately afterwards. Copying
+     * into the arena ties the bytes to the font's own lifetime.
+     *
+     * Left aliased, this reads freed memory on every glyph: it returned the
+     * right answers for as long as the allocator had not reused the block,
+     * then quietly started returning glyph 0 for everything. */
+    copy = pdfmake_arena_alloc(arena, len);
+    if (!copy) return NULL;
+    memcpy(copy, ttf_bytes, len);
+
+    ttf = pdfmake_ttf_parse(arena, copy, len);
     if (!ttf) return NULL;
 
     font = pdfmake_arena_alloc(arena, sizeof(pdfmake_font_t));
@@ -176,7 +191,26 @@ pdfmake_font_t *pdfmake_font_from_ttf(pdfmake_arena_t *arena,
     m->bbox[1] = (ttf->y_min * 1000) / upm;
     m->bbox[2] = (ttf->x_max * 1000) / upm;
     m->bbox[3] = (ttf->y_max * 1000) / upm;
+
+    /* mac_style bit 1 is italic; OS/2 fsSelection bit 0 says the same. A
+     * FontDescriptor without /ItalicAngle on a slanted face makes a reader
+     * synthesise its own slant on top of the real one. */
     m->flags = PDFMAKE_FONT_FLAG_NONSYMBOLIC;
-    
+    if ((ttf->mac_style & 0x02) ||
+        (ttf->has_os2 && (ttf->fs_selection & 0x01))) {
+        m->flags |= PDFMAKE_FONT_FLAG_ITALIC;
+        m->italic_angle = -12;
+    }
+    if (ttf->has_os2 && ttf->us_weight_class >= 600)
+        m->flags |= PDFMAKE_FONT_FLAG_FORCE_BOLD;
+    /* OS/2 panose[3] == 9 is monospaced; so is a single-advance hmtx. */
+    if (ttf->num_h_metrics == 1)
+        m->flags |= PDFMAKE_FONT_FLAG_FIXED_PITCH;
+
+    /* /BaseFont. Without it a TTF cannot be written at all, and
+     * PDF::Make::Font->base_font read back undef. */
+    font->base_font = pdfmake_ttf_postscript_name(ttf, arena);
+    if (!font->base_font) font->base_font = "PDFMakeTTF";
+
     return font;
 }

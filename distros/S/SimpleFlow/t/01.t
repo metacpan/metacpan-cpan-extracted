@@ -207,8 +207,10 @@ subtest 'exit code and signal are decoded independently (regression)' => sub {
 # number and exit must be 0.
 SKIP: {
 	skip 'POSIX signal semantics differ on Windows', 2 if $^O eq 'MSWin32';
-	# single-quote the inner code so the outer shell does not expand $$ itself
-	my $cmd = qq{$PERL -e 'kill 15 => \$\$'};
+	# single-quote the inner code so the outer shell does not expand $$ itself.
+	# TERM is set to its default first because the harness may have inherited
+	# it ignored, and task() leaves an inherited ignore alone, as system() does.
+	my $cmd = qq{$PERL -e '\$SIG{TERM} = q{DEFAULT}; kill 15 => \$\$'};
 	my (undef, $err, $t) = capture { task({ cmd => $cmd, die => 0 }) };
 	# Note: routed through a shell this usually surfaces as exit 128+15; the
 	# point of the assertion is simply that signal is decoded from the RAW

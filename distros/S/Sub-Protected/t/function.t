@@ -2,28 +2,31 @@
 # t/function.t -- white-box function-level subtests for Sub::Protected
 #
 # Tests each function individually, mocking non-core dependencies
-# (Params::Get, Params::Validate::Strict, Return::Set) where appropriate.
+# (Params::Get, Params::Validate::Strict, Return::Set, B::Hooks::EndOfScope,
+# Sub::Identify) where appropriate.
 # Uses Test::Returns to verify return-value schema compliance, and
 # Test::Memory::Cycle to verify closures leave no circular references.
 
 use strict;
 use warnings;
 
-# Non-CPAN test dependencies are sourced from local working trees.
-# The BEGIN block untaints $ENV{HOME} so the paths survive prove -lt.
-BEGIN {
-	my ($home) = ($ENV{HOME} =~ /\A(.+)\z/ms);
-	unshift @INC, 'lib',
-		"$home/src/njh/Test-Mockingbird/lib",
-		"$home/src/njh/Test-Returns/lib";
-}
-
 use Test::Most;
-use Test::Mockingbird;
+
+# Test::Mockingbird needs Perl 5.16.3, so it is an optional test dependency
+BEGIN {
+	eval { require Test::Mockingbird; Test::Mockingbird->import(); 1 }
+		or plan(skip_all => 'Test::Mockingbird not installed');
+}
 use Test::Returns;
 use Test::Memory::Cycle;
 use Scalar::Util qw(reftype);
 use Readonly;
+
+# Load these before anything mocks them: mocking a sub before its module is
+# loaded lets the later require overwrite the mock, and restore_all() then
+# deletes the real sub
+use B::Hooks::EndOfScope ();
+use Sub::Identify ();
 
 # Loading Sub::Protected fires the CHECK block and sets $_post_check = 1,
 # so any subsequent import() calls with sub names wrap immediately.
@@ -70,6 +73,10 @@ my %config = (
 
 	# call_secret: public entry point to the protected sub (for testing)
 	sub call_secret { (shift)->_secret }
+
+	# _who reports the package that called it; call_who reaches it from FT::Owner
+	sub _who :Protected { (caller(0))[0] }
+	sub call_who { (shift)->_who }
 
 	# call_fn: generic trampoline -- calls the passed coderef from FT::Owner context.
 	# This lets tests invoke a wrapper closure from the correct owner context.
@@ -252,25 +259,32 @@ subtest 'import(): wrapped sub enforces access (post-CHECK)' => sub {
 		'import: unrelated package blocked from wrapped sub';
 };
 
-subtest 'import(): spies confirm get_params and validate_strict are called' => sub {
-	plan tests => 2;
+subtest 'import(): get_params only for a single reference; validate_strict always' => sub {
+	plan tests => 3;
 
 	# Spy on Sub::Protected's imported aliases (same reason as set_return above)
 	my $spy_gp = spy 'Sub::Protected::get_params';
 	my $spy_vs = spy 'Sub::Protected::validate_strict';
 
-	# Define and wrap a new sub so the full validation path is exercised
+	# A plain list must bypass Params::Get, so qw(subs _x) is never read as
+	# subs => '_x'; an arrayref is normalised by it
 	{
 		package FT::SpyTarget;
-		sub _spy_sub { 'spied' }
+		sub _spy_sub  { 'spied' }
+		sub _spy_sub2 { 'spied' }
 		Sub::Protected->import('_spy_sub');
 	}
-
-	my @gp_calls = $spy_gp->();
+	my @gp_plain = $spy_gp->();
+	{
+		package FT::SpyTarget;
+		Sub::Protected->import([ '_spy_sub2' ]);
+	}
+	my @gp_all = $spy_gp->();
 	my @vs_calls = $spy_vs->();
 
-	ok scalar(@gp_calls) >= 1, 'get_params invoked during import() with sub names';
-	ok scalar(@vs_calls) >= 1, 'validate_strict invoked during import() with sub names';
+	is scalar(@gp_plain), 0, 'get_params not used for a plain list';
+	is scalar(@gp_all), 1, 'get_params used for a single arrayref';
+	is scalar(@vs_calls), 2, 'validate_strict checks every name';
 
 	restore_all();
 };
@@ -600,12 +614,13 @@ subtest 'attribute handler: Sub::Protected wrapper is invisible in caller()' => 
 
 	# The goto &$code in the wrapper removes the wrapper frame so that caller()
 	# inside the protected sub reports the real caller, not Sub::Protected.
-	# call_secret is in FT::Owner; _secret should see FT::Owner as its caller.
+	# call_who is in FT::Owner, so _who must see FT::Owner as its caller.
+	# Without the goto it would see Sub::Protected (where the wrapper lives).
 	local $ENV{HARNESS_ACTIVE}    = 0;
 	local $Sub::Protected::BYPASS = 0;
 
-	lives_ok { FT::Owner->new->call_secret }
-		'attribute handler: protected sub callable through owner public method';
+	is(FT::Owner->new->call_who, $OWNER,
+		'caller() inside the protected sub reports the real caller');
 };
 
 # ===================================================================
@@ -685,6 +700,267 @@ subtest '_assert_private_caller(): allows Sub::Protected subclass (isa branch)' 
 	# FT::SP::Sub->isa('Sub::Protected') is true, so the guard returns normally.
 	lives_ok { FT::SP::Sub::_isa_outer() }
 		'_assert_private_caller() allows caller that is a Sub::Protected subclass';
+};
+
+# ===================================================================
+# SECTION 9: UNIVERSAL::Protected BEGIN phase (run-time loading)
+#
+# The handler is called at BEGIN and at CHECK.  Before CHECK the BEGIN call
+# must do nothing (CHECK does the work); after CHECK it must defer wrapping
+# to end of scope, because CHECK will never fire again.
+# ===================================================================
+
+Readonly::Scalar my $ATTR_NAME => 'Protected';
+
+# Results of calling the handler at BEGIN phase while this file is still
+# being compiled, i.e. before CHECK.  Recorded here, asserted in a subtest.
+my %pre_check;
+{
+	package FT::PreCheck;
+	sub _early { 'early' }
+}
+BEGIN {
+	my $hooks = 0;
+	mock 'B::Hooks::EndOfScope::on_scope_end' => sub { $hooks++ };
+	my $before = \&FT::PreCheck::_early;
+	my @ret = UNIVERSAL::Protected('FT::PreCheck', \*FT::PreCheck::_early, $before, 'Protected', undef, 'BEGIN');
+	restore_all();
+	%pre_check = (
+		hooks     => $hooks,
+		unchanged => (\&FT::PreCheck::_early == $before) ? 1 : 0,
+		returned  => scalar(@ret),
+	);
+}
+
+# Fixtures for driving the handler by hand after CHECK
+{
+	package FT::Deferred;
+	sub _later { 'later' }
+	sub call_later { FT::Deferred::_later() }
+}
+{
+	package FT::Direct;
+	sub _direct { 'direct' }
+	sub call_direct { FT::Direct::_direct() }
+}
+
+subtest 'attribute handler: BEGIN phase before CHECK is a no-op' => sub {
+	plan tests => 3;
+
+	# Before CHECK the CHECK-phase call does the wrapping, so the BEGIN call
+	# must neither register an end-of-scope hook nor touch the sub
+	is $pre_check{hooks}, 0, 'no end-of-scope hook registered before CHECK';
+	ok $pre_check{unchanged}, 'sub is not wrapped by the BEGIN-phase call';
+	is $pre_check{returned}, 0, 'handler returns an empty list';
+
+	diag 'pre-CHECK BEGIN results: ' . join(', ', map { "$_=$pre_check{$_}" } sort keys %pre_check)
+		if $ENV{TEST_VERBOSE};
+};
+
+subtest 'attribute handler: BEGIN phase after CHECK defers wrapping to end of scope' => sub {
+	plan tests => 8;
+
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	# Capture the end-of-scope callback instead of letting it run, so we can
+	# check that nothing is wrapped until the scope really ends
+	my @hooks;
+	mock 'B::Hooks::EndOfScope::on_scope_end' => sub { push @hooks, $_[0] };
+
+	# At BEGIN the sub may still be anonymous, so the handler must get the
+	# name from Sub::Identify, not from the glob it is passed
+	my @identified;
+	mock 'Sub::Identify::get_code_info' => sub { push @identified, $_[0]; return ('FT::Deferred', '_later') };
+
+	my $original = \&FT::Deferred::_later;
+	my @ret = UNIVERSAL::Protected('FT::Deferred', 'ANON', $original, $ATTR_NAME, undef, 'BEGIN');
+
+	is scalar(@ret), 0, 'handler returns an empty list';
+	is scalar(@hooks), 1, 'exactly one end-of-scope hook registered';
+	ok \&FT::Deferred::_later == $original, 'sub is not wrapped until the scope ends';
+
+	# Simulate the end of the file being compiled
+	$hooks[0]->();
+	restore_all();
+
+	is scalar(@identified), 1, 'Sub::Identify consulted once';
+	ok $identified[0] == $original, 'Sub::Identify was asked about the decorated sub';
+	ok \&FT::Deferred::_later != $original, 'sub is wrapped once the scope ends';
+	is(FT::Deferred::call_later(), 'later', 'owner can still call the wrapped sub');
+	throws_ok { FT::Deferred::_later() }
+		qr/\A_later\(\) is a protected method of FT::Deferred and cannot be called from main at /,
+		'unrelated caller is blocked with the exact message';
+};
+
+subtest 'attribute handler: CHECK phase wraps the named glob' => sub {
+	plan tests => 5;
+
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	my $original = \&FT::Direct::_direct;
+	my @ret = UNIVERSAL::Protected('FT::Direct', \*FT::Direct::_direct, $original, $ATTR_NAME, undef, 'CHECK');
+
+	is scalar(@ret), 0, 'handler returns an empty list';
+	ok \&FT::Direct::_direct != $original, 'stash entry replaced with the wrapper';
+	is(FT::Direct::call_direct(), 'direct', 'owner can call the wrapped sub');
+	throws_ok { FT::Direct::_direct() }
+		qr/\A_direct\(\) is a protected method of FT::Direct and cannot be called from main at /,
+		'unrelated caller is blocked with the exact message';
+	memory_cycle_ok(\&FT::Direct::_direct, 'installed wrapper has no circular references');
+};
+
+subtest 'attribute handler: sub compiled by string eval after CHECK is protected' => sub {
+	plan tests => 3;
+
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	# End to end, with the real B::Hooks::EndOfScope and Sub::Identify: the
+	# eval is compiled after CHECK, so only the BEGIN-phase path can wrap it
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $ok = eval q{
+		package FT::Evald;
+		sub _evald :Protected { 'evald' }
+		sub call_evald { FT::Evald::_evald() }
+		1;
+	};
+	diag "string eval error: $@" if !$ok && $ENV{TEST_VERBOSE};
+
+	is(FT::Evald::call_evald(), 'evald', 'owner can call the protected sub');
+	throws_ok { FT::Evald::_evald() }
+		qr/\A_evald\(\) is a protected method of FT::Evald and cannot be called from main at /,
+		'unrelated caller is blocked';
+	is_deeply \@warnings, [], 'no warnings while compiling after CHECK';
+};
+
+# ===================================================================
+# SECTION 10: import() before CHECK, and the CHECK block
+#
+# Before CHECK, import() must only queue names; the CHECK block wraps them.
+# ===================================================================
+
+# Record the stash entry just before and just after a pre-CHECK import()
+my %queued;
+{
+	package FT::Queued;
+	sub _queued { 'queued' }
+	sub call_queued { FT::Queued::_queued() }
+	BEGIN {
+		$queued{before} = \&FT::Queued::_queued;
+		$queued{return} = Sub::Protected->import('_queued');
+		$queued{after}  = \&FT::Queued::_queued;
+	}
+}
+
+subtest 'import(): before CHECK queues the sub; the CHECK block wraps it' => sub {
+	plan tests => 5;
+
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	ok $queued{after} == $queued{before}, 'import() before CHECK does not wrap immediately';
+	is $queued{return}, $SP, 'import() with names returns the class name';
+	ok \&FT::Queued::_queued != $queued{before}, 'CHECK block has since wrapped the sub';
+	is(FT::Queued::call_queued(), 'queued', 'owner can call the wrapped sub');
+	throws_ok { FT::Queued::_queued() }
+		qr/\A_queued\(\) is a protected method of FT::Queued and cannot be called from main at /,
+		'unrelated caller is blocked';
+};
+
+# ===================================================================
+# SECTION 11: exact messages, return values and other details
+# ===================================================================
+
+# _check_access() when every frame belongs to Sub::Protected.  This must be
+# run at file scope: inside a subtest the test framework's frames are found.
+my $no_context_error;
+{
+	package Sub::Protected;
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+	$no_context_error = eval { Sub::Protected::_check_access('FT::Nowhere', 'lost'); 1 } ? undef : $@;
+}
+
+subtest '_check_access(): croaks when no caller outside Sub::Protected exists' => sub {
+	plan tests => 1;
+
+	like $no_context_error,
+		qr/\Alost\(\) is a protected method of FT::Nowhere and cannot be called outside any package context at /,
+		'croaks with the "outside any package context" message';
+};
+
+subtest 'import(): exact error messages for invalid names' => sub {
+	plan tests => 2;
+
+	throws_ok { Sub::Protected->import($config{invalid_digit}) }
+		qr/\A\Q$SP\E->import: '\Q$config{invalid_digit}\E' is not a valid Perl identifier at /,
+		'invalid name is quoted in the message';
+
+	# undef must be rejected, not slip through as a valid "string"
+	throws_ok { Sub::Protected->import(undef) }
+		qr/\A\Q$SP\E->import: '' is not a valid Perl identifier at /,
+		'undef is rejected as an empty name';
+};
+
+subtest 'import(): with names returns the class name and keeps $_' => sub {
+	plan tests => 2;
+
+	{
+		package FT::ImportReturn;
+		sub _ret { 'ret' }
+	}
+
+	local $_ = 'import_names_sentinel';
+	my $result;
+	{
+		package FT::ImportReturn;
+		$result = Sub::Protected->import('_ret');
+	}
+	returns_ok($result, { type => 'string' }, 'import() with names returns a string');
+	is $_, 'import_names_sentinel', '$_ unchanged after import() with names';
+};
+
+subtest '_wrap(): return value is a CODE ref' => sub {
+	plan tests => 1;
+
+	local $Sub::Protected::BYPASS = 1;
+	returns_ok(Sub::Protected::_wrap($OWNER, '_bare_unwrapped', sub { 1 }), { type => 'coderef' },
+		'_wrap() returns a coderef');
+};
+
+subtest '_process_one(): returns an empty list' => sub {
+	plan tests => 1;
+
+	{
+		package FT::ProcReturn;
+		sub _pr { 'pr' }
+	}
+	local $Sub::Protected::BYPASS = 1;
+	my @ret = Sub::Protected::_process_one('FT::ProcReturn', '_pr');
+	is scalar(@ret), 0, '_process_one() returns nothing';
+};
+
+subtest 'private guards: exact error messages' => sub {
+	plan tests => 2;
+
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	throws_ok { Sub::Protected::_wrap($OWNER, '_bare_unwrapped', sub { 1 }) }
+		qr/\A_wrap\(\) is a private method of \Q$SP\E and cannot be called from main at /,
+		'_wrap() guard names the method, the module and the caller';
+	throws_ok { Sub::Protected::_process_one($OWNER, $config{proc_sub}) }
+		qr/\A_process_one\(\) is a private method of \Q$SP\E and cannot be called from main at /,
+		'_process_one() guard names the method, the module and the caller';
+};
+
+subtest 'attribute handler: installed wrapper has no circular references' => sub {
+	plan tests => 1;
+
+	memory_cycle_ok(\&FT::Owner::_secret, 'wrapper installed at CHECK has no circular references');
 };
 
 done_testing;

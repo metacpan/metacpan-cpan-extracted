@@ -682,6 +682,21 @@ Tj(self, text)
         RETVAL
 
 SV *
+Tj_hex(self, text)
+    pdfmake_content_t *self
+    SV *text
+    PREINIT:
+        STRLEN len;
+        const char *str;
+    CODE:
+        str = SvPV(text, len);
+        if (pdfmake_text_Tj_hex(self, (const uint8_t *)str, len) != PDFMAKE_OK)
+            croak("PDF::Make::Canvas::Tj_hex: failed");
+        RETVAL = SvREFCNT_inc(ST(0));
+    OUTPUT:
+        RETVAL
+
+SV *
 TJ(self, array)
     pdfmake_content_t *self
     AV *array

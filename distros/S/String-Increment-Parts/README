@@ -3,7 +3,7 @@ NAME
     sequences)
 
 VERSION
-    This document describes version 0.002 of String::Increment::Parts (from
+    This document describes version 0.003 of String::Increment::Parts (from
     Perl distribution String-Increment-Parts), released on 2026-07-22.
 
 DESCRIPTION
@@ -31,10 +31,6 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   all_indexes => *bool*
-
-        (No description)
-
     *   filename => *bool*
 
         Treat string as filename and do not include the extension as parts.
@@ -45,11 +41,19 @@ FUNCTIONS
 
     *   indexes => *array[int]* (default: [-1])
 
-        (No description)
+        Specify indexes of parts (0 = first) to increment.
+
+    *   letter_indexes => *array[int]* (default: [-1])
+
+        Specify indexes of letter-sequence parts (0 = first) to increment.
 
     *   n => *posint* (default: 1)
 
         How many times to repeat the increment and return the result.
+
+    *   number_indexes => *array[int]* (default: [-1])
+
+        Specify indexes of number parts (0 = first) to increment.
 
     *   string* => *str*
 

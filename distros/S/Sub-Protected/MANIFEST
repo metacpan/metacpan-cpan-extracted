@@ -17,6 +17,9 @@ t/extended_tests.t
 t/function.t
 t/integration.t
 t/locales.t
+t/pod-coverage.t
+t/pod.t
+t/runtime_load.t
 t/subclass.t
 t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

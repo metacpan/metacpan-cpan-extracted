@@ -395,7 +395,7 @@ declined.  gemmi 0.7.5 reads 'A000' as residue 10000 and 'A0000' as serial
 Only ever reached after str2iv() has declined the field, so a decimal field
 keeps its meaning exactly.  w is at most five, and 36**5 is 60,466,176, which an
 IV holds on every perl.*/
-static bool hy36_decode(const char *CSP_RESTRICT s, STRLEN n, unsigned short int width,
+static bool hy36_decode(const char *CSP_RESTRICT s, STRLEN n, unsigned short width,
                         IV *CSP_RESTRICT out)
 {
 	IV v = 0, p = 1, dec = 1;
@@ -411,8 +411,8 @@ static bool hy36_decode(const char *CSP_RESTRICT s, STRLEN n, unsigned short int
 		else return FALSE;
 		v = v * 36 + d;
 	}
-	for (unsigned short int i = 1; i < width; i++) p *= 36;
-	for (unsigned short int i = 0; i < width; i++) dec *= 10;
+	for (unsigned short i = 1; i < width; i++) p *= 36;
+	for (unsigned short i = 0; i < width; i++) dec *= 10;
 	*out = upper ? v - 10 * p + dec : v + 16 * p + dec;
 	return TRUE;
 }
@@ -577,12 +577,11 @@ static bool fld_hy36(const char *CSP_RESTRICT line, STRLEN llen, STRLEN from, ST
 	const char *s;
 	STRLEN n = fld(line, llen, from, to, &s);
 	if (!n) return FALSE;
-	return str2iv(s, n, out) || hy36_decode(s, n, (unsigned short int)(to - from + 1), out);
+	return str2iv(s, n, out) || hy36_decode(s, n, (unsigned short)(to - from + 1), out);
 }
 
 static bool fld_nv(const char *CSP_RESTRICT line, STRLEN llen, STRLEN from, STRLEN to,
-                  NV *CSP_RESTRICT out)
-{
+                  NV *CSP_RESTRICT out){
 	const char *s;
 	STRLEN n = fld(line, llen, from, to, &s);
 	return n ? str2nv(s, n, out) : FALSE;
@@ -594,14 +593,13 @@ writes it and '+1' as some programs do (4byf and 4ui0 in PDBbind v2020 write
 in columns 73-80 has the tail of it here instead, and 'DR' is not a charge, nor
 is '09'.  A field that is not one reads as the empty string a blank field would
 have given, which is the answer for "the file does not say".*/
-static bool charge_ok(const char *CSP_RESTRICT s, STRLEN n)
-{
-	STRLEN i, digits = 0, signs = 0;
-	if (n == 0 || n > 2) return FALSE;
-	for (i = 0; i < n; i++) {
+static bool charge_ok(const char *CSP_RESTRICT s, STRLEN n){
+	if (n == 0 || n > 2) return 0;
+	STRLEN digits = 0, signs = 0;
+	for (STRLEN i = 0; i < n; i++) {
 		if (s[i] >= '0' && s[i] <= '9') digits++;
 		else if (s[i] == '+' || s[i] == '-') signs++;
-		else return FALSE;
+		else return 0;
 	}
 	return digits <= 1 && signs <= 1;
 }
@@ -737,16 +735,14 @@ modifies it -- and it compares, stringifies and hashes exactly as the
 newSVpvn() one did.  Copying it into another SV or using it as a hash key, which
 the Perl half does with most of them, is cheaper than it was, because the
 shared string is shared again rather than copied.*/
-static SV *csp_str(pTHX_ const char *CSP_RESTRICT s, STRLEN n)
-{
+static SV *csp_str(pTHX_ const char *CSP_RESTRICT s, STRLEN n){
 	return newSVpvn_share(s, (I32)n, 0);
 }
 
 /*sub_hv() -- the hash under a key, made on first use.  Two levels of these are
 what the per-chain tallies hang from; the same shape as the meta table below,
 which grows an array under a record name the same way.*/
-static HV *sub_hv(pTHX_ HV *CSP_RESTRICT parent, const char *CSP_RESTRICT key, STRLEN klen)
-{
+static HV *sub_hv(pTHX_ HV *CSP_RESTRICT parent, const char *CSP_RESTRICT key, STRLEN klen){
 	SV **slot = hv_fetch(parent, key, (I32)klen, 0);
 	HV *h;
 	if (slot && *slot && SvROK(*slot) && SvTYPE(SvRV(*slot)) == SVt_PVHV)
@@ -768,25 +764,21 @@ Reached once per residue rather than once per atom -- chain and model are both
 part of a residue's identity, so neither can change without the readers below
 noticing a new residue -- which leaves the per-atom cost at the one hash
 increment the whole-structure tally already costs.*/
-static HV *chain_tally(pTHX_ HV *CSP_RESTRICT root, IV model,
-                       const char *CSP_RESTRICT chain, STRLEN chain_len)
-{
+static HV *chain_tally(pTHX_ HV *CSP_RESTRICT root, IV model, const char *CSP_RESTRICT chain, STRLEN chain_len){
 	char mbuf[32]; //an IV prints in at most 21 characters, sign included
 	STRLEN mlen = (STRLEN)my_snprintf(mbuf, sizeof(mbuf), "%" IVdf, model);
 	return sub_hv(aTHX_ sub_hv(aTHX_ root, mbuf, mlen), chain, chain_len);
 }
 
 //options
-static SV *opt_get(pTHX_ HV *CSP_RESTRICT o, const char *CSP_RESTRICT k)
-{
-	SV **p;
+static SV *opt_get(pTHX_ HV *CSP_RESTRICT o, const char *CSP_RESTRICT k){
 	if (!o) return NULL;
+	SV **p;
 	p = hv_fetch(o, k, (I32)strlen(k), 0);
 	return (p && *p && SvOK(*p)) ? *p : NULL;
 }
 
-static IV opt_iv(pTHX_ HV *CSP_RESTRICT o, const char *CSP_RESTRICT k, IV dflt)
-{
+static IV opt_iv(pTHX_ HV *CSP_RESTRICT o, const char *CSP_RESTRICT k, IV dflt){
 	SV *v = opt_get(aTHX_ o, k);
 	return v ? SvIV(v) : dflt;
 }
@@ -795,8 +787,7 @@ static IV opt_iv(pTHX_ HV *CSP_RESTRICT o, const char *CSP_RESTRICT k, IV dflt)
 Parser.pm): hydrogens => $keep with $keep unset means the caller did not ask
 for them.  opt_get() treats undef as not given, which for a switch whose
 default is on would turn it on, so a key that is present is read here.*/
-static bool opt_bool(pTHX_ HV *CSP_RESTRICT o, const char *CSP_RESTRICT k, bool dflt)
-{
+static bool opt_bool(pTHX_ HV *CSP_RESTRICT o, const char *CSP_RESTRICT k, bool dflt){
 	SV **p;
 	if (!o) return dflt;
 	p = hv_fetch(o, k, (I32)strlen(k), 0);
@@ -826,8 +817,7 @@ with the counts they may as well be sums.*/
 static const char *const res_sum_name[NRSUM] = { "sx", "sy", "sz", "n_xyz", "sb", "n_b" };
 enum { R_SX, R_SY, R_SZ, R_NXYZ, R_SB, R_NB };
 
-static void flush_residue(pTHX_ AV **CSP_RESTRICT rs, NV sx, NV sy, NV sz, UV nc, NV sb, UV nb)
-{
+static void flush_residue(pTHX_ AV **CSP_RESTRICT rs, NV sx, NV sy, NV sz, UV nc, NV sb, UV nb){
 	av_push(rs[R_SX],   nc ? newSVnv(sx) : newSV(0));
 	av_push(rs[R_SY],   nc ? newSVnv(sy) : newSV(0));
 	av_push(rs[R_SZ],   nc ? newSVnv(sz) : newSV(0));
@@ -858,9 +848,8 @@ typedef struct {
 	I32 len[NAKEY];
 } atom_keys;
 
-static void atom_keys_init(pTHX_ atom_keys *CSP_RESTRICT k)
-{
-	for (unsigned short int i = 0; i < NAKEY; i++) {
+static void atom_keys_init(pTHX_ atom_keys *CSP_RESTRICT k){
+	for (unsigned short i = 0; i < NAKEY; i++) {
 		k->len[i] = (I32)strlen(akey_name[i]);
 		PERL_HASH(k->hash[i], akey_name[i], k->len[i]);
 	}
@@ -868,7 +857,7 @@ static void atom_keys_init(pTHX_ atom_keys *CSP_RESTRICT k)
 
 /*one atom's fields, as both readers hand them to atom_hash()*/
 typedef struct {
-	SV *name;                //the shared-key name SV, which filer_atom() keys on
+	SV *name; //the shared-key name SV, which filer_atom() keys on
 	const char *alt, *el, *chg;
 	STRLEN alt_n, el_n, chg_n;
 	IV serial;
@@ -882,8 +871,7 @@ Pre-split to sixteen buckets.  A fresh hash has eight and an atom has eleven
 keys, twelve with its altlocs, so every atom hash was split and rehashed once on
 the way to being filled; asking for the sixteen up front is the size it ends at
 anyway, so it costs no memory and saves the split.*/
-static HV *atom_hash(pTHX_ const atom_keys *CSP_RESTRICT k, const atom_fields *CSP_RESTRICT f)
-{
+static HV *atom_hash(pTHX_ const atom_keys *CSP_RESTRICT k, const atom_fields *CSP_RESTRICT f){
 	HV *a = newHV();
 	hv_ksplit(a, 16);
 #define AK_STORE(i, v) (void)hv_store(a, akey_name[i], k->len[i], (v), k->hash[i])
@@ -930,17 +918,16 @@ one residue with one set of atoms.  The key has to be the Perl half's to the
 byte, or a run would be filed where the Perl half does not look; t/options.t
 reads both shapes of every fixture and compares them.*/
 typedef struct {
-	HV *index;          //residue key -> the run index its containers were made at
-	AV *res_atoms;      //per run: a reference to its residue's atoms hash
-	AV *res_order;      //per run: a reference to its residue's atom_order
-	HV *cur_atoms;      //the current run's two, which it shares with its residue
+	HV *index;      //residue key -> the run index its containers were made at
+	AV *res_atoms;  //per run: a reference to its residue's atoms hash
+	AV *res_order;  //per run: a reference to its residue's atom_order
+	HV *cur_atoms;  //the current run's two, which it shares with its residue
 	AV *cur_order;
-	bool highest;       //altloc => 'highest'
-	atom_keys keys;     //the atom hash's keys, hashed once; see atom_keys_init()
+	bool highest;   //altloc => 'highest'
+	atom_keys keys; //the atom hash's keys, hashed once; see atom_keys_init()
 } atom_filer;
 
-static void filer_init(pTHX_ atom_filer *CSP_RESTRICT f, bool highest)
-{
+static void filer_init(pTHX_ atom_filer *CSP_RESTRICT f, bool highest){
 	atom_keys_init(aTHX_ &f->keys);
 	f->index     = newHV();
 	f->res_atoms = newAV();
@@ -998,10 +985,9 @@ static const char *const conf_field[7] = {
 };
 
 //one conformer's worth of an atom, for the altlocs list: copies, not aliases
-static SV *conformer(pTHX_ HV *CSP_RESTRICT a)
-{
+static SV *conformer(pTHX_ HV *CSP_RESTRICT a){
 	HV *c = newHV();
-	for (unsigned short int k = 0; k < 7; k++) {
+	for (unsigned short k = 0; k < 7; k++) {
 		SV **v = hv_fetch(a, conf_field[k], (I32)strlen(conf_field[k]), 0);
 		(void)hv_store(c, conf_field[k], (I32)strlen(conf_field[k]),
 		               v && *v ? newSVsv(*v) : newSV(0), 0);
@@ -1015,20 +1001,17 @@ string a was given as its name, and alt_len the length of its altloc.
 One hash operation an atom, not two: the slot is fetched for storing into, and
 the name's hash is the one its shared key already carries.  Not restrict: a and
 name are both reachable through the residue hash once a has been filed there.*/
-static void filer_atom(pTHX_ atom_filer *CSP_RESTRICT f, HV *a, SV *name,
-                       STRLEN alt_len, bool have_occ, NV occ)
-{
+static void filer_atom(pTHX_ atom_filer *CSP_RESTRICT f, HV *a, SV *name, STRLEN alt_len, bool have_occ, NV occ){
 	HE *he = hv_fetch_ent(f->cur_atoms, name, 1, SvSHARED_HASH(name));
-	SV *slot = HeVAL(he);
+	SV *slot = HeVAL(he), **list, **ho;
 	HV *h;
-	SV **list, **ho;
 	AV *l;
 	if (!SvOK(slot)) {
-		/*the new slot made into a reference to a, as newRV_inc() would make
-		one.  SVt_RV, not SVt_IV: a reference had a type of its own before
-		5.12, and a 5.10 slot upgraded no further than an IV is a reference
-		sv_clear() does not know to let go of.  Later perls define SVt_RV as
-		SVt_IV for exactly this use.*/
+	/*the new slot made into a reference to a, as newRV_inc() would make
+	one.  SVt_RV, not SVt_IV: a reference had a type of its own before
+	5.12, and a 5.10 slot upgraded no further than an IV is a reference
+	sv_clear() does not know to let go of.  Later perls define SVt_RV as
+	SVt_IV for exactly this use.*/
 		SvUPGRADE(slot, SVt_RV);
 		SvRV_set(slot, SvREFCNT_inc_simple_NN((SV *)a));
 		SvROK_on(slot);
@@ -1053,7 +1036,7 @@ static void filer_atom(pTHX_ atom_filer *CSP_RESTRICT f, HV *a, SV *name,
 	if (!f->highest || !have_occ) return;
 	ho = hv_fetchs(h, "occupancy", 0);
 	if (!ho || !*ho || !SvOK(*ho) || !(occ > SvNV(*ho))) return;
-	for (unsigned short int k = 0; k < 7; k++) {
+	for (unsigned short k = 0; k < 7; k++) {
 		SV **v = hv_fetch(a, conf_field[k], (I32)strlen(conf_field[k]), 0);
 		(void)hv_store(h, conf_field[k], (I32)strlen(conf_field[k]),
 		               v && *v ? newSVsv(*v) : newSV(0), 0);
@@ -1061,8 +1044,7 @@ static void filer_atom(pTHX_ atom_filer *CSP_RESTRICT f, HV *a, SV *name,
 }
 
 //the two arrays into the parse's output, and the index freed
-static void filer_done(pTHX_ atom_filer *CSP_RESTRICT f, HV *CSP_RESTRICT out)
-{
+static void filer_done(pTHX_ atom_filer *CSP_RESTRICT f, HV *CSP_RESTRICT out){
 	(void)hv_stores(out, "res_atoms", newRV_noinc((SV *)f->res_atoms));
 	(void)hv_stores(out, "res_order", newRV_noinc((SV *)f->res_order));
 	SvREFCNT_dec((SV *)f->index);
@@ -1076,11 +1058,10 @@ EXISTS.  A plain hash cannot, and a plain hash is all the Perl half ever
 passes, so anything with magic on it is refused here, while the options are
 being read and nothing has been allocated.  _parse_string() handed a tied hash
 whose EXISTS died leaked 448 SVs; _parse_cif_string(), 1,365.*/
-static HV *opt_chains(pTHX_ HV *CSP_RESTRICT opts)
-{
+static HV *opt_chains(pTHX_ HV *CSP_RESTRICT opts){
 	SV *c = opt_get(aTHX_ opts, "chains");
-	HV *h;
 	if (!c || !SvROK(c) || SvTYPE(SvRV(c)) != SVt_PVHV) return NULL;
+	HV *h;
 	h = (HV *)SvRV(c);
 	if (SvRMAGICAL((SV *)h)) croak("chains must be a plain hash reference, not a tied one");
 	return h;
@@ -1099,17 +1080,11 @@ static HV *parse_buf(pTHX_ const char *CSP_RESTRICT buf, STRLEN len, HV *CSP_RES
 	HV *out, *meta, *elements, *chain_elements;
 	/*the tally of the chain the current residue belongs to, refreshed at each
 	residue boundary; see chain_tally()*/
-	HV *cur_chain = NULL;
-	AV *atom_hv;
-	AV *col[NCOL];
-	AV *res_sum[NRSUM];
-	AV *res_first, *res_last;
-	AV *ter, *model_nums;
-	HV *want_chain = NULL;
+	HV *cur_chain = NULL, *want_chain = NULL;
+	AV *atom_hv, *col[NCOL], *res_sum[NRSUM], *res_first, *res_last, *ter, *model_nums;
 	//whole-structure statistics over the atoms that were kept
 	UV n_hydrogen = 0, n_water_atom = 0, bn = 0;
-	NV bmin = 0, bmax = 0, bsum = 0;
-	NV xmin = 0, ymin = 0, zmin = 0, xmax = 0, ymax = 0, zmax = 0;
+	NV bmin = 0, bmax = 0, bsum = 0, xmin = 0, ymin = 0, zmin = 0, xmax = 0, ymax = 0, zmax = 0;
 	bool have_bbox = 0, have_res = 0;
 	//the residue being accumulated
 	NV rsx = 0, rsy = 0, rsz = 0, rsb = 0;
@@ -1158,8 +1133,8 @@ static HV *parse_buf(pTHX_ const char *CSP_RESTRICT buf, STRLEN len, HV *CSP_RES
 	atom_hv = newAV();
 	res_first = newAV(); res_last = newAV();
 	ter = newAV(); model_nums = newAV();
-	for (unsigned short int i = 0; i < NCOL; i++)  col[i] = newAV();
-	for (unsigned short int i = 0; i < NRSUM; i++) res_sum[i] = newAV();
+	for (unsigned short i = 0; i < NCOL; i++)  col[i] = newAV();
+	for (unsigned short i = 0; i < NRSUM; i++) res_sum[i] = newAV();
 	if (build_atoms) filer_init(aTHX_ &filer, highest);
 
 	while (pos < len) {
@@ -1177,9 +1152,8 @@ static HV *parse_buf(pTHX_ const char *CSP_RESTRICT buf, STRLEN len, HV *CSP_RES
 			STRLEN nm_rawlen, n;
 			char elbuf[4], chain[4], icode[2], resname[8];;
 			STRLEN ellen;
-			bool het = (line[0] == 'H');
+			bool known, have_rs, het = (line[0] == 'H');
 			res_info ri;
-			bool known, have_rs;
 			//the residue number, read once: the boundary test below wants it,
 			//and so does whichever of the two shapes the record is emitted in
 			IV rs = 0;
@@ -1474,7 +1448,7 @@ a fact about the record rather than about the residue.*/
 	}
 
 	(void)hv_stores(out, "atoms", newRV_noinc((SV *)atom_hv));
-	for (unsigned short int i = 0; i < NRSUM; i++)
+	for (unsigned short i = 0; i < NRSUM; i++)
 		(void)hv_store(out, res_sum_name[i], (I32)strlen(res_sum_name[i]),
 		               newRV_noinc((SV *)res_sum[i]), 0);
 	(void)hv_stores(out, "elements",     newRV_noinc((SV *)elements));
@@ -1510,7 +1484,7 @@ a fact about the record rather than about the residue.*/
 		(void)hv_stores(out, "center", newSV(0));
 	}
 
-	for (unsigned short int i = 0; i < NCOL; i++) {
+	for (unsigned short i = 0; i < NCOL; i++) {
 		if (i == C_LINENO && !keep_lineno) { SvREFCNT_dec((SV *)col[i]); continue; }
 		(void)hv_store(out, col_name[i], (I32)strlen(col_name[i]), newRV_noinc((SV *)col[i]), 0);
 	}
@@ -1564,18 +1538,17 @@ typedef struct {
 typedef struct {
 	const char *s;
 	STRLEN n;
-	unsigned short int kind; //CT_*: seven token kinds and no sentinel
+	unsigned short kind; //CT_*: seven token kinds and no sentinel
 	/*a quoted value is text and nothing else: '.' in quotes is a full stop, and
 	only a bare '.' is the null the format means*/
 	bool quoted;
 } cif_tok;
 
-static bool cif_iskw(const char *CSP_RESTRICT s, STRLEN n, const char *CSP_RESTRICT kw,
-                    STRLEN kwn){
-	if (n < kwn) return FALSE;
+static bool cif_iskw(const char *CSP_RESTRICT s, STRLEN n, const char *CSP_RESTRICT kw, STRLEN kwn){
+	if (n < kwn) return 0;
 	for (STRLEN i = 0; i < kwn; i++)
-		if (toLOWER((unsigned char)s[i]) != kw[i]) return FALSE;
-	return TRUE;
+		if (toLOWER((unsigned char)s[i]) != kw[i]) return 0;
+	return 1;
 }
 
 static bool cif_space(char c){
@@ -1676,9 +1649,7 @@ static void cif_next(cif_lex *CSP_RESTRICT lx, cif_tok *CSP_RESTRICT t){
 /*a tag is _category.item.  Both halves are wanted -- the category says which
 table a loop is, the item says which column -- and both are matched without
 regard to case, which the format allows and real files use.*/
-static STRLEN cif_split_tag(const char *CSP_RESTRICT s, STRLEN n,
-                            const char **CSP_RESTRICT item, STRLEN *CSP_RESTRICT itemn)
-{
+static STRLEN cif_split_tag(const char *CSP_RESTRICT s, STRLEN n, const char **CSP_RESTRICT item, STRLEN *CSP_RESTRICT itemn){
 	const char *dot = (const char *)memchr(s, '.', n);
 	if (!dot) { *item = s; *itemn = n; return n; }   //core CIF: no category half
 	*item  = dot + 1;
@@ -1700,8 +1671,7 @@ enum {
 	A_MODEL, A_NFIELD
 };
 
-static short int cif_atom_field(const char *CSP_RESTRICT item, STRLEN n)
-{
+static short int cif_atom_field(const char *CSP_RESTRICT item, STRLEN n){
 	for (short int i = 0; i < A_NFIELD; i++) {
 		STRLEN kn = strlen(cif_atom_item[i]);
 		if (kn == n && cif_iskw(item, n, cif_atom_item[i], kn)) return i;
@@ -1715,8 +1685,7 @@ cif::as_number() reads it.  str2nv() takes the whole field or nothing -- the
 rule that keeps a PDB coordinate which overflowed into the next field from
 reading as its prefix -- so the uncertainty is taken off here, on the mmCIF
 side only, and a PDB field is held to the stricter rule.*/
-static bool cif_nv(const char *CSP_RESTRICT s, STRLEN n, NV *CSP_RESTRICT out)
-{
+static bool cif_nv(const char *CSP_RESTRICT s, STRLEN n, NV *CSP_RESTRICT out){
 	if (n >= 3 && s[n - 1] == ')') {
 		STRLEN open_at = n - 2;
 		while (open_at > 0 && isDIGIT((unsigned char)s[open_at])) open_at--;
@@ -1736,15 +1705,14 @@ against "the field said zero".  mmCIF spells the first '?', which arrives here
 as a field that was never set, so nothing is lost by reading the second
 literally -- and 6cc9, which writes a 0 in columns 79-80, reads the same from
 either format because of it.*/
-static STRLEN cif_charge(const char *CSP_RESTRICT s, STRLEN n, char *CSP_RESTRICT buf)
-{
+static STRLEN cif_charge(const char *CSP_RESTRICT s, STRLEN n, char *CSP_RESTRICT buf){
 	IV c;
 	if (n == 0) return 0;
 	if (!str2iv(s, n, &c)) {
-		/*Passed through only when it could be the PDB spelling, which is two
-		columns wide.  Anything longer is not a charge, and was cut to its first
-		two characters: an integer too wide for an IV -- twenty digits of one, or
-		ten on a 32-bit perl -- came back as "-9".*/
+	/*Passed through only when it could be the PDB spelling, which is two
+	columns wide.  Anything longer is not a charge, and was cut to its first
+	two characters: an integer too wide for an IV -- twenty digits of one, or
+	ten on a 32-bit perl -- came back as "-9".*/
 		if (n > 2) return 0;
 		memcpy(buf, s, n);
 		return n;
@@ -1763,8 +1731,7 @@ it, and its rule is where in those four the name starts.  mmCIF has no columns,
 so the name goes back where the PDB convention would have put it before the
 question is asked.  Only reached when _atom_site.type_symbol is missing, which
 is rare -- but a file without it should still not read CA as calcium.*/
-static STRLEN cif_guess_element(const char *CSP_RESTRICT s, STRLEN n, char *CSP_RESTRICT buf)
-{
+static STRLEN cif_guess_element(const char *CSP_RESTRICT s, STRLEN n, char *CSP_RESTRICT buf){
 	char pad[4];
 	if (n >= 4) return guess_element(s, 4, buf);
 	pad[0] = ' ';
@@ -1789,8 +1756,7 @@ typedef struct {
 	UV rnc, rnb, n_models, n_anisou, n_skipped, n_atom, n_atom_rec, n_het_rec;
 	//counted up only; the numbers read out of the file stay signed, as in parse_buf
 	IV want_model, cur_model;
-	bool have_res, seen_model, keep_h, keep_water, keep_het, keep_anisou, build_atoms;
-	bool slim; //as in parse_buf()
+	bool have_res, seen_model, keep_h, keep_water, keep_het, keep_anisou, build_atoms, slim; //as in parse_buf()
 	atom_filer filer; //likewise, when build_atoms
 	char p_icode[4], p_resname[8];
 	/*the previous residue's chain id, as a pointer into the file buffer rather
@@ -1810,14 +1776,11 @@ The order of the tests below is the order the PDB reader uses -- model, then
 HETATM, then water, then chain, then hydrogen -- because n_skipped counts what
 was thrown away and the two readers have to agree on the count as well as on
 the structure.*/
-static void cif_atom_row(pTHX_ cif_state *CSP_RESTRICT st,
-                         const char **CSP_RESTRICT v, STRLEN *CSP_RESTRICT vn)
-{
+static void cif_atom_row(pTHX_ cif_state *CSP_RESTRICT st, const char **CSP_RESTRICT v, STRLEN *CSP_RESTRICT vn){
 	char resname[8], icode[4], elbuf[4], chgbuf[4];
 	STRLEN resname_len, chain_len, ellen, chg_n;
 	//into the file buffer, as st->p_chain is, and for the same reason
-	const char *chain;
-	const char *CSP_RESTRICT nm_s, *CSP_RESTRICT alt_s;
+	const char *chain, *CSP_RESTRICT nm_s, *CSP_RESTRICT alt_s;
 	STRLEN nm_n, alt_n;
 	res_info ri;
 	bool known, het, changed, have_rs, have_serial, have_occ, have_xyz, have_b;
@@ -2050,15 +2013,13 @@ static SV *cif_key(pTHX_ const char *CSP_RESTRICT s, STRLEN n){
 	return sv;
 }
 
-static void cif_store_lc(pTHX_ HV *CSP_RESTRICT h, const char *CSP_RESTRICT k, STRLEN kn,
-                         SV *CSP_RESTRICT val){
+static void cif_store_lc(pTHX_ HV *CSP_RESTRICT h, const char *CSP_RESTRICT k, STRLEN kn, SV *CSP_RESTRICT val){
 	SV *key = cif_key(aTHX_ k, kn);
 	(void)hv_store_ent(h, key, val, 0);
 	SvREFCNT_dec(key);
 }
 
-static AV *cif_loop_av(pTHX_ HV *CSP_RESTRICT loops, const char *CSP_RESTRICT cat, STRLEN catn)
-{
+static AV *cif_loop_av(pTHX_ HV *CSP_RESTRICT loops, const char *CSP_RESTRICT cat, STRLEN catn) {
 	SV *key = cif_key(aTHX_ cat, catn);
 	HE *he = hv_fetch_ent(loops, key, 0, 0);
 	AV *av;
@@ -2098,14 +2059,14 @@ static HV *parse_cif_buf(pTHX_ const char *CSP_RESTRICT buf, STRLEN len, HV *CSP
 	size_t i;
 	st.cur_model  = 1;
 	st.want_model = opt_iv(aTHX_ opts, "model", 1);
-	st.keep_h     = opt_bool(aTHX_ opts, "hydrogens", TRUE);
-	st.keep_water = opt_bool(aTHX_ opts, "waters", TRUE);
-	st.keep_het   = opt_bool(aTHX_ opts, "hetatm", TRUE);
-	st.keep_anisou= opt_bool(aTHX_ opts, "anisou", FALSE);
-	st.build_atoms= opt_bool(aTHX_ opts, "atom_hashes", FALSE);
-	st.slim       = !st.build_atoms && opt_bool(aTHX_ opts, "slim", FALSE);
-	st.filer.highest = opt_bool(aTHX_ opts, "altloc_highest", FALSE);
-	keep_meta     = opt_bool(aTHX_ opts, "meta", TRUE);
+	st.keep_h     = opt_bool(aTHX_ opts, "hydrogens", 1);
+	st.keep_water = opt_bool(aTHX_ opts, "waters", 1);
+	st.keep_het   = opt_bool(aTHX_ opts, "hetatm", 1);
+	st.keep_anisou= opt_bool(aTHX_ opts, "anisou", 0);
+	st.build_atoms= opt_bool(aTHX_ opts, "atom_hashes", 0);
+	st.slim       = !st.build_atoms && opt_bool(aTHX_ opts, "slim", 0);
+	st.filer.highest = opt_bool(aTHX_ opts, "altloc_highest", 0);
+	keep_meta     = opt_bool(aTHX_ opts, "meta", 1);
 	st.want_chain = opt_chains(aTHX_ opts);
 
 	out = newHV(); meta = newHV(); cif = newHV(); loops = newHV();
@@ -2362,8 +2323,7 @@ for what is always a mistake.  Both of the others came back as t/errors.t
 failures from 0.031 smokers (Strawberry 5.42.0 on Win2012, and perl 5.42.3 on
 NetBSD 11).  structure_info() rejects a directory in Perl before it ever gets
 here; this is the same complaint for a caller that reached past it.*/
-static char *slurp(pTHX_ const char *CSP_RESTRICT path, STRLEN *CSP_RESTRICT lenp)
-{
+static char *slurp(pTHX_ const char *CSP_RESTRICT path, STRLEN *CSP_RESTRICT lenp){
 	//no CSP_RESTRICT on fh: it is perl-managed, and the layers below it alias it
 	PerlIO *fh;
 	char *CSP_RESTRICT buf;
@@ -2423,8 +2383,7 @@ its own, or the structure and a chain id.  Every wrong argument that has an
 obvious right one nearby says so, since the three hashes in a parsed structure
 -- structure, chain, residue -- all look alike from inside a hash reference and
 a false answer would be taken at face value.*/
-static HV *chain_arg(pTHX_ SV *CSP_RESTRICT first, SV *CSP_RESTRICT id, const char *CSP_RESTRICT who)
-{
+static HV *chain_arg(pTHX_ SV *CSP_RESTRICT first, SV *CSP_RESTRICT id, const char *CSP_RESTRICT who){
 	HV *h;
 	if (!SvROK(first) || SvTYPE(SvRV(first)) != SVt_PVHV)
 		croak("%s: expected the chain hash reference from structure_info()", who);
@@ -2475,8 +2434,7 @@ buffer molecule, one water or one free amino acid answers true as well.  In a
 real file those are rare next to the ions and are the same nuisance to a caller
 walking chains -- one residue, no sequence -- but a caller who needs to tell
 them apart has it a lookup away, in the residue's own type.*/
-static bool chain_is_single_ion(pTHX_ HV *CSP_RESTRICT c)
-{
+static bool chain_is_single_ion(pTHX_ HV *CSP_RESTRICT c){
 	SV **p = hv_fetchs(c, "residue_order", 0);
 	if (!p || !*p || !SvROK(*p) || SvTYPE(SvRV(*p)) != SVt_PVAV) return FALSE;
 	/*residue_order rather than n_residues or the residues hash: it is the
@@ -2550,9 +2508,7 @@ typedef struct {
 //2 angstroms is used"
 #define CSP_VDW_DEFAULT 2.0
 
-static bool elem_prop_of(const char *CSP_RESTRICT s, STRLEN len,
-                         elem_prop *CSP_RESTRICT out)
-{
+static bool elem_prop_of(const char *CSP_RESTRICT s, STRLEN len, elem_prop *CSP_RESTRICT out){
 	//initialised because the compiler cannot see that every case assigns and
 	//the default returns; the values are never the ones used
 	NV r = CSP_VDW_DEFAULT, m = 0.0;
@@ -2693,7 +2649,7 @@ static bool elem_prop_of(const char *CSP_RESTRICT s, STRLEN len,
 	out->vdw  = r;
 	out->mass = m;
 	out->key  = key;
-	return TRUE;
+	return 1;
 }
 
 /*max_asa[] -- the largest solvent-accessible surface a residue of each kind
@@ -2740,7 +2696,7 @@ comes back with those spellings and the same five ring atoms.*/
 
 typedef struct {
 	const char *const *atom; //ring atom names, normal taken from the first two
-	unsigned short int n;    //how many
+	unsigned short n;    //how many
 	char label;              //'6' six-membered, '5' five-membered
 } ring_def;
 
@@ -2759,7 +2715,7 @@ static const ring_def rings_pur[2] = { { ring_pur6, 6, '6' }, { ring_pur5, 5, '5
 static const ring_def rings_pyr[1] = { { ring_pyr6, 6, '6' } };
 
 //how many rings a residue name has, and where they are; 0 for everything else
-static unsigned short int ring_defs(U32 key, const ring_def *CSP_RESTRICT *CSP_RESTRICT out)
+static unsigned short ring_defs(U32 key, const ring_def *CSP_RESTRICT *CSP_RESTRICT out)
 {
 	switch (key) {
 		case K3('P','H','E'): case K3('T','Y','R'):
@@ -2783,27 +2739,23 @@ static unsigned short int ring_defs(U32 key, const ring_def *CSP_RESTRICT *CSP_R
 }
 
 //hash field accessors, for walking an $info that Perl built
-static SV *hvf_sv(pTHX_ HV *CSP_RESTRICT h, const char *CSP_RESTRICT k, STRLEN klen)
-{
+static SV *hvf_sv(pTHX_ HV *CSP_RESTRICT h, const char *CSP_RESTRICT k, STRLEN klen){
 	SV **p = hv_fetch(h, k, (I32)klen, 0);
 	return (p && *p && SvOK(*p)) ? *p : NULL;
 }
 
-static AV *hvf_av(pTHX_ HV *CSP_RESTRICT h, const char *CSP_RESTRICT k, STRLEN klen)
-{
+static AV *hvf_av(pTHX_ HV *CSP_RESTRICT h, const char *CSP_RESTRICT k, STRLEN klen){
 	SV *s = hvf_sv(aTHX_ h, k, klen);
 	return (s && SvROK(s) && SvTYPE(SvRV(s)) == SVt_PVAV) ? (AV *)SvRV(s) : NULL;
 }
 
-static HV *hvf_hv(pTHX_ HV *CSP_RESTRICT h, const char *CSP_RESTRICT k, STRLEN klen)
-{
+static HV *hvf_hv(pTHX_ HV *CSP_RESTRICT h, const char *CSP_RESTRICT k, STRLEN klen){
 	SV *s = hvf_sv(aTHX_ h, k, klen);
 	return (s && SvROK(s) && SvTYPE(SvRV(s)) == SVt_PVHV) ? (HV *)SvRV(s) : NULL;
 }
 
 //the hash an array element refers to, or NULL if it is not a hash reference
-static HV *hvf_ent_hv(pTHX_ HV *CSP_RESTRICT h, SV *CSP_RESTRICT key)
-{
+static HV *hvf_ent_hv(pTHX_ HV *CSP_RESTRICT h, SV *CSP_RESTRICT key){
 	HE *e = hv_fetch_ent(h, key, 0, 0);
 	SV *v = e ? HeVAL(e) : NULL;
 	return (v && SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV) ? (HV *)SvRV(v) : NULL;
@@ -2833,9 +2785,8 @@ memory than the coordinates it indexes -- a thin, extended structure in a large
 box would otherwise want more cells than there are atoms to put in them*/
 typedef struct {
 	UV *start; //ncell + 1 offsets into idx
-	UV *idx;   //point indices, grouped by cell
-	NV cell;   //edge length, angstrom
-	NV x0, y0, z0;
+	UV *idx; //point indices, grouped by cell
+	NV x0, y0, z0, cell; //edge length, angstrom
 	UV nx, ny, nz;
 } cell_grid;
 
@@ -2912,8 +2863,7 @@ typedef struct {
 	NV *ks_e;
 	//per chain: the residue range [first, last)
 	HV **chain_hv;
-	UV *chain_first, *chain_last;
-	UV n_chain;
+	UV *chain_first, *chain_last, n_chain;
 	//tallies gathered on the way past
 	NV mass_total;
 	UV n_no_element; //atoms whose element field spells no element
@@ -2965,8 +2915,7 @@ static void set_add_residue(pTHX_ structset *CSP_RESTRICT s, HV *r, NV probe,
 {
 	AV *ao;
 	HV *atoms;
-	SV *one;
-	SV *rn;
+	SV *one, *rn;
 	SSize_t ai, nai;
 	s->res_hv[s->n_res] = r;
 	s->res_first[s->n_res] = s->n_atom;
@@ -3213,12 +3162,10 @@ static UV grid_axis(NV d, NV cell, UV n){
 	return (UV)k; //truncation is floor here: k is positive
 }
 
-static void grid_build(pTHX_ cell_grid *CSP_RESTRICT g,
-                       const NV *CSP_RESTRICT x, const NV *CSP_RESTRICT y,
-                       const NV *CSP_RESTRICT z, UV n, NV cut){
+static void grid_build(pTHX_ cell_grid *CSP_RESTRICT g, const NV *CSP_RESTRICT x, const NV *CSP_RESTRICT y, const NV *CSP_RESTRICT z, UV n, NV cut){
 	NV xmax, ymax, zmax, cells = 0.0;
 	UV ncell, c;
-	bool have_box = FALSE;
+	bool have_box = 0;
 	Zero(g, 1, cell_grid);
 	if (n == 0) return;
 	/*The box is taken over the finite points only.  str2nv() hands a field
@@ -3235,7 +3182,7 @@ static void grid_build(pTHX_ cell_grid *CSP_RESTRICT g,
 		if (!(x[i] - x[i] == 0.0 && y[i] - y[i] == 0.0 && z[i] - z[i] == 0.0)) continue;
 		if (!have_box) {
 			g->x0 = xmax = x[i]; g->y0 = ymax = y[i]; g->z0 = zmax = z[i];
-			have_box = TRUE;
+			have_box = 1;
 			continue;
 		}
 		if (x[i] < g->x0) g->x0 = x[i]; else if (x[i] > xmax) xmax = x[i];
@@ -3249,7 +3196,7 @@ static void grid_build(pTHX_ cell_grid *CSP_RESTRICT g,
 	never come true and the grid falls back to a single cell.*/
 	{
 		NV ex = 0.0, ey = 0.0, ez = 0.0;
-		for (unsigned short int turn = 0; turn < 4096; turn++) {
+		for (unsigned short turn = 0; turn < 4096; turn++) {
 			ex = (xmax - g->x0) / g->cell;
 			ey = (ymax - g->y0) / g->cell;
 			ez = (zmax - g->z0) / g->cell;
@@ -3462,12 +3409,7 @@ neighbour covers.  The rotation is mdtraj's: consecutive points are close
 together, so the neighbour that covered the last one is the one most likely to
 cover this one, and the scan starts there.  *k_closest carries it from one call
 to the next.*/
-static UV sasa_open(const NV *CSP_RESTRICT pts, UV first, UV last,
-                    NV xi, NV yi, NV zi, NV ri,
-                    const NV *CSP_RESTRICT nx, const NV *CSP_RESTRICT ny,
-                    const NV *CSP_RESTRICT nz, const NV *CSP_RESTRICT nr2, UV n_nbr,
-                    UV *CSP_RESTRICT k_closest)
-{
+static UV sasa_open(const NV *CSP_RESTRICT pts, UV first, UV last, NV xi, NV yi, NV zi, NV ri, const NV *CSP_RESTRICT nx, const NV *CSP_RESTRICT ny, const NV *CSP_RESTRICT nz, const NV *CSP_RESTRICT nr2, UV n_nbr, UV *CSP_RESTRICT k_closest) {
 	UV acc = 0, kc = *k_closest;
 	for (UV j = first; j < last; j++) {
 		const NV px = xi + ri * pts[3 * j];
@@ -3706,9 +3648,7 @@ keep_grid keeps the whole-structure run's neighbour grid on s instead of freeing
 it, for iface_compute(), which asks the same atoms the same question at the same
 cutoff.  It is asked for only when there is an interface to compute: the grid is
 up to nine UVs an atom, which on 4fqr is 6.5 MB held to the end of the walk.*/
-static void sasa_compute(pTHX_ structset *CSP_RESTRICT s, UV npts, bool want_iface,
-                         bool keep_grid)
-{
+static void sasa_compute(pTHX_ structset *CSP_RESTRICT s, UV npts, bool want_iface, bool keep_grid){
 	NV *CSP_RESTRICT pts = NULL;
 	UV *CSP_RESTRICT chain_of = NULL;
 	unsigned char *CSP_RESTRICT cross = NULL;
@@ -3789,10 +3729,9 @@ of the three are close -- which for a globular structure, whose tensor is nearly
 isotropic, is the ordinary case rather than the awkward one.  Jacobi is
 backward-stable and converges quadratically; the sweep count below is a bound
 that is never reached in practice, not a tuning parameter.*/
-static void sym3_eigenvalues(const NV m[3][3], NV *CSP_RESTRICT out)
-{
+static void sym3_eigenvalues(const NV m[3][3], NV *CSP_RESTRICT out){
 	NV a[3][3];
-	unsigned short int sweep, p, q, i;
+	unsigned short sweep, p, q, i;
 	for (p = 0; p < 3; p++)
 		for (q = 0; q < 3; q++)
 			a[p][q] = m[p][q];
@@ -3804,7 +3743,7 @@ static void sym3_eigenvalues(const NV m[3][3], NV *CSP_RESTRICT out)
 		NV scale = nv_fabs(a[0][0]) + nv_fabs(a[1][1]) + nv_fabs(a[2][2]);
 		if (!(off > scale * NV_EPSILON)) break;
 		for (p = 0; p < 2; p++) {
-			for (q = (unsigned short int)(p + 1); q < 3; q++) {
+			for (q = (unsigned short)(p + 1); q < 3; q++) {
 				NV apq = a[p][q], theta, t, c, sn;
 				if (!(nv_fabs(apq) > 0.0)) continue;
 				theta = (a[q][q] - a[p][p]) / (2.0 * apq);
@@ -3816,7 +3755,7 @@ static void sym3_eigenvalues(const NV m[3][3], NV *CSP_RESTRICT out)
 				sn = t * c;
 				{
 					NV app = a[p][p], aqq = a[q][q];
-					unsigned short int r = (unsigned short int)(3 - p - q);
+					unsigned short r = (unsigned short)(3 - p - q);
 					NV apr = a[p][r], aqr = a[q][r];
 					a[p][p] = app - t * apq;
 					a[q][q] = aqq + t * apq;
@@ -3841,9 +3780,7 @@ static void sym3_eigenvalues(const NV m[3][3], NV *CSP_RESTRICT out)
 //atom of that name (a side chain modelled only as far as CB, most often).
 //Named for what it does rather than for the first thing that wanted it: the
 //rings, the disulfides and the dihedrals all reach for atoms by name.
-static bool atom_xyz(pTHX_ HV *CSP_RESTRICT atoms, const char *CSP_RESTRICT name,
-                      NV *CSP_RESTRICT px, NV *CSP_RESTRICT py, NV *CSP_RESTRICT pz)
-{
+static bool atom_xyz(pTHX_ HV *CSP_RESTRICT atoms, const char *CSP_RESTRICT name, NV *CSP_RESTRICT px, NV *CSP_RESTRICT py, NV *CSP_RESTRICT pz){
 	STRLEN nlen = strlen(name);
 	SV **slot = hv_fetch(atoms, name, (I32)nlen, 0);
 	HV *a;
@@ -3862,14 +3799,13 @@ static bool atom_xyz(pTHX_ HV *CSP_RESTRICT atoms, const char *CSP_RESTRICT name
 it is asked for and kept on the structset: the pi-stacking, the base pairs and
 the interface's cation-pi each want the same list.  The caller reads s->rings
 and does not free it; set_free() does.*/
-static UV rings_get(pTHX_ structset *CSP_RESTRICT s)
-{
+static UV rings_get(pTHX_ structset *CSP_RESTRICT s){
 	ring_t *rings = NULL;
 	UV cap = 0, n = 0, r;
 	if (s->have_rings) return s->n_rings;
 	for (r = 0; r < s->n_res; r++) {
 		const ring_def *defs;
-		unsigned short int nd = ring_defs(s->res_key[r], &defs), d;
+		unsigned short nd = ring_defs(s->res_key[r], &defs), d;
 		HV *atoms;
 		if (nd == 0) continue;
 		atoms = hvf_hv(aTHX_ s->res_hv[r], "atoms", 5);
@@ -3879,7 +3815,7 @@ static UV rings_get(pTHX_ structset *CSP_RESTRICT s)
 			//size of the table's largest entry, not of anything the file says
 			NV px[RING_MAX], py[RING_MAX], pz[RING_MAX];
 			NV cx = 0.0, cy = 0.0, cz = 0.0, ux, uy, uz, vx, vy, vz, wx, wy, wz, wl;
-			unsigned short int i, na = defs[d].n;
+			unsigned short i, na = defs[d].n;
 			bool whole = 1;
 			for (i = 0; i < na; i++) {
 				if (!atom_xyz(aTHX_ atoms, defs[d].atom[i], &px[i], &py[i], &pz[i])) {
@@ -3921,8 +3857,7 @@ static UV rings_get(pTHX_ structset *CSP_RESTRICT s)
 //mean one thing.  The cosine is clamped before acos() sees it: a dot product of
 //two unit vectors can land a fraction of an ulp outside [-1, 1] and acos() of
 //that is a NaN, which numpy warns about and carries and this would not.
-static NV vec_angle_capped(NV ax, NV ay, NV az, NV bx, NV by, NV bz)
-{
+static NV vec_angle_capped(NV ax, NV ay, NV az, NV bx, NV by, NV bz){
 	NV la = nv_sqrt(ax * ax + ay * ay + az * az);
 	NV lb = nv_sqrt(bx * bx + by * by + bz * bz);
 	NV c, a;
@@ -3933,14 +3868,12 @@ static NV vec_angle_capped(NV ax, NV ay, NV az, NV bx, NV by, NV bz)
 	return (a > CSP_PI / 2.0) ? CSP_PI - a : a;
 }
 
-static NV det3(NV a, NV b, NV c, NV d, NV e, NV f, NV g, NV h, NV i)
-{
+static NV det3(NV a, NV b, NV c, NV d, NV e, NV f, NV g, NV h, NV i){
 	return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
 }
 
 //the length of (vx, vy, vz) once its component along the unit vector u is removed
-static NV line_dist(NV vx, NV vy, NV vz, NV ux, NV uy, NV uz)
-{
+static NV line_dist(NV vx, NV vy, NV vz, NV ux, NV uy, NV uz){
 	NV t = ux * vx + uy * vy + uz * vz;
 	vx -= ux * t; vy -= uy * t; vz -= uz * t;
 	return nv_sqrt(vx * vx + vy * vy + vz * vz);
@@ -3971,9 +3904,7 @@ determinant against zero and lets a NaN fall through its threshold; this is
 only ever reached with the planes 50 degrees or more apart, where the
 determinant is |n1 x n2|^2 >= sin^2(50) = 0.587, so the test is a formality
 either way.*/
-static bool ring_intersect(const ring_t *CSP_RESTRICT a, const ring_t *CSP_RESTRICT b,
-                           NV *CSP_RESTRICT dmin)
-{
+static bool ring_intersect(const ring_t *CSP_RESTRICT a, const ring_t *CSP_RESTRICT b, NV *CSP_RESTRICT dmin){
 	NV dx = a->ny * b->nz - a->nz * b->ny;
 	NV dy = a->nz * b->nx - a->nx * b->nz;
 	NV dz = a->nx * b->ny - a->ny * b->nx;
@@ -4011,16 +3942,12 @@ typedef struct {
 	NV face_dist;                    //centroid separation, angstrom
 	NV face_plane_lo, face_plane_hi; //angle between the ring planes, radians
 	NV face_norm_lo, face_norm_hi;   //normal to centroid-to-centroid, radians
-	NV edge_dist;
-	NV edge_plane_lo, edge_plane_hi;
-	NV edge_norm_lo, edge_norm_hi;
+	NV edge_dist, edge_plane_lo, edge_plane_hi, edge_norm_lo, edge_norm_hi;
 	NV edge_radius;                  //centroid to the planes' shared line, angstrom
 } pi_opt;
 
 //one field of the residue a ring sits in, copied into the interaction hash
-static void pi_field(pTHX_ HV *CSP_RESTRICT out, const char *CSP_RESTRICT key, STRLEN klen,
-                     HV *CSP_RESTRICT res, const char *CSP_RESTRICT from, STRLEN flen)
-{
+static void pi_field(pTHX_ HV *CSP_RESTRICT out, const char *CSP_RESTRICT key, STRLEN klen,  HV *CSP_RESTRICT res, const char *CSP_RESTRICT from, STRLEN flen){
 	SV *v = hvf_sv(aTHX_ res, from, flen);
 	(void)hv_store(out, key, (I32)klen, v ? newSVsv(v) : newSVpvn("", 0), 0);
 }
@@ -4199,8 +4126,8 @@ adenine N6 at 2.7734 A.*/
 
 typedef struct {
 	char a, b;                  //the two bases, the purine first
-	unsigned short int saenger; //which of Saenger's twenty-eight this is
-	unsigned short int n;       //how many of the bonds below define it
+	unsigned short saenger; //which of Saenger's twenty-eight this is
+	unsigned short n;       //how many of the bonds below define it
 	const char *atom[CSP_BP_BONDS][2]; //the a atom and the b atom of each bond
 } bp_def;
 
@@ -4227,8 +4154,7 @@ has two rings and only the six-membered one is here, because it is the one both
 purines and pyrimidines have and the one every atom in the table above hangs
 off.  A modified base has no single-letter code and so is not a base here; that
 is the eighteen pairs the header comment accounts for.*/
-static UV bases_find(pTHX_ structset *CSP_RESTRICT s, base_t *CSP_RESTRICT *CSP_RESTRICT out)
-{
+static UV bases_find(pTHX_ structset *CSP_RESTRICT s, base_t *CSP_RESTRICT *CSP_RESTRICT out){
 	const ring_t *rings;
 	base_t *b = NULL;
 	UV n, k, m = 0;
@@ -4256,10 +4182,8 @@ static UV bases_find(pTHX_ structset *CSP_RESTRICT s, base_t *CSP_RESTRICT *CSP_
 
 //which entry of bp_kinds two bases could be, and which way round; NULL for a
 //combination that is not one of the canonical pairs
-static const bp_def *bp_kind_of(char x, char y, bool *CSP_RESTRICT swapped)
-{
-	unsigned short int i;
-	for (i = 0; i < (unsigned short int)C_ARRAY_LENGTH(bp_kinds); i++) {
+static const bp_def *bp_kind_of(char x, char y, bool *CSP_RESTRICT swapped){
+	for (unsigned short i = 0; i < (unsigned short)C_ARRAY_LENGTH(bp_kinds); i++) {
 		if (bp_kinds[i].a == x && bp_kinds[i].b == y) { *swapped = 0; return &bp_kinds[i]; }
 		if (bp_kinds[i].a == y && bp_kinds[i].b == x) { *swapped = 1;  return &bp_kinds[i]; }
 	}
@@ -4267,9 +4191,7 @@ static const bp_def *bp_kind_of(char x, char y, bool *CSP_RESTRICT swapped)
 }
 
 //the partner half of one pair, pushed onto a base's own list
-static void bp_note(pTHX_ HV *CSP_RESTRICT res, HV *CSP_RESTRICT partner,
-                    const char *CSP_RESTRICT type, unsigned short int saenger)
-{
+static void bp_note(pTHX_ HV *CSP_RESTRICT res, HV *CSP_RESTRICT partner, const char *CSP_RESTRICT type, unsigned short saenger){
 	SV **slot = hv_fetch(res, "base_pair", 9, 0);
 	AV *list;
 	HV *e;
@@ -4288,8 +4210,7 @@ static void bp_note(pTHX_ HV *CSP_RESTRICT res, HV *CSP_RESTRICT partner,
 	av_push(list, newRV_noinc((SV *)e));
 }
 
-static AV *base_pairs(pTHX_ structset *CSP_RESTRICT s, NV hb, NV stagger, bool store)
-{
+static AV *base_pairs(pTHX_ structset *CSP_RESTRICT s, NV hb, NV stagger, bool store){
 	AV *out = newAV();
 	base_t *bases = NULL;
 	NV *cx = NULL, *cy = NULL, *cz = NULL;
@@ -4330,7 +4251,7 @@ static AV *base_pairs(pTHX_ structset *CSP_RESTRICT s, NV hb, NV stagger, bool s
 				bool swapped = 0;
 				NV vx, vy, vz, d, plane, sag_i, sag_j, sag;
 				NV bond[CSP_BP_BONDS];
-				unsigned short int k;
+				unsigned short k;
 				bool whole = 1;
 				char tname[4];
 				HV *h;
@@ -4531,7 +4452,7 @@ cutoffs are what base_stacks() builds its grid on and scores against.*/
 
 typedef struct {
 	const char *const *atom;  //the heavy atoms the centre of mass is taken over
-	unsigned short int n;     //how many
+	unsigned short n;     //how many
 	const char *a, *b;        //the two atoms the normal's cross product is built from
 } nucbase_def;
 
@@ -4610,7 +4531,7 @@ static UV stacks_find(pTHX_ structset *CSP_RESTRICT s, nucbase_t *CSP_RESTRICT *
 		HV *atoms;
 		NV cx = 0.0, cy = 0.0, cz = 0.0, tot = 0.0;
 		NV ax, ay, az, bx, by, bz, wx, wy, wz, wl;
-		unsigned short int i;
+		unsigned short i;
 		bool whole = 1;
 		if (s->res_type[r] != RT_NUC) continue;
 		if (!nucbase_of(s->res_one[r], &def)) continue;
@@ -4783,7 +4704,7 @@ static AV *base_stacks(pTHX_ structset *CSP_RESTRICT s, NV dist_cut, NV omega_cu
 				bool have_xi = 0;
 				char tname[4];
 				HV *h;
-				unsigned short int k;
+				unsigned short k;
 				if (j <= i) continue; //each pair once, the earlier residue first
 	//two conformers of one residue are not two bases
 				if (bases[i].res == bases[j].res) continue;
@@ -5066,7 +4987,7 @@ measuring across a gap.*/
 
 typedef struct {
 	const char *const *atom; //the four atom names
-	unsigned short int n;    //how many alternatives follow this one
+	unsigned short n;    //how many alternatives follow this one
 } chi_alt;
 
 static const char *const chi1_a[5][4] = {
@@ -5113,7 +5034,7 @@ static bool dihedral4(const NV *CSP_RESTRICT p0, const NV *CSP_RESTRICT p1,
                       NV *CSP_RESTRICT out)
 {
 	NV b0[3], b1[3], b2[3], v[3], w[3], cr[3], len, d0, d2, x, y;
-	unsigned short int k;
+	unsigned short k;
 	for (k = 0; k < 3; k++) {
 		b0[k] = p0[k] - p1[k];
 		b1[k] = p2[k] - p1[k];
@@ -5149,10 +5070,10 @@ static bool dihedral4(const NV *CSP_RESTRICT p0, const NV *CSP_RESTRICT p1,
 //each comes from, 0 for the first residue's hash and 1 for the second's
 static bool four_atoms(pTHX_ HV *CSP_RESTRICT a, HV *CSP_RESTRICT b,
                        const char *const *CSP_RESTRICT name,
-                       const unsigned short int *CSP_RESTRICT which,
+                       const unsigned short *CSP_RESTRICT which,
                        NV p[4][3])
 {
-	for (unsigned short int k = 0; k < 4; k++) {
+	for (unsigned short k = 0; k < 4; k++) {
 		HV *from = which[k] ? b : a;
 		if (!from) return FALSE;
 		if (!atom_xyz(aTHX_ from, name[k], &p[k][0], &p[k][1], &p[k][2])) return FALSE;
@@ -5195,10 +5116,10 @@ static bool peptide_linked(pTHX_ structset *CSP_RESTRICT s, UV prev, UV next, NV
 
 //one chi, from whichever of its alternatives the residue is built from
 static bool chi_of(pTHX_ HV *CSP_RESTRICT atoms, const char *const alt[][4],
-                   unsigned short int n_alt, NV *CSP_RESTRICT out)
+                   unsigned short n_alt, NV *CSP_RESTRICT out)
 {
-	static const unsigned short int here[4] = { 0, 0, 0, 0 };
-	unsigned short int k;
+	static const unsigned short here[4] = { 0, 0, 0, 0 };
+	unsigned short k;
 	for (k = 0; k < n_alt; k++) {
 		NV p[4][3];
 		if (!four_atoms(aTHX_ atoms, NULL, alt[k], here, p)) continue;
@@ -5320,10 +5241,10 @@ static void nuc_torsions(pTHX_ HV *CSP_RESTRICT me, HV *CSP_RESTRICT my_at,
                          HV *CSP_RESTRICT pv_at, HV *CSP_RESTRICT nx_at,
                          bool prev_linked, bool next_linked)
 {
-	static const unsigned short int here[4]   = { 0, 0, 0, 0 };
-	static const unsigned short int prev_w[4] = { 0, 1, 1, 1 };
-	static const unsigned short int eps_w[4]  = { 0, 0, 0, 1 };
-	static const unsigned short int zeta_w[4] = { 0, 0, 1, 1 };
+	static const unsigned short here[4]   = { 0, 0, 0, 0 };
+	static const unsigned short prev_w[4] = { 0, 1, 1, 1 };
+	static const unsigned short eps_w[4]  = { 0, 0, 0, 1 };
+	static const unsigned short zeta_w[4] = { 0, 0, 1, 1 };
 	static const char *const alpha_n[4] = { "O3'", "P", "O5'", "C5'" };
 	static const char *const beta_n[4]  = { "P", "O5'", "C5'", "C4'" };
 	static const char *const gamma_n[4] = { "O5'", "C5'", "C4'", "C3'" };
@@ -5340,9 +5261,9 @@ static void nuc_torsions(pTHX_ HV *CSP_RESTRICT me, HV *CSP_RESTRICT my_at,
 	const NV to_deg = 180.0 / CSP_PI;
 	NV p[4][3], v, nu[5];
 	bool have_nu = 1;
-	unsigned short int k;
+	unsigned short k;
 
-	for (k = 0; k < (unsigned short int)C_ARRAY_LENGTH(nuc_keys); k++)
+	for (k = 0; k < (unsigned short)C_ARRAY_LENGTH(nuc_keys); k++)
 		(void)hv_delete(me, nuc_keys[k], (I32)strlen(nuc_keys[k]), G_DISCARD);
 
 	if (prev_linked && four_atoms(aTHX_ pv_at, my_at, alpha_n, prev_w, p)
@@ -5409,7 +5330,7 @@ static void nuc_torsions(pTHX_ HV *CSP_RESTRICT me, HV *CSP_RESTRICT my_at,
 			if (phase >= 360.0) phase = 0.0;
 			(void)hv_stores(me, "pucker_phase", newSVnv(phase));
 			(void)hv_stores(me, "pucker",
-			                newSVpv(nuc_pucker[(unsigned short int)(phase / 36.0)], 0));
+			                newSVpv(nuc_pucker[(unsigned short)(phase / 36.0)], 0));
 			//cos P is zero only when nu2 is exactly zero, where the amplitude
 			//is the other half of the fraction; there is no ring like that in
 			//a real file and none is invented here
@@ -5447,7 +5368,7 @@ static const char *const tors_name[] = {
 	"alpha", "beta", "gamma", "delta", "epsilon", "zeta",
 	"nu", "pucker", "pucker_phase", "pucker_amplitude", "glycosidic"
 };
-#define NTORS ((unsigned short int)(sizeof tors_name / sizeof *tors_name))
+#define NTORS ((unsigned short)(sizeof tors_name / sizeof *tors_name))
 
 static void chain_torsions(pTHX_ HV *CSP_RESTRICT chain,
                            HV *CSP_RESTRICT *CSP_RESTRICT res, UV n)
@@ -5456,7 +5377,7 @@ static void chain_torsions(pTHX_ HV *CSP_RESTRICT chain,
 	AV *col[NTORS];
 	STRLEN len[NTORS];
 	bool any[NTORS];   //FALSE until some residue turns out to have the key
-	unsigned short int k;
+	unsigned short k;
 	UV i;
 
 	for (k = 0; k < NTORS; k++) {
@@ -5503,11 +5424,11 @@ chain's worth of residue hashes, rather than a second pass over the structure.*/
 static void dihedrals(pTHX_ structset *CSP_RESTRICT s, NV bond, NV phospho)
 {
 	static const char *const phi_n[4]   = { "C", "N", "CA", "C" };
-	static const unsigned short int phi_w[4] = { 0, 1, 1, 1 };
+	static const unsigned short phi_w[4] = { 0, 1, 1, 1 };
 	static const char *const psi_n[4]   = { "N", "CA", "C", "N" };
-	static const unsigned short int psi_w[4] = { 0, 0, 0, 1 };
+	static const unsigned short psi_w[4] = { 0, 0, 0, 1 };
 	static const char *const omg_n[4]   = { "CA", "C", "N", "CA" };
-	static const unsigned short int omg_w[4] = { 0, 0, 1, 1 };
+	static const unsigned short omg_w[4] = { 0, 0, 1, 1 };
 	const NV to_deg = 180.0 / CSP_PI;
 	UV c, r;
 
@@ -5520,7 +5441,7 @@ static void dihedrals(pTHX_ structset *CSP_RESTRICT s, NV bond, NV phospho)
 			HV *pv_at = prev ? hvf_hv(aTHX_ prev, "atoms", 5) : NULL;
 			HV *nx_at = next ? hvf_hv(aTHX_ next, "atoms", 5) : NULL;
 			NV p[4][3], v;
-			unsigned short int k, last = 0;
+			unsigned short k, last = 0;
 			NV chi[CHI_MAX];
 			bool have[CHI_MAX];
 			if (!my_at) continue;
@@ -5549,7 +5470,7 @@ static void dihedrals(pTHX_ structset *CSP_RESTRICT s, NV bond, NV phospho)
 			have[2] = chi_of(aTHX_ my_at, chi3_a, 4, &chi[2]);
 			have[3] = chi_of(aTHX_ my_at, chi4_a, 2, &chi[3]);
 			have[4] = chi_of(aTHX_ my_at, chi5_a, 1, &chi[4]);
-			for (k = 0; k < CHI_MAX; k++) if (have[k]) last = (unsigned short int)(k + 1);
+			for (k = 0; k < CHI_MAX; k++) if (have[k]) last = (unsigned short)(k + 1);
 			if (last) {
 				AV *list = newAV();
 				for (k = 0; k < last; k++)
@@ -5623,7 +5544,7 @@ static bool gly_cb(pTHX_ HV *CSP_RESTRICT atoms, NV *CSP_RESTRICT out)
 {
 	NV nx, ny, nz, cx, cy, cz, ax, ay, az, k[3], v[3], len, c, sn, dot;
 	const NV ang = -CSP_PI * 120.0 / 180.0;
-	unsigned short int i;
+	unsigned short i;
 	if (!atom_xyz(aTHX_ atoms, "N",  &nx, &ny, &nz)) return FALSE;
 	if (!atom_xyz(aTHX_ atoms, "C",  &cx, &cy, &cz)) return FALSE;
 	if (!atom_xyz(aTHX_ atoms, "CA", &ax, &ay, &az)) return FALSE;
@@ -5764,7 +5685,7 @@ static bool ca_linked(pTHX_ HV *CSP_RESTRICT at1, HV *CSP_RESTRICT at2)
 	HV *ca[2];
 	AV *alt[2];
 	SSize_t top[2], i, j;
-	unsigned short int k;
+	unsigned short k;
 	for (k = 0; k < 2; k++) {
 		ca[k] = hvf_hv(aTHX_ k ? at2 : at1, "CA", 2);
 		if (!ca[k]) return FALSE;
@@ -5969,7 +5890,7 @@ static NV ks_energy(const backbone *CSP_RESTRICT a, const NV *CSP_RESTRICT h,
                     const NV *CSP_RESTRICT nd)
 {
 	NV r_on = 0.0, r_ch = 0.0, r_oh = 0.0, r_cn = 0.0, e;
-	for (unsigned short int k = 0; k < 3; k++) {
+	for (unsigned short k = 0; k < 3; k++) {
 		NV d;
 		d = a->o[k] - nd[k];   r_on += d * d;
 		d = a->c[k] - h[k];    r_ch += d * d;
@@ -6023,7 +5944,7 @@ static void ks_compute(pTHX_ structset *CSP_RESTRICT s, const backbone *CSP_REST
 		UV d = which[k];
 		NV h[3], len;
 		UV bx, by, bz, ci, cj, ck;
-		unsigned short int j;
+		unsigned short j;
 		if (bb[d].proline || !bb[d].linked) continue;
 		if (d == 0 || !bb[d - 1].whole) continue;
 		len = 0.0;
@@ -6074,7 +5995,7 @@ static AV *hbond_list(pTHX_ structset *CSP_RESTRICT s)
 	AV *out = newAV();
 	UV d;
 	for (d = 0; d < s->n_res; d++) {
-		for (unsigned short int k = 0; k < CSP_KS_KEEP; k++) {
+		for (unsigned short k = 0; k < CSP_KS_KEEP; k++) {
 			UV a = s->ks_acc[d * CSP_KS_KEEP + k];
 			HV *h;
 			if (a >= s->n_res) continue;
@@ -6244,7 +6165,7 @@ static float dssp_energy(const dssp_res *CSP_RESTRICT a, const dssp_res *CSP_RES
 	dssp_sub3(d->n, a->c, v); r[1] = dssp_dot3(v, v);
 	dssp_sub3(d->h, a->c, v); r[2] = dssp_dot3(v, v);
 	dssp_sub3(d->n, a->o, v); r[3] = dssp_dot3(v, v);
-	for (unsigned short int k = 0; k < 4; k++) r[k] = 1.0f / (float)sqrt((double)r[k]);
+	for (unsigned short k = 0; k < 4; k++) r[k] = 1.0f / (float)sqrt((double)r[k]);
 	lo = (-DSSP_COUPLE) * r[0] + (-DSSP_COUPLE) * r[1];
 	hi = DSSP_COUPLE * r[2] + DSSP_COUPLE * r[3];
 	e = lo + hi;
@@ -6351,7 +6272,7 @@ static void dssp_read(pTHX_ structset *CSP_RESTRICT s, dssp_res *CSP_RESTRICT bb
 		dssp_res *b = &bb[r];
 		Zero(b, 1, dssp_res);
 		b->proline = (s->res_key[r] == K3('P','R','O'));
-		for (unsigned short int k = 0; k < 3; k++) {
+		for (unsigned short k = 0; k < 3; k++) {
 			b->n[k]  = dssp_nm(x[r].n[k]);
 			b->ca[k] = dssp_nm(x[r].ca[k]);
 			b->c[k]  = dssp_nm(x[r].c[k]);
@@ -6370,7 +6291,7 @@ static void dssp_read(pTHX_ structset *CSP_RESTRICT s, dssp_res *CSP_RESTRICT bb
 		dssp_sub3(p->c, p->o, co);
 		len = (float)sqrt((double)dssp_dot3(co, co));
 		if (!(len > 0.0f)) continue;
-		for (unsigned short int k = 0; k < 3; k++) {
+		for (unsigned short k = 0; k < 3; k++) {
 	//one step per named float, so that each is rounded to float where
 	//it is in mdtraj, rather than a wider product reaching the sum
 			float u = co[k] / len;
@@ -6756,7 +6677,7 @@ static void dssp_helices(pTHX_ UV n_res, const UV *CSP_RESTRICT seg,
 {
 	unsigned char *CSP_RESTRICT hf = NULL;
 	UV i, j, first;
-	unsigned short int stride, k;
+	unsigned short stride, k;
 
 	Newxz(hf, n_res * 3, unsigned char);
 	//the n-turns, chain by chain and then stride by stride, as mdtraj walks them
@@ -6765,7 +6686,7 @@ static void dssp_helices(pTHX_ UV n_res, const UV *CSP_RESTRICT seg,
 		UV last = first;
 		while (last < n_res && seg[last] == seg[first]) last++;
 		for (stride = 3; stride <= 5; stride++) {
-			unsigned short int off = (unsigned short int)(stride - 3);
+			unsigned short off = (unsigned short)(stride - 3);
 			for (i = first; i < last; i++) {
 				UV t = i + stride;
 				if (t >= n_res || !dssp_bonded(n_res, acc, t, i) || seg[t] != seg[i])
@@ -7139,7 +7060,7 @@ static void touch_note(pTHX_ iface_touch **CSP_RESTRICT list, UV *CSP_RESTRICT n
 static SV *pair_av(pTHX_ const NV *CSP_RESTRICT v, const bool *CSP_RESTRICT have)
 {
 	AV *av = newAV();
-	unsigned short int k;
+	unsigned short k;
 	for (k = 0; k < 2; k++) av_push(av, have[k] ? newSVnv(v[k]) : newSV(0));
 	return newRV_noinc((SV *)av);
 }
@@ -7219,7 +7140,7 @@ static HV *iface_compute(pTHX_ structset *CSP_RESTRICT s, AV *sides[2], UV npts,
 	UV bn[2] = { 0, 0 }, bin[2] = { 0, 0 }, n_at[2] = { 0, 0 };
 	NV mass[2] = { 0.0, 0.0 }, com[2][3];
 	bool have_min = FALSE, have_b[2], have_bi[2];
-	unsigned short int sd;
+	unsigned short sd;
 
 	if (io->salt > reach)      reach = io->salt;
 	if (io->polar > reach)     reach = io->polar;
@@ -7534,7 +7455,7 @@ static HV *iface_compute(pTHX_ structset *CSP_RESTRICT s, AV *sides[2], UV npts,
 	Zero(com, 1, NV[2][3]);
 	for (k = 0; k < n_sub; k++) {
 		const UV a = w.map[k];
-		const unsigned short int p = k < n1 ? 0 : 1;
+		const unsigned short p = k < n1 ? 0 : 1;
 		mass[p] += s->mass[a];
 		com[p][0] += s->mass[a] * s->x[a];
 		com[p][1] += s->mass[a] * s->y[a];
@@ -7981,7 +7902,7 @@ static HV *features_do(pTHX_ HV *CSP_RESTRICT info, HV *CSP_RESTRICT o,
 		AV *pm = newAV();
 		AV *tensor = newAV();
 		NV tr = moment[0] + moment[1] + moment[2];
-		unsigned short int a, b;
+		unsigned short a, b;
 		for (a = 0; a < 3; a++) av_push(pm, newSVnv(moment[a]));
 		for (a = 0; a < 3; a++) {
 			AV *row = newAV();
@@ -8353,7 +8274,7 @@ static void qcp_rotation(NV s[3][3], NV e0, NV rot[3][3])
 	NV a3344_4334, a3244_4234, a3243_4233, a3143_4133, a3144_4134, a3142_4132;
 	NV q[4][4], qsqr[4], best, scale, qn;
 	NV a2, x2, y2, z2, xy, az, zx, ay, yz, ax;
-	unsigned short int it, k, kbest;
+	unsigned short it, k, kbest;
 
 	for (it = 0; it < CSP_QCP_ITER; it++) {
 		const NV old = lambda;
@@ -8476,7 +8397,7 @@ static NV rmsd_measure(const structset *CSP_RESTRICT A, const structset *CSP_RES
 	NV acx = 0.0, acy = 0.0, acz = 0.0, bcx = 0.0, bcy = 0.0, bcz = 0.0;
 	NV sum = 0.0;
 	UV i;
-	unsigned short int p, q;
+	unsigned short p, q;
 
 	Zero(rot, 1, NV[3][3]);
 	rot[0][0] = rot[1][1] = rot[2][2] = 1.0;
@@ -8531,6 +8452,9 @@ typedef struct {
 	structset *set;
 	rmsd_key **key;
 	UV *nkey, n_set, *ia, *ib;
+	//each structure's row of the RMSD and count matrices, borrowed: the AVs
+	//belong to the matrices, and only these two arrays of pointers are ours
+	AV **mrow, **crow;
 } rmsd_work;
 
 static void rmsd_work_free(pTHX_ rmsd_work *CSP_RESTRICT w)
@@ -8543,6 +8467,8 @@ static void rmsd_work_free(pTHX_ rmsd_work *CSP_RESTRICT w)
 	Safefree(w->nkey);
 	Safefree(w->ia);
 	Safefree(w->ib);
+	Safefree(w->mrow);
+	Safefree(w->crow);
 	Zero(w, 1, rmsd_work);
 }
 
@@ -8566,7 +8492,7 @@ static short int rmsd_word(pTHX_ HV *CSP_RESTRICT o, const char *CSP_RESTRICT k,
 {
 	SV *v = opt_get(aTHX_ o, k);
 	if (!v) return dflt;
-	for (unsigned short int i = 0; words[i]; i++) if (strEQ(SvPV_nolen(v), words[i])) return i;
+	for (unsigned short i = 0; words[i]; i++) if (strEQ(SvPV_nolen(v), words[i])) return i;
 	croak("%s: %s must be %s, not '%s'", who, k, list, SvPV_nolen(v));
 }
 
@@ -8616,6 +8542,8 @@ static HV *rmsd_do(pTHX_ AV *CSP_RESTRICT sets, HV *CSP_RESTRICT o,
 	Newxz(w.set, (UV)nsv, structset);
 	Newxz(w.key, (UV)nsv, rmsd_key *);
 	Newxz(w.nkey, (UV)nsv, UV);
+	Newxz(w.mrow, (UV)nsv, AV *);
+	Newxz(w.crow, (UV)nsv, AV *);
 	w.n_set = (UV)nsv;
 
 	//the intern table, mortal so that a croak below does not keep it
@@ -8652,31 +8580,33 @@ static HV *rmsd_do(pTHX_ AV *CSP_RESTRICT sets, HV *CSP_RESTRICT o,
 	sv_2mortal((SV *)mat);
 	sv_2mortal((SV *)cnt);
 	sv_2mortal((SV *)sizes);
-	for (si = 0; si < nsv; si++) {
-		av_push(sizes, newSVuv(w.nkey[si]));
-		av_push(mat, newRV_noinc((SV *)newAV()));
-		av_push(cnt, newRV_noinc((SV *)newAV()));
-	}
 	/*Both matrices are given their full length up front and filled in below.
 	A cell of the count matrix is always written; a cell of the RMSD matrix is
 	written only where there was an RMSD to write, and the ones that are not
 	are the pairs with too few atoms in common -- which is undef, which is what
-	a slot nobody stored into reads back as.*/
+	a slot nobody stored into reads back as.  The rows are kept in w as they
+	are made, rather than fetched back out of the matrices, so that nothing
+	below dereferences what av_fetch() returned.*/
 	for (si = 0; si < nsv; si++) {
-		av_fill((AV *)SvRV(*av_fetch(mat, si, 0)), nsv - 1);
-		av_fill((AV *)SvRV(*av_fetch(cnt, si, 0)), nsv - 1);
+		av_push(sizes, newSVuv(w.nkey[si]));
+		w.mrow[si] = newAV();
+		w.crow[si] = newAV();
+		av_push(mat, newRV_noinc((SV *)w.mrow[si]));
+		av_push(cnt, newRV_noinc((SV *)w.crow[si]));
+		av_fill(w.mrow[si], nsv - 1);
+		av_fill(w.crow[si], nsv - 1);
 	}
 
 	for (si = 0; si < nsv; si++) {
-		AV *mrow = (AV *)SvRV(*av_fetch(mat, si, 0));
-		AV *crow = (AV *)SvRV(*av_fetch(cnt, si, 0));
+		AV *mrow = w.mrow[si];
+		AV *crow = w.crow[si];
 		/*a structure against itself is zero by construction and needs neither
 		the pairing nor the fit; what it pairs with is everything it has*/
 		(void)av_store(mrow, si, newSVnv(0.0));
 		(void)av_store(crow, si, newSVuv(w.nkey[si]));
 		for (sj = si + 1; sj < nsv; sj++) {
-			AV *mrow2 = (AV *)SvRV(*av_fetch(mat, sj, 0));
-			AV *crow2 = (AV *)SvRV(*av_fetch(cnt, sj, 0));
+			AV *mrow2 = w.mrow[sj];
+			AV *crow2 = w.crow[sj];
 			NV rot[3][3], tran[3], r;
 			UV n;
 			if (match == RM_ORDER) {
@@ -8699,7 +8629,7 @@ static HV *rmsd_do(pTHX_ AV *CSP_RESTRICT sets, HV *CSP_RESTRICT o,
 			(void)av_store(mrow, sj, newSVnv(r));
 			(void)av_store(mrow2, si, newSVnv(r));
 			if (want_transform && !rotation) {
-				unsigned short int p, q;
+				unsigned short p, q;
 				rotation = newAV();
 				translation = newAV();
 				sv_2mortal((SV *)rotation);

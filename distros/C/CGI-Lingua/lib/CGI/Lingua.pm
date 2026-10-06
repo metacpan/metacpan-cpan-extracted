@@ -18,9 +18,8 @@ use Class::Autouse qw{
 	I18N::LangTags::Detect
 };
 
-our $VERSION = '0.85';
+our $VERSION = '0.86';
 
-# ── Module-level constants ───────────────────────────────────────────────────
 # Gathering magic strings here makes behavioural changes one-edit operations.
 
 Readonly my $CACHE_TTL_LONG      => '1 month';
@@ -81,7 +80,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.85
+Version 0.86
 
 =cut
 

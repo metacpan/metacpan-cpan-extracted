@@ -1,5 +1,8 @@
 Changelog for Mixin-ExtraFields
 
+0.140004  2026-10-05 08:41:50-04:00 America/New_York
+        - update to Params::SomeUtil and require it (thanks, ANDK!)
+
 0.140003  2022-12-31 13:29:27-05:00 America/New_York
         - update packaging and metadata
         - minimum required Perl is now v5.12

@@ -149,6 +149,11 @@ SKIP: {
 		if ($child == 0) {
 			open STDOUT, '>', File::Spec->devnull;
 			open STDERR, '>', File::Spec->devnull;
+			# The TERM must be able to end this child perl, and this file
+			# may have inherited it ignored, which parallel() would rightly
+			# leave alone; a default disposition survives exec. Until 0.194
+			# it was inherited.
+			$SIG{$_} = 'DEFAULT' foreach qw(HUP INT QUIT TERM);
 			no warnings 'exec';
 			# "or", not a statement after it: perl 5.10 and 5.12 warn
 			# "Statement unlikely to be reached" despite the no warnings

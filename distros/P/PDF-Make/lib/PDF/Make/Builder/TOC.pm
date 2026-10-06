@@ -53,11 +53,12 @@ sub render {
     my $tw = $page->width;
     my $right_x = $cx + $tw;
 
+    my $tj = $font->show_op;
     $canvas->BT
            ->rg($tr, $tg, $tb)
            ->Tf($res, $title_size)
            ->Tm(1, 0, 0, 1, $cx, $cy)
-           ->Tj(title $self)
+           ->$tj($font->encode(title $self))
            ->ET;
 
     $cy -= title_padding $self;
@@ -90,7 +91,7 @@ sub render {
                ->rg($er, $eg, $eb)
                ->Tf($entry_res, $entry_size)
                ->Tm(1, 0, 0, 1, $text_x, $cy)
-               ->Tj($text)
+               ->$tj($font->encode($text))
                ->ET;
 
         # Dot leaders: draw vector dots so spacing is visual, not font-dependent
@@ -119,7 +120,7 @@ sub render {
                ->rg($er, $eg, $eb)
                ->Tf($entry_res, $entry_size)
                ->Tm(1, 0, 0, 1, $pnum_x, $cy)
-               ->Tj($pnum_str)
+               ->$tj($font->encode($pnum_str))
                ->ET;
 
         # Make TOC row clickable (internal GoTo)

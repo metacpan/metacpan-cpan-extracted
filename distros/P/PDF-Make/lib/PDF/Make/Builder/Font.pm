@@ -15,6 +15,7 @@ BEGIN {
         'italic:Bool:default(0)',
         'line_height:Num',
         'loaded:HashRef:default({})',
+        'registry:HashRef:default({})',
     );
     Object::Proto::import_accessors('PDF::Make::Builder::Font');
 }
@@ -64,8 +65,23 @@ my %BASEFONT = (
 # Cache for Font::Metrics objects (exact per-glyph metrics via Font::Metrics XS)
 my %_fm_cache;
 
+# A family registered by Builder::load_ttf, or undef for a Standard 14 family.
+# The entry is the hashref the Builder owns: { font, path, obj, pages }, shared
+# by reference with every font cloned from this one, so a page recorded here is
+# a page the Builder will attach the embedded font to when it finalises.
+sub _ttf {
+    my ($self) = @_;
+    my $reg = registry $self;
+    return undef unless $reg;
+    return $reg->{ family $self };
+}
+
+sub is_ttf { return defined $_[0]->_ttf ? 1 : 0 }
+
 sub _xs_font {
     my ($self, $variant) = @_;
+    my $ttf = $self->_ttf;
+    return $ttf->{font} if $ttf;
     $variant //= $self->_default_variant;
     my $fam = family $self;
     my $key = "${fam}_${variant}";
@@ -74,6 +90,24 @@ sub _xs_font {
     return undef unless $basefont;
     $_fm_cache{$key} = Font::Metrics->new(name => $basefont);
     return $_fm_cache{$key};
+}
+
+# The show operator this font's text needs, and the operand to give it.
+#
+# A loaded TTF is embedded as a Type0 font with Identity-H encoding, so its
+# operand is two bytes of glyph id per character and goes in a hex string.
+# encode_utf8 also marks each glyph used, which is what the subsetter embeds,
+# so this must run for every string actually drawn.
+sub show_op { return $_[0]->is_ttf ? 'Tj_hex' : 'Tj' }
+
+sub encode {
+    my ($self, $text) = @_;
+    my $ttf = $self->_ttf;
+    return $text unless $ttf;
+    return '' unless defined $text;
+    my $utf8 = $text;
+    utf8::upgrade($utf8);   # SvPV then always hands XS UTF-8, never Latin-1
+    return $ttf->{font}->encode_utf8($utf8);
 }
 
 sub _default_variant {
@@ -155,15 +189,30 @@ sub hex_to_rgb {
 
 sub resource_name {
     my ($self, $variant) = @_;
-    $variant //= $self->_default_variant;
     my $fam = family $self;
+    # One file is one face, so a loaded TTF has no bold/italic variants to
+    # name - asking for bold on it gets the face as supplied.
+    return "F_${fam}" if $self->is_ttf;
+    $variant //= $self->_default_variant;
     return "F_${fam}_${variant}";
 }
 
 sub ensure_loaded {
     my ($self, $xs_page, $variant) = @_;
-    $variant //= $self->_default_variant;
     my $fam = family $self;
+
+    # An embedded font cannot be attached to the page yet: its object number
+    # is only known once the document is written, because subsetting depends
+    # on every glyph drawn with it. Record the page and let the Builder
+    # attach it in _finalise.
+    if (my $ttf = $self->_ttf) {
+        my $res_name = "F_${fam}";
+        push @{ $ttf->{pages} }, $xs_page
+            unless grep { $_ == $xs_page } @{ $ttf->{pages} };
+        return $res_name;
+    }
+
+    $variant //= $self->_default_variant;
     my $key = "${fam}_${variant}";
     my $res_name = "F_${key}";
 

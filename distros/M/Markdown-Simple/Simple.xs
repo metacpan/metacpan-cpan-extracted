@@ -18,30 +18,30 @@
  * glue at the bottom of this file calls.
  */
 #define MDS_UNITY_BUILD 1
-#include "../../src/mds_arena.c"
-#include "../../src/mds_buf.c"
-#include "../../src/mds_linkref.c"
-#include "../../src/mds_footnote.c"
-#include "../../src/mds_block.c"
-#include "../../src/mds_inline.c"
-#include "../../src/mds_render_html.c"
-#include "../../src/mds_gfm.c"
-#include "../../src/mds.c"
+#include "src/mds_arena.c"
+#include "src/mds_buf.c"
+#include "src/mds_linkref.c"
+#include "src/mds_footnote.c"
+#include "src/mds_block.c"
+#include "src/mds_inline.c"
+#include "src/mds_render_html.c"
+#include "src/mds_gfm.c"
+#include "src/mds.c"
 
 /* SIMD foundation: always build the scalar + dispatch units. The
  * AVX2/SSE2/NEON files compile only when their feature macro is set. */
-#include "../../src/simd/mds_simd_scalar.c"
+#include "src/simd/mds_simd_scalar.c"
 #ifdef MDS_HAVE_SSE2
-#  include "../../src/simd/mds_simd_sse2.c"
+#  include "src/simd/mds_simd_sse2.c"
 #endif
 #ifdef MDS_HAVE_AVX2
-#  include "../../src/simd/mds_simd_avx2.c"
+#  include "src/simd/mds_simd_avx2.c"
 #endif
 #ifdef MDS_HAVE_NEON
-#  include "../../src/simd/mds_simd_neon.c"
+#  include "src/simd/mds_simd_neon.c"
 #endif
-#include "../../src/simd/mds_simd_dispatch.c"
-#include "../../src/simd/mds_dispatch.c"
+#include "src/simd/mds_simd_dispatch.c"
+#include "src/simd/mds_dispatch.c"
 /* ------------------------------------------------------------------ */
 
 /* Special-byte table used by strip_markdown_except_lists_tables to skip

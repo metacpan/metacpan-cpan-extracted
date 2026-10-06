@@ -1,5 +1,9 @@
 Revision history for Physics::Balls
 
+0.08	2026-10-05
+        - A layout row's negative kind no longer indexes the world's kind arrays before it is refused
+        - t/13-advance.t marks 2 and 3 do not assume an NV is a double
+
 0.07	2026-09-23
         - ABI 4 by append: advance runs the world a fixed time from rows that carry a velocity and reports every body at the horizon, for a game that ticks
 

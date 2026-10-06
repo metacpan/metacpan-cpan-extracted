@@ -2,7 +2,7 @@ package PDF::Make::Action;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 1;
 

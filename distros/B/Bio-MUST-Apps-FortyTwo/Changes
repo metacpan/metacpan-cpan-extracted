@@ -1,3 +1,8 @@
+0.262780  2026-10-05 23:49:28+02:00 Europe/Brussels
+    - Fixes
+      - 42: Fixed bug due to change in XML BLAST report format
+      - 42: Fixed minor bugs in yaml-generator-42.pl
+
 0.213470  2021-12-14 00:07:07+01:00 Europe/Brussels
     - Additions
       - 42: New command-line option --outdir in debrief-42.pl and yaml-generator-42.pl

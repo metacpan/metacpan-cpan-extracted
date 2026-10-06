@@ -1,5 +1,157 @@
 Revision history for Stats-LikeR
 
+0.3214 2026-10-05 CDT
+
+ [read_table(): delimited text]
+
+ - colClasses read past the end of a field the parser had not copied:
+   Atof() ran on into the separator and the next field whenever the
+   separator could continue a number, so with sep '.' the field "1" of
+   "1.2" came back as 1.2, and with sep 'E' the "1" of "1E2" as 100. The
+   number is now parsed from a copy of the field alone.
+
+ - A quoted first field starting with the comment marker lost it: a header
+   written '"#a",b' came back as a column named a, and where the next row
+   was text as well the header was dropped and that row taken in its
+   place. A comment marker inside quotes is now text, as R's read.table
+   reads it.
+
+ - A sep regex under Unicode rules -- /u, which `use v5.12` and later put
+   on every qr//, or one using \p{} -- was matched against each line's
+   bytes, and took the trailing 0xA0 or 0x85 byte of a UTF-8 character for
+   a no-break space or NEL: qr/\s+/u cut "voilà" into "voil\xC3" and a
+   separator, and Cyrillic "Р" likewise, and never split on a U+2003. A
+   valid UTF-8 line is now matched as UTF-8 by such a pattern, and by one
+   under /a; a Latin-1 line is matched as bytes, as before, and the fields
+   are the file's bytes either way.
+
+ - A read error was reported with libc's strerror() of whatever errno
+   held, which on a threaded perl is not the function $! calls, and which
+   could be stale. The reason now comes from $!, and only when the failing
+   read set one.
+
+ [read_table(): Excel workbooks]
+
+ - A phonetic guide (<rPh>) is no longer read as part of the text.
+   Japanese Excel records the furigana for every string typed through
+   the input method, and 漢字 read back as 漢字カンジ.
+
+ - The shared-string table is found through the workbook's
+   relationships instead of by its usual name. A workbook that stored
+   it as xl/SharedStrings.xml read every string cell as empty, and the
+   first data row silently became the header.
+
+ - .xlsm, .xltx and .xltm files are read as workbooks. They were read
+   as text and reported as an alignment error.
+
+ - Attributes quoted with ' are read, as XML allows; a workbook written
+   that way lost every sheet name and its sheets were matched by
+   position. A sheet with no name no longer takes the key of a sheet
+   really called SheetN.
+
+ - The XML is read as an XML parser reads it: a commented-out row is not
+   data, a CDATA section is its literal text, and a CR LF or lone CR in
+   a cell is LF (&#13; is still a CR). A character reference to
+   something XML does not allow (&#0;, a surrogate, anything past
+   U+10FFFF) is left in the text, where it used to come back as bytes
+   that are not UTF-8; and one to a noncharacter such as &#x10FFFF; no
+   longer dies on perls before 5.14.
+
+ - Excel's _xHHHH_ escape for a character XML cannot hold (_x0000_ for
+   NUL, _x005F_ for a literal underscore) is decoded in string cells,
+   as Excel and LibreOffice decode it, so a cell with a control
+   character in it reads back as itself; a formula's cached result is
+   left as written.
+
+ - An .xlsx read as an aoh leaked a row hash when colClasses refused a
+   cell. Every cell is now converted before the row's hash is made.
+
+ [read_table(): speed and memory]
+
+ - The parser tests each field against na_strings as it cuts it, so an
+   NA cell never gets a string buffer and the rows need no second pass.
+   A 300,000 x 10 CSV with half its cells "." reads 25-30% faster (aoa
+   0.218 s to 0.153 s, aoh 0.285 s to 0.215 s, hoa 0.208 s to 0.147 s);
+   one with no NA cells, 3-6% faster.
+
+ - sep => qr/\s+/ is split in C rather than by a regex match per field,
+   with the same rows, errors and warnings. A 300,000 x 10 whitespace-
+   separated file reads as an aoa in 0.18 s rather than 0.35 s, and as an
+   aoh in 0.24 s rather than 0.41 s.
+
+ - An .xlsx's shared strings are kept once and shared by every cell that
+   uses them: a 500,000-row sheet of categorical columns takes 188 MB
+   instead of 249 MB, and reads 7% faster. On perls before 5.18 such a
+   cell reports itself read-only to Scalar::Util::readonly, though
+   assigning to it works as before.
+
+ [write_table(): records read_table could not see]
+
+ - A record whose only field was empty, undef or blank was written as a
+   blank line, which read_table skips, so a one-column table lost those
+   rows and every later row moved up. It is now written quoted, '""' or
+   '"  "', as csv.writer writes [''] (CPython 3.14.2 test_csv.py). A first
+   field starting with '#' is quoted too, since read_table took the record
+   for a comment.
+
+ - An undef in an AoA's col_names was skipped, so every later name moved
+   one column left: ['a', undef, 'c'] over [1, 2, 3] wrote "a,c,". It is
+   now an empty header cell in its place. A reference in a header cell is
+   refused as one in a data cell is, where it was written as its address.
+
+ [write_table(): arguments]
+
+ - sep => '', and a sep holding a NUL, a quote, a CR or a LF, are refused,
+   as is a file name holding a NUL, which used to be cut short there.
+
+ - row_names => 'name' now heads an AoA's or a flat hash's 1..n label
+   column, as it heads a HoH's, where it was ignored. A HoA row_names that
+   names no column dies, and AoH rows without it draw one warning with
+   their count, where both gave empty labels silently.
+
+ - Rows that are restricted hashes missing a column no longer die with
+   "Attempt to access disallowed key".
+
+ [write_table(): .xlsx workbooks Excel and openpyxl can open]
+
+ - U+FFFE, U+FFFF and surrogates were written raw, and openpyxl refused
+   the workbook as not well-formed. They, and the control characters that
+   used to be dropped, are now written as Excel's _xHHHH_ escape, as
+   XlsxWriter writes them. Every underscore that would open an escape is
+   itself escaped as _x005F_, overlapping ones included, where XlsxWriter
+   escapes only non-overlapping matches and a literal "_x005F_x0041_" came
+   back from a left-to-right decoder as "_x005FA".
+
+ - Excel's limits are enforced: 16384 columns, 1048576 rows with the
+   header, 32767 characters in a cell. A 16385th column used to be written
+   as XFE. xlsx_freeze_rows and xlsx_freeze_cols are bounded, where
+   2**32 + 1 froze one row.
+
+ - A string becomes a number cell only when Excel would show it as it
+   stands, so "007", "+5" and 20-digit IDs stay text, and "1e400" is no
+   longer an infinite number. A value perl holds as a number is always a
+   number cell, except Inf and NaN.
+
+ [write_table(): LaTeX]
+
+ - Every line of tex_comment is now a comment: a newline in it used to end
+   the comment, and the rest was typeset. An object passed as tex_comment
+   or xlsx_comment is stringified rather than dropped.
+
+ - '<' becomes \textless{}, as '>' became \textgreater{}; it printed as an
+   inverted exclamation mark. \ $ { } ^ ~ stay raw so cells can hold math
+   and macros, and the documentation now says so.
+
+ - A croak after the .tex file was opened no longer leaves its handle open.
+
+ [write_table(): speed and memory]
+
+ - Finding an AoH's or a HoH's columns no longer leaves an iterator on
+   every row hash: 200,000 rows came back 22.9 MB heavier. The AoH write
+   is 16% faster (0.342 s to 0.288 s) and the HoH write 13% faster
+   (0.806 s to 0.704 s), and an AoH written as .xlsx peaks 0.7 MB over
+   its data rather than 30 MB.
+
 0.3213 2026-10-01 CDT
 
  [Every name is spelled with _ instead of .]

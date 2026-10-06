@@ -20,10 +20,10 @@ use File::Basename qw(basename);
 use File::Which qw(which);
 use Getopt::Long qw(:config no_ignore_case);
 use IO::Interactive;
-use List::Util qw(zip none pairs any);
+use List::Util qw(none pairs any);
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.2.4';
+our $VERSION = '2.2.5';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -644,7 +644,8 @@ sub get_args {
 
   @vars = map { $_ ? $_ : '<undef>' } @vars;
 
-  my %args = map { @{$_} } zip \@vars, [ @{$command_args}[ 0 .. $#vars ] ];
+  my %args;
+  @args{@vars} = @{$command_args}[ 0 .. $#vars ];
 
   delete $args{'<undef>'};
 
@@ -1038,7 +1039,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.2.4.
+This documentation refers to version 2.2.5.
 
 =head1 FEATURES
 

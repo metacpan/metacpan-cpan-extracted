@@ -1,3 +1,29 @@
+Sun Oct  4 09:29:56 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.2.5]:
+	* VERSION: bump
+	* README.md: generated
+	* release-notes.md: updated
+	* release-notes/release-notes-2.2.5.md: new
+	* .gitignore
+	- add deps.mk
+	- updated by CPAN::Maker::Bootstrapper
+	* .includes/help.mk: likewise
+	* .includes/local.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* builder: likewise
+	* requires: pin List::Util to 1.33
+	* cpanfile: likewise
+	* recommends: removed blank line
+	* .includes/builder.mk: added by CPAN::Maker::Bootstrapper
+	* .includes/test.mk: new
+	* t/02-cli-simple-logging.t
+	- skip test if no Log::Log4perl
+	* lib/CLI/Simple.pm.in
+	(get_args): replace zip with in-line perl
+
 Wed Sep 30 09:36:10 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.2.4]:

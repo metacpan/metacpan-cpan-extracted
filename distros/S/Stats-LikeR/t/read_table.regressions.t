@@ -279,4 +279,19 @@ SKIP: {
 		'no leaks: two filters on one field';
 }
 
+# The parser's read error gave libc's strerror() of whatever errno held, which
+# reentr.h does not route as $! routes it on a threaded perl, and which can be
+# stale once sv_gets() has returned NULL. It is now $!'s text for the read that
+# failed, and $! still says it after the croak. Reading /proc/self/mem from its
+# start fails with EIO on Linux; the parser is called directly, since
+# read_table's own first look at the file meets the error before it does.
+SKIP: {
+	skip 'needs /proc/self/mem (Linux)', 2 unless $^O eq 'linux' && -r '/proc/self/mem';
+	my $eio = do { local $! = 5; "$!" };	# EIO, 5 on Linux (asm-generic/errno-base.h)
+	eval { Stats::LikeR::_parse_csv_file('/proc/self/mem', ',', '#') };
+	my $errno = $! + 0;
+	like($@, qr/^Error reading file '\/proc\/self\/mem': \Q$eio\E at /, 'a read error gives $!\'s reason');
+	is($errno, 5, '... and leaves it in $!');
+}
+
 done_testing();

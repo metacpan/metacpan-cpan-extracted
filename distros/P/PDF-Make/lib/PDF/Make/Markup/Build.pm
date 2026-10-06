@@ -5,7 +5,7 @@ use Carp ();
 use PDF::Make::Builder;
 use PDF::Make::Markup::Style;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 my $S = 'PDF::Make::Markup::Style';
 

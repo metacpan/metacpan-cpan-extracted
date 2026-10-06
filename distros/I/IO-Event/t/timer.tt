@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $smallsleep = 0.;
+my $bigsleep = 0.5;
+my $debug = 0;
+my $syncdebug = 0;
+my $inactivity = 5;
+my $heartbeat = 0.1;
+
+BEGIN   {
+    unless (eval { require Test::More; }) {
+        print "1..0 # Skipped: must have Test::More installed\n";
+        exit;
+    }
+}
+BEGIN   {
+    unless (eval { require Time::HiRes; }) {
+        print "1..0 # Skipped: must have Time::HiRes installed\n";
+        exit;
+    }
+}
+
+use Time::HiRes qw(time);
+use IO::Event;
+use Carp qw(verbose);
+use Test::More tests => 6;
+
+$SIG{ALRM} = sub { ok(0, "5 second alarlm went off"); exit 1 };
+
+alarm(10);
+
+my $start = time;
+
+my $timer1count = 0;
+my $timer2count = 0;
+
+IO::Event->timer(
+    interval    => 0.2,
+    cb      => sub {
+        $timer1count++;
+    },
+);
+
+IO::Event->timer(
+    interval    => 3,
+    cb      => sub {
+        $timer2count++;
+        IO::Event::unloop_all();
+    },
+);
+
+IO::Event::loop();
+
+ok(1, "loop finshed");
+
+my $end = time;
+
+my $duration = $end - $start;
+
+ok($end - $start > 2, "at least 2 seconds - got $duration");
+ok($end - $start < 4, "less than 4 seconds - got $duration");
+ok($timer1count > 8, "at least 8 firings - got $timer1count");
+ok($timer1count < 20, "no more than 20 firings - got $timer1count");
+is($timer2count, 1, "timer2count");
+
+alarm(0);
+
+1;

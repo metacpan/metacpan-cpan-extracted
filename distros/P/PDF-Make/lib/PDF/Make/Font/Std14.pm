@@ -2,7 +2,7 @@ package PDF::Make::Font::Std14;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 # Load the XS via PDF::Make
 require PDF::Make;

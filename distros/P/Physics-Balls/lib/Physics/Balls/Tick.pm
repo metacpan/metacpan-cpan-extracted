@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 use Physics::Balls::Error;
 use Physics::Balls::Outcome;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 has t => (
 	is => 'ro',
@@ -86,7 +86,7 @@ Physics::Balls::Tick - one advance to a horizon, for a game that ticks
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 

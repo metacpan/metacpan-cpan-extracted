@@ -25,4 +25,5 @@ t/dummy.txt
 t/file.t
 t/handle.t
 t/path_walking.t
+t/router.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

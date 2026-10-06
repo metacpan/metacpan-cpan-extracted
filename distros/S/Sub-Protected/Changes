@@ -1,5 +1,44 @@
 Revision history for Sub-Protected
 
+0.03	Mon Oct  5 10:32:25 AM EDT 2026
+	[ Bug Fixes ]
+	- Subs were left unprotected when Sub::Protected and the package using
+	  it were loaded at run time (require, plugin loader, string eval), and
+	  Perl warned "Too late to run CHECK block".  Both the :Protected
+	  attribute and the declarative form are now wrapped after CHECK
+	  (needs Perl 5.14 or later)
+	- import() no longer clears the caller's $@
+	- A plain list passed to import() is always a list of names:
+	  qw(subs _x) used to protect only _x.  A single arrayref or
+	  { subs => [...] } is still accepted
+	- The minimum Perl is now correctly declared as 5.10: the module
+	  already used //, so it never ran on 5.8
+
+	[ Enhancements ]
+	- Warn when another module has already defined UNIVERSAL::Protected
+
+	[ Documentation ]
+	- Documented how access is decided (immediate caller, subclasses,
+	  SUPER:: and can(), caller() transparency, croak location)
+	- import(): documented the arrayref and hashref argument forms and
+	  added a FORMAL SPECIFICATION
+	- Clarified thread safety
+
+	[ Testing ]
+	- Added t/runtime_load.t
+	- Rewrote t/unit.t around a ledger of documented messages and return
+	  states, with global-state checks
+	- Added author tests in xt/ (POD, POD coverage, Changes, version)
+	- Test::Mockingbird is now optional (it needs Perl 5.16.3); tests that
+	  use it skip without it
+	- CI also runs on Perl 5.10 and 5.14
+
+	[ Dependencies ]
+	- Added B::Hooks::EndOfScope and Sub::Identify
+	- Removed autodie (unused; it pulled in IPC::System::Simple at run
+	  time), Scalar::Util and Test::Exception
+	- Licence metadata is now gpl_2, matching LICENSE
+
 0.02	Tue Jun  9 08:56:25 EDT 2026
 	[ Enhancements ]
 	- Added test dashboard

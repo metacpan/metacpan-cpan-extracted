@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 has t => (
 	is => 'ro',
@@ -167,7 +167,7 @@ Physics::Balls::Outcome - what a strike did
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 

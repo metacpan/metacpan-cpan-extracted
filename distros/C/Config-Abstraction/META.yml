@@ -13,6 +13,7 @@ build_requires:
   Test::Mockingbird: '0.12'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::Permissions: '0'
   Test::Returns: '0.03'
   Test::TempDir::Tiny: '0'
   Test::Without::Module: '0'
@@ -20,7 +21,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,11 +35,12 @@ optional_features:
   encryption:
     description: 'AES-256-GCM encryption of config values via ENC[] tokens'
     requires:
-      CryptX: '0'
+      CryptX: '0.062'
 requires:
   Carp: '0'
   Config::Auto: '0'
   Config::IniFiles: '0'
+  CryptX: '0.062'
   File::Basename: '0'
   File::Slurp: '0'
   File::Spec: '0'
@@ -61,5 +63,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction
   homepage: https://metacpan.org/pod/Config::Abstraction
   repository: git://github.com/nigelhorne/Config-Abstraction.git
-version: '0.40'
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

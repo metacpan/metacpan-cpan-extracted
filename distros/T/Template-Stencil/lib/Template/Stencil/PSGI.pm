@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Template::Stencil;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my ($class, %opts) = @_;
