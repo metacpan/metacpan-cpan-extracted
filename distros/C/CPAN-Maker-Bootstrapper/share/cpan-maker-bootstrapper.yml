@@ -9,6 +9,7 @@ commands:
   critique:                 CPAN::Maker::Bootstrapper::Role::Critic
   default:                  cmd_install
   deps-filter:              CPAN::Maker::Bootstrapper::Role::DepsFilter
+  dist-file:                CPAN::Maker::Bootstrapper::Role::DistFile
   filter:                   CPAN::Maker::Bootstrapper::Role::Filter 
   install:                  CPAN::Maker::Bootstrapper::Role::Installer
   import-scaffold:          CPAN::Maker::Bootstrapper::Role::ScaffoldImporter
@@ -18,6 +19,7 @@ commands:
   provides:                 CPAN::Maker::Bootstrapper::Role::Provides
   publish-to-cpan:          CPAN::Maker::Bootstrapper::Role::PAUSEUpload
   release-notes:            CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes
+  show-defaults:            CPAN::Maker::Bootstrapper::Role::ShowDefaults
   update-annotations:       CPAN::Maker::Bootstrapper::Role::LLM::Annotator
   extra-files:              CPAN::Maker::Bootstrapper::Role::ExtraFiles
   resolve-vars:             CPAN::Maker::Bootstrapper::Role::ResolveVars
@@ -30,6 +32,7 @@ options:
 - context|C=s@
 - debug|d
 - dry-run|D
+- exclude=s@
 - file-list|L=s
 - filter=s
 - finalize-annotations|F
@@ -37,6 +40,7 @@ options:
 - max-diff-files=i
 - max-tokens|t=i
 - model|M=s
+- project-tarball
 - prompt|p=s
 - prompt-profile|P=s@
 - help|h

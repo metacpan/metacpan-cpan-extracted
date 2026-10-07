@@ -8,7 +8,7 @@ use Game::Backgammon::Move;
 use Game::Backgammon::Turn;
 use Exporter 'import';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(legal_turns apply_move single_moves);
 
 sub single_moves {

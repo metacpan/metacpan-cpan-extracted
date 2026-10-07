@@ -15,7 +15,7 @@ help: ## show this help message
 			| awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'; \
 		echo ""; \
 		echo "Variables:"; \
-		echo "  SCAN=OFF                  disable dependency scanning (default: ON)"; \
+		echo "  SCAN=OFF                  disable distribution dependency scanning (default: ON)"; \
 		echo "  LINT=OFF                  disable perlcritic, perltidy checking"; \
 		echo "  SYNTAX_CHECKING=OFF       disable syntax checking"; \
 		echo "  SKIP_TESTS=1              disable tests"; \

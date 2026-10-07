@@ -1794,4 +1794,572 @@ subtest '_evict_old_uploads -- stray regular file is also removed when old enoug
 	ok !-f $stray->to_string, 'stray file older than max_age_s is removed';
 };
 
+# ============================================================================
+# PART 11: DataSource::_sniff_data_ext
+#
+# _sniff_data_ext is the remote-file content detector: it reads the first 20
+# bytes (magic header) and the first text line to decide which standard
+# extension best describes a file that arrived with a non-standard suffix
+# (e.g. ".log").  Each subtest writes a minimal but structurally valid file
+# so the detection chain fires the expected branch.
+# ============================================================================
+
+subtest '_sniff_data_ext -- SQLite magic bytes map to db' => sub {
+	my $fn  = \&Database::BI::Model::DataSource::_sniff_data_ext;
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $path = "$dir/mystery.log";
+	{
+		# Write raw bytes: the first 15 bytes of every SQLite 3 file are
+		# exactly "SQLite format 3" followed by a NUL byte (byte 16).
+		no autodie 'open';
+		open my $fh, '>:raw', $path or BAIL_OUT "cannot write test file: $!";
+		print {$fh} "SQLite format 3\x00trailing data here";
+		close $fh;
+	}
+	is $fn->($path), 'db', 'SQLite magic bytes ("SQLite format 3") detected as db';
+};
+
+subtest '_sniff_data_ext -- XML preamble (<?xml) maps to xml' => sub {
+	my $fn   = \&Database::BI::Model::DataSource::_sniff_data_ext;
+	my $dir  = File::Temp::tempdir(CLEANUP => 1);
+
+	# Canonical XML declaration.
+	my $path1 = "$dir/feed.log";
+	Mojo::File->new($path1)->spew("<?xml version=\"1.0\"?>\n<root/>\n");
+	is $fn->($path1), 'xml', '<?xml declaration preamble detected as xml';
+
+	# XML file without a declaration (bare opening tag).
+	my $path2 = "$dir/data.log";
+	Mojo::File->new($path2)->spew("<catalog>\n<item><sku>1</sku></item>\n</catalog>\n");
+	is $fn->($path2), 'xml', 'bare opening < tag detected as xml';
+};
+
+subtest '_sniff_data_ext -- tab-delimited first line maps to tsv' => sub {
+	my $fn  = \&Database::BI::Model::DataSource::_sniff_data_ext;
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $path = "$dir/export.log";
+	Mojo::File->new($path)->spew("col1\tcol2\tcol3\n1\t2\t3\n");
+	is $fn->($path), 'tsv', 'tab characters in first line detected as tsv';
+};
+
+subtest '_sniff_data_ext -- pipe-delimited first line maps to psv' => sub {
+	my $fn  = \&Database::BI::Model::DataSource::_sniff_data_ext;
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $path = "$dir/report.log";
+	Mojo::File->new($path)->spew("col1|col2|col3\n1|2|3\n");
+	is $fn->($path), 'psv', 'pipe characters in first line detected as psv';
+};
+
+subtest '_sniff_data_ext -- comma-delimited or unknown content falls back to csv' => sub {
+	my $fn  = \&Database::BI::Model::DataSource::_sniff_data_ext;
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $path = "$dir/plain.log";
+	Mojo::File->new($path)->spew("id,name,value\n1,Alice,100\n");
+	is $fn->($path), 'csv', 'comma-delimited content falls back to csv';
+
+	# Free-text line with no special delimiters also falls back to csv.
+	my $path2 = "$dir/text.log";
+	Mojo::File->new($path2)->spew("just a plain sentence here\n");
+	is $fn->($path2), 'csv', 'plain text with no recognised delimiter falls back to csv';
+};
+
+# ============================================================================
+# PART 12: DataSource::updated() -- mtime delegation
+#
+# updated() has three paths:
+#   1. _db exists and implements updated() -> delegate to it
+#   2. _db absent but _file_path points to a real file -> stat() fallback
+#   3. Neither -> return undef
+# ============================================================================
+
+subtest 'DataSource::updated -- delegates to _db->updated() when available' => sub {
+	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
+
+	# Inject a mock backend whose updated() returns a sentinel mtime.
+	Readonly my $FAKE_MTIME => 999_000_001;
+	my $mock_db = bless {}, 'FakeUpdatedDB';
+	{
+		no strict 'refs';
+		*{'FakeUpdatedDB::updated'} = sub { $FAKE_MTIME };
+		*{'FakeUpdatedDB::can'}     = sub { 1 };   # pretends to implement everything
+	}
+	$src->{_db} = $mock_db;
+
+	is $src->updated, $FAKE_MTIME,
+		'updated() returns value from _db->updated() when _db implements it';
+};
+
+subtest 'DataSource::updated -- stat fallback when _db absent' => sub {
+	SKIP: {
+		my $path = File::Spec->rel2abs(File::Spec->catfile($DATA_DIR, 'sales.csv'));
+		skip 'data/sales.csv not found', 2 unless -f $path;
+
+		# Build a bare DataSource-shaped object with no _db but a valid _file_path.
+		my $src = bless { _db => undef, _file_path => $path }, $DS;
+		my $expected_mtime = (stat($path))[9];
+
+		ok defined $src->updated, 'updated() returns a defined value via stat fallback';
+		is $src->updated, $expected_mtime,
+			'updated() stat fallback returns the correct mtime';
+	}
+};
+
+subtest 'DataSource::updated -- returns undef when neither _db nor _file_path set' => sub {
+	my $src = bless { _db => undef }, $DS;
+	is $src->updated, undef,
+		'updated() returns undef when no backend and no file path are set';
+};
+
+subtest 'DataSource::updated -- returns undef for non-existent _file_path' => sub {
+	my $src = bless {
+		_db        => undef,
+		_file_path => '/no/such/file/at/all.csv',
+	}, $DS;
+	is $src->updated, undef,
+		'updated() returns undef when _file_path points to a missing file';
+};
+
+# ============================================================================
+# PART 13: DataSource::columns() -- delegation and URL-backed behaviour
+#
+# columns() has three code paths:
+#   1. _columns is already set -> return it directly (CSV/PSV fast-path)
+#   2. _url is set (URL-backed table) -> return undef WITHOUT touching _db
+#   3. Fallback: delegate to _db->columns()
+# The URL-backed check (path 2) is critical: calling _db->columns() on a
+# URL-backed instance would trigger a live HTTP round-trip even on a cache hit.
+# ============================================================================
+
+subtest 'DataSource::columns -- URL-backed: returns undef without consulting _db' => sub {
+	# Verify that _db->columns() is NEVER called for URL-backed tables.
+	my $db_columns_called = 0;
+	my $mock_db = bless {}, 'FakeColsDB_Url';
+	{
+		no strict 'refs';
+		*{'FakeColsDB_Url::columns'} = sub { $db_columns_called++; ['col1', 'col2'] };
+	}
+
+	my $src = bless {
+		_url     => 'http://example.com/page.html',
+		_columns => undef,
+		_db      => $mock_db,
+	}, $DS;
+
+	is $src->columns, undef,
+		'columns() returns undef for URL-backed table (prevents live network call)';
+	is $db_columns_called, 0,
+		'columns() does not call _db->columns() for URL-backed table';
+};
+
+subtest 'DataSource::columns -- delegates to _db->columns() for non-URL-backed table' => sub {
+	my $mock_db = bless {}, 'FakeColsDB_File';
+	{
+		no strict 'refs';
+		*{'FakeColsDB_File::columns'} = sub { [qw(id name score)] };
+	}
+
+	# No _url set, no _columns set -> must fall through to _db->columns().
+	my $src = bless { _columns => undef, _db => $mock_db }, $DS;
+	is_deeply $src->columns, [qw(id name score)],
+		'columns() delegates to _db->columns() for a non-URL-backed table';
+};
+
+subtest 'DataSource::columns -- returns undef when _db is undef and no _columns set' => sub {
+	my $src = bless { _columns => undef, _db => undef }, $DS;
+	is $src->columns, undef,
+		'columns() returns undef when both _db and _columns are absent';
+};
+
+# ============================================================================
+# PART 14: DataSource::selectall_arrayref -- @args bypasses cache
+#
+# When selectall_arrayref is called with extra arguments (a narrowed query),
+# the cache must be skipped entirely: neither read (get) nor written (set).
+# This prevents a partial result from polluting the full-scan cache entry that
+# other callers (Database::Join, fetch_all) depend on.
+# ============================================================================
+
+subtest 'DataSource::selectall_arrayref -- @args bypass cache get and set' => sub {
+	Readonly my $CACHE_SENTINEL => 'CACHE_SENTINEL_RESULT';
+
+	# A cache that records every get/set call so we can assert neither fires.
+	my @cache_calls;
+	my $cache = bless {}, 'FakeCacheArgsBypass';
+	{
+		no strict 'refs';
+		*{'FakeCacheArgsBypass::get'} = sub { push @cache_calls, 'get'; undef };
+		*{'FakeCacheArgsBypass::set'} = sub { push @cache_calls, 'set' };
+	}
+
+	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
+	$src->{_cache}     = $cache;
+	$src->{_file_path} = File::Spec->rel2abs(
+		File::Spec->catfile($DATA_DIR, 'sales.csv'));
+
+	# Mock the backend so the call succeeds without touching the real file.
+	my $db_pkg = ref($src->{_db});
+	Test::Mockingbird::mock("${db_pkg}::selectall_arrayref", sub {
+		return [{ id => 'FROM_DB' }];
+	});
+
+	# A non-empty @args signals "narrowed query" -- cache must be bypassed.
+	my $result = $src->selectall_arrayref({});
+
+	Test::Mockingbird::unmock("${db_pkg}::selectall_arrayref");
+
+	is scalar(@cache_calls), 0,
+		'cache->get and cache->set are not called when selectall_arrayref receives @args';
+	is $result->[0]{id}, 'FROM_DB',
+		'result still comes from the backend when cache is bypassed';
+};
+
+# ============================================================================
+# PART 15: Dashboard::_url_attribution -- URL spec attribution
+#
+# _url_attribution reads the l= query param.  When it is a url: spec it returns
+# the raw URL and a human-readable date.  For table: and path: specs, or when l=
+# is absent, it returns (undef, undef).
+# ============================================================================
+
+subtest 'Dashboard::_url_attribution -- url: spec returns URL and date string' => sub {
+	my $fn  = \&Database::BI::Controller::Dashboard::_url_attribution;
+	my $enc = Mojo::Util::url_escape('http://example.com/data.html');
+	my $tx  = $t->ua->build_tx(GET => "/?l=url:http://example.com/data.html");
+	my $c   = $t->app->build_controller($tx);
+	my ($url, $date) = $fn->($c);
+	is   $url, 'http://example.com/data.html',
+		'_url_attribution returns the URL from a url: spec';
+	like $date, qr/\A\d{1,2} [A-Z][a-z]+ \d{4}\z/,
+		'_url_attribution date is formatted as "D Month YYYY"';
+};
+
+subtest 'Dashboard::_url_attribution -- table: spec returns (undef, undef)' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_url_attribution;
+	my $tx = $t->ua->build_tx(GET => '/?l=table:sales');
+	my $c  = $t->app->build_controller($tx);
+	my ($url, $date) = $fn->($c);
+	is $url,  undef, '_url_attribution returns undef URL for a table: spec';
+	is $date, undef, '_url_attribution returns undef date for a table: spec';
+};
+
+subtest 'Dashboard::_url_attribution -- no l= param returns (undef, undef)' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_url_attribution;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+	my ($url, $date) = $fn->($c);
+	is $url,  undef, '_url_attribution returns undef URL when l= is absent';
+	is $date, undef, '_url_attribution returns undef date when l= is absent';
+};
+
+# ============================================================================
+# PART 16: Dashboard::_scan_data_dir -- filesystem data-directory scanner
+#
+# _scan_data_dir reads data_dir from app config and returns one hashref per
+# supported data file.  Files with unsupported extensions must be excluded.
+# Non-existent directories must return an empty arrayref without croaking.
+# ============================================================================
+
+subtest 'Dashboard::_scan_data_dir -- returns entries for the real data dir' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_scan_data_dir;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+
+	my $tables = $fn->($c);
+	returns_is $tables, { type => 'arrayref' }, '_scan_data_dir returns an arrayref';
+	ok scalar(@$tables) > 0,
+		'real data/ directory contains at least one supported file';
+	for my $entry (@$tables) {
+		ok exists $entry->{name}, "entry has a 'name' key";
+		ok exists $entry->{file}, "entry has a 'file' key";
+		unlike $entry->{name}, qr/\./,
+			"name key '$entry->{name}' has no file extension";
+		like $entry->{file}, qr/\.[\w]+\z/,
+			"file key '$entry->{file}' includes an extension";
+	}
+	diag 'scanned entries: ' . join(', ', map { $_->{name} } @$tables)
+		if $ENV{TEST_VERBOSE};
+};
+
+subtest 'Dashboard::_scan_data_dir -- all returned entries have supported extensions' => sub {
+	# Regression guard: no entry with .txt, .log, .pl, etc. must be returned.
+	my $fn = \&Database::BI::Controller::Dashboard::_scan_data_dir;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+	my $tables = $fn->($c);
+
+	Readonly my $SUPPORTED_EXT_RE =>
+		qr/\.(?:csv|db|sql|sqlite|sqlite3|xml|tsv|psv|xlsx)\z/i;
+
+	for my $entry (@$tables) {
+		like $entry->{file}, $SUPPORTED_EXT_RE,
+			"entry '$entry->{file}' has a recognised extension";
+	}
+};
+
+subtest 'Dashboard::_scan_data_dir -- non-existent data_dir returns []' => sub {
+	my $fn   = \&Database::BI::Controller::Dashboard::_scan_data_dir;
+	my $tx   = $t->ua->build_tx(GET => '/');
+	my $c    = $t->app->build_controller($tx);
+	my $orig = $t->app->config->{data_dir};
+
+	# Temporarily redirect data_dir to a relative path that cannot exist.
+	$t->app->config->{data_dir} = 'no_such_data_dir_xyz_99999';
+	my $tables = eval { $fn->($c) };
+	$t->app->config->{data_dir} = $orig // 'data';
+
+	is $@, '', '_scan_data_dir does not croak for a missing data_dir';
+	is_deeply $tables, [], 'missing data_dir returns empty arrayref';
+};
+
+# ============================================================================
+# PART 17: _detect_platform -- ENV localization invariant
+#
+# _detect_platform sets $ENV{HTTP_USER_AGENT} with local() so CGI::Info reads
+# it.  Verifying the local() is in place prevents a class of bugs where a
+# stale UA is left in the environment and affects subsequent requests.
+# ============================================================================
+
+subtest '_detect_platform -- local() restores ENV{HTTP_USER_AGENT} after call' => sub {
+	Readonly my $SENTINEL_UA => 'SENTINEL_BEFORE_DETECT_PLATFORM_CALL';
+	local $ENV{HTTP_USER_AGENT} = $SENTINEL_UA;
+
+	Database::BI::Controller::Dashboard::_detect_platform(
+		'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0)', 'web');
+
+	is $ENV{HTTP_USER_AGENT}, $SENTINEL_UA,
+		'$ENV{HTTP_USER_AGENT} is restored to its original value after _detect_platform';
+};
+
+# ============================================================================
+# PART 18: _resolve_language -- ENV localization invariant
+#
+# _resolve_language sets $ENV{HTTP_ACCEPT_LANGUAGE} with local() so
+# CGI::Lingua reads the request Accept-Language header.  A missing local()
+# would corrupt the env for any subsequent CGI::Lingua call in the same
+# process (e.g. a second request in the test suite).
+# ============================================================================
+
+subtest '_resolve_language -- local() restores ENV{HTTP_ACCEPT_LANGUAGE} after call' => sub {
+	Readonly my $SENTINEL_LANG => 'xx-SENTINEL-LANG-VALUE';
+	local $ENV{HTTP_ACCEPT_LANGUAGE} = $SENTINEL_LANG;
+
+	my $tx = $t->ua->build_tx(GET => '/');
+	$tx->req->headers->header('Accept-Language' => 'en-US,en;q=0.9');
+	my $c = $t->app->build_controller($tx);
+
+	Database::BI::Controller::Dashboard::_resolve_language($c, 'web', 'en');
+
+	is $ENV{HTTP_ACCEPT_LANGUAGE}, $SENTINEL_LANG,
+		'$ENV{HTTP_ACCEPT_LANGUAGE} is restored to its original value after _resolve_language';
+};
+
+# ============================================================================
+# PART 19: Dashboard::_open_spec -- all branches
+#
+# _open_spec parses "table:name", "path:/abs/path", or "url:http://..." specs,
+# checks file existence and extension, constructs a DataSource, and returns
+# ($src, $label) or an empty list on any failure.
+# ============================================================================
+
+subtest 'Dashboard::_open_spec -- table:sales returns DataSource and label' => sub {
+	SKIP: {
+		skip 'data/sales.csv not found', 3 unless -f 'data/sales.csv';
+		my $fn = \&Database::BI::Controller::Dashboard::_open_spec;
+		my $tx = $t->ua->build_tx(GET => '/');
+		my $c  = $t->app->build_controller($tx);
+		my ($src, $label) = $fn->($c, 'table:sales');
+		ok defined $src,   '_open_spec: table:sales returns a DataSource object';
+		ok blessed($src),  'returned value is a blessed reference';
+		is $label, 'sales', 'label matches the table name';
+	}
+};
+
+subtest 'Dashboard::_open_spec -- table:nosuchxyz returns empty list' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_open_spec;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+	my @result = $fn->($c, 'table:no_such_table_xyz_99');
+	is scalar(@result), 0,
+		'_open_spec returns empty list for a table name that has no matching file';
+};
+
+subtest 'Dashboard::_open_spec -- path: to supported file returns DataSource' => sub {
+	SKIP: {
+		my $abs = File::Spec->rel2abs(File::Spec->catfile($DATA_DIR, 'sales.csv'));
+		skip 'data/sales.csv not found', 3 unless -f $abs;
+		my $fn  = \&Database::BI::Controller::Dashboard::_open_spec;
+		my $tx  = $t->ua->build_tx(GET => '/');
+		my $c   = $t->app->build_controller($tx);
+		my ($src, $label) = $fn->($c, "path:$abs");
+		ok defined $src,       '_open_spec: path: to supported file returns DataSource';
+		ok blessed($src),      'returned value is a blessed reference';
+		like $label, qr/sales/, 'label contains the original file name';
+	}
+};
+
+subtest 'Dashboard::_open_spec -- path: to unsupported extension returns ()' => sub {
+	my $fn  = \&Database::BI::Controller::Dashboard::_open_spec;
+	my $tmp = File::Temp::tempdir(CLEANUP => 1);
+	my $abs = "$tmp/report.exe";
+	Mojo::File->new($abs)->spew('not a data file');
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+	my @result = $fn->($c, "path:$abs");
+	is scalar(@result), 0,
+		'_open_spec returns empty list when path: has an unsupported file extension';
+};
+
+subtest 'Dashboard::_open_spec -- garbage spec returns empty list' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_open_spec;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+	my @result = $fn->($c, 'not_a_valid_spec_at_all');
+	is scalar(@result), 0, '_open_spec returns empty list for an unrecognised spec format';
+};
+
+subtest 'Dashboard::_open_spec -- url: with localhost blocked by SSRF guard' => sub {
+	# _is_safe_url blocks localhost; _open_spec must return () before even
+	# attempting DataSource construction.
+	my $fn = \&Database::BI::Controller::Dashboard::_open_spec;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+	my @result = $fn->($c, 'url:http://localhost/data.html');
+	is scalar(@result), 0,
+		'_open_spec returns empty list for url: spec pointing to localhost (SSRF guard)';
+};
+
+subtest 'Dashboard::_open_spec -- remote path with shell metacharacter in hostname rejected' => sub {
+	# REMOTE_HOST_RE does not allow semicolons or spaces; an injected hostname
+	# like ";evil;" must be rejected before any SFTP attempt is made.
+	my $fn = \&Database::BI::Controller::Dashboard::_open_spec;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+	my @result = $fn->($c, 'path:/../;evil;/dir/file.csv');
+	is scalar(@result), 0,
+		'_open_spec rejects remote path whose hostname contains shell metacharacters';
+};
+
+# ============================================================================
+# PART 20: Dashboard::_list_dir -- directory listing helper
+#
+# _list_dir scans a directory and returns two sorted lists: subdirectories and
+# (optionally) data files.  Hidden entries (dot-prefixed names) must be excluded.
+# Files with unsupported extensions are always omitted.  Entries are sorted
+# case-insensitively.
+# ============================================================================
+
+subtest 'Dashboard::_list_dir -- hidden entries (dot-prefix) excluded' => sub {
+	my $fn  = \&Database::BI::Controller::Dashboard::_list_dir;
+	my $tmp = File::Temp::tempdir(CLEANUP => 1);
+	my $dir = Mojo::File->new($tmp);
+
+	$dir->child('visible_dir')->make_path;
+	$dir->child('.hidden_dir')->make_path;
+	Mojo::File->new("$tmp/data.csv")->spew("id,name\n1,Alice\n");
+	Mojo::File->new("$tmp/.hidden_file.csv")->spew("id,name\n");
+
+	my $tx     = $t->ua->build_tx(GET => '/');
+	my $c      = $t->app->build_controller($tx);
+	my $result = $fn->($c, $dir, 1);
+
+	my @dir_names  = map { $_->{name} } @{ $result->{dirs}  };
+	my @file_names = map { $_->{name} } @{ $result->{files} };
+
+	ok !grep { $_ eq '.hidden_dir' }     @dir_names,
+		'.hidden_dir excluded from directory listing';
+	ok  grep { $_ eq 'visible_dir' }     @dir_names,
+		'visible_dir included in directory listing';
+	ok !grep { $_ eq '.hidden_file.csv' } @file_names,
+		'.hidden_file.csv excluded from file listing';
+	ok  grep { $_ eq 'data.csv' }         @file_names,
+		'data.csv included in file listing';
+};
+
+subtest 'Dashboard::_list_dir -- want_files=0 returns empty files list' => sub {
+	my $fn  = \&Database::BI::Controller::Dashboard::_list_dir;
+	my $tmp = File::Temp::tempdir(CLEANUP => 1);
+	my $dir = Mojo::File->new($tmp);
+	Mojo::File->new("$tmp/data.csv")->spew("id,name\n1,Alice\n");
+	$dir->child('subdir')->make_path;
+
+	my $tx     = $t->ua->build_tx(GET => '/');
+	my $c      = $t->app->build_controller($tx);
+	my $result = $fn->($c, $dir, 0);  # want_files = false
+
+	is_deeply $result->{files}, [],
+		'files list is empty when want_files argument is false';
+	is scalar(@{ $result->{dirs} }), 1,
+		'directories are still returned when want_files is false';
+};
+
+subtest 'Dashboard::_list_dir -- entries sorted case-insensitively' => sub {
+	my $fn  = \&Database::BI::Controller::Dashboard::_list_dir;
+	my $tmp = File::Temp::tempdir(CLEANUP => 1);
+	my $dir = Mojo::File->new($tmp);
+	$dir->child('Zebra')->make_path;
+	$dir->child('alpha')->make_path;
+	$dir->child('Mango')->make_path;
+
+	my $tx     = $t->ua->build_tx(GET => '/');
+	my $c      = $t->app->build_controller($tx);
+	my $result = $fn->($c, $dir, 0);
+	my @names  = map { $_->{name} } @{ $result->{dirs} };
+	is_deeply \@names, [qw(alpha Mango Zebra)],
+		'directory entries are sorted case-insensitively (alpha < Mango < Zebra)';
+};
+
+subtest 'Dashboard::_list_dir -- unsupported file extensions excluded from files list' => sub {
+	my $fn  = \&Database::BI::Controller::Dashboard::_list_dir;
+	my $tmp = File::Temp::tempdir(CLEANUP => 1);
+	my $dir = Mojo::File->new($tmp);
+	Mojo::File->new("$tmp/report.csv")->spew("id,name\n1,A\n");
+	Mojo::File->new("$tmp/archive.zip")->spew("zip content");
+	Mojo::File->new("$tmp/notes.txt")->spew("plain text");
+
+	my $tx     = $t->ua->build_tx(GET => '/');
+	my $c      = $t->app->build_controller($tx);
+	my $result = $fn->($c, $dir, 1);
+	my @files  = map { $_->{name} } @{ $result->{files} };
+
+	ok  grep { $_ eq 'report.csv' }  @files, 'report.csv included (supported extension)';
+	ok !grep { $_ eq 'archive.zip' } @files, 'archive.zip excluded (unsupported extension)';
+	ok !grep { $_ eq 'notes.txt' }   @files, 'notes.txt excluded (unsupported extension)';
+};
+
+subtest 'Dashboard::_list_dir -- both dirs and files listed result has no circular refs' => sub {
+	my $fn  = \&Database::BI::Controller::Dashboard::_list_dir;
+	my $tmp = File::Temp::tempdir(CLEANUP => 1);
+	my $dir = Mojo::File->new($tmp);
+	$dir->child('sub')->make_path;
+	Mojo::File->new("$tmp/data.csv")->spew("id,name\n1,A\n");
+
+	my $tx     = $t->ua->build_tx(GET => '/');
+	my $c      = $t->app->build_controller($tx);
+	my $result = $fn->($c, $dir, 1);
+	memory_cycle_ok($result, '_list_dir result hashref has no circular references');
+};
+
+# ============================================================================
+# PART 21: Dashboard::_write_sqlite_db -- empty columns guard
+#
+# An empty column list would produce "CREATE TABLE data ()" which is invalid
+# SQLite syntax.  The function must croak with a recognisable message before
+# touching the filesystem so no orphaned temp file is left behind.
+# ============================================================================
+
+subtest 'Dashboard::_write_sqlite_db -- empty columns list croaks before file creation' => sub {
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 1;
+
+		# Pass undef as $self -- _write_sqlite_db only uses $self for the
+		# tempfile call (which pulls from the system tmpdir, not from the app).
+		throws_ok {
+			Database::BI::Controller::Dashboard::_write_sqlite_db(undef, [], [])
+		} qr/no columns/i,
+			'_write_sqlite_db croaks with a "no columns" message for an empty column list';
+	}
+};
+
 done_testing();
+

@@ -26,7 +26,7 @@ sub in_child {
     my $pid = fork // die "fork: $!";
     if (!$pid) { $SIG{ALRM} = 'DEFAULT'; alarm 8; eval { $code->() }; POSIX::_exit($@ ? 2 : 0) }
     waitpid $pid, 0;
-    return ($? & 127) == 14 ? 'hung' : ($? >> 8) == 2 ? 'died' : 'ok';
+    return ($? & 127) == 14 ? 'hung' : $? & 127 ? 'signal' : ($? >> 8) == 2 ? 'died' : 'ok';
 }
 
 sub fresh_map {

@@ -24,7 +24,7 @@ af
 agere
 airespace
 aironet
-airos
+arubaos
 alcatel
 Alcatel
 alteon
@@ -266,6 +266,10 @@ qts
 QTS
 quts
 QuTS
+synology
+Synology
+DiskStation
+DSM
 PVST
 qbridge
 qos

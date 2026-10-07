@@ -8,7 +8,7 @@ plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
 # Every XSUB that converts a string key or value enforces the 1GB ceiling, so
 # the uint32_t cast below it cannot truncate: a key of 2**32 + n bytes would
 # otherwise compare as its first n bytes and match a different entry.  Reaching
-# the croak costs a 1GiB scalar -- about 2.1GB resident -- hence xt, the memory
+# the croak costs a 1GiB scalar -- about 1GB resident -- hence xt, the memory
 # floor, and one scalar reused across every variant and call.
 #
 # The scalar is exactly one byte past SHM_MAX_STR_LEN (2**30 - 1): that length's
@@ -20,10 +20,29 @@ sub mem_available_kb {
     while (<$fh>) { return $1 if /^MemAvailable:\s+(\d+)\s+kB/ }
     return undef;
 }
+# In a memory-capped cgroup (a container, a systemd scope) MemAvailable is the
+# host's; the room left is the tightest cap on the way up, less its usage.
+sub first_line { open my $f, '<', $_[0] or return undef; scalar <$f> }
+sub cgroup_room_kb {
+    open my $fh, '<', '/proc/self/cgroup' or return undef;
+    my ($path) = map { /^0::(\S*)/ ? $1 : () } <$fh>;
+    my $room;
+    while (defined $path) {   # up to and including the root: a container's cap lives there
+        my ($max, $cur) = map { first_line("/sys/fs/cgroup$path/$_") } qw(memory.max memory.current);
+        if (defined $max && defined $cur && $max =~ /^(\d+)/) {
+            my $r = int(($1 - $cur) / 1024);
+            $room = $r if !defined $room || $r < $room;
+        }
+        last unless $path =~ s{/[^/]*$}{};
+    }
+    return $room;
+}
 my $avail = mem_available_kb();
 plan skip_all => 'cannot read MemAvailable' unless defined $avail;
-plan skip_all => sprintf('needs ~4GB free, MemAvailable is %.1fGB', $avail / 1048576)
-    if $avail < 4 * 1048576;
+my $room = cgroup_room_kb();
+$avail = $room if defined $room && $room < $avail;
+plan skip_all => sprintf('needs ~1.5GB free, %.1fGB available', $avail / 1048576)
+    if $avail < 1.5 * 1048576;
 
 # The key ceiling lives in the four string-KEY variants, the value ceiling in
 # the four string-VALUE variants; SS is the only one with both.  Both lists are
@@ -45,7 +64,8 @@ my @val_variants = (
 for (@key_variants, @val_variants) { my $c = $_->[0]; eval "require $c; 1" or die $@ }
 
 my $dir = tempdir(CLEANUP => 1);
-my $big = 'x' x 2**30;
+my $len = 2**30;
+my $big = 'x' x $len;   # a constant 'x' x 2**30 is folded at compile time, before the skip
 is length($big), 1073741824, 'built a string one byte past the 1GB ceiling';
 
 for my $v (@key_variants) {
@@ -71,7 +91,7 @@ for my $v (@key_variants) {
     ) {
         my ($what, $code) = @$call;
         eval { $code->(); 1 };
-        like $@, qr/^key too long \(max 1GB\)/, "$short: $what croaks on a 2**30-byte key";
+        like $@, qr/^Data::HashMap::Shared::\w+: key too long \(max 1GB\)/, "$short: $what croaks on a 2**30-byte key";
     }
 }
 
@@ -94,7 +114,7 @@ for my $v (@key_variants) {
     ) {
         my ($what, $code) = @$call;
         eval { $code->(); 1 };
-        like $@, qr/^key too long \(max 1GB\)/,
+        like $@, qr/^Data::HashMap::Shared::\w+: key too long \(max 1GB\)/,
             "$short sharded: $what croaks on a 2**30-byte key";
     }
 }
@@ -111,22 +131,22 @@ for my $v (@val_variants) {
     $sh->put($k0, $val);
 
     for my $call (
-        ['put',        sub { $m->put($k0, $big) },           qr/^value too long \(max 1GB\)/],
-        ['put_ttl',    sub { $m->put_ttl($k0, $big, 5) },    qr/^value too long \(max 1GB\)/],
-        ['add',        sub { $m->add($k1, $big) },           qr/^value too long \(max 1GB\)/],
-        ['add_ttl',    sub { $m->add_ttl($k1, $big, 5) },    qr/^value too long \(max 1GB\)/],
-        ['update',     sub { $m->update($k0, $big) },        qr/^value too long \(max 1GB\)/],
-        ['update_ttl', sub { $m->update_ttl($k0, $big, 5) }, qr/^value too long \(max 1GB\)/],
-        ['get_or_set', sub { $m->get_or_set($k1, $big) },    qr/^value too long \(max 1GB\)/],
-        ['swap',       sub { $m->swap($k0, $big) },          qr/^value too long \(max 1GB\)/],
-        ['set_multi',  sub { $m->set_multi($k0, $big) },     qr/^value too long \(max 1GB\)/],
-        ['set_multi (sharded)', sub { $sh->set_multi($k0, $big) }, qr/^value too long \(max 1GB\)/],
+        ['put',        sub { $m->put($k0, $big) },           qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['put_ttl',    sub { $m->put_ttl($k0, $big, 5) },    qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['add',        sub { $m->add($k1, $big) },           qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['add_ttl',    sub { $m->add_ttl($k1, $big, 5) },    qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['update',     sub { $m->update($k0, $big) },        qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['update_ttl', sub { $m->update_ttl($k0, $big, 5) }, qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['get_or_set', sub { $m->get_or_set($k1, $big) },    qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['swap',       sub { $m->swap($k0, $big) },          qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['set_multi',  sub { $m->set_multi($k0, $big) },     qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['set_multi (sharded)', sub { $sh->set_multi($k0, $big) }, qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
         # a guard hoisted out of the per-pair loop passes every row above
-        ['set_multi after a real pair',           sub { $m->set_multi($k0, $val, $k1, $big) },  qr/^value too long \(max 1GB\)/],
-        ['set_multi after a real pair (sharded)', sub { $sh->set_multi($k0, $val, $k1, $big) }, qr/^value too long \(max 1GB\)/],
-        ['cas expected', sub { $m->cas($k0, $big, $val) },   qr/^expected value too long \(max 1GB\)/],
-        ['cas desired',  sub { $m->cas($k0, $val, $big) },   qr/^desired value too long \(max 1GB\)/],
-        ['cas_take',   sub { $m->cas_take($k0, $big) },      qr/^expected value too long \(max 1GB\)/],
+        ['set_multi after a real pair',           sub { $m->set_multi($k0, $val, $k1, $big) },  qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['set_multi after a real pair (sharded)', sub { $sh->set_multi($k0, $val, $k1, $big) }, qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
+        ['cas expected', sub { $m->cas($k0, $big, $val) },   qr/^Data::HashMap::Shared::\w+: expected value too long \(max 1GB\)/],
+        ['cas desired',  sub { $m->cas($k0, $val, $big) },   qr/^Data::HashMap::Shared::\w+: desired value too long \(max 1GB\)/],
+        ['cas_take',   sub { $m->cas_take($k0, $big) },      qr/^Data::HashMap::Shared::\w+: expected value too long \(max 1GB\)/],
     ) {
         my ($what, $code, $re) = @$call;
         eval { $code->(); 1 };

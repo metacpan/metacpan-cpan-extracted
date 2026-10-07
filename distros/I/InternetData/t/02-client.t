@@ -89,6 +89,46 @@ subtest 'responses are unwrapped at the right depth' => sub {
     is($meta->{size}{csvgz}, 760, 'including the size that budgets a transfer');
 };
 
+# Through 1.8.1 an object without the member a call unwraps came back undef, as
+# if it were the answer, so `@{ $db->list }` died in the caller's code.
+subtest 'a 2xx a database call cannot read as its answer is a retried server_error' => sub {
+    my ($body, $type);
+    my $origin = InternetDataTest::Origin->new(sub {
+        my ($c) = @_;
+        $c->res->headers->content_type($type);
+        $c->render(data => $body);
+    });
+    my $db = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 0)->database;
+    my %calls = (
+        list => sub { $db->list },
+        checksums => sub { $db->checksums('bogon_ip_v1', 'csvgz') },
+        downloads => sub { $db->downloads },
+        metadata => sub { $db->metadata('bogon_ip_v1') },
+    );
+    my @bodies = (
+        ['<html>gateway</html>', 'text/html'], ['{"databases":[', 'application/json'],
+        ['', 'application/json'], ['[]', 'application/json'],
+        ['{}', 'application/json', 'list', 'checksums', 'downloads'],
+        ['{"databases":{},"checksums":[],"downloads":"x"}', 'application/json', 'list', 'checksums', 'downloads'],
+    );
+    for my $case (@bodies) {
+        ($body, $type, my @only) = @$case;
+        for my $name (@only ? @only : sort keys %calls) {
+            my $error = eval { $calls{$name}->(); 1 } ? undef : $@;
+            ok(ref $error && $error->isa('InternetData::Error'), "$name, '$body': raised an InternetData::Error")
+                or next;
+            is($error->kind, 'server_error', "$name, '$body': server_error");
+            is($error->status, 200, "$name, '$body': carrying the status");
+        }
+    }
+
+    ($body, $type) = ('{}', 'application/json');
+    $origin->reset;
+    my $retried = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 1)->database;
+    ok(!eval { $retried->list; 1 }, 'still failing on the retry');
+    is($origin->count, 2, 'and retried like any outage');
+};
+
 subtest 'the query a call makes says what it asked for' => sub {
     my $origin = InternetDataTest::Origin->new(sub {
         my ($c) = @_;

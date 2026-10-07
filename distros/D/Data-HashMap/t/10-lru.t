@@ -77,6 +77,38 @@ use Data::HashMap::SI32;
     ok(!defined $v2, 'put update promotes: key 2 evicted');
 }
 
+# ---- swap/cas/get_or_set promote to MRU ----
+
+{
+    my $m = Data::HashMap::II->new(5);
+    hm_ii_put $m, $_, $_ * 10 for 1..5;
+
+    hm_ii_swap $m, 1, 11;
+    hm_ii_put $m, 6, 60;
+    ok(defined(hm_ii_get $m, 1), 'swap promotes: key 1 still present');
+    ok(!defined(hm_ii_get $m, 2), 'swap promotes: key 2 evicted instead');
+}
+
+{
+    my $m = Data::HashMap::II->new(5);
+    hm_ii_put $m, $_, $_ * 10 for 1..5;
+
+    ok(hm_ii_cas $m, 1, 10, 11, 'cas succeeds');
+    hm_ii_put $m, 6, 60;
+    ok(defined(hm_ii_get $m, 1), 'cas promotes: key 1 still present');
+    ok(!defined(hm_ii_get $m, 2), 'cas promotes: key 2 evicted instead');
+}
+
+{
+    my $m = Data::HashMap::II->new(5);
+    hm_ii_put $m, $_, $_ * 10 for 1..5;
+
+    is(hm_ii_get_or_set $m, 1, 999, 10, 'get_or_set on present key returns existing');
+    hm_ii_put $m, 6, 60;
+    ok(defined(hm_ii_get $m, 1), 'get_or_set promotes: key 1 still present');
+    ok(!defined(hm_ii_get $m, 2), 'get_or_set promotes: key 2 evicted instead');
+}
+
 # ---- Put update of non-tail key does NOT evict ----
 
 {
@@ -475,6 +507,64 @@ use Data::HashMap::SI32;
     is(hm_ss_size $m, 10, 'SS lru_skip=50: capacity maintained');
     # All recent inserts should be present
     ok(defined(hm_ss_get $m, "k20"), 'SS lru_skip=50: newest key present');
+}
+
+{
+    my $m = Data::HashMap::II->new(2);
+    hm_ii_put $m, 1, 10;
+    hm_ii_put $m, 2, 20;
+    ok(!(hm_ii_cas $m, 1, 999, 100), 'II failed cas returns false');
+    hm_ii_put $m, 3, 30;
+    ok(!(hm_ii_exists $m, 1), 'II failed cas does not promote: stale entry still evicted');
+    is(hm_ii_get $m, 2, 20, 'II failed cas: other entry survives with value');
+}
+
+# ---- lru_skip cadence: skip=90 promotes one read in ten ----
+# (reads hit the middle entry: the MRU never counts, the LRU always promotes)
+{
+    my $m = Data::HashMap::II->new(3, 0, 90);
+    hm_ii_put $m, $_, $_ * 10 for 1..3;
+    hm_ii_get $m, 2 for 1..9;
+    hm_ii_put $m, 4, 40;
+    hm_ii_put $m, 5, 50;
+    ok(!(hm_ii_exists $m, 2), 'II skip=90: nine reads do not promote');
+}
+{
+    my $m = Data::HashMap::II->new(3, 0, 90);
+    hm_ii_put $m, $_, $_ * 10 for 1..3;
+    hm_ii_get $m, 2 for 1..10;
+    hm_ii_put $m, 4, 40;
+    hm_ii_put $m, 5, 50;
+    ok(hm_ii_exists $m, 2, 'II skip=90: tenth read promotes');
+    ok(!(hm_ii_exists $m, 3), 'II skip=90: promotion moved the victim on');
+}
+{
+    my $m = Data::HashMap::II->new(3, 0, 90);
+    hm_ii_put $m, $_, $_ * 10 for 1..3;
+    hm_ii_get $m, 3 for 1..50;
+    hm_ii_get $m, 2 for 1..9;
+    hm_ii_put $m, 4, 40;
+    hm_ii_put $m, 5, 50;
+    ok(!(hm_ii_exists $m, 2), 'II skip=90: MRU touches do not feed the counter');
+}
+
+# ---- from_hash/merge into a bounded map do not size the table to the source ----
+{
+    my $m = Data::HashMap::II->new(100);
+    $m->from_hash({ map { ($_ => $_) } 1 .. 20000 });
+    is(hm_ii_size $m, 100, 'from_hash into LRU map: size capped at max_size');
+    cmp_ok(hm_ii_capacity $m, '<', 1000, 'from_hash into LRU map: table not sized to the source');
+
+    my $src = Data::HashMap::II->new;
+    $src->put($_, $_) for 1 .. 20000;
+    my $t = Data::HashMap::II->new(100);
+    $t->merge($src);
+    is(hm_ii_size $t, 100, 'merge into LRU map: size capped at max_size');
+    cmp_ok(hm_ii_capacity $t, '<', 1000, 'merge into LRU map: table not sized to the source');
+
+    my $u = Data::HashMap::II->new;
+    $u->from_hash({ map { ($_ => $_) } 1 .. 1000 });
+    cmp_ok(hm_ii_capacity $u, '>=', 2048, 'from_hash into an unbounded map still reserves for all keys');
 }
 
 done_testing;

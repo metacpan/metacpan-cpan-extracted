@@ -1,4 +1,11 @@
 Revision history for Game-Checkers
 
+0.02    2026-10-06
+	- Pick a move with the arrow keys, not by typing it, in the terminal.
+	- The terminal board is checkered when colour is on.
+	- Fix: t/18 needed a Unix shell.
+	- Fix: bin/checkers died under Devel::Hook before 0.011.
+	- Fix: ambiguous negated constants in Bot.pm.
+
 0.01    2026-09-15
 	- First version

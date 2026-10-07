@@ -4,7 +4,7 @@ use warnings;
 use Data::HashMap::Shared::SS;
 
 # LRU cache: max 5 entries, oldest evicted on overflow
-my $cache = Data::HashMap::Shared::SS->new('/tmp/demo_lru.shm', 1000, 5);
+my $cache = Data::HashMap::Shared::SS->new("/tmp/dhms_lru_$$.shm", 1000, 5);
 
 for my $i (1 .. 8) {
     shm_ss_put $cache, "key$i", "value$i";

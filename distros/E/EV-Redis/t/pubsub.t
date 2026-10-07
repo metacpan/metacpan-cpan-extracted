@@ -22,7 +22,6 @@ my $publisher  = EV::Redis->new( path => $connect_info{sock} );
 $subscriber->command('subscribe', 'foo', sub {
     my ($r, $e) = @_;
 
-    # Handle disconnect error callback (expected after disconnect)
     if ($e && !defined $r) {
         pass 'subscription callback received disconnect error';
         return;
@@ -43,8 +42,7 @@ $subscriber->command('subscribe', 'foo', sub {
         is $r->[1], 'foo';
         is $r->[2], 'bar';
 
-        # Unsubscribe callback is silently discarded — hiredis routes the
-        # confirmation through the original subscribe callback above.
+        # hiredis routes the unsubscribe confirmation to the subscribe callback above
         $subscriber->unsubscribe('foo');
     } elsif ($r->[0] eq 'unsubscribe') {
         is $r->[1], 'foo';
@@ -61,9 +59,8 @@ my $timeout; $timeout = EV::timer 5, 0, sub {
 };
 
 EV::run;
-undef $timeout;  # kill pending timeout: an active leaked timer would EV::break a later EV::run
+undef $timeout;  # a leaked active timer would EV::break a later EV::run
 
-# Test: multi-channel subscribe
 {
     my $subscriber = EV::Redis->new( path => $connect_info{sock} );
     my $publisher  = EV::Redis->new( path => $connect_info{sock} );
@@ -102,7 +99,7 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
     };
 
     EV::run;
-    undef $timeout;  # kill pending timeout (see above)
+    undef $timeout;
 
     my @subscribe_msgs = grep { $_->[0] eq 'subscribe' } @received;
     is scalar(@subscribe_msgs), 2, 'multi-subscribe: got 2 subscribe confirmations';
@@ -119,7 +116,6 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
     is scalar(@unsub_msgs), 2, 'multi-subscribe: got 2 unsubscribe confirmations';
 }
 
-# Test: psubscribe (pattern subscribe)
 {
     my $subscriber = EV::Redis->new( path => $connect_info{sock} );
     my $publisher  = EV::Redis->new( path => $connect_info{sock} );
@@ -129,7 +125,6 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
     $subscriber->psubscribe('test:*', sub {
         my ($r, $e) = @_;
 
-        # Handle disconnect error callback
         if ($e && !defined $r) {
             pass 'psubscribe callback received disconnect error';
             return;
@@ -141,7 +136,6 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
             is $r->[1], 'test:*', 'psubscribe pattern correct';
             is $r->[2], 1, 'psubscribe count correct';
 
-            # Publish to a matching channel
             $publisher->publish('test:foo', 'hello', sub {
                 my ($res, $err) = @_;
                 is $res, 1, 'publish to pattern-matched channel returned 1 subscriber';
@@ -163,7 +157,6 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
     EV::run;
 }
 
-# Test: monitor command
 {
     my $monitor = EV::Redis->new( path => $connect_info{sock} );
     my $client  = EV::Redis->new( path => $connect_info{sock} );
@@ -175,7 +168,6 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
     $monitor->monitor(sub {
         my ($r, $e) = @_;
 
-        # Handle disconnect error
         if ($e && !defined $r) {
             return;
         }
@@ -184,12 +176,10 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
 
         if ($r eq 'OK' && !$monitor_started) {
             $monitor_started = 1;
-            # Issue a command from another client to see it in monitor
             $client->set('monitor_test_key', 'monitor_test_value', sub {
                 $client->disconnect;
             });
         }
-        # Check if we captured the SET command
         elsif ($r =~ /SET.*monitor_test_key/i) {
             $captured_set = 1;
             $monitor->disconnect;
@@ -197,7 +187,6 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
         }
     });
 
-    # Timeout in case monitor doesn't capture command
     my $timeout; $timeout = EV::timer 2, 0, sub {
         undef $timeout;
         $monitor->disconnect;
@@ -206,22 +195,14 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
     };
 
     EV::run;
-    undef $timeout;  # kill pending timeout (see above)
+    undef $timeout;
 
     ok $monitor_started, 'monitor command acknowledged with OK';
     ok $captured_set, 'monitor captured SET command';
 }
 
-# Test: sharded pub/sub is refused. hiredis has no ssubscribe/smessage
-# support: an incoming smessage would abort the process (RESP2 assert) or be
-# misrouted to on_push (RESP3), so command() croaks instead of crashing.
-# SPUBLISH is a regular command and stays allowed.
+# hiredis cannot route smessage, so sharded subscribe is refused
 {
-    # Fetch the version BEFORE creating $r: get_redis_version runs a timerless
-    # EV::run that only returns when no active watchers remain; an idle
-    # connected $r would keep its read watcher active and hang it forever.
-    # (Previously this was masked by a leaked block-4 guard timer whose
-    # EV::break ended the helper's loop after ~2s.)
     my ($redis_version) = get_redis_version($connect_info{sock});
 
     my $r = EV::Redis->new( path => $connect_info{sock} );
@@ -231,6 +212,12 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
 
     eval { $r->sunsubscribe('sharded_channel', sub {}) };
     like $@, qr/sunsubscribe is not supported/, 'sunsubscribe croaks';
+
+    eval { $r->command('PMONITOR', sub {}) };
+    like $@, qr/PMONITOR is not supported/, 'PMONITOR croaks';
+
+    eval { $r->command("subscribe\0", 'x', sub {}) };
+    like $@, qr/NUL byte/, 'a command name with a NUL byte croaks';
     SKIP: {
         skip 'spublish requires Redis 7+', 1 if $redis_version < 7;
         my $spublish_res;
@@ -241,22 +228,20 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
         });
         my $timeout; $timeout = EV::timer 2, 0, sub { undef $timeout; EV::break };
         EV::run;
-        undef $timeout;  # kill pending timeout (see above)
+        undef $timeout;
         is $spublish_res, 0, 'spublish works as a regular command (0 receivers)';
     }
     $r->disconnect;
 }
 
-# Test: MONITOR mixing guards — monitor needs an idle connection, and no
-# commands may follow while it is active (hiredis repushes callback records
-# in monitor mode; mixing would be a use-after-free).
+# mixing MONITOR with other commands would be a use-after-free in hiredis
 {
     my $r = EV::Redis->new( path => $connect_info{sock} );
 
     $r->command('set', 'mon_guard_key', 1, sub { EV::break });
     eval { $r->monitor(sub {}) };
     like $@, qr/idle connection/, 'monitor with a pending command croaks';
-    EV::run;  # drain the pending SET
+    EV::run;
 
     is $r->pending_count, 0, 'connection idle again';
     my $mon_ok;
@@ -269,26 +254,23 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
     });
     my $t1; $t1 = EV::timer 2, 0, sub { undef $t1; EV::break };
     EV::run;
-    undef $t1;  # kill pending timeout (see above)
+    undef $t1;
     ok $mon_ok, 'monitor on idle connection works';
 
     eval { $r->ping(sub {}) };
     like $@, qr/MONITOR is active/, 'command while monitoring croaks';
 
-    # Flag clears with the connection
     $r->disconnect;
     $r->connect_unix($connect_info{sock});
     my $pong;
     $r->ping(sub { $pong = $_[0]; EV::break });
     my $t2; $t2 = EV::timer 2, 0, sub { undef $t2; EV::break };
     EV::run;
-    undef $t2;  # kill pending timeout (see above)
+    undef $t2;
     is $pong, 'PONG', 'commands work again after reconnect clears monitor state';
     $r->disconnect;
 }
 
-# Test: subscribe with no channels croaks (server would reject it and the
-# persistent tracking entry would strand until disconnect).
 {
     my $r = EV::Redis->new( path => $connect_info{sock} );
     eval { $r->subscribe(sub {}) };
@@ -298,43 +280,34 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
     $r->disconnect;
 }
 
-# Test: disconnect with active subscription — callback should fire exactly once
-# with a meaningful error (not empty string), and not be double-invoked.
 {
     my $sub = EV::Redis->new(path => $connect_info{sock});
     my @cb_calls;
     my $subscribed = 0;
 
-    $sub->on_error(sub {}); # suppress
+    $sub->on_error(sub {});
 
     $sub->subscribe('disconnect_test_ch', sub {
         my ($result, $error) = @_;
         push @cb_calls, [$result, $error];
         if ($result && ref $result eq 'ARRAY' && $result->[0] eq 'subscribe') {
             $subscribed = 1;
-            # Disconnect without unsubscribing
             $sub->disconnect;
         }
     });
 
     my $t; $t = EV::timer 2, 0, sub { undef $t; EV::break };
     EV::run;
-    undef $t;  # kill pending timeout (see above)
+    undef $t;
 
     ok $subscribed, 'subscribed before disconnect';
-    # Expect: subscribe confirmation + exactly one disconnect error
     my @errors = grep { defined $_->[1] } @cb_calls;
     is scalar(@errors), 1, 'subscribe callback invoked exactly once with error on disconnect';
     ok $errors[0][1], 'error string is truthy (not empty)';
     like $errors[0][1], qr/disconnected/, 'error string is "disconnected"';
 }
 
-# Test: multi-channel subscribe + disconnect — one error callback total.
-# (Historically flaky here: guard timers leaked by earlier blocks — kept
-# alive by their self-capturing callbacks — fired their deferred EV::break
-# inside this block's run, ending it before the subscriber's read interest
-# was registered. Fixed by the undef-after-EV::run lines above; a failure
-# here now means a real regression.)
+# teardown: at most one error per channel
 {
     my $sub = EV::Redis->new(path => $connect_info{sock});
     my @cb_calls;
@@ -355,17 +328,148 @@ undef $timeout;  # kill pending timeout: an active leaked timer would EV::break 
 
     my $t; $t = EV::timer 5, 0, sub { undef $t; EV::break };
     EV::run;
-    undef $t;  # kill pending timeout (see above)
+    undef $t;
 
     is $sub_count, 2, 'both channels subscribed';
     my @errors = grep { defined $_->[1] } @cb_calls;
-    # With multi-channel, hiredis fires once per channel on teardown.
     for my $e (@errors) {
         ok $e->[1], 'error string is truthy (not empty)';
     }
-    # 2 subscribe confirmations + at most one error per channel;
-    # no extra invocation from remove_cb_queue_sv
     ok scalar(@errors) <= 2, 'no more than 2 error callbacks for 2-channel subscribe';
+}
+
+# on_disconnect may connect again into MONITOR from inside disconnect()
+{
+    my $r;
+    $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $t = EV::timer 0.3, 0, sub { EV::break };
+    EV::run;
+    undef $t;
+    $r->on_disconnect(sub {
+        $r->on_disconnect(undef);
+        $r->connect_unix($connect_info{sock});
+        $r->monitor(sub {});
+    });
+    $r->disconnect;
+    eval { $r->ping(sub {}) };
+    like $@, qr/MONITOR is active/, 'MONITOR opened by on_disconnect still refuses commands';
+    $r->disconnect;
+}
+
+# disconnect() in the MONITOR callback, then on_disconnect connects again
+{
+    my ($r, $again, @mon);
+    my $reconnected = 0;
+    $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    $r->on_disconnect(sub { $r->connect_unix($connect_info{sock}) unless $reconnected++ });
+    $r->on_connect(sub {
+        return unless $reconnected;
+        $again = eval { $r->command('monitor', sub {}); 1 };
+        EV::break;
+    });
+    $r->command('monitor', sub { push @mon, $_[0] // $_[1]; $r->disconnect if @mon == 1 });
+    my $g = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    ok $again, 'MONITOR again after disconnect() in the MONITOR callback';
+    is_deeply \@mon, ['OK', 'disconnected'], 'the first MONITOR callback gets one final error';
+    $r->on_disconnect(undef);
+    $r->disconnect;
+}
+
+# disconnect() outside the MONITOR callback: one final error
+{
+    my @mon;
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    $r->command('monitor', sub { push @mon, $_[0] // $_[1]; EV::break if @mon == 1 });
+    { my $g = EV::timer 3, 0, sub { EV::break }; EV::run }
+    $r->disconnect;
+    is_deeply \@mon, ['OK', 'disconnected'], 'disconnect() of a MONITOR connection: one final error';
+}
+
+# hiredis delivers a channel to its latest subscriber's callback
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $p = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $log = sub { my $l = shift; sub { push @$l, $_[1] // $_[0][0] } };
+    my $run = sub { my $g = EV::timer 3, 0, sub { EV::break }; EV::run };
+
+    # unsubscribe + subscribe in one tick: the unsubscribe reply goes to the
+    # new callback, which must survive it
+    my (@a, @b);
+    $r->subscribe('ps_resub', sub {
+        $log->(\@a)->(@_);
+        return unless @a == 1;
+        $r->unsubscribe('ps_resub');
+        $r->subscribe('ps_resub', sub {
+            $log->(\@b)->(@_);
+            $p->publish('ps_resub', 'x', sub {}) if @b == 2;
+            EV::break if @b == 3;
+        });
+    });
+    $run->();
+    is_deeply \@b, ['unsubscribe', 'subscribe', 'message'],
+        'resubscribe in one tick: the new callback keeps the channel';
+
+    # a second subscribe to a channel replaces its callback
+    my (@c, @d);
+    $r->subscribe('ps_repl', $log->(\@c));
+    $r->subscribe('ps_repl', sub {
+        $log->(\@d)->(@_);
+        $p->publish('ps_repl', 'x', sub {}) if @d == 2;
+        EV::break if @d == 3;
+    });
+    $run->();
+    is_deeply \@d, ['subscribe', 'subscribe', 'message'], 'second subscribe takes the channel';
+
+    # replaced from inside its own callback
+    my (@e, @f);
+    $r->subscribe('ps_self', sub {
+        $log->(\@e)->(@_);
+        return unless @e == 1;
+        $r->subscribe('ps_self', sub {
+            $log->(\@f)->(@_);
+            $p->publish('ps_self', 'x', sub {}) if @f == 1;
+            EV::break if @f == 2;
+        });
+    });
+    $run->();
+    is_deeply \@f, ['subscribe', 'message'], 'replaced from its own callback';
+
+    # losing one of two channels keeps the callback for the other
+    my (@g, @h, @i);
+    $r->subscribe('ps_m1', 'ps_m2', sub {
+        $log->(\@g)->(@_);
+        EV::break if @g == 3;
+        return unless @g == 2;
+        $r->subscribe('ps_m1', sub {
+            $log->(\@h)->(@_);
+            $p->publish('ps_m2', 'x', sub {}) if @h == 1;
+        });
+    });
+    $r->psubscribe('ps_pat*', $log->(\@i));
+    $r->psubscribe('ps_pat*', sub { push @i, 'new:' . ($_[1] // $_[0][0]) });
+    $run->();
+    is_deeply \@g, ['subscribe', 'subscribe', 'message'], 'the other channel stays with the first callback';
+    is_deeply \@i, ['new:psubscribe', 'new:psubscribe'], 'second psubscribe takes the pattern';
+
+    # duplicate names make one subscription
+    my @j;
+    $r->subscribe('ps_dup', 'ps_dup', sub {
+        $log->(\@j)->(@_);
+        $r->unsubscribe('ps_dup') if @j == 2;
+        EV::break if @j == 3;
+    });
+    $run->();
+    is_deeply \@j, ['subscribe', 'subscribe', 'unsubscribe'], 'subscribe a a, unsubscribe a';
+
+    $r->disconnect;
+    is_deeply \@a, ['subscribe'], 'replaced callbacks get no teardown error';
+    is_deeply \@c, [], 'a callback replaced before any reply is never called';
+    is_deeply \@e, ['subscribe'], 'a callback replaced from inside itself is not called again';
+    is_deeply [@j[3 .. $#j]], [], 'fully unsubscribed callback gets no teardown error';
+    is $b[-1], 'disconnected', 'current callbacks get the teardown error';
+    is scalar(grep { $_ eq 'disconnected' } @g), 1, 'one teardown error for the one channel left';
+    $p->disconnect;
 }
 
 done_testing;

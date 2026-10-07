@@ -223,4 +223,30 @@ subtest 'croak_on_error is forwarded but turned into a carp' => sub {
 	is($msgs[0]{message}, 'bad thing', 'message still logged');
 };
 
+subtest 'timestamp and rotation options are forwarded' => sub {
+	require File::Spec;
+	require File::Temp;
+
+	my $out = '';
+	open(my $fh, '>', \$out) or die $!;
+	Log::Any::Adapter->set('Abstraction', level => 'debug', fd => $fh, format => '%timestamp%',
+		timestamp_format => '%Z|%S', timestamp_precision => 3, utc => 1);
+	Log::Any->get_logger(category => 'TestTS')->info('x');
+	close $fh;
+	like($out, qr/^UTC\|\d\d\.\d{3}$/m, 'timestamp_format, timestamp_precision and utc');
+
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $file = File::Spec->catfile($dir, 'rotate.log');
+	Log::Any::Adapter->set('Abstraction', level => 'debug', file => $file, logger => [],
+		rotate_size => 1, rotate_keep => 1);
+	my $log = Log::Any->get_logger(category => 'TestRotate');
+	$log->info($_) for 1..3;
+	ok(-e "$file.1", 'rotate_size: rotated');
+	ok(!-e "$file.2", 'rotate_keep: only one kept');
+
+	throws_ok(sub { Log::Any::Adapter->set('Abstraction', logger => [], rotate_interval => 'fortnightly') },
+		qr/rotate_interval must be/, 'rotate_interval reaches new()');
+	Log::Any::Adapter->set('Null');
+};
+
 done_testing();

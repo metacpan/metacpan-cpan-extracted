@@ -607,7 +607,8 @@
     .btn-graph,
     .btn-pie,
     .btn-heatmap,
-    .btn-bar {
+    .btn-bar,
+    .btn-folder {
       flex-shrink: 0;
       padding: 0.28rem 0.75rem;
       border: 1px solid #888;
@@ -618,11 +619,15 @@
       white-space: nowrap;
       cursor: pointer;
       transition: background 0.12s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
     }
     .btn-graph:hover,
     .btn-pie:hover,
     .btn-heatmap:hover,
-    .btn-bar:hover { background: #f0f0f0; }
+    .btn-bar:hover,
+    .btn-folder:hover { background: #f0f0f0; }
     .btn-graph:disabled,
     .btn-pie:disabled,
     .btn-heatmap:disabled,

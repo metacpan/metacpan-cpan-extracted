@@ -9,6 +9,7 @@ BEGIN {
 
 use Test::LeakTrace;
 use POSIX ();
+use Config;
 
 use Data::HashMap::II;
 use Data::HashMap::IS;
@@ -253,6 +254,49 @@ no_leaks_ok {
     my $m = Data::HashMap::I16S->new(10);
     hm_i16s_put $m, $_, "v$_" for 1..100;
 } 'I16S LRU: evicted string values freed';
+
+# ---- Removal-returning ops must not leak the returned value ----
+
+no_leaks_ok {
+    my $m = Data::HashMap::II->new();
+    hm_ii_put $m, $_, $_ for 1..100;
+    hm_ii_take $m, 10;
+    hm_ii_pop $m;
+    hm_ii_shift $m;
+    hm_ii_drain $m, 10;
+    hm_ii_swap $m, 20, 200;
+    hm_ii_clear $m;
+} 'II: take/pop/shift/drain/swap';
+
+no_leaks_ok {
+    my $m = Data::HashMap::SS->new();
+    hm_ss_put $m, "k$_", "v$_" for 1..100;
+    hm_ss_take $m, "k10";
+    hm_ss_pop $m;
+    hm_ss_shift $m;
+    hm_ss_drain $m, 10;
+    hm_ss_swap $m, "k20", "w";
+    hm_ss_clear $m;
+} 'SS: take/pop/shift/drain/swap';
+
+no_leaks_ok {
+    my $m = Data::HashMap::SA->new(0, 0, 0, 1);
+    hm_sa_put $m, "k$_", { n => $_ } for 1..100;
+    hm_sa_take $m, "k10";
+    hm_sa_pop $m;
+    hm_sa_shift $m;
+    hm_sa_drain $m, 10;
+    hm_sa_swap $m, "k20", { n => 0 };
+    hm_sa_clear $m;
+} 'SA copy: take/pop/shift/drain/swap';
+
+SKIP: {
+    skip 'max_size saturates at a 32-bit size_t', 1 if $Config{sizesize} < 8;
+    no_leaks_ok {
+        my $m = Data::HashMap::II->new(2**40);
+        eval { $m->freeze };
+    } 'II: failed freeze leaks nothing';
+}
 
 # ---- Destroy: map destruction frees all entries ----
 
@@ -606,5 +650,14 @@ SKIP: {
         }
     }
 }
+
+# ---- new/thaw on an instance must not leak the created map ----
+no_leaks_ok {
+    my $m = Data::HashMap::II->new;
+    $m->put($_, $_) for 1 .. 100;
+    my $blob = $m->freeze;
+    my $n = $m->new;
+    my $t = $m->thaw($blob);
+} 'II: instance new/thaw frees its map';
 
 done_testing;

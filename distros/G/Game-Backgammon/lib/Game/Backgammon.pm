@@ -13,7 +13,7 @@ use Game::Backgammon::Result;
 use Game::Backgammon::Rules ();
 use Game::Backgammon::Turn;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has seed => (
 	is => 'ro',

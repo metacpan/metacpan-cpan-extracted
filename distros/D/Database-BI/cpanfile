@@ -9,6 +9,7 @@ requires 'Carp';
 requires 'DBI';
 requires 'Database::Abstraction', '0.44';
 requires 'Database::Join', '0.004.0';
+requires 'File::Path', '2.07';   # For remove_tree in Dashboard.pm at runtime
 requires 'File::Spec', '3.40';
 requires 'File::Temp', '0.22';
 requires 'HTML::D3', '0.18';

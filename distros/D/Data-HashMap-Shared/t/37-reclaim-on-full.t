@@ -6,6 +6,7 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SI;
 use Data::HashMap::Shared::II;
+use Data::HashMap::Shared::IS;
 use Data::HashMap::Shared::SS;
 
 # An insert probe cannot tell an expired entry from a live one -- both are
@@ -90,6 +91,29 @@ for my $i (0 .. $#cases) {
     ok $p->put('fresh', 1), 'an insert into a full table holding five expired entries succeeds';
     is $p->size, $p->capacity - 4, '  ... flushing exactly the five';
     is $p->stats->{expired}, 5, '  ... billed as expired';
+}
+
+# --- crossing the design load flushes expired entries too ---------------------
+# A partial flush leaves free slots somewhere, so "no free slot" may never come:
+# the insert that takes the table over its load flushes first, rather than
+# carrying the dead entries into a larger table or a compaction.
+{
+    # TTL 2: a TTL of 1 can expire mid-fill, at a clock tick, and be flushed by
+    # the fill itself before the table reaches its load.
+    my $top = Data::HashMap::Shared::SI->new("$dir/top.shm", 1000, 0, 3600);
+    $top->put_ttl("old-$_", $_, 2) for 1 .. $top->max_entries;   # the largest table, at its load
+    my $mid = Data::HashMap::Shared::SI->new("$dir/mid.shm", 10_000, 0, 3600);
+    $mid->put_ttl("old-$_", $_, 2) for 1 .. 700;
+    my $cap = $mid->capacity;
+    Time::HiRes::sleep(2.2);
+
+    $top->put("new-$_", $_) for 1 .. 20;
+    cmp_ok $top->size, '<=', 20, 'at the largest table: the expired entries are flushed';
+    cmp_ok $top->stats->{expired}, '>=', $top->max_entries, '  ... all of them';
+
+    $mid->put("new-$_", $_) for 1 .. 100;
+    cmp_ok $mid->size, '<=', 100, 'below it: the expired entries are flushed';
+    is $mid->capacity, $cap, "  ... and the table stays at $cap slots rather than growing";
 }
 
 
@@ -280,6 +304,61 @@ for my $i (0 .. $#cases) {
     ok defined $w->get('A'), '  ... which survives beyond the search window';
     is $w->stats->{evictions} - $ev, 1, '  ... after one blind eviction';
     is $w->size, $size - 1, '  ... costing one entry';
+}
+
+# Long strings fill the arena before the table: a refused store flushes the
+# expired entries holding it, as a missing slot does, sparing the entry an
+# overwrite replaces.
+{
+    my $long = sub { sprintf '%0100d', $_[0] };
+    my $si = Data::HashMap::Shared::SI->new(undef, 1000, 0, 2);
+    my $n = 0;
+    $n++ while $n < 5000 && $si->put($long->($n), 1);
+    cmp_ok $n, '<', $si->capacity, 'long keys fill the arena before the table';
+    my $is = Data::HashMap::Shared::IS->new(undef, 1000, 0, 2);
+    my $m = 0;
+    $m++ while $m < 5000 && $is->put($m, $long->($m));
+    my $ss = Data::HashMap::Shared::SS->new(undef, 64, 0, 2);
+    my $s = 0;
+    $s++ while $s < 5000 && $ss->put("k$s", $long->($s));
+    Time::HiRes::sleep(3.1);
+    is scalar(grep { $si->put($long->(900_000 + $_), 1) } 1 .. 5), 5,
+        'a new long key is stored once the arena holds only expired ones';
+    is scalar(grep { $is->put(900_000 + $_, $long->($_)) } 1 .. 5), 5, '  ... and a new long value';
+    ok $ss->put('k0', 'y' x 100), 'an overwrite of an expired entry on a full arena succeeds';
+    is $ss->get('k0'), 'y' x 100, '  ... keeping the entry it replaces';
+    is $ss->size, 1, '  ... while the other expired entries are flushed';
+}
+
+# One insert's arena flush leaves tombstones that the next insert's design-load
+# check compacts in place rather than taking as a reason to grow.
+{
+    my $m = Data::HashMap::Shared::SS->new(undef, 100_000, 0, 2, 0, 16 + 768 * 16);
+    my $i = 0;
+    $i++ while $i < 800 && $m->put("k$i", 'v' x 10);
+    is $i . '/' . $m->capacity, '768/1024', 'the arena fills at the design load';
+    Time::HiRes::sleep(3.1);
+    ok $m->put("n$_", 'w' x 10), "insert $_ after every entry expired" for 1 .. 2;
+    is $m->capacity, 1024, '  ... compacts the table in place rather than doubling it';
+}
+
+# At $max_size a string no arena can hold is refused before the count eviction,
+# so the refused insert costs the cache nothing.
+{
+    my $s = Data::HashMap::Shared::SS->new(undef, 1000, 10, 0, 0, 8192);
+    $s->put("k$_", 'v' x 400) for 1 .. 10;
+    my $huge = 'y' x 100_000;
+    ok !$s->$_('huge', $huge), "$_ of a value no arena holds is refused at max_size"
+        for qw(put add swap get_or_set set_multi);
+    is $s->stats->{evictions}, 0, '  ... evicting nothing';
+    is $s->size, 10, '  ... so the cache keeps every entry';
+
+    my $c = Data::HashMap::Shared::SI->new(undef, 1000, 10, 0, 0, 4096);
+    $c->put("k$_", $_) for 1 .. 10;
+    ok !eval { $c->incr('K' x 5000); 1 }, 'incr of a key no arena holds croaks at max_size';
+    ok !eval { $c->max('K' x 5000, 1); 1 }, '  ... as does max';
+    is $c->stats->{evictions}, 0, '  ... evicting nothing';
+    is $c->size, 10, '  ... so every counter stays';
 }
 
 done_testing;

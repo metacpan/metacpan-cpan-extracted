@@ -71,6 +71,7 @@ t/cli/build.t
 t/cli/clean.t
 t/cli/dist_reproducible.t
 t/cli/dist_skip_prepare.t
+t/cli/output.t
 t/cli/prepare.t
 t/cli/regenerate_BuildPL.t
 t/cli/release.t

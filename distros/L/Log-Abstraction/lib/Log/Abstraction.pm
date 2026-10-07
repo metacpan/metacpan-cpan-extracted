@@ -52,18 +52,8 @@ package Log::Abstraction;
 #   - Store the provider reference, not a cached Logger, to survive
 #     provider swaps (workaround for blocker 3 above).
 
-# TODO: Outstanding items from the 0.35 gap analysis (2026-09-30).
-#
-#   - Sub::Private enforcement is silently disabled when this module is
-#     loaded at run time (require, use_ok, Log::Any::Adapter->set), and
-#     "Too late to run CHECK block" is emitted to the user.  Needs a fix in
-#     Sub::Private (e.g. wrap immediately or use INIT when CHECK has passed).
-#
 # Roadmap - features:
-#   - sendmail digests: batch messages suppressed by min_interval into the
-#     next email instead of discarding them.
 #   - Log::Dispatch / Log::Any producer mode.
-#   - Redaction: redact => [qr/password=\S+/] applied before any backend.
 #
 # Roadmap - technical debt:
 #   - Split _log into per-backend classes (Log::Abstraction::Backend::*)
@@ -106,9 +96,10 @@ use Time::Local ();
 
 # Sub::Private in enforce mode: _-prefixed subs decorated :Private croak when
 # called from outside this package.  HARNESS_ACTIVE bypasses checks during
-# make test so white-box tests can still reach private methods.
+# make test so white-box tests can still reach private methods.  0.06 also
+# enforces when this module is loaded at run time (require, Log::Any).
 BEGIN { $Sub::Private::config{mode} = 'enforce' }
-use Sub::Private 0.05;
+use Sub::Private 0.06;
 
 # Sys::Syslog, called as Sys::Syslog::openlog() etc. in _log and DESTROY
 use Sys::Syslog 0.28 ();
@@ -214,8 +205,15 @@ Readonly::Scalar my $JOURNALD_MIN_PAYLOAD => 4_096;
 # Longest journald field name; journald ignores fields with longer names
 Readonly::Scalar my $JOURNALD_MAX_FIELD_NAME => 64;
 
+# Most messages a sendmail digest holds, unless digest_max says otherwise;
+# beyond it they are only counted
+Readonly::Scalar my $DEFAULT_DIGEST_MAX => 100;
+
 # Marker appended to a message truncated to fit in a journald datagram
 Readonly::Scalar my $TRUNCATED_MARKER => ' [truncated]';
+
+# What each match of a redact pattern is replaced with
+Readonly::Scalar my $REDACTED_MARKER => '[REDACTED]';
 
 # Number of live instances that have opened the process-global syslog
 # connection; closelog() is only called when the last one is destroyed
@@ -231,11 +229,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.37
+0.39
 
 =cut
 
-our $VERSION = '0.37';
+our $VERSION = '0.39';
 
 =head1 SYNOPSIS
 
@@ -311,6 +309,66 @@ object logger is passed the pairs as an extra argument after the message.
 When logging through L<Log::Any>, a hash reference at the end of the call,
 together with the proxy's C<context>, arrives here as fields; see
 L<Log::Any::Adapter::Abstraction/structured>.
+
+=head2 Redaction
+
+The C<redact> option removes secrets before a message reaches the history
+or any backend.  Each match of any of its patterns is replaced with
+C<[REDACTED]>:
+
+  my $log = Log::Abstraction->new(
+      logger => '/var/log/myapp.log',
+      redact => [qr/password=\S+/, qr/\b\d{4}(?:[ -]?\d{4}){3}\b/],
+  );
+  $log->warn('Login failed: user=fred password=hunter2');
+  # Login failed: user=fred [REDACTED]
+
+To keep the start of a match, end it with C<\K>: C<qr/password=\K\S+/> logs
+C<password=[REDACTED]>.  The patterns run over the whole message, after its
+arguments are joined, so a match may span them, as in
+C<$log-E<gt>info('password=', $password)>; a CODE or object logger then gets
+the joined message as one argument.  The text given to C<carp> or C<croak>
+(see L</warn> and L</error>) is redacted too.
+
+L</Structured fields> are redacted as well: string values, including those
+inside plain hashes and arrays, and objects whose stringification matches
+(they become the redacted string).  Field names aren't redacted, nor are
+the format string, C<%env_*%> values or C<ctx>.
+
+Redaction is applied only to messages that pass the logger's C<level>, so
+it costs nothing for messages that are dropped.  A pattern that can match
+the empty string, such as C<qr/x*/>, is rejected by L</new>.
+
+=head2 Email digests
+
+C<min_interval> limits the C<sendmail> backend to one email per interval,
+dropping the messages in between.  With C<digest>, they are held instead,
+and sent ahead of the next message in the first email after the interval:
+
+  my $log = Log::Abstraction->new(
+      logger => {
+          file     => '/var/log/myapp.log',
+          sendmail => {
+              to           => 'ops@example.com',
+              level        => 'error',
+              min_interval => 300,
+              digest       => 1,
+              format       => '%level%> [%timestamp%] %message%',
+          },
+      },
+  );
+
+Each message is one line of the email, oldest first, as its own email body
+would be: formatted with the C<sendmail> C<format> if there is one (as
+above, so that each line has its time), else the message.  At most
+C<digest_max> messages (default 100) are held; later ones are only
+counted, and the email says C<... and N more messages> after the held ones.
+Messages held when an email fails to send stay held, and the new one is
+held with them.
+
+Nothing is sent on a timer: held messages go out with the next email,
+when L</flush> is called, or when the logger is destroyed (which calls
+L</flush>).  A clone made with L</new> starts with none held.
 
 =head2 Per-backend level and format
 
@@ -496,12 +554,13 @@ When not supplied, L<Log::Log4perl> is initialised as the default backend.
 
 The C<sendmail> sub-hash supports:
 C<host>, C<port>, C<to>, C<from>, C<subject>, C<level>, C<format>,
-C<min_interval>.  C<to> is required.  With C<format>, the email body is the
+C<min_interval>, C<digest>, C<digest_max>.  C<to> is required.  With C<format>, the email body is the
 formatted line rather than the message.  C<level> may be a level name or a syslog number (0-7);
 without it, every message is emailed.
-At most one email is sent per C<min_interval> seconds per instance.  If
-delivery fails, C<Carp::carp> is called and the other backends still receive
-the message.
+At most one email is sent per C<min_interval> seconds per instance; the
+messages in between are dropped, unless C<digest> is set, which sends them
+with the next email (see L</Email digests>).  If delivery fails,
+C<Carp::carp> is called and the other backends still receive the message.
 
 The C<syslog> sub-hash supports the keys below.  The message is passed to
 C<syslog()> through a C<%s> format, so C<%> sequences in it, such as C<%m>,
@@ -544,6 +603,12 @@ C<[truncated]> appended.
 Delivery failures are silent apart from a single C<Carp::carp> (repeated only
 after a later send has succeeded); the application is never crashed by a
 journald error.
+
+=item * C<redact>
+
+Patterns to remove from every message before it is logged: a C<qr//>, a
+string (compiled as a regular expression; a config file can't hold a
+C<qr//>), or an array reference of them.  See L</Redaction>.
 
 =item * C<rotate_interval>
 
@@ -642,6 +707,7 @@ specified.
       level          => { type => 'string',  regex => qr/^(trace|debug|info(?:rmational)?|notice|warn(?:ing)?|err(?:or)?|crit(?:ical)?|fatal|alert|emerg(?:ency)?|panic)$/i, optional => 1 },
       logger         => { optional => 1 },
       max_messages   => { type => 'integer', min => 0, optional => 1 },
+      redact         => { optional => 1 },    # regex, string, or arrayref of them
       rotate_interval => { type => 'string', regex => qr/^(hourly|daily|weekly|monthly)$/i, optional => 1 },
       rotate_keep    => { type => 'integer', min => 0, optional => 1 },
       rotate_size    => { type => 'string',  regex => qr/^\s*[1-9]\d*\s*[kmg]?b?\s*$/i, optional => 1 },
@@ -686,6 +752,14 @@ specified.
     non-empty string"                       reference.
   "<class>: timestamp_precision must be     timestamp_precision is not a whole
     an integer from 0 to 9, not '<v>'"      number of digits from 0 to 9.
+  "<class>: redact patterns must be         A redact entry is a reference other than
+    regular expressions or non-empty        a qr//, or an empty string.
+    strings"
+  "<class>: invalid redact pattern '<p>':   A redact string is not a valid regular
+    <error>"                                expression.
+  "<class>: redact pattern <p> matches the  The pattern can match nothing at all
+    empty string"                           (e.g. qr/x*/), which would put a marker
+                                            between every character.
   "<class>: invalid <backend> level '<l>'"  A backend's 'level' (file, fd, array,
                                             sendmail, journald) is neither a level
                                             name nor 0-7.  (A bad syslog 'level'
@@ -697,6 +771,8 @@ specified.
                                             'info' } without a 'file' key).
   "<class>: the sendmail backend needs      The sendmail sub-hash has no 'to' key.
     a 'to' address"
+  "<class>: sendmail digest_max must be a   digest_max is zero, negative or not a
+    positive integer, not '<v>'"            number.
   "<class>: invalid journald field name     An extra journald key, upper-cased, is not
     '<k>'"                                  [A-Z0-9_] or starts with '_'.
 
@@ -752,9 +828,11 @@ logging failure must never crash the application.
       CROAK on an invalid timestamp_format or timestamp_precision
       CROAK on an invalid rotate_size, rotate_interval or rotate_keep, and
         normalise rotate_size to bytes
+      CROAK on an invalid redact pattern; compile redact to one regex
       shallow-clone self merged with override args
       validate and store new level integer if level given in args
       copy message history list
+      start the clone with no held email digest
       count the clone as a user of an open syslog connection
       RETURN clone
 
@@ -782,6 +860,8 @@ logging failure must never crash the application.
     CROAK if rotate_size is not a positive size, rotate_interval is not
       hourly/daily/weekly/monthly, or rotate_keep is not a non-negative
       integer; normalise rotate_size to bytes
+    CROAK if a redact pattern is not a regex or non-empty string, doesn't
+      compile, or matches the empty string; compile redact to one regex
 
     FOR each backend (top-level file/fd/array, and the logger hash's
     file/fd/array/syslog/sendmail/journald) given as a hash:
@@ -790,7 +870,8 @@ logging failure must never crash the application.
       CROAK if its 'format' is undef, empty or not a string
 
     IF logger is a hash:
-      CROAK if a sendmail sub-hash has no 'to' address
+      CROAK if a sendmail sub-hash has no 'to' address, or a digest_max
+        that isn't a positive integer
       CROAK if an extra journald key is not a valid journald field name
 
     RETURN bless { messages => [], merged args, level => numeric } as class
@@ -843,6 +924,7 @@ sub new {
 		# Called on an existing instance -- return a shallow clone
 		_check_timestamp_args(ref($class), \%args);
 		_check_rotate_args(ref($class), \%args);
+		_check_redact_args(ref($class), \%args);
 		my $clone = bless { %{$class}, %args }, ref($class);
 		if(my $level = $args{'level'}) {
 			$level = lc($level);
@@ -853,6 +935,8 @@ sub new {
 		}
 		# Copy the message history so parent and clone diverge independently
 		$clone->{messages} = [ @{$class->{messages}} ];
+		# A clone has its own digest, or held messages would be sent twice
+		delete @{$clone}{qw(_email_digest _email_digest_dropped)};
 		# The clone shares the parent's open syslog connection
 		$syslog_open_count++ if($clone->{_syslog_opened});
 		return $clone;
@@ -912,6 +996,7 @@ sub new {
 
 	_check_timestamp_args($class, \%args);
 	_check_rotate_args($class, \%args);
+	_check_redact_args($class, \%args);
 
 	# Validate the backends' own 'level' and 'format' keys now, rather than
 	# have a bad value silently drop messages at log time: the top-level
@@ -946,6 +1031,11 @@ sub new {
 		if(exists($hash->{'sendmail'})
 		   && ((ref($hash->{'sendmail'}) ne 'HASH') || !$hash->{'sendmail'}->{'to'})) {
 			Carp::croak("$class: the sendmail backend needs a 'to' address");
+		}
+		if((ref($hash->{'sendmail'}) eq 'HASH') && defined(my $max = $hash->{'sendmail'}->{'digest_max'})) {
+			if($max !~ /^[1-9]\d*$/) {
+				Carp::croak("$class: sendmail digest_max must be a positive integer, not '$max'");
+			}
 		}
 
 		if(ref($hash->{'journald'}) eq 'HASH') {
@@ -1207,6 +1297,120 @@ sub _check_rotate_args :Private {
 }
 
 # ---------------------------------------------------------------------------
+# _check_redact_args -- validate the redact option and compile it
+#
+# Purpose:      Croak in new() (and when cloning) on a bad redact pattern,
+#               rather than leave a secret in the log.
+# Entry:        $class -- the class name, for the error message.
+#               $args  -- hashref of constructor arguments; changed in place.
+# Exit:         Returns nothing.  redact, a regex, a string or an arrayref of
+#               them, becomes one regex that matches any of them, or undef
+#               when there are none.  Croaks on a pattern that isn't a regex
+#               or non-empty string, doesn't compile, or matches ''.
+# Notes:        A pure function (no $self), called as
+#               _check_redact_args($class, \%args).  Strings are allowed
+#               because a config file can't hold a qr//.  One combined regex
+#               means one pass, so a replacement is never matched again.
+#
+# Pseudocode:
+#   FUNCTION _check_redact_args(class, args)
+#     RETURN unless args has a redact key
+#     patterns = the defined elements of redact (an arrayref) or redact itself
+#     FOR each pattern that isn't already a regex:
+#       CROAK if it is a reference or ''
+#       compile it (in eval); CROAK with the error, less its location, if
+#         it doesn't compile
+#     IF no patterns: set redact to undef; RETURN
+#     CROAK if any pattern matches ''
+#     set redact to qr/(?:p1)|(?:p2)|.../
+#   END FUNCTION
+# ---------------------------------------------------------------------------
+sub _check_redact_args :Private {
+	my ($class, $args) = @_;
+
+	return if(!exists($args->{'redact'}));
+	my $redact = $args->{'redact'};
+	my @patterns = grep { defined } ((ref($redact) eq 'ARRAY') ? @{$redact} : ($redact));
+	for my $pattern (@patterns) {
+		next if(re::is_regexp($pattern));
+		if(ref($pattern) || ($pattern eq '')) {
+			Carp::croak("$class: redact patterns must be regular expressions or non-empty strings");
+		}
+		my $re = eval { qr/$pattern/ };
+		if(!$re) {
+			(my $error = $@) =~ s/ at \S+ line \d+\.?\n\z//;
+			Carp::croak("$class: invalid redact pattern '$pattern': $error");
+		}
+		$pattern = $re;
+	}
+	if(!@patterns) {
+		$args->{'redact'} = undef;
+		return;
+	}
+	for my $pattern (@patterns) {
+		# It would put a marker between every character
+		if('' =~ $pattern) {
+			Carp::croak("$class: redact pattern $pattern matches the empty string");
+		}
+	}
+	my $any = join('|', map { "(?:$_)" } @patterns);
+	$args->{'redact'} = qr/$any/;
+	return;
+}
+
+# ---------------------------------------------------------------------------
+# _redact -- replace whatever matches the redact regex with [REDACTED]
+#
+# Purpose:      Remove secrets from a message or a structured-field value
+#               before it reaches the history or any backend.
+# Entry:        $re    -- the regex built by _check_redact_args.
+#               $value -- a string, or a field value of any kind.
+#               $seen  -- (recursion only) the references being walked.
+# Exit:         Returns the redacted copy; the value itself is unchanged.
+#               Plain hashes and arrays are copied with their contents
+#               redacted; a blessed object whose stringification matches
+#               becomes the redacted string; any other value is returned
+#               as it is.  A reference that contains itself is replaced by
+#               the marker where it recurs.
+# Notes:        A pure function (no $self), called as _redact($re, $value).
+#
+# Pseudocode:
+#   FUNCTION _redact(re, value, seen)
+#     RETURN value if undef
+#     IF blessed: RETURN _redact(re, "value") if "value" matches re, else value
+#     IF a reference:
+#       RETURN value unless a plain HASH or ARRAY
+#       RETURN the marker if value is in seen (it contains itself)
+#       add value to seen while walking it (local, so siblings may share it)
+#       RETURN a copy with each element/value passed through _redact
+#     replace every match of re in (a copy of) value with the marker
+#     RETURN it
+#   END FUNCTION
+# ---------------------------------------------------------------------------
+sub _redact :Private {
+	my ($re, $value, $seen) = @_;
+
+	return $value if(!defined($value));
+	if(Scalar::Util::blessed($value)) {
+		my $string = "$value";
+		return $value unless $string =~ $re;
+		$string =~ s/$re/$REDACTED_MARKER/g;
+		return $string;
+	}
+	if(my $type = ref($value)) {
+		return $value if(($type ne 'HASH') && ($type ne 'ARRAY'));
+		$seen ||= {};
+		return $REDACTED_MARKER if($seen->{$value});
+		local $seen->{$value} = 1;
+		return ($type eq 'HASH')
+			? { map { $_ => _redact($re, $value->{$_}, $seen) } keys %{$value} }
+			: [ map { _redact($re, $_, $seen) } @{$value} ];
+	}
+	$value =~ s/$re/$REDACTED_MARKER/g;
+	return $value;
+}
+
+# ---------------------------------------------------------------------------
 # _rotate -- rotate a log file if it is too big or from an earlier period
 #
 # Purpose:      Size- and time-based rotation for the file backends.
@@ -1370,6 +1574,118 @@ sub _write_line :Private {
 		print $fout "$line\n";
 		close $fout;
 	};
+	return;
+}
+
+# ---------------------------------------------------------------------------
+# _send_email -- send one email: any held digest, then the new lines
+#
+# Purpose:      The sendmail backend's delivery, shared by _log and flush().
+# Entry:        $self  -- the logger object (the digest and throttle state).
+#               $sm    -- the sendmail hash (to, from, subject, host, port,
+#                         digest).
+#               @lines -- the bodies of the new messages (none from flush).
+# Exit:         Returns 1 if the email was sent or there was nothing to
+#               send, 0 if delivery failed.
+# Side effects: Croaks on an invalid host or port, before the eval so that
+#               the misconfiguration isn't hidden.  On success, clears the
+#               digest and starts the min_interval throttle.  On failure,
+#               carps, and with digest holds @lines for the next email (the
+#               digest already held stays held).
+# Notes:        The body is the held lines, a "... and N more" line if some
+#               were dropped, then @lines, one per line; a single message
+#               with nothing held is sent exactly as it is.
+#
+# Pseudocode:
+#   FUNCTION _send_email(self, sm, lines...)
+#     CROAK if host contains unsafe characters, or port isn't 1-65535
+#     body = held digest, "... and N more" if N were dropped, lines
+#     RETURN 1 if body is empty
+#     (eval) load Email::* modules; build email with sanitised headers and
+#            body joined with newlines; send via SMTP transport
+#     IF it failed:
+#       CARP; IF sm->{digest}: hold each of lines; RETURN 0
+#     clear the digest; record the time for the throttle; RETURN 1
+#   END FUNCTION
+# ---------------------------------------------------------------------------
+sub _send_email :Private {
+	my ($self, $sm, @lines) = @_;
+
+	# Validate host and port before any eval so bad config croaks immediately
+	my $host = $sm->{'host'} || $DEFAULT_SMTP_HOST;
+	Carp::croak(ref($self), ": Invalid SMTP host: $host")
+		if $host =~ $RE_SAFE_HOST;
+	my $port = $sm->{'port'} || $DEFAULT_SMTP_PORT;
+	Carp::croak(ref($self), ": Invalid SMTP port: $port")
+		unless $port =~ $RE_PORT
+			&& $port >= $MIN_PORT
+			&& $port <= $MAX_PORT;
+
+	my $dropped = $self->{_email_digest_dropped};
+	my @body = (
+		@{$self->{_email_digest} || []},
+		($dropped ? ("... and $dropped more " . (($dropped == 1) ? 'message' : 'messages')) : ()),
+		@lines,
+	);
+	return 1 if(!@body);
+
+	# Load mail modules lazily; wrap only I/O in eval to handle delivery failures
+	eval {
+		require Email::Simple;
+		require Email::Sender::Simple;
+		require Email::Sender::Transport::SMTP;
+
+		# Build the email object with sanitised headers
+		my $email = Email::Simple->new('');
+		$email->header_set('to', _sanitize_email_header($sm->{'to'}));
+		$email->header_set('from', _sanitize_email_header($sm->{'from'} || $DEFAULT_FROM_ADDR));
+		if(my $subject = $sm->{'subject'}) {
+			$email->header_set('subject', _sanitize_email_header($subject));
+		}
+		$email->body_set(join("\n", @body));
+
+		my $transport = Email::Sender::Transport::SMTP->new({
+			host => $host,
+			port => $port,
+		});
+		# A class method, rather than the exported sendmail(), so that
+		# nothing is imported into this package
+		Email::Sender::Simple->send($email, { transport => $transport });
+	};
+	if($@) {
+		Carp::carp("Failed to send email: $@");
+		if($sm->{'digest'}) {
+			$self->_hold_email($sm, $_) for @lines;
+		}
+		return 0;
+	}
+
+	# Record send time for the throttle on success
+	delete @{$self}{qw(_email_digest _email_digest_dropped)};
+	$self->{_last_email_sent} = time();
+	return 1;
+}
+
+# ---------------------------------------------------------------------------
+# _hold_email -- keep a message body for the next email (sendmail digest)
+#
+# Purpose:      With digest, messages that min_interval (or a failed send)
+#               would lose are sent with the next email instead.
+# Entry:        $self -- the logger object.
+#               $sm   -- the sendmail hash (digest_max).
+#               $line -- the message's email body.
+# Exit:         Returns nothing.  Holds $line, or once digest_max are held,
+#               only counts it, so a burst can't use unbounded memory.
+# ---------------------------------------------------------------------------
+sub _hold_email :Private {
+	my ($self, $sm, $line) = @_;
+
+	my $held = $self->{_email_digest} ||= [];
+	if(scalar(@{$held}) < ($sm->{'digest_max'} // $DEFAULT_DIGEST_MAX)) {
+		push @{$held}, $line;
+	} else {
+		$self->{_email_digest_dropped}++;
+	}
 	return;
 }
 
@@ -1645,6 +1961,7 @@ sub _format_message :Private {
 #     IF more than one argument AND the last is an unblessed hashref:
 #       Pop it as the structured fields (a shallow copy; undef if empty)
 #     Flatten single-arrayref argument to a list; filter out undefs; join to $str
+#     IF redact: _redact $str (the parts become just $str) and the fields
 #     $text = $str plus the fields as logfmt key=value pairs (for backends
 #       with no field support: syslog, email, objects)
 #     Push { level, message, fields? } onto self->{messages} (always recorded);
@@ -1672,14 +1989,12 @@ sub _format_message :Private {
 #         push { level, message, fields? }, message = render(its format)
 #           if it has one
 #       IF 'sendmail' key present with a 'to' address:
-#         IF level passes threshold AND not throttled:
-#           CROAK if host contains unsafe characters
-#           CROAK if port is out of 1-65535 range
-#           (eval) load Email::* modules; build email with sanitised headers
-#                  and as the body render(its format) if it has one,
-#                  else $text; send via SMTP transport
-#           Record timestamp for throttle on success; a failure is carped
-#           and the remaining backends still run
+#         IF level passes threshold:
+#           body = render(its format) if it has one, else $text
+#           IF not throttled: _send_email(sm, body) (with any held digest;
+#             croaks on a bad host/port, carps on a failed delivery, and
+#             the remaining backends still run)
+#           ELSIF sm->{digest}: _hold_email(sm, body)
 #       IF 'syslog' key present:
 #         IF level passes threshold:
 #           Open syslog connection on first use (setlogsock, openlog)
@@ -1760,6 +2075,15 @@ sub _log :Private {
 	@messages = grep { defined } @messages;
 	my $str = join('', @messages);
 	chomp($str);
+
+	# Redact before the message reaches the history or any backend.  The
+	# regex runs over the joined message, so a match may span arguments;
+	# the CODE and object backends then get the one redacted string
+	if(my $redact = $self->{'redact'}) {
+		$str = _redact($redact, $str);
+		@messages = ($str);
+		$fields = _redact($redact, $fields) if($fields);
+	}
 
 	# Backends with no notion of fields get them appended as text
 	my $fields_text = $fields ? _fields_text($fields) : undef;
@@ -1856,69 +2180,22 @@ sub _log :Private {
 
 				# Check the level threshold for email (undef means send always)
 				if(_wants($level, $sm->{'level'})) {
+					my $body = defined($sm->{'format'}) ? $render->($sm->{'format'}) : $text;
 
 					# Honour the minimum-interval throttle
 					my $throttled = 0;
 					if(my $interval = $sm->{'min_interval'}) {
-						my $now = time();
 						$throttled = defined($self->{_last_email_sent})
-							&& ($now - $self->{_last_email_sent}) < $interval;
+							&& (time() - $self->{_last_email_sent}) < $interval;
 					}
 
+					# A throttled message is dropped, or with digest held for
+					# the next email.  A failed send doesn't stop the other
+					# backends (_send_email carps)
 					if(!$throttled) {
-						# Validate host and port before any eval so bad config croaks immediately
-						my $host = $sm->{'host'} || $DEFAULT_SMTP_HOST;
-						Carp::croak(ref($self), ": Invalid SMTP host: $host")
-							if $host =~ $RE_SAFE_HOST;
-						my $port = $sm->{'port'} || $DEFAULT_SMTP_PORT;
-						Carp::croak(ref($self), ": Invalid SMTP port: $port")
-							unless $port =~ $RE_PORT
-								&& $port >= $MIN_PORT
-								&& $port <= $MAX_PORT;
-
-						# Load mail modules lazily; wrap only I/O in eval to handle delivery failures
-						eval {
-							require Email::Simple;
-							require Email::Sender::Simple;
-							require Email::Sender::Transport::SMTP;
-
-
-							# Build the email object with sanitised headers
-							my $email = Email::Simple->new('');
-							$email->header_set(
-								'to',
-								_sanitize_email_header($sm->{'to'}),
-							);
-							my $from = $sm->{'from'} || $DEFAULT_FROM_ADDR;
-							$email->header_set(
-								'from',
-								_sanitize_email_header($from),
-							);
-							if(my $subject = $sm->{'subject'}) {
-								$email->header_set(
-									'subject',
-									_sanitize_email_header($subject),
-								);
-							}
-							$email->body_set(defined($sm->{'format'}) ? $render->($sm->{'format'}) : $text);
-
-							my $transport = Email::Sender::Transport::SMTP->new({
-								host => $host,
-								port => $port,
-							});
-							# A class method, rather than the exported sendmail(),
-							# so that nothing is imported into this package
-							Email::Sender::Simple->send($email, { transport => $transport });
-						};
-
-						# A delivery failure must not stop the remaining backends
-						# from receiving this message
-						if($@) {
-							Carp::carp("Failed to send email: $@");
-						} else {
-							# Record send time for the throttle on success
-							$self->{_last_email_sent} = time();
-						}
+						$self->_send_email($sm, $body);
+					} elsif($sm->{'digest'}) {
+						$self->_hold_email($sm, $body);
 					}
 				}
 			}
@@ -2113,6 +2390,7 @@ sub _log :Private {
 #       CARP with warning text; RETURN
 #
 #     Call self->_log(level, warning, fields?)
+#     IF redact: _redact the warning text, for Carp below
 #
 #     no_backend = no logger, array, file or fd configured
 #
@@ -2174,6 +2452,9 @@ sub _high_priority :Private {
 
 	# Log the message through the normal dispatch path
 	$self->_log($level, $warning, @fields);
+
+	# What Carp shows must be redacted too (_log redacts its own copy)
+	$warning = _redact($self->{'redact'}, $warning) if($self->{'redact'});
 
 	# A top-level file or fd counts as a backend, as do logger and array
 	my $no_backend = !defined($self->{'logger'}) && !defined($self->{'array'})
@@ -2410,6 +2691,60 @@ sub messages {
 	my $self = $_[0];
 
 	return [ @{$self->{messages}} ];
+}
+
+=head2 flush
+
+  $logger->flush();
+
+Sends, now, the messages that a C<sendmail> backend with C<digest> is
+holding back because of C<min_interval> (see L</Email digests>), whether or
+not the interval has passed.  Does nothing if none are held.  Called
+automatically when the logger is destroyed.
+
+=head3 Arguments
+
+None.
+
+=head3 Returns
+
+The logger, for method chaining.
+
+=head3 Side Effects
+
+May send an email, which starts the C<min_interval> interval again.  A
+delivery failure is carped and the messages stay held.  Croaks if the
+C<sendmail> C<host> or C<port> is invalid.
+
+=head3 Example
+
+  $logger->error('disk full');    # emailed
+  $logger->error('disk still full');    # held: within min_interval
+  $logger->flush();                # emailed now
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+  {} (no arguments)
+
+=head4 Output
+
+  { type => 'object', class => 'Log::Abstraction' }
+
+=cut
+
+sub flush {
+	my $self = $_[0];
+
+	# Preserve the caller's $@ and $! (see _log)
+	local ($@, $!);
+
+	my $sm = (ref($self->{'logger'}) eq 'HASH') ? $self->{'logger'}->{'sendmail'} : undef;
+	if($sm && $self->{_email_digest}) {
+		$self->_send_email($sm);
+	}
+	return $self;
 }
 
 =head2 trace
@@ -2924,6 +3259,9 @@ sub DESTROY {
 	# propagating, so don't let closelog() change the error variables
 	local ($@, $!, $?);
 
+	# Send any messages a sendmail digest is still holding
+	eval { $self->flush() } if($self->{_email_digest});
+
 	# openlog/closelog are process-global, so only close the connection
 	# when the last instance using it goes away
 	if($self->{_syslog_opened}) {
@@ -3070,8 +3408,8 @@ C<format> has no token for them on their own.
 
 =item B<Single-threaded email throttle>
 
-The C<min_interval> throttle for the C<sendmail> backend and the
-C<_syslog_opened> first-open flag are stored on the object without mutex
+The C<min_interval> throttle and C<digest> for the C<sendmail> backend and
+the C<_syslog_opened> first-open flag are stored on the object without mutex
 protection.  Under Perl ithreads or other concurrency models, objects shared
 between threads are not safe.
 
@@ -3151,13 +3489,18 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   FIELDS == STRING ⇸ VALUE          structured fields (see Structured fields)
   ENTRY  == { level : STRING; message : STRING; fields : FIELDS }
 
-  entry(l, m, f) == {level ↦ l, message ↦ m} ∪ (if f = ∅ then ∅ else {fields ↦ f})
+  entry(l, m, f) == {level ↦ l, message ↦ ρ(m)} ∪ (if f = ∅ then ∅ else {fields ↦ ρ(f)})
+
+  ρ(x) == if redact = ∅ then x
+          else x with each match of redact replaced by '[REDACTED]'
+               (in strings, recursively in plain hashes and arrays)
 
   ┌─ LogState ──────────────────────────────────────────────────
   │ level        : ℤ
   │ messages     : seq ENTRY
   │ max_messages : ℕ ∪ {∞}
   │ logger       : LOGGER
+  │ redact       : REGEX ∪ {∅}
   ├─────────────────────────────────────────────────────────────
   │ 0 ≤ level ≤ 7
   │ #messages ≤ max_messages
@@ -3170,6 +3513,8 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ result!.level = syslog_values(args?.level ∨ 'warning')
   │ result!.messages = ⟨⟩
   │ result!.max_messages = args?.max_messages ∨ ∞
+  │ result!.redact = ⋃ args?.redact   {one regex matching any; ∅ if none}
+  │ args?.redact ≠ ∅ ⟹ ¬('' ∈ L(result!.redact))
   │ args?.logger ≠ ∅ ⟹ result!.logger = args?.logger
   │ args?.logger = ∅ ∧ args?.file = ∅ ∧ args?.fd = ∅ ∧ args?.array = ∅
   │   ⟹ result!.logger = Log4perl
@@ -3235,6 +3580,19 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
   │ result! : seq ENTRY
   ├─────────────────────────────────────────────────────────────
   │ result! = messages
+  └─────────────────────────────────────────────────────────────
+
+=head2 flush
+
+  ┌─ Flush ────────────────────────────────────────────────────
+  │ ΔLogState
+  │ result! : LogState
+  ├─────────────────────────────────────────────────────────────
+  │ digest ≠ ⟨⟩ ∧ sent(digest) ⟹ digest' = ⟨⟩ ∧ last_email_sent' = now
+  │ digest ≠ ⟨⟩ ∧ ¬sent(digest) ⟹ digest' = digest
+  │ digest = ⟨⟩ ⟹ digest' = digest
+  │ messages' = messages
+  │ result! = self
   └─────────────────────────────────────────────────────────────
 
 =head2 trace

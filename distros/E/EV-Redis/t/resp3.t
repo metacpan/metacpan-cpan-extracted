@@ -15,13 +15,10 @@ use EV::Redis;
 use lib 't/lib';
 use RedisTestHelper qw(get_redis_version);
 
-# Helper to run a test with timeout
 sub run_with_timeout {
     my ($timeout, $code) = @_;
-    my $timer; $timer = EV::timer $timeout, 0, sub {
-        undef $timer;
-        EV::break;
-    };
+    # a guard that outlived an early EV::break would break a later test's loop
+    my $timer = EV::timer $timeout, 0, sub { EV::break };
     $code->();
     EV::run;
 }
@@ -30,7 +27,6 @@ my ($redis_version, $redis_minor) = get_redis_version($connect_info{sock});
 diag "Redis version: $redis_version.$redis_minor";
 
 {
-    # Test: REDIS_REPLY_DOUBLE via HINCRBYFLOAT
     {
         my $r = EV::Redis->new(path => $connect_info{sock});
         my $result;
@@ -51,7 +47,6 @@ diag "Redis version: $redis_version.$redis_minor";
         ok abs($result - 10.6) < 0.01, 'HINCRBYFLOAT returns float value';
     }
 
-    # Test: REDIS_REPLY_BOOL via SET ... GET with NX (Redis 6.2+)
     SKIP: {
         skip 'SET GET NX requires Redis 6.2+', 2 if $redis_version < 6 || ($redis_version == 6 && $redis_minor < 2);
 
@@ -78,7 +73,6 @@ diag "Redis version: $redis_version.$redis_minor";
         ok !defined($results[1][1]) || $results[1][1] eq '', 'SET NX returns nil when key exists';
     }
 
-    # Test: RESP3 protocol negotiation via HELLO 3
     SKIP: {
         my $r = EV::Redis->new(path => $connect_info{sock});
         my $hello_result;
@@ -105,7 +99,6 @@ diag "Redis version: $redis_version.$redis_minor";
         is $hello_map{proto}, 3, 'HELLO confirms RESP3 protocol';
     }
 
-    # Test: REDIS_REPLY_MAP via HGETALL with RESP3
     SKIP: {
         my $r = EV::Redis->new(path => $connect_info{sock});
         my $hello_ok = 0;
@@ -141,7 +134,6 @@ diag "Redis version: $redis_version.$redis_minor";
         is_deeply \%hash, { field1 => 'value1', field2 => 'value2' }, 'HGETALL map contents correct';
     }
 
-    # Test: REDIS_REPLY_SET via SMEMBERS with RESP3
     SKIP: {
         my $r = EV::Redis->new(path => $connect_info{sock});
         my $hello_ok = 0;
@@ -177,7 +169,6 @@ diag "Redis version: $redis_version.$redis_minor";
         is_deeply \@sorted, ['member1', 'member2', 'member3'], 'SMEMBERS set contents correct';
     }
 
-    # Test: REDIS_REPLY_BIGNUM via DEBUG PROTOCOL BIGNUM (if available)
     SKIP: {
         my $r = EV::Redis->new(path => $connect_info{sock});
         my $result;
@@ -198,7 +189,6 @@ diag "Redis version: $redis_version.$redis_minor";
         ok defined($result), 'DEBUG PROTOCOL BIGNUM returns a value';
     }
 
-    # Test: REDIS_REPLY_VERB via DEBUG PROTOCOL VERBATIM (if available)
     SKIP: {
         my $r = EV::Redis->new(path => $connect_info{sock});
         my $result;
@@ -220,7 +210,6 @@ diag "Redis version: $redis_version.$redis_minor";
     }
 }
 
-# Test: Basic RESP2 types work (baseline verification)
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
@@ -261,7 +250,6 @@ diag "Redis version: $redis_version.$redis_minor";
     ok ref($results[4][1]) eq 'ARRAY', 'RESP2 LRANGE returns array';
 }
 
-# Test: RESP3 PUSH callback via client-side caching invalidation
 SKIP: {
     skip 'Requires Redis >= 6.0 for RESP3 push', 3 if $redis_version < 6;
 
@@ -275,7 +263,6 @@ SKIP: {
     });
 
     run_with_timeout(3, sub {
-        # Switch to RESP3
         $r->hello(3, sub {
             my ($res, $err) = @_;
             if ($err) {
@@ -285,7 +272,6 @@ SKIP: {
             }
             $hello_ok = 1;
 
-            # Enable client tracking (BCAST mode for simplicity)
             $r->command('CLIENT', 'TRACKING', 'ON', 'BCAST', sub {
                 my ($res, $err) = @_;
                 if ($err) {
@@ -294,9 +280,7 @@ SKIP: {
                     return;
                 }
 
-                # Read a key to track it
                 $r->get('push:test:key', sub {
-                    # Use a second connection to modify the key
                     my $r2 = EV::Redis->new(path => $connect_info{sock});
                     $r2->set('push:test:key', 'modified', sub {
                         $r2->disconnect;
@@ -320,7 +304,6 @@ SKIP: {
     is $push_msgs[0][0], 'invalidate', 'PUSH message type is invalidate';
 }
 
-# Test: exception in on_push handler is caught and warned
 SKIP: {
     skip 'Requires Redis >= 6.0 for RESP3 push', 2 if $redis_version < 6;
 
@@ -371,6 +354,123 @@ SKIP: {
 
     ok scalar(@warnings) > 0, 'warning emitted for exception in push handler';
     like $warnings[0], qr/exception in push handler/, 'warning message is correct';
+}
+
+# DESTROY in on_push on a subscribed connection: the next message must not free
+# a subscription hiredis still holds
+SKIP: {
+    skip 'RESP3 client tracking needs Redis 6+', 1 if $redis_version < 6;
+    my $r;
+    $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    $r->on_push(sub { undef $r });
+    $r->hello(3, sub {});
+    $r->client('tracking', 'on', sub {});
+    $r->get('r3_push_k', sub {});
+    $r->subscribe('r3_push_ch', sub {});
+    my $b = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $t = EV::timer 0.2, 0, sub {
+        $b->set('r3_push_k', 1, sub {});
+        $b->publish('r3_push_ch', 'x', sub {});
+    };
+    my $guard = EV::timer 1, 0, sub { EV::break };
+    EV::run;
+    ok !defined $r, 'DESTROY in on_push on a subscribed RESP3 connection';
+    $b->disconnect;
+}
+
+# DESTROY in on_push must still close the connection
+SKIP: {
+    skip 'RESP3 client tracking needs Redis 6+', 1 if $redis_version < 6;
+    my ($r, $id, $gone);
+    $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    $r->on_push(sub { undef $r });
+    $r->hello(3, sub {});
+    $r->client('id', sub { $id = $_[0] });
+    $r->client('tracking', 'on', 'bcast', sub {});
+    my $b = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $t = EV::timer 0.2, 0, sub { $b->set('r3_free_k', 1, sub {}) };
+    my $poll = EV::timer 0.4, 0.2, sub {
+        $b->client('list', sub {
+            my %ids = map { /\bid=(\d+)/ ? ($1 => 1) : () } split /\n/, $_[0] // '';
+            if (defined $id && !$ids{$id}) { $gone = 1; EV::break }
+        });
+    };
+    my $deadline = EV::time + 3;
+    my $guard = EV::timer 3, 0, sub { EV::break };
+    EV::run while !$gone && EV::time < $deadline;
+    ok $gone, 'DESTROY in on_push closes the connection';
+    $b->disconnect;
+}
+
+# DESTROY in on_push must not wait for an outstanding blocking command
+SKIP: {
+    skip 'RESP3 client tracking needs Redis 6+', 3 if $redis_version < 6;
+    my ($r, $id, $gone);
+    my @calls;
+    $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    $r->on_push(sub { undef $r });
+    $r->hello(3, sub {});
+    $r->client('id', sub { $id = $_[0] });
+    $r->client('tracking', 'on', 'bcast', sub { EV::break });
+    run_with_timeout(3, sub {});
+
+    $r->blpop('r3_free_pending_empty', 0, sub { push @calls, [@_] });
+    $r->echo('pending', sub { push @calls, [@_] });
+    my $b = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $t = EV::timer 0.1, 0, sub { $b->set('r3_free_pending_k', 1, sub {}) };
+    my $poll = EV::timer 0.2, 0.05, sub {
+        $b->client('list', sub {
+            my %ids = map { /\bid=(\d+)/ ? ($1 => 1) : () } split /\n/, $_[0] // '';
+            if (defined $id && !$ids{$id}) { $gone = 1; EV::break }
+        });
+    };
+    my $deadline = EV::time + 3;
+    my $guard = EV::timer 3, 0, sub { EV::break };
+    EV::run while !$gone && EV::time < $deadline;
+    ok !defined $r, 'DESTROY in on_push with commands pending';
+    is_deeply \@calls, [[undef, 'disconnected'], [undef, 'disconnected']],
+        'DESTROY in on_push fails all pending commands once';
+    ok $gone, 'DESTROY in on_push closes a connection with a blocking command';
+    $b->disconnect;
+}
+
+# a nested loop in on_push: the connection reads again once the handler has
+# returned, with no new command on it
+SKIP: {
+    skip 'RESP3 client tracking needs Redis 6+', 2 if $redis_version < 6;
+    my $w = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my (@push, $r, $ready);
+    $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {}, on_push => sub {
+        push @push, $_[0][0];
+        if (1 == @push) {
+            $w->set('r3_nest_k2', 'v', sub {});
+            my $t = EV::timer 0.2, 0, sub { EV::break };
+            EV::run;
+        }
+    });
+    $r->hello(3, sub {
+        $r->client('tracking', 'on', sub {
+            $r->get($_, sub {}) for qw(r3_nest_k1 r3_nest_k2 r3_nest_k3);
+            $r->ping(sub { $ready = 1; EV::break });
+        });
+    });
+    { my $g = EV::timer 3, 0, sub { EV::break }; EV::run }
+    ok $ready, 'client tracking on';
+    my $wait_pushes = sub {
+        my ($n) = @_;
+        my $deadline = EV::time + 3;
+        my $g = EV::timer 3, 0, sub { EV::break };
+        my $c = EV::prepare sub { EV::break if @push >= $n };
+        EV::run while @push < $n && EV::time < $deadline;
+    };
+    $w->set('r3_nest_k1', 'v', sub {});
+    $wait_pushes->(2);
+    $w->set('r3_nest_k3', 'v', sub {});
+    $wait_pushes->(3);
+    is scalar(@push), 3, 'pushes arriving during and after a nested loop in on_push are delivered';
+    $r->on_push(undef);
+    $r->disconnect;
+    $w->disconnect;
 }
 
 done_testing;

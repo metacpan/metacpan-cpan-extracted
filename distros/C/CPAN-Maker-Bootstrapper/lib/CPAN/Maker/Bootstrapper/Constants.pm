@@ -11,6 +11,7 @@ our @EXPORT_OK = qw(
   $DEFAULT_POD_REVIEW_MODEL
   $DISPOSITIONS
   $MAX_DIFF_FILES
+  $MAX_TOKENS
 );
 
 our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
@@ -18,6 +19,8 @@ our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 use Readonly;
 
 Readonly::Scalar our $MAX_DIFF_FILES => 50;
+Readonly::Scalar our $MAX_TOKENS     => 8192;
+
 Readonly::Scalar our $DISPOSITIONS => {
   ACCEPT             => 1,
   CONFIRMED          => 1,

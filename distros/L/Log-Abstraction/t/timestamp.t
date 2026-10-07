@@ -112,7 +112,9 @@ subtest 'format => json uses the timestamp options' => sub {
 
 subtest 'one timestamp per message for every backend' => sub {
 	my $calls = 0;
-	my $guard = Test::Mockingbird::mock_scoped('Time::HiRes::time' => sub { $EPOCH + 0.001 * ++$calls });
+	# Steps of .125, exact in binary: 0.001 isn't, and on long-double perls
+	# EPOCH + 0.001 is just below .001, which truncates to .000
+	my $guard = Test::Mockingbird::mock_scoped('Time::HiRes::time' => sub { $EPOCH + 0.125 * ++$calls });
 	my ($out1, $out2) = ('', '');
 	open(my $fh1, '>', \$out1) or die $!;
 	open(my $fh2, '>', \$out2) or die $!;
@@ -124,7 +126,7 @@ subtest 'one timestamp per message for every backend' => sub {
 	close $fh2;
 	is($calls, 1, 'the clock is read once');
 	is($out1, $out2, 'both backends show the same time');
-	is($out1, "2001-09-09 01:46:40.001\n", 'and it is the time of the call');
+	is($out1, "2001-09-09 01:46:40.125\n", 'and it is the time of the call');
 };
 
 subtest 'invalid options croak' => sub {

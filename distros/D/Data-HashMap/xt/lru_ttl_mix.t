@@ -36,7 +36,7 @@ use Data::HashMap::SS;
 }
 
 # ---- pop/shift on non-LRU map with TTL-expired entries ----
-# Non-LRU pop advances iter_pos; TTL-expired slots are skipped WITHOUT
+# Non-LRU pop advances drain_pos; TTL-expired slots are skipped WITHOUT
 # being tombstoned (unlike LRU pop, which reaps expired tail entries).
 # So pop returns no entries but size stays > 0 until a read-path
 # operation (get/exists/remove) triggers lazy reaping.

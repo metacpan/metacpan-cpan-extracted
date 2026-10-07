@@ -3,6 +3,7 @@
 PERL       := $(shell command -v perl)
 PERLTIDY   := $(shell command -v perltidy)
 PERLCRITIC := $(shell command -v perlcritic)
+
 PODCHECKER := $(shell command -v podchecker)
 CPM        := $(shell command -v cpm)
 CARTON     := $(shell command -v carton)
@@ -11,38 +12,39 @@ PERL_BIN_FILES = $(patsubst %.pl.in,%.pl,$(filter %.pl.in,$(BIN_FILES:%=%.in)))
 
 PERLINCLUDE ?= -I lib -I local/lib/perl5
 
-SYNTAX_CHECKING ?= $(shell $(PERL) -MCPAN::Maker::ConfigReader \
+ifeq ($(origin SYNTAX_CHECKING),undefined)
+  SYNTAX_CHECKING := $(shell $(PERL) -MCPAN::Maker::ConfigReader \
     -e 'print CPAN::Maker::ConfigReader->new->cpan_maker_syntax_checking // q{}' 2>/dev/null)
+endif
 
-PERLTIDYRC ?= $(shell $(PERL) -MCPAN::Maker::ConfigReader \
+ifeq ($(origin PERLTIDYRC),undefined)
+  PERLTIDYRC := $(shell $(PERL) -MCPAN::Maker::ConfigReader \
     -e 'print CPAN::Maker::ConfigReader->new->cpan_maker_perltidyrc // q{}' 2>/dev/null)
+endif
 
-PERLCRITICRC ?= $(shell $(PERL) -MCPAN::Maker::ConfigReader \
+ifeq ($(origin PERLCRITICRC),undefined)
+  PERLCRITICRC := $(shell $(PERL) -MCPAN::Maker::ConfigReader \
     -e 'print CPAN::Maker::ConfigReader->new->cpan_maker_perlcriticrc // q{}' 2>/dev/null)
+endif
+
+lint_off  := $(filter off,$(call lc,$(LINT)))
+syntax_on := $(filter-out off,$(call lc,$(SYNTAX_CHECKING)))
+tidy_on   := $(if $(lint_off),,$(PERLTIDY))
+critic_on := $(if $(lint_off),,$(PERLCRITIC))
 
 PERLWC_SKIP ?=
 
 PERLCRITIC_SEVERITY ?= 5
 PERLCRITIC_THEME ?= pbp
 
-lint_off = $(filter off,$(shell echo $(LINT) | tr '[:upper:]' '[:lower:]'))
-
-# normalize - 'off' or empty disables, anything else enables
-syntax_on = $(filter-out off,$(shell echo $(SYNTAX_CHECKING) | tr '[:upper:]' '[:lower:]'))
-
-ifneq ($(PERLTIDY),)
-  tidy_on = $(if $(lint_off),,$(filter-out off,$(shell echo $(PERLTIDYRC)      | tr '[:upper:]' '[:lower:]')))
-endif
-
-ifneq ($(PERLCRITIC),)
-  critic_on  = $(if $(lint_off),,$(filter-out off,$(shell echo $(PERLCRITICRC)    | tr '[:upper:]' '[:lower:]')))
-endif
-
 $(eval $(call find-files,TIDY_FILES,lib bin,*.tdy))
 $(eval $(call find-files,CRITIC_FILES,lib bin,*.crit))
 $(eval $(call find-files,ERR_FILES,lib bin,*.crit))
 
-CLEANFILES += $(TIDY_FILES) $(CRITIC_FILES) $(ERR_FILES)
+PERL_CHECKED_FILES     = $(PERL_MODULES:%=%.checked)
+PERL_BIN_CHECKED_FILES = $(PERL_BIN_FILES:%=%.checked)
+
+CLEANFILES += $(TIDY_FILES) $(CRITIC_FILES) $(ERR_FILES) $(PERL_CHECKED_FILES) $(PERL_BIN_CHECKED_FILES)
 
 # ------------------------------------------------------------------
 # snippets
@@ -74,19 +76,19 @@ define check_syntax_pm
 	fi; \
 	printf "%s\n" $(PERLWC_SKIP) >> $$perlwc_skip; \
 	for f in $$(cat $$perlwc_skip); do \
-	  [[ "$$f" = "$@" ]] && skip=1 && break; \
+	  [[ "$$f" = "$<" ]] && skip=1 && break; \
 	done; \
 	if [[ "$$skip" -eq 0 ]]; then \
-	  module=$$(echo $@ | perl -npe 's{^lib/}{}; s/\//::/g; s/\.pm$$//;'); \
+	  module=$$(echo $< | perl -npe 's{^lib/}{}; s/\//::/g; s/\.pm$$//;'); \
 	  errfile=$$(mktemp); \
 	  local_cleanfiles="$$local_cleanfiles $$errfile"; \
-	  echo -n "Checking SYNTAX...$@..."; \
+	  echo -n "Checking SYNTAX...$<..."; \
 	  PERL5LIB= perl -wc $(PERLINCLUDE) -M"$$module" -e 1 2>$$errfile \
-	    || { rm -f "$@"; cat $$errfile; exit 1; }; \
+	    || { rm -f "$<"; cat $$errfile; exit 1; }; \
 	  echo "OK"; \
-	  echo -n "Checking POD...$@..."; \
-	  podcheck="$$($(PODCHECKER) $@ 2>&1 || true)"; \
-	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$@"; echo "$$podcheck"; exit 1; }; \
+	  echo -n "Checking POD...$<..."; \
+	  podcheck="$$($(PODCHECKER) $< 2>&1 || true)"; \
+	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$<"; echo "$$podcheck"; exit 1; }; \
 	  echo "OK"; \
 	fi
 endef
@@ -99,21 +101,33 @@ define check_syntax_pl
 	fi; \
 	printf "%s\n" $(PERLWC_SKIP) >> $$perlwc_skip; \
 	for f in $$(cat $$perlwc_skip); do \
-	  [[ "$$f" = "$@" ]] && skip=1 && break; \
+	  [[ "$$f" = "$<" ]] && skip=1 && break; \
 	done; \
 	if [[ "$$skip" -eq 0 ]]; then \
 	  errfile=$$(mktemp); \
 	  local_cleanfiles="$$local_cleanfiles $$errfile"; \
-	  echo "Checking...$@"; \
-	  PERL5LIB= perl -wc $(PERLINCLUDE) -e 1 2>$$errfile \
-	    || { rm -f "$@"; cat $$errfile; exit 1; }; \
-	  echo "$@ OK"; \
-	  echo "Checking POD...$@"; \
-	  podcheck="$$($(PODCHECKER) $@ 2>&1 || true)"; \
-	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$@"; echo "$$podcheck"; exit 1; }; \
-	  echo "$@ OK"; \
+	  echo "Checking...$<"; \
+	  PERL5LIB= perl -wc $(PERLINCLUDE) "$<" 2>$$errfile \
+	    || { rm -f "$<"; cat $$errfile; exit 1; }; \
+	  echo "$< OK"; \
+	  echo "Checking POD...$<"; \
+	  podcheck="$$($(PODCHECKER) $< 2>&1 || true)"; \
+	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$<"; echo "$$podcheck"; exit 1; }; \
+	  echo "$< OK"; \
 	fi
 endef
+
+%.pm.checked: %.pm | local/.installed
+	$(NO_ECHO)local_cleanfiles=""; \
+	trap 'rm -f $$local_cleanfiles' EXIT; \
+	$(check_syntax_pm); \
+	touch "$@"
+
+%.pl.checked: %.pl | local/.installed
+	$(NO_ECHO)local_cleanfiles=""; \
+	trap 'rm -f $$local_cleanfiles' EXIT; \
+	$(check_syntax_pl); \
+	touch "$@"
 
 # ------------------------------------------------------------------
 # sentinel rules - real gate or no-op touch based on configuration
@@ -123,14 +137,16 @@ endef
 
 %.pm.tdy: %.pm
 ifneq ($(tidy_on),)
-	$(NO_ECHO)test -e "$(PERLTIDYRC)" \
-	  || { echo "ERROR: $(PERLTIDYRC) not found"; exit 1; }; \
+	$(NO_ECHO)if [[ -n "$(PERLTIDYRC)" && ! -e "$(PERLTIDYRC)" ]]; then \
+	  echo "ERROR: $(PERLTIDYRC) not found"; \
+	  exit 1; \
+	fi; \
 	if [[ -z "$(PERLTIDY)" ]]; then \
 	  echo "ERROR: perltidy not found - install with: cpanm Perl::Tidy"; \
 	  exit 1; \
 	fi; \
 	echo -n "Checking TIDINESS...$<..."; \
-	$(PERLTIDY) --profile="$(PERLTIDYRC)" $< >/dev/null 2>&1; \
+	$(PERLTIDY) $(if $(PERLTIDYRC),--profile="$(PERLTIDYRC)") $< >/dev/null 2>&1; \
 	diff -q "$<" "$<.tdy" >/dev/null 2>&1 \
 	  || { echo "ERROR: $< is not tidy - run: make tidy"; rm -f "$<.tdy" "$@"; exit 1; }; \
 	rm -f "$<.tdy"; \
@@ -143,18 +159,18 @@ endif
 # note that perlcritic output errors on STDOUT
 %.pm.crit: %.pm
 ifneq ($(critic_on),)
-	$(NO_ECHO)test -e "$(PERLCRITICRC)" \
-	  || { echo "ERROR: $(PERLCRITICRC) not found"; exit 1; }; \
+	$(NO_ECHO)if [[ -n "$(PERLCRITICRC)"  && ! -e "$(PERLCRITICRC)" ]]; then \
+	  echo "ERROR: $(PERLCRITICRC) not found"; \
+	exit 1; \
+	fi; \
 	if [[ -z "$(PERLCRITIC)" ]]; then \
 	  echo "ERROR: perlcritic not found - install with: cpanm Perl::Critic"; \
 	  exit 1; \
 	fi; \
 	echo -n "Checking PERLCRITIC...$<..."; \
-	set -eo pipefail; \
 	$(PERLCRITIC) \
-	  --theme=$(PERLCRITIC_THEME) \
-	  --severity=$(PERLCRITIC_SEVERITY) \
-	  --profile="$(PERLCRITICRC)" $<  >/dev/null 2>&1 | tee $@ || { echo "ERROR: $< fails perlcritic"; exit 1; }; \
+	  --theme=$(PERLCRITIC_THEME) $(if $(PERLCRITICRC),--profile="$(PERLCRITICRC)") \
+	  --severity=$(PERLCRITIC_SEVERITY) $<  >/dev/null 2>&1 | tee $@ || { echo "ERROR: $< fails perlcritic"; exit 1; }; \
 	echo "OK"
 else
 	$(NO_ECHO)touch "$@"
@@ -162,14 +178,16 @@ endif
 
 %.pl.tdy: %.pl
 ifneq ($(tidy_on),)
-	$(NO_ECHO)test -e "$(PERLTIDYRC)" \
-	  || { echo "ERROR: $(PERLTIDYRC) not found"; exit 1; }; \
+	$(NO_ECHO)if [[ -n "$(PERLTIDYRC)"  && ! -e "$(PERLTIDYRC)" ]]; then \
+	  echo "ERROR: $(PERLTIDYRC) not found"; \
+	exit 1; \
+	fi; \
 	if [[ -z "$(PERLTIDY)" ]]; then \
 	  echo "ERROR: perltidy not found - install with: cpanm Perl::Tidy"; \
 	  exit 1; \
 	fi; \
 	echo >&2 "Checking tidiness...$<"; \
-	$(PERLTIDY) --profile="$(PERLTIDYRC)" $<; \
+	$(PERLTIDY) $(if $(PERLTIDYRC),--profile="$(PERLTIDYRC)") $<; \
 	diff -q "$<" "$<.tdy" 2>/dev/null \
 	  || { echo "ERROR: $< is not tidy - run: make tidy"; rm -f "$<.tdy" "$@"; exit 1; }; \
 	rm -f "$<.tdy"; \
@@ -180,18 +198,19 @@ endif
 
 %.pl.crit: %.pl
 ifneq ($(critic_on),)
-	$(NO_ECHO)test -e "$(PERLCRITICRC)" \
-	  || { echo "ERROR: $(PERLCRITICRC) not found"; exit 1; }; \
+	$(NO_ECHO)if [[ -n "$(PERLCRITICRC)" && ! -e "$(PERLCRITICRC)" ]]; \
+	  echo "ERROR: $(PERLCRITICRC) not found"; \
+	  exit 1; \
+	fi; 
 	if [[ -z "$(PERLCRITIC)" ]]; then \
 	  echo "ERROR: perlcritic not found - install with: cpanm Perl::Critic"; \
 	  exit 1; \
 	fi; \
 	echo >&2 "Critiquing...$<"; \
-	set -eo pipefail; \
 	$(PERLCRITIC) \
 	  --theme=$(PERLCRITIC_THEME) \
 	  --severity=$(PERLCRITIC_SEVERITY) \
-	  --profile="$(PERLCRITICRC)" $<  2>&1 | tee $@ || { echo "ERROR: $< fails perlcritic"; exit 1; };
+	  $(if $(PERLCRITICRC),--profile="$(PERLCRITICRC)") $< 2>&1 | tee $@ || { echo "ERROR: $< fails perlcritic"; exit 1; };
 else
 	$(NO_ECHO)touch "$@"
 endif
@@ -205,20 +224,12 @@ gen-vars-file = $(file >$(1),)$(foreach v,$(TEMPLATE_VARS),$(file >>$(1),$(v)=$(
 # pattern rules
 # ------------------------------------------------------------------
 #
-# Templating and syntax-checking are combined again (previously split
-# into %.pm.checked/%.pl.checked sentinels + a check-syntax target to
-# work around a deps.mk chicken-and-egg problem). That problem is now
-# solved at the source: deps.mk depends on the .pm.in/.pl.in SOURCE
-# files, not the built .pm/.pl targets (see Makefile:
-# `deps.mk: $(PERL_MODULES:%=%.in)`), so deps.mk can always regenerate
-# -- and its edges are always current -- before anything gets built.
-# Real graph edges are respected by GNU Make even under -j, so the
-# combined rule below builds/checks modules in correct dependency
-# order without needing a separate phase-barrier pass.
 
-LOCAL_PREREQ := $(if $(syntax_on),local/.installed)
+# Module/script generation is separate from syntax validation.
+# The .checked sentinels record that the current generated artifact
+# has passed syntax/POD checks.
 
-%.pm: %.pm.in | $(LOCAL_PREREQ)
+%.pm: %.pm.in
 	$(call gen-vars-file,$<.vars)
 	$(NO_ECHO)module_tmp="$$(mktemp)"; \
 	local_cleanfiles="$$module_tmp"; \
@@ -227,25 +238,23 @@ LOCAL_PREREQ := $(if $(syntax_on),local/.installed)
 	$(run_podextract); \
 	rm -f "$@"; \
 	cp "$$module_tmp" "$@"; \
-	chmod -w "$@"; \
-	$(if $(syntax_on),$(check_syntax_pm))
+	chmod -w "$@"
 
-%.pl: %.pl.in | $(LOCAL_PREREQ)
+%.pl: %.pl.in
 	$(call gen-vars-file,$<.vars)
 	$(NO_ECHO)local_cleanfiles=""; \
 	trap 'rm -f $$local_cleanfiles $<.vars' EXIT; \
 	rm -f "$@"; \
 	$(BOOTSTRAPPER) resolve-vars $< > $@; \
 	chmod +x "$@"; \
-	chmod -w "$@"; \
-	$(if $(syntax_on),$(check_syntax_pl))
+	chmod -w "$@"
 
-# kept as a convenience alias (Makefile's $(TARBALL) target depends on
-# this explicitly) -- syntax checking is bundled into the rules above
-# again, so this is just $(PERL_MODULES)/$(PERL_BIN_FILES) by another
-# name.
 .PHONY: check-syntax
-check-syntax: $(PERL_MODULES) $(PERL_BIN_FILES) ## verify all built modules/scripts compile and pass podchecker
+ifneq ($(syntax_on),)
+check-syntax: $(PERL_CHECKED_FILES) $(PERL_BIN_CHECKED_FILES)
+else
+check-syntax:
+endif
 
 # ------------------------------------------------------------------
 # convenience targets
@@ -254,67 +263,77 @@ check-syntax: $(PERL_MODULES) $(PERL_BIN_FILES) ## verify all built modules/scri
 .PHONY: tidy critic lint
 
 tidy: ## run perltidy on all source files
-	$(NO_ECHO)if [[ -z "$(PERLTIDYRC)" ]]; then \
-	  echo "ERROR: PERLTIDYRC not set - add perltidyrc to your config or set PERLTIDYRC=path"; \
-	  exit 1; \
-	fi; \
-	test -e "$(PERLTIDYRC)" \
-	  || { echo "ERROR: $(PERLTIDYRC) not found"; exit 1; }; \
-	if [[ -z "$(PERLTIDY)" ]]; then \
+	$(NO_ECHO)if [[ -z "$(PERLTIDY)" ]]; then \
 	  echo "ERROR: perltidy not found - install with: cpanm Perl::Tidy"; \
 	  exit 1; \
 	fi; \
-	$(MAKE) check-syntax SYNTAX_CHECKING=on PERLTIDYRC="" PERLCRITICRC=""; \
-        FILE_LIST=$$(find lib bin -name '*.p[lm].in'); \
+	if [[ -n "$(PERLTIDYRC)" && ! -e "$(PERLTIDYRC)" ]]; then \
+	  echo "ERROR: $(PERLTIDYRC) not found"; \
+	  exit 1; \
+	fi; \
+	if [[ -z "$(PERLTIDYRC)" ]]; then \
+	  echo "WARNING: PERLTIDYRC not set - using perltidy defaults"; \
+	fi; \
+	$(MAKE) check-syntax SYNTAX_CHECKING=on LINT=off; \
+	FILE_LIST=$$(find lib bin -name '*.p[lm].in'); \
 	for f in $$FILE_LIST; do \
 	  echo "tidying: $$f"; \
-	  $(PERLTIDY) --profile="$(PERLTIDYRC)" "$$f"; \
+	  $(PERLTIDY) $(if $(PERLTIDYRC),--profile="$(PERLTIDYRC)") "$$f"; \
 	  mv "$$f.tdy" "$$f"; \
 	done
 
 critic: ## run perlcritic on all source files
-	$(NO_ECHO)if [[ -z "$(PERLCRITICRC)" ]]; then \
-	  echo "ERROR: PERLCRITICRC not set - add perlcriticrc to your config or set PERLCRITICRC=path"; \
-	  exit 1; \
-	fi; \
-	test -e "$(PERLCRITICRC)" \
-	  || { echo "ERROR: $(PERLCRITICRC) not found"; exit 1; }; \
-	if [[ -z "$(PERLCRITIC)" ]]; then \
+	$(NO_ECHO)if [[ -z "$(PERLCRITIC)" ]]; then \
 	  echo "ERROR: perlcritic not found - install with: cpanm Perl::Critic"; \
 	  exit 1; \
 	fi; \
-	$(MAKE) check-syntax SYNTAX_CHECKING=on PERLTIDYRC="" PERLCRITICRC=""; \
-        PERL_SCRIPTS=$$(find bin/ -name '*.pl'); \
-	$(PERLCRITIC) --profile="$(PERLCRITICRC)" \
+	if [[ -n "$(PERLCRITICRC)" && ! -e "$(PERLCRITICRC)" ]]; then \
+	  echo "ERROR: $(PERLCRITICRC) not found"; \
+	  exit 1; \
+	fi; \
+	if [[ -z "$(PERLCRITICRC)" ]]; then \
+	  echo "WARNING: PERLCRITICRC not set - using perlcritic defaults"; \
+	fi; \
+	$(MAKE) check-syntax SYNTAX_CHECKING=on LINT=off; \
+	PERL_SCRIPTS=$$(find bin/ -name '*.pl'); \
+	$(PERLCRITIC) \
+	  $(if $(PERLCRITICRC),--profile="$(PERLCRITICRC)") \
 	  --theme=$(PERLCRITIC_THEME) \
 	  --severity=$(PERLCRITIC_SEVERITY) \
-	  --profile="$(PERLCRITICRC)" $(PERL_MODULES); \
+	  $(PERL_MODULES); \
 	if [[ -n "$$PERL_SCRIPTS" ]]; then \
-	  $(PERLCRITIC) 
-	    --profile="$(PERLCRITICRC)" $$PERL_SCRIPTS; \
+	  $(PERLCRITIC) \
+	    $(if $(PERLCRITICRC),--profile="$(PERLCRITICRC)") \
 	    --theme=$(PERLCRITIC_THEME) \
 	    --severity=$(PERLCRITIC_SEVERITY) \
-	    --profile="$(PERLCRITICRC)" $$PERL_SCRIPTS; \
+	    $$PERL_SCRIPTS; \
 	fi
 
 lint: ## run all linting tools (tidy + critic)
 	$(NO_ECHO)$(MAKE) tidy critic
 
-# dependencies
-#
-# deps.mk's self-remake rule now depends on the .pm.in/.pl.in SOURCE
-# files (see Makefile: `deps.mk: $(PERL_MODULES:%=%.in)`), not the
-# built .pm/.pl targets. `make clean` never touches source files, so
-# including this unconditionally can no longer force a build-then-
-# delete cycle during clean/distclean the way it used to when deps.mk
-# depended on $(PERL_MODULES) directly.
--include deps.mk
+ifneq ($(syntax_on),)
+
+include deps.mk
+
+# deps.mk depends on SOURCE (.pm.in), not the built .pm targets.
+# cmb create-deps already scans .pm.in directly, so this makes deps.mk
+# regenerate purely from source edits -- no build artifacts involved,
+# so there's no chicken-and-egg with $(PERL_MODULES) needing to be
+# built before deps.mk can be regenerated, and 'make clean' can never
+# trigger a rebuild through this include (clean doesn't touch .pm.in).
+deps.mk: $(SOURCE_FILES_IN)
+	$(NO_ECHO)cmb create-deps > $@.tmp \
+	  && mv $@.tmp $@ \
+	  || { rm -f $@.tmp; false; }
+
+endif
 
 # custom make rules
 #
 # project.mk is plain data (module dependency edges) with no rule to
 # remake itself. It's also the conventional place to drop extra
 # clean-local:: recipes, so it must stay included unconditionally in
-# all cases, same as deps.mk above.
+# all cases
 -include project.mk
 

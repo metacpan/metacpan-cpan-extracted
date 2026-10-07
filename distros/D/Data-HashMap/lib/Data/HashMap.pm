@@ -3,7 +3,7 @@ package Data::HashMap;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Data::HashMap', $VERSION);
@@ -178,9 +178,9 @@ Method-only operations (no keyword form):
 
     $map->clone                     # copy the map (SV* values per its copy mode)
     $map->from_hash(\%h)            # bulk-insert from a Perl hashref
-    $map->merge($other_map)         # copy in another map's entries; it wins on a conflict
+    $map->merge($other_map)         # copy in another same-variant map's entries
     $map->freeze                    # serialize to binary string (non-SV* variants)
-    MyVariant->thaw($data)          # reconstruct map from freeze data
+    MyVariant->thaw($data)          # rebuild a frozen map (non-SV* variants)
 
 =head1 CONSTRUCTOR
 
@@ -199,8 +199,10 @@ seconds saturates.
 =head2 LRU eviction
 
 With C<max_size> set, inserting a new key into a full map evicts the least
-recently used entry. C<get>, C<put> on an existing key, and the counters promote
-the entry they touch; C<exists> does not.
+recently used entry. Reading or writing an existing key promotes it: C<get>,
+C<get_direct>, C<put>, C<put_ttl>, C<swap>, a successful C<cas>,
+C<get_or_set> and the counters do; C<exists>, C<persist> and a failed C<cas>
+do not.
 
 C<lru_skip> (0-99, larger values clamp to 99) skips promotion on exactly that
 percentage of the accesses that would promote: 90 promotes one in ten. The
@@ -235,6 +237,10 @@ used entry whether or not it has expired, and an expired entry keeps its slot
 and its value until it is reaped: call C<purge> periodically so that expired
 entries, not live ones, make room.
 
+Expiry is measured against the wall clock (C<time>), so stepping the system
+clock moves every deadline with it; a clock set backward keeps entries alive
+longer.
+
 =head1 CAVEATS
 
 =over
@@ -256,12 +262,16 @@ skips. C<no Data::HashMap::XX> does not remove the keywords.
 =item Integers
 
 Keys and values are checked against the variant's range on every call,
-C<from_hash> included, and croak outside it rather than wrap. INT_MIN and
-INT_MIN+1 are reserved as keys: C<put>, C<put_ttl>, C<get_or_set> and lookups
-ignore them, while C<incr>, C<decr> and C<incr_by> croak. The counters also
-croak rather than overflow, leaving the value unchanged, with the same
-C<increment failed> message. The I16 and I32 croaks name the full type range,
-reserved values included. A 64-bit perl (C<use64bitint>) is required.
+C<from_hash> included, and croak outside it rather than wrap. NaN croaks
+wherever a number is expected. INT_MIN and INT_MIN+1 are reserved as keys:
+C<put>, C<put_ttl>, C<get_or_set> and lookups ignore them, as do C<swap> and
+C<cas> (returning undef and false), while C<incr>, C<decr> and C<incr_by>
+croak. An undef key or value coerces as in Perl, to C<""> or 0, usually with
+a warning; SV* variants store an undef value as-is. The counters croak rather
+than overflow, leaving the value unchanged: C<incr> with C<increment failed>,
+C<decr> with C<decrement failed> and C<incr_by> with C<incr_by failed>. The
+I16 and I32 croaks name the full type range, reserved values included. A
+64-bit perl (C<use64bitint>) is required.
 
 =item String keys
 
@@ -281,20 +291,25 @@ leaves every entry holding the loop's final C<undef>; a C<substr> result, C<$1>
 or a C<foreach> variable changes after it is stored; C<from_hash>, C<clone>,
 C<merge> and C<to_hash> share SVs with their source; and a stored literal is
 read-only. Store a copy (C<"$_">), or pass a true fourth argument, C<copy>, to
-C<new>: the map then copies each value it stores, as a hash does, and each put
-costs 1.6 to 2.6 times as much, still less than a Perl hash. In either mode
-C<get>, C<values>, C<items> and C<each> return the map's own SV, as
-C<values %h> does, and referents are shared.
+C<new>: the map then copies each value it stores, as a hash does, at the cost
+of one SV copy per put. In either mode C<get>, C<values>, C<items> and C<each>
+return the map's own SV, as C<values %h> does, and referents are shared.
 
 =item Iteration and order
 
 Key order is unspecified and differs between processes, as with Perl's own
-hashes; sort if you need a stable one. C<each> restarts if a C<put>, C<remove>,
-C<incr> or C<get_or_set> resizes or compacts the table, so do not mutate the
-map during C<each>; in scalar context it returns the key. C<drain> removes
-entries in table order, not LRU order, unlike C<pop> and C<shift> on an LRU
-map. C<pop> and C<shift> skip expired entries; on an LRU map they also reap
-them, and on a plain map C<size> keeps counting them until a lookup reaps them.
+hashes; sort if you need a stable one. C<each> restarts after C<clear>, and
+whenever another write resizes or compacts the table (C<swap>, C<cas> and
+C<persist> only do so by reaping an expired entry), so do not write to the
+map during C<each>; reads are safe. In scalar context it returns the key, so
+a C<while> loop over it must guard with C<defined> -- C<while (defined(my $k =
+hm_xx_each $map))> -- or it stops early on a false key such as C<0> or C<"">.
+C<pop>, C<shift> and C<drain> keep their own cursor, so they do not move an
+C<each> in progress unless they compact the table. On an LRU map C<pop> and
+C<shift> take the least and most recently used entry; C<drain> always goes in
+table order. In scalar context the three return the last value removed.
+C<pop> and C<shift> skip expired entries; on an LRU map they also reap them,
+and on a plain map C<size> keeps counting them until a lookup reaps them.
 
 =item get_direct
 
@@ -312,8 +327,9 @@ byte-stable -- table order drifts across rehashes and, with the per-process hash
 seed, between runs -- so do not use a frozen blob as a digest or cache key;
 C<thaw> round-trips the data regardless. Each entry's remaining lifetime is
 stored, and C<thaw> starts that countdown afresh, so time spent frozen does not
-count. A C<thaw>ed LRU map has lost its recency order. All of this applies to
-L<Storable> too.
+count. A C<thaw>ed LRU map has lost its recency order. A map whose
+C<max_size> exceeds 4294967295 cannot be frozen: the format stores it in 32
+bits, so C<freeze> croaks. All of this applies to L<Storable> too.
 
 =item from_hash and merge
 
@@ -321,7 +337,7 @@ C<from_hash> croaks on a key or value the matching C<put> would reject, leaving
 the entries inserted so far in place, skips reserved keys silently, and reads
 tied hashes. C<merge> copies another map's entries in, the other map winning a
 conflict; they take this map's TTL rules, not the other map's, so merging into
-a map without a TTL makes them permanent.
+a map without a TTL makes them permanent. Already-expired entries are skipped.
 
 =item Capacity
 

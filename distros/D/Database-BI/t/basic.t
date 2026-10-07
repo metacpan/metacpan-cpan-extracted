@@ -592,4 +592,14 @@ subtest 'GET /bar' => sub {
 	  ->content_like(qr/id="bar_chart"/, 'bar chart SVG present');
 };
 
+# ---------------------------------------------------------------------------
+subtest 'GET /folder' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'foldersmoke.csv');
+	Mojo::File->new($csv)->spurt("order_no,item\nA10,Widget\nA20,Gadget\nB5,Doohickey\n");
+	$t->get_ok('/folder?l=' . url_escape("path:$csv") . '&col=order_no')
+	  ->status_is(200)
+	  ->content_like(qr/Folder view/, 'folder view heading present');
+};
+
 done_testing();

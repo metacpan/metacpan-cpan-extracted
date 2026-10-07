@@ -9,7 +9,7 @@ use Game::Checkers::Notation;
 use Game::Checkers::Rules;
 use Game::Checkers::Move;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant {
 	MATE => 10_000,
@@ -190,17 +190,17 @@ sub _root {
 		? ($depth, 1)
 		: ($depth - 1, 0);
 
-	my $alpha = -INFINITY;
+	my $alpha = -INFINITY();
 	my ($best, $best_score);
 	for my $raw (@{$self->_ordered($state, $moves, 0, undef)}) {
 		# a move that fails low comes back as a bound rather than a score, and
 		# a bound plus a jitter is how a losing move gets chosen. So when the
 		# jitter is on every root move is searched with the full window and the
 		# scores it is added to are all exact.
-		my $bound = $state->{jitter} ? -INFINITY : $alpha;
+		my $bound = $state->{jitter} ? -INFINITY() : $alpha;
 		my $score = $self->_child(
 			$state, $position, $turn, $raw,
-			$child_depth, -INFINITY, -$bound, 1, $child_extension, $no_progress
+			$child_depth, -INFINITY(), -$bound, 1, $child_extension, $no_progress
 		);
 		return (undef, undef) if $state->{aborted};
 
@@ -260,7 +260,7 @@ sub _search {
 	}
 
 	my $moves = Game::Checkers::Rules::generate($position, $turn);
-	return -MATE + $ply unless @{$moves};
+	return -MATE() + $ply unless @{$moves};
 
 	my $forced = @{$moves->[0][RM_CAPTURES]} ? 1 : 0;
 	my $extend = $forced && $extension < MAX_EXTENSION ? 1 : 0;
@@ -271,7 +271,7 @@ sub _search {
 		: ($depth - 1, $extension);
 
 	my $original = $alpha;
-	my ($best_score, $best_move) = (-INFINITY, undef);
+	my ($best_score, $best_move) = (-INFINITY(), undef);
 	for my $raw (@{$self->_ordered($state, $moves, $ply, $table_move)}) {
 		my $score = $self->_child(
 			$state, $position, $turn, $raw,
@@ -444,7 +444,7 @@ Game::Checkers::Bot - an opponent, at five strengths
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

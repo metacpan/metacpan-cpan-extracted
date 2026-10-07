@@ -30,3 +30,5 @@ resources
 test-requires.scan
 test-requires.cpanfile
 test.t.tmpl
+deps.mk
+*.reconciled

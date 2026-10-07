@@ -193,7 +193,7 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     undef $map;
 
     eval { Data::HashMap::Shared::SS->new($ii_path, 100) };
-    like($@, qr/variant mismatch/, 'opening II file as SS croaks');
+    like($@, qr/variant mismatch \(the file is II, not SS\)/, 'opening II file as SS croaks, naming both');
 
     unlink $ii_path;
 }

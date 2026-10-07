@@ -4,8 +4,8 @@ use warnings;
 use Data::HashMap::Shared::SS;
 
 # memfd-backed map: zero filesystem presence, shareable via the file
-# descriptor across processes (fork+exec, SCM_RIGHTS). Useful for
-# ephemeral shared caches that should never hit disk.
+# descriptor across processes (fork, SCM_RIGHTS, or a POSIX::dup of it
+# across exec). Useful for ephemeral shared caches that should never hit disk.
 
 my $map = Data::HashMap::Shared::SS->new_memfd("session-cache", 10_000, 0, 60);
 my $fd  = $map->memfd;

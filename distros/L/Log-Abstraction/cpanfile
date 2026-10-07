@@ -16,7 +16,7 @@ requires 'Readonly::Values::Syslog', '0.04';
 requires 'Return::Set', '0.04';
 requires 'Scalar::Util';
 requires 'Socket';
-requires 'Sub::Private', '0.05';
+requires 'Sub::Private', '0.06';
 requires 'Sys::Syslog', '0.28';
 requires 'Time::HiRes';
 requires 'Time::Local';

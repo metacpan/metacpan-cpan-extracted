@@ -1,5 +1,12 @@
 Revision history for Perl extension EV::Redis
 
+0.15 2026-10-06
+     - Fix crashes and use-after-free in connects, DESTROY, fork and exit
+     - Fix misrouted replies; commands that would misroute them now croak
+     - Wait queue, max_pending, reconnect and timeouts work as documented
+     - Malformed server replies fail the connection instead of aborting
+     - Linear large writes; 32-bit fixes; new() warns on unknown options
+
 0.14 2026-08-12
      - Update bundled hiredis to v1.4.1 (security release: stack
        overflow on deeply nested replies, map element count overflow)

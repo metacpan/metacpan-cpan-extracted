@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use open IO => ":raw";
 use Test::More;
 use File::Temp ();
 use File::Spec ();
@@ -127,6 +128,100 @@ sub held_reader_slots {
     is($m->get("after_kill"), 42, "post-recovery value is correct");
     is(held_reader_slots($path), 0, "the dead readers' slots were reclaimed by the write lock");
 
+    unlink $path;
+}
+
+# A child that takes a reader slot, then waits to be killed.
+sub start_reader {
+    my ($path) = @_;
+    pipe my $r, my $w or die "pipe: $!";
+    my $pid = fork // die "fork: $!";
+    unless ($pid) {
+        close $r;
+        my $c = Data::HashMap::Shared::SI->new($path, 1000);
+        $c->incr('k');
+        print $w "ok\n"; close $w;
+        sleep 60; POSIX::_exit(0);
+    }
+    close $w; <$r>;
+    return $pid;
+}
+
+# Leave a dead reader's slot holding the read lock: poked, since no kill lands
+# reliably inside a lock.
+sub pin_read_lock {
+    my ($path, $pid) = @_;
+    open my $f, '+<:raw', $path or die "open: $!";
+    seek $f, 80, 0 or die "seek: $!"; read $f, my $buf, 8;
+    my ($slots_off) = unpack 'Q<', $buf;
+    seek $f, $slots_off, 0 or die "seek: $!"; read $f, my $slots, 1024 * 16;
+    my ($slot) = grep { unpack('L<', substr $slots, $_ * 16, 4) == $pid } 0 .. 1023;
+    defined $slot or BAIL_OUT('the dead reader holds no slot');
+    seek $f, $slots_off + $slot * 16 + 4, 0 or die "seek: $!";
+    print $f pack 'L<', 1; close $f or die "close: $!";
+}
+
+# The put runs in a child under a deadline, so a write lock that never comes
+# fails the test instead of hanging it.
+sub put_in_child {
+    my ($m, $setup) = @_;
+    my $t0 = time;
+    my $pid = fork // die "fork: $!";
+    unless ($pid) { $setup->() if $setup; POSIX::_exit(eval { $m->put(after => 2); 1 } ? 0 : 3) }
+    my ($reaped, $status) = (0, -1);
+    for (1 .. 1000) {
+        if (waitpid($pid, POSIX::WNOHANG()) == $pid) { ($reaped, $status) = (1, $?); last }
+        Time::HiRes::sleep(0.01);
+    }
+    unless ($reaped) { kill 'KILL', $pid; waitpid $pid, 0 }
+    return ($status == 0, time - $t0);
+}
+
+# A reader killed but not yet reaped is a zombie, which kill($pid, 0) still
+# reports alive, and nobody reaps it while the writer waits.  Only
+# /proc/<pid>/stat tells it from a live process.
+SKIP: {
+    skip 'needs a readable /proc/<pid>/stat', 4 unless -r "/proc/$$/stat";
+    my $path = tmpfile();
+    my $m = Data::HashMap::Shared::SI->new($path, 1000);
+    $m->put(k => 1);
+    my $zpid = start_reader($path);
+    kill 'KILL', $zpid;
+    my $state = '';
+    for (1 .. 200) {
+        open my $s, '<', "/proc/$zpid/stat" or last;
+        $state = (split ' ', scalar <$s>)[2];
+        last if $state eq 'Z';
+        Time::HiRes::sleep(0.01);
+    }
+    pin_read_lock($path, $zpid);
+    my ($ok, $elapsed) = put_in_child($m);
+    is($state, 'Z', 'the killed reader is an unreaped zombie');
+    ok($ok, "a write past it completes (elapsed ${\ sprintf '%.2f', $elapsed }s)");
+    is($m->get('after'), 2, '  ... and stores its value');
+    is(held_reader_slots($path), 0, "  ... reclaiming the zombie's slot");
+    waitpid $zpid, 0;
+    unlink $path;
+}
+
+# Each signal restarts the writer's first drain wait: one taking signals faster
+# than that wait must probe on a signal too, or it never gets past a dead reader
+# (and Perl croaks it out, lock held, after 120 pending signals).
+{
+    my $path = tmpfile();
+    my $m = Data::HashMap::Shared::SI->new($path, 1000);
+    $m->put(k => 1);
+    my $dpid = start_reader($path);
+    kill 'KILL', $dpid;
+    waitpid $dpid, 0;
+    pin_read_lock($path, $dpid);
+    my ($ok, $elapsed) = put_in_child($m, sub {
+        $SIG{ALRM} = sub { };
+        Time::HiRes::setitimer(Time::HiRes::ITIMER_REAL(), 0.005, 0.005);
+    });
+    ok($ok, "a writer signalled every 5 ms gets past a dead reader (elapsed ${\ sprintf '%.2f', $elapsed }s)");
+    is($m->get('after'), 2, '  ... and stores its value');
+    is(held_reader_slots($path), 0, "  ... reclaiming the dead reader's slot");
     unlink $path;
 }
 

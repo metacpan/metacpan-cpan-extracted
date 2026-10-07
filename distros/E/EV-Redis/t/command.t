@@ -89,14 +89,11 @@ $r->command('set', 'foo', sub {
 EV::run;
 is $called, 1;
 
-# Test: priority validation and clamping
 {
     $r->connect_unix( $connect_info{sock} );
 
-    # Default priority is 0
     is $r->priority, 0, 'default priority is 0';
 
-    # Valid priorities
     $r->priority(-2);
     is $r->priority, -2, 'priority set to -2 (minimum)';
 
@@ -112,7 +109,6 @@ is $called, 1;
     $r->priority(1);
     is $r->priority, 1, 'priority set to 1';
 
-    # Out-of-range values should be clamped
     $r->priority(100);
     is $r->priority, 2, 'priority 100 clamped to 2';
 
@@ -125,7 +121,6 @@ is $called, 1;
     $r->priority(-3);
     is $r->priority, -2, 'priority -3 clamped to -2';
 
-    # Verify commands still work with different priorities
     my $done = 0;
     $r->priority(2);
     $r->ping(sub {
@@ -138,7 +133,6 @@ is $called, 1;
     ok $done, 'high priority command completed';
 }
 
-# Test: priority setting via constructor
 {
     my $r_prio = EV::Redis->new(
         path => $connect_info{sock},
@@ -149,7 +143,6 @@ is $called, 1;
     EV::run;
 }
 
-# Test: priority clamping via constructor
 {
     my $r_prio2 = EV::Redis->new(
         path => $connect_info{sock},
@@ -160,13 +153,11 @@ is $called, 1;
     EV::run;
 }
 
-# Test: priority change with active command timeout timer
-# This verifies that changing priority while a timeout timer is active
-# preserves the timeout behavior (tests ev_timer_again fix)
+# a priority change must not reset or lose a running command timeout
 {
     my $r_timeout = EV::Redis->new(
         path => $connect_info{sock},
-        command_timeout => 200,  # 200ms timeout
+        command_timeout => 200,
         on_error => sub { },
     );
 
@@ -175,7 +166,6 @@ is $called, 1;
     my $start_time = EV::now;
     my $elapsed;
 
-    # Issue a blocking command that will timeout
     $r_timeout->blpop('priority_timeout_test_key', 10, sub {
         my ($res, $err) = @_;
         $callback_called = 1;
@@ -184,13 +174,10 @@ is $called, 1;
         $r_timeout->disconnect;
     });
 
-    # Change priority while timeout timer is active
-    # This exercises the ev_timer_again code path
     $r_timeout->priority(1);
     $r_timeout->priority(-1);
     $r_timeout->priority(2);
 
-    # Fallback timer in case timeout doesn't work
     my $fallback = EV::timer 2, 0, sub {
         $r_timeout->disconnect unless $callback_called;
     };
@@ -199,25 +186,20 @@ is $called, 1;
 
     ok $callback_called, 'callback was called after priority changes';
     ok $got_timeout, 'command timed out correctly after priority changes';
-    # Timeout should still occur around 200ms, not be reset or lost
-    # Allow some slack for timing variations
     ok $elapsed < 0.5, "timeout occurred within reasonable time (${elapsed}s < 0.5s)";
 }
 
-# Test: constructor with explicit zero values
 {
     my $r_zero = EV::Redis->new(
         path => $connect_info{sock},
-        max_pending => 0,        # explicit 0 (unlimited)
-        waiting_timeout => 0,    # explicit 0 (unlimited)
-        priority => 0,           # explicit default
+        max_pending => 0,
+        waiting_timeout => 0,
+        priority => 0,
     );
 
     is $r_zero->max_pending, 0, 'max_pending explicitly set to 0';
     is $r_zero->priority, 0, 'priority explicitly set to 0';
 
-    # connect_timeout => 0 means "immediate timeout" in hiredis, so test
-    # it separately as a getter only (connecting with 0 timeout is flaky)
     $r_zero->connect_timeout(0);
     is $r_zero->connect_timeout, 0, 'connect_timeout 0 accepted';
 
@@ -230,12 +212,10 @@ is $called, 1;
     ok $done, 'connection with zero values works';
 }
 
-# Test: zero-length (empty) string arguments
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
 
-    # Test empty value
     $r->set('test:empty:value', '', sub {
         my ($res, $err) = @_;
         push @results, ['set_empty_value', $res, $err];
@@ -244,7 +224,6 @@ is $called, 1;
             my ($res, $err) = @_;
             push @results, ['get_empty_value', $res, $err];
 
-            # Test empty key (Redis allows this)
             $r->set('', 'empty_key_value', sub {
                 my ($res, $err) = @_;
                 push @results, ['set_empty_key', $res, $err];
@@ -253,7 +232,6 @@ is $called, 1;
                     my ($res, $err) = @_;
                     push @results, ['get_empty_key', $res, $err];
 
-                    # Test both empty
                     $r->set('', '', sub {
                         my ($res, $err) = @_;
                         push @results, ['set_both_empty', $res, $err];
@@ -279,12 +257,10 @@ is $called, 1;
     is $results[5][1], '', 'GET with empty key returns empty value';
 }
 
-# Test: binary strings with embedded NUL bytes
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
 
-    # Create binary string with embedded NUL bytes
     my $binary_value = "hello\x00world\x00end";
 
     $r->set('test:binary:simple', $binary_value, sub {
@@ -305,7 +281,6 @@ is $called, 1;
     is length($results[1][1]), length($binary_value), 'Binary value length preserved';
 }
 
-# Test: negative max_pending validation
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
 
@@ -321,7 +296,6 @@ is $called, 1;
     $r->disconnect;
 }
 
-# Test: negative waiting_timeout validation
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
 
@@ -337,7 +311,6 @@ is $called, 1;
     $r->disconnect;
 }
 
-# Test: negative connect_timeout validation
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
 
@@ -353,7 +326,6 @@ is $called, 1;
     $r->disconnect;
 }
 
-# Test: negative command_timeout validation
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
 
@@ -369,11 +341,9 @@ is $called, 1;
     $r->disconnect;
 }
 
-# Test: command() with insufficient arguments
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
 
-    # Only callback, no command name
     my $died = 0;
     eval {
         $r->command(sub { });
@@ -386,16 +356,13 @@ is $called, 1;
     $r->disconnect;
 }
 
-# Test: command() without callback (fire-and-forget)
-# Non-CODE last argument is treated as a regular command arg, not a callback.
+# a non-CODE last argument is a command arg, not a callback
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
 
-    # Fire-and-forget: string args only, no callback
     eval { $r->command('SET', 'ff_test', 'value') };
     is $@, '', 'fire-and-forget command does not croak';
 
-    # Verify the SET took effect
     my $got;
     $r->command('GET', 'ff_test', sub {
         ($got) = @_;
@@ -405,12 +372,9 @@ is $called, 1;
     is $got, 'value', 'fire-and-forget SET was executed by Redis';
 }
 
-# Test: clearing callbacks (both no-arg and undef work)
 {
-    # Don't auto-connect - just test the setter behavior
     my $r = EV::Redis->new;
 
-    # Set callbacks and verify clearing with undef works
     $r->on_error(sub { });
     $r->on_error(undef);
     ok !defined($r->on_error), 'on_error cleared by undef';
@@ -423,7 +387,6 @@ is $called, 1;
     $r->on_disconnect(undef);
     ok !defined($r->on_disconnect), 'on_disconnect cleared by undef';
 
-    # Verify clearing with no-arg also works
     $r->on_error(sub { });
     $r->on_error();
     ok !defined($r->on_error), 'on_error cleared by no-arg call';
@@ -437,19 +400,15 @@ is $called, 1;
     ok !defined($r->on_disconnect), 'on_disconnect cleared by no-arg call';
 }
 
-# Test: replacing callbacks (memory management)
 {
-    # Don't auto-connect - just test the setter behavior
     my $r = EV::Redis->new;
 
-    # Set and replace callbacks multiple times
     for (1..5) {
         $r->on_error(sub { });
         $r->on_connect(sub { });
         $r->on_disconnect(sub { });
     }
 
-    # Clear them
     $r->on_error(undef);
     $r->on_connect(undef);
     $r->on_disconnect(undef);
@@ -457,7 +416,6 @@ is $called, 1;
     ok 1, 'repeatedly replacing callbacks does not crash';
 }
 
-# Test: timeout getter methods return current value
 {
     my $r = EV::Redis->new(
         connect_timeout => 5000,
@@ -467,14 +425,12 @@ is $called, 1;
     is $r->connect_timeout(), 5000, 'connect_timeout getter returns set value';
     is $r->command_timeout(), 3000, 'command_timeout getter returns set value';
 
-    # Modify and verify getter reflects change
     $r->connect_timeout(7000);
     $r->command_timeout(4000);
     is $r->connect_timeout(), 7000, 'connect_timeout getter returns updated value';
     is $r->command_timeout(), 4000, 'command_timeout getter returns updated value';
 }
 
-# Test: timeout getters return undef when not set
 {
     my $r = EV::Redis->new;
 
@@ -482,21 +438,17 @@ is $called, 1;
     ok !defined($r->command_timeout()), 'command_timeout returns undef when not set';
 }
 
-# Test: callback clearing via no-argument call
 {
     my $r = EV::Redis->new;
 
     my $called = 0;
     $r->on_connect(sub { $called++ });
 
-    # Clear the handler by calling without arguments
     $r->on_connect();
 
-    # Verify handler was cleared by setting a new one and checking it works
     my $new_called = 0;
     $r->on_connect(sub { $new_called++ });
 
-    # The new handler should work (old one was cleared)
     $r->connect_unix($connect_info{sock});
     my $t; $t = EV::timer 0.1, 0, sub { $r->disconnect; undef $t };
     EV::run;
@@ -505,15 +457,12 @@ is $called, 1;
     is $new_called, 1, 'new on_connect handler works after clearing';
 }
 
-# Test: empty array reply (LRANGE on empty/nonexistent list)
 {
     $r->connect_unix($connect_info{sock});
 
     my @results;
 
-    # First ensure key doesn't exist
     $r->del('empty_list_test', sub {
-        # Now LRANGE should return empty array
         $r->lrange('empty_list_test', 0, -1, sub {
             my ($res, $err) = @_;
             push @results, [$res, $err];
@@ -528,34 +477,27 @@ is $called, 1;
     is scalar(@{$results[0][0]}), 0, 'LRANGE returns empty array for nonexistent list';
 }
 
-# Test: timeout overflow protection
 {
     my $r = EV::Redis->new;
 
-    # Valid large timeout should work (about 23 days)
     eval { $r->connect_timeout(2000000000) };
     ok !$@, 'large valid timeout accepted';
     is $r->connect_timeout, 2000000000, 'large timeout value preserved';
 
-    # Timeout exceeding max should croak
     eval { $r->connect_timeout(2000000001) };
     like $@, qr/timeout too large/, 'timeout exceeding max rejected';
 
-    # Same for command_timeout
     eval { $r->command_timeout(2000000001) };
     like $@, qr/timeout too large/, 'command_timeout exceeding max rejected';
 
-    # Same for waiting_timeout
     eval { $r->waiting_timeout(2000000001) };
     like $@, qr/waiting_timeout too large/, 'waiting_timeout exceeding max rejected';
 
-    # Valid waiting_timeout should work
     eval { $r->waiting_timeout(60000) };
     ok !$@, 'normal waiting_timeout accepted';
     is $r->waiting_timeout, 60000, 'waiting_timeout value preserved';
 }
 
-# Test: command() without connection throws exception
 {
     my $r = EV::Redis->new;
 
@@ -569,7 +511,6 @@ is $called, 1;
     like $@, qr/connection required/, 'exception mentions connection required';
 }
 
-# Test: AUTOLOAD command without connection throws exception
 {
     my $r = EV::Redis->new;
 
@@ -583,19 +524,15 @@ is $called, 1;
     like $@, qr/connection required/, 'AUTOLOAD exception mentions connection required';
 }
 
-# Test: Redis transactions (MULTI/EXEC)
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
 
-    # Clean up test keys
     $r->del('tx_key1', 'tx_key2', 'tx_counter', sub {
-        # Start transaction
         $r->multi(sub {
             my ($res, $err) = @_;
             push @results, { cmd => 'multi', res => $res, err => $err };
 
-            # Queue commands
             $r->set('tx_key1', 'value1', sub {
                 my ($res, $err) = @_;
                 push @results, { cmd => 'set1', res => $res, err => $err };
@@ -616,7 +553,6 @@ is $called, 1;
                 push @results, { cmd => 'get', res => $res, err => $err };
             });
 
-            # Execute transaction
             $r->exec(sub {
                 my ($res, $err) = @_;
                 push @results, { cmd => 'exec', res => $res, err => $err };
@@ -642,7 +578,6 @@ is $called, 1;
     is $results[5]{res}[3], 'value1', 'GET result is value1';
 }
 
-# Test: DISCARD aborts transaction
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
@@ -661,7 +596,6 @@ is $called, 1;
                 my ($res, $err) = @_;
                 push @results, { cmd => 'discard', res => $res };
 
-                # Verify value unchanged
                 $r->get('discard_test', sub {
                     my ($res, $err) = @_;
                     push @results, { cmd => 'get', res => $res };
@@ -680,21 +614,17 @@ is $called, 1;
     is $results[3]{res}, 'original', 'value unchanged after DISCARD';
 }
 
-# Test: WATCH for optimistic locking (Redis 2.2+)
 SKIP: {
     skip 'WATCH requires Redis 2.2+', 8 if $redis_version < 2 || ($redis_version == 2 && $redis_minor < 2);
 
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
 
-    # Setup: set initial value
     $r->set('watch_key', '100', sub {
-        # Watch the key
         $r->watch('watch_key', sub {
             my ($res, $err) = @_;
             push @results, { cmd => 'watch', res => $res, err => $err };
 
-            # Start transaction
             $r->multi(sub {
                 my ($res, $err) = @_;
                 push @results, { cmd => 'multi', res => $res };
@@ -708,7 +638,6 @@ SKIP: {
                     my ($res, $err) = @_;
                     push @results, { cmd => 'exec', res => $res, err => $err };
 
-                    # Verify result
                     $r->get('watch_key', sub {
                         my ($res, $err) = @_;
                         push @results, { cmd => 'get', res => $res };
@@ -731,21 +660,18 @@ SKIP: {
     is $results[4]{res}, '101', 'final value is 101';
 }
 
-# Test: EVAL Lua scripting (Redis 2.6+)
 SKIP: {
     skip 'EVAL requires Redis 2.6+', 6 if $redis_version < 2 || ($redis_version == 2 && $redis_minor < 6);
 
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
 
-    # Simple script: return arguments
     my $script1 = q{return {KEYS[1], ARGV[1], ARGV[2]}};
 
     $r->eval($script1, 1, 'mykey', 'arg1', 'arg2', sub {
         my ($res, $err) = @_;
         push @results, { cmd => 'eval1', res => $res, err => $err };
 
-        # Script with computation
         my $script2 = q{return tonumber(ARGV[1]) + tonumber(ARGV[2])};
         $r->eval($script2, 0, '10', '25', sub {
             my ($res, $err) = @_;
@@ -764,17 +690,14 @@ SKIP: {
     is $results[1]{res}, 35, 'EVAL arithmetic works';
 }
 
-# Test: SCAN cursor iteration (Redis 2.8+)
 SKIP: {
     skip 'SCAN requires Redis 2.8+', 4 if $redis_version < 2 || ($redis_version == 2 && $redis_minor < 8);
 
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
 
-    # Setup a unique key for this test, then scan for it specifically
     my $unique_key = "scan_unique_$$";
     $r->set($unique_key, 'value', sub {
-        # SCAN returns [cursor, [keys...]]
         $r->scan(0, 'MATCH', $unique_key, 'COUNT', 1000, sub {
             my ($res, $err) = @_;
             push @results, { cmd => 'scan', res => $res, err => $err };
@@ -790,7 +713,6 @@ SKIP: {
     is ref($results[0]{res}[1]), 'ARRAY', 'SCAN second element is array of keys';
 }
 
-# Test: HGETALL returns flat array
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
@@ -818,7 +740,6 @@ SKIP: {
     is $hash{field2}, 'value2', 'HGETALL field2 correct';
 }
 
-# Test: SETEX with expiry (Redis 2.0+)
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
@@ -841,7 +762,6 @@ SKIP: {
     ok $results[1]{res} > 0 && $results[1]{res} <= 10, 'TTL returns valid expiry';
 }
 
-# Test: MSET/MGET multiple keys
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
@@ -865,13 +785,12 @@ SKIP: {
     is_deeply $results[1]{res}, ['mval1', 'mval2', 'mval3', undef], 'MGET returns correct values (including nil)';
 }
 
-# Test: LPUSH/LRANGE list operations
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
 
     $r->del('list_test', sub {
-        $r->lpush('list_test', 'c', 'b', 'a', sub {  # Results in: a, b, c
+        $r->lpush('list_test', 'c', 'b', 'a', sub {
             my ($res, $err) = @_;
             push @results, { cmd => 'lpush', res => $res, err => $err };
 
@@ -890,13 +809,12 @@ SKIP: {
     is_deeply $results[1]{res}, ['a', 'b', 'c'], 'LRANGE returns list in order';
 }
 
-# Test: SADD/SMEMBERS set operations
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
 
     $r->del('set_test', sub {
-        $r->sadd('set_test', 'a', 'b', 'c', 'a', sub {  # 'a' duplicate ignored
+        $r->sadd('set_test', 'a', 'b', 'c', 'a', sub {
             my ($res, $err) = @_;
             push @results, { cmd => 'sadd', res => $res, err => $err };
 
@@ -916,7 +834,6 @@ SKIP: {
     is scalar(@{$results[1]{res}}), 3, 'SMEMBERS returns 3 unique elements';
 }
 
-# Test: ZADD/ZRANGE sorted set operations
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
@@ -941,7 +858,6 @@ SKIP: {
     is_deeply $results[1]{res}, ['one', 'two', 'three'], 'ZRANGE returns sorted order';
 }
 
-# Test: EXISTS and DEL
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
@@ -971,7 +887,6 @@ SKIP: {
     is $results[2]{res}, 0, 'EXISTS returns 0 after DEL';
 }
 
-# Test: TYPE command
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my @results;
@@ -1002,6 +917,83 @@ SKIP: {
     is $results[1], 'list', 'TYPE returns list';
     is $results[2], 'set', 'TYPE returns set';
     is $results[3], 'none', 'TYPE returns none for nonexistent';
+}
+
+# the undef first argument of an error callback is writable
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my ($from_reply, $from_skip);
+    local $SIG{__WARN__} = sub {};
+    $r->command('ev_redis_nosuchcommand', sub { $_[0] //= 'set'; $from_reply = $_[0]; EV::break });
+    { my $g = EV::timer 3, 0, sub { EV::break }; EV::run }
+    $r->get('cmd_rw', sub { $_[0] //= 'set'; $from_skip = $_[0] });
+    $r->skip_pending;
+    is $from_reply, 'set', 'error reply: $_[0] is writable';
+    is $from_skip, 'set', 'skipped command: $_[0] is writable';
+    $r->disconnect;
+}
+
+# arguments go out as bytes
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my $s = "caf\xe9";
+    utf8::upgrade($s);
+    my $got;
+    $r->set('cmd_bytes', $s, sub {});
+    $r->strlen('cmd_bytes', sub { $got = $_[0]; EV::break });
+    my $g = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    is $got, 4, 'an upgraded string is sent as its Latin-1 bytes';
+    eval { $r->set('cmd_bytes', "\x{263a}", sub {}) };
+    like $@, qr/Wide character/, 'a wide character croaks';
+    is $r->pending_count, 0, 'a croaked command leaves nothing pending';
+    $r->disconnect;
+}
+
+# the callback is the code reference passed, not the caller's variable
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my (@pending, @waiting, $cb);
+    for my $k (1 .. 2) {
+        $cb = sub { push @pending, "cb$k:" . ($_[0] // $_[1]) };
+        $r->echo("v$k", $cb);
+    }
+    $r->max_pending(1);
+    for my $k (3 .. 4) {
+        $cb = sub { push @waiting, "cb$k:" . ($_[0] // $_[1]) };
+        $r->echo("v$k", $cb);
+    }
+    $cb = 'reassigned';
+    $r->ping(sub { EV::break });
+    my $g = EV::timer 5, 0, sub { EV::break };
+    EV::run;
+    is_deeply \@pending, ['cb1:v1', 'cb2:v2'], 'reassigning the callback variable leaves sent commands alone';
+    is_deeply \@waiting, ['cb3:v3', 'cb4:v4'], '... and waiting ones';
+    $r->disconnect;
+}
+
+# integer replies beyond 32 bits, as a 32-bit perl sees them too
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my %got;
+    $r->set('cmd_big', 0);
+    $r->incrby('cmd_big', 5000000000, sub { $got{five} = $_[0] });
+    $r->incrby('cmd_big', -10000000000, sub { $got{neg} = $_[0] });
+    $r->set('cmd_e15', '1125899906842623');
+    $r->incrby('cmd_e15', 1, sub { $got{e15} = $_[0] });
+    $r->set('cmd_2p53', '9007199254740991');
+    $r->incrby('cmd_2p53', '-18014398509481983', sub { $got{n2p53} = $_[0] });
+    $r->set('cmd_huge', '1152921504606846976');
+    $r->incrby('cmd_huge', 1, sub { $got{huge} = $_[0]; EV::break });
+    my $g = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    is "$got{five}", '5000000000', 'an integer reply above 2**32';
+    is $got{five} + 1, 5000000001, '... is a number';
+    is "$got{neg}", '-5000000000', 'a negative one';
+    is "$got{e15}", '1125899906842624', 'one of 16 digits keeps every digit';
+    is "$got{n2p53}", '-9007199254740992', 'so does -2**53';
+    is "$got{huge}", '1152921504606846977', 'one beyond 2**53 keeps every digit';
+    $r->disconnect;
 }
 
 done_testing;

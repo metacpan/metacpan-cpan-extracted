@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.001.1';
+our $VERSION = '0.001.2';
 
 use Carp qw(croak carp);
 use Readonly;
@@ -56,7 +56,7 @@ Music::NWC2MusicXML - Convert NoteWorthy Composer 2 C<.nwc> score files to Music
 
 =head1 VERSION
 
-0.001.1
+0.001.2
 
 =head1 SYNOPSIS
 
@@ -594,6 +594,10 @@ honour them without repeating the arguments on each call.
 =item * L<Test Dashboard|https://nigelhorne.github.io/nwc2musicxml/coverage/>
 
 =back
+
+=head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 =head1 FORMAL SPECIFICATION
 

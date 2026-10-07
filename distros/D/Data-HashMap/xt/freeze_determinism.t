@@ -30,10 +30,7 @@ sub set_equal {
     my %h3 = $m3->to_hash ? %{ $m3->to_hash } : ();
     is_deeply \%h3, \%h2, "$label: second roundtrip preserves all pairs";
 
-    # Bytes-equal is too strict but self-roundtrip (thaw a frozen form,
-    # freeze again) must match — because thaw from the same bytes must
-    # produce the same bucket layout (deterministic hash + insertion order).
-    is $s2, $s2, "$label: freeze is repeatable on the same map";
+    is $m2->freeze, $s2, "$label: freeze is repeatable on the same map";
 }
 
 set_equal('Data::HashMap::II', sub {

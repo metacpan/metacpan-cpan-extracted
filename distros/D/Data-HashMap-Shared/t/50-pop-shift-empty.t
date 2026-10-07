@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use Time::HiRes ();
 
 # pop/shift return an EMPTY LIST on an empty map, which is what makes
 # `while (my ($k, $v) = $map->shift)` terminate.  Every existing caller binds
@@ -32,5 +33,24 @@ for my $v (@variants) {
     $drained = 0;
     while (my ($k, $val) = $m->pop) { last if ++$drained > 10 }
     is $drained, 3, "$v: while (my (\$k, \$v) = pop) drains 3 entries and stops";
+}
+
+# Finding only expired entries, pop, shift and drain sweep them away, and the
+# table shrinks as after any other removal.
+{
+    require Data::HashMap::Shared::II;
+    my %m;
+    for my $op (qw(pop shift drain)) {
+        $m{$op} = Data::HashMap::Shared::II->new("$dir/sweep-$op.shm", 10000, 0, 60);
+        $m{$op}->put_ttl($_, $_, 1) for 1 .. 5000;
+    }
+    my $cap = $m{pop}->capacity;
+    Time::HiRes::sleep(1.2);
+    for my $op (qw(pop shift drain)) {
+        my @r = $op eq 'drain' ? $m{$op}->drain(10) : $m{$op}->$op;
+        is_deeply \@r, [], "$op: an all-expired map returns an empty list";
+        is $m{$op}->size, 0, "$op: ...having swept the expired entries";
+        cmp_ok $m{$op}->capacity, '<', $cap / 4, "$op: ...and shrunk the table from $cap slots";
+    }
 }
 done_testing;

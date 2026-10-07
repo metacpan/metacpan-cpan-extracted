@@ -1,3 +1,7 @@
+Travel::Status::MOTIS 0.05 - Tue Oct 06 2026
+
+    * MOTIS::Trip: add ->trip_short_name accessor (patch by Kenneth Bruen)
+
 Travel::Status::MOTIS 0.04 - Wed Aug 12 2026
 
     * MOTIS: Use v6 API

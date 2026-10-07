@@ -6,7 +6,9 @@ use warnings;
 use Getopt::Long qw(:config bundling no_ignore_case);
 
 use Game::Oware;
+use Game::Oware::Bot;
 use Game::Oware::Terminal;
+use Game::Oware::Variant ();
 
 my %opt = (
 	level   => 3,
@@ -25,6 +27,7 @@ GetOptions(\%opt,
 	'quiet|q',
 	'ascii|a',
 	'ansi!',
+	'pick!',
 	'version|v',
 	'help|h',
 ) or usage(2);
@@ -45,6 +48,7 @@ my $terminal = eval {
 		quiet   => $opt{quiet} ? 1 : 0,
 		ascii   => $opt{ascii} ? 1 : 0,
 		(exists $opt{ansi} ? (ansi => $opt{ansi} ? 1 : 0) : ()),
+		(exists $opt{pick} ? (picking => $opt{pick} ? 1 : 0) : ()),
 	);
 };
 
@@ -57,33 +61,70 @@ unless ($terminal) {
 	exit 2;
 }
 
-my $result = $terminal->start;
+# The picker puts the terminal into cbreak, so a death or a signal has to put
+# it back or the shell it came from is left with no echo.
+for my $signal (qw/ INT TERM HUP /) {
+	$SIG{$signal} = sub {
+		$terminal->leave_raw;
+		$SIG{ $_[0] } = 'DEFAULT';
+		kill $_[0], $$;
+	};
+}
+
+my $result = eval { $terminal->start };
+my $died = $@;
+$terminal->leave_raw;
+die $died if $died;
 
 exit 0 unless $result;
 exit 0 if !defined $result->winner;
 exit 0 if $result->winner eq $opt{seat};
 exit 1;
 
+# The variant and level lists are read from the modules that own them, never
+# typed out here. The first version of this text offered `slam_ends`, which no
+# version of this distribution has ever had a variant called, so the one
+# alternative it documented was the one thing you could not type.
 sub usage {
 	my ($status) = @_;
 	my $handle = $status ? \*STDERR : \*STDOUT;
 
-	print {$handle} <<'USAGE';
+	my @levels   = Game::Oware::Bot->levels;
+	my @variants = Game::Oware::Variant::variants();
+
+	my $levels   = $levels[0] . ' to ' . $levels[-1];
+	my $variants = join ' or ', @variants;
+
+	print {$handle} <<"USAGE";
 oware - play Oware against a bot
 
 Usage: oware [options]
 
-  -l, --level N      bot level, 1 to 5 (default 3)
-  -s, --seat SEAT    the seat you play, p1 or p2 (default p1)
-  -V, --variant V    abapa or slam_ends (default abapa)
+  -l, --level N      bot level, $levels (default $opt{level})
+  -s, --seat SEAT    the seat you play, p1 or p2 (default $opt{seat})
+  -V, --variant V    $variants (default $opt{variant})
       --seed STRING  the seed, so a game can be replayed
-  -q, --quiet        no banner and no narration
-  -a, --ascii        plain box drawing
+  -q, --quiet        only the result: no banner, narration or board
+  -a, --ascii        plain box drawing, for a terminal without the glyphs
       --ansi         force colour on, --no-ansi forces it off
+      --no-pick      type the moves out instead of choosing them with the keys
   -v, --version      print the version
   -h, --help         this
 
-Levels 4 and 5 think for up to a second and up to six seconds a move.
+On a terminal the legal moves are listed under the board and chosen with the
+arrow keys: the board above the list is the one the move under the cursor
+would produce, so a capture is seen before it is played. Enter sows it, a
+house letter jumps to that house, t goes back to typing and ? prints the
+rules. Needs Term::ReadKey; without it, or off a terminal, the moves are
+typed out as a letter at a time.
+
+The board marks what the last move did: - emptied, + gained a seed, * where
+the last seed landed, x captured, ! capture forfeited. Those are characters
+rather than colours, so they survive --no-ansi and a redirected handle.
+
+Levels $levels[-2] and $levels[-1] search a great deal deeper and take noticeably
+longer a move. The budget is in nodes rather than seconds, so a loaded
+machine plays the same game as an idle one.
 
 Exit status is 0 if you won or drew, 1 if you lost, 2 for a bad option.
 USAGE

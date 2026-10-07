@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Encode;
 
-use version 0.77; our $VERSION = version->declare("v0.1.0");
+use version 0.77; our $VERSION = version->declare("v0.1.5");
 
 use Time::Piece ();
 use Class::Accessor::Lite::Lazy 0.03 (

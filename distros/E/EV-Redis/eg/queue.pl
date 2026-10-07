@@ -31,7 +31,7 @@ sub wait_for_job {
             return;
         }
         unless ($res) {
-            # Timeout — no more jobs
+            # Timeout: no more jobs
             print "\nWorker: queue empty, done.\n";
             $worker->disconnect;
             $producer->disconnect;

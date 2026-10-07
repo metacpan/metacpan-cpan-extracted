@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Songmu/Acme-Songmu.svg?branch=master)](https://travis-ci.org/Songmu/Acme-Songmu)
+[![Actions Status](https://github.com/Songmu/Acme-Songmu/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/Songmu/Acme-Songmu/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Acme-Songmu.svg)](https://metacpan.org/release/Acme-Songmu)
 # NAME
 
 Acme::Songmu - Songmu's sample module

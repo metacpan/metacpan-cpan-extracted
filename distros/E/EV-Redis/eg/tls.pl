@@ -19,8 +19,9 @@ my $redis = EV::Redis->new(
     tls             => 1,
     tls_ca          => $ca,
     tls_verify      => $verify,
+    command_timeout => 5000,
     on_error        => sub { warn "Redis error: @_\n" },
-    on_connect      => sub { print "TLS connection established\n" },
+    on_connect      => sub { print "TCP connected, TLS handshake follows\n" },
 );
 
 $redis->ping(sub {

@@ -28,6 +28,7 @@ WriteMakefile(
 		'Database::Join'	=> '0.004.0',
 		'DBI'		=> 0,
 		'Net::SFTP::Foreign' => 0,
+		'File::Path'	=> '2.07',	# For remove_tree in Dashboard.pm at runtime
 		'File::Spec'	=> '3.40',
 		'File::Temp'	=> '0.22',
 		'List::Util'	=> '1.40',

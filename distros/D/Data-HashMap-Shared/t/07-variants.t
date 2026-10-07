@@ -501,6 +501,24 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
+# An integer cas and a get_or_set hit leave their lock-free fast path to maps
+# without LRU or TTL: with either, they still promote and refresh.
+{
+    require Data::HashMap::Shared::II;
+    my $map = Data::HashMap::Shared::II->new(undef, 1000, 3);
+    $map->put($_, $_) for 1 .. 3;
+    ok($map->cas(1, 1, 10), 'II cas LRU: succeeds');
+    $map->put(4, 4);
+    ok($map->exists(1) && !$map->exists(2), 'II cas LRU: promoted key survives, the next oldest goes');
+
+    for my $v (qw(II SS)) {
+        my $m = "Data::HashMap::Shared::$v"->new(undef, 1000, 0, 100);
+        $m->put_ttl(1, 1, 5);
+        is($m->get_or_set(1, 2), 1, "$v get_or_set TTL: a hit returns the value");
+        cmp_ok($m->ttl_remaining(1), '>', 90, "$v get_or_set TTL: and refreshes it to the default");
+    }
+}
+
 # ====== persist/set_ttl on non-II variants ======
 
 # I16 with TTL: persist/set_ttl

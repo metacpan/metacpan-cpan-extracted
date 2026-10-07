@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 ## Version
 
-0.37
+0.39
 
 ## Synopsis
 
@@ -76,6 +76,70 @@ object logger is passed the pairs as an extra argument after the message.
 When logging through [Log::Any](https://metacpan.org/pod/Log%3A%3AAny), a hash reference at the end of the call,
 together with the proxy's `context`, arrives here as fields; see
 ["structured" in Log::Any::Adapter::Abstraction](https://metacpan.org/pod/Log%3A%3AAny%3A%3AAdapter%3A%3AAbstraction#structured).
+
+### Redaction
+
+The `redact` option removes secrets before a message reaches the history
+or any backend.  Each match of any of its patterns is replaced with
+`[REDACTED]`:
+
+```perl
+my $log = Log::Abstraction->new(
+    logger => '/var/log/myapp.log',
+    redact => [qr/password=\S+/, qr/\b\d{4}(?:[ -]?\d{4}){3}\b/],
+);
+$log->warn('Login failed: user=fred password=hunter2');
+# Login failed: user=fred [REDACTED]
+```
+
+To keep the start of a match, end it with `\K`: `qr/password=\K\S+/` logs
+`password=[REDACTED]`.  The patterns run over the whole message, after its
+arguments are joined, so a match may span them, as in
+`$log->info('password=', $password)`; a CODE or object logger then gets
+the joined message as one argument.  The text given to `carp` or `croak`
+(see ["warn"](#warn) and ["error"](#error)) is redacted too.
+
+["Structured fields"](#structured-fields) are redacted as well: string values, including those
+inside plain hashes and arrays, and objects whose stringification matches
+(they become the redacted string).  Field names aren't redacted, nor are
+the format string, `%env_*%` values or `ctx`.
+
+Redaction is applied only to messages that pass the logger's `level`, so
+it costs nothing for messages that are dropped.  A pattern that can match
+the empty string, such as `qr/x*/`, is rejected by ["new"](#new).
+
+### Email Digests
+
+`min_interval` limits the `sendmail` backend to one email per interval,
+dropping the messages in between.  With `digest`, they are held instead,
+and sent ahead of the next message in the first email after the interval:
+
+```perl
+my $log = Log::Abstraction->new(
+    logger => {
+        file     => '/var/log/myapp.log',
+        sendmail => {
+            to           => 'ops@example.com',
+            level        => 'error',
+            min_interval => 300,
+            digest       => 1,
+            format       => '%level%> [%timestamp%] %message%',
+        },
+    },
+);
+```
+
+Each message is one line of the email, oldest first, as its own email body
+would be: formatted with the `sendmail` `format` if there is one (as
+above, so that each line has its time), else the message.  At most
+`digest_max` messages (default 100) are held; later ones are only
+counted, and the email says `... and N more messages` after the held ones.
+Messages held when an email fails to send stay held, and the new one is
+held with them.
+
+Nothing is sent on a timer: held messages go out with the next email,
+when ["flush"](#flush) is called, or when the logger is destroyed (which calls
+["flush"](#flush)).  A clone made with ["new"](#new) starts with none held.
 
 ### Per-Backend Level and Format
 
@@ -258,12 +322,13 @@ called on an object.  It may also be called as a plain function,
 
     The `sendmail` sub-hash supports:
     `host`, `port`, `to`, `from`, `subject`, `level`, `format`,
-    `min_interval`.  `to` is required.  With `format`, the email body is the
+    `min_interval`, `digest`, `digest_max`.  `to` is required.  With `format`, the email body is the
     formatted line rather than the message.  `level` may be a level name or a syslog number (0-7);
     without it, every message is emailed.
-    At most one email is sent per `min_interval` seconds per instance.  If
-    delivery fails, `Carp::carp` is called and the other backends still receive
-    the message.
+    At most one email is sent per `min_interval` seconds per instance; the
+    messages in between are dropped, unless `digest` is set, which sends them
+    with the next email (see ["Email digests"](#email-digests)).  If delivery fails,
+    `Carp::carp` is called and the other backends still receive the message.
 
     The `syslog` sub-hash supports the keys below.  The message is passed to
     `syslog()` through a `%s` format, so `%` sequences in it, such as `%m`,
@@ -291,6 +356,12 @@ called on an object.  It may also be called as a plain function,
     Delivery failures are silent apart from a single `Carp::carp` (repeated only
     after a later send has succeeded); the application is never crashed by a
     journald error.
+
+- `redact`
+
+    Patterns to remove from every message before it is logged: a `qr//`, a
+    string (compiled as a regular expression; a config file can't hold a
+    `qr//`), or an array reference of them.  See ["Redaction"](#redaction).
 
 - `rotate_interval`
 
@@ -396,6 +467,7 @@ my $clone = $logger->new(level => 'info');
     level          => { type => 'string',  regex => qr/^(trace|debug|info(?:rmational)?|notice|warn(?:ing)?|err(?:or)?|crit(?:ical)?|fatal|alert|emerg(?:ency)?|panic)$/i, optional => 1 },
     logger         => { optional => 1 },
     max_messages   => { type => 'integer', min => 0, optional => 1 },
+    redact         => { optional => 1 },    # regex, string, or arrayref of them
     rotate_interval => { type => 'string', regex => qr/^(hourly|daily|weekly|monthly)$/i, optional => 1 },
     rotate_keep    => { type => 'integer', min => 0, optional => 1 },
     rotate_size    => { type => 'string',  regex => qr/^\s*[1-9]\d*\s*[kmg]?b?\s*$/i, optional => 1 },
@@ -444,6 +516,14 @@ Error                                     Meaning / Action
   non-empty string"                       reference.
 "<class>: timestamp_precision must be     timestamp_precision is not a whole
   an integer from 0 to 9, not '<v>'"      number of digits from 0 to 9.
+"<class>: redact patterns must be         A redact entry is a reference other than
+  regular expressions or non-empty        a qr//, or an empty string.
+  strings"
+"<class>: invalid redact pattern '<p>':   A redact string is not a valid regular
+  <error>"                                expression.
+"<class>: redact pattern <p> matches the  The pattern can match nothing at all
+  empty string"                           (e.g. qr/x*/), which would put a marker
+                                          between every character.
 "<class>: invalid <backend> level '<l>'"  A backend's 'level' (file, fd, array,
                                           sendmail, journald) is neither a level
                                           name nor 0-7.  (A bad syslog 'level'
@@ -455,6 +535,8 @@ Error                                     Meaning / Action
                                           'info' } without a 'file' key).
 "<class>: the sendmail backend needs      The sendmail sub-hash has no 'to' key.
   a 'to' address"
+"<class>: sendmail digest_max must be a   digest_max is zero, negative or not a
+  positive integer, not '<v>'"            number.
 "<class>: invalid journald field name     An extra journald key, upper-cased, is not
   '<k>'"                                  [A-Z0-9_] or starts with '_'.
 ```
@@ -514,9 +596,11 @@ FUNCTION new(class_or_obj, args...)
     CROAK on an invalid timestamp_format or timestamp_precision
     CROAK on an invalid rotate_size, rotate_interval or rotate_keep, and
       normalise rotate_size to bytes
+    CROAK on an invalid redact pattern; compile redact to one regex
     shallow-clone self merged with override args
     validate and store new level integer if level given in args
     copy message history list
+    start the clone with no held email digest
     count the clone as a user of an open syslog connection
     RETURN clone
 
@@ -544,6 +628,8 @@ FUNCTION new(class_or_obj, args...)
   CROAK if rotate_size is not a positive size, rotate_interval is not
     hourly/daily/weekly/monthly, or rotate_keep is not a non-negative
     integer; normalise rotate_size to bytes
+  CROAK if a redact pattern is not a regex or non-empty string, doesn't
+    compile, or matches the empty string; compile redact to one regex
 
   FOR each backend (top-level file/fd/array, and the logger hash's
   file/fd/array/syslog/sendmail/journald) given as a hash:
@@ -552,7 +638,8 @@ FUNCTION new(class_or_obj, args...)
     CROAK if its 'format' is undef, empty or not a string
 
   IF logger is a hash:
-    CROAK if a sendmail sub-hash has no 'to' address
+    CROAK if a sendmail sub-hash has no 'to' address, or a digest_max
+      that isn't a positive integer
     CROAK if an extra journald key is not a valid journald field name
 
   RETURN bless { messages => [], merged args, level => numeric } as class
@@ -744,6 +831,53 @@ my $msgs = $logger->messages();
 
 ```perl
 { type => 'arrayref', element_type => { level => 'string', message => 'string', fields => 'hashref?' } }
+```
+
+### Flush
+
+```
+$logger->flush();
+```
+
+Sends, now, the messages that a `sendmail` backend with `digest` is
+holding back because of `min_interval` (see ["Email digests"](#email-digests)), whether or
+not the interval has passed.  Does nothing if none are held.  Called
+automatically when the logger is destroyed.
+
+#### Arguments
+
+None.
+
+#### Returns
+
+The logger, for method chaining.
+
+#### Side Effects
+
+May send an email, which starts the `min_interval` interval again.  A
+delivery failure is carped and the messages stay held.  Croaks if the
+`sendmail` `host` or `port` is invalid.
+
+#### Example
+
+```
+$logger->error('disk full');    # emailed
+$logger->error('disk still full');    # held: within min_interval
+$logger->flush();                # emailed now
+```
+
+#### Api Specification
+
+##### Input
+
+```
+{} (no arguments)
+```
+
+##### Output
+
+```perl
+{ type => 'object', class => 'Log::Abstraction' }
 ```
 
 ### Trace
@@ -1343,8 +1477,8 @@ callback as described above.
 
 - **Single-threaded email throttle**
 
-    The `min_interval` throttle for the `sendmail` backend and the
-    `_syslog_opened` first-open flag are stored on the object without mutex
+    The `min_interval` throttle and `digest` for the `sendmail` backend and
+    the `_syslog_opened` first-open flag are stored on the object without mutex
     protection.  Under Perl ithreads or other concurrency models, objects shared
     between threads are not safe.
 
@@ -1415,13 +1549,18 @@ You can also look for information at:
 FIELDS == STRING ⇸ VALUE          structured fields (see Structured fields)
 ENTRY  == { level : STRING; message : STRING; fields : FIELDS }
 
-entry(l, m, f) == {level ↦ l, message ↦ m} ∪ (if f = ∅ then ∅ else {fields ↦ f})
+entry(l, m, f) == {level ↦ l, message ↦ ρ(m)} ∪ (if f = ∅ then ∅ else {fields ↦ ρ(f)})
+
+ρ(x) == if redact = ∅ then x
+        else x with each match of redact replaced by '[REDACTED]'
+             (in strings, recursively in plain hashes and arrays)
 
 ┌─ LogState ──────────────────────────────────────────────────
 │ level        : ℤ
 │ messages     : seq ENTRY
 │ max_messages : ℕ ∪ {∞}
 │ logger       : LOGGER
+│ redact       : REGEX ∪ {∅}
 ├─────────────────────────────────────────────────────────────
 │ 0 ≤ level ≤ 7
 │ #messages ≤ max_messages
@@ -1434,6 +1573,8 @@ entry(l, m, f) == {level ↦ l, message ↦ m} ∪ (if f = ∅ then ∅ else {fi
 │ result!.level = syslog_values(args?.level ∨ 'warning')
 │ result!.messages = ⟨⟩
 │ result!.max_messages = args?.max_messages ∨ ∞
+│ result!.redact = ⋃ args?.redact   {one regex matching any; ∅ if none}
+│ args?.redact ≠ ∅ ⟹ ¬('' ∈ L(result!.redact))
 │ args?.logger ≠ ∅ ⟹ result!.logger = args?.logger
 │ args?.logger = ∅ ∧ args?.file = ∅ ∧ args?.fd = ∅ ∧ args?.array = ∅
 │   ⟹ result!.logger = Log4perl
@@ -1505,6 +1646,21 @@ is_<lvl> ≡ IsLevel[lvl? := lvl]
 │ result! : seq ENTRY
 ├─────────────────────────────────────────────────────────────
 │ result! = messages
+└─────────────────────────────────────────────────────────────
+```
+
+### Flush
+
+```
+┌─ Flush ────────────────────────────────────────────────────
+│ ΔLogState
+│ result! : LogState
+├─────────────────────────────────────────────────────────────
+│ digest ≠ ⟨⟩ ∧ sent(digest) ⟹ digest' = ⟨⟩ ∧ last_email_sent' = now
+│ digest ≠ ⟨⟩ ∧ ¬sent(digest) ⟹ digest' = digest
+│ digest = ⟨⟩ ⟹ digest' = digest
+│ messages' = messages
+│ result! = self
 └─────────────────────────────────────────────────────────────
 ```
 

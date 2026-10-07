@@ -42,4 +42,49 @@ for my $v (@variants) {
     is $sum_second, 1,  "$v: the second value was true once, on the final call";
     is $m->size,    0,  "$v: table empty afterwards";
 }
+
+# flush_expired covers the whole table, wherever a partial flush -- this
+# process's or another's -- left the shared cursor.
+{
+    my $m = Data::HashMap::Shared::SI->new(undef, 1000, 0, 2);
+    $m->put("k$_", $_) for 1 .. 500;
+    $m->flush_expired_partial($m->capacity / 2);    # nothing has expired: only moves the cursor
+    Time::HiRes::sleep(2.1);
+    is $m->flush_expired, 500, 'flush_expired after a partial flush expires all 500';
+    is $m->size, 0, '  ... leaving the map empty';
+}
+
+# A cycle whose last slice expires nothing still shrinks a table its earlier
+# slices emptied.
+{
+    my $m = Data::HashMap::Shared::II->new(undef, 10_000, 0, 60);
+    $m->reserve(8000);
+    my $cap = $m->capacity;
+    $m->put_ttl($_, $_, 1) for 1 .. 100;
+    Time::HiRes::sleep(1.2);
+    my ($n, $d) = $m->flush_expired_partial($cap - 1);   # all but the last slot
+    ok !$d, "the first slice of $cap - 1 slots does not end the cycle";
+    ($n, $d) = $m->flush_expired_partial($cap - 1);      # the last slot alone
+    ok $d, 'the second ends it';
+    is $m->size, 0, 'every expired entry was flushed';
+    cmp_ok $m->capacity, '<', $cap, "and the table shrank from $cap slots";
+}
+
+# Two flushers share the cursor, and the one whose slices never reach the
+# table's end still learns that the cycle ended.
+{
+    my $path = "$dir/two-flushers.shm";
+    my $low = Data::HashMap::Shared::II->new($path, 64, 0, 60);
+    $low->put($_, $_) for 1 .. 30;
+    my $high = Data::HashMap::Shared::II->new($path, 64, 0, 60);
+    my $half = $low->capacity / 2;
+    my (@low_done, @high_done);
+    for (1 .. 3) {
+        push @low_done,  ($low->flush_expired_partial($half))[1];    # the lower half, every time
+        push @high_done, ($high->flush_expired_partial($half))[1];   # the upper half, to the end
+    }
+    is "@high_done", '1 1 1', 'the flusher that reaches the end of the table reports each cycle done';
+    is "@low_done",  '0 1 1', 'and so does the other, once it finds the cursor back behind it';
+    is $low->size, 30, 'nothing unexpired was flushed';
+}
 done_testing;

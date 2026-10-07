@@ -363,6 +363,20 @@ subtest 'Transaction 4: Join pipeline -> filter -> export consistency' => sub {
 	ok $header_cols{region},      'Phase 5b: left column "region" present in merged header';
 	ok $header_cols{quantity},    'Phase 5b: left column "quantity" present in merged header';
 	ok $header_cols{price_each},  'Phase 5b: right column "price_each" present in merged header';
+
+	# ------------------------------------------------------------------
+	# Phase 6: join panel UI carries the renamed "Which rows to include"
+	# label (not the old SQL-jargon "Join type").  Regression guard --
+	# a careless template revert would break non-technical users.
+	# ------------------------------------------------------------------
+	$t->get_ok('/view/sales')
+	  ->status_is(200, 'Phase 6: view renders for label check');
+	$t->content_like(qr/Which rows to include/,
+	                 'Phase 6: join panel label is "Which rows to include" not "Join type"');
+	$t->content_like(qr/Keep all rows from the left table/,
+	                 'Phase 6: left-join option uses plain English');
+	$t->content_unlike(qr/Join type/i,
+	                   'Phase 6: old "Join type" jargon label is absent');
 };
 
 # ======================================================================
@@ -2638,6 +2652,87 @@ subtest 'Transaction 42 -- import_url drill-down breadcrumb lifecycle' => sub {
 	$t->content_like(qr/Back to pie chart/, 'Phase 2: breadcrumb shows Back to pie chart');
 	$t->content_like(qr/<a [^>]*>Back to pie chart<\/a>/,
 	                    'Phase 2: Back to pie chart is a rendered anchor link');
+};
+
+# ======================================================================
+# TRANSACTION 43: Folder view lifecycle
+#
+# Lifecycle:
+#  Phase 0: open a CSV that has an order-number column
+#  Phase 1: GET /folder top-level -> folder cards rendered, one per letter
+#  Phase 2: drill into prefix "A" -> item table rendered, sorted numerically
+#  Phase 3: drill into multi-letter prefix "CA" -> sub-items rendered
+#  Phase 4: back link derived from l= when no back= param
+#  Phase 5: missing l= returns 400; DoS prefix returns 400
+# ======================================================================
+
+subtest 'Transaction 43 -- Folder view lifecycle' => sub {
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $file   = Mojo::File->new($tmpdir)->child('orders.csv');
+	$file->spurt(join("\n",
+		'order_no,description,qty',
+		'A1,Alpha widget,5',
+		'A10,Alpha sprocket,2',
+		'A9,Alpha doohickey,7',
+		'B3,Beta gadget,1',
+		'CA4,Gamma alpha,3',
+		'CB2,Gamma beta,9',
+	) . "\n");
+
+	my $lspec = 'path:' . $file->to_string;
+
+	# ------------------------------------------------------------------
+	# Phase 0: open the CSV directly to confirm it is parseable.
+	# ------------------------------------------------------------------
+	$t->get_ok('/open?path=' . url_escape($file->to_string))
+	  ->status_is(200, 'Phase 0: CSV opens via /open');
+
+	# ------------------------------------------------------------------
+	# Phase 1: top-level /folder renders folder cards, one per first letter.
+	# ------------------------------------------------------------------
+	$t->get_ok('/folder?l=' . url_escape($lspec) . '&col=order_no')
+	  ->status_is(200, 'Phase 1: top-level folder view returns 200')
+	  ->content_like(qr/Folder view/, 'Phase 1: page heading present')
+	  ->content_like(qr/folder-card/, 'Phase 1: folder cards rendered')
+	  ->content_like(qr/href=[^>]*prefix=A/, 'Phase 1: link to prefix A present')
+	  ->content_like(qr/href=[^>]*prefix=B/, 'Phase 1: link to prefix B present')
+	  ->content_like(qr/href=[^>]*prefix=C/, 'Phase 1: link to prefix C present');
+
+	# ------------------------------------------------------------------
+	# Phase 2: drill into prefix "A" -> items A1, A9, A10 in numeric order.
+	# ------------------------------------------------------------------
+	$t->get_ok('/folder?l=' . url_escape($lspec) . '&col=order_no&prefix=A')
+	  ->status_is(200, 'Phase 2: drill into A returns 200')
+	  ->content_like(qr/A1.*A9.*A10/s, 'Phase 2: items sorted numerically (A1, A9, A10)')
+	  ->content_like(qr/Alpha widget/, 'Phase 2: A1 description present')
+	  ->content_like(qr/order_no/,     'Phase 2: column headers rendered');
+
+	# ------------------------------------------------------------------
+	# Phase 3: drill into multi-letter prefix "CA" -> item CA4 only.
+	# ------------------------------------------------------------------
+	$t->get_ok('/folder?l=' . url_escape($lspec) . '&col=order_no&prefix=CA')
+	  ->status_is(200, 'Phase 3: drill into CA returns 200')
+	  ->content_like(qr/CA4/, 'Phase 3: item CA4 rendered')
+	  ->content_unlike(qr/CB2/, 'Phase 3: item CB2 not shown under CA');
+
+	# ------------------------------------------------------------------
+	# Phase 4: back link derived from l= when no explicit back= param.
+	# ------------------------------------------------------------------
+	$t->get_ok('/folder?l=' . url_escape($lspec) . '&col=order_no')
+	  ->status_is(200, 'Phase 4: top-level renders');
+	$t->content_unlike(qr/href="javascript:/i,
+	                   'Phase 4: no javascript: in any back link');
+	$t->content_like(qr{href="/open\?path=},
+	                 'Phase 4: back link falls through to /open URL derived from path: spec');
+
+	# ------------------------------------------------------------------
+	# Phase 5: error paths.
+	# ------------------------------------------------------------------
+	$t->get_ok('/folder')
+	  ->status_is(400, 'Phase 5: missing l= returns 400');
+
+	$t->get_ok('/folder?l=' . url_escape($lspec) . '&prefix=' . ('X' x 21))
+	  ->status_is(400, 'Phase 5: 21-char prefix rejected by DoS guard');
 };
 
 done_testing();

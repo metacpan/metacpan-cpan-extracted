@@ -58,9 +58,12 @@ use Data::HashMap::SA;
 
 SKIP: {
     skip 'RSS check requires /proc (Linux)', 1 unless -r "/proc/$$/status";
-    # Shadow memory and redzones move RSS on their own under a sanitizer.
+    # Shadow memory and redzones move RSS on their own under a sanitizer,
+    # however it got loaded: LD_PRELOAD, options, or linked into the perl.
+    open my $maps, '<', "/proc/$$/maps";
+    my $libs = join '', $ENV{LD_PRELOAD} // '', $maps ? <$maps> : ();
     skip 'RSS is not measurable under a sanitizer', 1
-        if ($ENV{LD_PRELOAD} || '') =~ /libu?[at]san/ || $ENV{ASAN_OPTIONS};
+        if $ENV{ASAN_OPTIONS} || $ENV{UBSAN_OPTIONS} || $libs =~ /lib(?:a|ub|t|l)san|clang_rt\.asan/;
     my $rss = sub { open my $f, '<', "/proc/$$/status" or return 0;
                     while (<$f>) { return $1 if /^VmRSS:\s+(\d+)/ } 0 };
     my $m = Data::HashMap::SA->new;

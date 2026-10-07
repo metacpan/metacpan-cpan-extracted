@@ -1066,6 +1066,12 @@ SUBCLASSES
 
             See documentation in SNMP::Info::Layer7::QNAP for details.
 
+        SNMP::Info::Layer7::Synology
+            Subclass for Synology NAS devices running DiskStation Manager
+            (DSM).
+
+            See documentation in SNMP::Info::Layer7::Synology for details.
+
         SNMP::Info::Layer7::Kemp
             Subclass for Kemp LoadMaster appliances.
 

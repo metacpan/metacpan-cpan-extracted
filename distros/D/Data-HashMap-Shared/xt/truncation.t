@@ -18,6 +18,6 @@ truncate($path, $sz - 1) or die;
 
 my $r = eval { Data::HashMap::Shared::II->new($path, 64) };
 ok !$r, "reopen of truncated file rejected";
-like $@, qr/invalid|incompatible|too small|corrupt/i, "meaningful error";
+like $@, qr/the file is @{[ $sz - 1 ]} bytes but its header says $sz/, "meaningful error, naming both sizes";
 
 done_testing;

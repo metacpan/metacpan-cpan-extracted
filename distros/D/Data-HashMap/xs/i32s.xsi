@@ -2,12 +2,12 @@ MODULE = Data::HashMap    PACKAGE = Data::HashMap::I32S
 PROTOTYPES: DISABLE
 
 SV*
-new(char* class, ...)
+new(SV* class, ...)
     CODE:
         EXTRACT_NEW_ARGS(_max_size, _ttl, _lru_skip);
         HashMapI32S* map = hashmap_i32s_create(_max_size, _ttl, _lru_skip);
         if (!map) croak("Failed to create HashMap::I32S");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+        RETVAL = sv_setref_pv(newSV(0), hm_class_name(aTHX_ class), (void*)map);
     OUTPUT:
         RETVAL
 
@@ -208,8 +208,8 @@ drain(SV* self_sv, UV count)
         EXTEND(SP, (count < self->size ? count : self->size) * 2);
         size_t scanned;
         for (scanned = 0; scanned < self->capacity && n < count; scanned++) {
-            if (self->iter_pos >= self->capacity) self->iter_pos = 0;
-            size_t i = self->iter_pos++;
+            if (self->drain_pos >= self->capacity) self->drain_pos = 0;
+            size_t i = self->drain_pos++;
             if (I32S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 mXPUSHi(self->nodes[i].key);
                 if (self->nodes[i].value) {
@@ -222,7 +222,7 @@ drain(SV* self_sv, UV count)
                 n++;
             }
         }
-        if (self->iter_pos >= self->capacity) self->iter_pos = 0;
+        if (self->drain_pos >= self->capacity) self->drain_pos = 0;
         HM_MAYBE_COMPACT_XS(self, hashmap_i32s_compact);
 
 void
@@ -252,8 +252,8 @@ pop(SV* self_sv)
         } else {
             size_t scanned;
             for (scanned = 0; scanned < self->capacity; scanned++) {
-                if (self->iter_pos >= self->capacity) self->iter_pos = 0;
-                size_t i = self->iter_pos++;
+                if (self->drain_pos >= self->capacity) self->drain_pos = 0;
+                size_t i = self->drain_pos++;
                 if (I32S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
@@ -267,7 +267,7 @@ pop(SV* self_sv)
                     XSRETURN(2);
                 }
             }
-            self->iter_pos = 0;
+            self->drain_pos = 0;
             XSRETURN_EMPTY;
         }
 
@@ -298,8 +298,8 @@ shift(SV* self_sv)
         } else {
             size_t scanned;
             for (scanned = 0; scanned < self->capacity; scanned++) {
-                if (self->iter_pos == 0) self->iter_pos = self->capacity;
-                size_t i = --self->iter_pos;
+                if (self->drain_pos == 0) self->drain_pos = self->capacity;
+                size_t i = --self->drain_pos;
                 if (I32S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
@@ -341,6 +341,7 @@ freeze(SV* self_sv)
     CODE:
         EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        if (self->max_size > 0xFFFFFFFFU) croak("max_size too large to freeze");
         SV* buf = newSV(22 + self->size * 32);
         SvPOK_on(buf);
         SvCUR_set(buf, 0);
@@ -375,6 +376,7 @@ freeze(SV* self_sv)
             }
           }
         }
+        if (n_written > 0xFFFFFFFFU) { SvREFCNT_dec(buf); croak("too many entries to freeze"); }
         { uint32_t actual = (uint32_t)n_written;
           memcpy(SvPVX(buf) + cnt_offset, &actual, 4); }
         RETVAL = buf;
@@ -382,7 +384,7 @@ freeze(SV* self_sv)
         RETVAL
 
 SV*
-thaw(char* class, SV* data)
+thaw(SV* class, SV* data)
     CODE:
         STRLEN dlen;
         const uint8_t* p = (const uint8_t*)SvPV(data, dlen);
@@ -412,7 +414,7 @@ thaw(char* class, SV* data)
             if (ttl == 0 && map->expires_at) hashmap_i32s_persist(map, key);
           }
         }
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+        RETVAL = sv_setref_pv(newSV(0), hm_class_name(aTHX_ class), (void*)map);
     OUTPUT:
         RETVAL
 
@@ -438,6 +440,7 @@ swap(SV* self_sv, int32_t key, SV* new_sv)
     CODE:
         EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         STRLEN _nvl; const char* _nvs = SvPV(new_sv, _nvl); bool _nvu = SvUTF8(new_sv) ? true : false;
+        if (_nvl > HM_MAX_STR_LEN) croak("value too long (max 2GB)");
         const char* old; uint32_t old_len; bool old_utf8;
         if (!hashmap_i32s_swap(self, key, _nvs, (uint32_t)_nvl, _nvu, &old, &old_len, &old_utf8)) XSRETURN_UNDEF;
         RETVAL = newSVpvn(old, old_len);
@@ -464,7 +467,7 @@ from_hash(SV* self_sv, SV* href)
         if (!SvROK(href) || SvTYPE(SvRV(href)) != SVt_PVHV)
             croak("from_hash requires a hashref");
         HV* hv = (HV*)SvRV(href);
-        if (!hashmap_i32s_reserve(self, (size_t)HvUSEDKEYS(hv))) croak("OOM during from_hash");
+        if (!hashmap_i32s_reserve(self, HM_RESERVE_FOR(self, (size_t)HvUSEDKEYS(hv)))) croak("OOM during from_hash");
         hv_iterinit(hv);
         HE* he;
         while ((he = hv_iternext(hv))) {
@@ -473,6 +476,7 @@ from_hash(SV* self_sv, SV* href)
             if (hashmap_i32s_key_is_reserved(key)) continue;
             SV* val = hv_iterval(hv, he);   /* HeVAL is NULL for a tied hash */
             STRLEN vlen; const char* vstr = SvPV(val, vlen); bool vutf8 = SvUTF8(val) ? true : false;
+            if (vlen > HM_MAX_STR_LEN) croak("value too long (max 2GB)");
             if (!hashmap_i32s_put(self, key, vstr, (uint32_t)vlen, vutf8, 0)) croak("OOM during from_hash");
         }
 
@@ -482,7 +486,7 @@ merge(SV* self_sv, SV* other_sv)
         EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         EXTRACT_OTHER_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", other_sv);
         if (self == other) XSRETURN_EMPTY;
-        if (!hashmap_i32s_reserve(self, self->size + other->size)) croak("OOM during merge");
+        if (!hashmap_i32s_reserve(self, HM_RESERVE_FOR(self, other->size))) croak("OOM during merge");
         uint32_t now = other->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
         for (i = 0; i < other->capacity; i++) {
@@ -519,8 +523,9 @@ bool
 put_ttl(SV* self_sv, int32_t key, SV* value, SV* ttl)
     CODE:
         EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
+        uint32_t _ttl = hm_ttl_arg(aTHX_ ttl);
         EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_i32s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, hm_ttl_arg(aTHX_ ttl));
+        RETVAL = hashmap_i32s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, _ttl);
     OUTPUT:
         RETVAL
 

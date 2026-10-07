@@ -2,6 +2,10 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use POSIX ();
+
+# The croaks carry strerror in the process's locale; the match below is English.
+POSIX::setlocale(POSIX::LC_ALL(), 'C');
 
 plan skip_all => 'root can bypass permissions' if $> == 0;
 

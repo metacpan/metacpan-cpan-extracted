@@ -196,17 +196,22 @@ SKIP: {
 	subtest 'a new effective uid uses a new key' => sub {
 		clear_cache();
 		$environment = 'yes';
-		chmod 0755, $dir;
-		can_revoke('read', $dir);
+		# The other uid must be able to reach the directory: root's TMPDIR
+		# may be private (pam_tmpdir makes /tmp/user/0 mode 0700).
+		my $shared = (-d '/tmp' && -w _) ? File::Temp::tempdir(DIR => '/tmp', CLEANUP => 1) : $dir;
+		chmod 0755, $shared;
+		can_revoke('read', $shared);
 		{
 			local $> = 65534;
-			if($> == 65534) {
-				is(probes_during(sub { can_revoke('read', $dir) }), 1, 'probed again as the other user');
-			} else {
+			if($> != 65534) {
 				pass('could not change the effective uid here (a one-uid user namespace)');
+			} elsif(!-d $shared) {
+				pass("uid 65534 cannot reach $shared");
+			} else {
+				is(probes_during(sub { can_revoke('read', $shared) }), 1, 'probed again as the other user');
 			}
 		}
-		is(probes_during(sub { can_revoke('read', $dir) }), 0, "root's entry is still CACHED");
+		is(probes_during(sub { can_revoke('read', $shared) }), 0, "root's entry is still CACHED");
 		clear_cache();
 	};
 }

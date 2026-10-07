@@ -4,22 +4,17 @@
 #  CI script suitable for GitHub actions and other runners
 ########################################################################
 #
-# To run locally:
-
-# Assuming your project directory name is the same as your repo name
-# repo_name=$(basename -s .git "$(git remote get-url origin)")
-# docker run --rm -it \
-#   -v "$(pwd)/builder:/builder" \
-#   -v "$(pwd):/$(basename $(pwd)) \
-#   -e GITHUB_REF_NAME=master \
-#   -e REPO=$(basename  -s .git "$(git remote get-url origin)")
-#   -e INSTALLER=cpm \
-#   debian:trixie \
-#   /bin/bash
+# Run from the root of a checked-out project:
 #
-# --or--
+#   ./builder
 #
-#  make build-ci
+# Or pass the project directory explicitly:
+#
+#   /builder /path/to/project
+#
+# To run in the standard clean-room container:
+#
+#   make build-ci
 #
 ########################################################################
 
@@ -76,10 +71,17 @@ function install_build_deps {
 # main script starts here
 ########################################################################
 
-REPO="$1"
-
 set -euo pipefail
 set -x
+
+PROJECT_DIR="${1:-$(pwd)}"
+
+if ! [[ -d "$PROJECT_DIR" ]]; then
+    echo >&2 "ERROR: project directory does not exist ($PROJECT_DIR)"
+    exit 1
+fi
+
+cd "$PROJECT_DIR"
 
 ########################################################################
 # Install the minimum set of dependencies required to do a build
@@ -106,25 +108,6 @@ elif [[ $INSTALLER =~ cpanm ]]; then
 else
     echo >&2 "ERROR: unknown installer ($INSTALLER)"
     exit 1;
-fi
-
-if [[ -n "$REPO" ]]; then
-    dir=$(basename $REPO .git)
-    if ! [[ -d "$dir" ]]; then
-        git clone $REPO
-    fi
-    cd $dir
-fi
-
-BRANCH_NAME="${BUILD_BRANCH:-${GITHUB_REF_NAME:-}}"
-if [[ -n "${BRANCH_NAME}" ]]; then
-    if [[ -d ".git" ]]; then
-        echo "checking out $BRANCH_NAME"
-        git checkout "$BRANCH_NAME"
-    fi
-else
-   BRANCH_NAME=$(git branch --show-current)
-   echo "BRANCH: $BRANCH_NAME"
 fi
 
 if [[ -e build-apt-deps ]]; then
@@ -172,7 +155,7 @@ export PERLCRITICRC=$(find . -name '.perlcriticrc' -o -name 'perlcriticrc')
 set +x
                            echo "+-------------------------------------------------"
                            echo "|      BUILD_DATE: $(date +'%Y-%m-%d %H:%M:%S')"
-                           echo "|          BRANCH: $BRANCH_NAME"
+                           echo "|     PROJECT_DIR: $(pwd)"
                            echo "|            SCAN: ${SCAN:-on}"
                            echo "| SYNTAX_CHECKING: ${SYNTAX_CHECKING:-on}"
 test -n "$PERLTIDYRC" &&   echo "|        PERLTIDY: ${PERLTIDYRC:-disabled}"
@@ -208,6 +191,12 @@ install_build_deps
 #-----------------------------------------------------------------------
 # export NO_ECHO=""
 ########################################################################
-export PERL5LIB=$(pwd)/local/lib/perl5
+set -a
+PERL5LIB="$(pwd)/local/lib/perl5"
+test ! -e ./builder.env || . ./builder.env
+set +a
 
-time make CMB_VERSION_DRIFT=ignore NO_ECHO=
+make clean
+make builder-pre
+time make
+make builder-post

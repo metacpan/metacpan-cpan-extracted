@@ -1,2 +1,13 @@
-EV::Redis               T_PTROBJ
+EV::Redis               T_EVREDIS
 EV::Loop                T_PTROBJ
+sat_iv                  T_SAT_IV
+
+INPUT
+T_EVREDIS
+	$var = ev_redis_from_sv($arg)
+T_SAT_IV
+	$var = sv_to_sat_iv($arg)
+
+OUTPUT
+T_EVREDIS
+	sv_setref_pv($arg, \"EV::Redis\", (void*)$var);

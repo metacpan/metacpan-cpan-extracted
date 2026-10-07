@@ -126,6 +126,13 @@ my %ledger = (
 
 	# _safe_back_url: XSS-unsafe back= must not reach the rendered page
 	'GET./bar.200.back_rejected' => 'GET /bar?back=javascript:alert(1) renders back_url as /',
+
+	# folder_view action (added 0.010.0) -- all documented return paths
+	'GET./folder.200'                 => 'GET /folder?l=...&col=... 200 HTML folder view',
+	'GET./folder.200.drill'           => 'GET /folder?l=...&prefix=X 200 HTML items rendered',
+	'GET./folder.400.no_l'            => 'GET /folder (no l=) 400 plain text',
+	'GET./folder.404.no_source'       => 'GET /folder?l=path:/nonexistent 404 plain text',
+	'GET./folder.400.prefix_too_long' => 'GET /folder?prefix=<21+ chars> 400 plain text',
 );
 
 # ---------------------------------------------------------------------------
@@ -1030,6 +1037,63 @@ subtest 'GET /bar?back=javascript:alert(1) -- XSS-unsafe back= falls back to /' 
 		  ->content_unlike(qr/href="javascript:/i, 'javascript: URL not in page href attributes');
 	}
 	delete $ledger{'GET./bar.200.back_rejected'};
+};
+
+# ---------------------------------------------------------------------------
+# GET /folder -- folder_view action (added 0.010.0)
+#
+# folder_view documented return paths:
+#   400 -- missing l= param
+#   400 -- prefix exceeds MAX_PREFIX_LEN (DoS guard)
+#   404 -- no data source (bad path)
+#   200 -- top-level folder grid rendered
+#   200 -- drill into prefix: item table rendered
+# ---------------------------------------------------------------------------
+
+subtest 'GET /folder (no l= param) -- 400 Missing l= parameter' => sub {
+	$t->get_ok('/folder')
+	  ->status_is(400, 'missing l= returns 400')
+	  ->content_like(qr/Missing l= parameter/, 'correct error text');
+	$t->get_ok('/folder?col=order_no')
+	  ->status_is(400, 'l= absent with col= also returns 400');
+	delete $ledger{'GET./folder.400.no_l'};
+};
+
+subtest 'GET /folder?prefix=<21 chars> -- 400 DoS guard' => sub {
+	my $long_prefix = 'A' x 21;
+	$t->get_ok('/folder?l=table:' . $SALES_TABLE . '&prefix=' . $long_prefix)
+	  ->status_is(400, '21-char prefix rejected')
+	  ->content_like(qr/Prefix too long/, 'correct error text');
+	delete $ledger{'GET./folder.400.prefix_too_long'};
+};
+
+subtest 'GET /folder?l=path:/nonexistent -- 404' => sub {
+	$t->get_ok('/folder?l=' . url_escape('path:/nonexistent/nosuchfile.csv'))
+	  ->status_is(404, 'non-existent path returns 404');
+	delete $ledger{'GET./folder.404.no_source'};
+};
+
+subtest 'GET /folder -- top-level folder grid (200)' => sub {
+	my $dir  = tempdir(CLEANUP => 1);
+	my $file = Mojo::File->new($dir, 'orders.csv');
+	$file->spew("order_no,item\nA10,Widget\nA20,Gadget\nB5,Doohickey\nCA3,Sprocket\n");
+	$t->get_ok('/folder?l=path:' . url_escape($file->to_string) . '&col=order_no')
+	  ->status_is(200, 'top-level folder view returns 200')
+	  ->content_type_like(qr{text/html}, 'response is HTML')
+	  ->content_like(qr/Folder view/, 'page contains "Folder view" heading')
+	  ->content_like(qr/folder-card/, 'folder cards are rendered');
+	delete $ledger{'GET./folder.200'};
+};
+
+subtest 'GET /folder?prefix=A -- drill-down renders items (200)' => sub {
+	my $dir  = tempdir(CLEANUP => 1);
+	my $file = Mojo::File->new($dir, 'drill.csv');
+	$file->spew("order_no,item\nA10,Widget\nA20,Gadget\nB5,Doohickey\n");
+	$t->get_ok('/folder?l=path:' . url_escape($file->to_string)
+	           . '&col=order_no&prefix=A')
+	  ->status_is(200, 'drill-down into prefix A returns 200')
+	  ->content_like(qr/Widget|Gadget/, 'items for prefix A are rendered');
+	delete $ledger{'GET./folder.200.drill'};
 };
 
 # ---------------------------------------------------------------------------

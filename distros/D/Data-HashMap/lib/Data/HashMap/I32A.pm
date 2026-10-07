@@ -2,7 +2,7 @@ package Data::HashMap::I32A;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub import {
     $^H{"Data::HashMap::I32A/hm_i32a_put"}        = 1;
@@ -39,7 +39,7 @@ __END__
 
 =head1 NAME
 
-Data::HashMap::I32A - hash map from int32 keys to any Perl value values
+Data::HashMap::I32A - hash map from int32 keys to any Perl value
 
 =head1 SYNOPSIS
 

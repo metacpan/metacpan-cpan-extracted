@@ -1,3 +1,7 @@
+0.020 2026-10-07
+  [Test Improvement]
+    * Remove Test::SPVM::Sys::Socket::XXX classes from tests.
+      I've rewritten the server tests from the unreliable implementation using Perl's fork to a portable test suite using only SPVM::Go.
 0.019 2026-02-09
   [Incompatible Changes]
     * Remove Deadline field and update set_deadline to set both ReadDeadline and WriteDeadline for Go compatibility.

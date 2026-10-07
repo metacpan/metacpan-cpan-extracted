@@ -20,6 +20,15 @@ ok dies { CLASS->new(
   parse => 'multiline-cmt.sii',
 )->raw_data }, 'multi-line comment';
 
+is CLASS->new(
+  mount => ['t/fixtures/syntax'],
+  parse => 'multi-block.sii',
+)->raw_data, {
+  foo => { unit => 1 },
+  bar => { unit => 2 },
+  baz => { unit => 3 },
+}, 'multiple unit definition blocks per file';
+
 ok dies { CLASS->new(
   mount => ['t/fixtures/syntax'],
   parse => 'nested-block.sii',

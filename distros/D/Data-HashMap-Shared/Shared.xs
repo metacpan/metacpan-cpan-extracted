@@ -38,23 +38,21 @@ static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
     (handle)->lock_depth++; \
     SAVEDESTRUCTOR_X(shm_rdunlock_cleanup, (void*)(handle))
 
-/* ---- Exception-safe guard for a wrlock + seqlock write section ----
- * Releases the write lock and closes the seqlock on scope exit, normal or by
- * die(): a die() that left the seqlock odd would self-deadlock the map until
- * stale-lock recovery.  Batch writes materialise their arguments before the
- * lock, so no tied/overloaded magic runs inside the section. */
-static void shm_wrseq_unlock_cleanup(pTHX_ void *ptr) {
-    ShmHandle *h = (ShmHandle *)ptr;
-    shm_seqlock_write_end(&h->hdr->seq);
-    shm_rwlock_wrunlock(h);
-    shm_guard_leave(h);
-}
-
-#define WRSEQ_GUARD(handle) \
+/* ---- The wrlock + seqlock write section of a batch write ----
+ * No destructor releases it, on purpose.  The batch materialises its arguments
+ * before the lock, so nothing inside runs Perl code or croaks -- except Perl's
+ * own pending-signals croak, raised from its C signal handler in the middle of
+ * a mutation.  Unwinding must then leave the lock held and the seqlock odd, for
+ * stale-lock recovery once the process is gone: a release here would publish a
+ * half-written table -- a resize midway.  The batch checks for signals every
+ * few entries (shm_sig_check_every), so that croak cannot reach it. */
+#define WRSEQ_BEGIN(handle) \
     shm_rwlock_wrlock(handle); \
-    shm_seqlock_write_begin(&(handle)->hdr->seq); \
-    (handle)->lock_depth++; \
-    SAVEDESTRUCTOR_X(shm_wrseq_unlock_cleanup, (void*)(handle))
+    shm_seqlock_write_begin(&(handle)->hdr->seq)
+
+#define WRSEQ_END(handle) \
+    shm_seqlock_write_end(&(handle)->hdr->seq); \
+    shm_rwlock_wrunlock(handle)
 
 /* Exception-safe free() for a scratch buffer held across newSVpvn(), so an OOM
  * croak cannot leak it.  free(), not Safefree: the buffer comes from the C
@@ -94,12 +92,175 @@ static const char *shm_write_path_arg(pTHX_ SV *sv, const char *what,
 
 /* ---- Helper macros ---- */
 
-/* Constructor sizes arrive as UV and reach the C layer as uint32_t: without
- * this, new($path, 2**32+100) silently builds a 100-entry map. */
-#define CK_U32(val, what, classname) \
-    do { if ((UV)(val) > (UV)0xFFFFFFFF) \
-            croak("%s: %s %" UVuf " exceeds the maximum of %u", \
-                  classname, what, (UV)(val), 0xFFFFFFFFU); } while (0)
+/* A count read from the SV: a UV parameter would wrap -1 to "everything". */
+static UV shm_count_arg(pTHX_ SV *sv, const char *what, const char *classname) {
+    NV nv;
+    SvGETMAGIC(sv);
+    if (SvIOK(sv)) {
+        if (!SvIsUV(sv) && SvIVX(sv) < 0) croak("%s: %s must not be negative", classname, what);
+        return SvUVX(sv);
+    }
+    nv = SvNV_nomg(sv);
+    if (nv < 0) croak("%s: %s must not be negative", classname, what);
+    if (!(nv >= 1)) return 0;   /* also NaN */
+    return nv >= (NV)UV_MAX ? UV_MAX : (UV)nv;
+}
+
+/* A size argument checked against uint32_t, or `dflt` when it was not passed. */
+static inline uint32_t shm_u32_arg(pTHX_ SV *sv, const char *what, const char *classname, uint32_t dflt) {
+    UV v;
+    if (!sv) return dflt;
+    if ((SvFLAGS(sv) & (SVf_IOK|SVf_IVisUV|SVs_GMG)) == SVf_IOK && (UV)SvIVX(sv) <= 0xFFFFFFFFu)
+        return (uint32_t)SvIVX(sv);
+    v = shm_count_arg(aTHX_ sv, what, classname);
+    if (v > 0xFFFFFFFFu)
+        croak("%s: %s %" UVuf " exceeds the maximum of %u",
+              classname, what, v, 0xFFFFFFFFU);
+    return (uint32_t)v;
+}
+
+/* An object invocant would stringify to "Class=SCALAR(0x...)". */
+static const char *shm_invocant_class(pTHX_ SV *sv, const char *classname) {
+    if (sv_isobject(sv))
+        return HvNAME_get(SvSTASH(SvRV(sv)));
+    if (SvROK(sv))
+        croak("%s: constructor invocant must be a class name or object", classname);
+    return SvPV_nolen(sv);
+}
+
+/* to_hash copies each entry under the read lock -- an integer key or value
+ * raw into `raw`, a string key's bytes into `keys` (shm_pack_key), a string
+ * value as an SV into `vals` -- and builds the hash from the copies here, once
+ * the lock is released: making SVs, formatting keys and hashing, most of the
+ * cost, then run without it.  `keys` or `vals` is NULL where that side is an
+ * integer. */
+#define SHM_KEY_UTF8_BIT 0x80000000u
+static STRLEN shm_pack_key(pTHX_ SV *keys, STRLEN used, const char *p, uint32_t len, int utf8) {
+    STRLEN need = used + sizeof(uint32_t) + len;
+    uint32_t word = len | (utf8 ? SHM_KEY_UTF8_BIT : 0);
+    char *d;
+    if (need > SvLEN(keys)) SvGROW(keys, need + need / 4);
+    d = SvPVX(keys) + used;
+    memcpy(d, &word, sizeof word);
+    memcpy(d + sizeof word, p, len);
+    return need;
+}
+
+static SV *shm_copies_to_hashref(pTHX_ SV *raw, SV *keys, AV *vals, SSize_t n) {
+    HV *hv = newHV();
+    const IV *r = raw ? (const IV *)SvPVX(raw) : NULL;
+    const char *kb = keys ? SvPVX(keys) : NULL;
+    SV **s = vals ? AvARRAY(vals) : NULL;
+    SSize_t ri = 0, vi = 0, j;
+    STRLEN ko = 0;
+    hv_ksplit(hv, n);
+    for (j = 0; j < n; j++) {
+        char kbuf[24];
+        const char *kp = kbuf;
+        I32 klen;
+        SV *val;
+        if (!keys) {
+            klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, r[ri++]);
+        } else {
+            uint32_t word;
+            memcpy(&word, kb + ko, sizeof word);
+            kp = kb + ko + sizeof word;
+            klen = (I32)(word & ~SHM_KEY_UTF8_BIT);
+            ko += sizeof word + (STRLEN)klen;
+            if (word & SHM_KEY_UTF8_BIT) klen = -klen;
+        }
+        if (!vals) val = newSViv(r[ri++]);
+        else { val = s[vi++]; SvREFCNT_inc_simple_void_NN(val); }
+        if (!hv_store(hv, kp, klen, val, 0)) SvREFCNT_dec(val);
+    }
+    return newRV_noinc((SV *)hv);
+}
+
+/* keys, values and items copy under the read lock too.  An integer waits in the
+ * stack slot its SV will take, and the slots get their mortals here, once the
+ * lock is released.  A string is made an SV under the lock, unless its shard
+ * holds SHM_LIST_PACK_MIN entries: then it waits in `strs`, packed by
+ * shm_pack_key, its slot NULL.  Each of the `n` entries has `fields` slots,
+ * field f a string where bit f of `str_fields` is set. */
+#define SHM_LIST_PACK_MIN 4096u
+static void shm_stack_copies_to_svs(pTHX_ SV **slot, SSize_t n, int fields, int str_fields, SV *strs) {
+    const char *p = strs ? SvPVX(strs) : NULL;
+    SSize_t j;
+    int f;
+    for (j = 0; j < n; j++) {
+        for (f = 0; f < fields; f++, slot++) {
+            if (!(str_fields >> f & 1)) {
+                *slot = sv_2mortal(newSViv(PTR2IV(*slot)));
+            } else if (!*slot) {
+                uint32_t word, len;
+                memcpy(&word, p, sizeof word);
+                len = word & ~SHM_KEY_UTF8_BIT;
+                *slot = sv_2mortal(newSVpvn(p + sizeof word, len));
+                if (word & SHM_KEY_UTF8_BIT) SvUTF8_on(*slot);
+                p += sizeof word + len;
+            }
+        }
+    }
+}
+
+/* The PPCODE body of keys, values and items on handle `h`.  Every shard's read
+ * lock is taken in turn and all are held until the last copy is made, as with
+ * to_hash.  Write-lock updates are blocked; fast atomic counter updates can
+ * still proceed.  `copy` stores an entry's fields in order with SHM_COPY_INT
+ * and SHM_COPY_STR. */
+#define SHM_LIST_COPIES(node_type, fields, str_fields, copy) \
+    STMT_START { \
+        SV *strs = NULL; \
+        SSize_t n = 0; \
+        STRLEN used = 0; \
+        uint32_t ns = h->shard_handles ? h->num_shards : 1; \
+        ENTER; \
+        for (uint32_t si = 0; si < ns; si++) { \
+            ShmHandle *sh = h->shard_handles ? h->shard_handles[si] : h; \
+            ShmHeader *hdr = sh->hdr; \
+            node_type *nodes = (node_type *)sh->nodes; \
+            RDLOCK_GUARD(sh); \
+            uint32_t now = sh->expires_at ? shm_now() : 0, left = hdr->size; \
+            const int pack = (str_fields) && left >= SHM_LIST_PACK_MIN; \
+            EXTEND(SP, (SSize_t)left * (fields)); \
+            if (pack) { \
+                if (!strs) strs = sv_2mortal(newSV(1)); \
+                SvGROW(strs, used + (STRLEN)left * 16 + 16); \
+            } \
+            for (uint32_t i = 0; i < hdr->table_cap && left; i++) { \
+                if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now)) { \
+                    copy; \
+                    n++; left--; \
+                } \
+            } \
+            PERL_UNUSED_VAR(pack); \
+        } \
+        LEAVE; \
+        PERL_UNUSED_VAR(used); \
+        shm_stack_copies_to_svs(aTHX_ SP - n * (fields) + 1, n, fields, str_fields, strs); \
+    } STMT_END
+#define SHM_COPY_INT(value) (*++SP = INT2PTR(SV *, (IV)(value)))
+#define SHM_COPY_STR(off, len) \
+    STMT_START { \
+        char _ib[SHM_INLINE_MAX]; uint32_t _l; \
+        const int _utf8 = SHM_UNPACK_UTF8(nodes[i].len); \
+        const char *_p = shm_str_ptr(nodes[i].off, nodes[i].len, sh->arena, sh->hdr->arena_cap, _ib, &_l); \
+        if (pack) { \
+            used = shm_pack_key(aTHX_ strs, used, _p, _l, _utf8); \
+            *++SP = NULL; \
+        } else { \
+            *++SP = sv_2mortal(newSVpvn(_p, _l)); \
+            if (_utf8) SvUTF8_on(*SP); \
+        } \
+    } STMT_END
+
+/* A regular file's type bits pass, so (stat $file)[2] works as a mode. */
+static mode_t shm_file_mode(pTHX_ UV mode, const char *classname) {
+    UV type = mode & ~(UV)07777;
+    if (type && type != S_IFREG)
+        croak("%s: file_mode %#" UVof " exceeds the maximum of 07777", classname, mode);
+    return (mode_t)(mode & 07777);
+}
 
 #define SHM_PATH_ARG(sv, what, classname) \
     (SvGETMAGIC(sv), SvOK(sv) ? shm_path_arg(aTHX_ (sv), (what), (classname)) : NULL)
@@ -122,12 +283,31 @@ static const char *shm_write_path_arg(pTHX_ SV *sv, const char *what,
             SvREFCNT_inc_simple_void_NN(sv); \
          } } while (0)
 
+/* A new writable handle, its write sections watching this interpreter's count
+ * of signals awaiting their handlers. */
+#define SHM_RETURN_MAP(map, classname, class) \
+    shm_set_sig_count((map), &PL_sig_pending); \
+    RETVAL = sv_setref_pv(newSV(0), (class), (void*)(map)); \
+    CK_MAX_SIZE((map), (classname), RETVAL)
+
+/* The exact class answers nearly every call; sv_derived_from, which costs more
+ * than a lookup, is left to subclasses. */
+static int shm_isa(pTHX_ SV *sv, const char *classname) {
+    if (!sv_isobject(sv)) return 0;
+    HV *stash = SvSTASH(SvRV(sv));
+    const char *name = HvNAME_get(stash);
+    STRLEN len = strlen(classname);
+    return (name && (STRLEN)HvNAMELEN_get(stash) == len && memEQ(name, classname, len))
+        || sv_derived_from(sv, classname);
+}
+
 #define EXTRACT_MAP(classname, sv) \
-    if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
+    if (!shm_isa(aTHX_ sv, classname)) \
         croak("Expected a %s object", classname); \
     ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed %s object", classname); \
     ShmHandle *h0 = h; PERL_UNUSED_VAR(h0); \
+    const char *shm_class = classname; PERL_UNUSED_VAR(shm_class); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
 /* Re-read the handle after a call that can run Perl code: argument magic may
@@ -149,40 +329,41 @@ static const char *shm_write_path_arg(pTHX_ SV *sv, const char *what,
 #define EXTRACT_STR_KEY(sv) \
     STRLEN _klen; \
     const char* _kstr = SvPV(sv, _klen); \
-    if (_klen > SHM_MAX_STR_LEN) croak("key too long (max 1GB)"); \
+    if (_klen > SHM_MAX_STR_LEN) croak("%s: key too long (max 1GB)", shm_class); \
     bool _kutf8 = SvUTF8(sv) ? true : false
 
 #define EXTRACT_STR_VAL(sv) \
     STRLEN _vlen; \
     const char* _vstr = SvPV(sv, _vlen); \
-    if (_vlen > SHM_MAX_STR_LEN) croak("value too long (max 1GB)"); \
+    if (_vlen > SHM_MAX_STR_LEN) croak("%s: value too long (max 1GB)", shm_class); \
     bool _vutf8 = SvUTF8(sv) ? true : false
 
 #define EXTRACT_STR_EXPECTED(esv) \
     STRLEN _elen; \
     const char* _estr = SvPV(esv, _elen); \
-    if (_elen > SHM_MAX_STR_LEN) croak("expected value too long (max 1GB)")
+    if (_elen > SHM_MAX_STR_LEN) croak("%s: expected value too long (max 1GB)", shm_class)
 
 #define EXTRACT_STR_EXPECTED_DESIRED(esv, dsv) \
     EXTRACT_STR_EXPECTED(esv); \
     SHM_COPY_IF_MAGICAL(esv, _estr, _elen); \
     STRLEN _dlen; \
     const char* _dstr = SvPV(dsv, _dlen); \
-    if (_dlen > SHM_MAX_STR_LEN) croak("desired value too long (max 1GB)"); \
+    if (_dlen > SHM_MAX_STR_LEN) croak("%s: desired value too long (max 1GB)", shm_class); \
     bool _dutf8 = SvUTF8(dsv) ? true : false
 
 #define REQUIRE_TTL(h) \
     { ShmHandle *_th = (h)->shard_handles ? (h)->shard_handles[0] : (h); \
-      if (!_th->expires_at) croak("operation requires a TTL-enabled map (pass ttl > 0 to constructor)"); }
+      if (!_th->expires_at) croak("%s: operation requires a TTL-enabled map (pass ttl > 0 to constructor)", shm_class); }
 
 #define EXTRACT_CURSOR(classname, sv) \
-    if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
+    if (!shm_isa(aTHX_ sv, classname)) \
         croak("Expected a %s object", classname); \
     ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(sv))); \
     if (!c) croak("Attempted to use a destroyed %s cursor", classname); \
     if (c->owner && !SvIV(c->owner)) \
         croak("Attempted to use a %s cursor whose map was destroyed", classname); \
     ShmCursor *c0 = c; PERL_UNUSED_VAR(c0); \
+    const char *shm_class = classname; PERL_UNUSED_VAR(shm_class); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))   /* pin the invocant across the method (reentrant-DESTROY UAF guard) */
 
 /* Cursor counterpart of REEXTRACT_MAP: same explicit-DESTROY hazard, applied

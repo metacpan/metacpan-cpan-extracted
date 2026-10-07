@@ -8,20 +8,17 @@ use Test::TCP qw(empty_port);
 use EV;
 use EV::Redis;
 
-# A password-protected server exercises the AUTH error/success paths, which
-# are otherwise completely untested.
 my $port = empty_port;
 my $redis_server;
 eval {
     $redis_server = Test::RedisServer->new(
-        conf => { port => $port, requirepass => 'sekret' },
+        conf => { port => $port, bind => '127.0.0.1', requirepass => 'sekret' },
     );
 } or plan skip_all => 'redis-server is required for this test';
 
 plan tests => 5;
 
-# 1. A command issued before AUTH is rejected with NOAUTH, delivered to the
-#    command callback as an error (not via on_error).
+# a command before AUTH gets NOAUTH in its own callback, not via on_error
 {
     my $r = EV::Redis->new;
     $r->on_error(sub { });
@@ -38,7 +35,6 @@ plan tests => 5;
         'command before auth returns NOAUTH error';
 }
 
-# 2. AUTH with the correct password succeeds and unlocks subsequent commands.
 {
     my $r = EV::Redis->new;
     $r->on_error(sub { });
@@ -57,7 +53,6 @@ plan tests => 5;
     ok !$set_err,  'command after successful auth succeeds';
 }
 
-# 3. AUTH with a wrong password is rejected.
 {
     my $r = EV::Redis->new;
     $r->on_error(sub { });

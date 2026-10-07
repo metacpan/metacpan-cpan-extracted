@@ -36,7 +36,7 @@ static volatile long plain;
 static int inside, overlap;
 
 static ShmHandle *open_map(const char *p) {
-    char eb[256];
+    char eb[SHM_ERR_BUFLEN];
     ShmHandle *h = shm_ii_create(p, 64, 0, 0, 0, 0, 0600, eb);
     if (!h) { fprintf(stderr, "open %s: %s\n", p, eb); exit(2); }
     return h;

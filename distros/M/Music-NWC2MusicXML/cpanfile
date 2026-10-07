@@ -35,6 +35,7 @@ on 'test' => sub {
 	requires 'Test::Mockingbird';
 	requires 'Test::More';
 	requires 'Test::Most';
+	requires 'Test::Needs';
 	requires 'Test::Returns';
 	requires 'Test::Without::Module';
 	requires 'XML::PP';   # pure-Perl XML parser; no libxml2 dependency required

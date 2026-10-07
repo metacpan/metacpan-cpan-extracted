@@ -3,7 +3,7 @@ package Game::Oware::Board;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant HOUSES    => 12;
 use constant CELLS     => 14;
@@ -114,7 +114,7 @@ Game::Oware::Board - the twelve houses, the two stores, and the sowing
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

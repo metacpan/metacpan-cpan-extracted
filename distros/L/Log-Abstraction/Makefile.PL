@@ -36,7 +36,7 @@ WriteMakefile(
 		'Sys::Syslog' => 0.28,
 		'Scalar::Util'=> 0,
 		'Socket' => 0,
-		'Sub::Private' => 0.05,
+		'Sub::Private' => 0.06,
 		'Time::HiRes' => 0,
 		'Time::Local' => 0,
 	},

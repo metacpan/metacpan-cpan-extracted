@@ -25,6 +25,7 @@ t/07-shots.t
 t/08-bot.t
 t/09-no-io.t
 t/10-terminal.t
+t/11-pick.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

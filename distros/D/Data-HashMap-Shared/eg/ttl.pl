@@ -4,7 +4,7 @@ use warnings;
 use Data::HashMap::Shared::SI;
 
 # TTL-enabled map: entries expire after 2 seconds by default
-my $map = Data::HashMap::Shared::SI->new('/tmp/demo_ttl.shm', 10000, 0, 2);
+my $map = Data::HashMap::Shared::SI->new("/tmp/dhms_ttl_$$.shm", 10000, 0, 2);
 
 shm_si_put $map, "counter", 100;
 shm_si_put_ttl $map, "permanent", 999, 0;  # ttl=0 means permanent

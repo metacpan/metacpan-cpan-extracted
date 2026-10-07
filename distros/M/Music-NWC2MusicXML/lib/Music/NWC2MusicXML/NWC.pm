@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(open close);
 
-our $VERSION = '0.001.1';
+our $VERSION = '0.001.2';
 
 use Carp qw(croak carp);
 use Readonly;
@@ -56,7 +56,7 @@ Music::NWC2MusicXML::NWC - Binary NWC container decoder.
 
 =head1 VERSION
 
-0.001.1
+0.001.2
 
 =head1 SYNOPSIS
 
@@ -217,6 +217,7 @@ sub read {
 
 	my $data;
 	{
+		no autodie 'open';	# autodie would swallow the open failure before or-croak fires
 		open my $fh, '<:raw', $filename
 			or croak _fmt_msg('error_not_a_file', "$filename: $!");
 		local $/;

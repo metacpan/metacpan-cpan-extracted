@@ -178,4 +178,40 @@ req
 
 tx->note;
 
+req
+  GET('http://something1.test/ascii'),
+  res {
+    code 200;
+    content "<html>some html</html>\n";
+    content_type 'text/html';
+    charset 'UTF-8';
+    content_length_ok;
+  },
+  'html file without .html extension';
+
+tx->note;
+
+req
+  GET('http://custom404.test/foo/bar'),
+  res {
+    code 200;
+    content "<html>bar</html>\n";
+    content_type 'text/html';
+    charset 'UTF-8';
+    content_length_ok;
+  },
+  'html file in subdirectory without .html extension';
+
+tx->note;
+
+req
+  GET('http://custom404.test/foo/bar/'),
+  res {
+    code 404;
+    content "<html>custom 404</html>\n";
+  },
+  'html file without .html extension with trailing slash is not found';
+
+tx->note;
+
 done_testing

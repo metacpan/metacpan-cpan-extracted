@@ -475,13 +475,27 @@ static int __redisGetSubscribeCallback(redisAsyncContext *ac, redisReply *reply,
     int pvariant;
     char *stype;
     sds sname = NULL;
+    const char *protoerr; /* local patch (EV::Redis/3) */
 
     /* Match reply with the expected format of a pushed message.
      * The type and number of elements (3 to 4) are specified at:
      * https://redis.io/docs/latest/develop/interact/pubsub/#format-of-pushed-messages */
     if ((reply->type == REDIS_REPLY_ARRAY && !(c->flags & REDIS_SUPPORTS_PUSH) && reply->elements >= 3) ||
         reply->type == REDIS_REPLY_PUSH) {
-        assert(reply->element[0]->type == REDIS_REPLY_STRING);
+        /* local patch (EV::Redis/3): subscribe-shaped traffic always
+         * has three elements or more; anything shorter fails it. */
+        if (reply->elements < 3) {
+            protoerr = "Protocol error: short pub/sub message";
+            goto protocol_error;
+        }
+        /* local patch (EV::Redis/3): a hostile server must fail the
+         * connection, not abort the process. */
+        if (reply->element[0] == NULL ||
+            reply->element[0]->type != REDIS_REPLY_STRING)
+        {
+            protoerr = "Protocol error: malformed pub/sub message";
+            goto protocol_error;
+        }
         stype = reply->element[0]->str;
         pvariant = (tolower(stype[0]) == 'p') ? 1 : 0;
 
@@ -503,7 +517,12 @@ static int __redisGetSubscribeCallback(redisAsyncContext *ac, redisReply *reply,
 
         /* If this is an subscribe reply decrease pending counter. */
         if (strcasecmp(stype+pvariant,"subscribe") == 0) {
-            assert(cb != NULL);
+            /* local patch (EV::Redis/3): a confirmation for a channel with
+             * no subscription fails the connection. */
+            if (cb == NULL) {
+                protoerr = "Protocol error: subscribe confirmation without a subscription";
+                goto protocol_error;
+            }
             cb->pending_subs -= 1;
 
         } else if (strcasecmp(stype+pvariant,"unsubscribe") == 0) {
@@ -514,7 +533,14 @@ static int __redisGetSubscribeCallback(redisAsyncContext *ac, redisReply *reply,
 
             /* If this was the last unsubscribe message, revert to
              * non-subscribe mode. */
-            assert(reply->element[2]->type == REDIS_REPLY_INTEGER);
+            /* local patch (EV::Redis/3): a confirmation without a
+             * subscriber count fails the connection. */
+            if (reply->element[2] == NULL ||
+                reply->element[2]->type != REDIS_REPLY_INTEGER)
+            {
+                protoerr = "Protocol error: unsubscribe confirmation without a subscriber count";
+                goto protocol_error;
+            }
 
             /* Unset subscribed flag only when no pipelined pending subscribe
              * or pending unsubscribe replies. */
@@ -537,6 +563,12 @@ static int __redisGetSubscribeCallback(redisAsyncContext *ac, redisReply *reply,
         __redisShiftCallback(&ac->sub.replies,dstcb);
     }
     return REDIS_OK;
+protocol_error:
+    /* local patch (EV::Redis/3): sdsfree(NULL) is safe. */
+    sdsfree(sname);
+    __redisSetError(&(ac->c), REDIS_ERR_PROTOCOL, protoerr);
+    __redisAsyncCopyError(ac);
+    return REDIS_ERR;
 oom:
     __redisSetError(&(ac->c), REDIS_ERR_OOM, "Out of memory");
     __redisAsyncCopyError(ac);
@@ -567,6 +599,23 @@ static int redisIsSubscribeReply(redisReply *reply) {
            !strncasecmp(str, "unsubscribe", len);
 }
 
+/* local patch (EV::Redis/3): the reader counts an attribute inside an
+ * aggregate as one of its elements, which pushes the last element into
+ * the next reply. */
+static int __redisHasNestedAttr(const redisReply *r) {
+    size_t i;
+    if (r->type != REDIS_REPLY_ARRAY && r->type != REDIS_REPLY_MAP &&
+        r->type != REDIS_REPLY_SET && r->type != REDIS_REPLY_PUSH &&
+        r->type != REDIS_REPLY_ATTR)
+        return 0;
+    for (i = 0; i < r->elements; i++) {
+        const redisReply *e = r->element[i];
+        if (e != NULL && (e->type == REDIS_REPLY_ATTR || __redisHasNestedAttr(e)))
+            return 1;
+    }
+    return 0;
+}
+
 void redisProcessCallbacks(redisAsyncContext *ac) {
     redisContext *c = &(ac->c);
     void *reply = NULL;
@@ -586,6 +635,17 @@ void redisProcessCallbacks(redisAsyncContext *ac) {
             break;
         }
 
+        /* local patch (EV::Redis/3): fail the connection rather than hand
+         * that element to the wrong callback. */
+        if (__redisHasNestedAttr((redisReply*)reply)) {
+            c->reader->fn->freeObject(reply);
+            __redisSetError(c, REDIS_ERR_PROTOCOL,
+                "Protocol error: attribute inside an aggregate reply");
+            __redisAsyncCopyError(ac);
+            __redisAsyncDisconnect(ac);
+            return;
+        }
+
         /* Keep track of push message support for subscribe handling */
         if (redisIsPushReply(reply)) c->flags |= REDIS_SUPPORTS_PUSH;
 
@@ -595,6 +655,20 @@ void redisProcessCallbacks(redisAsyncContext *ac) {
          * either RESP2 or RESP3 mode. */
         if (redisIsSpontaneousPushReply(reply)) {
             __redisRunPushCallback(ac, reply);
+            c->reader->fn->freeObject(reply);
+            /* local patch (EV::Redis/3): honour a free requested by a push
+             * callback before waiting for any pending command reply. */
+            if (c->flags & REDIS_FREEING) {
+                __redisAsyncFree(ac);
+                return;
+            }
+            continue;
+        }
+
+        /* local patch (EV::Redis/3): attributes arrive as a reply of
+         * their own, ahead of the reply they belong to; drop them so
+         * that reply reaches its command. */
+        if (((redisReply*)reply)->type == REDIS_REPLY_ATTR) {
             c->reader->fn->freeObject(reply);
             continue;
         }
@@ -625,10 +699,23 @@ void redisProcessCallbacks(redisAsyncContext *ac) {
                 __redisAsyncDisconnect(ac);
                 return;
             }
-            /* No more regular callbacks and no errors, the context *must* be subscribed. */
-            assert(c->flags & REDIS_SUBSCRIBED);
-            if (c->flags & REDIS_SUBSCRIBED)
-                __redisGetSubscribeCallback(ac,reply,&cb);
+            /* No more regular callbacks and no errors: an unsolicited
+             * reply, or a pub/sub message on a subscribed context.
+             * local patch (EV::Redis/3): either failure fails the
+             * connection instead of aborting the process. */
+            if (!(c->flags & REDIS_SUBSCRIBED)) {
+                c->reader->fn->freeObject(reply);
+                __redisSetError(c, REDIS_ERR_PROTOCOL,
+                    "Protocol error: unsolicited reply from server");
+                __redisAsyncCopyError(ac);
+                __redisAsyncDisconnect(ac);
+                return;
+            }
+            if (__redisGetSubscribeCallback(ac,reply,&cb) != REDIS_OK) {
+                c->reader->fn->freeObject(reply);
+                __redisAsyncDisconnect(ac);
+                return;
+            }
         }
 
         if (cb.fn != NULL) {

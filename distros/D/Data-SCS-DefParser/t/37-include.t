@@ -11,6 +11,11 @@ my $data = CLASS->new(
 is $data->{foo}{attr}, 'ok', 'include attribute, file name txt';
 is $data->{bar}{unit}, 'ok', 'include unit block, file name sui';
 
+is CLASS->new(
+  mount => ['t/fixtures/include'],
+  parse => 'sub.sii',
+)->raw_data->{multi}{recursive}, 'ok', 'include sub';
+
 ok dies { CLASS->new(
   mount => ['t/fixtures/include'],
   parse => 'missing.sii',

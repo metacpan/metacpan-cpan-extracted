@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Config;
 
 use Data::HashMap::I16;
 use Data::HashMap::I16S;
@@ -1224,7 +1225,7 @@ use Data::HashMap::I16A;
     my $m = Data::HashMap::IA->new();
     hm_ia_put $m, 1, [1,2,3];
     my $c = $m->clone;
-    is_deeply(hm_ia_get $c, 1, [1,2,3], 'IA clone: SV* value deep-independent');
+    is_deeply(hm_ia_get $c, 1, [1,2,3], 'IA clone: SV* value round-trips');
 }
 
 # clone with LRU
@@ -1280,7 +1281,7 @@ use Data::HashMap::I16A;
     my $m = Data::HashMap::II->new(0, 1);
     hm_ii_put $m, $_, $_ for 1..10;
     sleep 2;
-    hm_ii_put $m, 11, 11;  # this one is fresh
+    hm_ii_put_ttl $m, 11, 11, 3600;  # fresh, and long enough to survive a slow smoker
     hm_ii_purge $m;
     is(hm_ii_size $m, 1, 'II purge: only fresh entry remains');
     is(hm_ii_get $m, 11, 11, 'II purge: fresh entry intact');
@@ -1418,6 +1419,44 @@ use Data::HashMap::I16A;
     my $f = $m->freeze;
     my $m2 = Data::HashMap::II->thaw($f);
     is(hm_ii_max_size $m2, 50, 'II thaw: max_size preserved');
+}
+
+# freeze refuses a max_size the 32-bit header cannot hold
+{
+    my $m = Data::HashMap::II->new(2**32 - 1);
+    hm_ii_put $m, 1, 10;
+    my $m2 = Data::HashMap::II->thaw($m->freeze);
+    is(hm_ii_max_size $m2, 2**32 - 1, 'II thaw: 32-bit max_size round-trips');
+    SKIP: {
+        skip 'max_size saturates at a 32-bit size_t', 1 if $Config{sizesize} < 8;
+        my $big = Data::HashMap::II->new(2**32);
+        eval { $big->freeze };
+        like($@, qr/too large to freeze/, 'II freeze: larger max_size croaks');
+    }
+}
+
+# thawed LRU map lost its recency order: eviction follows table order
+{
+    my $m = Data::HashMap::II->new(2);
+    hm_ii_put $m, 1, 10;
+    hm_ii_put $m, 2, 20;
+    my @keys = hm_ii_keys $m;
+    my $x = hm_ii_get $m, $keys[0];
+    my $m2 = Data::HashMap::II->thaw($m->freeze);
+    hm_ii_put $m2, 3, 30;
+    ok(!(hm_ii_exists $m2, $keys[0]), 'II thaw: evicts in frozen order, not the recency victim');
+    is(hm_ii_size $m2, 2, 'II thaw: size still capped');
+}
+
+# time spent frozen does not count against TTL
+{
+    my $m = Data::HashMap::II->new();
+    hm_ii_put_ttl $m, 1, 10, 2;
+    my $f = $m->freeze;
+    sleep 3;
+    ok(!(hm_ii_exists $m, 1), 'II put_ttl: the live entry has expired');
+    my $m2 = Data::HashMap::II->thaw($f);
+    is(hm_ii_get $m2, 1, 10, 'II thaw: the frozen one restarts its countdown');
 }
 
 # SV* freeze croaks

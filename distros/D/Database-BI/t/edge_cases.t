@@ -1049,4 +1049,288 @@ subtest 'GET /combine -- l= pointing to non-existent file returns 404' => sub {
 	)->status_is(404, 'combine with non-existent left source returns 404');
 };
 
+# ---------------------------------------------------------------------------
+# Section 22: /folder hostile inputs and security
+#
+# Strategy: Exhaustively probe the new folder_view action for:
+#   (a) missing / invalid parameters
+#   (b) XSS via user-controlled stash variables reflected in the template
+#   (c) DoS via an artificially long prefix that would expand the breadcrumb
+#       to O(N) entries if unchecked
+#   (d) graceful degradation when the chosen column contains no order-code
+#       values, leaving the prefix map empty
+#   (e) back= sanitisation confirming javascript: is always replaced with
+#       the source-table URL rather than leaking through the | html filter
+# ---------------------------------------------------------------------------
+
+Readonly my $SALES_SPEC => 'table:sales';
+
+subtest 'GET /folder -- missing l= param returns 400' => sub {
+	# The controller guards length($left_spec) immediately; the error is plain text.
+	$t->get_ok('/folder')
+	  ->status_is(400, 'no l= param returns 400');
+	$t->get_ok('/folder?col=id')
+	  ->status_is(400, 'col= without l= still returns 400');
+};
+
+subtest 'GET /folder -- non-existent path returns 404' => sub {
+	# _run_export_pipeline returns () when the data source cannot be opened;
+	# the action must return 404, not 500.
+	$t->get_ok('/folder?l=' . url_escape('path:/nonexistent/data.csv'))
+	  ->status_is(404, 'non-existent path returns 404');
+};
+
+subtest 'GET /folder -- prefix longer than MAX_PREFIX_LEN returns 400 (DoS guard)' => sub {
+	# A crafted prefix of length N causes N breadcrumb entries and an O(N)
+	# response.  The controller now rejects anything over $MAX_PREFIX_LEN (20).
+	my $long_prefix = 'A' x 21;
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC) . '&prefix=' . url_escape($long_prefix))
+	  ->status_is(400, '21-char prefix rejected with 400');
+
+	my $exactly_max = 'A' x 20;
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC) . '&prefix=' . url_escape($exactly_max))
+	  ->status_is(200, '20-char prefix (exactly at limit) accepted');
+
+	# 10_000-char URL would exceed Mojo's max_line_size and be truncated to empty,
+	# bypassing the controller guard.  Use 100 chars: clearly over MAX_PREFIX_LEN,
+	# well within HTTP URL limits, and exercises the same controller code path.
+	my $huge = 'X' x 100;
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC) . '&prefix=' . url_escape($huge))
+	  ->status_is(400, '100-char prefix rejected with 400 (no crash)');
+};
+
+subtest 'GET /folder -- XSS in prefix param is HTML-encoded by TT' => sub {
+	# The prefix value is reflected in the page title and breadcrumb.
+	# TT | html encodes < > " & so the payload cannot execute.
+	# Note: payload must be <= MAX_PREFIX_LEN (20) chars or the DoS guard fires
+	# first (400) before TT can encode it.  '<img src=x>' is 12 chars and is a
+	# valid injection probe.
+	my $xss = '<img src=x>';
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC) . '&prefix=' . url_escape($xss))
+	  ->status_is(200)
+	  ->content_unlike(qr{<img src=x>},       'raw <img> tag not in response body')
+	  ->content_like(qr{&lt;img|no folders|No items},
+	                 'img tag is HTML-encoded or prefix yields empty result');
+};
+
+subtest 'GET /folder -- XSS in col param is HTML-encoded' => sub {
+	# A hostile col= value that contains HTML metacharacters.
+	# The col name is URL-escaped into base_url and | html-filtered in the template.
+	my $xss_col = '"><img src=x onerror=alert(1)>';
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC) . '&col=' . url_escape($xss_col))
+	  ->status_is(200)
+	  ->content_unlike(qr{onerror=alert}, 'onerror= not literally in response');
+};
+
+subtest 'GET /folder -- back=javascript: is blocked; back link uses table URL' => sub {
+	# _safe_back_url returns undef for javascript: URIs; folder_view then falls
+	# back to _spec_to_url($left_spec), which returns /view/sales.
+	# The rendered page must never contain href="javascript: in any element.
+	$t->get_ok(
+		'/folder?l=' . url_escape($SALES_SPEC)
+		. '&back=' . url_escape('javascript:alert(1)')
+	)->status_is(200)
+	 ->content_unlike(qr{href="javascript:}, 'javascript: not reflected in any href')
+	 ->content_like(qr{href="/view/sales"}, 'back link falls through to table URL');
+};
+
+subtest 'GET /folder -- back=data: is blocked; back link uses table URL' => sub {
+	$t->get_ok(
+		'/folder?l=' . url_escape($SALES_SPEC)
+		. '&back=' . url_escape('data:text/html,<b>xss</b>')
+	)->status_is(200)
+	 ->content_unlike(qr{href="data:}, 'data: URI not in any href');
+};
+
+subtest 'GET /folder -- prefix not present in data: empty page, no crash' => sub {
+	# A prefix like "ZZZ" does not exist in sales.csv (which has no order codes).
+	# The result must be a clean 200 with no folders and no items.
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC) . '&prefix=ZZZ')
+	  ->status_is(200, 'non-existent prefix returns 200 (no crash)')
+	  ->content_unlike(qr/500 Internal Server Error/, 'no 500');
+};
+
+subtest 'GET /folder -- prefix of all digits: no letter prefix match, 200' => sub {
+	# Digits-only prefix: \A([A-Z]+) regex never matches, no folders/items.
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC) . '&prefix=123')
+	  ->status_is(200, 'all-digit prefix returns 200 (no crash)');
+};
+
+subtest 'GET /folder -- col= pointing to non-existent column: graceful fallback' => sub {
+	# When the specified column does not exist, all values are undef -> no letter
+	# prefix found -> empty prefix map -> top level shows no folders.
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC) . '&col=no_such_column')
+	  ->status_is(200, 'non-existent col= returns 200')
+	  ->content_unlike(qr/500 Internal Server Error/, 'no 500');
+};
+
+subtest 'GET /folder -- data column with no order-number values: no folders rendered' => sub {
+	# sales.csv contains "product,region,amount,sale_date" -- none of which are
+	# order codes. Auto-detect finds nothing; falls back to first column ("id"
+	# or "product"). Since no values match [A-Z]+\d+, the prefix map is empty.
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC))
+	  ->status_is(200, 'table with no order-code columns renders 200')
+	  ->content_unlike(qr/500 Internal Server Error/, 'no 500 when no order codes exist');
+};
+
+subtest 'GET /folder -- back URL auto-derived from table spec when back= absent' => sub {
+	# folder_view derives back_url from _spec_to_url($left_spec) when no back=
+	# param is supplied.  The rendered page must contain a "Back to table" link
+	# pointing at the source table.
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC))
+	  ->status_is(200)
+	  ->content_like(qr/Back to table/, '"Back to table" link is present');
+};
+
+subtest 'GET /folder -- NUL byte in prefix: no crash' => sub {
+	# A NUL-byte prefix cannot match any real letter prefix; must return 200.
+	my $null_prefix = "A\x00B";
+	$t->get_ok('/folder?l=' . url_escape($SALES_SPEC) . '&prefix=' . url_escape($null_prefix))
+	  ->status_is(200, 'NUL-byte prefix: no crash');
+};
+
+subtest 'GET /folder -- valid data file with order codes: top-level folders appear' => sub {
+	# Create a small CSV that contains order-number codes.  Verify the folder
+	# view renders at least one folder card.
+	my $dir  = tempdir(CLEANUP => 1);
+	my $path = "$dir/orders.csv";
+	Mojo::File->new($path)->spew(
+		"order_no,product,qty\n"
+		. "A10,Widget,5\n"
+		. "A11,Gadget,3\n"
+		. "B1,Doohickey,1\n"
+		. "CT4,Carol item,2\n"
+	);
+	$t->get_ok('/folder?l=' . url_escape("path:$path"))
+	  ->status_is(200)
+	  ->content_like(qr/folder-card/, 'folder cards rendered for order-code CSV')
+	  ->content_like(qr/fc-name">A/, '"A" folder card present');
+};
+
+subtest 'GET /folder -- drill into A prefix: shows A10 A11 items' => sub {
+	my $dir  = tempdir(CLEANUP => 1);
+	my $path = "$dir/orders2.csv";
+	Mojo::File->new($path)->spew(
+		"order_no,product\nA10,Widget\nA11,Gadget\nB1,Doohickey\n"
+	);
+	$t->get_ok('/folder?l=' . url_escape("path:$path") . '&prefix=A')
+	  ->status_is(200)
+	  ->content_like(qr/A10/, 'A10 item appears in folder A')
+	  ->content_like(qr/A11/, 'A11 item appears in folder A')
+	  ->content_unlike(qr/B1/, 'B1 item not shown inside folder A');
+};
+
+subtest 'GET /folder -- prefix with multi-letter hierarchy: sub-folders rendered' => sub {
+	my $dir  = tempdir(CLEANUP => 1);
+	my $path = "$dir/orders3.csv";
+	Mojo::File->new($path)->spew(
+		"order_no,product\n"
+		. "C1,Plain C\nCA1,Alpha\nCA2,Alpha2\nCB1,Beta\n"
+	);
+	# C level should show sub-folders CA and CB, plus direct item C1
+	$t->get_ok('/folder?l=' . url_escape("path:$path") . '&prefix=C')
+	  ->status_is(200)
+	  ->content_like(qr/fc-name">CA/, 'CA sub-folder present inside C')
+	  ->content_like(qr/fc-name">CB/, 'CB sub-folder present inside C')
+	  ->content_like(qr/C1/,          'direct C-prefix item C1 also visible');
+};
+
+# ---------------------------------------------------------------------------
+# Section 23: upload_file eval { ...; 1 } regression
+#
+# Strategy:
+#  (a) Mock Mojo::Upload::move_to to croak -- verify the action returns a
+#      500 JSON body with the error_upload_save key, NOT a bare HTML 500 page.
+#      This also confirms the eval guard catches the exception correctly.
+#  (b) Mock move_to to silently succeed without creating $dest -- verify the
+#      -f $dest post-check triggers the same 500 JSON path.
+#  (c) Verify that a normal upload after a prior (unrelated) eval { die }
+#      still returns 200.  This is the regression guard for the stale-$@
+#      bug: the old eval { move_to() } + if ($@) pattern would have fired
+#      on a contaminated $@ left by an earlier eval (including Mojo's own
+#      internal dispatch evals or destructor evals).  The fix captures
+#      $ok = eval { ...; 1 } whose truthiness is independent of $@.
+# ---------------------------------------------------------------------------
+
+subtest 'upload_file -- move_to croak returns 500 JSON with error key' => sub {
+	# Simulate a disk-full or permission-denied error from the filesystem.
+	mock 'Mojo::Upload::move_to' => sub { die "Simulated ENOSPC -- disk full\n" };
+
+	my $res = $t->post_ok('/upload', form => {
+		file => { content => "id,label\n1,TestItem\n", filename => 'diskfull.csv' }
+	})->status_is(500, 'move_to croak: controller returns 500')
+	  ->tx->res->json;
+
+	ok defined $res,            'response body is valid JSON';
+	ok exists $res->{error},    'JSON response has "error" key';
+	like $res->{error}, qr/Could not save uploaded file/i,
+		'error message is the expected error_upload_save text';
+
+	# Critical: the response must be JSON, not a raw HTML Mojolicious exception page.
+	unlike $t->tx->res->body, qr/<html/i, 'response is JSON, not an HTML error page';
+
+	restore_all();
+};
+
+subtest 'upload_file -- move_to silent no-op (no file created) returns 500 JSON' => sub {
+	# Simulates a Mojo::Asset::Memory->move_to that returns without writing
+	# (e.g. a write that silently fails).  The -f $dest post-check must catch this.
+	mock 'Mojo::Upload::move_to' => sub {
+		# Return a defined truthy value without creating the destination file.
+		return Mojo::File->new('/nonexistent/never_created.csv');
+	};
+
+	my $res = $t->post_ok('/upload', form => {
+		file => { content => "id,x\n1,y\n", filename => 'noop.csv' }
+	})->status_is(500, 'silent no-op move_to: controller returns 500')
+	  ->tx->res->json;
+
+	ok exists $res->{error}, 'JSON error key present when dest file not created';
+
+	restore_all();
+};
+
+subtest 'upload_file -- successful upload after prior eval { die } returns 200 (stale-$@ regression)' => sub {
+	# Regression guard for the eval { move_to() } + if ($@) pattern.
+	#
+	# In the OLD code, $@ contaminated by a prior eval (from Mojo's internal
+	# dispatch evals or DESTROY-method evals) could make if ($@) fire even
+	# when move_to succeeded, causing a false 500.
+	#
+	# With the fix -- my $ok = eval { move_to(); 1 }; if (!$ok) -- the check
+	# depends only on whether THIS eval threw, making it immune to stale $@.
+	#
+	# We simulate the contamination by deliberately running eval { die } in the
+	# test process (same Perl runtime as the in-process Test::Mojo server)
+	# immediately before the upload request.
+	eval { die "deliberate contaminator to simulate stale \$\@\n" };
+	# At this point $@ is set to "deliberate contaminator..."
+	diag "stale \$@ before upload: '$@'" if $ENV{TEST_VERBOSE};
+
+	my $res = $t->post_ok('/upload', form => {
+		file => { content => "id,x\n1,y\n", filename => 'stale_at.csv' }
+	})->status_is(200, 'upload succeeds despite stale $@ in outer scope (regression)')
+	  ->tx->res->json;
+
+	ok defined $res->{path}, 'path returned in JSON (move_to succeeded)';
+	ok defined $res->{url},  'url returned in JSON';
+
+	diag "\$@ after upload: '$@'" if $ENV{TEST_VERBOSE};
+};
+
+subtest 'upload_file -- two sequential uploads both succeed (no $@ accumulation)' => sub {
+	# If the eval guard leaked a dirty $@ across requests, the second upload
+	# would fail.  Both must return 200 with distinct paths.
+	my $res_a = $t->post_ok('/upload', form => {
+		file => { content => "a,b\n1,2\n", filename => 'seq_a.csv' }
+	})->status_is(200, 'first sequential upload: 200')->tx->res->json;
+
+	my $res_b = $t->post_ok('/upload', form => {
+		file => { content => "x,y\n3,4\n", filename => 'seq_b.csv' }
+	})->status_is(200, 'second sequential upload: 200')->tx->res->json;
+
+	ok $res_a->{path} && $res_b->{path},    'both uploads returned a path';
+	isnt $res_a->{path}, $res_b->{path},    'the two paths are distinct (no collision)';
+};
+
 done_testing();

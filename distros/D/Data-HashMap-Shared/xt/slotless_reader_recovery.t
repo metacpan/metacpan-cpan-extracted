@@ -31,8 +31,8 @@ typedef struct SV SV;
 struct flags { int reader_active, writer_active, violation, b_holds, a_holds; };
 static struct flags *F; static ShmHandle *L;
 int main(void) {
-    char eb[256];
-    L = shm_create_map(NULL, 64, 32, 3, 0, 0, 0, 0, 0, 0600, eb);
+    char eb[SHM_ERR_BUFLEN];
+    L = shm_create_map(NULL, 64, 32, 3, 0, 0, 0, 0, 0, 0600, eb, NULL);
     if (!L) { fprintf(stderr, "create: %s\n", eb); return 2; }
     F = mmap(NULL, sizeof *F, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
     memset(F, 0, sizeof *F);

@@ -306,7 +306,7 @@ sub _cmd_review {
     text          => $text,
     annotations   => $review ? JSON->new->utf8->encode($review) : undef,
     context_files => \@context_files,
-    max_tokens    => $self->get_max_tokens // 8192,
+    max_tokens    => $self->get_max_tokens,
     input_tokens  => $input_tokens,
     input_cost    => $input_cost,
   );

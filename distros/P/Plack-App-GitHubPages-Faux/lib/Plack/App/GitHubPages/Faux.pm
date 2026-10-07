@@ -1,10 +1,9 @@
-package Plack::App::GitHubPages::Faux 0.03 {
+package Plack::App::GitHubPages::Faux 0.04 {
 
   use strict;
   use warnings;
-  use 5.020;
+  use 5.036;
   use parent 'Plack::App::File';
-  use experimental qw( signatures postderef );
   use Path::Tiny qw( path );
 
   # ABSTRACT: PSGI app to test your GitHub Pages site
@@ -13,6 +12,23 @@ package Plack::App::GitHubPages::Faux 0.03 {
   sub should_handle ($self, $file)
   {
     return -f $file || -d $file;
+  }
+
+  sub locate_file ($self, $env)
+  {
+    my $path_info = $env->{PATH_INFO} // '';
+
+    if($path_info ne '' && $path_info !~ m{/$})
+    {
+      my $file = ($self->root // '.') . $path_info;
+      if(!-e $file && -f "$file.html")
+      {
+        local $env->{PATH_INFO} = "$path_info.html";
+        return $self->SUPER::locate_file($env);
+      }
+    }
+
+    return $self->SUPER::locate_file($env);
   }
 
   sub serve_path ($self, $env, $path, $fullpath=undef)
@@ -72,7 +88,7 @@ Plack::App::GitHubPages::Faux - PSGI app to test your GitHub Pages site
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -99,6 +115,12 @@ file, that index will be served as a response.
 
 This is important to get the right relative URLs in your indexes.
 
+=item serve C<.html> files without the C<.html> extension
+
+If a request is made for C</foo> and there is no file or directory
+named C<foo>, but there is a C<foo.html>, then C<foo.html> will be
+served.
+
 =item serve C<404.html> for not found
 
 You can customize your 404 response on GitHub pages by putting a C<404.html>
@@ -121,7 +143,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018-2022 by Graham Ollis.
+This software is copyright (c) 2018-2026 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

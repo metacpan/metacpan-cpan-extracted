@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 2042 2025-12-24 10:23:11Z willem $"
+#define XS_Id "$Id: SEC.xs 2063 2026-10-05 11:02:58Z willem $"
 
 
 =head1 NAME
@@ -13,7 +13,7 @@ upon which the Net::DNS::SEC cryptographic components are built.
 
 =head1 COPYRIGHT
 
-Copyright (c)2018-2024 Dick Franks
+Copyright (c)2018-2026 Dick Franks
 
 All Rights Reserved
 
@@ -49,20 +49,37 @@ extern "C" {
 
 #include <openssl/opensslv.h>
 
-#ifdef OPENSSL_VERSION_NUMBER
-#define OPENSSL_RELEASE	( OPENSSL_VERSION_NUMBER>>4 )	/* 0xMMmm0000 */
-#else
-#define OPENSSL_RELEASE	( OPENSSL_VERSION_MAJOR<<24 | OPENSSL_VERSION_MINOR<<16 )
+#ifndef OPENSSL_API_LEVEL
+# if (OPENSSL_VERSION_NUMBER < 0x10101000)
+#  error	deprecated OpenSSL version
+#  include OPENSSL_VERSION_TEXT /* in error log; by any means, however reprehensible! */
+# endif
+# define OPENSSL_API_LEVEL 10101
 #endif
 
-#if (OPENSSL_RELEASE < 0x03000000)
-#define API_1_1_1
-#include <openssl/dsa.h>
-#include <openssl/ecdsa.h>
-#include <openssl/rsa.h>
+	/* OpenSSL support status */
+#define OSSL_RELEASE (OPENSSL_VERSION_MAJOR * 100 + OPENSSL_VERSION_MINOR) * 100
+#if (OSSL_RELEASE == 30500)		/* LTS */
+# define EOL 20300408
+#elif (OSSL_RELEASE < 30600)
+# define EOL 20260907
+#elif (OSSL_RELEASE < 40000)
+# define EOL 20261101
+#elif (OSSL_RELEASE < 40100)
+# define EOL 20270514
+#elif (OSSL_RELEASE < 40200)
+# define EOL 20271130
+#endif
+
+
+#if (OPENSSL_API_LEVEL < 30000)
+# define API_1_1_1
+# include <openssl/dsa.h>
+# include <openssl/ecdsa.h>
+# include <openssl/rsa.h>
 #else
-#include <openssl/core_names.h>
-#include <openssl/param_build.h>
+# include <openssl/core_names.h>
+# include <openssl/param_build.h>
 static OSSL_LIB_CTX *libctx = NULL;
 #endif
 
@@ -75,63 +92,16 @@ static OSSL_LIB_CTX *libctx = NULL;
 #endif
 
 
-#ifdef OPENSSL_NO_DSA
-#undef  NO_DSA		/* suppress compiler noise if already defined */
-#define NO_DSA
+#if (OPENSSL_API_LEVEL < 30500)
+# define NO_MLDSA
 #endif
-
-#ifdef OPENSSL_NO_RSA
-#define NO_RSA
-#endif
-
-#ifdef OPENSSL_NO_EC
-#define NO_ECDSA
-#define NO_EdDSA
-#endif
-
-#ifdef OPENSSL_NO_ECX
-#define NO_EdDSA
-#endif
-
-#ifdef OPENSSL_NO_SM3
-#define NO_SM3
-#endif
-
-
-#if (OPENSSL_RELEASE < 0x01010100)		/* OpenSSL support status */
-#error	deprecated OpenSSL version
-#include OPENSSL_VERSION_TEXT /* in error log; by any means, however reprehensible! */
-#elif (OPENSSL_RELEASE < 0x03000000)
-#define EOL 20230911
-#elif (OPENSSL_RELEASE < 0x03010000)
-#define EOL 20260907
-#elif (OPENSSL_RELEASE < 0x03030000)
-#define EOL 20251123
-#elif (OPENSSL_RELEASE < 0x03040000)
-#define EOL 20260409
-#elif (OPENSSL_RELEASE < 0x03050000)
-#define EOL 20261022
-#elif (OPENSSL_RELEASE < 0x03060000)
-#define EOL 20300408
-#elif (OPENSSL_RELEASE < 0x03070000)
-#define EOL 20261101
-#endif
-
-
-#ifdef API_1_1_1
-#ifndef NID_ED25519
-#define NO_EdDSA
-#endif
-#define NO_SM3
-#endif
-
 
 #ifdef OPENSSL_IS_BORINGSSL
-#undef EOL
+# undef EOL
 #endif
 
 #ifdef LIBRESSL_VERSION_NUMBER
-#undef EOL
+# undef EOL
 #endif
 
 
@@ -204,7 +174,7 @@ EVP_sign(SV *message, EVP_PKEY *pkey, const EVP_MD *md=NULL)
 #define msgbuf (unsigned char*) SvPVX(message)
 #define msglen SvCUR(message)
 	EVP_MD_CTX *ctx = EVP_MD_CTX_new();
-	unsigned char sigbuf[512];		/* RFC3110(2) */
+	unsigned char sigbuf[2420];		/* ML-DSA-44 */
 	STRLEN buflen = sizeof(sigbuf);
 	int error;
     CODE:
@@ -277,13 +247,6 @@ EVP_sha384()
 
 const EVP_MD*
 EVP_sha512()
-
-
-#ifndef NO_SM3
-const EVP_MD*
-EVP_sm3()
-
-#endif
 
 
 ####	DSA	####
@@ -481,6 +444,32 @@ EVP_PKEY_new_EdDSA(SV *curve, SV *public, SV *private=NULL)
 #endif
 
 
+####	MLDSA	####
+
+#ifndef NO_MLDSA
+
+EVP_PKEY*
+EVP_PKEY_new_MLDSA(SV *flavour, SV *rawkey)
+    INIT:
+	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
+	EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name( libctx, SvPVX(flavour), NULL );
+    CODE:
+	RETVAL = NULL;
+	if ( SvCUR(rawkey) > 32 ) {
+		checkerr( OSSL_PARAM_BLD_push_octet_string( bld, OSSL_PKEY_PARAM_PUB_KEY, SvPVX(rawkey), SvCUR(rawkey) ) );
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_PUBLIC_KEY, bld ) );
+	} else {
+		checkerr( OSSL_PARAM_BLD_push_octet_string( bld, OSSL_PKEY_PARAM_ML_DSA_SEED, SvPVX(rawkey), SvCUR(rawkey) ) );
+		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_KEYPAIR, bld ) );
+	}
+	OSSL_PARAM_BLD_free(bld);
+	EVP_PKEY_CTX_free(ctx);
+    OUTPUT:
+	RETVAL
+
+#endif
+
+
 ####################
 
 void
@@ -500,6 +489,7 @@ ERR_print_errors(SV *filename)
     CODE:
 	BIO *bio = BIO_new_file( SvPVX(filename), "w" );
 	ERR_print_errors(bio);
+	BIO_flush(bio);
 	BIO_free(bio);
 
 #endif

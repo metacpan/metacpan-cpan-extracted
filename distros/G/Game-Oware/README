@@ -19,6 +19,15 @@ A terminal game and a bot come with it:
 
     oware --level 3
 
+The board is drawn as a board: a store at each end, a seed cluster in every
+house beside its count, and a mark on every house the last move touched. On a
+terminal with Term::ReadKey installed the legal moves are listed under the
+board and chosen with the arrow keys, and the board above the list is the one
+the move under the cursor would produce, so a capture is seen before it is
+played. Without it, or off a terminal, the moves are typed out a letter at a
+time. The marks are characters rather than colours, so NO_COLOR, --no-ansi and
+a redirected handle all keep them.
+
 INSTALLATION
 
     perl Makefile.PL

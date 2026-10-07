@@ -1,6 +1,11 @@
 Changelog for HealthCheck
 
-v1.9.2 2025-05-27T14:20:54
+v1.9.3 2026-10-06T18:28:41
+ - Update dates in README and LICENSE (Andrew Hewus Fresh)
+ - Revise t/HealthCheck.t following blead line number tracking update
+   (Richard Leach)
+
+v1.9.2 2025-05-27T14:20:25
  - Update Makefile (Brendan Byrd)
  - Pull request #14: SM-5505 (Brendan Byrd)
  - Update Makefile / README / LICENSE (Brendan Byrd)

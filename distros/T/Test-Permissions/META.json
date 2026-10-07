@@ -83,6 +83,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Permissions"
       }
    },
-   "version" : "v0.001.1",
+   "version" : "v0.001.2",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

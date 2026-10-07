@@ -1,0 +1,145 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<style>
+  .folder-back { margin-bottom: 1rem; }
+
+  /* Breadcrumb row that shows the current drill-down path */
+  .folder-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+  }
+  .folder-breadcrumb a { color: #2c3e7a; text-decoration: none; }
+  .folder-breadcrumb a:hover { text-decoration: underline; }
+  .folder-breadcrumb .bc-sep { color: #888; }
+  .folder-breadcrumb .bc-current { font-weight: 600; }
+
+  /* Grid of folder cards */
+  .folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .folder-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.85rem 0.5rem 0.65rem;
+    background: #f9fafc;
+    border: 1px solid #dde2ef;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #1a1a2e;
+    transition: background 0.12s, box-shadow 0.12s;
+    cursor: pointer;
+  }
+  .folder-card:hover {
+    background: #e8ecf7;
+    box-shadow: 0 2px 6px rgba(44,62,122,.15);
+  }
+  .folder-card .fc-icon { font-size: 2.2rem; line-height: 1; }
+  .folder-card .fc-name {
+    margin-top: 0.35rem;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+  }
+  .folder-card .fc-count {
+    margin-top: 0.15rem;
+    font-size: 0.75rem;
+    color: #666;
+  }
+
+  /* Items table */
+  .folder-items-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e7a;
+    margin-bottom: 0.6rem;
+  }
+
+  .folder-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+  }
+  .folder-table thead tr { background: #2c3e7a; color: #fff; }
+  .folder-table th, .folder-table td {
+    padding: 0.55rem 0.9rem;
+    text-align: left;
+    border-bottom: 1px solid #e0e4ef;
+    white-space: nowrap;
+  }
+  .folder-table tbody tr:nth-child(even) { background: #f4f6fb; }
+  .folder-table tbody tr:hover { background: #e8ecf7; }
+
+  /* "No items" message */
+  .folder-empty { color: #666; font-style: italic; margin-top: 0.5rem; }
+</style>
+
+<p class="back-link folder-back">
+  <a href="/">&larr; Home</a>
+  [%- IF back_url -%]
+  &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>
+  [%- END -%]
+  &rsaquo; <a href="[% base_url | html %]">Folder view</a>
+  [%- IF breadcrumb.size -%]
+    [%- FOREACH crumb IN breadcrumb -%]
+  &rsaquo;
+      [%- IF crumb.href -%]
+  <a href="[% crumb.href | html %]">[% crumb.name | html %]</a>
+      [%- ELSE -%]
+  <strong>[% crumb.name | html %]</strong>
+      [%- END -%]
+    [%- END -%]
+  [%- END -%]
+</p>
+
+<h2 class="graph-title">[% title | html %]</h2>
+
+[%- IF folders.size -%]
+<div class="folder-grid">
+  [%- FOREACH f IN folders -%]
+  <a class="folder-card" href="[% f.href | html %]">
+    <span class="fc-icon">&#x1F4C1;</span>
+    <span class="fc-name">[% f.name | html %]</span>
+    <span class="fc-count">[% f.count %] item[% IF f.count != 1 %]s[% END %]</span>
+  </a>
+  [%- END -%]
+</div>
+[%- END -%]
+
+[%- IF items.size -%]
+[%- IF folders.size -%]
+<p class="folder-items-heading">Items in [% prefix | html %]</p>
+[%- END -%]
+<div class="table-scroll">
+<table class="folder-table">
+  <thead>
+    <tr>
+      [%- FOREACH col IN columns -%]
+      <th>[% col | html %]</th>
+      [%- END -%]
+    </tr>
+  </thead>
+  <tbody>
+    [%- FOREACH row IN items -%]
+    <tr>
+      [%- FOREACH col IN columns -%]
+      <td>[% row.$col | html %]</td>
+      [%- END -%]
+    </tr>
+    [%- END -%]
+  </tbody>
+</table>
+</div>
+[%- ELSIF !folders.size -%]
+<p class="folder-empty">No items found.</p>
+[%- END -%]
+
+[%- END -%]

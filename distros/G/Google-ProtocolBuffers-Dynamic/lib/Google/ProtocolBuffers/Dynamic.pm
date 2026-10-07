@@ -9,7 +9,7 @@ use Exporter ();
 # @EXPORT_OK/%EXPORT_TAGS are set up in XS
 *import = \&Exporter::import;
 
-our $VERSION = '0.43'; # VERSION
+our $VERSION = '0.44'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -98,7 +98,7 @@ Google::ProtocolBuffers::Dynamic - fast and complete protocol buffer implementat
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 

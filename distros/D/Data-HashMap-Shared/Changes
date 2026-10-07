@@ -1,5 +1,13 @@
 Revision history for Data-HashMap-Shared
 
+0.22      2026-10-06
+          - A writer killed mid resize, clear, put or remove, or croaked by a
+            fast signal timer, no longer loses entries or keeps the lock.
+          - New: DATA_HASHMAP_SHARED_SPARSE=0 reserves file space up front.
+          - Faster lookups, counters, lock waits and resizes; integer cas on
+            plain maps takes the read lock; many TTL, LRU and arena fixes.
+          - Stricter argument checks; correct the documentation.
+
 0.21      2026-09-15
           - Builds on older toolchains (compilers defaulting to C89, glibc
             before 2.27, no kernel headers) and now requires 64-bit pointers.

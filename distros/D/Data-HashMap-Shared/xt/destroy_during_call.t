@@ -37,6 +37,22 @@ my @cases = (
         sub { my ($m, $e) = @_; $m->get($e) }],
 );
 
+# A numeric argument (ttl, limit, target) read with magic, in every variant.
+for my $v (qw(II I16 I32 IS I16S I32S SI SI16 SI32 SS)) {
+    my $class = "Data::HashMap::Shared::$v";
+    eval "require $class; 1" or die $@;
+    my $k = $v =~ /^S/ ? 'k' : 1;
+    my $val = $v =~ /S$/ ? 'v' : 2;
+    my $new = sub { $class->new(undef, 64, 0, 60) };
+    push @cases,
+        ["${v}::put_ttl", $new, sub { $_[0]->put_ttl($k, $val, $_[1]) }],
+        ["${v}::add_ttl", $new, sub { $_[0]->add_ttl($k, $val, $_[1]) }],
+        ["${v}::update_ttl", $new, sub { $_[0]->put($k, $val); $_[0]->update_ttl($k, $val, $_[1]) }],
+        ["${v}::set_ttl", $new, sub { $_[0]->put($k, $val); $_[0]->set_ttl($k, $_[1]) }],
+        ["${v}::flush_expired_partial", $new, sub { my @r = $_[0]->flush_expired_partial($_[1]) }],
+        ["${v}::reserve", $new, sub { $_[0]->reserve($_[1]) }];
+}
+
 for my $case (@cases) {
     my ($name, $new, $call) = @$case;
     my $pid = fork();

@@ -56,6 +56,19 @@ sub race {
     unlink $path;
 }
 
+# Counting through cas retry loops loses no update, on a map without TTL (the
+# read-locked path) and with one (the write-locked path).
+for my $ttl (0, 60) {
+    my $path = tmpfile();
+    my $parent = Data::HashMap::Shared::II->new($path, 100, 0, $ttl);
+    $parent->put(0, 0);
+    my ($N, $each) = (4, 2000);
+    race($N, sub { Data::HashMap::Shared::II->new($path, 100, 0, $ttl) },
+             sub { for (1 .. $each) { my $v; do { $v = $_[0]->get(0) } until $_[0]->cas(0, $v, $v + 1) } 1 });
+    is($parent->get(0), $N * $each, "cas counting, ttl $ttl: no lost update");
+    unlink $path;
+}
+
 # Concurrent add: only the first worker per key inserts; the others see add fail.
 {
     my $path = tmpfile();

@@ -11,7 +11,7 @@ use DateTime::Format::ISO8601;
 use Travel::Status::MOTIS::Stop;
 use Travel::Status::MOTIS::Polyline qw(decode_polyline);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 Travel::Status::MOTIS::Trip->mk_ro_accessors(
 	qw(
@@ -47,6 +47,7 @@ sub new {
 		mode             => $json->{mode},
 		agency           => $json->{agencyName},
 		display_name     => $json->{displayName},
+		trip_short_name  => $json->{tripShortName},
 		route_color      => $json->{routeColor},
 		route_text_color => $json->{routeTextColor},
 		headsign         => $json->{headsign},

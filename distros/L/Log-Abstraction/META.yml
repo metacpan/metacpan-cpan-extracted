@@ -51,7 +51,7 @@ requires:
   Return::Set: '0.04'
   Scalar::Util: '0'
   Socket: '0'
-  Sub::Private: '0.05'
+  Sub::Private: '0.06'
   Sys::Syslog: '0.28'
   Time::HiRes: '0'
   Time::Local: '0'
@@ -61,5 +61,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction
   homepage: https://metacpan.org/pod/Log::Abstraction
   repository: git://github.com/nigelhorne/Log-Abstraction.git
-version: '0.37'
+version: '0.39'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -30,6 +30,11 @@ DESCRIPTION
 
       This is important to get the right relative URLs in your indexes.
 
+    serve .html files without the .html extension
+
+      If a request is made for /foo and there is no file or directory named
+      foo, but there is a foo.html, then foo.html will be served.
+
     serve 404.html for not found
 
       You can customize your 404 response on GitHub pages by putting a
@@ -47,7 +52,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2018-2022 by Graham Ollis.
+    This software is copyright (c) 2018-2026 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

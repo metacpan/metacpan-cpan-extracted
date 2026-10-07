@@ -2,7 +2,7 @@ package Data::HashMap::SA;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub import {
     $^H{"Data::HashMap::SA/hm_sa_put"}        = 1;
@@ -39,7 +39,7 @@ __END__
 
 =head1 NAME
 
-Data::HashMap::SA - hash map from string keys to any Perl value values
+Data::HashMap::SA - hash map from string keys to any Perl value
 
 =head1 SYNOPSIS
 

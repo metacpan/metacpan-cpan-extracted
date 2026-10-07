@@ -28,7 +28,7 @@ $redis->set('lock:job1', 'worker_1', 'NX', 'EX', 3, sub {
     my ($res, $err) = @_;
     printf "  lock:job1    NX      -> %s\n", $res // '(nil, already locked)';
 
-    # Try again — should fail (already set)
+    # Try again: should fail (already set)
     $redis->set('lock:job1', 'worker_2', 'NX', 'EX', 3, sub {
         my ($res, $err) = @_;
         printf "  lock:job1    NX 2nd  -> %s\n", $res // '(nil, already locked)';

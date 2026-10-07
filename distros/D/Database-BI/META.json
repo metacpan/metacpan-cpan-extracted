@@ -39,6 +39,7 @@
             "DBI" : "0",
             "Database::Abstraction" : "0.44",
             "Database::Join" : "v0.4.0",
+            "File::Path" : "2.07",
             "File::Spec" : "3.40",
             "File::Temp" : "0.22",
             "HTML::D3" : "0.18",
@@ -89,6 +90,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "v0.009.0",
+   "version" : "v0.010.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

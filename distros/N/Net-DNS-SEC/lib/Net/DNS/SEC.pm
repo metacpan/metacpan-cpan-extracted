@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use Carp;
 
-our $SVNVERSION = (qw$Id: SEC.pm 2045 2026-01-16 12:30:12Z willem $)[2];
+our $SVNVERSION = (qw$Id: SEC.pm 2064 2026-10-05 12:25:28Z willem $)[2];
 our $VERSION;
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 use base qw(Exporter DynaLoader);
 

@@ -18,11 +18,15 @@ my $redis = EV::Redis->new(
 
 # periodic ping
 my $w = EV::timer 0, 3, sub {
-    $redis->ping(sub {
-        my ($res, $err) = @_;
-        if ($err) { warn "PING error: $err\n" }
-        else      { print "PONG at " . scalar(localtime) . "\n" }
-    });
+    # ping croaks once reconnecting is given up
+    eval {
+        $redis->ping(sub {
+            my ($res, $err) = @_;
+            if ($err) { warn "PING error: $err\n" }
+            else      { print "PONG at " . scalar(localtime) . "\n" }
+        });
+    };
+    warn $@ if $@;
 };
 
 print "Pinging every 3s (try stopping/starting redis-server)...\n";

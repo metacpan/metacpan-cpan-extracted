@@ -31,6 +31,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Term::ReadKey" : "0"
+         },
          "requires" : {
             "Object::Proto::Sugar" : "0.05",
             "perl" : "5.010"
@@ -43,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

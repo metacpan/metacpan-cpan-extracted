@@ -63,4 +63,43 @@ for my $v (@variants) {
     }
 }
 
+# A batch write blocks signals only once it has the lock (t/86): one stuck
+# waiting for a lock that a live process holds must still die from one, a batch
+# long enough to block them included.
+{
+    require File::Temp;
+    require Time::HiRes;
+    require Data::HashMap::Shared::II;
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    my $path = "$dir/held.shm";
+    my $m = Data::HashMap::Shared::II->new($path, 20_000);
+    $m->put(1, 1);
+    my $poke = sub {
+        open my $f, '+<:raw', $path or die "open: $!";
+        seek $f, 128, 0 or die "seek: $!";        # ShmHeader.wlock
+        print $f pack 'L', $_[0];
+        close $f or die "close: $!";
+    };
+    for my $pairs (1, 10_000) {
+        $poke->(0x80000000 | $$);                 # held by this live process
+        my $pid = fork // die "fork: $!";
+        unless ($pid) {
+            my $c = Data::HashMap::Shared::II->new($path, 20_000);
+            my @batch = map { ($_, $_) } 2 .. $pairs + 1;
+            alarm 1;
+            $c->set_multi(@batch);
+            POSIX::_exit(0);
+        }
+        my ($reaped, $status) = (0, 0);
+        for (1 .. 600) {
+            if (waitpid($pid, POSIX::WNOHANG()) == $pid) { ($reaped, $status) = (1, $?); last }
+            Time::HiRes::sleep(0.01);
+        }
+        unless ($reaped) { kill 'KILL', $pid; waitpid $pid, 0 }
+        $poke->(0);
+        ok $reaped && ($status & 127) == POSIX::SIGALRM(),
+            "a batch write of $pairs waiting for a held lock still dies from a signal";
+    }
+}
+
 done_testing;

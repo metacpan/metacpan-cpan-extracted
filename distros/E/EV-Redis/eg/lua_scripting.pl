@@ -29,7 +29,7 @@ $redis->set('balance', '100', sub {
         die "EVAL failed: $err\n" if $err;
         print "CAS 100->80: " . ($ok ? "success" : "failed") . "\n";
 
-        # Try again — should fail since balance is now 80
+        # Try again: should fail since balance is now 80
         $redis->eval($cas_script, 1, 'balance', '100', '60', sub {
             my ($ok, $err) = @_;
             die "EVAL failed: $err\n" if $err;

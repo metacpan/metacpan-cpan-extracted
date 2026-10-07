@@ -13,6 +13,7 @@ Getopt::Long::GetOptions(
     'view=s'  => \$o{view},
     'ascii'   => \$o{ascii},
     'colour!' => \my $colour,
+    'pick!'   => \my $pick,
     'help'    => \my $help,
 ) or die usage();
 die usage() if $help;
@@ -21,12 +22,16 @@ die usage() unless $o{seat} =~ /\A(?:white|black)\z/;
 die usage() unless $o{view} =~ /\A(?:white|black|)\z/;
 die usage() unless $o{level} >= 1 && $o{level} <= 3;
 
-Game::Backgammon::Terminal->new(%o, (defined $colour ? (colour => $colour) : ()))->run;
+Game::Backgammon::Terminal->new(
+    %o,
+    (defined $colour ? (colour => $colour) : ()),
+    (defined $pick ? (picking => $pick) : ()),
+)->run;
 
 sub usage {
     return <<'USAGE';
 backgammon [--mode bot|hotseat|watch] [--level 1-3] [--seat white|black]
-           [--view white|black] [--ascii] [--no-colour]
+           [--view white|black] [--ascii] [--no-colour] [--no-pick]
 
   bot       play the computer (the default)
   hotseat   two people at one keyboard
@@ -36,9 +41,19 @@ backgammon [--mode bot|hotseat|watch] [--level 1-3] [--seat white|black]
             from the side on roll, because a turn is written in the mover's
             own numbers and the board should agree with the list.
   --ascii   O and X instead of the round checkers.
+  --no-pick choose a whole turn by number from the list, as 0.01 did, rather
+            than one checker at a time with the keys.
 
 The board is the usual one: your home board is the bottom right quarter and
 you run into it anticlockwise, the bar is the middle column and the tray the
-one on the right. Pick a turn by its number from the list. q stops.
+one on the right.
+
+On a terminal a turn is built one checker at a time: the moves you can make
+with the dice you have left are listed, up and down choose one and enter plays
+it, backspace takes the last one back, and the board shows where the checker
+under the cursor is going. A roll that can be played three hundred ways is
+still only a handful of choices at each step. v turns the board round and q
+stops. Without a terminal, or with --no-pick, every legal turn is numbered and
+you pick one.
 USAGE
 }

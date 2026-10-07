@@ -1,5 +1,12 @@
 Revision history for Music-NWC2MusicXML
 
+0.001.2	Mon Oct  6 2026
+	[ Bug Fixes ]
+	- NWC::read: suppress autodie on the open() call so the "Cannot read file"
+	  croak fires correctly on Cygwin, where -r returns true for chmod 0000 files
+	  due to imprecise Windows ACL mapping.
+	  fixes https://matrix.perl-magpie.org/results/dbc4dafe-7e31-1014-904b-aa3c0773776a
+
 0.001.1	Sat Sep 19 09:14:05 PM EDT 2026
 	[ Bug Fixes]
 	- Fix Test Dashboard URL

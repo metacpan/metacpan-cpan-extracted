@@ -154,4 +154,17 @@ sub filled {                     # a map fragmented by removing every other key
     like $@, qr/frozen/, '  ... saying so';
 }
 
+# A back-off earned while the arena was genuinely full does not outlast the
+# removals that would let a slide succeed.
+{
+    my $m = Data::HashMap::Shared::SS->new(undef, 10000, 0, 0, 0, 65536);
+    my $n = 0;
+    $n++ while $n < 5000 && $m->put("k$n", 'x' x 100);
+    $m->put("z$_", 'y' x 100) for 1 .. 40_000;
+    $m->remove("k$_") for grep { $_ % 2 == 0 } 0 .. $n;
+    my $tries = 0;
+    $tries++ until $m->put("big$tries", 'B' x 1000) || $tries >= 1000;
+    cmp_ok $tries, '<', 10, 'after half the entries go, a refused store compacts instead of backing off';
+}
+
 done_testing;

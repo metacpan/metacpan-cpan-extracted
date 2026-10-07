@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %MESSAGE = (
 	game_over    => 'the game is over',

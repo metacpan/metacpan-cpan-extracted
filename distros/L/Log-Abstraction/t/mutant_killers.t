@@ -182,4 +182,70 @@ subtest 'COND_INV_587_3 — top-level fd: subclass default format includes class
 		'subclass top-level fd default format includes class name');
 };
 
+# ============================================================
+# COND_INV_1394_2 -- line 1394: if(Scalar::Util::blessed($value))
+#
+# Mutation: invert to if(!Scalar::Util::blessed($value))
+# Effect:   blessed objects skip the stringify-and-redact branch entirely and
+#           fall through to the ref($value) check.  Non-HASH/non-ARRAY blessed
+#           objects (the common case) are returned unredacted.  The inverted
+#           condition also causes infinite recursion for plain strings when the
+#           code used a recursive call, but the fix (direct substitution) removes
+#           that crash path, leaving the observable difference: a blessed field
+#           value whose stringification matches the pattern is no longer redacted.
+# Kill strategy: log a structured field whose value is a blessed object that
+#   overloads stringification to produce a secret string.  Verify the history
+#   entry shows [REDACTED], not the original blessed object.
+# ============================================================
+
+{
+	package Log::Abstraction::Test::SecretObj;
+	use overload q("") => sub { 'password=topsecret' }, fallback => 1;
+	sub new { bless {}, shift }
+}
+
+subtest 'COND_INV_1394_2 -- blessed field value is redacted when stringification matches' => sub {
+	plan tests => 2;
+
+	my @arr;
+	my $log = Log::Abstraction->new(
+		array  => \@arr,
+		level  => 'debug',
+		redact => [qr/password=\S+/],
+	);
+
+	my $secret = Log::Abstraction::Test::SecretObj->new();
+	$log->info('login attempt', { credential => $secret });
+
+	my $entry = $arr[-1];
+	is(ref($entry->{fields}{credential}), '',
+		'blessed field value is replaced with a plain string after redaction');
+	is($entry->{fields}{credential}, '[REDACTED]',
+		'blessed field value containing password= is replaced with [REDACTED]');
+};
+
+subtest 'COND_INV_1394_2 -- blessed field value kept intact when stringification does not match' => sub {
+	plan tests => 1;
+
+	{
+		package Log::Abstraction::Test::SafeObj;
+		use overload q("") => sub { 'harmless info' }, fallback => 1;
+		sub new { bless {}, shift }
+	}
+
+	my @arr;
+	my $log = Log::Abstraction->new(
+		array  => \@arr,
+		level  => 'debug',
+		redact => [qr/password=\S+/],
+	);
+
+	my $safe_obj = Log::Abstraction::Test::SafeObj->new();
+	$log->info('status', { info => $safe_obj });
+
+	my $entry = $arr[-1];
+	is(ref($entry->{fields}{info}), 'Log::Abstraction::Test::SafeObj',
+		'blessed field value not matching pattern is returned unchanged (still blessed)');
+};
+
 done_testing();

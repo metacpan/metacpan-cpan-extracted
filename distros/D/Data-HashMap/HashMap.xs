@@ -58,6 +58,23 @@ static HV* stash_ss;
     type* other = INT2PTR(type*, SvIV(SvRV(sv))); \
     if (!other) croak("Attempted to use a destroyed %s object", classname)
 
+/* Reserve for size + extra, but a bounded map evicts down to max_size, so never
+   size the table past it: a small LRU cache filled from a huge source stays small. */
+#define HM_RESERVE_FOR(map, extra) \
+    ((map)->max_size && (map)->size + (extra) > (map)->max_size \
+        ? (map)->max_size : (map)->size + (extra))
+
+/* Class name for new/thaw. A blessed invocant ($obj->new) gives its own class
+   instead of stringifying into a bogus package that leaks its C map. */
+static const char* hm_class_name(pTHX_ SV* sv) {
+    if (SvROK(sv)) {
+        SV* rv = SvRV(sv);
+        if (SvOBJECT(rv)) return HvNAME(SvSTASH(rv));
+        croak("cannot create a map from an unblessed reference");
+    }
+    return SvPV_nolen(sv);
+}
+
 /* Clears the pointer before destroy() so a value's DESTROY reaching back croaks "destroyed". */
 #define HM_DESTROY(type, destroy_fn, sv) STMT_START { \
     if (!SvROK(sv)) XSRETURN_EMPTY; \
@@ -69,32 +86,54 @@ static HV* stash_ss;
 
 #define HM_MAX_STR_LEN 0x7FFFFFFFU
 
+/* Settled value only: SVf would FETCH a tied scalar again on the croak path. */
 static void croak_i16(SV* sv) {
     dTHX;
-    Perl_croak(aTHX_ "%" SVf " out of int16 range [-32768, 32767]", SVfARG(sv));
+    STRLEN len;
+    const char* p = SvPV_nomg(sv, len);
+    Perl_croak(aTHX_ "%.*s out of int16 range [-32768, 32767]", (int)len, p);
 }
 static void croak_i32(SV* sv) {
     dTHX;
-    Perl_croak(aTHX_ "%" SVf " out of int32 range [-2147483648, 2147483647]", SVfARG(sv));
+    STRLEN len;
+    const char* p = SvPV_nomg(sv, len);
+    Perl_croak(aTHX_ "%.*s out of int32 range [-2147483648, 2147483647]", (int)len, p);
 }
 static void croak_i64(SV* sv) {
     dTHX;
-    Perl_croak(aTHX_ "%" SVf " out of int64 range", SVfARG(sv));
+    STRLEN len;
+    const char* p = SvPV_nomg(sv, len);
+    Perl_croak(aTHX_ "%.*s out of int64 range", (int)len, p);
 }
 
 static IV hm_sv_to_int(pTHX_ SV* sv, IV lo, IV hi, int width) {
     /* SvIV first: a key arrives as a string, and the flags that show it overflowed appear only after conversion. */
     IV v = SvIV(sv);
+    /* Before the IsUV test: SvIV may turn NaN into UV 0. */
+    if (SvNOKp(sv)) {
+        NV nv = SvNV_nomg(sv);
+        if (nv != nv) croak("cannot use NaN where an integer is expected");
+        if (nv < (NV)lo || nv > (NV)hi) goto bad;
+    }
     if (SvIsUV(sv)) {
-        UV u = SvUV(sv);
+        UV u = SvUV_nomg(sv);
         if (u > (UV)hi) goto bad;
         return (IV)u;
     }
-    if (SvNOK(sv)) {
-        NV nv = SvNV(sv);
-        if (!(nv == nv) || nv < (NV)lo || nv > (NV)hi) goto bad;
-    }
     if (v < lo || v > hi) goto bad;
+    /* A string whose integer value overflows IV clamps silently to lo/hi; a
+       double-NV perl then cannot tell -2^63-1 from -2^63. Re-check precisely. */
+    if (SvPOKp(sv) && (v == lo || v == hi)) {
+        STRLEN _slen;
+        const char* _sp = SvPV_nomg(sv, _slen);
+        UV _mag;
+        int _fl = grok_number(_sp, _slen, &_mag);
+        if (_fl) {   /* parsed as a number */
+            if (!(_fl & IS_NUMBER_IN_UV)) goto bad;   /* magnitude exceeds UV */
+            UV _max = (_fl & IS_NUMBER_NEG) ? ((UV)(-(lo + 1)) + 1) : (UV)hi;
+            if (_mag > _max) goto bad;
+        }
+    }
     return v;
 bad:
     if (width == 16) croak_i16(sv);
@@ -108,13 +147,6 @@ bad:
 #define HM_SV_TO_I64(var, sv) (var) = (int64_t)hm_sv_to_int(aTHX_ (sv), IV_MIN, IV_MAX, 64)
 
 #define HM_SV_TO_I32(var, sv) (var) = (int32_t)hm_sv_to_int(aTHX_ (sv), (IV)(-2147483647-1), 2147483647, 32)
-
-/* newSVsv_nomg only exists from 5.32; get-magic was already run by the caller. */
-static SV* hm_copy_nomg(pTHX_ SV* sv) {
-    SV* copy = newSV(0);
-    sv_setsv_nomg(copy, sv);
-    return copy;
-}
 
 /* Deferred: the value's DESTROY may reach back into the map, which is mid-mutation here. */
 static void hm_sv_free(void* sv) {
@@ -160,30 +192,67 @@ static inline SV* hm_zerocopy_sv(pTHX_ const char* buf, uint32_t len, bool is_ut
     uint32_t _khash = hm_hash_string(_kstr, (uint32_t)_klen); \
     (void)_kutf8
 
-#define EXTRACT_STR_VAL(sv) \
+#define EXTRACT_STR_VAL_NOMG(sv) \
     STRLEN _vlen; \
-    SvGETMAGIC(sv); \
     const char* _vstr = SvPV_nomg(sv, _vlen); \
     if (_vlen > HM_MAX_STR_LEN) croak("value too long (max 2GB)"); \
     bool _vutf8 = SvUTF8(sv) ? true : false
 
+#define EXTRACT_STR_VAL(sv) \
+    SvGETMAGIC(sv); \
+    EXTRACT_STR_VAL_NOMG(sv)
+
+/* The value's "" overload runs after the key is taken and may free its buffer. */
+#define EXTRACT_STR_KEY_VAL(ksv, vsv) \
+    SvGETMAGIC(vsv); \
+    EXTRACT_STR_KEY(ksv); \
+    if (HM_UNLIKELY(SvAMAGIC(vsv))) _kstr = SvPVX(sv_2mortal(newSVpvn(_kstr, _klen))); \
+    EXTRACT_STR_VAL_NOMG(vsv)
+
+/* newSVsv_nomg only exists from 5.32; get-magic was already run by the caller. */
+static SV* hm_copy_nomg(pTHX_ SV* sv) {
+    SV* copy = newSV(0);
+    sv_setsv_nomg(copy, sv);
+    return copy;
+}
+
 static void hm_num_arg(pTHX_ SV* sv, const char* what) {
-    if (SvROK(sv) || (SvOK(sv) && !looks_like_number(sv)))
-        croak("%s must be a number, got '%" SVf "'", what, SVfARG(sv));
+    if (SvROK(sv) || (SvOK(sv) && !looks_like_number(sv))) {
+        STRLEN len;
+        const char* p = SvPV_nomg(sv, len);
+        croak("%s must be a number, got '%.*s'", what, (int)len, p);
+    }
 }
 static uint32_t hm_ttl_arg(pTHX_ SV* sv) {
+    SvGETMAGIC(sv);
     hm_num_arg(aTHX_ sv, "ttl");
-    {
-        NV nv = SvNV(sv);
-        if (nv < 0) croak("ttl must be non-negative, got %" NVgf, nv);
-        if (nv > 0 && nv < 1) return 1;   /* 0 means no TTL; a fraction must not truncate to it */
-    }
-    { UV v = SvUV(sv); return v > UINT32_MAX ? UINT32_MAX : (uint32_t)v; }
+    NV nv = SvNV_nomg(sv);
+    if (nv != nv) croak("ttl must be a number, got NaN");
+    if (nv < 0) croak("ttl must be non-negative, got %" NVgf, nv);
+    if (nv > 0 && nv < 1) return 1;   /* 0 means no TTL; a fraction must not truncate to it */
+    UV v = SvUV_nomg(sv);
+    return v > UINT32_MAX ? UINT32_MAX : (uint32_t)v;
 }
 static size_t hm_size_arg(pTHX_ SV* sv, const char* what) {
+    SvGETMAGIC(sv);
     hm_num_arg(aTHX_ sv, what);
-    if (SvNV(sv) < 0) croak("%s must be non-negative, got %" NVgf, what, SvNV(sv));
-    return (size_t)SvUV(sv);
+    NV nv = SvNV_nomg(sv);
+    if (nv != nv) croak("%s must be a number, got NaN", what);
+    if (nv < 0) croak("%s must be non-negative, got %" NVgf, what, nv);
+    UV v = SvUV_nomg(sv);
+#if UVSIZE > Size_t_size
+    if (v > (UV)SIZE_MAX) return SIZE_MAX;
+#endif
+    return (size_t)v;
+}
+
+static UV hm_uv_arg(pTHX_ SV* sv) {
+    SvGETMAGIC(sv);
+    if (SvNOKp(sv) || SvPOKp(sv)) {
+        NV nv = SvNV_nomg(sv);
+        if (!(nv == nv)) croak("NaN is not a valid count");
+    }
+    return SvUV_nomg(sv);
 }
 
 /* ---- new() arguments ---- */

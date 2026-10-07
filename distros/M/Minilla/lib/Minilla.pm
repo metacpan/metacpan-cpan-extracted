@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.3.0");
+use version; our $VERSION = version->declare("v3.3.1");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -44,7 +44,8 @@ for example C<minil --help release>.
 
 Enable or disable colored log output. Color is enabled by default when standard
 error is connected to a terminal. Log output is written to standard error so
-standard output remains available for command output and pipelines.
+standard output remains reserved for structured JSON results emitted by
+C<Minilla::Logger::slog>.
 
 =item B<--debug>
 
@@ -99,6 +100,18 @@ C<-y>
 Minilla is a CPAN module authoring tool. Minilla provides L<minil> command for authorizing a CPAN distribution.
 
     (M::I - inc) + shipit + (dzil - plugins)
+
+=head2 Command output
+
+The CLI reserves standard output for structured JSON results emitted by
+C<Minilla::Logger::slog>. All other output goes to standard error, including
+build commands, test summaries, dependency installation, release hooks, and
+interactive prompts. This also applies to C<--version>, C<minil help>, and
+commands executed by C<minil run>.
+
+For example, C<minil dist --no-test --skip-prepare> writes only a single JSON
+line containing the archive path to standard output; build progress remains
+visible on standard error.
 
 =head1 CONVENTION
 
@@ -184,10 +197,13 @@ push.
 
 C<minil dist --skip-prepare> and C<minil release --skip-prepare> build a
 distribution from an already prepared source tree without regenerating
-F<META.json>, F<README.md>, or F<Build.PL> or F<Makefile.PL>. Packaging files
-such as F<META.yml> and F<MANIFEST> are still generated. Distribution tests
-run by default and can be disabled with C<--no-test>. The release command uses
-the prepared version without prompting for or updating it.
+F<README.md> or F<Build.PL> or F<Makefile.PL>. Prepared F<META.json> fields
+are preserved, while C<release_status> and C<provides> are finalized in the
+archive using the same rules as a normal distribution build. The source
+F<META.json> is not changed. Packaging files such as F<META.yml> and
+F<MANIFEST> are still generated. Distribution tests run by default and can be
+disabled with C<--no-test>. The release command uses the prepared version
+without prompting for or updating it.
 
 =head2 CheckUntrackedFiles
 

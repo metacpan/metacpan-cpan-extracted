@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3214';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3215';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -2887,11 +2887,23 @@ sub _xml_unescape {
 # commented-out <sheet> or <Relationship> is not read as one, and a tag is
 # matched quote by quote, so that a '>' inside an attribute value -- which XML
 # allows unescaped -- does not end it.
+#
+# Both this and _xml_attr() compile their pattern once per name and keep it.
+# Interpolated into the match, it was recompiled on every call (the callers
+# alternate names), and perl 5.32's regcomp leaks the inversion lists it builds
+# for \s and \w on each compile: 0.3214 failed 14 leak subtests on a 5.32.1
+# smoker that no perl in the local matrix could reproduce. The keys are the
+# literal names the xlsx reader passes, so the caches stay a few entries long,
+# and the qr// is evaluated only on a miss, never inside a warmed leak check
+# (5.10.0's pp_qr() leaks an SV each time one is).
+my (%xml_tag_re, %xml_attr_re);
 sub _xml_start_tags {
 	my ($xml, $local) = @_;
 	$xml =~ s/<!--.*?-->//gs if index($xml, '<!--') >= 0;
+	my $re = $xml_tag_re{$local}
+		||= qr{<(?:[\w.-]+:)?\Q$local\E\b((?:[^>"']|"[^"]*"|'[^']*')*)>};
 	my @tags;
-	while ($xml =~ m{<(?:[\w.-]+:)?\Q$local\E\b((?:[^>"']|"[^"]*"|'[^']*')*)>}g) {
+	while ($xml =~ /$re/g) {
 		(my $at = $1) =~ s{/\z}{};	# the "/" of a self-closing tag
 		push @tags, $at;
 	}
@@ -2906,8 +2918,9 @@ sub _xml_start_tags {
 # file position rather than through their relationships.
 sub _xml_attr {
 	my ($attrs, $name) = @_;
-	return undef
-		unless $attrs =~ /(?:\A|\s)$name\s*=\s*(?:"([^"]*)"|'([^']*)')/;
+	my $re = $xml_attr_re{$name}
+		||= qr/(?:\A|\s)$name\s*=\s*(?:"([^"]*)"|'([^']*)')/;
+	return undef unless $attrs =~ $re;
 	return defined $1 ? $1 : $2;
 }
 
@@ -6375,7 +6388,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3214
+version 0.3215
 
 =head1 Synopsis
 

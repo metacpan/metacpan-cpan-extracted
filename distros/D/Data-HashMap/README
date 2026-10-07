@@ -127,9 +127,9 @@ KEYWORDS
 
         $map->clone                     # copy the map (SV* values per its copy mode)
         $map->from_hash(\%h)            # bulk-insert from a Perl hashref
-        $map->merge($other_map)         # copy in another map's entries; it wins on a conflict
+        $map->merge($other_map)         # copy in another same-variant map's entries
         $map->freeze                    # serialize to binary string (non-SV* variants)
-        MyVariant->thaw($data)          # reconstruct map from freeze data
+        MyVariant->thaw($data)          # rebuild a frozen map (non-SV* variants)
 
 CONSTRUCTOR
         my $map  = Data::HashMap::II->new();              # plain (no LRU, no TTL)
@@ -147,8 +147,10 @@ CONSTRUCTOR
 
   LRU eviction
     With "max_size" set, inserting a new key into a full map evicts the
-    least recently used entry. "get", "put" on an existing key, and the
-    counters promote the entry they touch; "exists" does not.
+    least recently used entry. Reading or writing an existing key promotes
+    it: "get", "get_direct", "put", "put_ttl", "swap", a successful "cas",
+    "get_or_set" and the counters do; "exists", "persist" and a failed "cas"
+    do not.
 
     "lru_skip" (0-99, larger values clamp to 99) skips promotion on exactly
     that percentage of the accesses that would promote: 90 promotes one in
@@ -185,6 +187,10 @@ CONSTRUCTOR
     keeps its slot and its value until it is reaped: call "purge"
     periodically so that expired entries, not live ones, make room.
 
+    Expiry is measured against the wall clock ("time"), so stepping the
+    system clock moves every deadline with it; a clock set backward keeps
+    entries alive longer.
+
 CAVEATS
     Keyword syntax
         A keyword taking two or more arguments takes a plain comma list with
@@ -203,12 +209,16 @@ CAVEATS
     Integers
         Keys and values are checked against the variant's range on every
         call, "from_hash" included, and croak outside it rather than wrap.
-        INT_MIN and INT_MIN+1 are reserved as keys: "put", "put_ttl",
-        "get_or_set" and lookups ignore them, while "incr", "decr" and
-        "incr_by" croak. The counters also croak rather than overflow,
-        leaving the value unchanged, with the same "increment failed"
-        message. The I16 and I32 croaks name the full type range, reserved
-        values included. A 64-bit perl ("use64bitint") is required.
+        NaN croaks wherever a number is expected. INT_MIN and INT_MIN+1 are
+        reserved as keys: "put", "put_ttl", "get_or_set" and lookups ignore
+        them, as do "swap" and "cas" (returning undef and false), while
+        "incr", "decr" and "incr_by" croak. An undef key or value coerces as
+        in Perl, to "" or 0, usually with a warning; SV* variants store an
+        undef value as-is. The counters croak rather than overflow, leaving
+        the value unchanged: "incr" with "increment failed", "decr" with
+        "decrement failed" and "incr_by" with "incr_by failed". The I16 and
+        I32 croaks name the full type range, reserved values included. A
+        64-bit perl ("use64bitint") is required.
 
     String keys
         Identity is the key's bytes. A UTF-8-flagged key whose characters
@@ -228,20 +238,27 @@ CAVEATS
         it is stored; "from_hash", "clone", "merge" and "to_hash" share SVs
         with their source; and a stored literal is read-only. Store a copy
         ("$_"), or pass a true fourth argument, "copy", to "new": the map
-        then copies each value it stores, as a hash does, and each put costs
-        1.6 to 2.6 times as much, still less than a Perl hash. In either
-        mode "get", "values", "items" and "each" return the map's own SV, as
-        "values %h" does, and referents are shared.
+        then copies each value it stores, as a hash does, at the cost of one
+        SV copy per put. In either mode "get", "values", "items" and "each"
+        return the map's own SV, as "values %h" does, and referents are
+        shared.
 
     Iteration and order
         Key order is unspecified and differs between processes, as with
-        Perl's own hashes; sort if you need a stable one. "each" restarts if
-        a "put", "remove", "incr" or "get_or_set" resizes or compacts the
-        table, so do not mutate the map during "each"; in scalar context it
-        returns the key. "drain" removes entries in table order, not LRU
-        order, unlike "pop" and "shift" on an LRU map. "pop" and "shift"
-        skip expired entries; on an LRU map they also reap them, and on a
-        plain map "size" keeps counting them until a lookup reaps them.
+        Perl's own hashes; sort if you need a stable one. "each" restarts
+        after "clear", and whenever another write resizes or compacts the
+        table ("swap", "cas" and "persist" only do so by reaping an expired
+        entry), so do not write to the map during "each"; reads are safe. In
+        scalar context it returns the key, so a "while" loop over it must
+        guard with "defined" -- "while (defined(my $k = hm_xx_each $map))"
+        -- or it stops early on a false key such as 0 or "". "pop", "shift"
+        and "drain" keep their own cursor, so they do not move an "each" in
+        progress unless they compact the table. On an LRU map "pop" and
+        "shift" take the least and most recently used entry; "drain" always
+        goes in table order. In scalar context the three return the last
+        value removed. "pop" and "shift" skip expired entries; on an LRU map
+        they also reap them, and on a plain map "size" keeps counting them
+        until a lookup reaps them.
 
     get_direct
         Returns a read-only SV that borrows the map's buffer instead of
@@ -259,8 +276,9 @@ CAVEATS
         frozen blob as a digest or cache key; "thaw" round-trips the data
         regardless. Each entry's remaining lifetime is stored, and "thaw"
         starts that countdown afresh, so time spent frozen does not count. A
-        "thaw"ed LRU map has lost its recency order. All of this applies to
-        Storable too.
+        "thaw"ed LRU map has lost its recency order. A map whose "max_size"
+        exceeds 4294967295 cannot be frozen: the format stores it in 32
+        bits, so "freeze" croaks. All of this applies to Storable too.
 
     from_hash and merge
         "from_hash" croaks on a key or value the matching "put" would
@@ -268,7 +286,7 @@ CAVEATS
         keys silently, and reads tied hashes. "merge" copies another map's
         entries in, the other map winning a conflict; they take this map's
         TTL rules, not the other map's, so merging into a map without a TTL
-        makes them permanent.
+        makes them permanent. Already-expired entries are skipped.
 
     Capacity
         A table never shrinks: "remove" and "clear" keep its capacity for

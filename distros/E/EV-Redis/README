@@ -1,0 +1,767 @@
+NAME
+    EV::Redis - Asynchronous redis client using hiredis and EV
+
+SYNOPSIS
+        use EV::Redis;
+
+        my $redis = EV::Redis->new;
+        $redis->connect('127.0.0.1');
+
+        # or
+        my $redis = EV::Redis->new( host => '127.0.0.1' );
+
+        # command
+        $redis->set('foo' => 'bar', sub {
+            my ($res, $err) = @_;
+
+            print $res; # OK
+
+            $redis->get('foo', sub {
+                my ($res, $err) = @_;
+
+                print $res; # bar
+
+                $redis->disconnect;
+            });
+        });
+
+        # start main loop
+        EV::run;
+
+DESCRIPTION
+    EV::Redis is a fork of EV::Hiredis by Daisuke Murase (typester),
+    extended with reconnection, flow control, TLS, and RESP3 support. It is
+    a drop-in replacement for EV::Hiredis, except that commands which would
+    pair replies with the wrong callbacks croak (see Reply order note).
+
+    This is an asynchronous client for Redis using hiredis and EV as
+    backend. It connects to EV with C-level interface so that it runs
+    faster.
+
+ANYEVENT INTEGRATION
+    AnyEvent has a support for EV as its one of backends, so EV::Redis can
+    be used in your AnyEvent applications seamlessly.
+
+NO UTF-8 SUPPORT
+    Unlike other redis modules, this module doesn't support utf-8 string.
+
+    This module handle all variables as bytes: command arguments are sent as
+    their byte representation regardless of Perl's internal string encoding
+    (upgraded strings are downgraded in place, unless read-only), and
+    passing a string with characters above 0xFF croaks with a "Wide
+    character" error. You should encode your utf-8 string before passing
+    commands like following:
+
+        use Encode;
+
+        # set $val
+        $redis->set(foo => encode_utf8 $val, sub { ... });
+
+        # get $val
+        $redis->get('foo', sub {
+            my $val = decode_utf8 $_[0];
+        });
+
+SIGPIPE
+    Writing to a connection the server has already closed raises "SIGPIPE",
+    which terminates the process by default. Set "$SIG{PIPE} = 'IGNORE'" so
+    the write fails instead and the connection error reaches "on_error" as
+    usual.
+
+FORK
+    A child process inherits the connection's socket, which the parent goes
+    on using. The child never uses it: when the child's loop next has an
+    event for that connection, the connection fails there with "connection
+    inherited from the parent process" -- its pending commands get that
+    error, "on_error" runs, and "on_disconnect" too unless it was still
+    connecting, and with "reconnect" the child connects on its own. A child
+    forked inside a callback still gets the replies the parent had already
+    read. A child that exits, or destroys the object, without running the
+    loop changes nothing. The parent is not affected. A loop other than the
+    default needs "$loop->loop_fork" in the child, as EV requires.
+
+    Objects cannot be copied: "Storable" croaks on them, and "Clone" must
+    not be used on them: the copy shares the original's connection, and
+    destroying either one frees it for both.
+
+RESP3 REPLIES
+    After "HELLO 3", maps and sets arrive as array references (a map as a
+    flat key, value, key, value list), doubles as numbers, booleans as 1 or
+    0, and big numbers and verbatim strings as plain strings, without the
+    verbatim format tag. Attribute replies are not supported: one ahead of a
+    reply, as "DEBUG PROTOCOL attrib" sends, is dropped and the reply
+    arrives as usual; one inside an array or map, which some modules send,
+    fails the connection with a protocol error.
+
+METHODS
+  new(%options);
+    Create new EV::Redis instance.
+
+    Available %options are:
+
+    *   host => 'Str'
+
+    *   port => 'Int'
+
+        Hostname and port number of redis-server to connect. Mutually
+        exclusive with "path".
+
+    *   path => 'Str'
+
+        UNIX socket path to connect. Mutually exclusive with "host".
+
+    *   on_error => $cb->($errstr)
+
+        Error callback will be called when a connection level error occurs.
+        If not provided (or "undef"), a default handler that calls "die" is
+        installed. Note that exceptions thrown inside any handler (including
+        this default) or command callback are caught and reported as
+        warnings -- they do not propagate out of the event loop. In practice
+        the default handler therefore turns connection errors into warnings;
+        install your own "on_error" to handle them programmatically. To have
+        no error handler, call "$obj->on_error(undef)" after construction.
+
+        A $SIG{__WARN__} that dies while such a warning is reported cannot
+        stop the loop either: both messages are printed to STDERR instead.
+        Perl runs a %SIG handler when Perl code next runs, which inside
+        "EV::run" is a callback; a handler that dies there aborts that
+        callback and is reported as a warning, so an "alarm" that dies does
+        not end "EV::run". Use "command_timeout" or an "EV::timer" instead.
+
+        This callback can be set by "$obj->on_error($cb)" method any time.
+
+    *   on_connect => $cb->()
+
+        Connection callback will be called when connection successful and
+        completed to redis server. With "tls", it is called once the TCP
+        connection is up; a failed TLS handshake then arrives as "on_error"
+        and "on_disconnect".
+
+        This callback can be set by "$obj->on_connect($cb)" method any time.
+
+    *   on_disconnect => $cb->()
+
+        Disconnect callback will be called when disconnection occurs (both
+        normal and error cases).
+
+        This callback can be set by "$obj->on_disconnect($cb)" method any
+        time.
+
+    *   on_push => $cb->($reply)
+
+        RESP3 push callback for server-initiated out-of-band messages (Redis
+        6.0+). Called with the decoded push message (an array reference).
+        This enables client-side caching invalidation and other server-push
+        features.
+
+        This callback can be set by "$obj->on_push($cb)" method any time.
+
+    *   connect_timeout => $num_of_milliseconds
+
+        Connection timeout.
+
+    *   command_timeout => $num_of_milliseconds
+
+        Command timeout.
+
+    *   max_pending => $num
+
+        Maximum number of commands sent to Redis concurrently. When this
+        limit is reached, additional commands are queued locally and sent as
+        responses arrive. 0 means unlimited (default). Use "waiting_count"
+        to check the local queue size.
+
+    *   waiting_timeout => $num_of_milliseconds
+
+        Maximum time a command can wait in the local queue before being
+        cancelled with "waiting timeout" error. 0 means unlimited (default).
+
+    *   resume_waiting_on_reconnect => $bool
+
+        Controls behavior of waiting queue on disconnect. If false
+        (default), waiting commands are cancelled with error on disconnect
+        and on each failed connect attempt. If true, waiting commands are
+        preserved and resumed after successful reconnection; an explicit
+        disconnect(), a lost connection or failed connect without
+        "reconnect", or giving up on reconnecting still cancels them. The
+        settings as the connection is lost decide; a handler changing them
+        affects the next one, except that reconnect(0) or disconnect() there
+        cancels the kept commands at once. Commands cancelled on a lost
+        connection are off the queue before "on_error" and "on_disconnect"
+        run.
+
+    *   reconnect => $bool
+
+        Enable automatic reconnection on connection failure or unexpected
+        disconnection. Default is disabled (0).
+
+    *   reconnect_delay => $num_of_milliseconds
+
+        Delay between reconnection attempts. Default is 1000 (1 second).
+        Used only with "reconnect", as is "max_reconnect_attempts".
+
+    *   max_reconnect_attempts => $num
+
+        Maximum number of reconnection attempts. 0 means unlimited. Default
+        is 0. Negative values are treated as 0 (unlimited). Only connects
+        that fail count: an established connection starts the count again,
+        also one that is closed at once or fails its TLS handshake, so
+        retries against such a server or proxy go on.
+
+    *   priority => $num
+
+        Priority for the underlying libev IO watchers. Higher priority
+        watchers are invoked before lower priority ones. Valid range is -2
+        (lowest) to +2 (highest), with 0 being the default. See EV
+        documentation for details on priorities.
+
+    *   keepalive => $seconds
+
+        Enable TCP keepalive with the specified interval in seconds (at most
+        32767). When enabled, the OS will periodically send probes on idle
+        connections to detect dead peers. 0 means disabled (default).
+        Recommended for long-lived connections behind NAT gateways or
+        firewalls. The interval applies on Linux with glibc and on macOS;
+        elsewhere only keepalive itself is enabled, with the system's
+        timing. Ignored for unix sockets.
+
+    *   prefer_ipv4 => $bool
+
+        Resolve host names to IPv4 addresses, falling back to IPv6 only when
+        there is none; this is already the default. Mutually exclusive with
+        "prefer_ipv6".
+
+    *   prefer_ipv6 => $bool
+
+        Resolve host names to IPv6 addresses, falling back to IPv4 only when
+        there is none. Mutually exclusive with "prefer_ipv4".
+
+    *   source_addr => 'Str'
+
+        Local address to bind the outbound connection to. Useful on
+        multi-homed servers to select a specific network interface.
+
+    *   tcp_user_timeout => $num_of_milliseconds
+
+        Set the TCP_USER_TIMEOUT socket option (Linux-specific). Controls
+        how long transmitted data may remain unacknowledged before the
+        connection is dropped. Helps detect dead connections faster on lossy
+        networks. Ignored for unix sockets; where the system lacks the
+        option, TCP connects fail with an error.
+
+    *   cloexec => $bool
+
+        Set SOCK_CLOEXEC on the Redis connection socket. Prevents the file
+        descriptor from leaking to child processes after fork/exec. Default
+        is enabled.
+
+    *   reuseaddr => $bool
+
+        Set SO_REUSEADDR on the Redis connection socket. Allows rebinding to
+        an address that is still in TIME_WAIT state. Default is disabled.
+
+    *   tls => $bool
+
+        Enable TLS/SSL encryption for the connection. Requires that the
+        module was built with TLS support (auto-detected at build time, or
+        forced with "EV_REDIS_SSL=1"). Only valid with "host" connections,
+        not "path".
+
+    *   tls_ca => 'Str'
+
+        Path to CA certificate file for server verification. If not
+        specified, uses the system default CA store.
+
+    *   tls_capath => 'Str'
+
+        Path to a directory containing CA certificate files in
+        OpenSSL-compatible format (hashed filenames). Alternative to
+        "tls_ca" for multiple CA certs.
+
+    *   tls_cert => 'Str'
+
+        Path to client certificate file for mutual TLS authentication. Must
+        be specified together with "tls_key".
+
+    *   tls_key => 'Str'
+
+        Path to client private key file. Must be specified together with
+        "tls_cert".
+
+    *   tls_server_name => 'Str'
+
+        Server name for SNI (Server Name Indication), sent on every
+        connection the object makes; without it no SNI is sent, which
+        endpoints that route by SNI reject. It is not checked against the
+        certificate.
+
+    *   tls_verify => $bool
+
+        Enable or disable TLS peer verification. Default is true (verify).
+        Set to false to accept self-signed certificates (not recommended for
+        production). Verification checks the certificate chain against the
+        CAs only: the bundled hiredis does not check that the certificate
+        names the host, so any certificate those CAs issued is accepted. Use
+        "tls_ca" with a CA dedicated to your Redis servers rather than the
+        system store.
+
+    *   loop => 'EV::Loop',
+
+        EV loop for running this instance. Default is "EV::default_loop".
+
+    All parameters are optional. Unknown ones warn, unless "new" is called
+    on a subclass.
+
+    If parameters about connection (host&port or path) is not passed, you
+    should call "connect" or "connect_unix" method by hand to connect to
+    redis-server.
+
+  connect($hostname [, $port])
+  connect_unix($path)
+    Connect to a redis-server for "$hostname:$port" or $path. $port defaults
+    to 6379. Croaks if a connection is already active, $port is outside
+    1..65535, or $path is too long for a unix socket (over 107 bytes on
+    Linux, 103 on BSD and macOS).
+
+    A failure detected inside the call (a missing unix socket, a host name
+    that does not resolve) reaches "on_error" before the method returns,
+    also when called from "new"; with reconnect enabled a retry is then
+    scheduled.
+
+    The host name is resolved inside the call, and again by each reconnect
+    attempt: the event loop waits for the system resolver, "connect_timeout"
+    does not cover it, and only the first address found is tried. Pass an IP
+    address where DNS can be slow.
+
+  command($commands..., [$cb->($result, $error)])
+    Do a redis command and return its result by callback. Returns "REDIS_OK"
+    (0) on success or "REDIS_ERR" (-1) if the command could not be enqueued
+    (the error is also delivered via callback, so the return value is rarely
+    needed).
+
+        $redis->command('get', 'foo', sub {
+            my ($result, $error) = @_;
+
+            print $result; # value for key 'foo'
+            print $error;  # redis error string, undef if no error
+        });
+
+    If any error is occurred, $error presents the error message and $result
+    is undef. If no error, $error is undef and $result presents response
+    from redis. An error inside an array reply, such as "EXEC"'s result for
+    a queued command that failed, arrives as its error text. Arrays nested
+    more than 512 levels deep in a reply arrive empty; a reply nested more
+    than 1024 levels deep is a protocol error that closes the connection.
+
+    The callback is optional: only a code reference in the last position is
+    taken as one, so an "undef" there is sent as an argument. Without a
+    callback, the command runs in fire-and-forget mode: the reply from Redis
+    is silently discarded and errors are not reported to Perl code
+    (connection-level errors still trigger "on_error"). This is useful for
+    high-volume writes where individual acknowledgement is not needed:
+
+        $redis->set('counter', 42);  # fire-and-forget, no callback
+
+    The callback is the code reference passed, so reusing a variable for it
+    is safe. Perl releases many closures in creation order slowly: with a
+    million commands outstanding, each with a closure of its own, their
+    replies or a cancel take about two minutes, against under a second with
+    one shared code reference.
+
+    NOTE: Alternatively all commands can be called via AUTOLOAD interface,
+    including fire-and-forget:
+
+        $redis->command('get', 'foo', sub { ... });
+
+    is equivalent to:
+
+        $redis->get('foo', sub { ... });
+
+    The Redis "COMMAND" command itself is reached as
+    "$redis->command('command', ...)", since "command" is this method.
+
+    Note: Calling command() while not connected will croak with "connection
+    required before calling command", unless automatic reconnection is
+    active (reconnect timer running). Commands issued then wait locally and
+    are sent in order once a connection is established; with
+    "resume_waiting_on_reconnect", so are commands issued while an attempt
+    is still connecting. Unless "resume_waiting_on_reconnect" is set, a
+    failed attempt cancels waiting commands with its error. Queued commands
+    respect "waiting_timeout" if set. A command issued from a command's
+    callback that reports the loss or timeout of an established connection
+    waits too: with "reconnect" and "resume_waiting_on_reconnect" it is sent
+    on the next connection, otherwise it fails with that error once
+    "on_error" and "on_disconnect" have run. After a failed connect it
+    croaks as above, unless a reconnect is scheduled: then it waits for that
+    attempt. From "on_error" and "on_disconnect" themselves it croaks as
+    above: the reconnect is scheduled only after they return.
+
+    Pub/Sub note: For "subscribe" and "psubscribe", the callback is
+    persistent and receives all messages; at least one channel/pattern
+    argument is required. For "unsubscribe" and "punsubscribe", the
+    confirmation is delivered through the original subscribe callback (this
+    is hiredis behavior). Any callback passed to unsubscribe commands is
+    silently discarded, unless hiredis refuses the command (as when nothing
+    is subscribed): then it gets the error. Subscribing again to a channel
+    or pattern that already has a callback moves it to the new callback,
+    including confirmations still due; a callback left with no channels is
+    never called again. An error reply that arrives while the connection is
+    subscribed (RESP2 or RESP3) is taken by hiredis as a connection error
+    and closes the connection, so keep pub/sub on a connection of its own. A
+    subscribed connection waits for messages without a timeout: set
+    "keepalive" to notice a server that is gone without closing it. When the
+    connection is lost or disconnect() closes it, a subscribe callback gets
+    one error for each channel or pattern it still holds; when the object is
+    destroyed it gets one.
+
+    Sharded pub/sub note: "ssubscribe" and "sunsubscribe" are not supported
+    and croak: the bundled hiredis has no sharded pub/sub support, so it
+    cannot deliver "smessage" messages to a callback. "spublish" works as a
+    regular command.
+
+    MONITOR note: "monitor" requires an idle connection (no pending,
+    waiting, or subscribed commands), and once active no further commands
+    may be sent on that connection -- command() croaks. Both restrictions
+    exist because hiredis's monitor mode re-queues callback records in a way
+    that is unsafe to mix with other traffic. Use a dedicated connection;
+    the state clears on disconnect.
+
+    Reply order note: hiredis hands each reply to the oldest callback still
+    waiting for one, so commands that change how the server answers are
+    refused: "CLIENT REPLY OFF", "CLIENT REPLY SKIP", "REPLCONF ACK" and
+    "REPLCONF GETACK" croak, and so do "SYNC" and "PSYNC", whose replication
+    stream is not a sequence of replies; "RESET" croaks while the connection
+    is subscribed or a subscribe is waiting (leave with "unsubscribe" and
+    "punsubscribe" and wait for their replies, or disconnect), and fails
+    through its callback if a subscription was made while it waited; pub/sub
+    commands, "monitor" and "HELLO" sent inside "MULTI" fail through their
+    callback. Pub/sub and "HELLO" wait locally for outstanding transaction
+    replies before they are checked and sent; each such wait costs a round
+    trip, and commands issued meanwhile queue behind it. A "MONITOR" the
+    server refuses leaves the connection usable. An "EXEC" cancelled before
+    it is sent (by "waiting_timeout" or "skip_waiting") leaves the
+    transaction open: later commands are answered "QUEUED" until a
+    "DISCARD".
+
+    Nested event loop note: while a callback runs for an event on this
+    connection (a reply, message or push, the connect, or the connection's
+    loss), its I/O watchers are paused, so a nested "EV::run" (or
+    condvar-style wait) inside it cannot process replies for the same
+    connection -- they are delivered after the outer callback returns.
+    Callbacks of commands cancelled locally ("waiting_timeout",
+    "skip_waiting", "skip_pending", and waiting commands that disconnect()
+    cancels) do not pause them. Use a separate connection if you must wait
+    for Redis inside a callback.
+
+  disconnect
+    Disconnect from redis-server. Safe to call when already disconnected.
+    Stops any pending reconnect timer, so explicit disconnect prevents
+    automatic reconnection. Triggers the "on_disconnect" callback when
+    disconnecting from an established connection. Called while the
+    connection is still being established, it skips "on_connect" for it;
+    "on_disconnect" still runs if commands already sent keep it open until
+    they are answered. Waiting commands are cancelled with a "disconnected"
+    error before it returns, also while the connection is still being
+    established or finishing its pending replies, and when already
+    disconnected (e.g., commands kept by "resume_waiting_on_reconnect").
+    Commands already sent are not cancelled: the connection closes once
+    their replies have arrived. That holds while it is still being
+    established too: they go out when it is up and are answered first.
+    Commands sent while the connection is subscribed are cancelled with
+    "disconnected" instead. So disconnect() does not drop a server that
+    stopped answering: use "command_timeout", or destroy the object.
+
+    Sending "QUIT" is no substitute: the server closing the connection is
+    reported to "on_error" as a lost connection, and "reconnect" connects
+    again.
+
+  is_connected
+    Returns true (1) if a connection context is active (including while the
+    connection is being established), false (0) otherwise.
+
+  has_ssl
+    Class method. Returns true (1) if the module was built with TLS support,
+    false (0) otherwise.
+
+        if (EV::Redis->has_ssl) {
+            # TLS connections are available
+        }
+
+  connect_timeout([$ms])
+    Get or set the connection timeout in milliseconds. Pass 0 to disable.
+    Returns the current value, or undef if never set. Can also be set via
+    constructor. It counts from the start of the connect attempt, once the
+    host name is resolved; commands issued meanwhile do not extend it.
+    Without it, a connect to a unix socket whose server has a full listen
+    queue is retried in a busy loop until the server accepts it. With "tls"
+    it covers the TCP connect only: a stalled handshake is ended by
+    "command_timeout", once a command is outstanding.
+
+  command_timeout([$ms])
+    Get or set the command timeout in milliseconds. Pass 0 to disable.
+    Returns the current value, or undef if never set. Can also be set via
+    constructor. It fires when replies are outstanding and nothing has been
+    received for that long; sending more commands does not extend it, but a
+    command too large for one write counts its bytes going out as progress,
+    as the system's socket buffer takes them, so a steady stream of such
+    commands can keep it from firing. That buffer can hold megabytes: on a
+    slow link a large command can still time out while it goes out.
+    (P)SUBSCRIBE and (P)UNSUBSCRIBE are not tracked as outstanding replies;
+    MONITOR is, so a MONITOR connection that sees no traffic for that long
+    is dropped with a timeout. A command that failed with a timeout, or with
+    a lost connection, may still have run on the server, or may still run
+    there later, even after commands sent on the next connection. Repeat
+    only commands that are safe to run twice. When changed while connected,
+    takes effect immediately on the active connection, including re-arming
+    (or stopping, for 0) an already-scheduled timeout for commands currently
+    in flight.
+
+  on_error([$cb->($errstr)])
+    Set error callback. With a CODE reference argument, replaces the handler
+    and returns the new handler. With "undef" or without arguments, clears
+    the handler and returns undef; any other value clears it with a warning.
+
+    Note: Calling without arguments clears the handler. There is no way to
+    read the current handler without clearing it. This applies to all
+    handler methods ("on_error", "on_connect", "on_disconnect", "on_push").
+
+  on_connect([$cb->()])
+    Set connect callback. With a CODE reference argument, replaces the
+    handler and returns the new handler. With "undef" or without arguments,
+    clears the handler and returns undef; any other value clears it with a
+    warning.
+
+    Commands issued from the callback go ahead of commands waiting in the
+    local queue and past "max_pending", so it suits per-connection setup
+    such as "AUTH" or "SELECT". If a setup command waits for transaction
+    replies, later setup commands wait behind it, ahead of the ordinary
+    queue. Commands still waiting in the local queue when it runs (issued
+    during a reconnect delay, or over "max_pending") go after that setup.
+    One sent while the connection is being established -- right after "new"
+    or "connect", or while a reconnect attempt is connecting -- goes ahead
+    of it, unless both "reconnect" and "resume_waiting_on_reconnect" are on,
+    which make it wait.
+
+  on_disconnect([$cb->()])
+    Set disconnect callback, called on both normal and error disconnections.
+    With a CODE reference argument, replaces the handler and returns the new
+    handler. With "undef" or without arguments, clears the handler and
+    returns undef; any other value clears it with a warning.
+
+  on_push([$cb->($reply)])
+    Set RESP3 push callback for server-initiated messages (Redis 6.0+). The
+    callback receives the decoded push message as an array reference. With a
+    CODE reference argument, replaces the handler and returns the new
+    handler. With "undef" or without arguments, clears the handler and
+    returns undef; any other value clears it with a warning. When changed
+    while connected, takes effect immediately.
+
+        $redis->on_push(sub {
+            my ($msg) = @_;
+            # $msg is an array ref, e.g. ['invalidate', ['key1', 'key2']]
+        });
+
+  reconnect($enable, $delay_ms, $max_attempts)
+    Configure automatic reconnection.
+
+        $redis->reconnect(1);                    # enable with defaults (1s delay, unlimited)
+        $redis->reconnect(1, 0);                 # enable with immediate reconnect
+        $redis->reconnect(1, 2000);              # enable with 2 second delay
+        $redis->reconnect(1, 1000, 5);           # enable with 1s delay, max 5 attempts
+        $redis->reconnect(0);                    # disable
+
+    $delay_ms defaults to 1000 (1 second). 0 means immediate reconnect: a
+    local server that refuses connections then gets tens of thousands of
+    attempts a second. $max_attempts defaults to 0 (unlimited).
+
+    When enabled, the client will automatically attempt to reconnect on
+    connection failure or unexpected disconnection. Intentional disconnect()
+    calls will not trigger reconnection. The reconnect is scheduled after
+    "on_error" and "on_disconnect" return, so command() still croaks inside
+    them. A new connection starts fresh: subscriptions, "AUTH", "SELECT" and
+    "HELLO" are not restored, so issue them from "on_connect" (which says
+    what can overtake them).
+
+  reconnect_enabled
+    Returns true (1) if automatic reconnection is enabled, false (0)
+    otherwise.
+
+  pending_count
+    Returns the number of commands sent to Redis awaiting responses.
+    Persistent commands (subscribe, psubscribe, monitor) are not included in
+    this count. When called from inside a callback for a reply or a
+    connection error, the count includes the current command (it is
+    decremented after the callback returns); inside one that "skip_pending"
+    runs, it does not.
+
+  waiting_count
+    Returns the number of commands queued locally (not yet sent to Redis):
+    commands over the "max_pending" limit, commands issued while a reconnect
+    is pending (with "resume_waiting_on_reconnect", also while an attempt is
+    connecting), commands waiting for transaction replies, and later
+    commands queued behind them to keep their order.
+
+  max_pending($limit)
+    Get or set the maximum number of concurrent commands sent to Redis.
+    Persistent commands (subscribe, psubscribe, monitor) do not count toward
+    the limit; subscribe and psubscribe wait behind it like other commands,
+    and monitor croaks unless the connection is idle. 0 means unlimited
+    (default). When the limit is reached, additional commands are queued
+    locally and sent as responses arrive. Replies still owed by a connection
+    that disconnect() replaced count in "pending_count" but hold no slot of
+    the new connection.
+
+  waiting_timeout($ms)
+    Get or set the maximum time in milliseconds a command can wait in the
+    local queue. Commands exceeding this timeout are cancelled with "waiting
+    timeout" error. 0 means unlimited (default). Returns the current value
+    as an integer (0 when unset). With "reconnect" and
+    "resume_waiting_on_reconnect" it also covers commands issued while a
+    connect is in progress. Time spent held only for outstanding transaction
+    replies (see Reply order note) does not count.
+
+  resume_waiting_on_reconnect($bool)
+    Get or set whether waiting commands are preserved on disconnect and
+    resumed after reconnection. Default is false (waiting commands cancelled
+    on disconnect and on each failed connect attempt).
+
+  priority($priority)
+    Get or set the priority for the underlying libev IO watchers. Higher
+    priority watchers are invoked before lower priority ones when multiple
+    watchers are pending. Valid range is -2 (lowest) to +2 (highest), with 0
+    being the default. Values outside this range are clamped automatically.
+    Can be changed at any time, including while connected.
+
+        $redis->priority(1);     # higher priority
+        $redis->priority(-1);    # lower priority
+        $redis->priority(99);    # clamped to 2
+        my $prio = $redis->priority;  # get current priority
+
+  keepalive($seconds)
+    Get or set the TCP keepalive interval in seconds (at most 32767; see the
+    constructor option for platform limits). When set, the OS sends periodic
+    probes on idle connections to detect dead peers. 0 means disabled
+    (default). When set to a positive value while connected over TCP, takes
+    effect immediately, and croaks, keeping the old value, if the system
+    refuses it. Setting to 0 while connected records the preference for
+    future connections but does not disable keepalives on the current
+    socket.
+
+  prefer_ipv4($bool)
+    Get or set IPv4 preference for DNS resolution, already the default (see
+    "new"). Mutually exclusive with "prefer_ipv6" (setting one clears the
+    other). Takes effect on the next connection.
+
+  prefer_ipv6($bool)
+    Get or set IPv6 preference for DNS resolution. Mutually exclusive with
+    "prefer_ipv4" (setting one clears the other). Takes effect on the next
+    connection.
+
+  source_addr($addr)
+    Get or set the local source address to bind to when connecting. This is
+    useful on multi-homed hosts to control which network interface is used.
+    Pass "undef" to clear. Takes effect on the next TCP connection (has no
+    effect on Unix socket connections).
+
+  tcp_user_timeout($ms)
+    Get or set the TCP user timeout in milliseconds. This controls how long
+    transmitted data may remain unacknowledged before the connection is
+    dropped. 0 means use the OS default. Takes effect on the next
+    connection. Applies to TCP connections only; where the system lacks the
+    option, TCP connects fail with an error.
+
+  cloexec($bool)
+    Get or set the close-on-exec flag for the Redis socket. When enabled,
+    the socket is automatically closed in child processes after fork+exec.
+    Enabled by default. Takes effect on the next connection.
+
+  reuseaddr($bool)
+    Get or set SO_REUSEADDR on the Redis socket. Allows rebinding to an
+    address still in TIME_WAIT state. Disabled by default. Takes effect on
+    the next connection.
+
+  skip_waiting
+    Cancel only waiting (not yet sent) command callbacks. Each callback is
+    invoked with "(undef, "skipped")". In-flight commands continue normally.
+    Commands issued by those callbacks are not cancelled.
+
+  skip_pending
+    Cancel all pending and waiting command callbacks. Each Perl callback is
+    invoked immediately with "(undef, "skipped")". For pending commands, the
+    internal hiredis tracking entry remains until a reply arrives (which is
+    then discarded); no second callback fires. Commands issued by those
+    callbacks, and callbacks already running, are not cancelled.
+
+  can($method)
+    Returns code reference if method is available, undef otherwise. Methods
+    installed via AUTOLOAD (Redis commands) will return true after first
+    call.
+
+DESTRUCTION BEHAVIOR
+    When an EV::Redis object is destroyed (goes out of scope or is
+    explicitly undefined) while commands are still pending or waiting,
+    hiredis invokes all pending command callbacks with a disconnect error,
+    and EV::Redis invokes all waiting queue callbacks with "disconnected".
+    This ensures callbacks are not orphaned. An object still alive at global
+    destruction (a package variable, or one kept by a reference cycle) runs
+    no callbacks.
+
+    For predictable cleanup, explicitly disconnect before destruction:
+
+        $redis->disconnect;    # waiting callbacks get "disconnected"
+        undef $redis;          # pending callbacks get "disconnected"
+
+    Or use skip methods to cancel with a specific error message:
+
+        $redis->skip_pending;  # Invokes callbacks with (undef, "skipped")
+        $redis->skip_waiting;
+        $redis->disconnect;
+        undef $redis;
+
+    Circular references: If your callbacks close over the $redis variable,
+    this creates a reference cycle ($redis -> object -> callback -> $redis)
+    that prevents garbage collection. Break the cycle before the object goes
+    out of scope by clearing callbacks:
+
+        $redis->on_error(undef);
+        $redis->on_connect(undef);
+        $redis->on_disconnect(undef);
+        $redis->on_push(undef);
+
+BENCHMARKS
+    Measured on Linux with Unix socket connection, 100,000 commands with
+    100-byte values, Perl 5.40, Redis 8.x ("bench/benchmark.pl" in the
+    source repository, "BENCH_COMMANDS=100000"):
+
+        Pipeline SET          ~107K ops/sec
+        Pipeline GET          ~112K ops/sec
+        Mixed workload        ~112K ops/sec
+        Fire-and-forget SET   ~655K ops/sec
+        Sequential round-trip  ~39K ops/sec (SET+GET pairs)
+
+    Fire-and-forget mode (no callback) is roughly 6x faster than callback
+    mode due to zero Perl-side overhead per command. Pipeline throughput is
+    bounded by the event loop round-trip, not by hiredis or the network.
+
+    Flow control ("max_pending") has minimal impact at reasonable limits:
+
+        unlimited       ~180K ops/sec
+        max_pending=500 ~186K ops/sec
+        max_pending=100 ~146K ops/sec
+
+    Run "perl bench/benchmark.pl" in a checkout of the repository for full
+    results. Set "BENCH_COMMANDS" and "BENCH_VALUE_SIZE" environment
+    variables to customize; the default of 10,000 commands gives different
+    rates.
+
+AUTHOR
+    Daisuke Murase (typester) (original EV::Hiredis)
+
+    vividsnow
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2013 Daisuke Murase, 2026 vividsnow. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

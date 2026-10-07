@@ -3,7 +3,7 @@ package Game::Checkers::Squares;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant {
 	NE => 0,
@@ -156,7 +156,7 @@ Game::Checkers::Squares - the board numbering, and the step and jump tables buil
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

@@ -1,5 +1,12 @@
 Revision history for Data-HashMap
 
+0.10  2026-10-06
+    - Stricter input handling: NaN, out-of-range numbers and oversized
+      strings croak; tied arguments are read once
+    - Fix reentrancy and iteration bugs across each, clear, from_hash,
+      merge and new/thaw; bounded maps keep a small table
+    - POD: iteration, LRU, TTL and coercion rules clarified
+
 0.09  2026-09-11
     - Per-process hash seed; key order and freeze output vary between runs
     - SV* variants: opt-in value copying (fourth new() argument)

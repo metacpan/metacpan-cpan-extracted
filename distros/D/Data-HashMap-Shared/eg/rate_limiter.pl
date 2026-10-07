@@ -6,13 +6,14 @@ use Data::HashMap::Shared::SI;
 # Simple per-IP rate limiter shared across worker processes
 # TTL=60s acts as a sliding window reset
 
-my $limits = Data::HashMap::Shared::SI->new('/tmp/demo_ratelimit.shm', 100000, 0, 60);
+my $limits = Data::HashMap::Shared::SI->new("/tmp/dhms_ratelimit_$$.shm", 100000, 0, 60);
 my $max_requests = 100;
 
 sub check_rate_limit {
     my ($ip) = @_;
-    # incr auto-creates a missing key at 0, so the first request returns 1
-    my $count = shm_si_incr $limits, $ip;
+    # incr auto-creates a missing key at 0, so the first request returns 1;
+    # it croaks when every slot holds a live subject, so refuse then
+    my $count = eval { shm_si_incr $limits, $ip } // return 0;
     return $count <= $max_requests ? 1 : 0;
 }
 
@@ -22,9 +23,6 @@ sub check_rate_limit {
 sub reclaim_expired { my ($n, $done) = $limits->flush_expired_partial(5000); $n }
 
 reclaim_expired();
-
-# The file outlives the process: an interrupted run would leave the count hot.
-shm_si_put $limits, "192.168.1.1", 0;
 
 # simulate requests
 for my $i (1 .. 105) {

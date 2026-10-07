@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Data::HashMap::Shared::II;
 
-my $map = Data::HashMap::Shared::II->new('/tmp/demo_ii.shm', 10000);
+my $map = Data::HashMap::Shared::II->new("/tmp/dhms_basic_$$.shm", 10000);
 
 # keyword API (fastest)
 shm_ii_put $map, 42, 100;

@@ -19,7 +19,7 @@ use Data::HashMap::Shared::SS;
         _exit($m->get("hello") == 42 ? 0 : 1);
     }
     waitpid $pid, 0;
-    is $? >> 8, 0, 'anon: fork-inherited mmap visible in child';
+    is $?, 0, 'anon: fork-inherited mmap visible in child';
 }
 
 # Integer-key variant also works anonymously.

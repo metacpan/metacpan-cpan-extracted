@@ -9,16 +9,16 @@ on configure => sub {
 };
 
 on test => sub {
+    requires 'Devel::Peek';
     requires 'Devel::Refcount';
     requires 'Test::Deep';
     requires 'Test::More', '0.98';
-    requires 'Test::RedisServer', '0.12';
+    requires 'Test::RedisServer', '0.23';
     requires 'Test::TCP', '1.18';
 };
 
 on develop => sub {
     requires 'Test::Pod', '1.41';
-    requires 'Test::Spellunker', 'v0.2.7';
-    requires 'Test::MinimumVersion::Fast', '0.04';
-    requires 'Test::CPAN::Meta';
+    requires 'Test::Pod::Coverage', '1.04';
+    requires 'Test::Spelling';
 };

@@ -10,6 +10,7 @@ my $values = CLASS->new(
 )->raw_data;
 
 is $values->{types}{string}, 'String value', 'string';
+is $values->{types}{quotes}, '"escaped with backslash"', 'escaped quotes';
 
 is $values->{types}{float_f}, 1.23, 'float, decimal notation';
 is $values->{types}{float_e}, -.62e+4, 'float, scientific notation';

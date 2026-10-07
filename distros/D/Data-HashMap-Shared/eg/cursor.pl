@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Data::HashMap::Shared::SS;
 
-my $map = Data::HashMap::Shared::SS->new('/tmp/demo_cursor.shm', 10000);
+my $map = Data::HashMap::Shared::SS->new("/tmp/dhms_cursor_$$.shm", 10000);
 
 shm_ss_put $map, "alice",   "engineer";
 shm_ss_put $map, "bob",     "designer";

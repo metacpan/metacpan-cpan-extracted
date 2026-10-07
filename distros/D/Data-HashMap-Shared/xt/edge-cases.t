@@ -12,6 +12,9 @@ use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 use Data::HashMap::Shared::SI;
 
+# The croaks carry strerror in the process's locale; the matches below are English.
+POSIX::setlocale(POSIX::LC_ALL(), 'C');
+
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
 # clear mid-iteration resets iterator state
@@ -176,7 +179,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
     eval { Data::HashMap::Shared::SS->new($path, 100) };
     like($@, qr/variant mismatch/, 'variant mismatch gives diagnostic error');
-    like($@, qr/file=\d+, expected=\d+/, 'error includes variant IDs');
+    like($@, qr/the file is II, not SS/, 'error names both variants');
 
     unlink $path;
 }
@@ -1963,6 +1966,17 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
         $readable++ if defined shm_ii_get $map, $_;
     }
     ok($readable > 0, "full table: $readable entries readable");
+    unlink $path;
+}
+
+# --- max_entries stops at 3/4 of 2**31 slots, however large the request ---
+SKIP: {
+    my $path = tmpfile();
+    my $m = eval { Data::HashMap::Shared::II->new($path, 3_000_000_000) };
+    skip "cannot map a 36 GB sparse file here: $@", 2 unless $m;
+    is($m->max_entries, 1610612736, 'a request beyond the table limit reports 1610612736');
+    ok($m->put(1, 1) && $m->get(1) == 1, '  ... and the map works');
+    undef $m;
     unlink $path;
 }
 

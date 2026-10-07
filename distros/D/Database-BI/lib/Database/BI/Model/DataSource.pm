@@ -12,7 +12,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.009.0';
+our $VERSION = '0.010.0';
 
 =head1 NAME
 
@@ -1154,6 +1154,23 @@ file-backed instances.
 sub source_url {
 	my $self = shift;
 	return $self->{_url};
+}
+
+=head2 updated
+
+Returns the Unix mtime of the backing file, or C<undef> for URL-backed tables.
+C<Database::Join> calls C<updated()> on each component database to invalidate
+its SQLite spill cache when a source file changes on disk.
+
+=cut
+
+sub updated {
+	my $self = shift;
+	# Delegate to the D::A backend when available -- it tracks mtime internally.
+	return $self->{_db}->updated() if $self->{_db} && $self->{_db}->can('updated');
+	# Fallback: stat the file path directly (header-less CSV and XLSX bypass D::A).
+	return (stat($self->{_file_path}))[9] if defined $self->{_file_path} && -f $self->{_file_path};
+	return undef;
 }
 
 # ---------------------------------------------------------------------------

@@ -28,9 +28,11 @@ for my $s (@scripts) {
         or diag "parse error:\n$out";
 }
 
-# Actually run the fast, self-contained examples (each uses a $$-unique /tmp
-# path and terminates quickly) and assert a clean exit.
-for my $name (qw(leaderboard memoize sharded_counter feature_flags)) {
+# Actually run every example that terminates quickly (heartbeat and ttl sleep);
+# each uses a $$-unique /tmp path or none, and must exit cleanly.
+for my $name (qw(aggregator basic cursor feature_flags leaderboard lru_cache
+                 memfd_handoff memoize multiprocess rate_limiter sharded_counter
+                 work_queue)) {
     my $script = "$root/eg/$name.pl";
     unless (-f $script) { fail("eg/$name.pl exists"); next; }
     my $out = qx($^X -I$root/blib/lib -I$root/blib/arch $script 2>&1);

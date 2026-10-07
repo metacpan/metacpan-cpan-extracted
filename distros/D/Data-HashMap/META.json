@@ -4,7 +4,7 @@
       "vividsnow"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150014",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "perl_5"
    ],
@@ -48,63 +48,63 @@
    "provides" : {
       "Data::HashMap" : {
          "file" : "lib/Data/HashMap.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::I16" : {
          "file" : "lib/Data/HashMap/I16.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::I16A" : {
          "file" : "lib/Data/HashMap/I16A.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::I16S" : {
          "file" : "lib/Data/HashMap/I16S.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::I32" : {
          "file" : "lib/Data/HashMap/I32.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::I32A" : {
          "file" : "lib/Data/HashMap/I32A.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::I32S" : {
          "file" : "lib/Data/HashMap/I32S.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::IA" : {
          "file" : "lib/Data/HashMap/IA.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::II" : {
          "file" : "lib/Data/HashMap/II.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::IS" : {
          "file" : "lib/Data/HashMap/IS.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::SA" : {
          "file" : "lib/Data/HashMap/SA.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::SI" : {
          "file" : "lib/Data/HashMap/SI.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::SI16" : {
          "file" : "lib/Data/HashMap/SI16.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::SI32" : {
          "file" : "lib/Data/HashMap/SI32.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Data::HashMap::SS" : {
          "file" : "lib/Data/HashMap/SS.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -118,6 +118,6 @@
          "web" : "https://github.com/vividsnow/perl5-data-hashmap"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,30 +1,32 @@
-# NAME
+## Name
 
 Music::NWC2MusicXML - Convert NoteWorthy Composer 2 `.nwc` score files to MusicXML.
 
-# VERSION
+## Version
 
-0.001.1
+0.001.2
 
-# SYNOPSIS
+## Synopsis
 
-    # Simple conversion
-    use Music::NWC2MusicXML;
+```perl
+# Simple conversion
+use Music::NWC2MusicXML;
 
-    my $converter = Music::NWC2MusicXML->new;
-    $converter->convert(
-        input  => 'Pilgrim.nwc',
-        output => 'Pilgrim.musicxml',
-    );
+my $converter = Music::NWC2MusicXML->new;
+$converter->convert(
+    input  => 'Pilgrim.nwc',
+    output => 'Pilgrim.musicxml',
+);
 
-    # Batch conversion
-    $converter->batch_convert(
-        inputs     => [ glob('*.nwc') ],
-        output_dir => 'musicxml',
-        overwrite  => 1,
-    );
+# Batch conversion
+$converter->batch_convert(
+    inputs     => [ glob('*.nwc') ],
+    output_dir => 'musicxml',
+    overwrite  => 1,
+);
+```
 
-# DESCRIPTION
+## Description
 
 `Music::NWC2MusicXML` is the top-level facade for the NWC-to-MusicXML conversion
 pipeline.  It coordinates three independent stages:
@@ -41,7 +43,7 @@ Each stage is independently testable.  The facade wires them together,
 handles batch processing, and routes all diagnostics through a single
 `Music::NWC2MusicXML::Diagnostics` instance.
 
-# PRESERVATION PRINCIPLE
+## Preservation Principle
 
 The guiding principle of the conversion is:
 
@@ -50,16 +52,16 @@ _Preserve musical meaning rather than graphical appearance._
 Priority order: notes and rhythm > voices > measures > articulations >
 dynamics > lyrics > structural markings > instrument info > graphical layout.
 
-## new
+### New
 
 Construct a converter.
 
-### Purpose
+#### Purpose
 
 Creates a configured converter instance that can be reused for multiple
 conversions without reconstructing the pipeline components each time.
 
-### Arguments
+#### Arguments
 
 Named parameters:
 
@@ -68,40 +70,46 @@ Named parameters:
 STDERR in the `Diagnostics` object).
 - `validate`    -- perform extended consistency checks (boolean, default 0).
 
-### Returns
+#### Returns
 
 Blessed `Music::NWC2MusicXML` object.
 
-### Usage Example
+#### Usage Example
 
-    my $c = Music::NWC2MusicXML->new(log_level => 'verbose', validate => 1);
+```perl
+my $c = Music::NWC2MusicXML->new(log_level => 'verbose', validate => 1);
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    log_level    : SCALAR  (optional, default 'normal')
-    warnings_fh  : (filehandle, optional)
-    validate     : SCALAR  (optional, default 0)
+```
+log_level    : SCALAR  (optional, default 'normal')
+warnings_fh  : (filehandle, optional)
+validate     : SCALAR  (optional, default 0)
+```
 
-#### Output
+##### Output
 
-    Music::NWC2MusicXML object
+```
+Music::NWC2MusicXML object
+```
 
-### MESSAGES
+#### Messages
 
 None.
 
-## convert
+### Convert
 
 Convert a single `.nwc` file to MusicXML.
 
-### Purpose
+#### Purpose
 
 Main single-file conversion entry point.  Chains decoder -> parser ->
 generator, writes the output file, and updates the internal diagnostic counters.
 
-### Arguments
+#### Arguments
 
 Named parameters:
 
@@ -111,33 +119,39 @@ Defaults to the input path with the extension replaced by `.musicxml`.
 - `overwrite` -- if false (default), skip conversion when the output file
 already exists.
 
-### Returns
+#### Returns
 
 Scalar string -- the output file path if conversion succeeded, or undef on
 failure.
 
-### Side Effects
+#### Side Effects
 
 Writes the output file.  Updates diagnostic counters.
 Croaks on fatal errors; non-fatal issues are issued as warnings.
 
-### Usage Example
+#### Usage Example
 
-    my $out = $c->convert(input => 'Pilgrim.nwc', overwrite => 1);
+```perl
+my $out = $c->convert(input => 'Pilgrim.nwc', overwrite => 1);
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    input     : SCALAR (path, required)
-    output    : SCALAR (path, optional)
-    overwrite : boolean (optional, default false)
+```
+input     : SCALAR (path, required)
+output    : SCALAR (path, optional)
+overwrite : boolean (optional, default false)
+```
 
-#### Output
+##### Output
 
-    SCALAR (output path) or undef
+```
+SCALAR (output path) or undef
+```
 
-### MESSAGES
+#### Messages
 
 | Code               | Meaning                              | Resolution                    |
 |--------------------|--------------------------------------|-------------------------------|
@@ -148,17 +162,17 @@ Croaks on fatal errors; non-fatal issues are issued as warnings.
 | error\_generate     | MusicXML generation failed           | See error detail              |
 | error\_write        | Cannot write output file             | Check permissions / disk space|
 
-## batch\_convert
+### Batch\_Convert
 
 Convert multiple `.nwc` files, optionally into a separate output directory.
 
-### Purpose
+#### Purpose
 
 Processes a list of input files in sequence.  Failures on individual files
 are caught and counted; conversion continues with remaining files.
 A summary is printed at the end.
 
-### Arguments
+#### Arguments
 
 Named parameters:
 
@@ -171,46 +185,52 @@ file's own directory).
 - `base_dir`   -- base directory stripped when computing relative paths
 for recursive mode (optional).
 
-### Returns
+#### Returns
 
 Hashref: `{ processed => N, successful => N, warnings => N, failed => N }`.
 
-### Side Effects
+#### Side Effects
 
 Writes output files.  Prints a summary to STDERR.
 Does not croak on per-file failures.
 
-### Usage Example
+#### Usage Example
 
-    $c->batch_convert(
-        inputs     => [ glob('scores/**/*.nwc') ],
-        output_dir => 'musicxml',
-        recursive  => 1,
-        base_dir   => 'scores',
-        overwrite  => 1,
-    );
+```perl
+$c->batch_convert(
+    inputs     => [ glob('scores/**/*.nwc') ],
+    output_dir => 'musicxml',
+    recursive  => 1,
+    base_dir   => 'scores',
+    overwrite  => 1,
+);
+```
 
-### API SPECIFICATION
+#### Api Specification
 
-#### Input
+##### Input
 
-    inputs     : ARRAYREF of SCALAR paths (required)
-    output_dir : SCALAR (optional)
-    overwrite  : SCALAR bool (optional, default 0)
-    recursive  : SCALAR bool (optional, default 0)
-    base_dir   : SCALAR (optional)
+```
+inputs     : ARRAYREF of SCALAR paths (required)
+output_dir : SCALAR (optional)
+overwrite  : SCALAR bool (optional, default 0)
+recursive  : SCALAR bool (optional, default 0)
+base_dir   : SCALAR (optional)
+```
 
-#### Output
+##### Output
 
-    HASHREF { processed:int, successful:int, warnings:int, failed:int }
+```
+HASHREF { processed:int, successful:int, warnings:int, failed:int }
+```
 
-## diagnostics
+### Diagnostics
 
 Return the `Music::NWC2MusicXML::Diagnostics` instance.
 
-# DIAGNOSTICS
+## Diagnostics
 
-### MESSAGES
+#### Messages
 
 | Code                 | Meaning                             | Resolution                        |
 |----------------------|-------------------------------------|-----------------------------------|
@@ -222,7 +242,7 @@ Return the `Music::NWC2MusicXML::Diagnostics` instance.
 | error\_write          | Cannot write output                 | Check disk space and permissions  |
 | error\_mkdir          | Cannot create output directory      | Check parent directory permissions|
 
-# LIMITATIONS
+## Limitations
 
 - Parallel batch processing is not implemented; files are converted sequentially.
 - MusicXML validation against the official DTD/XSD is not performed
@@ -230,57 +250,67 @@ internally; use an external validator with `--validate`.
 - Tuplet time-modification and multi-voice `RestChord` records are not yet
 emitted (Phase 4 items).
 
-# DEPENDENCIES
+## Dependencies
 
 [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure) is used to allow callers to pre-configure converter
 defaults at the class level (e.g. `Music::NWC2MusicXML->configure(log_level => 'verbose')`).
 This means a consuming application can set defaults once and `new` will
 honour them without repeating the arguments on each call.
 
-# SEE ALSO
+## See Also
 
 - [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [Test Dashboard](https://nigelhorne.github.io/nwc2musicxml/coverage/)
 
-# FORMAL SPECIFICATION
+## Support
 
-## new
+This module is provided as-is without any warranty.
 
-    [ConverterInit]
-      log_level   : LogLevel
-      validate    : Boolean
-      diagnostics : Diagnostics
-      nwc_decoder : NWCDecoder
-      parser      : Parser
-      generator   : Generator
+## Formal Specification
 
-    (placeholder -- populate with Z calculus as implementation matures)
+### New
 
-## convert
+```
+[ConverterInit]
+  log_level   : LogLevel
+  validate    : Boolean
+  diagnostics : Diagnostics
+  nwc_decoder : NWCDecoder
+  parser      : Parser
+  generator   : Generator
 
-    [Convert]
-      input?  : FileName
-      output? : FileName
-      ----------
-      result! : FileName | Undef
+(placeholder -- populate with Z calculus as implementation matures)
+```
 
-    (placeholder)
+### Convert
 
-## batchconvert
+```
+[Convert]
+  input?  : FileName
+  output? : FileName
+  ----------
+  result! : FileName | Undef
 
-    [BatchConvert]
-      inputs?     : seq FileName
-      output_dir? : DirName
-      ----------
-      summary!    : BatchSummary
+(placeholder)
+```
 
-    (placeholder)
+### Batchconvert
 
-# AUTHOR
+```
+[BatchConvert]
+  inputs?     : seq FileName
+  output_dir? : DirName
+  ----------
+  summary!    : BatchSummary
+
+(placeholder)
+```
+
+## Author
 
 Nigel Horne `<njh@nigelhorne.com>`
 
-# LICENSE
+## License
 
 Copyright 2026 Nigel Horne.
 

@@ -3,8 +3,9 @@ package Game::Checkers;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
+use Carp ();
 use Object::Proto::Sugar -types;
 use Game::Checkers::Squares;
 use Game::Checkers::Piece;
@@ -387,7 +388,7 @@ Game::Checkers - English draughts as an engine, with a terminal game on top
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -669,6 +670,16 @@ matters.
 =head1 CONSTANTS
 
 C<NO_PROGRESS_PLIES> is 80, the forty move rule counted in plies.
+
+=head1 CAVEATS
+
+This module loads L<Carp> before L<Object::Proto::Sugar>, which it does not
+otherwise need. Releases of L<Devel::Hook> before 0.011, reached through
+L<BEGIN::Lift>, call C<Carp::croak> without parentheses, and that line only
+compiles if C<Carp> was already loaded. A test file gets C<Carp> for free from
+L<Test::More>, so the gap only shows up in a plain script, where it is a
+compile time failure rather than a warning. Loading C<Carp> here closes it for
+every consumer of the engine.
 
 =head1 AUTHOR
 

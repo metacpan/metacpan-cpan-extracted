@@ -54,3 +54,5 @@ smessage
 ssubscribe
 sunsubscribe
 spublish
+macOS
+SIGPIPE

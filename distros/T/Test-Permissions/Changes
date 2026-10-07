@@ -1,5 +1,14 @@
 Revision history for Test-Permissions
 
+0.001.2	Tue Oct  6 09:16:55 AM EDT 2026
+	[ Bug Fixes ]
+	t/transition.t: the effective-uid test, run as root, failed when
+	  root's TMPDIR was private (pam_tmpdir makes /tmp/user/0 mode 0700),
+	  as uid 65534 could not reach the directory.  It now uses a
+	  directory under /tmp
+	t/kwalitee.t: run the META.yml check when META.yml exists, as in a
+	  built distribution
+
 0.001.1	Fri Oct  2 09:21:53 AM EDT 2026
 	[ Bug Fixes ]
 	Bump minimum version of Params::Validate::Strict

@@ -39,12 +39,43 @@
     vertical-align: middle;
   }
   .chip-remove:hover { color: #c00; }
+  /* Schema-type-mismatch warnings from Database::Join */
+  .schema-warnings {
+    list-style: none;
+    margin: 0.4rem 0 0.6rem;
+    padding: 0.5rem 0.8rem;
+    background: #fffbe6;
+    border-left: 3px solid #f0a000;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #5a4000;
+  }
+  .schema-warnings li + li { margin-top: 0.25rem; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .schema-warnings {
+      background: #3a2e00;
+      border-left-color: #f0c040;
+      color: #f0d890;
+    }
+  }
+  :root[data-theme="dark"] .schema-warnings {
+    background: #3a2e00;
+    border-left-color: #f0c040;
+    color: #f0d890;
+  }
 </style>
 
 [%- IF back_url -%]
 <p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
 [%- ELSE -%]
 <p class="back-link"><a href="/">&larr; Choose another database</a></p>
+[%- END -%]
+[%- IF schema_warnings.size -%]
+<ul class="schema-warnings" role="alert">
+  [%- FOREACH w IN schema_warnings -%]
+  <li>&#9888; [% w | html %]</li>
+  [%- END -%]
+</ul>
 [%- END -%]
 
 [%- IF left_spec -%]
@@ -81,6 +112,8 @@
           title="Plot the current data as a heatmap - choose two categorical columns and an optional value column">&#x229F; Heatmap&hellip;</button>
   <button class="btn-bar" id="btn-bar" type="button"
           title="Plot the current data as a bar chart - choose a category column and an optional value column">&#x1F4CA; Bar chart&hellip;</button>
+  <button class="btn-folder" id="btn-folder" type="button"
+          title="Browse records grouped by the letter prefix of a code column (e.g. Order # A10, B3, CT4)">&#x1F4C1; Folder view&hellip;</button>
   [%- END -%]
   <button class="btn-dedup[% IF dedup %] btn-dedup--active[% END %]" id="btn-dedup" type="button"
           title="Remove duplicate rows from the view and from any export">[% IF dedup %]Show duplicates[% ELSE %]Hide duplicates[% END %]</button>
@@ -208,6 +241,15 @@
         <label for="right-key-sel">Matching column in the new database</label>
         <select id="right-key-sel" disabled>
           <option value="">&mdash; select a database first &mdash;</option>
+        </select>
+      </div>
+
+      <div class="join-field">
+        <label for="join-type-sel">Which rows to include</label>
+        <select id="join-type-sel" name="jtype">
+          <option value="left" selected>Keep all rows from the left table</option>
+          <option value="inner">Only rows that match in both tables</option>
+          <option value="outer">All rows from either table</option>
         </select>
       </div>
     </div>
@@ -515,6 +557,36 @@
         <div class="graph-btn-row">
           <button type="submit" id="btn-do-bar" class="btn-primary" disabled>Plot</button>
           <button type="button" id="btn-cancel-bar" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="folder-panel" hidden>
+  <form id="folder-form" method="get" action="/folder">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    <input type="hidden" name="back" id="folder-back-inp" value="">
+
+    <h3 class="graph-panel-title">&#x1F4C1; Folder view</h3>
+
+    <p class="graph-panel-desc">Choose the column whose values contain order codes (e.g. A10, CT4, B3). Records will be grouped by the letter prefix of that column.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="folder-col-sel">Code column</label>
+        <select id="folder-col-sel" name="col" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-folder" class="btn-primary" disabled>Open</button>
+          <button type="button" id="btn-cancel-folder" class="btn-secondary">Cancel</button>
         </div>
       </div>
     </div>
@@ -1483,7 +1555,7 @@ function parseAccounting(v) {
   var ySel      = document.getElementById('graph-y-sel');
   var backInp   = document.getElementById('graph-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'folder-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1591,7 +1663,7 @@ function parseAccounting(v) {
   var valSel    = document.getElementById('pie-val-sel');
   var backInp   = document.getElementById('pie-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel', 'folder-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1668,7 +1740,7 @@ function parseAccounting(v) {
   var ySel      = document.getElementById('heatmap-y-sel');
   var backInp   = document.getElementById('heatmap-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel', 'folder-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1731,7 +1803,7 @@ function parseAccounting(v) {
   var catSel    = document.getElementById('bar-cat-sel');
   var backInp   = document.getElementById('bar-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'folder-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1779,6 +1851,44 @@ function parseAccounting(v) {
   });
 
   catSel.addEventListener('change', checkBar);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Folder view panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-folder');
+  var panel     = document.getElementById('folder-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel = document.getElementById('btn-cancel-folder');
+  var btnDo     = document.getElementById('btn-do-folder');
+  var colSel    = document.getElementById('folder-col-sel');
+  var backInp   = document.getElementById('folder-back-inp');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  function checkFolder() {
+    btnDo.disabled = !colSel.value;
+  }
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    panel.hidden = !panel.hidden;
+    checkFolder();
+    if (!panel.hidden) { colSel.focus(); }
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  colSel.addEventListener('change', checkFolder);
 }());
 </script>
 

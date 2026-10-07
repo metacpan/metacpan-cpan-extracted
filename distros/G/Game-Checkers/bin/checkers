@@ -28,6 +28,7 @@ GetOptions(
 	'seed=i',
 	'ascii',
 	'colour!',
+	'pick!',
 	'analyse',
 	'version',
 	'help'
@@ -67,7 +68,8 @@ my $terminal = Game::Checkers::Terminal->new(
 		bot => Game::Checkers::Bot->new(level => $level[0], seed => $option{seed})
 	)),
 	ascii => $option{ascii},
-	(defined $option{colour} ? (colour => $option{colour}) : ())
+	(defined $option{colour} ? (colour => $option{colour}) : ()),
+	(defined $option{pick} ? (picking => $option{pick}) : ())
 );
 
 my $result = $terminal->start;
@@ -121,6 +123,7 @@ sub replay {
 		game => $game,
 		human => 'both',
 		ascii => $option{ascii},
+		picking => 0,
 		(defined $option{colour} ? (colour => $option{colour}) : ())
 	);
 	for my $move (@{$whole->history}) {
@@ -149,10 +152,16 @@ checkers [options]
   --seed N           the seed the bot varies its easy levels with.
   --ascii            letters instead of the draughts symbols.
   --no-colour        no ANSI colour. NO_COLOR in the environment does the same.
+  --no-pick          type the moves out instead of choosing them with the keys.
   --version, --help
 
-At the prompt, a move is its squares, read off the edge of the board: a3-b4 to
-slide, c3xe5xg7 to jump. Type help for the rest of the commands.
+On a terminal the legal moves are listed under the board: the up and down keys
+choose one, enter plays it, and the board shows where it goes. Press ? for the
+other keys, or : to type a command.
+
+Typing a move works everywhere, and is all there is when the input is not a
+terminal or Term::ReadKey is not installed. A move is its squares, read off the
+edge of the board: a3-b4 to slide, c3xe5xg7 to jump. Type help for the commands.
 USAGE
 	exit $status;
 }

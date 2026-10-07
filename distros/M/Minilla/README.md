@@ -24,7 +24,8 @@ Minilla - CPAN module authoring tool
 
     Enable or disable colored log output. Color is enabled by default when standard
     error is connected to a terminal. Log output is written to standard error so
-    standard output remains available for command output and pipelines.
+    standard output remains reserved for structured JSON results emitted by
+    `Minilla::Logger::slog`.
 
 - **--debug**
 
@@ -73,6 +74,18 @@ Run `minil help COMMAND` for the full documentation of a subcommand.
 Minilla is a CPAN module authoring tool. Minilla provides [minil](https://metacpan.org/pod/minil) command for authorizing a CPAN distribution.
 
     (M::I - inc) + shipit + (dzil - plugins)
+
+## Command output
+
+The CLI reserves standard output for structured JSON results emitted by
+`Minilla::Logger::slog`. All other output goes to standard error, including
+build commands, test summaries, dependency installation, release hooks, and
+interactive prompts. This also applies to `--version`, `minil help`, and
+commands executed by `minil run`.
+
+For example, `minil dist --no-test --skip-prepare` writes only a single JSON
+line containing the archive path to standard output; build progress remains
+visible on standard error.
 
 # CONVENTION
 
@@ -149,10 +162,13 @@ push.
 
 `minil dist --skip-prepare` and `minil release --skip-prepare` build a
 distribution from an already prepared source tree without regenerating
-`META.json`, `README.md`, or `Build.PL` or `Makefile.PL`. Packaging files
-such as `META.yml` and `MANIFEST` are still generated. Distribution tests
-run by default and can be disabled with `--no-test`. The release command uses
-the prepared version without prompting for or updating it.
+`README.md` or `Build.PL` or `Makefile.PL`. Prepared `META.json` fields
+are preserved, while `release_status` and `provides` are finalized in the
+archive using the same rules as a normal distribution build. The source
+`META.json` is not changed. Packaging files such as `META.yml` and
+`MANIFEST` are still generated. Distribution tests run by default and can be
+disabled with `--no-test`. The release command uses the prepared version
+without prompting for or updating it.
 
 ## CheckUntrackedFiles
 

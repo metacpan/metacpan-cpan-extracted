@@ -14,7 +14,8 @@ use Data::HashMap::Shared::SI;
 # cursor's reset with it.
 #
 # Six insert paths carry their own copy, so each is cycled below.  The counts
-# stay under shm_needs_compaction (tomb <= size, tomb <= cap/4) and under
+# stay under shm_needs_compaction (tomb <= size, tomb <= cap/4, tomb <= empty
+# slots) and under
 # shm_over_load, either of which would clear the tombstones by rehashing and
 # hide the difference; the last block crosses over_load deliberately, to show
 # what that costs.
@@ -84,6 +85,22 @@ for my $case (@paths) {
     is $r->{map}->capacity, $r->{cap0},
        "300 keys, remove 100, put the same 100 back: the table stays at $r->{cap0} slots";
     is $r->{map}->size, 300, "and still holds exactly 300 keys";
+}
+
+# At its largest the table cannot grow, and churn at max_entries turns empty
+# slots into tombstones until none is left and every miss walks the table.
+# Tombstones outnumbering the empty slots must compact it.
+{
+    require Data::HashMap::Shared::II;
+    my $m = Data::HashMap::Shared::II->new(undef, 1000);
+    my $k = 0;
+    1 while $m->put(++$k, 1);                              # every slot, then refused
+    my $cap = $m->capacity;
+    $m->remove($_) for 1 .. $cap / 4;                     # max_entries left, the rest tombstones
+    is $m->size + $m->tombstones, $cap, "full table: $cap slots, none empty";
+    $m->put(-1, 1);
+    is $m->tombstones, 0, 'the next insert compacts the tombstones away';
+    is $m->capacity, $cap, '...in place, at the same capacity';
 }
 
 done_testing;

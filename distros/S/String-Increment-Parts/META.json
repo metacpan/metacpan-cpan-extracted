@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "5.57",
+            "Log::ger" : "0.038",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -51,7 +52,7 @@
    "provides" : {
       "String::Increment::Parts" : {
          "file" : "lib/String/Increment/Parts.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -66,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-String-Increment-Parts"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

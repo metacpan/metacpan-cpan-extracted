@@ -50,7 +50,8 @@ WriteMakefile(
 		'Test::Mockingbird'       => 0,
 		'Test::More'              => 0,
 		'Test::Most'              => 0,
-		'Test::Returns'           => 0,
+		'Test::Needs' => 0,
+		'Test::Returns'   => 0,
 		'Test::Without::Module'   => 0,
 		'XML::PP'                 => 0,	# pure-Perl XML parser; no libxml2 dependency required
 	}, META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec

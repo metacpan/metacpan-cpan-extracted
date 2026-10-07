@@ -9,7 +9,8 @@ Data::HashMap::Shared::Cookbook - Practical recipes for shared-memory maps
 Copy-paste patterns for common cross-process tasks with
 L<Data::HashMap::Shared>: counters, caches, rate limiting, liveness, dedup,
 and atomic state. Runnable versions of several live under C<eg/> in the
-distribution.
+distribution. The C</tmp> paths are placeholders: keep a real map in a
+directory only your application can write (L<Data::HashMap::Shared/SECURITY>).
 
 Pick a variant by key/value type (see L</CHOOSING A VARIANT>) and replace the
 C<shm_xx_*> keyword prefix accordingly (C<shm_ii_>, C<shm_ss_>, C<shm_si_>, ...).
@@ -150,13 +151,19 @@ full window, and a client that keeps retrying stays limited until it backs off.
 
     sub allow {
         my $who = shift;
-        my $n = shm_si_incr $rl, $who;   # auto-creates at 1 with the default TTL
+        # auto-creates at 1 with the default TTL; croaks when there is no room
+        my $n = eval { shm_si_incr $rl, $who } // return 0;
         return $n <= 100;                # cap per window
     }
 
-Subjects that never come back leave expired entries holding their slots until
-an insert needs one: an insert that finds the table full flushes every dead
-subject at once, which keeps the limiter working.  Reclaim on a timer as well,
+C<incr> croaks only when live subjects hold every slot, or (for subjects longer
+than 7 bytes) the whole arena -- a flood of new subjects inside one window --
+or, once, when subject lengths change and the dead subjects' blocks are the
+wrong size; C<allow> then refuses rather than dies. Subjects that never come back leave
+expired entries holding their slots and arena space until an insert needs them:
+an insert that finds the table or arena full, or takes the table over its
+design load, flushes every dead subject at once, which keeps the limiter
+working.  Reclaim on a timer as well,
 to keep C<size> honest and the probes short between those flushes; the slice
 counts slots scanned, not entries freed, so size it to cycle the whole table
 inside one window, the slots the map can grow to over the window in ticks.
@@ -166,7 +173,8 @@ C<size> climbing while C<keys> stays flat means the slice is losing ground:
     my ($flushed, $done) = $rl->flush_expired_partial(5000);
 
 Giving the map a C<$max_size> instead makes eviction reclaim the slots for you
-and needs no timer at all.
+and needs no timer at all, and a flood then evicts instead of refusing: the
+subjects it pushes out start counting again from zero.
 
 When clients choose the subjects, hash them under a secret first, and keep the
 file in a directory only your processes can write to: see
@@ -238,7 +246,7 @@ See L<Data::HashMap::Shared/Constructor>.
 Set explicitly when a few large string keys/values would otherwise exhaust the
 default; integer-only variants ignore it. Each string occupies the next power of
 two at or above its length (16-byte minimum), so size from the rounded lengths,
-not the raw byte total.
+not the raw byte total, plus the 16 bytes the arena reserves.
 
 =item * B<shards> (C<new_sharded($prefix, $shards, ...)>) -- independent maps with
 independent locks for write-heavy workloads; per-key ops route automatically,

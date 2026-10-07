@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.020"
+            "perl" : "5.036"
          }
       },
       "develop" : {
@@ -103,10 +103,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.130",
             "Plack::App::File" : "0",
             "Test2::Tools::HTTP" : "0.02",
-            "perl" : "5.020"
+            "perl" : "5.036"
          }
       },
       "test" : {
@@ -115,7 +115,7 @@
             "Importer" : "0",
             "Test2::Todo" : "0.000121",
             "Test2::V0" : "0.000121",
-            "perl" : "5.020"
+            "perl" : "5.036"
          }
       }
    },
@@ -131,9 +131,9 @@
          "web" : "https://github.com/plicease/Plack-App-GitHubPages-Faux"
       }
    },
-   "version" : "0.03",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

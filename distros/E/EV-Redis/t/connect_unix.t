@@ -15,7 +15,6 @@ eval {
 
 my %connect_info = $redis_server->connect_info;
 
-# Test: connect via unix socket
 {
     my $r = EV::Redis->new;
     my $connected = 0;
@@ -26,7 +25,6 @@ my %connect_info = $redis_server->connect_info;
     $r->on_disconnect(sub { $disconnected++ });
     $r->on_connect(sub {
         $connected++;
-        # Schedule disconnect after brief delay
         my $t; $t = EV::timer 0.1, 0, sub {
             undef $t;
             $r->disconnect;
@@ -40,13 +38,11 @@ my %connect_info = $redis_server->connect_info;
     is $error, 0, 'no errors during unix socket connection';
     is $disconnected, 1, 'disconnect callback was called';
 
-    # Clear handlers before object destruction to break reference cycles
     $r->on_error(undef);
     $r->on_connect(undef);
     $r->on_disconnect(undef);
 }
 
-# Test: connect_unix() when already connected throws exception
 {
     my $r = EV::Redis->new;
     $r->on_error(sub { });
@@ -70,11 +66,9 @@ my %connect_info = $redis_server->connect_info;
 
     EV::run;
 
-    # Clear handlers before object destruction
     $r->on_error(undef);
 }
 
-# Test: connect_unix() then connect() throws exception
 {
     my $r = EV::Redis->new;
     $r->on_error(sub { });
@@ -98,8 +92,25 @@ my %connect_info = $redis_server->connect_info;
 
     EV::run;
 
-    # Clear handlers before object destruction
     $r->on_error(undef);
+}
+
+# hiredis would cut the path to fit sun_path
+{
+    my @errors;
+    my $r = EV::Redis->new(on_error => sub { push @errors, $_[0] });
+    my $long = '/tmp/' . ('x' x 300) . '.sock';
+    ok !eval { $r->connect_unix($long); 1 }, 'connect_unix croaks on a path too long for a unix socket';
+    like $@, qr/unix socket path too long/, '... saying why';
+    ok !eval { EV::Redis->new(path => $long, on_error => sub {}); 1 }, 'so does new()';
+    is_deeply \@errors, [], 'nothing reached on_error';
+
+    my $pong;
+    $r->connect_unix($connect_info{sock});
+    $r->ping(sub { $pong = $_[0]; $r->disconnect; EV::break });
+    my $g = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    is $pong, 'PONG', 'the object connects afterwards';
 }
 
 done_testing;

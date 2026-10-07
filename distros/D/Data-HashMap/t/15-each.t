@@ -233,4 +233,70 @@ use Data::HashMap::I16A;
     ok((hm_ii_size $m) < 10, 'entries removed during iteration');
 }
 
+# ---- pop/shift/drain use a separate cursor: each loses nothing ----
+{
+    my $m = Data::HashMap::II->new();
+    hm_ii_put $m, $_, $_ * 10 for 1..8;
+    my ($sk, $sv) = hm_ii_shift $m;
+    ok(defined $sk, 'II shift returns an entry');
+    my %got; my $n = 0;
+    while (my ($k, $v) = hm_ii_each $m) { $got{$k} = $v; $n++; }
+    is(scalar keys %got, 7, 'II each after shift sees every remaining entry');
+    is($n, 7, 'II each after shift yields exactly 7 (no dupes)');
+    ok(!exists $got{$sk}, 'II shifted key absent from each');
+}
+{
+    my $m = Data::HashMap::II->new();
+    hm_ii_put $m, $_, $_ * 10 for 1..8;
+    my ($pk, $pv) = hm_ii_pop $m;
+    hm_ii_put $m, $pk, $pv;
+    my $n = 0;
+    while (my ($k, $v) = hm_ii_each $m) { $n++ }
+    is($n, 8, 'II each after pop, entry put back: sees all 8');
+}
+{
+    my $m = Data::HashMap::II->new();
+    hm_ii_put $m, $_, $_ * 10 for 1..8;
+    my %d = hm_ii_drain $m, 3;
+    is(scalar keys %d, 3, 'II drain 3 returns 3 pairs');
+    hm_ii_put $m, $_, $d{$_} for keys %d;
+    my $n = 0;
+    while (my ($k, $v) = hm_ii_each $m) { $n++ }
+    is($n, 8, 'II each after drain, entries put back: sees all 8');
+}
+{
+    my $m = Data::HashMap::II->new();
+    hm_ii_put $m, $_, $_ for 1..8;
+    my ($k, $v) = hm_ii_each $m;
+    my %seen = ($k => 1);
+    my ($sk, $sv) = hm_ii_shift $m;
+    my $n = 0;
+    while (my ($ek, $ev) = hm_ii_each $m) { $seen{$ek} = 1; $n++; }
+    delete $seen{$sk};
+    is(scalar keys %seen, 7, 'II shift mid-each: union covers all remaining');
+    is($n, 6, 'II shift mid-each: continued each yields exactly the rest');
+}
+{
+    my $m = Data::HashMap::SS->new();
+    hm_ss_put $m, "k$_", "v$_" for 1..8;
+    my ($sk, $sv) = hm_ss_shift $m;
+    ok(defined $sk, 'SS shift returns an entry');
+    my %got; my $n = 0;
+    while (my ($k, $v) = hm_ss_each $m) { $got{$k} = $v; $n++; }
+    is(scalar keys %got, 7, 'SS each after shift sees every remaining entry');
+    is($n, 7, 'SS each after shift yields exactly 7 (no dupes)');
+}
+
+# ---- each restarts when a put resizes the table ----
+{
+    my $m = Data::HashMap::II->new();
+    hm_ii_put $m, $_, $_ for 1..8;
+    my ($first_k, $first_v) = hm_ii_each $m;
+    ok(defined $first_k, 'II each yields before resize');
+    hm_ii_put $m, $_, $_ for 100..300;
+    my ($rk, $rv) = hm_ii_each $m;
+    my @keys = hm_ii_keys $m;
+    is($rk, $keys[0], 'II each restarts from the table start after resize');
+}
+
 done_testing;

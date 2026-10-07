@@ -1,3 +1,5 @@
+#-*- mode: makefile; -*-
+
 test-requires.cpanfile: test-requires
 	$(NO_ECHO)$(CPAN_MAKER) create-cpanfile --dependency-type requires $< -o $@
 
@@ -13,12 +15,16 @@ local/.installed:  cpanfile.runtime test-requires.cpanfile
 	      for a in $$(cat build-mirrors 2>/dev/null); do \
 	        resolvers+=(--resolver 02packages,$$a); \
 	      done; \
-	      cpm install -L local --cpanfile $< "$${resolvers[@]}" --show-build-log-on-failure; \
-	      cpm install -L local --cpanfile test-requires.cpanfile "$${resolvers[@]}" --show-build-log-on-failure;; \
-	    carton) \
-	      mirror=$$(head -1 build-mirrors 2>/dev/null); \
-	      env PERL_CARTON_MIRROR="$$mirror" carton install ;; \
-	    *) echo >&2 "ERROR: unsupported CPAN_INSTALLER: $(CPAN_INSTALLER)"; exit 1 ;; \
+	      cpm install -L local --cpanfile $< "$${resolvers[@]}" --show-build-log-on-failure $(QUIET); \
+	      cpm install -L local --cpanfile test-requires.cpanfile "$${resolvers[@]}" --show-build-log-on-failure $(QUIET);; \
+	  carton) \
+	     mirror=$$(head -1 build-mirrors 2>/dev/null); \
+	     env PERL_CARTON_MIRROR="$$mirror" \
+	       carton install --cpanfile $< $(QUIET); \
+	     env PERL_CARTON_MIRROR="$$mirror" \
+	       carton install --cpanfile test-requires.cpanfile $(QUIET);; \
+	  *) echo >&2 "ERROR: unsupported CPAN_INSTALLER: $(CPAN_INSTALLER)"; exit 1 ;; \
 	  esac; \
 	fi; \
+	mkdir -p local; \
 	touch $@

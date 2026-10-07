@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 
 ## Version
 
-0.009.0
+0.010.0
 
 ## Description
 
@@ -369,7 +369,7 @@ works correctly in production without any special workarounds.
 
 ## Roadmap
 
-Features planned for future releases (post-0.009.0).  Items are ordered by
+Features planned for future releases (post-0.010.0).  Items are ordered by
 priority.
 
 - **Pagination / virtual scrolling** (High) -- Tables are rendered as a
@@ -379,6 +379,10 @@ infinite-scroll to cap peak HTML size.
 - **XLSX export** (High) -- `/export` supports CSV, SQLite, and JSON
 but not XLSX output.  `Excel::Writer::XLSX` would close the round-trip for
 users whose source data is XLSX.
+- **Folder view filter/join propagation** (Medium) -- The folder view
+panel in the dashboard does not carry forward active `j=` and `f=` params
+when building the `/folder` URL.  Users who have filtered or joined a table
+and then click "Folder view" silently lose their filter context.
 - **Copy-link button on chart pages** (Medium) -- The dashboard data
 view has a copy-link button when filters are active, but `/graph`, `/pie`,
 `/heatmap`, and `/bar` do not, even though their URLs are fully

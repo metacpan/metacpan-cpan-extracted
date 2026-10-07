@@ -12,7 +12,7 @@ my $port = empty_port;
 
 my $redis_server;
 eval {
-    $redis_server = Test::RedisServer->new( conf => { port => $port });
+    $redis_server = Test::RedisServer->new( conf => { port => $port, bind => '127.0.0.1' });
 } or plan skip_all => 'redis-server is required to this test';
 
 
@@ -39,29 +39,25 @@ is $connected, 1;
 is $error, 0;
 
 
-# Test: constructor with on_error => undef still gets default handler (backward compat)
 {
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
     my $r_default = EV::Redis->new(on_error => undef);
-    # Default handler is 'die @_', which XS catches and warns about
-    $r_default->connect('127.0.0.1', 59999);  # Invalid port
+    $r_default->connect('127.0.0.1', 59999);
     my $t; $t = EV::timer 0.5, 0, sub { undef $t };
     EV::run;
 
-    # The default die handler should have been called and caught by XS
     like $warnings[0], qr/exception in error handler/,
         'on_error => undef in constructor still gets default die handler';
+    unlike $warnings[0], qr/Redis\.pm line/, '... whose message names no line of the module';
 }
 
-# Test: on_error() without arguments clears the handler
 {
     my $error_count = 0;
     my $r = EV::Redis->new(on_error => sub { $error_count++ });
-    $r->on_error();  # Clear the handler
-    # Now errors should not call our handler
-    $r->connect('127.0.0.1', 59999);  # Invalid port
+    $r->on_error();
+    $r->connect('127.0.0.1', 59999);
     my $t; $t = EV::timer 0.5, 0, sub { undef $t };
     EV::run;
     is $error_count, 0, 'on_error() without args clears handler';
@@ -118,10 +114,8 @@ is $connected, 0;
 is $error, 1;
 
 
-# Restart Redis for remaining tests
-$redis_server = Test::RedisServer->new( conf => { port => $port });
+$redis_server = Test::RedisServer->new( conf => { port => $port, bind => '127.0.0.1' });
 
-# Test: disconnect() is idempotent (no error on double call)
 {
     my $error_count = 0;
     my $r = EV::Redis->new(
@@ -132,7 +126,7 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
 
     my $t; $t = EV::timer 0.1, 0, sub {
         $r->disconnect;
-        $r->disconnect;  # Should not trigger error
+        $r->disconnect;
         undef $t;
     };
     EV::run;
@@ -140,20 +134,18 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
     is $error_count, 0, 'double disconnect does not trigger error';
 }
 
-# Test: disconnect() on never-connected instance is safe
 {
     my $error_count = 0;
     my $r = EV::Redis->new(
         on_error => sub { $error_count++ },
     );
 
-    $r->disconnect;  # Never connected - should be no-op
-    $r->disconnect;  # Again - should still be no-op
+    $r->disconnect;
+    $r->disconnect;
 
     is $error_count, 0, 'disconnect on never-connected instance does not trigger error';
 }
 
-# Test: exception in on_disconnect handler is caught and warned
 {
     my $disconnect_called = 0;
     my @warnings;
@@ -180,7 +172,6 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
     like $warnings[0], qr/exception in disconnect handler/, 'warning was emitted';
 }
 
-# Test: exception in on_connect handler is caught and warned
 {
     my $connect_called = 0;
     my @warnings;
@@ -207,7 +198,6 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
     like $warnings[0], qr/exception in connect handler/, 'warning was emitted';
 }
 
-# Test: exception in on_error handler is caught and warned
 {
     my $error_called = 0;
     my @warnings;
@@ -220,7 +210,6 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
         },
     );
 
-    # Connect to invalid port to trigger error
     $r->connect('127.0.0.1', 59999);
 
     my $t; $t = EV::timer 0.5, 0, sub {
@@ -233,7 +222,6 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
     like $warnings[0], qr/exception in error handler/, 'warning was emitted';
 }
 
-# Test: connect() when already connected throws exception
 {
     my $r = EV::Redis->new;
     $r->on_error(sub { });
@@ -258,7 +246,6 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
     EV::run;
 }
 
-# Test: skip_pending during disconnect callback (re-entrant safety)
 {
     my @results;
     my $disconnect_called = 0;
@@ -266,7 +253,6 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
         on_error => sub { },
         on_disconnect => sub {
             $disconnect_called++;
-            # This should be safe - skip_pending should no-op during cleanup
             $r->skip_pending();
         },
     );
@@ -275,7 +261,6 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
 
     my $t; $t = EV::timer 0.1, 0, sub {
         undef $t;
-        # Queue some commands
         $r->set('key1', 'value1', sub { push @results, ['set1', @_] });
         $r->set('key2', 'value2', sub { push @results, ['set2', @_] });
         $r->disconnect;
@@ -284,13 +269,9 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
     EV::run;
 
     is $disconnect_called, 1, 'disconnect callback was called';
-    # Commands should have completed or received disconnect error - no crash
     ok 1, 'skip_pending during disconnect callback did not crash';
 }
 
-# Test: waiting queue is drained after on_connect without infinite loop
-# This verifies the fix for the bug where the waiting queue drain loop
-# could infinite-loop if connect_handler caused issues.
 {
     my $connect_called = 0;
     my @results;
@@ -299,12 +280,11 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
         on_connect => sub {
             $connect_called++;
         },
-        max_pending => 1,  # Force waiting queue usage
+        max_pending => 1,
     );
 
     $r->connect('127.0.0.1', $port);
 
-    # Queue commands after connect starts - they'll use waiting queue
     my $queue_timer; $queue_timer = EV::timer 0.1, 0, sub {
         undef $queue_timer;
         $r->set('key1', 'val1', sub { push @results, ['set1', $_[1] ? 'error' : 'ok'] });
@@ -322,8 +302,6 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
     is scalar(@results), 2, 'all queued commands executed (no infinite loop)';
 }
 
-# Test: disconnect() from on_connect prevents waiting queue drain
-# This tests the intentional_disconnect check in the waiting queue drain loop
 {
     my $connect_called = 0;
     my @results;
@@ -332,16 +310,13 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
         on_error => sub { },
         on_connect => sub {
             $connect_called++;
-            # Disconnect immediately in connect handler
-            # This should prevent waiting queue commands from being sent
             $r->disconnect;
         },
-        max_pending => 1,  # Force commands to wait queue
+        max_pending => 1,
     );
 
     $r->connect('127.0.0.1', $port);
 
-    # Queue commands - first goes to pending (sent immediately), rest to waiting
     $r->set('dc_connect_1', 'val1', sub { push @results, ['cmd1', $_[1] ? 'error' : 'ok'] });
     $r->set('dc_connect_2', 'val2', sub { push @results, ['cmd2', $_[1] ? 'error' : 'ok'] });
     $r->set('dc_connect_3', 'val3', sub { push @results, ['cmd3', $_[1] ? 'error' : 'ok'] });
@@ -351,14 +326,12 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
 
     is $connect_called, 1, 'on_connect was called';
     is scalar(@results), 3, 'all callbacks were invoked';
-    # First command may succeed (already sent), waiting commands should get errors
-    # The key test is that waiting queue was NOT drained after disconnect
+    # the first command may already have been sent
     my $errors = grep { $_->[1] eq 'error' } @results;
     ok $errors >= 2, 'waiting queue commands got errors (not drained after disconnect)';
     is $r->is_connected, 0, 'not connected after disconnect in on_connect';
 }
 
-# Test: disconnect() from inside a reply callback (deferred disconnect path)
 {
     my @results;
     my $disconnect_called = 0;
@@ -390,7 +363,6 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
     is $r->is_connected, 0, 'no longer connected after deferred disconnect';
 }
 
-# Test: constructor rejects both host and path
 {
     eval {
         EV::Redis->new(
@@ -402,10 +374,7 @@ $redis_server = Test::RedisServer->new( conf => { port => $port });
     like $@, qr/Cannot specify both/, 'constructor rejects both host and path';
 }
 
-# Test: connect_timeout fires on unreachable host
-# 192.0.2.1 (TEST-NET-1, RFC 5737) is reserved for documentation and should
-# never be routed, causing SYN packets to be silently dropped on most networks.
-# This test is skipped if the network returns an immediate error.
+# 192.0.2.1 (TEST-NET-1) is never routed, so most networks silently drop the SYN
 SKIP: {
     my $error_msg = '';
     my $error_time;
@@ -433,6 +402,52 @@ SKIP: {
 
     ok $elapsed < 1.0, sprintf 'connect_timeout fired within expected time (%.2fs)', $elapsed;
     like $error_msg, qr/./, "error message received: $error_msg";
+}
+
+# disconnect while the connect is still in progress
+SKIP: {
+    my $closed_port = empty_port;
+    my $r = EV::Redis->new(waiting_timeout => 200, max_pending => 1, on_error => sub {});
+    $r->connect('127.0.0.1', $closed_port);
+    skip 'loopback connect refused synchronously', 4 unless $r->is_connected;
+    $r->command('ping', sub {});
+    my $cb_err;
+    $r->command('get', 'key', sub { $cb_err = $_[1] });
+
+    $r->disconnect;
+    is $r->is_connected, 0, 'disconnected';
+    is $r->waiting_count, 0, 'waiting_count is 0 immediately after disconnect';
+    is $cb_err, 'disconnected', 'waiting command received disconnected error';
+
+    my $w; $w = EV::timer 0.3, 0, sub { undef $w; EV::break };
+    EV::run;
+    is $cb_err, 'disconnected', 'callback error was not overwritten by waiting timeout';
+}
+
+# disconnect on an established connection while a reply is still pending
+{
+    my $r = EV::Redis->new(
+        max_pending => 1,
+        on_error    => sub {},
+        on_connect  => sub { EV::break },
+    );
+    $r->connect('127.0.0.1', $port);
+    { my $g = EV::timer 3, 0, sub { EV::break }; EV::run }
+    my ($blpop_done, $blpop_err, $get_err);
+    $r->command('blpop', 'connect_t_nokey', 1, sub {
+        ($blpop_done, $blpop_err) = (1, $_[1]);
+        EV::break;
+    });
+    $r->command('get', 'key', sub { $get_err = $_[1] });
+    is $r->waiting_count, 1, 'get waits behind the pending blpop';
+
+    $r->disconnect;
+    is $r->waiting_count, 0, 'pending reply: waiting_count is 0 right after disconnect';
+    is $get_err, 'disconnected', 'pending reply: waiting command failed right away';
+
+    my $g = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    ok $blpop_done && !defined $blpop_err, 'pending reply: blpop still finishes normally';
 }
 
 done_testing;

@@ -1,6 +1,9 @@
 Makefile.txt
 bash-completion.mk
 bootstrap.mk
+builder
+builder.env
+builder.mk
 git.mk
 gitignore
 help.mk
@@ -9,6 +12,7 @@ modulino.mk
 perl.mk
 publish.mk
 release-notes.mk
+test.mk
 update.mk
 upgrade.mk
 version.mk

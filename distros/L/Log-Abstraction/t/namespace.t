@@ -41,7 +41,7 @@ subtest 'the public API is all that is left' => sub {
 	no strict 'refs';
 	my @subs = sort grep { defined(&{"Log::Abstraction::$_"}) && !/^_/ } keys %Log::Abstraction::;
 	is_deeply(\@subs, [ sort qw(
-		DESTROY new level messages
+		DESTROY new level messages flush
 		trace debug info notice warn error fatal critical alert emergency
 		is_trace is_debug is_info is_notice is_warn is_error is_critical is_alert is_emergency
 	) ], 'Log::Abstraction') or diag(explain(\@subs));

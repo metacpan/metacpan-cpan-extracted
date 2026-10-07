@@ -71,4 +71,19 @@ for my $v (@variants) {
     like $cerr, qr/^Expected a \Q$class\E::Cursor object/, "$v: a cursor class-method call croaks";
 }
 
+# A subclass passes the class check, which tests the exact class first.
+{
+    package My::II; our @ISA = ('Data::HashMap::Shared::II');
+    package My::II::Cursor; our @ISA = ('Data::HashMap::Shared::II::Cursor');
+    package main;
+    my $m = My::II->new(undef, 64);
+    is ref($m), 'My::II', 'a subclass constructor blesses into the subclass';
+    ok $m->put(1, 10), '  ... whose handle the methods accept';
+    shm_ii_put $m, 2, 20;
+    is $m->get(2), 20, '  ... and the keywords too';
+    my $c = bless $m->cursor, 'My::II::Cursor';
+    is scalar(() = $c->next), 2, '  ... as its cursor class does a subclassed cursor';
+    ok !eval { Data::HashMap::Shared::SS::get($m, 1); 1 }, '  ... while another variant still refuses it';
+}
+
 done_testing;

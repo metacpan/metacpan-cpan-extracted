@@ -58,8 +58,8 @@ print eval { $m->freeze; 1 } ? "refroze\n" : "refreeze refused\n";
 PERL
 close $fh;
 
-my $out = `LD_PRELOAD=$dir/failmsync.so $^X -Mblib $dir/child.pl $prefix 2>&1`;
-my $eio = do { local $! = Errno::EIO(); "$!" };
+my $out = `LC_ALL=C LD_PRELOAD=$dir/failmsync.so $^X -Mblib $dir/child.pl $prefix 2>&1`;
+my $eio = do { local $! = Errno::EIO(); "$!" };   # English whatever the locale, as C strerror is
 like $out, qr/^croaked: .*freeze: msync: \Q$eio\E/m,
     'a failed flush makes freeze croak with the error'
     or diag $out;

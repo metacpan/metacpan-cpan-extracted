@@ -13,6 +13,7 @@ build_requires:
   Test::Mockingbird: '0'
   Test::More: '0'
   Test::Most: '0'
+  Test::Needs: '0'
   Test::Returns: '0'
   Test::Without::Module: '0'
   XML::PP: '0'
@@ -53,5 +54,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-NWC2MusicXML
   homepage: https://metacpan.org/pod/Music::NWC2MusicXML
   repository: https://github.com/nigelhorne/NWC2MusicXML.git
-version: v0.001.1
+version: v0.001.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

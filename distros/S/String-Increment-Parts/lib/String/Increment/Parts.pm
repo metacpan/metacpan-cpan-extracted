@@ -3,11 +3,12 @@ package String::Increment::Parts;
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-07-22'; # DATE
+our $DATE = '2026-07-28'; # DATE
 our $DIST = 'String-Increment-Parts'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(
@@ -55,13 +56,11 @@ MARKDOWN
         number_indexes => {
             summary => 'Specify indexes of number parts (0 = first) to increment',
             schema => ['array*', of=>'int*'],
-            default => [-1],
             cmdline_aliases => {N=>{}},
         },
         letter_indexes => {
             summary => 'Specify indexes of letter-sequence parts (0 = first) to increment',
             schema => ['array*', of=>'int*'],
-            default => [-1],
             cmdline_aliases => {L=>{}},
         },
         #all_indexes => {
@@ -78,6 +77,21 @@ MARKDOWN
             schema => 'posint*',
             default => 1,
         },
+        debug => {
+            summary => 'Show debug information instead',
+            schema => ['str*', in=>[qw/show_parts show_increments/]],
+            description => <<'MARKDOWN',
+
+`show_parts` will show the parts along with their types and indexes.
+
+`show_increments` will show which part(s) will be incremented.
+
+MARKDOWN
+            cmdline_aliases => {
+                show_parts => {is_flag=>1, summary=>'Short alias for --debug=show_parts', code=>sub {$_[0]{debug} = 'show_parts'}},
+                show_increments => {is_flag=>1, summary=>'Short alias for --debug=show_parts', code=>sub {$_[0]{debug} = 'show_increments'}},
+            },
+        },
     },
     args_rels => {
         #'choose_one&' => [
@@ -89,6 +103,7 @@ MARKDOWN
 sub increment_string_parts {
     my %args = @_;
 
+    my $debug = $args{debug} // '';
     my $string = $args{string};
     my $n = $args{n} // 1;
     my $inc = $args{inc} // 1;
@@ -122,21 +137,34 @@ sub increment_string_parts {
         }
     } # SPLIT
 
+    if ($debug eq 'show_parts') {
+        return [200, "OK", [map {+{index=>$_, type=>$parts_types[$_], part=>$parts[$_]}} 0..$#parts]];
+    }
+
     my @results;
   INCREMENT: {
         for my $i (1 .. $n) {
 
             my @indexes;
             if ($args{all_indexes}) {
+                #log_trace "D1";
                 @indexes = 0 .. $#parts_indexes;
             } elsif ($args{number_indexes}) {
+                #log_trace "D2";
                 @indexes = map { $parts_number_indexes_to_indexes[$_] } @{ $args{number_indexes} };
             } elsif ($args{letter_indexes}) {
+                #log_trace "D3";
                 @indexes = map { $parts_letter_indexes_to_indexes[$_] } @{ $args{letter_indexes} };
             } elsif ($args{indexes}) {
+                #log_trace "D4";
                 @indexes = @{ $args{indexes} };
             } else {
-                @indexes = -1;
+                #log_trace "D5";
+                @indexes = (-1);
+            }
+
+            if ($debug eq 'show_increments') {
+                return [200, "OK", [map {+{number=>$_, index=>$indexes[$_], part=>$parts[ $indexes[$_] ]}} 0..$#indexes]];
             }
 
             my %incremented_indexes;
@@ -199,7 +227,7 @@ String::Increment::Parts - Increment string parts (numbers or letter sequences)
 
 =head1 VERSION
 
-This document describes version 0.003 of String::Increment::Parts (from Perl distribution String-Increment-Parts), released on 2026-07-22.
+This document describes version 0.004 of String::Increment::Parts (from Perl distribution String-Increment-Parts), released on 2026-07-28.
 
 =head1 DESCRIPTION
 
@@ -231,6 +259,14 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<debug> => I<str>
+
+Show debug information instead.
+
+C<show_parts> will show the parts along with their types and indexes.
+
+C<show_increments> will show which part(s) will be incremented.
+
 =item * B<filename> => I<bool>
 
 Treat string as filename and do not include the extension as parts.
@@ -243,7 +279,7 @@ Treat string as filename and do not include the extension as parts.
 
 Specify indexes of parts (0 = first) to increment.
 
-=item * B<letter_indexes> => I<array[int]> (default: [-1])
+=item * B<letter_indexes> => I<array[int]>
 
 Specify indexes of letter-sequence parts (0 = first) to increment.
 
@@ -251,7 +287,7 @@ Specify indexes of letter-sequence parts (0 = first) to increment.
 
 How many times to repeat the increment and return the result.
 
-=item * B<number_indexes> => I<array[int]> (default: [-1])
+=item * B<number_indexes> => I<array[int]>
 
 Specify indexes of number parts (0 = first) to increment.
 
@@ -277,6 +313,8 @@ Source repository is at L<https://github.com/perlancar/perl-String-Increment-Par
 L<String::Incremental>.
 
 Perl's auto-increment and auto-decrement documentation in L<perlop>.
+
+Previous efforts (deprecated): L<Data::Increment>, L<Data::Decrement>.
 
 =head1 AUTHOR
 

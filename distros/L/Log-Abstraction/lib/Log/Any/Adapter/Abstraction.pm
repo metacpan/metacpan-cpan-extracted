@@ -10,7 +10,7 @@ use Carp ();
 use Log::Abstraction;
 use Scalar::Util ();
 
-our $VERSION = '0.37';
+our $VERSION = '0.39';
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Log::Any::Adapter::Abstraction - Log::Any adapter backed by Log::Abstraction
 
 =head1 VERSION
 
-0.37
+0.39
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,9 @@ C<Log::Abstraction> object (or subclass) is a fatal error.
 
 C<logger>, C<level>, C<file>, C<fd>, C<array>, C<format>, C<ctx>,
 C<script_name>, C<verbose>, C<carp_on_warn>, C<croak_on_error>,
-C<config_file>, C<max_messages>.  Used to build a fresh C<Log::Abstraction>
+C<config_file>, C<max_messages>, C<redact>, C<timestamp_format>,
+C<timestamp_precision>, C<utc>, C<rotate_size>, C<rotate_interval>,
+C<rotate_keep>.  Used to build a fresh C<Log::Abstraction>
 instance when C<instance> is not supplied.
 
 =back
@@ -119,6 +121,13 @@ instance when C<instance> is not supplied.
       croak_on_error => { type => BOOLEAN, optional => 1 },
       config_file    => { type => SCALAR, optional => 1 },
       max_messages   => { type => INTEGER, min => 0, optional => 1 },
+      redact         => { optional => 1 },
+      timestamp_format    => { type => SCALAR, optional => 1 },
+      timestamp_precision => { type => INTEGER, min => 0, max => 9, optional => 1 },
+      utc            => { type => BOOLEAN, optional => 1 },
+      rotate_size    => { type => SCALAR, optional => 1 },
+      rotate_interval => { type => SCALAR, optional => 1 },
+      rotate_keep    => { type => INTEGER, min => 0, optional => 1 },
   }
 
 =head4 Output
@@ -181,7 +190,9 @@ sub init {
 	my %new_args;
 	for my $key (qw(
 		logger level file fd array format ctx script_name verbose
-		carp_on_warn croak_on_error config_file max_messages
+		carp_on_warn croak_on_error config_file max_messages redact
+		timestamp_format timestamp_precision utc
+		rotate_size rotate_interval rotate_keep
 	)) {
 		$new_args{$key} = $self->{$key} if exists $self->{$key};
 	}

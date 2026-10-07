@@ -2,7 +2,7 @@ package Data::HashMap::Shared::SS;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 my @KEYWORDS = qw(
     put get remove exists size keys values items each iter_reset clear

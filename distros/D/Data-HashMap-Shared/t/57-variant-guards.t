@@ -49,10 +49,10 @@ for (@VARIANTS) {
 }
 
 # ---- put_ttl/add_ttl/update_ttl refuse a map that has no expiry array ----
-# REQUIRE_TTL (Shared.xs:150) is invoked from three sites in each of the ten
+# REQUIRE_TTL (Shared.xs) is invoked from three sites in each of the ten
 # files.  Without it the call reaches the C layer with h->expires_at NULL.
 {
-    my $re = qr/^operation requires a TTL-enabled map \(pass ttl > 0 to constructor\)/;
+    my $re = qr/^Data::HashMap::Shared::\w+: operation requires a TTL-enabled map \(pass ttl > 0 to constructor\)/;
     for my $v (@VARIANTS) {
         my ($name, $key, $val) = @$v;
         my $m = "Data::HashMap::Shared::$name"->new(path("ttl_$name"), 64);
@@ -76,7 +76,7 @@ for (@VARIANTS) {
 # ---- set_multi rejects an odd argument list ----
 # Without the guard the loop reads ST(items) -- one past the argument stack.
 {
-    my $re = qr/^set_multi requires even number of arguments \(key, value pairs\)/;
+    my $re = qr/^Data::HashMap::Shared::\w+: set_multi requires an even number of arguments \(key, value pairs\)/;
     for my $v (@VARIANTS) {
         my ($name, $key) = @$v;
         my $m = "Data::HashMap::Shared::$name"->new(path("sm_$name"), 64);

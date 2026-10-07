@@ -8,10 +8,10 @@ use Test::More;
 my @variants = qw(I16 I16A I16S I32 I32A I32S IA II IS SA SI16 SI32 SI SS);
 
 my @common_methods = qw(
-    new put get remove exists size max_size ttl lru_skip capacity
+    new put get remove take exists size max_size ttl lru_skip capacity
     keys values items each iter_reset drain pop shift
     clone from_hash merge swap clear reserve purge
-    persist put_ttl get_or_set
+    persist put_ttl get_or_set to_hash
 );
 
 my %integer_value_methods = map { $_ => 1 } qw(I16 I32 II SI16 SI32 SI);

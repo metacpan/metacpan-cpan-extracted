@@ -3,6 +3,7 @@ SiiNunit
 test : types {
 
 string: "String value"
+quotes: "\"escaped with backslash\""
 
 float_f: 1.23
 float_e: -.62e+4

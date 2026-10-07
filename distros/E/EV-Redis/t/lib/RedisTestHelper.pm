@@ -9,9 +9,10 @@ our @EXPORT_OK = qw(get_redis_version);
 
 sub get_redis_version {
     my ($sock) = @_;
-    my ($major, $minor) = (0, 0);
+    my ($major, $minor, $done) = (0, 0);
     my $r = EV::Redis->new(path => $sock);
     $r->info('server', sub {
+        return if $done;
         my ($info, $err) = @_;
         if ($info && $info =~ /redis_version:(\d+)\.(\d+)/) {
             ($major, $minor) = ($1, $2);
@@ -19,10 +20,12 @@ sub get_redis_version {
         $r->disconnect;
         EV::break;
     });
-    # Guard timer: never depend on ambient loop state (an idle caller
-    # connection would otherwise keep this EV::run from returning).
+    # the INFO reply may never arrive; the loop's clock was last read before
+    # the caller's slow setup
+    EV::now_update;
     my $t = EV::timer 5, 0, sub { EV::break };
     EV::run;
+    $done = 1;
     return ($major, $minor);
 }
 

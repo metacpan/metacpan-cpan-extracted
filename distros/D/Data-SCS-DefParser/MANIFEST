@@ -40,9 +40,14 @@ t/fixtures/include/attr.txt
 t/fixtures/include/include.sii
 t/fixtures/include/inline.sii
 t/fixtures/include/missing.sii
+t/fixtures/include/sub.sii
+t/fixtures/include/sub/sub1.sui
+t/fixtures/include/sub/sub2/sub2.sui
+t/fixtures/include/sub/sub3.sui
 t/fixtures/include/unit.sui
 t/fixtures/new-bar/foo1.sii
 t/fixtures/new-baz/foo2.sii
+t/fixtures/syntax/multi-block.sii
 t/fixtures/syntax/multiline-cmt.sii
 t/fixtures/syntax/nested-block.sii
 t/fixtures/syntax/syntax.sii

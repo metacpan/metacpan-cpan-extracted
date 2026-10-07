@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: A health check for your code
 use version;
-our $VERSION = 'v1.9.2'; # VERSION
+our $VERSION = 'v1.9.3'; # VERSION
 
 use 5.010;
 use strict;
@@ -633,7 +633,7 @@ HealthCheck - A health check for your code
 
 =head1 VERSION
 
-version v1.9.2
+version v1.9.3
 
 =head1 SYNOPSIS
 
@@ -1019,7 +1019,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 - 2025 by Grant Street Group.
+This software is Copyright (c) 2017 - 2026 by Grant Street Group.
 
 This is free software, licensed under:
 

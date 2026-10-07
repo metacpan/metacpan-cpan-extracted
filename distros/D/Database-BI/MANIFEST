@@ -31,6 +31,7 @@ t/transaction.t
 t/unit.t
 templates/web/en/bar.html.tt
 templates/web/en/browse.html.tt
+templates/web/en/folder.html.tt
 templates/web/en/dashboard.html.tt
 templates/web/en/graph.html.tt
 templates/web/en/heatmap.html.tt

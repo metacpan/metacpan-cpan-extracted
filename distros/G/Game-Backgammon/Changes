@@ -1,5 +1,10 @@
 Revision history for Game-Backgammon
 
+0.02    2026-10-07
+    - Build a turn one checker at a time with the keys, instead of
+      picking one of up to three hundred numbered turns.
+    - The points are checkered when colour is on.
+
 0.01
     - Phase 01: the board, the position, the move, the turn and the
       notation. No play yet: the dice and legal turn generation are

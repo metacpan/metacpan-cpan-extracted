@@ -7,13 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: debian:trixie
+      env:
+        CMB_VERSION_DRIFT: ignore
     steps:
       # 1. Install git BEFORE checkout so the action clones properly
       - name: Pre-install git
         run: apt-get update && apt-get install -y git
 
       # 2. Now the checkout action will create a true .git repository
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # 3. Prevent Git "dubious ownership" fatal errors in containers
       - name: Configure Git Safe Directory

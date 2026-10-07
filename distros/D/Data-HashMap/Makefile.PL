@@ -2,8 +2,11 @@ use ExtUtils::MakeMaker;
 use Module::Metadata;
 use Config;
 
-die "Data::HashMap requires 64-bit integers (ivsize >= 8), got ivsize=$Config{ivsize}\n"
-    if $Config{ivsize} < 8;
+if ($Config{ivsize} < 8) {
+    # "OS unsupported" marks the report NA, not FAIL, on CPAN Testers.
+    print "OS unsupported: Data::HashMap requires 64-bit integers (ivsize >= 8), got ivsize=$Config{ivsize}\n";
+    exit 0;
+}
 
 use Devel::PPPort;
 Devel::PPPort::WriteFile();

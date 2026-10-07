@@ -50,7 +50,7 @@ Using [cpanminus](https://metacpan.org/pod/App::cpanminus)
 on Perl v5.36 or later:
 
 ```sh
-cpanm https://github.com/nautofon/Data-SCS-DefParser.git
+cpanm Data::SCS::DefParser
 ```
 
 Performing a manual installation should be considered slightly
@@ -74,7 +74,7 @@ The two modules are somewhat related.
 
 ### License
 
-Copyright © 2025 [nautofon](https://github.com/nautofon)
+Copyright © 2026 [nautofon](https://github.com/nautofon)
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

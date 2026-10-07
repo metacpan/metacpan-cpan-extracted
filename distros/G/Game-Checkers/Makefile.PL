@@ -20,6 +20,18 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'Object::Proto::Sugar' => '0.05',
     },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    # the terminal game picks a move with the arrow keys when
+                    # this is installed, and is typed at when it is not
+                    'Term::ReadKey' => '0',
+                },
+            },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Game-Checkers-*' },
 );
@@ -35,6 +47,8 @@ unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
     @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
 }
 
+delete $WriteMakefileArgs{META_MERGE}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 };
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
     unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
 delete $WriteMakefileArgs{MIN_PERL_VERSION}

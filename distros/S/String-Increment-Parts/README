@@ -3,8 +3,8 @@ NAME
     sequences)
 
 VERSION
-    This document describes version 0.003 of String::Increment::Parts (from
-    Perl distribution String-Increment-Parts), released on 2026-07-22.
+    This document describes version 0.004 of String::Increment::Parts (from
+    Perl distribution String-Increment-Parts), released on 2026-07-28.
 
 DESCRIPTION
 FUNCTIONS
@@ -31,6 +31,14 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   debug => *str*
+
+        Show debug information instead.
+
+        "show_parts" will show the parts along with their types and indexes.
+
+        "show_increments" will show which part(s) will be incremented.
+
     *   filename => *bool*
 
         Treat string as filename and do not include the extension as parts.
@@ -43,7 +51,7 @@ FUNCTIONS
 
         Specify indexes of parts (0 = first) to increment.
 
-    *   letter_indexes => *array[int]* (default: [-1])
+    *   letter_indexes => *array[int]*
 
         Specify indexes of letter-sequence parts (0 = first) to increment.
 
@@ -51,7 +59,7 @@ FUNCTIONS
 
         How many times to repeat the increment and return the result.
 
-    *   number_indexes => *array[int]* (default: [-1])
+    *   number_indexes => *array[int]*
 
         Specify indexes of number parts (0 = first) to increment.
 
@@ -73,6 +81,8 @@ SEE ALSO
     String::Incremental.
 
     Perl's auto-increment and auto-decrement documentation in perlop.
+
+    Previous efforts (deprecated): Data::Increment, Data::Decrement.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

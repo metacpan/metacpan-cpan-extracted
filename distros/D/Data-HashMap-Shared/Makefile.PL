@@ -2,15 +2,15 @@ use ExtUtils::MakeMaker;
 use Config;
 
 unless ($^O eq 'linux') {
-    print "NA: Data::HashMap::Shared requires Linux\n";
+    print "OS unsupported: Data::HashMap::Shared requires Linux\n";
     exit 0;
 }
 if ($Config{ivsize} < 8 || $Config{ptrsize} < 8) {
-    print "NA: Data::HashMap::Shared requires a 64-bit perl (ivsize and ptrsize >= 8)\n";
+    print "OS unsupported: Data::HashMap::Shared requires a 64-bit perl (ivsize and ptrsize >= 8)\n";
     exit 0;
 }
 if ($Config{byteorder} !~ /^1234/) {
-    print "NA: Data::HashMap::Shared requires a little-endian architecture\n";
+    print "OS unsupported: Data::HashMap::Shared requires a little-endian architecture\n";
     exit 0;
 }
 

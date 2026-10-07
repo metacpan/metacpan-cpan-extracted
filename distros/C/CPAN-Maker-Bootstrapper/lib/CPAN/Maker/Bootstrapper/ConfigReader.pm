@@ -9,7 +9,7 @@ use File::HomeDir;
 use parent qw(Class::Accessor::Fast);
 
 __PACKAGE__->follow_best_practice;
-__PACKAGE__->mk_accessors(qw(config));
+__PACKAGE__->mk_accessors(qw(config config_file));
 
 ########################################################################
 sub new {
@@ -24,7 +24,9 @@ sub new {
   my $config = Config::Tiny->read($file)
     or die "ERROR: Could not read $file: " . Config::Tiny->errstr . "\n";
 
-  return $class->SUPER::new( { config => $config } );
+  my $self = $class->SUPER::new( { config => $config, config_file => $file } );
+
+  return $self;
 }
 
 ########################################################################

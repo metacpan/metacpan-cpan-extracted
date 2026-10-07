@@ -35,16 +35,13 @@ $r->rpush('foo' => 'bar1', sub {
 });
 EV::run;
 
-# Test: callback cleanup on Redis error responses
 {
     my $r2 = EV::Redis->new( path => $connect_info{sock} );
     my $error_result;
     my $error_msg;
 
-    # Create a string key, then try to use list command on it (causes Redis error)
     $r2->set('string_key', 'value', sub {
         $r2->lpush('string_key', 'item', sub {
-            # This should fail with WRONGTYPE error
             ($error_result, $error_msg) = @_;
             $r2->disconnect;
         });
@@ -56,14 +53,13 @@ EV::run;
 }
 pass 'no leak on Redis error response callback';
 
-# Test: callback cleanup when callback throws exception
 {
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
     my $r3 = EV::Redis->new(
         path => $connect_info{sock},
-        on_error => sub { }, # suppress default die
+        on_error => sub { },
     );
     my $exception_thrown = 0;
     my $after_exception = 0;
@@ -73,7 +69,6 @@ pass 'no leak on Redis error response callback';
         die "intentional exception in callback";
     });
 
-    # Give time for the callback to execute
     my $timer = EV::timer 0.1, 0, sub {
         $after_exception = 1;
         $r3->disconnect;
@@ -86,26 +81,22 @@ pass 'no leak on Redis error response callback';
 }
 pass 'no leak when callback throws exception';
 
-# Test: callback cleanup on command timeout
 {
     my $r4 = EV::Redis->new(
         path => $connect_info{sock},
-        on_error => sub { }, # suppress default die
-        command_timeout => 100, # 100ms timeout
+        on_error => sub { },
+        command_timeout => 100,
     );
     my $timeout_result;
     my $timeout_error;
     my $callback_called = 0;
 
-    # BLPOP with 10 second wait, but command_timeout is 100ms
-    # This should timeout before BLPOP returns
     $r4->blpop('nonexistent_key_for_timeout_test', 10, sub {
         ($timeout_result, $timeout_error) = @_;
         $callback_called = 1;
         $r4->disconnect;
     });
 
-    # Fallback timer in case timeout doesn't work as expected
     my $fallback = EV::timer 2, 0, sub {
         $r4->disconnect unless $callback_called;
     };
@@ -118,9 +109,7 @@ pass 'no leak when callback throws exception';
 }
 pass 'no leak on command timeout callback';
 
-# Test: object destruction with pending commands
-# Note: redisAsyncFree triggers disconnect callback, which invokes pending
-# callbacks with error. This is hiredis behavior, not our choice.
+# redisAsyncFree (hiredis) fails the pending callbacks with an error
 {
     my $callback_called = 0;
     my $callback_error;
@@ -131,7 +120,6 @@ pass 'no leak on command timeout callback';
             on_error => sub { },
         );
 
-        # Issue a blocking command
         $r5->blpop('destruction_test_key', 10, sub {
             my ($res, $err) = @_;
             $callback_called = 1;
@@ -139,21 +127,16 @@ pass 'no leak on command timeout callback';
         });
 
         is $r5->pending_count, 1, 'pending_count is 1 before destruction';
-        # $r5 goes out of scope here without explicit disconnect
     }
 
-    # Give event loop a chance to process any lingering events
     my $timer = EV::timer 0.1, 0, sub { };
     EV::run;
 
-    # Callbacks ARE called during destruction (via hiredis disconnect path)
     is $callback_called, 1, 'callback called during destruction (hiredis behavior)';
     ok defined($callback_error), 'callback received error on destruction';
 }
 pass 'no crash when destroying with pending commands';
 
-# Test: object destruction with waiting queue
-# Waiting queue callbacks are also invoked with error during destruction
 {
     my @callbacks_called;
 
@@ -164,12 +147,10 @@ pass 'no crash when destroying with pending commands';
             on_error => sub { },
         );
 
-        # First command goes to pending
         $r6->blpop('destruction_wait_key', 10, sub {
             my ($res, $err) = @_;
             push @callbacks_called, { type => 'pending', err => $err };
         });
-        # Second goes to waiting queue
         $r6->set('waiting_test', 'val', sub {
             my ($res, $err) = @_;
             push @callbacks_called, { type => 'waiting', err => $err };
@@ -177,20 +158,17 @@ pass 'no crash when destroying with pending commands';
 
         is $r6->pending_count, 1, 'pending_count is 1';
         is $r6->waiting_count, 1, 'waiting_count is 1';
-        # $r6 goes out of scope here
     }
 
     my $timer = EV::timer 0.1, 0, sub { };
     EV::run;
 
-    # Both callbacks are invoked during destruction with errors
     is scalar(@callbacks_called), 2, 'both callbacks called on destruction';
     ok defined($callbacks_called[0]{err}), 'pending callback got error';
     ok defined($callbacks_called[1]{err}), 'waiting callback got error';
 }
 pass 'no crash when destroying with waiting queue';
 
-# Test: explicit skip_pending before destruction (callbacks ARE called)
 {
     my @callbacks_called;
 
@@ -211,11 +189,9 @@ pass 'no crash when destroying with waiting queue';
 
         is $r7->pending_count, 2, 'pending_count is 2';
 
-        # Explicitly skip before destruction
         $r7->skip_pending;
 
         is $r7->pending_count, 0, 'pending_count is 0 after skip';
-        # Now $r7 goes out of scope
     }
 
     is scalar(@callbacks_called), 2, 'both callbacks called via skip_pending';
@@ -224,7 +200,6 @@ pass 'no crash when destroying with waiting queue';
 }
 pass 'skip_pending before destruction works correctly';
 
-# Test: circular reference is broken by clearing callbacks
 {
     my $destroyed = 0;
     {
@@ -233,16 +208,13 @@ pass 'skip_pending before destruction works correctly';
             on_error => sub { },
         );
 
-        # Create circular reference: $r8 -> object -> callback -> $r8
         $r8->on_connect(sub { $r8->is_connected });
 
-        # Break the cycle by clearing the callback
         $r8->on_connect();
         $r8->on_error();
 
         $r8->disconnect;
         $destroyed = refcount($r8);
-        # $r8 goes out of scope
     }
     is $destroyed, 1, 'refcount is 1 after clearing circular callbacks (GC will collect)';
 }

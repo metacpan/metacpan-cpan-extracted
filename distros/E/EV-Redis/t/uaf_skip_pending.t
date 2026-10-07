@@ -12,7 +12,7 @@ eval {
 
 my %connect_info = $redis_server->connect_info;
 
-# Reproduction of Use-After-Free in skip_pending
+# skip_pending survives DESTROY inside the first skipped callback
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     
@@ -20,7 +20,7 @@ my %connect_info = $redis_server->connect_info;
 
     $r->command('set', 'key1', 'val1', sub {
         $cb_count++;
-        undef $r; # Trigger destruction
+        undef $r;
     });
 
     $r->command('set', 'key2', 'val2', sub {
@@ -36,9 +36,7 @@ my %connect_info = $redis_server->connect_info;
     is($cb_count, 3, "All callbacks invoked despite destruction in the first one");
 }
 
-# Test: undef $redis inside async reply callback (hiredis deferred free path)
-# When DESTROY fires inside REDIS_IN_CALLBACK, remaining pending callbacks
-# should still be invoked with a disconnect error (not silently dropped).
+# DESTROY inside a reply callback (hiredis deferred free path)
 {
     my @results;
     my $r = EV::Redis->new(path => $connect_info{sock});
@@ -46,7 +44,7 @@ my %connect_info = $redis_server->connect_info;
     $r->command('set', 'uaf_key1', 'val1', sub {
         my ($res, $err) = @_;
         push @results, [$res, $err];
-        undef $r;  # Trigger DESTROY inside hiredis reply callback
+        undef $r;
     });
 
     $r->command('set', 'uaf_key2', 'val2', sub {
@@ -69,15 +67,12 @@ my %connect_info = $redis_server->connect_info;
     ok(defined $results[2][1], "third command got error string");
 }
 
-# Test: multi-channel subscribe + DESTROY outside callback (FREED path)
-# When DESTROY fires outside REDIS_IN_CALLBACK with a multi-channel subscribe
-# active, __redisAsyncFree iterates the channels dict and fires reply_cb once
-# per channel with the same cbt. Without the fix, the second call is UAF.
+# __redisAsyncFree fires reply_cb once per channel with the same cbt
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my $subscribed = 0;
 
-    $r->on_error(sub {}); # suppress die on disconnect
+    $r->on_error(sub {});
     $r->command('subscribe', 'mc_ch1', 'mc_ch2', 'mc_ch3', sub {
         my ($res, $err) = @_;
         return if $err;
@@ -89,24 +84,22 @@ my %connect_info = $redis_server->connect_info;
 
     EV::run;
     is($subscribed, 3, "multi-channel: subscribed to all 3 channels");
-    # $r goes out of scope — DESTROY fires outside callback (FREED path)
+    # DESTROY at scope exit, outside any callback
 }
 pass("Survived multi-channel subscribe FREED path");
 
-# Test: multi-channel subscribe + undef inside callback (self==NULL path)
-# When DESTROY fires inside REDIS_IN_CALLBACK, ac->data is NULLed.
-# __redisAsyncFree fires reply_cb for each channel with self==NULL.
+# undef inside a subscribe callback: reply_cb then fires per channel with self==NULL
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my $cb_count = 0;
 
-    $r->on_error(sub {}); # suppress die on disconnect
+    $r->on_error(sub {});
     $r->command('subscribe', 'mc_ch4', 'mc_ch5', 'mc_ch6', sub {
         my ($res, $err) = @_;
         $cb_count++;
         return if $err;
         if ($res->[0] eq 'subscribe' && $res->[2] == 3) {
-            undef $r;  # DESTROY inside REDIS_IN_CALLBACK
+            undef $r;
         }
     });
 
@@ -115,22 +108,17 @@ pass("Survived multi-channel subscribe FREED path");
 }
 pass("Survived multi-channel subscribe self==NULL path");
 
-# Test: multi-channel subscribe + skip_pending + disconnect (skipped path)
-# When skip_pending marks a multi-channel subscribe cbt as skipped, then
-# disconnect fires, hiredis calls reply_cb N times with reply=NULL for
-# each channel. Without the sub_count fix, the first call frees cbt and
-# subsequent calls are use-after-free.
+# hiredis calls reply_cb once per channel with reply=NULL on the skipped cbt
 {
     my $r = EV::Redis->new(path => $connect_info{sock});
     my $skip_cb_count = 0;
 
-    $r->on_error(sub {}); # suppress die on disconnect
+    $r->on_error(sub {});
     $r->command('subscribe', 'skip_ch1', 'skip_ch2', 'skip_ch3', sub {
         my ($res, $err) = @_;
         $skip_cb_count++;
         return unless defined $res;
         if ($res->[0] eq 'subscribe' && $res->[2] == 3) {
-            # All 3 channels subscribed — now skip_pending + disconnect
             $r->skip_pending();
             $r->disconnect;
         }
@@ -141,33 +129,26 @@ pass("Survived multi-channel subscribe self==NULL path");
 }
 pass("Survived multi-channel subscribe skip_pending path");
 
-# Test: undef $redis inside on_disconnect callback during synchronous disconnect.
-# When disconnect() calls redisAsyncDisconnect on an idle connection (no pending
-# replies, not inside REDIS_IN_CALLBACK), hiredis fires disconnect_cb synchronously.
-# If the user's on_disconnect handler drops the last Perl reference, DESTROY fires
-# and defers Safefree. Without callback_depth protection in disconnect(), the
-# subsequent `self->ac = NULL` is a write to freed memory.
+# on_disconnect drops the last reference inside a synchronous disconnect()
 {
     my $disconnected = 0;
     my $r = EV::Redis->new(path => $connect_info{sock});
     $r->on_error(sub {});
 
-    # Wait for connection to be fully established and idle
+    # wait until connected and idle
     $r->command('ping', sub {
         my ($res, $err) = @_;
         is($res, 'PONG', 'disconnect uaf: connected');
 
-        # Set up on_disconnect to drop the last reference
         $r->on_disconnect(sub {
             $disconnected = 1;
-            undef $r;  # Drop last ref inside synchronous disconnect_cb
+            undef $r;
         });
 
-        # Use a timer to call disconnect from outside any hiredis callback,
-        # ensuring REDIS_IN_CALLBACK is not set
+        # outside any hiredis callback
         my $w; $w = EV::timer 0.01, 0, sub {
             undef $w;
-            $r->disconnect;  # synchronous path: triggers disconnect_cb immediately
+            $r->disconnect;
         };
     });
 
@@ -175,5 +156,73 @@ pass("Survived multi-channel subscribe skip_pending path");
     is($disconnected, 1, 'disconnect uaf: on_disconnect fired');
 }
 pass("Survived disconnect() UAF with undef in on_disconnect");
+
+# after a nested event loop, skip_pending must not re-invoke the running callback
+{
+    my $r = EV::Redis->new(path => $connect_info{sock});
+    my $cb_calls = 0;
+    my @errors;
+
+    $r->command('ping', sub {
+        my ($res, $err) = @_;
+        $cb_calls++;
+        push @errors, $err;
+        if ($cb_calls == 1) {
+            $r->disconnect;
+            $r->connect_unix($connect_info{sock});
+            $r->command('ping', sub { EV::break });
+            EV::run;
+            $r->skip_pending;
+            EV::break;
+        }
+    });
+
+    my $guard = EV::timer 5, 0, sub { EV::break };
+    EV::run;
+    is($cb_calls, 1, 'running callback invoked exactly once (current_cb not clobbered by nested loop)');
+    is($errors[0], undef, 'first call succeeded with undef error');
+}
+
+{
+    my $r = EV::Redis->new(path => $connect_info{sock});
+    my $calls = 0;
+    $r->command('ping', sub {
+        return if $calls++;
+        $r->disconnect;
+        $r->connect_unix($connect_info{sock});
+        $r->command('ping', sub { $r->skip_pending; EV::break });
+        my $inner = EV::timer 2, 0, sub { EV::break };
+        EV::run;
+        EV::break;
+    });
+    my $guard = EV::timer 5, 0, sub { EV::break };
+    EV::run;
+    is($calls, 1, 'skip_pending inside a nested loop: outer callback invoked once');
+    $r->disconnect;
+}
+
+# a running subscribe callback's entry must stay registered
+{
+    my $r = EV::Redis->new(path => $connect_info{sock}, on_error => sub {});
+    my ($t, $skipped) = (undef, 0);
+    $r->command('ping', sub {
+        $t = EV::timer 0, 0, sub {
+            $r->command('blpop', 'usp_nolist', 1, sub { $r->skip_pending; EV::break });
+            $r->disconnect;
+            $r->connect_unix($connect_info{sock});
+            $r->command('subscribe', 'usp_ch', sub {
+                $skipped++ if defined $_[1] && $_[1] eq 'skipped';
+                return unless $_[0] && $_[0][0] eq 'subscribe';
+                EV::run;
+                EV::break;
+            });
+        };
+    });
+    my $guard = EV::timer 5, 0, sub { EV::break };
+    EV::run;
+    undef $t;
+    undef $r;
+    is($skipped, 0, 'skip_pending in a nested loop leaves the running subscribe callback alone');
+}
 
 done_testing;

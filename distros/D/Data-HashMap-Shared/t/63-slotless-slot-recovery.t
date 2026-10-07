@@ -47,9 +47,11 @@ sub poke_pid {
 }
 
 my $ppid = $$;
-# Pass 1 starts at pid % SLOTS and takes the first free slot, so on a fresh map
-# this one is the parent's.  Freeing its neighbour cannot disturb it.
-my $free_idx = ($ppid + 1) % SLOTS;
+# Free the neighbour of the parent's own slot, so the parent is not disturbed.
+my @owners = slot_pids();
+my ($own_idx) = grep { $owners[$_] == $ppid } 0 .. SLOTS - 1;
+defined $own_idx or BAIL_OUT('the parent holds no reader slot');
+my $free_idx = ($own_idx + 1) % SLOTS;
 
 my $pid = fork // die "fork: $!";
 if (!$pid) {

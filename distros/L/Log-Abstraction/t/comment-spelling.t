@@ -65,6 +65,7 @@ rfc
 SDK
 SeverityNumber
 SIGHUP
+sm
 str
 Sys
 systemd

@@ -1,3 +1,31 @@
+Version 3.978002 (2026-10-07)
+
+  [NEW FEATURES]
+
+  * Add ArubaCX client IP tracking to IPv4 and IPv6 address collection
+    (netdisco/netdisco#1713)
+
+Version 3.978001 (2026-10-07)
+
+  [NEW FEATURES]
+
+  * #590 Add Synology DSM NAS support
+  * #591 Add Cisco C9800 per-AP policy, site and RF tags, including tag names
+    in AP module descriptions
+
+  [BUG FIXES]
+
+  * #412 Classify Aruba controller AP inventory entries as APs instead of modules
+
+  * #592 Fix HP/Aruba switch model translation, including Aruba 3810M
+    product prefixes, and add missing 2930F, 2930M and 3810M mappings (#553)
+  * #593 Read Cisco Catalyst 1300 software versions from ENTITY-MIB (#568)
+
+  [ENHANCEMENTS]
+
+  * #527 Report Aruba wireless OS as arubaos instead of airos; update
+    OS-based filters or scripts matching airos. Alcatel-Lucent remains aos-w.
+
 Version 3.978000 (2026-09-29)
 
   [NEW FEATURES]

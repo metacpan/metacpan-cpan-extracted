@@ -7,7 +7,7 @@ use Data::HashMap::Shared::SS;
 # atomically claim with `cas_take`. Claim is exclusive — only one
 # worker can take each job, even with N workers racing on the same id.
 
-my $queue = Data::HashMap::Shared::SS->new('/tmp/demo_queue.shm', 100_000);
+my $queue = Data::HashMap::Shared::SS->new("/tmp/dhms_queue_$$.shm", 100_000);
 
 # Producer side
 sub enqueue {
@@ -23,8 +23,6 @@ sub claim {
 }
 
 # Demo: enqueue some jobs, spawn 4 workers, count wins.
-# Pass `reset` as an argument to drop the backing file and exit.
-if (@ARGV && $ARGV[0] eq 'reset') { $queue->unlink; exit }
 
 {
     my $njobs = 20;

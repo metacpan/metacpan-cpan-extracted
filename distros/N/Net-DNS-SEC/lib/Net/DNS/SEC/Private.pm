@@ -3,7 +3,7 @@ package Net::DNS::SEC::Private;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Private.pm 2003 2025-01-21 12:06:06Z willem $)[2];
+our $VERSION = (qw$Id: Private.pm 2063 2026-10-05 11:02:58Z willem $)[2];
 
 
 =head1 NAME
@@ -89,7 +89,8 @@ sub _new_params {
 }
 
 
-sub _index { return my @empty }		## no algorithm index
+sub _deprecate { return my @empty }	## dummy deprecation list
+sub _index     { return &_deprecate }	## dummy algorithm index
 
 sub AUTOLOAD {				## Dynamic instance methods
 	my ($self) = @_;

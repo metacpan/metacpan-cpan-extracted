@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.009.0';
+our $VERSION = '0.010.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -14,6 +14,7 @@ use CGI::Lingua;
 use Mojo::File;
 use Mojo::JSON		qw(encode_json);
 use Mojo::Util		qw(url_escape encode);
+use File::Path		qw(remove_tree);
 use File::Temp		qw(tempfile tempdir);
 use Readonly;
 use Socket		qw(inet_aton);
@@ -66,6 +67,7 @@ Readonly my %MESSAGES => (
 	error_upload_none      => 'No file received',
 	error_upload_ext       => 'Unsupported file type. Accepted: CSV, TSV, PSV, XML, SQLite (.sql, .sqlite, .sqlite3), Berkeley DB (.db), XLSX',
 	error_upload_too_large => 'File too large (maximum %s MiB)',
+	error_upload_save      => 'Could not save uploaded file',
 	error_path_required    => '"path" parameter is required',
 	error_url_required     => 'Please enter a URL',
 	error_url_invalid      => '"%s" is not a valid http:// or https:// URL',
@@ -79,6 +81,7 @@ Readonly my %MESSAGES => (
 Readonly my $MAX_UPLOAD_MIB      => 50;
 Readonly my $MAX_UPLOAD_BYTES    => $MAX_UPLOAD_MIB * 1_048_576;
 Readonly my $DEFAULT_JOIN_MAX_ROWS => 10_000;
+Readonly my $MAX_PREFIX_LEN        => 20;
 
 # ---------------------------------------------------------------------------
 # Protected helpers
@@ -660,8 +663,11 @@ sub _run_export_pipeline :Protected ($self) {
 
 	# Build the join chain lazily: each Database::Join wraps the previous source
 	# and a new right DataSource.  No data is fetched until after the loop.
-	my $max_rows = $self->app->config('join_max_rows') // $DEFAULT_JOIN_MAX_ROWS;
+	my $max_rows  = $self->app->config('join_max_rows') // $DEFAULT_JOIN_MAX_ROWS;
+	my $join_type = $self->param('jtype') // 'left';
+	$join_type    = 'left' unless $join_type =~ /\A(?:left|inner|outer)\z/;
 	my $src = $left_src;
+	my @schema_warnings;
 	for my $jspec (@{ $self->every_param('j') }) {
 		my ($right_spec, $left_key, $right_key) = split /\|/, $jspec, 3;
 		next unless defined $right_spec && defined $left_key && defined $right_key;
@@ -678,15 +684,22 @@ sub _run_export_pipeline :Protected ($self) {
 		next unless +{ map { $_ => 1 } @$right_cols }->{$right_key};
 
 		require Database::Join;
+		local $SIG{__WARN__} = sub { push @schema_warnings, $_[0] };
 		$src = Database::Join->new(
 			databases        => [$src, $right_src],
 			join_column      => $left_key,
 			backend          => 'auto',
 			max_array_rows   => $max_rows,
+			join_type        => $join_type,
 			($left_key ne $right_key ? (join_map         => {1 => $right_key})   : ()),
 			($right_label             ? (collision_prefix => {1 => $right_label}) : ()),
 		);
 	}
+
+	# Surface any schema-type-mismatch warnings from Database::Join to the UI
+	# so the user sees "column X has conflicting types" rather than losing it
+	# silently to the error log.
+	$self->stash(schema_warnings => \@schema_warnings) if @schema_warnings;
 
 	my $records = eval { $src->selectall_arrayref };
 	return () if $@;
@@ -1510,8 +1523,11 @@ sub join_tables ($self) {
 
 	# Build the join chain: each step wraps the previous source in a
 	# Database::Join.  Data is not fetched until after the loop.
-	my $max_rows = $self->app->config('join_max_rows') // $DEFAULT_JOIN_MAX_ROWS;
+	my $max_rows  = $self->app->config('join_max_rows') // $DEFAULT_JOIN_MAX_ROWS;
+	my $join_type = $self->param('jtype') // 'left';
+	$join_type    = 'left' unless $join_type =~ /\A(?:left|inner|outer)\z/;
 	my $src = $left_src;
+	my @schema_warnings;
 	for my $jspec (@join_specs) {
 		my ($right_spec, $left_key, $right_key) = split /\|/, $jspec, 3;
 		next unless defined $right_spec && defined $left_key && defined $right_key;
@@ -1528,11 +1544,13 @@ sub join_tables ($self) {
 		next unless +{ map { $_ => 1 } @$right_cols }->{$right_key};
 
 		require Database::Join;
+		local $SIG{__WARN__} = sub { push @schema_warnings, $_[0] };
 		$src = Database::Join->new(
 			databases        => [$src, $right_src],
 			join_column      => $left_key,
 			backend          => 'auto',
 			max_array_rows   => $max_rows,
+			join_type        => $join_type,
 			($left_key ne $right_key ? (join_map         => {1 => $right_key})   : ()),
 			($right_label             ? (collision_prefix => {1 => $right_label}) : ()),
 		);
@@ -1583,6 +1601,7 @@ sub join_tables ($self) {
 		filters_json     => $filters_json,
 		dedup            => $dedup,
 		export_url       => $self->_build_export_url($left_spec, \@join_specs, $filter_specs, undef, $dedup),
+		schema_warnings  => \@schema_warnings,
 	);
 }
 
@@ -2052,21 +2071,38 @@ Multipart form upload, field name: C<file>.
 
   200 application/json   { "url": "/open?path=/abs/path/file.csv", "path": "/abs/path/file.csv" }
   400 application/json   { "error": "No file received" }
+  413 application/json   { "error": "File too large to upload (limit: 50 MB)" }
   415 application/json   { "error": "Unsupported file type. Accepted: ..." }
+  500 application/json   { "error": "Could not save uploaded file" }
 
 =head3 MESSAGES
 
-  error_upload_none   -- no file was received in the multipart upload.
-  error_upload_ext    -- the file's extension is not in the supported list.
+  error_upload_none       -- no file was received in the multipart upload.
+  error_upload_ext        -- the file's extension is not in the supported list.
+  error_upload_too_large  -- the upload body exceeded MAX_UPLOAD_MIB (50 MiB).
+  error_upload_save       -- move_to failed or the destination file was not
+                             created (I/O error, full disk, permission error).
+
+=head3 IMPLEMENTATION NOTES
+
+The C<move_to> call is wrapped with the C<eval { ...; 1 }> idiom (not
+C<eval {}> + C<if ($@)>).  Mojolicious dispatch and DESTROY-phase evals can
+leave C<$@> set before the action runs; checking C<if ($@)> after a new eval
+may fire falsely on that stale value.  C<eval { move_to(); 1 }> returns 1 on
+success and C<undef> on exception, so the result is independent of any prior
+C<$@> value.
 
 =head3 FORMAL SPECIFICATION
 
   upload_file == lambda self .
     let upload = req.upload('file') in
     pre  upload /= undef /\ basename(upload.filename) =~ EXT_RE
+         /\ NOT req->is_limit_exceeded
+         /\ upload.size <= MAX_UPLOAD_BYTES
     let dest = home/.uploads/<random>/<filename> in
-    post upload.move_to(dest)
-         /\ render_json({ url: '/open?path=' ++ url_escape(dest), path: dest })
+    let ok = eval { upload.move_to(dest); 1 } in
+    pre  ok /\ -f dest
+    post render_json({ url: '/open?path=' ++ url_escape(dest), path: dest })
 
 =head3 EXAMPLE
 
@@ -2114,7 +2150,21 @@ sub upload_file ($self) {
 	$uploads_base->make_path unless -d $uploads_base;
 	my $sub_dir = tempdir(DIR => $uploads_base->to_string, CLEANUP => 0);
 	my $dest    = Mojo::File->new($sub_dir)->child($filename)->to_string;
-	$upload->move_to($dest);
+
+	# move_to returns the destination Mojo::File on success; croaks on I/O
+	# failure.  Wrap in eval so a disk error becomes a 500 JSON response
+	# rather than a bare Mojolicious exception page.
+	# Use the "eval { ...; 1 }" idiom: $ok is undef only when THIS eval
+	# threw, avoiding false positives from a stale $@ left by Mojo's
+	# internal dispatch code that runs before the controller action.
+	my $ok = eval { $upload->move_to($dest); 1 };
+	if (!$ok || !-f $dest) {
+		remove_tree($sub_dir);
+		return $self->render(
+			json   => { error => $self->_i18n('error_upload_save') },
+			status => 500,
+		);
+	}
 
 	$self->render(json => {
 		url  => '/open?path=' . url_escape($dest),
@@ -2212,7 +2262,7 @@ sub graph_view ($self) {
 
 	require HTML::D3;
 	my $title   = "$y_col vs $x_col";
-	my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580)
+	my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580, responsive => 1)
 		->render_zoomable_line_chart_snippet(\@pairs, { animated => 1 });
 
 	my $graph_html = $snippet->{html};
@@ -2298,14 +2348,16 @@ sub pie_view ($self) {
 	my ($source_url, $source_accessed) = $self->_url_attribution;
 
 	require HTML::D3;
+	my $scheme  = $self->param('scheme') // 'tableau10';
 	my $title   = $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
-	my $snippet = HTML::D3->new(title => $title, width => 600, height => 500)
+	my $snippet = HTML::D3->new(title => $title, width => 600, height => 500, responsive => 1)
 		->render_pie_chart_snippet(\@slices, {
-			animated    => 1,
-			donut       => $donut,
-			sort_slices => 'value',
-			max_slices  => 12,
-			legend      => 1,
+			animated     => 1,
+			donut        => $donut,
+			sort_slices  => 'value',
+			max_slices   => 12,
+			legend       => 1,
+			color_scheme => $scheme,
 		});
 
 	my $pie_html = $snippet->{html};
@@ -2328,6 +2380,59 @@ sub pie_view ($self) {
 		source_accessed  => $source_accessed,
 	);
 }
+
+=head2 heatmap_view
+
+C<GET /heatmap> -- Render a D3.js grid heatmap for two categorical axes.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  x=<col>      X-axis (horizontal) categorical column (required)
+  y=<col>      Y-axis (vertical) categorical column (required)
+  val=<col>    Cell value column (optional; when absent, cells show row count)
+  scheme=<name> D3 sequential colour scheme name (default: YlOrRd)
+  show_val=1   Overlay the numeric value inside each cell
+  back=<url>   URL for the "Back to table" breadcrumb link
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l       spec     Required.  Left table spec (table:name or path:/abs/path).
+  x       string   Required.  Name of the X-axis categorical column.
+  y       string   Required.  Name of the Y-axis categorical column.
+  val     string   Optional.  Name of the value column; omit for count mode.
+  scheme  string   Optional.  D3 sequential colour scheme name.
+  show_val flag    Optional.  Set to 1 to render values inside cells.
+  back    url      Optional.  Safe back-link URL (sanitised by _safe_back_url).
+
+=head4 OUTPUT
+
+  200 text/html           Rendered heatmap page.
+  200 text/plain          "No plottable data: ..." when grid is empty.
+  400 text/plain          Missing x= or y= parameter.
+  400 text/plain          Column not found: <col>.
+  404 text/plain          "Could not open data source" when l= is absent/invalid.
+
+=head3 MESSAGES
+
+  error_heatmap_no_data -- no (x,y) pair has a non-empty value.
+
+=head3 FORMAL SPECIFICATION
+
+  heatmap_view == lambda self .
+    pre length(x_col) > 0 /\ length(y_col) > 0
+        /\ x_col in columns /\ y_col in columns
+    let triples = { (row[x_col], row[y_col], row[val_col]) | row in records,
+                    all three fields non-empty } in
+    post render(heatmap, triples)
+
+=head3 EXAMPLE
+
+  GET /heatmap?l=table:sales&x=region&y=product&val=amount
+    -> 200 HTML page containing D3 heatmap SVG
+
+=cut
 
 sub heatmap_view ($self) {
 	my $x_col   = $self->param('x')        // '';
@@ -2389,7 +2494,7 @@ sub heatmap_view ($self) {
 	require HTML::D3;
 	my $title   = length($val_col) ? "$val_col by $x_col and $y_col"
 	                                : "Count by $x_col and $y_col";
-	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500)
+	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500, responsive => 1)
 		->render_heatmap_snippet(\@triples, {
 			x_label      => $x_col,
 			y_label      => $y_col,
@@ -2417,11 +2522,66 @@ sub heatmap_view ($self) {
 	);
 }
 
+=head2 bar_view
+
+C<GET /bar> -- Render a D3.js bar chart grouped by a categorical column.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  cat=<col>    Category (X-axis) column (required)
+  val=<col>    Value column to sum per category; omit or use C<__count__>
+               to count rows instead of summing (optional)
+  orient=h     Horizontal bars (default: vertical)
+  sort=value|label  Sort bars by descending value or ascending label
+  max=N        Collapse bars beyond the top-N into an "Other" bar
+  back=<url>   URL for the "Back to table" breadcrumb link
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l       spec     Required.  Left table spec (table:name or path:/abs/path).
+  cat     string   Required.  Name of the category column.
+  val     string   Optional.  Name of the value column; use __count__ or
+                   omit entirely to count rows per category.
+  orient  string   Optional.  "h" for horizontal bars; default vertical.
+  sort    string   Optional.  "value" or "label"; default file order.
+  max     integer  Optional.  Collapse beyond top-N categories into "Other".
+  back    url      Optional.  Safe back-link URL (sanitised by _safe_back_url).
+
+=head4 OUTPUT
+
+  200 text/html           Rendered bar chart page (SVG element id="bar_chart").
+  200 text/plain          "No plottable data: ..." when no categories exist.
+  400 text/plain          Missing cat= parameter.
+  400 text/plain          Column not found: <col>.
+  404 text/plain          "Could not open data source" when l= is absent/invalid.
+
+=head3 MESSAGES
+
+  error_bar_no_data -- no row has a non-empty category value.
+
+=head3 FORMAL SPECIFICATION
+
+  bar_view == lambda self .
+    pre length(cat_col) > 0 /\ cat_col in columns
+    let bars = { (cat, sum(val)) | row in records, row[cat_col] = cat,
+                 val /= undef } in
+    post render(bar, bars, orientation, sort, max_bars)
+
+=head3 EXAMPLE
+
+  GET /bar?l=table:sales&cat=region&val=amount&sort=value
+    -> 200 HTML page with id="bar_chart" SVG element
+
+=cut
+
 sub bar_view ($self) {
 	my $cat_col  = $self->param('cat')    // '';
 	my $val_col  = $self->param('val')    // '';
 	my $orient   = $self->param('orient') // 'vertical';
 	my $sort     = $self->param('sort')   // 'none';
+	my $max_bars = int($self->param('max') // 0);
 	my $back     = _safe_back_url($self->param('back')) // '/';
 
 	return $self->render(text => 'Missing cat column parameter', status => 400)
@@ -2472,7 +2632,7 @@ sub bar_view ($self) {
 	require HTML::D3;
 	my $title   = $count_mode ? "Count by $cat_col"
 	                          : "$val_col by $cat_col";
-	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480)
+	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480, responsive => 1)
 		->render_bar_chart_snippet(\@bars, {
 			animated     => 1,
 			orientation  => $orientation,
@@ -2480,6 +2640,8 @@ sub bar_view ($self) {
 			color        => 'categorical',
 			show_values  => 0,
 			value_label  => ($count_mode ? 'Count' : $val_col),
+			x_label      => $cat_col,
+			($max_bars > 0 ? (max_bars => $max_bars) : ()),
 		});
 
 	my $bar_html = $snippet->{html};
@@ -2498,6 +2660,217 @@ sub bar_view ($self) {
 		back_label      => 'Back to table',
 		source_url      => $source_url,
 		source_accessed => $source_accessed,
+	);
+}
+
+=head2 folder_view
+
+C<GET /folder> -- Browse a data table grouped by the letter-prefix hierarchy
+of an order-number column (e.g. A10, CT4, B3).
+
+The top level displays one folder icon per initial letter group (A, B, C ...).
+Clicking a folder with sub-prefixes (e.g. C contains CA and CB items) shows
+the sub-folders; clicking a leaf prefix shows the actual data rows sorted
+numerically by the embedded digit sequence.
+
+Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
+
+  col=<col>      Column whose values contain order codes (optional; auto-
+                 detected when absent by scanning the first 10 rows for
+                 values matching C<[A-Z]{1,4}\d+[A-Z]?>)
+  prefix=<str>   Current drill-down prefix, e.g. "CA" (optional; top-level
+                 when absent)
+  back=<url>     URL for the "Back to table" breadcrumb link (optional;
+                 derived from C<l=> when absent)
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l       spec     Required.  Left table spec (table:name or path:/abs/path).
+  col     string   Optional.  Order-code column name.
+  prefix  string   Optional.  Current letter prefix; max length MAX_PREFIX_LEN.
+  back    url      Optional.  Safe back-link URL (sanitised by _safe_back_url).
+
+=head4 OUTPUT
+
+  200 text/html    Rendered folder page with folder grid and/or item table.
+  400 text/plain   "Missing l= parameter" when l= is absent.
+  400 text/plain   "Prefix too long" when prefix exceeds MAX_PREFIX_LEN (20).
+  404 text/plain   "Could not open data source" when the data source is unavailable.
+
+=head3 MESSAGES
+
+None -- all failure paths render plain text with an HTTP status code.
+
+=head3 FORMAL SPECIFICATION
+
+  folder_view == lambda self .
+    pre length(left_spec) > 0 /\ length(prefix) <= MAX_PREFIX_LEN
+    let records = pipeline(left_spec, joins, filters)
+        prefix_map = { p -> [row] | row in records, row[col] =~ /[A-Z]+/ -> p } in
+    IF prefix = "" THEN
+      post render(folder, folders = first_letters(prefix_map))
+    ELSE
+      post render(folder, folders = sub_prefixes(prefix, prefix_map),
+                          items   = sort_numeric(prefix_map[prefix]))
+
+=head3 EXAMPLE
+
+  GET /folder?l=table:orders&col=order_no
+    -> 200 HTML folder grid showing A (12 items), B (7 items), C (4 items)
+
+  GET /folder?l=table:orders&col=order_no&prefix=A
+    -> 200 HTML folder grid for sub-prefixes and items directly under "A"
+
+=cut
+
+sub folder_view ($self) {
+	my $key_col   = $self->param('col')    // '';
+	my $prefix    = $self->param('prefix') // '';
+	my $left_spec = $self->param('l')      // '';
+
+	return $self->render(text => 'Missing l= parameter', status => 400)
+		unless length($left_spec);
+
+	# Guard against DoS: a crafted prefix longer than any real order-code would
+	# generate O(N) breadcrumb entries and a proportionally large HTML response.
+	return $self->render(text => 'Prefix too long', status => 400)
+		if length($prefix) > $MAX_PREFIX_LEN;
+
+	# Fall back to the table's own URL when no explicit back= is supplied,
+	# so the breadcrumb always has a "Back to table" link.
+	my $back = _safe_back_url($self->param('back'))
+		|| $self->_spec_to_url($left_spec);
+
+	my ($records, $columns) = $self->_run_export_pipeline;
+	return $self->render(text => 'Could not open data source', status => 404)
+		unless $records;
+
+	# Auto-detect key column: find the first column whose sampled values look
+	# like order-number codes (1-4 uppercase letters followed by digits).
+	if (!length($key_col)) {
+		my $sample_end = $#{$records} < 9 ? $#{$records} : 9;
+		OUTER: for my $col (@{$columns}) {
+			for my $row (@{$records}[0 .. $sample_end]) {
+				if (($row->{$col} // '') =~ /\A[A-Z]{1,4}\d+[A-Z]?\z/) {
+					$key_col = $col;
+					last OUTER;
+				}
+			}
+		}
+		$key_col ||= ($columns->[0] // '');
+	}
+
+	# Build prefix -> [rows] map.  Prefix is the leading letter-run of each
+	# key value: "A10" -> "A", "CT4" -> "CT", "CC30A" -> "CC".
+	my %prefix_to_rows;
+	for my $row (@{$records}) {
+		my $val = $row->{$key_col} // '';
+		my ($p) = $val =~ /\A([A-Z]+)/;
+		next unless defined $p;
+		push @{ $prefix_to_rows{$p} }, $row;
+	}
+
+	# Return the sorted list of "one-step" child prefixes of $par: all known
+	# prefixes that share the parent as a strict prefix and extend it by
+	# exactly one letter.
+	my $sub_prefixes = sub {
+		my ($par) = @_;
+		my $len = length($par);
+		my %seen;
+		for my $p (keys %prefix_to_rows) {
+			next if length($p) <= $len;
+			next if substr($p, 0, $len) ne $par;
+			$seen{ substr($p, 0, $len + 1) } = 1;
+		}
+		return sort keys %seen;
+	};
+
+	# Count total items underneath a prefix (including all deeper sub-prefixes).
+	my $deep_count = sub {
+		my ($par) = @_;
+		my $n = 0;
+		for my $p (keys %prefix_to_rows) {
+			$n += scalar @{ $prefix_to_rows{$p} }
+				if substr($p, 0, length($par)) eq $par;
+		}
+		return $n;
+	};
+
+	my ($platform, $language) = $self->_resolve_template;
+
+	# Base URL carries the table spec (and optional col=) so every sub-link
+	# re-uses the same data source without repeating params.
+	my $base_url = '/folder?l=' . url_escape($left_spec);
+	$base_url .= '&col=' . url_escape($key_col) if length($key_col);
+
+	my (@folders, @items, @breadcrumb);
+
+	if (!length($prefix)) {
+		# Top level: group all prefixes by their first letter.
+		my %first_letter;
+		for my $p (keys %prefix_to_rows) {
+			$first_letter{ substr($p, 0, 1) } = 1;
+		}
+		for my $fl (sort keys %first_letter) {
+			push @folders, {
+				name  => $fl,
+				count => $deep_count->($fl),
+				href  => $base_url . '&prefix=' . url_escape($fl),
+			};
+		}
+	} else {
+		# Build breadcrumb: one entry per letter-prefix layer up to current.
+		# e.g. prefix="CD" -> [ {name="C", href=...}, {name="CD", href=undef} ]
+		for my $i (1 .. length($prefix)) {
+			my $p = substr($prefix, 0, $i);
+			push @breadcrumb, {
+				name => $p,
+				href => ($i < length($prefix))
+					? ($base_url . '&prefix=' . url_escape($p))
+					: undef,
+			};
+		}
+
+		# One-step child prefixes of the current prefix (sub-folders).
+		for my $sp ($sub_prefixes->($prefix)) {
+			push @folders, {
+				name  => $sp,
+				count => $deep_count->($sp),
+				href  => $base_url . '&prefix=' . url_escape($sp),
+			};
+		}
+
+		# Items whose prefix matches exactly (e.g. prefix="C" shows C1, C3, ...).
+		@items = @{ $prefix_to_rows{$prefix} // [] };
+
+		# Sort by the numeric part of the key value so A9 < A10.
+		@items = sort {
+			my ($an) = ($a->{$key_col} // '') =~ /(\d+)/;
+			my ($bn) = ($b->{$key_col} // '') =~ /(\d+)/;
+			($an // 0) <=> ($bn // 0)
+				|| ($a->{$key_col} // '') cmp ($b->{$key_col} // '');
+		} @items;
+	}
+
+	my $title = length($prefix) ? "Folder: $prefix" : 'Folder view';
+
+	$self->render(
+		handler    => 'tt',
+		template   => "$platform/$language/folder",
+		format     => 'html',
+		title      => $title,
+		folders    => \@folders,
+		items      => \@items,
+		columns    => $columns,
+		key_col    => $key_col,
+		prefix     => $prefix,
+		breadcrumb => \@breadcrumb,
+		base_url   => $base_url,
+		back_url   => $back,
+		back_label => 'Back to table',
+		left_spec  => $left_spec,
 	);
 }
 

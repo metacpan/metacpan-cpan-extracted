@@ -3,7 +3,7 @@
 #
 # 1. With Sub::Private 0.04 the subs marked :Private vanished, so every log
 #    call died with 'Can't locate object method "_log"'.  Sub::Private 0.05
-#    is required since Log::Abstraction 0.34.
+#    is required since Log::Abstraction 0.34 (0.06 since 0.38).
 # 2. Without Log::Any (only a recommended dependency), t/10-compile.t failed
 #    with "Can't locate Log/Any/Adapter/Base.pm".  Since 0.35 it skips the
 #    adapter instead.
@@ -68,7 +68,7 @@ sub write_file {
 }
 
 subtest 'the private subs exist' => sub {
-	cmp_ok(Sub::Private->VERSION, '>=', 0.05, 'Sub::Private is at least 0.05');
+	cmp_ok(Sub::Private->VERSION, '>=', 0.06, 'Sub::Private is at least 0.06');
 	for my $sub (qw(_log _high_priority _validate_file_path _format_message _write_line
 			_journald_send _sanitize_email_header _level_number _to_json _field_string _fields_text)) {
 		ok(defined(&{"Log::Abstraction::$sub"}), "$sub is defined");
@@ -93,7 +93,7 @@ subtest 'Log::Abstraction refuses to load with Sub::Private 0.04' => sub {
 
 	my ($status, $output) = run_perl($dir, 'require Log::Abstraction; print "loaded\n"');
 	isnt($status, 0, 'require fails');
-	like($output, qr/Sub::Private version 0\.05 required--this is only version 0\.04/,
+	like($output, qr/Sub::Private version 0\.06 required--this is only version 0\.04/,
 		'with a clear version message, not a missing _log at log time');
 };
 

@@ -10,6 +10,8 @@ T_I32
 	$var = (int32_t)hm_sv_to_int(aTHX_ $arg, (IV)(-2147483647-1), 2147483647, 32);
 T_I64
 	$var = (int64_t)hm_sv_to_int(aTHX_ $arg, IV_MIN, IV_MAX, 64);
+T_UV
+	$var = ($type)hm_uv_arg(aTHX_ $arg);
 
 OUTPUT
 T_I16

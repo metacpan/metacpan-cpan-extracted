@@ -1,0 +1,4 @@
+test : multi
+{
+@include "sub2/sub2.sui"
+}

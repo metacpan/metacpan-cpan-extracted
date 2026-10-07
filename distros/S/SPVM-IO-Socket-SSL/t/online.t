@@ -2,11 +2,8 @@ use Test::More;
 
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/lib";
-BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
+use lib 't/lib';
 
-use SPVM 'Fn';
 use SPVM 'TestCase::IO::Socket::SSL::Online';
 
 # Check network connectivity to httpbin.org using Perl's HTTP::Tiny
@@ -35,7 +32,7 @@ ok(SPVM::TestCase::IO::Socket::SSL::Online->https_httpbin_with_mozilla_ca_SSL_ca
 # CA verification using a directory (SSL_ca_path)
 ok(SPVM::TestCase::IO::Socket::SSL::Online->https_httpbin_with_mozilla_ca_SSL_ca_path);
 
-SPVM::Fn->destroy_runtime_permanent_vars;
+$api->destroy_runtime_permanent_vars;
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
 is($end_memory_blocks_count, $start_memory_blocks_count);

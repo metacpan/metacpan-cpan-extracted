@@ -235,6 +235,7 @@ typedef struct {
     uint32_t  default_ttl;
     uint32_t* expires_at;
     size_t    iter_pos;
+    size_t    drain_pos;
 #ifdef HM_VALUE_IS_SV
     void (*free_value_fn)(void*);      /* deferred release, for single-slot paths */
     void (*free_value_now_fn)(void*);  /* immediate release, for clear/destroy */
@@ -391,6 +392,7 @@ static HM_MAP_TYPE* HM_FN(create)(size_t max_size, uint32_t default_ttl, uint32_
     map->lru_prev = NULL;
     map->lru_next = NULL;
     map->iter_pos = 0;
+    map->drain_pos = 0;
 #ifdef HM_VALUE_IS_SV
     map->free_value_fn = NULL;
     map->free_value_now_fn = NULL;
@@ -449,20 +451,16 @@ static void HM_FN(destroy)(HM_MAP_TYPE* map) {
 
 static void HM_FN(clear)(HM_MAP_TYPE* map) {
     if (!map) return;
-    /* A value's DESTROY may look at the map, so it stays consistent at every step. */
+    /* A value's DESTROY may write to the map: keep exact accounting at every
+       step and, like hv_clear, sweep again until nothing is left. */
     map->iter_pos = 0;
-    if (map->lru_prev) {
-        memset(map->lru_prev, 0xFF, map->capacity * sizeof(uint32_t));
-        memset(map->lru_next, 0xFF, map->capacity * sizeof(uint32_t));
-        map->lru_head = HM_LRU_NONE;
-        map->lru_tail = HM_LRU_NONE;
-    }
-    if (map->expires_at)
-        memset(map->expires_at, 0, map->capacity * sizeof(uint32_t));
-    {
+    map->drain_pos = 0;
+    do {
         size_t i;
         for (i = 0; i < map->capacity; i++) {
             if (HM_SLOT_IS_LIVE(&map->nodes[i])) {
+                if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_unlink)(map, (uint32_t)i);
+                if (map->expires_at) map->expires_at[i] = 0;
                 HM_NODE_TYPE dead = map->nodes[i];
                 HM_FN(init_nodes)(&map->nodes[i], 1);
                 if (map->size) map->size--;
@@ -472,9 +470,7 @@ static void HM_FN(clear)(HM_MAP_TYPE* map) {
                 if (map->tombstones) map->tombstones--;
             }
         }
-    }
-    map->size = 0;
-    map->tombstones = 0;
+    } while (map->size);
 }
 
 /* ---- reap_expired / purge ---- */
@@ -509,6 +505,7 @@ static HM_MAP_TYPE* HM_FN(clone)(const HM_MAP_TYPE* map) {
     if (!c) return NULL;
     *c = *map;
     c->iter_pos = 0;
+    c->drain_pos = 0;
 #ifdef HM_VALUE_IS_SV
     c->free_value_fn = NULL;  /* prevent double-dec on OOM cleanup */
     c->free_value_now_fn = NULL;
@@ -700,6 +697,7 @@ static bool HM_FN(rehash_to)(HM_MAP_TYPE* map, size_t new_capacity) {
     map->mask = new_mask;
     map->tombstones = 0;
     map->iter_pos = 0;
+    map->drain_pos = 0;
     return true;
 }
 

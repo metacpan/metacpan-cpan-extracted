@@ -6,7 +6,7 @@ use warnings;
 use Game::Checkers::Squares;
 use Game::Checkers::Move;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # The raw move layout is Move's, so there is one definition of it. These are the
 # names the generator and the search read it by.
@@ -188,7 +188,7 @@ Game::Checkers::Rules - move generation over a raw position
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

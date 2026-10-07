@@ -1,4 +1,13 @@
 Revision history for Game-Oware
 
+0.02    2026-10-07
+	- Pick a move with the arrow keys in the terminal, previewing the
+	  position the move would produce.
+	- The terminal board is drawn as a board: a store at each end, seed
+	  clusters, colour, and a mark on every house the last move touched.
+	- Fix: --ascii was a second glyph table identical to the first.
+	- Fix: --quiet swallowed the result.
+	- Fix: a command answered on the prompt's own line off a terminal.
+
 0.01    2026-09-18
 	First version

@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.8.2 - 2026-10-07
+
+### Fixes
+
+- Raise a database answer missing what the call returns as server_error ([`8547698`](https://github.com/internetdata/sdk-perl/commit/854769899db6d73f7e4a1b52cf35d9057747eb13))
+
 ## 1.8.1 - 2026-10-04
 
 ### Fixes

@@ -12,26 +12,19 @@ eval {
 
 my %connect_info = $redis_server->connect_info;
 
-# Test Case 1: Memory leak on asynchronous connection failure with reconnect disabled.
-# When a connection fails asynchronously (e.g., TCP timeout or refused), and
-# reconnect is disabled, the waiting queue MUST be cleared to prevent leaks.
+# async connect failure with reconnect disabled clears both queues
 {
     my $r = EV::Redis->new;
     $r->max_pending(1);
-    $r->on_error(sub { }); # silence error
+    $r->on_error(sub { });
 
-    # Connect to a closed TCP port. On most platforms a refused loopback
-    # connection fails asynchronously, so the two commands queue (pending +
-    # wait) and are flushed with an error when the failure is delivered. On
-    # platforms where the refusal is synchronous (e.g. FreeBSD returns
-    # ECONNREFUSED immediately) command() croaks "connection required" as
-    # documented (see Test Case 4). Either way the queues must end empty.
+    # refusal is usually async; on FreeBSD it is synchronous and command() croaks
     $r->connect("127.0.0.1", 65534);
 
     my $called = 0;
     my $queued = eval {
-        $r->command('ping', sub { $called++; }); # pending
-        $r->command('ping', sub { $called++; }); # wait_queue
+        $r->command('ping', sub { $called++; });
+        $r->command('ping', sub { $called++; });
         1;
     };
 
@@ -53,9 +46,7 @@ my %connect_info = $redis_server->connect_info;
     is $r->pending_count, 0, 'pending queue cleared after connect failure';
 }
 
-# Test Case 2: Memory leak for skipped persistent commands upon unsubscription.
-# If a persistent command (SUBSCRIBE) is skipped via skip_pending, and then
-# an unsubscribe reply arrives, the command callback entry MUST be freed.
+# a skipped SUBSCRIBE frees its callback entry when the unsubscribe replies arrive
 {
     my $r = EV::Redis->new;
     $r->connect_unix( $connect_info{sock} );
@@ -69,8 +60,6 @@ my %connect_info = $redis_server->connect_info;
     my $t; $t = EV::timer 0.1, 0, sub {
         $r->skip_pending;
         
-        # Manually trigger unsubscription from same connection to force 
-        # unsubscribe replies back to the skipped subscribe entry.
         $r->command('unsubscribe', 'leak_ch1', 'leak_ch2', sub { });
         undef $t;
     };
@@ -84,15 +73,12 @@ my %connect_info = $redis_server->connect_info;
     pass 'Skipped persistent command unsubscription did not crash';
 }
 
-# Test Case 3: Fire-and-forget commands (no callback).
 {
     my $r = EV::Redis->new;
     $r->connect_unix( $connect_info{sock} );
 
-    # Fire-and-forget SET
     $r->set('ff_key', 'ff_val');
 
-    # Verify with a callback-based GET
     my $result;
     $r->get('ff_key', sub {
         ($result) = @_;
@@ -103,7 +89,6 @@ my %connect_info = $redis_server->connect_info;
     is $result, 'ff_val', 'fire-and-forget SET succeeded';
 }
 
-# Test Case 4: Fire-and-forget without connection croaks.
 {
     my $r = EV::Redis->new;
     eval {
@@ -113,7 +98,6 @@ my %connect_info = $redis_server->connect_info;
     like $@, qr/connection required/, 'exception mentions connection required';
 }
 
-# Test Case 5: Constructor with undef host/path croaks.
 {
     eval { EV::Redis->new(host => undef) };
     like $@, qr/'host' must be a defined string/, 'host => undef croaks';
@@ -122,8 +106,7 @@ my %connect_info = $redis_server->connect_info;
     like $@, qr/'path' must be a defined string/, 'path => undef croaks';
 }
 
-# Test Case 6: N sequential connect/disconnect cycles on the same object.
-# Catches cumulative state leaks (cb_queue residue, counter drift, timer leaks).
+# connect/disconnect cycles on one object leave no residual state
 {
     my $r = EV::Redis->new(on_error => sub { });
     for my $i (1..20) {

@@ -35,11 +35,6 @@ sub init {
   my $importdir = $self->get_import // [];
   $self->set_import($importdir);
 
-  if ( @{$importdir} ) {
-    $self->_import_file_listing;
-    $self->get_logger->debug( Dumper( [ listing => $self->get_import_file_listing ] ) );
-  }
-
   $self->set_max_diff_files( $self->get_max_diff_files // $MAX_DIFF_FILES );
 
   if ( $self->get_color ) {
@@ -50,6 +45,10 @@ sub init {
     };
 
     $self->set_color($color);
+  }
+
+  if ( !defined $self->get_max_tokens ) {
+    $self->set_max_tokens($MAX_TOKENS);
   }
 
   return;
@@ -65,7 +64,9 @@ sub _init_config {
   # Example usage:
   my $reader = eval { CPAN::Maker::Bootstrapper::ConfigReader->new( $self->get_config ); };
 
-  if ($EVAL_ERROR) {
+  $self->set_config( $reader ? $reader->get_config_file : undef );
+
+  if ( $EVAL_ERROR && $self->get_config ) {
     warn "WARNING: could not load config file: $EVAL_ERROR Using defaults.\n";
   }
 

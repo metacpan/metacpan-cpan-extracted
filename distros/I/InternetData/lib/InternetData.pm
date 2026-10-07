@@ -14,7 +14,7 @@ use InternetData::Database;
 use InternetData::Error;
 use InternetData::Oauth;
 
-our $VERSION = '1.8.1';
+our $VERSION = '1.8.2';
 
 use constant DEFAULT_BASE_URL => 'https://internetdata.io';
 
@@ -195,9 +195,13 @@ sub _retry_delay {
     return BACKOFF_BASE * 2**($tries < 6 ? $tries : 6);
 }
 
-# $timeout is the call's own bound, or undef for the client's.
+# $timeout is the call's own bound, or undef for the client's. $member, when
+# given, is the one member of the answer the call returns, a reference of type
+# $type: an object without it is no answer at all, so it fails inside the attempt
+# as a retried server_error, like any other 2xx that cannot be read, rather than
+# reaching the caller as undef.
 sub _json_p {
-    my ($self, $url, $timeout) = @_;
+    my ($self, $url, $timeout, $member, $type) = @_;
     return $self->_get_p($url, $timeout)->then(sub {
         my $res = shift->res;
         die InternetData::Error->from_response($res->code, $res->headers, $res->json)
@@ -207,7 +211,12 @@ sub _json_p {
             kind => 'server_error', status => $res->code,
             message => 'the API did not answer with a JSON object',
         ) unless ref $body eq 'HASH';
-        return $body;
+        return $body unless defined $member;
+        return $body->{$member} if ref $body->{$member} eq $type;
+        die InternetData::Error->new(
+            kind => 'server_error', status => $res->code,
+            message => "the API answered with no $member",
+        );
     });
 }
 

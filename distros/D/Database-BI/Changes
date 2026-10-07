@@ -1,5 +1,48 @@
 Revision history for Database-BI
 
+0.010.0	Tue Oct  6 11:29:33 AM EDT 2026
+    [ Enhancements ]
+    - Added Folder view (GET /folder): browse any data file grouped by the
+      letter prefix of a chosen code column (e.g. Order # values like A10,
+      CT4, B3).  Records are organised into a two- or three-level folder
+      hierarchy -- top level shows distinct first letters (A-Z), clicking a
+      letter reveals sub-prefix folders (e.g. CA, CB, CC inside C) and any
+      items with that exact prefix, clicking a sub-prefix shows the matching
+      records in a table.  A "Folder view..." toolbar button opens a column-
+      picker panel identical in style to the chart panels; the code column is
+      auto-detected when the panel is opened but the user can override it via
+      the dropdown.  Breadcrumb navigation lets the user step back to any
+      folder level or return to the source table via "Back to table".
+    - upload_file now guards move_to() with eval { ...; 1 } and checks -f
+      $dest after the call.  A failed save returns a JSON 500 with the key
+      error_upload_save instead of propagating an unhandled exception.
+      The orphaned upload subdirectory is removed before the error response
+      is sent.  (Uses the eval { ...; 1 } idiom to avoid false positives
+      from a stale $@ left by Mojolicious internal dispatch code.)
+
+    - All chart pages (/graph, /pie, /heatmap, /bar) now use responsive SVG
+      layout (HTML::D3 0.18 `responsive => 1`): charts scale to the available
+      container width so they render correctly on mobile and narrow windows.
+    - /bar: added ?max=N parameter -- when N > 0, bars beyond the top N are
+      collapsed into a single "Other" bar (HTML::D3 `max_bars`).  Prevents
+      unreadable charts from high-cardinality categorical columns.
+    - /bar: category-column name is now shown as an axis label below the bars
+      (HTML::D3 `x_label`).
+    - /pie: added ?scheme= parameter to select the D3 categorical colour
+      palette (tableau10, category10, set2, set3, paired; default tableau10).
+      Mirrors the existing ?scheme= parameter already on /heatmap.
+    - /join: added ?jtype=left|inner|outer parameter to control join semantics.
+      `left` (default) keeps all rows from the left table; `inner` returns
+      only rows that match in both; `outer` returns all rows from either table.
+      Exposed in the "Merge data" panel as a "Which rows to include" dropdown.
+    - /join: schema-type-mismatch warnings from Database::Join (e.g. "column
+      'score' has type TEXT in left table but INTEGER in right table") are now
+      captured and displayed as a yellow notice bar above the data table,
+      instead of landing silently in the server error log.
+    - DataSource now implements updated() -- proxies to Database::Abstraction's
+      updated() or stats the file directly.  This allows Database::Join to
+      invalidate its SQLite spill cache when a source file changes on disk.
+
 0.009.0	Wed Sep 23 09:14:24 PM EDT 2026
     [ Enhancements ]
     - Added a bar chart (GET /bar).  Choose a categorical column and an

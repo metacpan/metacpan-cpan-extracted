@@ -11,6 +11,7 @@ my %WriteMakefileArgs = (
     LICENSE          => 'artistic_2',
     EXE_FILES        => [ 'bin/backgammon' ],
     MIN_PERL_VERSION => '5.010',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -18,9 +19,17 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        # Digest::SHA is core and is all the dice need; Object::Proto::Sugar
-        # is the house object system, as in Game::Checkers.
         'Object::Proto::Sugar' => '0.05',
+    },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Term::ReadKey' => '0',
+                },
+            },
+        },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Game-Backgammon-*' },
@@ -37,6 +46,8 @@ unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
     @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
 }
 
+delete $WriteMakefileArgs{META_MERGE}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 };
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
     unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
 delete $WriteMakefileArgs{MIN_PERL_VERSION}

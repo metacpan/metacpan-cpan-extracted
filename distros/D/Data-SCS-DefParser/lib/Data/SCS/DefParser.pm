@@ -1,7 +1,7 @@
 use v5.36;
 use Object::Pad 0.805;
 
-class Data::SCS::DefParser 0.11
+class Data::SCS::DefParser 0.12
   :strict(params);
 
 use Archive::SCS 1.06;
@@ -67,13 +67,27 @@ sub parse_block {
 }
 
 
-method include_file ($file) {
-  $archive_has_entry{$file} or croak
-    sprintf "Couldn't find file '%s' in: %s", $file, join ", ", @mounts;
-  my $inc = $archive->read_entry($file);
-  utf8::decode($inc);
-  my @inc = grep {$_} map {trim $_} split m/\n/, $inc;
-  return @inc;
+method lines_from_file ($context, $contents) {
+  my @input = grep {length $_} map {trim $_} split m/\n/, $contents;
+  my @lines;
+  while (my $line = shift @input) {
+    if (my ($inc) = $line =~ m/\A\@include\s+"(.+?)"\z/) {
+      # include file
+      my $file = path("/$context")->parent->relative("/")->child($inc);
+      $file = substr $inc, 1 if $inc =~ m|\A/|;
+      if (! $archive_has_entry{$file}) {
+        $archive_has_entry{$file} = eval { $archive->read_entry($file); 1 };
+        $archive_has_entry{$file} or croak
+          sprintf "Couldn't find file '%s' (referenced by '%s') in: %s",
+          $file, $context, join ", ", @mounts;
+      }
+      utf8::decode my $entry = $archive->read_entry($file);
+      unshift @input, $self->lines_from_file($file, $entry);
+      next;
+    }
+    push @lines, $line;
+  }
+  return @lines;
 }
 
 
@@ -82,16 +96,7 @@ method parse_sii ($file) {
   my ($magic, $unit) = parse_block $sii;
   $magic =~ m/^ \N{ BYTE ORDER MARK }? SiiNunit $/x or die
     sprintf "Expected SiiNunit, found '%s' in %s", $magic, $file;
-  my @input = grep {$_} map {trim $_} split m/\n/, $unit;
-  my @lines;
-  while (my $line = shift @input) {
-    if (my ($inc) = $line =~ m/^\@include\s+"([^"]+)"$/) {
-      my $inc_path = path("/$file")->parent->relative("/")->child($inc);
-      unshift @input, $self->include_file($inc_path);
-      next;
-    }
-    push @lines, $line;
-  }
+  my @lines = $self->lines_from_file($file, $unit);
   @lines = map {trim $_} map {
     s{/\* .*? \*/}{}gx;
     m{/\*|\*/} and die "Multi-line comments unimplemented";
@@ -101,7 +106,7 @@ method parse_sii ($file) {
   @lines = grep {$_} map {trim $_} map {
     # make sure { and } stand by their own on a line
     my @line = ($_);
-    while ($line[$#line] =~ m/^([^\{]+)([\{\}])(.*)/) {
+    while ($line[$#line] =~ m/^(.*?)([\{\}])(.*)/) {
       pop @line;
       push @line, $1, $2, $3;
     }
@@ -121,8 +126,9 @@ sub parse_sui_data_value {
   if ( $value =~ m/^\(([^()]+)\)$/ ) {
     return join ', ', map { parse_sui_data_value( trim $_ ) } split m/,/, $1;
   }
-  if ( $value =~ m/^"([^"]+)"$/ ) {
+  if ( $value =~ m/^"( ([^"]|\\")+ )"$/x ) {
     my $str = $1 =~ s{ \\x( [0-9A-Fa-f]{2} ) }{ chr hex $1 }egrx;
+    $str =~ s{\\"}{"}g;
     utf8::decode $str;
     return $str;
   }
@@ -301,7 +307,7 @@ method raw_data () {
   @company_files = grep { m|^/?def/company/| } @archive_files;
 
   my $ats_data = {};
-  parse_sui_blocks $ats_data, map { $self->parse_sii($_) } $self->sii_files;
+  parse_sui_blocks $ats_data, $self->parse_sii($_) for $self->sii_files;
   return $ats_data;
 }
 
@@ -390,3 +396,258 @@ method all_locations ($companies = {}, $data = $self->data) {
 
 
 1;
+
+=head1 NAME
+
+Data::SCS::DefParser - Parse SCS def SII files
+
+=head1 SYNOPSIS
+
+  my $game_data = Data::SCS::DefParser->new(
+    mount => ( $game_name or $dir_path or [@scs_files] ),
+    parse => ( $def_file or [@def_files] ),
+  )->raw_data;
+
+  # Example: Write out a YAML representation of definitions;
+  # omitting "parse" will default to city and company files.
+  use YAML::Tiny;
+  my $ats = Data::SCS::DefParser->new( mount => 'ATS' )->data;
+  YAML::Tiny->new( $ats )->write( 'ats.yml' );
+
+  # Example: List city tokens from the Texas DLC; the correct
+  # def name city.dlc_tx.sii will be automatically determined.
+  say for ( sort keys Data::SCS::DefParser->new(
+    mount => ['dlc_tx.scs'],
+    parse => ['def/city.sii'],
+  )->data->{city}->%* );
+
+=head1 DESCRIPTION
+
+This software is a Perl module to parse units contained in SII
+definition files (plain text variant). SII files are used by the
+L<ATS|https://americantrucksimulator.com> and
+L<ETS2|https://eurotrucksimulator2.com> simulator games.
+
+What I originally needed was a quick solution to read basic city and
+company data. Instead of creating a generic SII parser, I ended up just
+throwing regular expressions at the problem until I got what I wanted.
+The result turned out to be capable of parsing many other def files as
+well to some extent, although it might not be very reliable. That said,
+it's served me well in practice for many years without needing too
+much maintenance. Which is good, since that quick-and-dirty approach
+let readability suffer.
+
+The code is structured around the expectation that the game files
+have already been extracted to the file system, and have been
+limited to just the files you want to parse. While you I<can>
+easily point the parser to the full game installation thanks to
+L<Archive::SCS>, doing so is comparatively slow. Fixing that would
+be a bit of a redesign and I don't think I'll bother with it.
+
+=head1 METHODS
+
+=head2 all_locations
+
+  @locs = $parser->all_locations($companies);
+  @locs = $parser->all_locations($companies, $data);
+
+Obtain an array of all company locations in the parsed game data.
+
+Company locations (sometimes called "depots") are instances of
+placed company prefabs in the game world which are an active part
+of the economy simulation; in other words, they are the places
+where you can either pick up or drop off cargo. The returned array
+contains one item for each company location looking like this:
+
+  {
+    branch  => 'dg_wd_hrv',   # company game token: Deepgrove logging site
+    company => 'deepgrove'    # unique ID, chosen by you (see below)
+    country => 'montana',     # game token for Montana
+    city    => 'thompson_f',  # game token for Thompson Falls
+    prefab  => 'd_wd_hrv1',   # game token for Deepgrove logging site prefab
+  }
+
+The game treats functionally distinct parts of what appears to be a
+single company in the game world as a separate company each internally.
+This module refers to such distinct parts as "company branches".
+
+For example, the forestry company Deepgrove has locations that
+are logging sites and some locations that are sawmills.
+These location types are implemented as separate companies by the
+game engine, but they both use the same player-visible branding
+and are clearly meant to be a single company semantically.
+
+The C<$companies> hash ref is expected to have one entry for each
+such semantic company, with the hash key being a unique ID for
+that company. You can pick any truthy string as the ID, it's
+simply fed back to you as C<company> in the method return value.
+The entry value is another hash ref that has a C<branches>
+entry, which is an array ref of game company tokens that should
+be treated as belonging to the respective semantic company.
+
+  $companies = {
+    'deepgrove' => {   # unique ID for Deepgrove, chosen by you
+      branches => [
+        'dg_wd_hrv',   # game token for Deepgrove logging site
+        'dg_wd_saw',   # game token for Deepgrove sawmill
+        'dg_wd_saw1',  # game token for Deepgrove sawmill variant
+      ],
+    },
+    ...
+  };
+
+The optional C<$data> attribute is simply the output of L</data>,
+which you can pass in to avoid having to parse files more than
+once.
+
+See F<example/all_locations.pl> in this dist for how to create the
+companies hash from the game files, and use that data to produce
+a table of all company locations in the game.
+
+=head2 data
+
+  $data    = $parser->data;
+
+  %city    = $data->{city}{ $city_token }->%*;
+  %company = $data->{company}{permanent}{ $company_token }->%*;
+  %country = $data->{country}{data}{ $country_token }->%*;
+
+Returns a hash ref of parsed game data. This method is primarily
+designed to retrieve basic city and company data, which can be
+accessed like shown above. Depending on which archive entries
+you decide to parse, additional data may be returned in the same
+format as described for the L</raw_data> method.
+
+Some munging is performed to make the game data easier to use.
+For example, company_def editor entries are inserted into a
+company's "permanent" tree to keep them nice and organized:
+
+  @cm_min_str_locations
+    = $data->{company}{permanent}{cm_min_str}{company_def}->@*;
+
+Additionally, this method performs cleanup steps that remove data
+not considered relevant when focusing on cities and companies.
+The exact behavior of these cleanup steps is subject to change.
+See also L</GLOBALS> below. Unless you're specifically interested
+in city and company data, you should probably use L</raw_data>
+instead.
+
+The parsed data is currently not cached, which means each call to
+this method will parse all files again. This may change in a future
+version. Until then, you should cache the returned hash locally.
+
+See F<example/dump.pl> in this dist for how to use this method to
+write city/company data to a file in a common data exchange format
+like YAML or JSON.
+
+=head2 new
+
+  $parser = Data::SCS::DefParser->new( mount => ... );
+
+Creates a new L<Data::SCS::DefParser> object. Available parameters:
+
+=over
+
+=item mount
+
+The game data archives to consider when parsing. Mandatory.
+
+Can be an array reference with pathnames of archives to mount.
+Archives are mounted using L<Archive::SCS>.
+
+If given the pathname of a directory instead, the parser will
+behave as if an array ref had been given which contains all children
+of that directory whose names start with C<def> or C<dlc_>.
+This is legacy behavior and shouldn't be relied upon.
+
+If given the string C<'ATS'>, the parser will try to mount
+C<def.scs> and all map DLC relevant for your currently
+installed version of ATS. The same I<should> happen for
+C<'ETS2'>, but that is known to be unreliable at present.
+The full game names may be used as aliases. The behavior
+if given other strings is currently unspecified.
+
+Additionally, the C<mount> parameter accepts an L<Archive::SCS>
+object, but this currently results in unintended behavior and
+shouldn't be relied upon.
+
+=item parse
+
+The list of archive entries to parse and return data for.
+Can either be an array reference of pathnames or a single pathname.
+Optional. When not given, this parameter defaults to:
+
+  parse => [qw(
+    def/country.sii
+    def/city.sii
+    def/company.sii
+  )]
+
+=back
+
+=head2 raw_data
+
+  local $Data::SCS::DefParser::tidy = 0;
+  $data = $parser->raw_data;
+
+Parses the game data and returns a hash reference with the
+result. Hash keys for named units will be unit name components.
+For unnamed units, keys will be unit class names with a prefixed
+underscore. The entry pathname is currently not recorded
+(but this may change because it can be relevant).
+
+The data output format is still evolving. There is already some
+code that depends on it, so radical changes are somewhat unlikely.
+But if you use this parser for your own projects, it would still
+be wise to let the author know about that, so that your needs
+can be taken into consideration for future development.
+
+This method is currently affected by the tidy feature.
+This is unintended and will probably be fixed eventually.
+As a workaround, you can disable tidy explicitly if needed.
+
+=head1 GLOBALS
+
+=over
+
+=item $Data::SCS::DefParser::cargo
+
+Controls whether C<data()> will populate cargo in/out attributes
+for companies. This is disabled by default.
+
+=item $Data::SCS::DefParser::tidy
+
+Controls whether C<data()> will run certain cleanup steps, such as
+removing unit attributes that were considered "currently useless
+clutter" at the time this feature was first implemented. This is
+enabled by default. The exact behavior is subject to change.
+
+This variable currently enables some of the cleanup steps for
+C<raw_data()>, too. This is unintended and will probably be fixed
+eventually. Once C<raw_data()> is fixed, this variable will likely
+no longer have any effect on C<data()>, either. The parser will
+then simply always run cleanup for C<data()> and never do so for
+C<raw_data()>.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<https://modding.scssoft.com/wiki/Documentation/Engine/Game_data>
+
+=item * L<https://modding.scssoft.com/wiki/Documentation/Engine/Units>
+
+=back
+
+=head1 AUTHOR
+
+L<nautofon|https://github.com/nautofon>
+
+=head1 COPYRIGHT
+
+This software is copyright (c) 2026 by nautofon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

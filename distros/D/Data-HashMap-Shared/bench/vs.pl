@@ -1030,7 +1030,7 @@ print "-" x 70, "\n";
 }
 
 print "\n", "-" x 70, "\n";
-print "LOOKUP (LRU promotes on read vs plain lock-free seqlock)\n";
+print "LOOKUP (LRU sets its clock bit on read vs plain lock-free seqlock)\n";
 print "-" x 70, "\n";
 {
     my $p1 = tmppath(); my $m1 = Data::HashMap::Shared::II->new($p1, $N);
@@ -1112,13 +1112,13 @@ print "-" x 70, "\n";
 }
 
 print "\n", "-" x 70, "\n";
-print "LRU SKIP (multiprocess Zipfian reads, 4 workers, $N entries)\n";
+print "LRU SKIP (multiprocess Zipfian updates, 4 workers, $N entries)\n";
 print "-" x 70, "\n";
 {
     my $nworkers = 4;
     my $rounds = 50;
 
-    # Generate Zipfian-like key sequence: 80% of reads go to 20% of keys
+    # Generate Zipfian-like key sequence: 80% of updates go to 20% of keys
     my $hot = int($N * 0.2) || 1;
     srand(42);
     my @keys;
@@ -1140,7 +1140,7 @@ print "-" x 70, "\n";
                 my $child = Data::HashMap::Shared::II->new($path, $N, $N, 0, $skip);
                 my $t0 = Time::HiRes::time();
                 for my $r (1 .. $rounds) {
-                    for my $k (@keys) { my $v = shm_ii_get $child, $k; }
+                    for my $k (@keys) { shm_ii_incr $child, $k; }
                 }
                 printf $wr "%.6f\n", Time::HiRes::time() - $t0;
                 close $wr;
@@ -1158,7 +1158,7 @@ print "-" x 70, "\n";
         }
 
         my $total_ops = $nworkers * $rounds * scalar(@keys);
-        printf "  skip=%2d%%  %8.3f ms  (%s reads/sec across %d workers)\n",
+        printf "  skip=%2d%%  %8.3f ms  (%s updates/sec across %d workers)\n",
             $skip, $max_t * 1000, commify(int($total_ops / $max_t)), $nworkers;
 
         undef $map; unlink $path;

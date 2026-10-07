@@ -31,6 +31,7 @@ t/18-bot.t
 t/19-bot-terminates.t
 t/20-terminal.t
 t/21-no-io.t
+t/22-pick.t
 t/manifest.t
 t/pod-coverage.t
 t/lib/Game/Oware/Test/Handle.pm

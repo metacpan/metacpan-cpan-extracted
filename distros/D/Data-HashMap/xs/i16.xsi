@@ -2,12 +2,12 @@ MODULE = Data::HashMap    PACKAGE = Data::HashMap::I16
 PROTOTYPES: DISABLE
 
 SV*
-new(char* class, ...)
+new(SV* class, ...)
     CODE:
         EXTRACT_NEW_ARGS(_max_size, _ttl, _lru_skip);
         HashMapI16* map = hashmap_i16_create(_max_size, _ttl, _lru_skip);
         if (!map) croak("Failed to create HashMap::I16");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+        RETVAL = sv_setref_pv(newSV(0), hm_class_name(aTHX_ class), (void*)map);
     OUTPUT:
         RETVAL
 
@@ -199,8 +199,8 @@ drain(SV* self_sv, UV count)
         EXTEND(SP, (count < self->size ? count : self->size) * 2);
         size_t scanned;
         for (scanned = 0; scanned < self->capacity && n < count; scanned++) {
-            if (self->iter_pos >= self->capacity) self->iter_pos = 0;
-            size_t i = self->iter_pos++;
+            if (self->drain_pos >= self->capacity) self->drain_pos = 0;
+            size_t i = self->drain_pos++;
             if (I16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 mXPUSHi(self->nodes[i].key);
                 mXPUSHi(self->nodes[i].value);
@@ -209,7 +209,7 @@ drain(SV* self_sv, UV count)
                 n++;
             }
         }
-        if (self->iter_pos >= self->capacity) self->iter_pos = 0;
+        if (self->drain_pos >= self->capacity) self->drain_pos = 0;
         HM_MAYBE_COMPACT_XS(self, hashmap_i16_compact);
 
 void
@@ -235,8 +235,8 @@ pop(SV* self_sv)
         } else {
             size_t scanned;
             for (scanned = 0; scanned < self->capacity; scanned++) {
-                if (self->iter_pos >= self->capacity) self->iter_pos = 0;
-                size_t i = self->iter_pos++;
+                if (self->drain_pos >= self->capacity) self->drain_pos = 0;
+                size_t i = self->drain_pos++;
                 if (I16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
@@ -246,7 +246,7 @@ pop(SV* self_sv)
                     XSRETURN(2);
                 }
             }
-            self->iter_pos = 0;
+            self->drain_pos = 0;
             XSRETURN_EMPTY;
         }
 
@@ -273,8 +273,8 @@ shift(SV* self_sv)
         } else {
             size_t scanned;
             for (scanned = 0; scanned < self->capacity; scanned++) {
-                if (self->iter_pos == 0) self->iter_pos = self->capacity;
-                size_t i = --self->iter_pos;
+                if (self->drain_pos == 0) self->drain_pos = self->capacity;
+                size_t i = --self->drain_pos;
                 if (I16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                     EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
@@ -312,6 +312,7 @@ freeze(SV* self_sv)
     CODE:
         EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        if (self->max_size > 0xFFFFFFFFU) croak("max_size too large to freeze");
         SV* buf = newSV(22 + self->size * 32);
         SvPOK_on(buf);
         SvCUR_set(buf, 0);
@@ -342,6 +343,7 @@ freeze(SV* self_sv)
             }
           }
         }
+        if (n_written > 0xFFFFFFFFU) { SvREFCNT_dec(buf); croak("too many entries to freeze"); }
         { uint32_t actual = (uint32_t)n_written;
           memcpy(SvPVX(buf) + cnt_offset, &actual, 4); }
         RETVAL = buf;
@@ -349,7 +351,7 @@ freeze(SV* self_sv)
         RETVAL
 
 SV*
-thaw(char* class, SV* data)
+thaw(SV* class, SV* data)
     CODE:
         STRLEN dlen;
         const uint8_t* p = (const uint8_t*)SvPV(data, dlen);
@@ -376,7 +378,7 @@ thaw(char* class, SV* data)
             if (ttl == 0 && map->expires_at) hashmap_i16_persist(map, key);
           }
         }
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+        RETVAL = sv_setref_pv(newSV(0), hm_class_name(aTHX_ class), (void*)map);
     OUTPUT:
         RETVAL
 
@@ -433,7 +435,7 @@ from_hash(SV* self_sv, SV* href)
         if (!SvROK(href) || SvTYPE(SvRV(href)) != SVt_PVHV)
             croak("from_hash requires a hashref");
         HV* hv = (HV*)SvRV(href);
-        if (!hashmap_i16_reserve(self, (size_t)HvUSEDKEYS(hv))) croak("OOM during from_hash");
+        if (!hashmap_i16_reserve(self, HM_RESERVE_FOR(self, (size_t)HvUSEDKEYS(hv)))) croak("OOM during from_hash");
         hv_iterinit(hv);
         HE* he;
         while ((he = hv_iternext(hv))) {
@@ -451,7 +453,7 @@ merge(SV* self_sv, SV* other_sv)
         EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         EXTRACT_OTHER_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", other_sv);
         if (self == other) XSRETURN_EMPTY;
-        if (!hashmap_i16_reserve(self, self->size + other->size)) croak("OOM during merge");
+        if (!hashmap_i16_reserve(self, HM_RESERVE_FOR(self, other->size))) croak("OOM during merge");
         uint32_t now = other->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
         for (i = 0; i < other->capacity; i++) {

@@ -1,5 +1,39 @@
 Revision history for Log-Abstraction
 
+0.39	Tue Oct  6 08:17:42 PM EDT 2026
+	[ Bug Fixes ]
+	- Remove recursion issue when running mutant tests
+
+0.38	Tue Oct  6 02:15:21 PM EDT 2026
+	[ Enhancements ]
+	- sendmail digest: with digest => 1, messages that min_interval holds
+	  back are sent, oldest first, with the next email instead of being
+	  dropped (at most digest_max, default 100; the rest are counted).
+	  New flush() method sends them at once; destroying the logger calls
+	  it.  A failed send keeps them for the next email.
+	- New redact option: a qr//, a string or a list of them.  Each match
+	  is replaced with [REDACTED] before the message reaches the history
+	  or any backend, in structured-field values too, and in the text
+	  given to carp/croak.  Strings make it usable from config files, and
+	  \K keeps a prefix: redact => qr/password=\K\S+/.  The Log::Any
+	  adapter passes it on.
+	- Require Sub::Private 0.06.  Before it, the private subs were not
+	  protected when Log::Abstraction was loaded at run time (require,
+	  string eval, Log::Any::Adapter->set), and "Too late to run CHECK
+	  block" was printed.
+	[ Bug Fixes ]
+	- The Log::Any adapter ignored timestamp_format, timestamp_precision,
+	  utc, rotate_size, rotate_interval and rotate_keep; it now passes
+	  them to Log::Abstraction->new().
+	[ Tests ]
+	- New t/redact.t and t/sendmail_digest.t.
+	- New t/private_runtime.t checks that private subs can't be called
+	  from outside when the module is loaded at run time.
+	- t/timestamp.t failed on long-double perls (x86_64-linux-ld): its
+	  mocked clock stepped by 0.001, which isn't exact in binary and
+	  truncated to .000.  It now steps by 0.125:
+	  https://www.cpantesters.org/cpan/report/0332021c-c0f8-11f1-80bb-2ae0940ca041
+
 0.37	Sun Oct  4 09:43:19 PM EDT 2026
 	[ Bug Fixes ]
 	- journald: a datagram bigger than the system's Unix-socket send

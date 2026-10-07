@@ -4,7 +4,7 @@ use warnings;
 use POSIX ();
 use Data::HashMap::Shared::II;
 
-my $path = '/tmp/demo_multi.shm';
+my $path = "/tmp/dhms_multi_$$.shm";
 my $map = Data::HashMap::Shared::II->new($path, 100000);
 
 shm_ii_put $map, 1, 0;

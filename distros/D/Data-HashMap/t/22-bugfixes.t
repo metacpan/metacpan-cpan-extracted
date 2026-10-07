@@ -94,9 +94,7 @@ use Data::HashMap::IA;
     is(hm_sa_size $m, 2, 'SA: both keys coexist');
 }
 
-# ---- Issue #1: each() scalar context via method dispatch ----
-# Note: keyword syntax (hm_xx_each) always calls in list context due to
-# XS::Parse::Keyword op tree construction. Method dispatch works correctly.
+# ---- Issue #1: each() scalar context returns the key ----
 
 {
     my $m = Data::HashMap::II->new();
@@ -125,6 +123,31 @@ use Data::HashMap::IA;
 
     my $k = $m->each;
     is($k, "x", 'SI each scalar: returns key not value');
+}
+
+{
+    my $m = Data::HashMap::II->new();
+    hm_ii_put $m, 10, 100;
+    hm_ii_put $m, 20, 200;
+
+    my $k = hm_ii_each $m;
+    ok($k == 10 || $k == 20, 'keyword each scalar: returns a key');
+}
+
+# ---- scalar pop/shift/drain return the last value removed ----
+
+{
+    my $m = Data::HashMap::II->new();
+    hm_ii_put $m, 10, 100;
+    my $p = hm_ii_pop $m;
+    is($p, 100, 'scalar pop returns the value');
+    hm_ii_put $m, 20, 200;
+    my $s = hm_ii_shift $m;
+    is($s, 200, 'scalar shift returns the value');
+    hm_ii_put $m, 30, 300;
+    hm_ii_put $m, 40, 400;
+    my $d = hm_ii_drain $m, 2;
+    ok($d == 300 || $d == 400, 'scalar drain returns the last value removed');
 }
 
 # ---- Issue #3: TTL read-path should not compact (each iterator safety) ----
@@ -245,8 +268,6 @@ use Data::HashMap::IA;
 # ---- merge rejects a destroyed or foreign argument ----
 
 {
-    local $SIG{__WARN__} = sub {}; # an explicit DESTROY warns again at scope exit
-
     my $a = Data::HashMap::II->new();
     $a->put(1, 10);
     my $b = Data::HashMap::II->new();
@@ -263,6 +284,11 @@ use Data::HashMap::IA;
 
     eval { $a->merge("not a map") };
     like($@, qr/Expected a Data::HashMap::II object/, 'merge still rejects a non-map argument');
+
+    my $ss = Data::HashMap::SS->new();
+    eval { $a->merge($ss) };
+    like($@, qr/Expected a Data::HashMap::II object/, 'merge rejects a foreign-variant map');
+    is($a->size, 1, 'cross-variant merge left the target untouched');
 }
 
 # ---- clone preserves tombstones ----
@@ -367,8 +393,8 @@ for my $c (qw(SA IA I32A I16A)) {
 
 # ---- Storable ----
 
-{
-    require Storable;
+SKIP: {
+    skip 'Storable not available', 7 unless eval { require Storable; 1 };
     my $m = Data::HashMap::II->new(5, 0, 90);
     $m->put($_, $_ * 2) for 1 .. 50;
     my $c = Storable::dclone($m);
@@ -481,6 +507,23 @@ for my $c (qw(SA IA I32A I16A)) {
     my $ok = hm_ii_put $m, 9223372036854775807, 1;
     ok($ok, 'IV_MAX is a valid key');
     is(hm_ii_size $m, 1, 'only the valid key was stored');
+}
+
+# ---- a string one past the boundary croaks even where (NV) rounds onto it ----
+# On a double-NV perl, "-9223372036854775809" has the same NV as INT64_MIN, so
+# the range check must parse the integer, not round through the NV.
+{
+    my $m = Data::HashMap::II->new();
+    for my $bad ('-9223372036854775809', '-9223372036854776000', '9223372036854775808') {
+        eval { hm_ii_put $m, 1, $bad };
+        like($@, qr/out of int64 range/, "II value $bad croaks, not clamped to the boundary");
+        eval { hm_ii_put $m, $bad, 1 };
+        like($@, qr/out of int64 range/, "II key $bad croaks, not clamped to reserved");
+    }
+    is(hm_ii_size $m, 0, 'no boundary-clamped entry slipped in');
+    # INT64_MIN itself is a reserved key, so test the boundary string as a value.
+    $m->put(7, '-9223372036854775808');
+    is($m->get(7), '-9223372036854775808', 'the exact INT64_MIN string is still accepted as a value');
 }
 
 # ---- from_hash range-checks every integer path, exactly as put does ----
@@ -643,6 +686,261 @@ for my $c (qw(SA IA I32A I16A)) {
     like($@, qr/^32767\.2 out of int16 range/, 'the croak names 32767.2, not the clamped 32767');
     eval { Data::HashMap::I32->new->put('18446744073709551615', 1) };
     like($@, qr/^18446744073709551615 out of int32 range/, 'and the string as given');
+}
+
+# ---- a tied value is FETCHed once per call, not twice ----
+
+{
+    package FetchCounter;
+    our $n;
+    sub TIESCALAR { bless {}, $_[0] }
+    sub FETCH { $n++; 'fetched' }
+    sub STORE { }
+    package main;
+
+    my $t;
+    tie $t, 'FetchCounter';
+    my $m = Data::HashMap::SS->new();
+    $FetchCounter::n = 0;
+    hm_ss_put $m, 'k', $t;
+    is($FetchCounter::n, 1, 'SS put FETCHes a tied value once');
+    is(hm_ss_get $m, 'k', 'fetched', 'SS put stored the FETCHed value');
+    $FetchCounter::n = 0;
+    hm_ss_put_ttl $m, 'k2', $t, 60;
+    is($FetchCounter::n, 1, 'SS put_ttl FETCHes a tied value once');
+    $FetchCounter::n = 0;
+    hm_ss_get_or_set $m, 'k3', $t;
+    is($FetchCounter::n, 1, 'SS get_or_set FETCHes a tied default once');
+    $FetchCounter::n = 0;
+    hm_ss_swap $m, 'k', $t;
+    is($FetchCounter::n, 1, 'SS swap FETCHes a tied value once');
+
+    my $alias = Data::HashMap::SA->new();
+    $FetchCounter::n = 0;
+    hm_sa_put $alias, 'k', $t;
+    is($FetchCounter::n, 0, 'SA alias put does not FETCH the stored SV');
+    my $copy = Data::HashMap::SA->new(0, 0, 0, 1);
+    $FetchCounter::n = 0;
+    hm_sa_put $copy, 'k', $t;
+    is($FetchCounter::n, 1, 'SA copy put FETCHes a tied value once');
+    is($copy->get('k'), 'fetched', 'SA copy put stored the FETCHed value');
+}
+
+# ---- a key FETCH moving the value SV cannot strand a stale pointer ----
+
+{
+    package MutatingKey;
+    our $victim;
+    sub TIESCALAR { bless {}, $_[0] }
+    sub FETCH { $victim .= "Q" x 5000; 'k1' }
+    sub STORE { }
+    package GrowingBoth;
+    our $n;
+    sub TIESCALAR { bless {}, $_[0] }
+    sub FETCH { $n++; "V" x ($n * 4) }
+    sub STORE { }
+    package main;
+
+    my $k;
+    tie $k, 'MutatingKey';
+    for my $op (qw(put put_ttl get_or_set)) {
+        local $MutatingKey::victim = "v";
+        my $m = Data::HashMap::SS->new();
+        $m->$op($k, $MutatingKey::victim, $op eq 'put_ttl' ? 60 : ());
+        is(length(hm_ss_get $m, 'k1'), 5001, "SS $op reads a value moved by key FETCH");
+    }
+
+    my $t;
+    tie $t, 'GrowingBoth';
+    local $GrowingBoth::n = 0;
+    my $m2 = Data::HashMap::SS->new();
+    hm_ss_put $m2, $t, $t;
+    my @keys = hm_ss_keys $m2;
+    is(scalar @keys, 1, 'same tied SV as key and value stores one entry');
+    is(length($keys[0]), 8, '... key is the second FETCH');
+    is(length(hm_ss_get $m2, $keys[0]), 8, '... value re-read after key FETCH');
+
+    package KeyClobber { use overload '""' => sub { $main::clobbered = 'd' x 100000; 'v' }, fallback => 1 }
+    for my $op (qw(put put_ttl get_or_set swap)) {
+        our $clobbered = 'c' x 40;
+        my $m3 = Data::HashMap::SS->new;
+        $m3->put($clobbered, 'old') if $op eq 'swap';
+        $m3->$op($clobbered, (bless {}, 'KeyClobber'), $op eq 'put_ttl' ? 60 : ());
+        is_deeply([$m3->keys], ['c' x 40], "SS $op: a value overload that frees the key buffer leaves the key intact");
+    }
+}
+
+# ---- ttl/size arguments FETCH magic exactly once ----
+
+{
+    package CountOnce;
+    our $n;
+    sub TIESCALAR { bless {}, $_[0] }
+    sub FETCH { $n++; 30 }
+    sub STORE { }
+    package FlipFlop;
+    our @v;
+    sub TIESCALAR { bless {}, $_[0] }
+    sub FETCH { shift @v }
+    sub STORE { }
+    package main;
+
+    my $t;
+    tie $t, 'CountOnce';
+    $CountOnce::n = 0;
+    my $m = Data::HashMap::II->new(0, $t);
+    is($CountOnce::n, 1, 'new ttl FETCHes a tied scalar once');
+    $CountOnce::n = 0;
+    my $m2 = Data::HashMap::II->new($t);
+    is($CountOnce::n, 1, 'new max_size FETCHes a tied scalar once');
+    $CountOnce::n = 0;
+    hm_ii_put_ttl $m, 1, 2, $t;
+    is($CountOnce::n, 1, 'II put_ttl FETCHes a tied ttl once');
+    my $s = Data::HashMap::SS->new();
+    $CountOnce::n = 0;
+    hm_ss_put_ttl $s, 'k', 'v', $t;
+    is($CountOnce::n, 1, 'SS put_ttl FETCHes a tied ttl once');
+
+    my $f;
+    tie $f, 'FlipFlop';
+    local @FlipFlop::v = (30, -3);
+    my $fm = Data::HashMap::II->new(0, $f);
+    is($fm->ttl, 30, 'ttl uses a single settled read (no flip-flop bypass)');
+
+    my $bad;
+    tie $bad, 'FlipFlop';
+    local @FlipFlop::v = ('abc');
+    eval { Data::HashMap::II->new(0, $bad) };
+    like($@, qr/must be a number/, 'tied non-numeric ttl croaks like a plain one');
+}
+
+{
+    package CountBad;
+    our $n;
+    sub TIESCALAR { bless {}, $_[0] }
+    sub FETCH { $n++; 'abc' }
+    sub STORE { }
+    package main;
+
+    my $bad;
+    tie $bad, 'CountBad';
+    $CountBad::n = 0;
+    eval { Data::HashMap::II->new(0, $bad) };
+    like($@, qr/must be a number/, 'tied non-numeric ttl croaks');
+    is($CountBad::n, 1, 'croak path reads a tied ttl once (message uses settled value)');
+}
+
+# ---- clear() removes what a value's DESTROY adds, as %h = () does ----
+{
+    package ReinsClear { sub DESTROY { $main::ReinsClearMap->put($_, 're') for 90000 .. 90040 } }
+    our $ReinsClearMap;
+    for my $max (0, 2) {
+        my $m = $ReinsClearMap = Data::HashMap::IA->new($max);
+        hm_ia_put $m, $_, 'v' for 1 .. 5;
+        hm_ia_put $m, 1, bless {}, 'ReinsClear';
+        hm_ia_clear $m;
+        my @keys = hm_ia_keys $m;
+        is(hm_ia_size $m, 0, "clear (max_size $max): entries a DESTROY adds are cleared too");
+        is(scalar @keys, 0, "clear (max_size $max): no live slot is left");
+        hm_ia_put $m, 100 + $_, "v$_" for 1 .. 3;
+        @keys = hm_ia_keys $m;
+        is(hm_ia_size $m, scalar @keys, "clear (max_size $max): size matches keys after refill");
+    }
+    undef $ReinsClearMap;
+
+    package DropMap { sub DESTROY { undef $main::DropMap } }
+    our $DropMap = Data::HashMap::SA->new;
+    $DropMap->put("k$_", bless {}, 'DropMap') for 1 .. 8;
+    hm_sa_clear $DropMap;
+    ok(!defined $DropMap, 'clear survives a DESTROY that frees the map');
+}
+
+# ---- NaN croaks wherever a number is expected ----
+{
+    my $nan = 0 + "nan";
+    my $m = Data::HashMap::II->new();
+    eval { hm_ii_put $m, $nan, 1 };
+    like($@, qr/cannot use NaN/, 'II put: NaN key croaks');
+    eval { hm_ii_put $m, 1, $nan };
+    like($@, qr/cannot use NaN/, 'II put: NaN value croaks');
+    eval { hm_ii_put $m, "nan", 1 };
+    like($@, qr/cannot use NaN/, 'II put: "nan" string key croaks');
+    eval { Data::HashMap::II->new(0, $nan) };
+    like($@, qr/ttl must be a number/, 'II new: NaN ttl croaks');
+    eval { Data::HashMap::II->new($nan) };
+    like($@, qr/max_size must be a number/, 'II new: NaN max_size croaks');
+    eval { Data::HashMap::II->new(2, 0, $nan) };
+    like($@, qr/lru_skip must be a number/, 'II new: NaN lru_skip croaks');
+    eval { hm_ii_put_ttl $m, 2, 2, $nan };
+    like($@, qr/ttl must be a number/, 'II put_ttl: NaN ttl croaks');
+    eval { hm_ii_reserve $m, $nan };
+    like($@, qr/NaN is not a valid count/, 'II reserve: NaN count croaks');
+    eval { hm_ii_drain $m, $nan };
+    like($@, qr/NaN is not a valid count/, 'II drain: NaN count croaks');
+    eval { hm_ii_incr_by $m, 1, $nan };
+    like($@, qr/cannot use NaN/, 'II incr_by: NaN delta croaks');
+    my $saturated = Data::HashMap::II->new(0, 9**9**9);
+    is($saturated->ttl, 4294967295, 'II new: Inf ttl saturates to UINT32_MAX');
+}
+
+# ---- int conversion reads a tied scalar once, on success and croak paths ----
+{
+    package CountKey;
+    our ($n, $v);
+    sub TIESCALAR { bless {}, $_[0] }
+    sub FETCH { $n++; $v }
+    sub STORE { }
+    package main;
+
+    my $t;
+    tie $t, 'CountKey';
+    my $m = Data::HashMap::II->new();
+    $CountKey::v = 4.5; $CountKey::n = 0;
+    hm_ii_put $m, $t, 9;
+    is($CountKey::n, 1, 'II put: tied NV key FETCHed once');
+    is(hm_ii_get $m, 4, 9, 'II put: tied NV key converts correctly');
+
+    $CountKey::v = 7; $CountKey::n = 0;
+    hm_ii_put $m, $t, 1;
+    is($CountKey::n, 1, 'II put: tied IV key FETCHed once');
+
+    my $m16 = Data::HashMap::I16->new();
+    $CountKey::v = 100000; $CountKey::n = 0;
+    eval { hm_i16_put $m16, $t, 1 };
+    like($@, qr/out of int16 range/, 'I16 put: tied out-of-range key croaks');
+    is($CountKey::n, 1, 'I16 put: croak path reads tied key once');
+
+    $CountKey::v = 1e30; $CountKey::n = 0;
+    eval { hm_i16_put $m16, $t, 1 };
+    like($@, qr/out of int16 range/, 'I16 put: tied NV out-of-range key croaks');
+    is($CountKey::n, 1, 'I16 put: NV croak path reads tied key once');
+
+    $CountKey::v = 'nan';
+    eval { hm_ii_put $m, $t, 1 };
+    like($@, qr/cannot use NaN/, 'II put: tied NaN key croaks');
+    $CountKey::v = 5;
+    ok(eval { hm_ii_put $m, $t, 1; 1 }, 'II put: a tied key judged on its new value, not the last FETCH');
+}
+
+# ---- new/thaw on an instance use its real class, not a stringified ref ----
+{
+    my $m = Data::HashMap::II->new;
+    $m->put(1, 10);
+    my $blob = $m->freeze;
+
+    my $n = $m->new;
+    is(ref($n), 'Data::HashMap::II', 'instance->new blesses into the real class');
+    $n->put(2, 20);
+    is($n->get(2), 20, 'instance->new returns a usable map');
+
+    my $t = $m->thaw($blob);
+    is(ref($t), 'Data::HashMap::II', 'instance->thaw blesses into the real class');
+    is($t->get(1), 10, 'instance->thaw returns a usable map');
+
+    package My::HM::II; our @ISA = ('Data::HashMap::II'); package main;
+    my $sub = My::HM::II->thaw($blob);
+    is(ref($sub), 'My::HM::II', 'thaw as a subclass blesses into the subclass');
+    is($sub->get(1), 10, 'subclass thaw is usable');
 }
 
 done_testing;

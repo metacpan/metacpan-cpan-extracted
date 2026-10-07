@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Scalar::Util qw(readonly);
 
 use Data::HashMap::IS;
 use Data::HashMap::SS;
@@ -32,6 +33,10 @@ for my $spec (
     is $m->get_direct($missing_k), undef, "$label: missing key returns undef";
 
     is length($m->get_direct($k)), length($v), "$label: length correct";
+
+    ok(readonly($m->get_direct($k)), "$label: return is SvREADONLY");
+    eval { for ($m->get_direct($k)) { $_ = 'X' } };
+    like($@, qr/read-only/, "$label: aliased write dies");
 }
 
 # SvREADONLY preservation note: per CLAUDE.md, the returned SV is read-only.

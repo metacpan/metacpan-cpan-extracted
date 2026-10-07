@@ -383,4 +383,20 @@ like exception(sub { Data::HashMap::Shared::SS->new_readonly($path) }),
     }
 }
 
+# A read hit through a handle opened before the freeze leaves the sealed file
+# as it was: no LRU clock bit.
+{
+    require Digest::MD5;
+    my $dir = tempdir(CLEANUP => 1);
+    my $p = "$dir/clock.shm";
+    my $freezer = Data::HashMap::Shared::II->new($p, 100, 50);
+    $freezer->put($_, $_) for 1 .. 10;
+    my $old = Data::HashMap::Shared::II->new($p, 100, 50);
+    $freezer->freeze;
+    my $md5 = sub { open my $fh, '<:raw', $p or die $!; Digest::MD5->new->addfile($fh)->hexdigest };
+    my $before = $md5->();
+    is $old->get($_), $_, "get $_ through a pre-freeze handle" for 1 .. 3;
+    is $md5->(), $before, 'the sealed file is unchanged by those hits';
+}
+
 done_testing;

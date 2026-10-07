@@ -86,7 +86,10 @@ unlink $p;
         my $m = Data::HashMap::Shared::II->new($p2, 64);
         $m->put(2, 2);
         my @k = $m->keys;
-        POSIX::_exit(($m->stats->{recoveries} >= 1 && @k == 2) ? 0 : 1);
+        my $rc = $m->stats->{recoveries};
+        POSIX::_exit(1) unless $rc >= 1 && @k == 2;
+        POSIX::_exit(2) unless $m->stat_recoveries == $rc && (shm_ii_stat_recoveries $m) == $rc;
+        POSIX::_exit(0);
     }
     waitpid $kid, 0;
     is $?, 0, 'a lock word holding pid 0 is recovered, not waited on forever'

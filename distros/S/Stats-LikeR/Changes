@@ -1,5 +1,24 @@
 Revision history for Stats-LikeR
 
+0.3215 2026-10-06 CDT
+
+ [read_table(): Excel workbooks]
+
+ - Reading a workbook no longer leaks memory on perl 5.32. Finding the
+   sheets and relationships compiled a fresh regex on every call, one per
+   attribute name, and 5.32's regex compiler leaks the character lists it
+   builds for \s and \w on each compile. 0.3214 failed 14 leak tests on a
+   5.32.1 CPAN smoker for this. Each pattern is now compiled once and kept.
+
+ [Tests]
+
+ - test.all.perls.pl now lists every stable perl series, 5.10 to the
+   newest installed, that the local matrix has no perl from. A bug in one
+   perl's own internals shows only on that perl, and the matrix went from
+   5.16.3 to 5.42.3, so nothing here could see the leak above. A 5.32.1
+   perl has been added to the matrix; it fails the same 14 subtests
+   without the fix.
+
 0.3214 2026-10-05 CDT
 
  [read_table(): delimited text]

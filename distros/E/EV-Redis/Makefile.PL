@@ -9,17 +9,13 @@ use EV::MakeMaker '$installsitearch';
 
 die "OS unsupported\n" if $^O eq "MSWin32";
 
-# Generate ppport.h if needed
 unless (-f 'src/ppport.h') {
     require Devel::PPPort;
     Devel::PPPort::WriteFile('src/ppport.h');
 }
 
-# Copy XS source to top-level for MakeMaker
 copy('src/EV__Redis.xs', 'Redis.xs')
     or die "Cannot copy src/EV__Redis.xs -> Redis.xs: $!\n";
-
-# --- SSL detection ---
 
 sub _detect_openssl {
     if (defined $ENV{OPENSSL_PREFIX}) {
@@ -66,8 +62,6 @@ print $has_ssl
     ? "Building with TLS support\n"
     : "Building without TLS support (set EV_REDIS_SSL=1 to force)\n";
 
-# --- Build hiredis static library ---
-
 die <<'EOM' unless -f 'deps/hiredis/Makefile';
 deps/hiredis is missing or empty. This distribution bundles hiredis as a
 git submodule; run:
@@ -77,20 +71,55 @@ git submodule; run:
 and then re-run: perl Makefile.PL
 EOM
 
-my $make;
-if ($^O =~ m/bsd$/ && $^O !~ m/gnukfreebsd$/) {
-    $make = which('gmake');
-    unless (defined $make) {
-        print "'gmake' is necessary for BSD platform.\n";
-        exit 0;
+# every hunk of the patch carries its revision marker: a partly applied or
+# older patch leaves a count that differs from the patch's own
+sub _patch_markers {
+    my ($file, $added_only) = @_;
+    open my $fh, '<', $file or die "Cannot read $file: $!\n";
+    my $n = 0;
+    while (<$fh>) {
+        $n++ if (!$added_only || /^\+/) && /local patch \(EV::Redis\/3\)/;
     }
-} else {
-    $make = $Config{make};
+    return $n;
 }
 
-# Build hiredis with perl's compiler (not the hiredis Makefile's default)
-# and without -Werror, which breaks the build on new-compiler warnings.
+{
+    my $patch = 'deps/hiredis-protocol-errors.patch';
+    my $async = 'deps/hiredis/async.c';
+    die "Local hiredis patch $patch is missing from this distribution.\n" unless -f $patch;
+    my $want = _patch_markers($patch, 1);
+    my $have = _patch_markers($async);
+    if (!$have) {
+        my $patch_bin = which('patch')
+            or die "The 'patch' utility is required to build (it applies $patch).\n";
+        print "Applying $patch\n";
+        system($patch_bin, '-p1', '-i', $patch) == 0
+            or die "Failed to apply $patch: restore $async"
+            . " (git -C deps/hiredis checkout async.c) and see the patch header.\n";
+        $have = _patch_markers($async);
+    }
+    $have == $want
+        or die "$async holds $have of the $want marked changes of $patch: restore it"
+        . " (git -C deps/hiredis checkout async.c) and re-run perl Makefile.PL.\n";
+}
+
+my $make = $Config{make};
+if (`$make --version 2>&1` !~ /GNU Make/) {
+    $make = which('gmake');
+    unless (defined $make) {
+        print "OS unsupported: GNU make ('gmake') is necessary to build the bundled hiredis.\n";
+        exit 0;
+    }
+}
+
 my @make_args = ('-C', 'deps/hiredis', "CC=$Config{cc}", 'USE_WERROR=0', 'static');
+
+# hiredis exchanges struct timeval with the XS: both need perl's time_t/off_t ABI
+my @abi_flags = grep { /^-D_(?:TIME_BITS|FILE_OFFSET_BITS|LARGEFILE_SOURCE|LARGE_FILES)\b/ }
+    split ' ', $Config{ccflags};
+push @abi_flags, split ' ', $ENV{CPPFLAGS} if defined $ENV{CPPFLAGS};
+push @make_args, "CPPFLAGS=@abi_flags" if @abi_flags;
+
 if ($has_ssl) {
     push @make_args, 'USE_SSL=1';
     if (defined $ssl_detected && !ref $ssl_detected) {
@@ -98,6 +127,9 @@ if ($has_ssl) {
     }
 }
 
+# objects left by a build with other flags (another perl's ABI) must not be linked
+system($make, '-C', 'deps/hiredis', 'clean') == 0
+    or die "Failed to clean the bundled hiredis with '$make'.\n";
 system($make, @make_args) == 0
     or die "Failed to build hiredis static library. Check that you have a C compiler and '$make' installed.\n";
 
@@ -106,8 +138,6 @@ if ($has_ssl) {
     die "Failed to build hiredis SSL library ($ssl_lib). Check OpenSSL installation.\n"
         unless -f $ssl_lib;
 }
-
-# --- Assemble flags ---
 
 my @inc = ('-Isrc', '-Ideps/hiredis', "-I$installsitearch/EV", "-I$installsitearch");
 push @inc, split(/\s+/, $ssl_cflags) if $ssl_cflags;
@@ -119,8 +149,8 @@ push @myextlib, "deps/hiredis/libhiredis_ssl$Config{lib_ext}" if $has_ssl;
 
 my @libs;
 push @libs, $ssl_libs if $ssl_libs;
-
-# --- WriteMakefile ---
+# pthread_atfork: in libc on Linux, as EV assumes too
+push @libs, '-lpthread' if $^O ne 'linux';
 
 WriteMakefile(
     NAME             => 'EV::Redis',
@@ -144,18 +174,18 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         'Test::More'        => '0.98',
-        'Test::RedisServer' => '0.12',
+        'Test::RedisServer' => '0.23',
         'Test::TCP'         => '1.18',
         'Test::Deep'        => 0,
         'Devel::Refcount'   => 0,
+        'Devel::Peek'       => 0,
     },
 
     INC      => join(' ', @inc),
     DEFINE   => join(' ', @define),
     MYEXTLIB => join(' ', @myextlib),
     LIBS     => [join(' ', @libs)],
-    # Hide hiredis symbols to avoid clashes with other modules bundling
-    # hiredis. GNU ld/gold/lld only — Solaris/AIX linkers reject it.
+    # hide bundled hiredis symbols; GNU ld/gold/lld only (Solaris/AIX reject it)
     ($^O =~ /^(?:linux|gnukfreebsd|freebsd|midnightbsd|dragonfly|openbsd|netbsd)$/
         ? (LDDLFLAGS => "$Config{lddlflags} -Wl,--exclude-libs,ALL") : ()),
 
@@ -182,14 +212,13 @@ WriteMakefile(
     },
 );
 
-# hiredis is built during Makefile.PL; provide a no-op rule.
-# Also make Redis.xs depend on src/EV__Redis.xs so editing the source
-# triggers a rebuild without re-running `perl Makefile.PL`.
 sub MY::postamble {
     my @targets;
     for my $lib (@myextlib) {
         push @targets, "$lib :\n\t\@echo \"$lib already built\"\n";
     }
     push @targets, "Redis.xs : src/EV__Redis.xs\n\t\$(CP) src/EV__Redis.xs Redis.xs\n";
+    push @targets, "Redis\$(OBJ_EXT) : src/libev_adapter.h src/ngx-queue.h deps/hiredis/dict.c deps/hiredis/dict.h\n";
+    push @targets, "clean ::\n\t-$make -C deps/hiredis clean\n";
     return join "\n", @targets;
 }

@@ -4,10 +4,14 @@ use warnings;
 use Benchmark qw(cmpthese);
 
 use Data::HashMap::I16;
+use Data::HashMap::I16S;
 use Data::HashMap::I32;
+use Data::HashMap::I32S;
 use Data::HashMap::II;
 use Data::HashMap::IS;
 use Data::HashMap::SI;
+use Data::HashMap::SI16;
+use Data::HashMap::SI32;
 use Data::HashMap::SS;
 use Data::HashMap::IA;
 use Data::HashMap::SA;
@@ -25,8 +29,14 @@ print "=" x 70, "\n\n";
 my $m_i16 = Data::HashMap::I16->new();
 hm_i16_put $m_i16, $_, $_ for 1 .. $N16;
 
+my $m_i16s = Data::HashMap::I16S->new();
+hm_i16s_put $m_i16s, $_, "v$_" for 1 .. $N16;
+
 my $m_i32 = Data::HashMap::I32->new();
 hm_i32_put $m_i32, $_, $_ for 1 .. $N;
+
+my $m_i32s = Data::HashMap::I32S->new();
+hm_i32s_put $m_i32s, $_, "v$_" for 1 .. $N;
 
 my $m_ii = Data::HashMap::II->new();
 hm_ii_put $m_ii, $_, $_ for 1 .. $N;
@@ -36,6 +46,12 @@ hm_is_put $m_is, $_, "v$_" for 1 .. $N;
 
 my $m_si = Data::HashMap::SI->new();
 hm_si_put $m_si, "k$_", $_ for 1 .. $N;
+
+my $m_si16 = Data::HashMap::SI16->new();
+hm_si16_put $m_si16, "k$_", $_ % 30000 for 1 .. $N;
+
+my $m_si32 = Data::HashMap::SI32->new();
+hm_si32_put $m_si32, "k$_", $_ for 1 .. $N;
 
 my $m_ss = Data::HashMap::SS->new();
 hm_ss_put $m_ss, "k$_", "v$_" for 1 .. $N;
@@ -69,8 +85,14 @@ cmpthese(-3, {
     'I16' => sub {
         while (my ($k, $v) = hm_i16_each $m_i16) { }
     },
+    'I16S' => sub {
+        while (my ($k, $v) = hm_i16s_each $m_i16s) { }
+    },
     'I32' => sub {
         while (my ($k, $v) = hm_i32_each $m_i32) { }
+    },
+    'I32S' => sub {
+        while (my ($k, $v) = hm_i32s_each $m_i32s) { }
     },
     'II' => sub {
         while (my ($k, $v) = hm_ii_each $m_ii) { }
@@ -80,6 +102,12 @@ cmpthese(-3, {
     },
     'SI' => sub {
         while (my ($k, $v) = hm_si_each $m_si) { }
+    },
+    'SI16' => sub {
+        while (my ($k, $v) = hm_si16_each $m_si16) { }
+    },
+    'SI32' => sub {
+        while (my ($k, $v) = hm_si32_each $m_si32) { }
     },
     'SS' => sub {
         while (my ($k, $v) = hm_ss_each $m_ss) { }

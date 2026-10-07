@@ -1,5 +1,6 @@
 Changes
 cpanfile
+deps/hiredis-protocol-errors.patch
 deps/hiredis/adapters/ae.h
 deps/hiredis/adapters/glib.h
 deps/hiredis/adapters/ivykis.h
@@ -64,7 +65,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
-README.md
+README
 src/EV__Redis.xs
 src/libev_adapter.h
 src/ngx-queue.h
@@ -73,19 +74,29 @@ t/auth.t
 t/autoload.t
 t/command.t
 t/connect.t
+t/connect_fail_sync.t
 t/connect_unix.t
+t/dispatch_state.t
 t/flow_control.t
+t/fork.t
 t/handler_selfclear.t
 t/leak.t
 t/lib/RedisTestHelper.pm
 t/options.t
+t/protocol_state.t
+t/protocol_violation.t
 t/pubsub.t
 t/reconnect.t
+t/reconnect_attempts.t
 t/regression_leaks.t
+t/replaced_connection.t
 t/resp3.t
+t/retry_on_lost.t
+t/timeout_traffic.t
 t/tls.t
 t/uaf_deferred_disconnect.t
 t/uaf_skip_pending.t
+t/warn_hook_die.t
 typemap
 xt/pod.t
 xt/pod_coverage.t

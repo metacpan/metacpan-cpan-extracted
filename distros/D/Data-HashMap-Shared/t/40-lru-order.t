@@ -70,4 +70,26 @@ my $dir = File::Temp::tempdir(CLEANUP => 1);
        '  ... and not as an eviction');
 }
 
+# Every entry recently read: an eviction spares 64 of them, then takes the next
+# rather than walking the whole cache.
+{
+    my $map = Data::HashMap::Shared::II->new(undef, 1000, 200);
+    $map->put($_, $_) for 1 .. 200;
+    $map->get($_) for 1 .. 200;
+    $map->put(201, 201);
+    my @gone = grep { !$map->exists($_) } 1 .. 200;
+    is("@gone", '65', 'an eviction spares 64 recently read entries, then takes the 65th');
+}
+
+{
+    my $map = Data::HashMap::Shared::II->new(undef, 3000, 1000, 3600);
+    $map->put_ttl($_, $_, 1) for 1 .. 1000;
+    $map->get($_) for 1 .. 1000;
+    Time::HiRes::sleep(2.1);
+    $map->put($_, $_) for 1001 .. 2000;
+    is(scalar(grep { $map->exists($_) } 1001 .. 2000), 1000,
+        'eviction does not spare a read entry that has since expired');
+    is($map->stats->{evictions}, 0, '  ... and evicts nothing live');
+}
+
 done_testing;

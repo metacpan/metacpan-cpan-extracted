@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.8.1';
+our $VERSION = '1.8.2';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -36,8 +36,7 @@ sub list {
 
 sub list_p {
     my ($self, %options) = @_;
-    return $self->_body_p('list', \%options, '/api/v2/database/list')
-        ->then(sub { $_[0]->{databases} });
+    return $self->_body_p('list', \%options, '/api/v2/database/list');
 }
 
 # What is inside one database: schema, sample rows, row count and per-format
@@ -71,7 +70,7 @@ sub checksums_p {
     _assert_database('checksums', $id, $format);
     return $self->_body_p(
         'checksums', \%options, '/api/v2/database/checksum', id => $id, format => $format,
-    )->then(sub { $_[0]->{checksums} });
+    );
 }
 
 # Your organization's recent download attempts, newest first, refusals included:
@@ -88,7 +87,7 @@ sub downloads_p {
     return $self->_body_p(
         'downloads', \%options, '/api/v2/database/downloads',
         defined $limit ? (limit => $limit) : (),
-    )->then(sub { $_[0]->{downloads} });
+    );
 }
 
 # The time-limited URL for one file.
@@ -212,13 +211,22 @@ sub _transfer_p {
     });
 }
 
+# The member each call returns from one level down, and what it must be; a call
+# not named here returns the whole answer.
+my %UNWRAP = (
+    list => [databases => 'ARRAY'],
+    checksums => [checksums => 'HASH'],
+    downloads => [downloads => 'ARRAY'],
+);
+
 sub _body_p {
     my ($self, $method, $options, $path, @query) = @_;
     my $client = $self->{client};
     $client->_check_options("database->$method", $options, 'retries', 'timeout');
     my $url = $client->_url($path, @query);
     my $retries = defined $options->{retries} ? $options->{retries} : $client->{retries};
-    return $client->_retry_p($retries, sub { $client->_json_p($url, $options->{timeout}) });
+    my @unwrap = @{ $UNWRAP{$method} || [] };
+    return $client->_retry_p($retries, sub { $client->_json_p($url, $options->{timeout}, @unwrap) });
 }
 
 sub _assert_database {

@@ -3,6 +3,15 @@ use Test2::V0 -target => 'HealthCheck',
 
 my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
+# Detect the line number reporting behaviour of this version of perl
+our $use_block_end;
+BEGIN {
+    sub X { my (undef, undef, $line) = caller;
+                $use_block_end++ if ($line != shift); }
+    X __LINE__, # $use_block_end = 0
+    sub { }     # $use_block_end = 1
+};
+
 { note "Require instance methods";
     foreach my $method (qw( register check )) {
         local $@;
@@ -150,7 +159,8 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         },
         "Results as expected"
     );
-    my $at = "at " . __FILE__ . " line " . ( __LINE__ - 10 );
+    my $at = "at " . __FILE__ . " line "
+             . ( $use_block_end ?__LINE__ - 11 : __LINE__ - 17);
 
     s/0x[[:xdigit:]]+/0xHEX/g for @warnings;
 

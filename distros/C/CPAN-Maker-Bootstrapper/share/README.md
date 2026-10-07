@@ -4,7 +4,9 @@
 * [SYNOPSIS](#synopsis)
 * [DESCRIPTION](#description)
 * [QUICK START](#quick-start)
-  * [Next Steps](#next-steps)
+  * [Scaffolding a new project from the default stub](#scaffolding-a-new-project-from-the-default-stub)
+  * [Bootstrapping an existing project](#bootstrapping-an-existing-project)
+* [NEXT STEPS](#next-steps)
 * [WHY YOU SHOULD CONSIDER USING CPAN::Maker::Bootstrapper](#why-you-should-consider-using-cpanmakerbootstrapper)
   * [The Stack](#the-stack)
   * [Best Practices Out of the Box](#best-practices-out-of-the-box)
@@ -13,8 +15,11 @@
 * [IMPORTING FILES](#importing-files)
   * [Determining the Primary Module](#determining-the-primary-module)
   * [What Gets Imported](#what-gets-imported)
-  * [Module Name Requirement](#module-name-requirement)
-  * [The Build After Import](#the-build-after-import)
+  * [Excluding Import Paths](#excluding-import-paths)
+  * [Previewing an Import](#previewing-an-import)
+  * [Creating a Project Tarball](#creating-a-project-tarball)
+  * [Import Destination Safety](#import-destination-safety)
+  * [Import Build Policy](#import-build-policy)
   * [Next Steps After a Successful Import](#next-steps-after-a-successful-import)
   * [Limitations](#limitations)
   * [Importing a CLI::Simple Scaffold Tarball](#importing-a-clisimple-scaffold-tarball)
@@ -38,25 +43,27 @@
   * [Using Profiles](#using-profiles)
     * [Built-in Profiles](#built-in-profiles)
     * [Creating Custom Profiles](#creating-custom-profiles)
-    * [Planned Profiles](#planned-profiles)
+    * [Additional Profile Ideas](#additional-profile-ideas)
 * [EXTENDING THE BUILD SYSTEM](#extending-the-build-system)
   * [Immutability Is a Feature](#immutability-is-a-feature)
   * [How the Makefile Works](#how-the-makefile-works)
   * [What Belongs in `project.mk`](#what-belongs-in-projectmk)
-  * [What does NOT belong in project.mk](#what-does-not-belong-in-projectmk)
+  * [What Does NOT Belong in `project.mk`](#what-does-not-belong-in-projectmk)
   * [Custom Template Tokens](#custom-template-tokens)
   * [Keeping the build system up to date](#keeping-the-build-system-up-to-date)
   * [Automatic Drift and Update Checks](#automatic-drift-and-update-checks)
   * [What You Should Never Modify](#what-you-should-never-modify)
   * [Dependencies Management](#dependencies-management)
     * [The local dependency library](#the-local-dependency-library)
-    * [build-mirrors](#build-mirrors)
+    * [`build-mirrors`](#build-mirrors)
 * [MODULINOS](#modulinos)
   * [Continuous Integration](#continuous-integration)
     * [Running builder manually](#running-builder-manually)
     * [Environment variables](#environment-variables)
-    * [Override files](#override-files)
-    * [make build-ci variables](#make-build-ci-variables)
+    * [`builder.env`](#builderenv)
+    * [Builder lifecycle hooks](#builder-lifecycle-hooks)
+    * [`make build-ci`](#make-build-ci)
+    * [Builder input files](#builder-input-files)
     * [See Also](#see-also)
 * [PREREQUISITES](#prerequisites)
 * [CAVEATS](#caveats)
@@ -69,34 +76,36 @@
   * [I want to exclude a module the scanner found](#i-want-to-exclude-a-module-the-scanner-found)
   * [I edited a .pm file and my changes disappeared](#i-edited-a-pm-file-and-my-changes-disappeared)
   * [Why does my build say it has drifted from the installed bootstrapper?](#why-does-my-build-say-it-has-drifted-from-the-installed-bootstrapper)
-  * [make says nothing to do but my source changed](#make-says-nothing-to-do-but-my-source-changed)
-  * [How do I disable scanning temporarily?](#how-do-i-disable-scanning-temporarily)
+  * [make update overwrote something I changed in a managed file](#make-update-overwrote-something-i-changed-in-a-managed-file)
+  * [`make` says nothing to do but my source changed](#make-says-nothing-to-do-but-my-source-changed)
+  * [How do I disable dependency scanning temporarily?](#how-do-i-disable-dependency-scanning-temporarily)
   * [How do I disable syntax checking temporarily?](#how-do-i-disable-syntax-checking-temporarily)
   * [How do I upgrade the build system?](#how-do-i-upgrade-the-build-system)
   * [I want to add a bash script to my distribution](#i-want-to-add-a-bash-script-to-my-distribution)
   * [What is `make release-notes` used for?](#what-is-make-release-notes-used-for)
   * [Can I distribute the POD in my modules separately?](#can-i-distribute-the-pod-in-my-modules-separately)
-  * [The dependency resolver keeps adding a file I don't want to](#the-dependency-resolver-keeps-adding-a-file-i-dont-want-to)
   * [Something still doesn't work - how do I report an issue?](#something-still-doesnt-work---how-do-i-report-an-issue)
 * [SEE ALSO](#see-also)
 * [DEPENDENCIES](#dependencies)
-  * [Required for AI Commands](#required-for-ai-commands)
-  * [Recommend Packages](#recommend-packages)
 * [VERSION](#version)
 * [AUTHOR](#author)
 * [LICENSE](#license)
 # NAME
 
-CPAN::Maker::Bootstrapper - Scaffold a new CPAN distribution in one command
+CPAN::Maker::Bootstrapper - A complete build, dependency, and release framework for CPAN distributions
 
 # SYNOPSIS
+
+    # Bootstrap an existing project
+    cd /path/to/Foo-Bar
+    cmb --import .
 
     # Create a configuration file (recommended first-time setup)
     cmb create-config > ~/.cpan-makerrc
     export CPAN_MAKER_CONFIG=$HOME/.cpan-makerrc
 
     # Create a new plain Perl module project
-    cmb --module  My::New::Module
+    cmb --module My::New::Module
 
     # Create a CLI module project (inherits from CLI::Simple)
     cmb --module My::New::CLI --stub cli
@@ -105,9 +114,10 @@ CPAN::Maker::Bootstrapper - Scaffold a new CPAN distribution in one command
     cmb --module My::Module --stub /path/to/mystub.pm
 
     # Import files from another project
-    cmb --module My::Module \
-     -I /path/to/my-module/lib -I /path/to/my-module/bin \
-     --installdir /tmp/My-Module
+    mkdir My-Module
+    cd My-Module
+    cmb -I /path/to/my-module/lib -I /path/to/my-module/bin \
+     --installdir .
 
     # Install into a specific directory
     cmb --module My::Module --installdir ~/git/My-Module
@@ -116,34 +126,44 @@ CPAN::Maker::Bootstrapper - Scaffold a new CPAN distribution in one command
     cmb --module My::Module --username "Rob Lauer" --email rob@example.org
 
     # Run a code review on a module (set API key in environment)
-    export LLM_API_KEY=$(cat ~/.ssh/anthropic-api-key)
     cmb code-review lib/My/Module.pm    
 
 # DESCRIPTION
 
-[![CPAN::Maker::Bootstrapper](https://github.com/rlauer6/CPAN-Maker-Bootstrapper/actions/workflows/build.yml/badge.svg)](https://github.com/rlauer6/CPAN-Maker-Bootstrapper/actions/workflows/build.yml)
+`CPAN::Maker::Bootstrapper` provides a complete development framework
+for building, testing, maintaining, and releasing CPAN distributions.
 
-`CPAN::Maker::Bootstrapper` scaffolds a new Perl project that
-leverages [CPAN::Maker](https://metacpan.org/pod/CPAN%3A%3AMaker) to create a ready-built CPAN distribution. It
-installs a project Makefile, a `buildspec.yml` pre-populated and
-ready to feed to `CPAN::Maker`, optional stub source file and test
-file, and supporting makefile snippets that implement the bootstrapper
-framework. It then runs `make` to generate your distribution tarball.
+It can scaffold a new Perl project or import an existing one, installing
+a managed build framework that carries the project from source through
+testing, dependency management, distribution, and release.
 
-The result is a project that can produce a distributable tarball with
-a single `make` invocation. As you iterate on your application, new
-dependencies are discovered and added to the build system
-automatically.
+Core features include:
 
-`CPAN::Maker::Bootstrapper` also provides AI-assisted development
-tools via the Anthropic Claude API. These include iterative code
-review with structured finding annotations, POD documentation review,
-optional POD **generation**, and AI-generated release notes. See ["LLM
-Commands"](#llm-commands) and ["THE REVIEW WORKFLOW"](#the-review-workflow) for details.
+- Continuous dependency discovery and maintenance for runtime,
+test, recommended, and suggested dependencies
+- Syntax checking, perltidy, perlcritic, POD checking, and other
+build-time quality gates
+- Hermetic project-local dependency installation coupled with
+syntax checking of modules and scripts to expose undeclared
+dependencies
+- Extensible project-specific build logic through `project.mk`
+without modifying managed build files
+- Semantic versioning, release-note generation, CPAN publishing,
+and CI workflow support
+- DarkPAN dependency manifests for distributions that depend on
+modules published outside CPAN
+- Build-system update checks and managed-file drift detection,
+with support for upgrading and refreshing the framework
+- AI-assisted code review, POD review and generation, structured
+finding annotation, and release-note generation
+
+See ["LLM Commands"](#llm-commands) and ["THE REVIEW WORKFLOW"](#the-review-workflow) for details on the
+AI-assisted development tools.
 
 _NOTE: Check out the
 [release-notes](https://github.com/rlauer6/CPAN-Maker-Bootstrapper/tree/main/release-notes)
-directory in the GitHub project for examples of release notes generated by the LLM._
+directory in the GitHub project for examples of release notes generated by
+the LLM._
 
 # QUICK START
 
@@ -156,211 +176,385 @@ to set up a personal configuration file - it pre-populates your git
 identity, GitHub username, and preferred project directory so you never
 have to pass them on the command line. See ["CONFIGURATION"](#configuration) for details._
 
-Scaffold a new project:
+## Scaffolding a new project from the default stub
 
-    cmb --module My::Module --installdir ~/git/My-Module
+    cmb --module My::Module
 
-The bootstrapper creates the project directory, installs the build
-system, generates stub source and test files, and runs `make`
-automatically. By the time it finishes you already have a working
-distribution tarball in `~/git/My-Module`.
+or
 
-_By default the final build step applies full linting: syntax
+    # create a directory for the new CPAN distribution
+    mkdir My-Module
+
+    # cd into the directory
+    cd My-Module
+
+    # scaffold the project
+    cmb --installdir .
+
+The bootstrapper derives the primary module name from the directory
+name (`My::Module` in this example). It then installs the build
+system, generates the stub source and test files, and runs `make`
+automatically to create the first distribution tarball.
+
+By default the final build step applies full linting: syntax
 checking (`perl -wc`), perltidy conformance, and perlcritic at its
-default severity (5 - the most severe violations only). If your stub
-or imported source isn't tidy, has a severity-5 perlcritic violation,
-or fails to compile, the build - and therefore `install` - will fail.
-Disable these gates with environment variables if you want to
-bootstrap first and clean up after:_
+default severity (5 - the most severe violations only).
 
-    make LINT=off SYNTAX_CHECKING=off SKIP_TESTS=1
+## Bootstrapping an existing project
 
-_`LINT` disables perltidy and perlcritic; `SYNTAX_CHECKING`
-disables the `perl -wc` check -- both are interpreted by the build
-system installed by this module. `SKIP_TESTS` is interpreted by
-[CPAN::Maker](https://metacpan.org/pod/CPAN%3A%3AMaker) to skip running the test suite when building the
-distribution tarball._
+If you already have a Perl project, run `cmb` from the project root
+and import the current directory:
 
-**Have an existing project?**
+    cd Foo-Bar
+    cmb --import .
 
-    cmb -I lib -I bin --module Foo::Bar
+When exactly one import directory is supplied and neither `--module`
+nor `--installdir` determines the module name, the bootstrapper derives
+the primary module name from the import directory. In this example,
+`Foo-Bar` implies `Foo::Bar`.
 
-## Next Steps
+Use `--dry-run` first if you want to inspect the import plan without
+creating files or running the generated build:
 
-- Review the generated files
+    cmb --import . --dry-run
 
-    ...particularly `buildspec.yml` which controls how the distribution
-    is built as well as `requires` and `test-requires` which list your
-    module's dependencies. Your git identity is pre-populated from
-    `~/.gitconfig` but you may want to adjust the description or resource
-    URLs.
+You may also import from multiple directories and specify the primary
+module explicitly:
 
-    See [CPAN::Maker](https://metacpan.org/pod/CPAN%3A%3AMaker) for details regarding `buildspec.yml`.
+    cmb --module Foo::Bar 
+        --import lib 
+        --import bin 
+        --installdir /tmp/Foo-Bar
 
-- Edit the generated stub in `lib/My/Module.pm.in`.
+# NEXT STEPS
 
-    This is your primary source file - never edit the generated `.pm` file
-    directly as it will be overwritten on the next `make`.
+- Review the project source
 
-- Add More Modules and Scripts
+    For a newly scaffolded project, edit the generated source file:
 
-    As your project grows, add new modules to `lib/` and scripts to
-    `bin/` as `.pm.in` and `.pl.in` files respectively. The build
-    system discovers them automatically - no changes to the Makefile
-    required. Add new test files to `t/` as `.t` files.
+        lib/My/Module.pm.in
+
+    For an imported project, review the `.pm.in` and `.pl.in` files
+    created from the imported modules and scripts.
+
+    Files ending in `.in` are the editable project sources. The generated
+    `.pm` and `.pl` files are build artifacts and will be overwritten by
+    subsequent `make` invocations.
+
+- Review the framework's populated artifacts
+    - `buildspec.yml` - controls how the distribution is built
+
+        See [CPAN::Maker](https://metacpan.org/pod/CPAN%3A%3AMaker) for details regarding `buildspec.yml`.
+
+    - `requires` - found dependencies
+    - `test-requires` - test dependencies
+    - `recommends` - recommended dependencies
+    - `suggests` - optional dependencies
+- Manage the project version
+
+    The bootstrapper creates a `VERSION` file containing the semantic
+    version number for the project. New projects begin at `1.0.0`.
+
+    Use the version targets to increment it:
+
+        make release    # 1.0.0 -> 1.0.1
+        make minor      # 1.0.1 -> 1.1.0
+        make major      # 1.1.0 -> 2.0.0
+
+    If you imported the primary module rather than generating it from a
+    stub, make sure its version declaration uses the project version token:
+
+        our $VERSION = C<E<64>PACKAGE_VERSIONE<64>>;
+
+    When `make` generates the `.pm` file from its `.pm.in` source,
+    `@PACKAGE_VERSION@` is replaced with the value from
+    `VERSION`.
+
+- Add More Modules, Scripts, and Tests
+
+    As your project grows, add new modules beneath `lib/` as `.pm.in`
+    files and scripts beneath `bin/` as `.pl.in` files. The build system
+    discovers them automatically - no Makefile changes are required.
+
+    Distribution tests belong beneath `t/`.
+
+    Additional test suites may use the conventional extended-test
+    directories:
+
+        xt/author/
+        xt/release/
+        xt/smoke/
+
+    These suites can be run explicitly with `make test-author`,
+    `make test-release`, and `make test-smoke`, or together with
+    `make test-all`.
+
+- Add additional files to the distribution
+
+    Edit `buildspec.yml` to declare additional files that should be
+    included in the distribution.
+
+    Files may be added at the distribution root or installed beneath the
+    distribution's share directory.
+
+    For example:
+
+        extra-files:
+          - ChangeLog
+          - share:
+            - config/example.ini
+            - defaults.json
+
+    Use root-level entries for files that should be packaged but not
+    installed into the share directory.
+
+    Use the `share` section for files that should be installed as
+    distribution data.
+
+    See ["How do I include additional files in the distribution?"](#how-do-i-include-additional-files-in-the-distribution) for
+    more details.
 
 - Rebuild Your Distribution
 
-    When you are ready to build:
+    When you are ready to rebuild the project:
 
         make
 
-    This scans your source files for dependencies, regenerates `requires`
-    and `test-requires`, generates `README.md` from your POD, and
-    produces a distributable tarball.
+    The default build applies the project's dependency and quality gates,
+    regenerates derived source files and documentation as needed, and
+    produces the CPAN distribution tarball.
 
-- Verify Your Tarball Installs Cleanly
+    When dependency scanning is enabled, changed source files are scanned
+    and the dependency artifacts are updated only when their contents have
+    changed:
 
-    To verify your distribution installs cleanly:
+        requires
+        test-requires
+        recommends
+        suggests
+
+    The build also regenerates `README.md` when required and rebuilds only
+    those derived artifacts whose prerequisites have changed.
+
+    For a faster development build that skips dependency scanning and both
+    lint tools while retaining syntax checking, use:
+
+        make quick
+
+- Verify the Distribution Installs Cleanly
+
+    After building the distribution, install the generated tarball with
+    `cpanm` to verify that it can be consumed independently of the source
+    tree:
 
         cpanm --local-lib=$HOME My-Module-*.tar.gz
 
+    This exercises the packaged distribution and its declared
+    dependencies through the normal CPAN installation path rather than
+    through the project's development build environment.
+
 - Put Your Project Under Source Control
 
-    To initialize version control and make your first commit:
+    Initialize the repository and stage the project files recommended by
+    the build system:
 
         make git
 
-    Set `NO_COMMIT=1` if you don't want to commit yet.
+    By default, `make git` creates the initial commit after staging the
+    managed build files, project configuration, editable source files, and
+    other tracked project artifacts.
+
+    If you want to initialize and stage the project without creating the
+    commit yet, use:
 
         make git NO_COMMIT=1
 
 - Learn More About `CPAN::Maker::Bootstrapper`
 
-    See ["EXTENDING THE BUILD SYSTEM"](#extending-the-build-system) for customizing the build,
-    dependency management details. See ["FAQ"](#faq) for common
-    questions and recipes.
+    See ["EXTENDING THE BUILD SYSTEM"](#extending-the-build-system) for adding project-specific build
+    logic and customizing the managed build framework.
+
+    See ["Dependencies Management"](#dependencies-management) for details on dependency discovery,
+    classification, filtering, and generated dependency artifacts.
+
+    See ["FAQ"](#faq) for common questions and practical recipes.
 
 # WHY YOU SHOULD CONSIDER USING CPAN::Maker::Bootstrapper
 
-If you have ever reached for Jenkins, GitHub Actions, CircleCI, or a
-sprawling shell script to automate your Perl builds, consider what
-those tools actually require: a server or cloud account, a proprietary
-YAML DSL, plugin ecosystems with their own release cycles, containers,
-agents, and configuration files that only run in one specific
-environment.
+Many build systems place the build procedure inside the CI platform:
+workflow files describe the steps, the CI runner executes them, and a
+separate local workflow is needed to reproduce the same build.
 
-The `CPAN::Maker` build system runs everywhere Perl runs - your
-laptop, a remote EC2 instance, a colleague's workstation - with no
-setup beyond `cpanm CPAN::Maker::Bootstrapper`. `git clone && make`
-is always sufficient to build a fresh checkout.
+`CPAN::Maker::Bootstrapper` takes the opposite approach.
+
+The build belongs to the project.
+
+The same dependency graph, quality gates, generated artifacts, tests,
+and distribution rules run whether `make` is invoked on your laptop,
+on a remote host, inside `make build-ci`, or from GitHub Actions.
+
+CI is therefore a caller of the build system rather than the place
+where the build system lives.
+
+A fresh checkout remains directly buildable with:
+
+    git clone <repository>
+    cd <project>
+    make
+
+The CI layer can add isolation and automation, but it does not define a
+second build procedure that must be kept synchronized with local
+development.
 
 ## The Stack
 
-The build system is built on three tools that have been solving these
-problems correctly for decades:
+The build system is built on three tools with deliberately different
+responsibilities:
 
-- **GNU make** - dependency tracking, incremental builds, the
-target/prerequisite model is still the clearest expression of _build
-this from that_. A Makefile from 1990 still runs today.
-- **bash** - process orchestration, file manipulation,
-conditionals, the Unix toolkit. Available on every system you will
-ever deploy to.
-- **Perl** - text processing, CPAN ecosystem access, JSON, YAML,
-HTTP - anything complex enough to warrant a real language, right there
-in your build recipes without shelling out to another runtime.
+- **GNU make** - models causality.
 
-Together they give you a complete, auditable, version-controlled build
-system that is trivially debuggable with `make -n` and `bash -x`,
-self-documents via `make help`, and needs no external services to run.
+    Targets, prerequisites, timestamps, pattern rules, and order-only
+    dependencies describe what must be rebuilt and why. Make decides what
+    work is necessary.
+
+- **bash** - performs process orchestration.
+
+    Shell recipes connect command-line tools, manage files and temporary
+    state, and express the small imperative steps needed to carry out a
+    build action.
+
+- **Perl** - handles transformations that deserve a real
+programming language.
+
+    Dependency analysis, metadata generation, configuration processing,
+    distribution assembly, and other non-trivial transformations remain
+    readable and testable Perl rather than growing into increasingly
+    complex shell fragments.
+
+`CPAN::Maker::Bootstrapper` provides the conventions that connect
+those layers.
+
+GNU make owns the dependency graph, bash performs the orchestration,
+and Perl implements the complex transformations. The result is a
+build system that remains visible and auditable: `make -n` shows what
+would run, `bash -x` exposes shell execution, `make help` documents
+the available targets, and `project.mk` provides an upgrade-safe place
+for project-specific behavior.
 
 ## Best Practices Out of the Box
 
-The installed build system encourages professional Perl development
-habits from the start:
+The installed build system makes several professional development
+practices part of the project structure without forcing them on the
+developer on every build:
 
-- **Source files are clearly separated** - generated `.pm` and
-`.pl` files live alongside their `.pm.in` and `.pl.in` sources.
-The build system always regenerates the `.pm` from the `.pm.in` on
-change, making it clear which file you own. Never edit the generated
-file directly - your changes will be overwritten on the next `make`.
-- **Dependencies are tracked automatically** - `scandeps-static.pl`
-scans your source files on every build, keeping `requires` and
-`test-requires` current. You stay in control via pinning, sticky
-entries, and skip lists.
-- **Quality gates are built in** - `perl -wc` syntax checking,
-`perltidy`, and `perlcritic`, `podchecker` run automatically on
-every build, stopping bad code before it enters the
-distribution. Gates can be selectively disabled via your configuration
-file or on the command line (`make LINT=off`) when you need a faster
-build during development.
-- **The build system upgrades itself** - `make update` refreshes
-managed build files from the installed bootstrapper; `make upgrade`
-checks MetaCPAN and upgrades the bootstrapper itself.
-- **Extension without modification** - `project.mk` is your
-upgrade-safe extension point. Add custom targets, inter-module
-dependencies, and project-specific variables there. The managed
-`Makefile` is never modified directly.
+- **Editable source and generated artifacts are distinct** -
+`.pm.in` and `.pl.in` files are the project sources; the corresponding
+`.pm` and `.pl` files are generated artifacts. Changes belong in the
+`.in` files and are propagated by `make`.
+- **Dependencies are derived from the source** -
+`scandeps-static.pl` maintains `requires`, `test-requires`,
+`recommends`, and `suggests` as the source changes. Pinning, sticky
+entries, and skip lists allow the generated dependency model to be
+adjusted when necessary.
+- **Quality checks are part of the dependency graph** -
+syntax checking, `perltidy`, `perlcritic`, and POD validation are
+build gates rather than separate release-time procedures. The gates
+remain independently controllable when a project needs different
+development or runtime behavior.
+- **Managed build policy remains upgradeable** -
+`make update` refreshes the build framework installed beneath
+`.includes/`, while `make upgrade` checks for and installs newer
+versions of `CPAN::Maker::Bootstrapper`.
+- **Project-specific behavior stays outside managed files** -
+`project.mk` is the upgrade-safe extension point for custom targets,
+additional dependencies, lifecycle hooks, and project-specific
+variables. Projects extend the framework without modifying the files
+maintained by the bootstrapper.
 
 ## Perl Quality Tools
 
-The build system supports optional Perl quality gates controlled via
-your configuration file. Set the following keys in the `[cpan-maker]`
-section:
+The build system supports syntax checking, perltidy, and perlcritic as
+build-time quality gates.
 
-    syntax-checking = on          # enables perl -wc on generated files
-    perltidyrc = ~/.perltidyrc    # enables perltidy stage gate
-    perlcriticrc = ~/.perlcriticrc # enables perlcritic stage gate
+Syntax checking is controlled independently with `SYNTAX_CHECKING`:
 
-These can be overridden per-run from the command line:
+    make SYNTAX_CHECKING=OFF
 
-    make SYNTAX_CHECKING=off      # disable syntax checking
-    make PERLTIDYRC=""            # disable tidy gate
-    make PERLCRITICRC=""          # disable critic gate
+Perltidy and perlcritic are controlled by `LINT`, which acts as the
+master switch for both tools:
 
-Add modules that cannot be syntax-checked outside their runtime
-environment to `PERLWC_SKIP` in `project.mk`:
+    make LINT=OFF
+
+The tools may also be disabled individually:
+
+    make PERLTIDY=""
+    make PERLCRITIC=""
+
+This allows one linting tool to remain enabled while the other is
+disabled.
+
+`PERLTIDYRC` and `PERLCRITICRC` configure the corresponding tools;
+they do not enable or disable them.
+
+For example:
+
+    make PERLTIDYRC=.perltidyrc
+    make PERLCRITICRC=.perlcriticrc
+
+If no profile is specified, the corresponding tool uses its default
+configuration.
+
+If a profile variable names a file that does not exist, the operation
+fails.
+
+Modules or scripts that cannot be syntax-checked outside their runtime
+environment may be added to `PERLWC_SKIP` in `project.mk`:
 
     PERLWC_SKIP = bin/startup.pl
 
-Add inter-module build dependencies to `project.mk` when modules
-depend on each other at build time:
+Inter-module build dependencies may also be declared explicitly in
+`project.mk` when they cannot be inferred automatically:
 
     lib/Foo/Bar.pm: lib/Foo.pm
 
-To disable all linting at once:
+`make quick` provides a fast development build that disables
+distribution dependency scanning and both lint tools while leaving
+syntax checking enabled:
 
-    make LINT=off
+    make quick
 
-Or use `make quick` to disable both scanning and linting in one step.
+This is equivalent to:
+
+    make SCAN=OFF LINT=OFF
 
 ## A GNU Make Tutorial in Disguise
 
-The `.includes/` directory is also a practical demonstration of
-advanced GNU make techniques that most developers never encounter -
-working, production-tested examples you can learn from and adapt:
+Because the build system is implemented with ordinary GNU make, the
+managed files beneath `.includes/` are also working examples of the
+techniques used to model a non-trivial build.
+
+They include:
 
 - Pattern rules and sentinel files for incremental quality gates
-- `define`/`endef` snippets - reusable shell and Perl code
-blocks exported as make variables, eliminating duplication across
-recipes
+- `define`/`endef` blocks for reusable shell and Perl fragments
 - `$(shell ...)`, `$(eval ...)`, `$(call ...)`,
-`$(filter-out ...)`, `$(addprefix ...)`, `$(patsubst ...)` - the
-full make function toolkit in real use
-- `?=`, `:=`, `+=`, and `=` - all four assignment operators
-with their distinct evaluation semantics put to work
+`$(filter-out ...)`, `$(addprefix ...)`, and `$(patsubst ...)` for
+deriving and transforming build state
+- `?=`, `:=`, `+=`, and `=` with their distinct evaluation
+semantics
 - Order-only prerequisites, `.DEFAULT_GOAL`, `-include`, and
-`.SHELLFLAGS := -ec` - advanced directives that tame complex builds
-- Trap-based temp file cleanup, `mktemp`, and bash `[[ ]]`>
-conditionals inside make recipes
-- Perl snippets exported into make via `$(value ...)` and
-`export` - leveraging Perl's text processing power directly in the
-build
+`.SHELLFLAGS := -ec`
+- `mktemp`, shell traps, and bash conditionals inside recipes
+- Perl programs embedded in make variables when a transformation
+is better expressed in Perl than in shell
 
-If GNU make is the cast-iron pan of build tools - virtually
-indestructible, infinitely useful, and unfairly overlooked in favor of
-shinier alternatives - then `CPAN::Maker::Bootstrapper` is the recipe
-book that shows you what it can really do.
+The build system is deliberately transparent to not only reveal _how
+the sausage is made_ but to expose these techniques to the developer
+so you can incorporate them in your recipes. However, the build sysetm
+framework itself is read-only to discourage you from tampering with a
+complex set of recipes that have been carefully crafted and can easily
+be broken. Your extension point remains the `project.mk` file and the
+double-colon targets.
 
 # IMPORTING FILES
 
@@ -393,12 +587,25 @@ order:
 
 - 3. Installation directory
 
-    If the module name is still unknown, the bootstrapper derives it from
-    the installation directory name. Hyphens are converted to `::`, so a
-    directory named `Foo-Bar` implies `Foo::Bar`.
+    If the module name is still unknown and `--installdir` was supplied,
+    the bootstrapper derives the module name from the installation directory
+    name.
 
-    When `--installdir` is not supplied, the current project directory is
-    used by the normal installation-directory logic.
+- 4. Single import directory
+
+    If the module name is still unknown and exactly one `--import` path was
+    supplied, the bootstrapper derives the module name from the basename of
+    that directory.
+
+    For example:
+
+        cd Foo-Bar
+        cmb --import .
+
+    infers `Foo::Bar`.
+
+When deriving a module name from a directory name, hyphens are converted
+to `::`, so `Foo-Bar` implies `Foo::Bar`.
 
 The resulting name must be a valid Perl module name.
 
@@ -409,48 +616,234 @@ supplied with `--import`.
 
 ## What Gets Imported
 
-The importer recursively scans the path provided by `--import` and
-brings in the following file types:
+When importing an existing project, the bootstrapper scans each
+`--import` directory and builds an explicit import plan.
 
-- `.pm` files - copied to `lib/` as `.pm.in` source files,
-preserving the directory structure implied by the package name
-- `.pl` files - copied to `bin/` as `.pl.in` source files
-- `.t` files - copied to `t/`
-- Executable files - copied to `bin/` as `.in` files.
+The following files are recognized:
 
-    _Note: Executable files are imported with their execute permission
-    removed. The build system sets permissions appropriately when
-    generating the final files from the `.in` sources._
+- Perl modules
 
-All imported files receive the `.in` extension because they become
-source inputs to the build system. The build generates the final
-`.pm`, `.pl`, and script files from these sources, substituting
-version tokens and running syntax checks along the way.
+    Files ending in `.pm` are imported as distribution modules and placed
+    beneath `lib/`.
 
-## Module Name Requirement
+    For example:
 
-When using `--import` you must also specify `--module` with the
-primary module name of the distribution. The importer cannot infer
-the module name from the imported files alone:
+        lib/Foo/Bar.pm
 
-    cmb --module My::Script --import /path/to/source --installdir .
+    becomes:
 
-## The Build After Import
+        lib/Foo/Bar.pm.in
 
-After creating the project source tree the importer runs `make`
-with linting disabled but syntax checking and dependency scanning
-enabled:
+    The package declared by the module determines its destination beneath
+    `lib/`.
 
-    make LINT=off SYNTAX_CHECKING=on SCAN=on
+- Perl scripts
 
-This serves two purposes - it validates that the imported files are
-syntactically correct Perl, and it runs `scandeps-static.pl` against
-the source to seed the `requires` and `test-requires` dependency
-files.
+    Files ending in `.pl` are imported beneath `bin/` and converted to
+    generated source files ending in `.in`.
 
-The build will attempt to produce a distribution tarball. If the
-build fails, `make.log` and `make.err` are written to your current
-working directory for diagnosis.
+- Executable files
+
+    Executable files not otherwise classified are imported beneath `bin/`
+    and converted to generated source files ending in `.in`.
+
+- Test files and test helpers
+
+    Files beneath the following recognized test directories are preserved in
+    place:
+
+        t/
+        xt/author/
+        xt/release/
+        xt/smoke/
+
+    Within those directories, files with the following extensions are
+    treated as test material:
+
+        .pm
+        .pl
+        .t
+        .sh
+        .dat
+
+    The directory takes precedence over the file extension. For example:
+
+        t/lib/TestHelper.pm
+
+    remains:
+
+        t/lib/TestHelper.pm
+
+    and is not imported as:
+
+        lib/TestHelper.pm.in
+
+    Likewise:
+
+        xt/author/check.pl
+
+    remains beneath `xt/author/`.
+
+- Change logs
+
+    The following root-level change log files are preserved when present:
+
+        ChangeLog
+        CHANGELOG
+        Changes
+        CHANGES
+
+    Their original names are retained.
+
+Files not matching one of the recognized categories are not imported.
+
+## Excluding Import Paths
+
+Use `--exclude` to omit directories beneath an import root.
+
+The option may be supplied more than once:
+
+    cmb --import . 
+        --exclude local 
+        --exclude Foo-Bar-1.2.3
+
+Each exclusion is interpreted relative to the import root and excludes
+that directory and everything beneath it.
+
+For example:
+
+    --exclude local
+
+excludes:
+
+    local/
+    local/lib/
+    local/bin/
+
+but does not exclude an unrelated directory with the same name outside
+the import root.
+
+The following source-control directories are always excluded and do not
+need to be specified explicitly:
+
+    .git
+    .hg
+    .svn
+
+These directories are pruned wherever they occur beneath an import
+root.
+
+## Previewing an Import
+
+Use `--dry-run` to inspect the import plan without modifying the
+filesystem or running the generated build.
+
+For example:
+
+    cmb --import . 
+        --exclude local 
+        --dry-run
+
+The bootstrapper scans the import directories, applies exclusions,
+classifies the recognized files, determines their destinations, and
+prints the resulting import plan.
+
+No installation directory is created, no files are copied, and `make`
+is not run.
+
+This is useful when importing an existing project because it allows the
+proposed mapping to be reviewed before any project files are generated.
+
+## Creating a Project Tarball
+
+Use `--project-tarball` to create an archive containing the complete
+generated CPAN::Maker::Bootstrapper project instead of installing that
+project into a directory.
+
+For example:
+
+    cmb --import . 
+        --exclude local 
+        --project-tarball
+
+The bootstrapper performs the normal import and build process in a
+temporary working directory and then writes a project archive to the
+directory from which `cmb` was invoked.
+
+For a module named `Foo::Bar`, the resulting archive is named:
+
+    Foo-Bar-cmb.tar.gz
+
+The archive contains a top-level project directory:
+
+    Foo-Bar/
+
+and includes the generated CPAN::Maker::Bootstrapper project, including
+the Makefile, build configuration, imported source files, test files,
+build support files, logs, and the generated CPAN distribution tarball.
+
+This is different from the CPAN distribution tarball produced by the
+build. The CPAN distribution contains the files intended for release to
+CPAN; the project tarball contains the complete CPAN::Maker::Bootstrapper
+development project used to build that distribution.
+
+The temporary dependency installation directory used during the import
+build is not included in the project archive.
+
+## Import Destination Safety
+
+When importing an existing project into a directory, the bootstrapper
+refuses to create the generated project inside one of the directories
+being imported.
+
+For example, this is not allowed:
+
+    cmb --import . --installdir ./converted
+
+when `converted/` would be created beneath the import root.
+
+The bootstrapper also refuses to use the import root itself as the
+installation directory.
+
+These checks prevent the generated project from becoming part of the
+source tree while that source tree is being scanned and imported.
+
+`--force` does not override this safety check.
+
+The check applies only when installing the generated project into a
+directory. `--project-tarball` does not create an installation
+directory and therefore does not require this restriction.
+
+## Import Build Policy
+
+After constructing the imported project, the bootstrapper runs the
+generated build to verify that the project can be built successfully.
+
+The import build uses the following defaults:
+
+    SCAN=on
+    SYNTAX_CHECKING=on
+    LINT=off
+
+Dependency scanning and syntax validation therefore remain enabled
+during import.
+
+Linting is disabled by default because importing an existing project
+should not require that project to satisfy the bootstrapper's
+perltidy or perlcritic policy before it can be converted.
+
+These defaults may be overridden through the corresponding environment
+variables.
+
+For example:
+
+    LINT=on cmb --import .
+
+enables linting during the import build.
+
+This setting applies only to the bootstrap import build. The generated
+project retains its normal build configuration and may enable linting
+for subsequent `make` invocations.
 
 ## Next Steps After a Successful Import
 
@@ -474,36 +867,42 @@ module name, author, and resource links are correct
             - my-app.json <= installs my-app.json from the root of your project into the distribution's share directory
 
 - 3. Initialize a git repository with `make git`
-- 4. Run `make tidy` if you have `perltidy` installed
+- 4. Run `make tidy` if you want to format the imported source
+
+        make tidy
+
+    Perltidy uses `PERLTIDYRC` when configured and otherwise uses its
+    default configuration.
+
 - 5. Run `make` to produce the final distribution tarball
 
-    By default the recipes in the `Makefile` will perform the following
-    actions:
+    By default the generated build performs syntax checking, dependency
+    scanning, perltidy, and perlcritic.
 
-    - Perform a syntax check (`perl -wc -I lib $@`) on your source files
-    - Scan your source for dependencies
+    Dependency scanning may be disabled with:
 
-        To turn this off:
+        make SCAN=OFF
 
-            make SCAN=off
+    Perltidy may be disabled independently with:
 
-    - Run `perltidy` on your source files
+        make PERLTIDY=""
 
-        To turn this off:
+    Perlcritic may be disabled independently with:
 
-            make PERLTIDYRC=""
-            make LINT=off
+        make PERLCRITIC=""
 
-    - Run `perlcritic` on your source files
+    Both lint tools may be disabled together with:
 
-            make PERLCRITICRC=""
-            make LINT=off
+        make LINT=OFF
 
-    To turn off everything except syntax checking:
+    To disable dependency scanning and both lint tools while retaining
+    syntax checking, use:
 
         make quick
 
-- 6. Test installation: `cpanm -n -v ./My-Script-1.0.0.tar.gz`
+- 6. Test installation
+
+        cpanm -n -v ./My-Script-1.0.0.tar.gz
 
 ## Limitations
 
@@ -513,22 +912,26 @@ exclusive ways to create the initial source
 to determine where to place them under `lib/`. If the importer cannot
 match the filename with a package declaration inside the file, it will
 warn and skip that file
-- Imported files are not tidied automatically. If you have
-`perltidy` installed, run `make tidy` after import to bring the
-imported code into conformance with your `.perltidyrc` before
-committing
-- If your imported modules have dependencies on each other, the
-syntax check phase of the build may fail because Make processes files
-independently and cannot guarantee build order. Add a `project.mk`
-to declare inter-module dependencies:
+- Imported files are not tidied automatically.
+
+    Run `make tidy` after import if you want to format the imported source.
+
+    If `PERLTIDYRC` is configured, that profile is used. Otherwise
+    perltidy runs with its default configuration.
+
+- Inter-module dependencies are normally detected automatically.
+The build generates `deps.mk` from dependencies between modules in the
+distribution so prerequisite modules are built before syntax checking
+modules that depend on them.
+
+    If a dependency cannot be inferred automatically, declare it explicitly
+    in `project.mk`:
 
         lib/My/Script.pm: \
           lib/My/Script/Role/Frobnicate.pm \
           lib/My/Script/Role/List.pm
 
-    Make will then build your dependencies before attempting to syntax-check
-    the main module. See ["EXTENDING THE BUILD SYSTEM"](#extending-the-build-system) for details on
-    `project.mk`.
+    See ["Inter-module dependencies"](#inter-module-dependencies) for details.
 
 ## Importing a CLI::Simple Scaffold Tarball
 
@@ -547,10 +950,9 @@ scaffold tarballs.
 
 # CONFIGURATION
 
-`cmb` can read your global `.gitconfig` file or
-a properly formatted `.ini` file to populate some of the options used
-when creating a distribution and using the AI commands. If you have a
-GitHub user account add your username:
+`cmb` can read configuration from your global `.gitconfig` or from
+a separate `.ini` file. Configuration values are used when
+scaffolding distributions and by the AI-assisted commands.
 
     git config --global user.github <your-username>
 
@@ -559,8 +961,13 @@ option:
 
     git config --global cpan-maker.basedir $HOME/git
 
-If you want to create a different configuration file it should have at
-least the following entries:
+When `--installdir` is not supplied, the bootstrapper uses `basedir`
+from the configuration when one is defined. Otherwise, it uses the
+current working directory as the base directory for the new project.
+
+An explicit `--installdir` always takes precedence.
+
+A separate configuration file may contain entries such as:
 
     [user]
            email = your-email@somedomain
@@ -589,8 +996,9 @@ least the following entries:
     See [CPAN::Maker::ConfigReader](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3AConfigReader) for a complete description of the
     configuration file.
 
-- Use the `--config` option to use your custom config.
-- Use `create-config` to generate a starter configuration file:
+    Use the `--config` option to use your custom config.
+
+    You can generate a starter configuration with:
 
         cmb create-config > ~/.cpan-makerrc
 
@@ -609,7 +1017,7 @@ least the following entries:
     The key is removed from environment so it is not inherited by child
     processes such as 'make'. This does not protect against memory
     inspection of the current process - see [LLM::API](https://metacpan.org/pod/LLM%3A%3AAPI) for how the key is
-    actuall stored using a closure to prevent accidental serialization
+    actually stored using a closure to prevent accidental serialization
     via Dumper.
 
     Avoid passing the key on the command line where it might be saved in
@@ -624,45 +1032,46 @@ least the following entries:
 
 - SCAN
 
-    Controls whether dependency scanning is performed during `make`. Set
-    to OFF or off to disable scanning. Default is ON.
+    Controls dependency scanning during `make`. Set to `OFF` to disable
+    distribution dependency scanning. The default is `ON`.
 
 # INSTALLED PROJECT FILES
 
 The following files are installed into the project directory:
 
-- `Makefile` - the complete build system. Derives all paths and
-names from `MODULE_NAME` or your stub file's package name. See ["THE
-PROJECT MAKEFILE"](#the-project-makefile).
+- `Makefile` - the complete build system. Derives project paths
+and names from `MODULE_NAME`, the package name in a custom stub, or
+the project directory name. See ["THE PROJECT MAKEFILE"](#the-project-makefile).
 - `buildspec.yml` - generated from the template, pre-populated
 with your module name, git identity, GitHub username, and project URLs.
 - `lib/<Module/Path>.pm.in` - stub module, populated from
-either `class-module.pm.tmpl` (default) or `cli-module.pm.tmpl` (when
-`--stub cli` option is used). Contains package declaration, `$VERSION`,
-and a POD skeleton with your name and email from git config.
+either `class-module.pm.tmpl` or `cli-module.pm.tmpl` when
+`--stub cli` is used.
 
-    _Note: All source files in `lib/` and `bin/` use the `.pm.in` / `.pl.in`
-    convention. These are the files you edit. The `.pm` and `.pl` files are
-    derived from them by the pattern rules in the Makefile, which substitute
-    `@PACKAGE_VERSION@` with the current value of `VERSION`. Never edit the
-    generated `.pm` or `.pl` files directly - your changes will be
-    overwritten the next time `make` runs!_
+    _Note: Files under `lib/` and `bin/` use `.pm.in` and `.pl.in`
+    as editable sources. The generated `.pm` and `.pl` files are derived
+    from them by the Makefile and will be overwritten by subsequent
+    builds._
 
 - `t/00-<project-name>.t` - minimal smoke test that calls
 `use_ok` on your module.
 - `.includes/` - the managed build system directory. Contains
 all `.mk` files installed and maintained by the bootstrapper. These
 files are write-protected and should never be edited directly. Updated
-by `make update`.
+with `make update`.
 
-        .includes/perl.mk          - pattern rules, syntax checking, tidy, critic
-        .includes/git.mk           - make git target
-        .includes/help.mk          - make help target
-        .includes/publish.mk       - publish to CPAN
-        .includes/release-notes.mk - make release-notes target
-        .includes/update.mk        - make update target
-        .includes/upgrade.mk       - make upgrade/check-upgrade targets
-        .includes/version.mk       - make release/minor/major targets
+        .includes/bootstrap.mk       - used internally by the bootstrapper
+        .includes/bash-completion.mk - make bash-completion target
+        .includes/modulino.mk        - make modulino target
+        .includes/git.mk             - make git target
+        .includes/help.mk            - make help target
+        .includes/local.mk           - vendors dependencies for syntax checking
+        .includes/perl.mk            - pattern rules, syntax checking, tidy, critic
+        .includes/publish.mk         - publish to CPAN
+        .includes/release-notes.mk   - make release-notes target
+        .includes/update.mk          - make update target
+        .includes/upgrade.mk         - make upgrade/check-upgrade targets
+        .includes/version.mk         - make release/minor/major targets
 
 - `project.mk` - your extension point for custom make rules,
 inter-module dependencies, and project-specific variables. Never
@@ -673,15 +1082,18 @@ generate bash wrapper scripts for modulino-style modules.
 `major.minor.patch` format. Managed by `make release`, `make minor`,
 and `make major`.
 - `ChangeLog` - empty placeholder, required by the distribution.
-- .prompts/
+- `.prompts/`
 
-    The first time you attempt to run `pod-review` or `code-review` the
-    script will populate this directory with the default prompts.
+    The directory is created automatically the first time `pod-review`
+    or `code-review` needs the default prompt files.
 
 # THE PROJECT MAKEFILE
 
-The installed Makefile is self-configuring. It can derive everything
-from `MODULE_NAME` or the package name inside a custom stub file.
+The installed Makefile is self-configuring. It can derive the primary
+module from `MODULE_NAME`, the package name inside a custom stub, or
+the project directory name.
+
+For example, a primary module of `My::New::Module` produces:
 
     MODULE_PATH  - lib/My/New/Module.pm (from MODULE_NAME)
     PROJECT_NAME - My-New-Module (from MODULE_NAME)
@@ -694,8 +1106,9 @@ Key Makefile targets:
 
 - `make` / `make all`
 
-    Builds the distribution tarball. Generates `requires`,
-    `test-requires`, and `README.md` as prerequisites.
+    Builds the distribution tarball. When dependency scanning is enabled,
+    updates `requires`, `test-requires`, `recommends`, and `suggests`,
+    and generates `README.md` as prerequisites.
 
 - `make bash-completion`
 
@@ -724,22 +1137,29 @@ Key Makefile targets:
     Scans source files with `scandeps-static.pl` and writes the dependency
     files specified in the `buildspec.yml` file used by `make-cpan-dist.pl`.
 
-    _Note: By default, any change to your `.pm.in` files will trigger a
-    rescan of your modules for new dependencies. This will add a
-    significant delay when you have many modules and a large number of
-    dependencies. You can avoid the scan by setting the environment
-    variable `SCAN` to any value other than `ON` (case insensitive)._
+    Any change to your `.pm.in` files will trigger a rescan of your
+    modules for new dependencies. This can add a significant delay when
+    you have many modules and a large number of dependencies. You can
+    avoid the scan if you know that no new dependencies have been added by
+    setting the environment variable `SCAN` to `OFF` (case insensitive).
 
         make SCAN=OFF
+
+    You can make scanning deliberate by adding `SCAN=OFF` to your
+    `config.mk` file. Then, to rescan:
+
+        make SCAN=ON
 
 - `make recommends` / `make suggests`
 
     Companion targets to `make requires`. The dependency scanner classifies
     each discovered module into one of three tiers: hard `requires`,
     `recommends` (soft, non-eval conditional dependencies), and `suggests`
-    (eval-wrapped, optional dependencies). These populate the corresponding
-    sections of the generated `Makefile.PL`. Each is regenerated when a
-    source file changes; see ["Dependencies Management"](#dependencies-management).
+    (eval-wrapped, optional dependencies).
+
+    These files are consumed by [CPAN::Maker](https://metacpan.org/pod/CPAN%3A%3AMaker) when it generates the
+    distribution metadata, including the corresponding dependency sections
+    in `Makefile.PL`. See ["Dependencies Management"](#dependencies-management).
 
 - `DARKPAN_REQUIRES`
 
@@ -770,6 +1190,11 @@ Key Makefile targets:
 
         cpanfile.darkpan
         cpanm.darkpan
+
+    When `DARKPAN_REQUIRES` is enabled, `cpanfile.darkpan` and `cpanm.darkpan`
+    are added to `buildspec.yml` as extra files and are therefore included
+    in the distribution. They are expected to be tracked by git unless the
+    developer explicitly adds them to `extra-files.skip`.
 
     For each module listed in `requires`, the build checks whether the module
     is available from the configured DarkPAN. Modules found there are added to
@@ -821,10 +1246,10 @@ Key Makefile targets:
 
 - `make clean`
 
-    Removes generated files. Does not affect `buildspec.yml`, `VERSION`,
-    or any `*.in` source files.
+    Removes build artifacts registered for cleaning. Does not affect
+    `buildspec.yml`, `VERSION`, or any `*.in` source files.
 
-    If your project needs to add a project specific clean recipe, use the
+    If your project needs a project-specific clean recipe, use the
     `clean-local` target with a double-colon.
 
         clean-local::
@@ -834,42 +1259,131 @@ Key Makefile targets:
 
     Runs the project's distribution unit tests under `t/`:
 
-        prove -I lib -v t/
+        prove -I lib -I local/lib/perl5 -v t/
 
-    Projects may also have tests that exercise development infrastructure,
+    `make test` also runs any project-specific `test-local::` recipes
+    defined in `project.mk`.
+
+    Projects may have tests that exercise development infrastructure,
     external services, generated artifacts, or other behavior that should
-    not be included in the CPAN distribution. These tests should remain
-    outside `t/` and can be run by defining `test-local::` in
-    `project.mk`:
-
-        test-local::
-            prove -I lib -v xt/
-
-    or:
+    not be included in the CPAN distribution. These can be added through
+    the `test-local::` extension point:
 
         test-local::
             ./bin/test-integration
 
-    `make test` runs both the distribution tests under `t/` and any
-    project-specific `test-local::` recipes.
-
     The double-colon form allows `project.mk` to extend the managed
     `test-local` target without replacing it.
 
+    `make test` also recognizes the conventional extended-test
+    directories `xt/author/`, `xt/release/`, and `xt/smoke/`. These
+    test suites are not run by default, but may be enabled through the
+    corresponding environment or make variables:
+
+        AUTHOR_TESTING=1 make test
+        RELEASE_TESTING=1 make test
+        AUTOMATED_TESTING=1 make test
+
+    When enabled, `make test` invokes the corresponding test target after
+    the normal `t/` test suite and `test-local::` recipes have completed.
+
+- `make test-author`
+
+    Runs tests under `xt/author/`:
+
+        prove -I lib -I local/lib/perl5 -r xt/author
+
+    The `xt/author/` directory is created automatically if it does not
+    already exist.
+
+    This target uses a double-colon rule and may therefore be extended in
+    `project.mk` without replacing the managed target:
+
+        test-author::
+            ./bin/check-generated-docs
+
+- `make test-release`
+
+    Runs tests under `xt/release/`:
+
+        prove -I lib -I local/lib/perl5 -r xt/release
+
+    The `xt/release/` directory is created automatically if it does not
+    already exist.
+
+    The target may be extended in `project.mk` using `test-release::`.
+
+- `make test-smoke`
+
+    Runs tests under `xt/smoke/`:
+
+        prove -I lib -I local/lib/perl5 -r xt/smoke
+
+    The `xt/smoke/` directory is created automatically if it does not
+    already exist.
+
+    The target may be extended in `project.mk` using `test-smoke::`.
+
+- `make test-all`
+
+    Runs the complete test suite: distribution tests under `t/`, any
+    project-specific `test-local::` recipes, and the author, release, and
+    smoke test suites.
+
+    It is equivalent to running:
+
+        make test AUTHOR_TESTING=1 RELEASE_TESTING=1 AUTOMATED_TESTING=1
+
+    The extended test directories follow established Perl distribution
+    conventions. `CPAN::Maker::Bootstrapper` preserves those conventions
+    rather than requiring imported or existing projects to reorganize
+    their tests.
+
 - `make tidy`
 
-    Runs `perltidy` on all `.pm.in` and `.pl.in` source files using
-    the profile specified by `perltidyrc` in your config. Requires
-    `perltidyrc` to be set.
+    Runs `perltidy` on all `.pm.in` and `.pl.in` source files.
+
+    If `PERLTIDYRC` is set, the named profile is used:
+
+        make tidy PERLTIDYRC=.perltidyrc
+
+    If `PERLTIDYRC` is not set, perltidy runs using its default
+    configuration.
+
+    If `PERLTIDYRC` names a file that does not exist, the target fails.
+
+    The target also performs syntax checking before modifying the source
+    files.
 
 - `make critic`
 
-    Runs `perlcritic` on all source files using the profile specified by
-    `perlcriticrc` in your config. Requires `perlcriticrc` to be set.
+    Runs `perlcritic` on the project's Perl source files.
+
+    If `PERLCRITICRC` is set, the named profile is used:
+
+        make critic PERLCRITICRC=.perlcriticrc
+
+    If `PERLCRITICRC` is not set, perlcritic runs using its default
+    configuration.
+
+    If `PERLCRITICRC` names a file that does not exist, the target fails.
+
+    The target also honors:
+
+        PERLCRITIC_THEME
+        PERLCRITIC_SEVERITY
+
+    and performs syntax checking before running perlcritic.
 
 - `make lint`
 
-    Runs both `make tidy` and `make critic`.
+    Runs both linting targets:
+
+        make tidy
+        make critic
+
+    The perltidy and perlcritic configuration variables described above
+    apply to their respective targets.
 
 - `make git`
 
@@ -878,34 +1392,38 @@ Key Makefile targets:
 
 - `make quick`
 
-    Builds the distribution tarball with dependency scanning and all
-    linting disabled. Useful during active development when you want fast
-    iterative builds without waiting for `scandeps-static.pl` or quality
-    gates.
+    Builds the distribution tarball with distribution dependency scanning
+    and perltidy/perlcritic disabled. Syntax checking remains enabled.
+
+    Useful during active development when you want fast iterative builds
+    without updating `requires`, `test-requires`, `recommends`, or
+    `suggests`.
 
         make quick
 
     Equivalent to:
 
-        make SCAN=off LINT=off
+        make SCAN=OFF LINT=OFF
 
 - `make workflow`
 
-    Installs a CI build script (`builder`) and a GitHub Actions workflow
-    (`.github/workflows/build.yml`) into your project, templated with
-    your module and project name. Also merges any build-only dependencies
+    Installs a CI build script (`builder`), its default environment file
+    (`builder.env`), and a GitHub Actions workflow
+    (`.github/workflows/build.yml`) into your project, templated with your
+    module and project name. Also merges any build-only dependencies
     `builder` needs into `build-requires`.
 
         make workflow
-        git add build-requires builder .github/workflows/build.yml
+        git add build-requires builder builder.env .github/workflows/build.yml
 
     Commit these files - GitHub Actions will then run `./builder` on
     every push to `main` or `dev`. See ["Continuous Integration"](#continuous-integration) for
-    what `builder` does and how to run it outside of GitHub Actions.
+    what `builder` does, how to customize its environment and build
+    lifecycle, and how to run it outside of GitHub Actions.
 
 - `make build-ci`
 
-    Runs `builder` locally inside Docker, against your current branch,
+    Runs `builder` locally inside Docker, against your current working tree,
     to reproduce a CI build without pushing. Requires `docker` and a
     `builder` script (run `make workflow` first if you don't have one).
 
@@ -934,7 +1452,7 @@ edit the `buildspec.yml` file.
     - ChangeLog
     - README.md
 
-If you want a different `README.md` generated create a
+If you want to generate `README.md` from a custom source, create a
 `README.md.in` file. That file will be filtered through
 `md-utils.pl` (from [Markdown::Render](https://metacpan.org/pod/Markdown%3A%3ARender)) to produce a `.md` file.
 
@@ -942,7 +1460,7 @@ If you want a different `README.md` generated create a
 
 - install (default)
 
-    Scaffolds a new project. This is the default command so:
+    Scaffolds a new project. This is the default command, so:
 
         cmb -m My::Module
 
@@ -976,14 +1494,26 @@ If you want a different `README.md` generated create a
     Makefile for `requires`, `recommends`, `suggests`, and
     `test-requires`.
 
+- dist-file
+
+        cmb dist-file distribution-name filename
+
+    Copies a distribution file to STDOUT. Searches the root and `share/`
+    directories of the distribution for file. Throws and exception if
+    either the file is not found or the distribution is invalid.
+
+    Example:
+
+        cmb dist-file CPAN-Maker-Bootstrapper builder.env
+
 - extra-files
 
         cmb extra-files path file1 file2 ...
 
-    Add files to be installed with the distribution. Use '.' for path if
-    the file is to be installed in the root of the distribution tarball
-    but not in the share directory. Use 'share' if the file is to be
-    installed into the distribution share directory.
+    Adds files to the distribution. Use `.` for files that should appear
+    at the root of the distribution tarball but not be installed into the
+    share directory. Use `share` for files that should be installed into
+    the distribution share directory.
 
     _NOTE: file should be the relative path within the project that points to the file._
 
@@ -1038,6 +1568,10 @@ If you want a different `README.md` generated create a
 
     When invoked through the generated Makefile, `darkpan.skip` is used
     automatically when it exists.
+
+    The presence of `darkpan.skip` affects only which dependencies are
+    written to the manifests; it does not change the distribution or
+    source-control treatment of the generated files.
 
     The generated files are intended as installation aids and are included with
     the distribution. They do not alter normal Perl dependency resolution by
@@ -1094,8 +1628,8 @@ If you want a different `README.md` generated create a
 
     The username and password may be supplied as arguments or through
     `PAUSE_USER` and `PAUSE_PASSWORD`. Normally this command is invoked
-    through `make publish`, which rebuilds and tests the distribution
-    before uploading it.
+    by `make publish`, which rebuilds and tests the distribution before
+    uploading it.
 
 - resolve-vars
 
@@ -1105,15 +1639,15 @@ If you want a different `README.md` generated create a
     with values drawn from the environment (or from a `--vars-file`). This
     is the mechanism the generated `Makefile` uses to turn `.pm.in` and
     `.pl.in` sources into their built `.pm`/`.pl` counterparts -- for
-    example filling `2.3.6` from the `VERSION` file or
+    example filling `2.4.0` from the `VERSION` file or
     `@BUILD_DATE@` at build time.
 
-    A placeholder is only _required_ to resolve if it appears in live code.
-    Placeholders that occur solely inside POD or `#` comments are treated as
-    references, not substitutions: they never trigger a "no value present"
-    error and are left untouched when no value is available. This lets you
-    document a token in your POD (e.g. mention `@BUILD_DATE@` in a
-    description) without breaking the build.
+    A placeholder is required to have a value only when it appears in live
+    code. Placeholders that occur solely inside POD or `#` comments are
+    treated as references, not substitutions: they never trigger a "no
+    value present" error and are left untouched when no value is
+    available. This lets you document a token in your POD (e.g. mention
+    `@BUILD_DATE@` in a description) without breaking the build.
 
     For placeholders that _do_ appear in code, behavior depends on
     `--strict` (the default):
@@ -1124,7 +1658,7 @@ If you want a different `README.md` generated create a
     warning and is left in place literally (as `@TOKEN@`) rather than being
     substituted to an empty string.
 
-    See ["--vars-file"](#vars-file) and ["--strict, --no-strict"](#strict-no-strict).
+    See ["`--vars-file`"](#vars-file) and ["`--strict, --no-strict`"](#strict-no-strict).
 
 ## LLM Commands
 
@@ -1159,7 +1693,7 @@ would be visible in shell history and process listings._
     is automatically sent with your code to re-focus the review. You must
     annotate the review file before resubmitting by running the
     `annotate` command and marking each finding with a valid
-    dispostion. See ["THE REVIEW WORKFLOW"](#the-review-workflow) for details.
+    disposition. See ["THE REVIEW WORKFLOW"](#the-review-workflow) for details.
 
     Options specific to code-review:
 
@@ -1167,7 +1701,7 @@ would be visible in shell history and process listings._
         --prompt-profile|-P NAME  additive prompt profile (repeatable)
         --context|-C PATH         context file to submit alongside the review (repeatable)
 
-    _Note: The prompt profile list and the context file list is written
+    _Note: The prompt profile list and the context file list are written
     to the review output file. On subsequent runs these will be read from
     the review. You do not need to provide them unless you want to update
     their values._
@@ -1207,9 +1741,9 @@ would be visible in shell history and process listings._
 
     Submits a Perl module or script to the LLM for a documentation review.
     The full file including code is submitted so the LLM can check
-    consistency between implementation and documentation. If no POD exists
-    the LLM generates complete POD documentation ready to paste after
-    `__END__`.
+    consistency between implementation and documentation.  If no POD
+    exists, the LLM generates complete POD documentation suitable for
+    placement after `__END__`.
 
         cmb pod-review lib/My/Module.pm
 
@@ -1238,6 +1772,11 @@ would be visible in shell history and process listings._
 
         cmb code-finding lib/My/Module.pm 1
 
+- show-defaults
+
+    Prints the resolved default option values to STDOUT after applying
+    configuration-file values and runtime defaults.
+
 - update-annotations
 
         cmb update-annotations file
@@ -1260,7 +1799,7 @@ would be visible in shell history and process listings._
 
 - `--basedir|-b` DIR
 
-    Base directory in which to create the projects. Defaults to the
+    Base directory in which to create the project. Defaults to the
     current working directory when `--installdir` and `--basedir` are not
     provided. The directory must exist or the script will throw an
     exception.
@@ -1287,12 +1826,6 @@ would be visible in shell history and process listings._
     used to scaffold your project.
 
     default: ~/.gitconfig
-
-- `--color, --no-color`
-
-    Turns coloring of the annotation summary table on or off.
-
-    default: on
 
 - `--context|-C` PATH
 
@@ -1328,10 +1861,10 @@ would be visible in shell history and process listings._
 
         cmb --module Foo::Bar -I ~/foo-bar/lib -I ~/foo-bar/bin
 
-    - The primary module must be determinable from either the current
-    directory name or supplied using the `--module` option. The
-    corresponding module file must exist beneath one of the import paths.
-    For example, `Foo::Bar` must be found as `Foo/Bar.pm`.
+    - The primary module must be determinable from either directory
+    name or supplied using the `--module` option. The corresponding
+    module file must exist beneath one of the import paths.  For example,
+    `Foo::Bar` must be found as `Foo/Bar.pm`.
     - The `Makefile` will automatically attempt to substitute the
     token `@PACKAGE_VERSION@` inside your `.pl.in` or `.pm.in`
     files with the current semantic version in the `VERSION` file. If you
@@ -1342,9 +1875,9 @@ would be visible in shell history and process listings._
 
 - `--installdir|-i` DIR
 
-    Directory in which to create the project. Defaults to the
-    current working directory. The directory is created if it does not
-    exist.
+    Directory in which to create the project. When supplied, this overrides
+    the configured or command-line `basedir`. The directory is created if
+    it does not exist.
 
     Example:
 
@@ -1356,9 +1889,9 @@ would be visible in shell history and process listings._
 
 - `--max-diff-files` LIMIT
 
-    The number of files inside the tarball that contains the changed files
-    for release notes creation that can be uploaded to the LLM. Set to 0
-    for no limit.
+    The maximum number of changed files included in the release artifact
+    that may be uploaded to the LLM when generating release notes. Set to
+    `0` for no limit.
 
     default: 50
 
@@ -1376,7 +1909,7 @@ would be visible in shell history and process listings._
 
     For `pod-review` the default model is `claude-haiku-4-5-20251001`.
 
-    For `code-review` the default mode is `claude-sonnet-4-6`.
+    For `code-review` the default model is `claude-sonnet-4-6`.
 
     The Haiku model tends to be better at summarizing documentation and
     avoiding unnecessary analysis around edge cases that contribute to
@@ -1391,13 +1924,10 @@ would be visible in shell history and process listings._
 
     The Perl module name for the new project, e.g. `My::New::Module`.
     Used to derive the project directory name, source file path, and
-    tarball name. You can omit this option if you provide a stub file
-    (`--stub path`) that contains a package name that is consistent with
-    the stub's path. For example, if my package is `My::App` and the
-    module path contains `My/App` then the script will assume your
-    module name is `My::App`.
+    tarball name.
 
-        cmb --stub $HOME/workdir/My/App.pm
+    You may omit this option when the module name can be determined from
+    a custom stub file or from the project directory name.
 
 - `--prompt|-p` PATH
 
@@ -1460,11 +1990,12 @@ would be visible in shell history and process listings._
 
 - `--vars-file`
 
-    The path to the file that contains template variable values.
+    The path to a file containing template variable values used by
+    `resolve-vars`.
 
 # THE REVIEW WORKFLOW
 
-`CPAN::Maker::Bootstrapper` allow you implement a structured
+`CPAN::Maker::Bootstrapper` allows you to implement a structured
 iterative code review workflow built around JSON review files and
 developer-applied disposition annotations. The workflow converges over
 several rounds, with each round potentially costing less as noise is
@@ -1484,7 +2015,7 @@ Each review round consists of three steps:
 - 2. Annotate the findings
 
     An annotation is how you mark a finding with a disposition. The
-    dispositions are used by the LLM during thenext review. See ["Dispositions"](#dispositions).
+    dispositions are used by the LLM during the next review. See ["Dispositions"](#dispositions).
 
         cmb annotate lib/My/Module.pm
 
@@ -1495,6 +2026,15 @@ Each review round consists of three steps:
 
     You can annotate incrementally across multiple invocations. Each call
     shows the updated state so you always know what remains.
+
+    Alternatively, use `update-annotations` to maintain dispositions in an
+    annotation file rather than on the command line:
+
+        cmb update-annotations lib/My/Module.pm
+
+    The first invocation creates an `.annotate` file for editing. Run the
+    command again after editing the file to apply those dispositions to the
+    review.
 
 - 3. Submit the next review
 
@@ -1517,24 +2057,22 @@ Each review round consists of three steps:
 
 ## Dry Run Mode
 
-Before your prompt and code are submitted for review, the script will
-output a table of showing you the estimated cosst based on token
-counts. The input token count is derived by calling the "COUNT TOKEN"
-endpoint API with the message to be submitted for review. The input
-token count is therefore accurate, while the output token count is an
-estimate.
+Before the prompt and code are submitted for review, the script
+displays estimated token usage and cost. The input token count is
+obtained from the model's token-counting API using the message that
+will actually be submitted, so the input count is accurate. The
+output token count, and therefore the final cost, is an estimate.
 
-To stop the script for actually submitting the message for review, use
-the `--dry-run` option. This will abort the process immediately prior
-to submission.
+To stop before submitting the review, use `--dry-run`. The command
+will abort immediately before the message is sent to the LLM.
 
 ## Dispositions
 
 Each finding in the annotations file must be given one of the
-dispositions describe below before the next review can be
+dispositions described below before the next review can be
 submitted. The prompt sent to the LLM is designed around these
-dispositions. This helps the LLM produce findings that hopefully will
-converge on a clean review.
+dispositions. This helps successive reviews converge by carrying forward the
+developer's decisions from earlier rounds.
 
 - ACCEPT
 
@@ -1589,7 +2127,7 @@ possibly rephrased (LLMs can and do make mistakes!).
 - New findings describe edge cases that cannot occur in normal usage.
 
 When all findings have dispositions and no new substantive issues
-appear, the code is ready to ship.
+appear, the review should be considered complete.
 
 ## The Release Artifact
 
@@ -1616,12 +2154,10 @@ than permanent suppression.
 
 ## Cost Management
 
-Typical review costs run $0.05-0.10 per run on a moderately sized
-module with POD stripped depending on the model you choose. The
-default model used for POD review is `claude-haiku-4-5-20251001` and
-`claude-sonnet-4-6` for code review. Costs decrease over successive
-rounds as the model spends fewer output tokens re-explaining
-suppressed findings.
+Review cost depends on the selected model, source size, prompt
+profiles, and number of findings. Costs generally decrease over
+successive rounds as the model spends fewer output tokens
+re-explaining suppressed findings.
 
 Use your own prompt profiles (`--prompt-profile`) to suppress entire
 classes of noise before they reach the annotation file. A well-tuned
@@ -1655,8 +2191,8 @@ Multiple profiles may be combined:
 
 Profiles are resolved from the `.prompts/` directory in the current
 project. A profile named `cli-tool` resolves to
-`.prompts/cli-tool.prompt`. Add your own prompt profiles and commit
-them to your project.
+`.prompts/cli-tool.prompt`. Add project-specific prompt profiles to
+`.prompts/` and commit them with your project.
 
 ### Built-in Profiles
 
@@ -1674,9 +2210,11 @@ The following profile is installed with the distribution:
 ### Creating Custom Profiles
 
 A profile is a plain text file in `.prompts/` containing additional
-prompt instructions, one per line. Lines beginning with `#` are treated
-as comments and stripped before submission. Profile instructions use the
-same format as the base review prompt.
+prompt instructions, one per line. Lines beginning with `#` are
+treated as comments and stripped before submission. Profile
+instructions are appended verbatim to the base review prompt.  The
+built-in profiles use one instruction per line, typically prefixed
+with `-`.
 
 Example `.prompts/security.prompt`:
 
@@ -1685,9 +2223,7 @@ Example `.prompts/security.prompt`:
     - Flag any use of eval, system, or exec that incorporates external data.
     - Flag missing taint checks on data used in file or system operations.
 
-### Planned Profiles
-
-The following profiles are planned for future releases:
+### Additional Profile Ideas
 
 - library
 
@@ -1714,34 +2250,21 @@ Community contributions of additional profiles are welcome. See
 
 # EXTENDING THE BUILD SYSTEM
 
-The bootstrapper's `Makefile` is intended to be immutable and work
-across all of the projects that use `CPAN::Maker::Bootstrapper`. Our
-goal is to keep `Makefile` working for you even when we make updates
-to the bootstrapper.
+The installed `Makefile` and files under `.includes/` are managed by
+`CPAN::Maker::Bootstrapper`. They are intentionally write-protected and
+may be replaced by `make update` when the bootstrapper is upgraded.
 
-However, you own `Makefile` and are free to do with it as you
-please. But we strongly advise that you read the sections below and
-follow the _recipe_ as the saying goes, to use and update the build
-system as it was intended.
+Project-specific build logic belongs in `project.mk`, which is always
+writable and is never touched by `make update`. This provides an
+upgrade-safe extension point for project-specific targets, variables,
+and build ordering.
 
-The installed `Makefile` is a managed file - it can be updated by
-using the `make` target `update` when a new version of
-`CPAN::Maker::Bootstrapper` is released.
+The managed include files live in the `.includes/` directory,
+where they are write-protected and clearly separated from project
+files. The `Makefile` includes them automatically:
 
-    make update
-
-You are strongly advised not to modify the `Makefile` - your changes
-will be overwritten if you run `make update`.
-
-Instead, the recommended workflow, should you need to add new make
-targets or control the order of the build based on dependencies is to
-add those to `project.mk`. All managed build system files live in
-the `.includes/` directory where they are write-protected and clearly
-separated from your project files. The `Makefile` includes them
-automatically and conditionally includes `project.mk` from the
-project root:
-
-    -include config.mk
+    include .includes/publish.mk
+    include .includes/bootstrap.mk
     include .includes/perl.mk
     include .includes/local.mk
     include .includes/help.mk
@@ -1752,24 +2275,23 @@ project root:
     include .includes/upgrade.mk
     include .includes/bash-completion.mk
     include .includes/modulino.mk
-    -include project.mk
-    -include extra-files.mk
 
-`project.mk` remains in the project root - it is your file, always
-writable, and never touched by `make update`. The leading `-` on
-its include means make will not complain if it does not exist yet.
-This gives you a sanctioned, upgrade-safe extension point for
-anything project-specific.
+These files are included if they exist:
+
+    include config.mk
+    include project.mk
+    include extra-files.mk
 
 ## Immutability Is a Feature
 
-The managed build system is deliberately **immutable**: the `Makefile`,
-everything under `.includes/`, and the generated `.pm`/`.pl` files are
-write-protected on purpose. This is a feature, not a restriction. It lets
-`make update` replace those files with newer, better versions without
-clobbering anything of yours, and it guarantees that two projects on the
-same bootstrapper version build _identically_ -- there is no per-project
-drift hiding in a locally-edited rule.
+The managed build system is deliberately **immutable**: the
+`Makefile`, everything under `.includes/`, and the generated
+`.pm`/`.pl` files are write-protected on purpose. This is a feature,
+not a restriction. It lets `make update` replace those files with
+newer, better versions without clobbering anything of yours, and it
+guarantees that two projects on the same bootstrapper version use the
+same managed build rules -- there is no per-project drift hiding in a
+locally edited managed rule.
 
 You _can_ override any of it -- these are your files, and nothing stops you
 from `chmod +w` and editing a generated module or a managed include. But
@@ -1795,7 +2317,7 @@ change. Every legitimate customization has a sanctioned hook that survives
     your own generated files, and `CLEANFILES +=` for anything else.
 
     See ["What Belongs in `project.mk`"](#what-belongs-in-project-mk) for worked examples of each, and
-    ["What does NOT belong in project.mk"](#what-does-not-belong-in-project-mk) for the line between your extensions
+    ["What Does NOT Belong in `project.mk`"](#what-does-not-belong-in-project-mk) for the line between your extensions
     and the managed core.
 
 - **Build-behavior toggles** (dependency scanning, linting, syntax
@@ -1804,8 +2326,6 @@ line or in `config.mk` (see ["CONFIGURATION"](#configuration) and the variable l
 - **Template tokens in your source** -- declare them in
 `TEMPLATE_VARS` and let `cmb resolve-vars` fill them, rather than
 hand-editing a generated `.pm` (see ["Custom Template Tokens"](#custom-template-tokens)).
-- **Custom cleanup** -- the `clean-local::` double-colon target in
-`project.mk`.
 - **Extra distribution files** -- list them in `buildspec.yml`;
 `extra-files.mk` wires them into the tarball automatically.
 - **Dependencies the scanner cannot see** -- the sticky `+` prefix in
@@ -1815,10 +2335,11 @@ If you find yourself wanting to edit a managed file, check this list first:
 the hook you need almost certainly exists, and using it keeps you on the
 upgrade path instead of forking the build system.
 
-_Why the generated `.pm`/`.pl` files are read-only:_ they are regenerated
-from their `.pm.in`/`.pl.in` sources on every build, so any edit you make
-directly to a generated `.pm` would be silently lost on the next `make`.
-The `chmod -w` is there to stop you from making that mistake. Edit the
+_Why the generated `.pm`/`.pl` files are read-only:_ they are
+regenerated from their `.pm.in`/`.pl.in` sources when its
+prerequisites require regeneration, so any edit you make directly to a
+generated `.pm` would be silently lost on the next `make`.  The
+`chmod -w` is there to stop you from making that mistake. Edit the
 `.pm.in` source, not the generated `.pm`.
 
 ## How the Makefile Works
@@ -1827,24 +2348,33 @@ The installed `Makefile` is structured around a few key concepts:
 
 - **Source files** live in `lib/` as `.pm.in` and in `bin/` as
 `.pl.in`. The build generates the final `.pm` and `.pl` files from
-these sources by substituting `@PACKAGE_VERSIONE@` and other
+these sources by substituting `@PACKAGE_VERSION@` and other
 tokens, running syntax checks, and optionally running perltidy and
 perlcritic.
-- **Sentinel files** - `.tdy` and `.crit` files track whether
-a source file has passed tidiness and critic checks. These are
-regenerated only when the source changes.
+- **Sentinel files** - the build uses sentinel files to track
+incremental quality-gate state. `.checked` records successful syntax
+and validation checks, `.tdy` records successful perltidy processing,
+and `.crit` records successful perlcritic processing. Each sentinel is
+regenerated only when the source or the prerequisites for that gate
+change.
 - **Dependency scanning** - `scandeps-static.pl` scans your
-source files and generates `requires` and `test-requires` files
-which feed into `Makefile.PL`. Controlled by `SCAN=on|off`.
+source files and maintains the dependency files used by [CPAN::Maker](https://metacpan.org/pod/CPAN%3A%3AMaker)
+when generating distribution metadata, including `requires`,
+`test-requires`, `recommends`, and `suggests`. Controlled by
+`SCAN=ON|OFF`.
 - **The distribution tarball** is the final output of `make`.
 It is built by `make-cpan-dist.pl` using `buildspec.yml`.
+- **Inter-module dependency discovery** - the build scans modules
+within the distribution and generates `deps.mk` so `make` can build
+modules in dependency order before syntax checking them. Dependencies
+that cannot be inferred automatically may be added in `project.mk`.
 
-Key variables you can override on the make command line or in
-`project.mk`:
+Key build variables you can override on the make command line or in
+`config.mk`:
 
-- `SCAN=off` - skip dependency scanning
-- `LINT=off` - skip perltidy and perlcritic
-- `SYNTAX_CHECKING=off` - skip `perl -wc` syntax checks
+- `SCAN=OFF` - skip distribution dependency scanning
+- `LINT=OFF` - skip perltidy and perlcritic
+- `SYNTAX_CHECKING=OFF` - skip `perl -wc` syntax checks
 - `MIN_PERL_VERSION=5.016` - minimum Perl version for Makefile.PL
 - `PERLTIDYRC=/path/to/rc` - path to perltidy configuration
 - `PERLCRITICRC=/path/to/rc` - path to perlcritic configuration
@@ -1865,7 +2395,7 @@ Two further toggles, `CMB_UPDATE_CHECK` and `CMB_VERSION_DRIFT`, are set
 in `config.mk` rather than on the command line; see ["Automatic Drift and
 Update Checks"](#automatic-drift-and-update-checks). `config.mk` is read on every invocation of `make` and is
 the right place for durable, machine- or project-wide build settings such as
-`SYNTAX_CHECKING=off` on a box without an installer.
+`SYNTAX_CHECKING=OFF` on a box without an installer.
 
 ## What Belongs in `project.mk`
 
@@ -1914,7 +2444,7 @@ the right place for durable, machine- or project-wide build settings such as
 
         CLEANFILES += mygenerated.pm config/generated.yml
 
-- Extending the `clean-recipe`
+- Extending the clean target
 
         clean-local::
                rm -rf workdir
@@ -1928,7 +2458,7 @@ the right place for durable, machine- or project-wide build settings such as
         test-local::
             prove -I lib -v xt/
 
-## What does NOT belong in project.mk
+## What Does NOT Belong in `project.mk`
 
 - Modifications to existing targets like `all`, `clean`, `requires`
 - Replacing managed variables such as `DEPS` or `CLEANFILES`.
@@ -1947,9 +2477,10 @@ The standard tokens (`@PACKAGE_VERSION@`, `@MODULE_NAME@`,
 available, but the mechanism is extensible: a project can define its own
 tokens without editing any managed file.
 
-To add a token, declare its name in `TEMPLATE_VARS` (in `project.mk`) and
-provide a value -- as a make variable, an exported environment variable, or
-via the `.vars` sidecar. For example, to stamp a build timestamp:
+To add a token, declare its name in `TEMPLATE_VARS` (in
+`project.mk`) and provide a value -- as a make variable, an exported
+environment variable, or through the variables file passed to
+`resolve-vars`. For example, to stamp a build timestamp:
 
     # in project.mk
     BUILD_DATE      := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -1958,16 +2489,18 @@ via the `.vars` sidecar. For example, to stamp a build timestamp:
     # in a .pm.in source
     our $BUILD_DATE = 'E<64>BUILD_DATEE<64>';
 
-`cmb resolve-vars` then fills `@BUILD_DATE@` from the value on
-every build. The token grammar is uppercase-only (`@[A-Z0-9_]+@`),
-so placeholders never collide with real Perl such as `@_` or `@ISA`.
+`cmb resolve-vars` then fills `@BUILD_DATE@` from the value
+when its prerequisites require regeneration. The token grammar is
+uppercase-only (`@[A-Z0-9_]+@`), so placeholders never
+collide with real Perl such as `@_` or `@ISA`.
 
-The substitution is **fail-loud**: if a source contains a
-`@TOKEN@` that is not resolved -- because it was never declared, or
-declared but left empty -- the build stops and names the offending token,
-rather than silently substituting an empty string and producing a subtly
-broken module. This is what makes custom tokens safe to rely on: a missing
-value is a build error, not a runtime surprise.
+By default, substitution is **fail-loud** for placeholders that appear
+in live code: if a token has no value, the build stops and names the
+offending token rather than silently substituting an empty string.
+
+Placeholders that occur only in POD or comments do not require values.
+`--no-strict` may be used to downgrade a missing live-code value to a
+warning and leave the placeholder unchanged.
 
 ## Keeping the build system up to date
 
@@ -1998,12 +2531,12 @@ The following targets manage the lifecycle of the build system itself:
 
     Copies the managed files from the currently installed bootstrapper
     distribution into your project directory. After running, use
-    `git diff` to review what changed and `git checkout <file>`
-    to revert any changes you don't want.
+    `git diff` to review what changed.
 
     The following files are managed and may be updated:
 
         Makefile
+        .includes/bootstrap.mk
         .includes/perl.mk
         .includes/local.mk
         .includes/git.mk
@@ -2014,7 +2547,7 @@ The following targets manage the lifecycle of the build system itself:
         .includes/release-notes.mk
         .includes/bash-completion.mk
         .includes/modulino.mk
-        modulino.tmpl
+        .includes/publish.mk
 
     Your `project.mk`, `buildspec.yml`, `requires`, `VERSION`, source
     files and tests are **never** touched by `make update`.
@@ -2053,38 +2586,45 @@ doesn't try to tell these apart - the fix is the same either way:
 Two variables, set in `config.mk`, control how strict these checks
 are:
 
-- `CMB_UPDATE_CHECK` (`on`|`off`, default `on`)
+- `CMB_UPDATE_CHECK` (`ON`|`OFF`, default `ON`)
 
-    Set to `off` to skip the MetaCPAN lookup - useful in CI or offline
+    Set to `OFF` to skip the MetaCPAN lookup - useful in CI or offline
     environments where the network call would just fail or slow things
     down.
 
-- `CMB_VERSION_DRIFT` (`fail`|`warn`|`ignore`, default `fail`)
+- `CMB_VERSION_DRIFT` (`FAIL`|`WARN`|`IGNORE`, default `FAIL`)
 
     Controls what happens when a project's managed files no longer match
-    the installed bootstrapper. `fail` stops the build until you run
-    `make update`; `warn` prints a message and continues; `ignore`
+    the installed bootstrapper. `FAIL` stops the build until you run
+    `make update`; `WARN` prints a message and continues; `IGNORE`
     skips the check entirely.
 
 ## What You Should Never Modify
 
-The files in `.includes/` - `perl.mk`, `git.mk`, `help.mk` etc.
-\- are managed files that will be overwritten by `make update`. Do
-not modify them directly. If you need to override behavior they
-provide, do so in `project.mk` using Make's double-colon rule
-pattern or by setting variables before the include.
+The files in `.includes/` - `perl.mk`, `git.mk`, `help.mk` etc.  -
+are managed files that will be overwritten by `make update`.  Do not
+modify managed files directly. Use `config.mk` for documented build
+variables and `project.mk` for project-specific targets, rules, and
+build ordering.
 
 The `Makefile` itself is also managed and will be overwritten by
-`make update`. Your extension point is exclusively `project.mk`.
+`make update`. Use the documented project-level configuration and
+extension files instead.
 
 ## Dependencies Management
 
-The `Makefile` will attempt to detect Perl module dependencies by
-scanning .pm.in and .pl.in files and creating the `requires` and
-`test-requires` files whenever you run `make`. These files are used
-by the `make-cpan-dist.pl` utility to specify the dependencies in your
-CPAN distribution file. You can prevent that by setting the environment
-variable `SCAN=OFF`. The default is `SCAN=ON`.
+The build system scans `.pm.in` and `.pl.in` source files and
+maintains the dependency files used by [CPAN::Maker](https://metacpan.org/pod/CPAN%3A%3AMaker) when generating
+distribution metadata:
+
+    F<requires>
+    F<test-requires>
+    F<recommends>
+    F<suggests>
+
+Distribution dependency scanning is controlled by `SCAN`. Set
+`SCAN=OFF` to skip updates to `requires`, `test-requires`,
+`recommends`, and `suggests` for a build; the default is `ON`.
 
 To prevent an entry from being removed by a rescan, prefix the module
 name with `+`. These entries are sticky and survive all subsequent
@@ -2106,27 +2646,28 @@ required._
 
 ### The local dependency library
 
-Syntax checking is performed in a _hermetic_ environment: each generated
-`.pm` is compiled with `perl -wc` against `lib` and a project-local
-library at `local/lib/perl5` only, with `PERL5LIB` explicitly cleared for
-the check. This ensures a module's dependencies are actually declared and
-installed, rather than being satisfied by chance from whatever happens to be
-in your `PERL5LIB` or system `@INC`. A dependency that compiles on your
-machine but is missing from `requires` will fail the build here instead of
+Syntax checking is performed in a _hermetic_ environment: each
+generated `.pm` is compiled with `perl -wc` against `lib` and a
+project-local library at `local/lib/perl5` only, with `PERL5LIB`
+explicitly cleared for the check. This ensures a module's dependencies
+are actually declared and installed, rather than being satisfied by
+chance from whatever happens to be in your `PERL5LIB` or system
+`@INC`. A dependency that compiles on your machine but is missing
+from the declared dependency set will fail the build here instead of
 surprising you on a clean install or CI box.
 
 To populate that library, the build installs your declared dependencies into
 `local/` using `cpm` (preferred) or `carton`:
 
-    make local        # installs requires/recommends/suggests into local/lib/perl5
+    make local # installs requires/recommends/suggests/test-requires into local/lib/perl5
 
 This runs automatically as a prerequisite of the module build, so a
 normal `make` installs dependencies first, then syntax-checks against
-them. `cpm` is preferred because it supports multiple mirrors (see
-`build-mirrors`); `carton` is supported but resolves against a
-single mirror -- its default, or the one named in
-`PERL_CARTON_MIRROR`. Multiple mirrors may be specified in the
-`cpanfile` for both `carton` and `cpm`.
+them.
+
+`cpm` is preferred because it supports multiple resolvers directly
+from `build-mirrors`. `carton` is also supported; see
+["build-mirrors"](#build-mirrors) for its mirror behavior.
 
 The use of a `build-mirrors` file versus specifying the mirrors in
 the dependency files determines the scope of their
@@ -2147,14 +2688,13 @@ makes the entry sticky and survives every rescan:
 
     +Log::Log4perl    # loaded at runtime via a framework call; scanner can't see it
 
-### build-mirrors
+### `build-mirrors`
 
 When using the preferred CPAN installer (`cpm`), the build system
 reads mirror URLs, one per line, from a `build-mirrors` file in the
-project root and passes each as a resolver. This lets the build
-resolve dependencies from a private DarkPAN in addition to (or instead
-of) the public CPAN. If `build-mirrors` is absent, the installer uses
-its default mirror.
+project root and passes each as a resolver. This allows the build to
+resolve dependencies against one or more configured CPAN-compatible
+repositories, including private DarkPAN repositories.
 
 When `carton` is used, because it does not support multiple mirrors
 when setting the mirror using an environment variable, the build
@@ -2192,9 +2732,9 @@ Modulinos are useful for CLI scripts because they encourage
 encapsulation, simplify unit testing, and keep logic organized
 in named methods rather than inline code.
 
-The `Makefile` provides a `modulino` target that generates a bash
-wrapper script that invokes your module. By default it uses
-`MODULE_NAME`, producing a script named after the module:
+The `Makefile` provides a `modulino` target that generates a wrapper
+script for invoking your module. By default it uses `MODULE_NAME`,
+producing a script named after the module:
 
     make modulino
 
@@ -2225,76 +2765,226 @@ The `.in` source files are tracked by git.
 
 ## Continuous Integration
 
-`make workflow` installs `builder`, a self-contained bash script
-that performs a clean-room build: it installs a minimal Perl
-toolchain, installs your distribution's dependencies, and runs
-`make`. It's designed to run unmodified in GitHub Actions, in any
-other CI runner, or by hand from the command line.
+CPAN::Maker::Bootstrapper provides a clean-room build path that can be
+used locally or from a CI system.
+
+The CI design separates source acquisition from project build
+responsibilities:
+
+    source acquisition       caller or CI system
+    build environment        builder
+    project build            make
+
+A CI system such as GitHub Actions is responsible for checking out the
+project. `builder` then operates on that existing project directory,
+installs the required build environment and dependencies, and runs the
+project build.
+
+`make build-ci` provides the corresponding local clean-room build. It
+uses the current working tree as its source, copies that tree into a
+disposable container build directory, and invokes `builder` there.
+
+This separation keeps `builder` independent of repository hosting,
+branch selection, and source-control workflow while allowing the same
+build mechanism to be used both locally and in CI.
+
+The build lifecycle is:
+
+    builder.env
+        |
+        v
+    builder-pre
+        |
+        v
+    make
+        |
+        v
+    builder-post
+
+`builder` can run unmodified in GitHub Actions, in another CI runner,
+or by hand from the command line.
 
 ### Running builder manually
 
-`builder` can build any git repository, not just the one it's
-installed in - useful for testing a build in isolation without
-touching your working tree:
+`builder` operates on an existing project directory. Source acquisition
+is deliberately outside its responsibility; the caller must clone,
+check out, or otherwise provide the project before invoking `builder`.
 
-    docker run --rm -v "$(pwd)/builder:/builder:ro" \
-       -e BUILD_BRANCH=$(git branch --show-current) \
-       debian:trixie \
-       bash /builder https://github.com/your-user/Your-Module.git
+Run it from the root of a project:
 
-_Note: a repository URL is currently required - `builder` does not
-yet support building an already-checked-out project mounted directly
-into the container._
+    ./builder
+
+or pass the project directory explicitly:
+
+    /builder /path/to/project
+
+The project directory defaults to the current working directory.
+
+`builder` changes to that directory, installs the build environment and
+declared dependencies, loads the project CI environment, and runs the
+configured build lifecycle.
+
+For the standard containerized clean-room build, use:
+
+    make build-ci
+
+`make build-ci` copies the current working tree into a disposable build
+environment and invokes `builder` there. Because it operates on the
+current working tree rather than cloning the repository, the build may
+include uncommitted and untracked files present on disk.
 
 ### Environment variables
 
+`builder` accepts environment variables that control dependency
+installation and build behavior.
+
 - `INSTALLER`
 
-    Which tool `builder` uses to install dependencies. Accepts `cpm` or
-    `cpanm`-based values.
+    The command used to install Perl dependencies.
 
-    default: `cpm install -g --show-build-log-on-failure --verbose`
+    The default is:
 
-- `PERLTIDYRC` / `PERLCRITICRC`
+        cpm install -g --show-build-log-on-failure --verbose
 
-    `builder` searches the checked-out repository for `.perltidyrc` or
-    `perltidyrc` (respectively `.perlcriticrc`/`perlcriticrc`) and
-    exports them automatically. When found, `builder` also installs
-    `Perl::Tidy` or `Perl::Critic` (plus the community/compatibility
-    policy modules) as extra build dependencies before running `make`.
+- `NO_ECHO`
 
-- `BUILD_BRANCH` / `GITHUB_REF_NAME`
+    Passed through to the generated Makefile when set.
 
-    The branch to check out and build. `GITHUB_REF_NAME` is set
-    automatically by GitHub Actions; `BUILD_BRANCH` is the equivalent
-    override for manual or non-GitHub runs. Falls back to the current
-    branch if neither is set.
+- `CMB_VERSION_DRIFT`
 
-### Override files
+    Controls how `builder` handles differences between the installed
+    CPAN::Maker::Bootstrapper version and the version expected by the
+    project.
 
-Commit these to your project root to customize a CI build without
-touching `builder` itself:
+    The generated `builder.env` defaults this to:
+
+        CMB_VERSION_DRIFT=ignore
+
+### `builder.env`
+
+Before running the project build, `builder` loads `builder.env` from
+the project root when that file exists.
+
+Variables defined there are exported to the build environment.
+
+A generated project includes:
+
+    CMB_VERSION_DRIFT=ignore
+    NO_ECHO=
+
+`builder.env` provides a project-local place to customize CI build
+behavior without modifying `builder` itself.
+
+### Builder lifecycle hooks
+
+`builder` exposes two Makefile hooks around the main project build:
+
+    builder-pre
+    builder-post
+
+The build lifecycle is:
+
+    builder.env
+        |
+    builder-pre
+        |
+    make
+        |
+    builder-post
+
+`builder-pre` runs after `builder.env` has been loaded and before the
+main `make` invocation.
+
+`builder-post` runs only after the main build completes successfully.
+
+Generated projects define both targets as empty double-colon targets:
+
+    builder-pre::
+
+    builder-post::
+
+Projects may extend them in `project.mk` without modifying the managed
+Makefile.
+
+For example:
+
+    builder-pre::
+            ./prepare-ci-environment
+
+    builder-post::
+            ./collect-build-artifacts
+
+These hooks are intended for project-specific CI setup and post-build
+work that should remain outside the managed build files.
+
+### `make build-ci`
+
+`make build-ci` runs the current project in a disposable containerized
+build environment.
+
+Unlike a CI workflow that clones the repository, `build-ci` uses the
+current working tree as its source. The project is mounted read-only,
+copied into the container build area, and then passed to `builder`.
+
+This means the build reflects the files currently present on disk,
+including uncommitted changes and untracked files.
+
+The source tree itself is not modified by the container build.
+
+`make build-ci` accepts the following variables:
+
+    DOCKER_BUILD_IMAGE  - container image used for the build
+    DOCKER_CPAN_INSTALLER
+                        - dependency installer command used in the container
+    BUILD_LOG           - path used for captured build output
+    MODULE_NAME         - primary module name passed into the clean-room build
+
+For example:
+
+    make build-ci
+
+or:
+
+    make build-ci DOCKER_BUILD_IMAGE=debian:trixie
+
+The command exits with the status of the container build even though
+the output is also written to `BUILD_LOG`.
+
+### Builder input files
+
+`builder` recognizes project files that supply additional build
+requirements without modifying `builder` itself.
 
 - `build-apt-deps`
 
-    Whitespace-separated list of additional Debian packages to install
-    before the build (`builder` always installs a minimal base:
-    `git gcc make perl curl ca-certificates libexpat-dev libssl-dev
-    libzip-dev`).
+    A whitespace-separated list of additional Debian packages required by
+    the project build.
+
+    `builder` installs these packages in addition to its standard build
+    environment before installing Perl dependencies.
+
+    For example:
+
+        libxml2-dev
+        libpq-dev
 
 - `build-mirrors`
 
-    One CPAN mirror URL per line - for example, your DarkPAN. Merged with
-    `https://cpan.metacpan.org` when resolving dependencies.
+    A list of CPAN mirror URLs, one per line.
 
-### make build-ci variables
+    Use this file when the build requires a DarkPAN or another additional
+    CPAN-compatible repository.
 
-`make build-ci` wraps the manual docker invocation above. It accepts:
+    For example:
 
-    DOCKER_BUILD_IMAGE  - container image to build in (default: debian:trixie)
-    BRANCH              - branch to build (default: current branch)
-    INSTALLER           - see L</Environment variables> above (default: cpm)
-    BUILD_LOG           - path to write build output (default: timestamped)
+        https://cpan.openbedrock.net
+        https://cpan.metacpan.org
+
+    The configured mirrors are used when resolving project dependencies.
+
+These files describe build inputs. For environment variables use
+`builder.env`; for project-specific Makefile behavior use
+`project.mk`.
 
 ### See Also
 
@@ -2312,7 +3002,7 @@ project-local library (`local/lib/perl5`) for hermetic syntax checking
 
 You can set make variables like `SYNTAX_CHECKING` in `config.mk`, which
 is included on every invocation of `make`, to alter build behavior -- for
-example `SYNTAX_CHECKING=off` to skip the check when neither installer is
+example `SYNTAX_CHECKING=OFF` to skip the check when neither installer is
 present (undeclared dependencies then go undetected).
 
 _Note: neither `cpm` nor `carton` is a hard prerequisite of
@@ -2324,11 +3014,9 @@ multi-mirror support (see ["build-mirrors"](#build-mirrors))._
 
 - `.pm` and `.pl` Generation
 
-    These files are generated from `.pm.in` and `.pl.in` files in the
-    Makefile by filtering them through a `cmb resolve-vars` command that
-    replaces certain tokens like `@PACKAGE_VERSION@` with
-    values. The generated files are read-only. Always edit the `.in` file
-    version.
+    Generated `.pm` and `.pl` files are derived from their
+    `.pm.in`/`.pl.in` sources through `cmb resolve-vars` and are
+    read-only. Always edit the `.in` source.
 
     Use `@PACKAGE_VERSION@` like this:
 
@@ -2337,36 +3025,42 @@ multi-mirror support (see ["build-mirrors"](#build-mirrors))._
 - The import feature cannot be used with `--stub`
 - git
 
-    There is an assumption that users of this script are also `git`
-    users. `git` is required to run `make git` which instatiates a git
-    project and makes an intial commit. It's also used to look into your
-    `.gitconfig` file for your name and email address to populate the
-    certain element in the resources file used when building your CPAN
-    distribution.
+    `git` is used throughout the framework. `make git` initializes the
+    repository and creates the initial commit, and the bootstrapper reads
+    user identity and related defaults from `.gitconfig` when no separate
+    configuration file is supplied.
 
 # FAQ
 
 ## My build is failing with a module not found error during syntax
 checking
 
-This is almost always a build-time dependency ordering issue. If
-`lib/Foo/Bar.pm` uses `lib/Foo.pm`, make may attempt to build and
-syntax-check `Foo/Bar.pm` before `Foo.pm` exists. Declare the
-dependency in `project.mk`:
+There are several common causes.
+
+One possible cause is an inter-module build-order dependency. The build
+system normally detects dependencies between modules in the distribution
+and writes them to `deps.mk`, allowing `make` to build prerequisite
+modules before syntax-checking modules that depend on them.
+
+For example, if `lib/Foo/Bar.pm` uses `lib/Foo.pm`, the generated
+dependency rules ensure that `Foo.pm` is built first.
+
+If the dependency cannot be inferred automatically, declare it explicitly
+in `project.mk`:
 
     lib/Foo/Bar.pm: lib/Foo.pm
 
-This tells make to build `Foo.pm` first. See ["Inter-module
-dependencies"](#inter-module-dependencies) for details.
+See ["Inter-module dependencies"](#inter-module-dependencies) for details.
 
-A third cause, new to the hermetic build: the module is a real dependency
-that simply isn't installed in `local/`. Because syntax checking runs
-against `local/lib/perl5` with `PERL5LIB` cleared, a dependency that is
-present elsewhere on your system but not declared will fail here. Confirm it
-is in `requires` (add it with a sticky `+` if the scanner can't see it --
-see ["Dependencies Management"](#dependencies-management)), then `make local` to install it. This is
-the check working as intended: it catches a missing declaration on your
-machine instead of on someone else's.
+Another cause is a real dependency that is not installed in
+`local/`. Because syntax checking runs against `local/lib/perl5`
+with `PERL5LIB` cleared, a dependency that is present elsewhere on
+your system but not declared will fail here. 
+
+Confirm it is in `requires` (add it with a sticky `+` if the scanner
+can't see it -- see ["Dependencies Management"](#dependencies-management)), then `make local`
+to install it. This is the check working as intended: it catches a
+missing declaration on your machine instead of on someone else's.
 
 If the module genuinely cannot be loaded outside its runtime
 environment (an Apache handler, a mod\_perl module, etc.), add it to
@@ -2374,22 +3068,27 @@ environment (an Apache handler, a mod\_perl module, etc.), add it to
 
     PERLWC_SKIP = lib/My/Apache/Handler.pm
 
+Files listed in `PERLWC_SKIP` are excluded from the `perl -wc`
+syntax-checking and POD-checking stages. They are still built and
+included in the distribution; only those validation steps are skipped.
+
 ## How do I do a fast build during development?
 
     make quick
 
-This disables dependency scanning and all linting (syntax checking,
-perltidy, perlcritic) for the current build. Your `requires` and
-`test-requires` files are not updated and no quality gates run.
+This disables distribution dependency scanning and all linting
+(perltidy, perlcritic) for the current build. `requires`,
+`test-requires`, `recommends`, and `suggests` are not updated.
+Syntax checking remains enabled.
 
-Use `make` without flags when you are ready to do a full build before
-committing or releasing.
+Use `make` without flags when you are
+ready to do a full build before committing or releasing.
 
 You can also disable individual features:
 
-    make SCAN=off          # skip dependency scanning only
-    make LINT=off          # skip all linting only
-    make SYNTAX_CHECKING=off  # skip syntax checking only
+    make SCAN=OFF             # skip distribution dependency scanning only
+    make LINT=OFF             # skip all linting only
+    make SYNTAX_CHECKING=OFF  # skip syntax checking only
 
 ## How do I add a new module or script to the project?
 
@@ -2436,12 +3135,12 @@ files. The files remain part of the distribution and continue to be
 included as dependencies when determining whether the distribution
 tarball must be rebuilt.
 
-`CPAN::Maker::Bootstrapper` uses this mechanism for generated DarkPAN
-dependency manifests. When `DARKPAN_REQUIRES` is enabled,
-`cpanfile.darkpan` and `cpanm.darkpan` are added to `buildspec.yml`
-as extra files and to `extra-files.skip` because presumably the
-developer has enabled `DARKPAN_REQUIRES` for the purpose of adding
-them to the distribution. See ["DARKPAN\_REQUIRES"](#darkpan_requires).
+When `DARKPAN_REQUIRES` is enabled, `cpanfile.darkpan` and
+`cpanm.darkpan` are automatically added to `buildspec.yml` as extra
+files. They are therefore subject to the normal git tracking check. If
+the developer wants to include these generated manifests in the
+distribution without tracking them in the repository, they may be
+added explicitly to `extra-files.skip`. See ["DARKPAN\_REQUIRES"](#darkpan_requires).
 
 ## I want to pin a version or add a module the scanner missed
 
@@ -2458,7 +3157,7 @@ different one on subsequent builds:
     Some::Module 2.0
 
 These two mechanisms are independent - `+` controls survivability,
-the version number controls what version is required. See ["Dependencies"](#dependencies)
+the version number controls what version is required. See ["Dependencies Management"](#dependencies-management)
 for full details.
 
 ## I want to exclude a module the scanner found
@@ -2480,7 +3179,8 @@ list takes effect from the second build onward.
 
 The `.pm` files in `lib/` are generated from the `.pm.in` sources
 and are write-protected. Always edit the `.pm.in` file - the `.pm`
-is regenerated on every `make` and your changes will be lost.
+is regenerated when its prerequisites require regeneration and your
+changes will be lost.
 
 If you are unsure which file to edit:
 
@@ -2501,22 +3201,20 @@ same way:
     make update
 
 If you don't want a drifted project to fail the build outright, set
-`CMB_VERSION_DRIFT=warn` (or `=ignore`) in that project's
+`CMB_VERSION_DRIFT=WARN` (or `=IGNORE`) in that project's
 `config.mk`. See ["Automatic Drift and Update Checks"](#automatic-drift-and-update-checks).
-&#x3d;head2 make update overwrote something I changed in a managed file
 
-The managed files in `.includes/` should never be edited directly -
-that is what `project.mk` is for. However if you did modify a managed
-file and `make update` overwrote it, git has you covered:
+## make update overwrote something I changed in a managed file
 
-    git diff .includes/perl.mk
-    git checkout .includes/perl.mk
+The managed files in `.includes/` should never be edited directly.
+Use `config.mk`, `project.mk`, or the other documented project-level
+extension points instead.
 
 This is why `make git` and committing your `.includes/` directory is
 strongly recommended - git is your safety net for the entire build
 system.
 
-## make says nothing to do but my source changed
+## `make` says nothing to do but my source changed
 
 The most common cause is that the generated `.pm` file is newer than
 the `.pm.in` source. This can happen if you accidentally edited the
@@ -2528,21 +3226,25 @@ Or do a clean rebuild:
 
     make clean && make
 
-## How do I disable scanning temporarily?
+## How do I disable dependency scanning temporarily?
 
-    make SCAN=off
+    make SCAN=OFF
 
-This skips the dependency scan entirely for that run - useful when
-you have many modules and want a fast build during active development.
-The default is `SCAN=ON`.
+This skips distribution dependency scanning for that run, so
+`requires`, `test-requires`, `recommends`, and `suggests` are not
+updated.
+
+Inter-module dependency discovery for `deps.mk` is independent of
+`SCAN` and may still run when syntax checking is enabled. The default
+is `SCAN=ON`.
 
 ## How do I disable syntax checking temporarily?
 
-    make SYNTAX_CHECKING=off
+    make SYNTAX_CHECKING=OFF
 
 Similarly you can disable individual quality gates:
 
-    make PERLTIDYRC="" PERLCRITICRC=""
+    make PERLTIDY="" PERLCRITIC=""
 
 ## How do I upgrade the build system?
 
@@ -2551,8 +3253,7 @@ Similarly you can disable individual quality gates:
 This checks MetaCPAN for a newer version of
 `CPAN::Maker::Bootstrapper`, installs it via `cpanm`, and
 automatically refreshes the managed files in `.includes/` with
-`make update`. Review the changes with `git diff` and revert
-anything you don't want with `git checkout`.
+`make update`. Review the changes with `git diff`.
 
 If `cpanm` is not installed:
 
@@ -2615,8 +3316,7 @@ The release artifacts are cleaned up by `make clean`.
 
 When you package your CPAN distribution you can strip the pod from
 your modules or you can extract the pod and provide them as separate
-`.pod` files. There are two `make` environment variables you can set
-to control that behavior.
+`.pod` files. The `POD` make variable controls that behavior:
 
 - `make POD=extract`
 
@@ -2627,21 +3327,6 @@ to control that behavior.
 
     `remove` will strip POD from your module. No POD will be included in
     the distribution.
-
-## The dependency resolver keeps adding a file I don't want to
-list. How can I tell it to skip those files?
-
-Add a `requires.skip` file to exclude modules from the scanned
-list. Sometimes the scanner may include modules that are optional or
-modules you just don't want to include as requirements because they
-are already included in a module you have already required.
-
-Similarly, `test-requires.skip` excludes modules from the test
-dependency scan.
-
-On a clean first run neither `requires` nor `test-requires` exists
-yet, so the raw scanner output becomes the dependency file - meaning
-skip list and pins have no effect until the second run.
 
 ## Something still doesn't work - how do I report an issue?
 
@@ -2681,47 +3366,25 @@ tools.
 
 [LLM::API](https://metacpan.org/pod/LLM%3A%3AAPI) - client interface to Anthropic's Claude API
 
-[Module::ScanDeps::Static](https://metacpan.org/pod/Module%3A%3AScanDeps%3A%3AStatic) - the static dependency scanner used by
-`make requires` and `make test-requires` to analyze your source files
+[Module::ScanDeps::Static](https://metacpan.org/pod/Module%3A%3AScanDeps%3A%3AStatic) - the static scanner used for CPAN
+dependency discovery and for inter-module build-order discovery
+through `deps.mk`.
 
 # DEPENDENCIES
 
-    CLI::Simple
-    CPAN::Maker
-    Class::Accessor::Fast
-    Config::Tiny
-    Email::Valid
-    File::Copy::Recursive
-    File::HomeDir
-    File::ShareDir
-    HTTP::Tiny
-    IO::Interactive
-    IO::Scalar
-    IO::Socket::SSL
-    JSON
-    Log::Log4perl
-    Module::Metadata
-    Module::ScanDeps::Static
-    Net::SSLeay
-    Pod::Extract
-    Readonly
-    Role::Tiny
-    Text::ASCIITable
-    YAML::Tiny
+The current runtime, build, test, recommended, and suggested
+dependencies are declared in the distribution metadata generated by
+[CPAN::Maker](https://metacpan.org/pod/CPAN%3A%3AMaker).
 
-## Required for AI Commands
+See `Makefile.PL`, `META.json`, or `META.yml` in the distribution
+for the authoritative dependency set.
 
-    Archive::Tar
-    Pod::Extract (required for code-review command)
-    Text::ASCIITable;
-
-## Recommend Packages
-
-    Term::ANSIColor
+Some optional features require additional dependencies only when those
+features are used.
 
 # VERSION
 
-This documentation refers to version 2.3.6
+This documentation refers to version 2.4.0
 
 # AUTHOR
 

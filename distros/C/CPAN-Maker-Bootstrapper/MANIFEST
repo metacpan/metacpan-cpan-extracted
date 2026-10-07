@@ -10,6 +10,7 @@ lib/CPAN/Maker/Bootstrapper/Role/CreateDeps.pm
 lib/CPAN/Maker/Bootstrapper/Role/Critic.pm
 lib/CPAN/Maker/Bootstrapper/Role/DarkPANRequires.pm
 lib/CPAN/Maker/Bootstrapper/Role/DepsFilter.pm
+lib/CPAN/Maker/Bootstrapper/Role/DistFile.pm
 lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm
 lib/CPAN/Maker/Bootstrapper/Role/Filter.pm
 lib/CPAN/Maker/Bootstrapper/Role/Init.pm
@@ -23,6 +24,7 @@ lib/CPAN/Maker/Bootstrapper/Role/PAUSEUpload.pm
 lib/CPAN/Maker/Bootstrapper/Role/Provides.pm
 lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm
 lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm
+lib/CPAN/Maker/Bootstrapper/Role/ShowDefaults.pm
 lib/CPAN/Maker/Bootstrapper/Role/Version.pm
 lib/Git/ReleaseDiffs.pm
 lib/Text/ASCIITable/FixANSI.pm
@@ -35,6 +37,8 @@ share/bash-completion.mk
 share/bootstrap.mk
 share/build.yml
 share/builder
+share/builder.env
+share/builder.mk
 share/buildspec.yml.tmpl
 share/class-module.pm.tmpl
 share/cli-module.pm.tmpl
@@ -54,6 +58,7 @@ share/pod-review.prompt
 share/publish.mk
 share/README.md
 share/release-notes.mk
+share/test.mk
 share/test.t.tmpl
 share/update.mk
 share/upgrade.mk

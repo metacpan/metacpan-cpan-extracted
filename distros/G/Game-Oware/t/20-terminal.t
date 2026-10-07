@@ -67,12 +67,23 @@ subtest 'a whole game, in process, on handles that are strings' => sub {
 	like($$output, qr/\bA\b.*\bF\b/s, 'the letters are printed');
 };
 
+# Rendered in --ascii so the frame is a `|` that split can be trusted with.
+# The wide frame is multi-byte and this file is not under `use utf8`, so
+# splitting a wide board here would be a trap rather than a test. The wide
+# form gets its own subtest below.
+sub counts {
+	my ($line) = @_;
+	$line =~ s/\e\[[0-9;]*m//g;
+	my @field = split /\|/, $line;
+	return map { my $n = $field[$_]; $n =~ s/\D//g; $n } 2 .. 7;
+}
+
 subtest 'the board is turned round for whoever is looking' => sub {
 	my $game = Game::Oware->new(seed => 'view',
 		board => [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0, 0 ]);
 
-	my ($as_p1) = terminal(game => $game, seat => 'p1');
-	my ($as_p2) = terminal(game => $game, seat => 'p2');
+	my ($as_p1) = terminal(game => $game, seat => 'p1', ascii => 1);
+	my ($as_p2) = terminal(game => $game, seat => 'p2', ascii => 1);
 
 	my @one = $as_p1->board_text($game, 'p1');
 	my @two = $as_p2->board_text($game, 'p2');
@@ -85,11 +96,40 @@ subtest 'the board is turned round for whoever is looking' => sub {
 
 	# THE HALF THAT MATTERS: the view rotates, the names do not. Two people
 	# looking at one game must never disagree about where a house is.
-	is(scalar @one, 7, 'seven lines: two letter rows, two number rows, three rules');
-	like($one[4], qr/\|\s*1\|\s*2\|\s*3\|\s*4\|\s*5\|\s*6\|/,
+	is(scalar @one, 9,
+		'nine lines: two letter rows, two seed rows, two count rows, three rules');
+
+	is_deeply([ counts($one[5]) ], [ 1, 2, 3, 4, 5, 6 ],
 		"p1's own row reads A to F, left to right");
-	like($two[2], qr/\|\s*6\|\s*5\|\s*4\|\s*3\|\s*2\|\s*1\|/,
+	is_deeply([ counts($two[3]) ], [ 6, 5, 4, 3, 2, 1 ],
 		'and p2 sees the same row reversed, still called A to F');
+
+	# And the stores sit at the ends, the viewer's own on the right, which is
+	# where it is when you sit down to play.
+	my @ends = (split /\|/, $one[3])[ 1, 8 ];
+	like($ends[0], qr/p2/, "p1 sees p2's store on the left");
+	like($ends[1], qr/p1/, 'and its own on the right');
+	like((split /\|/, $two[3])[1], qr/p1/, "p2's view puts p1's store on the left");
+};
+
+# THE FLAG THAT CHANGED NOTHING. The first version of this module shipped two
+# identical glyph tables, so --ascii was a documented option with no effect.
+subtest 'ascii is a real second table' => sub {
+	my $game = Game::Oware->new(seed => 'glyph');
+
+	my ($wide)  = terminal(game => $game, ascii => 0);
+	my ($plain) = terminal(game => $game, ascii => 1);
+
+	my @wide  = $wide->board_text($game, 'p1');
+	my @plain = $plain->board_text($game, 'p1');
+
+	isnt($wide[1], $plain[1], 'the frame differs');
+	isnt($wide[2], $plain[2], 'and so do the seeds');
+
+	like($plain[1], qr/\A\+-+\+/, 'ascii draws the frame with + and -');
+	unlike($plain[2], qr/[^-+|.\s\d]/, 'and a seed with a full stop');
+
+	is(scalar @wide, scalar @plain, 'both tables draw the same nine lines');
 };
 
 subtest 'a bad letter is refused and the prompt comes back' => sub {
@@ -256,7 +296,10 @@ subtest 'every option is validated in the constructor' => sub {
 	like($@, qr/seat must be p1 or p2/, 'and a seat that does not exist');
 };
 
-subtest 'quiet says nothing but still plays' => sub {
+# QUIET IS NOT SILENT. The first version of this module gated `_finish` on
+# quiet along with everything else, so a --quiet game played to the end and
+# then never said who won, which is the one line a run of a game always owes.
+subtest 'quiet drops the board and the narration, never the result' => sub {
 	my ($terminal, $output) = terminal(quiet => 1);
 
 	my $result = $terminal->start;
@@ -264,6 +307,27 @@ subtest 'quiet says nothing but still plays' => sub {
 	isa_ok($result, 'Game::Oware::Result');
 	unlike($$output, qr/sows/, 'no narration');
 	unlike($$output, qr/Oware, abapa rules/, 'and no banner');
+	unlike($$output, qr/in play, 25 wins/, 'and no board');
+
+	like($$output, qr/\Q@{[ $result->stringify ]}\E/, 'but the result is there');
+};
+
+subtest 'the cycle house rule is said even under quiet' => sub {
+	# The circuit: one seed each, twelve-ply period, fires on ply 24.
+	my $game = Game::Oware->new(seed => 'circuit',
+		board => [ (0) x 5, 1, (0) x 5, 1, 23, 23 ]);
+
+	my ($terminal, $output) = terminal(game => $game, quiet => 1);
+
+	$terminal->start;
+
+	is($terminal->game->result->reason, 'cycle', 'the cycle rule ended it');
+
+	# It is not narration. A terse run of this program must not imply that a
+	# book says what it just did.
+	like($$output, qr/THAT IS A HOUSE RULE AND NOT A RULE OF OWARE/,
+		'so quiet does not silence the disclaimer');
+	unlike($$output, qr/sows/, 'while the narration is still gone');
 };
 
 # bin/oware owns the exit status, which is the only reason it exists as a

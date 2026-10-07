@@ -42,12 +42,15 @@ t/pod-cm.t
 t/pod-coverage.t
 t/pod-synopsis.t
 t/pod.t
+t/private_runtime.t
+t/redact.t
 t/regressions.t
 t/rotation.t
 t/rt_178070.t
 t/rt_180018.t
 t/rt_181461.t
 t/sendmail.t
+t/sendmail_digest.t
 t/structured_fields.t
 t/subclass.t
 t/syslog.t

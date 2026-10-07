@@ -2,7 +2,7 @@ package Data::HashMap::I16A;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub import {
     $^H{"Data::HashMap::I16A/hm_i16a_put"}        = 1;
@@ -39,7 +39,7 @@ __END__
 
 =head1 NAME
 
-Data::HashMap::I16A - hash map from int16 keys to any Perl value values
+Data::HashMap::I16A - hash map from int16 keys to any Perl value
 
 =head1 SYNOPSIS
 

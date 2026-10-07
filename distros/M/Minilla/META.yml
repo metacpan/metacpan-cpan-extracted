@@ -33,7 +33,7 @@ no_index:
 provides:
   Minilla:
     file: lib/Minilla.pm
-    version: v3.3.0
+    version: v3.3.1
   Minilla::CLI:
     file: lib/Minilla/CLI.pm
   Minilla::CLI::Build:
@@ -177,7 +177,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/Minilla/issues
   homepage: https://github.com/tokuhirom/Minilla
   repository: https://github.com/tokuhirom/Minilla.git
-version: v3.3.0
+version: v3.3.1
 x_contributors:
   - 'Alex Kapranoff <alex@kapranoff.ru>'
   - 'Alex Kapranoff <kappa@yandex.ru>'

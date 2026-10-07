@@ -75,6 +75,16 @@ is( lst("pre" . (shm_ss_keys $m)),
         ok !eval q{ shm_ss_size $m; 1 }, 'no Data::HashMap::Shared::SS switches the keywords off';
     }
     ok eval q{ shm_ss_size $m; 1 }, '  ... for the enclosing scope only' or diag $@;
+
+    # A last argument that opens with a parenthesis ends at its close: what
+    # follows applies to the keyword's result.
+    my ($x, $y) = ('a', 'b');
+    { no warnings 'void'; shm_ss_put $m, 'p', ($x) . $y; }
+    is $m->get('p'), 'a', 'a last argument ($x) . $y passes only $x';
+    shm_ss_put $m, 'q', +($x) . $y;
+    is $m->get('q'), 'ab', '  ... and +($x) . $y passes the whole expression';
+    $m->put(a => 'A');
+    is scalar(shm_ss_get $m, ($x) . $y), 'Ab', '  ... in a lookup, the concatenation applies to the result';
 }
 
 done_testing;

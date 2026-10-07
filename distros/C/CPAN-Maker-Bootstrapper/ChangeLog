@@ -1,3 +1,133 @@
+Fri Oct  2 15:52:52 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.4.0]:
+	* README.md: generated
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-2.4.0.md: new
+	* gitignore: *.reconciled
+	* .gitignore: likewise
+	* .includes/builder.mk
+	- moved from Makefile
+	- pass MODULE_NAME to CI environment
+	- refactored to eliminate git knowledge
+	* .includes/test.mk: new
+	* buildspec.yml
+	(extra-files): + .includes/builder.mk, .includes/test.mk
+	* builder
+	- CI hooks
+	- builder.env
+	- make clean
+	* builder.env: new
+	* MANIFEST
+	- +builder, builder.env, builder.mk, test.mk
+	* cmb_md5sums.txt: generated
+	* .includes/test.mk
+	- moved targets test, test-local, check here
+	(test-author): new
+	(test-release): new
+	(test-smoke): new
+	* .includes/publish.mk
+	- add mode line
+	- prevent PAUSE_PASSWORD from appearing in output
+	* .includes/local.mk
+	- install test-requires.cpanfile for carton too
+	- mode line
+	- create local directory if it does not exist
+	* .includes/perl.mk
+	- no recursive expansion for SYNTAX_CHECKING, PERLTIDYRC, PERLCRITICRC
+	- only create deps.mk if syntax checking is on
+	- add check sentinel for syntax checking
+	- use PERLCRITIC, not PERLCRITICRC to gate perlcritic
+	- use PERLTIDY, not PERLTIDYRC to gate perltidy
+	* .includes/update.mk
+	- add builder.mk, test.mk
+	(INCLUDES_FILES)
+	- fix addprefix command
+	(MANAGED_FILES): renamed MANAGED_SOURCE_FILES
+	(MANIFEST): INCLUDES_FILES
+	(update-available)
+	- refactored to use cmb_update_check, cmb_version_drift
+	* Makefile
+	- no recursive expansion for MODULE_NAME
+	- pipefail
+	- move workflow: build-ci: targets to .includes/builder.mk
+	- set PERL_MODULES if bootstrapping
+	- include .includes/test.mk
+	- use sentinel to avoid re-running filter on dependency files
+	(builder-pre): new
+	(builder-post): new
+	(lc): new
+	(scan_on): new
+	(lint_off): new
+	(darkpan_requires_on): new
+	(cmb_update_check): new
+	(cmb_version_drift): new
+	- use darkpan_requires_on, not DARKPAN_REQUIRES_ENABLED
+	(cpanfile.darkpan,cpanm.darkpan): do not add files to extra-files.skip
+	- $(MODULE_PATH.in): make sure module path exists
+	- use scan_on to gate distribution dependency scanning
+	(extra-files): only check if files are tracked by git if $(GIT)
+	(TARBALL)
+	- add syntax checking gate
+	(provides): depend on just pm.in files
+	(test-require): guard missing files
+	(%: %.raw): likewise
+	(test-local): moved to test.mk
+	(test): likewise
+	(check): likewise
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- POD updates
+	* lib/CPAN/Maker/Bootstrapper/Role/DistFile.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/ShowDefaults.pm.in: new
+	* cpan-maker-bootstrapper.yml: add above new commands
+	* lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in
+	(cmd_install)
+	- validate import paths early
+	- make SKIP_TESTS true always on imports
+	- no need to check $ENV{SCAN}
+	- use @args that were set
+	- use current path as module name if not provided
+	- produce report in dry-run mode
+	- create project tarball if --project-tarball
+	- default to LINT=off, PERLTIDYRC & PERLCRITICRC no longer gate	linting
+	- remove local/ before copying or creating tarball
+	- update final message based on --project-tarball state
+	- report import errors in summary
+	(_validate_import_paths): new
+	(_validate_module)
+	- avoid traversing exclude paths
+	(_import_files)
+	- use new $files object to create and copy files
+	(_report_import_plan): new
+	(_report_import_errors): new
+	(_exclude_import_dir): new
+	(_import_file_listing)
+	- create structure map of files to be imported
+	- identify duplicate files
+	(_import_error_destination): new
+	(_classify_test_file): new
+	(_create_project_tarball): new
+	* recommends: removed blank line
+	* .prompts/release-notes.prompt: remove prompt re build system
+	* lib/CPAN/Maker/Bootstrapper/ConfigReader.pm.in
+	- add config_file accessor
+	(new) save config_file value
+	* lib/CPAN/Maker/Bootstrapper/Constants.pm.in
+	(@EXPORT_OK): $MAX_TOKENS
+	* lib/CPAN/Maker/Bootstrapper/Role/Init.pm.in
+	(init)
+	- do to not execute _import_file_listing here
+	- set max tokens if not set
+	(_init_config)
+	- set config from reader
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm.in
+	(_cmd_review): use max_tokens (default already set)
+	* lib/CPAN/Maker/Bootstrapper/Role/Provides.pm.in
+	(cmd_provides)
+	- stop using CPAN::Maker::Role::Provides::create_provides
+	- use File::Find to find .pm.in files
+
 Thu Oct  1 06:24:45 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.3.6]:
