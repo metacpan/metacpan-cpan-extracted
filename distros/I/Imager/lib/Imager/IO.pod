@@ -11,6 +11,7 @@ Imager::IO - Imager's io_layer object.
   my $count = $IO->read($buffer, $max_count);
   my $position = $IO->seek($offset, $whence);
   my $status = $IO->close;
+  my $size = $IO->size;
 
 =head1 DESCRIPTION
 
@@ -46,6 +47,8 @@ string.  If C<$data> contains characters with a code point above
 C<0xFF> an exception will be thrown.
 
 =item new_cb($writecb, $readcb, $seekcb, $closecb)
+
+=item new_cb($writecb, $readcb, $seekcb, $closecb, $sizecb)
 
 Create a new I/O layer based on callbacks.  See 
 L<Imager::Files/"I/O Callbacks"> for details on the behavior of 
@@ -220,6 +223,11 @@ a file this won't close the file handle, but buffers may be flushed
 
 Returns 0 on success, -1 on failure.
 
+=item size()
+
+Returns the size of the stream, if it's a file or memory buffer.
+Returns -1 on failure.
+
 =item eof()
 
   $io->eof
@@ -361,6 +369,26 @@ the new_bufchain() method.
 Dump the internal buffering state of the I/O object to C<stderr>.
 
   $io->dump();
+
+=back
+
+=head2 CLASS METHODS
+
+=over
+
+=item get_max_mmap_size()
+
+  my $size = Imager::IO->get_max_mmap_size();
+
+Fetch the maximum allowed address space that can be used to map a file
+into memory.
+
+=item set_max_mmap_size()
+
+  my $ok = Imager::IO->get_max_mmap_size($new_size);
+
+Set the maximum allowed address space that can be used to map a file
+into memory.
 
 =back
 

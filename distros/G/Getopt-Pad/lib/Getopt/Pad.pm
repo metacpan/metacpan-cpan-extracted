@@ -17,19 +17,24 @@ use Getopt::Pad::Completion;
 use Getopt::Pad::Error;
 use Getopt::Pad::ExitRequest;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @EXPORT  = qw(GetOptions);
 
-sub GetOptions(%raw) {
-	my $argv = delete $raw{argv} // [@ARGV];
-	Getopt::Pad::Util::specError("'argv' must be an array reference") if ref $argv ne 'ARRAY';
+sub GetOptions(@pairs) {
+	Getopt::Pad::Util::specError('GetOptions expects key/value pairs') if @pairs % 2;
+
+	my %raw     = @pairs;
+	my $rawArgv = delete $raw{argv} // [@ARGV];
+	Getopt::Pad::Util::specError("'argv' must be an array reference") if ref $rawArgv ne 'ARRAY';
+	my $argv = [map { Getopt::Pad::Util::decodedWord($_) } $rawArgv->@*];
 
 	my $spec = Getopt::Pad::Spec->new(raw => \%raw);
 
 	# A generated completion script asking for candidates: answer it
 	# instead of parsing.
 	if (defined $ENV{Getopt::Pad::Completion->SHELL_VARIABLE}) {
-		print Getopt::Pad::Completion->new(spec => $spec)->renderCandidates($argv, $ENV{Getopt::Pad::Completion->INDEX_VARIABLE});
+		my $candidates = Getopt::Pad::Completion->new(spec => $spec)->renderCandidates($argv, $ENV{Getopt::Pad::Completion->INDEX_VARIABLE});
+		print Getopt::Pad::Util::encodedFor(\*STDOUT, $candidates);
 		exit 0;
 	}
 
@@ -40,13 +45,13 @@ sub GetOptions(%raw) {
 	}
 	catch ($error) {
 		if (blessed($error) && $error->isa('Getopt::Pad::ExitRequest')) {
-			print $error->output;
+			print Getopt::Pad::Util::encodedFor(\*STDOUT, $error->output);
 			exit 0;
 		}
 		die $error if !blessed($error) || !$error->isa('Getopt::Pad::Error');
 
 		my $errorTag = Getopt::Pad::Util::useColor(\*STDERR) ? "\e[1;31mERROR\e[0m" : 'ERROR';
-		print {*STDERR} sprintf("%s: %s\n", $errorTag, $error);
+		print {*STDERR} Getopt::Pad::Util::encodedFor(\*STDERR, sprintf("%s: %s\n", $errorTag, $error));
 		if (defined $error->level) {
 			print {*STDERR} "\n";
 			$spec->helperFor($error->level, handle => \*STDERR)->printHelp;
@@ -253,9 +258,10 @@ C<--log-level debug>. Options are declared under the C<options> key.
 
 An option is declared with one or more names separated by C<|>, such as
 C<'owner|o'>. The first name (C<owner>) is the I<primary name>. It names
-the reader and is shown in the help output. The other names (C<o>) are
-I<aliases>: the command line accepts them and shell completion offers
-them, but readers and the help output use only the primary name.
+the reader and comes first in the help output. The other names (C<o>)
+are I<aliases>: the command line accepts them, shell completion offers
+them and the help output lists them after the primary name, but readers
+and messages use only the primary name.
 
 =item arg
 
@@ -373,6 +379,7 @@ L</description>, L</examples>, L</config>, L</version> and L</argv>.
     hidden               boolean                false
     valid                arrayref or coderef    none       allowed values
     lazyValid            coderef                none       custom check
+    processValue         coderef                none       converts each value
     multiple             boolean                false      value-taking types only
     csv                  boolean                false      requires multiple
     hash                 boolean                false      value-taking types only
@@ -380,8 +387,10 @@ L</description>, L</examples>, L</config>, L</version> and L</argv>.
     inherit              boolean                false      levels with commands only
     typehint             string                 type's     label shown in the help
     min, max             number                 none       int and float only
+    bigint               boolean                false      int only
     mustExist            boolean                false      file and dir only
     createPathIfMissing  boolean                false      file and dir only
+    timezone             time zone name         'local'    date and duration only
 
 See L</OPTION SPECS>. C<multiple>, C<hash> and C<objectlist> exclude each
 other. C<mustExist> and C<createPathIfMissing> exclude each other.
@@ -398,9 +407,12 @@ other. C<mustExist> and C<createPathIfMissing> exclude each other.
     multiple             boolean    false      last arg only, takes the rest
     help                 string     ''
     typehint             string     type's     label shown in the help
+    processValue         coderef    none       converts each value
     min, max             number     none       int and float only
+    bigint               boolean    false      int only
     mustExist            boolean    false      file and dir only
     createPathIfMissing  boolean    false      file and dir only
+    timezone             zone name  'local'    date and duration only
 
 See L</ARG SPECS>.
 
@@ -433,6 +445,8 @@ See L</CONFIG FILES>.
     file                         --name PATH          the path
     dir, directory               --name PATH          the path
     url, uri                     --name URL           the URL
+    date                         --name tomorrow      DateTime object
+    duration                     --name '2 days'      DateTime::Duration object
 
 See L</TYPES>.
 
@@ -611,6 +625,7 @@ An arrayref of words to parse instead of C<@ARGV>. C<GetOptions> copies
 the words; neither C<@ARGV> nor this arrayref is modified. This is useful
 for tests (see L<Getopt::Pad::Cookbook/Testing a command line>) and for
 parsing a command line that does not come from C<@ARGV>. Top level only.
+The words are decoded like those of C<@ARGV>, see L</Encoding>.
 
 =head1 OPTION SPECS
 
@@ -688,7 +703,7 @@ own. An unknown type name is a spec error.
 
 The option must be set, on the command line or in a config file. If
 neither sets it, parsing stops with the user error C<missing required
-option '--NAME'>. This works for flags as well: a required flag must be
+option '--NAME'> (C<'-N'> for a name of one letter). This works for flags as well: a required flag must be
 given. A value from a config file satisfies C<required>. The help
 output marks required options with C<[REQ]>. C<required> and L</default>
 exclude each other.
@@ -714,15 +729,15 @@ reader returns the checked value, for example a number for an C<int>
 option. Every parse gets its own copy of a list or mapping default, so
 changing it does not affect later parses.
 
-The help output shows the default in a C<Default> line.
+The help output shows the default as the spec wrote it in a C<Default>
+line, so an C<int> default of C<'007'> is shown as 007. An empty list or
+mapping default shows no C<Default> line.
 
-C<< default => undef >> is allowed for single-value options and mostly
-means the same as no default. There are two differences: a custom type's
-C<prepare> method is called with C<undef> (see
-L<Getopt::Pad::Type/prepare>), and C<--create-default-config> writes the
-option into the file with an empty value (YAML C<~>, JSON C<null>),
-which the program then rejects with C<no value given> when it reads the
-file. Remove such lines from a generated file.
+C<< default => undef >> is allowed for single-value options and means
+the same as no default, also to C<--create-default-config>, which leaves
+the option out. The one difference: a custom type's C<verify> and
+C<prepare> methods are called with C<undef> (see
+L<Getopt::Pad::Type/verify>).
 
 C<default> and L</required> exclude each other.
 
@@ -806,6 +821,48 @@ for the help output or for shell completion.
 If you want a more specific error message than "is not a valid value",
 write a custom type instead (see L<Getopt::Pad::Type>), whose C<check>
 method returns the message.
+
+=head2 processValue
+
+=for highlighter language=perl
+
+    processValue => sub {
+        my ($opt, $value) = @_;
+        return Mojo::File->new($value);
+    },
+
+A coderef that converts a value into what the reader returns, for
+example an object. It is accepted on options and on args (see
+L</ARG SPECS>).
+
+The coderef is called with two arguments: the result object of the
+level the option belongs to, and one value. Its return value replaces
+that value. For options with several values, it is called once for each
+list item (L</multiple>), each mapping value (L</hash>) or each field
+value (L</objectlist>), and the list or mapping itself is kept. For a
+multiple arg, it is called once per word.
+
+It runs once all options and args of the level have passed their checks
+(see L</How values are checked>), and only for the value that is finally
+used, whether that comes from the command line, a config file or the
+L</default>. An option that is not set anywhere and has no default is
+not processed, and neither is an optional arg that is not given; they
+read as described in L</Values by option kind>.
+
+C<$opt> holds the checked values of every option and arg of the level
+before any C<processValue> ran, so the order in which the callbacks run
+does not matter. Its L<Getopt::Pad::Result/subcommand> is already
+processed. It gives no access to the levels above, including the
+L</inherit> options declared there. C<GetOptions> returns a different
+result object, created after all callbacks ran, which holds the
+processed values; do not keep C<$opt> beyond the callback.
+
+C<processValue> does not affect the help output, shell completion or
+C<--create-default-config>, which work with the values before
+processing. Exceptions thrown by the coderef are not caught (see
+L</Spec errors>). To reject a value with a user error, use
+L</lazyValid> or a custom type. L<Getopt::Pad::Cookbook> has recipes
+that wrap paths in objects and convert a L</duration> to seconds.
 
 =head2 multiple
 
@@ -892,12 +949,15 @@ arrayref of hashrefs, one per index, ordered by index:
     $ tool --server 0.host=alpha --server 0.port=80 --server 1.host=beta
     # $opt->server is [ { host => 'alpha', port => '80' }, { host => 'beta' } ]
 
-INDEX is a number starting at 0. The indices used must be exactly 0 to
-n-1, in any order; a gap is the user error C<missing index N>. FIELD
+INDEX is a number starting at 0, written without leading zeros. The
+indices used must be exactly 0 to n-1, in any order; a gap is the user
+error C<missing index N>. FIELD
 consists of letters, digits, underscores and dashes. A word without C<=>
 is the user error C<Option server, key "WORD", requires a value>; a word
 whose key does not have the form C<INDEX.FIELD> is the user error
-C<invalid key 'KEY', expected INDEX.FIELD=VALUE>. Giving the same
+C<invalid key 'KEY', expected INDEX.FIELD=VALUE>, and an index with a
+leading zero (C<00.host>) the user error C<invalid key 'KEY', the index
+must not have leading zeros>. Giving the same
 C<INDEX.FIELD> again replaces its value. The values are checked with the
 type (so the C<port> above stays a string for a C<string> option),
 L</valid> and L</lazyValid>. When the option is not set anywhere and has
@@ -968,6 +1028,19 @@ inclusive. Values outside are user errors (C<5 is smaller than the
 minimum of 10>). Both must be numbers and C<min> must not be larger than
 C<max>, or the spec is invalid.
 
+=item bigint
+
+=for highlighter language=perl
+
+    id => { type => 'int', bigint => 1 },
+
+For C<int>. The reader returns a L<Math::BigInt> object instead of a
+Perl number, so integers of any size are accepted and kept exactly,
+such as C<123456789012345678901234567890>. The bounds L</min, max> are
+compared exactly and must be integers themselves (C<min must be an
+integer with bigint, not '1.5'>). Large integers in JSON config files
+reach the option exactly as well.
+
 =item mustExist
 
 For C<file> and C<dir>. The path must exist when the command line is
@@ -975,12 +1048,11 @@ parsed: an existing file (not a directory) for C<file>, an existing
 directory for C<dir>. The help output marks the option with
 C<[has to exist]>.
 
-Like every check, C<mustExist> also applies to the L</default>, and
-defaults are checked when C<GetOptions> builds the spec. A default path
-that does not exist on the machine the program runs on therefore makes
-C<GetOptions> die with a spec error, even when the command line gives
-another path. Give a C<mustExist> option a default only if the path is
-certain to exist.
+The path is checked only for the value that is finally used, after all
+other checks of every selected level passed. A L</default> is checked
+only when neither the command line nor a config file overrides it; a
+missing default path is then the user error C<option '--NAME': default
+value: file 'PATH' does not exist>.
 
 =item createPathIfMissing
 
@@ -989,16 +1061,28 @@ directory with all missing parent directories for C<dir>, an empty file
 and its missing parent directories for C<file>. An existing path is left
 alone. The help output marks the option with C<[created if missing]>.
 
-The path is created after all checks of that value passed, and only for
-the value that is finally used: a default is created only if neither
-the command line nor a config file overrides it. Nothing is created for
+The path is created only for the value that is finally used: a default
+is created only if neither the command line nor a config file overrides
+it. Nothing is created until every option and arg of every selected
+level passed its checks, including L</mustExist>, so a command line that
+turns out to be invalid creates nothing. Nothing is created for
 C<--help> and the other automatic options, or for a shell completion
-request. Values are processed one option at a time, so a path can
-already have been created when a later option or arg of the same command
-line turns out to be invalid. If the path cannot be created, that is a
-user error (C<cannot create directory 'PATH': REASON>).
+request. If the path cannot be created, that is a user error
+(C<cannot create directory 'PATH': REASON>); paths created for other
+options of the same parse stay. A path that exists but is of the other
+kind, such as a directory for a C<file> option, is the user error
+C<'PATH' is not a file>.
 
 C<mustExist> and C<createPathIfMissing> exclude each other.
+
+=item timezone
+
+For C<date> and C<duration>. The time zone in which values are parsed
+and returned, as a name that L<DateTime::TimeZone> knows, such as
+C<UTC>, C<Europe/Berlin> or C<floating>. The default, C<local>, is the
+system's time zone; when the system's time zone cannot be determined,
+C<local> falls back to C<floating>, a date and time without a zone. An
+unknown name is a spec error.
 
 =back
 
@@ -1054,6 +1138,11 @@ The help text shown in the C<Arguments> section of the help output.
 
 Replaces the type label in the help output, see L</typehint>.
 
+=item processValue
+
+A coderef that converts the value, as for options (see
+L</processValue>). For a multiple arg, it is called once per word.
+
 =back
 
 Args do not support C<default>, C<valid>, C<lazyValid>, C<hidden>,
@@ -1062,8 +1151,8 @@ that is not given reads as C<undef>. Words left over after the last arg
 are the user error C<unexpected extra argument 'WORD'>. A level without
 C<args> accepts no positional words at all.
 
-Args are checked with their type, including C<mustExist>, the bounds and
-C<createPathIfMissing>. They cannot be set in config files.
+Args are checked with their type, including the bounds, C<mustExist>
+and C<createPathIfMissing>. They cannot be set in config files.
 
 =head1 TYPES
 
@@ -1114,23 +1203,24 @@ Any value. The reader returns it unchanged.
 
 =head2 int
 
-Names: C<int>, C<integer>, C<i>. Keys: L</min, max>.
+Names: C<int>, C<integer>, C<i>. Keys: L</min, max>, L</bigint>.
 
 An integer: optional C<+> or C<->, followed by decimal digits (C<42>,
 C<-7>, C<+3>, C<007>). The reader returns a number (C<007> reads as 7).
-Other values are the user error C<'VALUE' is not an integer>.
+Other values are the user error C<'VALUE' is not an integer>. A value
+outside the range of Perl's integers (from -2**63 to 2**64-1 on a 64-bit
+perl) is the user error C<'VALUE' is too large for an integer>, unless
+the option has L</bigint>.
 
 =head2 float
 
 Names: C<float>, C<num>, C<number>, C<f>. Keys: L</min, max>.
 
 A number in any notation Perl understands as a decimal number: C<1.5>,
-C<-2>, C<.5>, C<1e3>. Values spelled C<inf>, C<infinity> or C<nan> are
-rejected with C<'VALUE' is not a finite number>. Hexadecimal values such
-as C<0x10> are rejected with C<'VALUE' is not a number>. A value too
-large for a Perl number, such as
-C<1e999>, is accepted and reads as C<Inf>; use C<max> to exclude it. The
-reader returns a number. Other values are the user error C<'VALUE' is not
+C<-2>, C<.5>, C<1e3>. Values spelled C<inf>, C<infinity> or C<nan>, and
+values too large for a Perl number, such as C<1e999>, are rejected with
+C<'VALUE' is not a finite number>. Hexadecimal values such as C<0x10> are
+rejected with C<'VALUE' is not a number>. The reader returns a number. Other values are the user error C<'VALUE' is not
 a number>.
 
 =head2 file
@@ -1158,6 +1248,53 @@ A URL of the form C<scheme://rest>: a scheme that starts with a letter
 least one character, without whitespace. C<https://example.com/x> and
 C<file:///tmp/x> are accepted; C<example.com> and C<mailto:me@example.com>
 are not. The help output labels the option C<[URL]>.
+
+=head2 date
+
+Names: C<date>. Keys: L</timezone>.
+
+A date and time in natural language, such as C<tomorrow 3pm>,
+C<last monday>, C<3 days ago> or C<2026-10-06 14:00>. The value is
+parsed by L<DateTime::Format::Natural>, which is not installed together
+with Getopt::Pad; a spec that uses C<date> without it is a spec error.
+L<DateTime::Format::Natural::Lang::EN> lists the expressions it
+understands. Numeric dates such as C<10/06/2026> are read as
+day/month/year; the ISO 8601 form C<2026-10-06> cannot be misread.
+
+The reader returns a L<DateTime> object in the option's L</timezone>. A
+value that cannot be parsed is the user error C<'VALUE' is not a date>.
+The help output labels the option C<[Date]>.
+
+Relative values are resolved against the current time when the value is
+checked: during the parse for the command line and config files, and
+when C<GetOptions> builds the spec for a L</default>. The help output
+and C<--create-default-config> show a default as the spec wrote it
+(C<yesterday>), not as the date it resolved to. A L</valid> list is
+compared with the date's string form, such as C<2026-10-06T14:00:00>.
+
+=head2 duration
+
+Names: C<duration>. Keys: L</timezone>.
+
+A length of time: one number and one unit, written out, with an
+optional leading C<for>, such as C<90 seconds>, C<2 weeks>, C<1 month> or
+C<for 3 hours>. Abbreviations such as C<1h> and combinations such as
+C<1 hour 30 minutes> are not accepted. Like C<date>, the value is parsed
+by L<DateTime::Format::Natural> and needs that module.
+
+The reader returns a L<DateTime::Duration> object. A value that cannot
+be parsed is the user error C<'VALUE' is not a duration>. The help output
+labels the option C<[Duration]>, and the help output and
+C<--create-default-config> show a default as the spec wrote it.
+
+A L<DateTime::Duration> keeps months, days and minutes apart, as calendar
+arithmetic requires: C<2 weeks> is 14 days, and its
+C<in_units('seconds')> is 0. Add it to a L<DateTime> to find a point in
+time, or convert it with L</processValue> as shown in
+L<Getopt::Pad::Cookbook/"A duration in seconds (duration and processValue)">.
+The length is measured from the current time in the option's
+L</timezone>, which makes a difference only when it spans a daylight
+saving change.
 
 =head2 Custom types
 
@@ -1339,7 +1476,7 @@ the level where it happened. An invalid value of an inherited option is
 reported with the help of the level that declares it, wherever on the
 command line it was given. An error in the structure of a config file
 (an unknown command or option, a parse error, a missing file) is
-reported with the help of the top level.
+reported with the help of the innermost level the command line selects.
 
 =head2 Options for all commands (global options)
 
@@ -1415,8 +1552,7 @@ mapping are checked one by one in the following steps.
 
 =item 2.
 
-The type's check, including the type-specific keys (L</min, max>,
-L</mustExist>).
+The type's check, including the type-specific keys L</min, max>.
 
 =item 3.
 
@@ -1432,13 +1568,24 @@ The L</lazyValid> check, called with the converted value.
 
 =item 6.
 
-For the value that is finally used: preparation, which creates missing
+For the value that is finally used, once the values of every level the
+command line selects passed the steps above: the checks that depend on
+the machine, such as L</mustExist>.
+
+=item 7.
+
+Once every such value passed step 6: preparation, which creates missing
 paths for L</createPathIfMissing>.
+
+=item 8.
+
+For the value that is finally used, once all options and args of the
+level passed the steps above: L</processValue>.
 
 =back
 
-Args pass steps 2, 3 and 6. Defaults pass steps 1 to 5 when
-C<GetOptions> builds the spec, and step 6 when a parse uses them.
+Args pass steps 2, 3 and 6 to 8. Defaults pass steps 1 to 5 when
+C<GetOptions> builds the spec, and steps 6 to 8 when a parse uses them.
 
 =head1 CONFIG FILES
 
@@ -1630,8 +1777,8 @@ C<counter> options take a non-negative integer.
 =item *
 
 A JSON C<true> or C<false> given to an option that is not a C<flag> or
-C<bool> reaches the reader as a L<JSON::PP::Boolean> object, which
-stringifies to 1 or 0.
+C<bool> reads as the plain value 1 or 0. YAML gives 1 and the empty
+string.
 
 =item *
 
@@ -1701,10 +1848,9 @@ that neither the command line nor a later config file overrides. A
 C<mustExist> path in the section of another command is not checked, and
 C<createPathIfMissing> creates nothing for it.
 
-An empty file is not an empty mapping. An empty YAML file (or one with
-only comments) is the user error C<config file 'PATH' must contain a
-mapping of group names>. For JSON, an empty file is a parse error; write
-C<{}> for a JSON file that sets nothing.
+An empty file sets nothing, like an empty mapping: a file of the
+autoload chain can be created before it has content. For YAML, a file
+with only comments is empty as well.
 
 =head2 Writing a starter config file
 
@@ -1717,11 +1863,11 @@ C<{}> for a JSON file that sets nothing.
 shows the path as the program received it.)
 
 The automatic option C<--create-default-config PATH> writes a config file
-that contains the default of every option that has one, on every level,
+that contains the default of every option that has a defined one, on every level,
 in the layout described above, and exits with status 0. Groups and
 command sections without any defaults are left out. The values are the
-checked and converted defaults, so an C<int> default of C<'007'> is
-written as 7.
+defaults as the spec wrote them, so an C<int> default of C<'007'> is
+written as 007.
 
 The option refuses to overwrite an existing file, and to write through a
 symbolic link (C<config file 'PATH' already exists>). It works even when
@@ -1733,7 +1879,20 @@ cannot write config files>. The built-in C<yaml> and C<json> formats can.
 =head2 Encoding
 
 Config files are read and written as UTF-8. Their values are Perl
-character strings. See L</CAVEATS> for values from the command line.
+character strings.
+
+Command line words are decoded from UTF-8 as well, so a value reaches
+the reader as the same character string from either source, and a
+L</valid> list written under C<use utf8> matches both. A word that is
+decoded already (with C<perl -CA>, or by your program) is taken as it
+is, and a word that is not valid UTF-8, such as a file name in Latin-1,
+stays a byte string.
+
+Output that holds characters (the help, error messages, completion
+candidates) is printed as UTF-8, unless the handle has an encoding layer
+of its own (C<perl -CS>, or C<binmode STDOUT, ':encoding(UTF-8)'>). Text
+that is a byte string, such as a help text in a program without C<use
+utf8>, is printed as it is.
 
 =head1 AUTOMATIC OPTIONS
 
@@ -1808,13 +1967,13 @@ L</SYNOPSIS> it looks like this:
        --[no-]compress             Compress the backup; --no-compress turns it
                                    off
                                        Default = 1
-       --exclude <>                Pattern of files to skip; repeat for more
+       --exclude, -x <>            Pattern of files to skip; repeat for more
                                    patterns
        --keep <>                   Number of backups to keep
                                        Default = 7
-       --target <>                 [REQ] Directory the backup is written to
+       --target, -t <>             [REQ] Directory the backup is written to
                                    [Path]
-       --verbose                   Print more details; repeat for even more
+       --verbose, -v               Print more details; repeat for even more
                                    (-vv)
 
 =head2 Layout
@@ -1853,8 +2012,11 @@ The L</examples>, if any.
 
 =head2 Entries
 
-An option is shown by its primary name. Aliases are not shown. The name
-is followed by a placeholder for its value:
+An option is shown by all its names, the primary name first, each written
+as it is typed: C<--owner, -o>. A L</bool> option shows its negation on
+the first name longer than one letter (C<--[no-]color, -c>), or after
+the names when all of them are single letters (C<-c, --no-c>). The names
+are followed by a placeholder for the value:
 
 =for highlighter language=plain
 
@@ -1866,12 +2028,13 @@ is followed by a placeholder for its value:
     --name <N.key=value>   objectlist
 
 The text next to the name consists of, in this order: C<[REQ]> for a
-required option or arg, C<[has to exist]> or C<[created if missing]> (for
-options only; args do not show them), the L</help> text, and the type
-label (C<[URL]>, C<[Path]>, C<[File Path]> or the L</typehint>). Below it,
-a C<Valid> line lists the values of a static L</valid> arrayref, and a
-C<Default> line shows the L</default>. A list default is shown as C<a, b>,
-a hash default as C<k=v, k2=v2>, and an objectlist default as C<0.host=a,
+required option or arg, C<[has to exist]> or C<[created if missing]>, the
+L</help> text, and the type label (C<[URL]>, C<[Path]>, C<[File Path]> or
+the L</typehint>). Below it, a C<Valid> line lists the values of a static
+L</valid> arrayref, and a C<Default> line shows the L</default> as the
+spec wrote it. An undefined default and an empty list or mapping default
+show no C<Default> line. A list default is shown as C<a, b>, a hash
+default as C<k=v, k2=v2>, and an objectlist default as C<0.host=a,
 0.port=80>.
 
 =head2 Width and color
@@ -1915,7 +2078,9 @@ For zsh, the directory must be in your C<$fpath>. You can also source the
 script from F<~/.bashrc> or F<~/.zshrc>. The script registers
 completion for the program's file name (the file name of C<$0> when the
 script is generated), so install the program under that name in your
-C<PATH>. The bash script needs bash 4.0 or later.
+C<PATH>. The bash script works with bash 3.2 (the system bash of macOS)
+and later. Before bash 4.0, file and directory candidates are not marked
+as such, so a directory is completed without a trailing slash.
 
 =head2 What is completed
 
@@ -1991,7 +2156,11 @@ name.
     objectlist option                  arrayref of hashrefs   []
     optional arg                       the value              undef
 
-Numbers from C<int> and C<float> options are returned as numbers.
+Numbers from C<int> and C<float> options are returned as numbers, and
+C<date> and C<duration> values as L<DateTime> and L<DateTime::Duration>
+objects. For an
+option or arg with L</processValue>, each value is replaced by what the
+coderef returned for it.
 
 =head2 Methods
 
@@ -2029,8 +2198,7 @@ uses. These names are a spec error: C<command>, C<subcommand>, C<help>,
 C<version>, C<helper>, C<reservesReader>, C<new>, C<can>, C<isa>,
 C<DOES>, C<VERSION>, C<META>, C<BUILDARGS>, C<DESTROY> and C<AUTOLOAD>
 (C<helper> and C<reservesReader> are internals of the result class).
-Currently C<croak> is rejected as well, which is a known bug. The error
-message is C<reader 'NAME' collides with a built-in result method>.
+The error message is C<reader 'NAME' collides with a built-in result method>.
 
 Aliases have no readers, so they may use these names, except C<help>
 (on every level) and C<version> (on the top level), which are automatic
@@ -2071,21 +2239,17 @@ and ends with the file and line of your C<GetOptions> call, for example:
 
     Getopt::Pad spec: option 'keep': default value: 'seven' is not an integer at backup line 11.
 
-Messages from the checks of a command's level start with the command
-path, such as C<Getopt::Pad spec: command 'image resize': ...>. These
-include the checks between the options and args of that level: duplicate
-names and aliases, reader clashes, the order of args and C<inherit>.
-Messages about the keys of one option or arg spec (unknown keys, type,
-default, bounds, C<valid>, C<typehint>) name only the option or arg, not
-the command, and C<unknown option type> names neither. C<GetOptions>
-checks the complete spec on every call, including all commands, before it looks
-at the command line, so a broken spec fails on the first run, whatever
-the command line is. The exception is an error raised by a L</valid>
+Messages about a command's level, and about the options and args
+declared on it, start with the command path, such as
+C<Getopt::Pad spec: command 'image resize': option 'width': ...>.
+C<GetOptions> checks the complete spec on every call, including all
+commands, before it looks at the command line, so a broken spec fails on
+the first run, whatever the command line is. The exception is an error raised by a L</valid>
 coderef that returns something other than an arrayref, which is only
 noticed when the coderef is called.
 
-Exceptions thrown by your own coderefs (L</valid>, L</lazyValid>) are
-not caught; they propagate out of C<GetOptions>.
+Exceptions thrown by your own coderefs (L</valid>, L</lazyValid>,
+L</processValue>) are not caught; they propagate out of C<GetOptions>.
 
 =head2 Exit status (exit code)
 
@@ -2106,10 +2270,7 @@ After a user error.
 
 C<GetOptions> itself never exits with any other status. When it returns,
 your program continues normally. A spec error is an uncaught C<die>,
-which ends the program with a non-zero status chosen by Perl from C<$!>
-or C<$?> (see L<perlfunc/die>): usually 255, but it can be any value,
-including 2. Do not use the exit status to tell spec errors from user
-errors.
+which ends the program with status 255.
 
 =head1 DIAGNOSTICS
 
@@ -2118,8 +2279,9 @@ text you see.
 Upper case words stand for the actual values. In the messages that start
 with C<Option> or C<Unknown option>, NAME is the option as the user typed
 it, without dashes (C<Unknown option: taget> for C<--taget>). The other
-command line messages name an option by its primary name with two dashes
-(C<option '--keep': ...>). Config file and spec messages use the primary
+command line messages name an option by its primary name as it is typed
+(C<option '--keep': ...>, or C<option '-k': ...> for a name of one
+letter). Config file and spec messages use the primary
 name without dashes (C<config value for 'keep': ...>).
 
 =head2 Command line errors
@@ -2152,6 +2314,8 @@ option as C<INDEX.FIELD=VALUE>.
 
 =item missing required option '--NAME'
 
+=item missing required option '-N'
+
 A L</required> option was not set on the command line or in a config
 file.
 
@@ -2174,7 +2338,10 @@ commands.
 
 =item option '--NAME': PROBLEM
 
-The value of an option failed a check. PROBLEM is one of the value
+=item option '-N': PROBLEM
+
+The value of an option failed a check. A name of one letter is written
+with one dash. PROBLEM is one of the value
 problems listed below.
 
 =item argument <NAME>: PROBLEM
@@ -2197,10 +2364,15 @@ PROBLEM>.
 
 The value of an C<int> or C<float> option is not a number of that kind.
 
+=item 'VALUE' is too large for an integer
+
+An C<int> value outside the range of Perl's integers. The option needs
+L</bigint> to accept it.
+
 =item 'VALUE' is not a finite number
 
 A C<float> value spelled C<inf>, C<infinity> or C<nan> (in any case,
-with an optional sign).
+with an optional sign), or too large for a Perl number (C<1e999>).
 
 =item VALUE is smaller than the minimum of MIN
 
@@ -2212,9 +2384,15 @@ The value is outside the L</min, max> bounds.
 
 =item directory 'PATH' does not exist
 
-The option has L</mustExist>, and the path is not an existing file or
-directory. The message is the same when the path exists but is of the
-other kind.
+The option has L</mustExist>, and the path does not exist. A missing
+L</default> path is reported as C<option '--NAME': default value: ...>.
+
+=item 'PATH' is not a file
+
+=item 'PATH' is not a directory
+
+The option has L</mustExist> or L</createPathIfMissing>, and the path
+exists but is of the other kind.
 
 =item cannot create file 'PATH': REASON
 
@@ -2225,6 +2403,13 @@ L</createPathIfMissing> could not create the path.
 =item 'VALUE' is not a URL
 
 The value is not of the form C<scheme://...>, see L</url>.
+
+=item 'VALUE' is not a date
+
+=item 'VALUE' is not a duration
+
+L<DateTime::Format::Natural> cannot parse the value, see L</date> and
+L</duration>.
 
 =item 'VALUE' is not one of: VALUES
 
@@ -2250,6 +2435,11 @@ The value for KEY of a L</hash> option failed a check.
 
 A word of an L</objectlist> option does not have the form
 C<INDEX.FIELD=VALUE>.
+
+=item invalid key 'KEY', the index must not have leading zeros
+
+A word of an L</objectlist> option writes its index with a leading zero,
+such as C<00.host>.
 
 =item missing index N
 
@@ -2321,7 +2511,7 @@ The format could not parse the file. MESSAGE comes from the parser.
 
 =item config file 'PATH' must contain a mapping of group names
 
-The top level of the file is not a mapping, or the YAML file is empty.
+The top level of the file is not a mapping (for YAML also C<~>).
 
 =item config file 'PATH': group 'GROUP' must contain a mapping of option names
 
@@ -2375,9 +2565,8 @@ The format has no C<dump> method, see L<Getopt::Pad::Config::Format>.
 =head2 Spec error messages
 
 These make C<GetOptions> die with C<Getopt::Pad spec: MESSAGE at FILE
-line LINE.> Messages from the checks of a command's level start with
-C<command 'PATH': >; messages about the keys of a single option or arg
-spec do not name the command.
+line LINE.> Messages about a command's level and the options and args
+declared on it start with C<command 'PATH': >.
 
 =over 4
 
@@ -2405,6 +2594,12 @@ in a command spec, or C<min> for a C<string> option).
 =item each example must be a hash with 'text' and 'args'
 
 A spec key has the wrong kind of value.
+
+=item GetOptions expects key/value pairs
+
+C<GetOptions> was called with an odd number of arguments. Usually a
+value is missing, or the spec was passed as a hashref
+(C<GetOptions($spec)> instead of C<GetOptions(%$spec)>).
 
 =item option 'KEY': spec must be a hash reference
 
@@ -2451,7 +2646,9 @@ L</AUTOMATIC OPTIONS>. For an option whose primary name is C<help> or
 C<version>, the message is C<reader 'NAME' collides with a built-in
 result method> instead.
 
-=item unknown option type 'TYPE' (known: NAMES)
+=item option 'NAME': unknown option type 'TYPE' (known: NAMES)
+
+=item arg 'NAME': unknown option type 'TYPE' (known: NAMES)
 
 See L</TYPES>.
 
@@ -2475,6 +2672,10 @@ See L</TYPES>.
 
 =item option 'NAME': lazyValid must be a code reference
 
+=item option 'NAME': processValue must be a code reference
+
+=item arg 'NAME': processValue must be a code reference
+
 =item option 'NAME': typehint must be a non-empty string
 
 =item arg 'NAME': typehint must be a non-empty string
@@ -2489,10 +2690,26 @@ The default failed a check, see L</Value problems>.
 
 =item option 'NAME': min MIN is larger than max MAX
 
+=item option 'NAME': min must be an integer with bigint, not 'VALUE'
+
+=item option 'NAME': max must be an integer with bigint, not 'VALUE'
+
 (For args, these and the other messages about one arg start with
 C<arg 'NAME':> instead.)
 
 =item option 'NAME': mustExist and createPathIfMissing are mutually exclusive
+
+=item option 'NAME': type 'TYPE' requires the DateTime::Format::Natural module
+
+The option uses C<date> or C<duration>, and L<DateTime::Format::Natural>
+is not installed.
+
+=item option 'NAME': timezone 'ZONE' is not a known time zone
+
+=item option 'NAME': timezone must be a non-empty string
+
+The L</timezone> key does not name a time zone that L<DateTime::TimeZone>
+knows.
 
 =item arg 'NAME': type 'TYPE' cannot be used for a positional arg
 
@@ -2536,12 +2753,6 @@ point at a mistake in the program.
 
 =over 4
 
-=item Odd name/value argument for subroutine 'Getopt::Pad::GetOptions'
-
-Perl's own message: C<GetOptions> was called with an odd number of
-arguments. Usually a value is missing, or the spec was passed as a
-hashref (C<GetOptions($spec)> instead of C<GetOptions(%$spec)>).
-
 =item Getopt::Pad: option type name 'NAME' is already registered by CLASS
 
 =item Getopt::Pad: config format name 'NAME' is already registered by CLASS
@@ -2554,10 +2765,10 @@ L<Getopt::Pad::Config::Format>.
 
 =item Getopt::Pad: config format class CLASS does not provide a NAMES list
 
-The registered class has no C<NAMES> constant. Before this check, the
-class's module file is loaded, so if the class is defined in the script
-itself, the message can be C<Can't locate My/Type/Foo.pm in @INC ...>
-(for the class C<My::Type::Foo>) instead.
+The registered class has no C<NAMES> constant. A class that is not
+defined yet has its module file loaded first, so a misspelled class name
+gives C<Can't locate My/Type/Foo.pm in @INC ...> (for the class
+C<My::Type::Foo>) instead.
 
 =item Getopt::Pad: no help renderer attached to this result
 
@@ -2634,7 +2845,8 @@ Options with groups, defaults and a C<valid> list, and a required arg.
 
 =item F<02-types.pl>
 
-One option per built-in type.
+One option per built-in type, except C<date> and C<duration>, which need
+L<DateTime::Format::Natural> and are shown in F<09-dates.pl>.
 
 =item F<03-commands.pl>
 
@@ -2663,6 +2875,12 @@ C<--create-default-config>.
 C<valid> lists and coderefs, C<lazyValid>, float bounds, C<mustExist>,
 C<createPathIfMissing>, C<hidden> and C<typehint>.
 
+=item F<09-dates.pl>
+
+C<date> and C<duration> options, a fixed C<timezone>, and
+C<processValue> turning a duration into seconds. Needs
+L<DateTime::Format::Natural>.
+
 =back
 
 The source of the examples is at
@@ -2679,27 +2897,13 @@ C<exit>. Code after the call only runs for a valid command line. To test
 a command line that should fail, run your program in a separate process;
 see L<Getopt::Pad::Cookbook/Testing a command line>.
 
-=item Command line values are not decoded
+=item Non-ASCII text in the spec needs C<use utf8>
 
-Words from the command line reach your program as Perl receives them:
-byte strings, not decoded character strings. Values from config files
-are decoded from UTF-8. For non-ASCII values the two sources then
-differ, and a C<valid> list with non-ASCII values written in a C<use
-utf8> program matches config values but not command line values. If
-your program handles non-ASCII input, decode C<@ARGV> before calling
-C<GetOptions>:
-
-=for highlighter language=perl
-
-    use Encode qw(decode);
-    @ARGV = map { decode('UTF-8', $_) } @ARGV;
-
-or run perl with the C<-CA> switch.
-
-=item Aliases are not shown in the help
-
-The help output lists an option by its primary name only. Mention short
-aliases in the L</help> text if users should know them.
+Values reach your program as character strings, from the command line
+as from config files (see L</Encoding>). A non-ASCII string in the spec,
+such as an entry of a L</valid> list, must be a character string too, so
+write the spec under C<use utf8>. Without it, C<'Köln'> in the source is
+a byte string that no value matches.
 
 =item The order in the help output is alphabetical
 
@@ -2713,8 +2917,9 @@ in the order of the spec.
 Perl 5.26 or later, L<Object::Pad> 0.818 or later, L<Getopt::Long> 2.50
 or later, L<Feature::Compat::Try> and L<JSON::PP>.
 
-Optional: L<YAML::XS> for YAML config files, and L<Term::ReadKey> for
-wrapping the help output to the terminal width.
+Optional: L<YAML::XS> for YAML config files, L<Term::ReadKey> for
+wrapping the help output to the terminal width, and
+L<DateTime::Format::Natural> for the C<date> and C<duration> types.
 
 =head1 SEE ALSO
 

@@ -3,6 +3,7 @@
 # 10 minutes, so no progress tick is expected here; only the created response is.
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 

@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000066';
+our $VERSION = '0.000067';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -345,6 +345,7 @@ my %default_ignore = (
     'HTTP::Message::PSGI'            => 1,    # HTTP::Request::(to|from)_psgi
     'Import::Into'                   => 1,
     'local::lib'                     => 1,
+    'LWP::ConsoleLogger::Everywhere' => 1,    # wraps UAs to log requests
     'MLDBM'                          => 1,
     'Modern::Perl'                   => 1,
     'Mojo::Base'                     => 1,
@@ -585,7 +586,7 @@ sub _build_possible_imports {
         # cant validate class/instance method names:
         next if !$word->isa('PPI::Token::Symbol') && is_method_call($word);
 
-        next if $self->_is_word_interpreted_as_string($word);
+        next if _is_word_interpreted_as_string($word);
 
         next if is_package_declaration($word);
 
@@ -650,10 +651,12 @@ sub _build_ppi_document {
 #     POSIX => [],
 # }
 #
-# In lint mode, it never changes.  In edit mode, it starts out as a list of
-# original imports, but with each include that gets processed, this list gets
-# updated. We do this so that we can keep track of what previous modules
-# are really importing, avoiding duplicate imports.
+# It starts out as a list of original imports, but with each include that gets
+# processed, this list gets updated to what the include will import once
+# tidied (an empty list if the include is removed as unused). This happens in
+# both lint and edit mode, although lint mode never modifies the document. We
+# do this so that we can keep track of what previous modules are really
+# importing, avoiding duplicate imports.
 
 sub _build_found_imports {
     my $self = shift;
@@ -1216,6 +1219,10 @@ INCLUDE:
                 && $args[0] eq '()'
                 && !$self->_is_used_fully_qualified( $include->module ) ) {
 
+                # This include no longer imports anything, so later includes
+                # must not rely on it for symbols it used to import.
+                $self->_reset_found_import( $include->module, [] );
+
                 if ( $self->lint ) {
                     $self->_warn_diff_for_linter(
                         'appears to be unused and should be removed',
@@ -1262,6 +1269,15 @@ INCLUDE:
         else {
             $processed{ $include->module } = 1;
 
+            $self->logger->info("resetting imports for |$elem|");
+
+            # Track what this include will import once tidied, in lint mode
+            # too, so that later includes are checked against it.
+            $self->_reset_found_import(
+                $include->module,
+                _imports_for_include($elem)
+            );
+
             if ( $self->lint ) {
                 my $before = join q{ },
                     map { $_->content } $include->arguments;
@@ -1278,13 +1294,6 @@ INCLUDE:
                 }
                 next INCLUDE;
             }
-
-            $self->logger->info("resetting imports for |$elem|");
-
-            $self->_reset_found_import(
-                $include->module,
-                _imports_for_include($elem)
-            );
         }
     }
 
@@ -1565,7 +1574,7 @@ sub _maybe_cache_inspectors {
 }
 
 sub _is_word_interpreted_as_string {
-    my ( $self, $word ) = @_;
+    my ($word) = @_;
 
     return unless $word->statement && $word->isa('PPI::Token::Word');
     my @children = $word->statement->schildren;
@@ -1607,7 +1616,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000066
+version 0.000067
 
 =head1 MOTIVATION
 
@@ -1669,10 +1678,10 @@ e.g.
 
   { Carp => ['croak', ..], ... }
 
-In lint mode, this attribute is never altered.
-
-In edit mode, when L<tidied_document> is called, with each include that gets
-processed, this list gets updated to what we think it should be.  We do this
+When L<tidied_document> or L<linter_success> is called, with each include
+that gets processed, this list gets updated to what we think it should be
+(an empty list if the include is removed as unused). Lint mode updates this
+attribute too, even though it never modifies the document.  We do this
 so that we can keep track of what previous modules are really importing, to
 avoid duplicate imports (same symbol name from different packages).
 

@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package App::FuguBench::Deps;
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 use v5.34;
 use warnings;
@@ -41,9 +41,7 @@ use Fugu::Signify;
 # The verb reads the external tools, the Perl distributions, the CPAN
 # modules, and the prebuilt binaries that deps/<OS>.txt names, and it
 # installs each one. --dry-run prints the command of each install,
-# and it runs none of them. The design comes from the synced
-# scripts/deps, and the trace of --dry-run is the oracle of
-# CLI-CONFORMANCE-2.
+# and it runs none of them.
 #
 # The verb reads deps/<OS>.txt relative to the start directory, and
 # it walks up to no checkout (CLI-CHECKOUT-5). A guest runs
@@ -754,8 +752,7 @@ sub _packages ( $ctx, @pkgs )
 #
 #	The digest of an entry takes its check in the install loop, at
 #	the download of that entry. A mismatch there leaves an earlier
-#	entry of the set installed (DEPS-TIER-2). The two loops come
-#	from the synced scripts/deps, which CLI-CONFORMANCE-2 pins.
+#	entry of the set installed (DEPS-TIER-2).
 sub _dists ( $ctx, @urls )
 {
 	_note( $ctx, 'the distributions: %s', join q{ }, @urls );
@@ -816,9 +813,7 @@ sub _modules ( $ctx, @modules )
 #	The digest of an entry takes its check in the install loop, at
 #	the download of that entry. A mismatch there leaves an earlier
 #	entry of the set installed, and a mismatch on the first entry
-#	leaves the new install directory behind (DEPS-TIER-2). The two
-#	loops come from the synced scripts/deps, which
-#	CLI-CONFORMANCE-2 pins.
+#	leaves the new install directory behind (DEPS-TIER-2).
 sub _bins ( $ctx, @bins )
 {
 	my $app = $ctx->{app};
@@ -1952,9 +1947,7 @@ sub _note ( $ctx, $fmt, @args )
 # _trace($ctx, @cmd):
 #	Trace one command of the run. A dry run prints it to standard
 #	output, as the line that starts with '+ ' and holds each
-#	argument shell-quoted (DEPS-MANIFEST-6). That trace is the
-#	oracle of CLI-CONFORMANCE-2, so the form of the line comes
-#	from the synced scripts/deps.
+#	argument shell-quoted (DEPS-MANIFEST-6).
 #
 #	A real run prints no line to standard output, because standard
 #	output carries the result of the verb alone (CLI-PROGRAM-4).

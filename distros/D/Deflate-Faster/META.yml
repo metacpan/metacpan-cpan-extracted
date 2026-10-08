@@ -1,5 +1,5 @@
 ---
-abstract: 'High-speed DEFLATE, zlib, and gzip compression and decompression using libdeflate'
+abstract: 'fast gzip, zlib and raw DEFLATE using libdeflate'
 author:
   - vividsnow
 build_requires:
@@ -22,7 +22,7 @@ no_index:
 provides:
   Deflate::Faster:
     file: lib/Deflate/Faster.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-deflate-faster/issues
   repository: https://github.com/vividsnow/perl5-deflate-faster.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

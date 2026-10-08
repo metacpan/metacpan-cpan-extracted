@@ -943,4 +943,25 @@ SKIP: {
     is($sub->get(1), 10, 'subclass thaw is usable');
 }
 
+{
+    package ClearLookup;
+    our ($map, $missed);
+    sub DESTROY {
+        $missed++ for grep { !$map->exists($_) } $map->keys;
+    }
+    package main;
+
+    for my $v (qw(IA SA I16A I32A)) {
+        for my $max (0, 100) {
+            local $ClearLookup::map = "Data::HashMap::$v"->new($max);
+            local $ClearLookup::missed = 0;
+            my $m = $ClearLookup::map;
+            $m->put($_, bless({}, 'ClearLookup')) for 1 .. 70;
+            $m->clear;
+            is($ClearLookup::missed, 0, "$v clear ($max): DESTROY can look up every remaining key");
+            is($m->size, 0, "$v clear ($max): no entries remain");
+        }
+    }
+}
+
 done_testing;

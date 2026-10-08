@@ -28,12 +28,26 @@ my($dir1, $file1) = win32_space_be_gone($dir,$file);
 ok -d $dir1, "dir exists $dir1";
 ok -r $file1, "file readable $file1";
 
-unlike $dir1, qr{\s}, "dir has no spaces"
-  or diag "before: $dir\n",
-          "after:  $dir1";
-unlike $file1, qr{\s}, "file has no spaces"
-  or diag "before: $file\n",
-          "after:  $file1";
+note "before: $dir";
+note "after:  $dir1";
+note "before: $file";
+note "after:  $file1";
+
+# short (8+3) names are not created by default on newer versions of
+# Windows, in which case the original paths should be returned as-is.
+if($dir1 =~ /\s/ || $file1 =~ /\s/)
+{
+  note "short names do not appear to be available";
+  is $dir1,  $dir,  "dir unchanged";
+  is $file1, $file, "file unchanged";
+}
+else
+{
+  pass "dir has no spaces";
+  pass "file has no spaces";
+}
+
+is [win32_space_be_gone 'foo', 'bar baz'], ['foo', 'bar baz'], "non-existent path with space is returned unchanged";
 
 my $content = do {
   open my $fh, '<', $file1;

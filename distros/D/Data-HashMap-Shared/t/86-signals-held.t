@@ -9,15 +9,13 @@ use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 
 # Perl croaks a call from inside its C signal handler once 120 signals are
-# pending.  Out of a long pass under the write lock that leaves the lock with a
-# live process, which nobody can recover, so such a pass blocks signals until
-# the lock is released.  Each pass below runs in a child under a timer that
-# fires 240 times while it lasts -- 480 when it builds a large result once it
-# has let go of the lock -- and while that child lives another process must
-# get the lock.  The call may still be croaked outside the lock, where it
-# reads its arguments or builds its result: then it did all of its work or
-# none.  The same timer first has to croak a long call that blocks nothing,
-# keys, or the case proves nothing and skips.
+# pending.  Out of a long pass under the write lock that leaves the lock held by
+# a live process nobody can recover, so such a pass blocks signals until the
+# lock is released.  Each pass runs in a child under a timer firing 240 times
+# (480 for a large result built after the lock is dropped); meanwhile another
+# process must get the lock.  Outside the lock the call may still be croaked,
+# having done all of its work or none. The same timer must first croak a long
+# call that blocks nothing, keys, or the case skips.
 
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 my $n = 300_000;
@@ -29,7 +27,7 @@ my @scattered = map { 'key-' . 73 * $_ } 1 .. 4095;
 # One child per group runs its cases in turn, after the group's wait:
 # [ name, class, constructor arguments after the path, fill, the pass,
 #   the map with the pass done, the map with it not begun, timer fires ]
-my $expired = sub { $_[0]->set_multi(@ii) };        # under a default TTL of a second
+my $expired = sub { $_[0]->set_multi(@ii) };
 my $empty   = sub { $_[0]->size == 0 };
 my $never   = sub { 0 };
 my @groups = (
@@ -103,21 +101,19 @@ my @groups = (
     ],
 );
 
-# Bytes this process has had read from storage.  A call that has to read the
-# map back from disk can be croaked anywhere, the write lock held or not, by a
-# timer this fast.
+# A call that has to read the map back from disk can be croaked anywhere, lock
+# held or not.
 sub read_bytes {
     open my $fh, '<', '/proc/self/io' or return 0;
     local $/;
     return <$fh> =~ /^read_bytes:\s*(\d+)/m ? $1 : 0;
 }
 
-# Run $code in a child of its own under a timer of $period: Perl's croak from
-# its signal handler can leave the interpreter it unwinds broken, so no croaked
-# process runs anything else.  Returns 10 when the code was croaked, 0 when it
-# returned, 1 when it died of anything else, and -1 when perl itself died.  With
-# a pipe pair the child reports r, c, e, or m when it was croaked after reading
-# from disk -- a held lock is then not the pass's fault -- and waits for the
+# Run $code in a child under a timer of $period; a croak from the signal handler
+# can leave the interpreter broken, so a croaked process runs nothing else.
+# Returns 10 if croaked, 0 if it returned, 1 if it died otherwise, -1 if perl
+# itself died.  With a pipe pair the child reports r, c, e, or m (croaked after
+# reading from disk, so a held lock is not the pass's fault) and waits for the
 # parent's answer.
 sub under_timer {
     my ($period, $code, $report, $answer) = @_;
@@ -222,9 +218,9 @@ for my $group (@groups) {
             my $t = Time::HiRes::time(); $pass->($twin);          my $took = Time::HiRes::time() - $t;
             $t    = Time::HiRes::time(); my @k = $listed->items;  my $ctl  = Time::HiRes::time() - $t;
             @k = ();
-            # never above 100 kHz: the stretch a pass runs between two looks for
-            # signals -- up to 16 entries or 256 slots -- must stay well short
-            # of 120 periods
+            # never above 100 kHz: a pass runs up to 16 entries or 256 slots
+            # between two looks for signals, which must stay well short of 120
+            # periods
             my $floor = 1e-5;
             my $period = ($took < $ctl ? $took : $ctl) / ($fires // 240);
             $period = $floor if $period < $floor;
@@ -238,7 +234,7 @@ for my $group (@groups) {
             my $status = under_timer($period, sub {
                 $pass->("Data::HashMap::Shared::$cls"->new($path[$i], @$args));
             }, $to_parent, $from_parent);
-            if ($status < 0) {                      # died before it could report
+            if ($status < 0) {
                 syswrite $to_parent, 'x';
                 sysread $from_parent, my $ack, 1;
             }

@@ -6,8 +6,8 @@ use POSIX ();
 use Data::HashMap::Shared::II;
 
 # A call that waits for the lock judges expiry when it gets it, not when it
-# asked: keys that expire during the wait are gone to it.  A live process named
-# in the lock word holds every caller until it is killed.
+# asked. A live process named in the lock word holds every caller until it is
+# killed.
 
 plan skip_all => 'Linux only' unless $^O eq 'linux';
 my $dir = tempdir(CLEANUP => 1);

@@ -6,7 +6,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: AIDisclosure
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use Carp;
 
@@ -32,7 +32,8 @@ sub get_available_classes_and_versions {
     return {
         'Basic' => {
             versions => {
-                '1' => 1,
+                '1'   => 1,
+                '1.1' => 1,
             },
             formats => {
                 'markdown' => 1,
@@ -55,7 +56,7 @@ Software::Policies::AIDisclosure - Create project policy file: AIDisclosure
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =begin Pod::Coverage
 
@@ -89,7 +90,7 @@ Available classes: B<Basic> (default).
 
 =item version
 
-Available versions: 1 (default), text.
+Available versions: 1 (default), 1.1.
 
 =item format
 
@@ -105,6 +106,7 @@ Return a hash with classes as keys. Example:
         'Basic' => {
             versions => {
                 '1' => 1,
+                '1.1' => 1,
             },
             formats => {
                 'markdown' => 1,

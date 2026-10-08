@@ -7,8 +7,7 @@
 #include "etcd_common.h"
 #include "etcd_election.h"
 
-/* EVAPI.h's GEVAPI is a per-translation-unit static: each file calling EV must
- * bind its own (from BOOT), or ev_timer_start & co dereference a NULL table */
+/* GEVAPI is static per translation unit: unbound, ev_* calls dereference NULL */
 void election_init_ev_api(pTHX) {
     I_EV_API("EV::Etcd");
 }
@@ -142,6 +141,7 @@ void cleanup_observe(pTHX_ observe_call_t *oc) {
         grpc_call_unref(oc->call);
         oc->call = NULL;
     }
+    etcd_call_release(&oc->base);
     SvREFCNT_dec(oc->callback);
     oc->callback = NULL;
     oc->active = 0;
@@ -183,6 +183,7 @@ void process_observe_response(pTHX_ observe_call_t *oc) {
     }
 
     oc->reconnect_attempt = 0;
+    oc->established = 1;
 
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
@@ -224,7 +225,8 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
     grpc_slice_unref(req_slice);
 
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
-    oc->base.channel_gen = client->channel_gen;
+    etcd_call_acquire(client, &oc->base);
+    grpc_channel_reset_connect_backoff(client->channel);
     oc->call = grpc_channel_create_call(
         client->channel, NULL, GRPC_PROPAGATE_DEFAULTS,
         client->cq, METHOD_ELECTION_OBSERVE, NULL, deadline, NULL);
@@ -232,42 +234,32 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
     if (!oc->call) {
         grpc_byte_buffer_destroy(send_buffer);
         oc->active = 0;
-        client->in_callback++;
+        CALLBACK_WINDOW_BEGIN(client);
         CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Observe reconnect failed", "observe");
-        client->in_callback--;
-        if (!client->in_callback && !client->active) {
-            finish_client_destroy(aTHX_ client);
+        if (CALLBACK_WINDOW_END(client))
             return;
-        }
         cleanup_observe(aTHX_ oc);
         return;
     }
 
     grpc_op ops[5] = {0};
-    grpc_metadata auth_md;
-    STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buffer, oc);
+    STREAMING_CALL_SETUP_OPS(client, ops, send_buffer, oc);
 
-    /* Observe is server-streaming: add the half-close the bidi macro omits and
-     * move RECV_MESSAGE to ops[4], as the initial call does, or the
-     * reconnected stream delivers no events */
+    /* Server-streaming: without the half-close the bidi macro omits, no events */
     ops[3].op = GRPC_OP_SEND_CLOSE_FROM_CLIENT;
     ops[4].op = GRPC_OP_RECV_MESSAGE;
     ops[4].data.recv_message.recv_message = &oc->recv_buffer;
 
     init_call_base(&oc->base, CALL_TYPE_ELECTION_OBSERVE);
     grpc_call_error err = grpc_call_start_batch(oc->call, ops, 5, &oc->base, NULL);
-    cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(oc);
-        client->in_callback++;
+        CALLBACK_WINDOW_BEGIN(client);
         CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Observe reconnect batch failed", "observe");
-        client->in_callback--;
-        if (!client->in_callback && !client->active) {
-            finish_client_destroy(aTHX_ client);
+        if (CALLBACK_WINDOW_END(client))
             return;
-        }
         cleanup_observe(aTHX_ oc);
     }
 }
@@ -279,15 +271,21 @@ int try_reconnect_observe(pTHX_ observe_call_t *oc) {
         return 0;
     }
 
-    etcd_stream_failed(client, oc->base.channel_gen);
+    etcd_stream_failed(client, oc->base.channel_gen, oc->established, oc->status, oc->status_details);
+    oc->established = 0;
+    if (oc->attempt_epoch != client->no_leader_epoch) {
+        oc->attempt_epoch = client->no_leader_epoch;
+        oc->reconnect_attempt = 0;
+    }
 
     if (!oc->auto_reconnect || oc->reconnect_attempt >= client->max_retries) {
         return 0;
     }
 
-    oc->reconnect_attempt++;
-
-    ev_tstamp delay = RECONNECT_BACKOFF_SECONDS(oc->reconnect_attempt);
+    int no_leader = etcd_is_no_leader(oc->status, oc->status_details);
+    if (!no_leader) oc->reconnect_attempt++;
+    ev_tstamp delay = no_leader ? NO_LEADER_RETRY_SECONDS
+        : RECONNECT_BACKOFF_SECONDS(oc->reconnect_attempt);
     ev_timer_init(&oc->reconnect_timer, observe_reconnect_cb, delay, 0.0);
     ev_timer_start(EV_DEFAULT, &oc->reconnect_timer);
 

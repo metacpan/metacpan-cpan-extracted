@@ -188,7 +188,7 @@ im_ext_funcs imager_function_table =
     im_io_new_fd,
     im_io_new_bufchain,
     im_io_new_buffer,
-    im_io_new_cb,
+    im_io_new_cb8,
     get_context,
     im_lhead,
     im_loog,
@@ -220,7 +220,11 @@ im_ext_funcs imager_function_table =
     im_malloc,
     im_realloc,
     im_free,
-    im_malloc_fail
+    im_malloc_fail,
+
+    /* level 12 */
+    im_io_set_max_mmap_size,
+    im_io_get_max_mmap_size
   };
 
 /* in general these functions aren't called by Imager internally, but

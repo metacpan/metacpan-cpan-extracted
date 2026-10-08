@@ -1,0 +1,437 @@
+.\" $OpenBSD$
+.\"
+.\" Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: September 22 2026 $
+.Dt FUGUBENCH 1
+.Os
+.Sh NAME
+.Nm fugubench
+.Nd outfit a FuguBSD checkout for a coding agent
+.Sh SYNOPSIS
+.Nm fugubench
+.Op Fl h
+.Op Fl C Ar dir
+.Op Fl Fl verbose
+.Ar verb
+.Op Ar argument ...
+.Nm fugubench
+.Cm deps
+.Op Fl Fl dry-run
+.Op Fl Fl os Ar name
+.Op Fl Fl arch Ar name
+.Cm tool | runtime | test | develop
+.Nm fugubench
+.Cm deps Fl Fl update-sums
+.Op Fl Fl force
+.Op Fl Fl os Ar name
+.Op Fl Fl arch Ar name
+.Nm fugubench
+.Cm doctor
+.Op Fl Fl fix
+.Nm fugubench
+.Cm fetch Ar file url
+.Nm fugubench
+.Cm hook install
+.Nm fugubench
+.Cm hook SessionStart | SessionEnd
+.Nm fugubench
+.Cm hook WorktreeCreate | WorktreeRemove
+.Nm fugubench
+.Cm install
+.Nm fugubench
+.Cm shim
+.Nm fugubench
+.Cm traces
+.Op Fl Fl root Ar dir
+.Op Fl Fl name Ar name
+.Nm fugubench
+.Cm update
+.Op Fl Fl version Ar tag
+.Op Fl Fl allow-downgrade
+.Nm fugubench
+.Cm version
+.Nm fugubench
+.Cm wiki init
+.Nm fugubench
+.Cm wiki open Ar project session
+.Nm fugubench
+.Cm wiki note | admit Ar page file
+.Nm fugubench
+.Cm wiki close Ar session
+.Nm fugubench
+.Cm wiki status | candidates
+.Nm fugubench
+.Cm worktree create Ar name
+.Nm fugubench
+.Cm worktree remove
+.Op Fl Fl force
+.Ar name
+.Nm fugubench
+.Cm worktree list
+.Nm fugubench
+.Cm worktree clone Ar path ...
+.Sh DESCRIPTION
+.Nm
+outfits a FuguBSD checkout for a coding agent.
+It installs the dependencies of a repository, makes and removes
+worktrees, operates the learning library, answers the Claude Code
+hooks, and measures the sessions.
+One verb serves each concern.
+.Pp
+The released program is one packed perl file that runs on core perl
+5.34.
+It loads no CPAN module, and the pack carries the Fugu modules that it
+uses.
+.Pp
+A verb operates one checkout: the repository that holds the manifests,
+the worktrees, or the library clone.
+The program walks up from the start directory to the nearest
+.Pa .toolingrc ,
+and that directory is the checkout root.
+The start is the
+.Fl C
+value, the payload
+.Ql cwd
+of a hook, or the current directory.
+A worktree holds a
+.Pa .toolingrc
+of its own, and is a checkout.
+.Pp
+Standard output carries the result of a verb.
+Every diagnostic, and every line of a child command, goes to standard
+error.
+A usage error prints the usage to standard error and exits 2.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl C Ar dir
+Read
+.Ar dir
+as the checkout root, in front of the walk above.
+.It Fl h , Fl Fl help
+Print the usage to standard output and exit 0.
+A verb in front of the option gives the usage of that verb.
+.It Fl Fl verbose
+Trace each child command on standard error.
+A verb can add its own progress lines to that stream.
+.El
+.Pp
+The verbs are as follows:
+.Bl -tag -width Ds
+.It Cm deps Oo Fl Fl dry-run Oc Ar environment
+Install one dependency environment from
+.Pa deps/<OS>.txt ,
+where the file name holds the system name of
+.Xr uname 1 .
+The environments are
+.Cm tool , runtime , test
+and
+.Cm develop .
+.Pp
+.Fl Fl dry-run
+prints each command to standard output, and runs none of them.
+.Fl Fl os
+and
+.Fl Fl arch
+replace the two words of
+.Xr uname 1 ,
+which a manifest writes as
+.Ql {os}
+and
+.Ql {arch} .
+.It Cm deps Fl Fl update-sums Op Fl Fl force
+Record the digest of each versioned download of the manifest in
+.Pa deps/SHA256.txt .
+.Fl Fl force
+rewrites a recorded digest.
+.It Cm doctor Op Fl Fl fix
+Report the state of the checkout, as one
+.Ql ok <check>: <detail>
+or
+.Ql problem <check>: <detail>
+line for each check.
+The checks are the version of the program, the presence of
+.Xr git 1 ,
+.Xr make 1
+and a downloader on
+.Ev PATH ,
+the hook entries and the worktree base reference of
+.Pa .claude/settings.json ,
+and the state of the library clone.
+The verb exits 1 when it wrote one problem line.
+.Pp
+.Fl Fl fix
+skips the pending commit of a library clone that sits in a stopped
+rebase, when that commit adds a session page with no observation.
+.It Cm fetch Ar file url
+Download one URL to one file, through the downloader of the program.
+.It Cm hook Ar event
+Answer one Claude Code hook event.
+The events are
+.Cm SessionStart , SessionEnd , WorktreeCreate
+and
+.Cm WorktreeRemove ,
+and another word is a usage error.
+.It Cm hook install
+Write the four hook entries in
+.Pa .claude/settings.json
+of the checkout, and keep every other key of the file.
+.It Cm install
+Copy the running program to
+.Pa ~/.local/bin/fugubench
+with mode 755, atomically, and print the path.
+.It Cm shim
+Print the wrapper shim of a consumer to standard output.
+The shim is POSIX shell, and a consumer keeps it at
+.Pa scripts/fugubench .
+The shim is the pin of the release.
+A checkout with no tag carries the version 0.0.0, and the verb refuses
+such a version.
+.It Cm traces Oo Fl Fl root Ar dir Oc Op Fl Fl name Ar name
+Measure the Claude Code sessions of the checkout.
+The verb prints one line for each session that holds a request, sorted
+by start time, under a header.
+The verb reads the trace directory of the checkout, of each worktree
+of it, and of each project clone in either.
+.Fl Fl root
+names a trace root in place of
+.Pa ~/.claude/projects/ ,
+and
+.Fl Fl name
+replaces the derived name.
+.It Cm update Oo Fl Fl version Ar tag Oc Op Fl Fl allow-downgrade
+Replace the running program with a verified release.
+The result line is
+.Ql fugubench <version> ,
+and a failed update prints no line.
+.Pp
+The verb refuses a version below the running one, without
+.Fl Fl allow-downgrade .
+.It Cm version
+Print
+.Ql fugubench <version>
+and the Fugu version of the snapshot on one line.
+.It Cm wiki init
+Clone
+.Ic wiki.origin
+into the library directory when that directory is absent.
+.It Cm wiki open Ar project session
+Start the session page of
+.Ar session ,
+commit, and push.
+The page name is
+.Pa Session-<project>-<date>-<n>.md ,
+and the verb writes it to standard output as the only line.
+.It Cm wiki note Ar page file
+.It Cm wiki admit Ar page file
+Append the text of
+.Ar file
+to
+.Ar page
+after one blank line, commit, and push.
+The two subcommands differ in the commit subject only.
+.It Cm wiki close Ar session
+Append the
+.Ql Closed:\&
+line to the page of
+.Ar session ,
+commit, and push.
+.It Cm wiki status
+Report each open session with its page, its
+.Ql Claim:\&
+count, and its
+.Ql Admitted:\&
+count, and then the count of unpushed commits.
+.It Cm wiki candidates
+Report each undelivered candidate of the page
+.Pa Rule-candidates.md ,
+with its age in days and its date.
+.It Cm worktree create Ar name
+Make the worktree at
+.Pa <root>/<worktree.base>/<name> ,
+on a new branch
+.Ar name
+that starts at the local HEAD of the main checkout.
+The verb then runs
+.Ql make -C <worktree> bootstrap MAIN=<root>
+when the worktree holds a makefile.
+It writes the worktree path to standard output as the only line.
+.It Cm worktree remove Oo Fl Fl force Oc Ar name
+Remove the worktree of
+.Ar name
+and delete its branch.
+Without
+.Fl Fl force ,
+the verb refuses a worktree that holds work at risk, and the message
+names each cause.
+The causes are an uncommitted change in the worktree or in a
+repository inside it, and a commit that no remote holds.
+.It Cm worktree list
+Report each worktree with its name, its age in days, and its state.
+The state is
+.Cm clean ,
+or each cause of
+.Cm remove .
+.It Cm worktree clone Ar path ...
+Copy each gitignored
+.Ar path
+of the main checkout that
+.Fl C
+names into the current directory, with no network.
+.El
+.Sh CONFIGURATION
+.Nm
+reads its keys from
+.Pa .toolingrc ,
+the identity file of the synced FuguBSD tools.
+A line holds a key, whitespace, and a value.
+A
+.Ql #
+starts a comment.
+The program ignores every other key of the file.
+.Bd -literal -offset indent
+wiki.origin   https://github.com/FuguBSD/Wiki.git
+wiki.projects Projects
+.Ed
+.Pp
+The keys are as follows:
+.Bl -tag -width "wiki.projects" -offset indent
+.It Ic wiki.dir
+The library clone, under the home of
+.Ic wiki.origin .
+The default is
+.Pa Wiki .
+.It Ic wiki.origin
+The URL of the library repository.
+It has no default, and
+.Cm wiki init
+stops without it.
+.It Ic wiki.project
+The project name of a session at the root.
+The default is the name of the root directory.
+.It Ic wiki.projects
+The directory whose children are project clones.
+The default is
+.Pa Projects .
+.It Ic worktree.base
+The directory of the worktrees, under the root.
+The default is
+.Pa .claude/worktrees .
+.El
+.Sh ENVIRONMENT
+.Bl -tag -width "PERL_LOCAL_LIB_ROOT"
+.It Ev FUGUBENCH
+The program that the wrapper shim runs in place of the release.
+A developer points it at
+.Pa bin/fugubench
+of a checkout.
+A value that names no executable makes the shim report the value and
+exit non-zero.
+An empty value names no executable either.
+.It Ev PERL_LOCAL_LIB_ROOT
+With a value,
+.Cm deps
+adds
+.Fl Fl local-lib
+with that value to each
+.Xr cpanm 1
+command.
+.El
+.Sh FILES
+.Bl -tag -width "~/.cache/fugubench/<version>/" -compact
+.It Pa .toolingrc
+The configuration of the checkout.
+.It Pa deps/<OS>.txt
+The dependency manifest of one operating system.
+.It Pa scripts/fugubench
+The wrapper shim of a consumer.
+.It Pa .claude/settings.json
+The settings file of Claude Code, which
+.Cm hook install
+writes.
+.It Pa ~/.local/bin/fugubench
+The program that
+.Cm install
+copies.
+.It Pa ~/.cache/fugubench/<version>/
+The shim cache of one release.
+.It Pa ~/.claude/projects/
+The default trace root of
+.Cm traces .
+.El
+.Sh EXIT STATUS
+.Nm
+exits with one of the following values:
+.Pp
+.Bl -tag -width Ds -offset indent -compact
+.It 0
+Success.
+.It 1
+A failure.
+.Cm doctor
+also gives this status for a report that names a problem.
+.It 2
+A usage error.
+.It 3
+A configuration error: no
+.Pa .toolingrc
+above the start directory, or a key that no file holds.
+.El
+.Pp
+No verb defines another code.
+.Sh EXAMPLES
+Outfit a checkout, install the hooks, and read the report:
+.Bd -literal -offset indent
+$ fugubench deps tool
+$ fugubench deps test
+$ fugubench hook install
+$ fugubench doctor
+.Ed
+.Pp
+Make a worktree, list the worktrees, and remove it again:
+.Bd -literal -offset indent
+$ fugubench worktree create bugfix/parser
+/home/dick/FuguBench/.claude/worktrees/bugfix/parser
+$ fugubench worktree list
+bugfix/parser                               2 d  clean
+$ fugubench worktree remove bugfix/parser
+.Ed
+.Pp
+Open a session page, add one observation, and close the session:
+.Bd -literal -offset indent
+$ page="$(fugubench wiki open FuguBench 4f21c0)"
+$ fugubench wiki note "$page" observation.txt
+$ fugubench wiki close 4f21c0
+.Ed
+.Pp
+Run the checkout in place of the release that the shim pins:
+.Bd -literal -offset indent
+$ FUGUBENCH=$PWD/bin/fugubench scripts/fugubench version
+fugubench 0.0.0 (Fugu 0.5.0)
+.Ed
+.Sh SEE ALSO
+.Xr cpanm 1 ,
+.Xr git 1 ,
+.Xr make 1 ,
+.Xr perl 1 ,
+.Xr uname 1
+.Pp
+The module documentation is in the
+.Pa .pod
+sidecars beside
+.Pa lib/App/FuguBench/ .
+.Sh AUTHORS
+.An Dick Olsson Aq Mt hi@senzilla.io

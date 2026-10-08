@@ -127,4 +127,49 @@ for my $path (@sources) {
 	is( "@copy", q{}, "$name holds no copy of a Fugu module" );
 }
 
+# The site publish must start when a source of the site changes.
+# .fuguwebrc names each source directory, and publish.yml names each
+# path of the trigger. The site keeps the old page when the trigger
+# misses a directory.
+subtest 'the publish trigger covers each source of the site' => sub {
+	my $rc       = "$root/.fuguwebrc";
+	my $workflow = "$root/.github/workflows/publish.yml";
+	plan skip_all => 'the site configuration is absent'
+	    unless -f $rc && -f $workflow;
+
+	# Each dir key of a manuals or a modules block, reduced to
+	# its first segment: man/fugubench gives man.
+	my %dir;
+	for ( _read($rc) ) {
+		next unless /\A\s*dir\s*=\s*(\S+)/;
+		my $value = $1;
+		my ($segment) = split m{/}, $value;
+		$dir{$segment} = $value;
+	}
+	ok( scalar keys %dir, '.fuguwebrc names a source directory' );
+
+	# Each quoted entry of the paths list, in order, up to the
+	# first line that holds no entry.
+	my @paths;
+	my $inside = 0;
+	for my $line ( _read($workflow) ) {
+		if ( $line =~ /\A\s*paths:\s*\z/ ) {
+			$inside = 1;
+			next;
+		}
+		next unless $inside;
+		last unless $line =~ /\A\s*-\s*"([^"]+)"/;
+		push @paths, $1;
+	}
+	ok( @paths, 'publish.yml names a path of the trigger' );
+
+	for my $segment ( sort keys %dir ) {
+		my @hit = grep { $_ eq $segment || index( $_, "$segment/" ) == 0 } @paths;
+		ok( @hit, "the publish trigger covers $dir{$segment}" )
+		    or diag(
+			"add \"$segment/**\" to the paths list of publish.yml"
+		    );
+	}
+};
+
 done_testing();

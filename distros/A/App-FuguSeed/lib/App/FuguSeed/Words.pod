@@ -27,7 +27,7 @@ The module reads the share files of the sheet, and it prints the result
 of a verb. The build and the check themselves hold no stream.
 
 The program sees no seed word, so it can run on any computer. No module
-that it loads maps 12 words to anything.
+that it loads maps seed words to anything.
 
 =head2 run
 

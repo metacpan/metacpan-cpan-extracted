@@ -7,7 +7,7 @@ use Exporter 'import';
 
 use Game::Dominoes::Scoring ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(candidates can_play best_arm);
 
 sub candidates {
@@ -56,7 +56,7 @@ Game::Dominoes::Rules - which plays are legal, and what they would score
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

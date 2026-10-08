@@ -40,8 +40,8 @@ like( $source, qr/^package[ \t]+\Q$module\E[ \t]*;$/m,
 	'the lead module declares the package that PAUSE indexes' );
 
 # QR-PACK-4: the module holds no code, so scripts/pack packs no part
-# of it. t/scripts/pack.t proves that the packed file holds the six
-# modules of the program and no other package. Each line outside the
+# of it. t/scripts/pack.t proves that each packed file holds the
+# modules of its program and no other package. Each line outside the
 # comments is the package statement, a pragma line, or the true value
 # at the end. A subroutine, a top-level statement, and a BEGIN block
 # each fail this check.

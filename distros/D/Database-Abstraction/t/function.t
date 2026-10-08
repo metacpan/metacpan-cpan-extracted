@@ -27,6 +27,7 @@ use Readonly;
 
 use Test::Most;
 use Test::Returns;
+use Test::Returns;
 use Test::Memory::Cycle;
 
 # ---------------------------------------------------------------------------
@@ -63,7 +64,7 @@ note '--- A1: init()';
 	%Database::Abstraction::defaults = ();
 
 	my $d = Database::Abstraction::init(directory => $DATA_DIR);
-	isa_ok($d, 'HASH', 'init() returns a hashref');
+	returns_is($d, { type => 'hashref' }, 'init() returns a hashref');
 	is($Database::Abstraction::defaults{'directory'}, $DATA_DIR, 'init(): directory stored in %defaults');
 
 	# expires_in aliased to cache_duration
@@ -97,22 +98,22 @@ note '--- A2: new()';
 
 	# Bare-string shortcut
 	my $obj = Database::test1->new($DATA_DIR);
-	isa_ok($obj, 'Database::test1', 'new(): bare string → directory');
+	returns_is($obj, { type => 'object', isa => 'Database::test1' }, 'new(): bare string → directory');
 	is($obj->{'id'}, $ENTRY_COL, 'new(): id defaults to "entry"');
 	ok(!$obj->{'no_entry'}, 'new(): no_entry defaults to 0');
 	is($obj->{'cache_duration'}, '1 hour', 'new(): cache_duration defaults to 1 hour');
 
 	# Hashref form
 	my $obj2 = Database::test1->new({ directory => $DATA_DIR });
-	isa_ok($obj2, 'Database::test1', 'new(): hashref args accepted');
+	returns_is($obj2, { type => 'object', isa => 'Database::test1' }, 'new(): hashref args accepted');
 
 	# Named-list form
 	my $obj3 = Database::test1->new(directory => $DATA_DIR);
-	isa_ok($obj3, 'Database::test1', 'new(): named-list args accepted');
+	returns_is($obj3, { type => 'object', isa => 'Database::test1' }, 'new(): named-list args accepted');
 
 	# Clone form: $obj->new(extra_key => 1) merges into a new object
 	my $clone = $obj->new(extra_key => 'clone_val');
-	isa_ok($clone, 'Database::test1', 'new(): clone retains class');
+	returns_is($clone, { type => 'object', isa => 'Database::test1' }, 'new(): clone retains class');
 	is($clone->{'extra_key'}, 'clone_val', 'new(): clone merges extra key');
 	is($clone->{'id'}, $ENTRY_COL, 'new(): clone inherits id');
 
@@ -425,13 +426,12 @@ note '--- A13: fetchrow_hashref() — slurp path';
 
 	# Hit
 	my $row = $db->fetchrow_hashref(entry => 'one');
-	isa_ok($row, 'HASH', 'fetchrow_hashref(): returns hashref on hit');
+	returns_is($row, { type => 'hashref' }, 'fetchrow_hashref(): returns hashref on hit');
 	is($row->{$ENTRY_COL}, 'one', 'fetchrow_hashref(): correct row returned');
-	returns_ok($row, { type => 'hashref' }, 'fetchrow_hashref(): return type is hashref');
 
 	# Miss → undef (not throw, even with locked hash)
 	my $miss = $db->fetchrow_hashref(entry => '__nonexistent__');
-	ok(!defined($miss), 'fetchrow_hashref(): miss returns undef');
+	returns_is($miss, { type => 'void' }, 'fetchrow_hashref(): miss returns undef');
 
 	# Bare single-arg shortcut (no_entry not set)
 	my $row2 = $db->fetchrow_hashref('two');
@@ -447,9 +447,7 @@ note '--- A14: selectall_arrayref() — slurp path';
 
 	# No criteria → all rows
 	my $all = $db->selectall_arrayref();
-	isa_ok($all, 'ARRAY', 'selectall_arrayref(): no criteria → arrayref');
-	ok(scalar @{$all} >= 4, 'selectall_arrayref(): returns all rows (>=4)');
-	returns_ok($all, { type => 'arrayref' }, 'selectall_arrayref(): return type is arrayref');
+	returns_is($all, { type => 'arrayref', min => 4 }, 'selectall_arrayref(): no criteria returns arrayref of ≥4 rows');
 
 	# In-memory scan by non-key column
 	my $matches = $db->selectall_arrayref(number => 1);
@@ -514,7 +512,7 @@ note '--- A17: AUTOLOAD';
 
 	# Missing entry → undef (not throw)
 	my $miss = $db->number(entry => '__nope__');
-	ok(!defined($miss), 'AUTOLOAD(): missing entry returns undef');
+	returns_is($miss, { type => 'void' }, 'AUTOLOAD(): missing entry returns undef');
 
 	# auto_load => 0 → croak
 	my $noa = Database::test1->new({ directory => $DATA_DIR, auto_load => 0 });
@@ -553,7 +551,7 @@ SKIP: {
 	# List context → array of hashrefs
 	my @rows = $db->execute(query => 'SELECT * FROM exec');
 	is(scalar @rows, 2, 'execute(): list context returns all rows');
-	isa_ok($rows[0], 'HASH', 'execute(): each row is a hashref');
+	returns_is($rows[0], { type => 'hashref' }, 'execute(): each row is a hashref');
 
 	# Scalar context → first row only
 	my $row = $db->execute(query => 'SELECT * FROM exec WHERE id = ?', args => [1]);
@@ -575,7 +573,7 @@ note '--- A19: columns() and schema()';
 	my $db = Database::test1->new($DATA_DIR);
 
 	my $cols = $db->columns();
-	isa_ok($cols, 'ARRAY', 'columns(): returns arrayref');
+	returns_is($cols, { type => 'arrayref' }, 'columns(): returns arrayref');
 	ok(grep({ $_ eq $ENTRY_COL } @{$cols}), 'columns(): entry column present');
 
 	# Cached on second call
@@ -583,7 +581,7 @@ note '--- A19: columns() and schema()';
 	is($cols, $cols2, 'columns(): returns cached ref on second call');
 
 	my $schema = $db->schema();
-	isa_ok($schema, 'HASH', 'schema(): returns hashref');
+	returns_is($schema, { type => 'hashref' }, 'schema(): returns hashref');
 	ok(exists $schema->{$ENTRY_COL}, 'schema(): entry key present');
 	ok(exists $schema->{$ENTRY_COL}{'type'}, 'schema(): type sub-key present');
 	ok(exists $schema->{$ENTRY_COL}{'nullable'}, 'schema(): nullable sub-key present');
@@ -610,13 +608,13 @@ note '--- A19b: columns() and schema() — ARRAY-ref slurp path';
 		'A19b pre-cond: data is ARRAY ref for test4ne');
 
 	my $ne_cols = $ne->columns();
-	isa_ok($ne_cols, 'ARRAY',
+	returns_is($ne_cols, { type => 'arrayref' },
 		'columns() ARRAY slurp: returns arrayref (not empty)');
 	ok(scalar(@{$ne_cols}) > 0,
 		'columns() ARRAY slurp: list is non-empty');
 
 	my $ne_schema = $ne->schema();
-	isa_ok($ne_schema, 'HASH',
+	returns_is($ne_schema, { type => 'hashref' },
 		'schema() ARRAY slurp: returns hashref (not empty)');
 	ok(scalar(keys %{$ne_schema}) > 0,
 		'schema() ARRAY slurp: schema is non-empty');
@@ -631,7 +629,7 @@ note '--- A20: query()';
 	SKIP: {
 		skip 'DBD::SQLite not available for query() path', 1 unless $have_sqlite;
 		my $q = $db->query();
-		isa_ok($q, 'Database::Abstraction::Query', 'query(): returns Query object');
+		returns_is($q, { type => 'object', isa => 'Database::Abstraction::Query' }, 'query(): returns Query object');
 	}
 }
 
@@ -693,7 +691,7 @@ SKIP: {
 		'Query->new(): wrong type causes croak';
 
 	my $q = $db->query();
-	isa_ok($q, 'Database::Abstraction::Query', 'Query->new(): valid object');
+	returns_is($q, { type => 'object', isa => 'Database::Abstraction::Query' }, 'Query->new(): valid object');
 
 	memory_cycle_ok($q, 'Query->new(): no memory cycles');
 
@@ -714,8 +712,7 @@ SKIP: {
 
 	my $q2 = $db->query();
 	my $all = $q2->all();
-	isa_ok($all, 'ARRAY', 'all(): returns arrayref');
-	is(scalar @{$all}, 5, 'all(): returns all 5 rows');
+	returns_is($all, { type => 'arrayref', min => 5, max => 5 }, 'all(): returns 5-row arrayref');
 
 	# where() + all()
 	my $active = $db->query->where(status => 'active')->all();
@@ -725,11 +722,11 @@ SKIP: {
 	note '--- B4: Query->first()';
 
 	my $first = $db->query->where(name => 'Alice')->first();
-	isa_ok($first, 'HASH', 'first(): returns hashref');
+	returns_is($first, { type => 'hashref' }, 'first(): returns hashref');
 	is($first->{'name'}, 'Alice', 'first(): correct row returned');
 
 	my $miss = $db->query->where(name => '__nobody__')->first();
-	ok(!defined($miss), 'first(): no match returns undef');
+	returns_is($miss, { type => 'void' }, 'first(): no match returns undef');
 
 	# ---- B5: count() -------------------------------------------------
 	note '--- B5: Query->count()';
@@ -858,11 +855,11 @@ SKIP: {
 		# all() with no joins must return all injected rows
 		my $bdb_all = $bdb->query()->all();
 		is(scalar @{$bdb_all}, 3, 'Query BDB all(): returns all 3 rows from berkeley hash');
-		isa_ok($bdb_all->[0], 'HASH', 'Query BDB all(): each row is a hashref');
+		returns_is($bdb_all->[0], { type => 'hashref' }, 'Query BDB all(): each row is a hashref');
 
 		# first() must return the first element of the berkeley scan
 		my $bdb_first = $bdb->query()->first();
-		isa_ok($bdb_first, 'HASH', 'Query BDB first(): returns a hashref');
+		returns_is($bdb_first, { type => 'hashref' }, 'Query BDB first(): returns a hashref');
 
 		# count() must return the total count without SQL
 		my $bdb_count = $bdb->query()->count();
@@ -1063,10 +1060,9 @@ note '--- A25: _scan_berkeley()';
 		$bdb->{'berkeley'} = { alice => 'Alice', bob => 'Bob', carol => 'Carol' };
 		my $all = $bdb->_scan_berkeley({});
 		is(scalar @{$all}, 3, '_scan_berkeley(): no criteria → 3 rows');
-		isa_ok($all, 'ARRAY', '_scan_berkeley(): returns arrayref');
+		returns_is($all, { type => 'arrayref', min => 3, max => 3 }, '_scan_berkeley(): returns 3-row arrayref');
 		ok(exists $all->[0]{'entry'}, '_scan_berkeley(): each row has entry key');
 		ok(exists $all->[0]{'value'}, '_scan_berkeley(): each row has value key');
-		returns_ok($all, { type => 'arrayref' }, '_scan_berkeley(): return type is arrayref');
 	}
 
 	# entry criterion selects exactly one row
@@ -1276,7 +1272,7 @@ SKIP: {
 
 	# columns() — SQLite uses SELECT * WHERE 1=0 then $sth->{NAME}
 	my $cols = $db->columns();
-	isa_ok($cols, 'ARRAY', 'columns() SQLite: returns arrayref');
+	returns_is($cols, { type => 'arrayref' }, 'columns() SQLite: returns arrayref');
 	is(scalar @{$cols}, 3,  'columns() SQLite: exactly 3 columns');
 	ok((grep { $_ eq 'entry' } @{$cols}), 'columns() SQLite: entry present');
 	ok((grep { $_ eq 'name'  } @{$cols}), 'columns() SQLite: name present');
@@ -1284,7 +1280,7 @@ SKIP: {
 
 	# schema() — SQLite uses PRAGMA table_info
 	my $schema = $db->schema();
-	isa_ok($schema, 'HASH', 'schema() SQLite: returns hashref');
+	returns_is($schema, { type => 'hashref' }, 'schema() SQLite: returns hashref');
 	ok(exists $schema->{'entry'}, 'schema() SQLite: entry key present');
 	is($schema->{'entry'}{'pk'}, 1, 'schema() SQLite: entry is primary key');
 	# PRAGMA table_info sets notnull=1 for NOT NULL; nullable = !notnull, which
@@ -1319,7 +1315,7 @@ note '--- A31: selectall_hashref / selectall_hash aliases';
 	my $ref2 = $db->selectall_arrayref();
 	is(scalar @{$ref1}, scalar @{$ref2},
 		'selectall_hashref(): returns same count as selectall_arrayref()');
-	isa_ok($ref1, 'ARRAY', 'selectall_hashref(): returns arrayref');
+	returns_is($ref1, { type => 'arrayref' }, 'selectall_hashref(): returns arrayref');
 
 	# selectall_hash is a documented backward-compat alias for selectall_array
 	my @arr1 = $db->selectall_hash();
@@ -1378,16 +1374,16 @@ SKIP: {
 
 	# --- 32b: fetchrow_hashref ---------------------------------------------------
 	my $row = $db->fetchrow_hashref(entry => 'a');
-	isa_ok($row, 'HASH', 'XLSX fetchrow_hashref(): returns hashref');
+	returns_is($row, { type => 'hashref' }, 'XLSX fetchrow_hashref(): returns hashref');
 	is($row->{'score'}, 10, 'XLSX fetchrow_hashref(): correct column value returned');
 
 	# Miss → undef
 	my $miss = $db->fetchrow_hashref(entry => '__none__');
-	ok(!defined($miss), 'XLSX fetchrow_hashref(): miss returns undef');
+	returns_is($miss, { type => 'void' }, 'XLSX fetchrow_hashref(): miss returns undef');
 
 	# --- 32c: selectall_arrayref ------------------------------------------------
 	my $all = $db->selectall_arrayref();
-	isa_ok($all, 'ARRAY', 'XLSX selectall_arrayref(): returns arrayref');
+	returns_is($all, { type => 'arrayref' }, 'XLSX selectall_arrayref(): returns arrayref');
 	is(scalar @{$all}, 3, 'XLSX selectall_arrayref(): all 3 rows returned');
 
 	# --- 32d: constructor table override — multi-worksheet access ---------------
@@ -1410,7 +1406,7 @@ SKIP: {
 
 	# Fetch from the alt worksheet using the overridden table
 	my $alt_row = $alt_db->fetchrow_hashref(entry => 'x');
-	isa_ok($alt_row, 'HASH', 'XLSX table override: fetchrow_hashref returns hashref');
+	returns_is($alt_row, { type => 'hashref' }, 'XLSX table override: fetchrow_hashref returns hashref');
 	is($alt_row->{'val'}, 99, 'XLSX table override: correct column value from alt worksheet');
 
 	# --- 32e: memory cycle check ------------------------------------------------
@@ -1582,11 +1578,11 @@ note '--- A36: dbi_source()';
 	my $slurp = Database::test1->new($DATA_DIR);
 	$slurp->count();	# trigger _open (slurp path)
 	my $src = $slurp->dbi_source();
-	ok(!defined($src), 'dbi_source(): slurp backend → undef');
+	returns_is($src, { type => 'void' }, 'dbi_source(): slurp backend → undef');
 }
 
 SKIP: {
-	skip 'DBD::SQLite not available for dbi_source() tests', 6
+	skip 'DBD::SQLite not available for dbi_source() tests', 5
 		unless $have_sqlite;
 
 	my $sdir = tempdir(CLEANUP => 1);
@@ -1608,8 +1604,7 @@ SKIP: {
 
 	# SQLite connection must return a valid source descriptor
 	my $src = $db->dbi_source();
-	ok(defined($src), 'dbi_source() SQLite: returns defined value');
-	isa_ok($src, 'HASH', 'dbi_source() SQLite: returns hashref');
+	returns_is($src, { type => 'hashref' }, 'dbi_source() SQLite: returns hashref');
 	ok(exists $src->{'dbh'},   'dbi_source() SQLite: dbh key present');
 	ok(exists $src->{'table'}, 'dbi_source() SQLite: table key present');
 	is($src->{'table'}, 'dsrc', 'dbi_source() SQLite: table name is correct');

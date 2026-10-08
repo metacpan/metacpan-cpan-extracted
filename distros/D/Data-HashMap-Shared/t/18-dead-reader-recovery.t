@@ -9,18 +9,12 @@ use Time::HiRes qw(time);
 
 use Data::HashMap::Shared::SI;
 
-# A SIGKILL'd child holding the read lock must not block the parent's next
-# write: dead-reader recovery reclaims its slot.
-#
-# Readers publish their lock depth in per-process slots (16 bytes each: pid,
-# rdepth, two reserved; the table's offset is the u64 at header byte 80).  The
-# word at byte 128 is the writer's alone, and reclaiming a dead reader clears
-# its slot's pid without counting anything, so the proof is in the slots: after
-# the kill at least one is held by a dead pid, after the put none is.
-#
-# The children hammer keys() on a 20,000-entry map, which holds the read lock
-# for the whole XSUB including list building, so the kill lands inside it;
-# incr_by's few hundred nanoseconds under the lock never caught one.
+# A SIGKILL'd child holding the read lock must not block the next write.
+# Reader slots are 16 bytes (pid, rdepth, two reserved) at the u64 offset in
+# header byte 80; reclaiming clears the pid without counting, so the proof is in
+# the slots: one is held by a dead pid after the kill, none after the put. The
+# children hammer keys() on 20,000 entries: it holds the read lock for the whole
+# XSUB, which incr_by's few hundred nanoseconds under the lock never did.
 
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_dead_rdr') . '.shm' }
 
@@ -46,11 +40,9 @@ sub held_reader_slots {
     my $m = Data::HashMap::Shared::SI->new($path, 100_000);
     $m->put("seed$_", $_) for 1 .. 20_000;
 
-    # The write op runs in a child: a wrlock that never returns stays inside
-    # the XSUB, where a Perl-level SIGALRM is deferred for ever, so an alarm
-    # here could not break the hang, and it would surface only as a prove
-    # timeout with no output.  Forked before the readers, so its pid cannot be
-    # one of theirs, it waits on a pipe until they are dead.
+    # the write runs in a child: a wrlock that never returns sits inside the
+    # XSUB, where SIGALRM is deferred, so an alarm here could not break the
+    # hang; forked before the readers so its pid cannot be one of theirs
     pipe(my $go_r, my $go_w) or die "pipe: $!";
     my $writer = fork // die "fork: $!";
     if (!$writer) {
@@ -62,10 +54,9 @@ sub held_reader_slots {
     }
     close $go_r;
 
-    # Each child reports once it has completed a keys() call, so the kill
-    # lands on children that are hammering, not on ones still opening the map.
-    # About half of them are inside the lock at any instant; a kill that
-    # catches none of sixteen is rare enough that three attempts suffice.
+    # children report after one completed keys() so the kill lands on hammering
+    # ones; about half are inside the lock at any instant, so three attempts at
+    # sixteen suffice
     my $N_CHILDREN = 16;
     my $kill_hammering_children = sub {
         pipe(my $ready_r, my $ready_w) or die "pipe: $!";
@@ -106,8 +97,7 @@ sub held_reader_slots {
     while ($held < 1 && $attempts++ < 3) { $held = $kill_hammering_children->() }
     cmp_ok($held, '>=', 1, "the kill caught $held children holding the read lock (attempt $attempts)");
 
-    # The write must complete within one FUTEX_WAIT timeout (~2s) plus slack,
-    # not hang on the dead readers.
+    # one FUTEX_WAIT timeout (~2s) plus slack bounds the write
     my $start = time;
     local $SIG{PIPE} = 'IGNORE';               # a writer that died early: EPIPE, not a signal death
     syswrite($go_w, 'g') == 1 or die "release: $!";
@@ -131,7 +121,6 @@ sub held_reader_slots {
     unlink $path;
 }
 
-# A child that takes a reader slot, then waits to be killed.
 sub start_reader {
     my ($path) = @_;
     pipe my $r, my $w or die "pipe: $!";
@@ -147,8 +136,7 @@ sub start_reader {
     return $pid;
 }
 
-# Leave a dead reader's slot holding the read lock: poked, since no kill lands
-# reliably inside a lock.
+# poked into the slot, since no kill lands reliably inside a lock
 sub pin_read_lock {
     my ($path, $pid) = @_;
     open my $f, '+<:raw', $path or die "open: $!";
@@ -161,8 +149,8 @@ sub pin_read_lock {
     print $f pack 'L<', 1; close $f or die "close: $!";
 }
 
-# The put runs in a child under a deadline, so a write lock that never comes
-# fails the test instead of hanging it.
+# the put runs in a child under a deadline: a write lock that never comes fails,
+# not hangs
 sub put_in_child {
     my ($m, $setup) = @_;
     my $t0 = time;
@@ -177,9 +165,8 @@ sub put_in_child {
     return ($status == 0, time - $t0);
 }
 
-# A reader killed but not yet reaped is a zombie, which kill($pid, 0) still
-# reports alive, and nobody reaps it while the writer waits.  Only
-# /proc/<pid>/stat tells it from a live process.
+# an unreaped killed reader is a zombie that kill($pid, 0) still reports alive;
+# only /proc/<pid>/stat tells it from a live process
 SKIP: {
     skip 'needs a readable /proc/<pid>/stat', 4 unless -r "/proc/$$/stat";
     my $path = tmpfile();
@@ -204,9 +191,9 @@ SKIP: {
     unlink $path;
 }
 
-# Each signal restarts the writer's first drain wait: one taking signals faster
-# than that wait must probe on a signal too, or it never gets past a dead reader
-# (and Perl croaks it out, lock held, after 120 pending signals).
+# each signal restarts the writer's first drain wait, so a writer taking signals
+# faster than that wait must probe on a signal too, or it never gets past a dead
+# reader
 {
     my $path = tmpfile();
     my $m = Data::HashMap::Shared::SI->new($path, 1000);

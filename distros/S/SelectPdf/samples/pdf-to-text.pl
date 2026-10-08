@@ -39,6 +39,9 @@ eval {
 
     print "Finished! Number of pages processed: " . $client->getNumberOfPages() . ".\n";
 
+    # response telemetry
+    print "Credits remaining: " . ($client->getCreditsRemaining() // "n/a") . " / " . ($client->getCreditsTotal() // "n/a") . ".\n";
+
     # get API usage
     my $usageClient = new SelectPdf::UsageClient($apiKey);
     my $usage = $usageClient->getUsage(0);

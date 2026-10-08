@@ -7,16 +7,14 @@ use Time::HiRes ();
 
 use Data::HashMap::Shared::II;
 
-# size and tombstones are read at different instants, so on a saturated map a
-# concurrent writer can make the invariant size + tombstones <= table_cap look
-# violated.  Attach validation re-checks under the seqlock and refuses only a
-# stable violation, never a torn read of a healthy file.
+# size and tombstones are read at different instants, so a concurrent writer can
+# make size + tombstones <= table_cap look violated; attach validation must
+# refuse only a stable violation, never a torn read of a healthy file.
 
 use constant { OFF_TABLE_CAP => 20, OFF_SIZE => 136, OFF_TOMBSTONES => 140 };
 
 my $dir = tempdir(CLEANUP => 1);
 
-# --- a stably invalid header must still be refused -------------------------
 {
     my $p = "$dir/corrupt.hm";
     { my $m = Data::HashMap::Shared::II->new($p, 8); $m->put($_, $_) for 1 .. 10; }
@@ -48,10 +46,8 @@ my $dir = tempdir(CLEANUP => 1);
 
     ok( $attach->(), 'header restored: attaches again' );
 
-    # Attach validation waits out an active writer rather than rejecting on a
-    # torn counter pair, so it must NOT also wait on a file that is simply
-    # corrupt: a stable violation has to be refused on the first attempt.
-    # (Guards the backoff from turning every bad file into a multi-second stall.)
+    # a stable violation must be refused on the first attempt, not wait out the
+    # torn-read backoff
     $poke->(OFF_SIZE, 9999);
     my $t0 = Time::HiRes::time();
     $attach->() for 1 .. 20;
@@ -62,12 +58,8 @@ my $dir = tempdir(CLEANUP => 1);
 }
 
 
-# --- attaching to a saturated map under concurrent writes must not croak ----
-# A probabilistic detector: against a build with the validation retry removed
-# it failed 1 run in 45 under one load and 6 in 65 under another, so a single
-# green run proves nothing; at those rates fifty runs catch a revert with
-# two-thirds to near-certain probability.  The failing interleaving needs the
-# writer to tear two consecutive reads, which nothing in the test can force.
+# probabilistic: without the validation retry this fails about 1 run in 10 to
+# 45, and nothing here can force the writer to tear two consecutive reads
 {
     my $p = "$dir/race.hm";
     my $m = Data::HashMap::Shared::II->new($p, 8);   # pinned at table_cap 16

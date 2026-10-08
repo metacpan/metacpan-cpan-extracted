@@ -8,6 +8,8 @@ print "This is SelectPdf-$SelectPdf::VERSION.\n";
 
 my $url = "https://selectpdf.com/";
 my $local_file = "Test.pdf";
+# Replace with your API key. Pass undef, "" or "demo" instead to use the
+# keyless demo endpoint (watermarked output, capped at 5 pages).
 my $apiKey = "Your API key here";
 
 eval {
@@ -54,11 +56,22 @@ eval {
 
     print "Finished! Number of pages: " . $client->getNumberOfPages() . ".\n";
 
-    # get API usage
-    my $usageClient = new SelectPdf::UsageClient($apiKey);
-    my $usage = $usageClient->getUsage();
-    print("Usage: " . encode_json($usage) . "\n");
-    print("Conversions remained this month: ". $usage->{"available"});
+    # response telemetry
+    print "Mode: " . $client->getMode() . ", Execution: " . $client->getExecutionMode() . ".\n";
+
+    if ($client->isDemoMode()) {
+        print "Demo clamped: " . join(", ", $client->getClampedFields()) . ".\n" if $client->wasClamped();
+        print "Demo dropped: " . join(", ", $client->getDroppedFields()) . ".\n" if $client->wasAnyFieldDropped();
+    }
+    else {
+        print "Credits remaining: " . $client->getCreditsRemaining() . " / " . $client->getCreditsTotal() . ".\n";
+
+        # get API usage (paid keys only - the demo endpoint has no usage account)
+        my $usageClient = new SelectPdf::UsageClient($apiKey);
+        my $usage = $usageClient->getUsage();
+        print("Usage: " . encode_json($usage) . "\n");
+        print("Conversions remained this month: ". $usage->{"available"} . ".\n");
+    }
 };
 
 if ($@) {

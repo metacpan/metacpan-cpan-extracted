@@ -5,10 +5,10 @@ class Getopt::Pad::Help :strict(params) {
 	use Feature::Compat::Try;
 	use List::Util      qw(max);
 	use File::Basename  qw(basename);
-	use Getopt::Pad::Util qw(useColor);
+	use Getopt::Pad::Util qw(useColor optionSpelling encodedFor);
 	use Text::Wrap ();
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	field $level       :param;
 	field $version     :param = undef;
@@ -59,12 +59,12 @@ class Getopt::Pad::Help :strict(params) {
 	}
 
 	method printHelp() {
-		print {$handle} $self->renderHelp;
+		print {$handle} encodedFor($handle, $self->renderHelp);
 		return $self;
 	}
 
 	method printVersion() {
-		print {$handle} $self->renderVersion, "\n";
+		print {$handle} encodedFor($handle, $self->renderVersion . "\n");
 		return $self;
 	}
 
@@ -122,6 +122,7 @@ class Getopt::Pad::Help :strict(params) {
 		foreach my $arg ($args->@*) {
 			my @parts;
 			push @parts, ['[REQ]', $palette{annotation}] if $arg->required;
+			push @parts, map { [sprintf('[%s]', $_), $palette{annotation}] } $arg->type->constraintNotes;
 			push @parts, [$arg->help, undef] if $arg->help ne '';
 			push @parts, [sprintf('[%s]', $arg->typeLabel), $palette{typeLabel}] if defined $arg->typeLabel;
 			push @lines, $self->entryLines($self->argLabel($arg), \@parts);
@@ -148,10 +149,9 @@ class Getopt::Pad::Help :strict(params) {
 				push @lines, $subIndent . $self->paint('Valid', $palette{subKey})
 					. '   = [ ' . join(', ', map { $self->paint($_, $palette{validValue}) } $option->valid->@*) . ' ]'
 					if ref $option->valid eq 'ARRAY';
-				# An undefined default is the same as none to the reader of the help.
 				push @lines, $subIndent . $self->paint('Default', $palette{subKey})
-					. ' = ' . $self->paint($self->stringifyDefault($option->default), $palette{defaultValue})
-					if $option->hasDefault && defined $option->default;
+					. ' = ' . $self->paint($self->stringifyDefault($option->presentedDefault), $palette{defaultValue})
+					if $self->showsDefault($option);
 			}
 			push @blocks, join("\n", @lines);
 		}
@@ -177,13 +177,38 @@ class Getopt::Pad::Help :strict(params) {
 		return join("\n", @lines);
 	}
 
+	# An undefined default, or an empty list or mapping, is the same as none
+	# to the reader of the help.
+	method showsDefault($option) {
+		return 0 if !$option->hasDefault;
+
+		my $default = $option->presentedDefault;
+		return 0 if !defined $default;
+		return 0 if ref $default eq 'ARRAY' && !$default->@*;
+		return 0 if ref $default eq 'HASH'  && !$default->%*;
+		return 1;
+	}
+
 	method optionLabel($option) {
-		my $label = sprintf($option->negatable ? '--[no-]%s' : '--%s', $option->name);
+		my $label = join(', ', $self->optionSpellings($option));
 		return $label . ' <key=value>'   if $option->hash;
 		return $label . ' <N.key=value>' if $option->objectlist;
 		return $label . ' <a,b,...>'     if $option->csv;
 		return $label . ' <>'          if $option->type->takesValue;
 		return $label;
+	}
+
+	# Every name of $option as it is typed, the Primary name first. A
+	# negatable option shows its negation on the first long name, or after
+	# the names when all of them are single letters.
+	method optionSpellings($option) {
+		my @names = ($option->name, $option->aliases);
+		return map { optionSpelling($_) } @names if !$option->negatable;
+
+		my ($negatedName) = grep { length > 1 } @names;
+		my @spellings = map { defined $negatedName && $_ eq $negatedName ? '--[no-]' . $_ : optionSpelling($_) } @names;
+		push @spellings, '--no-' . $option->name if !defined $negatedName;
+		return @spellings;
 	}
 
 	method argLabel($arg) {

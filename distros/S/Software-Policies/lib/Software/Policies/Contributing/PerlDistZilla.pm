@@ -6,7 +6,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: Contributing / PerlDistZilla
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use Carp;
 use Data::Section -setup;
@@ -30,11 +30,11 @@ sub create {
     croak 'Unknown arguments: ', join q{,}, keys %args if (%args);
 
     if ( $attributes{'ai_disclosure'} ) {
-        $attributes{'ai_disclosure_text'} = _ai_assisted( $attributes{'ai_assisted'}, $format );
+        $attributes{'ai_disclosure_text'} = _ai_assisted( $attributes{'ai_assisted'}, $version, $format );
     }
 
     my ($data_section)     = __PACKAGE__ =~ m/.+::([^:]+)$/msx;
-    my $data_section_label = $data_section . q{_v} . $version . q{_} . $format;
+    my $data_section_label = $data_section . q{_v} . q{1} . q{_} . $format;
     my $template           = $self->section_data($data_section_label);
     croak "Cannot find data section $data_section_label"
       if ( !$template );
@@ -77,43 +77,103 @@ sub _filename {
 }
 
 sub _ai_assisted {
-    my ( $wanted, $format ) = @_;
+    my ( $wanted, $version, $format ) = @_;
     if ($wanted) {
         if ( $format eq 'markdown' ) {
-            return <<'EOF';
+            if ( $version eq '1' ) {
+                return <<'EOF';
 ### AI-assisted contributions
 
 This project uses AI-assisted development tools. If you also use AI tools
 when preparing your contribution, please note the following:
 
-- Review, understand, and test all AI-generated code before submitting.
-  Do not submit raw, unreviewed AI output.
-- Be prepared to disclose which AI tools you used if asked.
-- Consider the ethical implications of your tool choices, particularly
-  regarding training data practices.
+- Disclose if you have used AI tools in preparing your contribution.
+- Review, understand, and test all AI-generated code, documentation
+  and other output before submitting.
+- Do not submit raw, unreviewed AI output.
+- Consider the ethical implications of your choice of AI tools,
+  particularly regarding how the tools' models were trained and whether
+  their data sourcing practices are consistent with respect for
+  creators and rights holders.
+- Be prepared to identify which AI tools were used if asked.
 
 See [AI_DISCLOSURE.md](AI_DISCLOSURE.md) for the full policy on AI usage
 in this project.
 
 EOF
+            }
+            else {
+                # version 1.1
+                return <<'EOF';
+### AI-assisted contributions
+
+This project uses AI-assisted development tools. If you also use AI tools
+when preparing your contribution, please note the following:
+
+- Disclose that you have used AI tools in the commit message and pull request.
+  For commits, use an "AI-assisted-by: <tool name>" trailer.
+- Review, understand, and test all AI-generated code, documentation
+  and other output before submitting.
+- Do not submit raw, unreviewed AI output.
+- Consider the ethical implications of your choice of AI tools,
+  particularly regarding how the tools' models were trained and whether
+  their data sourcing practices are consistent with respect for
+  creators and rights holders.
+- Be prepared to disclose which AI tools you used if asked.
+
+See [AI_DISCLOSURE.md](AI_DISCLOSURE.md) for the full policy on AI usage
+in this project.
+
+EOF
+            }
         }
         else {
-            return <<'EOF';
+            if ( $version eq '1' ) {
+                return <<'EOF';
 AI-assisted contributions
 
 This project uses AI-assisted development tools. If you also use AI tools
 when preparing your contribution, please note the following:
 
-- Review, understand, and test all AI-generated code before submitting.
-  Do not submit raw, unreviewed AI output.
-- Be prepared to disclose which AI tools you used if asked.
-- Consider the ethical implications of your tool choices, particularly
-  regarding training data practices.
+- Disclose if you have used AI tools in preparing your contribution.
+- Review, understand, and test all AI-generated code, documentation
+  and other output before submitting.
+- Do not submit raw, unreviewed AI output.
+- Consider the ethical implications of your choice of AI tools,
+  particularly regarding how the tools' models were trained and whether
+  their data sourcing practices are consistent with respect for
+  creators and rights holders.
+- Be prepared to identify which AI tools were used if asked.
 
 See file AI_DISCLOSURE.md for the full policy on AI usage
 in this project.
 
 EOF
+            }
+            else {
+                # version 1.1
+                return <<'EOF';
+AI-assisted contributions
+
+This project uses AI-assisted development tools. If you also use AI tools
+when preparing your contribution, please note the following:
+
+- Disclose that you have used AI tools in the commit message and pull request.
+  For commits, use an "AI-assisted-by: <tool name>" trailer.
+- Review, understand, and test all AI-generated code, documentation
+  and other output before submitting.
+- Do not submit raw, unreviewed AI output.
+- Consider the ethical implications of your choice of AI tools,
+  particularly regarding how the tools' models were trained and whether
+  their data sourcing practices are consistent with respect for
+  creators and rights holders.
+- Be prepared to disclose which AI tools you used if asked.
+
+See file AI_DISCLOSURE.md for the full policy on AI usage
+in this project.
+
+EOF
+            }
         }
     }
     else {
@@ -184,7 +244,7 @@ Software::Policies::Contributing::PerlDistZilla - Create project policy file: Co
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =for Pod::Coverage new create get_available_classes_and_versions
 
@@ -256,7 +316,7 @@ __[ PerlDistZilla_v1_markdown ]__
 Thank you for considering contributing to this distribution.  This file
 contains instructions that will help you work with the source code.
 
-The distribution is managed with Dist::Zilla.  This means than many of the
+The distribution is managed with Dist::Zilla.  This means that many of the
 usual files you might expect are not in the repository, but are generated at
 release time, as is much of the documentation.  Some generated files are
 kept in the repository as a convenience (e.g. Makefile.PL or cpanfile).
@@ -343,7 +403,7 @@ HOW TO CONTRIBUTE
 Thank you for considering contributing to this distribution.  This file
 contains instructions that will help you work with the source code.
 
-The distribution is managed with Dist::Zilla.  This means than many of the
+The distribution is managed with Dist::Zilla.  This means that many of the
 usual files you might expect are not in the repository, but are generated at
 release time, as is much of the documentation.  Some generated files are
 kept in the repository as a convenience (e.g. Makefile.PL or cpanfile).

@@ -5,6 +5,14 @@ All notable changes to Alien::SDL3 will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.4.18] - 2026-10-07
+
+### Changed
+
+- Updated to SDL3 3.4.18
+- Install satellite libs SDL_image (v3.4.8), SDL_ttf (v3.2.2), and SDL_mixer (v3.2.4)
+- Use `Alien::Xrepo` to locate, build, or install a prebuilt libs unless a system install meets our version requirements
+
 ## [v3.4.2] - 2026-02-22
 
 ### Changed
@@ -53,7 +61,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Installs from the tip of main
   - Note: Does not pull prebuilt binaries for Windows
 
-[Unreleased]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/v3.4.2...HEAD
+[Unreleased]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/v3.4.18...HEAD
+[v3.4.18]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/v3.4.2...v3.4.18
 [v3.4.2]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/v2.28.0...v3.4.2
 [v2.28.0]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/0.05...v2.28.0
 [0.05]: https://github.com/Perl-SDL3/Alien-SDL3.pm/compare/0.04...0.05

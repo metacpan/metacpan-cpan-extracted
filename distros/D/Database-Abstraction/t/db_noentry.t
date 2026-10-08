@@ -12,6 +12,7 @@ use Fcntl;
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::Most;
+use Test::Returns;
 
 use Test::Needs 'DB_File';
 
@@ -47,7 +48,7 @@ is_deeply($row, { alpha => 'one' },
 	'fetchrow_hashref no_entry: returns {key => value} pair (not {entry => value})');
 
 my $missing = $dao->fetchrow_hashref(entry => 'does_not_exist');
-ok(!defined $missing, 'fetchrow_hashref returns undef for nonexistent key');
+returns_is($missing, { type => 'void' }, 'fetchrow_hashref returns undef for nonexistent key');
 
 # ---------------------------------------------------------------------------
 # Relational-style methods now work for BerkeleyDB via in-memory scan

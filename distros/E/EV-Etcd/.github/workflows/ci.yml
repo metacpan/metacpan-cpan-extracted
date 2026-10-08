@@ -62,13 +62,15 @@ jobs:
           etcdctl endpoint health
 
       - name: Test
+        env:
+          EV_ETCD_TEST_ETCD: 1
+          ETCD_TEST_AUTH_ENABLE_DISABLE: 1
         run: make test
 
   test-debian:
     runs-on: ubuntu-latest
     container: debian:bookworm
     name: Debian bookworm
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v7
 
@@ -97,7 +99,7 @@ jobs:
 
       - name: Start etcd
         run: |
-          etcd --data-dir /tmp/etcd-data &
+          etcd --data-dir /tmp/etcd-data > /tmp/etcd.log 2>&1 &
           for i in $(seq 1 30); do
             etcdctl endpoint health 2>/dev/null && break
             sleep 1
@@ -105,6 +107,9 @@ jobs:
           etcdctl endpoint health
 
       - name: Test
+        env:
+          EV_ETCD_TEST_ETCD: 1
+          ETCD_TEST_AUTH_ENABLE_DISABLE: 1
         run: make test
 
   test-macos:
@@ -150,6 +155,9 @@ jobs:
           etcdctl endpoint health
 
       - name: Test
+        env:
+          EV_ETCD_TEST_ETCD: 1
+          ETCD_TEST_AUTH_ENABLE_DISABLE: 1
         run: make test
 
   test-freebsd:
@@ -208,3 +216,46 @@ jobs:
             perl Makefile.PL
             gmake
             gmake test
+
+  release-hygiene:
+    runs-on: ubuntu-latest
+    name: Release hygiene
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgrpc-dev libgrpc++-dev libprotobuf-c-dev pkg-config
+
+      - name: Install Perl dependencies
+        run: cpanm --notest EV Test::Spelling Test::Kwalitee Test::CPAN::Changes Devel::Leak Test::DistManifest Test::Pod Test::Pod::Coverage Test::Synopsis
+
+      - name: Install etcd
+        run: |
+          ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+          curl -fsSL "https://github.com/etcd-io/etcd/releases/download/v3.5.26/etcd-v3.5.26-linux-${ARCH}.tar.gz" | tar xz -C "$RUNNER_TEMP"
+          sudo mv "$RUNNER_TEMP/etcd-v3.5.26-linux-${ARCH}/etcd" /usr/local/bin/
+          sudo mv "$RUNNER_TEMP/etcd-v3.5.26-linux-${ARCH}/etcdctl" /usr/local/bin/
+
+      - name: Start etcd
+        run: |
+          etcd --data-dir /tmp/etcd-data &
+          for i in $(seq 1 30); do
+            etcdctl endpoint health 2>/dev/null && break
+            sleep 1
+          done
+          etcdctl endpoint health
+
+      - name: Dist from clean checkout
+        run: |
+          perl Makefile.PL
+          make
+          make disttest
+
+      - name: Author tests
+        run: prove -b xt/

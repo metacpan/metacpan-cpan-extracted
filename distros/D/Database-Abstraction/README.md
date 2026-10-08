@@ -4,7 +4,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 ## Version
 
-Version 0.46
+Version 0.47
 
 ## Description
 
@@ -457,6 +457,26 @@ string which is taken to be `directory`.
     The first row of the selected table is used as column headers.
     Requires [LWP::UserAgent::Cached](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3ACached) and [HTML::TableExtract](https://metacpan.org/pod/HTML%3A%3ATableExtract) (both loaded lazily).
 
+- `database`
+
+    A Redis connection URL in the form `redis://[password@]host[:port][/db_index]`.
+    When present, `directory`, `dsn`, and `url` are not required.  Rows are
+    expected to be stored as Redis Hashes at keys of the form
+    `tablename:entry_value`; fields of each Hash become column values.  The
+    module slurps all matching keys via `KEYS tablename:*` + `HGETALL` into the
+    same in-memory structure used by the CSV and DBM::Deep backends, so all
+    existing fast-paths (`selectall_arrayref`, `selectall_array`,
+    `fetchrow_hashref`, `count`, `columns`, `schema`, AUTOLOAD) work without
+    modification.  `no_entry` mode is supported.
+
+    [Redis::Fast](https://metacpan.org/pod/Redis%3A%3AFast) is tried first (XS, faster); if unavailable, [Redis](https://metacpan.org/pod/Redis)
+    (pure-Perl) is used as a fallback.  Both are loaded lazily - neither is
+    required when using file-based or DSN-based backends.  The URL scheme is
+    validated at construction time (`redis://` only; all other schemes croak).
+
+    Use ["select"](#select) to switch the active Redis database on an already-open
+    connection.
+
 #### Behaviour Parameters
 
 - `no_entry`
@@ -568,6 +588,17 @@ arguments.
 ### Set\_Logger
 
 Sets the class, code reference, or file that will be used for logging.
+
+### Select
+
+Select a Redis database by number (0-15).  Clears the in-memory data cache so
+the next query re-slurps from the newly selected database.  Returns `$self`
+for chaining.  Croaks if the object is not backed by a Redis connection.
+
+```perl
+$db->select(3);          # switch to Redis DB 3
+my $count = $db->count;  # queries the new DB
+```
 
 ### Selectall\_Arrayref
 

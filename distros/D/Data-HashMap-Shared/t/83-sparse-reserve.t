@@ -10,9 +10,8 @@ use Data::HashMap::Shared::SS;
 $ENV{LC_ALL} = 'C';
 POSIX::setlocale(POSIX::LC_ALL(), 'C');
 
-# DATA_HASHMAP_SHARED_SPARSE=0 allocates the whole segment at creation.  Only
-# tmpfs is sure to show that in st_blocks: a compressing filesystem stores the
-# no-fallocate fallback's zero bytes as holes.
+# Only tmpfs reliably shows SPARSE=0's full allocation in st_blocks: a
+# compressing filesystem stores the no-fallocate fallback's zero bytes as holes.
 
 plan skip_all => 'Linux only' unless $^O eq 'linux';
 plan skip_all => 'no writable /dev/shm' unless -d '/dev/shm' && -w '/dev/shm';

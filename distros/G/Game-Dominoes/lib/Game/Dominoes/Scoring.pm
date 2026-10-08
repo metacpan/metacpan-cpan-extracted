@@ -5,7 +5,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(count score_for bonus MAX_COUNT);
 
 use constant MAX_COUNT => 35;
@@ -48,7 +48,7 @@ Game::Dominoes::Scoring - the open end total, what it scores, and the domino bon
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

@@ -16,10 +16,9 @@ use Data::HashMap::Shared::I32S;
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 sub path { File::Spec->catfile($dir, "$_[0].shm") }
 
-# $1 is a magical scalar: its buffer holds whatever was LAST fetched from it,
-# and only get-magic refreshes it from the current match.  Fetch "stale" from
-# it, then match "hello" without fetching, so a key read with SvPV_nomg sees
-# "stale" while SvPV sees "hello".
+# $1's buffer holds whatever was last fetched from it; only get-magic refreshes
+# it.  Fetch "stale", then match "hello" without fetching: a key read with
+# SvPV_nomg sees "stale", SvPV sees "hello".
 sub prime { my $x; "stale" =~ /(\w+)/ and $x = "$1"; die unless $x eq 'stale'; return }
 sub prime_num { my $n; "7" =~ /(\d+)/ and $n = 0 + $1; die unless $n == 7; return }
 
@@ -63,8 +62,7 @@ for my $class (qw(SS IS I16S I32S)) {
     is $map->get($k2), 'hello', "$class: set_multi value is the current capture";
 }
 
-# Integer keys and values reach the XS through SvIV, which is as magic-aware as
-# SvPV -- and as easy to write as SvIV_nomg.  The stale-buffer trap is the same.
+# integers reach the XS through SvIV: the same stale-buffer trap as SvIV_nomg
 {
     my $map = Data::HashMap::Shared::II->new(path('num'), 100);
     prime_num();                            # buffer now holds 7

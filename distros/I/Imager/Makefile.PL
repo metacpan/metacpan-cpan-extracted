@@ -671,6 +671,21 @@ EOS
   else {
     print $config "#define IMAGER_STATIC_INLINE static\n";
   }
+
+  if ($Config{d_mmap} && $Config{d_munmap}) {
+    print $config <<'EOS'
+/* we can use mmap()/munmap() */
+#define IMAGER_POSIX_MMAP
+
+EOS
+
+  }
+
+  print $config <<"EOS";
+/* size of pointers, for use in preprocessing */
+#define IMAGER_PTR_SIZE $Config{ptrsize}
+EOS
+
   print $config <<'EOS';
 
 #ifdef __cplusplus

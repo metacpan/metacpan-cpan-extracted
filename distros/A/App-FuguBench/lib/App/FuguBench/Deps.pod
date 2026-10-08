@@ -17,12 +17,6 @@ C<test>, and C<develop>, and the verb takes one of them as its
 argument. C<--update-sums> records the digest of each download of the
 manifest, and it takes no environment word.
 
-The design comes from the synced F<scripts/deps> of Tooling. The
-trace of C<--dry-run> equals the trace of that script, line for line,
-over the manifest of every consumer. The test
-F<t/fugubench/deps-conformance.t> holds that comparison, and no
-consumer file changes.
-
 Every download goes through L<Fugu::Curl>, and each download that a
 manifest names takes its check before anything reads it. A run
 without C<--dry-run> then installs, and it runs each command as a
@@ -246,9 +240,7 @@ install directory.
 The digest of an entry takes its check at the download of that entry,
 which the install of that entry follows. A mismatch on a later entry
 leaves an earlier one installed, and a mismatch on the first C<bin>
-entry leaves the new install directory behind. The two loops come
-from the synced F<scripts/deps>, and the dry-run trace holds the verb
-to that order.
+entry leaves the new install directory behind.
 
 A C<pkg> entry reaches the package manager of the platform:
 C<pkg_add> on OpenBSD, C<apt-get install -y> under C<sudo> on Linux,

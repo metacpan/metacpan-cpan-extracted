@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguVM::Disk;
-our $VERSION = '0.3.0';
+our $VERSION = '0.3.1';
 
 use File::Basename;
 use Fugu::File;

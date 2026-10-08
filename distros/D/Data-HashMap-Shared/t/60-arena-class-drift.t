@@ -5,16 +5,10 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SS;
 
-# Arena blocks are exact power-of-two classes that are never split or coalesced,
-# so freeing any number of 64-byte blocks can never yield a 512-byte one.  A
-# cache whose value size drifts into a larger class therefore evicts an entry
-# per attempt without ever fitting, and when the last one goes the arena is
-# entirely free yet every insert still fails: the free lists hold only the wrong
-# class and the bump is spent.  An empty map has no node pointing at any block,
-# so the arena is reset whole and the map becomes usable again.
-#
-# The drift still costs every entry the cache held -- only the permanent dead
-# end afterwards is fixed.
+# Arena blocks are exact power-of-two classes, never split or coalesced, so
+# freeing 64-byte blocks never yields a 512-byte one.  When a cache drifts to a
+# larger value class and the last entry goes, the arena is entirely free yet
+# refuses every insert; an empty map resets the arena whole.
 
 my $dir = tempdir(CLEANUP => 1);
 

@@ -3,21 +3,19 @@ use strict;
 use warnings;
 use Data::HashMap::Shared::SS;
 
-# memfd-backed map: zero filesystem presence, shareable via the file
-# descriptor across processes (fork, SCM_RIGHTS, or a POSIX::dup of it
-# across exec). Useful for ephemeral shared caches that should never hit disk.
+# memfd-backed map: no filesystem presence, shared by passing the file
+# descriptor (fork, SCM_RIGHTS, or a POSIX::dup of it across exec).
 
 my $map = Data::HashMap::Shared::SS->new_memfd("session-cache", 10_000, 0, 60);
 my $fd  = $map->memfd;
 print "memfd created on fd=$fd; nothing on disk\n";
 
-# Producer writes
 $map->put("user:42", "alice");
 $map->put_ttl("session:abc", "valid", 30);
 
 my $pid = fork // die "fork: $!";
 if ($pid == 0) {
-    # Child reopens via the inherited fd — no path string needed.
+    # Child reopens via the inherited fd; no path string needed.
     my $shared = Data::HashMap::Shared::SS->new_from_fd($fd);
     print "child sees user:42 = ", $shared->get("user:42"), "\n";
     my ($val, $ttl) = $shared->get_with_ttl("session:abc");

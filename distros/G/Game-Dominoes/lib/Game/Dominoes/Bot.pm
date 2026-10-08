@@ -11,7 +11,7 @@ use Game::Dominoes::Rules;
 use Game::Dominoes::Scoring;
 use Game::Dominoes::Set;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our %LEVEL = (
 	1 => { worlds => 0,  depth => 0,  shape => 0 },
@@ -262,7 +262,7 @@ Game::Dominoes::Bot - a determinised search that plays without peeking
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

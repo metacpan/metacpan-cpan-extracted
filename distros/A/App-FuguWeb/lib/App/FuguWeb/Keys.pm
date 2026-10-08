@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Keys;
-our $VERSION = '0.7.0';
+our $VERSION = '0.8.0';
 
 use App::FuguWeb;
 use App::FuguWeb::Page;
@@ -757,7 +757,7 @@ sub _stray_files ( $self, $keys )
 #	The manifest names every key file and every binding file, with
 #	the digest that the file has, and it names nothing else. A
 #	digest that disagrees with its file is the fault that the tier
-#	of scripts/deps rests on.
+#	of `fugubench deps` rests on.
 #	The check therefore reads the bytes, and never the size or the
 #	time.
 sub _manifest_problems ( $self, $keys )

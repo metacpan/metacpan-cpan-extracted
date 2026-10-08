@@ -7,6 +7,7 @@ use File::Spec;
 use File::Temp qw(tempdir);
 use Test::Most;
 use Test::NoWarnings;
+use Test::Returns;
 
 eval { require DBI; require DBD::SQLite };
 if ($@) {
@@ -138,7 +139,7 @@ is($db->count(score  => { '>' => 8 }),     3, 'count(score>8)');
 use_ok('Database::Abstraction::Query');
 
 my $q = $db->query();
-isa_ok($q, 'Database::Abstraction::Query', 'query() returns Query object');
+returns_is($q, { type => 'object', isa => 'Database::Abstraction::Query' }, 'query() returns Query object');
 
 # all() — no criteria
 my $all = $db->query->all();

@@ -6,6 +6,8 @@ use SelectPdf::AsyncJobClient;
 use strict;
 our @ISA = qw(SelectPdf::ApiClient);
 
+our $VERSION = '1.6.0';
+
 =head1 NAME
 
 SelectPdf::PdfToTextClient - Pdf To Text Conversion with SelectPdf Online API. Extract text from PDF. Search PDF.
@@ -183,7 +185,7 @@ Parameters:
 - $outputFilePath: The output file where the resulted text will be written.
 
 =cut
-sub getTextFromFileToFile($,$) {
+sub getTextFromFileToFile($$) {
     my($self, $inputPdf, $outputFilePath) = @_;
 
     my $result = $self->getTextFromFile($inputPdf);
@@ -260,7 +262,7 @@ Parameters:
 - $outputFilePath: The output file where the resulted text will be written.
 
 =cut
-sub getTextFromFileToFileAsync($,$) {
+sub getTextFromFileToFileAsync($$) {
     my($self, $inputPdf, $outputFilePath) = @_;
 
     my $result = $self->getTextFromFileAsync($inputPdf);
@@ -315,7 +317,7 @@ Parameters:
 - $outputFilePath: The output file where the resulted text will be written.
 
 =cut
-sub getTextFromUrlToFile($,$) {
+sub getTextFromUrlToFile($$) {
     my($self, $url, $outputFilePath) = @_;
 
     my $result = $self->getTextFromUrl($url);
@@ -391,7 +393,7 @@ Parameters:
 - $outputFilePath: The output file where the resulted text will be written.
 
 =cut
-sub getTextFromUrlToFileAsync($,$) {
+sub getTextFromUrlToFileAsync($$) {
     my($self, $url, $outputFilePath) = @_;
 
     my $result = $self->getTextFromUrlAsync($url);
@@ -424,7 +426,7 @@ Returns:
 
 - List with text positions in the current PDF document.
 =cut
-sub searchFile($,$,$,$) {
+sub searchFile($$$$) {
     my($self, $inputPdf, $textToSearch, $caseSensitive, $wholeWordsOnly) = @_;
 
     if (!$textToSearch) {
@@ -475,7 +477,7 @@ Returns:
 
 - List with text positions in the current PDF document.
 =cut
-sub searchFileAsync($,$,$,$) {
+sub searchFileAsync($$$$) {
     my($self, $inputPdf, $textToSearch, $caseSensitive, $wholeWordsOnly) = @_;
 
     if (!$textToSearch) {
@@ -549,7 +551,7 @@ Returns:
 
 - List with text positions in the current PDF document.
 =cut
-sub searchUrl($,$,$,$) {
+sub searchUrl($$$$) {
     my($self, $url, $textToSearch, $caseSensitive, $wholeWordsOnly) = @_;
 
     if (!$textToSearch) {
@@ -599,7 +601,7 @@ Returns:
 
 - List with text positions in the current PDF document.
 =cut
-sub searchUrlAsync($,$,$,$) {
+sub searchUrlAsync($$$$) {
     my($self, $url, $textToSearch, $caseSensitive, $wholeWordsOnly) = @_;
 
     if (!$textToSearch) {
@@ -665,7 +667,7 @@ Returns:
 
 - Reference to the current object.
 =cut
-sub setCustomParameter($,$) {
+sub setCustomParameter($$) {
     my($self, $parameterName, $parameterValue) = @_;
 
     $self->{parameters}{$parameterName} = $parameterValue;

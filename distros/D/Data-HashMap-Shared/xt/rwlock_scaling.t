@@ -4,15 +4,11 @@ use Test::More;
 use Time::HiRes qw(time);
 use POSIX qw(_exit);
 
-# Reader scalability: if the rwlock truly permits concurrent readers,
-# throughput with N readers should be > ~40% of N×(single-reader rate).
-# A dramatic drop indicates lock-convoy / accidental serialization.
-
 use Data::HashMap::Shared::II;
 
-# The ratio below compares four reader processes against one, so its ceiling
-# is the number of CPUs they can occupy: on two it cannot exceed 2.0 and lands
-# at 1.4-1.5 under any competing load.
+# Four readers must scale past 1.5x one reader; a drop means lock convoy or
+# accidental serialization. The ratio's ceiling is the CPU count: on two it
+# cannot exceed 2.0 and lands at 1.4-1.5 under load.
 sub ncpu {
     return $ENV{TEST_NCPU} if $ENV{TEST_NCPU};
     if (open my $fh, '<', '/proc/self/status') {
@@ -61,7 +57,6 @@ sub measure_reader_rate {
         push @pids, $pid;
     }
     close $r; close $res_w;
-    # Starting gun
     syswrite($w, 'G') for 1..$n_readers;
     close $w;
 

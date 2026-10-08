@@ -9,16 +9,14 @@ use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::IS;
 use Data::HashMap::Shared::SS;
 
-# An insert probe cannot tell an expired entry from a live one -- both are
-# SHM_IS_LIVE -- so a table whose slots are all held by expired entries must
-# still accept an insert, or a map keyed by identities that never repeat wedges
-# for good while keys() reports nothing.
+# An insert probe cannot tell an expired entry from a live one (both are
+# SHM_IS_LIVE), so a table full of expired entries must still accept an insert.
 
 my $dir = tempdir(CLEANUP => 1);
 my $seq = 0;
 
-# A long default TTL: only the fillers expire, so the key each case then inserts
-# cannot expire before the assertion that looks for it.
+# long default TTL: only the fillers expire, not the key a case inserts
+# afterwards
 sub filled_to_capacity {
     my $m = Data::HashMap::Shared::SI->new("$dir/x" . $seq++ . ".shm", 8, 0, 3600);
     $m->put_ttl("old-$_", $_, 1) for 1 .. $m->capacity;
@@ -26,8 +24,7 @@ sub filled_to_capacity {
     return $m;
 }
 
-# --- every insert path reclaims -------------------------------------------
-# One TTL window for all six maps, not one each.
+# one TTL wait shared by all six maps
 my @cases = (
     [ put        => sub { $_[0]->put($_[1], 1) } ],
     [ add        => sub { $_[0]->add($_[1], 1) } ],
@@ -47,7 +44,6 @@ for my $i (0 .. $#cases) {
     ok $m->exists('fresh'), "  ... and the new key is really there";
 }
 
-# --- a genuinely full table still refuses ---------------------------------
 {
     my $m = Data::HashMap::Shared::SI->new("$dir/live.shm", 8, 0, 900);
     $m->put("live-$_", $_) for 1 .. $m->capacity;
@@ -55,17 +51,15 @@ for my $i (0 .. $#cases) {
     is $m->size, $m->capacity, '  ... and nothing was evicted to make room';
 }
 
-# --- a permanent entry is never reclaimed ---------------------------------
 {
     my $m = Data::HashMap::Shared::II->new("$dir/perm.shm", 8, 0, 1);
-    $m->put_ttl(999, 42, 0);                       # permanent
+    $m->put_ttl(999, 42, 0);
     $m->put($_, $_) for 1 .. $m->capacity - 1;
     Time::HiRes::sleep(1.2);
     $m->put(1000 + $_, $_) for 1 .. 2 * $m->capacity;
     is $m->get(999), 42, 'a permanent entry survives repeated reclaim';
 }
 
-# --- the reclaim is accounted, not silent ---------------------------------
 {
     my $m = Data::HashMap::Shared::SI->new("$dir/stat.shm", 8, 0, 1);
     $m->put("e$_", $_) for 1 .. $m->capacity;
@@ -75,7 +69,6 @@ for my $i (0 .. $#cases) {
     cmp_ok $m->stats->{expired}, '>', 0, 'the reclaimed entry is counted in stats';
 }
 
-# --- a saturated table is flushed whole, not one slot per insert ------------
 {
     my $m = Data::HashMap::Shared::SI->new("$dir/whole.shm", 8, 0, 1);
     $m->put("e$_", $_) for 1 .. $m->capacity;
@@ -93,15 +86,13 @@ for my $i (0 .. $#cases) {
     is $p->stats->{expired}, 5, '  ... billed as expired';
 }
 
-# --- crossing the design load flushes expired entries too ---------------------
-# A partial flush leaves free slots somewhere, so "no free slot" may never come:
-# the insert that takes the table over its load flushes first, rather than
-# carrying the dead entries into a larger table or a compaction.
+# the insert that crosses the design load must flush expired entries first: a
+# partial flush leaves free slots, so "no free slot" may never come
 {
-    # TTL 2: a TTL of 1 can expire mid-fill, at a clock tick, and be flushed by
-    # the fill itself before the table reaches its load.
+    # TTL 2, not 1: a 1s TTL can expire mid-fill at a clock tick and be flushed
+    # before the table reaches its load
     my $top = Data::HashMap::Shared::SI->new("$dir/top.shm", 1000, 0, 3600);
-    $top->put_ttl("old-$_", $_, 2) for 1 .. $top->max_entries;   # the largest table, at its load
+    $top->put_ttl("old-$_", $_, 2) for 1 .. $top->max_entries;
     my $mid = Data::HashMap::Shared::SI->new("$dir/mid.shm", 10_000, 0, 3600);
     $mid->put_ttl("old-$_", $_, 2) for 1 .. 700;
     my $cap = $mid->capacity;
@@ -117,9 +108,6 @@ for my $i (0 .. $#cases) {
 }
 
 
-# --- an LRU map evicts when the ARENA is exhausted, not only when the entry
-# --- count reaches max_size: otherwise the cache freezes holding its oldest
-# --- entries, which is the opposite of what a cache is for.
 {
     my $c = Data::HashMap::Shared::SS->new("$dir/arena.shm", 1000, 500);
     my $v = 'x' x 400;                       # default arena is ~128 KB
@@ -131,8 +119,6 @@ for my $i (0 .. $#cases) {
     ok !defined $c->get('key1'),   '  ... and the oldest was evicted';
 }
 
-# a map WITHOUT LRU must still refuse -- never evict what the caller did not ask
-# to have evicted
 {
     my $p = Data::HashMap::Shared::SS->new("$dir/noarena.shm", 1000, 0, 0, 0, 4096);
     my $fail = 0;
@@ -142,17 +128,12 @@ for my $i (0 .. $#cases) {
 }
 
 
-# --- arena eviction must reach every insert path, not just put ---------------
-# The reclaim above was wired into all six insert paths; the arena-eviction
-# retry initially reached only put_inner, so add/swap/get_or_set/incr/max still
-# refused -- and the counters croaked rather than returning false.
 {
     my $V = 'x' x 400;
     my $seq2 = 0;
     my $full_arena = sub {
-        # An explicit small arena is the binding constraint with no slack: the
-        # default one leaves free blocks behind and a following insert finds
-        # room without ever needing to evict, which is not the state under test.
+        # a small explicit arena leaves no slack: the default one leaves free
+        # blocks behind, so a following insert would fit without evicting
         my $m = Data::HashMap::Shared::SS->new("$dir/ae" . $seq2++ . ".shm", 1000, 500, 0, 0, 8192);
         my $n = 0;
         while ($m->put("fill-$n", $V)) { last if ++$n > 500 }
@@ -168,7 +149,8 @@ for my $i (0 .. $#cases) {
         ok $code->($full_arena->(), 'fresh'), "$name evicts when the arena is exhausted";
     }
 
-    # string keys need arena space too, and these croak rather than return false
+    # string keys need arena space too, and the counters croak rather than
+    # return false
     my $counters = sub {
         my $m = Data::HashMap::Shared::SI->new("$dir/ac" . $seq2++ . ".shm", 1000, 500, 0, 0, 8192);
         my $n = 0;
@@ -180,7 +162,6 @@ for my $i (0 .. $#cases) {
     ok eval { $counters->()->max('z' x 200 . '-new', 5); 1 },
         'max evicts rather than croaking when the arena is exhausted';
 
-    # and a map with no LRU still refuses every one of them
     my $p = Data::HashMap::Shared::SS->new("$dir/noevict.shm", 1000, 0, 0, 0, 8192);
     my $n = 0;
     while ($p->put("f$n", $V)) { last if ++$n > 500 }
@@ -192,11 +173,8 @@ for my $i (0 .. $#cases) {
 }
 
 
-# --- an unsatisfiable insert must not destroy the cache to discover that ------
-# Arena blocks are exact size classes and are never coalesced, so a request the
-# whole arena could not hold is not made satisfiable by any number of evictions.
-# Without a guard the retry loop evicted until the map was empty and then failed
-# anyway.
+# arena blocks are exact size classes and never coalesce: no number of evictions
+# makes a request larger than the whole arena fit
 {
     my $m = Data::HashMap::Shared::SS->new("$dir/oversize.shm", 1000, 500, 0, 0, 8192);
     my $n = 0;
@@ -213,11 +191,8 @@ for my $i (0 .. $#cases) {
 }
 
 
-# --- a doomed insert costs at most one entry per store, whatever its size ----
-# The whole-arena guard only catches a request larger than the arena.  A request
-# that fits the arena but matches no size class the eviction frees is equally
-# unsatisfiable, because blocks are exact classes and never coalesce -- and the
-# retry loop used to evict until the map was empty discovering that.
+# a request that fits the arena but matches no size class the eviction frees is
+# equally unsatisfiable
 {
     my $seq3 = 0;
     my $cache = sub {                       # 15 entries of 200B in a 4096B arena
@@ -237,17 +212,14 @@ for my $i (0 .. $#cases) {
         ok $ok, "  ... and a ${len}B insert succeeds" if $len == 200;
     }
 
-    # an arena-backed KEY is guarded the same way as a value
     my $m = $cache->();
     my ($size, $ev) = ($m->size, $m->stats->{evictions});
     $m->put('z' x 300, 'y' x 5000);
     cmp_ok $size - $m->size, '<=', 1, 'a long key with an oversize value costs at most one entry';
 
-    # the other direction: a class smaller than every block present.  Blocks are
-    # never split, and this arena is tiled exactly by eight 1024-byte blocks, so
-    # neither a free block nor a bump remainder can serve it.  That was a dead
-    # end until the arena learned to compact: the block the first attempt evicts
-    # is reclaimed by the next insert, which then fits.
+    # a class smaller than every block present: blocks are never split and this
+    # arena is tiled exactly by eight 1024-byte blocks, so only compaction can
+    # serve it
     my $s = Data::HashMap::Shared::SS->new("$dir/small.shm", 1000, 900, 0, 0, 16 + 8 * 1024);
     my $j = 0;
     while ($s->put("b$j", 'b' x 1000)) { last if ++$j > 40 }
@@ -263,8 +235,6 @@ for my $i (0 .. $#cases) {
     my $smalls = grep { ($s->get("s$_") // '') eq 'a' x 100 } 1 .. 3;
     is $larges + $smalls, $s->size, '  ... and every entry present reads back its own value';
 
-    # an insert whose arena-backed key is stored, then whose value evicts and
-    # still fails, costs two entries and releases the key block again
     my $two = Data::HashMap::Shared::SS->new("$dir/two.shm", 1000, 500, 0, 0, 4096);
     my $t = 0;
     while ($two->put("k$t", 'x' x 200)) { last if ++$t > 100 }
@@ -279,9 +249,8 @@ for my $i (0 .. $#cases) {
 }
 
 
-# --- the eviction is aimed at the request's size class ------------------------
-# Among the 32 oldest entries the victim is the oldest holding a block of the
-# request's own class; only when none of them does is the tail evicted blindly.
+# among the 32 oldest entries the victim is the oldest holding a block of the
+# request's class; if none does, the tail is evicted blindly
 {
     my $fixture = sub {                 # $n class-256 entries, one class-4096 entry,
         my ($n) = @_;                   # then class-256 fillers up to exactly the arena
@@ -306,9 +275,8 @@ for my $i (0 .. $#cases) {
     is $w->size, $size - 1, '  ... costing one entry';
 }
 
-# Long strings fill the arena before the table: a refused store flushes the
-# expired entries holding it, as a missing slot does, sparing the entry an
-# overwrite replaces.
+# long strings fill the arena before the table: a refused store flushes expired
+# entries as a missing slot does, sparing the entry an overwrite replaces
 {
     my $long = sub { sprintf '%0100d', $_[0] };
     my $si = Data::HashMap::Shared::SI->new(undef, 1000, 0, 2);
@@ -330,8 +298,6 @@ for my $i (0 .. $#cases) {
     is $ss->size, 1, '  ... while the other expired entries are flushed';
 }
 
-# One insert's arena flush leaves tombstones that the next insert's design-load
-# check compacts in place rather than taking as a reason to grow.
 {
     my $m = Data::HashMap::Shared::SS->new(undef, 100_000, 0, 2, 0, 16 + 768 * 16);
     my $i = 0;
@@ -342,8 +308,6 @@ for my $i (0 .. $#cases) {
     is $m->capacity, 1024, '  ... compacts the table in place rather than doubling it';
 }
 
-# At $max_size a string no arena can hold is refused before the count eviction,
-# so the refused insert costs the cache nothing.
 {
     my $s = Data::HashMap::Shared::SS->new(undef, 1000, 10, 0, 0, 8192);
     $s->put("k$_", 'v' x 400) for 1 .. 10;

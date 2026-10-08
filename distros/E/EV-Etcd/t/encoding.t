@@ -3,6 +3,7 @@
 # bytes, and values come back as byte strings without the flag.
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use utf8;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;

@@ -4,10 +4,8 @@ use Test::More;
 use Time::HiRes ();
 use File::Temp qw(tempdir);
 
-# flush_expired_partial returns ($flushed, $done), and the XSUB is written ten
-# times over.  Drive every variant through a full expiry cycle and pin each
-# value to what only IT can be: the first sums to the expired count, the
-# second is 0 or 1 and true exactly once.
+# flush_expired_partial returns ($flushed, $done) and the XSUB is written ten
+# times over: drive every variant through a full expiry cycle.
 
 my @variants = qw(II IS SI SS I16 I16S I32 I32S SI16 SI32);
 my $dir = tempdir(CLEANUP => 1);
@@ -21,7 +19,7 @@ for my $v (@variants) {
     $m->set_ttl($_, 1) for 1 .. 30;
     $map{$v} = $m;
 }
-Time::HiRes::sleep(1.2);                                               # everything expires, once
+Time::HiRes::sleep(1.2);
 
 for my $v (@variants) {
     my $m = $map{$v};
@@ -43,8 +41,6 @@ for my $v (@variants) {
     is $m->size,    0,  "$v: table empty afterwards";
 }
 
-# flush_expired covers the whole table, wherever a partial flush -- this
-# process's or another's -- left the shared cursor.
 {
     my $m = Data::HashMap::Shared::SI->new(undef, 1000, 0, 2);
     $m->put("k$_", $_) for 1 .. 500;
@@ -54,8 +50,8 @@ for my $v (@variants) {
     is $m->size, 0, '  ... leaving the map empty';
 }
 
-# A cycle whose last slice expires nothing still shrinks a table its earlier
-# slices emptied.
+# a cycle whose last slice expires nothing still shrinks a table the earlier
+# slices emptied
 {
     my $m = Data::HashMap::Shared::II->new(undef, 10_000, 0, 60);
     $m->reserve(8000);
@@ -70,8 +66,6 @@ for my $v (@variants) {
     cmp_ok $m->capacity, '<', $cap, "and the table shrank from $cap slots";
 }
 
-# Two flushers share the cursor, and the one whose slices never reach the
-# table's end still learns that the cycle ended.
 {
     my $path = "$dir/two-flushers.shm";
     my $low = Data::HashMap::Shared::II->new($path, 64, 0, 60);

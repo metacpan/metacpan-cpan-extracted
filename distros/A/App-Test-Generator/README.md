@@ -1,12 +1,12 @@
-# NAME
+## Name
 
 App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Dashboard for Perl modules
 
-# VERSION
+## Version
 
-Version 0.45
+Version 0.47
 
-# SYNOPSIS
+## Synopsis
 
 `App::Test::Generator` is a suite to help the testing of CPAN modules.
 It consists of 6 subsystems:
@@ -20,54 +20,59 @@ It consists of 6 subsystems:
 
 From the command line:
 
-    # Takes the formal definition of a routine, creates tests against that routine, and runs the test
-    fuzz-harness-generator -r t/conf/abs.yml
+```perl
+# Takes the formal definition of a routine, creates tests against that routine, and runs the test
+fuzz-harness-generator -r t/conf/abs.yml
 
-    # Attempt to create a formal definition from a routine package, then run tests against that formal definition
-    # This is the holy grail of test generation, a set of tests is automatically created directly from the source code,
-    extract-schemas lib/App/Test/Generator/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yml
+# Attempt to create a formal definition from a routine package, then run tests against that formal definition
+# This is the holy grail of test generation, a set of tests is automatically created directly from the source code,
+extract-schemas lib/App/Test/Generator/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yml
 
-    # Fuzz a module and keep the corpus bounded: trim to the minimum subset that still covers every branch
-    extract-schemas --fuzz --minimize-corpus lib/My/Module.pm
+# Fuzz a module and keep the corpus bounded: trim to the minimum subset that still covers every branch
+extract-schemas --fuzz --minimize-corpus lib/My/Module.pm
 
-    # Generate round-trip tests that run every code example in a module's POD and verify the results
-    pod-example-tester lib/My/Module.pm --output t/pod_examples.t
+# Generate round-trip tests that run every code example in a module's POD and verify the results
+pod-example-tester lib/My/Module.pm --output t/pod_examples.t
 
-    # Generate a Benchmark::cmpthese script from a schema; each transform becomes one timed variant
-    benchmark-generator -i schemas/abs.yml -o benchmarks/abs.pl
+# Generate a Benchmark::cmpthese script from a schema; each transform becomes one timed variant
+benchmark-generator -i schemas/abs.yml -o benchmarks/abs.pl
 
-    # Copy dashboard.yml and mutate.yml into a module repository's .github/workflows/ directory
-    deploy-workflows --target /path/to/my-module
+# Copy dashboard.yml and mutate.yml into a module repository's .github/workflows/ directory
+deploy-workflows --target /path/to/my-module
+```
 
 From Perl:
 
-    use App::Test::Generator qw(generate);
-    use App::Test::Generator::SchemaExtractor;
+```perl
+use App::Test::Generator qw(generate);
+use App::Test::Generator::SchemaExtractor;
 
-    # Generate to STDOUT
-    App::Test::Generator->generate("t/conf/abs.yml");
+# Generate to STDOUT
+App::Test::Generator->generate("t/conf/abs.yml");
 
-    # Generate directly to a file
-    App::Test::Generator->generate('t/conf/abs.yml', 't/add_fuzz.t');
+# Generate directly to a file
+App::Test::Generator->generate('t/conf/abs.yml', 't/add_fuzz.t');
 
-    # Holy grail mode - read a Perl file, generate tests, and run them
-    # This is a long way away yet, but see t/schema_input.t for a proof of concept
-    my $extractor = App::Test::Generator::SchemaExtractor->new(
-      input_file => 'lib/App/Test/Generator/Template.pm',
-      output_dir => '/tmp',
-    );
-    my $schemas = $extractor->extract_all();
-    foreach my $schema(keys %{$schemas}) {
-      my $tempfile = '/var/tmp/foo.t';    # Use File::Temp in real life
-      App::Test::Generator->generate(
-        schema => $schemas->{$schema},
-        output_file => $tempfile,
-      );
-      system("$^X -Ilib $tempfile");
-      unlink $tempfile;
-    }
+# Holy grail mode - read a Perl file, generate tests, and run them
+# This is a long way away yet, but see t/schema_input.t for a proof of concept
+my $extractor = App::Test::Generator::SchemaExtractor->new(
+  input_file => 'lib/App/Test/Generator/Template.pm',
+  output_dir => '/tmp',
+);
+my $schemas = $extractor->extract_all();
+use File::Temp qw(tempfile);
+foreach my $schema(keys %{$schemas}) {
+  my ($fh, $tempfile) = tempfile(SUFFIX => '.t', UNLINK => 1);
+  close $fh;
+  App::Test::Generator->generate(
+    schema => $schemas->{$schema},
+    output_file => $tempfile,
+  );
+  system($^X, '-Ilib', $tempfile);
+}
+```
 
-# OVERVIEW
+## Overview
 
 This module takes a formal input/output specification for a routine or
 method and automatically generates test cases. In effect, it allows you
@@ -85,19 +90,26 @@ This approach strengthens your test suite by probing both expected and
 unexpected inputs, helping you to catch boundary errors, invalid data
 handling, and regressions without manually writing every case.
 
-# TOOLS
+## Tools
 
 The distribution ships the following command-line tools:
 
 - [benchmark-generator](https://metacpan.org/pod/benchmark-generator) - generate a self-contained [Benchmark](https://metacpan.org/pod/Benchmark) `cmpthese` script from a YAML schema. Each transform in the schema becomes one named variant; representative input values are derived from each parameter's type and range constraints.
 - [deploy-workflows](https://metacpan.org/pod/deploy-workflows) - copy `dashboard.yml` and `mutate.yml` into the target repository's `.github/workflows/` directory. Both files are embedded verbatim in the script, so no ATG source tree is needed after installation. Supports `--target`, `--force`, and `--dry-run`.
+
+    To add a test dashboard to your CPAN module: copy these scripts into your `.github/workflows` directory,
+    then commit the changes to GitHub and enable the page through `Settings-Pages-branch = gh_pages`:
+
+    - [https://github.com/nigelhorne/App-Test-Generator/blob/master/.github/workflows/dashboard.yml](https://github.com/nigelhorne/App-Test-Generator/blob/master/.github/workflows/dashboard.yml)
+    - [https://github.com/nigelhorne/App-Test-Generator/blob/master/.github/workflows/mutate.yml](https://github.com/nigelhorne/App-Test-Generator/blob/master/.github/workflows/mutate.yml)
+
 - [extract-schemas](https://metacpan.org/pod/extract-schemas) - heuristically extract YAML parameter schemas from a `.pm` file, with optional coverage-guided fuzzing (`--fuzz`) and corpus minimization (`--minimize-corpus`).
 - [fuzz-harness-generator](https://metacpan.org/pod/fuzz-harness-generator) - generate a `Test::Most` fuzzing harness from a YAML schema.
 - [pod-example-tester](https://metacpan.org/pod/pod-example-tester) - generate a `Test::Most` round-trip test file from a module's POD code examples. Annotated examples (`# returns value` / `# => value`) get `is()` assertions; unannotated verbatim blocks are wrapped in `eval{}` and checked for no exception.
 - [test-generator-mutate](https://metacpan.org/pod/test-generator-mutate) - run mutation testing against a module's test suite.
 - [test-generator-index](https://metacpan.org/pod/test-generator-index) - generate the HTML test-quality dashboard, combining Devel::Cover statement/branch data, LCSAJ path coverage, mutation results, and CPAN Testers failure analysis. For each CPAN Testers FAIL report, also writes a self-contained shell script (`cover_html/reproduce/reproduce-GUID.sh`) that pins every installed module at its exact failing version, enabling local reproduction of the failure environment.
 
-# DESCRIPTION
+## Description
 
 This module implements the logic behind [fuzz-harness-generator](https://metacpan.org/pod/fuzz-harness-generator).
 It parses configuration files (fuzz and/or corpus YAML), and
@@ -114,41 +126,45 @@ It then generates a [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)-based 
 - Functional or OO mode (via `$new`)
 - Reproducible runs via `$seed` and configurable iterations via `$iterations`
 
-# MUTATION-GUIDED TEST GENERATION
+## Mutation-Guided Test Generation
 
 `App::Test::Generator` includes a pipeline that automatically closes the
 feedback loop between mutation testing, schema extraction, and fuzz
 testing. The goal is that surviving mutants drive the creation of new
 tests that kill them on the next run, without manual intervention.
 
-## The Pipeline
+### The Pipeline
 
-    mutation survivor
-        |
-        v
-    SchemaExtractor extracts the schema for the enclosing sub
-        |
-        v
-    Schema augmented with boundary values from the mutant
-        |
-        v
-    Augmented schema written to t/conf/
-        |
-        v
-    t/fuzz.t picks up the new schema and runs fuzz tests
-        |
-        v
-    Mutation killed on next run
+```perl
+mutation survivor
+    |
+    v
+SchemaExtractor extracts the schema for the enclosing sub
+    |
+    v
+Schema augmented with boundary values from the mutant
+    |
+    v
+Augmented schema written to t/conf/
+    |
+    v
+t/fuzz.t picks up the new schema and runs fuzz tests
+    |
+    v
+Mutation killed on next run
+```
 
-## How to Use It
+### How to Use It
 
 The pipeline is driven by three flags passed to
 `bin/test-generator-index`, which is invoked automatically by
 `bin/generate-test-dashboard` on each CI push.
 
-### Step 1: Generate TODO stubs for all survivors
+#### Step 1: Generate TODO Stubs for All Survivors
 
-    bin/test-generator-index --generate_mutant_tests=t
+```
+bin/test-generator-index --generate_mutant_tests=t
+```
 
 Produces `t/mutant_YYYYMMDD_HHMMSS.t` containing:
 
@@ -160,11 +176,13 @@ enclosing subroutine name for navigation context.
 Multiple mutations on the same source line are deduplicated into one
 stub. One good test kills all variants on that line.
 
-### Step 2: Generate runnable schemas for NUM\_BOUNDARY survivors
+#### Step 2: Generate Runnable Schemas for NUM\_BOUNDARY Survivors
 
-    bin/test-generator-index \
-        --generate_mutant_tests=t \
-        --generate_test=mutant
+```
+bin/test-generator-index \
+    --generate_mutant_tests=t \
+    --generate_test=mutant
+```
 
 For each NUM\_BOUNDARY survivor, calls
 [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) to extract the schema for
@@ -179,12 +197,14 @@ Falls back to a TODO stub if:
 - The enclosing sub cannot be determined
 - The extracted schema confidence is `very_low` or `none`
 
-### Step 3: Augment existing schemas with survivor boundary values
+#### Step 3: Augment Existing Schemas With Survivor Boundary Values
 
-    bin/test-generator-index \
-        --generate_mutant_tests=t \
-        --generate_test=mutant \
-        --generate_fuzz
+```
+bin/test-generator-index \
+    --generate_mutant_tests=t \
+    --generate_test=mutant \
+    --generate_fuzz
+```
 
 Scans `t/conf/` for existing YAML schema files (hand-written or
 previously generated) and writes augmented copies with boundary values
@@ -197,22 +217,24 @@ Schemas whose filename already starts with `mutant_fuzz_` are skipped
 to prevent cascading augmentation. Schemas with no matching survivors
 are skipped, with a note if `--verbose` is active.
 
-### Putting It All Together
+#### Putting It All Together
 
 The recommended invocation in `bin/generate-test-dashboard`
 Step 7 runs all three stages together:
 
-    bin/test-generator-index \
-        --generate_mutant_tests=t \
-        --generate_test=mutant \
-        --generate_fuzz
+```
+bin/test-generator-index \
+    --generate_mutant_tests=t \
+    --generate_test=mutant \
+    --generate_fuzz
+```
 
 The GitHub Actions workflow in `.github/workflows/dashboard.yml`
 then commits any new `t/mutant_*.t` and `t/conf/mutant_*.yml` files
 to the repository so they accumulate over time as the test suite
 improves.
 
-## Confidence Levels
+### Confidence Levels
 
 [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) assigns a confidence level
 to each extracted schema:
@@ -226,7 +248,7 @@ with explicit parameter validation ([Params::Validate::Strict](https://metacpan.
 [Params::Get](https://metacpan.org/pod/Params%3A%3AGet)) or comprehensive POD will produce higher-confidence
 schemas.
 
-## Files Produced
+### Files Produced
 
 - `t/mutant_YYYYMMDD_HHMMSS.t`
 
@@ -243,7 +265,7 @@ schemas.
     Augmented copy of an existing schema with survivor boundary values
     merged in. Picked up by `t/fuzz.t`.
 
-## See Also
+### See Also
 
 - [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) - Schema extraction
 from Perl source code
@@ -251,27 +273,29 @@ from Perl source code
 pipeline driver
 - ["generate-test-dashboard" in bin](https://metacpan.org/pod/bin#generate-test-dashboard) - Full pipeline runner
 
-# CONFIGURATION
+## Configuration
 
 The configuration file,
 for each set of tests to be produced,
 is a file containing a schema that can be read by [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction).
 
-## SCHEMA
+### Schema
 
 The schema is split into several sections.
 
-### `%input` - input params with keys => type/optional specs
+#### `%Input` - Input Params With Keys => Type/Optional Specs
 
 When using named parameters
 
-    input:
-      name:
-        type: string
-        optional: false
-      age:
-        type: integer
-        optional: true
+```
+input:
+  name:
+    type: string
+    optional: false
+  age:
+    type: integer
+    optional: true
+```
 
 Supported basic types used by the fuzzer: `string`, `integer`, `float`, `number`, `boolean`, `arrayref`, `hashref`.
 See also [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
@@ -279,31 +303,37 @@ You can add more custom types using properties.
 
 For routines with one unnamed parameter
 
-    input:
-      type: string
+```
+input:
+  type: string
+```
 
 For routines with more than one named parameter, use the `position` keyword.
 
-    module: Math::Simple::MinMax
-    fuction: max
+```
+module: Math::Simple::MinMax
+fuction: max
 
-    input:
-      left:
-        type: number
-        position: 0
-      right:
-        type: number
-        position: 1
+input:
+  left:
+    type: number
+    position: 0
+  right:
+    type: number
+    position: 1
 
-    output:
-      type: number
+output:
+  type: number
+```
 
 The keyword `undef` is used to indicate that the `function` takes no arguments.
 
-### `%output` - output param types for [Return::Set](https://metacpan.org/pod/Return%3A%3ASet) checking
+#### `%Output` - Output Param Types for [Return::Set](https://metacpan.org/pod/Return%3A%3ASet) Checking
 
-    output:
-      type: string
+```
+output:
+  type: string
+```
 
 If the output hash contains the key \_STATUS, and if that key is set to DIES,
 the routine should die with the given arguments; otherwise, it should live.
@@ -311,14 +341,16 @@ If it's set to WARNS,
 the routine should warn with the given arguments.
 The output can be set to the string 'undef' if the routine should return the undefined value:
 
-    ---
-    module: Scalar::Util
-    function: blessed
+```
+---
+module: Scalar::Util
+function: blessed
 
-    input:
-      type: string
+input:
+  type: string
 
-    output: undef
+output: undef
+```
 
 The keyword `undef` is used to indicate that the `function` returns nothing.
 
@@ -326,10 +358,12 @@ For methods that return a list (rather than a reference), use `type: array`.
 The generated test captures the result in list context and validates it as an
 arrayref, which requires [Test::Returns](https://metacpan.org/pod/Test%3A%3AReturns) 0.03 or later:
 
-    output:
-      type: array
+```
+output:
+  type: array
+```
 
-### `%config` - optional hash of configuration.
+#### `%Config` - Optional Hash of Configuration.
 
 The current supported variables are
 
@@ -356,11 +390,13 @@ The current supported variables are
 
 All values default to `true`.
 
-### `%accessor` - this is an accessor routine
+#### `%Accessor` - This Is an Accessor Routine
 
-    accessor:
-      property: ua
-      type: getset
+```
+accessor:
+  property: ua
+  type: getset
+```
 
 Has two mandatory elements:
 
@@ -372,7 +408,7 @@ Has two mandatory elements:
 
     One of `getter`, `setter`, `getset`.
 
-### `%transforms` - list of transformations from input sets to output sets
+#### `%Transforms` - List of Transformations From Input Sets to Output Sets
 
 Transforms allow you to define how input data should be transformed into output data.
 This is useful for testing functions that convert between formats, normalize data,
@@ -380,7 +416,7 @@ or apply business logic transformations on a set of data to different set of dat
 It takes a list of subsets of the input and output definitions,
 and verifies that data from each input subset is correctly transformed into data from the matching output subset.
 
-#### Transform Validation Rules
+##### Transform Validation Rules
 
 For each transform:
 
@@ -390,51 +426,53 @@ For each transform:
 - 4. If output has a specific 'value', check exact match
 - 5. If output has constraints (min/max), validate within bounds
 
-#### Example 1
+##### Example 1
 
-    ---
-    module: builtin
-    function: abs
+```
+---
+module: builtin
+function: abs
 
-    config:
-      test_undef: no
-      test_empty: no
-      test_nuls: no
-      test_non_ascii: no
+config:
+  test_undef: no
+  test_empty: no
+  test_nuls: no
+  test_non_ascii: no
 
+input:
+  number:
+    type: number
+    position: 0
+
+output:
+  type: number
+  min: 0
+
+transforms:
+  positive:
     input:
       number:
         type: number
         position: 0
-
+        min: 0
     output:
       type: number
       min: 0
-
-    transforms:
-      positive:
-        input:
-          number:
-            type: number
-            position: 0
-            min: 0
-        output:
-          type: number
-          min: 0
-      negative:
-        input:
-          number:
-            type: number
-            position: 0
-            max: 0
-        output:
-          type: number
-          min: 0
-      error:
-        input:
-          undef
-        output:
-          _STATUS: DIES
+  negative:
+    input:
+      number:
+        type: number
+        position: 0
+        max: 0
+    output:
+      type: number
+      min: 0
+  error:
+    input:
+      undef
+    output:
+      _STATUS: DIES
+```
 
 If the output hash contains the key \_STATUS, and if that key is set to DIES,
 the routine should die with the given arguments; otherwise, it should live.
@@ -442,51 +480,53 @@ If it's set to WARNS, the routine should warn with the given arguments.
 
 The keyword `undef` is used to indicate that the `function` returns nothing.
 
-#### Example 2
+##### Example 2
 
-    ---
-    module: Math::Utils
-    function: normalize_number
+```
+---
+module: Math::Utils
+function: normalize_number
 
+input:
+  value:
+    type: number
+    position: 0
+
+output:
+  type: number
+
+transforms:
+  positive_stays_positive:
     input:
       value:
         type: number
-        position: 0
-
+        min: 0
+        max: 1000
     output:
       type: number
+      min: 0
+      max: 1
 
-    transforms:
-      positive_stays_positive:
-        input:
-          value:
-            type: number
-            min: 0
-            max: 1000
-        output:
-          type: number
-          min: 0
-          max: 1
+  negative_becomes_zero:
+    input:
+      value:
+        type: number
+        max: 0
+    output:
+      type: number
+      value: 0
 
-      negative_becomes_zero:
-        input:
-          value:
-            type: number
-            max: 0
-        output:
-          type: number
-          value: 0
+  preserves_zero:
+    input:
+      value:
+        type: number
+        value: 0
+    output:
+      type: number
+      value: 0
+```
 
-      preserves_zero:
-        input:
-          value:
-            type: number
-            value: 0
-        output:
-          type: number
-          value: 0
-
-### `$module`
+#### `$Module`
 
 The name of the module (optional).
 
@@ -495,104 +535,116 @@ Using the reserved word `builtin` means you're testing a Perl builtin function.
 If omitted, the generator will guess from the config filename:
 `My-Widget.conf` -> `My::Widget`.
 
-### `$function`
+#### `$Function`
 
 The function/method to test.
 
 This defaults to `run`.
 
-### `%new`
+#### `%New`
 
 An optional hashref of args to pass to the module's constructor.
 
-    new:
-      api_key: ABC123
-      verbose: true
+```
+new:
+  api_key: ABC123
+  verbose: true
+```
 
 To ensure `new()` is called with no arguments, you still need to define new, thus:
 
-    module: MyModule
-    function: my_function
+```
+module: MyModule
+function: my_function
 
-    new:
+new:
+```
 
-### `%cases`
+#### `%Cases`
 
 An optional Perl static corpus, when the output is a simple string (expected => \[ args... \]).
 
 Maps the expected output string to the input and \_STATUS
 
-    cases:
-      ok:
-        input: ping
-        _STATUS: OK
-      error:
-        input: ""
-        _STATUS: DIES
+```
+cases:
+  ok:
+    input: ping
+    _STATUS: OK
+  error:
+    input: ""
+    _STATUS: DIES
+```
 
-### `$yaml_cases` - optional path to a YAML file with the same shape as `%cases`.
+#### `$yaml_cases` - Optional Path to a YAML File With the Same Shape as `%Cases`.
 
-### `$seed`
+#### `$Seed`
 
 An optional integer.
 When provided, the generated `t/fuzz.t` will call `srand($seed)` so fuzz runs are reproducible.
 
-### `$iterations`
+#### `$Iterations`
 
 An optional integer controlling how many fuzz iterations to perform (default 30).
 
-### `%edge_cases`
+#### `%edge_cases`
 
 An optional hash mapping of extra values to inject.
 
-        # Two named parameters
-        edge_cases:
-                name: [ '', 'a' x 1024, \"\x{263A}" ]
-                age: [ -1, 0, 99999999 ]
+```
+    # Two named parameters
+    edge_cases:
+            name: [ '', 'a' x 1024, \"\x{263A}" ]
+            age: [ -1, 0, 99999999 ]
 
-        # Takes a string input
-        edge_cases: [ 'foo', 'bar' ]
+    # Takes a string input
+    edge_cases: [ 'foo', 'bar' ]
+```
 
 Values can be strings or numbers; strings will be properly quoted.
 Note that this only works with routines that take named parameters.
 
-### `%type_edge_cases`
+#### `%type_edge_cases`
 
 An optional hash mapping types to arrayrefs of extra values to try for any field of that type:
 
-        type_edge_cases:
-                string: [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ]
-                number: [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ]
-                integer: [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ]
+```
+    type_edge_cases:
+            string: [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ]
+            number: [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ]
+            integer: [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ]
+```
 
-### `%edge_case_array`
+#### `%edge_case_array`
 
 Specify edge case values for routines that accept a single unnamed parameter.
 This is specifically designed for simple functions that take one argument without a parameter name.
 These edge cases supplement the normal random string generation, ensuring specific problematic values are always tested.
 During fuzzing iterations, there's a 40% probability that a test case will use a value from edge\_case\_array instead of randomly generated data.
 
-    ---
-    module: Text::Processor
-    function: sanitize
+```
+---
+module: Text::Processor
+function: sanitize
 
-    input:
-      type: string
-      min: 1
-      max: 1000
+input:
+  type: string
+  min: 1
+  max: 1000
 
-    edge_case_array:
-      - "<script>alert('xss')</script>"
-      - "'; DROP TABLE users; --"
-      - "\0null\0byte"
-      - "emoji😊test"
-      - ""
-      - " "
+edge_case_array:
+  - "<script>alert('xss')</script>"
+  - "'; DROP TABLE users; --"
+  - "\0null\0byte"
+  - "emoji😊test"
+  - ""
+  - " "
 
-    seed: 42
-    iterations: 30
+seed: 42
+iterations: 30
+```
 
-### Semantic Data Generators
+#### Semantic Data Generators
 
 For property-based testing with [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest),
 you can use semantic generators to create realistic test data.
@@ -600,20 +652,22 @@ you can use semantic generators to create realistic test data.
 `unix_timestamp` is currently fully supported,
 other fuzz testing support for `semantic` entries is being developed.
 
-    input:
-      email:
-        type: string
-        semantic: email
+```
+input:
+  email:
+    type: string
+    semantic: email
 
-      user_id:
-        type: string
-        semantic: uuid
+  user_id:
+    type: string
+    semantic: uuid
 
-      phone:
-        type: string
-        semantic: phone_us
+  phone:
+    type: string
+    semantic: phone_us
+```
 
-#### Available Semantic Types
+##### Available Semantic Types
 
 - `email` - Valid email addresses (user@domain.tld)
 - `url` - HTTP/HTTPS URLs
@@ -635,7 +689,7 @@ other fuzz testing support for `semantic` entries is being developed.
 - `sha256` - SHA-256 hashes (64 hex chars)
 - `unix_timestamp`
 
-## EDGE CASE GENERATION
+### Edge Case Generation
 
 In addition to purely random fuzz cases, the harness generates
 deterministic edge cases for parameters that declare `min`, `max` or `len` in their schema definitions.
@@ -681,20 +735,22 @@ Supported constraint types:
     `status` is a string that must have the value `ok`, `error` or `pending`.
     The `level` argument is an integer that must be one of `1`, `5` or `111`.
 
-        ---
-        input:
-          status:
-            type: string
-            memberof:
-              - ok
-              - error
-              - pending
-          level:
-            type: integer
-            memberof:
-              - 1
-              - 5
-              - 111
+    ```
+    ---
+    input:
+      status:
+        type: string
+        memberof:
+          - ok
+          - error
+          - pending
+      level:
+        type: integer
+        memberof:
+          - 1
+          - 5
+          - 111
+    ```
 
     The generator will automatically create test cases for each allowed value (inside the member list),
     and at least one value outside the list (which should die or `croak`, `_STATUS = 'DIES'`).
@@ -703,9 +759,11 @@ Supported constraint types:
 - `enum` - synonym of `memberof`
 - `boolean` - automatic boundary tests for boolean fields
 
-        input:
-          flag:
-            type: boolean
+    ```
+    input:
+      flag:
+        type: boolean
+    ```
 
     The generator will automatically create test cases for 0 and 1; true and false; off and on, and values that should trigger `_STATUS = 'DIES'`.
 
@@ -713,11 +771,11 @@ These edge cases are inserted automatically, in addition to the random
 fuzzing inputs, so each run will reliably probe boundary conditions
 without relying solely on randomness.
 
-# EXAMPLES
+## Examples
 
 See the files in `t/conf` for examples.
 
-## Adding Scheduled fuzz Testing with GitHub Actions to Your Code
+### Adding Scheduled Fuzz Testing With GitHub Actions to Your Code
 
 To automatically create and run tests on a regular basis on GitHub Actions,
 you need to create a configuration file for each method and subroutine that you're testing,
@@ -725,100 +783,104 @@ and a GitHub Actions configuration file.
 
 This example takes you through testing the online\_render method of [HTML::Genealogy::Map](https://metacpan.org/pod/HTML%3A%3AGenealogy%3A%3AMap).
 
-### t/conf/online\_render.yml
+#### T/Conf/Online\_render.yml
 
-    ---
+```
+---
 
-    module: HTML::Genealogy::Map
-    function: onload_render
+module: HTML::Genealogy::Map
+function: onload_render
 
-    input:
-      gedcom:
-        type: object
-        can: individuals
-      geocoder:
-        type: object
-        can: geocode
-      debug:
-        type: boolean
-        optional: true
-      google_key:
-        type: string
-        optional: true
-        min: 39
-        max: 39
-        matches: "^AIza[0-9A-Za-z_-]{35}$"
+input:
+  gedcom:
+    type: object
+    can: individuals
+  geocoder:
+    type: object
+    can: geocode
+  debug:
+    type: boolean
+    optional: true
+  google_key:
+    type: string
+    optional: true
+    min: 39
+    max: 39
+    matches: "^AIza[0-9A-Za-z_-]{35}$"
 
-    config:
-      test_undef: 0
+config:
+  test_undef: 0
+```
 
-### .github/actions/fuzz.t
+#### .Github/Actions/fuzz.t
 
-    ---
-    name: Fuzz Testing
+```
+---
+name: Fuzz Testing
 
-    permissions:
-      contents: read
+permissions:
+  contents: read
 
-    on:
-      push:
-        branches: [main, master]
-      pull_request:
-        branches: [main, master]
-      schedule:
-        - cron: '29 5 14 * *'
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    - cron: '29 5 14 * *'
 
-    jobs:
-      generate-fuzz-tests:
-        strategy:
-          fail-fast: false
-          matrix:
-            os:
-              - macos-latest
-              - ubuntu-latest
-              - windows-latest
-            perl: ['5.42', '5.40', '5.38', '5.36', '5.34', '5.32', '5.30', '5.28', '5.22']
+jobs:
+  generate-fuzz-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+        perl: ['5.42', '5.40', '5.38', '5.36', '5.34', '5.32', '5.30', '5.28', '5.22']
 
-        runs-on: ${{ matrix.os }}
-        name: Fuzz testing with perl ${{ matrix.perl }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    name: Fuzz testing with perl ${{ matrix.perl }} on ${{ matrix.os }}
 
-        steps:
-          - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
-          - name: Set up Perl
-            uses: shogo82148/actions-setup-perl@a198315ec4e9244f206879ea7b63078003aec8a6 # v1.41.1
-            with:
-              perl-version: ${{ matrix.perl }}
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@a198315ec4e9244f206879ea7b63078003aec8a6 # v1.41.1
+        with:
+          perl-version: ${{ matrix.perl }}
 
-          - name: Install App::Test::Generator this module's dependencies
-            run: |
-              cpanm App::Test::Generator
-              cpanm --installdeps .
+      - name: Install App::Test::Generator this module's dependencies
+        run: |
+          cpanm App::Test::Generator
+          cpanm --installdeps .
 
-          - name: Make Module
-            run: |
-              perl Makefile.PL
-              make
-            env:
-              AUTOMATED_TESTING: 1
-              NONINTERACTIVE_TESTING: 1
+      - name: Make Module
+        run: |
+          perl Makefile.PL
+          make
+        env:
+          AUTOMATED_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
 
-          - name: Generate fuzz tests
-            run: |
-              mkdir t/fuzz
-              find t/conf -name '*.yml' | while read config; do
-                test_name=$(basename "$config" .conf)
-                fuzz-harness-generator "$config" > "t/fuzz/${test_name}_fuzz.t"
-              done
+      - name: Generate fuzz tests
+        run: |
+          mkdir t/fuzz
+          find t/conf -name '*.yml' | while read config; do
+            test_name=$(basename "$config" .conf)
+            fuzz-harness-generator "$config" > "t/fuzz/${test_name}_fuzz.t"
+          done
 
-          - name: Run generated fuzz tests
-            run: |
-              prove -lr t/fuzz/
-            env:
-              AUTOMATED_TESTING: 1
-              NONINTERACTIVE_TESTING: 1
+      - name: Run generated fuzz tests
+        run: |
+          prove -lr t/fuzz/
+        env:
+          AUTOMATED_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
+```
 
-## Fuzz Testing your CPAN Module
+### Fuzz Testing Your CPAN Module
 
 Running fuzz tests when you run `make test` in your CPAN module.
 
@@ -826,52 +888,54 @@ Create a directory &lt;t/conf> which contains the schemas.
 
 Then create this file as &lt;t/fuzz.t>:
 
-    #!/usr/bin/env perl
+```perl
+#!/usr/bin/env perl
 
-    use strict;
-    use warnings;
+use strict;
+use warnings;
 
-    use FindBin qw($Bin);
-    use IPC::Run3;
-    use IPC::System::Simple qw(system);
-    use Test::Needs 'App::Test::Generator';
-    use Test::Most;
+use FindBin qw($Bin);
+use IPC::Run3;
+use IPC::System::Simple qw(system);
+use Test::Needs 'App::Test::Generator';
+use Test::Most;
 
-    my $dirname = "$Bin/conf";
+my $dirname = "$Bin/conf";
 
-    if((-d $dirname) && opendir(my $dh, $dirname)) {
-          while (my $filename = readdir($dh)) {
-                  # Skip '.' and '..' entries and vi temporary files
-                  next if ($filename eq '.' || $filename eq '..') || ($filename =~ /\.swp$/);
+if((-d $dirname) && opendir(my $dh, $dirname)) {
+      while (my $filename = readdir($dh)) {
+              # Skip '.' and '..' entries and vi temporary files
+              next if ($filename eq '.' || $filename eq '..') || ($filename =~ /\.swp$/);
 
-                  my $filepath = "$dirname/$filename";
+              my $filepath = "$dirname/$filename";
 
-                  if(-f $filepath) {      # Check if it's a regular file
-                          my ($stdout, $stderr);
-                          run3 ['fuzz-harness-generator', '-r', $filepath], undef, \$stdout, \$stderr;
+              if(-f $filepath) {      # Check if it's a regular file
+                      my ($stdout, $stderr);
+                      run3 ['fuzz-harness-generator', '-r', $filepath], undef, \$stdout, \$stderr;
 
-                          ok($? == 0, 'Generated test script exits successfully');
+                      ok($? == 0, 'Generated test script exits successfully');
 
-                          if($? == 0) {
-                                  ok($stdout =~ /^Result: PASS/ms);
-                                  if($stdout =~ /Files=1, Tests=(\d+)/ms) {
-                                          diag("$1 tests run");
-                                  }
-                          } else {
-                                  diag("$filepath: STDOUT:\n$stdout");
-                                  diag($stderr) if(length($stderr));
-                                  diag("$filepath Failed");
-                                  last;
-                          }
-                          diag($stderr) if(length($stderr));
-                  }
-          }
-          closedir($dh);
-    }
+                      if($? == 0) {
+                              ok($stdout =~ /^Result: PASS/ms);
+                              if($stdout =~ /Files=1, Tests=(\d+)/ms) {
+                                      diag("$1 tests run");
+                              }
+                      } else {
+                              diag("$filepath: STDOUT:\n$stdout");
+                              diag($stderr) if(length($stderr));
+                              diag("$filepath Failed");
+                              last;
+                      }
+                      diag($stderr) if(length($stderr));
+              }
+      }
+      closedir($dh);
+}
 
-    done_testing();
+done_testing();
+```
 
-## Property-Based Testing with Transforms
+### Property-Based Testing With Transforms
 
 The generator can create property-based tests using [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) when the
 `properties` configuration option is enabled.
@@ -879,51 +943,53 @@ This provides more comprehensive
 testing by automatically generating thousands of test cases and verifying that
 mathematical properties hold across all inputs.
 
-### Basic Property-Based Transform Example
+#### Basic Property-Based Transform Example
 
 Here's a complete example testing the `abs` builtin function:
 
 **t/conf/abs.yml**:
 
-    ---
-    module: builtin
-    function: abs
+```
+---
+module: builtin
+function: abs
 
-    config:
-      test_undef: no
-      test_empty: no
-      test_nuls: no
-      properties:
-        enable: true
-        trials: 1000
+config:
+  test_undef: no
+  test_empty: no
+  test_nuls: no
+  properties:
+    enable: true
+    trials: 1000
 
+input:
+  number:
+    type: number
+    position: 0
+
+output:
+  type: number
+  min: 0
+
+transforms:
+  positive:
     input:
       number:
         type: number
-        position: 0
-
+        min: 0
     output:
       type: number
       min: 0
 
-    transforms:
-      positive:
-        input:
-          number:
-            type: number
-            min: 0
-        output:
-          type: number
-          min: 0
-
-      negative:
-        input:
-          number:
-            type: number
-            max: 0
-        output:
-          type: number
-          min: 0
+  negative:
+    input:
+      number:
+        type: number
+        max: 0
+    output:
+      type: number
+      min: 0
+```
 
 This configuration:
 
@@ -933,7 +999,9 @@ This configuration:
 
 Generate the test:
 
-    fuzz-harness-generator t/conf/abs.yml > t/abs_property.t
+```
+fuzz-harness-generator t/conf/abs.yml > t/abs_property.t
+```
 
 The generated test will include:
 
@@ -941,7 +1009,7 @@ The generated test will include:
 - Random fuzzing with 30 iterations (or as configured)
 - Property-based tests that verify the transforms with 1000 trials each
 
-### What Properties Are Tested?
+#### What Properties Are Tested?
 
 The generator automatically detects and tests these properties based on your transform specifications:
 
@@ -952,73 +1020,77 @@ The generator automatically detects and tests these properties based on your tra
 
 For the `abs` example above, the generated properties verify:
 
-    # For the "positive" transform:
-    - Given a positive number, abs() returns >= 0
-    - The result is a valid number
-    - The result is defined
+```
+# For the "positive" transform:
+- Given a positive number, abs() returns >= 0
+- The result is a valid number
+- The result is defined
 
-    # For the "negative" transform:
-    - Given a negative number, abs() returns >= 0
-    - The result is a valid number
-    - The result is defined
+# For the "negative" transform:
+- Given a negative number, abs() returns >= 0
+- The result is a valid number
+- The result is defined
+```
 
-### Advanced Example: String Normalization
+#### Advanced Example: String Normalization
 
 Here's a more complex example testing a string normalization function:
 
 **t/conf/normalize.yml**:
 
-    ---
-    module: Text::Processor
-    function: normalize_whitespace
+```
+---
+module: Text::Processor
+function: normalize_whitespace
 
-    config:
-      properties:
-        enable: true
-        trials: 500
+config:
+  properties:
+    enable: true
+    trials: 500
 
+input:
+  text:
+    type: string
+    min: 0
+    max: 1000
+    position: 0
+
+output:
+  type: string
+  min: 0
+  max: 1000
+
+transforms:
+  empty_preserved:
     input:
       text:
         type: string
-        min: 0
-        max: 1000
-        position: 0
-
+        value: ""
     output:
       type: string
-      min: 0
-      max: 1000
+      value: ""
 
-    transforms:
-      empty_preserved:
-        input:
-          text:
-            type: string
-            value: ""
-        output:
-          type: string
-          value: ""
+  single_space:
+    input:
+      text:
+        type: string
+        min: 1
+        matches: '^\S+(\s+\S+)*$'
+    output:
+      type: string
+      matches: '^\S+( \S+)*$'
 
-      single_space:
-        input:
-          text:
-            type: string
-            min: 1
-            matches: '^\S+(\s+\S+)*$'
-        output:
-          type: string
-          matches: '^\S+( \S+)*$'
-
-      length_bounded:
-        input:
-          text:
-            type: string
-            min: 1
-            max: 100
-        output:
-          type: string
-          min: 1
-          max: 100
+  length_bounded:
+    input:
+      text:
+        type: string
+        min: 1
+        max: 100
+    output:
+      type: string
+      min: 1
+      max: 100
+```
 
 This tests that the normalization function:
 
@@ -1026,41 +1098,49 @@ This tests that the normalization function:
 - Collapses multiple spaces into single spaces (`single_space` transform)
 - Maintains length constraints (`length_bounded` transform)
 
-### Interpreting Property Test Results
+#### Interpreting Property Test Results
 
 When property-based tests run, you'll see output like:
 
-    ok 123 - negative property holds (1000 trials)
-    ok 124 - positive property holds (1000 trials)
+```
+ok 123 - negative property holds (1000 trials)
+ok 124 - positive property holds (1000 trials)
+```
 
 If a property fails, Test::LectroTest will attempt to find the minimal failing
 case and display it:
 
-    not ok 123 - positive property holds (47 trials)
-    # Property failed
-    # Reason: counterexample found
+```
+not ok 123 - positive property holds (47 trials)
+# Property failed
+# Reason: counterexample found
+```
 
 This helps you quickly identify edge cases that your function doesn't handle correctly.
 
-### Configuration Options for Property-Based Testing
+#### Configuration Options for Property-Based Testing
 
 In the `config` section:
 
-    config:
-      properties:
-        enable: true     # Enable property-based testing (default: false)
-        trials: 1000     # Number of test cases per property (default: 1000)
+```
+config:
+  properties:
+    enable: true     # Enable property-based testing (default: false)
+    trials: 1000     # Number of test cases per property (default: 1000)
+```
 
 You can also disable traditional fuzzing and only use property-based tests:
 
-    config:
-      properties:
-        enable: true
-        trials: 5000
+```perl
+config:
+  properties:
+    enable: true
+    trials: 5000
 
-    iterations: 0  # Disable random fuzzing, use only property tests
+iterations: 0  # Disable random fuzzing, use only property tests
+```
 
-### When to Use Property-Based Testing
+#### When to Use Property-Based Testing
 
 Property-based testing with transforms is particularly useful for:
 
@@ -1070,12 +1150,14 @@ Property-based testing with transforms is particularly useful for:
 - Functions with clear input-output relationships
 - Code that should satisfy mathematical properties (commutativity, associativity, idempotence)
 
-### Requirements
+#### Requirements
 
 Property-based testing requires both [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) and
 [Test::LectroTest::Compat](https://metacpan.org/pod/Test%3A%3ALectroTest%3A%3ACompat) to be installed:
 
-    cpanm Test::LectroTest Test::LectroTest::Compat
+```
+cpanm Test::LectroTest Test::LectroTest::Compat
+```
 
 [Test::LectroTest::Compat](https://metacpan.org/pod/Test%3A%3ALectroTest%3A%3ACompat) provides the `use_ok` bridge between
 [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) and [Test::Most](https://metacpan.org/pod/Test%3A%3AMost); it is used in every generated
@@ -1085,73 +1167,79 @@ property-based test file.  Both are declared in the distribution's
 If not installed, the generated tests will automatically skip the property-based
 portion with a message.
 
-### Testing Email Validation
+#### Testing Email Validation
 
-    ---
-    module: Email::Valid
-    function: rfc822
+```
+---
+module: Email::Valid
+function: rfc822
 
-    config:
-      properties:
-        enable: true
-        trials: 200
-      close_stdin: true
-      test_undef: no
-      test_empty: no
-      test_nuls: no
+config:
+  properties:
+    enable: true
+    trials: 200
+  close_stdin: true
+  test_undef: no
+  test_empty: no
+  test_nuls: no
 
+input:
+  email:
+    type: string
+    semantic: email
+    position: 0
+
+output:
+  type: boolean
+
+transforms:
+  valid_emails:
     input:
       email:
         type: string
         semantic: email
-        position: 0
-
     output:
       type: boolean
-
-    transforms:
-      valid_emails:
-        input:
-          email:
-            type: string
-            semantic: email
-        output:
-          type: boolean
+```
 
 This generates 200 realistic email addresses for testing, rather than random strings.
 
-### Combining Semantic with Regex
+#### Combining Semantic With Regex
 
 You can combine semantic generators with regex validation:
 
-    input:
-      corporate_email:
-        type: string
-        semantic: email
-        matches: '@company\.com$'
+```
+input:
+  corporate_email:
+    type: string
+    semantic: email
+    matches: '@company\.com$'
+```
 
 The semantic generator creates realistic emails, and the regex ensures they match your domain.
 
-### Custom Properties for Transforms
+#### Custom Properties for Transforms
 
 You can define additional properties that should hold for your transforms beyond
 the automatically detected ones.
 
-#### Using Built-in Properties
+##### Using Built-In Properties
 
-    transforms:
-      positive:
-        input:
-          number:
-            type: number
-            min: 0
-        output:
-          type: number
-          min: 0
-        properties:
-          - idempotent       # f(f(x)) == f(x)
-          - non_negative     # result >= 0
-          - positive         # result > 0
+```
+transforms:
+  positive:
+    input:
+      number:
+        type: number
+        min: 0
+    output:
+      type: number
+      min: 0
+    properties:
+      - idempotent       # f(f(x)) == f(x)
+      - non_negative     # result >= 0
+      - positive         # result > 0
+```
 
 Available built-in properties:
 
@@ -1168,7 +1256,7 @@ Available built-in properties:
 - `unique_elements` - Array has no duplicates
 - `preserves_keys` - Hash has same keys as input
 
-#### Custom Property Code
+##### Custom Property Code
 
 Custom properties allows the definition additional invariants and relationships that should hold for their transforms,
 beyond what's auto-detected.
@@ -1182,25 +1270,27 @@ For example:
 
 Define your own properties with custom Perl code:
 
-    transforms:
-      normalize:
-        input:
-          text:
-            type: string
-        output:
-          type: string
-        properties:
-          - name: single_spaces
-            description: "No multiple consecutive spaces"
-            code: $result !~ /  /
+```
+transforms:
+  normalize:
+    input:
+      text:
+        type: string
+    output:
+      type: string
+    properties:
+      - name: single_spaces
+        description: "No multiple consecutive spaces"
+        code: $result !~ /  /
 
-          - name: no_leading_space
-            description: "No space at start"
-            code: $result !~ /^\s/
+      - name: no_leading_space
+        description: "No space at start"
+        code: $result !~ /^\s/
 
-          - name: reversible
-            description: "Can be reversed back"
-            code: length($result) == length($text)
+      - name: reversible
+        description: "Can be reversed back"
+        code: length($result) == length($text)
+```
 
 The code has access to:
 
@@ -1208,27 +1298,29 @@ The code has access to:
 - Input variables - All input parameters (e.g., `$text`, `$number`)
 - The function itself - Can call it again for idempotence checks
 
-#### Combining Auto-detected and Custom Properties
+##### Combining Auto-Detected and Custom Properties
 
 The generator automatically detects properties from your output spec, and adds
 your custom properties:
 
-    transforms:
-      sanitize:
-        input:
-          html:
-            type: string
-        output:
-          type: string
-          min: 0              # Auto-detects: defined, min_length >= 0
-          max: 10000
-        properties:           # Additional custom checks:
-          - name: no_scripts
-            code: $result !~ /<script/i
-          - name: no_iframes
-            code: $result !~ /<iframe/i
+```
+transforms:
+  sanitize:
+    input:
+      html:
+        type: string
+    output:
+      type: string
+      min: 0              # Auto-detects: defined, min_length >= 0
+      max: 10000
+    properties:           # Additional custom checks:
+      - name: no_scripts
+        code: $result !~ /<script/i
+      - name: no_iframes
+        code: $result !~ /<iframe/i
+```
 
-## GENERATED OUTPUT
+### Generated Output
 
 The generated test:
 
@@ -1240,86 +1332,100 @@ The generated test:
 - Runs static `is(... )` corpus tests from Perl and/or YAML corpus
 - Runs [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) tests
 
-# METHODS
+## Methods
 
-## generate
+### Generate
 
 Takes a schema file and produces a test file (or STDOUT).
 
-    # Modern named API
-    App::Test::Generator->generate(
-        schema_file => 'schemas/foo.yml',
-        output_file => 'test/foo.t',
-    );
+```perl
+# Modern named API
+App::Test::Generator->generate(
+    schema_file => 'schemas/foo.yml',
+    output_file => 'test/foo.t',
+);
 
-    # Legacy positional API
-    App::Test::Generator->generate($schema_file, $test_file);
+# Legacy positional API
+App::Test::Generator->generate($schema_file, $test_file);
+```
 
-### API Specification
+#### API Specification
 
-#### Input
+##### Input
 
-    {
-        schema_file => { type => 'string', optional => 0 },
-        input_file  => { type => 'string', optional => 1 },
-        output_file => { type => 'string', optional => 1, max => 255 },
-    }
+```perl
+{
+    schema_file => { type => 'string', optional => 0 },
+    input_file  => { type => 'string', optional => 1 },
+    output_file => { type => 'string', optional => 1, max => 255 },
+}
+```
 
-#### Output
+##### Output
 
-    { type => 'string' }
+```perl
+{ type => 'string' }
+```
 
-## render\_fallback
+### Render\_Fallback
 
 Render any Perl value into a compact Perl source-code string using
 [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper). Used as a catch-all when no more specific renderer
 applies.
 
-    my $code = render_fallback({ key => 'value' });
-    # returns: "{'key' => 'value'}"
+```perl
+my $code = render_fallback({ key => 'value' });
+# returns: "{'key' => 'value'}"
+```
 
-### Arguments
+#### Arguments
 
 - `$v`
 
     Any Perl value, including undef, scalars, refs, and blessed objects.
 
-### Returns
+#### Returns
 
 A string of Perl source code that reproduces the value when evaluated.
 Returns the string `'undef'` when `$v` is undef.
 
-### Side effects
+#### Side Effects
 
 Temporarily sets `$Data::Dumper::Terse` and `$Data::Dumper::Indent`
 to produce compact single-line output. Both are restored on return via
 `local`.
 
-### Notes
+#### Notes
 
 The output is always a single line with no trailing newline. Suitable
 for embedding in generated test code where readability is secondary to
 correctness.
 
-### API specification
+#### API Specification
 
-#### input
+##### Input
 
-    { v => { type => 'any', optional => 1 } }
+```perl
+{ v => { type => 'any', optional => 1 } }
+```
 
-#### output
+##### Output
 
-    { type => 'string' }
+```perl
+{ type => 'string' }
+```
 
-## render\_hash
+### Render\_Hash
 
 Render a two-level hashref (parameter name => spec hashref) into Perl
 source code suitable for embedding in a generated test file as the
 input specification passed to [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
 
-    my $code = render_hash(\%input);
+```perl
+my $code = render_hash(\%input);
+```
 
-### Arguments
+#### Arguments
 
 - `$href`
 
@@ -1328,16 +1434,18 @@ input specification passed to [Params::Validate::Strict](https://metacpan.org/po
     `_valid_type`) is expanded to `{ type => $value }`. Any other
     non-hashref value is skipped with a warning.
 
-### Returns
+#### Returns
 
 A string of comma-separated Perl source-code lines, one per key, of
 the form:
 
-    'key' => { subkey => value, ... }
+```perl
+'key' => { subkey => value, ... }
+```
 
 Returns an empty string if `$href` is undef, empty, or not a hashref.
 
-### Notes
+#### Notes
 
 The `matches` and `nomatch` sub-keys are treated specially — their
 values are compiled to `Regexp` objects via `eval { qr/.../ }` and
@@ -1347,98 +1455,114 @@ pattern from causing compilation failures.
 
 Other sub-keys are rendered via `perl_quote`.
 
-### API specification
+#### API Specification
 
-#### input
+##### Input
 
-    { href => { type => 'any', optional => 1 } }
+```perl
+{ href => { type => 'any', optional => 1 } }
+```
 
-#### output
+##### Output
 
-    { type => 'string' }
+```perl
+{ type => 'string' }
+```
 
-## render\_args\_hash
+### Render\_Args\_Hash
 
 Render a flat hashref into a Perl source-code argument list of the
 form `'key' =` value, ...>, suitable for embedding in a function call
 in a generated test file.
 
-    my $code = render_args_hash({ type => 'string', min => 1 });
-    # returns: "'min' => 1, 'type' => 'string'"
+```perl
+my $code = render_args_hash({ type => 'string', min => 1 });
+# returns: "'min' => 1, 'type' => 'string'"
+```
 
-### Arguments
+#### Arguments
 
 - `$href`
 
     A flat hashref of key-value pairs. Values may be scalars, arrayrefs,
     or Regexp objects — all are handled by `perl_quote`.
 
-### Returns
+#### Returns
 
 A comma-separated string of `key =` value> pairs sorted by key.
 Returns an empty string if `$href` is undef, empty, or not a hashref.
 
-### Notes
+#### Notes
 
 Keys and values are both rendered via `perl_quote`. In particular,
 `Regexp` values are rendered as `qr{...}` which is correct for
 [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) and [Return::Set](https://metacpan.org/pod/Return%3A%3ASet) schema arguments in
 the generated test.
 
-### API specification
+#### API Specification
 
-#### input
+##### Input
 
-    { href => { type => 'any', optional => 1 } }
+```perl
+{ href => { type => 'any', optional => 1 } }
+```
 
-#### output
+##### Output
 
-    { type => 'string' }
+```perl
+{ type => 'string' }
+```
 
-## render\_arrayref\_map
+### Render\_Arrayref\_Map
 
 Render a hashref whose values are arrayrefs into a Perl source-code
 fragment suitable for use as a hash literal in a generated test file.
 
-    my $code = render_arrayref_map({ name => ['', 'a' x 100] });
+```perl
+my $code = render_arrayref_map({ name => ['', 'a' x 100] });
+```
 
-### Arguments
+#### Arguments
 
 - `$href`
 
     A hashref whose values are arrayrefs. Keys whose values are not
     arrayrefs are silently skipped.
 
-### Returns
+#### Returns
 
 A comma-separated string of `'key' =` \[ val, ... \]> entries, one per
 qualifying key, sorted alphabetically. Returns the string `'()'` if
 `$href` is undef, empty, or not a hashref — this produces an empty
 hash assignment in the generated test rather than a syntax error.
 
-### Notes
+#### Notes
 
 Array element values are rendered via `perl_quote` which handles
 scalars, arrayrefs, and Regexp objects. Non-arrayref values are
 skipped without warning — this is intentional since callers may pass
 mixed-value hashes and only want the arrayref entries rendered.
 
-### API specification
+#### API Specification
 
-#### input
+##### Input
 
-    { href => { type => 'any', optional => 1 } }
+```perl
+{ href => { type => 'any', optional => 1 } }
+```
 
-#### output
+##### Output
 
-    { type => 'string' }
+```perl
+{ type => 'string' }
+```
 
-## perl\_quote
+### Perl\_Quote
 
 Convert any Perl value into a source-code fragment that reproduces that value
 when evaluated in a generated test file.
 
-### Arguments
+#### Arguments
 
 - `$v`
 
@@ -1449,21 +1573,25 @@ when evaluated in a generated test file.
     Regexps become `qr{...}`, and anything else (including hashrefs and
     blessed objects) falls through to `render_fallback`.
 
-### API specification
+#### API Specification
 
-#### input
+##### Input
 
-    { v => { type => 'any', optional => 1 } }
+```perl
+{ v => { type => 'any', optional => 1 } }
+```
 
-#### output
+##### Output
 
-    { type => 'string' }
+```perl
+{ type => 'string' }
+```
 
-# NOTES
+## Notes
 
 `seed` and `iterations` really should be within `config`.
 
-# SEE ALSO
+## See Also
 
 - [Test Dashboard](https://nigelhorne.github.io/App-Test-Generator/coverage/)
 - [App::Test::Generator::Template](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ATemplate) - Template of the file of tests created by `App::Test::Generator`
@@ -1475,20 +1603,22 @@ when evaluated in a generated test file.
 - [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)
 - [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS)
 
-# AUTHOR
+## Author
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
 Portions of this module's initial design and documentation were created with the
 assistance of AI.
 
-# SUPPORT
+## Support
 
 This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc App::Test::Generator
+```
+perldoc App::Test::Generator
+```
 
 You can also look for information at:
 
@@ -1512,7 +1642,7 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=App::Test::Generator](http://deps.cpantesters.org/?module=App::Test::Generator)
 
-# LICENCE AND COPYRIGHT
+## Licence and Copyright
 
 Copyright 2025-2026 Nigel Horne.
 

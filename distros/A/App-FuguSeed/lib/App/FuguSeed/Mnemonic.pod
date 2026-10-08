@@ -1,28 +1,24 @@
 =head1 NAME
 
-App::FuguSeed::Mnemonic - the 12 seed words of a SeedQR
+App::FuguSeed::Mnemonic - the word checks and the BIP39 checksum
 
 =head1 SYNOPSIS
 
     use App::FuguSeed::Mnemonic;
 
     my @words = split q{ }, $line;
-    my $fault = App::FuguSeed::Mnemonic->fault(\@words);
+    my $fault = App::FuguSeed::Mnemonic->fault(\@words, 12);
     die "$fault\n" if defined $fault;
 
-    if (App::FuguSeed::Mnemonic->valid(\@words)) {
-            my $digits = App::FuguSeed::Mnemonic->digits(\@words);
-    }
-    else {
-            my $word = App::FuguSeed::Mnemonic->check_word(\@words);
-    }
+    my @index    = App::FuguSeed::Mnemonic->indexes(\@words);
+    my $checksum = App::FuguSeed::Mnemonic->checksum(@index);
 
 =head1 DESCRIPTION
 
-App::FuguSeed::Mnemonic holds the words of one seed. It proves the
-count and the list membership of 12 words, it proves the BIP39
-checksum, it gives the digit string of the SeedQR, and it finds the
-check word.
+App::FuguSeed::Mnemonic holds the parts of the seed words that
+C<fuguseed-last> and C<fuguseed-qr> both call. It proves the count and
+the list membership of the words, it gives the index of each word, and
+it computes the BIP39 checksum.
 
 Every method is a class method, and every method is pure: it takes
 values and it returns values. The module touches no stream, so a
@@ -30,51 +26,44 @@ caller prints the failure message itself. A message names a count or
 a word position, never a word.
 
 The module runs on core Perl v5.34 with C<Digest::SHA> alone, because
-F<scripts/pack> embeds it in C<fuguseed-qr>.
+F<scripts/pack> embeds it in C<fuguseed-last> and C<fuguseed-qr>.
 
 =head2 fault
 
-C<fault($words)> returns the failure message for the words of the
-array reference C<$words>, or C<undef> when the words pass the check.
-The input must hold exactly 12 words, and each word must be in the
-list of App::FuguSeed::List.
+C<fault($words, $count)> returns the failure message for the words of
+the array reference C<$words>, or C<undef> when the words pass the
+check. The input must hold exactly C<$count> words, and each word must
+be in the list of App::FuguSeed::List.
 
-=head2 digits
+=head2 indexes
 
-C<digits($words)> returns the digit string: the 12 indexes, 0-based,
-each as 4 decimal digits with leading zeros, in word order. The string
-holds 48 digits. The caller proves the words with C<fault> first.
+C<indexes($words)> returns the 0-based list index of each word, in
+word order.
 
-=head2 valid
+=head2 checksum
 
-C<valid($words)> returns true when the last 4 bits of the 12 indexes
-are the 4 bits that BIP39 requires. The bits are the first bits of the
-SHA-256 of the 16 entropy bytes.
-
-=head2 check_word
-
-C<check_word($words)> returns the one word of the BLUE row of word 12
-that makes the checksum valid. The YELLOW block and the BLUE row of
-the typed word 12 give the 7 entropy bits of that word, and the RED
-column gives the 4 checksum bits, so the row holds exactly one valid
-word. The method computes that word, and it runs no trial loop.
+C<checksum(@index)> returns the 4 checksum bits of 12 indexes, as a
+number from 0 to 15. The 12 indexes give 132 bits, and the first 128
+bits are the entropy. The checksum is the first 4 bits of the SHA-256
+of the 16 entropy bytes. The low 4 bits of index 12 are no part of the
+entropy, so they do not change the result.
 
 =head1 RETURN VALUES
 
-C<fault()> returns C<undef> for 12 words of the list. C<digits()>
-returns 48 digits, C<valid()> returns true or false, and
-C<check_word()> returns one word of the list.
+C<fault()> returns C<undef> for C<$count> words of the list.
+C<indexes()> returns one number for each word, and C<checksum()>
+returns one number.
 
 =head1 ERRORS
 
-C<digits()>, C<valid()> and C<check_word()> expect 12 words of the
-list. With another input, the caller gets a warning of Perl and a
-result without meaning. Call C<fault()> first.
+C<indexes()> and C<checksum()> expect words of the list. With another
+input, the caller gets a warning of Perl and a result without meaning.
+Call C<fault()> first.
 
 =head1 SEE ALSO
 
-L<App::FuguSeed::List>, L<App::FuguSeed::Codewords>, and the BIP39
-specification.
+L<App::FuguSeed::List>, L<App::FuguSeed::Last>, L<App::FuguSeed::QR>,
+and the BIP39 specification.
 
 =head1 AUTHORS
 

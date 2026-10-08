@@ -4,6 +4,7 @@
 use strict;
 use Test::More;
 use Imager::Test qw(is_color3 is_color4);
+use Config;
 eval "require Inline::C;";
 plan skip_all => "Inline required for testing API" if $@;
 
@@ -553,6 +554,70 @@ allocation() {
   return 1;
 }
 
+int
+test_map_mem(Imager::IO io) {
+  const void *p;
+  size_t size;
+  int ok = 1;
+
+  if (i_io_mmap(io, &p, &size)) {
+    if (memcmp(p, "testdata", 8) != 0) {
+      fprintf(stderr, "mapped buffer doesn't match expected");
+      ok = 0;
+    }
+    if (!i_io_munmap(io)) {
+      fprintf(stderr, "Failed to munmap memory buffer");
+      ok = 0;
+    }
+  }
+  else {
+    fprintf(stderr, "Failed to mmap memory buffer");
+    ok = 0;
+  }
+
+  return ok;
+}
+
+int
+test_map_fd(Imager::IO io, SV *sv) {
+  const void *p;
+  size_t size;
+  int ok = 1;
+  const char *check;
+  STRLEN len;
+
+  check = SvPV(sv, len);
+  if (i_io_mmap(io, &p, &size)) {
+    if (memcmp(p, check, len) != 0) {
+      fprintf(stderr, "mapped buffer doesn't match expected\n");
+      ok = 0;
+    }
+    if (!i_io_munmap(io)) {
+      fprintf(stderr, "Failed to munmap memory buffer\n");
+      ok = 0;
+    }
+  }
+  else {
+    fprintf(stderr, "Failed to mmap memory buffer\n");
+    ok = 0;
+  }
+
+  if (ok) {
+    size_t maxmmap = i_io_get_max_mmap_size();
+    if (!(ok = i_io_set_max_mmap_size(10))) {
+      fprintf(stderr, "i_io_set_max_mmap_size(10) failed\n");
+    }
+    if (ok) {
+      if (!(ok = !i_io_mmap(io, &p, &len))) {
+        fprintf(stderr, "i_io_mmap() succeeded on too large a file\n");
+      }
+    }
+    i_io_set_max_mmap_size(maxmmap);
+  }
+
+  return ok;
+}
+
 EOS
 
 my $im = Imager->new(xsize=>50, ysize=>50);
@@ -860,9 +925,32 @@ ok(test_slots(), "call slot APIs");
     ($im, $ok) = do_one_exif("t/data/exif32oversz.bin");
     ok(!$ok, "fail to load exif with 32-bit overflow sz")
         or diag(Imager->_error_as_msg);
+
+    # https://github.com/tonycoz/imager/issues/580
+    ($im, $ok) = do_one_exif("t/data/exif580atend.bin");
+    ok($ok, "load exif with data right at the end")
+        or diag(Imager->_error_as_msg);
 }
 
 ok(allocation(), "test modern allocation interfaces");
+
+{
+  my $s = "testdata";
+  my $io = Imager::IO->new_buffer($s);
+  ok(test_map_mem($io), "check we can map memory IO");
+}
+
+SKIP:
+{
+  $Config{d_mmap} && $Config{d_munmap}
+    or skip "No mmap available", 1;
+  open my $fh, "<", $0 or skip "cannot open $0", 1;
+  binmode $fh;
+  my $buf;
+  read($fh, $buf, 8);
+  my $io = Imager::IO->new_fd(fileno($fh));
+  ok(test_map_fd($io, $buf), "test we can map fd io");
+}
 
 done_testing();
 

@@ -5,23 +5,17 @@ use File::Temp qw(tempdir);
 use File::Spec ();
 use POSIX ();
 
-# The ten xs/*.xs files are near-duplicates, each carrying its own copy of every
-# guard below, and they have drifted before.  Every row names its variant, so a
-# lost copy fails exactly that row rather than passing on another's.
-#
-# Every regex is anchored at the start of $@: croak appends " at FILE line N.",
-# so an unanchored pattern naming a word from this file's own name would match
-# that suffix instead of the message.
+# The ten xs/*.xs files carry near-duplicate copies of every guard; each row
+# names its variant so a lost copy fails exactly that row.  Regexes are anchored
+# at the start of $@: croak appends " at FILE line N.", which an unanchored
+# pattern naming a word from this file's name would match.
 
 my $dir = tempdir(CLEANUP => 1);
 sub path { File::Spec->catfile($dir, "$_[0].shm") }
 
-# One guard below crashes the process when missing: unlink after an explicit
-# DESTROY dereferences a null handle.  The class-form unlink arity check and the
-# three DESTROY class rows are less violent only because the IV is zeroed before
-# the free.  All five run in a child, so a regression fails one row instead of
-# harming the harness; the child reports by exit status and leaves via _exit,
-# running no END block.
+# Guards whose absence crashes or corrupts run in a child, so a regression fails
+# one row; the child reports by exit status and leaves via _exit, running no END
+# block.
 sub in_child {
     my ($code) = @_;
     my $pid = fork // die "fork: $!";
@@ -48,9 +42,6 @@ for (@VARIANTS) {
     eval "require $class; 1" or die $@;
 }
 
-# ---- put_ttl/add_ttl/update_ttl refuse a map that has no expiry array ----
-# REQUIRE_TTL (Shared.xs) is invoked from three sites in each of the ten
-# files.  Without it the call reaches the C layer with h->expires_at NULL.
 {
     my $re = qr/^Data::HashMap::Shared::\w+: operation requires a TTL-enabled map \(pass ttl > 0 to constructor\)/;
     for my $v (@VARIANTS) {
@@ -63,7 +54,6 @@ for (@VARIANTS) {
     }
 }
 
-# ---- new_readonly requires a path ----
 {
     for my $v (@VARIANTS) {
         my $class = "Data::HashMap::Shared::$v->[0]";
@@ -73,8 +63,6 @@ for (@VARIANTS) {
     }
 }
 
-# ---- set_multi rejects an odd argument list ----
-# Without the guard the loop reads ST(items) -- one past the argument stack.
 {
     my $re = qr/^Data::HashMap::Shared::\w+: set_multi requires an even number of arguments \(key, value pairs\)/;
     for my $v (@VARIANTS) {
@@ -85,9 +73,8 @@ for (@VARIANTS) {
     }
 }
 
-# ---- the counters croak when a NEW key has nowhere to go ----
-# incr/decr/incr_by/max/min are the one op class that dies rather than
-# returning false; without the check they return a fabricated 0.
+# incr/decr/incr_by/max/min die rather than return false when a new key has no
+# room
 {
     for my $v (grep { $_->[3] } @VARIANTS) {
         my ($name, $key) = @$v;
@@ -113,11 +100,6 @@ for (@VARIANTS) {
     }
 }
 
-# ---- unlink refuses a handle that an explicit DESTROY already freed ----
-# xs/*.xs, the object arm of unlink.  Without it the invocant still passes the
-# class test, h is NULL, and shm_unlink_sharded() dereferences it: SIGSEGV.
-# Measured: a build with only SS's copy removed passed the whole t/ suite and
-# segfaulted on this call.
 {
     for my $v (@VARIANTS) {
         my $name  = $v->[0];
@@ -133,9 +115,6 @@ for (@VARIANTS) {
     }
 }
 
-# ---- the class form of unlink needs its path ----
-# Without the arity check the XSUB reads ST(1) with items == 1, one past the
-# argument stack, and acts on whatever that slot holds instead of croaking.
 {
     for my $v (@VARIANTS) {
         my $class = "Data::HashMap::Shared::$v->[0]";
@@ -149,11 +128,10 @@ for (@VARIANTS) {
     }
 }
 
-# ---- DESTROY refuses another variant's object, for maps and for cursors ----
-# t/45 walks put/get/size and Cursor::next; DESTROY is in neither list.  Without
-# the class test, V::DESTROY($other) closes that map -- or frees that cursor --
-# from under its owner.  It does not crash today (the IV is zeroed before the
-# free, so the next call croaks), so the oracle is that the victim still works.
+# DESTROY on another variant's object (t/45 does not cover it): without the
+# class test the victim is closed or freed from under its owner; no crash (the
+# IV is zeroed first, so the next call croaks), so the oracle is that the victim
+# still works.
 {
     for my $v (@VARIANTS) {
         my $name = $v->[0];
@@ -183,8 +161,8 @@ for (@VARIANTS) {
         is $st, 0, "$name: Cursor::DESTROY on a $wname cursor leaves that cursor alive"
             or diag sprintf('child status 0x%04x (signal %d, exit %d)', $st, $st & 127, $st >> 8);
     }
-    # ... and acts on its own: a guard drifted to a sibling's class name would
-    # still reject the foreign cursor above while never freeing its own
+    # a guard drifted to a sibling's class name would still reject the foreign
+    # cursor above
     for my $v (@VARIANTS) {
         my ($name, $key, $val) = @$v;
         my $st = in_child(sub {
@@ -200,13 +178,9 @@ for (@VARIANTS) {
     }
 }
 
-# ---- the constructor sizes are range-checked, not truncated ----
-# CK_U32 (Shared.xs:87) is invoked nineteen times per file; thirteen of them are
-# the constructor sizes below (four in new, five in new_sharded, four in
-# new_memfd).  Without it new($p, 2**32 + 100) builds a
-# 100-entry map -- four billion slots asked for, a hundred delivered, no error.
-# Every copy croaks before its constructor allocates anything, so no row here
-# creates a file, a shard set or a memfd.
+# Constructor sizes are range-checked, not truncated: new($p, 2**32 + 100) would
+# build a 100-entry map.  Every copy croaks before allocating, so no row creates
+# a file, shards or a memfd.
 {
     my $N = 2**32;
     for my $v (@VARIANTS) {
@@ -236,10 +210,8 @@ for (@VARIANTS) {
     }
 }
 
-# ---- the per-call uint32 arguments are range-checked too ----
-# The other six CK_U32 copies per file: ttl on the four TTL setters,
-# flush_expired_partial's limit, reserve's target.  A lost copy turns a
-# 2**32-second TTL into 0, silently clearing a live one.
+# Per-call uint32 arguments; a lost copy turns a 2**32-second TTL into 0,
+# silently clearing a live one.
 {
     my $N = 2**32;
     for my $v (@VARIANTS) {

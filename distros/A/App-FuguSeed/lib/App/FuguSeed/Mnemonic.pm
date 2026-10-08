@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package App::FuguSeed::Mnemonic;
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 use v5.34;
 use warnings;
@@ -27,12 +27,13 @@ use Digest::SHA ();
 
 use App::FuguSeed::List ();
 
-# App::FuguSeed::Mnemonic - the 12 seed words of a SeedQR.
+# App::FuguSeed::Mnemonic - the word checks and the BIP39 checksum.
 #
-# The module proves the count and the list membership of 12 words
-# (QR-MNEMONIC-1), it proves the BIP39 checksum (QR-MNEMONIC-2), it
-# gives the digit string (QR-MNEMONIC-3), and it finds the check word
-# (QR-MNEMONIC-4).
+# The module proves the count and the list membership of the words
+# (QR-MNEMONIC-1, LAST-WORD-1), it gives the index of each word, and
+# it computes the BIP39 checksum (QR-MNEMONIC-2, LAST-WORD-4). It
+# holds the parts that fuguseed-last and fuguseed-qr both call, and
+# no other part.
 #
 # Every method is a class method, and every method is pure: it takes
 # values and it returns values. The module touches no stream. A
@@ -40,11 +41,7 @@ use App::FuguSeed::List ();
 # names a count or a word position, never a word (SEC-CHANNELS-2).
 #
 # The module runs on core perl v5.34 with Digest::SHA alone, because
-# scripts/pack embeds it in fuguseed-qr (QR-PROGRAM-5).
-
-# COUNT:
-#	The word count of one seed (D-04).
-use constant COUNT => 12;
+# scripts/pack embeds it in fuguseed-last and fuguseed-qr (D-07).
 
 # INDEX_BITS:
 #	The bit width of one word index. The list holds 2048 words,
@@ -53,8 +50,7 @@ use constant INDEX_BITS => 11;
 
 # ENTROPY_BITS:
 #	The entropy bits of 12 words. The 12 indexes give 132 bits,
-#	and the 4 bits after the entropy are the checksum (BIP39,
-#	QR-MNEMONIC-2).
+#	and the 4 bits after the entropy are the checksum (BIP39).
 use constant ENTROPY_BITS => 128;
 
 # CHECKSUM_BITS:
@@ -63,22 +59,17 @@ use constant ENTROPY_BITS => 128;
 #	an index (D-05).
 use constant CHECKSUM_BITS => 4;
 
-# DIGITS:
-#	The decimal digits of one index in the digit string
-#	(QR-MNEMONIC-3).
-use constant DIGITS => 4;
-
-# $class->fault($words):
+# $class->fault($words, $count):
 #	The failure message for the words of the array reference
-#	$words, or undef when the words pass QR-MNEMONIC-1. The
+#	$words, or undef when they are $count words of the list. The
 #	message names a count or a word position, never a word.
-sub fault ( $, $words )
+sub fault ( $, $words, $count )
 {
-	my $count = scalar @{$words};
-	return "the input holds $count words, not " . COUNT
-	    if $count != COUNT;
+	my $found = scalar @{$words};
+	return "the input holds $found words, not $count"
+	    if $found != $count;
 
-	for my $position ( 1 .. COUNT ) {
+	for my $position ( 1 .. $count ) {
 		my $index =
 		    App::FuguSeed::List->index( $words->[ $position - 1 ] );
 		return "word $position is not in the word list"
@@ -88,65 +79,23 @@ sub fault ( $, $words )
 	return;
 }
 
-# $class->digits($words):
-#	The digit string of QR-MNEMONIC-3: the 12 indexes, 0-based,
-#	each as 4 decimal digits with leading zeros, in word order.
-#	The caller proves the words with fault first.
-sub digits ( $class, $words )
-{
-	return join q{},
-	    map { sprintf '%0' . DIGITS . 'd', $_ } $class->_indexes($words);
-}
-
-# $class->valid($words):
-#	True when the 4 checksum bits of the words are the bits that
-#	BIP39 requires (QR-MNEMONIC-2).
-sub valid ( $class, $words )
-{
-	my $bits  = $class->_bits($words);
-	my $typed = substr $bits, ENTROPY_BITS;
-
-	return oct( '0b' . $typed ) == $class->_checksum($bits);
-}
-
-# $class->check_word($words):
-#	The one word of the BLUE row of word 12 that makes the
-#	checksum valid (QR-MNEMONIC-4). The YELLOW block and the BLUE
-#	row of the typed word 12 give the 7 entropy bits of that
-#	word, and the RED column gives the 4 checksum bits (D-05), so
-#	the row holds exactly one valid word. The search is one
-#	computation, and no trial loop exists.
-sub check_word ( $class, $words )
-{
-	my $bits    = $class->_bits($words);
-	my @indexes = $class->_indexes($words);
-	my $row     = $indexes[-1] - $indexes[-1] % ( 2**CHECKSUM_BITS );
-
-	return App::FuguSeed::List->word( $row + $class->_checksum($bits) );
-}
-
-# $class->_indexes($words):
-#	The 0-based list index of each word.
-sub _indexes ( $, $words )
+# $class->indexes($words):
+#	The 0-based list index of each word. The caller proves the
+#	words with fault first.
+sub indexes ( $, $words )
 {
 	return map { App::FuguSeed::List->index($_) } @{$words};
 }
 
-# $class->_bits($words):
-#	The 132 bits of the 12 indexes, as a string of "0" and "1".
-sub _bits ( $class, $words )
+# $class->checksum(@index):
+#	The 4 checksum bits of the 12 indexes @index, as a number.
+#	The 12 indexes give 132 bits, and the first 128 bits are the
+#	entropy. BIP39 takes the checksum from the first bits of the
+#	SHA-256 of the 16 entropy bytes. The low 4 bits of index 12
+#	are no part of the entropy, so they do not change the result.
+sub checksum ( $, @index )
 {
-	return join q{},
-	    map { sprintf '%0' . INDEX_BITS . 'b', $_ }
-	    $class->_indexes($words);
-}
-
-# $class->_checksum($bits):
-#	The 4 checksum bits of the first 128 bits of $bits, as a
-#	number. BIP39 takes them from the first bits of the SHA-256
-#	of the 16 entropy bytes.
-sub _checksum ( $, $bits )
-{
+	my $bits = join q{}, map { sprintf '%0' . INDEX_BITS . 'b', $_ } @index;
 	my $entropy = pack 'B' . ENTROPY_BITS, substr( $bits, 0, ENTROPY_BITS );
 	my $digest  = Digest::SHA::sha256($entropy);
 

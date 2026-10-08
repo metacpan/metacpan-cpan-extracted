@@ -4,9 +4,8 @@ use warnings;
 use POSIX ();
 use Data::HashMap::Shared::IS;   # pid -> status string, with a TTL
 
-# Liveness registry via per-key TTL. Each worker refreshes its heartbeat every
-# second; a worker that dies stops refreshing and its entry simply expires, so
-# the supervisor sees only live workers with no explicit death notification.
+# Liveness registry via per-key TTL: workers refresh a heartbeat every second;
+# a dead worker's entry simply expires, with no death notification needed.
 
 my $path = "/tmp/dhms_heartbeat_$$.shm";
 my $TTL  = 3;                                   # a 1s refresh needs more than 1s of margin

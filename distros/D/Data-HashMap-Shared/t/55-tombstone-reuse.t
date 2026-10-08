@@ -6,26 +6,16 @@ use File::Temp qw(tempdir);
 use Data::HashMap::Shared::SS;
 use Data::HashMap::Shared::SI;
 
-# Every insert path lands a new entry on the first tombstone it probes past,
-# retiring it.  Without that the insert walks on to the first empty slot: the
-# content is identical, so no content test sees it, but hdr->tombstones only
-# grows, and shm_over_load counts it, so a remove-and-refill workload rehashes
-# and doubles a table that had room -- taking a table_gen bump and every live
-# cursor's reset with it.
-#
-# Six insert paths carry their own copy, so each is cycled below.  The counts
-# stay under shm_needs_compaction (tomb <= size, tomb <= cap/4, tomb <= empty
-# slots) and under
-# shm_over_load, either of which would clear the tombstones by rehashing and
-# hide the difference; the last block crosses over_load deliberately, to show
-# what that costs.
+# Every insert path lands on the first tombstone it probes past and retires it;
+# content tests cannot see that, but hdr->tombstones would only grow and refill
+# workloads would rehash. Counts stay under shm_needs_compaction and
+# shm_over_load, which would clear tombstones and hide it.
 
 my $dir = tempdir(CLEANUP => 1);
 my $seq = 0;
 
-# Seed $n keys, remove the first $m, then re-insert exactly those $m through
-# $insert.  The same keys hash the same way, so every re-insert probes the
-# tombstone it just made.
+# Seed $n keys, remove the first $m, re-insert them through $insert; each probes
+# the tombstone it just made.
 sub cycle {
     my (%o) = @_;
     my ($class, $n, $m, $seed, $insert) = @o{qw(class n m seed insert)};
@@ -87,9 +77,8 @@ for my $case (@paths) {
     is $r->{map}->size, 300, "and still holds exactly 300 keys";
 }
 
-# At its largest the table cannot grow, and churn at max_entries turns empty
-# slots into tombstones until none is left and every miss walks the table.
-# Tombstones outnumbering the empty slots must compact it.
+# At max_entries the table cannot grow and churn turns empty slots into
+# tombstones; once they outnumber the empty slots it must compact.
 {
     require Data::HashMap::Shared::II;
     my $m = Data::HashMap::Shared::II->new(undef, 1000);

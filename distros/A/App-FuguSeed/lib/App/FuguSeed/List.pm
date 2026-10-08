@@ -21,7 +21,7 @@
 # to one digest.
 
 package App::FuguSeed::List;
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 use v5.34;
 use warnings;
@@ -35,7 +35,8 @@ no feature qw(indirect multidimensional bareword_filehandles);
 # (LIST-MODULE-1). The index of a word is its 0-based position.
 #
 # The module runs on core perl v5.34 with no dependency, because
-# scripts/pack embeds it in fuguseed-qr (LIST-MODULE-2). It opens no
+# scripts/pack embeds it in fuguseed-last and fuguseed-qr
+# (LIST-MODULE-2). It opens no
 # file (SEC-TRUST-3): the digest check of a list file belongs to
 # fuguseed-words. A single-quoted heredoc holds the words, because a
 # packed file holds several modules and only one __DATA__ section can

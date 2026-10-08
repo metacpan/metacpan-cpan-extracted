@@ -2,6 +2,7 @@
 # TLS and mutual TLS against an etcd started here with throwaway certificates
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 use File::Temp 'tempdir';

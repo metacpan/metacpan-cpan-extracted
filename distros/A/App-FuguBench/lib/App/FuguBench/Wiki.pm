@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package App::FuguBench::Wiki;
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 use v5.34;
 use warnings;

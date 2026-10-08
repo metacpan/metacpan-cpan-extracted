@@ -8,22 +8,9 @@ use Time::HiRes qw(time);
 
 use Data::HashMap::Shared::SS;
 
-# set_multi runs its whole batch under one write lock and one seqlock section.
-# The lock excludes other writers, but get() is lock-free and protected only by
-# the seqlock: a reader that passes the check at the wrong moment can see the
-# interim inline-empty state, a length from one generation with an offset from
-# another, or a retired block whose head is now a free-list link.  Both halves
-# read those values back and accept nothing but the two a writer stored.
-#
-# Two guard defects, two geometries:
-#   1. the begin/end pair dropped -- seq never moves, so any concurrent get()
-#      is unprotected.  Two writers over many keys.
-#   2. the cleanup unlocking before closing the seqlock -- the next writer wins
-#      the lock and makes seq even in its own section while the previous writer
-#      is still inside wrunlock's FUTEX_WAKE.  That window is one syscall wide
-#      and opens only with a waiter parked, so it needs enough writers to keep
-#      hdr->rwait above zero: few keys, many writers.  Four writers over eight
-#      keys measured zero.
+# set_multi runs its batch under one write lock and one seqlock section; a
+# lock-free get() must never see an interim state, so the reader accepts only
+# the two values a writer stored.
 
 sub ncpu {
     return $ENV{TEST_NCPU} if $ENV{TEST_NCPU};
@@ -54,7 +41,7 @@ sub race {
         @o{qw(path keys vals writers batch secs)};
 
     my $map = Data::HashMap::Shared::SS->new($path, 4096);
-    $map->put($_, $vals->($_)->[0]) for @$keys;   # every key present before the race
+    $map->put($_, $vals->($_)->[0]) for @$keys;
     my $cap0 = $map->capacity;
 
     pipe(my $rd, my $wr) or die "pipe: $!";
@@ -68,7 +55,7 @@ sub race {
             alarm 30;
             my $m = Data::HashMap::Shared::SS->new($path, 4096);
             my $go;
-            sysread($rd, $go, 1);                 # barrier
+            sysread($rd, $go, 1);
             my $end  = time + $secs;
             my $flip = $w;
             while (time < $end) {
@@ -119,12 +106,12 @@ sub race {
     return ($reads, $absent, $torn, \%sample, $map, $cap0, $crashed, $failed, $both);
 }
 
-# ---- 1. the seqlock pair dropped from the guard ----
+# seqlock begin/end pair dropped from the guard: two writers over many keys
 {
     my @keys = map { "k$_" } 0 .. 63;
-    # 200 and 250 bytes both round up to the 256 class, so the two values
-    # recycle one arena block; the differing lengths also expose a val_len
-    # paired with the other generation's val_off.
+    # 200 and 250 bytes share the 256 class, so the values recycle one arena
+    # block; the differing lengths expose a val_len paired with the other
+    # generation's val_off.
     my $vals = sub {
         my $k = shift;
         ["A:$k:" . ('a' x (200 - length "A:$k:")),
@@ -136,8 +123,8 @@ sub race {
 
     is $crashed, 0, "two writers: no writer died on a signal";
     is $failed,  0, "two writers: no writer exited with an error";
-    # the reader overlapped the writers: not a rate, which valgrind divides by
-    # a hundred, but both generations of every key seen among the $reads reads
+    # not a read rate (valgrind divides it by a hundred): both generations of
+    # every key must be seen
     is $both, scalar @keys, "two writers: the reader saw both values of every key ($reads get() calls)";
     is $absent, 0, "two writers: no key ever read back as absent";
     is $torn,   0, "two writers: every value get() returned was one set_multi stored";
@@ -146,13 +133,12 @@ sub race {
     diag "torn $_ => $sample->{$_}" for sort keys %$sample;
 }
 
-# ---- 2. the guard's cleanup unlocking before closing the seqlock ----
+# cleanup unlocking before closing the seqlock: few keys, many writers
 {
     my @keys = ('k0', 'k1');
-    # 12 and 16 bytes are both the 16-byte class.  Two keys and eight writers:
-    # the reader must land on the one record the incoming writer is rewriting
-    # inside a one-syscall window, so the odds come from key count, and the
-    # window itself from keeping a writer parked on hdr->wlock.
+    # 12 and 16 bytes are both the 16-byte class.  The window is one syscall
+    # wide and opens only while a writer is parked on the lock, so it needs few
+    # keys and many writers (4 over 8 never hit it).
     my $vals = sub {
         my $k = shift;
         ["A$k" . ('a' x (12 - length "A$k")),

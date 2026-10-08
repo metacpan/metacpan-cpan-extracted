@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 use Encode qw(encode_utf8);

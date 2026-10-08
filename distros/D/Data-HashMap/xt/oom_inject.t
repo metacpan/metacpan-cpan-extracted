@@ -38,7 +38,7 @@ plan skip_all => "requires /proc/self/status" unless defined current_as_bytes();
         _exit($ok || $@ ? 0 : 1);
     }
     waitpid $pid, 0;
-    is $? >> 8, 0, 'OOM: reserve(huge) under memory limit did not SEGV';
+    is $?, 0, 'OOM: reserve(huge) under memory limit did not SEGV';
 }
 
 # ---- 2. put of impossibly large string returns false ----
@@ -67,7 +67,7 @@ plan skip_all => "requires /proc/self/status" unless defined current_as_bytes();
         _exit(0);  # any exit without SEGV is OK — error message or truncated
     }
     waitpid $pid, 0;
-    is $? >> 8, 0, 'OOM: thaw with bogus huge count does not SEGV';
+    is $?, 0, 'OOM: thaw with bogus huge count does not SEGV';
 }
 
 done_testing;

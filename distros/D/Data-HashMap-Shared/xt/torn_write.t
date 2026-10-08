@@ -4,20 +4,15 @@ use Test::More;
 use POSIX qw(_exit);
 use Time::HiRes qw(time usleep);
 
-# Torn-write detection: producer updates an entry rapidly; concurrent
-# reader must observe either the old value or the new value, never a
-# half-written state. Seqlock retry on the read path guarantees this.
-
 use Data::HashMap::Shared::SS;
 
-# A non-zero max_size routes the write path through the LRU code; the test
-# stores one key, so nothing is evicted.  2047 rather than the table capacity
-# 1024 entries yields (2048) keeps max_size below it, avoiding the constructor's
-# unreachable-LRU-bound warning on stderr.
+# A non-zero max_size routes writes through the LRU code (one key, so nothing
+# evicts). 2047 keeps it below the table capacity of 2048 slots, avoiding the
+# constructor's unreachable-LRU-bound warning.
 my $m = Data::HashMap::Shared::SS->new_memfd("torn", 1024, 2047);
 
-# Alternating values of different length — torn write would produce a
-# truncated or mixed-length result.
+# Different lengths, so a torn write shows as a truncated or
+# mixed-length result.
 my $v1 = "A" x 100;
 my $v2 = "B" x 200;
 
@@ -32,7 +27,6 @@ if (!$pid) {
     _exit(0);
 }
 
-# Reader: verify every read is one of the two valid values, never torn
 my $torn = 0;
 my $reads = 0;
 my $end = time + 1.0;

@@ -16,9 +16,15 @@
 #define MAX_COMPRESSION_LEVEL 12
 #define MIN_COMPRESSION_LEVEL 0
 
-#define DF_MAX_INITIAL_ALLOC (64 * 1024 * 1024) /* 64 MB initial allocation cap */
+#define DF_MAX_INITIAL_ALLOC (64 * 1024 * 1024)
+#define DEFLATE_MAX_RATIO 1032
 
-/* Marker for extra field in gzip header to preserve Perl flags */
+#define GZIP_FHCRC    0x02
+#define GZIP_FEXTRA   0x04
+#define GZIP_FNAME    0x08
+#define GZIP_FCOMMENT 0x10
+
+/* Extra-field subfield holding Perl's UTF-8 flag, as Gzip::Faster writes it */
 #define GZIP_PERL_ID "GF\1\0"
 #define GZIP_PERL_ID_LENGTH 4
 #define GZIP_PERL_LENGTH 1
@@ -39,7 +45,6 @@ typedef struct {
     unsigned int user_object : 1;
 } deflate_faster_t;
 
-/* Branch prediction hints */
 #if defined(__GNUC__) || defined(__clang__)
 #define DF_LIKELY(x)   __builtin_expect(!!(x), 1)
 #define DF_UNLIKELY(x) __builtin_expect(!!(x), 0)
@@ -61,13 +66,6 @@ struct df_tls_cache {
     struct libdeflate_decompressor * decompressor;
 };
 
-#if defined(DF_TLS)
-static DF_TLS struct df_tls_cache * tls_cache = NULL;
-
-#if defined(DF_HAVE_PTHREAD)
-static pthread_key_t tls_cache_key;
-static pthread_once_t tls_cache_key_once = PTHREAD_ONCE_INIT;
-
 static void
 df_cache_free_engines (struct df_tls_cache * c)
 {
@@ -86,6 +84,14 @@ df_cache_free_engines (struct df_tls_cache * c)
     }
 }
 
+#if defined(DF_TLS)
+static DF_TLS struct df_tls_cache * tls_cache = NULL;
+
+#if defined(DF_HAVE_PTHREAD)
+static pthread_key_t tls_cache_key;
+static pthread_mutex_t tls_cache_key_mutex = PTHREAD_MUTEX_INITIALIZER;
+static int tls_cache_key_ready = 0;
+
 static void
 tls_cache_cleanup (void * ptr)
 {
@@ -96,10 +102,21 @@ tls_cache_cleanup (void * ptr)
     }
 }
 
-static void
+static int
 tls_cache_init_key (void)
 {
-    pthread_key_create (&tls_cache_key, tls_cache_cleanup);
+    int error = pthread_mutex_lock (&tls_cache_key_mutex);
+    if (error != 0) {
+        return error;
+    }
+    if (! tls_cache_key_ready) {
+        error = pthread_key_create (&tls_cache_key, tls_cache_cleanup);
+        if (error == 0) {
+            tls_cache_key_ready = 1;
+        }
+    }
+    int unlock_error = pthread_mutex_unlock (&tls_cache_key_mutex);
+    return error != 0 ? error : unlock_error;
 }
 #endif
 
@@ -108,11 +125,22 @@ static inline struct df_tls_cache *
 get_tls_cache (void)
 {
     if (DF_UNLIKELY (! tls_cache)) {
-        tls_cache = (struct df_tls_cache *)calloc (1, sizeof(struct df_tls_cache));
 #if defined(DF_HAVE_PTHREAD)
-        pthread_once (&tls_cache_key_once, tls_cache_init_key);
-        pthread_setspecific (tls_cache_key, tls_cache);
+        if (DF_UNLIKELY (tls_cache_init_key () != 0)) {
+            croak ("Failed to allocate engine cache key");
+        }
 #endif
+        struct df_tls_cache * c = (struct df_tls_cache *)calloc (1, sizeof(struct df_tls_cache));
+        if (DF_UNLIKELY (! c)) {
+            croak ("Failed to allocate engine cache");
+        }
+#if defined(DF_HAVE_PTHREAD)
+        if (DF_UNLIKELY (pthread_setspecific (tls_cache_key, c) != 0)) {
+            free (c);
+            croak ("Failed to register engine cache");
+        }
+#endif
+        tls_cache = c;
     }
     return tls_cache;
 }
@@ -141,7 +169,7 @@ get_decompressor (void)
 
 #elif defined(USE_ITHREADS)
 
-/* Threaded build on compiler without TLS: allocate per call to avoid race */
+/* No TLS: a shared cache would race between threads */
 #define DF_PER_CALL_ENGINES 1
 
 static inline struct libdeflate_compressor *
@@ -160,7 +188,6 @@ get_decompressor (void)
 
 #else
 
-/* Non-threaded build without TLS: static global cache is safe */
 static struct df_tls_cache global_cache;
 
 static inline struct libdeflate_compressor *
@@ -183,7 +210,15 @@ get_decompressor (void)
     return global_cache.decompressor;
 }
 #endif
- 
+
+#if defined(DF_PER_CALL_ENGINES)
+#define DF_FREE_COMPRESSOR(c) libdeflate_free_compressor (c)
+#define DF_FREE_DECOMPRESSOR(d) libdeflate_free_decompressor (d)
+#else
+#define DF_FREE_COMPRESSOR(c) ((void)0)
+#define DF_FREE_DECOMPRESSOR(d) ((void)0)
+#endif
+
 static void
 df_atexit_cleanup (pTHX_ void * ptr)
 {
@@ -191,10 +226,13 @@ df_atexit_cleanup (pTHX_ void * ptr)
 #if defined(DF_TLS)
     if (tls_cache) {
         struct df_tls_cache * c = tls_cache;
-        tls_cache = NULL;
 #if defined(DF_HAVE_PTHREAD)
-        pthread_setspecific (tls_cache_key, NULL);
+        if (DF_UNLIKELY (pthread_setspecific (tls_cache_key, NULL) != 0)) {
+            df_cache_free_engines (c);
+            return;
+        }
 #endif
+        tls_cache = NULL;
         df_cache_free_engines (c);
         free (c);
     }
@@ -270,6 +308,27 @@ parse_max_size_sv (SV * sv)
         return 0;
     }
     return (UV)iv;
+}
+
+#define MOD_TIME_MAX 0xffffffff
+
+static inline UV
+parse_mod_time_sv (SV * sv)
+{
+    if (! (SvIOK (sv) || looks_like_number (sv))) {
+        warn ("Argument \"%s\" isn't numeric in modification time", SvPV_nomg_nolen (sv));
+        return 0;
+    }
+    if (SvNV_nomg (sv) < 0) {
+        warn ("Cannot set modification time to less than 0");
+        return 0;
+    }
+    UV uv = SvUV_nomg (sv);
+    if (uv > MOD_TIME_MAX) {
+        warn ("Cannot set modification time to more than 4294967295");
+        return MOD_TIME_MAX;
+    }
+    return uv;
 }
 
 #define UO \
@@ -350,53 +409,85 @@ new_user_object (deflate_faster_t * df)
     df->level = DEFAULT_COMPRESSION_LEVEL;
 }
 
-/* Parse RFC 1952 gzip header fields (MTIME, FNAME, Perl UTF8 flag) */
-static void
-parse_gzip_header_meta (deflate_faster_t * df, const unsigned char * in, STRLEN in_len, int * is_utf8_out)
+typedef struct {
+    uint32_t mtime;
+    int has_mtime;
+    const unsigned char * fname;
+    STRLEN fname_len;
+    int has_fname;
+} df_gzip_meta_t;
+
+/* Also checks FHCRC, which libdeflate skips. Returns 0 for a malformed header. */
+static int
+parse_gzip_header_meta (df_gzip_meta_t * meta, const unsigned char * in, STRLEN in_len, int * is_utf8_out)
 {
     if (in_len < 10 || in[0] != 0x1f || in[1] != 0x8b || in[2] != 8) {
-        return;
+        return 0;
     }
     unsigned char flg = in[3];
-
-    if (df->user_object) {
-        uint32_t mtime = (uint32_t)in[4] | ((uint32_t)in[5] << 8) |
-                         ((uint32_t)in[6] << 16) | ((uint32_t)in[7] << 24);
-        if (mtime > 0) {
-            if (df->mod_time) {
-                SvREFCNT_dec (df->mod_time);
-            }
-            df->mod_time = newSVuv (mtime);
-        }
-    }
+    const unsigned char * fname = NULL;
+    STRLEN fname_len = 0;
 
     STRLEN pos = 10;
-    if (flg & 0x04) { /* FEXTRA */
-        if (pos + 2 > in_len) return;
+    if (flg & GZIP_FEXTRA) {
+        if (pos + 2 > in_len) return 0;
         uint16_t xlen = (uint16_t)in[pos] | ((uint16_t)in[pos + 1] << 8);
         pos += 2;
-        if (pos + xlen > in_len) return;
-        if (xlen >= EXTRA_LENGTH &&
-            in[pos] == 'G' && in[pos + 1] == 'F' && in[pos + 2] == 1 && in[pos + 3] == 0) {
-            if (is_utf8_out) {
-                *is_utf8_out = (in[pos + 4] & GZIP_PERL_UTF8) ? 1 : 0;
+        if (pos + xlen > in_len) return 0;
+        STRLEN extra_end = pos + xlen;
+        while (pos + 4 <= extra_end) {
+            uint16_t sub_len = (uint16_t)in[pos + 2] | ((uint16_t)in[pos + 3] << 8);
+            if (sub_len > extra_end - pos - 4) break;
+            if (in[pos] == 'G' && in[pos + 1] == 'F' && sub_len == GZIP_PERL_LENGTH) {
+                if (is_utf8_out) {
+                    *is_utf8_out = (in[pos + 4] & GZIP_PERL_UTF8) ? 1 : 0;
+                }
+                break;
             }
+            pos += 4 + sub_len;
         }
-        pos += xlen;
+        pos = extra_end;
     }
 
-    if (flg & 0x08) { /* FNAME */
+    if (flg & GZIP_FNAME) {
         STRLEN start = pos;
         while (pos < in_len && in[pos] != '\0') {
             pos++;
         }
-        if (pos < in_len && df->user_object) {
-            if (df->file_name) {
-                SvREFCNT_dec (df->file_name);
-            }
-            df->file_name = newSVpvn ((const char *)(in + start), pos - start);
+        if (pos >= in_len) return 0;
+        fname = in + start;
+        fname_len = pos - start;
+        pos++;
+    }
+
+    if (flg & GZIP_FCOMMENT) {
+        while (pos < in_len && in[pos] != '\0') {
+            pos++;
+        }
+        if (pos >= in_len) return 0;
+        pos++;
+    }
+
+    if (flg & GZIP_FHCRC) {
+        if (pos + 2 > in_len) return 0;
+        uint16_t expected = (uint16_t)in[pos] | ((uint16_t)in[pos + 1] << 8);
+        if ((libdeflate_crc32 (0, in, pos) & 0xffff) != expected) return 0;
+    }
+
+    if (meta) {
+        uint32_t mtime = (uint32_t)in[4] | ((uint32_t)in[5] << 8) |
+                         ((uint32_t)in[6] << 16) | ((uint32_t)in[7] << 24);
+        if (mtime > 0) {
+            meta->mtime = mtime;
+            meta->has_mtime = 1;
+        }
+        if (fname) {
+            meta->fname = fname;
+            meta->fname_len = fname_len;
+            meta->has_fname = 1;
         }
     }
+    return 1;
 }
 
 static SV *
@@ -413,7 +504,7 @@ deflate_faster_compress (deflate_faster_t * df)
     STRLEN fname_len = 0;
     SV * fname_mortal = NULL;
 
-    if (df->user_object) {
+    if (df->user_object && df->is_gzip) {
         if (df->mod_time) {
             SvGETMAGIC (df->mod_time);
             if (SvOK (df->mod_time)) {
@@ -424,10 +515,25 @@ deflate_faster_compress (deflate_faster_t * df)
             SvGETMAGIC (df->file_name);
             if (SvOK (df->file_name)) {
                 fname_mortal = sv_mortalcopy (df->file_name);
-                fname = SvPV (fname_mortal, fname_len);
+                if (SvROK (fname_mortal)) {
+                    fname = SvPV_force (fname_mortal, fname_len);
+                }
+                else {
+                    fname = SvPV (fname_mortal, fname_len);
+                }
                 const char * nul = (const char *)memchr (fname, '\0', fname_len);
                 if (nul) {
-                    fname_len = (STRLEN)(nul - fname);
+                    STRLEN prefix_len = (STRLEN)(nul - fname);
+                    fname = SvPV_force (fname_mortal, fname_len);
+                    fname_len = prefix_len;
+                    SvCUR_set (fname_mortal, fname_len);
+                    SvPVX (fname_mortal)[fname_len] = '\0';
+                }
+                if (SvUTF8 (fname_mortal)) {
+                    if (! sv_utf8_downgrade (fname_mortal, TRUE)) {
+                        croak ("Gzip file_name must contain only Latin-1 characters");
+                    }
+                    fname = SvPV (fname_mortal, fname_len);
                 }
             }
         }
@@ -471,8 +577,8 @@ deflate_faster_compress (deflate_faster_t * df)
             ptr[2] = 0x08;
 
             unsigned char flg = 0;
-            if (df->copy_perl_flags) flg |= 0x04;
-            if (fname != NULL)       flg |= 0x08;
+            if (df->copy_perl_flags) flg |= GZIP_FEXTRA;
+            if (fname != NULL)       flg |= GZIP_FNAME;
             ptr[3] = (char)flg;
 
             ptr[4] = (char)(mtime & 0xff);
@@ -500,9 +606,7 @@ deflate_faster_compress (deflate_faster_t * df)
             size_t comp_len = libdeflate_deflate_compress (c, df->in_char, df->in_length, ptr + pos, bound);
             if (DF_UNLIKELY (comp_len == 0)) {
                 SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                libdeflate_free_compressor (c);
-#endif
+                DF_FREE_COMPRESSOR (c);
                 croak ("libdeflate_deflate_compress failed");
             }
             pos += comp_len;
@@ -529,9 +633,7 @@ deflate_faster_compress (deflate_faster_t * df)
             if (df->file_name) {
                 df_delete_file_name (df);
             }
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_compressor (c);
-#endif
+            DF_FREE_COMPRESSOR (c);
             return out;
         }
         else {
@@ -543,9 +645,7 @@ deflate_faster_compress (deflate_faster_t * df)
             size_t out_len = libdeflate_gzip_compress (c, df->in_char, df->in_length, ptr, bound);
             if (DF_UNLIKELY (out_len == 0)) {
                 SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                libdeflate_free_compressor (c);
-#endif
+                DF_FREE_COMPRESSOR (c);
                 croak ("libdeflate_gzip_compress failed");
             }
 
@@ -556,9 +656,7 @@ deflate_faster_compress (deflate_faster_t * df)
                 SvPV_shrink_to_cur (out);
             }
 
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_compressor (c);
-#endif
+            DF_FREE_COMPRESSOR (c);
             return out;
         }
     }
@@ -571,9 +669,7 @@ deflate_faster_compress (deflate_faster_t * df)
         size_t out_len = libdeflate_deflate_compress (c, df->in_char, df->in_length, ptr, bound);
         if (DF_UNLIKELY (out_len == 0)) {
             SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_compressor (c);
-#endif
+            DF_FREE_COMPRESSOR (c);
             croak ("libdeflate_deflate_compress failed");
         }
 
@@ -584,9 +680,7 @@ deflate_faster_compress (deflate_faster_t * df)
             SvPV_shrink_to_cur (out);
         }
 
-#if defined(DF_PER_CALL_ENGINES)
-        libdeflate_free_compressor (c);
-#endif
+        DF_FREE_COMPRESSOR (c);
         return out;
     }
     else {
@@ -598,9 +692,7 @@ deflate_faster_compress (deflate_faster_t * df)
         size_t out_len = libdeflate_zlib_compress (c, df->in_char, df->in_length, ptr, bound);
         if (DF_UNLIKELY (out_len == 0)) {
             SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_compressor (c);
-#endif
+            DF_FREE_COMPRESSOR (c);
             croak ("libdeflate_zlib_compress failed");
         }
 
@@ -611,9 +703,7 @@ deflate_faster_compress (deflate_faster_t * df)
             SvPV_shrink_to_cur (out);
         }
 
-#if defined(DF_PER_CALL_ENGINES)
-        libdeflate_free_compressor (c);
-#endif
+        DF_FREE_COMPRESSOR (c);
         return out;
     }
 }
@@ -621,6 +711,11 @@ deflate_faster_compress (deflate_faster_t * df)
 static SV *
 deflate_faster_decompress (deflate_faster_t * df)
 {
+    if (DF_UNLIKELY (df->user_object)) {
+        df_delete_file_name (df);
+        df_delete_mod_time (df);
+    }
+
     SvGETMAGIC (df->in);
     if (DF_UNLIKELY (! SvOK (df->in))) {
         warn ("Empty input");
@@ -638,19 +733,13 @@ deflate_faster_decompress (deflate_faster_t * df)
     }
 
     if (df->is_gzip) {
-        if (DF_UNLIKELY (df->user_object)) {
-            df_delete_file_name (df);
-            df_delete_mod_time (df);
-        }
-
-        /* Check for zlib format compatibility fallback: CMF==8, check bits */
+        /* gunzip accepts zlib too, as Gzip::Faster does */
         if (df->in_length >= 6 &&
             ((unsigned char)df->in_char[0] != 0x1f || (unsigned char)df->in_char[1] != 0x8b)) {
             unsigned char cmf = (unsigned char)df->in_char[0];
             unsigned char flg = (unsigned char)df->in_char[1];
             if ((cmf & 0x0f) == 8 && ((cmf >> 4) <= 7) &&
                 (((cmf * 256 + flg) % 31) == 0) && ((flg & 0x20) == 0)) {
-                /* Valid zlib header: decompress via zlib path */
                 STRLEN alloc = df->in_length < 4096 ? (df->in_length * 4 + 256) : (df->in_length * 2 + 1024);
                 if (alloc > DF_MAX_INITIAL_ALLOC) {
                     alloc = DF_MAX_INITIAL_ALLOC;
@@ -674,9 +763,7 @@ deflate_faster_decompress (deflate_faster_t * df)
                     if (res == LIBDEFLATE_INSUFFICIENT_SPACE) {
                         if (df->user_object && df->max_size > 0 && alloc >= df->max_size) {
                             SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                            libdeflate_free_decompressor (d);
-#endif
+                            DF_FREE_DECOMPRESSOR (d);
                             croak ("Uncompressed data exceeds max_size of %" UVuf " bytes", df->max_size);
                         }
                         alloc = alloc * 2 + 1024;
@@ -687,25 +774,19 @@ deflate_faster_decompress (deflate_faster_t * df)
                         continue;
                     }
                     SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                    libdeflate_free_decompressor (d);
-#endif
+                    DF_FREE_DECOMPRESSOR (d);
                     croak ("Data input to inflate is not in libz format");
                 }
 
                 if (actual_in != df->in_length) {
                     SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                    libdeflate_free_decompressor (d);
-#endif
+                    DF_FREE_DECOMPRESSOR (d);
                     croak ("Data input to inflate is not in libz format");
                 }
 
                 if (DF_UNLIKELY (df->user_object && df->max_size > 0 && actual_out > df->max_size)) {
                     SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                    libdeflate_free_decompressor (d);
-#endif
+                    DF_FREE_DECOMPRESSOR (d);
                     croak ("Uncompressed data exceeds max_size of %" UVuf " bytes", df->max_size);
                 }
 
@@ -717,9 +798,7 @@ deflate_faster_decompress (deflate_faster_t * df)
                     SvPV_shrink_to_cur (out);
                 }
 
-#if defined(DF_PER_CALL_ENGINES)
-                libdeflate_free_decompressor (d);
-#endif
+                DF_FREE_DECOMPRESSOR (d);
                 return out;
             }
         }
@@ -727,18 +806,16 @@ deflate_faster_decompress (deflate_faster_t * df)
         if (DF_UNLIKELY (df->in_length < 18 ||
             (unsigned char)df->in_char[0] != 0x1f ||
             (unsigned char)df->in_char[1] != 0x8b)) {
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_decompressor (d);
-#endif
+            DF_FREE_DECOMPRESSOR (d);
             croak ("Data input to inflate is not in libz format");
         }
 
-        /* Estimate initial buffer using ISIZE hint capped at 64 MB */
+        /* ISIZE is untrusted: only a hint, bounded by the DEFLATE ratio */
         const unsigned char * tr = (const unsigned char *)(df->in_char + df->in_length - 4);
         uint32_t isize = (uint32_t)tr[0] | ((uint32_t)tr[1] << 8) |
                          ((uint32_t)tr[2] << 16) | ((uint32_t)tr[3] << 24);
 
-        uint64_t max_expected = (uint64_t)df->in_length * 1032 + 1024;
+        uint64_t max_expected = (uint64_t)df->in_length * DEFLATE_MAX_RATIO + 1024;
         STRLEN alloc = 0;
         if (isize > 0 && isize <= max_expected) {
             alloc = isize <= DF_MAX_INITIAL_ALLOC ? isize : DF_MAX_INITIAL_ALLOC;
@@ -761,6 +838,8 @@ deflate_faster_decompress (deflate_faster_t * df)
         size_t in_pos = 0;
         int member_count = 0;
         int has_utf8_flag = 0;
+        df_gzip_meta_t meta;
+        Zero (&meta, 1, df_gzip_meta_t);
 
         while (in_pos < df->in_length) {
             if (df->in_length - in_pos < 18 ||
@@ -768,16 +847,20 @@ deflate_faster_decompress (deflate_faster_t * df)
                 (unsigned char)df->in_char[in_pos + 1] != 0x8b ||
                 (unsigned char)df->in_char[in_pos + 2] != 8) {
                 SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                libdeflate_free_decompressor (d);
-#endif
+                DF_FREE_DECOMPRESSOR (d);
                 croak ("Data input to inflate is not in libz format");
             }
 
-            if (member_count == 0 && df->user_object) {
+            if ((df->user_object && (member_count == 0 || df->copy_perl_flags)) ||
+                ((unsigned char)df->in_char[in_pos + 3] & GZIP_FHCRC)) {
                 int is_utf8 = 0;
-                parse_gzip_header_meta (df, (const unsigned char *)df->in_char + in_pos,
-                                        df->in_length - in_pos, &is_utf8);
+                if (! parse_gzip_header_meta (member_count == 0 && df->user_object ? &meta : NULL,
+                                             (const unsigned char *)df->in_char + in_pos,
+                                             df->in_length - in_pos, &is_utf8)) {
+                    SvREFCNT_dec (out);
+                    DF_FREE_DECOMPRESSOR (d);
+                    croak ("Data input to inflate is not in libz format");
+                }
                 if (df->copy_perl_flags && is_utf8) {
                     has_utf8_flag = 1;
                 }
@@ -809,9 +892,7 @@ deflate_faster_decompress (deflate_faster_t * df)
                 if (res == LIBDEFLATE_INSUFFICIENT_SPACE) {
                     if (df->user_object && df->max_size > 0 && alloc >= df->max_size) {
                         SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                        libdeflate_free_decompressor (d);
-#endif
+                        DF_FREE_DECOMPRESSOR (d);
                         croak ("Uncompressed data exceeds max_size of %" UVuf " bytes", df->max_size);
                     }
                     size_t next_alloc = alloc * 2 + 1024;
@@ -833,9 +914,7 @@ deflate_faster_decompress (deflate_faster_t * df)
                     continue;
                 }
                 SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                libdeflate_free_decompressor (d);
-#endif
+                DF_FREE_DECOMPRESSOR (d);
                 croak ("Data input to inflate is not in libz format");
             }
 
@@ -845,10 +924,23 @@ deflate_faster_decompress (deflate_faster_t * df)
 
             if (DF_UNLIKELY (df->user_object && df->max_size > 0 && out_len_total > df->max_size)) {
                 SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                libdeflate_free_decompressor (d);
-#endif
+                DF_FREE_DECOMPRESSOR (d);
                 croak ("Uncompressed data exceeds max_size of %" UVuf " bytes", df->max_size);
+            }
+        }
+
+        if (df->user_object) {
+            if (meta.has_mtime) {
+                if (df->mod_time) {
+                    SvREFCNT_dec (df->mod_time);
+                }
+                df->mod_time = newSVuv (meta.mtime);
+            }
+            if (meta.has_fname) {
+                if (df->file_name) {
+                    SvREFCNT_dec (df->file_name);
+                }
+                df->file_name = newSVpvn ((const char *)meta.fname, meta.fname_len);
             }
         }
 
@@ -866,9 +958,7 @@ deflate_faster_decompress (deflate_faster_t * df)
             SvPV_shrink_to_cur (out);
         }
 
-#if defined(DF_PER_CALL_ENGINES)
-        libdeflate_free_decompressor (d);
-#endif
+        DF_FREE_DECOMPRESSOR (d);
         return out;
     }
     else if (df->is_raw) {
@@ -895,9 +985,7 @@ deflate_faster_decompress (deflate_faster_t * df)
             if (res == LIBDEFLATE_INSUFFICIENT_SPACE) {
                 if (df->user_object && df->max_size > 0 && alloc >= df->max_size) {
                     SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                    libdeflate_free_decompressor (d);
-#endif
+                    DF_FREE_DECOMPRESSOR (d);
                     croak ("Uncompressed data exceeds max_size of %" UVuf " bytes", df->max_size);
                 }
                 alloc = alloc * 2 + 1024;
@@ -908,25 +996,19 @@ deflate_faster_decompress (deflate_faster_t * df)
                 continue;
             }
             SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_decompressor (d);
-#endif
+            DF_FREE_DECOMPRESSOR (d);
             croak ("Data input to inflate is not in libz format");
         }
 
         if (actual_in != df->in_length) {
             SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_decompressor (d);
-#endif
+            DF_FREE_DECOMPRESSOR (d);
             croak ("Data input to inflate is not in libz format");
         }
 
         if (DF_UNLIKELY (df->user_object && df->max_size > 0 && actual_out > df->max_size)) {
             SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_decompressor (d);
-#endif
+            DF_FREE_DECOMPRESSOR (d);
             croak ("Uncompressed data exceeds max_size of %" UVuf " bytes", df->max_size);
         }
 
@@ -938,9 +1020,7 @@ deflate_faster_decompress (deflate_faster_t * df)
             SvPV_shrink_to_cur (out);
         }
 
-#if defined(DF_PER_CALL_ENGINES)
-        libdeflate_free_decompressor (d);
-#endif
+        DF_FREE_DECOMPRESSOR (d);
         return out;
     }
     else {
@@ -967,9 +1047,7 @@ deflate_faster_decompress (deflate_faster_t * df)
             if (res == LIBDEFLATE_INSUFFICIENT_SPACE) {
                 if (df->user_object && df->max_size > 0 && alloc >= df->max_size) {
                     SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-                    libdeflate_free_decompressor (d);
-#endif
+                    DF_FREE_DECOMPRESSOR (d);
                     croak ("Uncompressed data exceeds max_size of %" UVuf " bytes", df->max_size);
                 }
                 alloc = alloc * 2 + 1024;
@@ -980,25 +1058,19 @@ deflate_faster_decompress (deflate_faster_t * df)
                 continue;
             }
             SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_decompressor (d);
-#endif
+            DF_FREE_DECOMPRESSOR (d);
             croak ("Data input to inflate is not in libz format");
         }
 
         if (actual_in != df->in_length) {
             SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_decompressor (d);
-#endif
+            DF_FREE_DECOMPRESSOR (d);
             croak ("Data input to inflate is not in libz format");
         }
 
         if (DF_UNLIKELY (df->user_object && df->max_size > 0 && actual_out > df->max_size)) {
             SvREFCNT_dec (out);
-#if defined(DF_PER_CALL_ENGINES)
-            libdeflate_free_decompressor (d);
-#endif
+            DF_FREE_DECOMPRESSOR (d);
             croak ("Uncompressed data exceeds max_size of %" UVuf " bytes", df->max_size);
         }
 
@@ -1010,9 +1082,7 @@ deflate_faster_decompress (deflate_faster_t * df)
             SvPV_shrink_to_cur (out);
         }
 
-#if defined(DF_PER_CALL_ENGINES)
-        libdeflate_free_decompressor (d);
-#endif
+        DF_FREE_DECOMPRESSOR (d);
         return out;
     }
 }

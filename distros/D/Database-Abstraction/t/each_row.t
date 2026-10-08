@@ -6,6 +6,7 @@ use FindBin qw($Bin);
 use File::Spec;
 use Test::Most tests => 31;
 use Test::NoWarnings;
+use Test::Returns;
 
 use lib 't/lib';
 use Database::test1;
@@ -32,8 +33,8 @@ throws_ok(
 my @collected;
 my $count = $db->each_row(sub { push @collected, shift });
 # test1.csv has: one, two, three, empty (4 data rows; comment line ignored)
-cmp_ok($count, '==', 4, 'ER2: each_row returns row count');
-cmp_ok(scalar @collected, '==', 4, 'ER2: callback called once per row');
+returns_is($count, { type => 'integer', min => 4, max => 4 }, 'ER2: each_row returns row count');
+returns_is(\@collected, { type => 'arrayref', min => 4, max => 4 }, 'ER2: callback called once per row');
 
 my %entries = map { $_->{'entry'} => 1 } @collected;
 ok(exists $entries{'one'},   'ER2: entry "one" present');
@@ -46,7 +47,7 @@ ok(exists $entries{'empty'}, 'ER2: entry "empty" present');
 # ---------------------------------------------------------------------------
 my @filtered;
 $db->each_row(sub { push @filtered, shift }, number => 1);
-cmp_ok(scalar @filtered, '==', 1, 'ER3: criteria filter works');
+returns_is(\@filtered, { type => 'arrayref', min => 1, max => 1 }, 'ER3: criteria filter works');
 is($filtered[0]{'entry'}, 'one', 'ER3: correct row returned');
 
 # ---------------------------------------------------------------------------
@@ -54,7 +55,7 @@ is($filtered[0]{'entry'}, 'one', 'ER3: correct row returned');
 # ---------------------------------------------------------------------------
 my $called = 0;
 my $n = $db->each_row(sub { $called++ }, entry => 'nonexistent');
-cmp_ok($n, '==', 0, 'ER4: returns 0 for no matches');
+returns_is($n, { type => 'integer', min => 0, max => 0 }, 'ER4: returns 0 for no matches');
 cmp_ok($called, '==', 0, 'ER4: callback not called for empty result');
 
 # ---------------------------------------------------------------------------
@@ -73,11 +74,11 @@ is_deeply(\@sorted_desc, [reverse sort @sorted_desc], 'ER5: sort_by DESC produce
 # ---------------------------------------------------------------------------
 my @limited;
 $db->each_row(sub { push @limited, shift }, sort_by => 'entry', limit => 2);
-cmp_ok(scalar @limited, '==', 2, 'ER6: limit respected');
+returns_is(\@limited, { type => 'arrayref', min => 2, max => 2 }, 'ER6: limit respected');
 
 my @offset;
 $db->each_row(sub { push @offset, shift }, sort_by => 'entry', limit => 2, offset => 1);
-cmp_ok(scalar @offset, '==', 2, 'ER6: offset + limit combination');
+returns_is(\@offset, { type => 'arrayref', min => 2, max => 2 }, 'ER6: offset + limit combination');
 isnt($limited[0]{'entry'}, $offset[0]{'entry'}, 'ER6: offset shifts the window');
 
 # ---------------------------------------------------------------------------
@@ -108,7 +109,7 @@ ok(ref($ne_rows[0]) eq 'HASH', 'ER8: rows are hashrefs in no_entry mode');
 my $bc_db = Database::test1->new({ directory => $directory, base_criteria => { number => 1 } });
 my @bc_rows;
 my $bc_n = $bc_db->each_row(sub { push @bc_rows, shift });
-cmp_ok($bc_n, '==', 1, 'ER9: base_criteria filters each_row');
+returns_is($bc_n, { type => 'integer', min => 1, max => 1 }, 'ER9: base_criteria filters each_row');
 is($bc_rows[0]{'entry'}, 'one', 'ER9: correct row under base_criteria');
 
 # ---------------------------------------------------------------------------
@@ -116,13 +117,13 @@ is($bc_rows[0]{'entry'}, 'one', 'ER9: correct row under base_criteria');
 # ---------------------------------------------------------------------------
 my @q_rows;
 my $q_n = $db->query->each(sub { push @q_rows, shift });
-cmp_ok($q_n, '==', 4, 'ER10: query->each() returns row count');
-cmp_ok(scalar @q_rows, '==', 4, 'ER10: query->each() visits all rows');
+returns_is($q_n, { type => 'integer', min => 4, max => 4 }, 'ER10: query->each() returns row count');
+returns_is(\@q_rows, { type => 'arrayref', min => 4, max => 4 }, 'ER10: query->each() visits all rows');
 
 # ER10b: query->where()->each()
 my @q_filtered;
 $db->query->where(number => 1)->each(sub { push @q_filtered, shift });
-cmp_ok(scalar @q_filtered, '==', 1, 'ER10b: query->where()->each() filters');
+returns_is(\@q_filtered, { type => 'arrayref', min => 1, max => 1 }, 'ER10b: query->where()->each() filters');
 is($q_filtered[0]{'entry'}, 'one', 'ER10b: correct row');
 
 # ER10c: query->each() callback croak

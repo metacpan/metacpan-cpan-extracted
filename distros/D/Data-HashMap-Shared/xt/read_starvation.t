@@ -6,9 +6,9 @@ use File::Temp qw(tempdir);
 use POSIX ();
 use Data::HashMap::Shared::SS;
 
-# A lock-free read retries while writers keep bumping the sequence; one that
-# is slower than the gaps between a busy writer's sections has to fall back to
-# the read lock, or it never finishes.  Two writers saturate the map here.
+# A lock-free read slower than the gaps between a busy writer's sections must
+# fall back to the read lock, or it never finishes. Two writers saturate the
+# map.
 
 plan skip_all => 'Linux only' unless $^O eq 'linux';
 my $dir = tempdir(CLEANUP => 1);
@@ -32,9 +32,9 @@ sub with_writers {
     return $ok ? '' : $err;
 }
 
-# A read lock the fallback failed to release would stop every writer, and the
-# reads would only get faster.  One put must still finish; the default SIGALRM
-# action ends a child stuck in C, where a Perl handler never runs.
+# A read lock the fallback failed to release would stop every writer while reads
+# got faster, so one put must still finish. Default SIGALRM action: it ends a
+# child stuck in C, where a Perl handler never runs.
 sub writer_ok {
     my ($m, $key) = @_;
     my $pid = fork // die "fork: $!";

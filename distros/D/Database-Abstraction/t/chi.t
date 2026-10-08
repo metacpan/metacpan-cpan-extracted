@@ -5,12 +5,13 @@ use warnings;
 use lib 't/lib';
 
 use File::Spec;
-use Test::Most tests => 22;
+use Test::Most tests => 21;
+use Test::Returns;
+use Test::Log::Abstraction;
 use FindBin qw($Bin);
 use Test::Needs 'CHI';
 
 CHI: {
-	use_ok('MyLogger');
 	use_ok('Database::test1');
 	CHI->import();
 
@@ -21,7 +22,7 @@ CHI: {
 	my $test1 = new_ok('Database::test1' => [{
 		cache => $cache,
 		directory => $directory,
-		logger => new_ok('MyLogger'),
+		logger => new_ok('Test::Log::Abstraction'),
 		max_slurp_size => 0,	# force to not use slurp and therefore to use SQL and cache
 	}]);
 
@@ -50,7 +51,7 @@ CHI: {
 	$rc = $test1->selectall_hashref();
 	cmp_ok(scalar $cache->get_keys(), '==', 2, 'cache miss');
 	cmp_ok(ref($rc), 'eq', 'ARRAY', 'selectall hashref returns a reference to an array');
-	cmp_ok(scalar @{$rc}, '==', 4, 'selectall_hashref returns all matches');
+	returns_is($rc, { type => 'arrayref', min => 4, max => 4 }, 'selectall_hashref returns all matches');
 
 	if($ENV{'TEST_VERBOSE'}) {
 		foreach my $key($cache->get_keys()) {

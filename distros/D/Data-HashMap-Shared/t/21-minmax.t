@@ -15,9 +15,8 @@ use Data::HashMap::Shared::I32;
 
 sub tmp { File::Temp::tempnam(File::Spec->tmpdir, 'shm_minmax') . '.shm' }
 
-# ---- single-thread semantics, keyword form (SI) ----
-# NB: the shm_* keywords are list operators -- wrap the call in outer parens,
-# do not put parens directly after the keyword name.
+# the shm_* keywords are list operators: wrap the call in outer parens, never
+# put parens directly after the keyword name
 {
     my $path = tmp();
     my $m = Data::HashMap::Shared::SI->new($path, 1000);
@@ -34,7 +33,6 @@ sub tmp { File::Temp::tempnam(File::Spec->tmpdir, 'shm_minmax') . '.shm' }
     unlink $path;
 }
 
-# ---- single-thread semantics, method form, every int-value variant ----
 my @variants = (
     { class => 'Data::HashMap::Shared::SI',   key => 'k', key2 => 'z' },
     { class => 'Data::HashMap::Shared::SI32', key => 'k', key2 => 'z' },
@@ -59,12 +57,11 @@ for my $v (@variants) {
     unlink $path;
 }
 
-# ---- slow-path coverage: LRU- and TTL-enabled maps force the wrlock
-# find-or-insert path (the fast path is taken only when both are disabled) ----
+# LRU- or TTL-enabled maps force the wrlock find-or-insert path; the fast path
+# needs both off
 {
-    # LRU-enabled (max_size>0): exercises slow-path update (+ promote) and insert
     my $path = tmp();
-    my $m = Data::HashMap::Shared::SI->new($path, 1000, 16);  # max_size=16 -> LRU on
+    my $m = Data::HashMap::Shared::SI->new($path, 1000, 16);
     is($m->max("k", 5), 5, 'LRU map: max insert (slow path)');
     is($m->max("k", 9), 9, 'LRU map: max raise (slow-path update + promote)');
     is($m->max("k", 1), 9, 'LRU map: max no-op when >= desired');
@@ -73,22 +70,20 @@ for my $v (@variants) {
     unlink $path;
 }
 {
-    # LRU eviction triggered by a max-insert on a full map
     my $path = tmp();
-    my $m = Data::HashMap::Shared::SI->new($path, 1000, 3);  # max_size=3
+    my $m = Data::HashMap::Shared::SI->new($path, 1000, 3);
     $m->max("a", 1);
     $m->max("b", 2);
     $m->max("c", 3);
     is($m->size, 3, 'LRU map at capacity');
-    $m->max("d", 4);                        # insert -> must evict one
+    $m->max("d", 4);
     is($m->size, 3, 'max-insert on full LRU map evicts (size stays at max_size)');
     is($m->get("d"), 4, 'newly max-inserted key present after eviction');
     unlink $path;
 }
 {
-    # TTL-enabled (ttl>0): slow path sets the default TTL on insert
     my $path = tmp();
-    my $m = Data::HashMap::Shared::SI->new($path, 1000, 0, 100);  # ttl=100s
+    my $m = Data::HashMap::Shared::SI->new($path, 1000, 0, 100);
     is($m->max("k", 5), 5, 'TTL map: max insert (slow path)');
     my $rem = $m->ttl_remaining("k");
     ok(defined $rem && $rem > 0 && $rem <= 100,
@@ -97,24 +92,20 @@ for my $v (@variants) {
     unlink $path;
 }
 {
-    # TTL expiry: max/min on an expired key re-inserts `desired` rather than
-    # comparing against the stale value. Discriminating case: min with a
-    # desired GREATER than the stored value -- a live min would be a no-op (5),
-    # an expired-then-reinsert yields the desired (100).
+    # min with a desired greater than the stored value discriminates: a live min
+    # is a no-op (5), an expired key re-inserts the desired (100)
     my $path = tmp();
-    # Long default TTL: only the seeded entry expires, so the re-inserted value
-    # below cannot expire before the get() that checks it, however loaded the box.
+    # long default TTL: only the seeded entry expires, not the re-inserted one
     my $m = Data::HashMap::Shared::SI->new($path, 1000, 0, 60);
     $m->put_ttl("k", 5, 1);
     is($m->get("k"), 5, 'TTL map: value stored before expiry');
-    Time::HiRes::sleep(1.2);                                # let "k" expire (its own ttl=1s)
+    Time::HiRes::sleep(1.2);
     is($m->min("k", 100), 100,
         'min on expired key re-inserts desired (expired treated as absent)');
     is($m->get("k"), 100, '  ...stored value is the re-inserted desired');
     unlink $path;
 }
 
-# ---- concurrency: pure max converges to max(all desired) across processes ----
 {
     my $path = tmp();
     my $m = Data::HashMap::Shared::SI->new($path, 1000);
@@ -154,9 +145,6 @@ for my $v (@variants) {
     unlink $path;
 }
 
-# ---- concurrency: max interleaved with incr_by never clobbers either ----
-# Models the motivating case: a "snap to authoritative" (max) racing receiver
-# increments (incr_by) on the same hot key.
 {
     my $path = tmp();
     my $m = Data::HashMap::Shared::SI->new($path, 1000);
@@ -167,7 +155,7 @@ for my $v (@variants) {
     my $big      = 5_000_000;
     my @pids;
 
-    for (1 .. $n_incr) {            # increment workers
+    for (1 .. $n_incr) {
         my $pid = fork();
         die "fork: $!" unless defined $pid;
         if ($pid == 0) {
@@ -177,7 +165,7 @@ for my $v (@variants) {
         }
         push @pids, $pid;
     }
-    for my $w (1 .. 3) {            # max (snap) workers
+    for my $w (1 .. 3) {
         my $pid = fork();
         die "fork: $!" unless defined $pid;
         if ($pid == 0) {

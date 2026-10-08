@@ -5,13 +5,9 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SS;
 
-# Regression (0.18): the list-returning keywords (keys/values/items/each/
-# cursor_next) built their entersub with OPf_STACKED | OPf_WANT_LIST.
-# Perl_scalar() returns early on an op whose OPf_WANT bits are already set, so
-# the call ran in list context even in scalar context and its surplus return
-# values spilled into the enclosing expression -- silently adding arguments to
-# whatever call contained it.  A keyword must behave exactly like the method it
-# wraps; the reference in every case below is the method form.
+# A list-returning keyword must follow the caller's context: in scalar context
+# its surplus return values must not spill into the enclosing call.  The
+# reference in every case below is the method form.
 
 my $dir = tempdir(CLEANUP => 1);
 my $m = Data::HashMap::Shared::SS->new("$dir/ctx.hm", 1024);
@@ -39,7 +35,6 @@ is( lst("pre" . (shm_ss_keys $m)),
     is( $kw, $mm, 'keyword in scalar assignment matches the method' );
 }
 
-# List contexts must be untouched by the fix.
 {
     my @kw = sort(shm_ss_keys $m);
     my @mm = sort($m->keys);
@@ -48,7 +43,6 @@ is( lst("pre" . (shm_ss_keys $m)),
     is( $n, 2, 'count idiom still sees both keys' );
 }
 
-# The pair-returning keywords keep working in their idiomatic loop form.
 {
     my %seen;
     while (my ($k, $v) = shm_ss_each $m) { $seen{$k} = $v }
@@ -60,12 +54,9 @@ is( lst("pre" . (shm_ss_keys $m)),
     is_deeply( \%cseen, { b => "1", c => "2" }, 'cursor_next keyword loop yields all pairs' );
 }
 
-# The POD's keyword-syntax promises.
 {
     ok !eval q{ 0 and shm_ss_put($m, 'x', 'y'); 1 }, 'a multi-argument keyword refuses parentheses';
     like $@, qr/^Expected ','/, '  ... when the code is compiled';
-    # With one following item, the parenthesized 2-arg keyword takes it as the
-    # second argument and dies at run time (the POD's documented failure).
     ok !eval q{ my @r = (shm_ss_get($m, 'x'), 1); 1 },
         'a parenthesized keyword with a trailing item swallows it and dies at run time';
     like $@, qr/^Usage: Data::HashMap::Shared::SS::get\(/, '  ... with the method usage message';
@@ -76,8 +67,6 @@ is( lst("pre" . (shm_ss_keys $m)),
     }
     ok eval q{ shm_ss_size $m; 1 }, '  ... for the enclosing scope only' or diag $@;
 
-    # A last argument that opens with a parenthesis ends at its close: what
-    # follows applies to the keyword's result.
     my ($x, $y) = ('a', 'b');
     { no warnings 'void'; shm_ss_put $m, 'p', ($x) . $y; }
     is $m->get('p'), 'a', 'a last argument ($x) . $y passes only $x';

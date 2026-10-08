@@ -6,7 +6,7 @@ use Params::Get qw(get_params);
 use Readonly;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 Readonly my %TYPE_DEFAULTS => (
 	number  => 42,

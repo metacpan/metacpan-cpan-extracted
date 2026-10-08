@@ -10,7 +10,7 @@ my $have_gzip_faster = eval {
     1;
 };
 
-# 1. System gzip compatibility
+# System gzip compatibility
 SKIP: {
     my $system_gzip = `which gzip 2>/dev/null`;
     chomp $system_gzip if defined $system_gzip;
@@ -50,27 +50,24 @@ SKIP: {
     ok(1, "system gzip bidirectional roundtrip completed");
 }
 
-# 2. Gzip::Faster cross-compatibility
+# Gzip::Faster cross-compatibility
 SKIP: {
     skip "Gzip::Faster not installed in perl INC", 6 unless $have_gzip_faster;
 
     my $sample = "Cross-module testing Deflate::Faster vs Gzip::Faster: " x 25;
 
-    # gzip / gunzip
     my $gf_gz = Gzip::Faster::gzip($sample);
     is(gunzip($gf_gz), $sample, "Deflate::Faster gunzips Gzip::Faster gzip");
 
     my $df_gz = gzip($sample);
     is(Gzip::Faster::gunzip($df_gz), $sample, "Gzip::Faster gunzips Deflate::Faster gzip");
 
-    # deflate / inflate (zlib format)
     my $gf_zlib = Gzip::Faster::deflate($sample);
     is(inflate($gf_zlib), $sample, "Deflate::Faster inflates Gzip::Faster deflate");
 
     my $df_zlib = deflate($sample);
     is(Gzip::Faster::inflate($df_zlib), $sample, "Gzip::Faster inflates Deflate::Faster deflate");
 
-    # deflate_raw / inflate_raw (raw DEFLATE)
     my $gf_raw = Gzip::Faster::deflate_raw($sample);
     is(inflate_raw($gf_raw), $sample, "Deflate::Faster inflates raw from Gzip::Faster");
 
@@ -78,7 +75,7 @@ SKIP: {
     is(Gzip::Faster::inflate_raw($df_raw), $sample, "Gzip::Faster inflates raw from Deflate::Faster");
 }
 
-# 3. UTF-8 flag cross-compatibility with Gzip::Faster
+# UTF-8 flag cross-compatibility with Gzip::Faster
 SKIP: {
     skip "Gzip::Faster not installed in perl INC", 2 unless $have_gzip_faster;
 

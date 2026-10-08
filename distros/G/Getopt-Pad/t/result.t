@@ -55,7 +55,7 @@ subtest 'base methods' => sub {
 
 subtest 'reserved reader names come from the result class itself' => sub {
 	ok(Getopt::Pad::Result->reservesReader($_), "'$_' is reserved") foreach qw(help version command subcommand new can isa DOES META BUILDARGS helper DESTROY AUTOLOAD);
-	ok !Getopt::Pad::Result->reservesReader($_), "'$_' is free" foreach qw(owner workDir sourceUrl);
+	ok !Getopt::Pad::Result->reservesReader($_), "'$_' is free" foreach qw(owner workDir sourceUrl croak);
 };
 
 done_testing;

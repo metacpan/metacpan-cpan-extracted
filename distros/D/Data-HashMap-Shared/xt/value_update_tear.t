@@ -4,16 +4,13 @@ use Test::More;
 use File::Temp qw(tempdir);
 
 # A string's (off, len_field) pair must never be observable as the new offset
-# with the old length: the update path never touches states[idx], so the entry
-# stays live and recovery cannot detect it, and a later shm_str_free would take
-# the size class from the stale length and file the block on the wrong free
-# list -- after which that class hands out an undersized block and the next
-# value written overruns a neighbouring entry.
-#
-# Both stores go through an interim inline-empty state, which shm_str_free
-# treats as a no-op, so every observable pair is fully-old, fully-new, or safe.
-# Built at -O2 on purpose: the interim store is dead by ordinary dataflow and
-# survives only because it is an __atomic_store_n.
+# with the old length: the update path never touches states[idx], so recovery
+# cannot detect it, and a later shm_str_free would file the block on the wrong
+# free list, after which that class hands out an undersized block and a write
+# overruns a neighbouring entry. Both stores go through an interim inline-empty
+# state (a no-op for shm_str_free), so every observable pair is fully-old,
+# fully-new, or safe. Built at -O2 on purpose: the interim store is dead by
+# ordinary dataflow and survives only because it is an __atomic_store_n.
 
 plan skip_all => 'set CRASH_GDB=1 to run' unless $ENV{CRASH_GDB};
 my $gdb = `which gdb 2>/dev/null`; chomp $gdb;
@@ -85,9 +82,8 @@ my $out = `$^X -Iblib/lib -Iblib/arch -MData::HashMap::Shared::IS -e '
         ((defined \$c && \$c eq ("C" x 100)) ? 1 : 0);
 ' 2>&1`;
 
-# Post-fix the interim state is inline-empty (length 0).  Pre-fix the node kept
-# the stale 100-byte length while pointing at the new 32-byte block, so get()
-# reads 100 bytes out of a 32-byte allocation -- i.e. a neighbour's bytes.
+# The interim state is inline-empty (length 0); a stale 100-byte length over the
+# new 32-byte block would make get() read a neighbour's bytes.
 like $out, qr/target_len=0\b/, 'torn update left a self-consistent inline-empty value'
     or diag "after SIGKILL mid-update: $out";
 like $out, qr/canary_ok=1/, 'neighbouring entry intact'

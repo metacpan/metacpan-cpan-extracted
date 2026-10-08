@@ -1,10 +1,15 @@
 package SelectPdf::HtmlToPdfClient;
 
+use IO::File;
 use SelectPdf::ApiClient;
+use SelectPdf::ApiEnums;
 use SelectPdf::AsyncJobClient;
+use SelectPdf::DemoExceptions;
 use SelectPdf::WebElementsClient;
 use strict;
 our @ISA = qw(SelectPdf::ApiClient);
+
+our $VERSION = '1.6.0';
 
 =head1 NAME
 
@@ -22,7 +27,7 @@ Convert URL to PDF and save result into a file on disk.
     my $apiKey = "Your API key here";
 
     eval {
-        my $client = new HtmlToPdfClient($apiKey);
+        my $client = SelectPdf::HtmlToPdfClient->new($apiKey);
 
         $client
             ->setPageSize("A4")
@@ -48,7 +53,7 @@ Convert raw HTML string to PDF and save result into a file on disk.
     my $apiKey = "Your API key here";
 
     eval {
-        my $client = new HtmlToPdfClient($apiKey);
+        my $client = SelectPdf::HtmlToPdfClient->new($apiKey);
 
         $client
             ->setPageSize("A4")
@@ -64,6 +69,28 @@ Convert raw HTML string to PDF and save result into a file on disk.
         print "An error occurred: $@\n";  
     }
 
+Keyless demo mode (no API key; output is watermarked and capped at 5 pages).
+
+    use SelectPdf;
+
+    eval {
+        my $client = SelectPdf::HtmlToPdfClient->new(); # undef, "" or "demo" selects the demo endpoint
+
+        $client->convertUrlToFile("https://selectpdf.com/", "Test.pdf");
+
+        print "Demo response: " . $client->isDemoResponse() . ", mode: " . $client->getMode() . "\n";
+        print "Dropped fields: " . join(", ", $client->getDroppedFields()) . "\n" if $client->wasAnyFieldDropped();
+    };
+
+    if (my $err = $@) {
+        if (ref $err && $err->isa("SelectPdf::DemoRateLimitException")) {
+            print "Demo rate limit reached. Retry after " . $err->retryAfter() . "s.\n";
+        }
+        else {
+            print "An error occurred: $err\n";
+        }
+    }
+
 For more details and full list of parameters see L<Html To Pdf API|https://selectpdf.com/html-to-pdf-api/>.
 
 =head1 METHODS
@@ -74,21 +101,158 @@ Construct the Html To Pdf Client.
 
     my $client = SelectPdf::HtmlToPdfClient->new($apiKey);
 
+Pass a paid API key for production use. Pass undef, an empty string, or "demo" (case-insensitive) to use the
+keyless demo endpoint - output is watermarked and capped at 5 pages, but no signup is required.
+
+    my $demoClient = SelectPdf::HtmlToPdfClient->new(); # keyless demo mode
+
 Parameters:
 
-- $apiKey API Key.
+- $apiKey API Key. Undef, empty or "demo" selects the keyless demo endpoint.
 =cut
 sub new {
     my $type = shift;
+    my $apiKey = shift;
     my $self = $type->SUPER::new;
 
-    # API endpoint
-    $self->{apiEndpoint} = "https://selectpdf.com/api2/convert/";
+    # Names of the parameters the demo endpoint clamped / dropped on the most recent conversion.
+    $self->{clampedFields} = [];
+    $self->{droppedFields} = [];
 
-    $self->{parameters}{"key"} = shift;
+    my $demo = (not defined($apiKey) or $apiKey eq "" or $apiKey =~ m/^\s*demo\s*$/i);
+
+    if ($demo) {
+        # API endpoint (keyless demo)
+        $self->{apiEndpoint} = "https://selectpdf.com/api2/convert/demo/";
+        $self->{isDemoMode} = 1;
+        # Demo is keyless. The "key" parameter is not sent.
+    }
+    else {
+        # API endpoint
+        $self->{apiEndpoint} = "https://selectpdf.com/api2/convert/";
+        $self->{isDemoMode} = 0;
+        $self->{parameters}{"key"} = $apiKey;
+    }
 
     bless $self, $type;
     return $self;
+}
+
+# Capture demo-specific response headers (the demo-clamped fields list and the demo-dropped fields list).
+# Mode and execution mode are read in the base class.
+sub onResponseHeadersReceived {
+    my($self, $response) = @_;
+
+    $self->{clampedFields} = _splitFields($response->header("X-SelectPdf-Demo-Clamped"));
+    $self->{droppedFields} = _splitFields($response->header("X-SelectPdf-Demo-Dropped"));
+}
+
+sub _splitFields {
+    my($raw) = @_;
+    return [] if (not defined($raw) or $raw eq "");
+    my @parts = split(/,/, $raw, -1);
+    s/^\s+|\s+$//g foreach @parts;
+    return \@parts;
+}
+
+=head2 isDemoMode
+
+True if the client was constructed for the keyless demo endpoint (the API key was undef, empty, or "demo").
+Set at construction time and stable for the lifetime of the client. Calling setApiEndpoint does not change it.
+
+    if ($client->isDemoMode()) { ... }
+
+Returns:
+
+- 1 for demo mode, 0 otherwise.
+=cut
+sub isDemoMode {
+    my($self) = @_;
+    return $self->{isDemoMode} ? 1 : 0;
+}
+
+=head2 isDemoResponse
+
+True if the most recent response was tagged X-SelectPdf-Mode: demo (the request actually landed on a demo endpoint).
+
+    if ($client->isDemoResponse()) { ... }
+
+Returns:
+
+- 1 if the most recent response came from the demo endpoint, 0 otherwise.
+=cut
+sub isDemoResponse {
+    my($self) = @_;
+    my $mode = $self->getMode();
+    return (defined($mode) and lc($mode) eq "demo") ? 1 : 0;
+}
+
+=head2 getClampedFields
+
+Names of the parameters the demo endpoint clamped on the most recent conversion (e.g. "max_load_time", "engine").
+"Clamped" means the value was modified (capped, force-set), not discarded. Empty if nothing was clamped or for non-demo responses.
+
+    my @clamped = $client->getClampedFields();
+
+Returns:
+
+- List of parameter names (an array reference in scalar context).
+=cut
+sub getClampedFields {
+    my($self) = @_;
+    my @fields = @{ $self->{clampedFields} };
+    return wantarray ? @fields : \@fields;
+}
+
+=head2 wasClamped
+
+True if the most recent response had any clamped fields.
+
+Returns:
+
+- 1 or 0.
+=cut
+sub wasClamped {
+    my($self) = @_;
+    return scalar(@{ $self->{clampedFields} }) > 0 ? 1 : 0;
+}
+
+=head2 getDroppedFields
+
+Names of the parameters the demo endpoint silently dropped on the most recent conversion (e.g. "auth_username", "cookies").
+The demo endpoint refuses to honor a small set of fields for safety reasons - auth credentials, cookies, raw_parameters,
+pdf_name, async - and reports any caller-supplied value via the X-SelectPdf-Demo-Dropped response header.
+Empty if nothing was dropped or for non-demo responses. Clamped = value modified, dropped = value thrown away.
+
+    my @dropped = $client->getDroppedFields();
+
+Returns:
+
+- List of parameter names (an array reference in scalar context).
+=cut
+sub getDroppedFields {
+    my($self) = @_;
+    my @fields = @{ $self->{droppedFields} };
+    return wantarray ? @fields : \@fields;
+}
+
+=head2 wasAnyFieldDropped
+
+True if the most recent response reported any dropped fields.
+
+Returns:
+
+- 1 or 0.
+=cut
+sub wasAnyFieldDropped {
+    my($self) = @_;
+    return scalar(@{ $self->{droppedFields} }) > 0 ? 1 : 0;
+}
+
+# Async conversions are not available on the keyless demo endpoint.
+sub _requireNonDemoForAsync {
+    my($self) = @_;
+    die SelectPdf::DemoUnsupportedException->newLocal("async") if ($self->{isDemoMode});
 }
 
 =head2 convertUrl( $url )
@@ -117,7 +281,7 @@ sub convertUrl($) {
     return $self->SUPER::performPost();
 }
 
-=head2 convertUrl( $url, $filePath )
+=head2 convertUrlToFile( $url, $filePath )
 
 Convert the specified url to PDF and writes the resulted PDF to a local file.
 SelectPdf online API can convert http:// and https:// publicly available urls.
@@ -145,6 +309,7 @@ sub convertUrlToFile($;$) {
 
 Convert the specified url to PDF using an asynchronous call.
 SelectPdf online API can convert http:// and https:// publicly available urls.
+Not available in demo mode (dies with a SelectPdf::DemoUnsupportedException).
 
     $content = $client->convertUrlAsync($url);
 
@@ -158,6 +323,8 @@ Returns:
 =cut
 sub convertUrlAsync($) {
     my($self, $url) = @_;
+
+    $self->_requireNonDemoForAsync();
 
     $self->{parameters}{"url"} = $url;
     $self->{parameters}{"html"} = "";
@@ -196,6 +363,7 @@ sub convertUrlAsync($) {
 
 Convert the specified url to PDF using an asynchronous call and writes the resulted PDF to a local file.
 SelectPdf online API can convert http:// and https:// publicly available urls.
+Not available in demo mode (dies with a SelectPdf::DemoUnsupportedException).
 
     $client->convertUrlToFileAsync($url, $filePath);
 
@@ -232,7 +400,7 @@ Returns:
 
 - Byte array containing the resulted PDF.
 =cut
-sub convertHtmlStringWithBaseUrl($,$) {
+sub convertHtmlStringWithBaseUrl($$) {
     my($self, $htmlString, $baseUrl) = @_;
 
     $self->{parameters}{"url"} = "";
@@ -258,7 +426,7 @@ Parameters:
 - $filePath: Local file including path if necessary.
 
 =cut
-sub convertHtmlStringWithBaseUrlToFile($,$,$) {
+sub convertHtmlStringWithBaseUrlToFile($$$) {
     my($self, $htmlString, $baseUrl, $filePath) = @_;
 
     my $content = $self->convertHtmlStringWithBaseUrl($htmlString, $baseUrl);
@@ -272,6 +440,7 @@ sub convertHtmlStringWithBaseUrlToFile($,$,$) {
 =head2 convertHtmlStringWithBaseUrlAsync( $htmlString, $baseUrl )
 
 Convert the specified HTML string to PDF with an asynchronous call. Use a base url to resolve relative paths to resources.
+Not available in demo mode (dies with a SelectPdf::DemoUnsupportedException).
 
     $content = $client->convertHtmlStringWithBaseUrlAsync($htmlString, $baseUrl);
 
@@ -285,8 +454,10 @@ Returns:
 
 - Byte array containing the resulted PDF.
 =cut
-sub convertHtmlStringWithBaseUrlAsync($,$) {
+sub convertHtmlStringWithBaseUrlAsync($$) {
     my($self, $htmlString, $baseUrl) = @_;
+
+    $self->_requireNonDemoForAsync();
 
     $self->{parameters}{"url"} = "";
     $self->{parameters}{"async"} = "False";
@@ -325,6 +496,7 @@ sub convertHtmlStringWithBaseUrlAsync($,$) {
 =head2 convertHtmlStringWithBaseUrlToFileAsync( $htmlString, $baseUrl, $filePath )
 
 Convert the specified HTML string to PDF with an asynchronous call and writes the resulted PDF to a local file. Use a base url to resolve relative paths to resources.
+Not available in demo mode (dies with a SelectPdf::DemoUnsupportedException).
 
     $client->convertHtmlStringWithBaseUrlToFileAsync($htmlString, $baseUrl, $filePath);
 
@@ -337,7 +509,7 @@ Parameters:
 - $filePath: Local file including path if necessary.
 
 =cut
-sub convertHtmlStringWithBaseUrlToFileAsync($,$,$) {
+sub convertHtmlStringWithBaseUrlToFileAsync($$$) {
     my($self, $htmlString, $baseUrl, $filePath) = @_;
 
     my $content = $self->convertHtmlStringWithBaseUrlAsync($htmlString, $baseUrl);
@@ -381,7 +553,7 @@ Parameters:
 - $filePath: Local file including path if necessary.
 
 =cut
-sub convertHtmlStringToFile($,$) {
+sub convertHtmlStringToFile($$) {
     my($self, $htmlString, $filePath) = @_;
 
     $self->convertHtmlStringWithBaseUrlToFile($htmlString, "", $filePath);
@@ -390,6 +562,7 @@ sub convertHtmlStringToFile($,$) {
 =head2 convertHtmlStringAsync( $htmlString )
 
 Convert the specified HTML string to PDF with an asynchronous call.
+Not available in demo mode (dies with a SelectPdf::DemoUnsupportedException).
 
     $content = $client->convertHtmlStringAsync($htmlString);
 
@@ -410,6 +583,7 @@ sub convertHtmlStringAsync($) {
 =head2 convertHtmlStringToFileAsync( $htmlString, $filePath )
 
 Convert the specified HTML string to PDF with an asynchronous call and writes the resulted PDF to a local file.
+Not available in demo mode (dies with a SelectPdf::DemoUnsupportedException).
 
     $client->convertHtmlStringToFileAsync($htmlString, $filePath);
 
@@ -420,7 +594,7 @@ Parameters:
 - $filePath: Local file including path if necessary.
 
 =cut
-sub convertHtmlStringToFileAsync($,$) {
+sub convertHtmlStringToFileAsync($$) {
     my($self, $htmlString, $filePath) = @_;
 
     $self->convertHtmlStringWithBaseUrlToFileAsync($htmlString, "", $filePath);
@@ -631,7 +805,7 @@ Set the rendering engine used for the HTML to PDF conversion. Default value is W
 
 Parameters:
 
-- $renderingEngine: HTML rendering engine. Possible values: WebKit, Restricted, Blink.
+- $renderingEngine: HTML rendering engine. Possible values: WebKit, Restricted, Blink, Chromium (see SelectPdf::RenderingEngine constants).
 
 Returns:
 
@@ -640,17 +814,91 @@ Returns:
 sub setRenderingEngine($) {
     my($self, $renderingEngine) = @_;
 
-    if ($renderingEngine !~ m/^(WebKit|Restricted|Blink)$/i) {
-        die ("Allowed values for Rendering Engine: WebKit, Restricted, Blink.");
+    if ($renderingEngine !~ m/^(WebKit|Restricted|Blink|Chromium)$/i) {
+        die ("Allowed values for Rendering Engine: WebKit, Restricted, Blink, Chromium.");
     }
 
     $self->{parameters}{"engine"} = $renderingEngine;
     return $self;
 }
 
+=head2 setTagged( $tagged )
+
+Produce a tagged, accessible PDF: a logical structure tree covering headings, paragraphs, lists, tables,
+figures with alternate text, links and reading order. Default is False.
+
+Requires the Blink or Chromium rendering engine - the WebKit engines cannot produce a structure tree.
+If no engine is set, the API promotes the request to Chromium and reports it in the X-SelectPdf-Engine response header.
+Setting an explicit WebKit engine together with tagged output is rejected by the API.
+
+A tagged document also needs a title, so set setDocTitle - the converter falls back to the HTML document title when it is not set.
+
+Parameters:
+
+- $tagged: Produce a tagged, accessible PDF.
+
+Returns:
+
+- Reference to the current object.
+=cut
+sub setTagged($) {
+    my($self, $tagged) = @_;
+
+    $self->{parameters}{"tagged"} = $self->SUPER::serializeBoolean($tagged);
+    return $self;
+}
+
+=head2 setPdfStandard( $pdfStandard )
+
+Set the PDF conformance target - PDF/A for archiving, PDF/X for graphics exchange, PDF/SiqQ for digital signatures. Default is Full.
+
+PdfA3A is the accessible level of PDF/A-3: it implies a tagged document, so it carries the same rendering-engine requirement as setTagged.
+
+Parameters:
+
+- $pdfStandard: PDF conformance target. Possible values: Full, PdfA, PdfA2B, PdfA3A, PdfA3B, PdfA3U, PdfX, PdfSiqQ_A, PdfSiqQ_B (see SelectPdf::PdfStandard constants).
+
+Returns:
+
+- Reference to the current object.
+=cut
+sub setPdfStandard($) {
+    my($self, $pdfStandard) = @_;
+
+    if (not defined($pdfStandard) or $pdfStandard !~ m/^(Full|PdfA|PdfA2B|PdfA3A|PdfA3B|PdfA3U|PdfX|PdfSiqQ_A|PdfSiqQ_B)$/i) {
+        die ("Allowed values for Pdf Standard: Full, PdfA, PdfA2B, PdfA3A, PdfA3B, PdfA3U, PdfX, PdfSiqQ_A, PdfSiqQ_B.");
+    }
+
+    $self->{parameters}{"pdf_standard"} = $pdfStandard;
+    return $self;
+}
+
+=head2 setDocumentLanguage( $documentLanguage )
+
+Set the natural language of the document, for example "en-US" or "de-DE".
+Written as the PDF /Lang entry and onto tagged structure elements. Default is "en-US".
+
+Parameters:
+
+- $documentLanguage: Language tag, for example "en-US".
+
+Returns:
+
+- Reference to the current object.
+=cut
+sub setDocumentLanguage($) {
+    my($self, $documentLanguage) = @_;
+
+    $self->{parameters}{"doc_language"} = $documentLanguage;
+    return $self;
+}
+
 =head2 setUserPassword( $userPassword )
 
 Set PDF user password.
+
+Not available in demo mode: if the client was constructed for the keyless demo endpoint,
+this method dies with a SelectPdf::DemoUnsupportedException.
 
 Parameters:
 
@@ -663,6 +911,10 @@ Returns:
 sub setUserPassword($) {
     my($self, $userPassword) = @_;
 
+    if ($self->{isDemoMode} and defined($userPassword) and $userPassword ne "") {
+        die SelectPdf::DemoUnsupportedException->newLocal("user_password");
+    }
+
     $self->{parameters}{"user_password"} = $userPassword;
     return $self;
 }
@@ -670,6 +922,9 @@ sub setUserPassword($) {
 =head2 setOwnerPassword( $ownerPassword )
 
 Set PDF owner password.
+
+Not available in demo mode: if the client was constructed for the keyless demo endpoint,
+this method dies with a SelectPdf::DemoUnsupportedException.
 
 Parameters:
 
@@ -681,6 +936,10 @@ Returns:
 =cut
 sub setOwnerPassword($) {
     my($self, $ownerPassword) = @_;
+
+    if ($self->{isDemoMode} and defined($ownerPassword) and $ownerPassword ne "") {
+        die SelectPdf::DemoUnsupportedException->newLocal("owner_password");
+    }
 
     $self->{parameters}{"owner_password"} = $ownerPassword;
     return $self;
@@ -722,6 +981,29 @@ sub setWebPageHeight($) {
     my($self, $webPageHeight) = @_;
 
     $self->{parameters}{"web_page_height"} = $webPageHeight;
+    return $self;
+}
+
+=head2 setWebPageFixedSize( $webPageFixedSize )
+
+Leave out the content below the web page height (set with setWebPageHeight) instead of letting the page flow onto further pages.
+
+When not set, each rendering engine keeps its own behavior: WebKit and WebKit Restricted leave the content out whenever a web page height is set,
+Blink and Chromium convert the whole page. Set it to True or False to choose explicitly. It needs a non-zero web page height; with 0 there is no
+height to fix the page at and the setting is ignored. With WebKit, a fixed size also cuts off content wider than the web page width.
+
+Parameters:
+
+- $webPageFixedSize: True to cut the page at the web page height, False to convert the whole page.
+
+Returns:
+
+- Reference to the current object.
+=cut
+sub setWebPageFixedSize($) {
+    my($self, $webPageFixedSize) = @_;
+
+    $self->{parameters}{"web_page_fixed_size"} = $self->SUPER::serializeBoolean($webPageFixedSize);
     return $self;
 }
 
@@ -2039,6 +2321,48 @@ sub setCookies($) {
     return $self;
 }
 
+=head2 setAuthUsername( $authUsername )
+
+Set the user name for HTTP Basic authentication on the web page being converted.
+
+Use it together with setAuthPassword. The demo endpoint does not send credentials; it reports the value in getDroppedFields.
+
+Parameters:
+
+- $authUsername: User name for HTTP Basic authentication.
+
+Returns:
+
+- Reference to the current object.
+=cut
+sub setAuthUsername($) {
+    my($self, $authUsername) = @_;
+
+    $self->{parameters}{"auth_username"} = $authUsername;
+    return $self;
+}
+
+=head2 setAuthPassword( $authPassword )
+
+Set the password for HTTP Basic authentication on the web page being converted.
+
+Use it together with setAuthUsername. The demo endpoint does not send credentials; it reports the value in getDroppedFields.
+
+Parameters:
+
+- $authPassword: Password for HTTP Basic authentication.
+
+Returns:
+
+- Reference to the current object.
+=cut
+sub setAuthPassword($) {
+    my($self, $authPassword) = @_;
+
+    $self->{parameters}{"auth_password"} = $authPassword;
+    return $self;
+}
+
 =head2 setCustomParameter( $parameterName, $parameterValue )
 
 Set a custom parameter. Do not use this method unless advised by SelectPdf.
@@ -2053,7 +2377,7 @@ Returns:
 
 - Reference to the current object.
 =cut
-sub setCustomParameter($,$) {
+sub setCustomParameter($$) {
     my($self, $parameterName, $parameterValue) = @_;
 
     $self->{parameters}{$parameterName} = $parameterValue;
@@ -2070,6 +2394,7 @@ Returns:
 =cut
 sub getWebElements {
     my($self) = @_;
+    die SelectPdf::DemoUnsupportedException->newLocal("pdf_web_elements_selectors") if ($self->{isDemoMode});
 
     my $webElementsClient = SelectPdf::WebElementsClient->new($self->{parameters}{"key"}, $self->{jobId});
     $webElementsClient->setApiEndpoint($self->{apiWebElementsEndpoint});

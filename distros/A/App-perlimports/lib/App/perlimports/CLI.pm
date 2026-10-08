@@ -3,7 +3,7 @@ package App::perlimports::CLI;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000066';
+our $VERSION = '0.000067';
 
 use App::perlimports           ();
 use App::perlimports::Config   ();
@@ -612,7 +612,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000066
+version 0.000067
 
 =head1 DESCRIPTION
 

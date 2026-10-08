@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package App::FuguSeed;
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 use v5.34;
 use warnings;
@@ -31,8 +31,8 @@ no feature qw(indirect multidimensional bareword_filehandles);
 # and indexes the distribution through it. The .pod sidecar maps the
 # modules below it.
 #
-# scripts/pack packs no part of this module: the packed fuguseed-qr
-# file holds the six modules that the program loads, and no other
-# module (QR-PACK-2).
+# scripts/pack packs no part of this module: each packed file holds
+# the modules that its program loads, and no other module (QR-PACK-2,
+# QR-PACK-4, LAST-PACK-1).
 
 1;

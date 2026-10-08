@@ -5,13 +5,34 @@ use warnings;
 use File::Spec;
 use File::Temp;
 use Shell::Guess;
-use Shell::Config::Generate qw( cmd_escape_path powershell_escape_path );
+use Shell::Config::Generate qw( cmd_escape_path );
 use Test2::API qw( context );
 use Env qw( @PATH );
 use TestPath;
 use base qw( Exporter );
 
 our @EXPORT = qw( find_shell tempdir get_env bad_fish );
+
+# quote a word for the shell used by backticks / system
+# (cmd.exe on MSWin32, /bin/sh elsewhere)
+sub _q
+{
+  my $word = shift;
+  if($^O eq 'MSWin32')
+  {
+    return $word =~ /[\s&^|<>()]/ ? qq{"$word"} : $word;
+  }
+  $word =~ s/'/'"'"'/g;
+  "'$word'";
+}
+
+# quote a word for use inside a PowerShell script
+sub _q_ps
+{
+  my $word = shift;
+  $word =~ s/'/''/g;
+  "'$word'";
+}
 
 sub shell_is_okay
 {
@@ -33,7 +54,8 @@ sub shell_is_okay
   if($shell =~ /^powershell.exe$/ && -e $full_path)
   {
     return 0 if $ENV{ACTIVESTATE_PPM_BUILD};
-    `$full_path -ExecutionPolicy RemoteSigned -InputFormat none -NoProfile -File corpus\\true.ps1`;
+    my $ps1 = $^O eq 'MSWin32' ? 'corpus\\true.ps1' : 'corpus/true.ps1';
+    `@{[ _q($full_path) ]} -ExecutionPolicy RemoteSigned -InputFormat none -NoProfile -File @{[ _q($ps1) ]}`;
     return $? == 0;
   }
 
@@ -57,7 +79,6 @@ sub find_shell
 }
 
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
-$dir = Win32::GetShortPathName($dir) if $^O eq 'MSWin32';
 
 do {
   my $fn = File::Spec->catfile($dir, 'dump.pl');
@@ -136,15 +157,23 @@ sub get_env
     }
     else
     {
-      my $perl_exe = $^X;
-      $perl_exe = Cygwin::posix_to_win_path($perl_exe)
+      my @cmd = ($^X, File::Spec->catfile($dir, 'dump.pl'));
+      @cmd = map { Cygwin::posix_to_win_path($_) } @cmd
         if $^O =~ /^(cygwin|msys)$/ && $fn =~ /\.(bat|cmd|ps1)$/;
-      ($perl_exe) = cmd_escape_path($perl_exe)
-        if $^O =~ /^(MSWin32|cygwin|msys)$/ && $fn =~ /\.(bat|cmd)$/;;
-      ($perl_exe) = powershell_escape_path($perl_exe)
-        if $^O =~ /^(MSWin32|cygwin|msys)$/ && $fn =~ /\.ps1$/;;
-      print $fh "$perl_exe ", File::Spec->catfile($dir, 'dump.pl'), "\n";
-      close $fn;
+      if($fn =~ /\.(bat|cmd)$/)
+      {
+        @cmd = map { cmd_escape_path($_) } @cmd;
+      }
+      elsif($fn =~ /\.ps1$/)
+      {
+        @cmd = ('&', map { _q_ps($_) } @cmd);
+      }
+      else
+      {
+        # bourne, csh and fish all understand single quotes
+        @cmd = map { s/'/'"'"'/g; "'$_'" } @cmd;
+      }
+      print $fh "@cmd\n";
     }
     print $fh "exit\n" if $shell->is_power;
   };
@@ -157,11 +186,11 @@ sub get_env
   {
     if($shell->is_c)
     {
-      $output = `$shell_path -f $fn`;
+      $output = `@{[ _q($shell_path) ]} -f @{[ _q($fn) ]}`;
     }
     else
     {
-      $output = `$shell_path $fn`;
+      $output = `@{[ _q($shell_path) ]} @{[ _q($fn) ]}`;
     }
   }
   elsif($shell->is_power && $^O =~ /^(cygwin|MSWin32|msys)$/)
@@ -169,11 +198,11 @@ sub get_env
     my $fn2 = $fn;
     $fn2 = Cygwin::posix_to_win_path($fn) if $^O =~ /^(cygwin|msys)$/;
     $fn2 =~ s{\\}{/}g;
-    $output = `$shell_path -ExecutionPolicy RemoteSigned -InputFormat none -NoProfile -File $fn2`;
+    $output = `@{[ _q($shell_path) ]} -ExecutionPolicy RemoteSigned -InputFormat none -NoProfile -File @{[ _q($fn2) ]}`;
   }
   else
   {
-    $output = `$fn`;
+    $output = `@{[ _q($fn) ]}`;
   }
 
   my $fail = $?;

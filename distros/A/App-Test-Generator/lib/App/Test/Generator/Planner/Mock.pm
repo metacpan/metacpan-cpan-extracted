@@ -15,11 +15,11 @@ use Readonly;
 Readonly my $MOCK_SYSTEM     => 'mock_system';
 Readonly my $MOCK_CAPTURE_IO => 'capture_io';
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =head1 DESCRIPTION
 
@@ -125,6 +125,7 @@ sub plan {
 	my %mock_plan;
 
 	for my $method (keys %{$schema}) {
+		next unless ref($schema->{$method}) eq 'HASH';
 		# Extract side effect analysis if present —
 		# default to empty hashref if not available
 		my $effects = $schema->{$method}{_analysis}{side_effects} || {};

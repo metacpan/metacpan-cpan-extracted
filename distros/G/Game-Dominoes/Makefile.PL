@@ -32,6 +32,16 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'Object::Proto::Sugar' => '0.05',
     },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Term::ReadKey' => '0',
+                },
+            },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Game-Dominoes-*' },
 );

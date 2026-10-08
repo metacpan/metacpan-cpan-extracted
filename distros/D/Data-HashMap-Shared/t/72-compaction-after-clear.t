@@ -5,15 +5,13 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SS;
 
-# A slide that recovers nothing makes the map wait longer before the next one,
-# so an arena that is simply full does not rescan its table on every refusal.
-# That wait describes the contents, and clear() replaces them: carried across,
-# a wait run up on a full map suppresses the one slide the refilled map needs.
+# A slide that recovers nothing makes the map wait longer before the next one;
+# that wait describes the contents, and clear() replaces them, so it must not
+# carry across.
 
 my $dir = tempdir(CLEANUP => 1);
 my $m = Data::HashMap::Shared::SS->new("$dir/c.shm", 8192, 0, 0, 0, 65536);
 
-# Run the wait up: fill the arena with live 32-byte blocks, then keep asking.
 my $i = 0;
 $i++ while $m->put(sprintf('k%05d', $i), 'x' x 20);
 my $refused = 0;

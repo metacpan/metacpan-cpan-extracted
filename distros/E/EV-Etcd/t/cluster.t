@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -72,6 +73,9 @@ SKIP: {
 # drop the gRPC connection on member_remove/update with an invalid id
 our $added_member_id;
 our $cluster_client = $client;
+SKIP: {
+skip 'adds a cluster member: set EV_ETCD_TEST_ETCD=1 for an etcd that exists for testing', 3
+    unless $ENV{EV_ETCD_TEST_ETCD};
 # Never bound, as the learner never starts; per-run to avoid leftover members
 my $peer_url = sprintf 'http://127.0.0.1:%d', 20000 + $$ % 10000;
 $client->member_add([$peer_url], { is_learner => 1 }, sub {
@@ -90,6 +94,7 @@ $client->member_add([$peer_url], { is_learner => 1 }, sub {
 });
 my $t1b = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
+}
 
 # Promotion requires a caught-up learner, and this one never runs
 SKIP: {

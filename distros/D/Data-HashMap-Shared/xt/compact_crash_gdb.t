@@ -4,15 +4,13 @@ use Test::More;
 use File::Temp qw(tempdir);
 
 # Compaction moves a live arena block and then rewrites the node offset that
-# points at it.  Between those two the node still names the source, so the whole
-# design rests on one rule: relocate only when the destination lies entirely
-# below the source, and the copy can never touch the bytes the node is still
-# reading.  Killing a compacting writer at random cannot test that -- the window
-# between the copy and the store is nanoseconds wide -- so stop exactly there
-# with a breakpoint and kill it, once for each of the first relocations.
-#
-# Break after the memcpy and before the store: at -O2 neither can move across
-# the other, because both write memory the compiler cannot prove disjoint.
+# points at it; until then the node still names the source, so the design rests
+# on one rule: relocate only when the destination lies entirely below the
+# source.  A random kill cannot test that (the copy-to-store window is
+# nanoseconds wide), so gdb stops exactly there and kills it, once for each of
+# the first relocations.  The breakpoint sits after the memcpy and before the
+# store: at -O2 neither can move across the other, because both write memory the
+# compiler cannot prove disjoint.
 
 plan skip_all => 'set CRASH_GDB=1 to run' unless $ENV{CRASH_GDB};
 my $gdb = `which gdb 2>/dev/null`; chomp $gdb;
@@ -45,12 +43,11 @@ is $?, 0, '-O2 -g build succeeded' or BAIL_OUT("build failed:\n$build");
 
 my $dir = tempdir(CLEANUP => 1);
 
-# The fixture has to force the case the rule exists for: a hole smaller than the
+# The fixture must force the case the rule exists for: a hole smaller than the
 # block above it, so the destination would overlap the source.  Alternating
-# like-sized entries does not -- every gap is then wider than the block that
-# follows, the rule never bites, and a build without it behaves identically.
-# A 32-byte hole under a 1024-byte block does.  Values are position-sensitive,
-# so a copy that slid over itself cannot read back as the original.
+# like-sized entries never does, and a build without the rule would pass.  A
+# 32-byte hole under a 1024-byte block does; values are position-sensitive, so a
+# copy that slid over itself cannot read back as the original.
 my $victim = "$dir/victim.pl";
 open my $v, '>', $victim or die $!;
 print $v <<'VEOF';

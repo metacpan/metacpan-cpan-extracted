@@ -22,7 +22,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,6 +37,12 @@ optional_features:
     description: 'Coverage-guided corpus pruning in CoverageGuidedFuzzer'
     recommends:
       Devel::Cover: '1.51'
+  type_params_extraction:
+    description: 'Accurate schema extraction from Type::Params signatures in SchemaExtractor'
+    recommends:
+      BSD::Resource: '0'
+      Type::Params: '0'
+      Types::Common: '0'
 requires:
   Carp: '0'
   Config::Abstraction: '0.36'
@@ -55,6 +61,7 @@ requires:
   File::Temp: '0'
   Getopt::Long: '0'
   HTML::Entities: '0'
+  HTTP::Tiny: '0'
   IPC::Open3: '0'
   IPC::Run3: '0'
   JSON::MaybeXS: '0'
@@ -69,7 +76,9 @@ requires:
   Return::Set: '0.03'
   Safe: '0'
   Template: '0'
+  Test::Exception: '0'
   Text::Balanced: '0'
+  Time::HiRes: '0'
   URI: '0'
   UUID::Tiny: '0'
   Unicode::GCString: '0'
@@ -81,5 +90,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.46'
+version: '0.47'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

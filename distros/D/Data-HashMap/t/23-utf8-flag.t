@@ -193,4 +193,25 @@ use Data::HashMap::SA;
     ok utf8::is_utf8($k), 'a key that needs UTF-8 comes back flagged';
 }
 
+{
+    require Tie::Hash;
+    for my $v (qw(SS SA SI SI16 SI32)) {
+        my $class = "Data::HashMap::$v";
+        for my $key ("", "ascii", "caf\xe9", "nul\0\xe9", "wide\x{263a}") {
+            my $up = $key;
+            utf8::upgrade($up);
+            tie my %h, 'Tie::StdHash';
+            $h{$up} = 12;
+            my $m = $class->new;
+            $m->from_hash(\%h);
+            is($m->get($key), 12, "$v tied from_hash: original key finds value");
+            is($m->get($up), 12, "$v tied from_hash: upgraded key finds value");
+            $m->put($key, 23);
+            is($m->size, 1, "$v tied from_hash: put updates the same entry");
+            ok($m->remove($up), "$v tied from_hash: remove finds the entry");
+            is($m->size, 0, "$v tied from_hash: no unreachable entry remains");
+        }
+    }
+}
+
 done_testing;

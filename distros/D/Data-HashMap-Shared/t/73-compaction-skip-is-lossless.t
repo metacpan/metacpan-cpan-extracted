@@ -12,9 +12,9 @@ use Data::HashMap::Shared::SS;
 my $dir = tempdir(CLEANUP => 1);
 my $m = Data::HashMap::Shared::SS->new("$dir/l.shm", 8192, 0, 0, 0, 65536);
 
-# A full arena of 32-byte blocks with ten holes scattered through it.  The fill
-# ends on a refused store; compact() while the arena is still dense disarms it,
-# so the first slide attempted is the one the big store below asks for.
+# A full arena of 32-byte blocks with ten holes.  The fill ends on a refused
+# store, which arms a slide; compact() while the arena is still dense disarms
+# it, so the first slide is the big store's.
 my $n = 0;
 $n++ while $m->put(sprintf('k%05d', $n), 'x' x 20);
 is $m->compact, 0, 'a dense arena gives a slide nothing to gather';

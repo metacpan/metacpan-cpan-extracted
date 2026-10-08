@@ -5,11 +5,14 @@ use Getopt::Pad::Type;
 use Getopt::Pad::Result;
 
 class Getopt::Pad::Spec::Arg :strict(params) {
-	use Getopt::Pad::Util qw(camelize specError isValidName);
+	use Getopt::Pad::Util qw(camelize specError isValidName processedWith);
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
-	field $raw :param;
+	field $raw   :param;
+	# Where the arg sits in the spec, as the start of a spec error, e.g.
+	# "command 'image resize': ".
+	field $where :param = '';
 
 	field $short    :reader;
 	field $reader   :reader;
@@ -19,32 +22,39 @@ class Getopt::Pad::Spec::Arg :strict(params) {
 	field $multiple :reader = 0;
 	field $help     :reader = '';
 	field $typehint :reader;
+	field $processValue :reader;
 
 	ADJUST {
-		specError("arg: spec must be a hash reference") if ref $raw ne 'HASH';
+		specError("%sarg: spec must be a hash reference", $where) if ref $raw ne 'HASH';
 
 		my %spec = $raw->%*;
 		$short   = delete $spec{short};
-		specError("arg: missing or invalid 'short' name") if !isValidName($short);
+		specError("%sarg: missing or invalid 'short' name", $where) if !isValidName($short);
 		$reader = camelize($short);
-		specError("arg '%s': reader '%s' collides with a built-in result method", $short, $reader) if Getopt::Pad::Result->reservesReader($reader);
+		specError("%sarg '%s': reader '%s' collides with a built-in result method", $where, $short, $reader) if Getopt::Pad::Result->reservesReader($reader);
 
-		($type, $typeName) = Getopt::Pad::Type::takeFromSpec(\%spec, 'string', sprintf("arg '%s'", $short));
-		specError("arg '%s': type '%s' cannot be used for a positional arg", $short, $typeName) if !$type->takesValue;
+		($type, $typeName) = Getopt::Pad::Type::takeFromSpec(\%spec, 'string', sprintf("%sarg '%s'", $where, $short));
+		specError("%sarg '%s': type '%s' cannot be used for a positional arg", $where, $short, $typeName) if !$type->takesValue;
 
 		$required = delete $spec{required} ? 1 : 0;
 		$multiple = delete $spec{multiple} ? 1 : 0;
 		$help     = delete $spec{help} // '';
 		$typehint = delete $spec{typehint};
+		$processValue = delete $spec{processValue};
 
-		specError("arg '%s': unknown key(s): %s", $short, join(', ', sort keys %spec)) if %spec;
-		specError("arg '%s': typehint must be a non-empty string", $short) if defined $typehint && (ref $typehint || $typehint eq '');
+		specError("%sarg '%s': unknown key(s): %s", $where, $short, join(', ', sort keys %spec)) if %spec;
+		specError("%sarg '%s': typehint must be a non-empty string", $where, $short) if defined $typehint && (ref $typehint || $typehint eq '');
+		specError("%sarg '%s': processValue must be a code reference", $where, $short) if defined $processValue && ref $processValue ne 'CODE';
 	}
 
 	# The tag the help output renders after the help text: the spec's
 	# typehint, or what the type calls itself.
 	method typeLabel() {
 		return $typehint // $type->label;
+	}
+
+	method processedValue($result, $value) {
+		return processedWith($processValue, $result, $value);
 	}
 }
 
@@ -67,8 +77,11 @@ this page is for people working on Getopt::Pad itself.
 An arg spec holds the checked settings of one positional arg: its
 C<short> name, the reader name derived from it, the type (a
 L<Getopt::Pad::Type> instance that must take a value) and the keys
-C<required>, C<multiple>, C<help> and C<typehint>. The meaning of each key
-is documented in L<Getopt::Pad/ARG SPECS>. Unknown keys are a spec error.
+C<required>, C<multiple>, C<help>, C<typehint> and C<processValue>. The
+meaning of each key is documented in L<Getopt::Pad/ARG SPECS>. Unknown
+keys are a spec error. Spec errors start with the optional C<where>
+constructor param, which the declaring L<Getopt::Pad::Spec::Level> sets
+to its command path (C<command 'image resize': >).
 
 The order rules between args (a required arg after an optional one, and
 C<multiple> on the last arg only) are checked by
@@ -78,9 +91,16 @@ L<Getopt::Pad::Parser> when it consumes the positional words.
 =head1 METHODS
 
 The readers C<short>, C<reader>, C<type>, C<typeName>, C<required>,
-C<multiple>, C<help> and C<typehint>, and:
+C<multiple>, C<help>, C<typehint> and C<processValue>, and:
 
 =over 4
+
+=item processedValue($result, $value)
+
+The reader value with every single value in it replaced by what the
+C<processValue> coderef returns when called with C<$result> and the
+value. An arg that was not given (C<undef>) is left alone. Without
+C<processValue> the value is returned as it is.
 
 =item typeLabel
 

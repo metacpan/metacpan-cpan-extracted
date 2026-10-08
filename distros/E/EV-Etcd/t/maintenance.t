@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -29,7 +30,10 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 21;
+# Compaction cannot be undone and defragmentation stalls the member: only on
+# an etcd that exists for testing
+my $disposable = $ENV{EV_ETCD_TEST_ETCD};
+plan tests => $disposable ? 21 : 15;
 
 my $etcd = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -37,7 +41,8 @@ my $etcd = EV::Etcd->new(
 ok($etcd, "created client");
 
 my $done = 0;
-my $expected = 9;  # status + alarm + hash_kv + auth_status + put + compact + hash_kv(rev) + delete + defragment
+# status + alarm + hash_kv + auth_status [+ put + compact + hash_kv(rev) + delete + defragment]
+my $expected = $disposable ? 9 : 4;
 
 $etcd->status(sub {
     my ($result, $err) = @_;
@@ -79,7 +84,7 @@ $etcd->auth_status(sub {
 # Chained off the put callback so the plan holds whatever the put's round trip
 my $compact_prefix = "/test-compact-$$-" . time();
 
-$etcd->put("$compact_prefix/key1", "value1", sub {
+$disposable and $etcd->put("$compact_prefix/key1", "value1", sub {
     my ($result, $err) = @_;
     ok(!$err, "compact prep: put succeeded");
     $done++;
@@ -109,7 +114,7 @@ $etcd->put("$compact_prefix/key1", "value1", sub {
 });
 
 # Some etcd versions omit the header here
-$etcd->defragment(sub {
+$disposable and $etcd->defragment(sub {
     my ($result, $err) = @_;
     ok(!$err, "defragment: no error");
     diag("Defragment completed" . ($result->{header} ? " (has header)" : " (no header)"));

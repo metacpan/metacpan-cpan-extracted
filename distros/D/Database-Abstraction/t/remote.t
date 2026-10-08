@@ -9,6 +9,7 @@ use warnings;
 
 use File::Spec;
 use Test::Most;
+use Test::Returns;
 
 use Test::Needs 'File::Slurp::Remote';
 
@@ -80,7 +81,7 @@ is(ref($row), 'HASH',   'fetchrow_hashref returns hashref');
 is($row->{'name'}, 'Bob', 'fetchrow_hashref name correct');
 
 my $missing = $dao->fetchrow_hashref(entry => 'nosuch');
-ok(!defined($missing), 'fetchrow_hashref returns undef for missing key');
+returns_is($missing, { type => 'void' }, 'fetchrow_hashref returns undef for missing key');
 
 # count
 is($dao->count(), 3,         'count() returns 3');
@@ -112,7 +113,7 @@ is($q_count, 1, 'query()->where()->count() returns 1');
 
 # type is set to DBI (CSV goes via DBI::CSV, not slurp for larger files;
 # for tiny fixtures it may slurp — just verify the object works)
-ok(defined($dao->{'type'}), 'type is set after first data access');
+returns_is($dao->{'type'}, { type => 'string', min => 1 }, 'type is set after first data access');
 
 # ---------------------------------------------------------------------------
 # Section 2: no_entry CSV remote backend
@@ -129,7 +130,7 @@ my $ne_all = $ne->selectall_arrayref();
 is(scalar @{$ne_all}, 2, 'no_entry remote CSV: 2 rows');
 
 my ($london) = grep { $_->{'city'} eq 'London' } @{$ne_all};
-ok(defined $london, 'London row found');
+returns_is($london, { type => 'hashref' }, 'London row found');
 is($london->{'pop'}, 9000000, 'London pop correct');
 
 # ---------------------------------------------------------------------------

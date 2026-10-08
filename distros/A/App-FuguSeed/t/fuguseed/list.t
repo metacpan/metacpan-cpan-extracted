@@ -85,13 +85,14 @@ like( $@, qr/Too few arguments/, 'word dies on a call with no argument' );
 eval { $class->index };
 like( $@, qr/Too few arguments/, 'index dies on a call with no argument' );
 
-# LIST-MODULE-2: scripts/pack embeds the module in fuguseed-qr, so
-# the module loads no module from outside this repository but the
-# core of perl 5.34. Digest::SHA, the one module that this test adds,
-# is core as well. The child gets no PERL5LIB and no PERL5OPT of this
-# environment. PERL5OPT loads a module through -M, and that module
-# writes a false %INC entry. PERL5LIB writes no entry: it adds a
-# directory to @INC, so a module can come from outside this checkout.
+# LIST-MODULE-2: scripts/pack embeds the module in fuguseed-last and
+# fuguseed-qr, so the module loads no module from outside this
+# repository but the core of perl 5.34. Digest::SHA, the one module
+# that this test adds, is core as well. The child gets no PERL5LIB and
+# no PERL5OPT of this environment. PERL5OPT loads a module through -M,
+# and that module writes a false %INC entry. PERL5LIB writes no entry:
+# it adds a directory to @INC, so a module can come from outside this
+# checkout.
 delete local @ENV{qw(PERL5LIB PERL5OPT)};
 
 open my $ph, '-|', $^X, '-Ilib', "-M$class", '-e',

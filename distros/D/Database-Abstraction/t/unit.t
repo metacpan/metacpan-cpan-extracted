@@ -92,7 +92,7 @@ note '=== 1. init() ===';
 	# 1.1  No-arg call: always returns a hashref of current defaults.
 	#      cache_duration is NOT injected when there are no params.
 	my $d = Database::Abstraction::init();
-	isa_ok($d, 'HASH', '1.1 init() returns hashref');
+	returns_is($d, { type => 'hashref' }, '1.1 init() returns hashref');
 
 	# 1.2  Named-list call stores keys in %defaults and returns them
 	my $d2 = Database::Abstraction::init(directory => $DATA_DIR);
@@ -142,20 +142,20 @@ note '=== 2. new() ===';
 
 	# 2.2  Bare string → treated as directory shortcut
 	my $obj = Database::test1->new($DATA_DIR);
-	isa_ok($obj, 'Database::test1', '2.2 new(): bare string shortcut returns correct class');
+	returns_is($obj, { type => 'object', isa => 'Database::test1' }, '2.2 new(): bare string shortcut returns correct class');
 	is($obj->{'id'}, $ENTRY_COL, '2.2 new(): id defaults to "entry"');
 
 	# 2.3  Named-list form
 	my $obj2 = Database::test1->new(directory => $DATA_DIR);
-	isa_ok($obj2, 'Database::test1', '2.3 new(): named-list form accepted');
+	returns_is($obj2, { type => 'object', isa => 'Database::test1' }, '2.3 new(): named-list form accepted');
 
 	# 2.4  Hashref form
 	my $obj3 = Database::test1->new({ directory => $DATA_DIR });
-	isa_ok($obj3, 'Database::test1', '2.4 new(): hashref form accepted');
+	returns_is($obj3, { type => 'object', isa => 'Database::test1' }, '2.4 new(): hashref form accepted');
 
 	# 2.5  Clone form: calling new() on an existing object merges new args
 	my $clone = $obj->new(extra => 'cloned');
-	isa_ok($clone, 'Database::test1', '2.5 new(): clone retains class');
+	returns_is($clone, { type => 'object', isa => 'Database::test1' }, '2.5 new(): clone retains class');
 	is($clone->{'extra'}, 'cloned', '2.5 new(): clone receives new key');
 	is($clone->{'id'}, $ENTRY_COL, '2.5 new(): clone inherits existing keys');
 
@@ -207,7 +207,7 @@ note '=== 2. new() ===';
 			use parent 'Database::Abstraction';
 		}
 		my $dsnobj = Database::bypass->new(dsn => "dbi:SQLite:dbname=$file");
-		isa_ok($dsnobj, 'Database::bypass', '2.14 new(): dsn form works without directory');
+		returns_is($dsnobj, { type => 'object', isa => 'Database::bypass' }, '2.14 new(): dsn form works without directory');
 	}
 
 	# 2.15 new() must not clobber errno ($!) — the POD makes no guarantee
@@ -282,9 +282,7 @@ note '=== 5. selectall_arrayref() ===';
 
 	# 5.1  No criteria → arrayref of all rows
 	my $all = $db->selectall_arrayref();
-	isa_ok($all, 'ARRAY', '5.1 selectall_arrayref(): no criteria returns arrayref');
-	ok(scalar @{$all} >= 4, '5.1 selectall_arrayref(): returns at least 4 rows');
-	returns_ok($all, { type => 'arrayref' }, '5.1 selectall_arrayref(): Test::Returns shape');
+	returns_is($all, { type => 'arrayref', min => 4 }, '5.1 selectall_arrayref(): no criteria returns arrayref of ≥4 rows');
 
 	# 5.2  Each element is a hashref
 	ok((grep { ref($_) eq 'HASH' } @{$all}) == scalar @{$all},
@@ -305,14 +303,14 @@ note '=== 5. selectall_arrayref() ===';
 	#      a proper SQL backend in section 10 / section 14).
 	#      Here we just verify the slurp in-memory scan path returns an arrayref.
 	my $eq3 = $db->selectall_arrayref(number => 3);
-	ok(defined($eq3) && ref($eq3) eq 'ARRAY',
+	returns_is($eq3, { type => 'arrayref' },
 		'5.5 selectall_arrayref(): criteria with slurp scan returns arrayref');
 
 	# 5.6  No-match criterion → arrayref (not undef); entry fast-path must
 	#      not throw on a locked hash key that does not exist.
 	my $none = $db->selectall_arrayref(entry => '__NO_SUCH_ENTRY__');
-	ok(defined($none) && ref($none) eq 'ARRAY',
-		'5.6 selectall_arrayref(): no-match returns arrayref, not undef');
+	returns_is($none, { type => 'arrayref', max => 0 },
+		'5.6 selectall_arrayref(): no-match returns empty arrayref');
 
 	# 5.7  BerkeleyDB backend → returns empty arrayref (in-memory scan on empty hash)
 	{
@@ -377,8 +375,7 @@ note '=== 7. fetchrow_hashref() ===';
 
 	# 7.1  Returns a hashref on match
 	my $row = $db->fetchrow_hashref(entry => 'one');
-	isa_ok($row, 'HASH', '7.1 fetchrow_hashref(): returns hashref on match');
-	returns_ok($row, { type => 'hashref' }, '7.1 fetchrow_hashref(): Test::Returns shape');
+	returns_is($row, { type => 'hashref' }, '7.1 fetchrow_hashref(): returns hashref on match');
 
 	# 7.2  Correct row content
 	is($row->{$ENTRY_COL}, 'one', '7.2 fetchrow_hashref(): entry column correct');
@@ -390,7 +387,7 @@ note '=== 7. fetchrow_hashref() ===';
 
 	# 7.4  No match → undef (NOT an exception)
 	my $miss = $db->fetchrow_hashref(entry => '__NO_MATCH__');
-	ok(!defined($miss), '7.4 fetchrow_hashref(): no match returns undef');
+	returns_is($miss, { type => 'void' }, '7.4 fetchrow_hashref(): no match returns undef');
 
 	# 7.5  Multiple plain criteria (AND semantics)
 	my $both = $db->fetchrow_hashref(entry => 'three', number => 3);
@@ -412,7 +409,7 @@ note '=== 8. count() ===';
 
 	# 8.1  No criteria → total row count (positive integer)
 	my $total = $db->count();
-	ok(looks_like_number($total) && $total > 0,
+	returns_is($total, { type => 'integer', min => 1 },
 		'8.1 count(): no criteria returns positive integer');
 
 	# 8.2  Entry fast-path: known entry → 1
@@ -458,7 +455,7 @@ note '=== 9. AUTOLOAD ===';
 
 	# 9.4  Missing entry → undef, not an exception (locked-hash safe)
 	my $miss = $db->number(entry => '__NO_SUCH__');
-	ok(!defined($miss), '9.4 AUTOLOAD(): missing entry returns undef');
+	returns_is($miss, { type => 'void' }, '9.4 AUTOLOAD(): missing entry returns undef');
 
 	# 9.5  auto_load => 0 disables AUTOLOAD → croak
 	my $noauto = Database::test1->new({ directory => $DATA_DIR, auto_load => 0 });
@@ -520,7 +517,7 @@ SKIP: {
 	# 10.1 List context with no bind args → all rows
 	my @all = $db->execute(query => 'SELECT * FROM exec_unit');
 	is(scalar @all, 3, '10.1 execute(): list context returns all rows');
-	isa_ok($all[0], 'HASH', '10.1 execute(): each row is a hashref');
+	returns_is($all[0], { type => 'hashref' }, '10.1 execute(): each row is a hashref');
 
 	# 10.2 Scalar context → only the first row
 	my $first = $db->execute(query => 'SELECT * FROM exec_unit ORDER BY id');
@@ -577,7 +574,7 @@ note '=== 12. columns() ===';
 
 	# 12.1  Returns an arrayref of column name strings
 	my $cols = $db->columns();
-	isa_ok($cols, 'ARRAY', '12.1 columns(): returns arrayref');
+	returns_is($cols, { type => 'arrayref' }, '12.1 columns(): returns arrayref');
 
 	# 12.2  Entry column is present
 	ok((grep { $_ eq $ENTRY_COL } @{$cols}),
@@ -609,7 +606,7 @@ note '=== 12. columns() ===';
 		my $ne = Database::test4ne->new(directory => $DATA_DIR);
 		$ne->count();    # trigger lazy _open and slurp into ARRAY ref
 		my $ne_cols = $ne->columns();
-		isa_ok($ne_cols, 'ARRAY', '12.6 columns(): no_entry CSV ARRAY slurp returns arrayref');
+		returns_is($ne_cols, { type => 'arrayref' }, '12.6 columns(): no_entry CSV ARRAY slurp returns arrayref');
 		ok(scalar(@{$ne_cols}) > 0,
 			'12.6 columns(): no_entry CSV ARRAY slurp returns non-empty list');
 	}
@@ -626,7 +623,7 @@ note '=== 13. schema() ===';
 
 	# 13.1  Returns a hashref
 	my $schema = $db->schema();
-	isa_ok($schema, 'HASH', '13.1 schema(): returns hashref');
+	returns_is($schema, { type => 'hashref' }, '13.1 schema(): returns hashref');
 
 	# 13.2  Entry column is a key
 	ok(exists $schema->{$ENTRY_COL}, '13.2 schema(): entry column present as key');
@@ -667,7 +664,7 @@ note '=== 13. schema() ===';
 		my $ne = Database::test4ne->new(directory => $DATA_DIR);
 		$ne->count();    # trigger lazy _open and slurp into ARRAY ref
 		my $ne_schema = $ne->schema();
-		isa_ok($ne_schema, 'HASH', '13.7 schema(): no_entry CSV ARRAY slurp returns hashref');
+		returns_is($ne_schema, { type => 'hashref' }, '13.7 schema(): no_entry CSV ARRAY slurp returns hashref');
 		ok(scalar(keys %{$ne_schema}) > 0,
 			'13.7 schema(): no_entry CSV ARRAY slurp schema is non-empty');
 	}
@@ -711,7 +708,7 @@ SKIP: {
 
 	# 14.0  query() returns a Database::Abstraction::Query object
 	my $q = $db->query();
-	isa_ok($q, 'Database::Abstraction::Query', '14.0 query(): returns Query object');
+	returns_is($q, { type => 'object', isa => 'Database::Abstraction::Query' }, '14.0 query(): returns Query object');
 
 	# ---- Query->new() validation ----------------------------------------
 
@@ -740,8 +737,7 @@ SKIP: {
 
 	# 14.9  No criteria → all rows
 	my $all = $db->query()->all();
-	isa_ok($all, 'ARRAY', '14.9 query->all(): returns arrayref');
-	is(scalar @{$all}, 5, '14.9 query->all(): all 5 rows returned');
+	returns_is($all, { type => 'arrayref', min => 5, max => 5 }, '14.9 query->all(): returns 5-row arrayref');
 
 	# 14.10 where() filter
 	my $active = $db->query()->where(status => 'active')->all();
@@ -775,12 +771,12 @@ SKIP: {
 
 	# 14.14 Returns a hashref for a hit
 	my $first = $db->query()->where(name => 'Alice')->first();
-	isa_ok($first, 'HASH', '14.14 query->first(): returns hashref on match');
+	returns_is($first, { type => 'hashref' }, '14.14 query->first(): returns hashref on match');
 	is($first->{'name'}, 'Alice', '14.14 query->first(): correct row');
 
 	# 14.15 Returns undef on no match
 	my $miss = $db->query()->where(name => '__nobody__')->first();
-	ok(!defined($miss), '14.15 query->first(): no match returns undef');
+	returns_is($miss, { type => 'void' }, '14.15 query->first(): no match returns undef');
 
 	# 14.16 Applies LIMIT 1 internally (does not affect object state)
 	my $q2 = $db->query();
@@ -914,14 +910,14 @@ note '=== 16. PSV and XML backends ===';
 	# 16.1  PSV fixture loads and returns data
 	my $psv = Database::test2->new($DATA_DIR);
 	my $all = $psv->selectall_arrayref();
-	ok(defined($all) && scalar @{$all} >= 1,
+	returns_is($all, { type => 'arrayref', min => 1 },
 		'16.1 PSV backend: selectall_arrayref returns rows');
 
 	# 16.2  XML fixture must run in SQL mode (max_slurp_size => 1) because the
 	#       complex nested <entry> structure is not supported in slurp mode.
 	my $xml = Database::test3->new({ directory => $DATA_DIR, max_slurp_size => 1 });
 	my $xall = $xml->selectall_arrayref();
-	ok(defined($xall) && scalar @{$xall} >= 1,
+	returns_is($xall, { type => 'arrayref', min => 1 },
 		'16.2 XML backend: selectall_arrayref returns rows');
 }
 
@@ -1044,8 +1040,8 @@ SKIP: {
 
 	# 17.15 fetchrow_hashref with operator criterion
 	my $frh = $op->fetchrow_hashref(score => { '>=' => 100 });
-	ok(defined($frh) && $frh->{'name'} eq 'Eve',
-		'17.15 fetchrow_hashref with >= 100 returns the Eve row');
+	returns_is($frh, { type => 'hashref' }, '17.15 fetchrow_hashref with >= 100 returns hashref');
+	is($frh->{'name'}, 'Eve', '17.15 fetchrow_hashref with >= 100: name is Eve');
 }
 
 # ---------------------------------------------------------------------------
@@ -1281,7 +1277,7 @@ note '=== 21. XLSX backend ===';
 		# 21.7  The 'table' constructor parameter selects an alternate worksheet;
 		#        the file stem still resolves from the class name, not from 'table'
 		my $db2 = Database::test1->new(directory => $tmpdir, table => 'sheet2');
-		isa_ok($db2, 'Database::test1',
+		returns_is($db2, { type => 'object', isa => 'Database::test1' },
 			'21.7 new(table => "sheet2"): object created');
 
 		# 21.8  Querying the alternate worksheet returns the correct row count
@@ -1347,8 +1343,8 @@ SKIP: {
 	#        and dsn are set in new(), _open() is not needed for the DSN path).
 	$db_dsn->count();	# trigger _open so dialect and dsn are populated
 	my $t1 = $db_dsn->updated();
-	ok(defined($t1),          '22.1 updated() SQLite DSN: returns defined value');
-	ok(looks_like_number($t1), '22.1 updated() SQLite DSN: value is numeric');
+	returns_is($t1, { type => 'integer', semantic => 'unix_timestamp' },
+		'22.1 updated() SQLite DSN: returns unix timestamp');
 
 	# 22.2  Return value must equal stat() on the backing file
 	my $stat_mtime = (stat($ufile))[9];
@@ -1378,9 +1374,8 @@ SKIP: {
 		$db_generic->count();	# populate _updated
 		$db_generic->{'_dialect'} = 'generic';	# force generic path
 		my $tu = $db_generic->updated();
-		ok(defined($tu),           '22.5 updated() generic DSN: returns defined value');
-		ok(looks_like_number($tu), '22.5 updated() generic DSN: value is numeric');
-		ok($tu > 0,                '22.5 updated() generic DSN: value is positive');
+		returns_is($tu, { type => 'integer', semantic => 'unix_timestamp' },
+			'22.5 updated() generic DSN: returns unix timestamp');
 	}
 
 	# 22.6  dbi:SQLite:dbname= form (with explicit "dbname=") is supported
@@ -1518,7 +1513,7 @@ note '=== 24. dbi_source() ===';
 		my $slurp = Database::test1->new($DATA_DIR);
 		$slurp->count();	# trigger _open (slurp path)
 		my $src = $slurp->dbi_source();
-		ok(!defined($src), '24.1 dbi_source(): CSV slurp backend returns undef');
+		returns_is($src, { type => 'void' }, '24.1 dbi_source(): CSV slurp backend returns undef');
 		delete $LEDGER{'dbi_source slurp undef'};
 	}
 
@@ -1527,7 +1522,7 @@ note '=== 24. dbi_source() ===';
 		my $bdb = Database::test1->new($DATA_DIR);
 		$bdb->{'berkeley'} = { k => 'v' };
 		my $src = $bdb->dbi_source();
-		ok(!defined($src), '24.2 dbi_source(): BerkeleyDB backend returns undef');
+		returns_is($src, { type => 'void' }, '24.2 dbi_source(): BerkeleyDB backend returns undef');
 	}
 }
 
@@ -1556,8 +1551,7 @@ SKIP: {
 
 	# 24.3  SQLite DSN connection → hashref
 	my $src = $db->dbi_source();
-	ok(defined($src),     '24.3 dbi_source() SQLite: returns defined value');
-	isa_ok($src, 'HASH',  '24.3 dbi_source() SQLite: returns hashref');
+	returns_is($src, { type => 'hashref' }, '24.3 dbi_source() SQLite: returns hashref');
 
 	# 24.4  'dbh' key must be a blessed DBI handle
 	ok(exists $src->{'dbh'}, '24.4 dbi_source() SQLite: dbh key present');

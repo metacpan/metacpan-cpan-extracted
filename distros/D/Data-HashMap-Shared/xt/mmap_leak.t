@@ -17,14 +17,12 @@ sub maps_count {
 
 my $baseline = maps_count();
 
-# Create + destroy 50 handles. Each handle does 1 mmap; all should be
-# released on DESTROY.
 for (1..50) {
     my $h = Data::HashMap::Shared::II->new(undef, 64);
     undef $h;
 }
 
-# Fudge ± 3 lines (other mmap churn: malloc arenas, thread stacks, etc).
+# Slack of 3 lines for other mmap churn (malloc arenas, thread stacks).
 my $after = maps_count();
 my $delta = $after - $baseline;
 cmp_ok abs($delta), '<=', 3,

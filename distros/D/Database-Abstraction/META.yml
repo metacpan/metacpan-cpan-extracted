@@ -31,6 +31,7 @@ build_requires:
   Test::Carp: '0'
   Test::Compile: '0'
   Test::DescribeMe: '0'
+  Test::Log::Abstraction: '0'
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0'
   Test::Most: '0'
@@ -75,12 +76,11 @@ requires:
   Sub::Private: '0'
   Sub::Protected: '0'
   autodie: '0'
-  boolean: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.47'
+version: '0.48'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

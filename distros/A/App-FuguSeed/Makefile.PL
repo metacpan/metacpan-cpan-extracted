@@ -4,12 +4,13 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'App::FuguSeed',
-	VERSION          => '0.1.0',
+	VERSION          => '0.2.0',
 	ABSTRACT         => 'make BIP39 seed words with dice, and turn them into a SeedQR',
 	LICENSE          => 'open_source',
 	MIN_PERL_VERSION => '5.034',
 	EXE_FILES        => [
 		'bin/fuguseed-words',
+		'bin/fuguseed-last',
 		'bin/fuguseed-qr'
 	],
 	PREREQ_PM        => {
@@ -22,6 +23,8 @@ WriteMakefile(
 		'lib/App/FuguSeed/Check.pod' => '$(INST_LIB)/App/FuguSeed/Check.pod',
 		'lib/App/FuguSeed/Codewords.pm' => '$(INST_LIB)/App/FuguSeed/Codewords.pm',
 		'lib/App/FuguSeed/Codewords.pod' => '$(INST_LIB)/App/FuguSeed/Codewords.pod',
+		'lib/App/FuguSeed/Last.pm' => '$(INST_LIB)/App/FuguSeed/Last.pm',
+		'lib/App/FuguSeed/Last.pod' => '$(INST_LIB)/App/FuguSeed/Last.pod',
 		'lib/App/FuguSeed/List.pm' => '$(INST_LIB)/App/FuguSeed/List.pm',
 		'lib/App/FuguSeed/List.pod' => '$(INST_LIB)/App/FuguSeed/List.pod',
 		'lib/App/FuguSeed/ListFile.pm' => '$(INST_LIB)/App/FuguSeed/ListFile.pm',

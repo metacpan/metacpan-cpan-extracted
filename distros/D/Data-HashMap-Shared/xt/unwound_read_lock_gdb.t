@@ -6,11 +6,11 @@ use File::Copy qw(copy);
 use File::Path qw(make_path);
 use File::Basename qw(dirname);
 
-# Perl's pending-signals croak can leave a call from inside its C read section,
-# with the read lock still counted in the handle's slot.  gdb makes that state
-# exactly: it returns from get_with_ttl before the unlock.  The handle must then
-# give the lock back at its next lock call behind a writer, and when it is
-# destroyed, or every writer waits until the process exits.
+# Perl's pending-signals croak can leave a call from inside its C read section
+# with the read lock still counted in the handle's slot (gdb makes that state by
+# returning from get_with_ttl before the unlock). The handle must give the lock
+# back at its next lock call behind a writer, and when destroyed, or every
+# writer waits until the process exits.
 
 plan skip_all => 'set CRASH_GDB=1 to run' unless $ENV{CRASH_GDB};
 my $gdb = `which gdb 2>/dev/null`; chomp $gdb;

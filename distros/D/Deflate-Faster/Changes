@@ -1,4 +1,17 @@
 Revision history for Deflate::Faster
 
+0.02  2026-10-07
+    - gunzip and unzip reject a gzip header with a wrong header checksum.
+    - unzip clears file_name and mod_time in every format, and leaves them
+      unset when it croaks.
+    - copy_perl_flags finds its marker among other extra subfields and in
+      any member.
+    - file_name is written as Latin-1; characters beyond Latin-1 croak.
+    - mod_time is clamped to 32 bits with a warning instead of wrapping.
+    - gzip_file keeps the file name and mtime when other options are given.
+    - DESTROY on a foreign blessed object no longer crashes.
+    - Configure tries every libdeflate location and links pthread where
+      needed.
+
 0.01  2026-10-01
     - Initial release.

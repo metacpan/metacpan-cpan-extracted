@@ -1,6 +1,6 @@
 use v5.40;
 
-package Alien::Xrepo::Build::Dist v1.0.3 {
+package Alien::Xrepo::Build::Dist v1.0.4 {
     use File::Find;
     use Path::Tiny;
 

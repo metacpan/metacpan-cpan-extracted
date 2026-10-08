@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -29,7 +30,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 31;
+plan tests => 32;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -149,6 +150,14 @@ $client->delete("$prefix/key4", { prev_kv => 1 }, sub {
     EV::break;
 });
 my $t10 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
+EV::run;
+
+$client->delete("$prefix/missing", { prev_kv => 1 }, sub {
+    my ($resp, $err) = @_;
+    is_deeply($resp && $resp->{prev_kvs}, [], 'delete of a missing key returns an empty prev_kvs');
+    EV::break;
+});
+my $t10b = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
 $client->delete("$prefix/", { prefix => 1 }, sub {

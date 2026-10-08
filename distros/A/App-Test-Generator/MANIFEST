@@ -1,5 +1,5 @@
 bin/benchmark-generator
-bin/demo_extractor.pl
+bin/demo_extractor
 bin/deploy-workflows
 bin/extract-schemas
 bin/fuzz-harness-generator

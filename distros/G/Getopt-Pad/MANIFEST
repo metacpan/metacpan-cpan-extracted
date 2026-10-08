@@ -9,6 +9,7 @@ examples/06-value-shapes.pl
 examples/07-config.json
 examples/07-config.pl
 examples/08-checks.pl
+examples/09-dates.pl
 examples/ResultDump.pm
 lib/Getopt/Pad.pm
 lib/Getopt/Pad/Completion.pm
@@ -31,12 +32,15 @@ lib/Getopt/Pad/Spec/Level.pm
 lib/Getopt/Pad/Spec/Option.pm
 lib/Getopt/Pad/Tutorial.pod
 lib/Getopt/Pad/Type.pm
+lib/Getopt/Pad/Type/Date.pm
 lib/Getopt/Pad/Type/Dir.pm
+lib/Getopt/Pad/Type/Duration.pm
 lib/Getopt/Pad/Type/File.pm
 lib/Getopt/Pad/Type/Float.pm
 lib/Getopt/Pad/Type/Int.pm
 lib/Getopt/Pad/Type/Number.pm
 lib/Getopt/Pad/Type/Path.pm
+lib/Getopt/Pad/Type/Temporal.pm
 lib/Getopt/Pad/Type/Url.pm
 lib/Getopt/Pad/Util.pm
 Makefile.PL

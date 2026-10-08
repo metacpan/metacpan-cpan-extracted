@@ -17,7 +17,6 @@ POSIX::setlocale(POSIX::LC_ALL(), 'C');
 
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
-# clear mid-iteration resets iterator state
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -42,7 +41,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# clear with live cursor doesn't corrupt iterator count
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -50,7 +48,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_put $map, $_, $_ * 10 for 1..20;
 
     my $cur = shm_ii_cursor $map;
-    shm_ii_cursor_next $cur;  # cursor is active
+    shm_ii_cursor_next $cur;
 
     shm_ii_clear $map;
     is(shm_ii_size $map, 0, 'size 0 after clear with live cursor');
@@ -64,7 +62,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# put returns false when table is full at max_table_cap
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 4);
@@ -83,7 +80,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok($inserted > 0 && $inserted < $max * 2,
         "inserted $inserted entries before full (max_entries=$max, cap=$cap)");
 
-    # verify existing entries are intact
     for my $i (1..$inserted) {
         is($map->get($i), $i * 10, "entry $i still readable after full");
     }
@@ -91,7 +87,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# get_or_set string: mutating returned SV doesn't affect shared value
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -112,13 +107,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# put_ttl with ttl_sec=0 creates permanent entry on TTL-enabled map
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
 
-    shm_ii_put_ttl $map, 1, 100, 0;  # permanent
-    shm_ii_put $map, 2, 200;         # default TTL (2s)
+    shm_ii_put_ttl $map, 1, 100, 0;
+    shm_ii_put $map, 2, 200;
 
     my $rem1 = shm_ii_ttl_remaining $map, 1;
     is($rem1, 0, 'ttl_remaining is 0 for permanent entry');
@@ -137,7 +131,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# stale write lock recovery: simulate dead process holding wrlock
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -170,7 +163,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# error diagnostics: wrong variant gives informative message
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100);
@@ -184,13 +176,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# error diagnostics: bad path gives errno message
 {
     eval { Data::HashMap::Shared::II->new('/nonexistent/path/test.shm', 100) };
     like($@, qr/No such file|Permission denied/, 'bad path gives errno in error');
 }
 
-# unlink: instance method
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100);
@@ -198,12 +188,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(-f $path, 'backing file exists');
     ok($map->unlink, 'instance unlink returns true');
     ok(!-f $path, 'backing file removed after unlink');
-    # map still works (mmap stays alive after unlink)
     my $v = shm_ii_get $map, 1;
     is($v, 42, 'map still readable after unlink');
 }
 
-# unlink: class method
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100);
@@ -213,34 +201,26 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(!-f $path, 'backing file removed after class unlink');
 }
 
-# unlink: returns false for non-existent file
 {
     ok(!Data::HashMap::Shared::II->unlink('/tmp/nonexistent_shm_test_' . $$ . '.shm'),
        'unlink returns false for non-existent file');
 }
 
-# lru_skip: probabilistic promotion skip reduces churn
 {
     my $path = tmpfile();
-    # max_size=100, ttl=0, lru_skip=90 (skip 90% of promotions)
+    # max_size 100, ttl 0, lru_skip 90 (percent of promotions skipped)
     my $map = Data::HashMap::Shared::II->new($path, 10000, 100, 0, 90);
 
-    # fill to capacity
     shm_ii_put $map, $_, $_ for 1..100;
 
-    # repeatedly access a non-tail key — with 90% skip, most promotes are skipped
-    # but the entry should still be reachable and not evicted
     shm_ii_get $map, 50 for 1..20;
     my $v = shm_ii_get $map, 50;
     is($v, 50, 'lru_skip: frequently accessed key still readable');
 
-    # insert more entries to trigger evictions
     shm_ii_put $map, 100 + $_, 100 + $_ for 1..50;
     is(shm_ii_size $map, 100, 'lru_skip: map stays at max_size');
     ok(shm_ii_stat_evictions($map) >= 50, 'lru_skip: evictions occurred');
 
-    # tail entry (LRU victim) is never skip-protected — eviction still works
-    # the map should be functional and not corrupt
     my $count = 0;
     while (my ($k, $v) = shm_ii_each $map) { $count++ }
     is($count, 100, 'lru_skip: iteration returns exactly max_size entries');
@@ -248,15 +228,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# lru_skip=0 (default): strict LRU, same as before
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 5, 0, 0);
 
     shm_ii_put $map, $_, $_ for 1..5;
-    # access key 1 to promote it
     shm_ii_get $map, 1;
-    # insert one more — should evict key 2 (LRU), not key 1 (promoted)
     shm_ii_put $map, 6, 6;
     my $v2 = shm_ii_get $map, 2;
     ok(!defined $v2, 'lru_skip=0: key 2 evicted (strict LRU)');
@@ -266,7 +243,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# pop: removes and returns one entry (non-LRU: arbitrary, LRU: tail)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -285,7 +261,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# pop with LRU: evicts from tail (least recently used)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 100);
@@ -300,7 +275,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# drain: removes up to N entries, returns flat list
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -320,7 +294,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# drain with LRU: returns all entries (clock eviction order)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 100);
@@ -336,7 +309,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# pop/drain with SS variant
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -354,14 +326,13 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# shift: removes from opposite end of pop
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 100);
     shm_ii_put $map, $_, $_ for 1..5;
 
-    my ($pk) = shm_ii_pop $map;    # from tail end
-    my ($sk) = shm_ii_shift $map;  # from head end
+    my ($pk) = shm_ii_pop $map;
+    my ($sk) = shm_ii_shift $map;
     ok(defined $pk, 'pop returns entry from LRU map');
     ok(defined $sk, 'shift returns entry from LRU map');
     ok($pk != $sk, 'pop and shift return different entries');
@@ -370,7 +341,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# shift on non-LRU map: takes from opposite end of table vs pop
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -389,7 +359,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# shift + pop exhaust map from both ends
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 100);
@@ -406,7 +375,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# arena_used / arena_cap: int-only variants return 0
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -415,7 +383,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# arena_used / arena_cap: string variants track usage
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -428,7 +395,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# add: insert only if absent
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -443,7 +409,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# add with TTL: expired key treated as absent
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
@@ -456,7 +421,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# update: overwrite only if exists
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -472,7 +436,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# swap: returns old value or undef for new insert
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -490,7 +453,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# swap with SS variant
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -503,7 +465,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# add + update + swap combined workflow
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -524,7 +485,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# cas: compare-and-swap (integer variants)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -546,7 +506,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# persist: remove TTL from a key
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 60);
@@ -565,7 +524,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# set_ttl: change TTL without changing value
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 60);
@@ -588,7 +546,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# stats: returns hashref with all diagnostics
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 50, 60);
@@ -611,7 +568,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# stats for SS variant includes arena info
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -623,7 +579,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# set_multi: batch put under single lock
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000);
@@ -646,7 +601,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# set_multi with SS variant
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 10000);
@@ -657,7 +611,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# set_multi with odd args croaks
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000);
@@ -666,14 +619,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# clock second-chance: accessed key survives first eviction round
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 10);
     shm_ii_put $map, $_, $_ for 1..10;
-    # access key 1 to set its clock bit
     shm_ii_get $map, 1;
-    # insert 1 more — triggers one eviction, key 1 gets second chance
     shm_ii_put $map, 99, 99;
     my $sz = shm_ii_size $map;
     is($sz, 10, 'clock: map stays at max_size after overflow');
@@ -682,7 +632,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# swap on LRU at capacity: triggers eviction
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 5);
@@ -696,7 +645,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# add on LRU at capacity: triggers eviction
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 5);
@@ -710,7 +658,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# set_multi with TTL: entries get default TTL
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
@@ -723,12 +670,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# persist then get: seqlock ensures visibility
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, 1, 100;
-    # persist before TTL expires
     shm_ii_persist $map, 1;
     Time::HiRes::sleep(2.2);
     my $v = shm_ii_get $map, 1;
@@ -736,14 +681,13 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# set_ttl to re-add TTL to permanent entry
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 60);
-    shm_ii_put_ttl $map, 1, 100, 0;  # permanent
+    shm_ii_put_ttl $map, 1, 100, 0;
     my $rem = shm_ii_ttl_remaining $map, 1;
     is($rem, 0, 'permanent entry has ttl_remaining=0');
-    shm_ii_set_ttl $map, 1, 2;  # re-add 2s TTL
+    shm_ii_set_ttl $map, 1, 2;
     $rem = shm_ii_ttl_remaining $map, 1;
     ok($rem > 0 && $rem <= 2, 'set_ttl re-adds TTL to permanent entry');
     Time::HiRes::sleep(2.2);
@@ -752,14 +696,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# pop/shift on TTL-only map with expired entries
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, $_, $_ * 10 for 1..5;
-    shm_ii_put_ttl $map, 99, 990, 0;  # permanent entry
+    shm_ii_put_ttl $map, 99, 990, 0;
     Time::HiRes::sleep(2.2);
-    # keys 1-5 expired, key 99 still live
     my ($k, $v) = shm_ii_pop $map;
     is($k, 99, 'pop on TTL map skips expired, returns live entry');
     is($v, 990, 'pop on TTL map returns correct value');
@@ -768,7 +710,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# cas on TTL map with expired key
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
@@ -779,12 +720,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# drain on TTL map: skips expired entries
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, $_, $_ for 1..3;
-    shm_ii_put_ttl $map, 99, 99, 0;  # permanent
+    shm_ii_put_ttl $map, 99, 99, 0;
     Time::HiRes::sleep(2.2);
     my @got = shm_ii_drain $map, 10;
     is(scalar @got, 2, 'drain on TTL map returns only live entries (1 pair)');
@@ -793,7 +733,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# empty string values (SS variant)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -812,11 +751,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# sparse table iteration (SSE2 shm_find_next_live correctness)
+# exercises the SSE2 shm_find_next_live scan over a sparse table
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000);
-    # insert 100 entries then delete 90 — sparse table
     shm_ii_put $map, $_, $_ for 1..100;
     shm_ii_remove $map, $_ for 1..90;
     my $sz = shm_ii_size $map;
@@ -835,7 +773,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# cross-process: concurrent set_multi from 2 processes
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100000);
@@ -854,22 +791,19 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# cross-process: clock accessed bit visibility
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 5);
     shm_ii_put $map, $_, $_ for 1..5;
 
-    # child reads key 1 (sets accessed bit) then exits
     my $pid = fork();
     if ($pid == 0) {
         my $child = Data::HashMap::Shared::II->new($path, 10000, 5);
-        shm_ii_get $child, 1;  # sets accessed bit in shared memory
+        shm_ii_get $child, 1;
         POSIX::_exit(0);
     }
     waitpid($pid, 0);
 
-    # parent inserts — should evict, but key 1 has accessed bit from child
     shm_ii_put $map, 99, 99;
     my $v = shm_ii_get $map, 1;
     ok(defined $v, 'cross-process clock: child accessed bit gives second chance');
@@ -878,7 +812,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# cross-process: persist visibility
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
@@ -898,11 +831,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# reserve beyond max_table_cap returns false
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 100);  # small max
-    my $r = shm_ii_reserve $map, 10000;  # way beyond max
+    my $map = Data::HashMap::Shared::II->new($path, 100);
+    my $r = shm_ii_reserve $map, 10000;
     ok(!$r, 'reserve beyond max_table_cap returns false');
     shm_ii_put $map, 1, 1;
     my $rv = shm_ii_get $map, 1;
@@ -910,10 +842,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# arena near-exhaustion: put fails, smaller put succeeds via free-list
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::SS->new($path, 50);  # small arena
+    my $map = Data::HashMap::Shared::SS->new($path, 50);
     my $filled = 0;
     for my $i (1..50) {
         my $r = shm_ss_put $map, "k$i", "x" x 100;
@@ -921,10 +852,8 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
         $filled++;
     }
     ok($filled > 0 && $filled < 50, "arena fill: inserted $filled before full");
-    # remove some entries to free arena blocks
     shm_ss_remove $map, "k1";
     shm_ss_remove $map, "k2";
-    # now a smaller string should succeed via free-list reclamation
     my $r = shm_ss_put $map, "new", "small";
     ok($r, 'arena: smaller put succeeds after remove (free-list reclaim)');
     my $v = shm_ss_get $map, "new";
@@ -932,27 +861,24 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# new() on wrong SHM_VERSION file
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100);
     shm_ii_put $map, 1, 1;
     undef $map;
-    # corrupt the version field (offset 4 in header)
+    # the version field is at header offset 4
     open my $fh, '+<:raw', $path or die;
     seek($fh, 4, 0);
-    print $fh pack('V', 999);  # bogus version
+    print $fh pack('V', 999);
     close $fh;
     eval { Data::HashMap::Shared::II->new($path, 100) };
     like($@, qr/version mismatch/, 'wrong SHM_VERSION gives version mismatch error');
     unlink $path;
 }
 
-# new() with max_entries=0
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 0);
-    # should create with SHM_INITIAL_CAP
     my $cap = shm_ii_capacity $map;
     ok($cap >= 16, 'max_entries=0: creates with initial capacity');
     shm_ii_put $map, 1, 42;
@@ -961,14 +887,13 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# UTF-8 string key/value round-trip
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
-    my $key = "\x{263A}";  # smiley face, UTF-8
-    my $val = "\x{1F600}"; # grinning face, wide UTF-8
+    my $key = "\x{263A}";
+    my $val = "\x{1F600}";
     utf8::encode($key) unless utf8::is_utf8($key);
-    utf8::decode($key);  # ensure UTF-8 flag on
+    utf8::decode($key);
     utf8::encode($val) unless utf8::is_utf8($val);
     utf8::decode($val);
     ok(utf8::is_utf8($key), 'UTF-8 key has flag set');
@@ -977,17 +902,14 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $got = shm_ss_get $map, $key;
     is($got, $val, 'UTF-8 value round-trips correctly');
     ok(utf8::is_utf8($got), 'UTF-8 flag preserved on get');
-    # exists
     my $e = shm_ss_exists $map, $key;
     ok($e, 'UTF-8 key: exists returns true');
-    # take
     my $taken = shm_ss_take $map, $key;
     is($taken, $val, 'UTF-8 value: take returns correct value');
     ok(utf8::is_utf8($taken), 'UTF-8 flag preserved on take');
     unlink $path;
 }
 
-# sharded map: basic put/get/remove/exists
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1004,7 +926,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded map: incr/cas
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1020,7 +941,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded SS variant
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new_sharded($path, 4, 1000);
@@ -1035,7 +955,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: add/update/swap
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1050,7 +969,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded cursor: iterate all shards
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1062,13 +980,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is(scalar keys %seen, 50, 'sharded cursor visits all entries across shards');
     ok((grep { $seen{$_} == $_ * 10 } 1..50) == 50, 'sharded cursor values correct');
 
-    # reset and re-scan
     shm_ii_cursor_reset $cur;
     my $count = 0;
     while (my ($k, $v) = shm_ii_cursor_next $cur) { $count++ }
     is($count, 50, 'sharded cursor reset re-scans all shards');
 
-    # seek on sharded cursor
     my $c2 = shm_ii_cursor $map;
     my $found = shm_ii_cursor_seek $c2, 25;
     ok($found, 'sharded cursor seek finds key');
@@ -1079,7 +995,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded SS cursor
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new_sharded($path, 4, 1000);
@@ -1091,7 +1006,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: keys/values/items/to_hash
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1111,7 +1025,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: each/iter_reset
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1127,7 +1040,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: set_multi
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1137,7 +1049,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is($v3, 30, 'sharded: set_multi values correct');
     my $sz = shm_ii_size $map;
     is($sz, 5, 'sharded: set_multi size');
-    # remove_multi on a sharded map (per-shard dispatch; 99 is absent)
     my $rm = $map->remove_multi(1, 3, 99);
     is($rm, 2, 'sharded: remove_multi returns count of existing keys removed');
     ok(!(shm_ii_exists $map, 1) && !(shm_ii_exists $map, 3), 'sharded: remove_multi removed the keys');
@@ -1145,7 +1056,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: take/pop/shift/drain
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1171,7 +1081,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: get_or_set, incr_by, decr
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1186,7 +1095,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: clear
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1199,7 +1107,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: TTL ops
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000, 0, 60);
@@ -1227,7 +1134,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: stats and diagnostics
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1261,7 +1167,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: reserve and path
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1273,7 +1178,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded SS: bulk ops
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new_sharded($path, 4, 1000);
@@ -1298,7 +1202,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# sharded: unlink
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 100);
@@ -1308,12 +1211,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(!-e "$path.3", 'sharded: unlink removes all shard files');
 }
 
-# TTL refresh: cas, add, update, swap should extend TTL on success
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 30);
 
-    # cas: should refresh TTL
     shm_ii_put $map, 1, 100;
     my $rem_before = shm_ii_ttl_remaining $map, 1;
     ok($rem_before > 0, 'cas ttl: key has TTL');
@@ -1323,27 +1224,23 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok($rem_after > 0, 'cas ttl: TTL refreshed after cas');
     is((shm_ii_get $map, 1), 200, 'cas ttl: value updated');
 
-    # update: should refresh TTL
     shm_ii_put $map, 2, 10;
     my $u = shm_ii_update $map, 2, 20;
     ok($u, 'update ttl: update succeeded');
     my $rem_u = shm_ii_ttl_remaining $map, 2;
     ok($rem_u > 0, 'update ttl: TTL refreshed');
 
-    # swap: should refresh TTL
     shm_ii_put $map, 3, 30;
     my $old = $map->swap(3, 40);
     is($old, 30, 'swap ttl: old value returned');
     my $rem_s = shm_ii_ttl_remaining $map, 3;
     ok($rem_s > 0, 'swap ttl: TTL refreshed');
 
-    # add on existing key: should fail (not refresh)
     shm_ii_put $map, 4, 40;
     my $a = shm_ii_add $map, 4, 50;
     ok(!$a, 'add ttl: add fails on existing key');
     is((shm_ii_get $map, 4), 40, 'add ttl: value unchanged');
 
-    # add on new key: should set TTL
     my $a2 = shm_ii_add $map, 5, 50;
     ok($a2, 'add ttl: add succeeds on new key');
     my $rem_a = shm_ii_ttl_remaining $map, 5;
@@ -1352,21 +1249,19 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# put_ttl on permanent entry: explicit TTL overrides permanent status
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 60);
-    shm_ii_put_ttl $map, 1, 100, 0;  # permanent
+    shm_ii_put_ttl $map, 1, 100, 0;
     my $rem0 = shm_ii_ttl_remaining $map, 1;
     is($rem0, 0, 'put_ttl permanent: entry is permanent');
-    shm_ii_put_ttl $map, 1, 200, 30;  # explicit TTL overrides permanent
+    shm_ii_put_ttl $map, 1, 200, 30;
     my $rem1 = shm_ii_ttl_remaining $map, 1;
     ok($rem1 > 0 && $rem1 <= 30, 'put_ttl permanent: explicit TTL applied');
     is((shm_ii_get $map, 1), 200, 'put_ttl permanent: value updated');
 
-    # put (default TTL) should preserve permanent status
-    shm_ii_put_ttl $map, 2, 10, 0;  # permanent
-    shm_ii_put $map, 2, 20;  # default TTL — should preserve permanent
+    shm_ii_put_ttl $map, 2, 10, 0;
+    shm_ii_put $map, 2, 20;
     my $rem2 = shm_ii_ttl_remaining $map, 2;
     is($rem2, 0, 'put on permanent: stays permanent');
     is((shm_ii_get $map, 2), 20, 'put on permanent: value updated');
@@ -1374,7 +1269,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# get_multi: batch lookup
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -1385,13 +1279,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is($vals[1], 500, 'get_multi: middle key correct');
     is($vals[2], 1000, 'get_multi: last key correct');
     ok(!defined $vals[3], 'get_multi: missing key returns undef');
-    # empty get_multi
     my @empty = $map->get_multi();
     is(scalar @empty, 0, 'get_multi: empty args returns empty list');
     unlink $path;
 }
 
-# get_multi SS: string variant
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -1405,7 +1297,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# get_multi sharded
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000);
@@ -1418,45 +1309,40 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# --- Inline string boundary: 7 bytes (inline) vs 8 bytes (arena) ---
+# 7 bytes is the inline maximum; 8 bytes goes to the arena
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
-    my $k7 = "1234567";      # exactly 7 bytes — inline
-    my $k8 = "12345678";     # 8 bytes — arena
-    my $v7 = "abcdefg";      # 7 bytes — inline
-    my $v8 = "abcdefgh";     # 8 bytes — arena
+    my $k7 = "1234567";
+    my $k8 = "12345678";
+    my $v7 = "abcdefg";
+    my $v8 = "abcdefgh";
     shm_ss_put $map, $k7, $v7;
     shm_ss_put $map, $k8, $v8;
     is((shm_ss_get $map, $k7), $v7, 'inline boundary: 7-byte key+val roundtrip');
     is((shm_ss_get $map, $k8), $v8, 'inline boundary: 8-byte key+val roundtrip');
-    # mixed: inline key, arena value and vice versa
     shm_ss_put $map, "short", $v8;
     shm_ss_put $map, $k8, "tiny";
     is((shm_ss_get $map, "short"), $v8, 'inline boundary: inline key, arena val');
     is((shm_ss_get $map, $k8), "tiny", 'inline boundary: arena key, inline val');
-    # update inline→arena and arena→inline
-    shm_ss_put $map, $k7, $v8;  # was inline val, now arena
+    shm_ss_put $map, $k7, $v8;
     is((shm_ss_get $map, $k7), $v8, 'inline boundary: inline→arena val update');
-    shm_ss_put $map, $k7, "x";  # back to inline
+    shm_ss_put $map, $k7, "x";
     is((shm_ss_get $map, $k7), "x", 'inline boundary: arena→inline val update');
     unlink $path;
 }
 
-# --- SIMD probe with short string keys (inline + SIMD fast path) ---
+# short keys: some must land in the first 16 probe positions (SIMD fast path)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 10000);
-    # Insert many short keys to ensure some land in first 16 probe positions
     shm_ss_put $map, "k$_", "v$_" for 1..500;
-    # Verify all retrievable (exercises SIMD path for most lookups)
     my $ok = 1;
     for (1..500) {
         my $v = shm_ss_get $map, "k$_";
         $ok = 0 unless defined $v && $v eq "v$_";
     }
     ok($ok, 'SIMD probe: all 500 short string keys found');
-    # Also test SI variant
     my $path2 = tmpfile();
     my $si = Data::HashMap::Shared::SI->new($path2, 10000);
     shm_si_put $si, "k$_", $_ for 1..500;
@@ -1470,13 +1356,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path2;
 }
 
-# --- get_multi with TTL (some expired) ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 60);
     shm_ii_put $map, 1, 10;
     shm_ii_put $map, 2, 20;
-    shm_ii_put_ttl $map, 3, 30, 2;  # expires in 2s
+    shm_ii_put_ttl $map, 3, 30, 2;
     Time::HiRes::sleep(2.2);
     my @vals = $map->get_multi(1, 2, 3);
     is($vals[0], 10, 'get_multi TTL: non-expired key 1');
@@ -1485,7 +1370,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- get_multi SS sharded ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new_sharded($path, 4, 1000);
@@ -1499,17 +1383,14 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..3;
 }
 
-# --- Resize with inline strings ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 100000);
-    # Insert enough short-key entries to trigger multiple resizes
     shm_ss_put $map, "k$_", "v$_" for 1..2000;
     my $sz = shm_ss_size $map;
     is($sz, 2000, 'resize inline: size correct after bulk insert');
     my $cap = shm_ss_capacity $map;
     ok($cap >= 2000, 'resize inline: capacity grew');
-    # Verify all entries survive resize
     my $ok = 1;
     for (1..2000) {
         my $v = shm_ss_get $map, "k$_";
@@ -1519,7 +1400,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Drain/pop/shift with inline strings ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -1532,7 +1412,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(defined $sk && defined $sv, 'inline shift: returns key+value');
     my @drained = shm_ss_drain $map, 5;
     is(scalar @drained, 10, 'inline drain: returns 5 k/v pairs');
-    # Verify drained data is valid strings
     my $all_valid = 1;
     for (my $i = 0; $i < @drained; $i += 2) {
         $all_valid = 0 unless $drained[$i] =~ /^k\d+$/ && $drained[$i+1] =~ /^v\d+$/;
@@ -1541,7 +1420,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- set_multi + get_multi roundtrip ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -1556,7 +1434,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Cross-process with inline strings ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -1574,13 +1451,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Empty string key and value (0 bytes, always inline) ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
     shm_ss_put $map, "", "empty_key";
     shm_ss_put $map, "empty_val", "";
-    shm_ss_put $map, "", "";  # overwrite: empty key → empty val
+    shm_ss_put $map, "", "";
     is((shm_ss_get $map, ""), "", 'empty string: empty key → empty val');
     is((shm_ss_get $map, "empty_val"), "", 'empty string: normal key → empty val');
     my $e = shm_ss_exists $map, "";
@@ -1590,25 +1466,22 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- LRU eviction of inline entries ---
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::SS->new($path, 10000, 100, 0);  # LRU, max 100
-    shm_ss_put $map, "k$_", "v$_" for 1..150;  # trigger 50 evictions
+    my $map = Data::HashMap::Shared::SS->new($path, 10000, 100, 0);
+    shm_ss_put $map, "k$_", "v$_" for 1..150;
     my $sz = shm_ss_size $map;
     is($sz, 100, 'LRU inline eviction: size capped at max_size');
     my $ev = shm_ss_stat_evictions $map;
     ok($ev >= 50, 'LRU inline eviction: evictions occurred');
-    # Most recent keys should survive
     my $v = shm_ss_get $map, "k150";
     is($v, "v150", 'LRU inline eviction: recent key survives');
     unlink $path;
 }
 
-# --- flush_expired with actual expired entries ---
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);  # TTL=2s
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
     shm_ii_put $map, $_, $_ for 1..50;
     Time::HiRes::sleep(2.2);
     my $flushed = shm_ii_flush_expired $map;
@@ -1620,7 +1493,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- flush_expired_partial full scan cycle ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
@@ -1641,7 +1513,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Concurrent writers (fork + incr from N processes, SS variant) ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI->new($path, 1000);
@@ -1662,7 +1533,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Multiple cursors on same map (nesting) ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -1673,7 +1543,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $cur2 = shm_ii_cursor $map;
     my ($k2, $v2) = shm_ii_cursor_next $cur2;
     ok(defined $k2, 'cursor nesting: second cursor gets entry');
-    # Both cursors iterate independently
     my $count1 = 1;
     while (my ($k, $v) = shm_ii_cursor_next $cur1) { $count1++; }
     my $count2 = 1;
@@ -1683,7 +1552,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Iterator + remove during iteration ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -1698,21 +1566,18 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(scalar @removed > 0, 'remove during each: some removed');
     my $sz = shm_ii_size $map;
     is($sz, 50 - scalar @removed, 'remove during each: size correct');
-    # Verify removed keys are gone
     my $gone = 1;
     for (@removed) { $gone = 0 if shm_ii_exists $map, $_; }
     ok($gone, 'remove during each: removed keys gone');
-    # Verify remaining keys present
     my $remain = 1;
     for (1..50) { next if $_ % 2 == 0; $remain = 0 unless shm_ii_exists $map, $_; }
     ok($remain, 'remove during each: odd keys survive');
     unlink $path;
 }
 
-# --- Reserve beyond max_entries ---
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 100);  # max 100
+    my $map = Data::HashMap::Shared::II->new($path, 100);
     my $ok1 = shm_ii_reserve $map, 50;
     ok($ok1, 'reserve: within max succeeds');
     my $ok2 = shm_ii_reserve $map, 200;
@@ -1720,10 +1585,8 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Arena exhaustion + inline strings still work ---
 {
     my $path = tmpfile();
-    # Small max_entries with arena — fill with long strings to exhaust arena
     my $map = Data::HashMap::Shared::SS->new($path, 200);
     my $long = "x" x 500;
     my $filled = 0;
@@ -1733,37 +1596,32 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
         $filled++;
     }
     ok($filled > 0, "arena exhaustion: filled $filled long entries");
-    # Now try inline strings — should still work (no arena needed)
     my $ok = shm_ss_put $map, "tiny", "val";
     ok($ok, 'arena exhaustion: inline put succeeds despite full arena');
     is((shm_ss_get $map, "tiny"), "val", 'arena exhaustion: inline get works');
     unlink $path;
 }
 
-# --- UTF-8 short strings inline ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
-    my $utf_key = "\x{e9}";      # é — 2 bytes UTF-8, fits inline
-    my $utf_val = "\x{263a}";    # ☺ — 3 bytes UTF-8, fits inline
-    utf8::encode($utf_key);       # force UTF-8 encoding
+    my $utf_key = "\x{e9}";
+    my $utf_val = "\x{263a}";
+    utf8::encode($utf_key);
     utf8::encode($utf_val);
-    # Actually use Perl's native UTF-8 flagged strings
-    my $ukey = "caf\x{e9}";     # 5 bytes UTF-8
-    my $uval = "hi\x{2603}";    # 5 bytes UTF-8 (snowman)
+    my $ukey = "caf\x{e9}";
+    my $uval = "hi\x{2603}";
     shm_ss_put $map, $ukey, $uval;
     my $got = shm_ss_get $map, $ukey;
     is($got, $uval, 'UTF-8 inline: roundtrip short UTF-8 strings');
     ok(utf8::is_utf8($got), 'UTF-8 inline: UTF-8 flag preserved');
-    # Longer UTF-8 that goes to arena
-    my $long_utf = "\x{2603}" x 10;  # 30 bytes UTF-8
+    my $long_utf = "\x{2603}" x 10;
     shm_ss_put $map, "snowmen", $long_utf;
     my $got_utf = shm_ss_get $map, "snowmen";
     is($got_utf, $long_utf, 'UTF-8 arena: longer UTF-8 roundtrip');
     unlink $path;
 }
 
-# --- Cursor seek on SS variant ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -1774,13 +1632,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my ($k, $v) = shm_ss_cursor_next $cur;
     is($k, "key_25", 'cursor seek SS: positioned at correct key');
     is($v, "val_25", 'cursor seek SS: correct value');
-    # Seek to nonexistent key
     my $nf = shm_ss_cursor_seek $cur, "nonexistent";
     ok(!$nf, 'cursor seek SS: nonexistent key returns false');
     unlink $path;
 }
 
-# --- swap: new key returns undef, existing returns old value ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -1790,7 +1646,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $old2 = $map->swap(1, 200);
     is($old2, 100, 'swap existing key: returns old value');
     is((shm_ii_get $map, 1), 200, 'swap existing key: value updated');
-    # SS swap
     my $path2 = tmpfile();
     my $ssm = Data::HashMap::Shared::SS->new($path2, 1000);
     my $o1 = $ssm->swap("k", "v1");
@@ -1801,13 +1656,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path2;
 }
 
-# --- Version/variant mismatch on reopen ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
     shm_ii_put $map, 1, 1;
     undef $map;
-    # Try opening same file as SS — should croak
     my $died = 0;
     eval { Data::HashMap::Shared::SS->new($path, 1000); };
     $died = 1 if $@;
@@ -1816,44 +1669,38 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Sharded LRU eviction ---
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000, 100);  # LRU, max 100 per shard
-    shm_ii_put $map, $_, $_ for 1..600;  # should trigger evictions
+    my $map = Data::HashMap::Shared::II->new_sharded($path, 4, 1000, 100);
+    shm_ii_put $map, $_, $_ for 1..600;
     my $sz = shm_ii_size $map;
     ok($sz <= 400, "sharded LRU: size capped ($sz <= 400)");
     my $ev = shm_ii_stat_evictions $map;
     ok($ev > 0, "sharded LRU: evictions occurred ($ev)");
-    # Recent keys should be findable
     my $v = shm_ii_get $map, 600;
     is($v, 600, 'sharded LRU: most recent key survives');
     unlink "$path.$_" for 0..3;
 }
 
-# --- Tombstone compaction after mass removal ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 10000);
     shm_ii_put $map, $_, $_ for 1..500;
-    shm_ii_remove $map, $_ for 1..490;  # 490 tombstones, only 10 live
+    shm_ii_remove $map, $_ for 1..490;
     my $tb = shm_ii_tombstones $map;
     ok($tb > 0, "tombstone compaction: tombstones present ($tb)");
-    # Iterate to completion — should trigger deferred shrink/compact
+    # exhausting each() runs the deferred shrink/compact
     my $count = 0;
     while (my ($k, $v) = shm_ii_each $map) { $count++; }
     is($count, 10, 'tombstone compaction: each sees 10 remaining');
-    # After iteration, flush_deferred runs — compact should fire (tombstones > size)
     my $tb_after = shm_ii_tombstones $map;
     ok($tb_after <= $tb, "tombstone compaction: tombstones not increased ($tb_after <= $tb)");
-    # Verify remaining keys intact
     my $ok = 1;
     for (491..500) { my $v = shm_ii_get $map, $_; $ok = 0 unless defined $v && $v == $_; }
     ok($ok, 'tombstone compaction: remaining 10 keys intact');
     unlink $path;
 }
 
-# --- Table shrink after mass removal ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100000);
@@ -1861,48 +1708,39 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $cap_full = shm_ii_capacity $map;
     ok($cap_full >= 2000, "table shrink: capacity after insert ($cap_full)");
     shm_ii_remove $map, $_ for 1..1900;
-    # Force compaction via iterator
+    # exhausting each() runs the deferred shrink
     while (my ($k, $v) = shm_ii_each $map) {}
     my $cap_after = shm_ii_capacity $map;
     ok($cap_after < $cap_full, "table shrink: capacity shrank ($cap_after < $cap_full)");
     my $sz = shm_ii_size $map;
     is($sz, 100, 'table shrink: size correct');
-    # Verify remaining keys intact
     my $ok = 1;
     for (1901..2000) { my $v = shm_ii_get $map, $_; $ok = 0 unless defined $v && $v == $_; }
     ok($ok, 'table shrink: remaining 100 keys intact');
     unlink $path;
 }
 
-# --- get_or_set on SS ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
-    # Insert via get_or_set
     my $v1 = shm_ss_get_or_set $map, "hello", "world";
     is($v1, "world", 'get_or_set SS: inserts default');
-    # Get existing
     my $v2 = shm_ss_get_or_set $map, "hello", "other";
     is($v2, "world", 'get_or_set SS: returns existing, ignores default');
-    # Inline key+val
     my $v3 = shm_ss_get_or_set $map, "a", "b";
     is($v3, "b", 'get_or_set SS: inline key+val');
-    # Arena key+val
     my $v4 = shm_ss_get_or_set $map, "long_key_value_test", "long_default_value_here";
     is($v4, "long_default_value_here", 'get_or_set SS: arena key+val');
     unlink $path;
 }
 
-# --- incr creating new entry on TTL map ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 30);
-    # incr on nonexistent key — creates with value 1
     my $v = shm_ii_incr $map, 42;
     is($v, 1, 'incr new on TTL: returns 1');
     my $rem = shm_ii_ttl_remaining $map, 42;
     ok($rem > 0 && $rem <= 30, 'incr new on TTL: new entry gets default TTL');
-    # incr_by on nonexistent key
     my $v2 = shm_ii_incr_by $map, 99, 10;
     is($v2, 10, 'incr_by new on TTL: returns delta');
     my $rem2 = shm_ii_ttl_remaining $map, 99;
@@ -1910,7 +1748,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Two handles to same file in same process ---
 {
     my $path = tmpfile();
     my $m1 = Data::HashMap::Shared::II->new($path, 1000);
@@ -1927,7 +1764,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- Large shard count (16) ---
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new_sharded($path, 16, 1000);
@@ -1937,7 +1773,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $ok = 1;
     for (1..500) { my $v = shm_ii_get $map, $_; $ok = 0 unless defined $v && $v == $_ * 3; }
     ok($ok, 'large shards: all 500 entries retrievable');
-    # Cursor across 16 shards
     my $cur = shm_ii_cursor $map;
     my $count = 0;
     while (my ($k, $v) = shm_ii_cursor_next $cur) { $count++; }
@@ -1948,10 +1783,8 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink "$path.$_" for 0..15;
 }
 
-# --- put on truly full table (max_entries reached, no LRU) ---
 {
     my $path = tmpfile();
-    # Very small table, no LRU
     my $map = Data::HashMap::Shared::II->new($path, 16);
     my $inserted = 0;
     for (1..100) {
@@ -1960,7 +1793,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     }
     ok($inserted < 100, "full table: not all 100 inserted ($inserted)");
     ok($inserted >= 10, "full table: at least 10 inserted ($inserted)");
-    # Verify inserted entries are readable
     my $readable = 0;
     for (1..$inserted) {
         $readable++ if defined shm_ii_get $map, $_;
@@ -1969,7 +1801,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# --- max_entries stops at 3/4 of 2**31 slots, however large the request ---
 SKIP: {
     my $path = tmpfile();
     my $m = eval { Data::HashMap::Shared::II->new($path, 3_000_000_000) };

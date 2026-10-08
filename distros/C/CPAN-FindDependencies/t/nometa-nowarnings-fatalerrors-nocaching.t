@@ -6,10 +6,15 @@ use Test::Differences;
 use Test::Time;
 
 use CPAN::FindDependencies qw(finddeps);
-use LWP::Simple;
+use HTTP::Tiny;
 
 unless(
-    head("http://www.cpan.org/modules/02packages.details.txt.gz")
+    my $response = HTTP::Tiny->new(
+        # allow_credentialed_redirects => 1,
+        # allow_downgrade              => 1,
+        agent => __PACKAGE__."/$CPAN::FindDependencies::VERSION",
+    )->head('http://www.cpan.org/modules/02packages.details.txt.gz')
+     ->{success}
 ) {
     plan skip_all => "Need web access to the CPAN";
     exit;

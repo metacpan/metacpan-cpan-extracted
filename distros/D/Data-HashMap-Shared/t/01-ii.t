@@ -9,7 +9,6 @@ use Data::HashMap::Shared::II;
 
 my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
 
-# Basic CRUD
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
     ok($map, 'created shared map');
@@ -29,7 +28,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# Multiple entries
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
 
@@ -45,7 +43,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# Counters
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
 
@@ -57,7 +54,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# keys/values/items
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
 
@@ -82,7 +78,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# each iterator
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
 
@@ -95,7 +90,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     }
     is_deeply(\%got, {1 => 10, 2 => 20}, 'each');
 
-    # Second iteration should work after auto-reset
     %got = ();
     while (my ($k, $v) = shm_ii_each $map) {
         $got{$k} = $v;
@@ -105,7 +99,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# clear
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
 
@@ -118,7 +111,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# to_hash
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
 
@@ -131,7 +123,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# get_or_set
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
 
@@ -141,7 +132,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# max_entries
 {
     my $map = Data::HashMap::Shared::II->new($path, 100);
     my $me = shm_ii_max_entries $map;
@@ -150,7 +140,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# Method API
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
     $map->put(42, 100);
@@ -163,7 +152,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# Cross-process sharing
 {
     my $map = Data::HashMap::Shared::II->new($path, 1000);
     shm_ii_put $map, 1, 100;
@@ -183,7 +171,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# Opening a file with a mismatched variant should fail
 {
     use Data::HashMap::Shared::SS;
 

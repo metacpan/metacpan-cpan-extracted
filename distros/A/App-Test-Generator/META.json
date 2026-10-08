@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "gpl_2"
    ],
@@ -26,6 +26,18 @@
             "runtime" : {
                "recommends" : {
                   "Devel::Cover" : "1.51"
+               }
+            }
+         }
+      },
+      "type_params_extraction" : {
+         "description" : "Accurate schema extraction from Type::Params signatures in SchemaExtractor",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "BSD::Resource" : "0",
+                  "Type::Params" : "0",
+                  "Types::Common" : "0"
                }
             }
          }
@@ -61,6 +73,7 @@
             "File::Temp" : "0",
             "Getopt::Long" : "0",
             "HTML::Entities" : "0",
+            "HTTP::Tiny" : "0",
             "IPC::Open3" : "0",
             "IPC::Run3" : "0",
             "JSON::MaybeXS" : "0",
@@ -75,7 +88,9 @@
             "Return::Set" : "0.03",
             "Safe" : "0",
             "Template" : "0",
+            "Test::Exception" : "0",
             "Text::Balanced" : "0",
+            "Time::HiRes" : "0",
             "URI" : "0",
             "UUID::Tiny" : "0",
             "Unicode::GCString" : "0",
@@ -120,6 +135,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.46",
+   "version" : "0.47",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

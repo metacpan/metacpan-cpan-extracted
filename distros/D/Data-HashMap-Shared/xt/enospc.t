@@ -5,8 +5,6 @@ use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Temp qw(tempdir);
 
-# Mounts a 4 MiB tmpfs in a private user and mount namespace.
-
 plan skip_all => 'Linux only' unless $^O eq 'linux';
 $ENV{LC_ALL} = 'C';   # the children's croaks are matched in English
 system(q{unshare -Urm sh -c 'mount -t tmpfs -o size=1m tmpfs /tmp' >/dev/null 2>&1}) == 0

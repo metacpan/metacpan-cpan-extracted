@@ -47,6 +47,10 @@
 # The key signs the two fixture releases and nothing else. It is no
 # key of the organization, and one case holds it apart from the
 # embedded list.
+#
+# One case embeds a key that signed nothing, and it derives that key
+# from the fixture body. DIST-KEY-3 names that condition: a program
+# whose embedded list lacks the key of the release.
 
 use v5.34;
 use warnings;
@@ -61,6 +65,7 @@ use File::Path       qw(make_path);
 use File::Temp       qw(tempdir);
 use FindBin          qw($RealBin);
 use IO::Socket::INET ();
+use MIME::Base64     ();
 use POSIX            ();
 use lib "$RealBin/../../lib";
 
@@ -100,6 +105,10 @@ plan skip_all => 'Fugu::Signify holds no perl engine'
 
 my $downloader = Fugu::Curl->new;
 plan skip_all => 'no downloader is on PATH' unless $downloader->is_available;
+
+# The published install command (DIST-INSTALL-3). Every case reads
+# the constant, so no case repeats the literal.
+my $INSTALL = App::FuguBench::Update::INSTALL();
 
 my $tree = tempdir( CLEANUP => 1 );
 my $srv  = "$tree/srv";
@@ -247,19 +256,36 @@ END { kill 'TERM', $server if $server; }
 # a consumer and no key of the organization.
 my $KEY = ( split /\n/, _slurp("$fixture/keys/fugubench-fixture.pub") )[1];
 
-# _lib($stamp):
+# A key body that signed nothing: the fixture body with one step of
+# its key number. A body holds the algorithm in the first two bytes,
+# the key number in the next eight, and the key in the rest. The
+# verifier compares the key number before it checks the signature, so
+# this key verifies no fixture release. One case embeds it alone, and
+# the program then lacks the key of the release (DIST-KEY-3).
+my $OTHER = do {
+	my $bytes = MIME::Base64::decode_base64($KEY);
+	my $first = ord substr $bytes, 2, 1;
+	substr $bytes, 2, 1, chr( ( $first + 1 ) % 256 );
+	MIME::Base64::encode_base64( $bytes, q{} );
+};
+
+# _lib($stamp, $key, $label):
 #	One library directory of a child, first in @INC. It holds a
 #	copy of App::FuguBench with the stamp of a release, as the
 #	dist build writes it, and a copy of App::FuguBench::Keys with
-#	the fixture key in place of the organization keys. So no case
-#	needs a release, and no case reaches an organization key.
+#	$key in place of the organization keys. So no case needs a
+#	release, and no case reaches an organization key.
+#
+#	$key defaults to the fixture key, and $label names the
+#	directory. The case of DIST-KEY-3 passes $OTHER, which signed
+#	nothing, so its directory takes a label of its own.
 #
 #	The helper asserts, so the first call comes after the last
 #	skip_all of this file. A plan behind an assertion writes
 #	'1..0 # SKIP' after an 'ok' line, and the harness fails then.
-sub _lib ($stamp)
+sub _lib ( $stamp, $key = $KEY, $label = $stamp )
 {
-	my $dir = "$tree/lib-$stamp";
+	my $dir = "$tree/lib-$label";
 	make_path("$dir/App/FuguBench");
 
 	my $source = _slurp("$repo/lib/App/FuguBench.pm");
@@ -285,7 +311,7 @@ sub _lib ($stamp)
 
 		sub keys (\$)
 		{
-			return ( [ 'fugubench-fixture', '$KEY' ] );
+			return ( [ 'fugubench-fixture', '$key' ] );
 		}
 
 		1;
@@ -555,6 +581,12 @@ subtest 'a signature of another release stops the update' => sub {
 		$r->{stderr}, qr/no embedded key verifies the signature/,
 		'and the message names the failed signature'
 	);
+
+	# The install script reads no embedded key, so the failure
+	# names it as the path out (DIST-KEY-3, DIST-INSTALL-3).
+	like( $r->{stderr}, qr/\Qinstall the program again: $INSTALL\E/,
+		'and it names the install command as the path out' );
+
 	_unchanged( $r, 'a bad signature' );
 
 	is_deeply(
@@ -562,6 +594,39 @@ subtest 'a signature of another release stops the update' => sub {
 		[
 			'/mixed/releases/latest/download/SHA256',
 			'/mixed/releases/latest/download/SHA256.sig',
+		],
+		'and the verb downloads no packed file'
+	);
+};
+
+subtest 'a release of no embedded key stops the update' => sub {
+
+	# The condition of DIST-KEY-3: a rotation left this program
+	# without the key of the release. The embedded list holds one
+	# key of another key number, and the fixture key signed the
+	# release. So the pairing is right and the list is wrong.
+	_release( 'rotated', 'releases/latest/download', 'v1.3.0' );
+
+	my $r =
+	    _update( 'rotated', lib => _lib( $STAMP, $OTHER, 'rotated' ) );
+	is( $r->{exit_code}, 1,   'an absent key exits 1' );
+	is( $r->{stdout},    q{}, 'and it prints no version' );
+	like(
+		$r->{stderr}, qr/no embedded key verifies the signature/,
+		'and the message names the failed signature'
+	);
+	like( $r->{stderr}, qr/checked against wrong key/,
+		'and it gives the reason of the embedded key' );
+	like( $r->{stderr}, qr/\Qinstall the program again: $INSTALL\E/,
+		'and it names the install command as the path out' );
+
+	_unchanged( $r, 'an absent key' );
+
+	is_deeply(
+		[ _requests('rotated') ],
+		[
+			'/rotated/releases/latest/download/SHA256',
+			'/rotated/releases/latest/download/SHA256.sig',
 		],
 		'and the verb downloads no packed file'
 	);
@@ -771,6 +836,27 @@ subtest 'the sandbox row of update' => sub {
 	is( $u->{out}, q{}, 'the verb writes no result line' );
 	like( $u->{err}, qr/^usage: fugubench update /m,
 		'and the usage reaches standard error' );
+};
+
+subtest 'the embedded install command is the published one' => sub {
+
+	# The verb names the install command in a failed signature
+	# check, and INSTALL.md publishes the same command
+	# (DIST-INSTALL-3). This case holds the two equal, and it reads
+	# the published text from the file. So no case of this file
+	# carries a copy of the command.
+	my $doc = "$repo/INSTALL.md";
+	plan skip_all => 'the release tarball holds no INSTALL.md'
+	    unless -f $doc;
+
+	# The first fenced sh block of the document is the install
+	# command, and it holds that one line.
+	my ($published) = _slurp($doc) =~ m{^```sh\n(.*?)\n```$}ms;
+	ok( defined $published, 'INSTALL.md holds a fenced sh block' )
+	    or return;
+
+	is( $published, $INSTALL,
+		'the published command is the embedded command' );
 };
 
 done_testing();

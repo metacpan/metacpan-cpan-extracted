@@ -79,7 +79,6 @@ print "  CPUs: $NCPU  Workers: $workers  Duration: ${duration}s\n";
 print "  Entries: $entries  Key range: $key_range  Val length: $val_len\n";
 print "=" x 78, "\n";
 
-# Test 1: II — Pure write contention (all writers)
 print "\n", "-" x 78, "\n";
 print "II: Pure write contention ($workers writers)\n";
 print "-" x 78, "\n";
@@ -104,20 +103,17 @@ print "-" x 78, "\n";
     my $elapsed = time() - $t0;
     print_result("put (all writers)", $total, $elapsed, $workers);
 
-    # verify integrity
     my $sz = shm_ii_size $map;
     printf "  -> map size: %s (expected <= %s)\n", commify($sz), commify($key_range);
     undef $map; unlink $path;
 }
 
-# Test 2: II — Mixed read/write (readers >> writers)
 print "\n", "-" x 78, "\n";
 printf "II: Mixed read/write (1 writer, %d readers)\n", $workers - 1;
 print "-" x 78, "\n";
 {
     my $path = tmppath();
     my $map = Data::HashMap::Shared::II->new($path, $entries);
-    # pre-populate
     shm_ii_put $map, $_, $_ for 1 .. $key_range;
 
     my $t0 = time();
@@ -127,7 +123,6 @@ print "-" x 78, "\n";
         my $ops = 0;
         my $deadline = time() + $duration;
         if ($wid == 0) {
-            # writer
             while (time() < $deadline) {
                 for (1 .. 1000) {
                     my $k = 1 + int(rand($key_range));
@@ -136,7 +131,6 @@ print "-" x 78, "\n";
                 }
             }
         } else {
-            # reader
             while (time() < $deadline) {
                 for (1 .. 1000) {
                     my $k = 1 + int(rand($key_range));
@@ -152,7 +146,6 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# Test 3: II — Atomic counter contention
 print "\n", "-" x 78, "\n";
 print "II: Atomic counter contention ($workers incrementers)\n";
 print "-" x 78, "\n";
@@ -178,7 +171,6 @@ print "-" x 78, "\n";
     my $elapsed = time() - $t0;
     print_result("incr (all writers)", $total, $elapsed, $workers);
 
-    # verify: sum of all values should equal total ops
     my $sum = 0;
     while (my ($k, $v) = shm_ii_each $map) { $sum += $v; }
     printf "  -> total increments: %s  sum of values: %s  %s\n",
@@ -186,7 +178,6 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# Test 4: SS — String read/write contention
 print "\n", "-" x 78, "\n";
 print "SS: String read/write contention ($workers mixed)\n";
 print "-" x 78, "\n";
@@ -194,7 +185,6 @@ print "-" x 78, "\n";
     my $path = tmppath();
     my $map = Data::HashMap::Shared::SS->new($path, $entries);
     my $val_template = "x" x $val_len;
-    # pre-populate
     for my $i (1 .. $key_range) {
         shm_ss_put $map, "k$i", $val_template . $i;
     }
@@ -224,7 +214,6 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# Test 5: SI — Atomic counters with string keys
 print "\n", "-" x 78, "\n";
 print "SI: String-key atomic counters ($workers incrementers)\n";
 print "-" x 78, "\n";
@@ -257,7 +246,6 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# Test 6: II — Insert + delete churn (high tombstone pressure)
 print "\n", "-" x 78, "\n";
 print "II: Insert/delete churn ($workers workers, high tombstone pressure)\n";
 print "-" x 78, "\n";
@@ -292,7 +280,6 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# Test 7: II — LRU eviction under contention
 print "\n", "-" x 78, "\n";
 print "II: LRU eviction under contention ($workers writers, max_size=$key_range)\n";
 print "-" x 78, "\n";
@@ -326,7 +313,6 @@ print "-" x 78, "\n";
     undef $map; unlink $path;
 }
 
-# Test 8: Scaling — throughput vs worker count
 print "\n", "-" x 78, "\n";
 print "Scaling: II read throughput vs worker count\n";
 print "-" x 78, "\n";

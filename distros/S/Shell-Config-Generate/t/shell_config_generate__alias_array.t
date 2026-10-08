@@ -8,7 +8,6 @@ use TestLib;
 my $dir = tempdir();
 
 my $perl_exe = $^X;
-$perl_exe = Win32::GetShortPathName($perl_exe) if $^O eq 'MSWin32';
 
 my $config = eval { Shell::Config::Generate->new };
 isa_ok $config, 'Shell::Config::Generate';
@@ -42,7 +41,7 @@ foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bs
       # protected on those shells.  generate should refuse to produce
       # a broken alias and die with a helpful message instead.
       my $ret = eval { $config->generate($guess) };
-      like $@, qr/word 'has space' contains a space/, 'generate dies with a helpful message';
+      like $@, qr/word '[^']*' contains a space/, 'generate dies with a helpful message';
       is $ret, U(), 'generate did not return a value';
       return;
     }

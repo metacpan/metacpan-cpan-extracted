@@ -1,0 +1,73 @@
+=head1 NAME
+
+App::FuguSeed::Last - the check word of 11 seed words and two dice
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::Last;
+
+    exit App::FuguSeed::Last->run(@ARGV);
+
+=head1 DESCRIPTION
+
+App::FuguSeed::Last holds the face check, the check word, and the flow
+of the program C<fuguseed-last>. It reads words 1 to 11 from the first
+line of standard input, and the YELLOW face and the BLUE face of word
+12 from the second line. It writes the check word to standard output.
+
+It is the one module of the program that touches a stream. The three
+standard streams are the one contact of the program with the computer:
+no module of the program opens a file, spawns a process, or reads an
+environment variable.
+
+A failure prints one line to standard error. The line names the word
+position, the count, or the die that failed, never a word or a face.
+The check word leaves on standard output only.
+
+=head2 fault
+
+C<fault($faces)> returns the failure message for the fields of the
+array reference C<$faces>, or C<undef> when the fields pass the check.
+The array must hold two fields. The YELLOW face must be one of the
+numbers 1 to 8, and the BLUE face one of the numbers 1 to 16, with no
+sign and no leading zero.
+
+=head2 check_word
+
+C<check_word($words, $yellow, $blue)> returns the one word of the BLUE
+row of word 12 that makes the checksum valid. The faces give the first
+index of the row, C<(Y-1)*256 + (B-1)*16>. The 11 indexes and the 7
+high bits of that index are the 128 entropy bits. The check word is
+the word of the first index of the row plus the checksum. The method
+computes that word, and it runs no trial loop.
+
+=head2 run
+
+C<run(@argument)> reads the two lines, prints the check word, and
+returns the exit code.
+
+=head1 RETURN VALUES
+
+C<fault()> returns C<undef> for two good faces. C<check_word()>
+returns one word of the list. C<run()> returns 0 for a success, 1 for
+a failure, and 2 for a usage error.
+
+=head1 ERRORS
+
+An argument is a usage error: C<run()> prints one usage line to
+standard error and returns 2. Another count than 11 words, a word
+outside the list, another count than two fields, and a bad face are
+failures: C<run()> prints one line to standard error and returns 1.
+
+C<check_word()> expects 11 words of the list and two good faces. Call
+App::FuguSeed::Mnemonic and C<fault()> first.
+
+=head1 SEE ALSO
+
+C<fuguseed-last(1)>, C<fuguseed-qr(1)>, and L<App::FuguSeed::Mnemonic>.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

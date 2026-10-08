@@ -4861,7 +4861,7 @@ THEAD
 		} else {
 			# Low score — add actionable note
 			$exec_summary = "Tests execute $stmt_pct% of the code "
-				. "but detect only $data->{score}% of injected faults — "
+				. "but detect only $data->{score}% of injected faults - "
 				. 'consider adding targeted tests to kill surviving mutants.';
 		}
 

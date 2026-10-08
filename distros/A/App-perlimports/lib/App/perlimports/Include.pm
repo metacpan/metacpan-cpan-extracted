@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000066';
+our $VERSION = '0.000067';
 
 ## no critic (Bangs::ProhibitDebuggingModules)
 
@@ -467,6 +467,11 @@ sub _build_is_ignored {
 
     return 0 if $self->_export_inspector->is_oo_class;
 
+    # A MooseX::Types type library can have a Moose metaclass (as with
+    # MooseX::Types 0.50), which would otherwise trip the uses_moose check
+    # below. See GH#202.
+    return 0 if $self->_export_inspector->is_moose_type_class;
+
     return 1 if $self->_export_inspector->is_moose_class;
 
     return 1 if $self->_export_inspector->uses_moose;
@@ -920,7 +925,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000066
+version 0.000067
 
 =head1 METHODS
 

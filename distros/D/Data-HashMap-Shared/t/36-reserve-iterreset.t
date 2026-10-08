@@ -9,19 +9,12 @@ use Data::HashMap::Shared::SS;
 my $dir = tempdir(CLEANUP => 1);
 my $seq = 0;
 
-# ---------------------------------------------------------------------------
-# reserve() refused its own ceiling.  The target is checked against
-# max_table_cap, but the capacity derived from it (next_pow2 of the 75% load
-# figure) lands one step above that, so reserve(max_entries()) -- the largest
-# value the accessor itself reports -- returned false and grew nothing.
-# ---------------------------------------------------------------------------
 for my $want (100, 1000, 10_000) {
     my $m   = Data::HashMap::Shared::II->new("$dir/r" . $seq++ . ".shm", $want);
     my $max = $m->max_entries;
     ok $m->reserve($max), "reserve(max_entries) accepted for max_entries=$want";
     cmp_ok $m->capacity, '>', 16, "  ... and the table actually grew";
 
-    # the reserved table really holds that many
     $m->put($_, $_) for 1 .. $max;
     is $m->size, $max, "  ... and holds all $max entries";
 
@@ -29,11 +22,7 @@ for my $want (100, 1000, 10_000) {
     ok !$n->reserve($n->max_entries * 4), '  ... while a target past the ceiling is still refused';
 }
 
-# ---------------------------------------------------------------------------
-# iter_reset on a sharded map reset each shard's iterator but flushed only the
-# dispatcher handle, whose deferred flag is never set -- so the compaction the
-# abandoned iteration had deferred stayed pending on every shard.
-# ---------------------------------------------------------------------------
+# sharded: iter_reset must flush each shard, not only the dispatcher handle
 for my $case ([plain => 0], [sharded => 1]) {
     my ($label, $sharded) = @$case;
     my $p = "$dir/i" . $seq++;
@@ -44,7 +33,6 @@ for my $case ([plain => 0], [sharded => 1]) {
     $m->put($_, $_) for 1 .. 8_000;
     my $grown = $m->capacity;
 
-    # remove from inside an open iteration: the shrink is deferred, not applied
     my $seen = 0;
     while (my ($k, $v) = $m->each) { $m->remove($k) if ++$seen <= 7_900; last if $seen > 7_900 }
     is $m->capacity, $grown, "$label: shrink is deferred while the iteration is open";

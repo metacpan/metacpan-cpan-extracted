@@ -1,6 +1,20 @@
 Revision history for SimpleFlow
 
 
+0.195 2026-10-07 (Claude Opus 5.5 helped)
+
+ [Tests]
+
+ - **Two tests no longer assume that the wall clock keeps pace with
+     `sleep`.** `t/01.t` checked that `overwrite => 'true'` rewrites its
+     output by comparing the file's `-M` before and after a `sleep 1`; on a
+     perl 5.10.1 CPAN smoker running in a VM, both readings fell in the
+     second the test started although the file had been rewritten, and the
+     test died "output files are not overwritten". It now checks the file's
+     contents, which the re-run replaces. Block 12 of `t/02.fixes.t` made
+     its input newer than its output with a `sleep 2` between the writes,
+     and now sets both times with `utime`. The module is unchanged.
+
 0.194 2026-10-05 (Claude Opus 5.5 helped)
 
  [Fixed]

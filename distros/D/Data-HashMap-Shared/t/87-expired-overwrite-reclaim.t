@@ -9,9 +9,9 @@ use Data::HashMap::Shared::I32S;
 use Data::HashMap::Shared::SS;
 
 # Only one class-2048 value fits this arena. An overwrite stores its replacement
-# before freeing the old block, and protects the old entry from its TTL scan.
-# If that overwrite fails, the protected entry stays expired. A later insert
-# must still reclaim it, even in the same second as the earlier scan.
+# before freeing the old block and protects the old entry from its TTL scan; if
+# it fails, a later insert must still reclaim the expired entry, even in the
+# same second as the earlier scan.
 my $value = 'v' x 1500;
 my @cases;
 for my $variant (qw(IS I16S I32S SS)) {
@@ -27,8 +27,7 @@ for my $variant (qw(IS I16S I32S SS)) {
 }
 sleep 1.2;
 
-# Leave most of a clock second for the failed overwrite and the following
-# insert, so the previous same-second suppression is actually exercised.
+# leave most of a clock second for the failed overwrite and the insert after it
 my $now = clock_gettime(CLOCK_MONOTONIC);
 sleep int($now) + 1.01 - $now if $now - int($now) > 0.5;
 

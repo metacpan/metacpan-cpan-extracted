@@ -18,37 +18,31 @@ use Data::HashMap::Shared::SS;
 
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_addttl') . '.shm' }
 
-# II: add_ttl on TTL-enabled map (keyword form + method form)
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 30);  # default TTL 30s
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 30);
 
-    # Keyword form: insert with explicit TTL larger than default
     ok(shm_ii_add_ttl $map, 1, 100, 120, 'II add_ttl kw: succeeds on new key');
     is($map->get(1), 100, 'II add_ttl: value stored');
     my $rem = shm_ii_ttl_remaining $map, 1;
     ok($rem > 30, "II add_ttl: TTL > default (rem=$rem)");
     ok($rem <= 120, "II add_ttl: TTL within explicit value (rem=$rem)");
 
-    # Existing key: add_ttl fails, value/TTL unchanged
     ok(!(shm_ii_add_ttl $map, 1, 999, 5), 'II add_ttl: fails on existing key');
     is($map->get(1), 100, 'II add_ttl: existing value unchanged on collision');
     my $rem2 = shm_ii_ttl_remaining $map, 1;
     ok($rem2 > 30, "II add_ttl collision: TTL unchanged (rem=$rem2)");
 
-    # Permanent (ttl=0)
     ok(shm_ii_add_ttl $map, 2, 200, 0, 'II add_ttl: succeeds with ttl=0');
     my $perm = shm_ii_ttl_remaining $map, 2;
     is($perm, 0, 'II add_ttl: ttl=0 → permanent');
 
-    # Method form
     ok($map->add_ttl(3, 300, 90), 'II add_ttl: method form');
     is($map->get(3), 300, 'II add_ttl method: value stored');
 
     unlink $path;
 }
 
-# SI: string key
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI->new($path, 1000, 0, 30);
@@ -60,7 +54,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_addttl') . '.shm' }
     unlink $path;
 }
 
-# IS: int key, string value
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::IS->new($path, 1000, 0, 30);
@@ -71,7 +64,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_addttl') . '.shm' }
     unlink $path;
 }
 
-# SS: string key, string value
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000, 0, 30);
@@ -84,8 +76,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_addttl') . '.shm' }
     unlink $path;
 }
 
-# Smoke tests for the remaining six variants — verify each XS binding
-# routes correctly and TTL is honored. Logic is shared via templated C.
+# smoke test per remaining variant; the logic is shared templated C
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I16->new($path, 1000, 0, 30);
@@ -137,30 +128,25 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_addttl') . '.shm' }
     unlink $path;
 }
 
-# add_ttl on map without TTL → croak
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 100);  # no TTL
+    my $map = Data::HashMap::Shared::II->new($path, 100);
     eval { $map->add_ttl(1, 1, 60) };
     like($@, qr/TTL-enabled/, 'add_ttl croaks on non-TTL map');
     unlink $path;
 }
 
-# add_ttl on expired entry should succeed (expired treated as absent)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100, 0, 30);
-    shm_ii_put_ttl $map, 1, 100, 1;   # expires in 1s
+    shm_ii_put_ttl $map, 1, 100, 1;
     Time::HiRes::sleep(1.2);
     ok(shm_ii_add_ttl $map, 1, 200, 60, 'II add_ttl: succeeds when prior entry expired');
     is($map->get(1), 200, 'II add_ttl: re-added value visible');
     unlink $path;
 }
 
-# Regression (0.19): the per-key TTL arguments were cast straight to uint32,
-# so a value at or above 2**32 wrapped -- put_ttl($k,$v,2**32) silently made the
-# entry PERMANENT rather than failing.  The constructor's ttl and reserve()
-# already rejected out-of-range values; these four now match.
+# a ttl of 2**32 would wrap to 0 (permanent) if cast to uint32 unchecked
 {
     my $path = tmpfile();
     my $map  = Data::HashMap::Shared::II->new($path, 100, 0, 30);
@@ -183,26 +169,19 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_addttl') . '.shm' }
     unlink $path;
 }
 
-
-# Expiry is compared in five independent places -- the SHM_IS_EXPIRED macro,
-# get()'s inline check, ttl_remaining's, flush_expired_partial's, and the copy
-# get_multi inlines in each of the ten xs/*.xs files -- so they can drift apart
-# by a second and leave two accessors disagreeing about the same key.  Sample
-# every one of them across the whole boundary rather than at one instant,
-# whatever second the entry dies in.
+# expiry is compared in several independent places (SHM_IS_EXPIRED, get,
+# ttl_remaining, flush_expired_partial, get_multi's inline copies); sample all
+# of them across the whole boundary so they cannot drift apart by a second
 {
     my $dir  = File::Temp::tempdir(CLEANUP => 1);
     my $path = File::Spec->catfile($dir, 'boundary.shm');
-    my $map  = Data::HashMap::Shared::II->new($path, 64, 0, 1);   # 1s default TTL
-    # get_multi inlines its own copy of the check in every variant file, and it
-    # is the XSUB with the drift history, so watch a string-key one too
+    my $map  = Data::HashMap::Shared::II->new($path, 64, 0, 1);
+    # get_multi inlines its own check per variant file, so watch a string-key
+    # one too
     my $spath = File::Spec->catfile($dir, 'boundary-ss.shm');
     my $smap  = Data::HashMap::Shared::SS->new($spath, 64, 0, 1);
-    # flush_expired_partial removes what IT calls expired; a full sweep followed
-    # by size() is its verdict, and it must match get()'s on the same map
-    # ... and its verdict is destructive, so the entry a disagreement is about is
-    # gone by the next reading and a re-read of the same map can never confirm
-    # it: give every reading its own map.
+    # flush_expired_partial's verdict is destructive, so give every reading its
+    # own map
     my @fmaps = map {
         my $m = Data::HashMap::Shared::II->new(
             File::Spec->catfile($dir, "boundary-flush-$_.shm"), 64, 0, 1);
@@ -210,14 +189,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_addttl') . '.shm' }
         $m;
     } 1 .. 200;
 
-    # The watched entries go in last: building 200 maps takes milliseconds, and
-    # an entry that dies before the first sample fails 'saw it alive'.
+    # the watched entries go in last so they cannot die before the first sample
     $map->put(7, 70);
     $smap->put('seven', 'seventy');
 
-    # The readings in one sample are taken one after another, so the entry can
-    # die between two of them; a lone disagreement is that, not drift.  Re-read
-    # at once and count only what persists.
+    # an entry can die between two readings of one sample; re-read at once and
+    # count only a disagreement that persists
     my $sample = sub {
         my $by_get = defined($map->get(7)) ? 1 : 0;
         my ($wv)   = $map->get_with_ttl(7);

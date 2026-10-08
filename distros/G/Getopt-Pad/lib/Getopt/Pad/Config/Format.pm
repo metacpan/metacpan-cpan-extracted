@@ -8,7 +8,7 @@ use experimental 'signatures';
 use Object::Pad;
 use Getopt::Pad::Registry;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my @builtins = map { "Getopt::Pad::Config::Format::$_" } qw(Yaml Json);
 my $registry;
@@ -142,7 +142,9 @@ options) and hashrefs (for C<hash> and C<objectlist> options). Getopt::Pad
 checks the structure and every value, so C<parse> does not need to.
 Booleans may be returned as C<1> and C<0> or as boolean objects such as
 L<JSON::PP::Boolean>; an undefined value is reported to the user as
-C<no value given>.
+C<no value given>. A file that sets nothing, such as an empty file,
+should give an empty hashref: anything that is not a hashref is reported
+as C<config file 'PATH' must contain a mapping of group names>.
 
 When the text cannot be parsed, C<parse> dies. Getopt::Pad reports the
 message to the user as a config error that names the file, for example
@@ -176,9 +178,9 @@ of C<GetOptions> unchanged.
     Getopt::Pad::Config::Format::registerFormat('My::Format::Toml');
 
 Registers a format class under the names in its L</NAMES> constant, for
-all specs in the program. The argument is the class name. If the class has
-no C<NAMES> method yet, which usually means that its module is not
-loaded, its module file is loaded first (for example
+all specs in the program. The argument is the class name. If the class is
+not defined yet (it has no C<new> method), its module file is loaded
+first (for example
 F<My/Format/Toml.pm> from C<@INC>).
 
 It dies when a name is already registered by another class, with

@@ -245,7 +245,7 @@ entries to the C<options> hash from step 2:
         type     => 'string',
         multiple => 1,
         csv      => 1,
-        help     => 'Skip files matching this pattern (-x, may be repeated)',
+        help     => 'Skip files matching this pattern (may be repeated)',
     },
 
 C<valid> lists the values the option accepts. C<multiple> lets the option
@@ -297,7 +297,7 @@ C<help> text you write. A few more keys make it more useful:
                 type     => 'dir',
                 required => 1,
                 group    => 'Destination',
-                help     => 'Directory the backup is written to (-t)',
+                help     => 'Directory the backup is written to',
             },
             'keep' => {
                 type    => 'int',
@@ -323,14 +323,14 @@ C<help> text you write. A few more keys make it more useful:
                 multiple => 1,
                 csv      => 1,
                 typehint => 'Pattern',
-                help     => 'Skip files matching this pattern (-x, may be repeated)',
+                help     => 'Skip files matching this pattern (may be repeated)',
             },
             'dry-run|n' => {
-                help => 'Only show what would be copied (-n)',
+                help => 'Only show what would be copied',
             },
             'verbose|v' => {
                 type => 'counter',
-                help => 'Print more details; repeat for even more (-v)',
+                help => 'Print more details; repeat for even more',
             },
         },
         args => [
@@ -350,8 +350,8 @@ group are listed under C<Options>.
 =item * C<typehint> sets the label at the end of the help text, here
 C<[Pattern]>.
 
-=item * The help output lists every option by its primary name only, so
-the help texts mention the short aliases.
+=item * The help output lists the aliases after the primary name, as in
+C<--target, -t>, so the help texts need not mention them.
 
 =back
 
@@ -374,18 +374,17 @@ the help texts mention the short aliases.
                                        Default = 1
        --keep <>                   Number of backups to keep
                                        Default = 7
-       --target <>                 [REQ] Directory the backup is written to
-                                   (-t) [Path]
+       --target, -t <>             [REQ] Directory the backup is written to
+                                   [Path]
 
     ## Options
-       --dry-run                   Only show what would be copied (-n)
-       --exclude <a,b,...>         Skip files matching this pattern (-x, may be
+       --dry-run, -n               Only show what would be copied
+       --exclude, -x <a,b,...>     Skip files matching this pattern (may be
                                    repeated) [Pattern]
        --method <>                 How to copy the files
                                        Valid   = [ tar, rsync ]
                                        Default = tar
-       --verbose                   Print more details; repeat for even more
-                                   (-v)
+       --verbose, -v               Print more details; repeat for even more
 
     # Examples:
     ## Back up your photos, skipping temporary files
@@ -435,7 +434,7 @@ command are called I<levels>; every level has its own options:
             'verbose|v' => {
                 type    => 'counter',
                 inherit => 1,
-                help    => 'Print more details; repeat for even more (-v)',
+                help    => 'Print more details; repeat for even more',
             },
         },
         commands => {
@@ -451,7 +450,7 @@ command are called I<levels>; every level has its own options:
                         type     => 'string',
                         multiple => 1,
                         csv      => 1,
-                        help     => 'Skip files matching this pattern (-x)',
+                        help     => 'Skip files matching this pattern',
                     },
                 },
                 args => [
@@ -475,7 +474,7 @@ command are called I<levels>; every level has its own options:
                         min     => 1,
                         help    => 'Number of backups to keep',
                     },
-                    'dry-run|n' => { help => 'Only show what would be deleted (-n)' },
+                    'dry-run|n' => { help => 'Only show what would be deleted' },
                 },
             },
         },
@@ -559,10 +558,9 @@ command's help shows its own options followed by the inherited ones:
                                        Valid   = [ bash, zsh ]
 
     ## Options
-       --target <>                 [REQ] Directory the backups are kept in
+       --target, -t <>             [REQ] Directory the backups are kept in
                                    [Path]
-       --verbose                   Print more details; repeat for even more
-                                   (-v)
+       --verbose, -v               Print more details; repeat for even more
 
     ## Commands
        list                        List the existing backups
@@ -574,11 +572,11 @@ command's help shows its own options followed by the inherited ones:
     # Delete old backups
 
     ## Options
-       --dry-run       Only show what would be deleted (-n)
-       --keep <>       Number of backups to keep
-                           Default = 7
-       --target <>     [REQ] Directory the backups are kept in [Path]
-       --verbose       Print more details; repeat for even more (-v)
+       --dry-run, -n       Only show what would be deleted
+       --keep <>           Number of backups to keep
+                               Default = 7
+       --target, -t <>     [REQ] Directory the backups are kept in [Path]
+       --verbose, -v       Print more details; repeat for even more
 
 Commands can have commands of their own, to any depth. See
 L<Getopt::Pad/COMMANDS>.

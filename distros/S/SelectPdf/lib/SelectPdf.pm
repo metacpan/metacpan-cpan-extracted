@@ -1,15 +1,20 @@
 package SelectPdf;
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.6.0';
 
+require SelectPdf::ApiEnums;
+require SelectPdf::DemoExceptions;
 require SelectPdf::HtmlToPdfClient;
+require SelectPdf::InvoiceClient;
 require SelectPdf::PdfMergeClient;
 require SelectPdf::PdfToTextClient;
 require SelectPdf::UsageClient;
+require SelectPdf::WebElementsClient;
+require SelectPdf::AsyncJobClient;
 
 =head1 NAME
  
-SelectPdf - SelectPdf Online REST API client library for Perl. Contains HTML to PDF converter, PDF merge, PDF to text extractor, search PDF.
+SelectPdf - SelectPdf Online REST API client library for Perl. Contains HTML to PDF converter, ZUGFeRD / Factur-X electronic invoices, PDF merge, PDF to text extractor, search PDF.
  
 =head1 SYNOPSIS
  
@@ -26,7 +31,7 @@ Convert HTML to PDF
     my $apiKey = "Your API key here";
 
     eval {
-        my $client = new HtmlToPdfClient($apiKey);
+        my $client = SelectPdf::HtmlToPdfClient->new($apiKey);
         
         $client
             ->setPageSize("A4")
@@ -184,6 +189,79 @@ Search PDF
         print "An error occurred: $@\n";  
     }
 
+Convert HTML to PDF with the keyless demo endpoint (no API key; watermarked output, capped at 5 pages)
+
+    use SelectPdf;
+
+    eval {
+        my $client = SelectPdf::HtmlToPdfClient->new(); # undef, "" or "demo" selects the demo endpoint
+
+        $client->convertUrlToFile("https://selectpdf.com/", "Test.pdf");
+
+        print "Mode: " . $client->getMode() . "\n"; # "demo"
+    };
+
+    if (my $err = $@) {
+        if (ref $err && $err->isa('SelectPdf::DemoRateLimitException')) {
+            print "Demo rate limit (" . $err->reason() . "). Retry after " . $err->retryAfter() . "s.\n";
+        }
+        elsif (ref $err && $err->isa('SelectPdf::DemoSafetyException')) {
+            print "Demo safety guard rejected '" . $err->field() . "' (reason=" . $err->reason() . ").\n";
+        }
+        elsif (ref $err && $err->isa('SelectPdf::DemoUnsupportedException')) {
+            print "Feature '" . $err->field() . "' not available in demo mode.\n";
+        }
+        else {
+            print "An error occurred: $err\n";
+        }
+    }
+
+Tagged (accessible) PDF and PDF/A
+
+    use SelectPdf;
+
+    my $apiKey = "Your API key here";
+
+    eval {
+        my $client = SelectPdf::HtmlToPdfClient->new($apiKey);
+
+        $client
+            ->setTagged('True')
+            ->setDocTitle("Accessible document")
+            ->setDocumentLanguage("en-US")
+            ->setPdfStandard(SelectPdf::PdfStandard::PdfA3A)
+        ;
+
+        $client->convertUrlToFile("https://selectpdf.com/", "Accessible.pdf");
+
+        print "Credits remaining: " . $client->getCreditsRemaining() . " / " . $client->getCreditsTotal() . "\n";
+    };
+
+    if ($@) {
+        print "An error occurred: $@\n";
+    }
+
+ZUGFeRD / Factur-X electronic invoice
+
+    use SelectPdf;
+
+    my $apiKey = "Your API key here";
+
+    eval {
+        my $client = SelectPdf::InvoiceClient->new($apiKey);
+
+        $client
+            ->setInvoiceXmlFile("factur-x.xml")
+            ->setZugferdProfile(SelectPdf::ZugferdProfile::En16931)
+        ;
+
+        $client->createFromHtmlStringToFile("<h1>Invoice INV-2026-001</h1>", "Invoice.pdf");
+    };
+
+    if ($@) {
+        print "An error occurred: $@\n";
+    }
+
 =head1 DESCRIPTION
  
 SelectPdf HTML To PDF Online REST API is a professional solution that lets you create PDF from web pages and raw HTML code in your applications. 
@@ -191,6 +269,12 @@ The API is easy to use and the integration takes only a few lines of code. The g
 That makes SelectPdf API the best html to pdf online service that can be used.
 
 For more details and full list of parameters see L<Html To Pdf API|https://selectpdf.com/html-to-pdf-api/>.
+
+The distribution contains: SelectPdf::HtmlToPdfClient (HTML to PDF, with a keyless demo mode), SelectPdf::InvoiceClient (ZUGFeRD / Factur-X hybrid electronic invoices),
+SelectPdf::PdfMergeClient (PDF merge), SelectPdf::PdfToTextClient (PDF to text, search PDF), SelectPdf::UsageClient (API usage),
+SelectPdf::WebElementsClient and SelectPdf::AsyncJobClient (helpers), the typed demo errors in SelectPdf::DemoExceptions and the value constants in SelectPdf::ApiEnums.
+
+Every client exposes the response telemetry of the most recent call: getNumberOfPages, getCreditsTotal, getCreditsRemaining, getMode and getExecutionMode.
 
 =cut
 1;

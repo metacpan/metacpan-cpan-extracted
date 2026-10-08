@@ -27,5 +27,4 @@ while (my ($k, $v) = shm_ii_each $map) {
 $map->put(99, 999);
 print "get(99) = ", $map->get(99), "\n";
 
-# cleanup
 $map->unlink;

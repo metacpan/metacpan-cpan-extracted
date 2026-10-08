@@ -511,4 +511,97 @@ END_PM
 	Test::Mockingbird::unmock('App::Test::Generator::SchemaExtractor', '_numeric_boundary_values');
 };
 
+# --------------------------------------------------
+# Invocant variable stripping: $pkg, $proto, $klass
+# --------------------------------------------------
+
+subtest 'import with $pkg invocant produces no input parameters' => sub {
+	my $src = <<'END_PM';
+package Database::Abstraction;
+
+=head2 import
+
+Initialise via C<use>.
+
+=cut
+
+sub import
+{
+	my $pkg = shift;
+
+	if((scalar(@_) % 2) == 0) {
+		my %h = @_;
+		configure($pkg, \%h);
+	} elsif((scalar(@_) == 1) && (ref($_[0]) eq 'HASH')) {
+		configure($pkg, $_[0]);
+	}
+}
+
+1;
+END_PM
+	my ($pm) = _make_pm($src);
+	my $e = App::Test::Generator::SchemaExtractor->new(input_file => $pm);
+	my $schemas = $e->extract_all(no_write => 1);
+
+	ok(exists $schemas->{import}, 'import sub found');
+	my $input = $schemas->{import}{input} // {};
+	ok(!exists $input->{pkg}, '$pkg not extracted as input parameter');
+	is(scalar keys %$input, 0, 'import has no extracted input parameters');
+};
+
+subtest 'constructor with $proto invocant produces no invocant parameter' => sub {
+	my $src = <<'END_PM';
+package Foo;
+
+=head2 new
+
+Constructor.
+
+=cut
+
+sub new {
+	my $proto = shift;
+	my $class = ref($proto) || $proto;
+	return bless {}, $class;
+}
+
+1;
+END_PM
+	my ($pm) = _make_pm($src);
+	my $e = App::Test::Generator::SchemaExtractor->new(input_file => $pm);
+	my $schemas = $e->extract_all(no_write => 1);
+
+	ok(exists $schemas->{new}, 'new sub found');
+	my $input = $schemas->{new}{input} // {};
+	ok(!exists $input->{proto}, '$proto not extracted as input parameter');
+};
+
+subtest 'class method with $klass invocant produces no invocant parameter' => sub {
+	my $src = <<'END_PM';
+package Bar;
+
+=head2 create
+
+Factory method.
+
+=cut
+
+sub create {
+	my $klass = shift;
+	my ($x) = @_;
+	return bless { x => $x }, $klass;
+}
+
+1;
+END_PM
+	my ($pm) = _make_pm($src);
+	my $e = App::Test::Generator::SchemaExtractor->new(input_file => $pm);
+	my $schemas = $e->extract_all(no_write => 1);
+
+	ok(exists $schemas->{create}, 'create sub found');
+	my $input = $schemas->{create}{input} // {};
+	ok(!exists $input->{klass}, '$klass not extracted as input parameter');
+	ok(exists $input->{x}, 'real parameter $x is still extracted');
+};
+
 done_testing();

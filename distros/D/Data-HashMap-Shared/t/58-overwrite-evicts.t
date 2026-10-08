@@ -5,18 +5,18 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SS;
 
-# An overwrite -- put on a hit, update, swap, cas -- stores the new value before
-# releasing the old one, so on a full arena it needs room for both.  An LRU map
-# makes that room by evicting, and the entry being replaced is never the victim.
+# An overwrite stores the new value before releasing the old one, so a full
+# arena needs room for both; an LRU map evicts to make it, and the entry being
+# replaced is never the victim.
 
 my $dir = tempdir(CLEANUP => 1);
 my $V = 'x' x 200;
 my $seq = 0;
-my $full = sub {                    # class-256 entries evicting in a 4096-byte arena
+my $full = sub {                    # class-256 entries in a 4096-byte arena
     my $m = Data::HashMap::Shared::SS->new("$dir/f" . $seq++ . ".shm", 1000, 500, 0, 0, 4096);
     my $n = 0;
     while ($m->put("k$n", $V)) { last if ++$n > 100 }
-    return ($m, "k" . ($n - 1));       # the newest key
+    return ($m, "k" . ($n - 1));
 };
 
 for my $case (

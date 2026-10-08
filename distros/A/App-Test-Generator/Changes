@@ -1,5 +1,50 @@
 Revision history for App-Test-Generator
 
+0.47	Wed Oct  7 09:29:14 PM EDT 2026
+	[Enhancements]
+	- Bump actions-setup-perl to 1.44.0
+	- Add --function NAME (-F NAME) option to bin/extract-schemas. When set,
+	  all schemas are extracted as normal, then every .yml except NAME.yml is
+	  deleted from the output directory and every other routine is removed from
+	  the in-memory schema map, so the fuzz run and summary table cover only
+	  that one routine. If NAME is not found in the file the script prints the
+	  available routine names and exits 1. Useful for isolating a single
+	  t/self-fuzz.t failure:
+	    extract-schemas --function bugs --output-dir /tmp/dbg \
+	        lib/App/Test/Generator/CoverageGuidedFuzzer.pm
+	    fuzz-harness-generator -r /tmp/dbg/bugs.yml
+
+	- Improve t/self-fuzz.t end-of-run summary table. Previously only
+	  successfully fuzz-tested routines appeared (skipped ones, including those
+	  in %no_fuzz such as 'generate', were invisible). The table now covers
+	  every processed routine with two columns: Module (derived from the .pm
+	  path, e.g. App::Test::Generator::CoverageGuidedFuzzer) and Routine, plus
+	  a Tests column showing the test count for fuzz-tested routines or a
+	  plain-English reason for skipped ones:
+	    "skipped (internal helper)"              — name starts with _
+	    "skipped (excluded from fuzz list)"      — in %no_fuzz
+	    "skipped (instance method, needs $self)" — schema has new: key
+	    "skipped (object param without can:)"    — mandatory object, no can: hint
+	    "FAILED"                                 — harness exited non-zero
+	  The subtest name for each .pm now uses the module name rather than the
+	  raw file path.
+	[ Documentation ]
+	- Enhanced the MUTANT_SKIP examples
+
+	[Bug fixes]
+	- Fix SchemaExtractor treating $pkg (and $proto, $klass) as a user-facing
+	  input parameter instead of a class invocant. The invocant-skip filter
+	  previously only covered $self and $class; $pkg (used in import()),
+	  $proto (older constructor idiom), and $klass (alternate class spelling)
+	  were all passed through as position-0 string parameters, producing
+	  schema entries like "pkg: {type: string}" for import() subroutines.
+	  The fix extends every invocant regex — ten extraction-loop guards, the
+	  _validate_pod_code_agreement special-case block, and the inline body
+	  guard — to the full set (self|class|pkg|proto|klass). The position-0
+	  detection logic in _analyze_code Style 1/2/3 is also simplified to a
+	  single regex rather than separate eq-'class'/eq-'self' branches.
+	  Three regression tests added to t/SchemaExtractor_unit.t.
+
 0.46	Tue Aug 18 08:51:10 PM EDT 2026
 	[Enhancements]
 	- Add CPD drill-down pages (cover_html/cpd_html/): per-file HTML showing

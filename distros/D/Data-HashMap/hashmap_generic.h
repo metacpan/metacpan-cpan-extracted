@@ -1,27 +1,11 @@
 /*
- * hashmap_generic.h — Macro-template for type-specialized hashmaps.
- *
- * Before including this file, define:
- *   HM_PREFIX      — function name prefix (e.g., hashmap_ii)
- *   HM_NODE_TYPE   — node struct name
- *   HM_MAP_TYPE    — map struct name
- *
- * Key type (choose one):
- *   HM_KEY_IS_INT  — define for integer keys
- *   (leave undefined for string keys: char* + uint32_t len + uint32_t hash)
- *
- * Value type (choose one):
- *   HM_VALUE_IS_STR — define for string values (char* + uint32_t len)
- *   HM_VALUE_IS_SV  — define for opaque pointer values (void*, refcounted externally)
- *   (leave undefined for integer values)
- *
- * Integer width (optional, defaults to int64_t):
- *   HM_INT_TYPE    — integer type (int32_t or int64_t)
- *   HM_INT_MIN     — minimum value (sentinel: empty key)
- *   HM_INT_MAX     — maximum value (for overflow checks)
- *
- * Optional:
- *   HM_HAS_COUNTERS — define to generate incr/decr functions (int values only)
+ * hashmap_generic.h — macro template for the type-specialized maps.
+ * Each hashmap_<variant>.h defines these before including it:
+ *   HM_PREFIX / HM_NODE_TYPE / HM_MAP_TYPE    names
+ *   HM_KEY_IS_INT                             integer keys, else string
+ *   HM_VALUE_IS_STR | HM_VALUE_IS_SV          value kind, else integer
+ *   HM_INT_TYPE / HM_INT_MIN / HM_INT_MAX     key width (default int64_t)
+ *   HM_HAS_COUNTERS                           incr/decr (int values only)
  */
 
 #include <stdint.h>
@@ -457,20 +441,49 @@ static void HM_FN(clear)(HM_MAP_TYPE* map) {
     map->drain_pos = 0;
     do {
         size_t i;
+#ifdef HM_VALUE_IS_SV
+        /* Sweep backwards from an empty slot, so deletions end probe chains. */
+        for (i = 0; i < map->capacity && !HM_SLOT_IS_EMPTY(&map->nodes[i]); i++) {}
+        size_t left = map->capacity;
+        while (left--) {
+            if (i == 0) i = map->capacity;
+            i--;
+#else
         for (i = 0; i < map->capacity; i++) {
+#endif
             if (HM_SLOT_IS_LIVE(&map->nodes[i])) {
                 if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_unlink)(map, (uint32_t)i);
                 if (map->expires_at) map->expires_at[i] = 0;
                 HM_NODE_TYPE dead = map->nodes[i];
                 HM_FN(init_nodes)(&map->nodes[i], 1);
+#ifdef HM_VALUE_IS_SV
+                if (!HM_SLOT_IS_EMPTY(&map->nodes[(i + 1) & map->mask])) {
+#ifdef HM_KEY_IS_INT
+                    map->nodes[i].key = HM_TOMBSTONE_KEY;
+#else
+                    map->nodes[i].key = HM_STR_TOMBSTONE;
+#endif
+                    map->tombstones++;
+                }
+#endif
                 if (map->size) map->size--;
                 HM_FREE_NODE_NOW(map, &dead);
-            } else if (HM_SLOT_IS_TOMBSTONE(&map->nodes[i])) {
+            } else if (HM_SLOT_IS_TOMBSTONE(&map->nodes[i])
+#ifdef HM_VALUE_IS_SV
+                       && HM_SLOT_IS_EMPTY(&map->nodes[(i + 1) & map->mask])
+#endif
+                      ) {
                 HM_FN(init_nodes)(&map->nodes[i], 1);
                 if (map->tombstones) map->tombstones--;
             }
         }
     } while (map->size);
+#ifdef HM_VALUE_IS_SV
+    if (map->tombstones) HM_FN(init_nodes)(map->nodes, map->capacity);
+    map->tombstones = 0;
+    map->iter_pos = 0;
+    map->drain_pos = 0;
+#endif
 }
 
 /* ---- reap_expired / purge ---- */

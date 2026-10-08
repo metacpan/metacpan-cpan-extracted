@@ -5,6 +5,8 @@ use SelectPdf::ApiClient;
 use strict;
 our @ISA = qw(SelectPdf::ApiClient);
 
+our $VERSION = '1.6.0';
+
 =head1 NAME
 
 SelectPdf::WebElementsClient - Get the locations of certain web elements. 

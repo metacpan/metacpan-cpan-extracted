@@ -12,6 +12,7 @@ use File::Temp qw(tempdir);
 use FindBin qw($Bin);
 use Test::Most;
 use Test::NoWarnings;
+use Test::Returns;
 
 eval { require DBI; require DBD::SQLite };
 if($@) {
@@ -39,16 +40,16 @@ my $t1 = new_ok('Database::test1' => [$data_dir]);
 
 # Slurped data should be accessible without throwing on any key access
 my $row = $t1->fetchrow_hashref(entry => 'one');
-ok(defined($row), 'BUG1: fetchrow_hashref returns data from locked slurp hash');
+returns_is($row, { type => 'hashref' }, 'BUG1: fetchrow_hashref returns data from locked slurp hash');
 is($row->{'number'}, 1, 'BUG1: locked hash value readable');
 
 # Accessing a key that doesn't exist in the outer locked hash should return undef, not throw
 my $missing = $t1->fetchrow_hashref(entry => 'nonexistent');
-ok(!defined($missing), 'BUG1: missing outer key returns undef, not throw');
+returns_is($missing, { type => 'void' }, 'BUG1: missing outer key returns undef, not throw');
 
 # AUTOLOAD on a missing entry should also return undef, not throw
 my $n = $t1->number('nonexistent');
-ok(!defined($n), 'BUG1: AUTOLOAD missing entry returns undef not exception');
+returns_is($n, { type => 'void' }, 'BUG1: AUTOLOAD missing entry returns undef not exception');
 
 # -------------------------------------------------------------------------
 # BUG 2: execute() passed arrayref instead of list to DBI->execute()
@@ -135,7 +136,7 @@ throws_ok { $noa->number('one') } qr/AUTOLOAD disabled/i, 'BUG4: auto_load => 0 
 # so we test that the XML success path still works (regression guard).
 pass('Database::test3 loaded');
 my $t3 = Database::test3->new(directory => $data_dir);
-ok(defined($t3), 'BUG5: XML load still works after die->croak fix');
+returns_is($t3, { type => 'object', isa => 'Database::test3' }, 'BUG5: XML load still works after die->croak fix');
 
 # -------------------------------------------------------------------------
 # BUG 6: AUTOLOAD list-context query used hardcoded 'entry' instead of id
@@ -158,13 +159,13 @@ is(scalar @names, 5, 'BUG6: AUTOLOAD list context with custom id column returns 
 
 # Filter by a non-key column in slurped data
 my $matches = $t1->selectall_arrayref(number => 2);
-ok(defined($matches) && ref($matches) eq 'ARRAY', 'BUG7: selectall_arrayref in-memory scan returns arrayref');
+returns_is($matches, { type => 'arrayref' }, 'BUG7: selectall_arrayref in-memory scan returns arrayref');
 is(scalar @{$matches}, 1, 'BUG7: in-memory scan finds exactly 1 match');
 is($matches->[0]{'entry'}, 'two', 'BUG7: in-memory scan returns the right row');
 
 # Make sure no-match returns empty arrayref (not undef)
 my $none = $t1->selectall_arrayref(number => 999);
-ok(defined($none) && ref($none) eq 'ARRAY', 'BUG7: in-memory scan no-match returns arrayref');
+returns_is($none, { type => 'arrayref' }, 'BUG7: in-memory scan no-match returns arrayref');
 is(scalar @{$none}, 0, 'BUG7: in-memory scan no-match returns empty arrayref');
 
 # selectall_array in-memory scan
@@ -186,7 +187,7 @@ my $logged_db;
 lives_ok {
 	$logged_db = Database::test1->new({ directory => $data_dir, logger => $logger_sub });
 } 'BUG8: code-ref logger accepted in new()';
-ok(defined($logged_db), 'BUG8: object created with code-ref logger');
+returns_is($logged_db, { type => 'object', can => 'count' }, 'BUG8: object created with code-ref logger has count() method');
 
 # -------------------------------------------------------------------------
 # BUG 9: Column name SQL injection guard in _build_where_conditions
@@ -254,7 +255,7 @@ ok(defined($logged_db), 'BUG8: object created with code-ref logger');
 		my $db_dbi = Database::test1->new(directory => $data_dir, max_slurp_size => 0);
 		my $all = $db_dbi->selectall_arrayref();
 		my ($empty_row) = grep { $_->{'entry'} eq 'empty' } @{$all};
-		ok(defined($empty_row),            'BUG10: empty row is present in DBI results');
+		returns_is($empty_row, { type => 'hashref' }, 'BUG10: empty row is present in DBI results');
 		ok(!defined($empty_row->{'number'}), 'BUG10: empty row has undef number column (trigger condition confirmed)');
 	}
 	@slice_warns = grep { /uninitialized value in hash slice/ } @warned;

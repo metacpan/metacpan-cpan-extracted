@@ -37,14 +37,33 @@ test-generator-mutate - Run mutation testing against a Perl test suite
 
 =head2 Skipping Lines from Mutation
 
-Some routines involve process-management side-effects (forking,
-signalling, C<waitpid>) that are inherently difficult to assert against
-in a unit test.  A mutant that corrupts a PID or signal value may cause
-the test suite to hang or emit warnings from an C<END> block rather than
-producing a clean pass/fail result.
+Some routines involve logic that must not be mutated because doing so
+would cause the test suite to hang rather than produce a clean
+pass/fail result.  Two common cases:
 
-To exclude a block of lines from mutation testing entirely, wrap it with
-C<## MUTANT_SKIP_BEGIN> and C<## MUTANT_SKIP_END> annotations:
+=over 4
+
+=item Recursion base cases
+
+The C<ConditionalInversion> and C<BooleanNegation> operators will negate
+any C<if> condition, including the guard that terminates a recursive
+function.  A mutant that removes the base case causes infinite recursion
+and the per-mutant C<prove> run hangs indefinitely (there is currently
+no per-mutant timeout).  Protect the base-case condition:
+
+    sub factorial {
+        my ($n) = @_;
+        ## MUTANT_SKIP_BEGIN
+        return 1 if $n <= 1;
+        ## MUTANT_SKIP_END
+        return $n * factorial($n - 1);
+    }
+
+=item Process-management side-effects
+
+Forking, signalling, and C<waitpid> are inherently difficult to assert
+against in a unit test.  A mutant that corrupts a PID or signal value
+may cause the test suite to hang or emit warnings from an C<END> block:
 
     sub disable_hot_reload {
         ## MUTANT_SKIP_BEGIN
@@ -52,6 +71,12 @@ C<## MUTANT_SKIP_BEGIN> and C<## MUTANT_SKIP_END> annotations:
         waitpid $pid, 0;
         ## MUTANT_SKIP_END
     }
+
+=back
+
+To exclude a block of lines from mutation testing entirely, wrap it with
+C<## MUTANT_SKIP_BEGIN> and C<## MUTANT_SKIP_END> annotations as shown
+above.
 
 Skipped lines are silently excluded from the mutation candidate list and
 do not appear in the killed or survived counts.  The number of skipped

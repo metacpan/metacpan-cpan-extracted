@@ -86,8 +86,23 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 CHANGES
+t/00_load.t
+t/10_main_date.t
+t/11_main_num.t
+t/12_main_text.t
+t/20_fields.t
+t/21_dict_tags.t
+t/30_dbadmin_pure.t
+t/31_dbadmin_sqlite.t
+t/40_tracking_validate.t
+t/50_edms_pure.t
+t/cp_fr
+t/cp_fr.dat
 t/cp_fr_fixe.dat
+t/edtk.ini
+t/lib/TestOEdtk.pm
 t/test.t
+t/test_csv_pg_copy.pl
 t/test_fixe_oEdtk.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

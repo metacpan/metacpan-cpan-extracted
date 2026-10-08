@@ -9,12 +9,12 @@ use lib 't/lib';
 use Test::Most;
 
 if(-r '/etc/passwd') {
-	plan(tests => 5);
+	plan(tests => 6);
 
-	use_ok('MyLogger');
+	use_ok('Test::Log::Abstraction');
 	use_ok('Database::passwd');
 
-	my $passwd = Database::passwd->new({ directory => '/etc', filename => 'passwd', no_entry => 1, logger => MyLogger->new() });
+	my $passwd = Database::passwd->new({ directory => '/etc', filename => 'passwd', no_entry => 1, logger => new_ok('Test::Log::Abstraction') });
 	my $row = $passwd->fetchrow_hashref(name => 'root');
 
 	cmp_ok($row->{'uid'}, '==', 0, 'Root has UID 0');

@@ -192,6 +192,20 @@ static inline SV* hm_zerocopy_sv(pTHX_ const char* buf, uint32_t len, bool is_ut
     uint32_t _khash = hm_hash_string(_kstr, (uint32_t)_klen); \
     (void)_kutf8
 
+/* Ordinary hash keys are already canonical; tied hashes return SV keys. */
+#define EXTRACT_HASH_KEY(he) \
+    STRLEN klen; \
+    const char* kstr = HePV(he, klen); \
+    bool kutf8 = HeUTF8(he) ? true : false; \
+    uint32_t khash; \
+    if (HM_UNLIKELY(HeKLEN(he) == HEf_SVKEY && kutf8)) { \
+        EXTRACT_STR_KEY(HeSVKEY(he)); \
+        kstr = _kstr; klen = _klen; kutf8 = _kutf8; khash = _khash; \
+    } else { \
+        if (klen > HM_MAX_STR_LEN) croak("key too long (max 2GB)"); \
+        khash = hm_hash_string(kstr, (uint32_t)klen); \
+    }
+
 #define EXTRACT_STR_VAL_NOMG(sv) \
     STRLEN _vlen; \
     const char* _vstr = SvPV_nomg(sv, _vlen); \

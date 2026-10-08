@@ -5,6 +5,13 @@ All notable changes to Alien::Xrepo will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.4] - 2026-10-07
+
+### Fixed
+
+- ExtUtils::Install installs files as readonly (mode 0444) so Xmake's templates (used by `xmake create`, etc.) would copy readonly files into a project and then try to modify them which obviously does not work. I just copy them to the global xmake directory on first use and fix permissions.
+- In situations like prebuilt libs bundled in a single archive, `libpath` used to resolve to whichever lib the filesystem happened to sort first. The runtime library now uses the package's `links`; falling back to the first lib when none match.
+
 ## [v1.0.3] - 2026-10-06
 
 ### Added
@@ -44,7 +51,8 @@ Splitting this out of the `Alien::Xmake` dist and repo
 
 - It exists? Check the Alien::Xmake changelog, I guess
 
-[Unreleased]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.4...HEAD
+[v1.0.4]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.3...v1.0.4
 [v1.0.3]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.2...v1.0.3
 [v1.0.2]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/sanko/Alien-Xrepo/compare/v1.0.0...v1.0.1

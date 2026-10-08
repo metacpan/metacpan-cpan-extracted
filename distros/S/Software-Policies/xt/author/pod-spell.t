@@ -18,6 +18,7 @@ ContributorCovenant
 Individual
 Koivunalho
 License
+MaintainerSuccession
 Mikko
 PerlDistZilla
 Policies

@@ -1,8 +1,9 @@
-SelectPdf version 1.4.0
+SelectPdf version 1.6.0
 =======================
 
 This is a Perl version for SelectPdf Online REST API client library.
-It contains: HTML to PDF client, PDF Merge client, PDF to Text client.
+It contains: HTML to PDF client (with a keyless demo mode), electronic invoice
+(ZUGFeRD / Factur-X) client, PDF Merge client, PDF to Text client.
 
 INSTALLATION
 

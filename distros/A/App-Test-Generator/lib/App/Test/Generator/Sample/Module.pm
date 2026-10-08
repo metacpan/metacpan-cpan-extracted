@@ -5,7 +5,7 @@ use warnings;
 use Carp    qw(croak);
 use Readonly;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 # --------------------------------------------------
 # Validation constants — centralised so that changes
@@ -102,7 +102,7 @@ String (C<$MIN_EMAIL_LEN>-C<$MAX_EMAIL_LEN> chars). Required.
 
 =head4 output
 
-    { type => SCALAR, value => 1 }
+    { type => SCALAR }
 
 =cut
 
@@ -255,7 +255,7 @@ Hashref of configuration options. Required.
 
 =head4 output
 
-    { type => SCALAR, value => 1 }
+    { type => SCALAR }
 
 =cut
 
@@ -357,7 +357,7 @@ Boolean scalar.
 
     {
         self    => { type => OBJECT, isa => 'App::Test::Generator::Sample::Module' },
-        enabled => { type => SCALAR },
+        enabled => { type => 'any', optional => 1 },
     }
 
 =head4 output
@@ -401,7 +401,7 @@ C<'Fail'> otherwise. Croaks on invalid input.
 
     {
         self  => { type => OBJECT, isa => 'App::Test::Generator::Sample::Module' },
-        score => { type => SCALAR, min => 0.0, max => 100.0 },
+        score => { type => 'number', min => 0.0, max => 100.0 },
     }
 
 =head4 output

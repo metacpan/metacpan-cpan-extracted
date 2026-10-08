@@ -8,12 +8,9 @@ use Time::HiRes qw(time);
 
 use Data::HashMap::Shared::SS;
 
-# get() is lock-free behind the seqlock; the unsharded get_multi is not -- it
-# takes the read lock for the whole batch.  Without that lock nothing retries
-# a value that a writer replaces mid-copy, so a reader can return bytes no
-# writer ever stored.  Two writers alternate every key between two values of
-# one arena size class while the parent reads them back through get_multi and
-# accepts nothing but those two.
+# The unsharded get_multi holds the read lock for the whole batch (get() retries
+# via the seqlock): two writers flip every key between two same-size values and
+# the reader accepts only those two.
 
 sub ncpu {
     return $ENV{TEST_NCPU} if $ENV{TEST_NCPU};
@@ -34,7 +31,7 @@ sub ncpu {
 plan skip_all => 'needs 2+ CPUs to observe a torn read' if ncpu() == 1;
 
 my $NKEYS = 64;
-my $LEN   = 240;                                  # arena-allocated, one size class
+my $LEN   = 240;                                  # arena-allocated; both values share a size class
 my @keys  = map { "k$_" } 0 .. $NKEYS - 1;
 sub vals { my $k = shift; ("a$k:" . ('a' x $LEN), "b$k:" . ('b' x $LEN)) }
 
@@ -53,7 +50,7 @@ for my $w (1 .. 2) {
         alarm 20;
         my $m = Data::HashMap::Shared::SS->new($path, 4096);
         my $go;
-        sysread($rd, $go, 1);                     # barrier
+        sysread($rd, $go, 1);
         my $end  = time + 3;
         my $flip = $w;
         while (time < $end) {

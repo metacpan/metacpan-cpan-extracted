@@ -11,7 +11,7 @@
 .\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-.Dd September 19, 2026
+.Dd October 7, 2026
 .Dt FUGUSEED-QR 1
 .Os
 .Sh NAME
@@ -39,8 +39,7 @@ Run it on an air-gapped computer only.
 The first line of standard input holds the 12 words, with one space
 between two words.
 Each word must be a word of the English word list of BIP39.
-.Ss The two results
-With a valid checksum,
+.Ss The result
 .Nm
 prints the SeedQR.
 Standard output holds the digit string on the first line: the 12 word
@@ -57,15 +56,25 @@ of the dark modules of the zone.
 After each zone view, the program reads one line from standard input.
 Press the return key to get the next zone.
 At the end of the input, the remaining zones print without a pause.
+.Ss The checksum
+Word 12 must be the check word of words 1 to 11.
+.Xr fuguseed-last 1
+prints that word.
 .Pp
 With a wrong checksum,
 .Nm
-prints the check word.
-Standard output holds that one word, and the program prints no SeedQR
-in that run.
-The dice give the YELLOW block and the BLUE row of word 12, and the
-program finds the one word of that row that makes the checksum valid.
-Write the check word in place of word 12, and start the program again.
+prints one line to standard error, and it prints no SeedQR.
+A wrong word at any position can give that failure.
+Compare the 12 words that you typed with the paper, word for word.
+When a typed word is different from the paper, correct the word.
+Then start the program again.
+.Pp
+When the typed words agree with the paper, a word on the paper is
+wrong.
+When the procedure of
+.Xr fuguseed 7
+gave the words, word 12 is wrong.
+That page gives the steps that correct word 12.
 .Ss The form of the code
 The output is a Standard SeedQR of 25 x 25 modules.
 It is not a Compact SeedQR:
@@ -132,12 +141,13 @@ from the air-gapped computer.
 .Bl -tag -width Ds
 .It 0
 .Nm
-printed the SeedQR, or it printed the check word.
+printed the SeedQR.
 .It 1
-The input did not hold 12 words of the list.
+The input did not hold 12 words of the list, or the checksum of the 12
+words failed.
 .Nm
 printed one line to standard error.
-That line names the word position or the word count, never a word.
+That line holds no word.
 .It 2
 The command line held an argument.
 .Nm
@@ -150,6 +160,10 @@ $ fuguseed-qr
 .Ed
 .Pp
 The program waits for the 12 words on standard input.
+.Sh SEE ALSO
+.Xr fuguseed-last 1 ,
+.Xr fuguseed-words 1 ,
+.Xr fuguseed 7
 .Sh STANDARDS
 The word list and the checksum come from BIP39, the mnemonic code for
 the generation of a deterministic key.

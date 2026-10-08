@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -29,7 +30,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 30;
+plan tests => 33;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -254,6 +255,36 @@ $client->get("$range_prefix/", { prefix => 1 }, sub {
 });
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
+
+# An empty key with prefix means every key (never delete that here)
+{
+    my ($count, $count_err, $seen, $watch_err, $created);
+    $client->get('', { prefix => 1, count_only => 1 }, sub {
+        ($count, $count_err) = ($_[0] && $_[0]{count}, $_[1]);
+        EV::break;
+    });
+    my $t = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+    is($count_err, undef, 'get with an empty prefix succeeds');
+    cmp_ok($count // 0, '>=', 1, 'and counts every key');
+
+    my $w = $client->watch('', { prefix => 1 }, sub {
+        my ($resp, $err) = @_;
+        if ($err) { $watch_err = $err; EV::break; return }
+        $created = 1 if $resp->{created};
+        $seen = 1 if grep { $_->{kv}{key} eq "$prefix/everything" } @{$resp->{events}};
+        EV::break if $seen;
+    });
+    my $poll = EV::timer(0.02, 0.02, sub { EV::break if $created });
+    $t = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+    undef $poll;
+    $client->put("$prefix/everything", 'v', sub {});
+    $t = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+    ok($seen, 'watch with an empty prefix sees any key') or diag explain $watch_err;
+    $w->cancel(sub {});
+}
 
 $client->delete("$prefix/", { prefix => 1 }, sub { EV::break });
 EV::run;

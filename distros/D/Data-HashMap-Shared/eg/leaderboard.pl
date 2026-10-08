@@ -13,7 +13,7 @@ my $board = Data::HashMap::Shared::SI->new($path, 1000);
 
 my @players = qw(alice bob carol dave);
 my @pids;
-for my $w (1 .. 4) {                          # four workers submitting scores
+for my $w (1 .. 4) {
     my $pid = fork;
     die "fork: $!" unless defined $pid;
     if ($pid == 0) {
@@ -21,7 +21,7 @@ for my $w (1 .. 4) {                          # four workers submitting scores
         my $b = Data::HashMap::Shared::SI->new($path, 1000);
         for (1 .. 5000) {
             my $player = $players[int rand @players];
-            shm_si_max $b, $player, int rand 100_000;   # only the max survives
+            shm_si_max $b, $player, int rand 100_000;
         }
         POSIX::_exit(0);
     }

@@ -1,5 +1,10 @@
 Revision history for EV-Etcd
 
+0.11  2026-10-07
+    - Fixes for watch replay, failover, leaderless members, reconnects, crashes
+    - Invalid arguments and unknown options croak
+    - max_retries defaults to 30: streams ride out about two minutes of outage
+
 0.10  2026-09-23
     - Add TLS and mutual TLS (tls_* options, https:// endpoints)
     - Fail over to the next endpoint when the current one is unreachable

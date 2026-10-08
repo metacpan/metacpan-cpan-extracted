@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
 # ex:ts=8 sw=4:
 # The SeedQR pipeline (TEST-QR). The tests hold the two 12-word test
-# vectors of the SeedQR specification to their digit strings, the 44
-# codewords and the matrix of test vector 4 to its reference image,
+# vectors of the SeedQR specification to their digit strings, and the
+# failure of each other word of the BLUE row of word 12. They hold the
+# 44 codewords and the matrix of test vector 4 to its reference image,
 # the two views to their fixture, and the pause between two zone
 # views.
 #
@@ -97,10 +98,32 @@ sub _words ($number)
 sub _matrix ($number)
 {
 	my @words     = _words($number);
-	my $digits    = App::FuguSeed::Mnemonic->digits( \@words );
+	my $digits    = App::FuguSeed::QR->digits( \@words );
 	my @codewords = App::FuguSeed::Codewords->encode($digits);
 
 	return App::FuguSeed::Matrix->build( \@codewords );
+}
+
+# _run($input):
+#	Run App::FuguSeed::QR in this process, with $input on standard
+#	input. The result is the standard output, the standard error,
+#	and the exit code.
+sub _run ($input)
+{
+	my ( $output, $error ) = ( q{}, q{} );
+	open my $in,  '<', \$input  or BAIL_OUT("the input handle: $!");
+	open my $out, '>', \$output or BAIL_OUT("the output handle: $!");
+	open my $err, '>', \$error  or BAIL_OUT("the error handle: $!");
+
+	my $code;
+	{
+		local *STDIN  = $in;
+		local *STDOUT = $out;
+		local *STDERR = $err;
+		$code = App::FuguSeed::QR->run();
+	}
+
+	return ( $output, $error, $code );
 }
 
 # _picture($matrix):
@@ -149,18 +172,18 @@ sub _function_positions ()
 	return @positions;
 }
 
-# TEST-QR-1: the digit strings, the failures, and the check word.
+# TEST-QR-1: the digit strings and the failures.
 for my $number ( sort keys %VECTOR ) {
 	my @words = _words($number);
 
-	my $fault = App::FuguSeed::Mnemonic->fault( \@words );
+	my $fault = App::FuguSeed::Mnemonic->fault( \@words, 12 );
 
 	is( scalar @words, 12,    "vector $number holds 12 words" );
 	is( $fault,        undef, "vector $number passes the word check" );
-	is( App::FuguSeed::Mnemonic->digits( \@words ),
+	is( App::FuguSeed::QR->digits( \@words ),
 		$VECTOR{$number}{digits},
 		"vector $number gives its digit string" );
-	ok( App::FuguSeed::Mnemonic->valid( \@words ),
+	ok( App::FuguSeed::QR->valid( \@words ),
 		"vector $number holds a valid checksum" );
 }
 
@@ -168,12 +191,10 @@ my @vector4 = _words(4);
 
 for my $count ( 0, 11, 13, 24 ) {
 	my @words = ( @vector4, @vector4 )[ 0 .. $count - 1 ];
-	my $fault = App::FuguSeed::Mnemonic->fault( \@words );
-	my @named = grep { $fault =~ /\b\Q$_\E\b/ } @words;
+	my $fault = App::FuguSeed::Mnemonic->fault( \@words, 12 );
 
 	is( $fault, "the input holds $count words, not 12",
 		"a count of $count fails and the message names the count" );
-	is( "@named", q{}, "the message of $count names no word" );
 }
 
 my $outside = App::FuguSeed::List->index('blorp');
@@ -182,18 +203,17 @@ is( $outside, undef, 'the replacement word is outside the list' );
 for my $position ( 1, 5, 12 ) {
 	my @words = @vector4;
 	$words[ $position - 1 ] = 'blorp';
-	my $fault = App::FuguSeed::Mnemonic->fault( \@words );
-	my @named = grep { $fault =~ /\b\Q$_\E\b/ } @words;
+	my $fault = App::FuguSeed::Mnemonic->fault( \@words, 12 );
 
 	is( $fault, "word $position is not in the word list",
 		"an unknown word at $position fails and the message names it" );
-	is( "@named", q{}, "the message of position $position names no word" );
 }
 
-# TEST-QR-1: word 12 of each vector is the check word of every word
-# of its BLUE row. The row holds 16 words, and the RED column of the
-# roll gives the 4 checksum bits (D-05), so one word of the row is
-# valid (QR-MNEMONIC-4).
+# TEST-QR-1: each other word of the BLUE row of word 12 fails with
+# the line of QR-MNEMONIC-4. The row holds 16 words, and the RED
+# column of the roll gives the 4 checksum bits (D-05), so one word of
+# the row is valid. Each run holds its failure line to the exact
+# text, so the line holds no word.
 for my $number ( sort keys %VECTOR ) {
 	my @words = _words($number);
 	my $index = App::FuguSeed::List->index( $words[-1] );
@@ -203,11 +223,16 @@ for my $number ( sort keys %VECTOR ) {
 	for my $column ( 0 .. 15 ) {
 		my @typed = @words;
 		$typed[-1] = App::FuguSeed::List->word( $row + $column );
-		push @valid, $typed[-1]
-		    if App::FuguSeed::Mnemonic->valid( \@typed );
-		is( App::FuguSeed::Mnemonic->check_word( \@typed ),
-			$words[-1],
-			"vector $number: column $column of the row names word 12"
+		if ( App::FuguSeed::QR->valid( \@typed ) ) {
+			push @valid, $typed[-1];
+			next;
+		}
+
+		my ( $output, $error, $code ) = _run("@typed\n");
+		is_deeply(
+			[ $output, $error, $code ],
+			[ q{}, "fuguseed-qr: the checksum of the 12 words fails\n", 1 ],
+			"vector $number: column $column of the row fails"
 		);
 	}
 

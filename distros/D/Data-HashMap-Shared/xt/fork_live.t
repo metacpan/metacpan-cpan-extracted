@@ -5,9 +5,8 @@ use POSIX qw(_exit);
 
 use Data::HashMap::Shared::II;
 
-# Parent creates file-backed map, forks N children; each child sets
-# its own disjoint key range. Parent verifies all keys are present
-# with the correct values.
+# Each forked child writes its own disjoint key range; the parent checks every
+# key.
 
 my $N = 4;
 my $M = 500;

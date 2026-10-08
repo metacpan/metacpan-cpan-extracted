@@ -5,12 +5,10 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SS;
 
-# An insert stores the key, then the value, and only then counts the entry.
-# Reclaiming the whole arena because the table is empty is therefore unsafe
-# anywhere between those two: the key already holds a block that nothing counts,
-# and handing it out again lets the next store write over a live key.  The
-# reclaim has to happen before the key is stored, which costs the insert that
-# empties the map and heals on the one after it.
+# An insert stores the key, then the value, then counts the entry; reclaiming
+# the whole arena in between would hand out the uncounted key's block again.
+# The reclaim happens before the key is stored, so the insert that empties the
+# map fails and the next one heals it.
 
 my $dir  = tempdir(CLEANUP => 1);
 my $path = "$dir/reset.shm";

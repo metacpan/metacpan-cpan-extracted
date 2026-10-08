@@ -4,11 +4,9 @@ use Test::More;
 use Config;
 use File::Temp qw(tempdir);
 
-# Regression for the slotless-reader force-reset race: when the per-process
-# reader-slot table is full a reader holds the rwlock word with no slot and is
-# invisible to dead-reader recovery, which could then force-reset the lock out
-# from under it and admit a writer (writer-exclusion violation). Reproduced by
-# compiling shm_generic.h with SHM_READER_SLOTS=1 so the 2nd reader goes slotless.
+# A reader holding the rwlock word with no slot (SHM_READER_SLOTS=1 makes the
+# 2nd reader slotless) is invisible to dead-reader recovery, which must not
+# force-reset the lock out from under it and admit a writer.
 
 plan skip_all => 'Linux only' unless $^O eq 'linux';
 my $cc = $Config{cc} || 'cc';

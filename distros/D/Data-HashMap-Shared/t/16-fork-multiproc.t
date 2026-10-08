@@ -10,10 +10,9 @@ use Data::HashMap::Shared::SS;
 
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_fork') . '.shm' }
 
-# Every worker opens its own handle, then waits on a pipe barrier so all of them
-# reach the contested call together: a bare fork loop lets the first child
-# finish before the last one exists, and nothing races.  Returns how many
-# workers' calls returned true, after checking that none died on a signal.
+# Workers wait on a pipe barrier so they reach the contested call together; a
+# bare fork loop lets the first child finish before the last exists. Returns how
+# many calls returned true.
 sub race {
     my ($n, $open, $call) = @_;
     pipe(my $r, my $w) or die "pipe: $!";
@@ -29,7 +28,7 @@ sub race {
         push @pids, $pid;
     }
     close $r;
-    close $w;                                  # release every worker at once
+    close $w;
     local $SIG{ALRM} = sub { kill 'KILL', @pids; die "workers exceeded their time budget\n" };
     alarm 30;
     my ($true, $crashed) = (0, 0);
@@ -42,11 +41,10 @@ sub race {
     return $true;
 }
 
-# Concurrent CAS: many workers race to flip a value 0 -> 1. Exactly one wins.
 {
     my $path = tmpfile();
     my $parent = Data::HashMap::Shared::II->new($path, 100);
-    $parent->put(0, 0);   # the contested cell
+    $parent->put(0, 0);
     my $N = 8;
     my $wins = race($N, sub { Data::HashMap::Shared::II->new($path, 100) },
                         sub { $_[0]->cas(0, 0, $_[1]) });
@@ -56,8 +54,7 @@ sub race {
     unlink $path;
 }
 
-# Counting through cas retry loops loses no update, on a map without TTL (the
-# read-locked path) and with one (the write-locked path).
+# ttl 0 takes the read-locked cas path, ttl 60 the write-locked one
 for my $ttl (0, 60) {
     my $path = tmpfile();
     my $parent = Data::HashMap::Shared::II->new($path, 100, 0, $ttl);
@@ -69,7 +66,6 @@ for my $ttl (0, 60) {
     unlink $path;
 }
 
-# Concurrent add: only the first worker per key inserts; the others see add fail.
 {
     my $path = tmpfile();
     my $N = 6;
@@ -79,7 +75,6 @@ for my $ttl (0, 60) {
     unlink $path;
 }
 
-# Concurrent incr: the sum visible to the parent equals N
 {
     my $path = tmpfile();
     my $parent = Data::HashMap::Shared::II->new($path, 100);
@@ -90,7 +85,6 @@ for my $ttl (0, 60) {
     unlink $path;
 }
 
-# Concurrent cas_take: only one process gets the value
 {
     my $path = tmpfile();
     my $parent = Data::HashMap::Shared::SS->new($path, 100);

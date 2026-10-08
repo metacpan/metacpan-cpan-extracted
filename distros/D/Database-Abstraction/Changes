@@ -1,5 +1,48 @@
 Revision history for Database-Abstraction
 
+0.48	Wed Oct  7 01:23:25 PM EDT 2026
+	[ Enhancements ]
+	- Redis backend: pass database => 'redis://[password@]host[:port][/db]'
+	  to connect to a Redis server.  Rows are stored as Redis Hashes at
+	  tablename:entry_value keys; KEYS + HGETALL slurp them into the same
+	  in-memory structure as CSV/DBM::Deep, so all existing fast-paths
+	  (selectall_arrayref, selectall_array, fetchrow_hashref, count,
+	  columns, schema, AUTOLOAD) work without modification.  Keyed and
+	  no_entry modes supported.  Redis::Fast is used when available,
+	  falling back to Redis.  Both are lazy-loaded (not required for
+	  file-based or DSN backends).  URL is validated at construction time
+	  (redis:// scheme only); all other schemes are rejected.
+	- select($db_num): new public method on Redis-backed objects to switch
+	  the active Redis database (0-15).  Clears the data/columns/schema
+	  cache so the next query re-slurps from the new database.  Returns
+	  $self for chaining.  Croaks on non-integer argument or non-Redis
+	  connection.
+	- DESTROY: Redis connections are cleanly closed via quit() on object
+	  destruction.
+	[ Tests ]
+	- Use Test::Log::Abstraction
+	- t/redis.t: 20 subtests covering all Redis backend behaviour via
+	  MockRedis (no live server required); skipped when neither Redis::Fast
+	  nor Redis is installed.
+	- t/redis_live.t: 23 subtests against a real Redis server; run only
+	  when REDIS_SERVER env var is set.  Uses a PID-unique key prefix to
+	  avoid collisions on shared servers; all created keys are deleted in
+	  an END block.
+	- Test suite converted to use Test::Returns::returns_is() across 24
+	  test files, replacing informal ok(defined)/ok(!defined)/isa_ok+cmp_ok
+	  pairs with formal Params::Validate::Strict schemas
+	  ({type=>'hashref'}, {type=>'void'}, {type=>'arrayref',min=>N,max=>N},
+	  {type=>'integer',min=>N,max=>N}, {type=>'object',isa=>'ClassName'},
+	  etc.).
+	- t/optional_deps.t: 11 subtests verifying graceful behaviour when each
+	  optional runtime module is absent (Redis, Redis::Fast, Gzip::Faster,
+	  Text::xSV::Slurp, XML::Simple, DBM::Deep, Spreadsheet::ParseXLSX,
+	  LWP::UserAgent::Cached, HTML::TableExtract, File::Slurp::Remote).
+	  new() always succeeds; the first query either dies with a clear
+	  "Can't locate" message or (Text::xSV::Slurp + max_slurp_size=>0)
+	  falls back to the DBI/SQL path and returns correct data.
+	  All 2176 tests pass.
+
 0.47	Fri Oct  2 05:30:13 PM EDT 2026
 	[ Enhancements ]
 	- Added more test cases

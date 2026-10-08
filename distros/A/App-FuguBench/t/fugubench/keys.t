@@ -82,7 +82,7 @@ my @pairs = App::FuguBench::Keys->keys;
 
 # The module holds the keys of the file, in the trust order of the
 # file: no key of the file is absent, and no pair holds a name that
-# the file lacks (DIST-KEY-1, DIST-KEY-3).
+# the file lacks (DIST-KEY-1).
 is_deeply(
 	[ map { $_->[0] } @pairs ],
 	[ map { $_->[0] } @lines ],

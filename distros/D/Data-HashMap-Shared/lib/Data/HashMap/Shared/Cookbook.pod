@@ -39,18 +39,17 @@ F<eg/sharded_counter.pl>).
 =head2 High-water marks and leaderboards
 
 C<max>/C<min> store C<max($current, $desired)> / C<min(...)> atomically, so
-concurrent updates never clobber each other or lose a higher score. A missing
-key is inserted as the given value.
+concurrent updates never lose a higher score. A missing key is inserted as the
+given value.
 
     use Data::HashMap::Shared::SI;   # player -> high score
     my $board = Data::HashMap::Shared::SI->new('/tmp/board.shm', 10_000);
 
     shm_si_max $board, $player, $score;   # keeps only the best, race-free
-    # keep unrelated metrics in their own map -- anything in $board is a player
 
     my $scores = $board->to_hash;
     my @top = sort { $scores->{$b} <=> $scores->{$a} } keys %$scores;
-    @top = @top[0 .. 9] if @top > 10;   # a slice would pad a short board with undef
+    @top = @top[0 .. 9] if @top > 10;
 
 Full example: F<eg/leaderboard.pl>.
 
@@ -71,10 +70,8 @@ stored value, so an expensive computation is shared across the fleet.
         return defined $stored ? $stored : $fresh;
     }
 
-C<get_or_set> returns undef when the entry could not be stored at all -- the
-table is full, or (string variants) the arena is exhausted.  Fall back to the
-computed value as above, and give a long-lived cache a C<$max_size> so eviction
-keeps slots free.
+C<get_or_set> returns undef when there is no room; fall back to the computed
+value as above, and give a long-lived cache a C<$max_size>.
 
 Full example: F<eg/memoize.pl>.
 
@@ -91,12 +88,9 @@ on insert.
     my $v = shm_ss_get $cache, $key;          # also refreshes recency (clock bit)
     my $evicted = $cache->stats->{evictions};
 
-For large values on a small table, size the string arena explicitly so a few
-big entries do not starve it: C<< ->new($path, $max_entries, $max_size, 0, 0, $arena_cap) >>.
-An insert that cannot fit evicts one entry and retries, so size the arena for
-the working set: one that only just holds it evicts on nearly every insert, so
-the hit rate collapses while C<< stats->{evictions} >> climbs, and an entry
-needing a size class none of the oldest entries holds still fails.
+For large values, size the string arena for the working set
+(C<< ->new($path, $max_entries, $max_size, 0, 0, $arena_cap) >>): an arena that
+only just holds it evicts on nearly every insert.
 
 =head2 Per-key TTL and dedup / idempotency
 
@@ -108,13 +102,10 @@ Together they make a "process each id once within a window" guard.
 
     if ($seen->add($event_id, '1')) {   # true only the first time (then TTL'd)
         handle($event_id);
-    } # else: already processed recently, skip
+    } # else: already processed recently, or no room
 
-C<add> is false both when the id was already seen B<and> when the entry could
-not be stored, and the two are indistinguishable.  Event ids never repeat, so
-the table fills with expired ids; a timer keeps the dead weight from lengthening
-every probe.  Size its slice as under L</Sliding-window rate limiting>, or give
-the map a C<$max_size>:
+Event ids never repeat, so the table fills with expired ids; a timer keeps them
+from lengthening every probe:
 
     # once a second: the 2097152 slots this map can grow to, over a 300s TTL
     my ($flushed, $done) = $seen->flush_expired_partial(7000);
@@ -141,10 +132,9 @@ Full example: F<eg/heartbeat.pl>.
 
 =head2 Sliding-window rate limiting
 
-A counter per subject with a TTL window; the first hit creates it (TTL applies)
-and subsequent hits increment it.  Each C<incr> refreshes the entry's
-TTL, so the window slides: it resets only once a subject stops hitting it for a
-full window, and a client that keeps retrying stays limited until it backs off.
+A counter per subject with a TTL window; the first hit creates it and later
+hits increment it. Each C<incr> refreshes the TTL, so the window slides: a
+client that keeps retrying stays limited until it backs off for a full window.
 
     use Data::HashMap::Shared::SI;   # subject -> hits, 60s window
     my $rl = Data::HashMap::Shared::SI->new('/tmp/rl.shm', 100_000, 0, 60);
@@ -156,29 +146,16 @@ full window, and a client that keeps retrying stays limited until it backs off.
         return $n <= 100;                # cap per window
     }
 
-C<incr> croaks only when live subjects hold every slot, or (for subjects longer
-than 7 bytes) the whole arena -- a flood of new subjects inside one window --
-or, once, when subject lengths change and the dead subjects' blocks are the
-wrong size; C<allow> then refuses rather than dies. Subjects that never come back leave
-expired entries holding their slots and arena space until an insert needs them:
-an insert that finds the table or arena full, or takes the table over its
-design load, flushes every dead subject at once, which keeps the limiter
-working.  Reclaim on a timer as well,
-to keep C<size> honest and the probes short between those flushes; the slice
-counts slots scanned, not entries freed, so size it to cycle the whole table
-inside one window, the slots the map can grow to over the window in ticks.
-C<size> climbing while C<keys> stays flat means the slice is losing ground:
+C<incr> croaks only when there is no room, as in a flood of new subjects inside
+one window; C<allow> then refuses rather than dies. Flush expired subjects on a
+timer, with a slice that cycles the whole table inside one window, or give the
+map a C<$max_size> and let eviction reclaim them:
 
     # once a second: the 262144 slots this map can grow to, over the 60s window
     my ($flushed, $done) = $rl->flush_expired_partial(5000);
 
-Giving the map a C<$max_size> instead makes eviction reclaim the slots for you
-and needs no timer at all, and a flood then evicts instead of refusing: the
-subjects it pushes out start counting again from zero.
-
-When clients choose the subjects, hash them under a secret first, and keep the
-file in a directory only your processes can write to: see
-L<Data::HashMap::Shared/SECURITY> on keys chosen to collide and on planted maps.
+When clients choose the subjects, hash them under a secret first
+(L<Data::HashMap::Shared/SECURITY>).
 
 Full example: F<eg/rate_limiter.pl>.
 
@@ -218,9 +195,7 @@ arena, fastest); string sides use the shared arena.
     SS    string -> string    config, sessions, generic caches
 
 Use the narrowest integer width that fits your range (values wrap at the
-variant's width; see L<Data::HashMap::Shared/"Integer Range and Wrapping">).
-The C<incr>/C<decr>/C<incr_by>/C<max>/C<min> counter ops exist only on
-integer-value variants.
+variant's width). Counter ops exist only on integer-value variants.
 
 =head1 SIZING
 
@@ -228,31 +203,23 @@ C<< ->new($path, $max_entries, $max_size, $ttl, $lru_skip, $arena_cap) >>
 
 =over
 
-=item * B<$max_entries> -- table capacity (it grows/shrinks elastically up to
-this). Round up for your peak live-key count.
+=item * B<$max_entries> -- the live-key count to run at; the table grows and
+shrinks up to it.
 
-=item * B<$max_size> -- LRU cap (0 = no eviction). Set to bound memory; entries
-beyond it evict least-recently-used.
+=item * B<$max_size> -- LRU cap (0 = no eviction).
 
-=item * B<$ttl> -- default per-entry TTL in seconds (0 = none). Set for caches /
-windows; combine with C<$max_size> for a bounded TTL cache.
+=item * B<$ttl> -- default per-entry TTL in seconds (0 = none); combine with
+C<$max_size> for a bounded TTL cache.
 
-=item * B<$lru_skip> -- LRU promotion-skip rate (0-99, default 0; a power-of-two
-step, so a value below 50 is a no-op). Leave at 0; raise only if profiling shows
-write-lock contention from LRU promotions on a Zipfian workload.
-See L<Data::HashMap::Shared/Constructor>.
+=item * B<$lru_skip> -- leave at 0 unless LRU promotions on a Zipfian write
+workload show up as lock contention.
 
-=item * B<$arena_cap> -- string-storage bytes (0 = C<max(max_entries*128, 4096)>).
-Set explicitly when a few large string keys/values would otherwise exhaust the
-default; integer-only variants ignore it. Each string occupies the next power of
-two at or above its length (16-byte minimum), so size from the rounded lengths,
-not the raw byte total, plus the 16 bytes the arena reserves.
+=item * B<$arena_cap> -- string-storage bytes (default about 128 per entry):
+size it from string lengths rounded up to powers of two.
 
-=item * B<shards> (C<new_sharded($prefix, $shards, ...)>) -- independent maps with
-independent locks for write-heavy workloads; per-key ops route automatically,
-and the sizing args above are B<per shard>. A set created by 0.20 or later
-records its count and croaks if opened with a different one; an older set does
-not, so every process must pass the same one.
+=item * B<shards> (C<new_sharded($prefix, $shards, ...)>) -- independent maps
+with independent locks for write-heavy workloads; the sizing arguments above are
+B<per shard>.
 
 =back
 

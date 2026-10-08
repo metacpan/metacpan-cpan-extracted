@@ -13,8 +13,8 @@ App::FuguBench::Keys - the embedded release keys of fugubench
 =head1 DESCRIPTION
 
 B<App::FuguBench::Keys> holds the release public keys of the
-organization. The program embeds them in this module, so a release
-carries the keys that verify the next release. The keys are those of
+organization. The program embeds them in this module, so no file of
+the host decides what a release trusts. The keys are those of
 F<deps/KEYS.txt> of the org pack, and F<t/fugubench/keys.t> holds
 this module to that file.
 
@@ -33,9 +33,11 @@ key carries no secret, so the list is source.
 The list order is the line order of F<deps/KEYS.txt>, which is the
 trust order. The current key comes first.
 
-A rotation is a release of the program. The old key stays in the list
-for one release after the new key enters it, so an operator one
-release behind can still update.
+A rotation is a release of the program, and this list follows
+F<deps/KEYS.txt>. A release therefore carries the keys that the file
+held at that release, and an installed program can lack the key of a
+later release. C<update> then names the install command, and the
+operator installs the program again.
 
 =head1 RETURN VALUES
 

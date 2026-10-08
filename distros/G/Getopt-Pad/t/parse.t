@@ -116,6 +116,9 @@ subtest 'objectlist' => sub {
 	like dies { parseWith(['--server', '0.host=a', '--server', '2.host=b'], options => {%server}) }, qr/option '--server': missing index 1/, 'a gap in the indices';
 	like dies { parseWith(['--server', 'host=a'], options => {%server}) },  qr/option '--server': invalid key 'host', expected INDEX.FIELD=VALUE/, 'a key without an index';
 	like dies { parseWith(['--server', '0.a.b=x'], options => {%server}) }, qr/invalid key '0.a.b'/, 'nested fields are rejected';
+	like dies { parseWith(['--server', '00.host=b', '--server', '0.host=a'], options => {%server}) },
+		qr/option '--server': invalid key '00.host', the index must not have leading zeros/, 'an index with a leading zero is rejected';
+	like dies { parseWith(['--server', '4000000000.host=a'], options => {%server}) }, qr/option '--server': missing index 0/, 'a large index alone is a gap at 0';
 	like dies { parseWith(['--limit', '0.cpu=lots'], options => { limit => { type => 'i', objectlist => 1 } }) },
 		qr/option '--limit': entry 0: key 'cpu': 'lots' is not an integer/, 'a value failing the type names its entry and key';
 };
@@ -136,6 +139,61 @@ subtest 'paths created when the parse settles on them' => sub {
 
 	like dies { parseWith([], options => { 'work-dir' => { type => 'dir', mustExist => 1, createPathIfMissing => 1 } }) },
 		qr/option 'work-dir': mustExist and createPathIfMissing are mutually exclusive/, 'both keys is a spec error';
+
+	my %scratch = (scratch => { type => 'dir', createPathIfMissing => 1 });
+	like dies { parseWith(['--scratch', "$dir/early"], options => { %scratch, target => { type => 's', required => 1 } }) },
+		qr/missing required option '--target'/, 'a later option fails';
+	ok !-e "$dir/early", 'nothing is created when the parse fails';
+
+	like dies { parseWith(['--scratch', "$dir/early", '--source', "$dir/nope"], options => { %scratch, source => { type => 'file', mustExist => 1 } }) },
+		qr/option '--source': file '.*nope' does not exist/, 'a missing path fails';
+	ok !-e "$dir/early", 'nothing is created when another path fails its check';
+};
+
+subtest 'mustExist is checked when the parse settles on a path' => sub {
+	my $dir    = tempdir(CLEANUP => 1);
+	my %config = (config => { type => 'file', mustExist => 1, default => "$dir/missing.conf" });
+
+	my $opt = parseWith(['--config', __FILE__], options => {%config});
+	is $opt->config, __FILE__, 'a default missing on this machine is no spec error';
+
+	like dies { parseWith([], options => {%config}) },
+		qr/^option '--config': default value: file '.*missing\.conf' does not exist/, 'it is a user error when the parse settles on it';
+
+	like dies { parseWith(['--config', $dir], options => {%config}) },
+		qr/^option '--config': '.*' is not a file/, 'a path of the wrong kind is named as such';
+};
+
+subtest 'processValue' => sub {
+	my @seen;
+	my $wrap = sub ($opt, $value) { push @seen, $opt->prefix; return [wrapped => $value] };
+	my $opt  = parseWith(
+		['--name', 'a', '--tag', 'x', '--tag', 'y', '--env', 'os=linux', 'rest'],
+		options => {
+			prefix  => { type => 's', default => 'p', processValue => sub ($opt, $value) { return uc $value } },
+			name    => { type => 's', processValue => $wrap },
+			tag     => { type => 's', multiple => 1, processValue => $wrap },
+			env     => { type => 's', hash => 1, processValue => $wrap },
+			level   => { type => 's', default => 'info', processValue => $wrap },
+			unset   => { type => 's', processValue => $wrap },
+			nothing => { type => 's', multiple => 1, processValue => $wrap },
+		},
+		args => [{ short => 'word', processValue => $wrap }],
+	);
+	is $opt->prefix,  'P',                                  'a default is processed';
+	is $opt->name,    [wrapped => 'a'],                     'a single value is processed';
+	is $opt->tag,     [[wrapped => 'x'], [wrapped => 'y']], 'every list item is processed';
+	is $opt->env,     { os => [wrapped => 'linux'] },       'every mapping value is processed';
+	is $opt->level,   [wrapped => 'info'],                  'the default of another option too';
+	is $opt->unset,   undef,                                'an unset option is not processed';
+	is $opt->nothing, [],                                   'an empty list stays empty';
+	is $opt->word,    [wrapped => 'rest'],                  'an arg is processed';
+	is \@seen,        [('p') x 6],                          'callbacks see the unprocessed values of other options';
+
+	like dies { parseWith([], options => { name => { type => 's', processValue => 'uc' } }) },
+		qr/spec: option 'name': processValue must be a code reference/, 'processValue needs a coderef';
+	like dies { parseWith([], args => [{ short => 'word', processValue => 'uc' }]) },
+		qr/spec: arg 'word': processValue must be a code reference/, 'on args too';
 };
 
 subtest 'validation failures' => sub {

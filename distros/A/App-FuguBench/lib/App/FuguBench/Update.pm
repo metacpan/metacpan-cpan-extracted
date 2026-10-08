@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package App::FuguBench::Update;
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 use v5.34;
 use warnings;
@@ -43,8 +43,8 @@ use App::FuguBench::Keys;
 # release key, in this process (D-05).
 #
 # The keys come from App::FuguBench::Keys alone. The keys of a
-# consumer never enter here, because a release of the organization
-# carries the keys that verify the next one (DIST-KEY-2).
+# consumer never enter here, because a release decides what it
+# trusts and no file of the host decides it (DIST-KEY-2).
 #
 # The verb reads no checkout (CLI-CHECKOUT-5), so an operator runs it
 # from ~/.local/bin in any directory.
@@ -79,6 +79,13 @@ use constant {
 
 	# The mode of the replaced program (DIST-INSTALL-2).
 	MODE => 0755,
+
+	# The published install command (DIST-INSTALL-3). A rotation
+	# of the release key can leave this program without the key of
+	# a later release, and the install script reads no embedded
+	# key. The failure of the signature names this command, so the
+	# operator reads the path out (DIST-KEY-3).
+	INSTALL => 'curl -fsSL https://bench.fugubsd.org/get | sh',
 };
 
 # App::FuguBench::Update->command($verb):
@@ -161,6 +168,7 @@ sub _run ( $app, @argv )
 		$log->error( 'no embedded key verifies the signature of %s/%s',
 			$base, MANIFEST );
 		$log->error( '  %s', $signify->error );
+		$log->error( '  install the program again: %s', INSTALL );
 		return EXIT_ERROR;
 	}
 

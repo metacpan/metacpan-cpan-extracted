@@ -5,7 +5,7 @@ use warnings;
 use Params::Validate::Strict 0.30;
 use YAML::XS;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ App::Test::Generator::Exporter::YAML - Serialise a test plan to YAML
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 

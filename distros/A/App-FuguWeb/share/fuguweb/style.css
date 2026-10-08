@@ -14,9 +14,38 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* Page */
+:root {
+	color-scheme: light dark;
+	--bg: #ffffff;
+	--fg: #000000;
+	--muted: #444444;
+	--rule: #999999;
+	--link: #23238e;
+	--link-active: #ff0000;
+	--band: #e0e0e8;
+	--band2: #eeeef4;
+	--band-rule: #c0c0cc;
+	--code-bg: #f0f0f0;
+	--code-rule: #999999;
+	--serif: "Times New Roman", Times, serif;
+	--mono: Courier, "Courier New", monospace;
+}
 
-/* Without this guard, iOS Safari scales each text block separately */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #15151a;
+		--fg: #e8e8ec;
+		--muted: #a0a0aa;
+		--rule: #55555f;
+		--link: #a3abff;
+		--link-active: #ff6b6b;
+		--band: #26263a;
+		--band2: #1e1e2c;
+		--band-rule: #3a3a50;
+		--code-bg: #1c1c22;
+		--code-rule: #44444c;
+	}
+}
 
 html {
 	-webkit-text-size-adjust: 100%;
@@ -24,45 +53,45 @@ html {
 }
 
 body {
-	background: #fff;
-	color: #000;
-	font-family: "Times New Roman", Times, serif;
-	font-size: 16px;
-	line-height: 1.4;
-	margin: 1em;
-	max-width: 55em;
+	background: var(--bg);
+	color: var(--fg);
+	font-family: var(--serif);
+	font-size: 17px;
+	line-height: 1.55;
+	margin: 1.75em 1.5em;
+	max-width: 42em;
 }
 
 hr {
 	border: 0;
-	border-top: 1px solid #999;
-	margin: 1em 0;
+	border-top: 1px solid var(--rule);
+	margin: 1.25em 0;
 }
-
-/* Links: openbsd.org uses one color for visited and unvisited alike */
 
 a:link,
 a:visited {
-	color: #23238e;
+	color: var(--link);
 	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.15em;
 }
 
 a:active {
-	color: #ff0000;
+	color: var(--link-active);
 }
 
-/* Banner and navigation */
+/* The chrome carries no class, so the selector names the element */
 
-.banner {
+body > header {
 	font-size: 2em;
 	font-weight: bold;
 	letter-spacing: 0.05em;
 	margin: 0 0 0.2em 0;
 }
 
-.banner a:link,
-.banner a:visited {
-	color: #000;
+body > header a:link,
+body > header a:visited {
+	color: var(--fg);
 	text-decoration: none;
 }
 
@@ -70,112 +99,82 @@ nav {
 	font-size: 0.95em;
 }
 
-/* Headings */
-
-h1,
-h2,
-h3,
-h4 {
-	font-family: "Times New Roman", Times, serif;
+h1, h2, h3, h4 {
+	font-family: var(--serif);
 	font-weight: bold;
 	line-height: 1.2;
-	margin: 1em 0 0.4em 0;
+	margin: 1.5em 0 0.6em 0;
 }
 
+/* The bands of openbsd.org, as a table cell once drew them: ruled above and below */
+
 h1 {
-	background: #e0e0e8;
+	background: var(--band);
+	border-top: 1px solid var(--band-rule);
+	border-bottom: 1px solid var(--band-rule);
 	font-size: 1.5em;
-	padding: 0.15em 0.3em;
+	padding: 0.2em 0.45em;
 }
 
 h2 {
-	background: #eeeef4;
+	background: var(--band2);
+	border-bottom: 1px solid var(--band-rule);
 	font-size: 1.25em;
-	padding: 0.15em 0.3em;
+	padding: 0.15em 0.45em;
 }
 
-h3 {
-	font-size: 1.1em;
+h3 { font-size: 1.1em; }
+h4 { font-size: 1em; }
+
+p, li, dd, dt {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 }
 
-h4 {
-	font-size: 1em;
-}
+dt { font-weight: bold; }
+dd { margin-left: 2em; }
 
-/* Body text */
+table { border-collapse: collapse; }
 
-p,
-li,
-dd,
-dt {
-	margin-top: 0.4em;
-	margin-bottom: 0.4em;
-}
-
-dt {
-	font-weight: bold;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-/* Code */
-
-code,
-pre,
-tt,
-kbd,
-samp,
-var {
-	font-family: "Courier New", Courier, monospace;
-	font-size: 0.95em;
+code, pre, tt, kbd, samp, var {
+	font-family: var(--mono);
+	font-size: 0.92em;
 }
 
 pre {
-	background: #f7f7f7;
-	border: 1px solid #ccc;
+	background: var(--code-bg);
+	border: 1px solid var(--code-rule);
+	line-height: 1.4;
 	overflow-x: auto;
-	padding: 0.5em;
+	padding: 0.7em 0.9em;
 }
 
 pre code {
-	background: none;
-	border: 0;
-	padding: 0;
+	font-size: 1em;
 }
 
-/* Footer */
-
 footer {
-	color: #444;
+	color: var(--muted);
 	font-size: 0.9em;
 }
 
-/*
- * Manual pages.
- *
- * mandoc(1) emits its own class names.  The rules below adopt them into
- * the site's typography instead of shipping mandoc's default stylesheet.
- * Bold, italic and monospace are the whole vocabulary.  The target is a
- * manual page, not a syntax-highlighted document.
- */
 
-/* Running header and footer bars */
+/* Manual pages: mandoc(1) emits its own class names. */
 
 table.head,
 table.foot {
 	font-size: 0.85em;
 	width: 100%;
+	color: var(--muted);
 }
 
 table.head {
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px solid var(--rule);
 	margin-bottom: 1em;
 }
 
 table.foot {
-	border-top: 1px solid #ccc;
+	border-top: 1px solid var(--rule);
 	margin-top: 1.5em;
 }
 
@@ -189,27 +188,32 @@ td.foot-os {
 	text-align: right;
 }
 
-/* Section and subsection headings.  As in a terminal, SECTION sits flush
- * left, Subsection sits at a half indent, and the text sits past both. */
-
 h1.Sh,
 h2.Ss {
 	background: none;
+	border: 0;
 	padding: 0;
+	font-weight: bold;
+	font-variant-caps: normal;
+	letter-spacing: 0;
+	text-transform: none;
 }
 
 h1.Sh {
 	font-size: 1.2em;
-	margin-left: -3.5em;
-	margin-top: 1.4em;
+	margin-left: calc(-3.5em / 1.2);
+	margin-top: 1.6em;
 }
 
 h2.Ss {
 	font-size: 1.05em;
-	margin-left: -1.75em;
+	margin-left: calc(-1.75em / 1.05);
 }
 
-/* Heading permalinks stay clickable but do not look like body links */
+h1.Sh::before,
+h2.Ss::before {
+	content: none;
+}
 
 a.permalink:link,
 a.permalink:visited {
@@ -217,19 +221,20 @@ a.permalink:visited {
 	text-decoration: none;
 }
 
-/* Body */
-
 .manual-text {
 	margin-left: 3.5em;
 }
-
-/* pod2man's preamble leaves a line break before the first section */
 
 .manual-text > br:first-child {
 	display: none;
 }
 
-/* The SYNOPSIS is a two-cell table: the name, then everything else */
+/* Inline code of a manual page takes no box */
+
+.manual-text code {
+	background: none;
+	padding: 0;
+}
 
 table.Nm td {
 	vertical-align: top;
@@ -248,27 +253,20 @@ dl.Bl-tag > dd {
 	margin-left: 2em;
 }
 
-/* Inline semantics.  Bold marks what you type, and italic marks what
- * you substitute. */
-
-.Nm,
-.Cm,
-.Fl,
-.Ic,
-.Fn,
-.Dv,
-.Er,
-.Ev {
+.Nm, .Cm, .Fl, .Ic, .Fn, .Dv, .Er, .Ev {
 	font-weight: bold;
 }
 
-.Ar,
-.Va,
-.Pa {
-	font-family: "Courier New", Courier, monospace;
+.Ar, .Va, .Pa {
+	font-family: var(--mono);
 	font-style: italic;
 }
 
 .Em {
 	font-style: italic;
+}
+
+@media (max-width: 40em) {
+	.manual-text { margin-left: 0; }
+	h1.Sh, h2.Ss { margin-left: 0; }
 }

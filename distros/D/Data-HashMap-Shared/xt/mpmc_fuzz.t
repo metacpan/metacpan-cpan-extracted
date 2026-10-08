@@ -9,7 +9,7 @@ use File::Temp qw(tmpnam);
 my $path = tmpnam() . ".$$";
 
 my $N_PROC = 4;
-my $OPS = 2000;  # per child
+my $OPS = 2000;
 
 my $m = Data::HashMap::Shared::II->new($path, 8192);
 

@@ -3,7 +3,7 @@ package Data::HashMap;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('Data::HashMap', $VERSION);
@@ -375,167 +375,37 @@ or receive the contents as a plain hash via C<to_hash>.
 
 =head1 PERFORMANCE
 
-Benchmarks with 100k entries on Linux x86_64, in iterations per second (higher
-is better). The 16-bit variants (I16, I16A, I16S, SI16) run at 30k entries,
-since int16 caps them near 65k unique keys, so their rows overstate their
-speed; at equal size SI16 and SI32 run within a few percent of SI, so choose
-them for their range checks.
+Measure on your own machine with C<perl -Mblib bench/all.pl>; speed varies with
+hardware, Perl build and table size, so treat only the shape as portable.
 
-    INSERT (iterations/sec):
-              Rate perl_ss perl_ii    SA    SS  I32A    IA I32S   IS   SI SI32  I32   II I16A I16S SI16  I16
-    perl_ss 20.0/s      --     -1%   -2%  -26%  -31%  -32% -51% -52% -53% -54% -81% -82% -84% -86% -87% -95%
-    perl_ii 20.2/s      1%      --   -1%  -25%  -30%  -32% -51% -51% -53% -54% -81% -82% -83% -86% -87% -95%
-    SA      20.4/s      2%      1%    --  -25%  -29%  -31% -50% -51% -53% -53% -81% -82% -83% -86% -87% -95%
-    SS      27.1/s     35%     34%   33%    --   -6%   -8% -34% -35% -37% -38% -75% -76% -78% -81% -83% -94%
-    I32A    28.8/s     44%     43%   41%    6%    --   -3% -30% -30% -33% -34% -73% -74% -76% -80% -82% -93%
-    IA      29.6/s     48%     46%   45%    9%    3%    -- -28% -29% -31% -32% -72% -73% -76% -79% -81% -93%
-    I32S    41.0/s    105%    103%  101%   51%   42%   39%   --  -1%  -5%  -6% -62% -63% -66% -71% -74% -90%
-    IS      41.4/s    107%    105%  103%   53%   44%   40%   1%   --  -4%  -5% -61% -63% -66% -71% -74% -90%
-    SI      42.9/s    115%    113%  111%   59%   49%   45%   5%   4%   --  -1% -60% -61% -65% -70% -73% -90%
-    SI32    43.5/s    118%    115%  113%   61%   51%   47%   6%   5%   1%   -- -59% -61% -64% -70% -72% -90%
-    I32      107/s    435%    430%  425%  295%  272%  262% 161% 159% 149% 146%   --  -3% -12% -25% -32% -75%
-    II       111/s    453%    448%  442%  309%  284%  274% 170% 167% 158% 154%   3%   --  -9% -23% -29% -74%
-    I16A     121/s    507%    501%  495%  348%  322%  311% 196% 193% 183% 179%  13%  10%   -- -15% -23% -71%
-    I16S     143/s    614%    607%  600%  428%  396%  383% 248% 245% 233% 228%  33%  29%  18%   --  -9% -66%
-    SI16     157/s    684%    676%  669%  479%  444%  430% 282% 279% 265% 260%  46%  42%  29%  10%   -- -63%
-    I16      424/s   2020%   1999% 1980% 1466% 1372% 1334% 934% 925% 887% 875% 296% 283% 249% 197% 170%   --
-
-    LOOKUP (iterations/sec):
-                Rate    SS    SA SS_direct perl_ii perl_ss    SI  SI32   IS I32S IS_direct I32A   IA   II  I32 SI16 I16A I16S  I16
-    SS        35.0/s    --   -2%       -3%     -7%    -12%  -19%  -20% -43% -45%      -47% -47% -47% -72% -75% -83% -88% -89% -93%
-    SA        35.7/s    2%    --       -1%     -5%    -10%  -18%  -18% -42% -43%      -45% -46% -46% -71% -74% -82% -88% -89% -93%
-    SS_direct 36.2/s    3%    1%        --     -4%     -9%  -17%  -17% -41% -43%      -45% -45% -46% -71% -74% -82% -88% -89% -93%
-    perl_ii   37.7/s    8%    5%        4%      --     -5%  -13%  -13% -39% -40%      -42% -43% -43% -70% -73% -82% -87% -89% -92%
-    perl_ss   39.6/s   13%   11%        9%      5%      --   -9%   -9% -36% -37%      -40% -40% -41% -68% -72% -81% -87% -88% -92%
-    SI        43.3/s   24%   21%       20%     15%     10%    --   -0% -30% -31%      -34% -34% -35% -65% -69% -79% -85% -87% -91%
-    SI32      43.5/s   24%   22%       20%     15%     10%    0%    -- -29% -31%      -33% -34% -35% -65% -69% -79% -85% -87% -91%
-    IS        61.5/s   76%   72%       70%     63%     56%   42%   41%   --  -2%       -6%  -7%  -8% -51% -56% -70% -79% -81% -88%
-    I32S      63.0/s   80%   76%       74%     67%     59%   45%   45%   2%   --       -4%  -5%  -5% -49% -55% -69% -79% -81% -87%
-    IS_direct 65.4/s   87%   83%       81%     74%     65%   51%   50%   6%   4%        --  -1%  -2% -47% -53% -68% -78% -80% -87%
-    I32A      66.0/s   89%   85%       83%     75%     67%   52%   52%   7%   5%        1%   --  -1% -47% -53% -68% -78% -80% -87%
-    IA        66.6/s   90%   86%       84%     77%     68%   54%   53%   8%   6%        2%   1%   -- -47% -52% -67% -78% -80% -86%
-    II         124/s  256%  248%      244%    230%    215%  187%  186% 102%  97%       90%  88%  87%   -- -11% -39% -58% -62% -75%
-    I32        140/s  300%  291%      287%    271%    253%  223%  221% 127% 122%      114% 112% 110%  12%   -- -31% -53% -58% -72%
-    SI16       204/s  483%  470%      463%    441%    415%  370%  368% 231% 223%      211% 208% 206%  64%  46%   -- -32% -38% -59%
-    I16A       297/s  751%  733%      723%    690%    652%  586%  584% 384% 372%      355% 350% 347% 139% 113%  46%   -- -10% -40%
-    I16S       329/s  841%  821%      810%    774%    732%  659%  657% 435% 422%      403% 398% 394% 164% 135%  62%  11%   -- -33%
-    I16        492/s 1308% 1278%     1261%   1207%   1144% 1036% 1032% 700% 681%      653% 645% 639% 296% 252% 142%  65%  50%   --
-
-    INCREMENT (iterations/sec):
-              Rate perl_ss perl_ii      SI    SI32      II     I32    SI16     I16
-    perl_ss 31.2/s      --     -5%    -24%    -26%    -66%    -70%    -79%    -92%
-    perl_ii 32.9/s      6%      --    -19%    -22%    -64%    -68%    -78%    -91%
-    SI      40.9/s     31%     24%      --     -3%    -55%    -60%    -73%    -89%
-    SI32    42.1/s     35%     28%      3%      --    -54%    -59%    -72%    -89%
-    II      91.0/s    192%    177%    123%    116%      --    -11%    -40%    -76%
-    I32      103/s    229%    212%    151%    144%     13%      --    -32%    -73%
-    SI16     151/s    386%    360%    271%    260%     66%     48%      --    -60%
-    I16      380/s   1118%   1054%    829%    802%    317%    270%    151%      --
-
-    DELETE (iterations/sec):
-              Rate    SS perl_ss    SA perl_ii    SI  SI32 I32A   IA I32S   IS   II  I32 I16A SI16 I16S  I16
-    SS      13.0/s    --    -11%  -15%    -25%  -39%  -41% -48% -49% -53% -53% -78% -81% -87% -87% -89% -95%
-    perl_ss 14.6/s   12%      --   -5%    -16%  -31%  -33% -42% -42% -47% -47% -76% -79% -85% -85% -88% -94%
-    SA      15.3/s   18%      5%    --    -12%  -28%  -30% -39% -40% -44% -45% -75% -78% -84% -84% -88% -94%
-    perl_ii 17.4/s   34%     19%   14%      --  -18%  -21% -31% -31% -36% -37% -71% -75% -82% -82% -86% -93%
-    SI      21.3/s   64%     46%   39%     22%    --   -3% -15% -16% -22% -23% -65% -69% -78% -78% -83% -92%
-    SI32    21.9/s   68%     50%   43%     26%    3%    -- -13% -13% -20% -21% -64% -68% -78% -78% -82% -91%
-    I32A    25.2/s   94%     73%   65%     45%   18%   15%   --  -0%  -8%  -9% -58% -63% -74% -74% -79% -90%
-    IA      25.3/s   94%     73%   65%     45%   19%   15%   0%   --  -8%  -9% -58% -63% -74% -74% -79% -90%
-    I32S    27.4/s  111%     88%   79%     57%   29%   25%   9%   8%   --  -1% -54% -60% -72% -72% -78% -89%
-    IS      27.8/s  113%     90%   82%     60%   30%   27%  10%  10%   1%   -- -54% -60% -72% -72% -77% -89%
-    II      60.3/s  363%    313%  294%    246%  183%  175% 139% 138% 120% 117%   -- -13% -38% -38% -51% -76%
-    I32     69.0/s  430%    372%  351%    296%  224%  215% 173% 173% 152% 148%  14%   -- -29% -29% -44% -73%
-    I16A    97.6/s  649%    568%  537%    460%  357%  345% 287% 286% 256% 251%  62%  41%   --  -0% -21% -62%
-    SI16    97.8/s  651%    569%  539%    461%  359%  346% 287% 286% 256% 252%  62%  42%   0%   -- -20% -62%
-    I16S     123/s  843%    740%  702%    605%  476%  460% 387% 385% 348% 342% 104%  78%  26%  26%   -- -52%
-    I16      254/s 1852%   1640% 1561%   1359% 1092% 1059% 908% 905% 827% 815% 322% 269% 161% 160% 107%   --
-
-=head2 LRU / TTL overhead
-
-    INSERT, II variant (iterations/sec):
-                 Rate II_lru_ttl     II_lru         II
-    II_lru_ttl 75.5/s         --        -7%       -31%
-    II_lru     81.5/s         8%         --       -26%
-    II          110/s        45%        34%         --
-
-    LOOKUP, II variant (iterations/sec):
-                 Rate II_lru_ttl II_lru_s90     II_lru         II
-    II_lru_ttl 84.2/s         --        -9%       -11%       -32%
-    II_lru_s90 92.8/s        10%         --        -3%       -25%
-    II_lru     95.2/s        13%         3%         --       -23%
-    II          124/s        47%        33%        30%         --
-
-    LRU EVICTION CHURN: insert 100k into capacity 50k (iterations/sec):
-                 Rate II_lru_ttl     II_lru
-    II_lru_ttl 92.2/s         --        -9%
-    II_lru      102/s        10%         --
-
-=head2 Method vs keyword overhead
-
-Method calls cost more than keywords:
-
-    II variant, 100k operations (iterations/sec):
-                    keyword    method    extra time per call
-    LOOKUP             122/s      105/s      +16%
-    INSERT             110/s     98.4/s      +12%
+Inserts into an integer-key map beat a Perl hash at every size -- roughly 2x at
+a thousand entries, widening to several times at 100k; string-key maps are
+faster too, by a smaller margin. Lookups trade places with size: on a small
+map a Perl hash is quicker, and the C map pulls ahead as the table fills, so
+the win is largest on big, long-lived maps. Within one key width the variants
+run at about the same speed -- the narrower integer types buy memory and range
+checks, not throughput. A keyword call is a little cheaper than the method
+form.
 
 =head1 MEMORY
 
-Memory usage with 1M entries (fork-isolated measurements):
+Bytes per entry at 1M entries, fork-isolated (16-bit rows at 30k, where int16
+caps unique keys near 65k; each row exceeds its node size because the table is
+a power of two above 4/3 of the entries):
 
-    Variant       Memory       Bytes/entry   vs Perl hash
-    -------       ------       -----------   ------------
-    I16*           0.6 MB        21             8x less
-    I32            29 MB         30            5.5x less
-    II             45 MB         46            3.5x less
-    I32S           73 MB         75            2.2x less
-    IS             73 MB         75            2.2x less
-    SI16           73 MB         75            2.2x less
-    SI32           73 MB         75            2.2x less
-    SI             73 MB         75            2.2x less
-    I16A*          0.6 MB        21             8x less
-    I16S*          0.6 MB        21             8x less
-    I32A           92 MB         95            1.7x less
-    IA             92 MB         95            1.7x less
-    SS            121 MB        124            1.3x less
-    SA            140 MB        144            1.1x less
-    perl %h (int) 159 MB        163            (baseline)
-    perl %h (str) 166 MB        170            (baseline)
+    Variant       Bytes/entry   vs Perl hash
+    I16/I16A/I16S          21      8x less
+    I32                    30    5.5x less
+    II                     46    3.5x less
+    I32S/IS/SI/SI16/SI32   75    2.2x less
+    I32A/IA                95    1.7x less
+    SS                    124    1.3x less
+    SA                    144    1.1x less
+    perl %h (int/str)  163/170   baseline
 
-    * I16/I16A/I16S measured at 30k entries (the int16 key range caps unique keys
-      at ~65k). Every row is larger than its node size because the table is a
-      power of two at or above 4/3 of the entries and a growth step transiently
-      holds both tables; the I16 row is the least favourable case, sitting just
-      above a power-of-two boundary.
-
-=head2 LRU / TTL memory overhead
-
-Per-entry cost of LRU (prev/next indices) and TTL (expiry timestamp), at 1M
-entries.
-
-    II variant (int64/int64):
-    Variant        Bytes/entry   LRU overhead   +TTL overhead
-    -------        -----------   ------------   -------------
-    II                    46.4       -              -
-    II_lru                67.3     +20.9 B          -
-    II_lru_ttl            79.9       -            +12.6 B
-
-    SS variant (string/string, various key+value sizes):
-    Variant        Bytes/entry   LRU overhead   +TTL overhead
-    -------        -----------   ------------   -------------
-    SS  8B keys          123.9       -              -
-    SS  8B lru           140.7     +16.8 B          -
-    SS  8B lru+ttl       152.2       -            +11.5 B
-    SS 16B keys          123.9       -              -
-    SS 16B lru           140.7     +16.8 B          -
-    SS 16B lru+ttl       152.2       -            +11.5 B
-    SS 32B keys          155.9       -              -
-    SS 32B lru           172.7     +16.8 B          -
-    SS 32B lru+ttl       181.1       -             +8.4 B
-    SS 64B keys          220.0       -              -
-    SS 64B lru           236.7     +16.8 B          -
-    SS 64B lru+ttl       245.1       -             +8.4 B
+LRU adds about 17-21 bytes per entry (two slot indices) and a TTL about 8-13
+more (an expiry timestamp); each array is allocated only when its feature is
+used.
 
 =head1 IMPLEMENTATION
 

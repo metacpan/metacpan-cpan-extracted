@@ -6,12 +6,7 @@ use POSIX ();
 
 use Data::HashMap::Shared::II;
 
-# take/pop/shift/drain are the removal primitives eg/work_queue.pl is built on,
-# and their whole promise is that a key is claimed by exactly one caller.
-# t/16-fork-multiproc.t races cas/add/incr/cas_take and stops there, so nothing
-# exercised these across processes -- the same kind of gap that let a sharded
-# first-open race ship.
-#
+# take/pop/shift/drain must claim each key for exactly one caller.
 # Workers are released through a pipe barrier: a bare fork loop lets the first
 # child finish before the last one exists, so the claims barely overlap.
 
@@ -35,11 +30,10 @@ sub claim_race {
             my @claimed;
             my $idle = 0;
             my $rounds = 0;
-            # bounded so a primitive that returns without removing fails
-            # the test instead of hanging the suite
+            # bounded so a primitive that returns without removing fails the
+            # test instead of hanging the suite
             while ($idle < 3 && ++$rounds <= 4 * $NKEYS) {
                 my $got = 0;
-                # each worker leans on a different primitive, all removing
                 if    ($w == 1) { my ($k) = $map->pop;      $got = defined $k ? push @claimed, $k : 0 }
                 elsif ($w == 2) { my ($k) = $map->shift;    $got = defined $k ? push @claimed, $k : 0 }
                 elsif ($w == 3) { my @kv  = $map->drain(7);

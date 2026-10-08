@@ -7,7 +7,7 @@ use Getopt::Pad::Spec::Arg;
 class Getopt::Pad::Spec::Level :strict(params) {
 	use Getopt::Pad::Util qw(specError isValidName);
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	field $raw  :param;
 	field $path :param :reader = '';
@@ -30,13 +30,13 @@ class Getopt::Pad::Spec::Level :strict(params) {
 		my $rawOptions = delete $spec{options} // {};
 		specError("%s'options' must be a hash reference", $where) if ref $rawOptions ne 'HASH';
 		foreach my $key (sort keys $rawOptions->%*) {
-			$self->addOption(Getopt::Pad::Spec::Option->new(key => $key, raw => $rawOptions->{$key}));
+			$self->addOption(Getopt::Pad::Spec::Option->new(key => $key, raw => $rawOptions->{$key}, where => $where));
 		}
 
 		my $rawArgs = delete $spec{args} // [];
 		specError("%s'args' must be an array reference", $where) if ref $rawArgs ne 'ARRAY';
 		foreach my $rawArg ($rawArgs->@*) {
-			push @args, Getopt::Pad::Spec::Arg->new(raw => $rawArg);
+			push @args, Getopt::Pad::Spec::Arg->new(raw => $rawArg, where => $where);
 		}
 		my $sawOptional = 0;
 		foreach my $index (0 .. $#args) {

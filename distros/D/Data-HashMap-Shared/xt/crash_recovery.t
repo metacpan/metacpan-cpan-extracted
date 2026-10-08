@@ -7,11 +7,8 @@ use IO::Pipe;
 
 use Data::HashMap::Shared::II;
 
-# ============================================================
-# HashMap: writer crashes while holding write lock.
-# Parent opens the same file-backed map and expects recovery
-# within ~2s (LOCK_TIMEOUT_SEC).
-# ============================================================
+# A writer killed holding the write lock: the parent must recover within ~2s
+# (LOCK_TIMEOUT_SEC).
 
 use File::Temp qw(tmpnam);
 my $path = tmpnam() . ".$$";
@@ -25,7 +22,6 @@ my $path = tmpnam() . ".$$";
     if ($pid == 0) {
         $pipe->writer;
         my $child = Data::HashMap::Shared::II->new($path, 1024);
-        # Enter a long write-lock path: put many keys to stress the lock.
         for (1..100) { $child->put($_, $_ * 2) }
         print $pipe "ready\n";
         $pipe->close;

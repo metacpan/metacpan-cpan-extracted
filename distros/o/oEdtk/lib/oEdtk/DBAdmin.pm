@@ -21,7 +21,7 @@ use Data::Dumper qw(Dumper);
 # SHOW CREATE DATABASE oEdtk;
 
 use Exporter;
-our $VERSION		= 2.1101; #version lc Mysql / PG / Oracle / SQLite
+our $VERSION		= 2.1104; #version lc Mysql / PG / Oracle / SQLite
 our $VERSION_TXT 	= $VERSION =~ s/\./_/gr;
 our @ISA			= qw(Exporter);
 our @EXPORT_OK		= qw(
@@ -61,6 +61,10 @@ our @EXPORT_OK		= qw(
 my $_LOCAL_EDTK_WAITRUN=0;
 my $CONNECT_COUNT=0;
 our %_csv_import_type_cache;
+
+# PostgreSQL bulk-load tuning (used by _load_csv_pg_copy / _pg_load_tx).
+use constant PG_COPY_SYNC_OFF => 'SET LOCAL synchronous_commit = off';  # relax fsync for this transaction only
+use constant PG_COPY_ANALYZE  => 'ANALYZE %s';                            # refresh planner stats after a bulk load
 
 
 sub move_table (@){
@@ -179,7 +183,8 @@ sub _load_csv_mysql_infile ($$$$) {
 		return (-1, &logger (3, "$count-ERROR LOAD INFILE-$@ $!".$dbh::errstr));
 	}
 
-	&logger(4, $count." lines inserted into $tablename");
+	my $rows = _count_csv_rows($fi, $params);
+	&logger(4, "bulk insert into $tablename via LOAD DATA INFILE: $rows rows");
 	return ($count, " lines inserted");
 }
 
@@ -223,7 +228,8 @@ sub _load_csv_mysql_local_infile ($$$$) {
 		return (-1, &logger (3, "$count-ERROR LOAD INFILE-$@ $!".($dbh::errstr || "")));
 	}
 
-	&logger(4, $count." lines inserted into $tablename");
+	my $rows = _count_csv_rows($fi, $params);
+	&logger(4, "bulk insert into $tablename via LOAD DATA LOCAL INFILE: $rows rows");
 	return ($count, " lines inserted");
 }
 
@@ -264,6 +270,154 @@ sub _pg_encoding_name {
 	return "CP$1" if $n =~ /^WIN(\d+)$/;
 	return $n if $n ne '' && defined find_encoding($n);
 	return 'UTF-8';
+}
+
+# ============================================================
+# PRIVATE : count the CSV data records (header excluded) so a bulk
+# load can report how many rows it is about to inject. getline (not
+# parse) is used so a quoted field may span several physical lines.
+# Returns the number of data records, or -1 when the file is unreadable.
+# ============================================================
+sub _count_csv_rows {
+	my ($fi, $params) = @_;
+	open(my $fh, '<', $fi) or return -1;
+	my $csv = Text::CSV->new({ binary     => 1,
+	                           sep_char   => $params->{'sep_char'}   // ',',
+	                           quote_char => $params->{'quote_char'} // '"',
+	});
+	$csv->getline($fh);            # skip the header record
+	my $rows = 0;
+	while (1) {
+		my $data = $csv->getline($fh);
+		last if !defined $data;
+		$rows++;
+	}
+	close($fh);
+	return $rows;
+}
+
+# ============================================================
+# PRIVATE : run a COPY ... FROM STDIN, aborting it best-effort on failure.
+# Returns the driver error message, or undef on success.
+# ============================================================
+sub _pg_copy_stdin {
+	my ($dbh, $sql, $tmpfh) = @_;
+	my $emsg;
+	my $copy_live = 0;
+	eval {
+		$dbh->do($sql);
+		$copy_live = 1;
+		while (my $line = <$tmpfh>) {
+			defined $dbh->pg_putcopydata($line)
+				or die ($dbh->errstr || "pg_putcopydata failed");
+		}
+		$copy_live = 0;              # pg_putcopyend always ends the COPY
+		$dbh->pg_putcopyend();
+		1;
+	} or $emsg = $@;
+	$emsg ||= ($dbh->err ? $dbh->errstr : '');
+	if ($emsg) {
+		eval { $dbh->pg_putcopyend() } if $copy_live;  # abort a live COPY
+		return $emsg;
+	}
+	return undef;
+}
+
+# ============================================================
+# PRIVATE : quote a PostgreSQL identifier ("" doubling).
+# ============================================================
+sub _pg_quote_ident {
+	my ($name) = @_;
+	(my $s = $name) =~ s/"/""/g;
+	return '"' . $s . '"';
+}
+
+# ============================================================
+# PRIVATE : list the DDL a bulk COPY may drop up-front and rebuild
+# afterwards, so every inserted row does not have to maintain it.
+# Only standalone secondary indexes and unique / foreign-key constraints
+# are returned : primary keys, and any index a foreign key depends on, are
+# left untouched. Returns { drop => [sql...], create => [sql...] }.
+# ============================================================
+sub _pg_deferrable_ddl {
+	my ($dbh, $table) = @_;
+	my ($oid) = $dbh->selectrow_array("SELECT to_regclass(?)::oid", undef, $table);
+	return { drop => [], create => [] } unless $oid;
+
+	my (@drop, @create);
+
+	# Secondary indexes that back no constraint and are referenced by no FK.
+	my $idx = $dbh->selectall_arrayref(
+		"SELECT n.nspname, c.relname, pg_get_indexdef(i.indexrelid)"
+		. " FROM pg_index i"
+		. " JOIN pg_class c ON c.oid = i.indexrelid"
+		. " JOIN pg_namespace n ON n.oid = c.relnamespace"
+		. " WHERE i.indrelid = ? AND NOT i.indisprimary"
+		. "   AND NOT EXISTS (SELECT 1 FROM pg_constraint k WHERE k.conindid = i.indexrelid)",
+		undef, $oid);
+	foreach my $r (@$idx) {
+		my ($nsp, $name, $def) = @$r;
+		push @drop,   "DROP INDEX " . _pg_quote_ident($nsp) . "." . _pg_quote_ident($name);
+		push @create, $def;
+	}
+
+	# Unique and foreign-key constraints on this table, except a unique
+	# constraint whose index a foreign key depends on.
+	my $cons = $dbh->selectall_arrayref(
+		"SELECT c.conname, pg_get_constraintdef(c.oid) FROM pg_constraint c"
+		. " WHERE c.conrelid = ? AND c.contype IN ('u','f')"
+		. "   AND NOT (c.contype = 'u' AND EXISTS (SELECT 1 FROM pg_constraint k"
+		. "                                        WHERE k.conindid = c.conindid"
+		. "                                          AND k.contype = 'f'))",
+		undef, $oid);
+	foreach my $r (@$cons) {
+		my ($cname, $cdef) = @$r;
+		my $cid = _pg_quote_ident($cname);
+		push @drop,   "ALTER TABLE $table DROP CONSTRAINT $cid";
+		push @create, "ALTER TABLE $table ADD CONSTRAINT $cid $cdef";
+	}
+
+	return { drop => \@drop, create => \@create };
+}
+
+# ============================================================
+# PRIVATE : load the cleaned temp file into $tablename inside one
+# transaction, optionally after dropping the deferrable DDL and relaxing
+# synchronous_commit for that transaction only (SET LOCAL). Rebuilds the
+# DDL and commits ; a failure rolls the data AND the DDL back. A
+# caller-managed transaction (AutoCommit already off) is left open.
+# Returns ('ok',''), ('defer',$err) when the DDL could not be dropped,
+# or ('fail',$err) on any other error.
+# ============================================================
+sub _pg_load_tx {
+	my ($dbh, $tablename, $sql, $tmpfh, $ddl) = @_;
+	my $own   = $dbh->{AutoCommit} ? 1 : 0;
+	my $phase = 'begin';
+	my $ok = eval {
+		$dbh->begin_work if $own;
+		eval { $dbh->do(PG_COPY_SYNC_OFF); 1 }
+			or &logger(4, "_pg_load_tx: SET LOCAL failed: $@");
+		$phase = 'defer';
+		foreach my $s (@{ $ddl->{drop} }) {
+			$dbh->do($s) or die($dbh->errstr || "drop failed: $s");
+		}
+		$phase = 'copy';
+		seek($tmpfh, 0, 0) or die("cannot rewind temp file: $!");
+		my $err = _pg_copy_stdin($dbh, $sql, $tmpfh);
+		die $err if defined $err;
+		$phase = 'rebuild';
+		foreach my $s (@{ $ddl->{create} }) {
+			$dbh->do($s) or die($dbh->errstr || "create failed: $s");
+		}
+		$dbh->commit if $own;
+		1;
+	};
+	return ('ok', '') if $ok;
+
+	my $err = $@ // '';
+	eval { $dbh->rollback } if $own && !$dbh->{AutoCommit};
+	$err =~ s/\s+\z//;
+	return ($phase eq 'defer' ? 'defer' : 'fail', $err);
 }
 
 # ============================================================
@@ -337,26 +491,40 @@ sub _load_csv_pg_copy ($$$$$) {
 	        . " QUOTE '" . $quo . "', NULL '')";
 	&logger(7, $sql);
 
-	my $emsg;
-	eval {
-		$dbh->do($sql);
-		while (my $line = <$tmpfh>) {
-			defined $dbh->pg_putcopydata($line)
-				or die ($dbh->errstr || "pg_putcopydata failed");
+	# Default path (pg_copy_optimize unset or true) : load inside one
+	# transaction, dropping the target table's secondary indexes and unique /
+	# FK constraints for the duration of the COPY, relaxing synchronous_commit
+	# for that transaction only and refreshing the planner statistics at the
+	# end. If the DDL cannot be dropped, the load is retried once without
+	# deferral. Passing pg_copy_optimize => 0 keeps the historical plain COPY.
+	my ($status, $emsg) = ('ok', '');
+	if ($params->{'pg_copy_optimize'} // 1) {
+		my $ddl = eval { _pg_deferrable_ddl($dbh, $tablename) };
+		&logger(4, "_load_csv_pg_copy: deferral lookup failed: $@") unless $ddl;
+		$ddl ||= { drop => [], create => [] };
+		($status, $emsg) = _pg_load_tx($dbh, $tablename, $sql, $tmpfh, $ddl);
+		if ($status eq 'defer') {
+			&logger(4, "_load_csv_pg_copy: deferral unavailable ($emsg), retrying without it");
+			($status, $emsg) = _pg_load_tx($dbh, $tablename, $sql, $tmpfh,
+			                               { drop => [], create => [] });
 		}
-		$dbh->pg_putcopyend();
-		1;
-	} or $emsg = $@;
-	$emsg ||= ($dbh->err ? $dbh->errstr : '');
-	if ($emsg) {
-		eval { $dbh->pg_putcopyend() };  # best-effort abort if left in COPY state
+	} else {
+		my $err = _pg_copy_stdin($dbh, $sql, $tmpfh);
+		($status, $emsg) = defined $err ? ('fail', $err) : ('ok', '');
+	}
+
+	if ($status ne 'ok') {
 		close($tmpfh);
-		chomp($emsg);
+		chomp($emsg //= '');
 		return (-1, &logger(3, "_load_csv_pg_copy: COPY into $tablename failed: $emsg"));
 	}
+
+	# Refresh the planner statistics for the freshly loaded table (best effort).
+	eval { $dbh->do(sprintf(PG_COPY_ANALYZE, $tablename)); 1 }
+		or &logger(4, "_load_csv_pg_copy: ANALYZE $tablename failed: $@");
 	close($tmpfh);
 
-	&logger(4, $count." lines inserted into $tablename");
+	&logger(4, "bulk insert into $tablename via COPY ... FROM STDIN: $count rows");
 	return ($count, " lines inserted");
 }
 

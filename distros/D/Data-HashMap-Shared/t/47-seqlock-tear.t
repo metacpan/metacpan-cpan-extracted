@@ -8,32 +8,24 @@ use Time::HiRes qw(time);
 
 use Data::HashMap::Shared::SS;
 
-# get() is lock-free and consistent only because of the seqlock: a writer flips
-# hdr->seq odd before it touches an entry and even after, and a reader that saw
-# the sequence move re-reads.  Without write_begin a section can hand a reader a
-# record mid-rewrite, and an odd number of sections leaves the sequence odd for
-# good, where read_begin spins forever -- nobody holds wlock, so stale-lock
-# recovery never fires.  Two alarm-bounded detectors, so either outcome fails an
-# assertion:
-#  - the tear: readers hammer get() on a key a writer keeps rewriting.  Every
-#    value names its key and its round and repeats a round-derived byte to the
-#    end, so a recycled block's free-list link, the interim inline-empty state,
-#    or a mix of two generations fails a field check;
+# get() is lock-free only because of the seqlock: a writer flips hdr->seq odd
+# before touching an entry and even after.  Two alarm-bounded detectors:
+#  - the tear: readers hammer get() on a key a writer keeps rewriting; every
+#    value names its key and round and repeats a round-derived byte, so a
+#    recycled block or a mix of two generations fails a field check;
 #  - the spin: after the writer stops, a probe child does one get() under a
-#    no-handler alarm, once before and once after a single put() flips the
-#    parity.  A stuck-odd sequence kills exactly one probe with SIGALRM.
+#    no-handler alarm, before and after a put() flips the parity; a stuck-odd
+#    sequence kills exactly one probe with SIGALRM.
 # A Perl-level $SIG{ALRM} cannot interrupt a get() that never returns to Perl,
-# so every read that could spin runs in a child with the default disposition and
-# the parent only judges exit statuses.
+# so every read that could spin runs in a child with the default disposition.
 
 use constant {
     VLEN    => 256,       # > 7 bytes: an arena block
     HEAD    => 18,        # "KKKKKKKK|RRRRRRRR|"
     READERS => 3,
     READS   => 50_000,    # per reader
-    # One key, so every read targets the entry being rewritten, and a TTL, so
-    # the expiry check sits inside the reader's window: together they raise
-    # the observed tear rate from a handful per run to hundreds.
+    # one key plus a TTL (the expiry check sits inside the reader's window)
+    # raises the tear rate from a handful per run to hundreds
     TTL     => 3600,
 };
 
@@ -122,8 +114,8 @@ local $SIG{ALRM} = sub {
     kill 'KILL', @pids;
     die "seqlock probe exceeded its time budget\n";
 };
-# a writer that died early leaves nobody reading the stop pipe; its status is
-# asserted below, so do not let SIGPIPE kill the report first
+# a writer that died early leaves nobody reading the stop pipe: keep SIGPIPE
+# from killing the report before its status is asserted
 local $SIG{PIPE} = 'IGNORE';
 alarm 60;
 
@@ -165,10 +157,8 @@ is($reads, READERS * READS, "every reader reported its full read count");
 is($tears, 0, sprintf "every get() returned a record consistent with its key and round (%d reads, %d torn%s)",
     $reads, $tears, %kinds ? ': ' . join(', ', sort keys %kinds) : '');
 
-# The spin.  One get() in a child under a no-handler alarm: a sequence left
-# odd never returns and the child dies of SIGALRM, which is a status, not a
-# stall.  The put() between the two probes flips the parity, so a no-op
-# write_begin is caught whichever parity the race happened to end on.
+# the put() between the two probes flips the parity, so a no-op write_begin is
+# caught whichever parity the race ended on
 sub probe_get {
     my $pid = fork;
     die "fork: $!" unless defined $pid;

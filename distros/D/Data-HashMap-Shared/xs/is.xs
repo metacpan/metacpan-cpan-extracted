@@ -155,11 +155,8 @@ set_multi(SV* self_sv, ...)
                 count += shm_is_put(h, _key, _vs, (uint32_t)_vl, _vu);
             }
         } else {
-            /* Materialize every argument before the lock: SvIV/SvPV run a tied
-             * FETCH or overload, which must not run under the write lock, or a
-             * callback that re-enters this map self-deadlocks it.  A magical
-             * string is copied (it outlives its FETCH's return); a plain one is
-             * held by pointer, as the single-key path does. */
+            /* Materialize arguments before the lock: a re-entrant FETCH would
+             * self-deadlock.  Magical strings are copied, plain ones held by pointer. */
             int _n = (items - 1) / 2;
             int64_t *_ks; const char **_vs; STRLEN *_vl; bool *_vu;
             Newx(_ks, _n ? _n : 1, int64_t);      SAVEFREEPV(_ks);
@@ -600,8 +597,7 @@ drain(SV* self_sv, SV* limit_sv)
         UV limit = shm_count_arg(aTHX_ limit_sv, "drain limit", "Data::HashMap::Shared::IS");
         EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::IS: map is frozen (read-only)");
-        /* Only as many as the map can actually yield: drain(1e9) on a
-         * ten-entry map otherwise reserved a billion entries up front. */
+        /* Only as many as the map can yield: limit sizes the allocation. */
         {
             UV avail = (UV)shm_is_size(h);
             if (limit > avail) limit = avail;

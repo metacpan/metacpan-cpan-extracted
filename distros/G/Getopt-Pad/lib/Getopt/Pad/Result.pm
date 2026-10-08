@@ -2,9 +2,11 @@ use v5.26;
 use Object::Pad qw(:experimental(mop));
 
 class Getopt::Pad::Result {
-	use Carp qw(croak);
+	# Carp is called fully qualified: an imported croak would be a method
+	# of every Result and reserve its name for no reason.
+	use Carp ();
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	# Names Perl looks up on an object by itself; a Reader by one of these
 	# would run at the wrong time with the wrong arguments.
@@ -26,13 +28,13 @@ class Getopt::Pad::Result {
 	}
 
 	method help() {
-		croak 'Getopt::Pad: no help renderer attached to this result' unless defined $helper;
+		Carp::croak('Getopt::Pad: no help renderer attached to this result') unless defined $helper;
 		$helper->printHelp;
 		exit 0;
 	}
 
 	method version() {
-		croak 'Getopt::Pad: no help renderer attached to this result' unless defined $helper;
+		Carp::croak('Getopt::Pad: no help renderer attached to this result') unless defined $helper;
 		$helper->printVersion;
 		exit 0;
 	}
@@ -81,12 +83,11 @@ use C<< $opt->isa('Getopt::Pad::Result') >> to check for a result object.
 The readers are read-only: there are no methods to set values, and
 calling a reader with an argument is an error. The values are plain Perl
 data: strings, numbers, and for options with several values arrayrefs
-and hashrefs. (One exception: a JSON C<true> or C<false> given to an
-option that is not a C<flag> or C<bool>, such as a C<string> option,
-is returned as a L<JSON::PP::Boolean> object, which stringifies to 1 or
-0.) These references belong to the result object; if your
+and hashrefs. These references belong to the result object; if your
 program changes their contents, the reader returns the changed data from
-then on. Other parses are not affected. What each kind of option returns is
+then on. Other parses are not affected. An option or arg with
+C<processValue> returns what its coderef returned instead, see
+L<Getopt::Pad/processValue>. What each kind of option returns is
 listed in L<Getopt::Pad/Values by option kind>, and how reader names are
 derived from option names in L<Getopt::Pad/Reader names>.
 

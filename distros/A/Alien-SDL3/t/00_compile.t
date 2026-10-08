@@ -1,24 +1,32 @@
-use Test2::V0 '!subtest';
-use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
-use lib 'lib', '../lib', 'blib/lib', '../blib/lib';
+use v5.40;
+use blib;
+use Test2::V0;
 use Alien::SDL3;
+use feature 'try';
 #
-diag 'Alien::SDL3::VERSION == ' . $Alien::SDL3::VERSION;
+try { require Affix } catch ($e) {
+    skip_all 'Needs Affix'
+}
+my $sdl3 = Alien::SDL3->new;
+isa_ok $sdl3, ['Alien::SDL3'],           'isa Alien::SDL3';
+isa_ok $sdl3, ['Alien::Xrepo::Runtime'], 'isa Alien::Xrepo::Runtime';
+
+#~ is [ $sdl3->package_names ], [ 'libsdl3', 'libsdl3_image', 'libsdl3_ttf', 'libsdl3_mixer' ], 'package_names lists the SDL3 family';
 #
-diag 'Support:';
-diag sprintf '  - %s', $_,
-    for grep {defined}
-    map { Alien::SDL3->features->{$_}{okay} ? $_ . ' v' . Alien::SDL3->features->{$_}{version} : () } qw[SDL3 SDL2_image SDL2_mixer SDL2_ttf];
-diag 'Libs:';
-diag '  - ' . $_ for sort Alien::SDL3->dynamic_libs;
-#
-isa_ok( Alien::SDL3->sdldir, ['Path::Tiny'], 'sdldir' );
-isa_ok( Alien::SDL3->incdir, ['Path::Tiny'], 'incdir' );
-isa_ok( Alien::SDL3->libdir, ['Path::Tiny'], 'libdir' );
-#
-diag 'incdir:';
-Alien::SDL3->incdir->visit( sub { diag $_->realpath } );
-diag 'libdir:';
-Alien::SDL3->libdir->visit( sub { diag $_->realpath } );
+for my $name ( $sdl3->package_names ) {
+    my $alt  = $sdl3->alt($name);
+    my $info = $alt->package_info;
+    unless ($info) {
+        diag $name . ' is missing';
+        next;
+    }
+    diag sprintf '%-16s v%-9s %-8s',  $name, $info->version, $info->kind;
+    diag sprintf '  installdir : %s', $info->installdir // '(none)';
+    diag sprintf '  libpath    : %s', $info->libpath    // '(none)';
+    diag sprintf '  dynamic    : %s', join( '; ', @{ $info->libfiles    // [] } ) || '(none)';
+    diag sprintf '  includes   : %s', join( '; ', @{ $info->includedirs // [] } ) || '(none)';
+    diag sprintf '  cflags     : %s', $alt->cflags;
+    diag sprintf '  libs       : %s', $alt->libs;
+}
 #
 done_testing;

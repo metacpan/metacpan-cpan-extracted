@@ -22,6 +22,7 @@ WriteMakefile(
 	EXE_FILES => [
 		'bin/test-generator-mutate',
 		'bin/benchmark-generator',
+		'bin/demo_extractor',
 		'bin/deploy-workflows',
 		'bin/fuzz-harness-generator',
 		'bin/extract-schemas',
@@ -49,6 +50,7 @@ WriteMakefile(
 		'File::Temp' => 0,
 		'Getopt::Long' => 0,
 		'HTML::Entities' => 0,
+		'HTTP::Tiny' => 0,
 		'IPC::Open3' => 0,
 		'IPC::Run3' => 0,
 		'JSON::MaybeXS' => 0,
@@ -63,7 +65,9 @@ WriteMakefile(
 		'Return::Set' => 0.03,
 		'Safe' => 0,
 		'Template' => 0,
+		'Test::Exception' => 0,
 		'Text::Balanced' => 0,
+		'Time::HiRes' => 0,
 		'Unicode::GCString' => 0,
 		'URI' => 0,
 		'UUID::Tiny' => 0,
@@ -93,6 +97,14 @@ WriteMakefile(
 			coverage_guided_fuzzing => {
 				description => 'Coverage-guided corpus pruning in CoverageGuidedFuzzer',
 				prereqs => { runtime => { recommends => { 'Devel::Cover' => '1.51' } } },
+			},
+			type_params_extraction => {
+				description => 'Accurate schema extraction from Type::Params signatures in SchemaExtractor',
+				prereqs => { runtime => { recommends => {
+					'Type::Params'   => 0,
+					'Types::Common'  => 0,
+					'BSD::Resource'  => 0,
+				} } },
 			},
 		},
 		resources => {

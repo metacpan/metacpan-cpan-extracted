@@ -14,8 +14,8 @@ plan skip_all => "machine too loaded for a timing ratio (loadavg $load)" if $loa
 
 use Data::HashMap::Shared::II;
 
-# to_hash copies the entries under the read lock and builds the hash once it is
-# released, so a writer waits for the copy, not for the hash inserts.  Priced
+# to_hash copies the entries under the read lock and builds the hash after
+# releasing it, so a writer waits for the copy, not the hash inserts. Priced
 # against the call itself, so the ratio holds on any machine.
 
 my $dir = tempdir(CLEANUP => 1);

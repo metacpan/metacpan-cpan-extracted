@@ -5,12 +5,8 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SI;
 
-# Regression (0.19): the dispatcher's shard_iter served two masters -- each()'s
-# shard-progress cursor and pop/shift/drain's round-robin start.  Draining a
-# sharded map during an each() moved the cursor past shards the iteration had
-# not visited, so each() silently skipped live keys.  pop/shift/drain now use a
-# separate shard_rr.  The invariant: a key each() never yields must be a key
-# that is no longer there.
+# pop/shift/drain during each() must not move each()'s shard cursor: a key
+# each() never yields must be a key that is no longer there.
 
 my $dir = tempdir(CLEANUP => 1);
 my @keys = map { "sharded-iter-key-longer-than-inline-$_" } 1 .. 40;
@@ -28,7 +24,7 @@ for my $case (
     my (%seen, $step);
     while (my ($k, $v) = $m->each) {
         $seen{$k} = 1;
-        $act->($m) if ++$step == 5;         # drain mid-iteration
+        $act->($m) if ++$step == 5;
     }
 
     my @skipped_but_live = grep { !$seen{$_} && $m->exists($_) } @keys;
@@ -37,15 +33,13 @@ for my $case (
         or diag "skipped while still live: @skipped_but_live";
 }
 
-# Regression (0.19): clear() reset each shard but not the dispatcher's own
-# shard cursor, so an each() left part-way through before the clear resumed at
-# that shard afterwards and never visited the ones below it.
+# clear() must also reset the dispatcher's shard cursor of an abandoned each()
 {
     my $m = Data::HashMap::Shared::SI->new_sharded("$dir/cleared", 4, 1000);
     $m->put($_, 1) for @keys;
 
     my $n = 0;
-    while (my ($k, $v) = $m->each) { last if ++$n >= 15 }   # abandon mid-iteration
+    while (my ($k, $v) = $m->each) { last if ++$n >= 15 }
     $m->clear;
 
     my @after = map { "post-clear-$_" } @keys;

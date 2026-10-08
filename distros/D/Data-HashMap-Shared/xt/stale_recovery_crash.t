@@ -6,11 +6,11 @@ use Time::HiRes qw(time);
 
 use Data::HashMap::Shared::II;
 
-# A process that crashes while recovering a stale lock must leave the lock
-# recoverable: shm_recover_stale_lock takes it as our own pid, not a bare
-# WRITER_BIT, which shm_pid_alive would read as always alive and hang forever.
-# The true window is a few instructions wide and cannot be hit portably, so
-# what runs here is the common trigger path: SIGKILL during writes.
+# A process crashing while recovering a stale lock must leave it recoverable:
+# shm_recover_stale_lock takes it as our own pid, since a bare WRITER_BIT reads
+# as always alive to shm_pid_alive and would hang forever. The true window is a
+# few instructions wide, so this runs the common trigger path: SIGKILL during
+# writes.
 
 use File::Temp qw(tmpnam);
 my $path = tmpnam() . ".$$";

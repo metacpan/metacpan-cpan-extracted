@@ -208,6 +208,11 @@ subtest '--create-default-config writes the defaults and exits' => sub {
 		);
 	}, qr/Option create-default-config requires an argument/, 'a path is mandatory';
 
+	my $unsetPath = "$dir/unset-default.yaml";
+	isa_ok dies { parseWith(['--create-default-config', $unsetPath], options => { %options, target => { type => 'dir', default => undef } }, config => { format => 'yaml' }) },
+		['Getopt::Pad::ExitRequest'], 'the file is written';
+	is YAML::XS::LoadFile($unsetPath), { Options => { 'log-level' => 'info' } }, 'an undefined default is left out';
+
 	my $spec = Getopt::Pad::Spec->new(raw => { options => {%options}, config => { format => 'yaml' } });
 	my $rendered = $spec->helperFor($spec->root, programName => 'demo', width => 160, color => 0)->renderHelp;
 	like $rendered,
@@ -228,6 +233,26 @@ subtest 'json format and format errors' => sub {
 	my $parseError = dies { parseWith([], options => {%options}, config => { format => 'json', paths => [$brokenJson] }) };
 	like $parseError, qr/config file '.*broken\.json':/, 'parse failure names the file';
 	unlike $parseError, qr/ at \S+ line \d+/, 'the parser\'s Perl source location is stripped';
+
+	my $booleans = writeFile("$dir/booleans.json", '{"Options": {"owner": true, "tag": [false, "x"]}}');
+	my $plain = parseWith([], options => {%options}, config => { format => 'json', paths => [$booleans] });
+	is $plain->owner, 1, 'a boolean for a string option reads as 1';
+	ok !ref $plain->owner, 'as a plain scalar, not an object';
+	is $plain->tag, [0, 'x'], 'booleans inside lists become plain values too';
+	is parseWith([], options => { flag => {} }, config => { format => 'json', paths => [writeFile("$dir/flag.json", '{"Options": {"flag": true}}')] })->flag, 1, 'flags still take booleans';
+
+	my $bigJson = writeFile("$dir/big.json", '{"Options": {"id": 123456789012345678901234567890, "ratio": 0.1}}');
+	my $big     = parseWith([], options => { id => { type => 'int', bigint => 1 }, ratio => { type => 'float' } }, config => { format => 'json', paths => [$bigJson] });
+	is $big->id->bstr, '123456789012345678901234567890', 'a large JSON integer reaches a bigint option exactly';
+	is $big->ratio, 0.1, 'other JSON numbers read as before';
+	like dies { parseWith([], options => { id => { type => 'int' }, ratio => { type => 'float' } }, config => { format => 'json', paths => [$bigJson] }) },
+		qr/config value for 'id': '123456789012345678901234567890' is too large for an integer/, 'without bigint it is too large, not a rounded float';
+
+	foreach my $empty (['empty.json', 'json', ''], ['blank.json', 'json', " \n"], ['empty.yaml', 'yaml', ''], ['comments.yaml', 'yaml', "# nothing set yet\n"]) {
+		my ($name, $format, $content) = $empty->@*;
+		my $path = writeFile("$dir/$name", $content);
+		is parseWith([], options => {%options}, config => { format => $format, paths => [$path] })->logLevel, 'info', sprintf('%s sets nothing', $name);
+	}
 
 	like dies { Getopt::Pad::Spec->new(raw => { options => {}, config => { format => 'toml' } }) },
 		qr/unknown config format 'toml' \(known: json, yaml, yml\)/, 'unknown format is a spec error';
@@ -384,6 +409,9 @@ subtest 'command sections are validated whether their command runs or not' => su
 		my $file = writeFile("$dir/broken-command.yaml", $content);
 		like dies { parseCommands(['document', 'create', 'T'], $file) }, $expected, $case;
 	}
+
+	my $broken = writeFile("$dir/broken-command.yaml", "commands:\n  image:\n    Size:\n      height: 5\n");
+	is dies { parseCommands(['document', 'create', 'T'], $broken) }->level->path, 'document create', 'reported with the help of the command that runs';
 };
 
 subtest 'only the selected levels check and prepare their config values' => sub {

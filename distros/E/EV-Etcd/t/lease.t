@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -29,7 +30,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 20;
+plan tests => 23;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -53,7 +54,7 @@ my $t1 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
 SKIP: {
-    skip "no lease id", 16 unless $lease_id;
+    skip "no lease id", 19 unless $lease_id;
 
     $client->lease_time_to_live($lease_id, sub {
         my ($resp, $err) = @_;
@@ -87,6 +88,29 @@ SKIP: {
     });
     my $t4 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
     EV::run;
+
+    my $bare_lease;
+    $client->lease_grant(60, sub {
+        my ($resp, $err) = @_;
+        ok(!$err, 'bare lease_grant succeeded');
+        $bare_lease = $resp->{id} if !$err;
+        EV::break;
+    });
+    my $t4b = EV::timer(5, 0, sub { fail('timeout'); EV::break });
+    EV::run;
+
+    SKIP: {
+        skip 'no bare lease id', 2 unless $bare_lease;
+        $client->lease_time_to_live($bare_lease, { keys => 1 }, sub {
+            my ($resp, $err) = @_;
+            ok(!$err, 'ttl on keyless lease succeeded');
+            ok(exists $resp->{keys} && ref($resp->{keys}) eq 'ARRAY' && !@{$resp->{keys}},
+                'keys present but empty on keyless lease');
+            EV::break;
+        });
+        my $t4c = EV::timer(5, 0, sub { fail('timeout'); EV::break });
+        EV::run;
+    }
 
     $client->lease_leases(sub {
         my ($resp, $err) = @_;

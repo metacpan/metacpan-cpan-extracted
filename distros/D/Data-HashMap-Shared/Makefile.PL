@@ -24,16 +24,11 @@ eval {
 };
 warn "XS::Parse::Keyword::Builder not found; build will likely fail\n" if $@;
 
-# Compilers older than GCC 5 default to gnu89, where the C99 declarations in
-# the templates are errors.  Only add -std when the default rejects them, so a
-# toolchain that already accepts them keeps whatever perl was built with.
+# GCC < 5 defaults to gnu89: add -std only when the default rejects what the
+# templates need.  The probe holds those exact constructs, since before GCC 5
+# the static assert fails under gnu11 too.
 my $ccflags = $Config{ccflags};
 {
-    # The probe mirrors what the templates actually need: a C99 declaration in
-    # a for-init, and the static assert exactly as SHM_STATIC_ASSERT writes it.
-    # Before GCC 5 __atomic_always_lock_free is not a constant expression, so
-    # -std=gnu11 turns one failure into another there; probing the real
-    # constructs picks gnu99 on those compilers and gnu11 on newer ones.
     my $probe = "shm_std_probe_$$";
     open my $fh, '>', "$probe.c" or last;
     print $fh <<'PROBE';
@@ -96,18 +91,16 @@ WriteMakefile(
     AUTHOR            => 'vividsnow',
     LICENSE           => 'perl_5',
     MIN_PERL_VERSION  => '5.022',
-    # pthread_once is not in libc before glibc 2.34; the empty fallback keeps
-    # working where it is (and where libpthread does not exist separately).
-    LIBS              => ['-lpthread', ''],
+    # glibc < 2.34 has pthread_once only in libpthread; '' covers the rest.
+    LIBS             => ['-lpthread', ''],
     CCFLAGS           => $ccflags,
     DEFINE            => $define,
     INC               => '-I. ' . join(' ', @xpk_flags),
     XS                => { 'Shared.xs' => 'Shared.c' },
     OBJECT            => 'Shared$(OBJ_EXT)',
     TYPEMAPS         => ['typemap'],
-    # Track the INCLUDE:d xs/*.xs and the #included C templates, or `make`
-    # silently reuses a stale Shared.c after editing one.
-    depend            => {
+    # Or make reuses a stale build after an INCLUDE:d or #included file changes.
+    depend           => {
         'Shared.c'         => join(' ', sort glob 'xs/*.xs'),
         'Shared$(OBJ_EXT)' => join(' ', 'xxhash.h', sort glob 'shm_*.h'),
     },

@@ -5,15 +5,11 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SS;
 
-# Compaction clears the class free lists before it moves anything, so every gap
-# it then declines to close has to be handed back.  A block is only slid when
-# its destination lies wholly below its source; where a small hole sits under a
-# larger live block that never holds, and if those gaps are not relisted the
-# arena silently loses space it could already allocate -- capacity that a map
-# without compaction at all would still have.
-#
-# The layout below makes every block stuck: 128-class holes under 512-class
-# blocks.
+# Compaction clears the class free lists before moving anything, so every gap it
+# declines to close must be handed back, or the arena silently loses space it
+# could already allocate.  A block slides only when its destination lies wholly
+# below its source; build() makes every block stuck with 128-class holes under
+# 512-class blocks.
 
 my $dir = tempdir(CLEANUP => 1);
 
@@ -36,8 +32,8 @@ sub build {                      # fill alternating, then free every small one
     cmp_ok $freed, '>', 50, 'the fixture frees a useful number of small blocks';
     my $used = $m->arena_used;
 
-    # Whatever compaction the refused stores in build() armed has already run by
-    # the first insert here, so this measures the state it left behind.
+    # the compaction armed by build()'s refused stores has already run by the
+    # first insert here
     my ($ok, $fail) = (0, 0);
     for my $n (1 .. $freed) { $m->put("p$n", 'a' x 100) ? $ok++ : $fail++ }
     is $fail, 0, 'every freed block is still allocatable after compaction'
@@ -51,10 +47,8 @@ sub build {                      # fill alternating, then free every small one
 {
     my ($m, $freed, $bigs) = build("$dir/explicit.shm");
     my $gained = $m->compact;
-    # Against arena_used this could not fail: the return is before-minus-bump,
-    # and the bump never goes below the reserved first offset.  The claim is
-    # that a layout where nothing can slide gathers almost none of its free
-    # space, so compare it to that free space.
+    # compared to the free space, not arena_used: the return is
+    # before-minus-bump and could not fail against that
     cmp_ok $gained, '<', $freed * 128 / 4,
         'an explicit compact on a stuck layout reclaims almost none of the free space';
     my ($ok, $fail) = (0, 0);
@@ -64,16 +58,11 @@ sub build {                      # fill alternating, then free every small one
     is_deeply \@bad, [], '  ... with the stuck blocks unharmed';
 }
 
-# The gap must come back as the blocks that were freed there, not re-cut into
-# the largest class that fits.  Nothing here splits a block, so handing a run of
-# small holes back as one big block destroys the capacity instead of preserving
-# it.  The case above cannot catch that: its holes are isolated, one small block
-# between two large ones, so there is no run to merge.  This one frees a
-# contiguous run under a block that cannot slide.
-# Sixteen 16-byte blocks under a 512-byte anchor: the gap is 256 bytes, smaller
-# than the block above it, so the anchor cannot slide and the run has to be
-# relisted -- and a relist that merges hands back one 256-byte block, which no
-# 16-byte request can use because nothing splits.
+# The gap must come back as the blocks freed there, not re-cut into the largest
+# class that fits: nothing splits, so merging a run of small holes destroys
+# capacity.  The case above has only isolated holes; here sixteen 16-byte blocks
+# sit under a 512-byte anchor that cannot slide (256-byte gap), and a merging
+# relist would hand back one 256-byte block no 16-byte request can use.
 {
     my $m = Data::HashMap::Shared::SS->new("$dir/run.shm", 8192, 0, 0, 0, 65536);
     my $tiny   = 'a' x 10;                      # 16 class
@@ -102,8 +91,8 @@ sub build {                      # fill alternating, then free every small one
     is $m->get("A0"), $anchor, '  ... and a block that could not slide is unharmed';
 }
 
-# A layout that can slide must still actually reclaim, or the relist would have
-# been achieved by simply never compacting.
+# a layout that can slide must still reclaim, or the relist is trivially
+# satisfied by never compacting
 {
     my $m = Data::HashMap::Shared::SS->new("$dir/slide.shm", 4096, 0, 0, 0, 65536);
     my $i = 0;
@@ -116,12 +105,9 @@ sub build {                      # fill alternating, then free every small one
     cmp_ok $m->arena_used, '<', $before, '  ... visibly';
 }
 
-# Repeated cycles must not bleed capacity.  A block that slides out of a gap
-# vacates its source, and that source was live when the free lists were
-# snapshotted, so nothing in the snapshot can give it back.  Left unhandled it
-# accumulates: measured 22% of the entries gone after a dozen cycles, with the
-# stranded total climbing every round.  Both cases above are blind to it,
-# because in each of them nothing slides.
+# Repeated cycles must not bleed capacity: a block that slides out of a gap
+# vacates a source that was live when the free lists were snapshotted, so
+# nothing in the snapshot gives it back. The cases above never slide anything.
 {
     my $m = Data::HashMap::Shared::SS->new("$dir/cycles.shm", 8192, 0, 0, 0, 65536);
     my $tiny   = 'a' x 10;                      # 16 class
@@ -134,8 +120,8 @@ sub build {                      # fill alternating, then free every small one
     my $start = scalar keys %live;
     cmp_ok $start, '>', 1500, 'the cycle fixture fills the arena under stuck anchors';
 
-    # Free a small scattered subset each round, so the tinies that slide do so
-    # into the holes and vacate sources inside a gap under an anchor.
+    # a small scattered subset each round, so tinies slide into holes and vacate
+    # sources inside a gap
     srand 7;
     for my $cycle (1 .. 12) {
         my @k = sort keys %live;

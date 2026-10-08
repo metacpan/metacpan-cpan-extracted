@@ -4,7 +4,7 @@ use Moo;
 
 ## no critic (Modules::RequireExplicitInclusion, Subroutines::ProhibitCallsToUnexportedSubs, TestingAndDebugging::ProhibitNoStrict)
 
-our $VERSION = '0.000066';
+our $VERSION = '0.000067';
 
 use App::perlimports::Sandbox ();
 use Class::Inspector          ();
@@ -462,6 +462,11 @@ sub _build_is_moose_class {
 
 sub _build_uses_moose {
     my $self = shift;
+
+    # Make sure the module itself has been loaded before looking for a
+    # metaclass. _implicit is cached and tolerates load failures.
+    $self->_implicit;
+
     if ( $self->_maybe_require_module('Moose::Util') ) {
         return Moose::Util::find_meta( $self->_module_name ) ? 1 : 0;
     }
@@ -537,7 +542,7 @@ App::perlimports::ExportInspector - Inspect code for exportable symbols
 
 =head1 VERSION
 
-version 0.000066
+version 0.000067
 
 =head1 SYNOPSIS
 

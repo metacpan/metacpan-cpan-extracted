@@ -6,19 +6,16 @@ use Errno ();
 use File::Temp qw(tempdir);
 use Data::HashMap::Shared::II;
 
-# A freeze whose flush fails part-way must still leave every shard sealed, so
-# each shard opens read-only and sync can finish the flush.  An LD_PRELOAD shim
-# fails the second msync.
+# A freeze whose flush fails part-way must still leave every shard sealed.  An
+# LD_PRELOAD shim fails the second msync.
 
 plan skip_all => 'Linux only' unless $^O eq 'linux';
 my $cc = $Config{cc} || 'cc';
 system("$cc --version >/dev/null 2>&1") == 0
     or plan skip_all => "no working C compiler ($cc)";
 
-# The failure is forced by launching a child with LD_PRELOAD set to the msync
-# shim, which would replace the ASan runtime the ASan job preloads through the
-# same variable; the two cannot compose. The freeze-flush behaviour is covered
-# in the plain and valgrind jobs.
+# The shim would replace the ASan runtime the ASan job preloads through the
+# same variable; the plain and valgrind jobs cover this.
 plan skip_all => 'incompatible with an ASan LD_PRELOAD'
     if ($ENV{LD_PRELOAD} // '') =~ /asan/i;
 

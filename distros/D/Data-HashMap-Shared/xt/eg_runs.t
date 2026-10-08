@@ -4,9 +4,6 @@ use Test::More;
 
 plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
 
-# Every eg/*.pl script should at least parse cleanly (`perl -c`); the fast,
-# self-contained ones (unique /tmp paths, no sleep) are also actually run and
-# checked for a clean exit -- catching runtime breakage that `perl -c` misses.
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 my $root = dirname(dirname(abs_path(__FILE__)));
@@ -20,7 +17,6 @@ for my $s (@scripts) {
     my $out = qx($^X -I$root/blib/lib -I$root/blib/arch -c $s 2>&1);
     my $rc = $?;
     if ($out =~ /Can't locate (\S+\.pm)/) {
-        # Missing optional dep (e.g. EV, AnyEvent, OpenGL) — skip, don't fail.
         SKIP: { skip "$rel: missing optional dep $1", 1 }
         next;
     }
@@ -28,8 +24,7 @@ for my $s (@scripts) {
         or diag "parse error:\n$out";
 }
 
-# Actually run every example that terminates quickly (heartbeat and ttl sleep);
-# each uses a $$-unique /tmp path or none, and must exit cleanly.
+# heartbeat and ttl sleep, so they are only parse-checked above.
 for my $name (qw(aggregator basic cursor feature_flags leaderboard lru_cache
                  memfd_handoff memoize multiprocess rate_limiter sharded_counter
                  work_queue)) {

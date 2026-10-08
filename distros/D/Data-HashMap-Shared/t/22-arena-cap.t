@@ -12,21 +12,19 @@ use Data::HashMap::Shared::II;
 sub tmp { File::Temp::tempnam(File::Spec->tmpdir, 'shm_arena') . '.shm' }
 
 # ctor: new($path, $max_entries, $max_size, $ttl, $lru_skip, $arena_cap)
-my $big = "x" x 50_000;   # 50 KB value — far larger than a small map's default arena
+my $big = "x" x 50_000;
 
-# ---- the motivating problem: default arena is sized from max_entries ----
 {
     my $p = tmp();
-    my $m = Data::HashMap::Shared::SS->new($p, 4);   # arena = max(4*128, 4096) = 4096
+    my $m = Data::HashMap::Shared::SS->new($p, 4);
     is($m->arena_cap, 4096, 'default arena_cap floors at 4096 for a tiny max_entries');
     ok(!$m->put("k", $big), 'default arena rejects a 50KB value (the motivating incident)');
     unlink $p;
 }
 
-# ---- explicit arena_cap decouples string storage from entry count ----
 {
     my $p = tmp();
-    my $m = Data::HashMap::Shared::SS->new($p, 4, 0, 0, 0, 1 << 20);  # 1 MB arena, 4-entry table
+    my $m = Data::HashMap::Shared::SS->new($p, 4, 0, 0, 0, 1 << 20);
     is($m->arena_cap, 1 << 20, 'explicit arena_cap is honored');
     ok($m->put("k",  $big), 'large value stored with an explicit arena');
     is(length($m->get("k")), 50_000, '  ...and reads back intact');
@@ -34,27 +32,24 @@ my $big = "x" x 50_000;   # 50 KB value — far larger than a small map's defaul
     unlink $p;
 }
 
-# ---- reopen ignores the arg; the stored arena_cap wins ----
 {
     my $p = tmp();
     { my $m = Data::HashMap::Shared::SS->new($p, 4, 0, 0, 0, 1 << 20); $m->put("k", $big); }
-    my $r = Data::HashMap::Shared::SS->new($p, 1);          # no arena_cap arg
+    my $r = Data::HashMap::Shared::SS->new($p, 1);
     is($r->arena_cap, 1 << 20, 'reopen keeps the stored arena_cap (ctor arg ignored)');
     is(length($r->get("k")), 50_000, 'large value survives reopen');
-    my $r2 = Data::HashMap::Shared::SS->new($p, 4, 0, 0, 0, 999);  # different arg, still ignored
+    my $r2 = Data::HashMap::Shared::SS->new($p, 4, 0, 0, 0, 999);
     is($r2->arena_cap, 1 << 20, 'reopen ignores a differing arena_cap arg too');
     unlink $p;
 }
 
-# ---- clamp: floor 4096 ----
 {
     my $p = tmp();
-    my $m = Data::HashMap::Shared::SS->new($p, 4, 0, 0, 0, 100);  # below the floor
+    my $m = Data::HashMap::Shared::SS->new($p, 4, 0, 0, 0, 100);
     is($m->arena_cap, 4096, 'arena_cap below the floor clamps up to 4096');
     unlink $p;
 }
 
-# ---- int-only variant: arena_cap arg is a harmless no-op (no arena) ----
 {
     my $p = tmp();
     my $m = Data::HashMap::Shared::II->new($p, 100, 0, 0, 0, 1 << 20);
@@ -64,7 +59,6 @@ my $big = "x" x 50_000;   # 50 KB value — far larger than a small map's defaul
     unlink $p;
 }
 
-# ---- string VALUE side (IS: int key, string value) honors arena_cap ----
 {
     my $p = tmp();
     my $m = Data::HashMap::Shared::IS->new($p, 4, 0, 0, 0, 1 << 20);
@@ -73,7 +67,6 @@ my $big = "x" x 50_000;   # 50 KB value — far larger than a small map's defaul
     unlink $p;
 }
 
-# ---- sharded: arena_cap is per-shard (aggregate = shards * cap) ----
 {
     my $prefix = tmp();
     my $shards = 4;
@@ -84,7 +77,6 @@ my $big = "x" x 50_000;   # 50 KB value — far larger than a small map's defaul
     unlink glob "$prefix*";
 }
 
-# ---- new_memfd honors arena_cap ----
 {
     my $m = Data::HashMap::Shared::SS->new_memfd("dhm_arena_test", 4, 0, 0, 0, 1 << 20);
     is($m->arena_cap, 1 << 20, 'new_memfd honors explicit arena_cap');
@@ -92,12 +84,10 @@ my $big = "x" x 50_000;   # 50 KB value — far larger than a small map's defaul
     is(length($m->get("k")), 50_000, '  ...value intact');
 }
 
-# ---- string-KEY variants (SI) keep keys in the arena, so arena_cap governs
-# large keys the same way it governs large values ----
 {
-    my $bigkey = "k" x 20_000;   # 20 KB key (well past the inline threshold -> arena)
+    my $bigkey = "k" x 20_000;
     my $p = tmp();
-    my $d = Data::HashMap::Shared::SI->new($p, 4);              # default arena 4096
+    my $d = Data::HashMap::Shared::SI->new($p, 4);
     ok(!$d->put($bigkey, 1), 'SI: default arena rejects a 20KB key');
     unlink $p;
 
@@ -108,12 +98,10 @@ my $big = "x" x 50_000;   # 50 KB value — far larger than a small map's defaul
     unlink $p2;
 }
 
-# ---- a too-small custom arena fails gracefully (put returns false, no crash),
-# leaving earlier entries intact ----
 {
     my $p = tmp();
-    my $m = Data::HashMap::Shared::SS->new($p, 1000, 0, 0, 0, 4096);  # roomy table, tiny 4KB arena
-    my $val = "v" x 1000;   # ~1KB each -> only a few fit in 4KB
+    my $m = Data::HashMap::Shared::SS->new($p, 1000, 0, 0, 0, 4096);
+    my $val = "v" x 1000;
     my $stored = 0;
     for my $i (1 .. 100) { $m->put("k$i", $val) ? $stored++ : last }
     cmp_ok($stored, '>', 0,   'arena-full: some values stored before exhaustion');
@@ -122,7 +110,6 @@ my $big = "x" x 50_000;   # 50 KB value — far larger than a small map's defaul
     unlink $p;
 }
 
-# ---- explicit arena_cap => 0 is identical to omitting it (default sizing) ----
 {
     my $p = tmp();
     my $m = Data::HashMap::Shared::SS->new($p, 4, 0, 0, 0, 0);

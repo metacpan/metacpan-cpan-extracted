@@ -92,6 +92,7 @@ subtest 'scripts' => sub {
 	my $bash = $completion->renderScript('bash');
 	like $bash, qr/^complete -F _tool_completion tool$/m, 'bash registers the function';
 	like $bash, qr/GETOPT_PAD_COMPLETE=bash GETOPT_PAD_COMPLETE_INDEX=/, 'bash calls back through the environment';
+	unlike $bash, qr/^\s*mapfile\b/m, 'no mapfile, which bash 3.2 lacks';
 
 	my $zsh = $completion->renderScript('zsh');
 	like $zsh, qr/^#compdef tool$/m, 'zsh compdef header';

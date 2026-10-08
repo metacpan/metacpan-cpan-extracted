@@ -22,8 +22,6 @@ my @variants = qw(I16 I32 II I16S I32S IS SI16 SI32 SI SS);
 my %map = map { $_ => "Data::HashMap::Shared::$_"->new(path($_), 100) } @variants;
 $map{$_}->put($_ =~ /^S/ ? 'k' : 1, $_ =~ /S$/ ? 'v' : 1) for @variants;
 
-# Every XSUB checks that its invocant is its own class.  Called with another
-# variant's object it must croak, not reinterpret that map's nodes.
 for my $callee (@variants) {
     my $k = $callee =~ /^S/ ? 'k' : 1;
     my $v = $callee =~ /S$/ ? 'v' : 1;
@@ -48,7 +46,6 @@ for my $callee (@variants) {
         "${callee}::Cursor::next on a $cur_owner cursor croaks";
 }
 
-# keyword form: same XSUB, same check
 {
     my $err = eval { shm_ss_put $map{II}, 'k', 'v'; 1 } ? '' : $@;
     like $err, qr/^Expected a Data::HashMap::Shared::SS object/, 'shm_ss_put on an II map croaks';
@@ -60,9 +57,8 @@ for my $v (@variants) {
     is $map{$v}->size, 1, "$v map still holds exactly its own entry";
 }
 
-# The other half of the guard: an invocant that is not an object at all.  A
-# class-method typo reaches the same macro, and without sv_isobject it
-# dereferences the class name as a handle.
+# a non-object invocant (a class-method typo) must not be dereferenced as a
+# handle
 for my $v (@variants) {
     my $class = "Data::HashMap::Shared::$v";
     my $err = eval { $class->size; 1 } ? '' : $@;
@@ -71,7 +67,6 @@ for my $v (@variants) {
     like $cerr, qr/^Expected a \Q$class\E::Cursor object/, "$v: a cursor class-method call croaks";
 }
 
-# A subclass passes the class check, which tests the exact class first.
 {
     package My::II; our @ISA = ('Data::HashMap::Shared::II');
     package My::II::Cursor; our @ISA = ('Data::HashMap::Shared::II::Cursor');

@@ -146,9 +146,8 @@ set_multi(SV* self_sv, ...)
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         if ((items - 1) % 2 != 0) croak("%s: set_multi requires an even number of arguments (key, value pairs)", shm_class);
         uint32_t count = 0;
-        /* Value first (copied if get-magical), key last: reading the key may run
-         * the value's FETCH.  A key's FETCH or overload that rewrites a plain
-         * value scalar can still dangle _vs. */
+        /* Value first (copied if get-magical): reading the key may run its FETCH.
+         * A key FETCH that rewrites a plain value scalar can still dangle _vs. */
         if (h->shard_handles) {
             for (int i = 1; i < items; i += 2) {
                 STRLEN _vl; const char *_vs = SvPV(ST(i+1), _vl);
@@ -163,12 +162,8 @@ set_multi(SV* self_sv, ...)
                 count += shm_ss_put(h, _ks, (uint32_t)_kl, _ku, _vs, (uint32_t)_vl, _vu);
             }
         } else {
-            /* Materialize every argument before the lock: SvPV runs a tied
-             * FETCH or overload, which must not run under the write lock, or a
-             * callback that re-enters this map self-deadlocks it.  Both key and
-             * value are copied if get-magical (each is held past later FETCHes
-             * here); a plain scalar is held by pointer, as the single-key path
-             * does. */
+            /* Materialize arguments before the lock: a re-entrant FETCH would
+             * self-deadlock.  Magical strings are copied, plain ones held by pointer. */
             int _n = (items - 1) / 2;
             const char **_ks, **_vs; STRLEN *_kl, *_vl; bool *_ku, *_vu;
             Newx(_ks, _n ? _n : 1, const char *); SAVEFREEPV(_ks);
@@ -261,10 +256,8 @@ get_multi(SV* self_sv, ...)
             uint8_t *states = h->states;
             char *arena = h->arena;
             uint64_t arena_cap = h->hdr->arena_cap;
-            /* Materialize the keys before the lock: SvPV runs a tied FETCH or
-             * overload, which must not run under the read lock, or a key that
-             * re-enters this map with a write self-deadlocks it.  A magical key
-             * is copied; a plain one is held by pointer. */
+            /* Materialize the keys before the read lock: a FETCH that writes this
+             * map would self-deadlock.  Magical keys are copied. */
             const char **keys; STRLEN *klens; bool *kutf8;
             Newx(keys,  nkeys, const char *); SAVEFREEPV(keys);
             Newx(klens, nkeys, STRLEN);       SAVEFREEPV(klens);
@@ -656,8 +649,7 @@ drain(SV* self_sv, SV* limit_sv)
         UV limit = shm_count_arg(aTHX_ limit_sv, "drain limit", "Data::HashMap::Shared::SS");
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
-        /* Only as many as the map can actually yield: drain(1e9) on a
-         * ten-entry map otherwise reserved a billion entries up front. */
+        /* Only as many as the map can yield: limit sizes the allocation. */
         {
             UV avail = (UV)shm_ss_size(h);
             if (limit > avail) limit = avail;

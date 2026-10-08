@@ -8,7 +8,7 @@ class Getopt::Pad::Config :strict(params) {
 	use Feature::Compat::Try;
 	use Getopt::Pad::Util qw(expandTilde);
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	field $format      :param;
 	field $formatName  :param;
@@ -148,9 +148,11 @@ class Getopt::Pad::Config :strict(params) {
 
 	# The defaults of $level and every Level below it, in the config file
 	# structure. Groups and command sections without defaults are left out.
+	# An undefined default means no default: written as null, the program
+	# would reject the file it wrote.
 	method defaultSection($level) {
 		my %section;
-		$section{$_->group}{$_->name} = $_->default foreach grep { $_->hasDefault } $level->declaredOptions;
+		$section{$_->group}{$_->name} = $_->presentedDefault foreach grep { $_->hasDefault && defined $_->presentedDefault } $level->declaredOptions;
 		foreach my $name ($level->commandNames) {
 			my $commandSection = $self->defaultSection($level->command($name));
 			$section{+COMMANDS_KEY}{$name} = $commandSection if %$commandSection;

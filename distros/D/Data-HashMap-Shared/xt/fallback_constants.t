@@ -4,12 +4,8 @@ use Test::More;
 use Config;
 use File::Temp qw(tempdir);
 
-# The templates declare the memfd, file-sealing and futex constants themselves,
-# because glibc before 2.27 and a container without kernel headers do not.  A
-# wrong value there is invisible on a machine whose headers supply the real one
-# and silently breaks sealing or parks a futex on the wrong operation where they
-# do not -- which is the population those fallbacks exist for.  Compare every
-# fallback against the system's own definition wherever there is one.
+# A wrong fallback constant is invisible wherever the system headers supply the
+# real one, so compare each against the system definition where there is one.
 
 plan skip_all => 'Linux only' unless $^O eq 'linux';
 plan skip_all => 'author tests' unless $ENV{AUTHOR_TESTING};

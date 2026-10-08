@@ -12,7 +12,6 @@ use Data::HashMap::Shared::SS;
 
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
 
-# update_ttl: int-value variant
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100, 0, 30);
@@ -22,13 +21,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     is($map->get(1), 200, 'II update_ttl: value changed');
     my $rem = shm_ii_ttl_remaining $map, 1;
     ok($rem > 30 && $rem <= 90, "II update_ttl: TTL applied (rem=$rem)");
-    # ttl=0 → permanent
     ok($map->update_ttl(1, 300, 0), 'II update_ttl: succeeds with ttl=0');
     is(scalar(shm_ii_ttl_remaining $map, 1), 0, 'II update_ttl: ttl=0 → permanent');
     unlink $path;
 }
 
-# update_ttl: string-value variant
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 100, 0, 30);
@@ -41,7 +38,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# update_ttl: croak on non-TTL map
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100);
@@ -50,7 +46,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# cas_take: int-value
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100);
@@ -63,7 +58,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# cas_take: string-value (byte-only compare; UTF-8 flag ignored on expected)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 100);
@@ -71,14 +65,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     is($map->cas_take("k", "wrong"), undef, 'SS cas_take: mismatch returns undef');
     is($map->cas_take("k", "v1"), "v1", 'SS cas_take: match returns value');
     ok(!$map->exists("k"), 'SS cas_take: key removed');
-    # UTF-8 toggle
     $map->put("u", "abc");
     my $up = "abc"; utf8::upgrade($up);
     is($map->cas_take("u", $up), "abc", 'SS cas_take: utf8-upgraded expected matches ASCII');
     unlink $path;
 }
 
-# cas_take: keyword form for int-value
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100);
@@ -89,7 +81,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# remove_multi
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100);
@@ -100,12 +91,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     ok(!$map->exists(1), 'II remove_multi: key 1 gone');
     ok($map->exists(2), 'II remove_multi: key 2 retained');
     ok(!$map->exists(3), 'II remove_multi: key 3 gone');
-    # Empty call
     is($map->remove_multi(), 0, 'II remove_multi: empty list returns 0');
     unlink $path;
 }
 
-# remove_multi: SS (string keys)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 100);
@@ -117,7 +106,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# get_with_ttl: TTL-less map
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100);
@@ -129,7 +117,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# get_with_ttl: TTL map, permanent + per-key TTL
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::IS->new($path, 100, 0, 30);
@@ -150,7 +137,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# get_with_ttl: expired entry returns empty list
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 100, 0, 30);
@@ -161,7 +147,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# get_with_ttl: SI string-key
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI->new($path, 100, 0, 60);
@@ -172,10 +157,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# get_with_ttl on a non-TTL map: value present, TTL undef
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 100);   # no TTL
+    my $map = Data::HashMap::Shared::II->new($path, 100);
     $map->put(5, 99);
     my ($v, $t) = $map->get_with_ttl(5);
     is($v, 99, 'get_with_ttl on non-TTL map: returns value');
@@ -183,34 +167,29 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# get_or_set returns undef for a new key when a non-LRU map is full
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 4);   # tiny, LRU off
+    my $map = Data::HashMap::Shared::II->new($path, 4);
     my $full = 0;
     for my $k (1 .. 1000) {
         defined($map->get_or_set($k, $k)) or do { $full = $k; last };
     }
     ok($full, "get_or_set returns undef for a new key on a full non-LRU map (failed at key $full, size @{[$map->size]})");
-    # an existing key still returns its stored value (not undef) when full
     is($map->get_or_set(1, -1), 1, 'get_or_set on existing key returns stored value even when full');
     unlink $path;
 }
 
-# new_sharded requires a real path_prefix (anonymous sharded maps unsupported)
 {
     my $ok = eval { Data::HashMap::Shared::II->new_sharded(undef, 2, 100); 1 };
     ok(!$ok, 'new_sharded(undef, ...) dies');
     like($@, qr/path_prefix/, '  ...with a path_prefix diagnostic');
 }
 
-# incr/incr_by croak when a NEW key cannot be inserted (map at capacity) -- the
-# one op class that dies rather than returning false. Existing keys still work.
 {
     my $path = tmpfile();
-    my $m = Data::HashMap::Shared::II->new($path, 2);   # tiny, no LRU
+    my $m = Data::HashMap::Shared::II->new($path, 2);
     my $n = 0;
-    $n++ while $n < 10_000 && $m->put($n, $n);          # fill to capacity
+    $n++ while $n < 10_000 && $m->put($n, $n);
     ok($n > 0 && $n < 10_000, "map filled to capacity at $n entries");
     is($m->incr(0), 1, 'incr on an existing key works at capacity (no insert needed)');
     ok(!eval { $m->incr(999_999); 1 }, 'incr on a new key croaks when the map is full');
@@ -220,25 +199,22 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
-# get_with_ttl on an EXPIRED key returns empty list (like a missing key) --
-# distinct from a never-existed key
 {
     my $path = tmpfile();
-    my $m = Data::HashMap::Shared::II->new($path, 100, 0, 1);   # ttl = 1s
+    my $m = Data::HashMap::Shared::II->new($path, 100, 0, 1);
     $m->put(1, 100);
     my @live = $m->get_with_ttl(1);
     is($live[0], 100, 'get_with_ttl: value present before expiry');
-    Time::HiRes::sleep(1.2);                                                    # key 1 expires
+    Time::HiRes::sleep(1.2);
     my @expired = $m->get_with_ttl(1);
     is_deeply(\@expired, [], 'get_with_ttl on an expired key returns empty list');
     unlink $path;
 }
 
-# set_multi on a non-LRU map that fills mid-batch returns the partial success count
 {
     my $path = tmpfile();
     my $m = Data::HashMap::Shared::II->new($path, 2);           # ~3 usable slots
-    my @pairs = map { ($_ => $_ * 10) } 1 .. 20;               # far over capacity
+    my @pairs = map { ($_ => $_ * 10) } 1 .. 20;
     my $count = $m->set_multi(@pairs);
     cmp_ok($count, '>', 0,  'set_multi: some pairs stored before the map fills');
     cmp_ok($count, '<', 20, 'set_multi: returns the partial count when the map fills mid-batch');

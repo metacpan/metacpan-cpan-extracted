@@ -7,7 +7,7 @@ use Exporter qw(import);
 use XSLoader;
 use Time::HiRes;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 XSLoader::load('Libssh::Session', $VERSION);
 
@@ -716,6 +716,155 @@ sub execute_simple {
     return pop(@{$self->{store_no_callback}});
 }
 
+#
+# Scenario methods
+#
+
+sub init_scenario {
+    my ($self, %options) = @_;
+
+    my $channel_id = $self->open_channel();
+    if ($channel_id !~ /^\d+\:\d+$/) {
+        $self->{scenario}->{exit} = SSH_ERROR;
+        $self->set_err(msg => 'cannot init channel');
+        return undef;
+    }
+
+    if (defined($options{interactive}) && $options{interactive} =~ /1/) {
+        $self->channel_request_pty(channel => ${$self->{channels}->{$channel_id}});
+        $self->channel_change_pty_size(channel => ${$self->{channels}->{$channel_id}}, cols => $options{cols}, rows => $options{rows});
+        $self->channel_request_shell(channel => ${$self->{channels}->{$channel_id}});
+    }
+
+    return $channel_id;
+}
+
+sub execute_scenario_read_channel {
+    my ($self, %options) = @_;
+    
+    my $channel = ${$self->{channels}->{ $options{channel_id} }};
+
+    # read stdout
+    my $stdout = '';
+    while (1) {
+        my $result = ssh_channel_read($channel, 4092, 0, 1);
+        if (defined($result->{message})) {
+            $stdout .= $result->{message};
+        }
+
+        last if ($result->{code} != 4092);
+    }
+
+    # read stderr
+    my $stderr = '';
+    while (1) {
+        my $result = ssh_channel_read($channel, 4092, 1, 1);
+        if (defined($result->{message})) {
+            $stderr .= $result->{message};
+        }
+        
+        last if ($result->{code} != 4092);
+    }
+    
+    if (ssh_channel_is_eof($channel) != 0) {
+        my $channel_exit_status = SSH_ERROR;
+        for (my $i = 0; $i < 20; $i++) {
+            $channel_exit_status = $self->channel_get_exit_status(channel => $channel);
+            last if $channel_exit_status != SSH_ERROR;
+            Time::HiRes::usleep(50000);
+        }
+        $self->{scenario}->{exit_code} = $channel_exit_status;
+        $self->close_channel(channel_id => $options{channel_id});
+    } else {
+        $self->{scenario}->{read} = 1;
+    }
+
+    return ($stdout, $stderr);
+}
+
+sub execute_scenario {
+    my ($self, %options) = @_;
+    my $cols = (defined($options{pty}->{cols}) && int($options{pty}->{cols}) > 0) ? 
+        $options{pty}->{cols} : 80;
+    my $rows = (defined($options{pty}->{rows}) && int($options{pty}->{rows}) > 0) ? 
+        $options{pty}->{rows} : 24;
+
+    $self->{scenario} = { exit => SSH_OK, msg_error => '', stdout => '', stderr => '', steps => [] };
+    my $channel_id = $self->init_scenario(interactive => $options{interactive}, cols => $cols, rows => $rows);
+    if (!defined($channel_id)) {
+        return $self->{scenario};
+    }
+
+    my $count_steps = scalar(@{$options{scenario}});
+    my $step = 0;
+    while ($step < $count_steps) {
+ 
+        if ($options{scenario}->[$step]->{cmd} eq 'waitfor') {
+            $self->{scenario}->{read} = 0;
+            my ($stdout, $stderr) = ('', '');
+            my $timeout = (defined($options{scenario}->[$step]->{options}->{Timeout}) && int($options{scenario}->[$step]->{options}->{Timeout}) > 0) ? 
+                $options{scenario}->[$step]->{options}->{Timeout} : 60;
+            my $timeout_nodata = (defined($options{scenario}->[$step]->{options}->{TimeoutNoData}) && int($options{scenario}->[$step]->{options}->{TimeoutNoData}) > 0) ? 
+                $options{scenario}->[$step]->{options}->{TimeoutNoData} : 60;
+
+            while (1) {
+                my $now = Time::HiRes::time();
+                my $ret = ssh_channel_select_read([${$self->{channels}->{$channel_id}}], 5);
+                if ($ret->{code} == SSH_OK) {
+                    my ($read_stdout, $read_stderr) = $self->execute_scenario_read_channel(channel_id => $channel_id);
+                    $self->{scenario}->{stdout} .= $read_stdout;
+                    $self->{scenario}->{stderr} .= $read_stderr;
+                    $stdout .= $read_stdout;
+                    $stderr .= $read_stderr;
+                }
+                my $now2 = Time::HiRes::time();
+
+                if ($stdout =~ /$options{scenario}->[$step]->{options}->{Match}/) {
+                    $step++;
+                    last;
+                }
+
+                # check timeout
+                my $seconds = ($now2 - $now);
+                
+                $timeout -= $seconds;
+                if ($self->{scenario}->{read} == 0) {
+                    $timeout_nodata -= $seconds;
+                }
+                
+                if ($timeout <= 0 || 
+                    $timeout_nodata <= 0) {
+                    $self->close_channel(channel_id => $channel_id);
+
+                    $self->{scenario}->{exit} = SSH_AGAIN;
+                    $self->{scenario}->{msg_error} = 'timeout raiched';
+                    $self->set_err(msg => 'timeout raiched');
+                    return $self->{scenario};
+                }
+            }
+            
+        } elsif ($options{scenario}->[$step]->{cmd} eq 'put') {
+            if ($self->channel_write(channel => ${$self->{channels}->{ $channel_id }}, data => $options{scenario}->[$step]->{options}->{String}) == SSH_ERROR) {
+                $self->{scenario}->{exit} = SSH_ERROR;
+                $self->set_err(msg => 'cannot write in channel');
+                $self->{scenario}->{msg_error} = 'cannot write in channel';
+                return $self->{scenario};
+            }
+            $step++;
+        } elsif ($options{scenario}->[$step]->{cmd} eq 'close') {
+            $self->close_channel(channel_id => $channel_id);
+            $step++;
+        } else {
+            $self->{scenario}->{exit} = SSH_ERROR;
+            $self->set_err(msg => 'unknown scenario command');
+            $self->{scenario}->{msg_error} = 'unknown scenario command';
+            return $self->{scenario};
+        }
+    }
+
+    return $self->{scenario};
+}
+
 sub open_channel {
     my ($self, %options) = @_;
     
@@ -794,6 +943,18 @@ sub channel_request_shell {
     my ($self, %options) = @_;
     
     return ssh_channel_request_shell($options{channel});
+}
+
+sub channel_request_pty {
+    my ($self, %options) = @_;
+    
+    return ssh_channel_request_pty($options{channel});
+}
+
+sub channel_change_pty_size {
+    my ($self, %options) = @_;
+    
+    return ssh_channel_change_pty_size($options{channel}, $options{cols}, $options{rows});
 }
 
 sub channel_close {

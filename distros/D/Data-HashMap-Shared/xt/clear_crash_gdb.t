@@ -6,11 +6,10 @@ use File::Copy qw(copy);
 use File::Path qw(make_path);
 use File::Basename qw(dirname);
 
-# clear() empties the table under a record in the header.  Kill the clearing
-# writer with gdb before the record, inside the pass that empties the states
-# and at each store after it -- and kill the process finishing it too -- then
-# check that the next process sees the map whole or empty, never in between,
-# and can use it.
+# clear() empties the table under a header record.  gdb kills the clearing
+# writer before the record, inside the states pass and at each store after it,
+# and its recoverer too; the next process must see the map whole or empty, never
+# in between, and be able to use it.
 
 plan skip_all => 'set CRASH_GDB=1 to run' unless $ENV{CRASH_GDB};
 my $gdb = `which gdb 2>/dev/null`; chomp $gdb;
@@ -46,7 +45,7 @@ my @lost = map { $_->[0] } grep { !defined $_->[1] } @anchors;
 ok !@lost, 'located every clear breakpoint: ' . join ', ', map { "$_->[0]=" . ($_->[1] // '?') } @anchors
     or BAIL_OUT("no line in shm_generic.h for: @lost");
 
-# A debug build in a scratch copy, so blib is left alone.
+# debug build in a scratch copy, so blib is left alone
 my $dir = tempdir(CLEANUP => 1);
 my $bld = "$dir/build";
 {
@@ -151,7 +150,6 @@ for my $a (@anchors) {
 }
 ok $reached{$_->[0]}, "$_->[0] is reached" for @anchors;
 
-# The process finishing a dead writer's clear dies inside it too.
 my ($pass) = grep { $_->[0] eq 'states pass' } @anchors;
 for my $cls (qw(II SS)) {
     my $tag = "cc$runs"; $runs++;

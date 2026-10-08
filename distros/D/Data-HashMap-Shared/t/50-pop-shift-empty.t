@@ -4,10 +4,9 @@ use Test::More;
 use File::Temp qw(tempdir);
 use Time::HiRes ();
 
-# pop/shift return an EMPTY LIST on an empty map, which is what makes
-# `while (my ($k, $v) = $map->shift)` terminate.  Every existing caller binds
-# the result with `my ($k) = ...`, which cannot tell () from (undef).  Check
-# the list shape directly, on every variant.
+# pop/shift return an empty list on an empty map, which ends `while (my ($k, $v)
+# = $map->shift)`; `my ($k) = ...` cannot tell () from (undef), so check the
+# list shape directly.
 
 my @variants = qw(II IS SI SS I16 I16S I32 I32S SI16 SI32);
 my $dir = tempdir(CLEANUP => 1);
@@ -35,8 +34,6 @@ for my $v (@variants) {
     is $drained, 3, "$v: while (my (\$k, \$v) = pop) drains 3 entries and stops";
 }
 
-# Finding only expired entries, pop, shift and drain sweep them away, and the
-# table shrinks as after any other removal.
 {
     require Data::HashMap::Shared::II;
     my %m;

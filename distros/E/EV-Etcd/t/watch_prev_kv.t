@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use Test::More;
 use lib 'blib/lib', 'blib/arch';
 
@@ -59,6 +60,8 @@ my $test_key = "$prefix/key";
     my $watch = $client->watch($test_key, { prev_kv => 1 }, sub {
         my ($resp, $err) = @_;
         return if $err;
+        # A change committed before the watch is registered is never delivered
+        $client->put($test_key, "updated-value", sub {}) if $resp->{created};
         if ($resp->{events} && @{$resp->{events}}) {
             push @events, @{$resp->{events}};
             EV::break if @events >= 1;
@@ -66,11 +69,6 @@ my $test_key = "$prefix/key";
     });
 
     ok($watch, 'watch created with prev_kv option');
-
-    # Give watch time to establish
-    my $settle = EV::timer(0.1, 0, sub {
-        $client->put($test_key, "updated-value", sub {});
-    });
 
     my $timeout = EV::timer(3, 0, sub { EV::break });
     EV::run;
@@ -107,6 +105,7 @@ my $test_key = "$prefix/key";
     my $watch = $client->watch($delete_key, { prev_kv => 1 }, sub {
         my ($resp, $err) = @_;
         return if $err;
+        $client->delete($delete_key, sub {}) if $resp->{created};
         if ($resp->{events} && @{$resp->{events}}) {
             push @events, @{$resp->{events}};
             EV::break if @events >= 1;
@@ -114,11 +113,6 @@ my $test_key = "$prefix/key";
     });
 
     ok($watch, 'delete watch created with prev_kv');
-
-    # Give watch time to establish
-    my $settle = EV::timer(0.1, 0, sub {
-        $client->delete($delete_key, sub {});
-    });
 
     my $timeout = EV::timer(3, 0, sub { EV::break });
     EV::run;

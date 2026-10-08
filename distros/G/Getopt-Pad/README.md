@@ -10,8 +10,8 @@ returns an object with one method per option and argument
 
 - **Typed values**: `flag`, `bool` (`--x` / `--no-x`), `counter` (`-vvv`),
   `string`, `int` and `float` (with `min` / `max`), `file` and `dir` (with
-  `mustExist` or `createPathIfMissing`) and `url`. Custom types can be
-  added.
+  `mustExist` or `createPathIfMissing`), `url`, and `date` and `duration`
+  in natural language (with `timezone`). Custom types can be added.
 - **Checks**: fixed lists of allowed values, lists computed at run time,
   and arbitrary checks, for command line, config file and default values
   alike.
@@ -100,13 +100,13 @@ Called with `--help`, this program prints:
    --[no-]compress             Compress the backup; --no-compress turns it
                                off
                                    Default = 1
-   --exclude <>                Pattern of files to skip; repeat for more
+   --exclude, -x <>            Pattern of files to skip; repeat for more
                                patterns
    --keep <>                   Number of backups to keep
                                    Default = 7
-   --target <>                 [REQ] Directory the backup is written to
+   --target, -t <>             [REQ] Directory the backup is written to
                                [Path]
-   --verbose                   Print more details; repeat for even more
+   --verbose, -v               Print more details; repeat for even more
                                (-vv)
 ```
 
@@ -131,13 +131,14 @@ values of its result object, so you can try different command lines; its
 header comment lists command lines to try:
 
 - [`01-basic.pl`](examples/01-basic.pl) - options, groups, defaults, a `valid` list and a required argument
-- [`02-types.pl`](examples/02-types.pl) - one option per built-in type
+- [`02-types.pl`](examples/02-types.pl) - one option per built-in type, except `date` and `duration`
 - [`03-commands.pl`](examples/03-commands.pl) - nested commands, an inherited option and a JSON config file with command sections
 - [`04-custom-type.pl`](examples/04-custom-type.pl) - a custom type that accepts only even numbers
 - [`05-custom-format.pl`](examples/05-custom-format.pl) - a custom TOML config format via TOML::Tiny
 - [`06-value-shapes.pl`](examples/06-value-shapes.pl) - `multiple`, `csv`, `hash` and `objectlist` options
 - [`07-config.pl`](examples/07-config.pl) - config files: the autoload chain, `defaultPath` and `--create-default-config`
 - [`08-checks.pl`](examples/08-checks.pl) - `valid` lists and coderefs, `lazyValid`, bounds, `mustExist`, `createPathIfMissing`, `typehint` and `hidden`
+- [`09-dates.pl`](examples/09-dates.pl) - `date` and `duration` options, a fixed `timezone`, and `processValue` turning a duration into seconds (needs DateTime::Format::Natural)
 
 ## Installation
 
@@ -159,10 +160,11 @@ make install
 Requires Perl 5.26 or later, Object::Pad 0.818 or later, Getopt::Long
 2.50 or later, Feature::Compat::Try and JSON::PP.
 
-Optional: YAML::XS for YAML config files, and Term::ReadKey for wrapping
-the help output to the width of the terminal. The help is wrapped to the
-width in `COLUMNS` if it is set, else to the terminal width (with
-Term::ReadKey), else to 100 columns.
+Optional: YAML::XS for YAML config files, Term::ReadKey for wrapping
+the help output to the width of the terminal, and
+DateTime::Format::Natural for the `date` and `duration` types. The help
+is wrapped to the width in `COLUMNS` if it is set, else to the terminal
+width (with Term::ReadKey), else to 100 columns.
 
 ## License
 

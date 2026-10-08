@@ -5,11 +5,11 @@ use Time::HiRes qw(time);
 use Data::HashMap::Shared::SI;
 
 # Never-repeating keys on a TTL map at its largest table, with the Cookbook's
-# partial flush after every batch: the flush leaves free slots in a window, so
-# the "no free slot" reclaim never fires, and expired entries used to stretch
-# every insert's probe across the table and every compaction's placement chains
-# into seconds under the write lock.  The table takes longer to fill than the
-# TTL, as a real flood does.  Priced by how many inserts fit in 30 s.
+# partial flush after every batch. The flush leaves free slots in a window, so
+# the "no free slot" reclaim never fires; expired entries must still not stretch
+# inserts and compactions into seconds under the write lock. The table takes
+# longer to fill than the TTL, as a real flood does. Priced by how many inserts
+# fit in 30 s.
 
 my $m = Data::HashMap::Shared::SI->new(undef, 1_000_000, 0, 2);
 my ($i, $worst, $t0) = (0, 0, time);
@@ -40,9 +40,8 @@ cmp_ok $worst, '<', 3, 'and no single insert stalls for seconds';
     cmp_ok $el, '<', 0.5, sprintf('20k inserts over the load with nothing expired take %.0f ms', $el * 1e3);
 }
 
-# A failed overwrite protects its expired value from reclamation. Repeating
-# that overwrite still needs only one scan per second: fixing the later insert
-# must not turn these failures into a whole-table scan on every call.
+# A failed overwrite protects its expired value from reclamation; repeating it
+# must still cost only one scan per second, not a whole-table scan per call.
 {
     require Data::HashMap::Shared::IS;
     my $m = Data::HashMap::Shared::IS->new(undef, 100_000, 0, 3600, 0, 4096);

@@ -3,25 +3,18 @@ use warnings;
 use Test::More;
 use POSIX ();
 
-# The batch methods (set_multi, remove_multi, get_multi) evaluate their key and
-# value arguments with SvIV/SvPV, which runs a tied scalar's FETCH or an
-# overloaded object's conversion.  Those must run before the map's lock is
-# taken: a FETCH that re-enters the same map with a write, while the batch holds
-# the write lock (set_multi/remove_multi) or the read lock (get_multi), would
-# self-deadlock the whole map -- our own live pid sits in the lock word, so
-# every other process on the map hangs too.  The fix materialises every argument
-# before the lock.
-#
-# The probe runs in a child under a no-handler alarm: a regression is a signal
-# death, not a hung suite, since a Perl alarm cannot interrupt an XSUB spinning
-# in C.
+# Batch methods must evaluate tied and overloaded arguments before taking the
+# map's lock: a FETCH re-entering the map with a write would self-deadlock it,
+# and every other process with it. Probes run in a child under a no-handler
+# alarm: a Perl alarm cannot interrupt an XSUB spinning in C, so a regression is
+# a signal death, not a hung suite.
 
 {
     package ReenterKey;
     sub TIESCALAR { my ($c, $m, $k2, $v, $k1) = @_;
                     bless { m => $m, k2 => $k2, v => $v, k1 => $k1, n => 0 }, $c }
     sub FETCH { my $s = shift;
-                $s->{m}->put($s->{k2}, $s->{v}) unless $s->{n}++;   # re-enter with a write
+                $s->{m}->put($s->{k2}, $s->{v}) unless $s->{n}++;
                 $s->{k1} }
 }
 
@@ -33,7 +26,7 @@ sub in_child {
     return ($? & 127) ? 'hung' : ($? >> 8) == 0 ? 'ok' : 'died';
 }
 
-# [ class, key1, key2, value ] -- valid literals for each key/value type.
+# [ class, key1, key2, value ]
 my @variants = (
     [ 'II',   1,   2,   9   ],
     [ 'IS',   1,   2,   'x' ],
@@ -63,9 +56,8 @@ for my $v (@variants) {
     }
 }
 
-# A batch write blocks signals only once it has the lock (t/86): one stuck
-# waiting for a lock that a live process holds must still die from one, a batch
-# long enough to block them included.
+# A batch blocks signals only once it holds the lock (t/86): a waiter must still
+# die from one.
 {
     require File::Temp;
     require Time::HiRes;

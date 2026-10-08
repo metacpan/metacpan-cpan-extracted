@@ -1,3 +1,9 @@
+4.00    2026-10-07
+
+- Use HTTP::Tiny instead of LWP;
+- Don't try to cope if SSL isn't available. A machine without working SSL is broken
+  and unsupported.
+
 3.14    2026-06-21
 
 - Try to create cachedir if it doesn't exist;

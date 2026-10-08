@@ -1,5 +1,14 @@
 Revision history for oEdtk
 
+2.1102      2026-10-06
+    - oEdtk::DBAdmin: new csv_import fast path for PostgreSQL using COPY ... FROM STDIN, the native equivalent of the MySQL LOAD DATA LOCAL INFILE path. It is selected automatically for the Pg driver when the import mode is not "merge"; rows are first cleaned through the same _get_col_meta / _make_clean_val pipeline into a temporary file, so truncation and '' => NULL conversion match the row-by-row path. New private helpers _load_csv_pg_copy, _pg_csv_field and _pg_encoding_name.
+    - oEdtk::DBAdmin: _load_csv_pg_copy reads records with Text::CSV getline (instead of parse) so that a quoted field may span several physical lines; COPY runs with FORMAT csv, the current separator/quote characters and NULL '' so an unquoted empty field is read back as NULL.
+    - oEdtk::DBAdmin: _load_csv_pg_copy re-encodes each row to the session client_encoding (from SHOW client_encoding, mapped to an Encode name) before pg_putcopydata, so multibyte values are stored correctly. New dependencies: File::Temp and Encode.
+    - oEdtk::DBAdmin: $VERSION 2.1071 → 2.1101 during the PostgreSQL COPY work.
+    - New test suite under t/ (Test::More): 00_load.t, 10_main_date.t, 11_main_num.t, 12_main_text.t, 20_fields.t, 21_dict_tags.t, 30_dbadmin_pure.t, 31_dbadmin_sqlite.t, 40_tracking_validate.t and 50_edms_pure.t, plus t/lib/TestOEdtk.pm (shared helpers), t/edtk.ini (test configuration) and t/test_csv_pg_copy.pl (PostgreSQL COPY import check).
+    - README.md: the former plain-text README was merged into README.md and the CONTENT OF THIS ARCHIVE section rewritten with the actual package tree; copyright year updated 2024 → 2026.
+    - oEdtk.pm: $VERSION 2.1071 → 2.1102.
+
 2.1071      2026-07-01
     - oEdtk::DBAdmin: _get_col_meta now distinguishes text types (varchar, character varying, char, bpchar, text) from numeric and date/time types. The truncation size is only used for text columns; numeric and date/time columns get a new blank_to_null flag. This fixes erroneous truncation of values on PostgreSQL (e.g. a date 2026-07-09 was being truncated to 2026 because column_info returns the internal storage size for non-text types).
     - oEdtk::DBAdmin: _make_clean_val — empty-string → undef conversion now applies to both numeric AND date/time columns (blank_to_null), fixing PostgreSQL "invalid input syntax for type date" errors.

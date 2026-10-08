@@ -86,8 +86,6 @@ print ", BerkeleyDB"      if $have_bdb;
 print ", Cache::FastMmap"  if $have_cfm;
 print "\n", "=" x 70, "\n";
 
-# Section 1: Integer key -> Integer value
-
 if (run_section(1)) {
 
 print "\n", "=" x 70, "\n";
@@ -211,8 +209,6 @@ print "-" x 70, "\n";
 
 } # end section 1
 
-# Section 2: Integer key -> String value
-
 if (run_section(2)) {
 
 print "\n", "=" x 70, "\n";
@@ -301,11 +297,8 @@ print "-" x 70, "\n";
 
 } # end section 2
 
-# Section 3: String key -> String value
-
 if (run_section(3)) {
 
-# Pre-generate short and long key/value arrays
 my (@sk, @sv, @lk, @lv);
 for my $i (1 .. $N) {
     push @sk, "k$i";                                # 2-6 bytes (inline)
@@ -604,8 +597,6 @@ print "-" x 70, "\n";
 
 } # end section 3
 
-# Section 4: String key -> Integer value  (atomic counters)
-
 if (run_section(4)) {
 
 print "\n", "=" x 70, "\n";
@@ -689,8 +680,6 @@ print "-" x 70, "\n";
 
 } # end section 4
 
-# Section 5: Cross-process read latency
-
 if (run_section(5)) {
 
 print "\n", "=" x 70, "\n";
@@ -766,8 +755,6 @@ print "=" x 70, "\n\n";
     undef $xp_hsm; rmtree $xp_hsm_dir if defined $xp_hsm_dir;
     if ($have_lmdb) { undef $xp_lmdb_env; rmtree $xp_lmdb_d; }
 }
-
-# ---- Cross-process writes ----
 
 print "\n", "=" x 70, "\n";
 print "CROSS-PROCESS: concurrent writes from 2 processes ($N SS entries)\n";
@@ -869,8 +856,6 @@ print "=" x 70, "\n\n";
     }
 }
 
-# ---- Cross-process mixed (50% reads, 50% writes) ----
-
 print "\n", "=" x 70, "\n";
 print "CROSS-PROCESS: mixed 50/50 read/write ($N SS entries)\n";
 print "=" x 70, "\n\n";
@@ -889,7 +874,6 @@ print "=" x 70, "\n\n";
             close $rd;
             my $c = Data::HashMap::Shared::SS->new($p, $N * 2);
             my $t0 = Time::HiRes::time();
-            # child: reads
             for my $i (1 .. $N) { my $v = shm_ss_get $c, "key$i"; }
             printf $wr "%.6f\n", Time::HiRes::time() - $t0;
             close $wr;
@@ -897,7 +881,6 @@ print "=" x 70, "\n\n";
         }
         close $wr;
         my $t0 = Time::HiRes::time();
-        # parent: writes (overwrite existing keys)
         for my $i (1 .. $N) { shm_ss_put $m, "key$i", "upd$i"; }
         my $parent_t = Time::HiRes::time() - $t0;
         my $child_t = <$rd>; close $rd; waitpid($pid, 0); chomp $child_t;
@@ -979,8 +962,6 @@ print "=" x 70, "\n\n";
 }
 
 } # end section 5
-
-# Section 6: LRU cache performance
 
 if (run_section(6)) {
 
@@ -1167,8 +1148,6 @@ print "-" x 70, "\n";
 
 } # end section 6
 
-# Section 7: TTL overhead and flush performance
-
 if (run_section(7)) {
 
 print "\n", "=" x 70, "\n";
@@ -1286,8 +1265,6 @@ print "-" x 70, "\n";
 }
 
 } # end section 7
-
-# Section 8: LRU + TTL combined
 
 if (run_section(8)) {
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -97,18 +98,17 @@ my $prefix = "/test-concurrent-$$-" . time();
             $watch_error = 1;
             return;
         }
+        # Puts committed before the watch is registered are never delivered
+        if ($resp->{created}) {
+            for my $i (1..$target_events) {
+                $client->put($watch_key, "event$i", sub {
+                    my ($resp, $err) = @_;
+                    $puts_completed++;
+                });
+            }
+        }
         if ($resp->{events} && @{$resp->{events}}) {
             $events_received += scalar(@{$resp->{events}});
-        }
-    });
-
-    # Wait for watch to establish
-    my $wait = EV::timer(0.1, 0, sub {
-        for my $i (1..$target_events) {
-            $client->put($watch_key, "event$i", sub {
-                my ($resp, $err) = @_;
-                $puts_completed++;
-            });
         }
     });
 

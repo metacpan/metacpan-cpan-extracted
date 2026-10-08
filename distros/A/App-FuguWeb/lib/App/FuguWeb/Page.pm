@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Page;
-our $VERSION = '0.7.0';
+our $VERSION = '0.8.0';
 
 use App::FuguWeb;
 use Fugu::File;
@@ -111,7 +111,7 @@ sub _head ( $self, $title )
 <link rel="stylesheet" href="$sheet">
 </head>
 <body>
-<header class="banner"><a href="$entry">$site</a></header>
+<header><a href="$entry">$site</a></header>
 HTML
 }
 

@@ -7,17 +7,12 @@ use POSIX ();
 
 use Data::HashMap::Shared::SS;
 
-# A lost writer lock is invisible unless two put()s run at the same instant.
-# Release N workers from a barrier onto disjoint key ranges, then check what an
-# unlocked insert path cannot hold: hdr->size is a plain non-atomic ++ and the
-# arena a plain bump pointer, so unlocked inserts lose counts, hand two writers
-# the same arena bytes and drop keys, each surfacing as an arithmetic mismatch
-# rather than a stall.  The table is pre-grown before the fork so no rehash
-# overlaps the race and every failure is attributable.
+# Release N workers from a barrier onto disjoint key ranges: unlocked inserts
+# (a plain ++ on hdr->size, a plain arena bump pointer) lose counts and hand
+# two writers the same bytes.  The table is pre-grown so no rehash overlaps the
+# race.
 
-# Real parallelism, not time-slicing, is what makes the unlocked window
-# observable: on one CPU an unlocked put passes this test, so say so rather
-# than report a false clean.
+# on one CPU an unlocked put passes, so skip rather than report a false clean
 sub ncpu {
     return $ENV{TEST_NCPU} if $ENV{TEST_NCPU};
     if (open my $fh, '<', '/proc/self/status') {   # usable CPUs, not present ones

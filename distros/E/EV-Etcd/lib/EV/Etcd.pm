@@ -3,8 +3,9 @@ use 5.010;
 use strict;
 use warnings;
 use Carp ();
+use Scalar::Util ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use EV ();
 require XSLoader;
@@ -17,31 +18,56 @@ sub CLONE_SKIP { 1 }
     *{"EV::Etcd::${_}::CLONE_SKIP"} = \&CLONE_SKIP for qw(Watch Keepalive Observe);
 }
 
+# Called from XS under G_EVAL: $EV::DIED, __WARN__ and stringification may all die
+sub _warn_callback_died {
+    my $err = $_[0];
+    my $died = eval { my $text = "$err"; 1 } ? $err : ref($err) . ' object';
+    return warn "EV::Etcd: callback died: $died" unless ref $EV::DIED;
+    # eval clears $@ on entry, so it is set inside
+    eval { $@ = $died; $EV::DIED->(); 1 }
+        or warn "EV::Etcd: \$EV::DIED died on '$died': $@";
+}
+
 my $_xs_txn = \&txn;
+
+# As the XS methods check them: blessed references pass
+my $reftype = sub { Scalar::Util::reftype($_[0]) // '' };
 
 no warnings 'redefine';
 *txn = sub {
     my $self = shift;
 
     if (@_ == 4
-        && ref($_[0]) eq 'ARRAY'
-        && ref($_[1]) eq 'ARRAY'
-        && ref($_[2]) eq 'ARRAY'
-        && ref($_[3]) eq 'CODE') {
+        && $reftype->($_[0]) eq 'ARRAY'
+        && $reftype->($_[1]) eq 'ARRAY'
+        && $reftype->($_[2]) eq 'ARRAY'
+        && $reftype->($_[3]) eq 'CODE') {
         return $_xs_txn->($self, @_);
+    }
+    if (@_ == 4
+        && $reftype->($_[0]) eq 'ARRAY'
+        && $reftype->($_[1]) eq 'ARRAY'
+        && $reftype->($_[2]) eq 'ARRAY') {
+        Carp::croak("txn: callback must be a code reference");
     }
 
     my $callback;
-    if (@_ % 2 == 1 && ref($_[-1]) eq 'CODE') {
+    if (@_ % 2 == 1) {
+        $reftype->($_[-1]) eq 'CODE'
+            or Carp::croak("txn: expected positional (compare, success, failure, callback) or name => value pairs");
         $callback = pop;
     }
 
     my %args = @_;
+    for my $k (keys %args) {
+        Carp::croak("Unknown option '$k' in \$client->txn")
+            unless $k eq 'compare' || $k eq 'success' || $k eq 'failure' || $k eq 'callback';
+    }
     $callback //= $args{callback};
 
     for my $k (qw(compare success failure)) {
         next unless defined $args{$k};
-        ref($args{$k}) eq 'ARRAY'
+        $reftype->($args{$k}) eq 'ARRAY'
             or Carp::croak("txn '$k' must be an array reference");
     }
 
@@ -71,21 +97,18 @@ EV::Etcd - Async etcd v3 client using native gRPC and EV/libev
         endpoints => ['127.0.0.1:2379'],
     );
 
-    # Async put
     $client->put('/my/key', 'value', sub {
         my ($resp, $err) = @_;
         die $err->{message} if $err;
         say "Put succeeded, revision: $resp->{header}{revision}";
     });
 
-    # Async get
     $client->get('/my/key', sub {
         my ($resp, $err) = @_;
         die $err->{message} if $err;
         say "Value: $resp->{kvs}[0]{value}";
     });
 
-    # Watch
     $client->watch('/my/key', sub {
         my ($resp, $err) = @_;
         return warn "Watch error: $err->{message}\n" if $err;
@@ -98,109 +121,134 @@ EV::Etcd - Async etcd v3 client using native gRPC and EV/libev
 
 =head1 DESCRIPTION
 
-EV::Etcd provides a high-performance async client for etcd v3 using native
-gRPC Core C API integrated with the EV event loop.
+An asynchronous etcd v3 client on the gRPC Core C API and the EV event
+loop: a gRPC thread waits for completions and wakes the loop, and callbacks
+run in the Perl thread. It needs etcd 3.4 or later (C<auth_status> needs
+3.5).
 
-=head1 METHODS
+Every method takes a callback last; methods with options take them as a
+hash reference just before it. Invalid arguments croak. The callback
+receives C<($response, $error)>: the response hash and C<undef>, or
+C<undef> and an error hash (see L</ERRORS>). Responses carry a C<header>
+with C<cluster_id>, C<member_id>, C<revision> and C<raft_term> unless noted
+otherwise. A kv hash has C<key>, C<value>, C<create_revision>,
+C<mod_revision>, C<version> and C<lease>.
+
+=head1 CONSTRUCTOR
 
 =head2 new
 
     my $client = EV::Etcd->new(%options);
 
-Options:
-
 =over 4
 
-=item endpoints
+=item endpoints => [ 'host:port', ... ]
 
-ArrayRef of etcd endpoints (host:port). Optional; defaults to
-C<['127.0.0.1:2379']>. An endpoint may carry an C<http://> or C<https://>
-scheme, as etcd prints its client URLs; C<https://> turns on C<tls>.
-When more than one is provided, the client starts on
-the first and moves to the next when its current endpoint cannot be
-reached: a unary call fails with UNAVAILABLE, or with DEADLINE_EXCEEDED
-before a connection was established, or a streaming call has to reconnect
-because its connection is down. An endpoint that stops answering on an open
-connection is found by the keepalive pings (see C<keepalive_time>). The call
-that hit the dead endpoint still reports its error; retrying it reaches the
-next endpoint. Several calls failing on the same endpoint move the client
-only once. etcd also answers UNAVAILABLE from a member that has lost its
-leader, which moves the client on as well.
+Default C<['127.0.0.1:2379']>; an empty list croaks. An endpoint may carry
+the C<http://> or C<https://> scheme etcd prints; C<https://> turns on
+C<tls>.
 
-An endpoint may also be a gRPC target listing several IP addresses, such as
-C<ipv4:10.0.0.1:2379,10.0.0.2:2379>; gRPC then fails over between them
-within one connection, so a refused address does not fail any call.
+The client uses one endpoint at a time and moves to the next when it cannot
+be reached: a unary call fails with UNAVAILABLE, or with DEADLINE_EXCEEDED
+before a connection was made, a stream has to reconnect because its
+connection is down, or a keepalive ping goes unanswered. The failing call
+still reports its error; retrying it reaches the next endpoint. Several
+failures on one endpoint move the client once.
 
-=item timeout
+A member that has lost its leader fails linearizable reads and writes
+after etcd's request timeout (7 seconds by default), and these failures
+move the client on too, though a shorter C<timeout> ends the call on the
+client first and does not. Errors a working member returns during an election, such as
+C<etcdserver: leader changed>, do not move it.
 
-RPC timeout in whole seconds. Default is 30 seconds. Minimum value is 1
-second.
+Streams need a leader as well: a member without one refuses new streams
+and, after a few election timeouts, ends running watches and keepalives
+with UNAVAILABLE C<etcdserver: no leader>. Streams retry such answers a
+second apart until a leader is back, on the next endpoint when there are
+several; each restarts the C<max_retries> count. Once a unary call, or a
+stream that was running, reports C<etcdserver: no leader>, pending C<lock>
+and C<election_campaign> calls sent over the same connection fail with
+UNAVAILABLE, as they do when a connection that never became ready is
+abandoned.
 
-=item max_retries
+An endpoint may also be a gRPC target listing several addresses, such as
+C<ipv4:10.0.0.1:2379,10.0.0.2:2379>. gRPC moves between them within one
+connection, so a refused address fails no call, but never away from a
+member that has lost its leader: list members as separate endpoints to
+leave one.
 
-Maximum number of reconnection attempts for streaming operations (watch,
-lease_keepalive, election_observe) after a connection failure. Default is 3.
-Set to 0 to disable automatic reconnection.
+gRPC connects through a proxy named in C<grpc_proxy>, C<https_proxy> or
+C<http_proxy>, even to a loopback address; list etcd's hosts in
+C<no_proxy> to connect directly.
 
-=item keepalive_time
+=item timeout => $seconds
 
-Seconds between keepalive pings while calls or streams are open; fractions
-are allowed. Default is 10; 0 disables the pings. An endpoint that leaves a
-ping unanswered for C<keepalive_timeout> has its connection closed, which
-fails the calls on it with UNAVAILABLE and moves a client with several
-endpoints to the next one. Without pings, an endpoint that stops answering
-on an open connection (a hung host, a silent partition) goes unnoticed until
-the operating system gives up on the connection. etcd answers pings more
-frequent than its C<--grpc-keepalive-min-time> (default 5 seconds) by
-closing the connection.
+RPC timeout in whole seconds, at least 1; default 30. C<lock> and
+C<election_campaign> wait without one, as a timeout could not tell whether
+they succeeded.
 
-=item keepalive_timeout
+=item max_retries => $count
 
-Seconds to wait for a keepalive ping reply. Default is 10.
+Reconnection attempts for a stream (C<watch>, C<lease_keepalive>,
+C<election_observe>) after a connection failure; default 30, 0 disables
+reconnecting. Attempts are 0.5 seconds further apart each time, up to 5
+seconds, so the default gives up about two minutes after the endpoints
+start refusing connections, plus gRPC's 20-second connect timeout for one
+that accepts them but stays silent. Lower it to learn sooner that the
+endpoints are gone.
 
-=item health_interval
+=item keepalive_time => $seconds
 
-Interval in seconds for health monitoring; fractions are allowed. Default is
-0 (disabled). When enabled, the client periodically checks the gRPC channel
-connectivity state, without sending a request, and calls the on_health_change
-callback when the connection state changes. Only a failed connection attempt
-counts as unhealthy; a connection that is idle or still being opened counts
-as healthy. With several endpoints, a change to unhealthy also moves the
-client to the next endpoint.
+=item keepalive_timeout => $seconds
 
-=item on_health_change
+Seconds between pings while calls or streams are open (default 10,
+fractions allowed, 0 disables them), and how long a ping may go unanswered
+(default 10). An unanswered ping closes the connection: its calls fail with
+UNAVAILABLE and the client moves to the next endpoint. Without pings, an
+endpoint that goes silent (a hung host, a partition) goes unnoticed until
+the operating system gives up on the connection. etcd closes connections
+that ping more often than its C<--grpc-keepalive-min-time> (5 seconds by
+default).
 
-Callback called when the connection health status changes. Receives two
-arguments: a boolean indicating health status (1=healthy, 0=unhealthy) and
-the endpoint that was checked. Switching endpoints after a failed call is
-not reported.
+=item health_interval => $seconds
 
-    my $client = EV::Etcd->new(
-        endpoints => ['127.0.0.1:2379'],
-        health_interval => 5,
-        on_health_change => sub {
-            my ($is_healthy, $endpoint) = @_;
-            warn $is_healthy ? "Connected to $endpoint" : "Disconnected from $endpoint";
-        },
-    );
+=item on_health_change => sub { my ($healthy, $endpoint) = @_; ... }
 
-=item auth_token
+Every C<health_interval> seconds (fractions allowed; default 0, off) the
+client checks its connection state without sending a request, and calls
+C<on_health_change> when health changes. Only a failed connection attempt
+counts as unhealthy; with several endpoints it also moves the client on.
+Switching endpoints after a failed call is not reported.
 
-Pre-set authentication token. Use this to create an authenticated client
-without calling authenticate() first. Useful when you already have a valid
-token from a previous session.
+=item auth_token => $token
 
-    my $client = EV::Etcd->new(
-        endpoints => ['127.0.0.1:2379'],
-        auth_token => $saved_token,
-    );
+A token from an earlier C<authenticate>, used without authenticating again.
 
-=item tls
+=item tls => $bool
 
-Connect with TLS. Default is off; any of the other C<tls_*> options and an
-C<https://> endpoint turn it on. Without C<tls_ca_file>, gRPC's default
-root certificates are used; the C<GRPC_DEFAULT_SSL_ROOTS_FILE_PATH>
-environment variable can point gRPC at a PEM bundle instead.
+Connect with TLS; any C<tls_*> option or an C<https://> endpoint turns it
+on too. Without C<tls_ca_file>, gRPC uses its default roots, or the PEM
+bundle named by C<GRPC_DEFAULT_SSL_ROOTS_FILE_PATH>.
+
+=item tls_ca_file => $path
+
+PEM CA certificates to verify the servers with (etcd's
+C<--trusted-ca-file>), in place of the default roots. Verification cannot
+be turned off; for a self-signed server, give its certificate here.
+
+=item tls_cert_file => $path
+
+=item tls_key_file => $path
+
+Client certificate and key, given together, for servers started with
+C<--client-cert-auth>.
+
+=item tls_server_name => $name
+
+Name to verify the server certificate against and send as SNI, in place of
+the endpoint's host.
+
+=back
 
     my $client = EV::Etcd->new(
         endpoints     => ['https://10.0.0.1:2379', 'https://10.0.0.2:2379'],
@@ -209,561 +257,273 @@ environment variable can point gRPC at a PEM bundle instead.
         tls_key_file  => '/etc/etcd/client.key',
     );
 
-=item tls_ca_file
+=head1 ERRORS
 
-PEM file with the CA certificates that signed the etcd server certificates
-(etcd's C<--trusted-ca-file>). Replaces the default roots. Verification
-cannot be switched off; for a self-signed server, give its certificate
-here.
+    {
+        code      => 14,                    # gRPC status code
+        status    => 'UNAVAILABLE',
+        message   => 'Connection refused',
+        source    => 'range',               # the call that failed
+        retryable => 1,
+    }
 
-=item tls_cert_file
+C<source> is the method name, except C<range> for C<get>, C<lease_ttl> for
+C<lease_time_to_live>, C<keepalive> for C<lease_keepalive>, C<campaign>,
+C<proclaim>, C<leader>, C<resign> and C<observe> for the C<election_*>
+calls, and C<internal> for a unary response the client could not read.
 
-=item tls_key_file
+C<retryable> is set for UNAVAILABLE, ABORTED, DEADLINE_EXCEEDED and
+RESOURCE_EXHAUSTED C<etcdserver: too many requests>, but never for a failed
+C<lock> or C<election_campaign>. Other RESOURCE_EXHAUSTED errors last until
+someone intervenes, such as C<etcdserver: mvcc: database space exceeded> (see
+C<alarm>). Retryable means transient, not without effect: a write can be
+applied after its deadline has passed, so retrying C<lease_grant>,
+C<lease_revoke> or C<delete> can apply it twice or report what the first
+attempt did.
 
-PEM client certificate and private key, for servers started with
-C<--client-cert-auth>. Both must be given together.
+Unary calls are not retried. Streams reconnect on their own (see
+C<max_retries>), to the next endpoint once the current one has failed, and
+the count restarts once a stream is working again. A stream reports an
+error when reconnecting is disabled or exhausted, at once for a status a
+new connection cannot fix (UNAUTHENTICATED, PERMISSION_DENIED,
+INVALID_ARGUMENT, NOT_FOUND, ALREADY_EXISTS, FAILED_PRECONDITION,
+OUT_OF_RANGE, UNIMPLEMENTED), and for an error the server sends on it, such
+as a cancelled or compacted watch or an expired lease, which ends it.
 
-=item tls_server_name
+The server can still clean up after a failed C<lock> or
+C<election_campaign> has reported, deleting the key it made on the lease.
+Retry with a fresh lease, and revoke the old one (which deletes all its
+keys) or let it expire, as a stale candidate on it can block the new
+attempt.
 
-Name to verify the server certificate against, and to send as SNI, in place
-of the endpoint's host: for connecting by an address the certificate does
-not list.
+=head1 CALLBACKS AND HANDLES
 
-=back
+A callback that dies stops neither the loop nor the client: the exception
+goes to C<$EV::DIED>, a warning by default.
+
+Callbacks live in C structures Perl cannot see, so a closure that captures
+its client or stream handle keeps it alive until the stream is cancelled
+or the client destroyed; capture a weakened copy instead. Dropping a handle
+does not cancel its stream. Destroying a client cancels its calls and
+streams without calling their callbacks. A client keeps C<EV::run> running
+while it exists: destroy it or call C<EV::break> to leave the loop. Only
+EV's default loop runs the callbacks, never a loop from
+C<< EV::Loop->new >>.
+
+    use Scalar::Util 'weaken';
+    weaken(my $weak = $client);
+    my $watch = $client->watch('/jobs', sub {
+        my ($resp, $err) = @_;
+        $weak->put('/seen', 1, sub {}) if $weak && !$err;
+    });
+
+=head2 cancel
+
+    $handle->cancel($callback);
+
+C<watch>, C<lease_keepalive> and C<election_observe> return a handle
+(C<EV::Etcd::Watch>, C<EV::Etcd::Keepalive>, C<EV::Etcd::Observe>) whose
+C<cancel> ends the stream. The callback runs before C<cancel> returns, with
+an empty hash as the response, and the stream delivers nothing after it.
+Cancelling again is safe and does the same.
 
 =head1 ENCODING
 
-Keys and values are stored by etcd as raw bytes; this module does not perform
-any character encoding. If you pass a Perl string with the UTF-8 flag set
-(e.g. a literal containing non-ASCII characters under C<use utf8>), the UTF-8
-byte representation is what gets stored. Values returned by C<get> are byte
-strings without the UTF-8 flag, so string-equality with the original literal
-fails unless you decode explicitly.
+etcd stores keys and values as bytes and the client does no encoding: a
+string with the UTF-8 flag is stored as its UTF-8 bytes, and responses hold
+byte strings. Use C<encode_utf8> and C<decode_utf8> from L<Encode> at the
+boundary for character data.
 
-For character data, encode/decode at the boundary using L<Encode>:
+A key or value over 1 MiB croaks before anything is sent. etcd refuses a
+request over its C<--max-request-bytes> (1.5 MiB by default) with
+INVALID_ARGUMENT C<etcdserver: request is too large>, and gRPC one 512 KiB
+larger still with RESOURCE_EXHAUSTED.
 
-    use Encode qw(encode_utf8 decode_utf8);
-
-    $client->put($key, encode_utf8($value), sub { ... });
-    $client->get($key, sub {
-        my ($resp) = @_;
-        my $value = decode_utf8($resp->{kvs}[0]{value});
-    });
-
-=head1 ERROR HANDLING
-
-Errors are returned as hash references with the following structure:
-
-    {
-        code      => 14,              # gRPC status code (integer)
-        status    => "UNAVAILABLE",   # gRPC status name (string)
-        message   => "Connection refused",  # Error message
-        source    => "get",           # Which operation failed
-        retryable => 1,               # Whether the error is retryable
-    }
-
-The C<retryable> field indicates whether the error is transient (status codes:
-UNAVAILABLE, RESOURCE_EXHAUSTED, ABORTED, DEADLINE_EXCEEDED).
-Streaming operations (watch, keepalive, observe) automatically reconnect
-with linear backoff whenever the stream ends (connection loss, server
-restart, graceful close) for any reason other than an explicit cancel, up to
-C<max_retries> attempts (the attempt counter resets as the stream makes
-progress). The error callback fires once reconnection is disabled or
-exhausted. Errors the server sends I<on> the stream (a watch cancelled or
-compacted away, an expired lease) are reported immediately and do not
-reconnect. A fully silent network partition (no FIN/RST reaching the
-client) is found by the keepalive pings within C<keepalive_time> plus
-C<keepalive_timeout> while calls or streams are open; with the pings
-disabled it surfaces only once connectivity returns or the OS abandons the
-connection. Unary RPCs (get, put, delete, etc.) do
-not retry automatically; use the C<retryable> field to implement
-application-level retry logic. With several endpoints, both reconnects and
-retries go to the next endpoint once the current one has failed (see
-C<endpoints> under L</new>).
-
-=head1 CALLBACK LIFETIMES
-
-Callbacks are stored in C structures that are invisible to Perl's garbage
-collector. A callback closure that captures the client (or its own stream
-handle) forms a reference cycle that Perl cannot reclaim: the objects stay
-alive until the stream is cancelled or the client is destroyed, even if all
-Perl-side references are dropped.
-
-For long-lived streams, capture a weakened client reference and call
-C<cancel()> when the stream is no longer needed:
-
-    use Scalar::Util 'weaken';
-
-    my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
-    weaken(my $weak = $client);
-    my $watch = $client->watch('/my/key', sub {
-        my ($resp, $err) = @_;
-        return if $err;
-        $weak->put('/my/seen', 1, sub {}) if $weak;
-    });
-    # ... later:
-    $watch->cancel(sub { });
-
-=head1 KEY-VALUE OPERATIONS
+=head1 KEY-VALUE
 
 =head2 put
 
-    $client->put($key, $value, $callback);
-    $client->put($key, $value, \%opts, $callback);
-
-Put a key-value pair into etcd.
-
-Options:
+    $client->put($key, $value, [\%opts,] $callback);
 
 =over 4
 
-=item lease
+=item lease => $lease_id
 
-Lease ID to associate with the key.
+Attach the key to a lease.
 
-=item prev_kv
+=item prev_kv => $bool
 
-If true, returns the previous key-value pair in the response.
+Return the previous kv as C<prev_kv>.
 
-=item ignore_value
+=item ignore_value => $bool
 
-If true, updates the lease without changing the value.
+=item ignore_lease => $bool
 
-=item ignore_lease
-
-If true, updates the value without changing the lease.
+Keep the current value, or lease, and update only the other.
 
 =back
-
-The callback receives C<($response, $error)>. Response keys: C<header>, plus
-C<prev_kv> (a kv hashref) when the C<prev_kv> option is set.
 
 =head2 get
 
-    $client->get($key, $callback);
-    $client->get($key, \%opts, $callback);
+    $client->get($key, [\%opts,] $callback);
 
-Get key(s) from etcd.
-
-Options:
+Response keys: C<kvs> (array of kv hashes), C<count> (all keys matched,
+even beyond C<limit>) and C<more> (true when C<limit> cut the result).
 
 =over 4
 
-=item prefix
+=item prefix => $bool
 
-If true, returns all keys with the given prefix.
+Every key with C<$key> as prefix; every key at all for an empty one.
 
-=item range_end
+=item range_end => $end
 
-End of the key range to query.
+Keys from C<$key> up to C<$end>, exclusive.
 
-=item limit
+=item limit => $n
 
-Maximum number of keys to return.
+At most C<$n> keys.
 
-=item revision
+=item revision => $rev
 
-Get keys at a specific revision.
+Read at an older revision.
 
-=item keys_only
+=item keys_only => $bool
 
-If true, returns only keys without values.
+=item count_only => $bool
 
-=item count_only
+Return keys without values, or only C<count>.
 
-If true, returns only the count of keys.
+=item sort_order => 'ascend' | 'descend'
 
-=item sort_order
+=item sort_target => 'key' | 'version' | 'create' | 'mod' | 'value'
 
-Sort order: "ascend" or "descend".
+Sort the result by C<sort_target>, in C<sort_order>.
 
-=item sort_target
+=item serializable => $bool
 
-What to sort by: "key", "version", "create", "mod", or "value".
+Read from the member's local data: faster, possibly stale.
 
-=item serializable
+=item min_mod_revision, max_mod_revision, min_create_revision, max_create_revision => $rev
 
-If true, use serializable (faster but possibly stale) reads.
-
-=item min_mod_revision, max_mod_revision
-
-Filter keys by modification revision.
-
-=item min_create_revision, max_create_revision
-
-Filter keys by creation revision.
-
-=back
-
-The callback receives C<($response, $error)>. Response keys:
-
-=over 4
-
-=item kvs
-
-Array reference of key-value hashrefs (C<key>, C<value>, C<create_revision>,
-C<mod_revision>, C<version>, C<lease>).
-
-=item count
-
-Total number of keys matched (may exceed C<< scalar @{$resp->{kvs}} >> when
-C<limit> is in effect).
-
-=item more
-
-True if more keys exist beyond the returned C<kvs> (C<limit> truncated the
-result).
-
-=item header
-
-Cluster response header (see L</ERROR HANDLING>).
+Filter by modification or creation revision.
 
 =back
 
 =head2 delete
 
-    $client->delete($key, $callback);
-    $client->delete($key, \%opts, $callback);
+    $client->delete($key, [\%opts,] $callback);
 
-Delete key(s) from etcd.
+Options C<prefix> and C<range_end> as for C<get> (an empty prefix deletes
+every key), and C<prev_kv> to return the deleted kvs. Response keys:
+C<deleted> (count) and C<prev_kvs>.
 
-Options:
-
-=over 4
-
-=item prefix
-
-If true, deletes all keys with the given prefix.
-
-=item range_end
-
-End of the key range to delete.
-
-=item prev_kv
-
-If true, returns the deleted key-value pairs in the response.
-
-=back
-
-The callback receives C<($response, $error)>. Response keys: C<header>,
-C<deleted> (count of keys deleted), plus C<prev_kvs> (array of kv hashrefs)
-when the C<prev_kv> option is set.
-
-=head1 WATCH SERVICE
+=head1 WATCH
 
 =head2 watch
 
-    my $watch = $client->watch($key, $callback);
-    my $watch = $client->watch($key, \%opts, $callback);
+    my $watch = $client->watch($key, [\%opts,] $callback);
 
-Create a watch on a key or key range. Returns an EV::Etcd::Watch object.
+Watch a key or range; returns a handle (see L</cancel>). The callback runs
+for each message, whose C<events> hold hashes with C<type> (C<PUT> or
+C<DELETE>), C<kv> and, with the C<prev_kv> option, C<prev_kv>. C<created>
+is true on the first message of each stream, so again after a reconnect.
 
-The callback is invoked with C<($response, $error)> for each watch message.
-Response keys:
-
-=over 4
-
-=item events
-
-Array reference of event hashrefs (C<type> = "PUT" or "DELETE", C<kv>, and
-optionally C<prev_kv> when the C<prev_kv> option is set).
-
-=item watch_id
-
-Server-assigned watch identifier. Note that etcd assigns a fresh id for
-each Watch stream, so this value can change if the watch transparently
-reconnects.
-
-=item created
-
-True on the first message after the watch is established.
-
-=item header
-
-Cluster response header.
-
-=back
-
-Server-side cancellation (including compaction-induced) is delivered through
-the I<error> callback path, not as a success response: C<< $err->{source} >>
-will be C<"watch"> and C<< $err->{message} >> will contain the server's reason
-(typically including the compact revision when relevant).
-
-Options:
+A watch the server cancels arrives as an error with C<status> CANCELLED
+and C<source> C<watch>, whatever the cause its C<message> names: a
+compaction, a permission denied or an expired token. After a compaction,
+C<< $err->{compact_revision} >> holds the revision to resume from (0
+otherwise).
 
 =over 4
 
-=item prefix
+=item prefix => $bool
 
-If true, watches all keys with the given prefix.
+=item range_end => $end
 
-=item range_end
+As for C<get>.
 
-End of the key range to watch.
+=item start_revision => $rev
 
-=item start_revision
+Start from an older revision instead of the current one.
 
-Revision to start watching from. If not specified, watches from the
-current revision. Use this to resume watching after a reconnect.
+=item prev_kv => $bool
 
-=item prev_kv
+Add the previous kv to each event.
 
-If true, the response will include the previous key-value pair for
-UPDATE and DELETE events.
+=item progress_notify => $bool
 
-=item progress_notify
+Have the server send empty messages while idle, carrying the current
+revision.
 
-If true, the server will periodically send progress notifications
-even when there are no events, allowing the client to know the
-current revision.
+=item watch_id => $id
 
-=item watch_id
+Choose the watch ID instead of letting the server assign one.
 
-Optional explicit watch ID. If not specified, the server assigns one.
+=item auto_reconnect => $bool
 
-=item auto_reconnect
-
-If true, the watch will automatically reconnect after a connection failure,
-resuming from the last seen revision. Default is true. This is useful for
-long-running watches that should survive network interruptions.
-
-    my $watch = $client->watch('/my/key', {
-        auto_reconnect => 1,
-        progress_notify => 1,  # Helps track revision even during inactivity
-    }, sub {
-        my ($event, $err) = @_;
-        if ($err) {
-            warn "Watch error: $err->{message}";
-            return;
-        }
-        # Process events...
-    });
+Reconnect after a connection failure, resuming from the last revision seen.
+Default true.
 
 =back
 
-=head2 EV::Etcd::Watch Methods
-
-=head3 cancel
-
-    $watch->cancel($callback);
-
-Cancel the watch. The callback receives C<($response, $error)> when
-cancellation is complete. The response is an empty hash reference on success.
-
-Calling C<cancel> on an already-cancelled handle is safe: the callback fires
-immediately with success. The handle remains valid as a Perl reference until
-you drop it.
-
-    $watch->cancel(sub {
-        my ($resp, $err) = @_;
-        if ($err) {
-            warn "Cancel failed: $err->{message}";
-        } else {
-            print "Watch cancelled\n";
-        }
-    });
-
-=head1 LEASE SERVICE
+=head1 LEASE
 
 =head2 lease_grant
 
     $client->lease_grant($ttl, $callback);
 
-Grant a lease with the specified TTL (time-to-live) in seconds.
-
-The callback receives C<($response, $error)>. Response keys:
-
-=over 4
-
-=item id
-
-The lease ID.
-
-=item ttl
-
-The actual TTL granted by the server.
-
-=item header
-
-Standard response header.
-
-=back
+Grant a lease for C<$ttl> seconds. Response keys: C<id> and C<ttl> (as
+granted).
 
 =head2 lease_revoke
 
     $client->lease_revoke($lease_id, $callback);
 
-Revoke a lease. All keys attached to the lease will be deleted. The response
-contains C<header> only.
+Revoke a lease, deleting every key attached to it.
 
 =head2 lease_keepalive
 
-    my $keepalive = $client->lease_keepalive($lease_id, $callback);
-    my $keepalive = $client->lease_keepalive($lease_id, \%opts, $callback);
+    my $keepalive = $client->lease_keepalive($lease_id, [\%opts,] $callback);
 
-Keep a lease alive. Creates a bidirectional streaming connection that keeps
-the lease refreshed. Returns an C<EV::Etcd::Keepalive> object that can be
-used to cancel the keepalive stream:
-
-    $keepalive->cancel(sub { my ($resp, $err) = @_; });
-
-Options:
-
-=over 4
-
-=item auto_reconnect
-
-If true, the keepalive stream will automatically reconnect after a connection
-failure, with linear backoff up to C<max_retries> (set on the client).
-Default is 1 (enabled). Pass C<0> to disable.
-
-=back
-
-The keepalive callback receives C<($response, $error)> for each tick. On
-success the response includes C<id>, C<ttl>, and C<header>. When the lease
-has expired the server sends C<ttl=0>; the client maps that to an error
-callback with C<< source => "keepalive" >> and status C<NOT_FOUND>.
-
-=head2 EV::Etcd::Keepalive Methods
-
-=head3 cancel
-
-    $keepalive->cancel($callback);
-
-Cancel the keepalive stream. The callback receives C<($response, $error)>
-when cancellation is complete. The response is an empty hash reference on
-success.
-
-Calling C<cancel> on an already-cancelled handle is safe: the callback fires
-immediately with success. The handle remains valid as a Perl reference until
-you drop it.
+Keep a lease refreshed over a stream; returns a handle (see L</cancel>).
+Each refresh calls back with C<id> and C<ttl>. An expired lease ends the
+stream with a NOT_FOUND error. Option C<auto_reconnect> (default true)
+reconnects after a connection failure.
 
 =head2 lease_time_to_live
 
-    $client->lease_time_to_live($lease_id, $callback);
-    $client->lease_time_to_live($lease_id, \%opts, $callback);
+    $client->lease_time_to_live($lease_id, [\%opts,] $callback);
 
-Get the remaining TTL of a lease.
-
-Options:
-
-=over 4
-
-=item keys
-
-If true, also return the list of keys attached to this lease.
-
-=back
-
-The callback receives C<($response, $error)>. Response keys:
-
-=over 4
-
-=item id
-
-The lease ID.
-
-=item ttl
-
-Remaining TTL in seconds. Returns -1 if the lease has expired.
-
-=item granted_ttl
-
-The original TTL granted when the lease was created.
-
-=item keys
-
-Array of keys attached to this lease (only when the C<keys> option is true).
-
-=item header
-
-Standard response header.
-
-=back
+Response keys: C<id>, C<ttl> (remaining seconds, -1 once expired),
+C<granted_ttl> and C<keys>, which with the C<keys> option lists the keys
+attached to the lease.
 
 =head2 lease_leases
 
     $client->lease_leases($callback);
 
-List all active leases. The callback receives C<($response, $error)>.
-Response keys: C<header>, and C<leases>, an array of hashrefs each with an
-C<id> key.
+Response key C<leases>: an array of hashes with an C<id>.
 
-=head1 LOCK SERVICE
-
-EV::Etcd provides distributed locking through the etcd Lock service.
-Locks are tied to leases - when the lease expires or is revoked, the lock
-is automatically released.
+=head1 LOCK
 
 =head2 lock
 
     $client->lock($name, $lease_id, $callback);
 
-Acquire a distributed lock.
+Acquire the lock C<$name>, held until C<unlock> or until the lease expires
+or is revoked. The call waits until the lock is free, without the client
+C<timeout>; destroying the client cancels it. The response C<key> is what
+C<unlock> takes. On failure, see L</ERRORS>.
 
-Arguments:
-
-=over 4
-
-=item name
-
-The name (identifier) of the lock to acquire. This is a byte string that
-identifies the resource being locked. Multiple clients attempting to lock
-the same name will block until the lock is available.
-
-=item lease_id
-
-The ID of a lease to attach to the lock. The lock will be held for the
-duration of the lease. If the lease expires or is revoked, the lock is
-automatically released. You must first create a lease with C<lease_grant>
-and optionally keep it alive with C<lease_keepalive>.
-
-=item callback
-
-Called with C<($response, $error)> when the lock is acquired (or fails).
-
-=back
-
-The response contains:
-
-=over 4
-
-=item key
-
-The key that holds the lock. This key is used to unlock the lock and
-should be stored by the caller. The key is unique to this lock holder
-and contains the lock name as a prefix.
-
-=item header
-
-Standard response header with cluster_id, member_id, revision, and raft_term.
-
-=back
-
-Example:
-
-    # First, create a lease for the lock
     $client->lease_grant(30, sub {
-        my ($lease_resp, $err) = @_;
+        my ($lease, $err) = @_;
         die $err->{message} if $err;
-
-        my $lease_id = $lease_resp->{id};
-
-        # Now acquire the lock
-        $client->lock("my-resource", $lease_id, sub {
-            my ($lock_resp, $err) = @_;
+        $client->lock('my-resource', $lease->{id}, sub {
+            my ($lock, $err) = @_;
             die $err->{message} if $err;
-
-            my $lock_key = $lock_resp->{key};
-            print "Lock acquired with key: $lock_key\n";
-
-            # ... do protected work ...
-
-            # Release the lock when done
-            $client->unlock($lock_key, sub {
-                my ($unlock_resp, $err) = @_;
-                warn "Unlock failed: $err->{message}" if $err;
-            });
+            # ... protected work ...
+            $client->unlock($lock->{key}, sub {});
         });
     });
 
@@ -771,1249 +531,290 @@ Example:
 
     $client->unlock($key, $callback);
 
-Release a distributed lock.
-
-Arguments:
-
-=over 4
-
-=item key
-
-The lock key returned from a successful C<lock> call. This is the unique
-key that was created to hold the lock ownership.
-
-=item callback
-
-Called with C<($response, $error)> when the unlock completes.
-
-=back
-
-The response contains:
-
-=over 4
-
-=item header
-
-Standard response header with cluster_id, member_id, revision, and raft_term.
-
-=back
-
-B<Note>: You can also release a lock by revoking its associated lease with
-C<lease_revoke>. This is useful if you want to release all resources
-associated with a lease at once.
-
-=head1 AUTHENTICATION SERVICE
-
-EV::Etcd provides full support for etcd's authentication and authorization
-system. Authentication uses username/password credentials, and authorization
-is based on roles with key-range permissions.
+=head1 AUTHENTICATION
 
 =head2 authenticate
 
-    $client->authenticate($username, $password, $callback);
+    $client->authenticate($user, $password, $callback);
 
-Authenticate with etcd using username and password. On success, the client
-automatically stores the auth token and uses it for subsequent requests.
+On success the client keeps the token (response key C<token>) and sends it
+with every later call.
 
-Arguments:
-
-=over 4
-
-=item username
-
-The username to authenticate as.
-
-=item password
-
-The password for the user.
-
-=item callback
-
-Called with C<($response, $error)> when authentication completes.
-
-=back
-
-The response contains:
-
-=over 4
-
-=item token
-
-The authentication token (also automatically stored in the client).
-
-=item header
-
-Standard response header.
-
-=back
-
-Example:
-
-    $client->authenticate('admin', 'secret', sub {
-        my ($resp, $err) = @_;
-        if ($err) {
-            die "Authentication failed: $err->{message}";
-        }
-        say "Authenticated successfully";
-        # Client now automatically uses the token for all requests
-    });
+Simple tokens expire after C<--auth-token-ttl> seconds unused (300 by
+default), do not survive a restart, and are timed by each member
+separately, so one may already have expired on the member the client
+switches to. JWT tokens expire after the C<ttl> of C<--auth-token>, and
+calls fail with INVALID_ARGUMENT C<etcdserver: revision of auth store is
+old> after any user, role or permission change. With an expired or stale
+token, calls and new streams fail, while running streams may continue for a
+while; call C<authenticate> again and restart the streams.
 
 =head2 auth_enable
 
     $client->auth_enable($callback);
 
-Enable authentication on the etcd cluster.
-
-B<Warning>: Before enabling auth, you must create at least one user with
-the root role, otherwise you will be locked out of the cluster.
-
-Example:
-
-    # First create root user
-    $client->user_add('root', 'rootpassword', sub {
-        my ($resp, $err) = @_;
-        die $err->{message} if $err;
-
-        $client->user_grant_role('root', 'root', sub {
-            my ($resp, $err) = @_;
-            die $err->{message} if $err;
-
-            # Now safe to enable auth
-            $client->auth_enable(sub {
-                my ($resp, $err) = @_;
-                say "Authentication enabled" unless $err;
-            });
-        });
-    });
+etcd refuses it until a C<root> user with the C<root> role exists.
 
 =head2 auth_disable
 
     $client->auth_disable($callback);
 
-Disable authentication on the etcd cluster. Requires root privileges.
+Needs root. The client drops its token. Other clients keep theirs, which
+etcd before 3.4.28 and 3.5.10 rejects with C<etcdserver: invalid auth
+token>; C<authenticate> on such a client fails with FAILED_PRECONDITION and
+drops it.
 
 =head2 auth_status
 
     $client->auth_status($callback);
 
-Check whether authentication is enabled on the etcd cluster. Response keys:
+Response keys: C<enabled> and C<auth_revision>.
 
-=over 4
+=head2 user_add, user_delete, user_change_password, user_get, user_list
 
-=item enabled
+    $client->user_add($user, $password, $callback);
+    $client->user_delete($user, $callback);
+    $client->user_change_password($user, $password, $callback);
+    $client->user_get($user, $callback);       # roles => [...]
+    $client->user_list($callback);             # users => [...]
 
-Boolean indicating whether authentication is enabled.
+=head2 user_grant_role, user_revoke_role
 
-=item auth_revision
+    $client->user_grant_role($user, $role, $callback);
+    $client->user_revoke_role($user, $role, $callback);
 
-The current revision of the auth store.
+=head2 role_add, role_delete, role_get, role_list
 
-=item header
+    $client->role_add($role, $callback);
+    $client->role_delete($role, $callback);
+    $client->role_get($role, $callback);       # perm => [...]
+    $client->role_list($callback);             # roles => [...]
 
-Standard response header.
+C<role_get> lists permissions as hashes with C<perm_type> (C<READ>,
+C<WRITE> or C<READWRITE>), C<key> and C<range_end>.
 
-=back
+=head2 role_grant_permission, role_revoke_permission
 
-Example:
+    $client->role_grant_permission($role, $perm_type, $key, $range_end, $callback);
+    $client->role_revoke_permission($role, $key, $range_end, $callback);
 
-    $client->auth_status(sub {
+C<$range_end> is exclusive; C<undef> means the single key. For a prefix,
+pass it with its last byte incremented: C</app/> gives C</app0>.
+C<"\x00"> covers every key from C<$key> on, not only the prefix.
+
+    $client->role_grant_permission('app', 'READWRITE', '/app/', '/app0', sub {
         my ($resp, $err) = @_;
-        if ($resp->{enabled}) {
-            say "Authentication is enabled (revision: $resp->{auth_revision})";
-        } else {
-            say "Authentication is disabled";
-        }
+        warn $err->{message} if $err;
     });
 
-=head2 User Management
-
-=head3 user_add
-
-    $client->user_add($username, $password, $callback);
-
-Create a new user.
-
-Arguments:
-
-=over 4
-
-=item username
-
-The username for the new user.
-
-=item password
-
-The password for the new user.
-
-=item callback
-
-Called with C<($response, $error)> when complete.
-
-=back
-
-=head3 user_delete
-
-    $client->user_delete($username, $callback);
-
-Delete a user.
-
-=head3 user_change_password
-
-    $client->user_change_password($username, $password, $callback);
-
-Change a user's password.
-
-=head3 user_get
-
-    $client->user_get($username, $callback);
-
-Get information about a user.
-
-The response contains:
-
-=over 4
-
-=item roles
-
-Array of role names assigned to the user.
-
-=back
-
-Example:
-
-    $client->user_get('myuser', sub {
-        my ($resp, $err) = @_;
-        say "User has roles: @{$resp->{roles}}";
-    });
-
-=head3 user_list
-
-    $client->user_list($callback);
-
-List all users.
-
-The response contains:
-
-=over 4
-
-=item users
-
-Array of usernames.
-
-=back
-
-=head3 user_grant_role
-
-    $client->user_grant_role($username, $role_name, $callback);
-
-Grant a role to a user.
-
-Example:
-
-    $client->user_grant_role('myuser', 'readwrite', sub {
-        my ($resp, $err) = @_;
-        say "Role granted" unless $err;
-    });
-
-=head3 user_revoke_role
-
-    $client->user_revoke_role($username, $role_name, $callback);
-
-Revoke a role from a user.
-
-=head2 Role Management
-
-=head3 role_add
-
-    $client->role_add($role_name, $callback);
-
-Create a new role.
-
-Example:
-
-    $client->role_add('readonly', sub {
-        my ($resp, $err) = @_;
-        say "Role created" unless $err;
-    });
-
-=head3 role_delete
-
-    $client->role_delete($role_name, $callback);
-
-Delete a role.
-
-=head3 role_get
-
-    $client->role_get($role_name, $callback);
-
-Get information about a role, including its permissions.
-
-The response contains:
-
-=over 4
-
-=item perm
-
-Array of permission objects, each containing:
-
-=over 4
-
-=item perm_type
-
-Permission type: "READ", "WRITE", or "READWRITE".
-
-=item key
-
-The key or key prefix this permission applies to.
-
-=item range_end
-
-The end of the key range (if applicable).
-
-=back
-
-=back
-
-Example:
-
-    $client->role_get('myrole', sub {
-        my ($resp, $err) = @_;
-        for my $perm (@{$resp->{perm}}) {
-            say "Permission: $perm->{perm_type} on $perm->{key}";
-        }
-    });
-
-=head3 role_list
-
-    $client->role_list($callback);
-
-List all roles.
-
-The response contains:
-
-=over 4
-
-=item roles
-
-Array of role names.
-
-=back
-
-=head3 role_grant_permission
-
-    $client->role_grant_permission($role_name, $perm_type, $key, $range_end, $callback);
-
-Grant a permission to a role.
-
-Arguments:
-
-=over 4
-
-=item role_name
-
-The role to grant the permission to.
-
-=item perm_type
-
-The permission type: "READ", "WRITE", or "READWRITE".
-
-=item key
-
-The key or key prefix to grant access to.
-
-=item range_end
-
-The end of the key range. Use C<undef> for a single key, or use the
-special value C<"\x00"> after the last byte of the prefix to match all
-keys with that prefix.
-
-=item callback
-
-Called with C<($response, $error)> when complete.
-
-=back
-
-Example:
-
-    # Grant read access to a single key
-    $client->role_grant_permission('readonly', 'READ', '/config/setting', undef, sub {
-        my ($resp, $err) = @_;
-        say "Permission granted" unless $err;
-    });
-
-    # Grant read/write access to all keys under /app/
-    # Range end is /app0 (the byte after / is 0)
-    $client->role_grant_permission('readwrite', 'READWRITE', '/app/', '/app0', sub {
-        my ($resp, $err) = @_;
-        say "Permission granted" unless $err;
-    });
-
-=head3 role_revoke_permission
-
-    $client->role_revoke_permission($role_name, $key, $range_end, $callback);
-
-Revoke a permission from a role.
-
-Arguments:
-
-=over 4
-
-=item role_name
-
-The role to revoke the permission from.
-
-=item key
-
-The key or key prefix of the permission to revoke.
-
-=item range_end
-
-The end of the key range of the permission to revoke.
-
-=item callback
-
-Called with C<($response, $error)> when complete.
-
-=back
-
-=head2 Complete Authentication Example
-
-    use EV;
-    use EV::Etcd;
-
-    my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
-
-    # Setup authentication (run once, as root)
-    sub setup_auth {
-        # Create a role with permissions
-        $client->role_add('app-role', sub {
-            my ($resp, $err) = @_;
-
-            # Grant read/write on /app/ prefix
-            $client->role_grant_permission('app-role', 'READWRITE', '/app/', '/app0', sub {
-                my ($resp, $err) = @_;
-
-                # Create user
-                $client->user_add('appuser', 'apppassword', sub {
-                    my ($resp, $err) = @_;
-
-                    # Assign role to user
-                    $client->user_grant_role('appuser', 'app-role', sub {
-                        my ($resp, $err) = @_;
-                        say "Auth setup complete";
-                        EV::break;
-                    });
-                });
-            });
-        });
-    }
-
-    # Normal usage with authentication
-    sub use_with_auth {
-        $client->authenticate('appuser', 'apppassword', sub {
-            my ($resp, $err) = @_;
-            die "Auth failed: $err->{message}" if $err;
-
-            # Now all operations use the auth token
-            $client->put('/app/key', 'value', sub {
-                my ($resp, $err) = @_;
-                say "Put succeeded" unless $err;
-                EV::break;
-            });
-        });
-    }
-
-    use_with_auth();
-    EV::run;
-
-=head1 MAINTENANCE SERVICE
-
-EV::Etcd provides access to etcd's maintenance operations for cluster
-administration and monitoring.
+=head1 MAINTENANCE
 
 =head2 status
 
     $client->status($callback);
 
-Get the status of the etcd member this client is connected to. Useful for
-health checks and cluster monitoring. Response keys:
-
-=over 4
-
-=item version
-
-The etcd server version.
-
-=item db_size
-
-Backend database size in bytes.
-
-=item db_size_in_use
-
-Database size in use after compaction.
-
-=item leader
-
-Member ID of the cluster leader.
-
-=item raft_index
-
-Current raft index of this member.
-
-=item raft_term
-
-Current raft term of the cluster.
-
-=item raft_applied_index
-
-Raft applied index of this member.
-
-=item is_learner
-
-True if this member is a learner (non-voting).
-
-=item errors
-
-Array of error strings if this member has any. Absent when no errors.
-
-=item header
-
-Standard response header.
-
-=back
+Status of the member the client is connected to. Response keys:
+C<version>, C<db_size>, C<db_size_in_use>, C<leader> (member ID),
+C<raft_index>, C<raft_term>, C<raft_applied_index>, C<is_learner>, and
+C<errors> when the member has any.
 
 =head2 compact
 
-    $client->compact($revision, $callback);
-    $client->compact($revision, \%opts, $callback);
+    $client->compact($revision, [\%opts,] $callback);
 
-Compact the key-value store up to the given revision. All revisions older
-than C<$revision> are discarded.
-
-B<Warning>: compaction is irreversible; historical reads of older revisions
-fail after the compact completes.
-
-Options:
-
-=over 4
-
-=item physical
-
-If true, the RPC waits until the compaction is physically applied to the
-local backend (entries fully removed). Default is false (the call returns
-once the compaction is logically committed).
-
-=back
-
-The response contains C<header> only.
+Discard all revisions before C<$revision>, irreversibly. With
+C<< physical => 1 >> the call returns once the data is removed from the
+backend rather than once the compaction is committed.
 
 =head2 alarm
 
-    $client->alarm($action, $callback);
-    $client->alarm($action, \%opts, $callback);
+    $client->alarm($action, [\%opts,] $callback);
 
-Get, activate, or deactivate alarms on etcd cluster members.
+C<$action> is C<GET>, C<ACTIVATE> or C<DEACTIVATE>. Option C<alarm> is
+C<NOSPACE> or C<CORRUPT>; the default, C<NONE>, lists every alarm for
+C<GET> and does nothing otherwise. Option C<member_id> names the member the
+alarm is recorded for: pass a real one, from C<GET> or C<member_list>.
+Response key C<alarms>: hashes with C<member_id>, C<alarm> (a number) and
+C<alarm_type> (its name); etcd 3.4 sends no header.
 
-Arguments:
-
-=over 4
-
-=item action
-
-The alarm action to perform. Must be one of:
-
-=over 4
-
-=item GET
-
-List all active alarms.
-
-=item ACTIVATE
-
-Activate an alarm on a member.
-
-=item DEACTIVATE
-
-Deactivate an alarm on a member.
-
-=back
-
-=item callback
-
-Called with C<($response, $error)> when the operation completes.
-
-=back
-
-Options:
-
-=over 4
-
-=item member_id
-
-The member ID to operate on. Required for ACTIVATE/DEACTIVATE on a
-specific member. Use 0 for all members.
-
-=item alarm
-
-The alarm type. Can be "NOSPACE" (storage quota exceeded) or "CORRUPT"
-(data corruption detected). Default is "NONE" which means all alarms.
-
-=back
-
-The response contains:
-
-=over 4
-
-=item alarms
-
-Array of alarm objects, each containing:
-
-=over 4
-
-=item member_id
-
-The member ID where the alarm is active.
-
-=item alarm
-
-The alarm type as an integer.
-
-=item alarm_type
-
-The alarm type as a string ("NONE", "NOSPACE", or "CORRUPT").
-
-=back
-
-=item header
-
-Standard response header.
-
-=back
-
-Example:
-
-    # List all alarms
+    # After freeing space: clear every alarm
     $client->alarm('GET', sub {
         my ($resp, $err) = @_;
-        for my $alarm (@{$resp->{alarms}}) {
-            warn "Alarm on member $alarm->{member_id}: $alarm->{alarm_type}";
-        }
-    });
-
-    # Deactivate NOSPACE alarm on all members
-    $client->alarm('DEACTIVATE', { alarm => 'NOSPACE' }, sub {
-        my ($resp, $err) = @_;
-        warn "Alarm deactivated" unless $err;
+        return warn $err->{message} if $err;
+        $client->alarm('DEACTIVATE', {
+            alarm     => $_->{alarm_type},
+            member_id => $_->{member_id},
+        }, sub { warn $_[1]{message} if $_[1] }) for @{$resp->{alarms}};
     });
 
 =head2 defragment
 
     $client->defragment($callback);
 
-Defragment the storage backend on the etcd member this client is connected to.
-This reclaims storage space by removing deleted keys and compacted revisions.
-
-B<Warning>: Defragmentation is a blocking operation and may cause latency
-spikes. Run it during maintenance windows.
-
-The response contains:
-
-=over 4
-
-=item header
-
-Standard response header.
-
-=back
-
-Example:
-
-    $client->defragment(sub {
-        my ($resp, $err) = @_;
-        if ($err) {
-            warn "Defragment failed: $err->{message}";
-        } else {
-            say "Defragmentation complete";
-        }
-    });
+Defragment the backend of the member the client is connected to. It blocks
+that member while running. etcd 3.4 and 3.5 send no header, so the
+response is empty.
 
 =head2 hash_kv
 
-    $client->hash_kv($callback);
-    $client->hash_kv($revision, $callback);
+    $client->hash_kv([$revision,] $callback);
 
-Compute the hash of the KV store up to the given revision. Useful for
-verifying data consistency across cluster members.
-
-Arguments:
-
-=over 4
-
-=item revision (optional)
-
-The revision to hash up to. If not specified, uses the current revision.
-
-=item callback
-
-Called with C<($response, $error)> when the operation completes.
-
-=back
-
-The response contains:
-
-=over 4
-
-=item hash
-
-The hash value of the KV store.
-
-=item compact_revision
-
-The compaction revision of the KV store.
-
-=item header
-
-Standard response header.
-
-=back
-
-Example:
-
-    $client->hash_kv(sub {
-        my ($resp, $err) = @_;
-        say "KV hash: $resp->{hash}";
-        say "Compact revision: $resp->{compact_revision}";
-    });
+Hash of the store up to C<$revision> (default current), to compare
+members. Response keys: C<hash> and C<compact_revision>.
 
 =head2 move_leader
 
-    $client->move_leader($target_id, $callback);
+    $client->move_leader($member_id, $callback);
 
-Transfer leadership to another member. Only the current leader can
-transfer leadership.
+Hand leadership to another voting member. Only the leader accepts it, so
+the client must be connected to the leader (C<status> then shows C<leader>
+equal to C<< $resp->{header}{member_id} >>). etcd sends no header.
 
-Arguments:
-
-=over 4
-
-=item target_id
-
-The member ID of the new leader. Must be a voting member (not a learner).
-
-=item callback
-
-Called with C<($response, $error)> when the operation completes.
-
-=back
-
-The response contains:
-
-=over 4
-
-=item header
-
-Standard response header.
-
-=back
-
-Example:
-
-    # Get current cluster status to find member IDs
-    $client->member_list(sub {
-        my ($resp, $err) = @_;
-        my $target = $resp->{members}[1]{id};  # Pick a different member
-
-        $client->move_leader($target, sub {
-            my ($resp, $err) = @_;
-            if ($err) {
-                warn "Failed to move leader: $err->{message}";
-            } else {
-                say "Leadership transferred";
-            }
-        });
-    });
-
-=head1 ELECTION SERVICE
-
-EV::Etcd provides leader election support through the etcd Election service.
-Elections use leases to ensure that leadership is automatically released
-when a leader fails.
+=head1 ELECTION
 
 =head2 election_campaign
 
     $client->election_campaign($name, $lease_id, $value, $callback);
 
-Campaign for leadership of an election.
-
-This call blocks until the caller is elected as leader. Once elected, the
-caller should periodically keep the lease alive to maintain leadership.
-
-Arguments:
-
-=over 4
-
-=item name
-
-The name of the election to campaign in.
-
-=item lease_id
-
-The lease ID to use for the campaign. The leadership is held for the
-duration of this lease.
-
-=item value
-
-The value to set when elected. Other clients can read this value to
-identify the current leader.
-
-=item callback
-
-Called with C<($response, $error)> when elected (or on failure).
-
-=back
-
-The response contains:
-
-=over 4
-
-=item leader
-
-A hash containing the leader key information:
-
-=over 4
-
-=item name
-
-The election name.
-
-=item key
-
-The key in etcd that holds the leadership (use for proclaim/resign).
-
-=item rev
-
-The creation revision of the leader key.
-
-=item lease
-
-The lease ID attached to the leadership.
-
-=back
-
-=item header
-
-Standard response header.
-
-=back
-
-Example:
-
-    $client->lease_grant(30, sub {
-        my ($resp, $err) = @_;
-        my $lease_id = $resp->{id};
-
-        $client->election_campaign("my-election", $lease_id, "leader-1", sub {
-            my ($resp, $err) = @_;
-            if ($err) {
-                warn "Failed to become leader: $err->{message}";
-                return;
-            }
-            say "Elected as leader!";
-            my $leader = $resp->{leader};   # hashref: pass to proclaim/resign
-        });
-    });
+Wait to become leader of C<$name> with C<$value>; leadership lasts as long
+as the lease. There is no client C<timeout>, and destroying the client
+cancels the wait. The response C<leader> is a hash (C<name>, C<key>, C<rev>,
+C<lease>) for C<election_proclaim> and C<election_resign>. On failure, see
+L</ERRORS>.
 
 =head2 election_leader
 
     $client->election_leader($name, $callback);
 
-Get the current leader of an election.
-
-Arguments:
-
-=over 4
-
-=item name
-
-The name of the election.
-
-=item callback
-
-Called with C<($response, $error)> when complete.
-
-=back
-
-The response contains:
-
-=over 4
-
-=item kv
-
-The key-value pair of the current leader, containing the leader's value.
-
-=item header
-
-Standard response header.
-
-=back
-
-Returns an error if there is no current leader.
-
-Example:
-
-    $client->election_leader("my-election", sub {
-        my ($resp, $err) = @_;
-        if ($err) {
-            warn "No leader: $err->{message}";
-        } else {
-            say "Current leader value: $resp->{kv}{value}";
-        }
-    });
+Response key C<kv>: the leader's kv. Without a leader, an error.
 
 =head2 election_proclaim
 
     $client->election_proclaim($leader, $value, $callback);
 
-Update the leader's value. Only the current leader can proclaim. The
-response contains C<header> only.
-
-Arguments:
-
-=over 4
-
-=item leader
-
-The leader hashref returned in C<< $resp->{leader} >> from
-C<election_campaign>.
-
-=item value
-
-The new value to announce.
-
-=item callback
-
-Called with C<($response, $error)> when complete.
-
-=back
-
-Example:
-
-    $client->election_proclaim($leader, "new-value", sub {
-        my ($resp, $err) = @_;
-        warn "Proclaim failed: $err->{message}" if $err;
-    });
+Announce a new value as leader.
 
 =head2 election_resign
 
     $client->election_resign($leader, $callback);
 
-Voluntarily give up leadership. The response contains C<header> only.
-
-Arguments:
-
-=over 4
-
-=item leader
-
-The leader hashref returned in C<< $resp->{leader} >> from
-C<election_campaign>.
-
-=item callback
-
-Called with C<($response, $error)> when complete.
-
-=back
-
-Example:
-
-    $client->election_resign($leader, sub {
-        my ($resp, $err) = @_;
-        say "Resigned from leadership" unless $err;
-    });
+Give up leadership. Both this and C<election_proclaim> croak unless
+C<$leader> has a non-empty C<key> and positive C<rev> and C<lease>.
 
 =head2 election_observe
 
-    my $observe = $client->election_observe($name, $callback);
-    my $observe = $client->election_observe($name, \%opts, $callback);
+    my $observe = $client->election_observe($name, [\%opts,] $callback);
 
-Observe leader changes for an election. This creates a streaming connection
-that receives notifications whenever the leader changes. Returns an
-C<EV::Etcd::Observe> object that can be used to cancel the observe stream:
+Call back with the leader's C<kv> on every change; returns a handle (see
+L</cancel>). Option C<auto_reconnect> (default true) reconnects after a
+connection failure.
 
-    $observe->cancel(sub { my ($resp, $err) = @_; });
-
-Arguments:
-
-=over 4
-
-=item name
-
-The name of the election to observe.
-
-=item callback
-
-Called with C<($response, $error)> for each leader change.
-
-=back
-
-Options:
-
-=over 4
-
-=item auto_reconnect
-
-If true, automatically reconnect after connection failures. Default is true.
-
-=back
-
-The response contains:
-
-=over 4
-
-=item kv
-
-The key-value pair of the current leader.
-
-=item header
-
-Standard response header.
-
-=back
-
-Example:
-
-    my $observe = $client->election_observe("my-election", sub {
-        my ($resp, $err) = @_;
-        if ($err) {
-            warn "Observe error: $err->{message}";
-            return;
-        }
-        say "Leader changed: $resp->{kv}{value}";
-    });
-
-=head2 EV::Etcd::Observe Methods
-
-=head3 cancel
-
-    $observe->cancel($callback);
-
-Cancel the observe stream. The callback receives C<($response, $error)>
-when cancellation is complete. The response is an empty hash reference on
-success.
-
-Calling C<cancel> on an already-cancelled handle is safe: the callback fires
-immediately with success. The handle remains valid as a Perl reference until
-you drop it.
-
-=head1 CLUSTER SERVICE
-
-EV::Etcd provides cluster membership management through the Cluster service.
+=head1 CLUSTER
 
 =head2 member_list
 
-    $client->member_list($callback);
-    $client->member_list(\%opts, $callback);
+    $client->member_list([\%opts,] $callback);
 
-List all members in the etcd cluster.
-
-Options:
-
-=over 4
-
-=item linearizable
-
-If true, perform a linearizable (strongly consistent) read. Default is 0
-(serializable read: faster, but may be slightly stale).
-
-=back
-
-The response contains:
-
-=over 4
-
-=item members
-
-Array of member objects, each containing:
-
-=over 4
-
-=item id
-
-The member ID.
-
-=item name
-
-The member name.
-
-=item peer_urls
-
-Array of peer URLs for cluster communication.
-
-=item client_urls
-
-Array of client URLs for client requests.
-
-=item is_learner
-
-Boolean indicating if the member is a learner.
-
-=back
-
-=item header
-
-Standard response header.
-
-=back
-
-Example:
-
-    $client->member_list(sub {
-        my ($resp, $err) = @_;
-        for my $member (@{$resp->{members}}) {
-            say "Member $member->{name} (ID: $member->{id})";
-            say "  Client URLs: @{$member->{client_urls}}";
-        }
-    });
+Response key C<members>: hashes with C<id>, C<name>, C<peer_urls>,
+C<client_urls> and C<is_learner>. Option C<linearizable> reads through the
+leader instead of the member's local view; etcd 3.4 ignores it.
 
 =head2 member_add
 
-    $client->member_add(\@peer_urls, $callback);
-    $client->member_add(\@peer_urls, \%opts, $callback);
+    $client->member_add(\@peer_urls, [\%opts,] $callback);
 
-Add a new member to the cluster.
+Option C<is_learner> adds a non-voting member. Response keys: C<member>
+(the new one) and C<members>.
 
-Arguments:
-
-=over 4
-
-=item peer_urls
-
-Array of peer URLs for the new member.
-
-=item callback
-
-Called with C<($response, $error)> when complete.
-
-=back
-
-Options:
-
-=over 4
-
-=item is_learner
-
-If true, add the member as a non-voting learner.
-
-=back
-
-=head2 member_remove
+=head2 member_remove, member_update, member_promote
 
     $client->member_remove($member_id, $callback);
-
-Remove a member from the cluster. The response contains C<header> and
-C<members> (the cluster's remaining members after removal).
-
-=head2 member_update
-
     $client->member_update($member_id, \@peer_urls, $callback);
+    $client->member_promote($member_id, $callback);   # learner to voter
 
-Update a member's peer URLs. The response contains C<header> and C<members>.
-
-=head2 member_promote
-
-    $client->member_promote($member_id, $callback);
-
-Promote a learner member to a voting member. The response contains C<header>
-and C<members>.
+Response key C<members>.
 
 =head1 TRANSACTIONS
-
-EV::Etcd supports atomic transactions with compare-and-swap semantics.
 
 =head2 txn
 
     $client->txn(
-        compare => \@compare_ops,
-        success => \@success_ops,
-        failure => \@failure_ops,
+        compare  => \@compare,
+        success  => \@success,
+        failure  => \@failure,
         callback => $callback,
     );
-
-    # Or positional form:
     $client->txn(\@compare, \@success, \@failure, $callback);
 
-Execute an atomic transaction. If all compare operations succeed, the
-success operations are executed; otherwise, the failure operations are
-executed.
+Run C<success> if every comparison holds, otherwise C<failure>, atomically;
+the response C<succeeded> says which. A comparison names a key and one
+field, compared with C<result> C<=> (default), C<!=>, C<< < >> or
+C<< > >>:
 
-Compare operations:
+    { key => $key, value => $expected }
+    { key => $key, version => $expected }
+    { key => $key, create_revision => $expected }
+    { key => $key, mod_revision => $expected, result => '<' }
+    { key => $key, lease => $expected }
 
-    { key => $key, target => 'value', value => $expected }
-    { key => $key, target => 'version', version => $expected }
-    { key => $key, target => 'create', create_revision => $expected }
-    { key => $key, target => 'mod', mod_revision => $expected }
-    { key => $key, target => 'lease', lease => $expected }
+C<target> (C<value>, C<version>, C<create>, C<mod> or C<lease>) may name
+the field too, and must agree with it; alone it compares against 0 or an
+empty value, so C<< { key => $key, target => 'version' } >>, like
+C<< { key => $key, version => 0 } >>, means the key does not exist.
+Operations, which also take C<lease> (put) and C<range_end> (delete,
+range):
 
-The optional C<result> field controls the comparison operator (default: C<=>):
+    { put    => { key => $key, value => $value } }   # or request_put
+    { delete => { key => $key } }                     # or request_delete_range
+    { range  => { key => $key } }                     # or request_range
 
-    result => '='    # EQUAL (default)
-    result => '!='   # NOT_EQUAL
-    result => '<'    # LESS
-    result => '>'    # GREATER
-
-Note: Specify exactly one target field (value, version, create_revision,
-mod_revision or lease) per compare operation. If multiple are provided, the
-last one processed takes precedence.
-
-Request operations (for success/failure):
-
-    { request_put => { key => $key, value => $value } }
-    { request_delete_range => { key => $key } }
-    { request_range => { key => $key } }
-
-Short aliases are also accepted:
-
-    { put => { key => $key, value => $value } }
-    { delete => { key => $key } }
-    { range => { key => $key } }
-
-Example:
+The response C<responses> holds one hash per operation run, under
+C<response_put>, C<response_delete_range> (C<deleted>, C<prev_kvs>) or
+C<response_range> (C<kvs>, C<count>, C<more>).
 
     $client->txn(
-        compare => [
-            { key => '/counter', target => 'value', value => '0' }
-        ],
-        success => [
-            { request_put => { key => '/counter', value => '1' } }
-        ],
-        failure => [],
+        compare  => [{ key => '/counter', value => '0' }],
+        success  => [{ put => { key => '/counter', value => '1' } }],
         callback => sub {
             my ($resp, $err) = @_;
-            say $resp->{succeeded} ? "Incremented" : "Already changed";
+            say $resp->{succeeded} ? 'Incremented' : 'Already changed';
         },
     );
 
 =head1 CAVEATS
 
-B<Fork safety:> gRPC's threads do not survive C<fork()>. EV::Etcd starts
-gRPC with the first client and shuts it down when the last one is
-destroyed, so a process that holds no client when it forks, including one
-that only loaded the module or used a client and dropped it, leaves the
-child free to create its own clients. Newer gRPC releases finish shutting
-down on their own threads after the last client is gone, within milliseconds
-on Linux; the first C<fork()> after that waits for them, for at most two
-seconds. On macOS gRPC does not shut down promptly, so EV::Etcd leaves it
-running once started, and a child of a process that has used EV::Etcd
-croaks in C<new>. If the parent holds a client when it
-forks, the child cannot use etcd at all: C<new> croaks there, and so does
-any call on an inherited client or stream handle, because gRPC activity in
-the child can break the parent's connections. Inherited clients are inert
-in the child: their timers and watchers are stopped at the fork, so they
-neither fire nor keep the child's event loop running. Destroying one in the
-child only frees its Perl-side resources (with a warning). In a server that
-forks workers, create clients in the workers, or drop the master's clients
-before it forks. A child forked from inside an EV::Etcd callback must exec
-or exit rather than return from that callback.
+B<Fork:> gRPC's threads do not survive C<fork()>. EV::Etcd starts gRPC
+with the first client and shuts it down when the last is destroyed, so a
+child forked while the process holds no client can create its own. The
+first C<fork()> after shutdown waits up to two seconds for gRPC's threads
+to finish. Destroying a client whose streams never ran can take seconds to
+settle; cancel its streams, or run the loop, first. On macOS gRPC stays up
+until the process exits. A child forked while gRPC is up (a client exists,
+it is still settling, or on macOS ever since the first client) cannot use
+etcd: C<new> croaks, as does any call on an inherited client or handle.
+Inherited clients are inert in the child (they neither fire nor keep its
+loop running), and destroying one there only frees its Perl side, with a
+warning. In a server that forks workers, create
+clients in the workers. A child forked inside an EV::Etcd callback must
+exec or exit, not return from it.
+
+B<Signals:> on a threaded perl before 5.42, a C<%SIG> handler that runs on
+a gRPC thread crashes perl. EV::Etcd starts gRPC with all signals blocked,
+which keeps them on the Perl thread in practice, but gRPC can start a
+thread later; prefer C<EV::signal> watchers there.
+
+=head1 INSTALLATION
+
+Building needs the gRPC Core and protobuf-c C libraries and pkg-config:
+
+    apt install libgrpc-dev libgrpc++-dev libprotobuf-c-dev pkg-config
+    brew install grpc protobuf-c pkg-config
+    pkg install grpc protobuf-c pkgconf
+
+Most tests need an etcd on C<127.0.0.1:2379> and skip without one. They
+write under their own prefixes and remove the leases, users and roles they
+create; tests that compact history or add members run only with
+C<EV_ETCD_TEST_ETCD=1>, for an etcd that exists for testing.
 
 =head1 AUTHOR
 

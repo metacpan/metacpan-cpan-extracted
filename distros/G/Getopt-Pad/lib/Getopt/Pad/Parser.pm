@@ -8,8 +8,9 @@ use Getopt::Pad::Result::Generator;
 class Getopt::Pad::Parser :strict(params) {
 	use Feature::Compat::Try;
 	use Scalar::Util ();
+	use Getopt::Pad::Util qw(scalarsIn);
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	field $spec :param;
 	field $argv :param;
@@ -18,19 +19,44 @@ class Getopt::Pad::Parser :strict(params) {
 	# selects are resolved afterwards, innermost first, since each Result
 	# holds the one below it. Every Trigger has fired before anything is
 	# resolved, so --help anywhere on the line wins over a missing required
-	# option or a broken config file.
+	# option or a broken config file. Every selected Level settles its
+	# values before any value is verified, and all are verified before any
+	# is prepared, so a parse that fails creates nothing on disk.
 	method parse() {
 		my @words           = $argv->@*;
 		my @steps           = $self->parseCommandLine(\@words);
 		my $inheritedValues = $steps[-1]{inheritedValues};
-		my $configValues    = $self->inContext($spec->root, sub { $self->loadConfigValues($inheritedValues) });
+		my $configValues    = $self->inContext($steps[-1]{level}, sub { $self->loadConfigValues($inheritedValues) });
+
+		my @settlements = map {
+			my $step = $_;
+			$self->inContext($step->{level}, sub { $self->settleStep($step, $inheritedValues, $configValues, \@words) });
+		} reverse @steps;
+		$self->checkSettled(\@settlements, sub ($type, $scalar) { $type->verify($scalar) });
+		$self->checkSettled(\@settlements, sub ($type, $scalar) { $type->prepare($scalar) });
 
 		my $result;
-		foreach my $step (reverse @steps) {
+		foreach my $settlement (@settlements) {
 			my $subResult = $result;
-			$result = $self->inContext($step->{level}, sub { $self->resolveStep($step, $inheritedValues, $configValues, \@words, $subResult) });
+			$result = $self->inContext($settlement->{level}, sub { $self->resultOf($settlement, $subResult) });
 		}
 		return $result;
+	}
+
+	# Runs $check on every scalar of every settled value, a problem
+	# reported in the wording of the value's source.
+	method checkSettled($settlements, $check) {
+		foreach my $settlement ($settlements->@*) {
+			$self->inContext($settlement->{level}, sub {
+				foreach my $entry ($settlement->{entries}->@*) {
+					foreach my $scalar (scalarsIn($entry->{value})) {
+						my $problem = $check->($entry->{type}, $scalar);
+						$entry->{report}->($problem) if defined $problem;
+					}
+				}
+			});
+		}
+		return;
 	}
 
 	# User errors raised by $code are attributed to $level, whose help the
@@ -135,31 +161,57 @@ class Getopt::Pad::Parser :strict(params) {
 		return $configSpec->io->explicitValues($spec->root, $inheritedValues->{$configOption});
 	}
 
-	# The Result of one selected Level. Its inherited options take the words
-	# collected on every Level down from it, its options the config values
-	# of its own section.
-	method resolveStep($step, $inheritedValues, $configValues, $words, $subResult) {
+	# The checked values of one selected Level, as reader values, and as
+	# entries carrying what verify and prepare need. Its inherited options
+	# take the words collected on every Level down from it, its options the
+	# config values of its own section.
+	method settleStep($step, $inheritedValues, $configValues, $words) {
 		my $level       = $step->{level};
 		my %commandLine = ($step->{values}->%*, map { $_->name => $inheritedValues->{$_->name} } grep { exists $inheritedValues->{$_->name} } $level->inheritableOptions);
 		my $config      = $configValues->{$level->path} // {};
 
-		my %readerValues;
-		$readerValues{$_->reader} = $_->readerValue(commandLine => \%commandLine, config => $config) foreach $level->declaredOptions;
+		my (%readerValues, @entries);
+		foreach my $option ($level->declaredOptions) {
+			my ($value, $report) = $option->settledValue(commandLine => \%commandLine, config => $config);
+			$readerValues{$option->reader} = $value;
+			push @entries, { type => $option->type, value => $value, report => $report } if defined $report;
+		}
 
-		my $class  = Getopt::Pad::Result::Generator::generate($level);
-		my $helper = $spec->helperFor($level);
-		return $class->new(%readerValues, command => $step->{command}, subcommand => $subResult, helper => $helper) if $level->hasCommands;
-		return $class->new(%readerValues, $self->consumeArgs($level, $words), helper => $helper);
+		if (!$level->hasCommands) {
+			my %argValues = $self->consumeArgs($level, $words);
+			foreach my $arg (grep { exists $argValues{$_->reader} } $level->args) {
+				my $short = $arg->short;
+				push @entries, { type => $arg->type, value => $argValues{$arg->reader}, report => sub ($problem) { Getopt::Pad::Error->throw("argument <%s>: %s", $short, $problem) } };
+			}
+			%readerValues = (%readerValues, %argValues);
+		}
+
+		return { level => $level, command => $step->{command}, readerValues => \%readerValues, entries => \@entries };
+	}
+
+	# The Result of one settled Level, holding $subResult, the Result of
+	# the Level below it.
+	method resultOf($settlement, $subResult) {
+		my $level        = $settlement->{level};
+		my %readerValues = $settlement->{readerValues}->%*;
+		my %levelValues  = $level->hasCommands ? (command => $settlement->{command}, subcommand => $subResult) : ();
+
+		my $class       = Getopt::Pad::Result::Generator::generate($level);
+		my $helper      = $spec->helperFor($level);
+		my $unprocessed = $class->new(%readerValues, %levelValues, helper => $helper);
+		my @processing  = grep { defined $_->processValue } $level->declaredOptions, $level->args;
+		return $unprocessed if !@processing;
+
+		# Every processValue callback sees the unprocessed Result, so the
+		# order they run in does not matter.
+		$readerValues{$_->reader} = $_->processedValue($unprocessed, $readerValues{$_->reader}) foreach @processing;
+		return $class->new(%readerValues, %levelValues, helper => $helper);
 	}
 
 	method validatedArgValue($arg, $value) {
 		my $problem = $arg->type->check($value);
 		Getopt::Pad::Error->throw("argument <%s>: %s", $arg->short, $problem) if defined $problem;
-
-		my $coerced = $arg->type->coerce($value);
-		$problem = $arg->type->prepare($coerced);
-		Getopt::Pad::Error->throw("argument <%s>: %s", $arg->short, $problem) if defined $problem;
-		return $coerced;
+		return $arg->type->coerce($value);
 	}
 
 	method consumeArgs($level, $words) {
@@ -246,13 +298,22 @@ loop continues with that command's level.
 =head2 Second pass: the values
 
 The config values are loaded once (an explicit C<--config>, given on any
-level, replaces the autoload chain). Then the selected levels are
-resolved from the innermost to the top level. Each declared option gets
-its value from the command line words of its level and the config values
-of its level's section (see L<Getopt::Pad::Spec::Option>); an inherited
-option gets the words collected on all levels. The innermost level
-consumes the positional words for its args (type check, conversion,
-C<prepare>). Each level's result object, created by
+level, replaces the autoload chain). Then the selected levels settle
+their values, from the innermost to the top level. Each declared option
+gets its value from the command line words of its level and the config
+values of its level's section (see L<Getopt::Pad::Spec::Option>); an
+inherited option gets the words collected on all levels. The innermost
+level consumes the positional words for its args (type check and
+conversion).
+
+Once every selected level has settled, the type's C<verify> runs on
+every single value of every level, and only then the type's C<prepare>,
+so a parse that fails creates no paths. Then the result objects are
+built, from the innermost level up. When options or args of the level
+have C<processValue>,
+the level's result object is created with the checked values first and
+handed to every callback; a second result object with the processed
+values replaces it. Each level's result object, created by
 L<Getopt::Pad::Result::Generator>, holds the result object of the level
 below.
 

@@ -7,13 +7,11 @@ use POSIX ();
 use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 
-# A dead writer's pid stays in the lock word.  Recycled to the process now
-# attaching, it answers kill(pid, 0), so no recovery fires and the map
-# deadlocks.  Our own pid there is a ghost unless a thread of ours holds this
-# map, which its hold count says.
-#
-# The probe runs in a child under a no-handler alarm: a regression is a signal
-# death rather than a hung suite, since a Perl alarm cannot interrupt an XSUB.
+# A dead writer's pid stays in the lock word; recycled to the process now
+# attaching it answers kill(pid, 0), so no recovery fires.  Our own pid there is
+# a ghost unless a thread of ours holds the map. The probe runs in a child under
+# a no-handler alarm (a Perl alarm cannot interrupt an XSUB), so a regression is
+# a signal death rather than a hung suite.
 
 my $dir = tempdir(CLEANUP => 1);
 my $path = "$dir/ownpid.shm";
@@ -27,8 +25,8 @@ sub in_child {
     return ($? & 127) == 14 ? 'hung' : $? & 127 ? 'signal' : ($? >> 8) == 2 ? 'died' : 'ok';
 }
 
-# wlock holds 0x80000000|pid when write-locked; the child stamps its own pid
-# there, exactly as a recycled pid would appear to it.
+# wlock holds 0x80000000|pid when write-locked; the child stamps its own pid, as
+# a recycled one would appear.
 is in_child(sub {
     open my $fh, '+<:raw', $path or die $!;
     seek $fh, 128, 0 or die $!;
@@ -39,12 +37,10 @@ is in_child(sub {
     die "value lost\n" unless ($m->get(2) // -1) == 43;
 }), 'ok', 'a write proceeds when the lock word holds our own recycled pid';
 
-# a genuinely foreign live holder must still block rather than be stolen
 { my $m = Data::HashMap::Shared::II->new($path, 64); $m->put(3, 44) }
-# The holder must outlive the probe's alarm by a wide margin.  At 6s against an
-# 8s alarm the verdict turned on which came first, the alarm or the recovery at
-# the first 2s futex expiry after the holder exited -- a coin flip on a loaded
-# machine.  It is killed the moment the probe returns, so a long sleep is free.
+# The holder must outlive the probe's 8s alarm by a wide margin, or the verdict
+# races the recovery at the first 2s futex expiry; it is killed once the probe
+# returns, so a long sleep is free.
 my $holder = fork // die "fork: $!";
 if (!$holder) { select undef, undef, undef, 120; POSIX::_exit(0) }
 {
@@ -60,11 +56,9 @@ is in_child(sub {
 kill 'KILL', $holder;
 waitpid $holder, 0;
 
-# Batch methods materialize every argument before taking the lock, so a tied
-# argument whose FETCH re-enters the same map -- even through a second handle --
-# runs before the lock, not under it.  It completes instead of self-deadlocking
-# the map, and its re-entrant write takes effect.  t/79 sweeps every variant and
-# method; here it also confirms the own-pid machinery is never reached for it.
+# A tied batch argument whose FETCH re-enters the same map, even through a
+# second handle, runs before the lock (t/79 sweeps every variant); here it also
+# confirms the own-pid machinery is not reached.
 {
     my $rpath = "$dir/reentrant.shm";
     my $A = Data::HashMap::Shared::SS->new($rpath, 256);
@@ -82,8 +76,7 @@ waitpid $holder, 0;
         $A->set_multi(outer => $tied);
     }), 'ok', 'a re-entrant batch argument runs before the lock, not under it (no deadlock)';
 
-    # Read it back from a child: the re-entrant write and the outer store both
-    # landed, and a regression (a wedged map) fails here instead of hanging.
+    # read back from a child, so a wedged map fails here instead of hanging
     is in_child(sub {
         my $C = Data::HashMap::Shared::SS->new($rpath, 256);
         die "inner not written\n" unless ($C->get('inner') // '') eq 'written';

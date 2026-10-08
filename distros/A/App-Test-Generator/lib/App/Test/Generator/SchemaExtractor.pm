@@ -80,11 +80,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 SYNOPSIS
 
@@ -1480,10 +1480,31 @@ sub extract_all {
 		my $schema = $self->_analyze_method($method);
 		$schemas{$method->{name}} = $schema;
 		$schema->{'module'} = $package_name;
+	}
 
-		# Write individual schema file
-		# Only write schema files if no_write is not set
-		$self->_write_schema($method->{name}, $schema) unless $params->{no_write};
+	# Second pass: enrich instance-method schemas with constructor args so the
+	# fuzz harness can build $self automatically.  The new() schema (if present)
+	# provides type info; we generate one representative value per required param.
+	# Enrichable: new: {} (no-arg ctor) or new: {hash} (with args).
+	# Unenrichable (coderef/object params): leave new: as the package-name string
+	# so _write_schema still emits new: ~ and self-fuzz.t keeps skipping those.
+	if (exists $schemas{new}) {
+		my $ctor_args = $self->_ctor_representative_args($schemas{new});
+		if (defined $ctor_args) {
+			for my $method_name (keys %schemas) {
+				next if $method_name eq 'new';
+				my $schema = $schemas{$method_name};
+				next unless exists $schema->{new} && defined $schema->{new};
+				$schema->{new} = $ctor_args;
+				$self->_log("  ENRICH: $method_name new: enriched with ctor args");
+			}
+		}
+	}
+
+	unless ($params->{no_write}) {
+		for my $method_name (keys %schemas) {
+			$self->_write_schema($method_name, $schemas{$method_name});
+		}
 	}
 
 	return \%schemas;
@@ -3499,7 +3520,7 @@ sub _analyze_pod {
 		my @sig_params = $sig =~ /\$(\w+)/g;
 
 		# Skip $self or $class
-		shift @sig_params if @sig_params && $sig_params[0] =~ /^(self|class)$/i;
+		shift @sig_params if @sig_params && $sig_params[0] =~ /^(self|class|pkg|proto|klass)$/i;
 
 		# Assign positions
 		foreach my $param (@sig_params) {
@@ -3541,7 +3562,7 @@ sub _analyze_pod {
 				$desc =~ s/^\s+|\s+$//g if $desc;
 
 				# Skip common non-parameters
-				next if $name =~ /^(self|class|return|returns?)$/i;
+				next if $name =~ /^(self|class|pkg|proto|klass|return|returns?)$/i;
 
 				$params{$name} ||= { _source => 'pod' };
 
@@ -3606,7 +3627,7 @@ sub _analyze_pod {
 		$desc =~ s/^\s+|\s+$//g if $desc;
 
 		# Skip common words that aren't parameters
-		next if $name =~ /^(self|class|return|returns?)$/i;
+		next if $name =~ /^(self|class|pkg|proto|klass|return|returns?)$/i;
 
 		$params{$name} ||= { _source => 'pod' };
 
@@ -3654,7 +3675,7 @@ sub _analyze_pod {
 		$desc =~ s/^\s+|\s+$//g;
 
 		# Skip common non-parameters
-		next if $name =~ /^(self|class|return|returns?)$/i;
+		next if $name =~ /^(self|class|pkg|proto|klass|return|returns?)$/i;
 
 		$params{$name} ||= { _source => 'pod' };
 
@@ -3722,7 +3743,7 @@ sub _analyze_pod {
 
 	# Default undocumented optionality: documented params are REQUIRED unless stated otherwise
 	for my $name (keys %params) {
-		next if $name =~ /^(self|class)$/i;
+		next if $name =~ /^(self|class|pkg|proto|klass)$/i;
 
 		# TODO: if optionality was never explicitly set, assume required.
 		# Currently disabled as it breaks some schemas — revisit in a future pass.
@@ -3763,7 +3784,7 @@ sub _analyze_pod {
 			# Named format: each 'name => {…}' entry maps directly by name.
 			while ($block =~ /\b(\w+)\s*=>\s*\{([^}]*)\}/g) {
 				my ($name, $spec) = ($1, $2);
-				next if $name =~ /^(self|class)$/i;
+				next if $name =~ /^(self|class|pkg|proto|klass)$/i;
 				$params{$name} //= { _source => 'pod' };
 				$params{$name}{_from_input_spec} = 1;
 				if (my $t = $self->_map_formal_input_type($spec)) {
@@ -3947,6 +3968,10 @@ sub _analyze_output_from_pod {
 			} elsif($block =~ /^\{/) {
 				if($block =~ /type\s*=>\s*['"]?(\w[\w:]*?)['"]?\s*[,}]/i) {
 					my $type = lc($1);
+					$type = 'string'   if $type eq 'scalar' || $type eq 'scalarref' || $type eq 'str';
+					$type = 'integer'  if $type eq 'int';
+					$type = 'number'   if $type eq 'float' || $type eq 'num';
+					$type = 'boolean'  if $type eq 'bool';
 					$type = 'hashref'  if $type eq 'hash';
 					$type = 'arrayref' if $type eq 'array';
 					if($VALID_OUTPUT_TYPES{$type}) {
@@ -5110,7 +5135,7 @@ sub _analyze_code {
 		my $pos = scalar keys %params;
 		while($code =~ /get_params\s*\(\s*['"](\w+)['"]/g) {
 			my $name = $1;
-			next if $name =~ /^(self|class)$/i;
+			next if $name =~ /^(self|class|pkg|proto|klass)$/i;
 			$params{$name} //= { _source => 'code', position => $pos++ };
 			$self->_log("  CODE: Found Params::Get parameter '$name'");
 		}
@@ -5889,7 +5914,7 @@ sub _extract_parameters_from_signature {
 		my $pos = 0;
 		while($code =~ /my\s+\$(\w+)\s*=\s*\$_\[(\d+)\]/g) {
 			my $name = $1;
-			next if $name =~ /^(self|class)$/i;
+			next if $name =~ /^(self|class|pkg|proto|klass)$/i;
 			$params->{$name} //= { _source => 'code', optional => 1, position => $pos++ };
 			$self->_log("  CODE: Found direct-index parameter '\$$name' at \$_[$2]");
 		}
@@ -5904,7 +5929,7 @@ sub _extract_parameters_from_signature {
 		while ($sig =~ /\$(\w+)/g) {
 			my $name = $1;
 
-			next if $name =~ /^(self|class)$/i;
+			next if $name =~ /^(self|class|pkg|proto|klass)$/i;
 
 			$params->{$name} //= {
 				_source => 'code',
@@ -5922,7 +5947,7 @@ sub _extract_parameters_from_signature {
 		while ($code =~ /my\s+\$(\w+)\s*=\s*shift/g) {
 			push @shifts, $1;
 		}
-		shift @shifts if @shifts && $shifts[0] =~ /^(self|class)$/i;
+		shift @shifts if @shifts && $shifts[0] =~ /^(self|class|pkg|proto|klass)$/i;
 		my $pos = 0;
 		foreach my $param (@shifts) {
 			$params->{$param} ||= { _source => 'code', optional => 1, position => $pos++ };
@@ -5936,7 +5961,7 @@ sub _extract_parameters_from_signature {
 		my @param_names = $sig =~ /\$(\w+)/g;
 		my $pos = 0;
 		foreach my $param (@param_names) {
-			next if $param =~ /^(self|class)$/i;
+			next if $param =~ /^(self|class|pkg|proto|klass)$/i;
 			$params->{$param} ||= { _source => 'code', optional => 1, position => $pos++ };
 		}
 	}
@@ -6016,7 +6041,7 @@ sub _parse_modern_signature {
 			my $name = $param_info->{name};
 
 			# Skip self/class
-			if ($name =~ /^(self|class)$/i) {
+			if ($name =~ /^(self|class|pkg|proto|klass)$/i) {
 				next;
 			}
 
@@ -6608,19 +6633,16 @@ sub _extract_defaults_from_code {
 	# whose empty %params would otherwise trigger this fallback and pick up
 	# my (...) = @_ from inner closures as if they were method params.
 	# TODO:  On constructors, use $class to help to determine the output type
-	if (!keys %{$params} && $code !~ /my\s+\$(?:self|class)\s*=\s*\$_\[0\]/) {
+	if (!keys %{$params} && $code !~ /my\s+\$(?:self|class|pkg|proto|klass)\s*=\s*\$_\[0\]/) {
 		my $position = 0;
 
 		# Style 1: my ($a, $b) = @_;
 		while ($code =~ /my\s*\(\s*([^)]+)\s*\)\s*=\s*\@_/g) {
 			my @vars = $1 =~ /\$(\w+)/g;
 			foreach my $var (@vars) {
-				if(($var eq 'class') && ($position == 0) && ($method->{name} eq 'new')) {
-					# Don't include "class" in the variable names of the constructor
-					delete $params->{'class'};
-				} elsif(($var eq 'self') && ($position == 0) && ($method->{name} ne 'new')) {
-					# Don't include "self" in the variable names
-					delete $params->{'self'};
+				if(($position == 0) && ($var =~ /^(self|class|pkg|proto|klass)$/i)) {
+					# Invocant — skip it
+					delete $params->{$var};
 				} else {
 					$params->{$var} ||= { position => $position++ };
 					$self->_log("  CODE: $var extracted from \@_ list assignment");
@@ -6631,12 +6653,9 @@ sub _extract_defaults_from_code {
 		# Style 2: my $x = shift;
 		while ($code =~ /my\s+\$(\w+)\s*=\s*shift\b/g) {
 			my $var = $1;
-			if(($var eq 'class') && ($position == 0) && ($method->{name} eq 'new')) {
-				# Don't include "class" in the variable names of the constructor
-				delete $params->{'class'};
-			} elsif(($var eq 'self') && ($position == 0) && ($method->{name} ne 'new')) {
-				# Don't include "self" in the variable names
-				delete $params->{'self'};
+			if(($position == 0) && ($var =~ /^(self|class|pkg|proto|klass)$/i)) {
+				# Invocant — skip it
+				delete $params->{$var};
 			} else {
 				$params->{$var} ||= { position => $position++ };
 				$self->_log("  CODE: $var is extracted from shift");
@@ -6646,7 +6665,7 @@ sub _extract_defaults_from_code {
 		# Style 3: my $x = $_[0];
 		while ($code =~ /my\s+\$(\w+)\s*=\s*\$_\[(\d+)\]/g) {
 			my ($var, $index) = ($1, $2);
-			if(($var ne 'class') || ($position > 0) || ($method->{name} ne 'new')) {
+			if(($index > 0) || ($var !~ /^(self|class|pkg|proto|klass)$/i)) {
 				$params->{$var} ||= { position => $index };
 				$self->_log("  CODE: $var is extracted from \$_\[$index\]");
 			}
@@ -8058,7 +8077,10 @@ sub _write_schema {
 		if((ref($schema->{output}{_error_handling}) eq 'HASH') && (scalar(keys %{$schema->{output}{_error_handling}}) == 0)) {
 			delete $schema->{output}{_error_handling};
 		}
-		$output->{'output'} = $schema->{'output'};
+		# value/alt_value are inference metadata; Return::Set does not recognise them as validation rules
+		my %out_spec = %{$schema->{'output'}};
+		delete @out_spec{qw(value alt_value)};
+		$output->{'output'} = \%out_spec;
 	}
 
 	if($schema->{'output'}{'type'} && ($schema->{'output'}{'type'} eq 'scalar')) {
@@ -8320,11 +8342,19 @@ sub _serialize_parameter_for_yaml {
 			$cleaned{type} = 'coderef';
 			$cleaned{_note} = 'CODE reference - provide sub { } in tests';
 		} elsif ($semantic eq 'enum') {
-			# Enum: keep as string but add valid values
-			$cleaned{type} = 'string';
-			if ($param->{enum} && ref($param->{enum}) eq 'ARRAY') {
-				$cleaned{enum} = $param->{enum};
-				$cleaned{_note} = 'Must be one of: ' . join(', ', @{$param->{enum}});
+			# Enum: keep as string but add valid values.
+			# If the formal input spec explicitly declared a different type, honour
+			# it — the enum values from code analysis are regex-internal alternates
+			# (e.g. numeric format variants) that are meaningless as string choices.
+			if ($param->{_from_input_spec} && defined $param->{type} && $param->{type} ne 'string') {
+				# Formal spec wins; suppress spurious regex-derived enum.
+				delete $cleaned{enum};
+			} else {
+				$cleaned{type} = 'string';
+				if ($param->{enum} && ref($param->{enum}) eq 'ARRAY') {
+					$cleaned{enum} = $param->{enum};
+					$cleaned{_note} = 'Must be one of: ' . join(', ', @{$param->{enum}});
+				}
 			}
 		}
 	}
@@ -8332,7 +8362,10 @@ sub _serialize_parameter_for_yaml {
 	# Handle memberof even if not marked with semantic.
 	# enum and memberof are mutually exclusive — only set memberof when enum
 	# is not already being output (avoids the "has both" validation error).
-	if($param->{enum} && ref($param->{enum}) eq 'ARRAY' && !$cleaned{enum}) {
+	# Also suppress when the formal input spec declared a non-string type —
+	# the enum values are regex-internal alternates, not valid string members.
+	my $formal_non_string = $param->{_from_input_spec} && defined $param->{type} && $param->{type} ne 'string';
+	if($param->{enum} && ref($param->{enum}) eq 'ARRAY' && !$cleaned{enum} && !$formal_non_string) {
 		$cleaned{memberof} = $param->{enum};
 	}
 	if($param->{memberof} && ref($param->{memberof}) eq 'ARRAY') {
@@ -8397,6 +8430,57 @@ sub _format_relationship {
 # _needs_object_instantiation
 #
 # Purpose:    Determine whether a method requires
+# --------------------------------------------------
+# _ctor_representative_args
+#
+# Purpose:    Given a new() method schema, return a
+#             hashref of representative values for its
+#             required parameters, suitable for use as
+#             the new: key in an instance-method schema.
+#             Returns {} for a no-arg constructor.
+#             Returns undef when any required param is
+#             of a type that cannot be represented as a
+#             plain YAML scalar (e.g. coderef, object).
+#
+# Entry:      $ctor_schema - schema hashref for new().
+#
+# Exit:       Hashref of {param => value} or undef.
+# --------------------------------------------------
+sub _ctor_representative_args {
+	my ($self, $ctor_schema) = @_;
+
+	my %REP = (
+		string   => 'test',
+		integer  => 42,
+		float    => 3.14,
+		boolean  => 1,
+		hashref  => {},
+		arrayref => [],
+		any      => 'test',
+	);
+
+	my $input = $ctor_schema->{input} // {};
+	my %args;
+	for my $param_name (keys %$input) {
+		my $spec = $input->{$param_name} // {};
+		next if $spec->{optional};
+		# File-path params require a real file to exist, and object/coderef params
+		# cannot be represented as plain YAML scalars.  Fall back to a no-arg
+		# constructor ({}) rather than returning undef: the constructor may still
+		# work fine with no arguments, and the fuzz harness will discover at
+		# runtime whether new() truly requires the param.
+		if ($param_name =~ /(?:file|path|dir|filename)/i) {
+			return {};
+		}
+		my $type = $spec->{type} // 'string';
+		unless (exists $REP{$type}) {
+			return {};
+		}
+		$args{$param_name} = $REP{$type};
+	}
+	return \%args;
+}
+
 #             an object to be instantiated before
 #             it can be called, and if so return
 #             the package name to instantiate.
@@ -8976,7 +9060,7 @@ sub _detect_constructor_requirements {
 		push @shift_params, $1;
 	}
 	# Remove $self or $class if present
-	@shift_params = grep { $_ !~ /^(self|class)$/i } @shift_params;
+	@shift_params = grep { $_ !~ /^(self|class|pkg|proto|klass)$/i } @shift_params;
 
 	if (@shift_params) {
 		$requirements{parameters} = \@shift_params;
@@ -9712,12 +9796,12 @@ sub _validate_pod_code_agreement {
 		}
 
 		if(!exists $pod_params->{$param} && exists $code_params->{$param}) {
-			if($param eq 'class') {
-				# $class is the class invocant, not a user-facing parameter
+			if($param =~ /^(class|pkg|proto|klass)$/i) {
+				# class invocant, not a user-facing parameter
 				next;
 			}
 			if($param eq 'self') {
-				# $self is the instance invocant, not a user-facing parameter
+				# instance invocant, not a user-facing parameter
 				next;
 			}
 			push @errors, "Parameter '\$$param' found in code but not documented in POD";

@@ -16,11 +16,11 @@ Readonly my $MODE_SHARED_FIXTURE => 'shared_fixture';
 Readonly my $FIXTURE_SHARED       => 'shared';
 Readonly my $FIXTURE_NEW_PER_TEST => 'new_per_test';
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =head1 DESCRIPTION
 
@@ -104,8 +104,8 @@ C<mode> key set to either C<shared> or C<new_per_test>.
 
     {
         self      => { type => OBJECT,  isa     => 'App::Test::Generator::Planner::Fixture' },
-        schema    => { type => HASHREF },
-        isolation => { type => HASHREF },
+        schema    => { type => HASHREF, optional => 1 },
+        isolation => { type => HASHREF, optional => 0 },
     }
 
 =head4 output
@@ -125,7 +125,7 @@ C<mode> key set to either C<shared> or C<new_per_test>.
 sub plan {
 	my ($self, $schema, $isolation) = @_;
 
-	# Validate that isolation is a hashref before iterating
+	croak 'schema must be a hashref'    if defined($schema) && ref($schema) ne 'HASH';
 	croak 'isolation must be a hashref' unless ref($isolation) eq 'HASH';
 
 	my %fixture;
@@ -137,6 +137,7 @@ sub plan {
 	# fresh object constructed per test case.
 	# --------------------------------------------------
 	for my $method (keys %{$isolation}) {
+		next unless ref($isolation->{$method}) eq 'HASH';
 		my $mode = ($isolation->{$method}{fixture} // '') eq $MODE_SHARED_FIXTURE
 			? $FIXTURE_SHARED
 			: $FIXTURE_NEW_PER_TEST;

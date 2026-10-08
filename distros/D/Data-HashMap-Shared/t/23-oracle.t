@@ -6,10 +6,9 @@ use File::Spec ();
 
 use Data::HashMap::Shared::II;
 
-# Model-based / oracle test: drive a long random stream of operations against
-# the map AND a plain Perl-hash reference, then reconcile. A small key space
-# forces frequent collisions, updates, removes, and tombstone reuse / resizes.
-# Deterministic (srand) so failures reproduce.
+# Random op stream against the map and a plain hash, then reconcile; the small
+# key space forces collisions, tombstone reuse and resizes. Seeded so failures
+# reproduce.
 
 sub tmp { File::Temp::tempnam(File::Spec->tmpdir, 'shm_oracle') . '.shm' }
 
@@ -39,28 +38,27 @@ sub reconcile {
     is($ghost, 0, "$label: absent keys return undef");
 }
 
-# values stay well within int64 (and 64-bit Perl IV), so oracle arithmetic
-# matches the map's exactly (no wrap in this range)
+# values stay well within int64, so oracle arithmetic matches the map's exactly
 for my $round (1 .. $ROUNDS) {
     for (1 .. $OPS) {
         my $k  = int rand $KEYSPACE;
         my $op = int rand 5;
-        if ($op == 0) {                              # put / overwrite
+        if ($op == 0) {
             my $v = int(rand 1e9);
             $m->put($k, $v);
             $oracle{$k} = $v;
-        } elsif ($op == 1) {                         # remove
+        } elsif ($op == 1) {
             $m->remove($k);
             delete $oracle{$k};
-        } elsif ($op == 2) {                         # incr_by (creates at delta)
+        } elsif ($op == 2) {
             my $d = int(rand 2001) - 1000;
             $m->incr_by($k, $d);
             $oracle{$k} = ($oracle{$k} // 0) + $d;
-        } elsif ($op == 3) {                         # max (insert-if-absent)
+        } elsif ($op == 3) {
             my $v = int(rand 1e9);
             $m->max($k, $v);
             $oracle{$k} = (exists $oracle{$k} && $oracle{$k} > $v) ? $oracle{$k} : $v;
-        } else {                                     # get (exercise lookups)
+        } else {
             $m->get($k);
         }
     }

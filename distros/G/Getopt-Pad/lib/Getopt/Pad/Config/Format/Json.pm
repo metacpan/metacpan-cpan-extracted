@@ -6,12 +6,25 @@ use Getopt::Pad::Config::Format;
 class Getopt::Pad::Config::Format::Json :isa(Getopt::Pad::Config::Format) :strict(params) {
 	use JSON::PP ();
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	use constant NAMES => ['json'];
 
+	# An empty file sets nothing. Values arrive as plain scalars, as YAML
+	# gives them: booleans as 1 and 0, so a string option set to true reads
+	# 1, not an object; numbers as written, so a large integer is not
+	# rounded to a float before a bigint option sees it.
 	method parse($text) {
-		return JSON::PP->new->decode($text);
+		return {} if $text !~ /\S/;
+		return $self->plainScalars(JSON::PP->new->allow_bignum->decode($text));
+	}
+
+	method plainScalars($data) {
+		return [map { $self->plainScalars($_) } $data->@*] if ref $data eq 'ARRAY';
+		return { map { $_ => $self->plainScalars($data->{$_}) } keys $data->%* } if ref $data eq 'HASH';
+		return $data ? 1 : 0 if JSON::PP::is_bool($data);
+		return "$data" if ref $data;
+		return $data;
 	}
 
 	method dump($data) {
@@ -46,10 +59,13 @@ Getopt::Pad::Config::Format::Json - The json config file format
 
 The config file format C<json>, based on L<JSON::PP>, which comes with
 Perl. Files are parsed as strict JSON: comments and trailing commas are
-errors. C<true> and C<false> are accepted for C<flag> and C<bool>
-options. C<null> is reported as C<no value given> (for C<hash> and
-C<objectlist> options as a value of the wrong shape). An empty file is a
-parse error; a file that sets nothing contains C<{}>.
+errors. C<true> and C<false> become plain 1 and 0, which C<flag> and
+C<bool> options accept and other options read as values (a C<string>
+option set to C<true> reads 1). C<null> is reported as C<no value given>
+(for C<hash> and C<objectlist> options as a value of the wrong shape).
+An empty file, or one with only white space, sets nothing. Numbers
+reach the options as written, so a large integer is not rounded to a
+float first (see L<Getopt::Pad/bigint>).
 
 C<--create-default-config> writes indented JSON with the keys sorted.
 

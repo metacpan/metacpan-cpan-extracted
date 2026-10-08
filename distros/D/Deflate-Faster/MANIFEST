@@ -21,8 +21,10 @@ t/04-png.t
 t/05-dropin-compat.t
 t/06-threads.t
 t/07-review-regressions.t
+t/08-configure-fallback.t
 typemap
 xt/cpan-changes.t
+xt/cache-allocation.t
 xt/manifest.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -2,7 +2,7 @@ use v5.40;
 use feature qw[class try];
 no warnings 'experimental::class';
 #
-class Alien::Xrepo::Runtime v1.0.3 {
+class Alien::Xrepo::Runtime v1.0.4 {
     use Alien::Xrepo;
     use Alien::Xrepo::Build::Recipe;
     use Config   ();
@@ -191,7 +191,7 @@ class Alien::Xrepo::Runtime v1.0.3 {
     method package_info ( $pkg = undef ) { $self->_pkg_info($pkg) }
 };
 #
-class Alien::Xrepo::Runtime::Alt v1.0.3 {
+class Alien::Xrepo::Runtime::Alt v1.0.4 {
     field $base : param;
     field $pkg : reader(pkg_name) : param;
     method package_names ()      { $base->package_names }

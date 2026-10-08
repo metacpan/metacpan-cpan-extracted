@@ -10,7 +10,6 @@ use Data::HashMap::Shared::SI;
 
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
-# Basic cursor iteration (II)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -30,7 +29,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# Cursor method API
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -49,7 +47,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# Cursor reset
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -70,7 +67,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# Multiple cursors on same map
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -88,13 +84,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is(scalar @c1_keys, 3, 'cursor 1 visited all');
     is(scalar @c2_keys, 3, 'cursor 2 visited all');
 
-    # Same keys in both
     is_deeply([sort @c1_keys], [sort @c2_keys], 'cursors see same data');
 
     unlink $path;
 }
 
-# Remove during each (safe iteration)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -113,13 +107,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
     for my $k (@removed) {
         ok(!defined(shm_ii_get $map, $k), "removed key $k is gone")
-            or last;  # avoid flooding
+            or last;
     }
 
     unlink $path;
 }
 
-# Remove during cursor iteration
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -143,7 +136,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# iter_reset mid-iteration
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -165,7 +157,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# SS cursor (string key + string value)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -182,7 +173,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# SI cursor (string key + int value)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI->new($path, 1000);
@@ -199,7 +189,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# Cursor DESTROY mid-iteration
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
@@ -207,11 +196,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
     {
         my $cur = shm_ii_cursor $map;
-        shm_ii_cursor_next $cur;  # partial iteration
-        # $cur goes out of scope here — DESTROY should clean up iterating count
+        shm_ii_cursor_next $cur;
     }
 
-    # Map should still work fine
     shm_ii_put $map, 100, 1000;
     is(shm_ii_get $map, 100, 1000, 'map works after cursor DESTROY');
 
@@ -223,10 +210,8 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::II->new($path, 1000);
 
-    # Insert enough to grow table
     shm_ii_put $map, $_, $_ for 1..200;
 
-    # Remove most entries during iteration — deferred shrink/compact
     my $removed = 0;
     while (my ($k, $v) = shm_ii_each $map) {
         shm_ii_remove $map, $k;
@@ -235,17 +220,15 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is($removed, 200, 'removed all during iteration');
     is(shm_ii_size $map, 0, 'size is 0 after mass remove');
 
-    # Verify map is functional after deferred flush
     shm_ii_put $map, 1, 42;
     is(shm_ii_get $map, 1, 42, 'map functional after deferred flush');
 
     unlink $path;
 }
 
-# Cursor with LRU
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 10);  # max_size=10
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 10);
 
     shm_ii_put $map, $_, $_ * 10 for 1..10;
 
@@ -259,9 +242,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# A seek that finds nothing must leave the iteration alone.  It used to switch
-# shard (and reset iter_pos) before probing, so a failed seek cost a sharded
-# pass its position, and rewound an exhausted cursor to a whole second pass.
 {
     my $dir = File::Temp::tempdir(CLEANUP => 1);
     my $prefix = File::Spec->catfile($dir, 'seekshard');
@@ -277,7 +257,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     while (my ($k) = shm_ii_cursor_next $cur) {
         $yields++;
         $seen{$k}++;
-        last if $yields > 200;          # a repositioning seek used to loop here
+        last if $yields > 200;          # bail out if a failed seek repositions
         ok !(shm_ii_cursor_seek $cur, $missing), 'seek of a missing key is false'
             if $yields == 1;
         shm_ii_cursor_seek $cur, $missing;
@@ -304,16 +284,14 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is($second, 0, 'a failed seek does not rewind an exhausted cursor');
 }
 
-# keys/values/items walk states[] directly; each and the cursor go through the
-# SIMD live-slot scan.  Two implementations of the same traversal, and nothing
-# compared them -- so a scan that skipped one slot per group was invisible to
-# keys() while each() silently lost entries.  A sparse table is what exposes it:
-# in a dense one a neighbour lands in the skipped position and masks the gap.
+# keys() walks states[] directly, each() and the cursor use the SIMD live-slot
+# scan. Only a sparse table exposes a skipped slot; in a dense one a neighbour
+# masks the gap.
 {
     my $dir = File::Temp::tempdir(CLEANUP => 1);
     my $path = File::Spec->catfile($dir, 'sparse.shm');
     my $map = Data::HashMap::Shared::II->new($path, 100_000);
-    $map->reserve(50_000);                    # many slots, few entries
+    $map->reserve(50_000);
     my $N = 300;
     $map->put($_, $_ * 3) for 1 .. $N;
     cmp_ok($map->capacity, '>=', 8 * $N, 'sparse table: far more slots than entries');

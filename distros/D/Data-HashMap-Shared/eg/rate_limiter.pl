@@ -17,14 +17,13 @@ sub check_rate_limit {
     return $count <= $max_requests ? 1 : 0;
 }
 
-# Subjects that stop calling leave expired entries holding their slots.  A
-# slice that cycles the table inside the window keeps the probes short: the
-# 262144 slots this map can grow to, over 60 ticks of a second.
+# Expired entries of subjects that stopped calling still hold their slots; a
+# 5000-slot slice each second cycles the 262144-slot maximum table within the
+# window.
 sub reclaim_expired { my ($n, $done) = $limits->flush_expired_partial(5000); $n }
 
 reclaim_expired();
 
-# simulate requests
 for my $i (1 .. 105) {
     my $ok = check_rate_limit("192.168.1.1");
     printf "request %3d: %s\n", $i, $ok ? "allowed" : "RATE LIMITED"

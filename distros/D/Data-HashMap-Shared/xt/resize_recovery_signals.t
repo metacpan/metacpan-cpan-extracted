@@ -8,9 +8,9 @@ use Data::HashMap::Shared::SS;
 
 plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
 
-# A writer is killed while a resize rehashes keys of 40 MB.  The process that
-# recovers the lock finishes that resize under a fast signal timer: it must not
-# be croaked with the lock held, so a third process can still write.
+# A writer is killed mid-resize (keys of 40 MB). The process recovering the lock
+# finishes the resize under a fast signal timer and must not be croaked with the
+# lock held, so a third process can still write.
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 my $mb = 40;
 my @args = (1000, 0, 0, 0, (6 * $mb + 16) << 20);

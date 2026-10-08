@@ -6,11 +6,10 @@ use vars qw(@net_log $VERSION @ISA @EXPORT_OK);
 
 use Archive::Tar;
 use Archive::Zip;
-use Env::Path;
 use Path::Tiny;
 use File::Temp qw(tempfile);
 use File::Type;
-use LWP::UserAgent;
+use HTTP::Tiny;
 use Module::CoreList;
 use Scalar::Util qw(blessed);
 use CPAN::Meta;
@@ -23,11 +22,9 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(finddeps);
 
-$VERSION = '3.14';
+$VERSION = '4.00';
 
 use constant MAXINT => ~0;
-
-eval 'use LWP::Protocol::https';
 
 =head1 NAME
 
@@ -56,6 +53,13 @@ In version 2.49 you used the C<configreqs> argument to specify that you were
 interested in configure-time requirements as well as build- and run-time
 requirements. That option no longer exists as of version 3.00, it will always
 report on configure, build, test, and run-time requirements.
+
+Up to version 3.13 specifying a bogus directory for C<cachedir> would be
+ignored.
+
+From version 4.00 onwards you *must* have Net::SSLeay and IO::Socket::SSL
+available. A perl that doesn't have SSL support is broken. We will no
+longer fall back to wget.
 
 
 =head1 HOW IT WORKS
@@ -411,23 +415,19 @@ sub _get {
 
     push @net_log, $url;
 
-    if($LWP::Protocol::https::VERSION || $url !~ /^https:/) {
-        my $ua = LWP::UserAgent->new();
-        $ua->env_proxy();
-        $ua->agent(__PACKAGE__."/$VERSION");
-        my $response = $ua->get($url);
-        if($response->is_success()) {
-            return $response->content();
-        }
-        return undef;
-    } elsif((my $wget) = grep { -x "$_/wget" } Env::Path->PATH->List) {
-        open(my $wget_fh, '-|', 'wget', '--no-check-certificate', '-qO', '-', $url) || do {
-            warn("Couldn't wget: $!\n");
-            return undef;
-        };
-        return join('', <$wget_fh>);
+    if($url =~ m{^file://}) {
+        $url =~ s{^file://}{};
+        $url =~ s{^/([A-Z]:)}{$1};
+        open(my $fh, '<', $url) || return undef;
+        return join('', <$fh>);
     } else {
-        die("Ohnoes! No LWP::Protocol::https and couldn't wget either.\n");
+        my $response = HTTP::Tiny->new(
+            # allow_credentialed_redirects => 1,
+            # allow_downgrade              => 1,
+            agent => __PACKAGE__."/$VERSION",
+        )->get($url);
+        return $response->{content} if($response->{success});
+        return undef;
     }
 }
 

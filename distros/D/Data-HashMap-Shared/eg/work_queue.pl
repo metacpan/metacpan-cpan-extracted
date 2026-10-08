@@ -4,25 +4,20 @@ use warnings;
 use Data::HashMap::Shared::SS;
 
 # Shared work queue: producers `put` items keyed by job id; workers
-# atomically claim with `cas_take`. Claim is exclusive — only one
-# worker can take each job, even with N workers racing on the same id.
+# atomically claim with `cas_take`, so each job goes to exactly one worker.
 
 my $queue = Data::HashMap::Shared::SS->new("/tmp/dhms_queue_$$.shm", 100_000);
 
-# Producer side
 sub enqueue {
     my ($id, $payload) = @_;
     shm_ss_put $queue, $id, $payload;
 }
 
-# Worker side: claim-or-skip. Returns the payload if this worker won
-# the race; undef if another worker already took it.
+# Returns the payload if this worker won the race, undef if another took it.
 sub claim {
     my ($id, $expected_payload) = @_;
     return shm_ss_cas_take $queue, $id, $expected_payload;
 }
-
-# Demo: enqueue some jobs, spawn 4 workers, count wins.
 
 {
     my $njobs = 20;
@@ -48,10 +43,7 @@ sub claim {
     close $start_r;
     close $start_w;
     waitpid($_, 0) for @pids;
-    # Which worker wins is scheduler-dependent: twenty claims finish before four
-    # woken processes are dispatched, so one worker often sweeps the queue.  The
-    # invariant is exclusivity, and the totals show it: every job claimed, none
-    # claimed twice.
+    # which worker wins is scheduler-dependent; the totals show exclusivity
     print "claimed: ", $njobs - $queue->size, "/$njobs, remaining unclaimed: ",
           $queue->size, "\n";
     $queue->unlink;

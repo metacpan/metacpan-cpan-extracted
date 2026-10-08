@@ -6,7 +6,7 @@ use 5.010;
 
 # ABSTRACT: Create policy files: CODE_OF_CONDUCT, CONTRIBUTING, FUNDING, GOVERNANCE, SECURITY, SUPPORT, etc.
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use Module::Load   qw( load );
 use Module::Loader ();
@@ -71,7 +71,7 @@ Software::Policies - Create policy files: CODE_OF_CONDUCT, CONTRIBUTING, FUNDING
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -160,7 +160,7 @@ Create a policy and return it as a text string.
 =head1 SEE ALSO
 
 If you use L<Dist::Zilla> as your project distribution builder, please take a look
-at L<https://metacpan.org/pod/Dist::Zilla::App::Cmd::policies> to generate the files based on information
+at L<https://metacpan.org/pod/Dist::Zilla::App::Command::policies> to generate the files based on information
 in your B<dist.ini> file and at L<https://metacpan.org/pod/Dist::Zilla::Test::Software::Policies> to
 test the files are kept updated at every release. These modules are in the
 L<https://metacpan.org/pod/Dist::Zilla::Plugin::Softare::Policies> distribution.

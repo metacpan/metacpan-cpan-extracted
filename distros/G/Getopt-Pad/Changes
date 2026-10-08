@@ -1,5 +1,71 @@
 Revision history for Getopt::Pad
 
+0.06    2026-10-07
+        - Add processValue to option and arg specs: a coderef called
+          with the level's result object and each value it was set to,
+          whose return value replaces it, e.g. to wrap a path in an
+          object
+        - Add the date and duration types: natural language parsed by
+          DateTime::Format::Natural (now a recommended module) into
+          DateTime and DateTime::Duration objects, in the zone of the
+          new timezone key (default: local)
+        - New example for the date and duration types
+        - Spec errors about an option or arg of a command name the
+          command, and an unknown option type names the option or arg
+        - An odd number of GetOptions arguments is a spec error
+          (GetOptions expects key/value pairs) instead of Perl's own
+          signature message
+        - An uncaught spec error always exits with status 255, whatever
+          $! held
+        - croak is no longer a reserved reader name
+        - registerType and registerFormat load a module file only for a
+          class that is not defined yet, so a class defined in the
+          script without NAMES gets the NAMES message
+        - The help output lists every name of an option, the primary
+          name first, as typed: --owner, -o. Help and command line
+          errors write a single-letter name with one dash (-v)
+        - The help output and --create-default-config show defaults as
+          the spec wrote them for every type, so a custom type's
+          coerced value no longer leaks into them. The presentsAsGiven
+          type method is gone again
+        - Args show [has to exist] and [created if missing] in the help
+        - An empty list or mapping default shows no Default line
+        - An objectlist index with a leading zero (00.host) is an error,
+          and a large index no longer allocates a list up to it before
+          the gap below it is reported
+        - A float value too large for a Perl number (1e999) is rejected
+          as not finite instead of reading as Inf
+        - An int value outside Perl's integer range is rejected as too
+          large instead of reading as a rounded float or Inf
+        - Add bigint to int options and args: the reader returns a
+          Math::BigInt, so integers of any size are kept exactly. JSON
+          config files hand large integers over unrounded
+        - mustExist is checked only on the path a parse settles on: a
+          default missing on the user's machine is no longer a spec
+          error, and is a user error only when the parse uses it
+        - A path of the wrong kind is reported as 'PATH' is not a file
+          (or directory) instead of as missing
+        - createPathIfMissing creates nothing until every value of
+          every selected level passed its checks
+        - Add the verify type method for checks that depend on the
+          machine; it runs on the values of every selected level before
+          any prepare
+        - --create-default-config leaves out options whose default is
+          undef, so the file it writes loads back
+        - An empty config file, or a YAML file with only comments, sets
+          nothing instead of being an error
+        - JSON true and false reach non-boolean options as plain 1 and
+          0, as from YAML, not as JSON::PP::Boolean objects
+        - Errors in the structure of a config file are shown with the
+          help of the command the user ran, like every other error
+        - Command line words are decoded from UTF-8 like config file
+          values, unless decoded already (perl -CA) or not valid UTF-8.
+          The help, error messages and completion candidates are printed
+          as UTF-8 unless the handle has an encoding layer. Non-ASCII
+          strings in a spec need use utf8 to match
+        - The bash completion script works with bash 3.2, the system
+          bash of macOS
+
 0.05    2026-10-05
         - Require Object::Pad 0.818: class methods with a signature fail
           on older versions (GitHub issue #1)

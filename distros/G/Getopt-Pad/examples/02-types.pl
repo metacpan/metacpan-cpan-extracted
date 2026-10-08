@@ -3,6 +3,8 @@
 # One option per built-in type, showing what each reader returns:
 #   flag (the default), bool (negatable), counter, string,
 #   int (with min/max), float, file and dir (with mustExist), url.
+# Not shown: date and duration, which need DateTime::Format::Natural;
+# see 09-dates.pl.
 # Most types also have other names, e.g. 's' for string, 'i' for int,
 # '!' for bool and '+' for counter; see "TYPES" in the Getopt::Pad docs.
 #
@@ -34,7 +36,7 @@ my $opt = GetOptions(
 		'work-dir' => { type => 'dir', mustExist => 1, help => 'directory that has to exist' },
 		'source'   => { type => 'url', help => 'URL of the form scheme://... (ssh://, https://, ...)' },
 	},
-	description => 'Demonstrate every built-in option type.',
+	description => 'Demonstrate the built-in option types.',
 );
 
 dumpResult($opt);

@@ -404,10 +404,7 @@ from_hash(SV* self_sv, SV* href)
         hv_iterinit(hv);
         HE* he;
         while ((he = hv_iternext(hv))) {
-            STRLEN klen; const char* kstr = HePV(he, klen);
-            if (klen > HM_MAX_STR_LEN) croak("key too long (max 2GB)");
-            bool kutf8 = HeUTF8(he) ? true : false;
-            uint32_t khash = hm_hash_string(kstr, (uint32_t)klen);
+            EXTRACT_HASH_KEY(he);
             SV* val = hv_iterval(hv, he);   /* HeVAL is NULL for a tied hash */
             val = HM_STORE_SV(self, val, newSVsv(val));
             if (!hashmap_sa_put(self, kstr, (uint32_t)klen, khash, kutf8, (void*)val, 0)) {

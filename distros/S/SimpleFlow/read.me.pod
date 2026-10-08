@@ -6,7 +6,7 @@ SimpleFlow - easy, simple workflow manager (and logger); for keeping track of an
 
 =head1 VERSION
 
-version 0.194
+version 0.195
 
 =head1 DESCRIPTION
 

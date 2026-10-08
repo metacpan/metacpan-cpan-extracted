@@ -27,8 +27,8 @@ sub rss_kb {
     return undef;
 }
 
-# A result pushed without being mortalised is never freed: 1.6M leaked
-# scalars are well over 100MB, while a clean run stays flat after warm-up.
+# an unmortalised result leaks: 1.6M scalars is well over 100MB, a clean run is
+# flat after warm-up
 my $calls = 50_000;
 for my $shape (['SS', 0], ['II', 0], ['SS', 4], ['II', 4]) {
     my ($class, $shards) = @$shape;

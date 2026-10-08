@@ -25,7 +25,7 @@ use FindBin qw($Bin);
 use Readonly;
 use Scalar::Util qw(blessed reftype);
 use Test::Most;
-use Test::Returns qw(returns_ok);
+use Test::Returns;
 use Test::Without::Module ();	# loaded but not applied globally yet
 
 use lib 't/lib';
@@ -69,14 +69,14 @@ note '=== A. Cross-backend API consistency ===';
 	my $xml = Database::test3->new({ directory => $DATA_DIR, max_slurp_size => 1 });
 
 	# A1 — columns() returns an arrayref on all backends
-	returns_ok($csv->columns(), { type => 'arrayref' }, 'A1a CSV: columns() returns arrayref');
-	returns_ok($psv->columns(), { type => 'arrayref' }, 'A1b PSV: columns() returns arrayref');
-	returns_ok($xml->columns(), { type => 'arrayref' }, 'A1c XML(SQL): columns() returns arrayref');
+	returns_is($csv->columns(), { type => 'arrayref' }, 'A1a CSV: columns() returns arrayref');
+	returns_is($psv->columns(), { type => 'arrayref' }, 'A1b PSV: columns() returns arrayref');
+	returns_is($xml->columns(), { type => 'arrayref' }, 'A1c XML(SQL): columns() returns arrayref');
 
 	# A2 — schema() returns a hashref on all backends
-	returns_ok($csv->schema(), { type => 'hashref' }, 'A2a CSV: schema() returns hashref');
-	returns_ok($psv->schema(), { type => 'hashref' }, 'A2b PSV: schema() returns hashref');
-	returns_ok($xml->schema(), { type => 'hashref' }, 'A2c XML(SQL): schema() returns hashref');
+	returns_is($csv->schema(), { type => 'hashref' }, 'A2a CSV: schema() returns hashref');
+	returns_is($psv->schema(), { type => 'hashref' }, 'A2b PSV: schema() returns hashref');
+	returns_is($xml->schema(), { type => 'hashref' }, 'A2c XML(SQL): schema() returns hashref');
 
 	# A3 — count() returns a non-negative integer on all backends
 	my $csv_cnt = $csv->count();
@@ -99,9 +99,9 @@ note '=== A. Cross-backend API consistency ===';
 	# A5 — fetchrow_hashref() returns a hashref on match, undef on miss
 	my $csv_row = $csv->fetchrow_hashref(entry => $ENTRY_ONE);
 	my $psv_row = $psv->fetchrow_hashref(entry => 'first');
-	ok(ref($csv_row) eq 'HASH', 'A5a CSV: fetchrow_hashref returns hashref on match');
-	ok(ref($psv_row) eq 'HASH', 'A5b PSV: fetchrow_hashref returns hashref on match');
-	ok(!defined($csv->fetchrow_hashref(entry => '__no_such_entry__')),
+	returns_is($csv_row, { type => 'hashref' }, 'A5a CSV: fetchrow_hashref returns hashref on match');
+	returns_is($psv_row, { type => 'hashref' }, 'A5b PSV: fetchrow_hashref returns hashref on match');
+	returns_is($csv->fetchrow_hashref(entry => '__no_such_entry__'), { type => 'void' },
 		'A5c CSV: fetchrow_hashref returns undef on miss');
 
 	# A6 — SQLite backend (if available) also satisfies the same contract
@@ -125,8 +125,8 @@ note '=== A. Cross-backend API consistency ===';
 
 		my $db = Database::integ_a6->new(dsn => $dsn);
 
-		returns_ok($db->columns(), { type => 'arrayref' }, 'A6a SQLite: columns() returns arrayref');
-		returns_ok($db->schema(),  { type => 'hashref'  }, 'A6b SQLite: schema() returns hashref');
+		returns_is($db->columns(), { type => 'arrayref' }, 'A6a SQLite: columns() returns arrayref');
+		returns_is($db->schema(),  { type => 'hashref'  }, 'A6b SQLite: schema() returns hashref');
 		is($db->count(), 2,                        'A6c SQLite: count() == 2');
 		ok(ref($db->fetchrow_hashref(entry => 'k1')) eq 'HASH',
 			'A6d SQLite: fetchrow_hashref returns hashref');
@@ -220,8 +220,8 @@ note '=== C. Multi-instance non-interference ===';
 	# C4 — PSV and CSV backends coexist in the same process without collision
 	my $csv = Database::test1->new($DATA_DIR);
 	my $psv = Database::test2->new($DATA_DIR);
-	ok(defined($csv->fetchrow_hashref(entry => 'one')),   'C4a CSV object still responds');
-	ok(defined($psv->fetchrow_hashref(entry => 'first')), 'C4b PSV object still responds');
+	returns_is($csv->fetchrow_hashref(entry => 'one'),   { type => 'hashref' }, 'C4a CSV object still responds');
+	returns_is($psv->fetchrow_hashref(entry => 'first'), { type => 'hashref' }, 'C4b PSV object still responds');
 }
 
 # ---------------------------------------------------------------------------
@@ -256,7 +256,7 @@ note '=== D. init() -> new() -> clone chain ===';
 	# D4 — Clone via ->new() on an existing object merges new keys
 	my $original = Database::test1->new(directory => $DATA_DIR, max_slurp_size => 0);
 	my $clone    = $original->new(max_slurp_size => 99_999);
-	isa_ok($clone, 'Database::test1', 'D4: clone is still a Database::test1');
+	returns_is($clone, { type => 'object', isa => 'Database::test1' }, 'D4: clone is still a Database::test1');
 	is($clone->{'max_slurp_size'}, 99_999, 'D4: clone has overridden max_slurp_size');
 	is($clone->{'directory'}, $original->{'directory'}, 'D4: clone inherits directory');
 
@@ -384,7 +384,7 @@ SKIP: {
 
 	# E17 — fetchrow_hashref with operator criteria (LIMIT 1 semantics)
 	my $row = $db->fetchrow_hashref(score => { '>=' => 95 });
-	ok(defined($row),             'E17: fetchrow_hashref with operator returns row');
+	returns_is($row, { type => 'hashref' }, 'E17: fetchrow_hashref with operator returns row');
 	is($row->{'name'}, 'Eve',     'E17: highest-score row is Eve');
 
 	# E18 — multi-column implicit AND via direct criteria
@@ -488,8 +488,8 @@ SKIP: {
 	# F9 — first() returns undef on no match (same as fetchrow_hashref miss)
 	my $miss_direct = $db->fetchrow_hashref(entry => '__none__');
 	my $miss_qb     = $db->query->where(entry => '__none__')->first();
-	ok(!defined($miss_direct), 'F9a: fetchrow_hashref miss returns undef');
-	ok(!defined($miss_qb),     'F9b: query->first() miss returns undef');
+	returns_is($miss_direct, { type => 'void' }, 'F9a: fetchrow_hashref miss returns undef');
+	returns_is($miss_qb,     { type => 'void' }, 'F9b: query->first() miss returns undef');
 }
 
 # ---------------------------------------------------------------------------
@@ -568,7 +568,7 @@ SKIP: {
 	# G8 — cache is ignored when not configured (no crash, no caching)
 	my $db_no_cache = Database::test1->new({ directory => $DATA_DIR, max_slurp_size => 0 });
 	my $r = $db_no_cache->selectall_arrayref();
-	ok(defined($r) && ref($r) eq 'ARRAY',
+	returns_is($r, { type => 'arrayref' },
 		'G8: selectall_arrayref without cache returns arrayref (no crash)');
 }
 
@@ -650,11 +650,11 @@ note '=== I. no_entry CSV workflow ===';
 
 	# I3 — fetchrow_hashref() by non-key column returns correct row
 	my $row = $db->fetchrow_hashref(cardinal => 'two');
-	ok(defined($row), 'I3: no_entry fetchrow_hashref(cardinal=>two) defined');
+	returns_is($row, { type => 'hashref' }, 'I3: no_entry fetchrow_hashref(cardinal=>two) returns hashref');
 	is($row->{'ordinal'}, 'second', 'I3: ordinal column value is "second"');
 
 	# I4 — fetchrow_hashref() with miss returns undef
-	ok(!defined($db->fetchrow_hashref(cardinal => '__none__')),
+	returns_is($db->fetchrow_hashref(cardinal => '__none__'), { type => 'void' },
 		'I4: no_entry fetchrow_hashref miss returns undef');
 
 	# I5 — AUTOLOAD column lookup by non-key criterion
@@ -882,9 +882,9 @@ SKIP: {
 
 	# M6 — fetchrow_hashref by entry
 	my $m_row = $ddb_obj->fetchrow_hashref(entry => 'gamma');
-	ok(defined($m_row),             'M6a: fetchrow_hashref(entry=>gamma) defined');
+	returns_is($m_row, { type => 'hashref' }, 'M6a: fetchrow_hashref(entry=>gamma) returns hashref');
 	is($m_row->{'name'}, 'Carol',   'M6b: correct name');
-	ok(!defined($ddb_obj->fetchrow_hashref(entry => '__missing__')),
+	returns_is($ddb_obj->fetchrow_hashref(entry => '__missing__'), { type => 'void' },
 		'M6c: fetchrow_hashref miss returns undef');
 
 	# M7 — count() total and filtered
@@ -1068,7 +1068,7 @@ note '=== O. Local-host short-circuit ===';
 
 	# O5 — fetchrow_hashref on local shortcircuit returns correct row
 	my $o_row = $lo->fetchrow_hashref(entry => 'two');
-	ok(defined($o_row),          'O5a: fetchrow_hashref defined on local shortcircuit');
+	returns_is($o_row, { type => 'hashref' }, 'O5a: fetchrow_hashref defined on local shortcircuit');
 	is($o_row->{'name'}, 'Bob',  'O5b: correct name from local CSV via shortcircuit');
 }
 
@@ -1205,12 +1205,12 @@ SKIP: {
 
 	# Q5 — fetchrow_hashref by entry key
 	my $q_row = $db->fetchrow_hashref(entry => 'alice');
-	ok(defined($q_row),                'Q5a: fetchrow_hashref defined for "alice"');
+	returns_is($q_row, { type => 'hashref' }, 'Q5a: fetchrow_hashref returns hashref for "alice"');
 	is($q_row->{'name'},  'Alice',     'Q5b: name == Alice');
 	is($q_row->{'score'}, 90,          'Q5c: score == 90');
 
 	# Q6 — fetchrow_hashref miss returns undef
-	ok(!defined($db->fetchrow_hashref(entry => '__missing__')),
+	returns_is($db->fetchrow_hashref(entry => '__missing__'), { type => 'void' },
 		'Q6: fetchrow_hashref miss returns undef');
 
 	# Q7 — AUTOLOAD column lookup
@@ -1235,7 +1235,7 @@ SKIP: {
 		directory => $xlsx_dir,
 		table     => 'summary',
 	);
-	isa_ok($db2, 'Database::integ_xlsx', 'Q10: table-override object created');
+	returns_is($db2, { type => 'object', isa => 'Database::integ_xlsx' }, 'Q10: table-override object created');
 	is($db2->count(), 2, 'Q10: summary worksheet has 2 rows');
 
 	# Q11 — AUTOLOAD against the alternate worksheet
@@ -1450,8 +1450,8 @@ note '=== S. updated() cache-invalidation workflow ===';
 		my $db = Database::test1->new($DATA_DIR);
 		$db->count();    # trigger _open
 		my $ts = $db->updated();
-		ok(defined($ts) && $ts > 0,
-			'S1: CSV slurp updated() returns positive timestamp after load');
+		returns_is($ts, { type => 'integer', semantic => 'unix_timestamp' },
+			'S1: CSV slurp updated() returns unix timestamp after load');
 	}
 
 	# S2 — File mtime preserved across multiple calls (no cache drift for CSV)
@@ -1499,8 +1499,8 @@ SKIP: {
 		my $db = Database::integ_s->new(dsn => $s_dsn, no_entry => 1);
 		$db->count();
 		my $ts = $db->updated();
-		ok(defined($ts) && $ts > 0,
-			'S4: SQLite DSN updated() returns positive timestamp after _open');
+		returns_is($ts, { type => 'integer', semantic => 'unix_timestamp' },
+			'S4: SQLite DSN updated() returns unix timestamp after _open');
 	}
 
 	# S5 — SQLite DSN: updated() agrees with stat() on the backing file
@@ -1561,8 +1561,8 @@ SKIP: {
 		my $real_ts = $db->updated();        # live stat
 		$db->{'_dialect'} = 'generic';      # force generic path
 		my $fallback_ts = $db->updated();   # should return _updated, not live stat
-		ok(defined($fallback_ts) && $fallback_ts > 0,
-			'S10: generic dialect falls back to cached _updated timestamp');
+		returns_is($fallback_ts, { type => 'integer', semantic => 'unix_timestamp' },
+			'S10: generic dialect falls back to cached _updated unix timestamp');
 		# The generic path may return the same value OR _updated; both are valid.
 		# What we care about is that it doesn't croak and returns a number.
 	}
@@ -1650,15 +1650,15 @@ SKIP: {
 		# 'c' is Carol in 'sales', not 'eng'; $eng->fetchrow_hashref for Carol should
 		# return undef because base_criteria filters her out.
 		my $row = $eng->fetchrow_hashref(entry => 'c');
-		ok(!defined($row),
+		returns_is($row, { type => 'void' },
 			'T4: fetchrow_hashref returns undef for row excluded by base_criteria');
 	}
 
 	# T5 — fetchrow_hashref() returns row when entry matches base_criteria
 	{
 		my $row = $eng->fetchrow_hashref(entry => 'a');
-		ok(defined($row) && $row->{'name'} eq 'Alice',
-			'T5: fetchrow_hashref returns correct row matching base_criteria');
+		returns_is($row, { type => 'hashref' }, 'T5: fetchrow_hashref returns hashref matching base_criteria');
+		is($row->{'name'}, 'Alice', 'T5: name is Alice');
 	}
 
 	# T6 — query builder respects base_criteria
@@ -1720,7 +1720,7 @@ note '=== U. dbi_source() integration workflow ===';
 	{
 		my $csv = Database::test1->new($DATA_DIR);
 		$csv->count();    # trigger _open
-		ok(!defined($csv->dbi_source()),
+		returns_is($csv->dbi_source(), { type => 'void' },
 			'U1: CSV slurp backend: dbi_source() returns undef');
 	}
 
@@ -1728,7 +1728,7 @@ note '=== U. dbi_source() integration workflow ===';
 	{
 		my $bdb = Database::test1->new($DATA_DIR);
 		$bdb->{'berkeley'} = { k => 'v' };
-		ok(!defined($bdb->dbi_source()),
+		returns_is($bdb->dbi_source(), { type => 'void' },
 			'U2: BerkeleyDB backend: dbi_source() returns undef');
 	}
 
@@ -1737,7 +1737,7 @@ note '=== U. dbi_source() integration workflow ===';
 		my $deep = Database::test1->new($DATA_DIR);
 		$deep->{'type'} = 'Deep';
 		$deep->{'data'} = {};
-		ok(!defined($deep->dbi_source()),
+		returns_is($deep->dbi_source(), { type => 'void' },
 			'U3: Deep backend: dbi_source() returns undef');
 	}
 }

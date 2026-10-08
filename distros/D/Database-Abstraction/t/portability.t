@@ -7,6 +7,7 @@ use File::Spec;
 use File::Temp qw(tempdir);
 use Test::Most;
 use Test::NoWarnings;
+use Test::Returns;
 
 # Use SQLite via DSN to avoid needing Postgres/MySQL in CI.
 # This exercises the dsn constructor path, dialect detection,
@@ -37,7 +38,7 @@ $setup->disconnect();
 
 # Connect via DSN — no directory needed
 my $db = Database::porttest->new(dsn => $dsn, no_entry => 1);
-isa_ok($db, 'Database::porttest', 'object created via dsn');
+returns_is($db, { type => 'object', isa => 'Database::porttest' }, 'object created via dsn');
 
 # Basic select (triggers _open)
 my $rows = $db->selectall_arrayref();
@@ -62,12 +63,12 @@ is($all[0]{'name'}, 'Alice', 'execute() first row');
 
 # Schema introspection over DSN
 my $cols = $db->columns();
-isa_ok($cols, 'ARRAY', 'columns() over DSN returns arrayref');
+returns_is($cols, { type => 'arrayref' }, 'columns() over DSN returns arrayref');
 ok((grep { $_ eq 'id'   } @{$cols}), 'columns() has "id"');
 ok((grep { $_ eq 'name' } @{$cols}), 'columns() has "name"');
 
 my $schema = $db->schema();
-isa_ok($schema, 'HASH', 'schema() over DSN returns hashref');
+returns_is($schema, { type => 'hashref' }, 'schema() over DSN returns hashref');
 is($schema->{'id'}{'pk'}, 1, 'pk column detected via DSN');
 
 # .sqlite extension — directory probe should detect and open the file
@@ -103,7 +104,7 @@ $db->selectall_arrayref();
 
 my $t_before = (stat($file))[9];
 my $t_updated = $db->updated();
-ok(defined($t_updated), 'updated() is defined for SQLite DSN');
+returns_is($t_updated, { type => 'integer', min => 1 }, 'updated() is defined for SQLite DSN');
 is($t_updated, $t_before, 'updated() returns the file mtime (live stat)');
 
 # Touch the file and verify updated() returns the new mtime.

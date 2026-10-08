@@ -1393,7 +1393,7 @@ Also callable as C<io_new_buffer(data, length>.
 =for comment
 From: File iolayer.c
 
-=item im_io_new_cb(ctx, p, read_cb, write_cb, seek_cb, close_cb, destroy_cb)
+=item im_io_new_cb8(ctx, p, read_cb, write_cb, seek_cb, close_cb, destroy_cb, size_cb)
 X<im_io_new_cb API>X<io_new_cb API>
 
 Create a new I/O layer object that calls your supplied callbacks.
@@ -1473,11 +1473,17 @@ Returns true on success,
 =for comment
 From: File iolayer.c
 
-=item i_io_getc(ig)
+=item i_io_getc(io)
 
-A macro to read a single byte from a buffered I/O glue object.
+Fetch a single character from a buffered I/O stream.
 
-Returns EOF on failure, or a byte.
+
+=for comment
+From: File iolayer.c
+
+=item i_io_getc(io)
+
+Fetch a single character from a buffered I/O stream.
 
 
 =for comment
@@ -1534,11 +1540,17 @@ of bytes read into C<buffer>.
 =for comment
 From: File iolayer.c
 
-=item i_io_putc(ig, c)
+=item i_io_putc()
 
-Write a single character to the stream.
+Write a single character to a buffered I/O stream.
 
-On success return c, on error returns EOF
+
+=for comment
+From: File iolayer.c
+
+=item i_io_putc()
+
+Write a single character to a buffered I/O stream.
 
 
 =for comment
@@ -2698,6 +2710,30 @@ initialize the C<im_get_context> pointer at some point.
 
 =for comment
 From: File imext.c
+
+=item im_io_get_max_mmap_size()
+
+  size_t size = im_io_get_max_mmap_size(aIMCTX);
+  size_t size = i_io_get_max_mmap_size();
+
+Fetch the maximum address space than can be mapped by i_io_mmap() for
+files.
+
+
+=for comment
+From: File iolayer.c
+
+=item im_io_set_max_mmap_size()
+
+  int ok size = im_io_set_max_mmap_size(aIMCTX, new_size);
+  int ok size = i_io_set_max_mmap_size(new_size);
+
+Set the maximum address space than can be mapped by i_io_mmap() for
+files.
+
+
+=for comment
+From: File iolayer.c
 
 
 

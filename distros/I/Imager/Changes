@@ -1,5 +1,36 @@
 Imager release history.  Older releases can be found in Changes.old
 
+Imager 1.038 - 7 October 2026
+============
+
+The Imager C API major version has changed, any modules that depend on
+the Imager C API will need to be rebuilt.
+
+ - EXIF:
+   - fix an off-by-one error that could reject an IFD entry where the data
+     was exactly (and correctly) at the end of the EXIF data.
+     This broke Imager::ExifOrientation, which I've added to CI.
+     https://github.com/tonycoz/imager/issues/580
+
+ - iolayers:
+   - restructure the iolayer object to move the vtable outside of the
+     object, rather than entirely embedded.
+   - implement the size entry point, which existed, but had never been
+     implemented
+   - add mmap and munmap entry points and implement it for POSIX-likes
+     and Windows, only usable from the C API and read-only.
+   - largely pulled from an old topic branch
+
+ - TIFF:
+   - use the new iolayer size and mmap entry points
+
+ - Imager::ImageTypes:
+   - fix some incorrect sample code
+   - other minor documentation updates
+
+ - fix the rest of the failing perl-check checks
+   (core Imager, JPEG, FT2)
+
 Imager 1.037 - 30 September 2026
 ============
 

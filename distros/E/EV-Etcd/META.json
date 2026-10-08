@@ -39,7 +39,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -51,6 +51,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-etcd"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

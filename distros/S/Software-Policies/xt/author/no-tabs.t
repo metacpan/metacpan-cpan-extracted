@@ -15,11 +15,14 @@ my @files = (
     'lib/Software/Policies/Contributing.pm',
     'lib/Software/Policies/Contributing/PerlDistZilla.pm',
     'lib/Software/Policies/License.pm',
+    'lib/Software/Policies/MaintainerSuccession.pm',
+    'lib/Software/Policies/MaintainerSuccession/Basic.pm',
     'lib/Software/Policies/Security.pm',
     'lib/Software/Policies/Security/Individual.pm',
     't/00-load.t',
     't/aidisclosure.t',
     't/contributing.t',
+    't/maintainer_succession.t',
     't/policies.t'
 );
 

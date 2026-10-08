@@ -28,6 +28,7 @@ use IO::Compress::Gzip qw(gzip $GzipError);
 use Readonly;
 use Test::Most  tests => 70;
 use Test::NoWarnings;
+use Test::Returns;
 
 use lib 't/lib';
 use Database::test1;
@@ -397,7 +398,7 @@ note('Section 8: base_criteria persistent filter lifecycle');
 
 	# T8-2: selectall_arrayref() returns only the 1 matching row
 	my $rows = $db_bc->selectall_arrayref();
-	cmp_ok(scalar @{$rows}, '==', 1,
+	returns_is($rows, { type => 'arrayref', min => 1, max => 1 },
 	    'T8-2: selectall_arrayref() respects base_criteria');
 
 	# T8-3: fetchrow_hashref for a matching entry returns the row
@@ -433,7 +434,7 @@ note('Section 8: base_criteria persistent filter lifecycle');
 	# T8-8: query-builder all() respects base_criteria
 	my $db_bc3 = Database::test1->new(directory => $DATA_DIR, base_criteria => { number => '1' });
 	my $qb_rows = $db_bc3->query()->all();
-	cmp_ok(scalar @{$qb_rows}, '==', 1,
+	returns_is($qb_rows, { type => 'arrayref', min => 1, max => 1 },
 	    'T8-8: query builder all() respects base_criteria');
 
 	# T8-9: mutating the caller's hash after construction has no effect on the filter

@@ -6,7 +6,7 @@ class Getopt::Pad::Completion :strict(params) {
 	use File::Basename qw(basename);
 	use List::Util     qw(min);
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	use constant SHELLS         => ['bash', 'zsh'];
 	use constant SHELL_VARIABLE => 'GETOPT_PAD_COMPLETE';
@@ -54,9 +54,12 @@ _{{ident}}_completion() {
 		(( index == COMP_CWORD )) && cword=$(( ${#words[@]} - 1 ))
 	done
 
-	local IFS=$'\n'
-	local -a lines
-	mapfile -t lines < <({{shellVariable}}=bash {{indexVariable}}=$(( cword - 1 )) "${words[0]}" "${words[@]:1}" 2>/dev/null)
+	# A read loop: bash 3.2 has no builtin that reads lines into an array.
+	local -a lines=()
+	local line
+	while IFS= read -r line; do
+		lines+=("$line")
+	done < <({{shellVariable}}=bash {{indexVariable}}=$(( cword - 1 )) "${words[0]}" "${words[@]:1}" 2>/dev/null)
 
 	# The program answers with whole words; bash only replaces the part
 	# after the last '=', so strip what it keeps.
@@ -66,6 +69,9 @@ _{{ident}}_completion() {
 	COMPREPLY=("${lines[@]:1}")
 	COMPREPLY=("${COMPREPLY[@]#"$prefix"}")
 
+	# Set only now: bash 3.2 joins the quoted array expansions above
+	# into one word when IFS lacks a space.
+	local IFS=$'\n'
 	case $directive in
 		files) compopt -o filenames 2>/dev/null; COMPREPLY+=($(compgen -f -- "$cur")) ;;
 		dirs)  compopt -o filenames 2>/dev/null; COMPREPLY+=($(compgen -d -- "$cur")) ;;

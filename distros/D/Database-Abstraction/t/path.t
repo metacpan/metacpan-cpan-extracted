@@ -38,6 +38,7 @@ use Readonly;
 use Scalar::Util qw(blessed);
 use Test::Most  tests => 128;
 use Test::NoWarnings;
+use Test::Returns;
 
 use lib 't/lib';
 use Database::test1;   # keyed CSV  (entry / number)
@@ -449,7 +450,7 @@ note('_quote_identifier');
 # P9-1: DBI handle present → driver's quoting (CSV/DBD returns double-quoted ANSI)
 {
 	my $quoted = $db->_quote_identifier('my_col');
-	ok(defined $quoted && length($quoted) > 0, '_quote_identifier: with DBH → non-empty result');
+	returns_is($quoted, { type => 'string', min => 1 }, '_quote_identifier: with DBH → non-empty result');
 }
 
 # P9-2: no DBI handle (HTML or slurp-only) → ANSI double-quote fallback

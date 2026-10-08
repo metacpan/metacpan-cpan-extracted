@@ -6,6 +6,7 @@ use FindBin qw($Bin);
 use File::Spec;
 use Test::Most tests => 25;
 use Test::NoWarnings;
+use Test::Returns;
 
 use lib 't/lib';
 use Database::test1;
@@ -46,7 +47,7 @@ if($ENV{'TEST_VERBOSE'}) {
 
 cmp_ok(scalar(@rc), '==', 4, 'selectall_hash returns all entries');
 
-cmp_ok(scalar(@{$test1->selectall_arrayref()}), '==', 4, 'selectall_arrayref returns all entries');
+returns_is($test1->selectall_arrayref(), { type => 'arrayref', min => 4, max => 4 }, 'selectall_arrayref returns all entries');
 
 my $entry = $test1->entry(number => 2);
 cmp_ok($test1->count(number => 2), '==', 1, 'count returns 1');

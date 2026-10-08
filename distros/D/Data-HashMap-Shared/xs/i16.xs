@@ -397,8 +397,7 @@ drain(SV* self_sv, SV* limit_sv)
         UV limit = shm_count_arg(aTHX_ limit_sv, "drain limit", "Data::HashMap::Shared::I16");
         EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::I16: map is frozen (read-only)");
-        /* Only as many as the map can actually yield: drain(1e9) on a
-         * ten-entry map otherwise reserved a billion entries up front. */
+        /* Only as many as the map can yield: limit sizes the allocation. */
         {
             UV avail = (UV)shm_i16_size(h);
             if (limit > avail) limit = avail;
@@ -730,9 +729,7 @@ set_multi(SV* self_sv, ...)
                 count += shm_i16_put(h, _k, _v);
             }
         } else {
-            /* Materialize every argument before the lock: SvIV runs a tied
-             * FETCH or numeric overload, which must not run under the write
-             * lock, or a callback that re-enters this map self-deadlocks it. */
+            /* Materialize arguments before the lock: a re-entrant FETCH would self-deadlock. */
             int _n = (items - 1) / 2;
             int16_t *_ks, *_vs;
             Newx(_ks, _n ? _n : 1, int16_t); SAVEFREEPV(_ks);

@@ -5,15 +5,10 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SS;
 
-# clear()'s arena stores are plain, so a compiler may order them either way, and
-# a writer killed among them can leave an empty table, the bump back at the
-# start, and free lists still naming blocks above it.  The first insert then
-# pops a stale block, the bump later climbs over the same bytes, and two live
-# entries share them.  An empty map owns no block, so its arena is reset whole
-# whatever state the lists are in.
-#
-# This writes that state directly: the table and bump cleared, the free lists
-# not.
+# clear()'s arena stores are plain, so a writer killed among them can leave an
+# empty table, the bump at the start and free lists still naming blocks above
+# it.  An empty map owns no block, so the first insert must reset the arena
+# whole.  The state is written directly: table and bump cleared, free lists not.
 
 my $dir  = tempdir(CLEANUP => 1);
 my $path = "$dir/clear.shm";

@@ -7,12 +7,10 @@ use File::Copy qw(copy);
 
 plan skip_all => 'author tests' unless $ENV{AUTHOR_TESTING};
 
-# xt/resize_crash_gdb.t kills a resizing writer at chosen lines.  This kills it
-# with SIGKILL at a random moment of the resize instead, then kills up to two of
-# the processes finishing that resize the same way, and checks the map the next
-# process sees against what the writer was given: every entry, its value, its
-# TTL and its LRU position, and a table with no record, no leftover mark and
-# nothing above its capacity.
+# Like resize_crash_gdb.t, but SIGKILLs the resizing writer at a random moment,
+# then up to two of the processes finishing the resize, and checks the next
+# process sees the whole map: every entry with its value, TTL and LRU position,
+# no leftover record or mark, nothing above the capacity.
 
 my $dir = tempdir(CLEANUP => 1);
 my @inc = map { "-I$_" } @INC;

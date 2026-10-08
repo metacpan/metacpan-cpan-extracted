@@ -7,8 +7,7 @@
 #include "etcd_common.h"
 #include "etcd_watch.h"
 
-/* EVAPI.h's GEVAPI is a per-translation-unit static: each file calling EV must
- * bind its own (from BOOT), or ev_timer_start & co dereference a NULL table */
+/* GEVAPI is static per translation unit: unbound, ev_* calls dereference NULL */
 void watch_init_ev_api(pTHX) {
     I_EV_API("EV::Etcd");
 }
@@ -54,6 +53,7 @@ void cleanup_watch(pTHX_ watch_call_t *wc) {
 
     /* Unconditional: also clears an inactive-but-pending fired timer */
     ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
+    ev_timer_stop(EV_DEFAULT, &wc->progress_timer);
     grpc_metadata_array_destroy(&wc->initial_metadata);
     grpc_metadata_array_destroy(&wc->trailing_metadata);
     if (wc->recv_buffer) {
@@ -65,6 +65,7 @@ void cleanup_watch(pTHX_ watch_call_t *wc) {
         grpc_call_unref(wc->call);
         wc->call = NULL;
     }
+    etcd_call_release(&wc->base);
     SvREFCNT_dec(wc->callback);
     wc->callback = NULL;
     wc->active = 0;
@@ -76,6 +77,40 @@ void cleanup_watch(pTHX_ watch_call_t *wc) {
 void watch_call_perl_release(pTHX_ watch_call_t *wc) {
     wc->perl_owns = 0;
     if (!wc->client_owns) watch_call_free(aTHX_ wc);
+}
+
+static void watch_progress_cb(struct ev_loop *loop, ev_timer *w, int revents) {
+    (void)revents;
+    watch_call_t *wc = (watch_call_t *)((char *)w - offsetof(watch_call_t, progress_timer));
+    if (!wc->active) return;
+
+    Etcdserverpb__WatchProgressRequest progress = ETCDSERVERPB__WATCH_PROGRESS_REQUEST__INIT;
+    Etcdserverpb__WatchRequest req = ETCDSERVERPB__WATCH_REQUEST__INIT;
+    req.request_union_case = ETCDSERVERPB__WATCH_REQUEST__REQUEST_UNION_PROGRESS_REQUEST;
+    req.progress_request = &progress;
+
+    grpc_slice slice;
+    SERIALIZE_PROTOBUF_TO_SLICE(slice,
+        etcdserverpb__watch_request__get_packed_size,
+        etcdserverpb__watch_request__pack, &req);
+    grpc_byte_buffer *buffer = grpc_raw_byte_buffer_create(&slice, 1);
+    grpc_slice_unref(slice);
+
+    grpc_op op = {0};
+    op.op = GRPC_OP_SEND_MESSAGE;
+    op.data.send_message.send_message = buffer;
+    (void)grpc_call_start_batch(wc->call, &op, 1, &cancel_sentinel, NULL);
+    grpc_byte_buffer_destroy(buffer);
+
+    /* etcd 3.5.8-3.5.12 ignores repeats until the watch sends something; after
+     * about 13 s connected, a quiet watch counts as recovered */
+    if (w->repeat < 5.0) {
+        w->repeat *= 2;
+        ev_timer_again(loop, w);
+    } else {
+        ev_timer_stop(loop, w);
+        wc->reconnect_attempt = 0;
+    }
 }
 
 void process_watch_response(pTHX_ watch_call_t *wc) {
@@ -105,21 +140,49 @@ void process_watch_response(pTHX_ watch_call_t *wc) {
         return;
     }
 
+    wc->established = 1;
+
     if (resp->created) {
         wc->watch_id = resp->watch_id;
-        wc->reconnect_attempt = 0;
-    }
-
-    if (resp->header && resp->header->revision > wc->last_revision) {
-        wc->last_revision = resp->header->revision;
-        wc->reconnect_attempt = 0;
+        /* Only an initial watch at HEAD has no history to replay */
+        if (!wc->last_revision && wc->params.start_revision <= 0 && resp->header)
+            wc->last_revision = resp->header->revision;
     }
 
     if (resp->canceled) {
         wc->active = 0;
         const char *reason = (resp->cancel_reason && strlen(resp->cancel_reason) > 0)
             ? resp->cancel_reason : "Watch cancelled";
-        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_CANCELLED, reason, "watch");
+        SV *err = create_error_hv(aTHX_ GRPC_STATUS_CANCELLED,
+            reason, strlen(reason), "watch");
+        hv_store((HV *)SvRV(err), "compact_revision", 16,
+            newSVi64(resp->compact_revision), 0);
+        CALL_PREBUILT_ERROR_CALLBACK(wc->callback, err);
+        etcdserverpb__watch_response__free_unpacked(resp, NULL);
+        return;
+    }
+
+    if (resp->created && wc->reconnect_attempt && resp->header) {
+        if (resp->header->revision <= wc->last_revision) {
+            wc->reconnect_attempt = 0;
+        } else {
+            /* Created is not caught up: etcd 3.5.8+ answers a progress request once it is */
+            ev_timer_init(&wc->progress_timer, watch_progress_cb, 0.1, 0.1);
+            ev_timer_start(EV_DEFAULT, &wc->progress_timer);
+        }
+    }
+    if (!resp->created) {
+        wc->reconnect_attempt = 0;
+        ev_timer_stop(EV_DEFAULT, &wc->progress_timer);
+    }
+
+    int64_t revision = wc->last_revision;
+    if (!resp->created && !resp->n_events && resp->header)
+        revision = resp->header->revision;
+
+    if (!resp->created && !resp->n_events && resp->watch_id == -1) {
+        /* Our own progress request's reply. Before 3.4.25/3.5.8 it can overtake
+         * the replay, so it must never move the resume point */
         etcdserverpb__watch_response__free_unpacked(resp, NULL);
         return;
     }
@@ -135,9 +198,15 @@ void process_watch_response(pTHX_ watch_call_t *wc) {
         av_extend(events, resp->n_events - 1);
     }
     for (size_t i = 0; i < resp->n_events; i++) {
+        if (resp->events[i]->kv && resp->events[i]->kv->mod_revision > revision)
+            revision = resp->events[i]->kv->mod_revision;
         av_push(events, event_to_hashref(aTHX_ resp->events[i]));
     }
     hv_store(result, "events", 6, newRV_noinc((SV *)events), 0);
+
+    if (revision > wc->last_revision) {
+        wc->last_revision = revision;
+    }
 
     etcdserverpb__watch_response__free_unpacked(resp, NULL);
 
@@ -192,7 +261,9 @@ static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     grpc_slice_unref(req_slice);
 
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
-    wc->base.channel_gen = client->channel_gen;
+    etcd_call_acquire(client, &wc->base);
+    /* Within gRPC's own backoff the attempt would fail on the last connect error */
+    grpc_channel_reset_connect_backoff(client->channel);
     wc->call = grpc_channel_create_call(
         client->channel, NULL, GRPC_PROPAGATE_DEFAULTS,
         client->cq, METHOD_WATCH, NULL, deadline, NULL);
@@ -200,35 +271,27 @@ static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     if (!wc->call) {
         grpc_byte_buffer_destroy(send_buffer);
         wc->active = 0;
-        client->in_callback++;
+        CALLBACK_WINDOW_BEGIN(client);
         CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Watch reconnect failed", "watch");
-        client->in_callback--;
-        if (!client->in_callback && !client->active) {
-            finish_client_destroy(aTHX_ client);
+        if (CALLBACK_WINDOW_END(client))
             return;
-        }
         cleanup_watch(aTHX_ wc);
         return;
     }
 
     grpc_op ops[4] = {0};
-    grpc_metadata auth_md;
-    STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buffer, wc);
+    STREAMING_CALL_SETUP_OPS(client, ops, send_buffer, wc);
 
     init_call_base(&wc->base, CALL_TYPE_WATCH);
     grpc_call_error err = grpc_call_start_batch(wc->call, ops, 4, &wc->base, NULL);
-    cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(wc);
-        client->in_callback++;
+        CALLBACK_WINDOW_BEGIN(client);
         CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Watch reconnect batch failed", "watch");
-        client->in_callback--;
-        if (!client->in_callback && !client->active) {
-            finish_client_destroy(aTHX_ client);
+        if (CALLBACK_WINDOW_END(client))
             return;
-        }
         cleanup_watch(aTHX_ wc);
     }
 }
@@ -240,15 +303,21 @@ int try_reconnect_watch(pTHX_ watch_call_t *wc) {
         return 0;
     }
 
-    etcd_stream_failed(client, wc->base.channel_gen);
+    etcd_stream_failed(client, wc->base.channel_gen, wc->established, wc->status, wc->status_details);
+    wc->established = 0;
+    if (wc->attempt_epoch != client->no_leader_epoch) {
+        wc->attempt_epoch = client->no_leader_epoch;
+        wc->reconnect_attempt = 0;
+    }
 
     if (!wc->auto_reconnect || wc->reconnect_attempt >= client->max_retries) {
         return 0;
     }
 
-    wc->reconnect_attempt++;
-
-    ev_tstamp delay = RECONNECT_BACKOFF_SECONDS(wc->reconnect_attempt);
+    int no_leader = etcd_is_no_leader(wc->status, wc->status_details);
+    if (!no_leader) wc->reconnect_attempt++;
+    ev_tstamp delay = no_leader ? NO_LEADER_RETRY_SECONDS
+        : RECONNECT_BACKOFF_SECONDS(wc->reconnect_attempt);
     ev_timer_init(&wc->reconnect_timer, watch_reconnect_cb, delay, 0.0);
     ev_timer_start(EV_DEFAULT, &wc->reconnect_timer);
 

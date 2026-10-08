@@ -7,9 +7,8 @@ my $v = Data::HashMap::Shared->VERSION;
 ok $v, 'VERSION defined';
 like $v, qr/^\d+\.\d+$/, 'VERSION is X.YY';
 
-# MANIFEST must not contain stale entries not in git (and vice-versa,
-# but MANIFEST.SKIP makes reverse check noisy). Minimal: MANIFEST exists
-# and includes the .pm file.
+# Minimal MANIFEST check; a reverse check against git is noisy with
+# MANIFEST.SKIP.
 my $module_root = do {
     my $p = $INC{'Data/HashMap/Shared.pm'};
     $p =~ s{/blib/.*$}{};
@@ -28,7 +27,7 @@ SKIP: {
     ok exists $lines{'lib/Data/HashMap/Shared.pm'}, 'MANIFEST includes .pm';
 }
 
-# Every variant must declare the main module's version: a release that bumps
+# Every variant must declare the main module's version, or a release bumping
 # only the main .pm leaves the variant packages indexed at the previous release.
 for my $variant (qw(II IS SI SS I16 I16S I32 I32S SI16 SI32)) {
     my $class = "Data::HashMap::Shared::$variant";

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'App::FuguVM',
-	VERSION          => '0.3.0',
+	VERSION          => '0.3.1',
 	ABSTRACT         => 'install and manage OpenBSD virtual machines under QEMU',
 	LICENSE          => 'open_source',
 	MIN_PERL_VERSION => '5.036',

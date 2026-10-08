@@ -15,6 +15,7 @@ use Scalar::Util qw(blessed reftype);
 use POSIX qw(floor);
 use Readonly;
 use Test::Most;
+use Test::Returns;
 
 Readonly my $DATA_DIR        => File::Spec->catfile($Bin, 'data');
 Readonly my $DEFAULT_MAX_SLURP => 16_384;	# module default
@@ -280,8 +281,8 @@ XML
 subtest 'MK-OPEN-862: stat() result stored in _updated' => sub {
 	my $db = Database::mk1->new(directory => $DATA_DIR);
 	$db->count();	# trigger _open
-	ok($db->{'_updated'}, '_updated is truthy after _open (stat not negated)');
-	cmp_ok($db->{'_updated'}, '>', 0, '_updated is a positive timestamp (kills BOOL_NEGATE_862)');
+	returns_is($db->{'_updated'}, { type => 'integer', semantic => 'unix_timestamp' },
+		'_updated is a unix timestamp after _open (kills BOOL_NEGATE_862)');
 };
 
 ########################################################################
@@ -483,7 +484,7 @@ subtest 'MK-FRH-1319/1323/1324: BerkeleyDB entry lookup' => sub {
 	$db->count();	# trigger _open (BerkeleyDB detection)
 	if($db->{'berkeley'}) {
 		my $row = $db->fetchrow_hashref(entry => 'one');
-		ok(defined($row), 'BerkeleyDB fetchrow_hashref returns a result (kills NUM_BOUNDARY_1319)');
+		returns_is($row, { type => 'hashref' }, 'BerkeleyDB fetchrow_hashref returns a result (kills NUM_BOUNDARY_1319)');
 		ok(exists $row->{'entry'}, 'result has entry key (kills NUM_BOUNDARY_1323)');
 	} else {
 		pass('BerkeleyDB branch not reachable for this fixture — structural check only');
@@ -498,14 +499,13 @@ subtest 'MK-FRH-1340/1350/1358/1359/1368: SQL path WHERE + query string' => sub 
 	my $dir = make_sqlite_dir();
 	my $db  = Database::mk_sql->new(directory => $dir);
 	my $row = $db->fetchrow_hashref(entry => 'two');
-	ok(defined($row), 'fetchrow_hashref finds entry=two (WHERE applied, kills COND_INV_1350)');
+	returns_is($row, { type => 'hashref' }, 'fetchrow_hashref finds entry=two (WHERE applied, kills COND_INV_1350)');
 	is($row->{'entry'}, 'two', 'returned row is the right one');
 	is($row->{'number'}, 2,    'number column correct');
 
 	# Without explicit WHERE: bare-string shorthand uses entry key; LIMIT 1 must fire.
 	my $first = $db->fetchrow_hashref('one');
-	ok(defined($first), 'bare-string fetchrow_hashref returns a row (LIMIT 1 applied)');
-	ok(ref($first) eq 'HASH', 'result is a hashref (kills COND_INV_1368)');
+	returns_is($first, { type => 'hashref' }, 'bare-string fetchrow_hashref returns hashref (kills COND_INV_1368)');
 	is($first->{'entry'}, 'one', 'bare-string lookup returns correct row');
 };
 
@@ -522,7 +522,7 @@ subtest 'MK-FRH-1370/1371/1374/1385: cache HIT path' => sub {
 
 	my $r1 = $db->fetchrow_hashref(entry => 'three');
 	my $r2 = $db->fetchrow_hashref(entry => 'three');
-	ok(defined($r1), 'first fetchrow_hashref returns result');
+	returns_is($r1, { type => 'hashref' }, 'first fetchrow_hashref returns result');
 	is_deeply($r1, $r2, 'cache HIT returns same row (kills COND_INV_1370/BOOL_NEGATE_1371)');
 	is($r2->{'number'}, 3, 'cached row has correct data (kills BOOL_NEGATE_1374)');
 };
@@ -586,7 +586,7 @@ subtest 'MK-AUTO-1812: slurped scalar AUTOLOAD undef return trace' => sub {
 	my $found   = $db->number(entry => 'one');
 	my $missing = $db->number(entry => 'nonexistent_key_999');
 	is($found, 1, 'AUTOLOAD returns correct value for existing key (kills COND_INV_1812)');
-	ok(!defined($missing), 'AUTOLOAD returns undef for missing key');
+	returns_is($missing, { type => 'void' }, 'AUTOLOAD returns undef for missing key');
 };
 
 subtest 'MK-AUTO-1816/1820: keyed-slurp wantarray and distinct paths' => sub {

@@ -6,7 +6,7 @@ use v5.38;
 
 use App::Cmd::Setup -app;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 1;
 
@@ -22,7 +22,7 @@ Luv::CLI - command-line package manager for love2d projects
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

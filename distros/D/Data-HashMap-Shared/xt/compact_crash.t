@@ -8,21 +8,17 @@ use IO::Pipe;
 
 use Data::HashMap::Shared::SS;
 
-# Kill a compacting writer at a random point, over and over, and read the map
-# back from a fresh process: a partly compacted arena must still serve every
-# entry, and the stale write lock the kill leaves behind must recover.
-#
-# This does not establish the crash-safety rule itself.  The window between
-# copying a block and publishing its new offset is nanoseconds wide, so a random
-# kill effectively never lands in it -- a build with the rule removed passes this
-# test unchanged.  xt/compact_crash_gdb.t stops exactly there instead.
+# Kill a compacting writer at a random point, repeatedly, and read the map back
+# from a fresh process: a partly compacted arena must serve every entry and the
+# stale write lock must recover. This does not establish the crash-safety rule
+# itself: the copy-to-publish window is nanoseconds wide, so a random kill
+# effectively never lands in it.  xt/compact_crash_gdb.t stops exactly there.
 
 plan skip_all => 'author tests' unless $ENV{AUTHOR_TESTING};
 
 my $dir   = tempdir(CLEANUP => 1);
 my $path  = "$dir/compact.shm";
-# Sized to stay small on a tight machine: the kill window is measured from one
-# real compaction below, so fewer entries cost trials, not validity.
+# small on purpose: the kill window is measured from one real compaction below
 my $N     = 15_000;
 my $TRIALS = 25;
 
@@ -31,7 +27,7 @@ my $key = sub { sprintf 'key%017d', $_[0] };           # 20 bytes: never inline
 
 sub value_for {
     my ($i, $round) = @_;
-    my $c = ($i + $round) % 2 ? 'a' : 'b';       # a bare (...) x N here would repeat the LIST
+    my $c = ($i + $round) % 2 ? 'a' : 'b';       # a bare (...) x N here would repeat the list
     # Spans three size classes (256/512/1024), so a rewrite frees a block the
     # new value cannot use and the arena really fragments.
     return $c x (150 + (($i + $round) % 3) * 200);
@@ -45,8 +41,7 @@ for my $i (0 .. $N - 1) {
 }
 is $m->size, $N, "fixture holds $N entries";
 
-# Time one uninterrupted compaction, so the kill window is scaled to this
-# machine rather than to mine.
+# time one uninterrupted compaction to scale the kill window to this machine
 fragment(0);
 my $t0 = Time::HiRes::time();
 my $reclaimed = $m->compact;

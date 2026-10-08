@@ -193,6 +193,7 @@ xt/unwound_read_lock_gdb.t
 xt/valgrind.t
 xt/valgrind_mp.t
 xt/value_update_tear.t
+xt/variant_oracle.t
 xt/writer_crash_recovery.t
 xt/wrlock_threads.t
 xxhash.h

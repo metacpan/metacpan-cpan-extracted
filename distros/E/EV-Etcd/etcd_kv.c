@@ -61,14 +61,11 @@ void process_delete_response(pTHX_ pending_call_t *pc) {
 
     hv_store(result, "deleted", 7, newSVi64(resp->deleted), 0);
 
-    if (resp->n_prev_kvs > 0) {
-        AV *prev_kvs = newAV();
-        av_extend(prev_kvs, resp->n_prev_kvs - 1);
-        for (size_t i = 0; i < resp->n_prev_kvs; i++) {
-            av_push(prev_kvs, kv_to_hashref(aTHX_ resp->prev_kvs[i]));
-        }
-        hv_store(result, "prev_kvs", 8, newRV_noinc((SV *)prev_kvs), 0);
+    AV *prev_kvs = newAV();
+    for (size_t i = 0; i < resp->n_prev_kvs; i++) {
+        av_push(prev_kvs, kv_to_hashref(aTHX_ resp->prev_kvs[i]));
     }
+    hv_store(result, "prev_kvs", 8, newRV_noinc((SV *)prev_kvs), 0);
 
     etcdserverpb__delete_range_response__free_unpacked(resp, NULL);
 

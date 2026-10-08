@@ -16,12 +16,10 @@ use Data::HashMap::Shared::SS;
 
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
-# ====== I16 (int16 -> int16 with counters) ======
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I16->new($path, 1000);
 
-    # Basic CRUD
     ok(shm_i16_put $map, 0, 0, 'I16: put zero key');
     is(shm_i16_get $map, 0, 0, 'I16: get zero key');
     ok(shm_i16_put $map, -1, -1, 'I16: negative key/value');
@@ -35,13 +33,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(shm_i16_remove $map, 32767, 'I16: remove');
     ok(!defined(shm_i16_get $map, 32767), 'I16: removed');
 
-    # Counters
     is(shm_i16_incr $map, 10, 1, 'I16: incr');
     is(shm_i16_incr $map, 10, 2, 'I16: incr again');
     is(shm_i16_decr $map, 10, 1, 'I16: decr');
     is(shm_i16_incr_by $map, 10, 100, 101, 'I16: incr_by');
 
-    # Iteration
     shm_i16_clear $map;
     shm_i16_put $map, $_, $_ * 2 for 1..5;
     is(shm_i16_size $map, 5, 'I16: size');
@@ -50,14 +46,12 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $h = shm_i16_to_hash $map;
     is($h->{3}, 6, 'I16: to_hash');
 
-    # Method API
     $map->put(42, 84);
     is($map->get(42), 84, 'I16: method API');
 
     unlink $path;
 }
 
-# ====== I32 (int32 -> int32 with counters) ======
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I32->new($path, 1000);
@@ -83,7 +77,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# ====== I16S (int16 -> string) ======
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I16S->new($path, 1000);
@@ -91,13 +84,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(shm_i16s_put $map, 1, "hello", 'I16S: put');
     is(shm_i16s_get $map, 1, "hello", 'I16S: get');
 
-    # UTF-8
     ok(shm_i16s_put $map, 2, "\x{263A}", 'I16S: put UTF-8');
     my $v = shm_i16s_get $map, 2;
     ok(utf8::is_utf8($v), 'I16S: UTF-8 flag preserved');
     is($v, "\x{263A}", 'I16S: UTF-8 value correct');
 
-    # Empty string
     ok(shm_i16s_put $map, 3, "", 'I16S: put empty string');
     is(shm_i16s_get $map, 3, "", 'I16S: get empty string');
 
@@ -107,7 +98,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
     is(shm_i16s_size $map, 2, 'I16S: size');
 
-    # Cursor
     my $cur = shm_i16s_cursor $map;
     my $count = 0;
     while (my ($k, $val) = shm_i16s_cursor_next $cur) { $count++ }
@@ -119,7 +109,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# ====== I32S (int32 -> string) ======
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I32S->new($path, 1000);
@@ -139,7 +128,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# ====== IS (int64 -> string) ======
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::IS->new($path, 1000);
@@ -148,7 +136,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is(shm_is_get $map, 2**40, "big key", 'IS: get large');
     ok(shm_is_put $map, 0, "zero", 'IS: zero key');
 
-    # UTF-8
     ok(shm_is_put $map, 1, "\x{1F600}", 'IS: emoji');
     my $v = shm_is_get $map, 1;
     ok(utf8::is_utf8($v), 'IS: UTF-8 flag');
@@ -162,7 +149,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# ====== SI16 (string -> int16 with counters) ======
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI16->new($path, 1000);
@@ -174,12 +160,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(shm_si16_put $map, "min", -32768, 'SI16: INT16_MIN value');
     is(shm_si16_get $map, "min", -32768, 'SI16: get min');
 
-    # Counters
     is(shm_si16_incr $map, "cnt", 1, 'SI16: incr');
     is(shm_si16_incr $map, "cnt", 2, 'SI16: incr again');
     is(shm_si16_decr $map, "cnt", 1, 'SI16: decr');
 
-    # UTF-8 keys
     ok(shm_si16_put $map, "\x{263A}", 42, 'SI16: UTF-8 key');
     is(shm_si16_get $map, "\x{263A}", 42, 'SI16: get UTF-8 key');
 
@@ -192,7 +176,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# ====== SI32 (string -> int32 with counters) ======
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI32->new($path, 1000);
@@ -218,7 +201,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# ====== each variant with get_or_set ======
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I16->new($path, 1000);
@@ -248,7 +230,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# ====== Stress: many entries across variants ======
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I32->new($path, 100000);
@@ -260,9 +241,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# ====== add/update/swap/cas on integer variants ======
-
-# I16: add/update/swap/cas
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I16->new($path, 1000);
@@ -282,7 +260,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# I32: add/update/swap/cas
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I32->new($path, 1000);
@@ -298,7 +275,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# SI16: add/update/swap/cas (string key → int16 value)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI16->new($path, 1000);
@@ -314,7 +290,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# SI32: add/update/swap/cas
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI32->new($path, 1000);
@@ -329,7 +304,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# SI: add/update/swap/cas (string → int64)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI->new($path, 1000);
@@ -345,9 +319,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# ====== add/update/swap/cas on string-value variants ======
-
-# IS: add/update/swap/cas (int64 → string)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::IS->new($path, 1000);
@@ -365,20 +336,18 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     do { my $_r = shm_is_cas $map, 1, "wrong", "X"; ok(!$_r, 'IS cas: fails on mismatch') };
     do { my $_r = shm_is_get $map, 1; is($_r, "casval", 'IS cas mismatch: value unchanged') };
     do { my $_r = shm_is_cas $map, 1234567, "x", "y"; ok(!$_r, 'IS cas: fails on missing key') };
-    # Method form
     ok($map->cas(1, "casval", "method"), 'IS cas: method form succeeds');
     is($map->get(1), "method", 'IS cas method: value updated');
-    # Inline/arena boundary (7 = inline max, 8 = arena) via method form
-    $map->put(7, "1234567");          # exactly inline max
+    # 7 bytes is the inline maximum, 8 goes to the arena
+    $map->put(7, "1234567");
     ok($map->cas(7, "1234567", "abcdefg"), 'IS cas: 7-byte inline');
     is($map->get(7), "abcdefg", 'IS cas: 7-byte updated');
-    $map->put(8, "12345678");         # arena
+    $map->put(8, "12345678");
     ok($map->cas(8, "12345678", "abcdefgh"), 'IS cas: 8-byte arena');
     is($map->get(8), "abcdefgh", 'IS cas: 8-byte updated');
     unlink $path;
 }
 
-# I16S: add/update/swap/cas
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I16S->new($path, 1000);
@@ -402,7 +371,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# I32S: add/update/swap/cas
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I32S->new($path, 1000);
@@ -426,7 +394,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# SS: add/update/swap/cas (string → string)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
@@ -444,32 +411,27 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     do { my $_r = shm_ss_get $map, "k"; is($_r, "v2", 'SS cas mismatch: value unchanged') };
     do { my $_r = shm_ss_cas $map, "absent", "x", "y"; ok(!$_r, 'SS cas: fails on missing key') };
 
-    # Long values (force arena allocation, > 7 bytes inline limit)
     my $long_a = "a" x 100;
     my $long_b = "b" x 100;
     $map->put("L", $long_a);
     do { my $_r = shm_ss_cas $map, "L", $long_a, $long_b; ok($_r, 'SS cas: long arena value match') };
     do { my $_r = shm_ss_get $map, "L"; is($_r, $long_b, 'SS cas: long value updated') };
 
-    # Empty-string value
     $map->put("E", "");
     do { my $_r = shm_ss_cas $map, "E", "", "non-empty"; ok($_r, 'SS cas: empty→non-empty') };
     do { my $_r = shm_ss_cas $map, "E", "", "x"; ok(!$_r, 'SS cas: fails after value changed') };
 
-    # Byte-equality regardless of UTF-8 flag on expected (ASCII bytes only)
     $map->put("U", "abc");
     my $up_expected = "abc"; utf8::upgrade($up_expected);
     do { my $_r = shm_ss_cas $map, "U", $up_expected, "ok"; ok($_r, 'SS cas: utf8-upgraded expected matches downgraded stored') };
     do { my $_r = shm_ss_get $map, "U"; is($_r, "ok", 'SS cas: value updated via toggled expected') };
 
-    # Method form
     ok($map->cas("U", "ok", "method"), 'SS cas: method form');
     is($map->get("U"), "method", 'SS cas method: value updated');
 
     unlink $path;
 }
 
-# CAS refreshes TTL on match (string-value variant with default TTL)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SS->new($path, 1000, 0, 60);
@@ -479,21 +441,18 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok($before <= 58, "SS cas TTL: TTL decayed (before=$before)");
     ok($map->cas("k", "v1", "v2"), 'SS cas: succeeds with TTL');
     my $after = shm_ss_ttl_remaining $map, "k";
-    # After refresh, ttl should be back near the 60s default — assert >= 59
-    # to tolerate coarse-clock granularity without depending on $before.
+    # >= 59, not 60: tolerates coarse-clock granularity
     ok($after >= 59, "SS cas TTL: refreshed to default on match (after=$after)");
     unlink $path;
 }
 
-# CAS promotes in LRU on match
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::SS->new($path, 1000, 3);  # max_size=3 LRU
+    my $map = Data::HashMap::Shared::SS->new($path, 1000, 3);
     $map->put("a", "1");
     $map->put("b", "2");
     $map->put("c", "3");
     ok($map->cas("a", "1", "1prime"), 'SS cas LRU: succeeds');
-    # CAS-touched "a" promoted; adding "d" should evict the tail ("b")
     $map->put("d", "4");
     is($map->size, 3, 'SS cas LRU: size still 3');
     ok($map->exists("a"), 'SS cas LRU: promoted key survives eviction');
@@ -501,8 +460,8 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# An integer cas and a get_or_set hit leave their lock-free fast path to maps
-# without LRU or TTL: with either, they still promote and refresh.
+# an integer cas / get_or_set hit is lock-free only on maps without LRU or TTL;
+# with either, it still promotes and refreshes
 {
     require Data::HashMap::Shared::II;
     my $map = Data::HashMap::Shared::II->new(undef, 1000, 3);
@@ -519,9 +478,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     }
 }
 
-# ====== persist/set_ttl on non-II variants ======
-
-# I16 with TTL: persist/set_ttl
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I16->new($path, 1000, 0, 30);
@@ -538,7 +494,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# SI16 with TTL: persist/set_ttl
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI16->new($path, 1000, 0, 30);
@@ -551,7 +506,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# IS with TTL: persist/set_ttl
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::IS->new($path, 1000, 0, 30);
@@ -564,7 +518,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# I32S with TTL: persist/set_ttl
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I32S->new($path, 1000, 0, 30);
@@ -575,7 +528,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
-# SI32 with TTL: persist/set_ttl
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::SI32->new($path, 1000, 0, 30);
@@ -584,7 +536,6 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $rem = shm_si32_ttl_remaining $map, "k";
     is($rem, 0, 'SI32 persist: permanent');
     ok($map->set_ttl("k", 60), 'SI32 set_ttl: wait, key is permanent');
-    # set_ttl on permanent key — changes it back to TTL
     my $rem2 = shm_si32_ttl_remaining $map, "k";
     ok($rem2 > 0, 'SI32 set_ttl: permanent→TTL works');
     unlink $path;

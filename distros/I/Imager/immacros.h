@@ -154,6 +154,8 @@ returns -1 and pushes an error.
 #define io_new_buffer(data, len, closecb, closectx) im_io_new_buffer(aIMCTX, (data), (len), (closecb), (closectx))
 #define io_new_cb(p, readcb, writecb, seekcb, closecb, destroycb) \
   im_io_new_cb(aIMCTX, (p), (readcb), (writecb), (seekcb), (closecb), (destroycb))
+#define io_new_cb8(p, readcb, writecb, seekcb, closecb, destroycb, sizecb)     \
+  im_io_new_cb8(aIMCTX, (p), (readcb), (writecb), (seekcb), (closecb), (destroycb), (sizecb))
 
 #define i_malloc(size) im_malloc(aIMCTX, size)
 #define i_realloc(p, size) im_realloc(aIMCTX, p, size)
@@ -163,7 +165,11 @@ returns -1 and pushes an error.
 #define i_set_out_of_memory(callme, userdata) \
   im_set_out_of_memory(aIMCTX, callme, userdata)
 
+#define i_io_set_max_mmap_size(size) im_io_set_max_mmap_size(aIMCTX, (size))
+#define i_io_get_max_mmap_size()     im_io_get_max_mmap_size(aIMCTX)
+
 #define im_size_t_max (~(size_t)0)
+#define im_ssize_t_max ((ssize_t)((~(size_t)0) >> 1))
 
 #ifdef __cplusplus
 }

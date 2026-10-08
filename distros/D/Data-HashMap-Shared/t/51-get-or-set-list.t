@@ -3,17 +3,15 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 
-# get_or_set returns undef -- ONE undef, not an empty list -- when it cannot
-# insert.  t/15 checks that with defined() in scalar context, where an XSUB
-# returning nothing also reads as undef.  Bind the result as a list, on every
-# variant, so `my %h = (v => $m->get_or_set(...))` keeps its pairing.
+# get_or_set returns one undef, not an empty list, when it cannot insert; a
+# scalar-context defined() cannot tell them apart, so bind the result as a list.
 
 my @variants = qw(II IS SI SS I16 I16S I32 I32S SI16 SI32);
 my $dir = tempdir(CLEANUP => 1);
 for my $v (@variants) {
     my $cls = "Data::HashMap::Shared::$v";
     eval "require $cls; 1" or die $@;
-    my $m = $cls->new("$dir/gos-$v.shm", 4);          # tiny, LRU off: fills up
+    my $m = $cls->new("$dir/gos-$v.shm", 4);
     my $stored = 0;
     for my $k (1 .. 1000) { $m->put($k, $k) or last; $stored++ }
     ok $stored > 0 && $stored < 1000, "$v: non-LRU map filled after $stored inserts";

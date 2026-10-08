@@ -11,7 +11,6 @@ use Data::HashMap::Shared::II;
 
 my $path = tmpnam() . ".$$";
 
-# Parent creates, children concurrently mutate under valgrind
 my $N = 3;
 my $OPS = 200;
 
@@ -21,7 +20,6 @@ my @pids;
 for my $k (0..$N-1) {
     my $pid = fork // die;
     if ($pid == 0) {
-        # Child re-exec itself under valgrind to detect leaks/UB in this process
         my $inner = qq{
             use Data::HashMap::Shared::II;
             my \$c = Data::HashMap::Shared::II->new('$path', 1024);

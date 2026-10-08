@@ -5,7 +5,6 @@ use POSIX qw(_exit);
 use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 
-# new_memfd + new_from_fd round-trip (II variant)
 {
     my $m = Data::HashMap::Shared::II->new_memfd("mtest", 100);
     ok $m, 'II new_memfd created';
@@ -23,7 +22,6 @@ use Data::HashMap::Shared::SS;
     POSIX::close($fd);
 }
 
-# SS variant (has arena) — ensure arena survives the reopen
 {
     my $m = Data::HashMap::Shared::SS->new_memfd("mss", 64);
     $m->put("hello", "world");
@@ -33,7 +31,6 @@ use Data::HashMap::Shared::SS;
     POSIX::close($fd);
 }
 
-# Fork inherits the mapping via shared mmap
 {
     my $m = Data::HashMap::Shared::II->new_memfd("mfork", 100);
     $m->put(7, 7);
@@ -46,7 +43,6 @@ use Data::HashMap::Shared::SS;
     is $m->size, 2, 'child write visible in parent (shared mmap)';
 }
 
-# Reject a garbage fd
 {
     pipe my ($r, $w) or die;
     my $m = eval { Data::HashMap::Shared::II->new_from_fd(fileno($r)) };
@@ -55,7 +51,6 @@ use Data::HashMap::Shared::SS;
     close $r; close $w;
 }
 
-# sync() msync on memfd-backed map
 {
     my $m = Data::HashMap::Shared::II->new_memfd("sync_hm", 16);
     $m->put(1, 1);

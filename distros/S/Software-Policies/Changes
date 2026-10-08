@@ -1,5 +1,21 @@
 Revision history for Software-Policies
 
+0.006     2026-10-07 22:16:34+02:00 Europe/Stockholm
+    * Fix indentation to avoid rendering as a Markdown list.
+
+0.005     2026-10-07 20:04:24+02:00 Europe/Stockholm
+    * Change Co-Authored-By to AI-assisted-by in Contributing.
+
+0.004     2026-10-07 13:50:31+02:00 Europe/Stockholm
+    * Add policy Maintainer Succession v.1.
+    * Add policy Contributing/PerlDistZilla v.1.1.
+    * Add policy AIDisclosure/Basic v.1.1.
+    * Add version 1.1 of Contributing/PerlDistZilla policy.
+    * Add version 1.1 of AIDisclosure/Basic policy.
+    * Correct link.
+    * Correct typo.
+    * Add Maintainer Succession policy.
+
 0.003     2026-04-14 02:21:14+02:00 Europe/Stockholm
 
 0.002     2025-12-07 18:32:05+01:00 Europe/Stockholm

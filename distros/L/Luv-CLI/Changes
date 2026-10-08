@@ -1,5 +1,8 @@
 Revision history for Luv-CLI
 
+0.005     2026-10-08 00:17:43-04:00 America/New_York
+    - Changed the repository link from Codeberg to GitHub
+
 0.004     2026-09-21 19:23:40-04:00 America/New_York
     - Fixed `luv build`: files under source_dir now bundle inside their
       own subfolder in the .love archive instead of landing at the

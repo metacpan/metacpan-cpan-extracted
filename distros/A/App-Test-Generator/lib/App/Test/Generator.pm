@@ -7,6 +7,21 @@ package App::Test::Generator;
 #	to a new table called Metrics.  Add Halstead and McCabes metrics to
 #	this new Metrics table.  Include links to the definitions of TER1/2/3,
 #	Halstead and McCabes metrics, perhaps from Wikipedia
+# TODO: Template.pm - $spec->{schema} support for nested hashref/arrayref not implemented
+#	(Template.pm ~line 629-631); the hashref case currently skips the field with a carp
+# TODO: Template.pm public API (27/28 subs) lacks POD documentation; add =head2 sections
+#	with =head4 input / =head4 output formal specs for each public sub
+# TODO: SchemaExtractor does not traverse @ISA for inherited constructors; if a module's
+#	constructor is defined in a parent class, extract_all() may miss representative
+#	constructor args and emit new:~ (unenrichable) instead of inferring from the base class
+# TODO: Magic-number probability constants in Template.pm (e.g. rand() < 0.3) should be
+#	Readonly module-level constants with ALL_CAPS_SNAKE names for maintainability
+# TODO: Difficulty constants are duplicated between bin/test-generator-mutate and Mutator.pm;
+#	consolidate into a single source of truth (e.g. Readonly constants in Mutator.pm,
+#	imported by the CLI)
+# TODO: validate_email in Sample::Module needs a matches: regex in its formal input spec
+#	so fuzz-harness-generator can generate structurally valid email inputs and the harness
+#	can be removed from %no_fuzz in t/self-fuzz.t
 
 use 5.036;
 
@@ -38,7 +53,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 Readonly my $DEFAULT_ITERATIONS      => 30;
 Readonly my $DEFAULT_PROPERTY_TRIALS => 1000;
@@ -159,7 +174,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =head1 SYNOPSIS
 
@@ -265,6 +280,17 @@ The distribution ships the following command-line tools:
 =item * L<benchmark-generator> - generate a self-contained L<Benchmark> C<cmpthese> script from a YAML schema. Each transform in the schema becomes one named variant; representative input values are derived from each parameter's type and range constraints.
 
 =item * L<deploy-workflows> - copy C<dashboard.yml> and C<mutate.yml> into the target repository's C<.github/workflows/> directory. Both files are embedded verbatim in the script, so no ATG source tree is needed after installation. Supports C<--target>, C<--force>, and C<--dry-run>.
+
+To add a test dashboard to your CPAN module: copy these scripts into your C<.github/workflows> directory,
+then commit the changes to GitHub and enable the page through C<Settings-Pages-branch = gh_pages>:
+
+=over 4
+
+=item * L<https://github.com/nigelhorne/App-Test-Generator/blob/master/.github/workflows/dashboard.yml>
+
+=item * L<https://github.com/nigelhorne/App-Test-Generator/blob/master/.github/workflows/mutate.yml>
+
+=back
 
 =item * L<extract-schemas> - heuristically extract YAML parameter schemas from a C<.pm> file, with optional coverage-guided fuzzing (C<--fuzz>) and corpus minimization (C<--minimize-corpus>).
 
@@ -1990,7 +2016,7 @@ sub generate
 		if($new_code eq '') {
 			$new_code = "new_ok('$module')";
 		} else {
-			$new_code = "new_ok('$module' => [ { $new_code } ] )";
+			$new_code = "new_ok('$module' => [ $new_code ] )";
 		}
 		$setup_code .= "\nmy \$obj = $new_code;";
 		if($has_positions) {

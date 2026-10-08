@@ -6,17 +6,12 @@ use POSIX ();
 
 use Data::HashMap::Shared::II;
 
-# A writer killed between the two halves of a publish leaves the seqlock odd
-# and its pid in the lock word.  Lock-free readers wait for the holder, and a
-# pid that answers kill(pid, 0) is a holder -- so once the kernel recycled that
-# pid to the reading process, get, exists and cursors spun for ever: our own
-# pid always answers.  Our own pid in the word is a dead writer by construction
-# (t/61 makes the same case for the write path) unless another thread of ours
-# holds the lock, and the seqlock's timeout recovery now treats it as one.
-#
-# Each probe runs in a child under a no-handler alarm: a regression is a
-# signal death rather than a hung suite, since a Perl alarm cannot interrupt
-# an XSUB.
+# A writer killed mid-publish leaves the seqlock odd and its pid in the lock
+# word; lock-free readers wait for a pid that answers kill(pid, 0), and our own
+# pid always does.  So our own pid there is a dead writer unless another thread
+# of ours holds the lock (t/61 covers the write path). Each probe runs in a
+# child under a no-handler alarm (a Perl alarm cannot interrupt an XSUB), so a
+# regression is a signal death rather than a hung suite.
 
 my $dir  = tempdir(CLEANUP => 1);
 my $path = "$dir/ghost.shm";
@@ -65,7 +60,6 @@ for my $arm (
     }), 'ok', "$what proceeds when the writer mid-publish is our own recycled pid";
 }
 
-# A live foreign writer mid-publish must still be waited for, not recovered.
 fresh_map();
 my $holder = fork // die "fork: $!";
 if (!$holder) { select undef, undef, undef, 120; POSIX::_exit(0) }

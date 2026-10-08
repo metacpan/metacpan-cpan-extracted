@@ -4,24 +4,17 @@ use Test::More;
 use File::Temp qw(tempdir);
 use Time::HiRes qw(sleep time);
 
-# flush_deferred must re-test the seal under the write lock: testing it first
-# lets a call parked on that lock resize a map freeze() sealed meanwhile, and a
-# sealed file is served by new_readonly with no lock at all precisely because it
-# cannot change.  It is reachable without writing -- an exhausted each(), a
-# cursor reset or destroyed (including at process exit), a sharded cursor
-# advancing -- so "quiesce your writers" does not cover it.
-#
-# The window is two adjacent statements, so only stopping the process inside it
-# tells the orderings apart: gdb parks the victim on the lock, this process
-# freezes, then the victim is released.  The invariant asserted is the one the
-# bug breaks: the sealed table's capacity must not change afterwards.
+# flush_deferred must re-test the seal under the write lock, or a call parked on
+# it resizes a map freeze() sealed meanwhile.  The window is two adjacent
+# statements: gdb parks the victim on the lock, this process freezes, then the
+# victim is released.
 
 plan skip_all => 'set CRASH_GDB=1 to run' unless $ENV{CRASH_GDB};
 my $gdb = `which gdb 2>/dev/null`; chomp $gdb;
 plan skip_all => 'gdb not found' unless $gdb && -x $gdb;
 plan skip_all => 'needs the dist root' unless -f 'shm_generic.h' && -f 'Makefile.PL';
 
-# Anchor on the statement, not a line number: the fix itself moves the line.
+# Anchor on the statement, not a line number.
 my $line;
 {
     open my $fh, '<', 'shm_generic.h' or die $!;
@@ -94,7 +87,6 @@ unless (-e $ready) {
 }
 
 my $f = Data::HashMap::Shared::II->new($map, 1000);
-# Control: the deferred resize must still be pending, or the test proves nothing.
 is $f->capacity, $cap_seeded, 'control: table not yet resized when freeze runs';
 
 $f->freeze;

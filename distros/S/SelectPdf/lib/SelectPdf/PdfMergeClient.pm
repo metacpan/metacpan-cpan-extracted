@@ -6,6 +6,8 @@ use SelectPdf::AsyncJobClient;
 use strict;
 our @ISA = qw(SelectPdf::ApiClient);
 
+our $VERSION = '1.6.0';
+
 =head1 NAME
 
 SelectPdf::PdfMergeClient - Pdf Merge with SelectPdf Online API.
@@ -129,7 +131,7 @@ Returns:
 
 - Reference to the current object.
 =cut
-sub addFileWithPassword($,$) {
+sub addFileWithPassword($$) {
     my($self, $inputPdf, $userPassword) = @_;
 
     $self->{fileIdx} = $self->{fileIdx} + 1;
@@ -185,7 +187,7 @@ Returns:
 
 - Reference to the current object.
 =cut
-sub addUrlFileWithPassword($,$) {
+sub addUrlFileWithPassword($$) {
     my($self, $inputUrl, $userPassword) = @_;
 
     $self->{fileIdx} = $self->{fileIdx} + 1;
@@ -628,6 +630,25 @@ sub setOwnerPassword($) {
     return $self;
 }
 
+=head2 setPdfName( $pdfName )
+
+Specify the name of the pdf document that will be created. The default value is Document.pdf.
+
+Parameters:
+
+- $pdfName: Name of the generated PDF document.
+
+Returns:
+
+- Reference to the current object.
+=cut
+sub setPdfName($) {
+    my($self, $pdfName) = @_;
+
+    $self->{parameters}{"pdf_name"} = $pdfName;
+    return $self;
+}
+
 =head2 setCustomParameter( $parameterName, $parameterValue )
 
 Set a custom parameter. Do not use this method unless advised by SelectPdf.
@@ -642,7 +663,7 @@ Returns:
 
 - Reference to the current object.
 =cut
-sub setCustomParameter($,$) {
+sub setCustomParameter($$) {
     my($self, $parameterName, $parameterValue) = @_;
 
     $self->{parameters}{$parameterName} = $parameterValue;

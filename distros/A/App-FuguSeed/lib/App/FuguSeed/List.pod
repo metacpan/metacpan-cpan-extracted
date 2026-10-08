@@ -20,7 +20,7 @@ of a word is its 0-based position in the list.
 
 Every method is a class method. The module keeps no state and never
 logs. It runs on core Perl v5.34 with no dependency, because
-F<scripts/pack> embeds it in C<fuguseed-qr>.
+F<scripts/pack> embeds it in C<fuguseed-last> and C<fuguseed-qr>.
 
 The module opens no file. The share file is the copy that a person can
 inspect and replace, and C<fuguseed-words> reads it. The digest check

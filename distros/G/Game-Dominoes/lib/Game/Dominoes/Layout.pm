@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 
 use Game::Dominoes::Play;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @ARMS = qw/L R U D/;
 
@@ -201,7 +201,7 @@ Game::Dominoes::Layout - the tiles on the table, and where another may go
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

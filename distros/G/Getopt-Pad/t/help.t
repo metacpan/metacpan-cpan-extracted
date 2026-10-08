@@ -47,7 +47,8 @@ subtest 'rendered layout' => sub {
 	like $rendered, qr/^   --\[no-\]private\s+Create as private$/m, 'negatable label';
 	like $rendered, qr/^\s+Valid   = \[ debug, info, warn \]$/m, 'valid subline';
 	like $rendered, qr/^\s+Default = info$/m, 'default subline';
-	like $rendered, qr/^   --define <key=value>\s+Build variables$/m, 'hash option label';
+	like $rendered, qr/^   --define, -D <key=value>\s+Build variables$/m, 'hash option label';
+	like $rendered, qr/^   --owner, -o <>\s+\[REQ\] Target owner$/m, 'aliases follow the primary name';
 	like $rendered, qr/^   --tag <a,b,\.\.\.>\s+Labels to attach$/m, 'csv option label';
 	like $rendered, qr/^   --host <>\s+Where to connect \[Hostname\]$/m, 'typehint tags an option without a type label';
 	like $rendered, qr/^   --server <N.key=value>\s+Upstreams$/m, 'objectlist option label';
@@ -66,6 +67,28 @@ subtest 'rendered layout' => sub {
 	unlike $rendered, qr/--help/,    'auto help option hidden';
 	unlike $rendered, qr/--version/, 'auto version option hidden';
 	unlike $rendered, qr/\e\[/,      'no ANSI codes with color off';
+};
+
+subtest 'names, arg notes and defaults' => sub {
+	my $named = Getopt::Pad::Spec->new(raw => {
+		options => {
+			'v'       => { type => '+' },
+			'color|c' => { type => '!' },
+			'x|y'     => { type => '!' },
+			'keep'    => { type => 'int', default => '007' },
+			'tag'     => { type => 's', multiple => 1, default => [] },
+			'define'  => { type => 's', hash => 1, default => {} },
+		},
+		args => [{ short => 'source', type => 'dir', mustExist => 1 }],
+	});
+	my $out = $named->helperFor($named->root, programName => 'x', width => 100, color => 0)->renderHelp;
+
+	like $out, qr/^   -v$/m, 'a single-letter primary name has one dash';
+	like $out, qr/^   --\[no-\]color, -c$/m, 'the negation sits on the long name';
+	like $out, qr/^   -x, -y, --no-x$/m, 'without a long name the negation follows the names';
+	like $out, qr/^   <source>\s+\[has to exist\] \[Path\]$/m, 'args show their constraint notes';
+	like $out, qr/^\s+Default = 007$/m, 'a default is shown as the spec wrote it';
+	unlike $out, qr/^\s+Default = $/m, 'an empty list or mapping default shows no Default line';
 };
 
 subtest 'long help text wraps with hanging indent' => sub {

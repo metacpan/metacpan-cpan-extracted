@@ -7,17 +7,14 @@ use POSIX ();
 
 use Data::HashMap::Shared::SS;
 
-# set_multi and remove_multi hold one write lock across the whole batch.  A
-# guard that took the read lock instead would let two batches run at once, and
-# its cleanup still calls wrunlock, so the caller's reader slot keeps the depth
-# it took and the next write lock anyone takes drains that slot forever.
-#
+# set_multi and remove_multi hold one write lock across the batch.  A guard that
+# took the read lock would let two batches overlap, and its cleanup still calls
+# wrunlock, leaving the caller's reader slot depth held for the next write lock
+# to drain forever.
 # Same shape as t/41: barrier-released workers batch-insert disjoint ranges into
-# a pre-grown table, then arithmetic an unlocked batch cannot hold (hdr->size is
-# a plain ++, the arena a plain bump pointer).  Workers only call set_multi,
-# which a read-lock guard never blocks, so the losses stay countable.  The stall
-# is probed in a child under a no-handler alarm, where it is a status and not a
-# hang, and being deterministic it runs even where the race is skipped.
+# a pre-grown table.  Workers only call set_multi, which a read-lock guard never
+# blocks, so the losses stay countable.  The stall probe is deterministic and
+# runs even where the race is skipped.
 
 sub ncpu {
     return $ENV{TEST_NCPU} if $ENV{TEST_NCPU};
@@ -38,7 +35,7 @@ sub ncpu {
 
 my $WORKERS = 8;
 my $PER     = 2000;
-my $BATCH   = 8;                    # keys per set_multi call
+my $BATCH   = 8;
 my $TOTAL   = $WORKERS * $PER;
 
 sub val_for { "v:$_[0]:" . ('p' x 24) }   # >7 bytes: forces an arena allocation
@@ -96,9 +93,8 @@ SKIP: {
     is($crashed, 0, "no worker died on a signal");
     is($refused, 0, "every worker had every pair of its batches stored");
 
-    # Everything below reads the map, and get() is lock-free: a seqlock left
-    # odd spins inside XS, where a Perl-level handler would never run.  Default
-    # disposition, so a wedge here is a signal death and not a suite stall.
+    # get() is lock-free: a seqlock left odd spins inside XS, where a Perl-level
+    # handler would never run, so a wedge must be a signal death
     $SIG{ALRM} = 'DEFAULT';
     alarm 30;
 
@@ -124,9 +120,8 @@ SKIP: {
     alarm 0;
 }
 
-# t/25's sequence: set_multi, then a write lock in the same process.  A guard
-# that leaves the caller's read depth held makes freeze() (and put()) wait on
-# that slot forever, and the holder is alive, so recovery cannot break it.
+# a guard that leaves the caller's read depth held makes freeze() and put() wait
+# forever: the holder is alive, so recovery cannot break it
 {
     my $path = "$dir/stall.shm";
     my $pid = fork;

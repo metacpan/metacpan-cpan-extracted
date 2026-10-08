@@ -5,9 +5,8 @@ use POSIX ();
 use File::Temp qw(tempdir);
 use Data::HashMap::Shared::II;
 
-# A creator killed between ftruncate() and shm_init_header() leaves a full-size,
-# all-zero (magic==0) file.  new() must recover it instead of bricking the path,
-# and must never clobber a valid or foreign file.
+# A creator killed between ftruncate() and shm_init_header() leaves a full-size
+# all-zero file; new() must recover it but never clobber a valid or foreign one.
 
 my $dir = tempdir(CLEANUP => 1);
 my $p   = "$dir/recover.hm";
@@ -16,7 +15,6 @@ my $p   = "$dir/recover.hm";
 my $total = -s $p;
 unlink $p;
 
-# 1. Recovery: an abandoned all-zero file of exactly $total bytes is re-initialized.
 {
     open my $f, '>', $p or die $!; truncate $f, $total or die $!; close $f;
     is(-s $p, $total, "abandoned file is $total bytes");
@@ -30,7 +28,6 @@ unlink $p;
     undef $m; unlink $p;
 }
 
-# 2. No clobber: a file with nonzero (foreign) magic still errors.
 {
     open my $f, '>', $p or die $!; print $f "XXXX"; truncate $f, $total or die $!; close $f;
     my $m = eval { Data::HashMap::Shared::II->new($p, 1000) };
@@ -38,7 +35,6 @@ unlink $p;
     undef $m; unlink $p;
 }
 
-# 3. No recovery for the wrong size: magic==0 but size != total still errors.
 {
     open my $f, '>', $p or die $!; truncate $f, $total + 8 or die $!; close $f;
     my $m = eval { Data::HashMap::Shared::II->new($p, 1000) };
@@ -46,7 +42,6 @@ unlink $p;
     undef $m; unlink $p;
 }
 
-# 4. A valid file is attached, never re-initialized (its data survives).
 {
     my $a = Data::HashMap::Shared::II->new($p, 1000); $a->put(7, 99); undef $a;
     my $r = Data::HashMap::Shared::II->new($p, 1000);
@@ -54,8 +49,6 @@ unlink $p;
     undef $r; unlink $p;
 }
 
-# 5. A magic==0 file of the right size but with NON-zero data (not a fresh
-#    ftruncate) is NOT recovered -- recovery only re-inits a provably-empty file.
 {
     open my $zfh, '>', $p or die $!; truncate $zfh, $total or die $!; close $zfh;
     open $zfh, '+<', $p or die $!; seek $zfh, $total - 1, 0; print $zfh "\x01"; close $zfh;
@@ -64,10 +57,8 @@ unlink $p;
     undef $m; unlink $p;
 }
 
-# Regression (0.19): shm_pid_alive(0) returned "alive", so a lock word holding
-# pid 0 -- corruption, since a real writer always records getpid() -- was waited
-# on forever by the rwlock paths.  kill(0,0) signals our own process group, so
-# it could never answer for a holder anyway.  Every operation must now complete.
+# A lock word holding pid 0 is corruption; kill(0,0) signals our own process
+# group, so it must not be mistaken for a live holder.
 {
     my $p2 = "$dir/pidzero.hm";
     { my $m = Data::HashMap::Shared::II->new($p2, 64); $m->put(1, 1); }
@@ -77,9 +68,7 @@ unlink $p;
         print $f pack('L', 0x80000000);       # WRITER_BIT with pid 0
         close $f or die $!;
     }
-    # The operations run in a forked child under alarm: before the fix they
-    # spin forever, and a hung child must show up as a failed test rather than
-    # wedging the whole suite.
+    # forked under alarm so a hang fails the test instead of wedging the suite
     my $kid = fork // die "fork: $!";
     unless ($kid) {
         alarm 20;

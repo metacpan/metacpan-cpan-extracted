@@ -16,8 +16,8 @@ my $protobuf_c_cflags = `pkg-config --cflags libprotobuf-c 2>/dev/null` || '';
 my $protobuf_c_libs = `pkg-config --libs libprotobuf-c 2>/dev/null` || '-lprotobuf-c';
 chomp($protobuf_c_cflags, $protobuf_c_libs);
 
-# - gRPC >= ~1.42: grpc_insecure_credentials_create() + grpc_channel_create()
-# - gRPC <  ~1.42: grpc_insecure_channel_create()
+# - gRPC >= 1.45: grpc_insecure_credentials_create() + grpc_channel_create()
+# - gRPC <  1.45: grpc_insecure_channel_create()
 # The new API header moved from grpc_security.h to credentials.h in ~1.65
 use File::Temp qw(tempdir);
 my $grpc_api_defines = '';
@@ -53,6 +53,19 @@ MSG
     exit 0;  # exit 0 = NA on CPAN Testers (not a test failure)
 }
 
+unless (try_compile($all_cflags, <<'END')) {
+#include <grpc/grpc.h>
+#include <protobuf-c/protobuf-c.h>
+#if PROTOBUF_C_VERSION_NUMBER < 1003000
+#error protobuf-c too old
+#endif
+void test(void) { grpc_shutdown_blocking(); }
+int main(void) { return 0; }
+END
+    warn "EV::Etcd requires gRPC >= 1.20 and protobuf-c >= 1.3.0\n";
+    exit 0;
+}
+
 if (try_compile($all_cflags, <<'END')) {
 #include <grpc/credentials.h>
 int main(void) { return 0; }
@@ -66,11 +79,15 @@ my $creds_test_header = ($grpc_api_defines =~ /HAVE_GRPC_CREDENTIALS_H/)
 if (try_compile("$all_cflags $grpc_api_defines", <<"END")) {
 #include <grpc/grpc.h>
 $creds_test_header
-void test(void) { grpc_channel_credentials *c = grpc_insecure_credentials_create(); (void)c; }
+void test(void) {
+    grpc_channel_credentials *c = grpc_insecure_credentials_create();
+    grpc_channel *ch = grpc_channel_create("localhost", c, NULL);
+    (void)ch;
+}
 int main(void) { return 0; }
 END
     $grpc_api_defines .= ' -DHAVE_GRPC_NEW_CHANNEL_API';
-    print "Detected grpc_insecure_credentials_create (new channel API)\n";
+    print "Detected grpc_channel_create (new channel API)\n";
 } else {
     print "Using legacy grpc_insecure_channel_create\n";
 }
@@ -98,7 +115,7 @@ WriteMakefile(
     },
 
     TEST_REQUIRES => {
-        'Test::More' => 0,
+        'Test::More' => '0.88',
     },
 
     LIBS   => ["$grpc_libs $protobuf_c_libs -lpthread"],

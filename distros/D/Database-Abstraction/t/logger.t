@@ -7,17 +7,17 @@ use FindBin qw($Bin);
 
 use File::Temp;
 use File::Spec;
-use Test::Most tests => 34;
+use Test::Most tests => 33;
+use Test::Log::Abstraction;
 
 use lib 't/lib';
 
-use_ok('MyLogger');
 use_ok('Database::test1');
 use_ok('Database::test2');
 use_ok('Database::test4');
 
 my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
-my $test1 = new_ok('Database::test1' => [{ directory => $directory, logger => new_ok('MyLogger') }]);
+my $test1 = new_ok('Database::test1' => [{ directory => $directory, logger => new_ok('Test::Log::Abstraction') }]);
 
 cmp_ok($test1->number('two'), '==', 2, 'CSV AUTOLOAD works found');
 is($test1->number('four'), undef, 'CSV AUTOLOAD works not found');
@@ -26,14 +26,14 @@ my $res = $test1->selectall_hashref(entry => 'one');
 $res = $test1->selectall_hashref(number => 1);
 
 my $test2 = new_ok('Database::test2' => [ directory => $directory ]);
-cmp_ok($test2->set_logger(new_ok('MyLogger')), 'eq', $test2, 'set_logger returns self');
+cmp_ok($test2->set_logger(new_ok('Test::Log::Abstraction')), 'eq', $test2, 'set_logger returns self');
 
 cmp_ok($test2->number('third'), 'eq', '3rd', 'PSV AUTOLOAD works found');
 is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');
 
 # set_logger with a valid logger
 {
-	my $logger = new_ok('MyLogger');
+	my $logger = new_ok('Test::Log::Abstraction');
 	my $result = $test2->set_logger(logger => $logger);
 	is($result, $test2, 'set_logger returns $self when logger is set');
 	is($test2->{'logger'}, $logger, 'sets the logger correctly');

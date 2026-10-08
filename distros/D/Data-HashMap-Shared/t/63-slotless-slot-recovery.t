@@ -6,15 +6,10 @@ use POSIX ();
 
 use Data::HashMap::Shared::II;
 
-# With every reader slot taken a handle runs slotless: the lock still works,
-# but the handle's death is no longer recoverable.  Rescanning all 1024 slots
-# on each operation costs a kill(2) per live owner, so a slotless handle backs
-# off and only retries occasionally.  What the back-off risks is never retrying
-# at all, leaving a handle slotless for the rest of its life while slots sit
-# free, so that is what this pins.
-#
-# The table is filled with the parent's pid: alive, so pass 2 reclaims none of
-# them, which is the only way to reach the slotless path without 1024 processes.
+# A slotless handle backs off rescanning the 1024 slots (a kill(2) per live
+# owner); this pins that it still retries while slots sit free.  The table is
+# filled with the parent's pid, alive, so no slot is reclaimed: the only way to
+# reach the slotless path without 1024 processes.
 
 use constant { SLOTS => 1024, SLOT_SIZE => 16 };
 

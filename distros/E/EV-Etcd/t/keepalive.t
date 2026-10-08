@@ -4,6 +4,7 @@
 # etcds started here; the first is frozen with SIGSTOP.
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 use File::Temp 'tempdir';

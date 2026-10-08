@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package App::FuguBench::Keys;
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 use v5.34;
 use warnings;
@@ -26,15 +26,16 @@ no feature qw(indirect multidimensional bareword_filehandles);
 # App::FuguBench::Keys - the embedded release keys.
 #
 # The program embeds the release public keys of the organization in
-# one module (DIST-KEY-1). A release then carries the keys that verify
-# the next release, and no file of the host decides what it trusts.
+# one module (DIST-KEY-1). No file of the host then decides what a
+# release trusts.
 #
 # The keys are those of deps/KEYS.txt of the org pack, and
 # t/fugubench/keys.t holds this module to that file.
 #
 # The line order of that file is the trust order, and the current key
-# comes first. A rotation is a release of the program, and the old key
-# stays in the list for one release after the new key enters it
+# comes first. A rotation is a release of the program, and this list
+# follows the file. An installed program can therefore lack the key of
+# a later release, and `update` then names the install command
 # (DIST-KEY-3).
 #
 # DIST-KEY-2 gives this list to `update` alone. The `deps` verb
@@ -46,8 +47,8 @@ no feature qw(indirect multidimensional bareword_filehandles);
 # list is source.
 
 use constant KEYS => [ [
-		'fugubsd-1-release',
-		'RWRKSCtmq6YKnnWf4QcNV24EEspYWDvMZO7QhWrSKCqRpdWY+XYQsm9g'
+		'fugureleng-1-release',
+		'RWRPSFq0TxlrugHBInkYJP2+ItDv0UH4Vf3HxXFrIKqTE6tDFibU7l1w'
 	],
 ];
 

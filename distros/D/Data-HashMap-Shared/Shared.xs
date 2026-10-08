@@ -20,9 +20,7 @@
 
 /* ---- Exception-safe lock guard for rdlock held across Perl API calls ---- */
 
-/* Release the lock and drop the depth; run a close that was deferred
- * (pending_close) because a DESTROY arrived while a lock was held, so a free
- * never lands mid-lock. */
+/* Runs a close deferred by a DESTROY that arrived while a lock was held. */
 static void shm_guard_leave(ShmHandle *h) {
     if (--h->lock_depth == 0 && h->pending_close) shm_close_map_now(h);
 }
@@ -39,13 +37,10 @@ static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
     SAVEDESTRUCTOR_X(shm_rdunlock_cleanup, (void*)(handle))
 
 /* ---- The wrlock + seqlock write section of a batch write ----
- * No destructor releases it, on purpose.  The batch materialises its arguments
- * before the lock, so nothing inside runs Perl code or croaks -- except Perl's
- * own pending-signals croak, raised from its C signal handler in the middle of
- * a mutation.  Unwinding must then leave the lock held and the seqlock odd, for
- * stale-lock recovery once the process is gone: a release here would publish a
- * half-written table -- a resize midway.  The batch checks for signals every
- * few entries (shm_sig_check_every), so that croak cannot reach it. */
+ * No destructor releases it: the only croak possible inside, Perl's own
+ * pending-signals croak, must leave the lock held and seq odd for stale-lock
+ * recovery, never publish a half-written table.  shm_sig_check_every keeps that
+ * croak out. */
 #define WRSEQ_BEGIN(handle) \
     shm_rwlock_wrlock(handle); \
     shm_seqlock_write_begin(&(handle)->hdr->seq)
@@ -54,16 +49,13 @@ static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
     shm_seqlock_write_end(&(handle)->hdr->seq); \
     shm_rwlock_wrunlock(handle)
 
-/* Exception-safe free() for a scratch buffer held across newSVpvn(), so an OOM
- * croak cannot leak it.  free(), not Safefree: the buffer comes from the C
- * realloc() in shm_grow_buf, a different pool. */
+/* free(), not Safefree: the buffer comes from shm_grow_buf's realloc(). */
 static void shm_free_cleanup(pTHX_ void *ptr) {
     free(ptr);
 }
 
-/* perl core refuses a filename holding an embedded NUL; the C API would stop at
- * it and act on a shorter path than the caller named -- so unlink could remove
- * a different file.  The caller has run get-magic. */
+/* An embedded NUL would truncate the path: unlink could remove another file.
+ * The caller has run get-magic. */
 static const char *shm_path_arg(pTHX_ SV *sv, const char *what, const char *classname) {
     STRLEN len;
     const char *p = SvPV_nomg(sv, len);
@@ -72,11 +64,9 @@ static const char *shm_path_arg(pTHX_ SV *sv, const char *what, const char *clas
     return p;
 }
 
-/* A call that opens a file for writing, creates or removes one obeys taint mode
- * as core open and sysopen do: tainted data anywhere in the statement so far --
- * a path, a size, the file mode, a handle opened from tainted input -- is fatal
- * under -T and a warning under -t.  Use it once every argument has been read.
- * Reading by a tainted name is allowed. */
+/* As core open: tainted data anywhere in the statement is fatal for a call that
+ * writes, creates or removes a file.  Use it once every argument has been read;
+ * opening read-only by a tainted name is allowed. */
 #define SHM_TAINT_CHECK(op) STMT_START { TAINT_PROPER(op); } STMT_END
 
 static const char *shm_write_path_arg(pTHX_ SV *sv, const char *what,
@@ -90,9 +80,7 @@ static const char *shm_write_path_arg(pTHX_ SV *sv, const char *what,
     return p;
 }
 
-/* ---- Helper macros ---- */
-
-/* A count read from the SV: a UV parameter would wrap -1 to "everything". */
+/* A UV parameter would wrap -1 to "everything". */
 static UV shm_count_arg(pTHX_ SV *sv, const char *what, const char *classname) {
     NV nv;
     SvGETMAGIC(sv);
@@ -106,7 +94,6 @@ static UV shm_count_arg(pTHX_ SV *sv, const char *what, const char *classname) {
     return nv >= (NV)UV_MAX ? UV_MAX : (UV)nv;
 }
 
-/* A size argument checked against uint32_t, or `dflt` when it was not passed. */
 static inline uint32_t shm_u32_arg(pTHX_ SV *sv, const char *what, const char *classname, uint32_t dflt) {
     UV v;
     if (!sv) return dflt;
@@ -128,12 +115,9 @@ static const char *shm_invocant_class(pTHX_ SV *sv, const char *classname) {
     return SvPV_nolen(sv);
 }
 
-/* to_hash copies each entry under the read lock -- an integer key or value
- * raw into `raw`, a string key's bytes into `keys` (shm_pack_key), a string
- * value as an SV into `vals` -- and builds the hash from the copies here, once
- * the lock is released: making SVs, formatting keys and hashing, most of the
- * cost, then run without it.  `keys` or `vals` is NULL where that side is an
- * integer. */
+/* to_hash copies entries under the read lock (integers raw into `raw`, string
+ * keys packed into `keys`, string values as SVs into `vals`, NULL for an integer
+ * side) and builds the hash here, after the lock is released. */
 #define SHM_KEY_UTF8_BIT 0x80000000u
 static STRLEN shm_pack_key(pTHX_ SV *keys, STRLEN used, const char *p, uint32_t len, int utf8) {
     STRLEN need = used + sizeof(uint32_t) + len;
@@ -176,12 +160,10 @@ static SV *shm_copies_to_hashref(pTHX_ SV *raw, SV *keys, AV *vals, SSize_t n) {
     return newRV_noinc((SV *)hv);
 }
 
-/* keys, values and items copy under the read lock too.  An integer waits in the
- * stack slot its SV will take, and the slots get their mortals here, once the
- * lock is released.  A string is made an SV under the lock, unless its shard
- * holds SHM_LIST_PACK_MIN entries: then it waits in `strs`, packed by
- * shm_pack_key, its slot NULL.  Each of the `n` entries has `fields` slots,
- * field f a string where bit f of `str_fields` is set. */
+/* keys/values/items: an integer waits in its stack slot and becomes an SV here,
+ * after the lock is released.  A string becomes an SV under the lock, or, in a
+ * shard of SHM_LIST_PACK_MIN entries, waits packed in `strs` with a NULL slot.
+ * Field f of each entry is a string where bit f of `str_fields` is set. */
 #define SHM_LIST_PACK_MIN 4096u
 static void shm_stack_copies_to_svs(pTHX_ SV **slot, SSize_t n, int fields, int str_fields, SV *strs) {
     const char *p = strs ? SvPVX(strs) : NULL;
@@ -203,11 +185,8 @@ static void shm_stack_copies_to_svs(pTHX_ SV **slot, SSize_t n, int fields, int 
     }
 }
 
-/* The PPCODE body of keys, values and items on handle `h`.  Every shard's read
- * lock is taken in turn and all are held until the last copy is made, as with
- * to_hash.  Write-lock updates are blocked; fast atomic counter updates can
- * still proceed.  `copy` stores an entry's fields in order with SHM_COPY_INT
- * and SHM_COPY_STR. */
+/* Every shard's read lock is held until the last copy is made.  `copy` stores
+ * an entry's fields in order with SHM_COPY_INT and SHM_COPY_STR. */
 #define SHM_LIST_COPIES(node_type, fields, str_fields, copy) \
     STMT_START { \
         SV *strs = NULL; \
@@ -267,10 +246,8 @@ static mode_t shm_file_mode(pTHX_ UV mode, const char *classname) {
 #define SHM_WRITE_PATH_ARG(sv, what, classname, method) \
     (SvGETMAGIC(sv), SvOK(sv) ? shm_write_path_arg(aTHX_ (sv), (what), (classname), classname "->" method) : NULL)
 
-/* An unreachable LRU bound never evicts: the map fills and then refuses every
- * insert, or with a TTL reclaims expired slots instead.  Read it off the map,
- * not the arguments -- attaching ignores those.  A FATAL warning croaks, so
- * `sv` must already own the handle: SAVEFREESV frees it on that croak, and the
+/* max_size comes off the map: attaching ignores the arguments.  A FATAL warning
+ * croaks, so `sv` must own the handle: SAVEFREESV frees it then, and the
  * reference taken after the warning cancels the free otherwise. */
 #define CK_MAX_SIZE(map, classname, sv) \
     do { ShmHeader *_mh = (map)->shard_handles ? (map)->shard_handles[0]->hdr : (map)->hdr; \
@@ -283,15 +260,11 @@ static mode_t shm_file_mode(pTHX_ UV mode, const char *classname) {
             SvREFCNT_inc_simple_void_NN(sv); \
          } } while (0)
 
-/* A new writable handle, its write sections watching this interpreter's count
- * of signals awaiting their handlers. */
 #define SHM_RETURN_MAP(map, classname, class) \
     shm_set_sig_count((map), &PL_sig_pending); \
     RETVAL = sv_setref_pv(newSV(0), (class), (void*)(map)); \
     CK_MAX_SIZE((map), (classname), RETVAL)
 
-/* The exact class answers nearly every call; sv_derived_from, which costs more
- * than a lookup, is left to subclasses. */
 static int shm_isa(pTHX_ SV *sv, const char *classname) {
     if (!sv_isobject(sv)) return 0;
     HV *stash = SvSTASH(SvRV(sv));
@@ -310,11 +283,9 @@ static int shm_isa(pTHX_ SV *sv, const char *classname) {
     const char *shm_class = classname; PERL_UNUSED_VAR(shm_class); \
     sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
-/* Re-read the handle after a call that can run Perl code: argument magic may
- * call $obj->DESTROY explicitly, which frees the handle and zeroes the IV, and
- * EXTRACT_MAP's mortal pins the referent only against refcount destruction.
- * Belongs wherever magic can intervene between EXTRACT_MAP and the first use
- * of h, and nowhere else. */
+/* Argument magic may call $obj->DESTROY, freeing the handle: EXTRACT_MAP's mortal
+ * pins only against refcount destruction.  Use wherever magic can run between
+ * EXTRACT_MAP and the first use of h, and nowhere else. */
 #define REEXTRACT_MAP(classname, sv) \
     if (!SvROK(sv)) \
         croak("%s object was replaced during the call", classname); \
@@ -364,31 +335,24 @@ static int shm_isa(pTHX_ SV *sv, const char *classname) {
         croak("Attempted to use a %s cursor whose map was destroyed", classname); \
     ShmCursor *c0 = c; PERL_UNUSED_VAR(c0); \
     const char *shm_class = classname; PERL_UNUSED_VAR(shm_class); \
-    sv_2mortal(SvREFCNT_inc(SvRV(sv)))   /* pin the invocant across the method (reentrant-DESTROY UAF guard) */
+    sv_2mortal(SvREFCNT_inc(SvRV(sv)))
 
-/* Cursor counterpart of REEXTRACT_MAP: same explicit-DESTROY hazard, applied
- * to the cursor pointer where argument magic runs between EXTRACT_CURSOR and
- * the first use of c. */
+/* REEXTRACT_MAP for cursors. */
 #define REEXTRACT_CURSOR(classname, sv) \
     if (!SvROK(sv)) \
         croak("%s cursor was replaced during the call", classname); \
     c = INT2PTR(ShmCursor*, SvIV(SvRV(sv))); \
     if (c != c0) croak("%s cursor replaced or destroyed during the call", classname); \
-    /* The owner is checked in EXTRACT_CURSOR, before argument magic runs;
-     * magic that destroys the map would otherwise leave us dereferencing
-     * a freed handle. */ \
+    /* Magic may have destroyed the map since EXTRACT_CURSOR checked it. */ \
     if (c->owner && !SvIV(c->owner)) \
         croak("%s cursor whose map was destroyed during the call", classname)
 
-/* An explicit $map->DESTROY frees the handle while a live cursor still points
- * at it, zeroing the owner's IV.  Detach first so neither shm_cursor_destroy
- * (which decrements handle->iterating) nor flush_deferred touches freed memory. */
+/* An explicit $map->DESTROY leaves a live cursor on a freed handle: detach, so
+ * shm_cursor_destroy and flush_deferred do not touch it. */
 #define CURSOR_DETACH_IF_MAP_GONE(c, owner, h) \
     SV *owner = (c)->owner; \
     ShmHandle *h = ((owner) && SvIV(owner)) ? (c)->current : NULL; \
     if (!(h)) { (c)->current = NULL; (c)->handle = NULL; }
-
-/* ---- Generic keyword build functions ---- */
 
 static int build_kw_1arg(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata) {
     (void)nargs;
@@ -396,9 +360,7 @@ static int build_kw_1arg(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nar
     OP *map_op = args[0]->op;
     OP *cvref = newCVREF(0, newGVOP(OP_GV, 0, gv_fetchpv(func, GV_ADD, SVt_PVCV)));
     OP *arglist = op_append_elem(OP_LIST, map_op, cvref);
-    /* Plain OPf_STACKED: pre-setting OPf_WANT makes Perl_scalar() skip the op,
-     * so the call stayed in list context even in scalar context and spilled its
-     * extra return values into the enclosing list. */
+    /* No OPf_WANT: Perl_scalar() would then skip the op, leaving it in list context. */
     *out = op_convert_list(OP_ENTERSUB, OPf_STACKED, arglist);
     return KEYWORD_PLUGIN_EXPR;
 }
@@ -445,8 +407,6 @@ static int build_kw_4arg(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nar
     return KEYWORD_PLUGIN_EXPR;
 }
 
-/* ---- Keyword pieces ---- */
-
 static const struct XSParseKeywordPieceType pieces_1expr[] = {
     XPK_TERMEXPR, {0}
 };
@@ -463,8 +423,6 @@ static const struct XSParseKeywordPieceType pieces_4expr[] = {
     XPK_TERMEXPR, XPK_COMMA, XPK_TERMEXPR, XPK_COMMA, XPK_TERMEXPR, XPK_COMMA, XPK_TERMEXPR, {0}
 };
 
-/* ---- Keyword hook definitions ---- */
-
 #define DEFINE_KW_HOOK(variant, PKG, kw, nargs, builder) \
     static const struct XSParseKeywordHooks hooks_shm_##variant##_##kw = { \
         .flags = XPK_FLAG_EXPR, \
@@ -473,7 +431,6 @@ static const struct XSParseKeywordPieceType pieces_4expr[] = {
         .build = builder, \
     };
 
-/* I16 (int16 -> int16, counters) */
 DEFINE_KW_HOOK(i16, "I16", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", remove,      2, build_kw_2arg)
@@ -527,7 +484,6 @@ DEFINE_KW_HOOK(i16, "I16", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", set_ttl,         3, build_kw_3arg)
 
-/* I32 (int32 -> int32, counters) */
 DEFINE_KW_HOOK(i32, "I32", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", remove,      2, build_kw_2arg)
@@ -581,7 +537,6 @@ DEFINE_KW_HOOK(i32, "I32", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", set_ttl,         3, build_kw_3arg)
 
-/* II (int64 -> int64, counters) */
 DEFINE_KW_HOOK(ii, "II", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", remove,      2, build_kw_2arg)
@@ -635,7 +590,6 @@ DEFINE_KW_HOOK(ii, "II", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", set_ttl,         3, build_kw_3arg)
 
-/* I16S (int16 -> string, no counters) */
 DEFINE_KW_HOOK(i16s, "I16S", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i16s, "I16S", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", remove,      2, build_kw_2arg)
@@ -684,7 +638,6 @@ DEFINE_KW_HOOK(i16s, "I16S", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i16s, "I16S", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", set_ttl,         3, build_kw_3arg)
 
-/* I32S (int32 -> string, no counters) */
 DEFINE_KW_HOOK(i32s, "I32S", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i32s, "I32S", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", remove,      2, build_kw_2arg)
@@ -733,7 +686,6 @@ DEFINE_KW_HOOK(i32s, "I32S", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i32s, "I32S", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", set_ttl,         3, build_kw_3arg)
 
-/* IS (int64 -> string, no counters) */
 DEFINE_KW_HOOK(is, "IS", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(is, "IS", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", remove,      2, build_kw_2arg)
@@ -782,7 +734,6 @@ DEFINE_KW_HOOK(is, "IS", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(is, "IS", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", set_ttl,         3, build_kw_3arg)
 
-/* SI16 (string -> int16, counters) */
 DEFINE_KW_HOOK(si16, "SI16", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", remove,      2, build_kw_2arg)
@@ -836,7 +787,6 @@ DEFINE_KW_HOOK(si16, "SI16", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", set_ttl,         3, build_kw_3arg)
 
-/* SI32 (string -> int32, counters) */
 DEFINE_KW_HOOK(si32, "SI32", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", remove,      2, build_kw_2arg)
@@ -890,7 +840,6 @@ DEFINE_KW_HOOK(si32, "SI32", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", set_ttl,         3, build_kw_3arg)
 
-/* SI (string -> int64, counters) */
 DEFINE_KW_HOOK(si, "SI", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", remove,      2, build_kw_2arg)
@@ -944,7 +893,6 @@ DEFINE_KW_HOOK(si, "SI", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", set_ttl,         3, build_kw_3arg)
 
-/* SS (string -> string, no counters) */
 DEFINE_KW_HOOK(ss, "SS", put,         3, build_kw_3arg)
 DEFINE_KW_HOOK(ss, "SS", get,         2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", remove,      2, build_kw_2arg)
@@ -993,14 +941,9 @@ DEFINE_KW_HOOK(ss, "SS", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(ss, "SS", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", set_ttl,         3, build_kw_3arg)
 
-/* ---- Register keyword macro ---- */
-
 #define REGISTER_KW(variant, kw, func_name) \
     register_xs_parse_keyword("shm_" #variant "_" #kw, \
         &hooks_shm_##variant##_##kw, (void*)func_name)
-
-
-/* ---- MODULE/PACKAGE sections ---- */
 
 
 MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I16
@@ -1008,8 +951,7 @@ PROTOTYPES: DISABLE
 
 BOOT:
     boot_xs_parse_keyword(0.40);
-    /* I16 */
-    REGISTER_KW(i16, put,         "Data::HashMap::Shared::I16::put");
+    REGISTER_KW(i16, put,        "Data::HashMap::Shared::I16::put");
     REGISTER_KW(i16, get,         "Data::HashMap::Shared::I16::get");
     REGISTER_KW(i16, remove,      "Data::HashMap::Shared::I16::remove");
     REGISTER_KW(i16, exists,      "Data::HashMap::Shared::I16::exists");

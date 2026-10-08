@@ -20,7 +20,7 @@ The first fetch of the shim trusts HTTPS to GitHub. Every later
 download verifies against the release key of the organization, and
 this verb is one of them. The keys come from
 L<App::FuguBench::Keys>, and the keys of a consumer never enter. A
-release therefore carries the keys that verify the next release.
+release decides what it trusts, and no file of the host decides it.
 
 The verb reads no checkout, so an operator runs it in any directory.
 
@@ -63,7 +63,9 @@ It downloads F<SHA256> and F<SHA256.sig> into a temporary directory.
 =item 3.
 
 It writes each embedded key as a signify public key file, in trust
-order, and it verifies the manifest against that list.
+order, and it verifies the manifest against that list. A failure of
+that check names the install command, because a rotation of the
+release key can leave this program without the key of the release.
 
 =item 4.
 

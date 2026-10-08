@@ -13,14 +13,6 @@ require "Data/HashMap/Shared/$_->[0].pm" for @VARIANTS;
 my $dir = tempdir(CLEANUP => 1);
 my $seq = 0;
 
-# ---------------------------------------------------------------------------
-# get_multi must count as an LRU access, like get()
-#
-# The non-sharded get_multi reimplements the probe inline and used to skip the
-# clock bit that get() sets, so a hot set read only in batches was evicted as if
-# never touched -- while the sharded get_multi, which routes through get(), kept
-# it.
-# ---------------------------------------------------------------------------
 sub lru_trial {
     my ($v, $kstr, $vstr, $access, $sharded) = @_;
     my $cls  = "Data::HashMap::Shared::$v";
@@ -46,9 +38,6 @@ for my $v (@VARIANTS) {
         "$name: an untouched key is still evicted";
 }
 
-# ---------------------------------------------------------------------------
-# A path holding an embedded NUL must be refused, not truncated at the NUL.
-# ---------------------------------------------------------------------------
 {
     my $cls  = 'Data::HashMap::Shared::II';
     my $real = "$dir/nul-real.shm";
@@ -70,23 +59,17 @@ for my $v (@VARIANTS) {
     ok    $cls->unlink($real), 'unlink still removes a clean path';
 }
 
-# ---------------------------------------------------------------------------
-# max_size above the capacity max_entries provides can never evict: the map
-# fills up and then refuses every insert, keeping its oldest keys.  It is a
-# warning, not an error -- the bound is unreachable rather than impossible, and
-# LRU ordering (pop/shift) still works.
-# ---------------------------------------------------------------------------
 {
     my $cls = 'Data::HashMap::Shared::II';
     my $w = warning(sub { $cls->new("$dir/ms1.shm", 100, 1000) });
     like  $w, qr/max_size 1000 needs all \d+ slots/, 'max_size beyond capacity warns';
-    # the one sizing pin; everything below is relative to it
+    # the one sizing pin; the rest is relative to it
     my ($slots) = $w =~ /needs all (\d+) slots/;
     is    $slots, 256, 'max_entries 100 sizes the table to 256 slots';
     like  warning(sub { $cls->new("$dir/ms2.shm", 100, $slots + 1) }),
           qr/max_size @{[ $slots + 1 ]} needs all/, 'one slot beyond capacity warns';
-    # A max_size EQUAL to the slot count is unreachable too: the insert probes
-    # for a free slot and fails before it ever reaches the eviction check.
+    # max_size equal to the slot count is unreachable too: the insert fails to
+    # find a free slot before it reaches the eviction check
     like  warning(sub { $cls->new("$dir/ms3.shm", 100, $slots) }),
           qr/max_size $slots needs all/, 'max_size exactly at capacity warns';
     is    warning(sub { $cls->new("$dir/ms3b.shm", 100, $slots - 1) }),
@@ -94,8 +77,6 @@ for my $v (@VARIANTS) {
     is    warning(sub { $cls->new("$dir/ms4.shm", 100, 50) }),
           '', 'max_size below capacity is silent';
 
-    # ... and the warning tracks the behaviour: one slot below capacity evicts,
-    # at capacity never does
     my %ev;
     for my $ms ($slots - 1, $slots) {
         my $m = do { no warnings 'misc'; $cls->new("$dir/ev$ms.shm", 100, $ms) };
@@ -114,9 +95,7 @@ for my $v (@VARIANTS) {
     my $quiet = do { no warnings 'misc'; warning(sub { $cls->new("$dir/ms8.shm", 100, 1000) }) };
     is $quiet, '', 'the warning is suppressible with "no warnings"';
 
-    # the warning describes the map, not the arguments: attaching ignores them,
-    # so a sound file must stay silent however silly the arguments are, and an
-    # unsound one must speak up even when the arguments look fine.
+    # the warning describes the map, not the arguments (attaching ignores them)
     my $good = "$dir/ms-good.shm";
     $cls->new($good, 100, 50);
     is    warning(sub { $cls->new($good, 100, 1000) }),
@@ -131,7 +110,6 @@ for my $v (@VARIANTS) {
     is    warning(sub { $cls->new_readonly($frozen) }),
           '', 'a frozen map cannot insert, so new_readonly stays silent';
 
-    # it really is only a warning: the map is usable, with LRU ordering intact
     my $m = do { no warnings 'misc'; $cls->new("$dir/ms9.shm", 100, 1000) };
     $m->put($_, $_) for 1 .. 5;
     my ($k) = $m->pop;

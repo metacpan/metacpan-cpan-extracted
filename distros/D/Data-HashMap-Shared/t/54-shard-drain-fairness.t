@@ -5,15 +5,9 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SS;
 
-# pop, shift and drain walk a sharded map's shards from h->shard_rr and advance
-# it, so successive calls start on successive shards.  Without the offset every
-# call restarts at shard 0, and a producer keeping shard 0 stocked starves the
-# shards above it while size() still says the map is full.  Nothing is lost, so
-# only the order of delivery discriminates.
-#
-# The partition is read straight off the shard files: each is an ordinary map,
-# so opening PFX.n and listing its keys says exactly which shard holds what.
-# xxhash is deterministic, so for a fixed key set the split is fixed too.
+# pop/shift/drain start each call one shard further on (h->shard_rr); only
+# delivery order shows it. The key-to-shard split is read off the PFX.n shard
+# files, which are ordinary maps (xxhash is deterministic).
 
 my $SHARDS = 4;
 my $CAP    = 4000;
@@ -43,7 +37,6 @@ sub seeded {
     return ($m, $path, $where, \@thin);
 }
 
-# ---- each primitive starts where the previous call left off ----------------
 for my $case (
     [ 'drain', sub { ($_[0]->drain(1))[0] } ],
     [ 'pop',   sub { ($_[0]->pop)[0] } ],
@@ -65,7 +58,6 @@ for my $case (
        "$name: $SHARDS successive calls took from $SHARDS different shards (got @shards)";
 }
 
-# ---- a stocked shard 0 does not starve the rest ----------------------------
 {
     my ($m, $path, $where, $thin) = seeded('starve', 200);
     is scalar @$thin, 0, 'starvation case: every shard holds enough keys to see a turn';
@@ -79,7 +71,7 @@ for my $case (
         my ($k) = $m->drain(1);
         last unless defined $k;
         $seen{ $where->{$k} }++;
-        $m->put($refill[$round], "refilled-$round");   # producer tops shard 0 back up
+        $m->put($refill[$round], "refilled-$round");
     }
     is scalar(keys %seen), $SHARDS,
        "drain against a producer stocking shard 0 still reaches every shard (" .

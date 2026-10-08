@@ -8,7 +8,7 @@ class Getopt::Pad::Config::Format::Yaml :isa(Getopt::Pad::Config::Format) :stric
 	use Feature::Compat::Try;
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	use constant NAMES => ['yaml', 'yml'];
 
@@ -25,7 +25,11 @@ class Getopt::Pad::Config::Format::Yaml :isa(Getopt::Pad::Config::Format) :stric
 		# A config file is data: a !!perl/... tag never blesses anything,
 		# whatever the installed YAML::XS defaults to.
 		local $YAML::XS::LoadBlessed = 0;
-		return YAML::XS::Load(Encode::encode('UTF-8', $text));
+		my @documents = YAML::XS::Load(Encode::encode('UTF-8', $text));
+
+		# A file without a document, empty or holding only comments, sets
+		# nothing. Of several documents the last one counts.
+		return @documents ? $documents[-1] : {};
 	}
 
 	method dump($data) {
@@ -74,7 +78,8 @@ C<true> and C<false> are accepted for C<flag> and C<bool> options; C<yes>,
 C<no>, C<on> and C<off> are read as strings and rejected. C<~> and empty
 values are reported as C<no value given> (for C<hash> and C<objectlist>
 options as a value of the wrong shape). An empty file, or one with only
-comments, is reported as not containing a mapping of group names. Tags
+comments, sets nothing. Of a file with several documents, the last one
+is used. Tags
 such as C<!!perl/hash:Foo> never create objects: a config file is data.
 
 C<--create-default-config> writes a YAML document that starts with

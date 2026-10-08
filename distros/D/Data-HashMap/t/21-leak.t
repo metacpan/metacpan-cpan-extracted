@@ -536,7 +536,7 @@ SKIP: {
         my $line = <$rd>;
         close $rd;
         waitpid($pid, 0);
-        return () if $? >> 8;
+        die "RSS child failed (status=$?)\n" if $?;
         chomp $line;
         return split /\|/, $line;
     };
@@ -611,7 +611,7 @@ SKIP: {
         my $line = <$rd>;
         close $rd;
         waitpid($pid, 0);
-        return () if $? >> 8;
+        die "RSS child failed (status=$?)\n" if $?;
         chomp $line;
         return split /\|/, $line;
     };

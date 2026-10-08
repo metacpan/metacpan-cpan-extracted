@@ -65,12 +65,12 @@ t/lib/Database/test8.pm
 t/lib/Database/test_json.pm
 t/lib/Database/test_json_url.pm
 t/lib/Database/test_tsv.pm
-t/lib/MyLogger.pm
 t/locales.t
 t/logger.t
 t/logic.t
 t/mutant_killers.t
 t/no_entry.t
+t/optional_deps.t
 t/passwd.t
 t/path.t
 t/pod-cm.t
@@ -83,6 +83,8 @@ t/pod.t
 t/portability.t
 t/psv.t
 t/query_builder.t
+t/redis.t
+t/redis_live.t
 t/remote.t
 t/remote_local.t
 t/schema.t

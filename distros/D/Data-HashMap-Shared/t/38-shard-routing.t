@@ -7,14 +7,9 @@ use File::Temp qw(tempdir);
 use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 
-# Shard routing used the low hash bits -- the same bits the in-shard probe uses
-# -- so within a shard only capacity/num_shards home slots were reachable and
-# probe runs grew with the shard count.  Routing now uses the high half of the
-# 64-bit hash, which the slot index never looks at.
-#
-# That moves keys between shard FILES, which cannot be done in place, so the
-# choice is recorded per set in a header byte carved from the reserved pad.  A
-# set written before 0.20 reads 0 there and keeps its original placement.
+# Shard routing uses the high half of the 64-bit hash, which the in-shard slot
+# index never looks at.  The choice is recorded per set in a header byte; 0
+# means legacy low-bit routing.
 
 my $dir = tempdir(CLEANUP => 1);
 my $seq = 0;
@@ -33,7 +28,6 @@ sub set_header_byte {
     sysseek $fh, $off, 0; syswrite $fh, pack 'C', $v; close $fh;
 }
 
-# --- new sets are stamped, and every key round-trips at any shard count ------
 for my $shards (1, 4, 64, 1024) {
     my $p = "$dir/r" . $seq++;
     my $m = Data::HashMap::Shared::II->new_sharded($p, $shards, 40_000);
@@ -45,7 +39,6 @@ for my $shards (1, 4, 64, 1024) {
     is scalar @k, 5_000, "  ... and all are enumerable";
 }
 
-# --- a cursor seek must land in the same shard the dispatcher chose ----------
 {
     my $m = Data::HashMap::Shared::SS->new_sharded("$dir/seek", 64, 40_000);
     $m->put("k$_", "v$_") for 1 .. 5_000;
@@ -59,10 +52,8 @@ for my $shards (1, 4, 64, 1024) {
     is $bad, 0, 'cursor seek routes to the same shard as the dispatcher';
 }
 
-# --- the handle follows the FILE, not the build -----------------------------
-# Keys placed under split routing, then the byte forced to legacy: if the handle
-# ignored the byte every key would still be found, so a low count here is the
-# proof that a genuine pre-0.20 set gets its own routing.
+# keys placed under split routing, then the byte forced to legacy: if the handle
+# ignored the byte every key would still be found, so a low count is the proof
 {
     my $p = "$dir/legacy";
     my $m = Data::HashMap::Shared::II->new_sharded($p, 8, 40_000);
@@ -81,7 +72,6 @@ for my $shards (1, 4, 64, 1024) {
         '  ... and the set is intact under its own routing';
 }
 
-# --- a single-file map is unaffected either way -----------------------------
 {
     my $m = Data::HashMap::Shared::II->new("$dir/plain.shm", 5_000);
     $m->put($_, $_) for 1 .. 2_000;
@@ -90,10 +80,6 @@ for my $shards (1, 4, 64, 1024) {
 }
 
 
-# --- shards must agree with each other ---------------------------------------
-# Nothing checked this, so a shard file left by an earlier run with different
-# settings was adopted silently: each key then followed whichever shard it
-# routed to, while the summed accessors reported a figure belonging to no shard.
 {
     my $p = "$dir/mixed";
     Data::HashMap::Shared::II->new("$p.1", 100);          # no TTL, no max_size
@@ -112,9 +98,6 @@ for my $shards (1, 4, 64, 1024) {
 }
 
 
-# --- the shard count is recorded, so a wrong one is refused ------------------
-# No single shard can imply the count, and opening a set with the wrong one hid
-# the keys that routed elsewhere and orphaned every key written afterwards.
 {
     my $p = "$dir/count";
     my $m = Data::HashMap::Shared::II->new_sharded($p, 8, 40_000);
@@ -137,23 +120,19 @@ for my $shards (1, 4, 64, 1024) {
     is scalar(grep { defined $back->get($_) } 1 .. 2_000), 2_000, 'every key survived';
 }
 
-# a set predating the stamp keeps its old behaviour rather than having whatever
-# count the caller passed cemented into it
 {
     my $p = "$dir/nostamp";
     my $m = Data::HashMap::Shared::II->new_sharded($p, 4, 40_000);
     $m->put($_, $_) for 1 .. 100;
     undef $m;
-    set_header_byte("$p.$_", $ROUTING_OFF, 0) for 0 .. 3;         # legacy routing
-    set_header_byte("$p.$_", $SHARD_LOG2_OFF, 0) for 0 .. 3;   # and no recorded count
+    set_header_byte("$p.$_", $ROUTING_OFF, 0) for 0 .. 3;
+    set_header_byte("$p.$_", $SHARD_LOG2_OFF, 0) for 0 .. 3;
     ok eval { Data::HashMap::Shared::II->new_sharded($p, 4, 40_000); 1 },
         'a legacy set still opens with its own count';
     is header_byte("$p.0", $SHARD_LOG2_OFF), 0,
         '  ... and is not stamped retroactively';
 }
 
-# a legacy set opened with too many shards is refused because the new shards
-# disagree on routing; it must not leave the whole extra half behind first
 {
     my $p = "$dir/legacy_over";
     my $m = Data::HashMap::Shared::II->new_sharded($p, 8, 40_000);
@@ -176,9 +155,6 @@ for my $shards (1, 4, 64, 1024) {
 }
 
 
-# When shard 0 is the missing one it is recreated carrying no count, so the
-# mismatch is caught on a later shard -- and the message must name that file
-# rather than speak for the whole set, which is what it used to do.
 {
     my $p = "$dir/count0";
     { my $m = Data::HashMap::Shared::II->new_sharded($p, 8, 40_000);

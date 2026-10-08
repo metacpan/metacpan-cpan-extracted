@@ -12,7 +12,8 @@ App::FuguSeed::QR - the flow of fuguseed-qr
 
 App::FuguSeed::QR holds the flow of the program C<fuguseed-qr>. It
 reads the 12 seed words from the first line of standard input, and it
-writes the SeedQR or the check word to standard output.
+writes the SeedQR to standard output. It also holds the checksum check
+and the digit string of the 12 words.
 
 It is the one module of the program that touches a stream. The three
 standard streams are the one contact of the program with the computer:
@@ -25,12 +26,23 @@ After each zone view, the program reads one line from standard input
 before the next zone. At the end of the input, it prints the remaining
 zones without a pause.
 
-A wrong checksum is a result, not a failure: standard output holds the
-check word on one line, and the program prints no SeedQR in that run.
+A failure prints one line to standard error. The line can name the
+word position or the count that failed, never a word. A wrong checksum is a
+failure, and the program prints no SeedQR. C<fuguseed-last> finds the
+check word.
 
-A failure prints one line to standard error. The line names the word
-position or the count that failed, never a word, and the check word
-leaves on standard output only.
+=head2 valid
+
+C<valid($words)> returns true when the low 4 bits of index 12 are the
+4 bits that BIP39 requires. The bits are the first bits of the SHA-256
+of the 16 entropy bytes. The caller proves the words with
+App::FuguSeed::Mnemonic first.
+
+=head2 digits
+
+C<digits($words)> returns the digit string: the 12 indexes, 0-based,
+each as 4 decimal digits with leading zeros, in word order. The string
+holds 48 digits. The caller proves the words first.
 
 =head2 run
 
@@ -39,19 +51,20 @@ exit code.
 
 =head1 RETURN VALUES
 
+C<valid()> returns true or false, and C<digits()> returns 48 digits.
 C<run()> returns 0 for a success, 1 for a failure, and 2 for a usage
 error.
 
 =head1 ERRORS
 
 An argument is a usage error: C<run()> prints one usage line to
-standard error and returns 2. Another count than 12 words, and a word
-outside the list, are failures: C<run()> prints one line to standard
-error and returns 1.
+standard error and returns 2. Another count than 12 words, a word
+outside the list, and a wrong checksum are failures: C<run()> prints
+one line to standard error and returns 1.
 
 =head1 SEE ALSO
 
-C<fuguseed-qr(1)>, L<App::FuguSeed::Mnemonic>, and
+C<fuguseed-qr(1)>, C<fuguseed-last(1)>, L<App::FuguSeed::Mnemonic>, and
 L<App::FuguSeed::Text>.
 
 =head1 AUTHORS

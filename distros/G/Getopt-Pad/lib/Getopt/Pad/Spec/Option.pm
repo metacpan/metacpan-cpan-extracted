@@ -7,17 +7,18 @@ use Getopt::Pad::Result;
 
 class Getopt::Pad::Spec::Option :strict(params) {
 	use Carp qw(croak);
-	use Getopt::Pad::Util qw(camelize specError isValidName);
+	use Getopt::Pad::Util qw(camelize specError isValidName optionSpelling processedWith);
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	# The Value sources a parse hands over, in order of precedence, each with
-	# the wording of its user errors; the spec default follows them. The
-	# command line gives a multiple option one word per occurrence, a config
-	# file a lone value or a list.
+	# the wording of its user errors, which name the option as typed on the
+	# command line and by its Primary name in a config file; the spec
+	# default follows them. The command line gives a multiple option one
+	# word per occurrence, a config file a lone value or a list.
 	my @valueSources = (
-		{ key => 'commandLine', problemFormat => "option '--%s': %s",           givesWords => 1 },
-		{ key => 'config',      problemFormat => "config value for '%s': %s", givesWords => 0 },
+		{ key => 'commandLine', problemFormat => "option '%s': %s",           givesWords => 1, namesAsTyped => 1 },
+		{ key => 'config',      problemFormat => "config value for '%s': %s", givesWords => 0, namesAsTyped => 0 },
 	);
 	my %isValueSource = map { $_->{key} => 1 } @valueSources;
 
@@ -26,6 +27,9 @@ class Getopt::Pad::Spec::Option :strict(params) {
 	field $auto          :param :reader = 0;
 	field $optionalValue :param :reader = 0;
 	field $trigger       :param :reader = undef;
+	# Where the option sits in the spec, as the start of a spec error, e.g.
+	# "command 'image resize': ".
+	field $where         :param = '';
 
 	field $name     :reader;
 	field @aliases  :reader;
@@ -35,8 +39,10 @@ class Getopt::Pad::Spec::Option :strict(params) {
 	field $required   :reader = 0;
 	field $hasDefault :reader = 0;
 	field $default    :reader;
+	field $specDefault;
 	field $valid     :reader;
 	field $lazyValid;
+	field $processValue :reader;
 	field $group    :reader;
 	field $help     :reader = '';
 	field $multiple   :reader = 0;
@@ -48,27 +54,29 @@ class Getopt::Pad::Spec::Option :strict(params) {
 	field $typehint   :reader;
 
 	ADJUST {
-		specError("option key must be a non-empty string") if !defined $key || $key eq '';
-		specError("option '%s': spec must be a hash reference", $key) if ref $raw ne 'HASH';
-		specError("option '%s': a trigger is only allowed on auto options", $key) if defined $trigger && !$auto;
+		specError("%soption key must be a non-empty string", $where) if !defined $key || $key eq '';
+		specError("%soption '%s': spec must be a hash reference", $where, $key) if ref $raw ne 'HASH';
+		specError("%soption '%s': a trigger is only allowed on auto options", $where, $key) if defined $trigger && !$auto;
 
 		($name, @aliases) = split /\|/, $key, -1;
 		foreach my $candidate ($name, @aliases) {
-			specError("option '%s': invalid name '%s'", $key, $candidate // '') if !isValidName($candidate);
+			specError("%soption '%s': invalid name '%s'", $where, $key, $candidate // '') if !isValidName($candidate);
 		}
 		$reader = camelize($name);
-		specError("option '%s': reader '%s' collides with a built-in result method", $name, $reader) if !$auto && Getopt::Pad::Result->reservesReader($reader);
+		specError("%soption '%s': reader '%s' collides with a built-in result method", $where, $name, $reader) if !$auto && Getopt::Pad::Result->reservesReader($reader);
 
 		my %spec = $raw->%*;
-		($type, $typeName) = Getopt::Pad::Type::takeFromSpec(\%spec, 'flag', sprintf("option '%s'", $name));
+		($type, $typeName) = Getopt::Pad::Type::takeFromSpec(\%spec, 'flag', sprintf("%soption '%s'", $where, $name));
 
 		$required = delete $spec{required} ? 1 : 0;
 		if (exists $spec{default}) {
 			$hasDefault = 1;
 			$default    = delete $spec{default};
+			$specDefault = $default;
 		}
 		$valid     = delete $spec{valid};
 		$lazyValid = delete $spec{lazyValid};
+		$processValue = delete $spec{processValue};
 		$group    = delete $spec{group} // 'Options';
 		$help     = delete $spec{help} // '';
 		$multiple   = delete $spec{multiple} ? 1 : 0;
@@ -79,16 +87,17 @@ class Getopt::Pad::Spec::Option :strict(params) {
 		$inherit    = delete $spec{inherit} ? 1 : 0;
 		$typehint   = delete $spec{typehint};
 
-		specError("option '%s': unknown key(s): %s", $name, join(', ', sort keys %spec)) if %spec;
-		specError("option '%s': required and default are mutually exclusive", $name) if $required && $hasDefault;
+		specError("%soption '%s': unknown key(s): %s", $where, $name, join(', ', sort keys %spec)) if %spec;
+		specError("%soption '%s': required and default are mutually exclusive", $where, $name) if $required && $hasDefault;
 		my %shapeFlags = (multiple => $multiple, hash => $hash, objectlist => $objectlist);
 		my @shapes     = grep { $shapeFlags{$_} } qw(multiple hash objectlist);
-		specError("option '%s': %s requires a value-taking type, not '%s'", $name, $shapes[0], $typeName) if @shapes && !$type->takesValue;
-		specError("option '%s': %s are mutually exclusive", $name, join(' and ', @shapes)) if @shapes > 1;
-		specError("option '%s': csv requires multiple", $name) if $csv && !$multiple;
-		specError("option '%s': valid must be an array or code reference", $name) if defined $valid && ref $valid ne 'ARRAY' && ref $valid ne 'CODE';
-		specError("option '%s': lazyValid must be a code reference", $name) if defined $lazyValid && ref $lazyValid ne 'CODE';
-		specError("option '%s': typehint must be a non-empty string", $name) if defined $typehint && (ref $typehint || $typehint eq '');
+		specError("%soption '%s': %s requires a value-taking type, not '%s'", $where, $name, $shapes[0], $typeName) if @shapes && !$type->takesValue;
+		specError("%soption '%s': %s are mutually exclusive", $where, $name, join(' and ', @shapes)) if @shapes > 1;
+		specError("%soption '%s': csv requires multiple", $where, $name) if $csv && !$multiple;
+		specError("%soption '%s': valid must be an array or code reference", $where, $name) if defined $valid && ref $valid ne 'ARRAY' && ref $valid ne 'CODE';
+		specError("%soption '%s': lazyValid must be a code reference", $where, $name) if defined $lazyValid && ref $lazyValid ne 'CODE';
+		specError("%soption '%s': processValue must be a code reference", $where, $name) if defined $processValue && ref $processValue ne 'CODE';
+		specError("%soption '%s': typehint must be a non-empty string", $where, $name) if defined $typehint && (ref $typehint || $typehint eq '');
 
 		$default = $self->checkedDefault($default) if $hasDefault;
 	}
@@ -98,7 +107,19 @@ class Getopt::Pad::Spec::Option :strict(params) {
 	# to the help output.
 	method checkedDefault($value) {
 		return undef if !defined $value && !$multiple && !$hash && !$objectlist;
-		return $self->shapedValue($value, sub ($problem) { specError("option '%s': default value: %s", $name, $problem) });
+		return $self->shapedValue($value, sub ($problem) { specError("%soption '%s': default value: %s", $where, $name, $problem) });
+	}
+
+	# The default as help output and config files show it: as the spec
+	# wrote it. A converted value may not read back (a duration coerced to
+	# seconds), or be an object that cannot be shown at all.
+	method presentedDefault() {
+		return $specDefault;
+	}
+
+	# The Primary name as it is typed on the command line.
+	method spelling() {
+		return optionSpelling($name);
 	}
 
 	# What the reader gets when no value source set the option and the spec
@@ -135,7 +156,7 @@ class Getopt::Pad::Spec::Option :strict(params) {
 		return $valid->@* if ref $valid eq 'ARRAY';
 
 		my $values = $valid->();
-		specError("option '%s': the valid coderef must return an array reference", $name) if ref $values ne 'ARRAY';
+		specError("%soption '%s': the valid coderef must return an array reference", $where, $name) if ref $values ne 'ARRAY';
 		return $values->@*;
 	}
 
@@ -158,47 +179,56 @@ class Getopt::Pad::Spec::Option :strict(params) {
 		return (undef, $value);
 	}
 
-	# The Reader value for one parse. %sources maps each Value source to the
-	# raw values it gave, keyed by Primary name; a name missing from a map
-	# means that source did not set the option.
-	method readerValue(%sources) {
+	# The checked value one parse settles on, and the reporter for the
+	# problems its type's verify and prepare find in it later, worded for
+	# where the value came from. The empty value of an option no source
+	# sets leaves nothing to verify: its reporter is undef. %sources maps
+	# each Value source to the raw values it gave, keyed by Primary name; a
+	# name missing from a map means that source did not set the option.
+	method settledValue(%sources) {
 		my @unknown = grep { !$isValueSource{$_} } sort keys %sources;
 		croak(sprintf("Getopt::Pad: unknown value source(s): %s", join(', ', @unknown))) if @unknown;
 
 		foreach my $source (@valueSources) {
 			my $given = $sources{$source->{key}} // {};
 			next if !exists $given->{$name};
-			return $self->preparedValue($self->validatedValue($given->{$name}, $source));
+
+			my $report = $self->reporterFor($source);
+			return ($self->validatedValue($given->{$name}, $source, $report), $report);
 		}
 
-		return $self->preparedValue($self->copiedDefault) if $hasDefault;
-		Getopt::Pad::Error->throw("missing required option '--%s'", $name) if $required;
-		return $self->emptyValue;
+		return ($self->copiedDefault, $self->defaultReporter) if $hasDefault;
+		Getopt::Pad::Error->throw("missing required option '%s'", $self->spelling) if $required;
+		return ($self->emptyValue, undef);
 	}
 
-	# The effective value after the type prepared every scalar in it, e.g.
-	# created a path on demand. Only the value a parse settles on gets
-	# here, never a default the command line overrides.
-	method preparedValue($value) {
-		foreach my $scalar ($self->scalarsOf($value)) {
-			my $problem = $type->prepare($scalar);
-			Getopt::Pad::Error->throw("option '--%s': %s", $name, $problem) if defined $problem;
-		}
+	# The checked value one parse settles on, see settledValue.
+	method readerValue(%sources) {
+		my ($value) = $self->settledValue(%sources);
 		return $value;
 	}
 
-	method scalarsOf($value) {
-		return map { $self->scalarsOf($_) } $value->@*        if ref $value eq 'ARRAY';
-		return map { $self->scalarsOf($_) } values $value->%* if ref $value eq 'HASH';
-		return ($value);
+	method processedValue($result, $value) {
+		return processedWith($processValue, $result, $value);
 	}
 
-	# The value one source gave, in the option's shape, with problems
-	# reported in that source's wording. The command line gives a multiple
-	# option its words and a pair-taking option a flat mapping of its
-	# key=value pairs; a config file gives the shape directly.
-	method validatedValue($value, $source) {
-		my $report = sub ($problem) { Getopt::Pad::Error->throw($source->{problemFormat}, $name, $problem) };
+	# A reporter that throws a problem in the wording of $source: the
+	# option named as typed for the command line, by its Primary name for
+	# a config file.
+	method reporterFor($source) {
+		my $named = $source->{namesAsTyped} ? $self->spelling : $name;
+		return sub ($problem) { Getopt::Pad::Error->throw($source->{problemFormat}, $named, $problem) };
+	}
+
+	method defaultReporter() {
+		return sub ($problem) { Getopt::Pad::Error->throw("option '%s': default value: %s", $self->spelling, $problem) };
+	}
+
+	# The value one source gave, in the option's shape, with problems told
+	# to $report. The command line gives a multiple option its words and a
+	# pair-taking option a flat mapping of its key=value pairs; a config
+	# file gives the shape directly.
+	method validatedValue($value, $source, $report) {
 		return [map { $self->checkedScalar($_, $report) } $self->listItems($value, $source, $report)] if $multiple;
 		$value = $self->objectsFromPairs($value, $report) if $objectlist && $source->{givesWords};
 		return $self->shapedValue($value, $report);
@@ -228,17 +258,24 @@ class Getopt::Pad::Spec::Option :strict(params) {
 	}
 
 	# The objects an objectlist option collects from its INDEX.FIELD=VALUE
-	# words, handed over as a flat mapping. The indices must form 0..n-1.
+	# words, handed over as a flat mapping. The indices must form 0..n-1,
+	# each written one way only: a leading zero would make 0 and 00 two
+	# keys for one object.
 	method objectsFromPairs($pairs, $report) {
-		my @objects;
+		my %objectAt;
 		foreach my $key (sort keys $pairs->%*) {
-			my ($index, $field) = $key =~ /\A(\d+)\.([\w-]+)\z/ or $report->(sprintf("invalid key '%s', expected INDEX.FIELD=VALUE", $key));
-			$objects[$index]{$field} = $pairs->{$key};
+			$report->(sprintf("invalid key '%s', the index must not have leading zeros", $key)) if $key =~ /\A0[0-9]+\./;
+			my ($index, $field) = $key =~ /\A([0-9]+)\.([\w-]+)\z/ or $report->(sprintf("invalid key '%s', expected INDEX.FIELD=VALUE", $key));
+			$objectAt{$index}{$field} = $pairs->{$key};
 		}
-		foreach my $index (0 .. $#objects) {
-			$report->(sprintf('missing index %d', $index)) if !defined $objects[$index];
+
+		# The sorted indices match their positions unless one is missing;
+		# comparing them needs no array as large as the largest index.
+		my @indices = sort { $a <=> $b } keys %objectAt;
+		foreach my $position (0 .. $#indices) {
+			$report->(sprintf('missing index %d', $position)) if $indices[$position] != $position;
 		}
-		return \@objects;
+		return [map { $objectAt{$_} } @indices];
 	}
 
 	# $value in the option's shape with every scalar checked and coerced: a
@@ -316,18 +353,26 @@ An option spec holds the checked settings of one option: the primary
 name, the aliases, the reader name, the type (a L<Getopt::Pad::Type>
 instance) and the keys C<required>, C<default>, C<valid>, C<lazyValid>,
 C<group>, C<help>, C<multiple>, C<hash>, C<csv>, C<objectlist>,
-C<hidden>, C<inherit> and C<typehint>. The meaning of each key is
+C<hidden>, C<inherit>, C<typehint> and C<processValue>. The meaning of each key is
 documented in L<Getopt::Pad/OPTION SPECS>.
 
 The constructor checks every key and their combinations, and checks and
 converts the default in the option's shape: a list for C<multiple>, a
 mapping for C<hash>, a list of mappings for C<objectlist>, else a single
-value. An invalid default is a spec error.
+value. An invalid default is a spec error. Spec errors start with the
+optional C<where> constructor param, which the declaring
+L<Getopt::Pad::Spec::Level> sets to its command path
+(C<command 'image resize': >).
 
 =head2 Resolving a value
 
-C<readerValue(%sources)> returns the reader value of the option for one
-parse. C<%sources> maps each value source (C<commandLine>, C<config>) to
+C<settledValue(%sources)> returns the checked value of the option for
+one parse, and a reporter: a coderef that throws a problem found in the
+value later (by the type's C<verify> or C<prepare>) as a
+L<Getopt::Pad::Error> worded for the value's source, C<option '--NAME':
+default value: ...> for the default. The reporter is C<undef> when
+neither a source nor a default set the option. C<readerValue(%sources)>
+returns the value alone. C<%sources> maps each value source (C<commandLine>, C<config>) to
 the raw values it gave, keyed by primary name. The option takes the first
 source that set it, in that order, or else the default. Without either,
 a required option throws a L<Getopt::Pad::Error>, and any other option
@@ -343,21 +388,32 @@ predicate. Problems are thrown as L<Getopt::Pad::Error>, worded for their
 source (C<option '--NAME': ...> or C<config value for 'NAME': ...>) and
 naming the key or entry for C<hash> and C<objectlist> options.
 
-Finally every single value of the result is passed to the type's
-C<prepare> (which creates missing paths for C<createPathIfMissing>). This
-happens only for the value that is finally used, default included.
+The type's C<verify> and C<prepare> are not called here: the parser
+calls them on the settled values of every selected level, see
+L<Getopt::Pad::Parser/Second pass: the values>.
+
+C<processedValue($result, $value)> runs the C<processValue> coderef on
+that reader value: every single value in it is replaced by what the
+coderef returns when called with C<$result> and the value, the list or
+mapping around them is kept (see C<processedWith> in
+L<Getopt::Pad::Util>). An unset single value (C<undef>) is left alone.
+Without C<processValue> the value is returned as it is.
 
 =head1 METHODS
 
 Besides the readers of its settings (C<name>, C<aliases>, C<reader>,
 C<type>, C<typeName>, C<required>, C<hasDefault>, C<default>, C<valid>,
 C<group>, C<help>, C<multiple>, C<hash>, C<csv>, C<objectlist>,
-C<hidden>, C<inherit>, C<typehint>, C<auto>, C<optionalValue>,
-C<trigger>):
+C<hidden>, C<inherit>, C<typehint>, C<processValue>, C<auto>,
+C<optionalValue>, C<trigger>):
 
 =over 4
 
-=item readerValue(%sources)
+=item settledValue(%sources), readerValue(%sources)
+
+See L</Resolving a value>.
+
+=item processedValue($result, $value)
 
 See L</Resolving a value>.
 
@@ -375,6 +431,18 @@ without C<valid>. Shell completion uses it too.
 =item typeLabel
 
 The tag the help output shows: C<typehint>, or the type's C<label>.
+
+=item presentedDefault
+
+The default as the help output and C<--create-default-config> show it:
+as the spec wrote it, unchecked and unconverted. A converted value may
+not read back in (a duration converted to seconds) or be an object.
+
+=item spelling
+
+The primary name as it is typed: with one dash for a name of one letter
+(C<-v>), else with two (C<--verbose>). Command line errors name the
+option this way.
 
 =item takesPairs
 

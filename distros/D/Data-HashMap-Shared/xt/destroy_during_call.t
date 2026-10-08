@@ -8,12 +8,11 @@ use Data::HashMap::Shared::SS;
 
 plan skip_all => 'fork required' unless $Config{d_fork};
 
-# An overloaded key argument whose stringification calls $map->DESTROY frees
-# the C handle between EXTRACT_MAP and the first use of h.  Without the
-# REEXTRACT_MAP guard the method dereferences the freed pointer and crashes;
-# with it, the method must croak cleanly ("object destroyed during the call").
-# Each case runs in a forked child: exit 0 = croaked (correct), exit 7 = the
-# method ran on through freed memory, any signal = crash.
+# An overloaded argument whose conversion calls $map->DESTROY frees the C handle
+# between EXTRACT_MAP and the first use of h; the REEXTRACT_MAP guard must make
+# the method croak cleanly ("object destroyed during the call").  Each case runs
+# in a forked child: exit 0 = croaked (correct), 7 = ran on through freed
+# memory, any signal = crash.
 
 {
     package Evil;
@@ -61,7 +60,7 @@ for my $case (@cases) {
         my $obj  = $new->();
         my $evil = bless [$obj], 'Evil';
         my $ok = eval { $call->($obj, $evil); 1 };
-        POSIX::_exit($ok ? 7 : 0);   # 0 = croaked (correct), 7 = ran on through freed memory
+        POSIX::_exit($ok ? 7 : 0);
     }
     waitpid($pid, 0);
     my $st = $?;

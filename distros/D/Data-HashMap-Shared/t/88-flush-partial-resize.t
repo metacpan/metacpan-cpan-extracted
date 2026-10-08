@@ -4,9 +4,9 @@ use Test::More;
 use File::Temp qw(tempdir);
 use Time::HiRes qw(sleep);
 
-# A resize can move an entry behind the shared partial-flush cursor. Restart
-# the scan at zero, including when another handle performs the resize, rather
-# than reporting a cycle complete with already-expired entries left behind.
+# A resize can move an entry behind the shared partial-flush cursor, also when
+# another handle performs it; the scan must restart at zero rather than report a
+# complete cycle.
 my $dir = tempdir(CLEANUP => 1);
 my @cases;
 for my $variant (qw(II IS SI SS I16 I16S I32 I32S SI16 SI32)) {
@@ -21,9 +21,9 @@ for my $variant (qw(II IS SI SS I16 I16S I32 I32S SI16 SI32)) {
     push @cases, [$variant, $m, $writer];
 }
 
-# Each pair collides at slot 15 in a 64-slot II table. On growth the first key
-# hashes to 79 and the second stays at 15, so the long probe run splits. These
-# fixtures also exercise a same-capacity rehash after removing its prefix.
+# Each pair collides at slot 15 in a 64-slot II table; on growth the first key
+# hashes to 79 and the second stays at 15, so the probe run splits.  Also used
+# for a same-capacity rehash.
 my @high = qw(86 167 352 446 449 478 756 1025 1030 1200
               1481 1527 1623 1868 2004 2108 2289 2324 2338 2422);
 my @low = qw(200 326 671 778 1077 1149 1211 1284 1322 1355

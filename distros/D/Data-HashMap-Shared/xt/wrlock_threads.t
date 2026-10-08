@@ -5,12 +5,11 @@ use Config;
 use File::Temp qw(tempdir);
 
 # Threads of one process share a pid, so only the process-local hold counts say
-# which of them holds a map.  Threads with their own handles onto one map bump a
-# plain counter under the write lock: an overlap or a lost update means two were
-# inside at once, and a recovery with no dead process means a live lock was read
-# as a stale one.  Also: threads contending on an own-pid ghost repair it once, a
-# stale own-pid lock on a second map is repaired while the first is held, and a
-# handle that reads without repairing anything takes no registry entry.
+# which holds a map. Threads with their own handles bump a plain counter under
+# the write lock: an overlap or lost update means two were inside at once, and a
+# recovery with no dead process means a live lock was read as stale. Also
+# covered: own-pid ghost repair, a stale own-pid lock on a second map while the
+# first is held, and a read-only handle taking no registry entry.
 
 plan skip_all => 'Linux only' unless $^O eq 'linux';
 my $cc = $Config{cc} || 'cc';
@@ -120,8 +119,8 @@ sub run_harness {
     return $@ ? "timeout" : $out;
 }
 
-# A repairer once took a live lock of ours for a dead one in about a third of
-# eight-thread runs, so twenty runs miss such a race about once in a thousand.
+# Twenty runs, because the repairer race fired in only about a third of
+# eight-thread runs.
 my $clean = 0;
 for my $run (1 .. 20) {
     my $out = run_harness('race', "$dir/race.shm", 8, 500_000);

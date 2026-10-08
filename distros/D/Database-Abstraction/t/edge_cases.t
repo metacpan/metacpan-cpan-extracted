@@ -78,7 +78,7 @@ subtest 'EC1: hostile constructor inputs' => sub {
 	# EC1.6 — max_slurp_size => 0 forces SQL path; must not crash new()
 	my $obj6 = Database::test1->new({ directory => $DATA_DIR, max_slurp_size => 0 });
 	my $n = eval { $obj6->count() };
-	ok(defined($n) && $n >= 0, 'EC1.6 count() works with max_slurp_size=>0');
+	returns_is($n, { type => 'integer', min => 0 }, 'EC1.6 count() works with max_slurp_size=>0');
 };
 
 # ===========================================================================
@@ -104,7 +104,7 @@ subtest 'EC2: locked-hash missing-key access' => sub {
 	my $row;
 	lives_ok { $row = $db->fetchrow_hashref(entry => 'NO_SUCH_KEY_XYZ') }
 		'EC2.2 fetchrow_hashref for missing key does not throw';
-	ok(!defined($row), 'EC2.2 returns undef for missing entry');
+	returns_is($row, { type => 'void' }, 'EC2.2 returns undef for missing entry');
 
 	# EC2.3 — count() for a non-existent entry: must return 0 not throw
 	my $cnt;
@@ -124,7 +124,7 @@ subtest 'EC2: locked-hash missing-key access' => sub {
 	my $val;
 	lives_ok { $val = $db->number(entry => 'NO_SUCH_KEY_XYZ') }
 		'EC2.5 AUTOLOAD column access for missing entry does not throw';
-	ok(!defined($val), 'EC2.5 AUTOLOAD returns undef for missing entry');
+	returns_is($val, { type => 'void' }, 'EC2.5 AUTOLOAD returns undef for missing entry');
 };
 
 # ===========================================================================
@@ -218,7 +218,7 @@ subtest 'EC5: hostile reference types as criteria values' => sub {
 	my $nulls;
 	lives_ok { $nulls = $db->selectall_arrayref(number => undef) }
 		'EC5.3 undef criteria value (IS NULL) does not throw';
-	ok(defined($nulls), 'EC5.3 IS NULL returns defined result');
+	returns_is($nulls, { type => 'arrayref' }, 'EC5.3 IS NULL returns defined result');
 
 	# EC5.4 — zero as criteria value must not be treated as undef/false
 	lives_ok { $db->selectall_arrayref(number => 0) }
@@ -284,7 +284,7 @@ subtest 'EC10: undef mid-array — CSV slurp path' => sub {
 
 	# EC10.2 — the undef column value is faithfully preserved
 	my ($empty_row) = grep { defined($_->{'entry'}) && $_->{'entry'} eq 'empty' } @{$all};
-	ok(defined($empty_row),              'EC10.2 undef-column row is present in selectall_arrayref result');
+	returns_is($empty_row, { type => 'hashref' }, 'EC10.2 undef-column row is present in selectall_arrayref result');
 	ok(!defined($empty_row->{'number'}), 'EC10.2 undef column value is preserved in result row');
 
 	# EC10.3 — IS NULL criterion matches the undef-column row
@@ -303,7 +303,7 @@ subtest 'EC10: undef mid-array — CSV slurp path' => sub {
 	my $row;
 	lives_ok { $row = $db->fetchrow_hashref(entry => 'empty') }
 		'EC10.5 fetchrow_hashref for undef-column row does not throw';
-	ok(defined($row),              'EC10.5 returns a defined hashref for the undef-column entry');
+	returns_is($row, { type => 'hashref' }, 'EC10.5 returns a defined hashref for the undef-column entry');
 	ok(!defined($row->{'number'}), 'EC10.5 number column is undef in the returned hashref');
 
 	# ---- selectall_array ---------------------------------------------------
@@ -621,7 +621,7 @@ SKIP: {
 
 		# EC11.5 — fetchrow_hashref for the NULL-column row
 		my $null_fetched = $db_null->fetchrow_hashref(id => 2);
-		ok(defined($null_fetched),              'EC11.5 fetchrow_hashref returns defined hashref for NULL row');
+		returns_is($null_fetched, { type => 'hashref' }, 'EC11.5 fetchrow_hashref returns defined hashref for NULL row');
 		ok(!defined($null_fetched->{'label'}),  'EC11.5 NULL column is undef in fetchrow_hashref result');
 
 		# EC11.6 — selectall_array returns all rows with NULL preserved
@@ -863,7 +863,7 @@ subtest 'EC15: filesystem hostility' => sub {
 		my $good_link = File::Spec->catfile($ec15_dir, 'goodlink');
 		symlink($real_dir, $good_link);
 		my $sym_obj = eval { Database::test1->new(directory => $good_link) };
-		ok(defined($sym_obj),
+		returns_is($sym_obj, { type => 'object', isa => 'Database::test1' },
 			'EC15.2 symlink to a real directory is accepted by new()');
 	}
 
@@ -1025,7 +1025,7 @@ SKIP: {
 	# column defined in the primary worksheet; fetchrow_hashref by 'alpha' returns
 	# undef because 'alpha' exists only in the 'ec19' worksheet.
 	my $bleed_row = $db_over->fetchrow_hashref(entry => 'alpha');
-	ok(!defined($bleed_row),
+	returns_is($bleed_row, { type => 'void' },
 		'EC19.4 table-override: primary entry "alpha" is not visible in override worksheet');
 
 	# EC19.5 — two independent objects: data for one does not overwrite the other.
@@ -1076,7 +1076,7 @@ SKIP: {
 
 	# EC19.10 — fetchrow_hashref miss on XLSX returns undef, not a crash.
 	my $miss = $db_prim->fetchrow_hashref(entry => '__no_such_entry_xyz__');
-	ok(!defined($miss),
+	returns_is($miss, { type => 'void' },
 		'EC19.10 fetchrow_hashref miss on XLSX returns undef (not a crash)');
 }
 
@@ -1155,7 +1155,7 @@ subtest 'EC17: selectall_array context sensitivity' => sub {
 
 	# EC17.4 — scalar context for a missing entry key returns undef
 	my $missing_scalar = $db->selectall_array(entry => 'NO_SUCH_KEY_XYZ');
-	ok(!defined($missing_scalar),
+	returns_is($missing_scalar, { type => 'void' },
 		'EC17.4 missing entry in scalar context returns undef');
 
 	# EC17.5-6 — matching entry criterion: 1-element list in list context,
@@ -1663,7 +1663,7 @@ subtest 'EC26: limit/offset boundary conditions' => sub {
 		my $warned = 0;
 		local $SIG{__WARN__} = sub { $warned++ };
 		my $rows = $db->selectall_arrayref(limit => -1);
-		ok(defined($rows) && ref($rows) eq 'ARRAY',
+		returns_is($rows, { type => 'arrayref' },
 			'EC26.4 negative limit does not crash (returns arrayref)');
 		diag "EC26.4 warned=$warned rows=@{[scalar @{$rows}]}" if $ENV{TEST_VERBOSE};
 	}

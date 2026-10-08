@@ -6,10 +6,9 @@ use File::Temp qw(tempdir);
 use Data::HashMap::Shared::SS;
 use Data::HashMap::Shared::II;
 
-# Arena blocks are exact power-of-two classes that are never split or merged, so
-# freeing any number of small ones never yields a large one and the bump never
-# comes back on its own.  Compaction slides the live blocks together, which is
-# the only way a fragmented arena serves a class it has no free block for.
+# Arena blocks are exact classes, never split or merged, so only compaction
+# (sliding the live blocks together) lets a fragmented arena serve a class it
+# has no free block for.
 
 my $dir = tempdir(CLEANUP => 1);
 
@@ -17,8 +16,8 @@ sub filled {                     # a map fragmented by removing every other key
     my ($path, $cap) = @_;
     my $m = Data::HashMap::Shared::SS->new($path, 8192, 0, 0, 0, $cap);
     my (%want, $i);
-    # Stop short of a refusal: a refused store arms the automatic compaction,
-    # and these cases want to observe the refusal itself.
+    # stop short of a refusal: it would arm the automatic compaction these cases
+    # want to observe
     while ($m->arena_used + 1024 < $m->arena_cap) {
         my $k = sprintf 'key%06d', $i++;
         my $v = 'v' x (100 + ($i % 5) * 30);
@@ -61,7 +60,6 @@ sub filled {                     # a map fragmented by removing every other key
     is_deeply \@bad2, [], '  ... and the moved entries survived being written around';
 }
 
-# The automatic trigger: a refused store makes the next insert compact first.
 {
     my ($m, $want) = filled("$dir/auto.shm", 65536);
     my $big = 'w' x 900;
@@ -75,12 +73,12 @@ sub filled {                     # a map fragmented by removing every other key
     is_deeply \@bad, [], '  ... and nothing else disturbed';
 }
 
-# A workload that only ever updates existing keys reaches no insert at all, so
-# the reclaim has to sit on the overwrite path too or such a map never compacts.
+# An update-only workload reaches no insert, so the reclaim must sit on the
+# overwrite path too.
 {
     my $m = Data::HashMap::Shared::SS->new("$dir/update.shm", 8192, 0, 0, 0, 65536);
     my ($i, @all) = (0);
-    while ($m->arena_used + 320 < $m->arena_cap) {   # spend the bump
+    while ($m->arena_used + 320 < $m->arena_cap) {
         my $k = sprintf 'key%06d', $i++;
         $m->put($k, 'v' x 200) or last;              # 256 class
         push @all, $k;
@@ -90,9 +88,8 @@ sub filled {                     # a map fragmented by removing every other key
     my $held = $m->size;
     cmp_ok scalar @left, '>', 40, 'holes exist, and the bump is spent';
 
-    # Grow a subset into the 1024 class. Nothing here inserts a key, so without
-    # a reclaim on the overwrite path the freed space is unreachable and every
-    # one of these fails.
+    # grow a subset into the 1024 class; no key is inserted, so only the
+    # overwrite path can reclaim
     my @grow = @left[0 .. 24];
     my ($ok, $fail) = (0, 0);
     for my $round (1 .. 3) {
@@ -106,7 +103,6 @@ sub filled {                     # a map fragmented by removing every other key
     is_deeply \@spoiled, [], '  ... without disturbing the entries it did not touch';
 }
 
-# Inline strings live in the node, not the arena, and must not be touched.
 {
     my $m = Data::HashMap::Shared::SS->new("$dir/inline.shm", 512, 0, 0, 0, 65536);
     $m->put("k$_", "v$_") for 1 .. 100;         # all <= 7 bytes: inline
@@ -120,7 +116,6 @@ sub filled {                     # a map fragmented by removing every other key
     is_deeply \@bad, [], '  ... and readable';
 }
 
-# UTF-8 keys and values keep their flag across a move.
 {
     my $m = Data::HashMap::Shared::SS->new("$dir/utf8.shm", 512, 0, 0, 0, 65536);
     my $k = "\x{263A}" x 20;
@@ -135,7 +130,6 @@ sub filled {                     # a map fragmented by removing every other key
     is $got, $k, '  ... and so does the key';
 }
 
-# An int-keyed, int-valued map has no arena at all.
 {
     my $m = Data::HashMap::Shared::II->new("$dir/ii.shm", 512);
     $m->put($_, $_ * 2) for 1 .. 50;
@@ -143,7 +137,6 @@ sub filled {                     # a map fragmented by removing every other key
     is $m->size, 50, '  ... and changes nothing';
 }
 
-# Frozen maps refuse it like any other mutation.
 {
     my $path = "$dir/frozen.shm";
     my $m = Data::HashMap::Shared::SS->new($path, 512, 0, 0, 0, 65536);
@@ -154,8 +147,6 @@ sub filled {                     # a map fragmented by removing every other key
     like $@, qr/frozen/, '  ... saying so';
 }
 
-# A back-off earned while the arena was genuinely full does not outlast the
-# removals that would let a slide succeed.
 {
     my $m = Data::HashMap::Shared::SS->new(undef, 10000, 0, 0, 0, 65536);
     my $n = 0;

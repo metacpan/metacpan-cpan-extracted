@@ -3,54 +3,43 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-my $libs   = '';
-my $cflags = '';
+my @candidates;
 
-# 1. Try Alien::libdeflate if available
 if (eval { require Alien::libdeflate; 1 }) {
     my $alien_libs   = eval { Alien::libdeflate->libs };
     my $alien_cflags = eval { Alien::libdeflate->cflags };
+    chomp $alien_libs if defined $alien_libs;
+    chomp $alien_cflags if defined $alien_cflags;
     if ($alien_libs) {
-        $libs   = $alien_libs;
-        $cflags = $alien_cflags || '';
+        push @candidates, [$alien_libs, $alien_cflags || ''];
     }
 }
 
-# 2. Try ExtUtils::PkgConfig
-if (!$libs && eval { require ExtUtils::PkgConfig; 1 }) {
+if (eval { require ExtUtils::PkgConfig; 1 }) {
     if (eval { ExtUtils::PkgConfig->atleast_version('libdeflate', '1.7') }) {
         my %pkg = eval { ExtUtils::PkgConfig->find('libdeflate') };
         if (%pkg && $pkg{libs}) {
-            $cflags = $pkg{cflags} || '';
-            $libs   = $pkg{libs}   || '';
+            push @candidates, [$pkg{libs} || '', $pkg{cflags} || ''];
         }
     }
 }
 
-# 3. Try pkg-config directly
-if (!$libs) {
+{
     my $ver_ok = `pkg-config --atleast-version=1.7 libdeflate 2>/dev/null`;
     if ($? == 0) {
         my $pc_libs = `pkg-config --libs libdeflate 2>/dev/null`;
         if ($? == 0 && $pc_libs =~ /\S/) {
             chomp $pc_libs;
-            $libs = $pc_libs;
             my $pc_cflags = `pkg-config --cflags libdeflate 2>/dev/null`;
             chomp $pc_cflags if defined $pc_cflags;
-            $cflags = $pc_cflags || '';
+            push @candidates, [$pc_libs, $pc_cflags || ''];
         }
     }
 }
 
-# 4. Fallback to default linker flag
-if (!$libs) {
-    $libs = '-ldeflate';
-}
+push @candidates, ['-ldeflate', ''];
 
-my $inc = $cflags ? "-I. $cflags" : '-I.';
-
-# Probe for libdeflate header, library, and minimum version (1.7+)
-sub check_libdeflate {
+sub check_dependencies {
     my ($probe_libs, $probe_inc) = @_;
     require File::Temp;
     my $tmpdir = File::Temp::tempdir(CLEANUP => 1);
@@ -61,11 +50,21 @@ sub check_libdeflate {
 #if defined(LIBDEFLATE_VERSION_MAJOR) && (LIBDEFLATE_VERSION_MAJOR < 1 || (LIBDEFLATE_VERSION_MAJOR == 1 && LIBDEFLATE_VERSION_MINOR < 7))
 #error "libdeflate 1.7 or later is required"
 #endif
+#if (defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(_REENTRANT))
+#include <pthread.h>
+#define DF_HAVE_PTHREAD 1
+#endif
 int main(void) {
     struct libdeflate_compressor *c = libdeflate_alloc_compressor(0);
     if (c) libdeflate_free_compressor(c);
     struct libdeflate_decompressor *d = libdeflate_alloc_decompressor();
     if (d) libdeflate_free_decompressor(d);
+#if defined(DF_HAVE_PTHREAD) && (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)))
+    pthread_key_t key;
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    if (pthread_mutex_lock(&mutex) || pthread_key_create(&key, 0) ||
+        pthread_setspecific(key, 0) || pthread_mutex_unlock(&mutex)) return 1;
+#endif
     return 0;
 }
 END_C
@@ -79,8 +78,24 @@ END_C
     return ($res == 0);
 }
 
-if (!check_libdeflate($libs, $inc)) {
-    print STDERR "OS unsupported: libdeflate (>= 1.7) development files (header and library) are required\n";
+my ($pthread_lib) = ($Config{libs} || '') =~ /(?:^|\s)(-l(?:pthreads?|thr))(?=\s|$)/;
+$pthread_lib ||= '-lpthread';
+
+my ($libs, $inc);
+CANDIDATE:
+for my $cand (@candidates) {
+    for my $extra ('', " $pthread_lib") {
+        my $try_libs = $cand->[0] . $extra;
+        my $try_inc = $cand->[1] ? "-I. $cand->[1]" : '-I.';
+        if (check_dependencies($try_libs, $try_inc)) {
+            ($libs, $inc) = ($try_libs, $try_inc);
+            last CANDIDATE;
+        }
+    }
+}
+
+if (!defined $libs) {
+    print STDERR "OS unsupported: libdeflate (>= 1.7) development files and pthread support (where used) are required\n";
     exit 0;
 }
 
@@ -127,7 +142,8 @@ WriteMakefile(
         prereqs     => {
             configure => {
                 recommends => {
-                    'Alien::libdeflate' => '0.03',
+                    'Alien::libdeflate'   => '0.03',
+                    'ExtUtils::PkgConfig' => '0',
                 },
             },
         },
@@ -150,7 +166,7 @@ WriteMakefile(
     },
 );
 
-sub postamble {
+sub MY::postamble {
     return <<'MAKE_FRAG';
 README: lib/Deflate/Faster.pod
 	pod2text lib/Deflate/Faster.pod > README

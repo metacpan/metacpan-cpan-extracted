@@ -1,17 +1,17 @@
 use warnings;
 use strict;
 use utf8;
-use FindBin '$Bin';
 use Test::More;
+use File::Temp qw(tempdir);
 use Deflate::Faster qw(:all);
 
-# 1. Procedural basic round trip
+# Procedural basic round trip
 my $input = "The quick brown fox jumps over the lazy dog. 1234567890! " x 10;
 my $gz = gzip($input);
 ok(defined $gz && length($gz) > 0, "gzip produced output");
 is(gunzip($gz), $input, "gunzip round trip matches input");
 
-# 2. Warnings on invalid inputs
+# Warnings on invalid inputs
 {
     my $warning = '';
     local $SIG{__WARN__} = sub { $warning = shift };
@@ -30,22 +30,22 @@ is(gunzip($gz), $input, "gunzip round trip matches input");
     like($warning, qr/Empty input/, "gunzip warns on undef");
 }
 
-# 3. Bad compressed data croaks
+# Bad compressed data croaks
 eval { gunzip("this is definitely not gzip data") };
 ok($@, "croaked on invalid gzip data");
 like($@, qr/Data input to inflate is not in libz format/, "correct error message on bad data");
 
-# 4. Zlib format (deflate / inflate)
+# Zlib format (deflate / inflate)
 my $zlib = deflate($input);
 ok(defined $zlib && length($zlib) > 0, "deflate produced output");
 is(inflate($zlib), $input, "inflate round trip matches input");
 
-# 5. Raw DEFLATE format (deflate_raw / inflate_raw)
+# Raw DEFLATE format (deflate_raw / inflate_raw)
 my $raw = deflate_raw($input);
 ok(defined $raw && length($raw) > 0, "deflate_raw produced output");
 is(inflate_raw($raw), $input, "inflate_raw round trip matches input");
 
-# 6. Procedural optional level parameter
+# Procedural optional level parameter
 my $gz_fast = gzip($input, 1);
 is(gunzip($gz_fast), $input, "gzip with level 1 decompresses OK");
 my $gz_best = gzip($input, 12);
@@ -55,7 +55,7 @@ is(inflate($z_fast), $input, "deflate with level 1 decompresses OK");
 my $raw_fast = deflate_raw($input, 1);
 is(inflate_raw($raw_fast), $input, "deflate_raw with level 1 decompresses OK");
 
-# 7. OO interface
+# OO interface
 my $df = Deflate::Faster->new();
 isa_ok($df, 'Deflate::Faster');
 is($df->unzip($df->zip($input)), $input, "OO zip / unzip roundtrip");
@@ -90,7 +90,7 @@ $df->gzip_format(1);
 my $gz_out2 = $df->zip($input);
 is($df->unzip($gz_out2), $input, "OO gzip mode roundtrip after raw mode");
 
-# 8. Preservation of Perl UTF-8 flag
+# Preservation of Perl UTF-8 flag
 {
     my $kujira = '鯨';
     ok(utf8::is_utf8($kujira), "kujira is UTF-8 encoded");
@@ -113,7 +113,7 @@ is($df->unzip($gz_out2), $input, "OO gzip mode roundtrip after raw mode");
     is($k_out2, $kujira, "decoded text matches");
 }
 
-# 9. Gzip header metadata: file_name and mod_time
+# Gzip header metadata: file_name and mod_time
 {
     my $df_meta = Deflate::Faster->new();
     $df_meta->file_name("archive.txt");
@@ -128,29 +128,26 @@ is($df->unzip($gz_out2), $input, "OO gzip mode roundtrip after raw mode");
     is($reader->mod_time(), 1700000000, "mod_time metadata preserved");
 }
 
-# 10. File functions: gzip_to_file, gunzip_to_file, gzip_file, gunzip_file
+# File functions: gzip_to_file, gunzip_to_file, gzip_file, gunzip_file
 {
-    my $test_file = "$Bin/test_temp.txt";
-    my $gz_file   = "$Bin/test_temp.txt.gz";
+    my $tmpdir = tempdir(CLEANUP => 1);
+    my $test_file = "$tmpdir/test_temp.txt";
+    my $gz_file   = "$tmpdir/test_temp.txt.gz";
 
     open my $out, ">:raw", $test_file or die $!;
     print $out $input;
     close $out or die $!;
 
-    # gzip_file
     my $from_file_gz = gzip_file($test_file);
     is(gunzip($from_file_gz), $input, "gzip_file works");
 
-    # gzip_to_file
     gzip_to_file($input, $gz_file);
     ok(-f $gz_file, "gzip_to_file created file");
 
-    # gunzip_file
     my $retrieved = gunzip_file($gz_file);
     is($retrieved, $input, "gunzip_file read and decompressed file");
 
-    # gunzip_to_file
-    my $dest_plain = "$Bin/test_dest.txt";
+    my $dest_plain = "$tmpdir/test_dest.txt";
     gunzip_to_file($gz, $dest_plain);
     is(Deflate::Faster::get_file($dest_plain), $input, "gunzip_to_file decompressed to file");
 
@@ -175,11 +172,9 @@ is($df->unzip($gz_out2), $input, "OO gzip mode roundtrip after raw mode");
     eval { gunzip_to_file($gz, $dest_plain, max_size => 10) };
     ok($@, "gunzip_to_file enforces max_size");
     like($@, qr/max_size/, "correct max_size error from gunzip_to_file");
-
-    unlink $test_file, $gz_file, $dest_plain;
 }
 
-# 11. Test SvGMAGICAL scalar input (regex capture $1)
+# Test SvGMAGICAL scalar input (regex capture $1)
 {
     my $string = "prefix:MagicalContent12345:suffix";
     if ($string =~ /prefix:(.*):suffix/) {

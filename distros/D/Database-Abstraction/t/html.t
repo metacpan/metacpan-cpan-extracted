@@ -5,9 +5,10 @@ use warnings;
 
 use FindBin qw($Bin);
 use File::Spec;
-use Test::Most tests => 27;
+use Test::Most tests => 26;
 use Test::NoWarnings;
 use Test::Mockingbird;
+use Test::Returns;
 use HTTP::Response;
 
 # Pre-load the modules that _open() lazy-requires so that mock() can install
@@ -52,11 +53,11 @@ sub make_fail_response {
 	my $db = new_ok('Database::test1' => [{ url => 'http://example.com/test1.html' }]);
 
 	# _open is lazy; trigger it before checking type
-	cmp_ok($db->count(), '==', 3, 'count returns 3 data rows');
+	returns_is($db->count(), { type => 'integer', min => 3, max => 3 }, 'count returns 3 data rows');
 	is($db->{'type'}, 'HTML', 'type is HTML');
 
 	my $row = $db->fetchrow_hashref(entry => '1');
-	ok(defined $row, 'fetchrow_hashref finds entry 1');
+	returns_is($row, { type => 'hashref' }, 'fetchrow_hashref finds entry 1');
 	is($row->{'name'}, 'Alice', 'name is Alice');
 	is($row->{'age'}, '30', 'age is 30');
 
@@ -64,7 +65,7 @@ sub make_fail_response {
 	is($row2->{'name'}, 'Bob', 'name is Bob');
 
 	my $missing = $db->fetchrow_hashref(entry => '99');
-	ok(!defined $missing, 'missing entry returns undef');
+	returns_is($missing, { type => 'void' }, 'missing entry returns undef');
 }
 
 # ---------------------------------------------------------------------------
@@ -76,11 +77,10 @@ sub make_fail_response {
 	my $db = Database::test1->new(url => 'http://example.com/test1.html');
 
 	my $all = $db->selectall_arrayref();
-	is(ref $all, 'ARRAY', 'selectall_arrayref returns arrayref');
-	cmp_ok(scalar @{$all}, '==', 3, 'all 3 rows returned');
+	returns_is($all, { type => 'arrayref', min => 3, max => 3 }, 'selectall_arrayref returns 3-row arrayref');
 
 	my $filtered = $db->selectall_arrayref(name => 'Bob');
-	cmp_ok(scalar @{$filtered}, '==', 1, 'filter by name=Bob finds 1 row');
+	returns_is($filtered, { type => 'arrayref', min => 1, max => 1 }, 'filter by name=Bob finds 1 row');
 	is($filtered->[0]{'name'}, 'Bob', 'filtered row is Bob');
 }
 
@@ -106,7 +106,7 @@ sub make_fail_response {
 
 	my $rows = $db->selectall_arrayref();
 	is($db->{'type'}, 'HTML', 'type is HTML for table index 1');
-	cmp_ok(scalar @{$rows}, '==', 2, 'second table has 2 data rows');
+	returns_is($rows, { type => 'arrayref', min => 2, max => 2 }, 'second table has 2 data rows');
 	is($rows->[0]{'colour'}, 'red', 'first row colour is red');
 	is($rows->[1]{'hex'}, '#00ff00', 'second row hex is #00ff00');
 }
@@ -119,7 +119,7 @@ sub make_fail_response {
 
 	my $db = Database::test1->new(url => 'http://example.com/test1.html', no_entry => 1);
 	my $rows = $db->selectall_arrayref();
-	cmp_ok(scalar @{$rows}, '==', 3, 'no_entry mode returns 3 rows');
+	returns_is($rows, { type => 'arrayref', min => 3, max => 3 }, 'no_entry mode returns 3 rows');
 	ok(exists $rows->[0]{'entry'}, 'entry column is present in no_entry mode');
 }
 
@@ -179,5 +179,5 @@ sub make_fail_response {
 	$db->selectall_arrayref();
 	$db->count();
 
-	cmp_ok($call_count, '==', 1, 'URL fetched only once per object instance');
+	returns_is($call_count, { type => 'integer', min => 1, max => 1 }, 'URL fetched only once per object instance');
 }

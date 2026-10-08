@@ -28,10 +28,6 @@ sub maps_count {
 my @variants = qw(I16 I32 II I16S I32S IS SI16 SI32 SI SS);
 sub kv { $_[0] =~ /^S/ ? 'k' : 1, $_[0] =~ /S$/ ? 'v' : 1 }
 
-# Instance-form constructors bless into the object's class and return a
-# working map, in every variant.  Blessing into the stringified invocant
-# instead leaves an object whose methods all die and whose DESTROY guard
-# never fires, leaking the handle and its mapping.
 for my $v (@variants) {
     my $class = "Data::HashMap::Shared::$v";
     my ($k, $val) = kv($v);
@@ -51,7 +47,6 @@ for my $v (@variants) {
     is ref($s->new(undef, 64)), 'My::InstII', 'instance-form new of a subclass object blesses into the subclass';
 }
 
-# The other constructors take the instance form too.
 {
     my $seed = Data::HashMap::Shared::II->new(path('seed-sh'), 100);
     my $sh = $seed->new_sharded(path('inst-sh'), 2, 100);
@@ -70,7 +65,6 @@ for my $v (@variants) {
     is $ro->get(7), 8, '... and the frozen entries read back';
 }
 
-# Dropping instance-form maps unmaps them: no handle or mapping leak.
 SKIP: {
     skip 'needs a readable /proc/self/maps', 1 unless -r '/proc/self/maps';
     my $seed = Data::HashMap::Shared::II->new(path('leak-seed'), 100);

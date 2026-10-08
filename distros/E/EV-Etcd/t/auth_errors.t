@@ -2,6 +2,7 @@
 # Error paths t/auth.t skips: duplicate user, missing user or role
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 

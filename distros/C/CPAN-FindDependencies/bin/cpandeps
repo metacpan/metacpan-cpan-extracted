@@ -174,6 +174,13 @@ interested in configure-time requirements as well as build- and run-time
 requirements. That option no longer exists as of version 3.00, it will always
 report on configure, build, test, and run-time requirements.
 
+Up to version 3.13 specifying a bogus directory for C<cachedir> would be
+ignored.
+
+From version 4.00 onwards you *must* have Net::SSLeay and IO::Socket::SSL
+available. A perl that doesn't have SSL support is broken. We will no
+longer fall back to wget.
+
 
 =head1 TREE PRUNING
 

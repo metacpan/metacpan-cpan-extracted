@@ -417,6 +417,18 @@ ssh_channel_request_shell(ssh_channel channel)
     OUTPUT: RETVAL
 
 int
+ssh_channel_request_pty(ssh_channel channel)
+    CODE:
+        RETVAL = ssh_channel_request_pty(channel);
+    OUTPUT: RETVAL
+
+int
+ssh_channel_change_pty_size(ssh_channel channel, int cols, int rows)
+    CODE:
+        RETVAL = ssh_channel_change_pty_size(channel, cols, rows);
+    OUTPUT: RETVAL
+
+int
 ssh_channel_write(ssh_channel channel, char *data)
     CODE:
         RETVAL = ssh_channel_write(channel, data, strlen(data));

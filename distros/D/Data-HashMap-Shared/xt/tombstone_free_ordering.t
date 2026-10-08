@@ -3,23 +3,20 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 
-# tombstone_at must retire the slot before releasing the entry's arena blocks.
-# The other order leaves a writer killed in that window with states[idx] live
-# while the key's block is already on the free list, whose push overwrites its
-# first 4 bytes -- the key reads back mangled, the entry is unreachable by any
-# key string, and the block stays available for reuse.
-#
-# Both orders reach the same final state, so only a crash mid-call tells them
-# apart: stop the process on the line that publishes the tombstone and SIGKILL
-# it there.  The invariant asserted is the one the bug breaks: every key the
-# cursor yields must round-trip through exists().
+# tombstone_at must retire the slot before releasing the entry's arena blocks:
+# in the other order a writer killed in that window leaves states[idx] live
+# while the key's block is on the free list, whose push overwrites its first 4
+# bytes, so the key reads back mangled and the entry is unreachable. Both orders
+# reach the same final state, so only a crash mid-call tells them apart: gdb
+# stops the process on the line publishing the tombstone and SIGKILLs it.
+# Asserted: every key the cursor yields round-trips through exists().
 
 plan skip_all => 'set CRASH_GDB=1 to run' unless $ENV{CRASH_GDB};
 my $gdb = `which gdb 2>/dev/null`; chomp $gdb;
 plan skip_all => 'gdb not found' unless $gdb && -x $gdb;
 plan skip_all => 'needs the dist root' unless -f 'shm_generic.h' && -f 'Makefile.PL';
 
-# Anchor on the statement itself, not a line number: the fix moves the line.
+# Anchor on the statement itself, not a line number.
 my $line;
 {
     open my $fh, '<', 'shm_generic.h' or die $!;
@@ -80,7 +77,6 @@ my $gdblog = do { local $/; open my $l, '<', $log or die $!; <$l> };
 like $gdblog, qr/Breakpoint 1[.,]/, 'gdb bound and hit the breakpoint'
     or diag $gdblog;
 
-# Re-open in a fresh process and check the invariant.
 my $out = `$^X -Iblib/lib -Iblib/arch -MData::HashMap::Shared::SI -e '
     my \$m = Data::HashMap::Shared::SI->new(q{$map}, 1024);
     my \$c = \$m->cursor; my \$bad = 0; my \$n = 0;

@@ -8,7 +8,7 @@ eval "use Test::Spelling 0.20; 1"
 
 add_stopwords(qw(
     Async EV NOSPACE READWRITE
-    async backoff defragment reconnection ttl txn
+    async backoff defragment reconnection retryable ttl txn
     etcd gRPC libev libgrpc protobuf-c protobuf
     XS pthread typemap
     auth backend cancellable cluster_id codepoints compact_revision
@@ -19,9 +19,9 @@ add_stopwords(qw(
     namespace observe param params pre prev_kv prev_kvs proclaim
     progress_notify protobufs raft RPC RPCs runtime serializable
     serialize Sub-packages subkey subprocess SvUTF8 sync TLS tls TTL
-    PEM SNI macOS
-    UTF UV-cant userland vmactions watch_id YK
-    Yegor Korablev vividsnow
+    PEM SNI macOS JWT KiB MiB loopback
+    UTF UV-cant userland vmactions watch_id
+    vividsnow
 ));
 
 all_pod_files_spelling_ok();

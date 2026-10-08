@@ -7,6 +7,20 @@
 #define RECONNECT_BACKOFF_SECONDS(attempt) \
     ((attempt) * 0.5 > 5.0 ? 5.0 : (attempt) * 0.5)
 
+/* Retry pace after a member answered without a leader */
+#define NO_LEADER_RETRY_SECONDS 1.0
+
+/* Perl before 5.42 crashes running a %SIG handler on a thread without a Perl
+ * context; threads inherit the starter's mask, so gRPC's and ours block all */
+#define WITH_SIGNALS_BLOCKED(stmt) \
+    do { \
+        sigset_t _ws_all, _ws_old; \
+        sigfillset(&_ws_all); \
+        pthread_sigmask(SIG_SETMASK, &_ws_all, &_ws_old); \
+        stmt; \
+        pthread_sigmask(SIG_SETMASK, &_ws_old, NULL); \
+    } while (0)
+
 #include <grpc/grpc.h>
 #ifdef HAVE_GRPC_CREDENTIALS_H
 #include <grpc/credentials.h>
@@ -42,18 +56,27 @@
 #define ETCD_MAX_USERNAME_SIZE  256
 #define ETCD_MAX_PASSWORD_SIZE  4096
 
-#define VALIDATE_USERNAME_SIZE(len) \
+/* protobuf-c packs proto3 strings with strlen: a NUL would cut them short */
+#define VALIDATE_NO_NUL(str, len, what) \
     do { \
-        if ((len) > ETCD_MAX_USERNAME_SIZE) { \
-            croak("username too large: %zu bytes (max %d)", (size_t)(len), ETCD_MAX_USERNAME_SIZE); \
-        } \
+        if (memchr((str), '\0', (len))) \
+            croak("%s contains a NUL byte", what); \
     } while (0)
 
-#define VALIDATE_PASSWORD_SIZE(len) \
+#define VALIDATE_NAME(str, len) \
+    do { \
+        if ((len) > ETCD_MAX_USERNAME_SIZE) { \
+            croak("name too large: %zu bytes (max %d)", (size_t)(len), ETCD_MAX_USERNAME_SIZE); \
+        } \
+        VALIDATE_NO_NUL(str, len, "name"); \
+    } while (0)
+
+#define VALIDATE_PASSWORD(str, len) \
     do { \
         if ((len) > ETCD_MAX_PASSWORD_SIZE) { \
             croak("password too large: %zu bytes (max %d)", (size_t)(len), ETCD_MAX_PASSWORD_SIZE); \
         } \
+        VALIDATE_NO_NUL(str, len, "password"); \
     } while (0)
 
 #define ETCD_MAX_URL_SIZE  2048
@@ -62,6 +85,36 @@
     do { \
         if ((len) > ETCD_MAX_URL_SIZE) { \
             croak("peer URL too large: %zu bytes (max %d)", (size_t)(len), ETCD_MAX_URL_SIZE); \
+        } \
+    } while (0)
+
+/* Counts known keys first: iterating would reset the caller's each() */
+#define VALIDATE_OPTS_KEYS(hv, op, ...) \
+    do { \
+        const char *_vk_valid[] = { __VA_ARGS__, NULL }; \
+        I32 _vk_known = 0; \
+        HE *_vk_he; \
+        for (int _vk_n = 0; _vk_valid[_vk_n]; _vk_n++) { \
+            if (hv_exists((hv), _vk_valid[_vk_n], strlen(_vk_valid[_vk_n]))) \
+                _vk_known++; \
+        } \
+        if (!SvRMAGICAL(hv) && _vk_known == (I32)HvUSEDKEYS(hv)) \
+            break; \
+        hv_iterinit(hv); \
+        while ((_vk_he = hv_iternext(hv)) != NULL) { \
+            STRLEN _vk_len; \
+            const char *_vk_key = HePV(_vk_he, _vk_len); \
+            int _vk_ok = 0, _vk_i; \
+            for (_vk_i = 0; _vk_valid[_vk_i] != NULL; _vk_i++) { \
+                STRLEN _vk_vlen = strlen(_vk_valid[_vk_i]); \
+                if (_vk_vlen == _vk_len && memcmp(_vk_valid[_vk_i], _vk_key, _vk_len) == 0) { \
+                    _vk_ok = 1; \
+                    break; \
+                } \
+            } \
+            if (!_vk_ok) { \
+                croak("Unknown option '%s' in $client->%s", _vk_key, op); \
+            } \
         } \
     } while (0)
 
@@ -114,10 +167,19 @@ typedef enum {
     CALL_TYPE_DEFRAGMENT,
     CALL_TYPE_HASH_KV,
     CALL_TYPE_MOVE_LEADER,
-    CALL_TYPE_AUTH_STATUS
+    CALL_TYPE_AUTH_STATUS,
+    CALL_TYPE_WATCH_STATUS,
+    CALL_TYPE_LEASE_KEEPALIVE_STATUS,
+    CALL_TYPE_ELECTION_OBSERVE_STATUS
 } call_type_t;
 
 struct ev_etcd_struct;
+
+/* The client and each call keep the channel alive until their own cleanup. */
+typedef struct channel_ref {
+    grpc_channel *channel;
+    unsigned refs;
+} channel_ref_t;
 
 typedef struct queued_event {
     void *tag;
@@ -130,10 +192,13 @@ typedef struct call_base {
     call_type_t type;
     unsigned channel_gen;  /* client->channel_gen when the call was created */
     pid_t owner_pid;
+    channel_ref_t *channel_ref;
+    /* gRPC 1.30 links these into the call uncopied: keep until etcd_call_release */
+    grpc_metadata send_md[2];
+    int owns_auth_value;
 } call_base_t;
 
-/* Tag for fire-and-forget batches: GRPC_CQ_NEXT needs a non-NULL tag, and
- * process_grpc_event skips CALL_TYPE_NONE */
+/* Non-NULL tag for fire-and-forget batches; its CALL_TYPE_NONE is skipped */
 extern call_base_t cancel_sentinel;
 
 typedef struct pending_call {
@@ -147,6 +212,7 @@ typedef struct pending_call {
     grpc_slice status_details;
     struct ev_etcd_struct *client;
     struct pending_call *next;
+    struct pending_call **pprev;  /* NULL once unlinked */
 } pending_call_t;
 
 typedef struct watch_params {
@@ -168,18 +234,21 @@ typedef struct watch_call {
     grpc_metadata_array initial_metadata;
     grpc_metadata_array trailing_metadata;
     grpc_byte_buffer *recv_buffer;
+    grpc_status_code status;
     grpc_slice status_details;
     int64_t watch_id;
     int active;
     struct ev_etcd_struct *client;
     struct watch_call *next;
     int auto_reconnect;
+    int established;           /* a response arrived on the current call */
     int64_t last_revision;
     watch_params_t params;
     int reconnect_attempt;
+    unsigned attempt_epoch;    /* client->no_leader_epoch reconnect_attempt counts in */
     ev_timer reconnect_timer;
-    /* Dual ownership: client cleanup frees the gRPC state, the last owner
-     * frees the struct, so a Perl handle can outlive client cleanup */
+    ev_timer progress_timer;
+    /* Client cleanup frees the gRPC state, the last owner the struct */
     int client_owns;
     int perl_owns;
 } watch_call_t;
@@ -191,13 +260,16 @@ typedef struct keepalive_call {
     grpc_metadata_array initial_metadata;
     grpc_metadata_array trailing_metadata;
     grpc_byte_buffer *recv_buffer;
+    grpc_status_code status;
     grpc_slice status_details;
     int64_t lease_id;
     int active;
     struct ev_etcd_struct *client;
     struct keepalive_call *next;
     int auto_reconnect;
+    int established;
     int reconnect_attempt;
+    unsigned attempt_epoch;
     ev_timer reconnect_timer;
     ev_timer renew_timer;
     int client_owns;           /* dual ownership, see watch_call_t */
@@ -216,12 +288,15 @@ typedef struct observe_call {
     grpc_metadata_array initial_metadata;
     grpc_metadata_array trailing_metadata;
     grpc_byte_buffer *recv_buffer;
+    grpc_status_code status;
     grpc_slice status_details;
     int active;
     struct ev_etcd_struct *client;
     struct observe_call *next;
     int auto_reconnect;
+    int established;
     int reconnect_attempt;
+    unsigned attempt_epoch;
     ev_timer reconnect_timer;
     observe_params_t params;
     int client_owns;           /* dual ownership, see watch_call_t */
@@ -230,6 +305,7 @@ typedef struct observe_call {
 
 typedef struct ev_etcd_struct {
     grpc_channel *channel;
+    channel_ref_t *channel_ref;
     grpc_completion_queue *cq;
 
     /* cq_thread hands completions to the EV thread via event_queue + cq_async */
@@ -253,9 +329,6 @@ typedef struct ev_etcd_struct {
     int endpoint_count;
     int current_endpoint;
     unsigned channel_gen;  /* bumped on every endpoint switch */
-    /* Kept for one switch so calls queued on it end on their own terms
-     * instead of failing with "Channel Destroyed" */
-    grpc_channel *old_channel;
 
     grpc_channel_credentials *creds;  /* NULL = insecure */
     char *tls_server_name;
@@ -263,6 +336,8 @@ typedef struct ev_etcd_struct {
     int keepalive_timeout_ms;
 
     int max_retries;
+    /* Bumped by each answer without a leader: voids reconnects counted before it */
+    unsigned no_leader_epoch;
 
     ev_timer health_timer;
     int is_healthy;
@@ -271,6 +346,23 @@ typedef struct ev_etcd_struct {
     struct ev_etcd_struct *next_live;  /* this process's live clients */
 } ev_etcd_t;
 
+static inline void link_pending_call(ev_etcd_t *client, pending_call_t *pc) {
+    pc->next = client->pending_calls;
+    if (pc->next)
+        pc->next->pprev = &pc->next;
+    pc->pprev = &client->pending_calls;
+    client->pending_calls = pc;
+}
+
+static inline void unlink_pending_call(pending_call_t *pc) {
+    if (!pc->pprev)
+        return;
+    *pc->pprev = pc->next;
+    if (pc->next)
+        pc->next->pprev = pc->pprev;
+    pc->pprev = NULL;
+}
+
 typedef ev_etcd_t *EV__Etcd;
 typedef watch_call_t *EV__Etcd__Watch;
 typedef keepalive_call_t *EV__Etcd__Keepalive;
@@ -278,6 +370,12 @@ typedef observe_call_t *EV__Etcd__Observe;
 
 static inline void init_call_base(call_base_t *base, call_type_t type) {
     base->type = type;
+}
+
+static inline void etcd_call_acquire(ev_etcd_t *client, call_base_t *base) {
+    base->channel_gen = client->channel_gen;
+    base->channel_ref = client->channel_ref;
+    base->channel_ref->refs++;
 }
 
 #define VALIDATE_CALLBACK(cb) \
@@ -293,29 +391,38 @@ static inline void init_call_base(call_base_t *base, call_type_t type) {
 #  define newSVi64(v) newSViv((IV)(v))
 #  define newSVu64(v) newSVuv((UV)(v))
 #  define SvI64(sv)   ((int64_t)SvIV(sv))
+#  define SvI64_nomg(sv) ((int64_t)SvIV_nomg(sv))
 #  define SvU64(sv)   ((uint64_t)SvUV(sv))
 #else
 #  define newSVi64(v) newSVnv((NV)(v))
 #  define newSVu64(v) newSVnv((NV)(v))
 #  define SvI64(sv)   ((int64_t)SvNV(sv))
+#  define SvI64_nomg(sv) ((int64_t)SvNV_nomg(sv))
 #  define SvU64(sv)   ((uint64_t)SvNV(sv))
 #endif
 
 const char* grpc_status_name(grpc_status_code code);
 int is_retryable_status(grpc_status_code code);
+int is_permanent_status(grpc_status_code code);
+int etcd_is_no_leader(grpc_status_code status, grpc_slice status_details);
 SV* create_error_hv(pTHX_ grpc_status_code code, const char *message, size_t message_len, const char *source);
+SV* create_pending_error_hv(pTHX_ pending_call_t *pc, grpc_status_code code, const char *source);
 
 SV* kv_to_hashref(pTHX_ Mvccpb__KeyValue *kv);
 SV* event_to_hashref(pTHX_ Mvccpb__Event *event);
 void add_header_to_hv(pTHX_ HV *result, Etcdserverpb__ResponseHeader *header);
 
-grpc_channel *etcd_create_channel(ev_etcd_t *client, const char *target);
+channel_ref_t *etcd_create_channel(ev_etcd_t *client, const char *target);
+void etcd_channel_release(channel_ref_t *ref, int destroy);
+void etcd_call_release(call_base_t *base);
 void etcd_rotate_endpoint(ev_etcd_t *client);
-void etcd_endpoint_failed(ev_etcd_t *client, unsigned channel_gen, grpc_status_code status);
-void etcd_stream_failed(ev_etcd_t *client, unsigned channel_gen);
+void etcd_endpoint_failed(ev_etcd_t *client, const call_base_t *base,
+                          grpc_status_code status, grpc_slice status_details);
+void etcd_stream_failed(ev_etcd_t *client, unsigned channel_gen, int established,
+                        grpc_status_code status, grpc_slice status_details);
 
-void setup_auth_metadata(ev_etcd_t *client, grpc_op *op, grpc_metadata *auth_md);
-void cleanup_auth_metadata(ev_etcd_t *client, grpc_metadata *auth_md);
+void setup_auth_metadata(ev_etcd_t *client, grpc_op *op, call_base_t *base);
+void setup_stream_metadata(ev_etcd_t *client, grpc_op *op, call_base_t *base);
 
 extern grpc_slice METHOD_KV_RANGE;
 extern grpc_slice METHOD_KV_PUT;
@@ -375,7 +482,7 @@ void init_method_slices(void);
 /* Returns from the calling handler on error; declares _resp_slice */
 #define BEGIN_RESPONSE_HANDLER(pc, source) \
     if ((pc)->status != GRPC_STATUS_OK) { \
-        CALL_ERROR_CALLBACK((pc)->callback, (pc)->status, (pc)->status_details, source); \
+        CALL_PENDING_ERROR_CALLBACK(pc, (pc)->status, source); \
         return; \
     } \
     if (!(pc)->recv_buffer) { \
@@ -399,13 +506,23 @@ void init_method_slices(void);
         return; \
     }
 
-/* Safe call_sv wrapper: traps die() in callbacks to prevent longjmp over cleanup */
+/* No die may longjmp over the caller's cleanup: the report runs under G_EVAL
+ * too, and SvROK tests a reference whose SvTRUE would call overloads */
 #define CALL_SV_SAFE(sv, flags) \
     do { \
         call_sv(sv, (flags) | G_EVAL); \
-        if (SvTRUE(ERRSV)) { \
-            warn("EV::Etcd: callback died: %" SVf, SVfARG(ERRSV)); \
+        if (SvROK(ERRSV) || SvTRUE(ERRSV)) { \
+            SV *_cb_err = sv_mortalcopy(ERRSV); \
             sv_setsv(ERRSV, &PL_sv_undef); \
+            { \
+                dSP; \
+                ENTER; SAVETMPS; PUSHMARK(SP); \
+                XPUSHs(_cb_err); \
+                PUTBACK; \
+                call_pv("EV::Etcd::_warn_callback_died", G_EVAL | G_DISCARD); \
+                FREETMPS; LEAVE; \
+                sv_setsv(ERRSV, &PL_sv_undef); \
+            } \
         } \
     } while (0)
 
@@ -430,6 +547,24 @@ void init_method_slices(void);
         PUTBACK; CALL_SV_SAFE(callback, G_DISCARD); FREETMPS; LEAVE; \
     } while (0)
 
+#define CALL_PENDING_ERROR_CALLBACK(pc, status, source) \
+    do { \
+        dSP; \
+        ENTER; SAVETMPS; PUSHMARK(SP); EXTEND(SP, 2); \
+        PUSHs(&PL_sv_undef); \
+        PUSHs(sv_2mortal(create_pending_error_hv(aTHX_ pc, status, source))); \
+        PUTBACK; CALL_SV_SAFE((pc)->callback, G_DISCARD); FREETMPS; LEAVE; \
+    } while (0)
+
+#define CALL_PREBUILT_ERROR_CALLBACK(callback, err_sv) \
+    do { \
+        dSP; \
+        ENTER; SAVETMPS; PUSHMARK(SP); EXTEND(SP, 2); \
+        PUSHs(&PL_sv_undef); \
+        PUSHs(sv_2mortal(err_sv)); \
+        PUTBACK; CALL_SV_SAFE(callback, G_DISCARD); FREETMPS; LEAVE; \
+    } while (0)
+
 #define CALL_SIMPLE_ERROR_CALLBACK(callback, message) \
     CALL_STATUS_ERROR_CALLBACK(callback, GRPC_STATUS_INTERNAL, message, "internal")
 
@@ -442,17 +577,31 @@ void init_method_slices(void);
         PUTBACK; CALL_SV_SAFE(callback, G_DISCARD); FREETMPS; LEAVE; \
     } while (0)
 
-#define INIT_PENDING_CALL(pc, call_type, callback_sv, client_ref) \
+/* Run inside the caller's statement, as cancel's is: its $@ must survive */
+#define CALL_SYNC_SUCCESS_CALLBACK(callback, result_hv) \
+    do { \
+        ENTER; \
+        save_scalar(PL_errgv); \
+        CALL_SUCCESS_CALLBACK(callback, result_hv); \
+        LEAVE; \
+    } while (0)
+
+#define INIT_PENDING_CALL(pc, call_type, client_ref) \
     do { \
         Newxz((pc), 1, pending_call_t); \
         init_call_base(&(pc)->base, (call_type)); \
-        (pc)->base.channel_gen = (client_ref)->channel_gen; \
-        (pc)->callback = newSVsv((callback_sv)); \
         (pc)->client = (client_ref); \
         grpc_metadata_array_init(&(pc)->initial_metadata); \
         grpc_metadata_array_init(&(pc)->trailing_metadata); \
         (pc)->recv_buffer = NULL; \
         (pc)->status_details = grpc_empty_slice(); \
+    } while (0)
+
+/* After every argument conversion, so a croak cannot leak what this takes */
+#define START_PENDING_CALL(pc, callback_sv, client_ref) \
+    do { \
+        (pc)->callback = newSVsv((callback_sv)); \
+        etcd_call_acquire((client_ref), &(pc)->base); \
     } while (0)
 
 /* Only for a call not yet linked into client->pending_calls */
@@ -463,6 +612,7 @@ void init_method_slices(void);
         if ((pc)->recv_buffer) grpc_byte_buffer_destroy((pc)->recv_buffer); \
         grpc_slice_unref((pc)->status_details); \
         if ((pc)->call) grpc_call_unref((pc)->call); \
+        etcd_call_release(&(pc)->base); \
         SvREFCNT_dec((pc)->callback); \
         Safefree((pc)); \
     } while (0)
@@ -473,6 +623,7 @@ void init_method_slices(void);
             grpc_call_unref((call_ptr)->call); \
             (call_ptr)->call = NULL; \
         } \
+        etcd_call_release(&(call_ptr)->base); \
         grpc_metadata_array_destroy(&(call_ptr)->initial_metadata); \
         grpc_metadata_array_destroy(&(call_ptr)->trailing_metadata); \
         if ((call_ptr)->recv_buffer) { \
@@ -486,14 +637,15 @@ void init_method_slices(void);
     do { \
         grpc_metadata_array_init(&(call_ptr)->initial_metadata); \
         grpc_metadata_array_init(&(call_ptr)->trailing_metadata); \
+        (call_ptr)->status = GRPC_STATUS_OK; \
         (call_ptr)->status_details = grpc_empty_slice(); \
         (call_ptr)->active = 1; \
     } while (0)
 
-#define STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buf, call_ptr) \
+#define STREAMING_CALL_SETUP_OPS(client, ops, send_buf, call_ptr) \
     do { \
         (ops)[0].op = GRPC_OP_SEND_INITIAL_METADATA; \
-        setup_auth_metadata(client, &(ops)[0], &(auth_md)); \
+        setup_stream_metadata(client, &(ops)[0], &(call_ptr)->base); \
         (ops)[1].op = GRPC_OP_RECV_INITIAL_METADATA; \
         (ops)[1].data.recv_initial_metadata.recv_initial_metadata = &(call_ptr)->initial_metadata; \
         (ops)[2].op = GRPC_OP_SEND_MESSAGE; \
@@ -510,6 +662,7 @@ void init_method_slices(void);
             grpc_call_unref((call_ptr)->call); \
             (call_ptr)->call = NULL; \
         } \
+        etcd_call_release(&(call_ptr)->base); \
         grpc_metadata_array_destroy(&(call_ptr)->initial_metadata); \
         grpc_metadata_array_destroy(&(call_ptr)->trailing_metadata); \
         grpc_slice_unref((call_ptr)->status_details); \
@@ -519,5 +672,23 @@ void init_method_slices(void);
     } while (0)
 
 void finish_client_destroy(pTHX_ ev_etcd_t *client);
+void etcd_leave_callback(pTHX_ void *client);
+
+/* A client DESTROY inside the window defers to its end. The end is a
+ * save-stack destructor, so an exit() from a callback still reaches it. */
+#define CALLBACK_WINDOW_BEGIN(client) \
+    do { \
+        ENTER; \
+        (client)->in_callback++; \
+        SAVEDESTRUCTOR_X(etcd_leave_callback, (client)); \
+    } while (0)
+
+/* Ends the window; true when the client was destroyed in it and is gone */
+static inline int callback_window_end(pTHX_ ev_etcd_t *client) {
+    int freed = client->in_callback == 1 && !client->active;
+    LEAVE;
+    return freed;
+}
+#define CALLBACK_WINDOW_END(client) callback_window_end(aTHX_ (client))
 
 #endif

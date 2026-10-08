@@ -384,8 +384,15 @@ PROBE
 subtest 'stale => 1 re-runs when an input is newer than an output' => sub {
 	my ($in, $out) = ("$dir/stale.in", "$dir/stale.out");
 	open my $o, '>', $out; print {$o} 'old result'; close $o;
-	sleep 2; # mtime has 1-second granularity on some filesystems
 	open my $i, '>', $in;  print {$i} 'new input';  close $i;
+	# The times are set rather than waited for, as in t/05.features.t: a
+	# "sleep 2" between the writes assumed the wall clock kept pace with the
+	# sleep, which a VM smoker's clock did not (see "overwrite" in t/01.t).
+	# The rebuild below stamps the output with the current time, 100 s past
+	# the input's.
+	my $now = time;
+	utime $now - 200, $now - 200, $out or die "cannot set the time of $out: $!";
+	utime $now - 100, $now - 100, $in  or die "cannot set the time of $in: $!";
 
 	my $without = task(
 		cmd            => qq{$PERL -e "print q{regenerated}" > "$out"},

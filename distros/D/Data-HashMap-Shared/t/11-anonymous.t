@@ -6,7 +6,6 @@ use Data::HashMap::Shared::SI;
 use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 
-# Anonymous mmap (undef path) must work and expose undef path/accessor.
 {
     my $m = Data::HashMap::Shared::SI->new(undef, 64);
     ok !defined $m->path, 'anon: path is undef';
@@ -22,7 +21,6 @@ use Data::HashMap::Shared::SS;
     is $?, 0, 'anon: fork-inherited mmap visible in child';
 }
 
-# Integer-key variant also works anonymously.
 {
     my $m = Data::HashMap::Shared::II->new(undef, 64);
     ok !defined $m->path, 'II anon: path undef';
@@ -30,7 +28,6 @@ use Data::HashMap::Shared::SS;
     is $m->get(7), 777, 'II anon: round-trip';
 }
 
-# String-key/string-value variant (has_arena) also works anonymously.
 {
     my $m = Data::HashMap::Shared::SS->new(undef, 64);
     ok !defined $m->path, 'SS anon: path undef';
@@ -38,7 +35,6 @@ use Data::HashMap::Shared::SS;
     is $m->get("k"), "v", 'SS anon: round-trip';
 }
 
-# Calling unlink() on anon returns false (no path to unlink).
 {
     my $m = Data::HashMap::Shared::SI->new(undef, 16);
     ok !$m->unlink, 'anon: unlink returns false (no path)';

@@ -27,7 +27,6 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, PREREQ_PM => {
 		'autodie' => 0,
-		'boolean' => 0,
 		'strict' => 0,
 		'warnings' => 0,
 		'Carp' => 0,
@@ -80,6 +79,7 @@ WriteMakefile(
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Log::Abstraction' => 0,
 		'Test::Memory::Cycle' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -109,6 +109,8 @@ WriteMakefile(
 			'HTML::TableExtract' => 0,	# HTML URL backend
 			'JSON::MaybeXS' => 0,		# JSON backend
 			'LWP::UserAgent::Cached' => 0,	# URL backend (HTML and JSON)
+			'Redis::Fast' => 0,		# Redis backend (XS, preferred)
+			'Redis' => 0,			# Redis backend (pure-Perl fallback)
 			'Spreadsheet::ParseXLSX' => 0,	# .xlsx (OOXML Excel) backend
 			'Text::xSV::Slurp' => 0,	# CSV/PSV slurp backend
 			'XML::Simple' => 0,		# XML backend

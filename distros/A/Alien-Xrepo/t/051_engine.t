@@ -62,7 +62,7 @@ class Alien::Xrepo::Build::TestSpy {
             static      => 0,
             version     => $version // '1.2.3',
             installdir  => "/tmp/store/$name",
-            kind        => 'library',
+            kind        => 'library'
         );
     }
 }
@@ -339,7 +339,7 @@ class Alien::Xrepo::Build::TestShare {
             static      => 0,
             version     => $version // '1.2.3',
             installdir  => $dir,
-            kind        => 'library',
+            kind        => 'library'
         );
     }
 }
@@ -367,4 +367,5 @@ subtest 'share_dir shallow-installs packages and records share-relative paths' =
     is $data->{install_type},         'share',           'share install recorded';
     is $b->install_prop->{share_dir}, $share->stringify, 'share_dir recorded in install_prop';
 };
+#
 done_testing;

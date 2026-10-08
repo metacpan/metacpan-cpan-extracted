@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package App::FuguSeed::Words;
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 use v5.34;
 use warnings;
@@ -38,11 +38,11 @@ use Fugu::File              ();
 # command line interface (WORDS-PROGRAM-4).
 #
 # The program sees no seed word, so it can run on any computer (D-01).
-# No module that it loads maps 12 words to anything, and none of them
-# loads the mnemonic module of fuguseed-qr (SEC-TRUST-1).
+# No module that it loads maps seed words to anything, and none of them
+# loads the mnemonic module or the check word module (SEC-TRUST-1).
 # t/fuguseed/words-program.t proves the rule at the load, and it scans
-# each source of the program for the name of that module
-# (TEST-PACK-3). The name is therefore absent from this file.
+# each source of the program for the names of those modules
+# (TEST-PACK-3). The names are therefore absent from this file.
 
 # NAME and DIST:
 #	The name of the program in a diagnostic, and the name of the

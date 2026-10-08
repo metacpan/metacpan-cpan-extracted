@@ -1,5 +1,8 @@
 Revision history for Perl extension Libssh.
 
+1.2 2026-06-09
+  - Add execute_scenario methods
+
 1.1 2024-06-18
   - Fix release
 

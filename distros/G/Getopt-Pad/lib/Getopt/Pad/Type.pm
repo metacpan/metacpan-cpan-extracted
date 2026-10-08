@@ -9,9 +9,9 @@ use Object::Pad;
 use Getopt::Pad::Registry;
 use Getopt::Pad::Util qw(specError);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
-my @builtins = map { "Getopt::Pad::Type::$_" } qw(Flag Bool Counter String Int Float File Dir Url);
+my @builtins = map { "Getopt::Pad::Type::$_" } qw(Flag Bool Counter String Int Float File Dir Url Date Duration);
 my $registry;
 
 sub registry() {
@@ -30,7 +30,7 @@ sub registerType($class) {
 # resolved under.
 sub takeFromSpec($spec, $defaultName, $owner) {
 	my $typeName  = delete $spec->{type} // $defaultName;
-	my $typeClass = registry()->resolve($typeName);
+	my $typeClass = registry()->resolve($typeName, $owner);
 	my @typeKeys  = $typeClass->can('SPEC_KEYS') ? $typeClass->SPEC_KEYS->@* : ();
 	my %typeArgs  = map { $_ => delete $spec->{$_} } grep { exists $spec->{$_} } @typeKeys;
 
@@ -73,10 +73,18 @@ class Getopt::Pad::Type :abstract {
 		return undef;
 	}
 
-	# Runs once per parse on every scalar of an option's or arg's effective
-	# value, after the value pipeline, for types whose values need the
-	# world arranged (a path created on demand). Return a problem
-	# description without the option name, or undef.
+	# Runs once per parse on every scalar of the value an option or arg
+	# settles on, for checks that depend on the machine rather than on the
+	# value (a path exists). Never runs on a spec default when the spec is
+	# built. Return a problem description without the option name, or
+	# undef.
+	method verify($value) {
+		return undef;
+	}
+
+	# Like verify, for types whose values need the world arranged (a path
+	# created on demand). Runs only after every value of the parse passed
+	# verify, so a parse that fails arranges nothing.
 	method prepare($value) {
 		return undef;
 	}
@@ -231,7 +239,7 @@ keys.
 
 =for highlighter language=perl
 
-    use constant NAMES => ['duration', 'dur'];
+    use constant NAMES => ['seconds', 'secs'];
 
 Required. A constant that returns an arrayref of the names the type
 answers to in the C<type> key of an option or arg spec. Names are matched
@@ -283,9 +291,14 @@ Getopt::Pad adds it, producing messages like C<option '--color':
 C<check> always receives a single defined value: lists and mappings are
 taken apart before, and missing values are reported before. Values from
 config files can be numbers, or booleans: for C<true> and C<false>, JSON
-files give L<JSON::PP::Boolean> objects, which compare and stringify as 1
-and 0, and YAML files give 1 and the empty string. A value that fails
+files give 1 and 0, and YAML files give 1 and the empty string. A config
+format of your own may also give boolean objects such as
+L<JSON::PP::Boolean>. A value that fails
 C<check> is not passed to any other method.
+
+The spec's default is checked when C<GetOptions> builds the spec, on
+every run. Checks whose answer depends on the machine the program runs
+on, such as whether a path exists, belong in L</verify> instead.
 
 =head2 coerce
 
@@ -298,8 +311,31 @@ reader should return. The default returns the value unchanged. The
 numeric types use it to turn strings into numbers.
 
 The C<valid> list and the C<lazyValid> check of an option see the
-converted value. The C<Default> line of the help output shows the
-converted default, too.
+converted value. The C<Default> line of the help output and
+C<--create-default-config> show the default as the spec wrote it, not
+converted.
+
+=head2 verify
+
+=for highlighter language=perl
+
+    method verify($value) {
+        return undef if !defined $value || -r $value;
+        return sprintf("'%s' is not readable", $value);
+    }
+
+Optional. Called with the final, converted value of an option or arg
+(once per value for options with several values), like L</prepare>, for
+checks that depend on the machine rather than on the value. It is never
+called with a default when the spec is built, only when the parse
+settles on the default. Returns C<undef> when the value is acceptable,
+otherwise a short description of the problem B<without> the option name,
+which becomes a user error. The built-in C<file> and C<dir> types check
+C<mustExist> here.
+
+C<verify> runs on the values of every level the command line selects
+before L</prepare> runs on any of them. It can be called with C<undef>
+when the option's default is C<undef>. The default accepts every value.
 
 =head2 prepare
 
@@ -316,7 +352,10 @@ Optional. Called with the final, converted value of an option or arg
 value that is overridden, such as a default when the command line sets
 the option. Use it for side effects the value needs; the built-in
 C<file> and C<dir> types create missing paths here for
-C<createPathIfMissing>.
+C<createPathIfMissing>. It runs only after the values of every selected
+level passed L</check> and L</verify>, so a parse that fails earlier
+changes nothing. A C<prepare> that fails can still follow another that
+succeeded in the same parse.
 
 Returns C<undef> on success, or a short description of the problem
 B<without> the option name, which becomes a user error. It can be called
@@ -429,13 +468,13 @@ C<GetOptions> builds the spec; a problem there is a spec error.
 
 =for highlighter language=perl
 
-    Getopt::Pad::Type::registerType('My::Type::Duration');
+    Getopt::Pad::Type::registerType('My::Type::Seconds');
 
 Registers a type class under the names in its L</NAMES> constant, for all
 specs in the program. The argument is the class name. If the class
-has no C<NAMES> method yet, which usually means that its module is not
-loaded, its module file is loaded first (for example
-F<My/Type/Duration.pm> from C<@INC>). So a type in its own module file
+is not defined yet (it has no C<new> method), its module file is loaded
+first (for example
+F<My/Type/Seconds.pm> from C<@INC>). So a type in its own module file
 needs no separate C<use>.
 
 It dies when a name is already registered by another class, with
@@ -461,8 +500,8 @@ limit:
     use Getopt::Pad;
     use Getopt::Pad::Type;
 
-    class My::Type::Duration :isa(Getopt::Pad::Type) {
-        use constant NAMES     => ['duration'];
+    class My::Type::Seconds :isa(Getopt::Pad::Type) {
+        use constant NAMES     => ['seconds'];
         use constant SPEC_KEYS => ['maxSeconds'];
 
         my %secondsPer = (s => 1, m => 60, h => 3600, d => 86400);
@@ -497,12 +536,12 @@ limit:
         }
     }
 
-    Getopt::Pad::Type::registerType('My::Type::Duration');
+    Getopt::Pad::Type::registerType('My::Type::Seconds');
 
     my $opt = GetOptions(
         options => {
             timeout => {
-                type       => 'duration',
+                type       => 'seconds',
                 default    => '30s',
                 maxSeconds => 3600,
                 help       => 'How long to wait',
@@ -523,15 +562,15 @@ limit:
     $ sleeper --timeout soon
     ERROR: option '--timeout': 'soon' is not a duration such as 90s, 5m, 2h or 1d
 
-The help output shows the constraint note, the label and the converted
-default:
+The help output shows the constraint note, the label and the default as
+the spec wrote it:
 
 =for highlighter language=plain
 
     ## Options
        --timeout <>                [at most 3600 seconds] How long to wait
                                    [Duration]
-                                       Default = 30
+                                       Default = 30s
 
 A spec with C<< maxSeconds => '1h' >> fails with C<Getopt::Pad spec:
 option 'timeout': maxSeconds must be a whole number, not '1h'>, and one
@@ -612,6 +651,12 @@ provides C<mustExist> and C<createPathIfMissing>.
 =item L<Getopt::Pad::Type::Url>
 
 C<url>, C<uri>.
+
+=item L<Getopt::Pad::Type::Date>, L<Getopt::Pad::Type::Duration>
+
+C<date> and C<duration>, both subclasses of
+L<Getopt::Pad::Type::Temporal>, which provides C<timezone> and needs
+L<DateTime::Format::Natural>.
 
 =back
 

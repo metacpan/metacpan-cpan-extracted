@@ -5,13 +5,10 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::II;
 
-# freeze() seals a sharded map's shards one after another.  A freezer killed
-# between two of them leaves the first shards sealed and the rest not: every
-# mutator already refuses the set, since shard 0 answers for it, and
-# new_readonly refuses the unsealed shards.  freeze on a handle still open to
-# the set must finish the job, and with none open, freezing each unsealed shard
-# by name must.  seal_shard writes the state such a kill leaves -- a shard's
-# seal byte, at offset 96.
+# A freezer killed between shards leaves the first ones sealed: mutators already
+# refuse the set (shard 0 answers for it) and new_readonly refuses the unsealed
+# shards, so freeze must finish the job, with or without a handle open.
+# seal_shard writes that state: a shard's seal byte, at offset 96.
 
 my $dir = tempdir(CLEANUP => 1);
 

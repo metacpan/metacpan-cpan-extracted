@@ -4,13 +4,9 @@ use Test::More;
 use File::Temp qw(tempdir);
 use POSIX ();
 
-# Every path that compares an arena key must bound key_off before memcmp
-# (CWE-125): the lock-free get() and exists() inline their own compare, and the
-# write-locked paths share _key_eq_str.  A record whose key_off points outside
-# the arena must be a miss in all of them, not a crash.
-#
-# Each op runs in a forked child so a regression is a failed test, not a dead
-# harness.
+# Every arena-key compare must bound key_off before memcmp (CWE-125): a record
+# whose key_off points outside the arena must be a miss, not a crash.
+# Each op runs in a forked child so a regression fails a test, not the harness.
 
 my $dir = tempdir(CLEANUP => 1);
 my $KEY = 'a-key-well-over-the-inline-limit';
@@ -30,7 +26,6 @@ for my $v (@variants) {
     eval "require $class" or BAIL_OUT("cannot load $class: $@");
     { my $m = $class->new($path, 64); $m->put($KEY, $val); $m->sync }
 
-    # Point the live record's key_off outside the arena.
     {
         open my $f, '+<:raw', $path or die $!;
         my $d = do { local $/; <$f> };
@@ -52,7 +47,6 @@ for my $v (@variants) {
         close $f or die $!;
     }
 
-    # The poke must have hit the key's metadata: the record is now unreachable.
     {
         my $pid = fork // die "fork: $!";
         unless ($pid) {
@@ -63,8 +57,8 @@ for my $v (@variants) {
         is($?, 0, "$short: get() no longer finds the poisoned record");
     }
 
-    # get/exists are the lock-free readers the 0.19 fix covered; the rest reach
-    # the poisoned record through the shared compare under the write lock.
+    # get/exists are the lock-free readers; the rest compare under the write
+    # lock
     for my $op (qw(get exists remove put take update)) {
         my $pid = fork // die "fork: $!";
         unless ($pid) {
@@ -84,14 +78,10 @@ for my $v (@variants) {
 }
 
 
-# The block above only reaches the paths that find a key by comparing it.
-# keys() and to_hash() read the key through shm_str_ptr instead, which carries a
-# bound of its own (each, cursor and drain copy it through shm_str_copy, bounded
-# the same way), and nothing had exercised either against a poisoned record.
-#
-# A near-boundary offset was tried here first and is not worth testing: mmap
-# rounds the mapping up to a page, so a key running a few bytes past arena_cap
-# still lands in mapped memory and yields garbage rather than a fault.
+# keys()/to_hash() read the key through shm_str_ptr and each/cursor/drain
+# through shm_str_copy, each with its own bound.  Only a far offset is testable:
+# mmap rounds up to a page, so a few bytes past arena_cap yield garbage, not a
+# fault.
 {
     my $dir3 = tempdir(CLEANUP => 1);
     my $path = "$dir3/far.hm";
@@ -136,24 +126,20 @@ for my $v (@variants) {
     }
 }
 
-# The boundary value the far poison cannot reach.  Every arena bound is
-# `off + len > arena_cap`; a block that ends exactly at arena_cap is legitimate
-# and must be readable through every reader.  An off-by-one (>=) reports it
-# absent or empty and passes the rest of the suite.  Verified: a build with all
-# seven bounds flipped fails every read assertion below (14 of 19; the sizing
-# ones are write-path facts a read bound cannot touch); the clean build passes.
+# A block ending exactly at arena_cap is legitimate and must be readable through
+# every reader; an off-by-one (>=) bound would report it absent or empty.
 {
     my $dir3 = tempdir(CLEANUP => 1);
     # bump allocation from offset 16 in power-of-two classes: 30 x 4096 + 255 x 16
     # + one final 4096-byte block fills a 131072-byte arena to the last byte
     my $fill = sub {
         my $m = shift;
-        $m->put("k$_", 'V' x 4096) for 1 .. 30;                # inline keys, 4096-byte values
+        $m->put("k$_", 'V' x 4096) for 1 .. 30;
         $m->put(sprintf('key%05d', $_), 'x') for 1 .. 255;     # 8-byte keys -> 16-byte blocks
         is $m->arena_used, $m->arena_cap - 4096, 'arena filled to one block short of arena_cap'
             or die 'the arena fill no longer lands one block short of arena_cap';
     };
-    {   # the last block is a value
+    {
         my $m = Data::HashMap::Shared::SS->new("$dir3/edge-val.hm", 1024, 0, 3600);
         $fill->($m);
         my $want = 'L' x 4096;
@@ -167,7 +153,7 @@ for my $v (@variants) {
         my %e; while (my ($k, $v) = $m->each) { $e{$k} = $v }
         is $e{last}, $want, 'each() reads it';
     }
-    {   # the last block is a key
+    {
         my $m = Data::HashMap::Shared::SS->new("$dir3/edge-key.hm", 1024, 0, 3600);
         $fill->($m);
         my $K = 'K' x 4096;
@@ -184,8 +170,7 @@ for my $v (@variants) {
     }
 }
 
-# A key_off in the reserved prefix (< SHM_ARENA_MIN_ALLOC = 16) must be treated
-# as invalid/miss across all paths as well.
+# a key_off in the reserved prefix (< SHM_ARENA_MIN_ALLOC = 16) is a miss too
 {
     my $dir4 = tempdir(CLEANUP => 1);
     my $path = "$dir4/reserved.hm";
@@ -204,7 +189,7 @@ for my $v (@variants) {
     }
     ok defined $slot, 'reserved prefix test: located the live slot';
     seek $f3, $nodes_off + $slot * $node_size, 0 or die $!;
-    print $f3 pack 'L', 4;  # 4 < SHM_ARENA_MIN_ALLOC (16)
+    print $f3 pack 'L', 4;
     close $f3 or die $!;
 
     for my $op (qw(get exists remove keys values each cursor to_hash drain)) {
@@ -227,11 +212,9 @@ for my $v (@variants) {
             or diag sprintf('child died with status %d', $?);
     }
 
-    # The read of a reserved-prefix offset delivers an empty string, not the
-    # bytes it points at: this is what the < 16 guard adds over the upper-bound
-    # check, which alone would return the prefix bytes (a sub-16 offset is still
-    # inside the mapping, so no crash distinguishes the two).  A fresh map, since
-    # the drain above empties the shared one (remove misses the poisoned key).
+    # the < 16 guard yields an empty key, not the prefix bytes (still inside the
+    # mapping, so no crash tells them apart); fresh map: the drain above emptied
+    # the first
     my $rpath = "$dir4/reserved-read.hm";
     { my $m = Data::HashMap::Shared::SS->new($rpath, 64); $m->put($KEY3, 'value'); $m->sync }
     open my $rf, '+<:raw', $rpath or die $!;

@@ -14,11 +14,10 @@ use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 
 # A resize with next to nothing to move must not scan the whole table slot by
-# slot.  reserve on a one-entry map is priced against clear of the same table,
-# one memset over its slot states.  The shrink when the last entry of a large
-# table goes is priced against the shrink that leaves one entry, which has to
-# take every pass: both walk the states byte by byte, so the ratio holds with
-# any compiler and under a sanitizer.
+# slot. reserve on a one-entry map is priced against clear (one memset over the
+# states); the shrink after the last entry goes against the shrink that leaves
+# one entry. Both walk the states bytewise, so the ratio holds under any
+# compiler and a sanitizer.
 
 my $n = 1_000_000;
 for my $v (qw(II SS)) {

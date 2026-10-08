@@ -38,12 +38,12 @@ C<encode()> returns 44 numbers.
 
 =head1 ERRORS
 
-C<encode()> expects the 48 digits of App::FuguSeed::Mnemonic. With
+C<encode()> expects the 48 digits of App::FuguSeed::QR. With
 another input, the caller gets a code that no reader decodes.
 
 =head1 SEE ALSO
 
-L<App::FuguSeed::Mnemonic>, L<App::FuguSeed::Matrix>, and ISO/IEC
+L<App::FuguSeed::QR>, L<App::FuguSeed::Matrix>, and ISO/IEC
 18004, the QR standard.
 
 =head1 AUTHORS

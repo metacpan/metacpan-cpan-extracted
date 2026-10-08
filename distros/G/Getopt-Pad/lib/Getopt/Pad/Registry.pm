@@ -5,7 +5,7 @@ class Getopt::Pad::Registry {
 	use Carp qw(croak);
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	# Registration errors are reported at the registerType/registerFormat
 	# caller, not inside those one-line forwarders.
@@ -16,7 +16,9 @@ class Getopt::Pad::Registry {
 
 	method register(@classes) {
 		foreach my $class (@classes) {
-			if (!$class->can('NAMES')) {
+			# A class the program already defines is taken as it is, so a
+			# missing NAMES is reported as that, not as a missing file.
+			if (!$class->can('new')) {
 				(my $file = "$class.pm") =~ s{::}{/}g;
 				require $file;
 			}
@@ -34,11 +36,14 @@ class Getopt::Pad::Registry {
 		return $self;
 	}
 
-	method resolve($name) {
+	# An unknown name is reported for $owner (e.g. "option 'retries'") when
+	# one is given.
+	method resolve($name, $owner = undef) {
 		my $class = $entries{lc($name // '')};
-		specError("unknown %s '%s' (known: %s)", $kind, $name // '', join(', ', $self->knownNames)) unless defined $class;
+		return $class if defined $class;
 
-		return $class;
+		my $problem = sprintf("unknown %s '%s' (known: %s)", $kind, $name // '', join(', ', $self->knownNames));
+		specError('%s', defined $owner ? sprintf('%s: %s', $owner, $problem) : $problem);
 	}
 
 	method knownNames() {
@@ -78,15 +83,17 @@ C<$kind> names the registry in messages, such as C<option type>.
 =item register(@classes)
 
 Registers every class under the names its C<NAMES> constant lists, in
-lower case. A class without a C<NAMES> method has its module file loaded
-first, so the built-in classes can be listed by name. A name already
+lower case. A class without a C<new> method, which is not loaded yet, has
+its module file loaded first, so the built-in classes can be listed by
+name. A name already
 registered by another class makes C<register> die; registering the same
 class again changes nothing. Returns the registry.
 
-=item resolve($name)
+=item resolve($name, $owner)
 
 The class registered under C<$name>, matched case-insensitively. An
-unknown name is a spec error that lists all known names.
+unknown name is a spec error that lists all known names, prefixed with
+the optional C<$owner> (such as C<option 'retries'>).
 
 =item knownNames
 

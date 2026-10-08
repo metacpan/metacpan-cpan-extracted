@@ -9,9 +9,9 @@ use Data::HashMap::Shared::II;
 my $N = 8;
 my $ITERS = 20;
 
-# Without a barrier the first child's whole open finishes before the loop has
-# spawned the last one -- measured, 0.15ms against 0.8ms to fork eight -- so
-# only two or three of them ever overlap and the race is mostly not tested.
+# The barrier makes the children open together: without it the first open
+# finishes before the last fork (0.15ms against 0.8ms), and the race is mostly
+# not tested.
 for my $iter (1..$ITERS) {
     my $path = tmpnam() . ".$$.$iter";
     pipe(my $barrier_r, my $barrier_w) or die "pipe: $!";
@@ -41,11 +41,8 @@ for my $iter (1..$ITERS) {
         or diag "failed pids: @fails";
 }
 
-# A sharded set is the interesting case: 0.20 stamps the shard count into every
-# shard header, and stamping the whole set after creating it left a window where
-# shard 0 read stamped and shard k did not, so a second process starting at the
-# same moment refused a sound set as "shards that disagree" about half the time.
-# N workers starting together is the ordinary way a sharded set gets opened.
+# A sharded set stamps its shard count into every shard header: a process
+# starting mid-stamp must not refuse a sound set as "shards that disagree".
 for my $shards (8, 64) {
     for my $iter (1 .. 5) {
         my $prefix = tmpnam() . ".sh$shards.$$.$iter";
@@ -55,7 +52,7 @@ for my $shards (8, 64) {
             my $pid = fork // die "fork: $!";
             if ($pid == 0) {
                 close $barrier_w;
-                <$barrier_r>;               # released together
+                <$barrier_r>;
                 my $ok = eval {
                     Data::HashMap::Shared::II->new_sharded($prefix, $shards, 4096);
                     1;
@@ -78,11 +75,8 @@ for my $shards (8, 64) {
     }
 }
 
-# Two creators passing DIFFERENT counts must not both succeed: whoever claims
-# shard 0's count first wins and the other is refused.  Stamping the whole set
-# after the loop let both clear it while every shard still read 0, and they then
-# stamped disjoint halves -- a set recording two counts, where the keys written
-# to the losing half could never be read again.
+# Two creators passing different counts must not both succeed: whoever claims
+# shard 0's count first wins and the other is refused.
 for my $iter (1 .. 10) {
     my $prefix = tmpnam() . ".race.$$.$iter";
     pipe(my $barrier_r, my $barrier_w) or die "pipe: $!";

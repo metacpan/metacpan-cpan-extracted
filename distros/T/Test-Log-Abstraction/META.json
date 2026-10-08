@@ -1,0 +1,67 @@
+{
+   "abstract" : "Capture log output in tests and assert on it",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Log-Abstraction",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "Test::Builder" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Test-Log-Abstraction@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Log-Abstraction",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Log-Abstraction"
+      },
+      "homepage" : "https://metacpan.org/pod/Test::Log::Abstraction",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Test-Log-Abstraction.git",
+         "web" : "https://github.com/nigelhorne/Test-Log-Abstraction",
+         "x_repository" : "https://github.com/nigelhorne/Test-Log-Abstraction"
+      }
+   },
+   "version" : "v0.001.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

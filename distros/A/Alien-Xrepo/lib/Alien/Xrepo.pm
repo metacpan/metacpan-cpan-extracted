@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo v1.0.3 {
+class Alien::Xrepo v1.0.4 {
     use Alien::Xmake;
     use JSON::PP;
     use Digest::SHA qw[sha1_hex];
@@ -52,7 +52,7 @@ class Alien::Xrepo v1.0.3 {
         return;
     }
     #
-    class Alien::Xrepo::PackageInfo v1.0.3 {
+    class Alien::Xrepo::PackageInfo v1.0.4 {
         use Path::Tiny;
         field $includedirs : param : reader;
         field $libfiles    : param : reader;
@@ -601,8 +601,55 @@ class Alien::Xrepo v1.0.3 {
         }
     }
 
+    method _ensure_templates_available() {
+        return unless $^O eq 'MSWin32';
+        my $exe = eval { $xmake->exe };
+        return unless defined $exe && length $exe && -e $exe;
+        my $src = path($exe)->parent->child('templates');
+        return unless $src->is_dir;
+
+        # ExtUtils::Install ships these as 0444, and on Windows that attribute survives xmake's
+        # {writeable=true} copy, so `xmake create` dies "cannot open file ... Permission denied" while
+        # rewriting the copied xmake.lua. The installed tree under perl/lib should stay read-only, so mirror
+        # the built-in templates into the user's writable xmake global dir instead -- <globaldir>/templates,
+        # xmake's own per-user override, which it resolves before <programdir>/templates. Seeded once per
+        # installed xmake version; an upgrade recopies the mirror wholesale.
+        #
+        # The global dir comes from xmake itself: its `~` mapping (LOCALAPPDATA on Windows) and the
+        # %APPDATA% legacy fallback are not portable to replicate in Perl, but `lua -c` prints the very
+        # directory create will consult. Single-quoted Lua strings only: win32's naive argv quoting mangles
+        # embedded double quotes (which surfaces as a bogus "Can't spawn" warning and exit 255).
+        my $script  = q{import('core.base.global'); print('XREPO_GLOBALDIR=' .. global.directory())};
+        my $lines   = capture { system $exe, 'lua', '-c', $script };
+        my ($gldir) = $lines =~ /^XREPO_GLOBALDIR=(.+)$/m;
+        return unless defined $gldir;
+        $gldir =~ s/\s+$//;
+        my $dst = path($gldir)->child('templates');
+        $dst->mkpath;
+        my $marker = $dst->child('.alien-xrepo-synced');
+        my $ver    = eval { $xmake->_getver } // '';
+        my $synced = $marker->exists ? $marker->slurp : '';
+        return if length $synced && ( !length $ver || $synced eq "$ver\n" );
+        $src->visit(
+            sub {
+                my $file = shift;
+                return if $file->is_dir;
+                my $to = $dst->child( $file->relative($src) );
+                $to->parent->mkpath;
+
+                # Windows copies carry the source's read-only attribute with them, so force the per-user mirror
+                # writable (it lives in <globaldir>/templates, xmake's own mutable per-user template override).
+                $file->copy($to);
+                $to->chmod( $to->stat->mode | 0200 );
+            },
+            { recurse => 1 }
+        );
+        $marker->spew("$ver\n");
+    }
+
     method _argv ( $action, $flags, @spec ) {
         $self->_ensure_working_project;
+        $self->_ensure_templates_available;
         @spec = grep {defined} @spec;
         return ( $xmake->exe, qw[lua private.xrepo], $action, @$flags, @spec );
     }
@@ -861,8 +908,21 @@ class Alien::Xrepo v1.0.3 {
         my $runtime_lib;
         if ( $^O eq 'MSWin32' ) {
 
-            # Check if the DLL is already in libfiles (MinGW often does this)
-            ($runtime_lib) = grep {/\.dll$/i} @$libfiles;
+            # Check if the lib is already in libfiles (MinGW often does this). A package can ship several libs
+            # (SDL3_image plus its optional codec DLLs, for one), and the scan order is the order the filesystem hands
+            # them back - case-insensitive on NTFS, so libavif-16.dll comes before SDL3_image.dll. Prefer the DLL named
+            # by the package's own `links` instead of taking whatever sorted first.
+            my @dlls = grep {/\.dll$/i} @$libfiles;
+            if (@dlls) {
+                my $norm = sub {
+                    my $n = lc $_[0];
+                    $n =~ s/^lib//;
+                    $n;
+                };
+                my %want = map { $norm->($_) => 1 } grep { defined && length } @{ $info->{links} // [] };
+                ($runtime_lib) = grep { $want{ $norm->( path($_)->basename(qr/\.dll$/i) ) } } @dlls;
+                $runtime_lib //= $dlls[0];
+            }
 
             # If not, we must hunt for it in the 'bin' directory sibling to the 'lib' directory.
             unless ($runtime_lib) {
@@ -936,9 +996,3 @@ class Alien::Xrepo v1.0.3 {
 };
 #
 1;
-__END__
-Copyright (C) Sanko Robinson.
-
-This library is free software; you can redistribute it and/or modify it under the terms found in
-the Artistic License 2. Other copyrights, terms, and conditions may apply to data transmitted
-through this module.

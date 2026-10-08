@@ -27,10 +27,9 @@ sub vmpeak_kb {
     return undef;
 }
 
-# drain reserves only what the map can yield: a limit far above the entry
-# count must not reserve the limit (20M entries is several hundred MB).
-# VmPeak is a high-water mark: one baseline before the loop, or every shape
-# after the first measures nothing
+# a limit far above the entry count must not reserve the limit (20M entries is
+# hundreds of MB); VmPeak is a high-water mark, so one baseline before the loop,
+# or every shape after the first measures nothing
 my $peak0 = vmpeak_kb();
 for my $shape (['SS', 0], ['II', 0], ['SS', 4], ['II', 4]) {
     my ($class, $shards) = @$shape;

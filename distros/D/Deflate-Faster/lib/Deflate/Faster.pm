@@ -10,7 +10,7 @@ our @EXPORT = qw(gzip gunzip gzip_file gunzip_file gzip_to_file);
 our @EXPORT_OK = qw(deflate inflate deflate_raw inflate_raw gunzip_to_file);
 our %EXPORT_TAGS = ('all' => [@EXPORT, @EXPORT_OK]);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Deflate::Faster', $VERSION);
@@ -25,7 +25,7 @@ sub get_file
     my $content;
     if (defined $size && $size > 0) {
         my $read = sysread ($in, $content, $size);
-        if (! defined $read || $read != $size) {
+        if (! defined $read || $read != $size || ! eof ($in)) {
             seek $in, 0, 0;
             local $/;
             $content = <$in>;
@@ -47,7 +47,7 @@ sub gzip_options
     my $mod_time  = $options{mod_time};
     my $level     = $options{level};
 
-    if (defined $file_name && length($file_name) && $file_name ne '0') {
+    if (defined $file_name && length($file_name)) {
         $df->file_name($file_name);
     }
     if (defined $mod_time && $mod_time > 0) {
@@ -66,13 +66,9 @@ sub gzip_file
 {
     my ($file, %options) = @_;
     my $plain = get_file($file);
-    if (keys %options) {
-        return gzip_options($plain, %options);
-    }
-    else {
-        my $mod_time = (stat($file))[9];
-        return gzip_options($plain, file_name => $file, mod_time => $mod_time);
-    }
+    $options{file_name} = $file unless exists $options{file_name};
+    $options{mod_time} = (stat($file))[9] unless exists $options{mod_time};
+    return gzip_options($plain, %options);
 }
 
 sub gunzip_file
@@ -151,6 +147,9 @@ sub _write_file
             my $bytes = syswrite($out, $data, $len - $written, $written);
             if (! defined $bytes) {
                 croak "Error writing to '$file': $!";
+            }
+            if ($bytes == 0) {
+                croak "Error writing to '$file': syswrite returned 0";
             }
             $written += $bytes;
         }

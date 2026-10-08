@@ -5,15 +5,10 @@ use File::Temp qw(tempdir);
 
 plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
 
-# Every XSUB that converts a string key or value enforces the 1GB ceiling, so
-# the uint32_t cast below it cannot truncate: a key of 2**32 + n bytes would
-# otherwise compare as its first n bytes and match a different entry.  Reaching
-# the croak costs a 1GiB scalar -- about 1GB resident -- hence xt, the memory
-# floor, and one scalar reused across every variant and call.
-#
-# The scalar is exactly one byte past SHM_MAX_STR_LEN (2**30 - 1): that length's
-# packed form sets bit 30, the inline flag, so a guard drifted by one would
-# admit the one length that corrupts the encoding.
+# One 1GiB scalar (about 1GB resident) is reused for every variant and call,
+# hence xt and the memory floor. It is one byte past SHM_MAX_STR_LEN
+# (2**30 - 1), whose packed form would set the inline flag (bit 30), so an
+# off-by-one guard is caught.
 
 sub mem_available_kb {
     open my $fh, '<', '/proc/meminfo' or return undef;
@@ -44,10 +39,9 @@ $avail = $room if defined $room && $room < $avail;
 plan skip_all => sprintf('needs ~1.5GB free, %.1fGB available', $avail / 1048576)
     if $avail < 1.5 * 1048576;
 
-# The key ceiling lives in the four string-KEY variants, the value ceiling in
-# the four string-VALUE variants; SS is the only one with both.  Both lists are
-# complete: these are ten separate near-duplicate files and only the macro body
-# is shared, not the call sites.
+# Key ceiling: the four string-key variants; value ceiling: the four
+# string-value variants (SS has both). Both lists must stay complete: only the
+# macro body is shared, not the call sites.
 my @key_variants = (
     ['Data::HashMap::Shared::SS',   'v'],
     ['Data::HashMap::Shared::SI',   1],
@@ -81,8 +75,8 @@ for my $v (@key_variants) {
         ['get_multi after a real key', sub { $m->get_multi('short', $big) }],
         ['exists',    sub { $m->exists($big) }],
         ['remove',    sub { $m->remove($big) }],
-        # set_multi and remove_multi hand-inline the check instead of calling
-        # the macro, which is exactly how get_multi drifted twice.
+        # set_multi and remove_multi hand-inline the check instead of
+        # calling the macro
         ['set_multi',    sub { $m->set_multi($big, $val) }],
         ['remove_multi', sub { $m->remove_multi($big) }],
         # a guard hoisted out of the per-argument loop passes every row above
@@ -95,9 +89,8 @@ for my $v (@key_variants) {
     }
 }
 
-# The three batch XSUBs hand-inline the ceiling separately in each half of
-# their `if (h->shard_handles)` split, so the sharded copies are their own
-# sites.  One sharded map per variant, reusing the same scalar.
+# The batch XSUBs inline the ceiling separately in their sharded branch, so
+# those copies are their own sites.
 for my $v (@key_variants) {
     my ($class, $val) = @$v;
     (my $short = $class) =~ s/.*:://;
@@ -119,9 +112,8 @@ for my $v (@key_variants) {
     }
 }
 
-# The value side has the same uint32_t cast under the same ceiling; the scalar
-# is already built, so this costs no extra memory.  A TTL map, so the ttl
-# setters reach their value check whatever order their guards run in.
+# A TTL map, so the ttl setters reach their value check whatever order their
+# guards run in.
 for my $v (@val_variants) {
     my ($class, $k0, $k1, $val) = @$v;
     (my $short = $class) =~ s/.*:://;
@@ -141,7 +133,6 @@ for my $v (@val_variants) {
         ['swap',       sub { $m->swap($k0, $big) },          qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
         ['set_multi',  sub { $m->set_multi($k0, $big) },     qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
         ['set_multi (sharded)', sub { $sh->set_multi($k0, $big) }, qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
-        # a guard hoisted out of the per-pair loop passes every row above
         ['set_multi after a real pair',           sub { $m->set_multi($k0, $val, $k1, $big) },  qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
         ['set_multi after a real pair (sharded)', sub { $sh->set_multi($k0, $val, $k1, $big) }, qr/^Data::HashMap::Shared::\w+: value too long \(max 1GB\)/],
         ['cas expected', sub { $m->cas($k0, $big, $val) },   qr/^Data::HashMap::Shared::\w+: expected value too long \(max 1GB\)/],

@@ -6,7 +6,7 @@ use Getopt::Pad::Type;
 class Getopt::Pad::Type::Path :isa(Getopt::Pad::Type) :abstract {
 	use constant SPEC_KEYS => ['mustExist', 'createPathIfMissing'];
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	field $mustExist           :param :reader = 0;
 	field $createPathIfMissing :param :reader = 0;
@@ -24,13 +24,17 @@ class Getopt::Pad::Type::Path :isa(Getopt::Pad::Type) :abstract {
 	# Create the path; return undef, or the reason it could not be created.
 	method createPath($value);
 
-	method check($value) {
-		return sprintf("%s '%s' does not exist", $self->kind, $value) if $mustExist && !$self->pathExists($value);
+	# Whether a path exists depends on the machine, so it is asked of the
+	# value a parse settles on, never of a default when the spec is built.
+	# A path of the wrong kind can neither be used nor created.
+	method verify($value) {
+		return undef if !defined $value || (!$mustExist && !$createPathIfMissing);
+		return undef if $self->pathExists($value);
+		return sprintf("'%s' is not a %s", $value, $self->kind) if -e $value;
+		return sprintf("%s '%s' does not exist", $self->kind, $value) if $mustExist;
 		return undef;
 	}
 
-	# A path is created when the parse settles on it, not when a default is
-	# checked at spec build time.
 	method prepare($value) {
 		return undef if !defined $value || !$createPathIfMissing || $self->pathExists($value);
 
@@ -68,16 +72,20 @@ exclusive>):
 
 =item mustExist
 
-The value must be an existing path of the subclass's kind. Otherwise the
-value is rejected with C<KIND 'PATH' does not exist>, where KIND is
-C<file> or C<directory>. The help output shows C<[has to exist]>.
+The value that is finally used must be an existing path of the
+subclass's kind, checked in C<verify> (see L<Getopt::Pad::Type/verify>),
+never when the spec is built. A missing path is rejected with
+C<KIND 'PATH' does not exist>, where KIND is C<file> or C<directory>,
+and a path of the other kind with C<'PATH' is not a KIND>. The help
+output shows C<[has to exist]>.
 
 =item createPathIfMissing
 
 A missing path is created for the value that is finally used (in
-C<prepare>, see L<Getopt::Pad::Type/prepare>). A failure is reported as
-C<cannot create KIND 'PATH': REASON>. The help output shows
-C<[created if missing]>.
+C<prepare>, see L<Getopt::Pad::Type/prepare>). A path of the other kind
+is rejected in C<verify> with C<'PATH' is not a KIND>, a failure to
+create it with C<cannot create KIND 'PATH': REASON>. The help output
+shows C<[created if missing]>.
 
 =back
 

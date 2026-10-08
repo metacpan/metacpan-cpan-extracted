@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 
-use Env::Path;
 use Test::More;
 use Test::Differences;
 

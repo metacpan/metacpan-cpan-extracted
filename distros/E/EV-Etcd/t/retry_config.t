@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -94,27 +95,22 @@ plan tests => 11;
     );
 
     my $prefix = "/test-retry-$$-" . time();
-    my $watch_active = 0;
     my $events = 0;
 
     my $watch = $client->watch("$prefix/key", { auto_reconnect => 1 }, sub {
         my ($resp, $err) = @_;
         return if $err;
-        $watch_active = 1;
+        # A put committed before the watch is registered (created=1) is missed
+        if ($resp->{created}) {
+            $client->put("$prefix/key", "value", sub {});
+            return;
+        }
         $events++ if $resp->{events} && @{$resp->{events}};
+        EV::break if $events;
     });
 
     ok($watch, 'watch created with auto_reconnect');
 
-    my $put_done = 0;
-    $client->put("$prefix/key", "value", sub {
-        $put_done = 1;
-    });
-
-    my $check;
-    $check = EV::timer(0.1, 0.1, sub {
-        EV::break if $events > 0 || !$watch_active;
-    });
     my $timeout = EV::timer(5, 0, sub { EV::break });
     EV::run;
 

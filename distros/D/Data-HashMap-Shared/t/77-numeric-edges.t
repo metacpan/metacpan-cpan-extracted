@@ -8,10 +8,8 @@ use Data::HashMap::Shared::I16;
 use Data::HashMap::Shared::I32;
 use Data::HashMap::Shared::SI16;
 
-# What the POD promises at the edges of the integer types: narrow counters wrap
-# in two's complement, numbers beyond the 64-bit range saturate first, a TTL of
-# 2**32-1 seconds is a TTL, not the value that means "the map's default", and a
-# sharded set's totals are summed past 32 bits.
+# Edges of the integer types: counter wrap, saturation, a TTL of 2**32-1 (not
+# "the default"), 64-bit shard totals.
 
 for my $ttl (0, 60) {    # a TTL map takes the counters' locked path
     my $tag = $ttl ? 'TTL map' : 'plain map';
@@ -40,9 +38,7 @@ for my $ttl (0, 60) {    # a TTL map takes the counters' locked path
 }
 
 {
-    # Each shard's counts, written straight into its header (max_size 24, size
-    # 136, tombstones 140, stat_recoveries 184): two of 3e9 must sum to 6e9,
-    # not stop at 2**32-1.
+    # header offsets: max_size 24, size 136, tombstones 140, stat_recoveries 184
     my $dir = tempdir(CLEANUP => 1);
     my $m = Data::HashMap::Shared::II->new_sharded("$dir/s", 2, 64);
     for my $i (0, 1) {

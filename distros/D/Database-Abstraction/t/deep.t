@@ -15,6 +15,7 @@ use warnings;
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::Most;
+use Test::Returns;
 use Test::Needs 'DBM::Deep';
 
 BEGIN {
@@ -92,7 +93,7 @@ is($row->{'score'}, 20,    'fetchrow_hashref score correct');
 
 # fetchrow_hashref — missing key
 my $missing = $dao->fetchrow_hashref(entry => 'nosuchkey');
-ok(!defined($missing), 'fetchrow_hashref returns undef for missing key');
+returns_is($missing, { type => 'void' }, 'fetchrow_hashref returns undef for missing key');
 
 # count
 is($dao->count(), 3, 'count() returns total 3');

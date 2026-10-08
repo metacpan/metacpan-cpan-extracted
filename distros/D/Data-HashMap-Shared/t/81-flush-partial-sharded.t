@@ -7,8 +7,8 @@ use File::Temp qw(tempdir);
 use Data::HashMap::Shared::II;
 
 # On a sharded map flush_expired_partial reports done once every shard has
-# finished a cycle.  Shards of unequal size must not have to finish theirs on
-# the same call: that took the least common multiple of their cycle lengths.
+# finished a cycle; shards of unequal size must not have to finish theirs on the
+# same call.
 
 my $dir = tempdir(CLEANUP => 1);
 my $m = Data::HashMap::Shared::II->new_sharded("$dir/s", 2, 100000, 0, 60);

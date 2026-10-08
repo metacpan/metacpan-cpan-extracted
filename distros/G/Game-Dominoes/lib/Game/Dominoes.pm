@@ -19,7 +19,7 @@ use Game::Dominoes::Notation;
 use Game::Dominoes::Error;
 use Game::Dominoes::Result;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our %HAND_SIZE = (2 => 9, 3 => 7, 4 => 5);
 
@@ -434,7 +434,7 @@ Game::Dominoes - draw dominoes with All Fives scoring, as a reusable engine
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

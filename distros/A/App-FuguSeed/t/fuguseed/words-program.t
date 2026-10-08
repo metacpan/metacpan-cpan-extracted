@@ -4,7 +4,8 @@
 # WORDS-CHECK-1, WORDS-CHECK-2, SEC-TRUST-1, TEST-PACK-3).
 # The tests run bin/fuguseed-words as a child, and they hold each of
 # the three streams and the exit code. The last part proves that no
-# module of the program loads App::FuguSeed::Mnemonic.
+# module of the program loads App::FuguSeed::Mnemonic or
+# App::FuguSeed::Last.
 #
 # The child keeps the environment of this process. fuguseed-words
 # builds on the Fugu library (D-06), and an installed library can sit
@@ -166,7 +167,8 @@ like( $unreadable, qr/cannot read the sheet/,
 is( $absent_code, 1, 'a sheet that no file holds exits 1' );
 
 # SEC-TRUST-1 and TEST-PACK-3: no module of the program loads
-# App::FuguSeed::Mnemonic. The module list comes from the program
+# App::FuguSeed::Mnemonic or App::FuguSeed::Last. Each one maps seed
+# words to something. The module list comes from the program
 # itself: a child loads App::FuguSeed::Words and prints %INC, so a
 # later module of the program joins the scan.
 open my $ph, '-|', $^X, '-Ilib', '-MApp::FuguSeed::Words', '-e',
@@ -177,8 +179,9 @@ close $ph or BAIL_OUT("close $^X: status $?");
 chomp @loaded;
 
 my @modules = grep { m{\AApp/FuguSeed/} } @loaded;
-is( ( grep { $_ eq 'App/FuguSeed/Mnemonic.pm' } @modules ),
-	0, 'the program loads no App::FuguSeed::Mnemonic' );
+my @mapping  = grep { m{\AApp/FuguSeed/(?:Mnemonic|Last)[.]pm\z} } @modules;
+is( "@mapping", q{},
+	'the program loads no App::FuguSeed::Mnemonic and no App::FuguSeed::Last' );
 
 my @want = qw(
     App/FuguSeed/Check.pm
@@ -195,8 +198,8 @@ is( "@absent", q{}, 'the scan covers the program and its four modules' );
 # that a condition hides. The pattern is the literal module name, so
 # the word block of App::FuguSeed::List needs no strip.
 for my $path ( PROGRAM, map { "lib/$_" } sort @modules ) {
-	unlike( _slurp($path), qr/App::FuguSeed::Mnemonic/,
-		"$path names no App::FuguSeed::Mnemonic" );
+	unlike( _slurp($path), qr/App::FuguSeed::(?:Mnemonic|Last)\b/,
+		"$path names no App::FuguSeed::Mnemonic and no App::FuguSeed::Last" );
 }
 
 done_testing();

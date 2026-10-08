@@ -1,5 +1,5 @@
 {
-   "abstract" : "High-speed DEFLATE, zlib, and gzip compression and decompression using libdeflate",
+   "abstract" : "fast gzip, zlib and raw DEFLATE using libdeflate",
    "author" : [
       "vividsnow"
    ],
@@ -27,7 +27,8 @@
       },
       "configure" : {
          "recommends" : {
-            "Alien::libdeflate" : "0.03"
+            "Alien::libdeflate" : "0.03",
+            "ExtUtils::PkgConfig" : "0"
          },
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -51,7 +52,7 @@
    "provides" : {
       "Deflate::Faster" : {
          "file" : "lib/Deflate/Faster.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -65,6 +66,6 @@
          "web" : "https://github.com/vividsnow/perl5-deflate-faster"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

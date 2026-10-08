@@ -3,6 +3,7 @@ MANIFEST
 META.json
 Makefile.PL
 README.md
+bin/fuguseed-last
 bin/fuguseed-qr
 bin/fuguseed-words
 lib/App/FuguSeed.pm
@@ -11,6 +12,8 @@ lib/App/FuguSeed/Check.pm
 lib/App/FuguSeed/Check.pod
 lib/App/FuguSeed/Codewords.pm
 lib/App/FuguSeed/Codewords.pod
+lib/App/FuguSeed/Last.pm
+lib/App/FuguSeed/Last.pod
 lib/App/FuguSeed/List.pm
 lib/App/FuguSeed/List.pod
 lib/App/FuguSeed/ListFile.pm
@@ -27,6 +30,7 @@ lib/App/FuguSeed/Text.pm
 lib/App/FuguSeed/Text.pod
 lib/App/FuguSeed/Words.pm
 lib/App/FuguSeed/Words.pod
+man/fuguseed-last/fuguseed-last.1
 man/fuguseed-qr/fuguseed-qr.1
 man/fuguseed-words/fuguseed-words.1
 man/fuguseed/fuguseed.7
@@ -36,10 +40,12 @@ share/fuguseed/sheet.html
 t/fuguseed/fixtures/qr/vector4.output
 t/fuguseed/fixtures/qr/vector4.picture
 t/fuguseed/fixtures/sheet.html
+t/fuguseed/last.t
 t/fuguseed/list.t
 t/fuguseed/man.t
 t/fuguseed/module.t
 t/fuguseed/qr-program.t
 t/fuguseed/qr.t
 t/fuguseed/sheet.t
+t/fuguseed/trust.t
 t/fuguseed/words-program.t

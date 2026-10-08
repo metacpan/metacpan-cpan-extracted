@@ -9,7 +9,6 @@ use Data::HashMap::Shared::SI;
 
 my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
 
-# Basic CRUD
 {
     my $map = Data::HashMap::Shared::SI->new($path, 1000);
 
@@ -24,7 +23,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# Counters
 {
     my $map = Data::HashMap::Shared::SI->new($path, 1000);
 
@@ -36,7 +34,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# Cross-process atomic counters
 {
     my $map = Data::HashMap::Shared::SI->new($path, 1000);
     shm_si_put $map, "c", 0;
@@ -60,7 +57,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# keys/values/items
 {
     my $map = Data::HashMap::Shared::SI->new($path, 1000);
 
@@ -76,7 +72,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# to_hash
 {
     my $map = Data::HashMap::Shared::SI->new($path, 1000);
 

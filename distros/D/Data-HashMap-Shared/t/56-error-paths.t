@@ -9,15 +9,14 @@ use POSIX ();
 use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 
-# The croaks carry strerror in the process's locale, and "$!" is always English.
+# The croaks carry strerror in the process's locale; "$!" and the matches are
+# English.
 $ENV{LC_ALL} = 'C';
 POSIX::setlocale(POSIX::LC_ALL(), 'C');
 
-# Error paths no other test reaches; one of them, the destroyed-handle check in
-# unlink, segfaults without its guard.  Each croaking path is pinned by its
-# message, because with a guard gone a later check often still croaks in
-# different words; the two that return silently are pinned by the object
-# surviving.
+# Error paths no other test reaches.  Croaks are pinned by message, since with a
+# guard gone a later check often still croaks in different words; silent ones by
+# the object surviving.
 
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 sub path { File::Spec->catfile($dir, "$_[0].shm") }
@@ -30,7 +29,6 @@ sub poke {
     close $h;
 }
 
-# ---- 1. max/min/decr croak when a NEW key cannot be inserted (full table) ----
 {
     my $m = Data::HashMap::Shared::II->new(path('full'), 2);
     my $n = 0;
@@ -45,13 +43,12 @@ sub poke {
     like $@, qr/\bdecrement failed: no room for a new key\b/, '  ...naming the failed operation and why';
 }
 
-# ---- 2. class-method unlink: arity and destroyed-handle guards ----
 {
     ok !eval { Data::HashMap::Shared::II->unlink(); 1 }, 'unlink with no path croaks';
     like $@, qr/^Usage: Data::HashMap::Shared::II->unlink\(\$path\)/, '  ...with a usage message';
 
     # in a child: without the guard this dereferences the freed handle and
-    # takes the whole harness down with SIGSEGV rather than failing one test
+    # segfaults the harness
     my $p = path('u');
     my $st = do {
         my $pid = fork // die "fork: $!";
@@ -68,7 +65,6 @@ sub poke {
     ok(Data::HashMap::Shared::II->unlink($p), 'class-form unlink removes the file');
 }
 
-# ---- 2b. $map->unlink removes only the file the map was opened on ----
 {
     my $p = path('gen');
     my $old = Data::HashMap::Shared::II->new($p, 16);
@@ -92,13 +88,10 @@ sub poke {
     chdir $home or die "chdir: $!";
 }
 
-# ---- 3. DESTROY refuses a foreign invocant (t/45 covers put/get/size only) ----
-# Without the class check, II::DESTROY on an SS handle closes that map and
-# zeroes its IV, and II::Cursor::DESTROY frees an SS cursor: the object is
-# destroyed from under its owner.  Neither crashes -- the zeroed IV makes the
-# next call croak -- so the oracle is that the victim is still usable.  Run in
-# a child anyway, so a regression that does crash fails one test instead of
-# killing the harness.
+# DESTROY on a foreign invocant (t/45 covers put/get/size only).  Without the
+# class check the victim is destroyed from under its owner; that does not crash
+# (the zeroed IV makes the next call croak), so the oracle is that the victim
+# still works.  In a child in case a regression crashes.
 {
     my $st = do {
         my $pid = fork // die "fork: $!";
@@ -129,8 +122,7 @@ sub poke {
         or diag sprintf('child status 0x%04x (signal %d, exit %d)', $cst, $cst & 127, $cst >> 8);
 }
 
-# ---- 3b. Storable refuses a handle instead of making a second owner of it ----
-# A copy that got through would free the handle under the original: in a child.
+# in a child: a copy that got through would free the handle under the original
 {
     my $st = do {
         my $pid = fork // die "fork: $!";
@@ -158,9 +150,8 @@ sub poke {
         or diag sprintf('child status 0x%04x (signal %d, exit %d)', $st, $st & 127, $st >> 8);
 }
 
-# ---- 4. the five CK_U32 arguments no other test reaches ----
-# (max_entries is t/27's, ttl and flush_expired_partial's limit are t/14's;
-#  drain's limit needs no CK_U32 -- it is clamped in UV space before the cast)
+# the CK_U32 arguments not covered by t/27 (max_entries) and t/14 (ttl,
+# flush_expired_partial); drain's limit is clamped in UV space instead
 {
     my @cases = (
         ['lru_max',     sub { Data::HashMap::Shared::II->new(undef, 64, 2**32) }],
@@ -179,7 +170,6 @@ sub poke {
     like $@, qr/target 4294967296 exceeds the maximum of 4294967295/, '  ...naming target';
 }
 
-# ---- 4b. file_mode outside 07777 is refused, not cast into other bits ----
 {
     for my $mode (-1, 2**33, 010000, 0120644) {
         my $p = path("mode$mode");
@@ -203,7 +193,6 @@ sub poke {
     is +(stat $copy)[2] & 07777, 0640, '  ...its permission bits applied';
 }
 
-# ---- 4c. the shard count's bounds ----
 {
     ok !eval { Data::HashMap::Shared::II->new_sharded(path('s4097'), 4097, 16); 1 },
         'new_sharded: more than 4096 shards is refused';
@@ -213,7 +202,6 @@ sub poke {
     ok -e path('s0') . '.0' && !-e path('s0') . '.1', 'new_sharded: 0 shards is taken as 1';
 }
 
-# ---- 4d. a negative drain limit croaks instead of draining everything ----
 {
     my $q = Data::HashMap::Shared::SS->new(undef, 64);
     $q->put("j$_", $_) for 1 .. 10;
@@ -225,7 +213,6 @@ sub poke {
     is scalar(my @b = $q->drain(3)), 6, 'a positive limit still drains that many';
 }
 
-# ---- 5. size guards on the two open paths ----
 {
     my $p = path('tiny');
     open my $fh, '>', $p or die $!; print $fh 'abc'; close $fh;
@@ -236,7 +223,6 @@ sub poke {
     like $@, qr/file too small for header/, '  ...saying the header does not fit';
 }
 
-# ---- 5b. a copy whose size disagrees with its header says so ----
 {
     for my $delta (-4096, 4096) {
         my $p = path("resized$delta");
@@ -265,13 +251,12 @@ sub poke {
     like $@, qr/fd: the file is @{[ $size + 4096 ]} bytes but its header says $size/, '  ...naming both sizes';
 }
 
-# ---- 6. path length guards ----
 {
     ok !eval { Data::HashMap::Shared::II->new_sharded('x' x 5000, 2, 16); 1 },
         'new_sharded refuses a prefix that overflows the shard path buffer';
     like $@, qr/shard path too long/, '  ...saying so';
     my $long = path('x' x 5000);
-    my $toolong = do { local $! = POSIX::ENAMETOOLONG(); "$!" };   # the libc's own wording
+    my $toolong = do { local $! = POSIX::ENAMETOOLONG(); "$!" };
     ok !eval { Data::HashMap::Shared::II->new($long, 16); 1 },
         'new refuses a path longer than PATH_MAX';
     like $@, qr/\Q$toolong\E/, '  ...and its message keeps the reason';
@@ -284,7 +269,6 @@ sub poke {
     like $@, qr/\Q$noent\E/, '  ...and a path of 300 bytes does not crowd out the reason';
 }
 
-# ---- 6b. a descriptor that cannot be read reports the read error ----
 {
     my $p = path('wronly');
     Data::HashMap::Shared::II->new($p, 16);
@@ -295,7 +279,6 @@ sub poke {
     like $@, qr/read: \Q$badf\E/, '  ...naming the read error, not a foreign file';
 }
 
-# ---- 6c. a symlink at the path is refused, and named as the reason ----
 SKIP: {
     my $target = path('linked');
     { my $m = Data::HashMap::Shared::II->new($target, 16); $m->put(1, 2); $m->freeze }
@@ -310,7 +293,6 @@ SKIP: {
     ok !-e path('nowhere'), '  ...without creating its target';
 }
 
-# ---- 7. corrupt layout offsets are refused on attach ----
 {
     my $p = path('lay');
     { my $m = Data::HashMap::Shared::II->new($p, 1024); $m->put(1, 2); }
@@ -327,7 +309,6 @@ SKIP: {
     like $@, qr/reader_slots region missing or out of bounds/, '  ...naming the region';
 }
 
-# ---- 8. a frozen file whose lock word names a writer ----
 {
     my $p = path('froz');
     { my $m = Data::HashMap::Shared::II->new($p, 64); $m->put(1, 2); $m->freeze }
@@ -348,7 +329,6 @@ SKIP: {
         '  ...as a crashed writer whose pid we reuse, not one to wait for';
 }
 
-# ---- 9. a create whose mmap fails leaves no full-size file behind ----
 SKIP: {
     skip 'an address-space limit starves a sanitizer runtime', 3
         if ($ENV{LD_PRELOAD} // '') =~ /san/;
@@ -368,9 +348,9 @@ SKIP: {
     is -s $p, 0, '  ...which it leaves empty, not at its full size';
 }
 
-# ---- 10. another user's create, caught between its open and its flock ----
-# Its file is still empty and not ours to initialize: the open steps aside until
-# that user has created the map.  Two users take root.
+# Another user's create, caught between its open and its flock: the file is
+# still empty and not ours to initialize, so the open must wait for that user.
+# Two users take root.
 SKIP: {
     skip 'needs root, to be a second user', 2 if $>;
     my $other = (getpwnam 'nobody')[2] // 65534;

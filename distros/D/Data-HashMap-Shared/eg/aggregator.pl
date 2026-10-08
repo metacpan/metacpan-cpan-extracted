@@ -3,9 +3,8 @@ use strict;
 use warnings;
 use Data::HashMap::Shared::II;
 
-# Anonymous shared map (no filesystem presence) for in-memory aggregation
-# across forked workers. Parent forks N children; each increments a
-# shared counter. Parent reads the final sum.
+# Anonymous shared map (no filesystem presence): forked workers aggregate
+# counters, the parent reads the sums.
 
 my $stats = Data::HashMap::Shared::II->new(undef, 1024);  # anonymous
 
@@ -15,7 +14,7 @@ my @pids;
 for my $w (1..$N) {
     my $pid = fork // die "fork: $!";
     if ($pid == 0) {
-        # Child inherits the anonymous mmap automatically
+        # the child inherits the anonymous mmap
         shm_ii_incr_by $stats, 0, 1 for 1..$PER;     # global counter
         shm_ii_incr_by $stats, $w, $PER;             # per-worker counter
         exit;

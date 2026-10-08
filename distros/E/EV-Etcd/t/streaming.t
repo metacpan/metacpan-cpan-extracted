@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -99,6 +100,13 @@ $watch_handle = $client->watch($watch_key, sub {
     }
     if ($resp->{created}) {
         diag("Watch created with id=$resp->{watch_id}");
+        # Puts committed before the watch is registered are never delivered
+        for my $i (1..$watch_target) {
+            $client->put($watch_key, "value-$i", sub {
+                my ($resp, $err) = @_;
+                diag("Put $i " . ($err ? "failed" : "completed"));
+            });
+        }
         return;
     }
     my $event_count = scalar @{$resp->{events} || []};
@@ -111,13 +119,6 @@ $watch_handle = $client->watch($watch_key, sub {
 
 ok(defined $watch_handle, 'watch returns handle');
 isa_ok($watch_handle, 'EV::Etcd::Watch', 'watch handle');
-
-for my $i (1..$watch_target) {
-    $client->put($watch_key, "value-$i", sub {
-        my ($resp, $err) = @_;
-        diag("Put $i " . ($err ? "failed" : "completed"));
-    });
-}
 
 my $watch_timer = EV::timer 10, 0, sub {
     diag("Watch timer expired, received $watch_count events");

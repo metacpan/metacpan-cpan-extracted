@@ -4,6 +4,7 @@
 # dropping an inherited client warns without touching the parent's gRPC.
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 use IO::Socket::INET;
@@ -14,11 +15,12 @@ use EV;
 use EV::Etcd;
 
 my $endpoint = '127.0.0.1:2379';
+my $parent_key = "/test_fork_$$";   # children write it too: cleaned up once
 
 sub put_ok {
     my ($client) = @_;
     my $ok;
-    $client->put("/test_fork_$$", 'v', sub { $ok = !$_[1]; EV::break });
+    $client->put($parent_key, 'v', sub { $ok = !$_[1]; EV::break });
     my $t = EV::timer(5, 0, sub { EV::break });
     EV::run;
     return $ok;
@@ -39,12 +41,13 @@ sub in_child {
 }
 
 # A fork waits at most 2s for gRPC to finish shutting down, and a child that
-# still finds it running refuses it (exit 3). A slow machine may need a few
-# forks; macOS keeps gRPC running for good; without the drain on destroy it
-# never comes down and every fork is refused
+# still finds it running refuses it (exit 3). A connect still in progress at
+# the drop may hold gRPC up to its 20 s deadline, as a stalled loopback on a
+# CI runner seems to; macOS keeps gRPC running for good; without the drain on
+# destroy it never comes down and every fork is refused
 sub fork_after_drop_ok {
     my ($name) = @_;
-    for (1 .. 8) {
+    for (1 .. 30) {
         my $status = in_child(sub {
             my $c = eval { EV::Etcd->new(endpoints => [$endpoint], timeout => 3) };
             POSIX::_exit(3) if !$c && $@ =~ /was still running when it forked/;
@@ -82,6 +85,18 @@ fork_after_drop_ok('child can use etcd when the parent dropped its client before
 }
 alarm 0;
 fork_after_drop_ok('child can use etcd when the parent dropped a client with calls in flight');
+
+# A call that dies converting its arguments must keep neither the channel nor
+# its callback, which here holds the client
+{
+    my $c = EV::Etcd->new(endpoints => [$endpoint]);
+    use warnings FATAL => 'numeric';
+    ok(!eval { $c->put("/test_fork_$$", 'v', { lease => 'x' }, sub { $c }); 1 },
+        'a non-numeric lease dies under fatal warnings');
+    ok(!eval { $c->watch("/test_fork_$$", { start_revision => 'x' }, sub { $c }); 1 },
+        'a non-numeric start_revision dies under fatal warnings');
+}
+fork_after_drop_ok('child can use etcd when a call died converting its arguments');
 
 my $client = EV::Etcd->new(endpoints => [$endpoint]);
 ok(put_ok($client), 'parent client works');

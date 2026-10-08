@@ -16,6 +16,7 @@ use FindBin qw($Bin);
 use Scalar::Util qw(blessed);
 use Test::Most;
 use Test::Warn;
+use Test::Returns;
 
 # ---------------------------------------------------------------------------
 # Inline package declarations for classes used only in this file
@@ -97,7 +98,7 @@ subtest 'EX2: new() on an existing object creates a clone' => sub {
 	lives_ok {
 		$clone = $original->new(max_slurp_size => 1);
 	} 'new() on an existing object lives';
-	isa_ok($clone, 'Database::test1', 'clone is same class');
+	returns_is($clone, { type => 'object', isa => 'Database::test1' }, 'clone is same class');
 	is($clone->{'max_slurp_size'}, 1,
 		'clone carries the overridden argument (line 543)');
 };
@@ -166,7 +167,7 @@ subtest 'EX5: zero-byte CSV file sets data to empty hashref (line 766)' => sub {
 # ---------------------------------------------------------------------------
 
 subtest 'EX6: no_entry CSV slurp uses arrayref fast-paths' => sub {
-	plan tests => 8;
+	plan tests => 7;
 
 	my $db = Database::exttest_ne->new(directory => $DATA_DIR);
 
@@ -179,12 +180,11 @@ subtest 'EX6: no_entry CSV slurp uses arrayref fast-paths' => sub {
 	# After _open the data should be stored as an ARRAY ref (line 792 fix)
 	is(ref($db->{'data'}), 'ARRAY',
 		'no_entry CSV slurp stores arrayref after fix (line 792)');
-	cmp_ok(scalar @{$db->{'data'}}, '==', 3, 'arrayref holds 3 rows from test4.csv');
+	returns_is($db->{'data'}, { type => 'arrayref', min => 3, max => 3 }, 'arrayref holds 3 rows from test4.csv');
 
 	# EX6.2 — selectall_arrayref() arrayref fast-path (line 937)
 	my $rows = $db->selectall_arrayref();
-	isa_ok($rows, 'ARRAY', 'selectall_arrayref() returns arrayref (line 937)');
-	cmp_ok(scalar @{$rows}, '==', 3, 'selectall_arrayref() returns 3 rows');
+	returns_is($rows, { type => 'arrayref', min => 3, max => 3 }, 'selectall_arrayref() returns 3-row arrayref (line 937)');
 
 	# EX6.3 — selectall_array() arrayref fast-path (line 1070)
 	my @arr = $db->selectall_array();
@@ -367,17 +367,16 @@ subtest 'EX11: DESTROY unlinks the temp file (line 1920)' => sub {
 # ---------------------------------------------------------------------------
 
 subtest 'EX12: query builder generates CSV WHERE guard (Query.pm lines 288-290)' => sub {
-	plan tests => 3;
+	plan tests => 2;
 
 	my $db = Database::test1->new(directory => $DATA_DIR);
 
 	my $rows;
 	lives_ok { $rows = $db->query->all() }
 		'query->all() on CSV backend lives';
-	isa_ok($rows, 'ARRAY', 'query->all() returns arrayref');
 	# test1.csv has 4 data rows (plus 1 comment row that should be filtered)
-	cmp_ok(scalar @{$rows}, '==', 4,
-		'query->all() returns all non-comment rows via CSV guard (Query.pm lines 288-290)');
+	returns_is($rows, { type => 'arrayref', min => 4, max => 4 },
+		'query->all() returns 4-row arrayref via CSV guard (Query.pm lines 288-290)');
 };
 
 # ---------------------------------------------------------------------------
@@ -424,9 +423,9 @@ SKIP: {
 
 			# EX13.1-2 — selectall_arrayref: MISS then HIT (line 990)
 			my $r1 = $db->selectall_arrayref();
-			cmp_ok(scalar @{$r1}, '==', 3, 'selectall_arrayref MISS: 3 rows');
+			returns_is($r1, { type => 'arrayref', min => 3, max => 3 }, 'selectall_arrayref MISS: 3 rows');
 			my $r2 = $db->selectall_arrayref();
-			cmp_ok(scalar @{$r2}, '==', 3,
+			returns_is($r2, { type => 'arrayref', min => 3, max => 3 },
 				'selectall_arrayref HIT: still 3 rows (line 990)');
 
 			# EX13.3-4 — selectall_array wantarray: MISS then HIT (line 1127)
@@ -640,7 +639,7 @@ subtest 'EX18: columns() / schema() for no_entry CSV ARRAY slurp (DBI fallthroug
 
 	# columns() must fall through to DBI and return correct column names
 	my $cols = $db->columns();
-	isa_ok($cols, 'ARRAY', 'EX18: columns() returns arrayref even for ARRAY-slurp data');
+	returns_is($cols, { type => 'arrayref' }, 'EX18: columns() returns arrayref even for ARRAY-slurp data');
 	ok(scalar(grep { $_ eq 'cardinal' } @{$cols}),
 		'EX18: columns() includes "cardinal" via DBI fallthrough');
 	ok(scalar(grep { $_ eq 'ordinal' }  @{$cols}),
@@ -648,7 +647,7 @@ subtest 'EX18: columns() / schema() for no_entry CSV ARRAY slurp (DBI fallthroug
 
 	# schema() must fall through to DBI and return correct schema
 	my $schema = $db->schema();
-	isa_ok($schema, 'HASH', 'EX18: schema() returns hashref even for ARRAY-slurp data');
+	returns_is($schema, { type => 'hashref' }, 'EX18: schema() returns hashref even for ARRAY-slurp data');
 	ok(exists $schema->{'cardinal'}, 'EX18: schema() has "cardinal" column');
 	ok(exists $schema->{'ordinal'},  'EX18: schema() has "ordinal" column');
 };
@@ -661,7 +660,7 @@ subtest 'EX18: columns() / schema() for no_entry CSV ARRAY slurp (DBI fallthroug
 # ---------------------------------------------------------------------------
 
 subtest 'EX19: selectall_array() BerkeleyDB scalar context returns first row (line 1201)' => sub {
-	plan tests => 4;
+	plan tests => 3;
 
 	my $bdb_obj = Database::test1->new(directory => $DATA_DIR);
 
@@ -679,8 +678,7 @@ subtest 'EX19: selectall_array() BerkeleyDB scalar context returns first row (li
 
 	# Scalar context: should return first row only (the $rows->[0] branch)
 	my $first_row = $bdb_obj->selectall_array();
-	ok(defined($first_row), 'EX19: scalar context returns a defined value (not undef)');
-	ok(ref($first_row) eq 'HASH', 'EX19: scalar context returns a hashref (line 1201)');
+	returns_is($first_row, { type => 'hashref' }, 'EX19: scalar context returns a hashref');
 };
 
 # ---------------------------------------------------------------------------
@@ -724,7 +722,7 @@ SKIP: {
 		# Each arrayref element should be { 'entry' => key, value => scalar }
 		# (id defaults to 'entry' since we passed no custom id).
 		my ($p_row) = grep { defined $_->{'entry'} && $_->{'entry'} eq 'p' } @{$ne->{'data'}};
-		ok(defined($p_row), 'EX20: row with entry=p found');
+		returns_is($p_row, { type => 'hashref' }, 'EX20: row with entry=p found');
 		is($p_row->{'value'}, 'piano',   'EX20: value column holds scalar from DBM::Deep');
 
 		is($ne->count(), 2, 'EX20: count() returns 2 for no_entry scalar Deep file');
@@ -754,7 +752,7 @@ subtest 'EX21: .tsv file detected and sep_char set to tab' => sub {
 	my $db;
 	lives_ok { $db = Database::exttest_tsv->new(directory => $tmpdir) }
 		'EX21: new() lives with .tsv file present';
-	cmp_ok($db->count(), '==', 2, 'EX21: count() returns 2 rows from TSV');
+	returns_is($db->count(), { type => 'integer', min => 2, max => 2 }, 'EX21: count() returns 2 rows from TSV');
 	is($db->fetchrow_hashref(entry => 'uno')->{'number'}, 1,
 		'EX21: fetchrow_hashref returns correct value from TSV');
 	# Verify TSV detection returns no data when the .tsv file is absent
@@ -796,7 +794,7 @@ SKIP: {
 		my $db22;
 		lives_ok { $db22 = Database::exttest_sq->new(directory => $dir22) }
 			'EX22: new() lives with .sqlite file present';
-		cmp_ok($db22->count(), '==', 2, 'EX22: count() returns 2 from .sqlite file');
+		returns_is($db22->count(), { type => 'integer', min => 2, max => 2 }, 'EX22: count() returns 2 from .sqlite file');
 		is($db22->{'type'}, 'DBI', 'EX22: type is DBI for .sqlite backend');
 	};
 
@@ -818,7 +816,7 @@ SKIP: {
 		my $db23;
 		lives_ok { $db23 = Database::exttest_sq->new(directory => $dir23) }
 			'EX23: new() lives with .sqlite3 file present';
-		cmp_ok($db23->count(), '==', 3, 'EX23: count() returns 3 from .sqlite3 file');
+		returns_is($db23->count(), { type => 'integer', min => 3, max => 3 }, 'EX23: count() returns 3 from .sqlite3 file');
 		is($db23->{'type'}, 'DBI', 'EX23: type is DBI for .sqlite3 backend');
 	};
 }
@@ -848,7 +846,7 @@ SKIP: {
 		my $db;
 		lives_ok { $db = Database::exttest_json->new(directory => $tmpdir) }
 			'EX24: new() lives with .json file present';
-		cmp_ok($db->count(), '==', 2, 'EX24: count() returns 2 rows from JSON');
+		returns_is($db->count(), { type => 'integer', min => 2, max => 2 }, 'EX24: count() returns 2 rows from JSON');
 		is($db->fetchrow_hashref(entry => 'uno')->{'number'}, 1,
 			'EX24: fetchrow_hashref returns correct value from JSON');
 		is($db->{'type'}, 'JSON', 'EX24: type is JSON for .json backend');

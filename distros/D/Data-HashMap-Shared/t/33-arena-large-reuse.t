@@ -5,11 +5,8 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::IS;
 
-# Regression (0.19): the >512 KiB free list was first-fit on `blk >= asize`, so
-# a larger block could satisfy a smaller request -- and freeing it then refiled
-# it at the SMALLER size, losing the surplus permanently.  Alternating two large
-# sizes therefore grew the arena without bound.  Arena sizes are always powers
-# of two, so the list now matches exactly and behaves like the small classes.
+# The >512 KiB free list must match sizes exactly: a first-fit larger block
+# refiled at the smaller size would leak the surplus on every alternation.
 
 my $dir = tempdir(CLEANUP => 1);
 my $m = Data::HashMap::Shared::IS->new("$dir/arena.hm", 1000, 0, 0, 0, 64 * 1024 * 1024);
@@ -30,7 +27,6 @@ is( $after_18, $after_3,
     'alternating large sizes reach a steady state -- no surplus lost per cycle' )
     or diag "grew from $after_3 to $after_18 bytes over 15 further cycles";
 
-# The blocks must still actually be usable after all that churn.
 $m->put(3, $big);
 is( length($m->get(3)), length($big), 'a large value still stores and reads back' );
 

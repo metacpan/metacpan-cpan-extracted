@@ -5,12 +5,10 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::II;
 
-# On a map without $max_size, pop and drain sweep forward from where the last
-# one stopped and shift sweeps backward likewise, so successive partial drains
-# thin the whole table instead of always taking the lowest slots and leaving
-# a hash-biased survivor set behind.  The large table stays above the shrink
-# threshold, and the wrap is shown on a 16-slot table, which never shrinks, so
-# no rehash reorders the slots mid-test.
+# Without $max_size, pop/drain sweep forward from where the last one stopped and
+# shift backward. The 4096-slot table stays above the shrink threshold; the wrap
+# uses a 16-slot one, which never shrinks, so no rehash reorders the slots
+# mid-test.
 
 my $dir = tempdir(CLEANUP => 1);
 
@@ -31,9 +29,9 @@ sub keys_of { my @kv = @_; @kv[grep { $_ % 2 == 0 } 0 .. $#kv] }
     is_deeply \@popped, [ @order[300 .. 399] ], 'pop continues past where the drain stopped, not from the bottom';
 }
 
-# clear resets both cursors.  Only a 16-slot table shows it: clear shrinks the
-# table to its minimum, and above that a stale cursor lands past the regrown
-# table_cap, where the clamp starts the sweep at 0 whether it was reset or not.
+# clear resets both cursors; only a 16-slot table shows it, since above that a
+# stale cursor lands past the regrown table_cap and the clamp starts the sweep
+# at 0 anyway.
 {
     my $c = Data::HashMap::Shared::II->new("$dir/c.shm", 8);
     $c->put($_, $_) for 1 .. 12;
@@ -46,8 +44,6 @@ sub keys_of { my @kv = @_; @kv[grep { $_ % 2 == 0 } 0 .. $#kv] }
     is +($c->shift)[0], $n[-1], 'clear resets the backward sweep to the top';
 }
 
-# Each primitive advances the cursor itself, not only through the other one: a
-# key put straight back into the slot just vacated is not taken again.
 {
     my $w = Data::HashMap::Shared::II->new("$dir/again.shm", 8);
     $w->put($_, $_) for 1 .. 12;

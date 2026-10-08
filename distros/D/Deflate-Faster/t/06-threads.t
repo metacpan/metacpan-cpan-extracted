@@ -13,11 +13,11 @@ BEGIN {
 
 use Deflate::Faster qw(gzip gunzip deflate inflate);
 
-# Test 1: CLONE_SKIP is defined and returns 1
+# CLONE_SKIP is defined and returns 1
 ok(Deflate::Faster->can('CLONE_SKIP'), 'CLONE_SKIP is defined');
 is(Deflate::Faster->CLONE_SKIP, 1, 'CLONE_SKIP returns 1');
 
-# Test 2: Existing object in parent before thread creation (repro h2)
+# Existing object in parent before thread creation
 my $parent_df = Deflate::Faster->new();
 $parent_df->file_name("parent.txt");
 $parent_df->mod_time(1234567890);

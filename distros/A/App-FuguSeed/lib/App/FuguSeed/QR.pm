@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package App::FuguSeed::QR;
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 use v5.34;
 use warnings;
@@ -31,13 +31,15 @@ use App::FuguSeed::Text      ();
 # App::FuguSeed::QR - the flow of fuguseed-qr.
 #
 # The module reads the 12 words from standard input, and it writes
-# the SeedQR or the check word to standard output (QR-PROGRAM-3,
-# QR-PROGRAM-4). It is the one module of the program that touches a
-# stream, and the three standard streams are the one contact of the
-# program with the computer (SEC-TRUST-3).
+# the SeedQR to standard output (QR-PROGRAM-3, QR-PROGRAM-4). It is
+# the one module of the program that touches a stream, and the three
+# standard streams are the one contact of the program with the
+# computer (SEC-TRUST-3). It also holds the two parts of the words
+# that fuguseed-last does not call: the checksum check and the digit
+# string (QR-PROGRAM-6).
 #
-# A failure line names a word position or a count, never a word, and
-# the check word leaves on standard output only (SEC-CHANNELS-2).
+# A failure line can name a word position or a count, never a word
+# (SEC-CHANNELS-2).
 
 # NAME and USAGE:
 #	The name of the program in a failure line, and the one usage
@@ -53,9 +55,47 @@ use constant SUCCESS     => 0;
 use constant FAILURE     => 1;
 use constant USAGE_ERROR => 2;
 
+# COUNT:
+#	The word count of one seed (D-04).
+use constant COUNT => 12;
+
+# DIGITS:
+#	The decimal digits of one index in the digit string
+#	(QR-MNEMONIC-3).
+use constant DIGITS => 4;
+
+# CHECKSUM_FAULT:
+#	The failure line of a wrong checksum (QR-MNEMONIC-4). A typed
+#	word of any position can change the checksum, so the line
+#	names no position.
+use constant CHECKSUM_FAULT => 'the checksum of the 12 words fails';
+
+# $class->valid($words):
+#	True when the low 4 bits of index 12 are the checksum that
+#	BIP39 requires (QR-MNEMONIC-2). The caller proves the words
+#	with the fault method of App::FuguSeed::Mnemonic first.
+sub valid ( $, $words )
+{
+	my @index = App::FuguSeed::Mnemonic->indexes($words);
+	my $typed = $index[-1] % 2**App::FuguSeed::Mnemonic->CHECKSUM_BITS;
+
+	return $typed == App::FuguSeed::Mnemonic->checksum(@index);
+}
+
+# $class->digits($words):
+#	The digit string of QR-MNEMONIC-3: the 12 indexes, 0-based,
+#	each as 4 decimal digits with leading zeros, in word order.
+#	The caller proves the words first.
+sub digits ( $, $words )
+{
+	return join q{},
+	    map { sprintf '%0' . DIGITS . 'd', $_ }
+	    App::FuguSeed::Mnemonic->indexes($words);
+}
+
 # $class->run(@argument):
 #	Read the words, print the result, and return the exit code.
-sub run ( $, @argument )
+sub run ( $class, @argument )
 {
 	if (@argument) {
 		print {*STDERR} USAGE;
@@ -69,24 +109,19 @@ sub run ( $, @argument )
 	my $line  = readline STDIN;
 	my @words = split q{ }, $line // q{};
 
-	my $fault = App::FuguSeed::Mnemonic->fault( \@words );
+	# A wrong checksum is a failure, and the program prints no
+	# SeedQR (QR-MNEMONIC-4).
+	my $fault = App::FuguSeed::Mnemonic->fault( \@words, COUNT );
+	$fault = CHECKSUM_FAULT
+	    if !defined $fault && !$class->valid( \@words );
 	if ( defined $fault ) {
 		print {*STDERR} NAME . ": $fault\n";
 		return FAILURE;
 	}
 
-	# A wrong checksum is a result, not a failure: the program
-	# prints the check word and it prints no SeedQR
-	# (QR-MNEMONIC-4).
 	# A class name after print is a bareword filehandle on perl
 	# v5.34, so each result reaches a variable first.
-	if ( !App::FuguSeed::Mnemonic->valid( \@words ) ) {
-		my $word = App::FuguSeed::Mnemonic->check_word( \@words );
-		print "$word\n";
-		return SUCCESS;
-	}
-
-	my $digits    = App::FuguSeed::Mnemonic->digits( \@words );
+	my $digits    = $class->digits( \@words );
 	my @codewords = App::FuguSeed::Codewords->encode($digits);
 	my $matrix    = App::FuguSeed::Matrix->build( \@codewords );
 	my $grid      = App::FuguSeed::Text->grid($matrix);

@@ -3,6 +3,7 @@
 # the parent's C structs when the thread exits
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Config;
 use Test::More;
@@ -21,12 +22,13 @@ my $endpoint = '127.0.0.1:2379';
 plan skip_all => "etcd not available on $endpoint"
     unless IO::Socket::INET->new(PeerAddr => $endpoint, Timeout => 2);
 
+# The watch below breaks the loop on each event, which can come first
 sub put_ok {
     my ($client, $key) = @_;
     my $ok;
     $client->put($key, 'v', sub { $ok = !$_[1]; EV::break });
-    my $t = EV::timer(5, 0, sub { EV::break });
-    EV::run;
+    my $t = EV::timer(5, 0, sub { $ok //= 0; EV::break });
+    EV::run until defined $ok;
     return $ok;
 }
 

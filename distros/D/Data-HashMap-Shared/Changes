@@ -1,5 +1,8 @@
 Revision history for Data-HashMap-Shared
 
+0.23      2026-10-07
+          - Shorter documentation.
+
 0.22      2026-10-06
           - A writer killed mid resize, clear, put or remove, or croaked by a
             fast signal timer, no longer loses entries or keeps the lock.

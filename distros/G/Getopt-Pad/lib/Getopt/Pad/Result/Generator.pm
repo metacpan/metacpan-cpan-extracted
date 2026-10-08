@@ -8,7 +8,7 @@ use experimental 'signatures';
 use Object::Pad qw(:experimental(mop));
 use Getopt::Pad::Result;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my $classCounter = 0;
 my %classForReaders;

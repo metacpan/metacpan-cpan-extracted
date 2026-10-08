@@ -145,7 +145,7 @@ print "==================\n\n";
     my @latencies;
     my $events_received = 0;
     my $puts_sent = 0;
-    my $send_time;
+    my @send_times;
     my $watch_ready = 0;
 
     my $watch = $client->watch($watch_key, {}, sub {
@@ -157,7 +157,8 @@ print "==================\n\n";
             return;
         }
         for my $event (@{$resp->{events}}) {
-            my $latency = (time() - $send_time) * 1000;
+            my $sent = shift @send_times;
+            my $latency = (time() - $sent) * 1000;
             push @latencies, $latency;
             $events_received++;
         }
@@ -175,7 +176,7 @@ print "==================\n\n";
 
     # Send 100 puts, measuring latency for each
     for my $i (1..100) {
-        $send_time = time();
+        push @send_times, time();
         my $put_done = 0;
         $client->put($watch_key, "event$i", sub {
             $put_done = 1;

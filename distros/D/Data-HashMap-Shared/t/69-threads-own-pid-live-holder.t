@@ -16,13 +16,10 @@ use File::Temp qw(tempdir);
 use Data::HashMap::Shared::II;
 
 # Threads of one process share a pid, so the write lock's own-pid recovery must
-# never take one thread's live hold for a dead writer's, and CLONE_SKIP must keep
-# a handle from being cloned into a new thread (each thread opens its own).  Real
-# contention on one map exercises the whole stack -- ithreads, CLONE_SKIP, a
-# handle per thread, the write lock: every concurrent write lands and no recovery
-# fires.  Holding the lock across a long section to widen the theft window (which
-# a tied argument's FETCH used to do, before 0.21 moved argument evaluation out of
-# the locked section) is reproduced deterministically in C by xt/wrlock_threads.t.
+# never take a live thread's hold for a dead writer's, and CLONE_SKIP must keep
+# a handle from being cloned into a thread. Real contention on one map: every
+# concurrent write lands and no recovery fires.  The long-held-lock theft window
+# is reproduced deterministically in C by xt/wrlock_threads.t.
 
 my $dir  = tempdir(CLEANUP => 1);
 my $path = "$dir/thr.shm";

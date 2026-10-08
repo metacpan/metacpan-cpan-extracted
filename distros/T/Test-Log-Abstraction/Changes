@@ -1,0 +1,5 @@
+Revision history for Test-Log-Abstraction
+
+0.001.0
+	First draft: test double for Log::Abstraction that captures messages
+	so tests can assert on them, replacing per-dist t/lib/MyLogger.pm

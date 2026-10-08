@@ -25,7 +25,10 @@ void io_glue_gettypes    (io_glue *ig, int reqmeth);
 io_glue *im_io_new_fd(pIMCTX, int fd);
 io_glue *im_io_new_bufchain(pIMCTX);
 io_glue *im_io_new_buffer(pIMCTX, const char *data, size_t len, i_io_closebufp_t closecb, void *closedata);
-io_glue *im_io_new_cb(pIMCTX, void *p, i_io_readl_t readcb, i_io_writel_t writecb, i_io_seekl_t seekcb, i_io_closel_t closecb, i_io_destroyl_t destroycb);
+io_glue *
+im_io_new_cb8(pIMCTX, void *p, i_io_readl_t readcb, i_io_writel_t writecb,
+              i_io_seekl_t seekcb, i_io_closel_t closecb,
+              i_io_destroyl_t destroycb, i_io_sizel_t sizecb);
 size_t   io_slurp(io_glue *ig, unsigned char **c);
 void     io_glue_destroy(io_glue *ig);
 
@@ -43,5 +46,8 @@ extern int i_io_flush(io_glue *ig);
 extern int i_io_close(io_glue *ig);
 extern int i_io_set_buffered(io_glue *ig, int buffered);
 extern ssize_t i_io_gets(io_glue *ig, char *, size_t, int);
+
+int im_io_set_max_mmap_size(pIMCTX, size_t new_size);
+size_t im_io_get_max_mmap_size(pIMCTX);
 
 #endif /* _IOLAYER_H_ */

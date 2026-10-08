@@ -1,39 +1,25 @@
 ---
 X_No_Archive: Yes
-abstract: 'Build and install SDL3'
+abstract: 'Build and install SDL3 and friends'
 author:
-  - 'Sanko Robinson <sanko@cpan.org>'
+  - 'Sanko Robinson'
 build_requires:
   Test2::V0: '0'
 configure_requires:
-  Alien::Build: '0'
-  Alien::Build::MM: '0'
-  Alien::cmake3: '0'
-  Archive::Extract: '0.88'
-  Archive::Tar: '3.02'
-  Archive::Zip: '0'
+  Alien::Xmake: v1.0.4
+  Alien::Xrepo: v1.0.4
+  Alien::Xrepo::Build: v1.0.4
+  Alien::Xrepo::MB: '0'
   CPAN::Meta: '0'
-  CPAN::Requirements::Dynamic: '0'
-  Capture::Tiny: '0'
-  Compress::Zlib: '2.204'
   Config: '0'
-  Devel::CheckBin: '0'
   ExtUtils::Helpers: '0.028'
-  ExtUtils::Install: '0'
-  ExtUtils::InstallPaths: '0.002'
-  File::Basename: '0'
-  File::Path: '0'
-  File::Spec::Functions: '0'
-  Getopt::Long: '2.36'
-  HTTP::Tiny: '0'
-  IO::Socket::SSL: '1.42'
-  IO::Zlib: '1.14'
+  IO::Socket::SSL: '0'
   JSON::PP: '2'
-  Net::SSLeay: '1.49'
+  Module::Build: '0'
   Path::Tiny: '0'
-  PkgConfig: '0'
+  perl: v5.40.0
 dynamic_config: 0
-generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
 keywords: []
 license: artistic_2
 meta-spec:
@@ -49,29 +35,28 @@ no_index:
     - eg
     - examples
     - author
-    - builder
 provides:
   Alien::SDL3:
     file: lib/Alien/SDL3.pm
-    version: v3.4.2
+    version: v3.4.18
+recommends:
+  Affix: '0'
 requires:
-  Carp: '0'
-  Config: '0'
+  Alien::Xrepo::Build: v1.0.4
+  Alien::Xrepo::Runtime: v1.0.4
+  File::ShareDir: '1.00'
   Path::Tiny: '0'
-  perl: '5.038000'
+  perl: '5.040000'
 resources:
   bugtracker: https://github.com/Perl-SDL3/Alien-SDL3.pm/issues
   homepage: https://github.com/Perl-SDL3/Alien-SDL3.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/Perl-SDL3/Alien-SDL3.pm.git
-version: v3.4.2
+version: v3.4.18
 x_authority: cpan:SANKO
 x_ignore:
-  - .github/FUNDING.yml
-  - .github/workflows/ci.yml
-  - .github/workflows/delete_cache.yml
-  - .gitignore
   - .tidyallrc
+  - .gitignore
   - .clang-format
   - .github/**
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -7,7 +7,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: License
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use Carp;
 use Module::Load qw( load );
@@ -102,7 +102,7 @@ Software::Policies::License - Create project policy file: License
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 DESCRIPTION
 

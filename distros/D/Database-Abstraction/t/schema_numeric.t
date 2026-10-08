@@ -6,6 +6,7 @@ use FindBin qw($Bin);
 use File::Spec;
 use Test::Most tests => 24;
 use Test::NoWarnings;
+use Test::Returns;
 
 use lib 't/lib';
 use Database::numerictest;
@@ -18,7 +19,7 @@ my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 # SN1/SN2: schema() with infer_types reports correct numeric types
 # ---------------------------------------------------------------------------
 my $db = Database::numerictest->new({ directory => $directory, infer_types => 1 });
-isa_ok($db, 'Database::numerictest', 'SN1: object created with infer_types');
+returns_is($db, { type => 'object', isa => 'Database::numerictest' }, 'SN1: object created with infer_types');
 
 my $schema = $db->schema();
 is($schema->{'score'}{'type'},  'REAL',    'SN1: score column inferred as REAL');
@@ -36,7 +37,7 @@ is($rows[0]{'entry'}, 'a', 'SN3: correct entry returned');
 
 # fetchrow_hashref fast-track also honours numeric equality
 my $frow = $db->fetchrow_hashref(score => 1);
-ok(defined $frow, 'SN3: fetchrow_hashref finds row via REAL equality');
+returns_is($frow, { type => 'hashref' }, 'SN3: fetchrow_hashref finds row via REAL equality');
 is($frow->{'entry'}, 'a', 'SN3: fetchrow_hashref returns correct entry');
 
 # ---------------------------------------------------------------------------

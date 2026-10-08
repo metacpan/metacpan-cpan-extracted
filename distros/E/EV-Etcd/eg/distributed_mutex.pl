@@ -23,7 +23,7 @@ my $work_time = $ARGV[2] // 5;     # seconds the lock is held
 my $lock_ttl  = 10;                # seconds; must exceed work_time + slack
 
 my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379'], max_retries => 5);
-my ($lease_id, $lock_key, $keepalive, $work_timer, $lease_died);
+my ($lease_id, $lock_key, $keepalive, $work_timer, $lease_died, $acquire_timer);
 
 # 1. Lease for the lock — if we crash, the lock auto-releases after lock_ttl
 $client->lease_grant($lock_ttl, sub {
@@ -72,8 +72,9 @@ $client->lease_grant($lock_ttl, sub {
 
     # Optional caller-side timeout: cancel after N seconds if we never get the
     # lock. Without this the process can wait forever behind contention.
+    # File-scoped: a callback lexical would be GC'd before firing.
     my $acquire_timeout = 30;
-    my $timer = EV::timer($acquire_timeout, 0, sub {
+    $acquire_timer = EV::timer($acquire_timeout, 0, sub {
         return if $acquired++;
         warn "[$$] lock acquire timed out after ${acquire_timeout}s\n";
         graceful_exit(4);

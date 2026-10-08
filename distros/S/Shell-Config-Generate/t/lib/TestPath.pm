@@ -16,7 +16,7 @@ if($^O eq 'linux')
     chomp $data;
     $data;
   };
-  if($release =~ /-Microsoft$/)
+  if($release =~ /microsoft/i)
   {
     $WSL = 1;
     @PATH = grep !m{^/mnt/[a-z]/}, @PATH;

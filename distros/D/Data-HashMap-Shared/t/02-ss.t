@@ -9,7 +9,6 @@ use Data::HashMap::Shared::SS;
 
 my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
 
-# Basic CRUD
 {
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
     ok($map, 'created shared map');
@@ -29,12 +28,11 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# UTF-8
 {
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
 
-    my $key = "\x{263A}";    # smiley
-    my $val = "\x{2603}";    # snowman
+    my $key = "\x{263A}";
+    my $val = "\x{2603}";
     shm_ss_put $map, $key, $val;
     my $got = shm_ss_get $map, $key;
     is($got, $val, 'utf8 value');
@@ -43,7 +41,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# keys/values/items
 {
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
 
@@ -64,7 +61,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# each
 {
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
 
@@ -80,7 +76,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# to_hash
 {
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
 
@@ -93,7 +88,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# get_or_set
 {
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
 
@@ -103,7 +97,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# clear
 {
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
 
@@ -115,7 +108,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# Cross-process
 {
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
     shm_ss_put $map, "shared", "parent";
@@ -135,7 +127,6 @@ my $path = File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm';
     unlink $path;
 }
 
-# Method API
 {
     my $map = Data::HashMap::Shared::SS->new($path, 1000);
     $map->put("k", "v");

@@ -1,0 +1,120 @@
+.\" Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.Dd October 7, 2026
+.Dt FUGUSEED-LAST 1
+.Os
+.Sh NAME
+.Nm fuguseed-last
+.Nd print the check word of 11 seed words and two dice
+.Sh SYNOPSIS
+.Nm
+.Sh DESCRIPTION
+.Nm
+reads seed words 1 to 11 and the YELLOW and BLUE faces of word 12 from
+standard input.
+It prints the check word: the one word of the BLUE row of word 12 that
+makes the checksum of the 12 words valid.
+The program takes no option and no argument.
+.Pp
+The words and the faces enter on standard input only.
+No argument, no file name, and no environment variable carries a word
+or a face.
+The program opens no file, it starts no other program, and it reads no
+environment variable.
+The three standard streams are its one contact with the computer.
+.Pp
+.Nm
+sees the seed words.
+Run it on an air-gapped computer only.
+.Ss The input
+Standard input holds two lines.
+The first line holds words 1 to 11, with a space between two words.
+Each word must be a word of the English word list of BIP39.
+.Pp
+The second line holds the YELLOW face and the BLUE face of word 12,
+with a space between the two faces.
+The YELLOW face is a number from 1 to 8, and the BLUE face is a number
+from 1 to 16.
+Write each face with no sign and no leading zero.
+The faces are a part of the secret: they give 7 bits of word 12.
+.Ss The result
+Standard output holds the check word on one line.
+The YELLOW face gives the block, and the BLUE face gives the row of
+word 12.
+The RED column gives the 4 bits of the checksum, so one word of that
+row makes the checksum valid.
+The program computes that word.
+.Pp
+The check word carries no entropy: it is a function of the other
+bits.
+The YELLOW block and the BLUE row stay the throw of the dice.
+.Ss The next step
+Write the check word as word 12 on the paper.
+Then start
+.Xr fuguseed-qr 1 ,
+and type the 12 words.
+.Ss The check of the file
+The release publishes
+.Nm
+as one file, beside the tarballs.
+The signed SHA256 manifest of the release names that file.
+Compare the digest of the file with the manifest on the air-gapped
+computer, before the first run:
+.Pp
+.Dl $ sha256 fuguseed-last
+.Pp
+The two digests must agree.
+Do not run a file with a different digest.
+.Sh EXIT STATUS
+.Bl -tag -width Ds
+.It 0
+.Nm
+printed the check word.
+.It 1
+The first line did not hold 11 words of the list, or the second line
+did not hold two correct faces.
+.Nm
+printed one line to standard error.
+That line names the word position, the count, or the die, never a word
+or a face.
+.It 2
+The command line held an argument.
+.Nm
+printed one usage line to standard error.
+.El
+.Sh EXAMPLES
+Start the program on the air-gapped computer:
+.Bd -literal -offset indent
+$ fuguseed-last
+.Ed
+.Pp
+The program waits for the two lines on standard input.
+Type words 1 to 11 on the first line, and the two faces on the second
+line.
+.Sh SEE ALSO
+.Xr fuguseed-qr 1 ,
+.Xr fuguseed-words 1 ,
+.Xr fuguseed 7
+.Sh STANDARDS
+The word list and the checksum come from BIP39, the mnemonic code for
+the generation of a deterministic key.
+.Sh AUTHORS
+.An Dick Olsson Aq Mt hi@senzilla.io
+.Sh CAVEATS
+The check word makes the checksum valid for any 11 words of the list,
+so the program cannot find a wrong word in words 1 to 11.
+Compare each word with the sheet before you type it.
+When the paper holds the same wrong word,
+.Xr fuguseed-qr 1
+cannot find it either: the 12 words have a valid checksum.

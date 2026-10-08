@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguVM::Mirror;
-our $VERSION = '0.3.0';
+our $VERSION = '0.3.1';
 
 use File::Temp ();
 use Fugu::Curl 0.5.0;

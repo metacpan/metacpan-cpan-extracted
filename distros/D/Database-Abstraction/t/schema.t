@@ -7,6 +7,7 @@ use File::Spec;
 use File::Temp qw(tempdir);
 use Test::Most tests => 26;
 use Test::NoWarnings;
+use Test::Returns;
 
 use lib 't/lib';
 use Database::test1;
@@ -19,13 +20,13 @@ my $data_dir = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 my $t1 = new_ok('Database::test1' => [$data_dir]);
 
 my $cols = $t1->columns();
-isa_ok($cols, 'ARRAY', 'columns() returns an arrayref');
+returns_is($cols, { type => 'arrayref' }, 'columns() returns an arrayref');
 ok(scalar(@{$cols}) > 0, 'columns() is non-empty');
 ok((grep { $_ eq 'entry'  } @{$cols}), 'columns() includes "entry"');
 ok((grep { $_ eq 'number' } @{$cols}), 'columns() includes "number"');
 
 my $schema = $t1->schema();
-isa_ok($schema, 'HASH', 'schema() returns a hashref');
+returns_is($schema, { type => 'hashref' }, 'schema() returns a hashref');
 ok(exists $schema->{'entry'},  'schema() has "entry" key');
 ok(exists $schema->{'number'}, 'schema() has "number" key');
 is($schema->{'entry'}{'pk'}, 1, '"entry" column is marked as pk');
@@ -57,16 +58,16 @@ SKIP: {
 	}
 
 	my $obj = Database::schematest->new(directory => $dir, no_entry => 1);
-	isa_ok($obj, 'Database::schematest');
+	returns_is($obj, { type => 'object', isa => 'Database::schematest' }, 'schematest object created');
 
 	my $sql_cols = $obj->columns();
-	isa_ok($sql_cols, 'ARRAY', 'SQLite columns() returns arrayref');
+	returns_is($sql_cols, { type => 'arrayref' }, 'SQLite columns() returns arrayref');
 	ok((grep { $_ eq 'id'    } @{$sql_cols}), 'SQLite schema has "id"');
 	ok((grep { $_ eq 'name'  } @{$sql_cols}), 'SQLite schema has "name"');
 	ok((grep { $_ eq 'score' } @{$sql_cols}), 'SQLite schema has "score"');
 
 	my $sql_schema = $obj->schema();
-	isa_ok($sql_schema, 'HASH', 'SQLite schema() returns hashref');
+	returns_is($sql_schema, { type => 'hashref' }, 'SQLite schema() returns hashref');
 	is($sql_schema->{'id'}{'pk'}, 1, 'SQLite pk column detected correctly');
 	is_deeply($sql_cols, [sort @{$sql_cols}], 'SQLite columns() is alphabetically sorted');
 }
@@ -91,7 +92,7 @@ SKIP: {
 	}
 
 	my $ord = Database::colorder->new(directory => $dir2, no_entry => 1);
-	isa_ok($ord, 'Database::colorder', 'colorder object created');
+	returns_is($ord, { type => 'object', isa => 'Database::colorder' }, 'colorder object created');
 
 	my $ord_cols = $ord->columns();
 	is_deeply($ord_cols, ['id', 'name', 'score'],

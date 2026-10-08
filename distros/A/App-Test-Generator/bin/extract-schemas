@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+$| = 1;  # unbuffered stdout so messages appear in execution order
+
 use Data::Dumper;
 use File::Path qw(make_path);
 use File::Spec;
@@ -24,6 +26,8 @@ extract-schemas - Extract test schemas from Perl modules
     Options:
       --output-dir DIR    Output directory for schema files (default: schemas/)
       --strict-pod=off|warn|fatal
+      --function NAME     Only extract and test this one routine (useful for
+                          debugging a single failure in t/self-fuzz.t)
       --verbose           Show detailed analysis
       --version           Show the version of App::Test::Generator::SchemaExtractor
       --fuzz              Run coverage-guided fuzzing on extracted schemas
@@ -40,7 +44,9 @@ extract-schemas - Extract test schemas from Perl modules
     Examples:
       extract-schemas lib/MyModule.pm
       extract-schemas --output-dir my_schemas --verbose lib/MyModule.pm
+      extract-schemas --function greet lib/MyModule.pm
       extract-schemas --fuzz lib/MyModule.pm
+      extract-schemas --fuzz --function greet lib/MyModule.pm
       extract-schemas --fuzz --fuzz-iters 300 --corpus-dir t/corpus lib/MyModule.pm
       extract-schemas --fuzz --fuzz-all lib/MyModule.pm
       extract-schemas --fuzz --minimize-corpus lib/MyModule.pm
@@ -61,6 +67,64 @@ run builds on the last, probing deeper into your code each time.
 
 Otherwise, for each of the functions in MyModule.pm,
 C<fuzz-harness-generator -r schemas/function.yml>
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--output-dir|-o> I<DIR>
+
+Directory to write generated YAML schema files. Defaults to C<schemas/>.
+
+=item B<--strict-pod|-s> I<MODE>
+
+How to handle disagreements between POD and code analysis.
+C<0> (off), C<1> (warn), or C<fatal> (croak on disagreement).
+
+=item B<--function|-F> I<NAME>
+
+Extract schema for only the named function; delete all other generated YAMLs
+and restrict the fuzz run to that one routine.
+
+=item B<--verbose|-v>
+
+Print extra diagnostic information during extraction and fuzzing.
+
+=item B<--version|-V>
+
+Print the C<App::Test::Generator::SchemaExtractor> version and exit.
+
+=item B<--fuzz|-f>
+
+After extraction, run C<App::Test::Generator::CoverageGuidedFuzzer> against
+each method using the generated schema.
+
+=item B<--fuzz-all>
+
+Like C<--fuzz>, but also fuzzes methods that have no extractable schema.
+
+=item B<--fuzz-iters> I<N>
+
+Number of fuzzing iterations per method (default: 100).
+
+=item B<--corpus-dir|-c> I<DIR>
+
+Directory for loading and saving the fuzzing corpus between runs.
+
+=item B<--minimize-corpus>
+
+After fuzzing, run C<minimize_corpus()> to reduce the saved corpus to the
+smallest subset that still covers every branch discovered in this run.
+
+=item B<--help|-h>
+
+Print a short usage summary and exit.
+
+=item B<--man|-m>
+
+Print the full manual page and exit.
+
+=back
 
 =head1 DESCRIPTION
 
@@ -144,13 +208,15 @@ my $fuzz            = 0;
 my $fuzz_all        = 0;
 my $fuzz_iters      = 100;
 my $minimize_corpus = 0;
-my $corpus_dir;   # default set after output_dir is known
+my $corpus_dir;       # default set after output_dir is known
+my $function_filter;  # when set, restrict to this one routine
 
 Getopt::Long::Configure('bundling');
 
 GetOptions(
 	'output-dir|o=s'   => \$extractor_opts{output_dir},
 	'strict-pod|s=s'   => \$extractor_opts{strict_pod},
+	'function|F=s'     => \$function_filter,
 	'verbose|v'        => \$extractor_opts{verbose},
 	'version|V'        => \$extractor_opts{version},
 	'fuzz|f'           => \$fuzz,
@@ -195,6 +261,29 @@ my $extractor = App::Test::Generator::SchemaExtractor->new(
 );
 
 my $schemas = $extractor->extract_all();
+
+# ---------------------------------------------------------------------------
+# Optional: restrict to a single routine
+# ---------------------------------------------------------------------------
+
+if (defined $function_filter) {
+	unless (exists $schemas->{$function_filter}) {
+		print STDERR "Error: routine '$function_filter' not found in $input_file\n";
+		print STDERR "Available routines: ", join(', ', sort keys %$schemas), "\n";
+		exit 1;
+	}
+
+	# Remove every other schema and its on-disk YAML file so that callers
+	# (e.g. t/self-fuzz.t) see exactly one .yml in the output directory.
+	for my $name (keys %$schemas) {
+		next if $name eq $function_filter;
+		delete $schemas->{$name};
+		my $yml = File::Spec->catfile($extractor_opts{output_dir}, "$name.yml");
+		unlink $yml if -f $yml;
+	}
+
+	print "Restricted to routine: $function_filter\n\n";
+}
 
 # ---------------------------------------------------------------------------
 # Optional: coverage-guided fuzzing
@@ -473,6 +562,14 @@ Limited information. Manual review required.
 =head2 Basic Usage
 
     extract-schemas lib/MyModule.pm
+
+=head2 Extract and test one routine only
+
+    extract-schemas --function greet lib/MyModule.pm
+    extract-schemas --function greet --fuzz lib/MyModule.pm
+
+Useful when debugging a single C<t/self-fuzz.t> failure: only C<greet.yml>
+is written to the output directory and only C<greet> is fuzzed.
 
 =head2 Fuzz methods with known inputs
 

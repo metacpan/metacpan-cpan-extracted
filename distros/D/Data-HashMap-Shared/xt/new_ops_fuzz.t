@@ -6,11 +6,6 @@ use POSIX qw(_exit);
 use Data::HashMap::Shared::II;
 use Data::HashMap::Shared::SS;
 
-# Fuzz the new ops (update_ttl, cas_take, remove_multi, get_with_ttl)
-# under multi-process contention. Asserts invariants that hold regardless
-# of interleaving: no crashes, size stays sane, get_with_ttl returns
-# consistent (value, ttl) pairs.
-
 use File::Temp qw(tmpnam);
 
 sub run_fuzz {
@@ -45,7 +40,7 @@ sub run_fuzz {
         push @pids, $pid;
     }
     my @statuses;
-    for my $pid (@pids) { waitpid($pid, 0); push @statuses, $? >> 8 }
+    for my $pid (@pids) { waitpid($pid, 0); push @statuses, $? }
     ok($m->size <= 200, "$pkg fuzz: size within keyspace (" . $m->size . ")");
     ok(!(grep { $_ != 0 } @statuses), "$pkg fuzz: all children exited cleanly");
     unlink $path;

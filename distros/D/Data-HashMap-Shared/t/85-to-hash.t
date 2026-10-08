@@ -5,9 +5,8 @@ use Time::HiRes ();
 use File::Temp qw(tempdir);
 
 # to_hash, keys, values and items copy the entries under the read lock and build
-# their result afterwards.  It must be the live entries: every variant, plain
-# and sharded, with empty, binary, Latin-1 and UTF-8 strings, and without an
-# expired entry.
+# their result afterwards; it must be exactly the live entries, whatever the
+# variant or string flavour.
 
 my $dir = tempdir(CLEANUP => 1);
 my %shape = (II => 'ii', I16 => 'ii', I32 => 'ii', IS => 'is', I16S => 'is', I32S => 'is',
@@ -60,8 +59,8 @@ for my $v (sort keys %shape) {
     is_deeply [ $m->keys, $m->values, $m->items ], [], "$v: an empty map lists nothing";
 }
 
-# From 4096 entries in a shard on, strings are copied out packed and made SVs
-# once the lock is released.
+# from 4096 entries per shard on, strings are copied out packed and made SVs
+# after the unlock
 for my $v (qw(IS SI SS)) {
     my ($ks, $vs) = split //, $shape{$v};
     for my $shards (0, 2) {

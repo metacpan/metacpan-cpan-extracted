@@ -6,13 +6,10 @@ use POSIX ();
 
 use Data::HashMap::Shared::II;
 
-# A resize records its progress in the header, and whoever recovers a dead
-# resizer's lock finishes it.  Only the write section that made a record can
-# be finishing it: one left behind by a recovery that ignored it (an older
-# release's) must be dropped, or it re-places every tombstone as a live entry
-# and moves the table to a capacity its live entries were never rehashed for.
-# A record that cannot be finished must be dropped too, not spun on under the
-# lock.  Each recovery runs in a child under a no-handler alarm, as in t/68.
+# A resize records its progress in the header and whoever recovers a dead
+# resizer's lock finishes it. A record made by another write section, or one
+# that cannot be finished, must be dropped. Each recovery runs in a child under
+# a no-handler alarm, as in t/68.
 
 my $dir  = tempdir(CLEANUP => 1);
 my $path = "$dir/rz.shm";
@@ -70,7 +67,6 @@ sub survivors {
             scalar(grep { $m->exists($_) } @gone));
 }
 
-# A record another write section made, as an older release's recovery leaves it.
 fresh_map();
 my $cap = peek(20, 'L', 4);
 is in_child(sub {
@@ -83,7 +79,7 @@ is $back, 0, '  ... and no removed entry comes back';
 is peek(99, 'C', 1), 0, '  ... and the record is dropped';
 is peek(20, 'L', 4), $cap, '  ... and the capacity is left alone';
 
-# A record naming a capacity too small for what it has to place.
+# capacity 2**4 is too small for what the record has to place
 fresh_map();
 is in_child(sub {
     forge(3, 4, 1);
@@ -91,7 +87,7 @@ is in_child(sub {
 }), 'ok', 'a resize record that cannot be finished is dropped, not spun on';
 is peek(99, 'C', 1), 0, '  ... and cleared';
 
-# Control: a writer killed right after starting a grow is finished for it.
+# control: a record that does belong to the dead writer is finished
 fresh_map();
 $cap = peek(20, 'L', 4);
 is in_child(sub {
@@ -103,10 +99,8 @@ is $kept, scalar(@live), '  ... every live entry survives';
 is $back, 0, '  ... and no removed entry comes back';
 is peek(20, 'L', 4), 2 * $cap, '  ... and the table has grown';
 
-# clear() records itself the same way.  A writer killed while it empties the
-# states leaves the lower slots empty and the entries above them in place:
-# listed, and unreachable past the emptied slots.  The next lock holder finishes
-# the clear.
+# clear() records itself the same way: a writer killed mid-clear leaves the
+# lower slots empty and the entries above them in place, unreachable.
 fresh_map();
 $cap = peek(20, 'L', 4);
 is in_child(sub {
@@ -127,7 +121,6 @@ is in_child(sub {
     cmp_ok peek(20, 'L', 4), '<', $cap, '  ... and the table is back at its initial capacity';
 }
 
-# A clear record another write section made must not clear the map.
 fresh_map();
 is in_child(sub {
     forge(4, 0, 0);

@@ -6,9 +6,10 @@ use warnings;
 use FindBin qw($Bin);
 use File::Spec;
 use Test::Needs 'JSON::MaybeXS';
-use Test::Most tests => 23;
+use Test::Most tests => 22;
 use Test::NoWarnings;
 use Test::Mockingbird;
+use Test::Returns;
 use HTTP::Response;
 
 # Pre-load both lazy-required modules before any mock is installed.
@@ -67,15 +68,15 @@ sub fail_response { HTTP::Response->new(404, 'Not Found') }
 
 	my $db = new_ok('Database::test_json_url' => [{ url => 'http://example.com/data' }]);
 
-	cmp_ok($db->count(), '==', 3, 'count returns 3 rows from JSON URL');
+	returns_is($db->count(), { type => 'integer', min => 3, max => 3 }, 'count returns 3 rows from JSON URL');
 	is($db->{'type'}, 'JSON', 'type is JSON');
 
 	my $row = $db->fetchrow_hashref(entry => '1');
-	ok(defined $row, 'fetchrow_hashref finds entry 1');
+	returns_is($row, { type => 'hashref' }, 'fetchrow_hashref finds entry 1');
 	is($row->{'name'}, 'Alice', 'name is Alice');
 	is($row->{'grade'}, 'PASS', 'grade is PASS');
 
-	is($db->fetchrow_hashref(entry => '99'), undef, 'missing entry returns undef');
+	returns_is($db->fetchrow_hashref(entry => '99'), { type => 'void' }, 'missing entry returns undef');
 }
 
 # ---------------------------------------------------------------------------
@@ -87,11 +88,10 @@ sub fail_response { HTTP::Response->new(404, 'Not Found') }
 	my $db = Database::test_json_url->new(url => 'http://example.com/data');
 
 	my $all = $db->selectall_arrayref();
-	is(ref $all, 'ARRAY', 'selectall_arrayref returns arrayref');
-	cmp_ok(scalar @{$all}, '==', 3, 'all 3 rows returned');
+	returns_is($all, { type => 'arrayref', min => 3, max => 3 }, 'selectall_arrayref returns 3-row arrayref');
 
 	my $passing = $db->selectall_arrayref(grade => 'PASS');
-	cmp_ok(scalar @{$passing}, '==', 2, 'filter grade=PASS finds 2 rows');
+	returns_is($passing, { type => 'arrayref', min => 2, max => 2 }, 'filter grade=PASS finds 2 rows');
 }
 
 # ---------------------------------------------------------------------------
@@ -105,11 +105,11 @@ sub fail_response { HTTP::Response->new(404, 'Not Found') }
 		no_entry => 1,
 	);
 
-	cmp_ok($db->count(), '==', 3, 'CPAN Testers: count returns 3 results');
+	returns_is($db->count(), { type => 'integer', min => 3, max => 3 }, 'CPAN Testers: count returns 3 results');
 	is($db->{'type'}, 'JSON', 'CPAN Testers: type is JSON');
 
 	my $rows = $db->selectall_arrayref(grade => 'PASS');
-	cmp_ok(scalar @{$rows}, '==', 2, 'CPAN Testers: 2 PASS results');
+	returns_is($rows, { type => 'arrayref', min => 2, max => 2 }, 'CPAN Testers: 2 PASS results');
 	is($rows->[0]{'osname'}, 'linux', 'CPAN Testers: first PASS is linux');
 }
 
@@ -122,7 +122,7 @@ sub fail_response { HTTP::Response->new(404, 'Not Found') }
 
 	my $db = Database::test_json_url->new(url => 'http://example.com/data.json');
 
-	cmp_ok($db->count(), '==', 3, '.json URL suffix triggers JSON detection');
+	returns_is($db->count(), { type => 'integer', min => 3, max => 3 }, '.json URL suffix triggers JSON detection');
 	is($db->{'type'}, 'JSON', 'type is JSON for .json URL suffix');
 }
 
@@ -134,9 +134,9 @@ sub fail_response { HTTP::Response->new(404, 'Not Found') }
 
 	my $db = Database::test_json_url->new(url => 'http://example.com/colours.json');
 
-	cmp_ok($db->count(), '==', 2, 'object-form JSON: count returns 2');
+	returns_is($db->count(), { type => 'integer', min => 2, max => 2 }, 'object-form JSON: count returns 2');
 	my $row = $db->fetchrow_hashref(entry => 'uno');
-	ok(defined $row, 'object-form: fetchrow_hashref finds key "uno"');
+	returns_is($row, { type => 'hashref' }, 'object-form: fetchrow_hashref finds key "uno"');
 	is($row->{'colour'}, 'red', 'object-form: colour is red');
 	is($db->hex(entry => 'dos'), '#00ff00', 'AUTOLOAD hex lookup via object-form JSON URL');
 }
@@ -168,5 +168,5 @@ sub fail_response { HTTP::Response->new(404, 'Not Found') }
 	$db->selectall_arrayref();
 	$db->count();
 
-	cmp_ok($call_count, '==', 1, 'URL fetched only once per object instance');
+	returns_is($call_count, { type => 'integer', min => 1, max => 1 }, 'URL fetched only once per object instance');
 }

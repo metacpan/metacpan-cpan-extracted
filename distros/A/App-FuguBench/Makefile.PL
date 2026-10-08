@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'App::FuguBench',
-	VERSION          => '0.1.0',
+	VERSION          => '0.1.1',
 	ABSTRACT         => 'outfit a FuguBSD checkout for a coding agent',
 	LICENSE          => 'open_source',
 	MIN_PERL_VERSION => '5.034',

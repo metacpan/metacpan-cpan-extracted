@@ -7,6 +7,7 @@ use File::Temp qw(tempdir);
 use File::Spec;
 use FindBin qw($Bin);
 use Test::Most tests => 20;
+use Test::Returns;
 
 use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
 
@@ -39,7 +40,7 @@ use_ok('Database::test1');
 
 	# Valid class instantiation
 	my $obj = Database::test1->new(directory => $tempdir);
-	isa_ok($obj, 'Database::test1');
+	returns_is($obj, { type => 'object', isa => 'Database::test1' }, 'Valid class instantiation');
 
 	# Object cloning
 	my $clone = $obj->new(key1 => 'value1');

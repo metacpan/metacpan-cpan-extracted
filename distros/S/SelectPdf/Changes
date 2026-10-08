@@ -1,5 +1,34 @@
 Revision history for SelectPdf Online API client for Perl.
 
+1.6.0
+
+	- Feature parity with the SelectPdf.Api .NET client 1.6.0 (also covers the 1.5.0 features).
+	- Added SelectPdf::InvoiceClient: ZUGFeRD / Factur-X hybrid electronic invoices
+	  (POST /api2/invoice/, multipart request with the invoice XML as the zugferd_xml file part).
+	  setInvoiceXmlFile, setInvoiceXml, setZugferdProfile, setZugferdRelationship, setZugferdSchema,
+	  createFromUrl / createFromHtmlString (+ WithBaseUrl, ToFile and Async variants).
+	  Requires an API key; the carrier defaults to PDF/A-3A.
+	- HtmlToPdfClient: tagged (accessible) PDF and PDF standards - setTagged, setPdfStandard, setDocumentLanguage.
+	- HtmlToPdfClient: setWebPageFixedSize, setAuthUsername, setAuthPassword.
+	- HtmlToPdfClient: Chromium rendering engine.
+	- HtmlToPdfClient: keyless demo mode - construct with no key, an empty key or "demo" to use
+	  https://selectpdf.com/api2/convert/demo/ (watermarked output, max 5 pages). New isDemoMode,
+	  isDemoResponse, getClampedFields, wasClamped, getDroppedFields, wasAnyFieldDropped.
+	  setUserPassword, setOwnerPassword and async conversions die with SelectPdf::DemoUnsupportedException in demo mode.
+	- Typed demo errors (SelectPdf::DemoExceptions): SelectPdf::DemoRateLimitException,
+	  SelectPdf::DemoSafetyException, SelectPdf::DemoUnsupportedException - built from the demo
+	  endpoint's JSON error bodies; they stringify to the error message.
+	- Response telemetry on every client: getCreditsTotal, getCreditsRemaining, getMode, getExecutionMode.
+	  Pages and job id are read from the X-SelectPdf-Pages / X-SelectPdf-Job-Id headers.
+	- Value constants (SelectPdf::ApiEnums): SelectPdf::PdfStandard, SelectPdf::ZugferdProfile,
+	  SelectPdf::ZugferdRelationship, SelectPdf::ZugferdSchema, SelectPdf::RenderingEngine,
+	  SelectPdf::PageSize, SelectPdf::PageOrientation, SelectPdf::SecureProtocol, SelectPdf::PageLayout,
+	  SelectPdf::PageMode, SelectPdf::PageNumbersAlignment, SelectPdf::StartupMode,
+	  SelectPdf::TextLayout, SelectPdf::OutputFormat.
+	- PdfMergeClient: setPdfName.
+	- Long response headers (web elements locations) no longer fail with "Header line too long".
+	- New samples: accessible-pdf.pl, electronic-invoice.pl, async-conversion.pl, web-elements.pl.
+
 1.4.0
 
 	- Added Pdf Merge client.

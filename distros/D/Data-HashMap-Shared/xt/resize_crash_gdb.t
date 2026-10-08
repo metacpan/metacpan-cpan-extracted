@@ -7,10 +7,9 @@ use File::Path qw(make_path);
 use File::Basename qw(dirname);
 use Config;
 
-# A resize moves every live entry of the table.  Kill the resizing writer with
-# gdb at points of its loops and of its header-record stores -- and, once it is
-# dead, kill the process finishing it too -- then check that the next process
-# sees every entry with its value, its TTL and its LRU position.
+# Kill the resizing writer with gdb at points of its loops and header-record
+# stores (and the process finishing it too), then check the next process sees
+# every entry with its value, TTL and LRU position.
 
 plan skip_all => 'set CRASH_GDB=1 to run' unless $ENV{CRASH_GDB};
 my $gdb = `which gdb 2>/dev/null`; chomp $gdb;

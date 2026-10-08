@@ -24,54 +24,54 @@ no_index:
 provides:
   Data::HashMap:
     file: lib/Data/HashMap.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::I16:
     file: lib/Data/HashMap/I16.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::I16A:
     file: lib/Data/HashMap/I16A.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::I16S:
     file: lib/Data/HashMap/I16S.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::I32:
     file: lib/Data/HashMap/I32.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::I32A:
     file: lib/Data/HashMap/I32A.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::I32S:
     file: lib/Data/HashMap/I32S.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::IA:
     file: lib/Data/HashMap/IA.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::II:
     file: lib/Data/HashMap/II.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::IS:
     file: lib/Data/HashMap/IS.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::SA:
     file: lib/Data/HashMap/SA.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::SI:
     file: lib/Data/HashMap/SI.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::SI16:
     file: lib/Data/HashMap/SI16.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::SI32:
     file: lib/Data/HashMap/SI32.pm
-    version: '0.10'
+    version: '0.11'
   Data::HashMap::SS:
     file: lib/Data/HashMap/SS.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   XS::Parse::Keyword: '0.40'
   perl: '5.022'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-data-hashmap/issues
   repository: https://github.com/vividsnow/perl5-data-hashmap.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

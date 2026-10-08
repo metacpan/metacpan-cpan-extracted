@@ -4,9 +4,8 @@ use warnings;
 use POSIX ();
 use Data::HashMap::Shared::IS;   # int key -> string value (cached result)
 
-# Compute-once shared cache. Many workers need the same expensive results;
-# get_or_set stores each key's value once and hands every caller -- even ones
-# racing to compute it -- the same stored result.
+# Compute-once shared cache: get_or_set stores each key's value once and hands
+# every caller, even ones racing to compute it, the same stored result.
 
 my $path  = "/tmp/dhms_memoize_$$.shm";
 my $cache = Data::HashMap::Shared::IS->new($path, 1000);
@@ -14,7 +13,7 @@ my $cache = Data::HashMap::Shared::IS->new($path, 1000);
 sub expensive {                       # pretend this is slow / costly
     my $n = shift;
     my $r = 0;
-    $r += $_ for 1 .. ($n + 1) * 1000;   # busywork
+    $r += $_ for 1 .. ($n + 1) * 1000;
     return "f($n)=$r";
 }
 

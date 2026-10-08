@@ -1,4 +1,16 @@
 Revision history for Game-Dominoes
 
-0.01    2026-09-15
-	- First version
+0.02    2026-10-07
+	- Terminal.pm POD declares =encoding utf8
+	- Pick a move with the arrow keys, previewing the table it would make
+	  with its new count and what it would score.
+	- The tiles of the last round are marked on the table, in a heavier
+	  frame rather than only a colour.
+	- Fix: a bad --players, --seat or --variant died with a raw message and
+	  exit 255 instead of exit 2.
+	- Fix: a refused option printed the usage to stdout.
+	- Fix: the ascii command toggled the glyphs but not the output layer, so
+	  switching to the drawn tiles printed Wide character warnings.
+	- Fix: trailing whitespace on every drawn row and option line.
+	- Exit status documented: 0 if your seat won, 1 if not, 2 for a bad
+	  option.

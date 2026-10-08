@@ -4,17 +4,12 @@ use Test::More;
 use File::Temp qw(tempdir);
 use POSIX ();
 
-# A batch method's argument is a tied scalar or overloaded object whose FETCH
-# touches another Data::HashMap::Shared map -- a common shape (a tied value that
-# reads a second shared map).  Its FETCH runs before this map's lock is taken,
-# so it neither deadlocks this map nor is blocked by it: it can write a second
-# map, and can recover that second map's own stale lock (a dead writer whose pid
-# was recycled to us), exactly as a call with no batch in progress would.  A
-# genuinely foreign live holder of the second map is still waited for.
-#
-# Each probe runs in a child under a no-handler alarm: a regression (a wedged
-# map) is a signal death rather than a hung suite, since a Perl alarm cannot
-# interrupt an XSUB spinning in C.
+# A batch argument whose FETCH touches a second map runs before this map's lock,
+# so it neither deadlocks nor is blocked: it can write the second map and
+# recover that map's own stale lock (a dead writer's pid recycled to us); a live
+# foreign holder is still waited for. Each probe runs in a child under a
+# no-handler alarm (a Perl alarm cannot interrupt an XSUB spinning in C), so a
+# wedged map is a signal death rather than a hung suite.
 
 my $dir = tempdir(CLEANUP => 1);
 my ($A, $B) = ("$dir/a.shm", "$dir/b.shm");
@@ -57,7 +52,6 @@ use Data::HashMap::Shared::II;
     sub FETCH { my $s = shift; $s->{ran}++ ? 2 : do { $s->{code}->(); 1 } }
 }
 
-# $code runs from a batch argument's FETCH, i.e. before set_multi's lock.
 sub via_batch_fetch {
     my ($code) = @_;
     my $m = Data::HashMap::Shared::II->new($A, 64);
@@ -83,16 +77,13 @@ for my $arm (
         via_batch_fetch($on_b);
     }), 'ok', "$what on a second map from a batch FETCH recovers that map's own stale lock";
 
-    # Control: the same operation with no batch in progress must also pass, or
-    # the arm above proves nothing about the second map's own recovery.
+    # control: without it the arm above proves nothing about the second map's
+    # own recovery
     fresh();
     is in_child(sub { stamp($B, $$, $odd); $on_b->() }), 'ok',
         "  ... and still does called directly";
 }
 
-# A second handle onto the SAME map, written from a batch argument's FETCH, runs
-# before the lock too: it completes and its write lands, instead of the pre-fix
-# self-deadlock (t/79 sweeps every variant and method).
 fresh();
 is in_child(sub {
     my $inner = Data::HashMap::Shared::II->new($A, 64);
@@ -100,8 +91,6 @@ is in_child(sub {
     ($inner->get(3) // -1) == 9 or die "re-entrant write lost\n";
 }), 'ok', 'a re-entrant write from a batch FETCH runs before the lock and takes effect';
 
-# A genuinely foreign live holder of the second map is still waited for, not
-# recovered.
 fresh();
 my $holder = fork // die "fork: $!";
 if (!$holder) { select undef, undef, undef, 120; POSIX::_exit(0) }

@@ -22,8 +22,7 @@ sub path { File::Spec->catfile($dir, $_[0]) }
 my @variants = qw(I16 I32 II I16S I32S IS SI16 SI32 SI SS);
 sub kv { my $v = shift; ($v =~ /^S/ ? ('dying', 'living') : (11, 22)), ($v =~ /S$/ ? 'val' : 5) }
 
-# get_multi inlines its own probe in every variant file; it must agree with
-# get() about an expired key, plain and sharded.
+# get_multi inlines its own probe in every variant: it must agree with get()
 my %maps;
 for my $v (@variants) {
     my $pkg = "Data::HashMap::Shared::$v";
@@ -33,7 +32,7 @@ for my $v (@variants) {
                           : $pkg->new(path("$v.shm"), 100, 0, 1);   # 1s default TTL
         ok $map->put_ttl($k1, $val, 1), "$v" . ($shards ? ' sharded' : '') . ": put_ttl 1s";
         ok $map->put_ttl($k2, $val, 0), "$v" . ($shards ? ' sharded' : '') . ": put_ttl permanent";
-        # the 1s key can already be dead on a coarse clock; check liveness on the
+        # the 1s key can already be dead on a coarse clock: check the
         # permanent one
         my ($m2) = $map->get_multi($k2);
         is $m2, $map->get($k2), "$v" . ($shards ? ' sharded' : '') . ": get_multi agrees with get while alive";
@@ -41,7 +40,7 @@ for my $v (@variants) {
         $maps{"$v/$shards"} = $map;
     }
 }
-# CLOCK_MONOTONIC_COARSE seconds: 1.6s past the insert the second has ticked at least once
+# coarse-clock seconds: 1.6s past the insert the second has ticked at least once
 Time::HiRes::sleep(1.6);
 for my $v (@variants) {
     my ($k1, $k2, $val) = kv($v);
@@ -57,8 +56,6 @@ for my $v (@variants) {
     }
 }
 
-# Keys outside a narrow variant's range are truncated to the low bits; get and
-# get_multi must land on the same entry for the same out-of-range key.
 my %wide = (
     I16  => [4464, [70000, 131072 + 4464, 4464 - 65536, 2**31 + 4464, -2**40 + 4464]],
     I16S => [4464, [70000, 131072 + 4464, 4464 - 65536, 2**31 + 4464, -2**40 + 4464]],

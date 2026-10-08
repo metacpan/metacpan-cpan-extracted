@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Config;
 
-# Run the REAL interpreter, not a wrapper script: where `perl` is a shim
+# Run the real interpreter, not a wrapper script: where `perl` is a shim
 # (plenv, perlbrew) valgrind traces the shell and never sees the XS code, so
 # every test passes whatever the module does.
 my $PERL = $Config{perlpath};
@@ -23,10 +23,5 @@ for my $t (sort @tests) {
     # allocation still owned by a never-freed SV reads as "still reachable" and
     # a real leak never trips --errors-for-leak-kinds=definite.
     my $out = `PERL_DESTRUCT_LEVEL=2 valgrind --leak-check=full --error-exitcode=42 --errors-for-leak-kinds=definite $PERL -Mblib $t 2>&1`;
-    my $exit = $? >> 8;
-    my $ok = ($exit != 42);
-    ok $ok, "valgrind: $name" or do {
-        my @lines = grep { /ERROR SUMMARY|definitely lost|Invalid/ } split /\n/, $out;
-        diag join("\n", @lines);
-    };
+    ok $? == 0, "valgrind: $name" or diag $out;
 }

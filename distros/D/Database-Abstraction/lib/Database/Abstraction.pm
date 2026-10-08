@@ -25,7 +25,6 @@ use warnings;
 use strict;
 use autodie qw(:all);
 
-use boolean;
 use Carp;
 use Class::Abstract;
 use Data::Reuse;
@@ -60,34 +59,34 @@ my $SAFE_QUALIFIED  = qr/\A[a-zA-Z_][a-zA-Z0-9_.]*\z/;
 use constant INFER_TYPE_SAMPLE_SIZE => 100;
 my $INFER_INT_RE  = qr/\A-?\d+\z/;
 my $INFER_REAL_RE = qr/
-    \A              # start of string
-    -?              # optional leading minus
-    \d+             # integer part -- required
-    (?:\.\d+)?      # optional decimal part
-    (?:             # optional exponent block:
-        [eE]        #   e or E marker
-        [+-]?       #   optional sign
-        \d+         #   exponent digits
-    )?
-    \z              # end of string
+	\A              # start of string
+	-?              # optional leading minus
+	\d+             # integer part -- required
+	(?:\.\d+)?      # optional decimal part
+	(?:             # optional exponent block:
+		[eE]        #   e or E marker
+		[+-]?       #   optional sign
+		\d+         #   exponent digits
+	)?
+	\z              # end of string
 /x;
 # No \z anchor: intentionally matches any valid timestamp prefix so that full
 # timestamps with seconds, fractional seconds, or timezone offsets are still
 # classified as TIMESTAMP -- e.g. 2024-01-01 12:34:00.000+05:30
 my $INFER_TS_RE   = qr/
-    \A                              # start of string
-    \d{4}                           # 4-digit year
-    - (?:0[1-9]|1[0-2])            # month 01-12
-    - (?:0[1-9]|[12]\d|3[01])      # day   01-31
-    [T\ ]                           # ISO 8601 date-time separator: T or space
-    \d{2}:\d{2}                     # HH:MM -- no end anchor, see note above
+	\A                              # start of string
+	\d{4}                           # 4-digit year
+	- (?:0[1-9]|1[0-2])            # month 01-12
+	- (?:0[1-9]|[12]\d|3[01])      # day   01-31
+	[T\ ]                           # ISO 8601 date-time separator: T or space
+	\d{2}:\d{2}                     # HH:MM -- no end anchor, see note above
 /x;
 my $INFER_DATE_RE = qr/
-    \A                              # start of string
-    \d{4}                           # 4-digit year
-    - (?:0[1-9]|1[0-2])            # month 01-12
-    - (?:0[1-9]|[12]\d|3[01])      # day   01-31
-    \z                              # end of string
+	\A                              # start of string
+	\d{4}                           # 4-digit year
+	- (?:0[1-9]|1[0-2])            # month 01-12
+	- (?:0[1-9]|[12]\d|3[01])      # day   01-31
+	\z                              # end of string
 /x;
 
 # Module-level constant: valid JOIN types after uc() normalisation.
@@ -100,11 +99,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 DESCRIPTION
 
@@ -588,6 +587,26 @@ or more C<< <table> >> elements.  When present, C<directory> is not required.
 The first row of the selected table is used as column headers.
 Requires L<LWP::UserAgent::Cached> and L<HTML::TableExtract> (both loaded lazily).
 
+=item * C<database>
+
+A Redis connection URL in the form C<redis://[password@]host[:port][/db_index]>.
+When present, C<directory>, C<dsn>, and C<url> are not required.  Rows are
+expected to be stored as Redis Hashes at keys of the form
+C<tablename:entry_value>; fields of each Hash become column values.  The
+module slurps all matching keys via C<KEYS tablename:*> + C<HGETALL> into the
+same in-memory structure used by the CSV and DBM::Deep backends, so all
+existing fast-paths (C<selectall_arrayref>, C<selectall_array>,
+C<fetchrow_hashref>, C<count>, C<columns>, C<schema>, AUTOLOAD) work without
+modification.  C<no_entry> mode is supported.
+
+L<Redis::Fast> is tried first (XS, faster); if unavailable, L<Redis>
+(pure-Perl) is used as a fallback.  Both are loaded lazily - neither is
+required when using file-based or DSN-based backends.  The URL scheme is
+validated at construction time (C<redis://> only; all other schemes croak).
+
+Use L</select> to switch the active Redis database on an already-open
+connection.
+
 =back
 
 =head3 Behaviour parameters
@@ -774,7 +793,7 @@ sub new {
 		$args{'logger'} = Log::Abstraction->new($args{'logger'});
 	}
 
-	unless($args{'dsn'} || $defaults{'dsn'} || $args{'url'} || $defaults{'url'}) {
+	unless($args{'dsn'} || $defaults{'dsn'} || $args{'url'} || $defaults{'url'} || $args{'database'} || $defaults{'database'}) {
 		croak("$class: where are the files?") unless($args{'directory'} || $defaults{'directory'});
 
 		# Skip the local -d check only for genuinely remote hosts.
@@ -806,6 +825,10 @@ sub new {
 		if(defined $src->{'url'}) {
 			croak("$class: unsafe url '$src->{url}'")
 				unless $src->{'url'} =~ m{\Ahttps?://}i;
+		}
+		if(defined $src->{'database'}) {
+			croak("$class: unsafe database '$src->{database}'")
+				unless $src->{'database'} =~ m{\Aredis://}i;
 		}
 		if(defined $src->{'table'}) {
 			croak("$class: unsafe table name '$src->{table}'")
@@ -856,6 +879,39 @@ sub set_logger
 		return $self;
 	}
 	Carp::croak('Usage: set_logger(logger => $logger)')
+}
+
+=head2	select
+
+Select a Redis database by number (0-15).  Clears the in-memory data cache so
+the next query re-slurps from the newly selected database.  Returns C<$self>
+for chaining.  Croaks if the object is not backed by a Redis connection.
+
+    $db->select(3);          # switch to Redis DB 3
+    my $count = $db->count;  # queries the new DB
+
+=cut
+
+sub select
+{
+	my $self = shift;
+	my $db_num = Params::Get::get_params('database', @_)->{'database'};
+
+	Carp::croak(ref($self), ': select: db number must be a non-negative integer')
+		unless defined($db_num) && $db_num =~ /\A\d+\z/;
+
+	$self->_open_table({});
+	Carp::croak(ref($self), ': select: not a Redis connection')
+		unless $self->{'_redis'};
+
+	$self->{'_redis'}->select(int($db_num));
+
+	# Clear cached data so next query re-slurps from the new database
+	delete $self->{'data'};
+	delete $self->{'_columns'};
+	delete $self->{'_schema'};
+
+	return $self;
 }
 
 # Open the database connection based on the specified type (e.g., SQLite, CSV).
@@ -910,6 +966,58 @@ sub _open :Protected
 
 		$self->{'type'} = 'DBI';
 		$self->{$table} = $dbh;
+		$self->{'_updated'} = time();
+		return $self;
+	}
+
+	# Redis backend — connects to a Redis server and slurps hash keys matching
+	# "tablename:*" into memory, mirroring the DBM::Deep slurp structure.
+	# Lazily loads Redis::Fast (preferred) or Redis.
+	if(my $db_url = $self->{'database'} || $defaults{'database'}) {
+		# Parse redis://[userinfo@]host[:port][/db_index]
+		my ($userinfo, $host, $port, $db_idx) =
+			$db_url =~ m{\Aredis://(?:([^@]*)@)?([^/:]*)?(?::(\d+))?(?:/(\d+))?\z}i;
+		$host   //= 'localhost';
+		$port   //= 6379;
+		$db_idx //= 0;
+		my $password;
+		if(defined $userinfo) {
+			$password = ($userinfo =~ /:(.*)/) ? $1 : (length($userinfo) ? $userinfo : undef);
+		}
+
+		unless($self->{'_redis'}) {
+			my $redis_class;
+			eval { require Redis::Fast; $redis_class = 'Redis::Fast' };
+			if($@) {
+				require Redis;
+				$redis_class = 'Redis';
+			}
+			$self->{'_redis'} = $redis_class->new(server => "$host:$port", reconnect => 2, every => 100);
+			$self->{'_redis'}->auth($password) if defined $password && length $password;
+		}
+		$self->{'_redis'}->select($db_idx) if $db_idx;
+
+		my $id   = $self->{'id'};
+		my @keys = $self->{'_redis'}->keys("${table}:*");
+
+		if($self->{'no_entry'}) {
+			my @data;
+			for my $key (@keys) {
+				my %fields = $self->{'_redis'}->hgetall($key);
+				push @data, \%fields if %fields;
+			}
+			$self->{'data'} = @data ? \@data : undef;
+		} else {
+			my %data;
+			for my $key (@keys) {
+				(my $entry = $key) =~ s/\A\Q${table}\E://;
+				my %fields = $self->{'_redis'}->hgetall($key);
+				$data{$entry} = { $id => $entry, %fields } if %fields;
+			}
+			$self->{'data'} = %data ? \%data : undef;
+		}
+
+		$self->{'type'}     = 'Redis';
 		$self->{'_updated'} = time();
 		return $self;
 	}
@@ -3201,6 +3309,11 @@ sub DESTROY
 		unlink($temp_path) if defined($temp_path) && -f $temp_path;
 	}
 	delete $self->{'_remote_tmpdir'};
+
+	# Disconnect Redis
+	if(my $redis = delete $self->{'_redis'}) {
+		eval { $redis->quit() };
+	}
 
 	# Clean up database handles
 	my $table_name = $self->{'table'} || ref($self);

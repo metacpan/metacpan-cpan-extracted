@@ -150,23 +150,21 @@ dies_ok {
 } '"task" dies when given an empty filename in "output_files"';
 
 # --- overwrite => true actually re-runs and rewrites the file ------------
-sleep 1;
-my $mod0 = -M $fname;
-# note(), not say(): these are for whoever is reading a failure, and TAP
-# comments stay out of the way of everything else the run prints.
-note("\$mod0 = $mod0");
-note("\$fname = $fname");
+# The file holds the log written above, and the re-run replaces it with the
+# single byte "1", so its contents say whether it was rewritten. Up to 0.194
+# this compared -M before and after a "sleep 1", which assumed the wall clock
+# advanced by a second while the sleep did: on a 5.10.1 CPAN smoker in a VM
+# (2026-10), under t/10.ignored.signals.t, both readings were the same second
+# as $^T although the file held the "1", and the test died.
+my $before = do { open my $bfh, '<', $fname or die "cannot read $fname: $!"; local $/; <$bfh> };
+like($before, qr/Testing say2/, 'the file holds the log before the re-run');
 $r = quietly { task({
 	cmd            => qq{$PERL -e "print 1" > "$fname"}, # portable redirect
 	overwrite      => 'true',
 	'output_files' => $fname
 }) };
-note(sprintf '%s vs %lf', $mod0, -M $fname);
-if (
-		($mod0 > -M $fname) # the file has been modified (mtime newer)
-		&&
-		(-s $fname > 0)
-	) {
+my $after = do { open my $afh, '<', $fname or die "cannot read $fname: $!"; local $/; <$afh> };
+if (($r->{done} eq 'now') && ($after eq '1')) {
 	$overwrite = 1;
 } else {
 	p $r;

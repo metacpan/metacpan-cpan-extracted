@@ -3,11 +3,9 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 
-# Under taint mode a call that opens a file for writing, creates or removes one
-# must not be given tainted data -- a path, a size, a file mode, a descriptor,
-# or a handle opened from tainted input -- as core open and sysopen do, while a
-# file may be read by a tainted name.  A child runs under -T or -t with its inputs
-# taken from the environment, which taint mode marks tainted.
+# Under taint mode, calls that create, remove or write a file refuse tainted
+# data, as core open and sysopen do; reading by a tainted name is allowed.
+# Children run under -T or -t with env-borne inputs.
 
 open my $probe, '-|', $^X, '-T', '-e', 'print ${^TAINT}' or die $!;
 my $taint_on = <$probe> // '';

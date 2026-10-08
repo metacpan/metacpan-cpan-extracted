@@ -68,7 +68,7 @@ Luv::CLI::Command::Search - search the library registry
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

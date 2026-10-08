@@ -180,7 +180,13 @@ subtest 'command constraints' => sub {
 		qr/commandRequired without commands/, 'commandRequired needs commands';
 
 	like dies { buildSpec(commands => { doc => { options => { x => { type => 'bad' } } } }) },
-		qr/unknown option type 'bad'/, 'nested errors surface';
+		qr/spec: command 'doc': option 'x': unknown option type 'bad'/, 'an unknown type names the option and the command';
+
+	like dies { buildSpec(commands => { doc => { commands => { create => { options => { width => { foo => 1 } } } } } }) },
+		qr/spec: command 'doc create': option 'width': unknown key\(s\): foo/, 'an option error names the command';
+
+	like dies { buildSpec(commands => { doc => { args => [{ short => 'src', min => 1 }] } }) },
+		qr/spec: command 'doc': arg 'src': unknown key\(s\): min/, 'an arg error names the command';
 };
 
 subtest 'inherited option constraints' => sub {

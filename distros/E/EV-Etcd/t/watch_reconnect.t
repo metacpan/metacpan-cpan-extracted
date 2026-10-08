@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -38,14 +39,23 @@ my $client = EV::Etcd->new(
 
 my $prefix = "/test-watch-reconnect-$$-" . time();
 
+# A put committed before the watch is registered is never delivered
+sub wait_created {
+    my ($created) = @_;
+    my $poll = EV::timer(0.01, 0.01, sub { EV::break if $$created });
+    my $t = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+}
+
 {
     my $key = "$prefix/no-reconnect";
-    my @events;
+    my (@events, $created);
     my $watch = $client->watch($key, {
         auto_reconnect => 0,
     }, sub {
         my ($resp, $err) = @_;
         return if $err;
+        $created = 1 if $resp->{created};
         if ($resp->{events} && @{$resp->{events}}) {
             push @events, @{$resp->{events}};
             EV::break if @events >= 1;
@@ -55,6 +65,7 @@ my $prefix = "/test-watch-reconnect-$$-" . time();
     ok(defined $watch, 'watch with auto_reconnect=0 created');
     isa_ok($watch, 'EV::Etcd::Watch');
 
+    wait_created(\$created);
     $client->put($key, "test-no-reconnect", sub {});
     my $t1 = EV::timer(5, 0, sub { EV::break });
     EV::run;
@@ -71,10 +82,11 @@ my $prefix = "/test-watch-reconnect-$$-" . time();
 
 {
     my $key = "$prefix/with-reconnect";
-    my @events;
+    my (@events, $created);
     my $watch = $client->watch($key, sub {
         my ($resp, $err) = @_;
         return if $err;
+        $created = 1 if $resp->{created};
         if ($resp->{events} && @{$resp->{events}}) {
             push @events, @{$resp->{events}};
             EV::break if @events >= 3;
@@ -83,6 +95,7 @@ my $prefix = "/test-watch-reconnect-$$-" . time();
 
     ok(defined $watch, 'watch with default auto_reconnect created');
 
+    wait_created(\$created);
     for my $i (1..3) {
         $client->put($key, "value-$i", sub {});
     }
@@ -104,13 +117,14 @@ my $prefix = "/test-watch-reconnect-$$-" . time();
 
 {
     my $key = "$prefix/prefix-";
-    my @events;
+    my (@events, $created);
     my $watch = $client->watch($key, {
         auto_reconnect => 0,
         prefix => 1,
     }, sub {
         my ($resp, $err) = @_;
         return if $err;
+        $created = 1 if $resp->{created};
         if ($resp->{events} && @{$resp->{events}}) {
             push @events, @{$resp->{events}};
             EV::break if @events >= 2;
@@ -119,6 +133,7 @@ my $prefix = "/test-watch-reconnect-$$-" . time();
 
     ok(defined $watch, 'prefix watch with auto_reconnect=0 created');
 
+    wait_created(\$created);
     $client->put("$prefix/prefix-a", "a", sub {});
     $client->put("$prefix/prefix-b", "b", sub {});
     my $t5 = EV::timer(5, 0, sub { EV::break });

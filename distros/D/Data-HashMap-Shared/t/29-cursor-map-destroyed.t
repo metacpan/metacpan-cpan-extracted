@@ -4,19 +4,15 @@ use Test::More;
 use File::Temp qw(tempdir);
 use POSIX ();
 
-# A cursor keeps raw handle pointers and only a refcount on the map's referent
-# SV, so an explicit $map->DESTROY frees the handle under it: a cursor method
-# would segfault and merely dropping the cursor would be a silent heap
-# use-after-free.  Both must detect the zeroed owner IV.
-#
-# The risky sequences run in a forked child so a regression reports as a failed
-# test rather than taking the whole harness down with SIGSEGV.
+# A cursor holds raw handle pointers, so an explicit $map->DESTROY frees the
+# handle under it; cursor and map must detect the zeroed owner IV.
+# The risky sequences run in a forked child so a regression fails a test
+# instead of taking the harness down with SIGSEGV.
 
 my @variants = qw(II IS SI SS I16 I16S I32 I32S SI16 SI32);
 my $dir = tempdir(CLEANUP => 1);
 
-# Anchored: croak appends " at t/29-cursor-map-destroyed.t line N", and this
-# file name contains "destroyed", so a bare /destroyed/ matches any croak.
+# anchored: croak appends this file's name, which contains "destroyed"
 my $MAP_GONE    = qr/^Attempted to use a destroyed \S+ object/;
 my $CURSOR_GONE = qr/^Attempted to use a \S+ cursor whose map was destroyed/;
 
@@ -41,7 +37,6 @@ for my $v (@variants) {
         my $c = $m->cursor;
         $c->next;
         $m->DESTROY;
-        # Must croak, not segfault.
         eval { $c->next; 1 } and POSIX::_exit(20);       # no croak at all
         POSIX::_exit($@ =~ $CURSOR_GONE ? 0 : 21);
     });
@@ -49,10 +44,6 @@ for my $v (@variants) {
         or diag sprintf('child status 0x%04x (signal %d, exit %d)',
                         $status, $status & 127, $status >> 8);
 
-    # The same freed handle reached through the map itself.  This file built
-    # the state from the start but only ever asked a cursor about it, so the
-    # NULL check that keeps a map method from dereferencing the freed handle
-    # was never exercised -- it segfaults without it, rather than croaking.
     my $mstat = in_child(sub {
         my $m = $class->new("$dir/$v-map.hm", 1024);
         $m->put(make_key($v, 1), make_val($v, 1));
@@ -70,7 +61,7 @@ for my $v (@variants) {
         my $c = $m->cursor;
         $c->next;
         $m->DESTROY;
-        undef $c;                                        # cursor DESTROY on a freed handle
+        undef $c;
     });
     is $drop, 0, "$class: dropping a cursor after explicit map DESTROY is safe"
         or diag sprintf('child status 0x%04x (signal %d, exit %d)',

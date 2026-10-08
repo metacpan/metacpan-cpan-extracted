@@ -11,6 +11,15 @@
 #include <string.h>
 #include <errno.h>
 #include "imageri.h"
+#include <sys/stat.h>
+
+#ifdef IMAGER_POSIX_MMAP
+#include <sys/mman.h>
+#endif
+#ifdef WIN32
+#include <windows.h>
+#include <io.h> /* _get_osfhandle */
+#endif
 
 #define IOL_DEB(x)
 #define IOL_DEBs stderr
@@ -31,6 +40,12 @@ typedef struct io_blink {
 typedef struct {
   i_io_glue_t	base;
   int		fd;
+  off_t         size;
+  int size_set;
+#if defined(IMAGER_POSIX_MMAP) || defined(WIN32)
+  void *mapped;
+  size_t map_size;
+#endif
 } io_fdseek;
 
 typedef struct {
@@ -50,6 +65,8 @@ typedef struct {
   i_io_seekl_t	seekcb;
   i_io_closel_t closecb;
   i_io_destroyl_t      destroycb;
+  i_io_sizel_t sizecb;
+  off_t size;
 } io_cb;
 
 typedef struct {
@@ -99,7 +116,7 @@ iolayer.c implements the basic functions to create and destroy io_glue
 objects for Imager.  The typical usage pattern for data sources is:
 
    1. Create the source (io_new_fd)
-   2. Define how you want to get data from it (io_reqmeth)
+   2. Define how you want to get data from it
    3. read from it using the interface requested (ig->readdb, ig->mmapcb)
    4. Close the source, which 
       shouldn't really close the underlying source. (io_glue DESTROY)
@@ -114,14 +131,16 @@ Some of these functions are internal.
 */
 
 static void
-i_io_init(pIMCTX, io_glue *ig, int type, i_io_readp_t readcb,
-	  i_io_writep_t writecb, i_io_seekp_t seekcb);
+i_io_init(pIMCTX, io_glue *ig, int type, const i_io_glue_vtable_t *vtbl);
 
 static ssize_t fd_read(io_glue *ig, void *buf, size_t count);
 static ssize_t fd_write(io_glue *ig, const void *buf, size_t count);
 static off_t fd_seek(io_glue *ig, off_t offset, int whence);
 static int fd_close(io_glue *ig);
-static ssize_t fd_size(io_glue *ig);
+static off_t fd_size(io_glue *ig);
+static int fd_mmap(io_glue *ig, const void **pdata, size_t *psize);
+static int fd_munmap(io_glue *ig);
+static void fd_destroy(io_glue *igo);
 static const char *my_strerror(int err);
 static void i_io_setup_buffer(io_glue *ig);
 static void
@@ -135,10 +154,14 @@ static ssize_t realseek_write(io_glue *igo, const void *buf, size_t count);
 static int realseek_close(io_glue *igo);
 static off_t realseek_seek(io_glue *igo, off_t offset, int whence);
 static void realseek_destroy(io_glue *igo);
+static off_t realseek_size(io_glue *igo);
 static ssize_t buffer_read(io_glue *igo, void *buf, size_t count);
 static ssize_t buffer_write(io_glue *ig, const void *buf, size_t count);
 static int buffer_close(io_glue *ig);
 static off_t buffer_seek(io_glue *igo, off_t offset, int whence);
+static off_t buffer_size(io_glue *ig);
+static int buffer_mmap(io_glue *ig, const void **pdata, size_t *psize);
+static int buffer_munmap(io_glue *ig);
 static void buffer_destroy(io_glue *igo);
 static io_blink*io_blink_new(void);
 static void io_bchain_advance(io_ex_bchain *ieb);
@@ -147,7 +170,60 @@ static ssize_t bufchain_read(io_glue *ig, void *buf, size_t count);
 static ssize_t bufchain_write(io_glue *ig, const void *buf, size_t count);
 static int bufchain_close(io_glue *ig);
 static off_t bufchain_seek(io_glue *ig, off_t offset, int whence);
+static off_t bufchain_size(io_glue *ig);
 static void bufchain_destroy(io_glue *ig);
+
+static const i_io_glue_vtable_t
+bufchain_vtable =
+  {
+    bufchain_read,
+    bufchain_write,
+    bufchain_seek,
+    bufchain_close,
+    bufchain_size,
+    bufchain_destroy,
+    NULL,
+    NULL
+  };
+
+static const i_io_glue_vtable_t
+buffer_vtable =
+  {
+    buffer_read,
+    buffer_write,
+    buffer_seek,
+    buffer_close,
+    buffer_size,
+    buffer_destroy,
+    buffer_mmap,
+    buffer_munmap
+  };
+
+static const i_io_glue_vtable_t
+fd_vtable =
+  {
+    fd_read,
+    fd_write,
+    fd_seek,
+    fd_close,
+    fd_size,
+    fd_destroy, /* destroy */
+    fd_mmap,
+    fd_munmap
+  };
+
+static const i_io_glue_vtable_t
+callback_vtable =
+  {
+    realseek_read,
+    realseek_write,
+    realseek_seek,
+    realseek_close,
+    realseek_size,
+    realseek_destroy,
+    NULL,
+    NULL
+  };
 
 /*
  * Methods for setting up data source
@@ -176,7 +252,7 @@ im_io_new_bufchain(pIMCTX) {
 
   ig = mymalloc(sizeof(io_glue));
   memset(ig, 0, sizeof(*ig));
-  i_io_init(aIMCTX, ig, BUFCHAIN, bufchain_read, bufchain_write, bufchain_seek);
+  i_io_init(aIMCTX, ig, BUFCHAIN, &bufchain_vtable);
 
   ieb->offset = 0;
   ieb->length = 0;
@@ -189,8 +265,6 @@ im_io_new_bufchain(pIMCTX) {
   ieb->tail   = ieb->head;
   
   ig->exdata    = ieb;
-  ig->closecb   = bufchain_close;
-  ig->destroycb = bufchain_destroy;
 
   im_context_refinc(aIMCTX, "im_io_new_bufchain");
 
@@ -223,7 +297,7 @@ im_io_new_buffer(pIMCTX, const char *data, size_t len, i_io_closebufp_t closecb,
 
   ig = mymalloc(sizeof(io_buffer));
   memset(ig, 0, sizeof(*ig));
-  i_io_init(aIMCTX, &ig->base, BUFFER, buffer_read, buffer_write, buffer_seek);
+  i_io_init(aIMCTX, &ig->base, BUFFER, &buffer_vtable);
   ig->data      = data;
   ig->len       = len;
   ig->closecb   = closecb;
@@ -231,9 +305,6 @@ im_io_new_buffer(pIMCTX, const char *data, size_t len, i_io_closebufp_t closecb,
 
   ig->cpos   = 0;
   
-  ig->base.closecb   = buffer_close;
-  ig->base.destroycb = buffer_destroy;
-
   im_context_refinc(aIMCTX, "im_io_new_bufchain");
 
   return (io_glue *)ig;
@@ -266,12 +337,9 @@ im_io_new_fd(pIMCTX, int fd) {
 
   ig = mymalloc(sizeof(io_fdseek));
   memset(ig, 0, sizeof(*ig));
-  i_io_init(aIMCTX, &ig->base, FDSEEK, fd_read, fd_write, fd_seek);
+  i_io_init(aIMCTX, &ig->base, FDSEEK, &fd_vtable);
   ig->fd = fd;
 
-  ig->base.closecb   = fd_close;
-  ig->base.sizecb    = fd_size;
-  ig->base.destroycb = NULL;
   im_context_refinc(aIMCTX, "im_io_new_bufchain");
 
   im_log((aIMCTX, 1, "(%p) <- io_new_fd\n", ig));
@@ -279,7 +347,7 @@ im_io_new_fd(pIMCTX, int fd) {
 }
 
 /*
-=item im_io_new_cb(ctx, p, read_cb, write_cb, seek_cb, close_cb, destroy_cb)
+=item im_io_new_cb8(ctx, p, read_cb, write_cb, seek_cb, close_cb, destroy_cb, size_cb)
 X<im_io_new_cb API>X<io_new_cb API>
 =category I/O Layers
 =order 10
@@ -325,20 +393,17 @@ destroycb)>.
 */
 
 io_glue *
-im_io_new_cb(pIMCTX, void *p, i_io_readl_t readcb, i_io_writel_t writecb, 
-	  i_io_seekl_t seekcb, i_io_closel_t closecb, 
-	  i_io_destroyl_t destroycb) {
+im_io_new_cb8(pIMCTX, void *p, i_io_readl_t readcb, i_io_writel_t writecb,
+	  i_io_seekl_t seekcb, i_io_closel_t closecb,
+              i_io_destroyl_t destroycb, i_io_sizel_t sizecb) {
   io_cb *ig;
 
   im_log((aIMCTX, 1, "io_new_cb(p %p, readcb %p, writecb %p, seekcb %p, closecb %p, "
-          "destroycb %p)\n", p, readcb, writecb, seekcb, closecb, destroycb));
+          "destroycb %p, seekcb %p)\n", p, readcb, writecb, seekcb, closecb, destroycb, seekcb));
   ig = mymalloc(sizeof(io_cb));
   memset(ig, 0, sizeof(*ig));
-  i_io_init(aIMCTX, &ig->base, CBSEEK, realseek_read, realseek_write, realseek_seek);
-  im_log((aIMCTX, 1, "(%p) <- io_new_cb\n", ig));
-
-  ig->base.closecb   = realseek_close;
-  ig->base.destroycb = realseek_destroy;
+  i_io_init(aIMCTX, &ig->base, CBSEEK, &callback_vtable);
+  im_log((aIMCTX, 1, "(%p) <- io_new_cb8\n", ig));
 
   ig->p         = p;
   ig->readcb    = readcb;
@@ -346,8 +411,10 @@ im_io_new_cb(pIMCTX, void *p, i_io_readl_t readcb, i_io_writel_t writecb,
   ig->seekcb    = seekcb;
   ig->closecb   = closecb;
   ig->destroycb = destroycb;
+  ig->sizecb    = sizecb;
+  ig->size      = -1;
   
-  im_context_refinc(aIMCTX, "im_io_new_bufchain");
+  im_context_refinc(aIMCTX, "im_io_new_cb8");
 
   return (io_glue *)ig;
 }
@@ -423,8 +490,8 @@ io_glue_destroy(io_glue *ig) {
   dIMCTXio(ig);
   im_log((aIMCTX, 1, "io_glue_DESTROY(ig %p)\n", ig));
 
-  if (ig->destroycb)
-    ig->destroycb(ig);
+  if (ig->vtbl->destroycb)
+    ig->vtbl->destroycb(ig);
 
   if (ig->buffer)
     myfree(ig->buffer);
@@ -998,7 +1065,7 @@ i_io_gets(io_glue *ig, char *buffer, size_t size, int eol) {
 }
 
 /*
-=item i_io_init(ig, readcb, writecb, seekcb)
+=item i_io_init(ig, type, vtbl)
 
 Do common initialization for io_glue objects.
 
@@ -1006,16 +1073,11 @@ Do common initialization for io_glue objects.
 */
 
 static void
-i_io_init(pIMCTX, io_glue *ig, int type, i_io_readp_t readcb, i_io_writep_t writecb,
-	  i_io_seekp_t seekcb) {
+i_io_init(pIMCTX, io_glue *ig, int type, const i_io_glue_vtable_t *vtbl) {
   ig->type = type;
   ig->exdata = NULL;
-  ig->readcb = readcb;
-  ig->writecb = writecb;
-  ig->seekcb = seekcb;
-  ig->closecb = NULL;
-  ig->sizecb = NULL;
-  ig->destroycb = NULL;
+
+  ig->vtbl = vtbl;
   ig->context = aIMCTX;
 
   ig->buffer = NULL;
@@ -1082,11 +1144,12 @@ i_io_dump(io_glue *ig, int flags) {
   fprintf(IOL_DEBs, "  type: %d\n", ig->type);  
   fprintf(IOL_DEBs, "  exdata: %p\n", ig->exdata);
   if (flags & I_IO_DUMP_CALLBACKS) {
-    fprintf(IOL_DEBs, "  readcb: %p\n", ig->readcb);
-    fprintf(IOL_DEBs, "  writecb: %p\n", ig->writecb);
-    fprintf(IOL_DEBs, "  seekcb: %p\n", ig->seekcb);
-    fprintf(IOL_DEBs, "  closecb: %p\n", ig->closecb);
-    fprintf(IOL_DEBs, "  sizecb: %p\n", ig->sizecb);
+    fprintf(IOL_DEBs, "  vtable: %p\n", ig->vtbl);
+    fprintf(IOL_DEBs, "  readcb: %p\n", ig->vtbl->readcb);
+    fprintf(IOL_DEBs, "  writecb: %p\n", ig->vtbl->writecb);
+    fprintf(IOL_DEBs, "  seekcb: %p\n", ig->vtbl->seekcb);
+    fprintf(IOL_DEBs, "  closecb: %p\n", ig->vtbl->closecb);
+    fprintf(IOL_DEBs, "  sizecb: %p\n", ig->vtbl->sizecb);
   }
   if (flags & I_IO_DUMP_BUFFER) {
     fprintf(IOL_DEBs, "  buffer: %p\n", ig->buffer);
@@ -1279,14 +1342,6 @@ dump_data(unsigned char *start, unsigned char *end, int bias) {
 }
 
 /*
- * Callbacks for sources that cannot seek
- */
-
-/*
- * Callbacks for sources that can seek 
- */
-
-/*
 =item realseek_read(ig, buf, count)
 
 Does the reading from a source that can be seeked on
@@ -1307,6 +1362,10 @@ realseek_read(io_glue *igo, void *buf, size_t count) {
 
   IOL_DEB( fprintf(IOL_DEBs, "realseek_read:  buf = %p, count = %u\n", 
 		   buf, (unsigned)count) );
+  if (!ig->readcb) {
+    errno = EINVAL;
+    return -1;
+  }
   rc = ig->readcb(p,buf,count);
 
   IOL_DEB( fprintf(IOL_DEBs, "realseek_read: rc = %d\n", (int)rc) );
@@ -1338,6 +1397,11 @@ realseek_write(io_glue *igo, const void *buf, size_t count) {
   
   IOL_DEB( fprintf(IOL_DEBs, "realseek_write: ig = %p, buf = %p, "
 		   "count = %u\n", ig, buf, (unsigned)count) );
+
+  if (!ig->writecb) {
+    errno = EINVAL;
+    return -1;
+  }
 
   /* Is this a good idea? Would it be better to handle differently? 
      skip handling? */
@@ -1395,6 +1459,10 @@ realseek_seek(io_glue *igo, off_t offset, int whence) {
   void *p = ig->p;
   off_t rc;
   IOL_DEB( fprintf(IOL_DEBs, "realseek_seek(ig %p, offset %ld, whence %d)\n", ig, (long) offset, whence) );
+  if (!ig->seekcb) {
+    errno = ESPIPE;
+    return -1;
+  }
   rc = ig->seekcb(p, offset, whence);
 
   IOL_DEB( fprintf(IOL_DEBs, "realseek_seek: rc %ld\n", (long) rc) );
@@ -1409,6 +1477,27 @@ realseek_destroy(io_glue *igo) {
 
   if (ig->destroycb)
     ig->destroycb(ig->p);
+}
+
+static off_t
+realseek_size(io_glue *igo) {
+  io_cb * const ig = (io_cb *)igo;
+  void *p = ig->p;
+
+  off_t result = (off_t)-1;
+  if (ig->sizecb) {
+      result = ig->sizecb(p);
+  }
+  if (result == (off_t)-1 && ig->seekcb) {
+    /* try to figure it out */
+    const off_t orig_pos = realseek_seek(igo, 0, SEEK_CUR);
+    if (orig_pos != (off_t)-1) {
+      result = realseek_seek(igo, 0, SEEK_END);
+      realseek_seek(igo, orig_pos, SEEK_SET);
+    }
+  }
+
+return result;
 }
 
 /*
@@ -1526,6 +1615,31 @@ buffer_seek(io_glue *igo, off_t offset, int whence) {
 
   return reqpos;
   /* FIXME: How about implementing this offset handling stuff? */
+}
+
+static off_t
+buffer_size(io_glue *igo) {
+  io_buffer *ig = (io_buffer *)igo;
+
+  return ig->len;
+}
+
+static int
+buffer_mmap(io_glue *igo, const void **pdata, size_t *psize) {
+  io_buffer *ig = (io_buffer *)igo;
+
+  /* already mapped */
+  *pdata = ig->data;
+  *psize = ig->len;
+
+  return 1;
+}
+
+static int
+buffer_munmap(io_glue *igo) {
+  (void)igo;
+  /* nothing to do */
+  return 1;
 }
 
 static
@@ -1825,6 +1939,12 @@ bufchain_write(io_glue *ig, const void *buf, size_t count) {
   return ocount;
 }
 
+static off_t
+bufchain_size(io_glue *ig) {
+  io_ex_bchain *ieb = ig->exdata;
+  return ieb->length;
+}
+
 /*
 =item bufchain_close(ig)
 
@@ -2004,11 +2124,167 @@ static int fd_close(io_glue *ig) {
   return 0;
 }
 
-static ssize_t fd_size(io_glue *ig) {
-  dIMCTXio(ig);
-  im_log((aIMCTX, 1, "fd_size(ig %p) unimplemented\n", ig));
+static off_t
+fd_size(io_glue *igo) {
+  io_fdseek *ig = (io_fdseek *)igo;
+
+  if (!ig->size_set) {
+    struct stat st;
+    if (fstat(ig->fd, &st) == 0) {
+      ig->size = st.st_size;
+    }
+    else {
+      ig->size = -1;
+    }
+    ig->size_set = 1;
+  }
   
-  return -1;
+  return ig->size;
+}
+
+static int
+fd_mmap(io_glue *igo, const void **pdata, size_t *psize) {
+#if defined(IMAGER_POSIX_MMAP) || defined(WIN32)
+  io_fdseek *ig = (io_fdseek *)igo;
+
+  if (!ig->mapped) {
+    dIMCTXio(igo);
+    void *data;
+
+    if (!ig->size_set)
+      fd_size(igo);
+    if (ig->size <= 0)
+      return 0;
+#if IMAGER_PTR_SIZE == 4
+    if (ig->size > im_ssize_t_max) {
+      im_push_error(aIMCTX, 0, "file too large to mmap");
+      return 0;
+    }
+#endif
+    if ((size_t)ig->size > aIMCTX->max_mmap_size) {
+      im_push_error(aIMCTX, 0, "file larger than max mmap size");
+      return 0;
+    }
+#  if defined(IMAGER_POSIX_MMAP)
+    data = mmap(NULL, ig->size, PROT_READ, MAP_SHARED, ig->fd, 0);
+    if (data == (void *)-1) {
+      return 0;
+    }
+#  else
+    HANDLE h_mapping =
+      CreateFileMapping((HANDLE)_get_osfhandle(ig->fd), NULL, PAGE_READONLY,
+                        0, 0, NULL);
+    if (h_mapping == NULL) {
+      im_push_errorf(aIMCTX, 0, "CreateFileMapping failure %lu",
+                     (unsigned long)GetLastError());
+      return 0;
+    }
+    data = MapViewOfFile(h_mapping, FILE_MAP_READ, 0, 0, 0);
+    CloseHandle(h_mapping);
+    if (data == NULL) {
+      im_push_errorf(aIMCTX, 0, "MapViewOfFile failure %lu",
+                     (unsigned long)GetLastError());
+      return 0;
+    }
+#  endif
+    ig->mapped = data;
+    ig->map_size = ig->size;
+    im_log((aIMCTX, 2, "mapped io %p to address %p size %zu\n",
+            (void *)ig, data, ig->map_size));
+  }
+  
+  *pdata = ig->mapped;
+  *psize = ig->size;
+
+  return 1;
+#else
+  (void)igo;
+  *pdata = NULL;
+  *psize = 0;
+
+  return 0;
+#endif
+}
+
+static int
+fd_munmap(io_glue *igo) {
+#if defined(IMAGER_POSIX_MMAP) || defined(WIN32)
+  io_fdseek *ig = (io_fdseek *)igo;
+
+  if (ig->mapped) {
+    dIMCTXio(igo);
+#  ifdef IMAGER_POSIX_MMAP
+    munmap(ig->mapped, ig->size);
+#  else
+    UnmapViewOfFile(ig->mapped);
+#  endif
+    im_log((aIMCTX, 2, "unmapped io %p from address %p\n",
+            (void *)ig, ig->mapped));
+    ig->mapped = NULL;
+    return 1;
+  }
+  return 0;
+#else
+  (void)igo;
+  
+  return 0;
+#endif
+}
+
+static void
+fd_destroy(io_glue *igo) {
+#if defined(IMAGER_POSIX_MMAP)
+  io_fdseek *ig = (io_fdseek *)igo;
+
+  if (ig->mapped) {
+    fd_munmap(igo);
+  }
+#else
+  (void)igo;
+#endif
+  
+}
+
+/*
+=item im_io_get_max_mmap_size()
+
+  size_t size = im_io_get_max_mmap_size(aIMCTX);
+  size_t size = i_io_get_max_mmap_size();
+
+Fetch the maximum address space than can be mapped by i_io_mmap() for
+files.
+
+=cut
+*/
+
+size_t
+im_io_get_max_mmap_size(pIMCTX) {
+  return aIMCTX->max_mmap_size;
+}
+
+/*
+=item im_io_set_max_mmap_size()
+
+  int ok size = im_io_set_max_mmap_size(aIMCTX, new_size);
+  int ok size = i_io_set_max_mmap_size(new_size);
+
+Set the maximum address space than can be mapped by i_io_mmap() for
+files.
+
+=cut
+*/
+
+int
+im_io_set_max_mmap_size(pIMCTX, size_t new_size) {
+  im_clear_error(aIMCTX);
+
+  if (new_size > im_size_t_max / 2) {
+    im_push_error(aIMCTX, 0, "set_max_map_size: new size too large (> half address space)");
+    return 0;
+  }
+  aIMCTX->max_mmap_size = new_size;
+
+  return 1;
 }
 
 
@@ -2024,4 +2300,116 @@ Arnar M. Hrafnkelsson <addi@umich.edu>
 Imager(3)
 
 =cut
+*/
+
+/*
+
+Document the I/O macros.
+
+=item i_io_type()
+=category I/O Layers
+
+Return the type of an I/O layer object.
+
+  int type = i_io_type(io);
+
+=cut
+=item i_io_raw_read()
+=category I/O Layers
+
+Raw read from an I/O layer object.  This does not mix well with the
+buffer I/O functions.
+
+  char buf[SIZE];
+  ssize_t rd_size = i_io_raw_read(io, buf, SIZE);
+
+=cut
+=item i_io_raw_write()
+=category I/O Layers
+
+Raw write to an I/O layer object.  This does not mix well with the
+buffer I/O functions.
+
+  char data[SIZE] = "...";
+  ssize_t wr_size = i_io_raw_write(io, buf, SIZE);
+
+=cut
+=item i_io_raw_seek()
+=category I/O Layers
+
+Raw seek in an I/O layer object.  This does not mix well with the
+buffer I/O functions.
+
+  off_t pos = i_io_raw_seek(io, offset, seek_type);
+
+=cut
+=item i_io_raw_close()
+=category I/O Layers
+
+Raw close an I/O layer object.  This will not flush any buffered data.
+
+  int result = i_io_raw_close(io)
+
+=cut
+=item i_io_is_buffered()
+=category I/O Layers
+
+Returns true if the I/O layer object is buffered.
+
+=cut
+=item i_io_mmap()
+=category I/O Layers
+
+If the I/O object allows it, return the address and size of the data.
+For C<fd> objects this will attempt to mmap() the file into memory.
+
+The memory may not be written to.
+
+  const void *p;
+  size_t size;
+  if (i_io_mmap(io, &p, &size)) {
+    i_io_munmap(p);
+  }
+
+=cut
+=item i_io_munmap()
+=category I/O Layers
+
+Remove the memory mapping created by i_io_mmap().
+
+  i_io_munmap(io);
+
+=cut
+=item i_io_getc(io)
+=category I/O Layers
+
+Fetch a single character from a buffered I/O stream.
+
+=cut
+=item i_io_nextc()
+=category I/O Layers
+
+Currently broken.
+
+=cut
+=item i_io_putc()
+=category I/O Layers
+
+Write a single character to a buffered I/O stream.
+
+=cut
+=item i_io_eof()
+=category I/O Layers
+
+Return true if the stream is at end of file.
+
+=cut
+=item i_io_error()
+=category I/O Layers
+
+Return true if the stream is in an error state.  i_io_seek() will
+clear the error state.
+
+=cut
+
 */

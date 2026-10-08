@@ -34,6 +34,7 @@ t/18-bot.t
 t/19-bot-blind.t
 t/20-terminal.t
 t/21-no-io.t
+t/22-pick.t
 t/lib/Game/Dominoes/Test/Handle.pm
 t/manifest.t
 t/pod-coverage.t

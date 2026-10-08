@@ -87,7 +87,7 @@ subtest 'the whole chrome, in order' => sub {
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="banner"><a href="index.html">Example</a></header>
+<header><a href="index.html">Example</a></header>
 <nav>
 <a href="index.html">Home</a> \xc2\xb7
 <a href="manuals.html">Manuals</a>

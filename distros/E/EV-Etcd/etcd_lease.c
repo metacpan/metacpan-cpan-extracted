@@ -7,8 +7,7 @@
 #include "etcd_common.h"
 #include "etcd_lease.h"
 
-/* EVAPI.h's GEVAPI is a per-translation-unit static: each file calling EV must
- * bind its own (from BOOT), or ev_timer_start & co dereference a NULL table */
+/* GEVAPI is static per translation unit: unbound, ev_* calls dereference NULL */
 void lease_init_ev_api(pTHX) {
     I_EV_API("EV::Etcd");
 }
@@ -59,16 +58,16 @@ void process_lease_time_to_live_response(pTHX_ pending_call_t *pc) {
     hv_store(result, "ttl", 3, newSVi64(resp->ttl), 0);
     hv_store(result, "granted_ttl", 11, newSVi64(resp->grantedttl), 0);
 
+    AV *keys_av = newAV();
     if (resp->n_keys > 0) {
-        AV *keys_av = newAV();
         av_extend(keys_av, resp->n_keys - 1);
         for (size_t i = 0; i < resp->n_keys; i++) {
             av_push(keys_av, resp->keys[i].data
                 ? newSVpvn((char *)resp->keys[i].data, resp->keys[i].len)
                 : newSVpvn("", 0));
         }
-        hv_store(result, "keys", 4, newRV_noinc((SV *)keys_av), 0);
     }
+    hv_store(result, "keys", 4, newRV_noinc((SV *)keys_av), 0);
 
     etcdserverpb__lease_time_to_live_response__free_unpacked(resp, NULL);
 
@@ -151,6 +150,7 @@ void cleanup_keepalive(pTHX_ keepalive_call_t *kc) {
         grpc_call_unref(kc->call);
         kc->call = NULL;
     }
+    etcd_call_release(&kc->base);
     SvREFCNT_dec(kc->callback);
     kc->callback = NULL;
     kc->active = 0;
@@ -164,8 +164,7 @@ void keepalive_call_perl_release(pTHX_ keepalive_call_t *kc) {
     if (!kc->client_owns) keepalive_call_free(aTHX_ kc);
 }
 
-/* A failed batch only skips this tick: a still-pending previous SEND yields
- * TOO_MANY_OPERATIONS, which must not tear down the stream */
+/* A failed batch (a previous SEND still pending) only skips this tick */
 static void keepalive_renew_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     dTHX;
     (void)loop;
@@ -222,6 +221,7 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
     }
 
     kc->reconnect_attempt = 0;
+    kc->established = 1;
 
     if (resp->ttl == 0) {
         kc->active = 0;
@@ -275,7 +275,8 @@ static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revent
     grpc_slice_unref(req_slice);
 
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
-    kc->base.channel_gen = client->channel_gen;
+    etcd_call_acquire(client, &kc->base);
+    grpc_channel_reset_connect_backoff(client->channel);
     kc->call = grpc_channel_create_call(
         client->channel, NULL, GRPC_PROPAGATE_DEFAULTS,
         client->cq, METHOD_LEASE_KEEPALIVE, NULL, deadline, NULL);
@@ -283,35 +284,27 @@ static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revent
     if (!kc->call) {
         grpc_byte_buffer_destroy(send_buffer);
         kc->active = 0;
-        client->in_callback++;
+        CALLBACK_WINDOW_BEGIN(client);
         CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Keepalive reconnect failed", "keepalive");
-        client->in_callback--;
-        if (!client->in_callback && !client->active) {
-            finish_client_destroy(aTHX_ client);
+        if (CALLBACK_WINDOW_END(client))
             return;
-        }
         cleanup_keepalive(aTHX_ kc);
         return;
     }
 
     grpc_op ops[4] = {0};
-    grpc_metadata auth_md;
-    STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buffer, kc);
+    STREAMING_CALL_SETUP_OPS(client, ops, send_buffer, kc);
 
     init_call_base(&kc->base, CALL_TYPE_LEASE_KEEPALIVE);
     grpc_call_error err = grpc_call_start_batch(kc->call, ops, 4, &kc->base, NULL);
-    cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(kc);
-        client->in_callback++;
+        CALLBACK_WINDOW_BEGIN(client);
         CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Keepalive reconnect batch failed", "keepalive");
-        client->in_callback--;
-        if (!client->in_callback && !client->active) {
-            finish_client_destroy(aTHX_ client);
+        if (CALLBACK_WINDOW_END(client))
             return;
-        }
         cleanup_keepalive(aTHX_ kc);
     }
 }
@@ -323,16 +316,22 @@ int try_reconnect_keepalive(pTHX_ keepalive_call_t *kc) {
         return 0;
     }
 
-    etcd_stream_failed(client, kc->base.channel_gen);
+    etcd_stream_failed(client, kc->base.channel_gen, kc->established, kc->status, kc->status_details);
+    kc->established = 0;
+    if (kc->attempt_epoch != client->no_leader_epoch) {
+        kc->attempt_epoch = client->no_leader_epoch;
+        kc->reconnect_attempt = 0;
+    }
 
     if (!kc->auto_reconnect || kc->lease_id <= 0
         || kc->reconnect_attempt >= client->max_retries) {
         return 0;
     }
 
-    kc->reconnect_attempt++;
-
-    ev_tstamp delay = RECONNECT_BACKOFF_SECONDS(kc->reconnect_attempt);
+    int no_leader = etcd_is_no_leader(kc->status, kc->status_details);
+    if (!no_leader) kc->reconnect_attempt++;
+    ev_tstamp delay = no_leader ? NO_LEADER_RETRY_SECONDS
+        : RECONNECT_BACKOFF_SECONDS(kc->reconnect_attempt);
     ev_timer_init(&kc->reconnect_timer, keepalive_reconnect_cb, delay, 0.0);
     ev_timer_start(EV_DEFAULT, &kc->reconnect_timer);
 

@@ -25,6 +25,8 @@ subtest 'required and absent options' => sub {
 subtest 'errors name their value source' => sub {
 	my $width = option('width', type => 'i');
 	like dies { $width->readerValue(commandLine => { width => 'x' }) }, qr/^option '--width': 'x' is not an integer/, 'command line wording';
+	like dies { option('w', type => 'int')->readerValue(commandLine => { w => 'x' }) }, qr/^option '-w': 'x' is not an integer/, 'a single-letter name is spelled with one dash';
+	like dies { option('w', type => 'int', required => 1)->readerValue(commandLine => {}) }, qr/^missing required option '-w'/, 'also when it is missing';
 	like dies { $width->readerValue(config => { width => 'x' }) }, qr/^config value for 'width': 'x' is not an integer/, 'config wording';
 };
 

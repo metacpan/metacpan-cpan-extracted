@@ -1,10 +1,10 @@
 {
-   "abstract" : "SelectPdf Online REST API Perl Client (HTML to PDF, PDF merge, PDF to text, search PDF)",
+   "abstract" : "SelectPdf Online REST API Perl Client (HTML to PDF, electronic invoices, PDF merge, PDF to text, search PDF)",
    "author" : [
       "SelectPdf <support@selectpdf.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -42,38 +42,101 @@
    "provides" : {
       "SelectPdf" : {
          "file" : "lib/SelectPdf.pm",
-         "version" : "v1.4.0"
+         "version" : "v1.6.0"
       },
       "SelectPdf::ApiClient" : {
          "file" : "lib/SelectPdf/ApiClient.pm",
-         "version" : "v1.4.0"
+         "version" : "v1.6.0"
+      },
+      "SelectPdf::ApiEnums" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm",
+         "version" : "v1.6.0"
       },
       "SelectPdf::AsyncJobClient" : {
          "file" : "lib/SelectPdf/AsyncJobClient.pm",
-         "version" : "v1.4.0"
+         "version" : "v1.6.0"
+      },
+      "SelectPdf::DemoException" : {
+         "file" : "lib/SelectPdf/DemoExceptions.pm",
+         "version" : "v1.6.0"
+      },
+      "SelectPdf::DemoRateLimitException" : {
+         "file" : "lib/SelectPdf/DemoExceptions.pm"
+      },
+      "SelectPdf::DemoSafetyException" : {
+         "file" : "lib/SelectPdf/DemoExceptions.pm"
+      },
+      "SelectPdf::DemoUnsupportedException" : {
+         "file" : "lib/SelectPdf/DemoExceptions.pm"
       },
       "SelectPdf::HtmlToPdfClient" : {
          "file" : "lib/SelectPdf/HtmlToPdfClient.pm",
-         "version" : "v1.4.0"
+         "version" : "v1.6.0"
+      },
+      "SelectPdf::InvoiceClient" : {
+         "file" : "lib/SelectPdf/InvoiceClient.pm",
+         "version" : "v1.6.0"
+      },
+      "SelectPdf::OutputFormat" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::PageLayout" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::PageMode" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::PageNumbersAlignment" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::PageOrientation" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::PageSize" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
       },
       "SelectPdf::PdfMergeClient" : {
          "file" : "lib/SelectPdf/PdfMergeClient.pm",
-         "version" : "v1.4.0"
+         "version" : "v1.6.0"
+      },
+      "SelectPdf::PdfStandard" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
       },
       "SelectPdf::PdfToTextClient" : {
          "file" : "lib/SelectPdf/PdfToTextClient.pm",
-         "version" : "v1.4.0"
+         "version" : "v1.6.0"
+      },
+      "SelectPdf::RenderingEngine" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::SecureProtocol" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::StartupMode" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::TextLayout" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
       },
       "SelectPdf::UsageClient" : {
          "file" : "lib/SelectPdf/UsageClient.pm",
-         "version" : "v1.4.0"
+         "version" : "v1.6.0"
       },
       "SelectPdf::WebElementsClient" : {
          "file" : "lib/SelectPdf/WebElementsClient.pm",
-         "version" : "v1.4.0"
+         "version" : "v1.6.0"
+      },
+      "SelectPdf::ZugferdProfile" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::ZugferdRelationship" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
+      },
+      "SelectPdf::ZugferdSchema" : {
+         "file" : "lib/SelectPdf/ApiEnums.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "v1.4.0",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "v1.6.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

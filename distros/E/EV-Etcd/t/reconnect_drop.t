@@ -3,6 +3,7 @@
 # the stream by keepalive timeout, SIGCONT lets the reconnect succeed
 use strict;
 use warnings;
+BEGIN { delete @ENV{qw(http_proxy https_proxy grpc_proxy)} }
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
@@ -31,8 +32,17 @@ plan skip_all => 'etcd not reachable' unless $available;
 my $client = EV::Etcd->new(
     endpoints   => ['127.0.0.1:2379'],
     max_retries => 5,
+    keepalive_time => 5,
+    keepalive_timeout => 1,
 );
 my $key = "/test_reconnect_drop_$$";
+
+sub wait_for {
+    my ($condition, $seconds) = @_;
+    my $poll = EV::timer(0.05, 0.05, sub { EV::break if $condition->() });
+    my $guard = EV::timer($seconds, 0, sub { EV::break });
+    EV::run;
+}
 
 my @events;
 my $errors  = 0;
@@ -40,48 +50,45 @@ my $created = 0;
 my $watch = $client->watch($key, { progress_notify => 1 }, sub {
     my ($resp, $err) = @_;
     if ($err) { $errors++; return; }
-    $created ||= $resp->{created};
+    $created++ if $resp->{created};
     push @events, @{$resp->{events} || []};
 });
 ok($watch, 'watch created');
 
 # A put that lands before the watch is registered (created=1) is never delivered
-my $created_check = EV::timer(0.05, 0.05, sub { EV::break if $created });
-my $created_bail  = EV::timer(5, 0, sub { EV::break });
-EV::run;
+wait_for(sub { $created }, 5);
 ok($created, 'watch registered server-side');
 
 my $pre_count = @events;
-$client->put($key, "before", sub { EV::break });
-my $t1 = EV::timer(2, 0, sub { EV::break });
-EV::run;
+my $put_done;
+$client->put($key, "before", sub { $put_done = 1 });
+wait_for(sub { $put_done && @events > $pre_count }, 5);
 ok(@events > $pre_count, 'event delivered before drop');
 
 # Long enough for gRPC keepalive to close the stalled stream
 note("SIGSTOP etcd pid=$etcd_pid");
 kill 'STOP', $etcd_pid;
-my $stop_timer = EV::timer(8, 0, sub { EV::break });
-EV::run;
+wait_for(sub { 0 }, 8);
 
 note("SIGCONT etcd pid=$etcd_pid");
 kill 'CONT', $etcd_pid;
 
 # Give the reconnect machinery time to backoff + re-establish
-my $recover_timer = EV::timer(10, 0, sub { EV::break });
-EV::run;
+wait_for(sub { $created >= 2 || $errors }, 10);
+
+cmp_ok($created, '>=', 2, 'watch was recreated after the stalled connection closed');
+is($errors, 0, 'watch reconnects without a terminal error');
 
 my $mid_count = @events;
-$client->put($key, "after", sub { EV::break });
-my $t2 = EV::timer(5, 0, sub { EV::break });
-EV::run;
+$put_done = 0;
+$client->put($key, "after", sub { $put_done = 1 });
+wait_for(sub { $put_done && @events > $mid_count }, 5);
 
 ok(@events > $mid_count, 'event delivered after auto-reconnect');
 
-$watch->cancel(sub { EV::break });
-my $tc = EV::timer(2, 0, sub { EV::break });
-EV::run;
-$client->delete($key, sub { EV::break });
-my $td = EV::timer(2, 0, sub { EV::break });
-EV::run;
+$watch->cancel(sub {});
+my $deleted;
+$client->delete($key, sub { $deleted = 1 });
+wait_for(sub { $deleted }, 2);
 
 done_testing();

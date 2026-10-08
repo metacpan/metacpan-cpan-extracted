@@ -6,7 +6,7 @@ use Getopt::Pad::Type;
 class Getopt::Pad::Type::Number :isa(Getopt::Pad::Type) :abstract {
 	use Scalar::Util qw(looks_like_number);
 
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 
 	use constant SPEC_KEYS => ['min', 'max'];
 
@@ -30,11 +30,15 @@ class Getopt::Pad::Type::Number :isa(Getopt::Pad::Type) :abstract {
 		return $value + 0;
 	}
 
+	# The bounds are compared as converted, so a subclass whose numbers are
+	# objects (a Math::BigInt) compares them exactly.
 	method check($value) {
 		my $problem = $self->checkFormat($value);
 		return $problem if defined $problem;
-		return sprintf('%s is smaller than the minimum of %s', $value, $min) if defined $min && $value < $min;
-		return sprintf('%s is larger than the maximum of %s', $value, $max)  if defined $max && $value > $max;
+
+		my $number = $self->coerce($value);
+		return sprintf('%s is smaller than the minimum of %s', $value, $min) if defined $min && $number < $self->coerce($min);
+		return sprintf('%s is larger than the maximum of %s', $value, $max)  if defined $max && $number > $self->coerce($max);
 		return undef;
 	}
 }
@@ -86,7 +90,8 @@ C<min MIN is larger than max MAX>);
 
 =item * the value check: first the subclass's C<checkFormat>, then the
 bounds (C<VALUE is smaller than the minimum of MIN>, C<VALUE is larger
-than the maximum of MAX>);
+than the maximum of MAX>), compared after the value and the bound went
+through C<coerce>;
 
 =item * the conversion of the value to a number;
 

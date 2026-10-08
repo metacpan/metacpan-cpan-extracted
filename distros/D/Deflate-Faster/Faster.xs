@@ -15,13 +15,16 @@ SV *
 gzip (plain, level_sv = NULL)
 	SV * plain
 	SV * level_sv
+	ALIAS:
+	    deflate = 1
+	    deflate_raw = 2
 PREINIT:
 	deflate_faster_t df;
 	int is_custom = 0;
 CODE:
 	df.in = plain;
-	df.is_gzip = 1;
-	df.is_raw = 0;
+	df.is_gzip = (ix == 0);
+	df.is_raw = (ix == 2);
 	df.user_object = 0;
 	df.file_name = NULL;
 	df.mod_time = NULL;
@@ -38,96 +41,15 @@ OUTPUT:
 SV *
 gunzip (zipped)
 	SV * zipped
+	ALIAS:
+	    inflate = 1
+	    inflate_raw = 2
 PREINIT:
 	deflate_faster_t df;
 CODE:
 	df.in = zipped;
-	df.is_gzip = 1;
-	df.is_raw = 0;
-	df.user_object = 0;
-	df.file_name = NULL;
-	df.mod_time = NULL;
-	df.copy_perl_flags = 0;
-	df.max_size = 0;
-	RETVAL = deflate_faster_decompress (& df);
-OUTPUT:
-	RETVAL
-
-SV *
-deflate (plain, level_sv = NULL)
-	SV * plain
-	SV * level_sv
-PREINIT:
-	deflate_faster_t df;
-	int is_custom = 0;
-CODE:
-	df.in = plain;
-	df.is_gzip = 0;
-	df.is_raw = 0;
-	df.user_object = 0;
-	df.file_name = NULL;
-	df.mod_time = NULL;
-	df.copy_perl_flags = 0;
-	df.max_size = 0;
-	df.level = parse_level_sv (level_sv, &is_custom);
-	if (is_custom) {
-		df.user_object = 1;
-	}
-	RETVAL = deflate_faster_compress (& df);
-OUTPUT:
-	RETVAL
-
-SV *
-inflate (deflated)
-	SV * deflated
-PREINIT:
-	deflate_faster_t df;
-CODE:
-	df.in = deflated;
-	df.is_gzip = 0;
-	df.is_raw = 0;
-	df.user_object = 0;
-	df.file_name = NULL;
-	df.mod_time = NULL;
-	df.copy_perl_flags = 0;
-	df.max_size = 0;
-	RETVAL = deflate_faster_decompress (& df);
-OUTPUT:
-	RETVAL
-
-SV *
-deflate_raw (plain, level_sv = NULL)
-	SV * plain
-	SV * level_sv
-PREINIT:
-	deflate_faster_t df;
-	int is_custom = 0;
-CODE:
-	df.in = plain;
-	df.is_gzip = 0;
-	df.is_raw = 1;
-	df.user_object = 0;
-	df.file_name = NULL;
-	df.mod_time = NULL;
-	df.copy_perl_flags = 0;
-	df.max_size = 0;
-	df.level = parse_level_sv (level_sv, &is_custom);
-	if (is_custom) {
-		df.user_object = 1;
-	}
-	RETVAL = deflate_faster_compress (& df);
-OUTPUT:
-	RETVAL
-
-SV *
-inflate_raw (deflated)
-	SV * deflated
-PREINIT:
-	deflate_faster_t df;
-CODE:
-	df.in = deflated;
-	df.is_gzip = 0;
-	df.is_raw = 1;
+	df.is_gzip = (ix == 0);
+	df.is_raw = (ix == 2);
 	df.user_object = 0;
 	df.file_name = NULL;
 	df.mod_time = NULL;
@@ -163,6 +85,9 @@ void
 DESTROY (df)
 	Deflate::Faster df
 CODE:
+	if (! df) {
+		return;
+	}
 	if (! df->user_object) {
 		croak ("%s:%d: THIS IS NOT A USER-VISIBLE OBJECT",
 		       __FILE__, __LINE__);
@@ -261,7 +186,7 @@ CODE:
 	if (modtime) {
 		SvGETMAGIC (modtime);
 		if (SvOK (modtime)) {
-			SV * copy = newSVsv_nomg (modtime);
+			SV * copy = newSVuv (parse_mod_time_sv (modtime));
 			df_set_mod_time (df, copy);
 			SvREFCNT_dec (copy);
 			RETVAL = newSVsv (df_get_mod_time (df));

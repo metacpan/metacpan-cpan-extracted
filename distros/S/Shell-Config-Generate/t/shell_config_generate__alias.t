@@ -8,7 +8,6 @@ use TestLib;
 my $dir = tempdir();
 
 my $perl_exe = $^X;
-$perl_exe = Win32::GetShortPathName($perl_exe) if $^O eq 'MSWin32';
 
 my $config = eval { Shell::Config::Generate->new };
 isa_ok $config, 'Shell::Config::Generate';
@@ -28,6 +27,11 @@ do {
 eval { $config->set_alias("myecho1", "$perl_exe $script_name f00f") };
 is $@, '', 'set_alias';
 
+# the string form of set_alias leaves quoting up to the caller, so
+# paths with spaces can't be used here.  The array form, which does
+# quote each word, is tested with spaces in t/shell_config_generate__alias_array.t
+my $has_space = grep /\s/, $perl_exe, $script_name;
+
 foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bsd-csh jsh powershell.exe pwsh fish ))
 {
   subtest $shell => sub {
@@ -36,6 +40,7 @@ foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bs
     my $guess = TestLib::get_guess($shell);
     note $config->generate($guess);
     skip_all "no $shell found" unless defined $shell_path;
+    skip_all "path to perl or test script contains a space" if $has_space;
     skip_all "not testing sh in case it doesn't support aliases" if $shell eq 'sh';
     skip_all "alias may not work with non-interactive cmd.exe or command.com"
       if $shell eq 'cmd.exe' || $shell eq 'command.com';
@@ -61,6 +66,7 @@ subtest 'powershell.exe' => sub {
 
   note $config->generate($guess);
   skip_all "no powershell.exe found" unless defined $shell_path;
+  skip_all "path to perl or test script contains a space" if $has_space;
 
   my $list = get_env($config, $shell, $shell_path, 'myecho1 one two three');
   return unless defined $list;

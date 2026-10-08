@@ -19,7 +19,6 @@ requires 'Scalar::Util';
 requires 'Sub::Private';
 requires 'Sub::Protected';
 requires 'autodie';
-requires 'boolean';
 requires 'strict';
 requires 'warnings';
 recommends 'DBD::Excel';   # .xls (old binary Excel) backend
@@ -29,6 +28,8 @@ recommends 'Gzip::Faster';   # gzip CSV backend
 recommends 'HTML::TableExtract';   # HTML URL backend
 recommends 'JSON::MaybeXS';   # JSON backend
 recommends 'LWP::UserAgent::Cached';   # URL backend (HTML and JSON)
+recommends 'Redis';   # Redis backend (pure-Perl fallback)
+recommends 'Redis::Fast';   # Redis backend (XS, preferred)
 recommends 'Spreadsheet::ParseXLSX';   # .xlsx (OOXML Excel) backend
 recommends 'Text::xSV::Slurp';   # CSV/PSV slurp backend
 recommends 'XML::Simple';   # XML backend
@@ -65,6 +66,7 @@ on 'test' => sub {
 	requires 'Test::Carp';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
+	requires 'Test::Log::Abstraction';
 	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird';
 	requires 'Test::Most';

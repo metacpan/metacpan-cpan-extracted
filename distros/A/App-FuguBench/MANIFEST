@@ -30,11 +30,11 @@ lib/App/FuguBench/Wiki.pm
 lib/App/FuguBench/Wiki.pod
 lib/App/FuguBench/Worktree.pm
 lib/App/FuguBench/Worktree.pod
+man/fugubench/fugubench.1
 t/fugubench/checkout.t
 t/fugubench/cli.t
 t/fugubench/command.t
 t/fugubench/conventions.t
-t/fugubench/deps-conformance.t
 t/fugubench/deps-install.t
 t/fugubench/deps-sums.t
 t/fugubench/deps-tier.t

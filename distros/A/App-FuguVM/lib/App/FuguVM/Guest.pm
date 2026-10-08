@@ -24,7 +24,7 @@ use v5.36;
 # the hypervisor says and not what a sleep guessed.
 
 package App::FuguVM::Guest;
-our $VERSION = '0.3.0';
+our $VERSION = '0.3.1';
 
 use App::FuguVM::Arch;
 use App::FuguVM::Autoinstall;

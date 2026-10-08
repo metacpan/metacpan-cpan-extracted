@@ -8,6 +8,7 @@ use warnings;
 use File::Spec;
 use FindBin qw($Bin);
 use Test::Most tests => 10;
+use Test::Returns;
 
 use lib 't/lib';
 
@@ -36,7 +37,7 @@ if($ENV{'TEST_VERBOSE'}) {
 	diag(Data::Dumper->new([$rc])->Dump());
 }
 
-cmp_ok(scalar(@{$rc}), '==', 3, 'selectall_hashref returns all entries');
+returns_is($rc, { type => 'arrayref', min => 3, max => 3 }, 'selectall_hashref returns all entries');
 
 @rc = $test3->selectall_hash('fr' => 'Deux');
 

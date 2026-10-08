@@ -4,6 +4,8 @@ use SelectPdf::ApiClient;
 use strict;
 our @ISA = qw(SelectPdf::ApiClient);
 
+our $VERSION = '1.6.0';
+
 =head1 NAME
 
 SelectPdf::AsyncJobClient - Get the result of an asynchronous call.
@@ -68,7 +70,10 @@ Returns:
 sub finished() {
     my($self) = @_;
 
-    if ($self->{lastHTTPCode} eq 200) {
+    # 200 OK - the job is finished (successfully).
+    # 202 Accepted - the job is still running.
+    # Some other code - error - the job is finished (with error).
+    if ($self->{lastHTTPCode} ne "" and $self->{lastHTTPCode} != 202) {
         return 1;
     }
     else {

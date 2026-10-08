@@ -5,17 +5,11 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::SS;
 
-# A max_size that needs every slot the map holds can never evict, so the
-# constructor warns.  Under `use warnings FATAL => ...`, or any __WARN__ handler
-# that dies, that warning croaks -- and it used to croak before the handle
-# belonged to any SV, so nothing ever freed the mmap, or the descriptor a memfd
-# map owns.  The object is built first now, with a pending free across the
-# warning that only a survivor cancels.
-#
-# The two ways a warning croaks take different paths through perl: a dying
-# handler runs from the warn hook, FATAL croaks straight out of the warner and
-# never reaches a hook.  The pragma has to be in the scope of the constructor
-# call itself, since the warning bits come from the caller's statement.
+# The unreachable-max_size constructor warning must not leak the mmap, or a
+# memfd's descriptor, when it croaks (a dying __WARN__ handler or `use warnings
+# FATAL`).  The two take different paths through perl, and the pragma must be in
+# the scope of the constructor call itself, since the warning bits come from the
+# caller's statement.
 
 plan skip_all => 'needs /proc for fd and mapping counts' unless -r "/proc/$$/maps";
 
@@ -25,7 +19,6 @@ sub vmas { open my $f, '<', "/proc/$$/maps" or die $!; my $n = 0; $n++ while <$f
 
 my $N = 60;
 
-# The croak has to happen, or the rest of the file proves nothing.
 my $warned = 0;
 {
     local $SIG{__WARN__} = sub { $warned++ };
@@ -75,7 +68,6 @@ for my $what (sort keys %ctor) {
     }
 }
 
-# The object still works when the warning is not fatal, and when there is none.
 {
     my $m = do { local $SIG{__WARN__} = sub {}; Data::HashMap::Shared::SS->new("$dir/ok.shm", 64, 4096) };
     ok $m->put(a => 'b'), 'a map whose warning was not fatal is usable';

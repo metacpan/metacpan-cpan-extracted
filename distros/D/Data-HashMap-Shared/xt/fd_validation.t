@@ -5,7 +5,6 @@ use File::Temp qw(tempdir);
 
 use Data::HashMap::Shared::II;
 
-# 1. /dev/null rejection
 SKIP: {
     open(my $fh, '<', '/dev/null') or skip "no /dev/null", 1;
     my $r = eval { Data::HashMap::Shared::II->new_from_fd(fileno($fh)) };
@@ -13,8 +12,7 @@ SKIP: {
     like $@, qr/(too small|invalid|fstat|corrupt|bad magic|mismatch)/i, 'meaningful error';
 }
 
-# 2. A genuine file whose section offsets were corrupted at rest.  Built by the
-# module, so nothing but the three offsets under test is pinned.
+# A module-built file with only the three offsets under test corrupted.
 {
     my $dir  = tempdir(CLEANUP => 1);
     my $path = "$dir/good.shm";
@@ -38,9 +36,9 @@ SKIP: {
         close $rfh;
     }
 
-    # The occupancy bitmap follows the reader-slot table and is bounded on its
-    # own: a file short by up to its 128 bytes, total_size corrected to match,
-    # keeps the reader slots inside the mapping and only the bitmap outside.
+    # The occupancy bitmap is bounded on its own: a file short by up to its 128
+    # bytes, total_size corrected to match, leaves only the bitmap outside the
+    # mapping.
     for my $cut (1, 128) {
         my $bad = substr($good, 0, length($good) - $cut);
         substr($bad, 32, 8) = pack('Q<', length $bad);
@@ -56,7 +54,6 @@ SKIP: {
     }
 }
 
-# 3. Roundtrip
 {
     my $m = Data::HashMap::Shared::II->new_memfd("t", 64);
     my $m2 = Data::HashMap::Shared::II->new_from_fd($m->memfd);

@@ -7,24 +7,17 @@ use File::Temp qw(tempdir);
 use Data::HashMap::Shared::SS;
 
 # Compaction is priced like a resize, so what triggers it decides whether the
-# map is usable.  Two ways that went wrong, both of which returned perfectly
-# correct answers and so were invisible to every other test here:
-#
-#   * arming on a store that then succeeded after one eviction -- the normal
-#     state of a full LRU cache -- put a whole table scan on every 65th insert
-#     for the rest of the map's life (measured 329x).
-#   * retrying at a fixed rate on an arena that is simply too small, where a
-#     slide can never gather anything (measured 54x on the dist's own
-#     long-string INSERT benchmark, 92x on the fixture below).
-#
-# Absolute timings are not portable, so this prices each case against a roomy
-# map in the same process and bounds the ratio.  A healthy build sits near 1x,
-# so 20x separates it from either defect by a wide margin.
-#
-# The two fixtures reach different code: an LRU cache frees a block of the
-# right class on every eviction, so its stores are never refused and only the
-# arming defect can fire there.  The back-off only ever runs on a refusal, so
-# its fixture is a map that cannot evict and whose arena is entirely live.
+# map is usable.  Two defects return correct answers and no other test sees
+# them:
+#   * arming on a store that then succeeded after one eviction (the normal state
+#     of a full LRU cache) puts a table scan on every 65th insert;
+#   * retrying at a fixed rate on an arena too small for a slide to gather
+#     anything.
+# Absolute timings are not portable, so each case is priced against a roomy map
+# in the same process; a healthy build sits near 1x, so 20x separates it from
+# either defect. An LRU cache never has a store refused, so only the arming
+# defect can fire there; the back-off runs only on a refusal, so its fixture
+# cannot evict and its arena is entirely live.
 
 plan skip_all => 'author tests' unless $ENV{AUTHOR_TESTING};
 my $load = do {
@@ -48,7 +41,6 @@ sub us_per_insert {
     return (time - $t0) * 1e6 / $iters;
 }
 
-# No eviction, and an arena the fill leaves entirely live: nothing to gather.
 sub us_per_refusal {
     my $m = Data::HashMap::Shared::SS->new("$dir/hopeless.shm",
                                            2 * $entries, 0, 0, 0, $entries * 256 + 4096);

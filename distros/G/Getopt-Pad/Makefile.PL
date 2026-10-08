@@ -63,8 +63,9 @@ WriteMakefile(
 		prereqs     => {
 			runtime => {
 				recommends => {
-					'YAML::XS'      => '0',
-					'Term::ReadKey' => '0',
+					'YAML::XS'                  => '0',
+					'Term::ReadKey'             => '0',
+					'DateTime::Format::Natural' => '0',
 				},
 			},
 		},
